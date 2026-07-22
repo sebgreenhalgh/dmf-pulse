@@ -1,0 +1,1 @@
+{"error": {"code": "CONFIG_ENVIRONMENT_INVALID", "issues": [], "message": "environment must be one of: development, test, staging, production, replay"}, "ok": false}

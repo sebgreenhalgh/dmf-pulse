@@ -1,0 +1,368 @@
+{
+  "direct_development": [
+    "build",
+    "coverage",
+    "hatchling",
+    "hypothesis",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "ruff"
+  ],
+  "direct_runtime": [
+    "pydantic",
+    "pyyaml",
+    "typer"
+  ],
+  "generated_at": "2026-07-22T11:01:27Z",
+  "license_discovery": "Installed distribution metadata: License-Expression, then short License, then License classifiers; UNKNOWN is retained when no reliable value is present.",
+  "lock_package_count": 32,
+  "lock_sha256": "5ad433774f60d5a3c50dd0c6a1d9ac7199936952765d18e66e802f9631041d9c",
+  "packages": [
+    {
+      "dependencies": [],
+      "license": "MIT",
+      "name": "annotated-doc",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "0.0.4"
+    },
+    {
+      "dependencies": [],
+      "license": "OSI Approved :: MIT License",
+      "name": "annotated-types",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "0.7.0"
+    },
+    {
+      "dependencies": [
+        "colorama",
+        "packaging",
+        "pyproject-hooks"
+      ],
+      "license": "MIT",
+      "name": "build",
+      "relationships": [
+        "direct-development"
+      ],
+      "version": "1.5.0"
+    },
+    {
+      "dependencies": [],
+      "license": "OSI Approved :: BSD License",
+      "name": "colorama",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "0.4.6"
+    },
+    {
+      "dependencies": [],
+      "license": "Apache-2.0",
+      "name": "coverage",
+      "relationships": [
+        "direct-development"
+      ],
+      "version": "7.15.2"
+    },
+    {
+      "dependencies": [
+        "pydantic",
+        "pyyaml",
+        "typer"
+      ],
+      "license": "LicenseRef-Proprietary",
+      "name": "dmf-pulse",
+      "relationships": [
+        "project"
+      ],
+      "version": "0.1.0"
+    },
+    {
+      "dependencies": [
+        "packaging",
+        "pathspec",
+        "pluggy",
+        "trove-classifiers"
+      ],
+      "license": "MIT",
+      "name": "hatchling",
+      "relationships": [
+        "direct-development"
+      ],
+      "version": "1.31.0"
+    },
+    {
+      "dependencies": [
+        "sortedcontainers"
+      ],
+      "license": "MPL-2.0",
+      "name": "hypothesis",
+      "relationships": [
+        "direct-development"
+      ],
+      "version": "6.159.0"
+    },
+    {
+      "dependencies": [],
+      "license": "MIT",
+      "name": "iniconfig",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "2.3.0"
+    },
+    {
+      "dependencies": [],
+      "license": "MIT",
+      "name": "librt",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "0.13.0"
+    },
+    {
+      "dependencies": [
+        "mdurl"
+      ],
+      "license": "OSI Approved :: MIT License",
+      "name": "markdown-it-py",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "4.2.0"
+    },
+    {
+      "dependencies": [],
+      "license": "OSI Approved :: MIT License",
+      "name": "mdurl",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "0.1.2"
+    },
+    {
+      "dependencies": [
+        "librt",
+        "mypy-extensions",
+        "pathspec",
+        "typing-extensions"
+      ],
+      "license": "MIT",
+      "name": "mypy",
+      "relationships": [
+        "direct-development"
+      ],
+      "version": "1.20.2"
+    },
+    {
+      "dependencies": [],
+      "license": "MIT",
+      "name": "mypy-extensions",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "1.1.0"
+    },
+    {
+      "dependencies": [],
+      "license": "Apache-2.0 OR BSD-2-Clause",
+      "name": "packaging",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "26.2"
+    },
+    {
+      "dependencies": [],
+      "license": "OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+      "name": "pathspec",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "1.1.1"
+    },
+    {
+      "dependencies": [],
+      "license": "MIT",
+      "name": "pluggy",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "1.6.0"
+    },
+    {
+      "dependencies": [
+        "annotated-types",
+        "pydantic-core",
+        "typing-extensions",
+        "typing-inspection"
+      ],
+      "license": "MIT",
+      "name": "pydantic",
+      "relationships": [
+        "direct-runtime"
+      ],
+      "version": "2.13.4"
+    },
+    {
+      "dependencies": [
+        "typing-extensions"
+      ],
+      "license": "MIT",
+      "name": "pydantic-core",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "2.46.4"
+    },
+    {
+      "dependencies": [],
+      "license": "BSD-2-Clause",
+      "name": "pygments",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "2.20.0"
+    },
+    {
+      "dependencies": [],
+      "license": "OSI Approved :: MIT License",
+      "name": "pyproject-hooks",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "1.2.0"
+    },
+    {
+      "dependencies": [
+        "colorama",
+        "iniconfig",
+        "packaging",
+        "pluggy",
+        "pygments"
+      ],
+      "license": "MIT",
+      "name": "pytest",
+      "relationships": [
+        "direct-development"
+      ],
+      "version": "9.1.1"
+    },
+    {
+      "dependencies": [
+        "coverage",
+        "pluggy",
+        "pytest"
+      ],
+      "license": "MIT",
+      "name": "pytest-cov",
+      "relationships": [
+        "direct-development"
+      ],
+      "version": "7.1.0"
+    },
+    {
+      "dependencies": [],
+      "license": "MIT",
+      "name": "pyyaml",
+      "relationships": [
+        "direct-runtime"
+      ],
+      "version": "6.0.3"
+    },
+    {
+      "dependencies": [
+        "markdown-it-py",
+        "pygments"
+      ],
+      "license": "MIT",
+      "name": "rich",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "15.0.0"
+    },
+    {
+      "dependencies": [],
+      "license": "MIT",
+      "name": "ruff",
+      "relationships": [
+        "direct-development"
+      ],
+      "version": "0.15.22"
+    },
+    {
+      "dependencies": [],
+      "license": "ISC License",
+      "name": "shellingham",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "1.5.4"
+    },
+    {
+      "dependencies": [],
+      "license": "Apache 2.0",
+      "name": "sortedcontainers",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "2.4.0"
+    },
+    {
+      "dependencies": [],
+      "license": "OSI Approved :: Apache Software License",
+      "name": "trove-classifiers",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "2026.6.1.19"
+    },
+    {
+      "dependencies": [
+        "annotated-doc",
+        "colorama",
+        "rich",
+        "shellingham"
+      ],
+      "license": "MIT",
+      "name": "typer",
+      "relationships": [
+        "direct-runtime"
+      ],
+      "version": "0.27.0"
+    },
+    {
+      "dependencies": [],
+      "license": "PSF-2.0",
+      "name": "typing-extensions",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "4.16.0"
+    },
+    {
+      "dependencies": [
+        "typing-extensions"
+      ],
+      "license": "MIT",
+      "name": "typing-inspection",
+      "relationships": [
+        "transitive"
+      ],
+      "version": "0.4.2"
+    }
+  ],
+  "platform": {
+    "architecture": "AMD64",
+    "operating_system": "Windows",
+    "python": "3.13.9"
+  },
+  "pyproject_sha256": "10071e346aa15070a71ea56ce9ec7a53c06cd195ce1531a49739d0a12ef2fe0d",
+  "schema_version": "1.0",
+  "unknown_license_packages": []
+}

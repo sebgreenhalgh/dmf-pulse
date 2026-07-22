@@ -1,0 +1,3437 @@
+DMF PULSE — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+======================================================
+
+Document ID: DMFP-00
+Version: 0.9 (Research Baseline)
+Status: Proposed controlling architecture for Sebastian approval
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 16 July 2026
+Primary owner: Sebastian Greenhalgh
+Implementation agent: Codex, under human review
+Supersedes: the FPL-engine portions of the November 2025 DMF Pulse report
+Related internal documents:
+- DMF_Pulse_Report.txt
+- Sebastian_FPL_Analytics_Ecosystem_UPDATED_2025-2030.txt
+- DMF Content Automation Start Plan.txt
+
+IMPORTANT STATUS NOTE
+---------------------
+The 2026/27 Fantasy Premier League game had not yet been officially launched at
+the research cut-off. The Premier League said on 16 July 2026 that launch was
+still forthcoming. Therefore:
+
+1. No 2025/26 scoring, chip, transfer, deadline, price or squad rule is to be
+   treated as authoritative for 2026/27.
+2. All season rules MUST be configuration-driven.
+3. The official 2026/27 rules and game data MUST be captured, diffed and signed
+   off as soon as the game launches.
+4. Any example using 2025/26 rules in this document is explanatory only.
+5. The 2026/27 game configuration is a release-blocking dependency.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable architectural requirement.
+
+SHOULD / SHOULD NOT:
+The default decision. A documented architecture decision record is required to
+deviate.
+
+MAY:
+Optional, provided it does not violate a MUST requirement.
+
+DOCUMENT PURPOSE
+----------------
+This is the controlling document for DMF Pulse: the system intended to help
+Sebastian make the strongest possible sequence of decisions in the 2026/27
+Fantasy Premier League season.
+
+It defines:
+
+- the product mission;
+- what "win FPL" means as a mathematical and operational objective;
+- the boundary between market information and proprietary modelling;
+- the system modules and their dependencies;
+- the canonical decision lifecycle;
+- the treatment of uncertainty;
+- the separation between projections and strategy;
+- the required evidence, auditability and backtesting standards;
+- the minimum viable system to be ready before Gameweek 1;
+- the conditions under which Codex is allowed to implement modules;
+- acceptance criteria for a trustworthy decision engine.
+
+This document does not fully specify each mathematical model. Those decisions
+belong in the numbered module specifications. It does, however, constrain those
+documents so that the overall system remains coherent.
+
+======================================================================
+0. EXECUTIVE DECISION SUMMARY
+======================================================================
+
+0.1 THE PRODUCT IN ONE SENTENCE
+-------------------------------
+DMF Pulse is a market-informed, probabilistic, rolling-horizon FPL decision
+engine that converts football betting markets and other time-stamped information
+into player point distributions, then chooses transfers, squads, line-ups,
+captains and chips to maximise Sebastian's season objective.
+
+0.2 CORE STRATEGIC THESIS
+-------------------------
+The engine will not begin by trying to recreate the entire forecasting operation
+of professional betting markets.
+
+Instead:
+
+    betting markets estimate football outcomes;
+    DMF Pulse translates those outcomes into FPL decisions.
+
+Markets are the primary external information aggregator for football-event
+probabilities. They are not accepted blindly. Pulse will:
+
+- remove bookmaker margin;
+- detect stale or anomalous prices;
+- combine providers;
+- reconcile contradictory markets;
+- correct systematic calibration bias where evidence supports it;
+- understand settlement conditions;
+- supplement missing player markets with transparent models;
+- model FPL-specific variables that sportsbooks do not directly price.
+
+The proprietary advantage is expected to come primarily from:
+
+1. player starting and minutes distributions;
+2. coherent translation from betting markets to FPL scoring distributions;
+3. price-change and team-value decisions;
+4. multi-Gameweek squad and transfer optimisation;
+5. captaincy and chip opportunity-cost modelling;
+6. rank-aware risk strategy;
+7. disciplined use of information available at each deadline;
+8. calibration, decision logging and continual improvement.
+
+0.3 NON-GUARANTEE
+-----------------
+No system can guarantee first place in a competition affected by football
+outcomes, injuries, rotation, ownership, schedule changes and millions of
+opponents.
+
+"Build an engine that will win FPL" is therefore interpreted as:
+
+    build the most rigorous engine practicable for maximising the probability
+    of an exceptional overall finish, including the probability of overall rank
+    1, without pretending that uncertainty can be eliminated.
+
+A poor final rank does not automatically prove the engine was poor, and a strong
+rank does not automatically prove it was good. Evaluation MUST distinguish
+decision quality from realised luck.
+
+0.4 CONTROLLING ARCHITECTURAL DECISIONS
+---------------------------------------
+AD-00-01. Market-first, not market-only.
+Betting markets are the initial anchor for football probabilities. Pulse retains
+proprietary models where markets are absent, thin, incoherent or not directly
+mapped to FPL.
+
+AD-00-02. Distributions, not point estimates.
+The core product is a joint distribution of plausible FPL outcomes. Expected
+points are one summary, not the model.
+
+AD-00-03. Projection is separate from preference.
+A player's football and FPL outcome distribution MUST NOT change because
+Sebastian is chasing rank. Risk preference belongs in the decision layer.
+
+AD-00-04. Rolling horizon.
+Pulse will repeatedly optimise a finite future horizon, implement only the
+current decision, then re-optimise when new information arrives.
+
+AD-00-05. Time-travel-safe data.
+Every recommendation MUST be reconstructible from the information actually
+available at that moment. Backtests MUST NOT use post-deadline odds, line-ups,
+injury news, prices or outcomes.
+
+AD-00-06. Rules are data.
+FPL rules, squad constraints, chips, deadlines and scoring MUST be stored in a
+versioned season configuration and MUST NOT be scattered through code.
+
+AD-00-07. Human-in-the-loop.
+For the first season, Pulse recommends and records; Sebastian confirms and
+executes. No autonomous transfer, captain or chip submission.
+
+AD-00-08. Explainable recommendations.
+Every decision MUST include alternatives, assumptions, uncertainty, marginal
+value, failure scenarios and the reason it changed.
+
+AD-00-09. Fail closed.
+When critical data is stale, missing, unlicensed or internally inconsistent,
+Pulse MUST degrade visibly or refuse to issue a high-confidence recommendation.
+
+AD-00-10. LLMs are outside the numerical truth path.
+Large language models MAY help research, summarise news and draft explanations.
+They MUST NOT silently invent probabilities, odds, player identities, rules or
+solver outputs.
+
+AD-00-11. The FPL engine is upstream of DMF content.
+Content automation consumes approved Pulse outputs. Content performance must
+never influence player projections unless a separately justified variable is
+introduced.
+
+AD-00-12. One validated vertical slice before breadth.
+The first implementation target is:
+
+    time-stamped pre-deadline data
+    -> market probabilities
+    -> player point distributions
+    -> legal squad/captain decision
+    -> reproducible decision package
+    -> ex-ante evaluation
+
+Price rises, chips and rank-aware strategy are added after this slice works.
+
+======================================================================
+1. PRODUCT MISSION, VISION AND DEFINITION OF SUCCESS
+======================================================================
+
+1.1 MISSION
+-----------
+At every FPL decision point, produce the action with the best defensible
+probability-weighted value given:
+
+- the current squad;
+- money in the bank;
+- purchase and selling prices;
+- free transfers;
+- chip inventory;
+- fixtures and deadlines;
+- market-implied football probabilities;
+- player availability and minutes uncertainty;
+- future price changes;
+- future information likely to arrive;
+- Sebastian's current rank and season objective;
+- the decisions available in later Gameweeks.
+
+1.2 VISION
+----------
+By the end of the 2026/27 season, Pulse should function as a decision journal and
+learning system rather than a one-off optimiser.
+
+It should be able to answer:
+
+- What did we know at the deadline?
+- What probability distribution did we assign?
+- What were the best legal alternatives?
+- Why was one action selected?
+- What assumptions dominated the result?
+- What new information changed the recommendation?
+- Was the forecast calibrated?
+- Was the decision correct ex ante, even if the outcome was poor?
+- Where is the engine systematically wrong?
+- Which modules genuinely add value over simple baselines?
+
+1.3 PRIMARY USER
+----------------
+The primary user is Sebastian Greenhalgh operating one official FPL team.
+
+The system is initially optimised for:
+
+- a technically sophisticated user;
+- willingness to inspect uncertainty and assumptions;
+- manual final execution;
+- a high ambition for overall rank;
+- a preference for rigorous, non-hype explanations;
+- acceptance that some recommendations will be counterintuitive;
+- acceptance that an optimal policy can still lose.
+
+1.4 SECONDARY USERS
+-------------------
+Not in the initial build, but supported by the architecture:
+
+- a public DMF projection dashboard;
+- subscribers with their own squads;
+- educational notebooks;
+- content-generation systems;
+- research papers;
+- simulation of alternative manager profiles;
+- a future API or product.
+
+The private engine MUST be correct and auditable before public productisation.
+
+1.5 SUCCESS HIERARCHY
+---------------------
+Success is assessed at five levels.
+
+Level 1 — System integrity
+- correct rules;
+- correct identities;
+- fresh data;
+- reproducible decisions;
+- no leakage;
+- legal FPL actions;
+- reliable deadline operation.
+
+Level 2 — Forecast quality
+- calibrated event probabilities;
+- calibrated starting/minutes probabilities;
+- well-covered FPL point intervals;
+- useful joint simulations;
+- improvement over transparent baselines.
+
+Level 3 — Decision quality
+- higher expected decision value than no-action and simple heuristic policies;
+- sensible marginal transfer and chip values;
+- low avoidable regret;
+- robust behaviour under model uncertainty;
+- coherent treatment of future options.
+
+Level 4 — Season performance
+- strong points total;
+- strong overall rank;
+- effective chips;
+- preserved team value where useful;
+- few unforced decision errors.
+
+Level 5 — Aspirational outcome
+- contend for and maximise the probability of overall rank 1.
+
+Level 5 is the mission aspiration. Levels 1–4 are the engineering and scientific
+standards that can be controlled.
+
+======================================================================
+2. THE DECISION PROBLEM
+======================================================================
+
+2.1 FORMAL VIEW
+---------------
+FPL is a sequential decision problem under partial information.
+
+At time t:
+
+- S_t is the manager state:
+  squad, purchase prices, selling prices, bank, free transfers, chips, rank and
+  relevant league state.
+
+- I_t is the information set:
+  all observations legally and actually available at time t, including odds,
+  fixtures, injuries, predicted line-ups, press information, ownership and
+  model state.
+
+- A(S_t) is the set of legal actions:
+  transfers, chip choices, starting XI, bench order, captain and vice-captain.
+
+- Y_(t:T) is the uncertain future:
+  football events, minutes, injuries, postponements, price changes, ownership
+  changes and opponent decisions.
+
+- U is the terminal utility:
+  the value assigned to final points, final rank, target-rank probability or a
+  combination.
+
+The ideal policy is:
+
+    a*_t = argmax over a in A(S_t)
+           E[ U(S_T, R_T) | S_t, I_t, action a, future policy ]
+
+The exact solution across an entire season is computationally and statistically
+intractable. Pulse will use a rolling-horizon approximation, scenario simulation
+and explicit terminal-value approximations.
+
+2.2 WHY EXPECTED POINTS ALONE ARE INCOMPLETE
+--------------------------------------------
+Expected points are indispensable but not sufficient because:
+
+- transfers alter future squads;
+- purchase prices affect later affordability;
+- free transfers have option value;
+- chips are scarce and have opportunity cost;
+- bench points matter differently under Bench Boost;
+- players and matches are correlated;
+- future information has value;
+- final rank has a nonlinear relationship with points;
+- a late-season manager chasing rank may rationally prefer a different risk
+  profile from a manager defending rank.
+
+The engine MUST nevertheless keep the football projection objective and the
+manager utility objective separate.
+
+2.3 OPERATING OBJECTIVE BY SEASON STAGE
+---------------------------------------
+The default policy will be stage-adaptive, subject to later research in
+DMFP-14.
+
+Preseason and early season:
+- maximise robust expected points;
+- heavily value minutes security and information;
+- avoid overreacting to tiny samples;
+- value squad flexibility and routes to high-upside players;
+- use stronger priors and wider uncertainty;
+- avoid variance for its own sake.
+
+Middle season:
+- maximise rolling expected points over a medium horizon;
+- account for fixture swings, chips and price effects;
+- introduce rank and effective-ownership scenarios without allowing them to
+  distort base projections.
+
+Late season:
+- increasingly optimise probability of a chosen rank target;
+- model competitors and effective ownership;
+- select variance and correlation intentionally;
+- distinguish protecting a lead from chasing a deficit.
+
+Final Gameweeks:
+- use explicit target-rank or opponent-beating probability;
+- shorten the horizon;
+- value tactical leverage;
+- include correlated captaincy and transfer decisions.
+
+These are default strategic regimes, not fixed Gameweek cut-offs. The transition
+SHOULD depend on rank, uncertainty, chip state and the remaining opportunity set.
+
+2.4 CHAMPION UTILITY
+--------------------
+A literal "probability of rank 1" objective is too sparse and unstable early in
+the season. Pulse SHOULD use a smooth surrogate during most of the season, then
+increase weight on target-rank probabilities as the outcome becomes estimable.
+
+Candidate components include:
+
+- expected final points;
+- expected negative log rank;
+- probability of top 100k, 10k, 1k, 100, 10 and 1;
+- probability of beating selected elite-manager or mini-league benchmarks;
+- lower-tail risk;
+- option value;
+- model uncertainty penalty.
+
+A possible research form is:
+
+    Utility =
+        w_points(t) * normalised expected final points
+      + w_rank(t)   * E[-log(final rank)]
+      + w_target(t) * P(final rank <= target)
+      - w_tail(t)   * downside risk
+      + w_option(t) * future flexibility
+
+No weights are authorised by this document. DMFP-14 must research and validate
+them.
+
+2.5 VALUE OF INFORMATION
+------------------------
+Pulse MUST recognise that waiting can be an action.
+
+Examples:
+
+- delaying a transfer may reveal a press conference, training update or European
+  line-up;
+- transferring early may avoid a price rise;
+- holding a Wildcard may allow future fixture confirmation;
+- choosing a flexible squad may reduce the cost of future uncertainty.
+
+For a decision d, Pulse SHOULD estimate:
+
+    value of acting now
+    versus
+    value of waiting for expected information
+    minus
+    expected cost of waiting.
+
+This is particularly important for price decisions and early-season uncertainty.
+
+======================================================================
+3. 2026/27 OPERATING CONTEXT
+======================================================================
+
+3.1 CALENDAR
+------------
+As of the research cut-off:
+
+- the first scheduled Premier League match is Arsenal v Coventry City on
+  Friday 21 August 2026;
+- the final match round is Sunday 30 May 2027;
+- the season contains 33 weekends and five midweek match rounds;
+- fixture dates remain subject to television, cup and European amendments;
+- nine Premier League clubs are involved in UEFA competitions.
+
+Pulse MUST ingest official deadlines and fixture times from current data. It
+MUST NOT infer a deadline from a generic rule such as "90 minutes before the
+first kick-off" unless that rule is confirmed for 2026/27.
+
+3.2 UNUSUALLY HIGH PRESEASON UNCERTAINTY
+----------------------------------------
+The official Premier League's 16 July preseason analysis identified:
+
+- eight new Premier League managers;
+- late returns for players involved deep into the 2026 FIFA World Cup;
+- new signings and tactical changes;
+- less than five weeks between the World Cup final weekend and the opening
+  league fixtures for some players.
+
+Consequences for Pulse:
+
+- historical team-style priors must be down-weighted for changed managers;
+- start and minutes uncertainty must be wider;
+- pre-season line-ups must be treated as noisy evidence, not ground truth;
+- World Cup participation and return date must be explicit covariates;
+- promoted clubs need hierarchical priors and cross-competition uncertainty;
+- market prices may update faster than public statistical models;
+- initial squad optimisation should reward transfer-route flexibility;
+- the engine should avoid false precision.
+
+3.3 RULE UNCERTAINTY
+--------------------
+At the cut-off, the 2026/27 FPL game was not live. The prior 2025/26 game had
+material changes including defensive-contribution points, revised assists, two
+sets of major chips and BPS changes.
+
+Pulse MUST assume that rule changes can materially alter:
+
+- player position value;
+- defensive-midfielder value;
+- bench value;
+- chip opportunity;
+- free-transfer strategy;
+- price-change data;
+- optimisation constraints.
+
+The launch-diff process in DMFP-02 is therefore a critical-path task.
+
+======================================================================
+4. SCOPE
+======================================================================
+
+4.1 IN SCOPE FOR 2026/27
+------------------------
+A. Season and rule configuration
+- squads, formations and club limits;
+- budget and price units;
+- points scoring;
+- transfers and hits;
+- free-transfer accumulation;
+- chips and validity windows;
+- deadlines;
+- automatic substitutions;
+- captain and vice-captain rules.
+
+B. Temporal data foundation
+- official FPL game data;
+- fixtures and amendments;
+- player and team identities;
+- current squad state;
+- odds and market metadata;
+- line-up, availability and injury evidence;
+- price and transfer activity;
+- actual FPL outcomes;
+- ownership and effective ownership where obtainable.
+
+C. Market probability layer
+- odds ingestion;
+- de-vigging;
+- provider consensus;
+- freshness and liquidity;
+- market reconciliation;
+- implied football-event distributions.
+
+D. Proprietary FPL forecasting
+- starts and minutes;
+- goals where player markets are missing;
+- assists;
+- clean sheets;
+- saves;
+- bonus;
+- defensive contributions;
+- cards and negative events;
+- full player FPL point distributions;
+- correlations.
+
+E. Decision models
+- initial squad;
+- line-up and bench order;
+- captain and vice-captain;
+- transfers;
+- rolling multi-Gameweek plans;
+- price-rise/fall decisions;
+- Wildcard;
+- Free Hit;
+- Bench Boost;
+- Triple Captain;
+- rank-aware strategy.
+
+F. Evaluation
+- walk-forward and prequential testing;
+- calibration;
+- distribution scoring;
+- decision-regret analysis;
+- baseline comparisons;
+- prospective season monitoring;
+- model and decision versioning.
+
+G. Delivery
+- command-line workflow;
+- local dashboard or report;
+- decision package;
+- audit trail;
+- alerts for data failures and material recommendation changes.
+
+4.2 DEFERRED BUT ARCHITECTURALLY SUPPORTED
+------------------------------------------
+- public multi-user SaaS;
+- automated FPL action submission;
+- native mobile application;
+- real-time in-match optimisation;
+- betting execution;
+- social-media content generation;
+- fully automated natural-language injury extraction;
+- a general sports-optimisation platform;
+- reinforcement learning trained directly against an FPL environment;
+- proprietary computer-vision tracking.
+
+4.3 OUT OF SCOPE
+----------------
+- promising or claiming guaranteed FPL victory;
+- placing bets or recommending gambling stakes;
+- scraping in breach of terms or access controls;
+- storing data without the necessary rights;
+- using leaked or non-public team information;
+- manipulating FPL ownership or prices;
+- using post-deadline information in historical recommendations;
+- opaque LLM-generated numerical forecasts;
+- optimising public-content engagement inside player decisions;
+- maximising team value as an end in itself;
+- retroactively editing a recorded decision state.
+
+======================================================================
+5. DESIGN PRINCIPLES
+======================================================================
+
+5.1 PROBABILISTIC FIRST
+-----------------------
+Every material unknown SHOULD be represented probabilistically where feasible.
+
+Examples:
+- P(start);
+- minutes distribution;
+- P(clean sheet);
+- goals distribution;
+- points distribution;
+- P(price rise tonight);
+- P(fixture moves);
+- P(player is available);
+- chip-value distribution.
+
+"Likely to start" without a probability is insufficient for the core engine.
+
+5.2 CALIBRATION BEFORE COMPLEXITY
+---------------------------------
+A simpler well-calibrated model is preferred to a more accurate-looking but
+overconfident model.
+
+Model selection MUST consider:
+
+- log score or log loss;
+- Brier score for binary outcomes;
+- continuous ranked probability score for scalar distributions;
+- interval coverage;
+- reliability diagrams;
+- calibration intercept and slope;
+- sharpness conditional on calibration.
+
+Mean absolute error alone is not enough.
+
+5.3 MARKET INFORMATION IS EVIDENCE, NOT TRUTH
+----------------------------------------------
+Market odds include:
+
+- bookmaker margin;
+- favourite-longshot effects;
+- provider-specific pricing;
+- stale prices;
+- low-liquidity noise;
+- settlement-rule differences;
+- correlated or derivative markets;
+- possible limits on player-prop coverage.
+
+Pulse MUST preserve the raw quote and the transformed probability so every
+adjustment can be audited.
+
+5.4 TEMPORAL INTEGRITY
+----------------------
+Every row that can change MUST carry, as applicable:
+
+- event time;
+- provider publication time;
+- ingestion time;
+- effective-from time;
+- effective-to time;
+- source version;
+- raw payload hash.
+
+The system MUST be able to answer "what did Pulse know at 17:42 UTC?"
+
+5.5 COHERENCE
+-------------
+The football simulation must be internally coherent.
+
+Examples:
+- expected player goals cannot materially exceed expected team goals without a
+  flagged reconciliation issue;
+- a player cannot keep a clean sheet when his team does not;
+- a player cannot receive 60-minute clean-sheet points if simulated below the
+  threshold;
+- assists and goals must arise from compatible match events;
+- bonus is allocated among players in the same simulated match;
+- captaincy applies to the simulated player total, not separately to components;
+- double-Gameweek totals preserve match-level dependence.
+
+5.6 MODULARITY
+--------------
+Data acquisition, probability transformation, football simulation, FPL scoring
+and decision utility MUST be separate modules.
+
+A new odds provider should not require rewriting the optimiser.
+A scoring change should not require rewriting football probabilities.
+A rank objective should not alter player goal probabilities.
+
+5.7 REPRODUCIBILITY
+-------------------
+Given:
+
+- code commit;
+- configuration version;
+- model versions;
+- raw-data snapshot hashes;
+- random seed;
+- decision time;
+
+Pulse MUST reproduce the same recommendation and simulation summaries, subject
+only to documented solver nondeterminism.
+
+5.8 ROBUSTNESS
+--------------
+Pulse SHOULD avoid plans that are optimal only under one brittle estimate.
+
+Robustness may include:
+
+- scenario optimisation;
+- uncertainty sets;
+- chance constraints;
+- downside penalties;
+- multiple projection ensembles;
+- sensitivity analysis;
+- safe fallback actions;
+- explicit price of robustness.
+
+Robustness must not become unjustified conservatism.
+
+5.9 OPTION VALUE
+----------------
+A legal future action has value.
+
+Examples:
+- a banked free transfer;
+- money in the bank;
+- a flexible player price point;
+- an unused chip;
+- avoiding a player whose minutes depend on unknown information;
+- preserving a route to a future premium player.
+
+The optimiser MUST NOT treat future flexibility as zero merely because it does
+not score this Gameweek.
+
+5.10 TRANSPARENCY
+-----------------
+Every recommendation MUST reveal:
+
+- expected gain;
+- distribution of gain;
+- horizon;
+- main assumptions;
+- uncertainty;
+- alternative actions;
+- sensitivity;
+- source freshness;
+- model versions;
+- constraints;
+- why it changed.
+
+5.11 GRACEFUL DEGRADATION
+-------------------------
+The system must classify inputs as:
+
+- HEALTHY;
+- DEGRADED;
+- BLOCKING.
+
+Examples:
+- one missing bookmaker may be DEGRADED;
+- no fresh player availability data may be DEGRADED;
+- an unconfirmed FPL rules file is BLOCKING;
+- unresolved duplicate player identities are BLOCKING;
+- a stale deadline is BLOCKING.
+
+5.12 KEEP THE NUMERICAL CORE SMALL
+----------------------------------
+For the preseason MVP:
+
+- prefer a reliable CLI over a complex web application;
+- prefer Postgres plus Parquet over many databases;
+- prefer one proven optimiser over several experimental solvers;
+- prefer manual high-quality availability inputs over unreliable automated NLP;
+- prefer tested deterministic transformations over premature microservices.
+
+======================================================================
+6. HIGH-LEVEL SYSTEM ARCHITECTURE
+======================================================================
+
+6.1 LOGICAL FLOW
+----------------
+
+    External sources
+        |
+        v
+    [A] Acquisition adapters
+        |
+        v
+    [B] Immutable raw event store
+        |
+        v
+    [C] Validation, entity resolution and temporal canonicalisation
+        |
+        +------------------------------+
+        |                              |
+        v                              v
+    [D] Market probability core     [E] FPL/football context
+        |                              |
+        +---------------+--------------+
+                        |
+                        v
+              [F] Availability and minutes
+                        |
+                        v
+              [G] Football event engine
+                        |
+                        v
+              [H] FPL points simulator
+                        |
+          +-------------+-------------+
+          |                           |
+          v                           v
+    [I] Price/team value        [J] Ownership/rank model
+          |                           |
+          +-------------+-------------+
+                        |
+                        v
+              [K] Decision optimiser
+                        |
+                        v
+              [L] Explanation and UI
+                        |
+                        v
+              [M] Decision journal
+                        |
+                        v
+              [N] Evaluation and learning
+
+6.2 PHYSICAL DEPLOYMENT — MVP
+-----------------------------
+Recommended initial topology:
+
+- one Git repository;
+- Python application;
+- PostgreSQL database;
+- local or S3-compatible object store for immutable raw payloads;
+- Parquet analytical snapshots;
+- scheduled CLI jobs;
+- one optimiser process;
+- one local dashboard or generated HTML report;
+- GitHub Actions for tests;
+- encrypted secret management;
+- no microservices unless operational evidence justifies them.
+
+6.3 LATER DEPLOYMENT
+--------------------
+The architecture MAY later split into:
+
+- ingestion service;
+- projection service;
+- optimisation service;
+- reporting service;
+- public API.
+
+The module contracts in this document must remain valid across deployment
+changes.
+
+======================================================================
+7. MODULE MAP AND RESPONSIBILITIES
+======================================================================
+
+7.1 DMFP-01 — RESEARCH STANDARD AND EVIDENCE REGISTER
+-----------------------------------------------------
+Purpose:
+Control how claims, APIs, models and implementation choices are researched.
+
+Must define:
+- source hierarchy;
+- evidence grading;
+- source freshness;
+- reproducibility requirements;
+- how preprints are distinguished from peer-reviewed work;
+- how conflicting evidence is resolved;
+- citation and research-update format.
+
+7.2 DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+---------------------------------------------------------
+Purpose:
+Represent the official 2026/27 game exactly.
+
+Must own:
+- scoring;
+- positions;
+- budget;
+- squad and formation constraints;
+- club limit;
+- transfers;
+- hits;
+- selling-price calculation;
+- automatic substitutions;
+- captaincy;
+- chips;
+- validity windows;
+- deadlines;
+- rule provenance.
+
+No other module may hard-code these values.
+
+7.3 DMFP-03 — CANONICAL DATA MODEL AND IDENTIFIERS
+--------------------------------------------------
+Purpose:
+Create one stable identity layer across providers and time.
+
+Must own:
+- seasons;
+- Gameweeks;
+- clubs;
+- players;
+- fixtures;
+- markets;
+- selections;
+- provider identifiers;
+- odds snapshots;
+- manager states;
+- decisions;
+- model versions;
+- mapping confidence;
+- player transfers and name changes.
+
+7.4 DMFP-04 — DATA SOURCES, MARKETS, APIS AND LICENSING
+-------------------------------------------------------
+Purpose:
+Select legally usable providers.
+
+Must research and decide:
+- FPL game endpoints;
+- fixture feeds;
+- current odds;
+- historical odds;
+- player props;
+- line-ups;
+- injuries;
+- event statistics;
+- ownership;
+- price and transfer activity;
+- costs;
+- rate limits;
+- retention rights;
+- commercial rights;
+- fallback providers.
+
+A provider proof-of-access is required before its data becomes a core
+dependency.
+
+7.5 DMFP-05 — INGESTION, STORAGE AND DATA QUALITY
+-------------------------------------------------
+Purpose:
+Build the temporal data foundation.
+
+Must own:
+- raw payload preservation;
+- idempotent ingestion;
+- schedules;
+- retries;
+- validation;
+- quarantine;
+- freshness;
+- immutable snapshots;
+- historical reconstruction;
+- schema evolution;
+- provider outages.
+
+7.6 DMFP-06 — ODDS NORMALISATION AND MARKET CONSENSUS
+-----------------------------------------------------
+Purpose:
+Convert raw prices into coherent probability evidence.
+
+Must own:
+- implied probabilities;
+- margin removal;
+- exchange commission;
+- provider weighting;
+- stale quote detection;
+- outlier detection;
+- liquidity;
+- favourite-longshot correction;
+- market consensus;
+- uncertainty from disagreement;
+- settlement-rule normalisation;
+- cross-market reconciliation.
+
+7.7 DMFP-07 — PLAYER AVAILABILITY, START AND MINUTES MODEL
+---------------------------------------------------------
+Purpose:
+Estimate the player's opportunity to score FPL points.
+
+Must output:
+- P(start);
+- P(any appearance);
+- P(60+ minutes);
+- minutes distribution conditional on start;
+- substitute-minutes distribution;
+- P(zero minutes);
+- availability state;
+- evidence list;
+- uncertainty decomposition.
+
+This module must be able to accept manual overrides with provenance.
+
+7.8 DMFP-08 — FOOTBALL EVENT DISTRIBUTION ENGINE
+------------------------------------------------
+Purpose:
+Create coherent match and player event scenarios.
+
+Must model:
+- team goals;
+- player goals;
+- assists;
+- clean sheets;
+- goals conceded;
+- saves and penalties;
+- cards;
+- defensive events;
+- relevant correlations;
+- missing-market fallbacks.
+
+It must reconcile player and team markets rather than double count them.
+
+7.9 DMFP-09 — FPL POINTS DISTRIBUTION ENGINE
+--------------------------------------------
+Purpose:
+Apply configured FPL rules to simulated football events.
+
+Must output, per player and horizon:
+- expected points;
+- median;
+- variance;
+- quantiles;
+- P(0), P(1+), P(2+), P(5+), P(10+), P(15+);
+- component expectations;
+- match and Gameweek simulations;
+- correlations with relevant alternatives.
+
+7.10 DMFP-10 — UNCERTAINTY, SCENARIOS AND EARLY-SEASON POLICY
+-------------------------------------------------------------
+Purpose:
+Control epistemic uncertainty and model risk.
+
+Must own:
+- prior construction;
+- hierarchical shrinkage;
+- scenario weights;
+- model ensembles;
+- uncertainty widening;
+- early-season policy;
+- promoted-team treatment;
+- new-manager treatment;
+- value of information;
+- robust decision settings.
+
+7.11 DMFP-11 — PRICE CHANGE AND TEAM VALUE MODEL
+------------------------------------------------
+Purpose:
+Forecast price rises/falls and the decision value of acting early.
+
+Must output:
+- P(rise next update);
+- P(fall next update);
+- future price distribution;
+- confidence;
+- early-transfer value;
+- information-risk cost.
+
+7.12 DMFP-12 — SQUAD, TRANSFER AND LINE-UP OPTIMISER
+----------------------------------------------------
+Purpose:
+Select legal actions across a rolling horizon.
+
+Must own:
+- initial squad;
+- transfers;
+- starting XI;
+- bench order;
+- captain/vice constraints;
+- bank and selling prices;
+- hits;
+- free transfers;
+- terminal value;
+- scenario optimisation;
+- alternative plans;
+- marginal transfer values.
+
+7.13 DMFP-13 — CAPTAINCY AND CHIP OPTIMISER
+-------------------------------------------
+Purpose:
+Value captaincy and each chip against future alternatives.
+
+Must own:
+- captain;
+- vice-captain;
+- Triple Captain;
+- Bench Boost;
+- Free Hit;
+- Wildcard;
+- future chips introduced by rules;
+- opportunity cost;
+- scenario-aware chip value.
+
+7.14 DMFP-14 — RANK, EFFECTIVE OWNERSHIP AND RISK STRATEGY
+----------------------------------------------------------
+Purpose:
+Convert base projections into a manager-specific utility.
+
+Must own:
+- effective ownership;
+- field-score simulation;
+- rank transitions;
+- target-rank probability;
+- mini-league opponents;
+- leverage;
+- correlation;
+- stage-dependent risk.
+
+It MUST NOT modify the base player projections.
+
+7.15 DMFP-15 — BACKTESTING, CALIBRATION AND BENCHMARKS
+------------------------------------------------------
+Purpose:
+Determine whether forecasts and decisions add value.
+
+Must own:
+- walk-forward design;
+- information cut-offs;
+- baselines;
+- proper scoring rules;
+- decision regret;
+- ablations;
+- confidence intervals;
+- prospective evaluation;
+- model promotion gates.
+
+7.16 DMFP-16 — ORCHESTRATION, APIS AND DECISION PIPELINE
+--------------------------------------------------------
+Purpose:
+Run modules in the correct order and at the correct time.
+
+Must own:
+- job graph;
+- schedules;
+- retries;
+- deadline workflow;
+- internal APIs;
+- caching;
+- re-runs;
+- states;
+- feature flags;
+- manual overrides;
+- decision freeze.
+
+7.17 DMFP-17 — OBSERVABILITY, REPRODUCIBILITY, SECURITY AND COMPLIANCE
+---------------------------------------------------------------------
+Purpose:
+Keep the system reliable and lawful.
+
+Must own:
+- logs;
+- metrics;
+- alerts;
+- secrets;
+- backups;
+- source rights;
+- model registry;
+- dataset versions;
+- privacy;
+- incident response;
+- disaster recovery.
+
+7.18 DMFP-18 — DECISION UI, REPORTING AND EXPLANATIONS
+------------------------------------------------------
+Purpose:
+Make the engine usable under deadline pressure.
+
+Must own:
+- current recommendation;
+- alternative actions;
+- gains;
+- uncertainty;
+- stale-data warnings;
+- sensitivity;
+- assumption display;
+- change log;
+- approval and decision journal.
+
+7.19 DMFP-19 — CODEX IMPLEMENTATION ROADMAP AND ACCEPTANCE TESTS
+---------------------------------------------------------------
+Purpose:
+Translate approved specifications into small, testable implementation units.
+
+7.20 DMFP-20 — ASSUMPTIONS, DECISIONS AND OPEN QUESTIONS
+--------------------------------------------------------
+Purpose:
+Maintain the architecture decision record and prevent repeated debate.
+
+======================================================================
+8. CORE DATA AND INTERFACE CONTRACTS
+======================================================================
+
+The exact schemas belong in DMFP-03. The following fields are mandatory
+architectural concepts.
+
+8.1 ODDS SNAPSHOT
+-----------------
+Illustrative contract:
+
+{
+  "snapshot_id": "uuid",
+  "season": "2026/27",
+  "fixture_id": "canonical-fixture-id",
+  "provider": "provider-name",
+  "bookmaker_or_exchange": "source-name",
+  "market_type": "player_anytime_goal",
+  "selection_id": "canonical-player-id",
+  "provider_market_id": "external-id",
+  "provider_selection_id": "external-id",
+  "line": null,
+  "decimal_odds": 2.10,
+  "available_back_size": null,
+  "available_lay_size": null,
+  "market_status": "open",
+  "settlement_rule_id": "rule-version",
+  "provider_timestamp_utc": "timestamp",
+  "ingested_at_utc": "timestamp",
+  "raw_payload_hash": "sha256",
+  "license_policy_id": "policy-version"
+}
+
+Requirements:
+- raw odds are never overwritten;
+- updates create new snapshots;
+- settlement rule is explicit;
+- provider and ingestion time are both retained;
+- unresolved selection mapping blocks use.
+
+8.2 MARKET PROBABILITY
+----------------------
+{
+  "probability_id": "uuid",
+  "market_key": "canonical-key",
+  "as_of_utc": "timestamp",
+  "raw_implied_probability": 0.4762,
+  "margin_method": "power",
+  "fair_probability": 0.4520,
+  "consensus_probability": 0.4485,
+  "lower_probability": 0.4200,
+  "upper_probability": 0.4800,
+  "provider_count": 7,
+  "market_disagreement": 0.018,
+  "freshness_seconds": 180,
+  "confidence_grade": "B",
+  "transformation_version": "odds-core-v0.3"
+}
+
+8.3 PLAYER AVAILABILITY FORECAST
+--------------------------------
+{
+  "player_id": "canonical-player-id",
+  "fixture_id": "canonical-fixture-id",
+  "as_of_utc": "timestamp",
+  "p_start": 0.78,
+  "p_appearance": 0.91,
+  "p_60_plus": 0.69,
+  "p_zero_minutes": 0.09,
+  "minutes_quantiles": {
+    "p10": 0,
+    "p25": 25,
+    "p50": 76,
+    "p75": 90,
+    "p90": 90
+  },
+  "evidence": [
+    "official-status",
+    "manager-press-conference",
+    "recent-starts",
+    "world-cup-return"
+  ],
+  "manual_override": false,
+  "model_version": "minutes-v0.2",
+  "confidence_grade": "C"
+}
+
+8.4 PLAYER POINT DISTRIBUTION
+-----------------------------
+{
+  "player_id": "canonical-player-id",
+  "gameweek": 1,
+  "as_of_utc": "timestamp",
+  "simulation_count": 50000,
+  "expected_points": 5.84,
+  "median_points": 4.0,
+  "variance": 19.3,
+  "quantiles": {
+    "p05": 0,
+    "p10": 1,
+    "p25": 2,
+    "p50": 4,
+    "p75": 8,
+    "p90": 12,
+    "p95": 15
+  },
+  "probabilities": {
+    "zero": 0.06,
+    "five_plus": 0.43,
+    "ten_plus": 0.17,
+    "fifteen_plus": 0.05
+  },
+  "component_expectations": {
+    "appearance": 1.72,
+    "goals": 2.10,
+    "assists": 0.78,
+    "clean_sheet": 0.31,
+    "saves": 0.0,
+    "bonus": 0.79,
+    "defensive_contribution": 0.26,
+    "negative_events": -0.12
+  },
+  "projection_version": "points-v0.4",
+  "source_snapshot_bundle": "bundle-hash"
+}
+
+8.5 MANAGER STATE
+-----------------
+Must include:
+- season;
+- as-of time;
+- current squad;
+- purchase price;
+- current price;
+- selling price;
+- bank;
+- free transfers;
+- chip availability;
+- active chip;
+- current Gameweek;
+- points;
+- rank;
+- mini-league state where authorised;
+- source and verification status.
+
+8.6 DECISION RECOMMENDATION
+---------------------------
+{
+  "decision_id": "uuid",
+  "decision_time_utc": "timestamp",
+  "information_cutoff_utc": "timestamp",
+  "manager_state_hash": "sha256",
+  "source_bundle_hash": "sha256",
+  "objective_mode": "robust_points",
+  "horizon_gameweeks": [1, 2, 3, 4, 5, 6],
+  "recommended_action": {
+    "transfers": [],
+    "chip": null,
+    "starting_xi": [],
+    "bench_order": [],
+    "captain": "player-id",
+    "vice_captain": "player-id"
+  },
+  "expected_value_vs_baseline": 3.8,
+  "gain_quantiles": {
+    "p10": -2.1,
+    "p50": 2.9,
+    "p90": 11.4
+  },
+  "alternatives": [],
+  "binding_constraints": [],
+  "key_assumptions": [],
+  "material_risks": [],
+  "sensitivity": [],
+  "data_health": "HEALTHY",
+  "model_versions": {},
+  "solver_version": "string",
+  "code_commit": "git-sha",
+  "approved_by_human": false
+}
+
+8.7 DECISION JOURNAL ENTRY
+--------------------------
+After Sebastian acts, record:
+
+- recommendation;
+- actual chosen action;
+- any deviation;
+- reason for deviation;
+- information seen outside the engine;
+- confidence;
+- later outcome;
+- ex-ante evaluation;
+- post-outcome reflection kept separate from the original record.
+
+The original decision record MUST be immutable.
+
+======================================================================
+9. DATA SOURCE STRATEGY
+======================================================================
+
+9.1 SOURCE CLASSES
+------------------
+Tier A — Authoritative game state
+- official FPL game data;
+- official Premier League fixtures and amendments;
+- official rules;
+- official club/player availability announcements where available.
+
+Tier B — Market evidence
+- betting exchange prices and volume;
+- regulated bookmaker odds;
+- odds aggregators with clear provenance;
+- historical snapshots.
+
+Tier C — Football context
+- line-up providers;
+- injuries and suspensions;
+- press conferences;
+- match statistics;
+- European and cup schedules;
+- travel and rest.
+
+Tier D — FPL strategic context
+- ownership;
+- transfers in/out;
+- price history;
+- effective ownership;
+- elite-manager ownership where lawful and technically available.
+
+Tier E — Manual evidence
+- Sebastian's verified observations;
+- manual line-up overrides;
+- provider outage corrections;
+- explicitly documented assumptions.
+
+9.2 FPL DATA ACCESS
+-------------------
+The FPL web application exposes JSON endpoints, including the widely used
+bootstrap-static and fixtures endpoints. They are useful but publicly accessible
+does not mean contractually stable or formally supported.
+
+Therefore:
+- adapters MUST tolerate schema change;
+- raw payloads MUST be retained;
+- endpoint availability MUST be monitored;
+- no endpoint is assumed permanent;
+- authenticated endpoints require separate security review;
+- rules and deadlines are verified against the official game interface.
+
+9.3 ODDS PROVIDER ABSTRACTION
+-----------------------------
+Current research shows a fragmented market:
+
+- Betfair provides an Exchange API with odds and volume access plus a historical
+  data service.
+- The Odds API provides historical snapshots and EPL player props, but its
+  documented soccer player-prop coverage is limited to selected US bookmakers,
+  and historical event odds require paid access.
+- Sportradar documents player props for top soccer leagues and enterprise-grade
+  odds feeds.
+- OpticOdds documents historical odds, player props, injuries, rosters and
+  starting line-ups.
+- Provider coverage, price, retention rights and geographical access must be
+  verified by proof-of-access.
+
+Architectural consequence:
+- define one canonical market schema;
+- implement provider adapters;
+- never let provider-specific IDs reach projection or optimisation code;
+- support at least one fallback;
+- make provider coverage visible by fixture and player;
+- store provider terms/version metadata;
+- block commercial output if rights are unclear.
+
+9.4 MINIMUM MARKET SET
+----------------------
+Preferred markets, in descending architectural value:
+
+Core team markets:
+- match 1X2;
+- Asian handicap;
+- total goals;
+- team total goals;
+- both teams to score;
+- clean sheet or opponent to score zero;
+- correct score where useful for reconciliation.
+
+Core player markets:
+- anytime goalscorer;
+- two-or-more goals or player goal line;
+- assist;
+- shots;
+- shots on target;
+- goalkeeper saves;
+- cards;
+- player-specific lines where relevant.
+
+Supporting markets:
+- penalty markets;
+- first goalscorer;
+- player to score or assist;
+- same-game combinations only if dependencies and margin can be handled.
+
+The MVP is viable with team totals, clean-sheet probabilities, anytime scorer
+markets and a strong minutes layer. Assist and bonus estimates can initially be
+hybrid models.
+
+9.5 SETTLEMENT RULE PROBLEM
+---------------------------
+Player-market odds cannot be interpreted until settlement rules are understood.
+
+Examples of possible differences:
+- bet void if player does not start;
+- bet active if player appears at any time;
+- dead-heat or special settlement;
+- extra time excluded;
+- named-player replacement rules;
+- abandoned match rules.
+
+Pulse MUST attach a settlement-rule profile to every player market and transform
+the probability consistently with the minutes model.
+
+9.6 DATA RETENTION
+------------------
+Pulse requires historical snapshots to backtest honestly.
+
+Preferred retention:
+- all raw FPL payloads at each scheduled ingest;
+- every odds update allowed by license;
+- provider timestamps;
+- all transformations;
+- every pre-deadline source bundle;
+- every recommendation;
+- all actual outcomes.
+
+If a license forbids storing raw odds:
+- store only permitted derived values;
+- record the restriction;
+- preserve reproducibility to the maximum lawful extent;
+- do not claim complete historical reproducibility.
+
+======================================================================
+10. MARKET-INFORMED FORECASTING POLICY
+======================================================================
+
+10.1 RESEARCH BASIS
+-------------------
+Research supports using betting prices as a strong forecasting benchmark and as
+an input to statistical football models. Published and emerging work has shown:
+
+- hierarchical football models can blend historical data with bookmaker odds;
+- market calibration can dominate purely model-based parameters;
+- odds-to-probability conversion method matters;
+- margin removal alone may not remove favourite-longshot bias;
+- calibration is essential when probabilities feed decisions.
+
+Pulse treats these findings as a design hypothesis to validate, not as proof
+that every market is perfectly efficient.
+
+10.2 MARKET-FIRST HIERARCHY
+---------------------------
+For a football quantity q:
+
+1. Use a fresh, liquid, well-defined market consensus where available.
+2. Reconcile multiple related markets into a coherent distribution.
+3. Add player availability/minutes treatment.
+4. Use proprietary models to fill missing components.
+5. Shrink weak proprietary estimates toward market or hierarchical priors.
+6. Expose residual disagreement and uncertainty.
+
+10.3 AVOIDING DOUBLE COUNTING
+-----------------------------
+Do not independently combine:
+
+- a team total goal market;
+- player anytime goalscorer markets;
+- a historical player xG model;
+
+as though they were independent pieces of evidence.
+
+DMFP-08 must define a reconciliation procedure. Candidate approaches include:
+
+- constrained optimisation so player intensities sum to team intensity;
+- Bayesian calibration with the market as prior or likelihood;
+- latent match-intensity model jointly fitted to market probabilities;
+- iterative proportional fitting;
+- simulation weighting.
+
+10.4 MARGIN REMOVAL
+-------------------
+The first implementation may include:
+
+- multiplicative normalisation;
+- power method;
+- Shin method where applicable;
+- exchange back/lay midpoint with commission treatment;
+- a learned favourite-longshot correction.
+
+No method is selected globally by this file. DMFP-06 must compare them
+out-of-sample by market type and provider.
+
+10.5 MARKET UNCERTAINTY
+-----------------------
+Uncertainty should increase when:
+
+- few providers quote the market;
+- books disagree;
+- liquidity is low;
+- prices are stale;
+- line-ups are unknown;
+- settlement rules differ;
+- the quote moved sharply;
+- the market is derivative or highly margined;
+- provider mappings are uncertain.
+
+Market consensus MUST produce an uncertainty measure, not only a mean.
+
+10.6 MARKET MISSINGNESS
+-----------------------
+Missing a player prop is informative only after checking provider coverage. It
+may mean:
+
+- player unlikely to start;
+- player not offered due low demand;
+- provider omitted the market;
+- feed is incomplete;
+- player identity failed;
+- market not yet open.
+
+Pulse MUST NOT convert market absence directly into zero probability.
+
+======================================================================
+11. UNCERTAINTY ARCHITECTURE
+======================================================================
+
+11.1 UNCERTAINTY TYPES
+----------------------
+Aleatoric uncertainty:
+Irreducible football randomness.
+
+Epistemic uncertainty:
+Uncertainty because the model or data lacks knowledge.
+
+Market uncertainty:
+Margin, disagreement, liquidity, staleness and coverage.
+
+Availability uncertainty:
+Injury, selection, rotation and substitutions.
+
+Structural uncertainty:
+Wrong model family, changed manager, changed role or changed rules.
+
+Operational uncertainty:
+API outages, mapping failures, delayed data and solver failures.
+
+Strategic uncertainty:
+Future ownership, rival actions, fixture rearrangements and chip usage.
+
+These MUST be distinguishable in diagnostics where practicable.
+
+11.2 EARLY-SEASON POLICY
+------------------------
+The opening Gameweeks require wider epistemic uncertainty.
+
+Pulse SHOULD:
+
+- use stronger hierarchical shrinkage;
+- widen player-role and minutes distributions;
+- increase promoted-team uncertainty;
+- down-weight old-manager tactical data after a managerial change;
+- model World Cup return and preseason load;
+- value players with secure roles;
+- reward flexible price structures;
+- avoid aggressive long-horizon certainty;
+- update rapidly after each line-up and match;
+- track whether the market had already incorporated new information.
+
+11.3 ROBUST DECISIONS
+---------------------
+The optimiser SHOULD produce at least:
+
+- expected-value plan;
+- robust plan;
+- high-upside plan;
+- no-action baseline.
+
+The robust plan may optimise:
+
+- expected value minus uncertainty penalty;
+- conditional value at risk;
+- worst-case value over a calibrated scenario set;
+- chance constraints;
+- regret across model ensembles.
+
+The selected method must state the price paid in nominal expected points for
+robustness.
+
+11.4 SENSITIVITY
+----------------
+Every material decision should be stress-tested against:
+
+- start probability;
+- minutes;
+- one key market probability;
+- price-change probability;
+- planning horizon;
+- terminal transfer value;
+- alternative de-vigging method;
+- fixture status;
+- ownership estimate;
+- chip opportunity assumptions.
+
+A recommendation that reverses under a tiny plausible change is fragile and
+must be labelled.
+
+======================================================================
+12. DECISION ENGINE ARCHITECTURE
+======================================================================
+
+12.1 SEPARATION OF LAYERS
+-------------------------
+Projection layer:
+"What can happen, with what probability?"
+
+Decision layer:
+"What should Sebastian do, given preferences and constraints?"
+
+Explanation layer:
+"Why, compared with what?"
+
+This separation is mandatory.
+
+12.2 INITIAL SQUAD
+------------------
+The initial-squad optimiser must consider:
+
+- first-horizon expected points;
+- captaincy coverage;
+- player minutes security;
+- bench viability;
+- price structure;
+- likely early transfers;
+- fixture rotations;
+- club concentrations;
+- high-upside routes;
+- uncertainty;
+- expected price changes;
+- the value of waiting for information;
+- potential early Wildcard policy if rules allow.
+
+The initial team SHOULD not be selected by summing six Gameweeks of expected
+points with no future-transfer model.
+
+12.3 ROLLING TRANSFER HORIZON
+-----------------------------
+Recommended initial planning horizon:
+- six Gameweeks for normal transfer planning;
+- longer lightweight terminal value;
+- shorter horizon near blank/double Gameweeks or season end.
+
+At each decision:
+1. optimise a plan over the horizon;
+2. implement only the immediate action;
+3. retain future steps as contingent guidance;
+4. update when information changes.
+
+12.4 FREE TRANSFER VALUE
+------------------------
+A free transfer has nonzero option value.
+
+The optimiser should account for:
+- ability to react to injury;
+- ability to attack a future fixture swing;
+- ability to execute a two-transfer structure;
+- chip preparation;
+- price movement;
+- uncertainty resolution.
+
+Rolling a transfer may be optimal even if a small immediate expected-points gain
+exists.
+
+12.5 TRANSFER HITS
+------------------
+A hit is not evaluated as simply:
+
+    projected points in - projected points out > hit cost.
+
+It must include:
+- horizon points;
+- captaincy effects;
+- bench effects;
+- future transfers avoided;
+- price and affordability;
+- injury risk;
+- option value;
+- chip interaction;
+- rank utility;
+- uncertainty.
+
+12.6 CAPTAINCY
+--------------
+Captaincy must use the full joint points distribution and start risk.
+
+The decision package should show:
+- expected captain points;
+- P(blank);
+- P(10+ raw points);
+- upside quantiles;
+- vice-captain activation probability;
+- correlation with the rest of the squad;
+- effective ownership where relevant;
+- expected rank impact by scenario.
+
+12.7 CHIP OPPORTUNITY COST
+--------------------------
+A chip's value is incremental relative to the best policy without using it now.
+
+Triple Captain:
+Value of the extra captain multiplier now versus future opportunities.
+
+Bench Boost:
+Bench points gained now, minus squad-structure and transfer costs, versus future
+opportunities.
+
+Free Hit:
+Temporary optimal squad value minus best non-Free-Hit policy, including hits and
+long-term squad damage avoided.
+
+Wildcard:
+Value of immediate squad reset over the future horizon versus normal transfers,
+including information value and future Wildcard opportunities.
+
+The number, timing and rules of chips remain provisional until 2026/27 launch.
+
+12.8 PRICE DECISIONS
+--------------------
+Pulse must distinguish:
+
+- predicting a price change;
+- valuing the price change;
+- recommending an early transfer.
+
+An early transfer is justified only if:
+
+    expected affordability/team-value benefit
+    + expected points benefit of acting
+    >
+    expected cost of injury, rotation, new information and lost flexibility.
+
+12.9 RANK-AWARE STRATEGY
+------------------------
+Rank awareness begins with a field model, not slogans such as "take more risks."
+
+Pulse should estimate:
+- effective ownership;
+- captaincy effective ownership;
+- score distribution of nearby ranks;
+- rank gain/loss by player scenario;
+- correlations;
+- target-rank probability.
+
+A differential is valuable only when its expected utility exceeds the
+alternative. Low ownership is not intrinsically good.
+
+======================================================================
+13. DECISION OPERATING CYCLE
+======================================================================
+
+13.1 PRESEASON CYCLE
+--------------------
+Daily:
+- ingest official fixture changes;
+- update club and player rosters;
+- ingest preseason minutes and roles where licensed/available;
+- track World Cup return dates;
+- update new-manager tactical uncertainty;
+- ingest opening odds as markets appear;
+- run initial-squad scenarios;
+- record recommendation changes.
+
+Before the official FPL launch:
+- architecture and provider proof-of-access;
+- no final player-price optimisation.
+
+Immediately after launch:
+- snapshot full rules and game data;
+- diff against 2025/26;
+- create signed season configuration;
+- map all FPL players;
+- import prices and positions;
+- run rules tests;
+- block recommendations until validation passes.
+
+Final seven days before GW1:
+- run multiple daily projection builds;
+- run deadline-time dry runs;
+- test provider outage fallback;
+- produce initial squad families;
+- monitor expected price ownership only as context;
+- freeze and record final decision package.
+
+13.2 NORMAL GAMEWEEK CYCLE
+--------------------------
+After deadline:
+- freeze source bundle and recommendation;
+- record chosen action;
+- do not alter original decision;
+- ingest actual line-ups and results for evaluation.
+
+After matches:
+- reconcile FPL points;
+- update minutes and role evidence;
+- evaluate forecasts;
+- update price model;
+- identify data-quality issues;
+- produce model-error decomposition.
+
+Early week:
+- update fixture schedule;
+- generate base projections;
+- identify transfer candidates;
+- calculate price risks;
+- update chip plan.
+
+Midweek:
+- ingest European/cup outcomes;
+- update injuries and minutes;
+- run alternative transfer paths;
+- monitor odds coverage.
+
+Deadline day:
+- increase ingest frequency;
+- check freshness;
+- update start/minutes;
+- run optimiser;
+- compare against previous recommendation;
+- show change reasons;
+- perform human review;
+- record final action.
+
+13.3 DEADLINE-DAY SERVICE LEVEL
+-------------------------------
+Target for the MVP:
+- complete fresh data build within 10 minutes of scheduled run;
+- optimiser result within 2 minutes on standard hardware;
+- final decision report generated within 15 minutes;
+- explicit data-health banner;
+- deterministic rerun;
+- fallback report if one provider fails.
+
+These are engineering targets, not guarantees of source availability.
+
+13.4 MATERIAL CHANGE ALERT
+--------------------------
+A recommendation-change alert should trigger when:
+
+- recommended transfer changes;
+- captain changes;
+- chip decision changes;
+- expected advantage changes beyond a configured threshold;
+- a player start probability changes materially;
+- a fixture changes;
+- critical odds become stale;
+- a price change becomes likely enough to affect action;
+- data health becomes DEGRADED or BLOCKING.
+
+======================================================================
+14. EVALUATION AND SCIENTIFIC VALIDITY
+======================================================================
+
+14.1 INFORMATION-SET DISCIPLINE
+-------------------------------
+Every evaluation must specify an information cut-off.
+
+For a Gameweek deadline D:
+- only data with effective availability before D may be used;
+- provider timestamps must be interpreted correctly;
+- post-deadline line-ups are prohibited;
+- closing odds after D are prohibited;
+- retrospective injury reports are prohibited;
+- corrected FPL points may be used only for outcome labels, not inputs.
+
+14.2 FORECAST EVALUATION
+------------------------
+Binary events:
+- Brier score;
+- log loss;
+- reliability diagrams;
+- calibration slope/intercept;
+- expected calibration error with caution.
+
+Count and continuous distributions:
+- log score where valid;
+- continuous ranked probability score;
+- prediction interval coverage;
+- probability integral transform diagnostics;
+- MAE/RMSE as secondary summaries.
+
+Minutes:
+- Brier/log loss for start and 60+;
+- CRPS or discrete distribution score;
+- calibration by predicted-probability bin;
+- error by team, manager and congestion state.
+
+FPL points:
+- CRPS;
+- interval coverage;
+- expected-points bias;
+- tail-event calibration;
+- component-level error;
+- position and price-band diagnostics.
+
+14.3 DECISION EVALUATION
+------------------------
+Evaluate against:
+
+- no-transfer baseline;
+- simple recent-points heuristic;
+- official FPL form/FDR heuristic where reproducible;
+- market-only projection;
+- market plus minutes;
+- complete Pulse projection;
+- deterministic expected-points optimiser;
+- robust optimiser;
+- actual chosen action;
+- perfect hindsight, labelled only as an unattainable upper bound.
+
+Metrics:
+- points versus baseline;
+- ex-ante expected gain;
+- realised gain distribution;
+- transfer regret;
+- hit value;
+- chip incremental value;
+- team-value effect;
+- rank effect;
+- recommendation stability;
+- decision sensitivity.
+
+14.4 ABLATION
+-------------
+Pulse MUST be able to remove modules to measure contribution.
+
+Examples:
+- without market consensus;
+- without proprietary minutes;
+- without price model;
+- without robust optimisation;
+- without rank model;
+- without chip opportunity cost;
+- without ownership.
+
+A module that adds complexity but no stable out-of-sample value should be
+removed or simplified.
+
+14.5 MODEL PROMOTION
+--------------------
+A model version is promoted only when:
+
+- code and data are versioned;
+- tests pass;
+- no leakage is found;
+- calibration is acceptable;
+- performance is non-inferior to baseline;
+- decision impact is understood;
+- failures are documented;
+- rollback exists.
+
+A model is not promoted because it fits historical points better in-sample.
+
+14.6 SMALL-SAMPLE CAUTION
+-------------------------
+One FPL season provides few independent chip decisions and only 38 Gameweeks.
+
+Therefore:
+- use multi-season components where rules permit;
+- evaluate event-level probabilities;
+- use bootstrap or appropriate uncertainty intervals;
+- avoid overclaiming chip-model performance;
+- maintain prospective evidence;
+- keep manual decision journal;
+- distinguish model revision from outcome chasing.
+
+======================================================================
+15. EXPLANATION AND HUMAN OVERSIGHT
+======================================================================
+
+15.1 REQUIRED DECISION REPORT
+-----------------------------
+The final report must contain:
+
+1. Current manager state
+2. Data-health status
+3. Recommended action
+4. Expected gain versus baseline
+5. Gain distribution
+6. Six-Gameweek or selected-horizon view
+7. Captain and vice-captain analysis
+8. Price implications
+9. Chip implications
+10. Main assumptions
+11. Main risks
+12. Best alternatives
+13. Sensitivity
+14. What changed since the prior run
+15. Information that would reverse the decision
+16. Source and model timestamps
+17. Human approval field
+
+15.2 MANUAL OVERRIDES
+---------------------
+Sebastian may override:
+- injury status;
+- likely start;
+- expected minutes;
+- player role;
+- market exclusion;
+- fixture status;
+- risk mode;
+- action.
+
+Every override must include:
+- author;
+- time;
+- value;
+- reason;
+- evidence;
+- expiry;
+- effect on recommendation.
+
+15.3 DISAGREEMENT
+-----------------
+When Sebastian rejects a recommendation, the engine should record the reason,
+not force agreement.
+
+Useful categories:
+- external information not represented;
+- preference/risk disagreement;
+- trust/data-quality issue;
+- usability issue;
+- model appears wrong;
+- strategic choice;
+- execution error.
+
+This creates training data for improving the system and the user interface.
+
+======================================================================
+16. RELIABILITY, SECURITY AND COMPLIANCE
+======================================================================
+
+16.1 SOURCE RIGHTS
+------------------
+No provider becomes production-critical until DMFP-04 records:
+
+- access method;
+- permitted purpose;
+- storage rights;
+- derivative-use rights;
+- public-display rights;
+- rate limits;
+- attribution;
+- geographic limitations;
+- termination risk;
+- cost.
+
+16.2 NO UNAUTHORISED SCRAPING
+-----------------------------
+Pulse MUST use:
+- official APIs;
+- licensed feeds;
+- public endpoints where use is permitted;
+- manual imports.
+
+It MUST NOT bypass:
+- authentication;
+- anti-bot controls;
+- paywalls;
+- access limits;
+- contractual restrictions.
+
+16.3 SECRETS
+------------
+API keys and FPL session material:
+- never committed to Git;
+- stored in an encrypted secret manager or protected environment file;
+- scoped minimally;
+- rotated;
+- excluded from logs;
+- separated between development and production.
+
+16.4 FPL ACCOUNT SAFETY
+-----------------------
+The MVP should avoid automated account actions.
+
+If private squad data requires authentication:
+- prefer a safe export or read-only route;
+- do not store a password;
+- document session-token handling;
+- add revocation;
+- block any write request by default.
+
+16.5 BACKUPS
+------------
+Required:
+- database backup;
+- raw object-store backup;
+- configuration backup;
+- model artefact backup;
+- restore test;
+- exportable decision journal.
+
+16.6 INCIDENT CLASSES
+---------------------
+P0:
+Wrong rules, wrong deadline, corrupt manager state, or recommendation generated
+with future information.
+
+P1:
+Critical provider outage, identity mapping failure, or optimizer returning an
+illegal action.
+
+P2:
+Noncritical missing provider, stale secondary input, slow job.
+
+P3:
+UI defect or nonmaterial explanation issue.
+
+P0 and P1 incidents require the decision engine to fail closed.
+
+======================================================================
+17. TECHNICAL ARCHITECTURE BASELINE
+======================================================================
+
+17.1 REPOSITORY
+---------------
+Suggested initial structure:
+
+dmf-pulse/
+  README.md
+  pyproject.toml
+  uv.lock or equivalent lockfile
+  .env.example
+  docker-compose.yml
+
+  specs/
+    00_MASTER_ARCHITECTURE_AND_PRODUCT_DEFINITION.txt
+    01_RESEARCH_STANDARD_AND_EVIDENCE_REGISTER.txt
+    ...
+    20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt
+
+  config/
+    seasons/
+      2025_26_reference.yaml
+      2026_27.yaml
+    providers/
+    models/
+    optimisation/
+    risk_modes/
+
+  src/dmf_pulse/
+    domain/
+    rules/
+    data/
+    providers/
+    markets/
+    availability/
+    football/
+    fpl_points/
+    prices/
+    ownership/
+    optimisation/
+    chips/
+    evaluation/
+    orchestration/
+    reporting/
+
+  migrations/
+  tests/
+    unit/
+    integration/
+    contract/
+    regression/
+    backtest/
+    fixtures/
+
+  scripts/
+  notebooks/
+  data/
+    local-development-only/
+  reports/
+
+17.2 TECHNOLOGY BASELINE
+------------------------
+Recommended, subject to DMFP-19:
+
+- Python 3.12+ with a pinned environment;
+- PostgreSQL as canonical relational store;
+- Parquet for immutable analytical snapshots;
+- object storage for raw payloads;
+- SQLAlchemy and Alembic or equivalent;
+- Pydantic for boundary validation;
+- Polars and/or Pandas for analysis;
+- PyMC, NumPyro, Stan or simpler calibrated statistical models as justified;
+- OR-Tools, Pyomo or another tested optimisation layer;
+- pytest;
+- Ruff and static type checking;
+- FastAPI only when an API is needed;
+- Streamlit or generated HTML for the first UI;
+- structured logging;
+- GitHub Actions.
+
+Exact library choices require an ADR. The architecture does not require a
+particular cloud.
+
+17.3 DATABASE PRINCIPLES
+------------------------
+- canonical IDs;
+- append-only source facts;
+- bitemporal or effective-time support for changing facts;
+- foreign keys;
+- migrations;
+- UTC storage;
+- explicit units;
+- no silent null-to-zero conversion;
+- provenance;
+- checksums;
+- row-level model/source version where relevant.
+
+17.4 RANDOMNESS
+---------------
+Monte Carlo:
+- uses explicit seeds;
+- records generator and seed;
+- supports common random numbers when comparing actions;
+- uses enough draws for stable decision differences;
+- reports Monte Carlo error;
+- can increase draws for close decisions.
+
+17.5 SOLVER
+-----------
+The solver must:
+- enforce exact FPL constraints;
+- report status;
+- record optimality gap;
+- provide timeout fallback;
+- return no result rather than an illegal result;
+- support deterministic settings where practical;
+- expose binding constraints;
+- validate the solution independently after solve.
+
+======================================================================
+18. PRESEASON MVP AND IMPLEMENTATION ROADMAP
+======================================================================
+
+18.1 DEADLINE
+-------------
+The first scheduled match is Friday 21 August 2026. The system must be useful
+before the first official FPL deadline, which will be obtained from the launched
+game.
+
+The roadmap prioritises a trustworthy minimum system over feature completeness.
+
+18.2 PHASE 0 — ARCHITECTURE AND ACCESS
+Target: 16–22 July 2026
+
+Deliverables:
+- approve DMFP-00;
+- create DMFP-01 to DMFP-06 drafts;
+- establish repository;
+- prove current access to FPL public data;
+- obtain at least one odds-provider trial/account;
+- retrieve EPL team markets and sample player props;
+- confirm historical-data options;
+- create licensing decision table;
+- define canonical IDs;
+- define 2026/27 launch-diff checklist.
+
+Exit gate:
+- at least one feasible lawful odds path;
+- no unresolved architectural blocker;
+- repository tests run;
+- source snapshots can be stored.
+
+18.3 PHASE 1 — TEMPORAL DATA FOUNDATION
+Target: 23–29 July 2026
+
+Deliverables:
+- raw snapshot store;
+- Postgres schema;
+- FPL fixtures and bootstrap ingestion;
+- odds adapter interface;
+- one implemented odds provider;
+- player/team/fixture mapping;
+- data-quality checks;
+- event/provider/ingestion timestamps;
+- source bundle hashing;
+- rule configuration framework;
+- CLI health report.
+
+Exit gate:
+- reproducible source bundle;
+- idempotent re-run;
+- mapping exceptions visible;
+- schema changes detected;
+- data freshness reported.
+
+18.4 PHASE 2 — MARKET-TO-POINT VERTICAL SLICE
+Target: 30 July–5 August 2026
+
+Deliverables:
+- basic de-vigging methods;
+- market consensus;
+- team goal and clean-sheet distribution;
+- player goal conversion;
+- manual/hybrid P(start) and minutes input;
+- basic assists model;
+- configured FPL scoring;
+- Monte Carlo player points;
+- component breakdown;
+- one-Gameweek projections.
+
+Exit gate:
+- internally coherent simulations;
+- reproducible outputs;
+- probabilities in valid bounds;
+- expected team/player goals reconciled;
+- scoring unit tests pass;
+- uncertainty visible.
+
+18.5 PHASE 3 — INITIAL SQUAD AND CAPTAIN OPTIMISER
+Target: 6–12 August 2026
+
+Deliverables:
+- exact squad constraints;
+- initial squad optimiser;
+- starting XI and bench;
+- captain/vice;
+- multi-Gameweek horizon;
+- robust and expected-value variants;
+- alternative squad families;
+- sensitivity report;
+- independent solution validator.
+
+Exit gate:
+- all solutions legal;
+- solver repeatable;
+- result generated within service target;
+- alternatives and marginal values shown;
+- no-action/simple heuristic baseline available.
+
+18.6 PHASE 4 — LIVE DRY RUN AND GW1 READINESS
+Target: 13–20 August 2026
+
+Deliverables:
+- official 2026/27 rule capture and sign-off;
+- prices and positions imported;
+- deadline workflow;
+- increased odds frequency;
+- updated preseason minutes priors;
+- World Cup-return handling;
+- provider outage drill;
+- full decision report;
+- immutable final decision journal;
+- backup and restore test.
+
+Exit gate:
+- two successful end-to-end dry runs;
+- zero blocking data issues;
+- final rules tests pass;
+- final initial-squad recommendation available;
+- manual execution checklist complete.
+
+18.7 POST-GW1 BUILD ORDER
+-------------------------
+1. Prospective calibration dashboard
+2. Multi-Gameweek transfer optimiser
+3. Price model
+4. Chip opportunity model
+5. Ownership/effective-ownership model
+6. Rank simulation
+7. Advanced bonus/defensive-contribution model
+8. Provider ensemble and fallback
+9. Public/content outputs
+
+======================================================================
+19. MVP FUNCTIONAL REQUIREMENTS
+======================================================================
+
+FR-001:
+The system MUST ingest and preserve the official 2026/27 FPL rules/configuration.
+
+FR-002:
+The system MUST ingest current players, teams, fixtures, prices and deadlines.
+
+FR-003:
+The system MUST ingest at least one lawful odds source.
+
+FR-004:
+The system MUST preserve raw source payloads where licensing permits.
+
+FR-005:
+The system MUST map all used provider selections to canonical entities.
+
+FR-006:
+The system MUST produce fair probability estimates from quoted odds.
+
+FR-007:
+The system MUST expose the margin-removal method and provider coverage.
+
+FR-008:
+The system MUST represent player starting/minutes uncertainty.
+
+FR-009:
+The system MUST generate player FPL point distributions, not only means.
+
+FR-010:
+The system MUST generate legal initial squads.
+
+FR-011:
+The system MUST choose starting XI, bench order, captain and vice-captain.
+
+FR-012:
+The system MUST compare expected-value and robust alternatives.
+
+FR-013:
+The system MUST record the exact information cut-off.
+
+FR-014:
+The system MUST emit a reproducible decision package.
+
+FR-015:
+The system MUST warn or block on stale/invalid critical data.
+
+FR-016:
+The system MUST log Sebastian's actual decision.
+
+FR-017:
+The system MUST support prospective forecast evaluation.
+
+FR-018:
+The system MUST run without requiring an LLM for numerical outputs.
+
+FR-019:
+The system MUST permit manual availability/minutes overrides with provenance.
+
+FR-020:
+The system MUST independently validate optimiser output.
+
+======================================================================
+20. NON-FUNCTIONAL REQUIREMENTS
+======================================================================
+
+NFR-001 Reproducibility
+A decision is reproducible from code, config, data hashes and seed.
+
+NFR-002 Auditability
+Every transformed number traces to raw sources and transformation versions.
+
+NFR-003 Reliability
+Critical jobs have retries, alerts and failure states.
+
+NFR-004 Timeliness
+Deadline workflow completes within the stated service target.
+
+NFR-005 Maintainability
+Modules have explicit interfaces and no provider-specific leakage.
+
+NFR-006 Testability
+Rules, transformations, simulations and constraints are unit-testable.
+
+NFR-007 Security
+Secrets are not stored in source control or logs.
+
+NFR-008 Compliance
+Data use follows source terms and rights.
+
+NFR-009 Explainability
+Recommendations include alternatives and assumptions.
+
+NFR-010 Portability
+The MVP can run locally with containerised dependencies.
+
+NFR-011 Cost control
+Infrastructure SHOULD remain modest during private development; paid data may be
+the dominant cost and must be justified by coverage and decision value.
+
+NFR-012 Recovery
+A documented restore process exists before live use.
+
+======================================================================
+21. ACCEPTANCE CRITERIA FOR DMFP-00
+======================================================================
+
+This master architecture is accepted when Sebastian confirms:
+
+A. Product
+- Pulse is primarily the FPL decision engine.
+- Content automation is downstream.
+- "Win" means maximise probability, not guarantee.
+
+B. Forecasting thesis
+- betting markets anchor football probabilities;
+- proprietary models focus on FPL translation and missing variables;
+- distributions and calibration are mandatory.
+
+C. Decision thesis
+- rolling horizon;
+- projections separated from risk preference;
+- early season values robustness and information;
+- late season can become rank-aware.
+
+D. Data thesis
+- temporal snapshots;
+- no leakage;
+- provider abstraction;
+- licensing before dependency;
+- season rules configurable.
+
+E. Build order
+- vertical slice before price/chips/rank;
+- GW1 readiness prioritised over broad feature set;
+- human execution for the first season.
+
+F. Governance
+- no Codex module is considered complete without tests and acceptance criteria;
+- unresolved decisions are recorded rather than guessed.
+
+======================================================================
+22. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+22.1 WHAT CODEX MAY DO
+----------------------
+Codex may:
+
+- scaffold the repository;
+- implement approved interfaces;
+- create migrations;
+- write adapters;
+- write validation;
+- implement researched algorithms;
+- write tests;
+- create reproducible fixtures;
+- produce small pull requests;
+- add documentation;
+- flag ambiguity.
+
+22.2 WHAT CODEX MUST NOT DO
+---------------------------
+Codex must not:
+
+- invent FPL rules;
+- invent API fields;
+- select a provider without an approved source decision;
+- silently change an interface;
+- embed secrets;
+- use future data in tests;
+- replace probabilities with unsupported heuristics;
+- return an illegal FPL solution;
+- add autonomous account actions;
+- treat a TODO as completed;
+- hide failing tests;
+- substitute generated fake data for a required real integration test without
+  labelling it.
+
+22.3 IMPLEMENTATION UNIT STANDARD
+---------------------------------
+Each Codex task must contain:
+
+- purpose;
+- approved specification references;
+- inputs;
+- outputs;
+- schemas;
+- algorithm;
+- edge cases;
+- tests;
+- acceptance criteria;
+- exclusions;
+- example data;
+- expected command to run;
+- rollback or migration note where relevant.
+
+22.4 MERGE GATE
+---------------
+A module is mergeable only when:
+
+- formatting/lint/type checks pass;
+- unit tests pass;
+- integration tests pass where relevant;
+- no unresolved high-severity data issue;
+- public interfaces are documented;
+- source provenance is captured;
+- architecture deviations have an ADR;
+- output is reproducible.
+
+======================================================================
+23. RISK REGISTER
+======================================================================
+
+R-001 — 2026/27 rule changes
+Probability: High
+Impact: Critical
+Mitigation:
+Configuration-driven rules; official launch diff; block system until signed off.
+
+R-002 — No affordable player-prop history
+Probability: Medium/High
+Impact: High
+Mitigation:
+Provider trials; use team markets plus allocation model; begin prospective
+snapshot collection immediately; separate historical and live provider choices.
+
+R-003 — Player-prop settlement mismatch
+Probability: Medium
+Impact: High
+Mitigation:
+Settlement profiles; provider-specific tests; minutes-aware conversion.
+
+R-004 — Odds feed gaps or staleness
+Probability: High
+Impact: High
+Mitigation:
+Multiple providers where possible; freshness grades; fallback model; fail closed
+for critical gaps.
+
+R-005 — Identity mismatch
+Probability: Medium
+Impact: Critical
+Mitigation:
+Canonical IDs; manual mapping queue; confidence; block unresolved entities.
+
+R-006 — Data leakage
+Probability: Medium
+Impact: Critical
+Mitigation:
+Information cut-offs; immutable bundles; automated timestamp tests; independent
+backtest review.
+
+R-007 — False precision in early season
+Probability: High
+Impact: High
+Mitigation:
+Wider uncertainty; hierarchical priors; robust plans; sensitivity; manual
+evidence; no overconfident point estimates.
+
+R-008 — Minutes model error
+Probability: High
+Impact: High
+Mitigation:
+Dedicated module; manual override; line-up evidence; calibration by team/manager;
+scenario mixtures.
+
+R-009 — Cross-market incoherence
+Probability: Medium
+Impact: High
+Mitigation:
+Joint reconciliation; constraints; diagnostics; reject impossible bundles.
+
+R-010 — Overfitted price model
+Probability: High
+Impact: Medium/High
+Mitigation:
+Walk-forward tests; simple baseline; probability output; separate prediction
+from action value.
+
+R-011 — Chip model overconfidence
+Probability: High
+Impact: High
+Mitigation:
+Opportunity-cost framing; scenario analysis; conservative promotion; manual
+approval; multi-season component validation.
+
+R-012 — Rank model instability
+Probability: High
+Impact: Medium early, High late
+Mitigation:
+Keep separate from projections; smooth utility; target probabilities; sensitivity;
+late-season activation gates.
+
+R-013 — Solver complexity
+Probability: Medium
+Impact: Medium/High
+Mitigation:
+Start with MILP and limited scenarios; timeouts; optimality gap; fallback;
+independent validation.
+
+R-014 — Provider licensing restriction
+Probability: Medium
+Impact: Critical
+Mitigation:
+Rights register; no production dependency before approval; alternative provider;
+no public display without rights.
+
+R-015 — Deadline operational failure
+Probability: Medium
+Impact: Critical
+Mitigation:
+Dry runs; local fallback; cached last healthy build; alerting; manual checklist;
+early finalisation window.
+
+R-016 — Outcome bias
+Probability: High
+Impact: High
+Mitigation:
+Immutable pre-deadline journal; proper scoring; ex-ante review; prohibit
+retrospective rewriting.
+
+R-017 — Scope expansion
+Probability: High
+Impact: High
+Mitigation:
+GW1 vertical slice; defer content and public SaaS; architecture gates.
+
+R-018 — LLM hallucination in research or news
+Probability: Medium
+Impact: High
+Mitigation:
+Source requirement; structured evidence register; manual verification; no LLM
+numbers in core path.
+
+R-019 — World Cup and manager-change structural breaks
+Probability: High
+Impact: High
+Mitigation:
+Explicit covariates; uncertainty widening; fast updates; market anchoring;
+preseason evidence.
+
+R-020 — Optimising expected value but not winning probability
+Probability: Medium
+Impact: Strategic
+Mitigation:
+Stage-dependent utility; field simulation; rank module; do not introduce
+variance without positive target utility.
+
+======================================================================
+24. INITIAL ARCHITECTURE DECISION RECORDS
+======================================================================
+
+ADR-0001
+Decision:
+Rename and redefine the core as "DMF Pulse — FPL Decision Engine."
+
+Reason:
+The previous Pulse document primarily described content-growth intelligence.
+The new core is the system that generates football/FPL decisions. Content
+automation remains a consumer.
+
+Status:
+Proposed.
+
+ADR-0002
+Decision:
+Use betting markets as the primary external anchor for scoring-event
+probabilities.
+
+Reason:
+Markets aggregate information and are strong forecasting benchmarks. Building a
+full independent football model before the season would consume time and likely
+duplicate market information.
+
+Caveat:
+Markets require de-vigging, calibration, settlement interpretation and
+coherence checks.
+
+Status:
+Proposed.
+
+ADR-0003
+Decision:
+Use a rolling-horizon policy rather than a fixed season plan.
+
+Reason:
+FPL is sequential and new information arrives continuously.
+
+Status:
+Proposed.
+
+ADR-0004
+Decision:
+Store immutable pre-deadline source bundles and recommendations.
+
+Reason:
+Prevents hindsight and enables scientific evaluation.
+
+Status:
+Proposed.
+
+ADR-0005
+Decision:
+Do not automate FPL account writes in the first season.
+
+Reason:
+Security, operational risk and limited value relative to human confirmation.
+
+Status:
+Proposed.
+
+ADR-0006
+Decision:
+Implement one-Gameweek and initial-squad vertical slice before price, chips and
+rank.
+
+Reason:
+These later modules depend on trustworthy projections and temporal data.
+
+Status:
+Proposed.
+
+ADR-0007
+Decision:
+Use common random numbers when comparing candidate actions in Monte Carlo.
+
+Reason:
+Reduces simulation noise in differences between actions.
+
+Status:
+Proposed; implementation detail to validate.
+
+ADR-0008
+Decision:
+Treat current 2025/26 rules only as a reference test season.
+
+Reason:
+2026/27 rules are not yet authoritative.
+
+Status:
+Accepted by necessity.
+
+======================================================================
+25. OPEN QUESTIONS
+======================================================================
+
+Critical before implementation:
+1. Which odds provider gives lawful, affordable, reliable EPL player props in
+   Sebastian's jurisdiction?
+2. Can historical snapshots be acquired for the exact player markets needed?
+3. What storage and derivative-use rights apply?
+4. What are the official 2026/27 FPL rules?
+5. What are the official launch date and first deadline?
+6. Which method will import Sebastian's private squad state safely?
+7. Which canonical identity source is primary?
+8. What source provides BPS-relevant and defensive-contribution event data?
+9. What is the fallback when assist markets are absent?
+10. How will odds conditional on starting be converted?
+
+Critical before optimiser promotion:
+11. What planning horizon and terminal value are best?
+12. What uncertainty penalty or robust formulation is justified?
+13. How are future free transfers valued?
+14. How are fixture-move scenarios represented?
+15. What expected-price model is available before sufficient 2026/27 data?
+16. What player correlations are material?
+17. How are multiple fixtures in one Gameweek simulated?
+18. What is the baseline initial-squad heuristic?
+
+Critical before chip/rank modules:
+19. What chip set exists in 2026/27?
+20. How should opportunity cost be estimated?
+21. What ownership/effective-ownership sources are lawful and reliable?
+22. What terminal rank utility should be used?
+23. How are rivals or the global field simulated?
+24. What evidence is sufficient to switch from points mode to champion mode?
+
+Research governance:
+25. Which 2025–2026 preprints are robust enough to influence production?
+26. What minimum evidence promotes a model?
+27. How often will architecture/source reviews occur?
+28. Who signs off manual overrides and provider changes?
+
+======================================================================
+26. GLOSSARY
+======================================================================
+
+Action:
+A legal FPL decision: transfers, chip, line-up, bench and captaincy.
+
+Aleatoric uncertainty:
+Randomness intrinsic to outcomes.
+
+Backtest:
+Historical evaluation using only information available at the simulated time.
+
+Brier score:
+A proper score for probabilistic binary forecasts.
+
+Calibration:
+Agreement between predicted probabilities and observed frequencies.
+
+Canonical ID:
+Pulse's stable identity independent of provider.
+
+Champion mode:
+A rank-targeted utility mode intended to increase probability of an exceptional
+finish, especially late in the season.
+
+Common random numbers:
+Using the same simulated scenarios to compare actions, reducing noise in the
+difference.
+
+CRPS:
+Continuous ranked probability score for distribution forecasts.
+
+Decision bundle:
+All inputs, models, configuration and outputs needed to reproduce a decision.
+
+De-vig:
+Remove bookmaker margin from quoted odds.
+
+Effective ownership:
+Ownership adjusted for captaincy and chip multipliers in a relevant population.
+
+Epistemic uncertainty:
+Uncertainty due to incomplete knowledge or model uncertainty.
+
+Expected points:
+The probability-weighted mean of FPL points.
+
+Fail closed:
+Stop or lower confidence rather than issue an untrustworthy decision.
+
+Information cut-off:
+Latest time at which data may enter a decision.
+
+Market consensus:
+Combined fair probability from one or more market sources after processing.
+
+Market-first:
+Markets anchor football probabilities; proprietary models supplement and
+translate them.
+
+Model predictive control / rolling horizon:
+Optimise a future horizon, implement the first action, then repeat.
+
+Option value:
+Value of preserving future choices.
+
+Prequential evaluation:
+Sequentially evaluating forecasts as they are issued and outcomes arrive.
+
+Proper scoring rule:
+A score that rewards reporting honest probabilities.
+
+Robust optimisation:
+Optimisation designed to perform acceptably across uncertainty, not only at a
+single estimate.
+
+Sharpness:
+Concentration of a predictive distribution, desirable subject to calibration.
+
+Source bundle:
+Immutable set of data snapshots used by a model run.
+
+Temporal integrity:
+Correct representation of what was known and when.
+
+Utility:
+Numerical representation of the manager's objective.
+
+======================================================================
+27. SOURCE REGISTER
+======================================================================
+
+Research verification date for all web sources: 16 July 2026.
+Source status and caveats are part of the evidence.
+
+[EXT-01] Official Premier League
+Premier League Fixture Schedule Released for Season 2026/27
+Use:
+Opening fixture on Friday 21 August 2026; season structure; European scheduling
+context.
+URL:
+https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedulereleased-for-season-202627
+Evidence grade:
+A — official.
+Caveat:
+Fixture schedule can be amended.
+
+[EXT-02] Official Premier League
+What to look out for in pre-season ahead of 2026/27 Fantasy
+Use:
+Eight new managers; post-World-Cup return uncertainty; FPL not yet launched at
+the cut-off.
+URL:
+https://www.premierleague.com/en/news/4679613/what-to-look-out-for-in-pre-season-ahead-of-202627-fantasy
+Evidence grade:
+A — official current article.
+Caveat:
+Analytical guidance, not formal FPL rules.
+
+[EXT-03] Official Premier League
+Dates when 2026/27 Premier League live TV fixtures will be announced
+Use:
+Fixtures remain subject to change; nine European clubs; release schedule.
+URL:
+https://www.premierleague.com/en/news/4675211/dates-when-202627-premier-league-live-tv-fixtures-will-be-announced
+Evidence grade:
+A — official.
+
+[EXT-04] Official Premier League
+What are the dates for 2026/27 Premier League season?
+Use:
+Season end; 33 weekends and five midweek rounds.
+URL:
+https://www.premierleague.com/en/news/4468487/dates-for-202627-premier-league-season-confirmed
+Evidence grade:
+A — official.
+Caveat:
+The later fixture release scheduled the first actual match for Friday 21 August.
+
+[EXT-05] Official Premier League
+All you need to know about 2026/27 Premier League fixtures
+Use:
+Official statement that 2026/27 FPL would launch later in summer.
+URL:
+https://www.premierleague.com/en/news/4674573/all-you-need-to-know-for-202627-fixture-release-day/
+Evidence grade:
+A — official.
+
+[EXT-06] Official Premier League / FPL
+All you need to know about changes to FPL for 2025/26
+Use:
+Evidence that scoring, assists, chips, transfers and BPS can change materially
+between seasons.
+URL:
+https://www.premierleague.com/en/news/4362211/all-you-need-to-know-about-changes-to-fantasy-for-202526
+Evidence grade:
+A — official.
+Caveat:
+Reference season only; not authoritative for 2026/27.
+
+[EXT-07] Official Premier League
+How the FPL Bonus Points System works
+Use:
+BPS is match-relative and based on many Opta-supplied events; supports
+simulation rather than fixed bonus add-on.
+URL:
+https://www.premierleague.com/en/news/106533
+Evidence grade:
+A — official.
+Caveat:
+Must be rechecked after 2026/27 launch.
+
+[EXT-08] FPL web JSON endpoint
+bootstrap-static
+Use:
+Proof that the current FPL client exposes structured game data.
+URL:
+https://fantasy.premierleague.com/api/bootstrap-static/
+Evidence grade:
+B — first-party endpoint, but undocumented as a stable public API.
+Caveat:
+Schema and availability may change without notice.
+
+[EXT-09] FPL web JSON endpoint
+fixtures
+Use:
+Proof of structured fixture endpoint.
+URL:
+https://fantasy.premierleague.com/api/fixtures/
+Evidence grade:
+B — first-party endpoint, but undocumented as a stable public API.
+Caveat:
+Schema and availability may change without notice.
+
+[EXT-10] Betfair Developers
+Guide to the Betfair Exchange API
+Use:
+Exchange API provides navigation, odds, volumes and streaming access.
+URL:
+https://developer.betfair.com/exchange-api/
+Evidence grade:
+A — provider documentation.
+Caveat:
+Access, jurisdiction, market coverage and account requirements must be verified.
+
+[EXT-11] Betfair Developers
+Exchange Historical Data
+Use:
+Time-stamped historical exchange market data for backtesting.
+URL:
+https://developer.betfair.com/historical-data-services-api/
+Evidence grade:
+A — provider documentation.
+Caveat:
+Coverage and cost vary by package/market.
+
+[EXT-12] The Odds API
+Odds API Documentation V4
+Use:
+Historical event odds and paid-plan historical player-prop capability.
+URL:
+https://the-odds-api.com/liveapi/guides/v4/
+Evidence grade:
+A — provider documentation.
+Caveat:
+Plan and market availability must be verified.
+
+[EXT-13] The Odds API
+List of API Betting Markets
+Use:
+EPL soccer player props documented; current coverage limited to US bookmakers.
+URL:
+https://the-odds-api.com/sports-odds-data/betting-markets.html
+Evidence grade:
+A — provider documentation.
+Caveat:
+May not meet UK-market or complete-player requirements.
+
+[EXT-14] Sportradar
+Odds Comparison Player Props Overview
+Use:
+Player-prop support for top soccer leagues and aggregated bookmaker data.
+URL:
+https://developer.sportradar.com/odds/reference/oc-player-props-overview
+Evidence grade:
+A — provider documentation.
+Caveat:
+Commercial access and exact EPL coverage require confirmation.
+
+[EXT-15] OpticOdds
+Odds API Getting Started Guide
+Use:
+Documents historical odds, player props, injuries, rosters and starting line-ups.
+URL:
+https://developer.opticodds.com/docs/odds-api-getting-started-guide
+Evidence grade:
+A — provider documentation.
+Caveat:
+Claims require trial verification, contract review and coverage sampling.
+
+[RES-01] Egidi, Pauli and Torelli
+Combining historical data and bookmakers' odds in modelling football scores
+Use:
+Research basis for combining statistical football models with market odds.
+URL:
+https://arxiv.org/abs/1802.08848
+Evidence grade:
+B+ — academic paper/preprint record; published work exists.
+Caveat:
+Team-score forecasting, not direct FPL player projections.
+
+[RES-02] Goto, Takeishi and Yairi (2026)
+Forecast Sports Outcomes under Efficient Market Hypothesis
+Use:
+Odds-conversion methods; limitations of multiplicative, Shin and power methods;
+favourite-longshot adjustment.
+URL:
+https://arxiv.org/abs/2604.17194
+Evidence grade:
+B — recent preprint.
+Caveat:
+Must not be treated as settled evidence without replication/peer review.
+
+[RES-03] Clegg, Song and Cartlidge (2026)
+A market-calibrated accelerated failure time model for in-play football
+forecasting
+Use:
+Evidence that calibration to Betfair prices can dominate model accuracy.
+URL:
+https://arxiv.org/abs/2605.16066
+Evidence grade:
+B — recent preprint.
+Caveat:
+In-play study; architecture uses the market-calibration insight, not its reported
+betting result.
+
+[RES-04] Gneiting and Raftery (2007)
+Strictly Proper Scoring Rules, Prediction, and Estimation
+Use:
+Foundation for probabilistic evaluation, calibration and sharpness.
+URL:
+https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf
+Evidence grade:
+A — highly established peer-reviewed research.
+
+[RES-05] Bertsimas and Sim (2004)
+The Price of Robustness
+Use:
+Foundation for balancing nominal optimality and protection under uncertainty.
+URL:
+https://www.robustopt.com/references/Price%20of%20Robustness.pdf
+Evidence grade:
+A — established peer-reviewed operations research.
+
+[RES-06] Siddig, Song and Khademi
+Rolling Horizon Policies in Multistage Stochastic Programming
+Use:
+Research basis for rolling-horizon decisions in multistage uncertainty.
+URL:
+https://arxiv.org/abs/2102.04874
+Evidence grade:
+B — academic preprint.
+Caveat:
+General stochastic programming, not FPL-specific.
+
+[RES-07] Stan User's Guide
+Decision Analysis
+Use:
+Bayes-optimal decisions maximise expected utility or minimise expected loss.
+URL:
+https://mc-stan.org/docs/stan-users-guide/decision-analysis.html
+Evidence grade:
+A/B — authoritative technical documentation.
+
+[RES-08] Ramezani (2025)
+Data-Driven Team Selection in Fantasy Premier League Using Integer Programming
+and Predictive Modeling
+Use:
+FPL squad, XI and captain formulation using deterministic and robust integer
+programming.
+URL:
+https://arxiv.org/abs/2505.02170
+Evidence grade:
+B — FPL-specific preprint.
+Caveat:
+One study; projection design differs from Pulse.
+
+[RES-09] Groos (2025)
+OpenFPL: An open-source forecasting method rivaling state-of-the-art Fantasy
+Premier League services
+Use:
+Public-data FPL forecasting baseline and multi-horizon evaluation reference.
+URL:
+https://arxiv.org/abs/2508.09992
+Evidence grade:
+B — preprint.
+Caveat:
+Must reproduce and inspect code/data before relying on performance claims.
+
+[RES-10] Hunter, Vielma and Zaman
+Picking Winners in Daily Fantasy Sports Using Integer Programming
+Use:
+Top-heavy objective, expected score, variance and correlation concepts relevant
+to champion-mode strategy.
+URL:
+https://arxiv.org/abs/1604.01455
+Evidence grade:
+A/B — established academic work.
+Caveat:
+Daily fantasy portfolio contest, not season-long FPL.
+
+[INT-01] Internal
+DMF_Pulse_Report.txt
+Use:
+Original architecture principles: transparency, reproducibility, velocity and
+feedback.
+Caveat:
+Original scope was growth/content intelligence and is re-scoped by this file.
+
+[INT-02] Internal
+Sebastian_FPL_Analytics_Ecosystem_UPDATED_2025-2030.txt
+Use:
+Strategic context for DMF assets and sequencing.
+
+[INT-03] Internal
+DMF Content Automation Start Plan.txt
+Use:
+Downstream content packaging; kept outside the core FPL numerical engine.
+
+======================================================================
+28. RESEARCH CONCLUSIONS THAT CONTROL THE NEXT DOCUMENTS
+======================================================================
+
+Conclusion 1:
+The 2026/27 rules file must be treated as unknown until official launch.
+
+Conclusion 2:
+The season's unusual preseason increases the value of market anchoring,
+availability modelling, hierarchical uncertainty and flexibility.
+
+Conclusion 3:
+Provider feasibility is the first external blocker. A beautiful architecture is
+irrelevant without lawful, timely market access.
+
+Conclusion 4:
+The value of market odds is not merely expected goals. It is a time-stamped
+information aggregation layer.
+
+Conclusion 5:
+Pulse's edge is the FPL decision translation, especially minutes, points
+distribution, multi-period actions, prices, chips and rank.
+
+Conclusion 6:
+Backtesting must be designed before modelling to prevent leakage.
+
+Conclusion 7:
+A probabilistic engine must be evaluated with proper scoring rules.
+
+Conclusion 8:
+A winning objective requires rank-aware utility eventually, but introducing
+variance too early without positive expected target utility is not a strategy.
+
+Conclusion 9:
+Rolling-horizon optimisation is the natural operational form.
+
+Conclusion 10:
+The immediate build is a thin, complete vertical slice, not twenty incomplete
+models.
+
+======================================================================
+29. NEXT REQUIRED DOCUMENT
+======================================================================
+
+The next document SHOULD be:
+
+01_RESEARCH_STANDARD_AND_EVIDENCE_REGISTER.txt
+
+Reason:
+Every later module will be researched with ChatGPT. Without a shared standard
+for sources, freshness, evidence grading, conflicting claims and implementation
+decisions, the specification set will accumulate unsupported assumptions.
+
+However, in parallel, Sebastian should begin provider access discovery because
+odds data is a critical-path external dependency.
+
+======================================================================
+30. VERSION HISTORY
+======================================================================
+
+v0.9 — 16 July 2026
+- Reframed DMF Pulse as the core FPL decision engine.
+- Added market-first forecasting thesis.
+- Added formal sequential decision view.
+- Added 2026/27 preseason and rule uncertainty.
+- Added full module map.
+- Added temporal data and interface contracts.
+- Added uncertainty, evaluation and robust optimisation requirements.
+- Added five-week preseason MVP roadmap.
+- Added Codex implementation contract.
+- Added source register and risk register.
+
+Future v1.0 acceptance:
+- Sebastian approves controlling decisions.
+- Critical open questions assigned.
+- FPL 2026/27 launch status/rules updated if available.
+- Odds provider proof-of-access recorded.
+- Conflicts with later module documents resolved through ADRs.
+
+END OF DOCUMENT

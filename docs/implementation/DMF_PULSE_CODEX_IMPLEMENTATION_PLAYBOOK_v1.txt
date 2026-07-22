@@ -1,0 +1,1789 @@
+DMF PULSE - CODEX IMPLEMENTATION PLAYBOOK
+Version: 1.0
+Date: 18 July 2026
+Owner/final approver: Sebastian Greenhalgh
+Implementation agent: Codex under human review
+Scope: repository bootstrap through live GW1 vertical slice and post-GW1 expansion
+Status: PROPOSED IMPLEMENTATION OPERATING MANUAL
+====================================================================================================
+
+====================================================================================================
+0. HOW TO USE THIS PLAYBOOK
+====================================================================================================
+This file is the operating manual for converting the DMF Pulse specifications into code with
+Codex. It does not replace DMFP-00 through DMFP-20. It defines how to package context, select a
+Codex model, constrain permissions, issue one ticket, validate the result, obtain an independent
+review and retain acceptance evidence.
+1. Complete Stage A0 and approve DMFP-20/ADRs.
+2. Create the repository guidance and ticket/evidence schemas in Stage A1.
+3. For each ticket, generate a context bundle and run the planning prompt.
+4. Human reviews the plan and freezes the ticket contract.
+5. Run the implementation prompt in an isolated branch/worktree.
+6. Run tests and machine acceptance commands.
+7. Run an independent Codex review using a fresh session and preferably Sol.
+8. Resolve findings, generate the acceptance manifest, obtain human approval, merge and tag.
+9. Do not release the next ticket until the current public contract is accepted.
+
+====================================================================================================
+1. IMPLEMENTATION AUTHORITY
+====================================================================================================
+    Highest authority:
+      1. Active target-season FPL rules and signed provider contracts/rights profiles
+      2. Approved DMFP-20 decisions and ADRs
+      3. Approved DMFP module specification sections
+      4. Approved stage/ticket contract and public schemas
+      5. This Codex playbook and AGENTS.md
+      6. Comments/examples/legacy documents
+    
+    Conflict behavior:
+      - STOP; do not guess.
+      - Record the conflict in evidence/tickets/<ticket>/BLOCKER.md.
+      - Quote both requirements and their hashes/section locators.
+      - Propose options, but make no production semantic choice.
+
+====================================================================================================
+2. NON-NEGOTIABLE DELIVERY PRINCIPLES
+====================================================================================================
+1. One bounded ticket, one reviewable outcome. A normal ticket changes one public contract or
+   one cohesive capability.
+2. Public contract and fixtures first. Implementation begins only after schemas, expected
+   behavior and exclusions are frozen.
+3. Tests before or alongside code. Critical deterministic behavior requires an
+   oracle/golden/property test, not only implementation-shaped unit tests.
+4. No future-stage logic. Foundational abstractions are permitted only when the active vertical
+   slice needs them.
+5. No network in ordinary implementation or test sessions. Live provider access is isolated to
+   approved probe/capture tickets.
+6. No production secrets in Codex context, repository, prompts, logs, fixtures or CI artifacts.
+7. No uncontrolled dependency. Every new package needs purpose, licence, security/maintenance
+   check, alternative and lock/SBOM update.
+8. No numerical invention. Codex cannot fill missing rules, probabilities, weights, thresholds,
+   provider fields or expected outputs.
+9. No silent degradation. Missing/stale/blocked data must produce typed status and visible
+   confidence/failure.
+10. No same-agent self-acceptance. A fresh review plus human sign-off is required.
+11. Reproducibility is an output. Every accepted ticket stores commands, versions, hashes,
+    fixtures, seeds and results.
+12. A plausible-looking output is not success. Public command/API, clean environment and
+    accepted fixtures must demonstrate the capability.
+
+====================================================================================================
+3. CODEX MODEL ROUTING
+====================================================================================================
+Use the current GPT-5.6 Codex family by risk and task shape. Model names are configuration
+examples and should be checked against the installed Codex version before automation.
+    MODEL / REASONING             USE
+    
+    gpt-5.6-sol / high or xhigh   Architecture reconciliation, difficult domain contracts,
+                                  numerical methods, optimiser formulations, security,
+                                  migration design, incident analysis, final review.
+    
+    gpt-5.6-terra / medium-high   Default implementation model for normal tickets, adapters,
+                                  services, tests, refactors and documentation.
+    
+    gpt-5.6-luna / low-medium     Clear repeatable work: fixture conversion, schema snapshots,
+                                  mechanical tests, formatting, inventories, boilerplate and
+                                  structured extraction. Never sole authority for critical math.
+    
+    gpt-5.3-codex-spark           Optional interactive micro-edits/research preview only.
+                                  Do not use as sole implementation/reviewer for numerical core.
+
+3.1 ROLE ASSIGNMENT
+----------------------------------------------------------------------------------------------------
+    Planner / architect         Sol, high or xhigh, read-only
+    Implementer - normal        Terra, medium or high, workspace-write
+    Implementer - critical      Sol, high/xhigh, workspace-write
+    Fixture/test worker         Luna or Terra, low/medium, bounded files
+    Reviewer                    Sol, high, read-only, fresh session
+    Security reviewer           Sol, xhigh, read-only
+    Release/evidence generator  Terra or Luna, medium, structured output schema
+
+3.2 SUBAGENTS
+----------------------------------------------------------------------------------------------------
+- Use subagents for read-heavy parallel analysis: specification conflict review, security
+  review, test-gap review, performance review or document extraction.
+- Do not allow multiple agents to edit the same files concurrently.
+- A lead agent must define partitions, wait for all agents and consolidate findings with
+  file/line references.
+- Use Ultra only when the task has genuinely separable workstreams; it consumes more
+  context/tokens and is not the default.
+
+====================================================================================================
+4. CODEX PERMISSION AND SAFETY BASELINE
+====================================================================================================
+Repository implementation should run with workspace-only writes, approval on request and network
+disabled. Provider capture/probe tickets use a separate environment and explicit approval.
+
+4.1 RECOMMENDED REPOSITORY .codex/config.toml
+----------------------------------------------------------------------------------------------------
+    model = "gpt-5.6-terra"
+    model_reasoning_effort = "medium"
+    review_model = "gpt-5.6-sol"
+    approval_policy = "on-request"
+    sandbox_mode = "workspace-write"
+    web_search = "disabled"
+    
+    [sandbox_workspace_write]
+    network_access = false
+    exclude_slash_tmp = true
+    
+    [shell_environment_policy]
+    inherit = "core"
+    include_only = [
+      "PATH", "HOME", "LANG", "LC_ALL", "TZ",
+      "VIRTUAL_ENV", "PYTHONPATH", "CI"
+    ]
+
+4.2 TASK-SPECIFIC LAUNCH POLICY
+----------------------------------------------------------------------------------------------------
+    Architecture/review:
+      model=Sol; reasoning=high/xhigh; sandbox=read-only; network=disabled
+    
+    Normal implementation:
+      model=Terra; reasoning=medium/high; sandbox=workspace-write; network=disabled
+    
+    Critical algorithm/security:
+      model=Sol; reasoning=high/xhigh; sandbox=workspace-write; network=disabled
+    
+    Provider live probe:
+      isolated worktree/container; minimum credential; network only to approved host;
+      read-only account; no production database; capture sanitised fixture; human approval
+    
+    CI review:
+      read-only checkout; Codex output as patch/report artifact; no repository write token in
+      the same job that holds an OpenAI/Codex credential
+
+4.3 SECRET RULES
+----------------------------------------------------------------------------------------------------
+- Never include API keys, cookies, FPL login material, database passwords or auth.json in
+  prompts or mounted ticket bundles.
+- Use fake credentials in fixtures and golden leak-detection strings in tests.
+- Provider probe credentials are injected at process invocation or through the host credential
+  mechanism and removed before sanitised payload review.
+- Codex may create credential interfaces and tests but must not read or echo real credential
+  values.
+- Any observed secret causes immediate stop, rotation and incident evidence.
+
+====================================================================================================
+5. REPOSITORY STRUCTURE - REVISED
+====================================================================================================
+    dmf-pulse/
+      AGENTS.md
+      PLANS.md
+      CODE_REVIEW.md
+      pyproject.toml
+      uv.lock                         # proposed authoritative resolver lock after ADR
+      pylock.toml                     # release/export artifact when selected tool supports it
+      .python-version
+      .editorconfig
+      .gitignore
+      .pre-commit-config.yaml
+      Makefile
+      README.md
+      SECURITY.md
+      CONTRIBUTING.md
+      CODEOWNERS
+      CHANGELOG.md
+    
+      .codex/
+        config.toml
+        prompts/
+          plan_ticket.txt
+          implement_ticket.txt
+          review_ticket.txt
+          migration_ticket.txt
+          numerical_ticket.txt
+          provider_ticket.txt
+          model_ticket.txt
+          optimiser_ticket.txt
+          ui_ticket.txt
+          release_ticket.txt
+        schemas/
+          codex_result.schema.json
+          ticket.schema.json
+          review_result.schema.json
+        context/
+          README.md
+    
+      specs/
+        approved/                     # immutable approved copies/hashes only
+        manifests/
+          authority_manifest.json
+          document_manifest.json
+          decision_manifest.json
+        excerpts/                     # generated, ticket-specific excerpts
+        legacy/                       # archived strategy documents
+    
+      tickets/
+        A0/
+        A1/
+        A2/
+        ...
+        templates/
+          ticket.yaml
+          definition_of_ready.md
+          acceptance.md
+    
+      docs/
+        architecture/
+        adr/
+        api/
+        operations/
+        models/
+        datasets/
+        stages/
+    
+      config/
+        base/
+        environments/
+        rules/
+        providers/
+        models/
+        optimisation/
+        presentation/
+        assurance/
+    
+      fixtures/
+        manifest.json
+        rules/
+        fpl/
+        odds/
+        identity/
+        minutes/
+        events/
+        points/
+        optimisation/
+        prices/
+        chips/
+        rank/
+        ui/
+    
+      evidence/
+        tickets/
+        stages/
+        releases/
+        reviews/
+        incidents/
+    
+      alembic/
+      scripts/
+      src/dmf_pulse/
+      tests/
+      web/
+      artifacts/.gitkeep
+
+====================================================================================================
+6. INPUT FILE ARCHITECTURE
+====================================================================================================
+Codex should not receive all specifications as one prompt. Every ticket receives a generated
+Context Bundle. The bundle is immutable and hash-addressed.
+
+6.1 CONTEXT BUNDLE CONTENTS
+----------------------------------------------------------------------------------------------------
+    context_bundle/<ticket_id>/
+      ticket.yaml
+      authority.json
+      decisions.json
+      specification_excerpts.txt
+      public_contracts/
+      fixtures/manifest.json
+      fixtures/<approved files>
+      expected_outputs/
+      current_tree.txt
+      relevant_existing_files.txt
+      dependency_manifest.txt
+      acceptance_commands.txt
+      exclusions.txt
+      bundle.sha256
+
+6.2 INPUT SELECTION RULES
+----------------------------------------------------------------------------------------------------
+1. Include only approved controlling sections plus directly relevant invariants and definitions.
+2. Include full public schemas and fixture expected outputs; never summarise away contract
+   details.
+3. Include one previous accepted stage contract when compatibility matters.
+4. Include current implementation files likely to change and interfaces they call.
+5. Include relevant ADRs/DMFP-20 decisions in full.
+6. Do not include large bibliographies unless the ticket is a research/evidence ticket.
+7. Do not include secrets, licensed raw bodies without permission, private manager identifiers
+   or irrelevant legacy documents.
+8. Record every included file hash and the generator version.
+
+====================================================================================================
+7. AUTHORITATIVE INPUT FILE MAP
+====================================================================================================
+    A0 Authority reconciliation | DMFP-00, 01, 04, 05, 06, 16, 17, 19; all headers/open questions; legacy docs | Sol/xhigh
+    A1 Repo/config              | DMFP-17, 19; approved A0 ADRs                                               | Terra/high; Sol review
+    A2 Rules                    | DMFP-00, 01, 02, 09, 12, 13; approved rules schemas/fixtures                | Sol/high
+    A3 Canonical model          | DMFP-03, 05, 17; approved identity ADRs                                     | Sol/high
+    A4 FPL ingestion            | DMFP-02, 03, 04, 05, 17; recorded FPL payloads/rights                       | Terra/high
+    A5 Odds/manual import       | DMFP-03, 04 ADR, 05, 17; provider fixture/rights profile                    | Terra or Sol/high
+    A6 Normalisation            | DMFP-06, 15; synthetic books and mathematical oracles                       | Sol/high
+    A7 Minutes baseline         | DMFP-07, 10, 15; labelled synthetic/historical fixtures                     | Sol/high
+    A8 Score distribution       | DMFP-06, 07, 08, 10, 15                                                     | Sol/xhigh
+    A9 FPL points               | DMFP-02, 07, 08, 09, 15                                                     | Sol/high
+    A10 One-GW optimiser        | DMFP-02, 09, 10, 12, 15                                                     | Sol/xhigh
+    A11 Decision Bundle/report  | DMFP-16, 17, 18 plus golden bundle                                          | Terra/high; Sol review
+    A12 Ops/assurance/dry run   | DMFP-05, 16, 17, 18, 19                                                     | Sol/xhigh
+    B1 Backtesting              | DMFP-05, 10, 15, all accepted model contracts                               | Sol/high
+    B2 Multi-GW                 | DMFP-10, 11, 12, 15                                                         | Sol/xhigh
+    B3 Price                    | DMFP-02, 05, 10, 11, 15                                                     | Sol/high
+    B4 Chips                    | DMFP-02, 09, 10, 12, 13, 15                                                 | Sol/xhigh
+    B5 Rank                     | DMFP-09, 10, 12, 13, 14, 15                                                 | Sol/xhigh
+    B6 Full control/UI          | DMFP-16, 17, 18                                                             | Terra/high; Sol security review
+    B7 Content outputs          | DMFP-00 boundary, 17, 18; legacy content docs strategy-only                 | Terra/medium
+
+====================================================================================================
+8. ROOT AGENTS.md TEMPLATE
+====================================================================================================
+    # DMF Pulse agent instructions
+    
+    ## Mission
+    Implement only the active approved ticket. Preserve temporal integrity, rules-as-data,
+    canonical identity, joint-scenario semantics, rights controls and reproducibility.
+    
+    ## Authority
+    1. `specs/manifests/authority_manifest.json`
+    2. approved DMFP-20 decisions and ADRs
+    3. the active ticket and public schemas
+    4. approved DMFP excerpts
+    5. this file
+    Stop on conflict. Do not invent a resolution.
+    
+    ## Repository layout
+    - production package: `src/dmf_pulse/`
+    - migrations: `alembic/`
+    - configuration: `config/`
+    - fixtures: `fixtures/`
+    - tests: `tests/`
+    - ticket evidence: `evidence/tickets/<ticket_id>/`
+    - approved specifications: `specs/approved/`
+    
+    ## Commands
+    - bootstrap: `make bootstrap`
+    - format: `make format`
+    - lint: `make lint`
+    - type: `make type`
+    - fast tests: `make test-fast`
+    - ticket tests: `make test-ticket TICKET=<id>`
+    - integration: `make test-integration`
+    - package: `make build`
+    - acceptance: command listed in active ticket
+    
+    ## Engineering constraints
+    - Python package is `dmf_pulse`; use `src/` layout.
+    - Strict typing in production code; use canonical domain types.
+    - UTC internally; no naive datetime.
+    - Money/odds exact at boundaries; no binary float for affordability or raw odds.
+    - No global RNG or clock; inject seed/RNG/Clock.
+    - Unit tests perform no network or production database access.
+    - PostgreSQL semantics are tested on PostgreSQL, never substituted by SQLite.
+    - External IDs are provider-scoped mappings, never canonical primary keys.
+    - Raw observations are immutable; corrections append/supersede.
+    - No LLM-generated numerical truth.
+    - No new dependency or migration unless ticket permits it.
+    - No unrelated refactor.
+    - No broad TODO/pass/NotImplementedError in accepted scope.
+    
+    ## Security and rights
+    - Never read or print secrets.
+    - Network disabled unless active ticket explicitly authorises a host and credential.
+    - Respect the fixture rights manifest and provider Rights Profile.
+    - Redact credentials, query keys, cookies and personal manager data from logs/artifacts.
+    
+    ## Work method
+    1. Read ticket, authority, decisions, contracts and fixtures.
+    2. Inspect relevant current code.
+    3. Write/update execution plan for nontrivial work.
+    4. Write failing tests or contract fixtures first.
+    5. Implement smallest complete vertical slice.
+    6. Run targeted tests, then required acceptance commands.
+    7. Review diff for scope, invariants, time cutoff, security and rights.
+    8. Write structured evidence and final response.
+    
+    ## Done means
+    - public contract implemented exactly;
+    - required tests/commands pass;
+    - output is deterministic under stored seed;
+    - no excluded feature is present;
+    - evidence files exist and hashes validate;
+    - independent review has no unresolved P0/P1 finding.
+    
+    ## Stop conditions
+    Stop and report a blocker when requirements conflict, expected output is absent, a fixture
+    is unlicensed, a required decision is unapproved, a public interface must change, a new
+    dependency/migration is needed but forbidden, or a safe deterministic result is impossible.
+
+====================================================================================================
+9. LOCAL AGENTS.md FILES
+====================================================================================================
+Add smaller directory-specific guidance only where repeated domain mistakes are likely. Local
+guidance overrides the root guidance and should not repeat the whole architecture. Suggested
+files:
+    src/dmf_pulse/rules/AGENTS.md
+      pure functions, integer scoring, active ruleset only, golden boundary cases
+    
+    src/dmf_pulse/data_model/AGENTS.md
+      UUID/canonical identity, bitemporal intervals, append-only corrections, Postgres
+    
+    src/dmf_pulse/ingestion/AGENTS.md
+      raw-before-transform, idempotency, no hidden network in tests, rights profile
+    
+    src/dmf_pulse/markets/AGENTS.md
+      Decimal boundary, no mixed-operator books, incomplete/nonexclusive semantics
+    
+    src/dmf_pulse/availability/AGENTS.md
+      probability coherence, team-level constrained samples, no post-cutoff lineups
+    
+    src/dmf_pulse/football_events/AGENTS.md
+      conservation constraints, score-grid mass, on-pitch validity
+    
+    src/dmf_pulse/fpl_points/AGENTS.md
+      deterministic scenario scoring, joint BPS/bonus, integer scenario outputs
+    
+    src/dmf_pulse/optimisation/AGENTS.md
+      legality validator independent of solver, gap/status required, toy exhaustive oracle
+    
+    src/dmf_pulse/assurance/AGENTS.md
+      fail closed, structured logs, secret redaction, immutable evidence
+
+====================================================================================================
+10. PLANS.md TEMPLATE
+====================================================================================================
+    # Execution plan format
+    
+    ## Ticket
+    ID, title, stage, branch, owner, reviewer.
+    
+    ## Goal
+    One observable capability; state the public command/API and expected output.
+    
+    ## Authority and decisions
+    Exact spec files/section locators/hashes and DMFP-20/ADR IDs.
+    
+    ## Current state
+    Relevant files, existing interfaces, known limitations, failing tests.
+    
+    ## Constraints and exclusions
+    Allowed files, dependency/migration/network rules, explicit non-goals.
+    
+    ## Invariants
+    Temporal, mathematical, legal, security and rights invariants.
+    
+    ## Implementation steps
+    Small ordered checkpoints, each leaving the repository testable.
+    
+    ## Tests first
+    Unit/property/contract/integration/golden/performance/security tests and fixtures.
+    
+    ## Acceptance commands
+    Exact commands and required results.
+    
+    ## Risks and fallback
+    Ambiguities, numerical/runtime risk, rollback and safe degradation.
+    
+    ## Evidence
+    Paths that will be written and fields required.
+    
+    ## Progress
+    Timestamped checkboxes; update after every meaningful checkpoint.
+    
+    ## Decision log
+    Any approved deviation; do not silently change the plan.
+
+====================================================================================================
+11. TICKET YAML SCHEMA - HUMAN-READABLE TEMPLATE
+====================================================================================================
+    ticket_id: "A1.01"
+    stage: "A1"
+    title: "Package and build skeleton"
+    status: "READY"
+    owner: "Sebastian Greenhalgh"
+    implementer_role: "codex_implementation"
+    reviewer_role: "codex_review_and_human"
+    
+    objective: >-
+      From a clean checkout, build and install the dmf_pulse wheel and run `dmf --version`.
+    
+    user_visible_vertical_slice:
+      command: "dmf --version"
+      expected: "valid semantic version and zero exit code"
+    
+    authority:
+      documents:
+        - id: "DMFP-19"
+          version: "approved-v1.0"
+          sections: ["Stage 1 package skeleton"]
+          sha256: "..."
+      decisions: ["ADR-TOOLCHAIN-001"]
+    
+    allowed_files:
+      create: ["pyproject.toml", "src/dmf_pulse/**", "tests/**", "README.md"]
+      modify: []
+      forbidden: ["alembic/**", "config/rules/**", "src/dmf_pulse/ingestion/**"]
+    
+    public_contracts:
+      - "dmf --version"
+    
+    fixtures: []
+    
+    tests_first:
+      - "wheel builds"
+      - "installed wheel imports outside source tree"
+      - "py.typed packaged"
+    
+    acceptance_commands:
+      - "make format-check"
+      - "make lint"
+      - "make type"
+      - "make test-ticket TICKET=A1.01"
+      - "make build"
+    
+    permissions:
+      network: false
+      migration: false
+      new_dependency: "only packages approved by ADR-TOOLCHAIN-001"
+      sandbox: "workspace-write"
+    
+    exclusions:
+      - "configuration loader"
+      - "database"
+      - "provider clients"
+    
+    stop_conditions:
+      - "selected Python version cannot build an approved dependency"
+      - "public CLI name conflicts with installed package"
+    
+    completion_evidence:
+      path: "evidence/tickets/A1.01/"
+      required: ["result.json", "commands.log", "diff.stat", "review.json"]
+
+====================================================================================================
+12. DEFINITION OF READY
+====================================================================================================
+    [ ] Ticket status is READY and parent stage is approved.
+    [ ] Objective is one sentence and independently demonstrable.
+    [ ] Authority sections and hashes resolve.
+    [ ] DMFP-20 decisions/ADRs are approved.
+    [ ] Public contract is reviewed.
+    [ ] Fixtures and expected outputs exist and rights permit use.
+    [ ] Allowed/forbidden files are explicit.
+    [ ] Dependency, migration and network permissions are explicit.
+    [ ] Tests-first list and acceptance commands are executable.
+    [ ] Performance/security requirements are stated.
+    [ ] Exclusions and stop conditions are stated.
+    [ ] Reviewer is assigned and independent.
+    [ ] No unresolved P0 blocker affects the ticket.
+
+====================================================================================================
+13. CODEX STRUCTURED RESULT SCHEMA
+====================================================================================================
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "ticket_id", "status", "summary", "files_changed", "tests",
+        "acceptance", "assumptions", "risks", "evidence_path"
+      ],
+      "properties": {
+        "ticket_id": {"type": "string"},
+        "status": {"enum": ["COMPLETE", "BLOCKED", "FAILED"]},
+        "summary": {"type": "string"},
+        "files_changed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "change"],
+            "properties": {
+              "path": {"type": "string"},
+              "change": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "public_interfaces": {"type": "array", "items": {"type": "string"}},
+        "tests": {"type": "array", "items": {"type": "object"}},
+        "acceptance": {"type": "array", "items": {"type": "object"}},
+        "migration_impact": {"type": "string"},
+        "dependency_impact": {"type": "string"},
+        "assumptions": {"type": "array", "items": {"type": "string"}},
+        "exclusions_verified": {"type": "array", "items": {"type": "string"}},
+        "risks": {"type": "array", "items": {"type": "string"}},
+        "evidence_path": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+
+====================================================================================================
+14. BRANCH, WORKTREE AND REVIEW WORKFLOW
+====================================================================================================
+    1. Create branch/worktree:
+       stage/<stage>/<ticket>-<slug>
+    
+    2. Generate and commit the ticket Context Bundle before implementation.
+    
+    3. Run planner in read-only mode; save plan to:
+       evidence/tickets/<ticket>/PLAN.md
+    
+    4. Human approves plan or edits ticket. Freeze ticket hash.
+    
+    5. Run implementer with workspace-write and no network.
+    
+    6. Run acceptance commands locally from a clean environment.
+    
+    7. Run fresh independent review:
+       codex review --base <accepted-stage-tag>
+       or review the exact commit with custom DMF checklist.
+    
+    8. Fix P0/P1 findings; reviewer re-runs targeted review.
+    
+    9. Generate acceptance manifest and human-readable report.
+    
+    10. Human signs; merge; tag ticket/stage; archive bundle and logs.
+
+14.1 COMMIT POLICY
+----------------------------------------------------------------------------------------------------
+- Prefer one or a few coherent commits: contract/tests, implementation, evidence/docs.
+- Do not mix formatting of unrelated files.
+- Migration and its model/repository/tests belong to the same ticket, but large data backfills
+  are separate.
+- Generated lock/SBOM/schema snapshots are reviewed like source changes.
+- Commit message includes ticket ID and observable capability.
+
+====================================================================================================
+15. REVISED STAGE PLAN
+====================================================================================================
+    A0   Authority, Decisions and Provider Reconciliation     Sol/xhigh            No production code           Approved DMFP-20, authority manifest, provider ADR, toolchain ADR backlog, legacy archive banners
+    A1   Repository, Configuration and Evidence Skeleton      Terra/high           Minimal package/CLI/config/evidence Wheel builds; dmf doctor; CI; lock; AGENTS/PLANS/ticket schemas
+    A2   Rules Compiler and Reference Scoring                 Sol/high             Pure deterministic rules     Compile/validate/reference-score fixtures; target rules remain inactive until approved
+    A3   Minimum Canonical Temporal Data Model                Sol/high             Only first-slice entities    PostgreSQL migrations; UUID; as-of queries; append-only corrections
+    A4   Official FPL Snapshot Ingestion                      Terra/high           Recorded first, live separately Raw snapshot; schema validation; canonical mapping; idempotency; quality report
+    A5   Approved Odds Source and Manual Fallback             Terra/Sol high       Provider ADR controls        One adapter plus manual import; rights/quota/secret tests; immutable observations
+    A6   Odds Normalisation and Consensus Baseline            Sol/high             Complete books first         Decimal conversion; proportional/power; robust pool; confidence/missingness
+    A7   Baseline Availability and Minutes                    Sol/high             Manual + calibrated baseline START/BENCH/OUT probabilities; 0-90 PMF; exactly 11 starters in scenarios
+    A8   Team Goal and Clean-Sheet Distribution               Sol/xhigh            Score-first baseline         Joint score grid; market constraints; clean-sheet probabilities; reconciliation
+    A9   Scenario-Level FPL Points Distribution               Sol/high             Active/reference rules only  Exact scoring transform; PMFs; joint matrix; MC diagnostics
+    A10  Initial Squad, XI, Bench, Captain and Vice           Sol/xhigh            One-GW/current squad modes   MILP + exact tactical evaluator + independent legality validator
+    A11  Decision Bundle and Operator Report                  Terra/high           Read-only publication        Immutable bundle, CLI, static/server-rendered report, explanations from structured data
+    A12  Control Plane, Assurance Minimum and Dry Runs        Sol/xhigh            Single-host private V1       Scheduler/run ledger, freshness/rights gates, secret redaction, backup restore, two rehearsals
+    B1   Prospective Registry and Walk-Forward Backtesting    Sol/high             Evaluation first             Forecast freeze, cutoff canaries, baseline comparisons, promotion registry
+    B2   Multi-Gameweek Transfer Optimisation                 Sol/xhigh            Deterministic then stochastic FT/bank/selling prices; rolling horizon; recourse; alternatives
+    B3   Price and ACT/WAIT                                   Sol/high             Shadow until calibrated      Multiclass baseline, price paths, information value
+    B4   Chip Scheduling                                      Sol/xhigh            Target rules required        Captain/vice exact, chip grammar, enumeration/continuation baseline
+    B5   EO, Rank and Risk Strategy                           Sol/xhigh            Feature flagged              Unchanged projections; synthetic/named cohorts; target utility
+    B6   Full Orchestration and Decision Cockpit              Terra/high + Sol review Scale only after need        API, workers, richer UI, observability, replay, accessibility
+    B7   Advanced Challengers and Content Outputs             Mixed                Shadow/research/downstream   Bayesian/deep challengers, provider ensemble, canonical content packages
+
+====================================================================================================
+16. STAGE A0 - AUTHORITY, DECISIONS AND PROVIDER RECONCILIATION
+====================================================================================================
+A0 is a documentation/evidence stage. Codex may analyse and generate manifests, but Sebastian
+must approve decisions. No provider-specific production adapter or numerical model is accepted
+before A0.
+
+16.1 TICKETS
+----------------------------------------------------------------------------------------------------
+    A0.01  Build document manifest and cross-reference validator.
+    A0.02  Extract all open questions into decisions/open_questions.csv or JSON.
+    A0.03  Classify questions P0/P1/P2 and propose defaults/fallbacks.
+    A0.04  Reconcile paid versus zero-cost provider architecture.
+    A0.05  Produce Provider ADR-001 and Rights Profile skeletons.
+    A0.06  Produce GW1 MVP scope ADR and post-GW1 roadmap.
+    A0.07  Produce toolchain spike plan and ADR backlog.
+    A0.08  Mark legacy documents ARCHIVED/STRATEGY_ONLY.
+    A0.09  Generate DMFP-20 v1 draft and authority_manifest.json.
+    A0.10  Validate all references/hashes and obtain Sebastian approval.
+
+16.2 A0 ACCEPTANCE
+----------------------------------------------------------------------------------------------------
+    [ ] One provider architecture controls all downstream docs.
+    [ ] Budget/jurisdiction/rights status is explicit.
+    [ ] Manual odds import fallback is approved.
+    [ ] GW1 and post-GW1 scopes are signed.
+    [ ] Every P0 question is APPROVED, DEFERRED WITH FALLBACK, or BLOCKED.
+    [ ] Legacy documents cannot be selected as core implementation authority.
+    [ ] Authority manifest resolves every stage to document versions/hashes.
+    [ ] No unresolved cross-document contradiction remains in Stage A1 inputs.
+
+====================================================================================================
+17. STAGE A1 - REPOSITORY AND TOOLCHAIN
+====================================================================================================
+
+17.1 TOOLCHAIN SPIKES
+----------------------------------------------------------------------------------------------------
+- Python 3.13 versus 3.14 compatibility across Pydantic, SQLAlchemy/Alembic, psycopg,
+  NumPy/SciPy, Pyomo/highspy, PyMC/NumPyro candidates, Hypothesis, mypy and deployment host.
+- Dependency manager/lock: evaluate uv (or approved alternative); keep the resolver lock
+  authoritative and export standards-compatible/release artifacts only after compatibility is
+  proven.
+- PostgreSQL exact supported major and extension policy.
+- UUIDv7 library/application generation behavior and Postgres storage.
+- HiGHS interface and deterministic/status/gap behavior.
+- SBOM, vulnerability and licence scan tools.
+- Container versus native systemd deployment and local developer bootstrap.
+- Browser/accessibility testing stack for the later UI.
+
+17.2 A1 TICKETS
+----------------------------------------------------------------------------------------------------
+    A1.01 Package and build skeleton.
+    A1.02 Typed configuration loader and secret-reference prohibition.
+    A1.03 Typer CLI with `dmf --version`, `dmf doctor`, config validate/show.
+    A1.04 Quality/test markers, Ruff, mypy, pytest, Hypothesis, coverage.
+    A1.05 Exact lock, build manifest, wheelhouse/export and SBOM workflow.
+    A1.06 CI: build, lint, type, unit/property, secret scan, package install.
+    A1.07 Evidence generator and ticket/stage manifest validator.
+    A1.08 AGENTS.md, PLANS.md, CODE_REVIEW.md and prompt/schema installation.
+
+====================================================================================================
+18. STAGE A2 - RULES
+====================================================================================================
+Implement a pure rules compiler/scorer using reference fixtures; activation of 2026/27 remains
+impossible until official capture and human approval.
+    A2.01 JSON Schemas and YAML-to-canonical-JSON compiler.
+    A2.02 Ruleset status, provenance, hash and activation guard.
+    A2.03 Appearance/goals/assists/CS/saves/negative scoring.
+    A2.04 BPS and joint bonus allocation.
+    A2.05 Manager transformations required by current acceptance fixtures.
+    A2.06 Rule diff and target-launch capture command.
+    A2.07 Golden reference fixture pack and official reconciliation harness.
+
+18.1 RULES TEST PRIORITIES
+----------------------------------------------------------------------------------------------------
+- Boundary minutes 0/1/59/60/90 and multi-fixture aggregation.
+- Every position-specific goal value and negative event.
+- All bonus tie patterns and participant universes.
+- Selling-price/FT/chip transitions only when their ticket is active.
+- Property: no rule value is read from unversioned global state.
+- Golden: canonical JSON/hash is deterministic and active rules are immutable.
+
+====================================================================================================
+19. STAGE A3 - MINIMUM CANONICAL MODEL
+====================================================================================================
+Do not create the entire eventual schema in one migration. Implement the minimum entities
+required by A4-A11, while preserving DMFP-03 identity/temporal principles.
+    Minimum initial tables/entities:
+      canonical_entity, competition, season, team, player, fixture,
+      external_identifier, entity_alias, player_team_membership,
+      gameweek, fixture_revision, fixture_gameweek_assignment,
+      data_provider, source_snapshot, raw_blob metadata,
+      ingestion_run, data_quality_issue, ruleset registry.
+    
+    Add market/projection/decision tables in the stage that first uses them.
+
+19.1 REQUIRED DATABASE TESTS
+----------------------------------------------------------------------------------------------------
+- Clean migration to head and upgrade from prior accepted tag.
+- No forbidden temporal overlap; adjacent closed-open intervals allowed.
+- As-of system/valid-time query returns the expected historical version.
+- Duplicate provider mapping conflict and concurrent insert behavior.
+- Correction appends/supersedes without mutating original observation.
+- PostgreSQL integration, never SQLite semantic substitution.
+- Schema fingerprint and migration evidence retained.
+
+====================================================================================================
+20. STAGES A4-A6 - DATA AND MARKETS
+====================================================================================================
+
+20.1 A4 OFFICIAL FPL INGESTION
+----------------------------------------------------------------------------------------------------
+    Sequence:
+      recorded payload schema -> raw snapshot envelope -> durable raw/retention action ->
+      staging parse -> validation -> central identity mapping -> canonical promotion ->
+      quality report -> source bundle.
+    
+    Acceptance:
+      repeated capture is idempotent at canonical effect;
+      every retrieval remains observable;
+      source/received/usable times are distinct;
+      unknown fields trigger controlled schema report;
+      unresolved identity is quarantined;
+      no post-cutoff/current-view shortcut exists.
+
+20.2 A5 PROVIDER OR MANUAL ODDS
+----------------------------------------------------------------------------------------------------
+Provider name and files are selected by Provider ADR-001, not hard-coded from the current
+DMFP-19 Stage 5. A manual import path is implemented first or in parallel so the vertical slice
+remains operable.
+    Required input pack per provider:
+      sanitised sample responses for happy/empty/partial/error/quota/schema-change;
+      endpoint and field contract version;
+      operator/bookmaker identity examples;
+      fixture/player mapping golden set;
+      settlement profiles;
+      timestamp semantics;
+      Rights Profile and retention/export behavior;
+      expected canonical observations.
+
+20.3 A6 NORMALISATION
+----------------------------------------------------------------------------------------------------
+    V1:
+      odds format -> Decimal decimal odds -> raw reciprocal -> complete-book grouping ->
+      proportional and power de-vig -> operator vector -> eligibility/freshness ->
+      robust equal/operator-weight pool -> confidence/bounds -> immutable output.
+    
+    Defer until evidence:
+      learned operator weights, context-specific calibration, advanced recent methods.
+    
+    Mathematical acceptance:
+      vectors proper and sum to target tolerance;
+      root residual/tolerance recorded;
+      operator books never mixed;
+      incomplete/nonexclusive market never force-normalised;
+      missing market is typed, not zero;
+      exchange back/lay remains separate and bounded.
+
+====================================================================================================
+21. STAGE A7 - BASELINE MINUTES
+====================================================================================================
+The GW1 model should be deliberately modest and transparent. It may combine structured manual
+probabilities, recent role evidence and a simple calibrated baseline. It must output a coherent
+distribution, not just expected minutes.
+    Required public output per player/fixture:
+      p_start, p_bench, p_out_of_squad;
+      p_appearance, p_zero, p_60_plus;
+      expected_minutes;
+      minute PMF 0..90;
+      confidence/uncertainty/source lineage.
+    
+    Team scenario requirement:
+      exactly 11 starters;
+      configured bench size;
+      no ineligible player selected;
+      marginals approximately reconciled and discrepancy reported.
+    
+    Defer:
+      hidden semi-Markov readiness, deep survival, score-state substitution coupling.
+
+====================================================================================================
+22. STAGES A8-A9 - FOOTBALL AND FPL DISTRIBUTIONS
+====================================================================================================
+
+22.1 A8 SCORE DISTRIBUTION BASELINE
+----------------------------------------------------------------------------------------------------
+    1. Construct finite prior joint score matrix (independent/dynamic Poisson baseline).
+    2. Expand grid until omitted tail mass below configured tolerance.
+    3. Map market events to score-grid linear functionals.
+    4. Solve soft KL/information projection or approved convex equivalent.
+    5. Validate non-negativity, unit mass and market residuals.
+    6. Derive 1X2, totals, team goals and clean sheets.
+    7. Allocate only the minimum player events required by A9, conditional on minutes.
+
+22.2 A9 FPL POINTS
+----------------------------------------------------------------------------------------------------
+    For each coherent scenario:
+      validate participants/minutes/events;
+      score exact integer components with the active/reference ruleset;
+      calculate all-player BPS and bonus jointly;
+      aggregate fixtures into Gameweek;
+      retain scenario ID/weight/player matrix;
+      summarise PMF, quantiles, thresholds, components and Monte Carlo error.
+    
+    Never:
+      add independent component means as the production distribution;
+      rank expected BPS;
+      simulate a clean sheet independently from score;
+      calculate events for off-pitch players;
+      apply captain/chips inside raw player points.
+
+====================================================================================================
+23. STAGE A10 - ONE-GAMEWEEK DECISION ENGINE
+====================================================================================================
+    V1 strategic master:
+      choose legal 15-player squad subject to budget, positions and club limits.
+    
+    V1 tactical evaluator:
+      enumerate legal XI, bench order, captain and vice for each candidate squad;
+      process appearance, autosubs and captain fallback scenario by scenario.
+    
+    Required safeguards:
+      independent legality validator after solve;
+      exhaustive tiny-universe oracle;
+      solver incumbent, bound, gap, time and status retained;
+      deterministic settings/seed where supported;
+      timeout may return only a labelled legal incumbent;
+      infeasible input returns diagnosis, never fabricated plan.
+
+23.1 PERFORMANCE PROFILE
+----------------------------------------------------------------------------------------------------
+    development: small scenarios, verbose diagnostics
+    normal: bounded player pool and scenario count; accepted runtime target from ADR
+    final-fast: cached projections, reduced certified candidate set, stricter wall clock,
+                publish only when legality/freshness/gap gates pass
+    research: larger scenarios and challenger solvers; never deadline-critical
+
+====================================================================================================
+24. STAGES A11-A12 - DECISION DELIVERY AND LIVE SAFETY
+====================================================================================================
+
+24.1 DECISION BUNDLE
+----------------------------------------------------------------------------------------------------
+    Immutable bundle minimum:
+      decision identity and cutoff/deadline;
+      manager/input state hash;
+      ruleset/config/model/source/dataset/code hashes;
+      recommended, no-action and alternatives;
+      exact current tactics;
+      paired gain distribution and uncertainty;
+      assumptions, confidence and switch conditions;
+      data health, rights and operational state;
+      solver/simulation evidence;
+      human approval/execution record links.
+
+24.2 PRIVATE REPORT
+----------------------------------------------------------------------------------------------------
+- Start with CLI plus deterministic HTML/static report; do not block GW1 on a rich SPA.
+- Every displayed number comes from the structured bundle.
+- Narrative templates are deterministic; optional LLM paraphrase is downstream, validated and
+  unable to add numbers/actions.
+- Show no-transfer baseline, p10/median/p90 paired gain, probability of improvement, key
+  assumption, fallback and freshness.
+- Blocked/degraded/superseded states are impossible to confuse with actionable.
+
+24.3 CONTROL-PLANE MINIMUM
+----------------------------------------------------------------------------------------------------
+    Minimum before live use:
+      PostgreSQL run/task ledger;
+      one-minute scheduler or explicit operator run;
+      deterministic run signature/idempotency;
+      source bundle freeze;
+      task dependency and retry state;
+      readiness/publication gate;
+      immutable latest pointer;
+      structured logs/run IDs;
+      secret redaction;
+      backup and verified restore;
+      manual execution checklist.
+
+24.4 DRY-RUN ACCEPTANCE
+----------------------------------------------------------------------------------------------------
+    [ ] Two complete end-to-end runs on distinct dates/source states.
+    [ ] One provider outage/degraded-path drill.
+    [ ] One stale-data/blocking drill.
+    [ ] One database/process restart and idempotent resume.
+    [ ] One backup restore into clean environment.
+    [ ] One rules/config mismatch block.
+    [ ] Final-fast run completes inside approved execution buffer.
+    [ ] Human can execute plan from mobile-readable summary.
+    [ ] Exact bundle reproduces from commit/config/source hashes and seed.
+
+====================================================================================================
+25. POST-GW1 RELEASE TRAIN
+====================================================================================================
+
+25.1 B1 BACKTESTING FIRST
+----------------------------------------------------------------------------------------------------
+After the initial vertical slice, prioritise forecast logging and walk-forward infrastructure
+before adding more model complexity. Every later model/policy needs the same time-safe
+evaluation surface.
+    B1 deliverables:
+      forecast registry and immutable pre-deadline freeze;
+      dataset modes LIVE_OBSERVED / RAW_OBSERVED / RECONSTRUCTED / FINAL_OUTCOME;
+      rolling-origin runner;
+      cutoff/leakage canaries;
+      proper-score/calibration reports;
+      policy replay with sequential state;
+      champion/challenger promotion and rollback evidence.
+
+25.2 B2-B7 ORDER
+----------------------------------------------------------------------------------------------------
+1. Deterministic multi-Gameweek transfers, then stochastic recourse and terminal value.
+2. Price baseline and ACT/WAIT in shadow until target-season calibration exists.
+3. Chip/captain scheduling after target chip rules are active and exact current tactics pass.
+4. EO/rank only with lawful, representative and calibrated opponent inputs; otherwise pure
+   points.
+5. Full API/worker/UI expansion only after the private single-host path is stable.
+6. Advanced Bayesian/deep/ensemble challengers promoted only through B1 gates.
+7. Content automation consumes approved read models and Decision Bundles; it never writes
+   numerical truth.
+
+====================================================================================================
+26. GENERIC CODEX PLANNING PROMPT
+====================================================================================================
+    ROLE
+    You are the planning agent for DMF Pulse ticket <TICKET_ID>. Do not edit files.
+    
+    GOAL
+    Produce an executable plan for the one vertical capability in ticket.yaml.
+    
+    CONTEXT
+    Read, in this order:
+    1. AGENTS.md and local AGENTS.md files.
+    2. context_bundle/<ticket>/authority.json and decisions.json.
+    3. ticket.yaml.
+    4. public contracts and approved specification excerpts.
+    5. fixtures and expected outputs.
+    6. relevant current code and tests.
+    
+    CONSTRAINTS
+    - Active ticket only; no future-stage logic.
+    - Do not invent rules, provider fields, expected outputs or architecture decisions.
+    - Identify every public interface, invariant, migration/dependency effect and test.
+    - Treat time cutoff, rights, security and reproducibility as design requirements.
+    - Stop if authority conflicts or a required fixture/decision is absent.
+    
+    OUTPUT
+    Write evidence/tickets/<ticket>/PLAN.md using PLANS.md.
+    Also produce a concise blocker list and proposed file-by-file change map.
+    Do not modify production code.
+    
+    DONE WHEN
+    The plan is specific enough that another agent can implement without making an
+    unapproved semantic decision, and every acceptance command maps to a planned test/output.
+
+====================================================================================================
+27. GENERIC IMPLEMENTATION PROMPT
+====================================================================================================
+    STAGE / TICKET
+    <TICKET_ID and title>
+    
+    GOAL
+    <one observable vertical capability>
+    
+    AUTHORITATIVE CONTEXT
+    Use only the provided Context Bundle and approved repository guidance. Cite section/decision IDs
+    inside evidence. Stop on contradiction.
+    
+    ALLOWED FILES
+    <explicit create/modify globs>
+    Everything else is read-only. No unrelated refactor.
+    
+    PUBLIC CONTRACT
+    <exact signatures, schemas, command/API and error behavior>
+    Do not change it without stopping.
+    
+    FIXTURES AND EXPECTED OUTPUTS
+    <IDs and paths>
+    
+    IMPLEMENTATION METHOD
+    1. Inspect current code and update PLAN progress.
+    2. Write the required failing tests first.
+    3. Implement the smallest complete slice.
+    4. Run targeted tests after each checkpoint.
+    5. Run all acceptance commands.
+    6. Review diff for invariants, cutoff, rights, secrets and exclusions.
+    7. Write evidence and a structured result matching codex_result.schema.json.
+    
+    PERMISSIONS
+    Network: <false/approved host only>
+    Migration: <allowed/forbidden>
+    New dependency: <allowed list or forbidden>
+    Sandbox: workspace-write
+    
+    EXCLUSIONS
+    <explicit non-goals>
+    
+    STOP CONDITIONS
+    <ticket list plus general AGENTS.md stop conditions>
+    
+    DONE WHEN
+    All public behavior and acceptance criteria pass from a clean environment; evidence is complete;
+    no excluded scope or hidden stub exists. Do not claim COMPLETE if any required command was not run.
+
+====================================================================================================
+28. GENERIC INDEPENDENT REVIEW PROMPT
+====================================================================================================
+    ROLE
+    Act as an independent, read-only reviewer. Assume the implementation may be subtly wrong.
+    Do not modify files.
+    
+    TARGET
+    Review <commit/branch/diff> against ticket <ID>, its authority, contracts, fixtures and exclusions.
+    
+    REVIEW ORDER
+    1. Scope/authority and unapproved decisions.
+    2. Domain correctness and boundary cases.
+    3. Temporal cutoff, idempotency, lineage and correction semantics.
+    4. Mathematical/numerical validity and determinism.
+    5. Database migration/constraints/concurrency.
+    6. Security, secret leakage, rights and personal data.
+    7. Test quality: missing oracle/property/integration/golden cases and assertion weakness.
+    8. Performance/deadline failure behavior.
+    9. Maintainability only after correctness.
+    
+    OUTPUT
+    For every finding provide severity P0/P1/P2/P3, file:line, failing scenario, why the current tests
+    miss it, and the smallest safe fix. Also list acceptance criteria independently verified.
+    Return structured review_result.json and a human-readable REVIEW.md.
+    
+    RULES
+    Do not praise generically. Do not accept because tests pass. Do not request out-of-scope redesign.
+    A P0/P1 finding blocks acceptance.
+
+====================================================================================================
+29. SPECIALISED PROMPT - DATABASE MIGRATION
+====================================================================================================
+    Implement exactly one approved schema change and its repository interface.
+    
+    Before coding:
+    - restate primary keys, foreign keys, unique/exclusion/check constraints, indexes,
+      valid/system time semantics and append-only policy;
+    - identify upgrade from prior accepted tag and downgrade/irreversible rationale;
+    - create the concurrency/as-of/correction test plan.
+    
+    Required tests:
+    - clean database upgrade;
+    - prior accepted schema upgrade;
+    - rollback or declared irreversible check;
+    - duplicate/concurrent insert behavior;
+    - as-of query;
+    - transaction rollback;
+    - schema fingerprint.
+    
+    Forbidden:
+    - autogenerate output accepted without manual edit;
+    - large data backfill hidden in migration;
+    - SQLite integration substitute;
+    - nullable/magic defaults that erase UNKNOWN semantics.
+
+====================================================================================================
+30. SPECIALISED PROMPT - NUMERICAL ALGORITHM
+====================================================================================================
+    Implement <algorithm> from the approved mathematical contract.
+    
+    First produce:
+    - formulas and parameterisation used;
+    - domain/preconditions;
+    - numerical method, bracket/tolerance/iteration limits;
+    - exact Decimal-to-float boundary;
+    - invariants and failure/fallback behavior;
+    - synthetic hand-computable or high-precision oracle cases.
+    
+    Required tests:
+    - known examples;
+    - boundaries/pathologies;
+    - property invariants;
+    - deterministic tolerance;
+    - fallback with visible confidence reduction;
+    - comparison to independent reference implementation on generated cases;
+    - performance budget.
+    
+    Do not change formulas, add regularisation or clip invalid outputs silently.
+    Record residuals, convergence and method version.
+
+====================================================================================================
+31. SPECIALISED PROMPT - PROVIDER ADAPTER
+====================================================================================================
+    Implement the adapter against recorded rights-approved fixtures first. Live HTTP is outside the
+    unit/contract suite.
+    
+    Required boundaries:
+    - deterministic request construction and sanitised fingerprint;
+    - credential injection without logs/config serialization;
+    - response envelope with provider/source/received/usable times;
+    - raw-retention action from Rights Profile;
+    - schema validation, unknown-field report and quarantine;
+    - central identity mapping only;
+    - quota/retry/cache status;
+    - idempotent canonical effect;
+    - explicit missing/error states.
+    
+    Live smoke ticket, if separately approved:
+    - isolated environment and read-only key;
+    - allowlisted host;
+    - minimum calls;
+    - save sanitised fixture and metadata;
+    - never make live smoke a deterministic PR requirement.
+
+====================================================================================================
+32. SPECIALISED PROMPT - PREDICTIVE MODEL
+====================================================================================================
+    Implement a baseline/challenger model without promoting it.
+    
+    Required artifacts:
+    - feature/label schemas and cutoff policy;
+    - training dataset ID/mode/splits;
+    - baseline and model card;
+    - deterministic seed hierarchy;
+    - training/evaluation command;
+    - calibration and subgroup metrics;
+    - serialized safe artifact/hash;
+    - prediction schema and confidence/degradation behavior.
+    
+    Time safety:
+    - all features usable before origin;
+    - preprocessing fitted on training only;
+    - no final cohort, lineup, correction or closing-odds leakage;
+    - canary tests prove post-cutoff changes do not alter historical predictions.
+    
+    Promotion is a separate human-approved ticket after DMFP-15 evidence.
+
+====================================================================================================
+33. SPECIALISED PROMPT - OPTIMISER
+====================================================================================================
+    Implement the approved formulation in layers:
+    1. data validation and canonical integer units;
+    2. decision variables/constraints;
+    3. objective components separately inspectable;
+    4. solver adapter/status/gap/time;
+    5. independent solution legality/value validator;
+    6. toy exhaustive oracle;
+    7. normal and final-fast performance profiles.
+    
+    Must report:
+    - feasible/infeasible/timeout/optimal state;
+    - incumbent, bound and gap;
+    - binding constraints;
+    - seed/options/version;
+    - objective decomposition;
+    - alternatives and baseline on common scenarios.
+    
+    Never return an illegal or unvalidated plan. A timeout may return only a labelled, independently
+    validated incumbent when ticket policy permits it.
+
+====================================================================================================
+34. SPECIALISED PROMPT - SECURITY/ASSURANCE
+====================================================================================================
+    Threat-model the exact ticket surface before implementation. Identify assets, trust boundaries,
+    attack/misuse paths, rights constraints and failure response.
+    
+    Required tests as applicable:
+    - golden fake-secret redaction across logs/errors/URLs/traces;
+    - authorization and loopback/private binding;
+    - path traversal/content-type/cache headers;
+    - dependency/SBOM/lock validation;
+    - rights-profile denial and retention deletion tombstone;
+    - backup restore verification;
+    - audit append-only/hash chain;
+    - fail-closed publication on stale rules/state/source.
+    
+    Do not weaken sandbox, expose a public write endpoint or add autonomous FPL actions.
+
+====================================================================================================
+35. SPECIALISED PROMPT - UI/EXPLANATION
+====================================================================================================
+    Build the view from an immutable golden Decision Bundle; do not call models/providers from the UI.
+    
+    Required:
+    - action/timing/baseline/value/range/confidence/assumption/fallback/freshness;
+    - blocked/degraded/superseded states;
+    - deterministic rounding and text;
+    - every number traceable to a structured field;
+    - accessible table/text alternative for each chart;
+    - keyboard, focus, contrast and reduced-motion behavior;
+    - private cache headers and immutable ETag behavior;
+    - responsive critical-deadline summary.
+    
+    Optional LLM rendering is excluded unless a separate ticket constrains it to paraphrasing approved
+    fields and verifies no numbers/actions/warnings change.
+
+====================================================================================================
+36. FIRST CODEX PROMPTS TO RUN
+====================================================================================================
+
+A0.01 - Read-only document manifest
+----------------------------------------------------------------------------------------------------
+Create a SHA-256 manifest for all supplied specifications; parse ID/version/status/parent/next-
+document references; report missing/duplicate/conflicting references. Do not modify source
+documents.
+    Suggested model: gpt-5.6-sol / high
+    Mode: read-only
+    Network: disabled
+    Output: structured result + evidence/tickets/A0.01/
+
+A0.02 - Open-question extraction
+----------------------------------------------------------------------------------------------------
+Extract each numbered OPEN QUESTION from DMFP-00 through DMFP-18 into structured JSON with
+document, section, category, exact text and inferred affected stages. Do not answer questions.
+    Suggested model: gpt-5.6-sol / high
+    Mode: read-only
+    Network: disabled
+    Output: structured result + evidence/tickets/A0.02/
+
+A0.03 - Criticality classification
+----------------------------------------------------------------------------------------------------
+Classify extracted questions P0/P1/P2 using legality, correctness, schedule and reversibility.
+Propose safe deferral/fallback only; mark all recommendations as proposed.
+    Suggested model: gpt-5.6-sol / high
+    Mode: read-only
+    Network: disabled
+    Output: structured result + evidence/tickets/A0.03/
+
+A0.04 - Provider contradiction analysis
+----------------------------------------------------------------------------------------------------
+Compare supplied DMFP-04 against every downstream reference to a zero-cost edition/API-FOOTBALL
+FREE. Produce a conflict matrix and two coherent option packages: paid-primary and zero-
+cost/manual-first.
+    Suggested model: gpt-5.6-sol / high
+    Mode: read-only
+    Network: disabled
+    Output: structured result + evidence/tickets/A0.04/
+
+A0.05 - DMFP-20 draft
+----------------------------------------------------------------------------------------------------
+Generate DMFP-20 from the decision inventory, preserving unresolved status and requiring
+Sebastian approval. Include provider, toolchain, GW1 scope, runtime, security and fallback
+decisions.
+    Suggested model: gpt-5.6-sol / high
+    Mode: workspace-write
+    Network: disabled
+    Output: structured result + evidence/tickets/A0.05/
+
+A0.06 - Authority manifest
+----------------------------------------------------------------------------------------------------
+Generate machine-readable module/stage authority mapping with
+document/version/hash/section/decision IDs and a validator.
+    Suggested model: gpt-5.6-sol / high
+    Mode: workspace-write
+    Network: disabled
+    Output: structured result + evidence/tickets/A0.06/
+
+A1.01 - Package skeleton
+----------------------------------------------------------------------------------------------------
+Implement only package/build skeleton, installed CLI version, py.typed and clean-wheel smoke
+test.
+    Suggested model: gpt-5.6-terra / medium-high
+    Mode: workspace-write
+    Network: disabled
+    Output: structured result + evidence/tickets/A1.01/
+
+A1.02 - Configuration
+----------------------------------------------------------------------------------------------------
+Implement strict typed configuration overlays, UTC/timezone/path validation and secret-
+reference-only semantics.
+    Suggested model: gpt-5.6-terra / medium-high
+    Mode: workspace-write
+    Network: disabled
+    Output: structured result + evidence/tickets/A1.02/
+
+A1.03 - Doctor CLI
+----------------------------------------------------------------------------------------------------
+Implement deterministic dmf doctor/config validate/show JSON output without network/database
+side effects.
+    Suggested model: gpt-5.6-terra / medium-high
+    Mode: workspace-write
+    Network: disabled
+    Output: structured result + evidence/tickets/A1.03/
+
+A1.04 - Quality/CI
+----------------------------------------------------------------------------------------------------
+Install approved Ruff/mypy/pytest/Hypothesis/coverage configuration, markers and clean wheel
+integration job.
+    Suggested model: gpt-5.6-terra / medium-high
+    Mode: workspace-write
+    Network: disabled
+    Output: structured result + evidence/tickets/A1.04/
+
+A1.05 - Evidence schema
+----------------------------------------------------------------------------------------------------
+Implement ticket/stage result JSON Schema validators and evidence manifest generator.
+    Suggested model: gpt-5.6-terra / medium-high
+    Mode: workspace-write
+    Network: disabled
+    Output: structured result + evidence/tickets/A1.05/
+
+A2.01 - Rules schemas/compiler
+----------------------------------------------------------------------------------------------------
+Implement YAML->canonical JSON validation/hash/status compiler against synthetic/reference
+fixtures; no target activation.
+    Suggested model: gpt-5.6-sol / high
+    Mode: workspace-write
+    Network: disabled
+    Output: structured result + evidence/tickets/A2.01/
+
+====================================================================================================
+37. COMPLETE PROMPT EXAMPLE - A1.01
+====================================================================================================
+    STAGE / TICKET
+    A1.01 - Package and build skeleton.
+    
+    GOAL
+    From a clean checkout, build a wheel, install it into a clean virtual environment and run
+    `dmf --version` successfully without importing from the source tree.
+    
+    AUTHORITATIVE CONTEXT
+    - approved authority manifest
+    - ADR-TOOLCHAIN-001
+    - A1.01 ticket/context bundle
+    - DMFP-19 repository/package requirements excerpt
+    - root AGENTS.md
+    
+    ALLOWED FILES
+    Create/modify only:
+    - pyproject.toml
+    - .python-version
+    - README.md
+    - LICENSE
+    - src/dmf_pulse/__init__.py
+    - src/dmf_pulse/py.typed
+    - src/dmf_pulse/cli/__init__.py
+    - src/dmf_pulse/cli/app.py
+    - tests/unit/cli/test_version.py
+    - tests/integration/package/test_installed_wheel.py
+    - Makefile targets directly required by this ticket
+    - evidence/tickets/A1.01/**
+    
+    PUBLIC CONTRACT
+    - Python package name: dmf_pulse
+    - console command: dmf
+    - `dmf --version` returns the package semantic version and exit code 0
+    - package distributes py.typed
+    
+    TESTS FIRST
+    1. version command schema/exit code
+    2. build wheel
+    3. install wheel in clean venv
+    4. run outside repository and prove installed package path is used
+    5. verify py.typed is in wheel
+    
+    ACCEPTANCE COMMANDS
+    - make format-check
+    - make lint
+    - make type
+    - pytest -m "unit or integration" tests/unit/cli tests/integration/package
+    - python -m build
+    - python scripts/verify_wheel.py dist/*.whl
+    
+    PERMISSIONS
+    - network disabled
+    - no migration
+    - no new dependency outside ADR-TOOLCHAIN-001
+    - workspace-write
+    
+    EXCLUSIONS
+    Configuration loader, database, rules, providers, FastAPI, models, orchestration and UI.
+    
+    STOP CONDITIONS
+    Stop if the selected Python/toolchain cannot build the approved dependencies, if `dmf` conflicts
+    with another required package command, or if a new dependency is required outside the ADR.
+    
+    RESPONSE
+    Write codex_result.json matching the repository schema and report every command actually run.
+    Do not claim complete if the clean-wheel test was skipped.
+
+====================================================================================================
+38. TEST STRATEGY
+====================================================================================================
+
+38.1 TEST PYRAMID BY RISK
+----------------------------------------------------------------------------------------------------
+    Pure deterministic rules/math:
+      exhaustive/golden + property + mutation + differential/oracle
+    
+    Domain/application services:
+      unit + property + contract + integration
+    
+    PostgreSQL/temporal/migrations:
+      real PostgreSQL integration + concurrency + replay/as-of
+    
+    Provider adapters:
+      recorded contract fixtures + schema drift + rights/quota; live smoke separate
+    
+    Predictive models:
+      leakage/unit + deterministic training smoke + rolling evaluation + calibration
+    
+    Optimisers:
+      constraint unit + exhaustive toy oracle + scenario integration + performance
+    
+    API/UI:
+      schema/OpenAPI + golden view + accessibility/security/e2e
+    
+    Operations/security:
+      fault injection + restore/replay + secret redaction + publication block drills
+
+38.2 COVERAGE/MUTATION
+----------------------------------------------------------------------------------------------------
+    Critical deterministic/security/cutoff logic: target >=95% branch and meaningful mutation score.
+    Core domain/application: target 85-90% branch by maturity.
+    Provider/UI: target 75-85% branch plus strong contract/golden/accessibility tests.
+    No broad pragma exclusions. Every surviving critical mutant is killed, proven equivalent or
+    explicitly approved with rationale.
+
+38.3 PROPERTY INVARIANTS
+----------------------------------------------------------------------------------------------------
+- Probabilities finite and within [0,1]; proper vectors sum within tolerance.
+- Prices/bank/selling values are integer tenths and legal.
+- Time intervals do not overlap where prohibited; as-of query is stable.
+- Repeated ingestion has one canonical effect but preserves retrieval events.
+- Score/player event conservation holds in every scenario.
+- FPL component sum equals exact integer total.
+- Every optimiser output passes independent legality validation.
+- Same inputs/config/seed produce the same canonical outputs/hashes, subject to documented
+  solver nondeterminism.
+- Changing a post-cutoff input cannot alter a historical pre-cutoff prediction.
+
+====================================================================================================
+39. CI PIPELINE
+====================================================================================================
+    PR FAST
+      format check
+      Ruff lint
+      mypy strict production package
+      unit tests
+      fast Hypothesis profile
+      contract/golden relevant to diff
+      branch coverage
+      build wheel and installed-wheel smoke
+      secret scan and dependency lock consistency
+    
+    MAIN
+      PR FAST plus PostgreSQL integration
+      migration upgrade/downgrade
+      solver integration and toy oracle
+      full contract fixtures
+      selected mutation slice
+      deterministic replay
+    
+    NIGHTLY
+      full Hypothesis
+      mutation rotation
+      historical/recorded fixture replay
+      performance benchmarks
+      schema/provider drift checks
+      vulnerability/licence/SBOM
+      model calibration/drift where data exist
+    
+    STAGE GATE
+      clean isolated environment
+      all stage suites
+      vertical-slice demo command
+      acceptance manifest validation
+      independent Codex review
+      human approval
+
+====================================================================================================
+40. EVIDENCE AND ACCEPTANCE
+====================================================================================================
+    evidence/tickets/<id>/
+      PLAN.md
+      ticket.yaml
+      context_bundle.sha256
+      commands.log
+      tests.json
+      coverage.json
+      mutation.json              # when applicable
+      performance.json
+      migration.json             # when applicable
+      dependency_diff.json
+      public_contract_hashes.json
+      fixture_hashes.json
+      diff.stat
+      codex_result.json
+      REVIEW.md
+      review_result.json
+      ACCEPTANCE.md
+    
+    evidence/stages/<id>/
+      stage_acceptance.json
+      STAGE_ACCEPTANCE.md
+      clean_demo.log
+      release_manifest.json
+      rollback.md
+
+40.1 ACCEPTANCE SIGNATURE
+----------------------------------------------------------------------------------------------------
+    Accepted ticket requires:
+      implementation commit
+      ticket/context hash
+      test/acceptance results
+      independent review commit/target
+      reviewer identity and time
+      human approval
+      known limitations/exclusions
+      migration/dependency/public-contract hashes
+    
+    A tag may be created only after the evidence validator passes.
+
+====================================================================================================
+41. DEPENDENCY POLICY
+====================================================================================================
+    For every proposed dependency record:
+      name/version/purpose
+      runtime or development
+      licence
+      official project/source
+      maintenance/release health
+      known security status
+      transitive impact
+      alternative considered
+      reason standard library/current stack is insufficient
+      deterministic/offline build availability
+      lock and SBOM update
+      removal/rollback plan
+    
+    Codex must stop rather than install an unapproved dependency.
+
+====================================================================================================
+42. CONTEXT AND TOKEN MANAGEMENT
+====================================================================================================
+1. Keep root AGENTS.md concise; place specialised rules in local files.
+2. Generate section excerpts with exact source locators and hashes; never copy whole specs by
+   default.
+3. Use one task session per ticket. Resume only for the same ticket; start a fresh session for
+   review.
+4. After planning, freeze a compact implementation context containing the plan, contracts and
+   fixtures rather than the entire research history.
+5. Use structured outputs for result/review/evidence so summaries do not lose required fields.
+6. Ask subagents to return concise findings with paths/lines, not full duplicated document
+   summaries.
+7. Archive completed ticket context and do not let later tickets rely on hidden chat history.
+8. When a repeated mistake occurs, add a narrow AGENTS.md rule or test rather than a longer
+   prompt.
+
+====================================================================================================
+43. FAILURE AND STOP CONDITIONS
+====================================================================================================
+    Codex MUST stop and mark BLOCKED when:
+    - approved requirements conflict;
+    - target rule/field/expected output is unknown;
+    - required fixture, mapping, rights profile or decision is missing;
+    - a public interface must change outside the ticket;
+    - a forbidden migration/dependency/network call is required;
+    - a secret or unlicensed raw body appears;
+    - deterministic acceptance cannot be reproduced;
+    - solver/model result is invalid or only plausible-looking;
+    - data cutoff cannot be proven;
+    - safe fallback/degradation behavior is unspecified;
+    - required acceptance command cannot run in the provided environment.
+    
+    Codex SHOULD continue with a documented partial result only when the ticket contract explicitly
+    allows a nonaccepted research spike. It must never label that COMPLETE.
+
+====================================================================================================
+44. INPUTS THAT MUST BE CREATED OR SUPPLIED
+====================================================================================================
+    Governance
+      approved DMFP-20
+      authority manifest
+      provider/toolchain/GW1-scope ADRs
+      stage/ticket owners and reviewers
+    
+    Target season
+      official rules source bundle and approved compiled ruleset
+      player/team/position/fixture/deadline snapshots
+      manager state for live decisions
+    
+    Provider
+      contract/terms and Rights Profile
+      credential provision outside repository
+      sample payloads and schema/version
+      coverage/latency/settlement benchmark
+      provider/operator/fixture/player mapping golden set
+    
+    Fixtures
+      synthetic rules and optimiser fixtures
+      recorded sanitised FPL/provider fixtures
+      expected canonical rows and outputs
+      source/rights/checksum manifest
+    
+    Models
+      labelled historical/prospective datasets with cutoff/usable times
+      baseline definitions
+      split manifests
+      promotion metric configuration
+    
+    Operations
+      target host/OS/CPU/RAM/storage
+      PostgreSQL version/connection strategy
+      backup destination and recovery objective
+      execution safety buffer and alert route
+      private API binding/auth decision
+
+====================================================================================================
+45. GW1 GO/NO-GO CHECKLIST
+====================================================================================================
+    RULES
+    [ ] 2026/27 ruleset ACTIVE and hash stored.
+    [ ] Deadlines, positions, prices, squad and captain rules verified.
+    
+    DATA
+    [ ] FPL snapshot fresh/mapped/usable.
+    [ ] Odds/manual market evidence fresh or approved degraded fallback.
+    [ ] Availability inputs reviewed; unresolved mappings zero.
+    [ ] Source bundle frozen at cutoff.
+    
+    MODELS
+    [ ] Baselines validated; outputs proper/coherent.
+    [ ] Scenario ESS/Monte Carlo error inside gate.
+    [ ] No post-cutoff data.
+    
+    DECISION
+    [ ] Current squad/bank/state independently verified.
+    [ ] Recommended and no-action plans legal.
+    [ ] Solver status/gap/time acceptable.
+    [ ] Exact tactics, captain/vice and execution timing present.
+    
+    ASSURANCE
+    [ ] Decision Bundle immutable and reproducible.
+    [ ] No blocking rights/security/data alert.
+    [ ] Latest safe execution time remains.
+    [ ] Backup/restore and operator checklist tested.
+    [ ] Human has reviewed and recorded execution.
+
+====================================================================================================
+46. CODEX AUTOMATION EXAMPLES
+====================================================================================================
+
+46.1 STRUCTURED PLANNING/RESULT
+----------------------------------------------------------------------------------------------------
+    # Read-only planning (illustrative; adjust flags to installed Codex version)
+    codex exec --sandbox read-only   -m gpt-5.6-sol   "$(cat .codex/prompts/plan_ticket.txt)"   --output-schema .codex/schemas/plan_result.schema.json   -o evidence/tickets/A1.01/plan_result.json
+    
+    # Implementation
+    codex exec --sandbox workspace-write   -m gpt-5.6-terra   "$(cat .codex/prompts/implement_ticket.txt)"   --output-schema .codex/schemas/codex_result.schema.json   -o evidence/tickets/A1.01/codex_result.json
+    
+    # Independent review in a fresh run
+    codex review --base dmfp-stage-A0-accepted
+Before scripting, verify command flags/model names against the installed Codex release. The
+repository should pin or record the Codex CLI version used for accepted automation.
+
+====================================================================================================
+47. FINAL OPERATING CHECKLIST FOR EACH TICKET
+====================================================================================================
+    BEFORE
+    [ ] READY gate passed and context bundle hash committed.
+    [ ] Correct Codex model/reasoning/sandbox selected.
+    [ ] Branch/worktree clean; accepted parent tag checked out.
+    
+    DURING
+    [ ] Plan maintained.
+    [ ] Tests/fixtures first.
+    [ ] No network/secrets/unapproved dependency/migration.
+    [ ] Scope remains inside allowed files and exclusions.
+    [ ] Partial findings are recorded, not hidden.
+    
+    AFTER IMPLEMENTATION
+    [ ] Acceptance commands run from clean environment.
+    [ ] Diff and generated artifacts reviewed.
+    [ ] Evidence/result schema validates.
+    [ ] Fresh Sol review completed.
+    [ ] P0/P1 findings resolved.
+    [ ] Human approves public contract and behavior.
+    [ ] Merge/tag/rollback documentation completed.
+
+====================================================================================================
+48. SOURCE MANIFEST FOR THIS PLAYBOOK
+====================================================================================================
+The following source files were used to construct this playbook. Hashes identify the exact
+uploaded versions; approval status remains governed by DMFP-20 and the Authority Manifest.
+DMFP-00    sha256=b003c63b392f43dcd2278333af5052ac3330f520b3506cd2a9a2b2d4a0b444a3  file=00_MASTER_ARCHITECTURE_AND_PRODUCT_DEFINITION(2).txt
+DMFP-01    sha256=07e35fcba49155e4fd6a149f513172ad72f31dc4aec231d8f9255ca3c2c5b9d6  file=01_RESEARCH_STANDARD_AND_EVIDENCE_REGISTER(2).txt
+DMFP-02    sha256=7080479a784d57a334f0b3ed8c9bd465c89434729e5f7599f666c269bec11916  file=02_FPL_RULES_SCORING_AND_SEASON_CONFIGURATION(2).txt
+DMFP-03    sha256=f3ecc7bb990e4f3ae0dcedb06438e04cd5516b156c9130fdc542dcd09dcd58ab  file=03_CANONICAL_DATA_MODEL_AND_IDENTIFIERS(2).txt
+DMFP-04    sha256=7650b1e09ff8e85d19dc3e6e177f0b09c1d11ea444b395c1ba78cfcb3093e5b8  file=04_DATA_SOURCES_MARKETS_APIS_AND_LICENSING(2).txt
+DMFP-05    sha256=de024be01f8e1fdd1bae259ffe9230508870830644da67dc61639cb70cd943dd  file=05_INGESTION_STORAGE_AND_DATA_QUALITY(2).txt
+DMFP-06    sha256=af171422026588db3e4f93301df3af686b3312cdd40dd0cf8c77b35174ec6e6c  file=06_ODDS_NORMALISATION_AND_MARKET_CONSENSUS(2).txt
+DMFP-07    sha256=e6c70afced2e702d99e321a424cec7fbf6c9fccbc91191717566f4aef66d2626  file=07_PLAYER_AVAILABILITY_START_AND_MINUTES_MODEL(2).txt
+DMFP-08    sha256=7cb378f26741d28e6b900530102dfdbd2286470c5b8920764792eb70834c18ff  file=08_FOOTBALL_EVENT_DISTRIBUTION_ENGINE(2).txt
+DMFP-09    sha256=1b5ee04f0b57f604072b6536fc8e60be19a0590f101f095614639af7cedd36da  file=09_FPL_POINTS_DISTRIBUTION_ENGINE(2).txt
+DMFP-10    sha256=5914251e325cd4b57f63413820c5d6a0612f6c33cbf73e7e003624d5faf6cf68  file=10_UNCERTAINTY_SCENARIOS_AND_EARLY_SEASON_POLICY(2).txt
+DMFP-11    sha256=32f831e4a249d10cd08323394a713fdd4084b297400503791e410f133184220e  file=11_PRICE_CHANGE_AND_TEAM_VALUE_MODEL(2).txt
+DMFP-12    sha256=cba15ba9c72ff68c0ea8dca6ac5cf9075bbb34eefca06e86060cf33f824a84f6  file=12_SQUAD_TRANSFER_AND_LINEUP_OPTIMISER(2).txt
+DMFP-13    sha256=6d2a7df75b53e338f96924de64cc4d847ba2964cabe700641086cf9acc8144b0  file=13_CAPTAINCY_AND_CHIP_OPTIMISER(2).txt
+DMFP-14    sha256=e796772890db8e5f6ca9ab8d61605a60a87acf6c545a05ab82c9fc73ae99c6de  file=14_RANK_EFFECTIVE_OWNERSHIP_AND_RISK_STRATEGY(2).txt
+DMFP-15    sha256=0feec95bb9a3fb31b5ccc504699681a8170d7c349c18accefc6e3047ab9a15ed  file=15_BACKTESTING_CALIBRATION_AND_BENCHMARKS(2).txt
+DMFP-16    sha256=0bf960b211f7f566ae30eed46f1f6b577606d9a8c9fd7229f122f10c64ad18f9  file=16_ORCHESTRATION_APIS_AND_DECISION_PIPELINE(2).txt
+DMFP-17    sha256=83fde67e17d8171c8305707c02b90838c7ad984f651f00636bb5a26d1ecd1486  file=17_OBSERVABILITY_REPRODUCIBILITY_SECURITY_COMPLIANCE(2).txt
+DMFP-18    sha256=6b2efa3193e6aa123e63038956f06f72dc597ce2bd169130dcaab0c160a1cd0f  file=18_DECISION_UI_REPORTING_AND_EXPLANATIONS(2).txt
+DMFP-19    sha256=2b2aac2301956b367b8fbd7c98259ccc7e6edcc9c294038de4e79c8bcabb4691  file=19_CODEX_IMPLEMENTATION_ROADMAP_AND_ACCEPTANCE_TESTS(2).txt
+LEGACY     sha256=563ec9b080835cbe2e720698ea79c9aab90be86789cd320cfb224788ec6ac8f9  file=DMF_Pulse_Report.txt
+LEGACY     sha256=3f67a367322e02a4668fb2acc7d3371153e11ff83246c4f1c3470df87565fe43  file=Sebastian_FPL_Analytics_Ecosystem_UPDATED_2025-2030.txt
+LEGACY     sha256=9b5b9de40c8fb2f20c4a0a195133f646c94ead3a17acb9d008d548ee0661d9d6  file=DMF Content Automation Start Plan.txt
+
+====================================================================================================
+49. CONCLUSION
+====================================================================================================
+The safest and fastest path is not to ask Codex to implement the whole system. Use Codex as a
+configured engineering team: Sol resolves and reviews the hardest contracts; Terra implements
+bounded vertical slices; Luna handles repeatable fixture/schema work; every ticket is
+constrained by approved inputs, least privilege, tests and independent evidence. Begin with
+A0.01, not with a broad request to build DMF Pulse.

@@ -1,0 +1,44 @@
+name: windows-smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 5 1 * *"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Python 3.13 / Windows smoke
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      UV_NO_PROGRESS: "1"
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install the pinned uv frontend
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen dependency sync
+        run: uv sync --all-groups --frozen
+
+      - name: Installed CLI smoke
+        run: |
+          uv run dmf --version
+          uv run dmf doctor --json
+          uv run dmf config validate --environment test --config-root config
+
+      - name: Package smoke outside source tree
+        env:
+          UV_OFFLINE: "1"
+        run: uv run python scripts/verify_wheel.py

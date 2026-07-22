@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DMF Pulse Ticket Evidence Manifest",
+  "type": "object",
+  "required": [
+    "ticket_id",
+    "status",
+    "created_at",
+    "commands",
+    "artifacts"
+  ],
+  "properties": {
+    "ticket_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "DRAFT",
+        "COMPLETE",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "code_commit": {
+      "type": "string"
+    },
+    "context_hash": {
+      "type": "string"
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "known_limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

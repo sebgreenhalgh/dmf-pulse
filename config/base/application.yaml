@@ -1,0 +1,9 @@
+internal_timezone: UTC
+display_timezone: Europe/London
+artifact_root: artifacts
+database_dsn_ref: null
+log_level: INFO
+compute:
+  device: cpu
+  requested_accelerator: null
+  fallback_to_cpu: true

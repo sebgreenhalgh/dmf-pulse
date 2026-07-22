@@ -1,0 +1,4841 @@
+DMF PULSE — ASSUMPTIONS, DECISIONS AND OPEN QUESTIONS
+=====================================================
+
+Document ID: DMFP-20
+Version: 0.9 (Living Architecture Decision and Assumption Register)
+Status: ACTIVE GOVERNANCE RECORD — AUTHORITATIVE AFTER SEBASTIAN APPROVAL
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 18 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Architecture/research steward: ChatGPT, under human review
+Implementation steward: Codex, under human review
+
+Parent documents:
+- DMFP-00 through DMFP-19
+
+PURPOSE
+-------
+This document is the living architectural memory for DMF Pulse.
+
+It records:
+
+- accepted architectural decisions;
+- provisional decisions;
+- blocked target-season decisions;
+- rejected alternatives;
+- assumptions;
+- known weaknesses;
+- unresolved research questions;
+- temporary shortcuts and technical debt;
+- reasons for architectural changes;
+- superseded decisions;
+- review triggers;
+- ownership and validation actions.
+
+Its purpose is to stop ChatGPT, Codex and human contributors from repeatedly
+reopening settled decisions or silently changing architecture.
+
+Before proposing or implementing a change, every contributor MUST:
+
+1. search this document for the relevant decision, assumption, weakness and
+   open question;
+2. read the authoritative module specification referenced by that entry;
+3. determine whether the proposal is compatible, an experiment or a breaking
+   architectural change;
+4. update this record before treating a changed decision as accepted;
+5. preserve the prior entry and its rationale.
+
+This document is not a substitute for the detailed module specifications.
+It is the authoritative index of what is settled, what is provisional and what
+remains unresolved.
+
+GOVERNING PRINCIPLE
+-------------------
+An architecture decision is not changed because a later conversation finds a
+plausible alternative.
+
+A settled decision changes only when:
+
+- new official FPL rules invalidate it;
+- new provider rights or technical constraints invalidate it;
+- prospective or locked-holdout evidence materially favours another approach;
+- implementation proves it infeasible or disproportionate;
+- Sebastian explicitly changes the product objective or risk tolerance;
+- a security, privacy or compliance issue requires replacement.
+
+A change requires:
+
+- a new or amended ADR entry;
+- evidence;
+- affected-module analysis;
+- migration and rollback plan;
+- acceptance-test changes;
+- Sebastian's approval when the decision is production material.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The accepted default. A deviation requires an explicit record.
+
+MAY:
+Optional within the accepted architecture.
+
+======================================================================
+0. AUTHORITY, PRECEDENCE AND STATUS
+======================================================================
+
+0.1 PRECEDENCE
+--------------
+When two records conflict, apply this order:
+
+1. Current official target-season FPL rules and controlling provider terms.
+2. An ACTIVE/ACCEPTED DMFP-20 decision with the newest approved decision date.
+3. The most specific accepted module document, DMFP-02 through DMFP-19.
+4. DMFP-00 master architecture.
+5. Earlier project notes and exploratory research.
+6. Implementation convenience or conversational preference.
+
+No implementation detail can override an official rule or accepted decision.
+
+0.2 STATUS VALUES
+-----------------
+ACCEPTED:
+The default architecture. Implementation must follow it.
+
+PROVISIONAL:
+Selected for the first implementation but still requires empirical validation.
+Codex implements it behind a version/config boundary where practical.
+
+BLOCKED_TARGET_RULES:
+Cannot activate until the 2026/27 game or rules are verified.
+
+EXPERIMENTAL:
+May run as a challenger or research branch. It cannot drive production output.
+
+DEFERRED:
+Valid future possibility, deliberately outside the current roadmap.
+
+REJECTED:
+Considered and not selected. Do not reintroduce without new evidence.
+
+SUPERSEDED:
+Previously selected but replaced. Kept for history.
+
+WITHDRAWN:
+Invalidated by evidence, rules, rights or security.
+
+0.3 DECISION IDENTIFIERS
+------------------------
+Decision IDs never change or get reused.
+
+Format:
+
+    ADR-<DOMAIN>-<NNN>
+
+Assumptions:
+
+    ASM-<DOMAIN>-<NNN>
+
+Known weaknesses:
+
+    WEAK-<DOMAIN>-<NNN>
+
+Open questions:
+
+    OQ-<DOMAIN>-<NNN>
+
+Temporary shortcuts:
+
+    TEMP-<DOMAIN>-<NNN>
+
+Rejected alternatives:
+
+    REJ-<DOMAIN>-<NNN>
+
+Architecture changes:
+
+    CHANGE-<NNN>
+
+0.4 CHANGE CONTROL
+------------------
+A decision change MUST record:
+
+- old status;
+- new status;
+- date;
+- author/proposer;
+- evidence;
+- reason;
+- affected documents/modules;
+- code/data migration;
+- test impact;
+- operational impact;
+- rollback;
+- approval.
+
+0.5 REVIEW CADENCE
+------------------
+Review this document:
+
+- immediately after 2026/27 FPL launch;
+- after every official rule change;
+- before each implementation stage begins;
+- after each stage acceptance;
+- after model promotion or withdrawal;
+- after a provider-terms change;
+- after a P0/P1 incident;
+- monthly during the season;
+- at season end.
+
+0.6 CODEX RULE
+--------------
+Codex MUST NOT resolve an OPEN question by silently choosing an implementation.
+It may implement an accepted provisional default and surface the question in
+stage evidence.
+
+0.7 CHATGPT RULE
+----------------
+ChatGPT MUST NOT present a rejected or deferred alternative as the selected
+architecture without explicitly proposing an ADR change.
+
+======================================================================
+1. ARCHITECTURAL DECISION REGISTER
+======================================================================
+
+----------------------------------------------------------------------
+ADR-PROD-001 — Private decision support, not automatic FPL execution
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Pulse provides recommendations, explanations and an execution checklist. Sebastian performs official FPL transfers, lineups, captaincy and chip activation manually. No official FPL write credential or automated action endpoint is part of V1.
+
+Reason:
+This materially reduces account, security, terms-of-service and deadline-execution risk while preserving the analytics objective.
+
+Alternatives rejected or not selected:
+Automated browser control; private undocumented write endpoints; stored FPL login/session automation.
+
+Key assumptions:
+Manual execution remains feasible and the official game does not provide an approved write API for this use.
+
+Known weaknesses / consequences:
+A correct recommendation can still be executed incorrectly or too late; execution state must be recorded separately.
+
+Revisit when:
+An official, documented, permitted write API becomes available and a separate security/compliance review approves its use.
+
+Authoritative references:
+DMFP-00, DMFP-16, DMFP-17, DMFP-18.
+
+----------------------------------------------------------------------
+ADR-PROD-002 — Expected remaining-season points is the default objective
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Outside an explicitly selected rank or competition objective, Pulse maximises expected cumulative FPL points over the remaining season using rolling-horizon approximation and future-state value.
+
+Reason:
+The product exists to improve season performance, not weekly entertainment, team value or short-term rank volatility.
+
+Alternatives rejected or not selected:
+Maximise current-Gameweek points only; maximise team value; minimise variance; maximise expected rank at all times.
+
+Key assumptions:
+Expected points is the appropriate default utility for a manager seeking the strongest long-run finish.
+
+Known weaknesses / consequences:
+Terminal-value and horizon approximation can bias the practical objective; this must be validated sequentially.
+
+Revisit when:
+Sebastian selects a different explicit utility, or backtesting shows another declared objective improves the desired outcome.
+
+Authoritative references:
+DMFP-00, DMFP-10, DMFP-12, DMFP-14.
+
+----------------------------------------------------------------------
+ADR-PROD-003 — Raw projections remain independent of rank strategy
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Football, minutes, price and FPL-points distributions are identical across points, protection and chasing modes for the same information and model versions. Rank affects only decision utility and opponent comparison.
+
+Reason:
+Changing forecasts because Sebastian is behind would mix belief with preference and make calibration impossible.
+
+Alternatives rejected or not selected:
+Inflating differential projections; reducing popular-player xP; rank-adjusted player forecasts.
+
+Key assumptions:
+The same physical football outcome distribution applies regardless of Sebastian’s league position.
+
+Known weaknesses / consequences:
+Users may misunderstand why a lower-xP player appears in a rank-aware plan; the UI must show the points sacrifice and target gain.
+
+Revisit when:
+A formally specified causal interaction exists between public ownership and football outcomes, which is currently outside scope.
+
+Authoritative references:
+DMFP-09, DMFP-14, DMFP-18.
+
+----------------------------------------------------------------------
+ADR-PROD-004 — Modular monolith before microservices
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Implement Pulse as one typed Python package with separate scheduler, API and worker processes sharing PostgreSQL and immutable artifacts.
+
+Reason:
+The workload is private and moderate. A modular monolith minimises deployment, network and schema complexity while preserving module contracts.
+
+Alternatives rejected or not selected:
+Kubernetes-first microservices; one service per model; distributed event bus as the initial architecture.
+
+Key assumptions:
+One host or small private server can satisfy the first-season workload and deadline objectives.
+
+Known weaknesses / consequences:
+A single codebase can still become tightly coupled; dependency rules and public contracts must be enforced.
+
+Revisit when:
+Measured scale, fault isolation or organisational boundaries make process/service separation materially beneficial.
+
+Authoritative references:
+DMFP-00, DMFP-16, DMFP-19.
+
+----------------------------------------------------------------------
+ADR-GOV-001 — Module specifications plus DMFP-20 govern architecture
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+DMFP-00–19 define detailed requirements; DMFP-20 records selected status, rationale, assumptions and review triggers. Conversations and implementation convenience do not override them.
+
+Reason:
+A persistent authority prevents architectural drift across long ChatGPT/Codex implementation cycles.
+
+Alternatives rejected or not selected:
+Treat each new prompt as a clean-slate design exercise; rely only on code as documentation.
+
+Key assumptions:
+The documents are versioned and reviewed when implementation evidence changes them.
+
+Known weaknesses / consequences:
+The register can become stale unless stage gates require updates.
+
+Revisit when:
+The governance process proves too burdensome; simplify format without removing decision history.
+
+Authoritative references:
+DMFP-00, DMFP-19, this document.
+
+----------------------------------------------------------------------
+ADR-GOV-002 — One validated vertical slice at a time
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Codex receives one bounded stage ticket at a time. The next stage starts only after runnable acceptance evidence and Sebastian approval.
+
+Reason:
+Small accepted slices reduce integration risk, hidden stubs and architecture-by-guesswork.
+
+Alternatives rejected or not selected:
+One prompt for the whole system; parallel implementation of unresolved later modules; code-first prototyping without contracts.
+
+Key assumptions:
+The 16-stage roadmap is sufficiently granular and the accepted interfaces can support later modules.
+
+Known weaknesses / consequences:
+Delivery can feel slower and interfaces may need controlled evolution.
+
+Revisit when:
+A stage is demonstrably over-fragmented; merge only bounded tickets with unchanged acceptance gate.
+
+Authoritative references:
+DMFP-19.
+
+----------------------------------------------------------------------
+ADR-GOV-003 — Official target-season rules are activation gates
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Reference 2025/26 rules may power tests and research, but 2026/27 production scoring, chips, ranks, prices and constraints remain blocked until official target-season rules are captured and activated.
+
+Reason:
+FPL changes rules between seasons. Silent carry-forward can invalidate every recommendation.
+
+Alternatives rejected or not selected:
+Assume prior-season rules remain unchanged; encode season checks directly in code.
+
+Key assumptions:
+Official rules become available before actionable 2026/27 deadlines.
+
+Known weaknesses / consequences:
+Prelaunch implementation must use reference/synthetic configurations and cannot claim live readiness.
+
+Revisit when:
+Immediately after launch and after any official rule amendment.
+
+Authoritative references:
+DMFP-02, DMFP-09, DMFP-12–15.
+
+----------------------------------------------------------------------
+ADR-GOV-004 — No hidden hard-coded policy constants
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Rules, policy thresholds, confidence gates, horizons, source freshness and robust parameters are versioned configuration or model artifacts, not scattered literals.
+
+Reason:
+The product must adapt across seasons and preserve reproducibility.
+
+Alternatives rejected or not selected:
+Inline season conditionals; magic numbers chosen for convenience.
+
+Key assumptions:
+Configuration validation and run manifests can capture all decision-relevant values.
+
+Known weaknesses / consequences:
+Over-configuration can reduce clarity; domain invariants remain code-level types and constraints.
+
+Revisit when:
+A value is proven to be a permanent mathematical invariant rather than a policy/rule.
+
+Authoritative references:
+DMFP-02, DMFP-10–19.
+
+----------------------------------------------------------------------
+ADR-RES-001 — Evidence hierarchy and claim-level source register
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Material architectural claims use official sources, primary research or clearly labelled practitioner evidence. Each module maintains a source register and separates evidence from Pulse inference.
+
+Reason:
+The system depends on changing rules, provider terms and methodological choices. Claim-level provenance prevents confident folklore.
+
+Alternatives rejected or not selected:
+Rely on community consensus; cite only a bibliography without mapping claims; use secondary summaries where primary evidence exists.
+
+Key assumptions:
+Sufficient primary or official evidence can be collected for material choices.
+
+Known weaknesses / consequences:
+Some FPL mechanisms remain proprietary and only inferential evidence exists.
+
+Revisit when:
+New primary evidence, target-season rules or contradictory prospective findings emerge.
+
+Authoritative references:
+DMFP-01 and every module source register.
+
+----------------------------------------------------------------------
+ADR-DATA-001 — Canonical UUID identity separated from provider identifiers
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Players, teams, fixtures, managers, markets and decisions use stable canonical UUIDs. Provider IDs live in temporal mapping tables.
+
+Reason:
+Provider IDs change, collide or refer to season-specific records. Canonical identity is required for multi-source lineage and replay.
+
+Alternatives rejected or not selected:
+Use FPL element ID as the primary key; use player names as joins.
+
+Key assumptions:
+Entity resolution can be maintained prospectively with explicit unresolved states.
+
+Known weaknesses / consequences:
+Mapping errors can propagate widely and require append-only correction/invalidation.
+
+Revisit when:
+A provider supplies globally stable, legally usable identifiers and all source requirements simplify materially.
+
+Authoritative references:
+DMFP-03, DMFP-05.
+
+----------------------------------------------------------------------
+ADR-DATA-002 — PostgreSQL operational truth and Parquet analytical archive
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+PostgreSQL is authoritative for canonical operational state, control-plane records and temporal queries. Immutable Parquet is the analytical/research artifact format.
+
+Reason:
+This combines transactional integrity and temporal querying with efficient columnar model/backtest access.
+
+Alternatives rejected or not selected:
+Only data lake; only SQLite; mutable CSV folders; document database as source of truth.
+
+Key assumptions:
+One PostgreSQL instance and local/object artifact store can support initial scale.
+
+Known weaknesses / consequences:
+Two storage layers require lineage and consistency controls.
+
+Revisit when:
+Scale or workload demonstrates a measured need for specialised analytical infrastructure.
+
+Authoritative references:
+DMFP-03, DMFP-05, DMFP-16.
+
+----------------------------------------------------------------------
+ADR-DATA-003 — Immutable raw observations and effectively-once canonical effects
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Retrieval is at least once. Every retrieval event is recorded. Raw source observations are immutable where rights permit. Canonical promotion is idempotent/effectively once.
+
+Reason:
+Retries and provider ambiguity are unavoidable; deleting duplicate retrieval evidence destroys operational truth.
+
+Alternatives rejected or not selected:
+Exactly-once network retrieval; overwrite latest payload; deduplicate away retrieval attempts.
+
+Key assumptions:
+Content hashing and database constraints can prevent duplicate canonical effects.
+
+Known weaknesses / consequences:
+Storage grows and provider retention may restrict raw persistence.
+
+Revisit when:
+Provider rights or storage capacity require a different retention implementation, without changing the logical immutability model.
+
+Authoritative references:
+DMFP-05.
+
+----------------------------------------------------------------------
+ADR-DATA-004 — usable_at controls historical eligibility
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Strict live features require `usable_at <= historical decision cutoff`. Provider generation time alone is insufficient.
+
+Reason:
+Pulse can receive, parse or map a fact after the deadline even if the provider timestamp is earlier.
+
+Alternatives rejected or not selected:
+Use event time; use received time only; use current database snapshot.
+
+Key assumptions:
+Pipeline timestamps are captured through ingestion and promotion.
+
+Known weaknesses / consequences:
+Older history may lack usable-time evidence and must be labelled reconstructed.
+
+Revisit when:
+A source provides cryptographically reliable, directly usable publication timing and no processing delay, which still must be recorded.
+
+Authoritative references:
+DMFP-05, DMFP-15.
+
+----------------------------------------------------------------------
+ADR-DATA-005 — Immutable deadline information bundles
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Every live decision resolves to an immutable bundle containing exactly the observations, mappings, rules, models and manager state available by the cutoff.
+
+Reason:
+This is the foundation for reproducibility, leakage prevention and why-changed analysis.
+
+Alternatives rejected or not selected:
+Requery latest state during or after a run; store only output without input manifest.
+
+Key assumptions:
+Artifact hashing and temporal queries are available.
+
+Known weaknesses / consequences:
+Bundle creation can block when lineage is incomplete; fail-closed behavior is intentional.
+
+Revisit when:
+None unless an equivalent immutable snapshot mechanism replaces it.
+
+Authoritative references:
+DMFP-05, DMFP-15–18.
+
+----------------------------------------------------------------------
+ADR-DATA-006 — Data modes remain separate
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+LIVE_OBSERVED, RAW_OBSERVED, RECONSTRUCTED, FINAL_OUTCOME and COUNTERFACTUAL records/results are labelled and never pooled without separate reporting.
+
+Reason:
+Current-vintage or reconstructed data can make historical systems look better than they were.
+
+Alternatives rejected or not selected:
+One cleaned historical dataset; silently repair live history with final values.
+
+Key assumptions:
+The system can carry mode through datasets, forecasts and reports.
+
+Known weaknesses / consequences:
+Comparisons become more verbose and some strict-live history will be small.
+
+Revisit when:
+A result is purely descriptive and cannot be misinterpreted as live performance; it still keeps mode metadata.
+
+Authoritative references:
+DMFP-05, DMFP-15.
+
+----------------------------------------------------------------------
+ADR-DATA-007 — Typed missingness: unknown is never zero
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Missing sources and outcomes use explicit states such as no market, stale, not applicable, source unavailable, not yet published or mapping unresolved.
+
+Reason:
+Zero is often a valid football value and silently imputing it creates severe bias.
+
+Alternatives rejected or not selected:
+Null without reason; zero fill; last observation carried forward without age.
+
+Key assumptions:
+Schemas can require reason/status alongside optional value.
+
+Known weaknesses / consequences:
+Models and UI must handle more states.
+
+Revisit when:
+No revisit; this is a core correctness invariant.
+
+Authoritative references:
+DMFP-03–06, DMFP-18.
+
+----------------------------------------------------------------------
+ADR-SRC-001 — Zero-paid-subscription core
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+The core system uses no paid API subscriptions, paid historical packages, compulsory betting turnover, paid scraping or quota-evasion accounts.
+
+Reason:
+Sebastian specified a zero-cost data architecture and the project should remain independently operable.
+
+Alternatives rejected or not selected:
+Paid Opta-like feeds; commercial odds subscriptions; paid historical player-prop packages.
+
+Key assumptions:
+Official/public and free-tier sources plus Pulse models provide enough coverage to build a useful system.
+
+Known weaknesses / consequences:
+Market completeness and historical player-prop coverage are weaker; prospective collection is essential.
+
+Revisit when:
+Sebastian explicitly approves a budget and a paid source demonstrates validated incremental decision value and acceptable rights.
+
+Authoritative references:
+DMFP-04.
+
+----------------------------------------------------------------------
+ADR-SRC-002 — Market-anchored, not market-complete
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Free match markets anchor team outcome probabilities. Pulse allocates player outcomes using its own minutes, role and event models. Missing player markets remain missing.
+
+Reason:
+Free sources cannot supply a complete, historical, timely market for every FPL player/event.
+
+Alternatives rejected or not selected:
+Pretend market completeness; use public predictor outputs as ground truth; set missing props to zero.
+
+Key assumptions:
+Team markets are sufficiently informative and player allocation can be calibrated prospectively.
+
+Known weaknesses / consequences:
+Player-level tails may be weaker than a complete prop market.
+
+Revisit when:
+A lawful, reliable, zero-cost or approved paid complete player market becomes available and adds validated value.
+
+Authoritative references:
+DMFP-04, DMFP-06, DMFP-08.
+
+----------------------------------------------------------------------
+ADR-SRC-003 — Selected initial source stack
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use official FPL/Premier League data, API-FOOTBALL Free, The Odds API Free Starter where coverage permits, conditional Betfair delayed/historical data, football-data.co.uk and manual human capture fallback.
+
+Reason:
+This is the best identified zero-cost combination for official state, match odds, selected player props and historical research.
+
+Alternatives rejected or not selected:
+SportsGameOdds as EPL core; paid Betfair Live; Smarkets/BETDAQ as immediate core; unapproved scraping.
+
+Key assumptions:
+Published free tiers, terms and EPL coverage remain materially similar at implementation time.
+
+Known weaknesses / consequences:
+Free plans, quotas, leagues and rights can change without notice.
+
+Revisit when:
+At implementation and quarterly; any provider terms, coverage or quota change.
+
+Authoritative references:
+DMFP-04, DMFP-17.
+
+----------------------------------------------------------------------
+ADR-SRC-004 — No multi-account or geographic circumvention
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Pulse uses one approved provider account per permitted purpose and does not create multiple accounts, bypass geography or evade quota/plan restrictions.
+
+Reason:
+Quota evasion and circumvention create legal, operational and reputational risk.
+
+Alternatives rejected or not selected:
+Account rotation to multiply free limits; VPN/geography bypass; credential sharing.
+
+Key assumptions:
+The architecture can prioritise quota and degrade gracefully.
+
+Known weaknesses / consequences:
+Coverage can be lower near busy periods.
+
+Revisit when:
+No revisit without explicit provider permission.
+
+Authoritative references:
+DMFP-04, DMFP-17.
+
+----------------------------------------------------------------------
+ADR-MKT-001 — Power normalisation is the initial fixed-odds default
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+For complete mutually exclusive fixed-odds books, calculate proportional and power methods and use power as the initial production default.
+
+Reason:
+Power normalisation can account for favourite–longshot distortion while retaining a transparent baseline.
+
+Alternatives rejected or not selected:
+Proportional as unquestioned default; Shin z as literal truth; best price without de-vig.
+
+Key assumptions:
+Out-of-time calibration will confirm or replace the method by market type.
+
+Known weaknesses / consequences:
+Power root can be unstable for malformed books and may not outperform proportional everywhere.
+
+Revisit when:
+Prospective proper-score evidence favours another method or market-specific ensemble.
+
+Authoritative references:
+DMFP-06.
+
+----------------------------------------------------------------------
+ADR-MKT-002 — Proportional normalisation is always retained
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Calculate proportional de-vig for every complete book as a baseline, diagnostic and fallback.
+
+Reason:
+It is simple, reproducible and exposes the incremental effect of more complex methods.
+
+Alternatives rejected or not selected:
+Omit baseline; only produce selected method.
+
+Key assumptions:
+Complete book semantics are known.
+
+Known weaknesses / consequences:
+It assumes equal relative margin across outcomes.
+
+Revisit when:
+No revisit; even if not champion it remains a benchmark.
+
+Authoritative references:
+DMFP-06, DMFP-15.
+
+----------------------------------------------------------------------
+ADR-MKT-003 — Shin is a challenger, not a literal insider estimate
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Retain Shin normalisation for sensitivity/research. Do not describe fitted z as measured insider trading or automatically select it.
+
+Reason:
+The interpretation is model-specific and can be overclaimed.
+
+Alternatives rejected or not selected:
+Discard Shin entirely; make it the default in all books.
+
+Key assumptions:
+Implementation and validation cost remain modest.
+
+Known weaknesses / consequences:
+Adds method complexity and potential user confusion.
+
+Revisit when:
+Market-specific out-of-time results demonstrate clear stable superiority.
+
+Authoritative references:
+DMFP-06.
+
+----------------------------------------------------------------------
+ADR-MKT-004 — Consensus is built by independent betting operator
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Multiple API rows representing the same bookmaker/operator are clustered before consensus. Weights include freshness, completeness, source quality, dependence and liquidity/spread where available.
+
+Reason:
+Counting feeds as independent bookmakers falsely narrows disagreement and overweights duplicated information.
+
+Alternatives rejected or not selected:
+Equal weight every row; choose one bookmaker; use best available price as forecast.
+
+Key assumptions:
+Operator identity can be mapped sufficiently well.
+
+Known weaknesses / consequences:
+Bookmakers are still correlated and true independence is unknown.
+
+Revisit when:
+A better empirically calibrated dependence model becomes available.
+
+Authoritative references:
+DMFP-06.
+
+----------------------------------------------------------------------
+ADR-MKT-005 — One-sided player quotes are not fully de-vigged
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+A one-sided anytime-scorer or other Yes quote is stored as raw implied probability with uncertainty. It is not forced into a complete exclusive market.
+
+Reason:
+The missing No side and overlapping multiple-scorer events prevent ordinary complete-book normalisation.
+
+Alternatives rejected or not selected:
+Force scorer list to sum one; apply 1X2 de-vig logic.
+
+Key assumptions:
+Downstream player-share calibration can use the observation softly.
+
+Known weaknesses / consequences:
+Residual bookmaker margin remains in the signal.
+
+Revisit when:
+Complete matched Yes/No markets become available.
+
+Authoritative references:
+DMFP-06, DMFP-08.
+
+----------------------------------------------------------------------
+ADR-MKT-006 — Consensus output includes bounds and disagreement
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Every usable market projection includes central probability, lower/upper bounds, provider/operator counts, disagreement, freshness and confidence.
+
+Reason:
+A single consensus number hides material source and method uncertainty.
+
+Alternatives rejected or not selected:
+Publish only the weighted mean.
+
+Key assumptions:
+Bounds can be calibrated prospectively.
+
+Known weaknesses / consequences:
+Early bounds may be heuristic/wide.
+
+Revisit when:
+After sufficient history, replace provisional components with calibrated interval model without removing diagnostics.
+
+Authoritative references:
+DMFP-06, DMFP-18.
+
+----------------------------------------------------------------------
+ADR-MIN-001 — START/BENCH/OUT is the primary role state
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Availability modelling uses a coherent three-state role distribution, followed by conditional starter and bench minute distributions.
+
+Reason:
+Binary start/no-start conflates bench appearances with unavailability and cannot form the correct minute mixture.
+
+Alternatives rejected or not selected:
+Expected minutes regression only; independent p_start and p_appearance models.
+
+Key assumptions:
+Historical lineups/substitutions can identify the states sufficiently.
+
+Known weaknesses / consequences:
+Squad reporting can be incomplete and tactical roles change.
+
+Revisit when:
+A richer hidden-state model is validated, while preserving the observable three-state output.
+
+Authoritative references:
+DMFP-07.
+
+----------------------------------------------------------------------
+ADR-MIN-002 — Minute PMF is an explicit mixture
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+The unconditional minute distribution equals the START, BENCH and OUT mixture, including a point mass at zero.
+
+Reason:
+All points components depend nonlinearly on minutes and the 60-minute threshold.
+
+Alternatives rejected or not selected:
+One expected-minutes number; independent p60 adjustment.
+
+Key assumptions:
+Conditional minute processes are estimable or can be represented by priors.
+
+Known weaknesses / consequences:
+Minute PMFs are more costly to model and evaluate.
+
+Revisit when:
+No revisit; a distribution remains required even if model family changes.
+
+Authoritative references:
+DMFP-07, DMFP-09.
+
+----------------------------------------------------------------------
+ADR-MIN-003 — Sample coherent team lineups
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Team scenarios contain exactly 11 starters and legal role/goalkeeper constraints, sampled without replacement from player-role utilities.
+
+Reason:
+Independent player p_start probabilities can imply impossible teams and corrupt correlated points.
+
+Alternatives rejected or not selected:
+Independent Bernoulli starts; normalize p_start only.
+
+Key assumptions:
+Tactical role and formation schemas can approximate real constraints.
+
+Known weaknesses / consequences:
+Detailed tactical role assignment is uncertain and computationally heavier.
+
+Revisit when:
+A superior sequential manager-choice model is validated.
+
+Authoritative references:
+DMFP-07.
+
+----------------------------------------------------------------------
+ADR-MIN-004 — Starter exits and bench entries use competing-risk hazards
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use discrete-time cause-specific starter-exit and bench-entry hazards, including tactical, injury, dismissal and forced substitution causes.
+
+Reason:
+Minute distributions have time and cause structure; simple normals or fixed substitution multipliers are inadequate.
+
+Alternatives rejected or not selected:
+Fixed expected minutes by start status; survival model without cause; deterministic substitute minute.
+
+Key assumptions:
+Historical event/substitution data are sufficient after Stage 7 baseline.
+
+Known weaknesses / consequences:
+Event cause labelling may be noisy and the full model is later than the implementation baseline.
+
+Revisit when:
+Stage 7 baseline evidence, data coverage and out-of-time score justify the full hazard model.
+
+Authoritative references:
+DMFP-07, DMFP-19.
+
+----------------------------------------------------------------------
+ADR-EVT-001 — Two-stage football event architecture
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+First construct one coherent joint team score distribution. Then allocate conditional goal times, scorers, assists, shots, saves, penalties, cards and defensive events.
+
+Reason:
+This preserves team totals and enables player correlations without fitting every event independently.
+
+Alternatives rejected or not selected:
+Independent player event models summed to team totals; one monolithic black-box simulator.
+
+Key assumptions:
+Team markets provide a stable anchor and player allocation can be conditioned on lineups/minutes.
+
+Known weaknesses / consequences:
+Conditional allocation can inherit errors from the score matrix and requires many consistency checks.
+
+Revisit when:
+A sequential marked point process materially improves out-of-time joint scores and remains computationally practical.
+
+Authoritative references:
+DMFP-08.
+
+----------------------------------------------------------------------
+ADR-EVT-002 — Soft KL/information projection to markets
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Project a statistical score prior toward market constraints through a proper nonnegative probability optimisation, using uncertainty-weighted soft constraints rather than forcing every market equality.
+
+Reason:
+Markets can be inconsistent, stale and dependent. A soft information projection retains a valid distribution and records residuals.
+
+Alternatives rejected or not selected:
+Independently calibrate each market output; hard equality to every quote; average model and market means.
+
+Key assumptions:
+Constraint uncertainty can be estimated from DMFP-06.
+
+Known weaknesses / consequences:
+Optimisation and constraint weighting require careful calibration.
+
+Revisit when:
+A different coherent calibration method achieves better proper scores and interpretability.
+
+Authoritative references:
+DMFP-08.
+
+----------------------------------------------------------------------
+ADR-EVT-003 — Poisson is a baseline, not a universal law
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use Poisson/team-strength as the initial count prior. Promote negative-binomial, Dixon–Coles, double-Poisson, COM-Poisson or other challengers only on out-of-time evidence.
+
+Reason:
+Football counts can be overdispersed, underdispersed or low-score dependent, but unnecessary flexibility overfits.
+
+Alternatives rejected or not selected:
+Assume Poisson forever; choose the most complex count family before validation.
+
+Key assumptions:
+Proper-score evaluation can select model family by context.
+
+Known weaknesses / consequences:
+A baseline can miss tails or low-score structure.
+
+Revisit when:
+DMFP-15 evidence supports a challenger by season/context.
+
+Authoritative references:
+DMFP-08, DMFP-15.
+
+----------------------------------------------------------------------
+ADR-EVT-004 — Player scoring shares preserve team totals
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Player-goal distributions are derived conditionally from sampled team goals, lineups, minutes and role shares, with explicit own-goal and OTHER mass.
+
+Reason:
+Player probabilities must reconcile to team outcomes and allow multiple goals.
+
+Alternatives rejected or not selected:
+Independent Bernoulli scorer events; blind lambda=-log(1-p) conversion under random minutes.
+
+Key assumptions:
+Share models can be softly calibrated to available props.
+
+Known weaknesses / consequences:
+Unlisted-player/own-goal mass and time-varying shares are difficult.
+
+Revisit when:
+A validated point-process model replaces the conditional allocation but preserves reconciliation.
+
+Authoritative references:
+DMFP-08.
+
+----------------------------------------------------------------------
+ADR-EVT-005 — Goal mechanism precedes FPL assist classification
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Each goal scenario records mechanism and goal chain, then classifies definite assist, definite no assist or ambiguous FPL assist.
+
+Reason:
+Provider football assists are not identical to FPL assists and ambiguous deflections/rebounds matter.
+
+Alternatives rejected or not selected:
+Use provider assist directly; predict total assists independently.
+
+Key assumptions:
+Goal-chain features and official corrections can train the classifier.
+
+Known weaknesses / consequences:
+Historical chain detail may be incomplete.
+
+Revisit when:
+Official target rules change or a direct authoritative FPL assist feed becomes available.
+
+Authoritative references:
+DMFP-08, DMFP-09.
+
+----------------------------------------------------------------------
+ADR-PTS-001 — FPL points are a pure scenario-level scoring transform
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+DMFP-09 does not fit a separate player-points forecast. It applies the active ruleset exactly to coherent football scenarios and aggregates the resulting integer scores.
+
+Reason:
+Separate component means or direct xP regression can violate scoring thresholds, bonus competition and correlations.
+
+Alternatives rejected or not selected:
+Fit player points directly as the final model; sum independent expected components.
+
+Key assumptions:
+Upstream event scenarios contain the required scoring events or explicit auxiliary residuals.
+
+Known weaknesses / consequences:
+Any missing BPS/assist event can bias the transform and must be modelled transparently.
+
+Revisit when:
+No revisit; this is the core architecture even if event models improve.
+
+Authoritative references:
+DMFP-09.
+
+----------------------------------------------------------------------
+ADR-PTS-002 — Bonus is a joint BPS ranking subsystem
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Calculate scenario BPS for all participants and award bonus through exact tie/competition ranking. Do not predict expected bonus independently.
+
+Reason:
+Bonus depends on all players in the fixture and tie patterns; ranking expected BPS is wrong.
+
+Alternatives rejected or not selected:
+Standalone bonus regression; add historical average bonus; rank expected BPS.
+
+Key assumptions:
+Enough event/auxiliary BPS information can be generated.
+
+Known weaknesses / consequences:
+BPS auxiliary residual modelling can be a significant source of error.
+
+Revisit when:
+Official BPS rules or data availability change; the joint ranking requirement remains.
+
+Authoritative references:
+DMFP-09.
+
+----------------------------------------------------------------------
+ADR-PTS-003 — Monte Carlo exposes numerical error separately
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Player/Gameweek distributions include effective sample size, Monte Carlo standard errors and deterministic seed lineage. Simulation precision is not mixed with football-model uncertainty.
+
+Reason:
+Users and optimisers need to know whether small plan differences are numerical noise.
+
+Alternatives rejected or not selected:
+Run an arbitrary fixed scenario count and omit diagnostics.
+
+Key assumptions:
+Counter-based/named RNG streams and batching can make convergence measurable.
+
+Known weaknesses / consequences:
+Priority decisions can be computationally expensive.
+
+Revisit when:
+Variance-reduction or exact methods materially reduce cost while retaining diagnostics.
+
+Authoritative references:
+DMFP-09, DMFP-17.
+
+----------------------------------------------------------------------
+ADR-PTS-004 — Optimiser receives full joint player-by-scenario matrix
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+DMFP-09 exports scenario weights and all player points together. The optimiser does not reconstruct dependence from marginal summaries.
+
+Reason:
+Captaincy, clean-sheet stacks, attacker-versus-defender exposure and rank decisions require joint outcomes.
+
+Alternatives rejected or not selected:
+Optimise only expected points; assume independent marginals; use pairwise covariance only.
+
+Key assumptions:
+Scenario reduction can preserve decision-relevant structure when full matrices are large.
+
+Known weaknesses / consequences:
+Storage and optimisation cost are substantial.
+
+Revisit when:
+A proven compressed representation retains equivalent decisions and improves operations.
+
+Authoritative references:
+DMFP-09, DMFP-12, DMFP-14.
+
+----------------------------------------------------------------------
+ADR-UNC-001 — Robustness targets epistemic regret, not ordinary football variance
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+The default does not penalise all outcome variance. Robust penalties focus on model, structural, lineup, source, rules and irreversible-action uncertainty.
+
+Reason:
+Football upside is necessary for expected points; generic variance aversion can select inferior teams.
+
+Alternatives rejected or not selected:
+Mean-variance penalty on total FPL points; weekly CVaR as the default objective; pure worst-case points.
+
+Key assumptions:
+Aleatoric scenarios are reasonably specified and rank utility is handled separately.
+
+Known weaknesses / consequences:
+The aleatoric/epistemic split depends on model framing and must be an operational ledger, not dogma.
+
+Revisit when:
+Rank/prize utility explicitly values tails, or empirical evidence supports a context-specific downside objective.
+
+Authoritative references:
+DMFP-10.
+
+----------------------------------------------------------------------
+ADR-UNC-002 — Nested structural, parameter and outcome scenarios
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Scenarios retain IDs for structural/model world, parameter draw and aleatoric outcome draw.
+
+Reason:
+This permits uncertainty decomposition, robust regret and value-of-information calculations.
+
+Alternatives rejected or not selected:
+Flatten all Monte Carlo draws into one undifferentiated sample.
+
+Key assumptions:
+Upstream modules can preserve these labels.
+
+Known weaknesses / consequences:
+Nested scenarios increase storage and computation.
+
+Revisit when:
+An alternative representation provides the same decision and audit capabilities.
+
+Authoritative references:
+DMFP-10.
+
+----------------------------------------------------------------------
+ADR-UNC-003 — Hierarchical shrinkage with parameter-specific learning speed
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Sparse players, promoted teams and new managers partially pool to structured priors. Role, lineup and set-piece states update faster than stable ability parameters.
+
+Reason:
+One match can be strong evidence about role and weak evidence about finishing quality.
+
+Alternatives rejected or not selected:
+Uniform recency multiplier; no pooling; complete reset after GW1.
+
+Key assumptions:
+Historical and market priors are informative enough to stabilise early forecasts.
+
+Known weaknesses / consequences:
+Incorrect group structure can overshrink genuine breakouts.
+
+Revisit when:
+Prospective calibration shows specific prior/update-rate failures.
+
+Authoritative references:
+DMFP-07, DMFP-10.
+
+----------------------------------------------------------------------
+ADR-UNC-004 — Predictive stacking is the preferred mature ensemble
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use a predeclared primary/baseline/challenger mixture initially, then learn time-safe predictive stacking weights from out-of-time proper scores.
+
+Reason:
+No candidate model is assumed true; predictive performance matters more than posterior model-selection certainty.
+
+Alternatives rejected or not selected:
+Winner-take-all model selection; permanent equal weights; unregularised context-specific weights.
+
+Key assumptions:
+Enough prospective data eventually exist to estimate stable weights.
+
+Known weaknesses / consequences:
+Early sample is small and component models are dependent.
+
+Revisit when:
+Hierarchical stacking or BMA materially outperforms and remains calibrated.
+
+Authoritative references:
+DMFP-10, DMFP-15.
+
+----------------------------------------------------------------------
+ADR-UNC-005 — Rolling-horizon reoptimisation
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Solve a finite multistage horizon at every deadline, execute only the immediate action and re-solve after new information.
+
+Reason:
+Full-season open-loop plans are computationally infeasible and brittle.
+
+Alternatives rejected or not selected:
+One-Gameweek greedy decisions; commit to an exact season transfer schedule; full dynamic programming over all states.
+
+Key assumptions:
+A terminal value can reduce horizon myopia and will be validated.
+
+Known weaknesses / consequences:
+Terminal-value error can drive decisions.
+
+Revisit when:
+A better approximate dynamic program or longer exact horizon proves feasible and superior.
+
+Authoritative references:
+DMFP-10, DMFP-12.
+
+----------------------------------------------------------------------
+ADR-UNC-006 — Value of information determines ACT versus WAIT
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Compare expected utility after future information with the price, points, execution and option costs of waiting.
+
+Reason:
+There is no universal rule to wait for press conferences or beat price rises.
+
+Alternatives rejected or not selected:
+Always wait; always transfer early; ad hoc news judgement.
+
+Key assumptions:
+Likely information events and price risks can be represented probabilistically.
+
+Known weaknesses / consequences:
+EVSI estimates can be noisy and model-dependent.
+
+Revisit when:
+Backtests show a simpler timing rule performs equivalently or better.
+
+Authoritative references:
+DMFP-10, DMFP-11, DMFP-18.
+
+----------------------------------------------------------------------
+ADR-UNC-007 — Team value is instrumental future affordability
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Team value enters through counterfactual future points enabled by bank, selling value and routes. It is never a standalone objective or fixed points conversion.
+
+Reason:
+Extra budget has nonlinear, season- and squad-specific value.
+
+Alternatives rejected or not selected:
+Maximise squad value; universal £0.1m-to-points conversion.
+
+Key assumptions:
+The optimiser can re-solve with marginal budget changes.
+
+Known weaknesses / consequences:
+Counterfactual valuation is expensive and depends on terminal assumptions.
+
+Revisit when:
+A simpler calibrated marginal-value approximation matches reoptimisation across relevant states.
+
+Authoritative references:
+DMFP-10–12.
+
+----------------------------------------------------------------------
+ADR-PRC-001 — Price changes are recurrent competing update events
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Model each overnight opportunity as RISE, FALL or NO_CHANGE with recurrent state after each event.
+
+Reason:
+Players can move multiple times in a Gameweek and rise/fall mechanisms differ.
+
+Alternatives rejected or not selected:
+One-time binary classifier; deterministic transfer threshold; symmetric rise/fall model.
+
+Key assumptions:
+Prospective price snapshots can identify update cycles.
+
+Known weaknesses / consequences:
+The hidden FPL algorithm can change and historical labels are sparse.
+
+Revisit when:
+Target-season evidence supports a different process.
+
+Authoritative references:
+DMFP-11.
+
+----------------------------------------------------------------------
+ADR-PRC-002 — Latent transfer pressure, not claimed exact threshold
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Estimate a probabilistic hidden pressure/boundary state and report standardised threshold distance. Do not publish an exact transfers-remaining number as official fact.
+
+Reason:
+FPL does not disclose its algorithm and public transfer counters omit effective-manager/chip behavior.
+
+Alternatives rejected or not selected:
+Hard-code community threshold; claim unique-manager rule; copy public predictor percentage.
+
+Key assumptions:
+Observed transfer flow contains enough signal for calibrated event probabilities.
+
+Known weaknesses / consequences:
+The latent quantity is model-dependent and can be difficult to explain.
+
+Revisit when:
+FPL publishes the exact mechanism or robust prospective evidence supports an interpretable count scale.
+
+Authoritative references:
+DMFP-11.
+
+----------------------------------------------------------------------
+ADR-PRC-003 — Ownership-adjusted buy and sell rates
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Model purchase pressure among nonowners and sale pressure among owners alongside absolute flow, velocity and acceleration.
+
+Reason:
+The possible buyer and seller populations differ, especially for low/high ownership players.
+
+Alternatives rejected or not selected:
+Raw net transfers only; selected_by_percent alone.
+
+Key assumptions:
+Active manager population and rounded ownership can be estimated with uncertainty.
+
+Known weaknesses / consequences:
+Denominator error can be material for low ownership.
+
+Revisit when:
+A direct effective-manager count source becomes lawful and reliable.
+
+Authoritative references:
+DMFP-11.
+
+----------------------------------------------------------------------
+ADR-PRC-004 — Wildcard and repeated-manager effects are latent contamination
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Do not assume wildcard transfers count zero or that every raw transfer is unique. Estimate effective flow with chip/repeat proxies and widen uncertainty when unknown.
+
+Reason:
+Community hypotheses are not official and observed counters can differ from algorithmic pressure.
+
+Alternatives rejected or not selected:
+Hard-code exclusion; ignore contamination.
+
+Key assumptions:
+Proxy features or lawful samples can estimate contamination sufficiently.
+
+Known weaknesses / consequences:
+The latent model may remain weak in chip-heavy weeks.
+
+Revisit when:
+Official documentation or high-quality unique-manager observations resolve the mechanism.
+
+Authoritative references:
+DMFP-11.
+
+----------------------------------------------------------------------
+ADR-OPT-001 — Rolling-horizon stochastic MILP under MPC
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+The central engine uses mixed-integer legal/state constraints, weighted scenarios and a model-predictive-control wrapper.
+
+Reason:
+FPL combines exact discrete rules with uncertain sequential outcomes and future recourse.
+
+Alternatives rejected or not selected:
+Static best-XV; full exact dynamic programming; MCTS as production core; heuristic genetic algorithm only.
+
+Key assumptions:
+The model can be decomposed/candidate-pruned to deadline runtime.
+
+Known weaknesses / consequences:
+Scenario explosion and terminal-value bias remain major implementation risks.
+
+Revisit when:
+A challenger demonstrates materially better decisions, transparency and runtime.
+
+Authoritative references:
+DMFP-12.
+
+----------------------------------------------------------------------
+ADR-OPT-002 — Exact current tactical enumeration
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+For a fixed squad, enumerate legal XIs, bench orders and captain/vice pairs and evaluate official autosubs/fallback against joint scenarios.
+
+Reason:
+The tactical action space is small enough and approximation errors can change decisions.
+
+Alternatives rejected or not selected:
+Sort bench by mean; optimise captain independently; embed a loose linear approximation only.
+
+Key assumptions:
+Vectorisation/pruning meets runtime.
+
+Known weaknesses / consequences:
+Future multiweek tactical states still need approximation/decomposition.
+
+Revisit when:
+A mathematically exact faster formulation is proven equivalent.
+
+Authoritative references:
+DMFP-12.
+
+----------------------------------------------------------------------
+ADR-OPT-003 — Ownership cohorts determine selling prices
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Track each player's purchase/ownership spell. Precompute scenario/node-specific selling price from purchase and current price under active rules.
+
+Reason:
+Two managers owning the same player can have different sale proceeds; repurchase resets the cohort.
+
+Alternatives rejected or not selected:
+Use current market price; store only one purchase price across repurchases.
+
+Key assumptions:
+The official selling-price rule is verified and configurable.
+
+Known weaknesses / consequences:
+Cohort variables increase MILP size.
+
+Revisit when:
+An equivalent compact exact state representation is validated.
+
+Authoritative references:
+DMFP-11, DMFP-12.
+
+----------------------------------------------------------------------
+ADR-OPT-004 — Scenario nonanticipativity is mandatory
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Future actions may depend only on information revealed at their scenario-tree node. Perfect-information policies are diagnostic upper bounds only.
+
+Reason:
+Leaf-specific clairvoyant actions create severe optimistic bias.
+
+Alternatives rejected or not selected:
+Optimise each scenario independently; use final outcomes to select future transfers.
+
+Key assumptions:
+Node-indexed variables or equality constraints can enforce the rule.
+
+Known weaknesses / consequences:
+Tree construction and information timing are complex.
+
+Revisit when:
+No revisit; this is a fundamental stochastic-control invariant.
+
+Authoritative references:
+DMFP-10, DMFP-12, DMFP-15.
+
+----------------------------------------------------------------------
+ADR-OPT-005 — Return multiple non-dominated plans
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Return recommended, conservative, high-upside and no-transfer plans, plus points/rank alternatives where relevant. Do not manufacture a distinct plan if none is meaningfully non-dominated.
+
+Reason:
+A single output hides objective sensitivity and makes human review difficult.
+
+Alternatives rejected or not selected:
+One optimal plan; arbitrary second-best list; alternatives ranked only by expected points.
+
+Key assumptions:
+Epsilon-constraint/Pareto generation is computationally feasible for the shortlist.
+
+Known weaknesses / consequences:
+More outputs can increase cognitive load; DMFP-18 uses progressive disclosure.
+
+Revisit when:
+Usability testing shows fewer/different default alternatives improve decisions.
+
+Authoritative references:
+DMFP-12, DMFP-18.
+
+----------------------------------------------------------------------
+ADR-OPT-006 — Pyomo and HiGHS are the initial optimiser stack
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use Pyomo for transparent algebraic models and HiGHS as the zero-cost LP/MIP solver.
+
+Reason:
+Both are open-source, Python-accessible and suitable for explicit constraints and solver evidence.
+
+Alternatives rejected or not selected:
+Commercial-solver dependency; custom branch-and-bound; OR-Tools as untested default.
+
+Key assumptions:
+Compatibility and runtime pass Stage 10–11 spikes.
+
+Known weaknesses / consequences:
+Performance on large stochastic instances may be insufficient.
+
+Revisit when:
+Benchmarks show SCIP/commercial/native highspy materially improves required runtime or reliability.
+
+Authoritative references:
+DMFP-12, DMFP-19.
+
+----------------------------------------------------------------------
+ADR-CHIP-001 — Captaincy and all chips share one opportunity-allocation module
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Ordinary captain/vice and every chip are optimised in one finite-inventory rolling policy because they compete for future Gameweeks and squad states.
+
+Reason:
+TC modifies captaincy; WC can prepare BB; FH protects permanent squad; only one chip may be usable per week.
+
+Alternatives rejected or not selected:
+One independent optimiser per chip; fixed chip weeks; captain chosen before chip.
+
+Key assumptions:
+Generic chip definitions can express target-season effects.
+
+Known weaknesses / consequences:
+The joint scheduling problem is larger and future opportunity estimates are uncertain.
+
+Revisit when:
+The official game introduces a chip whose semantics cannot fit the generic grammar.
+
+Authoritative references:
+DMFP-13.
+
+----------------------------------------------------------------------
+ADR-CHIP-002 — Chips are finite exercise rights with continuation value
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use-now value is compared with the best adaptive policy that retains the chip. Gross current gain and net policy value are always separate.
+
+Reason:
+A high current score can still be a poor use if a stronger future opportunity or synergy exists.
+
+Alternatives rejected or not selected:
+Use at highest forecast mean; save automatically for largest double; use before expiry regardless of conflict.
+
+Key assumptions:
+Future opportunity scenarios and terminal chip value can be approximated.
+
+Known weaknesses / consequences:
+Continuation value is model-dependent and selection of future maxima can be biased.
+
+Revisit when:
+Backtesting validates a simpler exercise-threshold policy.
+
+Authoritative references:
+DMFP-13.
+
+----------------------------------------------------------------------
+ADR-CHIP-003 — Triple Captain value is one extra effective-captain copy
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+The incremental TC distribution is the scenario effective captain score after vice fallback, with captain/vice selected jointly under the chip policy.
+
+Reason:
+Raw player mean ignores no-appearance and vice fallback.
+
+Alternatives rejected or not selected:
+TC value equals total captain points; require Double Gameweek.
+
+Key assumptions:
+Active rules preserve the reference multiplier/fallback logic or are reconfigured.
+
+Known weaknesses / consequences:
+Future opportunity modelling remains uncertain.
+
+Revisit when:
+Target rules change the multiplier/fallback semantics.
+
+Authoritative references:
+DMFP-13.
+
+----------------------------------------------------------------------
+ADR-CHIP-004 — Bench Boost subtracts autosub overlap and preparation cost
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+BB incremental value is all-bench scoring minus points already obtained through normal autosubs, plus/minus tactical changes. Net policy value includes bench capital, transfers and unwinding.
+
+Reason:
+Bench-point sum materially overstates the chip and ignores squad preparation trade-offs.
+
+Alternatives rejected or not selected:
+Use projected bench total; assume WC->BB is always positive.
+
+Key assumptions:
+The no-chip counterfactual can be evaluated exactly.
+
+Known weaknesses / consequences:
+Multiweek preparation attribution is computationally intensive.
+
+Revisit when:
+A validated approximation preserves the same policy decisions.
+
+Authoritative references:
+DMFP-13.
+
+----------------------------------------------------------------------
+ADR-CHIP-005 — Free Hit compares with best normal transfer policy
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+FH value includes temporary uplift, hits avoided and permanent squad damage avoided relative to an optimised no-FH transfer policy.
+
+Reason:
+Comparing to a frozen XI exaggerates value and ignores long-term state.
+
+Alternatives rejected or not selected:
+FH points minus current XI; always use on largest blank.
+
+Key assumptions:
+DMFP-12 can optimise both temporary and permanent policies.
+
+Known weaknesses / consequences:
+Counterfactual permanent recovery can be expensive to simulate.
+
+Revisit when:
+A simpler metric is proven decision-equivalent.
+
+Authoritative references:
+DMFP-13.
+
+----------------------------------------------------------------------
+ADR-CHIP-006 — Wildcard compares immediate, normal and delayed policies
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Wildcard is a permanent reset option. Compare immediate WC, normal transfers, delayed WC after explicit information and bridge policies such as FH.
+
+Reason:
+The value is multiweek and waiting can preserve information value.
+
+Alternatives rejected or not selected:
+Trigger after a fixed number of bad players; judge one-week gain.
+
+Key assumptions:
+Squad mismatch and future information can be represented.
+
+Known weaknesses / consequences:
+Delayed-policy branching and terminal values are uncertain.
+
+Revisit when:
+Sequential backtests support a robust simplified boundary.
+
+Authoritative references:
+DMFP-13.
+
+----------------------------------------------------------------------
+ADR-RANK-001 — Scenario effective ownership uses counted multipliers
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+EO is computed from actual scenario multipliers after starts, autosubs, captain/vice and chips, with saved and realised EO reported separately.
+
+Reason:
+Raw squad ownership or simplified starting+captain percentages omit important FPL scoring paths.
+
+Alternatives rejected or not selected:
+Use selected_by_percent as EO; ignore vice/autosubs/TC/BB.
+
+Key assumptions:
+Representative manager samples/actions can be estimated with uncertainty.
+
+Known weaknesses / consequences:
+Predeadline hidden actions and sampling bias can be large.
+
+Revisit when:
+A direct official cohort EO feed becomes available; exact multiplier definition remains.
+
+Authoritative references:
+DMFP-14.
+
+----------------------------------------------------------------------
+ADR-RANK-002 — Shared-scenario opponent simulation
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Sebastian and all rival/synthetic managers are scored on the same player-event scenarios.
+
+Reason:
+Overlap, captaincy and correlations determine relative rank variance.
+
+Alternatives rejected or not selected:
+Draw each manager's points independently; use EO alone as rank simulation.
+
+Key assumptions:
+Manager action distributions can be sampled separately from shared football outcomes.
+
+Known weaknesses / consequences:
+Large overall fields require approximation and importance sampling.
+
+Revisit when:
+A mathematically validated aggregate rank model reproduces shared-scenario results at lower cost.
+
+Authoritative references:
+DMFP-14.
+
+----------------------------------------------------------------------
+ADR-RANK-003 — Low ownership is not a decision objective
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Differential value is the change in target/rank utility versus an alternative. Ownership is one explanatory feature, never an intrinsic reward.
+
+Reason:
+Low-owned players are often low-owned for good reasons; chasing novelty can destroy expected points.
+
+Alternatives rejected or not selected:
+Maximise number of differentials; cap template players; use <10% as optimisation threshold.
+
+Key assumptions:
+Rank utility and opponent correlation capture genuine leverage.
+
+Known weaknesses / consequences:
+Requires more data/modeling than simple EO heuristics.
+
+Revisit when:
+No revisit except a clearly defined entertainment objective outside the current product.
+
+Authoritative references:
+DMFP-14.
+
+----------------------------------------------------------------------
+ADR-RANK-004 — Season-stage rank policy
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Early: points and flexibility. Middle: measured leverage among near-optimal plans. Late: rank-aware utility when decision-sensitive. Final weeks: explicit target probability.
+
+Reason:
+Early rank is noisy and long recourse remains; late relative position can change optimal correlation/tail exposure.
+
+Alternatives rejected or not selected:
+Rank-aware from GW1; rank ignored until GW38; fixed number of differentials by stage.
+
+Key assumptions:
+Opponent and target models mature enough later in the season.
+
+Known weaknesses / consequences:
+Rigid stage boundaries can be wrong; policy remains state-based and configurable.
+
+Revisit when:
+Sequential backtests support different activation criteria.
+
+Authoritative references:
+DMFP-10, DMFP-14.
+
+----------------------------------------------------------------------
+ADR-EVAL-001 — Nested walk-forward/prequential evaluation
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Outer deadline folds estimate performance. Earlier inner folds choose features, hyperparameters, calibration, ensembles and policy settings. Forecasts are frozen before outcomes.
+
+Reason:
+Random CV and flat tuning leak time and overstate performance.
+
+Alternatives rejected or not selected:
+Random train/test splits; tune and report on the same historical period; current-vintage backtest only.
+
+Key assumptions:
+Sufficient historical/prospective sequences exist to form meaningful folds.
+
+Known weaknesses / consequences:
+Strict live history is limited and nested evaluation is computationally expensive.
+
+Revisit when:
+Never for the temporal principle; fold size/cadence may change with evidence.
+
+Authoritative references:
+DMFP-15.
+
+----------------------------------------------------------------------
+ADR-EVAL-002 — Projection, distribution, decision and operations score separately
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+No model is promoted from one headline metric. Evaluate point accuracy, proper probability/distribution scores, joint dependence, downstream decisions and operational fidelity.
+
+Reason:
+Lower MAE can coexist with miscalibration, bad tails or worse optimiser decisions.
+
+Alternatives rejected or not selected:
+Choose by RMSE only; choose by season points only; choose by user preference.
+
+Key assumptions:
+A scorecard and promotion gate can manage multiple dimensions.
+
+Known weaknesses / consequences:
+Trade-offs require predeclared primary metrics and materiality thresholds.
+
+Revisit when:
+Metric research identifies a better task-specific primary score; the layered principle remains.
+
+Authoritative references:
+DMFP-15.
+
+----------------------------------------------------------------------
+ADR-EVAL-003 — Mandatory benchmark ladder B0–B5
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Evaluate naive recent points, official FPL form, market only, market+minutes, complete Pulse and labelled perfect-hindsight upper bounds.
+
+Reason:
+Incremental complexity must prove value against simple and information-rich baselines.
+
+Alternatives rejected or not selected:
+Compare only with prior Pulse version; compare with paid black boxes without reproducibility.
+
+Key assumptions:
+Each benchmark can be implemented with the same cutoff and universe.
+
+Known weaknesses / consequences:
+Market-only coverage can be incomplete and hindsight upper bounds can be misread.
+
+Revisit when:
+Add, do not remove, a reproducible stronger benchmark.
+
+Authoritative references:
+DMFP-15, DMFP-19.
+
+----------------------------------------------------------------------
+ADR-EVAL-004 — Proper scoring and calibration are primary for probabilities
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use log score, Brier, RPS/CRPS, calibration intercept/slope, reproducible reliability diagrams and interval coverage/sharpness.
+
+Reason:
+Accuracy and threshold metrics alone reward uninformative or miscalibrated predictions.
+
+Alternatives rejected or not selected:
+Use classification accuracy/AUC only; use hand-binned reliability as the sole calibration evidence.
+
+Key assumptions:
+Samples are sufficient over time and subgroup uncertainty is displayed.
+
+Known weaknesses / consequences:
+Rare events and small samples make estimates noisy.
+
+Revisit when:
+Metric weighting/aggregation may change through predeclared research.
+
+Authoritative references:
+DMFP-15.
+
+----------------------------------------------------------------------
+ADR-EVAL-005 — Sequential policy replay is required for decision claims
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Backtests execute only the historical root action, advance manager state using actual outcomes/prices and re-run at later deadlines.
+
+Reason:
+Transfers, prices, free transfers and chips are stateful. Independent one-decision hindsight comparisons are invalid season policies.
+
+Alternatives rejected or not selected:
+Evaluate each recommendation against a frozen future state; choose best actions with all future outcomes.
+
+Key assumptions:
+Historical manager states and prices can be reconstructed to an explicit dataset grade.
+
+Known weaknesses / consequences:
+Counterfactual policies are model-dependent and strict-live history may be incomplete.
+
+Revisit when:
+No revisit; only implementation details can improve.
+
+Authoritative references:
+DMFP-15.
+
+----------------------------------------------------------------------
+ADR-EVAL-006 — Experiment registry and locked/prospective confirmation
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Track every tried configuration, separate exploratory and confirmatory work, retain locked contiguous holdouts and require prospective champion/challenger evidence for material promotions.
+
+Reason:
+Repeated backtest selection creates chance winners and hidden research degrees of freedom.
+
+Alternatives rejected or not selected:
+Report only successful experiments; repeatedly inspect final holdout.
+
+Key assumptions:
+Stage evidence and registry storage are operationally feasible.
+
+Known weaknesses / consequences:
+Research velocity is lower and target-season evidence accumulates slowly.
+
+Revisit when:
+No revisit; thresholds may change.
+
+Authoritative references:
+DMFP-15, DMFP-17, DMFP-19.
+
+----------------------------------------------------------------------
+ADR-OPS-001 — PostgreSQL is the durable control-plane queue and ledger
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Runs, tasks, leases, dependencies, operations, outbox, cache metadata and publication state live in PostgreSQL.
+
+Reason:
+It provides transactions, durability and one authoritative state without a new broker.
+
+Alternatives rejected or not selected:
+Celery/RabbitMQ, Kafka, Airflow or Temporal as mandatory V1 infrastructure; in-memory queue.
+
+Key assumptions:
+Private workload remains moderate and PostgreSQL is well operated.
+
+Known weaknesses / consequences:
+Queue load can contend with canonical data and requires indexes/monitoring.
+
+Revisit when:
+Measured scale or reliability justifies a dedicated workflow/broker platform.
+
+Authoritative references:
+DMFP-16.
+
+----------------------------------------------------------------------
+ADR-OPS-002 — SKIP LOCKED claims and advisory-lock singletons
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Workers claim READY task rows using row locks with SKIP LOCKED. Transaction-scoped advisory locks protect scheduler/publication/singleton transitions.
+
+Reason:
+This supports concurrent consumers without duplicate singleton work.
+
+Alternatives rejected or not selected:
+Global table lock; optimistic claim without lease; session locks through pooled code.
+
+Key assumptions:
+Task execution is at least once and outputs are idempotent.
+
+Known weaknesses / consequences:
+Incorrect lease/transaction handling can duplicate or strand work.
+
+Revisit when:
+A dedicated queue replaces PostgreSQL or operational evidence shows another pattern is safer.
+
+Authoritative references:
+DMFP-16.
+
+----------------------------------------------------------------------
+ADR-OPS-003 — LISTEN/NOTIFY is a wake-up hint only
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Durable outbox/task rows are truth. NOTIFY reduces latency but workers also poll/recover.
+
+Reason:
+Notifications can be missed or folded and have small payload constraints.
+
+Alternatives rejected or not selected:
+Use NOTIFY as a durable queue; rely only on polling with high latency.
+
+Key assumptions:
+A one-minute scheduler/polling cadence is adequate for recovery.
+
+Known weaknesses / consequences:
+More moving parts than polling alone.
+
+Revisit when:
+A dedicated durable event system is introduced.
+
+Authoritative references:
+DMFP-16.
+
+----------------------------------------------------------------------
+ADR-OPS-004 — Immutable Decision Bundle and mutable latest pointer
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Every published recommendation is immutable and content-addressed. A transactional alias identifies the latest publishable bundle.
+
+Reason:
+History, why-changed, execution and backtesting require the exact original recommendation.
+
+Alternatives rejected or not selected:
+Update one decision row in place; regenerate historical explanation from current models.
+
+Key assumptions:
+Artifact storage and database manifests remain available.
+
+Known weaknesses / consequences:
+Storage grows and withdrawals require careful pointer handling.
+
+Revisit when:
+No revisit; an equivalent immutable event-sourcing representation could replace storage details.
+
+Authoritative references:
+DMFP-16, DMFP-18.
+
+----------------------------------------------------------------------
+ADR-OPS-005 — Deadline-relative D-15 and D-5 actionable cycles
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Run a final standard full recommendation around D-15 minutes and a final fast incremental recommendation around D-5, followed by an exact audit freeze at the deadline.
+
+Reason:
+This balances fresh information, solver runtime and manual execution safety.
+
+Alternatives rejected or not selected:
+Only one daily run; calculate after the deadline; wait to the final minute by default.
+
+Key assumptions:
+Source/runtime observations support completion before Sebastian's safe buffer.
+
+Known weaknesses / consequences:
+Provider latency or site reliability can make the proposed timing unsafe.
+
+Revisit when:
+Preseason rehearsals or live operations identify better timing and buffer.
+
+Authoritative references:
+DMFP-16, DMFP-17.
+
+----------------------------------------------------------------------
+ADR-OPS-006 — FastAPI/OpenAPI private API and Typer CLI share services
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+API and CLI call one application-service layer. The internal API uses versioned HTTP/JSON, operation resources, RFC 9457 errors and idempotency for mutations.
+
+Reason:
+One business implementation avoids divergence and enables UI, automation and replay.
+
+Alternatives rejected or not selected:
+Separate CLI scripts; public API first; long blocking HTTP calls.
+
+Key assumptions:
+Private/local deployment is sufficient.
+
+Known weaknesses / consequences:
+Maintaining contracts adds work before a multi-client ecosystem exists.
+
+Revisit when:
+A different interface framework is justified while preserving application contracts.
+
+Authoritative references:
+DMFP-16, DMFP-19.
+
+----------------------------------------------------------------------
+ADR-ASSUR-001 — Structured OpenTelemetry-correlated logs
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+First-party logs are structured JSON events with trace/run/task correlation and redacted safe attributes.
+
+Reason:
+Deadline incidents and reproducibility cannot rely on unstructured strings.
+
+Alternatives rejected or not selected:
+Plain console text only; log entire request/response objects.
+
+Key assumptions:
+A local open-source telemetry stack is sufficient.
+
+Known weaknesses / consequences:
+Schema discipline and cardinality/redaction require ongoing controls.
+
+Revisit when:
+No revisit; sink/backend may change.
+
+Authoritative references:
+DMFP-17.
+
+----------------------------------------------------------------------
+ADR-ASSUR-002 — Encrypted systemd credentials for V1 secrets
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use systemd credential delivery and encrypted credentials where the host supports them, with separately encrypted offline recovery.
+
+Reason:
+Avoids production secrets in environment variables, source, CLI and general backups while keeping the one-host design operable.
+
+Alternatives rejected or not selected:
+Production .env; command-line keys; database-stored plaintext; mandatory cloud vault.
+
+Key assumptions:
+The selected host/systemd/TPM configuration is understood and recovery tested.
+
+Known weaknesses / consequences:
+Host portability and TPM recovery can be difficult.
+
+Revisit when:
+A dedicated vault/managed secret service becomes operationally justified or the host cannot support secure credentials.
+
+Authoritative references:
+DMFP-17.
+
+----------------------------------------------------------------------
+ADR-ASSUR-003 — PostgreSQL plus immutable artifacts is the authoritative model/data registry
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Model and dataset versions, aliases, approvals and lineage live in Pulse registries. MLflow may be a UI but not a second authority.
+
+Reason:
+Decision reproducibility needs exact code/data/rules/environment links and controlled aliases.
+
+Alternatives rejected or not selected:
+Folder naming; mutable latest model file; independent MLflow lifecycle.
+
+Key assumptions:
+Custom registry scope remains manageable.
+
+Known weaknesses / consequences:
+Building registry UI/workflows has maintenance cost.
+
+Revisit when:
+A mature registry can become authority through an explicit migration and single-writer design.
+
+Authoritative references:
+DMFP-17.
+
+----------------------------------------------------------------------
+ADR-ASSUR-004 — Named SeedSequence RNG tree
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Every stochastic run stores a root seed and deterministic named child streams independent of worker scheduling. Global RNG use is prohibited.
+
+Reason:
+Reproducible scenarios and common random numbers require explicit stream identity.
+
+Alternatives rejected or not selected:
+Seed with wall clock/PID; one global NumPy seed; worker-local implicit RNG.
+
+Key assumptions:
+Selected libraries accept injected RNG/seed and scenario indices.
+
+Known weaknesses / consequences:
+Bitwise results can still vary across BLAS/CPU/solver environments.
+
+Revisit when:
+A stronger counter-based RNG abstraction replaces SeedSequence while preserving named streams.
+
+Authoritative references:
+DMFP-09, DMFP-17.
+
+----------------------------------------------------------------------
+ADR-ASSUR-005 — Backups require verified restore
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use WAL/PITR, base backups, logical dumps and immutable artifact replication, with monthly restore and preseason disaster rehearsal.
+
+Reason:
+A successful backup command does not prove recoverability.
+
+Alternatives rejected or not selected:
+File copy only; backup without restore test; same-disk backup.
+
+Key assumptions:
+Off-host encrypted storage is available.
+
+Known weaknesses / consequences:
+Storage cost and rights-aware deletion across backups are complex.
+
+Revisit when:
+Recovery objectives or infrastructure change; restore verification remains mandatory.
+
+Authoritative references:
+DMFP-17.
+
+----------------------------------------------------------------------
+ADR-ASSUR-006 — Provider Rights Profiles enforce use and retention
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Every provider has machine-readable rights metadata controlling automation, caching, training, display, redistribution, backup, retention and termination deletion.
+
+Reason:
+A public/free API does not automatically grant unrestricted storage or redistribution.
+
+Alternatives rejected or not selected:
+Informal notes only; assume derived data are unrestricted; review terms only at onboarding.
+
+Key assumptions:
+Provider terms can be captured and reviewed.
+
+Known weaknesses / consequences:
+Some terms are ambiguous and may block useful data until clarified.
+
+Revisit when:
+No revisit; the profile schema may evolve.
+
+Authoritative references:
+DMFP-04, DMFP-17, DMFP-18.
+
+----------------------------------------------------------------------
+ADR-UI-001 — Progressive-disclosure Decision Cockpit
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+The primary UI shows action, timing, comparator value, uncertainty, confidence, key assumption and fallback first; deeper views expose scenarios, models and audit.
+
+Reason:
+The user needs a fast deadline action without hiding uncertainty or provenance.
+
+Alternatives rejected or not selected:
+Model-debug dashboard as home; one-line recommendation; show every metric at once.
+
+Key assumptions:
+Sebastian benefits from quick, analyst and audit levels.
+
+Known weaknesses / consequences:
+Information hierarchy must be validated through usability tests.
+
+Revisit when:
+Task-based testing supports a different hierarchy.
+
+Authoritative references:
+DMFP-18.
+
+----------------------------------------------------------------------
+ADR-UI-002 — Paired distribution, not a single expected gain
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Show no-transfer comparison, paired p10/median/p90, P(beat baseline), material downside and upside. Plans use common scenarios.
+
+Reason:
+A small precise mean can conceal large downside, uncertainty and statistical ties.
+
+Alternatives rejected or not selected:
+Only xP; subtract independent percentile endpoints; generic risk badge.
+
+Key assumptions:
+Scenario samples and numerical diagnostics are available.
+
+Known weaknesses / consequences:
+Multiple uncertainty numbers can overload users.
+
+Revisit when:
+Usability evidence selects a simpler but still distributional summary.
+
+Authoritative references:
+DMFP-18.
+
+----------------------------------------------------------------------
+ADR-UI-003 — Explanation Graph is the evidence source
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Reasons, assumptions, counterfactuals, warnings and provenance are structured graph nodes/edges tied to actual run artifacts. Deterministic templates are the primary text renderer.
+
+Reason:
+This prevents post-hoc stories and keeps UI, CLI and audit consistent.
+
+Alternatives rejected or not selected:
+Free-form LLM explanation; SHAP as the whole decision explanation; manual narrative.
+
+Key assumptions:
+Decision modules emit enough structured reason data.
+
+Known weaknesses / consequences:
+Building and maintaining reason schemas is substantial work.
+
+Revisit when:
+A superior formal explanation representation preserves fidelity and versioning.
+
+Authoritative references:
+DMFP-18.
+
+----------------------------------------------------------------------
+ADR-UI-004 — Why-changed uses controlled reruns
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Attribute old/new recommendation differences by re-running controlled evidence/model/state groups with common scenarios, including interactions and residual reconciliation.
+
+Reason:
+A narrative comparison can mistake model promotion, price feasibility or numerical noise for football evidence.
+
+Alternatives rejected or not selected:
+Diff text fields only; ask an LLM to infer why; compare headline xP only.
+
+Key assumptions:
+Old immutable bundles and module-level inputs are retained.
+
+Known weaknesses / consequences:
+Controlled reruns are computationally expensive and path dependent.
+
+Revisit when:
+A validated cheaper attribution method reconciles exactly enough for the user task.
+
+Authoritative references:
+DMFP-18.
+
+----------------------------------------------------------------------
+ADR-UI-005 — Counterfactual switch thresholds explain fragility
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Show minimal plausible model/input changes that cause a different optimiser action, derived through reoptimisation.
+
+Reason:
+This turns uncertainty into an actionable monitoring plan and identifies decision boundaries.
+
+Alternatives rejected or not selected:
+Feature importance only; vague “could change with news”; unsupported causal statements.
+
+Key assumptions:
+Key inputs can be varied within calibrated plausible ranges.
+
+Known weaknesses / consequences:
+Optimiser discontinuities and interactions can make thresholds broad or multidimensional.
+
+Revisit when:
+Usability tests show another explanation better supports decisions.
+
+Authoritative references:
+DMFP-18.
+
+----------------------------------------------------------------------
+ADR-UI-006 — Quantile dotplots and CDFs are initial uncertainty defaults
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use frequency-based quantile dotplots for discrete plan differences and CDF/exceedance views for thresholds, with fan charts over horizons and accessible tables.
+
+Reason:
+They expose probability more directly than unlabeled error bars and suit discrete FPL points.
+
+Alternatives rejected or not selected:
+Error bar alone; decorative gauge; dense violin as the main view.
+
+Key assumptions:
+FPL-specific usability tests will validate comprehension.
+
+Known weaknesses / consequences:
+Evidence comes from other domains and individual preferences may differ.
+
+Revisit when:
+Task-based experiments demonstrate a better visual for Sebastian.
+
+Authoritative references:
+DMFP-18.
+
+----------------------------------------------------------------------
+ADR-UI-007 — WCAG 2.2 AA target
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+All critical UI and reports target WCAG 2.2 AA, including keyboard, contrast, non-colour status, screen-reader summaries, reflow and reduced motion.
+
+Reason:
+Deadline decisions must remain usable across devices and accessibility needs; accessible structure also improves robustness.
+
+Alternatives rejected or not selected:
+Accessibility after launch; automated checks only; colour-coded dashboard.
+
+Key assumptions:
+The selected web stack can support semantic accessible components.
+
+Known weaknesses / consequences:
+Manual testing adds implementation time.
+
+Revisit when:
+No revisit except a higher standard.
+
+Authoritative references:
+DMFP-18.
+
+----------------------------------------------------------------------
+ADR-IMPL-001 — Sixteen-stage implementation roadmap
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Implement repository/config through UI in the Stage 1–16 order specified in DMFP-19, with each stage forming a validated vertical slice.
+
+Reason:
+The dependency order reduces risk and forces scientific evaluation before advanced strategy/product claims.
+
+Alternatives rejected or not selected:
+Build UI first; build full models before canonical data; defer backtesting until the end.
+
+Key assumptions:
+The stage boundaries remain sufficiently stable.
+
+Known weaknesses / consequences:
+Later evidence may require a controlled stage split or added stage.
+
+Revisit when:
+A new dependency or external deadline requires a documented roadmap amendment.
+
+Authoritative references:
+DMFP-19.
+
+----------------------------------------------------------------------
+ADR-IMPL-002 — Python/PostgreSQL/Pyomo/HiGHS baseline toolchain
+----------------------------------------------------------------------
+Status: PROVISIONAL
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Use Python 3.13 compatibility baseline, PostgreSQL, Pydantic, Alembic, Typer, FastAPI, Pyomo and HiGHS, with Ruff, mypy, pytest, Hypothesis, coverage and mutation testing.
+
+Reason:
+This toolchain is open-source, typed, auditable and aligns with the architecture.
+
+Alternatives rejected or not selected:
+Unversioned notebooks; SQLite production; commercial-only solver; heavy SPA as a prerequisite.
+
+Key assumptions:
+Stage 1 and Stage 10 compatibility/performance spikes pass.
+
+Known weaknesses / consequences:
+Python/solver/library compatibility can change and optimiser performance may require replacement.
+
+Revisit when:
+The stage spike or benchmark demonstrates a better supported option.
+
+Authoritative references:
+DMFP-19.
+
+----------------------------------------------------------------------
+ADR-IMPL-003 — Stage acceptance is proof, not code volume
+----------------------------------------------------------------------
+Status: ACCEPTED
+Decision date: 2026-07-18
+Supersedes: None
+
+Decision:
+Every stage requires a runnable demo, public contract, fixture pack, migration evidence where relevant, coverage/mutation results and machine-readable acceptance record.
+
+Reason:
+Unintegrated code and high line counts do not prove capability.
+
+Alternatives rejected or not selected:
+Mark complete when unit tests pass; accept TODO/stub for hard integration.
+
+Key assumptions:
+The repository can retain evidence and CI can enforce gates.
+
+Known weaknesses / consequences:
+Evidence creation adds overhead.
+
+Revisit when:
+No revisit; specific thresholds can change through ADR.
+
+Authoritative references:
+DMFP-19.
+
+======================================================================
+2. ASSUMPTION REGISTER
+======================================================================
+
+Assumptions are not decisions. Each assumption has an impact and a validation
+plan. A failed assumption triggers the referenced decisions' review conditions.
+
+----------------------------------------------------------------------
+ASM-RULE-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: BLOCKING
+
+Assumption:
+The official 2026/27 FPL game and complete rules will be available before the first actionable deadline.
+
+Validation / mitigation:
+Capture, diff, compile and activate rules; run golden cases.
+
+References:
+DMFP-02, DMFP-19.
+
+----------------------------------------------------------------------
+ASM-RULE-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: PROVISIONAL
+
+Assumption:
+Reference 2025/26 scoring, transfers, chips and tie rules are sufficiently similar to support nonproduction implementation fixtures.
+
+Validation / mitigation:
+Replace or version fixtures immediately after launch.
+
+References:
+DMFP-02, DMFP-09, DMFP-12–14.
+
+----------------------------------------------------------------------
+ASM-SRC-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Official FPL/Premier League web data remain accessible for conservative private cached use.
+
+Validation / mitigation:
+Monitor terms/schema and maintain manual/block fallback.
+
+References:
+DMFP-04, DMFP-17.
+
+----------------------------------------------------------------------
+ASM-SRC-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+API-FOOTBALL Free retains EPL current coverage adequate for baseline match markets/context.
+
+Validation / mitigation:
+Provider spike and quarterly review.
+
+References:
+DMFP-04.
+
+----------------------------------------------------------------------
+ASM-SRC-003
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+The Odds API free tier retains selected EPL player-prop coverage and a usable monthly quota.
+
+Validation / mitigation:
+Prospective coverage report; no core dependency.
+
+References:
+DMFP-04.
+
+----------------------------------------------------------------------
+ASM-SRC-004
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: BLOCKING_FOR_SOURCE
+
+Assumption:
+Betfair delayed/historical use is permitted for the approved account, jurisdiction and private nonbetting purpose.
+
+Validation / mitigation:
+Written/account review before activation.
+
+References:
+DMFP-04, DMFP-17.
+
+----------------------------------------------------------------------
+ASM-DATA-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+A single PostgreSQL instance can support canonical, control-plane and evaluation workloads for V1.
+
+Validation / mitigation:
+Load tests, monitoring and deadline rehearsal.
+
+References:
+DMFP-05, DMFP-16.
+
+----------------------------------------------------------------------
+ASM-DATA-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+Immutable artifact storage has sufficient capacity for scenario matrices and retained decision bundles.
+
+Validation / mitigation:
+Capacity forecast and retention enforcement.
+
+References:
+DMFP-05, DMFP-17.
+
+----------------------------------------------------------------------
+ASM-MKT-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Free team markets are sufficiently informative to anchor score distributions.
+
+Validation / mitigation:
+Out-of-time market-only and market+minutes benchmarks.
+
+References:
+DMFP-06, DMFP-08, DMFP-15.
+
+----------------------------------------------------------------------
+ASM-MKT-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+Operator identity and duplicate feeds can be mapped accurately enough for consensus.
+
+Validation / mitigation:
+Operator mapping tests and disagreement audits.
+
+References:
+DMFP-06.
+
+----------------------------------------------------------------------
+ASM-MIN-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Historical lineups, minutes and substitutions are complete enough for the baseline and later hazard models.
+
+Validation / mitigation:
+Dataset coverage/card and subgroup calibration.
+
+References:
+DMFP-07, DMFP-15.
+
+----------------------------------------------------------------------
+ASM-EVT-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+A score-first conditional allocation model preserves the decision-relevant correlations better than independent player models.
+
+Validation / mitigation:
+Energy/variogram/joint decision ablations.
+
+References:
+DMFP-08, DMFP-15.
+
+----------------------------------------------------------------------
+ASM-PTS-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+BPS auxiliary/residual models can provide enough missing event detail to simulate bonus credibly.
+
+Validation / mitigation:
+Bonus/BPS calibration and residual ablation.
+
+References:
+DMFP-09.
+
+----------------------------------------------------------------------
+ASM-UNC-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Robust regret improves decisions under model/structural uncertainty without sacrificing excessive expected points.
+
+Validation / mitigation:
+Price-of-robustness frontier and sequential backtest.
+
+References:
+DMFP-10, DMFP-15.
+
+----------------------------------------------------------------------
+ASM-UNC-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Terminal-value approximations can reduce rolling-horizon myopia.
+
+Validation / mitigation:
+Horizon and terminal ablations.
+
+References:
+DMFP-10, DMFP-12, DMFP-15.
+
+----------------------------------------------------------------------
+ASM-PRC-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Public transfer counters contain enough signal for calibrated price-event prediction despite hidden algorithm inputs.
+
+Validation / mitigation:
+Prospective target-season price scorecard.
+
+References:
+DMFP-11, DMFP-15.
+
+----------------------------------------------------------------------
+ASM-PRC-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+Regular overnight price-update opportunities can be identified from snapshots.
+
+Validation / mitigation:
+High-frequency launch observation and interval-censored timing model.
+
+References:
+DMFP-11.
+
+----------------------------------------------------------------------
+ASM-OPT-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: BLOCKING_FOR_STAGE_11
+
+Assumption:
+Pyomo/HiGHS can solve the reduced stochastic optimisation within deadline targets.
+
+Validation / mitigation:
+Stage 10–11 performance benchmark and fallback solver ADR.
+
+References:
+DMFP-12, DMFP-19.
+
+----------------------------------------------------------------------
+ASM-OPT-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Candidate pruning and scenario reduction can preserve the selected action with acceptable error.
+
+Validation / mitigation:
+Full-pool/reduced-pool decision stability tests.
+
+References:
+DMFP-10, DMFP-12.
+
+----------------------------------------------------------------------
+ASM-CHIP-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Future chip opportunity distributions are predictable enough for policy value beyond crude heuristics.
+
+Validation / mitigation:
+Sequential chip backtest versus simple rules.
+
+References:
+DMFP-13, DMFP-15.
+
+----------------------------------------------------------------------
+ASM-RANK-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: BLOCKING_FOR_OVERALL_RANK
+
+Assumption:
+A lawful manager sample or exact mini-league data can support EO/opponent modelling.
+
+Validation / mitigation:
+Rights review, provenance and calibration.
+
+References:
+DMFP-04, DMFP-14, DMFP-17.
+
+----------------------------------------------------------------------
+ASM-RANK-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Synthetic manager cohorts can approximate extreme overall-rank tails with importance sampling.
+
+Validation / mitigation:
+Known synthetic populations and historical calibration.
+
+References:
+DMFP-14.
+
+----------------------------------------------------------------------
+ASM-EVAL-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Enough strict-live or graded historical data exist to separate model value from reconstruction bias.
+
+Validation / mitigation:
+Dataset inventory before claims.
+
+References:
+DMFP-15.
+
+----------------------------------------------------------------------
+ASM-OPS-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+One private Linux host can meet D-15/D-5 deadlines with worker isolation.
+
+Validation / mitigation:
+Preseason load/chaos rehearsal.
+
+References:
+DMFP-16, DMFP-17.
+
+----------------------------------------------------------------------
+ASM-OPS-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+Manual FPL execution before the safety buffer remains reliable.
+
+Validation / mitigation:
+Execution logging and buffer review.
+
+References:
+DMFP-16, DMFP-18.
+
+----------------------------------------------------------------------
+ASM-SEC-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+The production host supports a secure and recoverable systemd credential configuration.
+
+Validation / mitigation:
+Stage security spike and restore exercise.
+
+References:
+DMFP-17.
+
+----------------------------------------------------------------------
+ASM-UI-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+Sebastian will make better decisions with progressive uncertainty disclosure than with a single recommendation or full model dashboard.
+
+Validation / mitigation:
+Task-based usability study.
+
+References:
+DMFP-18.
+
+----------------------------------------------------------------------
+ASM-UI-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+Quantile dotplots/CDFs will be comprehensible for FPL plan differences.
+
+Validation / mitigation:
+Compare text/dotplot/CDF/fan on golden cases.
+
+References:
+DMFP-18.
+
+----------------------------------------------------------------------
+ASM-IMPL-001
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: MEDIUM
+
+Assumption:
+Python 3.13 and required packages remain compatible over the implementation release line.
+
+Validation / mitigation:
+Stage 1 compatibility matrix and locked release.
+
+References:
+DMFP-19.
+
+----------------------------------------------------------------------
+ASM-IMPL-002
+----------------------------------------------------------------------
+Status: OPEN ASSUMPTION
+Impact if false: HIGH
+
+Assumption:
+A one-person implementation with automated evidence and Sebastian approval can operate the control regime.
+
+Validation / mitigation:
+Track control burden and automate stage gates.
+
+References:
+DMFP-17, DMFP-19.
+
+======================================================================
+3. KNOWN WEAKNESSES
+======================================================================
+
+----------------------------------------------------------------------
+WEAK-SRC-001
+----------------------------------------------------------------------
+Known weakness:
+No complete free historical EPL player-prop archive.
+
+Required consequence / mitigation:
+Player-level market backtests are limited and prospective 2026/27 collection is essential.
+
+----------------------------------------------------------------------
+WEAK-SRC-002
+----------------------------------------------------------------------
+Known weakness:
+Free provider quotas and coverage can change without notice.
+
+Required consequence / mitigation:
+The system must reserve quota, cache, degrade and avoid source lock-in.
+
+----------------------------------------------------------------------
+WEAK-DATA-001
+----------------------------------------------------------------------
+Known weakness:
+Older history may not contain exact usable-at timestamps or original mappings.
+
+Required consequence / mitigation:
+Claims must remain RECONSTRUCTED and separate from live performance.
+
+----------------------------------------------------------------------
+WEAK-DATA-002
+----------------------------------------------------------------------
+Known weakness:
+Entity-resolution mistakes can invalidate many descendants.
+
+Required consequence / mitigation:
+Central mapping review, lineage invalidation and replay are required.
+
+----------------------------------------------------------------------
+WEAK-MKT-001
+----------------------------------------------------------------------
+Known weakness:
+Bookmaker/operator observations are correlated.
+
+Required consequence / mitigation:
+Consensus uncertainty can be too narrow without dependence correction.
+
+----------------------------------------------------------------------
+WEAK-MKT-002
+----------------------------------------------------------------------
+Known weakness:
+One-sided player quotes retain unknown margin.
+
+Required consequence / mitigation:
+Use softly and expose confidence rather than claiming de-vigged truth.
+
+----------------------------------------------------------------------
+WEAK-MIN-001
+----------------------------------------------------------------------
+Known weakness:
+Manager rotation and injury readiness contain private information.
+
+Required consequence / mitigation:
+Even a strong model retains irreducible/epistemic lineup uncertainty.
+
+----------------------------------------------------------------------
+WEAK-MIN-002
+----------------------------------------------------------------------
+Known weakness:
+New managers and new signings can invalidate historical pooling.
+
+Required consequence / mitigation:
+Regime/change-point uncertainty must reset confidence.
+
+----------------------------------------------------------------------
+WEAK-EVT-001
+----------------------------------------------------------------------
+Known weakness:
+Score-first V1 is not a full sequential match process.
+
+Required consequence / mitigation:
+Some substitution/score-state interactions are approximated.
+
+----------------------------------------------------------------------
+WEAK-EVT-002
+----------------------------------------------------------------------
+Known weakness:
+Auxiliary shot/card/BPS events may be incompletely observed historically.
+
+Required consequence / mitigation:
+Residual/auxiliary modelling can dominate bonus uncertainty.
+
+----------------------------------------------------------------------
+WEAK-PTS-001
+----------------------------------------------------------------------
+Known weakness:
+Monte Carlo tails can be noisy for close captain/chip/rank decisions.
+
+Required consequence / mitigation:
+Adaptive simulation and ESS/MCSE reporting are required.
+
+----------------------------------------------------------------------
+WEAK-UNC-001
+----------------------------------------------------------------------
+Known weakness:
+Aleatoric/epistemic decomposition depends on modelling choices.
+
+Required consequence / mitigation:
+Use a detailed operational uncertainty ledger.
+
+----------------------------------------------------------------------
+WEAK-UNC-002
+----------------------------------------------------------------------
+Known weakness:
+Value-of-information and terminal values are themselves model outputs.
+
+Required consequence / mitigation:
+Backtest ACT/WAIT and horizon decisions rather than treating them as facts.
+
+----------------------------------------------------------------------
+WEAK-PRC-001
+----------------------------------------------------------------------
+Known weakness:
+FPL's price algorithm is proprietary and may change.
+
+Required consequence / mitigation:
+Threshold distance is model-inferred and confidence is capped early.
+
+----------------------------------------------------------------------
+WEAK-OPT-001
+----------------------------------------------------------------------
+Known weakness:
+The stochastic MILP can become too large near chips/blanks/doubles.
+
+Required consequence / mitigation:
+Use reduction, warm starts, decomposition and visible solver gaps.
+
+----------------------------------------------------------------------
+WEAK-OPT-002
+----------------------------------------------------------------------
+Known weakness:
+Candidate pruning can remove the true best player/route.
+
+Required consequence / mitigation:
+Maintain safe bounds, escape candidates and full reruns.
+
+----------------------------------------------------------------------
+WEAK-CHIP-001
+----------------------------------------------------------------------
+Known weakness:
+Future best chip opportunity suffers forecast winner's curse.
+
+Required consequence / mitigation:
+Use adaptive continuation value and robust uncertainty.
+
+----------------------------------------------------------------------
+WEAK-RANK-001
+----------------------------------------------------------------------
+Known weakness:
+Predeadline rival actions are hidden.
+
+Required consequence / mitigation:
+Opponent decisions remain probabilistic and confidence-limited.
+
+----------------------------------------------------------------------
+WEAK-RANK-002
+----------------------------------------------------------------------
+Known weakness:
+Extreme overall-rank probabilities require tail modelling over millions of managers.
+
+Required consequence / mitigation:
+Use importance sampling and report approximation error.
+
+----------------------------------------------------------------------
+WEAK-EVAL-001
+----------------------------------------------------------------------
+Known weakness:
+FPL provides only one season trajectory per year.
+
+Required consequence / mitigation:
+Use paired decisions, hierarchical pooling, prospective logging and avoid overclaiming.
+
+----------------------------------------------------------------------
+WEAK-EVAL-002
+----------------------------------------------------------------------
+Known weakness:
+A decision can be correct ex ante and fail in realised points.
+
+Required consequence / mitigation:
+Evaluate repeated proper scores and policy regret, not anecdotes.
+
+----------------------------------------------------------------------
+WEAK-OPS-001
+----------------------------------------------------------------------
+Known weakness:
+A single host remains a single operational failure domain.
+
+Required consequence / mitigation:
+Verified off-host backup and emergency manual plan are required.
+
+----------------------------------------------------------------------
+WEAK-SEC-001
+----------------------------------------------------------------------
+Known weakness:
+One-person administration weakens separation of duties.
+
+Required consequence / mitigation:
+Use automation, append-only evidence and explicit Sebastian approval.
+
+----------------------------------------------------------------------
+WEAK-UI-001
+----------------------------------------------------------------------
+Known weakness:
+Showing uncertainty can increase cognitive load or reduce trust.
+
+Required consequence / mitigation:
+Use progressive disclosure and appropriate-reliance tests.
+
+----------------------------------------------------------------------
+WEAK-IMPL-001
+----------------------------------------------------------------------
+Known weakness:
+The full architecture is large and can exceed practical build capacity.
+
+Required consequence / mitigation:
+Stage gates and explicit shortcuts prevent an unfinished monolith.
+
+======================================================================
+4. TEMPORARY SHORTCUTS AND TECHNICAL DEBT
+======================================================================
+
+Temporary does not mean undocumented or low quality. Each shortcut must retain
+its replacement trigger and remain visible in model cards and UI confidence.
+
+----------------------------------------------------------------------
+TEMP-MKT-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+One-provider market consensus in Stage 6.
+
+Why accepted now:
+The contract supports multiple operators; confidence/provider count exposes the limitation.
+
+Exit / retirement condition:
+Retire after second approved odds source integration.
+
+----------------------------------------------------------------------
+TEMP-MIN-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Regularised/basic role and minute model before full hierarchical competing-risk model.
+
+Why accepted now:
+Provides a distributional vertical slice and baseline for evaluation.
+
+Exit / retirement condition:
+Retire/promote after DMFP-07 advanced model beats baseline prospectively.
+
+----------------------------------------------------------------------
+TEMP-EVT-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Independent Poisson score prior before bivariate/Dixon–Coles challengers.
+
+Why accepted now:
+Transparent and sufficient for the first coherent score distribution.
+
+Exit / retirement condition:
+Retain as benchmark even after challenger promotion.
+
+----------------------------------------------------------------------
+TEMP-EVT-002
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Simple player goal/assist shares before full event tree and prop calibration.
+
+Why accepted now:
+Enables end-to-end FPL distributions in Stage 9.
+
+Exit / retirement condition:
+Replace only through coherent ablation-tested event model.
+
+----------------------------------------------------------------------
+TEMP-PTS-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Minimal auxiliary BPS events/residual before full BPS coverage.
+
+Why accepted now:
+Required to exercise joint bonus engine.
+
+Exit / retirement condition:
+Retire after event coverage and bonus calibration pass.
+
+----------------------------------------------------------------------
+TEMP-UNC-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Predeclared model ensemble weights before learned stacking.
+
+Why accepted now:
+Avoids fitting unstable weights on tiny samples.
+
+Exit / retirement condition:
+Replace after sufficient time-safe forecasts.
+
+----------------------------------------------------------------------
+TEMP-OPT-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Top-K candidate plan generation plus exact reevaluation before full decomposition.
+
+Why accepted now:
+Delivers a tractable V1 central engine.
+
+Exit / retirement condition:
+Revisit when action instability/runtime fails targets.
+
+----------------------------------------------------------------------
+TEMP-OPT-002
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Interpretable terminal-value approximation.
+
+Why accepted now:
+Prevents obvious horizon myopia before learned ADP.
+
+Exit / retirement condition:
+Retain as benchmark after learned terminal model.
+
+----------------------------------------------------------------------
+TEMP-PRC-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Multinomial/logistic price baseline before full latent particle filter.
+
+Why accepted now:
+Establishes calibrated benchmark and data pipeline.
+
+Exit / retirement condition:
+Promote hazard/state model only on out-of-time evidence.
+
+----------------------------------------------------------------------
+TEMP-CHIP-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Schedule enumeration/beam search before integrated multistage chip MILP.
+
+Why accepted now:
+Transparent and reuses DMFP-12.
+
+Exit / retirement condition:
+Revisit if candidate schedule pruning is unstable.
+
+----------------------------------------------------------------------
+TEMP-RANK-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Exact mini-league and synthetic small cohort before overall-field tail engine.
+
+Why accepted now:
+Provides useful local strategy with lower rights/computation risk.
+
+Exit / retirement condition:
+Overall rank remains diagnostic until validated.
+
+----------------------------------------------------------------------
+TEMP-OPS-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+PostgreSQL queue and systemd rather than distributed workflow system.
+
+Why accepted now:
+Minimises operational burden for one host.
+
+Exit / retirement condition:
+Retire if measured scale/reliability requires it.
+
+----------------------------------------------------------------------
+TEMP-SEC-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Systemd encrypted credentials rather than external vault.
+
+Why accepted now:
+Proportionate for private one-host deployment.
+
+Exit / retirement condition:
+Revisit for multi-host or multi-user deployment.
+
+----------------------------------------------------------------------
+TEMP-UI-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Server-rendered HTML with progressive enhancement before a heavy SPA.
+
+Why accepted now:
+Improves accessibility, speed and implementation scope.
+
+Exit / retirement condition:
+Revisit only with demonstrated interaction needs.
+
+----------------------------------------------------------------------
+TEMP-UI-002
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Deterministic explanation templates before optional grounded LLM renderer.
+
+Why accepted now:
+Ensures fidelity and avoids hallucinated reasons/numbers.
+
+Exit / retirement condition:
+LLM remains optional even after implementation.
+
+----------------------------------------------------------------------
+TEMP-EVAL-001
+----------------------------------------------------------------------
+Status: ACTIVE TEMPORARY SHORTCUT
+
+Shortcut:
+Synthetic/graded reconstructed seasons before substantial strict-live history.
+
+Why accepted now:
+Allows engineering tests without false live claims.
+
+Exit / retirement condition:
+Prospective 2026/27 evidence becomes primary.
+
+======================================================================
+5. REJECTED ALTERNATIVES REGISTER
+======================================================================
+
+Rejected alternatives may be reconsidered only when new evidence directly
+addresses the rejection reason.
+
+----------------------------------------------------------------------
+REJ-ARCH-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Microservices and Kubernetes as the initial deployment.
+
+Reason rejected:
+Disproportionate operational complexity for a private, moderate workload.
+
+----------------------------------------------------------------------
+REJ-SRC-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Paid data subscriptions as a core requirement.
+
+Reason rejected:
+Conflicts with the zero-cost constraint and requires demonstrated incremental value before reconsideration.
+
+----------------------------------------------------------------------
+REJ-SRC-002
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Scraping or automating protected/private pages.
+
+Reason rejected:
+Terms, fragility and security risk.
+
+----------------------------------------------------------------------
+REJ-MKT-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Use a single bookmaker as market truth.
+
+Reason rejected:
+Provider margin, outlier and coverage risk.
+
+----------------------------------------------------------------------
+REJ-MKT-002
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Force anytime-scorer probabilities to sum one.
+
+Reason rejected:
+Events overlap and unlisted/own-goal mass exists.
+
+----------------------------------------------------------------------
+REJ-MIN-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Expected minutes only.
+
+Reason rejected:
+Loses zero/60 thresholds and start/bench mixture.
+
+----------------------------------------------------------------------
+REJ-EVT-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Independent player goal/assist models without team reconciliation.
+
+Reason rejected:
+Can create impossible totals and wrong correlations.
+
+----------------------------------------------------------------------
+REJ-PTS-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Direct expected-points model as the final scoring engine.
+
+Reason rejected:
+Breaks exact rules, thresholds and scenario dependence.
+
+----------------------------------------------------------------------
+REJ-UNC-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Generic mean-variance optimisation.
+
+Reason rejected:
+Penalises genuine football upside rather than knowledge error.
+
+----------------------------------------------------------------------
+REJ-UNC-002
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Pure maximin/worst-case points as default.
+
+Reason rejected:
+Excessively conservative and implausible simultaneous extremes.
+
+----------------------------------------------------------------------
+REJ-PRC-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Hard-code a community price threshold.
+
+Reason rejected:
+Proprietary mechanism and target-season drift.
+
+----------------------------------------------------------------------
+REJ-OPT-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Monte Carlo tree search as V1 central optimiser.
+
+Reason rejected:
+Branching, auditability and bound/runtime disadvantages.
+
+----------------------------------------------------------------------
+REJ-CHIP-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Always use TC/BB/FH on the largest projected Double/Blank Gameweek.
+
+Reason rejected:
+Ignores current squad, opportunity cost, preparation and uncertainty.
+
+----------------------------------------------------------------------
+REJ-RANK-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Choose low-owned players because Sebastian is behind.
+
+Reason rejected:
+Ownership novelty is not target utility.
+
+----------------------------------------------------------------------
+REJ-EVAL-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Random cross-validation.
+
+Reason rejected:
+Temporal leakage.
+
+----------------------------------------------------------------------
+REJ-OPS-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+LISTEN/NOTIFY as the durable queue.
+
+Reason rejected:
+Notifications are not a durable delivery ledger.
+
+----------------------------------------------------------------------
+REJ-UI-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Only show the recommended player and expected points.
+
+Reason rejected:
+Hides comparator, uncertainty, assumptions and alternatives.
+
+----------------------------------------------------------------------
+REJ-UI-002
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Use a free-form LLM to invent explanations.
+
+Reason rejected:
+Unfaithful numbers/reasons and hidden warnings.
+
+----------------------------------------------------------------------
+REJ-IMPL-001
+----------------------------------------------------------------------
+Status: REJECTED
+
+Alternative:
+Ask Codex to implement the complete system in one request.
+
+Reason rejected:
+Unreviewable scope and high hidden-integration risk.
+
+======================================================================
+6. OPEN RESEARCH AND IMPLEMENTATION QUESTIONS
+======================================================================
+
+An open question is not permission to improvise. The accepted provisional
+architecture remains in force until the question is resolved through evidence
+and an ADR update.
+
+----------------------------------------------------------------------
+OQ-RULE-001
+----------------------------------------------------------------------
+Priority / gate: BLOCKING
+Owner documents: DMFP-02/09
+
+Question:
+What exact 2026/27 scoring, BPS, assists, defensive-contribution and bonus rules activate?
+
+----------------------------------------------------------------------
+OQ-RULE-002
+----------------------------------------------------------------------
+Priority / gate: BLOCKING
+Owner documents: DMFP-02/13
+
+Question:
+Which chips, copies, windows, expiry and free-transfer interactions exist in 2026/27?
+
+----------------------------------------------------------------------
+OQ-SRC-001
+----------------------------------------------------------------------
+Priority / gate: BLOCKING PER SOURCE
+Owner documents: DMFP-04/17
+
+Question:
+What exact provider rights permit raw storage, model training, backup and display for each active source?
+
+----------------------------------------------------------------------
+OQ-SRC-002
+----------------------------------------------------------------------
+Priority / gate: BLOCKING PER SOURCE
+Owner documents: DMFP-04/17
+
+Question:
+Can Betfair delayed data be used for private nonbetting analytics under Sebastian’s account/jurisdiction?
+
+----------------------------------------------------------------------
+OQ-DATA-001
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-05/15
+
+Question:
+How much strict LIVE_OPERATIONAL historical FPL data exists before 2026/27?
+
+----------------------------------------------------------------------
+OQ-DATA-002
+----------------------------------------------------------------------
+Priority / gate: MEDIUM
+Owner documents: DMFP-05/17
+
+Question:
+What is the practical artifact-storage requirement for 50k–250k joint scenarios across a season?
+
+----------------------------------------------------------------------
+OQ-MKT-001
+----------------------------------------------------------------------
+Priority / gate: MEDIUM
+Owner documents: DMFP-06/15
+
+Question:
+Does power normalisation outperform proportional by market/context out of time?
+
+----------------------------------------------------------------------
+OQ-MKT-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-06
+
+Question:
+How should operator dependence and liquidity be calibrated with the free source stack?
+
+----------------------------------------------------------------------
+OQ-MKT-003
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-04/06
+
+Question:
+What player-prop coverage is actually available prospectively in 2026/27?
+
+----------------------------------------------------------------------
+OQ-MIN-001
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-07/10
+
+Question:
+What prior effective sample sizes and update rates are optimal by parameter family?
+
+----------------------------------------------------------------------
+OQ-MIN-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-07/10
+
+Question:
+Which change-point model best detects manager/tactical regime changes?
+
+----------------------------------------------------------------------
+OQ-MIN-003
+----------------------------------------------------------------------
+Priority / gate: MEDIUM
+Owner documents: DMFP-07
+
+Question:
+Can starter-exit and bench-entry causes be labelled reliably enough for cause-specific hazards?
+
+----------------------------------------------------------------------
+OQ-EVT-001
+----------------------------------------------------------------------
+Priority / gate: MEDIUM
+Owner documents: DMFP-08/15
+
+Question:
+Does bivariate Poisson/Dixon–Coles materially improve score distributions after market projection?
+
+----------------------------------------------------------------------
+OQ-EVT-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-08/09
+
+Question:
+Which auxiliary event models are necessary for BPS and which can remain residual?
+
+----------------------------------------------------------------------
+OQ-EVT-003
+----------------------------------------------------------------------
+Priority / gate: DEFERRED
+Owner documents: DMFP-08
+
+Question:
+When is a sequential marked point process worth the computational cost?
+
+----------------------------------------------------------------------
+OQ-PTS-001
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-09/12–14
+
+Question:
+What Monte Carlo sample sizes and stopping rules are sufficient for transfers, captaincy, chips and rank tails?
+
+----------------------------------------------------------------------
+OQ-PTS-002
+----------------------------------------------------------------------
+Priority / gate: MEDIUM
+Owner documents: DMFP-09/15
+
+Question:
+How should finite-Monte-Carlo zero probabilities be scored consistently?
+
+----------------------------------------------------------------------
+OQ-UNC-001
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-10/15
+
+Question:
+What robust-regret percentile and weight maximise sequential utility?
+
+----------------------------------------------------------------------
+OQ-UNC-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-10/12/15
+
+Question:
+What terminal-value function best prevents rolling-horizon myopia?
+
+----------------------------------------------------------------------
+OQ-UNC-003
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-10/18
+
+Question:
+How accurately can EVSI be estimated close to a deadline?
+
+----------------------------------------------------------------------
+OQ-UNC-004
+----------------------------------------------------------------------
+Priority / gate: EXPERIMENTAL
+Owner documents: DMFP-10
+
+Question:
+Does Wasserstein DRO add value beyond robust regret and scenario worlds?
+
+----------------------------------------------------------------------
+OQ-PRC-001
+----------------------------------------------------------------------
+Priority / gate: BLOCKING FOR PRICE PRODUCTION
+Owner documents: DMFP-11
+
+Question:
+What is the 2026/27 price-update timing window and whether the mechanism changed?
+
+----------------------------------------------------------------------
+OQ-PRC-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-11
+
+Question:
+Do unique managers, wildcard transfers, flag locks or low-ownership floors materially determine changes?
+
+----------------------------------------------------------------------
+OQ-PRC-003
+----------------------------------------------------------------------
+Priority / gate: RESEARCH
+Owner documents: DMFP-10/11/12
+
+Question:
+Can a price-only hit ever produce positive robust remaining-season utility?
+
+----------------------------------------------------------------------
+OQ-OPT-001
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-12/15
+
+Question:
+What explicit horizon and terminal model produce the best sequential decisions?
+
+----------------------------------------------------------------------
+OQ-OPT-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-10/12
+
+Question:
+How many scenarios preserve decisions while meeting deadline runtime?
+
+----------------------------------------------------------------------
+OQ-OPT-003
+----------------------------------------------------------------------
+Priority / gate: BLOCKING STAGE 11
+Owner documents: DMFP-12/19
+
+Question:
+Will Pyomo/HiGHS meet stochastic deadline performance or is decomposition/another solver required?
+
+----------------------------------------------------------------------
+OQ-OPT-004
+----------------------------------------------------------------------
+Priority / gate: DEFERRED
+Owner documents: DMFP-12
+
+Question:
+What exact logic-based Benders cuts are useful for transfer-master/tactical-subproblem decomposition?
+
+----------------------------------------------------------------------
+OQ-CHIP-001
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-13/15
+
+Question:
+What continuation-value method best schedules chips with sparse historical examples?
+
+----------------------------------------------------------------------
+OQ-CHIP-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-13
+
+Question:
+How should WC-BB synergy and bench capital cost be attributed robustly?
+
+----------------------------------------------------------------------
+OQ-RANK-001
+----------------------------------------------------------------------
+Priority / gate: BLOCKING OVERALL RANK
+Owner documents: DMFP-04/14/17
+
+Question:
+Which lawful manager samples can estimate rank-band EO and opponent actions?
+
+----------------------------------------------------------------------
+OQ-RANK-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-14
+
+Question:
+How many synthetic managers and what importance sampler are needed for top-100/top-1 tails?
+
+----------------------------------------------------------------------
+OQ-RANK-003
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-14/15
+
+Question:
+What expected-points epsilon should constrain protection/chasing by season stage?
+
+----------------------------------------------------------------------
+OQ-EVAL-001
+----------------------------------------------------------------------
+Priority / gate: BLOCKING PROMOTION
+Owner documents: DMFP-15
+
+Question:
+Which season or contiguous block remains the locked confirmatory holdout?
+
+----------------------------------------------------------------------
+OQ-EVAL-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-15
+
+Question:
+Which metric is primary for each module and what is a material improvement?
+
+----------------------------------------------------------------------
+OQ-EVAL-003
+----------------------------------------------------------------------
+Priority / gate: MEDIUM
+Owner documents: DMFP-15
+
+Question:
+What block-bootstrap unit and multiple-testing procedure are practical with FPL sample size?
+
+----------------------------------------------------------------------
+OQ-OPS-001
+----------------------------------------------------------------------
+Priority / gate: BLOCKING PRODUCTION OPS
+Owner documents: DMFP-16
+
+Question:
+What exact daily cadence and final execution buffer fit Sebastian’s workflow and provider latency?
+
+----------------------------------------------------------------------
+OQ-OPS-002
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-16/17
+
+Question:
+What source-age thresholds permit degraded publication by deadline phase?
+
+----------------------------------------------------------------------
+OQ-SEC-001
+----------------------------------------------------------------------
+Priority / gate: BLOCKING PRODUCTION
+Owner documents: DMFP-17
+
+Question:
+Which production host, backup destination and credential-recovery mechanism are selected?
+
+----------------------------------------------------------------------
+OQ-SEC-002
+----------------------------------------------------------------------
+Priority / gate: DEFERRED/ASSURANCE
+Owner documents: DMFP-17
+
+Question:
+Can the chosen build platform provide signed SLSA-L2-equivalent provenance?
+
+----------------------------------------------------------------------
+OQ-UI-001
+----------------------------------------------------------------------
+Priority / gate: HIGH
+Owner documents: DMFP-18
+
+Question:
+Which one-minute Decision Cockpit fields best support Sebastian’s real deadline workflow?
+
+----------------------------------------------------------------------
+OQ-UI-002
+----------------------------------------------------------------------
+Priority / gate: RESEARCH
+Owner documents: DMFP-18
+
+Question:
+Do 20-dot, 50-dot, CDF or fan displays produce the best FPL decisions?
+
+----------------------------------------------------------------------
+OQ-UI-003
+----------------------------------------------------------------------
+Priority / gate: DEFERRED
+Owner documents: DMFP-18
+
+Question:
+Is a grounded LLM renderer worth the complexity after deterministic explanations work?
+
+----------------------------------------------------------------------
+OQ-IMPL-001
+----------------------------------------------------------------------
+Priority / gate: BLOCKING STAGE 1
+Owner documents: DMFP-19
+
+Question:
+Does Python 3.13 pass all package/solver compatibility and performance tests?
+
+----------------------------------------------------------------------
+OQ-IMPL-002
+----------------------------------------------------------------------
+Priority / gate: STAGE 16
+Owner documents: DMFP-18/19
+
+Question:
+Should server-rendered HTML remain the final UI stack or move to React/TypeScript?
+
+======================================================================
+7. ARCHITECTURAL CHANGE HISTORY
+======================================================================
+
+This section records why the architecture evolved. It is not a substitute for
+individual supersession fields.
+
+----------------------------------------------------------------------
+CHANGE-001
+----------------------------------------------------------------------
+Change:
+Source strategy changed to a zero-cost core.
+
+Reason:
+Early ecosystem concepts considered broader paid/commercial data. DMFP-04 made zero paid subscription a hard constraint and selected a free, market-anchored source stack.
+
+Resulting decisions:
+ADR-SRC-001 through ADR-SRC-004.
+
+----------------------------------------------------------------------
+CHANGE-002
+----------------------------------------------------------------------
+Change:
+Market architecture changed from seeking completeness to market-anchored allocation.
+
+Reason:
+Free player-prop history/coverage was insufficient. Team markets now anchor probabilities and Pulse allocates player outcomes.
+
+Resulting decisions:
+ADR-SRC-002, ADR-EVT-004.
+
+----------------------------------------------------------------------
+CHANGE-003
+----------------------------------------------------------------------
+Change:
+Historical truth changed from current cleaned data to temporal usable-at bundles.
+
+Reason:
+Leakage/reproducibility analysis showed provider timestamp and current database state were insufficient.
+
+Resulting decisions:
+ADR-DATA-004 through ADR-DATA-006.
+
+----------------------------------------------------------------------
+CHANGE-004
+----------------------------------------------------------------------
+Change:
+Lineup model changed from minutes point estimates to START/BENCH/OUT distributions and coherent XI scenarios.
+
+Reason:
+FPL thresholds and team constraints require full role/minute uncertainty.
+
+Resulting decisions:
+ADR-MIN-001 through ADR-MIN-004.
+
+----------------------------------------------------------------------
+CHANGE-005
+----------------------------------------------------------------------
+Change:
+Football modelling changed from independent player projections to a score-first coherent event engine.
+
+Reason:
+Team totals, clean sheets, scorer/assist competition and correlations must reconcile.
+
+Resulting decisions:
+ADR-EVT-001 through ADR-EVT-005.
+
+----------------------------------------------------------------------
+CHANGE-006
+----------------------------------------------------------------------
+Change:
+FPL points changed from component expectation to exact scenario scoring with joint BPS.
+
+Reason:
+Rules, thresholds and bonus ties make independent mean addition invalid.
+
+Resulting decisions:
+ADR-PTS-001 through ADR-PTS-004.
+
+----------------------------------------------------------------------
+CHANGE-007
+----------------------------------------------------------------------
+Change:
+Risk strategy changed from generic variance aversion to epistemic robust regret.
+
+Reason:
+Ordinary football variance includes valuable upside; uncertainty about the model and irreversible actions is the correct robustness target.
+
+Resulting decisions:
+ADR-UNC-001 through ADR-UNC-007.
+
+----------------------------------------------------------------------
+CHANGE-008
+----------------------------------------------------------------------
+Change:
+Price prediction changed from inferred fixed threshold to recurrent latent-pressure hazards.
+
+Reason:
+The algorithm is proprietary, transfers are contaminated and multiple changes occur.
+
+Resulting decisions:
+ADR-PRC-001 through ADR-PRC-004.
+
+----------------------------------------------------------------------
+CHANGE-009
+----------------------------------------------------------------------
+Change:
+Optimisation changed from squad picker to rolling stochastic control.
+
+Reason:
+Future transfers, prices, injuries, FTs, chips and information make one-shot optimisation insufficient.
+
+Resulting decisions:
+ADR-OPT-001 through ADR-OPT-006.
+
+----------------------------------------------------------------------
+CHANGE-010
+----------------------------------------------------------------------
+Change:
+Chip advice changed from heuristic weeks to finite-inventory opportunity cost.
+
+Reason:
+Current gross points do not measure the value of consuming a scarce future option.
+
+Resulting decisions:
+ADR-CHIP-001 through ADR-CHIP-006.
+
+----------------------------------------------------------------------
+CHANGE-011
+----------------------------------------------------------------------
+Change:
+Rank strategy was separated from raw projections.
+
+Reason:
+Beliefs must remain calibrated; only utility changes with competition position.
+
+Resulting decisions:
+ADR-PROD-003 and ADR-RANK-001 through ADR-RANK-004.
+
+----------------------------------------------------------------------
+CHANGE-012
+----------------------------------------------------------------------
+Change:
+Backtesting changed from model-error reporting to a scientific trust gate.
+
+Reason:
+Deadline-specific vintages, proper scoring, sequential policy replay and multiple-testing controls are required before recommendations are trusted.
+
+Resulting decisions:
+ADR-EVAL-001 through ADR-EVAL-006.
+
+----------------------------------------------------------------------
+CHANGE-013
+----------------------------------------------------------------------
+Change:
+Operations changed from scripts to a durable PostgreSQL control plane and immutable Decision Bundles.
+
+Reason:
+Deadline reliability, failure recovery and audit require explicit run/task state and lineage.
+
+Resulting decisions:
+ADR-OPS-001 through ADR-OPS-006.
+
+----------------------------------------------------------------------
+CHANGE-014
+----------------------------------------------------------------------
+Change:
+UI changed from recommendation output to an uncertainty-aware Decision Cockpit.
+
+Reason:
+Human decisions need comparator value, assumptions, alternatives, change reasons and knowledge limits.
+
+Resulting decisions:
+ADR-UI-001 through ADR-UI-007.
+
+----------------------------------------------------------------------
+CHANGE-015
+----------------------------------------------------------------------
+Change:
+Implementation changed from a monolithic Codex request to 16 stage-gated vertical slices.
+
+Reason:
+The complete architecture is too large to implement and validate safely in one pass.
+
+Resulting decisions:
+ADR-IMPL-001 through ADR-IMPL-003.
+
+======================================================================
+8. PROPOSING A NEW OR CHANGED DECISION
+======================================================================
+
+8.1 REQUIRED TEMPLATE
+---------------------
+
+Decision ID:
+Use a new stable ID, or amend an existing decision with a new version/change
+record.
+
+Title:
+One concise decision statement.
+
+Status:
+PROVISIONAL / ACCEPTED / EXPERIMENTAL / REJECTED / SUPERSEDED / WITHDRAWN.
+
+Context:
+What problem or evidence requires a decision?
+
+Decision:
+What is selected, including boundaries and non-goals?
+
+Reason:
+Why does this best serve the product objective?
+
+Evidence:
+Official rules, primary research, prospective tests, locked backtests or
+implementation measurements.
+
+Alternatives:
+What was considered and why not selected?
+
+Assumptions:
+What must be true?
+
+Consequences:
+Benefits, costs, risks and migration requirements.
+
+Affected components:
+Documents, schemas, APIs, datasets, models, tests, UI and operations.
+
+Revisit trigger:
+Specific event or measurable threshold.
+
+Rollback:
+How to return to the prior accepted architecture.
+
+Approval:
+Sebastian and required technical/security reviewer.
+
+8.2 EXPERIMENTS
+---------------
+A challenger does not alter an ACCEPTED decision.
+
+The experiment record must specify:
+
+- hypothesis;
+- champion;
+- challenger;
+- data cutoff;
+- primary metric;
+- decision metric;
+- promotion threshold;
+- duration;
+- result;
+- whether an ADR change is proposed.
+
+8.3 IMPLEMENTATION DISCOVERY
+----------------------------
+If Codex finds an accepted interface infeasible:
+
+1. stop the ticket at a safe boundary;
+2. provide minimal reproducer/evidence;
+3. propose alternatives;
+4. create an OPEN question or ADR change;
+5. do not silently redesign the system.
+
+8.4 EMERGENCY CHANGE
+--------------------
+A P0 security/rules/decision-integrity incident may require immediate temporary
+withdrawal or fallback.
+
+The emergency change must be recorded within the incident and converted into a
+normal ADR review afterward.
+
+======================================================================
+9. HOW CHATGPT AND CODEX MUST USE THIS DOCUMENT
+======================================================================
+
+9.1 BEFORE DESIGNING
+--------------------
+Search:
+
+- decision register;
+- rejected alternatives;
+- open questions;
+- temporary shortcuts;
+- change history.
+
+9.2 BEFORE CODING
+-----------------
+The Codex ticket must cite applicable ADR IDs.
+
+9.3 DURING REVIEW
+-----------------
+Reviewers check:
+
+- no accepted decision was bypassed;
+- provisional decisions remain versioned/configurable;
+- exclusions are respected;
+- open questions were not silently closed;
+- new debt has a TEMP entry;
+- implementation evidence updates assumptions/weaknesses.
+
+9.4 AFTER STAGE ACCEPTANCE
+--------------------------
+Update:
+
+- decision statuses if evidence resolved them;
+- assumptions;
+- weaknesses;
+- temporary shortcuts;
+- open questions;
+- version history.
+
+9.5 CONVERSATIONAL GUARDRAIL
+----------------------------
+When a future prompt says, for example:
+
+    "Use one bookmaker because it is simpler"
+
+ChatGPT/Codex must state that ADR-MKT-004 selected operator consensus and either:
+
+- follow it; or
+- explicitly propose a change with evidence.
+
+======================================================================
+10. DECISION REVIEW CHECKLIST
+======================================================================
+
+PRODUCT
+[ ] Does it improve the declared FPL objective?
+[ ] Is points versus rank utility explicit?
+[ ] Does it preserve manual execution and user control?
+
+RULES
+[ ] Is the target-season rule active?
+[ ] Is prior-season behavior only reference?
+
+DATA
+[ ] Are identity, timing, lineage and missingness explicit?
+[ ] Is the dataset mode correct?
+[ ] Are provider rights compatible?
+
+MODELS
+[ ] Are uncertainty and calibration represented?
+[ ] Are joint constraints/correlations preserved?
+[ ] Is the approach benchmarked against a simpler alternative?
+
+DECISIONS
+[ ] Is future information nonanticipative?
+[ ] Are prices, FTs, chips and rank utility correctly separated?
+[ ] Is no-action a valid comparator?
+
+EVALUATION
+[ ] Is evidence walk-forward/prospective?
+[ ] Were hyperparameters chosen outside the test fold?
+[ ] Are proper scores and decision metrics included?
+[ ] Is multiple testing recorded?
+
+OPERATIONS
+[ ] Can it finish before deadline?
+[ ] Is failure behavior safe?
+[ ] Is the output immutable/replayable?
+
+SECURITY/COMPLIANCE
+[ ] Are secrets, privacy, rights, retention and backups addressed?
+
+UI
+[ ] Are action, uncertainty, assumptions and knowledge limits visible?
+[ ] Is the explanation faithful and accessible?
+
+IMPLEMENTATION
+[ ] Is the change inside the active DMFP-19 stage?
+[ ] Are tests, fixtures, migration and rollback complete?
+
+======================================================================
+11. MAINTENANCE AND VERSIONING
+======================================================================
+
+11.1 APPEND-OR-AMEND
+--------------------
+Never delete historical decisions.
+
+A material change:
+
+- amends the entry with version/date;
+- adds a CHANGE record;
+- marks alternatives/supersession;
+- updates affected modules.
+
+11.2 MACHINE-READABLE FUTURE
+----------------------------
+DMFP-19 may later implement a structured ADR registry in YAML/JSON/PostgreSQL.
+
+This text remains the human-readable authority until an explicit migration is
+accepted.
+
+11.3 OPEN-QUESTION CLOSURE
+--------------------------
+When an OQ is resolved:
+
+- record evidence;
+- create/amend ADR;
+- mark question RESOLVED with date and ADR;
+- update implementation tests.
+
+11.4 ASSUMPTION FAILURE
+-----------------------
+When an assumption fails:
+
+- open incident/change if material;
+- identify affected decisions/models/datasets;
+- block/degrade affected output;
+- update ADRs and roadmap.
+
+11.5 TEMPORARY DEBT EXPIRY
+--------------------------
+Every TEMP item is reviewed at the stage or evidence trigger stated.
+Temporary shortcuts do not become permanent by neglect.
+
+======================================================================
+12. IMMEDIATE ACTIONS AFTER APPROVAL
+======================================================================
+
+1. Approve this document as the architecture decision index.
+2. Add DMFP-20 review to every DMFP-19 ticket template.
+3. Mark all 2026/27 rule-dependent decisions BLOCKED_TARGET_RULES in the future
+   machine registry.
+4. Create provider Rights Profiles before Stage 4/5 live ingestion.
+5. Start Stage 1 with ADR-PROD-004, ADR-GOV-002, ADR-GOV-004,
+   ADR-IMPL-001, ADR-IMPL-002 and ADR-IMPL-003 cited.
+6. Update this record after the Stage 1 compatibility spike.
+7. Capture official 2026/27 launch/rules as the first major decision review.
+
+======================================================================
+13. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-18
+
+- Created the authoritative living decision register.
+- Defined precedence, status values and change control.
+- Consolidated accepted/provisional decisions from DMFP-00 through DMFP-19.
+- Added assumption, weakness, shortcut, rejection and open-question registers.
+- Recorded the major architectural evolution of Pulse.
+- Defined mandatory ChatGPT and Codex use rules.
+- Added decision review, maintenance and immediate implementation actions.
+
+Future v1.0:
+
+- Sebastian approves the register.
+- Entry owners and machine-readable schemas are assigned.
+- 2026/27 launch review updates blocked decisions.
+- Stage 1 evidence resolves the initial toolchain assumptions.
+
+END OF DOCUMENT

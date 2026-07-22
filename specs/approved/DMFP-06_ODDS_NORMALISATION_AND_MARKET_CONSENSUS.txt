@@ -1,0 +1,3255 @@
+DMF PULSE — ODDS NORMALISATION AND MARKET CONSENSUS
+===================================================
+
+Document ID: DMFP-06
+Version: 0.9 (Market Probability Core)
+Status: PROPOSED — READY FOR IMPLEMENTATION AND PROSPECTIVE VALIDATION
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 16 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+Provider architecture: DMFP-04 ZERO-COST ODDS ACQUISITION edition
+Input integrity architecture: DMFP-05
+Parent documents:
+- DMFP-00 — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+- DMFP-01 — RESEARCH STANDARD AND EVIDENCE REGISTER
+- DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+- DMFP-03 — CANONICAL DATA MODEL AND IDENTIFIERS
+- DMFP-04 — DATA SOURCES, MARKETS, APIS AND LICENSING
+- DMFP-05 — INGESTION, STORAGE AND DATA QUALITY
+
+PURPOSE
+-------
+This document defines the mathematical and operational layer that converts raw
+bookmaker and exchange prices into probability evidence for DMF Pulse.
+
+It covers:
+
+- odds-format conversion;
+- raw implied probabilities;
+- bookmaker overround;
+- proportional/multiplicative normalisation;
+- power normalisation;
+- Shin normalisation;
+- favourite–longshot bias;
+- incomplete and nonexclusive markets;
+- exchange back/lay prices;
+- commission;
+- source, bookmaker and liquidity weighting;
+- freshness;
+- stale and frozen quotes;
+- outlier rejection;
+- robust market consensus;
+- market disagreement;
+- uncertainty bounds;
+- suspended and reopened markets;
+- missing player markets;
+- prospective calibration;
+- audit, tests and backtesting.
+
+This module does not claim that betting odds are the true probability.
+
+It treats odds as:
+
+    PRICE-BASED, MARGIN-CONTAMINATED, SOURCE-DEPENDENT,
+    TIME-STAMPED AND IMPERFECT PROBABILITY EVIDENCE.
+
+The output is designed for the football-event engine, not for placing bets.
+
+GOVERNING PRINCIPLE
+-------------------
+The market layer must preserve four distinct concepts:
+
+1. RAW IMPLIED PROBABILITY
+   The reciprocal of quoted decimal odds.
+
+2. SOURCE FAIR PROBABILITY
+   One operator's probability after margin/commission treatment under a declared
+   method.
+
+3. MARKET CONSENSUS PROBABILITY
+   A robust combination of independent, eligible source fair probabilities.
+
+4. CALIBRATED CONSENSUS PROBABILITY
+   The consensus after an out-of-time calibration model, where enough historical
+   evidence exists.
+
+These values MUST NOT be collapsed into one undocumented number.
+
+IMPORTANT FREE-DATA CONTEXT
+---------------------------
+DMFP-04 selects a zero-subscription data stack.
+
+Consequences:
+
+- provider coverage can be sparse;
+- bookmakers may be US-only for free EPL player props;
+- exchange prices are delayed;
+- full exchange liquidity may be unavailable;
+- assist/shots/save markets may be missing;
+- historical player-prop data are incomplete;
+- source weights must be learned prospectively;
+- missing markets must not be treated as zero probabilities.
+
+The correct architecture is therefore:
+
+    robust where multiple sources exist;
+    explicit and conservative where only one source exists;
+    model-assisted where the market is incomplete;
+    never falsely precise.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require an architecture decision record.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE MATHEMATICAL DECISION
+======================================================================
+
+0.1 PRODUCTION DEFAULTS
+-----------------------
+A. COMPLETE FIXED-ODDS MARKETS
+
+Examples:
+- 1X2;
+- Over/Under with both sides;
+- Yes/No;
+- complete mutually exclusive correct-score book including an explicit "other"
+  outcome.
+
+Primary de-vigging method:
+POWER.
+
+Baselines/sensitivity:
+- PROPORTIONAL;
+- SHIN where mathematically applicable;
+- ADDITIVE diagnostic only;
+- future learned favourite–longshot calibration.
+
+B. BINARY FIXED-ODDS MARKETS
+
+Primary:
+POWER.
+
+Baseline:
+PROPORTIONAL.
+
+Shin:
+Calculated only as diagnostic because in two-outcome markets the standard Shin
+solution is equivalent to the additive method under the cited formulation, and
+the additive method can behave poorly in wider/many-runner contexts.
+
+C. THREE-WAY FOOTBALL RESULT
+
+Primary:
+POWER.
+
+Sensitivity:
+SHIN and PROPORTIONAL.
+
+Future:
+A one-parameter favourite–longshot calibration or other learned calibrator may
+be promoted after time-safe validation.
+
+D. EXCHANGE
+
+Primary informational probability:
+midpoint of reciprocal best-back and best-lay probabilities:
+
+    q_back = 1 / O_back
+    q_lay  = 1 / O_lay
+
+where O_back < O_lay in a normal positive spread.
+
+Probability interval:
+
+    lower_raw = q_lay
+    upper_raw = q_back
+
+Informational midpoint:
+
+    p_exchange = (q_back + q_lay) / 2
+
+The midpoint is taken in probability space, not odds space.
+
+Commission:
+not applied to the default informational probability.
+Commission-adjusted executable break-even bounds are stored separately.
+
+E. CONSENSUS
+
+Initial production method:
+robust, weighted arithmetic pool of proper operator-level probability vectors,
+followed by identity calibration until enough prospective evidence exists.
+
+Why:
+- simple and auditable;
+- preserves the probability simplex;
+- handles missing source weights;
+- supports robust filtering;
+- can be recalibrated;
+- avoids pretending operator forecasts are independent.
+
+F. WEIGHTS
+
+Initial:
+equal weight by independent betting operator, modified by:
+
+- freshness;
+- semantic/settlement compatibility;
+- market completeness;
+- source quality;
+- exchange spread/liquidity where available;
+- duplicate/upstream dependence.
+
+Future:
+rolling out-of-time log-score weights with hierarchical shrinkage toward equal
+weights.
+
+G. OUTLIERS
+
+Hard exclusion:
+semantic, identity, market-state or timestamp failure.
+
+Statistical disagreement:
+retained and flagged unless there is evidence of error.
+
+Robust screening:
+- logit median/MAD for binary outcomes;
+- Jensen–Shannon divergence from preliminary consensus for multinomial vectors.
+
+H. UNCERTAINTY BOUNDS
+
+`lower_bound` and `upper_bound` are operational market-uncertainty bounds, not a
+claim of an exact frequentist confidence interval.
+
+They combine:
+
+- operator dispersion;
+- de-vigging method uncertainty;
+- exchange spread;
+- source freshness;
+- calibration uncertainty;
+- historical residual floor.
+
+I. MISSING PLAYER MARKET
+
+A missing anytime-goalscorer, assist, shots or saves quote is never zero.
+
+Market states are explicit.
+The football-event engine receives:
+
+- available market evidence;
+- its age;
+- market missing reason;
+- confidence;
+- the need for proprietary team-to-player allocation.
+
+0.2 KEY SCIENTIFIC POSITION
+---------------------------
+Research does not establish one universally best odds-normalisation method.
+
+Evidence includes:
+
+- Štrumbelj found Shin probabilities more accurate than basic normalisation in
+  broad sports/bookmaker data and found bookmaker/exchange differences;
+- Clarke, Kovalchik and Ingram found the power method generally superior to
+  proportional normalisation and comparable to or better than Shin in their
+  datasets;
+- recent 2026 work argues that Multiplicative, Shin and Power can retain
+  systematic football biases and proposes alternatives;
+- recent work also questions interpreting event-level Shin estimates literally
+  as insider activity.
+
+Therefore Pulse will:
+
+- implement multiple methods;
+- choose by time-safe predictive performance;
+- keep the production default simple;
+- retain sensitivity outputs;
+- avoid ideological commitment to one bookmaker theory.
+
+======================================================================
+1. SCOPE, NON-GOALS AND TERMINOLOGY
+======================================================================
+
+1.1 IN SCOPE
+------------
+- quoted odds to probability;
+- fair probability per operator;
+- exchange probability;
+- margin diagnostics;
+- source weighting;
+- market aggregation;
+- uncertainty and confidence;
+- quote eligibility;
+- calibration.
+
+1.2 OUT OF SCOPE
+----------------
+This document does not:
+
+- predict player minutes;
+- allocate team goals to players;
+- generate FPL points;
+- optimise a squad;
+- decide whether a bet has value;
+- place bets;
+- infer bookmaker settlement rules from names;
+- create data not available before the FPL deadline.
+
+1.3 OPERATOR
+------------
+The bookmaker or exchange originating/hosting the price.
+
+1.4 PROVIDER
+------------
+The API/feed through which Pulse receives the price.
+
+Multiple providers can carry the same operator.
+They do not count as independent market opinions.
+
+1.5 BOOK
+--------
+A complete set of related, mutually exclusive/exhaustive outcomes quoted by one
+operator under one settlement definition.
+
+1.6 OVERROUND / BOOKSUM
+-----------------------
+For raw inverse odds q_i:
+
+    S = sum_i q_i
+
+For an exactly-one-winner complete market:
+
+    overround M = S - 1
+
+For a fair complete book:
+S = 1.
+
+1.7 PAYOUT INDEX
+----------------
+A simple diagnostic:
+
+    payout_index = 1 / S
+
+This is not a universal exact expected return because stake distribution and
+outcome-specific margins matter.
+
+1.8 PROPER PROBABILITY VECTOR
+-----------------------------
+Every component lies in [0,1] and sums to the market's target total.
+
+For exactly one winner:
+sum = 1.
+
+1.9 NONEXCLUSIVE MARKET
+-----------------------
+Multiple selections can win.
+
+Example:
+Anytime goalscorer.
+
+Player probabilities do not sum to one because several players may score.
+
+1.10 INCOMPLETE MARKET
+----------------------
+Not all required outcomes are observed.
+
+Example:
+Only "Yes, player scores" is returned, with no corresponding "No" price.
+
+1.11 FAIR PROBABILITY
+---------------------
+An estimate after removing/adjusting margin under a declared model.
+It is not guaranteed truth.
+
+1.12 CONSENSUS
+--------------
+An aggregation of eligible, mapped, independently counted operator probability
+estimates.
+
+======================================================================
+2. INPUT CONTRACT
+======================================================================
+
+2.1 REQUIRED QUOTE FIELDS
+-------------------------
+- canonical fixture;
+- market definition;
+- selection;
+- operator;
+- provider;
+- decimal odds;
+- line/handicap;
+- period;
+- settlement profile;
+- quote type;
+- source/update time;
+- received/usable time;
+- pre-match/in-play;
+- market/selection status;
+- free-data delay label;
+- available size/volume where supplied;
+- source snapshot;
+- information cutoff.
+
+2.2 REQUIRED MARKET GROUPING
+----------------------------
+A de-vigging book may include only quotes with identical:
+
+- operator;
+- fixture;
+- market definition;
+- period;
+- line;
+- settlement profile version;
+- pre-match/in-play mode;
+- effective quote window;
+- currency/commission context where relevant.
+
+2.3 NO CROSS-OPERATOR BOOK
+-------------------------
+Never build one raw book by taking:
+
+- favourite from bookmaker A;
+- draw from bookmaker B;
+- outsider from bookmaker C;
+
+and then de-vig it as though one bookmaker set that margin.
+
+Best-price/arbitrage books are separate analytics, not operator probability
+books.
+
+2.4 QUOTE ELIGIBILITY
+---------------------
+A quote is eligible only if DMFP-05 marks it:
+
+- usable before cutoff;
+- mapped;
+- structurally valid;
+- semantically compatible;
+- not blocking/stale;
+- permitted by source policy.
+
+======================================================================
+3. ODDS FORMAT CONVERSION
+======================================================================
+
+3.1 DECIMAL
+-----------
+For decimal odds O > 1:
+
+    raw implied probability q = 1 / O
+
+3.2 FRACTIONAL
+--------------
+For fractional odds a/b:
+
+    O_decimal = 1 + a/b
+
+Then:
+
+    q = 1 / O_decimal
+
+3.3 AMERICAN
+------------
+For positive American odds +A:
+
+    O_decimal = 1 + A/100
+
+For negative American odds -A:
+
+    O_decimal = 1 + 100/abs(A)
+
+Then:
+
+    q = 1 / O_decimal
+
+3.4 EXCHANGE
+------------
+Back and lay remain separate quote types.
+Do not collapse them before spread analysis.
+
+3.5 EXACT STORAGE
+-----------------
+Source odds are stored as exact Decimal values where practical.
+Numerical optimisation may convert to floating-point after validation.
+
+3.6 INVALID
+-----------
+Reject/quarantine:
+
+- decimal <= 1 for a conventional positive-return market;
+- zero/negative denominator;
+- unparsable odds;
+- odds outside provider/domain limit;
+- line mismatch;
+- price from a closed/void market used as current.
+
+======================================================================
+4. RAW IMPLIED PROBABILITIES AND MARGIN
+======================================================================
+
+4.1 RAW
+-------
+For outcome i:
+
+    q_i = 1 / O_i
+
+4.2 COMPLETE EXACTLY-ONE MARKET
+-------------------------------
+Booksum:
+
+    S = sum_i q_i
+
+Overround:
+
+    M = S - 1
+
+Expected normal fixed-odds case:
+S > 1.
+
+4.3 UNDERROUND
+--------------
+S < 1 can occur because of:
+
+- best prices combined across operators;
+- stale quotes;
+- incomplete book;
+- promotion;
+- exchange prices;
+- data error;
+- arbitrage.
+
+A single-operator complete fixed-odds underround triggers review.
+
+4.4 TARGET SUM
+--------------
+Most Pulse markets target one.
+
+For multiple-winner markets, a target sum greater than one is valid only when
+the market definition truly represents a known number of winners, such as top-k.
+
+Anytime scorer does not have a fixed count of winning selections and must not be
+normalised to an arbitrary target sum.
+
+4.5 MARGIN DIAGNOSTICS
+----------------------
+Store:
+
+- booksum;
+- overround;
+- payout index;
+- outcome-specific raw probability;
+- margin percentile by operator/market;
+- margin change;
+- completeness;
+- de-vig method.
+
+======================================================================
+5. PROPORTIONAL / MULTIPLICATIVE NORMALISATION
+======================================================================
+
+5.1 FORMULA
+-----------
+For a complete exactly-one-winner market:
+
+    p_i = q_i / sum_j q_j
+
+5.2 INTERPRETATION
+------------------
+The method allocates margin in proportion to raw implied probability.
+
+5.3 ADVANTAGES
+--------------
+- simple;
+- deterministic;
+- always proper for positive complete book;
+- no iteration;
+- useful baseline;
+- easy to audit.
+
+5.4 LIMITATIONS
+---------------
+- assumes proportional distortion;
+- does not explicitly model favourite–longshot bias;
+- can be less accurate than alternatives;
+- does not solve incomplete/nonexclusive markets.
+
+5.5 PRODUCTION ROLE
+-------------------
+Always computed.
+
+Used as:
+- baseline;
+- fallback if numerical method fails;
+- sensitivity output;
+- diagnostic comparison.
+
+Not the primary method for a normal complete book unless validation later shows
+it performs best for that market/operator.
+
+======================================================================
+6. POWER METHOD
+======================================================================
+
+6.1 FORMULA
+-----------
+Let:
+
+    q_i = 1 / O_i
+
+Find exponent alpha > 0 such that:
+
+    sum_i q_i^alpha = 1
+
+Then:
+
+    p_i = q_i^alpha
+
+For a normal overround book where sum q_i > 1:
+alpha is usually greater than one.
+
+Equivalent parameterisations may use an inverse exponent. Pulse stores the
+actual applied alpha unambiguously.
+
+6.2 ROOT FINDING
+----------------
+Solve:
+
+    f(alpha) = sum_i q_i^alpha - 1 = 0
+
+For q_i in (0,1), f is monotonic decreasing.
+
+Use:
+- bracketed Brent method;
+- deterministic tolerance;
+- maximum iterations;
+- safe fallback.
+
+Suggested initial bracket:
+[epsilon, alpha_max], expanded until sign change.
+
+6.3 ADVANTAGES
+--------------
+- proper probabilities;
+- no negative probabilities;
+- preserves ranking;
+- flexibly allocates greater proportional margin to longshots;
+- conceptually and computationally simple;
+- empirical support over proportional normalisation in published datasets.
+
+6.4 LIMITATIONS
+---------------
+- one distortion shape per book;
+- not guaranteed best by market/operator;
+- can retain systematic draw or market-specific bias;
+- assumes complete book;
+- no direct theory of source disagreement.
+
+6.5 PRODUCTION DECISION
+-----------------------
+Primary initial method for complete fixed-odds markets.
+
+6.6 FAILURE
+-----------
+If root cannot be found or output fails tolerance:
+
+- record numerical failure;
+- use proportional fallback;
+- lower confidence;
+- emit alert if recurring.
+
+6.7 OUTPUT
+----------
+- alpha;
+- fair probabilities;
+- convergence;
+- iterations;
+- residual;
+- method version.
+
+======================================================================
+7. SHIN METHOD
+======================================================================
+
+7.1 BACKGROUND
+--------------
+Shin's model was motivated by a bookmaker facing bettors with superior
+information.
+
+It produces a source fair-probability vector and an estimated parameter z.
+
+Pulse treats z as a model parameter/diagnostic.
+It MUST NOT label z as a literal measured percentage of insider trading in
+production output.
+
+7.2 FORMULA
+-----------
+For inverse odds q_i and booksum S:
+
+    p_i(z) =
+      [ sqrt( z^2 + 4(1-z) q_i^2 / S ) - z ]
+      / [ 2(1-z) ]
+
+Find z such that:
+
+    sum_i p_i(z) = 1
+
+7.3 NUMERICAL METHOD
+--------------------
+Use:
+
+- bounded root solver;
+- z in an admissible range, normally [0, 1);
+- strict sum tolerance;
+- stable handling near z = 1;
+- proportional fallback.
+
+7.4 ADVANTAGES
+--------------
+- adjusts margin nonproportionally;
+- empirically outperformed basic normalisation in Štrumbelj's multi-sport
+  analysis;
+- widely used benchmark;
+- useful sensitivity to favourite–longshot distortion.
+
+7.5 LIMITATIONS
+---------------
+- theoretical assumptions may not describe modern competitive/aggregated books;
+- event-level z interpretation has been questioned;
+- numerical complexity;
+- for two-outcome markets the standard formulation is equivalent to additive
+  margin removal;
+- not guaranteed best for football draws or player markets;
+- requires a complete mutually exclusive book.
+
+7.6 PRODUCTION ROLE
+-------------------
+Compute for:
+
+- 1X2;
+- complete correct-score;
+- other complete multi-outcome books.
+
+Use as:
+- sensitivity;
+- method-disagreement input;
+- challenger model.
+
+Not initial default.
+
+7.7 INVALID OUTPUT
+------------------
+If:
+
+- no admissible root;
+- p outside [0,1];
+- residual too high;
+- pathological z;
+
+mark Shin unavailable and do not force a result.
+
+======================================================================
+8. ADDITIVE AND OTHER DIAGNOSTIC METHODS
+======================================================================
+
+8.1 ADDITIVE
+------------
+Formula for n outcomes:
+
+    p_i = q_i - (sum(q)-1)/n
+
+Problem:
+can produce negative probabilities, especially with many longshots.
+
+Use:
+diagnostic only.
+
+8.2 MARGIN WEIGHTS PROPORTIONAL TO ODDS
+---------------------------------------
+May be implemented as a research challenger because it explicitly allocates
+more margin to longer odds.
+
+Not production default.
+
+8.3 ODDS-RATIO METHOD
+---------------------
+May be implemented as a challenger.
+
+Find common odds-ratio parameter such that transformed probabilities sum to one.
+
+8.4 OO-EPC AND RECENT METHODS
+-----------------------------
+A 2026 preprint proposes an odds-only equal-profitability-confidence method and
+reports improvements over Multiplicative, Shin and Power in a large football
+dataset.
+
+Status:
+RESEARCH_CANDIDATE.
+
+Promotion requires:
+
+- code/formula audit;
+- independent implementation;
+- reproduction;
+- EPL/market-type out-of-time test;
+- comparison under the zero-cost source mix;
+- no leakage.
+
+8.5 LEARNED FAVOURITE–LONGSHOT GLM
+----------------------------------
+The same 2026 work proposes a one-parameter favourite–longshot adjusted GLM.
+
+Candidate after enough prospective data.
+It must shrink to identity under weak evidence.
+
+======================================================================
+9. METHOD SELECTION POLICY
+======================================================================
+
+9.1 INITIAL TABLE
+-----------------
+Market type                    Primary        Sensitivity
+--------------------------------------------------------------
+1X2                            POWER          SHIN, PROPORTIONAL
+Binary yes/no                  POWER          PROPORTIONAL
+Over/under complete            POWER          PROPORTIONAL
+Asian line two-way             POWER          PROPORTIONAL
+Complete correct score         POWER          SHIN, PROPORTIONAL
+Exchange back/lay              EXCHANGE_MID   endpoints/commission
+One-sided player yes quote     NO_DEVIG        calibrated observation
+Nonexclusive player set        NO_CROSS_SUM    per-selection model
+Incomplete book               NO_DEVIG        fallback/reconstruct
+Manual quote                   source-specific based on completeness
+
+9.2 LEARNED SELECTION
+---------------------
+After enough observations, select method by:
+
+- market definition;
+- operator;
+- lead-time bucket;
+- settlement family;
+- season/competition where sample allows.
+
+Primary score:
+out-of-time logarithmic score.
+
+Secondary:
+- Brier score for binary;
+- ranked probability score for ordered/multinomial where appropriate;
+- calibration slope/intercept;
+- reliability;
+- numerical failure.
+
+9.3 NO IN-SAMPLE WINNER
+-----------------------
+A method is not promoted because it best fits the same matches used to select it.
+
+9.4 SMALL SAMPLE
+----------------
+Use hierarchical shrinkage:
+
+- global market-type performance;
+- operator deviation;
+- lead-time deviation.
+
+Where weak:
+retain POWER.
+
+======================================================================
+10. FAVOURITE–LONGSHOT BIAS
+======================================================================
+
+10.1 DEFINITION
+---------------
+Common empirical pattern:
+
+- longshots are priced with disproportionately high implied probability;
+- favourites may be relatively underpriced in probability terms.
+
+The pattern is not universal and varies by:
+
+- bookmaker;
+- sport;
+- market;
+- number of outcomes;
+- liquidity;
+- time to event;
+- customer mix.
+
+10.2 DO NOT HARD-CODE A UNIVERSAL CORRECTION
+--------------------------------------------
+Pulse MUST NOT assume:
+
+- every bookmaker has the same bias;
+- every player prop behaves like 1X2;
+- every exchange is unbiased;
+- the bias is stable through time.
+
+10.3 DIAGNOSTICS
+----------------
+By operator/market/lead-time:
+
+- reliability curve;
+- calibration intercept;
+- calibration slope;
+- log score by raw probability bin;
+- observed frequency;
+- expected payout/return diagnostic;
+- margin by probability;
+- method comparison.
+
+10.4 CALIBRATION SLOPE
+----------------------
+Binary logistic calibration:
+
+    logit(P(Y=1)) = a + b * logit(p_market)
+
+Interpretation:
+
+- a != 0: calibration-in-the-large shift;
+- b < 1: probabilities too extreme;
+- b > 1: probabilities not extreme enough.
+
+Interpret cautiously under selection/missingness.
+
+10.5 DRAW BIAS
+--------------
+Football 1X2 methods can mis-handle draws even if they adjust general
+favourite–longshot bias.
+
+Report outcome-specific calibration.
+
+10.6 PROSPECTIVE POLICY
+-----------------------
+No learned correction is activated until a minimum evidence threshold and
+walk-forward validation are specified in DMFP-15.
+
+======================================================================
+11. BINARY AND PLAYER-PROP MARKETS
+======================================================================
+
+11.1 COMPLETE BINARY
+--------------------
+If both Yes and No are offered by the same operator under identical settlement:
+
+    q_yes = 1/O_yes
+    q_no  = 1/O_no
+
+Apply POWER or proportional to the two-outcome book.
+
+11.2 ONE-SIDED YES QUOTE
+------------------------
+If only Yes is observed:
+
+    q_yes = 1/O_yes
+
+This is a raw implied probability, not a de-vigged probability.
+
+Store:
+
+normalisation_status = INCOMPLETE_ONE_SIDED
+market_probability = null unless an approved calibration/paired reconstruction
+exists
+raw_implied_probability = q_yes
+
+11.3 ONE-SIDED CALIBRATION
+--------------------------
+A future model may estimate fair probability from one-sided odds using:
+
+- operator;
+- market type;
+- raw q;
+- typical margin;
+- lead time;
+- source;
+- historical outcome.
+
+This is a learned calibration model, not margin removal from the current book.
+
+11.4 NONEXCLUSIVE PLAYER SET
+----------------------------
+Anytime scorers are not a mutually exclusive book.
+
+Multiple players can score.
+
+Therefore:
+
+- do not divide player q values by their sum;
+- do not force sum to one;
+- do not apply Shin across the player list;
+- do not call the sum an overround unless the market structure justifies it.
+
+11.5 TEAM RECONCILIATION
+------------------------
+Player goal probabilities later feed DMFP-08, which reconciles them with team
+goal distributions.
+
+This module provides observations and uncertainty, not an arbitrary player
+probability simplex.
+
+11.6 MULTIPLE WINNER/TOP-K
+--------------------------
+Only use target sum k where the market guarantees exactly k winning selections
+under the relevant definition.
+
+======================================================================
+12. EXCHANGE PRICES
+======================================================================
+
+12.1 BEST BACK AND LAY
+----------------------
+Let:
+
+- B = best available back decimal odds;
+- L = best available lay decimal odds;
+- normally B < L.
+
+Reciprocal probability endpoints:
+
+    q_back = 1/B
+    q_lay  = 1/L
+
+Because L > B:
+
+    q_lay < q_back
+
+No-arbitrage informational interval:
+
+    [q_lay, q_back]
+
+12.2 PROBABILITY MIDPOINT
+-------------------------
+Default:
+
+    p_mid = (q_lay + q_back)/2
+
+Reason:
+the engine needs probability evidence and probability-space spread.
+
+12.3 ODDS MIDPOINT
+------------------
+Odds midpoint:
+
+    1 / ((B+L)/2)
+
+is stored as a diagnostic but is not the default because odds space is nonlinear
+in probability.
+
+12.4 LOGIT MIDPOINT
+-------------------
+Research challenger:
+
+    p_logit_mid =
+      logistic((logit(q_lay)+logit(q_back))/2)
+
+May be compared prospectively.
+
+12.5 LAST TRADED PRICE
+----------------------
+Last traded price is:
+
+- stale if no recent trade;
+- transaction-specific;
+- useful with age and volume;
+- not automatically superior to current executable spread.
+
+12.6 AVAILABLE SIZE
+-------------------
+If available:
+
+- depth at best back;
+- depth at best lay;
+- multiple ladder levels;
+- total available;
+- total matched.
+
+A minimum size threshold is market/price/currency-specific.
+
+12.7 LIQUIDITY ABSENT
+---------------------
+Under the free delayed/basic architecture, full depth may not be available.
+
+Set:
+
+liquidity_status = UNKNOWN_OR_PARTIAL
+
+Do not invent a liquidity weight.
+
+12.8 CROSS-MATCHING
+-------------------
+Betfair documents whether cross matching is enabled.
+Exchange prices may reflect cross-matching mechanics.
+
+Store market flag.
+Do not treat exchange runners as independent bookmaker quotes.
+
+======================================================================
+13. EXCHANGE COMMISSION
+======================================================================
+
+13.1 OFFICIAL PRINCIPLE
+-----------------------
+Betfair commission is charged on net winnings on a market, not on each losing
+bet and not mechanically on every quote.
+
+The rate is account/jurisdiction/package dependent.
+
+13.2 BACK BREAK-EVEN
+--------------------
+For a standalone unit back stake at odds B and commission c on winning profit:
+
+Winning profit after commission:
+
+    (B-1)(1-c)
+
+Break-even event probability:
+
+    p_back_be =
+      1 / [1 + (B-1)(1-c)]
+
+13.3 LAY BREAK-EVEN
+-------------------
+For a lay accepting a unit opposing stake at lay odds L:
+
+- win if event does not occur: 1-c;
+- loss if event occurs: L-1.
+
+Break-even event probability:
+
+    p_lay_be =
+      (1-c)/(L-c)
+
+13.4 INTERVAL
+-------------
+Commission-adjusted executable interval:
+
+    [p_lay_be, p_back_be]
+
+This is generally wider than the raw reciprocal interval.
+
+13.5 PRODUCTION DECISION
+------------------------
+For football forecasting consensus:
+
+- use commission-free market information;
+- store commission-adjusted trading bounds separately;
+- do not embed Sebastian's account commission in universal player probabilities.
+
+13.6 NET-MARKET CAVEAT
+----------------------
+Actual commission depends on net market winnings and other positions.
+The standalone formulas are diagnostics, not exact portfolio settlement.
+
+======================================================================
+14. BOOKMAKER AND SOURCE WEIGHTING
+======================================================================
+
+14.1 COUNT OPERATORS, NOT API ROWS
+----------------------------------
+If API-FOOTBALL and The Odds API both carry bookmaker X:
+
+- X counts once;
+- choose best/freshest valid representation;
+- provider redundancy increases data confidence, not market opinion count.
+
+14.2 INITIAL OPERATOR WEIGHT
+----------------------------
+Start:
+
+    base_operator_weight = 1
+
+Then apply factors:
+
+    w_raw =
+        w_reliability
+      * w_freshness
+      * w_semantics
+      * w_completeness
+      * w_independence
+      * w_margin_quality
+      * w_liquidity_if_exchange
+
+Normalize accepted weights to sum one.
+
+14.3 INITIAL FACTORS
+--------------------
+Reliability:
+1 until enough prospective evidence, except known broken/degraded source.
+
+Semantics:
+1 for verified compatible settlement.
+0 for incompatible/unresolved critical settlement.
+
+Completeness:
+1 for complete book.
+lower or excluded for incomplete depending use.
+
+Independence:
+reduce for same operator/white-label/upstream duplicate.
+
+Margin quality:
+soft preference to lower-margin complete books, capped to avoid making margin a
+proxy for truth.
+
+14.4 LEARNED RELIABILITY
+------------------------
+Rolling out-of-time score:
+
+- negative mean log loss or skill;
+- sample-size uncertainty;
+- market type;
+- lead time;
+- operator.
+
+Shrink estimate toward equal/global weight.
+
+14.5 WEIGHT CAP
+---------------
+Initial maximum normalised operator weight:
+
+    0.35
+
+Configurable.
+
+Reason:
+no single free source/operator should dominate solely due sparse coverage.
+
+Exception:
+if only one eligible source, weight = 1 but confidence is low.
+
+14.6 SHARP BOOK LABEL
+---------------------
+Do not permanently hard-code a bookmaker as "sharp."
+
+Use observed accuracy and margin.
+Provider marketing inclusion such as "Pinnacle" is not itself a weight.
+
+14.7 MANUAL QUOTE
+-----------------
+Manual quote can receive normal operator weight after validation.
+Its ingestion method does not make the operator less informative, but
+transcription risk lowers source-quality confidence.
+
+======================================================================
+15. LIQUIDITY WEIGHTING
+======================================================================
+
+15.1 PURPOSE
+------------
+Liquidity can indicate that an exchange price is supported by meaningful
+capital rather than a token unmatched quote.
+
+15.2 CANDIDATE INPUTS
+---------------------
+- total matched;
+- runner matched;
+- available size at best prices;
+- depth within probability distance;
+- spread;
+- recent trade count;
+- quote age.
+
+15.3 NORMALISATION
+------------------
+Raw money values vary by market.
+
+Convert to within-market/market-type features:
+
+- log1p(total matched);
+- liquidity percentile by lead time;
+- spread in probability basis points;
+- depth relative to historical market median.
+
+15.4 INITIAL POLICY
+-------------------
+If reliable size is available:
+
+    w_liquidity =
+      clipped function of:
+      higher depth,
+      higher matched volume,
+      lower spread.
+
+Cap in [0.5, 1.5] before final normalisation.
+
+If unavailable:
+1 for source aggregation, but confidence grade notes unknown liquidity.
+
+15.5 DO NOT DOUBLE COUNT
+------------------------
+Spread already affects uncertainty.
+Do not let both spread and liquidity weight over-penalise the same thin market
+without validation.
+
+======================================================================
+16. FRESHNESS AND STALE-MARKET DETECTION
+======================================================================
+
+16.1 FRESHNESS AGE
+------------------
+Preferred age:
+
+    decision_time - source_updated_at
+
+If missing:
+
+    decision_time - received_at
+
+and:
+freshness_basis = RECEIPT_TIME.
+
+16.2 MARKET-TYPE HALF-LIFE
+--------------------------
+Freshness weight:
+
+    w_freshness = exp(-ln(2) * age / half_life)
+
+subject to hard stale cutoff.
+
+Initial configurable guidance:
+
+More than 24h before relevant cutoff:
+- half-life 6h;
+- hard stale 24h.
+
+24h to 6h:
+- half-life 90m;
+- hard stale 6h.
+
+6h to 2h:
+- half-life 30m;
+- hard stale 2h.
+
+Inside 2h before relevant cutoff:
+- half-life 10m;
+- hard stale 30m.
+
+For ten-minute/free delayed sources:
+thresholds must reflect documented cadence and be displayed.
+
+16.3 FPL DEADLINE VERSUS KICKOFF
+-------------------------------
+For an FPL decision, freshness is evaluated at the FPL deadline.
+
+A match may kick off much later.
+A quote updated after the FPL deadline is ineligible even if closer to kickoff.
+
+16.4 FROZEN QUOTE DETECTION
+---------------------------
+Flag FROZEN when:
+
+- quote has not updated across expected cycles;
+- peers moved materially;
+- market remains apparently open;
+- source age exceeds expected cadence;
+- provider heartbeat continues.
+
+Candidate movement trigger:
+
+absolute logit movement of peer consensus > configured threshold.
+
+16.5 STALE STATES
+-----------------
+FRESH
+AGING
+STALE_SOFT
+STALE_HARD
+FROZEN
+SOURCE_TIME_UNKNOWN
+POST_CUTOFF
+
+16.6 HARD STALE
+---------------
+Excluded from current consensus.
+
+May remain in:
+- historical trace;
+- fallback diagnostic;
+- last-known view with explicit state.
+
+======================================================================
+17. MARKET STATUS: SUSPENDED, CLOSED AND REOPENED
+======================================================================
+
+17.1 BETFAIR STATES
+-------------------
+Official Exchange data include market states such as:
+
+OPEN
+SUSPENDED
+CLOSED
+
+and runner states.
+Market version increments when status changes; soccer suspension reasons may be
+provided.
+
+17.2 FIXED-ODDS STATES
+----------------------
+Normalize provider states to:
+
+OPEN
+SUSPENDED
+CLOSED
+SETTLED
+VOID
+REMOVED
+UNKNOWN
+
+17.3 SUSPENDED
+--------------
+While suspended:
+
+- no quote is treated as currently executable;
+- last pre-suspension quote remains historical;
+- consensus excludes the source unless a dedicated stale-fallback policy is
+  invoked;
+- reason is stored.
+
+17.4 REOPENED
+-------------
+A reopened market requires:
+
+- explicit OPEN state;
+- a new post-reopen quote/update;
+- new freshness age;
+- market version/update evidence.
+
+Do not carry the pre-suspension quote forward as fresh.
+
+17.5 CLOSED/SETTLED
+-------------------
+Not a current forecast input.
+
+May be used for:
+- outcome/settlement;
+- historical audit.
+
+17.6 SOURCE WITHOUT STATUS
+--------------------------
+Use quote age and provider availability.
+Confidence reduced.
+
+======================================================================
+18. HARD VALIDATION AND OUTLIER REJECTION
+======================================================================
+
+18.1 HARD INVALID
+-----------------
+Exclude before statistics:
+
+- wrong fixture;
+- wrong player/team;
+- wrong period;
+- wrong line;
+- incompatible settlement;
+- in-play price in pre-match consensus;
+- post-cutoff;
+- suspended/closed;
+- odds <= 1;
+- unresolved mapping;
+- duplicate operator representation;
+- incomplete book used as complete;
+- stale hard.
+
+18.2 STATISTICAL OUTLIER IS NOT AUTOMATIC ERROR
+-----------------------------------------------
+A genuinely different price can contain information.
+
+Statistical outliers are:
+
+- retained in raw data;
+- flagged;
+- downweighted or excluded only under declared policy;
+- included in disagreement diagnostics.
+
+18.3 BINARY ROBUST SCREEN
+-------------------------
+For eligible source probabilities p_j:
+
+    x_j = logit(clip(p_j, eps, 1-eps))
+
+Preliminary center:
+weighted median x_med.
+
+Scale:
+
+    MAD = median(|x_j - x_med|)
+
+    robust_scale = 1.4826 * MAD
+
+Robust z:
+
+    z_j = |x_j - x_med| / max(robust_scale, scale_floor)
+
+Policy:
+
+- z <= 3: normal;
+- 3 < z <= 6: soft downweight / flag;
+- z > 6: exclude only if corroborated by stale/semantic/source issue;
+  otherwise retain as high disagreement and human-review candidate.
+
+18.4 MULTINOMIAL SCREEN
+-----------------------
+1. Build preliminary equal/quality-weight linear pool p_bar.
+2. Compute Jensen–Shannon divergence between each source vector and p_bar.
+3. Use median/MAD of divergences.
+4. Apply soft/hard policy.
+
+Jensen–Shannon divergence is finite and symmetric for proper vectors.
+
+18.5 SMALL N
+------------
+n = 1:
+no outlier detection.
+
+n = 2:
+cannot robustly identify which source is wrong.
+Report full disagreement.
+
+n = 3:
+use conservative flagging, not automatic exclusion.
+
+18.6 LINE OUTLIER
+-----------------
+A price on a different total/handicap line is not an outlier.
+It is a different market.
+
+======================================================================
+19. CONSENSUS FORMATION
+======================================================================
+
+19.1 PIPELINE
+-------------
+1. Query eligible quotes by exact market semantics.
+2. Collapse duplicate provider representations to operator.
+3. Form complete operator book.
+4. Convert raw odds.
+5. De-vig by primary method.
+6. Compute sensitivity methods.
+7. Apply hard validation.
+8. Compute preliminary consensus.
+9. Detect statistical disagreement.
+10. Apply soft/hard source weights.
+11. Compute final raw consensus.
+12. Apply calibration model if approved.
+13. generate uncertainty interval.
+14. assign confidence grade.
+15. publish audit record.
+
+19.2 COMPLETE MULTINOMIAL POOL
+------------------------------
+For operator j proper vector p_j and normalized weight w_j:
+
+    p_pool,i = sum_j w_j p_j,i
+
+Because each vector sums to one and weights sum to one, the pool sums to one.
+
+19.3 BINARY POOL
+----------------
+Same weighted mean of fair Yes probabilities.
+
+19.4 LOGARITHMIC POOL CHALLENGER
+--------------------------------
+Candidate:
+
+    p_log,i proportional to product_j p_j,i^(w_j)
+
+Then normalize.
+
+Logarithmic pooling corresponds to weighted averaging of log probabilities and
+can be attractive under log loss, but may behave differently in dispersion and
+zero-probability cases.
+
+Not initial default.
+Compare prospectively.
+
+19.5 MEDIAN FALLBACK
+--------------------
+Weighted median in logit space is used when:
+
+- one operator is extreme;
+- n is small;
+- source dependence is unclear;
+- robustness policy activates.
+
+Return:
+consensus_method = ROBUST_MEDIAN_FALLBACK.
+
+19.6 LINEAR-POOL CALIBRATION
+----------------------------
+Forecast-combination research shows a linear pool can require recalibration even
+when components are calibrated.
+
+Therefore identity-calibrated linear pooling is the starting point, not the
+final scientific assumption.
+
+19.7 SOURCE DEPENDENCE
+----------------------
+If two bookmakers/brands are not independent:
+
+- group under dependence cluster;
+- cap total cluster weight;
+- record source relationship.
+
+19.8 METHOD ENSEMBLE
+--------------------
+The primary consensus uses the selected primary de-vigging method.
+
+Method uncertainty uses:
+- POWER;
+- PROPORTIONAL;
+- SHIN where valid;
+- approved challenger.
+
+Do not average methods blindly into the central value unless prospective
+evidence supports a method ensemble.
+
+======================================================================
+20. CONSENSUS CALIBRATION
+======================================================================
+
+20.1 IDENTITY INITIAL
+---------------------
+Before enough time-safe samples:
+
+    p_calibrated = p_pool
+
+with:
+calibration_status = IDENTITY_INSUFFICIENT_DATA.
+
+20.2 BINARY LOGISTIC CALIBRATION
+--------------------------------
+Candidate:
+
+    p_cal =
+      logistic(a + b * logit(p_pool))
+
+Fit on prior observations only.
+
+20.3 TEMPERATURE / POWER RECALIBRATION
+--------------------------------------
+For multinomial vector p:
+
+    p_cal,i =
+      p_i^gamma / sum_k p_k^gamma
+
+This is a simple one-parameter sharpness/bias adjustment.
+
+20.4 OUTCOME-SPECIFIC 1X2
+-------------------------
+If draw bias persists, a multinomial calibration may be required.
+
+Use strong regularisation.
+Do not fit a flexible model on one short season.
+
+20.5 ISOTONIC
+-------------
+May be useful for large binary samples, but can overfit and produce flat/step
+probabilities.
+
+Use only with enough data and cross-validation.
+
+20.6 TRAINING SCOPE
+-------------------
+Possible hierarchy:
+
+- market definition;
+- competition/global football;
+- operator;
+- lead-time;
+- source.
+
+Pool information where samples are weak.
+
+20.7 PROMOTION
+--------------
+Calibration is promoted only if:
+
+- walk-forward log score improves;
+- calibration improves;
+- no material subgroup degradation;
+- parameter stable;
+- code/data versioned;
+- rollback exists.
+
+======================================================================
+21. MARKET DISAGREEMENT
+======================================================================
+
+21.1 PURPOSE
+------------
+Disagreement is information.
+
+It can indicate:
+
+- uncertainty;
+- stale quote;
+- different settlement;
+- low liquidity;
+- new information not yet incorporated;
+- operator bias;
+- mapping error.
+
+21.2 BINARY DISAGREEMENT
+------------------------
+Primary raw statistic:
+
+    sigma_logit =
+      sqrt(sum_j w_j (logit(p_j)-mu_logit)^2)
+
+where:
+
+    mu_logit = sum_j w_j logit(p_j)
+
+Also report:
+
+- weighted IQR;
+- probability range;
+- max absolute difference.
+
+21.3 MULTINOMIAL DISAGREEMENT
+-----------------------------
+Primary:
+
+weighted mean Jensen–Shannon divergence from final consensus.
+
+Normalize to [0,1]:
+
+    market_disagreement =
+      weighted_JSD / ln(2)
+
+when natural logs and valid conditions apply.
+
+21.4 METHOD DISAGREEMENT
+------------------------
+Separate field:
+
+- max/SD difference between POWER, SHIN and PROPORTIONAL consensus.
+
+21.5 EXCHANGE SPREAD
+--------------------
+Separate field:
+
+    exchange_probability_spread = q_back - q_lay
+
+21.6 NO SOURCE
+--------------
+market_disagreement = null
+reason = NO_MARKET.
+
+One source:
+0 is misleading.
+Use null and:
+disagreement_status = NOT_IDENTIFIABLE_SINGLE_SOURCE.
+
+======================================================================
+22. UNCERTAINTY BOUNDS
+======================================================================
+
+22.1 MEANING
+------------
+`lower_bound` and `upper_bound` are an 80% operational market-evidence interval
+by default.
+
+They reflect uncertainty about the market-derived probability, not football's
+aleatoric outcome variance and not a formal guarantee that the true probability
+lies inside 80% of the time until prospectively validated.
+
+22.2 UNCERTAINTY COMPONENTS
+---------------------------
+- operator dispersion;
+- source weighting uncertainty;
+- de-vig method spread;
+- exchange spread;
+- freshness/staleness;
+- settlement uncertainty;
+- calibration parameter uncertainty;
+- historical residual floor;
+- missing-market reconstruction.
+
+22.3 INITIAL ENSEMBLE PROCEDURE
+-------------------------------
+For each accepted market:
+
+1. Create source-method candidates:
+   - primary method for every operator;
+   - sensitivity methods with lower method weights;
+   - exchange endpoints/midpoint where present.
+
+2. Bootstrap independent operator clusters with replacement.
+
+3. Sample one admissible de-vig method according to configured method
+   probabilities.
+
+4. For exchange source, sample within [q_lay,q_back] using a triangular
+   distribution centred at p_mid if no better microstructure model exists.
+
+5. Apply calibration parameter draw if estimated.
+
+6. Form consensus replicate.
+
+7. Repeat N times, initial N = 2,000.
+
+8. Marginal 10th and 90th percentiles become bounds.
+
+22.4 MINIMUM FLOOR
+------------------
+With sparse sources, bootstrap can collapse.
+
+Apply historical market-type residual floor on logit scale.
+
+Before historical evidence:
+use conservative configured floor by confidence grade.
+
+22.5 MULTINOMIAL
+----------------
+Every replicate is a proper vector.
+Marginal bounds need not sum to one, which is acceptable if labelled as
+outcome-wise intervals.
+
+22.6 SINGLE SOURCE
+------------------
+Bounds must include:
+
+- method spread;
+- historical floor;
+- freshness;
+- settlement uncertainty.
+
+Never return lower = upper = one quote probability.
+
+22.7 NO CURRENT MARKET
+----------------------
+Bounds are null in this module.
+The football-event model supplies prior/model uncertainty separately.
+
+======================================================================
+23. CONFIDENCE GRADING
+======================================================================
+
+23.1 DIMENSIONS
+---------------
+- independent operator count;
+- provider redundancy;
+- freshness;
+- completeness;
+- settlement verification;
+- margin quality;
+- disagreement;
+- exchange spread/liquidity;
+- method stability;
+- calibration history;
+- mapping quality.
+
+23.2 GRADES
+-----------
+A — STRONG
+
+Typical:
+- >=5 independent operators, or >=3 plus a liquid/tight exchange;
+- all fresh;
+- complete market;
+- settlement verified;
+- low disagreement;
+- stable method/calibration;
+- no critical missingness.
+
+B — GOOD
+
+Typical:
+- >=3 independent operators;
+- fresh;
+- complete;
+- settlement verified;
+- moderate/low disagreement;
+- exchange optional.
+
+C — LIMITED
+
+Typical:
+- 2 operators, or one good exchange/source;
+- moderate age/disagreement;
+- incomplete redundancy;
+- no mature calibration.
+
+D — WEAK
+
+Typical:
+- one source;
+- manual one-sided prop;
+- stale-soft source;
+- uncertain settlement;
+- incomplete market.
+
+E — NO CURRENT MARKET
+
+Model-only fallback.
+No consensus probability from market.
+
+23.3 FREE-STACK EXPECTATION
+---------------------------
+Many EPL player props will be C or D.
+That is acceptable if displayed and propagated.
+
+Do not inflate grade to make the system appear sophisticated.
+
+23.4 MACHINE RULE AND NARRATIVE
+-------------------------------
+A deterministic scoring rubric may suggest a grade.
+Final fields retain dimension breakdown.
+
+A single blocking settlement/mapping issue overrides numeric score.
+
+======================================================================
+24. MISSING, SUSPENDED AND REOPENED PLAYER MARKETS
+======================================================================
+
+24.1 STATES
+-----------
+NOT_YET_OPEN
+NOT_OFFERED
+PLAYER_NOT_LISTED
+SUSPENDED
+REMOVED
+VOID
+SOURCE_UNAVAILABLE
+QUOTA_EXHAUSTED
+GEOGRAPHICALLY_UNAVAILABLE
+MAPPING_FAILED
+STALE
+POST_CUTOFF
+UNKNOWN
+
+24.2 NO IMPUTATION IN MARKET CORE
+---------------------------------
+The market module does not create a false bookmaker probability.
+
+It returns:
+
+- no consensus;
+- raw observations if any;
+- missing reason;
+- fallback requirement.
+
+24.3 PLAYER NOT LISTED
+----------------------
+Could indicate:
+
+- unlikely start;
+- provider omission;
+- market not open;
+- book does not offer player;
+- mapping failure.
+
+It is not automatically availability evidence.
+
+24.4 MARKET REAPPEARS
+---------------------
+A new quote after reopen is treated as a new eligible observation.
+Pre-suspension values remain historical.
+
+24.5 PARTIAL PLAYER PROP
+------------------------
+If only some operators list the player:
+
+- consensus uses available independent operators;
+- operator count reduced;
+- selection-coverage metric stored;
+- bounds widened;
+- absence at other books not converted to a negative vote.
+
+======================================================================
+25. OUTPUT DATA CONTRACT
+======================================================================
+
+25.1 SOURCE MARKET PROBABILITY
+------------------------------
+One operator/outcome:
+
+{
+  "market_probability_id": "uuid",
+  "fixture_id": "uuid",
+  "market_id": "uuid",
+  "selection_id": "uuid",
+  "operator_id": "uuid",
+  "provider_ids": ["uuid"],
+  "as_of_utc": "timestamp",
+  "information_cutoff_utc": "timestamp",
+
+  "raw_decimal_odds": "2.10",
+  "raw_implied_probability": 0.4761904762,
+
+  "booksum": 1.0712,
+  "overround": 0.0712,
+  "normalisation_method": "POWER",
+  "method_parameter": {
+    "alpha": 1.083
+  },
+
+  "market_probability": 0.4485,
+  "lower_source_bound": 0.432,
+  "upper_source_bound": 0.465,
+
+  "quote_age_seconds": 180,
+  "freshness_state": "FRESH",
+  "market_status": "OPEN",
+  "settlement_status": "VERIFIED",
+  "mapping_status": "VERIFIED",
+
+  "source_snapshot_ids": [],
+  "normalisation_version": "odds-core-v0.9"
+}
+
+25.2 CONSENSUS OUTPUT
+---------------------
+Required user fields plus richer diagnostics:
+
+{
+  "market_consensus_id": "uuid",
+  "fixture_id": "uuid",
+  "market_definition_id": "uuid",
+  "selection_id": "uuid",
+  "as_of_utc": "timestamp",
+  "information_cutoff_utc": "timestamp",
+
+  "market_probability": 0.4485,
+  "consensus_probability": 0.4521,
+  "uncalibrated_consensus_probability": 0.4498,
+
+  "lower_bound": 0.4210,
+  "upper_bound": 0.4827,
+  "bound_level": 0.80,
+  "bound_type": "OPERATIONAL_MARKET_UNCERTAINTY",
+
+  "market_disagreement": 0.041,
+  "disagreement_method": "NORMALIZED_WEIGHTED_JSD",
+  "method_disagreement": 0.009,
+
+  "data_freshness": {
+    "weighted_age_seconds": 214,
+    "oldest_included_seconds": 540,
+    "freshness_grade": "FRESH"
+  },
+
+  "provider_count": 2,
+  "operator_count": 5,
+  "independent_operator_cluster_count": 4,
+  "exchange_count": 1,
+
+  "confidence_grade": "B",
+  "confidence_dimensions": {
+    "coverage": "GOOD",
+    "freshness": "GOOD",
+    "settlement": "VERIFIED",
+    "disagreement": "LOW",
+    "liquidity": "PARTIAL",
+    "calibration": "IDENTITY"
+  },
+
+  "consensus_method": "ROBUST_WEIGHTED_LINEAR_POOL",
+  "primary_devig_method": "POWER",
+  "calibration_model_version_id": null,
+  "source_probability_ids": [],
+  "source_bundle_id": "uuid",
+  "code_commit": "git-sha"
+}
+
+25.3 REQUIRED USER-NAMED FIELDS
+-------------------------------
+The module MUST expose exactly:
+
+- market_probability;
+- consensus_probability;
+- lower_bound;
+- upper_bound;
+- market_disagreement;
+- data_freshness;
+- provider_count;
+- confidence_grade.
+
+It SHOULD also expose operator count because provider count alone can overstate
+independent evidence.
+
+25.4 NULLS
+----------
+Null requires reason.
+
+Example:
+
+"consensus_probability": null,
+"missing_reason": "NOT_YET_OPEN_AT_FPL_DEADLINE",
+"confidence_grade": "E"
+
+======================================================================
+26. CONFIGURATION
+======================================================================
+
+26.1 FILES
+----------
+config/markets/
+  odds_formats.yaml
+  devig_methods.yaml
+  method_policy.yaml
+  freshness.yaml
+  operator_weights.yaml
+  liquidity.yaml
+  outliers.yaml
+  consensus.yaml
+  calibration.yaml
+  confidence_grades.yaml
+  missing_markets.yaml
+
+26.2 NO MAGIC THRESHOLDS
+------------------------
+All:
+
+- half-lives;
+- stale cutoffs;
+- outlier z;
+- weight caps;
+- bootstrap draws;
+- confidence thresholds;
+- calibration minimum sample;
+
+must be configured and versioned.
+
+26.3 POLICY VERSION
+-------------------
+Every output stores:
+
+- odds policy version;
+- method version;
+- weight version;
+- calibration version;
+- confidence rubric version.
+
+======================================================================
+27. IMPLEMENTATION ARCHITECTURE
+======================================================================
+
+27.1 PACKAGE
+------------
+src/dmf_pulse/markets/
+
+- odds_formats.py
+- book_builder.py
+- proportional.py
+- power.py
+- shin.py
+- exchange.py
+- commission.py
+- freshness.py
+- weighting.py
+- outliers.py
+- pooling.py
+- calibration.py
+- uncertainty.py
+- confidence.py
+- missingness.py
+- schemas.py
+- diagnostics.py
+
+27.2 PURE FUNCTIONS
+-------------------
+decimal_to_raw_probability(odds)
+
+build_operator_book(quotes, market_definition)
+
+devig_proportional(raw_probabilities)
+
+devig_power(raw_probabilities)
+
+devig_shin(raw_probabilities)
+
+exchange_probability(back, lay, commission=None)
+
+freshness_weight(quote, decision_time, policy)
+
+detect_outliers(source_probabilities, policy)
+
+form_consensus(source_probabilities, weights, policy)
+
+calibrate_consensus(consensus, calibration_model)
+
+build_uncertainty_interval(inputs, policy)
+
+grade_confidence(diagnostics, rubric)
+
+27.3 DETERMINISM
+----------------
+Given:
+
+- inputs;
+- policy;
+- calibration version;
+- random seed for bootstrap;
+
+outputs reproduce exactly within documented numeric tolerance.
+
+27.4 NUMERIC LIBRARIES
+----------------------
+Use:
+
+- Decimal at source boundary;
+- float64 for numerical roots/pools;
+- scipy optimize or audited equivalent;
+- numpy;
+- no LLM.
+
+27.5 SAFE CLIPPING
+------------------
+Logit transforms clip only for numerical calculation:
+
+    eps <= p <= 1-eps
+
+Store unclipped original value.
+Clipping must not hide invalid probability output.
+
+======================================================================
+28. VALIDATION AND TESTING
+======================================================================
+
+28.1 ODDS CONVERSION
+--------------------
+Golden tests:
+
+- decimal;
+- fractional;
+- positive American;
+- negative American;
+- invalid.
+
+28.2 PROPORTIONAL
+-----------------
+- sums one;
+- ranking preserved;
+- known example;
+- overround;
+- zero/invalid guard.
+
+28.3 POWER
+----------
+- root residual;
+- sums one;
+- all probabilities in [0,1];
+- deterministic;
+- high/low margin;
+- near-fair book;
+- many outcomes;
+- compare to audited R `implied` examples.
+
+28.4 SHIN
+---------
+- known examples;
+- z root;
+- sums one;
+- two-outcome equivalence diagnostic;
+- no-root/pathology;
+- fallback.
+
+28.5 EXCHANGE
+-------------
+- B<L;
+- reciprocal interval;
+- midpoint;
+- crossed market B>=L alert;
+- one side missing;
+- size missing;
+- commission formulas;
+- market net caveat.
+
+28.6 CONSENSUS
+--------------
+- duplicate operator through two providers counted once;
+- weights sum one;
+- probability vector sums one;
+- one source;
+- no source;
+- dependence cluster;
+- manual quote;
+- exchange plus books.
+
+28.7 OUTLIERS
+-------------
+- clear data error;
+- true high disagreement retained;
+- n=1/2;
+- MAD zero;
+- multinomial JSD;
+- wrong line excluded before stats.
+
+28.8 FRESHNESS
+--------------
+- source time;
+- receipt fallback;
+- stale threshold;
+- postcutoff;
+- frozen quote;
+- reopened quote.
+
+28.9 PLAYER MARKET
+------------------
+- complete yes/no;
+- yes-only;
+- nonexclusive players;
+- missing;
+- suspended;
+- player absent at one operator;
+- no forced sum.
+
+28.10 BOUNDS
+------------
+- lower <= consensus <= upper where policy intends;
+- within [0,1];
+- interval widens with source dispersion;
+- interval widens with staleness;
+- one source nonzero width;
+- reproducible seed;
+- multinomial replicates sum one.
+
+28.11 CONFIDENCE
+----------------
+Golden grade cases A–E.
+Blocking settlement overrides otherwise strong dimensions.
+
+28.12 PROSPECTIVE EVALUATION
+----------------------------
+Per market type:
+
+- log loss;
+- Brier;
+- RPS;
+- calibration;
+- method comparison;
+- consensus versus best/equal book;
+- bound coverage;
+- confidence-grade performance.
+
+======================================================================
+29. BACKTESTING AND METHOD PROMOTION
+======================================================================
+
+29.1 TIME-SAFE INPUT
+--------------------
+Only DMFP-05 LIVE_OBSERVED deadline bundles establish live performance.
+
+29.2 RECONSTRUCTED HISTORY
+--------------------------
+May evaluate algorithms, but labelled separately.
+
+29.3 METHOD COMPARISON
+----------------------
+Compare:
+
+- raw reciprocal;
+- proportional;
+- power;
+- Shin;
+- exchange midpoint;
+- equal pool;
+- weighted pool;
+- median;
+- approved calibrators.
+
+29.4 LEAD-TIME BUCKET
+---------------------
+Performance can differ:
+
+- >24h;
+- 24–6h;
+- 6–2h;
+- <=2h before FPL cutoff.
+
+29.5 OPERATOR SAMPLE
+--------------------
+Do not promote operator-specific weights with tiny sample.
+
+29.6 PROMOTION GATE
+-------------------
+A challenger must:
+
+- improve mean out-of-time log score;
+- not materially worsen calibration;
+- remain numerically stable;
+- show benefit across multiple windows/subgroups;
+- pass leakage audit;
+- have rollback;
+- be explainable.
+
+29.7 MULTIPLE TESTING
+---------------------
+Repeated method search can overfit.
+Maintain untouched/rolling evaluation and report all tried methods.
+
+======================================================================
+30. DATA-QUALITY ALERTS
+======================================================================
+
+P0:
+- wrong market/selection mapping;
+- probability outside [0,1];
+- consensus vector not summing to one;
+- postcutoff quote included;
+- incompatible settlement combined.
+
+P1:
+- all sources stale;
+- market suspended near deadline;
+- power/Shin systematic numerical failure;
+- provider collapse;
+- exchange crossed;
+- confidence unexpectedly E for captaincy market.
+
+P2:
+- operator count drop;
+- disagreement spike;
+- method disagreement spike;
+- missing assist/shots;
+- source timestamp absent.
+
+P3:
+- new market/operator;
+- margin shift;
+- additional diagnostic method available.
+
+======================================================================
+31. EXPLANATION REQUIREMENTS
+======================================================================
+
+For each consensus, Pulse must be able to explain:
+
+- raw odds;
+- raw reciprocal;
+- operator book;
+- overround;
+- de-vig method;
+- method parameter;
+- sources included/excluded;
+- weights;
+- freshness;
+- settlement;
+- exchange spread;
+- outlier flags;
+- disagreement;
+- calibration;
+- bounds;
+- confidence grade;
+- missing data.
+
+User-facing summary example:
+
+"Estimated probability 45.2% (market interval 42.1–48.3%).
+Five operators across two feeds were included. Prices were 3.6 minutes old on
+average. The market showed low disagreement. Power de-vigging was used; no
+learned recalibration is active yet."
+
+======================================================================
+32. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+32.1 CODEX MAY
+-------------
+- implement methods/formulas;
+- use numerical root solvers;
+- build operator books;
+- implement robust pooling;
+- implement bootstrap bounds;
+- create tests/benchmarks;
+- compare to reference packages;
+- build diagnostics.
+
+32.2 CODEX MUST NOT
+-------------------
+- force incomplete markets to sum one;
+- normalise anytime-scorer lists;
+- count API providers as independent bookmakers;
+- treat Shin z as proven insider share;
+- use postdeadline prices;
+- merge settlement-incompatible quotes;
+- apply commission as universal bookmaker margin;
+- invent exchange liquidity;
+- hard-code favourite–longshot correction;
+- delete outlier observations;
+- return zero for missing player market;
+- use an LLM for numeric probabilities.
+
+32.3 PULL REQUEST
+-----------------
+Each change states:
+
+- formula/reference;
+- market applicability;
+- numeric tolerance;
+- failure/fallback;
+- configuration;
+- tests;
+- historical comparison;
+- output version impact.
+
+======================================================================
+33. RISK REGISTER
+======================================================================
+
+R-06-001 — Raw reciprocal treated as fair
+Probability: High
+Impact: Critical
+Mitigation:
+explicit raw/fair fields and margin treatment.
+
+R-06-002 — Proportional method assumed universally correct
+Probability: Medium
+Impact: High
+Mitigation:
+Power default, sensitivity, validation.
+
+R-06-003 — Power method overtrusted
+Probability: Medium
+Impact: High
+Mitigation:
+challengers and prospective selection.
+
+R-06-004 — Shin interpreted literally as insider fraction
+Probability: Medium
+Impact: Medium/High
+Mitigation:
+diagnostic language only.
+
+R-06-005 — Incomplete book de-vigged
+Probability: High
+Impact: Critical
+Mitigation:
+completeness gate.
+
+R-06-006 — Anytime scorers forced to sum one
+Probability: Medium
+Impact: Critical
+Mitigation:
+nonexclusive market policy.
+
+R-06-007 — Same bookmaker counted through two APIs
+Probability: High
+Impact: High
+Mitigation:
+operator canonicalization.
+
+R-06-008 — White-label/dependent books double counted
+Probability: Medium
+Impact: High
+Mitigation:
+dependence clusters and caps.
+
+R-06-009 — Stale quote dominates
+Probability: High
+Impact: Critical
+Mitigation:
+freshness weight/hard cutoff.
+
+R-06-010 — Suspended quote treated current
+Probability: Medium
+Impact: Critical
+Mitigation:
+market-state gate.
+
+R-06-011 — Pre-suspend price treated fresh after reopen
+Probability: Medium
+Impact: High
+Mitigation:
+new quote requirement.
+
+R-06-012 — Statistical outlier containing information removed
+Probability: Medium
+Impact: High
+Mitigation:
+soft flag unless corroborated error.
+
+R-06-013 — Data error retained as insight
+Probability: Medium
+Impact: Critical
+Mitigation:
+semantic hard validation.
+
+R-06-014 — Exchange odds midpoint chosen in wrong space
+Probability: Medium
+Impact: Medium
+Mitigation:
+probability midpoint default; test challengers.
+
+R-06-015 — Commission applied incorrectly
+Probability: High
+Impact: High
+Mitigation:
+separate information/trading probabilities.
+
+R-06-016 — Account-specific commission embedded universally
+Probability: Medium
+Impact: High
+Mitigation:
+store separate executable bounds.
+
+R-06-017 — Thin exchange quote overweighted
+Probability: Medium
+Impact: High
+Mitigation:
+spread/liquidity and capped weight.
+
+R-06-018 — Missing liquidity invented
+Probability: Medium
+Impact: High
+Mitigation:
+UNKNOWN status.
+
+R-06-019 — Confidence interval misrepresented
+Probability: High
+Impact: Reputational
+Mitigation:
+operational interval label and validation.
+
+R-06-020 — Bootstrap interval collapses with one source
+Probability: High
+Impact: High
+Mitigation:
+historical/configured uncertainty floor.
+
+R-06-021 — Calibration overfits
+Probability: High
+Impact: Critical
+Mitigation:
+walk-forward, shrinkage, promotion gate.
+
+R-06-022 — Draw calibration ignored
+Probability: Medium
+Impact: High
+Mitigation:
+outcome-specific diagnostics.
+
+R-06-023 — Operator weights use future outcomes
+Probability: Medium
+Impact: Critical
+Mitigation:
+versioned as-of rolling weights.
+
+R-06-024 — Best odds across books de-vigged as one book
+Probability: Medium
+Impact: Critical
+Mitigation:
+operator-book construction.
+
+R-06-025 — Market line mismatch
+Probability: High
+Impact: Critical
+Mitigation:
+canonical exact line/period.
+
+R-06-026 — Free US player props treated as UK-equivalent
+Probability: Medium
+Impact: High
+Mitigation:
+settlement/operator profile.
+
+R-06-027 — Provider count overstates evidence
+Probability: High
+Impact: Medium
+Mitigation:
+operator and cluster counts.
+
+R-06-028 — No-source disagreement set to zero
+Probability: Medium
+Impact: Medium
+Mitigation:
+null/status.
+
+R-06-029 — Numerical root instability
+Probability: Low/Medium
+Impact: High
+Mitigation:
+bracketed solver, fallback and tests.
+
+R-06-030 — Probability clipping hides invalid model
+Probability: Medium
+Impact: High
+Mitigation:
+clip only calculation copy; validate original.
+
+R-06-031 — Market disagreement mistaken for aleatoric uncertainty
+Probability: High
+Impact: High
+Mitigation:
+separate uncertainty layers.
+
+R-06-032 — Historical closing odds leak
+Probability: High
+Impact: Critical
+Mitigation:
+deadline bundle only.
+
+======================================================================
+34. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-16
+
+----------------------------------------------------------------------
+SRC-ODDS-METHOD-2014-001
+Title:
+On determining probability forecasts from betting odds
+
+Author:
+Erik Štrumbelj
+
+Publication:
+International Journal of Forecasting, 30(4), 934–943
+
+DOI:
+https://doi.org/10.1016/j.ijforecast.2014.02.008
+
+Relevant claims:
+Shin probabilities outperformed basic normalisation and regression approaches
+in the studied sports/bookmaker data; bookmakers differed in forecast accuracy;
+exchange odds were not always best, particularly in smaller markets.
+
+Reliability:
+HIGH peer-reviewed empirical research.
+Applicability requires market-specific validation.
+
+Pulse reliance:
+YES for Shin challenger and source-weight policy.
+
+----------------------------------------------------------------------
+SRC-ODDS-METHOD-2017-002
+Title:
+Adjusting Bookmaker's Odds to Allow for Overround
+
+Authors:
+Stephen Clarke, Stephanie Kovalchik, Martin Ingram
+
+Publication date:
+2017-12-25
+
+URL:
+https://figshare.swinburne.edu.au/articles/journal_contribution/Adjusting_bookmaker_s_odds_to_allow_for_overround/26295688
+
+Relevant claims:
+Power method avoids improper probabilities, accounts for favourite–longshot
+distortion, outperformed proportional normalisation and was comparable to or
+better than Shin in the analysed datasets.
+
+Reliability:
+MODERATE/HIGH peer-reviewed journal contribution; datasets are not exclusively
+EPL/player props.
+
+Pulse reliance:
+YES for initial Power default.
+
+----------------------------------------------------------------------
+SRC-ODDS-METHOD-2023-003
+Title:
+Introduction to the implied package
+
+Author/project:
+Rasmus Bååth / CRAN implied package documentation
+
+URL:
+https://cran.rstudio.com/web/packages/implied/vignettes/introduction.html
+
+Relevant claims:
+Implementation/formula references for proportional, power, additive, odds-ratio
+and Shin transformations, including multiple-winner caveats.
+
+Reliability:
+HIGH as transparent technical implementation reference, not independent proof
+of forecasting superiority.
+
+Pulse reliance:
+YES for test/reference implementation.
+
+----------------------------------------------------------------------
+SRC-SHIN-1991-001
+Title:
+Optimal Betting Odds Against Insider Traders
+
+Author:
+Hyun Song Shin
+
+Publication:
+The Economic Journal, 101(408), 1179–1185
+
+URL:
+https://ideas.repec.org/a/ecj/econjl/v101y1991i408p1179-85.html
+
+Relevant claim:
+Theoretical bookmaker-pricing model with informed bettors and systematic
+divergence between normalized odds and true probabilities.
+
+Reliability:
+HIGH foundational peer-reviewed theory.
+
+Pulse reliance:
+CONTEXTUAL.
+
+----------------------------------------------------------------------
+SRC-SHIN-2024-002
+Title:
+On Estimates of Insider Trading in Sports Betting
+
+Author:
+Karl Whelan
+
+URL:
+https://www.karlwhelan.com/Papers/ShinzNov24.pdf
+
+Publication date:
+2024
+
+Relevant claim:
+Reviews and questions event-level interpretation/estimation of Shin insider
+parameters.
+
+Reliability:
+MODERATE/HIGH academic working paper.
+
+Pulse reliance:
+YES for cautious interpretation of z.
+
+----------------------------------------------------------------------
+SRC-ODDS-METHOD-2026-004
+Title:
+Forecast Sports Outcomes under Efficient Market Hypothesis: Theoretical and
+Experimental Analysis of Odds-Only and Generalised Linear Models
+
+Authors:
+Kaito Goto, Naoya Takeishi, Takehisa Yairi
+
+URL:
+https://arxiv.org/abs/2604.17194
+
+Publication date:
+2026-04-19
+
+Relevant claims:
+Multiplicative, Shin and Power can retain systematic football biases; proposed
+OO-EPC and one-parameter favourite–longshot GLM improved results in the authors'
+large dataset.
+
+Reliability:
+MODERATE recent preprint; needs replication and code/formula review.
+
+Pulse reliance:
+RESEARCH_CANDIDATE only.
+
+----------------------------------------------------------------------
+SRC-COMBINE-2013-001
+Title:
+Combining Predictive Distributions
+
+Authors:
+Tilmann Gneiting, Roopesh Ranjan
+
+Publication:
+Electronic Journal of Statistics, Volume 7
+
+URL:
+https://projecteuclid.org/journals/electronic-journal-of-statistics/volume-7/issue-none/Combining-predictive-distributions/10.1214/13-EJS823.pdf
+
+Relevant claim:
+Linear and nonlinear probability-pooling methods have distinct calibration and
+dispersion properties; linear pools generally require attention to
+recalibration.
+
+Reliability:
+HIGH peer-reviewed forecast-combination research.
+
+Pulse reliance:
+YES for pooling/recalibration policy.
+
+----------------------------------------------------------------------
+SRC-SCORING-2007-001
+Title:
+Strictly Proper Scoring Rules, Prediction, and Estimation
+
+Authors:
+Tilmann Gneiting, Adrian E. Raftery
+
+URL:
+https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf
+
+Publication date:
+2007
+
+Relevant claim:
+Proper scoring rules evaluate probabilistic forecasts and support calibration
+and sharpness assessment.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+YES for method selection.
+
+----------------------------------------------------------------------
+SRC-FOOTBALL-MARKET-2018-001
+Title:
+Combining historical data and bookmakers' odds in modelling football scores
+
+Authors:
+Leonardo Egidi, Francesco Pauli, Nicola Torelli
+
+URL:
+https://arxiv.org/abs/1802.08848
+
+Relevant claim:
+Football score models can combine historical information with bookmaker odds.
+
+Reliability:
+MODERATE/HIGH academic work, not directly a de-vigging comparison.
+
+Pulse reliance:
+CONTEXTUAL for downstream market anchoring.
+
+----------------------------------------------------------------------
+SRC-BETFAIR-EXCHANGE-2026-001
+Title:
+Betfair Exchange API Type Definitions / MarketBook
+
+Organisation:
+Betfair
+
+URL:
+https://betfair-developer-docs.atlassian.net/wiki/spaces/1smk3cen4v3lu3yomq5qye0ni/pages/2687465/Betting+Type+Definitions
+
+Relevant claims:
+Market status, suspended reason, delay flag, total matched/available, market
+version, runner status, last traded price and exchange prices are available in
+the official model.
+
+Reliability:
+HIGH official provider documentation.
+
+Pulse reliance:
+YES for exchange status/liquidity semantics.
+
+----------------------------------------------------------------------
+SRC-BETFAIR-EXCHANGE-2026-002
+Title:
+listRunnerBook
+
+Organisation:
+Betfair
+
+URL:
+https://betfair-developer-docs.atlassian.net/wiki/spaces/1smk3cen4v3lu3yomq5qye0ni/pages/2687847/listRunnerBook
+
+Relevant claim:
+Returns dynamic market/runner prices, status and traded volume; market and
+selection context are required.
+
+Reliability:
+HIGH official.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-BETFAIR-COMMISSION-2026-001
+Title:
+Exchange: What is Commission and how is it calculated?
+
+Organisation:
+Betfair
+
+URL:
+https://support.betfair.com/app/answers/detail/a_id/413/
+
+Relevant claim:
+Commission is charged on net winnings on a market and depends on market base
+rate and discount/package context.
+
+Reliability:
+HIGH official.
+
+Pulse reliance:
+YES for commission separation.
+
+----------------------------------------------------------------------
+SRC-ODDS-API-2026-001
+Title:
+The Odds API V4 / Betting Markets Documentation
+
+Organisation:
+The Odds API
+
+URLs:
+https://the-odds-api.com/liveapi/guides/v4/
+https://the-odds-api.com/sports-odds-data/betting-markets.html
+
+Relevant claims:
+Odds include bookmaker last-update fields and current market availability;
+player-prop coverage is market/operator dependent.
+
+Reliability:
+HIGH provider documentation.
+
+Pulse reliance:
+YES for free-source freshness/missingness context.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 — Master Architecture and Product Definition
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-01 — Research Standard and Evidence Register
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-03 — Canonical Data Model and Identifiers
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-04 — Data Sources, Markets, APIs and Licensing — Zero-Cost Edition
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-05 — Ingestion, Storage and Data Quality
+
+Pulse reliance:
+YES.
+
+======================================================================
+35. ACCEPTANCE CRITERIA
+======================================================================
+
+A. RAW ODDS
+[ ] All odds formats convert to decimal and raw reciprocal.
+[ ] Booksums/overround are stored.
+[ ] Operator books are not mixed across bookmakers.
+[ ] Incomplete/nonexclusive markets are identified.
+
+B. DE-VIGGING
+[ ] Power is accepted as initial production default.
+[ ] Proportional is always computed as baseline.
+[ ] Shin is a sensitivity/challenger.
+[ ] Shin z is not presented as literal insider share.
+[ ] Method choice remains prospectively testable.
+
+C. EXCHANGE
+[ ] Back and lay are separate.
+[ ] Probability-space midpoint is default.
+[ ] Spread is retained.
+[ ] Commission-adjusted bounds are separate.
+[ ] Missing liquidity is labelled unknown.
+
+D. CONSENSUS
+[ ] Independent operators, not API rows, are weighted.
+[ ] Duplicate/dependent sources are clustered.
+[ ] Freshness and settlement affect weight.
+[ ] Outliers are not deleted blindly.
+[ ] Linear pool is recalibratable.
+[ ] Confidence and disagreement are explicit.
+
+E. PLAYER MARKETS
+[ ] One-sided quotes are not falsely de-vigged.
+[ ] Anytime scorers are not forced to sum one.
+[ ] Missing market is not zero.
+[ ] Reopened markets require a new quote.
+[ ] Player allocation remains downstream.
+
+F. OUTPUT
+[ ] Required fields are emitted.
+[ ] Bounds are labelled operational uncertainty.
+[ ] Provider and operator counts are distinct.
+[ ] Every output has lineage and method versions.
+[ ] No postdeadline data can enter.
+
+======================================================================
+36. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Create market policy/config files.
+2. Implement odds converters.
+3. Implement operator-book builder.
+4. Implement proportional method.
+5. Implement power method with Brent solver.
+6. Implement Shin method with bounded root solver.
+7. Reproduce published/CRAN examples.
+8. Implement exchange reciprocal interval/midpoint.
+9. Implement commission diagnostics.
+10. Implement freshness weights/states.
+11. Implement provider-to-operator collapse.
+12. Implement dependence clusters.
+13. Implement hard semantic filters.
+14. Implement binary logit MAD diagnostics.
+15. Implement multinomial JSD diagnostics.
+16. Implement weighted linear pool.
+17. Implement weighted median fallback.
+18. Implement uncertainty bootstrap.
+19. Implement confidence rubric.
+20. Implement missing-player-market output.
+21. Implement suspension/reopen transition logic.
+22. Create output schemas/tables.
+23. Create source/method audit report.
+24. Build historical method comparison on free data.
+25. Begin prospective 2026/27 evaluation.
+26. Keep learned calibration disabled until promotion gate passes.
+27. Connect only accepted consensus outputs to DMFP-08.
+
+Suggested commands:
+
+    dmf market build-book
+    dmf market devig --method power
+    dmf market compare-methods
+    dmf market exchange-mid
+    dmf market freshness
+    dmf market outliers
+    dmf market consensus
+    dmf market uncertainty
+    dmf market confidence
+    dmf market explain
+    dmf market validate
+
+======================================================================
+37. OPEN QUESTIONS
+======================================================================
+
+METHOD
+------
+1. What exact minimum sample promotes a market-specific method?
+2. Should binary markets always use Power or choose by operator?
+3. Should OO-EPC be independently implemented now or deferred?
+4. How should draw-specific calibration be regularised?
+5. Is an ensemble of Power/Shin better than selecting one method?
+
+EXCHANGE
+--------
+6. Is probability midpoint empirically better than logit midpoint?
+7. Which Betfair free fields provide reliable depth/volume?
+8. What minimum size makes a delayed exchange quote usable?
+9. How should cross-matched exchange prices affect interpretation?
+10. Should commission ever enter non-betting football probabilities?
+
+WEIGHTS
+-------
+11. What initial dependence clusters exist among free books?
+12. What weight cap is best?
+13. Should overround directly affect reliability weight?
+14. What shrinkage model will learn operator weights?
+15. How is operator churn handled?
+
+FRESHNESS
+---------
+16. What thresholds fit actual free source cadence?
+17. How should a quote with missing source time be graded?
+18. What peer movement threshold identifies frozen quotes?
+19. How does lead time to FPL deadline interact with match kickoff?
+
+UNCERTAINTY
+-----------
+20. What historical residual floor should be used before one season exists?
+21. Is an 80% operational interval the right display?
+22. Should bounds include method candidates equally or performance-weighted?
+23. How will bound coverage be validated?
+24. How should player one-sided quote uncertainty be represented?
+
+PLAYER MARKETS
+--------------
+25. Which free US books supply paired Yes/No player markets?
+26. Can nonstarter settlement be mapped for every operator?
+27. How much should one-sided raw implied probability influence player share?
+28. What absence state can be inferred from event-market discovery?
+29. How are multi-goal lines reconciled with anytime scorer?
+
+======================================================================
+38. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-07 — PLAYER AVAILABILITY, START AND MINUTES MODEL
+
+The minutes model consumes:
+
+- player-market existence as weak evidence only;
+- market probabilities with confidence and settlement;
+- suspended/missing states;
+- source freshness;
+- lineup and injury observations.
+
+Then:
+DMFP-08 — FOOTBALL EVENT DISTRIBUTION ENGINE
+
+DMFP-08 consumes:
+
+- team market consensus;
+- player market observations;
+- lower/upper bounds;
+- market disagreement;
+- missingness;
+- confidence;
+- method versions.
+
+It must reconcile player event expectations to team-level market distributions.
+
+======================================================================
+39. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-16
+
+- Defined raw implied probabilities and overround.
+- Selected Power as initial fixed-odds default.
+- Retained proportional and Shin methods.
+- Added favourite–longshot diagnostics.
+- Added incomplete/nonexclusive market policy.
+- Added exchange probability midpoint and spread.
+- Added account-specific commission diagnostics.
+- Added operator/source/independence weighting.
+- Added liquidity and freshness weighting.
+- Added stale/frozen detection.
+- Added suspension/reopen lifecycle.
+- Added robust outlier procedures.
+- Added weighted consensus and calibration.
+- Added disagreement metrics and operational bounds.
+- Added confidence grades.
+- Added one-sided and missing player-market handling.
+- Added full output contract.
+- Added implementation, tests, backtesting, risks and source register.
+
+Future v1.0:
+- Sebastian approves defaults.
+- reference method tests pass.
+- free-source operator books tested.
+- EPL 2026/27 prospective data collected.
+- stale/outlier thresholds tuned.
+- first calibration comparison complete.
+- consensus output connected to event engine.
+
+END OF DOCUMENT

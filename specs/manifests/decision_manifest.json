@@ -1,0 +1,102 @@
+{
+  "decisions": [
+    {
+      "id": "ADR-PROD-004",
+      "status": "ACCEPTED",
+      "summary": "Modular monolith before microservices."
+    },
+    {
+      "id": "ADR-GOV-001",
+      "status": "ACCEPTED",
+      "summary": "DMFP module specifications plus DMFP-20 govern architecture."
+    },
+    {
+      "id": "ADR-GOV-002",
+      "status": "ACCEPTED",
+      "summary": "One validated vertical slice at a time."
+    },
+    {
+      "id": "ADR-GOV-004",
+      "status": "ACCEPTED",
+      "summary": "No hidden hard-coded policy constants."
+    },
+    {
+      "id": "ADR-RES-001",
+      "status": "ACCEPTED",
+      "summary": "Evidence hierarchy and claim-level source register."
+    },
+    {
+      "id": "ADR-DATA-002",
+      "status": "ACCEPTED",
+      "summary": "PostgreSQL operational truth and Parquet analytical archive; no database implementation in FND-001."
+    },
+    {
+      "id": "ADR-SRC-001",
+      "status": "ACCEPTED",
+      "summary": "Zero-paid-subscription core."
+    },
+    {
+      "id": "ADR-IMPL-001",
+      "status": "ACCEPTED",
+      "summary": "Stage-gated implementation roadmap."
+    },
+    {
+      "id": "ADR-IMPL-002",
+      "status": "PROVISIONAL",
+      "summary": "Python 3.13 baseline and open-source typed toolchain."
+    },
+    {
+      "id": "ADR-IMPL-003",
+      "status": "ACCEPTED",
+      "summary": "Stage acceptance is proof, not code volume."
+    }
+  ],
+  "manifest_version": "1.0",
+  "pack_authorisations": [
+    {
+      "choice": "Python 3.13",
+      "id": "PACK-FND-001-TOOLCHAIN-001",
+      "status": "SANCTIONED_FOR_FND-001"
+    },
+    {
+      "choice": "uv",
+      "id": "PACK-FND-001-TOOLCHAIN-002",
+      "status": "SANCTIONED_FOR_FND-001"
+    },
+    {
+      "choice": "hatchling",
+      "id": "PACK-FND-001-TOOLCHAIN-003",
+      "status": "SANCTIONED_FOR_FND-001"
+    },
+    {
+      "choice": "Pydantic v2 + Typer + PyYAML",
+      "id": "PACK-FND-001-TOOLCHAIN-004",
+      "status": "SANCTIONED_FOR_FND-001"
+    },
+    {
+      "choice": "Ruff + mypy + pytest + Hypothesis + coverage + build",
+      "id": "PACK-FND-001-TOOLCHAIN-005",
+      "status": "SANCTIONED_FOR_FND-001"
+    },
+    {
+      "choice": "Private/proprietary",
+      "id": "PACK-FND-001-LICENCE-001",
+      "status": "SANCTIONED_FOR_FND-001"
+    },
+    {
+      "choice": "GitHub Actions",
+      "id": "PACK-FND-001-CI-001",
+      "status": "SANCTIONED_FOR_FND-001"
+    },
+    {
+      "choice": "Optional NVIDIA detection only",
+      "id": "PACK-FND-001-GPU-001",
+      "status": "SANCTIONED_FOR_FND-001"
+    }
+  ],
+  "pack_id": "FND-001",
+  "source": {
+    "document_id": "DMFP-20",
+    "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+  }
+}

@@ -1,0 +1,3529 @@
+DMF PULSE — UNCERTAINTY, SCENARIOS AND EARLY-SEASON POLICY
+==========================================================
+
+Document ID: DMFP-10
+Version: 0.9 (Sequential Decision and Robustness Architecture)
+Status: PROPOSED — READY FOR POLICY IMPLEMENTATION AND BACKTEST CALIBRATION
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 17 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Upstream inputs:
+- DMFP-02 target-season rules and configuration state
+- DMFP-03 canonical entities, model versions and decision records
+- DMFP-04 zero-cost source architecture
+- DMFP-05 deadline bundles, data quality and source timing
+- DMFP-06 market probability distributions
+- DMFP-07 lineup, availability and minutes distributions
+- DMFP-08 coherent football-event scenarios
+- DMFP-09 player and Gameweek FPL-points scenario matrices
+
+Downstream consumers:
+- DMFP-11 price change and team-value model
+- DMFP-12 squad, transfer, lineup and bench optimiser
+- DMFP-13 captaincy and chip optimiser
+- DMFP-14 rank, effective ownership and risk strategy
+- DMFP-15 backtesting, calibration and benchmarks
+- DMFP-18 decision explanations
+
+PURPOSE
+-------
+This document defines how DMF Pulse reasons and acts when the future is
+uncertain.
+
+It distinguishes and operationalises:
+
+- aleatoric uncertainty;
+- epistemic uncertainty;
+- market uncertainty;
+- model uncertainty;
+- lineup uncertainty;
+- data-source uncertainty;
+- rule uncertainty;
+- structural/regime uncertainty;
+- operational uncertainty;
+- strategic/rank uncertainty.
+
+It decides how Pulse uses:
+
+- Bayesian priors;
+- hierarchical shrinkage;
+- partial pooling;
+- sequential posterior updating;
+- model ensembles;
+- posterior predictive distributions;
+- scenario trees;
+- rolling-horizon optimisation;
+- robust optimisation;
+- robust regret;
+- conditional value at risk;
+- distributionally robust optimisation;
+- sensitivity analysis;
+- value of information;
+- value of waiting;
+- flexibility and option value;
+- team value as an instrumental state variable.
+
+The practical question is:
+
+    HOW SHOULD PULSE BEHAVE DIFFERENTLY IN GAMEWEEK 2
+    COMPARED WITH GAMEWEEK 30?
+
+The answer is not merely:
+
+    "be more conservative early."
+
+Pulse must specify:
+
+- which beliefs receive more shrinkage;
+- which observations update quickly;
+- which uncertainty is reducible;
+- which actions preserve future choices;
+- when waiting has value;
+- when team-value appreciation is worth pursuing;
+- which risks should be penalised;
+- when robustness becomes excessive caution;
+- how later rank objectives can legitimately change action utility.
+
+GOVERNING PRINCIPLE
+-------------------
+Pulse will maximise expected season decision value while preserving the ability
+to react to information.
+
+It will not confuse:
+
+- outcome randomness with ignorance;
+- low confidence with low expected points;
+- high variance with a bad player;
+- team value with FPL points;
+- one surprising match with a new permanent regime;
+- waiting with indecision;
+- worst-case optimisation with good robustness.
+
+The selected decision philosophy is:
+
+    BAYESIAN FOR BELIEFS
+    + SCENARIO-BASED FOR DEPENDENCE
+    + ROLLING-HORIZON FOR ADAPTATION
+    + ROBUSTNESS FOR MODEL/STRUCTURAL ERROR
+    + VALUE OF INFORMATION FOR TIMING
+    + EXPECTED SEASON POINTS AS THE PRIMARY ECONOMIC OBJECTIVE
+
+IMPORTANT TAXONOMY CAUTION
+--------------------------
+The aleatoric/epistemic distinction is useful but not sufficient by itself.
+
+Recent methodological work has highlighted that these labels can become
+incoherent when they are asked to represent all sources of predictive
+uncertainty.
+
+Pulse therefore uses them as a top-level explanation and maintains a more
+specific operational uncertainty ledger:
+
+- football-event randomness;
+- latent-state uncertainty;
+- parameter uncertainty;
+- model-class uncertainty;
+- regime uncertainty;
+- market disagreement;
+- source/measurement uncertainty;
+- rules uncertainty;
+- optimisation uncertainty.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require a documented architecture decision.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE DECISION POLICY
+======================================================================
+
+0.1 PRIMARY OBJECTIVE
+---------------------
+Pulse's default objective is not weekly rank and not immediate team value.
+
+It is:
+
+    maximise expected cumulative FPL points over the remaining season,
+    subject to legal state transitions,
+    with a rolling-horizon approximation to future adaptation.
+
+A practical optimisation objective at deadline t is:
+
+    maximise over action a:
+
+        E[ points_t:t+H(a, omega) ]
+      + E[ terminal_value(S_t+H) ]
+      - transfer_hit_cost(a)
+      - epistemic_regret_penalty(a)
+      - irreversibility_penalty(a)
+      - operational_risk_penalty(a)
+
+where:
+
+- omega is a coherent future scenario;
+- H is the explicit optimisation horizon;
+- terminal_value approximates value beyond H;
+- terminal state includes squad, bank, free transfers, chips, price positions,
+  fixtures, information and flexibility.
+
+Rank-specific utility is introduced later by DMFP-14, not silently mixed into
+the default points objective.
+
+0.2 ROBUSTNESS TARGET
+---------------------
+Pulse will not impose a generic penalty on all points variance.
+
+Ordinary football variance is aleatoric:
+
+- goals;
+- cards;
+- bonus ties;
+- random results.
+
+Penalising it indiscriminately can remove legitimate upside without improving
+expected season points.
+
+The robustness overlay primarily targets:
+
+- model-family disagreement;
+- structural/regime uncertainty;
+- source/data failure;
+- lineup/availability uncertainty;
+- rules ambiguity;
+- severe regret under plausible worlds;
+- irreversible commitments;
+- forced-future-transfer risk.
+
+0.3 SELECTED PRODUCTION DECISION SCORE
+--------------------------------------
+Initial production comparison:
+
+    decision_score(a)
+      =
+        posterior_expected_utility(a)
+      - lambda_regret x robust_regret(a)
+      - lambda_lockin x lock_in_cost(a)
+      - lambda_operational x operational_failure_cost(a)
+      + flexibility_value(a)
+      + information_timing_value(a)
+
+The optimiser MUST also report separately:
+
+- pure expected-points optimum;
+- robust-policy optimum;
+- highest-flexibility alternative;
+- team-value-sensitive alternative;
+- sensitivity breakpoints.
+
+No opaque weighted score may replace the decomposed evidence.
+
+0.4 ROBUST REGRET
+-----------------
+For epistemic/model world m:
+
+    regret(a,m)
+      =
+      max_b E[U(b) | m] - E[U(a) | m]
+
+Selected initial robust regret:
+
+- weighted 90th percentile of regret across plausible model/regime worlds;
+- maximum regret shown as a diagnostic;
+- worst-case action not automatically selected.
+
+This protects against choosing an action whose apparent superiority exists only
+under one fragile model.
+
+0.5 TEAM VALUE
+--------------
+Team value is an instrument for future points, not an independent prize.
+
+Pulse assigns no fixed universal value such as:
+
+    £0.1m = 0.5 points.
+
+Instead it estimates the marginal point value of money by counterfactual
+re-optimisation:
+
+    MV_budget(£0.1m)
+      =
+      expected optimal future points with £0.1m extra usable budget
+      -
+      expected optimal future points without it.
+
+This marginal value depends on:
+
+- season stage;
+- current price structure;
+- target players;
+- price brackets;
+- free transfers;
+- squad flexibility;
+- chip plan;
+- fixture horizon.
+
+0.6 EARLY-SEASON TEAM-VALUE POLICY
+----------------------------------
+Early price appreciation can be more valuable than late appreciation because:
+
+- it can expand the feasible squad for more future deadlines;
+- more transfers remain to exploit the added budget;
+- price tiers can otherwise block future moves.
+
+But price chasing is not a standalone objective.
+
+A price-motivated transfer is allowed only if:
+
+    expected football points gain/loss
+    + marginal future budget value
+    + future route/flexibility value
+    - hit cost
+    - information sacrificed by acting early
+    - reversal/lock-in risk
+
+is positive under the robust scenario set.
+
+REFERENCE-ONLY official price mechanics create an important asymmetry:
+
+- a price fall is fully reflected in selling value;
+- only half of a price rise is retained on sale, rounded down.
+
+Therefore avoiding a likely fall can have more immediate budget value than
+chasing one isolated £0.1m rise.
+
+Target-season rules must be verified.
+
+0.7 GAMEWEEK 2 POLICY
+---------------------
+Typical Gameweek 2 behaviour:
+
+- strong historical/market priors;
+- substantial hierarchical shrinkage;
+- wide epistemic and structural intervals;
+- rapid update for role, lineup and set-piece information;
+- slow update for stable ability from one match;
+- explicit new-manager/new-signing/promoted-team scenarios;
+- robust-regret and flexibility emphasis;
+- high value of rolling a transfer where the squad is healthy;
+- high value of banked cash and multiple transfer routes;
+- team-value protection considered, but not at any points cost;
+- fewer long-term irreversible commitments;
+- hits require unusually strong evidence;
+- captaincy remains based on expected distribution, not fear of variance;
+- model-confidence grade prominently affects recommendation strength.
+
+0.8 GAMEWEEK 30 POLICY
+----------------------
+Typical Gameweek 30 behaviour:
+
+- lower parameter uncertainty for established teams/players;
+- less shrinkage toward preseason priors;
+- greater weight on current-season role and market evidence;
+- shorter runway for team-value appreciation;
+- marginal budget value driven by specific affordability bottlenecks;
+- flexibility focused on blanks, doubles, chips and fixture rescheduling;
+- remaining free transfers/chips have high time-specific value;
+- irreversible long-term price structure matters less;
+- rank utility may justify controlled upside/differentiation through DMFP-14;
+- robust penalty decreases for well-identified football parameters but may rise
+  for schedule, injury or new-manager shocks;
+- waiting value depends on imminent team news and price/fixture risk, not season
+  number alone.
+
+0.9 STATE-BASED, NOT ONLY GAMEWEEK-BASED
+----------------------------------------
+Gameweek number is a useful prior for information maturity, not the whole policy.
+
+A new manager appointed in GW30 can recreate early-season structural
+uncertainty.
+
+A promoted player's role may be well understood by GW3.
+
+A long injury return in GW30 may be more uncertain than a healthy regular in
+GW2.
+
+Pulse determines policy from the uncertainty state plus season stage.
+
+======================================================================
+1. UNCERTAINTY TAXONOMY
+======================================================================
+
+1.1 ALEATORIC UNCERTAINTY
+-------------------------
+Genuine randomness conditional on the model/world.
+
+Examples:
+
+- whether a shot becomes a goal;
+- card occurrence;
+- exact bonus tie;
+- match score;
+- random tactical event.
+
+It cannot be eliminated merely by observing more historical matches, although
+its distribution can be estimated better.
+
+Primary representation:
+
+- coherent posterior predictive event and points scenarios.
+
+Decision treatment:
+
+- included in expected utility;
+- retained for upside/downside/rank analysis;
+- not automatically penalised.
+
+1.2 EPISTEMIC UNCERTAINTY
+-------------------------
+Uncertainty from limited knowledge.
+
+Examples:
+
+- player scoring ability;
+- promoted-team strength;
+- new manager's lineup;
+- injury readiness;
+- model parameters;
+- unobserved role hierarchy.
+
+It can often reduce through:
+
+- matches;
+- lineups;
+- market movement;
+- training reports;
+- better models/data.
+
+Decision treatment:
+
+- hierarchical shrinkage;
+- posterior parameter draws;
+- regret/robustness;
+- value-of-information analysis.
+
+1.3 MARKET UNCERTAINTY
+----------------------
+Uncertainty in using markets as evidence:
+
+- operator disagreement;
+- de-vig method;
+- sparse props;
+- stale/delayed quotes;
+- settlement rules;
+- exchange spread/liquidity;
+- bookmaker dependence.
+
+Representation:
+
+- DMFP-06 bounds, disagreement, source/method draws.
+
+1.4 MODEL UNCERTAINTY
+---------------------
+Uncertainty over:
+
+- Poisson versus flexible score models;
+- player-minutes model family;
+- calibration form;
+- BPS residual model;
+- price model;
+- optimisation terminal value.
+
+Representation:
+
+- predictive model ensemble;
+- model-family scenarios;
+- stacking weights;
+- challenger disagreement.
+
+1.5 LINEUP UNCERTAINTY
+----------------------
+Operationally separated because it dominates FPL outcomes:
+
+- availability;
+- start/bench/out;
+- minute limit;
+- tactical rotation;
+- formation;
+- substitutions.
+
+Lineup uncertainty contains both:
+
+- aleatoric manager choice;
+- epistemic lack of knowledge.
+
+Representation:
+
+- DMFP-07 coherent lineup/minute scenarios.
+
+1.6 DATA-SOURCE UNCERTAINTY
+---------------------------
+- missing fields;
+- conflicting reports;
+- stale data;
+- mapping ambiguity;
+- provider outage;
+- free-tier coverage;
+- manual transcription;
+- retrospective correction.
+
+Representation:
+
+- source-quality state;
+- missing reason;
+- alternative source scenarios;
+- operational failure scenarios.
+
+1.7 RULE UNCERTAINTY
+--------------------
+- target-season game not launched;
+- ambiguous official wording;
+- undocumented API behaviour;
+- mid-season correction;
+- chip/rule change.
+
+Representation:
+
+- candidate rulesets;
+- blocking state for critical rules;
+- sensitivity rescoring where nonblocking.
+
+1.8 STRUCTURAL / REGIME UNCERTAINTY
+-----------------------------------
+Uncertainty that the data-generating mechanism changed:
+
+- new manager;
+- promoted club;
+- major transfer;
+- tactical system;
+- competition/rule change;
+- post-World-Cup/preseason state;
+- injury-return regime.
+
+This is not handled adequately by only widening a normal parameter interval.
+
+Representation:
+
+- discrete regimes/model classes;
+- change-point probabilities;
+- mixture priors;
+- scenario branches.
+
+1.9 OPERATIONAL UNCERTAINTY
+---------------------------
+- source unavailable;
+- quota exhausted;
+- code/model failure;
+- missed deadline;
+- clock drift;
+- stale bundle.
+
+Treatment:
+
+- fail-closed conditions;
+- fallback policy;
+- operational penalties/chance constraints.
+
+1.10 STRATEGIC UNCERTAINTY
+--------------------------
+- future rank;
+- effective ownership;
+- rivals' actions;
+- chip timing;
+- future fixture announcements;
+- future price moves.
+
+Some belongs in later modules.
+DMFP-10 defines scenario representation and information value.
+
+1.11 UNCERTAINTY LEDGER
+-----------------------
+Every projection/decision includes:
+
+- uncertainty type;
+- affected variable;
+- representation;
+- reducible?;
+- likely information arrival;
+- deadline;
+- impact;
+- decision sensitivity;
+- mitigation.
+
+======================================================================
+2. POSTERIOR PREDICTIVE HIERARCHY
+======================================================================
+
+2.1 THREE NESTED LEVELS
+-----------------------
+Pulse distinguishes:
+
+WORLD / STRUCTURAL DRAW
+- ruleset;
+- manager regime;
+- model family;
+- promoted-team translation;
+- source reliability;
+- price mechanism regime.
+
+PARAMETER / EPISTEMIC DRAW
+- team/player abilities;
+- lineup coefficients;
+- calibration parameters;
+- market weights;
+- price parameters.
+
+OUTCOME / ALEATORIC DRAW
+- lineup choice;
+- score;
+- events;
+- FPL points;
+- price realization.
+
+2.2 NESTED SCENARIO ID
+----------------------
+Each scenario stores:
+
+- structural_world_id;
+- model_family_ids;
+- parameter_draw_id;
+- outcome_draw_id;
+- source_state_id;
+- ruleset_scenario_id;
+- probability/weight.
+
+2.3 WHY NESTING MATTERS
+-----------------------
+If all draws are flattened without labels:
+
+- model disagreement cannot be separated from match randomness;
+- robust regret cannot target epistemic worlds;
+- value of information cannot identify reducible uncertainty;
+- confidence becomes opaque.
+
+2.4 LAW OF TOTAL VARIANCE
+-------------------------
+Conceptually:
+
+    Var(Y)
+      =
+      E[Var(Y | epistemic state)]
+      +
+      Var(E[Y | epistemic state])
+
+First term:
+conditional outcome/aleatoric uncertainty.
+
+Second:
+epistemic/world uncertainty.
+
+Use this decomposition for diagnostics, while acknowledging that the split
+depends on model framing.
+
+2.5 ACTION UNCERTAINTY
+----------------------
+For each action a, compute:
+
+- mean utility;
+- within-world outcome variance;
+- between-world expected-utility variance;
+- robust regret;
+- downside by source/model world.
+
+======================================================================
+3. BAYESIAN PRIORS
+======================================================================
+
+3.1 PURPOSE
+-----------
+Priors stabilise predictions where evidence is limited and encode structured
+knowledge.
+
+3.2 PRIOR SOURCES
+-----------------
+- prior Premier League seasons;
+- recent season;
+- lower/other league translated performance;
+- bookmaker markets;
+- team/player role groups;
+- manager history;
+- promoted-club history;
+- age/position;
+- preseason evidence;
+- source reliability.
+
+3.3 NO DOUBLE COUNTING
+----------------------
+If bookmaker odds already enter the likelihood/current calibration, do not also
+encode the same odds as an independent prior without accounting for dependence.
+
+Likewise:
+
+- player historical statistics;
+- official FPL xG fields derived from those statistics;
+- public model using the same data;
+
+are not independent evidence.
+
+3.4 PRIOR PREDICTIVE CHECK
+--------------------------
+Before fitting:
+
+- simulate lineups, scores, minutes, points and prices;
+- inspect plausible ranges;
+- inspect promoted/new-manager states;
+- reject absurdly narrow/wide priors.
+
+3.5 WEAKLY INFORMATIVE, NOT VAGUE
+---------------------------------
+Use priors strong enough to regularise sparse parameters but wide enough to
+permit genuine breaks.
+
+3.6 POWER/DISCOUNTED PRIORS
+---------------------------
+Historical evidence may be discounted by:
+
+- age;
+- league transfer;
+- manager change;
+- role change;
+- injury;
+- rules change.
+
+A prior-power/discount factor is parameter-specific and validated.
+
+3.7 MARKET PRIORS
+-----------------
+Markets can anchor:
+
+- team score;
+- selected player events.
+
+They do not directly define:
+
+- minutes;
+- all assists;
+- BPS;
+- price changes.
+
+======================================================================
+4. HIERARCHICAL SHRINKAGE AND PARTIAL POOLING
+======================================================================
+
+4.1 PRINCIPLE
+-------------
+Sparse individual estimates borrow strength from related groups.
+
+Examples:
+
+- player from tactical role;
+- promoted club from promoted-club and league priors;
+- manager from league and prior-club behaviour;
+- injury return from diagnosis/position/age;
+- bookmaker weight from market-type population.
+
+4.2 ADAPTIVE SHRINKAGE
+----------------------
+The model learns the amount of pooling.
+
+Small-sample units shrink more.
+Established units with repeated evidence retain more individual signal.
+
+4.3 GROUPS
+----------
+Potential levels:
+
+- global;
+- competition;
+- season;
+- team;
+- manager;
+- manager-team regime;
+- FPL position;
+- tactical role;
+- player;
+- market/operator;
+- injury class;
+- price bracket.
+
+4.4 NEW PLAYER
+--------------
+A new signing is not assigned the league mean blindly.
+
+Prior mixture may use:
+
+- prior club/league;
+- role;
+- transfer context;
+- age;
+- markets;
+- preseason;
+- new-team depth.
+
+4.5 PROMOTED CLUB
+-----------------
+Use a distribution, not fixed promotion penalty.
+
+Borrow from:
+
+- historical promoted clubs;
+- underlying team metrics;
+- market strength;
+- squad change;
+- manager;
+- Championship/other league translation.
+
+4.6 NEW MANAGER
+---------------
+A new manager-team regime combines:
+
+- manager prior-club tendencies;
+- club squad/history;
+- league manager distribution;
+- preseason/current evidence.
+
+Uncertainty is wider than for an established regime.
+
+======================================================================
+5. PARAMETER-SPECIFIC LEARNING SPEED
+======================================================================
+
+5.1 NOT ALL PARAMETERS UPDATE EQUALLY
+-------------------------------------
+One early match can be highly informative about:
+
+- starting lineup;
+- formation;
+- set pieces;
+- penalty taker;
+- role.
+
+It is weak evidence about:
+
+- finishing ability;
+- long-run assist quality;
+- team defensive strength;
+- card propensity.
+
+5.2 FAST-LEARNING STATES
+------------------------
+- lineup role;
+- squad hierarchy;
+- tactical formation;
+- set-piece responsibility;
+- injury readiness;
+- manager selection policy.
+
+5.3 SLOW-LEARNING ABILITIES
+---------------------------
+- finishing;
+- chance creation;
+- defensive ability;
+- goalkeeper save ability;
+- long-term team strength.
+
+5.4 DYNAMIC UPDATE
+------------------
+Each parameter family has:
+
+- transition variance;
+- historical discount;
+- observation likelihood;
+- change-point sensitivity.
+
+5.5 EARLY-SEASON SURPRISE
+-------------------------
+A surprising GW1 event triggers:
+
+- posterior update;
+- change-point/regime evidence;
+- source review.
+
+It does not automatically replace the prior.
+
+5.6 CHANGE-POINT PROBABILITY
+----------------------------
+For role/team parameters:
+
+- maintain probability of old versus new regime;
+- update with lineups/events;
+- expand uncertainty while unresolved.
+
+5.7 FASTER UPDATING
+-------------------
+"Faster early-season updating" means:
+
+- run the posterior after every meaningful observation;
+- allow high-information role evidence to move rapidly;
+- reduce confidence lag;
+- retain correct prior strength for noisy statistics.
+
+It does not mean recency-chasing.
+
+======================================================================
+6. MODEL ENSEMBLES AND MODEL UNCERTAINTY
+======================================================================
+
+6.1 CANDIDATE MODELS
+--------------------
+Every major module maintains:
+
+- baseline;
+- primary;
+- challengers;
+- structural alternatives.
+
+6.2 NO WINNER-TAKE-ALL BY DEFAULT
+---------------------------------
+Selecting one model and ignoring selection uncertainty can produce
+overconfident decisions.
+
+6.3 BAYESIAN MODEL AVERAGING
+----------------------------
+BMA is a coherent option when candidate models and priors are well specified.
+
+But in the M-open setting—where no candidate is assumed true—posterior model
+probability can be unstable or overconfident.
+
+6.4 PREDICTIVE STACKING
+-----------------------
+Selected ensemble policy after enough validation:
+
+- combine predictive distributions;
+- weights learned by out-of-time proper scoring;
+- regularised;
+- time-safe;
+- optionally hierarchical by context.
+
+Yao, Vehtari, Simpson and Gelman recommend stacking predictive distributions in
+M-open settings and compare it favourably with several alternatives.
+
+6.5 HIERARCHICAL STACKING
+-------------------------
+Potential weights vary by:
+
+- early/late season;
+- manager regime;
+- market coverage;
+- player type;
+- promoted club;
+- injury return.
+
+Weights are partially pooled to avoid overfitting.
+
+6.6 INITIAL POLICY
+------------------
+Before enough data:
+
+- primary model weight: 0.60;
+- baseline/challenger mixture: remaining 0.40 according to predeclared
+  research evidence;
+- wide sensitivity;
+- no context-specific learned weights.
+
+These exact weights are provisional configuration, not scientific constants.
+
+6.7 ENSEMBLE UNCERTAINTY
+------------------------
+Report:
+
+- ensemble mean;
+- within-model uncertainty;
+- between-model mean disagreement;
+- model weights;
+- performance history.
+
+6.8 MODEL PROMOTION
+-------------------
+A model may receive more weight after prospective proper-score improvement.
+It is not removed solely due one bad Gameweek.
+
+======================================================================
+7. SCENARIO CONSTRUCTION
+======================================================================
+
+7.1 SCENARIO FAN
+----------------
+The full posterior predictive simulations from DMFP-09 form a scenario fan.
+
+7.2 SCENARIO TREE
+-----------------
+A multistage decision problem requires branching at information/decision times.
+
+Nodes represent what is known then.
+
+7.3 FPL TREE STAGES
+------------------
+Example:
+
+Stage 0 — current deadline:
+- transfer;
+- lineup;
+- captain;
+- chip.
+
+Stage 1 — current Gameweek outcomes:
+- points;
+- injuries;
+- price changes;
+- role evidence;
+- fixture news.
+
+Stage 2 — next deadline:
+- adapt transfer/lineup.
+
+Continue over selected horizon.
+
+7.4 NONANTICIPATIVITY
+---------------------
+Actions at a tree node may depend only on information revealed on the path to
+that node.
+
+They cannot depend on future outcomes.
+
+7.5 BRANCH VARIABLES
+--------------------
+Branch explicitly only on high-impact uncertainty that:
+
+- materially changes action;
+- can be revealed before a future action;
+- is not adequately represented by continuous scenario sampling.
+
+Examples:
+
+- player becomes regular starter;
+- injury return delayed;
+- manager switches formation;
+- blank/double announced;
+- price rise/fall;
+- penalty taker resolved;
+- rules clarification.
+
+7.6 NO FULL COMBINATORIAL TREE
+------------------------------
+Branching every player event causes explosion.
+
+Use:
+
+- sampled trajectories;
+- clustered latent worlds;
+- limited branch variables;
+- rolling horizon;
+- terminal value approximation.
+
+7.7 SCENARIO REDUCTION
+----------------------
+If the optimiser cannot ingest the full matrix:
+
+- preserve probability distribution and decision-relevant distances;
+- use forward selection/clustering/optimal-transport concepts;
+- validate that the selected action and objective remain stable;
+- retain rare adverse/upside scenarios.
+
+7.8 REDUCTION TARGET
+--------------------
+Reduce for decision equivalence, not merely statistical similarity.
+
+Compare:
+
+- selected transfers;
+- expected points;
+- robust regret;
+- tail probabilities;
+- covariance.
+
+7.9 TREE VERSIONING
+-------------------
+Every tree/reduced scenario set stores:
+
+- source scenario IDs;
+- clustering/reduction method;
+- probability mass;
+- decision-stage structure;
+- information revelation;
+- approximation error.
+
+======================================================================
+8. ROLLING-HORIZON POLICY
+======================================================================
+
+8.1 SELECTED APPROACH
+---------------------
+Solve a manageable multistage problem at every deadline using current
+information, execute only the immediate action, then re-solve.
+
+8.2 WHY
+-------
+Full-season scenario trees are computationally infeasible and brittle.
+
+Rolling horizon allows:
+
+- updated market data;
+- injuries;
+- fixtures;
+- price changes;
+- role information;
+- rank/chip state.
+
+8.3 HORIZON
+-----------
+Horizon is adaptive.
+
+Typical:
+
+- early season: 6–8 Gameweeks explicit plus terminal value;
+- stable middle: 5–7;
+- approaching blank/double: extend through the event;
+- late season: remaining season;
+- chip planning: include all relevant chip windows.
+
+8.4 TERMINAL VALUE
+------------------
+Avoid myopic transfers by valuing state after explicit horizon.
+
+Terminal value includes:
+
+- projected points beyond horizon;
+- bank/team-value affordability;
+- free transfers;
+- chip inventory;
+- fixture structure;
+- player contract/price position;
+- flexibility;
+- uncertainty.
+
+8.5 RE-SOLVE
+------------
+Every deadline.
+Also create interim no-action information checks where a price/news decision is
+time-sensitive.
+
+8.6 POLICY EVALUATION
+---------------------
+Backtest the rolling policy, not only one-step recommendations.
+
+======================================================================
+9. EXPECTED UTILITY
+======================================================================
+
+9.1 BASELINE
+------------
+For pure points mode:
+
+    U(points) = cumulative FPL points
+
+The default decision is risk-neutral with respect to correctly modelled FPL
+points.
+
+9.2 WHY EXPECTED POINTS
+-----------------------
+Winning a season generally requires repeatedly selecting actions with strong
+expected long-run outcomes.
+
+Research on FPL finds long-term planning and consistently good decisions in a
+noisy environment are important indicators of skill.
+
+9.3 UTILITY EXTENSIONS
+----------------------
+Later modules may include:
+
+- final-rank utility;
+- top-k probability;
+- relative ownership;
+- mini-league utility.
+
+These must be explicit.
+
+9.4 NO HIDDEN RISK AVERSION
+---------------------------
+A transfer cannot be rejected merely because its points distribution has higher
+variance if it has higher expected season points and no structural downside.
+
+9.5 CATASTROPHIC STATES
+-----------------------
+Chance constraints may protect against:
+
+- fewer than 11 likely players;
+- illegal squad;
+- no goalkeeper;
+- forced chain of hits;
+- unresolved deadline/rules;
+- excessive nonappearance.
+
+These are operational/squad failure risks, not ordinary football variance.
+
+======================================================================
+10. ROBUST OPTIMISATION
+======================================================================
+
+10.1 PURPOSE
+------------
+Robust optimisation protects against misspecified expectations.
+
+10.2 PRICE OF ROBUSTNESS
+------------------------
+Bertsimas and Sim show how budgeted uncertainty can trade nominal objective
+performance for protection without assuming every coefficient simultaneously
+takes its worst value.
+
+This motivates a configurable uncertainty budget rather than full worst-case
+FPL planning.
+
+10.3 BUDGETED PLAYER UNCERTAINTY
+-------------------------------
+For uncertain expected player contributions:
+
+- each can deviate within a calibrated epistemic band;
+- uncertainty budget Gamma limits how many adverse deviations are assumed
+  jointly.
+
+Use carefully because player errors are correlated.
+
+10.4 CORRELATION
+----------------
+Prefer scenario-induced or factor-based uncertainty sets over independent boxes.
+
+Examples:
+
+- one team attack downgrade affects several players;
+- manager rotation affects role group;
+- source outage affects many markets.
+
+10.5 SELECTED PRODUCTION ROBUSTNESS
+-----------------------------------
+Initial production:
+
+1. posterior expected utility;
+2. robust-regret penalty across model/regime worlds;
+3. chance constraints for squad failure;
+4. action sensitivity report;
+5. optional budgeted uncertainty challenger.
+
+10.6 NOT SELECTED AS DEFAULT
+----------------------------
+Pure maximin/worst-case points.
+
+Reason:
+
+- unrealistically pessimistic;
+- can select low-upside teams;
+- all uncertainty extremes rarely co-occur;
+- may sacrifice too many expected points.
+
+10.7 ROBUST FEASIBILITY
+-----------------------
+Legal/budget feasibility is deterministic under each price/state scenario.
+Actions must remain implementable where promised.
+
+10.8 PRICE OF ROBUSTNESS REPORT
+-------------------------------
+For robustness level r:
+
+- expected-points loss versus nominal;
+- regret reduction;
+- downside protection;
+- selected action changes;
+- failure probability.
+
+No robustness parameter is approved without this frontier.
+
+======================================================================
+11. DISTRIBUTIONALLY ROBUST OPTIMISATION
+======================================================================
+
+11.1 PURPOSE
+------------
+The empirical posterior/scenario probabilities themselves may be wrong.
+
+DRO optimises against a set of distributions around the nominal forecast.
+
+11.2 WASSERSTEIN AMBIGUITY
+--------------------------
+Esfahani and Kuhn show that data-driven DRO over Wasserstein balls can have
+finite-sample guarantees and tractable reformulations in many settings.
+
+11.3 FPL APPLICATION
+--------------------
+An ambiguity set may perturb:
+
+- scenario probabilities;
+- player mean distributions;
+- correlated team/regime outcomes;
+- price paths.
+
+11.4 RADIUS
+-----------
+Radius cannot be arbitrary.
+
+Candidates:
+
+- bootstrap;
+- held-out calibration error;
+- concentration result;
+- prospective decision performance;
+- season stage.
+
+11.5 EARLY SEASON
+-----------------
+Larger ambiguity set due:
+
+- sparse current-season data;
+- structural change;
+- source/model uncertainty.
+
+11.6 LATE SEASON
+----------------
+Smaller for stable player/team parameters, but not necessarily for:
+
+- new manager;
+- injury return;
+- blank/double schedule;
+- new signing.
+
+11.7 PRODUCTION STATUS
+----------------------
+CHALLENGER, not initial default.
+
+Promotion requires:
+
+- tractability;
+- interpretable radius;
+- better out-of-time utility/regret;
+- no excessive conservatism;
+- stable selected actions.
+
+======================================================================
+12. CONDITIONAL VALUE AT RISK
+======================================================================
+
+12.1 DEFINITION
+--------------
+For loss L, CVaR_beta is the expected loss in the worst beta-tail beyond the
+corresponding quantile, under standard conditions.
+
+Rockafellar and Uryasev provide a practical optimisation representation.
+
+12.2 FPL USE
+------------
+Potential use:
+
+- downside of a transfer plan;
+- risk of a severely depleted squad;
+- tail of points shortfall against a baseline;
+- rank utility later.
+
+12.3 NOT A DEFAULT POINTS PENALTY
+--------------------------------
+CVaR of weekly FPL points can over-penalise legitimate upside.
+
+Use primarily for:
+
+- operational/squad-availability tail;
+- robust alternative reporting;
+- explicit rank-risk mode.
+
+12.4 LOSS DEFINITION
+--------------------
+Never use raw negative points without context.
+
+Candidate loss:
+
+    loss_s(a)
+      =
+      points_s(baseline plan)
+      - points_s(a)
+
+This measures action regret/shortfall relative to a feasible baseline.
+
+12.5 CONFIGURATION
+------------------
+- tail level;
+- horizon;
+- baseline;
+- weight;
+- mode;
+- season stage.
+
+======================================================================
+13. SENSITIVITY ANALYSIS
+======================================================================
+
+13.1 PURPOSE
+------------
+A decision is fragile if small plausible changes reverse it.
+
+13.2 ONE-WAY
+------------
+Vary:
+
+- p_start;
+- minutes;
+- team goals;
+- price rise/fall;
+- fixture;
+- model weight;
+- market confidence;
+- future budget value.
+
+13.3 MULTIWAY
+-------------
+- player unavailable + rival starts;
+- new manager formation;
+- team attack downgrade;
+- blank fixture announcement;
+- source failure.
+
+13.4 DECISION-SWITCH THRESHOLD
+------------------------------
+Report:
+
+- parameter value where action changes;
+- current posterior probability of crossing it;
+- information likely before decision;
+- value of resolving it.
+
+13.5 TORNADO
+------------
+Rank uncertain inputs by change in action utility/regret.
+
+13.6 GLOBAL SENSITIVITY
+-----------------------
+For nonlinear decisions, use:
+
+- scenario-based variance decomposition;
+- Sobol/Shapley effects where computationally justified;
+- EVPPI as decision-focused alternative.
+
+13.7 SHADOW PRICES
+------------------
+Optimiser dual/marginal values:
+
+- £0.1 budget;
+- one free transfer;
+- club slot;
+- position slot;
+- chip;
+- bench reliability.
+
+Integer optimisation dual values can be unstable; validate through finite
+counterfactual re-optimisation.
+
+13.8 STABILITY SCORE
+--------------------
+Action stability:
+
+- fraction of posterior/model worlds selecting action;
+- utility gap;
+- switch probability;
+- regret distribution.
+
+======================================================================
+14. VALUE OF INFORMATION
+======================================================================
+
+14.1 PRINCIPLE
+--------------
+Uncertainty matters for decisions only when resolving it can change action or
+utility.
+
+14.2 EXPECTED VALUE OF PERFECT INFORMATION
+------------------------------------------
+For uncertain state theta:
+
+    EVPI
+      =
+      E_theta [ max_a E[U(a) | theta] ]
+      -
+      max_a E_theta [ U(a) ]
+
+EVPI is an upper bound on the value of any information about theta.
+
+14.3 EXPECTED VALUE OF SAMPLE INFORMATION
+-----------------------------------------
+For possible observation Y:
+
+    EVSI
+      =
+      E_Y [ max_a E[U(a) | Y] ]
+      -
+      max_a E[U(a)]
+
+14.4 PARTIAL PERFECT INFORMATION
+--------------------------------
+EVPPI for:
+
+- player availability;
+- new manager formation;
+- penalty taker;
+- fixture schedule;
+- price change;
+- model family.
+
+This identifies which uncertainty is decision-critical.
+
+14.5 INFORMATION COST
+---------------------
+Net information value:
+
+    net_EVSI
+      =
+      EVSI
+      - acquisition/time cost
+      - price-move risk
+      - deadline execution risk
+      - lost-option cost
+
+14.6 WAIT OR ACT
+----------------
+Wait when:
+
+    expected value of future information
+    + preserved flexibility
+
+exceeds:
+
+    expected price/budget loss
+    + points lost by delay
+    + execution risk.
+
+14.7 EXAMPLE
+-------------
+A doubtful transfer target may rise tonight before tomorrow's press conference.
+
+Pulse compares:
+
+ACT NOW:
+- price protected;
+- injury/role risk;
+- irreversible transfer.
+
+WAIT:
+- possible £0.1 loss;
+- improved availability evidence;
+- preserved transfer.
+
+No generic "always wait for press conferences" or "always beat price rises"
+rule is allowed.
+
+14.8 VALUE OF INFORMATION REPORT
+--------------------------------
+For each close decision:
+
+- uncertainty;
+- EVPI/EVPPI estimate;
+- next information event;
+- time;
+- expected action switch;
+- price risk;
+- recommendation: ACT / WAIT / NO MATERIAL INFORMATION VALUE.
+
+14.9 DATA ACQUISITION
+---------------------
+VOI can prioritize:
+
+- manual odds capture;
+- press conference review;
+- lineup-source verification;
+- provider quota;
+- model research.
+
+======================================================================
+15. VALUE OF WAITING AND FLEXIBILITY
+======================================================================
+
+15.1 REAL-OPTION ANALOGY
+------------------------
+A transfer is partly irreversible:
+
+- free transfer consumed;
+- previous purchase price lost;
+- future reversal costs another transfer;
+- price movement can close/reopen routes.
+
+Waiting can preserve an option to adapt after information arrives.
+
+15.2 WAITING IS NOT FREE
+------------------------
+Costs:
+
+- price change;
+- injury to current player;
+- missed points;
+- deadline risk;
+- lost free-transfer capacity;
+- lost team-value appreciation.
+
+15.3 FLEXIBILITY TYPES
+----------------------
+SQUAD FLEXIBILITY:
+multiple valid starters/bench.
+
+PRICE FLEXIBILITY:
+bank and price points that support alternative transfers.
+
+TRANSFER FLEXIBILITY:
+free transfers and no forced moves.
+
+FORMATION FLEXIBILITY:
+multiple legal formations without hits.
+
+CLUB-SLOT FLEXIBILITY:
+open slots for high-value teams.
+
+CHIP FLEXIBILITY:
+uncommitted chips and routes to planned weeks.
+
+INFORMATION FLEXIBILITY:
+ability to wait for evidence.
+
+15.4 FLEXIBILITY VALUE
+----------------------
+Define:
+
+    Flex(a)
+      =
+      E_future_info [
+        max_future_actions U
+      ]
+      -
+      max_fixed_future_plan E[U]
+
+or approximate by comparing adaptive re-optimisation with frozen plan.
+
+15.5 FEASIBLE-ACTION BREADTH
+----------------------------
+Supplementary metric:
+
+- number/weighted quality of plausible future actions;
+- affordability range;
+- transfer distances;
+- club/position bottlenecks.
+
+Count alone is not value; weight by future utility.
+
+15.6 PLAYER FLEXIBILITY
+-----------------------
+A player can provide option value through:
+
+- stable minutes;
+- multiple future fixtures;
+- price bracket;
+- easy upgrade/downgrade route;
+- low forced-transfer risk;
+- positional scarcity.
+
+This does not mean "versatile real-world player" unless reflected in FPL state.
+
+======================================================================
+16. TEAM VALUE AND BUDGET POLICY
+======================================================================
+
+16.1 STATE VARIABLES
+--------------------
+- squad market value;
+- bank;
+- player purchase prices;
+- selling prices;
+- unrealised price gains;
+- expected price paths;
+- affordability set.
+
+16.2 OFFICIAL REFERENCE MECHANICS
+---------------------------------
+Official 2025/26 guidance states:
+
+- prices may change by £0.1m per day according to transfer activity;
+- a fall is fully passed to selling value;
+- only half a rise is retained, rounded down to £0.1m.
+
+Target 2026/27 must be verified.
+
+16.3 TEAM VALUE IS NOT CASH
+---------------------------
+Reported squad value can overstate usable budget because selling-value rules
+retain only part of rises.
+
+Use:
+
+- liquidation selling value;
+- bank;
+- ownership-spell purchase price;
+- route-specific affordability.
+
+16.4 MARGINAL BUDGET VALUE
+--------------------------
+Counterfactual finite difference:
+
+    v_money(delta)
+      =
+      V*(state with delta extra bank)
+      -
+      V*(state)
+
+Evaluate delta = £0.1m and relevant increments.
+
+16.5 EARLY-SEASON RUNWAY
+------------------------
+Early extra budget may be more valuable because more future decisions remain.
+
+But its marginal value can be zero if:
+
+- optimal squad is already affordable;
+- price structure has no useful upgrade;
+- future price paths offset it;
+- transfer routes are constrained elsewhere.
+
+16.6 LATE-SEASON VALUE
+----------------------
+By GW30:
+
+- fewer deadlines remain;
+- prices may be less useful;
+- budget matters only for specific desired moves/chips;
+- points and fixture timing dominate.
+
+16.7 PRICE-CHASING GATE
+-----------------------
+Transfer for expected price movement only when:
+
+- price probability sufficiently strong;
+- selling-price impact is real;
+- future budget shadow value positive;
+- no high-value information is imminent;
+- transfer remains points-competitive;
+- no hit or lock-in creates excessive regret.
+
+16.8 HITS FOR TEAM VALUE
+------------------------
+No categorical ban, but require:
+
+    expected discounted future point value of extra usable budget
+    + immediate points value
+    > 4-point hit
+      + lost free transfer
+      + uncertainty/lock-in cost.
+
+In most ordinary cases, budget alone is unlikely to clear this hurdle.
+
+16.9 PRICE-DROP AVOIDANCE
+-------------------------
+A predicted fall can be more directly damaging than one predicted rise is
+beneficial because the full fall affects selling value while profit requires
+larger rises.
+
+Still account for:
+
+- current player's expected points;
+- possibility of price-model error;
+- value of waiting;
+- replacement risk.
+
+16.10 TEAM-VALUE OBJECTIVE ERROR
+--------------------------------
+Prohibited:
+
+    maximise team value.
+
+Selected:
+
+    maximise expected season points with team value embedded through future
+    affordability and terminal state.
+
+======================================================================
+17. EARLY-SEASON STRUCTURAL POLICY
+======================================================================
+
+17.1 EARLY-SEASON WINDOW
+------------------------
+Default:
+
+- preseason through GW5: high structural uncertainty;
+- GW6–10: transition;
+- state-specific overrides.
+
+This is configuration, not a universal law.
+
+17.2 PRIOR STRENGTH
+-------------------
+Greater shrinkage toward:
+
+- market team strength;
+- historical ability;
+- role/manager priors;
+- promoted-club distributions.
+
+17.3 INTERVAL WIDTH
+------------------
+Wider:
+
+- p_start;
+- team goals;
+- player shares;
+- BPS residual;
+- price changes;
+- model weights;
+- fixture/manager regimes.
+
+17.4 CONFIDENCE CAPS
+--------------------
+Examples:
+
+- new manager with <3 competitive lineups cannot receive confidence A for role;
+- new player with no target-league competitive minutes confidence capped;
+- promoted team strength remains structurally uncertain;
+- early rules/source changes cap confidence.
+
+17.5 FLEXIBILITY
+----------------
+Early squads prefer, all else equal:
+
+- fewer likely forced transfers;
+- reliable bench;
+- price routes;
+- bank where marginal option value is positive;
+- open club slots;
+- rollable transfer state.
+
+17.6 LONG-TERM COMMITMENTS
+--------------------------
+Require a higher robust evidence margin for:
+
+- expensive low-liquidity price bracket;
+- double/triple team exposure under uncertain manager;
+- injury-return player;
+- one-week bandwagon;
+- player requiring multiple future transfers to exit.
+
+17.7 HITS
+---------
+Early hits face:
+
+- 4-point immediate cost;
+- higher model uncertainty;
+- high reversal probability.
+
+Use only when robust season utility improves, not because an observed GW1 score
+was surprising.
+
+17.8 CAPTAINCY
+----------------
+Do not make captaincy "safe" by automatically avoiding variance.
+
+Use the full expected points/rank utility.
+Lineup uncertainty and catastrophic nonappearance are real risks; ordinary
+goal variance is not a reason to avoid a superior expected captain.
+
+17.9 MODEL UPDATE FREQUENCY
+---------------------------
+Update after:
+
+- every competitive lineup;
+- significant market move;
+- injury/training evidence;
+- manager formation;
+- set-piece evidence;
+- price data.
+
+17.10 ALERT
+-----------
+Early-season "structural surprise":
+
+- actual lineup low posterior probability;
+- role/tactic outside scenario set;
+- promoted-team performance outside interval;
+- repeated source disagreement.
+
+Triggers scenario/model review.
+
+======================================================================
+18. MID-SEASON POLICY
+======================================================================
+
+18.1 GW6–24 TYPICAL
+-------------------
+- current-season evidence dominates more;
+- shrinkage remains;
+- model weights learned cautiously;
+- narrower structural intervals;
+- expected points carry more weight relative to flexibility;
+- price value remains instrumental;
+- rolling horizon focuses fixtures and chips;
+- robust regret still applied to injury/role uncertainty.
+
+18.2 ESTABLISHED REGULAR
+------------------------
+High confidence possible if:
+
+- manager stable;
+- lineup history;
+- market/source agreement;
+- no injury regime.
+
+18.3 NO COMPLACENCY
+-------------------
+Regime changes reset uncertainty.
+
+======================================================================
+19. LATE-SEASON POLICY
+======================================================================
+
+19.1 GW25–31
+------------
+Common emphasis:
+
+- blank/double uncertainty;
+- fixture announcements;
+- chip routes;
+- free-transfer inventory;
+- short-to-medium horizon;
+- schedule VOI;
+- team value only where it enables planned structure.
+
+19.2 GW32–38
+------------
+- horizon becomes remaining season;
+- terminal value fades to zero at GW38;
+- unused chips/free transfers expire;
+- team-value appreciation after final use has no value;
+- immediate/remaining points dominate;
+- rank utility may alter variance preferences explicitly;
+- information timing remains important;
+- long-term lock-in penalty approaches zero where no future reversal needed.
+
+19.3 GW30 EXAMPLE
+-----------------
+A GW30 transfer may rationally be more aggressive than GW2 if:
+
+- the role is well estimated;
+- only eight/nine weeks remain;
+- fixture/chip path is clear;
+- team value has little later value;
+- rank utility rewards upside.
+
+It may be more conservative if:
+
+- blank/double schedule unresolved;
+- new manager;
+- injury return;
+- transfer would destroy a valuable chip route.
+
+======================================================================
+20. GAMEWEEK 2 VERSUS GAMEWEEK 30
+======================================================================
+
+20.1 BELIEFS
+------------
+GW2:
+- prior-heavy;
+- one current match is limited evidence;
+- structural mixture wide;
+- promoted/new-manager uncertainty high.
+
+GW30:
+- season data usually dominant;
+- narrower for established states;
+- structural reset only where new shocks exist.
+
+20.2 TRANSFER HORIZON
+---------------------
+GW2:
+- 36+ future deadlines;
+- reversal and price-route consequences large;
+- terminal value/flexibility material.
+
+GW30:
+- short remaining horizon;
+- immediate fixture/chip points larger share;
+- long-run price growth has little value.
+
+20.3 TEAM VALUE
+---------------
+GW2:
+- positive marginal value can compound through future affordability;
+- price fall/rise probabilities matter;
+- still not worth sacrificing robust points blindly.
+
+GW30:
+- value near zero unless it unlocks a specific remaining move;
+- do not chase abstract squad value.
+
+20.4 WAITING
+------------
+GW2:
+- information about manager roles and new players can have high value;
+- price movement can also be rapid;
+- formal EVSI trade-off.
+
+GW30:
+- information about blanks, doubles, injury and chip route can be high value;
+- less role-learning for established players.
+
+20.5 ROBUSTNESS
+---------------
+GW2:
+- higher regret penalty for structural/model worlds;
+- larger ambiguity set;
+- action stability matters.
+
+GW30:
+- lower model ambiguity for stable players;
+- robustness focuses schedule/injury;
+- rank utility may permit targeted risk.
+
+20.6 FLEXIBILITY
+----------------
+GW2:
+- broad route value;
+- roll transfer frequently valuable;
+- bank/bench/price structure important.
+
+GW30:
+- flexibility means exact blank/double/chip route;
+- unused flexibility soon expires.
+
+20.7 UPDATING
+-------------
+GW2:
+- fast for role;
+- slow for ability;
+- confidence cap.
+
+GW30:
+- mature estimates update normally;
+- structural shocks still update fast.
+
+20.8 PRACTICAL DEFAULT
+----------------------
+GW2 default recommendation threshold:
+require robust expected-season improvement and low reversal probability.
+
+GW30 default:
+require expected remaining-season/rank utility improvement; tolerate more
+commitment where no long horizon remains.
+
+======================================================================
+21. DECISION MODES
+======================================================================
+
+21.1 EXPECTED_POINTS
+--------------------
+Maximise posterior expected remaining points.
+
+Default benchmark.
+
+21.2 ROBUST_POINTS
+------------------
+Expected points minus robust-regret/lock-in penalties.
+
+Default early-season production recommendation.
+
+21.3 FLEXIBILITY
+----------------
+Maximise near-optimal points plus option/flexibility.
+
+Used for close decisions.
+
+21.4 TEAM_VALUE_AWARE
+---------------------
+Expected points plus modelled marginal future budget value.
+
+Never pure team value.
+
+21.5 DOWNSIDE_PROTECTED
+-----------------------
+Expected utility with CVaR/chance constraints.
+
+Used for severe squad fragility.
+
+21.6 RANK_AWARE
+----------------
+DMFP-14 objective.
+Not active by default in DMFP-10.
+
+21.7 OUTPUT
+-----------
+Compare all relevant modes and state why the selected action wins.
+
+======================================================================
+22. DECISION CONFIDENCE AND ACTION GATES
+======================================================================
+
+22.1 CONFIDENCE IS NOT EXPECTED VALUE
+-------------------------------------
+High-EV action can be low confidence.
+Low-EV action can be high confidence.
+
+Report separately.
+
+22.2 ACTION CONFIDENCE DIMENSIONS
+---------------------------------
+- utility gap;
+- probability action is optimal;
+- robust regret;
+- switch probability;
+- source/model confidence;
+- information arrival;
+- reversibility;
+- execution risk.
+
+22.3 GATES
+----------
+AUTO-RECOMMEND:
+strong utility gap, stable, legal, source/rules healthy.
+
+RECOMMEND_WITH_CAUTION:
+positive but model-sensitive.
+
+WAIT_FOR_INFORMATION:
+net EVSI positive and execution feasible.
+
+HUMAN_REVIEW:
+structural/rule/source conflict.
+
+NO_ACTION/ROLL:
+no alternative robustly clears cost.
+
+BLOCKED:
+rules/deadline/manager state invalid.
+
+22.4 TRANSFER HIT GATE
+----------------------
+Require:
+
+- posterior expected gain > hit;
+- robust lower comparison acceptable;
+- reversal probability;
+- free-transfer value;
+- team-value/flexibility accounted;
+- no imminent higher-VOI information ignored.
+
+======================================================================
+23. SENSITIVITY REPORT
+======================================================================
+
+For every major decision:
+
+- selected action;
+- expected points/utility;
+- robust score;
+- regret distribution;
+- probability optimal;
+- second-best gap;
+- p_start switch threshold;
+- minutes switch threshold;
+- price switch threshold;
+- fixture/model switch;
+- team-value marginal value;
+- EVPI/EVSI;
+- flexibility value;
+- early/late policy mode;
+- recommended action timing.
+
+======================================================================
+24. UNCERTAINTY OUTPUT CONTRACT
+======================================================================
+
+24.1 PLAYER
+-----------
+- aleatoric_points_variance;
+- epistemic_mean_variance;
+- model_disagreement;
+- lineup_uncertainty;
+- market_uncertainty;
+- source_uncertainty;
+- rule_uncertainty;
+- structural_regime_uncertainty;
+- total predictive distribution;
+- confidence.
+
+24.2 ACTION
+-----------
+- expected_utility;
+- expected_points;
+- robust_utility;
+- robust_regret;
+- worst_model_regret;
+- CVaR_shortfall;
+- probability_optimal;
+- action_switch_probability;
+- flexibility_value;
+- information_value;
+- team_value_contribution;
+- irreversibility_cost;
+- sensitivity thresholds.
+
+24.3 SCENARIO
+-------------
+- world/model/parameter/outcome IDs;
+- probability;
+- information revelation stage;
+- rules/source state;
+- action policy.
+
+24.4 EXAMPLE
+-------------
+{
+  "decision_uncertainty_id": "uuid",
+  "decision_run_id": "uuid",
+  "action_id": "uuid",
+  "season_stage": "EARLY",
+  "policy_mode": "ROBUST_POINTS",
+
+  "expected_points_horizon": 42.6,
+  "terminal_value_points": 18.4,
+  "expected_total_utility": 61.0,
+
+  "robust_regret_p90": 1.25,
+  "worst_model_regret": 3.80,
+  "lock_in_cost": 0.45,
+  "flexibility_value": 0.62,
+  "information_value": 0.31,
+  "team_value_contribution": 0.22,
+
+  "probability_optimal": 0.58,
+  "action_switch_probability": 0.27,
+
+  "uncertainty_breakdown": {
+    "aleatoric": 0.54,
+    "parameter": 0.13,
+    "model": 0.11,
+    "lineup": 0.12,
+    "market": 0.04,
+    "source": 0.02,
+    "structural": 0.04
+  },
+
+  "recommendation": "WAIT_FOR_INFORMATION",
+  "next_information_event": "MANAGER_PRESS_CONFERENCE",
+  "latest_safe_action_time_utc": "..."
+}
+
+======================================================================
+25. CONFIGURATION
+======================================================================
+
+config/uncertainty/
+  taxonomy.yaml
+  priors.yaml
+  shrinkage.yaml
+  update_rates.yaml
+  structural_regimes.yaml
+  ensemble.yaml
+  scenario_tree.yaml
+  scenario_reduction.yaml
+  rolling_horizon.yaml
+  robust_regret.yaml
+  robust_optimization.yaml
+  distributional_robustness.yaml
+  cvar.yaml
+  value_of_information.yaml
+  flexibility.yaml
+  team_value_policy.yaml
+  season_stage.yaml
+  action_gates.yaml
+  confidence.yaml
+  sensitivity.yaml
+
+No hard-coded:
+
+- GW2/GW30 penalty;
+- universal risk aversion;
+- fixed value of £0.1m;
+- fixed model weights;
+- arbitrary DRO radius;
+- worst-case all-player downgrade.
+
+======================================================================
+26. IMPLEMENTATION ARCHITECTURE
+======================================================================
+
+26.1 PACKAGE
+------------
+src/dmf_pulse/uncertainty/
+
+- taxonomy.py
+- posterior_decomposition.py
+- priors.py
+- updating.py
+- change_points.py
+- model_ensemble.py
+- stacking.py
+- scenario_fan.py
+- scenario_tree.py
+- scenario_reduction.py
+- rolling_horizon.py
+- expected_utility.py
+- robust_regret.py
+- budgeted_robustness.py
+- dro.py
+- cvar.py
+- value_of_information.py
+- flexibility.py
+- team_value.py
+- sensitivity.py
+- season_policy.py
+- confidence.py
+- explain.py
+- schemas.py
+
+26.2 PURE/CORE INTERFACES
+-------------------------
+decompose_uncertainty(nested_scenarios)
+
+update_posterior(prior, evidence, update_policy)
+
+combine_predictive_models(model_distributions, weights)
+
+build_scenario_tree(scenario_fan, revelation_policy)
+
+reduce_scenarios(full_set, decision_metric, target_size)
+
+evaluate_expected_utility(actions, scenarios)
+
+calculate_robust_regret(actions, epistemic_worlds)
+
+calculate_cvar_shortfall(actions, scenarios, baseline, beta)
+
+calculate_value_of_information(decision, possible_observation)
+
+estimate_flexibility_value(state, action, future_policy)
+
+estimate_marginal_budget_value(state, delta)
+
+apply_season_stage_policy(state, uncertainty)
+
+run_sensitivity(decision, uncertain_inputs)
+
+26.3 SOLVER SEPARATION
+----------------------
+DMFP-10 computes uncertainty/decision quantities.
+DMFP-12 owns the FPL mixed-integer/transfer optimisation formulation.
+
+26.4 REPRODUCIBILITY
+--------------------
+Record:
+
+- uncertainty-policy version;
+- scenario set/tree;
+- model weights;
+- prior version;
+- robust parameters;
+- value-function version;
+- random seed;
+- code commit.
+
+======================================================================
+27. CALIBRATION AND VALIDATION
+======================================================================
+
+27.1 UNCERTAINTY CALIBRATION
+----------------------------
+Check:
+
+- predictive interval coverage;
+- posterior rank/PIT;
+- p_start/points calibration;
+- between-model disagreement versus realised error;
+- confidence-grade performance.
+
+27.2 DECOMPOSITION VALIDATION
+-----------------------------
+An uncertainty component is useful if higher values correspond to:
+
+- greater forecast error;
+- greater action switching;
+- greater value of information;
+- greater regret.
+
+27.3 ENSEMBLE
+-------------
+Evaluate:
+
+- log score;
+- CRPS/RPS;
+- calibration;
+- subgroup;
+- weight stability;
+- primary model versus stacking/BMA/equal ensemble.
+
+27.4 ROBUST POLICY
+------------------
+Compare out-of-time:
+
+- nominal expected points;
+- robust points;
+- maximin;
+- budgeted robustness;
+- regret;
+- CVaR;
+- DRO challenger.
+
+Metrics:
+
+- cumulative points;
+- hit count;
+- forced-transfer count;
+- action regret;
+- downside;
+- team value;
+- rank utility later.
+
+27.5 EARLY-SEASON
+-----------------
+Separate GW1–5 backtest/prospective evaluation.
+
+27.6 TEAM VALUE
+----------------
+Evaluate:
+
+- marginal value estimates;
+- price-chasing transfers;
+- points enabled by extra budget;
+- price protection;
+- reversals;
+- terminal state.
+
+27.7 VALUE OF INFORMATION
+-------------------------
+Backtest decisions where Pulse chose ACT versus WAIT.
+
+Measure:
+
+- realised information;
+- action switch;
+- price cost;
+- points/utility;
+- EVSI calibration.
+
+27.8 POLICY, NOT HINDSIGHT
+-------------------------
+Evaluate the full sequential policy.
+Do not judge one transfer solely from the player's realised score.
+
+======================================================================
+28. BASELINES AND ABLATIONS
+======================================================================
+
+28.1 BASELINES
+--------------
+B0:
+Expected points only, one model.
+
+B1:
+Expected points plus arbitrary variance penalty.
+
+B2:
+Always maximise team value early.
+
+B3:
+Always wait for press conference.
+
+B4:
+Always beat predicted price rise.
+
+B5:
+Full worst-case maximin.
+
+B6:
+No hierarchical shrinkage.
+
+B7:
+Winner-take-all model selection.
+
+28.2 ABLATIONS
+--------------
+- no structural regime;
+- no model ensemble;
+- no robust regret;
+- no flexibility;
+- no terminal value;
+- no team-value state;
+- no VOI;
+- no scenario tree;
+- fixed horizon.
+
+28.3 EXPECTED RESULT
+--------------------
+Pulse should demonstrate that its nuanced policy outperforms simple slogans,
+not merely describe them.
+
+======================================================================
+29. OPERATIONAL EARLY-SEASON CHECKLIST
+======================================================================
+
+Before each early deadline:
+
+1. Confirm target rules are active.
+2. Confirm data/source health.
+3. Update every lineup/manager regime.
+4. Identify one-match overreaction risk.
+5. Check promoted/new-player prior.
+6. Refit fast-learning role states.
+7. Keep slow ability parameters shrunk.
+8. Recompute model ensemble.
+9. Update price probabilities.
+10. Estimate marginal £0.1m value.
+11. Calculate EVSI of imminent information.
+12. Compare nominal/robust/flexible plans.
+13. inspect action-switch thresholds.
+14. assess transfer reversal probability.
+15. prefer roll/no action when no robust gain.
+16. document uncertainty and next update.
+
+======================================================================
+30. OPERATIONAL LATE-SEASON CHECKLIST
+======================================================================
+
+1. Resolve fixture/blank/double scenarios.
+2. Include remaining chip horizon.
+3. Set terminal value to remaining-season reality.
+4. Reduce team-value weight unless affordability bottleneck exists.
+5. Update rank utility through DMFP-14.
+6. Recalculate value of free transfer before expiry.
+7. identify new manager/injury structural reset.
+8. compare immediate points versus option to wait.
+9. stress-test captain/chip tails.
+10. execute only with deadline/source health.
+
+======================================================================
+31. ALERTS AND MONITORING
+======================================================================
+
+P0:
+- rule uncertainty blocking;
+- scenario tree anticipates future data;
+- probability weights invalid;
+- optimiser action infeasible;
+- deadline/source bundle invalid.
+
+P1:
+- structural surprise;
+- model disagreement spike;
+- robust and nominal actions diverge materially;
+- action highly unstable;
+- team-value marginal estimate missing for price-driven action;
+- VOI recommends waiting but execution window inadequate.
+
+P2:
+- uncertainty calibration drift;
+- ensemble weight concentration;
+- scenario-reduction decision error;
+- price/flexibility model instability.
+
+Weekly/season metrics:
+
+- uncertainty decomposition;
+- confidence coverage;
+- action stability;
+- regret;
+- expected/realised information value;
+- robust price;
+- team-value-enabled points;
+- early versus late policy performance.
+
+======================================================================
+32. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+32.1 CODEX MAY
+-------------
+- implement uncertainty decomposition;
+- build nested scenarios/trees;
+- implement stacking;
+- calculate regret/CVaR/VOI;
+- implement scenario reduction;
+- build policy comparisons;
+- estimate marginal budget/flexibility through re-optimisation;
+- create reports/tests.
+
+32.2 CODEX MUST NOT
+-------------------
+- penalise all points variance by default;
+- treat epistemic and aleatoric uncertainty as interchangeable;
+- hard-code team value as points;
+- maximise team value as the main objective;
+- assume one GW changes stable ability completely;
+- apply one update speed to all parameters;
+- build a scenario tree with future leakage;
+- select worst-case all-player outcomes as default;
+- choose a DRO radius arbitrarily;
+- use future outcomes to set ensemble weights;
+- treat model weights as independent evidence;
+- hide nominal/robust trade-off;
+- act early solely to beat a £0.1m rise without VOI comparison;
+- use rank utility before DMFP-14 explicitly requests it.
+
+32.3 PULL REQUEST
+-----------------
+Every policy change states:
+
+- uncertainty target;
+- mathematical definition;
+- decision rationale;
+- configuration;
+- early/late effect;
+- backtest;
+- price of robustness;
+- calibration;
+- rollback.
+
+======================================================================
+33. RISK REGISTER
+======================================================================
+
+R-10-001 — All variance penalised
+Probability: High
+Impact: Critical
+Mitigation:
+target epistemic/regret, not aleatoric variance.
+
+R-10-002 — Aleatoric/epistemic split treated as absolute
+Probability: Medium
+Impact: Medium
+Mitigation:
+operational ledger and nested scenarios.
+
+R-10-003 — One GW overrules prior
+Probability: High
+Impact: Critical
+Mitigation:
+parameter-specific hierarchical update.
+
+R-10-004 — Slow role updating misses manager change
+Probability: Medium
+Impact: High
+Mitigation:
+fast state/change-point model.
+
+R-10-005 — Historical data overweights old manager
+Probability: High
+Impact: High
+Mitigation:
+regime priors.
+
+R-10-006 — New player confidence too high
+Probability: High
+Impact: High
+Mitigation:
+partial pooling/confidence cap.
+
+R-10-007 — Model ensemble double-counts similar models
+Probability: High
+Impact: High
+Mitigation:
+dependence, stacking and diversity audit.
+
+R-10-008 — Ensemble weights use future data
+Probability: Medium
+Impact: Critical
+Mitigation:
+as-of walk-forward weights.
+
+R-10-009 — Scenario tree explodes
+Probability: High
+Impact: High
+Mitigation:
+branch high-impact learnable states only.
+
+R-10-010 — Scenario reduction drops rare important state
+Probability: Medium
+Impact: Critical
+Mitigation:
+tail preservation and decision-error test.
+
+R-10-011 — Rolling horizon becomes myopic
+Probability: High
+Impact: Critical
+Mitigation:
+terminal value/future re-optimisation.
+
+R-10-012 — Terminal value double-counts team value
+Probability: Medium
+Impact: High
+Mitigation:
+decomposed state/value version.
+
+R-10-013 — Maximin too conservative
+Probability: High
+Impact: High
+Mitigation:
+not default; price-of-robustness frontier.
+
+R-10-014 — Robust uncertainty set ignores correlation
+Probability: High
+Impact: High
+Mitigation:
+scenario/factor sets.
+
+R-10-015 — DRO radius arbitrary
+Probability: High
+Impact: High
+Mitigation:
+calibration/promotion gate.
+
+R-10-016 — CVaR removes upside
+Probability: Medium
+Impact: High
+Mitigation:
+shortfall relative baseline and limited mode.
+
+R-10-017 — VOI estimate overconfident
+Probability: Medium
+Impact: High
+Mitigation:
+nested simulation, EVPI bound and calibration.
+
+R-10-018 — Waiting misses price rise
+Probability: High
+Impact: Medium/High
+Mitigation:
+net EVSI includes price risk.
+
+R-10-019 — Acting early loses critical news
+Probability: High
+Impact: High
+Mitigation:
+VOI/lock-in cost.
+
+R-10-020 — Team value maximised instead of points
+Probability: High
+Impact: Critical
+Mitigation:
+counterfactual marginal point value only.
+
+R-10-021 — Reported team value overstates selling value
+Probability: High
+Impact: High
+Mitigation:
+selling/liquidation state.
+
+R-10-022 — Price rise value overestimated
+Probability: High
+Impact: High
+Mitigation:
+half-profit mechanics and affordability re-optimisation.
+
+R-10-023 — Price fall avoidance forces bad player transfer
+Probability: Medium
+Impact: High
+Mitigation:
+full utility comparison.
+
+R-10-024 — Early hit justified by speculative value
+Probability: Medium
+Impact: Critical
+Mitigation:
+robust > hit + reversal threshold.
+
+R-10-025 — Flexibility metric rewards useless options
+Probability: Medium
+Impact: High
+Mitigation:
+utility-weight future feasible actions.
+
+R-10-026 — Bank held despite high point opportunity
+Probability: Medium
+Impact: High
+Mitigation:
+marginal bank value versus immediate points.
+
+R-10-027 — GW number overrides actual uncertainty
+Probability: High
+Impact: High
+Mitigation:
+state-based stage policy.
+
+R-10-028 — Late new manager treated as mature season
+Probability: Medium
+Impact: High
+Mitigation:
+regime reset.
+
+R-10-029 — Confidence confused with probability of optimal action
+Probability: Medium
+Impact: Medium
+Mitigation:
+separate outputs.
+
+R-10-030 — Optimiser anticipates information
+Probability: Medium
+Impact: Critical
+Mitigation:
+nonanticipativity tests.
+
+R-10-031 — Model disagreement not predictive of error
+Probability: Medium
+Impact: Medium
+Mitigation:
+calibrate uncertainty signals.
+
+R-10-032 — Robust policy improves regret but loses too many points
+Probability: Medium
+Impact: High
+Mitigation:
+price-of-robustness and out-of-time comparison.
+
+R-10-033 — Team-value policy fit to one season
+Probability: High
+Impact: High
+Mitigation:
+multi-season/prospective and mechanism-based valuation.
+
+R-10-034 — Rank preferences leak into points mode
+Probability: Medium
+Impact: Critical
+Mitigation:
+explicit DMFP-14 objective.
+
+======================================================================
+34. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-17
+
+----------------------------------------------------------------------
+SRC-UNCERTAINTY-2021-001
+Title:
+Aleatoric and Epistemic Uncertainty in Machine Learning
+
+Authors:
+Eyke Hüllermeier, Willem Waegeman
+
+Publication:
+Machine Learning, 110, 457–506
+
+URL:
+https://link.springer.com/article/10.1007/s10994-021-05946-3
+
+Relevant claim:
+Introduces and reviews the distinction between aleatoric and epistemic
+uncertainty and methods for handling uncertainty in machine learning.
+
+Reliability:
+HIGH peer-reviewed methodological review.
+
+Pulse reliance:
+YES for top-level taxonomy.
+
+----------------------------------------------------------------------
+SRC-UNCERTAINTY-2025-002
+Title:
+Rethinking Aleatoric and Epistemic Uncertainty
+
+Authors:
+Freddie Bickford Smith, Jannik Kossen, Eleanor Trollope, Mark van der Wilk,
+Adam Foster, Tom Rainforth
+
+URL:
+https://arxiv.org/abs/2412.20892
+
+Version/publication:
+2025 revision; preprint/research paper
+
+Relevant claim:
+Argues that the standard dichotomy can be insufficient/incoherent for the many
+distinct uncertainties used in modelling.
+
+Reliability:
+MODERATE/HIGH recent scholarly work.
+
+Pulse reliance:
+YES for operational uncertainty ledger.
+
+----------------------------------------------------------------------
+SRC-HIERARCHICAL-2006-001
+Title:
+Multilevel (Hierarchical) Modeling: What It Can and Cannot Do
+
+Author:
+Andrew Gelman
+
+Publication:
+Technometrics, 48(3)
+
+URL:
+https://sites.stat.columbia.edu/gelman/research/published/multi2.pdf
+
+Relevant claim:
+Hierarchical models support partial pooling and structured variation across
+groups while requiring thoughtful model structure.
+
+Reliability:
+HIGH peer-reviewed/foundational.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-HIERARCHICAL-STAN-001
+Title:
+Hierarchical Logistic Regression / Partial Pooling Case Studies
+
+Organisation:
+Stan
+
+URLs:
+https://mc-stan.org/docs/stan-users-guide/regression.html
+https://mc-stan.org/learn-stan/case-studies/pool-binary-trials.html
+
+Relevant claim:
+Partial pooling estimates group-level variation and stabilises sparse group
+estimates.
+
+Reliability:
+HIGH authoritative technical documentation.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-BMA-1999-001
+Title:
+Bayesian Model Averaging: A Tutorial
+
+Authors:
+Jennifer A. Hoeting, David Madigan, Adrian E. Raftery, Chris T. Volinsky
+
+Publication:
+Statistical Science, 14(4), 382–417
+
+URL:
+https://www.stat.colostate.edu/~jah/papers/statsci.pdf
+
+Relevant claim:
+Ignoring model-selection uncertainty can create overconfident inference;
+Bayesian model averaging provides a coherent framework.
+
+Reliability:
+HIGH foundational review.
+
+Pulse reliance:
+YES conceptually.
+
+----------------------------------------------------------------------
+SRC-STACKING-2018-001
+Title:
+Using Stacking to Average Bayesian Predictive Distributions
+
+Authors:
+Yuling Yao, Aki Vehtari, Daniel Simpson, Andrew Gelman
+
+URL:
+https://arxiv.org/abs/1704.02030
+
+Publication:
+Bayesian Analysis, 2018
+
+Relevant claim:
+Predictive stacking combines distributions using proper-score/leave-one-out
+criteria and is recommended in M-open settings relative to several alternatives.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for ensemble policy.
+
+----------------------------------------------------------------------
+SRC-STACKING-2021-002
+Title:
+Bayesian Hierarchical Stacking: Some Models Are (Somewhere) Useful
+
+Authors:
+Yuling Yao, Gregor Pirš, Aki Vehtari, Andrew Gelman
+
+URL:
+https://arxiv.org/abs/2101.08954
+
+Relevant claim:
+Model weights can vary by input/context and be partially pooled hierarchically.
+
+Reliability:
+MODERATE/HIGH scholarly preprint/research.
+
+Pulse reliance:
+CHALLENGER for contextual weights.
+
+----------------------------------------------------------------------
+SRC-ROBUST-2004-001
+Title:
+The Price of Robustness
+
+Authors:
+Dimitris Bertsimas, Melvyn Sim
+
+Publication:
+Operations Research, 52(1), 35–53
+
+DOI/URL:
+https://doi.org/10.1287/opre.1030.0065
+
+Relevant claim:
+Budgeted uncertainty provides a tunable trade-off between nominal performance
+and protection, with probabilistic interpretations in the analysed setting.
+
+Reliability:
+HIGH foundational peer-reviewed operations research.
+
+Pulse reliance:
+YES for budgeted robustness and price-of-robustness reporting.
+
+----------------------------------------------------------------------
+SRC-DRO-2018-001
+Title:
+Data-Driven Distributionally Robust Optimization Using the Wasserstein Metric:
+Performance Guarantees and Tractable Reformulations
+
+Authors:
+Peyman Mohajerin Esfahani, Daniel Kuhn
+
+Publication:
+Mathematical Programming, 171, 115–166
+
+URL:
+https://link.springer.com/article/10.1007/s10107-017-1172-1
+
+Relevant claim:
+Wasserstein ambiguity sets can provide data-driven performance guarantees and
+tractable reformulations for many DRO problems.
+
+Reliability:
+HIGH peer-reviewed foundational DRO work.
+
+Pulse reliance:
+CHALLENGER.
+
+----------------------------------------------------------------------
+SRC-CVAR-2000-001
+Title:
+Optimization of Conditional Value-at-Risk
+
+Authors:
+R. Tyrrell Rockafellar, Stanislav Uryasev
+
+URL:
+https://sites.math.washington.edu/~rtr/papers/rtr179-CVaR1.pdf
+
+Publication:
+Journal of Risk, 2000
+
+Relevant claim:
+Provides a tractable optimisation representation for CVaR.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+YES for downside-protected mode.
+
+----------------------------------------------------------------------
+SRC-SCENARIO-2006-001
+Title:
+Scenario Tree Modelling for Multistage Stochastic Programs
+
+Authors:
+Holger Heitsch, Werner Römisch
+
+URL:
+https://www.wias-berlin.de/people/heitsch/HR05svjour.pdf
+
+Relevant claim:
+Develops stability-based approaches for generating/reducing scenario trees for
+multistage stochastic programs.
+
+Reliability:
+HIGH peer-reviewed operations-research work.
+
+Pulse reliance:
+YES for scenario-tree design/reduction.
+
+----------------------------------------------------------------------
+SRC-ROLLING-2021-001
+Title:
+Rolling Horizon Policies in Multistage Stochastic Programming
+
+Authors:
+Murwan Siddig, Yongjia Song, Amin Khademi
+
+URL:
+https://arxiv.org/abs/2102.04874
+
+Relevant claim:
+Rolling-horizon methods solve sequences of shorter multistage problems and
+require careful horizon/terminal-value treatment.
+
+Reliability:
+MODERATE/HIGH scholarly preprint/research.
+
+Pulse reliance:
+YES for rolling-horizon policy.
+
+----------------------------------------------------------------------
+SRC-VOI-2001-001
+Title:
+Bayesian Value-of-Information Analysis: An Application to a Policy Model
+
+Authors:
+Karl Claxton, Mark Sculpher, Mark Drummond
+
+URL:
+https://pubmed.ncbi.nlm.nih.gov/11329844/
+
+Relevant claim:
+Separates the optimal current decision from whether further information is
+valuable; expected utility is the decision basis and uncertainty informs the
+value of information.
+
+Reliability:
+HIGH peer-reviewed decision-analysis work.
+
+Pulse reliance:
+YES for EVPI/EVSI policy.
+
+----------------------------------------------------------------------
+SRC-VOI-2019-002
+Title:
+Value of Information: Sensitivity Analysis and Research Design in Bayesian
+Evidence Synthesis
+
+Authors:
+Christopher H. Jackson et al.
+
+URL:
+https://www.tandfonline.com/doi/full/10.1080/01621459.2018.1562932
+
+Relevant claim:
+EVPPI measures the expected decision loss attributable to uncertainty in
+particular parameters and supports decision-focused sensitivity analysis.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for uncertainty prioritisation.
+
+----------------------------------------------------------------------
+SRC-FLEXIBILITY-2013-001
+Title:
+Decision Flexibility
+
+Authors:
+Tom Chavez, Ross D. Shachter
+
+URL:
+https://arxiv.org/abs/1302.4937
+
+Relevant claim:
+Develops a framework for valuing decision-policy flexibility and the ability to
+revise commitments after information is revealed.
+
+Reliability:
+MODERATE scholarly preprint.
+
+Pulse reliance:
+YES conceptually for FPL flexibility.
+
+----------------------------------------------------------------------
+SRC-FPL-SKILL-2020-001
+Title:
+Identification of Skill in an Online Game: The Case of Fantasy Premier League
+
+Authors:
+Joseph D. O'Brien, James P. Gleeson, David J. P. O'Sullivan
+
+URL:
+https://arxiv.org/abs/2009.01206
+
+Relevant claim:
+Across a large FPL dataset, rank persistence and successful-manager behaviour
+support the importance of long-term planning and consistently good decisions in
+a noisy contest.
+
+Reliability:
+HIGH academic research.
+
+Pulse reliance:
+YES for season objective.
+
+----------------------------------------------------------------------
+SRC-FPL-ROBUST-2025-001
+Title:
+Data-Driven Team Selection in Fantasy Premier League Using Integer Programming
+and Predictive Modeling Approach
+
+Author:
+Danial Ramezani
+
+URL:
+https://arxiv.org/abs/2505.02170
+
+Relevant claim:
+Proposes deterministic and robust integer-programming approaches for FPL team
+and captain selection and evaluates them out of sample with simulation.
+
+Reliability:
+MODERATE recent preprint.
+
+Pulse reliance:
+BENCHMARK/CONTEXTUAL.
+
+----------------------------------------------------------------------
+SRC-FPL-PRICE-2025-001
+Title:
+FPL Player Price Changes Explained
+
+Organisation:
+Premier League
+
+URL:
+https://www.premierleague.com/en/news/2858775
+
+Relevant claim:
+Reference-season player prices can rise/fall by £0.1m per day according to
+transfer activity; historical Gameweek movement has been bounded in published
+guidance.
+
+Reliability:
+HIGH official reference source.
+Target-season verification required.
+
+Pulse reliance:
+YES for price state context.
+
+----------------------------------------------------------------------
+SRC-FPL-TRANSFER-2025-001
+Title:
+FPL Basics Explained: How to Make Transfers
+
+Organisation:
+Premier League / The Scout
+
+URL:
+https://www.premierleague.com/en/news/2174907
+
+Relevant claim:
+Reference selling-price examples: full price falls are borne, while half of
+price increases are retained, rounded down.
+
+Reliability:
+HIGH official reference source.
+
+Pulse reliance:
+YES for team-value asymmetry, target-season verification required.
+
+----------------------------------------------------------------------
+SRC-FPL-CONTEXT-2026-001
+Title:
+What to Look Out for in Pre-Season Ahead of 2026/27 Fantasy
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2026-07-16
+
+URL:
+https://www.premierleague.com/en/news/4679613/what-to-look-out-for-in-pre-season-ahead-of-202627-fantasy
+
+Relevant claim:
+The target season has exceptional new-manager and post-World-Cup uncertainty;
+preseason lineups/minutes require cautious interpretation.
+
+Reliability:
+HIGH official current context.
+
+Pulse reliance:
+YES for early-season structural policy.
+
+----------------------------------------------------------------------
+SRC-SCORING-2007-001
+Title:
+Strictly Proper Scoring Rules, Prediction, and Estimation
+
+Authors:
+Tilmann Gneiting, Adrian E. Raftery
+
+URL:
+https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf
+
+Relevant claim:
+Proper scoring rules reward honest probabilistic forecasts and support
+calibration/sharpness evaluation.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+YES for uncertainty/model evaluation.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 — Master Architecture and Product Definition
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-05 — Ingestion, Storage and Data Quality
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-07 — Player Availability, Start and Minutes Model
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-08 — Football Event Distribution Engine
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-09 — FPL Points Distribution Engine
+
+Pulse reliance:
+YES.
+
+======================================================================
+35. ACCEPTANCE CRITERIA
+======================================================================
+
+A. OBJECTIVE
+[ ] Expected remaining-season points is the default.
+[ ] Rank utility is explicit and downstream.
+[ ] Team value is instrumental, not primary.
+[ ] Terminal value prevents myopia.
+
+B. UNCERTAINTY
+[ ] Aleatoric, epistemic and specific operational sources are separated.
+[ ] Nested scenarios preserve structural/parameter/outcome uncertainty.
+[ ] Lineup, market, model, source and rule uncertainty are explicit.
+[ ] Confidence is not hidden in one standard deviation.
+
+C. BAYESIAN POLICY
+[ ] Priors and partial pooling are accepted.
+[ ] No double-counting of evidence.
+[ ] Parameter-specific learning speeds exist.
+[ ] New-manager/new-player regimes widen uncertainty.
+[ ] Prospective updating is time-safe.
+
+D. DECISION METHODS
+[ ] Rolling horizon is primary.
+[ ] Scenario nonanticipativity is enforced.
+[ ] Robust regret is the initial robustness overlay.
+[ ] Worst-case/maximin is not default.
+[ ] DRO/CVaR are challengers/specific modes.
+[ ] Price of robustness is reported.
+
+E. INFORMATION/FLEXIBILITY
+[ ] EVPI/EVSI/EVPPI concepts are implemented.
+[ ] ACT versus WAIT includes price and execution costs.
+[ ] Flexibility has a future re-optimisation value.
+[ ] Roll/no-action is a valid optimal action.
+
+F. EARLY/LATE
+[ ] GW2 and GW30 policies differ.
+[ ] Early team-value policy uses marginal point value.
+[ ] Early hits face stronger reversal/uncertainty tests.
+[ ] Late value shifts to remaining points/chips/rank.
+[ ] State-based structural resets override Gameweek number.
+
+======================================================================
+36. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Implement uncertainty taxonomy and ledger.
+2. Add structural/model/parameter/outcome IDs to scenarios.
+3. Implement variance/decomposition reports.
+4. Define priors and update-speed configuration per model family.
+5. Implement manager/team change-point state.
+6. Implement predictive model ensemble/initial weights.
+7. Create walk-forward stacking training framework.
+8. Build rolling-horizon state and terminal-value interface.
+9. Build scenario-tree/revelation schema.
+10. Implement scenario reduction with decision-error validation.
+11. Implement expected-utility action evaluator.
+12. Implement robust regret.
+13. Implement chance constraints for squad fragility.
+14. Implement CVaR comparison mode.
+15. Implement Bertsimas–Sim budgeted robustness challenger.
+16. Implement Wasserstein DRO research prototype.
+17. Implement sensitivity/switch thresholds.
+18. Implement EVPI/EVSI/EVPPI estimator.
+19. Implement ACT-versus-WAIT policy.
+20. Implement flexibility value through future re-optimisation.
+21. Implement marginal £0.1m budget value.
+22. Implement price-motivated transfer gate.
+23. Implement season-stage/state policy.
+24. Implement action confidence/gates.
+25. Build GW2/GW30 synthetic cases.
+26. Backtest nominal versus robust/flexible/team-value policies.
+27. Start prospective early-season policy logging.
+28. Connect selected uncertainty policy to DMFP-12 only after acceptance tests.
+
+Suggested commands:
+
+    dmf uncertainty decompose
+    dmf uncertainty update
+    dmf uncertainty ensemble
+    dmf scenarios build-tree
+    dmf scenarios reduce
+    dmf decision expected-utility
+    dmf decision robust-regret
+    dmf decision cvar
+    dmf decision value-of-information
+    dmf decision flexibility
+    dmf decision marginal-budget-value
+    dmf decision sensitivity
+    dmf policy compare-gw2-gw30
+    dmf uncertainty validate
+
+======================================================================
+37. OPEN QUESTIONS
+======================================================================
+
+OBJECTIVE
+---------
+1. What explicit rolling horizon and terminal model are best?
+2. How are rank objectives activated without corrupting points mode?
+3. What regret percentile/weight is optimal?
+4. Which squad-failure chance constraints are required?
+
+PRIORS/UPDATING
+---------------
+5. How are prior effective sample sizes calibrated?
+6. What update speeds fit each parameter family?
+7. What change-point model is practical?
+8. How quickly should new-manager uncertainty decay?
+9. How are promoted-team translation priors built?
+
+ENSEMBLE
+--------
+10. Which model families are sufficiently diverse?
+11. Equal, BMA, stacking or hierarchical stacking initially?
+12. What minimum sample learns contextual weights?
+13. How are highly dependent models clustered?
+
+SCENARIOS
+---------
+14. Which uncertainties become explicit tree branches?
+15. How many stages are computationally viable?
+16. Which scenario-reduction distance preserves FPL decisions?
+17. What decision-error threshold is acceptable?
+18. How are future fixture announcements represented?
+
+ROBUSTNESS
+----------
+19. How is robust-regret weight selected?
+20. What Gamma budget is meaningful?
+21. Can scenario-induced sets outperform boxes?
+22. What DRO radius is defensible?
+23. When should CVaR affect points-mode decisions?
+
+VALUE OF INFORMATION
+--------------------
+24. What evidence events are modelled explicitly?
+25. How accurately can EVSI be estimated near deadline?
+26. What price-risk model enters waiting cost?
+27. How is manual research/odds quota allocated by EVPPI?
+
+FLEXIBILITY/TEAM VALUE
+----------------------
+28. What terminal value function measures flexibility?
+29. How is one free transfer valued?
+30. What is the marginal value curve for bank/team value?
+31. What price-probability threshold supports early action?
+32. When can a price-only hit ever be rational?
+33. How is purchase-price loss valued on reversal?
+
+EARLY/LATE POLICY
+-----------------
+34. Are GW1–5/GW6–10 bands supported empirically?
+35. Which confidence caps are appropriate?
+36. What evidence should cause an early structural reset?
+37. How does late-season rank utility alter robust policy?
+
+======================================================================
+38. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-11 — PRICE CHANGE AND TEAM VALUE MODEL
+
+DMFP-11 must supply:
+
+- price-change probabilities;
+- timing distributions;
+- current/purchase/selling values;
+- expected liquidation value;
+- affordability paths;
+- price uncertainty;
+- ownership/transfer-flow features.
+
+DMFP-10 will then convert price forecasts into:
+
+- marginal future point value;
+- ACT-versus-WAIT value;
+- team-value-aware transfer utility;
+- early versus late policy.
+
+Then:
+DMFP-12 will implement squad/transfer optimisation using the uncertainty
+policies defined here.
+
+======================================================================
+39. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-17
+
+- Defined complete uncertainty taxonomy.
+- Added nested world/parameter/outcome scenarios.
+- Selected expected remaining-season points objective.
+- Targeted robustness at epistemic/regime error rather than all variance.
+- Added Bayesian priors, partial pooling and parameter-specific learning.
+- Added model ensembles and predictive stacking.
+- Added scenario trees, reduction and rolling horizon.
+- Added robust regret, budgeted robustness, CVaR and DRO challenger.
+- Added sensitivity and action-switch thresholds.
+- Added EVPI, EVSI and EVPPI.
+- Added value of waiting and flexibility.
+- Defined team value as marginal future-point affordability value.
+- Added price-rise/fall asymmetry policy.
+- Defined early, middle and late-season behaviour.
+- Explicitly answered GW2 versus GW30.
+- Added output contracts, tests, risks and source register.
+
+Future v1.0:
+- Sebastian approves uncertainty philosophy.
+- uncertainty ledger/scenario hierarchy implemented.
+- robust-regret and VOI prototypes pass tests.
+- terminal/flexibility value calibrated.
+- team-value marginal model connected.
+- GW2/GW30 backtests completed.
+- DMFP-12 integration approved.
+
+END OF DOCUMENT

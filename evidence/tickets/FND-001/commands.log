@@ -1,0 +1,14 @@
+{"command": "uv sync --all-groups --frozen", "duration_seconds": 0.043, "exit_code": 0, "result": "PASS: frozen all-group sync"}
+{"command": "uv run ruff format --check .", "duration_seconds": 0.083, "exit_code": 0, "result": "PASS: formatting clean"}
+{"command": "uv run ruff check .", "duration_seconds": 0.087, "exit_code": 0, "result": "PASS: lint clean"}
+{"command": "uv run mypy src/dmf_pulse", "duration_seconds": 0.413, "exit_code": 0, "result": "PASS: strict typing clean"}
+{"command": "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing", "duration_seconds": 21.629, "exit_code": 0, "result": "PASS: 104 tests; 95.19% combined coverage"}
+{"command": "uv run dmf --version", "duration_seconds": 0.534, "exit_code": 0, "result": "PASS: dmf 0.1.0"}
+{"command": "uv run dmf doctor --json", "duration_seconds": 3.563, "exit_code": 0, "result": "PASS: doctor status HEALTHY"}
+{"command": "uv run dmf config validate --environment test --config-root config", "duration_seconds": 0.455, "exit_code": 0, "result": "PASS: test configuration valid"}
+{"command": "uv run dmf config show --environment test --config-root config --json", "duration_seconds": 0.448, "exit_code": 0, "result": "PASS: deterministic redacted JSON"}
+{"command": "uv build", "duration_seconds": 2.597, "exit_code": 0, "result": "PASS: sdist and wheel built"}
+{"command": "uv run python scripts/verify_wheel.py", "duration_seconds": 9.486, "exit_code": 0, "result": "PASS: clean wheel f75311b81b07daa2a0fc80a5ba37a21be5e1103158dc8c3daaadda413fc6c641; doctor HEALTHY"}
+{"command": "uv run python scripts/validate_repository.py", "duration_seconds": 0.2, "exit_code": 0, "result": "PASS: repository errors 0"}
+{"command": "uv run python scripts/scan_secrets.py", "duration_seconds": 1.654, "exit_code": 0, "result": "PASS: secret findings 0"}
+{"command": "uv run dmf review-pack build --ticket FND-001 --output review_pack/FND-001", "duration_seconds": 3.114, "exit_code": 0, "result": "PASS: 20 files; primary payload SHA-256 e01befcfe701e96b1dbdc44341c8d579cd70ab7e73edc97a2f98381a9a297231; archive SHA-256 ba6377978436e0f09a3b4240026b56a28407409fcc6cbd26411a0edf01e52a42"}

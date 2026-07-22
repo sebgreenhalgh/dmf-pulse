@@ -1,0 +1,240 @@
+{
+  "acceptance": [
+    {
+      "command": "uv sync --all-groups --frozen",
+      "duration_seconds": 0.043,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run ruff format --check .",
+      "duration_seconds": 0.083,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run ruff check .",
+      "duration_seconds": 0.087,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run mypy src/dmf_pulse",
+      "duration_seconds": 0.413,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing",
+      "duration_seconds": 21.629,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf --version",
+      "duration_seconds": 0.534,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf doctor --json",
+      "duration_seconds": 3.563,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf config validate --environment test --config-root config",
+      "duration_seconds": 0.455,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf config show --environment test --config-root config --json",
+      "duration_seconds": 0.448,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv build",
+      "duration_seconds": 2.597,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run python scripts/verify_wheel.py",
+      "duration_seconds": 9.486,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run python scripts/validate_repository.py",
+      "duration_seconds": 0.2,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run python scripts/scan_secrets.py",
+      "duration_seconds": 1.654,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf review-pack build --ticket FND-001 --output review_pack/FND-001",
+      "duration_seconds": 3.114,
+      "exit_code": 0,
+      "status": "PASS"
+    }
+  ],
+  "assumptions": [
+    "The captured tree was empty although an empty initial commit already existed.",
+    "pytest-cov is the unavoidable adapter for the mandated pytest --cov command.",
+    "The review-pack field is the validated detached primary-payload digest."
+  ],
+  "commands": [
+    {
+      "command": "uv sync --all-groups --frozen",
+      "duration_seconds": 0.043,
+      "exit_code": 0,
+      "result": "PASS: frozen all-group sync"
+    },
+    {
+      "command": "uv run ruff format --check .",
+      "duration_seconds": 0.083,
+      "exit_code": 0,
+      "result": "PASS: formatting clean"
+    },
+    {
+      "command": "uv run ruff check .",
+      "duration_seconds": 0.087,
+      "exit_code": 0,
+      "result": "PASS: lint clean"
+    },
+    {
+      "command": "uv run mypy src/dmf_pulse",
+      "duration_seconds": 0.413,
+      "exit_code": 0,
+      "result": "PASS: strict typing clean"
+    },
+    {
+      "command": "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing",
+      "duration_seconds": 21.629,
+      "exit_code": 0,
+      "result": "PASS: 104 tests; 95.19% combined coverage"
+    },
+    {
+      "command": "uv run dmf --version",
+      "duration_seconds": 0.534,
+      "exit_code": 0,
+      "result": "PASS: dmf 0.1.0"
+    },
+    {
+      "command": "uv run dmf doctor --json",
+      "duration_seconds": 3.563,
+      "exit_code": 0,
+      "result": "PASS: doctor status HEALTHY"
+    },
+    {
+      "command": "uv run dmf config validate --environment test --config-root config",
+      "duration_seconds": 0.455,
+      "exit_code": 0,
+      "result": "PASS: test configuration valid"
+    },
+    {
+      "command": "uv run dmf config show --environment test --config-root config --json",
+      "duration_seconds": 0.448,
+      "exit_code": 0,
+      "result": "PASS: deterministic redacted JSON"
+    },
+    {
+      "command": "uv build",
+      "duration_seconds": 2.597,
+      "exit_code": 0,
+      "result": "PASS: sdist and wheel built"
+    },
+    {
+      "command": "uv run python scripts/verify_wheel.py",
+      "duration_seconds": 9.486,
+      "exit_code": 0,
+      "result": "PASS: clean wheel f75311b81b07daa2a0fc80a5ba37a21be5e1103158dc8c3daaadda413fc6c641; doctor HEALTHY"
+    },
+    {
+      "command": "uv run python scripts/validate_repository.py",
+      "duration_seconds": 0.2,
+      "exit_code": 0,
+      "result": "PASS: repository errors 0"
+    },
+    {
+      "command": "uv run python scripts/scan_secrets.py",
+      "duration_seconds": 1.654,
+      "exit_code": 0,
+      "result": "PASS: secret findings 0"
+    },
+    {
+      "command": "uv run dmf review-pack build --ticket FND-001 --output review_pack/FND-001",
+      "duration_seconds": 3.114,
+      "exit_code": 0,
+      "result": "PASS: 20 files; primary payload SHA-256 e01befcfe701e96b1dbdc44341c8d579cd70ab7e73edc97a2f98381a9a297231; archive SHA-256 ba6377978436e0f09a3b4240026b56a28407409fcc6cbd26411a0edf01e52a42"
+    }
+  ],
+  "dependency_impact": "Runtime remains Pydantic, Typer, and PyYAML only; 32 frozen project/direct/transitive packages including the sanctioned build and quality tools.",
+  "exclusions_verified": [
+    "no FPL domain, provider, odds, model, optimization, database, API, UI, or automation code",
+    "no PostgreSQL, FastAPI, numerical/ML, provider SDK, or GPU dependency",
+    "no network/database/import side effects and no production secret"
+  ],
+  "files_changed": [
+    {
+      "change": "installed governed authority documents and manifests",
+      "path": "specs/"
+    },
+    {
+      "change": "implemented typed foundation package and CLI",
+      "path": "src/dmf_pulse/"
+    },
+    {
+      "change": "implemented deterministic offline verification",
+      "path": "tests/"
+    },
+    {
+      "change": "implemented least-privilege cross-platform automation",
+      "path": ".github/"
+    },
+    {
+      "change": "added governance, scripts, and ticket evidence",
+      "path": "repository root"
+    }
+  ],
+  "migration_impact": "None; no database or production state exists in FND-001.",
+  "public_interfaces": [
+    "dmf --version",
+    "dmf doctor [--json]",
+    "dmf config validate --environment <name> --config-root <path>",
+    "dmf config show --environment <name> --config-root <path> [--json]",
+    "dmf evidence validate <path>",
+    "dmf review-pack build --ticket FND-001 --output <path>"
+  ],
+  "review_pack": {
+    "file_count": 20,
+    "path": "review_pack/FND-001/DMF_PULSE_FND-001_REVIEW.zip",
+    "sha256": "1242b37971a28e4e0a0736db6d25a7d652f1d1dc6fcea2bfd2eded02e80a1a1e"
+  },
+  "risks": [
+    "Remote CI and independent human acceptance remain external gates.",
+    "Non-default IANA zones depend on host timezone data."
+  ],
+  "status": "COMPLETE",
+  "summary": "Governed Python 3.13 foundation with strict configuration, deterministic CLI/doctor, offline assurance, clean-wheel provenance, CI, and capped review evidence.",
+  "tests": [
+    {
+      "branch_coverage_percent": 90.57,
+      "branches_covered": 288,
+      "branches_total": 318,
+      "collected": 104,
+      "failed": 0,
+      "hypothesis_profile": "ci (derandomized, database disabled, 75 examples)",
+      "passed": 104,
+      "status": "PASS"
+    }
+  ],
+  "ticket_id": "FND-001"
+}

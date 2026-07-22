@@ -1,0 +1,3247 @@
+DMF PULSE — PRICE CHANGE AND TEAM VALUE MODEL
+==============================================
+
+Document ID: DMFP-11
+Version: 0.9 (Recurrent Price-Hazard and Transfer-Timing Architecture)
+Status: PROPOSED — TARGET-SEASON CALIBRATION BLOCKED PENDING 2026/27 FPL LAUNCH
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Reference season: Fantasy Premier League 2025/26
+Research cut-off: 17 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Upstream inputs:
+- DMFP-02 price, transfer and selling-price rules
+- DMFP-03 players, manager state, price snapshots and ownership spells
+- DMFP-04 zero-cost FPL data-source policy
+- DMFP-05 time-safe snapshots, corrections and deadline bundles
+- DMFP-07 injury, availability, start and minutes distributions
+- DMFP-09 full FPL-points distributions
+- DMFP-10 uncertainty, value of information and marginal-budget policy
+
+Downstream consumers:
+- DMFP-12 squad and transfer optimiser
+- DMFP-13 captaincy and chip optimiser
+- DMFP-14 rank and risk strategy
+- DMFP-15 backtesting and calibration
+- DMFP-18 decision explanations
+
+PURPOSE
+-------
+This document defines the model for predicting Fantasy Premier League player
+price rises and falls and for deciding whether making a transfer early is
+rational.
+
+It must produce:
+
+- probability_rise_next_update;
+- probability_fall_next_update;
+- expected_price_24h;
+- expected_price_72h;
+- expected_price_7d;
+- confidence;
+- likely_threshold_distance.
+
+It must also produce complete price-path distributions and the decision evidence
+needed to compare:
+
+    ACT NOW
+
+against:
+
+    WAIT FOR MORE INFORMATION.
+
+The central decision is not:
+
+    "Will the player rise?"
+
+It is:
+
+    "Does the expected future points and affordability value of acting before
+    the next update exceed the value of waiting for injury, rotation, lineup,
+    fixture and market information?"
+
+GOVERNING PRINCIPLE
+-------------------
+FPL's exact price-change algorithm is not publicly documented.
+
+Official sources establish only broad mechanics such as:
+
+- prices respond to transfer-market popularity;
+- changes occur overnight UK time;
+- a player may move by £0.1m in a day;
+- historical movement has tended to be around a total of £0.3m per Gameweek;
+- selling-price rules create asymmetric gains and losses.
+
+Any exact threshold, counter-reset rule, wildcard treatment, flag protection or
+ownership adjustment inferred from public observations is a hypothesis until it
+is validated prospectively.
+
+Pulse will therefore model price changes as:
+
+    AN UNOBSERVED THRESHOLD/STATE PROCESS
+    + OBSERVED TRANSFER FLOWS
+    + PLAYER/STATUS/GAMEWEEK CONTEXT
+    + RECURRENT COMPETING-RISK EVENTS
+    + CALIBRATED MACHINE-LEARNING CHALLENGERS.
+
+It will never present an inferred threshold as official source code.
+
+CRITICAL PRE-LAUNCH STATUS
+--------------------------
+At the research cut-off, the 2026/27 FPL game had not launched.
+
+Consequently:
+
+1. The target-season price fields and behaviour are not yet verified.
+2. All 2025/26 price mechanics are REFERENCE_ONLY.
+3. No production threshold model can activate until:
+   - 2026/27 player and manager totals exist;
+   - price updates are prospectively captured;
+   - official rules are verified;
+   - update timing is observed;
+   - model calibration is rechecked.
+4. Previous-season thresholds and community discoveries are priors/challengers,
+   not hard-coded target-season facts.
+5. The engine MUST fail safely if price snapshots, manager-count denominator,
+   transfer counters or update timing become unreliable.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require a documented architecture decision.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE MODEL DECISION
+======================================================================
+
+0.1 SELECTED PRODUCTION ARCHITECTURE
+------------------------------------
+The selected architecture has four linked layers.
+
+LAYER A — OFFICIAL PRICE-STATE LEDGER
+
+- current price;
+- purchase price;
+- selling price;
+- price changes;
+- ownership;
+- transfer counters;
+- FPL status/flag;
+- Gameweek/deadline;
+- last price event.
+
+LAYER B — LATENT TRANSFER-PRESSURE STATE
+
+A Bayesian state-space model estimates hidden positive and negative price
+pressure from observed transfer flows and unobserved algorithm inputs.
+
+LAYER C — RECURRENT COMPETING-RISK HAZARD
+
+At each overnight update opportunity, each player can experience:
+
+- RISE;
+- FALL;
+- NO_CHANGE.
+
+Price changes are recurrent. The state and risk process restart or change after
+each event.
+
+LAYER D — CLASSIFICATION AND ENSEMBLE CHALLENGERS
+
+- gradient-boosted multinomial classifier;
+- calibrated binary rise/fall classifiers;
+- interpretable threshold heuristic;
+- survival/hazard baselines;
+- predictive ensemble after time-safe validation.
+
+0.2 PRIMARY V1 MODEL
+--------------------
+Initial primary:
+
+- hierarchical Bayesian discrete-time competing-risk hazard;
+- nightly update as the time interval;
+- player/season/status random effects;
+- nonlinear time-varying transfer-flow features;
+- separate rise and fall mechanisms;
+- event-history/gap-time terms;
+- latent threshold-distance state;
+- posterior predictive price paths.
+
+0.3 CHALLENGER
+--------------
+Gradient-boosted trees, likely LightGBM or XGBoost, with:
+
+- rare-event-aware training;
+- time-based splits;
+- calibrated probability output;
+- no synthetic future leakage;
+- interpretability diagnostics;
+- strict comparison to the hazard model.
+
+A classifier can outperform an interpretable threshold theory even when the
+inferred theory is incomplete. It must not replace the time-to-event output or
+the uncertainty model without evidence.
+
+0.4 RECURRENT EVENT POLICY
+--------------------------
+A player can change price repeatedly during one Gameweek.
+
+The model uses:
+
+- event number;
+- days/updates since last rise;
+- days/updates since last fall;
+- previous change direction;
+- price changes this Gameweek;
+- transfer pressure accumulated after the last event;
+- Gameweek reset/deadline structure.
+
+The model does not impose a fictional one-change lockout.
+
+0.5 RISE AND FALL SEPARATION
+----------------------------
+Rises and falls are not symmetric.
+
+Reasons:
+
+- buyers come from the non-owner pool;
+- sellers come from the owner pool;
+- injury flags drive sales differently;
+- purchase price and current price affect manager behaviour;
+- community evidence suggests different reset/status behaviour;
+- low ownership constrains absolute buying volume;
+- price falls can accelerate after injury/news.
+
+Pulse uses separate latent states, coefficients, calibration and confidence.
+
+0.6 PRICE UPDATE TIME
+---------------------
+Official reference guidance says changes occur overnight UK time, not at a
+guaranteed exact minute.
+
+Pulse predicts the next official update event, while separately estimating an
+update-time interval from prospectively observed snapshots.
+
+It MUST NOT promise a precise change minute unless the target-season data prove
+a stable batch time.
+
+0.7 THRESHOLD DISTANCE
+----------------------
+`likely_threshold_distance` is a posterior estimate, not official fact.
+
+Default unit:
+
+    LATENT_PRESSURE_STANDARD_DEVIATIONS
+
+Positive rise distance:
+
+- >0 means latent rise pressure is estimated beyond the learned boundary;
+- <0 means below it.
+
+Fall distance is separate.
+
+If prospective evidence supports a stable effective-transfer scale, Pulse MAY
+also report:
+
+    estimated_effective_managers_remaining
+
+with a wide credible interval and a `MODEL_INFERRED` label.
+
+0.8 EARLY TRANSFER POLICY
+-------------------------
+A player predicted to rise is not automatically an early buy.
+
+A player predicted to fall is not automatically an early sell.
+
+Pulse compares complete action utilities:
+
+    utility(ACT_NOW)
+    versus
+    expected utility(WAIT and adapt after new information)
+
+including:
+
+- football points;
+- price-path/affordability;
+- selling-price mechanics;
+- free-transfer/hit cost;
+- injury/rotation risk;
+- information value;
+- reversal probability;
+- loss of purchase-price position;
+- execution risk;
+- future transfer routes.
+
+0.9 TEAM VALUE
+--------------
+Price predictions enter decisions only through the marginal future point value
+of affordability, defined in DMFP-10.
+
+The model does not maximize squad value.
+
+0.10 OFFICIAL REFERENCE FACTS
+-----------------------------
+REFERENCE_ONLY 2025/26 official guidance:
+
+- a heavily bought player may rise £0.1m per day;
+- a heavily sold player may fall £0.1m per day;
+- changes happen overnight UK time;
+- historically players have tended to move by a total of £0.3m per Gameweek;
+- profit is £0.1m for each complete £0.2m rise while owned;
+- a price fall is passed through fully to selling price.
+
+The exact threshold remains undisclosed.
+
+======================================================================
+1. PROBLEM FORMULATION
+======================================================================
+
+1.1 PRICE STATE
+---------------
+For player i at update opportunity t:
+
+    P_i,t
+
+integer tenths of £1m.
+
+Example:
+
+    £6.5m -> 65
+
+1.2 EVENT
+---------
+Y_i,t in:
+
+- RISE;
+- FALL;
+- NO_CHANGE.
+
+Reference step:
+
+    RISE: P_i,t+1 = P_i,t + 1
+    FALL: P_i,t+1 = P_i,t - 1
+
+Target-season configuration controls the step.
+
+1.3 NEXT-UPDATE PROBABILITY
+---------------------------
+Required:
+
+    probability_rise_next_update
+      = P(Y_i,t = RISE | information at as_of)
+
+    probability_fall_next_update
+      = P(Y_i,t = FALL | information at as_of)
+
+and:
+
+    P(NO_CHANGE)
+      = 1 - P(RISE) - P(FALL).
+
+1.4 PRICE HORIZON
+-----------------
+For horizon h:
+
+    expected_price_h
+      =
+      E[P_i,t+h | current information]
+
+where h is mapped to actual expected update opportunities within 24h, 72h or
+7d.
+
+The output MUST also retain the full price PMF.
+
+1.5 RECURRENCE
+--------------
+Each rise/fall changes future risk.
+
+The price process is a recurrent event process, not one time-to-first-event
+problem.
+
+1.6 COMPETING RISKS
+-------------------
+Rise and fall are mutually exclusive at one nightly update.
+
+Treating a fall as ordinary censoring in a rise-only survival model can
+misestimate absolute rise probability.
+
+Use multinomial/discrete competing-risk probabilities or coherent cause-specific
+hazards.
+
+1.7 INTERVAL CENSORING
+----------------------
+If Pulse observes:
+
+- price unchanged at 01:00;
+- changed at 02:00;
+
+the event time is interval-censored.
+
+For next-update prediction, the event label is the update cycle.
+For exact timing research, preserve the censoring interval.
+
+======================================================================
+2. OUTPUT CONTRACT
+======================================================================
+
+2.1 REQUIRED FIELDS
+-------------------
+- probability_rise_next_update;
+- probability_fall_next_update;
+- expected_price_24h;
+- expected_price_72h;
+- expected_price_7d;
+- confidence;
+- likely_threshold_distance.
+
+2.2 ADDITIONAL REQUIRED DIAGNOSTICS
+----------------------------------
+- probability_no_change_next_update;
+- price_pmf_24h;
+- price_pmf_72h;
+- price_pmf_7d;
+- probability_any_rise_24h/72h/7d;
+- probability_any_fall_24h/72h/7d;
+- probability_multiple_rises_gameweek;
+- probability_multiple_falls_gameweek;
+- expected_updates_to_rise;
+- expected_updates_to_fall;
+- predicted_update_window_utc;
+- rise/fall pressure;
+- transfer velocity;
+- transfer acceleration;
+- wildcard contamination;
+- status/flag regime;
+- model disagreement;
+- confidence dimensions;
+- source/model lineage.
+
+2.3 THRESHOLD DISTANCE OBJECT
+-----------------------------
+{
+  "unit": "LATENT_PRESSURE_SD",
+  "rise_distance_median": -0.24,
+  "rise_distance_p10": -0.71,
+  "rise_distance_p90": 0.31,
+  "fall_distance_median": -2.10,
+  "probability_rise_boundary_crossed": 0.34,
+  "probability_fall_boundary_crossed": 0.01,
+  "estimated_effective_transfers_remaining": null,
+  "status": "MODEL_INFERRED"
+}
+
+2.4 EXAMPLE OUTPUT
+------------------
+{
+  "player_price_projection_id": "uuid",
+  "player_id": "uuid",
+  "fpl_season_id": "uuid",
+  "as_of_utc": "timestamp",
+
+  "current_price": 65,
+
+  "probability_rise_next_update": 0.62,
+  "probability_fall_next_update": 0.01,
+  "probability_no_change_next_update": 0.37,
+
+  "expected_price_24h": 65.61,
+  "expected_price_72h": 66.18,
+  "expected_price_7d": 66.74,
+
+  "price_percentiles_7d": {
+    "p10": 65,
+    "p50": 67,
+    "p90": 68
+  },
+
+  "probability_multiple_rises_gameweek": 0.17,
+
+  "confidence": "B",
+
+  "likely_threshold_distance": {
+    "unit": "LATENT_PRESSURE_SD",
+    "rise_distance_median": 0.18,
+    "rise_distance_p10": -0.27,
+    "rise_distance_p90": 0.62,
+    "probability_rise_boundary_crossed": 0.60
+  },
+
+  "transfer_state": {
+    "ownership_percent": 8.4,
+    "buy_rate_nonowners_6h": 0.0038,
+    "sell_rate_owners_6h": 0.0003,
+    "net_flow_acceleration": 1.42,
+    "hours_to_fpl_deadline": 31.5
+  },
+
+  "model_version_ids": [],
+  "source_bundle_id": "uuid",
+  "code_commit": "..."
+}
+
+======================================================================
+3. OFFICIAL PRICE DATA AND LABELS
+======================================================================
+
+3.1 TARGET-SEASON FIELDS TO CAPTURE
+-----------------------------------
+Observed FPL interfaces have historically exposed fields such as:
+
+- now_cost;
+- cost_change_start;
+- cost_change_event;
+- cost_change_start_fall;
+- cost_change_event_fall;
+- selected_by_percent;
+- transfers_in;
+- transfers_out;
+- transfers_in_event;
+- transfers_out_event;
+- status;
+- chance_of_playing_next_round;
+- chance_of_playing_this_round;
+- news;
+- news_added.
+
+Every field must be reverified after 2026/27 launch.
+
+3.2 SNAPSHOT FREQUENCY
+----------------------
+Minimum:
+
+- every 15 minutes during likely overnight update window;
+- hourly during daytime;
+- every 5 minutes around observed target-season update period during calibration,
+  if official terms/request policy permit;
+- before/after every deadline;
+- source timestamps recorded.
+
+3.3 PRICE EVENT LABEL
+---------------------
+Compare consecutive official snapshots.
+
+If:
+
+    new_now_cost = old_now_cost + 1
+
+label RISE.
+
+If -1:
+FALL.
+
+If unchanged:
+NO_CHANGE.
+
+Any other step:
+schema/rule alert, preserved as observed.
+
+3.4 UPDATE CYCLE
+----------------
+One row per player per official nightly opportunity.
+
+Fields:
+
+- cycle ID;
+- cycle interval;
+- prior price;
+- resulting price;
+- event;
+- information available before cycle;
+- last observation before update;
+- first observation after update;
+- censoring interval.
+
+3.5 PRESEASON
+-------------
+Official reference rules say prices do not change until the season begins.
+
+Preseason rows are not ordinary negative examples.
+
+3.6 CORRECTIONS
+---------------
+If FPL later corrects a price:
+
+- new event/correction record;
+- original observed state preserved;
+- historical live prediction remains unchanged.
+
+======================================================================
+4. TRANSFER FLOW FEATURES
+======================================================================
+
+4.1 RAW CUMULATIVE COUNTERS
+---------------------------
+At snapshot t:
+
+- transfers_in;
+- transfers_out;
+- transfers_in_event;
+- transfers_out_event.
+
+4.2 INCREMENTS
+--------------
+For interval Δt:
+
+    buys_i = TI_i,t - TI_i,t-1
+    sells_i = TO_i,t - TO_i,t-1
+    net_i = buys_i - sells_i
+    gross_i = buys_i + sells_i
+
+Validate resets/corrections.
+
+4.3 VELOCITY
+------------
+Per hour:
+
+    v_net = net / elapsed_hours
+    v_buy = buys / elapsed_hours
+    v_sell = sells / elapsed_hours
+
+Use robust handling of unequal snapshot intervals.
+
+4.4 ACCELERATION
+----------------
+Difference in smoothed velocities:
+
+    acceleration_3h_12h
+      =
+      EWMA_velocity_short - EWMA_velocity_long
+
+Also:
+
+- ratio;
+- slope from recent intervals;
+- second derivative of cumulative flow;
+- momentum persistence.
+
+4.5 EWMA WINDOWS
+----------------
+Configurable half-lives:
+
+- 30m;
+- 1h;
+- 3h;
+- 6h;
+- 12h;
+- 24h;
+- since deadline;
+- since last change.
+
+No one decay rate is assumed to match the hidden algorithm.
+
+4.6 CUMULATIVE PRESSURE
+-----------------------
+Features:
+
+- net since last rise;
+- net since last fall;
+- net since any price change;
+- net since Gameweek deadline;
+- net since season start;
+- positive/negative separated;
+- recent-weighted pressure.
+
+4.7 PRESSURE PERSISTENCE
+------------------------
+- fraction of positive intervals;
+- consecutive positive intervals;
+- flow half-life;
+- spike decay;
+- peak-to-current velocity;
+- area under transfer-rate curve.
+
+4.8 GLOBAL MARKET ACTIVITY
+--------------------------
+- total transfers across all players;
+- total buys/sells;
+- share captured by player;
+- rank among players;
+- percentile by ownership/position;
+- deadline-day market regime.
+
+Community research cautions that aggregate market volume can create confounded
+patterns; it remains a feature, not a hard rule.
+
+======================================================================
+5. OWNERSHIP-ADJUSTED TRANSFER RATES
+======================================================================
+
+5.1 ESTIMATED OWNER COUNT
+-------------------------
+Let:
+
+    N_t = estimated active manager population
+    own_i,t = selected_by_percent / 100
+    owners_i,t = N_t x own_i,t
+    nonowners_i,t = N_t - owners_i,t
+
+Ownership percentage is rounded and manager-count timing uncertain.
+Propagate denominator uncertainty.
+
+5.2 BUY HAZARD AMONG NONOWNERS
+------------------------------
+    buy_rate_nonowners
+      =
+      buys / max(nonowners, floor)
+
+This represents the fraction of eligible potential buyers transferring the
+player in during the interval.
+
+5.3 SELL HAZARD AMONG OWNERS
+----------------------------
+    sell_rate_owners
+      =
+      sells / max(owners, floor)
+
+This is often more meaningful for falls than raw net transfers.
+
+5.4 NET OWNERSHIP PRESSURE
+--------------------------
+Do not simply subtract rates with incompatible denominators.
+
+Store separately and create calibrated transformations such as:
+
+    logit_buy_pressure - logit_sell_pressure
+
+or model both features.
+
+5.5 LOW OWNERSHIP
+-----------------
+Low-owned players have:
+
+- a small owner base;
+- a very large nonowner pool;
+- limited absolute transfer volume initially;
+- rounded ownership measurement error.
+
+No official ownership floor is assumed.
+
+A 2026 practitioner analysis reported no rises below 1% ownership in its
+four-season sample, but this remains an unverified community finding and may
+reflect the absolute volume needed to reach a hidden threshold.
+
+Use as:
+
+- prior/feature;
+- prospective hypothesis test;
+- not a hard production rule.
+
+5.6 HIGH OWNERSHIP
+------------------
+Raw sales can be large even when the per-owner sell rate is moderate.
+
+Use both absolute and adjusted flow.
+
+======================================================================
+6. UNIQUE MANAGERS AND WILDCARD CONTAMINATION
+======================================================================
+
+6.1 PROBLEM
+-----------
+Official aggregate transfer counters may not reveal:
+
+- unique managers;
+- repeated in/out actions;
+- Wildcard transfers;
+- Free Hit transfers;
+- automated/invalid patterns;
+- how the hidden algorithm counts them.
+
+6.2 COMMUNITY HYPOTHESES
+------------------------
+Historical community belief often held that Wildcard transfers were excluded or
+discounted.
+
+A 2026 FPLCore analysis using four seasons and a large sampled manager dataset
+argues that:
+
+- unique managers may matter more than raw transfer count;
+- repeated transfers by one manager may be capped;
+- chip-driven transfers contribute less pressure than raw transfer totals imply;
+- the exact mechanism remains inferred, not source-code verified.
+
+This is useful practitioner evidence but not controlling truth.
+
+6.3 PRODUCTION POLICY
+---------------------
+Do not hard-code:
+
+    wildcard transfers count zero
+
+or:
+
+    one transfer per manager is definitely the algorithm.
+
+Instead estimate latent effective flow.
+
+6.4 CHIP CONTAMINATION FEATURES
+-------------------------------
+If a lawful manager sample exists:
+
+- Wildcard share among transferring managers;
+- Free Hit share;
+- unique manager count;
+- repeated-transfer rate;
+- normal-transfer count.
+
+If not:
+
+- Gameweek number;
+- known Wildcard/chip windows;
+- total gross transfers;
+- ratio of gross to net;
+- unusually broad squad churn;
+- FPL chip usage aggregates if officially available;
+- sample uncertainty.
+
+6.5 MEASUREMENT MODEL
+---------------------
+Observed transfer flow:
+
+    observed_flow
+      =
+      effective_flow
+      + chip_contamination
+      + repeated_manager_flow
+      + measurement_noise
+
+Latent effective flow enters the price pressure model.
+
+6.6 UNCERTAINTY
+---------------
+When chip share is unknown:
+
+- posterior pressure interval widens;
+- threshold distance confidence falls;
+- act-now decisions require stronger evidence.
+
+======================================================================
+7. FLAGS, INJURIES AND STATUS REGIMES
+======================================================================
+
+7.1 FPL STATUS
+--------------
+Potential states:
+
+- available;
+- doubtful;
+- injured;
+- suspended;
+- unavailable;
+- left league;
+- unknown.
+
+Exact target-season enums must be mapped.
+
+7.2 STATUS TRANSITION
+---------------------
+Features:
+
+- current flag;
+- previous flag;
+- flag onset time;
+- flag removal time;
+- chance percentage;
+- news age;
+- injury severity;
+- DMFP-07 availability probabilities.
+
+7.3 SALES RESPONSE
+------------------
+An injury/flag can create:
+
+- rapid gross sales;
+- acceleration;
+- ownership-dependent fall risk;
+- deadline-dependent behaviour.
+
+7.4 PRICE PROTECTION HYPOTHESES
+-------------------------------
+Community tools have historically discussed "price protection" after some flag
+changes.
+
+The official public rules do not establish the precise rule.
+
+Pulse treats protection as a latent status regime:
+
+- NORMAL;
+- POSSIBLE_LOCK;
+- POST_FLAG_TRANSITION;
+- UNKNOWN.
+
+The probability and duration are learned prospectively.
+
+7.5 HARD-CODE PROHIBITION
+-------------------------
+Do not set a fixed lock length from community lore without target-season
+evidence.
+
+7.6 LEFT LEAGUE/CLUB
+--------------------
+Player status and price behaviour may be exceptional.
+Model separately or exclude from ordinary price-risk decisions.
+
+7.7 INJURY DECISION LINK
+------------------------
+DMFP-07 provides:
+
+- p_start;
+- p_appearance;
+- injury uncertainty.
+
+These enter both:
+
+- price fall prediction through manager behaviour;
+- early-transfer risk directly.
+
+Do not use the predicted fall twice in transfer utility.
+
+======================================================================
+8. DEADLINE AND CALENDAR FEATURES
+======================================================================
+
+8.1 TIME TO DEADLINE
+--------------------
+- hours to FPL deadline;
+- hours since prior deadline;
+- day of Gameweek;
+- number of matches completed;
+- whether player's match completed;
+- upcoming fixture time.
+
+8.2 POSTMATCH SURGE
+-------------------
+Points, injury and benching can trigger transfer waves.
+
+Features:
+
+- hours since player's last match;
+- latest FPL points;
+- ownership change;
+- news/flag;
+- match visibility/time.
+
+8.3 PREDEADLINE SURGE
+---------------------
+Managers concentrate transfers near deadline.
+
+Hazard is not stationary through the week.
+
+8.4 INTERNATIONAL BREAK
+------------------------
+Long intervals, injury news and slow transfer accumulation require separate
+calendar regime.
+
+8.5 BLANK/DOUBLE
+----------------
+Fixture announcements and DGWs can create sharp demand changes.
+
+8.6 UPDATE OPPORTUNITY
+----------------------
+The price event occurs at overnight cycles, while flow evolves continuously.
+
+Features are frozen at the final valid pre-update snapshot.
+
+======================================================================
+9. EVENT-HISTORY FEATURES
+======================================================================
+
+9.1 LAST EVENT
+--------------
+- previous price change direction;
+- price before/after;
+- update timestamp.
+
+9.2 GAP TIME
+------------
+- updates since last rise;
+- updates since last fall;
+- updates since any change;
+- hours since.
+
+9.3 EVENT ORDER
+---------------
+- number of rises this Gameweek;
+- number of falls;
+- season rises/falls;
+- consecutive same-direction events.
+
+9.4 RESET HYPOTHESIS
+--------------------
+A 2026 practitioner analysis argues that a cumulative counter resets after a
+price change and reports frequent double/triple rises within Gameweeks.
+
+Pulse uses:
+
+- post-event latent reset;
+- estimated reset distribution;
+- event-history features.
+
+It does not hard-code the reported 200k–240k threshold as official.
+
+9.5 DIRECTIONAL DEPENDENCE
+--------------------------
+After a rise, continued demand can make another rise more likely.
+After a fall, a quick opposite rise may be uncommon.
+
+Estimate prospectively and separately.
+
+9.6 GAMEWEEK TENDENCY
+---------------------
+Official language says movement has historically tended to total £0.3m per
+Gameweek.
+
+Treat as:
+
+- empirical prior;
+- not an absolute cap unless target rules confirm.
+
+======================================================================
+10. LATENT THRESHOLD-PRESSURE MODEL
+======================================================================
+
+10.1 MOTIVATION
+---------------
+Pulse observes noisy proxies for the hidden demand counter.
+
+Define latent rise pressure:
+
+    Z_i,t^+
+
+and fall pressure:
+
+    Z_i,t^-.
+
+10.2 STATE TRANSITION
+---------------------
+Illustrative:
+
+    Z_i,t+1^+
+      =
+      rho_i,t^+ Z_i,t^+
+      + beta^+ f_i,t^+
+      + u_i,t^+
+      - reset_i,t^+
+
+    Z_i,t+1^-
+      =
+      rho_i,t^- Z_i,t^-
+      + beta^- f_i,t^-
+      + u_i,t^-
+      - reset_i,t^-
+
+where:
+
+- f contains observed/ownership-adjusted flows;
+- u is hidden effective-flow noise;
+- rho is learned persistence;
+- reset depends on price event/status/Gameweek;
+- states are not required to be literal transfer counts.
+
+10.3 EVENT BOUNDARY
+-------------------
+Latent boundaries:
+
+    B_i,t^+
+    B_i,t^-.
+
+Boundary can vary by:
+
+- season;
+- direction;
+- status;
+- ownership regime;
+- price/event history;
+- hidden rules.
+
+10.4 PROBABILISTIC CROSSING
+---------------------------
+Event probability can be:
+
+    P(RISE at next update)
+      =
+      logistic(
+        (Z^+ - B^+) / tau^+
+        + baseline/calendar effects
+      )
+
+Fall analogous.
+
+A multinomial link ensures coherent rise/fall/no-change probabilities.
+
+10.5 STOCHASTIC THRESHOLD
+-------------------------
+Because hidden inputs are missing, use a distribution over B and Z.
+
+A deterministic threshold on imperfect public flow would be falsely precise.
+
+10.6 PARTICLE FILTER
+--------------------
+Candidate online inference:
+
+- particles over latent pressure/boundary/regime;
+- update with each transfer snapshot;
+- condition on observed nightly event;
+- resample;
+- output boundary-crossing probability and distance.
+
+Initial V1 may use posterior filtering in a simpler linear-Gaussian/nonlinear
+state-space approximation.
+
+10.7 FIRST-HITTING-TIME CONNECTION
+----------------------------------
+Threshold regression models event time as a latent stochastic process reaching a
+boundary.
+
+This is conceptually appropriate, but Pulse must respect the discrete nightly
+decision/update mechanism.
+
+10.8 DISTANCE
+-------------
+Normalized:
+
+    D_i,t^+
+      =
+      (Z_i,t^+ - B_i,t^+) / scale_i^+
+
+Report posterior distribution.
+
+10.9 INTERPRETABILITY
+---------------------
+Threshold distance answers:
+
+"How strongly does the observed hidden-pressure model suggest the player is
+near or beyond a rise boundary?"
+
+It does not answer:
+
+"What exact transfer count is in FPL source code?"
+
+======================================================================
+11. DISCRETE-TIME COMPETING-RISK HAZARD
+======================================================================
+
+11.1 TIME UNIT
+--------------
+One official overnight price-update opportunity.
+
+11.2 MULTINOMIAL HAZARD
+-----------------------
+For event k in {RISE, FALL, NO_CHANGE}:
+
+    P(Y_i,t=k | at risk, X_i,t)
+      =
+      softmax_k(eta_i,t,k)
+
+11.3 LINEAR PREDICTOR
+---------------------
+eta includes:
+
+- latent threshold distances;
+- transfer flow;
+- ownership-adjusted rates;
+- acceleration;
+- event history;
+- flag/status;
+- price;
+- deadline calendar;
+- wildcard contamination;
+- player/season effects;
+- interactions.
+
+11.4 HIERARCHICAL EFFECTS
+-------------------------
+- season;
+- player;
+- price bracket;
+- ownership bracket;
+- position;
+- status regime;
+- update/day;
+- prior event direction.
+
+11.5 GAP-TIME MODEL
+-------------------
+Price-change recurrence resembles recurrent survival data.
+
+Use gap time since last event and event-order-specific baseline hazards,
+analogous in spirit to Prentice–Williams–Peterson recurrent-event approaches.
+
+11.6 ANDERSEN–GILL CHALLENGER
+-----------------------------
+A counting-process model treats repeated events with time-varying covariates.
+
+Useful baseline, but may underrepresent event-order/reset dependence.
+
+11.7 FRAILTY
+------------
+Player/season frailty/random effects capture persistent unobserved
+change-proneness.
+
+11.8 TIME-VARYING COVARIATES
+----------------------------
+Transfer rates and flags are updated through the risk interval.
+Use the last valid values before the nightly update.
+
+11.9 CALIBRATED PROBABILITY
+---------------------------
+Survival discrimination alone is insufficient.
+Absolute next-update probabilities must be calibrated.
+
+======================================================================
+12. CLASSIFICATION APPROACHES
+======================================================================
+
+12.1 TARGET
+-----------
+Multiclass:
+
+- rise;
+- fall;
+- no change.
+
+Alternatively:
+
+- rise versus not;
+- fall versus not;
+
+with coherent reconciliation.
+
+12.2 MODELS
+-----------
+Baselines:
+
+- logistic/multinomial logistic;
+- penalized splines/GAM;
+- random forest;
+- gradient-boosted trees.
+
+Primary challenger:
+
+- LightGBM/XGBoost.
+
+12.3 NONLINEAR VALUE
+--------------------
+Tree models can capture:
+
+- threshold interactions;
+- ownership/flow regimes;
+- post-event reset;
+- flags;
+- deadline timing;
+- acceleration.
+
+12.4 CLASS IMBALANCE
+--------------------
+Price changes are rare relative to player-update rows.
+
+Do not judge by accuracy.
+
+12.5 WEIGHTING/RESAMPLING
+-------------------------
+Class weights can improve rare-event identification but alter probability
+calibration.
+
+If used:
+
+- train weights documented;
+- probabilities recalibrated on natural prevalence;
+- evaluation uses untouched prevalence;
+- no random oversampling across time.
+
+12.6 CALIBRATION
+----------------
+Candidate:
+
+- Platt/logistic;
+- beta calibration;
+- isotonic with enough data;
+- multiclass calibration.
+
+Fit on walk-forward validation only.
+
+12.7 ENSEMBLE
+-------------
+Initial:
+
+- hazard/state model primary;
+- GBDT challenger;
+- interpretable threshold baseline.
+
+Future stacking by out-of-time log score.
+
+======================================================================
+13. PRICE-PATH SIMULATION
+======================================================================
+
+13.1 PURPOSE
+------------
+Next-update probability is insufficient for:
+
+- 24h;
+- 72h;
+- 7d;
+- multiple changes;
+- team-value decisions.
+
+13.2 SIMULATION STATE
+---------------------
+For each path:
+
+- current price;
+- latent rise/fall pressure;
+- ownership;
+- transfer momentum;
+- flag/status;
+- last event;
+- Gameweek/deadline;
+- model parameters;
+- future news/football scenarios.
+
+13.3 UPDATE LOOP
+----------------
+For every expected nightly opportunity:
+
+1. evolve transfer-flow process;
+2. update ownership and latent pressure;
+3. sample status/news scenario;
+4. calculate rise/fall/no-change hazard;
+5. sample price event;
+6. apply configured price step;
+7. reset/update state;
+8. continue.
+
+13.4 FUTURE TRANSFER FLOW
+-------------------------
+Model:
+
+- self-exciting/momentum process;
+- decay/reversion;
+- match/news triggers;
+- ownership pool limits;
+- deadline cycle;
+- price event feedback.
+
+A Hawkes/self-exciting challenger MAY model transfer bursts, but a simpler
+state-space/count model is preferred initially.
+
+13.5 CONDITIONAL PATHS
+----------------------
+Price paths are coupled to DMFP-07/09 scenarios:
+
+- injury/benching -> sales;
+- haul/role confirmation -> buys;
+- fixture news -> flow;
+- price change itself -> altered flow.
+
+Avoid double counting the same simulated news in both price and utility.
+
+13.6 PRICE BOUNDS
+-----------------
+Use target-season official bounds if published.
+Otherwise learn observed/catalogue limits and validate.
+
+13.7 OUTPUT PMF
+----------------
+At each horizon:
+
+- exact price-unit probabilities;
+- expected price;
+- quantiles;
+- any rise/fall;
+- number of changes;
+- maximum/minimum.
+
+13.8 SELLING VALUE
+------------------
+For an owned player, also simulate selling-price distribution under the
+purchase-price rules.
+
+======================================================================
+14. MULTIPLE CHANGES WITHIN A GAMEWEEK
+======================================================================
+
+14.1 RECURRENT PATH
+-------------------
+A price event does not end the forecast.
+
+14.2 SAME-DIRECTION MOMENTUM
+----------------------------
+Post-rise demand can remain high.
+Post-fall selling can remain high.
+
+Use event-direction-specific transition.
+
+14.3 OPPOSITE DIRECTION
+-----------------------
+Possible but historically may be less likely over short gaps.
+
+Estimate, do not prohibit.
+
+14.4 GAMEWEEK COUNTS
+--------------------
+Output:
+
+- P(0 changes);
+- P(1 rise);
+- P(2+ rises);
+- P(1 fall);
+- P(2+ falls);
+- P(mixed direction).
+
+14.5 HISTORICAL CAP
+-------------------
+Do not impose ±£0.3 as a hard cap solely because official guidance says
+historically prices have tended to move by that total.
+
+======================================================================
+15. UPDATE-TIME MODEL
+======================================================================
+
+15.1 OFFICIAL FACT
+------------------
+Reference:
+overnight UK time.
+
+15.2 OBSERVATION
+----------------
+High-frequency snapshots identify intervals:
+
+    last unchanged
+    first changed.
+
+15.3 INTERVAL-CENSORED MODEL
+----------------------------
+Estimate distribution of batch time by:
+
+- season;
+- day;
+- daylight-saving state;
+- operational incidents.
+
+15.4 OUTPUT
+-----------
+- next expected update window;
+- p10/p50/p90 update time;
+- latest safe transfer time;
+- timing confidence.
+
+15.5 NO EXECUTION GUARANTEE
+---------------------------
+FPL site/app availability and clock risk remain.
+Recommended transfer time includes safety buffer.
+
+======================================================================
+16. THRESHOLD-DISTANCE ESTIMATION
+======================================================================
+
+16.1 PRIMARY
+------------
+Latent standardized distance.
+
+16.2 OPTIONAL EFFECTIVE TRANSFER UNITS
+--------------------------------------
+Only activate when:
+
+- relationship stable;
+- unique/effective flow is estimable;
+- coverage high;
+- prospective calibration passes.
+
+16.3 COMMUNITY PRIOR
+--------------------
+The 2026 FPLCore practitioner analysis reported:
+
+- approximate fixed rise threshold around 200k–240k cumulative effective
+  transfers;
+- daily activity condition;
+- reset after a change;
+- large four-season dataset;
+- explicit caveats and corrections.
+
+Pulse may use this as a weak prior/challenger.
+
+It MUST NOT state it as official or necessarily valid for falls/2026/27.
+
+16.4 THRESHOLD-DISTANCE CALIBRATION
+-----------------------------------
+For bins of distance:
+
+- empirical next-update rise/fall rate;
+- calibration;
+- season/status;
+- confidence interval.
+
+16.5 DISPLAY
+-------------
+Avoid fake precision.
+
+Good:
+
+"Likely near the rise boundary; posterior probability already across it 61%."
+
+Bad:
+
+"Needs exactly 14,218 transfers."
+
+======================================================================
+17. CONFIDENCE
+======================================================================
+
+17.1 DIMENSIONS
+---------------
+- target-season sample size;
+- snapshot freshness/frequency;
+- manager population estimate;
+- transfer-counter integrity;
+- wildcard contamination;
+- flag/status regime;
+- model agreement;
+- calibration;
+- threshold-state certainty;
+- update-time certainty;
+- structural rule stability.
+
+17.2 GRADES
+-----------
+A:
+mature target-season data, strong calibration, clean status, models agree.
+
+B:
+good flow and event history, moderate uncertainty.
+
+C:
+sparse/early season, chip contamination or model disagreement.
+
+D:
+flag/protection ambiguity, low ownership, missing snapshots, new rule regime.
+
+E:
+source invalid, target game not active, or no usable prediction.
+
+17.3 EARLY SEASON
+-----------------
+Confidence is capped until enough actual price events exist.
+
+Historical priors help but cannot prove target-season mechanics.
+
+======================================================================
+18. EARLY TRANSFER DECISION MODEL
+======================================================================
+
+18.1 DECISION TIMES
+-------------------
+Compare:
+
+- ACT_NOW;
+- WAIT_UNTIL information event;
+- WAIT_UNTIL latest safe time;
+- DO_NOT_TRANSFER;
+- alternative transfer route.
+
+18.2 STATE
+----------
+Includes:
+
+- current squad;
+- bank;
+- free transfers;
+- hits;
+- purchase/selling prices;
+- predicted player points;
+- injury/rotation;
+- price paths;
+- next information;
+- future routes.
+
+18.3 VALUE OF ACTING NOW
+------------------------
+Components:
+
+- avoid target price rise;
+- avoid outgoing price fall;
+- secure affordability;
+- future team-value point value;
+- immediate football points if relevant;
+- preserve another route before price boundary.
+
+Costs:
+
+- injury/rotation/news uncertainty;
+- target may not remain preferred;
+- current player may become better;
+- transfer cannot be reversed for free;
+- purchase-price position lost;
+- free transfer consumed;
+- hit;
+- operational/execution risk.
+
+18.4 VALUE OF WAITING
+---------------------
+Benefits:
+
+- press conference;
+- injury/training update;
+- European/cup match;
+- market move;
+- fixture announcement;
+- more role evidence;
+- retained transfer option.
+
+Costs:
+
+- target rises;
+- outgoing falls;
+- alternative rises;
+- execution risk;
+- reduced time to react;
+- missed current-price route.
+
+18.5 EXPECTED UTILITY
+--------------------
+For action timing τ:
+
+    EU(τ)
+      =
+      E[
+        remaining-season FPL points
+        + terminal/marginal affordability value
+        - hits
+        - forced future transfer costs
+        - lock-in/reversal cost
+      ]
+
+under joint football, information and price scenarios.
+
+18.6 DECISION DIFFERENCE
+------------------------
+    Delta_EU_early
+      =
+      EU(ACT_NOW)
+      -
+      E_Y[max_a EU(a | information Y at wait time)]
+
+Act now if Delta is positive after safety/execution constraints.
+
+18.7 VALUE OF £0.1M
+-------------------
+Use DMFP-10 counterfactual optimiser:
+
+    V_0.1
+      =
+      optimal future expected points with price route preserved
+      -
+      optimal future expected points if route is lost.
+
+This may be:
+
+- zero;
+- small;
+- large near a price-bracket bottleneck.
+
+18.8 SELLING-PRICE ASYMMETRY
+----------------------------
+Buying before one £0.1m target rise:
+
+- saves £0.1m purchase cost;
+- does not automatically create £0.1m sale profit.
+
+Avoiding one £0.1m fall on an owned player:
+
+- can protect £0.1m selling value immediately, subject to current purchase/current
+  relationship.
+
+The exact route is manager-specific.
+
+18.9 INJURY/ROTATION RISK
+-------------------------
+Use DMFP-07 distributions, not generic penalty.
+
+Cost of acting early includes:
+
+- probability target unavailable;
+- expected forced reversal;
+- points lost;
+- transfer/hit required.
+
+18.10 NEW INFORMATION
+---------------------
+Use DMFP-10 EVSI.
+
+High EVSI and low price risk -> WAIT.
+
+High price-route value and low EVSI -> ACT.
+
+18.11 DECISION OUTPUT
+---------------------
+- ACT_NOW;
+- WAIT;
+- DO_NOT_TRANSFER;
+- MANUAL_REVIEW.
+
+Include:
+
+- expected utility difference;
+- price component;
+- football component;
+- information value;
+- reversal risk;
+- switch probability;
+- latest safe time.
+
+======================================================================
+19. EARLY TRANSFER HARD GATES
+======================================================================
+
+19.1 TARGET QUALITY
+-------------------
+Do not buy early solely for price if the target is not a strong football
+candidate.
+
+19.2 ACTIVE MATCH
+-----------------
+Normally avoid early transfer before the target/current player completes a
+competitive match unless utility strongly clears injury/event risk.
+
+19.3 EUROPEAN/CUP MATCH
+-----------------------
+Explicit risk event.
+
+19.4 FLAGGED TARGET
+-------------------
+Manual review or wide scenario.
+
+19.5 HIT
+--------
+Price-only hit requires extraordinary marginal future point value.
+
+Reference four-point transfer cost means a speculative £0.1m alone is usually
+insufficient.
+
+19.6 FREE TRANSFER CAP
+----------------------
+If otherwise losing a free transfer at the cap, acting can be more valuable.
+
+19.7 MULTIPLE ROUTES
+--------------------
+If price rise closes only one route but near-equivalent alternatives remain,
+value is lower.
+
+19.8 DEADLINE BUFFER
+--------------------
+Do not wait beyond safe execution time even if more information could arrive.
+
+======================================================================
+20. TEAM VALUE FORECASTS
+======================================================================
+
+20.1 SQUAD PRICE PATH
+---------------------
+Simulate all owned/candidate player price paths with dependence through:
+
+- transfer market sentiment;
+- Gameweek outcomes/news;
+- chip periods;
+- template/herding;
+- manager population.
+
+20.2 DEPENDENCE
+--------------
+Price events are not independent:
+
+- one popular transfer in is funded by transfers out;
+- wildcard periods create broad churn;
+- injuries redirect flows;
+- same price-position alternatives compete.
+
+20.3 MARKET FLOW FACTOR
+-----------------------
+Use latent global factors:
+
+- overall activity;
+- template momentum;
+- wildcard/chip regime;
+- deadline pressure;
+- post-haul herding.
+
+20.4 LIQUIDATION VALUE
+----------------------
+Calculate manager-specific future selling value using purchase-price history.
+
+20.5 TEAM VALUE METRICS
+-----------------------
+- market squad value;
+- liquidation selling value;
+- bank;
+- usable budget;
+- expected 7d/30d liquidation value;
+- probability target route becomes unaffordable;
+- marginal point value.
+
+20.6 NO DIRECT OBJECTIVE
+------------------------
+The optimiser does not maximize expected liquidation value unless used as a
+small explicit terminal proxy validated against future points.
+
+======================================================================
+21. DATASET DESIGN
+======================================================================
+
+21.1 PLAYER-UPDATE ROW
+----------------------
+One player per nightly update opportunity.
+
+21.2 FEATURES
+-------------
+Only values usable before that update.
+
+21.3 LABEL
+----------
+Rise/fall/no change observed after update.
+
+21.4 MULTIPLE SNAPSHOTS
+-----------------------
+Intraday snapshots create time-varying feature history.
+Training row uses predeclared cutoff, such as final valid snapshot before update.
+
+21.5 PLAYER EVENT SERIES
+------------------------
+Retain recurrent sequence and gap time.
+
+21.6 SEASON VERSION
+-------------------
+Algorithm may change between seasons.
+
+Include:
+
+- season;
+- detected change points;
+- target-season weighting;
+- no indiscriminate pooling.
+
+21.7 RETROSPECTIVE COMMUNITY DATA
+---------------------------------
+May seed historical research but must be labelled RECONSTRUCTED and validated.
+
+Prospective Pulse snapshots are the gold standard.
+
+======================================================================
+22. CLASS IMBALANCE AND EVALUATION
+======================================================================
+
+22.1 PREVALENCE
+---------------
+No-change dominates.
+
+Metrics must reflect rare-event quality.
+
+22.2 PRIMARY PROBABILITY METRICS
+-------------------------------
+- multiclass logarithmic score;
+- Brier score/decomposition;
+- calibration intercept/slope;
+- reliability diagrams.
+
+22.3 RARE-EVENT METRICS
+-----------------------
+- precision;
+- recall;
+- precision-recall AUC;
+- lift at top k;
+- false-alert rate;
+- event capture at confidence thresholds.
+
+22.4 ROC
+--------
+ROC-AUC can appear strong under severe imbalance.
+Report but do not use as primary.
+
+22.5 SURVIVAL
+-------------
+- time-dependent Brier score;
+- cumulative incidence calibration;
+- integrated Brier score;
+- concordance/discrimination as secondary.
+
+22.6 PRICE HORIZON
+------------------
+- CRPS/ranked score for price PMF;
+- MAE of expected price;
+- coverage of price intervals;
+- probability any/multiple changes.
+
+22.7 THRESHOLD DISTANCE
+-----------------------
+Calibration of boundary-crossing bins.
+
+22.8 DECISION EVALUATION
+------------------------
+Most important:
+
+- ACT versus WAIT expected/realised utility;
+- price route preserved/lost;
+- points;
+- forced reversals;
+- hits;
+- value of information;
+- marginal team-value points.
+
+======================================================================
+23. WALK-FORWARD VALIDATION
+======================================================================
+
+23.1 TIME SPLIT
+---------------
+Train on past update cycles, predict future cycles.
+
+23.2 SEASON SPLIT
+-----------------
+- cross-season generalisation;
+- target-season online recalibration;
+- algorithm-change detection.
+
+23.3 PLAYER CLUSTER
+------------------
+Prevent leakage through future event history.
+
+23.4 CHIP WINDOWS
+-----------------
+Evaluate separately:
+
+- Wildcard-heavy;
+- normal;
+- Free Hit;
+- first weeks;
+- international breaks.
+
+23.5 FLAGS
+----------
+- available;
+- newly flagged;
+- long flagged;
+- flag removed;
+- left league.
+
+23.6 OWNERSHIP
+--------------
+Calibration by ownership range.
+
+23.7 EVENT ORDER
+----------------
+- first change;
+- second/third change;
+- post-rise;
+- post-fall.
+
+======================================================================
+24. BASELINES AND ABLATIONS
+======================================================================
+
+24.1 BASELINES
+--------------
+B0:
+No-change for everyone.
+
+B1:
+Raw net transfers ranking.
+
+B2:
+Ownership-adjusted net transfer rate.
+
+B3:
+Fixed empirical threshold heuristic.
+
+B4:
+Logistic rise/fall classifier.
+
+B5:
+Public predictor snapshot, manually captured where permitted.
+
+24.2 ABLATIONS
+--------------
+- no acceleration;
+- no ownership adjustment;
+- no wildcard proxy;
+- no flag status;
+- no event history;
+- no latent pressure;
+- no deadline/calendar;
+- no price;
+- no global transfer factor.
+
+24.3 COMMUNITY HYPOTHESIS TESTS
+------------------------------
+Explicitly test:
+
+- fixed threshold;
+- counter reset;
+- unique-manager counting;
+- low-ownership floor;
+- daily activity condition;
+- price effect on rises/falls;
+- flag protection;
+- Gameweek movement tendency.
+
+Preserve null/contradictory results.
+
+======================================================================
+25. MODEL UPDATING AND DRIFT
+======================================================================
+
+25.1 ONLINE FILTER
+------------------
+Latent pressure updates after every transfer snapshot.
+
+25.2 NIGHTLY UPDATE
+-------------------
+After observed event:
+
+- condition posterior;
+- update reset/regime;
+- recalibrate event-history state.
+
+25.3 WEEKLY
+-----------
+- recalibrate probabilities;
+- evaluate confidence;
+- update GBDT challenger periodically.
+
+25.4 SEASON START
+-----------------
+Strong historical prior but wide target-season mechanism uncertainty.
+
+25.5 CHANGE DETECTION
+---------------------
+Alert when:
+
+- calibration collapses;
+- threshold-distance relation shifts;
+- update time changes;
+- flags behave differently;
+- event frequency changes;
+- official fields/rules change.
+
+25.6 FALLBACK
+-------------
+If drift:
+
+1. target-season empirical hazard;
+2. simple calibrated flow model;
+3. public official statement only;
+4. confidence D/E;
+5. no price-motivated early action.
+
+======================================================================
+26. CONFIGURATION
+======================================================================
+
+config/prices/
+  official_rules.yaml
+  update_cycles.yaml
+  snapshot_policy.yaml
+  transfer_features.yaml
+  ownership_adjustment.yaml
+  wildcard_contamination.yaml
+  status_regimes.yaml
+  recurrent_events.yaml
+  latent_pressure.yaml
+  hazard_model.yaml
+  classifier.yaml
+  calibration.yaml
+  price_paths.yaml
+  threshold_distance.yaml
+  confidence.yaml
+  early_transfer_policy.yaml
+  team_value.yaml
+  alerts.yaml
+
+No hard-coded:
+
+- exact threshold;
+- wildcard exclusion;
+- lock/protection duration;
+- nightly minute;
+- Gameweek cap;
+- value of £0.1m;
+- rise/fall symmetry.
+
+======================================================================
+27. IMPLEMENTATION ARCHITECTURE
+======================================================================
+
+27.1 PACKAGE
+------------
+src/dmf_pulse/prices/
+
+- observations.py
+- update_cycles.py
+- labels.py
+- transfer_flows.py
+- ownership.py
+- chip_contamination.py
+- flags.py
+- event_history.py
+- latent_pressure.py
+- recurrent_hazard.py
+- classifiers.py
+- calibration.py
+- threshold_distance.py
+- update_time.py
+- price_paths.py
+- selling_value.py
+- team_value.py
+- early_transfer.py
+- evaluation.py
+- explain.py
+- schemas.py
+
+27.2 CORE INTERFACES
+--------------------
+build_price_update_rows(snapshot_history, update_cycles)
+
+calculate_transfer_flow_features(player_history, context)
+
+estimate_effective_flow(observed_flow, chip_state, model)
+
+filter_latent_pressure(previous_state, new_features, event)
+
+predict_next_update(player_state, model_versions)
+
+simulate_price_paths(player_state, horizon, scenarios)
+
+calculate_threshold_distance(latent_state)
+
+calculate_selling_value_paths(manager_state, price_paths, ruleset)
+
+evaluate_act_now_vs_wait(decision_state, information_event)
+
+27.3 FRAMEWORK
+--------------
+Initial:
+
+- PyMC/NumPyro or custom state-space filter;
+- regularized multinomial model;
+- LightGBM/XGBoost challenger;
+- SciPy/JAX/NumPy;
+- no LLM-generated probabilities.
+
+27.4 SPEED
+-----------
+Price predictions update incrementally after each snapshot.
+
+Full league:
+target under one minute.
+
+Early-transfer utility may call downstream optimiser and can run asynchronously
+within the current decision process, not in the background after response.
+
+======================================================================
+28. DATA TABLES
+======================================================================
+
+28.1 FPL PRICE OBSERVATION
+--------------------------
+- player-season;
+- now cost;
+- selected percentage;
+- transfers;
+- status;
+- observed/usable time;
+- source snapshot.
+
+28.2 PRICE UPDATE CYCLE
+-----------------------
+- cycle ID;
+- interval;
+- first/last observation;
+- event;
+- timing censoring;
+- Gameweek.
+
+28.3 TRANSFER FEATURE
+---------------------
+- player;
+- as-of;
+- raw increments;
+- rates;
+- EWMAs;
+- acceleration;
+- ownership adjustment;
+- global activity;
+- chip proxy.
+
+28.4 LATENT STATE
+-----------------
+- rise/fall pressure posterior;
+- boundary posterior;
+- regime;
+- particles/summary;
+- model version.
+
+28.5 PROJECTION
+--------------
+Required outputs and price PMFs.
+
+28.6 EARLY TRANSFER ANALYSIS
+----------------------------
+- action;
+- wait event;
+- price value;
+- football value;
+- information value;
+- reversal risk;
+- recommendation.
+
+======================================================================
+29. TESTING
+======================================================================
+
+29.1 LABELS
+-----------
+- no change;
+- rise;
+- fall;
+- multiple days;
+- correction;
+- preseason excluded;
+- interval timing.
+
+29.2 FEATURES
+-------------
+- unequal intervals;
+- transfer reset/correction;
+- rounded ownership;
+- zero owners/nonowners;
+- flag transition;
+- deadline change;
+- wildcard proxy.
+
+29.3 HAZARD
+-----------
+- probabilities sum one;
+- nonnegative;
+- recurrent event;
+- post-rise/fall gap;
+- no future feature;
+- calibration.
+
+29.4 LATENT PRESSURE
+--------------------
+- filtering;
+- reset;
+- boundary distance;
+- particle reproducibility;
+- uncertainty widens with missing chip data.
+
+29.5 PRICE PATH
+---------------
+- price increments configured;
+- multiple changes;
+- PMF sums one;
+- expected price from PMF;
+- selling-price path;
+- Gameweek tendency not a hard cap.
+
+29.6 EARLY TRANSFER
+-------------------
+Synthetic:
+
+- certain rise, no news risk -> ACT;
+- low rise, major press conference -> WAIT;
+- outgoing likely fall;
+- target plays Europe before deadline;
+- £0.1 route irrelevant -> no early action;
+- £0.1 closes unique high-value route;
+- price-only hit rejected;
+- free transfer otherwise expires.
+
+29.7 PROPERTY TESTS
+-------------------
+- P(rise)+P(fall)+P(no)=1;
+- expected price within support;
+- price path integer units;
+- threshold distance label remains model-inferred;
+- no target-season production before activation;
+- action utility decomposes.
+
+======================================================================
+30. ALERTS AND MONITORING
+======================================================================
+
+P0:
+- official price field invalid;
+- update event missed;
+- current price mismatch;
+- price rule changed;
+- probability invalid;
+- target-season model inactive.
+
+P1:
+- calibration failure;
+- update time shift;
+- transfer counters reset unexpectedly;
+- source snapshot stale;
+- threshold mechanism drift;
+- early-transfer action depends on E-confidence price model.
+
+P2:
+- wildcard contamination high;
+- flag protection ambiguous;
+- model disagreement;
+- low ownership/out-of-distribution;
+- multiple-change tail unstable.
+
+Metrics:
+
+- next-update log loss/Brier;
+- rise/fall precision/recall;
+- calibration;
+- price PMF CRPS;
+- threshold-distance calibration;
+- confidence performance;
+- ACT/WAIT utility;
+- team-value contribution;
+- false early-transfer alerts.
+
+======================================================================
+31. EXPLAINABILITY
+======================================================================
+
+31.1 PRICE EXPLANATION
+----------------------
+Must answer:
+
+- current price;
+- ownership;
+- observed buys/sells;
+- adjusted rates;
+- acceleration;
+- time to deadline/update;
+- last change;
+- flag/status;
+- wildcard uncertainty;
+- model probabilities;
+- threshold distance;
+- model disagreement.
+
+31.2 DECISION EXPLANATION
+-------------------------
+Must answer:
+
+- why acting now could save money;
+- whether the £0.1m is actually usable;
+- football reason for transfer;
+- information expected before deadline;
+- injury/rotation risk;
+- reversal cost;
+- probability route becomes unaffordable;
+- recommendation and latest safe action time.
+
+31.3 LANGUAGE
+-------------
+Good:
+
+"62% estimated chance of a rise at the next overnight update. The transfer is
+still a WAIT because tomorrow's team news has higher expected decision value
+than the modeled £0.1m affordability risk."
+
+Bad:
+
+"He will definitely rise tonight."
+
+======================================================================
+32. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+32.1 CODEX MAY
+-------------
+- implement snapshots/features;
+- fit survival/classification models;
+- implement state-space filtering;
+- simulate prices;
+- calculate selling values;
+- call optimiser for marginal budget;
+- implement early-transfer decision analysis;
+- create tests/reports.
+
+32.2 CODEX MUST NOT
+-------------------
+- hard-code community thresholds as official;
+- assume wildcard transfers count zero;
+- infer exact unique managers without data;
+- use post-update transfer data in prediction;
+- use future flags/news;
+- optimise accuracy under class imbalance;
+- report threshold distance as a fact;
+- maximize team value;
+- recommend early transfer solely because P(rise) is high;
+- ignore selling-price asymmetry;
+- treat one £0.1m rise as £0.1m sale profit;
+- take a price-only hit without full utility;
+- invent update time;
+- use an LLM for numeric probabilities.
+
+32.3 PULL REQUEST
+-----------------
+Every model change states:
+
+- theory/hypothesis;
+- data period;
+- features;
+- leakage controls;
+- calibration;
+- rare-event metrics;
+- ACT/WAIT effect;
+- target-season status;
+- rollback.
+
+======================================================================
+33. RISK REGISTER
+======================================================================
+
+R-11-001 — Hidden algorithm treated as known
+Probability: High
+Impact: Critical
+Mitigation:
+latent/probabilistic threshold and labels.
+
+R-11-002 — Community threshold hard-coded
+Probability: High
+Impact: Critical
+Mitigation:
+weak prior/challenger only.
+
+R-11-003 — Rise/fall modeled symmetrically
+Probability: High
+Impact: High
+Mitigation:
+separate states/hazards.
+
+R-11-004 — One-time model ignores recurrent changes
+Probability: High
+Impact: Critical
+Mitigation:
+recurrent gap-time process.
+
+R-11-005 — £0.3 Gameweek tendency treated as cap
+Probability: Medium
+Impact: High
+Mitigation:
+empirical prior only.
+
+R-11-006 — Raw transfers ignore ownership pool
+Probability: High
+Impact: High
+Mitigation:
+buy/sell denominators.
+
+R-11-007 — Ownership rounding creates false precision
+Probability: High
+Impact: Medium
+Mitigation:
+denominator uncertainty.
+
+R-11-008 — Wildcard transfers assumed excluded
+Probability: High
+Impact: Critical
+Mitigation:
+measurement model.
+
+R-11-009 — Mass manager sampling violates terms
+Probability: Medium
+Impact: Critical
+Mitigation:
+no unapproved scraping; proxy uncertainty.
+
+R-11-010 — Transfer acceleration calculated from unequal intervals
+Probability: Medium
+Impact: High
+Mitigation:
+rate/time normalization.
+
+R-11-011 — Deadline/postmatch regime ignored
+Probability: High
+Impact: High
+Mitigation:
+calendar features.
+
+R-11-012 — Flag protection hard-coded
+Probability: High
+Impact: Critical
+Mitigation:
+latent regime/prospective evidence.
+
+R-11-013 — Target-season algorithm changed
+Probability: Medium
+Impact: Critical
+Mitigation:
+early confidence cap/drift detection.
+
+R-11-014 — Classification accuracy looks excellent
+Probability: Certain
+Impact: High
+Mitigation:
+proper scores/PR/calibration.
+
+R-11-015 — Class weighting destroys calibration
+Probability: High
+Impact: High
+Mitigation:
+natural-prevalence recalibration.
+
+R-11-016 — Random train/test split leaks future
+Probability: High
+Impact: Critical
+Mitigation:
+walk-forward.
+
+R-11-017 — Update time guessed too precisely
+Probability: Medium
+Impact: High
+Mitigation:
+interval-censored window.
+
+R-11-018 — Snapshot misses update
+Probability: Medium
+Impact: High
+Mitigation:
+overnight cadence and interval label.
+
+R-11-019 — Threshold distance interpreted as transfers remaining
+Probability: High
+Impact: Reputational
+Mitigation:
+normalized unit/model label.
+
+R-11-020 — Price path ignores event reset
+Probability: High
+Impact: Critical
+Mitigation:
+state transition after each change.
+
+R-11-021 — Price path independent of injuries/news
+Probability: Medium
+Impact: High
+Mitigation:
+joint scenarios.
+
+R-11-022 — Team value maximized
+Probability: High
+Impact: Critical
+Mitigation:
+marginal future-points value.
+
+R-11-023 — £0.1 rise sale value overstated
+Probability: High
+Impact: High
+Mitigation:
+ownership-spell selling rules.
+
+R-11-024 — Outgoing fall and target rise double counted
+Probability: Medium
+Impact: High
+Mitigation:
+route-specific affordability.
+
+R-11-025 — Early transfer ignores European/cup match
+Probability: High
+Impact: Critical
+Mitigation:
+information/event scenarios.
+
+R-11-026 — Wait recommendation misses execution
+Probability: Medium
+Impact: Critical
+Mitigation:
+safe-time buffer/update window.
+
+R-11-027 — Price-only hit taken
+Probability: Medium
+Impact: Critical
+Mitigation:
+full utility gate.
+
+R-11-028 — Reversal cost omitted
+Probability: High
+Impact: High
+Mitigation:
+lock-in and purchase-price state.
+
+R-11-029 — Public predictor used as ground truth
+Probability: Medium
+Impact: High
+Mitigation:
+benchmark only.
+
+R-11-030 — Low-ownership player outside training support
+Probability: High
+Impact: Medium/High
+Mitigation:
+OOD confidence D.
+
+R-11-031 — Flagged player outside model support
+Probability: Medium
+Impact: High
+Mitigation:
+separate status model/manual review.
+
+R-11-032 — Expected price hides multimodal path
+Probability: High
+Impact: High
+Mitigation:
+price PMF/quantiles.
+
+R-11-033 — Team price paths assumed independent
+Probability: Medium
+Impact: High
+Mitigation:
+global/chip/herding factors.
+
+R-11-034 — Acting early becomes a behavioural default
+Probability: High
+Impact: Strategic
+Mitigation:
+ACT/WAIT decision analysis every time.
+
+======================================================================
+34. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-17
+
+----------------------------------------------------------------------
+SRC-FPL-PRICE-2025-001
+Title:
+FPL player price changes: how, why and when does it happen?
+
+Organisation:
+Premier League
+
+Publication date:
+2025-10-03
+
+URL:
+https://www.premierleague.com/en/news/2858775
+
+Relevant claims:
+Prices respond to heavy transfers in/out, can rise/fall £0.1m per day, change
+overnight UK time and have historically tended to move by £0.3m per Gameweek.
+Also explains selling-price examples.
+
+Reliability:
+HIGH official reference-season guidance.
+Exact algorithm not disclosed and target-season verification required.
+
+Pulse reliance:
+YES for broad mechanics, not hidden thresholds.
+
+----------------------------------------------------------------------
+SRC-FPL-TRANSFER-2025-001
+Title:
+FPL basics explained: How to make transfers
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174907
+
+Relevant claims:
+Official reference transfer costs, rolling transfers, price popularity and
+selling-price asymmetry.
+
+Reliability:
+HIGH official reference source.
+
+Pulse reliance:
+YES for early-transfer utility.
+
+----------------------------------------------------------------------
+SRC-FPL-RULES-2026-001
+Title:
+Fantasy Football Game Rules & Help
+
+Organisation:
+Fantasy Premier League
+
+URL:
+https://fantasy.premierleague.com/help/rules
+
+Relevant claim:
+Controlling target-season rules surface; prices change based on transfer-market
+activity and target-season wording must be captured after launch.
+
+Reliability:
+HIGH official, living source.
+
+Pulse reliance:
+BLOCKING at launch.
+
+----------------------------------------------------------------------
+SRC-FPL-TERMS-2026-001
+Title:
+Fantasy Premier League Terms and Conditions
+
+Organisation:
+Premier League
+
+URL:
+https://fantasy.premierleague.com/help/terms
+
+Relevant claim:
+FPL rules may be amended and the Premier League is the final interpreter.
+
+Reliability:
+HIGH official.
+
+Pulse reliance:
+YES for rule-change monitoring and data-use governance.
+
+----------------------------------------------------------------------
+SRC-FPLCORE-2026-001
+Title:
+One Threshold to Rule Them All: Cracking the FPL Price Algorithm, Part 3 of 7
+
+Author/organisation:
+olbaud / FPLCore
+
+Publication date:
+2026-02-23
+
+URL:
+https://www.fplcore.com/blog/one-threshold-to-rule-them-all-cracking-the-fpl-price-algorithm-part-3-of-7
+
+Relevant claims:
+Practitioner analysis of four seasons reports a counter-reset hypothesis,
+multi-rise events, an inferred approximate rise threshold, unique-manager/chip
+effects and several rejected confounded hypotheses.
+
+Reliability:
+MODERATE practitioner research with unusually detailed methodology and explicit
+caveats; not official, partly based on proprietary/sample data, and prospective
+replication required.
+
+Pulse reliance:
+HYPOTHESIS/PRIOR/FEATURE design only.
+
+----------------------------------------------------------------------
+SRC-LIVEFPL-PRICE-2026-001
+Title:
+LiveFPL Price Predictor
+
+Organisation:
+LiveFPL
+
+URL:
+https://www.livefpl.net/prices
+
+Relevant claim:
+Public practitioner predictor based on inferred transfer thresholds and price
+activity.
+
+Reliability:
+MODERATE practitioner tool; algorithm/methodology and guarantees are limited.
+
+Pulse reliance:
+Manual benchmark only, no automated ingestion without permission.
+
+----------------------------------------------------------------------
+SRC-FFSCOUT-PRICE-2026-001
+Title:
+FPL Price Change Predictions
+
+Organisation:
+Fantasy Football Scout
+
+URL:
+https://www.fantasyfootballscout.co.uk/fpl/price-predictions/
+
+Relevant claim:
+Public predictor explicitly states actual changes depend on a proprietary FPL
+algorithm and predictions are estimates.
+
+Reliability:
+MODERATE practitioner benchmark.
+
+Pulse reliance:
+Manual comparison only.
+
+----------------------------------------------------------------------
+SRC-FISO-PRICE-2018-001
+Title:
+The FISO Guide to FPL Price Changes
+
+Organisation:
+FISO community
+
+URL:
+https://www.fiso.co.uk/forum/viewtopic.php?t=128052
+
+Relevant claim:
+Documents historical community assumptions about net transfers, ownership and
+wildcard contamination.
+
+Reliability:
+LOW/MODERATE community observation; dated and unverified.
+
+Pulse reliance:
+Historical hypothesis context only.
+
+----------------------------------------------------------------------
+SRC-THRESHOLD-2009-001
+Title:
+Threshold Regression for Survival Analysis: Modeling Event Times by a
+Stochastic Process Reaching a Boundary
+
+Authors:
+Mei-Ling Ting Lee, G. A. Whitmore
+
+URL:
+https://arxiv.org/abs/0708.0346
+
+Relevant claim:
+First-hitting-time/threshold regression models event time as a latent stochastic
+process reaching a boundary with covariate-dependent parameters.
+
+Reliability:
+HIGH scholarly methodology.
+
+Pulse reliance:
+YES conceptually for latent pressure/boundary.
+
+----------------------------------------------------------------------
+SRC-DISCRETE-SURVIVAL-2022-001
+Title:
+Survival prediction models: an introduction to discrete-time modeling
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC9316420/
+
+Publication date:
+2022
+
+Relevant claim:
+Discrete-time survival methods support flexible hazards, time-varying
+prediction and performance evaluation.
+
+Reliability:
+HIGH peer-reviewed methods paper.
+
+Pulse reliance:
+YES for nightly hazard.
+
+----------------------------------------------------------------------
+SRC-RECURRENT-2014-001
+Title:
+Modelling recurrent events: a tutorial for analysis in epidemiology
+
+Authors:
+L. D. A. F. Amorim, J. Cai
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC4339761/
+
+Publication date:
+2014
+
+Relevant claim:
+Reviews recurrent-event approaches including counting-process, conditional,
+marginal and frailty models.
+
+Reliability:
+HIGH peer-reviewed tutorial.
+
+Pulse reliance:
+YES for repeated price-event structure.
+
+----------------------------------------------------------------------
+SRC-RECURRENT-2018-002
+Title:
+A systematic comparison of recurrent event models
+
+URL:
+https://link.springer.com/article/10.1186/s12874-017-0462-x
+
+Publication date:
+2018
+
+Relevant claim:
+Compares Andersen–Gill, Prentice–Williams–Peterson and related recurrent-event
+models under different data settings.
+
+Reliability:
+HIGH peer-reviewed methodology.
+
+Pulse reliance:
+YES for recurrent-model comparison.
+
+----------------------------------------------------------------------
+SRC-COMPETING-2021-001
+Title:
+Introduction to Survival Analysis in the Presence of Competing Risks
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC10760471/
+
+Relevant claim:
+Competing events must be accounted for when estimating cause-specific absolute
+risk.
+
+Reliability:
+HIGH peer-reviewed methods article.
+
+Pulse reliance:
+YES for rise/fall competing risk.
+
+----------------------------------------------------------------------
+SRC-RARE-EVENT-2023-001
+Title:
+Outcome class imbalance and rare events
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC10175167/
+
+Publication date:
+2023
+
+Relevant claim:
+Class imbalance requires careful modelling and evaluation; apparent
+discrimination/accuracy can be misleading and probability calibration remains
+important.
+
+Reliability:
+HIGH peer-reviewed guidance.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-RARE-EVENT-2021-002
+Title:
+Weighting Methods for Rare Event Identification From Imbalanced Data
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC8734962/
+
+Publication date:
+2021
+
+Relevant claim:
+Examines weighting approaches for rare-event classification.
+
+Reliability:
+HIGH peer-reviewed methods research.
+
+Pulse reliance:
+CHALLENGER/weighting caution.
+
+----------------------------------------------------------------------
+SRC-SCORING-2007-001
+Title:
+Strictly Proper Scoring Rules, Prediction, and Estimation
+
+Authors:
+Tilmann Gneiting, Adrian E. Raftery
+
+URL:
+https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf
+
+Relevant claim:
+Proper scoring rules support honest probabilistic prediction and calibration.
+
+Reliability:
+HIGH foundational research.
+
+Pulse reliance:
+YES for model evaluation.
+
+----------------------------------------------------------------------
+SRC-FPL-SKILL-2020-001
+Title:
+Identification of Skill in an Online Game: The Case of Fantasy Premier League
+
+Authors:
+Joseph D. O'Brien, James P. Gleeson, David J. P. O'Sullivan
+
+URL:
+https://arxiv.org/abs/2009.01206
+
+Relevant claim:
+Long-term planning and consistently good decisions in a noisy FPL contest are
+important indicators of skill; herding/template behaviour is observed.
+
+Reliability:
+HIGH academic research.
+
+Pulse reliance:
+CONTEXTUAL for team-value/herding and decision evaluation.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-02 — FPL Rules, Scoring and Season Configuration
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-03 — Canonical Data Model and Identifiers
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-05 — Ingestion, Storage and Data Quality
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-07 — Player Availability, Start and Minutes Model
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-09 — FPL Points Distribution Engine
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-006
+Title:
+DMFP-10 — Uncertainty, Scenarios and Early-Season Policy
+
+Pulse reliance:
+YES.
+
+======================================================================
+35. ACCEPTANCE CRITERIA
+======================================================================
+
+A. OFFICIAL/UNCERTAINTY
+[ ] Hidden price algorithm is not presented as known.
+[ ] 2025/26 values are reference only.
+[ ] Target-season model is confidence-capped/recalibrated.
+[ ] Community findings are labelled hypotheses.
+
+B. MODEL
+[ ] Rise, fall and no-change probabilities are coherent.
+[ ] Price events are recurrent.
+[ ] Rise/fall mechanisms are separate.
+[ ] Latent pressure and threshold distance have uncertainty.
+[ ] Classification challenger is calibrated.
+
+C. FEATURES
+[ ] Raw, velocity and acceleration are represented.
+[ ] Buy/sell rates use ownership pools.
+[ ] Wildcard contamination is modelled, not assumed away.
+[ ] Flags and protection are regimes, not hard lore.
+[ ] Deadline/event history is included.
+[ ] Multiple changes are supported.
+
+D. OUTPUT
+[ ] All required outputs are produced.
+[ ] Full price-path PMFs exist.
+[ ] Expected price derives from paths.
+[ ] Threshold distance has explicit units/status.
+[ ] Confidence is multidimensional.
+
+E. DECISION
+[ ] ACT NOW versus WAIT is a full utility comparison.
+[ ] Value of £0.1m is route-specific future points.
+[ ] Selling-price asymmetry is exact.
+[ ] Injury/rotation/information are included.
+[ ] Price-only hits face a high gate.
+[ ] Team value is not the objective.
+
+F. EVALUATION
+[ ] Walk-forward validation is mandatory.
+[ ] Proper scores/calibration and PR metrics are used.
+[ ] Decision utility is evaluated.
+[ ] No future transfer/price/news leakage.
+[ ] Drift and target-season changes are monitored.
+
+======================================================================
+36. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Verify all 2026/27 price/transfer fields at launch.
+2. Increase official price snapshot cadence around overnight updates.
+3. Build update-cycle/interval-censored labels.
+4. Build transfer flow feature pipeline.
+5. Estimate active manager population with uncertainty.
+6. Implement ownership-adjusted buy/sell rates.
+7. Build deadline/calendar/event-history features.
+8. Build flag/status transition table.
+9. Implement wildcard/chip contamination proxies.
+10. Create simple calibrated logistic baselines.
+11. Implement recurrent multinomial hazard.
+12. Implement latent pressure/state-space filter.
+13. Implement threshold-distance output.
+14. Implement GBDT challenger and calibration.
+15. Build model ensemble after walk-forward evidence.
+16. Implement update-time interval model.
+17. Implement multi-update price-path simulation.
+18. Implement manager-specific selling-value paths.
+19. Implement squad/team-value path aggregation.
+20. Connect marginal £0.1m value from DMFP-10.
+21. Implement ACT NOW versus WAIT utility.
+22. Build synthetic early-transfer cases.
+23. Benchmark public predictors manually.
+24. Start target-season prospective calibration immediately.
+25. Do not permit price-only recommendations until confidence gate passes.
+26. Connect outputs to DMFP-12 only after model/decision acceptance tests.
+
+Suggested commands:
+
+    dmf prices build-update-cycles
+    dmf prices build-features
+    dmf prices train-hazard
+    dmf prices train-classifier
+    dmf prices filter-pressure
+    dmf prices predict-next
+    dmf prices simulate-path
+    dmf prices threshold-distance
+    dmf prices selling-value
+    dmf prices team-value
+    dmf prices act-or-wait
+    dmf prices calibrate
+    dmf prices evaluate
+    dmf prices validate
+
+======================================================================
+37. OPEN QUESTIONS
+======================================================================
+
+TARGET SEASON
+-------------
+1. What price/transfer fields launch in 2026/27?
+2. What is the actual overnight update window?
+3. Is £0.3 still a tendency or a configured cap?
+4. Does the hidden algorithm materially change?
+5. How do flags/status transitions behave?
+
+TRANSFER FLOWS
+--------------
+6. Can active manager population be estimated reliably each day?
+7. What ownership precision is sufficient?
+8. Can unique managers be observed lawfully?
+9. What chip-use aggregates are available?
+10. Which EWMA/acceleration features are stable?
+
+THRESHOLD
+---------
+11. Does a fixed rise threshold replicate prospectively?
+12. Are rise and fall boundaries different?
+13. Does price affect fall threshold?
+14. Is counter reset complete or partial?
+15. Does pressure decay between changes?
+16. Is a daily activity condition separate from cumulative pressure?
+17. Is there a low-ownership floor?
+
+FLAGS/WILDCARDS
+---------------
+18. Do wildcard/Free Hit transfers count differently?
+19. Is there post-flag price protection?
+20. Which status transitions create protection?
+21. How long does any regime last?
+22. How should unknown contamination affect confidence?
+
+MODELS
+------
+23. Multinomial hazard or separate cause-specific hazards?
+24. Which recurrent-event formulation performs best?
+25. Particle filter or simpler latent-state approximation?
+26. LightGBM or XGBoost?
+27. How are probabilities recalibrated under class weighting?
+28. What sample promotes target-season model?
+
+EARLY TRANSFER
+--------------
+29. What latest safe execution buffer is appropriate?
+30. How is a future press-conference observation modelled?
+31. Which European/cup events create hard WAIT guidance?
+32. What marginal point value does £0.1m usually have?
+33. Can a price-only hit ever pass robust utility?
+34. What probability route becomes unaffordable triggers action?
+35. How is reversal/purchase-price loss valued?
+
+======================================================================
+38. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-12 — SQUAD, TRANSFER AND LINEUP OPTIMISER
+
+DMFP-12 will consume:
+
+- probability of rise/fall;
+- price-path PMFs;
+- selling-value paths;
+- threshold-distance/confidence;
+- ACT/WAIT timing states;
+- marginal budget value;
+- full points scenarios;
+- uncertainty/robustness policy.
+
+It must optimise transfer timing and transfer choice together rather than adding
+price predictions after selecting a player.
+
+======================================================================
+39. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-17
+
+- Defined official price-state ledger.
+- Added recurrent competing-risk update model.
+- Added latent transfer-pressure/threshold state.
+- Added classification/GBDT challengers.
+- Added ownership-adjusted buy and sell rates.
+- Added transfer velocity, acceleration and persistence.
+- Added wildcard/unique-manager measurement model.
+- Added flagged-player/protection regime uncertainty.
+- Added deadline and event-history features.
+- Added multiple-change simulation.
+- Added interval-censored update-time model.
+- Added normalized threshold-distance output.
+- Added complete 24h/72h/7d price distributions.
+- Added selling-value and team-value paths.
+- Defined ACT NOW versus WAIT utility.
+- Added route-specific value of £0.1m.
+- Added class-imbalance, calibration and walk-forward evaluation.
+- Added implementation, tests, risks and source register.
+
+Future v1.0:
+- 2026/27 game launched.
+- target-season fields verified.
+- prospective update cycles collected.
+- hazard/state models calibrated.
+- early-transfer utility backtested.
+- threshold hypotheses accepted/rejected.
+- DMFP-12 integration approved.
+
+END OF DOCUMENT

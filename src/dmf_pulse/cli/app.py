@@ -1,0 +1,76 @@
+"""Top-level Typer application."""
+
+from __future__ import annotations
+
+import json
+from typing import Annotated
+
+import typer
+
+from dmf_pulse import __version__
+from dmf_pulse.cli.config_cmd import config_app
+from dmf_pulse.cli.doctor import build_doctor_report
+from dmf_pulse.cli.evidence_cmd import evidence_app
+from dmf_pulse.cli.review_pack_cmd import review_pack_app
+
+app = typer.Typer(
+    add_completion=False,
+    context_settings={"help_option_names": ["-h", "--help"]},
+    help="DMF Pulse governed foundation commands.",
+    no_args_is_help=True,
+    pretty_exceptions_enable=False,
+)
+app.add_typer(config_app, name="config")
+app.add_typer(evidence_app, name="evidence")
+app.add_typer(review_pack_app, name="review-pack")
+
+DOCTOR_BLOCKING_EXIT = 40
+
+
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"dmf {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def root(
+    version: Annotated[
+        bool,
+        typer.Option(
+            "--version",
+            callback=_version_callback,
+            is_eager=True,
+            help="Show the installed DMF Pulse version and exit.",
+        ),
+    ] = False,
+) -> None:
+    """Dispatch DMF Pulse commands."""
+
+
+@app.command("doctor")
+def doctor_command(
+    as_json: Annotated[bool, typer.Option("--json", help="Emit the stable JSON contract.")] = False,
+) -> None:
+    """Run offline system and configuration diagnostics."""
+
+    report = build_doctor_report()
+    if as_json:
+        typer.echo(json.dumps(report.model_dump(mode="json"), indent=2, sort_keys=True))
+    else:
+        typer.echo(f"DMF Pulse {report.package_version}: {report.status}")
+        typer.echo(
+            f"Python {report.python.version} (requires {report.python.required_minor}): "
+            f"{'compatible' if report.python.compatible else 'incompatible'}"
+        )
+        typer.echo(f"Configuration: {report.config.status} ({report.config.source})")
+        typer.echo(f"Artifact root: {report.artifact_root.status}")
+        typer.echo(f"NVIDIA: {report.nvidia.status} (optional, nonblocking)")
+    if report.status == "BLOCKING":
+        raise typer.Exit(DOCTOR_BLOCKING_EXIT)
+
+
+def main() -> None:
+    """Run the installed console application."""
+
+    app(prog_name="dmf")

@@ -1,0 +1,3784 @@
+DMF PULSE — BACKTESTING, CALIBRATION AND BENCHMARKS
+===================================================
+
+Document ID: DMFP-15
+Version: 0.9 (Scientific Evaluation and Trust-Gate Architecture)
+Status: PROPOSED — REQUIRED BEFORE ANY MODEL OR POLICY IS TRUSTED
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Reference historical seasons: subject to source rights, completeness and dataset mode
+Research cut-off: 17 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Upstream systems under evaluation:
+- DMFP-02 FPL rules and season configuration
+- DMFP-05 ingestion, deadline bundles and historical datasets
+- DMFP-06 odds normalisation and market consensus
+- DMFP-07 availability, start and minutes model
+- DMFP-08 football-event distribution engine
+- DMFP-09 FPL-points distribution engine
+- DMFP-10 uncertainty and early-season policy
+- DMFP-11 price-change and team-value model
+- DMFP-12 squad, transfer and lineup optimiser
+- DMFP-13 captaincy and chip optimiser
+- DMFP-14 rank, effective ownership and risk strategy
+
+Downstream consumers:
+- DMFP-16 orchestration, APIs and decision pipeline
+- DMFP-17 observability, reproducibility, security and compliance
+- DMFP-18 decision UI, reporting and explanations
+- DMFP-19 implementation roadmap and acceptance tests
+- every model-promotion, policy-promotion and rollback decision
+
+PURPOSE
+-------
+This document defines how DMF Pulse proves that its forecasts and decisions are
+useful before they are trusted.
+
+It covers:
+
+- walk-forward testing;
+- prequential evaluation;
+- deadline-specific information sets;
+- prevention and detection of future-data leakage;
+- historical odds reconstruction;
+- live-observed versus reconstructed datasets;
+- nested time-series model selection;
+- forecast calibration;
+- proper probability scoring;
+- expected-points error;
+- distributional and multivariate evaluation;
+- rank outcomes;
+- decision regret;
+- sequential transfer-policy evaluation;
+- chip-value evaluation;
+- price-model accuracy;
+- team-value evaluation;
+- ablation testing;
+- benchmark design;
+- statistical uncertainty;
+- multiple-testing and backtest-overfitting controls;
+- model confidence sets;
+- promotion, rollback and trust gates.
+
+The core scientific question is:
+
+    IF PULSE HAD BEEN RUN AT EACH HISTORICAL FPL DEADLINE
+    WITH ONLY THE INFORMATION THAT WAS GENUINELY AVAILABLE THEN,
+    WHAT WOULD IT HAVE FORECAST, RECOMMENDED AND ACHIEVED?
+
+A backtest that cannot answer that question is not evidence.
+
+GOVERNING PRINCIPLE
+-------------------
+Pulse maintains four distinct evaluation layers.
+
+LAYER 1 — FORECAST QUALITY
+
+Did the system predict:
+
+- minutes;
+- starts;
+- goals;
+- points;
+- prices;
+- ownership;
+- rank;
+
+accurately and honestly?
+
+LAYER 2 — DISTRIBUTION QUALITY
+
+Were:
+
+- probabilities calibrated;
+- tails credible;
+- prediction intervals correct;
+- correlations and joint scenarios realistic?
+
+LAYER 3 — DECISION QUALITY
+
+Did the forecasts lead to better:
+
+- transfers;
+- lineups;
+- captaincy;
+- chip timing;
+- rank-target decisions;
+
+after costs and opportunity costs?
+
+LAYER 4 — OPERATIONAL FIDELITY
+
+Could the recommendation actually have been produced:
+
+- before the deadline;
+- from the available data;
+- under the active rules;
+- within runtime;
+- without hindsight or hidden corrections?
+
+A model may improve one layer and worsen another.
+
+No single headline metric is sufficient.
+
+CRITICAL TEMPORAL PRINCIPLE
+---------------------------
+The strict live backtest uses:
+
+    usable_at <= historical information cutoff
+
+not:
+
+- source timestamp alone;
+- current database state;
+- final corrected data;
+- today's player mappings;
+- closing odds;
+- postdeadline lineups;
+- future fixture assignments;
+- future model weights.
+
+Historical evaluation labels may use final corrected outcomes.
+
+Historical training features and model states may use only the data versions
+known at that historical refit time.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require a documented research decision.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE EVALUATION DECISIONS
+======================================================================
+
+0.1 SELECTED PRIMARY DESIGN
+---------------------------
+The production evaluation design is:
+
+    NESTED WALK-FORWARD / ROLLING-ORIGIN EVALUATION
+    + IMMUTABLE DEADLINE INFORMATION BUNDLES
+    + PREQUENTIAL FORECAST LOGGING
+    + OUT-OF-SAMPLE POLICY REPLAY
+    + UNTOUCHED FINAL HOLDOUTS
+    + PROPER SCORING AND DECISION REGRET
+    + MULTIPLE-TESTING CONTROLS.
+
+0.2 WALK-FORWARD UNIT
+---------------------
+The normal outer evaluation step is one FPL deadline.
+
+For deadline d:
+
+1. select all training information usable before the model-refit cutoff;
+2. select hyperparameters/policies only from earlier inner folds;
+3. fit/calibrate using earlier data;
+4. freeze every model, mapping, rule and policy version;
+5. build the historical deadline bundle;
+6. issue projections and decisions;
+7. store them before revealing future outcomes;
+8. advance time;
+9. evaluate against official final outcomes;
+10. repeat.
+
+0.3 EXPANDING VERSUS ROLLING WINDOW
+----------------------------------
+Primary:
+
+- expanding history with parameter-specific recency and regime weighting.
+
+Challenger:
+
+- fixed rolling windows;
+- season-weighted windows;
+- hierarchical dynamic models.
+
+The window is selected within the inner walk-forward process.
+
+No test-period outcome may choose it.
+
+0.4 NESTED MODEL SELECTION
+--------------------------
+Outer folds estimate real out-of-sample performance.
+
+Inner rolling-origin folds choose:
+
+- hyperparameters;
+- features;
+- calibration;
+- ensemble weights;
+- robust-policy parameters;
+- optimisation horizon;
+- confidence thresholds.
+
+Using the same outer outcomes for tuning and reporting is prohibited.
+
+0.5 FINAL HOLDOUT
+-----------------
+At least one complete season or a substantial final contiguous block is a
+locked confirmatory holdout when historical depth permits.
+
+Once opened for confirmatory testing:
+
+- result is recorded;
+- repeated tuning against it is prohibited;
+- subsequent changes require a new holdout or prospective evidence.
+
+0.6 PROSPECTIVE STANDARD
+------------------------
+The strongest evidence is:
+
+    LIVE_OPERATIONAL forecasts and decisions generated before real deadlines.
+
+Retrospective reconstructed tests are useful but cannot substitute for
+prospective validation where source history is incomplete.
+
+0.7 DATASET MODES
+-----------------
+Every result is labelled:
+
+LIVE_OBSERVED:
+The live system genuinely had and could use the information.
+
+RAW_OBSERVED:
+Data arrived before the deadline but were not operationally usable then.
+
+RECONSTRUCTED:
+Data or mappings were obtained later.
+
+FINAL_OUTCOME:
+Corrected labels.
+
+COUNTERFACTUAL:
+A deliberately unavailable/hindsight scenario.
+
+Only LIVE_OBSERVED supports a claim about actual live operational performance.
+
+0.8 PRIMARY PROJECTION METRICS
+------------------------------
+For point forecasts:
+
+- MAE;
+- RMSE;
+- bias.
+
+For probabilities:
+
+- logarithmic score/log loss;
+- Brier score;
+- calibration intercept/slope;
+- reproducible reliability diagrams.
+
+For complete univariate distributions:
+
+- ranked probability score or discrete CRPS;
+- logarithmic score of the observed outcome;
+- randomized PIT/rank histograms;
+- interval coverage and width.
+
+For joint/multivariate distributions:
+
+- energy score;
+- variogram score;
+- covariance and joint-threshold calibration.
+
+0.9 PRIMARY DECISION METRICS
+----------------------------
+- cumulative points above baseline;
+- net transfer value;
+- points lost to hits;
+- hit-adjusted points gained;
+- captaincy incremental points;
+- autosub/bench value;
+- chip incremental policy value;
+- team-value gain and points enabled by budget;
+- rank-target probability calibration;
+- realised policy regret;
+- forced-transfer rate;
+- action stability;
+- solver and operational success.
+
+0.10 PROMOTION PRINCIPLE
+------------------------
+A model/policy is promoted only if it:
+
+- improves a predeclared primary metric or decision utility;
+- remains calibrated;
+- does not create material subgroup failure;
+- passes leakage/reproducibility tests;
+- improves or does not materially harm downstream decisions;
+- survives multiple-testing controls;
+- passes prospective or locked-holdout evidence;
+- has a rollback path.
+
+0.11 PERFECT HINDSIGHT
+----------------------
+Perfect hindsight is an unattainable upper bound.
+
+It is useful for:
+
+- measuring remaining headroom;
+- diagnosing optimiser limitations;
+- separating forecast error from optimisation error.
+
+It MUST NOT be presented as a feasible benchmark or used to tune against the
+test outcome.
+
+0.12 CURRENT TARGET-SEASON STATUS
+---------------------------------
+As of 17 July 2026, official Premier League material still stated that the
+2026/27 FPL game would launch later in summer.
+
+Therefore:
+
+- target rules remain inactive;
+- prospective 2026/27 evaluation has not begun;
+- target-season benchmarks/calibration are not yet available;
+- prelaunch historical work remains REFERENCE/RECONSTRUCTED;
+- GW1 production remains blocked until DMFP-02 and data checks pass.
+
+======================================================================
+1. DEFINITIONS
+======================================================================
+
+1.1 FORECAST ORIGIN
+-------------------
+The historical instant at which a forecast or decision is made.
+
+For FPL decisions:
+the official Gameweek deadline, or an earlier explicitly logged transfer-timing
+decision.
+
+1.2 INFORMATION CUTOFF
+----------------------
+The latest allowed `usable_at` instant for features.
+
+1.3 LABEL CUTOFF
+----------------
+The latest outcome finality version used for evaluation.
+
+Labels can be final and corrected after the event.
+
+1.4 TRAINING CUTOFF
+-------------------
+The latest fact/outcome version available to the model-fitting process at the
+historical refit time.
+
+1.5 VINTAGE
+-----------
+The version of a fact/dataset as it existed at a particular system time.
+
+1.6 FOLD
+--------
+One contiguous historical evaluation period.
+
+1.7 OUTER FOLD
+--------------
+Untouched forecast/policy evaluation.
+
+1.8 INNER FOLD
+--------------
+Model, feature and policy selection using only data before the outer test.
+
+1.9 PREQUENTIAL EVALUATION
+--------------------------
+Sequentially:
+
+- predict first;
+- reveal outcome;
+- score;
+- update.
+
+Dawid's prequential principle assesses models by the sequence of their
+predictions for future observations.
+
+1.10 POLICY
+-----------
+A mapping from information state to action.
+
+1.11 DECISION REGRET
+--------------------
+Utility loss relative to a comparator under the same realised or simulated
+state.
+
+1.12 ORACLE
+-----------
+A comparator using information unavailable at the decision time.
+
+Always labelled unattainable.
+
+1.13 BENCHMARK
+--------------
+A completely specified reproducible forecasting or decision method.
+
+1.14 ABLATION
+-------------
+A controlled removal/replacement of one module or feature group.
+
+1.15 CALIBRATION
+----------------
+Forecast probabilities/distributions match observed conditional frequencies or
+distributional behaviour.
+
+1.16 SHARPNESS
+--------------
+Concentration of a probabilistic forecast, subject to calibration.
+
+======================================================================
+2. EVALUATION UNITS AND DATA GRAINS
+======================================================================
+
+2.1 PLAYER-FIXTURE
+------------------
+Used for:
+
+- start;
+- minutes;
+- goals;
+- assists;
+- clean sheet;
+- saves;
+- events;
+- fixture points.
+
+2.2 PLAYER-GAMEWEEK
+-------------------
+Used for:
+
+- FPL points;
+- Double/Blank Gameweeks;
+- thresholds;
+- optimiser inputs.
+
+2.3 FIXTURE
+-----------
+Used for:
+
+- scores;
+- team goals;
+- markets;
+- score distributions.
+
+2.4 PLAYER-UPDATE CYCLE
+-----------------------
+Used for price rises/falls.
+
+2.5 MANAGER-GAMEWEEK
+--------------------
+Used for:
+
+- transfer policy;
+- lineup/captain;
+- chip;
+- points;
+- team value.
+
+2.6 SEASON POLICY TRAJECTORY
+----------------------------
+Used for cumulative decision performance.
+
+2.7 COHORT-GAMEWEEK
+-------------------
+Used for:
+
+- EO;
+- opponent actions;
+- rank forecasts.
+
+2.8 CLUSTERED DEPENDENCE
+------------------------
+Rows are not independent.
+
+Examples:
+
+- players in one fixture;
+- fixtures in one Gameweek;
+- repeated players;
+- repeated managers;
+- model versions.
+
+Uncertainty intervals and tests use appropriate block/cluster resampling.
+
+======================================================================
+3. EVALUATION DATASET MODES
+======================================================================
+
+3.1 STRICT LIVE DATASET
+-----------------------
+Features:
+LIVE_OPERATIONAL only.
+
+Training:
+uses historical training vintages known by each refit date.
+
+Evaluation:
+FINAL_OUTCOME labels.
+
+Purpose:
+claim about what Pulse could genuinely have done.
+
+3.2 RAW-OBSERVED COUNTERFACTUAL
+-------------------------------
+Includes data received before deadline but processed/mapped later.
+
+Purpose:
+quantify operational latency cost.
+
+Not live performance.
+
+3.3 RECONSTRUCTED RESEARCH DATASET
+----------------------------------
+Includes retrospectively downloaded:
+
+- odds;
+- events;
+- injuries;
+- mappings;
+- lineups.
+
+Purpose:
+algorithm development and long-history comparison.
+
+Limitations displayed.
+
+3.4 CURRENT-VINTAGE RETROSPECTIVE DATASET
+-----------------------------------------
+Uses today's corrected canonical history.
+
+Allowed for:
+
+- football-model research;
+- final-label analysis;
+- nonlive benchmarks.
+
+Prohibited for live-performance claims.
+
+3.5 PERFECT-INFORMATION DATASET
+-------------------------------
+May include:
+
+- actual lineups;
+- actual minutes;
+- future prices;
+- fixture outcomes;
+- best transfers.
+
+Purpose:
+upper bounds and error decomposition.
+
+3.6 NO MODE MIXING
+------------------
+A report cannot average strict-live and reconstructed folds without separate
+results.
+
+======================================================================
+4. WALK-FORWARD EVALUATION DESIGN
+======================================================================
+
+4.1 ROLLING FORECAST ORIGIN
+---------------------------
+Time-series cross-validation evaluates each future origin using only prior
+observations.
+
+For deadline d:
+
+    Training_d = all permitted observations with usable/training availability
+                 before cutoff_d
+
+    Test_d = outcomes after deadline d.
+
+4.2 EXPANDING WINDOW
+--------------------
+Start with minimum training period.
+
+Add each completed/refit-eligible Gameweek.
+
+4.3 ROLLING WINDOW
+------------------
+Use only most recent W periods.
+
+W selected in inner folds.
+
+4.4 MULTI-HORIZON
+-----------------
+Evaluate separately:
+
+- current Gameweek;
+- 2-Gameweek;
+- 3-Gameweek;
+- 5-Gameweek;
+- optimisation horizon;
+- remaining season where relevant.
+
+A model can be strong at one horizon and weak at another.
+
+4.5 REFIT CADENCE
+-----------------
+Replay actual production cadence:
+
+- weekly;
+- after each fixture;
+- monthly;
+- online filtering.
+
+Do not refit retrospectively more often than production would have.
+
+4.6 MODEL FREEZE
+----------------
+Before scoring outer fold, store:
+
+- feature schema;
+- training dataset version;
+- parameters;
+- calibration;
+- ensemble weights;
+- code;
+- random seed;
+- rules;
+- source bundle.
+
+4.7 OUTCOME REVEAL
+------------------
+Only after immutable forecast publication.
+
+4.8 PREQUENTIAL LOG
+-------------------
+Each forecast receives:
+
+- issue time;
+- cutoff;
+- model;
+- distribution;
+- later score;
+- correction label.
+
+4.9 SEASON TRANSITION
+---------------------
+Historical season-to-season evaluation must reproduce:
+
+- newly promoted teams;
+- transfers;
+- new players;
+- new managers;
+- rules changes;
+- preseason uncertainty.
+
+4.10 FIRST-SEASON COLD START
+---------------------------
+Predeclared priors and historical inputs.
+Do not use later target-season data to revise GW1 evaluation.
+
+======================================================================
+5. NESTED WALK-FORWARD MODEL SELECTION
+======================================================================
+
+5.1 OUTER LOOP
+--------------
+Measures the full modelling procedure, including:
+
+- feature selection;
+- hyperparameter tuning;
+- calibration;
+- ensemble construction;
+- policy tuning.
+
+5.2 INNER LOOP
+--------------
+Earlier rolling origins select configuration.
+
+5.3 SEARCH BUDGET
+-----------------
+Every experiment records:
+
+- number of models;
+- hyperparameter configurations;
+- feature variants;
+- policy variants;
+- seeds;
+- metrics inspected.
+
+5.4 NO FLAT REPORTING
+---------------------
+If a configuration is selected by its performance on a fold, that same fold is
+not an unbiased performance estimate.
+
+5.5 COMPUTATIONAL SHORTCUT
+--------------------------
+Where full nesting is infeasible:
+
+- locked validation period for tuning;
+- later untouched test;
+- clear limitation;
+- prospective confirmation.
+
+5.6 ENSEMBLE WEIGHTS
+--------------------
+Learned only from inner/pre-outer data.
+
+5.7 CALIBRATION MODEL
+---------------------
+Fit only on past forecasts/outcomes.
+
+5.8 THRESHOLDS AND CONFIDENCE GRADES
+------------------------------------
+Promotion/alert/action thresholds are hyperparameters and must be tuned inside
+training/validation, not on the final test.
+
+======================================================================
+6. DEADLINE-SPECIFIC INFORMATION SETS
+======================================================================
+
+6.1 DEADLINE BUNDLE
+-------------------
+DMFP-05 LIVE_OPERATIONAL bundle is the strict feature universe.
+
+6.2 TRAINING VINTAGE
+--------------------
+At historical refit time, use:
+
+- outcomes/corrections known then;
+- mappings known then;
+- fixture assignments known then;
+- rules known then.
+
+6.3 FINAL LABELS
+----------------
+After evaluation, use authoritative final outcomes.
+
+The difference between training vintage and final label is preserved.
+
+6.4 AVAILABLE FEATURE MANIFEST
+------------------------------
+For every fold:
+
+- feature;
+- source;
+- provider time;
+- received time;
+- usable time;
+- missing reason;
+- included/excluded.
+
+6.5 DECISION TIME VERSUS DEADLINE
+---------------------------------
+Price-driven ACT NOW decisions can occur before the deadline.
+
+Their information cutoff is their actual decision timestamp.
+
+Waiting policies branch only on later information legally available.
+
+6.6 FIXTURE-SPECIFIC LATER NEWS
+------------------------------
+Not available for the earlier FPL deadline even if the match starts days later.
+
+6.7 OFFICIAL LINEUPS
+--------------------
+Labels/future history, not current features when released after deadline.
+
+======================================================================
+7. FUTURE-DATA LEAKAGE TAXONOMY
+======================================================================
+
+7.1 DIRECT OUTCOME LEAKAGE
+--------------------------
+- final points;
+- goals;
+- minutes;
+- result;
+- bonus;
+- price event.
+
+7.2 TIMESTAMP LEAKAGE
+---------------------
+Source update time before deadline but Pulse received/processed it after.
+
+7.3 CURRENT-VINTAGE LEAKAGE
+---------------------------
+Today's corrected fixture, player or injury history used as if known then.
+
+7.4 LINEUP LEAKAGE
+------------------
+Official/postdeadline lineups used in predeadline model.
+
+7.5 CLOSING-ODDS LEAKAGE
+------------------------
+Kickoff/closing market used for an earlier FPL deadline.
+
+7.6 FIXTURE-ASSIGNMENT LEAKAGE
+------------------------------
+Final Double/Blank Gameweek assignment used before announcement.
+
+7.7 ENTITY-RESOLUTION LEAKAGE
+-----------------------------
+A mapping fixed later applied to live historical features.
+
+7.8 PREPROCESSING LEAKAGE
+-------------------------
+Scaling, imputation, feature selection or embeddings fitted on test data.
+
+7.9 TARGET ENCODING LEAKAGE
+---------------------------
+Player/team aggregates include test outcomes.
+
+7.10 HYPERPARAMETER LEAKAGE
+---------------------------
+Test performance chooses settings.
+
+7.11 CALIBRATION LEAKAGE
+------------------------
+Calibration curve fitted using evaluation outcomes.
+
+7.12 ENSEMBLE-WEIGHT LEAKAGE
+----------------------------
+Future model scores choose historical weights.
+
+7.13 OPTIMISER LEAKAGE
+----------------------
+Future scenario path actions know unrevealed events.
+
+7.14 SURVIVORSHIP LEAKAGE
+-------------------------
+Only players/managers who remain in final data are included.
+
+7.15 SAMPLE-SELECTION LEAKAGE
+-----------------------------
+Final top managers define a live "elite" cohort.
+
+7.16 RULE LEAKAGE
+-----------------
+Later-season rule interpretation used before publication.
+
+7.17 RETROSPECTIVE MANUAL LEAKAGE
+---------------------------------
+Analyst remembers later news/result when coding history.
+
+7.18 LABEL-REVISION LEAKAGE
+---------------------------
+Final corrected outcome used to train a model before that correction existed.
+
+7.19 LEAKAGE TESTS
+------------------
+Automated canaries:
+
+- insert postcutoff extreme value;
+- confirm output unchanged;
+- shift usable_at;
+- remove current mapping;
+- compare current versus as-of queries;
+- fail build if unrestricted latest view appears.
+
+======================================================================
+8. HISTORICAL ODDS RECONSTRUCTION
+======================================================================
+
+8.1 PURPOSE
+-----------
+Build market baselines and historical Pulse variants without claiming data were
+available when they were not.
+
+8.2 EVIDENCE HIERARCHY
+----------------------
+1. Pulse's own immutable predeadline snapshots.
+2. Time-stamped historical exchange/API observations with rights.
+3. Time-stamped manual observations.
+4. Opening/closing fixed-odds records with known semantics.
+5. Untimed match-level odds.
+6. No market.
+
+8.3 BETFAIR HISTORICAL DATA
+---------------------------
+Betfair's historical service provides time-stamped Exchange data; official
+documentation says historical files are available from May 2015 and identifies
+JSON archive formats.
+
+Use:
+
+- market/selection mapping;
+- market status;
+- time;
+- last traded/best prices where tier provides them;
+- traded volume where provided;
+- in-play flag.
+
+8.4 BETFAIR BASIC LIMITATION
+----------------------------
+The free BASIC tier/source fields and snapshot cadence may not reproduce a full
+predeadline order book.
+
+Store tier and field completeness.
+
+8.5 FOOTBALL-DATA.CO.UK
+-----------------------
+Provides free historical results and fixed-odds CSVs across many seasons.
+
+Use for:
+
+- broad 1X2/totals/handicap benchmark;
+- bookmaker/market-history research.
+
+Limitations:
+
+- many columns are closing or summary prices;
+- time-varying deadline snapshots generally absent;
+- bookmaker coverage changes by season;
+- not player-prop history;
+- not proof of what Pulse knew at FPL deadline.
+
+8.6 DEADLINE ALIGNMENT
+----------------------
+For time-stamped quotes:
+
+    select latest usable quote with observed_at <= historical FPL deadline.
+
+Never use:
+
+- nearest quote in absolute time;
+- first quote after deadline;
+- kickoff close.
+
+8.7 QUOTE AGE
+-------------
+Record age at deadline and apply DMFP-06 freshness policy.
+
+8.8 NO PREDEADLINE QUOTE
+------------------------
+Set:
+
+    NO_MARKET_AT_DEADLINE
+
+Do not backfill from later opening.
+
+8.9 UNTYPED ODDS
+----------------
+If only an untimed closing price exists:
+
+- dataset mode RECONSTRUCTED_CLOSING;
+- use as market-strength research/oracle-like benchmark;
+- never as strict deadline benchmark.
+
+8.10 PLAYER PROPS
+-----------------
+No complete reliable free historical EPL player-prop dataset was identified in
+DMFP-04.
+
+Therefore:
+
+- historical player-prop Pulse tests are incomplete/reconstructed;
+- collect prospectively from 2026/27;
+- market-only/player-prop claims must identify coverage;
+- no market = missing, not zero.
+
+8.11 ODDS NORMALISATION VERSION
+-------------------------------
+Reconstruct raw quotes first.
+Apply historical/current DMFP-06 method under a versioned experiment.
+
+Distinguish:
+
+- original live normalisation;
+- current research re-normalisation.
+
+8.12 ODDS DATASET GRADE
+-----------------------
+A:
+exact predeadline live snapshot.
+
+B:
+time-stamped historical observation close to deadline.
+
+C:
+time-stamped but sparse/delayed/incomplete.
+
+D:
+untimed opening/closing match odds.
+
+E:
+no usable market.
+
+8.13 MARKET BENCHMARK REPORT
+---------------------------
+Always stratify by grade.
+
+======================================================================
+9. OUTCOME FINALITY AND CORRECTIONS
+======================================================================
+
+9.1 PROVISIONAL
+---------------
+FPL points, bonus, assists, prices and ranks can change after initial publication.
+
+9.2 FINAL LABEL POLICY
+----------------------
+Evaluation label is the configured official final state.
+
+9.3 LOCK TIME
+-------------
+Store:
+
+- initial outcome;
+- every correction;
+- finality time;
+- final value.
+
+9.4 2026/27 FINALITY
+--------------------
+Official Premier League material in May 2026 said a post-match-review finality
+approach would carry into 2026/27 and be confirmed in the game rules.
+
+Capture the exact target rule after launch.
+
+9.5 TRAINING VERSUS EVALUATION
+------------------------------
+Training replay uses correction state known at refit.
+Evaluation can use final label.
+
+9.6 CORRECTION IMPACT
+---------------------
+Report metrics:
+
+- initial labels;
+- final labels;
+- correction sensitivity.
+
+======================================================================
+10. BENCHMARK SUITE
+======================================================================
+
+10.1 BENCHMARK PRINCIPLES
+-------------------------
+Every benchmark:
+
+- uses the same information cutoff;
+- uses the same player universe;
+- follows the same target rules;
+- has fixed documented parameters;
+- produces the required distribution where applicable;
+- is evaluated at the same horizons.
+
+10.2 B0 — NAIVE RECENT-POINTS MODEL
+-----------------------------------
+Purpose:
+Simple recency benchmark.
+
+Player expected points per fixture/Gameweek from:
+
+- exponentially weighted recent official FPL points;
+- explicit appearance/minutes denominator;
+- position/team fallback for sparse players;
+- no market;
+- no opponent model beyond optional simple fixture adjustment in a separate
+  variant.
+
+Required fixed variants:
+
+B0A:
+last 3 appearances average.
+
+B0B:
+last 5 appearances average.
+
+B0C:
+EWMA selected in inner folds.
+
+Distribution:
+
+- empirical/hierarchical residual distribution;
+- zero/appearance mixture if benchmark specification includes it.
+
+No future appearances used.
+
+10.3 B1 — OFFICIAL FPL-FORM BASELINE
+------------------------------------
+Use the official form field captured at the deadline.
+
+Official help/reference says form is average points per match over matches played
+by the player's club in the previous 30 days.
+
+Faithful baseline:
+
+    expected fixture points = historical deadline FPL form
+
+with explicit:
+
+- Blank/Doubles;
+- availability;
+- no reinterpretation.
+
+A second FPL-form-plus-minutes variant may exist but must not replace the faithful
+baseline.
+
+10.4 B2 — MARKET-ONLY MODEL
+---------------------------
+Inputs:
+
+- predeadline team markets;
+- available player markets;
+- generic league/position priors;
+- no Pulse player-history ability model;
+- no bespoke minutes model.
+
+For missing player props:
+
+- allocate team goals with generic position/price/market-listing shares;
+- mark coverage.
+
+Purpose:
+measure the information in betting markets alone.
+
+10.5 B3 — MARKET PLUS MINUTES MODEL
+-----------------------------------
+Inputs:
+
+- DMFP-06 markets;
+- DMFP-07 coherent start/minutes distributions;
+- generic event allocation;
+- no full historical player-event engine.
+
+Purpose:
+measure incremental value of minutes and lineup modelling.
+
+10.6 B4 — COMPLETE PULSE MODEL
+------------------------------
+All accepted modules:
+
+- markets;
+- minutes;
+- events;
+- scoring;
+- uncertainty;
+- price;
+- optimiser;
+- chips/rank as objective requires.
+
+10.7 B5 — PERFECT-HINDSIGHT UPPER BOUND
+---------------------------------------
+Variants must be separate.
+
+B5A PERFECT LINEUP/MINUTES:
+actual starters/minutes, predeadline event distribution.
+
+B5B PERFECT FOOTBALL OUTCOMES:
+actual player points, best legal current tactical action.
+
+B5C PERFECT GAMEWEEK TRANSFERS:
+actual points/prices and best legal transfers under historical state.
+
+B5D PERFECT SEASON POLICY:
+clairvoyant dynamic optimisation with all future outcomes.
+
+These are upper bounds, not comparable feasible models.
+
+10.8 ADDITIONAL DECISION BENCHMARKS
+-----------------------------------
+- no transfer;
+- one-Gameweek greedy;
+- five-Gameweek deterministic;
+- public FPL form;
+- no chip until expiry;
+- simple largest-DGW chip rules;
+- pure expected points;
+- template/rank heuristics.
+
+======================================================================
+11. POINT FORECAST METRICS
+======================================================================
+
+11.1 MAE
+--------
+    MAE = mean |y - y_hat|
+
+Appropriate for median-like point forecasts under absolute loss.
+
+11.2 RMSE
+---------
+    RMSE = sqrt(mean (y - y_hat)^2)
+
+Penalises larger errors and targets the conditional mean under squared loss.
+
+11.3 BIAS
+---------
+    Bias = mean(y_hat - y)
+
+Report signed and absolute calibration-in-the-large.
+
+11.4 MEDIAN ERROR
+-----------------
+If reporting median points, evaluate median absolute loss/pinball loss.
+
+11.5 MEAN VERSUS MEDIAN
+-----------------------
+Do not evaluate a median forecast as if it claimed to be the mean.
+
+Gneiting's point-forecast research emphasises that the loss function determines
+the optimal target functional.
+
+11.6 WEIGHTED METRICS
+---------------------
+Report:
+
+- all player rows;
+- equal Gameweek;
+- equal fixture;
+- candidate/owned player;
+- high expected-points player;
+- price/position.
+
+Avoid letting inactive low-value players dominate.
+
+11.7 OUTCOME-CONDITIONED BIAS
+-----------------------------
+Do not make primary claims from only:
+
+- players who scored;
+- top scorers;
+- selected by hindsight.
+
+Predeclare subsets.
+
+11.8 MULTI-GAMEWEEK
+-------------------
+Score accumulated player points at exact horizon.
+
+======================================================================
+12. PROBABILITY SCORING
+======================================================================
+
+12.1 LOGARITHMIC SCORE
+----------------------
+For binary event y and probability p:
+
+    LogLoss = -[y log p + (1-y) log(1-p)]
+
+Strongly penalises confident wrong forecasts.
+
+Use numerical floors only for computation, not to disguise invalid zero/one
+probabilities.
+
+12.2 BRIER SCORE
+----------------
+    BS = mean (p-y)^2
+
+Interpretable and bounded for binary events.
+
+12.3 EVENTS
+-----------
+- start;
+- appearance;
+- 60+;
+- zero minutes;
+- goal;
+- assist;
+- clean sheet;
+- 5+/10+/15+ points;
+- price rise/fall;
+- chip/target events.
+
+12.4 MULTICLASS LOG/BRIER
+-------------------------
+For START/BENCH/OUT, score complete probability vector.
+
+12.5 RANKED PROBABILITY SCORE
+----------------------------
+For ordered/discrete outcomes:
+
+- minutes;
+- goals;
+- FPL points;
+- prices;
+- rank bands.
+
+Equivalent CRPS-like cumulative comparison.
+
+12.6 PROPER SCORING
+-------------------
+Gneiting and Raftery show that strictly proper scoring rules encourage honest
+predictive distributions.
+
+Primary model selection must use proper scores.
+
+12.7 RARE EVENTS
+----------------
+Report:
+
+- log score;
+- Brier;
+- precision-recall diagnostics;
+- calibration.
+
+Do not use accuracy.
+
+======================================================================
+13. CALIBRATION EVALUATION
+======================================================================
+
+13.1 RELIABILITY
+----------------
+A 30% event should occur approximately 30% among comparable forecasts.
+
+13.2 CORP RELIABILITY DIAGRAM
+-----------------------------
+Use Consistent, Optimally binned and Reproducible reliability diagrams based on
+isotonic regression where appropriate.
+
+This avoids arbitrary hand-selected bins.
+
+13.3 CALIBRATION INTERCEPT/SLOPE
+--------------------------------
+Binary logistic calibration:
+
+    logit(P(Y=1))
+      =
+      a + b logit(p)
+
+Ideal:
+
+    a = 0
+    b = 1.
+
+13.4 ECE
+--------
+Expected calibration error may be reported, but:
+
+- depends on bins;
+- can hide local failure;
+- is not a proper score;
+- never primary alone.
+
+13.5 BRIER DECOMPOSITION
+------------------------
+Report calibration/reliability, discrimination/resolution and uncertainty using
+a statistically principled decomposition.
+
+13.6 SUBGROUP CALIBRATION
+-------------------------
+- position;
+- team;
+- price;
+- ownership;
+- early/middle/late;
+- new manager;
+- injury return;
+- source confidence;
+- market coverage;
+- lead time.
+
+13.7 SAMPLE SIZE
+----------------
+Show confidence bands/counts.
+Do not declare calibration from ten events.
+
+13.8 RECALIBRATION
+------------------
+Evaluate raw and recalibrated forecasts separately.
+
+A recalibrator is trained only on prior folds.
+
+======================================================================
+14. DISTRIBUTION AND INTERVAL EVALUATION
+======================================================================
+
+14.1 DISCRETE POINTS/MINUTES
+----------------------------
+Use:
+
+- ranked probability score/discrete CRPS;
+- log probability of realised value;
+- randomized PIT;
+- quantile coverage.
+
+14.2 RANDOMIZED PIT
+-------------------
+For discrete outcome, randomize within the probability mass at the observed
+value.
+
+Avoid using continuous PIT naively.
+
+14.3 PREDICTION INTERVAL COVERAGE
+---------------------------------
+For nominal interval alpha:
+
+    empirical coverage
+    versus
+    alpha.
+
+14.4 WIDTH/SHARPNESS
+--------------------
+Coverage without width rewards vacuous intervals.
+
+Report:
+
+- average width;
+- median width;
+- interval score;
+- conditional width.
+
+14.5 CENTRAL AND ONE-SIDED
+--------------------------
+Evaluate:
+
+- central 50/80/90/95%;
+- upper-tail 90/95%;
+- lower-tail.
+
+14.6 CONDITIONAL COVERAGE
+-------------------------
+Coverage by:
+
+- forecast mean;
+- uncertainty grade;
+- player type;
+- Gameweek stage.
+
+14.7 QUANTILE LOSS
+------------------
+Pinball loss for selected quantiles.
+
+14.8 EXTREMES
+----------------
+10+/15+ FPL points and rare rank targets require dedicated threshold metrics and
+enough samples; average CRPS can be insensitive to extreme-tail quality.
+
+======================================================================
+15. MULTIVARIATE AND CORRELATION EVALUATION
+======================================================================
+
+15.1 WHY
+--------
+The optimiser relies on joint player distributions.
+
+Correct marginals with wrong dependence can produce bad:
+
+- bench;
+- captain;
+- double-up;
+- rank;
+- upside plans.
+
+15.2 ENERGY SCORE
+-----------------
+Proper multivariate score.
+
+Can be less sensitive to correlation misspecification than desired.
+
+15.3 VARIOGRAM SCORE
+--------------------
+Evaluates pairwise difference/dependence features and is more sensitive to
+correlation structure in relevant settings.
+
+15.4 TARGETED JOINT EVENTS
+-------------------------
+- goalkeeper + defender clean sheet;
+- two defenders;
+- scorer + assister;
+- attacker + opposing defender;
+- captain + vice nonappearance;
+- player pair 10+;
+- squad field-11;
+- rival relative score.
+
+15.5 COVARIANCE
+----------------
+Compare predicted and empirical covariance matrices after shrinkage.
+
+15.6 PORTFOLIO/SQUAD VARIANCE
+-----------------------------
+Evaluate realised variance of:
+
+- selected XI;
+- squad;
+- relative mini-league score;
+- differential/captain plan.
+
+15.7 COPULA/RANK HISTOGRAM
+-------------------------
+Use multivariate rank histograms or energy/variogram diagnostics where feasible.
+
+======================================================================
+16. MODULE-SPECIFIC PROJECTION SCORECARDS
+======================================================================
+
+16.1 ODDS / MARKET — DMFP-06
+----------------------------
+- raw/de-vig log score;
+- Brier/RPS;
+- calibration by method/operator;
+- market disagreement;
+- interval coverage;
+- consensus versus best/equal operator;
+- source freshness;
+- missing-market coverage.
+
+16.2 MINUTES — DMFP-07
+----------------------
+- START/BENCH/OUT multiclass log/Brier;
+- minute RPS/CRPS/log score;
+- p0/p60 Brier/log;
+- calibration;
+- lineup joint accuracy;
+- team XI coherence;
+- substitution time/cause.
+
+16.3 EVENTS — DMFP-08
+---------------------
+- exact-score log;
+- 1X2 RPS;
+- goal-count CRPS;
+- clean-sheet Brier;
+- player goal/assist counts;
+- saves/cards/defensive counts;
+- market residual;
+- event coherence;
+- joint score dependence.
+
+16.4 FPL POINTS — DMFP-09
+-------------------------
+- points MAE/RMSE/bias;
+- points RPS/log;
+- threshold Brier/log;
+- percentiles/coverage;
+- bonus distribution;
+- component accuracy;
+- joint player score.
+
+16.5 UNCERTAINTY — DMFP-10
+--------------------------
+- interval calibration;
+- confidence-grade error;
+- model disagreement versus error;
+- EVSI/ACT-WAIT calibration;
+- robust-policy utility;
+- action-switch stability.
+
+16.6 PRICE — DMFP-11
+--------------------
+- rise/fall/no multiclass log/Brier;
+- calibration;
+- PR-AUC/lift;
+- 24h/72h/7d price CRPS;
+- threshold-distance calibration;
+- timing-window coverage;
+- ACT-versus-WAIT utility.
+
+16.7 OPTIMISER — DMFP-12
+------------------------
+- cumulative points;
+- plan regret;
+- hits;
+- forced transfers;
+- field-11 probability;
+- autosub/bench/captain value;
+- SAA stability;
+- solver gap/runtime;
+- legality.
+
+16.8 CHIPS — DMFP-13
+--------------------
+- gross incremental;
+- net policy value;
+- timing regret;
+- opportunity-cost calibration;
+- preparation/unwind;
+- expiry waste;
+- captain/vice fallback.
+
+16.9 RANK — DMFP-14
+-------------------
+- EO forecast;
+- opponent-action log/Brier;
+- rank-band/target calibration;
+- mini-league P(win);
+- points sacrifice;
+- target-probability gain;
+- overall-field approximation.
+
+======================================================================
+17. DECISION BACKTEST ARCHITECTURE
+======================================================================
+
+17.1 POLICY REPLAY
+------------------
+At every deadline:
+
+1. restore historical manager state;
+2. load historical information bundle;
+3. generate forecasts;
+4. solve decision;
+5. execute only allowed current action;
+6. update state from actual price/outcome;
+7. continue.
+
+17.2 NO RETROSPECTIVE RECOMMENDATION
+------------------------------------
+Do not generate the whole season's action list with future outcomes available.
+
+17.3 POLICY VERSION
+-------------------
+Freeze policy throughout confirmatory test unless the test specifically
+evaluates online updates.
+
+17.4 REAL MANAGER START
+-----------------------
+Possible starts:
+
+- Sebastian's historical squad/state;
+- synthetic legal GW1 squad;
+- benchmark squad;
+- multiple random/strong initial states.
+
+17.5 STATE DEPENDENCE
+--------------------
+One poor early action changes later feasible decisions.
+Sequential evaluation preserves it.
+
+17.6 PRICE/TRANSFER STATE
+------------------------
+Use historical price and manager purchase/selling values.
+
+17.7 OPERATIONAL FAILURE
+------------------------
+Include:
+
+- missing data;
+- solver timeout;
+- source outage;
+- fallback action.
+
+An idealised backtest and operational backtest are separate.
+
+======================================================================
+18. DECISION REGRET
+======================================================================
+
+18.1 EX-ANTE MODEL REGRET
+-------------------------
+Under model/scenario world:
+
+    Regret_model(a)
+      =
+      best predicted feasible utility
+      - predicted utility(a).
+
+Used for robust policy diagnostics.
+
+18.2 EX-POST REALISED REGRET
+----------------------------
+For realised future path over horizon H:
+
+    Regret_realised(a)
+      =
+      utility(best legal action at historical decision time,
+              evaluated on realised path)
+      - utility(a on realised path).
+
+The comparator can know the future path for evaluation but not alter historical
+legality.
+
+Label as hindsight regret.
+
+18.3 POLICY REGRET
+------------------
+Compare complete sequential policies over a season.
+
+18.4 DECISION-FOCUSED LOSS
+--------------------------
+Predict-then-optimise research defines losses based on the downstream decision
+error rather than only coefficient prediction error.
+
+Pulse uses decision regret for evaluation and possible future training, but
+keeps forecast calibration as an independent requirement.
+
+18.5 ORACLE LEVELS
+------------------
+- perfect current Gameweek outcome;
+- perfect H-Gameweek path;
+- perfect full season;
+- perfect information with legal transitions.
+
+18.6 NORMALIZED REGRET
+----------------------
+    normalized regret
+      =
+      regret / max(|oracle utility - baseline utility|, epsilon)
+
+Use alongside absolute points.
+
+18.7 REGRET DISTRIBUTION
+------------------------
+Report:
+
+- mean;
+- median;
+- p90/p95;
+- maximum;
+- by decision type;
+- by confidence.
+
+18.8 NO SINGLE-OUTCOME OVERINTERPRETATION
+----------------------------------------
+A correct high-probability decision can have high realised regret through bad
+luck.
+
+Evaluate across many decisions and proper forecasts.
+
+======================================================================
+19. TRANSFER DECISION METRICS
+======================================================================
+
+19.1 POINTS ABOVE NO-TRANSFER
+-----------------------------
+For a transfer plan at deadline d:
+
+    realised net gain over horizon H
+      =
+      manager points under executed transfer policy
+      -
+      points under saved no-transfer policy,
+
+including:
+
+- lineups;
+- captain;
+- hits;
+- autosubs;
+- future state where the comparator policy is sequential.
+
+19.2 TRANSFER VALUE
+-------------------
+Separate:
+
+- current GW;
+- H-Gameweek;
+- remaining season;
+- points;
+- price/team value;
+- flexibility;
+- hit/FT.
+
+19.3 POINTS LOST TO HITS
+------------------------
+Report gross:
+
+    total hit points charged.
+
+Also net:
+
+    points gained by extra transfers
+    - hit cost.
+
+"Points lost to hits" alone does not show whether hits were rational.
+
+19.4 FREE-TRANSFER VALUE
+------------------------
+Counterfactual:
+
+- state/policy with FT;
+- state/policy without FT.
+
+19.5 REVERSALS
+--------------
+- transfer reversed within N Gameweeks;
+- forced reversal;
+- purchase-price loss;
+- regret.
+
+19.6 EARLY TRANSFERS
+--------------------
+ACT versus WAIT:
+
+- price route preserved;
+- injuries/news;
+- points;
+- reversal;
+- expected/realised information value.
+
+19.7 TRANSFER ATTRIBUTION
+------------------------
+Use DMFP-12 marginal/Shapley values for bundles.
+
+======================================================================
+20. CHIP-VALUE EVALUATION
+======================================================================
+
+20.1 INCREMENTAL, NOT TOTAL
+---------------------------
+Chip value is not total Gameweek points.
+
+20.2 TRIPLE CAPTAIN
+-------------------
+Realised gross incremental:
+
+    effective captain raw points
+
+relative to normal captaincy, including vice fallback.
+
+Policy value:
+compare sequential use-now policy versus hold.
+
+Metrics:
+
+- incremental points;
+- opportunity/timing regret;
+- p0;
+- expiry;
+- future opportunity foregone.
+
+20.3 BENCH BOOST
+----------------
+Realised immediate increment:
+
+    BB score
+    - exact saved no-chip score with autosubs.
+
+Full policy:
+
+- preparation points;
+- hits/transfers;
+- bench capital;
+- unwinding;
+- future policy.
+
+20.4 FREE HIT
+-------------
+Compare:
+
+- temporary FH policy;
+- best normal transfer/hit policy;
+- future permanent squad state.
+
+Include damage avoided.
+
+20.5 WILDCARD
+-------------
+Compare sequential permanent policies:
+
+- immediate WC;
+- delayed WC;
+- normal transfers;
+- future chips.
+
+One-week comparison is invalid.
+
+20.6 FUTURE CHIP
+----------------
+Use generic effect and opportunity-cost policy.
+
+20.7 CHIP TIMING REGRET
+-----------------------
+    best feasible historical exercise policy value
+    - chosen policy value.
+
+Clairvoyant best week is separate upper bound.
+
+20.8 EXPIRY WASTE
+-----------------
+Unused expired chip:
+
+- zero realised exercise;
+- but can be rational if every use had negative opportunity/conflict value.
+
+Report policy regret, not automatic failure.
+
+======================================================================
+21. PRICE-MODEL EVALUATION
+======================================================================
+
+21.1 NEXT UPDATE
+----------------
+Multiclass:
+
+- rise;
+- fall;
+- no change.
+
+Metrics:
+
+- log loss;
+- Brier;
+- calibration;
+- precision/recall;
+- PR-AUC;
+- lift;
+- false alarm.
+
+21.2 TIME TO EVENT
+------------------
+- cumulative incidence;
+- time-dependent Brier;
+- interval timing coverage;
+- expected updates-to-change.
+
+21.3 PRICE DISTRIBUTION
+-----------------------
+24h/72h/7d:
+
+- RPS/CRPS;
+- MAE/RMSE expected price;
+- interval coverage;
+- any/multiple change probability.
+
+21.4 THRESHOLD DISTANCE
+-----------------------
+Bin by latent distance:
+
+- observed event rate;
+- calibration;
+- status/ownership;
+- season.
+
+21.5 CONFIDENCE
+----------------
+Performance by grade.
+
+21.6 DECISION ACCURACY
+----------------------
+For early transfer:
+
+- ACT/WAIT recommendation;
+- route closed;
+- information changed preferred move;
+- utility;
+- price and football components.
+
+21.7 NO CLASS-IMBALANCE ACCURACY
+--------------------------------
+No-change accuracy is not primary.
+
+======================================================================
+22. TEAM-VALUE EVALUATION
+======================================================================
+
+22.1 MARKET SQUAD VALUE
+-----------------------
+Descriptive only.
+
+22.2 LIQUIDATION VALUE
+-----------------------
+Manager-specific selling value plus bank.
+
+22.3 TEAM-VALUE GAIN
+--------------------
+Compare policy to baseline:
+
+- market value;
+- liquidation value;
+- bank;
+- affordability.
+
+22.4 POINTS ENABLED
+-------------------
+Most important:
+
+    optimal future points with actual budget state
+    -
+    optimal future points with baseline budget state.
+
+22.5 PRICE-CHASE OUTCOME
+------------------------
+- transfer made for price;
+- price occurred;
+- route used;
+- points enabled;
+- football cost;
+- reversal.
+
+22.6 NO TEAM-VALUE CLAIM
+------------------------
+A policy gaining £2.0m but fewer points is not automatically better.
+
+======================================================================
+23. RANK OUTCOME EVALUATION
+======================================================================
+
+23.1 POINTS MODE
+----------------
+Record final/rolling rank, but judge points objective by points.
+
+23.2 TARGET MODE
+----------------
+Evaluate:
+
+- P(target);
+- realised target;
+- Brier/log;
+- rank bands;
+- expected-points sacrifice;
+- target-probability gain.
+
+23.3 EO
+------
+Projected versus realised:
+
+- saved EO;
+- scenario EO;
+- captain/chip;
+- sample bias.
+
+23.4 OPPONENT ACTION
+--------------------
+- transfers;
+- captain;
+- chips;
+- top-k action coverage.
+
+23.5 MINI-LEAGUE
+----------------
+Sequential P(win/top-k/beat rival) calibration.
+
+23.6 OVERALL RANK
+----------------
+- rank PMF;
+- percentile/target threshold;
+- tail error;
+- approximation.
+
+23.7 FINAL-WEEK
+---------------
+Exact target policy versus points plan and hindsight.
+
+======================================================================
+24. ABLATION TESTING
+======================================================================
+
+24.1 PURPOSE
+------------
+Determine which modules provide genuine incremental value.
+
+24.2 ONE-AT-A-TIME ABLATIONS
+----------------------------
+- remove markets;
+- remove player props;
+- remove minutes;
+- replace minutes with recent average;
+- independent Poisson;
+- remove score dependence;
+- remove correlations;
+- no BPS auxiliary;
+- no uncertainty/robustness;
+- no price model;
+- no flexibility/terminal value;
+- deterministic optimiser;
+- no chip opportunity cost;
+- no rank model.
+
+24.3 REPLACEMENT, NOT ONLY REMOVAL
+----------------------------------
+Replace module with explicit baseline so pipeline remains functional.
+
+24.4 SHAPLEY MODULE ATTRIBUTION
+-------------------------------
+For manageable module sets, estimate contribution across module-order
+coalitions.
+
+Caution:
+
+- interactions;
+- computation;
+- attribution is policy/data-specific.
+
+24.5 INTERACTION ABLATIONS
+--------------------------
+Examples:
+
+- markets alone;
+- minutes alone;
+- markets + minutes;
+- full events;
+- full points;
+- optimiser.
+
+24.6 EARLY/LATE
+----------------
+A module may add value only in certain season states.
+
+24.7 NEGATIVE ABLATION RESULT
+-----------------------------
+If removal improves out-of-time performance:
+
+- investigate;
+- reduce weight;
+- remove/promote baseline;
+- do not hide.
+
+======================================================================
+25. STATISTICAL UNCERTAINTY
+======================================================================
+
+25.1 BLOCK BOOTSTRAP
+--------------------
+Resample at appropriate clusters:
+
+- Gameweek;
+- fixture;
+- season;
+- manager trajectory.
+
+Preserve within-match/player dependence.
+
+25.2 PLAYER CLUSTER
+-------------------
+For player-level repeated rows, use multiway or player-block sensitivity where
+needed.
+
+25.3 GAMEWEEK AS PRIMARY POLICY BLOCK
+-------------------------------------
+Sequential decision points are strongly correlated within a Gameweek.
+
+25.4 CONFIDENCE INTERVALS
+------------------------
+For metric differences:
+
+- block bootstrap;
+- paired scenario bootstrap;
+- season-level variation;
+- Bayesian posterior where appropriate.
+
+25.5 PAIRED COMPARISON
+----------------------
+Models evaluated on same outcomes.
+Use paired loss differences.
+
+25.6 DIEBOLD–MARIANO
+--------------------
+Can compare forecast loss sequences.
+
+Diebold emphasises that the DM test compares forecasts, not abstract models, and
+its assumptions/serial dependence must be respected.
+
+Use cautiously with:
+
+- overlapping horizons;
+- small samples;
+- nested models;
+- Gameweek clusters.
+
+25.7 MODEL CONFIDENCE SET
+-------------------------
+Hansen, Lunde and Nason's Model Confidence Set returns a set that can contain the
+best forecasting method at a chosen confidence level.
+
+Use to avoid declaring a single winner when data are uninformative.
+
+25.8 EFFECT SIZE
+----------------
+Statistical significance without material decision value is insufficient.
+
+Report:
+
+- absolute score change;
+- relative skill;
+- points;
+- regret;
+- target probability.
+
+======================================================================
+26. MULTIPLE TESTING AND BACKTEST OVERFITTING
+======================================================================
+
+26.1 PROBLEM
+------------
+Testing many:
+
+- features;
+- models;
+- hyperparameters;
+- horizons;
+- policies;
+
+makes chance winners likely.
+
+White's Reality Check formalises the danger of data snooping when the same data
+are repeatedly reused.
+
+26.2 EXPERIMENT REGISTRY
+------------------------
+Before run:
+
+- hypothesis;
+- primary metric;
+- comparison;
+- data;
+- subgroup;
+- promotion threshold.
+
+After run:
+immutable result, including failures.
+
+26.3 TRIAL COUNT
+---------------
+Track every configuration, not only final shortlist.
+
+26.4 LOCKED HOLDOUT
+-------------------
+Primary protection.
+
+26.5 PROSPECTIVE CONFIRMATION
+-----------------------------
+Required for high-impact changes after extensive research.
+
+26.6 REALITY-CHECK / SPA-TYPE METHODS
+-------------------------------------
+May be used for families of policy/forecast alternatives.
+
+26.7 MODEL CONFIDENCE SET
+-------------------------
+Preferred for retaining statistically indistinguishable methods.
+
+26.8 P-HACKING PROHIBITION
+--------------------------
+No changing:
+
+- metric;
+- sample period;
+- subgroup;
+- benchmark;
+
+after seeing results without labelling exploratory.
+
+26.9 EXPLORATORY VERSUS CONFIRMATORY
+-----------------------------------
+All reports state mode.
+
+26.10 COMPLEXITY BUDGET
+-----------------------
+A more complex method needs:
+
+- meaningful gain;
+- stability;
+- operational value.
+
+======================================================================
+27. BENCHMARK FAIRNESS AND SKILL SCORES
+======================================================================
+
+27.1 SAME UNIVERSE
+------------------
+All methods evaluated on rows they can legitimately forecast.
+
+Also report coverage.
+
+27.2 COVERAGE-ADJUSTED
+----------------------
+A method cannot win by abstaining on hard cases without an abstention penalty or
+separate coverage.
+
+27.3 SKILL SCORE
+----------------
+For loss L relative benchmark b:
+
+    Skill = 1 - L_model / L_benchmark
+
+Only when benchmark loss >0 and interpretation appropriate.
+
+27.4 MARKET COVERAGE
+--------------------
+Market-only model scores:
+
+- all market-covered;
+- all players with fallback;
+- coverage.
+
+27.5 COMPUTE/RUNTIME
+--------------------
+Report:
+
+- training;
+- prediction;
+- optimiser;
+- data requirements.
+
+27.6 PARSIMONY
+-------------
+Prefer simpler method within practical/statistical equivalence.
+
+======================================================================
+28. MODEL AND POLICY PROMOTION GATES
+======================================================================
+
+28.1 FORECAST GATE
+------------------
+Required:
+
+- primary proper-score improvement or noninferiority;
+- calibration not materially worse;
+- coverage/interval acceptable;
+- subgroup checks;
+- leakage/reproducibility;
+- runtime.
+
+28.2 DISTRIBUTION GATE
+----------------------
+- joint score improvement;
+- correlations;
+- tails;
+- scenario coherence.
+
+28.3 DECISION GATE
+------------------
+- out-of-sample points/utility improvement;
+- regret;
+- hits/chips/price;
+- no operational degradation.
+
+28.4 PROSPECTIVE GATE
+---------------------
+At least:
+
+- configured number of live Gameweeks/events;
+- no severe calibration failure;
+- stable direction.
+
+28.5 NONINFERIOR SIMPLIFICATION
+-------------------------------
+A simpler model can replace a complex one if performance is statistically and
+materially noninferior.
+
+28.6 CHAMPION–CHALLENGER
+------------------------
+- champion production;
+- challenger shadow forecasts;
+- same deadlines;
+- no influence on live decision until promoted.
+
+28.7 ROLLBACK
+-------------
+Automatic trigger:
+
+- metric drift;
+- calibration;
+- source change;
+- runtime;
+- legality;
+- policy regret.
+
+======================================================================
+29. REPORTING SCORECARDS
+======================================================================
+
+29.1 MODEL CARD
+---------------
+- purpose;
+- data modes;
+- periods;
+- benchmarks;
+- metrics;
+- subgroups;
+- limitations;
+- promotion.
+
+29.2 DEADLINE REPORT
+--------------------
+- forecasts issued;
+- decisions;
+- confidence;
+- later outcomes;
+- errors;
+- corrections;
+- no hindsight narrative.
+
+29.3 GAMEWEEK REPORT
+--------------------
+- player/event/points scores;
+- decision points;
+- transfer/captain/chip;
+- operational incidents.
+
+29.4 MONTHLY REPORT
+-------------------
+- rolling calibration;
+- skill;
+- drift;
+- model confidence set;
+- ablations;
+- action stability.
+
+29.5 SEASON REPORT
+------------------
+- sequential policy;
+- cumulative points;
+- rank;
+- hits;
+- chip values;
+- team value;
+- regret;
+- benchmarks;
+- prospective versus reconstructed.
+
+29.6 NO SINGLE LEADERBOARD
+--------------------------
+Use panels:
+
+- projection;
+- distribution;
+- decision;
+- operations.
+
+======================================================================
+30. REPRODUCIBILITY ARTIFACTS
+======================================================================
+
+30.1 BACKTEST RUN
+-----------------
+- run ID;
+- research question;
+- mode;
+- train/test dates;
+- deadline bundles;
+- code/config;
+- model versions;
+- random seeds;
+- environment;
+- outputs;
+- metrics.
+
+30.2 FOLD MANIFEST
+------------------
+- training dataset;
+- inner choices;
+- model;
+- forecast bundle;
+- outcomes.
+
+30.3 METRIC ARTIFACT
+--------------------
+- row-level loss;
+- aggregation weights;
+- cluster;
+- confidence method.
+
+30.4 POLICY TRAJECTORY
+----------------------
+- historical state;
+- recommendation;
+- executed action;
+- state transition;
+- comparator.
+
+30.5 HASHES
+------------
+All manifests/file artifacts are hash-addressed under DMFP-05.
+
+30.6 REPLAY
+------------
+    dmf backtest replay <run_id>
+
+must reproduce within numerical tolerance.
+
+======================================================================
+31. IMPLEMENTATION ARCHITECTURE
+======================================================================
+
+31.1 PACKAGE
+------------
+src/dmf_pulse/evaluation/
+
+- folds.py
+- vintages.py
+- information_sets.py
+- leakage.py
+- odds_reconstruction.py
+- benchmarks.py
+- point_metrics.py
+- probability_metrics.py
+- calibration.py
+- distribution_metrics.py
+- multivariate_metrics.py
+- decision_regret.py
+- policy_replay.py
+- transfer_value.py
+- chip_value.py
+- price_metrics.py
+- rank_metrics.py
+- ablations.py
+- statistical_tests.py
+- multiple_testing.py
+- promotion.py
+- reports.py
+- schemas.py
+
+31.2 CORE INTERFACES
+--------------------
+build_walk_forward_folds(config)
+
+build_historical_information_set(deadline, mode)
+
+fit_inner_selected_model(training_folds, model_spec)
+
+issue_frozen_forecast(model, deadline_bundle)
+
+score_forecast(forecast, final_outcome, metric_spec)
+
+replay_policy(initial_state, deadline_sequence, policy_version)
+
+calculate_decision_regret(decision, comparators, realised_path)
+
+reconstruct_odds(deadline, source_priority)
+
+run_ablation(base_pipeline, removed_module)
+
+compare_models(loss_matrix, statistical_policy)
+
+evaluate_promotion(champion, challenger, gates)
+
+31.3 TOOLING
+------------
+- Python;
+- PostgreSQL;
+- Parquet/DuckDB;
+- NumPy/SciPy;
+- scoringRules-equivalent audited formulas;
+- scikit-learn calibration utilities only where time-safe;
+- statsmodels/custom block bootstrap;
+- no LLM numerical scoring.
+
+======================================================================
+32. DATABASE AND ARTIFACT MODEL
+======================================================================
+
+32.1 TABLES
+-----------
+evaluation.backtest_run
+evaluation.fold
+evaluation.experiment
+evaluation.forecast_record
+evaluation.outcome_record
+evaluation.row_loss
+evaluation.metric_summary
+evaluation.calibration_summary
+evaluation.policy_trajectory
+evaluation.decision_regret
+evaluation.ablation_run
+evaluation.benchmark_run
+evaluation.promotion_decision
+evaluation.leakage_test
+
+32.2 UNIQUE FORECAST
+--------------------
+Unique by:
+
+- target;
+- origin/cutoff;
+- horizon;
+- model version;
+- dataset mode;
+- issue run.
+
+32.3 IMMUTABILITY
+----------------
+Forecast and outer-fold result never overwritten.
+
+Correction creates new outcome version/re-score relation.
+
+======================================================================
+33. TESTING THE EVALUATION SYSTEM
+======================================================================
+
+33.1 SYNTHETIC CALIBRATED FORECASTS
+-----------------------------------
+Known probabilities produce expected calibration.
+
+33.2 DELIBERATE MISCALIBRATION
+------------------------------
+Detect overconfidence/underconfidence/bias.
+
+33.3 LEAKAGE CANARY
+-------------------
+Future feature must improve a deliberately leaked model; detector/test blocks
+it.
+
+33.4 TIME TRAVEL
+----------------
+As-of query returns only eligible data.
+
+33.5 ODDS
+---------
+Quote before/after deadline tests.
+
+33.6 NESTING
+------------
+Test outer outcomes cannot affect selected hyperparameter.
+
+33.7 METRICS
+-------------
+Golden formulas for:
+
+- MAE;
+- RMSE;
+- Brier;
+- log;
+- RPS;
+- CRPS;
+- energy;
+- variogram;
+- coverage.
+
+33.8 DECISION
+-------------
+Toy optimisation with known oracle/regret.
+
+33.9 POLICY
+-----------
+Sequential state where greedy differs from optimal.
+
+33.10 CHIP
+-----------
+Known incremental/counterfactual examples.
+
+33.11 PRICE
+------------
+Rare event/no-change benchmark.
+
+33.12 MULTIPLE TESTING
+----------------------
+Noise models demonstrate false winners; holdout/reality-check catches them.
+
+======================================================================
+34. OPERATIONAL SERVICE LEVELS
+======================================================================
+
+34.1 BEFORE MODEL PROMOTION
+---------------------------
+All mandatory gates automated.
+
+34.2 AFTER EACH DEADLINE
+------------------------
+Store forecasts and decision before outcome.
+
+34.3 AFTER FINALITY
+-------------------
+Score and reconcile.
+
+34.4 WEEKLY
+-----------
+Update dashboard within 24 hours of finality.
+
+34.5 MONTHLY
+------------
+Calibration/drift/promotion review.
+
+34.6 INCIDENT
+-------------
+If leakage discovered:
+
+- invalidate affected runs;
+- identify descendants;
+- roll back promotion;
+- disclose period;
+- rebuild.
+
+======================================================================
+35. RISK REGISTER
+======================================================================
+
+R-15-001 — Current data used in historical backtest
+Probability: High
+Impact: Critical
+Mitigation:
+deadline bundles and vintage queries.
+
+R-15-002 — Source timestamp confused with usable time
+Probability: High
+Impact: Critical
+Mitigation:
+usable_at cutoff.
+
+R-15-003 — Closing odds used at FPL deadline
+Probability: High
+Impact: Critical
+Mitigation:
+timestamp alignment and dataset grade.
+
+R-15-004 — Untimed odds presented as live
+Probability: High
+Impact: Critical
+Mitigation:
+RECONSTRUCTED_CLOSING label.
+
+R-15-005 — Player props backfilled from later market
+Probability: High
+Impact: Critical
+Mitigation:
+missing-state preservation.
+
+R-15-006 — Final fixture assignment leaks
+Probability: High
+Impact: Critical
+Mitigation:
+as-of fixture revision.
+
+R-15-007 — Postdeadline lineup leaks
+Probability: High
+Impact: Critical
+Mitigation:
+feature manifest/canary.
+
+R-15-008 — Today's mapping leaks
+Probability: Medium
+Impact: Critical
+Mitigation:
+mapping as-of version.
+
+R-15-009 — Final corrected label used in historical training
+Probability: Medium
+Impact: High
+Mitigation:
+training vintage.
+
+R-15-010 — Same fold tunes and tests
+Probability: High
+Impact: Critical
+Mitigation:
+nested walk-forward.
+
+R-15-011 — Final holdout repeatedly inspected
+Probability: High
+Impact: Critical
+Mitigation:
+locked governance/new prospective holdout.
+
+R-15-012 — Random CV breaks time
+Probability: High
+Impact: Critical
+Mitigation:
+rolling origin only.
+
+R-15-013 — Inactive players dominate MAE
+Probability: High
+Impact: High
+Mitigation:
+predeclared panels/weights.
+
+R-15-014 — Hindsight-selected subset
+Probability: High
+Impact: Critical
+Mitigation:
+subset defined from forecasts/predeadline state.
+
+R-15-015 — MAE improves but calibration worsens
+Probability: High
+Impact: High
+Mitigation:
+multi-gate scorecard.
+
+R-15-016 — Average metric hides subgroup failure
+Probability: High
+Impact: High
+Mitigation:
+position/regime/confidence panels.
+
+R-15-017 — Reliability bins manipulated
+Probability: Medium
+Impact: High
+Mitigation:
+CORP/reproducible diagrams.
+
+R-15-018 — Interval coverage rewarded without sharpness
+Probability: High
+Impact: High
+Mitigation:
+width/interval score.
+
+R-15-019 — Energy score misses correlation
+Probability: Medium
+Impact: High
+Mitigation:
+variogram/joint events.
+
+R-15-020 — Finite Monte Carlo gives zero probability
+Probability: Medium
+Impact: High
+Mitigation:
+DMFP-09 PMF evaluation policy.
+
+R-15-021 — Decision judged only by realised luck
+Probability: High
+Impact: Strategic
+Mitigation:
+proper scores and repeated policy regret.
+
+R-15-022 — Chip value measured as total GW points
+Probability: High
+Impact: Critical
+Mitigation:
+incremental policy counterfactual.
+
+R-15-023 — Wildcard judged one week
+Probability: High
+Impact: Critical
+Mitigation:
+sequential policy.
+
+R-15-024 — Hit cost reported without transfer benefit
+Probability: High
+Impact: High
+Mitigation:
+gross/net metrics.
+
+R-15-025 — Team value treated as success
+Probability: High
+Impact: Critical
+Mitigation:
+points-enabled metric.
+
+R-15-026 — Price accuracy judged by no-change accuracy
+Probability: High
+Impact: Critical
+Mitigation:
+proper rare-event scores.
+
+R-15-027 — Rank action judged by differential result
+Probability: High
+Impact: Strategic
+Mitigation:
+target probability/policy evaluation.
+
+R-15-028 — Opponent cohort uses final rank
+Probability: Medium
+Impact: Critical
+Mitigation:
+live cohort definition.
+
+R-15-029 — SAA optimisation evaluated in sample
+Probability: High
+Impact: Critical
+Mitigation:
+replicate and holdout.
+
+R-15-030 — Perfect information called achievable
+Probability: Medium
+Impact: Critical
+Mitigation:
+oracle labels.
+
+R-15-031 — Multiple experiments create chance winner
+Probability: Certain
+Impact: Critical
+Mitigation:
+registry, locked holdout, reality check/MCS.
+
+R-15-032 — Failed experiments omitted
+Probability: High
+Impact: High
+Mitigation:
+immutable experiment registry.
+
+R-15-033 — DM test misused for models/nested forecasts
+Probability: Medium
+Impact: High
+Mitigation:
+paired bootstrap/MCS and cautious interpretation.
+
+R-15-034 — Statistical significance without material gain
+Probability: High
+Impact: High
+Mitigation:
+effect/decision thresholds.
+
+R-15-035 — Reconstructed and prospective results pooled
+Probability: High
+Impact: Critical
+Mitigation:
+dataset-mode stratification.
+
+R-15-036 — Operational failures omitted
+Probability: High
+Impact: Critical
+Mitigation:
+operational policy backtest.
+
+R-15-037 — Rules change invalidates history
+Probability: Medium
+Impact: High
+Mitigation:
+ruleset-specific scoring and panels.
+
+R-15-038 — Backtest code differs from production
+Probability: High
+Impact: Critical
+Mitigation:
+same code paths/replay interfaces.
+
+R-15-039 — Backtest cannot reproduce
+Probability: Medium
+Impact: Critical
+Mitigation:
+hashes, seeds, manifests, environment.
+
+R-15-040 — Evaluation complexity hides weak sample
+Probability: High
+Impact: Strategic
+Mitigation:
+uncertainty, confidence set and prospective gate.
+
+======================================================================
+36. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-17
+
+----------------------------------------------------------------------
+SRC-TSCV-2016-001
+Title:
+Cross-validation for time series
+
+Author:
+Rob J. Hyndman
+
+URL:
+https://robjhyndman.com/hyndsight/tscv/
+
+Relevant claim:
+Time-series cross-validation uses a rolling forecasting origin and can evaluate
+multi-step-ahead forecasts while preserving temporal ordering.
+
+Reliability:
+HIGH authoritative forecasting-method reference.
+
+Pulse reliance:
+YES for walk-forward design.
+
+----------------------------------------------------------------------
+SRC-PREQUENTIAL-1984-001
+Title:
+Present Position and Potential Developments: Some Personal Views:
+Statistical Theory: The Prequential Approach
+
+Author:
+A. P. Dawid
+
+Publication:
+Journal of the Royal Statistical Society, Series A, 147(2), 278–292
+
+URL:
+https://academic.oup.com/jrsssa/article/147/2/278/7106293
+
+Relevant claim:
+The prequential approach evaluates statistical systems through their sequential
+predictions for future observations.
+
+Reliability:
+HIGH foundational peer-reviewed work.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-SCORING-2007-001
+Title:
+Strictly Proper Scoring Rules, Prediction, and Estimation
+
+Authors:
+Tilmann Gneiting, Adrian E. Raftery
+
+URL:
+https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf
+
+Relevant claims:
+Strictly proper scoring rules encourage honest probabilistic forecasts;
+discusses logarithmic, Brier/quadratic, CRPS and energy scores.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+YES for primary probability/distribution metrics.
+
+----------------------------------------------------------------------
+SRC-CALIBRATION-2007-001
+Title:
+Probabilistic Forecasts, Calibration and Sharpness
+
+Authors:
+Tilmann Gneiting, Fadoua Balabdaoui, Adrian E. Raftery
+
+URL:
+https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jrssb.pdf
+
+Relevant claim:
+Forecast evaluation should examine calibration and sharpness using diagnostic
+and proper-scoring methods.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-CORP-2021-001
+Title:
+Evaluating Probabilistic Classifiers: Reliability Diagrams and Score
+Decompositions Revisited
+
+Authors:
+Timo Dimitriadis, Tilmann Gneiting, Alexander I. Jordan
+
+URL:
+https://arxiv.org/abs/2008.03033
+
+Relevant claim:
+Introduces consistent, optimally binned and reproducible reliability diagrams
+based on isotonic regression and associated score decompositions.
+
+Reliability:
+HIGH peer-reviewed/research.
+
+Pulse reliance:
+YES for calibration diagrams.
+
+----------------------------------------------------------------------
+SRC-SCORINGRULES-2019-001
+Title:
+Evaluating Probabilistic Forecasts with scoringRules
+
+Authors:
+Alexander Jordan, Fabian Krüger, Sebastian Lerch
+
+Publication:
+Journal of Statistical Software, 90(12)
+
+URL:
+https://www.jstatsoft.org/article/view/v090i12
+
+Relevant claim:
+Provides audited implementations/discussion of CRPS, logarithmic, energy and
+variogram scores.
+
+Reliability:
+HIGH peer-reviewed software/method reference.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-VARIOGRAM-2015-001
+Title:
+Variogram-Based Proper Scoring Rules for Probabilistic Forecasts of
+Multivariate Quantities
+
+Authors:
+Michael Scheuerer, Thomas M. Hamill
+
+URL:
+https://journals.ametsoc.org/view/journals/mwre/143/4/mwr-d-14-00269.1.pdf
+
+Relevant claim:
+Variogram scores can be more discriminative regarding multivariate dependence
+than the energy score in relevant examples.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for joint scenario evaluation.
+
+----------------------------------------------------------------------
+SRC-POINT-2011-001
+Title:
+Making and Evaluating Point Forecasts
+
+Author:
+Tilmann Gneiting
+
+URL:
+https://arxiv.org/abs/0912.0902
+
+Relevant claim:
+Forecast evaluation must match the targeted functional; squared error elicits
+the mean and absolute error the median.
+
+Reliability:
+HIGH peer-reviewed/foundational.
+
+Pulse reliance:
+YES for MAE/RMSE interpretation.
+
+----------------------------------------------------------------------
+SRC-DM-2012-001
+Title:
+Comparing Predictive Accuracy, Twenty Years Later
+
+Author:
+Francis X. Diebold
+
+URL:
+https://www.nber.org/system/files/working_papers/w18391/w18391.pdf
+
+Relevant claim:
+The Diebold–Mariano procedure compares forecasts, not abstract models, and
+requires careful use with forecast settings and data vintages.
+
+Reliability:
+HIGH authoritative retrospective.
+
+Pulse reliance:
+YES for cautious forecast comparison.
+
+----------------------------------------------------------------------
+SRC-MCS-2011-001
+Title:
+The Model Confidence Set
+
+Authors:
+Peter R. Hansen, Asger Lunde, James M. Nason
+
+Publication:
+Econometrica, 79(2), 453–497
+
+PDF:
+https://www.kevinsheppard.com/files/teaching/mfe/advanced-econometrics/Hansen_Lunde_Nason.pdf
+
+Relevant claim:
+Constructs a set designed to contain the best model at a selected confidence
+level; uninformative data retain more models.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+YES for model comparison/promotion.
+
+----------------------------------------------------------------------
+SRC-REALITYCHECK-2000-001
+Title:
+A Reality Check for Data Snooping
+
+Author:
+Halbert White
+
+Publication:
+Econometrica, 68(5), 1097–1126
+
+PDF:
+https://www.ssc.wisc.edu/~bhansen/718/White2000.pdf
+
+Relevant claim:
+Repeated use of the same data for model selection can make chance performance
+appear genuine; develops a data-snooping adjustment.
+
+Reliability:
+HIGH foundational peer-reviewed work.
+
+Pulse reliance:
+YES for multiple-testing governance.
+
+----------------------------------------------------------------------
+SRC-BACKTEST-2014-001
+Title:
+The Probability of Backtest Overfitting
+
+Authors:
+David H. Bailey et al.
+
+PDF:
+https://carmamaths.org/jon/backtest2.pdf
+
+Relevant claim:
+Formalises the probability that selection from many historical strategy trials
+finds an in-sample winner that underperforms out of sample.
+
+Reliability:
+HIGH research reference; finance-specific implementation is not copied
+uncritically.
+
+Pulse reliance:
+CONTEXTUAL/DIAGNOSTIC.
+
+----------------------------------------------------------------------
+SRC-SAA-2002-001
+Title:
+The Sample Average Approximation Method for Stochastic Discrete Optimization
+
+Authors:
+Anton J. Kleywegt, Alexander Shapiro, Tito Homem-de-Mello
+
+DOI:
+https://doi.org/10.1137/S1052623499363220
+
+Relevant claim:
+Monte Carlo samples can approximate expected-value stochastic discrete
+optimisation and repeated solves can assess solution quality.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+YES for optimiser evaluation.
+
+----------------------------------------------------------------------
+SRC-SPO-2022-001
+Title:
+Smart “Predict, then Optimize”
+
+Authors:
+Adam N. Elmachtoub, Paul Grigas
+
+Publication:
+Management Science, 68(1), 9–26
+
+Preprint:
+https://arxiv.org/abs/1710.08005
+
+Relevant claim:
+Defines decision-focused/SPO loss as downstream decision error induced by
+predictions, demonstrating that prediction accuracy and decision quality can
+differ.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for decision-regret evaluation; not automatic production training.
+
+----------------------------------------------------------------------
+SRC-OPE-2022-001
+Title:
+A Review of Off-Policy Evaluation in Reinforcement Learning
+
+Authors:
+Masatoshi Uehara et al.
+
+URL:
+https://arxiv.org/pdf/2212.06355
+
+Relevant claim:
+Reviews the difficulty of evaluating a target sequential policy from historical
+data generated by another policy.
+
+Reliability:
+HIGH scholarly review.
+
+Pulse reliance:
+CONTEXTUAL; Pulse primarily uses model-based historical replay rather than
+claiming assumption-free off-policy evaluation.
+
+----------------------------------------------------------------------
+SRC-VINTAGE-2010-001
+Title:
+Forecasting with Real-Time Data Vintages
+
+Author:
+Dean Croushore
+
+PDF:
+https://facultystaff.richmond.edu/~dcrousho/docs/Croushore%20Oxford%20Handbook%20paper.pdf
+
+Relevant claim:
+Data revisions and vintages can materially affect historical forecasting
+evaluation; using current-vintage data can misrepresent real-time performance.
+
+Reliability:
+HIGH scholarly review.
+
+Pulse reliance:
+YES for outcome/training vintages.
+
+----------------------------------------------------------------------
+SRC-VINTAGE-2001-002
+Title:
+The Use and Abuse of “Real-Time” Data in Economic Forecasting
+
+Authors:
+Evan F. Koenig, Sheila Dolmas, Jeremy Piger
+
+PDF:
+https://www.philadelphiafed.org/-/media/frbp/assets/events/2001/real-time-data-analysis/koenig.pdf
+
+Relevant claim:
+Ex-post forecasts often misuse current-vintage data even when labelled
+out-of-sample.
+
+Reliability:
+HIGH research/reference.
+
+Pulse reliance:
+YES conceptually.
+
+----------------------------------------------------------------------
+SRC-BETFAIR-HISTORY-2026-001
+Title:
+Betfair Historical Data Feed Specification
+
+Organisation:
+Betfair
+
+URL:
+https://historicdata.betfair.com/files/Betfair-Historical-Data-Feed-Specification.pdf
+
+Relevant claims:
+Historical Exchange data are time-stamped, supplied in archived JSON formats
+and available from May 2015 under the documented service.
+
+Reliability:
+HIGH official provider documentation.
+
+Pulse reliance:
+YES for historical odds reconstruction.
+
+----------------------------------------------------------------------
+SRC-BETFAIR-HISTORY-2026-002
+Title:
+How do I download and view Betfair Historical Data?
+
+Organisation:
+Betfair Developer Support
+
+URL:
+https://support.developer.betfair.com/hc/en-us/articles/360000402211-How-do-I-download-and-view-Betfair-Historical-Data
+
+Relevant claim:
+Official historical service supplies time-stamped Exchange data with
+package/field specifications.
+
+Reliability:
+HIGH official.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-FOOTBALLDATA-2026-001
+Title:
+Football-Data.co.uk Historical Results and Betting Odds
+
+URL:
+https://www.football-data.co.uk/
+https://www.football-data.co.uk/englandm.php
+
+Relevant claim:
+Provides free computer-ready historical football results and fixed odds,
+including Premier League 1X2, total-goals and handicap data across many seasons.
+
+Reliability:
+MODERATE/HIGH established public data source; timing/licence/column changes must
+be handled.
+
+Pulse reliance:
+YES for reconstructed match-market benchmarks.
+
+----------------------------------------------------------------------
+SRC-FPL-FORM-2025-001
+Title:
+FPL basics explained: How to use the statistics menu
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2176606/fpl-basics-how-to-use-the-statistics-menus
+
+Relevant claim:
+Official form reflects recent Fantasy output over the previous 30 days.
+
+Reliability:
+HIGH official reference source.
+
+Pulse reliance:
+YES for the FPL-form benchmark.
+
+----------------------------------------------------------------------
+SRC-FPL-FINALITY-2026-001
+Title:
+Gameweek 38 scores to remain provisional until post-match reviews completed
+
+Organisation:
+Premier League
+
+Publication date:
+2026-05-22
+
+URL:
+https://www.premierleague.com/en/news/4659732/gameweek-38-scores-to-remain-provisional-until-post-match-reviews-completed
+
+Relevant claim:
+Scores, ranks and league positions remain provisional until review/finality; the
+approach was said to carry into 2026/27 subject to launch rules.
+
+Reliability:
+HIGH official current context.
+
+Pulse reliance:
+YES for outcome finality.
+
+----------------------------------------------------------------------
+SRC-FPL-LAUNCH-2026-001
+Title:
+All you need to know about 2026/27 Premier League fixtures
+
+Organisation:
+Premier League
+
+Publication date:
+2026-06-18
+
+URL:
+https://www.premierleague.com/en/news/4674573/all-you-need-to-know-for-202627-fixture-release-day/
+
+Relevant claim:
+The 2026/27 FPL game would launch later in summer; the Premier League season
+begins 21 August 2026.
+
+Reliability:
+HIGH official current source.
+
+Pulse reliance:
+YES for target-season activation gate.
+
+----------------------------------------------------------------------
+SRC-FPL-SKILL-2021-001
+Title:
+Identification of skill in an online game: The case of Fantasy Premier League
+
+Authors:
+Joseph D. O'Brien, James P. Gleeson, David J. P. O'Sullivan
+
+URL:
+https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0246698
+
+Relevant claim:
+FPL success displays skill/persistence and benefits from long-term planning and
+consistently good decisions amid noisy outcomes.
+
+Reliability:
+HIGH peer-reviewed FPL-specific research.
+
+Pulse reliance:
+YES for sequential policy evaluation.
+
+----------------------------------------------------------------------
+SRC-OPENFPL-2025-001
+Title:
+OpenFPL: An Open-Source Forecasting Method Rivaling State-of-the-Art Fantasy
+Premier League Services
+
+Author:
+Daniel Groos
+
+URL:
+https://arxiv.org/abs/2508.09992
+
+Relevant claim:
+Public-data FPL model evaluated prospectively on 2024/25 and across one-, two-
+and three-Gameweek horizons.
+
+Reliability:
+MODERATE recent preprint; reproduction and data/code review required.
+
+Pulse reliance:
+BENCHMARK CANDIDATE where reproducible/licensed.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-05 — Ingestion, Storage and Data Quality
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-06 — Odds Normalisation and Market Consensus
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-07 — Player Availability, Start and Minutes Model
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-08 — Football Event Distribution Engine
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-09 — FPL Points Distribution Engine
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-006
+Title:
+DMFP-10 — Uncertainty, Scenarios and Early-Season Policy
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-007
+Title:
+DMFP-11 — Price Change and Team Value Model
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-008
+Title:
+DMFP-12 — Squad, Transfer and Lineup Optimiser
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-009
+Title:
+DMFP-13 — Captaincy and Chip Optimiser
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-010
+Title:
+DMFP-14 — Rank, Effective Ownership and Risk Strategy
+
+Pulse reliance:
+YES.
+
+======================================================================
+37. ACCEPTANCE CRITERIA
+======================================================================
+
+A. TEMPORAL FIDELITY
+[ ] Outer tests are rolling-origin/walk-forward.
+[ ] Deadline bundle and usable_at control every feature.
+[ ] Training vintages are historical.
+[ ] Final labels are separate.
+[ ] Postdeadline lineups/closing odds cannot enter.
+[ ] Live and reconstructed results are separated.
+
+B. MODEL SELECTION
+[ ] Inner and outer evaluation are separated.
+[ ] Final holdout/prospective evidence exists.
+[ ] Every trial is registered.
+[ ] Multiple-testing controls are applied.
+[ ] Model confidence set/equivalence can retain multiple models.
+
+C. FORECAST METRICS
+[ ] MAE/RMSE/bias are reported with target interpretation.
+[ ] Log/Brier and calibration are primary for probabilities.
+[ ] RPS/CRPS and interval coverage/width evaluate distributions.
+[ ] Energy and variogram scores evaluate joint scenarios.
+[ ] Subgroups and horizons are explicit.
+
+D. BENCHMARKS
+[ ] Recent-points baseline exists.
+[ ] Faithful FPL-form baseline exists.
+[ ] Market-only exists.
+[ ] Market-plus-minutes exists.
+[ ] Complete Pulse exists.
+[ ] Perfect-hindsight levels are clearly unattainable.
+
+E. DECISIONS
+[ ] Policy replay is sequential.
+[ ] Transfer value is net and counterfactual.
+[ ] Hits are gross and net.
+[ ] Chip value is incremental and includes opportunity cost.
+[ ] Price and team-value decisions are evaluated.
+[ ] Rank targets are evaluated under their stated utility.
+[ ] Decision regret is separate from forecast error.
+
+F. TRUST
+[ ] Promotion gates include calibration, decisions and operations.
+[ ] Backtests use production code paths.
+[ ] Runs are immutable and replayable.
+[ ] Leakage invalidates descendants.
+[ ] Negative/neutral results are retained.
+[ ] Prospective 2026/27 collection is mandatory.
+
+======================================================================
+38. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Create evaluation database schemas.
+2. Implement fold and historical-vintage builders.
+3. Implement strict deadline information-set query.
+4. Implement leakage canary suite.
+5. Implement prequential forecast registry.
+6. Implement nested rolling-origin runner.
+7. Implement locked-holdout governance.
+8. Implement odds reconstruction and grades.
+9. Implement benchmark B0–B5.
+10. Implement audited point/probability/distribution metrics.
+11. Implement CORP/reliability and calibration reports.
+12. Implement randomized PIT and interval coverage.
+13. Implement energy/variogram and joint-event metrics.
+14. Implement policy replay engine.
+15. Implement transfer/hit/regret metrics.
+16. Implement chip incremental-policy evaluation.
+17. Implement price/team-value scorecards.
+18. Implement EO/rank target evaluation.
+19. Implement ablation runner.
+20. Implement block bootstrap and paired comparisons.
+21. Implement model confidence set/reality-check research tooling.
+22. Implement experiment registry and trial counts.
+23. Implement champion–challenger shadow logging.
+24. Build model/policy promotion gate.
+25. Build replayable reports and manifests.
+26. Backtest all strict-history portions available.
+27. Publish limitations for missing historical player props.
+28. Start prospective 2026/27 logging from the first prelaunch/live snapshots.
+29. Do not trust/release decision claims until acceptance gates pass.
+
+Suggested commands:
+
+    dmf evaluate build-folds
+    dmf evaluate information-set
+    dmf evaluate leakage
+    dmf evaluate reconstruct-odds
+    dmf evaluate benchmark
+    dmf evaluate projections
+    dmf evaluate calibration
+    dmf evaluate distributions
+    dmf evaluate joint
+    dmf evaluate policy
+    dmf evaluate regret
+    dmf evaluate chips
+    dmf evaluate prices
+    dmf evaluate rank
+    dmf evaluate ablation
+    dmf evaluate model-confidence-set
+    dmf evaluate promote
+    dmf evaluate replay
+
+======================================================================
+39. OPEN QUESTIONS
+======================================================================
+
+HISTORY
+-------
+1. Which historical seasons have trustworthy deadline bundles?
+2. Which FPL manager-state archives are complete?
+3. Which historical outcome corrections/finality times are available?
+4. How much strict live history exists before 2026/27?
+5. Which reconstructed data licences permit internal modelling?
+
+ODDS
+----
+6. What Betfair BASIC fields/cadence are available for each season?
+7. Can historical FPL deadlines be matched exactly to exchange snapshots?
+8. Which football-data columns are opening versus closing by season?
+9. How should untimed odds be weighted in research?
+10. What prospective player-prop sample is sufficient?
+
+WALK-FORWARD
+------------
+11. What initial training window is adequate?
+12. Expanding or rolling for each module?
+13. What refit cadence is replicated?
+14. Which complete season remains locked?
+15. How are rules changes handled across seasons?
+
+METRICS
+-------
+16. Which metric is primary for each model?
+17. What aggregation weights prevent inactive-player dominance?
+18. What interval levels are user-facing?
+19. Which joint player pairs/events are mandatory?
+20. What tail metrics best predict captain/chip decisions?
+
+STATISTICS
+----------
+21. What block-bootstrap unit is best by module?
+22. When is Diebold–Mariano appropriate?
+23. Which Model Confidence Set bootstrap is used?
+24. How are multiple hypotheses grouped?
+25. What minimum practical effect supports promotion?
+
+DECISIONS
+---------
+26. Which horizon defines transfer value?
+27. How are saved counterfactual policies executed?
+28. What oracle levels are reported?
+29. How is sequential Wildcard regret calculated efficiently?
+30. What is the primary team-value-enabled-points metric?
+31. How are solver/SAA errors separated from forecast regret?
+
+PROSPECTIVE
+-----------
+32. How many 2026/27 Gameweeks before each module can be promoted?
+33. Which champion/challenger alerts trigger rollback?
+34. What provisional/final scoring delay is accepted?
+35. How are benchmark changes frozen during the season?
+36. When can exploratory improvements enter shadow mode?
+
+======================================================================
+40. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-16 — ORCHESTRATION, APIS AND DECISION PIPELINE
+
+DMFP-16 must operationalise:
+
+- immutable forecast issue before deadline;
+- champion/challenger shadow execution;
+- historical/replay modes;
+- finality-triggered scoring;
+- evaluation jobs;
+- promotion/rollback state;
+- API exposure of model confidence and benchmark performance.
+
+DMFP-15 is the trust gate. A recommendation pipeline that cannot be evaluated
+under this document is not production-ready.
+
+======================================================================
+41. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-17
+
+- Selected nested walk-forward/prequential evaluation.
+- Added deadline and training-data vintages.
+- Defined strict live/reconstructed/counterfactual modes.
+- Added comprehensive leakage taxonomy and canary tests.
+- Added historical odds reconstruction and grades.
+- Defined required B0–B5 benchmarks.
+- Added MAE, RMSE, bias and target-functional interpretation.
+- Added log, Brier, RPS/CRPS and calibration.
+- Added CORP reliability, PIT and interval coverage/sharpness.
+- Added energy/variogram and joint-event evaluation.
+- Added module-specific scorecards.
+- Added sequential policy replay and decision regret.
+- Added transfer, hit, chip, price, team-value and rank metrics.
+- Added ablation and module-interaction testing.
+- Added block bootstrap, DM caution and Model Confidence Sets.
+- Added data-snooping/multiple-testing governance.
+- Added champion–challenger, promotion and rollback gates.
+- Added implementation, tests, risks, source register and acceptance criteria.
+
+Future v1.0:
+- Sebastian approves evaluation philosophy.
+- evaluation schemas and replay engine implemented.
+- historical strict/reconstructed datasets graded.
+- benchmark suite operational.
+- leakage suite passes.
+- prospective 2026/27 logging begins.
+- first locked/prospective promotion report completed.
+- DMFP-16 integration approved.
+
+END OF DOCUMENT

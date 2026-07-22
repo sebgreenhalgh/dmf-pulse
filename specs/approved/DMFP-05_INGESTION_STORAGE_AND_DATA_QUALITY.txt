@@ -1,0 +1,4035 @@
+DMF PULSE — INGESTION, STORAGE AND DATA QUALITY
+================================================
+
+Document ID: DMFP-05
+Version: 0.9 (Temporal Integrity and Data Operations Baseline)
+Status: PROPOSED — READY FOR IMPLEMENTATION AFTER SEBASTIAN APPROVAL
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 16 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+Provider architecture: DMFP-04 ZERO-COST ODDS ACQUISITION edition
+Parent documents:
+- DMFP-00 — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+- DMFP-01 — RESEARCH STANDARD AND EVIDENCE REGISTER
+- DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+- DMFP-03 — CANONICAL DATA MODEL AND IDENTIFIERS
+- DMFP-04 — DATA SOURCES, MARKETS, APIS AND LICENSING
+
+PURPOSE
+-------
+This document defines how data enters, survives, changes, fails, recovers and
+becomes historically usable inside DMF Pulse.
+
+It covers:
+
+- scheduled ingestion;
+- quota-aware and deadline-aware orchestration;
+- raw immutable snapshots;
+- PostgreSQL operational storage;
+- Parquet analytical archives;
+- timestamp standards;
+- odds snapshot frequency;
+- idempotent jobs;
+- retries and circuit breaking;
+- HTTP/API caching;
+- schema validation;
+- semantic and temporal validation;
+- missing-data treatment;
+- player and fixture matching;
+- postponed fixtures;
+- provider corrections;
+- data-quality alerts;
+- retention and deletion;
+- backup and recovery;
+- historical dataset construction;
+- trustworthy backtesting.
+
+The controlling question is:
+
+    WHAT DID DMF PULSE GENUINELY KNOW, IN A USABLE FORM,
+    AT THE EXACT FPL DEADLINE?
+
+If the system cannot answer that question precisely, it cannot produce a
+scientifically trustworthy backtest.
+
+GOVERNING PRINCIPLE
+-------------------
+Pulse must preserve three different truths:
+
+1. SOURCE TRUTH
+   What the provider returned, byte-for-byte or as closely as the access method
+   and licence permit.
+
+2. SYSTEM-KNOWN TRUTH
+   What Pulse had successfully received, validated, mapped and made usable at a
+   particular time.
+
+3. FINAL OUTCOME TRUTH
+   The eventual corrected result after official review and provider corrections.
+
+These truths are related but not interchangeable.
+
+A correction published after an FPL deadline may improve the final label.
+It must never be allowed to travel backwards into the features that supposedly
+existed before the deadline.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require an architecture decision record.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE CONTROL SUMMARY
+======================================================================
+
+0.1 THE PIPELINE IN ONE SENTENCE
+--------------------------------
+DMF Pulse uses at-least-once retrieval, immutable source observations,
+transactional canonical promotion, bitemporal facts and immutable deadline
+bundles to achieve effectively-once analytical results and time-travel-safe
+backtests.
+
+0.2 CONTROLLING ARCHITECTURAL DECISIONS
+---------------------------------------
+DO-05-01. Retrieval is at-least-once.
+Networks, schedulers and workers can duplicate a request. The system is designed
+to tolerate this rather than claiming impossible end-to-end exactly-once
+delivery.
+
+DO-05-02. Canonical effects are effectively once.
+Unique constraints, request fingerprints, immutable source IDs, transactional
+promotion and deterministic transformations ensure duplicate retrievals do not
+create duplicate domain facts.
+
+DO-05-03. Raw durability precedes transformation.
+Where storage rights permit, the source body and request metadata are durably
+captured before parsing and canonical promotion.
+
+DO-05-04. Raw observations are immutable.
+A provider correction creates a new observation. No prior raw snapshot is
+edited or overwritten.
+
+DO-05-05. Identical content does not erase repeated observation.
+The raw byte blob may be deduplicated by content hash, but every retrieval event
+is recorded because receipt time, cache validation, freshness and quota usage
+matter.
+
+DO-05-06. PostgreSQL is the operational source of canonical truth.
+PostgreSQL owns:
+
+- canonical entities;
+- temporal mappings;
+- current/as-of facts;
+- orchestration state;
+- quality results;
+- source metadata;
+- deadline bundles;
+- dataset manifests.
+
+DO-05-07. Parquet is the immutable analytical archive.
+Parquet stores versioned, columnar historical datasets for research,
+backtesting and model training. It is not the only copy of orchestration or
+canonical identity state.
+
+DO-05-08. No raw API dump is hidden inside mutable database JSON.
+Raw bodies live in a licensed object/file store. PostgreSQL stores metadata,
+hashes, URIs and selected structured fields.
+
+DO-05-09. Usable-at time controls historical features.
+A record becomes eligible for a live decision only when it is:
+
+- received;
+- durably stored or handled according to retention policy;
+- structurally valid;
+- semantically valid enough;
+- identity-mapped;
+- promoted to canonical state;
+- marked usable.
+
+The strict feature cutoff uses `usable_at <= deadline`.
+
+DO-05-10. Provider time is not system-known time.
+A source timestamp before the deadline does not make late-received data
+historically available.
+
+DO-05-11. Corrections are bitemporal.
+The system records when a corrected fact was valid in the domain and when Pulse
+learned it.
+
+DO-05-12. Deadline bundles are immutable.
+Each FPL deadline produces a hash-addressed manifest of the exact eligible
+source snapshots, canonical versions, model inputs, ruleset and code context.
+
+DO-05-13. Cache reuse never disguises age.
+A cached response carries original source/receipt age and cache-validation
+status. A stale response cannot masquerade as a new observation.
+
+DO-05-14. Missing is a typed state.
+`NOT_OFFERED`, `NOT_YET_OPEN`, `RATE_LIMITED`, `SOURCE_DOWN`, `MAPPING_FAILED`,
+`NOT_APPLICABLE`, `UNKNOWN` and numerical zero are different values.
+
+DO-05-15. Raw data are never imputed.
+Imputation occurs only in derived datasets or models, with method, version and
+uncertainty.
+
+DO-05-16. Entity matching is centralised.
+Provider adapters emit raw aliases and external IDs into staging. They do not
+independently perform irreversible name joins.
+
+DO-05-17. Fixture identity survives schedule changes.
+Postponement, kickoff change and Gameweek reassignment create new temporal facts
+around the same canonical fixture unless official evidence establishes a new
+match identity.
+
+DO-05-18. Provider corrections invalidate descendants.
+Affected current views, Parquet datasets, projections and backtests are marked
+impacted through lineage. Historical decisions remain immutable.
+
+DO-05-19. Quota is an operational resource.
+Free API quotas are stored and allocated by decision value. Retry logic cannot
+consume quota blindly.
+
+DO-05-20. The initial scheduler is deliberately simple.
+A one-minute planner tick, PostgreSQL job state, transaction-level advisory
+locks and a small worker pool are preferred to an early distributed workflow
+platform.
+
+DO-05-21. No silent backfill.
+Retrospectively acquired history is labelled `RECONSTRUCTED`, never mixed with
+data genuinely captured live without explicit dataset mode.
+
+DO-05-22. Quality gates are layered.
+Transport, syntax, schema, identity, semantic, temporal, cross-source and
+decision-readiness checks have separate outcomes and severity.
+
+DO-05-23. Every alert is actionable.
+A quality warning must state dataset, affected decision, evidence, severity,
+owner, expiry and the safe fallback.
+
+DO-05-24. Restore testing is part of storage.
+A backup that has not been restored and verified is not accepted as a recovery
+control.
+
+0.3 CORE DATA LAYERS
+--------------------
+LAYER 0 — TRANSPORT
+HTTP/file/manual acquisition metadata.
+
+LAYER 1 — RAW / BRONZE
+Immutable source bodies and exact observation envelopes.
+
+LAYER 2 — STAGING
+Parsed provider-shaped records awaiting validation/mapping.
+
+LAYER 3 — CANONICAL / SILVER
+Typed, mapped, bitemporal domain records.
+
+LAYER 4 — DEADLINE KNOWLEDGE
+Immutable "known and usable by cutoff" bundles.
+
+LAYER 5 — ANALYTICAL / GOLD
+Versioned feature, training and backtest datasets.
+
+LAYER 6 — FINAL OUTCOMES
+Official/corrected labels kept separate from historical features.
+
+0.4 REQUIRED SUCCESS PROPERTY
+------------------------------
+For any decision run, Pulse MUST be able to reconstruct:
+
+- the exact FPL deadline;
+- the machine clock health;
+- every source request and response used;
+- every source and usable timestamp;
+- cache status;
+- provider quota state;
+- schema version;
+- entity-mapping version;
+- canonical records;
+- missing-data reasons;
+- ruleset;
+- code commit;
+- dataset manifest;
+- source-bundle hash;
+- later corrections that were deliberately excluded.
+
+======================================================================
+1. SCOPE, NON-GOALS AND DEFINITIONS
+======================================================================
+
+1.1 IN SCOPE
+------------
+- orchestration;
+- source acquisition;
+- raw persistence;
+- canonical promotion;
+- analytical export;
+- temporal availability;
+- validation;
+- quality;
+- correction;
+- historical reconstruction;
+- recovery.
+
+1.2 OUT OF SCOPE
+----------------
+This document does not:
+
+- define market probability mathematics;
+- select final projection models;
+- optimise FPL decisions;
+- define FPL scoring;
+- create a public data API;
+- grant rights not contained in source terms;
+- treat paid infrastructure as necessary;
+- promise complete player-prop coverage.
+
+1.3 SOURCE SNAPSHOT
+-------------------
+One observed provider response, file, stream message group or manual entry,
+including:
+
+- request/context;
+- provider/source time;
+- receipt time;
+- headers;
+- raw body reference;
+- hash;
+- storage policy;
+- validation state.
+
+1.4 RAW BLOB
+------------
+Immutable stored body bytes referenced by one or more source snapshots.
+
+1.5 INGESTION RUN
+-----------------
+One logical execution of a defined ingestion job for a scheduled time/window.
+
+1.6 ATTEMPT
+-----------
+One network/storage/database attempt within an ingestion run.
+
+1.7 USABLE RECORD
+-----------------
+A canonical record that passed the required gates for its intended decision
+role.
+
+1.8 INFORMATION CUTOFF
+----------------------
+Latest instant at which an input may be used in a decision or historical
+simulation.
+
+1.9 DEADLINE BUNDLE
+-------------------
+Immutable manifest of inputs eligible for one FPL deadline.
+
+1.10 AS-OF QUERY
+----------------
+A query evaluated using facts and mappings known by a specified system time and
+valid for a specified domain time.
+
+1.11 CORRECTION
+---------------
+A later source or system action that supersedes a previously accepted value.
+
+1.12 QUARANTINE
+---------------
+Durable storage of a rejected/unresolved record outside canonical use.
+
+1.13 FRESHNESS
+--------------
+Age of the most relevant source/update observation at a decision time.
+
+1.14 COMPLETENESS
+-----------------
+Observed coverage relative to an explicit expected denominator.
+
+======================================================================
+2. END-TO-END DATA FLOW
+======================================================================
+
+2.1 NORMAL FLOW
+---------------
+1. Scheduler creates a logical run.
+2. Worker claims the run.
+3. Quota and provider-health gates execute.
+4. Request is constructed deterministically.
+5. Cache validators are attached where supported.
+6. Request begins; timing starts with a monotonic clock.
+7. Response metadata and body are received.
+8. Body is streamed to a temporary spool file.
+9. Body hash and size are calculated.
+10. File is flushed and made durable.
+11. Temporary file is atomically published to immutable raw storage.
+12. Source-snapshot metadata are committed.
+13. Parser creates provider-shaped staging rows.
+14. Structural/schema validation runs.
+15. Entity resolution and semantic validation run.
+16. Valid rows are transactionally promoted to canonical tables.
+17. Quality metrics and alerts are emitted.
+18. Eligible canonical rows receive `usable_at`.
+19. Parquet export/compaction occurs asynchronously.
+20. Deadline bundle includes only eligible records.
+21. Run is finalised with counts, timings, hashes and quota usage.
+
+2.2 RAW-STORAGE-FORBIDDEN FLOW
+------------------------------
+If source policy forbids body retention:
+
+1. Request/response metadata are captured.
+2. Body is held only in permitted volatile memory/temp storage.
+3. Hash and permitted derived/canonical values are calculated.
+4. Body is securely discarded.
+5. `raw_storage_policy = FORBIDDEN`.
+6. Source snapshot records:
+   - body hash if permitted;
+   - schema fingerprint;
+   - row counts;
+   - selected metadata;
+   - deletion confirmation.
+7. Canonical promotion continues only if allowed.
+
+2.3 FAILURE AFTER RAW STORAGE
+-----------------------------
+If the database fails after raw persistence:
+
+- raw sidecar manifest remains;
+- run remains recoverable;
+- orphan scanner registers or reconciles the blob later;
+- no re-download is required unless policy demands.
+
+2.4 FAILURE BEFORE RAW STORAGE
+------------------------------
+No canonical records are promoted.
+Attempt is retryable according to policy.
+
+2.5 FAILURE DURING CANONICAL PROMOTION
+--------------------------------------
+The database transaction rolls back.
+Raw/staging records remain for replay.
+A new attempt reuses the same source snapshot where appropriate.
+
+======================================================================
+3. STORAGE TOPOLOGY
+======================================================================
+
+3.1 INITIAL DEPLOYMENT
+----------------------
+Recommended zero-software-cost topology:
+
+- one PostgreSQL instance;
+- one local append-only raw/archive filesystem;
+- one separate backup destination;
+- Parquet datasets on local or S3-compatible filesystem;
+- Python workers;
+- one minute scheduler tick;
+- encrypted secrets;
+- Git for code/configuration, never raw data.
+
+3.2 DIRECTORY STRUCTURE
+-----------------------
+Example:
+
+data/
+  spool/
+    <ingestion_run_id>/
+      response.partial
+      envelope.partial.json
+
+  raw/
+    provider=<provider>/
+      resource=<resource>/
+        observed_date=YYYY-MM-DD/
+          <sha256_prefix>/
+            <body_sha256>.bin.zst
+            <source_snapshot_id>.envelope.json
+
+  parquet/
+    silver/
+      dataset=<dataset_name>/
+        schema_version=<version>/
+          season=<season>/
+            observed_date=YYYY-MM-DD/
+              part-<run_id>-<uuid>.parquet
+
+    gold/
+      dataset=<dataset_name>/
+        dataset_version=<version>/
+          ...
+
+  manifests/
+    source_bundles/
+    deadline_bundles/
+    dataset_versions/
+    parquet_files/
+
+  quarantine/
+    provider=<provider>/
+      date=YYYY-MM-DD/
+
+  backups/
+    manifests_only/
+
+3.3 RAW CONTENT ADDRESS
+-----------------------
+The body path uses SHA-256 of the stored logical entity body.
+
+Store separately:
+
+- body_sha256:
+  hash of source entity body after HTTP transfer decoding;
+
+- stored_blob_sha256:
+  hash of compressed/encrypted stored bytes;
+
+- canonical_json_sha256:
+  optional hash of canonicalised JSON for semantic duplicate detection.
+
+3.4 RAW ENVELOPE
+----------------
+Each source snapshot envelope includes:
+
+- source_snapshot_id;
+- ingestion_run_id;
+- attempt_id;
+- provider;
+- resource;
+- request method;
+- sanitized URL and parameter hash;
+- request start;
+- first byte;
+- response complete;
+- provider generated/update time;
+- HTTP status;
+- selected response headers;
+- content type/encoding;
+- quota headers;
+- cache validators;
+- body hash;
+- body size;
+- storage URI;
+- storage policy;
+- terms version;
+- adapter version;
+- schema fingerprint;
+- clock health;
+- error state.
+
+Secrets and authentication headers MUST be removed.
+
+3.5 IMMUTABILITY
+----------------
+Published raw files:
+
+- are never opened for in-place modification;
+- use unique content paths;
+- are made read-only;
+- are referenced through immutable metadata;
+- are deleted only by an authorised retention workflow;
+- produce a deletion tombstone if removed for rights/privacy reasons.
+
+3.6 ATOMIC PUBLISH
+------------------
+Write protocol:
+
+1. write `.partial`;
+2. flush application buffers;
+3. `fsync` file;
+4. verify size/hash;
+5. atomically rename into final path on the same filesystem;
+6. `fsync` directory where supported;
+7. commit metadata.
+
+Parquet files use the same temporary-publish pattern because file metadata is
+written at the end of the file.
+
+3.7 DEDUPLICATION
+-----------------
+`raw_blob` is content-addressed and may have one stored copy.
+
+`source_snapshot` is never deduplicated away.
+
+Example:
+Three API requests returning identical bytes create:
+
+- one raw blob;
+- three source snapshots;
+- three request/receipt times;
+- three quota/cache observations.
+
+======================================================================
+4. ORCHESTRATION ARCHITECTURE
+======================================================================
+
+4.1 COMPONENTS
+--------------
+SCHEDULER TICK:
+Runs every minute and plans due jobs.
+
+JOB PLANNER:
+Expands schedule templates relative to FPL deadlines and fixture kickoff.
+
+JOB TABLE:
+Persistent source of work.
+
+WORKER:
+Claims and executes jobs.
+
+QUOTA MANAGER:
+Approves, reserves and reconciles API usage.
+
+PROVIDER HEALTH:
+Circuit-breaker and freshness state.
+
+DEADLINE FREEZER:
+Creates immutable deadline bundle.
+
+4.2 WHY NOT A LARGE WORKFLOW PLATFORM INITIALLY
+-----------------------------------------------
+The initial workload is:
+
+- low to moderate volume;
+- small team;
+- highly provider-specific;
+- quota constrained;
+- deadline critical.
+
+A database-backed scheduler is easier to audit and recover.
+
+Celery/Airflow/other orchestration MAY be introduced after the interfaces and
+operational need are proven.
+
+4.3 SCHEDULER DEPLOYMENT
+------------------------
+A Linux `systemd` timer or cron invokes:
+
+    dmf ingest tick
+
+once per minute.
+
+The tick:
+
+- obtains a PostgreSQL transaction-level advisory lock;
+- reads schedule definitions;
+- creates missing logical jobs;
+- updates/cancels future jobs after fixture/deadline changes;
+- exits quickly.
+
+4.4 JOB CLAIMING
+----------------
+Workers claim due jobs using row locks and `SKIP LOCKED` or equivalent.
+
+A job claim records:
+
+- worker ID;
+- claim time;
+- lease expiry;
+- heartbeat;
+- attempt number.
+
+Expired leases return to the queue only after safety checks.
+
+4.5 ADVISORY LOCKS
+------------------
+PostgreSQL advisory transaction locks are used for:
+
+- one scheduler tick;
+- one provider quota update;
+- one deadline bundle;
+- one canonical promotion partition/window.
+
+Locks are transaction-scoped where possible so failure releases them
+automatically.
+
+4.6 JOB PRIORITY
+----------------
+P0:
+FPL deadline, rules and manager legality.
+
+P1:
+Current squad, captaincy, transfer targets and core market snapshots.
+
+P2:
+All EPL fixtures and availability.
+
+P3:
+Future-horizon context and redundant sources.
+
+P4:
+Historical compaction, exploratory markets and research.
+
+4.7 JOB STATES
+--------------
+PLANNED
+READY
+CLAIMED
+RUNNING
+WAITING_RETRY
+SUCCEEDED
+SUCCEEDED_WITH_WARNINGS
+SUCCEEDED_WITH_QUARANTINE
+SKIPPED_CACHE_FRESH
+SKIPPED_QUOTA
+SKIPPED_NO_LONGER_RELEVANT
+FAILED_RETRYABLE
+FAILED_PERMANENT
+CANCELLED
+SUPERSEDED
+
+4.8 JOB DEPENDENCIES
+--------------------
+Examples:
+
+fixture_sync
+    -> schedule_replan
+    -> odds_market_discovery
+    -> odds_snapshot
+
+source_snapshot
+    -> parse
+    -> validate
+    -> map
+    -> canonical_promote
+    -> quality_gate
+    -> parquet_export
+
+deadline
+    -> final_source_health
+    -> deadline_bundle
+    -> projection_run
+
+4.9 MISSED RUNS
+---------------
+Do not blindly execute every missed poll after downtime.
+
+Policy by job:
+
+LATEST_ONLY:
+Run once now.
+
+CATCH_UP_EACH_WINDOW:
+Run each missing logical window.
+
+DEADLINE_EXPIRED:
+Mark missed, alert and do not fabricate.
+
+HISTORICAL_BACKFILL:
+Queue separate reconstructed job.
+
+======================================================================
+5. SCHEDULE DEFINITIONS
+======================================================================
+
+5.1 SCHEDULE TYPES
+------------------
+CALENDAR:
+Fixed UTC interval.
+
+DEADLINE_RELATIVE:
+Relative to FPL deadline.
+
+FIXTURE_RELATIVE:
+Relative to kickoff.
+
+EVENT_TRIGGERED:
+After source/schema/fixture change.
+
+MANUAL:
+Human initiated.
+
+BACKFILL:
+Historical range.
+
+5.2 SCHEDULE CONFIG
+-------------------
+Example:
+
+job_definition:
+  job_key: "the_odds_api.player_props"
+  provider: "the_odds_api"
+  schedule_type: "FIXTURE_RELATIVE"
+  offsets:
+    - "-12h"
+    - "-2h"
+  information_cutoff: "FPL_DEADLINE"
+  priority_policy: "PLAYER_PROP_PRIORITY"
+  quota_policy: "THE_ODDS_API_MONTHLY"
+  missed_run_policy: "SKIP_IF_AFTER_CUTOFF"
+  max_runtime_seconds: 120
+  retry_policy: "HTTP_READ_QUOTA_AWARE_V1"
+
+5.3 SCHEDULE VERSION
+--------------------
+Every planned job records the schedule version that created it.
+
+A changed schedule does not rewrite historical planned jobs.
+
+======================================================================
+6. PROVIDER-SPECIFIC INGESTION SCHEDULE
+======================================================================
+
+6.1 OFFICIAL FPL
+----------------
+Prelaunch:
+- daily launch/status probe;
+- no aggressive polling.
+
+Preseason after launch:
+- bootstrap and fixtures every 6 hours;
+- daily full snapshot at a fixed UTC time;
+- immediate snapshot after detected schema/rules change.
+
+In-season, more than 72h before deadline:
+- every 6 hours.
+
+72h to 24h:
+- every 2 hours.
+
+24h to 6h:
+- hourly.
+
+6h to deadline:
+- every 15 minutes.
+
+Additional:
+- D-5 minutes;
+- D-1 minute only if provider health/terms/request policy permit;
+- deadline freeze after D, selecting only `usable_at <= D`.
+
+Live event/official points:
+- event-specific cadence during matches;
+- slower when not needed for user display;
+- final/correction checks after last fixture.
+
+All FPL calls are shared and cached. No per-user duplicate requests.
+
+6.2 API-FOOTBALL FREE
+---------------------
+Limits documented in DMFP-04:
+
+- 100 requests/day;
+- 10 requests/minute.
+
+Baseline daily planning:
+
+- fixture/schedule sync: 2–4;
+- injuries/sidelined: 2–4;
+- lineup requests for active fixtures: up to 20;
+- pre-match odds: up to 20;
+- result/event/statistics: up to 20;
+- transfer/player context: up to 5;
+- reserve: minimum 20.
+
+The planner must aggregate by league/date where supported.
+
+Hard client rate:
+<= 8 requests/minute.
+
+Quota headers are captured from every response.
+
+6.3 THE ODDS API FREE
+---------------------
+Free events endpoint:
+- call no more than every 6 hours normally;
+- every 60 minutes within 24h of FPL deadline if needed;
+- endpoint is quota-free but must not be abused.
+
+Event-market discovery:
+- T-24h or first market window;
+- T-6h for priority fixtures;
+- one credit per qualifying call under current documentation.
+
+Player-prop broad snapshot:
+- one per fixture before the FPL deadline where markets exist.
+
+Priority second snapshot:
+- current-squad/captaincy/transfer/DGW fixtures only.
+
+Monthly planner must keep:
+- at least 75 credits emergency reserve;
+- expected month usage <= 80% before reserve;
+- actual usage reconciled from response headers.
+
+If the FPL deadline occurs before the prop opens:
+- record `NOT_YET_OPEN_AT_DEADLINE`;
+- do not retrieve postdeadline data for that decision.
+
+6.4 BETFAIR DELAYED
+-------------------
+Conditional and noncritical:
+
+- T-24h;
+- T-6h;
+- T-2h where before FPL cutoff;
+- nearest approved predeadline snapshot;
+- no high-frequency hammering.
+
+Every record is labelled:
+- delayed;
+- receipt time;
+- source/provider time where present;
+- possible maximum delay.
+
+6.5 BETFAIR BASIC HISTORY
+-------------------------
+Manual or scheduled import after download:
+
+- verify file/package hash;
+- parse to staging;
+- map market/selection;
+- store dataset metadata;
+- no live-decision role.
+
+6.6 FOOTBALL-DATA.CO.UK
+-----------------------
+Weekly or after published update:
+
+- conditional download if validators exist;
+- hash;
+- parse notes/columns;
+- season-scoped import;
+- historical research only.
+
+6.7 MANUAL ODDS
+---------------
+Event-driven.
+
+Manual record becomes usable only after:
+- validation;
+- operator/market/selection mapping;
+- timestamp check;
+- settlement status;
+- optional second review for critical inputs.
+
+======================================================================
+7. INGESTION JOB DATA MODEL
+======================================================================
+
+7.1 ORCHESTRATION TABLES
+------------------------
+orchestration.job_definition
+orchestration.job_schedule_version
+orchestration.ingestion_run
+orchestration.ingestion_attempt
+orchestration.job_dependency
+orchestration.worker_lease
+orchestration.provider_circuit
+orchestration.quota_period
+orchestration.quota_transaction
+orchestration.retry_policy
+
+7.2 INGESTION RUN FIELDS
+------------------------
+- ingestion_run_id UUID;
+- logical_job_key;
+- provider_id;
+- resource;
+- scheduled_for_utc;
+- logical_window_start/end;
+- fixture/gameweek scope;
+- information_cutoff;
+- schedule_version;
+- request_fingerprint;
+- priority;
+- status;
+- first/last attempt;
+- claimed worker;
+- started/finished;
+- counts;
+- final source snapshot IDs;
+- error classification;
+- code commit;
+- adapter version.
+
+7.3 UNIQUE LOGICAL KEY
+----------------------
+Candidate:
+
+(provider,
+ logical_job_key,
+ scheduled_for_utc,
+ logical_scope_hash,
+ schedule_version)
+
+This prevents duplicate planned logical jobs.
+
+7.4 ATTEMPT FIELDS
+------------------
+- attempt_id;
+- run_id;
+- number;
+- start/end;
+- request ID;
+- response status;
+- bytes;
+- latency;
+- retry reason;
+- Retry-After;
+- quota before/after;
+- exception class;
+- source snapshot ID;
+- worker.
+
+======================================================================
+8. IDEMPOTENCY
+======================================================================
+
+8.1 PRINCIPLE
+-------------
+Exactly-once retrieval across the Internet cannot be assumed.
+
+Pulse provides:
+
+- at-least-once request attempts;
+- immutable observation;
+- deterministic transform;
+- effectively-once canonical effects.
+
+8.2 REQUEST FINGERPRINT
+-----------------------
+Hash of:
+
+- provider;
+- HTTP method;
+- normalized endpoint;
+- sorted nonsecret query parameters;
+- safe request-body hash;
+- relevant representation headers;
+- logical scope;
+- adapter version where semantics differ.
+
+Secrets are excluded.
+
+8.3 SOURCE SNAPSHOT IDENTITY
+----------------------------
+A source snapshot is one observation, not one unique body.
+
+Uniqueness may use:
+
+- provider message/event sequence;
+- provider update ID;
+- request/attempt;
+- response/body hash;
+- provider timestamp.
+
+8.4 CANONICAL UPSERT
+--------------------
+Use natural/provider mapping keys and `INSERT ... ON CONFLICT` where appropriate.
+
+Append-only facts:
+`DO NOTHING` on exact duplicate source identity.
+
+Current materialized state:
+create new temporal version, not destructive overwrite.
+
+8.5 DATABASE TRANSACTION
+------------------------
+One canonical promotion transaction:
+
+1. lock relevant identity/window;
+2. verify snapshot still eligible;
+3. insert facts;
+4. close superseded system-time intervals where needed;
+5. insert new temporal facts;
+6. record validation/provenance;
+7. set usable time;
+8. commit.
+
+8.6 SERIALIZATION
+----------------
+High-contention state transitions such as quota reservation and deadline bundle
+may use PostgreSQL Serializable isolation.
+
+Applications must retry SQLSTATE `40001` serialization failures.
+
+8.7 TRANSFORM IDEMPOTENCY
+-------------------------
+Transformation ID:
+
+hash(
+  source_snapshot_ids,
+  transform_name,
+  transform_version,
+  configuration_hash,
+  mapping_version
+)
+
+A repeated transform produces the same output set/hash.
+
+8.8 PARQUET IDEMPOTENCY
+-----------------------
+Parquet file names are unique, but dataset manifests deduplicate logical content.
+
+A compaction does not change dataset semantics:
+- new physical file set;
+- same logical dataset version or explicit storage revision;
+- old files retired through manifest, not overwritten.
+
+======================================================================
+9. RAW SNAPSHOTS AND SOURCE METADATA
+======================================================================
+
+9.1 RAW BLOB TABLE
+------------------
+provenance.raw_blob
+
+Fields:
+- raw_blob_id;
+- body_sha256;
+- stored_sha256;
+- size_bytes;
+- storage_uri;
+- compression;
+- encryption;
+- content_type;
+- created_at;
+- retention_policy_id;
+- deletion_status;
+- deletion_at;
+- tombstone_id.
+
+9.2 SOURCE SNAPSHOT TABLE
+-------------------------
+provenance.source_snapshot
+
+Fields:
+- source_snapshot_id;
+- provider;
+- resource;
+- ingestion run/attempt;
+- request fingerprint;
+- request_started_at;
+- first_byte_at;
+- response_received_at;
+- provider_generated_at;
+- source_updated_at;
+- source_timestamp_precision;
+- HTTP status;
+- cache status;
+- ETag;
+- Last-Modified;
+- quota headers;
+- raw_blob_id nullable;
+- body hash;
+- schema fingerprint;
+- terms version;
+- storage policy;
+- validation status;
+- usable_at nullable;
+- supersedes/superseded_by;
+- source quality;
+- notes.
+
+9.3 304 NOT MODIFIED
+--------------------
+A 304 response creates a new source snapshot:
+
+- status `NOT_MODIFIED`;
+- request/receipt time;
+- cache validator;
+- reference to prior representation/raw blob;
+- no claim that content changed.
+
+It proves revalidation at that time.
+
+9.4 STREAM DATA
+---------------
+For streams:
+
+- preserve provider sequence/clock;
+- group messages into small immutable segments;
+- record first/last sequence;
+- detect gaps;
+- reconnect using provider cursor where available;
+- never merge across an unresolved gap without marking it.
+
+9.5 MANUAL SOURCE
+-----------------
+Manual entries use a signed/attributed source snapshot with:
+
+- observer;
+- observation time;
+- entry time;
+- source URL/operator;
+- review state;
+- attachment reference where permitted.
+
+======================================================================
+10. POSTGRESQL OPERATIONAL STORAGE
+======================================================================
+
+10.1 RESPONSIBILITIES
+---------------------
+PostgreSQL stores:
+
+- canonical entities and mappings;
+- bitemporal facts;
+- odds metadata/quotes;
+- FPL snapshots;
+- orchestration;
+- quota;
+- validation;
+- DQ issues;
+- source/provenance;
+- deadline bundles;
+- datasets and manifests;
+- current/as-of views.
+
+10.2 SCHEMAS
+------------
+From DMFP-03 plus:
+
+orchestration
+quality
+archive
+staging
+
+10.3 STAGING TABLES
+-------------------
+Staging rows preserve provider shape and source snapshot ID.
+
+They are durable, not unlogged, when replay/audit value matters.
+
+Bulk loading MAY use PostgreSQL `COPY` into staging.
+
+10.4 TRANSACTION ISOLATION
+--------------------------
+Default:
+READ COMMITTED for append-heavy ingestion.
+
+Use REPEATABLE READ or SERIALIZABLE for:
+
+- one coherent deadline bundle;
+- quota reservation;
+- state transitions where concurrent change would create inconsistency.
+
+Handle serialization failures by retrying the entire transaction.
+
+10.5 ADVISORY LOCKS
+-------------------
+Transaction-level locks for application-defined mutual exclusion.
+
+No session-level lock should remain accidentally held by pooled connections.
+
+10.6 PARTITIONING
+-----------------
+Candidate monthly range partitioning:
+
+- betting.odds_quote by observed_at;
+- provenance.source_snapshot by received_at;
+- fpl.price_snapshot by observed_at;
+- quality.validation_result by created_at.
+
+Do not partition small tables prematurely.
+
+10.7 CONSTRAINTS
+----------------
+- foreign keys;
+- not null on critical fields;
+- unique source identity;
+- probability range;
+- odds range;
+- nonoverlapping temporal constraints;
+- home != away;
+- mapping status;
+- generated checks.
+
+10.8 INDEXES
+------------
+- run status/scheduled time;
+- source provider/resource/time;
+- odds market/selection/time;
+- player/fixture/Gameweek;
+- `usable_at`;
+- valid/system ranges;
+- deadline/source bundle;
+- DQ open severity;
+- hashes.
+
+10.9 CURRENT VIEWS
+------------------
+Current views never destroy history:
+
+- latest source snapshot;
+- latest usable quote;
+- current fixture revision;
+- current mapping;
+- latest price;
+- current availability;
+- unresolved quality issues.
+
+10.10 NO "LATEST" IN BACKTESTS
+------------------------------
+Backtests may not call a current/latest view without an explicit historical
+`as_of` parameter.
+
+======================================================================
+11. PARQUET ANALYTICAL ARCHIVE
+======================================================================
+
+11.1 PURPOSE
+------------
+Parquet provides compact columnar storage for:
+
+- large odds histories;
+- FPL snapshot history;
+- model features;
+- deadline datasets;
+- simulation inputs;
+- backtest outputs.
+
+Apache Parquet organizes files into row groups, column chunks and pages, with
+file metadata used to locate relevant columns. PyArrow supports partitioned
+datasets on local or object filesystems.
+
+11.2 WHAT DOES NOT GO TO PARQUET
+--------------------------------
+Parquet is not the authoritative store for:
+
+- worker leases;
+- current quota;
+- unresolved mappings;
+- activation state;
+- mutable incident workflow;
+- secret material.
+
+11.3 DATASET LEVELS
+-------------------
+SILVER:
+Canonical append-only facts exported from PostgreSQL.
+
+Examples:
+- odds_quotes;
+- price_snapshots;
+- player_status_observations;
+- fixture_revisions;
+- lineup_observations.
+
+GOLD:
+Immutable research products.
+
+Examples:
+- deadline_player_features;
+- deadline_market_features;
+- training_minutes;
+- backtest_inputs;
+- final_outcome_labels.
+
+11.4 PARTITIONING
+-----------------
+Use low-cardinality, query-relevant partitions.
+
+Example odds dataset:
+
+dataset=odds_quotes/
+schema_version=1/
+season=2026_27/
+competition=EPL/
+observed_date=2026-08-20/
+
+Do not partition by:
+- player;
+- selection;
+- market;
+- fixture;
+unless measured volume requires it.
+
+11.5 FILE SIZE
+--------------
+Target practical file size:
+
+- 64–256 MB for this project;
+- avoid thousands of tiny files;
+- compact daily/weekly depending volume.
+
+Parquet guidance often recommends larger row groups in distributed/HDFS
+environments; Pulse should tune for local memory and workload rather than copy a
+1 GB rule blindly.
+
+11.6 ROW GROUP
+--------------
+Initial target:
+64–128 MB uncompressed logical row groups.
+
+Measure:
+- scan performance;
+- memory;
+- predicate pruning;
+- compaction cost.
+
+11.7 COMPRESSION
+----------------
+Default:
+Zstandard at a moderate level, subject to benchmark.
+
+Fallback:
+Snappy for maximum compatibility.
+
+Record codec/version in manifest.
+
+11.8 EXACT TYPES
+----------------
+- timestamps as UTC Arrow timestamps;
+- odds/prices as Decimal where exact source reproduction matters;
+- canonical UUID as fixed/string representation;
+- enums as dictionary-encoded strings where useful;
+- no mixed-type columns.
+
+11.9 SCHEMA EVOLUTION
+---------------------
+Each dataset root/version has one declared schema.
+
+Breaking type/semantic change:
+new schema version and dataset version.
+
+Additive field:
+allowed only after compatibility review.
+
+11.10 WRITE PROTOCOL
+--------------------
+1. build Arrow table;
+2. validate schema;
+3. write temporary Parquet;
+4. reopen and verify metadata/schema/row count;
+5. hash;
+6. atomically publish;
+7. insert Parquet file record;
+8. publish dataset manifest;
+9. only then mark export complete.
+
+11.11 MANIFEST
+--------------
+Includes:
+
+- dataset version;
+- schema version;
+- file paths/hashes;
+- row counts;
+- min/max event/source/system time;
+- source bundles;
+- code/configuration;
+- partition values;
+- licence;
+- compaction lineage;
+- creation time.
+
+11.12 COMPACTION
+----------------
+Compaction creates a new physical manifest.
+
+It must not:
+
+- alter values;
+- remove rows without a documented duplicate rule;
+- change time precision;
+- silently apply corrections.
+
+Old files remain until the new manifest verifies and retention policy allows
+removal.
+
+======================================================================
+12. TIMESTAMP STANDARD
+======================================================================
+
+12.1 FORMAT
+-----------
+External/interface timestamps:
+
+RFC 3339 with explicit UTC `Z`.
+
+Database:
+
+PostgreSQL `timestamptz`.
+
+No naive datetime is allowed at a system boundary.
+
+12.2 REQUIRED TIMES
+-------------------
+SCHEDULED_FOR:
+When the job should run.
+
+REQUEST_STARTED_AT:
+Wall-clock instant request begins.
+
+FIRST_BYTE_AT:
+First response byte.
+
+RESPONSE_RECEIVED_AT:
+Full response available.
+
+PROVIDER_GENERATED_AT:
+Provider-declared generation time.
+
+SOURCE_UPDATED_AT:
+Provider-declared underlying data update time.
+
+DURABLE_AT:
+Raw snapshot made durable.
+
+VALIDATED_AT:
+Required validation complete.
+
+MAPPED_AT:
+Identity resolution complete.
+
+CANONICALIZED_AT:
+Canonical transaction committed.
+
+USABLE_AT:
+Record became eligible for decision use.
+
+EVENT_TIME:
+Football/market event time.
+
+VALID_FROM/UNTIL:
+Domain validity.
+
+SYSTEM_FROM/UNTIL:
+When canonical version was accepted by Pulse.
+
+INFORMATION_CUTOFF:
+Decision/backtest cutoff.
+
+12.3 USABLE-AT DEFINITION
+-------------------------
+Default:
+
+usable_at =
+maximum of:
+- response_received_at;
+- durable_at where required;
+- validation completion;
+- required mapping completion;
+- canonical commit.
+
+A record with `usable_at` after deadline is not a feature for that deadline.
+
+12.4 SOURCE TIME MISSING
+------------------------
+Do not set source time equal to receipt time silently.
+
+Store:
+
+source_updated_at = null
+source_time_status = MISSING
+freshness_basis = RECEIPT_TIME
+quality_grade reduced
+
+12.5 TIMESTAMP PRECISION
+------------------------
+Record:
+
+SECOND
+MILLISECOND
+MICROSECOND
+MINUTE
+DATE_ONLY
+UNKNOWN
+
+Do not invent precision.
+
+12.6 DURATIONS
+--------------
+Measure request/job duration with a monotonic clock.
+Store duration separately from wall-clock timestamps.
+
+12.7 CLOCK SYNCHRONIZATION
+--------------------------
+Hosts must use a reliable time-synchronisation service.
+
+Monitor:
+- clock offset;
+- last sync;
+- source.
+
+Proposed alerts:
+- >2 seconds: warning;
+- >10 seconds: high severity;
+- >30 seconds near deadline: block deadline bundle until reviewed.
+
+12.8 LOCAL DISPLAY
+------------------
+Store UTC.
+Display local timezone separately.
+The user's local display does not change the cutoff instant.
+
+======================================================================
+13. DEADLINE KNOWLEDGE BUNDLES
+======================================================================
+
+13.1 PURPOSE
+------------
+The deadline bundle is the evidence package for one decision point.
+
+13.2 STRICT ELIGIBILITY
+-----------------------
+A source/canonical record is eligible only if:
+
+- response/manual observation was available before cutoff;
+- required raw handling completed before cutoff;
+- validation passed before cutoff;
+- mapping passed before cutoff;
+- canonical promotion completed before cutoff;
+- `usable_at <= cutoff`;
+- source was not quarantined/blocking;
+- licence permits use;
+- relevant valid-time predicate holds.
+
+13.3 NOT ENOUGH
+---------------
+These do NOT make a record eligible:
+
+- provider timestamp before cutoff but receipt after;
+- historical API retrieved later;
+- correction published later with an earlier valid time;
+- manual note entered later claiming it was seen earlier, unless a
+  contemporaneous approved source snapshot exists;
+- cached content with unknown age presented as current;
+- record mapped after cutoff.
+
+13.4 BUNDLE CREATION TIME
+-------------------------
+The freezer may run just after the deadline.
+
+Its query cutoff is the exact official deadline.
+
+13.5 BUNDLE CONTENT
+-------------------
+- deadline/gameweek;
+- official deadline source;
+- ruleset hash;
+- clock-health record;
+- source snapshot IDs;
+- canonical record versions;
+- mapping versions;
+- missing-data inventory;
+- quality issues;
+- provider health;
+- quota state;
+- cache state;
+- dataset schema;
+- code commit;
+- manifest hash;
+- created_at.
+
+13.6 BUNDLE MODES
+-----------------
+LIVE_OPERATIONAL:
+What the live system could actually use.
+
+RAW_OBSERVED:
+What raw information was received, even if mapping/processing was not ready.
+
+RECONSTRUCTED:
+Historical data obtained later.
+
+FINAL_OUTCOME:
+Corrected labels after the event.
+
+Only LIVE_OPERATIONAL supports claims about the live engine's historical
+decision.
+
+13.7 BUNDLE IMMUTABILITY
+------------------------
+A later correction creates:
+
+- new outcome dataset;
+- optional corrected/reconstructed research bundle;
+- lineage relation.
+
+It does not alter the live deadline bundle.
+
+======================================================================
+14. RETRY POLICY
+======================================================================
+
+14.1 PRINCIPLE
+--------------
+Retries are bounded, classified and quota-aware.
+
+14.2 HTTP CLASSIFICATION
+------------------------
+200:
+Process.
+
+204:
+Valid empty response if endpoint contract permits.
+
+304:
+Successful cache revalidation.
+
+400:
+No automatic retry; request bug.
+
+401/403:
+Disable provider/job and alert. Do not loop.
+
+404:
+Usually no retry.
+May map to `NOT_YET_AVAILABLE` only for an endpoint whose contract permits it.
+
+408:
+Retry with bounded backoff.
+
+409:
+Provider-specific; retry only if documented safe.
+
+425:
+Retry after delay where relevant.
+
+429:
+Respect `Retry-After` and provider quota headers.
+
+500/502/503/504:
+Retry with exponential backoff and full jitter.
+
+TLS/certificate:
+No blind retry; security alert.
+
+DNS/connect reset/timeout:
+Retry.
+
+Invalid/truncated body:
+Retry retrieval, but retain invalid response metadata.
+
+Schema/semantic failure:
+Do not repeat the same request as a generic network retry.
+Quarantine and alert.
+
+14.3 RETRY-AFTER
+----------------
+HTTP semantics allow `Retry-After` as an HTTP date or delay seconds.
+
+Pulse parses both.
+
+14.4 BACKOFF
+------------
+Default GET:
+
+- attempt 1: immediate;
+- attempt 2: 1–3 seconds;
+- attempt 3: 3–10 seconds;
+- attempt 4: 10–30 seconds;
+- attempt 5: 30–60 seconds;
+
+with full jitter and provider-specific cap.
+
+Do not retry beyond the information cutoff if the result would no longer be
+eligible.
+
+14.5 DEADLINE-CRITICAL POLICY
+-----------------------------
+Inside 30 minutes of deadline:
+
+- shorter bounded retry;
+- reserve quota;
+- alternate provider in parallel after first material failure;
+- alert earlier;
+- never create a request storm.
+
+14.6 DATABASE RETRY
+-------------------
+Retry whole transaction for:
+
+- serialization failure `40001`;
+- deadlock `40P01`, with investigation if repeated;
+- transient connection loss.
+
+Do not retry:
+- constraint violations caused by bad data;
+- missing mapping;
+- invalid schema.
+
+14.7 CIRCUIT BREAKER
+--------------------
+States:
+
+CLOSED
+OPEN
+HALF_OPEN
+
+Open after configurable failures or stale-duration breach.
+Fallback routing activates.
+Half-open probe is quota-aware.
+
+======================================================================
+15. API CACHING
+======================================================================
+
+15.1 PURPOSE
+------------
+Caching reduces:
+
+- provider load;
+- free quota consumption;
+- repeated bytes;
+- latency.
+
+It must not erase observation history or fabricate freshness.
+
+15.2 HTTP VALIDATORS
+--------------------
+Use where provided:
+
+- ETag / If-None-Match;
+- Last-Modified / If-Modified-Since.
+
+HTTP caching defines ETag as a validator that can be sent with conditional
+requests, and a 304 allows reuse of the stored representation with updated
+metadata.
+
+15.3 CACHE CONTROL
+------------------
+Honor:
+
+- no-store;
+- no-cache;
+- max-age;
+- must-revalidate;
+- private;
+- Vary.
+
+Source contract/retention policy remains a separate legal control.
+
+15.4 CACHE KEY
+--------------
+- provider;
+- method;
+- normalized URL;
+- sorted parameters;
+- representation headers;
+- authentication/account context where representation varies;
+- API version.
+
+15.5 CACHE STATES
+-----------------
+MISS
+FRESH_HIT
+REVALIDATED_NOT_MODIFIED
+REVALIDATED_CHANGED
+STALE_ALLOWED_DEGRADED
+STALE_PROHIBITED
+BYPASSED
+NO_STORE
+
+15.6 STALE USE
+--------------
+Stale data may be used only if:
+
+- source/contract permits;
+- application policy explicitly permits;
+- age is shown;
+- decision confidence is reduced;
+- no fresh critical source is required.
+
+Near deadline, a stale odds quote cannot be described as a current quote.
+
+15.7 CACHE IS NOT ARCHIVE
+-------------------------
+HTTP cache lifecycle and immutable research archive are separate.
+
+A cached response can expire while its licensed historical source snapshot
+remains archived.
+
+======================================================================
+16. SCHEMA REGISTRY AND STRUCTURAL VALIDATION
+======================================================================
+
+16.1 SCHEMA REGISTRY
+--------------------
+quality.schema_definition
+
+Fields:
+- provider;
+- resource;
+- adapter version;
+- schema version;
+- format;
+- JSON Schema/Pydantic/Pandera artefact;
+- required fields;
+- critical fields;
+- effective interval;
+- approval;
+- hash.
+
+16.2 VALIDATION TECHNOLOGIES
+----------------------------
+Pydantic:
+API boundary objects and strict typed records.
+
+Pandera:
+DataFrame/Polars batch contracts, types and value checks.
+
+PostgreSQL:
+Persistent constraints and referential integrity.
+
+JSON Schema:
+Machine-readable raw/contract schemas where useful.
+
+16.3 RAW VALIDATION
+-------------------
+Do not coerce away provider errors silently.
+
+Raw-stage default:
+
+- strict critical types;
+- preserve raw value;
+- coercion recorded explicitly;
+- unexpected fields recorded;
+- missing critical fields block;
+- additive noncritical fields warn/observe.
+
+16.4 SCHEMA FINGERPRINT
+-----------------------
+For every response compute a structural fingerprint:
+
+- JSON pointer paths;
+- value type;
+- array/object shape;
+- critical-field presence.
+
+Compare with recent fingerprints.
+
+16.5 SCHEMA CHANGE CLASSIFICATION
+---------------------------------
+ADDITIVE_OPTIONAL
+ADDITIVE_REQUIRED
+FIELD_REMOVED
+TYPE_CHANGED
+SEMANTIC_CHANGED
+ENUM_ADDED
+ENUM_UNKNOWN
+NESTING_CHANGED
+EMPTY_SHAPE_CHANGED
+
+16.6 RESPONSE
+-------------
+Additive optional:
+accept and alert/investigate.
+
+Missing critical or type/semantic change:
+quarantine/block.
+
+Unknown enum:
+quarantine if logic depends on it; otherwise retain and warn.
+
+======================================================================
+17. LAYERED DATA-QUALITY GATES
+======================================================================
+
+17.1 GATE 0 — TRANSPORT
+-----------------------
+- expected status;
+- TLS;
+- content length;
+- no truncation;
+- quota headers;
+- content type;
+- response time.
+
+17.2 GATE 1 — SYNTAX
+--------------------
+- JSON/CSV/stream decodes;
+- encoding valid;
+- delimiter/header valid;
+- no corrupt Parquet.
+
+17.3 GATE 2 — STRUCTURE
+-----------------------
+- schema;
+- required fields;
+- types;
+- array shape;
+- version.
+
+17.4 GATE 3 — IDENTITY
+----------------------
+- provider IDs present;
+- fixture mapped;
+- team/player mapped;
+- market/selection mapped;
+- no ambiguous critical entity.
+
+17.5 GATE 4 — SEMANTIC
+----------------------
+Examples:
+
+Odds:
+- decimal odds > 1 where applicable;
+- line and market definition compatible;
+- no duplicate active selection;
+- market status valid.
+
+FPL:
+- price integer units;
+- ownership within [0,100];
+- position mapped;
+- team mapped;
+- Gameweek/deadline valid.
+
+Fixture:
+- home != away;
+- competition/season valid;
+- kickoff/status transition coherent.
+
+Lineup:
+- player belongs to fixture team context;
+- confirmed team lineup cardinality plausible.
+
+17.6 GATE 5 — TEMPORAL
+----------------------
+- provider time <= receipt time within clock tolerance;
+- no impossible future timestamp;
+- update sequence monotonic where promised;
+- valid/system intervals nonoverlapping;
+- deadline eligibility;
+- quote age threshold.
+
+17.7 GATE 6 — CROSS-SOURCE
+-------------------------
+- same fixture teams/kickoff;
+- official versus provider result;
+- FPL team/player membership;
+- odds line consensus;
+- player market belongs to fixture;
+- price agrees with official FPL.
+
+17.8 GATE 7 — DECISION READINESS
+--------------------------------
+- core source health;
+- unresolved candidate count zero;
+- deadline known;
+- ruleset active;
+- odds freshness sufficient or fallback declared;
+- missing data quantified;
+- no P0 issue.
+
+17.9 GATE OUTCOMES
+------------------
+PASS
+PASS_WITH_WARNING
+QUARANTINE_ROW
+QUARANTINE_BATCH
+DEGRADED
+BLOCK_DATASET
+BLOCK_DECISION
+
+======================================================================
+18. DATA-QUALITY DIMENSIONS
+======================================================================
+
+18.1 COMPLETENESS
+-----------------
+Observed / expected.
+
+Denominator must be explicit.
+
+Examples:
+- mapped EPL fixtures / expected fixtures;
+- props returned / expected starters;
+- price rows / active FPL players.
+
+18.2 VALIDITY
+-------------
+Conformance to contract and domain bounds.
+
+18.3 UNIQUENESS
+---------------
+No duplicate logical entity/observation under declared key.
+
+18.4 CONSISTENCY
+----------------
+Agreement across related fields/sources.
+
+18.5 TIMELINESS
+---------------
+Whether data arrived before it was operationally needed.
+
+18.6 FRESHNESS
+--------------
+Age at query/decision.
+
+18.7 ACCURACY
+-------------
+Agreement with authoritative final source where measurable.
+
+18.8 TRACEABILITY
+-----------------
+Every record has source and transformation lineage.
+
+18.9 COVERAGE
+-------------
+Breadth across teams, players, fixtures, bookmakers and markets.
+
+18.10 STABILITY
+----------------
+Schema and operational consistency over time.
+
+======================================================================
+19. DATASET-SPECIFIC QUALITY RULES
+======================================================================
+
+19.1 FPL PLAYER SNAPSHOT
+------------------------
+- target-season element ID mapped;
+- player/team/position mapped;
+- price integer and plausible;
+- ownership 0–100;
+- transfer fields numeric/nonnegative;
+- status enum known;
+- row count within expected band;
+- no duplicate element ID;
+- no silent loss of active player.
+
+19.2 FPL GAMEWEEK
+-----------------
+- official deadline not null;
+- ordered by target-season configuration;
+- fixture assignments consistent;
+- active/current flags coherent;
+- deadline source fresh.
+
+19.3 FIXTURE
+------------
+- teams differ;
+- canonical fixture mapped;
+- valid status transition;
+- kickoff precision known;
+- no two active revisions;
+- Gameweek assignment at most one current;
+- postponement triggers schedule replan.
+
+19.4 ODDS
+---------
+- fixture/market/selection/operator mapped;
+- odds/line valid;
+- source timestamp status known;
+- quote age;
+- pre-match/in-play flag;
+- no impossible duplicate outcome;
+- margin/overround diagnostic plausible;
+- provider/bookmaker count;
+- quota cost reconciled.
+
+19.5 PLAYER PROPS
+-----------------
+- player mapped;
+- player in fixture context;
+- settlement profile status;
+- market availability state;
+- no duplicate player runner;
+- expected candidate coverage;
+- source/bookmaker identified.
+
+19.6 LINEUP
+-----------
+- fixture/team/player mapped;
+- official/predicted distinguished;
+- source time;
+- confirmed starter count plausibility;
+- bench/starting state mutually exclusive.
+
+19.7 INJURY/AVAILABILITY
+------------------------
+- player mapped;
+- source;
+- observed/effective time;
+- state/reason;
+- no inferred return date treated as fact.
+
+19.8 PRICE
+----------
+- official source;
+- player-season mapping;
+- integer tenths;
+- change usually one unit, but do not hard-code as inviolable without rules;
+- no retroactive overwrite.
+
+======================================================================
+20. MISSING-DATA POLICY
+======================================================================
+
+20.1 MISSING REASON ENUM
+------------------------
+NOT_REPORTED
+NOT_APPLICABLE
+NOT_OFFERED
+NOT_YET_OPEN
+PLAYER_NOT_LISTED
+SOURCE_UNAVAILABLE
+RATE_LIMITED
+QUOTA_EXHAUSTED
+GEOGRAPHICALLY_UNAVAILABLE
+ACCESS_DENIED
+SCHEMA_INVALID
+MAPPING_FAILED
+QUARANTINED
+LATE_AFTER_CUTOFF
+DELETED_BY_RETENTION
+UNKNOWN
+
+20.2 ZERO IS NOT MISSING
+------------------------
+Examples:
+
+- zero goals;
+- zero price change;
+- no transfers;
+- no injury;
+- no assist odds returned.
+
+The last example is not numerical zero probability.
+
+20.3 RAW LAYER
+--------------
+No imputation.
+Preserve null and missing reason.
+
+20.4 CANONICAL LAYER
+--------------------
+Canonical facts remain unknown unless a legitimate derivation is explicitly
+stored as derived state.
+
+20.5 MODEL LAYER
+----------------
+Imputation is allowed only with:
+
+- method;
+- model version;
+- source inputs;
+- timestamp;
+- uncertainty;
+- fallback reason;
+- sensitivity.
+
+20.6 LAST OBSERVATION CARRIED FORWARD
+-------------------------------------
+Allowed only with:
+
+- maximum age;
+- field-specific policy;
+- original timestamp;
+- stale flag;
+- uncertainty penalty.
+
+Never carry forward:
+- deadline;
+- official lineup;
+- active market status;
+- injury recovery as certainty.
+
+20.7 COVERAGE DENOMINATOR
+-------------------------
+A market cannot be declared `NOT_OFFERED` unless market discovery or provider
+contract supports that conclusion.
+
+Otherwise use:
+UNKNOWN or PROVIDER_MISSING.
+
+======================================================================
+21. PLAYER-NAME AND ENTITY MATCHING
+======================================================================
+
+21.1 ADAPTER RESPONSIBILITY
+---------------------------
+Adapters must emit:
+
+- raw name;
+- raw ID;
+- provider;
+- fixture/team context;
+- source time.
+
+They do not assign a canonical player by name alone.
+
+21.2 MATCH ORDER
+---------------
+1. approved provider crosswalk;
+2. exact active external identifier;
+3. deterministic multi-field mapping;
+4. probabilistic candidate;
+5. human review;
+6. unresolved quarantine.
+
+21.3 NAME NORMALIZATION
+-----------------------
+Use DMFP-03:
+
+- raw preserved;
+- Unicode NFC;
+- casefold matching key;
+- whitespace/punctuation normalization;
+- optional diacritic/transliteration feature.
+
+21.4 CONTEXT
+------------
+- team at valid time;
+- fixture;
+- competition/season;
+- date of birth where lawful;
+- position;
+- known aliases.
+
+21.5 DEADLINE RULE
+------------------
+Any player, selection or fixture used in a recommendation must have an approved
+mapping before cutoff.
+
+Late mapping cannot be inserted into the live bundle retrospectively.
+
+21.6 MAPPING VERSION
+--------------------
+Every canonical row and dataset records the mapping version or mapping record
+used.
+
+21.7 FALSE MERGE
+----------------
+A corrected mapping:
+
+- creates merge/split/correction record;
+- invalidates descendants;
+- does not rewrite the original deadline bundle.
+
+======================================================================
+22. POSTPONED AND RESCHEDULED FIXTURES
+======================================================================
+
+22.1 IDENTITY
+-------------
+Same match intention:
+same canonical fixture.
+
+Mutable:
+- kickoff;
+- status;
+- venue;
+- Gameweek assignment.
+
+22.2 INGESTION
+--------------
+A changed provider fixture creates:
+
+- new source snapshot;
+- new fixture revision;
+- new/closed Gameweek assignment;
+- correction/change event;
+- schedule replan.
+
+22.3 JOB REPLANNING
+-------------------
+Future fixture-relative jobs for old kickoff:
+
+- marked SUPERSEDED or CANCELLED;
+- preserved historically;
+- regenerated around new kickoff.
+
+Deadline-relative jobs follow official FPL deadline, not fixture calculation.
+
+22.4 POSTPONEMENT AFTER DEADLINE
+-------------------------------
+- decision bundle remains unchanged;
+- fixture status correction is stored when learned;
+- outcome evaluation records disruption;
+- no historical feature rewrite.
+
+22.5 PROVIDER RECREATES ID
+--------------------------
+New provider event ID is mapped to the same canonical fixture after evidence.
+Old mapping remains.
+
+22.6 DOUBLE/BLANK GAMEWEEK
+--------------------------
+Fixture-to-Gameweek assignments are temporal.
+Parquet/deadline features use the assignment known by cutoff.
+
+A later reassignment is not inserted into old features.
+
+======================================================================
+23. PROVIDER CORRECTIONS AND SUPERSESSION
+======================================================================
+
+23.1 CORRECTION TYPES
+---------------------
+SOURCE_CORRECTION
+IDENTITY_CORRECTION
+FIXTURE_CORRECTION
+MARKET_SETTLEMENT_CORRECTION
+FPL_POINTS_CORRECTION
+SCHEMA_INTERPRETATION_CORRECTION
+SYSTEM_BUG_CORRECTION
+
+23.2 RECORD
+-----------
+quality.correction_event:
+
+- correction_id;
+- source/provider;
+- discovered_at;
+- valid/effective time;
+- old record/snapshot;
+- new record/snapshot;
+- reason;
+- authority;
+- severity;
+- affected lineage;
+- action;
+- reviewer.
+
+23.3 CURRENT VIEW
+-----------------
+Current canonical view points to latest accepted version.
+
+Historical as-of view uses system time.
+
+23.4 DESCENDANT INVALIDATION
+----------------------------
+Lineage identifies affected:
+
+- Parquet files;
+- dataset versions;
+- projection runs;
+- decisions;
+- backtests;
+- reports.
+
+Status options:
+
+UNAFFECTED
+IMPACTED_NONMATERIAL
+STALE
+INVALID
+RECOMPUTED
+SUPERSEDED
+
+23.5 DECISION IMMUTABILITY
+--------------------------
+A historical decision is never overwritten.
+
+A correction may produce:
+- corrected retrospective analysis;
+- revised regret/outcome;
+- explanatory note.
+
+23.6 FINAL LABELS
+-----------------
+Official corrections after deadline may be used as final target labels.
+
+The feature bundle remains unchanged.
+
+======================================================================
+24. DATA-QUALITY ALERTING
+======================================================================
+
+24.1 SEVERITY
+-------------
+P0 — DECISION BLOCKER
+Examples:
+- official deadline unknown;
+- active ruleset/hash wrong;
+- system clock materially wrong;
+- manager state invalid;
+- critical fixture/player mapping conflict;
+- source-bundle corruption.
+
+P1 — MAJOR
+Examples:
+- primary source down near deadline;
+- odds stale beyond threshold;
+- monthly quota unexpectedly exhausted;
+- schema critical field removed;
+- all player props unavailable;
+- fixture assignment conflict.
+
+P2 — DEGRADED
+Examples:
+- bookmaker coverage drop;
+- missing assist markets;
+- injury source stale;
+- cross-source disagreement.
+
+P3 — INFORMATIONAL
+Examples:
+- additive schema field;
+- delayed noncritical backfill;
+- planned compaction failure.
+
+24.2 ALERT PAYLOAD
+------------------
+- alert ID;
+- severity;
+- dataset/provider;
+- first/last occurrence;
+- deadline impact;
+- affected entities;
+- expected/actual;
+- evidence links;
+- fallback;
+- owner;
+- acknowledgement;
+- resolution;
+- deduplication key.
+
+24.3 DEDUPLICATION
+-----------------
+Repeated identical failures update one incident instead of sending unlimited
+alerts.
+
+24.4 ESCALATION
+---------------
+Near deadline:
+- P0 immediate;
+- P1 immediate;
+- P2 summarised unless it changes recommendation.
+
+Normal:
+- P2 daily digest;
+- P3 weekly.
+
+24.5 ALERT CHANNELS
+-------------------
+MVP:
+- terminal;
+- dashboard;
+- email;
+- local log.
+
+Later:
+- Slack/mobile.
+
+24.6 ALERT QUALITY
+------------------
+Every alert must answer:
+
+- what broke?;
+- why does it matter?;
+- what is affected?;
+- what fallback is active?;
+- what human action is required?;
+- when does it expire/escalate?
+
+======================================================================
+25. DATA QUALITY METRICS AND SERVICE LEVELS
+======================================================================
+
+25.1 INGESTION
+--------------
+- run success rate;
+- retry rate;
+- p50/p95 latency;
+- bytes;
+- quota cost;
+- cache hit/revalidation;
+- raw durability lag;
+- canonicalization lag.
+
+25.2 FRESHNESS
+--------------
+- quote age at deadline;
+- FPL snapshot age;
+- injury update age;
+- fixture update age;
+- lineup arrival delay.
+
+25.3 COVERAGE
+-------------
+- EPL fixture coverage;
+- bookmaker count;
+- goalscorer candidate coverage;
+- assist/shots/SOT/save coverage;
+- player mapping coverage;
+- lineup coverage.
+
+25.4 QUALITY
+-------------
+- schema failures;
+- quarantined rows;
+- unresolved mappings;
+- cross-source disagreement;
+- correction count;
+- duplicate deliveries;
+- temporal overlaps.
+
+25.5 PROPOSED DEADLINE SLOS
+--------------------------
+- official deadline/rules: 100% present and verified;
+- critical player/fixture mapping: 100%;
+- core team market: >=95% fixtures or visible fallback;
+- source bundle generated within 2 minutes after deadline;
+- bundle query uses exact cutoff;
+- no P0 open;
+- clock offset <2 seconds preferred;
+- raw/canonical lineage completeness 100% for used inputs.
+
+These are system targets, not provider SLAs.
+
+======================================================================
+26. HISTORICAL DATASET CREATION
+======================================================================
+
+26.1 DATASET MODES
+------------------
+LIVE_OBSERVED:
+Captured and usable before the original cutoff.
+
+RAW_OBSERVED:
+Captured before cutoff but not operationally usable then.
+
+RECONSTRUCTED:
+Obtained/processed later from historical sources.
+
+FINAL_OUTCOME:
+Official corrected label.
+
+COUNTERFACTUAL:
+Research scenario unavailable to the live engine.
+
+Every dataset version declares one mode.
+
+26.2 BRONZE DATASET
+-------------------
+Raw source-snapshot manifest and licensed bodies.
+
+26.3 SILVER DATASET
+-------------------
+Canonical, typed, mapped observations with:
+
+- source ID;
+- valid/system time;
+- usable time;
+- correction lineage;
+- quality flags;
+- missing reason.
+
+26.4 GOLD DEADLINE DATASET
+--------------------------
+One row universe per deadline/horizon.
+
+Inputs are joined using:
+
+- `usable_at <= cutoff`;
+- valid-at target time;
+- mapping as known at cutoff;
+- fixture assignment as known at cutoff;
+- latest eligible observation selected by explicit source policy.
+
+26.5 AS-OF JOIN
+---------------
+For each feature:
+
+1. identify subject and target;
+2. filter eligible system/usable time;
+3. filter valid time;
+4. apply source preference;
+5. select latest eligible observation;
+6. preserve age/source/missing reason.
+
+Never use an unrestricted current table.
+
+26.6 LABEL JOIN
+---------------
+Outcomes may be final/corrected after the event.
+
+Labels are joined only after features are frozen.
+
+26.7 DATASET VERSION
+--------------------
+Includes:
+
+- dataset_version_id;
+- mode;
+- purpose;
+- source bundles;
+- cutoff policy;
+- season/Gameweeks;
+- ruleset;
+- mapping version;
+- code commit;
+- transform/config hash;
+- schema;
+- row count;
+- file manifest;
+- quality report;
+- licence;
+- created_at;
+- parent/supersedes;
+- split definition.
+
+26.8 TRAIN/VALIDATION/TEST
+--------------------------
+Time-based splits only for live forecasting evaluation.
+
+No random row split that leaks later matches, prices or corrections into earlier
+periods.
+
+26.9 BACKFILL
+-------------
+Backfill is a separate run with:
+
+- reason;
+- historical source;
+- retrieval date;
+- mode RECONSTRUCTED;
+- no claim of live availability;
+- mapping/version;
+- comparison to live archive where overlapping.
+
+26.10 SNAPSHOT FREQUENCY BIAS
+-----------------------------
+Providers observed more often create more rows.
+
+Feature construction must use:
+- time-aware selection;
+- provider weighting;
+- one observation per defined point;
+not raw row counts.
+
+26.11 DATASET FREEZE
+--------------------
+After manifest publication:
+
+- no file mutation;
+- correction creates new dataset version;
+- old version retained according to rights;
+- models reference exact dataset version.
+
+======================================================================
+27. TRUSTWORTHY BACKTESTING RULES
+======================================================================
+
+27.1 STRICT FEATURE RULE
+------------------------
+Feature eligible only if:
+
+    usable_at <= simulated_cutoff
+
+and the valid-time/domain predicate is satisfied.
+
+27.2 LIVE SYSTEM BACKTEST
+-------------------------
+Uses LIVE_OBSERVED deadline bundle only.
+
+27.3 RESEARCH RECONSTRUCTION
+----------------------------
+May use RECONSTRUCTED data but must be labelled and evaluated separately.
+
+27.4 NO FUTURE MAPPING
+----------------------
+A player mapping resolved later cannot silently improve old live features.
+
+A counterfactual rerun may use it only under a new labelled mode.
+
+27.5 NO FUTURE FIXTURE ASSIGNMENT
+---------------------------------
+Use fixture/Gameweek assignment known at cutoff.
+
+27.6 NO CLOSING ODDS
+--------------------
+Postdeadline or kickoff closing odds are evaluation features only, never input
+to the earlier decision.
+
+27.7 NO FINAL INJURY KNOWLEDGE
+------------------------------
+Retrospective injury duration/return dates cannot enter historical features.
+
+27.8 NO FINAL POINTS AS FEATURE
+-------------------------------
+Final FPL points can be labels, not same-Gameweek predeadline inputs.
+
+27.9 PIPELINE LATENCY
+---------------------
+If raw arrived before cutoff but became usable after cutoff:
+
+- excluded from LIVE_OPERATIONAL;
+- may appear in RAW_OBSERVED research.
+
+27.10 CLOCK ERROR
+-----------------
+A material uncorrected clock error invalidates or downgrades affected deadline
+bundles.
+
+27.11 TEST
+----------
+Automated leakage test deliberately inserts a postcutoff correction and proves
+it cannot appear in the deadline feature dataset.
+
+======================================================================
+28. RETENTION AND DELETION
+======================================================================
+
+28.1 POLICY PER SOURCE
+----------------------
+quality/retention policy stores:
+
+- raw permitted?;
+- duration;
+- backup permitted?;
+- derived permitted?;
+- posttermination rule;
+- deletion date;
+- legal/source authority;
+- review date.
+
+28.2 RETENTION STATES
+---------------------
+RETAIN
+RETAIN_UNTIL
+DERIVED_ONLY
+DELETE_AFTER_PROCESSING
+DELETE_ON_TERMINATION
+LEGAL_HOLD
+UNKNOWN_BLOCKED
+
+28.3 DELETION
+-------------
+Authorised deletion:
+
+- removes body/file;
+- preserves permitted metadata/hash/tombstone;
+- records actor/time/reason;
+- updates manifests;
+- marks dataset reproducibility limit.
+
+28.4 PARQUET
+------------
+A Parquet dataset cannot retain source data beyond source rights merely because
+it is transformed.
+
+Classify every column:
+RAW_SOURCE
+NORMALIZED_SOURCE
+DERIVED
+AGGREGATED
+MODEL_OUTPUT
+
+28.5 FREE DATA
+--------------
+Free access does not imply indefinite storage or public redistribution.
+
+======================================================================
+29. SECURITY
+======================================================================
+
+29.1 SECRETS
+------------
+- environment/secret store;
+- never raw snapshot;
+- never log;
+- redact query keys;
+- rotate;
+- separate dev/prod.
+
+29.2 RAW DATA
+-------------
+- owner-only filesystem permissions;
+- encrypted disk where practical;
+- no public web serving;
+- restricted backups;
+- provider-specific access policy.
+
+29.3 MANAGER DATA
+-----------------
+FPL entry/squad data are private.
+Session tokens are not stored in dataset tables.
+
+29.4 MANUAL ATTACHMENTS
+-----------------------
+Screenshots may contain account/personal details.
+Redact and restrict.
+
+29.5 HASHES
+-----------
+Hashes support integrity and identity.
+They do not prove the source was correct.
+
+======================================================================
+30. BACKUP AND DISASTER RECOVERY
+======================================================================
+
+30.1 POSTGRESQL
+---------------
+PostgreSQL documentation identifies SQL dumps, filesystem-level backups and
+continuous archiving as distinct approaches.
+
+Recommended production controls:
+
+- continuous WAL archiving for point-in-time recovery;
+- regular base backups;
+- nightly logical custom-format dump for selective recovery;
+- backup manifests/hashes;
+- separate storage destination.
+
+30.2 RAW/PARQUET
+----------------
+- immutable copy to a second physical destination;
+- checksum verification;
+- incremental sync;
+- retain manifests separately.
+
+30.3 RECOVERY OBJECTIVES
+------------------------
+Proposed:
+
+RPO:
+- <=15 minutes for PostgreSQL during deadline week;
+- <=1 completed ingestion window for raw data.
+
+RTO:
+- <=2 hours normal;
+- <=30 minutes for last healthy deadline input/read-only mode.
+
+30.4 RESTORE TEST
+-----------------
+Monthly:
+
+- restore PostgreSQL into isolated environment;
+- verify raw/Parquet hashes;
+- recreate one deadline bundle;
+- run one historical query;
+- record duration/errors.
+
+Before GW1:
+full recovery rehearsal.
+
+30.5 BACKUP IS NOT SOURCE RETENTION PERMISSION
+----------------------------------------------
+A source deletion obligation includes backups unless the agreement permits
+otherwise.
+
+======================================================================
+31. OBSERVABILITY
+======================================================================
+
+31.1 SIGNALS
+-------------
+Logs:
+Detailed events.
+
+Metrics:
+Rates, ages, counts and quotas.
+
+Traces:
+Request -> snapshot -> validation -> promotion -> bundle.
+
+OpenTelemetry provides common semantics for traces, metrics, logs and resources;
+Pulse should use consistent names even if the initial backend is simple.
+
+31.2 REQUIRED CONTEXT
+---------------------
+Every log/span includes:
+
+- ingestion_run_id;
+- attempt_id;
+- provider;
+- resource;
+- fixture/Gameweek where relevant;
+- source_snapshot_id;
+- deadline;
+- worker;
+- code version;
+- status;
+- error class.
+
+31.3 METRIC EXAMPLES
+---------------------
+dmf_ingest_runs_total
+dmf_ingest_failures_total
+dmf_ingest_latency_seconds
+dmf_source_age_seconds
+dmf_usable_lag_seconds
+dmf_quota_remaining
+dmf_cache_revalidation_total
+dmf_schema_changes_total
+dmf_quarantine_rows_total
+dmf_mapping_unresolved
+dmf_deadline_bundle_inputs
+dmf_clock_offset_seconds
+dmf_parquet_files_small_total
+dmf_corrections_total
+
+31.4 CARDINALITY
+----------------
+Do not put player ID, market ID or raw URL into metric labels at high
+cardinality.
+Use logs/traces for detailed identity.
+
+======================================================================
+32. DATA-QUALITY TOOLING DECISION
+======================================================================
+
+32.1 SELECTED INITIAL TOOLS
+---------------------------
+- Pydantic for request/record boundaries;
+- Pandera for batch dataframe validation;
+- PostgreSQL constraints for persisted integrity;
+- custom domain and temporal checks;
+- pytest/property tests;
+- OpenTelemetry-compatible instrumentation.
+
+32.2 WHY NOT RELY ON ONE TOOL
+-----------------------------
+A dataframe schema cannot enforce:
+
+- bitemporal nonoverlap;
+- fixture identity;
+- decision cutoff;
+- cross-source reconciliation;
+- provider rights.
+
+Database constraints cannot fully validate:
+
+- complex batch distribution;
+- provider response shape;
+- market coverage.
+
+Layering is required.
+
+32.3 LAZY VALIDATION
+--------------------
+Batch validation SHOULD collect multiple errors in one run where safe, rather
+than fail on the first row, to improve diagnosis.
+
+Critical records remain quarantined.
+
+======================================================================
+33. COMMAND-LINE AND OPERATIONAL INTERFACES
+======================================================================
+
+Required commands:
+
+    dmf ingest tick
+    dmf ingest run <job>
+    dmf ingest replay <source_snapshot_id>
+    dmf ingest status
+    dmf ingest failures
+    dmf quota status
+    dmf quota reserve
+    dmf cache inspect
+    dmf schema diff
+    dmf quality validate
+    dmf quality issues
+    dmf quality resolve
+    dmf quarantine list
+    dmf fixture replan
+    dmf correction apply
+    dmf deadline freeze --gameweek <n>
+    dmf deadline inspect --gameweek <n>
+    dmf dataset build
+    dmf dataset manifest
+    dmf dataset diff
+    dmf archive compact
+    dmf backup verify
+    dmf restore rehearse
+
+======================================================================
+34. TESTING STRATEGY
+======================================================================
+
+34.1 UNIT
+---------
+- request fingerprint;
+- timestamp parser;
+- retry classifier;
+- cache key;
+- quota arithmetic;
+- missing reason;
+- schema validation;
+- idempotent upsert;
+- as-of selection;
+- deadline eligibility;
+- Parquet manifest.
+
+34.2 CONTRACT
+-------------
+Provider fixtures:
+
+- normal response;
+- empty response;
+- 304;
+- 429 + Retry-After;
+- 500;
+- schema additive;
+- critical field removed;
+- truncated JSON;
+- quota headers;
+- delayed timestamp.
+
+34.3 INTEGRATION
+----------------
+- raw write -> DB metadata -> parse -> canonical;
+- DB failure after raw;
+- replay;
+- duplicate delivery;
+- concurrent workers;
+- advisory lock;
+- deadline freeze.
+
+34.4 TEMPORAL
+-------------
+- source time before cutoff, received after -> excluded;
+- received before, usable after -> excluded from live;
+- correction after cutoff -> label only;
+- mapping after cutoff -> excluded;
+- fixture reassigned later -> old bundle unchanged.
+
+34.5 CHAOS
+----------
+- network timeout;
+- provider outage;
+- disk full;
+- database restart;
+- worker crash after request;
+- worker crash after raw publish;
+- quota exhaustion;
+- wrong system clock;
+- duplicate stream messages;
+- stream gap.
+
+34.6 PROPERTY TESTS
+-------------------
+- raw snapshot never changes;
+- bundle hash deterministic;
+- duplicate attempt cannot duplicate canonical fact;
+- no usable_at before required stages;
+- current view has one active version;
+- deleted raw body has tombstone;
+- Gold dataset contains only eligible source bundle members.
+
+34.7 GOLDEN DEADLINE
+--------------------
+Create a synthetic Gameweek with:
+
+- FPL snapshot;
+- odds;
+- missing prop;
+- manual entry;
+- postponed fixture;
+- late correction;
+- unresolved player;
+- provider outage.
+
+Expected bundle and blocked/degraded states are fixed.
+
+======================================================================
+35. IMPLEMENTATION PHASES
+======================================================================
+
+35.1 PHASE 1 — FOUNDATIONS
+--------------------------
+- orchestration tables;
+- raw store;
+- source snapshot;
+- hash/atomic publish;
+- timestamp types;
+- provider adapter base;
+- quota ledger;
+- Pydantic schemas.
+
+35.2 PHASE 2 — FREE SOURCES
+---------------------------
+- official FPL;
+- API-FOOTBALL;
+- The Odds API;
+- manual input;
+- Betfair delayed/basic;
+- football-data import.
+
+35.3 PHASE 3 — CANONICAL PROMOTION
+----------------------------------
+- staging;
+- mapping;
+- semantic checks;
+- bitemporal facts;
+- current/as-of views.
+
+35.4 PHASE 4 — DEADLINE INTEGRITY
+---------------------------------
+- scheduler replan;
+- usable_at;
+- clock health;
+- deadline freezer;
+- immutable bundle;
+- leakage tests.
+
+35.5 PHASE 5 — PARQUET/DATASETS
+-------------------------------
+- silver exports;
+- compaction;
+- gold dataset builder;
+- manifests;
+- history modes.
+
+35.6 PHASE 6 — OPERATIONS
+-------------------------
+- alerts;
+- dashboards;
+- backup/PITR;
+- restore rehearsal;
+- chaos tests.
+
+======================================================================
+36. RISK REGISTER
+======================================================================
+
+R-05-001 — Provider timestamp confused with known time
+Probability: High
+Impact: Critical
+Mitigation:
+separate times; usable_at cutoff.
+
+R-05-002 — Late correction leaks into backtest
+Probability: High
+Impact: Critical
+Mitigation:
+bitemporal facts; immutable deadline bundle.
+
+R-05-003 — Duplicate retries duplicate facts
+Probability: Medium
+Impact: High
+Mitigation:
+logical keys, constraints, deterministic promotion.
+
+R-05-004 — Raw snapshot overwritten
+Probability: Medium
+Impact: Critical
+Mitigation:
+content-addressed append-only store.
+
+R-05-005 — Identical responses lose observation history
+Probability: Medium
+Impact: High
+Mitigation:
+blob dedupe only; snapshots retained.
+
+R-05-006 — Raw written but DB metadata lost
+Probability: Medium
+Impact: High
+Mitigation:
+sidecar and orphan reconciliation.
+
+R-05-007 — DB committed but raw not durable
+Probability: Medium
+Impact: Critical
+Mitigation:
+raw-first write order.
+
+R-05-008 — Source terms prohibit storage
+Probability: Medium
+Impact: Critical
+Mitigation:
+retention policy and no-raw flow.
+
+R-05-009 — Quota exhausted by retries
+Probability: Medium
+Impact: High
+Mitigation:
+quota-aware retry and reserve.
+
+R-05-010 — Scheduler duplicates jobs
+Probability: Medium
+Impact: Medium
+Mitigation:
+advisory lock and unique logical key.
+
+R-05-011 — Missed jobs flood provider after outage
+Probability: Medium
+Impact: High
+Mitigation:
+missed-run policy.
+
+R-05-012 — Cache masks stale odds
+Probability: High
+Impact: Critical
+Mitigation:
+original age and cache state.
+
+R-05-013 — Schema additive field breaks parser
+Probability: Medium
+Impact: Medium
+Mitigation:
+fingerprint and compatible handling.
+
+R-05-014 — Critical field silently disappears
+Probability: Medium
+Impact: Critical
+Mitigation:
+block/quarantine.
+
+R-05-015 — Name matching links wrong player
+Probability: Medium
+Impact: Critical
+Mitigation:
+central mapping and deadline gate.
+
+R-05-016 — Postponed fixture duplicated
+Probability: Medium
+Impact: High
+Mitigation:
+fixture revision and mapping.
+
+R-05-017 — Gameweek reassignment rewrites history
+Probability: Medium
+Impact: Critical
+Mitigation:
+temporal assignment.
+
+R-05-018 — Raw null imputed as zero
+Probability: High
+Impact: High
+Mitigation:
+typed missing reasons.
+
+R-05-019 — Parquet tiny-file explosion
+Probability: Medium
+Impact: Medium
+Mitigation:
+partition discipline and compaction.
+
+R-05-020 — Parquet partial file published
+Probability: Low/Medium
+Impact: High
+Mitigation:
+temp write, reopen, verify, rename.
+
+R-05-021 — Current view used in backtest
+Probability: High
+Impact: Critical
+Mitigation:
+historical API and automated leakage tests.
+
+R-05-022 — System clock drifts near deadline
+Probability: Low/Medium
+Impact: Critical
+Mitigation:
+clock monitoring and block threshold.
+
+R-05-023 — Backfill presented as live
+Probability: Medium
+Impact: Critical
+Mitigation:
+dataset mode.
+
+R-05-024 — Provider correction not propagated
+Probability: Medium
+Impact: High
+Mitigation:
+lineage invalidation.
+
+R-05-025 — Correction overwrites decision
+Probability: Medium
+Impact: Critical
+Mitigation:
+immutable decision/bundle.
+
+R-05-026 — Alert fatigue
+Probability: High
+Impact: Medium
+Mitigation:
+severity, dedupe, actionable payload.
+
+R-05-027 — Backup cannot restore
+Probability: Medium
+Impact: Critical
+Mitigation:
+monthly restore test.
+
+R-05-028 — Retention deletion breaks manifests
+Probability: Medium
+Impact: High
+Mitigation:
+tombstones and reproducibility status.
+
+R-05-029 — Free provider changes quota
+Probability: Medium
+Impact: High
+Mitigation:
+headers, configurable quota, alert.
+
+R-05-030 — Provider response arrives after deadline
+Probability: High
+Impact: High
+Mitigation:
+usable cutoff and fallback.
+
+R-05-031 — Manual observation entered late
+Probability: Medium
+Impact: High
+Mitigation:
+entry/observation times; strict live eligibility.
+
+R-05-032 — Database concurrency corrupts quota/state
+Probability: Low/Medium
+Impact: High
+Mitigation:
+Serializable transaction and retry.
+
+R-05-033 — Compression/hash mismatch
+Probability: Low
+Impact: High
+Mitigation:
+body and stored hashes.
+
+R-05-034 — Public/raw data accidentally exposed
+Probability: Low/Medium
+Impact: Critical
+Mitigation:
+access controls and no web serving.
+
+======================================================================
+37. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-16
+
+----------------------------------------------------------------------
+SRC-TIME-2002-001
+Title:
+RFC 3339 — Date and Time on the Internet: Timestamps
+
+Authors/organisation:
+G. Klyne, C. Newman; IETF
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc3339
+
+Relevant claim:
+Defines a profile of ISO 8601 for interoperable Internet timestamps, including
+explicit relation to UTC and the `date-time` format.
+
+Reliability:
+HIGH official standard.
+
+Pulse reliance:
+YES for external timestamp representation.
+
+----------------------------------------------------------------------
+SRC-HTTP-2022-001
+Title:
+RFC 9110 — HTTP Semantics
+
+Organisation:
+IETF
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc9110
+
+Relevant claim:
+`Retry-After` can state an HTTP date or delay seconds and is used with temporary
+service conditions.
+
+Reliability:
+HIGH official standard.
+
+Pulse reliance:
+YES for retry handling.
+
+----------------------------------------------------------------------
+SRC-HTTP-2022-002
+Title:
+RFC 9111 — HTTP Caching
+
+Organisation:
+IETF
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc9111
+
+Relevant claims:
+ETag/Last-Modified validators support conditional revalidation; caches must
+respect freshness and directives such as no-store/must-revalidate.
+
+Reliability:
+HIGH official standard.
+
+Pulse reliance:
+YES for cache design.
+
+----------------------------------------------------------------------
+SRC-HTTP-2012-003
+Title:
+RFC 6585 — Additional HTTP Status Codes
+
+Organisation:
+IETF
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc6585
+
+Relevant claim:
+429 means Too Many Requests and may include Retry-After.
+
+Reliability:
+HIGH official standard.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-PG-2026-001
+Title:
+PostgreSQL Explicit Locking / Advisory Locks
+
+Organisation:
+PostgreSQL Global Development Group
+
+URLs:
+https://www.postgresql.org/docs/current/explicit-locking.html
+https://www.postgresql.org/docs/current/functions-admin.html
+
+Relevant claim:
+PostgreSQL supports application-defined advisory locks, including
+transaction-scoped locks.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for scheduler and promotion coordination.
+
+----------------------------------------------------------------------
+SRC-PG-2026-002
+Title:
+PostgreSQL INSERT / ON CONFLICT
+
+URL:
+https://www.postgresql.org/docs/current/sql-insert.html
+
+Relevant claim:
+ON CONFLICT can define an alternative to uniqueness/exclusion violations.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for idempotent effects.
+
+----------------------------------------------------------------------
+SRC-PG-2026-003
+Title:
+PostgreSQL Transaction Isolation and Serialization Failure Handling
+
+URLs:
+https://www.postgresql.org/docs/current/transaction-iso.html
+https://www.postgresql.org/docs/current/mvcc-serialization-failure-handling.html
+
+Relevant claims:
+Serializable emulates serial execution for committed transactions and
+applications must retry serialization failures such as SQLSTATE 40001.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for critical state transitions.
+
+----------------------------------------------------------------------
+SRC-PG-2026-004
+Title:
+PostgreSQL Table Partitioning
+
+URL:
+https://www.postgresql.org/docs/current/ddl-partitioning.html
+
+Relevant claim:
+PostgreSQL supports declarative table partitioning and partition pruning.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES where volume justifies it.
+
+----------------------------------------------------------------------
+SRC-PG-2026-005
+Title:
+PostgreSQL Range Types
+
+URL:
+https://www.postgresql.org/docs/current/rangetypes.html
+
+Relevant claim:
+Range types and exclusion constraints support nonoverlapping intervals.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for temporal facts.
+
+----------------------------------------------------------------------
+SRC-PG-2026-006
+Title:
+PostgreSQL COPY
+
+URL:
+https://www.postgresql.org/docs/current/sql-copy.html
+
+Relevant claim:
+COPY supports bulk movement between files/streams and PostgreSQL tables.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for staging/exports.
+
+----------------------------------------------------------------------
+SRC-PG-2026-007
+Title:
+PostgreSQL Backup and Restore / Continuous Archiving
+
+URLs:
+https://www.postgresql.org/docs/current/backup.html
+https://www.postgresql.org/docs/current/continuous-archiving.html
+https://www.postgresql.org/docs/current/app-pgbasebackup.html
+https://www.postgresql.org/docs/current/app-pgverifybackup.html
+
+Relevant claims:
+PostgreSQL documents SQL dumps, filesystem backups and continuous archiving;
+WAL archiving and base backups support point-in-time recovery and backup
+verification.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for disaster recovery.
+
+----------------------------------------------------------------------
+SRC-PARQUET-2024-001
+Title:
+Apache Parquet Concepts and File Format
+
+Organisation:
+Apache Parquet
+
+URLs:
+https://parquet.apache.org/docs/concepts/
+https://parquet.apache.org/docs/file-format/
+https://parquet.apache.org/docs/file-format/metadata/
+
+Relevant claims:
+Parquet files contain row groups, column chunks and pages; file metadata locates
+column chunks.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for analytical archive.
+
+----------------------------------------------------------------------
+SRC-ARROW-2026-001
+Title:
+PyArrow Parquet and Dataset Documentation
+
+Organisation:
+Apache Arrow
+
+URLs:
+https://arrow.apache.org/docs/python/parquet.html
+https://arrow.apache.org/docs/python/generated/pyarrow.dataset.partitioning.html
+https://arrow.apache.org/docs/python/generated/pyarrow.dataset.write_dataset.html
+
+Relevant claim:
+PyArrow writes Parquet and partitioned datasets to local/object filesystems.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-TEMPORAL-1986-001
+Title:
+Temporal Databases
+
+Author:
+Richard T. Snodgrass
+
+URL:
+https://www2.cs.arizona.edu/~rts/pubs/LNCS639.pdf
+
+Relevant claim:
+Valid time and transaction/system time are distinct dimensions; bitemporal
+storage records both.
+
+Reliability:
+HIGH foundational academic source.
+
+Pulse reliance:
+YES conceptually.
+
+----------------------------------------------------------------------
+SRC-VALIDATION-2026-001
+Title:
+Pandera Documentation
+
+URL:
+https://pandera.readthedocs.io/
+
+Relevant claim:
+Pandera supports runtime schemas and checks for dataframe-like objects,
+including lazy validation/error collection.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+YES for batch validation.
+
+----------------------------------------------------------------------
+SRC-VALIDATION-2026-002
+Title:
+Pydantic Documentation
+
+URL:
+https://docs.pydantic.dev/
+
+Relevant claim:
+Pydantic provides typed validation and JSON Schema generation for Python data
+models.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+YES for boundaries.
+
+----------------------------------------------------------------------
+SRC-OBS-2026-001
+Title:
+OpenTelemetry Semantic Conventions
+
+Organisation:
+OpenTelemetry
+
+URL:
+https://opentelemetry.io/docs/specs/semconv/
+
+Relevant claim:
+Common names/semantics support consistent traces, metrics, logs and resources.
+
+Reliability:
+HIGH official project specification.
+
+Pulse reliance:
+YES conceptually.
+
+----------------------------------------------------------------------
+SRC-API-FOOTBALL-2026-001
+Title:
+API-FOOTBALL Rate Limit Documentation
+
+URL:
+https://www.api-football.com/news/post/how-ratelimit-works
+
+Relevant claims:
+Free plan has 10 requests/minute; responses expose daily and per-minute limit and
+remaining headers; user/IP protections apply.
+
+Reliability:
+HIGH provider documentation.
+
+Pulse reliance:
+YES for quota manager.
+
+----------------------------------------------------------------------
+SRC-ODDSAPI-2026-001
+Title:
+The Odds API V4 Documentation
+
+URL:
+https://the-odds-api.com/liveapi/guides/v4/
+
+Relevant claims:
+Responses expose used/remaining/last credit headers; event listing is free;
+odds usage depends on returned markets and regions; empty data do not consume
+credits.
+
+Reliability:
+HIGH provider documentation.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-BETFAIR-2026-001
+Title:
+Betfair Delayed Application Key Documentation
+
+URL:
+https://support.developer.betfair.com/hc/en-us/articles/360009638032-When-should-I-use-the-Delayed-or-Live-Application-Key
+
+Relevant claim:
+Delayed snapshots may lag between one and 180 seconds.
+
+Reliability:
+HIGH provider documentation.
+
+Pulse reliance:
+YES for freshness labelling.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 — Master Architecture and Product Definition
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-01 — Research Standard and Evidence Register
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-02 — FPL Rules, Scoring and Season Configuration
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-03 — Canonical Data Model and Identifiers
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-04 — Data Sources, Markets, APIs and Licensing — Zero-Cost Edition
+
+Pulse reliance:
+YES.
+
+======================================================================
+38. ACCEPTANCE CRITERIA
+======================================================================
+
+A. TEMPORAL INTEGRITY
+[ ] Provider time, receipt time and usable time are distinct.
+[ ] Live historical features require usable_at <= cutoff.
+[ ] Late corrections cannot enter prior features.
+[ ] Deadline bundles are immutable.
+[ ] Live/reconstructed/final modes are separate.
+
+B. INGESTION
+[ ] At-least-once retrieval is accepted.
+[ ] Canonical effects are idempotent.
+[ ] Raw durability precedes promotion where permitted.
+[ ] Every attempt and quota effect is recorded.
+[ ] Missed-run behaviour is explicit.
+
+C. STORAGE
+[ ] Raw observations are immutable.
+[ ] Blob dedupe does not remove observation history.
+[ ] PostgreSQL is canonical operational truth.
+[ ] Parquet is versioned analytical archive.
+[ ] Partial files cannot be published.
+[ ] Manifests and hashes are mandatory.
+
+D. QUALITY
+[ ] Layered validation exists.
+[ ] Missing reasons are typed.
+[ ] No raw imputation.
+[ ] Entity matching is centralised.
+[ ] Unresolved critical records are quarantined.
+[ ] Alerts are severity-based and actionable.
+
+E. FIXTURES/CORRECTIONS
+[ ] Postponement uses fixture revisions.
+[ ] Schedule jobs are replanned.
+[ ] Corrections preserve history and invalidate descendants.
+[ ] Decisions are never overwritten.
+
+F. OPERATIONS
+[ ] Quota-aware retries and caching are implemented.
+[ ] Retry-After and 429 are respected.
+[ ] Clock health is monitored.
+[ ] Backup/PITR and restore tests are required.
+[ ] Provider retention policies control storage.
+
+======================================================================
+39. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Create orchestration, provenance, quality, archive and staging schemas.
+2. Implement the one-minute scheduler tick.
+3. Implement job definition/run/attempt tables.
+4. Implement PostgreSQL advisory-lock helpers.
+5. Implement quota ledger and reservation.
+6. Implement raw spool, hashing, atomic publish and orphan reconciliation.
+7. Implement source snapshot/envelope.
+8. Implement Pydantic provider boundaries.
+9. Implement schema fingerprint/diff.
+10. Implement Pandera batch checks.
+11. Implement typed missing reasons.
+12. Implement central entity-resolution staging.
+13. Implement canonical promotion transactions.
+14. Implement usable_at.
+15. Implement provider retry/circuit policies.
+16. Implement conditional HTTP cache.
+17. Implement official FPL adapter.
+18. Implement API-FOOTBALL adapter.
+19. Implement The Odds API adapter.
+20. Implement manual odds adapter.
+21. Implement Betfair delayed/basic import.
+22. Implement football-data importer.
+23. Implement fixture revision/replan.
+24. Implement quality alerts.
+25. Implement deadline freezer and bundle hash.
+26. Implement silver Parquet exports.
+27. Implement gold deadline dataset builder.
+28. Implement compaction/manifests.
+29. Implement late-correction and lineage invalidation.
+30. Configure WAL/base/logical backups.
+31. Run restore rehearsal.
+32. Run synthetic golden deadline test.
+33. Run temporal leakage suite.
+34. Do not connect optimiser until deadline-bundle acceptance passes.
+
+======================================================================
+40. OPEN QUESTIONS
+======================================================================
+
+SCHEDULING
+----------
+1. Which Linux scheduler will be used in development and production?
+2. How many worker processes are appropriate?
+3. Should a later queue use PostgreSQL only or add Celery?
+4. What exact FPL polling cadence is acceptable under target-season terms?
+
+RAW STORAGE
+-----------
+5. Which filesystem/object store will host raw data?
+6. Is Zstandard available everywhere?
+7. Which sources forbid raw storage?
+8. How large will one season's odds archive be?
+9. Is an external encrypted drive available for backup?
+
+TIME
+----
+10. Which time-sync daemon/monitor is standard?
+11. What clock-offset threshold blocks a decision?
+12. How is provider precision represented for date-only files?
+
+PARQUET
+-------
+13. What measured file/row-group size is optimal?
+14. Which compression codec performs best?
+15. Should DuckDB be added for local analytical queries?
+16. When should odds partitions add an hourly level?
+
+QUALITY
+-------
+17. What exact coverage thresholds block a decision?
+18. Which cross-source disagreement threshold is material?
+19. Who resolves mappings/quality issues near deadline?
+20. How long may stale team odds remain usable?
+21. Which player-prop missing reasons can be inferred safely?
+
+DEADLINE
+--------
+22. Should `usable_at` require Parquet export? Current answer: no; PostgreSQL
+    canonical readiness is sufficient.
+23. How are manual observations proven contemporaneous?
+24. What happens if canonical processing completes seconds after deadline?
+25. Should a predeadline processing freeze begin one minute early?
+
+BACKUPS/RETENTION
+-----------------
+26. Which WAL archive destination is used?
+27. What provider data must be deleted at termination?
+28. Which derived datasets survive raw deletion?
+29. What is the accepted RPO/RTO?
+30. Who performs restore sign-off?
+
+HISTORY
+-------
+31. Which historical files can be redistributed internally to Codex?
+32. How are reconstructed and live datasets shown in reports?
+33. Which mapping corrections justify rerunning a full backtest?
+34. How is a provider schema change applied across historical data?
+
+======================================================================
+41. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-06 — ODDS NORMALISATION AND MARKET CONSENSUS
+
+DMFP-06 can rely on DMFP-05 to provide:
+
+- immutable quote observations;
+- exact operator/market/selection mappings;
+- source and usable times;
+- settlement profiles;
+- missing-market states;
+- quote freshness;
+- bookmaker count;
+- exchange-delay labels;
+- deadline bundles;
+- historical/live dataset modes;
+- no-leakage guarantees.
+
+It must not normalize an odds row that failed the DMFP-05 decision-readiness
+gate.
+
+======================================================================
+42. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-16
+
+- Defined at-least-once retrieval and effectively-once canonical effects.
+- Defined raw-first immutable storage.
+- Added content-addressed blob store and observation envelopes.
+- Selected PostgreSQL operational storage and Parquet analytical archives.
+- Defined scheduler tick, job states, advisory locks and quota planning.
+- Added zero-cost provider schedules.
+- Added idempotency and retry matrices.
+- Added standards-compliant HTTP caching.
+- Added full timestamp and usable-at model.
+- Added immutable deadline knowledge bundles.
+- Added layered schema and data-quality gates.
+- Added typed missing-data treatment.
+- Added central entity resolution.
+- Added postponed-fixture replanning.
+- Added correction and lineage invalidation.
+- Added alerts, quality metrics and SLOs.
+- Added live/reconstructed/final historical dataset modes.
+- Added strict no-leakage backtesting rules.
+- Added retention, security, PostgreSQL backup/PITR and restore testing.
+- Added Parquet partitioning, compaction and manifests.
+- Added implementation phases, risks, sources and acceptance criteria.
+
+Future v1.0:
+- Sebastian approves operating decisions.
+- Database migrations implemented.
+- free-source adapters operational;
+- deadline bundle generated successfully;
+- temporal leakage tests pass;
+- first EPL coverage trial complete;
+- backup restore verified;
+- target-season live collection begins.
+
+END OF DOCUMENT

@@ -1,0 +1,4534 @@
+DMF PULSE — CANONICAL DATA MODEL AND IDENTIFIERS
+================================================
+
+Document ID: DMFP-03
+Version: 0.9 (Canonical Semantic Architecture)
+Status: PROPOSED — READY FOR SCHEMA IMPLEMENTATION AFTER SEBASTIAN APPROVAL
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 16 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+Parent documents:
+- DMFP-00 — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+- DMFP-01 — RESEARCH STANDARD AND EVIDENCE REGISTER
+- DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+
+PURPOSE
+-------
+This document defines the shared language, identities, relationships and
+temporal semantics of the entire DMF Pulse system.
+
+Its job is to ensure that:
+
+- "Mohamed Salah" in FPL;
+- "M. Salah" in a bookmaker market;
+- "Salah, Mohamed" in a sports-data feed;
+- an exchange runner;
+- a historical projection;
+- a squad member;
+- a price snapshot;
+- a transfer decision;
+
+can all be linked to the same real-world player without using a name as the
+identity.
+
+It also ensures that:
+
+- a player transfer between clubs does not create a new player;
+- two players with the same name do not collapse into one;
+- a postponed match remains the same fixture when its kickoff moves;
+- a fixture changing FPL Gameweek does not become a new fixture;
+- a Double Gameweek is represented by fixture membership, not special-case code;
+- provider market IDs remain scoped to their provider and market;
+- historical FPL player IDs can change without breaking longitudinal data;
+- every odds quote remains tied to the correct market, selection, source and
+  observation time;
+- every projection and decision can be reconstructed from the information
+  actually available at the time.
+
+The governing principle is:
+
+    REAL-WORLD IDENTITY, PROVIDER IDENTITY, OBSERVATION AND MODEL OUTPUT
+    ARE DIFFERENT THINGS AND MUST NEVER BE COLLAPSED INTO ONE TABLE OR KEY.
+
+IMPORTANT TARGET-SEASON NOTE
+----------------------------
+The 2026/27 FPL game had not launched at the research cut-off.
+
+Consequently:
+
+1. Current FPL endpoint structures may be used as REFERENCE interfaces only.
+2. Target-season FPL external IDs, positions, teams, Gameweeks and fixtures MUST
+   be captured after launch.
+3. FPL numeric IDs MUST be treated as provider- and season-scoped unless an
+   official guarantee establishes a broader scope.
+4. No FPL `element.id`, `team.id`, `event.id`, `fixture.id` or undocumented
+   `code` field may become the DMF canonical identity.
+5. The canonical model must survive a complete renumbering of the FPL catalogue
+   between seasons.
+6. Provider contracts and licensing determine which raw identifiers, payloads
+   and mappings may be retained.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. A documented architecture decision record is required to deviate.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE CONTROL SUMMARY
+======================================================================
+
+0.1 THE DATA MODEL IN ONE SENTENCE
+----------------------------------
+DMF Pulse uses immutable internal UUID identities, explicit provider mappings,
+bitemporal facts and append-only observations so that every player, fixture,
+market, projection and decision remains unambiguous across providers, seasons
+and corrections.
+
+0.2 CONTROLLING ARCHITECTURAL DECISIONS
+---------------------------------------
+DD-03-01. Canonical IDs are internal.
+Pulse generates and owns the canonical identifier for every core entity.
+External IDs are attributes in mapping tables, never primary keys for the domain.
+
+DD-03-02. Use UUIDv7 for new internal entity and event IDs.
+RFC 9562 UUIDv7 provides 128-bit identifiers with a Unix-epoch time-ordered
+field and no central registration requirement. Pulse will use one approved
+implementation and PostgreSQL's native UUID type.
+
+Caveats:
+- UUID creation time is not business event time;
+- do not infer ordering solely from UUID;
+- do not expose time-ordered IDs publicly where this creates unwanted
+  information leakage;
+- external/public aliases may be separate opaque IDs.
+
+DD-03-03. Identity is not a name.
+Names, abbreviations, shirt names, transliterations and spelling variants are
+aliases. They are never sufficient alone to merge canonical entities.
+
+DD-03-04. Identity is not current team membership.
+A player remains one player across transfers. Membership is an effective-dated
+relationship between player and team.
+
+DD-03-05. Identity is not a timestamp.
+A fixture remains one fixture when kickoff time changes. Schedule details live
+in versioned fixture revisions.
+
+DD-03-06. FPL Gameweek is not calendar week.
+A Gameweek is an FPL scoring period with an official deadline and explicit
+fixture memberships. Membership can change. It must never be inferred solely
+from date.
+
+DD-03-07. Provider IDs are namespaced and temporal.
+An external identifier is unique only inside its declared provider, product,
+entity type, identifier namespace and, where necessary, effective interval.
+
+DD-03-08. Market and selection identity are composite in semantics.
+A market is tied to:
+- operator;
+- fixture;
+- market definition;
+- period;
+- line/handicap;
+- settlement profile;
+- provider representation.
+
+A selection is tied to its market and outcome semantics. An exchange runner
+cannot be identified safely by `selectionId` alone.
+
+DD-03-09. Raw observations are append-only.
+Odds, prices, lineups, availability reports, projections and decisions are not
+updated in place. New information creates a new observation or run.
+
+DD-03-10. Mutable facts are bitemporal where material.
+Pulse records:
+- valid time: when the fact was true in the football/FPL world;
+- system time: when Pulse knew or stored that version.
+
+DD-03-11. Closed-open time intervals.
+Effective ranges use:
+    [valid_from, valid_until)
+This allows adjacent facts to meet without overlap ambiguity.
+
+DD-03-12. Canonical relational core, raw payload outside it.
+Core searchable semantics use typed relational columns. Raw provider payloads
+are preserved in licensed object storage with hashes and may be referenced by
+JSONB metadata. JSONB is not a substitute for modelling core relationships.
+
+DD-03-13. Provider and operator are different.
+A provider is the technical feed/vendor through which data arrives.
+A bookmaker or exchange is the economic market operator that originated or
+hosts the price.
+
+Example:
+The Odds API may be the provider; a nested bookmaker is the operator.
+
+DD-03-14. Observation and estimate are different.
+An official injury flag, a journalist report and Pulse's probability of
+availability are separate records.
+
+DD-03-15. Projection identity is run-scoped.
+A projection is identified by:
+- projection run;
+- entity;
+- target fixture/Gameweek/horizon;
+- metric;
+- model version;
+- ruleset;
+- information cutoff.
+
+DD-03-16. Decision records are immutable.
+A revised recommendation creates a new decision run. The previous
+recommendation remains queryable exactly as issued.
+
+DD-03-17. Merges do not erase history.
+If two canonical entities are discovered to be duplicates, one is superseded by
+a survivor through an explicit merge record. Historical provenance is retained.
+
+DD-03-18. Unknown is not null-by-accident.
+Unknown, not applicable, not offered, not observed, unavailable and zero are
+different states and require explicit semantics.
+
+DD-03-19. Identity resolution uncertainty is stored.
+Provider mappings have:
+- method;
+- confidence;
+- evidence;
+- reviewer;
+- status;
+- effective interval.
+
+DD-03-20. No downstream module rematches names independently.
+All modules consume canonical IDs or submit unresolved records to the central
+entity-resolution workflow.
+
+0.3 REQUIRED DOMAIN ENTITIES
+-----------------------------
+Core entities required by the project:
+
+- Competition
+- Season
+- Gameweek
+- Team
+- TeamSeason
+- Player
+- PlayerTeamMembership
+- PlayerFPLSeason
+- Fixture
+- FixtureRevision
+- FixtureGameweekAssignment
+- DataProvider
+- BettingOperator
+- Bookmaker
+- Exchange
+- MarketDefinition
+- Market
+- Selection
+- ExternalIdentifier
+- EntityAlias
+- OddsSnapshot
+- OddsQuote
+- ExchangePriceLevel
+- LineupObservation
+- LineupPredictionRun
+- LineupPrediction
+- AvailabilityObservation
+- PlayerAvailabilityState
+- ProjectionRun
+- FootballEventProjection
+- FPLPointsProjection
+- ManagerAccount
+- SquadSnapshot
+- SquadMember
+- TransferBatch
+- Transfer
+- ChipDefinition
+- ChipInventory
+- ChipActivation
+- PriceSnapshot
+- DecisionRun
+- DecisionAlternative
+- DecisionAction
+- BacktestRun
+- ModelFamily
+- ModelVersion
+- DatasetVersion
+- SourceSnapshot
+- SourceBundle
+- EntityMerge
+- DataQualityIssue
+
+0.4 PRODUCTION SUCCESS CONDITION
+--------------------------------
+The canonical model is successful when any downstream record can answer:
+
+- which real entity does this concern?
+- which provider record did it come from?
+- which version of that mapping was active?
+- when was the fact true?
+- when did Pulse know it?
+- what raw source supports it?
+- which season, Gameweek and fixture are involved?
+- which model, ruleset and code version produced it?
+- whether the mapping was certain, probabilistic or manually approved?
+- whether later corrections altered the current view without rewriting history?
+
+======================================================================
+1. SCOPE, NON-GOALS AND BOUNDED CONTEXTS
+======================================================================
+
+1.1 IN SCOPE
+------------
+A. Canonical football identity
+- competition;
+- season;
+- club/team;
+- player;
+- membership;
+- fixture;
+- schedule revisions;
+- player and team aliases.
+
+B. Canonical FPL identity
+- FPL season;
+- Gameweek;
+- target-season player catalogue entry;
+- position;
+- squad;
+- transfers;
+- chips;
+- official prices;
+- decisions.
+
+C. Betting identity
+- technical provider;
+- bookmaker;
+- exchange;
+- market definition;
+- operator market;
+- selection;
+- quote;
+- exchange ladder;
+- provider market mappings.
+
+D. Forecast identity
+- model family/version;
+- projection run;
+- football-event distribution;
+- FPL-points distribution;
+- lineup prediction;
+- availability state.
+
+E. Research and audit identity
+- source snapshot;
+- source bundle;
+- dataset version;
+- backtest run;
+- decision run;
+- code and rules versions.
+
+F. Identity operations
+- alias creation;
+- external mapping;
+- candidate matching;
+- manual review;
+- merge;
+- split/correction;
+- supersession;
+- temporal validity.
+
+1.2 OUT OF SCOPE
+----------------
+This document does not:
+
+- select the final data provider;
+- specify odds normalisation mathematics;
+- estimate player minutes;
+- forecast points;
+- optimise a squad;
+- define target-season FPL scoring;
+- predict prices;
+- define exact retention rights;
+- implement public user authentication;
+- provide a complete analytics warehouse star schema.
+
+It defines the domain those modules share.
+
+1.3 BOUNDED CONTEXTS
+--------------------
+FOOTBALL:
+Real competitions, clubs, players, registrations and matches.
+
+FPL:
+Gameweeks, player catalogue entries, prices, manager state, chips and scoring.
+
+BETTING:
+Operators, markets, selections and quotes.
+
+FORECASTING:
+Models, inputs, runs, distributions and scenarios.
+
+DECISION:
+Alternatives, objective, recommended actions and approvals.
+
+EVALUATION:
+Backtests, outcomes, calibration and regret.
+
+PROVENANCE:
+Sources, data bundles, code, rulesets and transformations.
+
+A canonical ID may connect contexts, but context-specific records remain
+separate.
+
+Example:
+- Player is a football identity.
+- PlayerFPLSeason is the FPL representation of that player in one season.
+- Selection may refer to that player in one betting market.
+- FPLPointsProjection predicts that player under one ruleset/run.
+
+======================================================================
+2. ONTOLOGY AND NAMING PRINCIPLES
+======================================================================
+
+2.1 ENTITY
+----------
+A thing with continuing identity.
+
+Examples:
+- player;
+- club;
+- fixture;
+- market;
+- model version.
+
+2.2 RELATIONSHIP
+----------------
+A time-scoped connection between entities.
+
+Examples:
+- player registered to team;
+- fixture assigned to Gameweek;
+- selection refers to player;
+- model version derived from dataset;
+- decision uses projection run.
+
+2.3 OBSERVATION
+---------------
+A source reports a value at a point in time.
+
+Examples:
+- bookmaker odds;
+- FPL price;
+- official availability flag;
+- published lineup;
+- team membership report.
+
+2.4 STATE
+---------
+A derived or authoritative view valid for a period.
+
+Examples:
+- current player membership;
+- aggregated availability state;
+- current fixture schedule;
+- current manager squad.
+
+2.5 EVENT
+---------
+Something that changes state.
+
+Examples:
+- player transfer;
+- fixture postponement;
+- price rise;
+- chip activation;
+- decision approval.
+
+2.6 RUN
+-------
+An immutable computational activity with fixed inputs and versioned code.
+
+Examples:
+- projection run;
+- entity-resolution run;
+- optimiser run;
+- backtest run.
+
+2.7 DEFINITION VERSUS INSTANCE
+------------------------------
+MarketDefinition:
+The canonical concept "player anytime goalscorer, full time."
+
+Market:
+One operator's actual offered instance for one fixture.
+
+ChipDefinition:
+The rules/configured capability "Free Hit."
+
+ChipInventory:
+The manager's available copy.
+
+ModelFamily:
+Concept "minutes model."
+
+ModelVersion:
+Immutable trained/released artefact.
+
+2.8 CURRENT VIEW VERSUS HISTORY
+-------------------------------
+A current view is a query over historical records. It is not a mutable row that
+destroys previous truth.
+
+Examples:
+- `current_player_team`;
+- `current_fixture_schedule`;
+- `current_external_mapping`;
+- `latest_price`;
+- `latest_projection_before_deadline`.
+
+2.9 CONTROLLED VOCABULARIES
+---------------------------
+Use explicit enums or reference tables for:
+
+- entity type;
+- provider type;
+- operator type;
+- fixture status;
+- market scope;
+- market period;
+- selection outcome;
+- availability state;
+- mapping status;
+- mapping method;
+- projection metric;
+- decision action;
+- lifecycle status.
+
+Do not use free text when the values control logic.
+
+2.10 HUMAN LABELS
+-----------------
+Every entity may have:
+- canonical display name;
+- short display name;
+- aliases;
+- language;
+- script;
+- valid interval;
+- source.
+
+Labels are presentation metadata, not identity.
+
+======================================================================
+3. INTERNAL IDENTIFIER STRATEGY
+======================================================================
+
+3.1 UUID STANDARD
+-----------------
+Use RFC 9562 UUIDs.
+
+Default:
+UUIDv7 for new internal IDs.
+
+Reasons:
+- distributed generation;
+- no central sequence service;
+- PostgreSQL native UUID type;
+- approximate creation-time locality;
+- stable across database migrations;
+- safe combination of data from multiple environments when generated correctly.
+
+3.2 UUID GENERATION POLICY
+--------------------------
+- one approved library/implementation;
+- cryptographically strong randomness according to implementation;
+- application-generated or approved database function;
+- generated exactly once;
+- never reused;
+- lowercase canonical textual representation;
+- validate UUID version on insert where appropriate.
+
+3.3 UUID IS NOT BUSINESS TIME
+-----------------------------
+Store explicit:
+- created_at;
+- observed_at;
+- valid_from;
+- kickoff_at;
+- deadline_at;
+- information_cutoff.
+
+Never derive these from UUID bits for business logic.
+
+3.4 PUBLIC IDENTIFIERS
+----------------------
+Internal UUIDv7 may reveal approximate creation time.
+
+For future public APIs, Pulse MAY expose:
+- random UUIDv4 public ID;
+- opaque short alias;
+- signed external token.
+
+Public ID maps to internal canonical ID.
+
+3.5 PRIMARY KEY NAMES
+---------------------
+Typed names:
+- season_id;
+- gameweek_id;
+- team_id;
+- player_id;
+- fixture_id;
+- market_id;
+- selection_id;
+- model_version_id;
+- decision_run_id.
+
+Avoid generic `id` in cross-table interfaces and exports.
+
+3.6 NATURAL KEYS
+----------------
+Natural keys remain unique constraints where reliable, not primary identity.
+
+Examples:
+- Gameweek: season_id + number;
+- TeamSeason: season_id + team_id;
+- ModelVersion: model_family_id + version;
+- one current player-team membership at one time;
+- one active fixture assignment at one time.
+
+3.7 ENTITY REGISTRY
+-------------------
+Recommended supertable:
+
+canonical_entity
+- entity_id UUID PRIMARY KEY;
+- entity_type;
+- created_at;
+- lifecycle_status;
+- superseded_by_entity_id nullable;
+- provenance_source_id;
+- notes.
+
+Typed tables share the same key:
+
+player.player_id
+  FK -> canonical_entity.entity_id
+  CHECK entity_type = PLAYER through trigger/constraint.
+
+Benefits:
+- generic aliases and external identifiers;
+- generic merge relations;
+- provenance graph;
+- typed domain tables.
+
+3.8 ENTITY TYPES
+----------------
+At minimum:
+COMPETITION
+SEASON
+GAMEWEEK
+TEAM
+PLAYER
+FIXTURE
+DATA_PROVIDER
+BETTING_OPERATOR
+MARKET
+SELECTION
+MODEL_FAMILY
+MODEL_VERSION
+MANAGER_ACCOUNT
+CHIP_DEFINITION
+
+Run/snapshot rows may use UUIDv7 without joining the entity registry unless they
+need aliases/external IDs.
+
+3.9 IDENTIFIER NEVER CHANGES
+----------------------------
+A canonical ID remains stable even if:
+- name changes;
+- team changes;
+- provider changes;
+- FPL ID changes;
+- fixture time changes;
+- market display name changes;
+- entity becomes inactive.
+
+======================================================================
+4. EXTERNAL IDENTIFIER MODEL
+======================================================================
+
+4.1 PRINCIPLE
+-------------
+An external ID is an assertion:
+
+"Provider P, product/namespace N, identifies canonical entity E as value X
+during effective interval V."
+
+4.2 EXTERNAL IDENTIFIER TABLE
+-----------------------------
+external_identifier
+- external_identifier_id UUID;
+- canonical_entity_id UUID;
+- provider_id UUID;
+- provider_product;
+- identifier_namespace;
+- entity_type;
+- external_id_text;
+- valid_during tstzrange/date range;
+- system_during tstzrange;
+- mapping_status;
+- mapping_method;
+- match_probability nullable;
+- evidence_bundle_id;
+- reviewed_by;
+- reviewed_at;
+- first_seen_at;
+- last_seen_at;
+- is_provider_primary;
+- raw_example;
+- superseded_by_mapping_id;
+- notes.
+
+4.3 EXTERNAL IDS STORED AS TEXT
+-------------------------------
+Even apparently numeric IDs are stored as text in the mapping layer.
+
+Reasons:
+- leading zeros;
+- prefixes;
+- decimal-looking IDs such as Betfair market IDs;
+- IDs larger than language integer limits;
+- mixed formats;
+- provider migration.
+
+Typed adapter fields may parse numbers separately if the API contract requires.
+
+4.4 NAMESPACE EXAMPLES
+----------------------
+FPL:
+- fpl.element.id;
+- fpl.element.code;
+- fpl.team.id;
+- fpl.event.id;
+- fpl.fixture.id.
+
+Sportradar:
+- sportradar.soccer.sr_player;
+- sportradar.soccer.sr_competitor;
+- sportradar.soccer.sr_match;
+- sportradar.uuid.player.
+
+Betfair:
+- betfair.exchange.market_id;
+- betfair.exchange.selection_id;
+- betfair.exchange.event_id.
+
+The Odds API:
+- the_odds_api.event_id;
+- source/bookmaker `sid` when enabled.
+
+4.5 UNIQUE CONSTRAINT
+---------------------
+A candidate uniqueness constraint:
+
+(provider_id,
+ provider_product,
+ identifier_namespace,
+ entity_type,
+ external_id_text,
+ valid_during)
+WITHOUT OVERLAPS where supported.
+
+Do not assume an external ID cannot be reused unless the provider guarantees it.
+
+4.6 COMPOSITE PROVIDER IDENTITY
+-------------------------------
+Some provider entities require context.
+
+Betfair runner identity:
+- marketId;
+- selectionId;
+- handicap/line.
+
+The official API requires marketId and selectionId, with handicap for relevant
+Asian handicap markets.
+
+Therefore:
+- do not map Betfair selectionId globally to a Pulse Selection;
+- store a provider runner mapping keyed by market context;
+- treat line/handicap as an exact decimal or canonical line value.
+
+4.7 PROVIDER MERGE MAPPINGS
+---------------------------
+Providers may merge duplicate teams, players or events.
+
+Sportradar explicitly documents:
+- competitor mappings;
+- player mappings;
+- competitor merge mappings;
+- player merge mappings.
+
+Pulse must:
+- ingest provider merge information;
+- preserve old external ID;
+- link old mapping to replacement;
+- evaluate whether the Pulse canonical entity also needs merging;
+- never assume a provider merge is automatically correct for all contexts.
+
+4.8 IDENTIFIER SCOPE
+--------------------
+Every namespace declares:
+
+scope:
+- GLOBAL_PROVIDER;
+- PRODUCT;
+- SPORT;
+- COMPETITION;
+- SEASON;
+- EVENT;
+- MARKET.
+
+FPL element IDs are treated as SEASON scope until proven otherwise.
+
+4.9 MAPPING STATUS
+------------------
+UNRESOLVED
+CANDIDATE
+AUTO_MATCHED
+HUMAN_VERIFIED
+CONFLICTED
+REJECTED
+SUPERSEDED
+EXPIRED
+
+Production use:
+- BLOCKING entity mappings require HUMAN_VERIFIED or an approved deterministic
+  provider mapping;
+- unresolved mapping cannot flow into optimisation.
+
+======================================================================
+5. TEXT, NAMES AND ALIASES
+======================================================================
+
+5.1 PRESERVE RAW TEXT
+---------------------
+Store the provider's original text exactly, subject to licensing.
+
+Examples:
+- "Mohamed Salah";
+- "M. Salah";
+- "Salah, Mohamed";
+- "Man Utd";
+- "Manchester United FC".
+
+5.2 CANONICAL DISPLAY NAME
+--------------------------
+A human-curated current display label.
+
+It may change without changing identity.
+
+5.3 ALIAS TABLE
+---------------
+entity_alias
+- alias_id UUID;
+- canonical_entity_id;
+- alias_text_raw;
+- alias_text_nfc;
+- alias_match_key;
+- language_code;
+- script_code optional;
+- alias_type;
+- provider_id nullable;
+- valid_during;
+- source_id;
+- is_preferred;
+- confidence;
+- notes.
+
+Alias types:
+OFFICIAL_FULL
+OFFICIAL_SHORT
+FPL_WEB_NAME
+SHIRT_NAME
+BOOKMAKER_NAME
+TRANSLITERATION
+FORMER_NAME
+ABBREVIATION
+MISSPELLING
+MANUAL_MATCH_KEY
+
+5.4 UNICODE NORMALISATION
+-------------------------
+Use Unicode Normalization Form C (NFC) for canonical stored comparison/display
+normalisation.
+
+For matching only, create additional derived keys using:
+- Unicode casefold;
+- punctuation standardisation;
+- whitespace collapse;
+- diacritic-insensitive key;
+- token reordering where justified;
+- optional transliteration.
+
+Never replace raw text with the match key.
+
+Unicode UAX #15 distinguishes canonical and compatibility normalization.
+Compatibility normalisation can collapse meaningful distinctions, so NFKC/NFKD
+may be used only in a separate candidate-generation feature with testing.
+
+5.5 NAME MATCHING IS NOT IDENTITY
+---------------------------------
+Exact normalized-name equality can propose candidates.
+
+It cannot auto-merge players when:
+- duplicate names exist;
+- initials are used;
+- team is unknown;
+- date of birth conflicts;
+- provider market is ambiguous.
+
+5.6 DUPLICATE NAMES
+-------------------
+Players may share:
+- full name;
+- surname;
+- FPL web name;
+- initials.
+
+Disambiguating evidence:
+- date of birth;
+- current/historical team;
+- competition/season;
+- nationality;
+- position;
+- provider IDs;
+- fixture participation;
+- shirt number as weak temporal evidence;
+- market fixture context.
+
+A name-only match receives LOW confidence and remains unresolved.
+
+5.7 TEAM NAMES
+--------------
+Do not strip:
+- "United";
+- "City";
+- geographical terms;
+- legal suffixes;
+without preserving full source text.
+
+Team abbreviation is contextual and nonunique.
+
+5.8 PERSON NAME CHANGES
+-----------------------
+A player may:
+- change preferred name;
+- use mononym;
+- change transliteration;
+- have punctuation/diacritics corrected.
+
+Add alias/version. Do not create new player unless identity evidence says so.
+
+======================================================================
+6. TEMPORAL AND PROVENANCE MODEL
+======================================================================
+
+6.1 FOUR IMPORTANT TIMES
+------------------------
+EVENT_TIME:
+When the football/FPL event occurred.
+
+VALID_TIME:
+When a fact was true in the domain.
+
+SOURCE_TIME:
+When the provider says the record/quote was generated or updated.
+
+SYSTEM_TIME:
+When Pulse ingested or recorded it.
+
+Additionally:
+INFORMATION_CUTOFF:
+Latest admissible information for a projection/decision/backtest.
+
+6.2 BITEMPORAL FACT
+-------------------
+Example:
+A fixture was scheduled for Saturday as known Monday, then moved to Sunday on
+Wednesday.
+
+Valid-time versions describe when the Sunday schedule became official.
+System time records when Pulse learned each version.
+
+6.3 CLOSED-OPEN INTERVALS
+-------------------------
+Use PostgreSQL `tstzrange` or dates with:
+    [start, end)
+
+Benefits:
+- adjacent intervals do not overlap;
+- exact point query is clear;
+- exclusion constraints can prevent overlapping current facts.
+
+6.4 REQUIRED BITEMPORAL TABLES
+------------------------------
+At minimum:
+- external_identifier;
+- entity_alias where aliases change;
+- player_team_membership;
+- team name/status;
+- fixture_revision;
+- fixture_gameweek_assignment;
+- official availability state;
+- provider market status where corrected;
+- manager squad state if reconstructed historically.
+
+6.5 APPEND-ONLY POINT OBSERVATIONS
+---------------------------------
+Use point timestamps rather than mutable ranges for:
+- odds quote;
+- price snapshot;
+- lineup prediction;
+- projection run;
+- decision run;
+- source snapshot.
+
+Current/latest values are views.
+
+6.6 PROVENANCE
+--------------
+Adapt W3C PROV concepts:
+
+ENTITY:
+- raw payload;
+- canonical record;
+- projection;
+- decision.
+
+ACTIVITY:
+- ingestion;
+- mapping;
+- model run;
+- optimiser run;
+- backtest.
+
+AGENT:
+- provider;
+- ChatGPT;
+- Codex;
+- Sebastian;
+- model service.
+
+6.7 SOURCE FIELDS
+-----------------
+Every ingested/derived record SHOULD carry:
+- source_snapshot_id;
+- source_bundle_id;
+- created_by_activity_id;
+- code_commit;
+- schema_version;
+- raw_payload_hash;
+- ingestion_run_id.
+
+6.8 NO DESTRUCTIVE CORRECTION
+-----------------------------
+Corrections create:
+- new record;
+- supersession link;
+- new system interval;
+- issue record;
+- affected downstream invalidation.
+
+======================================================================
+7. COMPETITION AND SEASON
+======================================================================
+
+7.1 COMPETITION
+---------------
+Represents the enduring competition concept.
+
+Fields:
+- competition_id;
+- sport;
+- canonical_name;
+- organiser;
+- country;
+- competition_type;
+- lifecycle_status.
+
+Examples:
+- Premier League;
+- Fantasy Premier League as a game product may also have a separate game
+  definition, but target football season links to Premier League.
+
+7.2 SEASON
+----------
+Represents one edition of a competition/game.
+
+Fields:
+- season_id;
+- competition_id;
+- season_code "2026/27";
+- start_date;
+- end_date;
+- official_label;
+- ruleset_id;
+- lifecycle_status;
+- source.
+
+Unique:
+competition_id + season_code.
+
+7.3 FPL SEASON VERSUS FOOTBALL SEASON
+-------------------------------------
+Recommended:
+- `football_season` for Premier League competition edition;
+- `fpl_season` for FPL game edition;
+- explicit one-to-one or many-to-one link.
+
+For MVP they may share a Season domain table with:
+season_kind:
+FOOTBALL_COMPETITION
+FANTASY_GAME
+
+and:
+fpl_season.underlying_football_season_id.
+
+This avoids assuming all future FPL rules map exactly to one competition season.
+
+7.4 SEASON IMMUTABILITY
+-----------------------
+A season identity does not change when:
+- dates are updated;
+- ruleset is patched;
+- provider season ID changes.
+
+Ruleset versions and schedule revisions are separate.
+
+7.5 HISTORICAL SEASONS
+----------------------
+Historical data MUST retain:
+- original ruleset;
+- original teams;
+- original player-season position;
+- original provider IDs;
+- source rights.
+
+Do not apply current-season position or club to historical points.
+
+======================================================================
+8. GAMEWEEK
+======================================================================
+
+8.1 DEFINITION
+--------------
+A Gameweek is an FPL scoring and decision period, not an ISO calendar week.
+
+Fields:
+- gameweek_id;
+- fpl_season_id;
+- gameweek_number;
+- official_name;
+- deadline_at_utc;
+- lifecycle_status;
+- is_current;
+- is_next;
+- points_finality_status;
+- source.
+
+Unique:
+fpl_season_id + gameweek_number.
+
+8.2 GAMEWEEK ID SCOPE
+---------------------
+FPL API `event.id` is stored as an external identifier scoped to FPL season.
+
+The canonical Gameweek UUID persists independently.
+
+8.3 GAMEWEEK STATUS
+-------------------
+PLANNED
+OPEN
+DEADLINE_PASSED
+IN_PROGRESS
+PROVISIONAL_COMPLETE
+FINAL
+CORRECTED
+CANCELLED
+
+8.4 GAMEWEEK AND FIXTURES
+-------------------------
+Gameweek does not own static fixture columns.
+
+Use:
+fixture_gameweek_assignment
+
+A Gameweek can contain:
+- zero fixtures for a club;
+- one;
+- multiple.
+
+8.5 DOUBLE GAMEWEEK
+-------------------
+A Double Gameweek is a derived condition:
+
+For a team T and Gameweek G:
+    count(fixtures assigned to G involving T) >= 2
+
+No separate "double_gameweek" entity is needed for core truth.
+A derived materialised view may expose it.
+
+8.6 BLANK GAMEWEEK
+------------------
+Derived:
+    count == 0
+
+8.7 GAMEWEEK DEADLINE HISTORY
+-----------------------------
+If an official deadline changes:
+- append a new Gameweek revision or bitemporal deadline fact;
+- preserve old known value;
+- decision records retain the deadline known at decision time.
+
+======================================================================
+9. TEAM AND TEAM-SEASON
+======================================================================
+
+9.1 TEAM
+--------
+Represents the enduring football club/competitive team identity.
+
+Fields:
+- team_id;
+- canonical_name;
+- short_name;
+- country;
+- founded_date optional;
+- lifecycle_status;
+- successor/predecessor relation where needed.
+
+9.2 TEAMSEASON
+--------------
+Represents participation and season-specific attributes.
+
+Fields:
+- team_season_id;
+- team_id;
+- football_season_id;
+- competition_id;
+- official_season_name;
+- abbreviation;
+- provider/FPL mappings;
+- active_from/to;
+- promoted/relegated context;
+- season attributes.
+
+9.3 WHY TEAMSEASON EXISTS
+-------------------------
+FPL team IDs and abbreviations are season data.
+Competition membership changes.
+Provider IDs may be season-scoped.
+Team strength and FPL metadata are time/season-specific.
+
+9.4 RENAMES AND REBRANDS
+------------------------
+A simple commercial/display name change:
+- same Team;
+- new alias/effective label.
+
+A legally or competitively distinct successor:
+- separate Team;
+- predecessor/successor relationship;
+- human decision.
+
+9.5 TEAM IDENTITY IS NOT NAME
+-----------------------------
+"Manchester United", "Man Utd", "Manchester Utd" map through aliases.
+They do not create separate teams.
+
+9.6 TEAM MERGES/SPLITS
+----------------------
+Rare but supported through:
+- entity_relation;
+- relation_type MERGED_INTO, SUCCESSOR_OF, RESERVE_OF;
+- valid time;
+- source.
+
+======================================================================
+10. PLAYER, PLAYER-SEASON AND CLUB MEMBERSHIP
+======================================================================
+
+10.1 PLAYER
+-----------
+Represents the enduring real person as a football participant.
+
+Fields:
+- player_id;
+- canonical_display_name;
+- date_of_birth where licensed/available;
+- nationality where useful;
+- lifecycle_status;
+- identity_confidence;
+- provenance.
+
+10.2 PLAYER IS NOT FPL ELEMENT
+------------------------------
+FPL element is a season/game catalogue entry.
+
+Use:
+player_fpl_season
+- player_fpl_season_id;
+- player_id;
+- fpl_season_id;
+- target-season FPL position;
+- initial/current status attributes;
+- FPL external IDs;
+- start/end availability in catalogue.
+
+10.3 PLAYER-TEAM MEMBERSHIP
+---------------------------
+player_team_membership
+- membership_id;
+- player_id;
+- team_id;
+- registration_type;
+- valid_during;
+- system_during;
+- source;
+- confidence;
+- status.
+
+Types:
+PERMANENT
+LOAN
+YOUTH
+TEMPORARY
+UNKNOWN
+
+10.4 TRANSFER BETWEEN CLUBS
+---------------------------
+On transfer:
+- same player_id;
+- end old membership;
+- begin new membership;
+- update aliases/context if needed;
+- add new provider/FPL season mappings as observed;
+- do not rewrite historical fixture participation.
+
+10.5 MULTIPLE MEMBERSHIPS
+-------------------------
+Loans or registration windows may overlap in source data.
+
+The domain must distinguish:
+- registered club;
+- loan parent;
+- eligible playing club.
+
+For FPL, `current_fpl_team_id` is a season-specific official fact and may be
+represented separately from legal registration details.
+
+10.6 PLAYER POSITION
+--------------------
+FPL position belongs to PlayerFPLSeason, not Player.
+
+Football tactical position may be:
+- observation;
+- role distribution;
+- provider attribute.
+
+Do not overwrite FPL position with tactical role.
+
+10.7 HISTORICAL PLAYER IDS
+--------------------------
+Every season's FPL element ID maps to the same Player where verified.
+
+If no stable provider mapping exists:
+- entity resolution uses aliases, date of birth, team history and other evidence;
+- unresolved records remain separate;
+- later merge is explicit.
+
+10.8 PLAYER RETIRES OR LEAVES LEAGUE
+------------------------------------
+Set lifecycle/season participation.
+Never delete.
+
+10.9 DUPLICATE PLAYER NAMES
+---------------------------
+Two distinct players:
+- have distinct canonical UUIDs;
+- can share exact aliases;
+- external mapping requires context;
+- user interfaces display disambiguators such as team, date of birth or position.
+
+======================================================================
+11. FIXTURE AND FIXTURE REVISION
+======================================================================
+
+11.1 FIXTURE
+------------
+Represents the enduring competitive match event/intention.
+
+Stable fields:
+- fixture_id;
+- competition_season_id;
+- home_team_id;
+- away_team_id;
+- leg/round identity where relevant;
+- lifecycle_status;
+- created provenance.
+
+Do not use kickoff time as primary identity.
+
+11.2 FIXTURE REVISION
+---------------------
+Mutable schedule/status facts:
+
+fixture_revision
+- fixture_revision_id;
+- fixture_id;
+- scheduled_kickoff_at;
+- venue_id optional;
+- round_label;
+- matchday;
+- status;
+- status_reason;
+- valid_during;
+- system_during;
+- provider_generated_at;
+- source_snapshot_id.
+
+11.3 POSTPONEMENT
+-----------------
+When the same official match is postponed:
+- same fixture_id;
+- new revision with POSTPONED;
+- later new scheduled revision;
+- external provider ID mapping may persist or change.
+
+11.4 PROVIDER DELETES AND RECREATES
+-----------------------------------
+If provider replaces event ID:
+- preserve old external mapping;
+- add new mapping to same fixture if evidence confirms;
+- link provider records through supersession;
+- do not create a new canonical fixture only because the external ID changed.
+
+11.5 CANCELLATION/REPLAY
+------------------------
+If the competition officially treats the later match as a new/replayed fixture:
+- create separate Fixture if identity is distinct;
+- relation:
+  REPLAY_OF
+  REPLACES
+  VOIDED_BY
+
+This requires official evidence.
+
+11.6 HOME/AWAY CHANGE
+---------------------
+If venue changes but designated home/away teams do not:
+- revision.
+
+If official fixture is replaced with reversed home/away:
+- review whether new fixture identity is required;
+- do not auto-match solely on teams and approximate date.
+
+11.7 FIXTURE STATUS
+-------------------
+SCHEDULED
+DATE_TBD
+POSTPONED
+CANCELLED
+ABANDONED
+LIVE
+SUSPENDED
+FINISHED
+AWARDED
+VOID
+REPLAY_REQUIRED
+
+11.8 FIXTURE GAMEWEEK ASSIGNMENT
+--------------------------------
+fixture_gameweek_assignment
+- assignment_id;
+- fixture_id;
+- gameweek_id nullable;
+- valid_during;
+- system_during;
+- assignment_status;
+- source.
+
+At most one active assignment per fixture for one FPL season.
+
+Null current Gameweek is explicit:
+UNASSIGNED / TO_BE_SCHEDULED.
+
+11.9 FPL FIXTURE ID
+-------------------
+FPL `fixture.id` is an external identifier scoped to target season/product.
+
+It does not replace fixture_id.
+
+11.10 DUPLICATE FIXTURE DETECTION
+---------------------------------
+Candidate features:
+- competition season;
+- home/away teams;
+- approximate kickoff;
+- round;
+- venue;
+- provider mappings.
+
+Never merge on time and team names alone without checking postponed/recreated
+events.
+
+======================================================================
+12. DATA PROVIDER, BOOKMAKER AND EXCHANGE
+======================================================================
+
+12.1 DATA PROVIDER
+------------------
+Technical source/vendor through which data is retrieved.
+
+Examples:
+- official FPL endpoint;
+- odds aggregator;
+- Sportradar;
+- Betfair API directly.
+
+Fields:
+- provider_id;
+- organisation;
+- product;
+- API version;
+- provider_type;
+- licence status;
+- timezone/format policy;
+- lifecycle status.
+
+12.2 BETTING OPERATOR
+---------------------
+The entity originating/hosting the market.
+
+Subtypes:
+BOOKMAKER
+EXCHANGE
+
+Fields:
+- betting_operator_id;
+- operator_type;
+- canonical_name;
+- jurisdiction;
+- website;
+- commission profile if exchange;
+- lifecycle status.
+
+12.3 BOOKMAKER
+--------------
+Fixed-odds operator.
+
+Specific fields:
+- bookmaker_id = betting_operator_id;
+- default margin metadata;
+- settlement policy family;
+- regional brand relation.
+
+12.4 EXCHANGE
+-------------
+Order-book/peer-to-peer venue.
+
+Specific fields:
+- exchange_id;
+- commission rules;
+- currency;
+- price ladder definition;
+- liquidity semantics.
+
+12.5 PROVIDER-OPERATOR MAPPING
+-----------------------------
+A provider may name/book-code an operator differently.
+
+provider_operator_mapping
+- provider_id;
+- operator_id;
+- external_operator_id;
+- display name;
+- valid/system time;
+- verification.
+
+12.6 BRAND VERSUS LEGAL OPERATOR
+-------------------------------
+One legal group can have:
+- multiple bookmaker brands;
+- jurisdictions;
+- feeds;
+- currencies.
+
+For pricing consensus, operator/brand independence matters.
+The schema should permit parent organisation relationships without collapsing
+brands.
+
+12.7 DIRECT VERSUS AGGREGATED SOURCE
+------------------------------------
+A quote records both:
+- provider_id;
+- betting_operator_id.
+
+If direct:
+both may refer to related entities, but roles remain distinct.
+
+======================================================================
+13. MARKET DEFINITION, MARKET AND SETTLEMENT PROFILE
+======================================================================
+
+13.1 MARKET DEFINITION
+----------------------
+Canonical semantic template independent of provider.
+
+Fields:
+- market_definition_id;
+- canonical_key;
+- display name;
+- scope;
+- target metric;
+- period;
+- outcome structure;
+- line type;
+- participant type;
+- settlement_profile_family;
+- version;
+- rules description.
+
+Examples:
+MATCH_1X2_FULL_TIME
+MATCH_TOTAL_GOALS_FULL_TIME
+TEAM_TOTAL_GOALS_FULL_TIME
+TEAM_CLEAN_SHEET
+PLAYER_ANYTIME_GOAL
+PLAYER_TO_ASSIST
+PLAYER_SHOTS_ON_TARGET
+GOALKEEPER_SAVES
+
+13.2 MARKET SCOPE
+-----------------
+MATCH
+TEAM
+PLAYER
+SEASON
+GAMEWEEK
+OUTRIGHT
+
+13.3 PERIOD
+-----------
+FULL_TIME_90
+FIRST_HALF
+SECOND_HALF
+EXTRA_TIME
+SPECIFIC_INTERVAL
+SEASON
+CUSTOM
+
+FPL projections generally require regulation Premier League match semantics.
+Provider market period must be explicit.
+
+13.4 SETTLEMENT PROFILE
+-----------------------
+Market display name is insufficient.
+
+settlement_profile
+- settlement_profile_id;
+- operator_id;
+- market_definition_id;
+- version;
+- start_requirement;
+- substitute treatment;
+- void conditions;
+- extra-time treatment;
+- abandoned-match treatment;
+- dead-heat;
+- source;
+- effective time.
+
+13.5 MARKET INSTANCE
+--------------------
+One offered market:
+
+market
+- market_id;
+- fixture_id;
+- betting_operator_id;
+- market_definition_id;
+- subject_team_id nullable;
+- subject_player_id nullable where market-level;
+- line_value nullable;
+- period;
+- settlement_profile_id;
+- currency;
+- open/close status;
+- first_seen_at;
+- last_seen_at;
+- lifecycle status.
+
+13.6 PROVIDER MARKET MAPPING
+---------------------------
+provider_market
+- provider_market_id internal;
+- market_id;
+- provider_id;
+- external_market_id;
+- external_event_id;
+- market_key;
+- raw_market_name;
+- valid/system time;
+- mapping status;
+- raw source.
+
+13.7 MARKET IDENTITY RULE
+-------------------------
+Do not automatically merge two markets because names match.
+
+Required semantic equivalence:
+- same fixture;
+- same operator;
+- same market definition;
+- same period;
+- same subject;
+- same line;
+- compatible settlement;
+- same currency/context.
+
+13.8 REOPENED MARKET
+--------------------
+A suspended/reopened operator market may retain market identity with new quote
+observations.
+
+If provider creates a new market ID:
+- map to same Market only after settlement/semantic verification;
+- otherwise create separate Market linked as REOPENED_AS or REPLACES.
+
+======================================================================
+14. SELECTION
+======================================================================
+
+14.1 DEFINITION
+--------------
+A selection is one outcome or runner offered within a Market.
+
+Fields:
+- selection_id;
+- market_id;
+- outcome_type;
+- subject_player_id nullable;
+- subject_team_id nullable;
+- side;
+- line_value nullable;
+- canonical_label;
+- lifecycle status.
+
+14.2 OUTCOME TYPES
+------------------
+HOME
+DRAW
+AWAY
+OVER
+UNDER
+YES
+NO
+PLAYER_SCORES
+PLAYER_ASSISTS
+PLAYER_OVER
+PLAYER_UNDER
+TEAM
+OTHER
+
+14.3 SUBJECT
+------------
+Selections may refer to:
+- team;
+- player;
+- abstract outcome.
+
+Use typed nullable foreign keys plus a check constraint or a generic
+selection_subject relation.
+
+14.4 PROVIDER SELECTION MAPPING
+------------------------------
+provider_selection
+- provider_selection_mapping_id;
+- selection_id;
+- provider_market_id;
+- provider_id;
+- external_selection_id;
+- external_runner_name;
+- handicap_or_line;
+- sort_priority;
+- valid/system time;
+- mapping status;
+- source.
+
+14.5 BETFAIR COMPOSITE
+----------------------
+Official Betfair documentation identifies a runner using:
+- marketId;
+- selectionId;
+- handicap for relevant markets.
+
+Store all three.
+Do not use a numeric selectionId as player ID.
+
+14.6 THE ODDS API SOURCE IDS
+----------------------------
+The Odds API can include bookmaker source IDs (`sids`) for events, markets or
+selections when requested.
+
+These remain:
+- provider/operator-scoped external identifiers;
+- not canonical IDs;
+- versioned if the feed changes.
+
+14.7 REMOVED SELECTION
+----------------------
+Do not delete.
+Set lifecycle/status:
+ACTIVE
+SUSPENDED
+REMOVED
+WINNER
+LOSER
+VOID
+
+Provider settlement status and canonical outcome result are separate.
+
+======================================================================
+15. ODDS SNAPSHOT, QUOTE AND EXCHANGE LADDER
+======================================================================
+
+15.1 ODDS SNAPSHOT
+------------------
+Represents one retrieval or provider-published batch.
+
+Fields:
+- odds_snapshot_id;
+- provider_id;
+- requested_at;
+- provider_generated_at nullable;
+- received_at;
+- information_effective_at;
+- endpoint/request parameters;
+- source_snapshot_id;
+- payload hash;
+- licence policy;
+- completeness status;
+- ingestion run.
+
+15.2 ODDS QUOTE
+---------------
+One price observation:
+
+odds_quote
+- odds_quote_id;
+- odds_snapshot_id;
+- market_id;
+- selection_id;
+- betting_operator_id;
+- provider_id;
+- quote_type;
+- decimal_odds;
+- American/fractional raw value optional;
+- line value;
+- available size;
+- currency;
+- market status;
+- selection status;
+- provider last update;
+- observed_at;
+- received_at;
+- is_in_play;
+- is_main_line;
+- source mapping IDs.
+
+15.3 QUOTE TYPES
+----------------
+BOOKMAKER_FIXED
+EXCHANGE_BACK
+EXCHANGE_LAY
+EXCHANGE_LAST_TRADED
+EXCHANGE_STARTING_PRICE
+DERIVED_MID
+SETTLEMENT
+
+Derived prices are not raw quotes and must link to input quote IDs/activity.
+
+15.4 DECIMAL STORAGE
+--------------------
+Raw decimal odds:
+exact decimal/numeric type with enough scale.
+
+Model probabilities:
+double precision or model artefact format with documented serialization.
+
+Never store odds as binary float if exact source reproduction matters.
+
+15.5 EXCHANGE PRICE LEVEL
+-------------------------
+exchange_price_level
+- odds_quote/snapshot reference;
+- selection_id;
+- side BACK/LAY;
+- level_index;
+- price;
+- available_size;
+- traded_size if applicable.
+
+A ladder is not compressed into one number.
+
+15.6 IMMUTABILITY
+-----------------
+No quote update in place.
+
+A new price:
+- new odds_quote;
+- new snapshot or stream update;
+- prior quote remains.
+
+15.7 DUPLICATE DELIVERY
+-----------------------
+Idempotency key may include:
+- provider;
+- external event/market/selection;
+- provider update sequence;
+- quote type;
+- price/size;
+- provider timestamp;
+- payload hash.
+
+Exact duplicate messages may be deduplicated operationally while preserving
+ingestion metrics.
+
+15.8 HISTORICAL SNAPSHOT SEMANTICS
+----------------------------------
+The Odds API documents historical data as point-in-time snapshots.
+
+Store:
+- requested historical timestamp;
+- returned snapshot timestamp;
+- provider generated timestamp;
+- retrieval time.
+
+Do not treat retrieval time as historical market time.
+
+15.9 INFORMATION CUTOFF
+-----------------------
+Backtests query:
+latest eligible quote where effective/provider time <= cutoff
+and ingestion/system-time conditions match the historical simulation policy.
+
+A future-retrieved historical service can be used only if its timestamped
+snapshot faithfully represents the past and the backtest records that source
+method.
+
+======================================================================
+16. LINEUPS AND PLAYER AVAILABILITY
+======================================================================
+
+16.1 ACTUAL LINEUP OBSERVATION
+------------------------------
+lineup_observation
+- lineup_observation_id;
+- fixture_id;
+- player_id;
+- team_id;
+- lineup_role;
+- confirmation_status;
+- shirt number;
+- provider/source;
+- provider generated time;
+- observed/ingested time;
+- source snapshot.
+
+Roles:
+STARTER
+BENCH
+NOT_IN_SQUAD
+UNKNOWN
+
+16.2 LINEUP PREDICTION RUN
+--------------------------
+lineup_prediction_run
+- run_id;
+- fixture_id;
+- as_of;
+- information_cutoff;
+- model/source;
+- model_version_id;
+- source_bundle_id;
+- code commit;
+- status.
+
+16.3 LINEUP PREDICTION
+----------------------
+Per player/fixture:
+- p_start;
+- p_bench;
+- p_not_in_squad;
+- p_any_appearance;
+- expected role;
+- confidence;
+- evidence.
+
+Probabilities sum according to schema tolerance.
+
+16.4 MULTIPLE PREDICTORS
+------------------------
+A press outlet prediction, an official provider prediction and Pulse model are
+separate runs.
+
+Consensus is a derived run with provenance.
+
+16.5 AVAILABILITY OBSERVATION
+-----------------------------
+Source-level evidence:
+- official FPL status;
+- club report;
+- suspension record;
+- journalist report;
+- training observation.
+
+Fields:
+- player_id;
+- valid/effective time;
+- source;
+- reported state;
+- text/value;
+- reliability;
+- fixture applicability;
+- observed time.
+
+16.6 PLAYER AVAILABILITY STATE
+------------------------------
+Pulse's aggregated state:
+
+player_availability_state
+- state_id;
+- player_id;
+- fixture_id or horizon;
+- as_of;
+- p_available;
+- p_start;
+- p_appearance;
+- reason categories;
+- state label;
+- source bundle;
+- model version.
+
+Labels:
+AVAILABLE
+DOUBT
+INJURED
+SUSPENDED
+INELIGIBLE
+ROTATION_RISK
+UNKNOWN
+
+The label is a summary. Probabilities remain primary.
+
+16.7 DO NOT OVERWRITE
+---------------------
+An official FPL "doubt" flag and Pulse's 80% start probability coexist.
+Neither overwrites the other.
+
+======================================================================
+17. PROJECTION RUNS AND FORECAST ENTITIES
+======================================================================
+
+17.1 PROJECTION RUN
+-------------------
+Immutable computational activity.
+
+Fields:
+- projection_run_id;
+- projection_type;
+- created_at;
+- as_of;
+- information_cutoff;
+- target season;
+- target Gameweeks/fixtures;
+- model_version IDs;
+- ruleset ID/hash;
+- source bundle;
+- scenario set;
+- code commit;
+- random seed;
+- run status;
+- parent run;
+- supersedes run nullable.
+
+17.2 FOOTBALL-EVENT PROJECTION
+------------------------------
+Represents probability distribution for a football event metric.
+
+Dimensions:
+- run;
+- fixture;
+- team/player subject;
+- metric;
+- conditioning state;
+- horizon.
+
+Metrics:
+TEAM_GOALS
+PLAYER_GOALS
+PLAYER_ASSISTS
+CLEAN_SHEET
+SAVES
+YELLOW_CARD
+DEFENSIVE_CONTRIBUTIONS
+MINUTES
+START
+APPEARANCE
+BPS_COMPONENT
+
+Fields:
+- distribution family;
+- parameters;
+- expected value;
+- quantiles;
+- probability mass reference;
+- sample artefact URI/hash;
+- units;
+- calibration version.
+
+17.3 FPL-POINTS PROJECTION
+--------------------------
+Per player and target scope.
+
+Fields:
+- fpl_points_projection_id;
+- projection_run_id;
+- player_fpl_season_id;
+- fixture_id nullable;
+- gameweek_id nullable;
+- horizon_start/end;
+- ruleset hash;
+- mean;
+- median;
+- variance;
+- quantiles;
+- threshold probabilities;
+- component expectations;
+- sample artefact;
+- correlation group/scenario set.
+
+Fixture-level and Gameweek-level projections are distinct rows.
+
+17.4 PROJECTION UNIQUENESS
+--------------------------
+Unique within run:
+(subject, target scope, metric, conditioning variant).
+
+17.5 FULL DISTRIBUTIONS
+-----------------------
+Large Monte Carlo samples SHOULD live in Parquet/object storage.
+
+Relational DB stores:
+- summary;
+- artefact URI;
+- hash;
+- schema;
+- sample count;
+- seed.
+
+17.6 PROJECTION REVISION
+------------------------
+Never update.
+Create new run and link:
+supersedes_projection_run_id.
+
+17.7 OBSERVATION OUTCOME
+------------------------
+Actual outcomes are separate tables.
+Do not insert actual points into projection row.
+
+======================================================================
+18. MODEL FAMILY, MODEL VERSION AND DATASET VERSION
+======================================================================
+
+18.1 MODEL FAMILY
+-----------------
+Conceptual method/component.
+
+Examples:
+MINUTES_MODEL
+MARKET_CONSENSUS
+ASSIST_MODEL
+PRICE_CHANGE_MODEL
+SQUAD_OPTIMISER
+
+Fields:
+- model_family_id;
+- canonical name;
+- owner;
+- interface version;
+- lifecycle status.
+
+18.2 MODEL VERSION
+------------------
+Immutable release/trained artefact.
+
+Fields:
+- model_version_id;
+- model_family_id;
+- semantic version;
+- created/trained at;
+- code commit;
+- package lock hash;
+- training dataset version;
+- configuration hash;
+- artefact URI/hash;
+- metrics;
+- calibration status;
+- approval status;
+- valid production interval;
+- parent version.
+
+18.3 VERSION IS NOT "LATEST"
+----------------------------
+Every projection/decision stores exact model_version_id.
+
+Production config resolves a named deployment to an exact version, recorded in
+the run.
+
+18.4 DATASET VERSION
+--------------------
+dataset_version
+- dataset_version_id;
+- dataset family;
+- creation time;
+- source bundle;
+- temporal cutoff;
+- rows/coverage;
+- schema version;
+- artefact hash;
+- licence status;
+- quality report.
+
+18.5 MODEL LINEAGE
+------------------
+Relations:
+- trained_on;
+- calibrated_on;
+- evaluated_on;
+- derived_from;
+- supersedes;
+- deployed_as.
+
+======================================================================
+19. FPL PRICE SNAPSHOT
+======================================================================
+
+19.1 PRICE SNAPSHOT
+-------------------
+Official observed FPL price at a point in time.
+
+Fields:
+- price_snapshot_id;
+- player_fpl_season_id;
+- price_units integer tenths;
+- observed_at;
+- effective_at if known;
+- provider/source;
+- source snapshot;
+- event type if change;
+- ingested_at.
+
+19.2 PURCHASE AND SELLING PRICE
+------------------------------
+Purchase/selling prices belong to manager squad state.
+
+Official current market price:
+PriceSnapshot.
+
+Manager purchase price:
+SquadMember in ownership spell.
+
+Selling price:
+Derived under exact ruleset or official manager-state observation.
+
+19.3 PRICE CHANGE EVENT
+-----------------------
+May be derived from consecutive snapshots:
+- old;
+- new;
+- change amount;
+- effective interval.
+
+Do not infer hidden price-change threshold here.
+
+19.4 SAME-TIMESTAMP CONFLICT
+----------------------------
+If providers disagree:
+- preserve both observations;
+- official FPL source has authority for official price;
+- create data-quality issue;
+- current official view selects approved source.
+
+======================================================================
+20. MANAGER, SQUAD, TRANSFER AND CHIP
+======================================================================
+
+20.1 MANAGER ACCOUNT
+--------------------
+Represents Sebastian's FPL entry/manager identity for a season.
+
+Fields:
+- manager_account_id;
+- fpl_season_id;
+- external entry ID mapping;
+- privacy classification;
+- lifecycle status.
+
+Do not expose authenticated tokens.
+
+20.2 SQUAD SNAPSHOT
+-------------------
+Immutable manager state at a time.
+
+Fields:
+- squad_snapshot_id;
+- manager_account_id;
+- as_of;
+- effective Gameweek;
+- bank price units;
+- free transfers;
+- total points/rank where observed;
+- active chip;
+- source;
+- ruleset;
+- source bundle;
+- predecessor snapshot.
+
+20.3 SQUAD MEMBER
+----------------
+Per snapshot:
+- squad_snapshot_id;
+- player_fpl_season_id;
+- purchase_price;
+- current_price;
+- selling_price;
+- position;
+- roster slot;
+- starting/bench role;
+- bench order;
+- captain flag;
+- vice flag;
+- ownership spell ID.
+
+A player appears once per squad snapshot.
+
+20.4 OWNERSHIP SPELL
+--------------------
+Tracks purchase-price continuity.
+
+- starts when bought;
+- ends when sold or season ends;
+- Free Hit temporary ownership handled separately;
+- repurchase starts new spell.
+
+20.5 TRANSFER BATCH
+-------------------
+One confirmed/planned set for a Gameweek.
+
+Fields:
+- transfer_batch_id;
+- manager account;
+- decision run or actual action;
+- Gameweek;
+- created/confirmed at;
+- chip context;
+- hit cost;
+- bank before/after;
+- status.
+
+20.6 TRANSFER
+-------------
+One outgoing/incoming pair.
+
+Fields:
+- transfer_id;
+- batch;
+- outgoing player;
+- incoming player;
+- outgoing selling price;
+- incoming purchase price;
+- sequence;
+- reason;
+- actual/planned;
+- provider transaction ID if available.
+
+20.7 TRANSFER IS NOT PLAYER CLUB TRANSFER
+-----------------------------------------
+Use names:
+FPL_TRANSFER
+PLAYER_TEAM_MEMBERSHIP_CHANGE
+
+Do not overload `transfer`.
+
+20.8 CHIP DEFINITION
+--------------------
+From active ruleset:
+- chip_definition_id;
+- ruleset;
+- type;
+- window;
+- effects.
+
+20.9 CHIP INVENTORY
+-------------------
+Per manager:
+- chip_inventory_id;
+- chip definition;
+- availability state;
+- acquired/expired/used Gameweek.
+
+20.10 CHIP ACTIVATION
+---------------------
+Immutable action:
+- manager;
+- Gameweek;
+- chip inventory;
+- activated at;
+- cancelled at if permitted;
+- final state;
+- decision link.
+
+======================================================================
+21. DECISION MODEL
+======================================================================
+
+21.1 DECISION RUN
+-----------------
+One immutable recommendation generation.
+
+Fields:
+- decision_run_id;
+- manager state/squad snapshot;
+- as_of;
+- information cutoff;
+- objective mode;
+- horizon;
+- projection run;
+- price/ownership model versions;
+- ruleset;
+- optimiser model/version;
+- source bundle;
+- code commit;
+- seed;
+- data health;
+- run status.
+
+21.2 DECISION ALTERNATIVE
+-------------------------
+Each candidate plan:
+
+- decision_alternative_id;
+- decision run;
+- rank;
+- expected utility;
+- expected points;
+- uncertainty;
+- downside/upside;
+- robustness metrics;
+- feasibility;
+- solver status;
+- explanation.
+
+21.3 DECISION ACTION
+--------------------
+Normalised actions:
+TRANSFER_OUT
+TRANSFER_IN
+SET_STARTER
+SET_BENCH_ORDER
+SET_CAPTAIN
+SET_VICE_CAPTAIN
+ACTIVATE_CHIP
+ROLL_TRANSFER
+NO_ACTION
+
+21.4 RECOMMENDATION
+-------------------
+Decision run references selected alternative.
+
+Do not overwrite if recommendation changes.
+New run links:
+supersedes_decision_run_id.
+
+21.5 HUMAN ACTION
+-----------------
+Record separately:
+decision_execution
+- recommended alternative;
+- chosen actual action;
+- approval;
+- deviations;
+- reason;
+- execution time;
+- external confirmation.
+
+21.6 DECISION ID IN CONTENT
+---------------------------
+Any downstream DMF content or report must reference the immutable decision run,
+not a mutable "current recommendation" blob.
+
+======================================================================
+22. BACKTEST RUN
+======================================================================
+
+22.1 DEFINITION
+--------------
+A reproducible evaluation activity over historical decision times.
+
+Fields:
+- backtest_run_id;
+- protocol ID;
+- created at;
+- code commit;
+- model versions;
+- ruleset versions;
+- dataset versions;
+- source bundles;
+- simulated decision schedule;
+- information cutoff policy;
+- start/end season/Gameweek;
+- manager initial state;
+- objective;
+- seeds;
+- status;
+- result artefacts;
+- approval.
+
+22.2 TEMPORAL POLICY
+--------------------
+Backtest must state:
+- what source time is admissible;
+- whether historical vendor snapshots were retrieved later;
+- maximum quote delay;
+- handling of corrections;
+- fixture information known then;
+- price snapshots known then;
+- lineup/news cutoff.
+
+22.3 BACKTEST SCENARIO
+----------------------
+Per decision point:
+- backtest_case_id;
+- Gameweek;
+- as_of;
+- source bundle;
+- reconstructed manager state;
+- projection run;
+- decision run;
+- actual outcome.
+
+22.4 NO MUTABLE RESULTS
+-----------------------
+If bug fixed:
+- new BacktestRun;
+- old run marked invalid/superseded;
+- results retained.
+
+22.5 COMPARATORS
+----------------
+Comparator policy/version is an entity/artefact:
+- no transfer;
+- recent points;
+- market-only;
+- full Pulse;
+- hindsight upper bound.
+
+======================================================================
+23. SOURCE SNAPSHOT, SOURCE BUNDLE AND INGESTION RUN
+======================================================================
+
+23.1 SOURCE SNAPSHOT
+--------------------
+Metadata for one raw retrieval.
+
+Fields:
+- source_snapshot_id;
+- provider;
+- endpoint/resource;
+- request fingerprint;
+- provider time;
+- received time;
+- HTTP/status metadata;
+- payload URI;
+- payload hash;
+- content type;
+- schema detected;
+- licence policy;
+- retention deadline;
+- ingestion status.
+
+23.2 SOURCE BUNDLE
+------------------
+Immutable manifest of inputs used by a run.
+
+Fields:
+- source_bundle_id;
+- created at;
+- source snapshot IDs;
+- bundle hash;
+- information cutoff;
+- licence class;
+- completeness;
+- notes.
+
+23.3 INGESTION RUN
+------------------
+Activity:
+- adapter version;
+- start/end;
+- source;
+- records received;
+- records accepted/quarantined;
+- mapping statistics;
+- schema changes;
+- errors;
+- code commit.
+
+23.4 RAW VERSUS CANONICAL
+------------------------
+Raw:
+- preserves source representation;
+- may be licensed/restricted;
+- is not queried as canonical truth.
+
+Canonical:
+- typed;
+- mapped;
+- validated;
+- retains provenance.
+
+======================================================================
+24. ENTITY RESOLUTION WORKFLOW
+======================================================================
+
+24.1 DEFINITION
+--------------
+Entity resolution links provider records that refer to the same real entity
+when no shared reliable identifier exists.
+
+24.2 ORDER OF METHODS
+---------------------
+1. Approved provider mapping API or explicit crosswalk.
+2. Exact trusted external ID.
+3. Deterministic multi-field match.
+4. Probabilistic record linkage.
+5. Human review.
+6. Remain unresolved.
+
+24.3 DETERMINISTIC PLAYER MATCH
+-------------------------------
+Strong examples:
+- exact stable provider crosswalk;
+- exact name + date of birth + team context;
+- exact official FPL mapping plus verified external feed mapping.
+
+Weak:
+- exact web name only;
+- surname + team;
+- shirt number only.
+
+24.4 PROBABILISTIC MATCHING
+---------------------------
+Fellegi–Sunter-style entity resolution provides a principled framework for
+combining agreement/disagreement evidence when unique IDs are absent.
+
+Candidate features:
+- normalized full name;
+- surname/given tokens;
+- date of birth;
+- team at event time;
+- nationality;
+- position;
+- height;
+- known provider aliases;
+- fixture participation.
+
+Model outputs:
+- match probability;
+- comparison vector;
+- threshold result;
+- uncertainty;
+- model version.
+
+24.5 BLOCKING
+-------------
+Candidate generation must reduce comparisons using context:
+- same fixture/team roster;
+- same season/competition;
+- date-of-birth year;
+- surname key.
+
+Blocking improves scale but can hide true matches. Its recall must be evaluated.
+
+24.6 TERM FREQUENCY
+-------------------
+Common names have less discriminating power than rare names.
+If probabilistic linkage is used, term-frequency adjustments SHOULD be
+considered and validated.
+
+24.7 MANUAL REVIEW QUEUE
+------------------------
+Fields:
+- candidate pair;
+- probability;
+- evidence;
+- conflicts;
+- source records;
+- reviewer;
+- decision;
+- notes;
+- time.
+
+Actions:
+MATCH
+NO_MATCH
+DEFER
+REQUEST_EVIDENCE
+CREATE_NEW_ENTITY
+
+24.8 THRESHOLDS
+---------------
+Thresholds depend on risk.
+
+For a player mapping that drives betting-market projection:
+- false match is potentially catastrophic;
+- uncertain cases should go to review.
+
+For a noncritical display alias:
+- lower threshold may be acceptable.
+
+24.9 TRANSITIVITY
+-----------------
+If A maps to B and B maps to C, do not assume A=C blindly.
+
+Check:
+- entity type;
+- time;
+- source;
+- conflicting identifiers;
+- merge history.
+
+24.10 NEGATIVE EVIDENCE
+-----------------------
+Store rejected pairs to prevent repeat proposals.
+
+======================================================================
+25. MERGE, SPLIT, SUPERSESSION AND CORRECTION
+======================================================================
+
+25.1 MERGE
+----------
+entity_merge
+- merge_id;
+- duplicate_entity_id;
+- survivor_entity_id;
+- reason;
+- evidence;
+- approved by;
+- effective/system time;
+- migration status.
+
+25.2 HISTORY
+------------
+Do not delete duplicate entity or old mappings.
+
+Current resolution view follows survivor.
+Historical source records retain original mapping activity.
+
+25.3 FOREIGN KEYS
+-----------------
+Two strategies:
+
+A. Preserve historical FK and resolve through survivor view.
+Preferred for audit.
+
+B. Migrate canonical FKs while retaining mapping log.
+May simplify querying but requires immutable audit trail.
+
+Initial Pulse recommendation:
+Preserve origin mapping and expose `resolved_entity_id` view.
+
+25.4 SPLIT
+----------
+If one canonical entity incorrectly combined two players:
+- create/identify separate entities;
+- reassign affected mappings/facts through correction records;
+- record scope and reason;
+- invalidate affected projections/backtests;
+- never silently rewrite.
+
+25.5 PROVIDER ID REUSE
+----------------------
+If same external text ID later refers to different entity:
+- close old valid interval;
+- create new mapping;
+- flag provider behaviour;
+- include context in uniqueness.
+
+25.6 ENTITY LIFECYCLE
+---------------------
+ACTIVE
+INACTIVE
+RETIRED
+DISSOLVED
+DUPLICATE
+SUPERSEDED
+UNKNOWN
+
+Lifecycle status does not delete.
+
+======================================================================
+26. RELATIONSHIP AND CARDINALITY SUMMARY
+======================================================================
+
+Competition 1 -> many Seasons.
+
+Football Season many -> many Teams through TeamSeason.
+
+FPL Season 1 -> many Gameweeks.
+
+Team 1 -> many TeamSeasons.
+
+Player 1 -> many PlayerTeamMemberships.
+
+Player 1 -> many PlayerFPLSeasons.
+
+Fixture belongs to one competition season.
+
+Fixture has many FixtureRevisions.
+
+Fixture has many historical FixtureGameweekAssignments but at most one current
+active assignment for the target FPL season.
+
+DataProvider supplies many SourceSnapshots and provider mappings.
+
+BettingOperator has many Markets.
+
+Bookmaker and Exchange are subtypes of BettingOperator.
+
+Fixture has many Markets.
+
+Market follows one MarketDefinition and one SettlementProfile version.
+
+Market has many Selections.
+
+OddsSnapshot has many OddsQuotes.
+
+OddsQuote references one Market and one Selection.
+
+LineupPredictionRun has many LineupPredictions.
+
+ProjectionRun has many FootballEventProjections and FPLPointsProjections.
+
+ModelFamily has many ModelVersions.
+
+ManagerAccount has many SquadSnapshots.
+
+SquadSnapshot has exactly configured squad-member count when complete.
+
+TransferBatch has many Transfers.
+
+DecisionRun has many DecisionAlternatives and Actions.
+
+BacktestRun has many historical cases/decision runs.
+
+Every computational run uses SourceBundle, ModelVersion(s), Ruleset and code
+commit.
+
+======================================================================
+27. PHYSICAL POSTGRESQL SCHEMA
+======================================================================
+
+27.1 SCHEMA NAMES
+-----------------
+core:
+Canonical entities and mappings.
+
+football:
+Seasons, teams, players, memberships, fixtures.
+
+fpl:
+Gameweeks, player-season, prices, manager state, chips.
+
+betting:
+Operators, markets, selections, odds.
+
+forecast:
+Models, projection runs and outputs.
+
+decision:
+Optimisation and execution.
+
+evaluation:
+Backtests and metrics.
+
+provenance:
+Sources, bundles, activities, datasets.
+
+staging:
+Unresolved provider records and quarantine.
+
+27.2 CORE TABLE INVENTORY
+-------------------------
+core.canonical_entity
+core.entity_alias
+core.external_identifier
+core.entity_merge
+core.entity_relation
+core.entity_resolution_candidate
+core.entity_resolution_decision
+core.data_quality_issue
+
+27.3 FOOTBALL TABLES
+--------------------
+football.competition
+football.season
+football.team
+football.team_season
+football.player
+football.player_team_membership
+football.fixture
+football.fixture_revision
+football.fixture_gameweek_assignment
+football.lineup_observation
+football.actual_event
+
+27.4 FPL TABLES
+---------------
+fpl.season
+fpl.gameweek
+fpl.player_season
+fpl.price_snapshot
+fpl.manager_account
+fpl.squad_snapshot
+fpl.squad_member
+fpl.ownership_spell
+fpl.transfer_batch
+fpl.transfer
+fpl.chip_definition
+fpl.chip_inventory
+fpl.chip_activation
+fpl.official_points
+
+27.5 BETTING TABLES
+-------------------
+betting.data_provider
+betting.betting_operator
+betting.bookmaker
+betting.exchange
+betting.provider_operator_mapping
+betting.market_definition
+betting.settlement_profile
+betting.market
+betting.provider_market
+betting.selection
+betting.provider_selection
+betting.odds_snapshot
+betting.odds_quote
+betting.exchange_price_level
+
+27.6 FORECAST TABLES
+--------------------
+forecast.model_family
+forecast.model_version
+forecast.projection_run
+forecast.lineup_prediction_run
+forecast.lineup_prediction
+forecast.availability_observation
+forecast.player_availability_state
+forecast.football_event_projection
+forecast.fpl_points_projection
+forecast.scenario_set
+forecast.projection_artifact
+
+27.7 DECISION TABLES
+--------------------
+decision.decision_run
+decision.decision_alternative
+decision.decision_action
+decision.decision_execution
+decision.explanation
+
+27.8 EVALUATION TABLES
+----------------------
+evaluation.backtest_run
+evaluation.backtest_case
+evaluation.forecast_score
+evaluation.decision_regret
+evaluation.model_comparison
+
+27.9 PROVENANCE TABLES
+----------------------
+provenance.source_snapshot
+provenance.source_bundle
+provenance.source_bundle_member
+provenance.ingestion_run
+provenance.transformation_activity
+provenance.dataset_family
+provenance.dataset_version
+provenance.code_version
+provenance.ruleset_reference
+
+27.10 LARGE TABLE PARTITIONING
+------------------------------
+Candidates:
+- odds_quote by observed month;
+- price_snapshot by season/month;
+- source_snapshot by provider/month;
+- projections by season/run date;
+- raw events by fixture/date.
+
+Partitioning is an implementation decision tested against actual volume.
+
+27.11 JSONB USE
+---------------
+Appropriate:
+- source metadata;
+- provider-specific noncanonical fields;
+- model distribution parameters;
+- explanation payload;
+- raw sample summary.
+
+Inappropriate:
+- storing all market identity in a JSON document;
+- storing squad members as an unvalidated array only;
+- hiding external IDs in unindexed blobs;
+- replacing foreign keys.
+
+PostgreSQL documentation notes JSONB is efficient for processing/indexing, but
+the relational model remains primary.
+
+======================================================================
+28. DATABASE CONSTRAINTS AND INDEXES
+======================================================================
+
+28.1 FOREIGN KEYS
+-----------------
+Every canonical relationship uses a real FK where practical.
+
+28.2 NONOVERLAP
+---------------
+Use PostgreSQL range types and exclusion/temporal constraints for:
+
+- player memberships that cannot overlap under the same membership type/context;
+- active external ID mappings;
+- active fixture schedule facts;
+- fixture Gameweek assignment;
+- preferred aliases where only one is allowed.
+
+28.3 CHECK CONSTRAINTS
+----------------------
+- probabilities 0–1;
+- lineup probabilities sum within tolerance;
+- decimal odds > 1 for normal quoted decimal odds, with explicit exceptions;
+- price units >= 0;
+- valid range not empty;
+- home_team != away_team;
+- UUID entity type consistency;
+- one subject type per selection;
+- one player per squad snapshot;
+- target fixture/Gameweek scope is valid.
+
+28.4 UNIQUE CONSTRAINTS
+-----------------------
+Examples:
+- Season competition + code;
+- Gameweek FPL season + number;
+- TeamSeason season + team;
+- PlayerFPLSeason FPL season + player;
+- provider external mapping under scope/time;
+- ModelFamily + version;
+- one selected recommendation per decision run;
+- one quote deduplication key.
+
+28.5 INDEXES
+-------------
+- every FK;
+- UUID PK;
+- external identifier lookup;
+- alias match key;
+- valid/system ranges GiST;
+- fixture by teams/season;
+- odds by market/selection/time;
+- latest price by player/time;
+- projections by run/player/Gameweek;
+- decisions by manager/time;
+- source hash.
+
+28.6 NO CASCADE DELETE FOR HISTORY
+----------------------------------
+Use RESTRICT for canonical history.
+Deletion should be exceptional and governed by retention/legal policy.
+
+28.7 CURRENT VIEWS
+------------------
+- core.current_external_identifier;
+- football.current_player_team;
+- football.current_fixture_revision;
+- football.current_fixture_gameweek;
+- fpl.latest_price;
+- betting.latest_quote_pre_deadline;
+- forecast.latest_projection;
+- decision.current_recommendation.
+
+Views must accept an explicit `as_of` for historical logic where possible.
+
+======================================================================
+29. API AND MESSAGE CONTRACTS
+======================================================================
+
+29.1 ID SERIALISATION
+---------------------
+UUID as lowercase hyphenated string.
+
+External ID:
+string plus namespace/provider.
+
+29.2 TIMESTAMPS
+---------------
+RFC 3339 UTC.
+
+29.3 DECIMALS
+-------------
+Odds and money serialised as strings or fixed decimal values where exactness is
+required.
+
+29.4 ENUMS
+----------
+Versioned controlled strings, not unexplained integers.
+
+29.5 NULL SEMANTICS
+-------------------
+API should include status/reason.
+
+Example:
+{
+  "gameweek_id": null,
+  "assignment_status": "UNASSIGNED"
+}
+
+Not:
+{
+  "gameweek_id": null
+}
+with no meaning.
+
+29.6 REFERENCES
+---------------
+API response may include:
+- canonical ID;
+- display label;
+- selected external IDs;
+- provenance link.
+
+Do not expose all restricted provider IDs publicly.
+
+29.7 IDEMPOTENCY
+----------------
+Ingestion endpoints/messages use:
+- provider event ID;
+- sequence;
+- payload hash;
+- idempotency key.
+
+======================================================================
+30. DATA QUALITY AND QUARANTINE
+======================================================================
+
+30.1 ISSUE TYPES
+----------------
+UNRESOLVED_ENTITY
+AMBIGUOUS_PLAYER
+DUPLICATE_EXTERNAL_ID
+CONFLICTING_TEAM_MEMBERSHIP
+FIXTURE_COLLISION
+GAMEWEEK_ASSIGNMENT_CONFLICT
+MARKET_SEMANTIC_CONFLICT
+SELECTION_SUBJECT_UNKNOWN
+STALE_MAPPING
+SCHEMA_CHANGE
+TIME_ORDER_ANOMALY
+PROBABILITY_INVALID
+ODDS_INVALID
+SOURCE_LICENSE_BLOCK
+HISTORICAL_LEAKAGE_RISK
+
+30.2 QUARANTINE
+---------------
+Records that fail critical mapping:
+- preserved in staging;
+- not discarded;
+- not promoted to canonical;
+- visible in review queue;
+- retain raw source/provenance.
+
+30.3 HEALTH METRICS
+-------------------
+- player mapping coverage;
+- fixture mapping coverage;
+- market mapping coverage;
+- unresolved selections;
+- ambiguous duplicates;
+- mapping confidence distribution;
+- provider merge events;
+- stale external IDs;
+- bitemporal overlaps;
+- odds orphan rate;
+- projection orphan rate.
+
+30.4 FAIL CLOSED
+----------------
+A market quote cannot enter the projection engine if:
+- fixture unresolved;
+- market definition unresolved;
+- selection subject unresolved;
+- settlement profile blocking;
+- provider timestamp invalid.
+
+======================================================================
+31. RESOLVING THE REQUIRED EDGE CASES
+======================================================================
+
+31.1 DIFFERENT PLAYER NAMES ACROSS PROVIDERS
+--------------------------------------------
+Resolution:
+- raw alias per provider;
+- Unicode-normalized match keys;
+- provider context;
+- external mappings;
+- deterministic/probabilistic linkage;
+- human verification for ambiguous cases.
+
+Never:
+join on lower(name).
+
+31.2 TRANSFERS BETWEEN CLUBS
+----------------------------
+Resolution:
+- Player remains stable;
+- membership closes/opens;
+- FPL season team assignment updates;
+- market selection remains linked to Player;
+- historical fixture links unchanged.
+
+31.3 DUPLICATE NAMES
+--------------------
+Resolution:
+- separate Player UUIDs;
+- matching uses date of birth/team/season/provider context;
+- UI shows disambiguation;
+- name-only automatic merge prohibited.
+
+31.4 POSTPONED FIXTURES
+-----------------------
+Resolution:
+- same Fixture;
+- new FixtureRevision;
+- Gameweek assignment revised separately;
+- external provider ID may be superseded/mapped;
+- historical known schedule preserved.
+
+31.5 DOUBLE GAMEWEEKS
+---------------------
+Resolution:
+- multiple Fixtures assigned to one Gameweek for a team;
+- no duplicate Player/Gameweek record identity issue;
+- fixture projections aggregate to Gameweek projection;
+- captaincy uses Gameweek appearance/points under ruleset.
+
+31.6 PROVIDER-SPECIFIC MARKET IDS
+---------------------------------
+Resolution:
+- internal Market UUID;
+- provider_market mapping;
+- operator and market semantics explicit;
+- selection mapping market-scoped;
+- external IDs stored text.
+
+31.7 HISTORICAL PLAYER IDS
+--------------------------
+Resolution:
+- FPL element ID scoped to season;
+- provider crosswalks retained;
+- Player UUID stable;
+- alias/membership evidence supports linkage;
+- merge/supersession explicit.
+
+31.8 PROVIDER DUPLICATE ENTITY MERGE
+------------------------------------
+Resolution:
+- ingest merge mapping;
+- evaluate;
+- close old external mapping;
+- preserve old source records;
+- route current resolution to survivor.
+
+31.9 FIXTURE RECREATED BY PROVIDER
+----------------------------------
+Resolution:
+- compare competition/teams/official event context;
+- map new ID to same Fixture if confirmed;
+- otherwise relation REPLACES/REPLAY_OF.
+
+31.10 PLAYER WITH MULTIPLE MARKET NAMES IN SAME MATCH
+-----------------------------------------------------
+Resolution:
+- separate provider selections;
+- candidate to same Player;
+- preserve raw names;
+- flag if operator accidentally duplicates runner;
+- do not average until selection equivalence is verified.
+
+======================================================================
+32. TESTING AND VALIDATION
+======================================================================
+
+32.1 UNIT TESTS
+---------------
+- UUID type/version validation;
+- external ID namespacing;
+- alias normalization;
+- membership ranges;
+- fixture revision;
+- Gameweek assignment;
+- market semantics;
+- Betfair composite selection key;
+- odds immutability;
+- model/run lineage;
+- squad ownership spell.
+
+32.2 SCHEMA TESTS
+----------------
+- required fields;
+- enum values;
+- no orphan;
+- constraints;
+- migrations;
+- temporal overlap.
+
+32.3 ENTITY-RESOLUTION GOLDEN SET
+---------------------------------
+Create labelled cases:
+- same player, accent difference;
+- same player, initial;
+- duplicate surname/team;
+- exact duplicate full names;
+- player transfer;
+- provider player merge;
+- wrong date of birth;
+- team abbreviation;
+- promoted club;
+- historical FPL element IDs.
+
+Metrics:
+- precision;
+- recall;
+- false-match rate;
+- review rate;
+- calibration of match probability.
+
+For critical player mapping, precision has priority.
+
+32.4 FIXTURE GOLDEN SET
+-----------------------
+- simple exact mapping;
+- kickoff moved;
+- postponed/TBD;
+- provider recreated ID;
+- home/away reversal;
+- abandoned/replay;
+- fixture moved Gameweek;
+- Double Gameweek.
+
+32.5 MARKET GOLDEN SET
+----------------------
+- 1X2;
+- team total line;
+- player anytime;
+- assist;
+- over/under;
+- two operators;
+- one aggregator;
+- Betfair selectionId with handicap;
+- suspended/reopened market;
+- removed player selection.
+
+32.6 TEMPORAL TESTS
+-------------------
+- query current;
+- query as known yesterday;
+- correction entered later but valid earlier;
+- no overlapping ranges;
+- exact boundary at end/start;
+- deadline information cutoff.
+
+32.7 PROPERTY TESTS
+------------------
+- canonical ID never changes;
+- one external mapping does not resolve to two active entities in same scope;
+- current fixture has at most one active Gameweek assignment;
+- home != away;
+- odds snapshot immutable;
+- projection references exact versions;
+- merge graph acyclic;
+- source bundle hash deterministic.
+
+32.8 REPLAY
+-----------
+Load historical/reference snapshots and ensure:
+- same mappings;
+- same canonical output;
+- same source bundle;
+- no dependence on current team/name.
+
+32.9 MIGRATION TESTS
+--------------------
+Every Alembic migration:
+- upgrade;
+- data backfill;
+- downgrade where safe;
+- constraints;
+- historical query;
+- large table timing where relevant.
+
+======================================================================
+33. SCHEMA EVOLUTION AND DATA MIGRATION
+======================================================================
+
+33.1 DATABASE MIGRATIONS
+------------------------
+Use reviewed migrations.
+Never allow application auto-create in production.
+
+33.2 DOMAIN SCHEMA VERSION
+--------------------------
+Every export/message/run records:
+- canonical schema version.
+
+33.3 BREAKING CHANGE
+--------------------
+Examples:
+- changing Player identity semantics;
+- changing Market uniqueness;
+- altering external ID scope;
+- replacing time model.
+
+Requires ADR and migration plan.
+
+33.4 ADDITIVE CHANGE
+--------------------
+New optional fields/enums require compatibility review.
+
+Unknown enum values should fail or quarantine according to adapter policy, not
+silently map to OTHER if logic depends on them.
+
+33.5 BACKFILL
+-------------
+Backfill records:
+- migration activity;
+- source;
+- method;
+- confidence;
+- affected rows;
+- code commit;
+- rollback.
+
+33.6 RECOMPUTATION
+------------------
+If identity corrections affect projections/backtests:
+- mark artefacts impacted;
+- do not mutate old run;
+- rerun under new data/model;
+- link supersession.
+
+======================================================================
+34. LICENSING, PRIVACY AND SECURITY
+======================================================================
+
+34.1 PROVIDER IDS MAY BE RESTRICTED
+-----------------------------------
+Technical IDs and crosswalks can be contract data.
+
+Source register must record:
+- storage;
+- retention;
+- derived use;
+- public display;
+- redistribution.
+
+34.2 PERSONAL DATA
+------------------
+Professional player identity data may still constitute personal data.
+
+Store only needed attributes.
+Date of birth and nationality are used only where justified for resolution and
+modelling, with access controls.
+
+34.3 MANAGER ACCOUNT
+--------------------
+Sebastian's entry ID and private squad data are access-controlled.
+Credentials/session tokens are not entities in this model and belong in secret
+management.
+
+34.4 PUBLIC OUTPUT
+------------------
+Public DMF products should expose:
+- Pulse canonical public alias;
+- permitted display names;
+- permitted derived probabilities.
+
+Do not expose restricted raw operator/provider mappings.
+
+34.5 RIGHT TO CORRECTION
+------------------------
+Identity corrections are supported through merge/split/supersession workflows,
+not destructive erasure of scientific audit unless law/contract requires
+deletion.
+
+======================================================================
+35. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+35.1 CODEX MAY
+-------------
+- create SQLAlchemy/Pydantic models;
+- create Alembic migrations;
+- implement UUID generation;
+- implement schemas and constraints;
+- implement alias normalization;
+- build mapping workflows;
+- implement source-bundle lineage;
+- create current/as-of views;
+- create validation CLI;
+- create golden fixtures;
+- create merge/split tools;
+- create provider adapter contracts.
+
+35.2 CODEX MUST NOT
+-------------------
+- use provider IDs as canonical PKs;
+- match entities on name alone;
+- treat FPL IDs as cross-season;
+- overwrite player team on transfer;
+- overwrite fixture kickoff;
+- infer Gameweek from date;
+- update odds/projections/decisions in place;
+- identify Betfair runner by selectionId alone;
+- hide unresolved IDs in JSONB;
+- expose restricted IDs publicly;
+- use current data in historical as-of query;
+- hard delete merged entities;
+- generate random duplicate canonical entities without checking staging.
+
+35.3 IMPLEMENTATION ORDER
+-------------------------
+1. UUID/entity registry.
+2. Provider and source snapshot.
+3. Alias and external identifier.
+4. Season/team/player/membership.
+5. Gameweek/fixture/revision/assignment.
+6. Market definition/operator/market/selection.
+7. Odds snapshot/quote.
+8. Model/version/projection.
+9. Manager/squad/transfer/chip/price.
+10. Decision/backtest.
+11. Entity resolution and review UI.
+12. performance/index/partition tuning.
+
+35.4 REQUIRED CLI
+-----------------
+dmf identity resolve
+dmf identity review
+dmf identity merge
+dmf identity split
+dmf identity history
+dmf mapping import
+dmf mapping conflicts
+dmf fixture reconcile
+dmf market reconcile
+dmf data validate
+dmf data as-of
+dmf data lineage
+
+35.5 PULL REQUEST REQUIREMENTS
+------------------------------
+Every data-model PR states:
+- entities/tables affected;
+- invariants;
+- identifiers;
+- temporal semantics;
+- migration;
+- source/provenance;
+- licence effect;
+- tests;
+- rollback;
+- downstream compatibility.
+
+======================================================================
+36. OBSERVABILITY AND OPERATIONAL REPORTS
+======================================================================
+
+36.1 IDENTITY HEALTH
+--------------------
+Dashboard:
+- mapped players / total;
+- unresolved market selections;
+- duplicate candidate count;
+- fixture conflicts;
+- provider ID changes;
+- merge events;
+- manual-review backlog.
+
+36.2 TEMPORAL HEALTH
+--------------------
+- overlapping valid ranges;
+- impossible time order;
+- stale current view;
+- future-dated source;
+- post-cutoff contamination.
+
+36.3 LINEAGE
+------------
+For any output:
+    dmf data lineage <id>
+
+returns:
+- canonical entity;
+- external mappings;
+- raw sources;
+- transformations;
+- model;
+- ruleset;
+- decision/backtest usage.
+
+36.4 CHANGE ALERTS
+------------------
+- provider player ID changed;
+- provider fixture removed;
+- fixture kickoff/Gameweek changed;
+- player team changed;
+- market mapping changed;
+- duplicate merge reported;
+- source schema changed.
+
+======================================================================
+37. RISK REGISTER
+======================================================================
+
+R-03-001 — FPL IDs treated as permanent
+Probability: High
+Impact: Critical
+Mitigation:
+Season-scoped external mappings; canonical Player/Team/Fixture UUIDs.
+
+R-03-002 — Name-only player merge
+Probability: High
+Impact: Critical
+Mitigation:
+Aliases, context, probabilistic linkage, human review.
+
+R-03-003 — Player transfer creates new player
+Probability: Medium
+Impact: Critical
+Mitigation:
+Membership relation; stable Player identity.
+
+R-03-004 — Duplicate names collapse
+Probability: Medium
+Impact: Critical
+Mitigation:
+DOB/team/season context; no name-only merge.
+
+R-03-005 — Fixture kickoff used as identity
+Probability: High
+Impact: Critical
+Mitigation:
+Fixture + revision model.
+
+R-03-006 — Postponed fixture duplicated
+Probability: High
+Impact: High
+Mitigation:
+Provider mapping history; fixture reconciliation.
+
+R-03-007 — Gameweek inferred from date
+Probability: Medium
+Impact: Critical
+Mitigation:
+Explicit official assignment.
+
+R-03-008 — Double Gameweek special-case corruption
+Probability: Medium
+Impact: High
+Mitigation:
+Many fixtures per Gameweek/team as normal relation.
+
+R-03-009 — Provider selectionId globally unique assumption
+Probability: Medium
+Impact: Critical
+Mitigation:
+Market + selection + handicap context.
+
+R-03-010 — Bookmaker confused with provider
+Probability: High
+Impact: High
+Mitigation:
+Separate provider/operator fields.
+
+R-03-011 — Market names merged despite settlement differences
+Probability: High
+Impact: Critical
+Mitigation:
+Settlement profile and semantic matching.
+
+R-03-012 — Odds updates overwrite history
+Probability: Medium
+Impact: Critical
+Mitigation:
+Append-only quote table.
+
+R-03-013 — System time confused with source time
+Probability: High
+Impact: Critical
+Mitigation:
+Separate timestamp fields and backtest policy.
+
+R-03-014 — Bitemporal overlap
+Probability: Medium
+Impact: High
+Mitigation:
+Range/exclusion constraints and tests.
+
+R-03-015 — Entity merge destroys audit
+Probability: Medium
+Impact: High
+Mitigation:
+Explicit merge relation; no hard delete.
+
+R-03-016 — Incorrect merge propagates to projections
+Probability: Medium
+Impact: Critical
+Mitigation:
+Review thresholds; impacted-run invalidation; split workflow.
+
+R-03-017 — JSONB becomes ungoverned dumping ground
+Probability: High
+Impact: High
+Mitigation:
+Relational canonical fields; schema review.
+
+R-03-018 — UUIDv7 creation time exposed publicly
+Probability: Low/Medium
+Impact: Low/Medium
+Mitigation:
+Public opaque IDs; do not infer business time.
+
+R-03-019 — Provider ID reuse
+Probability: Medium
+Impact: High
+Mitigation:
+Temporal/context scope; source monitoring.
+
+R-03-020 — Historical backtest uses current mapping
+Probability: High
+Impact: Critical
+Mitigation:
+as-of mapping and source bundle.
+
+R-03-021 — External mapping licence breached
+Probability: Medium
+Impact: Critical
+Mitigation:
+licence metadata/access controls.
+
+R-03-022 — Player personal data over-collected
+Probability: Low/Medium
+Impact: High
+Mitigation:
+data minimisation and restricted fields.
+
+R-03-023 — Fixture provider merge accepted blindly
+Probability: Medium
+Impact: High
+Mitigation:
+evidence/review and canonical relation.
+
+R-03-024 — Current view hides uncertainty
+Probability: Medium
+Impact: High
+Mitigation:
+mapping status/confidence in interfaces.
+
+R-03-025 — Model version mutable
+Probability: Medium
+Impact: Critical
+Mitigation:
+immutable artefact/version hash.
+
+R-03-026 — Decision recommendation overwritten
+Probability: Medium
+Impact: Critical
+Mitigation:
+new DecisionRun per update.
+
+R-03-027 — Source time missing
+Probability: High
+Impact: High
+Mitigation:
+explicit unknown state; provider-specific cutoff policy.
+
+R-03-028 — Different Unicode forms fail exact comparison
+Probability: Medium
+Impact: Medium
+Mitigation:
+NFC plus derived matching keys.
+
+R-03-029 — Compatibility normalization causes false match
+Probability: Low/Medium
+Impact: High
+Mitigation:
+NFKC matching feature only, raw/NFC preserved.
+
+R-03-030 — Schema evolves without migration
+Probability: Medium
+Impact: Critical
+Mitigation:
+Alembic, versioned contracts, tests.
+
+======================================================================
+38. SOURCE REGISTER
+======================================================================
+
+Research access date for web sources:
+2026-07-16
+
+----------------------------------------------------------------------
+SRC-ID-2024-001
+Title:
+RFC 9562 — Universally Unique IDentifiers (UUIDs)
+
+Authors/organisation:
+K. Davis, B. Peabody, P. Leach; IETF/RFC Editor
+
+Publication date:
+2024-05
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc9562
+
+Relevant claim:
+UUIDs are 128-bit identifiers requiring no central registration. UUIDv7 uses a
+Unix-epoch millisecond time-ordered field and is intended for improved ordering
+and database locality.
+
+Reliability:
+HIGH official RFC.
+
+Licensing:
+RFC citation/implementation terms apply.
+
+Pulse reliance:
+YES for internal canonical ID format.
+
+Future verification:
+On RFC update/errata or implementation change.
+
+----------------------------------------------------------------------
+SRC-PROV-2013-001
+Title:
+PROV-DM: The PROV Data Model / PROV-O
+
+Organisation:
+World Wide Web Consortium
+
+Publication date:
+2013-04-30
+
+URLs:
+https://www.w3.org/TR/prov-dm/
+https://www.w3.org/TR/prov-o/
+
+Relevant claim:
+Provenance can be represented through entities, activities and agents with
+derivation, attribution and generation relationships.
+
+Reliability:
+HIGH W3C Recommendation.
+
+Pulse reliance:
+YES, adapted for lineage.
+
+Future verification:
+On successor standard.
+
+----------------------------------------------------------------------
+SRC-DB-2026-001
+Title:
+PostgreSQL Range Types and Constraints Documentation
+
+Organisation:
+PostgreSQL Global Development Group
+
+URL:
+https://www.postgresql.org/docs/current/rangetypes.html
+
+Relevant claim:
+PostgreSQL range types and exclusion constraints support non-overlapping
+interval integrity.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for bitemporal/effective ranges.
+
+Future verification:
+On PostgreSQL version pin/upgrade.
+
+----------------------------------------------------------------------
+SRC-DB-2026-002
+Title:
+PostgreSQL JSON Types Documentation
+
+Organisation:
+PostgreSQL Global Development Group
+
+URL:
+https://www.postgresql.org/docs/current/datatype-json.html
+
+Relevant claim:
+PostgreSQL provides JSON/JSONB, with JSONB supporting efficient processing and
+indexing.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES, but JSONB restricted to semi-structured metadata/raw extensions.
+
+Future verification:
+On database upgrade.
+
+----------------------------------------------------------------------
+SRC-TEXT-2025-001
+Title:
+Unicode Standard Annex #15 — Unicode Normalization Forms
+
+Organisation:
+Unicode Consortium
+
+Update date:
+2025-07-30 version visible at access
+
+URL:
+https://unicode.org/reports/tr15/
+
+Relevant claim:
+Unicode defines canonical and compatibility equivalence and NFC/NFD/NFKC/NFKD
+normalisation.
+
+Reliability:
+HIGH official Unicode standard annex.
+
+Pulse reliance:
+YES for alias normalization.
+
+Future verification:
+On Unicode/runtime upgrade.
+
+----------------------------------------------------------------------
+SRC-ER-1969-001
+Title:
+A Theory for Record Linkage
+
+Authors:
+Ivan P. Fellegi and Alan B. Sunter
+
+Publication date:
+1969
+
+Persistent citation:
+Journal of the American Statistical Association, 64(328)
+
+Relevant claim:
+Probabilistic record linkage combines comparison evidence to classify
+match/nonmatch when common unique identifiers are absent.
+
+Reliability:
+HIGH foundational peer-reviewed methodology.
+
+Pulse reliance:
+YES conceptually; modern implementation must be validated.
+
+Future verification:
+Stable.
+
+----------------------------------------------------------------------
+SRC-ER-2022-002
+Title:
+(Almost) All of Entity Resolution
+
+Authors:
+Olivier Binette and Rebecca C. Steorts
+
+Publication date:
+2022
+
+URL:
+https://www.science.org/doi/10.1126/sciadv.abi8021
+
+Relevant claim:
+Entity resolution includes linkage/deduplication uncertainty and requires
+careful statistical and operational design beyond simple string matching.
+
+Reliability:
+HIGH peer-reviewed review/methods article.
+
+Pulse reliance:
+YES conceptually.
+
+Future verification:
+Every two years.
+
+----------------------------------------------------------------------
+SRC-ER-SPLINK-001
+Title:
+Splink — Probabilistic Record Linkage Documentation
+
+Organisation:
+UK Ministry of Justice analytical services/open-source project
+
+URL:
+https://moj-analytical-services.github.io/splink/
+
+Relevant claim:
+Splink implements probabilistic entity resolution for datasets without unique
+identifiers and supports term-frequency and fuzzy comparison approaches.
+
+Reliability:
+MODERATE/HIGH official project documentation; production suitability requires
+Pulse benchmark.
+
+Pulse reliance:
+CANDIDATE implementation.
+
+Future verification:
+Before library selection and version upgrade.
+
+----------------------------------------------------------------------
+SRC-SPORTS-2023-001
+Title:
+SportsML-G2 Guidelines — Keys and Identifiers
+
+Organisation:
+International Press Telecommunications Council
+
+Update date:
+2023-06-19
+
+URL:
+https://iptc.org/std/SportsML/guidelines/
+
+Relevant claim:
+Sports data interchange requires an explicit strategy to unambiguously identify
+players, teams, leagues and events rather than relying on labels.
+
+Reliability:
+HIGH official open sports-data standard guidance.
+
+Pulse reliance:
+YES conceptually, not full XML conformance.
+
+Future verification:
+On SportsML update.
+
+----------------------------------------------------------------------
+SRC-SPORTRADAR-2026-001
+Title:
+Sportradar Soccer ID Handling
+
+Organisation:
+Sportradar
+
+URL:
+https://developer.sportradar.com/soccer/docs/soccer-ig-id-handling
+
+Relevant claims:
+- IDs apply to competitions, seasons, teams, players, venues and matches.
+- Soccer uses SR IDs; other products may use UUIDs.
+- Mapping APIs translate identifier systems.
+- Merge mapping feeds exist for players and competitors.
+- mappings should be cached and merge history reconciled.
+- season IDs are stable once created according to the documentation.
+
+Reliability:
+HIGH for provider contract/documentation; actual access and licence require
+contract/proof.
+
+Pulse reliance:
+CANDIDATE provider design and general mapping evidence.
+
+Future verification:
+On provider/version change.
+
+----------------------------------------------------------------------
+SRC-BETFAIR-2026-001
+Title:
+Betfair Exchange API — listRunnerBook / Handicap Market Guidance
+
+Organisation:
+Betfair
+
+URLs:
+https://betfair-developer-docs.atlassian.net/wiki/spaces/1smk3cen4v3lu3yomq5qye0ni/pages/2687847/listRunnerBook
+https://support.developer.betfair.com/hc/en-us/articles/360016170431-How-do-I-place-bets-on-handicap-markets
+
+Relevant claim:
+A runner request uses marketId, selectionId and, for relevant handicap markets,
+the handicap value.
+
+Reliability:
+HIGH official provider documentation.
+
+Pulse reliance:
+YES for composite provider-selection mapping if Betfair used.
+
+Future verification:
+On API version change.
+
+----------------------------------------------------------------------
+SRC-ODDSAPI-2026-001
+Title:
+The Odds API V4 Documentation
+
+Organisation:
+The Odds API
+
+URL:
+https://the-odds-api.com/liveapi/guides/v4/
+
+Relevant claim:
+The API supplies event objects with bookmaker markets/outcomes and event-scoped
+odds endpoints.
+
+Reliability:
+HIGH for documented interface; target coverage requires test.
+
+Pulse reliance:
+CANDIDATE.
+
+Future verification:
+Before provider selection/version change.
+
+----------------------------------------------------------------------
+SRC-ODDSAPI-2026-002
+Title:
+The Odds API Historical Odds Data
+
+Organisation:
+The Odds API
+
+URL:
+https://the-odds-api.com/historical-odds-data/
+
+Relevant claim:
+Historical data are delivered as snapshots representing events and bookmaker
+odds at a point in time; historical event IDs can be queried.
+
+Reliability:
+HIGH provider documentation.
+
+Pulse reliance:
+CANDIDATE; timestamp semantics inform schema.
+
+Future verification:
+Before plan purchase and API update.
+
+----------------------------------------------------------------------
+SRC-ODDSAPI-2026-003
+Title:
+The Odds API Source IDs
+
+Organisation:
+The Odds API
+
+URL:
+https://the-odds-api.com/liveapi/guides/v4/api-error-codes.html
+
+Relevant claim:
+Optional `sids` can expose bookmaker source IDs for events, markets or betting
+selections.
+
+Reliability:
+HIGH provider documentation for feature existence.
+
+Pulse reliance:
+OPTIONAL; all SIDs remain scoped external IDs.
+
+Future verification:
+On API change.
+
+----------------------------------------------------------------------
+SRC-FPL-API-2026-001
+Title:
+FPL bootstrap-static JSON Endpoint
+
+Organisation:
+Fantasy Premier League
+
+URL:
+https://fantasy.premierleague.com/api/bootstrap-static/
+
+Publication date:
+Undocumented living endpoint
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+The official FPL web application currently exposes structured season/game data,
+including collections commonly used for events, teams and player elements.
+
+Reliability:
+MODERATE/HIGH for observed current payload; LOW as a guaranteed stable public
+contract.
+
+Licensing:
+Public accessibility does not establish storage/commercial rights.
+
+Pulse reliance:
+PROVISIONAL; target-season contract tests required.
+
+Future verification:
+At 2026/27 launch and daily schema monitor.
+
+----------------------------------------------------------------------
+SRC-FPL-API-2026-002
+Title:
+FPL Fixtures JSON Endpoint
+
+Organisation:
+Fantasy Premier League
+
+URL:
+https://fantasy.premierleague.com/api/fixtures/
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+The official FPL application exposes fixture records and Gameweek/event
+assignment fields in the current reference interface.
+
+Reliability:
+MODERATE/HIGH as observed endpoint; undocumented stability.
+
+Pulse reliance:
+PROVISIONAL.
+
+Future verification:
+At launch and daily.
+
+----------------------------------------------------------------------
+SRC-DATACITE-2026-001
+Title:
+DataCite Metadata Schema 4.7
+
+Organisation:
+DataCite
+
+Release date:
+2026-03-03
+
+URL:
+https://schema.datacite.org/
+
+Relevant claim:
+Persistent-resource metadata benefits from explicit identifiers, related
+identifiers, version/status and relation types.
+
+Reliability:
+HIGH official metadata standard.
+
+Pulse reliance:
+CONCEPTUAL for artefact/model/dataset metadata.
+
+Future verification:
+On schema release.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 — Master Architecture and Product Definition
+
+Relevant claim:
+Requires audit-ready, time-safe, modular domain architecture.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-01 — Research Standard and Evidence Register
+
+Relevant claim:
+Defines source, claim, provenance, licensing and verification governance.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-02 — FPL Rules, Scoring and Season Configuration
+
+Relevant claim:
+Defines ruleset IDs, Gameweek semantics, player-season position, price units,
+chips and immutable configuration.
+
+Pulse reliance:
+YES.
+
+======================================================================
+39. ACCEPTANCE CRITERIA
+======================================================================
+
+DMFP-03 is accepted when Sebastian confirms:
+
+A. Identity
+[ ] Pulse owns canonical IDs.
+[ ] UUIDv7 is acceptable for internal identity.
+[ ] Provider IDs are scoped mappings, not PKs.
+[ ] Names and times never define identity alone.
+
+B. Football/FPL
+[ ] Player persists across club transfers.
+[ ] PlayerFPLSeason is separate from Player.
+[ ] TeamSeason is separate from Team.
+[ ] Fixture revisions preserve postponement history.
+[ ] Gameweek assignment is explicit and temporal.
+[ ] Double Gameweek is a normal relationship.
+
+C. Betting
+[ ] Provider differs from bookmaker/exchange.
+[ ] MarketDefinition differs from Market.
+[ ] Selection is market-scoped.
+[ ] Settlement profile is part of market semantics.
+[ ] Odds snapshots/quotes are immutable.
+[ ] Exchange ladder is representable.
+
+D. Forecasting/decision
+[ ] Runs and versions are immutable.
+[ ] Projection outcome is separate from actual outcome.
+[ ] Decision revisions create new runs.
+[ ] Backtests store exact information cutoffs and lineage.
+
+E. Entity resolution
+[ ] No name-only player merge.
+[ ] Mapping confidence/evidence is stored.
+[ ] Manual review exists.
+[ ] Merge/split preserve history.
+[ ] Historical IDs can map across seasons.
+
+F. Temporal/provenance
+[ ] Valid time and system time are distinct.
+[ ] Closed-open intervals are used.
+[ ] Raw sources and canonical facts are linked.
+[ ] Current view is query-derived.
+
+G. Implementation
+[ ] Relational core is preferred over JSONB.
+[ ] Constraints and golden tests are mandatory.
+[ ] Unresolved critical records are quarantined.
+[ ] Licensing controls external ID/raw exposure.
+
+======================================================================
+40. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Create PostgreSQL schemas listed in Section 27.
+2. Implement RFC 9562 UUIDv7 generation with one approved library.
+3. Create canonical_entity and typed entity tables.
+4. Create source_snapshot, source_bundle and ingestion_run first.
+5. Create data_provider and external_identifier.
+6. Create entity_alias with raw/NFC/match keys.
+7. Implement range/system-time primitives and nonoverlap tests.
+8. Create competition, season, team, team_season, player and membership.
+9. Create FPL season/Gameweek/player-season.
+10. Create fixture, fixture_revision and Gameweek assignment.
+11. Import current/reference FPL data into staging only.
+12. Create provider mapping/review workflow.
+13. Create betting operator subtypes.
+14. Create market definition, settlement profile, market and selection.
+15. Create odds snapshot/quote/exchange ladder.
+16. Create model/version/projection run.
+17. Create price, squad, transfer, chip and decision entities.
+18. Create backtest and dataset lineage.
+19. Implement current/as-of views.
+20. Implement quarantine and data-quality reports.
+21. Build player/fixture/market golden resolution sets.
+22. Run target-season launch import through staging and review.
+23. Prohibit downstream optimisation until canonical mapping health passes.
+
+Suggested commands:
+
+    dmf data migrate
+    dmf data validate
+    dmf identity import-fpl --season 2026_27 --staging
+    dmf identity candidates --entity player
+    dmf identity review
+    dmf fixture reconcile
+    dmf market reconcile
+    dmf data health
+    dmf data lineage <uuid>
+    dmf data as-of --timestamp <utc>
+
+======================================================================
+41. OPEN QUESTIONS
+======================================================================
+
+IDENTIFIERS
+-----------
+1. Which UUIDv7 Python/PostgreSQL implementation will be approved?
+2. Should public APIs use separate UUIDv4 aliases?
+3. Does any selected provider guarantee global/nonreused IDs?
+4. Is FPL `code` useful as a supporting cross-season feature, and with what
+   evidence?
+5. Which provider crosswalk is primary for historical players?
+
+ENTITY RESOLUTION
+-----------------
+6. Is date of birth lawfully available from selected providers?
+7. What match threshold requires human review?
+8. Should Splink be used or a smaller custom linkage model?
+9. Who reviews unresolved player mappings during deadline week?
+10. How will corrected false merges invalidate dependent artefacts?
+
+FIXTURES
+--------
+11. Which source is canonical for football fixture identity?
+12. What official evidence distinguishes replay from reschedule?
+13. How will fixtures outside FPL but relevant to rotation be represented?
+14. Will European/cup fixtures use the same Fixture model?
+15. What is the target-season behaviour of FPL fixture IDs after postponement?
+
+BETTING
+-------
+16. Which provider exposes stable bookmaker/operator IDs?
+17. Are provider source IDs licensed for storage?
+18. How are operator brands/jurisdictions represented?
+19. How many settlement-profile variants exist for player props?
+20. Does Betfair player/team runner mapping remain stable enough to cache?
+21. How are markets with no provider market ID identified idempotently?
+22. How are same-game combination selections represented or excluded?
+
+TEMPORAL
+--------
+23. Will PostgreSQL native temporal constraints be used or explicit exclusion
+    constraints only?
+24. How is system time maintained: triggers, append-only application logic or
+    temporal extension?
+25. What source timestamp is authoritative for each provider?
+26. How are stream sequence gaps represented?
+
+STORAGE
+-------
+27. What odds volume requires partitioning?
+28. Which raw payloads may be stored under licence?
+29. How long are provider mappings retained?
+30. Which full distributions stay in Postgres versus Parquet?
+31. Should entity provenance be exposed as W3C PROV/JSON-LD later?
+
+FPL
+---
+32. What fields and IDs exist in the launched 2026/27 payload?
+33. Are FPL Gameweek/fixture IDs stable through schedule changes?
+34. How is Sebastian's squad state imported safely?
+35. How are Free Hit temporary ownership spells represented after target rules
+    verification?
+
+======================================================================
+42. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Recommended next:
+DMFP-04 — DATA SOURCES, MARKETS, APIS AND LICENSING
+
+Reason:
+The canonical schema now defines exactly what provider research must determine:
+
+- identifier scope and stability;
+- player/team/fixture crosswalks;
+- market and selection IDs;
+- source/operator distinction;
+- timestamps;
+- historical snapshots;
+- merge mappings;
+- raw-storage rights;
+- public/derived-use rights;
+- lineup/availability coverage.
+
+DMFP-04 should evaluate each provider against these contracts and supply sample
+payloads for the staging adapters.
+
+======================================================================
+43. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-16
+- Established UUIDv7 internal identity policy.
+- Separated canonical, external and public identifiers.
+- Added entity registry, aliases and temporal external mappings.
+- Added Unicode-normalized matching policy.
+- Defined competition, season, Gameweek, team, player and membership.
+- Separated Player from PlayerFPLSeason.
+- Defined Fixture, revisions and Gameweek assignments.
+- Resolved postponement and Double Gameweek semantics.
+- Separated provider, bookmaker and exchange.
+- Defined canonical market definitions, settlement profiles, markets and
+  selections.
+- Added market-scoped Betfair runner identity.
+- Defined immutable odds snapshots, quotes and exchange ladders.
+- Defined lineup, availability and projections.
+- Defined model/dataset versions.
+- Defined squad, transfer, chip, price and decision entities.
+- Defined backtest/source lineage.
+- Added entity-resolution, merge and split workflows.
+- Added PostgreSQL schema inventory, temporal constraints and tests.
+- Added source register, risks, acceptance criteria and Codex contract.
+
+Future v1.0:
+- Sebastian approves identity decisions.
+- PostgreSQL schemas/migrations implemented.
+- UUID implementation selected.
+- reference FPL payload imported into staging.
+- entity-resolution golden set created.
+- first provider mappings proven.
+- target-season 2026/27 IDs captured after launch.
+- all BLOCKING identity questions resolved.
+
+END OF DOCUMENT

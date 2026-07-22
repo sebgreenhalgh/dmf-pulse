@@ -1,0 +1,592 @@
+{
+  "exclusions": [
+    "Git metadata, virtual environments, caches, builds, coverage HTML, and review output",
+    "generated FND-001 evidence except the immutable baseline manifest",
+    "the current manifest itself"
+  ],
+  "files": [
+    {
+      "bytes": 772,
+      "path": ".codex/README.md",
+      "sha256": "a11064ca766c7ac136642950118ca1a9309ea812634d2822e23091ccfc35c4cd"
+    },
+    {
+      "bytes": 1321,
+      "path": ".codex/prompts/implement_foundation.txt",
+      "sha256": "4d12f50b57d056409861fb75c6c4655b8207202fff980dadd086555f7dd86898"
+    },
+    {
+      "bytes": 898,
+      "path": ".codex/prompts/review_ticket.txt",
+      "sha256": "696e20a7c69aca7d96f56a778133f6869cc3c9437a0fe8dd23bcf9c796b4f3e1"
+    },
+    {
+      "bytes": 2637,
+      "path": ".codex/schemas/codex_result.schema.json",
+      "sha256": "35372e4abd1f5951e35da6488ae71b85831efaf3742704b2a079039f0d8c359a"
+    },
+    {
+      "bytes": 916,
+      "path": ".codex/schemas/evidence_manifest.schema.json",
+      "sha256": "b159855bc320d2ec5b6cb42f417aff14e5615cb8cc45630eaf3f11a5ef20e10b"
+    },
+    {
+      "bytes": 1328,
+      "path": ".codex/schemas/review_manifest.schema.json",
+      "sha256": "6c65db0a9b33fb7103be3176fbf6a129704f3d8096128a7ed5d30c56bfe85d06"
+    },
+    {
+      "bytes": 260,
+      "path": ".editorconfig",
+      "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
+    },
+    {
+      "bytes": 283,
+      "path": ".gitattributes",
+      "sha256": "8366f8f99d6cc0bf5dae9106fa305c4c6477fc13761b98b2e2cf572252e61ece"
+    },
+    {
+      "bytes": 100,
+      "path": ".github/CODEOWNERS",
+      "sha256": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2"
+    },
+    {
+      "bytes": 1528,
+      "path": ".github/workflows/ci.yml",
+      "sha256": "369b762a17a47b7c6085405766dd327ccededd1be4acce00cc25751cac47fbe8"
+    },
+    {
+      "bytes": 1058,
+      "path": ".github/workflows/windows-smoke.yml",
+      "sha256": "aa66dad50299c5ef5f38f1ef22eb3b6de7c8c5a4024a2e9160aff0a91bbb7a97"
+    },
+    {
+      "bytes": 579,
+      "path": ".gitignore",
+      "sha256": "0f5d39f295419280862681317f068f29448b52d0a131e544dddfe5cc1370416f"
+    },
+    {
+      "bytes": 5,
+      "path": ".python-version",
+      "sha256": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    {
+      "bytes": 40,
+      "path": ".secret-scan-allowlist.json",
+      "sha256": "ec02687fce37745e4bf358be3a2266405920617fc8b854ce2f4887e9bc5ce142"
+    },
+    {
+      "bytes": 3059,
+      "path": "AGENTS.md",
+      "sha256": "c87e65f316be882f63936987b3e053f7cf6c7f211d7d15ea745a1a62ada49575"
+    },
+    {
+      "bytes": 258,
+      "path": "CHANGELOG.md",
+      "sha256": "516b0047e183844762430dd8c9363a7f4a69174e99a32bebc4f3f2272e4644ae"
+    },
+    {
+      "bytes": 1087,
+      "path": "CODE_REVIEW.md",
+      "sha256": "5c21e9ad7085a897f1676046d445be5dd298c24d33ee2cc2d56a9fe42a0a5021"
+    },
+    {
+      "bytes": 965,
+      "path": "CONTRIBUTING.md",
+      "sha256": "e98bdde62ecb5c95f380ceea8670f57eb8f083e395aec3eadbd4d551fa6f1005"
+    },
+    {
+      "bytes": 749,
+      "path": "LICENSE",
+      "sha256": "5f7d53fc26c890460d0a648a1a6296fb62d8ee99b26cfe5edfa1520065fbac5a"
+    },
+    {
+      "bytes": 577,
+      "path": "Makefile",
+      "sha256": "83d2dce7af3e1768927c915ded107eb4b0417575c2d9e4a916c8ab3ce5e0f250"
+    },
+    {
+      "bytes": 8867,
+      "path": "PLANS.md",
+      "sha256": "51108cc850be31133b3ec6de573ef9543581c7691d606a2f04fb060c1c89e4ae"
+    },
+    {
+      "bytes": 2339,
+      "path": "README.md",
+      "sha256": "a95af88eb01859a2c14011ff90566a2bf77b0ceff26db30a71ba7892d693f5eb"
+    },
+    {
+      "bytes": 1248,
+      "path": "SECURITY.md",
+      "sha256": "ff9911253ab65a446eca9a675f28442b72d0c129adda6f3f29ed4e8f0ff08917"
+    },
+    {
+      "bytes": 1,
+      "path": "artifacts/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "bytes": 196,
+      "path": "config/base/application.yaml",
+      "sha256": "e28e802b07277bc47663ad9ce62ff57f648a1beb6e666665c31ad79b8da9034d"
+    },
+    {
+      "bytes": 54,
+      "path": "config/environments/development.yaml",
+      "sha256": "6b5d79e01c584377b502b64c6914d9af16e65ee9a432580f5b206f83a7fcdaa7"
+    },
+    {
+      "bytes": 49,
+      "path": "config/environments/test.yaml",
+      "sha256": "e2ae2492b97dc9bce5c07de2d6c1c0cac49d0c5765419fa007b3696cb7941272"
+    },
+    {
+      "bytes": 852,
+      "path": "docs/adr/ADR-FND-001-TOOLCHAIN.md",
+      "sha256": "7bd7e4b356ca098106f13ef2ec5650cccd35550e10338ae61e9d97368aadeee2"
+    },
+    {
+      "bytes": 922,
+      "path": "docs/architecture/foundation.md",
+      "sha256": "52a80ae855c8856379545d41cec604b6b36c045a2244b4771230aa62dd1af70b"
+    },
+    {
+      "bytes": 86551,
+      "path": "docs/implementation/DMF_PULSE_CODEX_IMPLEMENTATION_PLAYBOOK_v1.txt",
+      "sha256": "43cf9f683c7c06740401e435b420e5372e43a8327fad616ce1e7b17f0344b893"
+    },
+    {
+      "bytes": 830,
+      "path": "docs/operations/codex_workflow.md",
+      "sha256": "26d4de37b71f26f80ca7170e5bb18a515800d216e4e1acfb87d26efdfc56e238"
+    },
+    {
+      "bytes": 785,
+      "path": "docs/operations/development_host.md",
+      "sha256": "3bed3aa4d35219ba4d56dd6bc0234a20e4e0db87e007bbd483d0128e38299ac2"
+    },
+    {
+      "bytes": 927,
+      "path": "docs/operations/secret_scan_allowlist.md",
+      "sha256": "12bd6125557b4421ebd0794491307bebe827d40050edc4debda7bfa3448661ea"
+    },
+    {
+      "bytes": 1030,
+      "path": "docs/operations/windows_and_linux_setup.md",
+      "sha256": "872e33dbd30f774729ef2fb8bfb6638e4e10341dfce5a12c61b56714085e7b10"
+    },
+    {
+      "bytes": 281,
+      "path": "evidence/tickets/FND-001/baseline_manifest.json",
+      "sha256": "98097c8ad7c4cf11441cfc56263849c226095b0933607fe63d4021af07830fad"
+    },
+    {
+      "bytes": 1882,
+      "path": "pyproject.toml",
+      "sha256": "10071e346aa15070a71ea56ce9ec7a53c06cd195ce1531a49739d0a12ef2fe0d"
+    },
+    {
+      "bytes": 1524,
+      "path": "scripts/build_review_pack.py",
+      "sha256": "8449a4f805bb9c985331c831c694b7879338751fc64172f1d075fef59d002dbf"
+    },
+    {
+      "bytes": 781,
+      "path": "scripts/calculate_review_payload.py",
+      "sha256": "42579e79935a2023395bf7936f963b9b4848a56bbb29d6ad0a1678360246b1ea"
+    },
+    {
+      "bytes": 7177,
+      "path": "scripts/generate_dependency_report.py",
+      "sha256": "819804bce394bf325e4291f20f0825a2420c2dc3910b871e91aadf38c944c096"
+    },
+    {
+      "bytes": 16644,
+      "path": "scripts/generate_final_evidence.py",
+      "sha256": "778322664f14fef436a44cd70567df5a7e79c7313fdaad7e4db9fecfddcb460e"
+    },
+    {
+      "bytes": 901,
+      "path": "scripts/generate_repository_manifest.py",
+      "sha256": "3980862a91869d1e8a2a34efae2083403e9b39d707b4dde923db3d415bfaf266"
+    },
+    {
+      "bytes": 8295,
+      "path": "scripts/run_acceptance.py",
+      "sha256": "05a734081ebefaf56059ecd1264458196cdf6e76bc2e37e962ea0721d357f78a"
+    },
+    {
+      "bytes": 1061,
+      "path": "scripts/scan_secrets.py",
+      "sha256": "1645db9a607d26dfd53337f0116bbd640fa6082e41258d8dc389f900145e2da1"
+    },
+    {
+      "bytes": 30925,
+      "path": "scripts/validate_repository.py",
+      "sha256": "6658ce7a89403208ce8afd0ba8eef644efe52585e55ee3c919832e66973107ed"
+    },
+    {
+      "bytes": 10213,
+      "path": "scripts/verify_wheel.py",
+      "sha256": "3d325b94ec07e3420d477d52106e26ed277d5364b08de222c1c66f76b0c94300"
+    },
+    {
+      "bytes": 98771,
+      "path": "specs/approved/DMFP-00_MASTER_ARCHITECTURE_AND_PRODUCT_DEFINITION.txt",
+      "sha256": "b003c63b392f43dcd2278333af5052ac3330f520b3506cd2a9a2b2d4a0b444a3"
+    },
+    {
+      "bytes": 117021,
+      "path": "specs/approved/DMFP-01_RESEARCH_STANDARD_AND_EVIDENCE_REGISTER.txt",
+      "sha256": "07e35fcba49155e4fd6a149f513172ad72f31dc4aec231d8f9255ca3c2c5b9d6"
+    },
+    {
+      "bytes": 107092,
+      "path": "specs/approved/DMFP-02_FPL_RULES_SCORING_AND_SEASON_CONFIGURATION.txt",
+      "sha256": "7080479a784d57a334f0b3ed8c9bd465c89434729e5f7599f666c269bec11916"
+    },
+    {
+      "bytes": 107465,
+      "path": "specs/approved/DMFP-03_CANONICAL_DATA_MODEL_AND_IDENTIFIERS.txt",
+      "sha256": "f3ecc7bb990e4f3ae0dcedb06438e04cd5516b156c9130fdc542dcd09dcd58ab"
+    },
+    {
+      "bytes": 109820,
+      "path": "specs/approved/DMFP-04_DATA_SOURCES_MARKETS_APIS_AND_LICENSING_ZERO_COST_v1.0.txt",
+      "sha256": "7a29960e3d6dba3f4ed0b4e0d5819e0d8e2ddbd70b79dcf6376b310b59368b85"
+    },
+    {
+      "bytes": 96676,
+      "path": "specs/approved/DMFP-05_INGESTION_STORAGE_AND_DATA_QUALITY.txt",
+      "sha256": "de024be01f8e1fdd1bae259ffe9230508870830644da67dc61639cb70cd943dd"
+    },
+    {
+      "bytes": 79029,
+      "path": "specs/approved/DMFP-06_ODDS_NORMALISATION_AND_MARKET_CONSENSUS.txt",
+      "sha256": "af171422026588db3e4f93301df3af686b3312cdd40dd0cf8c77b35174ec6e6c"
+    },
+    {
+      "bytes": 82803,
+      "path": "specs/approved/DMFP-07_PLAYER_AVAILABILITY_START_AND_MINUTES_MODEL.txt",
+      "sha256": "e6c70afced2e702d99e321a424cec7fbf6c9fccbc91191717566f4aef66d2626"
+    },
+    {
+      "bytes": 82581,
+      "path": "specs/approved/DMFP-08_FOOTBALL_EVENT_DISTRIBUTION_ENGINE.txt",
+      "sha256": "7cb378f26741d28e6b900530102dfdbd2286470c5b8920764792eb70834c18ff"
+    },
+    {
+      "bytes": 74425,
+      "path": "specs/approved/DMFP-09_FPL_POINTS_DISTRIBUTION_ENGINE.txt",
+      "sha256": "1b5ee04f0b57f604072b6536fc8e60be19a0590f101f095614639af7cedd36da"
+    },
+    {
+      "bytes": 88070,
+      "path": "specs/approved/DMFP-10_UNCERTAINTY_SCENARIOS_AND_EARLY_SEASON_POLICY.txt",
+      "sha256": "5914251e325cd4b57f63413820c5d6a0612f6c33cbf73e7e003624d5faf6cf68"
+    },
+    {
+      "bytes": 78300,
+      "path": "specs/approved/DMFP-11_PRICE_CHANGE_AND_TEAM_VALUE_MODEL.txt",
+      "sha256": "32f831e4a249d10cd08323394a713fdd4084b297400503791e410f133184220e"
+    },
+    {
+      "bytes": 94914,
+      "path": "specs/approved/DMFP-12_SQUAD_TRANSFER_AND_LINEUP_OPTIMISER.txt",
+      "sha256": "cba15ba9c72ff68c0ea8dca6ac5cf9075bbb34eefca06e86060cf33f824a84f6"
+    },
+    {
+      "bytes": 86905,
+      "path": "specs/approved/DMFP-13_CAPTAINCY_AND_CHIP_OPTIMISER.txt",
+      "sha256": "6d2a7df75b53e338f96924de64cc4d847ba2964cabe700641086cf9acc8144b0"
+    },
+    {
+      "bytes": 85863,
+      "path": "specs/approved/DMFP-14_RANK_EFFECTIVE_OWNERSHIP_AND_RISK_STRATEGY.txt",
+      "sha256": "e796772890db8e5f6ca9ab8d61605a60a87acf6c545a05ab82c9fc73ae99c6de"
+    },
+    {
+      "bytes": 89447,
+      "path": "specs/approved/DMFP-15_BACKTESTING_CALIBRATION_AND_BENCHMARKS.txt",
+      "sha256": "0feec95bb9a3fb31b5ccc504699681a8170d7c349c18accefc6e3047ab9a15ed"
+    },
+    {
+      "bytes": 79866,
+      "path": "specs/approved/DMFP-16_ORCHESTRATION_APIS_AND_DECISION_PIPELINE.txt",
+      "sha256": "0bf960b211f7f566ae30eed46f1f6b577606d9a8c9fd7229f122f10c64ad18f9"
+    },
+    {
+      "bytes": 103478,
+      "path": "specs/approved/DMFP-17_OBSERVABILITY_REPRODUCIBILITY_SECURITY_COMPLIANCE.txt",
+      "sha256": "83fde67e17d8171c8305707c02b90838c7ad984f651f00636bb5a26d1ecd1486"
+    },
+    {
+      "bytes": 83559,
+      "path": "specs/approved/DMFP-18_DECISION_UI_REPORTING_AND_EXPLANATIONS.txt",
+      "sha256": "6b2efa3193e6aa123e63038956f06f72dc597ce2bd169130dcaab0c160a1cd0f"
+    },
+    {
+      "bytes": 100282,
+      "path": "specs/approved/DMFP-19_CODEX_IMPLEMENTATION_ROADMAP_AND_ACCEPTANCE_TESTS.txt",
+      "sha256": "2b2aac2301956b367b8fbd7c98259ccc7e6edcc9c294038de4e79c8bcabb4691"
+    },
+    {
+      "bytes": 160816,
+      "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt",
+      "sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72"
+    },
+    {
+      "bytes": 4034,
+      "path": "specs/manifests/authority_manifest.json",
+      "sha256": "07780b214e84ac64747fdbc244fed2f480968a81fe79af4f25cf933b824ce2ee"
+    },
+    {
+      "bytes": 2689,
+      "path": "specs/manifests/decision_manifest.json",
+      "sha256": "d1dfa70f3f3df808add5aa6a42bd9dc9331c66a6cd2615d36329b5cde7813a14"
+    },
+    {
+      "bytes": 9534,
+      "path": "specs/manifests/document_manifest.json",
+      "sha256": "a236be8f097c2dfb520cfb33100fb515eb322cfd46ae20084f6c89251ed68455"
+    },
+    {
+      "bytes": 86,
+      "path": "src/dmf_pulse/__init__.py",
+      "sha256": "6cf4d51816de4d005168004656c353304f480277a7e64a245cd1c2451f557f53"
+    },
+    {
+      "bytes": 1599,
+      "path": "src/dmf_pulse/_data/zoneinfo/Europe/London",
+      "sha256": "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33"
+    },
+    {
+      "bytes": 650,
+      "path": "src/dmf_pulse/_data/zoneinfo/README.md",
+      "sha256": "82bdb338b2027caaff2590cb2ccaecbedff8bf7b35c0f0e6ccf8497e18702b8a"
+    },
+    {
+      "bytes": 729,
+      "path": "src/dmf_pulse/assurance/__init__.py",
+      "sha256": "7ee853c54a61becc5e8410d32baf109735bd40179403e3e74e429623ee882c60"
+    },
+    {
+      "bytes": 1451,
+      "path": "src/dmf_pulse/assurance/canonical.py",
+      "sha256": "687d4632f9bf4265a3b7ebfc95f61311e45cffb53b50d31645a48d08491381d2"
+    },
+    {
+      "bytes": 6596,
+      "path": "src/dmf_pulse/assurance/evidence.py",
+      "sha256": "0c95a2deb926e927c14778cae1bf88671117e9adf6cb1b7f6e68ed67732221d6"
+    },
+    {
+      "bytes": 4213,
+      "path": "src/dmf_pulse/assurance/manifests.py",
+      "sha256": "fbecdc162939a7084d127396978eafabef3c480a6249a145c435b9da6177e374"
+    },
+    {
+      "bytes": 22371,
+      "path": "src/dmf_pulse/assurance/review_pack.py",
+      "sha256": "4f338aada5680e90b14fda1d83e44a3db389d394949004fd22a35d4e88d2709e"
+    },
+    {
+      "bytes": 12568,
+      "path": "src/dmf_pulse/assurance/secret_scan.py",
+      "sha256": "10d1ea25825a956d995da45d692de2db0f88900b46314d6b3f8a36e00bb5d7cc"
+    },
+    {
+      "bytes": 45,
+      "path": "src/dmf_pulse/cli/__init__.py",
+      "sha256": "730f905d12f5fcefb162931d287cc6b6faab716c8538da88791c385f9ced8802"
+    },
+    {
+      "bytes": 2265,
+      "path": "src/dmf_pulse/cli/app.py",
+      "sha256": "a16e59a65d86253d21ce1a5548936fe2a52c6c2718ba756531772006f5cd7873"
+    },
+    {
+      "bytes": 2468,
+      "path": "src/dmf_pulse/cli/config_cmd.py",
+      "sha256": "ed61b74f132e1805f9a154e5d32ec0d2d70c2d98d37d668d691ef9f2402e3d77"
+    },
+    {
+      "bytes": 7368,
+      "path": "src/dmf_pulse/cli/doctor.py",
+      "sha256": "c0a5c3060a3bf20b43fb268ce94bccfd7789e7d78d4d12b859056ef03c987837"
+    },
+    {
+      "bytes": 916,
+      "path": "src/dmf_pulse/cli/evidence_cmd.py",
+      "sha256": "c69db2c8557c744c71d4d498b98aac34cbd86f066e5ac498a4136d8d2c00f4ca"
+    },
+    {
+      "bytes": 1469,
+      "path": "src/dmf_pulse/cli/review_pack_cmd.py",
+      "sha256": "6c575740aee88d78326cb264b6036b7e8e88eb5140052eba049425e4f7dc76af"
+    },
+    {
+      "bytes": 662,
+      "path": "src/dmf_pulse/config/__init__.py",
+      "sha256": "d9862d50fd44f976706e198a69a142a2e5ff55d42c2f3a4dc28423e5696f0811"
+    },
+    {
+      "bytes": 1274,
+      "path": "src/dmf_pulse/config/errors.py",
+      "sha256": "1d9dd32e0f8565559f0c767251260b02be4525c92462f840c17647d4d5e2c608"
+    },
+    {
+      "bytes": 5077,
+      "path": "src/dmf_pulse/config/loader.py",
+      "sha256": "8e41e964e939bae96895eac0965ff0e4f87bef2417333720108994b9bfd4af54"
+    },
+    {
+      "bytes": 5589,
+      "path": "src/dmf_pulse/config/models.py",
+      "sha256": "444c49b0a3c35d8d0114a9a0350cd90313334a530645e4dc7156db49c6f5b9c6"
+    },
+    {
+      "bytes": 1827,
+      "path": "src/dmf_pulse/config/redaction.py",
+      "sha256": "5e44ff1ba4f1facfa4c1fdf52ec00ff5c1245ed341ac6b268f948c52667a9a04"
+    },
+    {
+      "bytes": 1798,
+      "path": "src/dmf_pulse/config/sensitivity.py",
+      "sha256": "f6819975bd6ec163d33be55b7ccd3b09346f4922b7a123115222493dbdc4b78e"
+    },
+    {
+      "bytes": 1,
+      "path": "src/dmf_pulse/py.typed",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "bytes": 478,
+      "path": "src/dmf_pulse/system/__init__.py",
+      "sha256": "fcee0e398db1bd7de303ba3b680e3c315b83a5992f63f79bad650e0d1b7f1c34"
+    },
+    {
+      "bytes": 493,
+      "path": "src/dmf_pulse/system/clock.py",
+      "sha256": "634d5def436fc6f0f0e25846f8eeeb1731e2cd0c11d893764b55c23490bad2c7"
+    },
+    {
+      "bytes": 2366,
+      "path": "src/dmf_pulse/system/hardware.py",
+      "sha256": "f452d3d6380bf8aa4f2dff956337dbd3384a8b59b2dd27078e9103cd8167fb9e"
+    },
+    {
+      "bytes": 2257,
+      "path": "src/dmf_pulse/system/process.py",
+      "sha256": "592eea32f0b4d09e3e0512d283e65fafa957abe4ccec3371ae3aada1316bcb36"
+    },
+    {
+      "bytes": 1690,
+      "path": "tests/conftest.py",
+      "sha256": "5179c1dfe7b2a58dc05307c24262c12559698bc6f760c1d4bb003938411a60cd"
+    },
+    {
+      "bytes": 166,
+      "path": "tests/golden/config_error.json",
+      "sha256": "fa3fd33565fcfbe9f6d6e1a9bad2c5c7c42716b33dc3e13fd0031f5cc0b1e553"
+    },
+    {
+      "bytes": 976,
+      "path": "tests/golden/doctor.json",
+      "sha256": "361338e04ef25a4d1d0be41957598c8f2ae05dd30fbcfe389a86fe74f19e8989"
+    },
+    {
+      "bytes": 795,
+      "path": "tests/golden/doctor_blocking.json",
+      "sha256": "52d15403e19181e7f151a75f3431cd5f4c9dda8f1233068a3dc638ccfcb86258"
+    },
+    {
+      "bytes": 115,
+      "path": "tests/golden/evidence_error.json",
+      "sha256": "63d33b05b81d55670a66254be00118e6402e1c48b84ce1f7159a7de9a66d9cf3"
+    },
+    {
+      "bytes": 2770,
+      "path": "tests/integration/package/test_import_side_effects.py",
+      "sha256": "cc99371ef3a72251f9c8e8147db8ea1cedaef963c3ebe5022d31bf9517e00f70"
+    },
+    {
+      "bytes": 963,
+      "path": "tests/integration/package/test_installed_wheel.py",
+      "sha256": "ef5d9e01ec70079e64815ea694f90491583d8ce15a53334e9ffbae2f7a2062b0"
+    },
+    {
+      "bytes": 5137,
+      "path": "tests/integration/repository/test_manifests.py",
+      "sha256": "0079d50b98be3d9c38c009b5497bd3aed7f39a59d56c5953b2c0cfc9862a292e"
+    },
+    {
+      "bytes": 2635,
+      "path": "tests/property/config/test_config_properties.py",
+      "sha256": "31b562659dfe4f825f92647ac692338202305cf922e6e6e129e18285af5158aa"
+    },
+    {
+      "bytes": 5866,
+      "path": "tests/unit/assurance/test_evidence.py",
+      "sha256": "c2e5c0a9560d677e4a99ed334549063b07922246fd9b88a047d9c335bb03d526"
+    },
+    {
+      "bytes": 2722,
+      "path": "tests/unit/assurance/test_manifests.py",
+      "sha256": "94c80b2cd7b196df59610369da6d4e84f8a5c7a31a083ad958a4508e4167145d"
+    },
+    {
+      "bytes": 11929,
+      "path": "tests/unit/assurance/test_review_pack.py",
+      "sha256": "a0ddbf38e9704cf5a3e20be097f72fd3d0fde4e3bfcfe5811283af64c7936c3e"
+    },
+    {
+      "bytes": 5961,
+      "path": "tests/unit/assurance/test_secret_scan.py",
+      "sha256": "07ed9ac5688f91b6a017f1c2cc4ad506a83d578fea525b340a1d15716898c66c"
+    },
+    {
+      "bytes": 7996,
+      "path": "tests/unit/cli/test_commands.py",
+      "sha256": "8810b817ae00fee70b8fe9eb00b773366e12bb8b9d7ef286cd6677e67e592fb6"
+    },
+    {
+      "bytes": 9905,
+      "path": "tests/unit/config/test_loader.py",
+      "sha256": "fbaf8044fd378e48ad7b01583bc63bdaece1c7233b51b8ba9e89169081db8ace"
+    },
+    {
+      "bytes": 2021,
+      "path": "tests/unit/config/test_redaction.py",
+      "sha256": "5e9005b01d9eb09031cd9a6b94d1ba4e7312f250a18a0474c76cb86eba898e71"
+    },
+    {
+      "bytes": 8568,
+      "path": "tests/unit/system/test_doctor.py",
+      "sha256": "8dd0de3716f472926c597cf4b6d62022ca6af0af2e2f9c729ff0dcb2af58874a"
+    },
+    {
+      "bytes": 6484,
+      "path": "tickets/FND-001/ACCEPTANCE.md",
+      "sha256": "1efb298049c3a3de119f1eddcfaba49c0666b32f321ea9a970602b3089d6d7b2"
+    },
+    {
+      "bytes": 983,
+      "path": "tickets/FND-001/DEFINITION_OF_READY.md",
+      "sha256": "2af7532cab9510a7e8352b96c37aa7cd1c079be101d4679ec8a2700fe2bf8df8"
+    },
+    {
+      "bytes": 5015,
+      "path": "tickets/FND-001/ticket.yaml",
+      "sha256": "ca43ddb2c31a8ffa2a04d844bd5b8fd0e27715fc7a6151e8545d967c8d499840"
+    },
+    {
+      "bytes": 53012,
+      "path": "uv.lock",
+      "sha256": "5ad433774f60d5a3c50dd0c6a1d9ac7199936952765d18e66e802f9631041d9c"
+    }
+  ],
+  "schema_version": "1.0",
+  "scope": "repository-deliverables-excluding-generated-evidence",
+  "ticket_id": "FND-001"
+}

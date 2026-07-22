@@ -1,0 +1,92 @@
+{
+  "commands": [
+    {
+      "command": "uv sync --all-groups --frozen",
+      "duration_seconds": 0.043,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run ruff format --check .",
+      "duration_seconds": 0.083,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run ruff check .",
+      "duration_seconds": 0.087,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run mypy src/dmf_pulse",
+      "duration_seconds": 0.413,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing",
+      "duration_seconds": 21.629,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf --version",
+      "duration_seconds": 0.534,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf doctor --json",
+      "duration_seconds": 3.563,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf config validate --environment test --config-root config",
+      "duration_seconds": 0.455,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf config show --environment test --config-root config --json",
+      "duration_seconds": 0.448,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv build",
+      "duration_seconds": 2.597,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run python scripts/verify_wheel.py",
+      "duration_seconds": 9.486,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run python scripts/validate_repository.py",
+      "duration_seconds": 0.2,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run python scripts/scan_secrets.py",
+      "duration_seconds": 1.654,
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run dmf review-pack build --ticket FND-001 --output review_pack/FND-001",
+      "duration_seconds": 3.114,
+      "exit_code": 0,
+      "status": "PASS"
+    }
+  ],
+  "failed": 0,
+  "passed": 14,
+  "status": "COMPLETE",
+  "ticket_id": "FND-001"
+}

@@ -1,0 +1,137 @@
+
+ticket_id: "FND-001"
+stage: "A0/A1 foundation milestone"
+title: "Governed repository, toolchain, CLI, configuration, CI, evidence and review-pack foundation"
+status: "READY"
+owner: "Sebastian Greenhalgh"
+implementation_model: "GPT-5.6 Sol Ultra"
+reasoning_level: "maximum practical"
+
+objective: >-
+  Convert the empty private dmf-pulse GitHub repository into an implementation-ready,
+  installable, tested and governed Python workspace. The finished repository must expose a
+  deterministic dmf CLI, strict typed configuration, build/lock/CI quality gates, exact
+  specification/decision manifests, machine-validated evidence, and an automated review ZIP
+  containing no more than 20 files.
+
+user_visible_vertical_slice:
+  commands:
+    - "dmf --version"
+    - "dmf doctor --json"
+    - "dmf config validate --environment test --config-root config"
+    - "dmf config show --environment test --config-root config --json"
+    - "dmf evidence validate evidence/tickets/FND-001/codex_result.json"
+    - "dmf review-pack build --ticket FND-001 --output review_pack/FND-001"
+  expected: >-
+    All commands run from the installed wheel or uv environment without network/database side
+    effects; the final review ZIP is valid and contains at most 20 files.
+
+authority:
+  precedence:
+    - "DMFP-20 accepted decisions"
+    - "DMFP-19 Stage 1 and implementation rules"
+    - "DMFP-17 security, dependency and evidence controls"
+    - "DMFP-00 master constraints"
+    - "this ticket and acceptance contract"
+  decisions_file: "07_DECISIONS_RELEVANT.json"
+  source_manifest: "context/DOCUMENT_MANIFEST.json"
+
+approved_toolchain:
+  python: "3.13"
+  resolver_lock: "uv"
+  build_backend: "hatchling"
+  runtime_dependencies:
+    - "pydantic>=2,<3"
+    - "typer>=0.12,<1"
+    - "PyYAML>=6,<7"
+  development_dependencies:
+    - "ruff"
+    - "mypy"
+    - "pytest"
+    - "hypothesis"
+    - "coverage"
+    - "build"
+  forbidden_now:
+    - "PostgreSQL drivers or ORM"
+    - "FastAPI"
+    - "NumPy/SciPy/Pandas/Polars"
+    - "PyMC/NumPyro/PyTorch/JAX/CUDA packages"
+    - "Pyomo/HiGHS"
+    - "provider SDKs"
+
+permissions:
+  workspace_write: true
+  network: >-
+    Allowed only for installing the explicitly approved dependencies and consulting official
+    package/tool documentation when a concrete compatibility error requires it. No general
+    research, provider calls, or unrelated browsing.
+  git_push_merge: false
+  production_secrets: false
+  database: false
+
+required_checkpoints:
+  - "Capture initial repository baseline and hashes before edits"
+  - "Install authority/specification manifests and governance files"
+  - "Create package/build/lock foundation"
+  - "Implement strict typed configuration and redaction"
+  - "Implement CLI version, doctor, config, evidence and review-pack commands"
+  - "Implement tests, clean-wheel verification and repository validation"
+  - "Implement GitHub Actions and local cross-platform setup documentation"
+  - "Run full acceptance suite and generate evidence"
+  - "Generate final review ZIP with at most 20 files"
+
+public_contracts:
+  package_name: "dmf_pulse"
+  console_command: "dmf"
+  version: "0.1.0"
+  internal_time: "UTC"
+  default_display_timezone: "Europe/London"
+  default_compute_device: "cpu"
+  optional_accelerator: "cuda"
+
+allowed_repository_scope:
+  create_or_modify:
+    - "repository root governance/build files"
+    - ".github/**"
+    - ".codex/**"
+    - "specs/**"
+    - "tickets/FND-001/**"
+    - "config/**"
+    - "docs/**"
+    - "evidence/tickets/FND-001/**"
+    - "scripts/**"
+    - "src/dmf_pulse/**"
+    - "tests/**"
+    - "artifacts/.gitkeep"
+    - "review_pack/**"
+  forbidden:
+    - "FPL scoring or rules engine"
+    - "canonical database schemas or migrations"
+    - "provider clients or network ingestion"
+    - "odds maths"
+    - "minutes, football event or FPL points models"
+    - "optimisers, chips or rank logic"
+    - "FastAPI/server/UI"
+    - "content automation"
+
+quality_targets:
+  branch_coverage_foundation_package: ">=90%"
+  mypy: "strict for src/dmf_pulse"
+  ruff: "format and lint clean"
+  property_tests: "required for overlay determinism, redaction and manifest hashing"
+  clean_wheel: "required outside source tree"
+  test_network: "forbidden"
+  import_side_effects: "no network, database, filesystem mutation or subprocess at import"
+
+stop_conditions:
+  - "Python 3.13 cannot support an approved dependency after a minimal concrete compatibility attempt"
+  - "The repository contains a real secret or unlicensed raw payload"
+  - "An authoritative requirement conflicts with this ticket and cannot be safely isolated"
+  - "A required acceptance command cannot be made cross-platform without changing the public contract"
+  - "Completion would require a forbidden dependency or future-stage domain implementation"
+
+completion:
+  review_zip: "review_pack/FND-001/DMF_PULSE_FND-001_REVIEW.zip"
+  maximum_review_files: 20
+  codex_result_schema: "schemas/codex_result.schema.json"
+  review_manifest_schema: "schemas/review_manifest.schema.json"

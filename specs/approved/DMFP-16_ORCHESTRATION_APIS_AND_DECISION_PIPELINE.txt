@@ -1,0 +1,3510 @@
+DMF PULSE — ORCHESTRATION, APIS AND DECISION PIPELINE
+=====================================================
+
+Document ID: DMFP-16
+Version: 0.9 (Production Control Plane and Decision-Run Architecture)
+Status: PROPOSED — READY FOR IMPLEMENTATION AFTER RULE, SECURITY AND ACCEPTANCE SIGN-OFF
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 17 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Parent and dependency documents:
+- DMFP-00 — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+- DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+- DMFP-03 — CANONICAL DATA MODEL AND IDENTIFIERS
+- DMFP-04 — DATA SOURCES, MARKETS, APIS AND LICENSING
+- DMFP-05 — INGESTION, STORAGE AND DATA QUALITY
+- DMFP-06 — ODDS NORMALISATION AND MARKET CONSENSUS
+- DMFP-07 — PLAYER AVAILABILITY, START AND MINUTES MODEL
+- DMFP-08 — FOOTBALL EVENT DISTRIBUTION ENGINE
+- DMFP-09 — FPL POINTS DISTRIBUTION ENGINE
+- DMFP-10 — UNCERTAINTY, SCENARIOS AND EARLY-SEASON POLICY
+- DMFP-11 — PRICE CHANGE AND TEAM VALUE MODEL
+- DMFP-12 — SQUAD, TRANSFER AND LINEUP OPTIMISER
+- DMFP-13 — CAPTAINCY AND CHIP OPTIMISER
+- DMFP-14 — RANK, EFFECTIVE OWNERSHIP AND RISK STRATEGY
+- DMFP-15 — BACKTESTING, CALIBRATION AND BENCHMARKS
+
+Downstream consumers:
+- DMFP-17 — OBSERVABILITY, REPRODUCIBILITY, SECURITY AND COMPLIANCE
+- DMFP-18 — DECISION UI, REPORTING AND EXPLANATIONS
+- DMFP-19 — CODEX IMPLEMENTATION ROADMAP AND ACCEPTANCE TESTS
+- DMFP-20 — ASSUMPTIONS, DECISIONS AND OPEN QUESTIONS
+
+PURPOSE
+-------
+This document defines how every Pulse module runs together as one dependable,
+deadline-safe decision system.
+
+The canonical live cycle is:
+
+    Collect latest data
+    -> validate and snapshot
+    -> update player availability and minutes
+    -> normalise odds and build market consensus
+    -> generate coherent football-event distributions
+    -> generate FPL-points distributions
+    -> quantify uncertainty and scenarios
+    -> predict prices and selling-value paths
+    -> optimise squad, transfers, lineup, captain and chips
+    -> evaluate rank-aware alternatives where active
+    -> generate explanations and confidence
+    -> publish recommendations
+    -> record the complete decision state
+    -> run champion/challenger shadows and later evaluation.
+
+This document specifies:
+
+- deployment topology;
+- scheduler and worker architecture;
+- daily refresh cadence;
+- deadline-day cadence;
+- event-driven refresh;
+- task dependency graph;
+- run and task state machines;
+- failure and degradation behaviour;
+- retries, idempotency and recovery;
+- stage caching and invalidation;
+- internal HTTP APIs;
+- operation resources for long-running work;
+- API versioning and errors;
+- CLI commands;
+- manual overrides;
+- historical Gameweek replay;
+- champion/challenger execution;
+- output and artifact versioning;
+- decision publication;
+- pre-execution validation;
+- observability and service objectives;
+- implementation tests and acceptance gates.
+
+The control-plane question is:
+
+    CAN PULSE REPRODUCIBLY TURN THE EXACT INFORMATION AVAILABLE
+    BEFORE A DEADLINE INTO A LEGAL, EXPLAINED, VERSIONED DECISION
+    BEFORE IT IS TOO LATE TO ACT?
+
+If the answer is not demonstrably yes, the recommendation is not production
+ready.
+
+GOVERNING PRINCIPLE
+-------------------
+The control plane must be:
+
+- deadline aware;
+- deterministic where possible;
+- idempotent;
+- dependency explicit;
+- restartable;
+- content addressed;
+- fail closed for critical integrity;
+- degradable for optional evidence;
+- observable;
+- replayable;
+- auditable;
+- simple enough to operate privately at zero software-licence cost.
+
+Pulse will begin as a MODULAR MONOLITH with separate scheduler, API and worker
+processes sharing PostgreSQL and immutable artifact storage.
+
+It will not begin as a fleet of microservices.
+
+The architecture preserves module boundaries through:
+
+- typed Python interfaces;
+- versioned schemas;
+- task contracts;
+- immutable artifacts;
+- explicit dependency signatures;
+- OpenAPI-defined internal HTTP interfaces.
+
+Services can be separated later without changing those contracts.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require an architecture decision record.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE ARCHITECTURAL DECISIONS
+======================================================================
+
+0.1 INITIAL DEPLOYMENT
+----------------------
+Selected first production topology:
+
+- one Linux host or small private server;
+- PostgreSQL as operational state and job ledger;
+- local or S3-compatible immutable artifact storage;
+- one FastAPI internal API process;
+- one scheduler process invoked every minute;
+- a small set of queue-specific worker processes;
+- Typer-based `dmf` CLI;
+- systemd services and timers;
+- OpenTelemetry-compatible traces/log correlation;
+- Prometheus-format metrics;
+- no compulsory external message broker;
+- no public write access;
+- no automatic execution of FPL transfers, chips or lineups.
+
+0.2 CONTROL-PLANE SOURCE OF TRUTH
+---------------------------------
+PostgreSQL owns:
+
+- planned jobs;
+- task states;
+- worker leases;
+- dependency edges;
+- operation state;
+- run manifests;
+- override state;
+- publication pointers;
+- outbox events;
+- cache metadata;
+- manager decision records.
+
+Artifact files own:
+
+- large scenario matrices;
+- model outputs;
+- explanation bundles;
+- score grids;
+- Parquet datasets;
+- solver files;
+- reports.
+
+0.3 QUEUE DECISION
+------------------
+Workers claim PostgreSQL task rows using row locks with `SKIP LOCKED`.
+
+Why:
+
+- multiple workers can claim different queue rows without waiting;
+- the database already provides durability and transactions;
+- the workload is modest;
+- run state and queue state remain atomic;
+- no new operational dependency is required.
+
+`SKIP LOCKED` is suitable for a queue-like table, not for ordinary consistent
+business queries.
+
+0.4 SINGLETON DECISION
+----------------------
+Transaction-scoped PostgreSQL advisory locks protect:
+
+- scheduler planning tick;
+- one final decision run per manager/deadline/mode;
+- deadline freeze/publication;
+- model promotion;
+- historical replay namespace creation.
+
+Session-scoped locks are avoided in pooled worker code unless deliberately
+required.
+
+0.5 WAKE-UP DECISION
+--------------------
+PostgreSQL `LISTEN/NOTIFY` is used only as a low-latency wake-up hint.
+
+The durable task/outbox table remains truth.
+
+Reasons:
+
+- notifications are delivered after commit;
+- payloads are small;
+- identical notifications can be folded in one transaction;
+- consumers can disconnect;
+- table polling is still required for recovery.
+
+0.6 EXTERNAL WORKFLOW PLATFORM
+------------------------------
+Airflow, Dagster, Prefect, Temporal, Celery, Kafka and RabbitMQ are not required
+for V1.
+
+A later migration is justified only by measured need such as:
+
+- multi-host scale;
+- thousands of concurrent jobs;
+- complex human workflows;
+- broker-supported external systems;
+- unacceptable PostgreSQL queue pressure.
+
+The task contracts and operation resources are designed to permit migration.
+
+0.7 API DECISION
+----------------
+Internal API:
+
+- HTTP/JSON;
+- FastAPI;
+- OpenAPI 3.1;
+- JSON Schema 2020-12-compatible schemas;
+- Pydantic validation;
+- `/api/v1` major-version path;
+- RFC 9457 problem details;
+- RFC 3339 UTC timestamps;
+- ETag/conditional GET for immutable resources;
+- application-level idempotency keys for mutating requests.
+
+0.8 LONG-RUNNING OPERATION DECISION
+-----------------------------------
+A model or decision run can take seconds or minutes.
+
+POST creates an operation/run and returns:
+
+- HTTP 202 Accepted;
+- operation ID;
+- state;
+- status URI;
+- result URI when available;
+- retry/poll guidance.
+
+The operation resource is durable and queryable.
+
+The client does not hold one long HTTP connection for a full deep optimiser
+run.
+
+0.9 CLI DECISION
+----------------
+The `dmf` CLI and internal API call the same application-service layer.
+
+The CLI MUST NOT contain a second implementation of the pipeline.
+
+0.10 CACHING DECISION
+---------------------
+Stage results are reusable only under an exact dependency signature.
+
+No cache lookup may rely solely on:
+
+- Gameweek;
+- player name;
+- wall-clock recency;
+- "latest" model.
+
+Immutable artifact resources can be cached indefinitely by content hash.
+
+Mutable aliases such as `latest` use short/no cache and ETag revalidation.
+
+0.11 FAILURE DECISION
+---------------------
+Critical integrity failures produce BLOCKED, not a plausible recommendation.
+
+Optional-source failures produce DEGRADED only when an approved fallback exists.
+
+A previous recommendation is never silently relabelled current.
+
+0.12 PUBLICATION DECISION
+------------------------
+Every published recommendation is an immutable Decision Bundle.
+
+A mutable pointer may identify the latest publishable bundle, but the bundle is
+never edited.
+
+0.13 FINAL DEADLINE DECISION
+----------------------------
+Pulse produces:
+
+- early previews;
+- standard actionable runs;
+- final fast actionable run before the execution safety buffer;
+- an exact postdeadline audit freeze selecting only `usable_at <= deadline`.
+
+The postdeadline audit bundle cannot create a new actionable recommendation.
+
+0.14 REPLAY DECISION
+--------------------
+Historical reruns have distinct modes:
+
+- REPRODUCE_ORIGINAL;
+- CURRENT_CODE_STRICT_INFORMATION;
+- RECONSTRUCTED_RESEARCH;
+- COUNTERFACTUAL;
+- FINAL_OUTCOME_RESCORE.
+
+No rerun overwrites an original decision.
+
+======================================================================
+1. SCOPE AND NON-GOALS
+======================================================================
+
+1.1 IN SCOPE
+------------
+- process orchestration;
+- task scheduling;
+- module contracts;
+- data and artifact flow;
+- decision publication;
+- internal APIs;
+- CLI;
+- overrides;
+- replay;
+- failure handling;
+- operational cadence;
+- output versioning.
+
+1.2 OUT OF SCOPE
+----------------
+This document does not:
+
+- redefine projection mathematics;
+- redefine optimiser objective;
+- redefine FPL scoring;
+- automatically submit changes to the official FPL game;
+- expose a public multi-user SaaS API;
+- replace source licences;
+- promise high availability across multiple data centres;
+- require Kubernetes;
+- use an LLM for numeric model execution.
+
+1.3 HUMAN EXECUTION
+-------------------
+Pulse recommends and records.
+
+Sebastian executes official FPL actions manually unless a future separately
+approved document defines lawful, secure write automation.
+
+1.4 ONE DECISION ENGINE
+-----------------------
+There must be one canonical orchestration path for:
+
+- CLI;
+- API;
+- scheduled run;
+- historical replay;
+- tests.
+
+No notebook-only production pipeline.
+
+======================================================================
+2. COMPONENT ARCHITECTURE
+======================================================================
+
+2.1 COMPONENTS
+--------------
+SCHEDULER:
+Plans due work.
+
+WORKER:
+Claims and executes one task type.
+
+API:
+Creates runs, reads status/artifacts, manages approved overrides and exposes
+recommendations.
+
+CLI:
+Operator interface.
+
+POSTGRESQL:
+Control-plane and canonical operational state.
+
+RAW/ARTIFACT STORE:
+Immutable large outputs.
+
+MODEL REGISTRY:
+Approved model/version metadata and artifacts.
+
+RULE REGISTRY:
+DMFP-02 compiled rulesets.
+
+PUBLICATION SERVICE:
+Checks and publishes Decision Bundles.
+
+EVALUATION SERVICE:
+Scores frozen forecasts and decisions after outcome finality.
+
+2.2 PROCESS BOUNDARIES
+----------------------
+Suggested systemd units:
+
+- `dmf-api.service`;
+- `dmf-scheduler.service` or timer-triggered one-shot;
+- `dmf-worker-ingest@.service`;
+- `dmf-worker-model@.service`;
+- `dmf-worker-sim@.service`;
+- `dmf-worker-optimise@.service`;
+- `dmf-worker-evaluate@.service`.
+
+2.3 MODULAR MONOLITH
+--------------------
+All processes use one installed package and common contracts.
+
+Benefits:
+
+- shared types;
+- simpler deployment;
+- direct function execution for replay/tests;
+- fewer network failure modes;
+- easier tracing and version control.
+
+2.4 RESOURCE POOLS
+------------------
+Queue classes:
+
+INGEST_IO:
+Network and file ingestion.
+
+CANONICAL_CPU:
+Parsing, mapping and validation.
+
+MODEL_CPU:
+Availability, markets and price models.
+
+SIMULATION_CPU:
+Football/FPL scenarios.
+
+OPTIMISATION_CPU:
+MILP and chip/rank evaluation.
+
+REPORT_CPU:
+Explanations and reports.
+
+EVALUATION_LOW:
+Backtests and nondeadline work.
+
+2.5 PROCESS ISOLATION
+---------------------
+Large model/simulation/solver tasks run in separate worker processes so:
+
+- memory is released;
+- crashes do not kill API/scheduler;
+- resource/time limits can be applied;
+- native libraries are isolated.
+
+2.6 NO HIDDEN GLOBAL STATE
+--------------------------
+Each task receives:
+
+- task ID;
+- run ID;
+- input artifact IDs;
+- cutoff;
+- ruleset;
+- model versions;
+- config;
+- random-seed namespace.
+
+It must not read an unversioned global `latest` unless the task contract
+explicitly resolves and records it before execution.
+
+======================================================================
+3. RUN TYPES
+======================================================================
+
+3.1 DAILY_REFRESH
+-----------------
+Routine in-season update.
+
+Outputs:
+
+- fresh canonical data;
+- availability;
+- market and points projections;
+- price forecasts;
+- preview recommendations.
+
+3.2 DEADLINE_PREVIEW
+--------------------
+Deadline-relative full decision preview.
+
+3.3 DEADLINE_STANDARD
+---------------------
+Standard actionable decision run with full models and optimiser.
+
+3.4 DEADLINE_FAST_FINAL
+-----------------------
+Incremental actionable run inside the final safety window.
+
+Reuses exact-valid caches where possible.
+
+3.5 DEADLINE_AUDIT_FREEZE
+-------------------------
+Created at/after deadline using exact cutoff.
+
+Not actionable.
+
+3.6 PRICE_TIMING
+----------------
+ACT NOW versus WAIT decision, potentially before the normal full deadline run.
+
+3.7 EVENT_TRIGGERED
+-------------------
+Triggered by material:
+
+- injury/news;
+- fixture change;
+- rule update;
+- manager-state update;
+- price move;
+- source recovery;
+- model promotion.
+
+3.8 CHAMPION_SHADOW
+-------------------
+Production champion plus challengers; only champion may publish.
+
+3.9 HISTORICAL_REPLAY
+---------------------
+One of the replay modes.
+
+3.10 EVALUATION
+---------------
+Postfinality scoring, calibration and policy evaluation.
+
+3.11 REPAIR
+-----------
+Controlled reprocessing after:
+
+- mapping fix;
+- schema fix;
+- orphan artifact;
+- failed task.
+
+3.12 MANUAL
+-----------
+Operator-requested run with explicit reason.
+
+======================================================================
+4. RUN AND TASK STATE MACHINES
+======================================================================
+
+4.1 RUN STATES
+--------------
+PLANNED
+QUEUED
+RUNNING
+WAITING
+READY_FOR_PUBLICATION
+PUBLISHED
+DEGRADED
+BLOCKED
+FAILED
+CANCELLED
+SUPERSEDED
+EXPIRED
+
+4.2 TASK STATES
+---------------
+PLANNED
+READY
+CLAIMED
+RUNNING
+WAITING_RETRY
+SUCCEEDED
+SUCCEEDED_WITH_WARNINGS
+SKIPPED_CACHE_HIT
+SKIPPED_NOT_APPLICABLE
+SKIPPED_SUPERSEDED
+FAILED_RETRYABLE
+FAILED_PERMANENT
+BLOCKED_BY_DEPENDENCY
+CANCELLED
+TIMED_OUT
+
+4.3 OPERATION STATES
+--------------------
+PENDING
+RUNNING
+SUCCEEDED
+FAILED
+CANCELLED
+EXPIRED
+
+4.4 PUBLICATION STATES
+----------------------
+DRAFT
+VALIDATING
+PUBLISHABLE
+PUBLISHED
+WITHDRAWN
+SUPERSEDED
+
+4.5 TERMINALITY
+--------------
+Task success can include:
+
+- normal success;
+- approved warning;
+- exact cache hit.
+
+A degraded task is not necessarily a successful publication dependency.
+
+4.6 TRANSITIONS
+---------------
+Every transition records:
+
+- actor/worker;
+- time;
+- prior state;
+- new state;
+- reason;
+- trace ID;
+- attempt;
+- error/problem ID.
+
+4.7 INVALID TRANSITION
+----------------------
+Rejected by database/application state-machine constraint.
+
+No direct arbitrary status update.
+
+======================================================================
+5. PIPELINE DAG
+======================================================================
+
+5.1 HIGH-LEVEL DAG
+------------------
+PRE-FLIGHT
+  |
+  +-- clock_health
+  +-- ruleset_resolve
+  +-- deadline_resolve
+  +-- manager_state_resolve
+  +-- model_registry_resolve
+  |
+INGESTION FAN-OUT
+  |
+  +-- official_fpl_snapshot
+  +-- fixtures_and_results
+  +-- injuries_sidelined_lineups
+  +-- odds_market_discovery
+  +-- odds_quotes
+  +-- price_transfer_flow
+  +-- opponent_rank_sample
+  +-- manual_evidence
+  |
+VALIDATION/CANONICALISATION
+  |
+  +-- source_validation
+  +-- entity_resolution
+  +-- fixture_revision
+  +-- market_mapping
+  +-- manager_state_validation
+  |
+SOURCE BUNDLE
+  |
+  +-- live_information_bundle
+  |
+MODELS
+  |
+  +-- availability_minutes
+  +-- odds_normalisation_consensus
+  +-- price_change_paths
+  +-- opponent_action_projection
+  |
+FOOTBALL/FPL DISTRIBUTIONS
+  |
+  +-- football_event_distributions
+  +-- fpl_points_distributions
+  +-- uncertainty_scenario_fan
+  |
+DECISION ENGINE
+  |
+  +-- squad_transfer_lineup_optimiser
+  +-- captain_chip_policy
+  +-- rank_strategy_if_active
+  |
+EXPLANATION/PUBLICATION
+  |
+  +-- plan_comparison
+  +-- reasons_and_sensitivity
+  +-- readiness_gate
+  +-- decision_bundle
+  +-- publish_latest_pointer
+  |
+SHADOW/EVALUATION
+  |
+  +-- challenger_runs
+  +-- forecast_registry
+  +-- later_outcome_scoring.
+
+5.2 PRE-FLIGHT HARD DEPENDENCIES
+--------------------------------
+No decision run proceeds without:
+
+- healthy/verified clock;
+- exact deadline;
+- ruleset state;
+- valid manager state;
+- resolvable current squad;
+- code/config identity.
+
+5.3 PARALLELISM
+---------------
+Independent ingestion tasks run concurrently.
+
+Availability and odds can run concurrently after their source subsets validate.
+
+Price modelling can run concurrently with football simulations.
+
+Rank modelling can begin once opponent sources and candidate plans exist.
+
+5.4 JOIN POINTS
+---------------
+SOURCE_BUNDLE:
+all required source tasks settled.
+
+FPL_POINTS:
+availability + market consensus + event engine.
+
+OPTIMISER:
+FPL-points + uncertainty + manager state + prices.
+
+PUBLICATION:
+all required decision modules + explanation + readiness.
+
+5.5 OPTIONAL DEPENDENCIES
+-------------------------
+Examples:
+
+- player props;
+- rank cohort;
+- historical/manual odds;
+- price timing;
+- challenger models.
+
+Optional failure must map to an approved degraded mode.
+
+5.6 CONDITIONAL TASKS
+---------------------
+- rank strategy only if target/rank mode active and confidence sufficient;
+- chip optimiser if chip inventory/activation relevant;
+- deep optimiser only for material decision;
+- price ACT/WAIT only when price route may change;
+- manual override validation only when active.
+
+======================================================================
+6. DECISION RUN ENVELOPE
+======================================================================
+
+6.1 RUN IDENTITY
+----------------
+Each logical run receives immutable UUIDv7:
+
+- run_id;
+- parent_run_id;
+- run_type;
+- manager_id;
+- season;
+- Gameweek;
+- information_cutoff;
+- created_at;
+- requested_by;
+- policy mode.
+
+6.2 RESOLVED CONTEXT
+--------------------
+Before task planning, resolve and freeze:
+
+- ruleset ID/hash;
+- code commit/build;
+- environment lock hash;
+- configuration bundle/hash;
+- model registry snapshot;
+- active override set/hash;
+- random-seed root;
+- deadline source/version;
+- manager-state hash.
+
+6.3 RUN SIGNATURE
+-----------------
+    run_signature =
+      sha256(
+        run_type
+        + manager_state_hash
+        + cutoff
+        + ruleset_hash
+        + model_registry_hash
+        + config_hash
+        + override_hash
+        + code_commit
+      )
+
+6.4 DUPLICATE RUN
+-----------------
+If an identical run signature exists:
+
+- return existing run by default;
+- create a new attempt only with explicit `force_new_attempt`;
+- never duplicate publication.
+
+6.5 PARENT/DERIVATION
+---------------------
+Examples:
+
+- fast final derived from standard run;
+- rank run derived from points candidate run;
+- explanation derived from optimiser bundle;
+- replay derived from original run.
+
+======================================================================
+7. DAILY REFRESH CADENCE
+======================================================================
+
+7.1 SCHEDULER TICK
+------------------
+Every minute, all year.
+
+The tick is cheap:
+
+- acquire scheduler advisory lock;
+- inspect due schedules/events;
+- create missing jobs;
+- update deadlines;
+- release lock.
+
+7.2 OFF-SEASON/PRELAUNCH
+------------------------
+- daily rules/game-launch/status check;
+- daily fixture/team/player source check;
+- no aggressive polling;
+- immediate run after game launch/schema detection.
+
+7.3 IN-SEASON BASE CADENCE
+--------------------------
+Suggested Europe/London operational schedule, configurable:
+
+CONTINUOUS:
+- one-minute planning tick;
+- worker heartbeats every 15 seconds;
+- source health every 5 minutes.
+
+PRICE OBSERVATIONS:
+- hourly outside the learned overnight update window;
+- every 15 minutes in the broad overnight window;
+- every 5 minutes in the narrow calibrated update window when official access
+  policy and rate limits permit.
+
+POST-PRICE RECONCILIATION:
+- once after a detected official update cycle.
+
+MORNING FULL REFRESH:
+- once after expected overnight prices settle.
+
+MIDDAY INCREMENTAL:
+- official FPL, fixture, injury, market and manager-state changes.
+
+EVENING INCREMENTAL:
+- team news, European/cup context, transfer flow and odds.
+
+MODEL REFIT:
+- according to each module's approved cadence, normally not every daily
+  projection run.
+
+7.4 NO FIXED PRICE MINUTE
+-------------------------
+DMFP-11 supplies the learned update window.
+
+Orchestration uses that interval, not a hard-coded folklore timestamp.
+
+7.5 DAILY FULL DECISION
+-----------------------
+When more than 72 hours from deadline:
+
+- one complete daily preview is sufficient unless material events occur.
+
+7.6 CACHE WARMING
+-----------------
+Daily work precomputes:
+
+- current player features;
+- score priors;
+- model parameter loads;
+- candidate pools;
+- scenario templates;
+- optimiser warm starts.
+
+7.7 LOW-PRIORITY WORK
+---------------------
+Backtests, compaction and challengers yield to deadline queues.
+
+======================================================================
+8. DEADLINE-DAY REFRESH CADENCE
+======================================================================
+
+8.1 DEADLINE-RELATIVE PLANNING
+------------------------------
+All times relative to official deadline D.
+
+Suggested full/incremental runs:
+
+D-72h:
+full preview.
+
+D-48h:
+full preview if material fixtures/news or configurable.
+
+D-24h:
+full decision run.
+
+D-12h:
+full decision run.
+
+D-6h:
+full decision run.
+
+D-3h:
+full decision run.
+
+D-2h:
+full decision run.
+
+D-60m:
+full or incremental decision run depending cache/source state.
+
+D-30m:
+incremental model and optimiser run.
+
+D-15m:
+FINAL STANDARD ACTIONABLE run.
+
+D-5m:
+FINAL FAST ACTIONABLE run.
+
+D-2m:
+health, manager-state and critical-source diff check; emergency tactical/plan
+rerun only if a material input changed and execution remains safe.
+
+D:
+exact audit cutoff.
+
+D+0 to D+2m:
+DEADLINE_AUDIT_FREEZE may finish, selecting only information usable by D.
+
+D+5 to D+30m:
+capture official saved team/opponent state when permitted and register forecast
+for evaluation.
+
+8.2 FINAL STANDARD
+------------------
+The D-15 run should:
+
+- have full model stack;
+- allow standard optimiser depth;
+- be the default human execution recommendation.
+
+8.3 FINAL FAST
+--------------
+The D-5 run:
+
+- ingests only high-value changed sources;
+- reuses exact dependency caches;
+- runs fast posterior projection;
+- reoptimises current decision;
+- produces a diff from D-15;
+- targets completion before the configured safety buffer.
+
+8.4 D-2 CHECK
+-------------
+No expensive broad research.
+
+Checks:
+
+- official deadline unchanged;
+- manager state unchanged;
+- new P0/P1 source;
+- major injury/fixture/price update;
+- recommendation state hash.
+
+If material:
+issue an explicit emergency update and time-risk warning.
+
+8.5 EXECUTION BUFFER
+--------------------
+Configured separately from deadline.
+
+Factors:
+
+- official site reliability;
+- user execution speed;
+- API/source latency;
+- clock offset;
+- action complexity.
+
+Pulse must not recommend waiting beyond its safe execution point.
+
+8.6 QUOTA RESERVE
+-----------------
+Free API quota is preserved for D-6h onward according to DMFP-04/05.
+
+8.7 DEADLINE MOVE
+-----------------
+If official deadline changes:
+
+- cancel/supersede future deadline-relative tasks;
+- replan;
+- preserve old plans;
+- alert.
+
+======================================================================
+9. EVENT-DRIVEN REFRESH
+======================================================================
+
+9.1 MATERIAL EVENTS
+-------------------
+- fixture postponed/rescheduled;
+- Gameweek assignment changed;
+- official player flag/status changed;
+- official rule/schema changed;
+- manager-state change;
+- large market move;
+- player market suspended/reopened;
+- price rise/fall;
+- model promotion/rollback;
+- manual override activated.
+
+9.2 MATERIALITY FILTER
+----------------------
+Not every source row triggers a full optimiser run.
+
+Each event evaluates:
+
+- affected players/fixtures;
+- projection delta upper bound;
+- current squad/captain/candidate relevance;
+- time to deadline;
+- cached descendants;
+- likely action switch.
+
+9.3 EVENT COALESCING
+--------------------
+Events within a short window are grouped.
+
+A debounce window avoids repeated complete runs during source bursts.
+
+9.4 IMMEDIATE P0
+----------------
+No debounce for:
+
+- deadline change;
+- fixture cancellation;
+- official ineligibility of selected captain/transfer target;
+- ruleset invalidation;
+- manager-state mismatch.
+
+9.5 OUTBOX
+----------
+Canonical state changes write an outbox row in the same transaction.
+
+A dispatcher creates downstream jobs and marks the outbox item consumed.
+
+`NOTIFY` wakes the dispatcher; the outbox guarantees durability.
+
+======================================================================
+10. JOB PLANNING AND DEPENDENCIES
+======================================================================
+
+10.1 JOB DEFINITION
+-------------------
+Fields:
+
+- job key;
+- task type;
+- queue;
+- schedule policy;
+- dependency selector;
+- input contract;
+- output contract;
+- priority;
+- timeout;
+- retry policy;
+- cache policy;
+- failure criticality;
+- resource class;
+- code/adapter version.
+
+10.2 PLANNING
+-------------
+Planner:
+
+1. resolves run context;
+2. creates task DAG;
+3. resolves applicable tasks;
+4. calculates task input signatures;
+5. marks valid cache hits;
+6. marks ready roots;
+7. commits tasks/edges atomically;
+8. emits queue wake-up.
+
+10.3 DEPENDENCY TYPES
+---------------------
+ALL_SUCCESS:
+all parents pass.
+
+ALL_SETTLED:
+parents can succeed/warn/not-applicable; child decides.
+
+ANY_SUCCESS:
+at least one source succeeds.
+
+CONDITIONAL:
+predicate on output/state.
+
+SOFT:
+failure lowers confidence but does not block.
+
+HARD:
+failure blocks.
+
+10.4 DEPENDENCY VERSION
+-----------------------
+DAG definition version stored with run.
+
+10.5 DYNAMIC FAN-OUT
+--------------------
+Examples:
+
+- one fixture per event-model task;
+- one model challenger per shadow task;
+- one plan per rank evaluation;
+- one historical Gameweek per replay.
+
+10.6 DYNAMIC FAN-IN
+-------------------
+Manifest task waits for expected children and verifies counts.
+
+10.7 SUPERSESSION
+-----------------
+A newer equivalent run may supersede queued/running noncritical tasks.
+
+Running source acquisition is not killed if its artifact remains useful.
+
+Publication chooses newest complete eligible run, not simply newest started.
+
+======================================================================
+11. WORKER CLAIM, LEASE AND HEARTBEAT
+======================================================================
+
+11.1 CLAIM
+----------
+Worker transaction:
+
+- select READY task by priority/due time;
+- `FOR UPDATE SKIP LOCKED`;
+- set CLAIMED/RUNNING;
+- assign worker;
+- set lease expiry;
+- commit.
+
+11.2 LEASE
+----------
+Long tasks heartbeat and extend lease.
+
+11.3 EXPIRED LEASE
+------------------
+Reaper checks:
+
+- worker heartbeat;
+- task process;
+- output artifact;
+- idempotency state.
+
+Then:
+
+- recover success;
+- requeue;
+- mark failed;
+- quarantine.
+
+11.4 DUPLICATE EXECUTION
+------------------------
+At-least-once execution is expected.
+
+Effectively-once output through:
+
+- task input signature;
+- output uniqueness;
+- atomic artifact publication;
+- database constraints.
+
+11.5 TASK ATTEMPT
+-----------------
+Every execution has an attempt record.
+
+11.6 CANCELLATION
+-----------------
+Cooperative:
+
+- cancellation requested;
+- task checks safe points;
+- solver receives termination;
+- partial artifact not published;
+- final state recorded.
+
+11.7 RESOURCE LIMITS
+--------------------
+Per task:
+
+- memory;
+- CPU;
+- wall time;
+- open files;
+- worker concurrency.
+
+======================================================================
+12. TASK INPUT AND OUTPUT CONTRACT
+======================================================================
+
+12.1 TASK INPUT
+---------------
+Typed envelope:
+
+- task/run IDs;
+- task version;
+- cutoff;
+- dependency artifact references/hashes;
+- rules/model/config versions;
+- scope;
+- random seed;
+- requested quality mode.
+
+12.2 TASK OUTPUT
+----------------
+- status;
+- output artifact IDs;
+- row/entity counts;
+- quality metrics;
+- warnings;
+- cache eligibility;
+- runtime/resources;
+- lineage;
+- structured failure.
+
+12.3 ATOMICITY
+-------------
+Large output:
+
+1. write temporary artifact;
+2. validate;
+3. hash;
+4. atomically publish;
+5. insert artifact metadata;
+6. commit task output relation;
+7. mark task success.
+
+12.4 PARTIAL OUTPUT
+-------------------
+Never published as final.
+
+May be retained in quarantine for debugging.
+
+12.5 SIDE EFFECTS
+-----------------
+Model tasks do not mutate manager decisions or publish recommendations.
+
+Only designated services perform:
+
+- canonical promotion;
+- override transition;
+- publication;
+- evaluation finality.
+
+======================================================================
+13. CACHE ARCHITECTURE
+======================================================================
+
+13.1 CACHE KEY
+--------------
+    stage_cache_key =
+      sha256(
+        stage_name
+        + stage_version
+        + sorted(input_artifact_hashes)
+        + information_cutoff
+        + ruleset_hash
+        + model_version_ids
+        + config_hash
+        + override_hash
+        + random_seed_policy
+        + output_schema_version
+      )
+
+13.2 CONTENT CACHE
+------------------
+Immutable artifact addressed by SHA-256.
+
+13.3 STAGE CACHE
+---------------
+Maps exact stage signature to validated output artifact.
+
+13.4 QUERY CACHE
+---------------
+Short-lived API cache for expensive read queries.
+
+13.5 CACHE VALIDITY
+-------------------
+Requires:
+
+- artifact exists/hash verifies;
+- schema compatible;
+- source retention permits;
+- task version exact;
+- no invalidation/correction;
+- random policy compatible.
+
+13.6 CUTOFF
+-----------
+Same source data but different information cutoff can change eligibility.
+
+Cutoff is in the key.
+
+13.7 MANAGER STATE
+------------------
+Decision cache includes manager-state hash.
+
+13.8 OVERRIDE
+-------------
+Any active override-set change invalidates dependent stages.
+
+13.9 MODEL PROMOTION
+--------------------
+New champion does not delete old cache.
+
+It creates a new key/version.
+
+13.10 INVALIDATION GRAPH
+------------------------
+Lineage marks affected cache entries stale after:
+
+- provider correction;
+- entity mapping fix;
+- rules change;
+- model withdrawal;
+- artifact corruption.
+
+13.11 HTTP CACHE
+----------------
+Immutable resources:
+
+- strong ETag from content hash;
+- long `max-age`;
+- `immutable` where appropriate.
+
+Mutable aliases:
+
+- ETag;
+- `no-cache`/revalidation;
+- no long stale serving.
+
+Sensitive/private manager responses:
+
+- `Cache-Control: private, no-store` unless a narrowly approved internal cache
+  exists.
+
+13.12 NO STALE DISGUISE
+-----------------------
+A cached decision always exposes:
+
+- issue time;
+- cutoff;
+- age;
+- supersession state.
+
+======================================================================
+14. FAILURE CRITICALITY
+======================================================================
+
+14.1 CRITICAL / FAIL CLOSED
+---------------------------
+- ruleset inactive/invalid;
+- official deadline unknown/conflicting;
+- clock materially unhealthy;
+- manager squad/bank/FT invalid;
+- identity/mapping conflict affecting action;
+- source-bundle corruption;
+- FPL-points scenario invalid;
+- optimiser illegal/infeasible without safe fallback;
+- publication hash/lineage failure;
+- current state changed after run;
+- final actionable run completes after safe execution time.
+
+14.2 IMPORTANT / DEGRADE WITH APPROVAL
+--------------------------------------
+- player-prop odds absent;
+- exchange unavailable;
+- price model unavailable;
+- rank cohort unavailable;
+- one injury source unavailable;
+- challenger fails;
+- explanation enrichment fails.
+
+14.3 OPTIONAL
+-------------
+- noncandidate player deep scenarios;
+- historical compaction;
+- exploratory model;
+- secondary report.
+
+14.4 DEGRADED LABEL
+-------------------
+A degraded decision states:
+
+- missing dependency;
+- fallback;
+- estimated impact;
+- confidence reduction;
+- action restrictions.
+
+14.5 NO IMPLIED SUCCESS
+-----------------------
+`SUCCEEDED_WITH_WARNINGS` does not automatically make a run publishable.
+
+Readiness gate decides.
+
+======================================================================
+15. FAILURE AND FALLBACK MATRIX
+======================================================================
+
+15.1 OFFICIAL FPL SOURCE DOWN
+-----------------------------
+If last healthy snapshot age <= approved threshold:
+
+- use with explicit age;
+- do not assume manager-state changes;
+- disable price/ownership-sensitive action if counters stale;
+- reduce confidence.
+
+If manager state cannot be verified:
+BLOCK.
+
+15.2 FIXTURE SOURCE CONFLICT
+----------------------------
+Use official/authoritative source hierarchy.
+
+Unresolved deadline/Gameweek assignment:
+BLOCK affected decision or branch scenario if rules permit uncertainty.
+
+15.3 INJURY SOURCE DOWN
+-----------------------
+Use other sources + prior availability model.
+
+Reduce confidence and avoid hard availability claim.
+
+15.4 MARKET SOURCE DOWN
+-----------------------
+Use remaining sources/team historical prior.
+
+Label MARKET_DEGRADED.
+
+No market = unknown, not zero.
+
+15.5 PLAYER PROPS MISSING
+-------------------------
+Use DMFP-08 team-to-player model.
+
+15.6 PRICE MODEL FAILS
+----------------------
+Optimise at current actual prices.
+
+Disable price-motivated early execution and future price advantage.
+
+15.7 RANK MODEL FAILS
+---------------------
+Use pure/robust expected-points plan.
+
+15.8 CHIP MODEL FAILS
+---------------------
+Use no-chip ordinary captain/vice plan unless chip decision is manually locked
+and can be legally evaluated.
+
+15.9 OPTIMISER TIMEOUT
+----------------------
+Use best feasible incumbent if:
+
+- legal;
+- gap/status shown;
+- confidence acceptable.
+
+Otherwise:
+
+- deterministic/no-transfer tactical fallback;
+- BLOCK transfer recommendation.
+
+15.10 SIMULATION FAILS
+----------------------
+Use last healthy same-cutoff-compatible scenario only if dependency signature
+matches except for an approved nonmaterial source.
+
+Otherwise BLOCK.
+
+15.11 EXPLANATION FAILS
+-----------------------
+Numeric bundle can publish only if structured reason fields exist.
+
+Natural-language rendering may be regenerated.
+
+15.12 API DOWN
+--------------
+CLI can operate locally through application service.
+
+Publication still recorded in database/artifact store.
+
+======================================================================
+16. RETRIES, BACKOFF AND CIRCUIT BREAKERS
+======================================================================
+
+16.1 READ/SAFE REQUESTS
+-----------------------
+Use DMFP-05 bounded retry policy.
+
+16.2 NONIDEMPOTENT REQUESTS
+---------------------------
+Do not blindly retry.
+
+Use:
+
+- idempotency key;
+- operation lookup;
+- request fingerprint;
+- unique database constraint.
+
+16.3 DATABASE
+-------------
+Retry entire transaction for:
+
+- serialization failure;
+- deadlock;
+- transient connection.
+
+Do not retry bad constraints/schema as transient.
+
+16.4 MODEL NUMERICAL FAILURE
+----------------------------
+- one deterministic retry with safer numerical settings if approved;
+- then fallback/challenger;
+- no endless loop.
+
+16.5 CIRCUIT BREAKER
+--------------------
+Per provider/service:
+
+CLOSED
+OPEN
+HALF_OPEN.
+
+16.6 DEADLINE-AWARE RETRY
+-------------------------
+Do not schedule a retry whose expected completion is after the action safety
+window unless it is for audit/evaluation.
+
+16.7 RETRY-AFTER
+----------------
+Respect provider/server guidance.
+
+16.8 FAILURE BUDGET
+-------------------
+Repeated failure escalates severity and blocks source-dependent actions.
+
+======================================================================
+17. DECISION READINESS GATE
+======================================================================
+
+17.1 REQUIRED CHECKS
+--------------------
+- run type/cutoff correct;
+- deadline exact;
+- clock healthy;
+- rules active;
+- manager state valid/current;
+- required source bundle valid;
+- required model outputs complete;
+- PMFs/scenarios coherent;
+- optimiser plan legal;
+- solver status acceptable;
+- plan alternatives produced;
+- confidence computed;
+- warnings reviewed by policy;
+- execution buffer remains;
+- output schemas/hash/lineage valid.
+
+17.2 PUBLISHABLE STATES
+-----------------------
+PUBLISHABLE_NORMAL
+PUBLISHABLE_DEGRADED
+NOT_PUBLISHABLE
+AUDIT_ONLY
+
+17.3 DEGRADED POLICY
+--------------------
+Requires explicit allow-list by missing component and season stage.
+
+17.4 STATE HASH RECHECK
+-----------------------
+Immediately before publish:
+
+- re-read manager state;
+- rules/deadline;
+- active overrides;
+- critical source changes.
+
+If hash differs:
+supersede/re-run.
+
+17.5 NO ACTIONABLE POSTDEADLINE
+------------------------------
+If publish time exceeds safe action time:
+
+- mark LATE;
+- retain audit;
+- do not show as actionable current recommendation.
+
+======================================================================
+18. DECISION BUNDLE
+======================================================================
+
+18.1 CONTENT
+------------
+- decision bundle ID;
+- run ID;
+- manager state;
+- deadline/cutoff;
+- rules;
+- source bundle;
+- model/output versions;
+- recommended plan;
+- conservative plan;
+- high-upside plan;
+- no-transfer baseline;
+- captain/vice;
+- chip action;
+- rank plan where active;
+- price timing;
+- final rank distribution where active;
+- expected points/distributions;
+- marginal move values;
+- reasons;
+- sensitivity;
+- confidence;
+- warnings;
+- solver/MC diagnostics;
+- execution deadline;
+- hashes.
+
+18.2 IMMUTABILITY
+-----------------
+Published Decision Bundle is immutable.
+
+18.3 LATEST POINTER
+-------------------
+    publication.latest(manager, gameweek, policy_mode)
+
+points to a bundle.
+
+Pointer update is transactional and auditable.
+
+18.4 SUPERSESSION
+-----------------
+A new bundle:
+
+- references prior;
+- includes diff;
+- does not delete it.
+
+18.5 WITHDRAWAL
+--------------
+If a published bundle is later found invalid:
+
+- mark withdrawn;
+- remove latest pointer;
+- alert;
+- preserve evidence.
+
+18.6 EXECUTION STATE
+--------------------
+Separate record:
+
+NOT_EXECUTED
+EXECUTED_MANUALLY
+PARTIALLY_EXECUTED
+EXECUTION_DIFFERED
+UNKNOWN.
+
+The recommendation is not mutated to match human action.
+
+======================================================================
+19. INTERNAL API PRINCIPLES
+======================================================================
+
+19.1 SCOPE
+----------
+Private/internal only by default.
+
+19.2 BASE PATH
+--------------
+    /api/v1
+
+19.3 VERSIONING
+--------------
+Within v1:
+
+- additive optional response fields allowed;
+- enum additions require tolerant client contract;
+- no semantic repurposing;
+- breaking change -> `/api/v2`.
+
+Artifact schema/model/rules versions are independent from API major.
+
+19.4 OPENAPI
+------------
+Generate and freeze OpenAPI 3.1 description per release.
+
+Store OpenAPI JSON hash as build artifact.
+
+19.5 REQUEST VALIDATION
+-----------------------
+Pydantic models:
+
+- strict types;
+- explicit enums;
+- UTC timestamps;
+- bounded pagination;
+- no unknown critical fields where strict command schema applies.
+
+19.6 RESPONSE ENVELOPE
+----------------------
+Common metadata:
+
+- request_id;
+- trace_id;
+- generated_at;
+- API version;
+- data cutoff;
+- resource version;
+- warnings.
+
+19.7 PAGINATION
+---------------
+Cursor-based for:
+
+- runs;
+- tasks;
+- artifacts;
+- decisions;
+- overrides.
+
+19.8 LARGE ARTIFACTS
+--------------------
+API returns metadata and a protected artifact download reference.
+
+Do not embed 100,000-scenario matrices in JSON.
+
+19.9 CONTENT TYPES
+------------------
+- `application/json`;
+- `application/problem+json`;
+- Parquet/JSON artifact content types.
+
+19.10 AUTHORIZATION
+-------------------
+Roles:
+
+READER
+OPERATOR
+RESEARCHER
+APPROVER
+ADMIN.
+
+Default API binds to loopback/private interface.
+
+======================================================================
+20. CORE API RESOURCES
+======================================================================
+
+20.1 HEALTH
+-----------
+GET /health/live
+GET /health/ready
+GET /health/deadline
+
+20.2 RUNS
+---------
+POST /api/v1/runs
+GET  /api/v1/runs/{run_id}
+GET  /api/v1/runs/{run_id}/tasks
+POST /api/v1/runs/{run_id}/cancel
+POST /api/v1/runs/{run_id}/retry-failed
+
+20.3 OPERATIONS
+---------------
+GET /api/v1/operations/{operation_id}
+
+20.4 DECISIONS
+--------------
+GET /api/v1/decisions/latest
+GET /api/v1/decisions/{decision_bundle_id}
+GET /api/v1/decisions/{decision_bundle_id}/diff/{other_id}
+POST /api/v1/decisions/{decision_bundle_id}/execution
+
+20.5 PROJECTIONS
+----------------
+GET /api/v1/projections/players
+GET /api/v1/projections/fixtures
+GET /api/v1/projections/prices
+GET /api/v1/projections/rank
+GET /api/v1/projections/{projection_id}
+
+20.6 ARTIFACTS
+--------------
+GET /api/v1/artifacts/{artifact_id}
+GET /api/v1/artifacts/{artifact_id}/content
+
+20.7 RULES/MODELS
+-----------------
+GET /api/v1/rulesets
+GET /api/v1/rulesets/{id}
+GET /api/v1/models
+GET /api/v1/models/{id}
+
+20.8 OVERRIDES
+--------------
+POST /api/v1/overrides
+GET  /api/v1/overrides/{id}
+POST /api/v1/overrides/{id}/approve
+POST /api/v1/overrides/{id}/revoke
+
+20.9 REPLAY
+-----------
+POST /api/v1/replays
+GET  /api/v1/replays/{run_id}
+
+20.10 EVALUATION
+----------------
+GET /api/v1/evaluation/champion
+GET /api/v1/evaluation/challengers
+POST /api/v1/evaluation/runs
+
+20.11 MANAGER STATE
+-------------------
+GET /api/v1/manager-state/current
+POST /api/v1/manager-state/validate
+
+Mutating actual FPL state is not exposed.
+
+======================================================================
+21. CREATE-RUN API
+======================================================================
+
+21.1 REQUEST
+------------
+{
+  "run_type": "DEADLINE_STANDARD",
+  "manager_id": "uuid",
+  "gameweek_id": "uuid",
+  "information_cutoff_utc": "timestamp",
+  "policy_mode": "ROBUST_POINTS",
+  "quality_mode": "STANDARD",
+  "force_new_attempt": false
+}
+
+21.2 IDEMPOTENCY
+----------------
+Header:
+
+    Idempotency-Key: <client-generated UUID>
+
+Server stores:
+
+- key;
+- caller;
+- request fingerprint;
+- operation/run;
+- expiry.
+
+Same key and same request:
+return original operation.
+
+Same key and different request:
+409 problem response.
+
+21.3 RESPONSE
+-------------
+HTTP 202:
+
+{
+  "operation_id": "uuid",
+  "run_id": "uuid",
+  "status": "PENDING",
+  "status_url": "/api/v1/operations/...",
+  "result_url": "/api/v1/runs/..."
+}
+
+21.4 SYNCHRONOUS OPTION
+-----------------------
+Fast read-only operations may return 200.
+
+No `wait=true` promise for deep runs in production API.
+
+======================================================================
+22. API ERROR CONTRACT
+======================================================================
+
+22.1 RFC 9457
+-------------
+Use `application/problem+json`.
+
+22.2 REQUIRED FIELDS
+--------------------
+- type;
+- title;
+- status;
+- detail;
+- instance.
+
+22.3 PULSE EXTENSIONS
+---------------------
+- error_code;
+- request_id;
+- trace_id;
+- run_id;
+- task_id;
+- retryable;
+- retry_after_seconds;
+- affected_resources;
+- validation_errors.
+
+22.4 ERROR TYPES
+----------------
+RULESET_INACTIVE
+DEADLINE_UNKNOWN
+MANAGER_STATE_INVALID
+SOURCE_STALE
+DEPENDENCY_FAILED
+RUN_CONFLICT
+IDEMPOTENCY_CONFLICT
+NOT_PUBLISHABLE
+ARTIFACT_CORRUPT
+OPERATION_TIMED_OUT
+OVERRIDE_NOT_APPROVED.
+
+22.5 SECURITY
+-------------
+No stack trace, secret, raw provider token or sensitive filesystem path.
+
+======================================================================
+23. API CACHING AND CONDITIONAL REQUESTS
+======================================================================
+
+23.1 IMMUTABLE GET
+------------------
+Decision/artifact by immutable ID:
+
+- ETag;
+- conditional GET;
+- long cache for nonsensitive shared metadata;
+- private/no-store for manager-sensitive content as configured.
+
+23.2 LATEST
+-----------
+Latest recommendation:
+
+- ETag from pointer/bundle;
+- `Cache-Control: no-cache`;
+- client revalidates.
+
+23.3 304
+--------
+No body when representation unchanged.
+
+23.4 POST
+---------
+Not cache based.
+
+Idempotency handled by operation key.
+
+23.5 ARTIFACT RANGE
+-------------------
+Large files MAY support byte ranges through the serving layer.
+
+23.6 SCHEMA
+-----------
+Every response identifies schema version.
+
+======================================================================
+24. CLI ARCHITECTURE
+======================================================================
+
+24.1 FRAMEWORK
+--------------
+Typer-based typed command hierarchy.
+
+24.2 EXECUTION MODES
+--------------------
+LOCAL:
+calls application service in process.
+
+API:
+calls internal HTTP API.
+
+Default is configurable.
+
+24.3 COMMON OPTIONS
+-------------------
+- `--config`;
+- `--environment`;
+- `--json`;
+- `--quiet`;
+- `--trace-id`;
+- `--as-of`;
+- `--ruleset`;
+- `--force`;
+- `--dry-run`.
+
+24.4 OUTPUT
+-----------
+Human-readable by default.
+Machine JSON with `--json`.
+
+24.5 EXIT CODES
+--------------
+0 success.
+2 validation/user input.
+3 blocked/not publishable.
+4 transient failure.
+5 permanent/internal failure.
+6 partial/degraded.
+7 cancelled.
+8 late/expired.
+
+======================================================================
+25. CLI COMMANDS
+======================================================================
+
+25.1 CONTROL PLANE
+------------------
+    dmf scheduler tick
+    dmf scheduler plan
+    dmf worker run --queue <queue>
+    dmf worker leases
+    dmf operations status <id>
+    dmf operations cancel <id>
+
+25.2 CYCLES
+-----------
+    dmf cycle daily
+    dmf cycle deadline --gameweek <n>
+    dmf cycle final --gameweek <n>
+    dmf cycle price-timing --player <id>
+    dmf cycle event --event-id <id>
+
+25.3 RUNS
+---------
+    dmf runs create
+    dmf runs show <run_id>
+    dmf runs tasks <run_id>
+    dmf runs retry <run_id>
+    dmf runs cancel <run_id>
+    dmf runs diff <a> <b>
+
+25.4 MODULES
+------------
+Existing commands from DMFP-05–15 remain available:
+
+    dmf ingest ...
+    dmf market ...
+    dmf availability ...
+    dmf events ...
+    dmf fpl-points ...
+    dmf uncertainty ...
+    dmf prices ...
+    dmf optimise ...
+    dmf chips ...
+    dmf rank ...
+    dmf evaluate ...
+
+25.5 DECISIONS
+--------------
+    dmf decision latest
+    dmf decision show <id>
+    dmf decision publish <run_id>
+    dmf decision withdraw <id>
+    dmf decision mark-executed <id>
+    dmf decision explain <id>
+
+25.6 OVERRIDES
+--------------
+    dmf overrides create
+    dmf overrides list
+    dmf overrides approve <id>
+    dmf overrides revoke <id>
+    dmf overrides expire
+
+25.7 REPLAY
+-----------
+    dmf replay original <decision_run_id>
+    dmf replay strict --gameweek <n>
+    dmf replay reconstructed --gameweek <n>
+    dmf replay counterfactual --gameweek <n>
+    dmf replay rescore --gameweek <n>
+
+25.8 ADMIN
+----------
+    dmf artifacts verify
+    dmf cache inspect
+    dmf cache invalidate
+    dmf models list
+    dmf rules validate
+    dmf doctor
+    dmf backup verify
+    dmf openapi export
+
+======================================================================
+26. MANUAL OVERRIDES
+======================================================================
+
+26.1 PURPOSE
+------------
+Permit explicit, auditable human evidence or constraints without editing raw
+data or model output silently.
+
+26.2 TYPES
+----------
+SOURCE_CORRECTION
+ENTITY_MAPPING
+FIXTURE_STATUS
+PLAYER_ELIGIBILITY
+AVAILABILITY_EVIDENCE
+MINUTES_SCENARIO
+MARKET_EXCLUSION
+PRICE_STATUS
+MANAGER_STATE
+DECISION_CONSTRAINT
+MODEL_EXCLUSION
+RULE_INTERPRETATION
+PUBLICATION_BLOCK.
+
+26.3 HARD VERSUS SOFT
+---------------------
+HARD:
+deterministic rule/constraint.
+
+SOFT:
+evidence or probability scenario.
+
+A manager quote should normally be soft.
+An official suspension can be hard.
+
+26.4 OVERRIDE FIELDS
+--------------------
+- override ID;
+- type;
+- scope;
+- value/effect;
+- source/evidence;
+- author;
+- created_at;
+- usable_at;
+- valid interval;
+- expiry;
+- status;
+- reviewer/approver;
+- reason;
+- affected modules;
+- supersedes;
+- hash.
+
+26.5 STATES
+-----------
+DRAFT
+PENDING_APPROVAL
+APPROVED
+ACTIVE
+EXPIRED
+REVOKED
+SUPERSEDED
+REJECTED.
+
+26.6 EXPIRY
+----------
+Mandatory for temporary evidence/constraints.
+
+26.7 APPROVAL
+-------------
+Critical rules/publication/model overrides require Sebastian approval.
+
+Development environments may relax with explicit nonproduction label.
+
+26.8 NO RAW REWRITE
+-------------------
+Override becomes an input artifact/layer.
+
+Original source remains.
+
+26.9 DECISION IMPACT
+--------------------
+Activation emits outbox event and invalidates affected descendants.
+
+26.10 OUTPUT
+-------------
+Decision explanation shows:
+
+- override used;
+- before/after impact;
+- evidence;
+- expiry.
+
+======================================================================
+27. HISTORICAL GAMEWEEK REPLAY
+======================================================================
+
+27.1 REPRODUCE_ORIGINAL
+-----------------------
+Goal:
+recreate the original run.
+
+Uses:
+
+- original source bundle;
+- original code/container if retained;
+- original models/config/rules;
+- original overrides;
+- original random seed.
+
+Output:
+reproduction result/diff.
+
+27.2 CURRENT_CODE_STRICT_INFORMATION
+------------------------------------
+Goal:
+test current code with only information genuinely available then.
+
+Uses:
+
+- LIVE_OPERATIONAL historical bundle;
+- current selected model/policy;
+- historical cutoff/rules.
+
+Output:
+new research run.
+
+27.3 RECONSTRUCTED_RESEARCH
+---------------------------
+Goal:
+longer-history algorithm research.
+
+Uses:
+RECONSTRUCTED data with explicit grades.
+
+27.4 COUNTERFACTUAL
+--------------------
+Examples:
+
+- perfect lineup;
+- no price model;
+- alternative chip;
+- perfect fixture information;
+- rank objective.
+
+27.5 FINAL_OUTCOME_RESCORE
+--------------------------
+Goal:
+apply rules/scoring or evaluation to final outcome.
+
+Not a forecast.
+
+27.6 NAMESPACE
+-------------
+Historical artifacts stored under:
+
+- replay mode;
+- original Gameweek;
+- replay run ID.
+
+27.7 NO OVERWRITE
+-----------------
+Original run/publication remains immutable.
+
+27.8 CLOCK
+----------
+Replay clock is injected.
+
+Code must not call wall-clock `now()` for historical decision semantics except
+through the run clock abstraction.
+
+27.9 EXTERNAL CALLS
+-------------------
+Strict reproduction should not contact current providers.
+
+Missing original artifact -> explicit incomplete reproduction.
+
+27.10 CLI EXAMPLE
+-----------------
+    dmf replay strict \
+      --gameweek 5 \
+      --season 2026_27 \
+      --cutoff-from-official-deadline \
+      --model-registry current \
+      --policy robust_points
+
+======================================================================
+28. VERSIONED OUTPUTS
+======================================================================
+
+28.1 VERSION DIMENSIONS
+-----------------------
+- API version;
+- schema version;
+- ruleset;
+- source bundle;
+- data/dataset;
+- mapping;
+- feature set;
+- model;
+- calibration;
+- ensemble;
+- uncertainty policy;
+- optimiser formulation;
+- solver;
+- explanation;
+- code/environment.
+
+28.2 OUTPUT IDENTITY
+--------------------
+Every material output has:
+
+- UUID;
+- type;
+- semantic/schema version;
+- content hash;
+- parent artifacts;
+- created_at;
+- cutoff;
+- producer task;
+- retention/licence.
+
+28.3 BUNDLE MANIFEST
+--------------------
+Lists every child artifact and hash.
+
+28.4 IMMUTABLE
+--------------
+No in-place output update.
+
+28.5 ALIASES
+-------------
+Mutable aliases:
+
+- champion;
+- latest;
+- latest-publishable;
+- current rules.
+
+Aliases resolve to immutable IDs and are historically recorded.
+
+28.6 BACKWARD COMPATIBILITY
+---------------------------
+Readers validate schema version.
+
+Breaking artifact schema creates new major version.
+
+28.7 JSON NUMBER POLICY
+-----------------------
+- money/odds exact Decimal/string where required;
+- probabilities float64 with declared tolerance;
+- IDs strings/UUID;
+- timestamps RFC 3339 UTC.
+
+======================================================================
+29. DECISION STATE RECORD
+======================================================================
+
+29.1 BEFORE DECISION
+--------------------
+Snapshot:
+
+- manager squad;
+- purchase/selling prices;
+- bank;
+- free transfers;
+- chips;
+- rank/target;
+- deadline;
+- source/model confidence.
+
+29.2 RECOMMENDATION
+-------------------
+All plans and action timing.
+
+29.3 HUMAN ACTION
+----------------
+Recorded separately.
+
+29.4 AFTER DEADLINE
+-------------------
+Saved official team/captain/chip when available.
+
+29.5 AFTER OUTCOME
+-----------------
+Final points/rank and evaluation links.
+
+29.6 DECISION CHAIN
+-------------------
+One record connects:
+
+information -> forecast -> plan -> explanation -> execution -> outcome ->
+evaluation.
+
+======================================================================
+30. CHAMPION–CHALLENGER EXECUTION
+======================================================================
+
+30.1 CHAMPION
+-------------
+Only approved model/policy versions feed publishable plan.
+
+30.2 CHALLENGERS
+----------------
+Run on same deadline bundle/scenario seeds where appropriate.
+
+30.3 SHADOW
+-----------
+Challengers:
+
+- cannot publish;
+- cannot alter manager state;
+- write separate output namespace;
+- register forecasts before outcome.
+
+30.4 RESOURCE PRIORITY
+----------------------
+Deadline champion tasks outrank challengers.
+
+Challenger cancelled first under pressure.
+
+30.5 PROMOTION
+--------------
+DMFP-15 gate and explicit approval update champion alias transactionally.
+
+30.6 ROLLBACK
+-------------
+Repoint champion alias to prior approved version.
+Preserve every decision.
+
+======================================================================
+31. OBSERVABILITY
+======================================================================
+
+31.1 TRACE
+----------
+One trace can span:
+
+API request
+-> operation
+-> run planning
+-> tasks
+-> artifacts
+-> publication.
+
+OpenTelemetry context propagation carries trace correlation across processes.
+
+31.2 SPAN ATTRIBUTES
+--------------------
+- run/task/operation ID;
+- module;
+- Gameweek;
+- run type;
+- cutoff;
+- queue;
+- cache hit;
+- model/rules version;
+- status;
+- retry;
+- artifact.
+
+Avoid high-cardinality player IDs in metrics; detailed IDs can remain in traces
+and logs.
+
+31.3 LOGS
+---------
+Structured JSON:
+
+- timestamp;
+- severity;
+- message;
+- trace/span;
+- run/task;
+- error code;
+- safe context.
+
+31.4 METRICS
+-------------
+Examples:
+
+dmf_scheduler_ticks_total
+dmf_scheduler_lag_seconds
+dmf_tasks_total
+dmf_task_duration_seconds
+dmf_task_queue_depth
+dmf_task_lease_expired_total
+dmf_cache_hits_total
+dmf_runs_total
+dmf_run_duration_seconds
+dmf_deadline_seconds_remaining
+dmf_decision_publish_lag_seconds
+dmf_decision_state_hash_mismatch_total
+dmf_degraded_runs_total
+dmf_api_requests_total
+dmf_api_request_duration_seconds
+dmf_artifact_verify_failures_total.
+
+31.5 METRIC LABELS
+------------------
+Low cardinality:
+
+- task type;
+- queue;
+- status;
+- run type;
+- environment.
+
+31.6 HEARTBEAT
+--------------
+Workers/API/scheduler publish health.
+
+31.7 DASHBOARD
+--------------
+Deadline dashboard:
+
+- time remaining;
+- latest source ages;
+- task DAG;
+- running/failed;
+- optimiser status;
+- latest recommendation;
+- warnings;
+- execution buffer.
+
+======================================================================
+32. SERVICE OBJECTIVES
+======================================================================
+
+32.1 LEGALITY
+-------------
+100% published recommendations pass rules/state legality.
+
+32.2 LINEAGE
+------------
+100% published fields trace to versioned artifacts.
+
+32.3 DEADLINE
+-------------
+Normal target:
+
+- D-15 standard recommendation available;
+- D-5 fast recommendation available;
+- exact audit bundle within 2 minutes after D.
+
+32.4 RUNTIME
+-------------
+Suggested initial:
+
+- daily full cycle <=20 minutes;
+- deadline standard incremental <=10 minutes;
+- final fast cycle <=5 minutes;
+- emergency no-transfer tactical <=30 seconds.
+
+These are system targets, not guaranteed provider SLAs.
+
+32.5 API
+-------
+Metadata/read endpoints:
+
+- p95 <=500 ms under normal local load;
+- large artifacts excluded.
+
+32.6 SCHEDULER
+-------------
+- tick lag <=30 seconds normal;
+- no duplicate final logical run.
+
+32.7 FAILURE
+-------------
+- P0 alert within one minute;
+- no stale recommendation silently published.
+
+32.8 RECOVERY
+-------------
+- worker crash requeued/reconciled within two lease periods;
+- artifact integrity verified.
+
+======================================================================
+33. SECURITY AND ACCESS
+======================================================================
+
+33.1 NETWORK
+------------
+Default:
+
+- loopback/private bind;
+- firewall;
+- TLS if crossing host boundary.
+
+33.2 AUTH
+--------
+Short-lived/service credentials.
+No provider secret in client/API response.
+
+33.3 ROLES
+---------
+Least privilege by process and API role.
+
+33.4 DATABASE
+-------------
+Separate roles:
+
+- scheduler;
+- worker;
+- API reader/operator;
+- migration/admin;
+- evaluation.
+
+33.5 ARTIFACT ACCESS
+--------------------
+Signed/authorised internal references or API streaming.
+
+33.6 MANAGER PRIVACY
+-------------------
+Current squad, rival data and decision outputs private.
+
+33.7 OVERRIDES
+--------------
+Approval/audit.
+
+33.8 EXECUTION
+-------------
+No official FPL write credentials stored by this architecture.
+
+======================================================================
+34. CONFIGURATION AND ENVIRONMENTS
+======================================================================
+
+34.1 ENVIRONMENTS
+-----------------
+DEVELOPMENT
+TEST
+STAGING
+PRODUCTION
+REPLAY.
+
+34.2 CONFIG LAYERS
+------------------
+- defaults;
+- environment;
+- season/rules;
+- provider;
+- policy;
+- secret references.
+
+34.3 IMMUTABLE RUN CONFIG
+-------------------------
+Resolved config is stored/hash-addressed per run.
+
+34.4 SECRET SEPARATION
+----------------------
+Secrets never enter config artifact.
+
+Store redacted secret reference IDs.
+
+34.5 FEATURE FLAGS
+------------------
+Versioned, scoped, default off for experimental modules.
+
+No silent production toggle.
+
+======================================================================
+35. DATABASE TABLES
+======================================================================
+
+35.1 SCHEMAS
+------------
+pipeline
+publication
+override
+api
+evaluation
+provenance.
+
+35.2 TABLES
+-----------
+pipeline.run
+pipeline.run_context
+pipeline.task_definition
+pipeline.task_run
+pipeline.task_dependency
+pipeline.task_attempt
+pipeline.worker
+pipeline.worker_lease
+pipeline.operation
+pipeline.event_outbox
+pipeline.cache_entry
+pipeline.artifact_link
+pipeline.scheduler_tick
+pipeline.circuit_state
+
+publication.decision_bundle
+publication.latest_pointer
+publication.execution_record
+publication.withdrawal
+
+override.override
+override.approval
+override.effect_scope
+
+api.idempotency_key
+api.request_log
+
+35.3 INDEXES
+------------
+- task status/priority/due;
+- lease expiry;
+- run manager/Gameweek/type;
+- operation status;
+- cache signature;
+- outbox unconsumed;
+- latest pointer;
+- override active scope;
+- idempotency caller/key.
+
+35.4 CONSTRAINTS
+----------------
+- one logical final run signature;
+- legal state transitions;
+- one active latest pointer;
+- unique cache signature/output type;
+- approved override before active;
+- immutable published bundle.
+
+======================================================================
+36. TESTING STRATEGY
+======================================================================
+
+36.1 UNIT
+---------
+- state transitions;
+- run signatures;
+- cache keys;
+- DAG planning;
+- deadline schedules;
+- idempotency;
+- API schemas;
+- override expiry;
+- publication gate.
+
+36.2 INTEGRATION
+----------------
+- full synthetic daily cycle;
+- full deadline cycle;
+- source failure;
+- worker crash;
+- retry;
+- cache hit;
+- optimiser timeout;
+- publish.
+
+36.3 CONCURRENCY
+----------------
+- two scheduler ticks;
+- many workers claim tasks;
+- duplicate POST;
+- lease expiry;
+- advisory lock;
+- publication race.
+
+36.4 TEMPORAL
+-------------
+- deadline changes;
+- task finishes after cutoff;
+- historical clock;
+- postdeadline data;
+- D-5 late run.
+
+36.5 FAILURE INJECTION
+----------------------
+- PostgreSQL restart;
+- artifact disk full;
+- corrupt artifact;
+- provider 429/500;
+- worker OOM;
+- API restart;
+- `NOTIFY` lost/disconnected;
+- clock drift.
+
+36.6 CACHE
+----------
+- exact hit;
+- cutoff difference;
+- override change;
+- model change;
+- corrupted file;
+- correction invalidation.
+
+36.7 API
+--------
+- OpenAPI contract;
+- RFC problem response;
+- authentication;
+- ETag/304;
+- idempotency conflict;
+- pagination;
+- large artifact.
+
+36.8 REPLAY
+----------
+- original;
+- strict current code;
+- reconstructed;
+- counterfactual;
+- no current provider call.
+
+36.9 GOLDEN DEADLINE
+--------------------
+Synthetic full pipeline with:
+
+- price update;
+- injured captain;
+- missing player props;
+- postponed fixture;
+- optimiser timeout;
+- rank data unavailable;
+- override;
+- challenger.
+
+Expected publication/degradation fixed.
+
+36.10 PROPERTY TESTS
+--------------------
+- same signature -> same immutable result;
+- no task before dependencies;
+- no current decision from postcutoff data;
+- no illegal published plan;
+- published bundle never mutates;
+- lost NOTIFY does not lose task;
+- API and CLI produce same run.
+
+======================================================================
+37. FAILURE RECOVERY AND RUNBOOKS
+======================================================================
+
+37.1 SCHEDULER DOWN
+-------------------
+systemd restarts.
+Next tick plans missed latest-only work.
+
+37.2 WORKER DOWN
+----------------
+Lease reaper and task replay.
+
+37.3 API DOWN
+-------------
+CLI/local service and background pipeline continue.
+
+37.4 POSTGRESQL DOWN
+-------------------
+No publication.
+After recovery:
+
+- reconcile worker/artifact state;
+- resume tasks;
+- verify deadline viability.
+
+37.5 ARTIFACT STORE DOWN
+------------------------
+No task requiring large output can succeed.
+Publication blocked if artifact unavailable.
+
+37.6 PARTIAL DECISION
+---------------------
+Do not merge outputs from incompatible runs.
+
+Derive a new run with explicitly resolved artifacts.
+
+37.7 EMERGENCY MANUAL PLAN
+--------------------------
+Use latest valid bundle + exact current-state validator and show age/limitations.
+
+Never fabricate fresh projections.
+
+======================================================================
+38. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-17
+
+----------------------------------------------------------------------
+SRC-PG-QUEUE-2026-001
+Title:
+PostgreSQL SELECT — SKIP LOCKED
+
+Organisation:
+PostgreSQL Global Development Group
+
+URL:
+https://www.postgresql.org/docs/current/sql-select.html
+
+Relevant claim:
+`SKIP LOCKED` skips rows that cannot immediately be locked and is suitable for
+multiple consumers of a queue-like table, while not being suitable for general
+consistent queries.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for worker claims.
+
+----------------------------------------------------------------------
+SRC-PG-LOCK-2026-001
+Title:
+PostgreSQL Explicit Locking and Advisory Locks
+
+Organisation:
+PostgreSQL Global Development Group
+
+URL:
+https://www.postgresql.org/docs/current/explicit-locking.html
+https://www.postgresql.org/docs/current/functions-admin.html
+
+Relevant claim:
+PostgreSQL supports application-defined advisory locks, including
+transaction-level variants.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for scheduler/publication singleton operations.
+
+----------------------------------------------------------------------
+SRC-PG-NOTIFY-2026-001
+Title:
+PostgreSQL NOTIFY and LISTEN
+
+Organisation:
+PostgreSQL Global Development Group
+
+URLs:
+https://www.postgresql.org/docs/current/sql-notify.html
+https://www.postgresql.org/docs/current/sql-listen.html
+
+Relevant claims:
+NOTIFY provides simple interprocess notifications; delivery follows transaction
+commit and tables can carry durable structured state.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES as wake-up hint, not queue truth.
+
+----------------------------------------------------------------------
+SRC-SYSTEMD-2026-001
+Title:
+systemd.timer
+
+Organisation:
+systemd project
+
+URL:
+https://www.freedesktop.org/software/systemd/man/systemd.timer.html
+
+Relevant claim:
+Timer units activate and supervise scheduled service work.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+YES for scheduler/API/worker process management.
+
+----------------------------------------------------------------------
+SRC-HTTP-2022-001
+Title:
+RFC 9110 — HTTP Semantics
+
+Organisation:
+IETF
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc9110
+
+Relevant claims:
+Defines HTTP status/method semantics and idempotent methods; automatic retry of
+nonidempotent methods requires a mechanism proving safe/idempotent semantics.
+
+Reliability:
+HIGH Internet Standard.
+
+Pulse reliance:
+YES for API and retry behaviour.
+
+----------------------------------------------------------------------
+SRC-HTTP-CACHE-2022-001
+Title:
+RFC 9111 — HTTP Caching
+
+Organisation:
+IETF
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc9111
+
+Relevant claim:
+Defines cache-control, validators and HTTP cache behaviour.
+
+Reliability:
+HIGH Internet Standard.
+
+Pulse reliance:
+YES for ETag/conditional read policy.
+
+----------------------------------------------------------------------
+SRC-HTTP-PROBLEM-2023-001
+Title:
+RFC 9457 — Problem Details for HTTP APIs
+
+Organisation:
+IETF
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc9457
+
+Relevant claim:
+Defines machine-readable HTTP error objects using
+`application/problem+json`, including type, title, status, detail and instance.
+
+Reliability:
+HIGH IETF Standards Track.
+
+Pulse reliance:
+YES for API errors.
+
+----------------------------------------------------------------------
+SRC-IDEMPOTENCY-2025-001
+Title:
+The Idempotency-Key HTTP Header Field
+
+Organisation:
+IETF HTTPAPI working-group draft
+
+URL:
+https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header
+
+Relevant claim:
+Describes an Idempotency-Key request header for making POST/PATCH operations
+fault tolerant.
+
+Reliability:
+MODERATE standards draft, not a final RFC at research cut-off.
+
+Pulse reliance:
+Application-level pattern only; exact semantics are Pulse-defined.
+
+----------------------------------------------------------------------
+SRC-OPENAPI-2024-001
+Title:
+OpenAPI Specification v3.1.1
+
+Organisation:
+OpenAPI Initiative
+
+URL:
+https://spec.openapis.org/oas/v3.1.1.html
+
+Relevant claim:
+Defines a language-agnostic interface description for HTTP APIs.
+
+Reliability:
+HIGH official specification.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-FASTAPI-2026-001
+Title:
+FastAPI Documentation — OpenAPI and Client Generation
+
+Organisation:
+FastAPI project
+
+URLs:
+https://fastapi.tiangolo.com/tutorial/first-steps/
+https://fastapi.tiangolo.com/advanced/generate-clients/
+
+Relevant claims:
+FastAPI generates OpenAPI schemas and current documentation identifies OpenAPI
+3.1 output.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+YES for internal API implementation.
+
+----------------------------------------------------------------------
+SRC-TYPER-2026-001
+Title:
+Typer Documentation
+
+Organisation:
+Typer project
+
+URL:
+https://typer.tiangolo.com/
+
+Relevant claim:
+Typer provides type-hint-based Python CLI construction and subcommands.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+YES for CLI.
+
+----------------------------------------------------------------------
+SRC-OTEL-2026-001
+Title:
+OpenTelemetry Context Propagation and Traces
+
+Organisation:
+OpenTelemetry project
+
+URLs:
+https://opentelemetry.io/docs/concepts/context-propagation/
+https://opentelemetry.io/docs/concepts/signals/traces/
+
+Relevant claim:
+Context propagation correlates trace, metric and log signals across process and
+service boundaries.
+
+Reliability:
+HIGH official specification/documentation.
+
+Pulse reliance:
+YES for run/task correlation.
+
+----------------------------------------------------------------------
+SRC-PROM-2026-001
+Title:
+Prometheus Instrumentation and Metric Naming Practices
+
+Organisation:
+Prometheus project
+
+URLs:
+https://prometheus.io/docs/practices/instrumentation/
+https://prometheus.io/docs/practices/naming/
+
+Relevant claim:
+Provides instrumentation, label and naming practices, including avoiding
+procedurally generated metric names/high-cardinality misuse.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for metrics.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-05 — Ingestion, Storage and Data Quality
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-10 — Uncertainty, Scenarios and Early-Season Policy
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-12 — Squad, Transfer and Lineup Optimiser
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-13 — Captaincy and Chip Optimiser
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-14 — Rank, Effective Ownership and Risk Strategy
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-006
+Title:
+DMFP-15 — Backtesting, Calibration and Benchmarks
+
+Pulse reliance:
+YES.
+
+======================================================================
+39. ACCEPTANCE CRITERIA
+======================================================================
+
+A. CONTROL PLANE
+[ ] PostgreSQL is the durable run/task/operation truth.
+[ ] Worker claims use queue-safe locking.
+[ ] Advisory locks protect singleton operations.
+[ ] LISTEN/NOTIFY is not the only delivery mechanism.
+[ ] No external broker is required for V1.
+
+B. SCHEDULING
+[ ] Daily and deadline-relative cadences are configurable.
+[ ] D-15 and D-5 actionable runs exist.
+[ ] Exact audit freeze uses deadline cutoff.
+[ ] Quota reserve and safety buffer are represented.
+[ ] Deadline changes replan all work.
+
+C. DEPENDENCIES/FAILURE
+[ ] DAG dependencies are explicit/versioned.
+[ ] Critical failures block.
+[ ] Optional failures have approved fallbacks.
+[ ] No incompatible run outputs are merged.
+[ ] Retry is bounded/idempotent/deadline-aware.
+[ ] Worker crash recovery is tested.
+
+D. CACHING/VERSIONING
+[ ] Cache keys include every material dependency.
+[ ] Immutable content/artifacts are hash-addressed.
+[ ] Manager state/cutoff/override changes invalidate.
+[ ] Published Decision Bundles are immutable.
+[ ] Latest is only a pointer.
+[ ] Every output carries complete lineage.
+
+E. API/CLI
+[ ] API is OpenAPI-defined and versioned.
+[ ] Long work uses operation resources.
+[ ] Mutating requests are idempotent.
+[ ] Errors use RFC 9457.
+[ ] ETag/conditional reads exist.
+[ ] CLI and API share one service layer.
+[ ] No official FPL write action is exposed.
+
+F. OVERRIDES/REPLAY
+[ ] Overrides are scoped, evidenced, approved and expiring.
+[ ] Raw data are not rewritten.
+[ ] Every replay mode is separate.
+[ ] Historical clock and information cutoff are injected.
+[ ] Original decisions cannot be overwritten.
+
+G. PUBLICATION
+[ ] Readiness gate verifies rules/data/models/legality/time.
+[ ] State hash is rechecked before publication.
+[ ] Late outputs are audit-only.
+[ ] Recommendation, alternatives, reasons and confidence exist.
+[ ] Execution is recorded separately.
+
+H. OPERATIONS
+[ ] Traces, logs and low-cardinality metrics exist.
+[ ] Deadline dashboard and P0 alerts exist.
+[ ] Full synthetic pipeline and failure injection pass.
+[ ] Reproducible replay is possible.
+[ ] Champion/challenger outputs are isolated.
+
+======================================================================
+40. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Create pipeline/publication/override/API database migrations.
+2. Implement run/task/operation state machines.
+3. Implement one-minute scheduler tick and systemd timer.
+4. Implement DAG definition/compiler.
+5. Implement task claim with `SKIP LOCKED`.
+6. Implement worker leases, heartbeats and reaper.
+7. Implement transaction advisory-lock helpers.
+8. Implement outbox + NOTIFY dispatcher.
+9. Implement content/stage cache signatures.
+10. Implement artifact atomic publication.
+11. Implement run context and signature.
+12. Implement daily/deadline/event schedule planner.
+13. Implement hard/soft dependency policies.
+14. Implement failure/degradation matrix.
+15. Implement decision readiness gate.
+16. Implement immutable Decision Bundle/publication pointer.
+17. Implement FastAPI `/api/v1`.
+18. Export/freeze OpenAPI schema.
+19. Implement operation resources and idempotency keys.
+20. Implement RFC 9457 errors.
+21. Implement ETag/conditional GET.
+22. Implement Typer CLI calling common services.
+23. Implement override workflow.
+24. Implement all replay modes and historical clock.
+25. Implement champion/challenger shadow routing.
+26. Implement OpenTelemetry traces and Prometheus metrics.
+27. Build deadline dashboard inputs.
+28. Implement state-hash prepublication validation.
+29. Build golden full-pipeline integration test.
+30. Run concurrency, crash, lost-NOTIFY and disk-failure tests.
+31. Rehearse D-15/D-5/audit cadence.
+32. Do not enable production publication until all acceptance tests pass.
+
+Suggested commands:
+
+    dmf doctor
+    dmf scheduler tick
+    dmf cycle daily
+    dmf cycle deadline --gameweek <n>
+    dmf cycle final --gameweek <n>
+    dmf runs show <run_id>
+    dmf decision latest
+    dmf decision publish <run_id>
+    dmf replay original <run_id>
+    dmf artifacts verify
+    dmf openapi export
+    dmf pipeline validate
+
+======================================================================
+41. OPEN QUESTIONS
+======================================================================
+
+DEPLOYMENT
+----------
+1. Which Linux host/environment is production?
+2. Local filesystem or S3-compatible artifact store?
+3. How many worker processes by queue?
+4. What memory/CPU limits fit the simulation/optimiser?
+5. Is one PostgreSQL instance sufficient for the first season?
+
+SCHEDULING
+----------
+6. What exact daily run times suit Sebastian?
+7. What final execution buffer is accepted?
+8. Which D-60/D-30 tasks remain full versus incremental?
+9. What overnight price snapshot window is observed?
+10. Which event changes trigger immediate full reoptimisation?
+
+DAG/CACHE
+---------
+11. Which stage outputs are safe to reuse across run types?
+12. What random-seed policy allows cache reuse?
+13. What correction invalidation granularity is practical?
+14. How large can the task DAG become per deadline?
+15. When should scenario fan-out use one task per fixture?
+
+API
+---
+16. Is the API loopback-only or private LAN?
+17. What authentication mechanism is selected?
+18. How long are idempotency keys retained?
+19. Are server-sent events needed or is polling sufficient?
+20. Which immutable artifacts can be directly downloaded?
+21. What API clients will exist besides UI/CLI?
+
+FAILURE
+-------
+22. What source-age thresholds allow degraded publication?
+23. When can last healthy availability/market output be reused?
+24. What optimiser gap is publishable in final-fast mode?
+25. What emergency fallback is acceptable at D-2?
+26. What is the manual runbook if official FPL is unavailable?
+
+OVERRIDES
+---------
+27. Which overrides require two-person approval?
+28. Can Sebastian alone approve production player evidence?
+29. What default expiry applies by type?
+30. How are contradictory overrides resolved?
+
+REPLAY
+------
+31. Are original containers/environments retained?
+32. How many seasons of artifacts can be stored?
+33. Which replays may access current models?
+34. How are missing original provider bodies reported?
+35. Is strict replay required for every published decision?
+
+PUBLICATION/UI
+--------------
+36. What exact fields constitute a minimal actionable decision?
+37. Should degraded decisions require manual acknowledgement?
+38. How are plan diffs alerted?
+39. How long is latest recommendation retained after deadline?
+40. How is human execution captured reliably?
+
+======================================================================
+42. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-17 — OBSERVABILITY, REPRODUCIBILITY, SECURITY AND COMPLIANCE
+
+DMFP-17 will deepen:
+
+- telemetry;
+- alert routing;
+- incident response;
+- backup/recovery;
+- secrets;
+- access control;
+- privacy;
+- provider terms;
+- data retention;
+- environment reproducibility;
+- model/software supply chain;
+- audit evidence.
+
+DMFP-16 provides the control-plane entities and lifecycle that DMFP-17 must
+secure and observe.
+
+======================================================================
+43. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-17
+
+- Selected modular-monolith control plane.
+- Selected PostgreSQL durable queue with SKIP LOCKED.
+- Added advisory locks and NOTIFY/outbox pattern.
+- Defined scheduler, API and queue-specific workers.
+- Added daily, deadline and event-driven cadence.
+- Added D-15, D-5 and exact audit-freeze policy.
+- Defined complete module DAG and dependency types.
+- Added run/task/operation/publication state machines.
+- Added idempotent task contracts and worker leases.
+- Added content-addressed caching and invalidation.
+- Added comprehensive failure/degradation matrix.
+- Added readiness and prepublication state validation.
+- Defined immutable Decision Bundles and latest pointers.
+- Selected FastAPI/OpenAPI 3.1/RFC 9457 internal API.
+- Added operation resources, idempotency keys and ETags.
+- Added Typer CLI contract.
+- Added scoped manual overrides.
+- Added five historical replay modes.
+- Added champion/challenger execution.
+- Added versioned outputs, decision-state chain and execution records.
+- Added observability, SLOs, tests, risks, sources and acceptance criteria.
+
+Future v1.0:
+- Sebastian approves cadence and execution buffer.
+- database/control-plane migrations implemented.
+- full DAG runs successfully.
+- API and CLI contract tests pass.
+- D-15/D-5 rehearsal passes.
+- crash/recovery and replay tests pass.
+- publication readiness gate accepted.
+- DMFP-17 security/operations sign-off complete.
+
+END OF DOCUMENT

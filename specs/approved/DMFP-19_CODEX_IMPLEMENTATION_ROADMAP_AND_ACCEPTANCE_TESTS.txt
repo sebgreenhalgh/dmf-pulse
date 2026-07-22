@@ -1,0 +1,3990 @@
+DMF PULSE — CODEX IMPLEMENTATION ROADMAP AND ACCEPTANCE TESTS
+=============================================================
+
+Document ID: DMFP-19
+Version: 0.9 (Stage-Gated Vertical-Slice Delivery Plan)
+Status: PROPOSED — IMPLEMENTATION AUTHORITY AFTER SEBASTIAN APPROVAL
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 18 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Implementation agent: Codex, under human review
+Architecture/research authority: DMFP-00 through DMFP-18
+
+Parent documents:
+- DMFP-00 — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+- DMFP-01 — RESEARCH STANDARD AND EVIDENCE REGISTER
+- DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+- DMFP-03 — CANONICAL DATA MODEL AND IDENTIFIERS
+- DMFP-04 — DATA SOURCES, MARKETS, APIS AND LICENSING
+- DMFP-05 — INGESTION, STORAGE AND DATA QUALITY
+- DMFP-06 — ODDS NORMALISATION AND MARKET CONSENSUS
+- DMFP-07 — PLAYER AVAILABILITY, START AND MINUTES MODEL
+- DMFP-08 — FOOTBALL EVENT DISTRIBUTION ENGINE
+- DMFP-09 — FPL POINTS DISTRIBUTION ENGINE
+- DMFP-10 — UNCERTAINTY, SCENARIOS AND EARLY-SEASON POLICY
+- DMFP-11 — PRICE CHANGE AND TEAM VALUE MODEL
+- DMFP-12 — SQUAD, TRANSFER AND LINEUP OPTIMISER
+- DMFP-13 — CAPTAINCY AND CHIP OPTIMISER
+- DMFP-14 — RANK, EFFECTIVE OWNERSHIP AND RISK STRATEGY
+- DMFP-15 — BACKTESTING, CALIBRATION AND BENCHMARKS
+- DMFP-16 — ORCHESTRATION, APIS AND DECISION PIPELINE
+- DMFP-17 — OBSERVABILITY, REPRODUCIBILITY, SECURITY AND COMPLIANCE
+- DMFP-18 — DECISION UI, REPORTING AND EXPLANATIONS
+
+Next document:
+- DMFP-20 — ASSUMPTIONS, DECISIONS AND OPEN QUESTIONS
+
+PURPOSE
+-------
+This document converts the complete Pulse architecture into a staged coding,
+testing and acceptance programme for Codex.
+
+The required stages are:
+
+1. Repository and configuration
+2. FPL rules engine
+3. Canonical data model
+4. FPL API ingestion
+5. One odds provider
+6. Odds normalisation
+7. Basic minutes model
+8. Goal and clean-sheet distributions
+9. FPL-points simulation
+10. One-Gameweek squad selection
+11. Multi-Gameweek transfer optimisation
+12. Backtesting framework
+13. Price prediction
+14. Chip optimisation
+15. Rank-aware strategy
+16. User interface
+
+For every stage this document defines:
+
+- the user-visible vertical slice;
+- prerequisites;
+- files Codex should create or modify;
+- database migrations;
+- public interfaces;
+- CLI/API surfaces;
+- unit tests;
+- property tests;
+- integration tests;
+- golden fixtures;
+- acceptance criteria;
+- explicit exclusions;
+- completion evidence;
+- the exact boundary before the next stage.
+
+The central implementation rule is:
+
+    DO NOT GIVE CODEX THE ENTIRE SYSTEM IN ONE REQUEST.
+
+Codex receives one bounded, reviewable work unit at a time.
+
+The next work unit is released only after the current unit:
+
+- runs;
+- passes its tests;
+- satisfies its public contract;
+- has no hidden stubs in accepted scope;
+- records its evidence;
+- is reviewed;
+- is merged;
+- is tagged as accepted.
+
+GOVERNING DELIVERY PRINCIPLE
+----------------------------
+Every stage must form a VERTICAL SLICE.
+
+A vertical slice reaches from:
+
+    typed input
+    -> domain logic
+    -> persistence/artifact where applicable
+    -> CLI/API entry point
+    -> deterministic output
+    -> tests
+    -> acceptance evidence.
+
+A stage is not complete because:
+
+- classes exist;
+- schemas compile;
+- unit tests pass in isolation;
+- an unconnected notebook produces a chart;
+- a TODO says the difficult part comes later;
+- mocked data never reaches a public interface;
+- the code looks plausible.
+
+A stage is complete only when its promised capability can be demonstrated from
+the supported command/API with approved fixtures and reproducible evidence.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Any deviation requires an architecture decision record.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE IMPLEMENTATION DECISIONS
+======================================================================
+
+0.1 DEVELOPMENT MODEL
+---------------------
+Selected:
+
+- one Git repository;
+- Python modular monolith;
+- `src/` package layout;
+- PostgreSQL integration from Stage 3 onward;
+- immutable file/Parquet artifacts;
+- typed domain/application interfaces;
+- Typer CLI;
+- FastAPI introduced when a stage genuinely needs an HTTP surface;
+- Alembic database migrations;
+- Pyomo/HiGHS for optimisation;
+- pytest/Hypothesis for tests;
+- Ruff and mypy for static quality;
+- branch coverage and mutation testing;
+- locked, hash-verified dependencies;
+- one stage per release milestone;
+- one accepted public contract per stage.
+
+0.2 REPOSITORY PACKAGE
+----------------------
+Canonical Python package:
+
+    dmf_pulse
+
+No alternate package names.
+
+0.3 INITIAL PYTHON VERSION
+--------------------------
+Proposed conservative baseline:
+
+    Python 3.13.x
+
+Stage 1 performs a compatibility spike.
+
+Python 3.14 MAY be selected instead only if every required runtime dependency,
+solver interface, test tool and deployment target passes.
+
+The selected minor version is then exact and locked for the implementation
+release line.
+
+0.4 DATABASE
+------------
+PostgreSQL is the only production relational database.
+
+SQLite is not an integration-test substitute for PostgreSQL semantics.
+
+Unit tests may use pure in-memory repositories where the domain boundary is
+explicit.
+
+Database integration tests use an ephemeral real PostgreSQL instance.
+
+0.5 PACKAGE AND DEPENDENCY CONTROL
+----------------------------------
+Use:
+
+- `pyproject.toml` for package/tool configuration;
+- a standards-compatible `pylock.toml` or approved exact lock generated by the
+  selected toolchain;
+- artifact hashes;
+- a reproducible wheelhouse/release bundle;
+- exact Python version;
+- source and build manifests.
+
+The Python Packaging User Guide identifies `pyproject.toml` as the central
+configuration surface for build and tooling, while the `pylock.toml`
+specification is intended for reproducible environment installation.
+
+0.6 CODE QUALITY TOOLING
+------------------------
+Selected baseline:
+
+- Ruff formatter and linter;
+- mypy strict mode for production package;
+- pytest;
+- Hypothesis;
+- coverage.py branch coverage;
+- mutmut for mutation testing;
+- Schemathesis for OpenAPI property/stateful tests after the API exists;
+- Testcontainers or a controlled local PostgreSQL service for integration tests.
+
+0.7 CI
+------
+Selected default:
+
+- GitHub Actions if repository hosting permits it;
+- a self-hosted/local equivalent MAY be used;
+- workflow definitions remain repository-controlled;
+- production release does not depend on an unreviewed marketplace action.
+
+0.8 TESTING PHILOSOPHY
+----------------------
+Tests are not one final phase.
+
+Each implementation ticket begins with:
+
+1. public contract;
+2. fixture;
+3. failing test;
+4. minimal implementation;
+5. refactor;
+6. acceptance demonstration.
+
+0.9 MIGRATION PHILOSOPHY
+------------------------
+Schema changes:
+
+- Alembic revision in the same stage;
+- upgrade tested from prior accepted stage;
+- downgrade or explicit irreversible rationale;
+- clean-database migration tested;
+- current schema fingerprint stored.
+
+Data migrations are separate application operations unless a small, safe,
+idempotent metadata change genuinely belongs in schema migration.
+
+0.10 OPTIMISATION TOOLING
+-------------------------
+Selected:
+
+- Pyomo as the transparent algebraic modelling layer;
+- HiGHS as initial open-source solver.
+
+Pyomo supports structured symbolic optimisation models and open/commercial
+solver integration. HiGHS supports large sparse LP/MIP models and exposes
+solver status, limits and MIP options.
+
+0.11 API CONTRACT TESTING
+-------------------------
+Once FastAPI is introduced:
+
+- OpenAPI exported and versioned;
+- tests call application through HTTP;
+- dependency overrides replace external services;
+- Schemathesis generates edge cases from the OpenAPI schema;
+- RFC 9457 errors validated;
+- CLI/API parity tested.
+
+0.12 STAGE MERGE RULE
+---------------------
+No stage is merged with:
+
+- failing required tests;
+- unresolved critical type/lint errors;
+- migration drift;
+- unreviewed public-interface change;
+- hidden network dependency in unit tests;
+- production secret;
+- `pass`, `NotImplementedError` or unconditional TODO inside accepted scope;
+- fake numerical output;
+- silently skipped acceptance case.
+
+0.13 STAGE TAGS
+---------------
+After acceptance:
+
+    dmfp-stage-01-accepted
+    ...
+    dmfp-stage-16-accepted
+
+The tag points to the accepted commit and evidence manifest.
+
+0.14 IMPLEMENTATION ORDER
+-------------------------
+The requested stage order is retained.
+
+Codex may not build ahead into later-stage business logic.
+
+Foundational abstractions may be created earlier only when required by the
+current vertical slice and explicitly approved.
+
+======================================================================
+1. CODEX WORK-UNIT RULES
+======================================================================
+
+1.1 ONE REQUEST, ONE OUTCOME
+----------------------------
+A Codex request should normally implement one of:
+
+- one domain aggregate;
+- one migration;
+- one provider endpoint;
+- one public service;
+- one CLI command group;
+- one model baseline;
+- one optimiser formulation;
+- one acceptance fixture.
+
+Do not ask Codex to "implement Stage 8" in a single unconstrained prompt.
+
+1.2 MAXIMUM NORMAL DIFF
+-----------------------
+Guideline:
+
+- 3–12 production files;
+- 3–15 test files;
+- one migration;
+- one public-interface addition;
+- one fixture family.
+
+A larger diff requires an explicit reason.
+
+1.3 REQUIRED PROMPT INPUT
+-------------------------
+Every Codex implementation prompt includes:
+
+- stage and ticket ID;
+- exact objective;
+- parent architecture sections;
+- files allowed to change;
+- public interfaces;
+- fixture IDs;
+- tests that must pass;
+- exclusions;
+- completion command;
+- no-future-stage instruction.
+
+1.4 REQUIRED CODEX RESPONSE
+---------------------------
+Codex must report:
+
+- files changed;
+- interfaces implemented;
+- tests added;
+- commands run;
+- test results;
+- assumptions;
+- exclusions;
+- known risks;
+- migration impact;
+- exact acceptance evidence path.
+
+1.5 NO SPECULATION
+------------------
+If architecture is ambiguous:
+
+- Codex stops within the ticket;
+- records the question;
+- does not invent a new rule/model.
+
+1.6 NO UNRELATED REFACTOR
+-------------------------
+Refactoring outside the permitted files/scope requires a separate ticket.
+
+1.7 NO NEW DEPENDENCY WITHOUT REVIEW
+------------------------------------
+Any new runtime or development dependency requires:
+
+- purpose;
+- licence;
+- maintenance state;
+- security review;
+- lock update;
+- SBOM update;
+- alternative considered.
+
+1.8 PUBLIC CONTRACT FIRST
+-------------------------
+Public schemas/protocols are reviewed before implementation details.
+
+1.9 ACCEPTANCE-FIRST BRANCH
+---------------------------
+Recommended branch:
+
+    stage/<stage-number>/<ticket-id>-<short-name>
+
+1.10 TICKET STATES
+------------------
+PROPOSED
+READY
+IN_PROGRESS
+CODE_COMPLETE
+TEST_COMPLETE
+REVIEW_REQUIRED
+ACCEPTED
+REJECTED
+SUPERSEDED.
+
+======================================================================
+2. DEFINITION OF DONE
+======================================================================
+
+2.1 TICKET DEFINITION OF DONE
+-----------------------------
+A ticket is done when:
+
+- accepted code exists;
+- required tests pass;
+- no excluded feature was smuggled in;
+- documentation/docstrings are current;
+- lock/SBOM updated if needed;
+- migration tested if present;
+- public contract snapshot updated;
+- acceptance evidence written;
+- reviewer approval recorded.
+
+2.2 STAGE DEFINITION OF DONE
+----------------------------
+A stage is done when:
+
+- all mandatory tickets accepted;
+- vertical slice demo succeeds from clean environment;
+- public interface is versioned;
+- all stage unit/property/integration tests pass;
+- acceptance fixtures pass;
+- coverage/mutation gates pass;
+- no P0/P1 defect remains;
+- database can upgrade from prior accepted stage;
+- stage exclusions remain absent;
+- stage acceptance manifest validates;
+- rollback/replay instructions exist;
+- Sebastian signs the stage gate.
+
+2.3 COMPLETION MANIFEST
+-----------------------
+Path:
+
+    evidence/stages/<NN>/stage_acceptance.json
+
+Required fields:
+
+- stage;
+- name;
+- commit;
+- tag;
+- completed_at;
+- reviewer;
+- requirements;
+- test commands/results;
+- coverage;
+- mutation;
+- migrations;
+- public-contract hashes;
+- fixture hashes;
+- demo commands/results;
+- performance;
+- security/licence;
+- known limitations;
+- exclusions verified;
+- accepted.
+
+2.4 HUMAN-READABLE REPORT
+-------------------------
+Path:
+
+    evidence/stages/<NN>/STAGE_ACCEPTANCE.md
+
+2.5 ACCEPTED DOES NOT MEAN PRODUCTION
+-------------------------------------
+Early stages are research/development capabilities.
+
+Production publication remains gated by Stages 12, 16 and DMFP-17 controls.
+
+======================================================================
+3. TARGET REPOSITORY STRUCTURE
+======================================================================
+
+The final repository should converge toward:
+
+    dmf-pulse/
+      pyproject.toml
+      pylock.toml
+      README.md
+      LICENSE
+      SECURITY.md
+      CONTRIBUTING.md
+      CODEOWNERS
+      CHANGELOG.md
+      Makefile
+      .python-version
+      .gitignore
+      .editorconfig
+      .pre-commit-config.yaml
+      .github/
+        workflows/
+          ci.yml
+          nightly.yml
+          release.yml
+          security.yml
+      alembic.ini
+      alembic/
+        env.py
+        script.py.mako
+        versions/
+      config/
+        base/
+        environments/
+        rules/
+        providers/
+        models/
+        optimisation/
+        presentation/
+        assurance/
+      docs/
+        architecture/
+        adr/
+        api/
+        operations/
+        stages/
+      evidence/
+        stages/
+        releases/
+      fixtures/
+        fpl/
+        odds/
+        rules/
+        minutes/
+        events/
+        points/
+        optimisation/
+        prices/
+        chips/
+        rank/
+        ui/
+        historical/
+      scripts/
+        bootstrap_dev.py
+        verify_release.py
+      src/
+        dmf_pulse/
+          __init__.py
+          py.typed
+          config/
+          domain/
+          application/
+          infrastructure/
+          cli/
+          api/
+          rules/
+          data_model/
+          ingestion/
+          markets/
+          availability/
+          football_events/
+          fpl_points/
+          uncertainty/
+          prices/
+          optimisation/
+          chips/
+          rank_strategy/
+          evaluation/
+          pipeline/
+          assurance/
+          presentation/
+      tests/
+        unit/
+        property/
+        contract/
+        integration/
+        e2e/
+        golden/
+        performance/
+        security/
+        replay/
+      web/
+        templates/
+        static/
+      migrations/
+        data/
+      artifacts/
+        .gitkeep
+
+Not every directory is created in Stage 1.
+
+Create directories only when the active stage needs them, except the minimal
+top-level test/config/documentation skeleton.
+
+======================================================================
+4. TEST TAXONOMY AND MARKERS
+======================================================================
+
+4.1 MARKERS
+-----------
+    unit
+    property
+    golden
+    contract
+    integration
+    e2e
+    slow
+    performance
+    security
+    network
+    replay
+    postgres
+    solver
+    ui
+    target_season
+
+4.2 DEFAULT PR SUITE
+--------------------
+- format/lint;
+- type;
+- unit;
+- property fast profile;
+- contract;
+- selected integration;
+- branch coverage.
+
+4.3 MAIN-BRANCH SUITE
+---------------------
+- all PR tests;
+- PostgreSQL integration;
+- solver integration;
+- Schemathesis API tests;
+- mutation slice;
+- migration upgrade/downgrade;
+- fixture replay.
+
+4.4 NIGHTLY
+-----------
+- full Hypothesis;
+- full mutation rotation;
+- all historical fixtures;
+- performance;
+- deterministic replay;
+- dependency/security;
+- slow model validation.
+
+4.5 STAGE GATE
+--------------
+- stage-specific complete suite;
+- clean environment;
+- acceptance demonstration.
+
+4.6 TEST ISOLATION
+------------------
+Unit tests:
+
+- no Internet;
+- no real clock;
+- no production database;
+- no global RNG;
+- no mutable user home;
+- no ordering dependency.
+
+4.7 TIME
+--------
+Inject `Clock`.
+
+Use absolute times in fixtures.
+
+4.8 RANDOMNESS
+--------------
+Inject RNG/seed.
+
+Failure seed included in assertion/report.
+
+4.9 EXTERNAL PROVIDERS
+----------------------
+Contract fixtures use recorded, sanitised, rights-approved payloads.
+
+Live provider smoke tests are separate and never required for deterministic PR
+success.
+
+======================================================================
+5. FIXTURE STANDARD
+======================================================================
+
+5.1 FIXTURE MANIFEST
+--------------------
+Every fixture family includes:
+
+- fixture ID;
+- purpose;
+- source/synthetic status;
+- captured/generated time;
+- rights classification;
+- schema version;
+- expected outputs;
+- edge cases;
+- checksum.
+
+5.2 SYNTHETIC FIRST
+-------------------
+Rules, optimiser and security fixtures should be synthetic.
+
+5.3 RECORDED PAYLOADS
+---------------------
+Sanitise:
+
+- API keys;
+- manager IDs/names where private;
+- unstable timestamps if not part of test;
+- provider request metadata.
+
+5.4 GOLDEN OUTPUT
+----------------
+Golden file updates require:
+
+- explicit command;
+- diff review;
+- reason;
+- no automatic overwrite during ordinary test.
+
+5.5 MINIMAL AND ADVERSARIAL
+---------------------------
+Each fixture family includes:
+
+- happy path;
+- smallest valid input;
+- boundary;
+- missing/unknown;
+- invalid;
+- contradictory;
+- large representative.
+
+======================================================================
+6. ACCEPTANCE-GATE MATRIX
+======================================================================
+
+Stage 1:
+Repository executes and enforces quality.
+
+Stage 2:
+Synthetic football events score exactly under a versioned ruleset.
+
+Stage 3:
+Canonical entities persist temporally and replay.
+
+Stage 4:
+Official FPL snapshot ingests idempotently into canonical data.
+
+Stage 5:
+One free odds provider produces immutable raw observations.
+
+Stage 6:
+Market quotes become coherent probabilities and confidence.
+
+Stage 7:
+Player start/minute distributions are calibrated/coherent at baseline level.
+
+Stage 8:
+Team goal and clean-sheet distributions reconcile to markets.
+
+Stage 9:
+Coherent event scenarios become full player/Gameweek FPL points distributions.
+
+Stage 10:
+One-Gameweek legal squad/XI/bench/captain plan is optimised.
+
+Stage 11:
+Multi-Gameweek legal transfers, bank, FT and selling prices are optimised.
+
+Stage 12:
+Every accepted projection/decision can be walk-forward backtested without
+leakage.
+
+Stage 13:
+Price-event probabilities and ACT-versus-WAIT value are available.
+
+Stage 14:
+Captain and chips are scheduled with opportunity cost.
+
+Stage 15:
+Rank/EO utility re-evaluates unchanged point projections.
+
+Stage 16:
+A secure accessible cockpit publishes the immutable Decision Bundle.
+
+======================================================================
+7. STAGE 1 — REPOSITORY AND CONFIGURATION
+======================================================================
+
+7.1 VERTICAL SLICE
+------------------
+From a clean checkout:
+
+    dmf doctor
+
+loads a typed configuration, reports environment/version information and exits
+successfully.
+
+CI verifies formatting, types, tests, dependency lock and package build.
+
+7.2 DEPENDENCIES
+----------------
+None.
+
+7.3 CODEX TICKET SEQUENCE
+-------------------------
+19.01.01:
+Create package and build skeleton.
+
+19.01.02:
+Create typed configuration loader.
+
+19.01.03:
+Create CLI `doctor` command.
+
+19.01.04:
+Create CI/quality toolchain.
+
+19.01.05:
+Create release/evidence manifest.
+
+Do not combine all into one prompt unless the diff remains reviewable.
+
+7.4 FILES TO CREATE
+-------------------
+    pyproject.toml
+    pylock.toml or selected exact lock
+    .python-version
+    README.md
+    LICENSE
+    SECURITY.md
+    CONTRIBUTING.md
+    CHANGELOG.md
+    Makefile
+    .gitignore
+    .editorconfig
+    .pre-commit-config.yaml
+    .github/workflows/ci.yml
+    config/base/application.yaml
+    config/environments/development.yaml
+    config/environments/test.yaml
+    src/dmf_pulse/__init__.py
+    src/dmf_pulse/py.typed
+    src/dmf_pulse/config/__init__.py
+    src/dmf_pulse/config/models.py
+    src/dmf_pulse/config/loader.py
+    src/dmf_pulse/config/errors.py
+    src/dmf_pulse/cli/__init__.py
+    src/dmf_pulse/cli/app.py
+    src/dmf_pulse/cli/doctor.py
+    tests/unit/config/test_loader.py
+    tests/unit/cli/test_doctor.py
+    tests/property/config/test_config_properties.py
+    tests/conftest.py
+    scripts/verify_release.py
+    evidence/stages/01/.gitkeep
+
+7.5 PUBLIC INTERFACES
+---------------------
+    class EnvironmentName(StrEnum):
+        DEVELOPMENT
+        TEST
+        STAGING
+        PRODUCTION
+        REPLAY
+
+    class AppConfig(BaseModel):
+        environment: EnvironmentName
+        timezone: str
+        artifact_root: Path
+        database_dsn_ref: str | None
+        log_level: str
+
+    def load_config(
+        *,
+        environment: EnvironmentName,
+        config_root: Path,
+        overrides: Mapping[str, object] | None = None,
+    ) -> AppConfig
+
+CLI:
+
+    dmf --version
+    dmf doctor [--json]
+    dmf config show [--json]
+    dmf config validate
+
+7.6 UNIT TESTS
+--------------
+- base config loads;
+- environment overlay;
+- unknown critical field rejected;
+- missing required field;
+- path normalization;
+- timezone validation;
+- secret-looking value prohibited in ordinary config;
+- CLI version;
+- doctor JSON schema;
+- error exit codes.
+
+7.7 PROPERTY TESTS
+------------------
+- arbitrary supported overlay order is deterministic;
+- repeated load yields equal canonical representation;
+- environment enum round-trip;
+- no configuration field can serialize a secret value when marked secret-ref.
+
+7.8 INTEGRATION TESTS
+---------------------
+- build wheel;
+- install wheel into fresh virtual environment;
+- run `dmf doctor`;
+- verify source tree is not imported accidentally;
+- lock installation verifies hashes;
+- generated package includes `py.typed`.
+
+7.9 TEST FIXTURES
+-----------------
+    fixtures/config/minimal_valid/
+    fixtures/config/invalid_unknown/
+    fixtures/config/invalid_secret/
+    fixtures/config/overlay_precedence/
+
+7.10 ACCEPTANCE CRITERIA
+------------------------
+- `python -m build` succeeds;
+- locked clean install succeeds;
+- `dmf doctor --json` returns validated output;
+- Ruff passes;
+- mypy strict passes for production package;
+- pytest passes;
+- branch coverage >=90% for Stage 1 package;
+- no secrets in repository;
+- exact dependency manifest generated;
+- CI runs on pull request;
+- package imports have no network/database side effects.
+
+7.11 EXPLICIT EXCLUSIONS
+------------------------
+- PostgreSQL schema;
+- provider clients;
+- FPL rules;
+- domain entities beyond configuration;
+- FastAPI;
+- orchestration workers;
+- model code;
+- UI.
+
+7.12 COMPLETION DEFINITION
+--------------------------
+A new developer can clone, install from lock, run tests and execute `dmf doctor`
+without undocumented steps.
+
+======================================================================
+8. STAGE 2 — FPL RULES ENGINE
+======================================================================
+
+8.1 VERTICAL SLICE
+------------------
+Given a synthetic ruleset, player position, official minutes and fixture events:
+
+    dmf rules score-fixture <fixture.json>
+
+returns an exact component and total FPL score for every player.
+
+8.2 DEPENDENCIES
+----------------
+Stage 1 accepted.
+
+8.3 CODEX TICKET SEQUENCE
+-------------------------
+19.02.01:
+Ruleset schemas and compiler.
+
+19.02.02:
+Appearance/goal/assist/clean-sheet/save/negative-event scoring.
+
+19.02.03:
+Reference BPS and bonus tie engine.
+
+19.02.04:
+Reference automatic-substitution/captain rules where required for golden tests.
+
+19.02.05:
+CLI and golden fixture pack.
+
+8.4 FILES TO CREATE
+-------------------
+    config/rules/reference_2025_26.yaml
+    src/dmf_pulse/rules/__init__.py
+    src/dmf_pulse/rules/schemas.py
+    src/dmf_pulse/rules/compiler.py
+    src/dmf_pulse/rules/scoring.py
+    src/dmf_pulse/rules/assists.py
+    src/dmf_pulse/rules/bps.py
+    src/dmf_pulse/rules/bonus.py
+    src/dmf_pulse/rules/autosubs.py
+    src/dmf_pulse/rules/captaincy.py
+    src/dmf_pulse/rules/validation.py
+    src/dmf_pulse/rules/errors.py
+    src/dmf_pulse/cli/rules.py
+    tests/unit/rules/
+    tests/property/rules/
+    tests/golden/rules/
+    fixtures/rules/
+
+8.5 PUBLIC INTERFACES
+---------------------
+    class CompiledRuleset: ...
+
+    def compile_ruleset(document: RulesetDocument) -> CompiledRuleset
+
+    def score_player_fixture(
+        *,
+        player: PlayerScoringIdentity,
+        events: PlayerFixtureEvents,
+        fixture: FixtureScoringContext,
+        ruleset: CompiledRuleset,
+    ) -> PlayerFixtureScore
+
+    def calculate_bps(
+        *,
+        participants: Sequence[PlayerBpsEvents],
+        fixture: FixtureScoringContext,
+        ruleset: CompiledRuleset,
+    ) -> Mapping[PlayerId, int]
+
+    def allocate_bonus(
+        bps: Mapping[PlayerId, int],
+        ruleset: CompiledRuleset,
+    ) -> Mapping[PlayerId, int]
+
+    def apply_auto_substitutions(...) -> AutoSubstitutionResult
+
+    def apply_captaincy(...) -> ManagerScoringResult
+
+CLI:
+
+    dmf rules validate <ruleset>
+    dmf rules score-fixture <fixture>
+    dmf rules explain-score <fixture> --player <id>
+
+8.6 UNIT TESTS
+--------------
+Every defined scoring rule:
+
+- appearance minute boundaries;
+- position-specific goal values;
+- assists;
+- clean sheets;
+- saves groups;
+- penalty saves;
+- goals-conceded deductions;
+- defensive-contribution thresholds;
+- yellow/red interaction;
+- missed penalties;
+- own goals;
+- BPS positive and negative events;
+- mutually exclusive BPS rules;
+- match-winning goal;
+- pass-completion bands;
+- ties first/second/third;
+- more than three bonus recipients;
+- captain and vice fallback;
+- all legal auto-sub edge cases.
+
+8.7 PROPERTY TESTS
+------------------
+- total equals component sum;
+- BPS/points integers;
+- no invalid bonus value;
+- bonus tie allocation follows competition ranking;
+- legal autosub result;
+- ruleset compile/serialize round-trip;
+- changing one configured score changes only intended component.
+
+8.8 INTEGRATION TESTS
+---------------------
+- load YAML ruleset;
+- score complete synthetic fixture;
+- save/read golden JSON;
+- CLI output equals library output;
+- invalid ruleset refuses scoring;
+- mutation of a scoring constant causes golden failure.
+
+8.9 TEST FIXTURES
+-----------------
+- goalless fixture;
+- multi-goal/assist fixture;
+- penalty save/miss;
+- own goal;
+- red card after substitution;
+- exact 60 minutes;
+- BPS tie variants;
+- multiple autosub nonappearances;
+- captain and vice both absent;
+- defensive contribution thresholds.
+
+8.10 ACCEPTANCE CRITERIA
+------------------------
+- 100% rule-case coverage;
+- branch coverage >=95%;
+- mutation score >=90%;
+- all golden fixture totals verified;
+- no hard-coded 2026/27 values;
+- ruleset hash appears in output;
+- deterministic output;
+- no provider or database dependency.
+
+8.11 EXPLICIT EXCLUSIONS
+------------------------
+- event prediction;
+- official target-season activation;
+- provider assist mapping;
+- database persistence;
+- optimisation;
+- chip opportunity cost.
+
+8.12 COMPLETION DEFINITION
+--------------------------
+A complete synthetic fixture can be scored exactly and explained from a
+versioned reference ruleset.
+
+======================================================================
+9. STAGE 3 — CANONICAL DATA MODEL
+======================================================================
+
+9.1 VERTICAL SLICE
+------------------
+Create, persist and retrieve temporally versioned canonical:
+
+- season;
+- Gameweek;
+- team;
+- player;
+- player-season;
+- fixture;
+- ruleset;
+- source observation;
+- entity mapping.
+
+A replay query at a historical `as_of` returns the correct version.
+
+9.2 DEPENDENCIES
+----------------
+Stages 1–2 accepted.
+
+9.3 CODEX TICKET SEQUENCE
+-------------------------
+19.03.01:
+Database connection/unit-of-work.
+
+19.03.02:
+Core canonical tables/migration.
+
+19.03.03:
+Temporal observation/revision tables.
+
+19.03.04:
+Repository interfaces and identity resolution.
+
+19.03.05:
+CLI database commands and PostgreSQL integration suite.
+
+9.4 FILES TO CREATE
+-------------------
+    alembic.ini
+    alembic/env.py
+    alembic/script.py.mako
+    alembic/versions/<stage3_core>.py
+    src/dmf_pulse/data_model/ids.py
+    src/dmf_pulse/data_model/entities.py
+    src/dmf_pulse/data_model/observations.py
+    src/dmf_pulse/data_model/revisions.py
+    src/dmf_pulse/data_model/mappings.py
+    src/dmf_pulse/infrastructure/db/engine.py
+    src/dmf_pulse/infrastructure/db/session.py
+    src/dmf_pulse/infrastructure/db/models.py
+    src/dmf_pulse/infrastructure/db/repositories.py
+    src/dmf_pulse/application/unit_of_work.py
+    src/dmf_pulse/cli/database.py
+    tests/unit/data_model/
+    tests/integration/postgres/
+    fixtures/data_model/
+
+9.5 PUBLIC INTERFACES
+---------------------
+    Protocol TeamRepository
+    Protocol PlayerRepository
+    Protocol FixtureRepository
+    Protocol ObservationRepository
+    Protocol MappingRepository
+
+    class UnitOfWork(Protocol):
+        teams: TeamRepository
+        players: PlayerRepository
+        fixtures: FixtureRepository
+        observations: ObservationRepository
+        mappings: MappingRepository
+
+    def resolve_player_identity(
+        source: SourceKey,
+        external_id: str,
+        as_of: datetime,
+    ) -> PlayerId | UnresolvedMapping
+
+9.6 DATABASE REQUIREMENTS
+-------------------------
+- UUID primary keys;
+- UTC timestamps;
+- provider/generated/received/usable times;
+- valid-time and system-time fields where specified;
+- immutable source observations;
+- append-only correction/revision;
+- unique canonical identity constraints;
+- indexes for as-of lookup;
+- no cascade that destroys audit history.
+
+9.7 UNIT TESTS
+--------------
+- identity value objects;
+- temporal interval validation;
+- fixture status transitions;
+- mapping confidence;
+- immutable observation behavior;
+- repository protocol fakes;
+- transaction rollback.
+
+9.8 PROPERTY TESTS
+------------------
+- temporal intervals do not overlap where forbidden;
+- repeated correction preserves original;
+- UUID/entity serialization;
+- observation content hash deterministic.
+
+9.9 INTEGRATION TESTS
+---------------------
+Using real PostgreSQL:
+
+- migrate empty database to head;
+- create/read entities;
+- duplicate constraints;
+- transaction rollback;
+- concurrent mapping insertion;
+- as-of fixture query;
+- append correction;
+- downgrade/upgrade or approved irreversible test;
+- migration from Stage 2 empty state.
+
+Testcontainers is preferred because it runs integration tests against the same
+database type rather than an in-memory substitute.
+
+9.10 TEST FIXTURES
+------------------
+- two seasons;
+- promoted/relegated team;
+- player transfer;
+- duplicate names;
+- postponed fixture revision;
+- source ID remap;
+- correction after deadline.
+
+9.11 ACCEPTANCE CRITERIA
+------------------------
+- clean migration succeeds;
+- all integration tests pass on supported PostgreSQL;
+- as-of query returns expected fixtures/mappings;
+- original observation cannot be overwritten through public repository;
+- schema fingerprint recorded;
+- no SQLite production path;
+- database CLI can migrate/status/reset test database.
+
+9.12 EXPLICIT EXCLUSIONS
+------------------------
+- provider HTTP calls;
+- FPL payload schemas;
+- odds;
+- model features;
+- large scenario artifacts;
+- orchestration queue.
+
+9.13 COMPLETION DEFINITION
+--------------------------
+Pulse has a reproducible, temporal canonical database foundation that can store
+later stages without changing accepted identity semantics.
+
+======================================================================
+10. STAGE 4 — FPL API INGESTION
+======================================================================
+
+10.1 VERTICAL SLICE
+-------------------
+Given a recorded or live approved official FPL bootstrap/fixture snapshot:
+
+    dmf ingest fpl snapshot
+
+stores immutable raw observations, validates schema, maps canonical entities and
+produces a source-bundle summary.
+
+10.2 DEPENDENCIES
+-----------------
+Stages 1–3 accepted.
+DMFP-04/17 rights profile approved for private ingestion.
+
+10.3 CODEX TICKET SEQUENCE
+-------------------------
+19.04.01:
+Provider adapter interface and HTTP client.
+
+19.04.02:
+FPL payload schemas/recorded fixtures.
+
+19.04.03:
+Raw observation ingestion/idempotency.
+
+19.04.04:
+Canonical mapper.
+
+19.04.05:
+Quality report and CLI.
+
+10.4 FILES TO CREATE
+--------------------
+    config/providers/fpl.yaml
+    src/dmf_pulse/ingestion/base.py
+    src/dmf_pulse/ingestion/http.py
+    src/dmf_pulse/ingestion/raw_store.py
+    src/dmf_pulse/ingestion/quality.py
+    src/dmf_pulse/ingestion/fpl/__init__.py
+    src/dmf_pulse/ingestion/fpl/client.py
+    src/dmf_pulse/ingestion/fpl/schemas.py
+    src/dmf_pulse/ingestion/fpl/adapter.py
+    src/dmf_pulse/ingestion/fpl/mapper.py
+    src/dmf_pulse/ingestion/fpl/service.py
+    src/dmf_pulse/cli/ingest.py
+    alembic/versions/<stage4_ingestion>.py
+    tests/unit/ingestion/fpl/
+    tests/contract/fpl/
+    tests/integration/fpl/
+    fixtures/fpl/
+
+10.5 PUBLIC INTERFACES
+---------------------
+    class ProviderSnapshotResult(BaseModel):
+        retrieval_id: UUID
+        raw_artifact_id: UUID
+        observed_at: datetime
+        received_at: datetime
+        schema_status: SchemaStatus
+        row_counts: Mapping[str, int]
+        warnings: tuple[QualityWarning, ...]
+
+    class FplAdapter(ProviderAdapter):
+        def fetch_bootstrap(...) -> RawProviderResponse
+        def fetch_fixtures(...) -> RawProviderResponse
+
+    def ingest_fpl_snapshot(
+        *,
+        as_of: datetime,
+        mode: IngestionMode,
+        uow: UnitOfWork,
+    ) -> ProviderSnapshotResult
+
+CLI:
+
+    dmf ingest fpl snapshot
+    dmf ingest fpl replay <fixture-dir>
+    dmf ingest fpl validate <payload>
+
+10.6 UNIT TESTS
+--------------
+- HTTP timeout and status;
+- safe URL logging;
+- schema validation;
+- unknown additive field;
+- missing required field;
+- idempotency;
+- raw hash;
+- timestamp order;
+- canonical mapping;
+- player position/price conversion;
+- fixture/Gameweek mapping;
+- typed missingness.
+
+10.7 CONTRACT TESTS
+-------------------
+Recorded payloads:
+
+- parse against Pydantic models;
+- schema snapshots;
+- additive compatibility;
+- generated OpenAPI not yet required.
+
+10.8 INTEGRATION TESTS
+---------------------
+- recorded FPL snapshot -> raw artifact -> canonical PostgreSQL rows;
+- repeat same payload -> new retrieval event but no duplicate canonical effect;
+- changed price/status -> append temporal observation;
+- schema-breaking payload -> quarantine/block;
+- provider unavailable -> typed failure;
+- no network in recorded replay mode.
+
+10.9 TEST FIXTURES
+------------------
+- minimal bootstrap;
+- realistic full bootstrap sample;
+- fixture list;
+- postponed fixture;
+- new player;
+- price/status change;
+- unknown field;
+- missing required field;
+- malformed response;
+- 429/500.
+
+10.10 ACCEPTANCE CRITERIA
+-------------------------
+- idempotent canonical result;
+- raw stored before promotion where rights allow;
+- all fields required by later stages captured;
+- source/received/usable times present;
+- schema drift report generated;
+- no API key/secret in log or fixture;
+- rate/quota policy enforced;
+- replay command deterministic.
+
+10.11 EXPLICIT EXCLUSIONS
+------------------------
+- authenticated manager picks;
+- rank cohort scraping;
+- price threshold model;
+- other providers;
+- job scheduler;
+- UI.
+
+10.12 COMPLETION DEFINITION
+---------------------------
+Pulse can reproducibly convert one official FPL snapshot into canonical,
+deadline-timed entities and observations.
+
+======================================================================
+11. STAGE 5 — ONE ODDS PROVIDER
+======================================================================
+
+11.1 VERTICAL SLICE
+-------------------
+One approved free odds provider returns EPL match odds that are stored as
+immutable canonical market observations.
+
+Selected initial provider:
+
+    API-FOOTBALL FREE
+
+unless the live rights/quota spike establishes a better approved provider.
+
+11.2 DEPENDENCIES
+-----------------
+Stages 1–4 accepted.
+Provider rights profile and credential configured.
+
+11.3 CODEX TICKET SEQUENCE
+-------------------------
+19.05.01:
+Market domain schemas.
+
+19.05.02:
+Provider client/auth/quota.
+
+19.05.03:
+Fixture/market/outcome mapper.
+
+19.05.04:
+Raw/canonical storage.
+
+19.05.05:
+CLI and recorded contract suite.
+
+11.4 FILES TO CREATE
+--------------------
+    config/providers/api_football.yaml
+    src/dmf_pulse/markets/schemas.py
+    src/dmf_pulse/markets/semantics.py
+    src/dmf_pulse/ingestion/odds/api_football/client.py
+    src/dmf_pulse/ingestion/odds/api_football/schemas.py
+    src/dmf_pulse/ingestion/odds/api_football/mapper.py
+    src/dmf_pulse/ingestion/odds/api_football/service.py
+    alembic/versions/<stage5_markets>.py
+    tests/unit/ingestion/odds/
+    tests/contract/odds/
+    tests/integration/odds/
+    fixtures/odds/api_football/
+
+11.5 PUBLIC INTERFACES
+---------------------
+    class MarketObservation(BaseModel):
+        fixture_id: FixtureId
+        market_type: MarketType
+        period: MarketPeriod
+        line: Decimal | None
+        outcome: MarketOutcome
+        decimal_odds: Decimal
+        bookmaker_operator: str
+        observed_at: datetime
+        usable_at: datetime
+        source_observation_id: UUID
+
+    def ingest_match_odds(
+        *,
+        competition: CompetitionId,
+        date_range: DateRange,
+        as_of: datetime,
+    ) -> OddsIngestionResult
+
+CLI:
+
+    dmf ingest odds api-football
+    dmf market observations --fixture <id>
+
+11.6 UNIT TESTS
+--------------
+- credential injection/redaction;
+- quota accounting;
+- decimal odds validation;
+- fixture mapping;
+- market period/line;
+- bookmaker identity;
+- duplicate provider rows;
+- suspended/unavailable;
+- unknown market;
+- observed/usable time.
+
+11.7 PROPERTY TESTS
+------------------
+- valid decimal odds >1;
+- market identity hash deterministic;
+- odds preserve Decimal round trip;
+- no provider row maps to two canonical outcomes.
+
+11.8 INTEGRATION TESTS
+---------------------
+- recorded API response -> canonical odds;
+- unresolved fixture -> quarantine;
+- repeated retrieval;
+- partial bookmaker set;
+- quota exhausted;
+- rights profile blocks storage/export;
+- database query retrieves exact predeadline observation.
+
+11.9 TEST FIXTURES
+------------------
+- 1X2 complete;
+- over/under;
+- incomplete book;
+- duplicate bookmaker aliases;
+- postponed fixture;
+- unmapped team;
+- empty response;
+- quota headers.
+
+11.10 ACCEPTANCE CRITERIA
+-------------------------
+- at least one complete EPL 1X2 market stored;
+- every observation has semantics and lineage;
+- quotas enforced;
+- no secret leakage;
+- unknown market safely retained/quarantined;
+- exact predeadline query demonstrated;
+- no normalisation yet.
+
+11.11 EXPLICIT EXCLUSIONS
+------------------------
+- multiple providers;
+- player props;
+- exchange spreads;
+- de-vig;
+- consensus;
+- model use.
+
+11.12 COMPLETION DEFINITION
+---------------------------
+Pulse can ingest and inspect one trustworthy, versioned market source without
+conflating raw odds with probabilities.
+
+======================================================================
+12. STAGE 6 — ODDS NORMALISATION
+======================================================================
+
+12.1 VERTICAL SLICE
+-------------------
+For a complete 1X2 market:
+
+    dmf market normalise --fixture <id>
+
+returns raw implied probabilities, proportional baseline, power-normalised
+probabilities, consensus fields and uncertainty/confidence.
+
+With one provider, consensus equals the accepted normalised operator estimate;
+the data contract supports later providers.
+
+12.2 DEPENDENCIES
+-----------------
+Stages 1–5 accepted.
+
+12.3 CODEX TICKET SEQUENCE
+-------------------------
+19.06.01:
+Implied probability and market completeness.
+
+19.06.02:
+Proportional and power normalisation.
+
+19.06.03:
+Operator grouping and one-provider consensus.
+
+19.06.04:
+Uncertainty/confidence output.
+
+19.06.05:
+CLI and mathematical golden tests.
+
+12.4 FILES TO CREATE
+--------------------
+    config/models/market_normalisation.yaml
+    src/dmf_pulse/markets/implied.py
+    src/dmf_pulse/markets/completeness.py
+    src/dmf_pulse/markets/normalisation.py
+    src/dmf_pulse/markets/power.py
+    src/dmf_pulse/markets/consensus.py
+    src/dmf_pulse/markets/uncertainty.py
+    src/dmf_pulse/markets/confidence.py
+    src/dmf_pulse/markets/service.py
+    tests/unit/markets/
+    tests/property/markets/
+    tests/golden/markets/
+    fixtures/odds/normalisation/
+
+12.5 PUBLIC INTERFACES
+---------------------
+    def raw_implied_probability(decimal_odds: Decimal) -> Probability
+
+    def normalise_complete_market(
+        quotes: Sequence[ExclusiveOutcomeQuote],
+        method: NormalisationMethod,
+    ) -> NormalisedMarket
+
+    def build_market_consensus(
+        observations: Sequence[MarketObservation],
+        policy: ConsensusPolicy,
+    ) -> MarketConsensus
+
+Required fields:
+
+- market_probability;
+- consensus_probability;
+- lower_bound;
+- upper_bound;
+- market_disagreement;
+- data_freshness;
+- provider_count;
+- confidence_grade.
+
+12.6 UNIT TESTS
+--------------
+- q=1/odds;
+- margin/overround;
+- proportional;
+- power root;
+- probability sum;
+- symmetric market;
+- extreme odds;
+- incomplete market refusal;
+- one-sided quote typed;
+- freshness;
+- bookmaker/operator deduplication;
+- confidence grade.
+
+12.7 PROPERTY TESTS
+------------------
+- complete probabilities sum one within tolerance;
+- positive;
+- monotonic with odds holding others appropriately;
+- proportional baseline exact;
+- power solution deterministic;
+- no quote becomes zero unless mathematically impossible;
+- provider row duplicates do not increase operator count.
+
+12.8 INTEGRATION TESTS
+---------------------
+- canonical odds query -> consensus artifact;
+- stale quote;
+- incomplete operator ignored/degraded;
+- source correction invalidates cache;
+- CLI output and library identical.
+
+12.9 TEST FIXTURES
+------------------
+- balanced 1X2;
+- heavy favourite;
+- high overround;
+- one missing outcome;
+- duplicate operator feeds;
+- stale quote;
+- synthetic two-operator extension.
+
+12.10 ACCEPTANCE CRITERIA
+-------------------------
+- mathematical golden outputs pass;
+- power method handles all accepted fixtures;
+- fallback to proportional works;
+- complete/incomplete semantics explicit;
+- uncertainty/confidence present;
+- no unsupported anytime-scorer normalisation;
+- output version/hash stored.
+
+12.11 EXPLICIT EXCLUSIONS
+------------------------
+- advanced Shin production;
+- exchange executable commission;
+- learned operator weights;
+- player prop consensus;
+- football goal model.
+
+12.12 COMPLETION DEFINITION
+---------------------------
+Raw market odds become coherent, auditable probabilities suitable for a first
+forecast model.
+
+======================================================================
+13. STAGE 7 — BASIC MINUTES MODEL
+======================================================================
+
+13.1 VERTICAL SLICE
+-------------------
+For every player in a fixture, produce:
+
+- p_start;
+- p_bench;
+- p_out;
+- p_appearance;
+- p_60_plus;
+- expected_minutes;
+- a 0–90 minute PMF.
+
+The baseline must preserve team coherence enough to produce exactly 11 sampled
+starters.
+
+13.2 DEPENDENCIES
+-----------------
+Stages 1–6 accepted.
+Historical/current FPL player and fixture data available.
+
+13.3 CODEX TICKET SEQUENCE
+-------------------------
+19.07.01:
+Training/example dataset builder.
+
+19.07.02:
+Persistence baselines.
+
+19.07.03:
+Hierarchical/regularised role classifier baseline.
+
+19.07.04:
+Conditional starter/bench minute distributions.
+
+19.07.05:
+Coherent XI sampler.
+
+19.07.06:
+CLI, model artifact and evaluation.
+
+13.4 FILES TO CREATE
+--------------------
+    config/models/minutes_baseline.yaml
+    src/dmf_pulse/availability/features.py
+    src/dmf_pulse/availability/dataset.py
+    src/dmf_pulse/availability/baselines.py
+    src/dmf_pulse/availability/role_model.py
+    src/dmf_pulse/availability/minutes_distribution.py
+    src/dmf_pulse/availability/lineup_sampler.py
+    src/dmf_pulse/availability/service.py
+    src/dmf_pulse/availability/schemas.py
+    src/dmf_pulse/cli/availability.py
+    tests/unit/availability/
+    tests/property/availability/
+    tests/integration/availability/
+    fixtures/minutes/
+
+13.5 PUBLIC INTERFACES
+---------------------
+    class PlayerMinutesProjection(BaseModel):
+        p_start: Probability
+        p_bench: Probability
+        p_out_of_squad: Probability
+        p_appearance: Probability
+        p_zero_minutes: Probability
+        p_60_plus: Probability
+        expected_minutes: float
+        minute_pmf: tuple[float, ...]
+        confidence_grade: ConfidenceGrade
+
+    def fit_minutes_baseline(
+        training_dataset: DatasetVersion,
+        config: MinutesModelConfig,
+    ) -> ModelVersion
+
+    def predict_minutes(
+        fixture: FixtureContext,
+        squad: Sequence[PlayerContext],
+        model: MinutesModel,
+        seed: Seed,
+    ) -> TeamMinutesProjection
+
+    def sample_lineups(...) -> Sequence[LineupScenario]
+
+13.6 UNIT TESTS
+--------------
+- feature cutoff;
+- recent starts;
+- no-history prior;
+- role probabilities;
+- minute PMF construction;
+- p0/p60;
+- expected minute calculation;
+- injury hard ineligibility input;
+- goalkeeper baseline;
+- bench appearance.
+
+13.7 PROPERTY TESTS
+------------------
+- role probabilities sum one;
+- minute PMF sum one;
+- probabilities 0–1;
+- expected minutes 0–90;
+- sampled lineup exactly 11;
+- unique players;
+- goalkeeper constraint;
+- fixed seed deterministic.
+
+13.8 INTEGRATION TESTS
+---------------------
+- canonical history -> training dataset;
+- fit model -> registry artifact;
+- predict real/synthetic fixture;
+- lineup scenarios persisted;
+- no postcutoff features;
+- cold-start new player.
+
+13.9 TEST FIXTURES
+------------------
+- stable XI team;
+- high-rotation team;
+- injured player;
+- new signing;
+- promoted team;
+- new manager;
+- substitute with 60+ rare scenario;
+- goalkeeper.
+
+13.10 ACCEPTANCE CRITERIA
+-------------------------
+- beats simple previous-start baseline on an inner/held fixture set or is
+  explicitly retained as equal baseline;
+- role log/Brier reported;
+- p0/p60 calibration artifact;
+- exact 11 starters in every sampled lineup;
+- minute PMFs valid;
+- model and dataset registered;
+- no claim of advanced injury/substitution model.
+
+13.11 EXPLICIT EXCLUSIONS
+------------------------
+- full Bayesian hidden readiness;
+- news NLP;
+- detailed score-state substitution hazards;
+- full team formation assignment;
+- prospective production calibration.
+
+13.12 COMPLETION DEFINITION
+---------------------------
+Pulse has a reproducible baseline minutes distribution that later event/points
+simulators can consume without point estimates pretending certainty.
+
+======================================================================
+14. STAGE 8 — GOAL AND CLEAN-SHEET DISTRIBUTIONS
+======================================================================
+
+14.1 VERTICAL SLICE
+-------------------
+For one fixture, produce a market-constrained joint score matrix and derive:
+
+- expected home/away goals;
+- team goal PMFs;
+- 1X2;
+- totals;
+- clean-sheet probabilities;
+- scoreline probabilities.
+
+14.2 DEPENDENCIES
+-----------------
+Stages 1–7 accepted.
+
+14.3 CODEX TICKET SEQUENCE
+-------------------------
+19.08.01:
+Independent Poisson prior.
+
+19.08.02:
+Adaptive score grid.
+
+19.08.03:
+Market constraint matrix.
+
+19.08.04:
+Soft KL/information projection.
+
+19.08.05:
+Clean-sheet/team-goal outputs and diagnostics.
+
+19.08.06:
+Fixture CLI and calibration scaffold.
+
+14.4 FILES TO CREATE
+--------------------
+    config/models/score_baseline.yaml
+    src/dmf_pulse/football_events/poisson.py
+    src/dmf_pulse/football_events/score_prior.py
+    src/dmf_pulse/football_events/score_grid.py
+    src/dmf_pulse/football_events/market_constraints.py
+    src/dmf_pulse/football_events/score_projection.py
+    src/dmf_pulse/football_events/score_distribution.py
+    src/dmf_pulse/football_events/coherence.py
+    src/dmf_pulse/football_events/service.py
+    src/dmf_pulse/cli/events.py
+    tests/unit/football_events/
+    tests/property/football_events/
+    tests/golden/football_events/
+    fixtures/events/score/
+
+14.5 PUBLIC INTERFACES
+---------------------
+    class JointScoreDistribution(BaseModel):
+        home_max: int
+        away_max: int
+        probabilities: tuple[tuple[float, ...], ...]
+        tail_mass: float
+        expected_home_goals: float
+        expected_away_goals: float
+        market_residuals: Mapping[str, float]
+        confidence_grade: ConfidenceGrade
+
+    def build_score_prior(...) -> JointScoreDistribution
+    def project_to_markets(...) -> JointScoreDistribution
+    def derive_team_outcomes(...) -> TeamOutcomeDistribution
+
+CLI:
+
+    dmf events score-distribution --fixture <id>
+    dmf events explain-market-fit --fixture <id>
+
+14.6 UNIT TESTS
+--------------
+- Poisson PMF;
+- exact score matrix;
+- adaptive tail;
+- 1X2 derivation;
+- totals;
+- clean sheets;
+- market design rows;
+- KL objective;
+- feasible/inconsistent constraints;
+- fallback.
+
+14.7 PROPERTY TESTS
+------------------
+- matrix nonnegative and sums one;
+- derived markets match matrix;
+- home clean sheet equals P(away=0);
+- team expectation from marginal;
+- larger grid preserves probabilities within tolerance;
+- same inputs/seed deterministic.
+
+14.8 INTEGRATION TESTS
+---------------------
+- canonical market consensus -> score distribution;
+- no market -> prior with low confidence;
+- stale/inconsistent markets -> soft residual;
+- artifact persisted;
+- cache invalidates on market change.
+
+14.9 TEST FIXTURES
+------------------
+- balanced fixture;
+- strong home favourite;
+- low total;
+- high total;
+- inconsistent 1X2/total;
+- market missing;
+- postponed fixture.
+
+14.10 ACCEPTANCE CRITERIA
+-------------------------
+- all invariants pass;
+- market residual report;
+- clean-sheet output matches score matrix exactly;
+- perfect synthetic constraints reproduced within tolerance;
+- baseline exact-score/log scoring harness exists;
+- no player goals/assists yet.
+
+14.11 EXPLICIT EXCLUSIONS
+------------------------
+- bivariate Poisson production;
+- Dixon–Coles challenger;
+- player scorer allocation;
+- shots/saves/cards;
+- full event timeline.
+
+14.12 COMPLETION DEFINITION
+---------------------------
+Pulse can convert one fixture's market evidence into an internally coherent team
+goal and clean-sheet distribution.
+
+
+======================================================================
+15. STAGE 9 — FPL-POINTS SIMULATION
+======================================================================
+
+15.1 VERTICAL SLICE
+-------------------
+For a fixture/Gameweek, consume:
+
+- lineups/minutes scenarios;
+- score distribution;
+- simple coherent player goal/assist allocation;
+- rules engine;
+
+and output full player FPL-point distributions:
+
+- expected;
+- median;
+- variance;
+- p0;
+- p5+;
+- p10+;
+- p15+;
+- percentiles;
+- components.
+
+15.2 DEPENDENCIES
+-----------------
+Stages 1–8 accepted.
+
+15.3 CODEX TICKET SEQUENCE
+-------------------------
+19.09.01:
+Simple player scorer/assist share model.
+
+19.09.02:
+Goal timing and on-pitch allocation.
+
+19.09.03:
+Minimal shots/saves/cards/defensive event baseline required by rules.
+
+19.09.04:
+Scenario-level FPL scoring and BPS/bonus.
+
+19.09.05:
+Weighted distribution summariser and joint matrix.
+
+19.09.06:
+Monte Carlo diagnostics and CLI.
+
+15.4 FILES TO CREATE
+--------------------
+    config/models/event_allocation_baseline.yaml
+    config/models/fpl_points_simulation.yaml
+    src/dmf_pulse/football_events/scorer_model.py
+    src/dmf_pulse/football_events/assist_model.py
+    src/dmf_pulse/football_events/goal_timing.py
+    src/dmf_pulse/football_events/auxiliary_events.py
+    src/dmf_pulse/football_events/simulator_v1.py
+    src/dmf_pulse/fpl_points/scorer.py
+    src/dmf_pulse/fpl_points/bps.py
+    src/dmf_pulse/fpl_points/bonus.py
+    src/dmf_pulse/fpl_points/monte_carlo.py
+    src/dmf_pulse/fpl_points/summaries.py
+    src/dmf_pulse/fpl_points/joint_scenarios.py
+    src/dmf_pulse/fpl_points/schemas.py
+    src/dmf_pulse/cli/fpl_points.py
+    tests/unit/fpl_points/
+    tests/property/fpl_points/
+    tests/integration/fpl_points/
+    tests/golden/fpl_points/
+    fixtures/points/
+
+15.5 PUBLIC INTERFACES
+---------------------
+    class PlayerGameweekProjection(BaseModel):
+        expected_points: float
+        median_points: int
+        points_variance: float
+        probability_zero_points: float
+        probability_5_plus: float
+        probability_10_plus: float
+        probability_15_plus: float
+        selected_percentiles: Mapping[str, int]
+        component_breakdown: Mapping[str, float]
+        confidence_grade: ConfidenceGrade
+
+    def simulate_fixture_points(...) -> FixturePointScenarios
+    def assemble_gameweek_points(...) -> GameweekPointScenarios
+    def summarise_player_points(...) -> PlayerGameweekProjection
+
+15.6 UNIT TESTS
+--------------
+- player goal share sums;
+- team/player goals reconcile;
+- on-pitch eligibility;
+- scorer != assister;
+- own-goal category;
+- simple save coherence;
+- points component scoring;
+- BPS ranking/ties;
+- distribution moments;
+- weighted quantiles;
+- thresholds;
+- Monte Carlo SE.
+
+15.7 PROPERTY TESTS
+------------------
+- team player goals + own goals = team goals;
+- no off-pitch event;
+- total points = component sum;
+- scenario points integer;
+- PMFs sum one;
+- threshold ordering;
+- joint matrix dimensions/weights;
+- same seed same scenarios;
+- worker batching invariant.
+
+15.8 INTEGRATION TESTS
+---------------------
+- fixture market/minutes -> player distributions;
+- Double Gameweek assembly synthetic;
+- Blank Gameweek;
+- bonus all participants;
+- scenario artifact Parquet;
+- exact golden scoring from synthetic events;
+- Monte Carlo convergence.
+
+15.9 TEST FIXTURES
+------------------
+- 0-0;
+- 2-1 with scorer/assist;
+- penalty;
+- goalkeeper saves;
+- defensive threshold;
+- card/own goal;
+- bonus tie;
+- player substitute;
+- Double Gameweek.
+
+15.10 ACCEPTANCE CRITERIA
+-------------------------
+- required output fields for every player;
+- no scenario coherence failure;
+- team/player expected goal residual numerical zero;
+- 50k-scenario benchmark within runtime target on test host;
+- mean MCSE threshold for priority fixture;
+- complete points/bonus golden cases;
+- joint scenario artifact available.
+
+15.11 EXPLICIT EXCLUSIONS
+------------------------
+- advanced player prop reconciliation;
+- full shot/xG event engine;
+- production BPS auxiliary residual model;
+- rank/ownership;
+- optimiser.
+
+15.12 COMPLETION DEFINITION
+---------------------------
+Pulse can provide a full, coherent player/Gameweek points distribution—not only
+an expected-points number.
+
+======================================================================
+16. STAGE 10 — ONE-GAMEWEEK SQUAD SELECTION
+======================================================================
+
+16.1 VERTICAL SLICE
+-------------------
+Given a budget and candidate player point scenarios, select a legal 15-player
+squad and exact current:
+
+- XI;
+- bench goalkeeper;
+- ordered outfield bench;
+- captain;
+- vice.
+
+Return recommended and deterministic baseline evidence.
+
+16.2 DEPENDENCIES
+-----------------
+Stages 1–9 accepted.
+Pyomo/HiGHS compatibility accepted.
+
+16.3 CODEX TICKET SEQUENCE
+-------------------------
+19.10.01:
+Optimiser schemas and legal constraints.
+
+19.10.02:
+15-player squad MILP.
+
+19.10.03:
+Exact tactical enumerator/autosub/captain evaluator.
+
+19.10.04:
+Candidate generation and top-K reevaluation.
+
+19.10.05:
+CLI, solver audit and exhaustive toy verification.
+
+16.4 FILES TO CREATE
+--------------------
+    config/optimisation/one_gameweek.yaml
+    src/dmf_pulse/optimisation/schemas.py
+    src/dmf_pulse/optimisation/candidate_pool.py
+    src/dmf_pulse/optimisation/squad_model.py
+    src/dmf_pulse/optimisation/tactics.py
+    src/dmf_pulse/optimisation/autosub_evaluator.py
+    src/dmf_pulse/optimisation/solver.py
+    src/dmf_pulse/optimisation/explain.py
+    src/dmf_pulse/cli/optimise.py
+    tests/unit/optimisation/
+    tests/property/optimisation/
+    tests/integration/optimisation/
+    tests/golden/optimisation/
+    fixtures/optimisation/one_gameweek/
+
+16.5 PUBLIC INTERFACES
+---------------------
+    class OneGameweekPlan(BaseModel):
+        squad: tuple[PlayerId, ...]
+        starting_xi: tuple[PlayerId, ...]
+        bench_goalkeeper: PlayerId
+        bench_order: tuple[PlayerId, PlayerId, PlayerId]
+        captain: PlayerId
+        vice_captain: PlayerId
+        expected_manager_points: float
+        point_distribution: DistributionSummary
+        solver_status: SolverStatus
+
+    def optimise_one_gameweek(...) -> OneGameweekOptimisationResult
+    def evaluate_tactical_configuration(...) -> TacticalValue
+
+CLI:
+
+    dmf optimise one-gameweek --gameweek <id>
+    dmf optimise validate-plan <plan.json>
+
+16.6 UNIT TESTS
+--------------
+- squad totals;
+- position counts;
+- club maximum;
+- budget;
+- XI formation;
+- bench composition/order;
+- captain/vice distinct;
+- candidate dominance;
+- solver status/gap parsing;
+- scenario manager score.
+
+16.7 PROPERTY TESTS
+------------------
+- every returned plan legal;
+- bank nonnegative;
+- exhaustive tactics agree for small squads;
+- exact scenario evaluation;
+- no plan with missing player;
+- deterministic fixed solver settings where supported.
+
+16.8 INTEGRATION TESTS
+---------------------
+- synthetic player pool -> HiGHS solution;
+- top-K squads -> exact tactical evaluation;
+- compare MILP expected baseline to exhaustive tiny universe;
+- timeout returns labelled incumbent;
+- infeasible input diagnostic;
+- CLI plan artifact.
+
+16.9 TEST FIXTURES
+------------------
+- tiny exhaustive pool;
+- budget-binding;
+- club-limit-binding;
+- formation variants;
+- captain nonappearance;
+- bench autosub;
+- correlated defenders;
+- infeasible pool.
+
+16.10 ACCEPTANCE CRITERIA
+-------------------------
+- matches exhaustive optimum on toy cases;
+- every plan legal;
+- solver incumbent/bound/gap reported;
+- exact tactical subproblem uses joint scenarios;
+- normal test instance within runtime target;
+- no transfer/history state yet.
+
+16.11 EXPLICIT EXCLUSIONS
+------------------------
+- existing manager squad;
+- transfers/FT/hits;
+- purchase/selling prices;
+- multi-Gameweek horizon;
+- chips;
+- price/rank utility.
+
+16.12 COMPLETION DEFINITION
+---------------------------
+Pulse can select a complete legal one-week squad and tactical setup from full
+point distributions with auditable solver evidence.
+
+======================================================================
+17. STAGE 11 — MULTI-GAMEWEEK TRANSFER OPTIMISATION
+======================================================================
+
+17.1 VERTICAL SLICE
+-------------------
+Starting from a real/synthetic manager state, optimise over several Gameweeks:
+
+- transfers;
+- bank;
+- buying/selling prices;
+- free transfers;
+- hits;
+- future squads;
+- current tactical action;
+- rolling-horizon plan.
+
+Return:
+
+- recommended;
+- conservative;
+- high-upside;
+- no-transfer baseline;
+- marginal move value.
+
+17.2 DEPENDENCIES
+-----------------
+Stages 1–10 accepted.
+
+17.3 CODEX TICKET SEQUENCE
+-------------------------
+19.11.01:
+Manager-state and ownership-spell schemas.
+
+19.11.02:
+Selling-price and FT transition tables.
+
+19.11.03:
+Deterministic multi-GW MILP.
+
+19.11.04:
+Scenario/nonanticipative extension.
+
+19.11.05:
+Terminal/flexibility baseline and rolling wrapper.
+
+19.11.06:
+Alternative plans/marginal attribution.
+
+19.11.07:
+CLI and sequential toy backtest.
+
+17.4 FILES TO CREATE
+--------------------
+    config/optimisation/multi_gameweek.yaml
+    src/dmf_pulse/optimisation/manager_state.py
+    src/dmf_pulse/optimisation/ownership_spells.py
+    src/dmf_pulse/optimisation/free_transfers.py
+    src/dmf_pulse/optimisation/transfer_model.py
+    src/dmf_pulse/optimisation/scenario_tree.py
+    src/dmf_pulse/optimisation/rolling_horizon.py
+    src/dmf_pulse/optimisation/terminal_value.py
+    src/dmf_pulse/optimisation/alternatives.py
+    src/dmf_pulse/optimisation/marginal_values.py
+    src/dmf_pulse/optimisation/plan_service.py
+    tests/unit/optimisation/multi_gameweek/
+    tests/property/optimisation/multi_gameweek/
+    tests/integration/optimisation/multi_gameweek/
+    fixtures/optimisation/multi_gameweek/
+
+17.5 PUBLIC INTERFACES
+---------------------
+    class ManagerState(BaseModel):
+        squad: tuple[OwnedPlayer, ...]
+        bank: Money
+        free_transfers: int
+        chips: ChipInventory
+        gameweek_id: GameweekId
+
+    class TransferPlanSet(BaseModel):
+        recommended_plan: MultiGameweekPlan
+        conservative_plan: MultiGameweekPlan | None
+        high_upside_plan: MultiGameweekPlan | None
+        no_transfer_baseline: MultiGameweekPlan
+        marginal_value_of_each_move: tuple[MoveMarginalValue, ...]
+        confidence: ConfidenceGrade
+
+    def optimise_transfer_policy(...) -> TransferPlanSet
+    def advance_manager_state(...) -> ManagerState
+
+17.6 UNIT TESTS
+--------------
+- buy/sell half-profit/full-loss;
+- repurchase cohort;
+- bank transition;
+- FT arc transitions;
+- hit calculation;
+- squad continuity;
+- horizon objective;
+- nonanticipativity;
+- terminal value monotonicity;
+- move attribution.
+
+17.7 PROPERTY TESTS
+------------------
+- legal squad each node;
+- bank >=0;
+- FT state valid;
+- no clairvoyant future action;
+- no-transfer always feasible for valid state;
+- extra bank/FT cannot reduce optimal feasible value;
+- plan components reconcile.
+
+17.8 INTEGRATION TESTS
+---------------------
+- two- and three-GW toy exact solution;
+- price path branches;
+- injury/fixture scenario;
+- rolling execution first action only;
+- recommended versus no-transfer;
+- SAA replicate/holdout scaffold;
+- timeout/fallback.
+
+17.9 TEST FIXTURES
+------------------
+- one FT;
+- five banked FTs;
+- hit decision;
+- half-profit player;
+- price rise closes route;
+- postponed fixture;
+- injury between weeks;
+- funding transfer bundle;
+- horizon reversal.
+
+17.10 ACCEPTANCE CRITERIA
+-------------------------
+- matches exhaustive DP/enumeration on tiny state;
+- no nonanticipativity violation;
+- ownership-spell prices exact;
+- recommended/current action reproducible;
+- four required plan outputs;
+- marginal values reconcile bundle within tolerance;
+- rolling wrapper advances state correctly;
+- solver gap/runtime recorded.
+
+17.11 EXPLICIT EXCLUSIONS
+------------------------
+- calibrated robust regret;
+- learned price model;
+- chip scheduling;
+- rank opponents;
+- full orchestration/UI.
+
+17.12 COMPLETION DEFINITION
+---------------------------
+Pulse has its first central multi-Gameweek decision engine with exact legal
+manager-state transitions.
+
+======================================================================
+18. STAGE 12 — BACKTESTING FRAMEWORK
+======================================================================
+
+18.1 VERTICAL SLICE
+-------------------
+Replay at least one historical/synthetic sequence of deadlines with frozen
+information sets and compare:
+
+- naive recent points;
+- FPL form;
+- market only;
+- market + minutes;
+- complete current baseline;
+- hindsight upper bound.
+
+Produce projection and decision scorecards.
+
+18.2 DEPENDENCIES
+-----------------
+Stages 1–11 accepted.
+
+18.3 CODEX TICKET SEQUENCE
+-------------------------
+19.12.01:
+Dataset modes/vintage information sets.
+
+19.12.02:
+Walk-forward fold engine.
+
+19.12.03:
+Benchmark implementations.
+
+19.12.04:
+Metric/calibration library.
+
+19.12.05:
+Sequential policy replay and regret.
+
+19.12.06:
+Leakage tests and reports.
+
+18.4 FILES TO CREATE
+--------------------
+    config/evaluation/default.yaml
+    src/dmf_pulse/evaluation/folds.py
+    src/dmf_pulse/evaluation/vintages.py
+    src/dmf_pulse/evaluation/information_sets.py
+    src/dmf_pulse/evaluation/leakage.py
+    src/dmf_pulse/evaluation/benchmarks.py
+    src/dmf_pulse/evaluation/point_metrics.py
+    src/dmf_pulse/evaluation/probability_metrics.py
+    src/dmf_pulse/evaluation/calibration.py
+    src/dmf_pulse/evaluation/distribution_metrics.py
+    src/dmf_pulse/evaluation/multivariate_metrics.py
+    src/dmf_pulse/evaluation/policy_replay.py
+    src/dmf_pulse/evaluation/decision_regret.py
+    src/dmf_pulse/evaluation/reports.py
+    src/dmf_pulse/cli/evaluate.py
+    alembic/versions/<stage12_evaluation>.py
+    tests/unit/evaluation/
+    tests/property/evaluation/
+    tests/integration/evaluation/
+    tests/replay/
+    fixtures/historical/
+
+18.5 PUBLIC INTERFACES
+---------------------
+    def build_walk_forward_folds(...) -> Sequence[EvaluationFold]
+    def build_information_set(...) -> InformationBundle
+    def score_forecast(...) -> ForecastScore
+    def replay_policy(...) -> PolicyTrajectory
+    def calculate_decision_regret(...) -> DecisionRegret
+
+CLI:
+
+    dmf evaluate build-folds
+    dmf evaluate benchmark
+    dmf evaluate projections
+    dmf evaluate policy
+    dmf evaluate leakage
+    dmf evaluate report
+
+18.6 UNIT TESTS
+--------------
+- cutoff eligibility;
+- fold ordering;
+- no outer-to-inner leak;
+- metric golden formulas;
+- Brier/log/RPS/CRPS;
+- interval coverage;
+- paired plan value;
+- regret;
+- benchmark feature windows.
+
+18.7 PROPERTY TESTS
+------------------
+- future canary never affects forecast;
+- folds strictly ordered;
+- perfect forecast scores best;
+- probabilities valid;
+- policy replay executes only current action;
+- immutable forecast record.
+
+18.8 INTEGRATION TESTS
+---------------------
+- synthetic multi-deadline season;
+- historical strict fixture where available;
+- benchmark suite;
+- current model replay;
+- current-vintage versus strict separation;
+- result report;
+- locked forecast before outcome.
+
+18.9 TEST FIXTURES
+------------------
+- synthetic five-GW season;
+- future leakage canary;
+- fixture moved after cutoff;
+- price correction;
+- closing-odds trap;
+- postdeadline lineup;
+- benchmark player histories.
+
+18.10 ACCEPTANCE CRITERIA
+-------------------------
+- walk-forward report generated;
+- every row has dataset mode and cutoff;
+- leakage canaries pass;
+- B0–B5 benchmark contracts implemented;
+- projection and decision metrics separate;
+- policy replay stateful;
+- no test data tunes reported outer result;
+- original forecasts immutable.
+
+18.11 EXPLICIT EXCLUSIONS
+------------------------
+- huge multi-season definitive performance claims;
+- advanced Model Confidence Set tooling;
+- full provider historical odds if unavailable;
+- production champion promotion.
+
+18.12 COMPLETION DEFINITION
+---------------------------
+No subsequent model or optimiser improvement can be trusted without passing the
+Stage 12 evaluation path.
+
+======================================================================
+19. STAGE 13 — PRICE PREDICTION
+======================================================================
+
+19.1 VERTICAL SLICE
+-------------------
+Using historical/prospective price snapshots, output:
+
+- P(rise next update);
+- P(fall next update);
+- expected price 24h/72h/7d;
+- confidence;
+- likely threshold distance;
+- ACT NOW versus WAIT utility.
+
+19.2 DEPENDENCIES
+-----------------
+Stages 1–12 accepted.
+Price snapshot history available.
+
+19.3 CODEX TICKET SEQUENCE
+-------------------------
+19.13.01:
+Price update-cycle labels.
+
+19.13.02:
+Transfer-flow features.
+
+19.13.03:
+Calibrated multinomial/logistic baseline.
+
+19.13.04:
+Recurrent hazard/latent pressure baseline.
+
+19.13.05:
+Price-path simulation and selling value.
+
+19.13.06:
+ACT/WAIT decision integration.
+
+19.4 FILES TO CREATE
+--------------------
+    config/models/price_baseline.yaml
+    src/dmf_pulse/prices/observations.py
+    src/dmf_pulse/prices/update_cycles.py
+    src/dmf_pulse/prices/transfer_flows.py
+    src/dmf_pulse/prices/ownership.py
+    src/dmf_pulse/prices/status.py
+    src/dmf_pulse/prices/classifier.py
+    src/dmf_pulse/prices/recurrent_hazard.py
+    src/dmf_pulse/prices/latent_pressure.py
+    src/dmf_pulse/prices/calibration.py
+    src/dmf_pulse/prices/price_paths.py
+    src/dmf_pulse/prices/selling_value.py
+    src/dmf_pulse/prices/early_transfer.py
+    src/dmf_pulse/cli/prices.py
+    tests/unit/prices/
+    tests/property/prices/
+    tests/integration/prices/
+    fixtures/prices/
+
+19.5 PUBLIC INTERFACES
+---------------------
+    class PriceProjection(BaseModel):
+        probability_rise_next_update: float
+        probability_fall_next_update: float
+        expected_price_24h: Money
+        expected_price_72h: Money
+        expected_price_7d: Money
+        confidence: ConfidenceGrade
+        likely_threshold_distance: ThresholdDistance
+
+    def predict_price(...) -> PriceProjection
+    def simulate_price_paths(...) -> PricePathDistribution
+    def evaluate_act_now_vs_wait(...) -> EarlyTransferDecision
+
+19.6 UNIT TESTS
+--------------
+- snapshot increments;
+- unequal interval velocity;
+- acceleration;
+- ownership-adjusted rates;
+- status/flag features;
+- multiclass probabilities;
+- calibration;
+- price PMF;
+- selling value;
+- route closure;
+- information value decomposition.
+
+19.7 PROPERTY TESTS
+------------------
+- rise+fall+no=1;
+- price support integer 0.1 units;
+- expected price from PMF;
+- recurrent changes possible;
+- threshold distance labelled model-inferred;
+- no future flow.
+
+19.8 INTEGRATION TESTS
+---------------------
+- snapshots -> update rows -> train -> predict;
+- walk-forward price evaluation;
+- multiple rises synthetic;
+- flagged player;
+- wildcard contamination unknown;
+- optimiser marginal £0.1 value call;
+- ACT/WAIT cases.
+
+19.9 TEST FIXTURES
+------------------
+- rise/no/fall sequence;
+- double rise;
+- injury sale surge;
+- low ownership;
+- stale snapshot;
+- route bottleneck;
+- press conference information event.
+
+19.10 ACCEPTANCE CRITERIA
+-------------------------
+- proper probability metrics and calibration reported;
+- outperforms no-change/raw-flow baseline materially or remains shadow-only;
+- full required fields;
+- route-specific early-transfer recommendation;
+- no fixed hidden threshold claim;
+- target-season confidence cap.
+
+19.11 EXPLICIT EXCLUSIONS
+------------------------
+- public predictor scraping;
+- exact source-code threshold;
+- automated FPL transfer;
+- maximising team value.
+
+19.12 COMPLETION DEFINITION
+---------------------------
+Price uncertainty becomes a calibrated input to the existing transfer policy,
+not a separate price-chasing system.
+
+======================================================================
+20. STAGE 14 — CHIP OPTIMISATION
+======================================================================
+
+20.1 VERTICAL SLICE
+-------------------
+Given current chip inventory and future scenarios, compare:
+
+- no chip;
+- Triple Captain;
+- Bench Boost;
+- Free Hit;
+- Wildcard;
+- hold/delay.
+
+Return current action and future schedule with opportunity cost.
+
+20.2 DEPENDENCIES
+-----------------
+Stages 1–13 accepted.
+Target/reference chip definitions available.
+
+20.3 CODEX TICKET SEQUENCE
+-------------------------
+19.14.01:
+Generic chip definition/inventory compiler.
+
+19.14.02:
+Captain/vice and TC value.
+
+19.14.03:
+BB incremental/autosub overlap/preparation.
+
+19.14.04:
+FH temporary-state comparator.
+
+19.14.05:
+WC immediate/delayed comparator.
+
+19.14.06:
+Schedule/continuation baseline.
+
+19.14.07:
+CLI and golden chip policy fixtures.
+
+20.4 FILES TO CREATE
+--------------------
+    config/rules/chips_reference.yaml
+    config/optimisation/chips.yaml
+    src/dmf_pulse/chips/definitions.py
+    src/dmf_pulse/chips/inventory.py
+    src/dmf_pulse/chips/compiler.py
+    src/dmf_pulse/chips/captaincy.py
+    src/dmf_pulse/chips/triple_captain.py
+    src/dmf_pulse/chips/bench_boost.py
+    src/dmf_pulse/chips/free_hit.py
+    src/dmf_pulse/chips/wildcard.py
+    src/dmf_pulse/chips/opportunity.py
+    src/dmf_pulse/chips/scheduler.py
+    src/dmf_pulse/chips/service.py
+    src/dmf_pulse/cli/chips.py
+    tests/unit/chips/
+    tests/property/chips/
+    tests/integration/chips/
+    fixtures/chips/
+
+20.5 PUBLIC INTERFACES
+---------------------
+    class ChipDecision(BaseModel):
+        recommended_action: ChipAction
+        selected_chip: ChipKey | None
+        gross_current_gain: float
+        net_policy_value: float
+        continuation_value: float
+        opportunity_cost: float
+        exercise_advantage: float
+        probability_now_optimal: float
+        confidence: ConfidenceGrade
+
+    def evaluate_chip_opportunities(...) -> ChipDecisionSet
+    def optimise_chip_schedule(...) -> ChipSchedulePolicy
+
+20.6 UNIT TESTS
+--------------
+- inventory/copies/expiry;
+- one-chip conflict;
+- TC fallback;
+- BB autosub overlap;
+- FH restore;
+- WC permanent state;
+- continuation;
+- gross versus net;
+- schedule legality.
+
+20.7 PROPERTY TESTS
+------------------
+- chip never reused;
+- current exercise difference Q-use/Q-hold;
+- BB incremental exact;
+- FH permanent squad restored;
+- WC permanent;
+- one active chip;
+- expired chip unavailable.
+
+20.8 INTEGRATION TESTS
+---------------------
+- strong TC current versus future;
+- natural BB;
+- engineered BB with cost;
+- blank FH;
+- delayed WC;
+- chip conflict in DGW;
+- multi-copy reference inventory;
+- synthetic future chip compiler.
+
+20.9 TEST FIXTURES
+------------------
+- captain/vice absent;
+- BB four-player bench;
+- FH damage-avoidance;
+- WC squad mismatch;
+- expiry;
+- two chips want same week;
+- multi-week synthetic chip.
+
+20.10 ACCEPTANCE CRITERIA
+-------------------------
+- gross/net/opportunity values separate;
+- all state transitions correct;
+- tiny schedule matches exhaustive enumeration;
+- hold is legal policy;
+- no simplistic DGW/WC->BB rule;
+- target-season chips remain inactive until verified.
+
+20.11 EXPLICIT EXCLUSIONS
+------------------------
+- rank ownership utility;
+- advanced regression Monte Carlo;
+- public chip prediction;
+- unknown target chip assumptions.
+
+20.12 COMPLETION DEFINITION
+---------------------------
+Chips compete in one finite-inventory policy and are never evaluated by raw
+Gameweek totals alone.
+
+======================================================================
+21. STAGE 15 — RANK-AWARE STRATEGY
+======================================================================
+
+21.1 VERTICAL SLICE
+-------------------
+For a synthetic or approved mini-league/cohort, calculate:
+
+- effective ownership;
+- captain/chip multipliers;
+- player leverage;
+- shared-scenario rival scores;
+- final rank distribution;
+- P(target);
+- points-optimal versus rank-optimal plan.
+
+21.2 DEPENDENCIES
+-----------------
+Stages 1–14 accepted.
+Rights/privacy approval for manager samples.
+
+21.3 CODEX TICKET SEQUENCE
+-------------------------
+19.15.01:
+Manager multiplier/EO engine.
+
+19.15.02:
+Exact named mini-league simulator.
+
+19.15.03:
+Baseline opponent action model.
+
+19.15.04:
+Target/rank utility.
+
+19.15.05:
+Synthetic overall cohort approximation.
+
+19.15.06:
+Stage policy and plan reevaluation.
+
+21.4 FILES TO CREATE
+--------------------
+    config/rank_strategy/default.yaml
+    src/dmf_pulse/rank_strategy/cohorts.py
+    src/dmf_pulse/rank_strategy/ownership.py
+    src/dmf_pulse/rank_strategy/effective_ownership.py
+    src/dmf_pulse/rank_strategy/manager_multipliers.py
+    src/dmf_pulse/rank_strategy/opponent_actions.py
+    src/dmf_pulse/rank_strategy/mini_league.py
+    src/dmf_pulse/rank_strategy/overall_field.py
+    src/dmf_pulse/rank_strategy/rank_simulator.py
+    src/dmf_pulse/rank_strategy/utilities.py
+    src/dmf_pulse/rank_strategy/template.py
+    src/dmf_pulse/rank_strategy/service.py
+    src/dmf_pulse/cli/rank.py
+    tests/unit/rank_strategy/
+    tests/property/rank_strategy/
+    tests/integration/rank_strategy/
+    fixtures/rank/
+
+21.5 PUBLIC INTERFACES
+---------------------
+    class RankPlanEvaluation(BaseModel):
+        expected_final_points: float
+        expected_rank: float
+        median_rank: int
+        rank_percentiles: Mapping[str, int]
+        probability_target_rank: float
+        mini_league_win_probability: float | None
+        expected_points_sacrifice: float
+        template_beta: float | None
+        tracking_error: float | None
+        confidence: ConfidenceGrade
+
+    def calculate_effective_ownership(...) -> EffectiveOwnershipReport
+    def simulate_mini_league_rank(...) -> RankDistribution
+    def evaluate_rank_plans(...) -> RankAwarePlanComparison
+
+21.6 UNIT TESTS
+--------------
+- multipliers;
+- EO >100;
+- vice/autosub;
+- BB/TC/FH;
+- leverage identity;
+- transfer tie-break;
+- target indicator;
+- template beta;
+- tracking error.
+
+21.7 PROPERTY TESTS
+------------------
+- raw player projections unchanged;
+- identical teams have zero relative variance aside from hits/tie;
+- rank probabilities valid;
+- target probability from rank PMF;
+- plan respects points floor.
+
+21.8 INTEGRATION TESTS
+---------------------
+- two/three-manager exact league;
+- hidden rival action scenarios;
+- captain matching/chasing;
+- synthetic overall rank bands;
+- points versus rank plan;
+- early-season points-mode gate.
+
+21.9 TEST FIXTURES
+------------------
+- one rival ahead;
+- one rival behind;
+- same captain;
+- differential captain;
+- rank tie/fewer transfers;
+- chip rival;
+- target top-k;
+- impossible/secure target.
+
+21.10 ACCEPTANCE CRITERIA
+-------------------------
+- shared player scenarios for all managers;
+- EO uses actual multipliers;
+- points projections hash-identical across utility modes;
+- exact mini-league toy matches enumeration;
+- target probability and expected-points cost displayed;
+- low-confidence opponent model cannot override material points advantage.
+
+21.11 EXPLICIT EXCLUSIONS
+------------------------
+- mass manager scraping;
+- definitive overall-win model;
+- public rival service;
+- altering model projections by ownership.
+
+21.12 COMPLETION DEFINITION
+---------------------------
+Pulse can distinguish points maximisation from competition utility without
+corrupting raw forecasts.
+
+======================================================================
+22. STAGE 16 — USER INTERFACE
+======================================================================
+
+22.1 VERTICAL SLICE
+-------------------
+A private, accessible web Decision Cockpit displays an immutable Decision Bundle
+with:
+
+- recommended move and timing;
+- expected horizon value;
+- downside/upside;
+- confidence;
+- assumptions;
+- price risk;
+- alternatives;
+- why changed;
+- information watch;
+- scenario comparison;
+- chip opportunity cost;
+- final-rank distribution where active;
+- assurance/freshness.
+
+22.2 DEPENDENCIES
+-----------------
+Stages 1–15 accepted.
+DMFP-16/17 control-plane/security basics available or implemented as part of
+bounded supporting tickets.
+
+22.3 CODEX TICKET SEQUENCE
+-------------------------
+19.16.01:
+Decision View and Explanation Graph schemas.
+
+19.16.02:
+FastAPI read-only decision endpoints/OpenAPI.
+
+19.16.03:
+Server-rendered Action Card and plan table.
+
+19.16.04:
+Uncertainty visuals and accessible alternatives.
+
+19.16.05:
+Assumptions/information/change/counterfactual views.
+
+19.16.06:
+Price/chip/rank/data-health views.
+
+19.16.07:
+Responsive, accessibility, print/report.
+
+19.16.08:
+End-to-end golden decision cases.
+
+22.4 FILES TO CREATE
+--------------------
+    src/dmf_pulse/api/app.py
+    src/dmf_pulse/api/dependencies.py
+    src/dmf_pulse/api/errors.py
+    src/dmf_pulse/api/routes/decisions.py
+    src/dmf_pulse/api/routes/projections.py
+    src/dmf_pulse/api/routes/health.py
+    src/dmf_pulse/presentation/view_models.py
+    src/dmf_pulse/presentation/explanation_graph.py
+    src/dmf_pulse/presentation/explanation_templates.py
+    src/dmf_pulse/presentation/change_attribution.py
+    src/dmf_pulse/presentation/counterfactuals.py
+    src/dmf_pulse/presentation/scenario_views.py
+    src/dmf_pulse/presentation/reports.py
+    web/templates/base.html
+    web/templates/decision.html
+    web/templates/partials/
+    web/static/css/
+    web/static/js/
+    tests/unit/presentation/
+    tests/contract/api/
+    tests/integration/api/
+    tests/e2e/ui/
+    tests/security/ui/
+    tests/golden/ui/
+    fixtures/ui/
+
+22.5 PUBLIC INTERFACES
+---------------------
+HTTP:
+
+    GET /api/v1/decisions/latest
+    GET /api/v1/decisions/{id}
+    GET /api/v1/decisions/{id}/view
+    GET /api/v1/decisions/{id}/diff/{other_id}
+    GET /health/live
+    GET /health/ready
+
+Internal:
+
+    def build_decision_view(bundle: DecisionBundle) -> DecisionView
+    def build_explanation_graph(...) -> ExplanationGraph
+    def explain_change(...) -> ChangeExplanation
+    def calculate_switch_counterfactuals(...) -> tuple[DecisionCounterfactual, ...]
+
+22.6 UNIT TESTS
+--------------
+- view-model mapping;
+- rounding;
+- status;
+- confidence;
+- reason graph;
+- numeric validation;
+- deterministic text;
+- rank direction;
+- chip decomposition;
+- stale/superseded.
+
+22.7 CONTRACT TESTS
+-------------------
+- OpenAPI snapshot;
+- RFC 9457;
+- Pydantic response;
+- optional/critical fields;
+- ETag/304;
+- private cache headers;
+- dependency overrides.
+
+FastAPI officially supports dependency overrides for testing; use them to keep
+external providers and production repositories out of API tests.
+
+22.8 PROPERTY/API TESTS
+----------------------
+Schemathesis:
+
+- generated valid/invalid requests;
+- schema-conformant responses;
+- no 500 for valid schema inputs;
+- stateful latest/immutable resource behavior.
+
+22.9 INTEGRATION/E2E TESTS
+-------------------------
+- load golden Decision Bundle;
+- render decision;
+- compare plans;
+- why changed;
+- counterfactual;
+- blocked/degraded;
+- mobile;
+- print;
+- offline stale;
+- authorization.
+
+22.10 ACCESSIBILITY TESTS
+------------------------
+- automated WCAG checks;
+- keyboard;
+- focus;
+- screen reader;
+- contrast;
+- reduced motion;
+- chart table alternatives;
+- 200% zoom/mobile reflow.
+
+22.11 TEST FIXTURES
+-------------------
+- ACT NOW;
+- WAIT;
+- ROLL;
+- one-transfer;
+- hit;
+- chip;
+- rank chase;
+- data degraded;
+- blocked;
+- changed by market;
+- changed by model;
+- numerical tie;
+- stale/offline.
+
+22.12 ACCEPTANCE CRITERIA
+-------------------------
+- Sebastian can answer the ten DMFP-18 task questions;
+- main action visible in first viewport;
+- every displayed number matches bundle;
+- uncertainty visible;
+- no colour-only status;
+- WCAG 2.2 AA test target passes;
+- no secret/private/right-restricted exposure;
+- latest cannot serve stale as current;
+- first render meets local performance target;
+- API/CLI/library decision values identical;
+- immutable old decisions accessible.
+
+22.13 EXPLICIT EXCLUSIONS
+------------------------
+- public share links;
+- automated official FPL write actions;
+- ungrounded chatbot;
+- mass rival display;
+- public SaaS;
+- mobile native app.
+
+22.14 COMPLETION DEFINITION
+---------------------------
+The complete Pulse vertical path can produce and present a decision that is
+actionable, uncertainty-aware, explainable, accessible and auditable.
+
+======================================================================
+23. CROSS-STAGE PUBLIC-INTERFACE POLICY
+======================================================================
+
+23.1 STABILITY LEVELS
+---------------------
+INTERNAL:
+may change within stage.
+
+STAGE_PUBLIC:
+frozen after stage acceptance; breaking change requires migration/ADR.
+
+EXTERNAL_API:
+versioned `/api/v1`; breaking change requires `/api/v2`.
+
+ARTIFACT:
+schema version and migration/reader compatibility.
+
+23.2 NO IMPORT FROM INFRASTRUCTURE
+----------------------------------
+Domain and application modules must not depend on FastAPI, SQLAlchemy ORM or CLI
+types.
+
+23.3 PROTOCOLS
+--------------
+Use Protocol/ABC for:
+
+- repositories;
+- providers;
+- model services;
+- artifact store;
+- clock;
+- RNG;
+- optimiser solver.
+
+23.4 TYPES
+----------
+Money, Probability, IDs and timestamps use canonical types.
+
+23.5 ERROR TYPES
+----------------
+Domain errors are structured and translated at CLI/API boundaries.
+
+======================================================================
+24. DATABASE-MIGRATION ACCEPTANCE POLICY
+======================================================================
+
+24.1 EVERY MIGRATION
+--------------------
+- descriptive revision;
+- explicit constraints/index names;
+- upgrade;
+- downgrade or irreversible declaration;
+- integration test;
+- schema snapshot.
+
+24.2 AUTOGENERATE
+-----------------
+May propose migration.
+Human/Codex must edit/review.
+
+24.3 PRODUCTION DATA
+--------------------
+Migration rehearsal on representative copy before deployment.
+
+24.4 LARGE DATA CHANGE
+----------------------
+Separate resumable application job.
+
+Alembic documentation distinguishes schema migrations from general data
+migration concerns; large backfills should not be hidden in one blocking schema
+revision.
+
+24.5 STAGE GATE
+--------------
+Upgrade from every supported prior accepted release path.
+
+======================================================================
+25. COVERAGE AND MUTATION POLICY
+======================================================================
+
+25.1 COVERAGE
+-------------
+coverage.py branch measurement is mandatory; statement coverage alone misses
+untested control-flow branches.
+
+25.2 TARGETS
+-------------
+Critical deterministic rules/security:
+>=95% branch.
+
+Core domain/application:
+>=85–90% branch by stage maturity.
+
+Provider mapping/UI:
+>=75–85% branch plus contract/golden tests.
+
+25.3 MUTATION
+-------------
+mutmut used for:
+
+- rules;
+- selling price;
+- FT/hits;
+- score coherence;
+- threshold logic;
+- cache/cutoff;
+- security/retention.
+
+25.4 SURVIVING MUTANT
+---------------------
+Must be:
+
+- killed by new test;
+- proven equivalent;
+- explicitly excluded with reason.
+
+25.5 NO COVERAGE GAMING
+-----------------------
+No broad `pragma: no cover` without review.
+
+======================================================================
+26. RELEASE AND ENVIRONMENT GATES
+======================================================================
+
+26.1 DEVELOPMENT
+----------------
+May run incomplete active stage.
+
+26.2 STAGING
+------------
+Only accepted prior stages plus current release candidate.
+
+26.3 PRODUCTION
+---------------
+Requires:
+
+- Stage 12 accepted;
+- target rules active;
+- relevant model gates;
+- Stage 16 accepted;
+- DMFP-17 assurance acceptance;
+- rights profiles;
+- backup restore.
+
+26.4 FEATURE FLAGS
+------------------
+Later-stage modules can run shadow-only.
+
+26.5 ROLLBACK
+-------------
+Every stage release documents:
+
+- prior tag;
+- database compatibility;
+- artifact compatibility;
+- alias rollback;
+- migration action.
+
+======================================================================
+27. IMPLEMENTATION MILESTONES
+======================================================================
+
+M0 — ENGINEERING FOUNDATION
+Stages 1–4.
+
+Deliverable:
+typed repository, rules, canonical database and official FPL ingestion.
+
+M1 — BASELINE PROJECTION ENGINE
+Stages 5–9.
+
+Deliverable:
+market-anchored coherent player FPL-point distributions.
+
+M2 — CORE DECISION ENGINE
+Stages 10–12.
+
+Deliverable:
+one-/multi-Gameweek optimiser with scientific backtesting.
+
+M3 — ADVANCED SEASON STRATEGY
+Stages 13–15.
+
+Deliverable:
+price timing, chip scheduling and rank utility.
+
+M4 — DECISION PRODUCT
+Stage 16.
+
+Deliverable:
+accessible private Decision Cockpit and complete vertical slice.
+
+======================================================================
+28. STAGE DEPENDENCY GRAPH
+======================================================================
+
+1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14
+                                                                     |
+                                                                     v
+                                                                    15
+                                                                     |
+                                                                     v
+                                                                    16
+
+Important logical notes:
+
+- Stage 7 uses Stage 4 history but can coexist with Stage 6.
+- Stage 8 requires minutes and markets.
+- Stage 9 requires rules, minutes and team outcomes.
+- Stage 12 must exist before trusting Stages 13–16.
+- Stage 16 can prototype with golden fixtures before final live orchestration,
+  but production acceptance requires all prior stages.
+
+======================================================================
+29. CODEX PROMPT TEMPLATE
+======================================================================
+
+Use this exact structure:
+
+    STAGE:
+    DMFP-19 Stage <N>, ticket <ID>.
+
+    OBJECTIVE:
+    One sentence describing the vertical capability.
+
+    AUTHORITATIVE SPEC:
+    DMFP-<documents/sections>.
+
+    ALLOWED FILES:
+    Explicit list/globs.
+
+    PUBLIC INTERFACES:
+    Exact signatures/schemas.
+
+    FIXTURES:
+    Fixture IDs and expected outputs.
+
+    TESTS TO WRITE FIRST:
+    Exact tests.
+
+    ACCEPTANCE COMMANDS:
+    Commands and expected results.
+
+    EXCLUSIONS:
+    Features Codex must not implement.
+
+    MIGRATION/DEPENDENCY RULE:
+    Whether new migration/dependency is allowed.
+
+    RESPONSE FORMAT:
+    Files changed, tests run, results, assumptions, risks, evidence path.
+
+    STOP CONDITIONS:
+    If an ambiguity or architecture conflict appears, stop and report it.
+
+======================================================================
+30. REVIEW CHECKLIST FOR EVERY CODEX CHANGE
+======================================================================
+
+ARCHITECTURE
+[ ] Active stage only.
+[ ] No later-stage logic.
+[ ] Correct module direction.
+[ ] Public interface matches specification.
+
+CORRECTNESS
+[ ] Boundary cases.
+[ ] Invariants.
+[ ] Time cutoff.
+[ ] Decimal/money/probability handling.
+[ ] Determinism.
+
+DATA
+[ ] Temporal semantics.
+[ ] Idempotency.
+[ ] Lineage.
+[ ] Rights/retention.
+
+TESTS
+[ ] Test-first evidence.
+[ ] Unit/property/integration.
+[ ] Fixtures approved.
+[ ] Coverage.
+[ ] Mutation where required.
+[ ] No hidden network.
+
+OPERATIONS
+[ ] Structured errors/logs.
+[ ] Config.
+[ ] Migration.
+[ ] Runtime.
+[ ] Rollback.
+
+SECURITY
+[ ] No secret.
+[ ] Dependency reviewed.
+[ ] Input validation.
+[ ] Access/right boundary.
+
+DOCUMENTATION
+[ ] Docstrings/readme.
+[ ] Contract snapshot.
+[ ] Stage evidence.
+[ ] Exclusions current.
+
+======================================================================
+31. SOURCE REGISTER
+======================================================================
+
+Research access date:
+2026-07-18
+
+----------------------------------------------------------------------
+SRC-PYPROJECT-2026-001
+Title:
+Writing your pyproject.toml
+
+Organisation:
+Python Packaging Authority
+
+URL:
+https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+
+Relevant claim:
+`pyproject.toml` is the standard central configuration surface for build-system
+metadata and can configure development tools.
+
+Reliability:
+HIGH official Python packaging guidance.
+
+Pulse reliance:
+YES for Stage 1.
+
+----------------------------------------------------------------------
+SRC-PYLOCK-2026-001
+Title:
+pylock.toml Specification
+
+Organisation:
+Python Packaging Authority
+
+URL:
+https://packaging.python.org/en/latest/specifications/pylock-toml/
+
+Relevant claim:
+Defines a lock-file format for reproducible Python-environment installation.
+
+Reliability:
+HIGH official specification.
+
+Pulse reliance:
+YES where selected toolchain supports it.
+
+----------------------------------------------------------------------
+SRC-PYTEST-2026-001
+Title:
+pytest Good Integration Practices and Fixtures
+
+Organisation:
+pytest project
+
+URLs:
+https://docs.pytest.org/en/stable/explanation/goodpractices.html
+https://docs.pytest.org/en/stable/explanation/fixtures.html
+
+Relevant claims:
+Recommends isolated package installation/test layouts; pytest fixtures are
+explicit, modular and scalable.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for test architecture.
+
+----------------------------------------------------------------------
+SRC-HYPOTHESIS-2026-001
+Title:
+Hypothesis Documentation
+
+Organisation:
+Hypothesis project
+
+URL:
+https://hypothesis.readthedocs.io/
+
+Relevant claim:
+Property-based tests assert properties across generated input domains, including
+stateful test support.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for invariant/state-machine tests.
+
+----------------------------------------------------------------------
+SRC-RUFF-2026-001
+Title:
+Ruff Documentation
+
+Organisation:
+Astral
+
+URL:
+https://docs.astral.sh/ruff/
+
+Relevant claim:
+Ruff provides Python linting and formatting in one tool.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for Stage 1 quality tooling.
+
+----------------------------------------------------------------------
+SRC-MYPY-2026-001
+Title:
+mypy Strict Mode and Configuration
+
+Organisation:
+mypy project
+
+URL:
+https://mypy.readthedocs.io/en/stable/getting_started.html
+https://mypy.readthedocs.io/en/stable/config_file.html
+
+Relevant claim:
+Strict mode enables a broad set of optional checks aimed at identifying type
+unsoundness; exact enabled flags can evolve and must be locked/configured.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-ALEMBIC-2026-001
+Title:
+Alembic Documentation and Tutorial
+
+Organisation:
+SQLAlchemy project
+
+URL:
+https://alembic.sqlalchemy.org/
+
+Relevant claims:
+Alembic is a schema migration tool for SQLAlchemy and stores migration scripts
+with the application source; its cookbook distinguishes broad data migrations
+from schema migration concerns.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES from Stage 3.
+
+----------------------------------------------------------------------
+SRC-TESTCONTAINERS-2026-001
+Title:
+Getting started with Testcontainers for Python
+
+Organisation:
+Testcontainers project
+
+URL:
+https://testcontainers.com/guides/getting-started-with-testcontainers-for-python/
+
+Relevant claim:
+Testcontainers provisions disposable real services, including PostgreSQL, so
+integration tests can exercise the same service type used in production.
+
+Reliability:
+HIGH official project guidance.
+
+Pulse reliance:
+YES for PostgreSQL integration.
+
+----------------------------------------------------------------------
+SRC-PYDANTIC-2026-001
+Title:
+Pydantic Documentation
+
+Organisation:
+Pydantic project
+
+URL:
+https://docs.pydantic.dev/
+
+Relevant claim:
+Provides runtime validation and serialisation for typed Python models.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for configuration/contracts.
+
+----------------------------------------------------------------------
+SRC-FASTAPI-2026-001
+Title:
+FastAPI Testing and Dependency Overrides
+
+Organisation:
+FastAPI project
+
+URLs:
+https://fastapi.tiangolo.com/tutorial/testing/
+https://fastapi.tiangolo.com/advanced/testing-dependencies/
+
+Relevant claims:
+FastAPI applications can be tested through HTTPX/pytest and dependencies can be
+overridden during tests.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for Stage 16.
+
+----------------------------------------------------------------------
+SRC-SCHEMATHESIS-2026-001
+Title:
+Schemathesis Documentation
+
+Organisation:
+Schemathesis project
+
+URL:
+https://schemathesis.readthedocs.io/
+
+Relevant claim:
+Generates property-based and stateful API tests from OpenAPI schemas.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+YES for API contract robustness.
+
+----------------------------------------------------------------------
+SRC-COVERAGE-2026-001
+Title:
+coverage.py Branch Coverage Measurement
+
+Organisation:
+coverage.py project
+
+URL:
+https://coverage.readthedocs.io/en/latest/branch.html
+
+Relevant claim:
+Branch coverage records whether all possible destinations of control-flow
+branches were exercised, beyond statement execution.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for stage gates.
+
+----------------------------------------------------------------------
+SRC-MUTMUT-2026-001
+Title:
+mutmut Documentation
+
+Organisation:
+mutmut project
+
+URL:
+https://mutmut.readthedocs.io/
+
+Relevant claim:
+Mutation testing changes production code and checks whether the test suite
+detects the mutations.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+YES for critical deterministic logic.
+
+----------------------------------------------------------------------
+SRC-PYOMO-2026-001
+Title:
+Pyomo Documentation
+
+Organisation:
+Pyomo project
+
+URL:
+https://pyomo.readthedocs.io/en/latest/
+
+Relevant claim:
+Pyomo defines structured symbolic optimisation models and can use open-source or
+commercial solvers.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for Stages 10–14.
+
+----------------------------------------------------------------------
+SRC-HIGHS-2026-001
+Title:
+HiGHS Documentation
+
+Organisation:
+HiGHS project
+
+URL:
+https://ergo-code.github.io/HiGHS/dev/
+
+Relevant claim:
+HiGHS provides open-source large sparse linear and mixed-integer optimisation
+and exposes solver limits/status/options.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES as initial solver.
+
+----------------------------------------------------------------------
+SRC-GHA-2026-001
+Title:
+Building and testing Python with GitHub Actions
+
+Organisation:
+GitHub
+
+URL:
+https://docs.github.com/actions/guides/building-and-testing-python
+
+Relevant claim:
+GitHub Actions can run Python build/test workflows across jobs and Python
+versions.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+SELECTED default CI where hosting permits.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 through DMFP-18
+
+Pulse reliance:
+AUTHORITATIVE for domain architecture and acceptance semantics.
+
+======================================================================
+32. ACCEPTANCE OF THIS ROADMAP
+======================================================================
+
+This document is accepted when Sebastian approves:
+
+[ ] the 16-stage order;
+[ ] the selected core toolchain;
+[ ] PostgreSQL integration from Stage 3;
+[ ] Python-version compatibility spike;
+[ ] test and mutation gates;
+[ ] one-stage-at-a-time Codex rule;
+[ ] the public-interface freeze policy;
+[ ] the repository structure;
+[ ] the stage completion evidence;
+[ ] production gating after Stage 12/16/DMFP-17;
+[ ] explicit exclusions for every stage.
+
+After approval, the first implementation request must be:
+
+    DMFP-19 STAGE 1, TICKET 19.01.01 — PACKAGE AND BUILD SKELETON
+
+It must not ask Codex to implement configuration, database, rules or any other
+later ticket in the same request unless Sebastian deliberately merges bounded
+Stage 1 tickets after reviewing the expected diff.
+
+======================================================================
+33. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-18
+
+- Converted the complete architecture into 16 gated stages.
+- Selected a vertical-slice implementation method.
+- Defined Codex work-unit limits and prompt contract.
+- Defined ticket and stage completion evidence.
+- Proposed Python/package/database/testing/CI toolchain.
+- Added final target repository structure.
+- Added test taxonomy, fixture standard and stage gate matrix.
+- Specified files, interfaces, tests, fixtures, acceptance, exclusions and
+  completion for all 16 stages.
+- Added PostgreSQL/Testcontainers/Alembic strategy.
+- Added Pyomo/HiGHS optimisation implementation.
+- Added walk-forward trust gate before advanced modules.
+- Added dependency, coverage, mutation and release policies.
+- Added stage tags, milestones, review checklist and source register.
+
+Future v1.0:
+- Sebastian approves roadmap.
+- Stage 1 compatibility spike fixes exact versions.
+- implementation ticket templates are entered into the project tracker.
+- Stage 1 begins.
+- every later architecture change is reflected through DMFP-20 and a versioned
+  update to this roadmap.
+
+END OF DOCUMENT

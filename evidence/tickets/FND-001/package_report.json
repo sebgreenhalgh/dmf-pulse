@@ -1,0 +1,41 @@
+{
+  "clean_environment_outside_repository": true,
+  "cleaned_up": true,
+  "doctor_nvidia_status": "TIMEOUT",
+  "doctor_status": "HEALTHY",
+  "installed_module_path": "<temporary-environment>/site-packages/dmf_pulse/__init__.py",
+  "installed_version_output": "dmf 0.1.0",
+  "installed_zoneinfo_fallback": true,
+  "platform": {
+    "architecture": "AMD64",
+    "operating_system": "Windows",
+    "python": "3.13.9"
+  },
+  "status": "PASS",
+  "toolchain": {
+    "build": "1.5.0",
+    "build_backend": "hatchling",
+    "hatchling": "1.31.0"
+  },
+  "uv_build_distributions": [
+    {
+      "bytes": 36962,
+      "name": "dmf_pulse-0.1.0-py3-none-any.whl",
+      "sha256": "f75311b81b07daa2a0fc80a5ba37a21be5e1103158dc8c3daaadda413fc6c641"
+    },
+    {
+      "bytes": 768271,
+      "name": "dmf_pulse-0.1.0.tar.gz",
+      "sha256": "3f23dc2c0314551b0e52eb3f486e386777716c8299c3f9236240cb5af2e1e5d1"
+    }
+  ],
+  "uv_version": "uv 0.11.26 (396ef7ce4 2026-06-30 x86_64-pc-windows-msvc)",
+  "wheel": {
+    "bytes": 36962,
+    "contains_py_typed": true,
+    "file_count": 31,
+    "name": "dmf_pulse-0.1.0-py3-none-any.whl",
+    "sha256": "f75311b81b07daa2a0fc80a5ba37a21be5e1103158dc8c3daaadda413fc6c641",
+    "zoneinfo_fallback_sha256": "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33"
+  }
+}

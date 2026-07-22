@@ -1,0 +1,3434 @@
+DMF PULSE — PLAYER AVAILABILITY, START AND MINUTES MODEL
+========================================================
+
+Document ID: DMFP-07
+Version: 0.9 (Joint Availability and Playing-Time Architecture)
+Status: PROPOSED — READY FOR DATA AUDIT, BASELINE IMPLEMENTATION AND PROSPECTIVE VALIDATION
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 16 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+Upstream inputs:
+- DMFP-02 rules and official-minute semantics
+- DMFP-03 canonical players, fixtures, managers and memberships
+- DMFP-04 zero-cost football, injury, lineup and market sources
+- DMFP-05 time-safe ingestion and deadline bundles
+- DMFP-06 market probability evidence
+Downstream consumers:
+- DMFP-08 football-event distribution engine
+- DMFP-09 FPL-points distribution engine
+- DMFP-12 transfer/squad optimiser
+- DMFP-13 captaincy/chip optimiser
+
+PURPOSE
+-------
+This document defines the most important player-level predictive subsystem in
+DMF Pulse:
+
+    WHO IS AVAILABLE?
+    WHO STARTS?
+    WHO IS ON THE BENCH?
+    WHO APPEARS?
+    WHEN DO THEY ENTER OR LEAVE?
+    HOW MANY OFFICIAL FPL MINUTES DO THEY RECORD?
+
+It estimates:
+
+- probability of eligibility;
+- probability of being medically available;
+- probability of making the matchday squad;
+- probability of starting;
+- probability of being named as a substitute;
+- probability of not being in the squad;
+- expected minutes conditional on starting;
+- the complete starter-minutes distribution;
+- probability of appearing from the bench;
+- substitute entry-time and minutes distributions;
+- probability of 60+ minutes;
+- probability of zero minutes;
+- tactical rotation risk;
+- injury and return-to-play uncertainty;
+- suspension and ineligibility status;
+- European and domestic-cup workload effects;
+- fixture-congestion effects;
+- manager-change uncertainty;
+- preseason and post-tournament readiness;
+- coherent team lineup and substitution scenarios.
+
+The output MUST be a probability distribution.
+
+The system MUST NOT reduce the problem to:
+
+    expected_minutes = 74
+
+A single mean hides the distinction between materially different situations:
+
+- 80% chance of 90 and 20% chance of zero;
+- 100% chance of 72–76 minutes;
+- 55% chance of starting, 40% chance of a 25-minute substitute appearance and
+  5% chance of no involvement.
+
+Those distributions can have similar means and radically different FPL value,
+captaincy risk and transfer utility.
+
+GOVERNING PRINCIPLE
+-------------------
+Playing time is a structured sequence of dependent decisions and events:
+
+1. Is the player legally eligible?
+2. What is the player's latent medical/readiness state?
+3. Does the manager include the player in the matchday squad?
+4. Does the player start, sit on the bench or miss out?
+5. If starting, when and why does the player's participation end?
+6. If benched, whether and when does the player enter?
+7. How do the score, cards, injuries and remaining substitutions alter that
+   process?
+
+Pulse will model that sequence explicitly.
+
+IMPORTANT 2026/27 CONTEXT
+-------------------------
+The official Premier League preseason analysis on 16 July 2026 said the season
+would begin with a record eight new managers and highlighted that tactics,
+starting lineups and set-piece roles could change. It also noted that players
+involved on the final weekend of the 2026 World Cup would have less than five
+weeks before the Premier League season begins and advised monitoring their
+preseason minutes closely.
+
+A separate official analysis identified nine Premier League clubs involved in
+European competitions and warned that manager changes and European schedules
+would create unusually high early-season uncertainty.
+
+Therefore:
+
+- old-manager lineup history cannot be carried forward at full weight;
+- preseason availability cannot be treated as ordinary competitive evidence;
+- World Cup return dates and training exposure matter;
+- European fixture context is a first-class feature;
+- uncertainty must be wider early in the season;
+- "expected starter" is not enough for high-value FPL decisions.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require a documented architecture decision.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE MODEL DECISION
+======================================================================
+
+0.1 SELECTED TARGET ARCHITECTURE
+--------------------------------
+Pulse will use a hierarchical Bayesian, joint state-and-time model with five
+layers:
+
+LAYER A — HARD ELIGIBILITY
+Deterministic or near-deterministic fixture eligibility:
+
+- suspension;
+- registration;
+- loan-parent restriction;
+- competition ineligibility;
+- confirmed absence.
+
+LAYER B — LATENT READINESS
+A dynamic latent medical/readiness state inferred from time-stamped evidence.
+
+LAYER C — JOINT MATCHDAY ROLE
+A coherent team model for:
+
+- START;
+- BENCH;
+- OUT_OF_SQUAD.
+
+LAYER D — CONDITIONAL PLAYING-TIME PROCESS
+Discrete-time competing-risk hazards for starter exits and substitute entries.
+
+LAYER E — COHERENT TEAM SCENARIOS
+Formation, XI, bench and substitution paths that obey team-level constraints.
+
+0.2 INITIAL PRODUCTION MODEL
+----------------------------
+The first production-capable implementation will be:
+
+1. a hierarchical Bayesian multinomial role model;
+2. a constrained team-level sampler that produces exactly the configured number
+   of starters and substitutes;
+3. a discrete-time competing-risk starter-exit model;
+4. a discrete-time bench-entry model;
+5. posterior-predictive minute distributions;
+6. calibrated persistence and gradient-boosted challengers;
+7. explicit human/source evidence and uncertainty.
+
+0.3 LATER JOINT MODEL
+---------------------
+The target advanced model will add:
+
+- latent formation and role slots;
+- team substitution-event hazards;
+- explicit outgoing/incoming player choice;
+- substitution-window and maximum-substitute constraints;
+- score-state-dependent hazards;
+- coupling with DMFP-08 match simulation;
+- hidden semi-Markov injury/readiness transitions.
+
+0.4 WHY HIERARCHICAL BAYESIAN
+-----------------------------
+The dataset is strongly grouped and uneven:
+
+- players;
+- positions/roles;
+- teams;
+- managers;
+- competitions;
+- seasons;
+- injury types;
+- newly promoted clubs;
+- new signings;
+- new managers.
+
+Hierarchical partial pooling allows:
+
+- established players to retain individual history;
+- sparse/new players to shrink toward role/team/league priors;
+- new managers to borrow carefully from their prior clubs and the league;
+- uncertainty to expand automatically when data are sparse;
+- posterior distributions rather than unsupported point estimates.
+
+0.5 WHY DISCRETE-TIME SURVIVAL
+------------------------------
+Official FPL minutes are discrete and bounded.
+
+Discrete-time hazards:
+
+- handle strong nonlinear minute effects;
+- model halftime and substitution peaks;
+- include time-varying score state;
+- support competing exit causes;
+- produce a complete probability mass function;
+- are easier to calibrate directly than a single minutes regression.
+
+0.6 WHY NOT DEEP LEARNING FIRST
+-------------------------------
+DeepHit and related models can learn flexible competing-risk distributions, but
+the initial public dataset is too small, heterogeneous and missing many
+private-load variables.
+
+Deep survival models remain challengers after:
+
+- enough prospective data exist;
+- strong simple baselines are established;
+- calibration is verified;
+- time-safe validation demonstrates value.
+
+0.7 CORE OUTPUT
+---------------
+For every player/fixture/as-of time:
+
+- role-state probabilities;
+- 0–90 official-minute probability mass;
+- conditional distributions;
+- coherent scenario samples;
+- uncertainty decomposition;
+- source and model lineage;
+- confidence grade.
+
+======================================================================
+1. FORMAL PROBLEM
+======================================================================
+
+1.1 RANDOM VARIABLES
+--------------------
+For player i and fixture f:
+
+E_i:
+Eligibility state.
+
+H_i:
+Latent health/readiness state.
+
+R_i:
+Matchday role:
+- START;
+- BENCH;
+- OUT.
+
+M_i:
+Official FPL minutes, integer 0–90 for a normal league fixture under target
+season semantics.
+
+C_i:
+Participation-ending/entry cause.
+
+F:
+Team formation.
+
+L:
+Complete starting lineup.
+
+B:
+Complete bench.
+
+Z(t):
+Time-varying match state:
+- score difference;
+- red cards;
+- remaining substitutions;
+- competition state;
+- time.
+
+1.2 FACTORISATION
+-----------------
+Conceptually:
+
+P(E, H, F, L, B, substitution path, M | I)
+=
+P(E | I)
+x P(H | E, I)
+x P(F | team, manager, fixture, I)
+x P(L, B | E, H, F, manager, squad, I)
+x P(substitution path, M | L, B, H, Z(t), manager, fixture, I)
+
+I is the information legally and operationally available before the FPL cutoff.
+
+1.3 MARGINAL MINUTES MIXTURE
+----------------------------
+For a player:
+
+P(M=m)
+=
+P(R=START) P(M=m | START)
++
+P(R=BENCH) P(M=m | BENCH)
++
+P(R=OUT) 1[m=0]
+
+subject to eligibility and team-level coherence.
+
+1.4 ZERO MINUTES
+----------------
+Default:
+
+P(M=0)
+=
+P(R=OUT)
++
+P(R=BENCH) P(no entry | BENCH)
++
+P(pre-kickoff withdrawal after submitted prediction, where explicitly modelled)
+
+An actual starter label implies positive minutes unless the official fixture
+semantics create a rare exceptional case.
+
+1.5 60+ MINUTES
+----------------
+P(M >= 60)
+=
+P(START) P(M >= 60 | START)
++
+P(BENCH) P(M >= 60 | BENCH)
+
+The second term is usually small but not forced to zero because early forced
+substitutions can produce 60+ minutes for a substitute.
+
+1.6 EXPECTED MINUTES
+--------------------
+Unconditional:
+
+E[M] = sum_m m P(M=m)
+
+Conditional start:
+
+E[M | START] = sum_m m P(M=m | START)
+
+Conditional bench:
+
+E[M | BENCH] = sum_m m P(M=m | BENCH)
+
+1.7 BENCH APPEARANCE
+--------------------
+Conditional:
+
+P(appear | BENCH)
+=
+1 - P(M=0 | BENCH)
+
+Unconditional:
+
+P(bench appearance)
+=
+P(BENCH) P(appear | BENCH)
+
+Both outputs are required.
+
+======================================================================
+2. STATE DEFINITIONS
+======================================================================
+
+2.1 ELIGIBILITY
+---------------
+ELIGIBLE
+SUSPENDED
+INELIGIBLE_REGISTRATION
+INELIGIBLE_LOAN_PARENT
+INELIGIBLE_COMPETITION
+MATCH_CANCELLED
+UNKNOWN
+
+2.2 LATENT READINESS
+--------------------
+OUT_MEDICAL
+REHABILITATION
+PARTIAL_TRAINING
+FULL_TRAINING_NOT_MATCH_READY
+MATCH_READY_LIMITED
+MATCH_READY_FULL
+UNKNOWN
+
+2.3 MATCHDAY ROLE
+-----------------
+START
+BENCH
+OUT_OF_SQUAD
+
+2.4 STARTER EXIT CAUSE
+----------------------
+TACTICAL_SUBSTITUTION
+INJURY_OR_ILLNESS
+DISMISSAL
+OTHER_FORCED_EXIT
+MATCH_END
+ABANDONMENT
+
+2.5 BENCH ENTRY CAUSE
+---------------------
+TACTICAL_ATTACKING
+TACTICAL_DEFENSIVE
+TACTICAL_STRUCTURAL
+INJURY_REPLACEMENT
+CARD_OR_DISMISSAL_RESPONSE
+OTHER_FORCED_ENTRY
+NO_ENTRY
+MATCH_ABANDONED
+
+2.6 EVIDENCE TYPE
+-----------------
+OFFICIAL_SUSPENSION
+OFFICIAL_CLUB_REPORT
+OFFICIAL_LINEUP
+OFFICIAL_TRAINING_REPORT
+FPL_STATUS
+STRUCTURED_INJURY_FEED
+STRUCTURED_LINEUP_PREDICTION
+PRESS_CONFERENCE
+REPUTABLE_JOURNALIST
+PRESEASON_APPEARANCE
+COMPETITIVE_APPEARANCE
+MARKET_LISTING
+MARKET_ABSENCE
+MANUAL_ANALYST_OBSERVATION
+COMMUNITY_REPORT
+
+2.7 MODEL CONFIDENCE
+--------------------
+A
+B
+C
+D
+E
+
+Confidence is not the probability of starting.
+It describes the evidence/model quality around the distribution.
+
+======================================================================
+3. OUTPUT CONTRACT
+======================================================================
+
+3.1 REQUIRED SUMMARY FIELDS
+---------------------------
+- p_eligible;
+- eligibility_status;
+- suspension_status;
+- p_matchday_squad;
+- p_start;
+- p_bench;
+- p_out_of_squad;
+- p_appearance;
+- p_bench_appearance_unconditional;
+- p_appearance_given_bench;
+- p_zero_minutes;
+- p_60_plus;
+- expected_minutes;
+- expected_minutes_if_start;
+- expected_minutes_if_bench;
+- rotation_risk;
+- injury_unavailability_probability;
+- injury_uncertainty;
+- model_confidence_grade.
+
+3.2 REQUIRED DISTRIBUTIONS
+--------------------------
+- full official-minute PMF for m = 0...90;
+- starter-minute PMF;
+- bench-minute PMF;
+- starter exit-cause probabilities;
+- bench entry-time/cause probabilities;
+- role-state posterior samples;
+- coherent team lineup/minutes scenario samples.
+
+3.3 REQUIRED QUANTILES
+----------------------
+Unconditional minutes:
+
+- p05;
+- p10;
+- p25;
+- p50;
+- p75;
+- p90;
+- p95.
+
+Conditional start and bench:
+at least p10, p25, p50, p75, p90.
+
+3.4 REQUIRED UNCERTAINTY
+------------------------
+Separate:
+
+- aleatoric minutes uncertainty;
+- epistemic parameter uncertainty;
+- data/source uncertainty;
+- manager-regime uncertainty;
+- injury-state uncertainty;
+- model-family disagreement.
+
+3.5 EXAMPLE RECORD
+------------------
+{
+  "player_availability_projection_id": "uuid",
+  "player_id": "uuid",
+  "fixture_id": "uuid",
+  "gameweek_id": "uuid",
+  "as_of_utc": "timestamp",
+  "information_cutoff_utc": "timestamp",
+
+  "p_eligible": 0.995,
+  "eligibility_status": "ELIGIBLE",
+  "suspension_status": "CLEAR",
+
+  "p_matchday_squad": 0.94,
+  "p_start": 0.61,
+  "p_bench": 0.33,
+  "p_out_of_squad": 0.06,
+
+  "p_appearance": 0.84,
+  "p_appearance_given_bench": 0.70,
+  "p_bench_appearance_unconditional": 0.231,
+
+  "p_zero_minutes": 0.16,
+  "p_60_plus": 0.50,
+
+  "expected_minutes": 51.8,
+  "expected_minutes_if_start": 76.4,
+  "expected_minutes_if_bench": 15.7,
+
+  "rotation_risk": 0.34,
+  "injury_unavailability_probability": 0.08,
+  "injury_uncertainty": 0.19,
+
+  "minute_quantiles": {
+    "p05": 0,
+    "p10": 0,
+    "p25": 17,
+    "p50": 65,
+    "p75": 85,
+    "p90": 90,
+    "p95": 90
+  },
+
+  "minutes_pmf_artifact": {
+    "uri": "...",
+    "sha256": "...",
+    "support": [0, 90]
+  },
+
+  "confidence_grade": "C",
+  "model_version_ids": [],
+  "source_bundle_id": "uuid",
+  "ruleset_hash": "...",
+  "code_commit": "..."
+}
+
+======================================================================
+4. TIME-SAFE INPUT CONTRACT
+======================================================================
+
+4.1 DEADLINE ELIGIBILITY
+------------------------
+Every input MUST come from the DMFP-05 LIVE_OPERATIONAL bundle with:
+
+    usable_at <= official FPL deadline
+
+unless the use case is explicitly a later kickoff-lineup model rather than an
+FPL decision model.
+
+4.2 NO OFFICIAL LINEUP LEAKAGE
+------------------------------
+Official Premier League lineups are generally announced after the FPL deadline
+for the first fixture and far after the deadline for later fixtures.
+
+They are:
+
+- labels;
+- evaluation inputs;
+- future-match history.
+
+They are not current-Gameweek FPL features when published after the cutoff.
+
+4.3 LATE PRESS/INJURY NEWS
+--------------------------
+A news report published after the cutoff cannot enter the decision even if it
+describes an injury occurring earlier.
+
+4.4 RETROSPECTIVE INJURY RETURN
+-------------------------------
+Final injury duration and eventual return date are labels.
+They cannot be historical features.
+
+4.5 AS-OF DEPTH CHART
+---------------------
+Depth charts, recent-start shares and manager patterns must be calculated from
+matches whose lineups were known before the cutoff.
+
+======================================================================
+5. DATA SOURCES
+======================================================================
+
+5.1 OFFICIAL FPL
+----------------
+Potential target-season fields:
+
+- status;
+- chance of playing;
+- news;
+- news-added time;
+- team;
+- position;
+- recent minutes;
+- official fixture/player history.
+
+These are observations, not calibrated probabilities.
+
+5.2 API-FOOTBALL FREE
+---------------------
+Selected zero-cost structured source for:
+
+- fixtures;
+- lineups;
+- sidelined/injury records;
+- player transfers;
+- all-competition appearances;
+- squad/team/player statistics.
+
+Coverage and timestamp quality must be validated.
+
+5.3 OFFICIAL CLUB/PREMIER LEAGUE
+--------------------------------
+Highest-value public evidence for:
+
+- suspension;
+- injury;
+- training return;
+- manager statements;
+- registration;
+- preseason return;
+- official lineup outcome.
+
+5.4 PREDICTED LINEUP SOURCES
+----------------------------
+Every predicted lineup source is treated as an expert forecast.
+
+It receives a historical source-performance model.
+
+Do not convert:
+"listed in predicted XI"
+into:
+p_start = 1.
+
+5.5 BETTING MARKET
+------------------
+Player market listing, price or removal can contain participation information.
+
+However:
+
+- some markets are conditional on starting;
+- some books omit low-interest players;
+- markets open at different times;
+- free coverage is sparse;
+- market absence is confounded.
+
+Use only after source/market-specific calibration.
+
+5.6 PRESEASON
+-------------
+Preseason lineups/minutes are informative but downweighted because:
+
+- managers build fitness;
+- substitutions are atypical;
+- opponents and rules vary;
+- World Cup returners may be absent;
+- fringe players may temporarily start;
+- new signings are integrated gradually.
+
+5.7 MANUAL EVIDENCE
+-------------------
+Structured analyst observations may be entered with:
+
+- source;
+- quote;
+- time;
+- evidence type;
+- confidence;
+- expiry;
+- reviewer.
+
+======================================================================
+6. HARD ELIGIBILITY LAYER
+======================================================================
+
+6.1 PURPOSE
+-----------
+Separate legal/competition eligibility from medical/tactical selection.
+
+6.2 HARD ZERO
+-------------
+Set p_start = p_bench = p_appearance = 0 and p_zero = 1 when a fresh,
+authoritative source confirms:
+
+- active suspension covering the fixture;
+- player not registered/eligible;
+- loan-parent restriction;
+- fixture cancelled;
+- other formal ineligibility.
+
+6.3 APPEAL/UNCERTAINTY
+----------------------
+If suspension appeal or fixture applicability is unresolved:
+
+- scenario states;
+- do not hard zero;
+- P(eligible) reflects authoritative evidence.
+
+6.4 MEDICAL "RULED OUT"
+-----------------------
+An official medical statement can justify a very low probability.
+
+It SHOULD not automatically be treated as a mathematical zero unless the
+statement and timing make participation impossible.
+
+6.5 SUSPENSION DATA
+-------------------
+Store:
+
+- authority;
+- competition;
+- matches covered;
+- start/end;
+- appeal;
+- source time;
+- mapping.
+
+6.6 INELIGIBILITY OVERRIDES
+---------------------------
+Hard eligibility overrides all market and lineup-source signals.
+
+======================================================================
+7. LATENT READINESS MODEL
+======================================================================
+
+7.1 TARGET MODEL
+----------------
+A Bayesian hidden semi-Markov process over readiness states.
+
+"Semi-Markov" is important because transition probability depends on time spent
+in the state.
+
+7.2 STATE TRANSITIONS
+---------------------
+Typical:
+
+OUT_MEDICAL
+  -> REHABILITATION
+  -> PARTIAL_TRAINING
+  -> FULL_TRAINING_NOT_MATCH_READY
+  -> MATCH_READY_LIMITED
+  -> MATCH_READY_FULL
+
+Possible regressions:
+
+- PARTIAL_TRAINING -> OUT_MEDICAL;
+- MATCH_READY_LIMITED -> OUT_MEDICAL;
+- MATCH_READY_FULL -> OUT_MEDICAL.
+
+7.3 OBSERVATION MODEL
+---------------------
+Evidence updates latent state through source/type-specific likelihoods.
+
+Examples:
+
+- official "full team training";
+- official "will be assessed";
+- FPL yellow/red flag;
+- structured injury record;
+- preseason bench appearance;
+- competitive substitute appearance;
+- predicted lineup;
+- market listing;
+- press quote.
+
+7.4 SOURCE RELIABILITY
+----------------------
+Learn source reliability from its historical ability to predict:
+
+- squad inclusion;
+- start;
+- appearance;
+- return timing.
+
+Do not claim the source diagnosed the true medical state.
+
+7.5 INITIAL MVP
+---------------
+Before enough data for a full hidden semi-Markov model:
+
+- construct explicit readiness features;
+- use a hierarchical Bayesian availability classifier;
+- maintain state labels and time-since-evidence;
+- preserve the later upgrade path.
+
+7.6 EVIDENCE DECAY
+------------------
+Evidence value decays according to:
+
+- source type;
+- newer contradictory evidence;
+- days to fixture;
+- training progression;
+- injury type;
+- manager update.
+
+A fixed one-size half-life is prohibited.
+
+7.7 UNKNOWN INJURY
+------------------
+Unknown diagnosis increases uncertainty.
+
+Do not assign a precise recovery curve based only on a generic "knock" label.
+
+======================================================================
+8. MATCHDAY ROLE MODEL
+======================================================================
+
+8.1 TARGET
+----------
+Jointly predict:
+
+P(START)
+P(BENCH)
+P(OUT)
+
+8.2 WHY MULTINOMIAL
+-------------------
+Separate independent start and bench classifiers can create incoherent outputs.
+
+The three states are mutually exclusive.
+
+8.3 HIERARCHICAL LINEAR PREDICTOR
+---------------------------------
+For player i, role r, team-manager regime g and fixture f:
+
+eta_i,r =
+  global intercept_r
+  + player effect_i,r
+  + position/role effect
+  + team effect
+  + manager effect
+  + manager-team regime effect
+  + fixture/context effects
+  + health/readiness effects
+  + workload effects
+  + depth-chart/teammate effects
+  + source-evidence effects
+  + interactions.
+
+Probabilities use a softmax, subject to team-level reconciliation.
+
+8.4 RANDOM EFFECTS
+------------------
+Cross-classified/hierarchical:
+
+- player;
+- FPL position;
+- tactical role;
+- team;
+- manager;
+- manager-team spell;
+- competition;
+- season;
+- injury class;
+- age/experience band where justified.
+
+8.5 PLAYER PERSISTENCE
+----------------------
+Recent actual lineup role is a powerful feature but must not become a deterministic
+rule.
+
+Use exponentially weighted or state-space persistence:
+
+- start after start;
+- start after bench;
+- return after absence;
+- consecutive starts;
+- role continuity.
+
+8.6 MATCHDAY SQUAD
+------------------
+p_matchday_squad = p_start + p_bench.
+
+The bench-size configuration belongs to competition rules/context.
+
+8.7 COLD START
+--------------
+New player:
+
+- position/role prior;
+- transfer fee/market-value-type data only if lawful and shown useful;
+- prior club minutes;
+- competition-strength uncertainty;
+- preseason evidence;
+- new-team depth chart.
+
+Unmapped new signing remains blocked.
+
+======================================================================
+9. COHERENT TEAM LINEUP MODEL
+======================================================================
+
+9.1 WHY COHERENCE MATTERS
+-------------------------
+Twenty independent player start probabilities can imply:
+
+- 13 expected starters;
+- no goalkeeper;
+- four centre-forwards;
+- mutually exclusive alternatives both starting with high probability.
+
+Downstream event simulation requires valid joint scenarios.
+
+9.2 TARGET FORMATION MODEL
+--------------------------
+Predict formation F:
+
+P(F | team, manager, opponent, home/away, competition, congestion, available
+players)
+
+Formation is tactical-role structure, not FPL position.
+
+9.3 ROLE SLOTS
+--------------
+Example latent slots:
+
+- GK;
+- left/right centre-back;
+- full-back/wing-back;
+- holding midfielder;
+- central midfielder;
+- attacking midfielder;
+- winger;
+- striker.
+
+Role ontology is versioned.
+
+9.4 PLAYER-ROLE UTILITY
+-----------------------
+For player i and role slot r:
+
+u_i,r =
+  historical role fit
+  + manager preference
+  + health
+  + workload
+  + opposition/tactical context
+  + teammate alternatives
+  + recent lineup evidence
+  + uncertainty.
+
+9.5 ASSIGNMENT
+--------------
+Sample without replacement.
+
+Candidate implementation:
+
+- Gumbel perturbations of player-role utilities;
+- constrained maximum-weight assignment;
+- one player per role;
+- one role per player;
+- exactly 11 starters;
+- configured goalkeeper/formation constraints.
+
+This is related to a Plackett–Luce/random-utility selection process.
+
+9.6 BENCH
+---------
+Sample remaining matchday-squad slots from nonstarters using bench utilities and
+competition constraints.
+
+9.7 MARGINALS
+-------------
+Generate many coherent lineup samples.
+
+Estimate:
+
+p_start_i = fraction samples player starts
+p_bench_i = fraction samples player benched
+p_out_i = fraction samples player out
+
+9.8 INITIAL RECONCILIATION
+--------------------------
+Before the full role model:
+
+- fit marginal multinomial probabilities;
+- sample a fixed-size XI and bench using weighted sampling without replacement;
+- enforce one goalkeeper and broad position plausibility;
+- calibrate marginals through iterative adjustment.
+
+Label:
+COHERENCE_MODEL_V1.
+
+9.9 TEAM SUM CHECK
+------------------
+Across coherent samples:
+
+sum_i 1[start_i] = 11 exactly.
+
+Marginal:
+
+sum_i p_start_i = 11 within Monte Carlo error.
+
+Similarly for bench size.
+
+======================================================================
+10. STARTER MINUTES: COMPETING-RISK SURVIVAL
+======================================================================
+
+10.1 EVENT PROCESS
+------------------
+Conditional on starting, participation can end through:
+
+- tactical substitution;
+- injury/illness;
+- dismissal;
+- other forced exit;
+- match end.
+
+These are competing terminal causes for the player's on-pitch spell.
+
+10.2 DISCRETE HAZARD
+--------------------
+For minute bin t and cause k:
+
+h_i,k(t)
+=
+P(T_i=t, C_i=k | T_i >= t, START, X_i(t))
+
+Require:
+
+sum_k h_i,k(t) <= 1.
+
+10.3 SURVIVAL
+-------------
+S_i(t)
+=
+product over u <= t of
+[1 - sum_k h_i,k(u)]
+
+10.4 EVENT MASS
+---------------
+P(T_i=t, C_i=k | START)
+=
+S_i(t-1) h_i,k(t)
+
+10.5 MATCH-END MASS
+-------------------
+Probability of completing official full time is the residual survival mass at
+the configured endpoint.
+
+10.6 BASELINE HAZARD
+--------------------
+Use a flexible time function:
+
+- piecewise minute bins;
+- B-splines;
+- halftime indicator;
+- time-varying spline by cause.
+
+Do not assume proportional hazards across 90 minutes.
+
+10.7 HALFTIME
+-------------
+Halftime substitutions create a discontinuity.
+
+Represent explicitly rather than forcing a smooth curve.
+
+10.8 TACTICAL HAZARD FEATURES
+-----------------------------
+- minute;
+- score state;
+- pre-match team strength;
+- player's role;
+- position;
+- yellow card;
+- performance proxy where simulated/available;
+- manager;
+- remaining substitutions;
+- formation;
+- team chasing/protecting;
+- upcoming fixture;
+- workload;
+- player importance;
+- replacement quality.
+
+The 2008 Spanish-league substitution study found current score to be a leading
+factor in first-substitution timing, supporting time-varying score-state inputs.
+
+10.9 INJURY EXIT HAZARD
+-----------------------
+- readiness state;
+- recent return;
+- previous injury;
+- workload;
+- congestion;
+- age/position;
+- injury type;
+- environmental/context where available.
+
+This is a low-frequency event and requires strong pooling.
+
+10.10 DISMISSAL
+---------------
+Can be supplied by DMFP-08's card-event model in joint simulation.
+
+For standalone minutes baseline:
+use a small position/player/team-aware hazard.
+
+Avoid double counting when coupled.
+
+10.11 ABANDONED MATCH
+---------------------
+Exclude from normal training or model as a separate administrative endpoint.
+
+======================================================================
+11. BENCH ENTRY AND SUBSTITUTE MINUTES
+======================================================================
+
+11.1 ENTRY HAZARD
+-----------------
+Conditional on BENCH:
+
+e_i,k(t)
+=
+P(entry at minute t for cause k |
+  not entered before t,
+  BENCH,
+  team state X(t))
+
+11.2 NO ENTRY
+-------------
+Residual survival to match end is P(no entry | BENCH).
+
+11.3 FEATURES
+-------------
+- player tactical role;
+- manager substitution habits;
+- replacement hierarchy;
+- score state;
+- team strength/opponent;
+- injuries/cards to starters;
+- available substitutes;
+- remaining substitution windows;
+- competition;
+- fixture congestion;
+- player readiness/return;
+- preseason ramp;
+- whether player is attacking/defensive specialist.
+
+11.4 ENTRY CAUSE
+----------------
+Tactical and forced entries can have different timing/distributions.
+
+11.5 SUBSTITUTE MINUTES
+-----------------------
+Convert simulated entry time into official FPL minutes according to target
+scoring/event conventions.
+
+The training target is the official recorded minute total, not a naive
+wall-clock subtraction when they differ.
+
+11.6 EARLY SUBSTITUTE
+---------------------
+The distribution must permit 60+ minutes from an early forced substitution.
+
+11.7 UNUSED BENCH
+-----------------
+P(M=0 | BENCH) remains explicit and calibrated.
+
+======================================================================
+12. JOINT TEAM SUBSTITUTION PROCESS
+======================================================================
+
+12.1 TARGET ADVANCED MODEL
+--------------------------
+Player hazards alone can create impossible scenarios such as eight tactical
+substitutions.
+
+The target team simulation models:
+
+1. substitution-event time;
+2. event cause;
+3. outgoing starter;
+4. incoming substitute;
+5. formation update;
+6. remaining substitutions/windows.
+
+12.2 COMPETITION CONFIG
+-----------------------
+IFAB's Laws allow official competitions to determine substitutions up to the
+permitted framework; current senior football generally uses up to five
+substitutes and limited substitution opportunities.
+
+Pulse MUST load:
+
+- maximum substitutes;
+- bench size;
+- substitution opportunities;
+- concussion/additional rules;
+- target competition season.
+
+No hard-coded universal value.
+
+12.3 TEAM EVENT HAZARD
+----------------------
+Team substitution intensity depends on:
+
+- minute;
+- score;
+- match importance;
+- manager;
+- competition;
+- congestion;
+- red cards/injury events;
+- remaining capacity.
+
+12.4 OUTGOING CHOICE
+--------------------
+Conditional choice among starters uses:
+
+- role;
+- fatigue/workload;
+- card;
+- fitness limit;
+- tactical need;
+- performance state;
+- replacement availability.
+
+12.5 INCOMING CHOICE
+--------------------
+Conditional choice among bench uses:
+
+- role compatibility;
+- tactical need;
+- manager history;
+- fitness;
+- player hierarchy.
+
+12.6 INITIAL VERSION
+--------------------
+V1 may sample player-level entry/exit times then reconcile to team constraints.
+
+The reconciliation method must be deterministic/probabilistic and measured for
+distortion of player marginals.
+
+======================================================================
+13. MATCH-STATE COUPLING
+======================================================================
+
+13.1 PROBLEM
+------------
+Substitution decisions depend on score state.
+Score state depends on which players are on the pitch.
+
+13.2 BASELINE PASS
+------------------
+DMFP-07 first produces a pre-match minutes distribution using:
+
+- pre-match market probabilities;
+- expected score-state paths;
+- no current simulation feedback.
+
+13.3 JOINT PASS
+---------------
+DMFP-08 may simulate:
+
+- goals/cards;
+- score path;
+- lineup;
+- substitutions;
+- player events.
+
+At each minute:
+substitution hazard conditions on the simulated state.
+
+13.4 FIXED-POINT OPTION
+-----------------------
+Advanced workflow:
+
+1. baseline minutes;
+2. market-based match simulation;
+3. state-conditioned substitution simulation;
+4. update event/player exposure;
+5. repeat until changes are below tolerance or maximum iterations reached.
+
+Initial implementation should limit to one refinement pass unless evidence shows
+more iterations improve predictions.
+
+13.5 NO CIRCULAR LEAKAGE
+------------------------
+Every simulated input is generated from predeadline information.
+
+======================================================================
+14. FEATURE SYSTEM
+======================================================================
+
+14.1 PLAYER HISTORY
+-------------------
+- starts in prior 1/3/5/10 relevant matches;
+- bench/out state;
+- official minutes;
+- consecutive starts;
+- time since start/appearance;
+- season share;
+- manager-regime share;
+- position/role;
+- historical substitution minute;
+- historical bench-entry usage.
+
+14.2 TEAM/MANAGER
+-----------------
+- manager identity;
+- manager-team regime age;
+- formation distribution;
+- lineup stability;
+- rotation entropy;
+- changes per match;
+- substitution timing;
+- substitution role preferences;
+- squad depth;
+- competition priorities;
+- manager statements.
+
+14.3 TEAMMATE DEPENDENCE
+------------------------
+- injuries/suspensions to competitors;
+- role alternatives;
+- teammate return;
+- new signing;
+- likely formation;
+- replacement quality;
+- number of available players in role.
+
+14.4 FIXTURE
+------------
+- competition;
+- home/away;
+- opponent;
+- market strength;
+- expected score;
+- favourite/underdog;
+- must-win/knockout context;
+- derby/importance only if objectively defined and validated.
+
+14.5 WORKLOAD
+-------------
+- hours since last match;
+- days since last start;
+- minutes last 3/7/14/28 days;
+- starts last 7/14/28;
+- extra time;
+- travel;
+- international duty;
+- World Cup/tournament return;
+- training/minutes ramp where public;
+- next match in 3/5/7 days;
+- previous and next competition importance.
+
+14.6 INJURY
+------------
+- current status;
+- injury type/body region;
+- severity/grade where public;
+- days since injury;
+- days since full/partial training report;
+- prior recurrence;
+- number of substitute appearances since return;
+- minutes since return;
+- progression sequence;
+- FPL flag;
+- conflicting evidence.
+
+14.7 MARKET
+------------
+- player listed;
+- price;
+- market age;
+- settlement;
+- number of books;
+- market removal;
+- one-sided/complete status;
+- difference versus team allocation prior.
+
+Market absence is a typed feature, not a negative certainty.
+
+14.8 PRESEASON
+--------------
+- date player joined preseason;
+- tournament return date;
+- friendly starts;
+- friendly minutes;
+- consecutive workload;
+- role/formation;
+- rival absences;
+- opponent quality;
+- substitution pattern;
+- source confidence.
+
+14.9 NEWS
+---------
+Structured evidence only:
+
+- source;
+- exact time;
+- statement category;
+- certainty wording;
+- freshness;
+- contradiction.
+
+No unrestricted LLM embedding is permitted in the primary numeric model until
+validated.
+
+======================================================================
+15. FIXTURE CONGESTION AND EUROPEAN EFFECTS
+======================================================================
+
+15.1 RESEARCH POSITION
+----------------------
+The 2023 systematic review of professional male soccer found that several
+included studies associated congested schedules with increased match-injury
+incidence, while the evidence was heterogeneous.
+
+The model must not convert this into one universal rotation or injury multiplier.
+
+15.2 FEATURES
+-------------
+- rest hours;
+- prior minutes;
+- prior competition;
+- next match;
+- travel;
+- extra time;
+- home/away sequence;
+- European away return;
+- knockout/group stage;
+- team depth;
+- player age/role;
+- manager rotation style.
+
+15.3 INTERACTIONS
+-----------------
+Congestion effect may differ by:
+
+- manager;
+- player;
+- position;
+- injury history;
+- team resources;
+- match importance;
+- competition.
+
+15.4 EUROPEAN MATCH EFFECT
+--------------------------
+Do not use a binary "Europe = rotation" rule.
+
+Model:
+
+- previous European match;
+- next European match;
+- days;
+- travel;
+- minutes;
+- opponent;
+- competition stage;
+- league match importance;
+- manager preference.
+
+15.5 UPCOMING FIXTURE
+---------------------
+Managers may protect players for a later match.
+Future schedule is a valid predeadline feature.
+
+15.6 CAUSAL LANGUAGE
+--------------------
+Prediction features need not be interpreted causally.
+Report associations and uncertainty.
+
+======================================================================
+16. NEW-MANAGER AND REGIME UNCERTAINTY
+======================================================================
+
+16.1 MANAGER-TEAM REGIME
+------------------------
+Every appointment creates a new regime ID.
+
+16.2 CHANGE POINT
+-----------------
+Old club-manager lineup patterns are not treated as current-team observations.
+
+They inform priors.
+
+16.3 HIERARCHICAL PRIOR
+-----------------------
+New regime borrows from:
+
+- manager's prior clubs;
+- current club's prior manager;
+- team squad/depth;
+- league-wide manager patterns;
+- tactical formation signals.
+
+The hierarchical model determines pooling, with transferability uncertainty.
+
+16.4 MANAGER HISTORY TRANSFER
+-----------------------------
+A manager's historical substitution and rotation style can be informative but
+context differs:
+
+- squad quality;
+- competition;
+- substitutes allowed;
+- fixture congestion;
+- tactical roles.
+
+Use a discounted, uncertainty-rich prior.
+
+16.5 UNCERTAINTY DECAY
+----------------------
+Manager-regime uncertainty reduces with:
+
+- competitive lineups;
+- competitive substitution paths;
+- consistent formation;
+- press evidence.
+
+Preseason friendlies count less than competitive matches.
+
+16.6 NEW-MANAGER OUTPUT
+-----------------------
+- regime age;
+- competitive lineups observed;
+- posterior uncertainty;
+- prior source mixture;
+- lineup entropy.
+
+16.7 OFFICIAL 2026/27 CONTEXT
+-----------------------------
+The July 2026 official source described eight new managers and warned of changes
+to tactics and starting lineups.
+
+The model should begin 2026/27 with an explicit regime reset for affected clubs.
+
+======================================================================
+17. RETURNING FROM INJURY
+======================================================================
+
+17.1 RETURN TO PLAY IS NOT FULL PERFORMANCE
+-------------------------------------------
+Research distinguishes medical clearance/full availability from complete return
+to prior performance.
+
+Pulse must distinguish:
+
+- training return;
+- squad return;
+- bench return;
+- start return;
+- 60-minute return;
+- full-minute stability;
+- performance return.
+
+17.2 NO GENERIC RECOVERY CLOCK
+------------------------------
+The UEFA Elite Club Injury Study shows return times differ materially by injury
+diagnosis and severity.
+
+Do not use:
+
+    hamstring injury = exactly 21 days
+
+without direct evidence.
+
+17.3 RECURRENCE
+---------------
+Studies of professional football report meaningful recurrent injury risk,
+including higher recurrence after early return for some injuries and substantial
+variation by injury location.
+
+Use recurrence as uncertainty/risk evidence, not as a diagnosis.
+
+17.4 MINUTES RAMP
+-----------------
+Returning players may follow:
+
+- unused bench;
+- late substitute;
+- earlier substitute;
+- limited start;
+- repeated limited start;
+- full start.
+
+Model the progression sequence and time spent in each state.
+
+17.5 FEATURES
+-------------
+- injury class;
+- severity;
+- prior recurrence;
+- date of full training;
+- date of squad return;
+- appearances/minutes since return;
+- days between appearances;
+- manager comments;
+- market listing;
+- teammate alternatives;
+- upcoming schedule.
+
+17.6 LIMITED START
+------------------
+A start is not equivalent to full-minute availability.
+
+`MATCH_READY_LIMITED` increases tactical/injury exit hazard.
+
+17.7 PUBLIC INFORMATION LIMIT
+-----------------------------
+No medical inference beyond public evidence.
+Uncertainty remains wide when diagnosis is vague.
+
+======================================================================
+18. PRESEASON AND POST-TOURNAMENT MODEL
+======================================================================
+
+18.1 WORLD CUP RETURN
+---------------------
+For 2026/27:
+
+- tournament stage;
+- final match date;
+- travel;
+- rest period;
+- first club training;
+- friendly minutes;
+- manager statements.
+
+18.2 OFFICIAL GUIDANCE
+----------------------
+The Premier League's preseason article specifically says monitoring World Cup
+players' minutes is fundamental and warns against overvaluing fringe players who
+only start friendlies while established rivals rest.
+
+18.3 FRIENDLY WEIGHT
+--------------------
+Friendly evidence weight depends on:
+
+- date relative to GW1;
+- player training return;
+- opponent quality;
+- competition/rules;
+- lineup strength;
+- substitution schedule;
+- manager comments.
+
+18.4 FINAL FRIENDLIES
+---------------------
+Later friendlies usually receive more role weight, but no automatic certainty.
+
+18.5 OPENING-GAME UNCERTAINTY
+-----------------------------
+Early-season output should have:
+
+- wider epistemic interval;
+- stronger hierarchical shrinkage;
+- lower confidence;
+- robust FPL decision flag.
+
+======================================================================
+19. SUSPENSION AND INELIGIBILITY
+======================================================================
+
+19.1 DETERMINISTIC SOURCES
+--------------------------
+Use official competition/club/FPL records.
+
+19.2 CARD ACCUMULATION
+----------------------
+Suspension module should track:
+
+- competition-specific cards;
+- ban length;
+- served fixtures;
+- appeal;
+- cross-competition applicability.
+
+19.3 LOAN/PARENT RESTRICTION
+----------------------------
+Fixture-specific ineligibility.
+
+19.4 REGISTRATION
+-----------------
+New signings and squad registration require official confirmation.
+
+19.5 UNKNOWN
+-------------
+If eligibility cannot be confirmed:
+
+- do not treat as available;
+- create scenarios;
+- alert.
+
+======================================================================
+20. MODEL PRIORS AND PARTIAL POOLING
+======================================================================
+
+20.1 PLAYER EFFECT
+------------------
+Player start/sub effects drawn from role/team-level distributions.
+
+20.2 MANAGER EFFECT
+-------------------
+Manager effects drawn from league distributions, with manager history.
+
+20.3 TEAM EFFECT
+----------------
+Team rotation and bench-use effects.
+
+20.4 POSITION/ROLE
+------------------
+Separate baseline hazards:
+
+- goalkeeper;
+- centre-back;
+- full-back/wing-back;
+- central/defensive midfielder;
+- attacking midfielder/winger;
+- striker.
+
+20.5 GOALKEEPER
+----------------
+Goalkeeper starting and substitution processes differ strongly.
+Use separate model/coefficients.
+
+20.6 NEW PLAYER
+----------------
+Partial pooling avoids extreme estimates from one friendly or cameo.
+
+20.7 PRIOR PREDICTIVE CHECK
+---------------------------
+Before fitting:
+
+- simulate p_start;
+- lineups;
+- minutes;
+- substitution timing;
+- ensure realistic distributions.
+
+20.8 POSTERIOR PREDICTIVE CHECK
+-------------------------------
+Check:
+
+- team changes per match;
+- start persistence;
+- minute histogram;
+- halftime/60–75 substitution shape;
+- bench appearance;
+- injury returns;
+- manager/team subgroups.
+
+======================================================================
+21. MODEL FAMILY AND VERSION ROADMAP
+======================================================================
+
+21.1 BASELINES
+--------------
+B0:
+Last competitive lineup persistence.
+
+B1:
+Recent start frequency with injury/suspension rules.
+
+B2:
+Regularized multinomial logistic role model.
+
+B3:
+Empirical position/manager minutes distribution.
+
+21.2 PRIMARY V1
+--------------
+- hierarchical multinomial START/BENCH/OUT;
+- coherent fixed-size team sampler;
+- discrete-time starter competing risks;
+- discrete-time bench entry;
+- posterior predictive minutes;
+- calibrated outputs.
+
+21.3 CHALLENGERS
+----------------
+- gradient-boosted multiclass/hazard model;
+- random survival forest;
+- DeepHit competing-risk model;
+- source-expert stacking;
+- hidden semi-Markov readiness;
+- latent role/formation model.
+
+21.4 ENSEMBLE
+-------------
+Use only if walk-forward log score/CRPS and calibration improve.
+
+The ensemble must preserve coherent team scenarios.
+
+21.5 IMPLEMENTATION FRAMEWORK
+-----------------------------
+Recommended initial:
+
+- NumPyro or PyMC for hierarchical Bayesian models;
+- JAX/NumPy/SciPy for simulation;
+- gradient boosting challenger;
+- Polars/Pandas for features;
+- PostgreSQL/Parquet for data;
+- no neural model in production V1.
+
+Framework choice is benchmarked before final implementation.
+
+======================================================================
+22. TRAINING LABELS
+======================================================================
+
+22.1 ROLE LABEL
+---------------
+Actual kickoff state:
+
+- starter;
+- named bench;
+- not in matchday squad.
+
+Distinguish announced lineup from final kickoff lineup where warmup changes
+occur.
+
+22.2 MINUTES LABEL
+------------------
+Official FPL/competition recorded minutes.
+
+Keep:
+
+- event substitution time;
+- official FPL minutes;
+- reason/cause where available.
+
+22.3 STARTER CAUSE LABEL
+------------------------
+Cause quality varies.
+
+Hierarchy:
+
+1. official event/injury/card evidence;
+2. structured provider;
+3. inferred tactical;
+4. UNKNOWN.
+
+Weak cause labels should not contaminate all hazards.
+
+22.4 BENCH ENTRY LABEL
+----------------------
+Entry time and likely cause.
+
+22.5 ABANDONED MATCH
+--------------------
+Exclude from ordinary model or use separate endpoint.
+
+22.6 MISSING LINEUP
+------------------
+Do not infer role solely from positive minutes when named-bench data are needed
+for bench/no-squad distinction.
+
+22.7 ALL-COMPETITION HISTORY
+----------------------------
+Use all competitions for workload and manager behaviour.
+
+Target prediction/evaluation remains Premier League/FPL fixture-specific.
+
+======================================================================
+23. FEATURE LEAKAGE CONTROLS
+======================================================================
+
+23.1 NO FINAL TEAM NEWS
+-----------------------
+Postcutoff lineups and injuries prohibited.
+
+23.2 NO END-OF-SEASON DEPTH CHART
+---------------------------------
+Depth chart built as-of each deadline.
+
+23.3 NO FINAL INJURY DURATION
+-----------------------------
+Unavailable at prediction time.
+
+23.4 NO FUTURE MANAGER FORMATION
+--------------------------------
+Only observed prior lineups.
+
+23.5 NO POSTMATCH MARKET
+------------------------
+Player listing/odds after cutoff prohibited.
+
+23.6 PREPROCESSING
+------------------
+Feature transforms and calibration fitted on training window only.
+
+======================================================================
+24. CALIBRATION
+======================================================================
+
+24.1 ROLE CALIBRATION
+---------------------
+Evaluate:
+
+- multiclass reliability;
+- one-vs-rest p_start;
+- p_bench;
+- p_out;
+- team/position/manager subgroups.
+
+24.2 P0 AND P60
+---------------
+Calibrate directly:
+
+- P(M=0);
+- P(M>=60);
+- P(M>=80);
+- P(M=90).
+
+24.3 DISTRIBUTION CALIBRATION
+----------------------------
+Use:
+
+- randomized PIT/rank histograms for discrete distributions;
+- observed CDF coverage;
+- quantile coverage;
+- interval calibration.
+
+24.4 SURVIVAL CALIBRATION
+-------------------------
+For starter/bench hazards:
+
+- cumulative incidence by minute;
+- time-dependent Brier score;
+- cause-specific calibration.
+
+Competing-risk literature warns that standard survival methods treating
+competing events as ordinary censoring can misestimate absolute risks.
+
+24.5 RECALIBRATION
+------------------
+Potential:
+
+- intercept/slope;
+- beta calibration;
+- isotonic with enough data;
+- hazard-scale calibration.
+
+Strong regularisation required.
+
+======================================================================
+25. EVALUATION METRICS
+======================================================================
+
+25.1 MATCHDAY ROLE
+------------------
+Primary:
+
+- multiclass logarithmic score;
+- multiclass Brier score.
+
+Secondary:
+
+- start ROC-AUC/PR-AUC;
+- top-XI accuracy;
+- Jaccard similarity;
+- calibration slope/intercept;
+- expected calibration error with caution.
+
+25.2 MINUTE DISTRIBUTION
+-----------------------
+Primary:
+
+- discrete ranked probability score / CRPS analogue;
+- negative log probability of observed minute;
+- interval coverage;
+- CDF calibration.
+
+Secondary:
+
+- MAE;
+- RMSE;
+- median absolute error.
+
+25.3 BINARY FPL THRESHOLDS
+-------------------------
+- Brier/log loss for zero;
+- Brier/log loss for 60+;
+- Brier/log loss for 80+/90.
+
+25.4 COMPETING RISKS
+--------------------
+- time-dependent Brier score;
+- integrated Brier score;
+- cumulative incidence calibration;
+- cause-specific log score;
+- time-dependent AUC as secondary;
+- concordance as secondary only.
+
+25.5 TEAM COHERENCE
+-------------------
+- sampled XI exactly 11;
+- bench exact configured size;
+- formation validity;
+- marginal sum;
+- actual XI joint/approximate log probability;
+- substitutions within allowed count.
+
+25.6 DECISION WEIGHTED
+----------------------
+DMFP-15 should report minutes-model error weighted by:
+
+- player ownership in Sebastian's squad;
+- captaincy relevance;
+- transfer decision;
+- FPL scoring threshold crossing.
+
+This does not replace proper forecast metrics.
+
+======================================================================
+26. VALIDATION DESIGN
+======================================================================
+
+26.1 WALK-FORWARD
+-----------------
+Train on past, predict future deadline by deadline.
+
+26.2 SPLITS
+-----------
+- season-based;
+- rolling Gameweeks;
+- manager-regime changes;
+- promoted clubs;
+- new signings;
+- injury-return episodes.
+
+26.3 NEW-MANAGER TEST
+---------------------
+Hold out first N competitive lineups under new regimes.
+
+26.4 EARLY-SEASON TEST
+----------------------
+Evaluate GW1–5 separately.
+
+26.5 EUROPEAN TEST
+------------------
+Compare:
+
+- after European match;
+- before European match;
+- no Europe;
+- different rest windows.
+
+26.6 INJURY-RETURN TEST
+-----------------------
+Episode-level holdout to avoid leaking the same injury trajectory across train
+and test.
+
+26.7 SOURCE ABLATION
+--------------------
+- no predicted lineups;
+- no market listing;
+- no press evidence;
+- no injury feed;
+- no congestion;
+- no manager history.
+
+26.8 BASELINE PROMOTION
+-----------------------
+Primary model must improve proper scores and calibration over persistence and
+recent-frequency baselines.
+
+======================================================================
+27. UNCERTAINTY DECOMPOSITION
+======================================================================
+
+27.1 ALEATORIC
+--------------
+Manager and match randomness:
+
+- selection choice;
+- tactical substitutions;
+- injury;
+- score-state path.
+
+27.2 PARAMETER
+--------------
+Posterior uncertainty in coefficients/effects.
+
+27.3 REGIME
+-------------
+New manager/team uncertainty.
+
+27.4 HEALTH
+-------------
+Latent readiness state.
+
+27.5 SOURCE
+-------------
+Conflicting/missing evidence.
+
+27.6 MODEL
+-------------
+Difference among primary/challengers.
+
+27.7 OUTPUT
+-------------
+Provide:
+
+- posterior predictive minute PMF;
+- distribution of p_start estimates;
+- confidence grade;
+- dominant uncertainty drivers.
+
+======================================================================
+28. ROTATION RISK
+======================================================================
+
+28.1 DEFINITION
+--------------
+Rotation risk must be separated from injury risk.
+
+Proposed:
+
+rotation_risk
+=
+P(BENCH or OUT for tactical/workload reasons |
+  legally eligible and medically match-ready)
+
+28.2 COMPUTATION
+----------------
+Posterior simulation classifies role-state causes where possible.
+
+28.3 INTERPRETATION
+-------------------
+High rotation risk does not mean high injury risk.
+
+28.4 OUTPUT
+-----------
+- probability;
+- main drivers;
+- manager baseline;
+- congestion contribution;
+- teammate competition;
+- regime uncertainty.
+
+======================================================================
+29. INJURY UNCERTAINTY
+======================================================================
+
+29.1 PROBABILITY
+----------------
+injury_unavailability_probability:
+P(OUT or unavailable due medical condition before/at fixture).
+
+29.2 UNCERTAINTY INDEX
+----------------------
+Use normalized entropy/variance of latent readiness posterior, not arbitrary
+analyst score.
+
+29.3 RECURRENCE
+---------------
+Separate:
+
+- current availability;
+- early-exit injury hazard;
+- future recurrence risk.
+
+29.4 NO MEDICAL CLAIM
+---------------------
+Pulse predictions are decision-support probabilities, not diagnosis.
+
+======================================================================
+30. MANUAL OVERRIDES AND HUMAN REVIEW
+======================================================================
+
+30.1 HARD OVERRIDE
+------------------
+Permitted for:
+
+- official suspension;
+- formal ineligibility;
+- confirmed fixture cancellation;
+- official lineup in a non-FPL-cutoff use case.
+
+30.2 SOFT EVIDENCE
+------------------
+Manager quote, training report or analyst judgement should update evidence, not
+set p_start to 1/0.
+
+30.3 OVERRIDE RECORD
+--------------------
+- player/fixture;
+- prior distribution;
+- evidence;
+- source/time;
+- adjustment type;
+- expiry;
+- reviewer;
+- posterior effect;
+- reason.
+
+30.4 SCENARIO OVERRIDE
+----------------------
+When evidence is ambiguous:
+
+- "available";
+- "limited";
+- "out";
+
+with scenario probabilities.
+
+30.5 AUDIT
+----------
+Model output before and after override retained.
+
+======================================================================
+31. EXPLAINABILITY
+======================================================================
+
+31.1 PLAYER REPORT
+------------------
+Must answer:
+
+- why start probability changed;
+- why minutes conditional start changed;
+- injury versus rotation;
+- manager effect;
+- congestion;
+- teammate competition;
+- source conflict;
+- uncertainty.
+
+31.2 CHANGE ATTRIBUTION
+-----------------------
+Compare current run with previous run using:
+
+- new evidence;
+- fixture change;
+- teammate status;
+- model version;
+- manager regime;
+- market update.
+
+31.3 FEATURE IMPORTANCE
+-----------------------
+Use:
+
+- posterior coefficient/effect summaries;
+- leave-one-feature/source sensitivity;
+- challenger SHAP only as supplementary;
+- scenario analysis.
+
+31.4 AVOID CAUSAL OVERCLAIM
+---------------------------
+Prediction contribution is not necessarily causal effect.
+
+======================================================================
+32. CONFIGURATION
+======================================================================
+
+config/availability/
+  state_definitions.yaml
+  evidence_sources.yaml
+  source_reliability.yaml
+  eligibility.yaml
+  role_model.yaml
+  formation_roles.yaml
+  workload_windows.yaml
+  congestion.yaml
+  injury_states.yaml
+  hazard_bins.yaml
+  substitution_rules.yaml
+  priors.yaml
+  calibration.yaml
+  confidence_grades.yaml
+  manual_override.yaml
+
+All:
+
+- thresholds;
+- priors;
+- evidence decay;
+- workload windows;
+- hazard bins;
+- confidence rules;
+
+are versioned.
+
+======================================================================
+33. IMPLEMENTATION ARCHITECTURE
+======================================================================
+
+33.1 PACKAGE
+------------
+src/dmf_pulse/availability/
+
+- eligibility.py
+- evidence.py
+- readiness.py
+- features.py
+- role_model.py
+- formation.py
+- lineup_sampler.py
+- starter_hazard.py
+- bench_hazard.py
+- substitution_process.py
+- posterior.py
+- calibration.py
+- evaluation.py
+- explain.py
+- schemas.py
+
+33.2 PURE INTERFACES
+--------------------
+build_availability_evidence(player, fixture, cutoff)
+
+predict_readiness(evidence, model_version)
+
+predict_role_marginals(context, model_version)
+
+sample_coherent_lineups(team_context, role_draws, config)
+
+predict_starter_minutes(player_context, lineup_scenario, match_state_prior)
+
+predict_bench_minutes(player_context, bench_scenario, match_state_prior)
+
+combine_minutes_distribution(role_probs, conditional_pmfs)
+
+simulate_team_playing_time(lineup, bench, match_state_path, config)
+
+33.3 ARTIFACTS
+--------------
+- posterior parameter file;
+- model card;
+- training dataset;
+- feature schema;
+- calibration model;
+- coherent scenario Parquet;
+- evaluation report.
+
+33.4 FRAMEWORK
+--------------
+Initial benchmark:
+
+- NumPyro;
+- PyMC;
+- regularized GLM/gradient boosting.
+
+Select based on:
+
+- inference correctness;
+- speed;
+- posterior diagnostics;
+- implementation simplicity;
+- reproducibility.
+
+======================================================================
+34. TESTING
+======================================================================
+
+34.1 MATHEMATICAL
+-----------------
+- probabilities sum one;
+- PMF sums one;
+- p_start+p_bench+p_out=1;
+- p_appearance >= p_start;
+- p_zero = PMF[0];
+- expected minutes equals PMF mean;
+- p60 equals PMF tail;
+- conditional distributions normalized.
+
+34.2 TEAM COHERENCE
+-------------------
+- exactly 11 starters;
+- configured bench;
+- no duplicate player;
+- valid goalkeeper;
+- no ineligible player;
+- substitutions within limit;
+- one player cannot enter twice.
+
+34.3 HAZARD
+-----------
+- hazards nonnegative;
+- cause sum <=1;
+- survival monotonic;
+- halftime spike representable;
+- match-end residual;
+- competing risks mass sums one.
+
+34.4 EDGE CASES
+---------------
+- suspended;
+- loan-parent ineligible;
+- confirmed out;
+- 100% start;
+- bench unused;
+- early injury substitute;
+- starter injured at minute 5;
+- halftime sub;
+- red card;
+- abandoned match;
+- goalkeeper;
+- player returns after long injury;
+- new signing/new manager;
+- two fixtures in one FPL Gameweek.
+
+34.5 TEMPORAL
+-------------
+- postdeadline lineup excluded;
+- late injury correction excluded;
+- manager appointment timing;
+- historical depth chart as-of;
+- market opened after deadline.
+
+34.6 GOLDEN TEAM
+----------------
+Synthetic squad with known role hierarchy, injury and congestion.
+Expected role/minute distributions fixed.
+
+34.7 POSTERIOR
+--------------
+- convergence/R-hat/ESS where MCMC;
+- prior predictive;
+- posterior predictive;
+- no divergent pathologies accepted without resolution;
+- simulation reproducibility.
+
+======================================================================
+35. MONITORING AND DRIFT
+======================================================================
+
+35.1 WEEKLY
+-----------
+- role log loss;
+- P0/P60 Brier;
+- minute CRPS;
+- lineup coherence;
+- calibration;
+- source coverage;
+- manager/team subgroup.
+
+35.2 DRIFT
+----------
+- start-rate shift;
+- substitution-time shift;
+- rule/substitution changes;
+- manager change;
+- source schema;
+- injury-label distribution;
+- bench-size change.
+
+35.3 RETRAIN
+------------
+Triggered by:
+
+- scheduled monthly;
+- manager regime handled online/hierarchically;
+- calibration drift;
+- rule/competition change;
+- source change;
+- significant performance degradation.
+
+35.4 MODEL FAILURE
+------------------
+Fallback order:
+
+1. previous healthy model;
+2. hierarchical baseline;
+3. recent lineup persistence with injury rules;
+4. human-reviewed distribution.
+
+Never fallback to one expected-minute point.
+
+======================================================================
+36. RISK REGISTER
+======================================================================
+
+R-07-001 — Start probabilities do not form coherent XI
+Probability: High
+Impact: Critical
+Mitigation:
+joint sampler and sum checks.
+
+R-07-002 — Expected minutes hides bimodality
+Probability: High
+Impact: Critical
+Mitigation:
+full PMF.
+
+R-07-003 — Official lineup leakage
+Probability: High
+Impact: Critical
+Mitigation:
+deadline bundle.
+
+R-07-004 — New manager history carried at full weight
+Probability: High
+Impact: High
+Mitigation:
+regime change and hierarchical prior.
+
+R-07-005 — Preseason fringe player overvalued
+Probability: High
+Impact: High
+Mitigation:
+friendly weighting and rival-return features.
+
+R-07-006 — World Cup return ignored
+Probability: High in GW1
+Impact: High
+Mitigation:
+return/training/minutes features.
+
+R-07-007 — Europe encoded as universal rotation penalty
+Probability: Medium
+Impact: High
+Mitigation:
+learned interactions and manager effects.
+
+R-07-008 — Fixture congestion treated causally/universally
+Probability: Medium
+Impact: High
+Mitigation:
+heterogeneous model and cautious interpretation.
+
+R-07-009 — Injury "return" treated as fully fit
+Probability: High
+Impact: Critical
+Mitigation:
+readiness states and minutes ramp.
+
+R-07-010 — Vague injury label given exact recovery
+Probability: High
+Impact: High
+Mitigation:
+uncertainty and injury-specific priors.
+
+R-07-011 — Suspension applied to wrong competition/fixture
+Probability: Medium
+Impact: Critical
+Mitigation:
+fixture-specific official eligibility.
+
+R-07-012 — Market listing treated as guaranteed start
+Probability: Medium
+Impact: Critical
+Mitigation:
+weak calibrated feature.
+
+R-07-013 — Market absence treated as out
+Probability: High
+Impact: High
+Mitigation:
+typed missing reason.
+
+R-07-014 — Independent starter hazards create too many subs
+Probability: High
+Impact: High
+Mitigation:
+team substitution process/reconciliation.
+
+R-07-015 — Score-state circularity
+Probability: Medium
+Impact: High
+Mitigation:
+baseline/joint pass with controlled iteration.
+
+R-07-016 — Cause labels noisy
+Probability: High
+Impact: Medium/High
+Mitigation:
+unknown cause and partial likelihood.
+
+R-07-017 — Deep model overfits
+Probability: High
+Impact: High
+Mitigation:
+simple primary, challenger gate.
+
+R-07-018 — Rare injury exits underfit
+Probability: High
+Impact: Medium
+Mitigation:
+strong pooling and event-engine integration.
+
+R-07-019 — Goalkeeper model copied from outfield
+Probability: Medium
+Impact: High
+Mitigation:
+separate coefficients/model.
+
+R-07-020 — New signing identity/history wrong
+Probability: Medium
+Impact: Critical
+Mitigation:
+DMFP-03 mapping gate.
+
+R-07-021 — Friendlies counted like league matches
+Probability: High
+Impact: High
+Mitigation:
+competition evidence weights.
+
+R-07-022 — External lineup source overtrusted
+Probability: Medium
+Impact: High
+Mitigation:
+source-specific historical scoring.
+
+R-07-023 — Human override becomes permanent
+Probability: Medium
+Impact: High
+Mitigation:
+expiry and immutable audit.
+
+R-07-024 — Minutes labels inconsistent across providers
+Probability: Medium
+Impact: Critical
+Mitigation:
+official target and reconciliation.
+
+R-07-025 — Warmup withdrawal missed
+Probability: Medium
+Impact: Medium
+Mitigation:
+pre-kickoff transition/label.
+
+R-07-026 — Match abandonment contaminates hazards
+Probability: Low
+Impact: High
+Mitigation:
+separate endpoint/exclusion.
+
+R-07-027 — Calibration aggregate hides subgroup failure
+Probability: High
+Impact: High
+Mitigation:
+team/position/manager subgroup checks.
+
+R-07-028 — Model confidence confused with p_start
+Probability: Medium
+Impact: Medium
+Mitigation:
+separate fields.
+
+R-07-029 — Rotation and injury risk conflated
+Probability: High
+Impact: High
+Mitigation:
+cause decomposition.
+
+R-07-030 — Full PMFs too large operationally
+Probability: Medium
+Impact: Low/Medium
+Mitigation:
+artifact storage and summaries.
+
+R-07-031 — Posterior inference too slow near deadline
+Probability: Medium
+Impact: High
+Mitigation:
+pre-fit parameters, fast posterior prediction, cached features.
+
+R-07-032 — Future fixture importance feature uses future result
+Probability: Medium
+Impact: Critical
+Mitigation:
+as-of competition state.
+
+R-07-033 — Role ontology wrong after tactical change
+Probability: Medium
+Impact: High
+Mitigation:
+latent role uncertainty and manager regime.
+
+R-07-034 — Competing-risk model evaluated only by C-index
+Probability: Medium
+Impact: High
+Mitigation:
+time-dependent Brier/calibration/log score.
+
+======================================================================
+37. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-16
+
+----------------------------------------------------------------------
+SRC-FPL-CONTEXT-2026-001
+Title:
+What to look out for in pre-season ahead of 2026/27 Fantasy
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2026-07-16
+
+URL:
+https://www.premierleague.com/en/news/4679613/what-to-look-out-for-in-pre-season-ahead-of-202627-fantasy
+
+Relevant claims:
+- record eight new managers;
+- tactics, starting lineups and set pieces may change;
+- late World Cup returners have less than five weeks;
+- monitoring preseason minutes is fundamental;
+- early friendlies can mislead when rivals are rested.
+
+Reliability:
+HIGH official current FPL context.
+
+Pulse reliance:
+YES for early-season regime and tournament-return policy.
+
+----------------------------------------------------------------------
+SRC-FPL-CONTEXT-2026-002
+Title:
+Why 2026/27 will be a very different season in Fantasy
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2026-06-18
+
+URL:
+https://www.premierleague.com/en/news/4675372/why-202627-will-be-a-very-different-season-in-fantasy
+
+Relevant claims:
+Nine Premier League clubs are involved in European competitions; manager and
+European-status changes create unusual uncertainty and possible rotation.
+
+Reliability:
+HIGH official context; a later July source updated the new-manager count.
+
+Pulse reliance:
+YES for European/congestion features.
+
+----------------------------------------------------------------------
+SRC-SUBSTITUTION-2008-001
+Title:
+The Determinants of Soccer Player Substitutions: A Survival Analysis of the
+Spanish Soccer League
+
+Authors:
+Julio del Corral, Carlos Pestana Barros, Juan Prieto-Rodríguez
+
+Publication:
+Journal of Sports Economics
+
+DOI/URL:
+https://journals.sagepub.com/doi/10.1177/1527002507308309
+
+Relevant claim:
+An inverse-Gaussian hazard model of first substitutions found current score to
+be the most important explanatory factor in substitution timing in the studied
+league/season.
+
+Reliability:
+HIGH peer-reviewed football-specific research; older and limited to first
+substitutions.
+
+Pulse reliance:
+YES for score-state time-varying hazards.
+
+----------------------------------------------------------------------
+SRC-SURVIVAL-1972-001
+Title:
+Regression Models and Life-Tables
+
+Author:
+D. R. Cox
+
+Publication date:
+1972
+
+URL:
+https://rss.onlinelibrary.wiley.com/doi/10.1111/j.2517-6161.1972.tb00899.x
+
+Relevant claim:
+Foundational proportional-hazards regression framework for censored event times.
+
+Reliability:
+HIGH foundational research.
+
+Pulse reliance:
+CONCEPTUAL; Pulse uses more flexible discrete-time hazards.
+
+----------------------------------------------------------------------
+SRC-COMPETING-2022-001
+Title:
+A review on competing risks methods for survival analysis
+
+Authors:
+Karla Monterrubio-Gómez, Nathan Constantine-Cooke, Catalina A. Vallejos
+
+URL:
+https://arxiv.org/abs/2212.05157
+
+Relevant claim:
+Competing-risk methods target cause-specific events and require suitable
+evaluation/reproducibility.
+
+Reliability:
+MODERATE/HIGH scholarly review/preprint.
+
+Pulse reliance:
+YES for competing-exit structure.
+
+----------------------------------------------------------------------
+SRC-DISCRETE-SURVIVAL-2022-001
+Title:
+Survival prediction models: an introduction to discrete-time modeling
+
+URL:
+https://link.springer.com/article/10.1186/s12874-022-01679-6
+
+Publication date:
+2022
+
+Relevant claims:
+Discrete-time survival models provide flexible event-probability predictions
+and can be evaluated with time-dependent Brier/AUC measures.
+
+Reliability:
+HIGH peer-reviewed methods paper.
+
+Pulse reliance:
+YES for discrete-minute hazard architecture.
+
+----------------------------------------------------------------------
+SRC-DEEPHIT-2018-001
+Title:
+DeepHit: A Deep Learning Approach to Survival Analysis with Competing Risks
+
+Authors:
+Changhee Lee, William Zame, Jinsung Yoon, Mihaela van der Schaar
+
+URL:
+https://ojs.aaai.org/index.php/AAAI/article/view/11842
+
+Publication date:
+2018
+
+Relevant claim:
+DeepHit directly learns time-to-event distributions with competing risks and
+time-varying relationships.
+
+Reliability:
+HIGH peer-reviewed methods paper.
+
+Pulse reliance:
+CHALLENGER only.
+
+----------------------------------------------------------------------
+SRC-RSF-2008-001
+Title:
+Random Survival Forests
+
+Authors:
+Hemant Ishwaran, Udaya Kogalur, Eugene Blackstone, Michael Lauer
+
+URL:
+https://arxiv.org/abs/0811.1645
+
+Publication date:
+2008
+
+Relevant claim:
+Tree-ensemble method for right-censored survival data and nonlinear effects.
+
+Reliability:
+HIGH established methods research.
+
+Pulse reliance:
+CHALLENGER.
+
+----------------------------------------------------------------------
+SRC-HIERARCHICAL-STAN-001
+Title:
+Hierarchical Logistic Regression / Partial Pooling
+
+Organisation:
+Stan
+
+URLs:
+https://mc-stan.org/docs/2_18/stan-users-guide/hierarchical-logistic-regression.html
+https://mc-stan.org/learn-stan/case-studies/pool-binary-trials.html
+
+Relevant claim:
+Hierarchical models estimate the degree of pooling from the data and model
+population/unit effects.
+
+Reliability:
+HIGH authoritative statistical software documentation.
+
+Pulse reliance:
+YES for partial-pooling architecture.
+
+----------------------------------------------------------------------
+SRC-FIXTURE-INJURY-2023-001
+Title:
+The Effects of Fixture Congestion on Injury in Professional Male Soccer:
+A Systematic Review
+
+Authors:
+R. M. Page et al.
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC9758680/
+
+Publication:
+Sports Medicine, 2023
+
+Relevant claim:
+Several included studies associated congested schedules with increased
+match-injury incidence, with heterogeneous findings across outcomes.
+
+Reliability:
+HIGH peer-reviewed systematic review.
+
+Pulse reliance:
+YES for congestion feature, not a fixed coefficient.
+
+----------------------------------------------------------------------
+SRC-ROTATION-2024-001
+Title:
+“Chop and Change”: Examining the occurrence of squad rotation and its effect on
+team performance in top European football leagues
+
+Authors:
+Saumya Mehta, Manuel Bassek, Marc Garnica-Caparros, Daniel Memmert
+
+URL:
+https://journals.sagepub.com/doi/10.1177/17479541241274438
+
+Publication date:
+2024
+
+Relevant claims:
+Study of 16,720 matches across four major leagues; squad rotation varies in its
+relationship with team success and interacts with squad market value rather
+than yielding a universal benefit.
+
+Reliability:
+HIGH peer-reviewed observational study; not a causal rule for individual starts.
+
+Pulse reliance:
+YES for heterogeneous manager/team rotation effects.
+
+----------------------------------------------------------------------
+SRC-RTP-2019-001
+Title:
+Time before return to play for the most common injuries in professional
+football: a 16-year follow-up of the UEFA Elite Club Injury Study
+
+Authors:
+Jan Ekstrand et al.
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC7146935/
+
+Publication date:
+2019
+
+Relevant claim:
+Time loss differs by diagnosis/severity; many football injuries have individual
+absence up to four weeks, with injury-specific distributions.
+
+Reliability:
+HIGH long-running prospective elite-club injury study.
+
+Pulse reliance:
+YES for injury-specific priors and rejection of one generic recovery clock.
+
+----------------------------------------------------------------------
+SRC-RTP-2017-002
+Title:
+Return to play after hamstring injuries in football (soccer): a worldwide
+Delphi procedure regarding definition, medical criteria and decision-making
+
+Authors:
+N. van der Horst et al.
+
+URL:
+https://pubmed.ncbi.nlm.nih.gov/28360143/
+
+Publication date:
+2017
+
+Relevant claim:
+Return to play should be criteria-based and reflects availability for selection,
+not necessarily complete return to performance.
+
+Reliability:
+HIGH peer-reviewed consensus procedure.
+
+Pulse reliance:
+YES for readiness-state distinctions.
+
+----------------------------------------------------------------------
+SRC-RECURRENCE-2013-001
+Title:
+Recurrence of Achilles tendon injuries in elite male football players is more
+common after early return to play
+
+Authors:
+M. Gajhede-Knudsen et al.
+
+URL:
+https://pubmed.ncbi.nlm.nih.gov/23770660/
+
+Publication date:
+2013
+
+Relevant claim:
+Earlier return was associated with greater recurrence in the studied elite
+football cohort.
+
+Reliability:
+HIGH prospective UEFA injury-study evidence; injury-specific.
+
+Pulse reliance:
+YES for recurrence uncertainty, not universal causal coefficient.
+
+----------------------------------------------------------------------
+SRC-HAMSTRING-2014-001
+Title:
+MRI findings and return to play following muscle injuries in professional
+footballers
+
+Authors:
+A. Hallén, J. Ekstrand
+
+URL:
+https://pubmed.ncbi.nlm.nih.gov/24784885/
+
+Publication date:
+2014
+
+Relevant claim:
+Recovery and recurrence varied by muscle/injury characteristics; biceps femoris
+injuries had higher recurrence in the study.
+
+Reliability:
+HIGH peer-reviewed prospective elite-football evidence.
+
+Pulse reliance:
+YES for injury-specific heterogeneity.
+
+----------------------------------------------------------------------
+SRC-RECURRENCE-2016-001
+Title:
+Injury recurrence is lower at the highest professional football level than at
+national and amateur levels
+
+Authors:
+M. Hägglund et al.
+
+URL:
+https://pubmed.ncbi.nlm.nih.gov/27015858/
+
+Publication date:
+2016
+
+Relevant claim:
+Recurrence proportions varied by playing level and declined over the study
+period.
+
+Reliability:
+HIGH peer-reviewed evidence.
+
+Pulse reliance:
+YES for hierarchical context and nonuniversal recurrence.
+
+----------------------------------------------------------------------
+SRC-SUBSTITUTION-LAWS-2026-001
+Title:
+Law 3 — The Players / Laws of the Game 2026/27
+
+Organisation:
+The International Football Association Board
+
+URLs:
+https://www.theifab.com/laws/latest/the-players/
+https://www.theifab.com/laws-of-the-game-documents/
+
+Relevant claim:
+Official competitions configure permitted substitutes/opportunities within the
+Laws framework; substitutes must be named and substitution rules are
+competition-specific.
+
+Reliability:
+HIGH official law source.
+
+Pulse reliance:
+YES for configurable coherent substitution process.
+
+----------------------------------------------------------------------
+SRC-EVALUATION-2013-001
+Title:
+Comparing predictions among competing risks models with time-dependent Brier
+score
+
+Authors:
+G. Cortese et al.
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC3702649/
+
+Publication date:
+2013
+
+Relevant claim:
+Time-dependent Brier scoring can compare competing-risk predictions.
+
+Reliability:
+HIGH peer-reviewed methods work.
+
+Pulse reliance:
+YES for evaluation.
+
+----------------------------------------------------------------------
+SRC-SCORING-2007-001
+Title:
+Strictly Proper Scoring Rules, Prediction, and Estimation
+
+Authors:
+Tilmann Gneiting, Adrian Raftery
+
+URL:
+https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf
+
+Publication date:
+2007
+
+Relevant claim:
+Proper scoring rules reward honest probabilistic forecasts and support
+calibration/sharpness evaluation.
+
+Reliability:
+HIGH foundational research.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 — Master Architecture and Product Definition
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-01 — Research Standard and Evidence Register
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-03 — Canonical Data Model and Identifiers
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-04 — Data Sources, Markets, APIs and Licensing — Zero-Cost Edition
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-05 — Ingestion, Storage and Data Quality
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-006
+Title:
+DMFP-06 — Odds Normalisation and Market Consensus
+
+Pulse reliance:
+YES.
+
+======================================================================
+38. ACCEPTANCE CRITERIA
+======================================================================
+
+A. DISTRIBUTION
+[ ] Full 0–90 minute PMF is required.
+[ ] Conditional start and bench distributions are required.
+[ ] p0, p60 and expectations derive from the PMF.
+[ ] Role probabilities sum one.
+
+B. ARCHITECTURE
+[ ] Eligibility, readiness, role and minutes are separate.
+[ ] Starts/bench/out are modeled jointly.
+[ ] Team lineup scenarios are coherent.
+[ ] Starter exit and bench entry use competing-risk/time models.
+[ ] Team substitution limits are represented.
+
+C. UNCERTAINTY
+[ ] Hierarchical pooling is accepted.
+[ ] New-manager uncertainty is explicit.
+[ ] Injury and rotation are separate.
+[ ] Missing player markets increase uncertainty.
+[ ] Preseason evidence is downweighted.
+
+D. CONTEXT
+[ ] European and congestion effects are learned, not fixed.
+[ ] World Cup return is first-class for GW1.
+[ ] Returning from injury is a state progression.
+[ ] Suspension/ineligibility can hard-zero where authoritative.
+
+E. SCIENTIFIC VALIDITY
+[ ] Walk-forward validation is mandatory.
+[ ] Proper scores and calibration are primary.
+[ ] C-index alone is insufficient.
+[ ] Postdeadline lineups/news are prohibited.
+[ ] Baselines and ablations are required.
+
+F. OPERATIONS
+[ ] Posterior prediction must be deadline-fast.
+[ ] Manual evidence is structured and expires.
+[ ] Fallback remains probabilistic.
+[ ] Every output has lineage and confidence.
+
+======================================================================
+39. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Audit historical lineup, bench and minute coverage.
+2. Define tactical role ontology V1.
+3. Build time-safe team/manager regime table.
+4. Build suspension/ineligibility resolver.
+5. Build availability-evidence table.
+6. Build workload features across all competitions.
+7. Build manager rotation/substitution features.
+8. Create baselines B0–B3.
+9. Create START/BENCH/OUT training dataset.
+10. Implement hierarchical multinomial model.
+11. Implement coherent fixed-size lineup sampler.
+12. Create starter-minute discrete hazard dataset.
+13. Implement starter competing-risk model.
+14. Create bench-entry dataset.
+15. Implement bench-entry model.
+16. Combine full minute PMF.
+17. Add injury-return state features.
+18. Add congestion/Europe interactions.
+19. Add new-manager priors/regime uncertainty.
+20. Add preseason/World Cup return features.
+21. Implement calibration and evaluation.
+22. Create posterior scenario artifacts.
+23. Create explanation output.
+24. Run historical walk-forward baseline.
+25. Run manager-change and injury-return tests.
+26. Start prospective 2026/27 evaluation.
+27. Keep DeepHit/RSF challenger disabled until baseline data/model are stable.
+28. Connect coherent scenarios to DMFP-08 only after acceptance tests pass.
+
+Suggested commands:
+
+    dmf availability build-labels
+    dmf availability build-features
+    dmf availability train-role
+    dmf availability train-starter-hazard
+    dmf availability train-bench-hazard
+    dmf availability sample-lineups
+    dmf availability predict
+    dmf availability explain
+    dmf availability calibrate
+    dmf availability evaluate
+    dmf availability validate
+
+======================================================================
+40. OPEN QUESTIONS
+======================================================================
+
+DATA
+----
+1. Does the zero-cost source provide reliable named benches historically?
+2. Can substitution cause be inferred accurately enough?
+3. Which injury fields and timestamps are available?
+4. What historical preseason data exist?
+5. Can travel distance be derived reliably?
+6. How are warmup withdrawals represented?
+
+ROLE/LINEUP
+-----------
+7. What role ontology is detailed enough without overfitting?
+8. Which formations are retained?
+9. How should hybrid roles be represented?
+10. What constrained sampler best preserves marginals?
+11. Should predicted lineup sources enter the primary model or an ensemble?
+
+SURVIVAL
+--------
+12. One-minute or five-minute hazard bins?
+13. Which spline/baseline form performs best?
+14. Should tactical and injury exits share parameters?
+15. How are unknown exit causes trained?
+16. Is score state integrated analytically or by simulation?
+17. How much team-level substitution coherence is needed in V1?
+
+INJURY
+------
+18. Which public injury categories have enough reliability?
+19. What readiness states can be observed?
+20. How should vague "knock" reports update probability?
+21. Which recurrence features are lawful/available?
+22. How should injury during the deadline-to-kickoff window be modelled?
+
+MANAGER/CONGESTION
+------------------
+23. How transferable is manager history across clubs?
+24. What effective sample size reduces new-regime uncertainty?
+25. Which future-match importance metric is time-safe?
+26. What rest-hour thresholds emerge empirically?
+27. Does European rotation differ by competition/stage?
+
+IMPLEMENTATION
+--------------
+28. NumPyro or PyMC?
+29. MCMC, SVI or hybrid for production?
+30. What posterior sample count is adequate?
+31. What runtime is acceptable for 20 teams near deadline?
+32. Should the model update online after every lineup?
+
+EVALUATION
+----------
+33. What minimum improvement promotes V1?
+34. What interval coverage target is accepted?
+35. Which subgroup failure blocks promotion?
+36. How are coherent lineup probabilities scored?
+37. How much historical data are needed for DeepHit comparison?
+
+======================================================================
+41. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-08 — FOOTBALL EVENT DISTRIBUTION ENGINE
+
+It consumes:
+
+- coherent lineup samples;
+- p_start/p_bench/p_out;
+- full minute PMFs;
+- starter/bench conditional hazards;
+- readiness/injury uncertainty;
+- market evidence/confidence;
+- team/manager substitution process.
+
+DMFP-08 must preserve joint dependence:
+
+- players compete for lineup/bench slots;
+- substitutions are limited;
+- score state changes substitution hazards;
+- player event exposure follows actual simulated minutes.
+
+Then:
+DMFP-09 converts those coherent football scenarios into FPL points.
+
+======================================================================
+42. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-16
+
+- Defined joint eligibility/readiness/role/minutes architecture.
+- Selected hierarchical Bayesian primary model.
+- Added coherent formation/lineup sampling.
+- Added starter competing-risk survival.
+- Added bench-entry survival.
+- Added team substitution process.
+- Added score-state coupling.
+- Added full 0–90 minute PMF.
+- Added p0, p60 and conditional expectations.
+- Separated injury and rotation.
+- Added congestion, Europe, manager-regime and World Cup features.
+- Added injury-return state progression.
+- Added calibration, proper scoring and time-safe validation.
+- Added manual override and explainability.
+- Added implementation, testing, risks and source register.
+
+Future v1.0:
+- Sebastian approves architecture.
+- data audit completed.
+- role ontology approved.
+- baselines implemented.
+- V1 role and hazard models fitted.
+- coherent sampler passes tests.
+- prospective 2026/27 predictions active.
+- calibration report completed.
+- DMFP-08 integration approved.
+
+END OF DOCUMENT

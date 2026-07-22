@@ -1,0 +1,3508 @@
+DMF PULSE — CAPTAINCY AND CHIP OPTIMISER
+========================================
+
+Document ID: DMFP-13
+Version: 0.9 (Finite-Inventory Opportunity Allocation Architecture)
+Status: PROPOSED — TARGET-SEASON CHIP ACTIVATION BLOCKED PENDING 2026/27 FPL LAUNCH
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Reference ruleset: Fantasy Premier League 2025/26, REFERENCE_ONLY
+Research cut-off: 17 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Upstream inputs:
+- DMFP-02 FPL rules, chips, captaincy and season configuration
+- DMFP-03 canonical chips, inventory, activation and decision entities
+- DMFP-05 deadline-safe source bundles and fixture states
+- DMFP-07 appearance, lineup and minutes distributions
+- DMFP-09 joint player/Gameweek FPL-points scenario matrices
+- DMFP-10 uncertainty, value of information, robustness and early-season policy
+- DMFP-11 price and team-value paths
+- DMFP-12 legal squad, transfer, lineup, bench and rolling-horizon optimiser
+
+Downstream consumers:
+- DMFP-14 rank, effective ownership and risk strategy
+- DMFP-15 backtesting, calibration and benchmarks
+- DMFP-16 orchestration and decision pipeline
+- DMFP-18 decision explanations and reporting
+
+PURPOSE
+-------
+This document defines the unified captaincy and chip decision engine.
+
+It covers:
+
+- ordinary captaincy;
+- vice-captaincy;
+- Triple Captain;
+- Bench Boost;
+- Free Hit;
+- Wildcard;
+- any future chip introduced by FPL;
+- chip inventory and expiry;
+- chip opportunity cost;
+- future-opportunity forecasting;
+- chip interactions;
+- chip preparation;
+- value of waiting;
+- rolling re-optimisation;
+- rank-aware extensions;
+- decision explanations.
+
+Captaincy and chips belong in one document because:
+
+- Triple Captain modifies the ordinary captain decision;
+- only one chip may normally be used in a Gameweek;
+- Wildcard can prepare a Bench Boost;
+- Free Hit can protect a Wildcard-built permanent squad;
+- a Double Gameweek can be attractive for Triple Captain, Bench Boost or Free
+  Hit, but only one can be selected;
+- using a chip now removes a future opportunity;
+- a future chip may last multiple Gameweeks or alter transfer/captain rules;
+- captain/vice choices must be optimised inside every chip state.
+
+The critical concept is OPPORTUNITY COST.
+
+A chip is not valuable because it produces many total Gameweek points.
+
+A chip is valuable when:
+
+    THE BEST POLICY USING IT NOW
+    OUTPERFORMS
+    THE BEST POLICY THAT RETAINS IT FOR LATER.
+
+GOVERNING PRINCIPLE
+-------------------
+Each chip is a scarce, perishable exercise right.
+
+Its value depends on:
+
+- the current opportunity;
+- the distribution of future opportunities;
+- the information likely to arrive;
+- its expiry;
+- other chips competing for the same Gameweeks;
+- preparation and unwinding costs;
+- the manager's current squad;
+- transfers, bank and purchase prices;
+- rank objective;
+- uncertainty and robustness;
+- the ability to re-optimise later.
+
+Pulse therefore solves a finite-horizon, multiple-stopping and stochastic
+control problem.
+
+It MUST NOT use rules such as:
+
+- "Always Triple Captain in a Double Gameweek";
+- "Bench Boost immediately after Wildcard";
+- "Free Hit the biggest Blank Gameweek";
+- "Wildcard after six bad players";
+- "Captain the highest expected-points player and vice the second highest";
+- "Use every chip as late as possible";
+- "Use every first-half chip quickly because it expires";
+- "A chip scoring 20 points was a good decision."
+
+All such statements can be true in a particular state and false in another.
+
+CRITICAL PRE-LAUNCH STATUS
+--------------------------
+The 2026/27 FPL game had not launched at the research cut-off. The Premier
+League said it would launch later in summer 2026.
+
+Therefore:
+
+1. The 2026/27 chip set, copies, activation windows and effects are unknown.
+2. The 2025/26 chip rules in this document are REFERENCE_ONLY.
+3. The optimiser cannot activate target-season chip recommendations until:
+   - every chip is identified;
+   - inventory/copies are verified;
+   - activation and expiry windows are verified;
+   - one-chip-per-Gameweek rules are verified;
+   - transfer/free-transfer interactions are verified;
+   - cancellation rules are verified;
+   - multi-Gameweek effects are verified;
+   - captain/vice interactions are verified;
+   - golden official tests pass.
+4. Any newly introduced chip MUST be represented through the generic declarative
+   chip-effect model in this document.
+5. Unknown chip semantics are a decision blocker, not an invitation to copy a
+   previous season.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require a documented architecture decision.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE POLICY DECISIONS
+======================================================================
+
+0.1 SELECTED ARCHITECTURE
+-------------------------
+The production engine combines:
+
+A. EXACT CURRENT-GAMEWEEK TACTICAL EVALUATION
+From DMFP-12:
+
+- legal XI;
+- bench order;
+- captain;
+- vice;
+- automatic substitutions;
+- normal-chip scoring transformation.
+
+B. MULTISTAGE STOCHASTIC CHIP SCHEDULING
+At every future decision node:
+
+- use no chip; or
+- activate one eligible chip;
+- choose the chip-specific optimal squad/transfers/lineup/captain;
+- retain future chip inventory and recourse.
+
+C. ROLLING-HORIZON MODEL PREDICTIVE CONTROL
+Solve the chip schedule over an adaptive horizon, execute only the current
+activation/nonactivation, then update and re-solve.
+
+D. MULTIPLE-STOPPING VALUE FUNCTION
+Every unused chip has a continuation value.
+Multiple copies and expiry windows are treated as multiple exercise rights.
+
+E. ROBUST/INFORMATION-AWARE POLICY
+Use DMFP-10:
+
+- robust regret;
+- value of information;
+- structural scenarios;
+- rank utility later;
+- confidence and action stability.
+
+0.2 CHIP EXERCISE RULE
+----------------------
+For chip c at current node n:
+
+    exercise_advantage[c,n]
+      =
+      Q(use c now | state n)
+      -
+      Q(hold c | state n)
+
+Use c now only when:
+
+- exercise advantage is positive under the selected objective;
+- robust regret is acceptable;
+- the chip is legally activatable;
+- no competing chip has higher policy value;
+- source/rules/solver state passes;
+- execution timing is safe.
+
+0.3 CURRENT GAIN VERSUS POLICY VALUE
+------------------------------------
+Define:
+
+GROSS_CURRENT_GAIN:
+Current Gameweek manager-score difference from the same-state, optimised no-chip
+baseline.
+
+NET_POLICY_VALUE:
+Remaining-season utility difference after including:
+
+- future chip availability;
+- preparation/unwinding;
+- transfers/hits;
+- price paths;
+- future information;
+- future recourse;
+- chip conflicts;
+- terminal inventory/expiry.
+
+A chip can have:
+
+- high gross current gain but low/negative net policy value;
+- low current gain but positive long-term policy value, especially Wildcard;
+- positive value while producing a poor realised score.
+
+0.4 MULTIPLE-STOPPING INTERPRETATION
+------------------------------------
+A set of chips resembles a finite collection of exercise rights.
+
+Research on swing options and multiple stopping formalises decisions where a
+holder chooses when to exercise several finite rights.
+
+The analogy is useful because FPL chips have:
+
+- finite inventory;
+- expiry;
+- stochastic rewards;
+- mutually exclusive activation times;
+- information arrival;
+- state-dependent future value.
+
+Pulse does not import financial assumptions such as tradability or market
+completeness. It uses the dynamic-programming structure.
+
+0.5 ORDINARY CAPTAINCY
+----------------------
+Ordinary captaincy is available every Gameweek and is not a finite inventory.
+
+The optimal captain/vice pair is selected jointly from the starting XI using
+scenario-level appearance and points.
+
+The vice-captain is the best conditional fallback, not necessarily the player
+with the second-highest unconditional expected points.
+
+0.6 TRIPLE CAPTAIN
+------------------
+The incremental normal-points value of Triple Captain is exactly one additional
+copy of the effective captain's raw Gameweek score.
+
+Under reference rules:
+
+- if captain appears, that player receives triple instead of double;
+- if captain plays no minutes in the Gameweek, the triple multiplier passes to
+  the vice-captain;
+- if neither appears, the extra is lost and the chip is not returned.
+
+Therefore the Triple Captain opportunity distribution is the effective
+captain-score distribution after fallback, not the named captain's mean alone.
+
+0.7 BENCH BOOST
+----------------
+The immediate incremental Bench Boost value is:
+
+    all bench player points
+    -
+    points those bench players would already have contributed through normal
+    automatic substitutions.
+
+The full policy value also includes:
+
+- budget held on the bench;
+- transfer cost to prepare;
+- starting-XI points sacrificed before/after;
+- injury/rotation insurance;
+- Wildcard interaction;
+- future chip opportunity cost.
+
+0.8 FREE HIT
+------------
+Free Hit value is:
+
+    best temporary-squad policy
+    -
+    best policy without Free Hit
+
+including:
+
+- current Gameweek point uplift;
+- transfer hits avoided;
+- permanent squad damage avoided;
+- free-transfer state;
+- captain/bench effects;
+- opportunity cost of future Free Hit use.
+
+It is not simply:
+
+    Free Hit team points - original XI expected points.
+
+0.9 WILDCARD
+------------
+Wildcard value is a permanent-state policy difference.
+
+Compare:
+
+- normal transfers now;
+- immediate Wildcard;
+- delayed Wildcard after information;
+- Free Hit bridge;
+- alternative future Wildcard dates.
+
+Wildcard is an irreversible reset option. Waiting can have value because it
+preserves the ability to rebuild after more information, but waiting can also
+lose points, prices and chip synergies.
+
+0.10 FUTURE CHIP
+----------------
+Every future chip is defined by a declarative effect grammar.
+
+No chip-specific production code is accepted until the generic representation
+proves insufficient and an architecture decision records the exception.
+
+0.11 SELECTED METHODS
+---------------------
+Primary:
+
+- finite-horizon stochastic dynamic programming over chip inventory;
+- rolling-horizon scenario-based optimisation;
+- DMFP-12 mixed-integer squad/transfer subproblems;
+- exact tactical scenario evaluation;
+- approximate value functions for opportunities outside the explicit horizon.
+
+Challengers:
+
+- regression Monte Carlo optimal stopping;
+- approximate dynamic programming;
+- Monte Carlo tree search;
+- robust multiple-stopping algorithms;
+- learned chip policies.
+
+======================================================================
+1. REFERENCE CHIP RULES
+======================================================================
+
+1.1 REFERENCE SEASON
+--------------------
+Official 2025/26 guidance stated:
+
+- eight chips across the season;
+- two each of Wildcard, Free Hit, Triple Captain and Bench Boost;
+- one copy of each for the first half;
+- one copy of each for the second half;
+- only one chip can be played in a Gameweek;
+- first-half chips expire at the Gameweek 19 deadline;
+- second-half copies are available from Gameweek 20;
+- unused chips do not carry between halves.
+
+These are not target-season assumptions.
+
+1.2 REFERENCE BENCH BOOST
+-------------------------
+All bench-player points are included in the Gameweek total.
+
+It could be cancelled before the deadline.
+
+1.3 REFERENCE FREE HIT
+----------------------
+- unlimited free transfers for one Gameweek;
+- permanent squad restored at the next deadline;
+- unavailable in Gameweek 1;
+- cannot be played in both Gameweek 19 and 20;
+- irreversible after confirmation;
+- banked free transfers were retained under the reference rules.
+
+1.4 REFERENCE TRIPLE CAPTAIN
+----------------------------
+- captain scores triple instead of double;
+- cancellable before the deadline;
+- if captain records no minutes, vice receives triple;
+- if neither records minutes, multiplier is lost and chip is not returned.
+
+1.5 REFERENCE WILDCARD
+----------------------
+- all permanent transfers in the Gameweek are free;
+- unavailable in Gameweek 1;
+- irreversible after activation;
+- banked transfers were retained under reference rules.
+
+1.6 ONE-CHIP RULE
+-----------------
+One active chip per Gameweek under reference rules.
+
+The optimiser treats this as configurable mutual exclusion.
+
+1.7 BLANK AND DOUBLE GAMEWEEKS
+------------------------------
+Official guidance says Blank and Double Gameweeks are often caused by domestic
+cup rescheduling and chips can help navigate/capitalise on them.
+
+This is a strategic observation, not proof that the largest blank/double is
+always the optimal chip week.
+
+======================================================================
+2. CHIP STATE AND INVENTORY
+======================================================================
+
+2.1 CHIP TOKEN
+--------------
+Each usable copy is an individual token:
+
+- chip_inventory_id;
+- chip_definition_id;
+- acquired_at;
+- activation_start;
+- activation_end/expiry;
+- duration;
+- status;
+- used_at;
+- cancelled_at;
+- source/ruleset.
+
+2.2 INVENTORY STATE
+-------------------
+At node n:
+
+    I_n[c,j] in {AVAILABLE, ACTIVATED, USED, EXPIRED, UNAVAILABLE}
+
+where j indexes copies.
+
+2.3 EXPIRY
+----------
+At expiry:
+
+- unused token value becomes zero;
+- inventory transitions to EXPIRED;
+- no carryover unless rules explicitly permit it.
+
+2.4 FUTURE INVENTORY
+--------------------
+A later token not yet available can be represented as scheduled inventory.
+
+2.5 MUTUAL EXCLUSION
+--------------------
+For Gameweek t:
+
+    sum_c activate[c,t] <= chip_concurrency_limit[t]
+
+Reference:
+limit one.
+
+2.6 DURATION
+------------
+A chip may affect:
+
+- one Gameweek;
+- several consecutive Gameweeks;
+- one deadline action;
+- permanent future state.
+
+The token remains active for configured duration.
+
+2.7 CANCELLABILITY
+------------------
+Activation state machine:
+
+NOT_ACTIVATED
+PENDING_CANCELLABLE
+CONFIRMED_IRREVERSIBLE
+ACTIVE
+COMPLETED
+CANCELLED
+
+Chip-specific rules control transitions.
+
+======================================================================
+3. GENERIC CHIP EFFECT GRAMMAR
+======================================================================
+
+3.1 PURPOSE
+-----------
+Support future chips without `if chip == ...` logic spread throughout the
+system.
+
+3.2 DEFINITION
+--------------
+chip_definition:
+- chip key/version;
+- inventory/copies;
+- activation window;
+- expiry;
+- duration;
+- mutually exclusive group;
+- cancellability;
+- trigger surface;
+- scoring transform;
+- squad transform;
+- transfer transform;
+- budget transform;
+- club/position transform;
+- captain transform;
+- bench transform;
+- free-transfer transition;
+- state restoration;
+- output/decision requirements.
+
+3.3 SCORING TRANSFORM
+---------------------
+Examples:
+
+- multiply captain score;
+- include bench;
+- add manager/team outcome;
+- modify thresholds;
+- add new scoring entity.
+
+3.4 SQUAD TRANSFORM
+-------------------
+- temporary squad;
+- permanent reset;
+- add/remove roster slot;
+- add nonplayer entity;
+- change formation.
+
+3.5 TRANSFER TRANSFORM
+----------------------
+- unlimited free transfers;
+- hit waiver;
+- temporary transactions;
+- preserve/reset FT;
+- lock transfer in future weeks.
+
+3.6 BUDGET/CLUB TRANSFORM
+-------------------------
+A future chip can:
+
+- consume budget;
+- add temporary budget;
+- count against club quota;
+- alter squad constraints.
+
+All must be declarative.
+
+3.7 DURATION
+------------
+Multi-Gameweek chip:
+
+- activation node;
+- active interval;
+- state carried between active weeks;
+- transfer/selection during active period;
+- completion.
+
+3.8 UNKNOWN EFFECT
+------------------
+A field not representable blocks activation until schema/model is extended.
+
+3.9 COMPILER
+------------
+Chip definition compiles into:
+
+- DMFP-12 state-transition constraints;
+- tactical score function;
+- chip scheduler inventory transitions;
+- golden tests.
+
+======================================================================
+4. FINITE-HORIZON VALUE FUNCTION
+======================================================================
+
+4.1 STATE
+---------
+At decision node n:
+
+    S_n =
+      manager state
+      + belief state
+      + fixture/price state
+      + rank mode
+      + chip inventory.
+
+4.2 ACTION
+----------
+    a_n =
+      transfers
+      + lineup/bench
+      + captain/vice
+      + chip activation or no chip.
+
+4.3 BELLMAN RECURSION
+---------------------
+Conceptually:
+
+    V_n(S_n, I_n)
+      =
+      max_{a in legal(S_n,I_n)}
+      E[
+        R_n(S_n,a,omega)
+        +
+        V_next(S_next, I_next)
+      ]
+
+where future actions adapt only to revealed information.
+
+4.4 USE VERSUS HOLD
+-------------------
+For chip c:
+
+    Q_use(c,n)
+      =
+      best expected/robust utility with c activated now.
+
+    Q_hold(c,n)
+      =
+      best expected/robust utility with c retained now.
+
+    exercise_advantage
+      =
+      Q_use - Q_hold.
+
+4.5 OPPORTUNITY COST
+--------------------
+The opportunity cost of using c now is the reduction in optimal future value
+caused by removing the token:
+
+    OC_c,n
+      =
+      E[
+        V_next(S_next, I_n)
+        -
+        V_next(S_next, I_n \ {c})
+      ]
+
+conditional on the rest of the current action.
+
+It is not the expected points of the best currently forecast future Gameweek
+alone.
+
+4.6 EXPIRY PRESSURE
+-------------------
+As expiry approaches:
+
+- fewer future exercise dates remain;
+- continuation value may fall;
+- current exercise threshold falls;
+- conflicts with other unused chips can force suboptimal use or expiry.
+
+4.7 MULTIPLE RIGHTS
+-------------------
+With multiple copies, the value of one token depends on remaining copies.
+
+The first of two copies can be used at a lower opportunity threshold than a
+single unique season-long token, all else equal.
+
+4.8 CHIP INTERACTION
+--------------------
+The marginal value of one chip depends on the inventory of others.
+
+Example:
+
+- Free Hit can make a Wildcard/Bench Boost route more valuable;
+- using Triple Captain in a Double Gameweek frees Bench Boost for another;
+- Wildcard preparation changes Bench Boost opportunities.
+
+======================================================================
+5. OPPORTUNITY SET AND FUTURE OPPORTUNITY MODEL
+======================================================================
+
+5.1 OPPORTUNITY
+---------------
+For chip c and future Gameweek t:
+
+    O_c,t =
+      incremental policy value if c is exercised at t,
+      conditional on information and prior decisions.
+
+5.2 FORECAST DISTRIBUTION
+-------------------------
+O is random because:
+
+- fixtures may move;
+- player roles/injuries change;
+- prices change;
+- squad changes;
+- points distributions update;
+- rank objective changes;
+- another chip may occupy t.
+
+5.3 NO "MAX OF FORECAST MEANS" RULE
+-----------------------------------
+Taking the maximum of current forecast means across future weeks:
+
+- assumes current forecasts remain correct;
+- ignores information updates;
+- ignores chip conflicts;
+- overstates selection value;
+- ignores actions needed to prepare.
+
+It is a diagnostic, not the policy value.
+
+5.4 PERFECT-INFORMATION UPPER BOUND
+-----------------------------------
+A clairvoyant future best opportunity provides an upper bound.
+
+It is not achievable and must not be compared directly to current exercise as
+though it were.
+
+5.5 POLICY OPPORTUNITY VALUE
+----------------------------
+The correct future value allows decisions at future nodes using information
+available then.
+
+5.6 OPPORTUNITY QUANTILES
+-------------------------
+For each chip:
+
+- current gross gain;
+- current net policy value;
+- percentile of current opportunity among future policy opportunities;
+- P(future opportunity exceeds current by delta);
+- expected best future exercise value;
+- expiry-adjusted continuation value.
+
+5.7 FORECAST BIAS
+-----------------
+The best-looking future opportunity is subject to winner's-curse/forecast error.
+
+Use model uncertainty and out-of-time calibration.
+
+======================================================================
+6. ORDINARY CAPTAINCY
+======================================================================
+
+6.1 EFFECTIVE CAPTAIN SCORE
+---------------------------
+For scenario s, captain c and vice v:
+
+    C_eff(c,v,s)
+      =
+      X_c,s          if captain records any minutes in the Gameweek;
+      X_v,s          if captain records zero minutes and vice records any;
+      0              otherwise.
+
+`X` is raw DMFP-09 Gameweek points.
+
+6.2 NORMAL MANAGER EXTRA
+------------------------
+Normal captaincy adds:
+
+    C_eff(c,v,s)
+
+because the raw points already include one copy.
+
+6.3 PAIR OBJECTIVE
+------------------
+Under expected-points mode:
+
+    max_{c != v in XI}
+      E[C_eff(c,v)]
+
+subject to exact XI/tactical selection.
+
+6.4 VICE VALUE
+--------------
+Vice value is:
+
+    E[
+      X_v
+      x 1[captain zero, vice appears]
+    ]
+
+not:
+
+    E[X_v].
+
+6.5 CORRELATION
+---------------
+Captain and vice can share nonappearance risk:
+
+- same postponed fixture;
+- same team illness/rotation;
+- same schedule.
+
+A lower-mean vice from a different risk source may be better conditionally.
+
+6.6 DOUBLE GAMEWEEK
+-------------------
+Under the rule "captain plays no minutes in the Gameweek":
+
+- appearing in one of two fixtures prevents vice fallback;
+- the captain retains multiplier on total Gameweek points.
+
+Load exact target-season rule.
+
+6.7 CAPTAIN DISTRIBUTION
+-----------------------
+Output:
+
+- expected effective captain score;
+- median/variance;
+- P(0);
+- P(5+/10+/15+/20+);
+- vice fallback probability;
+- conditional vice gain;
+- captain/vice nonappearance joint probability.
+
+6.8 RANK-AWARE CAPTAINCY
+------------------------
+DMFP-14 may replace absolute points utility with rank/relative utility.
+
+Ownership is not used in normal points mode.
+
+6.9 HIGH UPSIDE
+----------------
+Do not select a captain merely for variance.
+
+Use:
+
+- P(beat baseline/rival threshold);
+- upper-tail incremental score;
+- expected-utility floor;
+- appearance constraints.
+
+======================================================================
+7. TRIPLE CAPTAIN
+======================================================================
+
+7.1 SCORING TRANSFORM
+---------------------
+Normal manager extra:
+
+    C_eff.
+
+Triple Captain manager extra:
+
+    2 x C_eff.
+
+Incremental TC gain over normal captaincy:
+
+    Delta_TC(s)
+      =
+      C_eff(c_TC,v_TC,s)
+      + any change from selecting a different optimal captain/vice pair under
+        the chip objective.
+
+The chip and captain pair are optimised jointly.
+
+7.2 RAW CURRENT TC VALUE
+------------------------
+    gross_TC_t
+      =
+      E[manager points with TC]
+      -
+      E[best normal manager points].
+
+7.3 POLICY VALUE
+----------------
+    net_TC_t
+      =
+      Q_use(TC,t)
+      -
+      Q_hold(TC,t).
+
+7.4 FUTURE COMPARISON
+---------------------
+Compare against plausible future:
+
+- Double Gameweeks;
+- strong single fixture;
+- multiple premium candidates;
+- fixture certainty;
+- player p_start/minutes;
+- market confidence;
+- rank utility;
+- chip conflict.
+
+7.5 DOUBLE GAMEWEEK
+-------------------
+Two fixtures can increase expected score but also introduce:
+
+- rotation;
+- injury between fixtures;
+- one-fixture appearance;
+- fixture cancellation;
+- captaincy competition;
+- correlated team performance.
+
+Use joint Gameweek scenarios.
+
+7.6 SINGLE GAMEWEEK
+-------------------
+A strong single fixture can dominate a weak/uncertain double.
+
+No DGW requirement.
+
+7.7 DISTRIBUTION
+----------------
+Output incremental chip PMF:
+
+- mean;
+- median;
+- variance;
+- P(0);
+- P(5+/10+/15+ incremental);
+- downside;
+- upper tail;
+- robust regret.
+
+7.8 APPEARANCE RISK
+-------------------
+A chip does not return after captain/vice failure under reference rules.
+
+Include:
+
+- p captain zero;
+- p vice fallback;
+- p chip produces zero extra;
+- lineup/news value.
+
+7.9 EXERCISE THRESHOLD
+----------------------
+Use current TC when:
+
+- current net policy value positive;
+- current opportunity exceeds continuation under selected robust policy;
+- future high-value opportunities are absent/less likely or chip expiry
+  approaches;
+- captain/vice distribution passes confidence.
+
+7.10 OPPORTUNITY-COST OUTPUT
+----------------------------
+- gross current incremental points;
+- continuation value;
+- exercise advantage;
+- P(now is optimal under scenario worlds);
+- expected future best policy gain;
+- future opportunity quantiles;
+- expiry pressure;
+- competing chip value.
+
+======================================================================
+8. BENCH BOOST
+======================================================================
+
+8.1 SCORING TRANSFORM
+---------------------
+Under Bench Boost:
+
+- all 15 permanent-squad player points count according to active rules;
+- normal automatic-substitution treatment is replaced/modified by chip rules.
+
+Implement through configuration.
+
+8.2 INCREMENTAL CURRENT VALUE
+-----------------------------
+For scenario s:
+
+    Delta_BB(s)
+      =
+      score_BB(s)
+      -
+      score_best_normal_tactics(s under the saved no-chip action).
+
+Conceptually:
+
+    bench total
+    -
+    bench points already realised through normal auto substitutions
+    + any tactical/captain differences.
+
+8.3 DO NOT USE BENCH SUM ALONE
+------------------------------
+If a starting player misses and a bench player would have auto-subbed normally,
+that bench score is not entirely incremental chip value.
+
+8.4 POLICY VALUE
+----------------
+Bench Boost policy includes squad preparation.
+
+Compare:
+
+A. no chip route;
+B. immediate BB with current squad;
+C. prepare through normal transfers then BB;
+D. Wildcard then BB;
+E. delay to future fixture state.
+
+8.5 BENCH CAPITAL COST
+----------------------
+Define:
+
+    bench_investment_cost
+      =
+      optimal expected policy value with unconstrained ordinary squad
+      -
+      optimal expected policy value under the squad preparation needed for BB,
+        excluding BB scoring benefit.
+
+This captures:
+
+- money shifted from XI;
+- weaker captain/premium;
+- transfers;
+- price locks;
+- post-BB unwinding;
+- opportunity cost before/after.
+
+8.6 NET BENCH BOOST VALUE
+------------------------
+    net_BB_policy_value
+      =
+      incremental BB scoring
+      - preparation cost
+      - transfer/hit cost
+      - post-chip lock-in cost
+      - chip continuation value foregone
+      + insurance/flexibility benefits.
+
+8.7 BENCH BOOST WITHOUT PREPARATION
+-----------------------------------
+Sometimes the current squad naturally has:
+
+- 15 likely starters;
+- good fixtures;
+- low opportunity cost.
+
+A "natural" BB can beat a higher-gross, heavily engineered future BB.
+
+8.8 DOUBLE GAMEWEEK
+-------------------
+A Double Gameweek can create up to two fixtures for each player, but fixture
+count is not value.
+
+Use:
+
+- joint points;
+- p_start/minutes each fixture;
+- rotation/injury;
+- postponement;
+- bench capital cost;
+- other chip conflict.
+
+8.9 WILDCARD PAIRING
+--------------------
+Wildcard-BB synergy:
+
+    synergy(WC_t, BB_u)
+      =
+      value(joint schedule)
+      - value(best policy using WC without planned BB)
+      - value(best policy using BB without WC preparation)
+      + value(no relevant chips baseline).
+
+Compute by policy re-solves.
+
+Do not assume synergy is positive.
+
+8.10 POST-BB SQUAD
+------------------
+A BB-prepared squad may contain excess bench budget afterward.
+
+Future value includes:
+
+- keeping useful depth;
+- transfers to release money;
+- opportunity cost.
+
+8.11 CURRENT OUTPUT
+-------------------
+- expected BB incremental points;
+- bench player component;
+- auto-sub overlap;
+- P(all 15 appear);
+- P(at least 14/13 appear);
+- preparation cost;
+- bench capital;
+- WC synergy;
+- continuation/opportunity cost;
+- net policy value;
+- confidence.
+
+======================================================================
+9. FREE HIT
+======================================================================
+
+9.1 STATE TRANSFORM
+-------------------
+Under reference rules:
+
+- create a temporary 15-player squad;
+- permit unlimited free temporary transfers;
+- optimise temporary XI/bench/captain/vice;
+- permanent squad returns after the Gameweek;
+- FT transition follows active rules.
+
+9.2 CORRECT BASELINE
+--------------------
+No-FH baseline must optimise:
+
+- normal permanent transfers;
+- transfer hits;
+- lineup;
+- bench;
+- captain;
+- future permanent squad.
+
+9.3 GROSS CURRENT VALUE
+-----------------------
+    gross_FH_t
+      =
+      E[best temporary FH manager points]
+      -
+      E[best no-FH manager points this Gameweek].
+
+9.4 NET POLICY VALUE
+--------------------
+Includes:
+
+- one-week point uplift;
+- avoided hits;
+- permanent squad damage avoided;
+- transfer inventory effects;
+- future squad retained;
+- future FH opportunity foregone;
+- chip conflicts;
+- price/timing uncertainty.
+
+9.5 LONG-TERM DAMAGE AVOIDED
+----------------------------
+Without FH, a manager may permanently transfer out good long-term players to
+field the current week.
+
+Define:
+
+    preserved_squad_value
+      =
+      best future utility with original permanent squad retained
+      -
+      best future utility after necessary no-FH permanent changes,
+
+net of later recovery transfers.
+
+9.6 BLANK GAMEWEEK
+------------------
+FH value depends on:
+
+- current squad players blanking;
+- bench;
+- normal transfers available;
+- hit cost;
+- quality of temporary fixtures;
+- permanent players desired immediately afterward.
+
+Large blank != automatically high FH value.
+
+9.7 DOUBLE GAMEWEEK
+-------------------
+FH can attack a double without permanently owning its players.
+
+Compare to:
+
+- TC;
+- BB;
+- normal transfers;
+- Wildcard.
+
+9.8 DEFENSIVE VERSUS OFFENSIVE
+------------------------------
+Defensive FH:
+avoid a structurally bad week/forced damage.
+
+Offensive FH:
+exploit unusually strong one-week fixtures.
+
+Both are valid.
+
+9.9 PRICE STATE
+----------------
+Use target rules for:
+
+- temporary buying prices;
+- bank;
+- restored ownership spells;
+- price changes to permanent players;
+- free transfers.
+
+Do not infer from reference season.
+
+9.10 OUTPUT
+-----------
+- temporary squad/tactics;
+- gross one-week uplift;
+- hit avoidance;
+- permanent squad preservation;
+- FT effect;
+- future opportunity cost;
+- net policy value;
+- P(FH optimal);
+- blank/double decomposition;
+- confidence.
+
+======================================================================
+10. WILDCARD
+======================================================================
+
+10.1 STATE TRANSFORM
+--------------------
+Wildcard permanently rebuilds the squad under active rules with no transfer-hit
+cost.
+
+It creates new purchase-price ownership spells for incoming players.
+
+10.2 NO DIRECT CHIP POINTS
+--------------------------
+Wildcard itself does not add a scoring multiplier.
+
+Its value appears through:
+
+- current and future squad points;
+- hits saved;
+- price routes;
+- flexibility;
+- chip synergies;
+- fewer forced transfers.
+
+10.3 COMPARATORS
+----------------
+For each possible activation date:
+
+A. normal transfers;
+B. immediate WC;
+C. wait and WC after information;
+D. FH bridge then WC;
+E. normal transfers then delayed WC;
+F. no WC before expiry.
+
+10.4 IMMEDIATE WILDCARD VALUE
+-----------------------------
+    Q_WC_now
+      =
+      optimal rolling policy with permanent reset now.
+
+10.5 HOLD VALUE
+---------------
+    Q_WC_hold
+      =
+      optimal current normal action
+      + adaptive future policy retaining WC.
+
+10.6 EXERCISE ADVANTAGE
+-----------------------
+    exercise_advantage_WC
+      =
+      Q_WC_now - Q_WC_hold.
+
+10.7 SQUAD MISMATCH
+-------------------
+Metrics:
+
+- number of desired changes;
+- expected points lost under current squad;
+- hit-equivalent repair cost;
+- forced-transfer risk;
+- captain/price bracket mismatch;
+- blank/double route mismatch;
+- bench fragility.
+
+No fixed "five transfers means Wildcard" rule.
+
+10.8 DELAYED WILDCARD
+---------------------
+Waiting can reveal:
+
+- new manager roles;
+- injuries;
+- fixture/rescheduling;
+- player prices;
+- set pieces;
+- markets;
+- tournament return.
+
+Value of waiting from DMFP-10 is included.
+
+10.9 COST OF WAITING
+--------------------
+- current points foregone;
+- hits or fielding weakness;
+- price route loss;
+- expiring chip window;
+- lost BB/FH timing;
+- execution risk.
+
+10.10 REAL-OPTION INTERPRETATION
+-------------------------------
+Wildcard is an irreversible reconfiguration right.
+
+Real-options research highlights the value of waiting when an irreversible
+decision can be delayed for information.
+
+The analogy is used only for decision timing; FPL has finite deadlines and no
+tradable option market.
+
+10.11 FUTURE INFORMATION
+------------------------
+The optimiser must represent the actual information event.
+
+"Wait for more data" is invalid if no meaningful information will arrive before
+the next relevant decision.
+
+10.12 WILDCARD SQUAD ROBUSTNESS
+-------------------------------
+The squad should be optimised over future scenarios, not one deterministic
+fixture ticker.
+
+Include:
+
+- lineup certainty;
+- price paths;
+- future transfers;
+- bench;
+- chip route;
+- blanks/doubles;
+- team/player correlation.
+
+10.13 EARLY WILDCARD
+--------------------
+Can be optimal when:
+
+- opening priors were materially wrong;
+- roles/players emerge;
+- current squad mismatch is expensive;
+- long runway amplifies squad quality;
+- delay information value is low.
+
+Can be poor when it overreacts to one noisy Gameweek or destroys a valuable
+future reset.
+
+10.14 LATE WILDCARD
+-------------------
+Can build a precise remaining-season/BB route.
+Opportunity cost declines near expiry, but fewer future weeks also reduce
+benefit.
+
+10.15 OUTPUT
+-----------
+- immediate WC squad and policy;
+- normal-transfer comparator;
+- delayed activation alternatives;
+- current/future utility;
+- hits saved;
+- price effect;
+- flexibility;
+- BB/FH/TC synergy;
+- information value;
+- exercise advantage;
+- squad mismatch;
+- confidence.
+
+======================================================================
+11. CHIP INTERACTIONS
+======================================================================
+
+11.1 ONE GAMEWEEK COMPETITION
+-----------------------------
+At one Gameweek, only one eligible chip can activate under reference rules.
+
+For a strong Double Gameweek compare:
+
+- TC;
+- BB;
+- FH;
+- WC;
+- no chip.
+
+11.2 SEQUENCE INTERACTION
+-------------------------
+Examples:
+
+- WC -> BB;
+- WC -> normal week -> BB;
+- WC -> BB -> FH blank;
+- FH blank -> WC -> BB double;
+- TC double while preserving BB;
+- early BB removes bench-investment pressure later.
+
+11.3 SYNERGY DEFINITION
+-----------------------
+For chips c,d on schedule sigma:
+
+    synergy(c,d)
+      =
+      V(policy with c and d)
+      - V(policy with c only)
+      - V(policy with d only)
+      + V(no c,d).
+
+11.4 CANNIBALISATION
+--------------------
+Two chips may compete for the same high-value week.
+
+The scheduler measures:
+
+- best joint dates;
+- value lost because both cannot be used together;
+- alternative opportunity quality.
+
+11.5 PREPARATION DEPENDENCE
+--------------------------
+A chip schedule affects prior transfers/squad.
+
+The chip scheduler and squad optimiser cannot be separated into:
+
+1. choose chip dates;
+2. optimise squad afterward.
+
+They must iterate or solve jointly.
+
+11.6 COORDINATION ALGORITHM
+---------------------------
+V1:
+
+1. generate candidate chip schedules;
+2. call DMFP-12 for each schedule;
+3. evaluate on common scenarios;
+4. refine around top schedules;
+5. return Pareto set.
+
+V2:
+integrated multistage mixed-integer model with chip activation variables.
+
+======================================================================
+12. CHIP SCHEDULE CANDIDATE GENERATION
+======================================================================
+
+12.1 WHY
+--------
+Enumerating all combinations can be large, especially with multiple copies and
+future chips.
+
+12.2 REQUIRED DATES
+-------------------
+Always include:
+
+- current Gameweek;
+- every expiry-adjacent Gameweek;
+- likely blank/double;
+- high captain opportunity;
+- high bench opportunity;
+- squad-overhaul trigger;
+- high Free Hit delta;
+- fixture swing;
+- future information node.
+
+12.3 UPPER BOUNDS
+-----------------
+Per chip/Gameweek upper bound:
+
+- TC: upper effective-captain extra;
+- BB: upper bench incremental;
+- FH: temporary optimal minus relaxed baseline;
+- WC: relaxed future squad/hit bound.
+
+Dates with bounds below incumbent opportunity can be pruned if safe.
+
+12.4 BEAM SEARCH
+----------------
+V1 may maintain top partial schedules by:
+
+- expected upper value;
+- diversity;
+- inventory feasibility;
+- expiry coverage.
+
+12.5 EXACT SMALL CASE
+---------------------
+For small chip/date sets, enumerate every legal schedule.
+
+12.6 FUTURE CHIP
+----------------
+Candidate generation uses effect type/duration, not name.
+
+======================================================================
+13. MULTIPLE-STOPPING SOLUTION METHODS
+======================================================================
+
+13.1 EXACT BACKWARD INDUCTION
+-----------------------------
+For reduced state/date opportunity process:
+
+- recursively solve value with k rights remaining;
+- use Bellman exercise/continue comparison.
+
+Selected for:
+
+- toy/golden validation;
+- TC-only/BB-only simplified timing;
+- expiry-window opportunity model.
+
+13.2 REGRESSION MONTE CARLO
+---------------------------
+Estimate continuation value from simulated future states.
+
+Use:
+
+- basis/gradient boosting;
+- cross-fitting;
+- out-of-sample lower-bound policy;
+- dual/perfect-information upper bounds where feasible.
+
+13.3 SWING-OPTION RESEARCH
+--------------------------
+Carmona and Touzi formalise multiple optimal stopping for several exercise
+rights.
+
+Robust multiple-stopping research provides upper/lower-bound approaches under
+model uncertainty.
+
+Pulse uses these as methodological references, not financial pricing models.
+
+13.4 APPROXIMATE DYNAMIC PROGRAMMING
+------------------------------------
+Learn continuation value:
+
+    V_hat(state, inventory, time).
+
+Features:
+
+- current opportunities;
+- future fixture structure;
+- squad mismatch;
+- chip inventory;
+- expiry;
+- rank;
+- uncertainty;
+- information schedule.
+
+13.5 MCTS
+---------
+Challenger for future-chip complexity.
+
+Requires:
+
+- legal schedule action generator;
+- progressive widening;
+- DMFP-12 rollout policy;
+- reproducible budgets;
+- comparison with DP/MILP bounds.
+
+13.6 SELECTED V1
+----------------
+Scenario schedule enumeration/beam search plus DMFP-12 rolling optimisation,
+supported by approximate continuation values.
+
+Why:
+
+- transparent;
+- auditable;
+- reuses central engine;
+- handles current FPL dimensions;
+- produces alternatives.
+
+======================================================================
+14. CAPTAIN/CHIP OBJECTIVES
+======================================================================
+
+14.1 POINTS MODE
+----------------
+Maximise expected remaining-season FPL points.
+
+14.2 ROBUST MODE
+----------------
+Apply DMFP-10 robust regret to model/lineup/fixture worlds.
+
+Do not penalise ordinary haul variance blindly.
+
+14.3 CONSERVATIVE CHIP PLAN
+--------------------------
+Within an expected-utility epsilon:
+
+- minimise robust regret;
+- reduce appearance/fixture failure;
+- preserve future flexibility;
+- avoid heavy preparation.
+
+14.4 HIGH-UPSIDE CHIP PLAN
+-------------------------
+Within expected-utility and fragility constraints:
+
+- maximise P(beat baseline by K);
+- upper-tail expected gain;
+- rank utility via DMFP-14.
+
+Do not use raw chip variance.
+
+14.5 RANK MODE
+--------------
+DMFP-14 supplies:
+
+- effective ownership;
+- rival captain/chip scenarios;
+- rank utility.
+
+Ownership is not used in normal points mode.
+
+14.6 CHIP EXPIRY
+----------------
+Use-it-or-lose-it is reflected in inventory terminal value zero.
+It does not justify a chip that displaces a much better competing chip.
+
+======================================================================
+15. VALUE OF INFORMATION AND ACTIVATION TIMING
+======================================================================
+
+15.1 CHIP ACTIVATION TIME
+-------------------------
+Depending on rules, a chip may be:
+
+- cancellable until deadline;
+- irreversible on confirmation;
+- activated through transfers;
+- activated through team save.
+
+15.2 ACT NOW VERSUS WAIT
+------------------------
+If cancellation is allowed:
+
+- early provisional activation has low decision cost but operational risks;
+- final saved state still validated.
+
+If irreversible:
+
+- use DMFP-10 ACT/WAIT analysis.
+
+15.3 INFORMATION EVENTS
+-----------------------
+- press conference;
+- European/cup match;
+- fixture announcement;
+- price update;
+- injury/training;
+- market opening;
+- lineup leak only if lawful/time-safe;
+- rules clarification.
+
+15.4 EVSI
+--------
+Estimate expected improvement in chip/plan choice from observing Y.
+
+15.5 COST OF WAITING
+--------------------
+- price;
+- execution;
+- website outage;
+- missed cancellation window;
+- inability to prepare squad;
+- uncertainty in fixture confirmation.
+
+15.6 CHIP-SPECIFIC
+------------------
+TC:
+captain availability/fixture certainty.
+
+BB:
+15-player availability.
+
+FH:
+blank/double confirmation and prices.
+
+WC:
+role/fixture/price information.
+
+======================================================================
+16. TRIPLE CAPTAIN FUTURE OPPORTUNITY MODEL
+======================================================================
+
+16.1 OPPORTUNITY FEATURES
+-------------------------
+- effective captain expected score;
+- captain/vice appearance;
+- number of fixtures;
+- home/away/opponent;
+- minutes/rotation;
+- penalty/set pieces;
+- market confidence;
+- postponement;
+- rank/EO later;
+- chip conflicts.
+
+16.2 CURRENT PERCENTILE
+-----------------------
+Report current gross opportunity percentile among predicted remaining
+opportunities, but label this as forecast-relative.
+
+16.3 CONTINUATION
+-----------------
+Future value accounts for re-selecting the captain based on future information.
+
+16.4 ROBUST THRESHOLD
+---------------------
+A current high mean with extreme lineup uncertainty may fail robust exercise,
+especially if several future opportunities remain.
+
+16.5 EXPIRY
+-----------
+Near expiry, the exercise threshold falls and best remaining legal date may be a
+single fixture.
+
+======================================================================
+17. BENCH BOOST OPPORTUNITY MODEL
+======================================================================
+
+17.1 OPPORTUNITY FEATURES
+-------------------------
+- incremental bench points after auto-sub overlap;
+- all 15 appearance;
+- fixture counts;
+- bench lineup/minutes;
+- transfer/preparation cost;
+- money on bench;
+- post-BB squad;
+- WC synergy;
+- chip conflict.
+
+17.2 NATURAL BENCH INDEX
+------------------------
+Measure BB opportunity if chip used with current/ordinary optimal squad, no
+special preparation.
+
+17.3 ENGINEERED BENCH INDEX
+---------------------------
+Measure best value after optimised preparation.
+
+Difference is not free:
+report preparation cost.
+
+17.4 APPEARANCE
+----------------
+A bench with four fixtures but two severe rotation risks can be inferior to a
+single-fixture, highly certain bench.
+
+17.5 BENCH GOALKEEPER
+---------------------
+Include save/clean-sheet distributions and price cost.
+
+17.6 BUDGET
+------------
+Bench capital cost is horizon-specific and manager-specific.
+
+======================================================================
+18. FREE HIT OPPORTUNITY MODEL
+======================================================================
+
+18.1 STRUCTURAL MISMATCH
+-----------------------
+Free Hit opportunity increases when:
+
+- temporary fixture landscape differs strongly from permanent optimal landscape;
+- current squad has many blanks/poor fixtures;
+- normal repair requires hits;
+- permanent sales would be regretted.
+
+18.2 TEMPORARY OPTIMUM
+----------------------
+Use full DMFP-12 legal optimiser for the temporary squad.
+
+18.3 BASELINE REPAIR
+--------------------
+No-FH policy can use transfers/hits and keep altered squad.
+It is not frozen current XI.
+
+18.4 DAMAGE METRIC
+------------------
+- long-term players sold;
+- purchase-price value lost;
+- future transfers needed to restore;
+- chip route weakened.
+
+18.5 FUTURE FH OPPORTUNITY
+-------------------------
+Known/possible future blanks/doubles form continuation value.
+
+======================================================================
+19. WILDCARD OPPORTUNITY MODEL
+======================================================================
+
+19.1 MISMATCH SURFACE
+---------------------
+Compare current permanent squad to scenario-optimal future squads.
+
+Metrics:
+
+- Hamming/transfer distance;
+- hit cost;
+- projected points gap;
+- price route;
+- player uncertainty;
+- bench/formation;
+- club slots.
+
+19.2 INFORMATION SURFACE
+------------------------
+Future observations that could materially change optimal rebuild.
+
+19.3 WILDCARD BOUNDARY
+----------------------
+Use when the immediate structural gain crosses the continuation/value-of-waiting
+boundary.
+
+No fixed transfer-count boundary.
+
+19.4 DELAY POLICY
+-----------------
+May use normal transfers or FH as bridge.
+
+19.5 EXPIRY
+-----------
+At expiry, remaining option value falls to zero.
+But another chip can occupy the final Gameweek, creating inventory scheduling
+pressure.
+
+======================================================================
+20. FUTURE CHIP POLICY
+======================================================================
+
+20.1 CLASSIFICATION
+-------------------
+A future chip is classified by:
+
+- scoring multiplier;
+- roster expansion;
+- temporary reset;
+- permanent reset;
+- multi-week entity;
+- transfer-cost modifier;
+- budget modifier;
+- fixture modifier;
+- other.
+
+20.2 VALUE
+----------
+Always compare the full policy with and without the chip.
+
+20.3 MULTI-WEEK CHIP
+--------------------
+Activation occupies configured duration/conflict interval.
+
+Opportunity cost includes blocking other chips during the active sequence if
+rules specify.
+
+20.4 NEW SCORING ENTITY
+-----------------------
+If a future chip adds a manager/coach/team entity:
+
+- canonical entity;
+- price;
+- club quota;
+- scoring distribution;
+- transfers;
+- duration;
+- downstream points scenario.
+
+20.5 MID-SEASON INTRODUCTION
+----------------------------
+Inventory acquisition time and expiry are explicit.
+
+20.6 RULE ACTIVATION
+---------------------
+Unknown target chip remains BLOCKED until verified.
+
+======================================================================
+21. OUTPUT CONTRACT
+======================================================================
+
+21.1 CURRENT CAPTAINCY
+----------------------
+- recommended captain;
+- recommended vice;
+- effective captain score distribution;
+- vice fallback probability;
+- captain/vice alternative table;
+- reasons;
+- confidence.
+
+21.2 CURRENT CHIP DECISION
+--------------------------
+- recommendation: USE / HOLD / WAIT / BLOCKED;
+- selected chip or NONE;
+- chip-specific plan;
+- gross current gain;
+- net policy value;
+- continuation value;
+- opportunity cost;
+- exercise advantage;
+- robust regret;
+- probability current activation is policy-optimal;
+- expected future best exercise;
+- expiry pressure;
+- competing chip values;
+- information value;
+- confidence.
+
+21.3 CHIP SCHEDULE
+------------------
+- recommended activation schedule;
+- conservative schedule;
+- high-upside schedule;
+- no-chip/current-hold baseline;
+- contingent branches;
+- inventory after each stage;
+- schedule Pareto table.
+
+21.4 EXAMPLE
+-------------
+{
+  "chip_decision_id": "uuid",
+  "gameweek_id": "uuid",
+  "as_of_utc": "timestamp",
+  "recommended_action": "HOLD",
+  "recommended_chip": null,
+
+  "captain": "player_uuid",
+  "vice_captain": "player_uuid",
+
+  "current_opportunities": {
+    "TRIPLE_CAPTAIN": {
+      "gross_incremental_points": 8.4,
+      "net_policy_value": -1.1,
+      "continuation_value": 9.5,
+      "exercise_advantage": -1.1,
+      "probability_now_optimal": 0.26
+    },
+    "BENCH_BOOST": {
+      "gross_incremental_points": 10.2,
+      "preparation_cost": 3.6,
+      "net_policy_value": -2.4
+    },
+    "FREE_HIT": {
+      "gross_incremental_points": 5.0,
+      "permanent_squad_preservation": 0.4,
+      "net_policy_value": -4.7
+    },
+    "WILDCARD": {
+      "current_future_points_gain": 12.1,
+      "information_value_of_delay": 4.2,
+      "net_policy_value_now": -0.8
+    }
+  },
+
+  "next_candidate_activation": {
+    "chip": "TRIPLE_CAPTAIN",
+    "gameweek_id": "uuid",
+    "conditional_probability": 0.42
+  },
+
+  "confidence": "B",
+  "reasons": [
+    "CURRENT_TC_BELOW_CONTINUATION_VALUE",
+    "HIGH_FUTURE_FIXTURE_OPTION_VALUE",
+    "NO_CHIP_EXPIRY_PRESSURE"
+  ],
+
+  "ruleset_hash": "...",
+  "scenario_tree_id": "uuid",
+  "decision_run_id": "uuid",
+  "code_commit": "..."
+}
+
+======================================================================
+22. EXPLANATION REQUIREMENTS
+======================================================================
+
+22.1 CHIP VALUE, NOT GAMEWEEK SCORE
+-----------------------------------
+Good:
+
+"Bench Boost is expected to add 8.1 points above the optimised no-chip score,
+but preparing the bench costs an estimated 3.0 points over the surrounding
+Gameweeks and uses the strongest projected Triple Captain week. Net policy
+value is negative."
+
+Bad:
+
+"Bench Boost projects 78 total points."
+
+22.2 FUTURE OPPORTUNITY
+-----------------------
+Explain:
+
+- what future states preserve the chip;
+- their probability;
+- forecast uncertainty;
+- expiry.
+
+22.3 COMPARATORS
+----------------
+Every chip use shows:
+
+- no-chip;
+- other chips this week;
+- hold;
+- delayed;
+- exact squad/tactical plan.
+
+22.4 WILDCARD
+-------------
+Explain current squad problems and why normal transfers cannot repair them
+efficiently, or why waiting is better.
+
+22.5 FREE HIT
+-------------
+Explain hits and permanent damage avoided.
+
+22.6 CAPTAIN
+-------------
+Explain effective score and vice conditional fallback.
+
+======================================================================
+23. CONFIDENCE
+======================================================================
+
+23.1 DIMENSIONS
+---------------
+- target rules;
+- fixture certainty;
+- points/minutes;
+- future opportunity forecasts;
+- scenario tree;
+- information revelation;
+- chip interaction;
+- squad/price state;
+- solver gap;
+- policy stability;
+- rank/EO objective.
+
+23.2 GRADES
+-----------
+A:
+active rules, confirmed schedule, clear exercise advantage, stable policy.
+
+B:
+strong but future opportunities retain moderate uncertainty.
+
+C:
+close use/hold decision, fixture/injury/model sensitivity.
+
+D:
+structural uncertainty, unconfirmed doubles/blanks, weak future value.
+
+E:
+rules inactive, state invalid or solver blocked.
+
+23.3 ACTION STABILITY
+---------------------
+Report fraction of model/SAA worlds choosing:
+
+- use current chip;
+- hold;
+- alternative chip.
+
+23.4 SWITCH THRESHOLDS
+----------------------
+Examples:
+
+- captain p_start;
+- current TC expected extra;
+- future DGW probability;
+- bench appearance;
+- Wildcard squad gap;
+- Free Hit blank count;
+- information value.
+
+======================================================================
+24. CONSERVATIVE AND HIGH-UPSIDES MODES
+======================================================================
+
+24.1 CONSERVATIVE CAPTAIN
+------------------------
+Not automatically the most-owned or lowest-variance player.
+
+Within an expected-utility epsilon:
+
+- reduce nonappearance;
+- reduce downside relative baseline;
+- improve conditional vice coverage;
+- limit model/regime regret.
+
+24.2 HIGH-UPSIDES CAPTAIN
+------------------------
+Within an expected-points floor:
+
+- maximise upper-tail gain/rank utility;
+- preserve appearance constraint.
+
+24.3 CONSERVATIVE CHIP SCHEDULE
+-------------------------------
+- confirmed fixtures;
+- lower preparation;
+- less dependence on one uncertain player;
+- protects squad.
+
+24.4 HIGH-UPSIDES CHIP SCHEDULE
+-------------------------------
+- high tail gain;
+- rank-aware later;
+- expected-value floor;
+- no uncontrolled fragility.
+
+24.5 NO FORCED DIFFERENCE
+-------------------------
+If recommended is simultaneously safest and highest-upside among near-optimal
+plans, alternative may match or be omitted.
+
+======================================================================
+25. SCENARIO AND SOLVER IMPLEMENTATION
+======================================================================
+
+25.1 ROOT ACTION
+----------------
+Current chip activation is one shared nonanticipative decision.
+
+25.2 FUTURE NODES
+-----------------
+Chip activation can depend on:
+
+- fixture announcements;
+- injury;
+- price;
+- rank;
+- squad;
+- earlier chip use.
+
+25.3 CHIP ACTIVATION VARIABLE
+-----------------------------
+    z[c,j,n] in {0,1}
+
+token j of chip c activated at node n.
+
+25.4 INVENTORY
+--------------
+    available[c,j,n]
+
+follows parent and activation/expiry.
+
+25.5 ONE CHIP
+-------------
+    sum_{c,j active at t} z[c,j,n] <= configured limit.
+
+For multi-week chip, active occupancy includes prior activation.
+
+25.6 DMFP-12 SUBPROBLEM
+-----------------------
+For fixed chip schedule/node:
+
+- transfers/squad;
+- bank/FT;
+- lineup/bench;
+- captain/vice;
+- manager score.
+
+25.7 OBJECTIVE
+--------------
+DMFP-10 selected utility plus terminal inventory value.
+
+25.8 TERMINAL CHIP VALUE
+------------------------
+At horizon end:
+
+- continuation-value model for chips surviving beyond horizon;
+- zero if expired/season end;
+- uncertainty and sensitivity.
+
+25.9 SOLVER
+-----------
+Use:
+
+- dynamic programming for reduced inventory/opportunity states;
+- scenario schedule enumeration/beam;
+- DMFP-12 MILP/HiGHS;
+- exact tactical evaluator.
+
+======================================================================
+26. COMPUTATIONAL CONTROL
+======================================================================
+
+26.1 CANDIDATE SCHEDULES
+------------------------
+Initial target:
+
+- 50–500 chip schedules;
+- expand around top;
+- exact enumeration where manageable.
+
+26.2 COMMON SCENARIOS
+---------------------
+Evaluate schedules on identical holdout scenarios.
+
+26.3 WARM START
+--------------
+- previous schedule;
+- official blank/double candidates;
+- champion/public heuristic only as candidate, not truth;
+- no-chip/expiry schedules.
+
+26.4 BOUNDS
+----------
+- perfect-information upper bound;
+- relaxed chip conflict;
+- per-chip opportunity upper bounds;
+- current incumbent.
+
+26.5 TIME BUDGET
+----------------
+Normal:
+5–15 minutes after DMFP-12 results.
+
+Deep chip planning:
+30–60 minutes, user-visible current-response execution only.
+
+Emergency:
+ordinary captain/vice and no-chip plan.
+
+26.6 INCREMENTAL UPDATE
+-----------------------
+When one fixture/injury changes:
+
+- update affected opportunities;
+- re-evaluate top schedules;
+- preserve unaffected computations.
+
+======================================================================
+27. BACKTESTING
+======================================================================
+
+27.1 SEQUENTIAL POLICY
+----------------------
+At every historical deadline:
+
+- use only live-known information;
+- solve;
+- execute current chip/no-chip/captain;
+- remove inventory;
+- update;
+- continue.
+
+27.2 NO HINDSIGHT CHIP VALUE
+----------------------------
+A realised haul does not define decision quality.
+
+Compare chosen action to the best policy available at the time and to a
+clairvoyant diagnostic separately.
+
+27.3 CHIP GAIN METRIC
+---------------------
+Use:
+
+    realised manager points under actual chip plan
+    -
+    counterfactual manager points under the saved no-chip policy,
+
+including state transitions where estimable.
+
+Do not use raw total Gameweek points.
+
+27.4 WILDCARD COUNTERFACTUAL
+----------------------------
+Requires sequential alternative policy, not one-week squad comparison.
+
+27.5 BENCH BOOST
+----------------
+Include preparation/unwinding.
+
+27.6 FREE HIT
+-------------
+Include hits and permanent squad path.
+
+27.7 TRIPLE CAPTAIN
+-------------------
+Incremental effective captain copy.
+
+27.8 METRICS
+-------------
+- cumulative season points;
+- chip net policy value;
+- chip timing regret;
+- captain extra;
+- vice fallback;
+- exercise advantage calibration;
+- P(current use optimal);
+- expiry waste;
+- preparation cost;
+- rank utility later;
+- policy stability.
+
+27.9 COMPARATORS
+----------------
+- use chip at highest current mean;
+- always save TC/BB for largest DGW;
+- WC after N changes;
+- FH biggest blank;
+- WC->BB heuristic;
+- use-before-expiry;
+- no opportunity-cost policy;
+- perfect hindsight.
+
+======================================================================
+28. CALIBRATION
+======================================================================
+
+28.1 OPPORTUNITY FORECAST
+-------------------------
+Check predicted versus realised incremental chip gains.
+
+28.2 CONTINUATION VALUE
+-----------------------
+Backtest whether HOLD decisions produced better future policy opportunities.
+
+28.3 EXERCISE PROBABILITY
+------------------------
+If "P(now optimal)" is 70%, assess frequency under appropriate retrospective
+policy-world definition.
+
+28.4 CAPTAIN
+-------------
+- effective captain score;
+- vice fallback;
+- threshold/tail calibration.
+
+28.5 CHIP-SPECIFIC
+------------------
+TC:
+extra score PMF.
+
+BB:
+bench incremental and appearance.
+
+FH:
+temporary uplift and preservation.
+
+WC:
+future policy gain/hits/flexibility.
+
+28.6 MODEL ERROR
+----------------
+Separate:
+
+- football prediction;
+- future fixture;
+- policy/value approximation;
+- solver/scenario error.
+
+======================================================================
+29. BASELINES AND ABLATIONS
+======================================================================
+
+29.1 BASELINES
+--------------
+B0:
+No chip until expiry.
+
+B1:
+Use chip on highest forecast gross gain.
+
+B2:
+TC largest DGW.
+
+B3:
+BB after WC.
+
+B4:
+FH largest blank.
+
+B5:
+WC when projected changes >= fixed N.
+
+B6:
+Captain highest mean; vice second-highest mean.
+
+29.2 ABLATIONS
+--------------
+- no opportunity cost;
+- no future information;
+- no chip interactions;
+- no preparation cost;
+- no price paths;
+- no robust regret;
+- no rank utility;
+- no future recourse;
+- no vice correlation.
+
+29.3 REQUIRED EDGE
+------------------
+The complete policy must outperform simplistic timing rules out of time or be
+simplified.
+
+======================================================================
+30. TESTING
+======================================================================
+
+30.1 INVENTORY
+--------------
+- activation;
+- expiry;
+- multiple copies;
+- future acquisition;
+- one-chip conflict;
+- multi-week occupancy;
+- cancellation.
+
+30.2 CAPTAIN
+-------------
+- captain appears;
+- captain zero, vice appears;
+- both zero;
+- Double Gameweek one appearance;
+- correlated postponement;
+- joint pair optimum.
+
+30.3 TC
+-------
+- incremental equals effective captain score;
+- vice receives multiplier;
+- neither plays, chip used;
+- opportunity cost;
+- expiry.
+
+30.4 BB
+-------
+- all bench score;
+- normal autosub overlap subtracted;
+- goalkeeper bench;
+- zero bench appearances;
+- preparation cost;
+- WC synergy.
+
+30.5 FH
+-------
+- temporary squad;
+- permanent restoration;
+- FT transition;
+- hit avoidance;
+- price scenarios;
+- blank/double;
+- club/position legality.
+
+30.6 WC
+-------
+- permanent reset;
+- purchase cohorts;
+- hit waiver;
+- immediate/delayed;
+- expiry;
+- squad mismatch.
+
+30.7 FUTURE CHIP
+----------------
+Synthetic:
+
+- multi-week scoring chip;
+- budget-consuming chip;
+- transfer-lock chip;
+- new entity;
+- conflict.
+
+30.8 DYNAMIC PROGRAM
+--------------------
+Small finite opportunity problem solved by exhaustive enumeration.
+
+30.9 NONANTICIPATIVITY
+---------------------
+Future chip cannot use future fixture result before announcement.
+
+30.10 PROPERTY TESTS
+--------------------
+- one chip per configured interval;
+- inventory cannot be reused;
+- exercise advantage equals Q difference;
+- gross/current and net/policy kept separate;
+- required outputs;
+- no illegal plan.
+
+======================================================================
+31. OPERATIONAL ALERTS
+======================================================================
+
+P0:
+- target chip rules unknown;
+- inventory mismatch;
+- illegal simultaneous chips;
+- captain/vice scoring mismatch;
+- permanent squad not restored after FH;
+- WC/FH transition wrong;
+- expired chip recommended.
+
+P1:
+- current/hold values close and unstable;
+- fixture announcement uncertainty;
+- solver schedule gap;
+- future opportunity model drift;
+- BB preparation dominates value;
+- TC captain confidence low;
+- chip expiry conflict.
+
+P2:
+- public heuristic differs;
+- low-value remaining chip;
+- future-chip schema additive;
+- rank objective changes schedule.
+
+Metrics:
+
+- chip inventory;
+- current exercise advantages;
+- expiry pressure;
+- captain extra;
+- vice fallback;
+- schedule stability;
+- gross/net chip value;
+- preparation cost;
+- solve time/gap;
+- policy regret.
+
+======================================================================
+32. EXPLAINABILITY EXAMPLES
+======================================================================
+
+32.1 HOLD TRIPLE CAPTAIN
+------------------------
+"Current Triple Captain is expected to add 8.4 points. The best adaptive future
+policy values the remaining chip at 9.5 points, mainly because a plausible
+Double Gameweek offers two high-minutes captain candidates. Net exercise
+advantage is -1.1 points, so HOLD."
+
+32.2 USE TRIPLE CAPTAIN
+-----------------------
+"Current extra score is 11.6 points and sits above 88% of remaining opportunity
+scenarios. The chip expires in three Gameweeks, future fixture uncertainty is
+high and no competing chip needs this week. USE."
+
+32.3 BENCH BOOST REJECTED
+-------------------------
+"The bench projects 13.0 points, but 3.4 would already enter through automatic
+substitutions in the normal plan. Preparing the squad costs 4.1 points and
+£2.0m of starting-XI budget over the horizon. Net chip value is 2.8, below a
+future natural Bench Boost opportunity. HOLD."
+
+32.4 FREE HIT
+----------------
+"Free Hit adds only 5.2 immediate points, but avoids an eight-point hit and
+preserves three long-term players whose sale/rebuy route would cost another 2.3
+expected points. Net policy value is 11.1. USE."
+
+32.5 DELAY WILDCARD
+-------------------
+"Wildcard now improves the six-Gameweek squad projection by 15.3 points, but
+tomorrow's manager information has 4.7 points of expected decision value and the
+current team can be repaired for one free transfer. Delayed Wildcard value is
+higher. WAIT."
+
+======================================================================
+33. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+33.1 CODEX MAY
+-------------
+- implement chip definitions/compiler;
+- implement captain/vice scoring;
+- schedule chip opportunities;
+- call DMFP-12 subproblems;
+- implement dynamic programming/continuation values;
+- calculate opportunity cost/synergy;
+- generate alternatives and explanations;
+- create tests/backtests.
+
+33.2 CODEX MUST NOT
+-------------------
+- hard-code 2025/26 chip copies/windows;
+- use gross Gameweek points as chip value;
+- ignore future opportunity cost;
+- choose vice by second-highest mean;
+- assume TC requires a Double Gameweek;
+- assume BB must follow WC;
+- value BB as bench sum only;
+- value FH against frozen squad only;
+- value WC by current Gameweek only;
+- use perfect future information as achievable;
+- use a chip because expiry is near without comparing conflicts;
+- create special-case future chip code without definition/compiler review;
+- apply rank/ownership strategy without DMFP-14;
+- report realised chip score as decision quality.
+
+33.3 PULL REQUEST
+-----------------
+Every change states:
+
+- chip/rules version;
+- opportunity-cost definition;
+- state transition;
+- objective;
+- scenario/continuation method;
+- tests;
+- backtest;
+- solver/runtime;
+- output impact.
+
+======================================================================
+34. RISK REGISTER
+======================================================================
+
+R-13-001 — Gross chip gain mistaken for policy value
+Probability: High
+Impact: Critical
+Mitigation:
+gross/net/continuation decomposition.
+
+R-13-002 — Future opportunity estimated by max forecast mean
+Probability: High
+Impact: Critical
+Mitigation:
+adaptive policy value.
+
+R-13-003 — Perfect-information future used
+Probability: Medium
+Impact: Critical
+Mitigation:
+nonanticipative tree; upper-bound label.
+
+R-13-004 — Chip inventory/rules carried from 2025/26
+Probability: High prelaunch
+Impact: Critical
+Mitigation:
+ACTIVE target rules gate.
+
+R-13-005 — One-chip conflict omitted
+Probability: Medium
+Impact: Critical
+Mitigation:
+inventory scheduler.
+
+R-13-006 — Multiple copies treated independently
+Probability: Medium
+Impact: High
+Mitigation:
+joint inventory value.
+
+R-13-007 — Expiry ignored
+Probability: Medium
+Impact: High
+Mitigation:
+terminal zero/expiry branches.
+
+R-13-008 — Expiry forces poor use over better competing chip
+Probability: Medium
+Impact: High
+Mitigation:
+joint schedule/allow expiry.
+
+R-13-009 — Captain and vice selected independently
+Probability: High
+Impact: High
+Mitigation:
+joint effective-score pair.
+
+R-13-010 — Vice second-highest mean
+Probability: High
+Impact: High
+Mitigation:
+conditional fallback.
+
+R-13-011 — Same-fixture captain/vice postponement risk ignored
+Probability: Medium
+Impact: High
+Mitigation:
+joint scenario correlation.
+
+R-13-012 — TC value uses captain mean only
+Probability: High
+Impact: Critical
+Mitigation:
+effective captain PMF.
+
+R-13-013 — TC assumed best in largest DGW
+Probability: High
+Impact: High
+Mitigation:
+full opportunity policy.
+
+R-13-014 — TC chip returned after failure
+Probability: Low/Medium
+Impact: Critical
+Mitigation:
+rules/state test.
+
+R-13-015 — BB value equals bench points
+Probability: High
+Impact: Critical
+Mitigation:
+subtract autosub overlap and preparation.
+
+R-13-016 — Bench capital ignored
+Probability: High
+Impact: High
+Mitigation:
+counterfactual squad policy.
+
+R-13-017 — WC-BB synergy assumed positive
+Probability: High
+Impact: High
+Mitigation:
+joint policy re-solves.
+
+R-13-018 — BB fixture count used as value
+Probability: High
+Impact: High
+Mitigation:
+points/minutes distributions.
+
+R-13-019 — FH baseline frozen
+Probability: High
+Impact: Critical
+Mitigation:
+optimised normal transfers/hits.
+
+R-13-020 — FH permanent damage ignored
+Probability: High
+Impact: Critical
+Mitigation:
+future squad counterfactual.
+
+R-13-021 — FH restoration/FT transition wrong
+Probability: Medium
+Impact: Critical
+Mitigation:
+config/golden tests.
+
+R-13-022 — Wildcard value measured one week
+Probability: High
+Impact: Critical
+Mitigation:
+rolling policy.
+
+R-13-023 — Wildcard fixed bad-player threshold
+Probability: High
+Impact: High
+Mitigation:
+squad mismatch/value boundary.
+
+R-13-024 — Wildcard waits for information that never arrives
+Probability: Medium
+Impact: High
+Mitigation:
+explicit information event.
+
+R-13-025 — Wildcard overreacts early
+Probability: High
+Impact: High
+Mitigation:
+priors/structural uncertainty/continuation.
+
+R-13-026 — Future chip cannot be represented
+Probability: Medium
+Impact: Critical
+Mitigation:
+effect grammar/block.
+
+R-13-027 — Multi-week future chip conflicts omitted
+Probability: Medium
+Impact: Critical
+Mitigation:
+duration occupancy.
+
+R-13-028 — Approximate continuation overfits
+Probability: High
+Impact: High
+Mitigation:
+cross-fit/lower-upper bounds/backtest.
+
+R-13-029 — Candidate schedule pruning removes optimum
+Probability: Medium
+Impact: Critical
+Mitigation:
+bounds/exact small case/escape schedules.
+
+R-13-030 — Rank ownership leaks into points policy
+Probability: Medium
+Impact: Critical
+Mitigation:
+explicit DMFP-14 mode.
+
+R-13-031 — Conservative means low variance
+Probability: High
+Impact: High
+Mitigation:
+regret/appearance definition.
+
+R-13-032 — Upside means maximum variance
+Probability: High
+Impact: High
+Mitigation:
+tail gain and expectation floor.
+
+R-13-033 — Chip plan judged by realised outcome
+Probability: High
+Impact: Strategic
+Mitigation:
+policy/counterfactual evaluation.
+
+R-13-034 — Public champion anecdote treated causal
+Probability: Medium
+Impact: Medium
+Mitigation:
+practitioner context only.
+
+R-13-035 — Fixture uncertainty double counted
+Probability: Medium
+Impact: High
+Mitigation:
+one scenario branch shared across modules.
+
+R-13-036 — Chip recommendation stale before deadline
+Probability: High
+Impact: Critical
+Mitigation:
+state hash/pre-execution validation.
+
+======================================================================
+35. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-17
+
+----------------------------------------------------------------------
+SRC-FPL-CHIPS-2025-001
+Title:
+FPL basics explained: How to use your chips
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174900
+
+Relevant claims:
+Reference Bench Boost, Free Hit, Triple Captain and Wildcard effects; one chip
+per Gameweek; two reference-season copies/windows; cancellation; Free Hit and
+Wildcard transfer interactions; common blank/double use cases.
+
+Reliability:
+HIGH official reference-season source.
+Not authoritative for 2026/27.
+
+Pulse reliance:
+YES for reference rules and golden tests.
+
+----------------------------------------------------------------------
+SRC-FPL-CHIPS-2025-002
+Title:
+What's new in 2025/26 Fantasy: Two sets of chips
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-18
+
+URL:
+https://www.premierleague.com/en/news/4362027/whats-new-in-202526-fantasy-two-sets-of-chips
+
+Relevant claims:
+Two sets/eight chips, first-half expiry, no Assistant Manager that season, and
+official strategic examples for TC, BB and FH.
+
+Reliability:
+HIGH official reference/context.
+Strategic examples are guidance, not optimisation proof.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-FPL-CAPTAIN-2025-001
+Title:
+FPL basics explained: Managing your team
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174899/fpl-basics-managing-your-team
+
+Relevant claims:
+Captain/vice must be in the XI; captain doubles if he appears; vice receives
+double if captain does not feature; neither means no extra; automatic
+substitution/formation rules.
+
+Reliability:
+HIGH official reference source.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-FPL-TC-2026-001
+Title:
+Fantasy Premier League Help & FAQs
+
+Organisation:
+Fantasy Premier League
+
+URL:
+https://fantasy.premierleague.com/help
+
+Relevant claim:
+Under the displayed reference rule, Triple Captain passes to the vice-captain if
+the captain does not play; if neither plays, the bonus is lost and the chip is
+not returned.
+
+Reliability:
+HIGH official living help surface.
+Target-season capture required.
+
+Pulse reliance:
+YES for reference test.
+
+----------------------------------------------------------------------
+SRC-FPL-BDGW-2026-001
+Title:
+How cup ties will cause Blank and Double Gameweeks in 2025/26 FPL
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2026-03-09
+
+URL:
+https://www.premierleague.com/en/news/4536133/how-domestic-cup-ties-cause-blank-and-double-gameweeks-in-fpl
+
+Relevant claims:
+Defines Blank and Double Gameweeks and explains cup-rescheduling origins and
+chip relevance.
+
+Reliability:
+HIGH official context.
+
+Pulse reliance:
+YES for fixture-opportunity scenarios.
+
+----------------------------------------------------------------------
+SRC-FPL-CHAMPION-2026-001
+Title:
+FPL champion: How to pick your captain and maximise your chips
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2026-05-30
+
+URL:
+https://www.premierleague.com/en/news/4672128/fpl-champion-how-to-pick-your-captain-and-maximise-your-chips
+
+Relevant claim:
+2025/26 champion describes patience and a WC32-BB33-FH34-TC36 sequence; describes
+Free Hit as protecting other chip/squad strategy.
+
+Reliability:
+HIGH as an accurate interview/anecdote.
+It is one manager/season and not causal evidence.
+
+Pulse reliance:
+PRACTITIONER CONTEXT only.
+
+----------------------------------------------------------------------
+SRC-FPL-DGW-2026-001
+Title:
+What's the best chip strategy for the run-in in FPL?
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2026-04-10
+
+URL:
+https://www.premierleague.com/en/news/4624426
+
+Relevant claim:
+Official strategic illustration of WC/BB/FH sequencing and the fact that a
+Bench Boost in a double can expose up to 15 players to two fixtures.
+
+Reliability:
+HIGH official context, not proof of optimality.
+
+Pulse reliance:
+SCENARIO/TEST inspiration only.
+
+----------------------------------------------------------------------
+SRC-FPL-LAUNCH-2026-001
+Title:
+All you need to know about 2026/27 Premier League fixtures
+
+Organisation:
+Premier League
+
+Publication date:
+2026-06-18
+
+URL:
+https://www.premierleague.com/en/news/4674573/all-you-need-to-know-for-202627-fixture-release-day/
+
+Relevant claim:
+The 2026/27 FPL game would launch later in summer; season starts 21 August 2026.
+
+Reliability:
+HIGH official current source.
+
+Pulse reliance:
+YES for prelaunch gate.
+
+----------------------------------------------------------------------
+SRC-MULTISTOP-2008-001
+Title:
+Optimal Multiple Stopping and Valuation of Swing Options
+
+Authors:
+René Carmona, Nizar Touzi
+
+Publication:
+Mathematical Finance, 18(2), 239–268
+
+Preprint:
+https://www.cmap.polytechnique.fr/~touzi/cat03.pdf
+
+Relevant claim:
+Formalises finite multiple exercise rights as an optimal multiple-stopping
+problem.
+
+Reliability:
+HIGH peer-reviewed/foundational.
+
+Pulse reliance:
+YES for chip-inventory timing framework.
+
+----------------------------------------------------------------------
+SRC-MULTISTOP-2010-002
+Title:
+A Dual Approach to Some Multiple Exercise Option Problems
+
+Authors:
+N. Aleksandrov, B. M. Hambly
+
+URL:
+https://people.maths.ox.ac.uk/~hambly/PDF/Papers/Optimal-multiple-stopping.pdf
+
+Relevant claim:
+Studies discrete-time options exercisable a fixed number of times and develops
+dual approaches/bounds.
+
+Reliability:
+HIGH peer-reviewed methods work.
+
+Pulse reliance:
+YES for upper/lower-bound research direction.
+
+----------------------------------------------------------------------
+SRC-MULTISTOP-2020-003
+Title:
+Robust Multiple Stopping — A Pathwise Duality Approach
+
+Authors:
+Roger J. A. Laeven, John G. M. Schoenmakers, Nikolaus Schweizer, Mitja Stadje
+
+URL:
+https://arxiv.org/abs/2006.01802
+
+Relevant claim:
+Develops robust multiple-stopping methods under model uncertainty with
+convergent upper/lower bounds.
+
+Reliability:
+MODERATE/HIGH scholarly work.
+
+Pulse reliance:
+CHALLENGER for robust chip timing.
+
+----------------------------------------------------------------------
+SRC-REALOPTIONS-1994-001
+Title:
+Investment Under Uncertainty
+
+Authors:
+Avinash K. Dixit, Robert S. Pindyck
+
+Reference copy:
+https://msuweb.montclair.edu/~lebelp/DixitPindyck1994.pdf
+
+Relevant claim:
+Irreversible action destroys the option to wait for information; uncertainty
+can create a value of waiting and an exercise threshold.
+
+Reliability:
+HIGH foundational text.
+
+Pulse reliance:
+YES conceptually for Wildcard/chip timing.
+
+----------------------------------------------------------------------
+SRC-VOI-2001-001
+Title:
+Bayesian Value-of-Information Analysis: An Application to a Policy Model
+
+Authors:
+Karl Claxton, Mark Sculpher, Mark Drummond
+
+URL:
+https://pubmed.ncbi.nlm.nih.gov/11329844/
+
+Relevant claim:
+Distinguishes the optimal current decision from the value of obtaining further
+information before commitment.
+
+Reliability:
+HIGH peer-reviewed decision-analysis work.
+
+Pulse reliance:
+YES for activation timing.
+
+----------------------------------------------------------------------
+SRC-SAA-2002-001
+Title:
+The Sample Average Approximation Method for Stochastic Discrete Optimization
+
+Authors:
+Anton J. Kleywegt, Alexander Shapiro, Tito Homem-de-Mello
+
+DOI:
+https://doi.org/10.1137/S1052623499363220
+
+Relevant claim:
+Supports Monte Carlo scenario approximation for stochastic discrete decisions,
+including solution assessment.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+YES for chip-schedule evaluation.
+
+----------------------------------------------------------------------
+SRC-ROLLING-2021-001
+Title:
+Rolling Horizon Policies in Multistage Stochastic Programming
+
+Authors:
+Murwan Siddig, Yongjia Song, Amin Khademi
+
+URL:
+https://arxiv.org/abs/2102.04874
+
+Relevant claim:
+Rolling-horizon policies repeatedly solve shorter multistage problems and
+require careful horizon/terminal-value handling.
+
+Reliability:
+MODERATE/HIGH scholarly work.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-MCTS-2022-001
+Title:
+Monte Carlo Tree Search: A Review of Recent Modifications and Applications
+
+Authors:
+Maciej Swiechowski, Konrad Godlewski, Bartosz Sawicki, Jacek Mandziuk
+
+URL:
+https://arxiv.org/abs/2103.04931
+
+Relevant claim:
+MCTS can solve simulation-based sequential decisions, but high-branching
+practical domains often require substantial domain-specific modification.
+
+Reliability:
+HIGH peer-reviewed review.
+
+Pulse reliance:
+CHALLENGER decision.
+
+----------------------------------------------------------------------
+SRC-FPL-OPT-2025-001
+Title:
+Data-Driven Team Selection in Fantasy Premier League Using Integer Programming
+and Predictive Modeling Approach
+
+Author:
+Danial Ramezani
+
+URL:
+https://arxiv.org/abs/2505.02170
+
+Relevant claim:
+FPL-specific deterministic and robust integer models select lineups and
+captains using predictive inputs.
+
+Reliability:
+MODERATE recent preprint.
+
+Pulse reliance:
+BENCHMARK for ordinary captain optimisation.
+
+----------------------------------------------------------------------
+SRC-FPL-SKILL-2021-001
+Title:
+Identification of Skill in an Online Game: The Case of Fantasy Premier League
+
+Authors:
+Joseph D. O'Brien, James P. Gleeson, David J. P. O'Sullivan
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC7928501/
+
+Relevant claim:
+Long-term planning and consistently good decisions are important in FPL's noisy
+environment.
+
+Reliability:
+HIGH peer-reviewed research.
+
+Pulse reliance:
+CONTEXTUAL for policy evaluation.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-02 — FPL Rules, Scoring and Season Configuration
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-09 — FPL Points Distribution Engine
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-10 — Uncertainty, Scenarios and Early-Season Policy
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-11 — Price Change and Team Value Model
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-12 — Squad, Transfer and Lineup Optimiser
+
+Pulse reliance:
+YES.
+
+======================================================================
+36. ACCEPTANCE CRITERIA
+======================================================================
+
+A. UNIFIED POLICY
+[ ] Captaincy and all chips share one decision system.
+[ ] Chip inventory, expiry and conflict are explicit.
+[ ] Current activation competes with future adaptive use.
+[ ] Rolling re-optimisation executes only the current decision.
+
+B. OPPORTUNITY COST
+[ ] Gross current gain and net policy value are separate.
+[ ] Continuation value is calculated.
+[ ] Perfect-information future is only an upper bound.
+[ ] Preparation, unwinding and chip interactions are included.
+[ ] Expiry pressure is represented.
+
+C. CAPTAIN/TC
+[ ] Captain and vice are jointly optimised.
+[ ] Vice is conditional fallback.
+[ ] TC incremental value is effective captain score.
+[ ] DGW is not required.
+[ ] Appearance/fallback and future opportunities are included.
+
+D. BB/FH/WC
+[ ] BB subtracts normal autosub overlap.
+[ ] Bench investment/preparation cost is included.
+[ ] FH baseline optimises normal transfers and long-term damage.
+[ ] WC compares immediate, normal and delayed policies.
+[ ] WC value is multi-Gameweek/permanent.
+[ ] Future information is explicit.
+
+E. FUTURE CHIPS
+[ ] Declarative effect grammar exists.
+[ ] Multi-week/conflict/budget/entity changes are representable.
+[ ] Unknown semantics block activation.
+[ ] No scattered chip-name conditionals.
+
+F. OUTPUT/SCIENCE
+[ ] Required plans, schedule, reasons and confidence are produced.
+[ ] Sequential no-hindsight backtesting is mandatory.
+[ ] Simplistic chip heuristics are baselines.
+[ ] Action stability and solver/scenario errors are reported.
+[ ] Rank ownership is explicit and downstream.
+
+======================================================================
+37. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Implement generic chip definition/effect schema.
+2. Implement inventory token/state machine.
+3. Compile reference 2025/26 chips for tests only.
+4. Implement ordinary captain/vice exact scenario evaluator.
+5. Implement TC scoring transform and fallback tests.
+6. Implement BB scoring transform and autosub-overlap calculation.
+7. Implement FH temporary/permanent squad transition interface.
+8. Implement WC permanent-reset transition interface.
+9. Implement one-chip/multi-duration conflict constraints.
+10. Implement current gross chip gain comparisons.
+11. Implement chip opportunity/continuation state features.
+12. Implement reduced dynamic-programming golden model.
+13. Build candidate chip schedule generator.
+14. Integrate schedules with DMFP-12 solver.
+15. Implement WC/BB/FH/TC interactions.
+16. Implement opportunity cost and exercise advantage.
+17. Implement value-of-information activation timing.
+18. Implement conservative/upside schedules.
+19. Implement future-chip synthetic tests.
+20. Implement current/future schedule explanations.
+21. Build sequential chip-policy backtester.
+22. Validate simplified heuristics as baselines.
+23. Begin target-season rule capture at launch.
+24. Do not activate production chip advice until target tests pass.
+
+Suggested commands:
+
+    dmf chips validate-rules
+    dmf chips inventory
+    dmf chips captain
+    dmf chips opportunity
+    dmf chips schedule
+    dmf chips compare
+    dmf chips wildcard-now-vs-later
+    dmf chips bench-boost-value
+    dmf chips free-hit-value
+    dmf chips triple-captain-value
+    dmf chips explain
+    dmf chips backtest
+    dmf chips validate
+
+======================================================================
+38. OPEN QUESTIONS
+======================================================================
+
+TARGET RULES
+------------
+1. Which chips/copies exist in 2026/27?
+2. What are their windows/expiry?
+3. Is one-chip-per-Gameweek unchanged?
+4. Are cancellation and FT interactions unchanged?
+5. Is a new/multi-week chip introduced?
+6. What happens in Double Gameweeks for captain fallback?
+
+CAPTAINCY
+----------
+7. What utility mode is default for ordinary captain?
+8. How is conditional vice value displayed?
+9. What captain/vice pruning is exact?
+10. When should rank-aware captaincy override expected points?
+
+OPPORTUNITY MODEL
+-----------------
+11. What continuation-value approximation is best?
+12. How many future opportunity branches are needed?
+13. What upper/lower bounds can certify timing?
+14. How is forecast winner's curse corrected?
+15. What probability-now-optimal definition is stable?
+
+TRIPLE CAPTAIN
+--------------
+16. What current/future threshold is appropriate?
+17. How strongly should lineup uncertainty enter robust exercise?
+18. How is multi-fixture cancellation represented?
+19. Should TC schedule use exact dynamic programming?
+
+BENCH BOOST
+-----------
+20. How is bench preparation cost isolated?
+21. What horizon values bench capital?
+22. How is natural versus engineered BB reported?
+23. What is the right WC-BB synergy attribution?
+24. Does BB alter autosub processing in target rules?
+
+FREE HIT
+--------
+25. How is permanent-squad preservation valued most accurately?
+26. How many price/fixture scenarios are required?
+27. How is FT transition modelled target season?
+28. When does offensive FH beat defensive FH?
+
+WILDCARD
+--------
+29. What terminal-value model best values a rebuild?
+30. Which information events justify delay?
+31. What squad-mismatch metric is most predictive?
+32. How are early Wildcard structural priors calibrated?
+33. How does WC inventory interact with price/team value?
+
+COMPUTATION
+-----------
+34. Exact enumeration or beam search for chip schedules?
+35. Regression Monte Carlo or fitted value iteration?
+36. What schedule count/runtime is acceptable?
+37. When is MCTS/deep optimal stopping worth testing?
+38. How are future chip effects added without solver explosion?
+
+======================================================================
+39. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-14 — RANK, EFFECTIVE OWNERSHIP AND RISK STRATEGY
+
+DMFP-14 will alter the utility—not the legal chip mechanics—for:
+
+- captain differentials;
+- Triple Captain relative value;
+- Bench Boost/Free Hit upside;
+- chip timing against rivals;
+- final-rank probability.
+
+DMFP-13 remains the single source of:
+
+- chip inventory;
+- opportunity cost;
+- activation schedule;
+- captain/vice scoring;
+- generic chip effects;
+- chip interactions.
+
+======================================================================
+40. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-17
+
+- Unified ordinary captaincy and every chip.
+- Defined chips as finite exercise rights.
+- Added Bellman use-versus-hold opportunity cost.
+- Separated gross current gain from net policy value.
+- Added adaptive future opportunity model and perfect-information upper bound.
+- Added exact captain/vice effective score.
+- Added Triple Captain incremental distribution.
+- Added Bench Boost autosub overlap and bench capital cost.
+- Added Free Hit permanent-squad preservation value.
+- Added immediate/delayed Wildcard comparison and real-option value.
+- Added generic future-chip effect grammar.
+- Added chip inventory, expiry, duration and conflicts.
+- Added chip interaction/synergy/cannibalisation.
+- Added candidate schedule generation and multiple-stopping methods.
+- Added robust, conservative and upside modes.
+- Added output, explanations, tests, risks and source register.
+
+Future v1.0:
+- Sebastian approves opportunity-cost philosophy.
+- 2026/27 chips and rules are ACTIVE.
+- reference chip golden tests pass.
+- captain/vice exact evaluator passes.
+- schedule/continuation model backtested.
+- future-chip compiler synthetic tests pass.
+- DMFP-14 and production pipeline integration approved.
+
+END OF DOCUMENT

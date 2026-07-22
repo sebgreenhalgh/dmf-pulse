@@ -1,0 +1,205 @@
+{
+  "manifest_version": "1.0",
+  "generated_at": "2026-07-22T00:00:00Z",
+  "pack_id": "FND-001",
+  "documents": [
+    {
+      "document_id": "DMFP-00",
+      "filename": "DMFP-00_MASTER_ARCHITECTURE_AND_PRODUCT_DEFINITION.txt",
+      "sha256": "b003c63b392f43dcd2278333af5052ac3330f520b3506cd2a9a2b2d4a0b444a3",
+      "bytes": 98771,
+      "version": "0.9 (Research Baseline)",
+      "status": "Proposed controlling architecture for Sebastian approval",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-01",
+      "filename": "DMFP-01_RESEARCH_STANDARD_AND_EVIDENCE_REGISTER.txt",
+      "sha256": "07e35fcba49155e4fd6a149f513172ad72f31dc4aec231d8f9255ca3c2c5b9d6",
+      "bytes": 117021,
+      "version": "0.9 (Research Governance Baseline)",
+      "status": "Proposed controlling research standard for Sebastian approval",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-02",
+      "filename": "DMFP-02_FPL_RULES_SCORING_AND_SEASON_CONFIGURATION.txt",
+      "sha256": "7080479a784d57a334f0b3ed8c9bd465c89434729e5f7599f666c269bec11916",
+      "bytes": 107092,
+      "version": "0.9 (Pre-Launch Rules Architecture)",
+      "status": "PROPOSED — TARGET-SEASON RULESET BLOCKED PENDING 2026/27 FPL LAUNCH",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-03",
+      "filename": "DMFP-03_CANONICAL_DATA_MODEL_AND_IDENTIFIERS.txt",
+      "sha256": "f3ecc7bb990e4f3ae0dcedb06438e04cd5516b156c9130fdc542dcd09dcd58ab",
+      "bytes": 107465,
+      "version": "0.9 (Canonical Semantic Architecture)",
+      "status": "PROPOSED — READY FOR SCHEMA IMPLEMENTATION AFTER SEBASTIAN APPROVAL",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-04",
+      "filename": "DMFP-04_DATA_SOURCES_MARKETS_APIS_AND_LICENSING_ZERO_COST_v1.0.txt",
+      "sha256": "7a29960e3d6dba3f4ed0b4e0d5819e0d8e2ddbd70b79dcf6376b310b59368b85",
+      "bytes": 109820,
+      "version": "1.0 (Zero-Paid-Subscription Source Architecture)",
+      "status": "PROPOSED — ZERO-COST STACK SELECTED; SOURCE-RIGHTS AND PROOF-OF-ACCESS GATES REMAIN",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-05",
+      "filename": "DMFP-05_INGESTION_STORAGE_AND_DATA_QUALITY.txt",
+      "sha256": "de024be01f8e1fdd1bae259ffe9230508870830644da67dc61639cb70cd943dd",
+      "bytes": 96676,
+      "version": "0.9 (Temporal Integrity and Data Operations Baseline)",
+      "status": "PROPOSED — READY FOR IMPLEMENTATION AFTER SEBASTIAN APPROVAL",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-06",
+      "filename": "DMFP-06_ODDS_NORMALISATION_AND_MARKET_CONSENSUS.txt",
+      "sha256": "af171422026588db3e4f93301df3af686b3312cdd40dd0cf8c77b35174ec6e6c",
+      "bytes": 79029,
+      "version": "0.9 (Market Probability Core)",
+      "status": "PROPOSED — READY FOR IMPLEMENTATION AND PROSPECTIVE VALIDATION",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-07",
+      "filename": "DMFP-07_PLAYER_AVAILABILITY_START_AND_MINUTES_MODEL.txt",
+      "sha256": "e6c70afced2e702d99e321a424cec7fbf6c9fccbc91191717566f4aef66d2626",
+      "bytes": 82803,
+      "version": "0.9 (Joint Availability and Playing-Time Architecture)",
+      "status": "PROPOSED — READY FOR DATA AUDIT, BASELINE IMPLEMENTATION AND PROSPECTIVE VALIDATION",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-08",
+      "filename": "DMFP-08_FOOTBALL_EVENT_DISTRIBUTION_ENGINE.txt",
+      "sha256": "7cb378f26741d28e6b900530102dfdbd2286470c5b8920764792eb70834c18ff",
+      "bytes": 82581,
+      "version": "0.9 (Market-Constrained Coherent Match Simulation Architecture)",
+      "status": "PROPOSED — READY FOR BASELINE IMPLEMENTATION AND PROSPECTIVE VALIDATION",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-09",
+      "filename": "DMFP-09_FPL_POINTS_DISTRIBUTION_ENGINE.txt",
+      "sha256": "1b5ee04f0b57f604072b6536fc8e60be19a0590f101f095614639af7cedd36da",
+      "bytes": 74425,
+      "version": "0.9 (Joint Fantasy Scoring and Distribution Architecture)",
+      "status": "PROPOSED — PRE-LAUNCH RULE ACTIVATION BLOCKED PENDING 2026/27 FPL RULES",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-10",
+      "filename": "DMFP-10_UNCERTAINTY_SCENARIOS_AND_EARLY_SEASON_POLICY.txt",
+      "sha256": "5914251e325cd4b57f63413820c5d6a0612f6c33cbf73e7e003624d5faf6cf68",
+      "bytes": 88070,
+      "version": "0.9 (Sequential Decision and Robustness Architecture)",
+      "status": "PROPOSED — READY FOR POLICY IMPLEMENTATION AND BACKTEST CALIBRATION",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-11",
+      "filename": "DMFP-11_PRICE_CHANGE_AND_TEAM_VALUE_MODEL.txt",
+      "sha256": "32f831e4a249d10cd08323394a713fdd4084b297400503791e410f133184220e",
+      "bytes": 78300,
+      "version": "0.9 (Recurrent Price-Hazard and Transfer-Timing Architecture)",
+      "status": "PROPOSED — TARGET-SEASON CALIBRATION BLOCKED PENDING 2026/27 FPL LAUNCH",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-12",
+      "filename": "DMFP-12_SQUAD_TRANSFER_AND_LINEUP_OPTIMISER.txt",
+      "sha256": "cba15ba9c72ff68c0ea8dca6ac5cf9075bbb34eefca06e86060cf33f824a84f6",
+      "bytes": 94914,
+      "version": "0.9 (Central Multistage Decision Engine)",
+      "status": "PROPOSED — TARGET-SEASON RULE ACTIVATION AND SOLVER ACCEPTANCE REQUIRED",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-13",
+      "filename": "DMFP-13_CAPTAINCY_AND_CHIP_OPTIMISER.txt",
+      "sha256": "6d2a7df75b53e338f96924de64cc4d847ba2964cabe700641086cf9acc8144b0",
+      "bytes": 86905,
+      "version": "0.9 (Finite-Inventory Opportunity Allocation Architecture)",
+      "status": "PROPOSED — TARGET-SEASON CHIP ACTIVATION BLOCKED PENDING 2026/27 FPL LAUNCH",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-14",
+      "filename": "DMFP-14_RANK_EFFECTIVE_OWNERSHIP_AND_RISK_STRATEGY.txt",
+      "sha256": "e796772890db8e5f6ca9ab8d61605a60a87acf6c545a05ab82c9fc73ae99c6de",
+      "bytes": 85863,
+      "version": "0.9 (Competition Utility and Opponent-Modelling Architecture)",
+      "status": "PROPOSED — TARGET-SEASON COHORT AND RULE ACTIVATION REQUIRED",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-15",
+      "filename": "DMFP-15_BACKTESTING_CALIBRATION_AND_BENCHMARKS.txt",
+      "sha256": "0feec95bb9a3fb31b5ccc504699681a8170d7c349c18accefc6e3047ab9a15ed",
+      "bytes": 89447,
+      "version": "0.9 (Scientific Evaluation and Trust-Gate Architecture)",
+      "status": "PROPOSED — REQUIRED BEFORE ANY MODEL OR POLICY IS TRUSTED",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-16",
+      "filename": "DMFP-16_ORCHESTRATION_APIS_AND_DECISION_PIPELINE.txt",
+      "sha256": "0bf960b211f7f566ae30eed46f1f6b577606d9a8c9fd7229f122f10c64ad18f9",
+      "bytes": 79866,
+      "version": "0.9 (Production Control Plane and Decision-Run Architecture)",
+      "status": "PROPOSED — READY FOR IMPLEMENTATION AFTER RULE, SECURITY AND ACCEPTANCE SIGN-OFF",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-17",
+      "filename": "DMFP-17_OBSERVABILITY_REPRODUCIBILITY_SECURITY_COMPLIANCE.txt",
+      "sha256": "83fde67e17d8171c8305707c02b90838c7ad984f651f00636bb5a26d1ecd1486",
+      "bytes": 103478,
+      "version": "0.9 (Assurance, Security and Governance Baseline)",
+      "status": "PROPOSED — REQUIRED BEFORE PRODUCTION PUBLICATION",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-18",
+      "filename": "DMFP-18_DECISION_UI_REPORTING_AND_EXPLANATIONS.txt",
+      "sha256": "6b2efa3193e6aa123e63038956f06f72dc597ce2bd169130dcaab0c160a1cd0f",
+      "bytes": 83559,
+      "version": "0.9 (Decision Cockpit and Explanation Architecture)",
+      "status": "PROPOSED — READY FOR UX PROTOTYPING AND USABILITY VALIDATION",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-19",
+      "filename": "DMFP-19_CODEX_IMPLEMENTATION_ROADMAP_AND_ACCEPTANCE_TESTS.txt",
+      "sha256": "2b2aac2301956b367b8fbd7c98259ccc7e6edcc9c294038de4e79c8bcabb4691",
+      "bytes": 100282,
+      "version": "0.9 (Stage-Gated Vertical-Slice Delivery Plan)",
+      "status": "PROPOSED — IMPLEMENTATION AUTHORITY AFTER SEBASTIAN APPROVAL",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMFP-20",
+      "filename": "DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt",
+      "sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+      "bytes": 160816,
+      "version": "0.9 (Living Architecture Decision and Assumption Register)",
+      "status": "ACTIVE GOVERNANCE RECORD — AUTHORITATIVE AFTER SEBASTIAN APPROVAL",
+      "authority": "APPROVED_INPUT_FOR_FND-001"
+    },
+    {
+      "document_id": "DMF-PULSE-CODEX-PLAYBOOK",
+      "filename": "DMF_PULSE_CODEX_IMPLEMENTATION_PLAYBOOK_v1.txt",
+      "sha256": "43cf9f683c7c06740401e435b420e5372e43a8327fad616ce1e7b17f0344b893",
+      "bytes": 86551,
+      "version": "1.0",
+      "status": "PROPOSED IMPLEMENTATION OPERATING MANUAL",
+      "authority": "IMPLEMENTATION_GUIDANCE"
+    }
+  ]
+}

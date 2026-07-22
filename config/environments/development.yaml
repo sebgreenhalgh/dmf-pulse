@@ -1,0 +1,2 @@
+artifact_root: artifacts/development
+log_level: DEBUG

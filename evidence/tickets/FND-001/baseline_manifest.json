@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "git": {
+    "branch": "stage/A1/FND-001-foundation",
+    "head": "44e63a9f2acf6627912f9a0b6d5173553db0895f",
+    "remote": "https://github.com/sebgreenhalgh/dmf-pulse.git"
+  },
+  "repository_empty": true,
+  "schema_version": "1.0.0",
+  "ticket_id": "FND-001"
+}

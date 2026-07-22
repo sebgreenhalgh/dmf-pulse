@@ -1,0 +1,13 @@
+Perform a fresh read-only review of the exact active ticket diff and evidence. Do not edit files or rely on the implementer's conclusion.
+
+Review in this order:
+1. scope/authority and accepted/provisional status;
+2. configuration/reference-only secrets/redaction;
+3. clean-wheel installation and import purity;
+4. Windows/POSIX paths, subprocess timeout/truncation, clock and cleanup boundaries;
+5. evidence/hash/review-pack integrity and 20-file cap;
+6. test strength, negative cases, golden contracts, and false-success paths;
+7. approved dependency/lock/build provenance;
+8. CI least privilege, frozen reproducibility, and absence of production secrets.
+
+Report findings by severity (P0, P1, P2), with exact file and line plus a concrete failure scenario. Distinguish a material defect from a preference. Explicitly state whether any P0/P1 remains and whether human acceptance is still pending.

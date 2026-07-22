@@ -1,0 +1,3174 @@
+DMF PULSE — FPL POINTS DISTRIBUTION ENGINE
+==========================================
+
+Document ID: DMFP-09
+Version: 0.9 (Joint Fantasy Scoring and Distribution Architecture)
+Status: PROPOSED — PRE-LAUNCH RULE ACTIVATION BLOCKED PENDING 2026/27 FPL RULES
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Reference ruleset: Fantasy Premier League 2025/26, REFERENCE_ONLY
+Research cut-off: 16 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Upstream inputs:
+- DMFP-02 FPL rules, scoring and season configuration
+- DMFP-03 canonical players, fixtures, Gameweeks and model versions
+- DMFP-05 deadline-safe source and dataset bundles
+- DMFP-07 coherent lineups, minutes and substitutions
+- DMFP-08 coherent football-event scenarios
+
+Downstream consumers:
+- DMFP-12 squad, transfer, lineup and bench optimiser
+- DMFP-13 captaincy and chip optimiser
+- DMFP-14 rank, effective ownership and risk strategy
+- DMFP-15 backtesting, calibration and benchmarks
+- DMFP-18 decision reporting and explanations
+
+PURPOSE
+-------
+This document defines the engine that converts coherent football scenarios into
+complete Fantasy Premier League points distributions.
+
+For every player and Gameweek it must produce:
+
+- expected_points;
+- median_points;
+- points_variance;
+- probability_zero_points;
+- probability_5_plus;
+- probability_10_plus;
+- probability_15_plus;
+- selected_percentiles;
+- component_breakdown.
+
+It must also retain the joint simulation structure required by the optimiser.
+
+Components include:
+
+- appearance points;
+- goals;
+- assists;
+- clean sheets;
+- goalkeeper saves;
+- penalty saves;
+- defensive contributions;
+- goals-conceded deductions;
+- missed penalties;
+- yellow and red cards;
+- own goals;
+- Bonus Points System score;
+- awarded bonus points.
+
+The engine MUST NOT calculate expected FPL points by independently adding
+unrelated component means.
+
+It MUST transform each coherent simulated match path into one exact integer
+FPL outcome and then summarize the distribution over many coherent paths.
+
+GOVERNING PRINCIPLE
+-------------------
+FPL scoring is deterministic conditional on:
+
+- the official season ruleset;
+- player position;
+- official minutes;
+- on-pitch intervals;
+- goal and assist classifications;
+- match events;
+- all relevant players' BPS actions;
+- fixture and Gameweek membership.
+
+The uncertainty belongs in the football scenarios, not in hidden scoring
+heuristics.
+
+Therefore:
+
+    FOOTBALL SCENARIO
+    + IMMUTABLE RULESET
+    = EXACT SCENARIO-LEVEL FPL SCORE
+
+and:
+
+    DISTRIBUTION OF COHERENT SCENARIO SCORES
+    = PLAYER/GAMEWEEK FPL POINTS DISTRIBUTION
+
+CRITICAL PRE-LAUNCH STATUS
+--------------------------
+The official 2026/27 FPL game had not launched at the research cut-off.
+
+Consequently:
+
+1. No 2025/26 score, BPS, assist or defensive-contribution value is
+   authoritative for 2026/27.
+2. DMFP-09 MUST load the ACTIVE ruleset from DMFP-02.
+3. No scoring weight is hard-coded in this module.
+4. Production projections remain blocked until:
+   - official 2026/27 rules are captured;
+   - the BPS table is verified;
+   - assist rules are verified;
+   - defensive-contribution rules are verified;
+   - golden official examples pass;
+   - the target ruleset is ACTIVE.
+5. The 2025/26 values in this document are REFERENCE_ONLY implementation and
+   testing examples.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require a documented architecture decision.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE MODEL DECISION
+======================================================================
+
+0.1 SELECTED ARCHITECTURE
+-------------------------
+The production engine is a pure, scenario-level scoring transform followed by a
+weighted Monte Carlo distribution summarizer.
+
+For every DMFP-08 scenario:
+
+1. load exact active FPL rules;
+2. calculate fixture-level raw scoring components for every player;
+3. calculate full match BPS for every relevant player;
+4. rank all players and award bonus jointly;
+5. produce fixture-level integer FPL score and component vector;
+6. validate conservation/rule invariants;
+7. aggregate fixture scores into Gameweek totals using coherent multi-fixture
+   scenarios;
+8. summarize weighted player and joint distributions;
+9. estimate Monte Carlo error separately from football-model uncertainty;
+10. publish relational summaries and joint scenario artifacts.
+
+0.2 BONUS IS A JOINT MATCH PROBLEM
+----------------------------------
+Bonus is not a player-isolated expected value.
+
+For each simulated fixture:
+
+- compute BPS for every participant;
+- apply the same match context;
+- identify the match-winning goal;
+- apply pass-completion bands and all negative actions;
+- rank the complete BPS vector;
+- apply official competition-ranking tie rules;
+- award integer 0, 1, 2 or 3 bonus points, with more than three players
+  potentially receiving bonus when ties occur.
+
+Expected bonus is then:
+
+    E[bonus_i]
+      =
+      sum_s weight_s x awarded_bonus_i,s
+
+The engine MUST NOT:
+
+- predict bonus from one player's expected BPS alone;
+- rank expected BPS values;
+- add a fixed "bonus likelihood" independently;
+- ignore teammates and opponents;
+- award exactly three players in every scenario.
+
+0.3 SCENARIO OUTPUT, NOT ONLY MARGINALS
+---------------------------------------
+The optimiser receives:
+
+- player marginal PMFs;
+- full player-by-scenario Gameweek points matrix;
+- scenario weights;
+- component matrices where required;
+- covariance/correlation summaries;
+- threshold probabilities;
+- Monte Carlo error.
+
+This preserves:
+
+- teammates competing for goals/assists/bonus;
+- goalkeeper/defender clean-sheet correlation;
+- attacker versus opposing defender negative dependence;
+- scorer–assister positive dependence;
+- card/bonus negative dependence;
+- Double Gameweek dependence;
+- captaincy upside and downside.
+
+0.4 MONTE CARLO POLICY
+----------------------
+Initial defaults:
+
+Development:
+10,000 effective scenarios per fixture.
+
+Normal production:
+50,000 effective scenarios.
+
+Priority fixtures/players:
+100,000 effective scenarios.
+
+Close optimiser decision or chip/captaincy analysis:
+adaptively increase to 250,000 or until precision gates pass.
+
+The effective number of scenarios is based on weights:
+
+    ESS = (sum w)^2 / sum(w^2)
+
+A run does not pass simply because its raw row count is large.
+
+0.5 PRECISION POLICY
+--------------------
+For priority players, proposed stopping targets:
+
+- Monte Carlo SE of expected points <= 0.02;
+- absolute SE of P(10+) <= 0.003;
+- percentile/quantile uncertainty reported and stable under batch resampling;
+- probability/mean change below configured tolerance over successive batches.
+
+These control simulation noise only.
+They do not imply the football model is accurate to 0.02 points.
+
+0.6 GAMEWEEK AGGREGATION
+------------------------
+A Blank Gameweek:
+all player Gameweek points are zero unless the player has another fixture
+officially assigned to that Gameweek.
+
+A Double/Multiple Gameweek:
+sum fixture scores within the same coherent Gameweek scenario.
+
+Do not independently convolve marginal fixture PMFs when:
+
+- injury in fixture one can affect fixture two;
+- suspension/card consequences can affect fixture two;
+- rotation/readiness states are shared;
+- manager/player latent effects are shared.
+
+0.7 CAPTAINCY AND CHIPS
+-----------------------
+DMFP-09 outputs raw player Gameweek points.
+
+It does NOT apply:
+
+- captain;
+- vice-captain fallback;
+- Triple Captain;
+- Bench Boost;
+- automatic substitutions;
+- transfer hits.
+
+Those are manager-state transformations in DMFP-12/13, applied to the same
+scenario matrix so dependence is preserved.
+
+======================================================================
+1. FORMAL DEFINITION
+======================================================================
+
+1.1 FIXTURE SCORE
+-----------------
+For player i, fixture f and coherent scenario s:
+
+    X_i,f,s
+      =
+        APP_i,f,s
+      + GOAL_i,f,s
+      + AST_i,f,s
+      + CS_i,f,s
+      + SAVE_i,f,s
+      + PEN_SAVE_i,f,s
+      + DEFCON_i,f,s
+      + GC_i,f,s
+      + PEN_MISS_i,f,s
+      + YC_i,f,s
+      + RC_i,f,s
+      + OG_i,f,s
+      + BONUS_i,f,s
+
+Each component is an integer under the active ruleset.
+
+1.2 GAMEWEEK SCORE
+------------------
+For fixtures F_g officially assigned to Gameweek g:
+
+    X_i,g,s
+      =
+      sum_{f in F_g} X_i,f,s
+
+The scenario assembly must preserve shared uncertainty across fixtures.
+
+1.3 WEIGHTED DISTRIBUTION
+-------------------------
+For scenario weights w_s normalized to sum one:
+
+    P(X_i,g = x)
+      =
+      sum_s w_s 1[X_i,g,s = x]
+
+Expected points:
+
+    E[X_i,g] = sum_s w_s X_i,g,s
+
+Variance:
+
+    Var(X_i,g)
+      =
+      sum_s w_s (X_i,g,s - E[X_i,g])^2
+
+1.4 MEDIAN AND QUANTILES
+------------------------
+Use the weighted discrete inverse CDF:
+
+    Q(alpha)
+      =
+      min{x : F(x) >= alpha}
+
+Record this convention.
+
+1.5 THRESHOLD PROBABILITY
+-------------------------
+For threshold t:
+
+    P(X_i,g >= t)
+      =
+      sum_s w_s 1[X_i,g,s >= t]
+
+1.6 COMPONENT EXPECTATION
+-------------------------
+For component c:
+
+    E[X_i,g,c]
+      =
+      sum_s w_s X_i,g,s,c
+
+Scenario-level component sum must equal the total exactly.
+
+1.7 COMPONENT COVARIANCE
+------------------------
+Components are dependent.
+
+Example:
+
+    Cov(GOAL_POINTS, BONUS) > 0
+
+The total variance is:
+
+    Var(sum_c X_c)
+      =
+      sum_c Var(X_c)
+      + 2 sum_{c<d} Cov(X_c, X_d)
+
+The engine SHOULD expose component covariance for diagnostics rather than imply
+component variances add independently.
+
+======================================================================
+2. INPUT CONTRACT
+======================================================================
+
+2.1 RULESET
+-----------
+From DMFP-02:
+
+- scoring weights;
+- minute thresholds;
+- clean-sheet policy;
+- assist policy;
+- defensive-contribution thresholds/caps;
+- BPS table;
+- bonus tie policy;
+- goals-conceded rule;
+- card/own-goal/penalty rules;
+- Gameweek/fixture assignment.
+
+2.2 PLAYER/FIXTURE IDENTITY
+---------------------------
+From DMFP-03:
+
+- player;
+- FPL player-season position;
+- fixture;
+- Gameweek;
+- team membership;
+- source/mapping version.
+
+2.3 EVENT SCENARIOS
+-------------------
+From DMFP-08:
+
+- final score;
+- event timeline;
+- on-pitch intervals;
+- goals and mechanisms;
+- scorer;
+- candidate/official assist chain;
+- shots and locations;
+- goalkeeper saves;
+- penalties;
+- cards;
+- own goals;
+- defensive actions;
+- BPS-relevant auxiliary events;
+- scenario weight;
+- source/model lineage.
+
+2.4 MINUTE/LINEUP SCENARIOS
+---------------------------
+From DMFP-07:
+
+- starters;
+- substitutes;
+- entry/exit time;
+- official-minute target;
+- dismissals;
+- availability;
+- coherent Gameweek paths.
+
+2.5 INFORMATION CUTOFF
+----------------------
+Every source/model input must belong to the live deadline bundle.
+
+2.6 REQUIRED PARTICIPANT UNIVERSE
+---------------------------------
+For bonus calculation, include every player who can have a nonzero BPS in the
+fixture under the active rules.
+
+Normally this means all simulated participants for both teams.
+
+Do not score bonus only for FPL-relevant shortlisted players.
+
+======================================================================
+3. OUTPUT CONTRACT
+======================================================================
+
+3.1 REQUIRED PLAYER/GAMEWEEK FIELDS
+-----------------------------------
+- expected_points;
+- median_points;
+- points_variance;
+- points_standard_deviation;
+- probability_negative_points;
+- probability_zero_points;
+- probability_1_plus;
+- probability_2_plus;
+- probability_5_plus;
+- probability_10_plus;
+- probability_15_plus;
+- selected_percentiles;
+- component_breakdown;
+- Monte Carlo error;
+- scenario effective sample size;
+- confidence grade;
+- ruleset/model/source lineage.
+
+3.2 SELECTED PERCENTILES
+------------------------
+Default:
+
+- p01;
+- p05;
+- p10;
+- p25;
+- p50;
+- p75;
+- p90;
+- p95;
+- p99.
+
+User-facing minimum:
+
+- p10;
+- p25;
+- p50;
+- p75;
+- p90.
+
+3.3 COMPONENT BREAKDOWN
+-----------------------
+For each component:
+
+- expected points;
+- probability nonzero;
+- minimum/maximum;
+- variance;
+- selected quantiles where useful;
+- covariance contribution diagnostics.
+
+Components:
+
+APPEARANCE
+GOALS
+ASSISTS
+CLEAN_SHEET
+SAVES
+PENALTY_SAVES
+DEFENSIVE_CONTRIBUTIONS
+GOALS_CONCEDED
+PENALTY_MISSES
+YELLOW_CARDS
+RED_CARDS
+OWN_GOALS
+BONUS
+
+3.4 BPS/BONUS OUTPUT
+--------------------
+- expected BPS;
+- BPS median/quantiles;
+- BPS variance;
+- P(bonus 0);
+- P(bonus 1);
+- P(bonus 2);
+- P(bonus 3);
+- expected bonus;
+- probability any bonus;
+- expected BPS rank;
+- probability rank 1/2/3;
+- tie probability;
+- BPS completeness mode.
+
+3.5 JOINT OUTPUT
+----------------
+For every fixture/Gameweek scenario artifact:
+
+- scenario ID;
+- weight;
+- player ID;
+- component points;
+- total points;
+- BPS;
+- bonus;
+- fixture/Gameweek;
+- ruleset hash;
+- upstream scenario ID.
+
+3.6 EXAMPLE SUMMARY
+-------------------
+{
+  "player_gameweek_projection_id": "uuid",
+  "player_id": "uuid",
+  "gameweek_id": "uuid",
+  "as_of_utc": "timestamp",
+  "information_cutoff_utc": "timestamp",
+
+  "expected_points": 6.34,
+  "median_points": 5,
+  "points_variance": 24.82,
+  "points_standard_deviation": 4.982,
+
+  "probability_negative_points": 0.006,
+  "probability_zero_points": 0.082,
+  "probability_5_plus": 0.493,
+  "probability_10_plus": 0.192,
+  "probability_15_plus": 0.057,
+
+  "selected_percentiles": {
+    "p05": 0,
+    "p10": 1,
+    "p25": 2,
+    "p50": 5,
+    "p75": 9,
+    "p90": 13,
+    "p95": 17
+  },
+
+  "component_breakdown": {
+    "appearance": 1.74,
+    "goals": 2.31,
+    "assists": 0.83,
+    "clean_sheet": 0.34,
+    "saves": 0.00,
+    "penalty_saves": 0.00,
+    "defensive_contributions": 0.18,
+    "goals_conceded": -0.06,
+    "penalty_misses": -0.03,
+    "yellow_cards": -0.09,
+    "red_cards": -0.01,
+    "own_goals": -0.01,
+    "bonus": 1.14
+  },
+
+  "bonus_distribution": {
+    "p0": 0.55,
+    "p1": 0.11,
+    "p2": 0.13,
+    "p3": 0.21
+  },
+
+  "monte_carlo": {
+    "raw_scenarios": 100000,
+    "effective_sample_size": 94311,
+    "mean_standard_error": 0.016,
+    "p10_plus_standard_error": 0.0013
+  },
+
+  "ruleset_hash": "...",
+  "projection_run_id": "uuid",
+  "source_bundle_id": "uuid",
+  "code_commit": "..."
+}
+
+======================================================================
+4. SCORING TRANSFORM ARCHITECTURE
+======================================================================
+
+4.1 PURE FUNCTION
+-----------------
+The scoring function:
+
+- performs no web/API call;
+- reads no current global season;
+- uses no fitted player model;
+- uses no LLM;
+- receives exact ruleset and scenario;
+- returns exact integer components;
+- is deterministic.
+
+4.2 FIXTURE ORDER
+-----------------
+For each scenario:
+
+1. validate fixture/event coherence;
+2. derive official FPL minutes;
+3. score appearance;
+4. score goals;
+5. classify and score FPL assists;
+6. score clean sheets;
+7. score saves;
+8. score penalty saves;
+9. score defensive contributions;
+10. score goals conceded;
+11. score missed penalties;
+12. score cards;
+13. score own goals;
+14. calculate BPS for every participant;
+15. allocate bonus jointly;
+16. add total;
+17. run scoring invariants.
+
+4.3 PLAYER POSITION
+-------------------
+Use target-season FPL position from PlayerFPLSeason.
+
+Do not use tactical role.
+
+4.4 INTEGER ARITHMETIC
+----------------------
+All scenario-level FPL points and BPS are integers.
+
+Summaries are floating-point/decimal weighted statistics.
+
+4.5 RULE IDS
+------------
+Every component records applied rule IDs.
+
+======================================================================
+5. APPEARANCE POINTS
+======================================================================
+
+5.1 INPUT
+---------
+Official simulated FPL minute count per fixture.
+
+5.2 ACTIVE RULE
+---------------
+Load configured minute bands.
+
+REFERENCE_ONLY 2025/26:
+
+- 1–59 minutes: 1 point;
+- 60+ minutes: 2 points;
+- stoppage excluded from threshold.
+
+5.3 SCENARIO
+------------
+A player can receive appearance points in each fixture of a Double Gameweek.
+
+5.4 EDGE CASES
+--------------
+- zero minutes;
+- exact 60;
+- goalkeeper substitution;
+- dismissal;
+- abandoned fixture;
+- official-minute rounding;
+- player entering before minute 30 and reaching 60 official minutes.
+
+5.5 OUTPUT
+----------
+Integer per fixture.
+
+======================================================================
+6. GOAL POINTS
+======================================================================
+
+6.1 INPUT
+---------
+Credited player goals from DMFP-08.
+
+Own goals are excluded.
+
+6.2 ACTIVE RULE
+---------------
+Position-specific point value from DMFP-02.
+
+REFERENCE_ONLY 2025/26:
+
+- GK 10;
+- DEF 6;
+- MID 5;
+- FWD 4.
+
+6.3 PENALTIES
+-------------
+Ordinary FPL goal points use position value unless target rules say otherwise.
+
+Penalty status affects BPS separately.
+
+6.4 MULTIPLE GOALS
+------------------
+Linear:
+
+    goal_points = goal_count x position_goal_value
+
+6.5 CONSISTENCY
+--------------
+Credited player goal count must match DMFP-08 team-goal allocation.
+
+======================================================================
+7. FPL ASSIST CLASSIFICATION
+======================================================================
+
+7.1 WHY SEPARATE
+----------------
+Provider assists and FPL assists can differ.
+
+DMFP-08 preserves a goal chain.
+DMFP-09 applies the target-season FPL assist policy.
+
+7.2 REFERENCE 2025/26
+---------------------
+Official reference rules included:
+
+- final pass/touch;
+- one defensive touch under specified conditions;
+- intended destination conditions outside the box;
+- rebound from block/save/woodwork;
+- forced own goal;
+- foul won for directly scored penalty/free kick;
+- no assist when the taker won the same foul;
+- no assist when scorer loses and regains possession.
+
+7.3 GOAL-CHAIN FIELDS
+---------------------
+Required where relevant:
+
+- scoring team;
+- scorer;
+- final attacking actor;
+- action type;
+- intended destination;
+- scorer receipt location;
+- defensive touches;
+- defensive action types;
+- possession loss/regain;
+- shot/rebound;
+- woodwork/save/block;
+- own-goal forcing action;
+- penalty/free-kick winner;
+- taker;
+- direct score;
+- source/model uncertainty.
+
+7.4 CLASSIFICATION STATES
+-------------------------
+DEFINITE_ASSIST
+DEFINITE_NO_ASSIST
+AMBIGUOUS_ASSIST
+
+7.5 AMBIGUOUS SIMULATION
+------------------------
+When the scenario lacks deterministic detail:
+
+- sample assist eligibility from a calibrated classifier;
+- retain probability/source;
+- never apply a blanket provider-assist conversion;
+- incorporate classification uncertainty into FPL distribution.
+
+7.6 POINTS
+----------
+Load configured assist value.
+
+REFERENCE_ONLY:
+3 points.
+
+7.7 CONSISTENCY
+--------------
+At most one FPL assist per goal under the target rules unless the official game
+changes.
+
+Scorer cannot receive the assist for the same goal.
+
+======================================================================
+8. CLEAN SHEET POINTS
+======================================================================
+
+8.1 INPUT
+---------
+- player position;
+- official minutes;
+- on-pitch interval;
+- team goals conceded timeline;
+- substitution/dismissal;
+- active clean-sheet policy.
+
+8.2 REFERENCE 2025/26
+---------------------
+- GK/DEF: 4;
+- MID: 1;
+- FWD: 0;
+- minimum 60;
+- substituted player retains clean sheet if no goal conceded while on pitch;
+- target-season red-card exception loaded from rules.
+
+8.3 FIXTURE-LEVEL
+----------------
+Score separately per fixture.
+
+8.4 ZERO-GOAL CONSISTENCY
+-------------------------
+Team clean-sheet outcome comes from DMFP-08 score path.
+
+Player clean-sheet points depend on eligibility and interval.
+
+8.5 RED CARD
+-------------
+Apply exact active rule for subsequent goals conceded.
+
+Do not infer normal substitution treatment.
+
+======================================================================
+9. GOALKEEPER SAVES AND PENALTY SAVES
+======================================================================
+
+9.1 ORDINARY SAVES
+------------------
+Input:
+canonical goalkeeper save count.
+
+Load group size and point value.
+
+REFERENCE_ONLY:
+1 point per complete 3 saves.
+
+9.2 PENALTY SAVE
+----------------
+Input:
+penalty result and on-pitch goalkeeper.
+
+REFERENCE_ONLY:
+5 points each.
+
+9.3 DOUBLE COUNTING
+-------------------
+Whether a penalty save is also present in ordinary save count is defined by the
+event source/rules mapping.
+
+The scenario must not accidentally duplicate or omit it.
+
+9.4 MULTIPLE KEEPERS
+--------------------
+Allocate save events by on-pitch interval.
+
+9.5 OUTPUT
+----------
+Separate ordinary save and penalty-save components.
+
+======================================================================
+10. DEFENSIVE-CONTRIBUTION POINTS
+======================================================================
+
+10.1 INPUT
+----------
+Canonical per-player defensive events by fixture:
+
+- clearances;
+- blocks;
+- interceptions;
+- tackles;
+- recoveries where position rules include them.
+
+10.2 REFERENCE 2025/26
+----------------------
+Defender:
+
+    CBIT >= 10 -> 2 points
+
+Midfielder/forward:
+
+    CBIRT >= 12 -> 2 points
+
+Cap:
+2 points per fixture.
+
+10.3 NONLINEAR THRESHOLD
+------------------------
+Expected defensive-event count cannot be converted by:
+
+    2 x 1[E[count] >= threshold]
+
+Correct:
+
+    E[defcon points]
+      =
+      2 x P(count >= threshold)
+
+under reference rules.
+
+Scenario-level thresholding is mandatory.
+
+10.4 DOUBLE GAMEWEEK
+--------------------
+Cap applies per fixture, so a player can receive the reward in multiple fixtures.
+
+10.5 PROVIDER DEFINITION
+------------------------
+DMFP-08 event mapping uncertainty propagates into threshold probability.
+
+======================================================================
+11. GOALS-CONCEDED DEDUCTIONS
+======================================================================
+
+11.1 INPUT
+----------
+- position;
+- goals conceded under player-on-pitch/red-card policy;
+- active rules.
+
+11.2 REFERENCE 2025/26
+----------------------
+GK/DEF:
+
+    -1 for each complete pair of goals conceded.
+
+Scenario formula:
+
+    -floor(goals_conceded_count / 2)
+
+11.3 PLAYER-SPECIFIC
+--------------------
+The player count may differ from the team's full match count due substitution.
+
+11.4 RED CARD
+-------------
+Apply exact target-season exception.
+
+11.5 COMPONENT
+--------------
+Report separately from clean-sheet points.
+
+======================================================================
+12. NEGATIVE EVENTS
+======================================================================
+
+12.1 MISSED PENALTY
+-------------------
+REFERENCE_ONLY:
+-2 per miss.
+
+12.2 YELLOW CARD
+----------------
+REFERENCE_ONLY:
+-1.
+
+12.3 RED CARD
+-------------
+REFERENCE_ONLY:
+-3, with official yellow/red interaction from rules.
+
+12.4 OWN GOAL
+-------------
+REFERENCE_ONLY:
+-2.
+
+12.5 COMBINATION
+----------------
+Components combine unless active rules specify exclusion.
+
+12.6 TIMELINE
+-------------
+An event after a player leaves the pitch is invalid upstream.
+
+======================================================================
+13. BONUS POINTS SYSTEM — DEDICATED JOINT SUBSYSTEM
+======================================================================
+
+13.1 WHY BONUS IS DIFFICULT
+---------------------------
+Bonus depends on:
+
+- every participating player's actions;
+- position;
+- minutes;
+- scoreline;
+- match-winning goal;
+- pass volume/completion;
+- save location;
+- errors;
+- cards;
+- defensive events;
+- ties.
+
+A player's bonus distribution can change when a teammate or opponent changes,
+even if the player's own event distribution is unchanged.
+
+13.2 BPS VERSUS BONUS
+---------------------
+BPS:
+integer performance score.
+
+Bonus:
+FPL points awarded after ranking BPS.
+
+They are separate outputs.
+
+13.3 REFERENCE 2025/26 BPS TABLE
+--------------------------------
+REFERENCE_ONLY official values:
+
+Positive:
+
+- playing 1–60 minutes: 3;
+- playing over 60: 6;
+- goal direct from penalty: 12;
+- nonpenalty goal by GK/DEF: 12;
+- nonpenalty goal by MID: 18;
+- nonpenalty goal by FWD: 24;
+- assist: 9;
+- GK/DEF clean sheet: 12;
+- penalty save: 8;
+- save from shot inside box: 3;
+- save from shot outside box: 2;
+- successful open-play cross: 1;
+- big chance created: 3;
+- every two clearances, blocks and interceptions: 1;
+- every three recoveries: 1;
+- key pass: 1;
+- successful tackle: 2;
+- successful dribble: 1;
+- match-winning goal: 3;
+- goal-line clearance: 9;
+- foul won: 1;
+- shot on target: 2;
+- 70–79% pass completion with at least 30 attempts: 2;
+- 80–89% with at least 30 attempts: 4;
+- 90%+ with at least 30 attempts: 6.
+
+Negative:
+
+- GK/DEF conceding a goal: -4;
+- conceding a penalty: -3;
+- penalty miss: -6;
+- yellow card: -3;
+- red card: -9;
+- own goal: -6;
+- big chance missed: -3;
+- error leading to goal: -3;
+- error leading to attempt: -1;
+- being tackled: -1;
+- foul conceded: -1;
+- offside: -1;
+- shot off target: -1.
+
+13.4 MUTUALLY EXCLUSIVE EVENTS
+------------------------------
+Penalty goal:
+
+- apply penalty-goal BPS;
+- do not also apply position nonpenalty-goal BPS.
+
+Pass-completion bands:
+apply one highest matching band only.
+
+Appearance bands:
+apply one matching band only.
+
+Penalty save reference:
+official explanation says penalty-save BPS and inside-box-save BPS can both
+apply, giving 11 total BPS for that action under 2025/26.
+
+13.5 GROUPED ACTIONS
+--------------------
+Use integer floor groups exactly:
+
+    floor((clearances + blocks + interceptions) / 2) x configured BPS
+
+    floor(recoveries / 3) x configured BPS
+
+13.6 MATCH-WINNING GOAL
+-----------------------
+Use the active rule and event timeline to identify the decisive goal.
+
+The goal-event timeline is required.
+Do not approximate from scorer and final score alone when multiple goals exist.
+
+13.7 CLEAN SHEET BPS
+--------------------
+Apply active position and minute eligibility.
+
+13.8 GOALS CONCEDED BPS
+-----------------------
+Apply per configured goal and on-pitch/red-card semantics.
+
+13.9 COMPLETE BPS EVENT VECTOR
+------------------------------
+For every player/scenario:
+
+- minutes;
+- goal type;
+- assists;
+- clean sheet;
+- penalty saves;
+- save locations;
+- crosses;
+- big chances created/missed;
+- CBI;
+- recoveries;
+- key passes;
+- tackles;
+- dribbles;
+- match-winning goal;
+- goal-line clearances;
+- fouls won/conceded;
+- SOT/off-target;
+- pass attempts/completions;
+- penalties conceded/missed;
+- cards;
+- own goals;
+- errors;
+- tackled count;
+- offsides;
+- goals conceded.
+
+13.10 BPS COMPLETENESS MODES
+----------------------------
+FULL_EVENT:
+All configured BPS actions are explicitly simulated.
+
+HYBRID_AUXILIARY:
+Core DMFP-08 events plus dedicated auxiliary BPS event models.
+
+HYBRID_RESIDUAL:
+Core explicit BPS plus a residual BPS distribution for omitted actions.
+
+OFFICIAL_RECONCILIATION:
+Historical official BPS is used as the outcome label.
+
+Production target:
+FULL_EVENT or HYBRID_AUXILIARY.
+
+Initial fallback:
+HYBRID_RESIDUAL with visible uncertainty.
+
+======================================================================
+14. BPS AUXILIARY AND RESIDUAL MODELS
+======================================================================
+
+14.1 WHY REQUIRED
+-----------------
+DMFP-08 may initially lack complete simulation of:
+
+- passes;
+- crosses;
+- key passes;
+- dribbles;
+- fouls;
+- offsides;
+- errors;
+- big chances;
+- being tackled.
+
+Ignoring them biases bonus probabilities.
+
+14.2 PREFERRED AUXILIARY MODEL
+------------------------------
+Model missing event counts coherently using:
+
+- player role;
+- minutes;
+- team possession;
+- match dominance;
+- score state;
+- opponent;
+- latent tempo;
+- historical rates;
+- team/player allocation.
+
+14.3 PASS MODEL
+---------------
+Simulate:
+
+- attempts;
+- completions;
+- completion percentage;
+- minimum-attempt threshold.
+
+Pass completion band must be calculated from integer attempts/completions.
+
+14.4 NEGATIVE ACTION MODEL
+--------------------------
+Cards/shots already linked where possible.
+
+Model:
+
+- offsides;
+- fouls;
+- being tackled;
+- errors;
+- big-chance misses.
+
+Use hierarchical count/rare-event distributions.
+
+14.5 RESIDUAL DEFINITION
+------------------------
+Historical:
+
+    BPS_residual
+      =
+      official_BPS
+      - explicitly_reconstructed_BPS
+
+Fit residual conditional on:
+
+- role;
+- minutes;
+- score;
+- possession;
+- explicit events;
+- team;
+- player;
+- manager/context.
+
+14.6 RESIDUAL CORRELATION
+-------------------------
+Residuals cannot be independent by player.
+
+Use shared:
+
+- team possession/pass factor;
+- match tempo;
+- referee/discipline factor;
+- player role effects.
+
+14.7 DOUBLE COUNTING
+--------------------
+The residual target and production explicit event set MUST share the same
+version.
+
+When an event becomes explicitly modelled, remove it from residual training and
+release a new BPS model version.
+
+14.8 RESIDUAL INTEGER
+---------------------
+BPS is integer.
+Residual simulation should yield integer BPS or be discretised under a declared
+model.
+
+14.9 CONFIDENCE
+----------------
+HYBRID_RESIDUAL lowers bonus confidence and widens FPL point intervals.
+
+======================================================================
+15. BONUS ALLOCATION AND TIES
+======================================================================
+
+15.1 STANDARD COMPETITION RANK
+------------------------------
+Sort players by BPS descending.
+
+Group equal BPS.
+
+Maintain competition rank:
+
+    rank starts at 1
+
+For a tie group of size g:
+
+- every player receives the award for the group's starting rank;
+- next rank += g.
+
+Award mapping under reference rules:
+
+- rank 1 -> 3;
+- rank 2 -> 2;
+- rank 3 -> 1;
+- rank >=4 -> 0.
+
+15.2 EXAMPLES
+-------------
+No tie:
+
+- ranks 1/2/3 receive 3/2/1.
+
+Two tied first:
+
+- both rank 1 receive 3;
+- next player rank 3 receives 1.
+
+Three tied first:
+
+- all receive 3;
+- next rank is 4, no further bonus.
+
+Tie second:
+
+- first receives 3;
+- tied rank-2 players receive 2;
+- next rank after tie may be 4 or greater.
+
+Tie third:
+
+- first 3;
+- second 2;
+- all rank-3 tied players 1.
+
+Two tied first and three tied at next BPS:
+
+- two receive 3;
+- next group starts at rank 3;
+- all three receive 1.
+
+15.3 MORE THAN THREE RECIPIENTS
+-------------------------------
+Supported by design.
+
+15.4 NEGATIVE/ZERO BPS
+----------------------
+If the top three competition ranks have zero or negative BPS, the official rank
+rule still controls unless target-season rules specify a threshold.
+
+Do not invent a minimum BPS threshold.
+
+15.5 PARTICIPANT LIST
+---------------------
+Players with BPS under active rules must be included, including substitutes who
+appeared.
+
+15.6 EXACT INTEGER TIES
+-----------------------
+BPS is integer, so tie comparison is exact.
+No floating-point tolerance for final BPS.
+
+======================================================================
+16. BONUS DISTRIBUTION AND EDGE
+======================================================================
+
+16.1 SCENARIO DISTRIBUTION
+--------------------------
+For player i:
+
+    P(B_i=b)
+      =
+      sum_s w_s 1[bonus_i,s=b]
+
+for b in {0,1,2,3} under reference rules.
+
+16.2 EXPECTED BONUS
+-------------------
+    E[B_i] = sum_b b P(B_i=b)
+
+16.3 NONLINEARITY
+-----------------
+Generally:
+
+    bonus(E[BPS vector])
+    != E[bonus(BPS vector)]
+
+Therefore ranking expected BPS is invalid.
+
+16.4 PLAYER COMPETITION EFFECT
+------------------------------
+Examples:
+
+- a high-BPS teammate lowers player's bonus probability;
+- opposing goalkeeper save volume changes all ranks;
+- a defender clean sheet creates clustered BPS competition;
+- penalty goals can be less BPS-dominant than nonpenalty forward goals under
+  reference rules;
+- one late yellow can change multiple players' bonus.
+
+16.5 BONUS CORRELATION
+----------------------
+Bonus points within a match are constrained and often negatively dependent
+across players, but ties can create shared positive awards.
+
+The joint scenario matrix captures this.
+
+======================================================================
+17. FIXTURE-LEVEL POINT DISTRIBUTION
+======================================================================
+
+17.1 EMPIRICAL WEIGHTED PMF
+---------------------------
+For each player/fixture:
+
+- point support;
+- weighted probability;
+- component support;
+- BPS/bonus.
+
+17.2 NEGATIVE SUPPORT
+---------------------
+FPL points can be negative.
+Do not truncate at zero.
+
+17.3 TAIL
+---------
+Rare high scores must remain represented.
+
+Adaptive simulation or analytic conditional calculations can improve rare-tail
+precision.
+
+17.4 PMF STORAGE
+----------------
+Relational summary:
+
+- min/max;
+- probability map for common support;
+- artifact URI/hash for full weighted samples/PMF.
+
+======================================================================
+18. GAMEWEEK SCENARIO ASSEMBLY
+======================================================================
+
+18.1 SINGLE FIXTURE
+-------------------
+Gameweek score equals fixture score.
+
+18.2 BLANK
+----------
+No fixture:
+point mass at zero.
+
+18.3 DOUBLE/MULTIPLE FIXTURE
+----------------------------
+Gameweek scenario includes all assigned fixtures.
+
+18.4 SHARED LATENT VARIABLES
+----------------------------
+Across fixtures preserve:
+
+- player baseline ability;
+- manager rotation style;
+- injury/readiness;
+- team regime;
+- penalty/set-piece hierarchy;
+- model parameter draw.
+
+18.5 SEQUENTIAL STATE TRANSITION
+--------------------------------
+Fixture one can affect fixture two through:
+
+- injury;
+- dismissal/suspension if applicable under competition timing;
+- fatigue/readiness;
+- minutes load;
+- tactical information only if the simulation represents the real future
+  timeline.
+
+For predeadline Gameweek prediction, simulate the sequence prospectively.
+
+18.6 FIXTURE INDEPENDENCE FALLBACK
+----------------------------------
+If no cross-fixture transition model is implemented:
+
+- share model parameter draws;
+- combine fixture event scenarios conditionally;
+- label remaining independence approximation;
+- widen uncertainty.
+
+Do not perform naive convolution and call it fully coherent.
+
+18.7 GAMEWEEK BONUS
+-------------------
+Bonus is calculated per fixture, then summed.
+
+======================================================================
+19. JOINT PLAYER DISTRIBUTIONS
+======================================================================
+
+19.1 WHY
+--------
+Squad decisions depend on joint outcomes.
+
+Examples:
+
+- two defenders from same team;
+- goalkeeper plus defender;
+- attacker plus teammate assister;
+- attacker against owned defender;
+- alternative captains;
+- bench coverage.
+
+19.2 SCENARIO MATRIX
+--------------------
+For Gameweek g:
+
+    X_g
+      =
+      N_scenarios x N_players integer matrix
+
+with weight vector.
+
+19.3 COVARIANCE
+----------------
+Weighted:
+
+    Cov(X_i, X_j)
+
+Report selected pairs and squad submatrices.
+
+19.4 CORRELATION EDGE CASE
+--------------------------
+If a player has zero variance, correlation is undefined.
+Store covariance and null correlation with reason.
+
+19.5 STORAGE
+-------------
+Parquet:
+
+- scenario rows;
+- player columns or long format;
+- weights;
+- component matrices optionally;
+- source/model/rules hashes.
+
+Choose wide versus long after benchmark.
+
+19.6 OPTIMISER API
+------------------
+Return scenario subset for candidate player pool plus deterministic mapping.
+
+Do not load all historical players into every optimiser run unnecessarily.
+
+======================================================================
+20. MONTE CARLO ENGINE
+======================================================================
+
+20.1 RANDOMNESS
+---------------
+Use approved counter-based/random-stream design.
+
+Each scenario has deterministic substreams:
+
+- lineup/minutes;
+- score;
+- goals/assists;
+- shots/saves;
+- penalties/cards;
+- defensive events;
+- BPS auxiliary;
+- FPL assist ambiguity.
+
+20.2 COMMON RANDOM NUMBERS
+--------------------------
+Use common random numbers when comparing:
+
+- model versions;
+- ruleset sensitivity;
+- transfer alternatives;
+- captain choices;
+- chip policies.
+
+This often reduces variance of differences.
+
+However, research shows common random numbers can sometimes increase variance
+when induced correlation is unfavourable.
+
+Monitor variance of paired differences; allow disabling by module/comparison.
+
+20.3 WEIGHTED SCENARIOS
+-----------------------
+If DMFP-08 uses importance/scenario weights:
+
+- normalize weights;
+- calculate ESS;
+- use weighted moments/quantiles;
+- monitor max weight and degeneracy.
+
+20.4 RESAMPLING
+----------------
+For optimiser convenience, an equal-weight systematic/stratified resample MAY be
+created.
+
+Preserve original weighted artifact.
+Report resampling error.
+Do not erase rare tails unnecessarily.
+
+20.5 BATCHING
+-------------
+Generate in batches, e.g. 10,000.
+
+After each batch:
+
+- update means;
+- variances;
+- threshold probabilities;
+- PMF;
+- MC error;
+- stopping criteria.
+
+20.6 VECTORISATION
+------------------
+Scoring transform should be vectorized where possible.
+
+Bonus ranking may use batch matrix operations by fixture.
+
+20.7 REPRODUCIBILITY
+--------------------
+Record:
+
+- root seed;
+- RNG algorithm/version;
+- stream allocation;
+- scenario count;
+- weight;
+- worker partition;
+- code commit.
+
+Worker order must not alter results.
+
+======================================================================
+21. MONTE CARLO ERROR
+======================================================================
+
+21.1 SEPARATE FROM FORECAST UNCERTAINTY
+--------------------------------------
+Football uncertainty:
+the width/variance of the player points distribution.
+
+Monte Carlo error:
+uncertainty in the numerical estimate caused by finite simulation.
+
+They must be displayed separately.
+
+21.2 MEAN
+---------
+Unweighted independent approximation:
+
+    MCSE(mean)
+      =
+      sample_sd / sqrt(N)
+
+Weighted approximation uses ESS and weighted variance.
+
+21.3 PROBABILITY
+----------------
+Unweighted:
+
+    MCSE(p_hat)
+      =
+      sqrt(p_hat(1-p_hat)/N)
+
+Weighted:
+use ESS approximation plus batch/bootstrap diagnostic.
+
+21.4 QUANTILES
+----------------
+Quantile MC error is not adequately represented by the mean formula.
+
+Use:
+
+- batch quantile variation;
+- weighted bootstrap;
+- order-statistic/binomial intervals where applicable.
+
+21.5 DEPENDENT/MCMC INPUT
+------------------------
+If upstream posterior samples are autocorrelated:
+
+- use effective sample size;
+- batch means;
+- chain diagnostics.
+
+Do not count correlated draws as independent.
+
+21.6 REQUIRED REPORT
+--------------------
+- raw N;
+- ESS;
+- mean MCSE;
+- threshold-probability SE;
+- quantile stability;
+- maximum scenario weight;
+- stopping result.
+
+21.7 ADAPTIVE STOPPING
+----------------------
+Stop only when all priority metrics satisfy configured thresholds or resource
+cap is reached.
+
+If cap reached:
+publish with warning.
+
+======================================================================
+22. VARIANCE REDUCTION
+======================================================================
+
+22.1 COMMON RANDOM NUMBERS
+--------------------------
+Primary for comparing decisions/model variants.
+
+22.2 CONDITIONAL MONTE CARLO
+----------------------------
+Where possible, integrate deterministic/analytic scoring conditional on a
+scenario rather than resampling unnecessary randomness.
+
+Examples:
+
+- appearance points deterministic from minutes;
+- clean-sheet points deterministic from score/timeline;
+- goal points deterministic from events;
+- bonus deterministic from BPS vector.
+
+22.3 CONTROL VARIATES
+---------------------
+Potential controls:
+
+- analytic expected team goals;
+- analytic clean-sheet probability;
+- known expected appearance points;
+- score-matrix outcome probabilities.
+
+Use only if correlation and unbiased expectation are verified.
+
+22.4 STRATIFICATION
+-------------------
+Stratify on:
+
+- scoreline;
+- lineup state;
+- player start state;
+- team clean-sheet state.
+
+Can improve tail precision for captaincy candidates.
+
+22.5 QUASI-MONTE CARLO
+----------------------
+Randomized Sobol/QMC may be evaluated for continuous latent draws.
+
+Discrete branching and rejection can reduce benefit.
+Not initial requirement.
+
+======================================================================
+23. PMF ESTIMATION AND LOG-SCORE SAFETY
+======================================================================
+
+23.1 EMPIRICAL PMF
+------------------
+For reporting thresholds/quantiles, weighted empirical PMF is valid.
+
+23.2 FINITE-SAMPLE ZERO
+-----------------------
+A rare possible score may receive zero simulated observations.
+
+This does not prove true probability zero.
+
+23.3 EVALUATION LOG SCORE
+-------------------------
+Do not calculate infinite log loss solely because finite Monte Carlo missed the
+realised integer.
+
+Options, predeclared:
+
+- increase simulation;
+- Rao–Blackwell/conditional probability calculation;
+- model-based exact/mixture PMF;
+- conservative Dirichlet/kernel smoothing fitted only for numerical evaluation.
+
+The smoothing method must be versioned and used consistently.
+
+23.4 STRUCTURAL ZERO
+--------------------
+A score is structural zero only if the model/rules make it impossible.
+
+Example:
+no fixture and no administrative points -> nonzero points impossible.
+
+23.5 TAIL BIN
+-------------
+Do not combine all high points into one public PMF bin if the optimiser needs
+15+/20+ detail.
+
+Compressed display and underlying artifact can differ.
+
+======================================================================
+24. RULESET CONFIGURATION AND VERSIONING
+======================================================================
+
+24.1 NO HARD-CODED POINTS
+-------------------------
+All weights/thresholds/tie rules from DMFP-02.
+
+24.2 RULESET REFERENCE
+----------------------
+Every fixture score row stores:
+
+- ruleset ID;
+- ruleset version;
+- compiled hash.
+
+24.3 RULE CHANGE
+----------------
+New ruleset:
+
+- rescore identical football scenarios;
+- compare distribution changes using common random numbers;
+- no need to refit DMFP-08 solely for scoring change unless event definitions
+  change.
+
+24.4 REFERENCE 2025/26
+----------------------
+Development fixture only.
+
+24.5 TARGET ACTIVATION
+----------------------
+No 2026/27 production output until ACTIVE.
+
+======================================================================
+25. RECONCILIATION AGAINST OFFICIAL FPL
+======================================================================
+
+25.1 PURPOSE
+------------
+Validate both:
+
+- rules engine;
+- football event mapping.
+
+25.2 OFFICIAL LABEL
+-------------------
+After official finality/correction:
+
+- official total points;
+- component fields where available;
+- BPS;
+- bonus;
+- defensive contributions;
+- minutes.
+
+25.3 RECONCILIATION REPORT
+--------------------------
+Per player/fixture:
+
+- simulated/scored historical reconstruction;
+- official;
+- component difference;
+- likely source;
+- rule version;
+- event-definition issue;
+- status.
+
+25.4 EXACT RULE TEST
+--------------------
+Given complete official event inputs, deterministic score MUST match official
+FPL exactly, subject to documented official discretionary assist/correction.
+
+25.5 DISCRETIONARY ASSIST
+-------------------------
+Official final outcome controls historical label.
+The independent classifier difference is retained.
+
+25.6 CORRECTIONS
+----------------
+Official late corrections update outcome dataset, not prior deadline features.
+
+======================================================================
+26. CALIBRATION AND EVALUATION
+======================================================================
+
+26.1 PLAYER POINT DISTRIBUTION
+------------------------------
+Primary:
+
+- logarithmic score with safe PMF evaluation policy;
+- discrete CRPS/ranked probability score;
+- calibration of CDF/quantiles.
+
+26.2 THRESHOLDS
+---------------
+Brier/log score for:
+
+- zero;
+- negative;
+- 2+;
+- 5+;
+- 10+;
+- 15+.
+
+26.3 MEAN
+---------
+- MAE;
+- RMSE;
+- bias;
+- mean calibration.
+
+These are secondary to the distribution.
+
+Gneiting's work on point forecasts emphasises that evaluation must match the
+functional: squared error targets the mean, absolute error targets the median.
+
+26.4 COMPONENTS
+---------------
+Evaluate:
+
+- appearance;
+- goal points;
+- assist points;
+- clean sheet;
+- saves;
+- defensive contributions;
+- negative events;
+- bonus.
+
+26.5 BONUS
+----------
+- BPS error;
+- BPS rank calibration;
+- bonus-class log/Brier score;
+- P(any bonus);
+- expected bonus bias;
+- tie frequency;
+- top-three/rank calibration.
+
+26.6 MULTIVARIATE
+-----------------
+For joint squad/player vector:
+
+- energy score;
+- variogram score;
+- covariance/joint-threshold calibration.
+
+Energy score is proper but can be less sensitive to correlation structure;
+variogram score is included specifically to inspect dependence.
+
+26.7 PROSPECTIVE
+----------------
+Only LIVE_OPERATIONAL predictions establish live forecast performance.
+
+======================================================================
+27. BASELINES AND ABLATIONS
+======================================================================
+
+27.1 BASELINES
+--------------
+B0:
+Expected FPL points from independent component means with no bonus dependence.
+
+B1:
+Scenario scoring without bonus.
+
+B2:
+Bonus from expected BPS ranks, deliberately naive.
+
+B3:
+Historical average points/minutes.
+
+B4:
+Public/OpenFPL-type projection where reproducible/licensed.
+
+27.2 ABLATIONS
+--------------
+- no auxiliary BPS events;
+- independent residual BPS;
+- no FPL-assist ambiguity;
+- no event correlations;
+- independent fixture convolution for DGW;
+- no defensive contributions;
+- fixed bonus heuristic.
+
+27.3 EDGE DEMONSTRATION
+-----------------------
+The complete model should demonstrate value through:
+
+- better tail/threshold calibration;
+- improved bonus prediction;
+- improved squad variance/correlation;
+- better transfer/captain decisions.
+
+======================================================================
+28. CONFIDENCE GRADING
+======================================================================
+
+28.1 DIMENSIONS
+---------------
+- active ruleset certainty;
+- event scenario quality;
+- minutes quality;
+- assist-classification quality;
+- BPS completeness;
+- Monte Carlo precision;
+- source coverage;
+- bonus calibration;
+- multi-fixture coherence.
+
+28.2 GRADES
+-----------
+A:
+active verified rules, full event/BPS model, strong sources, precise MC.
+
+B:
+strong core, minor auxiliary uncertainty.
+
+C:
+hybrid residual BPS or sparse player markets.
+
+D:
+major missing BPS/event inputs, single weak scenario source.
+
+E:
+rules inactive or decision-blocking inconsistency.
+
+28.3 RULE OVERRIDE
+------------------
+Inactive/unverified target rules force E/BLOCKED regardless of model quality.
+
+======================================================================
+29. STORAGE
+======================================================================
+
+29.1 POSTGRESQL SUMMARY TABLES
+------------------------------
+forecast.fpl_points_projection
+forecast.fpl_component_summary
+forecast.bonus_distribution
+forecast.monte_carlo_diagnostic
+forecast.player_covariance_summary
+
+29.2 PARQUET
+------------
+Scenario artifacts:
+
+dataset=fpl_points_scenarios/
+season=2026_27/
+gameweek=1/
+projection_run=<uuid>/
+
+Fields:
+
+- scenario ID;
+- weight;
+- fixture/Gameweek;
+- player;
+- component points;
+- total;
+- BPS;
+- bonus;
+- upstream scenario;
+- ruleset/model hashes.
+
+29.3 DATA TYPES
+---------------
+- points: int16 normally;
+- BPS: int16/int32;
+- scenario weight: float64;
+- IDs: fixed/string;
+- no float scenario-level FPL points.
+
+29.4 COMPRESSION
+----------------
+Zstandard/Snappy according to DMFP-05 benchmark.
+
+29.5 CANDIDATE MATRIX
+---------------------
+Create optimizer-specific filtered matrix without deleting full artifact.
+
+======================================================================
+30. IMPLEMENTATION ARCHITECTURE
+======================================================================
+
+30.1 PACKAGE
+------------
+src/dmf_pulse/fpl_points/
+
+- scorer.py
+- appearance.py
+- goals.py
+- assists.py
+- clean_sheets.py
+- saves.py
+- defensive_contributions.py
+- negative_events.py
+- bps.py
+- bps_auxiliary.py
+- bonus.py
+- fixture_distribution.py
+- gameweek_assembler.py
+- joint_scenarios.py
+- monte_carlo.py
+- mc_error.py
+- summaries.py
+- reconciliation.py
+- evaluation.py
+- explain.py
+- schemas.py
+
+30.2 PURE INTERFACES
+--------------------
+score_fixture_scenario(scenario, ruleset)
+
+classify_fpl_assist(goal_chain, ruleset, rng)
+
+calculate_player_bps(player_events, fixture_context, ruleset)
+
+allocate_bonus(all_player_bps, tie_policy)
+
+score_all_players_fixture(scenario, ruleset)
+
+assemble_gameweek(fixture_scenarios, gameweek_context)
+
+summarize_player_distribution(points, weights)
+
+summarize_joint_distribution(matrix, weights)
+
+estimate_monte_carlo_error(samples, weights, batches)
+
+30.3 NO SIDE EFFECTS
+--------------------
+Scoring functions are pure.
+
+Storage/orchestration is outside the scoring core.
+
+======================================================================
+31. TESTING
+======================================================================
+
+31.1 RULE COMPONENTS
+--------------------
+Every DMFP-02 golden scoring case.
+
+31.2 BPS EVENTS
+---------------
+One test per positive/negative BPS event.
+
+31.3 BPS EXCLUSIVITY
+--------------------
+- penalty goal vs position goal;
+- appearance band;
+- pass band.
+
+31.4 BPS GROUPS
+---------------
+- CBI groups;
+- recovery groups;
+- exact threshold.
+
+31.5 BONUS TIES
+---------------
+- no tie;
+- two-way first;
+- three-way first;
+- tie second;
+- multiway third;
+- two first + three at next rank;
+- negative top BPS;
+- zero top BPS.
+
+31.6 SCENARIO
+-------------
+- all component sum;
+- no off-pitch scoring;
+- clean-sheet interval;
+- red card;
+- multiple keepers;
+- penalty save;
+- own goal;
+- ambiguous FPL assist.
+
+31.7 GAMEWEEK
+-------------
+- blank;
+- single;
+- double;
+- injury between fixtures;
+- shared latent draw;
+- fixture reassignment.
+
+31.8 MONTE CARLO
+----------------
+- PMF sums one;
+- weighted moments;
+- ESS;
+- quantiles;
+- MCSE;
+- adaptive stopping;
+- reproducible batching;
+- common random numbers.
+
+31.9 PROPERTY TESTS
+-------------------
+- total equals component sum;
+- expected total equals sum expected components;
+- variance includes covariance identity;
+- bonus in configured set;
+- probabilities 0–1;
+- percentiles ordered;
+- P15 <= P10 <= P5;
+- fixture sum equals Gameweek score.
+
+31.10 MUTATION
+--------------
+Change:
+
+- threshold;
+- point weight;
+- BPS weight;
+- tie rank;
+- minute boundary.
+
+Tests must fail.
+
+======================================================================
+32. OPERATIONAL PERFORMANCE
+======================================================================
+
+32.1 TARGET
+-----------
+For a full 10-fixture Gameweek:
+
+- score 50,000 scenarios/fixture;
+- create summaries;
+- create candidate joint matrix;
+
+within a practical deadline window on standard development hardware.
+
+Initial target:
+under 5 minutes after upstream scenarios exist.
+
+32.2 BOTTLENECK
+---------------
+Bonus ranking and auxiliary BPS simulation are likely bottlenecks.
+
+Use:
+
+- vectorized integer arrays;
+- batch processing;
+- precomputed rule lookups;
+- efficient grouped ranking;
+- candidate-player filtering only after full fixture scoring.
+
+32.3 INCREMENTAL
+----------------
+If only rules/scoring code changes:
+rescore stored DMFP-08 scenarios without rerunning football model.
+
+If only one fixture input changes:
+rescore/reassemble affected fixture/Gameweek.
+
+======================================================================
+33. ALERTS AND MONITORING
+======================================================================
+
+P0:
+- active ruleset missing;
+- component total mismatch;
+- probability invalid;
+- BPS tie logic failure;
+- official reconciliation systematic failure;
+- upstream scenario invariant violation.
+
+P1:
+- BPS incomplete for priority fixture;
+- MC precision not reached;
+- scenario-weight degeneracy;
+- bonus calibration drift;
+- DGW assembly unavailable.
+
+P2:
+- auxiliary event coverage drop;
+- FPL assist ambiguity spike;
+- high reconciliation residual;
+- rare-tail instability.
+
+Weekly metrics:
+
+- expected-points bias;
+- CRPS/log score;
+- threshold Brier;
+- bonus log score;
+- BPS MAE/rank;
+- MCSE;
+- ESS;
+- scenario runtime;
+- rules reconciliation.
+
+======================================================================
+34. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+34.1 CODEX MAY
+-------------
+- implement pure rule scoring;
+- implement BPS/ranking;
+- vectorize Monte Carlo;
+- create weighted summaries;
+- create scenario artifacts;
+- implement auxiliary BPS models after specification;
+- create tests and reconciliation.
+
+34.2 CODEX MUST NOT
+-------------------
+- hard-code scoring values;
+- estimate bonus independently;
+- rank expected BPS;
+- score only shortlisted players for bonus;
+- ignore ties;
+- truncate negative points;
+- apply captain/chips here;
+- independently convolve DGW fixtures without label;
+- convert expected defensive events directly through threshold;
+- use provider assist as FPL assist automatically;
+- hide MC error;
+- use postdeadline events;
+- create float scenario FPL points;
+- use an LLM for scoring.
+
+34.3 PULL REQUEST
+-----------------
+Every scoring change states:
+
+- ruleset/source;
+- rule IDs;
+- scenario inputs;
+- outputs;
+- tests;
+- reconciliation;
+- performance;
+- version impact.
+
+======================================================================
+35. RISK REGISTER
+======================================================================
+
+R-09-001 — 2025/26 rules carried into 2026/27
+Probability: High prelaunch
+Impact: Critical
+Mitigation:
+ACTIVE ruleset gate.
+
+R-09-002 — Independent expected components used
+Probability: High
+Impact: Critical
+Mitigation:
+scenario scoring.
+
+R-09-003 — Bonus predicted independently
+Probability: High
+Impact: Critical
+Mitigation:
+joint BPS/rank simulation.
+
+R-09-004 — Expected BPS rank substituted for expected bonus
+Probability: High
+Impact: Critical
+Mitigation:
+scenario tie allocation.
+
+R-09-005 — Only selected players included in BPS race
+Probability: Medium
+Impact: Critical
+Mitigation:
+full participant universe.
+
+R-09-006 — Bonus ties limited to three players
+Probability: Medium
+Impact: High
+Mitigation:
+competition-rank algorithm.
+
+R-09-007 — Penalty goal BPS double counted
+Probability: Medium
+Impact: High
+Mitigation:
+exclusive rule.
+
+R-09-008 — Penalty save BPS component omitted
+Probability: Medium
+Impact: High
+Mitigation:
+configured cumulative BPS actions.
+
+R-09-009 — Pass bands accumulated
+Probability: Medium
+Impact: High
+Mitigation:
+highest one band.
+
+R-09-010 — Incomplete BPS events bias bonus
+Probability: High
+Impact: High
+Mitigation:
+auxiliary/residual model and confidence.
+
+R-09-011 — Residual BPS double counts new explicit events
+Probability: Medium
+Impact: Critical
+Mitigation:
+versioned explicit set/residual target.
+
+R-09-012 — Provider assist equals FPL assist
+Probability: High
+Impact: Critical
+Mitigation:
+goal-chain classifier.
+
+R-09-013 — Ambiguous assist ignored
+Probability: Medium
+Impact: High
+Mitigation:
+probabilistic classification.
+
+R-09-014 — Defensive threshold applied to expected count
+Probability: High
+Impact: Critical
+Mitigation:
+scenario threshold.
+
+R-09-015 — Goals conceded use full match for substituted player
+Probability: Medium
+Impact: High
+Mitigation:
+on-pitch/red-card rule.
+
+R-09-016 — Penalty save counted twice/zero
+Probability: Medium
+Impact: High
+Mitigation:
+canonical event mapping.
+
+R-09-017 — Negative points truncated
+Probability: Medium
+Impact: High
+Mitigation:
+signed integer PMF.
+
+R-09-018 — DGW marginals convolved independently
+Probability: High
+Impact: Critical
+Mitigation:
+joint sequential Gameweek scenarios.
+
+R-09-019 — Injury in first fixture cannot affect second
+Probability: Medium
+Impact: High
+Mitigation:
+Gameweek transition model.
+
+R-09-020 — Captain multiplier applied too early
+Probability: Medium
+Impact: Critical
+Mitigation:
+raw points only; downstream scenario transform.
+
+R-09-021 — Monte Carlo row count mistaken for ESS
+Probability: Medium
+Impact: High
+Mitigation:
+weight diagnostics.
+
+R-09-022 — MC error confused with forecast uncertainty
+Probability: High
+Impact: High
+Mitigation:
+separate fields.
+
+R-09-023 — Rare tail missed
+Probability: High
+Impact: High
+Mitigation:
+adaptive sampling/stratification.
+
+R-09-024 — Log score infinite due finite sampling
+Probability: Medium
+Impact: High
+Mitigation:
+predeclared PMF evaluation policy.
+
+R-09-025 — Common random numbers increase variance
+Probability: Low/Medium
+Impact: Medium
+Mitigation:
+monitor paired variance and disable.
+
+R-09-026 — Scenario weights degenerate
+Probability: Medium
+Impact: High
+Mitigation:
+ESS/max-weight alerts.
+
+R-09-027 — Component expectations do not sum
+Probability: Low/Medium
+Impact: Critical
+Mitigation:
+scenario identity/property test.
+
+R-09-028 — Correlation lost in optimiser export
+Probability: Medium
+Impact: Critical
+Mitigation:
+joint scenario matrix.
+
+R-09-029 — Official correction rewrites forecast
+Probability: Medium
+Impact: Critical
+Mitigation:
+outcome reconciliation separate.
+
+R-09-030 — BPS auxiliary model overfits
+Probability: High
+Impact: High
+Mitigation:
+hierarchical/walk-forward validation.
+
+R-09-031 — FPL rules discretionary edge not reconstructible
+Probability: Medium
+Impact: Medium/High
+Mitigation:
+official label authority and uncertainty.
+
+R-09-032 — Scenario storage too large
+Probability: Medium
+Impact: Medium
+Mitigation:
+compression, candidate matrices, summaries.
+
+R-09-033 — Percentile convention changes
+Probability: Medium
+Impact: Medium
+Mitigation:
+versioned weighted inverse-CDF rule.
+
+R-09-034 — Optimiser assumes normal points
+Probability: Medium
+Impact: High
+Mitigation:
+scenario/PMF API, not mean/variance only.
+
+======================================================================
+36. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-16
+
+----------------------------------------------------------------------
+SRC-FPL-SCORING-2025-001
+Title:
+FPL basics explained: Scoring points
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174909
+
+Relevant claims:
+Reference 2025/26 FPL scoring table, clean-sheet substitution treatment, assist
+rules, bonus tie examples and defensive-contribution thresholds.
+
+Reliability:
+HIGH official for 2025/26.
+Not authoritative for 2026/27.
+
+Pulse reliance:
+REFERENCE_ONLY and golden-test design.
+
+----------------------------------------------------------------------
+SRC-FPL-BPS-2026-001
+Title:
+How the FPL Bonus Points System works
+
+Organisation:
+Premier League / The Scout
+
+Publication/update date:
+2026-04-01
+
+URL:
+https://www.premierleague.com/en/news/106533
+
+Relevant claims:
+Full 2025/26 BPS action table, Opta source, ranking and tie rules.
+
+Reliability:
+HIGH official reference-season source.
+
+Pulse reliance:
+REFERENCE_ONLY until 2026/27 launch.
+
+----------------------------------------------------------------------
+SRC-FPL-BPS-2025-002
+Title:
+What’s new in 2025/26 Fantasy: Changes to Bonus Points System
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-19
+
+URL:
+https://www.premierleague.com/en/news/4362127/whats-new-in-202526-fantasy-changes-to-bonus-points-system
+
+Relevant claims:
+Save-location BPS, penalty-save BPS, goal-line clearances, penalty-goal BPS and
+tackle changes.
+
+Reliability:
+HIGH official.
+
+Pulse reliance:
+REFERENCE_ONLY and event-interaction tests.
+
+----------------------------------------------------------------------
+SRC-FPL-DEFCON-2025-001
+Title:
+What’s new in 2025/26 Fantasy: Defensive contributions
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-18
+
+URL:
+https://www.premierleague.com/en/news/4361991/whats-new-in-202526-fantasy-defensive-contributions
+
+Relevant claims:
+Defender CBIT threshold 10, midfielder/forward CBIRT threshold 12 and two-point
+per-match cap.
+
+Reliability:
+HIGH official reference-season source.
+
+Pulse reliance:
+REFERENCE_ONLY.
+
+----------------------------------------------------------------------
+SRC-SCORING-RULES-2007-001
+Title:
+Strictly Proper Scoring Rules, Prediction, and Estimation
+
+Authors:
+Tilmann Gneiting, Adrian E. Raftery
+
+Publication:
+Journal of the American Statistical Association
+
+URL:
+https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf
+
+Relevant claim:
+Proper scoring rules support honest probabilistic forecast evaluation and the
+calibration/sharpness framework.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+YES for distribution evaluation.
+
+----------------------------------------------------------------------
+SRC-POINT-FORECAST-2011-001
+Title:
+Making and Evaluating Point Forecasts
+
+Author:
+Tilmann Gneiting
+
+Publication:
+Journal of the American Statistical Association
+
+Preprint:
+https://arxiv.org/abs/0912.0902
+
+Relevant claim:
+Forecast evaluation must match the target functional; squared error targets the
+mean and absolute error targets the median.
+
+Reliability:
+HIGH peer-reviewed/foundational.
+
+Pulse reliance:
+YES for mean/median reporting and evaluation.
+
+----------------------------------------------------------------------
+SRC-SCORING-SOFTWARE-2019-001
+Title:
+Evaluating Probabilistic Forecasts with scoringRules
+
+Authors:
+Alexander Jordan, Fabian Krüger, Sebastian Lerch
+
+Publication:
+Journal of Statistical Software, 90(12)
+
+URL:
+https://www.jstatsoft.org/article/view/v090i12
+
+Relevant claim:
+Implements proper univariate and multivariate scoring rules including CRPS,
+logarithmic, energy and variogram scores.
+
+Reliability:
+HIGH peer-reviewed software/method reference.
+
+Pulse reliance:
+YES for evaluation implementation reference.
+
+----------------------------------------------------------------------
+SRC-VARIOGRAM-2015-001
+Title:
+Variogram-Based Proper Scoring Rules for Probabilistic Forecasts of
+Multivariate Quantities
+
+Authors:
+Michael Scheuerer, Thomas M. Hamill
+
+Publication:
+Monthly Weather Review
+
+URL:
+https://repository.library.noaa.gov/view/noaa/22327/
+
+Relevant claim:
+Variogram scores provide proper multivariate forecast evaluation and can be more
+sensitive to dependence structure than energy score in relevant settings.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for joint player-distribution evaluation.
+
+----------------------------------------------------------------------
+SRC-MC-ERROR-2009-001
+Title:
+On the Assessment of Monte Carlo Error in Simulation-Based Statistical Analyses
+
+Authors:
+Elizabeth Koehler, Elizabeth Brown, Sebastien J.-P.A. Haneuse
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC3337209/
+
+Publication date:
+2009
+
+Relevant claim:
+Monte Carlo error should be estimated and simulation replication counts chosen
+to make numerical uncertainty acceptably small.
+
+Reliability:
+HIGH peer-reviewed practical methods research.
+
+Pulse reliance:
+YES for MC precision/stopping.
+
+----------------------------------------------------------------------
+SRC-MC-QUANTILE-2014-001
+Title:
+Markov Chain Monte Carlo Estimation of Quantiles
+
+Authors:
+Charles Doss, James M. Flegal, Galin L. Jones, Ronald C. Neath
+
+Preprint:
+https://arxiv.org/abs/1207.6432
+
+Relevant claim:
+Quantile Monte Carlo error requires appropriate variance/interval estimation,
+especially for dependent samples.
+
+Reliability:
+HIGH peer-reviewed/preprint record.
+
+Pulse reliance:
+YES for percentile error policy.
+
+----------------------------------------------------------------------
+SRC-CRN-2008-001
+Title:
+Keeping the Noise Down: Common Random Numbers for Disease Simulation Modeling
+
+Authors:
+Nancy K. Stout et al.
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC2761656/
+
+Relevant claim:
+Common random numbers can improve precision in comparative simulation by
+creating positive paired correlation.
+
+Reliability:
+HIGH peer-reviewed tutorial/application.
+
+Pulse reliance:
+YES for paired decision/model comparison.
+
+----------------------------------------------------------------------
+SRC-CRN-1979-002
+Title:
+On the Effectiveness of Common Random Numbers
+
+Author:
+R. D. Wright
+
+Publication:
+Management Science, 25(7), 649–656
+
+URL:
+https://pubsonline.informs.org/doi/10.1287/mnsc.25.7.649
+
+Relevant claim:
+Common random numbers can sometimes increase rather than reduce comparison
+variance depending on induced correlation/design.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for CRN monitoring/fallback.
+
+----------------------------------------------------------------------
+SRC-FANTASY-DFS-2016-001
+Title:
+Picking Winners in Daily Fantasy Sports Using Integer Programming
+
+Authors:
+David Scott Hunter, Juan Pablo Vielma, Tauhid Zaman
+
+Preprint:
+https://arxiv.org/abs/1604.01455
+
+Relevant claim:
+Fantasy decisions with top-heavy objectives depend on expected score, variance
+and correlation; joint distributions/correlations matter.
+
+Reliability:
+HIGH peer-reviewed/established research.
+
+Pulse reliance:
+CONTEXTUAL for downstream joint scenario requirement.
+
+----------------------------------------------------------------------
+SRC-FPL-OPT-2025-001
+Title:
+Data-Driven Team Selection in Fantasy Premier League Using Integer Programming
+and Predictive Modeling Approach
+
+Author:
+Danial Ramezani
+
+URL:
+https://arxiv.org/html/2505.02170v1
+
+Publication date:
+2025
+
+Relevant claim:
+FPL team/captain optimisation research uses predictive inputs, robust methods
+and Monte Carlo comparisons.
+
+Reliability:
+MODERATE recent preprint.
+
+Pulse reliance:
+CONTEXTUAL for downstream integration.
+
+----------------------------------------------------------------------
+SRC-FPL-SKILL-2020-001
+Title:
+Identification of Skill in an Online Game: The Case of Fantasy Premier League
+
+Authors:
+Joseph D. O'Brien, James P. Gleeson, David J. P. O'Sullivan
+
+URL:
+https://arxiv.org/abs/2009.01206
+
+Relevant claim:
+Long-term planning and consistently good decisions in a noisy competition are
+important to FPL success.
+
+Reliability:
+HIGH academic research.
+
+Pulse reliance:
+CONTEXTUAL.
+
+----------------------------------------------------------------------
+SRC-FPL-OPEN-2025-001
+Title:
+OpenFPL: An Open-Source Forecasting Method Rivaling State-of-the-Art Fantasy
+Premier League Services
+
+Author:
+Daniel Groos
+
+URL:
+https://arxiv.org/abs/2508.09992
+
+Publication date:
+2025
+
+Relevant claim:
+Public-data FPL forecasting and multi-Gameweek evaluation benchmark, including
+attention to higher-return players.
+
+Reliability:
+MODERATE recent preprint; code/data must be reproduced before reliance.
+
+Pulse reliance:
+BENCHMARK CANDIDATE.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 — Master Architecture and Product Definition
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-02 — FPL Rules, Scoring and Season Configuration
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-05 — Ingestion, Storage and Data Quality
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-07 — Player Availability, Start and Minutes Model
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-08 — Football Event Distribution Engine
+
+Pulse reliance:
+YES.
+
+======================================================================
+37. ACCEPTANCE CRITERIA
+======================================================================
+
+A. RULE TRANSFORMATION
+[ ] Every scenario score is exact integer under active rules.
+[ ] No scoring constants are hard-coded.
+[ ] Component totals equal player total.
+[ ] 2026/27 remains blocked until rules activate.
+
+B. DISTRIBUTION
+[ ] Expected, median, variance, thresholds and percentiles are produced.
+[ ] Full PMF/scenario artifact exists.
+[ ] Negative points are retained.
+[ ] Monte Carlo error is separate.
+
+C. BONUS
+[ ] Every participant's BPS is calculated jointly.
+[ ] Official tie logic is generic.
+[ ] More than three bonus recipients are supported.
+[ ] Expected BPS ranking is prohibited.
+[ ] BPS completeness mode is visible.
+
+D. COMPONENTS
+[ ] FPL assist uses target policy.
+[ ] Defensive thresholds are scenario-level.
+[ ] Save and penalty-save mapping is coherent.
+[ ] Clean sheets/goals conceded use intervals/red-card rules.
+[ ] All negative events are separate components.
+
+E. GAMEWEEK/JOINT
+[ ] Blank/single/double Gameweeks are supported.
+[ ] DGW shared uncertainty is preserved.
+[ ] Player joint scenario matrix is delivered to optimiser.
+[ ] Captain/chips are downstream.
+
+F. SCIENCE
+[ ] Proper distribution scores are primary.
+[ ] Bonus and threshold calibration are evaluated.
+[ ] MC precision gates exist.
+[ ] Live deadline bundles are the prospective standard.
+[ ] Baselines/ablations are required.
+
+======================================================================
+38. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Implement scoring component interfaces from DMFP-02.
+2. Import the 2025/26 reference ruleset for tests only.
+3. Implement vectorized scenario scorer.
+4. Implement FPL assist classifier interface.
+5. Implement clean-sheet/on-pitch logic.
+6. Implement saves/penalty saves.
+7. Implement defensive-contribution thresholds.
+8. Implement negative components.
+9. Implement full BPS deterministic calculator.
+10. Implement generic competition-rank bonus allocation.
+11. Build BPS event completeness audit.
+12. Build auxiliary BPS data/training set.
+13. Implement HYBRID_RESIDUAL baseline.
+14. Build weighted fixture PMF summarizer.
+15. Build joint Gameweek assembler.
+16. Implement sequential DGW state interface.
+17. Implement weighted quantiles/ESS.
+18. Implement adaptive Monte Carlo stopping.
+19. Implement MC error/quantile diagnostics.
+20. Create scenario Parquet export.
+21. Create optimiser candidate matrix.
+22. Implement official reconciliation.
+23. Run full golden rules/BPS tests.
+24. Run synthetic bonus competition test.
+25. Run historical bonus baseline comparison.
+26. Start prospective 2026/27 distribution evaluation.
+27. Do not apply captain/chips in this module.
+28. Do not connect optimiser until joint scenario and MC precision gates pass.
+
+Suggested commands:
+
+    dmf fpl-points score-scenario
+    dmf fpl-points calculate-bps
+    dmf fpl-points allocate-bonus
+    dmf fpl-points simulate-fixture
+    dmf fpl-points assemble-gameweek
+    dmf fpl-points summarize
+    dmf fpl-points mc-diagnostics
+    dmf fpl-points reconcile
+    dmf fpl-points evaluate
+    dmf fpl-points validate
+
+======================================================================
+39. OPEN QUESTIONS
+======================================================================
+
+RULES
+-----
+1. What are the official 2026/27 score/BPS values?
+2. Are defensive contributions unchanged?
+3. Is the assist policy unchanged?
+4. What is official point-finality timing?
+5. Are any new point components introduced?
+
+BPS
+---
+6. Which BPS auxiliary events can be simulated from free data?
+7. Is residual BPS sufficiently calibrated?
+8. What match/player latent structure is needed for residual correlation?
+9. How is match-winning goal exactly identified in edge cases?
+10. What happens with unusual negative/zero top BPS?
+11. Can full official BPS history be retained?
+
+ASSISTS
+-------
+12. Does DMFP-08 preserve enough defensive-touch detail?
+13. What classifier handles ambiguous FPL assists?
+14. How is official discretion calibrated?
+
+MONTE CARLO
+-----------
+15. Is 50,000 the best normal baseline?
+16. What precision thresholds matter for optimiser decisions?
+17. Which stratification/control variates are effective?
+18. How should weighted quantile error be estimated?
+19. What smoothing is used for log-score evaluation?
+20. When should QMC be tested?
+
+GAMEWEEK
+--------
+21. What first-to-second DGW transition model is sufficient?
+22. How are suspensions between Gameweek fixtures applied?
+23. How is an injury in fixture one propagated?
+24. Which latent variables are shared across fixtures?
+
+STORAGE/OPTIMISER
+-----------------
+25. Wide or long scenario Parquet?
+26. How many candidate players enter each optimiser matrix?
+27. Which component matrices must be retained?
+28. What covariance summaries are user-facing?
+29. How much scenario compression preserves tail decisions?
+
+======================================================================
+40. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-10 — UNCERTAINTY, SCENARIOS AND EARLY-SEASON POLICY
+
+It will consume the complete player/Gameweek distributions and distinguish:
+
+- football randomness;
+- parameter uncertainty;
+- market uncertainty;
+- rules uncertainty;
+- source uncertainty;
+- model disagreement;
+- early-season structural uncertainty.
+
+Then DMFP-12 uses the joint scenario matrix for transfer and squad decisions.
+
+======================================================================
+41. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-16
+
+- Defined deterministic scenario-level FPL scoring.
+- Added full player/Gameweek PMFs and required outputs.
+- Added component decomposition and covariance identity.
+- Added target-season rules activation gate.
+- Added dedicated joint BPS/bonus subsystem.
+- Added full reference BPS table and tie algorithm.
+- Added auxiliary/residual BPS strategy.
+- Added probabilistic FPL assist classification.
+- Added scenario-level defensive thresholds.
+- Added Blank/Double Gameweek assembly.
+- Added joint player scenario matrix.
+- Added weighted/adaptive Monte Carlo.
+- Added ESS, MCSE and quantile error.
+- Added common-random-number and variance-reduction policy.
+- Added PMF/log-score safety.
+- Added official reconciliation.
+- Added distribution and multivariate evaluation.
+- Added implementation, testing, risks and sources.
+
+Future v1.0:
+- Sebastian approves architecture.
+- 2026/27 rules activated.
+- full scoring/BPS golden tests pass.
+- auxiliary BPS baseline validated.
+- Monte Carlo precision benchmark completed.
+- prospective Gameweek distributions active.
+- optimiser integration approved.
+
+END OF DOCUMENT

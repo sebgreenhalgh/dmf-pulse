@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DMF Pulse Codex Result",
+  "type": "object",
+  "required": [
+    "ticket_id",
+    "status",
+    "summary",
+    "files_changed",
+    "commands",
+    "tests",
+    "acceptance",
+    "assumptions",
+    "risks",
+    "review_pack"
+  ],
+  "properties": {
+    "ticket_id": {
+      "const": "FND-001"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "files_changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "change"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "change": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "public_interfaces": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "command",
+          "exit_code"
+        ],
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "exit_code": {
+            "type": "integer"
+          },
+          "duration_seconds": {
+            "type": "number"
+          },
+          "result": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "acceptance": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "dependency_impact": {
+      "type": "string"
+    },
+    "migration_impact": {
+      "type": "string"
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "exclusions_verified": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "review_pack": {
+      "type": "object",
+      "required": [
+        "path",
+        "file_count",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "file_count": {
+          "type": "integer",
+          "maximum": 20
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

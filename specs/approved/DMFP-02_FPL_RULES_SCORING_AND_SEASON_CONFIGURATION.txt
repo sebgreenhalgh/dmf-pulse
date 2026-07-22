@@ -1,0 +1,4268 @@
+DMF PULSE — FPL RULES, SCORING AND SEASON CONFIGURATION
+=======================================================
+
+Document ID: DMFP-02
+Version: 0.9 (Pre-Launch Rules Architecture)
+Status: PROPOSED — TARGET-SEASON RULESET BLOCKED PENDING 2026/27 FPL LAUNCH
+Target season: Fantasy Premier League 2026/27
+Reference season: Fantasy Premier League 2025/26
+Research cut-off: 16 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+Parent documents:
+- DMFP-00 — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+- DMFP-01 — RESEARCH STANDARD AND EVIDENCE REGISTER
+
+PURPOSE
+-------
+This document defines how every Fantasy Premier League rule is represented,
+validated, versioned and executed inside DMF Pulse.
+
+The governing principle is:
+
+    FPL RULES ARE VERSIONED DATA, NOT MODEL CODE.
+
+The modelling, simulation and optimisation layers must never depend on scattered
+numeric constants, hard-coded chip assumptions, hidden formation rules or
+season-specific if-statements.
+
+A change in:
+
+- goal points;
+- an assist definition;
+- a defensive-contribution threshold;
+- the Bonus Points System;
+- squad composition;
+- free-transfer accumulation;
+- selling-price treatment;
+- chip inventory;
+- a chip validity window;
+- a Gameweek deadline;
+- a one-off transfer grant;
+
+must be implemented by changing and approving configuration, not by rewriting
+the engine.
+
+IMPORTANT PRE-LAUNCH STATUS NOTE
+--------------------------------
+As of 16 July 2026, the official Fantasy Premier League game for 2026/27 had not
+yet launched. The Premier League stated that it would launch later in the
+summer. The Premier League season itself is scheduled to begin on Friday
+21 August 2026.
+
+Consequently:
+
+1. No 2025/26 rule is authoritative for 2026/27.
+2. Every 2025/26 value in this document is REFERENCE_ONLY.
+3. The 2026/27 production ruleset MUST remain:
+       production_eligible: false
+   until official target-season rules have been captured, compared, tested and
+   human-approved.
+4. The first 2026/27 FPL deadline MUST be read from official target-season game
+   data or an official target-season rules source. It MUST NOT be inferred from
+   the prior season's 90-minute convention.
+5. The engine MUST refuse to issue a production recommendation if any required
+   target-season rule is UNKNOWN, UNCONFIRMED, CONFLICTED or STALE.
+6. The target-season source bundle, compiled ruleset and approval record MUST be
+   immutable and hash-addressed.
+7. Any later official correction or mid-season special rule MUST create a new
+   effective-dated ruleset version or scheduled rule event.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. A documented architecture decision record is required to deviate.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE CONTROL SUMMARY
+======================================================================
+
+0.1 THE RULES ENGINE IN ONE SENTENCE
+------------------------------------
+The DMF Pulse rules engine is a deterministic, pure, versioned state-transition
+and scoring system that converts official football/FPL events and manager
+actions into legal squads, transfer costs, chip states and FPL points under one
+explicit season configuration.
+
+0.2 CONTROLLING ARCHITECTURAL DECISIONS
+---------------------------------------
+RD-02-01. Rules are external configuration.
+No production rule value may exist only as a literal inside scoring,
+optimisation, simulation or user-interface code.
+
+RD-02-02. Target-season official sources control.
+Official 2026/27 FPL rules, official target-season game data and explicit
+official clarifications take precedence over prior-season articles, community
+interpretations and model memory.
+
+RD-02-03. The active ruleset is an approved artefact.
+The application must not scrape a help page at runtime and silently alter
+behaviour. Official sources are captured into a reviewed ruleset that is
+validated, compiled, hashed and activated.
+
+RD-02-04. Human-readable YAML, canonical JSON.
+Rules are authored and reviewed in YAML 1.2.2-compatible files, then converted
+to canonical JSON, validated with JSON Schema Draft 2020-12, hashed and loaded
+by the engine.
+
+RD-02-05. Rule values and rule eligibility are separate.
+Example:
+- an assist is worth three points;
+- whether a touch qualifies as an assist is a separate policy.
+A season can change either without changing the other.
+
+RD-02-06. Scoring is fixture-scoped before Gameweek aggregation.
+Appearance, clean sheets, goals conceded, defensive contributions, BPS and
+bonus are calculated per fixture. A player's Gameweek total aggregates all
+fixtures assigned to that Gameweek.
+
+RD-02-07. Manager effects are applied after player scoring.
+Automatic substitutions, captaincy and chips act at the manager/Gameweek layer,
+not inside the player-event scoring layer.
+
+RD-02-08. Bonus is match-relative.
+BPS must be calculated for all relevant players in one match before bonus points
+can be allocated. Bonus cannot be forecast or recreated as an independent fixed
+player add-on.
+
+RD-02-09. Money uses integer price units.
+Store prices as integer tenths of a million pounds:
+    £5.0m -> 50
+    £14.5m -> 145
+Never use binary floating-point for affordability or selling-price rules.
+
+RD-02-10. Time uses explicit UTC timestamps.
+Deadlines, effective dates and source captures use RFC 3339-compatible UTC
+timestamps. Display conversion is separate.
+
+RD-02-11. State transitions are explicit.
+Free transfers, hits, chips, squad reversion, special transfer grants and
+deadline closure are state-machine transitions, not ad hoc calculations.
+
+RD-02-12. Special seasonal events are declarative.
+A one-off event such as the 2025/26 AFCON transfer top-up belongs in
+special_events.yaml, not an if statement such as:
+    if season == 2025 and gameweek == 16.
+
+RD-02-13. Undisclosed mechanisms remain outside deterministic rules.
+FPL does not publish the exact player price-change threshold algorithm. The
+rules engine can represent official price and selling-price mechanics; the
+probabilistic prediction of future changes belongs to DMFP-11.
+
+RD-02-14. Official outcomes remain the reconciliation authority.
+Pulse should model FPL points itself for projection and validation, but after
+official points are final it should reconcile to official FPL outcomes. It must
+not insist that its own reconstruction overrides official assist or bonus
+decisions.
+
+RD-02-15. Fail closed on ambiguity.
+A conflicting or unknown BLOCKING rule prevents activation. The engine does not
+guess.
+
+0.3 REQUIRED OUTPUT ARTEFACTS
+-----------------------------
+The rules subsystem must ultimately produce:
+
+- a human-readable target-season rules directory;
+- JSON Schemas;
+- a canonical compiled JSON ruleset;
+- a source/provenance manifest;
+- a rules diff against the prior season;
+- a signed approval record;
+- golden test cases;
+- a deterministic rules-engine package;
+- a reconciliation report against official FPL outputs;
+- a version history and rollback path.
+
+0.4 PRODUCTION ACTIVATION CONDITION
+-----------------------------------
+The 2026/27 ruleset may become ACTIVE only when:
+
+- the official game is launched;
+- the target-season rules source is captured;
+- scoring values are verified;
+- assist and BPS policies are verified;
+- squad, lineup and transfer constraints are verified;
+- selling-price mechanics are verified;
+- chip inventory and windows are verified;
+- deadlines are ingested and checked;
+- all required schemas validate;
+- golden tests pass;
+- a representative official-game comparison passes;
+- no BLOCKING field is unknown;
+- Sebastian records human approval.
+
+======================================================================
+1. SCOPE, NON-GOALS AND SYSTEM BOUNDARIES
+======================================================================
+
+1.1 IN SCOPE
+------------
+A. Player scoring
+- position-specific goal points;
+- appearance points;
+- assists;
+- clean sheets;
+- goalkeeper saves;
+- penalty saves;
+- defensive-contribution points;
+- goals-conceded deductions;
+- penalty misses;
+- cards;
+- own goals;
+- BPS;
+- bonus allocation.
+
+B. Manager scoring
+- starting XI;
+- automatic substitutions;
+- bench order;
+- captain;
+- vice-captain;
+- Bench Boost;
+- Triple Captain;
+- transfer deductions;
+- Gameweek total.
+
+C. Squad legality
+- squad size;
+- position quotas;
+- club quota;
+- budget;
+- legal line-up formations;
+- same-position transfer replacement;
+- externally created club-quota violations and repair.
+
+D. Manager state
+- purchase prices;
+- current prices;
+- selling prices;
+- bank;
+- free transfers;
+- chip inventory;
+- active chip;
+- provisional and final points.
+
+E. Season operation
+- Gameweeks;
+- fixture-to-Gameweek membership;
+- deadlines;
+- blank and double Gameweeks;
+- rescheduled fixtures;
+- special transfer events;
+- chip validity windows;
+- target-season changes.
+
+F. Governance
+- configuration;
+- schemas;
+- provenance;
+- versioning;
+- activation;
+- diffing;
+- tests;
+- rollback.
+
+1.2 OUT OF SCOPE
+----------------
+This document does not specify:
+
+- how to predict football events;
+- expected minutes;
+- expected goals or assists;
+- odds ingestion;
+- player price-change thresholds;
+- expected ownership;
+- rank utility;
+- transfer optimisation;
+- whether a chip should be used;
+- an autonomous FPL account-writing system;
+- scraping or licensing policy beyond the rules-source requirement.
+
+Those modules consume the rules configuration.
+
+1.3 CRITICAL BOUNDARY: RULES VERSUS MODELS
+------------------------------------------
+RULE:
+A defender receives N points for an eligible goal under a particular ruleset.
+
+MODEL:
+The probability that a defender scores.
+
+RULE:
+A player qualifies for clean-sheet points after a configured appearance
+threshold.
+
+MODEL:
+The probability that the player reaches that threshold and the team keeps a
+clean sheet.
+
+RULE:
+A free transfer costs zero points and extra transfers cost a configured amount.
+
+MODEL:
+Whether taking a hit has positive expected value.
+
+RULE:
+The captain multiplier is configured.
+
+MODEL:
+Which player should be captain.
+
+RULE:
+A player purchased at one price has a deterministic selling price given current
+price.
+
+MODEL:
+The probability that current price changes tonight.
+
+This boundary MUST be enforced in package dependencies.
+
+1.4 CRITICAL BOUNDARY: PROJECTION VERSUS OFFICIAL RECONCILIATION
+----------------------------------------------------------------
+For projections:
+- Pulse needs an explicit assist classifier;
+- Pulse needs a BPS simulator;
+- Pulse needs a defensive-contribution event model.
+
+For official historical outcomes:
+- Pulse should ingest the official FPL result;
+- compare its reconstruction;
+- explain differences;
+- preserve the official value as the outcome label unless an official correction
+  later changes it.
+
+The engine therefore has two modes:
+
+PROJECTION_MODE
+Uses simulated events and configured policies.
+
+RECONCILIATION_MODE
+Uses official event/point feeds and reports deviations from Pulse's independent
+calculation.
+
+======================================================================
+2. RULE AUTHORITY, PROVENANCE AND CONFLICT RESOLUTION
+======================================================================
+
+2.1 CLAIM CRITICALITY
+---------------------
+Every item in this document is BLOCKING or CORE under DMFP-01.
+
+BLOCKING examples:
+- goal point weights;
+- squad budget;
+- formation minimums;
+- transfer hit cost;
+- captain multiplier;
+- chip count;
+- deadline;
+- selling-price formula.
+
+CORE examples:
+- BPS reconstruction;
+- detailed assist policy;
+- points-finality window;
+- treatment of rare edge cases.
+
+2.2 TARGET-SEASON SOURCE ORDER
+------------------------------
+For a target-season rule:
+
+1. Official FPL rules/help for 2026/27.
+2. Official 2026/27 FPL game-update page.
+3. Official Premier League/FPL explanatory article.
+4. Observable official game behaviour or official API data.
+5. Explicit official support clarification.
+6. Prior-season official rule, labelled historical only.
+7. Reproducible practitioner observation.
+8. Community interpretation.
+
+An official explanatory article is useful, but the actual target-season rules
+and observable game behaviour must be checked where wording is incomplete.
+
+2.3 SOURCE LOCATOR PER RULE
+---------------------------
+Every configured rule must link to:
+
+- source_id;
+- canonical URL or internal artefact;
+- publication/update date;
+- date accessed;
+- exact section, line, JSON path or screenshot reference;
+- verification status;
+- verifier;
+- next-review trigger.
+
+2.4 CONFLICT TYPES
+------------------
+TEXT_VS_TEXT:
+Two official pages state different rules.
+
+TEXT_VS_GAME:
+Official prose conflicts with observed application behaviour.
+
+ARTICLE_VS_RULES:
+An explanatory article simplifies or conflicts with formal rules.
+
+PRIOR_VS_TARGET:
+The prior season differs from target season.
+
+CONFIG_VS_SOURCE:
+Compiled value differs from approved source.
+
+API_VS_UI:
+Official API data differs from visible game output.
+
+2.5 CONFLICT PROCEDURE
+----------------------
+1. Freeze production activation.
+2. Record a CONFLICTED claim.
+3. Capture both sources and timestamps.
+4. Determine whether one is stale or from another season.
+5. Construct a minimal official-game test where possible.
+6. Seek official clarification if material.
+7. Record the selected interpretation and residual risk.
+8. Add a golden regression test.
+9. Approve a new ruleset version.
+10. Preserve the conflict history.
+
+2.6 NO SILENT CORRECTION
+------------------------
+If an official rule is later corrected, the old config is not edited in place.
+
+Create:
+- new source record;
+- new claim version;
+- new ruleset version;
+- effective time;
+- migration/recalculation policy;
+- supersession link.
+
+======================================================================
+3. RULESET ARTEFACT ARCHITECTURE
+======================================================================
+
+3.1 DIRECTORY STRUCTURE
+-----------------------
+Recommended:
+
+config/
+  fpl/
+    schemas/
+      season_manifest.schema.json
+      positions.schema.json
+      scoring.schema.json
+      assists.schema.json
+      bonus.schema.json
+      squad.schema.json
+      lineup.schema.json
+      transfers.schema.json
+      prices.schema.json
+      chips.schema.json
+      deadlines.schema.json
+      special_events.schema.json
+      source_manifest.schema.json
+      compiled_ruleset.schema.json
+
+    reference/
+      2025_26/
+        season_manifest.yaml
+        positions.yaml
+        scoring.yaml
+        assists.yaml
+        bonus.yaml
+        squad.yaml
+        lineup.yaml
+        transfers.yaml
+        prices.yaml
+        chips.yaml
+        deadlines.yaml
+        special_events.yaml
+        source_manifest.yaml
+        CHANGELOG.txt
+        golden_cases/
+
+    seasons/
+      2026_27/
+        season_manifest.yaml
+        positions.yaml
+        scoring.yaml
+        assists.yaml
+        bonus.yaml
+        squad.yaml
+        lineup.yaml
+        transfers.yaml
+        prices.yaml
+        chips.yaml
+        deadlines.yaml
+        special_events.yaml
+        source_manifest.yaml
+        approval.yaml
+        CHANGELOG.txt
+        golden_cases/
+
+    compiled/
+      fpl-2025-26.reference.json
+      fpl-2026-27.v1.0.0.json
+
+3.2 FILE RESPONSIBILITIES
+-------------------------
+season_manifest.yaml
+- season identity;
+- status;
+- version;
+- source bundle;
+- production eligibility;
+- required-file hashes;
+- approval.
+
+positions.yaml
+- stable internal position enum;
+- target-season external mappings;
+- squad quota;
+- lineup minimum/maximum;
+- scoring references.
+
+scoring.yaml
+- numeric FPL point weights;
+- appearance thresholds;
+- clean-sheet eligibility;
+- saves;
+- goals conceded;
+- negative events;
+- defensive contributions.
+
+assists.yaml
+- assist eligibility policy;
+- rebound;
+- own-goal forcing;
+- penalty/free-kick rules;
+- defensive-touch conditions.
+
+bonus.yaml
+- BPS event values;
+- thresholds;
+- mutually exclusive values;
+- tie allocation;
+- bonus point values.
+
+squad.yaml
+- squad size;
+- position quotas;
+- club quota;
+- initial budget;
+- temporary violation policy.
+
+lineup.yaml
+- XI size;
+- formation constraints;
+- bench;
+- automatic substitutions;
+- captain and vice-captain.
+
+transfers.yaml
+- preseason transfer policy;
+- free-transfer earning and cap;
+- hit cost;
+- same-position requirement;
+- chip interactions;
+- club-quota repair.
+
+prices.yaml
+- price unit;
+- current/purchase/selling price;
+- sell-on rule;
+- undisclosed price-change boundary.
+
+chips.yaml
+- chip types;
+- inventory;
+- validity windows;
+- activation;
+- cancellation;
+- incompatibilities;
+- state transition.
+
+deadlines.yaml
+- Gameweek IDs;
+- official deadline timestamps;
+- fixture membership;
+- finalisation policy;
+- deadline provenance.
+
+special_events.yaml
+- one-off free-transfer grants;
+- mid-season rule patches;
+- emergency official changes;
+- effective Gameweeks.
+
+source_manifest.yaml
+- source IDs and locators for each field;
+- verification states;
+- hashes;
+- reviewers.
+
+3.3 AUTHORING AND RUNTIME FORMATS
+---------------------------------
+Human authoring:
+YAML 1.2.2.
+
+Validation representation:
+JSON data validated against JSON Schema Draft 2020-12.
+
+Runtime:
+Canonical JSON with:
+- deterministic key ordering;
+- normalised strings;
+- no comments;
+- no aliases;
+- no implicit dates;
+- explicit integers;
+- SHA-256 hash.
+
+3.4 YAML SAFETY RULES
+---------------------
+To avoid parser ambiguity:
+
+- quote season codes: "2026/27";
+- quote timestamps;
+- quote strings such as "on", "off", "yes", "no";
+- do not use YAML anchors in production rules;
+- do not use duplicate keys;
+- do not use custom tags;
+- do not rely on implicit octal/sexagesimal behaviour;
+- validate converted JSON, not only YAML syntax;
+- preserve comments only in source YAML, never as the sole provenance.
+
+3.5 REQUIRED FIELD METADATA
+---------------------------
+A critical configured value SHOULD support:
+
+rule_id:
+  "FPL-SCORE-GOAL-DEF"
+
+value:
+  6
+
+unit:
+  "fpl_points"
+
+effective_from:
+  "2026-08-21T00:00:00Z"
+
+effective_until:
+  null
+
+status:
+  "VERIFIED"
+
+source_refs:
+  - source_id: "SRC-FPL-2026-001"
+    locator: "Scoring > Goals > Defender"
+
+verified_by:
+  "Sebastian Greenhalgh"
+
+verified_at:
+  "2026-XX-XXTXX:XX:XXZ"
+
+3.6 NORMALISED VERSUS VERBOSE CONFIG
+------------------------------------
+Authoring files may be verbose and provenance-rich.
+
+The compiled runtime file should retain:
+- values;
+- rule IDs;
+- effective dates;
+- essential source IDs;
+- configuration version;
+- hash.
+
+Large source notes remain in the evidence register.
+
+======================================================================
+4. RULESET STATUS, VERSIONING AND ACTIVATION
+======================================================================
+
+4.1 RULESET STATUS
+------------------
+DRAFT_PRELAUNCH:
+Target-season file exists but official game is not launched.
+
+REFERENCE_ONLY:
+Historical ruleset used for testing, not production decisions.
+
+CAPTURED_UNVERIFIED:
+Official sources captured but not fully reviewed.
+
+CONFLICTED:
+One or more material rules disagree.
+
+VERIFIED:
+All required rules checked and tests pass.
+
+ACTIVE:
+Verified and approved for production use.
+
+SUPERSEDED:
+Replaced by a later effective ruleset.
+
+REVOKED:
+Known unsafe or incorrect; must not be used.
+
+4.2 SEMANTIC VERSIONING
+-----------------------
+Use Semantic Versioning 2.0.0 for the ruleset interface:
+
+MAJOR:
+A change that can alter public rules-engine semantics or require downstream
+adaptation.
+
+Examples:
+- new scoring event;
+- changed chip state model;
+- changed position set;
+- changed transfer transition contract.
+
+MINOR:
+Backward-compatible addition.
+
+Examples:
+- newly confirmed optional metadata;
+- additional special event;
+- additional nonrequired diagnostic.
+
+PATCH:
+Backward-compatible correction that does not alter intended official semantics,
+or provenance/test improvement.
+
+Because a correction can materially change decisions, every release also records:
+- effective date;
+- source change;
+- affected Gameweeks;
+- whether historical recomputation is required.
+
+4.3 PRE-RELEASE EXAMPLE
+-----------------------
+ruleset_id: "fpl-2026-27"
+ruleset_version: "0.1.0-prelaunch.1"
+season_code: "2026/27"
+status: "DRAFT_PRELAUNCH"
+production_eligible: false
+
+4.4 ACTIVATION GATE
+-------------------
+The activation command should resemble:
+
+    dmf rules activate fpl-2026-27 --version 1.0.0
+
+It must verify:
+- schema validity;
+- zero unknown required fields;
+- source manifest completeness;
+- source freshness;
+- human approval;
+- golden tests;
+- differential test;
+- compiled hash;
+- no newer conflicting official source.
+
+4.5 IMMUTABILITY
+----------------
+An ACTIVE ruleset is immutable.
+
+A change creates a new version. Database records and decision bundles store the
+exact ruleset ID and hash.
+
+4.6 ROLLBACK
+------------
+A new ruleset release must identify:
+- prior version;
+- rollback command;
+- incompatibilities;
+- historical data migration;
+- affected recommendations;
+- reprocessing plan.
+
+======================================================================
+5. DATA TYPES, UNITS AND CORE ENUMS
+======================================================================
+
+5.1 PRICE
+---------
+Type:
+integer
+
+Unit:
+tenths of £1m
+
+Examples:
+- £4.0m = 40
+- £5.5m = 55
+- £100.0m = 1000
+
+Never:
+- 5.5 as a binary float in legality calculations.
+
+5.2 POINTS
+----------
+Official FPL points:
+integer
+
+Expected points:
+floating distribution summary in modelling layer, not rules config.
+
+BPS:
+integer unless official rules introduce another type.
+
+5.3 MINUTES
+-----------
+Observed official minutes:
+nonnegative integer.
+
+Rule thresholds:
+explicit interval definitions.
+
+The ruleset must distinguish:
+- inclusive lower bound;
+- inclusive/exclusive upper bound;
+- stoppage treatment;
+- appearance definition.
+
+Do not encode ambiguous prose such as "up to 60" without interval tests.
+
+5.4 TIMESTAMP
+-------------
+RFC 3339 UTC:
+"2026-08-21T16:30:00Z"
+
+Store:
+- official deadline;
+- source publication time;
+- capture time;
+- activation time;
+- effective time.
+
+5.5 POSITION ENUM
+-----------------
+Stable internal:
+GK
+DEF
+MID
+FWD
+
+External element-type IDs are season data and MUST be mapped, not assumed.
+
+5.6 CHIP ENUM
+-------------
+Stable capability identifiers:
+BENCH_BOOST
+FREE_HIT
+TRIPLE_CAPTAIN
+WILDCARD
+
+The target season may add/remove/rename chips. Inventory and rules remain
+configuration.
+
+5.7 VERIFICATION ENUM
+---------------------
+UNKNOWN
+UNCONFIRMED
+PROVISIONAL
+VERIFIED
+CONFLICTED
+SUPERSEDED
+
+5.8 NO MAGIC NULLS
+------------------
+A production-required rule cannot use null to mean:
+- zero;
+- unlimited;
+- not applicable;
+- unknown.
+
+Use explicit values:
+limit_type: "UNLIMITED"
+applicability: false
+verification_status: "UNKNOWN"
+
+======================================================================
+6. POSITION CONFIGURATION
+======================================================================
+
+6.1 INTERNAL POSITION DEFINITION
+--------------------------------
+The rules engine uses semantic positions, not raw provider IDs.
+
+Example:
+
+positions:
+  GK:
+    display_name: "Goalkeeper"
+    squad_quota: 2
+    lineup_min: 1
+    lineup_max: 1
+
+  DEF:
+    display_name: "Defender"
+    squad_quota: 5
+    lineup_min: 3
+    lineup_max: 5
+
+  MID:
+    display_name: "Midfielder"
+    squad_quota: 5
+    lineup_min: 2
+    lineup_max: 5
+
+  FWD:
+    display_name: "Forward"
+    squad_quota: 3
+    lineup_min: 1
+    lineup_max: 3
+
+6.2 EXTERNAL POSITION MAPPING
+-----------------------------
+The target-season game data may expose numeric element types.
+
+Store:
+- provider;
+- season;
+- external ID;
+- external name;
+- internal enum;
+- source;
+- verified timestamp.
+
+The engine MUST reject a player with an unmapped position.
+
+6.3 POSITION CHANGE
+-------------------
+If FPL reclassifies a player between seasons:
+- the player-season record changes;
+- historical seasons remain unchanged;
+- projections use target-season position;
+- scoring follows target-season position;
+- purchase-price history is season-scoped.
+
+If an in-season reclassification ever occurs, it requires an effective-dated
+official rule/event and explicit migration.
+
+6.4 REFERENCE 2025/26 POSITION QUOTAS
+-------------------------------------
+REFERENCE_ONLY:
+- 2 GK;
+- 5 DEF;
+- 5 MID;
+- 3 FWD;
+- total 15.
+
+Target-season verification:
+REQUIRED AT 2026/27 LAUNCH.
+
+======================================================================
+7. APPEARANCE POINTS
+======================================================================
+
+7.1 REFERENCE 2025/26 VALUES
+----------------------------
+REFERENCE_ONLY official 2025/26 explanation:
+
+- appearance below the full threshold: 1 point;
+- appearance at or above 60 official minutes, excluding stoppage time:
+  2 points total.
+
+The target-season configuration must define exact threshold semantics.
+
+7.2 PROPOSED CONFIG SHAPE
+-------------------------
+appearance:
+  eligibility:
+    min_minutes_for_any_appearance_points: 1
+    minute_source: "OFFICIAL_FPL"
+    stoppage_time_included: false
+
+  bands:
+    - band_id: "APPEARANCE_SHORT"
+      min_minutes_inclusive: 1
+      max_minutes_exclusive: 60
+      points: 1
+
+    - band_id: "APPEARANCE_LONG"
+      min_minutes_inclusive: 60
+      max_minutes_exclusive: null
+      points: 2
+
+  combination: "HIGHEST_MATCHING_BAND_ONLY"
+
+7.3 EDGE CASES
+--------------
+- 0 minutes: no appearance points.
+- 1 minute: short-appearance band if target rule confirms.
+- exactly 60: long band if target rule confirms.
+- official minutes, not wall-clock elapsed seconds.
+- multiple fixtures: score each fixture independently.
+- abandoned/replayed match: official FPL treatment controls.
+- added time: excluded from threshold if official target rule confirms.
+- goalkeeper substituted: appearance scored normally.
+- player sent off: appearance remains based on official minutes.
+
+7.4 TESTS
+---------
+- minutes 0 -> 0;
+- minutes 1 -> 1 reference point;
+- minutes 59 -> 1;
+- minutes 60 -> 2;
+- minutes 90 -> 2;
+- no double counting of both bands;
+- two fixtures at 30 and 60 -> 1 + 2 before manager multipliers.
+
+======================================================================
+8. GOAL SCORING BY POSITION
+======================================================================
+
+8.1 REFERENCE 2025/26 VALUES
+----------------------------
+REFERENCE_ONLY:
+
+- GK goal: 10 FPL points;
+- DEF goal: 6;
+- MID goal: 5;
+- FWD goal: 4.
+
+8.2 CONFIG SHAPE
+----------------
+goals:
+  points_by_position:
+    GK: 10
+    DEF: 6
+    MID: 5
+    FWD: 4
+
+  event_scope: "PER_GOAL"
+  position_basis: "PLAYER_SEASON_FPL_POSITION"
+  penalty_goal_same_fpl_points_as_open_play: true
+
+8.3 RULES ENGINE BEHAVIOUR
+--------------------------
+For each official/simulated eligible goal:
+    goal_points += goals * position_weight
+
+Penalty status affects BPS in the 2025/26 reference system, not ordinary FPL goal
+points.
+
+8.4 EDGE CASES
+--------------
+- own goal is not an eligible scored goal and instead receives the configured
+  own-goal deduction;
+- shootout goals are not Premier League match goals;
+- voided/abandoned match follows official FPL outcome;
+- position is FPL classification, not tactical role;
+- a player transferred between clubs retains target-season FPL position unless
+  officially changed;
+- captain/chip multipliers apply to total player points later.
+
+8.5 TESTS
+---------
+One goal for each position.
+Two goals multiply correctly.
+Penalty goal ordinary FPL points equal position goal points if target rule
+confirms.
+Own goal never triggers positive goal scoring.
+
+======================================================================
+9. ASSIST SCORING AND ASSIST ELIGIBILITY
+======================================================================
+
+9.1 NUMERIC VALUE
+-----------------
+REFERENCE_ONLY 2025/26:
+An eligible assist is worth 3 FPL points for every position.
+
+9.2 WHY ASSISTS REQUIRE A POLICY FILE
+-------------------------------------
+The points value is simple. Eligibility is not.
+
+Assist allocation can depend on:
+- final attacking touch;
+- defensive touches;
+- location where scorer receives the ball;
+- intended target/destination;
+- rebound;
+- woodwork;
+- own goal;
+- penalty/free-kick won;
+- whether the taker won the foul;
+- possession lost and regained;
+- attempted defensive pass;
+- handball;
+- multiple interventions.
+
+The eligibility logic must not be compressed into one hard-coded boolean.
+
+9.3 REFERENCE 2025/26 POLICY SUMMARY
+------------------------------------
+REFERENCE_ONLY, paraphrased from official 2025/26 guidance:
+
+- The player from the scoring team making the final qualifying pass/touch may
+  receive the assist.
+- A rebound after a shot is blocked, saved or strikes the woodwork may create an
+  assist.
+- A player whose shot/pass forces an own goal may receive an assist.
+- A player winning a penalty or free kick may receive an assist if it is scored
+  directly.
+- The taker receives no assist merely for having won the same penalty/free kick.
+- If the scorer receives the ball inside the penalty area and there is only one
+  defensive touch, the intended target generally does not control.
+- If the scorer receives the ball outside the area, intended destination remains
+  relevant.
+- Two or more defensive touches prevent the assist under the cited 2025/26
+  policy.
+- Losing and regaining possession prevents an assist.
+- Detailed defensive-error and handball cases require exact target-season
+  verification.
+
+9.4 POLICY CONFIG EXAMPLE
+-------------------------
+assists:
+  points: 3
+
+  final_touch:
+    eligible_attacking_actions:
+      - PASS
+      - CROSS
+      - INADVERTENT_TOUCH
+      - SHOT
+      - FOUL_WON
+      - FORCED_OWN_GOAL_ACTION
+
+  defensive_touch_policy:
+    inside_box:
+      max_defensive_touches: 1
+      intended_destination_required: false
+    outside_box:
+      max_defensive_touches: 1
+      intended_destination_required: true
+    defensive_attempted_pass_disqualifies: true
+
+  possession:
+    scorer_loses_and_regains_disqualifies: true
+
+  rebounds:
+    blocked_shot: true
+    goalkeeper_save: true
+    woodwork: true
+
+  own_goals:
+    forced_by_shot_or_pass: true
+
+  set_pieces:
+    foul_winner_gets_assist_if_directly_scored: true
+    taker_who_won_foul_gets_assist: false
+
+  handball:
+    policy_id: "TARGET_SEASON_TO_VERIFY"
+
+9.5 IMPLEMENTATION STRATEGY
+---------------------------
+Projection mode SHOULD not attempt a perfect legalistic event classifier from
+minimal aggregate data.
+
+Use one of:
+- official/provider event labels;
+- a probabilistic assist allocation model;
+- scenario event types that map cleanly to configured rules.
+
+Reconciliation mode:
+- ingest official assist outcome;
+- compare independent classification only when event detail is available.
+
+9.6 DISCRETION AND SUBJECTIVITY
+-------------------------------
+If official allocation retains judgement:
+- configuration must record the policy;
+- model uncertainty must remain;
+- official final allocation controls historical label;
+- differences become reconciliation observations, not engine corruption.
+
+9.7 TEST CATALOGUE
+------------------
+- direct final pass;
+- one defensive touch, scorer receives inside box;
+- one touch, scorer outside box and remains intended target;
+- one touch, scorer outside box and not intended target;
+- two defensive touches;
+- shot rebound from goalkeeper;
+- shot rebound from woodwork;
+- forced own goal;
+- penalty won and another player scores;
+- same player wins and scores penalty;
+- scorer loses and regains possession;
+- defensive attempted pass;
+- handball with/without intervening touch.
+
+Each target-season expected result needs an official source or verified official
+game example.
+
+======================================================================
+10. CLEAN SHEETS AND GOALS CONCEDED
+======================================================================
+
+10.1 REFERENCE 2025/26 CLEAN-SHEET VALUES
+-----------------------------------------
+REFERENCE_ONLY:
+
+- GK clean sheet: 4;
+- DEF clean sheet: 4;
+- MID clean sheet: 1;
+- FWD clean sheet: 0.
+
+10.2 CLEAN-SHEET ELIGIBILITY
+----------------------------
+REFERENCE_ONLY:
+A player must reach the configured 60-minute threshold, excluding stoppage time.
+If substituted after becoming eligible and the team concedes later, the player
+retains clean-sheet points.
+
+10.3 CONFIG SHAPE
+-----------------
+clean_sheets:
+  points_by_position:
+    GK: 4
+    DEF: 4
+    MID: 1
+    FWD: 0
+
+  min_minutes_inclusive: 60
+  stoppage_time_included: false
+  evaluate_goals_conceded_while_player_on_pitch: true
+  retain_after_substitution: true
+  red_card_policy: "CONTINUE_TEAM_GOALS_CONCEDED_AFTER_DISMISSAL"
+
+10.4 GOALS-CONCEDED DEDUCTION
+-----------------------------
+REFERENCE_ONLY:
+For GK and DEF:
+- minus 1 point for every complete pair of goals conceded.
+
+Proposed calculation:
+    deduction = -floor(eligible_goals_conceded / 2)
+
+Position applicability:
+GK, DEF.
+
+10.5 PLAYER-ON-PITCH VERSUS TEAM GOALS
+--------------------------------------
+Normal substitution:
+Count goals conceded while the player is on the pitch.
+
+Red-card reference edge case:
+Official FPL rules state that a dismissed player continues to be penalised for
+goals subsequently conceded by the team.
+
+This means the event-state model needs:
+
+- on_pitch interval;
+- dismissed_at;
+- team goals after dismissal;
+- clean-sheet eligibility;
+- goals-conceded counter policy.
+
+10.6 OWN GOAL AND CLEAN SHEET
+-----------------------------
+If the player's team concedes an own goal, the team has conceded and clean-sheet
+eligibility is lost according to ordinary match outcome.
+
+10.7 MULTIPLE FIXTURES
+----------------------
+Clean sheet and goals-conceded deduction are calculated per fixture. A player
+can earn a clean sheet in one fixture and concede in another during a Double
+Gameweek.
+
+10.8 TESTS
+----------
+- GK 90 minutes, 0 conceded -> 4;
+- DEF 60 minutes, 0 conceded -> 4;
+- MID 60 minutes, 0 conceded -> 1;
+- FWD -> 0 clean-sheet points;
+- DEF 59 minutes, 0 conceded -> 0;
+- DEF substituted at 65, team concedes at 80 -> retain clean sheet;
+- DEF on pitch for 1 conceded -> no goals-conceded deduction;
+- DEF on pitch for 2 -> -1;
+- 4 -> -2;
+- red at 30, team later concedes 2 -> apply official red-card policy;
+- one clean sheet + one non-clean-sheet fixture aggregate correctly.
+
+======================================================================
+11. GOALKEEPER SAVES AND PENALTIES
+======================================================================
+
+11.1 SAVE POINTS
+----------------
+REFERENCE_ONLY 2025/26:
+- 1 point for every complete group of 3 goalkeeper saves.
+
+Calculation:
+    save_points = floor(saves / 3) * points_per_group
+
+Unlike 2025/26 defensive contributions, save points are not capped by the cited
+rule.
+
+11.2 PENALTY SAVE
+-----------------
+REFERENCE_ONLY:
+- 5 FPL points for each eligible penalty save.
+
+This is in addition to any ordinary save accounting if official event treatment
+counts it as a save; the target-season official data behaviour must be verified.
+
+11.3 PENALTY MISS
+-----------------
+REFERENCE_ONLY:
+- penalty taker receives -2 FPL points for each miss.
+
+11.4 CONFIG SHAPE
+-----------------
+goalkeeper_saves:
+  saves_per_point: 3
+  points_per_group: 1
+  cap_per_fixture: null
+
+penalties:
+  save_points: 5
+  miss_points: -2
+  shootout_events_eligible: false
+  saved_penalty_counts_as_ordinary_save:
+    value: "UNCONFIRMED_TARGET_SEASON"
+
+11.5 EDGE CASES
+--------------
+- penalty retaken;
+- penalty hits woodwork;
+- penalty saved then scored from rebound;
+- encroachment invalidates event;
+- shootout;
+- goalkeeper changes during match;
+- outfield player acting as goalkeeper;
+- official provider event correction.
+
+Projection engine should simulate event categories that the rules engine can map.
+
+11.6 TESTS
+----------
+- 0, 1, 2 saves -> 0 save points;
+- 3, 4, 5 -> 1;
+- 6 -> 2;
+- one penalty save -> configured points;
+- two saves -> twice points;
+- penalty miss -> deduction;
+- no shootout scoring.
+
+======================================================================
+12. DEFENSIVE-CONTRIBUTION POINTS
+======================================================================
+
+12.1 REFERENCE 2025/26 RULE
+---------------------------
+REFERENCE_ONLY:
+
+DEF:
+- metric: clearances + blocks + interceptions + tackles (CBIT);
+- threshold: 10 in a single match;
+- reward: 2 FPL points;
+- cap: 2 points per match.
+
+MID/FWD:
+- metric: clearances + blocks + interceptions + tackles + ball recoveries
+  (CBIRT);
+- threshold: 12;
+- reward: 2;
+- cap: 2 per match.
+
+GK:
+- no defensive-contribution rule in the reference scoring table.
+
+12.2 CONFIG SHAPE
+-----------------
+defensive_contributions:
+  scope: "PER_FIXTURE"
+
+  by_position:
+    GK:
+      enabled: false
+
+    DEF:
+      enabled: true
+      event_types:
+        - CLEARANCE
+        - BLOCK
+        - INTERCEPTION
+        - TACKLE
+      threshold: 10
+      points: 2
+      max_points_per_fixture: 2
+
+    MID:
+      enabled: true
+      event_types:
+        - CLEARANCE
+        - BLOCK
+        - INTERCEPTION
+        - TACKLE
+        - BALL_RECOVERY
+      threshold: 12
+      points: 2
+      max_points_per_fixture: 2
+
+    FWD:
+      enabled: true
+      event_types:
+        - CLEARANCE
+        - BLOCK
+        - INTERCEPTION
+        - TACKLE
+        - BALL_RECOVERY
+      threshold: 12
+      points: 2
+      max_points_per_fixture: 2
+
+12.3 CAP BEHAVIOUR
+------------------
+The reference 2025/26 rule is threshold/cap, not repeatable blocks.
+
+A defender with:
+- 9 -> 0;
+- 10 -> 2;
+- 20 -> still 2.
+
+The engine MUST NOT reuse the save-points floor-division function.
+
+12.4 EVENT DEFINITIONS
+----------------------
+The underlying event provider's definitions may control whether an action is
+recorded. The rule config must distinguish:
+
+- FPL eligibility rule;
+- source/provider event taxonomy;
+- mapping version.
+
+If Pulse uses non-Opta event data, it must validate mapping and tolerate
+systematic differences.
+
+12.5 MULTIPLE FIXTURES
+----------------------
+The cap is per fixture. A player may earn the reward in each fixture of a Double
+Gameweek.
+
+12.6 TESTS
+----------
+For each position:
+- threshold - 1;
+- exactly threshold;
+- threshold + 1;
+- two times threshold;
+- wrong event type excluded;
+- cap per fixture;
+- two fixtures can earn twice;
+- goalkeeper disabled.
+
+======================================================================
+13. BONUS POINTS SYSTEM
+======================================================================
+
+13.1 TWO DISTINCT LAYERS
+------------------------
+BPS:
+Performance score used to rank players in a match.
+
+BONUS FPL POINTS:
+3, 2 or 1 FPL points allocated based on ranked BPS and tie rules.
+
+Do not confuse them.
+
+13.2 REFERENCE 2025/26 BPS TABLE
+--------------------------------
+REFERENCE_ONLY official system updated 1 April 2026:
+
+Positive BPS:
+- playing 1–60 minutes: 3;
+- playing over 60: 6;
+- direct penalty goal: 12;
+- non-penalty goal by GK/DEF: 12;
+- non-penalty goal by MID: 18;
+- non-penalty goal by FWD: 24;
+- assist: 9;
+- GK/DEF clean sheet: 12;
+- penalty save: 8;
+- save from shot inside box: 3;
+- save from shot outside box: 2;
+- successful open-play cross: 1;
+- big chance created: 3;
+- every 2 clearances/blocks/interceptions combined: 1;
+- every 3 recoveries: 1;
+- key pass: 1;
+- successful tackle: 2;
+- successful dribble: 1;
+- match-winning goal: 3;
+- goalline clearance: 9;
+- foul won: 1;
+- shot on target: 2;
+- pass completion 70–79%, at least 30 attempts: 2;
+- pass completion 80–89%, at least 30 attempts: 4;
+- pass completion 90%+, at least 30 attempts: 6.
+
+Negative BPS:
+- GK/DEF conceding a goal: -4;
+- conceding a penalty: -3;
+- penalty miss: -6;
+- yellow: -3;
+- red: -9;
+- own goal: -6;
+- big chance missed: -3;
+- error leading to goal: -3;
+- error leading to attempt: -1;
+- being tackled: -1;
+- foul conceded: -1;
+- offside: -1;
+- shot off target: -1.
+
+13.3 MUTUAL EXCLUSIVITY
+-----------------------
+Penalty goal BPS is a special direct-penalty value in the reference table.
+
+Implementation must not:
+- add penalty-goal BPS;
+- then also add the position-specific ordinary goal BPS.
+
+The event must select one applicable goal-BPS category.
+
+Pass-completion bands are also mutually exclusive. Apply the highest single band
+that matches, not all lower bands cumulatively.
+
+Appearance BPS bands are mutually exclusive.
+
+13.4 BPS CONFIG SHAPE
+---------------------
+bonus:
+  scope: "PER_FIXTURE"
+
+  bps:
+    appearance_bands:
+      - min_minutes_inclusive: 1
+        max_minutes_inclusive: 60
+        bps: 3
+      - min_minutes_exclusive: 60
+        max_minutes_inclusive: null
+        bps: 6
+
+    goals:
+      penalty_direct:
+        bps: 12
+        exclusive_with_position_goal: true
+      non_penalty_by_position:
+        GK: 12
+        DEF: 12
+        MID: 18
+        FWD: 24
+
+    assists:
+      bps: 9
+
+    clean_sheet:
+      positions: [GK, DEF]
+      bps: 12
+      min_minutes: 60
+
+    grouped_events:
+      CBI:
+        group_size: 2
+        bps_per_group: 1
+      RECOVERY:
+        group_size: 3
+        bps_per_group: 1
+
+    pass_completion:
+      min_attempts: 30
+      bands:
+        - min_pct_inclusive: 70
+          max_pct_exclusive: 80
+          bps: 2
+        - min_pct_inclusive: 80
+          max_pct_exclusive: 90
+          bps: 4
+        - min_pct_inclusive: 90
+          max_pct_inclusive: 100
+          bps: 6
+      combination: "HIGHEST_MATCHING_BAND_ONLY"
+
+13.5 BONUS ALLOCATION
+---------------------
+REFERENCE_ONLY:
+- highest BPS rank receives 3;
+- second receives 2;
+- third receives 1.
+
+Tie rules:
+- tie for first: all tied first receive 3; the next distinct rank receives
+  the remaining appropriate allocation according to official rule;
+- official examples show two tied first receive 3 each and the next player gets
+  1;
+- tie for second: first gets 3, tied second players get 2;
+- tie for third: first gets 3, second gets 2, all tied third get 1.
+
+More than three players may receive bonus.
+
+13.6 GENERIC TIE ALGORITHM
+--------------------------
+Do not implement only three example-specific if-statements.
+
+Represent the rank award slots:
+[3, 2, 1]
+
+Group players by distinct BPS descending and use the target-season tie policy.
+
+For the 2025/26 reference policy, golden cases must include:
+- no tie;
+- two-way tie first;
+- three-way tie first;
+- two-way tie second;
+- multiway tie third;
+- two tied first plus three tied next;
+- all players tied;
+- negative BPS;
+- zero BPS.
+
+If official rules are unclear for unusual tie structures, compare against
+official historical matches and record the verified algorithm.
+
+13.7 BPS INPUT COMPLETENESS
+---------------------------
+Bonus cannot be correctly reconstructed from goals/assists alone.
+
+The provider must supply or Pulse must model:
+- all configured positive and negative BPS actions;
+- pass attempts/completions;
+- shot locations;
+- errors;
+- tackles;
+- recoveries;
+- match-winning goal;
+- player minutes;
+- goals conceded.
+
+Projection uncertainty must reflect missing BPS events.
+
+13.8 TESTS
+----------
+One unit test per BPS event.
+Mutual-exclusivity tests.
+Grouped-event floor tests.
+Pass-band boundaries.
+Clean-sheet threshold.
+Tie-allocation golden cases.
+Comparison with official fixture BPS/bonus records.
+
+======================================================================
+14. CARDS, OWN GOALS AND OTHER NEGATIVE EVENTS
+======================================================================
+
+14.1 REFERENCE 2025/26 FPL POINTS
+---------------------------------
+- yellow card: -1;
+- red card: -3;
+- own goal: -2;
+- penalty miss: -2;
+- every two goals conceded by GK/DEF: -1.
+
+14.2 RED CARD AND YELLOW INTERACTION
+-----------------------------------
+Official rules reference:
+Red-card deductions include the relevant yellow-card deductions.
+
+The engine must not assume:
+- red replaces all yellows;
+- red is always additive to two separate yellow deductions;
+without encoding the official target-season event semantics.
+
+Represent disciplinary events explicitly:
+- YELLOW;
+- SECOND_YELLOW_RED;
+- STRAIGHT_RED.
+
+Then configure their point outcome.
+
+14.3 RED-CARD GOALS-CONCEDED POLICY
+-----------------------------------
+Reference official rule:
+A dismissed player continues to be penalised for team goals conceded after the
+red card.
+
+This is a specific exception to ordinary on-pitch goals-conceded treatment.
+
+14.4 OWN GOAL
+-------------
+An own goal:
+- receives the configured negative FPL points;
+- contributes to the opponent's team score;
+- breaks the player's team clean sheet;
+- is distinct from an attacking player forcing an own goal, which may create an
+  assist under the assist policy.
+
+14.5 MULTIPLE EVENTS
+--------------------
+Unless official rules say otherwise, separate event classes combine.
+
+Examples:
+- appearance + yellow;
+- goal + red;
+- own goal + goals-conceded deduction;
+- penalty miss + yellow;
+- assist + later red.
+
+The configuration must identify exclusions explicitly.
+
+14.6 TESTS
+----------
+- one yellow;
+- two-yellow dismissal;
+- straight red;
+- post-dismissal team goals;
+- own goal scoring;
+- own goal clean-sheet effect;
+- multiple penalties missed;
+- combined events.
+
+======================================================================
+15. SQUAD CONSTRAINTS AND BUDGET
+======================================================================
+
+15.1 REFERENCE 2025/26 INITIAL SQUAD
+------------------------------------
+REFERENCE_ONLY:
+
+- budget: £100.0m (1000 internal units);
+- squad size: 15;
+- 2 GK;
+- 5 DEF;
+- 5 MID;
+- 3 FWD;
+- maximum 3 players from one Premier League club.
+
+15.2 CONFIG SHAPE
+-----------------
+squad:
+  total_players: 15
+  initial_budget_price_units: 1000
+
+  position_quotas:
+    GK: 2
+    DEF: 5
+    MID: 5
+    FWD: 3
+
+  max_players_per_club: 3
+
+  price_unit:
+    label: "0.1m_GBP"
+    integer_only: true
+
+15.3 AFFORDABILITY
+------------------
+For an initial squad:
+    sum(current_purchase_prices) <= initial_budget
+
+For current manager state:
+    sum(selling value of outgoing players)
+    + current bank
+    determines purchase capacity for transfer actions.
+
+Do not value an existing squad at all current market prices when determining
+cash available.
+
+15.4 DUPLICATES
+----------------
+A squad cannot contain the same player more than once.
+
+15.5 ACTIVE PLAYER/CLUB
+-----------------------
+Target-season player and club membership are season data, not embedded in rules.
+
+15.6 EXTERNALLY CREATED CLUB-QUOTA VIOLATION
+--------------------------------------------
+A real-world player transfer can move an already owned player into a club from
+which the manager owns three others.
+
+Official 2025/26 guidance showed that:
+- the manager may retain the temporarily over-quota squad;
+- the manager cannot continue making ordinary transfers while remaining above
+  the club cap;
+- required next transfer(s) must reduce the overrepresented club until legal.
+
+Represent:
+
+club_quota_state:
+  NORMAL
+  EXTERNAL_VIOLATION
+
+transfer_repair_required:
+  excess_by_club
+
+The optimiser must treat the existing state as valid-but-restricted, not as an
+impossible corrupt state.
+
+15.7 TESTS
+----------
+- exact legal squad;
+- wrong total;
+- wrong position quota;
+- over budget;
+- duplicate player;
+- four selected initially from same club -> invalid;
+- external transfer creates four -> state allowed;
+- transfer not repairing violation -> invalid;
+- transfer repairing one excess -> valid transition.
+
+======================================================================
+16. STARTING LINE-UP, FORMATION, BENCH AND CAPTAINCY
+======================================================================
+
+16.1 REFERENCE 2025/26 LINE-UP
+------------------------------
+REFERENCE_ONLY:
+
+- 11 starters;
+- exactly 1 goalkeeper;
+- minimum 3 defenders;
+- minimum 2 midfielders;
+- minimum 1 forward.
+
+The implied maxima follow from squad positions and XI size but should be explicit
+in configuration.
+
+16.2 VALID FORMATIONS
+---------------------
+The engine should validate constraints, not maintain a fragile string list.
+
+Reference constraints generate formations such as:
+3-4-3, 3-5-2, 4-3-3, 4-4-2, 4-5-1, 5-2-3, 5-3-2, 5-4-1.
+
+Test generated legal set against official UI.
+
+16.3 BENCH
+----------
+Reference:
+- one reserve goalkeeper;
+- three ordered outfield substitutes.
+
+Bench order is manager state.
+
+16.4 AUTOMATIC SUBSTITUTIONS
+----------------------------
+REFERENCE_ONLY:
+
+- processed at end of Gameweek;
+- starting player must have no appearance in the Gameweek to be replaced;
+- reserve goalkeeper can replace starting goalkeeper if reserve appeared;
+- outfield substitutes are considered in bench order;
+- substitute must have appeared;
+- resulting lineup must satisfy formation constraints.
+
+16.5 MULTIPLE NON-APPEARANCES
+-----------------------------
+Use a deterministic algorithm:
+
+1. Resolve goalkeeper separately.
+2. Identify nonappearing outfield starters.
+3. Consider bench players in configured order.
+4. For each candidate, place them into the earliest valid replacement according
+   to the official algorithm and formation legality.
+5. Stop after available eligible substitutes.
+
+The exact official replacement ordering for multiple absent starters should be
+confirmed with target-season golden UI examples.
+
+16.6 CAPTAIN AND VICE-CAPTAIN
+-----------------------------
+REFERENCE_ONLY:
+
+- both selected from starting XI before deadline;
+- captain scores double if he makes any appearance in the Gameweek;
+- if captain does not appear at all, vice receives double if vice appears;
+- if neither appears, no player receives captain multiplier.
+
+Captaincy is based on Gameweek appearance across all fixtures, not only one
+fixture in a Double Gameweek.
+
+16.7 CONFIG SHAPE
+-----------------
+captaincy:
+  normal_multiplier: 2
+  activation:
+    captain_must_appear: true
+    appearance_scope: "ANY_FIXTURE_IN_GAMEWEEK"
+  vice_activation:
+    only_if_captain_zero_appearances: true
+  fallback_if_both_absent:
+    multiplier_awarded: false
+
+16.8 ORDER OF OPERATIONS
+------------------------
+Recommended:
+
+1. Calculate each squad player's total raw FPL points across Gameweek fixtures.
+2. Determine appearances across Gameweek.
+3. Resolve automatic substitutions.
+4. Determine effective captain/vice.
+5. Apply captain multiplier.
+6. Apply Bench Boost inclusion if active.
+7. Subtract transfer cost.
+8. Produce manager Gameweek total.
+
+Triple Captain modifies captain multiplier.
+Bench Boost modifies which squad players are included.
+Free Hit/Wildcard modify squad/transfer state, not player scoring.
+
+16.9 TESTS
+----------
+- every legal formation;
+- invalid two-defender lineup;
+- goalkeeper substitution;
+- first bench substitute used;
+- first bench player cannot maintain formation, second can;
+- multiple absent starters;
+- one-minute captain still receives multiplier;
+- absent captain, appearing vice;
+- both absent;
+- captain appears in second fixture only;
+- bench player does not receive captain role unless vice/captain rule explicitly
+  says so; captain/vice are chosen starters.
+
+======================================================================
+17. TRANSFERS, FREE TRANSFERS AND HITS
+======================================================================
+
+17.1 REFERENCE 2025/26 TRANSFER ALLOWANCE
+-----------------------------------------
+REFERENCE_ONLY:
+
+- unlimited free transfers before first deadline;
+- after first deadline, one new free transfer is made available for each
+  Gameweek;
+- unused free transfers can accumulate to a maximum of five;
+- additional transfers cost four FPL points each;
+- replacement must be same position;
+- resulting squad must fit budget and club quota.
+
+17.2 STATE VARIABLES
+--------------------
+manager_transfer_state:
+- free_transfers_available;
+- confirmed_transfers_this_gameweek;
+- chargeable_transfers_this_gameweek;
+- provisional_hit_points;
+- active_transfer_chip;
+- pre_chip_squad_snapshot;
+- pre_chip_bank_snapshot;
+- deadline_closed;
+- special_event_adjustments.
+
+17.3 FREE-TRANSFER ACCUMULATION
+------------------------------
+Do not implement as a single simplistic formula without a transition timeline.
+
+A configured transition needs:
+
+- grant timing;
+- normal grant amount;
+- cap;
+- effect of using transfers;
+- effect of Wildcard;
+- effect of Free Hit;
+- special top-ups;
+- season start;
+- final Gameweek;
+- whether transfer use is counted before/after grant.
+
+Reference 2025/26 examples indicate Wildcard and Free Hit preserve banked free
+transfers. Target-season exact transition order must be tested.
+
+17.4 PROPOSED TRANSITION MODEL
+------------------------------
+At deadline close:
+
+1. Finalise transfer batch and chip effect.
+2. Calculate chargeable transfers under active chip rules.
+3. Record hit for current Gameweek.
+4. Transition squad according to chip.
+5. Apply configured free-transfer consumption/preservation.
+6. Apply normal next-Gameweek grant.
+7. Apply any special event.
+8. Enforce cap.
+9. Open next Gameweek state.
+
+The exact ordering is configuration-driven and golden-tested.
+
+17.5 TRANSFER COST
+------------------
+Reference:
+    hit_points =
+        max(0, chargeable_transfer_count) * 4
+
+Do not subtract hit independently for a transfer later made free by Wildcard
+activation if official rule says prior transfers become free.
+
+17.6 TRANSFER REVERSAL
+----------------------
+Ordinary confirmed transfers may not be reversible in the same way as pre-save
+lineup changes. The target-season official game behaviour controls.
+
+The engine must record:
+- action confirmation time;
+- provisional transfer cost;
+- later chip activation;
+- final cost.
+
+17.7 SAME-POSITION REPLACEMENT
+------------------------------
+For each transfer pair:
+    outgoing.position == incoming.position
+
+A multi-transfer batch can achieve structural changes only through same-position
+pairs, unless target rules introduce another mechanism.
+
+17.8 CLUB AND BUDGET AFTER EVERY BATCH
+--------------------------------------
+Validate final confirmed batch state. Also detect intermediate restrictions if
+the official interface requires sequence-specific repair.
+
+17.9 SPECIAL FREE-TRANSFER EVENT
+--------------------------------
+REFERENCE historical example:
+In 2025/26, ahead of AFCON, managers' free-transfer totals were topped up to the
+maximum of five in Gameweek 16.
+
+This is not equivalent to:
+"give everyone five additional transfers."
+
+Correct declarative event:
+
+special_event:
+  event_id: "2025_26_AFCON_FT_TOP_UP"
+  trigger_gameweek: 16
+  operation: "SET_AT_LEAST"
+  target_value: 5
+  cap: 5
+
+Examples:
+- existing 0 plus ordinary context -> final 5;
+- existing 3 -> final 5;
+- existing 5 -> remains 5.
+
+Exact transition timing relative to normal grant must be verified in the
+reference fixture.
+
+17.10 TESTS
+-----------
+- preseason unlimited;
+- one FT used;
+- zero used and rolled;
+- cap at five;
+- extra transfer hit;
+- two extra transfers;
+- Wildcard cancels prior hit;
+- Free Hit charge policy;
+- same-position requirement;
+- budget;
+- club quota;
+- special top-up from 0/3/5;
+- club-quota repair;
+- deadline closure prevents mutation.
+
+======================================================================
+18. PRICES AND SELLING-PRICE RULES
+======================================================================
+
+18.1 THREE PRICE CONCEPTS
+-------------------------
+PURCHASE_PRICE:
+Price paid when current ownership spell began.
+
+CURRENT_PRICE:
+Price another manager pays now.
+
+SELLING_PRICE:
+Cash received if sold now.
+
+These must be stored separately.
+
+18.2 REFERENCE 2025/26 SELLING RULE
+-----------------------------------
+REFERENCE_ONLY official examples:
+
+- if current price is below purchase price, the full fall is borne;
+- if current price is above purchase price, the manager receives £0.1m profit
+  for every complete £0.2m rise.
+
+Integer formula in price units:
+
+if current_price <= purchase_price:
+    selling_price = current_price
+else:
+    selling_price =
+        purchase_price
+        + floor((current_price - purchase_price) / 2)
+
+Examples:
+- purchase 50, current 54 -> sell 52;
+- purchase 50, current 53 -> sell 51;
+- purchase 50, current 47 -> sell 47.
+
+18.3 CONFIG SHAPE
+-----------------
+prices:
+  unit: "0.1m_GBP"
+
+  selling:
+    when_current_lte_purchase: "CURRENT_PRICE"
+    profit_increment_current_units: 2
+    profit_increment_selling_units: 1
+    rounding: "FLOOR"
+
+  ownership_spell:
+    repurchase_resets_purchase_price: true
+
+18.4 REBUY
+----------
+If a player is sold and later repurchased, purchase price resets to the new
+purchase price. Historical ownership spells remain separate.
+
+18.5 PRICE-CHANGE MECHANISM BOUNDARY
+------------------------------------
+Official guidance states that prices respond to transfer-market popularity and
+can change during the season, but the exact threshold mechanism is not publicly
+revealed.
+
+Therefore:
+
+DMFP-02 owns:
+- current official price;
+- purchase price;
+- selling formula;
+- official change events;
+- official limits if confirmed.
+
+DMFP-11 owns:
+- probability of change;
+- inferred thresholds;
+- timing model;
+- transfer-volume features.
+
+No deterministic hidden threshold appears in target rules config.
+
+18.6 BANK
+---------
+Bank is integer price units.
+
+Transfer affordability:
+    new_bank =
+        old_bank
+        + sum(outgoing selling prices)
+        - sum(incoming current prices)
+
+Must be >= 0.
+
+18.7 TESTS
+----------
+- no gain;
+- one-unit rise gives no sell profit;
+- two-unit rise gives one;
+- three gives one;
+- four gives two;
+- falls passed fully;
+- sell and repurchase resets purchase price;
+- multi-transfer affordability exact;
+- no float rounding.
+
+======================================================================
+19. CHIPS AS CONFIGURED STATE MACHINES
+======================================================================
+
+19.1 WHY CHIPS CANNOT BE BOOLEANS
+---------------------------------
+A chip has:
+
+- inventory count;
+- validity window;
+- eligibility;
+- activation surface;
+- activation time;
+- cancellation policy;
+- interaction with transfers;
+- interaction with free transfers;
+- effect duration;
+- end transition;
+- incompatibilities;
+- season-specific copies.
+
+Representing only:
+    wildcard_used = true
+is insufficient.
+
+19.2 REFERENCE 2025/26 INVENTORY
+--------------------------------
+REFERENCE_ONLY:
+
+- two Bench Boosts;
+- two Free Hits;
+- two Triple Captains;
+- two Wildcards;
+- one set available before the end of GW19;
+- second set from GW20;
+- first set expired if unused;
+- one chip maximum per Gameweek.
+
+2026/27 MUST be independently verified.
+
+19.3 COMMON CHIP SCHEMA
+-----------------------
+chip:
+  chip_id: "WILDCARD_H1"
+  type: "WILDCARD"
+  inventory_count: 1
+
+  window:
+    first_gameweek_inclusive: 1
+    last_gameweek_inclusive: 19
+
+  activation:
+    surface: "TRANSFER_CONFIRMATION"
+    reversible_before_deadline: false
+
+  effects: []
+  incompatibilities:
+    max_chips_per_gameweek: 1
+
+  expiry:
+    unused_carries_forward: false
+
+19.4 BENCH BOOST
+----------------
+REFERENCE_ONLY effect:
+Include points from eligible bench players in manager Gameweek total.
+
+State effect:
+- no automatic-substitution need for point inclusion, although official lineup
+  and appearance remain;
+- starting XI/captain remain configured;
+- all 15 player totals included according to official rule.
+
+Reference cancellation:
+Can be cancelled before deadline.
+
+Config:
+effects:
+  include_bench_points: true
+
+19.5 TRIPLE CAPTAIN
+-------------------
+REFERENCE_ONLY:
+Captain total multiplier becomes 3 instead of normal 2.
+
+Vice-captain inherits the chip multiplier if captain does not appear and vice
+does, subject to target-season rule confirmation.
+
+Reference cancellation:
+Can be cancelled before deadline.
+
+Config:
+effects:
+  captain_multiplier_override: 3
+
+19.6 FREE HIT
+-------------
+REFERENCE_ONLY:
+- unlimited free transfers for one Gameweek;
+- squad returns at next deadline to pre-Free-Hit squad;
+- unavailable in GW1;
+- activation cannot be cancelled after confirmation;
+- cannot be used in both GW19 and GW20 under 2025/26 boundary rule;
+- banked free transfers are kept.
+
+Required state snapshot:
+- pre-chip squad;
+- purchase prices;
+- bank;
+- free transfers;
+- chip inventory.
+
+Important unresolved details to capture at target launch:
+- precise treatment of price changes for restored players;
+- temporary squad purchase-price state;
+- transfer sequencing;
+- special events at restore deadline.
+
+Do not guess.
+
+19.7 WILDCARD
+-------------
+REFERENCE_ONLY:
+- all transfers for the Gameweek, including already made transfers, become free;
+- cannot be played in GW1;
+- cannot be cancelled after activation;
+- banked free transfers are kept.
+
+Effects:
+- no transfer-point deduction;
+- resulting squad persists;
+- ordinary squad legality still applies.
+
+19.8 ONE CHIP PER GAMEWEEK
+--------------------------
+Represent globally:
+max_active_chips_per_gameweek: 1
+
+Do not encode pairwise incompatibilities only.
+
+19.9 CHIP WINDOW MODEL
+----------------------
+Use explicit windows, not "first wildcard" logic.
+
+Supports:
+- half-season copies;
+- expiry;
+- special chip;
+- multiple windows;
+- future rule changes.
+
+19.10 CHIP TESTS
+----------------
+Bench Boost:
+- all bench points included;
+- captain still multiplied;
+- transfer hit still applied unless another rule says otherwise.
+
+Triple Captain:
+- captain appears;
+- captain absent/vice appears;
+- both absent.
+
+Free Hit:
+- temporary squad;
+- restore;
+- no hit;
+- cannot activate invalid GW;
+- cannot cancel;
+- banked FT transition.
+
+Wildcard:
+- previous provisional hits removed;
+- persistent new squad;
+- cannot cancel;
+- invalid GW;
+- free transfers preserved if target rule confirms.
+
+Global:
+- two chips same GW rejected;
+- expired chip rejected;
+- inventory decremented once;
+- unused first-half chip expiry.
+
+======================================================================
+20. DEADLINES, GAMEWEEKS, FIXTURE MEMBERSHIP AND POINT FINALITY
+======================================================================
+
+20.1 DEADLINES ARE SEASON DATA
+------------------------------
+The prior-season reference said the deadline was 90 minutes before the opening
+match. For 2026/27, Pulse MUST use the official target-season deadline timestamp.
+
+Do not calculate:
+    min(kickoff) - 90 minutes
+as the authoritative deadline.
+
+It may be used as a diagnostic comparison only.
+
+20.2 DEADLINE RECORD
+--------------------
+gameweek:
+  id: 1
+  name: "Gameweek 1"
+  deadline_utc: "TARGET_OFFICIAL_VALUE"
+  source_id: "SRC-FPL-API-2026-..."
+  captured_at_utc: "..."
+  verified: true
+
+20.3 DEADLINE EFFECT
+--------------------
+At deadline:
+- transfers lock for that Gameweek;
+- lineup locks;
+- captain/vice lock;
+- bench order locks;
+- cancellable chip state locks;
+- source bundle for decision is frozen;
+- manager state transition begins.
+
+The official game remains the execution authority.
+
+20.4 FIXTURE-TO-GAMEWEEK MEMBERSHIP
+-----------------------------------
+A Premier League fixture's calendar date does not alone determine FPL Gameweek.
+
+Store official:
+- fixture ID;
+- event/Gameweek ID;
+- kickoff;
+- status;
+- postponed flag;
+- started;
+- finished;
+- provisional/final stats.
+
+Rescheduled fixture may:
+- leave original Gameweek blank;
+- enter another Gameweek;
+- create Double Gameweek.
+
+20.5 BLANK GAMEWEEK
+-------------------
+A club has zero fixtures assigned to the Gameweek.
+
+No special scoring rule is required; player fixture aggregation yields zero
+football points unless another fixture exists.
+
+20.6 DOUBLE/MULTIPLE GAMEWEEK
+-----------------------------
+Aggregate all fixtures officially assigned to the same Gameweek.
+
+Per-fixture:
+- appearance;
+- goals;
+- assists;
+- clean sheets;
+- saves;
+- contributions;
+- BPS/bonus.
+
+Gameweek:
+- sum player fixture totals;
+- evaluate any-appearance captaincy;
+- resolve substitutions after all fixtures;
+- apply chip and manager effects.
+
+20.7 POSTPONEMENT AFTER DEADLINE
+-------------------------------
+If a fixture is postponed:
+- official Gameweek membership/status controls;
+- no invented rescheduling;
+- decision record remains unchanged;
+- projection/outcome evaluation records the realised disruption;
+- official points are reconciled.
+
+20.8 POINTS PROVISIONALITY
+--------------------------
+Official rule snippets for the reference season indicated points may be adjusted
+until after the final match of the Gameweek, including a stated one-hour window.
+
+Target-season finality must be verified.
+
+Config should support:
+- PROVISIONAL;
+- REVIEW_WINDOW;
+- FINAL;
+- CORRECTED_AFTER_FINAL.
+
+20.9 OUTCOME RECONCILIATION
+---------------------------
+Pulse should not promote official outcome labels to final until:
+- all fixtures finished;
+- official finality condition met;
+- late corrections checked.
+
+20.10 TESTS
+-----------
+- official deadline ingestion;
+- timezone conversion;
+- action one second before deadline;
+- action at/after deadline rejected by local planner;
+- postponed fixture;
+- blank;
+- double;
+- fixture moved to another Gameweek;
+- provisional point update;
+- final correction.
+
+======================================================================
+21. SEASON-SPECIFIC CHANGES AND SPECIAL EVENTS
+======================================================================
+
+21.1 PURPOSE
+------------
+FPL can change permanent rules between seasons and introduce temporary
+season-specific events.
+
+The architecture must support both.
+
+21.2 PERMANENT SEASON CHANGE
+----------------------------
+Examples from 2025/26 reference:
+- defensive-contribution points introduced;
+- assist definition changed;
+- BPS values changed;
+- chip inventory changed;
+- special free-transfer arrangement added.
+
+A permanent change belongs in the target-season core config.
+
+21.3 TEMPORARY EVENT
+--------------------
+Examples:
+- AFCON transfer top-up;
+- emergency fixture treatment;
+- official one-off chip grant;
+- rule correction effective from a specific Gameweek.
+
+Belongs in special_events.yaml with:
+- event ID;
+- authority;
+- trigger;
+- operation;
+- effective scope;
+- expiry;
+- tests.
+
+21.4 PATCH MODEL
+----------------
+A special event may use a constrained operation vocabulary:
+
+SET
+INCREMENT
+DECREMENT
+SET_AT_LEAST
+SET_AT_MOST
+REPLACE_WINDOW
+GRANT_INVENTORY
+EXPIRE_INVENTORY
+OVERRIDE_RULESET
+
+Avoid arbitrary executable code in configuration.
+
+21.5 JSON PATCH
+---------------
+JSON Patch (RFC 6902) MAY be used to represent machine-readable differences, but
+production special events should prefer domain-specific operations where this
+improves validation and readability.
+
+21.6 PRIOR-SEASON DIFF
+----------------------
+At 2026/27 launch, automatically compare:
+
+- position set;
+- squad quotas;
+- budget;
+- scoring;
+- assists;
+- contributions;
+- BPS;
+- transfer cap/cost;
+- selling formula;
+- chips;
+- deadlines;
+- point finality;
+- special events.
+
+Classify every diff:
+ADDED
+REMOVED
+CHANGED
+UNCHANGED
+UNKNOWN
+SOURCE_ONLY
+
+21.7 NO ASSUMED CONTINUITY
+--------------------------
+"Unchanged in announcement" is not enough if the official target-season rules
+have not been checked.
+
+======================================================================
+22. PROPOSED PRE-LAUNCH 2026/27 MANIFEST
+======================================================================
+
+Illustrative only:
+
+ruleset:
+  ruleset_id: "fpl-2026-27"
+  season_code: "2026/27"
+  version: "0.1.0-prelaunch.1"
+  status: "DRAFT_PRELAUNCH"
+
+  created_at_utc: "2026-07-16T00:00:00Z"
+  research_cutoff_utc: "2026-07-16T23:59:59Z"
+
+  production_eligible: false
+
+  official_game:
+    launch_status: "NOT_LAUNCHED"
+    launch_date: null
+    first_deadline_utc: null
+
+  reference_ruleset:
+    ruleset_id: "fpl-2025-26"
+    version: "1.0.0-reference"
+
+  required_files:
+    - "positions.yaml"
+    - "scoring.yaml"
+    - "assists.yaml"
+    - "bonus.yaml"
+    - "squad.yaml"
+    - "lineup.yaml"
+    - "transfers.yaml"
+    - "prices.yaml"
+    - "chips.yaml"
+    - "deadlines.yaml"
+    - "special_events.yaml"
+    - "source_manifest.yaml"
+
+  blocking_unconfirmed_paths:
+    - "/positions"
+    - "/scoring"
+    - "/assists"
+    - "/bonus"
+    - "/squad"
+    - "/lineup"
+    - "/transfers"
+    - "/prices"
+    - "/chips"
+    - "/deadlines/1"
+
+  activation:
+    required_human_approver: "Sebastian Greenhalgh"
+    approved: false
+    approved_at_utc: null
+    compiled_sha256: null
+
+The pre-launch files MAY contain reference values for development tests, but
+each must carry:
+    reference_only: true
+and the compiler must refuse production activation.
+
+======================================================================
+23. REFERENCE 2025/26 RULESET SUMMARY
+======================================================================
+
+WARNING:
+This section is a development fixture, not a 2026/27 rules declaration.
+
+23.1 SCORING
+------------
+Appearance:
+- 1 point below 60 official minutes after appearing;
+- 2 at 60+.
+
+Goals:
+- GK 10;
+- DEF 6;
+- MID 5;
+- FWD 4.
+
+Assist:
+- 3.
+
+Clean sheet:
+- GK/DEF 4;
+- MID 1.
+
+Goalkeeper:
+- every 3 saves: 1;
+- penalty save: 5.
+
+Defensive contributions:
+- DEF 10 CBIT -> 2, max 2 per match;
+- MID/FWD 12 CBIRT -> 2, max 2 per match.
+
+Negative:
+- penalty miss -2;
+- every 2 conceded GK/DEF -1;
+- yellow -1;
+- red -3;
+- own goal -2.
+
+Bonus:
+- 1–3 based on match BPS and tie rules.
+
+23.2 SQUAD
+----------
+- 15;
+- budget 1000 units;
+- 2/5/5/3 positions;
+- max 3 per club.
+
+23.3 LINEUP
+-----------
+- 11;
+- 1 GK;
+- min 3 DEF;
+- min 2 MID;
+- min 1 FWD;
+- captain and vice;
+- ordered outfield bench;
+- automatic substitutions.
+
+23.4 TRANSFERS
+--------------
+- unlimited before first deadline;
+- one normal grant per Gameweek;
+- accumulate to five;
+- extra transfer cost 4;
+- same-position replacement;
+- official selling-price half-profit rule.
+
+23.5 CHIPS
+----------
+- two copies of each of four chip types;
+- split into first-half and second-half windows;
+- one chip per Gameweek;
+- detailed restrictions in Section 19.
+
+23.6 SPECIAL EVENT
+------------------
+- AFCON-related Gameweek 16 top-up to five free transfers.
+
+23.7 REFERENCE STATUS
+---------------------
+reference_only: true
+production_eligible_for_2026_27: false
+
+======================================================================
+24. RULES-ENGINE INTERFACES
+======================================================================
+
+24.1 PACKAGE BOUNDARY
+---------------------
+Suggested package:
+
+src/dmf_pulse/rules/
+
+Modules:
+- loader.py
+- compiler.py
+- validator.py
+- models.py
+- scoring.py
+- assists.py
+- bonus.py
+- squad.py
+- lineup.py
+- transfers.py
+- prices.py
+- chips.py
+- gameweeks.py
+- reconciliation.py
+- errors.py
+
+24.2 PURE FUNCTION CONTRACTS
+----------------------------
+score_player_fixture(
+    player_position,
+    official_or_simulated_events,
+    fixture_context,
+    ruleset
+) -> PlayerFixtureScoreBreakdown
+
+calculate_bps(
+    player_position,
+    event_statistics,
+    fixture_context,
+    ruleset
+) -> int
+
+allocate_bonus(
+    player_bps_by_fixture,
+    ruleset
+) -> dict[player_id, int]
+
+aggregate_player_gameweek(
+    fixture_scores,
+    official_gameweek_membership,
+    ruleset
+) -> PlayerGameweekScore
+
+resolve_automatic_substitutions(
+    submitted_lineup,
+    player_gameweek_appearances,
+    ruleset
+) -> EffectiveLineup
+
+resolve_captaincy(
+    submitted_captain,
+    submitted_vice,
+    appearances,
+    active_chip,
+    ruleset
+) -> CaptaincyResolution
+
+calculate_manager_gameweek_points(
+    effective_lineup,
+    player_scores,
+    transfer_cost,
+    active_chip,
+    ruleset
+) -> ManagerGameweekBreakdown
+
+validate_squad(
+    squad,
+    bank,
+    context,
+    ruleset
+) -> ValidationResult
+
+calculate_selling_price(
+    purchase_price,
+    current_price,
+    ruleset
+) -> int
+
+apply_transfer_batch(
+    manager_state,
+    transfer_batch,
+    chip_activation,
+    ruleset
+) -> ManagerStateTransition
+
+transition_deadline(
+    manager_state,
+    gameweek,
+    special_events,
+    ruleset
+) -> ManagerState
+
+24.3 PURE FUNCTION REQUIREMENTS
+-------------------------------
+A pure rule function:
+- does not call the web;
+- does not read global current season;
+- does not read system clock implicitly;
+- receives exact ruleset;
+- returns breakdown and rule IDs;
+- is deterministic;
+- uses no LLM;
+- uses no optimiser;
+- mutates no historical state.
+
+24.4 SCORE BREAKDOWN
+--------------------
+Return component values:
+
+{
+  "appearance": 2,
+  "goals": 6,
+  "assists": 3,
+  "clean_sheet": 4,
+  "saves": 0,
+  "penalty_saves": 0,
+  "defensive_contributions": 2,
+  "goals_conceded": 0,
+  "penalty_misses": 0,
+  "yellow_cards": -1,
+  "red_cards": 0,
+  "own_goals": 0,
+  "bonus": 3,
+  "raw_total": 19,
+  "ruleset_hash": "...",
+  "applied_rule_ids": [...]
+}
+
+24.5 ERRORS
+-----------
+Typed errors:
+
+RulesetNotActive
+RulesetSchemaInvalid
+RulesetSourceStale
+UnknownPosition
+UnmappedExternalPosition
+UnknownScoringEvent
+InvalidSquad
+InvalidLineup
+InvalidTransfer
+InsufficientBudget
+ClubQuotaViolation
+ClubQuotaRepairRequired
+ChipUnavailable
+ChipWindowClosed
+ChipConflict
+DeadlineClosed
+UnresolvedRuleConflict
+OfficialOutcomeMismatch
+
+======================================================================
+25. ORDER OF CALCULATION
+======================================================================
+
+25.1 FIXTURE PLAYER SCORING
+---------------------------
+1. Validate player position and fixture.
+2. Determine official/simulated minutes.
+3. Score appearance.
+4. Score goals.
+5. Score assists.
+6. Score clean sheet.
+7. Score saves and penalties.
+8. Score defensive contributions.
+9. Score negative FPL events.
+10. Calculate BPS.
+11. Store provisional fixture subtotal excluding bonus.
+12. Allocate match bonus across all players.
+13. Add bonus.
+14. Return fixture breakdown.
+
+25.2 GAMEWEEK PLAYER AGGREGATION
+--------------------------------
+1. Retrieve all fixtures officially assigned to Gameweek.
+2. Sum fixture breakdowns.
+3. Determine any appearance.
+4. Preserve per-fixture components.
+5. Mark provisional/final.
+
+25.3 MANAGER SCORING
+--------------------
+1. Freeze submitted squad/lineup at deadline.
+2. Resolve player Gameweek totals.
+3. Resolve automatic substitutions.
+4. Resolve captain/vice.
+5. Apply captain multiplier or Triple Captain.
+6. Include bench only if Bench Boost.
+7. Subtract transfer deductions.
+8. Return manager total and audit trail.
+
+25.4 WHY ORDER MATTERS
+----------------------
+Examples:
+- bonus requires all player BPS;
+- clean sheets require player interval;
+- captaincy depends on any appearance;
+- auto subs depend on Gameweek appearances;
+- Triple Captain modifies effective captain;
+- transfer hit is a manager deduction, not player scoring.
+
+======================================================================
+26. TESTING AND VALIDATION STRATEGY
+======================================================================
+
+26.1 TEST PYRAMID
+-----------------
+Unit tests:
+One rule or pure function.
+
+Schema tests:
+Valid/invalid configuration documents.
+
+Property tests:
+Invariants across many generated cases.
+
+Golden tests:
+Known official scenarios.
+
+Differential tests:
+Compare prior/new rulesets.
+
+Contract tests:
+Compare configuration with official API/UI shape.
+
+Replay tests:
+Reconstruct completed Gameweeks.
+
+Reconciliation tests:
+Compare calculated and official points.
+
+End-to-end tests:
+Manager state through deadline and final score.
+
+26.2 RULE COVERAGE
+------------------
+Every rule_id must map to:
+- at least one positive test;
+- at least one boundary/negative test;
+- source locator;
+- implementation function.
+
+CI should report:
+    rules_with_tests / active_rules
+
+Target:
+100% for ACTIVE BLOCKING rules.
+
+26.3 PROPERTY-BASED INVARIANTS
+------------------------------
+Examples:
+
+- selling_price <= current_price;
+- selling_price >= minimum(current_price, purchase_price where formula applies);
+- legal squad total equals configured size;
+- squad price + bank remains conserved across transfers absent price changes;
+- manager cannot activate more than configured chips;
+- bonus points are nonnegative and from configured award set;
+- defensive-contribution points never exceed per-fixture cap;
+- save points are monotonic in saves;
+- goal points scale linearly per event;
+- an ACTIVE config contains no unknown required field;
+- same input/config/hash produces same output.
+
+26.4 METAMORPHIC TESTS
+----------------------
+- adding one save below next threshold changes no save points;
+- adding enough saves to cross threshold adds exactly configured value;
+- increasing current price by one unit alternates sell profit according to floor;
+- swapping two equal-BPS player IDs does not change bonus values;
+- adding a nonplaying bench player does not change normal score;
+- enabling Bench Boost can only add eligible bench totals, not alter player raw
+  totals;
+- captain multiplier changes only effective captain points.
+
+26.5 GOLDEN OFFICIAL CASES
+--------------------------
+Create target-season examples for:
+- each scoring component;
+- exact 60-minute boundary;
+- defender substituted before later concession;
+- red-card goals-conceded treatment;
+- one-touch assist inside box;
+- assist rejected after two defensive touches;
+- rebound assist;
+- penalty won and scored;
+- defensive contribution threshold/cap;
+- penalty goal BPS;
+- BPS pass bands;
+- all tie patterns;
+- multiple automatic substitutions;
+- captain/vice;
+- Wildcard after hits;
+- Free Hit restore;
+- external club-quota violation;
+- selling-price examples;
+- special transfer grant;
+- Double Gameweek scoring.
+
+26.6 RECONCILIATION TOLERANCE
+-----------------------------
+Official integer scoring:
+exact equality required after official finality, except documented unresolved
+provider event mismatch.
+
+Expected/simulated scoring:
+statistical tolerance belongs to model tests, not rules tests.
+
+26.7 MUTATION TESTING
+---------------------
+Recommended for the rules engine.
+
+Mutations such as:
+- 6 goal points -> 5;
+- floor -> ceil;
+- >=60 -> >60;
+- cap removed;
+- captain 2 -> 3;
+should cause tests to fail.
+
+26.8 HISTORICAL REPLAY
+----------------------
+Use 2025/26 as a reference replay if permitted data are available.
+
+Purpose:
+- verify architecture;
+- not validate 2026/27 continuity.
+
+======================================================================
+27. 2026/27 LAUNCH CAPTURE AND SIGN-OFF PROCEDURE
+======================================================================
+
+27.1 MONITOR
+------------
+Check:
+- official FPL launch;
+- official help/rules;
+- official game-update page;
+- Premier League FPL announcements;
+- bootstrap/static game data;
+- first deadline;
+- chips;
+- positions/prices.
+
+27.2 CAPTURE
+------------
+At launch:
+1. Record UTC capture time.
+2. Save permitted rule-page HTML/PDF/screenshot/hash.
+3. Save official game-data payload/hash.
+4. Record source IDs and locators.
+5. Create target-season source bundle.
+6. Mark config CAPTURED_UNVERIFIED.
+
+27.3 EXTRACT
+------------
+Two-pass extraction:
+
+Pass A:
+ChatGPT creates structured candidate values and claims.
+
+Pass B:
+Sebastian independently checks all BLOCKING fields.
+
+Do not copy the prior season forward without explicit comparison.
+
+27.4 DIFF
+---------
+Run:
+
+    dmf rules diff \
+        --from fpl-2025-26.reference \
+        --to fpl-2026-27.captured
+
+Output:
+- changed values;
+- added/removed rules;
+- source changes;
+- unknowns;
+- test impact;
+- code-interface impact.
+
+27.5 IMPLEMENT
+--------------
+If schema can express all changes:
+- update config;
+- add golden tests;
+- compile.
+
+If schema cannot express a rule:
+- do not add a season-specific code branch;
+- revise domain schema/interface through ADR;
+- release MAJOR rules-engine version if necessary.
+
+27.6 VERIFY
+-----------
+- schema validation;
+- zero unknown required fields;
+- compare official UI examples;
+- test one representative legal squad;
+- test transfer state;
+- test chip UI;
+- test deadline;
+- replay official scoring examples;
+- inspect BPS.
+
+27.7 APPROVE
+------------
+approval.yaml:
+
+ruleset_id: "fpl-2026-27"
+version: "1.0.0"
+compiled_sha256: "..."
+source_bundle_sha256: "..."
+approved_by: "Sebastian Greenhalgh"
+approved_at_utc: "..."
+approval_scope: "PRODUCTION_2026_27"
+known_nonblocking_issues: []
+production_eligible: true
+
+27.8 DRY RUN
+------------
+At least two end-to-end dry runs before GW1:
+- data ingest;
+- rules load;
+- squad validation;
+- optimiser;
+- decision report;
+- deadline freeze;
+- scoring replay.
+
+======================================================================
+28. FAIL-CLOSED AND FALLBACK POLICY
+======================================================================
+
+28.1 BLOCKING CONDITIONS
+------------------------
+- target game not launched;
+- ruleset not ACTIVE;
+- unknown required rule;
+- source conflict;
+- deadline missing/stale;
+- position mapping missing;
+- chip state unknown;
+- invalid manager state;
+- compiled hash mismatch;
+- schema validation failure.
+
+28.2 DEGRADED CONDITIONS
+------------------------
+- independent BPS reconstruction incomplete;
+- detailed assist simulation incomplete;
+- official point finality pending;
+- noncritical explanatory metadata missing.
+
+The engine may project under a DEGRADED state only if:
+- the limitation is visible;
+- a safe fallback exists;
+- manager legality remains exact;
+- no BLOCKING rule is affected.
+
+28.3 FALLBACK
+-------------
+Examples:
+- use official player total outcomes for reconciliation when event details are
+  missing;
+- exclude bonus projection or use a clearly probabilistic module, never invent
+  exact bonus;
+- use official selling price from authenticated state if independent formula
+  reconciliation is uncertain;
+- defer chip recommendation if chip rules conflict.
+
+28.4 NEVER FALL BACK TO LAST SEASON SILENTLY
+--------------------------------------------
+A missing 2026/27 value cannot silently inherit 2025/26.
+
+Inheritance must be explicit:
+inherits_from: "fpl-2025-26"
+target_verified_unchanged: true
+source_id: "..."
+verified_by: "..."
+
+======================================================================
+29. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+29.1 CODEX MAY
+-------------
+- create schemas;
+- create typed domain models;
+- implement parsers/compilers;
+- implement pure rules functions;
+- generate test matrices;
+- create rule-diff tooling;
+- create source-manifest validation;
+- create activation CLI;
+- implement golden fixtures;
+- create reconciliation reports.
+
+29.2 CODEX MUST NOT
+-------------------
+- assume 2025/26 equals 2026/27;
+- hard-code values outside test fixtures;
+- infer a missing deadline;
+- implement undocumented price-change thresholds;
+- flatten chip state to one boolean;
+- use floating prices;
+- silently ignore unknown events;
+- mutate ACTIVE config;
+- scrape rules at runtime and auto-activate them;
+- let optimiser code decide legality independently;
+- permit production with UNKNOWN fields;
+- change official points to match Pulse's preferred interpretation.
+
+29.3 STATIC ENFORCEMENT
+-----------------------
+Recommended controls:
+- grep/lint for banned rule literals in modelling packages;
+- dependency rule: optimisation imports rules interfaces, not config internals;
+- central `Ruleset` object required in all legality/scoring functions;
+- no `CURRENT_SEASON_RULES` global;
+- no `datetime.now()` inside pure rules functions;
+- no direct web calls in rules engine.
+
+29.4 BANNED EXAMPLE
+-------------------
+if player.position == "DEF":
+    points += goals * 6
+
+Required:
+points += goals * ruleset.goals.points_by_position[player.position]
+
+Banned:
+if gw == 16:
+    free_transfers = 5
+
+Required:
+apply_special_events(
+    state,
+    ruleset.special_events.for_gameweek(gameweek)
+)
+
+29.5 PULL REQUEST REQUIREMENTS
+------------------------------
+Every rules PR states:
+- rule IDs affected;
+- source IDs;
+- before/after config;
+- tests;
+- version effect;
+- historical recomputation effect;
+- approval needed.
+
+======================================================================
+30. OBSERVABILITY AND AUDIT
+======================================================================
+
+30.1 RULESET TELEMETRY
+----------------------
+Every run logs:
+- ruleset ID;
+- version;
+- hash;
+- status;
+- source bundle hash;
+- deadline record version;
+- special events applied;
+- warnings;
+- code commit.
+
+30.2 EXPLANATION
+----------------
+A score breakdown should be able to answer:
+- why did this player receive N points?
+- which rules applied?
+- which fixture?
+- which official events?
+- which multiplier?
+- which transfer deduction?
+- which config version?
+
+30.3 RULE DRIFT MONITOR
+-----------------------
+Automated checks:
+- official rules page changed hash;
+- game-update page changed;
+- bootstrap schema changed;
+- deadline changed;
+- chip availability changed;
+- source stale.
+
+A changed hash triggers review, not automatic activation.
+
+30.4 OFFICIAL MISMATCH REPORT
+-----------------------------
+Per fixture/Gameweek:
+- Pulse calculated;
+- official FPL;
+- difference;
+- component;
+- likely cause;
+- source/event completeness;
+- resolution status.
+
+======================================================================
+31. SECURITY AND INTEGRITY
+======================================================================
+
+31.1 APPROVAL
+-------------
+Approval files should be committed through reviewed Git history.
+
+Optional stronger control:
+- detached signature;
+- protected branch;
+- two-person approval for target-season activation.
+
+31.2 HASHES
+-----------
+SHA-256:
+- authoring files;
+- canonical JSON;
+- source bundle;
+- approval manifest;
+- golden fixtures.
+
+31.3 CONFIG INJECTION
+---------------------
+Do not load arbitrary untrusted YAML into unsafe constructors.
+Use safe loader.
+Reject:
+- executable tags;
+- duplicate keys;
+- unknown top-level fields;
+- path traversal;
+- remote includes.
+
+31.4 ENVIRONMENT
+----------------
+Ruleset selection is explicit:
+    DMF_RULESET_ID
+    DMF_RULESET_VERSION
+    DMF_RULESET_HASH
+
+Production must not default to "latest."
+
+======================================================================
+32. RISK REGISTER
+======================================================================
+
+R-02-001 — 2026/27 game not launched
+Probability: Certain at cut-off
+Impact: Critical
+Mitigation:
+Prelaunch status; no production activation; launch monitor.
+
+R-02-002 — Prior-season rule silently carried forward
+Probability: High
+Impact: Critical
+Mitigation:
+No implicit inheritance; target verification field; diff and human sign-off.
+
+R-02-003 — Official pages conflict
+Probability: Medium
+Impact: High
+Mitigation:
+Conflict workflow; observable test; clarification; block activation.
+
+R-02-004 — Deadline inferred incorrectly
+Probability: Medium
+Impact: Critical
+Mitigation:
+Official event deadline only; freshness alert; no formula authority.
+
+R-02-005 — Float price error
+Probability: Medium
+Impact: High
+Mitigation:
+Integer price units; property tests.
+
+R-02-006 — Exact 60-minute boundary implemented wrongly
+Probability: Medium
+Impact: High
+Mitigation:
+Explicit intervals; official golden case; mutation test.
+
+R-02-007 — Penalty goal BPS double counted
+Probability: Medium
+Impact: High
+Mitigation:
+Exclusive event category; unit test.
+
+R-02-008 — Bonus tie algorithm incomplete
+Probability: Medium
+Impact: High
+Mitigation:
+Generic ranking policy; unusual historical golden cases.
+
+R-02-009 — Defensive contributions treated like saves
+Probability: Medium
+Impact: High
+Mitigation:
+Per-fixture cap; threshold/cap-specific function.
+
+R-02-010 — Assist policy over-simplified
+Probability: High
+Impact: Medium/High
+Mitigation:
+Separate policy; probabilistic projection; official reconciliation.
+
+R-02-011 — Red-card goals conceded omitted
+Probability: Medium
+Impact: Medium
+Mitigation:
+Explicit exception and golden test.
+
+R-02-012 — Auto-sub algorithm wrong for multiple absences
+Probability: Medium
+Impact: High
+Mitigation:
+Official UI cases; deterministic tested algorithm.
+
+R-02-013 — Free-transfer transition order wrong
+Probability: Medium
+Impact: High
+Mitigation:
+State-machine fixtures; chip and special-event tests.
+
+R-02-014 — Free Hit restoration state wrong
+Probability: Medium
+Impact: High
+Mitigation:
+Capture target behaviour; no guess; snapshot fields.
+
+R-02-015 — External club transfer makes state appear corrupt
+Probability: Medium
+Impact: Medium
+Mitigation:
+Valid-but-restricted external violation state.
+
+R-02-016 — Price-change prediction mixed into rules
+Probability: High
+Impact: Medium/High
+Mitigation:
+Module boundary; no hidden threshold config.
+
+R-02-017 — Official event provider taxonomy changes
+Probability: Medium
+Impact: High
+Mitigation:
+Versioned mapping; contract tests; reconciliation.
+
+R-02-018 — Config schema too rigid for new chip
+Probability: Medium
+Impact: High
+Mitigation:
+Capability/state model; schema ADR; no hard-coded season branch.
+
+R-02-019 — Runtime silently chooses newest ruleset
+Probability: Medium
+Impact: Critical
+Mitigation:
+Explicit ID/version/hash; protected activation.
+
+R-02-020 — Official points corrected after initial finality
+Probability: Medium
+Impact: Medium
+Mitigation:
+Provisional/final/corrected states; immutable revisions.
+
+R-02-021 — Target rules change mid-season
+Probability: Low/Medium
+Impact: High
+Mitigation:
+Effective-dated release; source monitor; rollback/reprocess.
+
+R-02-022 — Rule literals leak into optimiser
+Probability: High
+Impact: High
+Mitigation:
+Lint/dependency tests; central rules object.
+
+R-02-023 — Unsafe YAML
+Probability: Low/Medium
+Impact: High
+Mitigation:
+Safe loader; JSON conversion; schema; no custom tags.
+
+R-02-024 — Official API undocumented and changes
+Probability: Medium
+Impact: High
+Mitigation:
+Raw snapshots; contract tests; adapter; source hierarchy.
+
+======================================================================
+33. SOURCE REGISTER
+======================================================================
+
+Research access date for web sources:
+2026-07-16
+
+----------------------------------------------------------------------
+SRC-FPL-2026-001
+Title:
+All you need to know about 2026/27 Premier League fixtures
+
+Organisation:
+Premier League
+
+Publication date:
+2026-06-18
+
+URL:
+https://www.premierleague.com/en/news/4674573/all-you-need-to-know-for-202627-fixture-release-day/
+
+Relevant claim:
+The 2026/27 Premier League season begins Friday 21 August 2026, and the official
+2026/27 FPL game was stated to launch later in the summer.
+
+Reliability:
+HIGH for launch status and Premier League calendar at access.
+
+Licensing:
+Citation/paraphrase only; site terms apply.
+
+Pulse reliance:
+YES — establishes prelaunch blocking state.
+
+Future verification:
+Daily until FPL launch.
+
+----------------------------------------------------------------------
+SRC-FPL-2026-002
+Title:
+What to look out for in pre-season ahead of 2026/27 Fantasy
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2026-07-16
+
+URL:
+https://www.premierleague.com/en/news/4679613/what-to-look-out-for-in-pre-season-ahead-of-202627-fantasy
+
+Relevant claim:
+The official article says launch is forthcoming and discusses the unusually
+uncertain preseason.
+
+Reliability:
+HIGH for current official status; not a formal rules source.
+
+Pulse reliance:
+SUPPORTING.
+
+Future verification:
+At launch.
+
+----------------------------------------------------------------------
+SRC-FPL-RULES-CURRENT-001
+Title:
+Fantasy Premier League Game Rules & Help
+
+Organisation:
+Fantasy Premier League
+
+Publication date:
+Living page
+
+URL:
+https://fantasy.premierleague.com/help/rules
+
+Relevant claim:
+Controlling official rules surface, including red-card and points-finality
+details exposed in current indexed content.
+
+Reliability:
+HIGH for the current official game; target-season version must be captured after
+launch.
+
+Licensing:
+Terms apply; preserve permitted metadata/snapshots.
+
+Pulse reliance:
+YES — BLOCKING at target launch.
+
+Future verification:
+At launch and on every page change.
+
+----------------------------------------------------------------------
+SRC-FPL-2025-001
+Title:
+FPL basics explained: Scoring points
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174909
+
+Relevant claim:
+Reference 2025/26 scoring table, assist summary, clean-sheet substitution rule,
+bonus ties and defensive-contribution thresholds.
+
+Reliability:
+HIGH for 2025/26 explanatory reference; not authoritative for 2026/27.
+
+Pulse reliance:
+REFERENCE_ONLY.
+
+Future verification:
+Superseded by target-season sources.
+
+----------------------------------------------------------------------
+SRC-FPL-2025-002
+Title:
+How the FPL Bonus Points System works
+
+Organisation:
+Premier League / The Scout
+
+Publication/update date:
+2026-04-01
+
+URL:
+https://www.premierleague.com/en/news/106533
+
+Relevant claim:
+Reference BPS event values and bonus tie allocation.
+
+Reliability:
+HIGH for the then-current 2025/26 system.
+
+Pulse reliance:
+REFERENCE_ONLY and test design.
+
+Future verification:
+At 2026/27 launch.
+
+----------------------------------------------------------------------
+SRC-FPL-2025-003
+Title:
+What's new in 2025/26 Fantasy: Changes to assists rules
+
+Organisation:
+Premier League
+
+Publication date:
+2025-07-18
+
+URL:
+https://www.premierleague.com/en/news/4362187/whats-new-in-202526-fantasy-changes-to-assists-rules
+
+Relevant claim:
+Detailed reference assist policy concerning defensive touches and receiving
+location.
+
+Reliability:
+HIGH for 2025/26.
+
+Pulse reliance:
+REFERENCE_ONLY.
+
+Future verification:
+At target launch.
+
+----------------------------------------------------------------------
+SRC-FPL-2025-004
+Title:
+What's new in 2025/26 Fantasy: Defensive contributions
+
+Organisation:
+Premier League
+
+Publication date:
+2025-07-18
+
+URL:
+https://www.premierleague.com/en/news/4361991/whats-new-in-202526-fantasy-defensive-contributions
+
+Relevant claim:
+Reference event sets, thresholds and two-point per-match cap.
+
+Reliability:
+HIGH for 2025/26.
+
+Pulse reliance:
+REFERENCE_ONLY.
+
+Future verification:
+At target launch.
+
+----------------------------------------------------------------------
+SRC-FPL-2025-005
+Title:
+FPL basics explained: How to pick a squad
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174419/fpl-basics-how-to-pick-a-squad
+
+Relevant claim:
+Reference £100.0m budget, 15-player position quotas and three-per-club limit.
+
+Reliability:
+HIGH for 2025/26.
+
+Pulse reliance:
+REFERENCE_ONLY.
+
+Future verification:
+At target launch.
+
+----------------------------------------------------------------------
+SRC-FPL-2025-006
+Title:
+FPL basics explained: Managing your team
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174899/fpl-basics-managing-your-team
+
+Relevant claim:
+Reference deadline convention, legal formation constraints, captain/vice and
+automatic substitutions.
+
+Reliability:
+HIGH for 2025/26.
+
+Pulse reliance:
+REFERENCE_ONLY.
+
+Future verification:
+At target launch.
+
+----------------------------------------------------------------------
+SRC-FPL-2025-007
+Title:
+FPL basics explained: How to make transfers
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174907
+
+Relevant claim:
+Reference free-transfer accumulation, hit cost, same-position transfer, club
+quota, prices and selling-price examples.
+
+Reliability:
+HIGH for 2025/26.
+
+Pulse reliance:
+REFERENCE_ONLY.
+
+Future verification:
+At target launch.
+
+----------------------------------------------------------------------
+SRC-FPL-2025-008
+Title:
+FPL basics explained: How to use your chips
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174900
+
+Relevant claim:
+Reference chip inventory, effects, windows, cancellation and banked-transfer
+interactions.
+
+Reliability:
+HIGH for 2025/26.
+
+Pulse reliance:
+REFERENCE_ONLY.
+
+Future verification:
+At target launch.
+
+----------------------------------------------------------------------
+SRC-FPL-2025-009
+Title:
+What's new in 2025/26 Fantasy: Extra transfers for AFCON
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-10-18
+
+URL:
+https://www.premierleague.com/en/news/4362102/whats-new-in-202526-fantasy-extra-transfers-for-afcon
+
+Relevant claim:
+Free-transfer totals were topped up to the maximum of five in Gameweek 16.
+
+Reliability:
+HIGH for the special 2025/26 event.
+
+Pulse reliance:
+REFERENCE_ONLY, architecture example.
+
+Future verification:
+No carry-forward.
+
+----------------------------------------------------------------------
+SRC-FPL-2026-003
+Title:
+What happens when you have more than three players from one club in your FPL
+squad?
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2026-01-19
+
+URL:
+https://www.premierleague.com/en/news/4536241/what-happens-when-you-have-four-players-from-one-club-in-your-fpl-squad
+
+Relevant claim:
+A real-world club transfer can create an over-quota squad that may be retained,
+but future transfers must repair the quota.
+
+Reliability:
+HIGH for observed/reference 2025/26 edge case.
+
+Pulse reliance:
+YES for state architecture; target-season verification required.
+
+Future verification:
+At target launch and if game behaviour changes.
+
+----------------------------------------------------------------------
+SRC-FPL-PRICE-001
+Title:
+FPL player price changes explained
+
+Organisation:
+Premier League
+
+URL:
+https://www.premierleague.com/en/news/2858775
+
+Relevant claim:
+Official public guidance describes popularity-driven price changes but does not
+publish the exact threshold formula.
+
+Reliability:
+HIGH for official disclosed scope.
+
+Pulse reliance:
+YES for separating deterministic rules from DMFP-11 prediction.
+
+Future verification:
+At target launch.
+
+----------------------------------------------------------------------
+SRC-STD-JSONSCHEMA-001
+Title:
+JSON Schema Draft 2020-12
+
+Organisation:
+JSON Schema
+
+URL:
+https://json-schema.org/draft/2020-12
+
+Relevant claim:
+Selected schema standard for validating compiled configuration.
+
+Reliability:
+HIGH official specification.
+
+Pulse reliance:
+YES.
+
+Future verification:
+On deliberate schema-standard upgrade.
+
+----------------------------------------------------------------------
+SRC-STD-YAML-001
+Title:
+YAML 1.2.2 Specification
+
+Organisation:
+YAML Language Development Team
+
+Publication date:
+2021-10-01
+
+URL:
+https://yaml.org/spec/1.2.2/
+
+Relevant claim:
+Selected human-readable authoring format.
+
+Reliability:
+HIGH official specification.
+
+Pulse reliance:
+YES.
+
+Future verification:
+On parser or spec upgrade.
+
+----------------------------------------------------------------------
+SRC-STD-SEMVER-001
+Title:
+Semantic Versioning 2.0.0
+
+Organisation:
+Semantic Versioning
+
+URL:
+https://semver.org/
+
+Relevant claim:
+Selected version communication convention.
+
+Reliability:
+HIGH official specification.
+
+Pulse reliance:
+YES, adapted with effective dates and hashes.
+
+Future verification:
+On deliberate version-policy change.
+
+----------------------------------------------------------------------
+SRC-STD-RFC3339-001
+Title:
+RFC 3339 — Date and Time on the Internet: Timestamps
+
+Organisation:
+IETF / RFC Editor
+
+Publication date:
+2002-07
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc3339
+
+Relevant claim:
+Selected timestamp profile.
+
+Reliability:
+HIGH official RFC.
+
+Pulse reliance:
+YES.
+
+Future verification:
+Stable; review on timestamp architecture change.
+
+----------------------------------------------------------------------
+SRC-STD-RFC6902-001
+Title:
+RFC 6902 — JSON Patch
+
+Organisation:
+IETF / RFC Editor
+
+Publication date:
+2013-04
+
+URL:
+https://datatracker.ietf.org/doc/html/rfc6902
+
+Relevant claim:
+Optional standard representation for machine-readable config differences.
+
+Reliability:
+HIGH official RFC.
+
+Pulse reliance:
+OPTIONAL.
+
+Future verification:
+Stable.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 — Master Architecture and Product Definition
+
+Relevant claim:
+Requires season configuration, reproducibility and fail-closed rules.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-01 — Research Standard and Evidence Register
+
+Relevant claim:
+Defines source hierarchy, claim verification, licensing and activation evidence.
+
+Pulse reliance:
+YES.
+
+======================================================================
+34. ACCEPTANCE CRITERIA
+======================================================================
+
+DMFP-02 is accepted when Sebastian confirms:
+
+A. Prelaunch status
+[ ] No 2025/26 rule is treated as authoritative for 2026/27.
+[ ] Production remains blocked until launch capture and sign-off.
+[ ] The first deadline will not be inferred.
+
+B. Architecture
+[ ] Rules are configuration, not model code.
+[ ] YAML authoring and canonical JSON runtime are acceptable.
+[ ] JSON Schema validation and immutable hashes are required.
+[ ] Scoring, manager state and optimisation are separated.
+
+C. Scoring
+[ ] Position-specific scoring is explicit.
+[ ] Assist eligibility is a separate policy.
+[ ] BPS and bonus are match-scoped.
+[ ] Defensive-contribution cap is explicit.
+[ ] Red-card and clean-sheet edge cases are represented.
+[ ] Multiple fixtures aggregate correctly.
+
+D. Squad and transfers
+[ ] Money uses integer tenths.
+[ ] Squad/formation constraints are central.
+[ ] Free transfers use a state machine.
+[ ] Selling price is deterministic and separate from price prediction.
+[ ] External club-quota violation is valid-but-restricted.
+
+E. Chips
+[ ] Chips are inventory/window/state-transition objects.
+[ ] No chip assumptions carry to 2026/27 without verification.
+[ ] Special events are declarative.
+
+F. Operations
+[ ] ACTIVE rulesets are immutable.
+[ ] Every decision stores ruleset version/hash.
+[ ] Unknown blocking rules fail closed.
+[ ] Official outcomes remain reconciliation authority.
+
+G. Implementation
+[ ] Codex will not hard-code rule literals.
+[ ] Every active rule has tests and source provenance.
+[ ] Launch diff and dry runs are mandatory.
+
+======================================================================
+35. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Create the config directory structure.
+2. Implement JSON Schemas.
+3. Create `fpl-2025-26.reference` from this documented reference.
+4. Mark it REFERENCE_ONLY and nonproduction.
+5. Create the prelaunch 2026/27 manifest.
+6. Implement safe YAML-to-canonical-JSON compilation.
+7. Implement hash and source-manifest validation.
+8. Implement the activation blocker.
+9. Implement integer price type.
+10. Implement core position/squad/lineup validators.
+11. Implement scoring breakdown.
+12. Implement BPS and tie-allocation reference tests.
+13. Implement selling-price function.
+14. Implement transfer/chip state interfaces.
+15. Implement rules diff CLI.
+16. Implement official-outcome reconciliation skeleton.
+17. Add rule-literal lint/dependency check.
+18. Start official launch monitor.
+19. At launch, execute the Section 27 procedure.
+20. Do not connect ruleset to production optimiser until ACTIVE.
+
+Suggested commands:
+
+    dmf rules validate --season 2025_26 --reference
+    dmf rules compile --season 2025_26 --reference
+    dmf rules validate --season 2026_27
+    dmf rules diff --from 2025_26 --to 2026_27
+    dmf rules test --season 2026_27
+    dmf rules blockers --season 2026_27
+    dmf rules activate --season 2026_27 --version 1.0.0
+
+======================================================================
+36. OPEN QUESTIONS
+======================================================================
+
+BLOCKING AT TARGET LAUNCH
+-------------------------
+1. What are the official 2026/27 scoring weights?
+2. Are defensive-contribution points retained and unchanged?
+3. Is the assist policy unchanged?
+4. Is the BPS table unchanged?
+5. What is the exact 2026/27 squad budget?
+6. Are position quotas unchanged?
+7. Is the club quota unchanged?
+8. Is the free-transfer cap unchanged?
+9. Is the hit cost unchanged?
+10. Is the selling-price rule unchanged?
+11. What chips exist and how many copies?
+12. What are chip windows and expiry rules?
+13. Which chips are cancellable?
+14. How do chips affect banked transfers?
+15. What is the official first deadline?
+16. Is the deadline convention unchanged?
+17. What is the target-season points-finality policy?
+18. Are there scheduled special transfer grants?
+
+IMPLEMENTATION DETAIL
+---------------------
+19. What is the exact official auto-sub ordering for multiple absent starters?
+20. What is the generic bonus algorithm for uncommon tie structures?
+21. Does an official penalty save count in the ordinary save total?
+22. What exact official minute value is used at the 60-minute boundary in all
+    edge cases?
+23. How does FPL handle abandoned matches?
+24. How is a player playing as an emergency goalkeeper classified for save
+    events?
+25. What exact state is restored after Free Hit, including purchase prices and
+    bank?
+26. How are free transfers ordered relative to special grants?
+27. What official API fields expose chip windows and free-transfer cap?
+28. Can official BPS event data be retained/reconstructed under data rights?
+29. How should official post-final corrections be versioned?
+30. Is a two-person approval warranted for ACTIVE rules?
+
+======================================================================
+37. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Recommended next:
+DMFP-03 — CANONICAL DATA MODEL AND IDENTIFIERS
+
+Reason:
+The rules engine now defines the domain concepts that need stable identities:
+- season;
+- ruleset;
+- position;
+- player;
+- club;
+- fixture;
+- Gameweek;
+- scoring event;
+- manager state;
+- chip;
+- transfer;
+- price;
+- decision.
+
+DMFP-03 must ensure that provider-specific IDs never leak into these rule
+interfaces.
+
+Parallel critical work:
+DMFP-04 provider research may begin because odds/data access remains a
+market-first architecture blocker.
+
+======================================================================
+38. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-16
+- Established prelaunch blocking status.
+- Separated target-season authority from 2025/26 reference rules.
+- Defined configuration artefact suite.
+- Selected YAML authoring, canonical JSON and JSON Schema validation.
+- Defined ruleset lifecycle, versioning, hashing and activation.
+- Specified position, scoring, assist, clean-sheet, saves, defensive
+  contributions and BPS configuration.
+- Specified squad, formation, auto-substitution and captaincy rules.
+- Specified transfer/free-transfer state model.
+- Specified integer selling-price formula.
+- Modelled chips as state machines.
+- Added deadlines, Gameweek membership, finality and special events.
+- Added reference 2025/26 test fixture.
+- Added pure function interfaces and calculation order.
+- Added extensive testing, launch capture and Codex contract.
+- Added source register, risks, acceptance criteria and open questions.
+
+Future v1.0:
+- Official 2026/27 FPL game launched.
+- All target-season sources captured.
+- Rules diff completed.
+- Configuration and golden cases implemented.
+- Human verification completed.
+- Production ruleset activated with immutable hash.
+
+END OF DOCUMENT

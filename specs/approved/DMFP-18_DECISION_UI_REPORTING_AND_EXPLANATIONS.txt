@@ -1,0 +1,3705 @@
+DMF PULSE — DECISION UI, REPORTING AND EXPLANATIONS
+===================================================
+
+Document ID: DMFP-18
+Version: 0.9 (Decision Cockpit and Explanation Architecture)
+Status: PROPOSED — READY FOR UX PROTOTYPING AND USABILITY VALIDATION
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 17 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Upstream inputs:
+- DMFP-02 FPL rules and active season configuration
+- DMFP-03 canonical entities and decision records
+- DMFP-05 data quality, freshness and source lineage
+- DMFP-07 availability, start and minutes distributions
+- DMFP-09 player and Gameweek FPL-points distributions
+- DMFP-10 uncertainty, assumptions, value of information and policy mode
+- DMFP-11 price risk and ACT-versus-WAIT analysis
+- DMFP-12 recommended, conservative, upside and no-transfer plans
+- DMFP-13 captaincy, vice-captaincy and chip opportunity costs
+- DMFP-14 effective ownership, opponent and final-rank distributions
+- DMFP-15 historical calibration and benchmark evidence
+- DMFP-16 immutable Decision Bundles and pipeline state
+- DMFP-17 observability, security, rights and assurance state
+
+Downstream consumers:
+- Sebastian's deadline decision workflow
+- DMFP-19 implementation roadmap and acceptance tests
+- DMFP-20 assumptions, decisions and open questions
+- prospective human-factors and decision-quality evaluation
+
+PURPOSE
+-------
+This document defines how Pulse communicates decisions.
+
+The interface must not simply output:
+
+    "Buy Player X."
+
+It must answer:
+
+- What should Sebastian do?
+- When should he do it?
+- What is the expected value over the selected horizon?
+- How much downside and upside are present?
+- How confident is Pulse, and why?
+- What assumptions matter?
+- What price risk exists?
+- What are the best alternatives?
+- Why did the recommendation change since yesterday?
+- What new information could reverse it?
+- How do the scenarios compare?
+- What is the opportunity cost of using a chip?
+- What is the final-rank distribution when rank mode is active?
+- What data, models, rules and overrides produced the answer?
+- Is the recommendation fresh and safe to act on?
+
+The interface must make uncertainty visible without burying the action.
+
+The selected design is a DECISION COCKPIT with progressive disclosure:
+
+LEVEL 1 — ACT
+A fast, clear action and timing instruction.
+
+LEVEL 2 — UNDERSTAND
+Value, uncertainty, alternatives, assumptions and switch conditions.
+
+LEVEL 3 — INVESTIGATE
+Scenario distributions, model evidence, change attribution and provenance.
+
+LEVEL 4 — AUDIT
+Complete immutable Decision Bundle, sources, versions, diagnostics and replay.
+
+GOVERNING PRINCIPLE
+-------------------
+The UI is not a decoration over model output.
+
+It is the final decision-support component of Pulse.
+
+Its job is to improve appropriate human reliance:
+
+- neither blind automation;
+- nor reflexive rejection after one bad outcome;
+- nor false confidence from a precise mean;
+- nor paralysis from excessive detail.
+
+The interface must preserve the difference between:
+
+FORECAST:
+What might happen?
+
+DECISION:
+What action best serves the selected objective?
+
+EXPLANATION:
+Why does that action beat the alternatives?
+
+UNCERTAINTY:
+What is not known, how much can outcomes vary, and how fragile is the choice?
+
+ASSURANCE:
+Is the decision fresh, valid, reproducible and legally displayable?
+
+The interface follows four explanation principles adapted from NIST:
+
+1. EXPLANATION
+   Provide evidence or reasons for outputs and processes.
+
+2. MEANINGFULNESS
+   Tailor explanations to Sebastian's task and level of detail.
+
+3. EXPLANATION ACCURACY
+   Explanations must faithfully reflect the actual system process.
+
+4. KNOWLEDGE LIMITS
+   Show when Pulse is outside its intended conditions or lacks sufficient
+   confidence.
+
+The UI MUST NOT optimise for "trust" as a vanity measure.
+
+It should optimise for:
+
+- comprehension;
+- calibrated reliance;
+- decision quality;
+- timely action;
+- error detection;
+- contestability;
+- reproducibility.
+
+CRITICAL EXPLANATION RULE
+-------------------------
+No natural-language explanation may be the primary source of a numerical claim.
+
+Every displayed number and substantive reason must come from a structured,
+versioned explanation object derived from the Decision Bundle.
+
+An optional language model may paraphrase approved fields only.
+
+It must not:
+
+- create a new number;
+- infer an unrecorded cause;
+- conceal a warning;
+- strengthen uncertainty language;
+- recommend an action not in the bundle;
+- read external sources during rendering;
+- change the plan;
+- overwrite the deterministic explanation.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require an architecture decision record.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE INTERFACE DECISIONS
+======================================================================
+
+0.1 PRIMARY SURFACE
+-------------------
+The default screen is the DEADLINE DECISION COCKPIT.
+
+It begins with one decision card:
+
+- action status;
+- exact transfer/tactical actions;
+- execution timing;
+- expected value versus no-transfer baseline;
+- downside/upside;
+- confidence;
+- one-sentence reason;
+- one-sentence warning or switch condition;
+- freshness/deadline state.
+
+0.2 PRIMARY ACTION STATES
+-------------------------
+ACT_NOW
+WAIT_FOR_INFORMATION
+HOLD_NO_TRANSFER
+ROLL_TRANSFER
+EXECUTE_BEFORE_SAFE_TIME
+MANUAL_REVIEW
+BLOCKED
+AUDIT_ONLY
+SUPERSEDED.
+
+0.3 RECOMMENDATION LANGUAGE
+---------------------------
+The first line is imperative and operational.
+
+Examples:
+
+"WAIT. Recheck after Arsenal's press conference tomorrow; the expected value of
+the information is greater than the modeled £0.1m price risk."
+
+"MAKE ONE FREE TRANSFER: Player A -> Player B. Start B, captain C, first bench
+D. Complete before 17:45 UK time."
+
+"ROLL THE TRANSFER. No alternative robustly clears the value of holding two free
+transfers next week."
+
+"BLOCKED. Current squad state has not been verified since the last official
+price update."
+
+0.4 DEFAULT COMPARATOR
+----------------------
+Every recommendation is compared with:
+
+    NO-TRANSFER BASELINE
+
+that still optimises:
+
+- starting XI;
+- bench order;
+- captain;
+- vice-captain.
+
+0.5 VALUE DISPLAY
+-----------------
+Default headline:
+
+    EXPECTED HORIZON POINTS GAIN VERSUS NO TRANSFER
+
+not:
+
+- player xP alone;
+- total squad xP without comparison;
+- team value;
+- model score;
+- solver objective without interpretation.
+
+0.6 UNCERTAINTY DISPLAY
+-----------------------
+Show:
+
+- paired difference distribution;
+- p10 / median / p90;
+- probability recommended plan beats baseline;
+- probability it loses by at least four points;
+- robust regret or action instability;
+- major uncertainty source.
+
+Do not display only:
+
+    +2.37 expected points
+
+without a distribution.
+
+0.7 CONFIDENCE DISPLAY
+----------------------
+Confidence is a multidimensional evidence grade.
+
+It is not:
+
+- the probability the player will return;
+- the probability the recommendation is "correct";
+- the inverse of variance;
+- a decoration.
+
+Default:
+
+    B — Strong recommendation, but target minutes remain material.
+
+Expandable dimensions:
+
+- data;
+- rules;
+- lineup/minutes;
+- football model;
+- price;
+- rank;
+- decision stability;
+- operational freshness.
+
+0.8 VISUALISATION DECISION
+--------------------------
+Preferred:
+
+- quantile dotplots for discrete plan-difference outcomes;
+- CDF/exceedance curves for thresholds;
+- percentile bands/fan charts across horizons;
+- small-multiple scenario cards;
+- exact tables with text alternatives;
+- optional hypothetical-outcome animation for joint outcomes.
+
+Error bars alone are not the default.
+
+0.9 CHANGE EXPLANATION
+----------------------
+"Why changed?" is generated from controlled old-versus-new re-runs.
+
+It separates:
+
+- changed evidence;
+- changed model/rules/objective;
+- changed manager state;
+- changed optimisation;
+- Monte Carlo/solver noise.
+
+A narrative guess is prohibited.
+
+0.10 COUNTERFACTUAL DECISION EXPLANATION
+-----------------------------------------
+"What could change this decision?" displays the smallest plausible changes that
+switch the plan.
+
+Examples:
+
+- Player B p_start below 74%;
+- Player A avoids the expected price fall;
+- fixture moved out of the Gameweek;
+- price rise makes the route unaffordable;
+- target-rank objective activated;
+- press conference confirms no minutes limit.
+
+These are model-decision counterfactuals, not necessarily causal statements
+about real football.
+
+0.11 RANK DISPLAY
+-----------------
+When rank mode is active, show:
+
+- points-optimal and rank-optimal plans;
+- expected-points difference;
+- probability of target rank;
+- final-rank distribution;
+- target threshold distribution;
+- named-rival win probabilities;
+- effective ownership and leverage;
+- confidence in opponent model.
+
+0.12 CHIP DISPLAY
+-----------------
+Chip cards show:
+
+- gross current incremental points;
+- preparation/unwinding costs;
+- continuation value;
+- opportunity cost;
+- net policy value;
+- P(use now is optimal);
+- competing chip opportunity;
+- expiry pressure.
+
+Never show only total Gameweek points with the chip.
+
+0.13 ACCESSIBILITY DECISION
+---------------------------
+Target:
+
+    WCAG 2.2 LEVEL AA
+
+No information is conveyed by colour alone.
+
+Every chart has:
+
+- meaningful title;
+- direct labels;
+- table/text alternative;
+- keyboard access;
+- screen-reader summary;
+- sufficient contrast;
+- visible focus;
+- reduced-motion fallback.
+
+0.14 MOBILE DECISION
+--------------------
+The actionable summary must work on a phone near deadline.
+
+Deep scenario/audit views can be desktop-first but remain accessible.
+
+======================================================================
+1. USER, TASKS AND DECISION CONTEXT
+======================================================================
+
+1.1 PRIMARY USER
+----------------
+Sebastian Greenhalgh.
+
+1.2 PRIMARY TASK
+---------------
+Make a timely, informed and legally valid FPL decision before the deadline.
+
+1.3 SECONDARY TASKS
+-------------------
+- understand recommendation;
+- compare alternatives;
+- evaluate risk;
+- decide ACT versus WAIT;
+- inspect chip timing;
+- select points or rank objective;
+- record human action/override;
+- review yesterday's change;
+- audit a past decision.
+
+1.4 TIME PRESSURE
+-----------------
+Interface mode changes by time to deadline:
+
+NORMAL:
+more than 72 hours.
+
+PREDEADLINE:
+72–6 hours.
+
+CRITICAL:
+6 hours to safe execution cutoff.
+
+FINAL:
+inside the final hour.
+
+AUDIT:
+after action cutoff/deadline.
+
+1.5 COGNITIVE LOAD
+------------------
+Near deadline:
+
+- fewer default numbers;
+- action and warning first;
+- no modal labyrinth;
+- no animation by default;
+- deterministic fallback;
+- latest safe time visible;
+- one-tap plan copy/checklist.
+
+1.6 EXPERTISE
+-------------
+The interface supports:
+
+QUICK:
+one-minute decision.
+
+ANALYST:
+full distributions and assumptions.
+
+AUDITOR:
+lineage, models and diagnostics.
+
+The system does not require statistical notation for the primary task.
+
+1.7 APPROPRIATE RELIANCE
+------------------------
+Research on algorithm aversion shows people can reject an algorithm after
+seeing inevitable errors even when it outperforms a human comparator.
+
+Research also finds that limited ability to adjust algorithmic forecasts can
+increase willingness to use them, though adjustments can worsen accuracy.
+
+Pulse response:
+
+- show calibration and historical benchmark performance;
+- show knowledge limits and mistakes;
+- allow structured what-if/constraints and manual action;
+- keep model output immutable;
+- evaluate override outcomes;
+- never imply perfection.
+
+======================================================================
+2. INFORMATION ARCHITECTURE
+======================================================================
+
+2.1 TOP-LEVEL NAVIGATION
+------------------------
+DECISION
+PLAYERS
+SCENARIOS
+CHIPS
+RANK
+PRICES
+DATA HEALTH
+HISTORY
+MODELS
+SETTINGS.
+
+2.2 DECISION
+------------
+- latest recommendation;
+- plans;
+- current tactics;
+- assumptions;
+- what changed;
+- information watch;
+- execution record.
+
+2.3 PLAYERS
+-----------
+Player projections and component distributions.
+
+2.4 SCENARIOS
+-------------
+Plan, match and Gameweek outcome exploration.
+
+2.5 CHIPS
+---------
+Current opportunity and future schedule.
+
+2.6 RANK
+--------
+EO, rivals, final-rank distribution and target plans.
+
+2.7 PRICES
+----------
+Rises/falls, route affordability and ACT/WAIT.
+
+2.8 DATA HEALTH
+---------------
+Freshness, degradation, drift, overrides and incidents.
+
+2.9 HISTORY
+-----------
+Past Decision Bundles, executions, outcomes and evaluations.
+
+2.10 MODELS
+-----------
+Model cards, calibration, champions/challengers and limitations.
+
+2.11 SETTINGS
+-------------
+- selected objective;
+- rank target;
+- horizon display;
+- notification preferences;
+- accessibility preferences;
+- no direct model-weight editing.
+
+======================================================================
+3. DEADLINE DECISION COCKPIT
+======================================================================
+
+3.1 HEADER
+----------
+- Gameweek;
+- official deadline;
+- current UK time;
+- time to safe execution;
+- Decision Bundle issue time;
+- information cutoff;
+- recommendation state;
+- assurance status.
+
+3.2 ACTION CARD
+---------------
+Required:
+
+ACTION:
+transfer(s), chip, captain, vice, XI, bench.
+
+TIMING:
+ACT NOW / WAIT / latest safe time / recheck event.
+
+VALUE:
+expected horizon gain relative to baseline.
+
+RANGE:
+p10 / median / p90 paired gain.
+
+WIN PROBABILITY:
+P(recommended beats baseline).
+
+CONFIDENCE:
+grade and short reason.
+
+KEY ASSUMPTION:
+highest-impact unresolved assumption.
+
+FALLBACK:
+best action if the assumption fails.
+
+3.3 EXAMPLE
+-----------
+RECOMMENDED — WAIT
+
+Recheck after the 13:30 manager press conference tomorrow. If Player B remains
+projected above 78% to start, make Player A -> Player B before 17:45.
+
+Expected five-Gameweek gain versus rolling: +2.1 points
+Paired range: -3 / +2 / +8 points (p10 / median / p90)
+Probability of beating roll: 61%
+Confidence: C — role evidence is incomplete
+Price route closes before deadline: 18%
+Most important assumption: Player B starts at least four of five fixtures.
+
+3.4 CURRENT TACTICS
+-------------------
+Always visible:
+
+- formation;
+- XI;
+- first/second/third bench;
+- captain;
+- vice;
+- P(field 11);
+- captain fallback probability.
+
+3.5 BASELINE
+------------
+Show no-transfer plan beside recommendation.
+
+3.6 ACTION CHECKLIST
+--------------------
+Copyable:
+
+1. Confirm official current squad and bank.
+2. Make transfer.
+3. Set XI.
+4. Set bench order.
+5. Set captain and vice.
+6. Confirm chip.
+7. Save team before latest safe time.
+8. Record execution.
+
+3.7 BLOCKED STATE
+-----------------
+A blocked state replaces action controls with:
+
+- blocking reason;
+- last valid recommendation and age;
+- safe manual fallback;
+- expected resolution;
+- no green success styling.
+
+3.8 DEGRADED STATE
+------------------
+Prominent banner:
+
+"Player-prop markets are unavailable. Pulse is using its team-to-player model;
+confidence reduced from B to C."
+
+3.9 SUPERSEDED
+--------------
+Old Decision Bundle:
+
+- superseded badge;
+- link to current;
+- change summary;
+- cannot be mistaken for latest.
+
+======================================================================
+4. RECOMMENDED MOVE REPRESENTATION
+======================================================================
+
+4.1 TRANSFER
+------------
+For each move:
+
+- OUT;
+- IN;
+- exact buy/sell price;
+- bank after;
+- FT before/after;
+- hit;
+- execution timing;
+- marginal value;
+- interaction value;
+- reasons;
+- uncertainty.
+
+4.2 NO TRANSFER
+---------------
+Must be written as a positive plan:
+
+    ROLL ONE TRANSFER
+
+not absence of output.
+
+4.3 MULTI-TRANSFER
+------------------
+Show:
+
+- bundle value;
+- each atomic move;
+- funding dependency;
+- hit;
+- Shapley/drop-one attribution;
+- route alternatives.
+
+4.4 BUY/SELL REASONS
+--------------------
+Structured:
+
+- points;
+- minutes;
+- fixtures;
+- captaincy;
+- price;
+- bench;
+- flexibility;
+- chip;
+- injury;
+- rank.
+
+4.5 PRICE
+---------
+Display route-specific effect:
+
+"Buying before one £0.1m rise preserves affordability but does not create
+£0.1m sale profit."
+
+4.6 RECOMMENDATION STATUS
+-------------------------
+DRAFT
+ACTIONABLE
+WAITING
+DEGRADED
+BLOCKED
+SUPERSEDED
+EXECUTED
+AUDIT_ONLY.
+
+======================================================================
+5. EXPECTED VALUE
+======================================================================
+
+5.1 SELECTED HORIZON
+--------------------
+Display:
+
+- horizon Gameweeks/dates;
+- terminal/flexibility value inclusion;
+- policy mode;
+- future re-optimisation assumption.
+
+5.2 VALUE COMPONENTS
+--------------------
+- current Gameweek points;
+- future explicit-horizon points;
+- hit;
+- captain;
+- bench/autosubs;
+- price-enabled points;
+- flexibility/terminal value;
+- chip/rank utility where active.
+
+5.3 DEFAULT UNIT
+----------------
+FPL points.
+
+Rank probability is separate.
+
+Team value is not converted with a fixed rate.
+
+5.4 EXPECTED VALUE TABLE
+------------------------
+Recommended
+Conservative
+High upside
+No transfer
+
+Rows:
+
+- current GW xP;
+- horizon xP;
+- net gain;
+- p10/median/p90 gain;
+- P(beat baseline);
+- hit;
+- bank;
+- FT next;
+- P(field 11);
+- robust regret;
+- target rank P where active.
+
+5.5 PAIRED COMPARISON
+---------------------
+Compare plans on identical scenarios:
+
+    points(plan A, scenario) - points(plan B, scenario).
+
+Do not subtract independently estimated percentile endpoints.
+
+5.6 ROUNDING
+------------
+UI:
+
+- expected points to one decimal;
+- probabilities to whole percent normally;
+- prices to £0.1m;
+- rank with appropriate significant precision.
+
+Full values accessible in audit.
+
+5.7 FALSE PRECISION
+-------------------
+Do not display:
+
+    2.371948 expected points
+
+as actionable precision.
+
+5.8 SMALL DIFFERENCE
+--------------------
+If difference is below decision/Monte Carlo precision:
+
+"Plans are effectively tied."
+
+======================================================================
+6. DOWNSIDE AND UPSIDE
+======================================================================
+
+6.1 RELATIVE DISTRIBUTION
+-------------------------
+Default downside/upside is relative to no-transfer or selected comparator.
+
+6.2 CORE METRICS
+----------------
+- p10;
+- median;
+- p90;
+- P(gain >0);
+- P(gain >=4);
+- P(loss <=-4);
+- expected shortfall in worst 10%;
+- upside expected gain in best 10%;
+- maximum plausible validated range.
+
+6.3 CONSERVATIVE
+----------------
+Explain downside protection:
+
+"Reduces the probability of fielding fewer than 11 from 13% to 5%, costing
+0.4 expected points."
+
+6.4 HIGH UPSIDE
+----------------
+Explain explicit tail objective:
+
+"Raises P(beating baseline by 10+) from 12% to 17%, costing 0.6 expected
+points."
+
+Do not say "riskier" without defining the risk.
+
+6.5 HORIZON FAN
+---------------
+Cumulative plan-difference fan by Gameweek:
+
+- median;
+- 50%;
+- 80%;
+- 90% intervals.
+
+6.6 TAIL WARNING
+----------------
+If Monte Carlo tail ESS is weak:
+mark approximate and show diagnostic.
+
+======================================================================
+7. UNCERTAINTY VISUALISATION
+======================================================================
+
+7.1 DESIGN PRINCIPLE
+--------------------
+A point estimate remains visible but is not visually dominant enough to suppress
+the distribution.
+
+Research finds that people often misinterpret standard error bars and that
+frequency-based quantile dotplots can support better probability extraction and
+decision performance in some tasks.
+
+7.2 QUANTILE DOTPLOT
+--------------------
+Default plan-difference visual:
+
+- 20 or 50 equal-probability dots;
+- each dot represents 5% or 2% of scenarios;
+- aligned to integer FPL-point difference;
+- zero/reference clearly marked;
+- direct counts:
+
+"31 of 50 representative outcomes favour the transfer."
+
+7.3 CDF/EXCEEDANCE
+------------------
+Answer:
+
+- chance gain is positive;
+- chance gain is at least four;
+- chance final rank reaches target.
+
+7.4 FAN CHART
+-------------
+Use for:
+
+- cumulative horizon points;
+- team value;
+- final rank percentile trajectory.
+
+7.5 HYPOTHETICAL OUTCOME PLOTS
+------------------------------
+Optional for:
+
+- side-by-side plan outcomes;
+- rank evolution;
+- correlated squad/rival outcomes.
+
+HOPs animate individual draws and have performed well for some multivariate
+probability judgments.
+
+Rules:
+
+- optional;
+- pause/control;
+- no default in final-minute mode;
+- reduced-motion alternative;
+- fixed representative seed;
+- static small multiples/table.
+
+7.6 DENSITY/VIOLIN
+------------------
+Analyst view only.
+
+Discrete FPL-point support must remain clear.
+
+7.7 ERROR BARS
+--------------
+Not used alone.
+
+Label interval meaning exactly.
+
+7.8 COLOUR
+----------
+- colour plus icon/text/pattern;
+- no red/green-only semantics;
+- accessible palette;
+- consistent meanings;
+- user colour theme cannot alter status semantics.
+
+7.9 SCREEN-READER SUMMARY
+-------------------------
+Example:
+
+"The recommended plan has a 61% probability of outscoring no transfer over five
+Gameweeks. Ten percent of scenarios lose three points or more; ten percent gain
+eight points or more."
+
+7.10 DATA TABLE
+----------------
+Every visual can be opened as a sortable/downloadable accessible table.
+
+======================================================================
+8. CONFIDENCE
+======================================================================
+
+8.1 DIMENSIONS
+--------------
+RULES
+DATA FRESHNESS
+SOURCE COVERAGE
+LINEUP/MINUTES
+MARKET
+EVENT/POINTS MODEL
+PRICE
+RANK/OPPONENT
+DECISION STABILITY
+MONTE CARLO
+SOLVER
+OPERATIONAL.
+
+8.2 GRADE
+---------
+A–E/BLOCKED, from upstream policy.
+
+8.3 CONFIDENCE CARD
+-------------------
+Overall:
+
+B — Strong
+
+Drivers:
++ Fresh official squad/price data
++ Models agree on Player B
+- Manager's rotation policy still uncertain
+- No player-goal market available
+
+8.4 CONFIDENCE VERSUS VALUE
+---------------------------
+Four-quadrant language:
+
+HIGH VALUE / HIGH CONFIDENCE:
+act unless timing information dominates.
+
+HIGH VALUE / LOW CONFIDENCE:
+wait/review/monitor.
+
+LOW VALUE / HIGH CONFIDENCE:
+small decision; rolling can dominate.
+
+LOW VALUE / LOW CONFIDENCE:
+do not force action.
+
+8.5 PROBABILITY PLAN OPTIMAL
+----------------------------
+May display estimated action stability:
+
+"Recommended in 64% of model/SAA worlds."
+
+Label methodology; do not call it exact probability of truth.
+
+8.6 HISTORICAL CALIBRATION
+--------------------------
+Optional:
+
+"When Pulse issued confidence B for similar transfer decisions, forecast
+intervals covered outcomes at the expected rate over the current sample."
+
+Show sample size and period.
+
+8.7 KNOWLEDGE LIMIT
+-------------------
+Examples:
+
+- 2026/27 price model has only two weeks of target-season data;
+- target rank model unavailable;
+- source licence prevents raw display;
+- new manager outside validated regime.
+
+======================================================================
+9. IMPORTANT ASSUMPTIONS
+======================================================================
+
+9.1 ASSUMPTION OBJECT
+---------------------
+- assumption ID;
+- statement;
+- current state/distribution;
+- affected plans;
+- decision impact;
+- switch threshold;
+- source/evidence;
+- confidence;
+- expected information;
+- information time;
+- owner;
+- status.
+
+9.2 TYPES
+---------
+PLAYER_START
+PLAYER_MINUTES
+INJURY_RETURN
+TACTICAL_ROLE
+PENALTY_TAKER
+TEAM_STRENGTH
+FIXTURE_ASSIGNMENT
+PRICE_CHANGE
+RULE
+MODEL
+SOURCE
+OPPONENT_ACTION
+CHIP_OPPORTUNITY
+TERMINAL_VALUE.
+
+9.3 PRIORITISATION
+------------------
+Rank by decision value:
+
+    probability assumption changes
+    x utility impact
+    x action switch relevance.
+
+Do not list every model assumption on the main screen.
+
+9.4 ASSUMPTION CARD
+-------------------
+"Player B starts: 79% (C confidence)
+Decision switches to HOLD below 72%.
+Next evidence: manager press conference, tomorrow 13:30."
+
+9.5 ACCEPTED ASSUMPTION
+-----------------------
+Sebastian may acknowledge but not silently change a model input.
+
+A changed assumption is a versioned what-if or override.
+
+9.6 CONFLICT
+------------
+Conflicting sources shown:
+
+- evidence;
+- time;
+- source quality;
+- model treatment.
+
+======================================================================
+10. WHAT INFORMATION COULD CHANGE THE DECISION
+======================================================================
+
+10.1 PURPOSE
+------------
+Turn uncertainty into an actionable monitoring plan.
+
+10.2 REQUIRED FIELDS
+--------------------
+- information event;
+- likely time;
+- affected assumption;
+- probability of action switch;
+- EVSI/EVPPI;
+- price/execution cost of waiting;
+- latest safe wait time;
+- action after each likely observation.
+
+10.3 EXAMPLE
+-------------
+MANAGER PRESS CONFERENCE — tomorrow 13:30
+
+If Player B is confirmed fully fit:
+buy B.
+
+If minutes restriction is confirmed:
+roll transfer.
+
+Estimated value of waiting:
++0.4 points.
+
+Probability desired price route closes first:
+18%.
+
+10.4 INFORMATION STATES
+-----------------------
+WATCHING
+AVAILABLE
+NO LONGER MATERIAL
+MISSED
+UNRELIABLE.
+
+10.5 NOTIFICATION
+-----------------
+Only notify if:
+
+- material evidence arrives;
+- decision changes;
+- switch probability crosses threshold;
+- safe execution time approaches.
+
+10.6 NO VAGUE WATCH
+-------------------
+"Wait for more news" is invalid without:
+
+- expected source;
+- expected time;
+- decision pathway.
+
+======================================================================
+11. COUNTERFACTUAL AND SWITCH-THRESHOLD EXPLANATIONS
+======================================================================
+
+11.1 PURPOSE
+------------
+Explain what minimal plausible change reverses the recommendation.
+
+Counterfactual explanations can help a user understand a decision and what
+would need to change to obtain a different result without requiring full
+exposure of every model computation.
+
+11.2 DECISION COUNTERFACTUALS
+-----------------------------
+Derived from actual reoptimisation.
+
+Examples:
+
+- p_start;
+- minutes;
+- team goals;
+- player price;
+- FT count;
+- fixture;
+- model weight;
+- rank target;
+- chip future opportunity.
+
+11.3 SINGLE-VARIABLE
+--------------------
+Report smallest switch:
+
+"Transfer becomes preferred when Player B's expected minutes rise from 63 to
+67."
+
+11.4 MULTIVARIABLE
+------------------
+When no single plausible change:
+
+"Requires both Player B p_start above 80% and no target price rise."
+
+11.5 PLAUSIBILITY
+-----------------
+Only show counterfactuals inside approved plausible uncertainty ranges unless
+explicitly labelled hypothetical.
+
+11.6 ACTIONABILITY
+------------------
+Separate:
+
+OBSERVABLE/ACTIONABLE:
+price, information, target objective.
+
+OBSERVABLE/NOT CONTROLLABLE:
+injury, fixture.
+
+MODEL-SENSITIVITY:
+model weights, terminal value.
+
+11.7 CAUSAL CAUTION
+-------------------
+A model counterfactual does not prove:
+
+"If Player B gets three extra minutes, the real-world decision is caused to
+improve."
+
+It states how the current model/optimiser decision boundary behaves.
+
+11.8 STABILITY
+-------------
+Show broad switch region when optimiser is discontinuous or Monte Carlo noise
+material.
+
+======================================================================
+12. WHY YESTERDAY'S RECOMMENDATION CHANGED
+======================================================================
+
+12.1 COMPARATOR
+---------------
+Default:
+
+- most recent prior actionable Decision Bundle for the same Gameweek/objective.
+
+User can choose another.
+
+12.2 CHANGE CATEGORIES
+----------------------
+MANAGER_STATE
+RULES
+DEADLINE/FIXTURE
+AVAILABILITY/MINUTES
+MARKETS
+EVENT/POINTS MODEL
+PRICE
+RANK/EO
+OBJECTIVE/HORIZON
+MODEL/CALIBRATION VERSION
+OVERRIDE
+SOLVER/SCENARIO QUALITY
+OPERATIONAL SOURCE
+TIME PASSAGE/NEW GAMEWEEK.
+
+12.3 EXACT DIFF
+---------------
+Show:
+
+- old plan;
+- new plan;
+- old/new expected value;
+- old/new range;
+- assumptions changed;
+- source/model/version changed;
+- deadline/cutoff.
+
+12.4 CONTROLLED RE-RUN ATTRIBUTION
+----------------------------------
+Create hybrid runs:
+
+- old state with one change group updated;
+- new state with one change group reverted.
+
+Calculate action/value effects using common random numbers.
+
+12.5 PATH DEPENDENCE
+--------------------
+One-at-a-time contributions depend on order and interactions.
+
+Primary display:
+
+- canonical operational order;
+- interaction/residual.
+
+Analyst display:
+
+- grouped Shapley attribution over a manageable number of change groups;
+- uncertainty;
+- runtime.
+
+12.6 ZERO RESIDUAL STANDARD
+---------------------------
+Numerical value change must reconcile:
+
+    old value
+    + attributed main effects
+    + interactions
+    + numerical/Monte Carlo residual
+    =
+    new value.
+
+Unexplained residual beyond tolerance is an error.
+
+12.7 DECISION FLIP
+------------------
+Explain both:
+
+- value movement;
+- constraint/threshold flip.
+
+Example:
+
+"Player B's price rise reduced bank below the route threshold. This—not a
+projection change—made the previous two-transfer plan infeasible."
+
+12.8 MODEL VERSION
+------------------
+Prominent:
+
+"Recommendation changed because the champion minutes model was promoted."
+
+Do not imply new football evidence.
+
+12.9 RANDOMNESS
+---------------
+If only simulation/solver variation changes a near tie:
+
+"Plans remain statistically tied; display ordering changed due to numerical
+precision."
+
+Do not frame as substantive football change.
+
+12.10 CHANGE TIMELINE
+---------------------
+Chronological events with impact.
+
+======================================================================
+13. PLAN AND SCENARIO COMPARISON
+======================================================================
+
+13.1 REQUIRED PLANS
+-------------------
+RECOMMENDED
+CONSERVATIVE
+HIGH_UPSIDE
+NO_TRANSFER.
+
+Additional:
+
+- points-optimal;
+- rank-optimal;
+- user what-if;
+- previous recommendation.
+
+13.2 COMMON SCENARIOS
+---------------------
+All comparisons use identical scenario IDs/weights where possible.
+
+13.3 COMPARISON TABLE
+---------------------
+Columns:
+plans.
+
+Rows:
+
+- action;
+- hit;
+- bank/FT;
+- expected current GW;
+- expected horizon;
+- net versus baseline;
+- p10/median/p90;
+- P(beat baseline);
+- P(loss 4+);
+- P(field 11);
+- captain/vice;
+- chip;
+- chip net value;
+- robust regret;
+- team-value-enabled points;
+- target rank P;
+- final rank median/range;
+- confidence;
+- execution timing.
+
+13.4 DOMINANCE
+----------------
+Mark if a plan is dominated in all selected metrics.
+
+13.5 SCENARIO SLICES
+--------------------
+- target starts;
+- target benched;
+- team clean sheet;
+- price rise;
+- fixture postponed;
+- injury;
+- captain haul;
+- rank rival action.
+
+13.6 SCENARIO CARD
+------------------
+"Target benched" — 17% probability
+
+Recommended loses 5.2 points versus roll.
+Conservative loses 1.4.
+Future transfer state remains better under roll.
+
+13.7 CUSTOM SCENARIO
+--------------------
+User can toggle approved what-if inputs.
+
+Creates:
+
+- new run;
+- WHAT_IF label;
+- no change to production recommendation;
+- explicit differences.
+
+13.8 DISTRIBUTION OVERLAY
+------------------------
+Prefer:
+
+- paired difference dotplot;
+- CDF;
+- small multiples.
+
+Avoid overlapping dense kernels without direct labels.
+
+======================================================================
+14. CHIP OPPORTUNITY COST
+======================================================================
+
+14.1 CHIP CARD
+--------------
+For each available chip:
+
+- current gross gain;
+- preparation/unwind;
+- current net policy value;
+- continuation value;
+- opportunity cost;
+- exercise advantage;
+- probability use-now optimal;
+- expected future best opportunity;
+- expiry;
+- competing chip week.
+
+14.2 TRIPLE CAPTAIN
+-------------------
+Show:
+
+- effective captain score distribution;
+- vice fallback;
+- extra points;
+- future opportunity percentile;
+- fixture/minutes risk.
+
+14.3 BENCH BOOST
+----------------
+Show:
+
+- bench points;
+- normal autosub overlap;
+- net incremental;
+- bench capital;
+- preparation;
+- P(all 15 appear);
+- Wildcard synergy.
+
+14.4 FREE HIT
+----------------
+Show:
+
+- temporary uplift;
+- hits avoided;
+- permanent squad damage avoided;
+- future Free Hit opportunity.
+
+14.5 WILDCARD
+----------------
+Show:
+
+- immediate rebuild;
+- normal repair;
+- delayed Wildcard;
+- value of information;
+- points/hits/price/flexibility;
+- future chip route.
+
+14.6 NO CHIP
+----------------
+"Hold" is a full policy with continuation value.
+
+14.7 VISUAL
+-----------
+Opportunity schedule:
+
+- Gameweeks on x-axis;
+- forecast net opportunity distributions;
+- expiry;
+- uncertainty;
+- conflicts;
+- current exercise line.
+
+No claim that forecast maximum is achievable with perfect foresight.
+
+======================================================================
+15. PRICE RISK
+======================================================================
+
+15.1 PRICE CARD
+--------------
+- current buy/sell;
+- P(rise next update);
+- P(fall next update);
+- 24h/72h price PMF;
+- likely threshold distance;
+- update window;
+- route-affordability probability;
+- confidence.
+
+15.2 DECISION IMPACT
+--------------------
+Translate price to points/feasibility:
+
+- route saved/lost;
+- bank;
+- sale value;
+- marginal future points;
+- reversal risk.
+
+15.3 ACT VERSUS WAIT
+--------------------
+Side-by-side:
+
+ACT NOW:
+price protection, risk before news.
+
+WAIT:
+information value, route-closing risk.
+
+15.4 KEY ASYMMETRY
+------------------
+Explain manager-specific selling price.
+
+15.5 LOW CONFIDENCE
+-------------------
+If target-season model immature:
+show strong knowledge-limit banner.
+
+======================================================================
+16. FINAL RANK DISTRIBUTION
+======================================================================
+
+16.1 ACTIVATION
+----------------
+Only when:
+
+- rank objective/diagnostic active;
+- opponent model available;
+- confidence displayed.
+
+16.2 REQUIRED METRICS
+---------------------
+- expected rank;
+- median rank;
+- p10/p25/p75/p90 rank;
+- P(top 1 / 100 / 1k / 10k / 100k as relevant);
+- P(selected target);
+- mini-league win/top-k;
+- target threshold points;
+- expected-points sacrifice versus points plan;
+- rank-model confidence.
+
+16.3 DIRECTION
+--------------
+Lower numerical rank is better.
+
+Visuals must make this explicit.
+
+16.4 LOG SCALE
+--------------
+Rank spans orders of magnitude.
+
+Default chart may use log-rank axis with direct labelled milestones.
+
+Accessible table uses exact values.
+
+16.5 RANK CDF
+-------------
+Display:
+
+    P(final rank <= R)
+
+at selectable thresholds.
+
+16.6 DISTRIBUTION
+----------------
+Use:
+
+- rank-band probability bars;
+- CDF;
+- percentile interval;
+- hypothetical outcome small multiples.
+
+Avoid a symmetric bell curve.
+
+16.7 POINTS VERSUS RANK
+-----------------------
+Compare:
+
+"Rank-aware plan costs 0.6 expected points but raises P(top 10k) from 18% to
+21%."
+
+16.8 OPPONENT ASSUMPTIONS
+-------------------------
+- cohort;
+- sample;
+- hidden-action model;
+- chip/captain uncertainty;
+- tail method.
+
+16.9 MINI-LEAGUE
+----------------
+Named rivals:
+
+- current gap;
+- P(beat);
+- score correlation;
+- likely captain/chip;
+- leverage players.
+
+16.10 EARLY SEASON
+------------------
+Rank view defaults to diagnostic and warns against overinterpreting current rank.
+
+======================================================================
+17. PLAYER REPORT
+======================================================================
+
+17.1 SUMMARY
+------------
+- price/position/team;
+- expected points;
+- median/variance;
+- p0/p5+/p10+/p15+;
+- minutes;
+- goal/assist/clean-sheet components;
+- price risk;
+- ownership/EO where available;
+- confidence.
+
+17.2 HORIZONS
+-------------
+Current fixture/Gameweek and selected multi-Gameweek horizon.
+
+17.3 DISTRIBUTION
+----------------
+Discrete PMF or quantile dotplot.
+
+17.4 START/MINUTES
+-----------------
+- start/bench/out;
+- p60;
+- minute PMF;
+- top causes;
+- evidence timeline.
+
+17.5 COMPONENT BREAKDOWN
+------------------------
+Expected points components with uncertainty.
+
+Do not imply independent addition of component variances.
+
+17.6 COMPARISON
+----------------
+Against same-position candidates using common scenario horizon.
+
+17.7 ROLE IN PLAN
+----------------
+- starter;
+- captain;
+- bench;
+- transfer target;
+- funding move;
+- future route.
+
+17.8 MODEL CARD LINK
+--------------------
+Relevant model version and limitations.
+
+======================================================================
+18. EXPLANATION GRAPH
+======================================================================
+
+18.1 PURPOSE
+------------
+Provide one structured source for:
+
+- UI;
+- CLI;
+- reports;
+- deterministic text;
+- optional language rendering;
+- audit.
+
+18.2 NODE TYPES
+---------------
+DECISION
+PLAN
+ACTION
+METRIC
+DISTRIBUTION
+REASON
+EVIDENCE
+ASSUMPTION
+UNCERTAINTY
+COUNTERFACTUAL
+CONSTRAINT
+CHANGE
+SOURCE
+MODEL
+RULE
+OVERRIDE
+WARNING
+KNOWLEDGE_LIMIT.
+
+18.3 EDGE TYPES
+---------------
+SUPPORTS
+OPPOSES
+DEPENDS_ON
+DERIVED_FROM
+COMPARED_WITH
+SWITCHES_IF
+INVALIDATES
+SUPERSEDES
+LIMITED_BY
+EXPLAINS_CHANGE.
+
+18.4 REASON OBJECT
+------------------
+- reason code;
+- summary;
+- direction;
+- magnitude;
+- plan/comparator;
+- calculation artifact;
+- source;
+- uncertainty;
+- priority.
+
+18.5 FIDELITY
+-------------
+Every explanation edge resolves to actual run artifacts.
+
+18.6 NO POST-HOC STORY
+----------------------
+A feature importance chart is not enough to explain an optimiser action.
+
+The decision explanation should show:
+
+- alternatives;
+- constraints;
+- scenario utility;
+- marginal move;
+- counterfactual boundary.
+
+18.7 MODEL EXPLANATION
+----------------------
+SHAP/feature attribution may explain a prediction model.
+
+It is clearly labelled:
+
+    MODEL PREDICTION EXPLANATION
+
+not:
+
+    DECISION CAUSE.
+
+18.8 CAUSAL CLAIMS
+------------------
+No causal language unless a causal model/assumption explicitly supports it.
+
+18.9 CONTRADICTIONS
+-------------------
+If evidence points both ways, show both.
+
+18.10 COMPLETENESS
+------------------
+Decision explanation must cover at least:
+
+- primary value reason;
+- primary downside;
+- major assumption;
+- why not best alternative;
+- switch condition;
+- knowledge limit.
+
+======================================================================
+19. NATURAL-LANGUAGE GENERATION
+======================================================================
+
+19.1 PRIMARY
+------------
+Deterministic templates from structured explanation graph.
+
+19.2 OPTIONAL LLM
+----------------
+May:
+
+- simplify;
+- reorder;
+- produce alternate reading level;
+- answer grounded follow-up.
+
+Must receive only approved Decision Bundle fields and source snippets.
+
+19.3 PROHIBITIONS
+-----------------
+- no new calculation;
+- no web lookup;
+- no unsupported certainty;
+- no hidden warning;
+- no changing recommendation;
+- no provider-licence violation;
+- no revealing private rival identity beyond permission.
+
+19.4 NUMERIC VALIDATION
+-----------------------
+Every number in rendered text must match an allowed structured value after
+rounding.
+
+Automated numeric-token checker.
+
+19.5 REASON VALIDATION
+----------------------
+Every reason code in text must exist in explanation graph.
+
+19.6 FALLBACK
+-------------
+If renderer fails:
+show deterministic template.
+
+19.7 STYLE
+-----------
+- direct;
+- exact action first;
+- define technical terms;
+- uncertainty with numbers;
+- no motivational hype;
+- no "guaranteed";
+- no "must haul";
+- no anthropomorphic model claims.
+
+======================================================================
+20. PROGRESSIVE DISCLOSURE
+======================================================================
+
+20.1 ONE-MINUTE VIEW
+--------------------
+- action;
+- timing;
+- value/range;
+- confidence;
+- main reason;
+- main switch condition;
+- health.
+
+20.2 FIVE-MINUTE VIEW
+---------------------
+- plan comparison;
+- assumptions;
+- price;
+- chip;
+- scenario dotplot;
+- why changed.
+
+20.3 ANALYST VIEW
+-----------------
+- full PMFs;
+- scenario slices;
+- sensitivity;
+- attribution;
+- rank distribution;
+- model/benchmark evidence.
+
+20.4 AUDIT VIEW
+----------------
+- Decision Bundle manifest;
+- source lineage;
+- rules/model/config;
+- solver/MC;
+- override;
+- trace;
+- replay.
+
+20.5 DEFAULT DEPTH
+------------------
+Time-to-deadline can change default depth, not hide details.
+
+======================================================================
+21. ALERTS AND NOTIFICATIONS
+======================================================================
+
+21.1 ACTIONABLE ONLY
+--------------------
+Notify when:
+
+- recommendation changes materially;
+- execution state changes ACT/WAIT/HOLD;
+- critical evidence arrives;
+- price route risk crosses threshold;
+- chip exercise changes;
+- deadline/safe time approaches;
+- assurance becomes blocked/degraded.
+
+21.2 MATERIALITY
+----------------
+Configurable:
+
+- transfer/captain/chip change;
+- expected-value change >= threshold;
+- P(action optimal) shift;
+- confidence grade;
+- target-rank probability change;
+- source P0/P1.
+
+21.3 MESSAGE
+-------------
+- what changed;
+- new action;
+- why;
+- deadline;
+- link;
+- confidence.
+
+21.4 NO SPAM
+------------
+- coalesce source bursts;
+- quiet hours except deadline/P0;
+- one active notification per decision state;
+- update/close prior.
+
+21.5 CHANNELS
+-------------
+- in-app;
+- email;
+- optional desktop/mobile push later.
+
+21.6 SECURITY
+-------------
+Notifications do not expose private rival details or secrets.
+
+======================================================================
+22. MANUAL CONTROLS AND WHAT-IF
+======================================================================
+
+22.1 USER CONTROLS
+------------------
+- objective mode;
+- rank target;
+- selected horizon view;
+- require/exclude player as what-if;
+- transfer count/hit cap;
+- chip schedule what-if;
+- assumption variation;
+- notification/accessibility settings.
+
+22.2 NEW RUN
+------------
+Any decision-affecting control creates a versioned what-if run.
+
+22.3 PRODUCTION RECOMMENDATION
+------------------------------
+Remains unchanged unless an approved policy/override is activated.
+
+22.4 MANUAL OVERRIDE
+--------------------
+Uses DMFP-17/16 approval workflow.
+
+UI shows:
+
+- scope;
+- evidence;
+- author;
+- expiry;
+- impact.
+
+22.5 HUMAN ACTION
+----------------
+Record:
+
+- executed plan;
+- differences;
+- reason;
+- time.
+
+22.6 NO SHAME
+-------------
+The UI neutrally compares human action and model recommendation.
+
+Evaluation later distinguishes outcome luck from decision quality.
+
+======================================================================
+23. DATA HEALTH AND ASSURANCE SURFACE
+======================================================================
+
+23.1 HEALTH SUMMARY
+-------------------
+- READY;
+- READY_WITH_WARNINGS;
+- BLOCKED;
+- AUDIT_ONLY.
+
+23.2 SOURCES
+------------
+For each critical source:
+
+- status;
+- age;
+- last success;
+- expected cadence;
+- coverage;
+- quota;
+- licence/display restriction.
+
+23.3 MODELS
+-----------
+- champion;
+- calibration;
+- drift;
+- sample;
+- knowledge limits;
+- challenger.
+
+23.4 RUN
+-------
+- tasks;
+- cache;
+- failures;
+- solver;
+- Monte Carlo;
+- trace.
+
+23.5 OVERRIDES/INCIDENTS
+------------------------
+Active and relevant.
+
+23.6 DISPLAY RIGHTS
+-------------------
+If raw provider evidence cannot be displayed:
+
+"Source evidence is licence-restricted. Derived probability and provenance are
+shown."
+
+23.7 NO FALSE GREEN
+-------------------
+Green/ready only when readiness gate passed.
+
+======================================================================
+24. HISTORY AND DECISION REVIEW
+======================================================================
+
+24.1 TIMELINE
+-------------
+Per Gameweek:
+
+- previews;
+- actionable bundles;
+- changes;
+- execution;
+- outcome;
+- evaluation.
+
+24.2 FORECAST VERSUS OUTCOME
+----------------------------
+Show:
+
+- forecast distribution;
+- realised outcome;
+- calibration context;
+- no hindsight claim.
+
+24.3 DECISION QUALITY
+---------------------
+- expected decision value at time;
+- realised result;
+- counterfactual baselines;
+- regret;
+- confidence.
+
+24.4 CHIP
+---------
+Incremental policy value, not total score.
+
+24.5 CHANGE REVIEW
+------------------
+Old recommendation remains accessible.
+
+24.6 REPLAY
+------------
+Launch approved replay mode with immutable label.
+
+======================================================================
+25. MODEL AND DATA DOCUMENTATION
+======================================================================
+
+25.1 MODEL CARD
+---------------
+Adapt model-card concepts:
+
+- intended use;
+- nonuse;
+- inputs/outputs;
+- training/evaluation;
+- metrics by relevant conditions;
+- limitations;
+- drift;
+- version;
+- source rights;
+- owner;
+- rollback.
+
+25.2 DATASET CARD
+----------------
+- collection;
+- time coverage;
+- mode;
+- missingness;
+- rights;
+- retention;
+- known bias;
+- leakage controls.
+
+25.3 USER VIEW
+--------------
+Concise summary plus full registry/audit link.
+
+25.4 PERFORMANCE CONTEXT
+-----------------------
+Do not show one "accuracy" number.
+
+Show primary metrics and benchmark.
+
+======================================================================
+26. ACCESSIBILITY
+======================================================================
+
+26.1 STANDARD
+-------------
+WCAG 2.2 AA target.
+
+W3C recommends using the latest WCAG 2 version; WCAG 2.2 adds criteria while
+remaining backwards compatible with earlier 2.x requirements.
+
+26.2 COLOUR
+-----------
+Colour is not the only visual means.
+
+Use:
+
+- text;
+- icon;
+- pattern;
+- border;
+- position.
+
+26.3 CONTRAST
+-------------
+Minimum AA contrast:
+
+- normal text 4.5:1;
+- large text 3:1;
+- nontext controls/meaningful graphics 3:1 where required.
+
+26.4 KEYBOARD
+-------------
+All functions keyboard reachable.
+
+Logical focus order follows decision hierarchy.
+
+26.5 FOCUS
+---------
+Visible, high-contrast focus.
+
+26.6 SCREEN READER
+------------------
+- landmarks;
+- headings;
+- table headers;
+- status announcements;
+- chart summaries;
+- action labels;
+- no icon-only unlabeled control.
+
+26.7 STATUS MESSAGES
+--------------------
+Material recommendation/health changes announced without forcing focus.
+
+26.8 ZOOM/REFLOW
+----------------
+Usable at 200% zoom and narrow viewport.
+
+26.9 MOTION
+-----------
+Respect `prefers-reduced-motion`.
+
+HOP animation has static equivalent and user control.
+
+26.10 COGNITION
+----------------
+- consistent terms;
+- short sentences;
+- definitions;
+- no unnecessary acronyms;
+- undo/cancel for nonirreversible UI actions;
+- confirmation for execution record/overrides.
+
+26.11 TESTING
+-------------
+Automated accessibility testing plus manual:
+
+- keyboard;
+- screen reader;
+- colour-blind simulation;
+- zoom;
+- mobile.
+
+======================================================================
+27. RESPONSIVE AND DEADLINE-SAFE DESIGN
+======================================================================
+
+27.1 MOBILE SUMMARY
+-------------------
+Top viewport:
+
+- action;
+- deadline/safe time;
+- transfers;
+- captain/chip;
+- confidence;
+- execute/copy checklist.
+
+27.2 MOBILE DETAILS
+-------------------
+Collapsible sections.
+
+No horizontal table required for action.
+
+27.3 OFFLINE SNAPSHOT
+---------------------
+Allow latest Decision Bundle to be saved/printed for emergency reference.
+
+Clearly show issue time/staleness.
+
+27.4 CONNECTION LOSS
+--------------------
+Do not show stale content as live.
+
+Banner:
+
+"Offline — displaying Decision Bundle from 16:42."
+
+27.5 PRINT
+----------
+Deadline report print/PDF layout includes:
+
+- action;
+- all tactical selections;
+- assumptions;
+- issue/deadline;
+- bundle ID/hash;
+- no interactive-only information.
+
+======================================================================
+28. REPORTS
+======================================================================
+
+28.1 DEADLINE REPORT
+--------------------
+Primary actionable report.
+
+28.2 DAILY PREVIEW
+------------------
+- current likely action;
+- information watch;
+- price risks;
+- chip schedule;
+- no premature imperative if WAIT.
+
+28.3 CHANGE REPORT
+------------------
+- old/new;
+- attribution;
+- timeline;
+- action impact.
+
+28.4 PLAYER REPORT
+------------------
+Projection and role.
+
+28.5 CHIP REPORT
+----------------
+Opportunity-cost schedule.
+
+28.6 RANK REPORT
+---------------
+Final-rank distribution and rivals.
+
+28.7 POST-GAMEWEEK REPORT
+-------------------------
+- outcome;
+- forecast context;
+- decision evaluation;
+- calibration;
+- no outcome-result fallacy.
+
+28.8 MONTHLY MODEL REPORT
+-------------------------
+- calibration;
+- benchmarks;
+- drift;
+- source health;
+- promotion.
+
+28.9 FORMATS
+------------
+- interactive HTML;
+- accessible print/PDF;
+- plain text;
+- structured JSON;
+- Parquet artifact links for analyst use.
+
+28.10 RIGHTS
+-------------
+Reports enforce provider display/redistribution policy.
+
+======================================================================
+29. UI/API DATA CONTRACTS
+======================================================================
+
+29.1 DECISION VIEW
+------------------
+GET immutable Decision Bundle and explanation graph.
+
+29.2 LATEST
+-----------
+Conditional GET with ETag.
+
+29.3 HEAVY DATA
+----------------
+Scenario/dotplot endpoints return:
+
+- precomputed representative quantiles/dots;
+- metadata;
+- artifact link.
+
+29.4 NO CLIENT RECALCULATION
+---------------------------
+The client does not recompute:
+
+- expected value;
+- confidence;
+- counterfactual;
+- rank;
+- chip opportunity.
+
+It may format/round.
+
+29.5 VIEW MODEL
+----------------
+Server-generated, versioned UI view model:
+
+- `decision_view_schema_version`.
+
+29.6 FEATURE DEGRADATION
+------------------------
+Unknown optional fields ignored.
+Unknown critical status blocks rendering/action.
+
+29.7 EVENT STREAM
+-----------------
+Optional server-sent events/polling for:
+
+- operation status;
+- new Decision Bundle;
+- alert.
+
+The immutable bundle remains source of truth.
+
+======================================================================
+30. EXPLANATION AND UI EVALUATION
+======================================================================
+
+30.1 USER TASK TESTS
+--------------------
+Can Sebastian answer:
+
+1. What should I do?
+2. When?
+3. Compared with what?
+4. What is the likely gain and downside?
+5. What assumption matters most?
+6. What would reverse the decision?
+7. Why did it change?
+8. Is the recommendation fresh?
+9. What happens if I use the chip?
+10. How does it affect target rank?
+
+30.2 COMPREHENSION
+------------------
+Measure:
+
+- correct action recall;
+- probability interpretation;
+- comparator understanding;
+- confidence interpretation;
+- switch-condition recall.
+
+30.3 DECISION QUALITY
+---------------------
+Use well-defined scenarios with utility.
+
+Recent decision-theory work warns that human-decision evaluations cannot make
+normative claims unless participants receive the information required to
+identify the utility-maximising action.
+
+Pulse usability tests must specify:
+
+- decision;
+- outcomes;
+- probabilities;
+- utility;
+- time.
+
+30.4 APPROPRIATE RELIANCE
+-------------------------
+Measure:
+
+- acceptance when recommendation is strong;
+- rejection/override when deliberately flawed/degraded;
+- ability to identify knowledge limit;
+- neither maximal acceptance nor maximal trust.
+
+30.5 TIME
+---------
+- time to find action;
+- time to compare plans;
+- time to understand change;
+- errors under final-minute mode.
+
+30.6 UNCERTAINTY VISUALS
+------------------------
+Compare:
+
+- text;
+- dotplot;
+- CDF;
+- fan;
+- HOP;
+- table.
+
+Use task-specific decision quality, not aesthetic preference alone.
+
+30.7 ACCESSIBILITY
+-----------------
+Include users/assistive workflows where feasible.
+
+30.8 OVERRIDES
+-------------
+Track whether what-if/override improves or worsens decision utility over time,
+without discouraging legitimate human evidence.
+
+30.9 ALGORITHM AVERSION
+-----------------------
+Historical performance is shown with:
+
+- calibration;
+- benchmark;
+- error examples;
+- limitations.
+
+Do not cherry-pick success.
+
+30.10 UI TELEMETRY
+------------------
+Privacy-minimised:
+
+- page/view;
+- section opened;
+- decision executed/differed;
+- time;
+- error.
+
+No invasive behavioural tracking.
+
+======================================================================
+31. SECURITY, PRIVACY AND RIGHTS
+======================================================================
+
+31.1 PRIVATE
+------------
+Manager state, decisions and named rivals are confidential.
+
+31.2 AUTHORIZATION
+------------------
+Sensitive pages require role.
+
+31.3 NO SECRET
+--------------
+No API key/provider credential in browser data.
+
+31.4 DOWNLOAD
+-------------
+Protected, logged and rights-checked.
+
+31.5 RIVAL DISPLAY
+------------------
+Names only when Sebastian is authorised and exact rival mode is active.
+
+Aggregate by default.
+
+31.6 PROVIDER
+-------------
+Raw quote/source evidence can be hidden or summarised according to Rights
+Profile.
+
+31.7 SCREENSHOTS
+----------------
+A screenshot/export can redistribute data.
+
+Export policy must enforce rights.
+
+31.8 SHARE LINK
+---------------
+No public share link in V1.
+
+31.9 RETENTION
+--------------
+UI history follows DMFP-17.
+
+======================================================================
+32. IMPLEMENTATION ARCHITECTURE
+======================================================================
+
+32.1 FRONT END
+--------------
+Initial recommendation:
+
+- server-rendered responsive HTML plus progressive enhancement;
+- minimal JavaScript for interactive charts/comparison;
+- accessible semantic components;
+- no mandatory heavy SPA.
+
+Alternative React/TypeScript can be chosen if implementation evidence supports
+it.
+
+32.2 CHARTING
+-------------
+Library must support:
+
+- SVG;
+- accessibility hooks;
+- direct labels;
+- keyboard;
+- custom dotplots/CDFs;
+- no canvas-only inaccessible default.
+
+32.3 BACK END
+-------------
+FastAPI view-model and report-rendering modules.
+
+32.4 PACKAGE
+------------
+src/dmf_pulse/presentation/
+
+- decision_view.py
+- view_models.py
+- explanation_graph.py
+- explanation_templates.py
+- natural_language.py
+- change_attribution.py
+- counterfactuals.py
+- scenario_views.py
+- uncertainty_visuals.py
+- rank_views.py
+- chip_views.py
+- price_views.py
+- reports.py
+- notifications.py
+- accessibility.py
+- export.py
+- schemas.py
+
+32.5 FRONT-END COMPONENTS
+-------------------------
+DecisionStatus
+ActionCard
+TimingCard
+ValueDistribution
+ConfidencePanel
+AssumptionList
+InformationWatch
+PlanComparison
+ScenarioExplorer
+ChangeTimeline
+PriceRiskCard
+ChipOpportunityCard
+RankDistribution
+DataHealthBanner
+ProvenanceDrawer
+ExecutionChecklist.
+
+======================================================================
+33. TESTING
+======================================================================
+
+33.1 CONTRACT
+-------------
+- Decision Bundle to view model;
+- unknown schema;
+- missing optional/critical fields;
+- ETag;
+- immutable old bundle.
+
+33.2 NUMERIC
+------------
+Every displayed number matches source field after documented rounding.
+
+33.3 EXPLANATION
+----------------
+- reason references actual graph;
+- change attribution reconciles;
+- counterfactual reoptimises;
+- no unsupported causal word;
+- deterministic fallback.
+
+33.4 STATUS
+-----------
+- normal;
+- wait;
+- hold;
+- blocked;
+- degraded;
+- late;
+- superseded;
+- offline.
+
+33.5 VISUAL
+-----------
+- discrete support;
+- dot count/probability;
+- CDF monotonic;
+- rank direction;
+- interval labels;
+- no colour-only.
+
+33.6 ACCESSIBILITY
+-----------------
+- automated WCAG checks;
+- keyboard;
+- focus order;
+- screen reader;
+- reduced motion;
+- zoom/reflow;
+- contrast.
+
+33.7 RESPONSIVE
+---------------
+Phone/tablet/desktop/print.
+
+33.8 SECURITY
+-------------
+- authorization;
+- private cache;
+- artifact access;
+- XSS/HTML escaping;
+- no secret/raw restricted data.
+
+33.9 PERFORMANCE
+----------------
+- decision summary first render <=1 second on local/private network target;
+- full decision page <=2 seconds excluding large artifact;
+- chart interactions responsive;
+- deadline mode load tested.
+
+33.10 GOLDEN DECISIONS
+----------------------
+Scenarios:
+
+- one free transfer;
+- roll;
+- price ACT NOW;
+- WAIT press conference;
+- hit;
+- chip conflict;
+- rank chase;
+- data degraded;
+- recommendation changed by model only;
+- near tie/numerical noise;
+- blocked.
+
+======================================================================
+34. ALERTS AND MONITORING
+======================================================================
+
+P0:
+- UI displays wrong/illegal action;
+- numeric mismatch;
+- stale bundle shown as current;
+- blocked warning hidden;
+- private rival/provider data exposed;
+- inaccessible critical action.
+
+P1:
+- why-changed attribution incorrect;
+- missing major uncertainty;
+- confidence mislabelled;
+- action timing wrong;
+- Decision Bundle render failure.
+
+P2:
+- chart unavailable with table fallback;
+- explanation renderer failure with deterministic fallback;
+- notification delayed;
+- analyst detail unavailable.
+
+Metrics:
+
+- latest view render;
+- Decision Bundle age;
+- stale display;
+- action-card errors;
+- explanation numeric validation;
+- accessibility regressions;
+- user task completion;
+- notification changes;
+- human execution/difference.
+
+======================================================================
+35. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+35.1 CODEX MAY
+-------------
+- implement view models and UI;
+- implement deterministic explanations;
+- build scenario visual datasets;
+- implement controlled change attribution;
+- implement counterfactual switch analysis;
+- generate reports;
+- add optional grounded language rendering;
+- create tests.
+
+35.2 CODEX MUST NOT
+-------------------
+- invent a recommendation;
+- recalculate core metrics in browser;
+- show only a point estimate;
+- conflate confidence and expected value;
+- hide degraded/blocked state;
+- use colour as sole indicator;
+- use SHAP as the complete decision explanation;
+- claim correlation is causation;
+- produce why-changed text without controlled run evidence;
+- show chip total points as chip value;
+- show raw ownership as EO;
+- mutate model output through what-if;
+- expose secrets/private/licence-restricted data;
+- allow optional LLM to create numbers;
+- report old Decision Bundle as current.
+
+35.3 PULL REQUEST
+-----------------
+Every change states:
+
+- user task;
+- data contract;
+- explanation/uncertainty effect;
+- accessibility;
+- rights/privacy;
+- tests;
+- usability evidence;
+- rollback.
+
+======================================================================
+36. RISK REGISTER
+======================================================================
+
+R-18-001 — UI outputs only "buy X"
+Probability: High
+Impact: Critical
+Mitigation:
+mandatory Decision Card fields.
+
+R-18-002 — Expected value shown without comparator
+Probability: High
+Impact: High
+Mitigation:
+no-transfer baseline.
+
+R-18-003 — Expected value shown without distribution
+Probability: High
+Impact: Critical
+Mitigation:
+paired range/dotplot/probabilities.
+
+R-18-004 — Independent plan percentiles subtracted
+Probability: Medium
+Impact: Critical
+Mitigation:
+common-scenario differences.
+
+R-18-005 — Confidence treated as probability correct
+Probability: High
+Impact: High
+Mitigation:
+dimension definition.
+
+R-18-006 — Low confidence hides high value
+Probability: Medium
+Impact: High
+Mitigation:
+separate value/confidence.
+
+R-18-007 — Precise mean creates false certainty
+Probability: High
+Impact: High
+Mitigation:
+rounding and range.
+
+R-18-008 — Error bars misinterpreted
+Probability: High
+Impact: High
+Mitigation:
+frequency/CDF/table and labels.
+
+R-18-009 — Animation overwhelms deadline use
+Probability: Medium
+Impact: High
+Mitigation:
+optional/reduced-motion/static.
+
+R-18-010 — Colour-only state inaccessible
+Probability: High
+Impact: Critical
+Mitigation:
+text/icon/pattern/WCAG.
+
+R-18-011 — Final rank axis interpreted backwards
+Probability: Medium
+Impact: High
+Mitigation:
+direct labels/CDF/table.
+
+R-18-012 — Low-ownership player labelled valuable
+Probability: High
+Impact: Critical
+Mitigation:
+utility-based differential explanation.
+
+R-18-013 — Chip total score shown as value
+Probability: High
+Impact: Critical
+Mitigation:
+incremental policy decomposition.
+
+R-18-014 — Price rise shown as automatic profit
+Probability: High
+Impact: High
+Mitigation:
+manager-specific route explanation.
+
+R-18-015 — Important assumption buried
+Probability: High
+Impact: Critical
+Mitigation:
+decision-impact ranking.
+
+R-18-016 — Too many assumptions cause overload
+Probability: High
+Impact: High
+Mitigation:
+top assumptions/progressive disclosure.
+
+R-18-017 — "Wait for news" lacks action
+Probability: High
+Impact: Critical
+Mitigation:
+information event/EVSI/latest time.
+
+R-18-018 — Counterfactual outside plausible range
+Probability: Medium
+Impact: High
+Mitigation:
+plausibility bounds.
+
+R-18-019 — Counterfactual misdescribed as causal
+Probability: High
+Impact: High
+Mitigation:
+model-boundary language.
+
+R-18-020 — Why-changed is narrative guess
+Probability: High
+Impact: Critical
+Mitigation:
+controlled re-runs.
+
+R-18-021 — Attribution path dependence hidden
+Probability: Medium
+Impact: High
+Mitigation:
+interaction/Shapley/residual.
+
+R-18-022 — Model change presented as football news
+Probability: Medium
+Impact: Critical
+Mitigation:
+change categories.
+
+R-18-023 — Monte Carlo ordering change treated substantive
+Probability: Medium
+Impact: High
+Mitigation:
+tie/noise label.
+
+R-18-024 — SHAP explains prediction, not optimiser decision
+Probability: High
+Impact: Critical
+Mitigation:
+explanation graph/alternatives/counterfactual.
+
+R-18-025 — LLM hallucinates number/reason
+Probability: Medium
+Impact: Critical
+Mitigation:
+structured grounding/numeric validator/fallback.
+
+R-18-026 — LLM hides warning through summary
+Probability: Medium
+Impact: Critical
+Mitigation:
+mandatory fields and validation.
+
+R-18-027 — User what-if mutates production state
+Probability: Medium
+Impact: Critical
+Mitigation:
+separate versioned run.
+
+R-18-028 — Human override undocumented
+Probability: Medium
+Impact: High
+Mitigation:
+override workflow.
+
+R-18-029 — Algorithm aversion after unlucky outcome
+Probability: High
+Impact: Strategic
+Mitigation:
+calibration/history/errors/appropriate control.
+
+R-18-030 — Automation bias/blind trust
+Probability: Medium
+Impact: Critical
+Mitigation:
+knowledge limits/alternatives/contestability.
+
+R-18-031 — Historical page rewrites old recommendation
+Probability: Medium
+Impact: Critical
+Mitigation:
+immutable bundle.
+
+R-18-032 — Stale offline recommendation appears live
+Probability: High
+Impact: Critical
+Mitigation:
+offline/age banner.
+
+R-18-033 — Blocked state hidden by cached page
+Probability: Medium
+Impact: Critical
+Mitigation:
+ETag/no-cache latest/readiness status.
+
+R-18-034 — Mobile view omits bench/captain action
+Probability: Medium
+Impact: Critical
+Mitigation:
+mobile checklist.
+
+R-18-035 — Provider data displayed beyond rights
+Probability: Medium
+Impact: Critical
+Mitigation:
+Rights Profile/export gate.
+
+R-18-036 — Rival personal data leaked
+Probability: Low/Medium
+Impact: Critical
+Mitigation:
+authorization/aggregate default.
+
+R-18-037 — Accessibility automated tests only
+Probability: High
+Impact: High
+Mitigation:
+manual assistive testing.
+
+R-18-038 — Dashboard becomes model-debug interface
+Probability: High
+Impact: Strategic
+Mitigation:
+task-first IA/progressive disclosure.
+
+R-18-039 — Alert fatigue causes ignored deadline change
+Probability: High
+Impact: Critical
+Mitigation:
+materiality/coalescing/severity.
+
+R-18-040 — UI preferred aesthetically but worsens decisions
+Probability: Medium
+Impact: Strategic
+Mitigation:
+decision-theoretic usability evaluation.
+
+======================================================================
+37. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-17
+
+----------------------------------------------------------------------
+SRC-XAI-NIST-2021-001
+Title:
+Four Principles of Explainable Artificial Intelligence
+
+Authors/organisation:
+P. Jonathon Phillips et al., National Institute of Standards and Technology
+
+Publication:
+NISTIR 8312, 2021
+
+URL:
+https://nvlpubs.nist.gov/nistpubs/ir/2021/nist.ir.8312.pdf
+
+Relevant claims:
+Proposes four principles: Explanation, Meaningful, Explanation Accuracy and
+Knowledge Limits; explanation needs depend on user, task and purpose.
+
+Reliability:
+HIGH official research publication.
+
+Pulse reliance:
+YES for explanation quality framework.
+
+----------------------------------------------------------------------
+SRC-AIRMF-NIST-2023-001
+Title:
+Artificial Intelligence Risk Management Framework 1.0
+
+Organisation:
+NIST
+
+URL:
+https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf
+
+Relevant claims:
+Transparency, explainability and interpretability are related but distinct;
+explanations should be tailored to user role, knowledge and context, and support
+documentation, audit and governance.
+
+Reliability:
+HIGH official framework.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-XAI-PSYCH-NIST-2021-001
+Title:
+Psychological Foundations of Explainability and Interpretability in Artificial
+Intelligence
+
+Organisation:
+NIST
+
+URL:
+https://nvlpubs.nist.gov/nistpubs/ir/2021/NIST.IR.8367.pdf
+
+Relevant claim:
+Reviews psychological foundations and human factors for designing explanations
+that support understanding.
+
+Reliability:
+HIGH official research publication.
+
+Pulse reliance:
+YES for user-centred explanation design.
+
+----------------------------------------------------------------------
+SRC-COUNTERFACTUAL-2018-001
+Title:
+Counterfactual Explanations Without Opening the Black Box: Automated Decisions
+and the GDPR
+
+Authors:
+Sandra Wachter, Brent Mittelstadt, Chris Russell
+
+Publication:
+Harvard Journal of Law & Technology, 31(2), 2018
+
+URL:
+https://jolt.law.harvard.edu/assets/articlePDFs/v31/Counterfactual-Explanations-without-Opening-the-Black-Box-Sandra-Wachter-et-al.pdf
+
+Relevant claims:
+Explanations can support understanding, contesting and identifying what would
+need to change for a different result; counterfactual explanations need not
+expose all internal model logic.
+
+Reliability:
+HIGH peer-reviewed/legal-technical scholarship.
+
+Pulse reliance:
+YES for switch-threshold explanation, with causal limitations.
+
+----------------------------------------------------------------------
+SRC-MODELCARDS-2019-001
+Title:
+Model Cards for Model Reporting
+
+Authors:
+Margaret Mitchell et al.
+
+Publication:
+FAT* 2019
+
+URL:
+https://arxiv.org/pdf/1810.03993
+
+Relevant claims:
+Models should be accompanied by concise documentation of intended uses,
+evaluation conditions, performance and limitations.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for model documentation views.
+
+----------------------------------------------------------------------
+SRC-UNCERTAINTY-2022-001
+Title:
+Uncertainty Visualization
+
+Authors:
+Lace Padilla, Matthew Kay, Jessica Hullman
+
+Publication:
+Wiley Interdisciplinary Reviews: Computational Statistics, 2022
+
+URL:
+https://space.ucmerced.edu/Downloads/publications/Uncertainty_Visualization_Padilla_Kay_Hullman_2022.pdf
+
+Relevant claim:
+Reviews conventional and newer uncertainty visualisations and cognitive
+mechanisms, including frequency framing, quantile dotplots and HOPs.
+
+Reliability:
+HIGH peer-reviewed review.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-DOTPLOT-2018-001
+Title:
+Uncertainty Displays Using Quantile Dotplots or CDFs Improve Transit
+Decision-Making
+
+Authors:
+Michael Fernandes, Logan Walls, Sean Munson, Jessica Hullman, Matthew Kay
+
+Publication:
+CHI 2018
+
+URL:
+https://www.mjskay.com/papers/chi2018-uncertain-bus-decisions.pdf
+
+Relevant claims:
+In the study, frequency-based quantile dotplots and CDFs supported better
+decision quality than control/text conditions; quantile dotplots represent
+probability through countable outcomes.
+
+Reliability:
+HIGH peer-reviewed experimental HCI research.
+Transit context requires task-specific validation in FPL.
+
+Pulse reliance:
+YES for candidate default visual.
+
+----------------------------------------------------------------------
+SRC-HOPS-2015-001
+Title:
+Hypothetical Outcome Plots Outperform Error Bars and Violin Plots for
+Inferences About Reliability of Variable Ordering
+
+Authors:
+Jessica Hullman, Paul Resnick, Eytan Adar
+
+Publication:
+PLOS ONE, 2015
+
+URL:
+https://idl.cs.washington.edu/files/2015-HOPs-PLOS.pdf
+
+Relevant claims:
+HOPs animate draws from distributions and improved accuracy for some multi-value
+uncertainty judgments relative to error bars and violin plots.
+
+Reliability:
+HIGH peer-reviewed experimental research.
+
+Pulse reliance:
+OPTIONAL uncertainty visual, not universal default.
+
+----------------------------------------------------------------------
+SRC-HOPS-2018-002
+Title:
+Hypothetical Outcome Plots Help Untrained Observers Judge Trends in Ambiguous
+Data
+
+Authors:
+Alex Kale et al.
+
+Publication:
+IEEE Transactions on Visualization and Computer Graphics
+
+URL:
+https://users.eecs.northwestern.edu/~jhullman/hops_jobs_pfs.pdf
+
+Relevant claim:
+Evaluates HOPs, error bars and line ensembles for realistic uncertainty
+judgments and perceptual decision tasks.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+SUPPORTING.
+
+----------------------------------------------------------------------
+SRC-PROBFORECAST-2014-001
+Title:
+Use and Communication of Probabilistic Forecasts
+
+Author:
+Adrian E. Raftery
+
+URL:
+https://arxiv.org/abs/1408.4812
+
+Relevant claims:
+Probabilistic forecast communication should match user goals and cognitive load;
+adverse-event probabilities and predictive percentiles can be effective
+summaries for relevant users.
+
+Reliability:
+HIGH scholarly review.
+
+Pulse reliance:
+YES for progressive disclosure and task-specific summaries.
+
+----------------------------------------------------------------------
+SRC-ALGORITHM-AVERSION-2015-001
+Title:
+Algorithm Aversion: People Erroneously Avoid Algorithms After Seeing Them Err
+
+Authors:
+Berkeley J. Dietvorst, Joseph P. Simmons, Cade Massey
+
+Publication:
+Journal of Experimental Psychology: General, 2015
+
+URL:
+https://marketing.wharton.upenn.edu/wp-content/uploads/2016/10/Dietvorst-Simmons-Massey-2014.pdf
+
+Relevant claim:
+Participants were more likely to reject algorithmic forecasters after seeing
+them make errors, even when the algorithm outperformed human forecasters.
+
+Reliability:
+HIGH peer-reviewed experimental research.
+Generalisability to expert FPL use must be tested.
+
+Pulse reliance:
+YES for appropriate-reliance design.
+
+----------------------------------------------------------------------
+SRC-ALGORITHM-CONTROL-2018-001
+Title:
+Overcoming Algorithm Aversion: People Will Use Imperfect Algorithms If They Can
+(Even Slightly) Modify Them
+
+Authors:
+Berkeley J. Dietvorst, Joseph P. Simmons, Cade Massey
+
+Publication:
+Management Science, 64(3), 2018
+
+URL:
+https://faculty.wharton.upenn.edu/wp-content/uploads/2016/08/Dietvorst-Simmons-Massey-2018.pdf
+
+Relevant claims:
+Limited ability to modify algorithmic forecasts increased willingness to use
+them; unconstrained adjustment can reduce accuracy, and constrained adjustment
+can preserve more algorithmic value.
+
+Reliability:
+HIGH peer-reviewed experimental research.
+
+Pulse reliance:
+YES for structured what-if/override controls.
+
+----------------------------------------------------------------------
+SRC-WCAG-2024-001
+Title:
+Web Content Accessibility Guidelines (WCAG) 2.2
+
+Organisation:
+World Wide Web Consortium
+
+URL:
+https://www.w3.org/TR/WCAG22/
+
+Relevant claims:
+Defines accessibility success criteria including text/nontext contrast,
+keyboard/focus and adaptable presentation.
+
+Reliability:
+HIGH W3C Recommendation.
+
+Pulse reliance:
+YES; target Level AA.
+
+----------------------------------------------------------------------
+SRC-WCAG-COLOR-2026-001
+Title:
+Understanding Success Criterion 1.4.1: Use of Color
+
+Organisation:
+W3C Web Accessibility Initiative
+
+URL:
+https://www.w3.org/WAI/WCAG22/Understanding/use-of-color
+
+Relevant claim:
+Colour must not be the only visual means of conveying information or action.
+
+Reliability:
+HIGH official guidance.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-HUMAN-XAI-EVAL-2024-001
+Title:
+Human-centered evaluation of explainable AI applications: a systematic review
+
+Authors:
+J. Kim et al.
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC11525002/
+
+Relevant claim:
+Reviews how explanations are evaluated with human users and highlights the need
+to measure user-centred outcomes rather than technical explanation properties
+alone.
+
+Reliability:
+HIGH peer-reviewed systematic review.
+
+Pulse reliance:
+YES for explanation evaluation.
+
+----------------------------------------------------------------------
+SRC-DECISION-EVAL-2024-001
+Title:
+Decision Theoretic Foundations for Experiments Evaluating Human Decisions
+
+Authors:
+Jessica Hullman, Alex Kale, Jason Hartline
+
+URL:
+https://arxiv.org/abs/2401.15106
+
+Relevant claim:
+Human-decision experiments require a well-defined decision problem and enough
+information to identify the utility-maximising action before normative claims
+about performance are justified.
+
+Reliability:
+MODERATE/HIGH recent scholarly research.
+
+Pulse reliance:
+YES for UI decision-quality evaluation.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-09 — FPL Points Distribution Engine
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-10 — Uncertainty, Scenarios and Early-Season Policy
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-12 — Squad, Transfer and Lineup Optimiser
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-13 — Captaincy and Chip Optimiser
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-14 — Rank, Effective Ownership and Risk Strategy
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-006
+Title:
+DMFP-15 — Backtesting, Calibration and Benchmarks
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-007
+Title:
+DMFP-16 — Orchestration, APIs and Decision Pipeline
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-008
+Title:
+DMFP-17 — Observability, Reproducibility, Security and Compliance
+
+Pulse reliance:
+YES.
+
+======================================================================
+38. ACCEPTANCE CRITERIA
+======================================================================
+
+A. ACTION
+[ ] Primary action and timing are immediately visible.
+[ ] No-transfer is an explicit comparator/plan.
+[ ] XI, bench, captain, vice and chip are included.
+[ ] Blocked/degraded/stale cannot look normal.
+[ ] Mobile checklist is complete.
+
+B. VALUE AND UNCERTAINTY
+[ ] Horizon and objective are explicit.
+[ ] Expected gain uses a comparator.
+[ ] Paired p10/median/p90 and probability gain are shown.
+[ ] Downside/upside are defined, not vague.
+[ ] Confidence is separate and decomposed.
+[ ] Monte Carlo/solver uncertainty is visible.
+
+C. EXPLANATIONS
+[ ] Reasons come from the explanation graph.
+[ ] Why-changed uses controlled re-runs.
+[ ] Change attribution reconciles.
+[ ] Switch conditions are actual reoptimisations.
+[ ] Model counterfactuals are not described as causal.
+[ ] Natural-language rendering cannot invent numbers/reasons.
+[ ] Knowledge limits are displayed.
+
+D. DECISION CONTENT
+[ ] Important assumptions are impact-ranked.
+[ ] Future information has time, EVSI and action branches.
+[ ] Price implications are route-specific.
+[ ] Alternatives are common-scenario comparisons.
+[ ] Chip value includes opportunity cost.
+[ ] Final rank distribution appears only with confidence/context.
+
+E. ACCESSIBILITY/RIGHTS
+[ ] WCAG 2.2 AA is the target.
+[ ] No colour-only status.
+[ ] Every chart has table/text alternative.
+[ ] Keyboard/screen reader/reduced motion pass.
+[ ] Private and licence-restricted data are protected.
+[ ] Exports obey provider Rights Profiles.
+
+F. EVALUATION
+[ ] User can correctly answer the ten decision questions.
+[ ] Appropriate reliance is measured.
+[ ] Visuals are evaluated by decision quality.
+[ ] UI telemetry is privacy-minimised.
+[ ] Old recommendations remain immutable.
+[ ] Points/rank modes never alter raw projections.
+
+======================================================================
+39. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Define versioned Decision View and Explanation Graph schemas.
+2. Implement deterministic Decision Card.
+3. Implement plan-comparison view from common scenarios.
+4. Implement paired quantile dotplot and CDF data products.
+5. Implement accessible fan chart/rank distribution.
+6. Implement confidence-dimension panel.
+7. Implement decision-impact assumption ranking.
+8. Implement information-watch/EVSI cards.
+9. Implement counterfactual switch-threshold service.
+10. Implement old/new controlled change-attribution runner.
+11. Implement grouped interaction/Shapley attribution for important changes.
+12. Implement chip opportunity-cost view.
+13. Implement price ACT/WAIT view.
+14. Implement final-rank distribution and rival view.
+15. Implement data-health/readiness banner.
+16. Implement deterministic natural-language templates.
+17. Implement optional grounded renderer with numeric/reason validation.
+18. Implement responsive mobile action/checklist.
+19. Implement WCAG AA component library and test suite.
+20. Implement accessible chart tables and screen-reader summaries.
+21. Implement notifications/materiality/coalescing.
+22. Implement what-if runs and execution recording.
+23. Implement decision history/change timeline.
+24. Implement print/PDF/plain-text reports.
+25. Implement rights-aware export.
+26. Run task-based usability tests.
+27. Compare uncertainty visual formats on FPL decisions.
+28. Run algorithm-aversion/appropriate-reliance exercises with historical cases.
+29. Do not publish production UI until acceptance tests pass.
+
+Suggested commands:
+
+    dmf presentation build-view <decision_id>
+    dmf presentation explain <decision_id>
+    dmf presentation compare <plan_a> <plan_b>
+    dmf presentation why-changed <old> <new>
+    dmf presentation counterfactuals <decision_id>
+    dmf presentation render-report <decision_id>
+    dmf presentation accessibility-test
+    dmf presentation validate <decision_id>
+    dmf presentation usability-report
+
+======================================================================
+40. OPEN QUESTIONS
+======================================================================
+
+PRIMARY EXPERIENCE
+------------------
+1. Server-rendered HTML or React/TypeScript?
+2. Which exact one-minute fields fit Sebastian's workflow?
+3. What is the accepted final execution buffer display?
+4. Should the UI default to WAIT monitoring or latest actionable plan?
+5. How is manual execution confirmed fastest?
+
+UNCERTAINTY
+-----------
+6. 20-dot or 50-dot quantile plot?
+7. Which thresholds matter most: positive, +4, +10?
+8. Fan chart or CDF default for multiweek?
+9. Does HOP animation improve Sebastian's decisions?
+10. How are rank distributions best shown on mobile?
+11. How much model uncertainty versus outcome uncertainty appears by default?
+
+CONFIDENCE
+----------
+12. Which dimensions are main-screen?
+13. Is A–E plus text sufficiently clear?
+14. How is probability-plan-optimal labelled?
+15. What historical sample supports calibration claims?
+
+EXPLANATIONS
+------------
+16. Which change groups enter Shapley attribution?
+17. How many switch counterfactuals are useful?
+18. What numerical residual tolerance is accepted?
+19. Which reason codes require a full sentence?
+20. Is optional LLM rendering valuable enough to justify complexity?
+21. How should conflicting evidence be summarised?
+
+SCENARIOS
+---------
+22. Which scenario slices should be automatic?
+23. Can user-created scenarios remain simple without model misuse?
+24. What plan-comparison metrics fit on one screen?
+25. How is a statistical tie presented?
+
+CHIPS/PRICE/RANK
+----------------
+26. Which chip schedule chart is most understandable?
+27. How is bench capital cost explained simply?
+28. How is value of £0.1m displayed without false precision?
+29. What target-rank milestones are defaults?
+30. How much rival detail is useful versus distracting?
+
+ACCESSIBILITY
+-------------
+31. Which chart library passes semantic/SVG requirements?
+32. Which screen reader/browser combinations are mandatory?
+33. Is dark mode required at launch?
+34. Which colours/patterns fit Pulse branding and accessibility?
+35. How is printable/PDF accessibility validated?
+
+EVALUATION
+----------
+36. What historical decisions form the usability test set?
+37. What constitutes appropriate reliance success?
+38. What time-to-action is acceptable?
+39. How are human overrides evaluated without discouraging them?
+40. Which UI variants are confirmatory versus exploratory?
+
+======================================================================
+41. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-19 — CODEX IMPLEMENTATION ROADMAP AND ACCEPTANCE TESTS
+
+DMFP-19 must turn this specification into:
+
+- schema work;
+- back-end services;
+- UI components;
+- explanation generation;
+- accessibility gates;
+- integration tests;
+- usability studies;
+- release milestones.
+
+No production milestone is complete until a user can see the action,
+uncertainty, assumptions, alternatives, change explanation and assurance state
+defined here.
+
+======================================================================
+42. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-17
+
+- Selected a progressive-disclosure Decision Cockpit.
+- Defined actionable decision states and timing.
+- Added paired horizon value and no-transfer baseline.
+- Added explicit downside/upside and plan distributions.
+- Selected quantile dotplots, CDFs, fans and optional HOPs.
+- Defined multidimensional confidence and knowledge limits.
+- Added impact-ranked assumptions and information-watch cards.
+- Added counterfactual switch-threshold explanations.
+- Added controlled why-changed attribution and interaction reconciliation.
+- Added plan/scenario comparison under common draws.
+- Added complete chip opportunity-cost reporting.
+- Added price ACT/WAIT and affordability views.
+- Added final-rank distribution and rival views.
+- Defined structured Explanation Graph and deterministic rendering.
+- Restricted optional LLM rendering to grounded paraphrase.
+- Added data-health, provenance and assurance surfaces.
+- Added responsive/mobile/print reports.
+- Adopted WCAG 2.2 AA target.
+- Added appropriate-reliance and decision-quality evaluation.
+- Added implementation, tests, risks, sources and acceptance criteria.
+
+Future v1.0:
+- Sebastian approves information hierarchy and terminology.
+- prototype covers the golden decision cases.
+- explanation/change/counterfactual services pass fidelity tests.
+- accessibility tests pass.
+- usability tests demonstrate action/uncertainty comprehension.
+- rights/security review passes.
+- DMFP-19 implementation plan is approved.
+
+END OF DOCUMENT

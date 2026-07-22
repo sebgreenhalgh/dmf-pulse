@@ -1,0 +1,3932 @@
+DMF PULSE — DATA SOURCES, MARKETS, APIS AND LICENSING
+=====================================================
+
+Document ID: DMFP-04
+Version: 1.0 (Zero-Paid-Subscription Source Architecture)
+Status: PROPOSED — ZERO-COST STACK SELECTED; SOURCE-RIGHTS AND PROOF-OF-ACCESS GATES REMAIN
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 18 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+Initial use: Private/internal, non-betting FPL decision support
+Future public/commercial use: BLOCKED pending a new source-by-source licensing review
+Operating jurisdiction: United Kingdom is assumed for planning; account/provider eligibility MUST be verified
+Supersedes:
+- DMFP-04 v0.9 — Provider Selection and Procurement Baseline
+Controlling decisions:
+- DMFP-20 ADR-SRC-001 — Zero-paid-subscription core
+- DMFP-20 ADR-SRC-002 — Market-anchored, not market-complete
+- DMFP-20 ADR-SRC-003 — Selected initial source stack
+- DMFP-20 ADR-SRC-004 — No multi-account or geographic circumvention
+Parent documents:
+- DMFP-00 — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+- DMFP-01 — RESEARCH STANDARD AND EVIDENCE REGISTER
+- DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+- DMFP-03 — CANONICAL DATA MODEL AND IDENTIFIERS
+Related downstream documents:
+- DMFP-05 — INGESTION, STORAGE AND DATA QUALITY
+- DMFP-06 — ODDS NORMALISATION AND MARKET CONSENSUS
+- DMFP-07 — PLAYER AVAILABILITY, START AND MINUTES MODEL
+- DMFP-08 — FOOTBALL EVENT DISTRIBUTION ENGINE
+- DMFP-15 — BACKTESTING, CALIBRATION AND BENCHMARKS
+- DMFP-17 — OBSERVABILITY, REPRODUCIBILITY, SECURITY AND COMPLIANCE
+- DMFP-19 — CODEX IMPLEMENTATION ROADMAP AND ACCEPTANCE TESTS
+- DMFP-20 — ASSUMPTIONS, DECISIONS AND OPEN QUESTIONS
+
+PURPOSE
+-------
+This document selects the external data-source architecture for DMF Pulse under
+one binding economic constraint:
+
+    THE CORE DATA-SOURCE SUBSCRIPTION COST MUST BE £0.
+
+The document covers:
+
+- official FPL rules, deadlines, game state and outcomes;
+- current bookmaker odds;
+- match-result, total-goals and related team markets;
+- selected EPL player props where a free provider actually returns them;
+- exchange research data;
+- fixtures, results and competition schedules;
+- official and observed lineups;
+- injuries, suspensions and availability evidence;
+- price, ownership and transfer-flow snapshots;
+- historical match and odds research;
+- open football event data;
+- rate limits, quotas and source scheduling;
+- identity mapping;
+- timestamps, freshness and deadline integrity;
+- licensing, database rights, storage, transformation and display;
+- fallbacks, manual evidence and degraded operation;
+- source acceptance tests and implementation contracts.
+
+It does not attempt to create a directory of everything that can be accessed.
+It selects the smallest defensible free stack and defines when a technically
+available source is still prohibited from production use.
+
+ZERO-COST DEFINITION
+--------------------
+For DMFP-04, "completely free" means:
+
+- no paid API subscription;
+- no paid historical-data package;
+- no paid live exchange key;
+- no compulsory betting deposit, turnover or wager;
+- no paid scraping service, browser farm, proxy network or CAPTCHA service;
+- no purchase required to unlock a source;
+- no multiple-account strategy to multiply quotas;
+- no geographic or access-control circumvention;
+- no hidden assumption that Sebastian later upgrades to a paid tier.
+
+The target recurring data-source spend is therefore:
+
+    £0 PER MONTH
+    £0 PER SEASON
+    £0 ONE-OFF DATA PURCHASES
+
+This does not mean:
+
+- unlimited requests;
+- complete player-prop coverage;
+- guaranteed uptime;
+- permission to store or publish everything that is technically visible;
+- zero compute, electricity, storage or hosting cost;
+- a service-level agreement;
+- that public data have no copyright, database-right or contractual conditions.
+
+Infrastructure cost is governed outside this document. The data-source design
+must remain operable on free plans and existing/private infrastructure.
+
+GOVERNING PRINCIPLES
+--------------------
+1. ZERO COST DOES NOT MEAN ZERO RIGHTS.
+   Publicly accessible data may still prohibit systematic database creation,
+   redistribution, model training, public display or commercial use.
+
+2. A SOURCE IS NOT APPROVED MERELY BECAUSE AN HTTP REQUEST SUCCEEDS.
+   Technical access, contractual permission and third-party data rights are
+   separate gates.
+
+3. MARKET-ANCHORED, NOT MARKET-COMPLETE.
+   Free team markets anchor score distributions. Pulse's minutes, role and event
+   models allocate team outcomes to players. Missing player markets remain
+   explicitly missing.
+
+4. PROSPECTIVE COLLECTION IS THE PRIMARY HISTORICAL STRATEGY.
+   No complete, lawful, zero-cost historical EPL player-prop archive has been
+   identified. Pulse must begin time-stamped collection immediately.
+
+5. RIGHTS OVERRIDE COVERAGE.
+   A technically rich source with unresolved rights is conditional or blocked.
+
+6. OFFICIAL FPL IS AUTHORITATIVE BUT NOT AUTOMATICALLY LICENSED FOR DATABASE USE.
+   Official rules and game output control FPL truth. The Premier League terms
+   currently restrict database creation from Website/App material without prior
+   written approval. Persistent automated ingestion therefore needs a specific
+   rights decision.
+
+7. NO MARKET IS DATA.
+   NOT_OFFERED, NOT_YET_OPEN, STALE, RATE_LIMITED, SOURCE_DOWN and UNKNOWN are
+   distinct from a numerical probability of zero.
+
+8. ONE ACCOUNT, ONE PERMITTED PURPOSE.
+   Quotas are managed, not evaded.
+
+9. FAIL CLOSED FOR CRITICAL STATE; DEGRADE FOR OPTIONAL EVIDENCE.
+   Unknown deadlines, manager state, rules or identity can block a decision.
+   Missing player props or exchange data normally reduce confidence instead.
+
+10. PUBLIC/COMMERCIAL DMF IS A NEW PURPOSE.
+    The private V1 rights profile does not authorise a future dashboard,
+    newsletter, API, subscription product or downloadable dataset.
+
+IMPORTANT LEGAL POSITION
+------------------------
+This is an engineering and research specification, not legal advice.
+
+Where public terms are ambiguous, the document intentionally records AMBER or
+UNKNOWN rather than inventing permission. Sebastian or a nominated specialist
+must review controlling terms before live activation. Written provider
+clarification can supersede the public-term interpretation only when captured,
+dated and linked in the Rights Profile.
+
+RESEARCH METHOD
+---------------
+The rewrite follows DMFP-01 R3 provider research:
+
+- official pricing and documentation were preferred;
+- provider terms were inspected separately from marketing claims;
+- access, automation, storage, transformation, training, display and
+  redistribution were evaluated separately;
+- free-plan limits were checked at the research cut-off;
+- unsupported completeness claims were rejected;
+- historical/live modes were separated;
+- every provisional source receives proof-of-access and rights gates.
+
+Public documentation does not prove:
+
+- actual 2026/27 EPL coverage on Sebastian's account;
+- actual predeadline player-prop availability;
+- operator lists returned in the UK;
+- source-to-API latency;
+- exact settlement semantics for every bookmaker;
+- stable free-plan quotas;
+- stable undocumented FPL web interfaces;
+- a court or regulator's interpretation of database rights;
+- permission for future commercial products.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. A deviation requires an approved DMFP-20 decision/ADR.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE SOURCE DECISION
+======================================================================
+
+0.1 SELECTED ZERO-COST STACK
+----------------------------
+A. OFFICIAL FPL / PREMIER LEAGUE
+
+Role:
+- controlling FPL rules and official clarifications;
+- Gameweeks and deadlines;
+- official player catalogue, positions, prices and status;
+- official fixture assignment;
+- ownership and transfer counters where exposed;
+- official FPL points, BPS, bonus and final outcomes;
+- Sebastian's manager state where lawfully and safely accessed.
+
+Decision:
+CONDITIONALLY SELECTED AS THE AUTHORITATIVE FPL REFERENCE.
+
+Cost:
+£0.
+
+Critical rights status:
+AMBER/BLOCKING FOR SYSTEMATIC PERSISTENT DATABASE CREATION.
+
+Reason:
+The current Premier League Terms of Use permit reasonable private/personal use
+but state that the Website/App must not otherwise be reproduced, re-utilised or
+redistributed, including creating a database containing material obtained from
+them, without prior written approval.
+
+Production implication:
+- official sources remain the truth authority;
+- target-season rules may be captured manually into an approved ruleset;
+- persistent automated raw/canonical ingestion is not assumed authorised;
+- Stage 4 live ingestion requires written permission, a legal determination, or
+  an approved reduced-retention design that is demonstrably within permitted
+  private/personal use;
+- no raw redistribution, public mirror or mass manager collection;
+- account login/session automation is outside V1.
+
+B. THE ODDS API — FREE STARTER
+
+Role:
+PRIMARY CURRENT MARKET FEED.
+
+Published free allowance at cut-off:
+- 500 usage credits per month;
+- all sports;
+- most bookmakers;
+- all currently available markets;
+- no historical odds entitlement.
+
+Documented EPL capability:
+- sport key `soccer_epl`;
+- 1X2 through `h2h`;
+- regions including UK, EU, US, US2 and AU;
+- selected soccer player props for EPL;
+- soccer props currently limited to US bookmakers;
+- listed soccer props include anytime/first/last scorer, cards, red cards,
+  shots, shots on target and assists;
+- additional soccer markets include BTTS and correct score.
+
+Decision:
+SELECTED AS PRIMARY FREE ODDS SOURCE.
+
+Rights status:
+- access: GREEN;
+- internal analytical application: GREEN based on public terms;
+- standalone resale/redistribution: RED;
+- raw historical retention/model training: AMBER until clarified;
+- public/commercial analytical product: potentially permitted when data are not
+  the primary product, but requires a new review.
+
+Production policy:
+- use one region per ordinary request;
+- prioritise 1X2 and team markets;
+- request props only for high-value fixtures/candidates;
+- record quota headers;
+- never depend on paid historical endpoints;
+- build own prospective snapshot history.
+
+C. API-FOOTBALL FREE
+
+Role:
+CONDITIONAL SECONDARY FOOTBALL-CONTEXT AND ODDS SOURCE.
+
+Published free allowance:
+- £0 / US$0;
+- no credit card required;
+- 100 requests per day;
+- 10 requests per minute;
+- all endpoints and competitions, with free-plan season-depth limits.
+
+Documented endpoint families:
+- fixtures, events, lineups, players, transfers;
+- sidelined/injuries;
+- statistics;
+- pre-match and in-play odds;
+- predictions.
+
+Decision:
+TECHNICALLY SELECTED; RIGHTS-CONDITIONAL.
+
+Critical rights status:
+AMBER/BLOCKING FOR PUBLICATION AND SOME PERSISTENCE.
+
+Reason:
+API-SPORTS' public terms state that it does not provide a licence for use and
+publication of the underlying data and that users must obtain permissions from
+the competent rights holders.
+
+Production policy:
+- no logos, crests or photos;
+- no public display under the private V1 decision;
+- no assumption that API access grants underlying competition-data rights;
+- use only after a Rights Profile approves private internal processing,
+  retention and model use;
+- use `/leagues` coverage flags before feature-specific calls;
+- treat lineups as postpublication labels, not predeadline FPL features;
+- treat provider predictions as a benchmark only, never numerical truth;
+- prospectively save permitted outputs because odds history is limited.
+
+D. FOOTBALL-DATA.ORG FREE
+
+Role:
+SECONDARY FIXTURE, RESULT, TABLE AND COMPETITION CROSS-CHECK.
+
+Published free characteristics:
+- Free Plan described as free forever;
+- top competitions remain free;
+- 10 requests per minute for registered free clients;
+- Premier League examples use competition code `PL`;
+- attribution requested: "Data provided by football-data.org";
+- free use is described by the provider as non-commercial.
+
+Decision:
+SELECTED AS A LOW-FREQUENCY SECONDARY SOURCE.
+
+Rights status:
+GREEN/AMBER for private non-commercial use with attribution;
+public/commercial use requires contact/review.
+
+Limitations:
+- free coverage and fields vary by competition/tier;
+- not selected for player props;
+- not selected as the sole live/deadline source;
+- crests/logos are excluded unless separately licensed;
+- delayed free data must not override a fresher authoritative fixture source.
+
+E. BETFAIR BASIC HISTORICAL DATA
+
+Role:
+OPTIONAL EXCHANGE-PRICE RESEARCH AND HISTORICAL CALIBRATION.
+
+Published free characteristics:
+- BASIC historical tier is free;
+- one-minute intervals;
+- last traded price;
+- no volume and no full price ladder;
+- historical site states Personal Use Only;
+- requires an eligible Betfair account for portal acquisition.
+
+Decision:
+SELECTED ONLY AS OPTIONAL PERSONAL/INTERNAL RESEARCH.
+
+Rights status:
+AMBER; account, jurisdiction and purpose review required.
+
+Production restrictions:
+- not required by the live pipeline;
+- no claim of liquidity from the Basic tier;
+- no paid Advanced/Pro files;
+- no live key;
+- no betting execution;
+- historical files remain separately classified PERSONAL_RESEARCH;
+- derived results cannot be publicly redistributed without a new review.
+
+F. BETFAIR DELAYED APPLICATION KEY
+
+Role:
+Potential delayed exchange cross-check.
+
+Published status:
+- free for development purposes for private betting customers and licensed
+  software vendors;
+- delayed price snapshots can vary between 1 and 180 seconds;
+- delayed stream can be conflated;
+- the live key costs money and read-only live-key use is not permitted.
+
+Decision:
+DISABLED BY DEFAULT.
+
+Activation:
+Only after written/account-specific confirmation that Sebastian's jurisdiction,
+account and private non-betting analytical use are permitted.
+
+It is not a production dependency.
+
+G. FOOTBALL-DATA.CO.UK
+
+Role:
+RECONSTRUCTED HISTORICAL MATCH RESULTS AND FIXED-ODDS RESEARCH.
+
+Published coverage at cut-off:
+- 31 seasons of results;
+- 26 seasons of betting odds;
+- 26 seasons of match statistics;
+- downloadable Excel/CSV;
+- opening and closing/summary odds vary by season.
+
+Decision:
+SELECTED AS A RESEARCH CANDIDATE, NOT STRICT LIVE TRUTH.
+
+Rights status:
+AMBER because the site states all rights reserved and does not publish a
+sufficiently explicit reuse/training licence for Pulse's intended persistence.
+
+Use:
+- only after rights review/permission;
+- as RECONSTRUCTED or RECONSTRUCTED_CLOSING data;
+- never as proof of the price available at an FPL deadline;
+- no high-frequency page scraping;
+- direct published file downloads only;
+- preserve data dictionary, season and bookmaker-column definitions.
+
+H. OFFICIAL CLUB / PREMIER LEAGUE / FA MANUAL EVIDENCE
+
+Role:
+High-authority manual evidence for:
+- injuries;
+- suspension;
+- training return;
+- press-conference statements;
+- fixture changes;
+- official lineups;
+- target-season rules and clarifications.
+
+Decision:
+SELECTED AS STRUCTURED MANUAL EVIDENCE.
+
+Policy:
+- human opens the source;
+- record a short factual paraphrase, URL, publication time, observation time,
+  evidence type, expiry and reviewer;
+- avoid storing whole articles/pages;
+- no protected-page scraping;
+- no long copyrighted quotation;
+- manual evidence cannot silently become a hard zero without authority and
+  timestamp checks.
+
+I. STATSBOMB OPEN DATA
+
+Role:
+RESEARCH-ONLY football event data for:
+- event taxonomy;
+- coherent event-model prototypes;
+- methodology tests;
+- open-data examples.
+
+Decision:
+SELECTED AS OPTIONAL RESEARCH DATA.
+
+Limitations:
+- only certain competitions are available;
+- not a live 2026/27 EPL source;
+- the repository licence/attribution requirements apply;
+- public/commercial use requires separate review.
+
+J. VAASTAV FPL HISTORICAL REPOSITORY
+
+Role:
+RECONSTRUCTED historical FPL research and fixtures for development.
+
+Decision:
+OPTIONAL RESEARCH-ONLY.
+
+Limitations:
+- weekly repository updates stopped after 2024/25;
+- only three major updates per season are now planned;
+- repository code licensing does not grant ownership of underlying FPL or
+  Understat data;
+- unsuitable for strict-live 2026/27 features;
+- fields with possible post-match lookahead must be excluded from live-style
+  backtests.
+
+K. OPEN-METEO FREE API
+
+Role:
+OPTIONAL WEATHER CONTEXT.
+
+Published free characteristics:
+- no key/card for non-commercial use;
+- fewer than 10,000 calls/day;
+- API data under CC BY 4.0 with attribution;
+- no uptime guarantee.
+
+Decision:
+OPTIONAL SUPPORTING SOURCE, NOT MVP-CRITICAL.
+
+L. STRUCTURED MANUAL ODDS CAPTURE
+
+Role:
+Emergency or targeted current-market fallback.
+
+Decision:
+PERMITTED ONLY when:
+- the public page is lawfully visible to Sebastian;
+- no access control is bypassed;
+- no automated extraction is used;
+- operator, market, time, line, price and settlement are recorded;
+- the rights profile permits private recording;
+- manual entries are clearly labelled and independently reviewed.
+
+0.2 ZERO-COST OPERATING COST
+----------------------------
+Required provider/data payments:
+- The Odds API Free Starter: £0;
+- API-FOOTBALL Free: £0;
+- football-data.org Free: £0;
+- Betfair Basic historical: £0 where account/region eligible;
+- football-data.co.uk files: £0 access;
+- StatsBomb Open Data: £0 access;
+- Open-Meteo Free: £0;
+- official/manual sources: £0 access.
+
+Selected total:
+    £0 recurring
+    £0 one-off
+    £0 compulsory betting activity
+
+0.3 WHAT IS DELIBERATELY NOT SELECTED
+-------------------------------------
+- SportsGameOdds paid plans;
+- Sportmonks paid plans/add-ons;
+- OpticOdds;
+- Sportradar;
+- paid Opta/Stats Perform feeds;
+- The Odds API paid historical/credit plans;
+- API-FOOTBALL paid plans;
+- Betfair Live Application Key;
+- Betfair Advanced/Pro history;
+- Smarkets/BETDAQ paid or turnover-dependent access;
+- paid odds-comparison feeds;
+- paid proxies or scraping platforms;
+- any service whose free trial requires a later paid production assumption.
+
+They may be mentioned only as rejected alternatives under DMFP-20.
+They are not backups.
+
+0.4 MINIMUM VIABLE SOURCE SET
+-----------------------------
+The smallest live-capable free configuration is:
+
+1. approved target-season FPL state/rules capture;
+2. The Odds API Free for current team markets;
+3. Pulse's own prospective market archive;
+4. Pulse's own minutes and player-allocation models;
+5. structured manual official injury/suspension evidence;
+6. manual fallback for manager state and critical rules;
+7. no player-prop requirement.
+
+API-FOOTBALL and football-data.org improve context and redundancy but must not
+become hidden prerequisites for Stage 5.
+
+0.5 REJECTION RULE
+------------------
+A source is rejected or disabled when any of these holds:
+
+- a payment becomes necessary;
+- access requires betting activity;
+- free quota is available only through multiple accounts;
+- geography/account rules do not permit Sebastian's use;
+- terms prohibit the planned private processing;
+- required rights remain UNKNOWN at activation;
+- provider IDs cannot be reconciled safely;
+- timestamps cannot establish decision-time eligibility;
+- market settlement is not interpretable;
+- coverage fails the accepted role;
+- no safe fallback exists for a critical dependency;
+- the source attempts to force logos/photos/raw redistribution into the product;
+- a terms change invalidates the Rights Profile.
+
+======================================================================
+1. REQUIRED DATA CAPABILITIES
+======================================================================
+
+1.1 AUTHORITATIVE FPL RULES AND STATE
+-------------------------------------
+Required:
+- target-season rules;
+- player catalogue;
+- player FPL position;
+- club/team;
+- current price;
+- status and official news;
+- Gameweeks and official deadlines;
+- fixture-to-Gameweek assignment;
+- ownership percentage;
+- transfer counters;
+- official points, components, BPS and bonus;
+- manager squad, bank, free transfers and chip state;
+- final official outcomes.
+
+Critical note:
+Official authority and database-use rights are separate. If persistent automated
+ingestion is not approved, Pulse MUST use a manual/short-retention workflow and
+remain blocked from claims that require a permanent official-data mirror.
+
+1.2 FOOTBALL CONTEXT
+--------------------
+Required or strongly preferred:
+- Premier League fixtures/results;
+- domestic and European schedules affecting rotation;
+- kickoff revisions and postponements;
+- official lineups and benches after publication;
+- substitutions and match events;
+- injuries, suspensions and sidelined status;
+- squads/transfers;
+- player/team identifiers;
+- coverage flags and source timestamps.
+
+1.3 CORE MARKET EVIDENCE
+------------------------
+P0:
+- 1X2 complete book from one or more operators;
+- source/operator identity;
+- decimal price;
+- quote/update time;
+- received/usable time;
+- pre-match status;
+- market state;
+- fixture mapping.
+
+P1:
+- total goals;
+- Asian handicap/spread;
+- BTTS;
+- correct score;
+- team totals or equivalent.
+
+P2:
+- anytime goalscorer;
+- multi-goal/player-goal line;
+- assists;
+- shots;
+- shots on target;
+- cards;
+- goalkeeper saves where ever lawfully available.
+
+P2 markets are opportunistic. Their absence cannot block the baseline engine.
+
+1.4 HISTORICAL EVIDENCE
+-----------------------
+A strict historical market source needs:
+- exact observation/snapshot time;
+- operator;
+- market and selection;
+- line;
+- price;
+- status;
+- provider/source version;
+- settlement profile;
+- time relative to FPL deadline;
+- storage rights;
+- acquisition mode;
+- coverage boundaries.
+
+Opening, closing or untimed match odds are useful research data but not strict
+deadline evidence.
+
+1.5 NON-FUNCTIONAL REQUIREMENTS
+-------------------------------
+- £0 source cost;
+- lawful account/access;
+- explicit quota;
+- canonical/mappable IDs;
+- source and received timestamps;
+- storage and transformation classification;
+- deterministic request fingerprint;
+- caching policy;
+- source health;
+- fallback/degraded mode;
+- terms refresh trigger;
+- exit/deletion process;
+- no unsupported redistribution;
+- no dependency on an LLM to extract numerical fields.
+
+======================================================================
+2. SOURCE EVIDENCE AND APPROVAL STATES
+======================================================================
+
+2.1 REVIEW LEVEL
+----------------
+Every material provider/source decision is R3 under DMFP-01.
+
+2.2 SOURCE STATES
+-----------------
+DISCOVERED:
+A potentially useful source exists.
+
+DOCUMENTED:
+Official documentation states a feature or limit.
+
+TERMS_REVIEWED:
+Controlling public terms were captured and interpreted.
+
+TECHNICALLY_OBSERVED:
+A test account/request returned the expected payload.
+
+BENCHMARKED:
+Coverage, latency, timestamps, quota and mapping were measured prospectively.
+
+RIGHTS_APPROVED:
+The Rights Profile permits the intended private processing.
+
+PRODUCTION_APPROVED:
+Technical, temporal, rights and operational gates pass.
+
+DEGRADED_ONLY:
+Source may support a fallback but cannot be a primary dependency.
+
+RESEARCH_ONLY:
+Source can be used only in labelled research/reconstructed datasets.
+
+BLOCKED:
+A named issue prohibits use.
+
+WITHDRAWN:
+Previously usable but invalidated by terms, cost, coverage or security.
+
+2.3 NO FEATURE BY MARKETING CLAIM
+---------------------------------
+A provider page saying "all endpoints" or "all markets" is not proof that:
+- EPL returns the endpoint;
+- every bookmaker offers it;
+- a selected player prop is available before the FPL deadline;
+- source timestamps are usable;
+- a field can be retained;
+- the quota can support Pulse's cadence.
+
+Only prospective coverage reports can promote DOCUMENTED to BENCHMARKED.
+
+2.4 NO IMPLIED RIGHTS
+---------------------
+Silence is not permission.
+
+A field marked UNKNOWN for raw storage, training, backup, public display or
+redistribution remains blocked for that action.
+
+======================================================================
+3. RIGHTS PROFILE
+======================================================================
+
+3.1 RIGHTS ARE ATOMIC
+---------------------
+Each source MUST separately classify:
+
+- ACCESS;
+- ACCOUNT_CREATION;
+- AUTOMATED_RETRIEVAL;
+- REQUEST_CACHING;
+- RAW_BODY_STORAGE;
+- HISTORICAL_RAW_STORAGE;
+- CANONICAL_FACT_STORAGE;
+- SOURCE_ID_STORAGE;
+- TRANSFORMATION;
+- FAIR_PROBABILITY_DERIVATION;
+- MODEL_CALIBRATION;
+- MODEL_TRAINING;
+- PRIVATE_DECISION_USE;
+- PRIVATE_DISPLAY;
+- BACKUP;
+- REPRODUCIBILITY_ARCHIVE;
+- PUBLIC_DISPLAY;
+- COMMERCIAL_USE;
+- RAW_REDISTRIBUTION;
+- DERIVED_REDISTRIBUTION;
+- BENCHMARK_PUBLICATION;
+- ATTRIBUTION;
+- LOGO/PHOTO USE;
+- POST_TERMINATION_RETENTION;
+- DELETION;
+- GEOGRAPHY;
+- ACCOUNT_SHARING.
+
+3.2 STATUS
+----------
+GREEN:
+Explicitly compatible with the intended purpose.
+
+AMBER:
+Ambiguous, scope-dependent, plan-dependent or needs written review.
+
+RED:
+Explicitly prohibited or incompatible.
+
+UNKNOWN:
+Not established; treated as blocked.
+
+NOT_APPLICABLE:
+The action is not performed.
+
+3.3 STRICTEST-RIGHT PROPAGATION
+-------------------------------
+An artifact combining multiple sources inherits the strictest applicable:
+- security classification;
+- display rule;
+- retention period;
+- backup rule;
+- export rule;
+- attribution obligation.
+
+A derived probability is not automatically free of source restrictions.
+
+3.4 RIGHTS-PROFILE MINIMUM FIELDS
+---------------------------------
+- rights_profile_id;
+- provider/source key;
+- terms URL;
+- terms version/date;
+- retrieval/hash;
+- account/plan;
+- intended purpose;
+- jurisdiction;
+- atomic rights statuses;
+- evidence/locator;
+- reviewer;
+- approval;
+- valid_from;
+- review_due;
+- change trigger;
+- deletion plan;
+- notes.
+
+3.5 TERMS MONITORING
+--------------------
+At minimum:
+- snapshot terms URL and content hash when permitted;
+- record Last-Modified/ETag where available;
+- check before each season;
+- check quarterly;
+- check after provider email/dashboard notice;
+- check before public/commercial expansion;
+- block export if the profile is stale.
+
+======================================================================
+4. SOURCE CRITICALITY
+======================================================================
+
+4.1 P0 — BLOCKING
+-----------------
+- official target-season rules;
+- official FPL deadline;
+- Sebastian's valid manager state;
+- player/team/fixture identity;
+- at least one usable team-strength probability source or an approved
+  market-free baseline;
+- legal source usage.
+
+4.2 P1 — IMPORTANT
+------------------
+- 1X2 consensus depth;
+- current fixture revisions;
+- injuries/suspensions;
+- current prices/ownership/transfer counters;
+- European/domestic schedule context;
+- actual lineups for labels;
+- source timestamps.
+
+4.3 P2 — OPTIONAL/DEGRADABLE
+----------------------------
+- player props;
+- exchange reference;
+- football-data.org cross-check;
+- weather;
+- public predicted lineups;
+- historical opening/closing prices;
+- optional event datasets.
+
+4.4 CONSEQUENCE
+---------------
+P2 failure MUST NOT prevent a baseline decision when P0/P1 are healthy.
+It must reduce confidence, widen uncertainty or disable a specific feature.
+
+======================================================================
+5. MARKET-COVERAGE POLICY
+======================================================================
+
+5.1 BASELINE TEAM MARKETS
+-------------------------
+Production baseline MUST work with 1X2 only.
+
+Where available, totals/BTTS/correct score/team totals improve score-matrix
+reconciliation.
+
+No architecture decision may make complete player props a prerequisite.
+
+5.2 CLEAN-SHEET PROBABILITY
+---------------------------
+Preferred evidence:
+- opponent team total under 0.5;
+- opponent-to-score No;
+- direct team clean-sheet market.
+
+Free-data fallback:
+- derive P(opponent goals = 0) from the market-constrained score matrix using
+  1X2, totals, BTTS and prior model evidence.
+
+5.3 PLAYER GOALS
+----------------
+Use anytime scorer when:
+- player identity is mapped;
+- quote is predeadline;
+- operator/settlement is known;
+- nonstarter treatment is known or uncertainty is represented;
+- market is not suspended.
+
+Otherwise:
+- use team-to-player allocation from DMFP-07/08;
+- set market state explicitly;
+- widen uncertainty.
+
+5.4 ASSISTS, SHOTS AND SHOTS ON TARGET
+--------------------------------------
+The Odds API documents these for selected EPL US-bookmaker props.
+
+Policy:
+- opportunistic;
+- candidate-fixture only;
+- no claim of full starting-XI coverage;
+- no missing-to-zero conversion;
+- operator/line/settlement preserved;
+- Pulse models remain mandatory.
+
+5.5 GOALKEEPER SAVES
+--------------------
+No selected free source is assumed to provide complete EPL goalkeeper-save props.
+
+Use:
+- opponent shots-on-target model;
+- goalkeeper minutes;
+- coherent shot tree.
+
+Any observed save prop is supplemental only.
+
+5.6 ONE-SIDED PROPS
+-------------------
+One-sided player Yes/Over quotes are not complete books.
+
+They retain:
+- raw implied probability;
+- margin uncertainty;
+- source/operator;
+- market state;
+- optional calibration.
+
+They are not forced to sum one across players.
+
+5.7 MARKET OPENING
+------------------
+Player props can appear close to kickoff, often after the FPL deadline for later
+fixtures.
+
+Pulse MUST produce a complete baseline before props exist.
+
+5.8 MARKET DISAGREEMENT
+-----------------------
+Do not delete a quote merely because it differs.
+
+Exclude only for:
+- identity error;
+- wrong period/line;
+- stale/suspended state;
+- impossible price;
+- settlement incompatibility;
+- provider duplication;
+- postcutoff receipt.
+
+Statistical disagreement is retained as uncertainty.
+
+======================================================================
+6. OFFICIAL FPL / PREMIER LEAGUE
+======================================================================
+
+6.1 ROLE
+--------
+Authoritative FPL rules and final game truth.
+
+6.2 REFERENCE WEB INTERFACES
+----------------------------
+Historically observed web-application JSON surfaces include:
+- `/api/bootstrap-static/`;
+- `/api/fixtures/`;
+- `/api/event/{gw}/live/`;
+- `/api/element-summary/{id}/`;
+- entry history and picks resources.
+
+These are not treated as a guaranteed public API contract.
+Every endpoint, field and access pattern must be reverified after 2026/27 launch.
+
+6.3 REQUIRED TARGET-SEASON FIELDS
+---------------------------------
+- external player/team/fixture/Gameweek IDs;
+- player names and FPL position;
+- team;
+- current price;
+- status/chance/news;
+- selected percentage;
+- transfer counters;
+- deadlines;
+- fixture assignments;
+- official points/events/BPS/bonus;
+- manager squad/bank/FT/chips.
+
+6.4 IDENTITY
+------------
+All official IDs remain:
+- provider-scoped;
+- target-season scoped unless proven otherwise;
+- mapped to DMFP-03 UUIDs;
+- never used as the canonical domain primary key.
+
+6.5 RIGHTS FINDING
+------------------
+The Premier League Terms of Use currently state that:
+- reasonable private/personal use is allowed;
+- Website/App material cannot otherwise be reproduced, re-utilised or
+  redistributed;
+- creating a database from Website/App material is an example requiring prior
+  written approval.
+
+Therefore:
+- an undocumented JSON endpoint is not an open-data licence;
+- long-term raw snapshots and a canonical FPL mirror are not automatically
+  approved;
+- public redistribution is prohibited without approval;
+- commercial/public DMF requires a new licence review.
+
+6.6 APPROVED PRE-RIGHTS WORK
+----------------------------
+Until a production rights decision:
+- use synthetic/recorded test fixtures whose retention is approved;
+- manually capture target rules into DMFP-02;
+- use minimal short-lived operational reads only if Sebastian approves the
+  private/personal interpretation;
+- avoid bulk manager sampling;
+- avoid copying article bodies;
+- store source locators, hashes and extracted rule facts where permitted;
+- maintain a manual manager-state import/fallback.
+
+6.7 MANAGER STATE
+-----------------
+V1 MUST NOT:
+- store an FPL password;
+- automate login through a browser;
+- persist session cookies unnecessarily;
+- call undocumented write endpoints;
+- submit transfers/captain/chips automatically.
+
+Preferred:
+- public/read-only manager state where permitted;
+- Sebastian confirms state manually;
+- private local import;
+- manual execution record.
+
+6.8 FRESHNESS
+-------------
+Critical deadline/manager state needs:
+- observed_at;
+- received_at;
+- usable_at;
+- endpoint/interface version;
+- raw hash where allowed;
+- last healthy age.
+
+6.9 FALLBACK
+------------
+- manual official-game check;
+- approved previous snapshot with visible age;
+- football-data.org/API-FOOTBALL for fixture cross-check only;
+- BLOCK when manager legality/deadline cannot be verified.
+
+======================================================================
+7. THE ODDS API FREE STARTER
+======================================================================
+
+7.1 ROLE
+--------
+Primary current bookmaker-market source.
+
+7.2 FREE PLAN
+-------------
+At research cut-off:
+- 500 credits/month;
+- all sports;
+- most bookmakers;
+- all available current markets;
+- historical odds excluded.
+
+No paid plan is permitted by ADR-SRC-001.
+
+7.3 EPL REQUEST
+---------------
+Canonical current EPL configuration:
+- sport key: `soccer_epl`;
+- odds format: decimal;
+- one region per ordinary call;
+- `h2h` for 1X2;
+- ISO 8601 timestamps;
+- explicit commence-time window where useful.
+
+7.4 QUOTA COST
+--------------
+Official v4 rule:
+    current odds cost
+      = unique markets returned/requested as defined by endpoint
+        x regions
+
+The general odds endpoint documents:
+    cost = number_of_markets x number_of_regions.
+
+Event-specific odds:
+    cost = unique markets returned x regions.
+
+Useful free endpoints:
+- `/sports`: no quota;
+- `/events`: no quota;
+- empty event-specific responses generally do not consume credits;
+- quota headers report remaining, used and last-call cost.
+
+Historical endpoints:
+- paid-plan only;
+- prohibited for the zero-cost architecture.
+
+7.5 CURRENT MARKET PRIORITY
+---------------------------
+P0:
+- h2h / soccer 1X2.
+
+P1:
+- totals;
+- spreads/handicap;
+- BTTS;
+- correct score;
+- other score-reconcilable markets that are actually returned.
+
+P2:
+- player_goal_scorer_anytime;
+- player_first_goal_scorer;
+- player_last_goal_scorer;
+- player_shots;
+- player_shots_on_target;
+- player_assists;
+- player_to_receive_card;
+- player_to_receive_red_card.
+
+7.6 PLAYER-PROP LIMIT
+---------------------
+Official market documentation says soccer player props are available for EPL and
+other named leagues but currently limited to US bookmakers.
+
+Consequences:
+- UK-region requests may not return the props;
+- request US region only for prop calls;
+- settlement and player naming can differ;
+- bookmaker/operator coverage must be measured;
+- no prop completeness target is a production blocker.
+
+7.7 MONTHLY CREDIT POLICY
+-------------------------
+Internal Pulse recommendation:
+
+Reserve:
+- 20% emergency/terms/schema/late-month buffer = 100 credits.
+
+Normal usable budget:
+- 400 credits/month.
+
+Priority allocation:
+- 55% core 1X2/current team-market snapshots;
+- 25% targeted totals/BTTS/correct-score enrichment;
+- 15% selected player-prop calls;
+- 5% technical probes/retries.
+
+This allocation is configurable, not a provider rule.
+
+The quota manager MUST:
+- read response headers;
+- reserve credits before jobs;
+- reject low-value requests when below reserve;
+- prevent retry storms;
+- track cost by Gameweek, market and decision impact;
+- never assume a monthly reset until observed/account-confirmed.
+
+7.8 QUOTA-SAVING DESIGN
+-----------------------
+- call `/events` before event-specific odds;
+- use event-specific calls for targeted props;
+- one region per call;
+- do not request all markets "just in case";
+- cache immutable event IDs/mappings;
+- avoid polling when no relevant fixture/window changed;
+- share one response across all modules/users;
+- do not poll in-play for the predeadline decision engine;
+- batch core EPL fixtures in the sport odds call;
+- stop prop calls after the FPL cutoff.
+
+7.9 TIMESTAMPS
+--------------
+Store:
+- bookmaker/operator last_update;
+- market last_update where supplied;
+- request start/end;
+- received_at;
+- usable_at;
+- event commence time;
+- source snapshot.
+
+Provider last_update is not a substitute for usable_at.
+
+7.10 RIGHTS
+-----------
+Public terms:
+- prohibit standalone resale/repackaging/redistribution;
+- support websites, apps, dashboards and analytical tools, including commercial
+  use, when data are not the primary product;
+- disclaim perfect accuracy/timeliness;
+- require API-key protection.
+
+Pulse interpretation for private V1:
+- private analytical use: approved;
+- raw redistribution: prohibited;
+- public downloadable odds feed: prohibited;
+- derived FPL recommendations: expected compatible, subject to rights profile;
+- indefinite raw archive/model training: obtain clarification;
+- provider/operator attribution and source notes should be retained internally.
+
+7.11 SETTLEMENT
+---------------
+The API carries bookmaker markets, not one universal settlement policy.
+
+For each operator/market:
+- link rule page where available;
+- store regulation-time/overtime semantics;
+- nonstarter rule;
+- void/postponement rule;
+- stat provider for props;
+- line/handicap;
+- date reviewed.
+
+Unknown settlement lowers confidence or blocks direct calibration.
+
+7.12 ACCEPTANCE TARGETS
+-----------------------
+Before production:
+- EPL event discovery works;
+- 1X2 returned for >=95% of expected EPL fixtures in a measured preseason/sample
+  window, or the baseline fallback is approved;
+- operator and event IDs map safely;
+- last_update is present/usable;
+- quota costs match headers;
+- repeated request is idempotently ingested;
+- one malformed/empty/429 fixture is tested;
+- no API key appears in logs/artifacts;
+- actual prop coverage is reported, not assumed.
+
+7.13 FALLBACK
+-------------
+- API-FOOTBALL odds if rights-approved;
+- manual odds capture;
+- Betfair historical is not a current fallback;
+- calibrated team-strength prior with MARKET_DEGRADED status.
+
+======================================================================
+8. API-FOOTBALL FREE
+======================================================================
+
+8.1 ROLE
+--------
+Conditional context, label and secondary-market source.
+
+8.2 FREE LIMITS
+---------------
+At cut-off:
+- 100 requests/day;
+- 10 requests/minute;
+- all endpoints and competitions;
+- free-plan available seasons limited;
+- no credit card required.
+
+Response headers include daily and per-minute remaining limits.
+
+8.3 COVERAGE-FIRST RULE
+-----------------------
+Before calling a feature endpoint:
+- query/capture league-season coverage;
+- verify flags for fixtures, lineups, injuries, statistics, odds and players;
+- store coverage version;
+- do not assume one season equals another.
+
+Provider league IDs are configuration/mappings, not canonical identities.
+
+8.4 USEFUL ENDPOINT FAMILIES
+----------------------------
+- leagues/seasons/coverage;
+- fixtures;
+- events;
+- lineups;
+- players;
+- transfers;
+- sidelined/injuries;
+- statistics;
+- pre-match odds.
+
+The provider prediction endpoint is a benchmark/challenger only.
+
+8.5 LINEUPS
+-----------
+Provider documentation states lineups are normally available around 20–40
+minutes before kickoff when the competition supports them.
+
+For FPL:
+- later-match official lineups generally arrive after the Gameweek deadline;
+- they are labels and future training data;
+- they must not leak into the predeadline decision bundle.
+
+8.6 ODDS HISTORY
+----------------
+Provider documentation warns that only the last seven days of odds are retained.
+
+Therefore:
+- collect prospectively;
+- no historical backfill assumption;
+- store snapshot cadence and retrieval;
+- do not query after seven days expecting recovery;
+- current API-Football odds remain secondary to The Odds API.
+
+8.7 DAILY QUOTA POLICY
+----------------------
+Recommended reserve:
+- 20 requests/day for failures, critical corrections and manual reruns.
+
+Normal budget:
+- 80 requests/day.
+
+Example allocation:
+- 5 coverage/competition/schedule;
+- 10 fixture and rotation-context sync;
+- 15 injuries/sidelined;
+- 20 relevant lineup labels;
+- 10 postmatch events/statistics;
+- 10 secondary odds;
+- 10 reserve within normal allocation.
+
+Actual calls are deadline/fixture driven and may be lower.
+
+8.8 RIGHTS FINDING
+------------------
+API-SPORTS terms state that:
+- it does not provide a licence for use/publication of the underlying data;
+- the user must obtain permissions from competent authorities.
+
+Therefore the API subscription/free account solves access, not all rights.
+
+Required before activation:
+- determine whether private internal processing is permitted;
+- determine permitted raw/canonical retention;
+- determine whether model training/calibration is permitted;
+- prohibit public display by default;
+- exclude logos/photos;
+- record third-party competition rights;
+- define deletion and backup policy.
+
+8.9 DATA QUALITY
+----------------
+Validate:
+- fixture/team/player ID stability;
+- missing source times;
+- duplicate events;
+- lineup completeness;
+- event/stat correction;
+- injury start/end ambiguity;
+- transfer dates;
+- odds operator identity;
+- coverage flag versus observed response.
+
+8.10 ACCEPTANCE TARGETS
+-----------------------
+- one current EPL season coverage object captured;
+- core fixture sample maps to canonical IDs;
+- lineup sample contains XI/bench where coverage promises it;
+- injury sample distinguishes no records from source failure;
+- odds sample proves operator/market fields;
+- daily/minute quota headers recorded;
+- 429 handling works without retry storm;
+- Rights Profile approved;
+- no feature uses provider predictions as truth.
+
+8.11 FALLBACK
+-------------
+- football-data.org for schedules/results;
+- official manual injury/lineup evidence;
+- The Odds API for markets;
+- source missing state.
+
+======================================================================
+9. FOOTBALL-DATA.ORG FREE
+======================================================================
+
+9.1 ROLE
+--------
+Low-frequency independent fixture/result/table cross-check.
+
+9.2 FREE SERVICE
+----------------
+Current provider material:
+- describes the Free Plan as free forever;
+- says top competitions remain free;
+- registered free clients: 10 requests/minute;
+- provides machine-readable fixtures, scores, standings, squads and other fields
+  according to tier/coverage;
+- Premier League examples use `PL`;
+- Champions League examples use `CL`.
+
+9.3 USE
+-------
+Approved private use candidates:
+- Premier League schedule/result cross-check;
+- Champions League schedule context;
+- standings;
+- team identity aliases;
+- fixture revision comparison.
+
+Not selected for:
+- current odds;
+- player props;
+- primary injury feed;
+- FPL state;
+- final deadline authority.
+
+9.4 ATTRIBUTION AND PURPOSE
+---------------------------
+Provider FAQ requests visible attribution:
+    "Data provided by football-data.org"
+
+Provider material describes free use as non-commercial.
+
+Therefore:
+- private non-commercial V1: compatible subject to terms;
+- future public/commercial DMF: contact provider/new review;
+- no crests/logos without separate rights;
+- one API key applies to the registered application/purpose.
+
+9.5 FRESHNESS
+-------------
+Free data can be delayed or less detailed than paid tiers.
+
+Pulse stores:
+- source `lastUpdated` where supplied;
+- received/usable time;
+- compared fixture state;
+- conflict outcome.
+
+It cannot overrule the official FPL deadline/Gameweek assignment.
+
+9.6 ACCEPTANCE
+--------------
+- free account registered for Pulse;
+- PL and needed European competitions available;
+- 10/minute limiter tested;
+- attribution text added to internal UI/report where source is displayed;
+- fixture IDs map;
+- response schema captured;
+- rights and retention recorded.
+======================================================================
+10. BETFAIR
+======================================================================
+
+10.1 BASIC HISTORICAL DATA
+--------------------------
+Selected role:
+Optional personal/internal exchange research.
+
+Published Basic fields:
+- one-minute intervals;
+- last traded price;
+- no traded volume;
+- no full order-book ladder.
+
+Interpretation:
+- useful for broad market movement and historical exchange calibration;
+- insufficient for reliable liquidity/spread modelling;
+- cannot support claims requiring available-to-back/lay ladders or volume;
+- last traded price may update only when it changes.
+
+10.2 PERSONAL-USE LIMIT
+-----------------------
+The historical-data site states:
+    Personal Use Only.
+
+Consequences:
+- classify source and descendants as PERSONAL_RESEARCH;
+- no public data export;
+- no commercial training/display assumption;
+- no sharing historical files;
+- no public provider benchmark without review;
+- separate storage/access controls;
+- retain acquisition/account evidence.
+
+10.3 ACCOUNT AND GEOGRAPHY
+--------------------------
+Before use:
+- confirm Betfair account availability in Sebastian's region;
+- complete required account verification;
+- review historical-data terms;
+- confirm no betting/deposit requirement applies to the free Basic acquisition;
+- record provider account ID pseudonymously;
+- prohibit credential sharing.
+
+10.4 DELAYED APP KEY
+--------------------
+Official guidance:
+- Delayed App Key is for development and functional testing;
+- operates against the production Exchange with delayed data;
+- delay can vary from 1 to 180 seconds;
+- detailed historical data are also suggested for testing/analysis.
+
+Official cost guidance:
+- delayed development access is free for private betting customers and licensed
+  software vendors;
+- Live App Key carries a paid activation fee;
+- read-only live-key access is not permitted.
+
+Pulse decision:
+- no Live App Key;
+- no fee;
+- no betting;
+- Delayed App Key disabled until purpose eligibility is confirmed;
+- never a critical deadline source.
+
+10.5 STREAM CONFLATION
+----------------------
+If delayed streaming is ever approved:
+- record conflation/delay mode;
+- do not treat messages as real-time;
+- use source/event/received/usable times;
+- do not infer best execution or market liquidity;
+- compare only as delayed evidence.
+
+10.6 MARKET MAPPING
+-------------------
+Betfair runner identity is contextual:
+- marketId;
+- selectionId;
+- handicap/line.
+
+Never map selectionId globally without market context.
+
+10.7 HISTORICAL ACQUISITION
+---------------------------
+- obtain only Basic/free files;
+- use official portal/API;
+- record requested competition, market type, date range and acquisition time;
+- retain source file hash;
+- separate raw Betfair store from ordinary redistributable artifacts;
+- derive time-to-FPL-deadline fields;
+- mark PERSONAL_RESEARCH.
+
+10.8 ACCEPTANCE
+---------------
+- account/jurisdiction approved;
+- Basic file acquired at £0;
+- file parses deterministically;
+- one-minute/LTP/no-volume limitations reflected in schema;
+- runner mappings reviewed;
+- personal-use classification enforced;
+- no public export route;
+- no paid-tier code path;
+- Delayed API remains off unless separately approved.
+
+======================================================================
+11. FOOTBALL-DATA.CO.UK
+======================================================================
+
+11.1 ROLE
+---------
+Free downloadable historical match results, match statistics and betting odds.
+
+11.2 PUBLISHED COVERAGE
+-----------------------
+At cut-off the site states:
+- 31 seasons of results;
+- 26 seasons of betting odds;
+- 26 seasons of match statistics;
+- match odds from multiple bookmakers;
+- average/maximum market prices in later seasons;
+- opening and later/closing collections in some recent seasons;
+- Excel/CSV downloads.
+
+11.3 DATA MODES
+---------------
+Every imported row must be classified:
+- RECONSTRUCTED_OPENING;
+- RECONSTRUCTED_CLOSING;
+- RECONSTRUCTED_SUMMARY;
+- FINAL_OUTCOME;
+- UNKNOWN_TIMING.
+
+None is automatically LIVE_OBSERVED_AT_FPL_DEADLINE.
+
+11.4 LIMITATIONS
+----------------
+- collection times vary by season;
+- bookmaker columns change;
+- odds-comparison sources change;
+- no complete player-prop history;
+- no FPL-deadline alignment guarantee;
+- final spreadsheets may include later corrections;
+- the site disclaims accuracy;
+- a sufficiently explicit data reuse/model-training licence was not identified.
+
+11.5 RIGHTS POLICY
+------------------
+Until permission/rights are clarified:
+- RESEARCH_ONLY;
+- private local access;
+- no public redistribution;
+- no derivative public data release;
+- no claim that access equals training rights;
+- no automated high-frequency scraping;
+- direct file download only;
+- retain site/data dictionary and disclaimer references.
+
+11.6 USE
+--------
+Permitted after rights approval for:
+- broad score/odds baselines;
+- de-vig method research;
+- favourite–longshot diagnostics;
+- bookmaker-column mapping;
+- reconstructed team-strength priors;
+- nonlive model development.
+
+11.7 ACCEPTANCE
+---------------
+- one EPL season file acquired;
+- data dictionary captured;
+- columns and bookmaker semantics mapped;
+- opening/closing labels verified;
+- file hash stored;
+- rights decision recorded;
+- dataset mode enforced;
+- no strict-live report includes these rows without a separate result.
+
+======================================================================
+12. OFFICIAL MANUAL EVIDENCE
+======================================================================
+
+12.1 PURPOSE
+------------
+Free structured manual capture covers high-value facts that are legally safer or
+too sparse for automated feeds.
+
+12.2 SOURCE HIERARCHY
+---------------------
+1. official FPL rules/help/game update;
+2. Premier League official article or fixture announcement;
+3. club official website/press conference;
+4. The FA disciplinary source;
+5. UEFA/FIFA/competition official source;
+6. reputable journalist with direct attributable report;
+7. secondary media;
+8. community report.
+
+12.3 MANUAL EVIDENCE RECORD
+---------------------------
+Required fields:
+- evidence_id;
+- canonical player/team/fixture;
+- evidence type;
+- factual paraphrase;
+- source URL;
+- publisher;
+- publication time;
+- observed time;
+- usable_at;
+- quoted words, if any, kept minimal;
+- confidence;
+- expiry;
+- reviewer;
+- source screenshot/hash only where lawful;
+- affected projection variable;
+- contradiction state.
+
+12.4 PROHIBITED
+---------------
+- copying an entire article;
+- automated extraction from protected pages;
+- storing copyrighted photos/logos;
+- inventing publication time;
+- turning vague language into certainty;
+- using postdeadline news in a predeadline bundle;
+- storing rumours as official facts;
+- using an LLM summary without opening the source.
+
+12.5 AVAILABILITY SEMANTICS
+---------------------------
+Examples:
+- "ruled out" does not always equal mathematical zero unless participation is
+  impossible and source timing is current;
+- "will be assessed" remains a scenario;
+- "back in training" does not imply match ready;
+- suspension must match competition/fixture applicability;
+- predicted lineup is a forecast, not a label.
+
+12.6 MANUAL ODDS
+----------------
+If used:
+- one operator/market/selection/line/price per observation;
+- exact time and time zone;
+- pre-match/in-play state;
+- page/source;
+- manual reviewer;
+- settlement profile;
+- no screenshot distribution;
+- no automated refresh.
+
+======================================================================
+13. STATSBOMB OPEN DATA
+======================================================================
+
+13.1 ROLE
+---------
+Open research data for model design, not current EPL operations.
+
+13.2 USE CASES
+--------------
+- event-taxonomy testing;
+- scorer/assist/shot-tree prototype;
+- lineup/event parser fixtures;
+- calibration methodology;
+- coherent scenario invariants;
+- educational/research notebooks;
+- baseline event-rate priors with clear competition translation.
+
+13.3 LIMITATIONS
+----------------
+- selected competitions only;
+- not necessarily Premier League;
+- not current 2026/27 operational data;
+- different event definitions from FPL/API-FOOTBALL;
+- no direct FPL deadline state;
+- attribution/licence requirements apply.
+
+13.4 POLICY
+-----------
+- capture repository version/commit;
+- capture competition list;
+- preserve StatsBomb IDs as provider IDs;
+- no claim of EPL representativeness;
+- separate RESEARCH_OPEN dataset mode;
+- include required attribution;
+- new public/commercial use review.
+
+======================================================================
+14. VAASTAV FPL HISTORICAL REPOSITORY
+======================================================================
+
+14.1 ROLE
+---------
+Convenience research dataset for historical FPL structure and test fixtures.
+
+14.2 CURRENT MAINTENANCE
+------------------------
+The repository states that weekly updates stopped after 2024/25 and future
+seasons receive only:
+- season-start update;
+- post-January-window update;
+- season-end update.
+
+Therefore:
+- not a weekly/live 2026/27 source;
+- not a price/ownership snapshot source;
+- not a deadline bundle source.
+
+14.3 RIGHTS
+-----------
+The code repository's software licence does not grant ownership of underlying
+FPL/Understat data.
+
+Policy:
+- research-only;
+- record underlying provenance;
+- no public repackaging;
+- no assumption that software licence covers data;
+- use only fields whose methodology/timing are understood.
+
+14.4 LEAKAGE
+------------
+Potential post-match or current-vintage fields must be audited.
+
+In strict-live research:
+- exclude unverified expected-points fields;
+- reconstruct usable-at only where evidence exists;
+- mark current-vintage mappings;
+- report dataset mode.
+
+======================================================================
+15. OPEN-METEO
+======================================================================
+
+15.1 ROLE
+---------
+Optional fixture weather covariates.
+
+15.2 FREE CONDITIONS
+--------------------
+At cut-off:
+- non-commercial free endpoint;
+- no API key/card;
+- fewer than 10,000 calls/day;
+- 5,000/hour and 600/minute in terms;
+- data under CC BY 4.0;
+- attribution required;
+- no uptime guarantee.
+
+15.3 USE
+--------
+Possible fields:
+- temperature;
+- precipitation;
+- wind speed/gust;
+- humidity;
+- weather-code/condition.
+
+15.4 LIMITATIONS
+----------------
+- stadium coordinate mapping required;
+- forecast vintage must be stored;
+- forecast is not observation;
+- weather likely has low marginal value relative to lineup/market data;
+- not MVP-critical.
+
+15.5 POLICY
+-----------
+- one batched request per relevant fixture update;
+- no repeated high-frequency polling;
+- store model/source/vintage;
+- attribute;
+- promote only after out-of-time value test.
+
+======================================================================
+16. STRUCTURED MANUAL CAPTURE FALLBACK
+======================================================================
+
+16.1 WHY MANUAL IS FIRST-CLASS
+------------------------------
+A zero-cost architecture cannot guarantee that all free APIs:
+- remain available;
+- have compatible rights;
+- contain target-season fields;
+- fit quota at deadline.
+
+A structured manual workflow is therefore an accepted operational control, not
+an embarrassing exception.
+
+16.2 MANUAL INPUT TYPES
+-----------------------
+- current manager squad/bank/FT/chips;
+- official deadline;
+- rules clarification;
+- fixture move;
+- injury/suspension;
+- target player market;
+- bookmaker 1X2/total;
+- source outage override;
+- identity mapping.
+
+16.3 VALIDATION
+---------------
+Every manual input:
+- typed schema;
+- second-person review for blocking values;
+- timestamp;
+- source;
+- reason;
+- expiry;
+- immutable revision;
+- no overwrite;
+- visible MANUAL provenance.
+
+16.4 HUMAN ERROR
+----------------
+Controls:
+- range checks;
+- market complete-book checks;
+- duplicate detection;
+- player/fixture confirmation;
+- screenshot/source reference where lawful;
+- two-person confirmation for rules/deadlines;
+- comparison to prior value;
+- audit trail.
+
+======================================================================
+17. REJECTED AND PROHIBITED SOURCES/METHODS
+======================================================================
+
+17.1 PAID PROVIDERS
+-------------------
+REJECTED BY ADR-SRC-001:
+- SportsGameOdds;
+- Sportmonks paid products;
+- OpticOdds;
+- Sportradar;
+- Stats Perform/Opta commercial feeds;
+- paid xG vendors;
+- paid historical odds/player props.
+
+17.2 PAID PLAN ESCALATION
+-------------------------
+The system MUST NOT:
+- auto-upgrade;
+- prompt for card details in production;
+- consume paid overage;
+- assume a trial continues;
+- make a paid endpoint part of acceptance.
+
+17.3 SCRAPING
+-------------
+PROHIBITED without explicit rights:
+- OddsPortal scraping;
+- bookmaker-site automation;
+- FBref/Understat/Transfermarkt/FotMob/Sofascore protected scraping;
+- Premier League page/API database mirroring;
+- browser automation through login;
+- CAPTCHA bypass;
+- rotating proxies;
+- headless evasion;
+- robots/terms circumvention.
+
+17.4 ACCOUNT EVASION
+--------------------
+PROHIBITED:
+- multiple free accounts;
+- shared keys;
+- quota rotation;
+- VPN/geographic bypass;
+- fake identity;
+- concurrent applications registered to disguise one project.
+
+17.5 PREDICTION WEBSITES
+------------------------
+Public xP/lineup/prediction sites MAY be manual comparison sources only when
+rights allow.
+
+They MUST NOT:
+- become ground truth;
+- be copied into the model without calibration;
+- be scraped;
+- replace Pulse's probability distributions.
+
+17.6 BETTING
+------------
+DMF Pulse:
+- does not place bets;
+- does not recommend stakes;
+- does not require a funded betting account;
+- does not use a live exchange key;
+- does not use betting turnover to unlock data.
+
+======================================================================
+18. SOURCE-BY-DATA-ITEM MATRIX
+======================================================================
+
+18.1 FPL RULES
+--------------
+Primary:
+- official FPL rules/help/update captured manually.
+
+Fallback:
+- prior official season, REFERENCE_ONLY;
+- official support clarification.
+
+Blocking:
+- target rule unknown/conflicted.
+
+18.2 FPL DEADLINES/GAMEWEEKS
+----------------------------
+Primary:
+- approved official target-season source/interface.
+
+Fallback:
+- manual official-game confirmation.
+
+Cross-check:
+- fixture providers do not define the FPL deadline.
+
+18.3 PLAYER CATALOGUE/POSITION/PRICE
+------------------------------------
+Primary:
+- approved official FPL read.
+
+Fallback:
+- manual export/capture.
+
+No third-party source can authoritatively assign FPL position/price.
+
+18.4 OWNERSHIP/TRANSFER COUNTERS
+---------------------------------
+Primary:
+- approved official FPL read.
+
+Fallback:
+- last healthy snapshot with age;
+- manual capture.
+
+If stale:
+- disable price/EO-sensitive action as required.
+
+18.5 MANAGER STATE
+------------------
+Primary:
+- approved read-only official state or local manual import.
+
+Fallback:
+- manual typed state confirmed by Sebastian.
+
+No automated write/login.
+
+18.6 FIXTURES AND RESULTS
+-------------------------
+Authority:
+- official FPL for Gameweek assignment;
+- official Premier League for league fixture;
+- competition official source for European/cup fixture.
+
+Structured cross-check:
+- API-FOOTBALL conditional;
+- football-data.org.
+
+18.7 EUROPEAN/DOMESTIC ROTATION CONTEXT
+----------------------------------------
+Primary structured:
+- API-FOOTBALL if rights-approved.
+
+Secondary:
+- football-data.org for covered competitions;
+- official manual schedule sources.
+
+18.8 LINEUPS
+------------
+Labels:
+- API-FOOTBALL conditional;
+- official club/competition manual source.
+
+Predictions:
+- Pulse DMFP-07;
+- manual official FPL predicted-lineup articles only as one expert forecast.
+
+18.9 INJURIES/SUSPENSIONS
+-------------------------
+Primary evidence:
+- club/PL/FA official manual.
+
+Structured secondary:
+- API-FOOTBALL conditional.
+
+FPL status:
+- official FPL observation, not calibrated probability.
+
+18.10 CURRENT 1X2
+-----------------
+Primary:
+- The Odds API Free.
+
+Secondary:
+- API-FOOTBALL Free if rights-approved;
+- structured manual.
+
+Fallback:
+- market-free team prior with degradation.
+
+18.11 TOTALS/BTTS/CORRECT SCORE
+-------------------------------
+Primary:
+- The Odds API when returned.
+
+Secondary:
+- API-FOOTBALL if returned/approved;
+- manual.
+
+Missing:
+- score-model prior, not zero.
+
+18.12 PLAYER GOAL PROPS
+------------------------
+Primary:
+- The Odds API selected US operators.
+
+Secondary:
+- manual lawful observation.
+
+Fallback:
+- team-to-player model.
+
+18.13 ASSISTS/SHOTS/SOT/CARDS
+------------------------------
+Primary:
+- The Odds API when returned.
+
+Fallback:
+- proprietary event model.
+
+18.14 GOALKEEPER SAVES
+-----------------------
+Primary:
+- proprietary coherent shot/save model.
+
+Observed prop:
+- supplemental only.
+
+18.15 EXCHANGE HISTORY
+----------------------
+Primary free:
+- Betfair Basic historical, personal research.
+
+Alternative:
+- none selected.
+
+18.16 HISTORICAL FIXED ODDS
+---------------------------
+Candidate:
+- football-data.co.uk reconstructed files after rights approval.
+
+Primary strict history:
+- Pulse's own prospective snapshots.
+
+18.17 HISTORICAL FPL
+--------------------
+Primary strict:
+- Pulse prospective official snapshots where rights permit.
+
+Reconstructed:
+- Vaastav and other reviewed datasets.
+
+18.18 FOOTBALL EVENTS
+---------------------
+Current/labels:
+- API-FOOTBALL conditional.
+
+Research:
+- StatsBomb Open Data.
+
+18.19 WEATHER
+-------------
+Optional:
+- Open-Meteo.
+
+======================================================================
+19. COMPETITION COVERAGE
+======================================================================
+
+19.1 CORE
+---------
+- Premier League;
+- FPL Gameweeks/deadlines.
+
+19.2 ROTATION CONTEXT
+---------------------
+Desired:
+- UEFA Champions League;
+- UEFA Europa League;
+- UEFA Conference League;
+- FA Cup;
+- EFL Cup;
+- relevant international windows/competitions;
+- Club World Cup/other special competition only if it affects players.
+
+19.3 FREE-COVERAGE REALITY
+--------------------------
+No selected free source is assumed to cover every competition with identical:
+- lineups;
+- injuries;
+- event detail;
+- history;
+- timestamps.
+
+The source registry stores competition-season-feature coverage.
+
+19.4 MISSING COMPETITION
+------------------------
+When a rotation-relevant competition is missing:
+- official manual schedule;
+- workload uncertainty branch;
+- reduced confidence;
+- no fabricated zero workload.
+
+======================================================================
+20. QUOTA AND CADENCE
+======================================================================
+
+20.1 GENERAL
+------------
+Quota is a decision resource.
+
+Every source adapter exposes:
+- hard daily/monthly limit;
+- per-minute limit;
+- remaining;
+- reset time;
+- estimated call cost;
+- reservation;
+- priority;
+- retry cost;
+- last header observation.
+
+20.2 PRIORITIES
+---------------
+P0:
+- deadline/rules/manager legality;
+- 1X2 market.
+
+P1:
+- fixture changes;
+- candidate injury/availability;
+- selected totals/team markets.
+
+P2:
+- player props;
+- secondary context;
+- weather;
+- optional research.
+
+20.3 THE ODDS API CADENCE
+-------------------------
+Recommended normal policy, subject to monthly budget:
+
+More than 72h before deadline:
+- event discovery free;
+- one low-frequency h2h snapshot per material update/day.
+
+72h–24h:
+- one h2h snapshot per 12h;
+- selected totals/BTTS once if available.
+
+24h–6h:
+- one h2h snapshot per 6h;
+- targeted candidate-fixture prop discovery.
+
+6h–cutoff:
+- h2h at selected decision times, not blind minute polling;
+- targeted prop calls only where action-sensitive;
+- stop after cutoff.
+
+Final:
+- one reserved final snapshot before execution safety buffer.
+
+This is a quota envelope, not an SLA. Actual schedule is optimised monthly.
+
+20.4 API-FOOTBALL CADENCE
+-------------------------
+- coverage: preseason/season change, then weekly;
+- fixtures/schedule: daily and after detected revision;
+- injuries/sidelined: daily, more near deadline if quota allows;
+- lineups: one call per relevant fixture after expected publication, for labels;
+- events/stats: one postmatch/finality collection;
+- odds: secondary targeted only;
+- no 15-second live polling on free quota.
+
+20.5 FOOTBALL-DATA.ORG CADENCE
+------------------------------
+- fixtures/tables: daily or after material revision;
+- results: after matches/finality;
+- no high-frequency deadline polling.
+
+20.6 OFFICIAL FPL CADENCE
+-------------------------
+Only after rights approval.
+
+DMFP-05 may define a conservative cadence, but it MUST:
+- share/cache responses;
+- avoid per-user duplication;
+- avoid mass manager reads;
+- remain inside the Rights Profile;
+- stop/reduce on terms/schema concern.
+
+20.7 RETRIES
+------------
+- no retry for quota exhaustion;
+- exponential backoff for transient 5xx;
+- honour Retry-After;
+- no unbounded retry;
+- reserve-aware;
+- one logical run retains all attempts.
+
+======================================================================
+21. ODDS SNAPSHOT PLAN
+======================================================================
+
+21.1 PURPOSE
+------------
+Create the free history that cannot be purchased or backfilled under the
+architecture.
+
+21.2 SNAPSHOT ENVELOPE
+----------------------
+- source_snapshot_id;
+- provider;
+- endpoint/resource;
+- request fingerprint;
+- operator;
+- fixture;
+- market;
+- selection;
+- line;
+- price;
+- market state;
+- source/update time;
+- received_at;
+- usable_at;
+- information cutoff;
+- quota cost;
+- body hash/storage policy;
+- mapping version;
+- settlement version;
+- terms version.
+
+21.3 TARGET VINTAGES
+--------------------
+For each FPL deadline, aim to preserve:
+- opening/early predeadline;
+- D-72h;
+- D-24h;
+- D-6h;
+- final reserved snapshot;
+- material event-triggered revisions.
+
+Quota may reduce this. The actual observed schedule is recorded.
+
+21.4 LATER FIXTURES
+-------------------
+FPL deadline, not kickoff, controls feature eligibility.
+
+Odds captured after the FPL deadline:
+- useful for labels/research;
+- not eligible for that Gameweek decision;
+- stored separately by mode.
+
+21.5 SNAPSHOT MISSING
+---------------------
+Record reason:
+- NOT_OPEN;
+- NO_EVENT;
+- NO_MARKET;
+- NO_OPERATOR;
+- QUOTA_RESERVED;
+- RATE_LIMITED;
+- SOURCE_DOWN;
+- RIGHTS_BLOCKED;
+- MAPPING_FAILED;
+- AFTER_CUTOFF.
+
+======================================================================
+22. HISTORICAL DATA STRATEGY
+======================================================================
+
+22.1 HIERARCHY
+--------------
+1. Pulse LIVE_OBSERVED prospective snapshots.
+2. Predeadline time-stamped permitted historical observations.
+3. Betfair Basic time-stamped personal-research history.
+4. Manual time-stamped observations.
+5. football-data.co.uk opening/closing reconstructed odds.
+6. untimed match-level odds.
+7. no market.
+
+22.2 NO HISTORICAL PLAYER-PROP CLAIM
+------------------------------------
+No complete zero-cost source has been approved for historical EPL:
+- scorer;
+- assist;
+- shots;
+- SOT;
+- saves.
+
+Therefore:
+- player-prop backtests are partial/prospective;
+- coverage denominator always reported;
+- market-available subset separated;
+- no extrapolation disguised as full history.
+
+22.3 CLOSING ODDS
+-----------------
+Closing odds may be a useful upper-bound/market-strength benchmark.
+
+They are not valid FPL deadline features unless the closing quote was observed
+before the deadline.
+
+22.4 BETFAIR BASIC
+------------------
+Use as:
+- time-stamped exchange reference;
+- one-minute LTP movement;
+- no-volume research.
+
+Do not use as:
+- full spread/liquidity history;
+- exact executable midpoint;
+- public source.
+
+22.5 RECONSTRUCTED FPL
+----------------------
+Current-vintage historical FPL data:
+- may include corrected fixtures/outcomes;
+- may lack usable_at;
+- must be labelled RECONSTRUCTED;
+- cannot support actual live-performance claims.
+
+22.6 PROSPECTIVE START DATE
+---------------------------
+As soon as Stage 5 technical/rights gates pass:
+- begin snapshots even before the full model exists;
+- never wait for the optimiser;
+- preserve coverage reports;
+- retain failures and missing states.
+
+======================================================================
+23. IDENTITY AND MAPPING
+======================================================================
+
+23.1 CANONICAL ID
+-----------------
+DMFP-03 UUIDs are authoritative.
+
+23.2 PROVIDER MAPPINGS
+----------------------
+Store:
+- provider;
+- product/namespace;
+- entity type;
+- external ID as text;
+- effective interval;
+- source evidence;
+- match method;
+- confidence;
+- review status.
+
+23.3 TEAM/FIXTURE
+-----------------
+Fixture matching uses:
+- competition;
+- teams;
+- scheduled kickoff;
+- season/round;
+- provider event ID;
+- schedule revisions.
+
+Kickoff change does not create a new canonical fixture by itself.
+
+23.4 PLAYER PROPS
+-----------------
+Player match requires:
+- fixture context;
+- team;
+- raw name;
+- provider participant ID where supplied;
+- position/roster evidence;
+- alias mapping.
+
+Name-only ambiguous match:
+BLOCKED/UNRESOLVED.
+
+23.5 OPERATOR VERSUS PROVIDER
+-----------------------------
+The Odds API/API-FOOTBALL are providers.
+Bookmakers/exchanges inside payloads are operators.
+
+Consensus counts independent operators, not duplicate provider rows.
+
+23.6 MAPPING ACCEPTANCE
+-----------------------
+Blocking identities:
+- human verified or deterministic high-confidence approved mapping;
+- no unresolved candidate enters projections/optimiser;
+- corrections append/supersede; never rewrite history.
+
+======================================================================
+24. SETTLEMENT AND MARKET SEMANTICS
+======================================================================
+
+24.1 WHY
+--------
+The same label can differ by:
+- regulation time versus extra time;
+- nonstarter void versus action;
+- stat provider;
+- postponement window;
+- abandoned-match rules;
+- dead heat;
+- assist definition;
+- card definition;
+- shot-on-target definition.
+
+24.2 SETTLEMENT PROFILE
+-----------------------
+- settlement_profile_id;
+- operator;
+- sport/competition;
+- market definition;
+- period;
+- line;
+- stat provider;
+- nonstarter rule;
+- void rule;
+- postponement rule;
+- abandoned rule;
+- extra-time policy;
+- source URL;
+- valid interval;
+- reviewed_at/by;
+- confidence.
+
+24.3 UNKNOWN SETTLEMENT
+-----------------------
+For 1X2:
+- can often be inferred as regulation time only when provider definition is
+  explicit.
+
+For player props:
+- unknown nonstarter/stat semantics materially reduce usability.
+
+Policy:
+- retain raw quote;
+- do not overstate fair probability;
+- block direct training target when label semantics mismatch;
+- use as soft evidence only with explicit uncertainty, if approved.
+
+24.4 PROVIDER GRADING
+---------------------
+Provider result/settlement fields do not replace operator rules unless contract
+states that semantics are harmonised.
+
+======================================================================
+25. FRESHNESS AND QUALITY
+======================================================================
+
+25.1 TIMES
+----------
+At minimum:
+- source_time;
+- request_started_at;
+- received_at;
+- validated_at;
+- mapped_at;
+- usable_at;
+- information_cutoff.
+
+25.2 ELIGIBILITY
+----------------
+Strict decision feature:
+    usable_at <= cutoff
+
+Not:
+    source_time <= cutoff alone.
+
+25.3 FRESHNESS CLASS
+--------------------
+FRESH:
+inside market/source threshold.
+
+AGED:
+usable but confidence reduced.
+
+STALE:
+not usable for the intended decision.
+
+UNKNOWN_AGE:
+blocked for time-critical role.
+
+Thresholds are source/market/deadline-phase configuration and validated
+prospectively.
+
+25.4 SCHEMA QUALITY
+-------------------
+- JSON/content type;
+- required fields;
+- numeric/decimal validity;
+- timezone-aware timestamp;
+- outcome completeness;
+- line consistency;
+- duplicate key;
+- provider error array;
+- quota header;
+- schema fingerprint.
+
+25.5 SEMANTIC QUALITY
+---------------------
+- home/away orientation;
+- event date;
+- competition;
+- operator identity;
+- market period;
+- line;
+- impossible odds;
+- suspended/closed market;
+- player-team mismatch;
+- postdeadline quote;
+- in-play quote in prematch model.
+
+25.6 CROSS-SOURCE
+-----------------
+Compare:
+- fixture existence/time;
+- team mapping;
+- score/result;
+- market direction;
+- injury contradiction;
+- lineup count.
+
+Conflict remains visible.
+
+======================================================================
+26. FAILURE, FALLBACK AND DEGRADATION
+======================================================================
+
+26.1 OFFICIAL FPL UNAVAILABLE
+-----------------------------
+- last healthy state with age;
+- manual official check;
+- block if manager state/deadline/rules uncertain;
+- do not silently use a third party as FPL authority.
+
+26.2 THE ODDS API DOWN/QUOTA LOW
+--------------------------------
+- use last eligible snapshot if fresh enough;
+- API-FOOTBALL secondary if rights-approved;
+- manual targeted quote;
+- market-free prior;
+- label MARKET_DEGRADED;
+- no quota evasion.
+
+26.3 PLAYER PROPS MISSING
+-------------------------
+Normal operation:
+- team-to-player model;
+- wider uncertainty;
+- no zero.
+
+26.4 API-FOOTBALL BLOCKED/DOWN
+------------------------------
+- football-data.org schedule;
+- official manual injury/lineup;
+- historical/public model priors;
+- context confidence reduction.
+
+26.5 FOOTBALL-DATA.ORG DOWN
+---------------------------
+No critical impact if official/API-FOOTBALL sources healthy.
+
+26.6 BETFAIR UNAVAILABLE
+------------------------
+No live blocking impact.
+Historical/exchange diagnostic disabled.
+
+26.7 MANUAL INPUT UNAVAILABLE
+-----------------------------
+- use structured sources/prior;
+- avoid hard claims;
+- escalate critical rule/deadline issue.
+
+26.8 RIGHTS PROFILE EXPIRED
+---------------------------
+- stop new ingestion;
+- prevent export/training;
+- preserve/deal with existing data per prior terms;
+- create compliance alert;
+- reapprove or delete.
+
+26.9 DEGRADATION OUTPUT
+-----------------------
+Must state:
+- missing source;
+- role affected;
+- fallback;
+- snapshot age;
+- coverage impact;
+- confidence change;
+- action restriction;
+- next check.
+
+======================================================================
+27. RIGHTS ENFORCEMENT IN SOFTWARE
+======================================================================
+
+27.1 ADAPTER GATE
+-----------------
+Before network call:
+- account/plan approved;
+- intended purpose approved;
+- rights profile active;
+- geography approved;
+- quota available.
+
+27.2 RAW STORAGE GATE
+---------------------
+Storage policy:
+- ALLOWED_IMMUTABLE;
+- ALLOWED_TTL;
+- HASH_ONLY;
+- VOLATILE_ONLY;
+- FORBIDDEN.
+
+27.3 TRANSFORMATION GATE
+------------------------
+Before probability/model feature creation:
+- transformation approved;
+- training/calibration approved if applicable;
+- descendant licence tags set.
+
+27.4 EXPORT GATE
+----------------
+Before UI/report/download:
+- private display;
+- public display;
+- commercial;
+- attribution;
+- raw/derived;
+- personal-data class.
+
+27.5 BACKUP GATE
+----------------
+Backup is a separate right.
+A source allowed in the operational database is not automatically allowed in an
+offsite backup.
+
+27.6 DELETION
+-------------
+- retention expiry;
+- source/account termination;
+- terms change;
+- rights withdrawal;
+- deletion tombstone;
+- descendant impact analysis;
+- model/decision reproducibility impact.
+
+27.7 NO CODEX LEGAL INFERENCE
+-----------------------------
+Codex implements statuses and gates.
+Codex does not change UNKNOWN to GREEN.
+
+======================================================================
+28. GEOGRAPHY, ACCOUNTS AND SECRETS
+======================================================================
+
+28.1 ACCOUNT REGISTER
+---------------------
+For each:
+- provider;
+- registered user/entity;
+- country;
+- purpose;
+- plan;
+- created_at;
+- accepted terms;
+- key/credential reference;
+- permitted application;
+- renewal/review;
+- status.
+
+28.2 ONE ACCOUNT
+----------------
+One approved account for Pulse per provider unless written provider permission
+states otherwise.
+
+28.3 API KEYS
+-------------
+- secret manager/systemd credential;
+- never URL logs;
+- query parameter stripped for The Odds API traces;
+- rotate on exposure;
+- no repository `.env` in production;
+- no fixture contains real key.
+
+28.4 BETFAIR
+------------
+- KYC/account rules;
+- jurisdiction restrictions;
+- no funded-live-key requirement;
+- no credential sharing;
+- no automated betting.
+
+28.5 PUBLIC MANAGER DATA
+------------------------
+A publicly readable manager endpoint does not remove privacy/terms obligations.
+No mass collection is authorised.
+
+======================================================================
+29. RELIABILITY AND MONITORING
+======================================================================
+
+29.1 SOURCE HEALTH
+------------------
+Track:
+- request success;
+- latency;
+- quota remaining;
+- freshness;
+- schema change;
+- empty coverage;
+- mapping failures;
+- operator count;
+- market count;
+- rights-profile age;
+- status page where available.
+
+29.2 COVERAGE METRICS
+---------------------
+By deadline:
+- expected EPL fixtures;
+- fixtures with 1X2;
+- operators per fixture;
+- totals/BTTS/correct score;
+- player props by market;
+- candidate players quoted;
+- injury/lineup coverage;
+- unresolved IDs.
+
+29.3 NO FALSE SLA
+-----------------
+Free tiers have no accepted SLA unless explicitly documented.
+Availability is measured prospectively.
+
+29.4 TERMS CHANGE
+-----------------
+Critical alert:
+- pricing/free quota changes;
+- historical availability changes;
+- player-prop coverage changes;
+- terms/rights changes;
+- account restrictions;
+- endpoint deprecation.
+
+======================================================================
+30. SOURCE TRIAL AND ACCEPTANCE PROGRAMME
+======================================================================
+
+30.1 PURPOSE
+------------
+No source becomes production-approved from web research alone.
+
+30.2 TRIAL WINDOW
+-----------------
+Minimum preferred:
+- preseason plus at least two representative EPL rounds;
+- include one normal weekend and one congested/midweek context where possible;
+- continue prospective measurement through early season.
+
+30.3 THE ODDS API TRIAL
+-----------------------
+Measure:
+- fixtures discovered;
+- h2h coverage;
+- operators/region;
+- totals/BTTS/correct score;
+- prop availability time;
+- candidate-player coverage;
+- update times;
+- request costs;
+- errors;
+- mapping;
+- terms.
+
+30.4 API-FOOTBALL TRIAL
+-----------------------
+Measure:
+- competition coverage flags;
+- fixtures/revisions;
+- lineup timing/completeness;
+- injuries/sidelined;
+- event/stat completeness;
+- odds operators/markets;
+- seven-day retrieval behavior;
+- quota;
+- rights decision.
+
+30.5 FOOTBALL-DATA.ORG TRIAL
+----------------------------
+Measure:
+- covered competitions;
+- latency/delay;
+- fixture mapping;
+- result corrections;
+- 10/min limit;
+- attribution implementation.
+
+30.6 BETFAIR TRIAL
+------------------
+Only after eligibility:
+- one Basic historical dataset;
+- parser;
+- timestamp mapping;
+- LTP behavior;
+- no-volume fields;
+- personal-use controls.
+
+30.7 MANUAL WORKFLOW TRIAL
+--------------------------
+- rule capture;
+- manager-state entry;
+- injury evidence;
+- manual market;
+- double review;
+- error correction;
+- audit/replay.
+
+30.8 COVERAGE REPORT
+--------------------
+Each source report includes:
+- dates/fixtures;
+- expected denominator;
+- observed numerator;
+- timestamps;
+- rights status;
+- quota cost;
+- mappings;
+- errors;
+- conclusion:
+  ACCEPT / ACCEPT_DEGRADED / RESEARCH_ONLY / BLOCK / REJECT.
+
+======================================================================
+31. IMPLEMENTATION CONTRACT FOR CODEX
+======================================================================
+
+31.1 STAGE BOUNDARY
+-------------------
+DMFP-19 Stage 4:
+- official FPL ingestion only after rights/activation gate;
+- otherwise recorded/synthetic adapter fixtures.
+
+DMFP-19 Stage 5:
+- one odds provider;
+- use The Odds API Free;
+- no API-FOOTBALL requirement;
+- no historical endpoint;
+- no paid code path.
+
+31.2 REQUIRED PROVIDER INTERFACE
+--------------------------------
+Conceptual:
+
+    class SourceClient(Protocol):
+        source_key: SourceKey
+
+        async def fetch(
+            self,
+            request: SourceRequest,
+            *,
+            clock: Clock,
+            quota: QuotaManager,
+            rights: RightsGate,
+        ) -> SourceResponseEnvelope
+
+    class SourceAdapter(Protocol):
+        def parse(self, snapshot: SourceSnapshot) -> list[StagingRecord]
+        def schema_fingerprint(self, snapshot: SourceSnapshot) -> str
+
+31.3 RIGHTS GATE
+----------------
+Must execute before:
+- fetch;
+- persist raw;
+- promote canonical;
+- train/calibrate;
+- backup;
+- export.
+
+31.4 QUOTA MANAGER
+------------------
+Required:
+- period/daily/monthly dimensions;
+- provider header reconciliation;
+- reservation;
+- priority;
+- request cost estimate;
+- retry budget;
+- reset observation;
+- low-quota decision.
+
+31.5 THE ODDS API FIRST TICKET
+------------------------------
+Input:
+- recorded sanitised events/odds payloads;
+- one EPL fixture;
+- one complete h2h book;
+- empty response;
+- 429;
+- malformed outcome;
+- operator duplicate;
+- stale quote.
+
+Output:
+- immutable source snapshot;
+- staging event/operator/market/selection/quote;
+- quota ledger;
+- source timestamps;
+- no canonical name matching inside adapter.
+
+31.6 NO NETWORK UNIT TESTS
+--------------------------
+- unit/property tests use fixtures;
+- live smoke test is separate;
+- CI does not require provider availability;
+- real key never enters test artifacts.
+
+31.7 SAMPLE FIXTURE FAMILIES
+----------------------------
+- `fixtures/sources/the_odds_api/events/epl_valid_v1.json`;
+- `fixtures/sources/the_odds_api/h2h/epl_valid_v1.json`;
+- `fixtures/sources/the_odds_api/player_props/epl_partial_v1.json`;
+- `fixtures/sources/the_odds_api/empty_v1.json`;
+- `fixtures/sources/the_odds_api/malformed_v1.json`;
+- `fixtures/sources/api_football/coverage/epl_v1.json`;
+- `fixtures/sources/api_football/lineups/epl_v1.json`;
+- `fixtures/sources/football_data_org/pl_matches_v1.json`;
+- `fixtures/sources/betfair/basic_soccer_v1.tar.fixture`;
+- manual evidence fixtures.
+
+31.8 CONTRACT TESTS
+-------------------
+- endpoint/request construction;
+- API key redaction;
+- decimal odds;
+- timestamps;
+- event/operator separation;
+- response error array;
+- quota headers;
+- empty no-cost semantics where relevant;
+- idempotent replay;
+- rights block;
+- raw-storage-forbidden flow;
+- mapping unresolved;
+- postcutoff exclusion.
+
+31.9 ACCEPTANCE COMMANDS
+------------------------
+Suggested:
+    dmf source rights validate
+    dmf source quota show the_odds_api
+    dmf source replay the_odds_api --fixture ...
+    dmf source coverage report --source the_odds_api
+    dmf source smoke the_odds_api --no-persist
+    dmf research blockers --module DMFP-04
+
+31.10 STOP CONDITIONS
+---------------------
+Codex stops and reports when:
+- rights status is UNKNOWN for requested action;
+- a paid endpoint is needed;
+- quota cost cannot be determined;
+- target field semantics conflict;
+- provider ID is ambiguous;
+- raw fixture retention is not permitted;
+- source terms differ from approved profile.
+
+======================================================================
+32. MACHINE-READABLE SOURCE REGISTRY
+======================================================================
+
+32.1 SOURCE KEYS
+----------------
+- `official_fpl_reference`;
+- `the_odds_api_free`;
+- `api_football_free`;
+- `football_data_org_free`;
+- `betfair_historical_basic`;
+- `betfair_delayed_disabled`;
+- `football_data_uk_reconstructed`;
+- `official_manual_evidence`;
+- `statsbomb_open_data`;
+- `vaastav_fpl_history`;
+- `open_meteo_free`;
+- `manual_odds_capture`.
+
+32.2 SOURCE CONFIG
+------------------
+Example:
+
+source:
+  key: "the_odds_api_free"
+  status: "PROVISIONAL"
+  cost_policy: "ZERO_ONLY"
+  account_plan: "Starter Free"
+  quota:
+    period: "MONTH"
+    hard_limit: 500
+    emergency_reserve: 100
+    cost_model: "MARKETS_X_REGIONS"
+  rights_profile: "RIGHTS-THEODDSAPI-2026-001"
+  provider_type: "ODDS_AGGREGATOR"
+  stores_raw: "ALLOWED_TTL_PENDING_REVIEW"
+  public_export: false
+  enabled_roles:
+    - "CURRENT_1X2"
+    - "CURRENT_TEAM_MARKETS"
+    - "SELECTED_PLAYER_PROPS"
+  disabled_roles:
+    - "HISTORICAL_ODDS"
+  review_due: "2026-10-18"
+
+32.3 COVERAGE RECORD
+--------------------
+- source;
+- competition;
+- season;
+- feature;
+- documented;
+- observed;
+- numerator/denominator;
+- date range;
+- plan/account;
+- geography;
+- confidence;
+- evidence.
+
+======================================================================
+33. PROVIDER/SOURCE DECISION MATRIX
+======================================================================
+
+Ratings:
+STRONG / ADEQUATE / WEAK / UNKNOWN / NOT_APPLICABLE.
+
+Source                     Cost   Current odds   Player props   Context   History   Rights certainty   Decision
+----------------------------------------------------------------------------------------------------------------
+Official FPL/PL            £0     N/A            N/A            FPL       FPL       WEAK/AMBER         CONDITIONAL AUTHORITY
+The Odds API Free          £0     STRONG         PARTIAL        EVENTS    NONE       ADEQUATE/AMBER     PRIMARY MARKETS
+API-FOOTBALL Free          £0     ADEQUATE       UNKNOWN        STRONG    7-DAY ODDS WEAK/AMBER         CONDITIONAL SECONDARY
+football-data.org Free     £0     NONE           NONE           ADEQUATE  LIMITED    ADEQUATE/AMBER     SECONDARY FIXTURES
+Betfair Basic Historical   £0     NONE           NONE           N/A       ADEQUATE   PERSONAL_ONLY      OPTIONAL RESEARCH
+Betfair Delayed            £0*    DELAYED        LIMITED        N/A       N/A        UNKNOWN PURPOSE    DISABLED
+football-data.co.uk        £0     NONE           NONE           RESULTS   ADEQUATE   WEAK/AMBER         RESEARCH CANDIDATE
+Official manual evidence   £0     MANUAL         MANUAL         STRONG    MANUAL     SOURCE-SPECIFIC    SELECTED
+StatsBomb Open Data        £0     NONE           NONE           RESEARCH  ADEQUATE   ADEQUATE            RESEARCH
+Vaastav FPL history        £0     NONE           NONE           FPL HIST  ADEQUATE   UNDERLYING AMBER    RESEARCH
+Open-Meteo Free            £0     NONE           NONE           WEATHER   LIMITED    STRONG/ATTRIBUTION  OPTIONAL
+Manual odds capture        £0     WEAK/TARGETED  WEAK/TARGETED  N/A       MANUAL     SOURCE-SPECIFIC     EMERGENCY
+
+* Betfair Delayed remains disabled and is not treated as an available production
+  source merely because the provider charges no development fee.
+
+======================================================================
+34. SOURCE REGISTER
+======================================================================
+
+Access/research date unless noted:
+18 July 2026.
+
+SRC-PL-TERMS-2026-001
+Title:
+Premier League Terms of Use
+URL:
+https://www.premierleague.com/en/terms-and-conditions
+Relevant claim:
+Reasonable private/personal use is permitted, but other reproduction,
+re-utilisation or redistribution, including creating a database from Website/App
+material, requires prior written approval.
+Reliability:
+CONTROLLING PUBLIC TERMS.
+Pulse reliance:
+YES — blocks assumption that undocumented FPL interfaces are open data.
+Refresh:
+Before FPL launch, quarterly and on terms change.
+
+SRC-THEODDS-PRICING-2026-001
+Title:
+The Odds API — Plans / Home
+URL:
+https://the-odds-api.com/
+Relevant claim:
+Starter is free with 500 credits/month; current sports/markets available;
+historical odds excluded from free.
+Reliability:
+OFFICIAL CURRENT PRICING.
+Pulse reliance:
+YES.
+Refresh:
+Monthly during implementation; quarterly in season.
+
+SRC-THEODDS-EPL-2026-001
+Title:
+EPL Odds API
+URL:
+https://the-odds-api.com/sports-odds-data/epl-odds.html
+Relevant claim:
+`soccer_epl`, regions, current EPL event and h2h request structure.
+Reliability:
+OFFICIAL DOCUMENTATION.
+Pulse reliance:
+YES.
+
+SRC-THEODDS-MARKETS-2026-001
+Title:
+List of API Betting Markets
+URL:
+https://the-odds-api.com/sports-odds-data/betting-markets.html
+Relevant claim:
+EPL soccer player props and their market keys; props currently limited to US
+bookmakers; BTTS/correct-score and other soccer markets.
+Reliability:
+OFFICIAL DOCUMENTATION.
+Pulse reliance:
+YES.
+
+SRC-THEODDS-DOCS-2026-001
+Title:
+Odds API Documentation V4
+URL:
+https://the-odds-api.com/liveapi/guides/v4/
+Relevant claim:
+quota formula, free events endpoint, response quota headers, event odds behavior,
+historical endpoint conditions.
+Reliability:
+OFFICIAL TECHNICAL DOCUMENTATION.
+Pulse reliance:
+YES.
+
+SRC-THEODDS-TERMS-2026-001
+Title:
+The Odds API Terms and Conditions
+URL:
+https://the-odds-api.com/terms-and-conditions.html
+Relevant claim:
+no standalone resale/repackaging/redistribution; analytical applications are
+supported when data are not the primary product; accuracy/timeliness disclaimer.
+Reliability:
+CONTROLLING PUBLIC TERMS.
+Pulse reliance:
+YES.
+Open issue:
+raw retention/training clarification.
+
+SRC-APIFOOTBALL-PRICING-2026-001
+Title:
+API-FOOTBALL Pricing
+URL:
+https://www.api-football.com/pricing
+Relevant claim:
+free £0/US$0 plan, 100 requests/day, no card, all endpoint families, free season
+limits.
+Reliability:
+OFFICIAL PRICING.
+Pulse reliance:
+YES.
+
+SRC-APIFOOTBALL-RATE-2026-001
+Title:
+How Rate Limit Works
+URL:
+https://www.api-football.com/news/post/how-ratelimit-works
+Relevant claim:
+free 10 requests/minute and quota headers.
+Reliability:
+OFFICIAL PROVIDER GUIDANCE.
+Pulse reliance:
+YES.
+
+SRC-APIFOOTBALL-DOCS-2026-001
+Title:
+API-FOOTBALL Documentation
+URL:
+https://www.api-football.com/documentation-v3
+Relevant claim:
+endpoint schemas, coverage flags and lineup availability timing.
+Reliability:
+OFFICIAL TECHNICAL DOCUMENTATION.
+Pulse reliance:
+YES.
+
+SRC-APIFOOTBALL-ODDSHISTORY-2026-001
+Title:
+How to Get Started with API-FOOTBALL
+URL:
+https://www.api-football.com/news/post/how-to-get-started-with-api-football-the-complete-beginners-guide
+Relevant claim:
+free plan access and seven-day odds-history limit.
+Reliability:
+OFFICIAL PROVIDER GUIDANCE.
+Pulse reliance:
+YES.
+
+SRC-APISPORTS-TERMS-2026-001
+Title:
+API-SPORTS Terms of Service
+URL:
+https://api-sports.io/terms
+Relevant claim:
+provider does not grant a licence for use/publication of underlying data; users
+must obtain permissions from competent rights holders.
+Reliability:
+CONTROLLING PUBLIC TERMS.
+Pulse reliance:
+YES — source remains rights-conditional.
+
+SRC-FDO-PRICING-2026-001
+Title:
+football-data.org Pricing
+URL:
+https://www.football-data.org/pricing
+Relevant claim:
+Free Plan is free forever; coverage depends on competition/data point.
+Reliability:
+OFFICIAL PRICING.
+Pulse reliance:
+YES.
+
+SRC-FDO-DOCS-2026-001
+Title:
+football-data.org API Reference / Policies
+URLs:
+https://www.football-data.org/documentation/api
+https://docs.football-data.org/general/v4/policies.html
+Relevant claim:
+registered free clients receive 10 requests/minute; REST resources and fields.
+Reliability:
+OFFICIAL DOCUMENTATION.
+Pulse reliance:
+YES.
+
+SRC-FDO-TERMS-2026-001
+Title:
+football-data.org Registration Terms
+URL:
+https://www.football-data.org/client/register
+Relevant claim:
+account/application conditions and fair-use requirements.
+Reliability:
+CONTROLLING PUBLIC TERMS.
+Pulse reliance:
+YES.
+
+SRC-FDO-ATTRIBUTION-2026-001
+Title:
+football-data.org FAQ
+URL:
+https://www.football-data.org/documentation/faq
+Relevant claim:
+visible attribution requested: "Data provided by football-data.org".
+Reliability:
+OFFICIAL.
+Pulse reliance:
+YES.
+
+SRC-BETFAIR-DELAYED-2026-001
+Title:
+When should I use the Delayed or Live Application Key?
+URL:
+https://support.developer.betfair.com/hc/en-us/articles/360009638032-When-should-I-use-the-Delayed-or-Live-Application-Key
+Relevant claim:
+Delayed key is for development/testing; variable 1–180 second snapshots;
+historical data for testing/analysis.
+Reliability:
+OFFICIAL.
+Pulse reliance:
+YES.
+
+SRC-BETFAIR-COST-2026-001
+Title:
+Are there any costs associated with API access?
+URL:
+https://support.developer.betfair.com/hc/en-us/articles/115003864531-Are-there-any-costs-associated-with-API-access
+Relevant claim:
+Delayed development access conditions; paid live key; read-only live key not
+permitted.
+Reliability:
+OFFICIAL.
+Pulse reliance:
+YES — rejects live key.
+
+SRC-BETFAIR-HIST-TERMS-2026-001
+Title:
+Betfair Historical Data
+URL:
+https://historicdata.betfair.com/
+Relevant claim:
+Personal Use Only.
+Reliability:
+CONTROLLING SITE TERMS.
+Pulse reliance:
+YES.
+
+SRC-BETFAIR-HIST-BASIC-2026-001
+Title:
+Using the Historic Data Site
+URL:
+https://betfair-datascientists.github.io/data/usingHistoricDataSite/
+Relevant claim:
+free Basic tier, one-minute last traded price, no volume/full ladder.
+Reliability:
+OFFICIAL BETFAIR DATA-SCIENTIST GUIDANCE.
+Pulse reliance:
+YES.
+
+SRC-FDUK-DATA-2026-001
+Title:
+Football-Data.co.uk Historical Data
+URL:
+https://www.football-data.co.uk/data.php
+Relevant claim:
+31 seasons results, 26 seasons odds/statistics, free downloadable files and
+collection descriptions.
+Reliability:
+SOURCE SITE.
+Pulse reliance:
+RESEARCH CANDIDATE.
+Open issue:
+reuse/training licence.
+
+SRC-FDUK-DISCLAIMER-2026-001
+Title:
+Football-Data.co.uk / Liability Disclaimer
+URL:
+https://www.football-data.co.uk/
+Relevant claim:
+free portal, all rights reserved, accuracy/liability limitation.
+Reliability:
+SOURCE SITE.
+Pulse reliance:
+YES for limitations.
+
+SRC-STATSBOMB-OPEN-2026-001
+Title:
+StatsBomb Open Data
+URL:
+https://github.com/statsbomb/open-data
+Relevant claim:
+selected competitions freely available for research and genuine football
+analytics; repository contains licence guidance.
+Reliability:
+OFFICIAL SOURCE REPOSITORY.
+Pulse reliance:
+RESEARCH ONLY.
+
+SRC-VAASTAV-2026-001
+Title:
+Fantasy-Premier-League Historical Repository
+URL:
+https://github.com/vaastav/Fantasy-Premier-League
+Relevant claim:
+weekly updates stopped after 2024/25; three major updates per later season.
+Reliability:
+SOURCE REPOSITORY.
+Pulse reliance:
+RECONSTRUCTED RESEARCH.
+
+SRC-OPENMETEO-2026-001
+Title:
+Open-Meteo Free API / Terms / Licence
+URLs:
+https://open-meteo.com/
+https://open-meteo.com/en/terms
+https://open-meteo.com/en/licence
+Relevant claim:
+non-commercial free access below limits; no key/card; CC BY 4.0 data and
+attribution.
+Reliability:
+OFFICIAL.
+Pulse reliance:
+OPTIONAL.
+
+SRC-INTERNAL-DMFP20-2026-001
+Title:
+DMFP-20 — Assumptions, Decisions and Open Questions
+Relevant claim:
+zero-paid-subscription core, market-anchored strategy, initial source stack and
+no circumvention.
+Reliability:
+INTERNAL ARCHITECTURE AUTHORITY AFTER APPROVAL.
+Pulse reliance:
+YES.
+
+======================================================================
+35. RISK REGISTER
+======================================================================
+
+R-04-001 — Premier League database restriction
+Probability: High under public terms.
+Impact: Critical.
+Mitigation: permission/legal review; manual/reduced-retention design; no public mirror.
+
+R-04-002 — FPL interface changes
+Probability: High across seasons.
+Impact: Critical.
+Mitigation: target-season schema capture; adapters; fail closed.
+
+R-04-003 — The Odds API quota insufficient
+Probability: Medium.
+Impact: High.
+Mitigation: one region, priority markets, 20% reserve, event endpoint, targeted props.
+
+R-04-004 — The Odds API free plan changes
+Probability: Medium.
+Impact: High.
+Mitigation: quarterly terms/pricing check; market-free fallback; no lock-in.
+
+R-04-005 — EPL props absent
+Probability: High for many fixtures/players.
+Impact: Medium.
+Mitigation: props optional; own allocation model.
+
+R-04-006 — Props only from US bookmakers
+Probability: High/currently documented.
+Impact: Medium.
+Mitigation: US region targeted; operator/settlement calibration; no completeness claim.
+
+R-04-007 — API-FOOTBALL underlying rights unresolved
+Probability: High.
+Impact: Critical for persistence/publication.
+Mitigation: Rights Profile; written clarification; private-only/block.
+
+R-04-008 — API-FOOTBALL quota exhaustion
+Probability: Medium.
+Impact: Medium.
+Mitigation: 20-call reserve; coverage-first; postmatch batching; no live polling.
+
+R-04-009 — API-FOOTBALL seven-day odds loss
+Probability: High/documented.
+Impact: High for history.
+Mitigation: prospective snapshots; no backfill assumption.
+
+R-04-010 — football-data.org delay
+Probability: Medium.
+Impact: Low/Medium.
+Mitigation: secondary only; timestamps; official source hierarchy.
+
+R-04-011 — Betfair purpose/account ineligible
+Probability: Medium.
+Impact: Low for live, Medium research.
+Mitigation: optional; disable; no production dependency.
+
+R-04-012 — Betfair Basic lacks volume/ladder
+Probability: Certain.
+Impact: Medium.
+Mitigation: do not model liquidity from it; explicit field grade.
+
+R-04-013 — football-data.co.uk reuse rights unclear
+Probability: High.
+Impact: High for research.
+Mitigation: permission; research-only; replace with own history if unresolved.
+
+R-04-014 — official manual evidence missed
+Probability: Medium.
+Impact: High for candidate player.
+Mitigation: checklist, alerts, multiple source watch, uncertainty.
+
+R-04-015 — manual transcription error
+Probability: Medium.
+Impact: High.
+Mitigation: typed schema, range checks, reviewer, immutable correction.
+
+R-04-016 — player identity mismatch
+Probability: Medium.
+Impact: Critical.
+Mitigation: DMFP-03 mappings; fixture/team context; block ambiguity.
+
+R-04-017 — fixture revision mismatch
+Probability: Medium.
+Impact: Critical.
+Mitigation: canonical fixture revisions; source hierarchy; alerts.
+
+R-04-018 — settlement mismatch
+Probability: High for props.
+Impact: High.
+Mitigation: settlement profiles; soft evidence/block.
+
+R-04-019 — source timestamp absent
+Probability: Medium.
+Impact: High.
+Mitigation: received/usable time; lower confidence; no strict history claim.
+
+R-04-020 — terms change silently
+Probability: Medium.
+Impact: Critical.
+Mitigation: term hashes/review; stale rights block.
+
+R-04-021 — raw storage not permitted
+Probability: Medium/High.
+Impact: High for reproducibility.
+Mitigation: volatile/hash-only flow; derived artifact; explicit limitation.
+
+R-04-022 — public/commercial scope creep
+Probability: Medium.
+Impact: Critical.
+Mitigation: export gate; new purpose review; private-only default.
+
+R-04-023 — free data outage at deadline
+Probability: Medium.
+Impact: High.
+Mitigation: reserved snapshots, manual fallback, market-free model, fail/degrade.
+
+R-04-024 — opening/closing data used as deadline truth
+Probability: Medium.
+Impact: Critical scientific bias.
+Mitigation: dataset modes; usable_at checks; review tests.
+
+R-04-025 — current corrected history leaks backward
+Probability: Medium.
+Impact: Critical.
+Mitigation: immutable deadline bundles; modes; mapping vintages.
+
+R-04-026 — quota retry storm
+Probability: Medium.
+Impact: High.
+Mitigation: quota-aware retry; 429 no blind retry; reservations.
+
+R-04-027 — secret leakage in URL/log
+Probability: Medium.
+Impact: High.
+Mitigation: redaction, query stripping, golden fake-secret tests.
+
+R-04-028 — provider prediction contaminates champion
+Probability: Medium.
+Impact: Medium/High.
+Mitigation: benchmark-only feature flag; independent evaluation.
+
+R-04-029 — competition context incomplete
+Probability: High.
+Impact: Medium/High.
+Mitigation: official manual schedule; wider rotation uncertainty.
+
+R-04-030 — zero-cost architecture underperforms paid benchmark
+Probability: Unknown.
+Impact: Medium.
+Mitigation: honest benchmark; no paid dependency; revisit only through ADR.
+
+======================================================================
+36. PRODUCTION ACCEPTANCE CRITERIA
+======================================================================
+
+36.1 ECONOMIC
+-------------
+[ ] No active paid subscription.
+[ ] No paid historical package.
+[ ] No live-key activation fee.
+[ ] No compulsory betting activity.
+[ ] No paid scraper/proxy.
+[ ] No multi-account quota design.
+[ ] Source cost manifest totals £0.
+
+36.2 RIGHTS
+-----------
+[ ] Rights Profile exists for every active source.
+[ ] Intended private purpose is approved.
+[ ] Raw/canonical/training/backup/export are separately classified.
+[ ] Unknown rights block the affected operation.
+[ ] Premier League database issue is resolved or architecture is reduced accordingly.
+[ ] API-FOOTBALL underlying rights are resolved before persistent production use.
+[ ] Attribution obligations are implemented.
+[ ] Public/commercial export remains disabled.
+[ ] Deletion/termination process exists.
+
+36.3 TECHNICAL
+--------------
+[ ] The Odds API event and h2h calls work.
+[ ] Quota cost/header reconciliation passes.
+[ ] Monthly reserve is enforced.
+[ ] API keys are redacted.
+[ ] Empty/429/5xx/malformed cases pass.
+[ ] Canonical provider/operator/event/market IDs are separated.
+[ ] Decimal odds preserved.
+[ ] Source/received/usable times stored.
+
+36.4 COVERAGE
+-------------
+[ ] Expected EPL fixture denominator defined.
+[ ] 1X2 coverage measured.
+[ ] Operators per fixture measured.
+[ ] team-market coverage measured.
+[ ] player-prop coverage reported by market/player/time.
+[ ] missing props do not block baseline.
+[ ] competition-context coverage measured.
+[ ] identity unresolved rate reported.
+
+36.5 TEMPORAL
+-------------
+[ ] `usable_at <= cutoff` enforced.
+[ ] postdeadline lineups excluded from predeadline features.
+[ ] later odds excluded.
+[ ] current-vintage/reconstructed data labelled.
+[ ] deadline bundle immutable.
+[ ] provider corrections do not rewrite history.
+
+36.6 FALLBACK
+-------------
+[ ] Manual manager-state workflow tested.
+[ ] Manual official rule/deadline workflow tested.
+[ ] Market-free baseline runs.
+[ ] player-prop-missing path runs.
+[ ] API-FOOTBALL unavailable path runs.
+[ ] quota-low path runs.
+[ ] rights-expired path blocks correctly.
+
+36.7 HISTORICAL
+---------------
+[ ] Prospective snapshot process active.
+[ ] no paid historical endpoint.
+[ ] Betfair Basic, if used, is personal-research only.
+[ ] football-data.co.uk rows are reconstructed.
+[ ] no complete historical prop claim.
+[ ] coverage grade accompanies every backtest.
+
+36.8 IMPLEMENTATION
+-------------------
+[ ] Recorded sanitised fixtures exist.
+[ ] no unit test uses Internet.
+[ ] live smoke test is separate.
+[ ] no hidden later-stage model.
+[ ] evidence manifest records source/terms hashes.
+[ ] independent review returns ACCEPT or ACCEPT_WITH_ACTIONS.
+
+======================================================================
+37. IMMEDIATE ACTIONS
+======================================================================
+
+1. Sebastian approves DMFP-04 v1.0 as the zero-cost provider architecture.
+2. Amend DMFP-20 ADR-SRC-003 wording/status if needed to reflect:
+   - The Odds API as primary market feed;
+   - API-FOOTBALL as rights-conditional;
+   - football-data.org as secondary;
+   - Betfair Delayed disabled by default;
+   - Premier League database rights as a blocker.
+3. Create machine-readable Rights Profiles for:
+   - official FPL/PL;
+   - The Odds API;
+   - API-FOOTBALL;
+   - football-data.org;
+   - Betfair Basic;
+   - football-data.co.uk;
+   - StatsBomb Open;
+   - Open-Meteo.
+4. Contact the Premier League/FPL for written clarification on private automated
+   access, caching, storage, derived modelling and historical reproducibility.
+5. Contact API-SPORTS for written clarification on private internal storage,
+   transformation, model training and backup.
+6. Contact The Odds API about raw snapshot retention and model training.
+7. Register one free The Odds API account for Pulse.
+8. Register one free API-FOOTBALL account, but do not persist production data
+   until rights approval.
+9. Register one football-data.org free application and implement attribution.
+10. Confirm Betfair account/jurisdiction eligibility; keep disabled if unclear.
+11. Start The Odds API preseason coverage/quota spike.
+12. Create sanitised provider fixtures.
+13. Implement RightsGate and QuotaManager before live adapters.
+14. Begin prospective snapshots immediately after acceptance.
+15. Run a manual deadline rehearsal before relying on free APIs.
+
+======================================================================
+38. OPEN QUESTIONS
+======================================================================
+
+OQ-04-001 — Premier League/FPL persistence
+Does prior written approval or another lawful basis permit Pulse to create the
+private, time-stamped FPL database required by DMFP-03/05?
+
+Priority:
+BLOCKING STAGE 4 PRODUCTION.
+
+OQ-04-002 — Minimal FPL retention
+If full raw persistence is not permitted, which minimal facts/hashes/short-lived
+cache can be retained while preserving enough reproducibility?
+
+Priority:
+BLOCKING ARCHITECTURE.
+
+OQ-04-003 — The Odds API retention/training
+May Pulse indefinitely retain private raw snapshots and use them to calibrate
+models under the free plan?
+
+Priority:
+HIGH.
+
+OQ-04-004 — The Odds API 2026/27 coverage
+What EPL 1X2/team/player markets and operators are actually present at each FPL
+deadline?
+
+Priority:
+HIGH / PROSPECTIVE.
+
+OQ-04-005 — Quota policy
+What snapshot cadence maximises decision value inside 500 monthly credits?
+
+Priority:
+HIGH.
+
+OQ-04-006 — API-FOOTBALL rights
+What private internal storage, transformation, model-training and backup rights
+are permitted, and which competent rights holder permissions are required?
+
+Priority:
+BLOCKING FOR SOURCE.
+
+OQ-04-007 — API-FOOTBALL coverage
+Are EPL, cups and UEFA competitions available with required features on the free
+2026/27 season?
+
+Priority:
+HIGH.
+
+OQ-04-008 — football-data.org scope
+Which current competition/features are in Free Plan, how delayed are they, and
+what retention/public-use rights apply?
+
+Priority:
+MEDIUM.
+
+OQ-04-009 — Betfair use
+Is Delayed API access permitted for Sebastian's private non-betting analytics,
+and may Basic historical derived research be retained for season evaluation?
+
+Priority:
+BLOCKING FOR BETFAIR ONLY.
+
+OQ-04-010 — football-data.co.uk rights
+May the downloadable CSVs be stored and used for private model training and
+retained reproducibility?
+
+Priority:
+HIGH FOR HISTORICAL RESEARCH.
+
+OQ-04-011 — Props
+Which prop settlement profiles can be mapped reliably across US operators?
+
+Priority:
+HIGH.
+
+OQ-04-012 — Manager state
+What lawful, low-friction manual/read-only method confirms Sebastian's current
+squad, prices, FT and chips?
+
+Priority:
+BLOCKING PRODUCTION.
+
+OQ-04-013 — Public DMF future
+Which derived outputs can later be displayed commercially without relicensing
+or exposing source data?
+
+Priority:
+DEFERRED / NEW PURPOSE.
+
+OQ-04-014 — Source-value ablation
+How much decision value comes from:
+- The Odds API;
+- API-FOOTBALL context;
+- player props;
+- exchange research;
+relative to the free baseline?
+
+Priority:
+DMFP-15 PROMOTION.
+
+======================================================================
+39. REQUIRED DMFP-20 ALIGNMENT
+======================================================================
+
+39.1 ADR-SRC-001
+----------------
+No change:
+The rewrite fully implements the zero-paid-subscription core.
+
+39.2 ADR-SRC-002
+----------------
+No change:
+The rewrite explicitly makes player props optional and retains team-to-player
+allocation.
+
+39.3 ADR-SRC-003
+----------------
+Recommended clarification:
+- The Odds API Free is PRIMARY CURRENT MARKET SOURCE.
+- Official FPL/PL is an AUTHORITATIVE BUT RIGHTS-CONDITIONAL source.
+- API-FOOTBALL Free is TECHNICALLY SELECTED BUT RIGHTS-CONDITIONAL.
+- football-data.org Free is SECONDARY FIXTURE/RESULT CROSS-CHECK.
+- Betfair Basic is OPTIONAL PERSONAL RESEARCH.
+- Betfair Delayed is DISABLED until purpose/account approval.
+- football-data.co.uk is RECONSTRUCTED RESEARCH pending rights.
+- manual capture is first-class.
+
+This is a clarification based on stronger terms review, not a return to a paid
+stack.
+
+39.4 ADR-SRC-004
+----------------
+No change:
+All quota/account/geographic circumvention remains prohibited.
+
+39.5 ASSUMPTIONS
+----------------
+ASM-SRC-001 should explicitly recognise the Premier League database restriction.
+
+ASM-SRC-002 should separate API-FOOTBALL technical coverage from underlying
+rights.
+
+ASM-SRC-003 remains valid but props are explicitly noncritical.
+
+ASM-SRC-004 should distinguish:
+- free Basic Historical Personal Use;
+- Delayed development-key eligibility.
+
+39.6 NEW WEAKNESS
+-----------------
+Recommended:
+WEAK-SRC-003 — Official FPL is authoritative but public terms do not presently
+grant a clear right to create the persistent private database assumed by the
+architecture.
+
+39.7 NEW OPEN QUESTIONS
+------------------------
+Add OQ-04-001 through OQ-04-010 or link them from the DMFP-20 source section.
+
+======================================================================
+40. VERSION HISTORY
+======================================================================
+
+v1.0 — 2026-07-18
+
+- Replaced the paid-provider procurement baseline.
+- Enforced DMFP-20's zero-paid-subscription decision.
+- Selected The Odds API Free as primary market feed.
+- Made player props optional and market-anchored allocation explicit.
+- Classified API-FOOTBALL as technically useful but rights-conditional.
+- Added football-data.org as a free fixture/result cross-check.
+- Limited Betfair to optional free Basic personal research; disabled paid/live.
+- Added football-data.co.uk as reconstructed research pending rights.
+- Added official structured manual evidence, StatsBomb Open, Vaastav and
+  Open-Meteo roles.
+- Added atomic Rights Profiles, quota management, cadence, source matrix,
+  historical modes, fallbacks, Codex contract, source register, risks,
+  acceptance tests and open questions.
+- Identified the Premier League database restriction as a critical rights gate.
+- Set selected data-source spend to exactly £0.
+
+END OF DOCUMENT

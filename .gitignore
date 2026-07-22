@@ -1,0 +1,54 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+auth.json
+*.pem
+*.key
+
+# Python and tools
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+.venv/
+venv/
+
+# Builds
+build/
+dist/
+site/
+
+# Private data, large artifacts, models, and logs
+data/
+artifacts/*
+!artifacts/.gitkeep
+models/
+checkpoints/
+backups/
+logs/
+*.parquet
+*.pickle
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated review output
+review_pack/

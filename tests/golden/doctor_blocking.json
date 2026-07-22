@@ -1,0 +1,36 @@
+{
+  "artifact_root": {
+    "basis": "configuration_invalid",
+    "cleaned_up": true,
+    "error_code": null,
+    "status": "NOT_CHECKED",
+    "writable": null
+  },
+  "config": {
+    "environment": "development",
+    "error_code": "CONFIG_VALIDATION_FAILED",
+    "source": "repository",
+    "status": "BLOCKING"
+  },
+  "nvidia": {
+    "blocking": false,
+    "device_count": null,
+    "status": "UNAVAILABLE"
+  },
+  "package_version": "0.1.0",
+  "python": {
+    "compatible": false,
+    "required_minor": "3.13",
+    "version": "3.12.0"
+  },
+  "schema_version": "1.0",
+  "status": "BLOCKING",
+  "system": {
+    "architecture": "x",
+    "operating_system": "TestOS",
+    "platform": "test-platform",
+    "python_implementation": "CPython"
+  },
+  "tools": {},
+  "utc_time": "2026-01-01T00:00:00Z"
+}

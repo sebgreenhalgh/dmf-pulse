@@ -1,0 +1,4012 @@
+DMF PULSE — SQUAD, TRANSFER AND LINEUP OPTIMISER
+================================================
+
+Document ID: DMFP-12
+Version: 0.9 (Central Multistage Decision Engine)
+Status: PROPOSED — TARGET-SEASON RULE ACTIVATION AND SOLVER ACCEPTANCE REQUIRED
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Reference ruleset: Fantasy Premier League 2025/26, REFERENCE_ONLY
+Research cut-off: 17 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Upstream inputs:
+- DMFP-02 FPL rules, squad constraints and season configuration
+- DMFP-03 canonical players, squads, transfers, decisions and ownership spells
+- DMFP-05 deadline bundles and data-quality state
+- DMFP-07 availability, lineup and minutes distributions
+- DMFP-09 full player/Gameweek points scenarios
+- DMFP-10 uncertainty, robust regret, scenario trees and terminal-value policy
+- DMFP-11 price, selling-value and ACT-versus-WAIT distributions
+
+Downstream consumers:
+- DMFP-13 captaincy and chip optimiser
+- DMFP-14 rank, effective ownership and risk strategy
+- DMFP-15 backtesting, calibration and benchmarks
+- DMFP-16 orchestration and decision pipeline
+- DMFP-18 decision UI, explanations and reports
+
+PURPOSE
+-------
+This document defines the central DMF Pulse decision engine.
+
+It selects and explains:
+
+- squad composition;
+- transfers in and out;
+- transfer timing;
+- number of transfers;
+- use or preservation of free transfers;
+- transfer hits;
+- bank;
+- buying and selling prices;
+- starting XI;
+- legal formation;
+- goalkeeper and outfield bench;
+- bench order;
+- captain;
+- vice-captain;
+- future squad paths;
+- future lineup recourse;
+- price and affordability paths;
+- injury/rotation protection;
+- fixture postponement responses;
+- future flexibility;
+- rolling re-optimisation.
+
+The engine must return more than one answer:
+
+- recommended_plan;
+- conservative_plan;
+- high_upside_plan;
+- no_transfer_baseline;
+- marginal_value_of_each_move;
+- reasons;
+- confidence.
+
+It must also return:
+
+- solver status and optimality gap;
+- assumptions and binding constraints;
+- scenario/uncertainty sensitivity;
+- expected and robust utility;
+- points, price and flexibility decomposition;
+- alternative transfer timing;
+- action-switch thresholds;
+- full current-Gameweek tactical plan;
+- future contingent policy.
+
+The optimiser is not a static "best XV" generator.
+
+It is a sequential decision system for a game where:
+
+- transfers alter future squads;
+- free transfers accumulate;
+- buying and selling prices are path dependent;
+- players can be injured or rotated;
+- fixtures move;
+- blanks and doubles appear;
+- new information arrives;
+- the manager can re-optimise every deadline;
+- current choices preserve or destroy future options.
+
+GOVERNING PRINCIPLE
+-------------------
+Pulse optimises the complete manager state, not a list of player projections.
+
+The selected architecture is:
+
+    EXACT RULE CONSTRAINTS
+    + JOINT PLAYER-POINT SCENARIOS
+    + MULTISTAGE TRANSFER RECOURSE
+    + ROLLING-HORIZON MODEL PREDICTIVE CONTROL
+    + ROBUST REGRET AND FLEXIBILITY VALUE
+    + EXACT CURRENT-GAMEWEEK TACTICAL EVALUATION
+
+The optimiser MUST NOT:
+
+- select transfers using only one-Gameweek expected points;
+- treat buying price and selling price as identical;
+- ignore purchase-price history;
+- approximate bench value as the fourth-highest mean only;
+- ignore automatic substitutions;
+- choose captain independently of vice-captain fallback;
+- ignore player correlations;
+- add price value after transfer selection;
+- assume fixtures cannot be postponed;
+- spend free transfers merely because they exist;
+- roll transfers merely because rolling feels safe;
+- hide a solver failure behind a plausible-looking plan;
+- return one answer without decision alternatives and sensitivity.
+
+CRITICAL PRE-LAUNCH STATUS
+--------------------------
+The 2026/27 FPL game had not launched at the research cut-off.
+
+Official Premier League material said the new FPL game would launch later in the
+summer.
+
+Therefore:
+
+1. All 2025/26 squad, transfer, chip, deadline and free-transfer values are
+   REFERENCE_ONLY.
+2. DMFP-12 receives every rule from the ACTIVE DMFP-02 ruleset.
+3. Production is blocked until:
+   - target player catalogue and positions exist;
+   - squad/budget/club constraints are verified;
+   - free-transfer transitions are verified;
+   - selling-price rules are verified;
+   - deadline and automatic-substitution rules are verified;
+   - captain/vice rules are verified;
+   - target chips and special events are verified;
+   - golden official examples pass.
+4. No season check such as `if season == 2026` is permitted in solver code.
+5. A ruleset change must be solvable by configuration and transition tables.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require an architecture decision record.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE OPTIMISATION DECISION
+======================================================================
+
+0.1 SELECTED PRODUCTION METHOD
+------------------------------
+The production engine is a hybrid multistage stochastic mixed-integer system:
+
+A. MODEL-PREDICTIVE-CONTROL WRAPPER
+At every FPL deadline:
+
+- observe current state;
+- solve a finite-horizon stochastic decision problem;
+- execute only the immediate transfer/tactical action;
+- retain the future contingent policy as explanation;
+- ingest new information;
+- re-solve at the next deadline.
+
+B. SCENARIO-BASED STOCHASTIC OPTIMISATION
+Use DMFP-09/10 coherent scenarios and scenario trees.
+
+Expected utility is approximated by a weighted sample-average objective.
+
+C. MIXED-INTEGER LINEAR MASTER
+Select:
+
+- squad;
+- transfer path;
+- bank;
+- free-transfer transitions;
+- purchase-price ownership spells;
+- legal future manager state.
+
+D. EXACT TACTICAL SUBPROBLEM
+For a fixed current squad, evaluate exactly:
+
+- every legal starting XI;
+- outfield bench order;
+- captain;
+- vice-captain;
+- automatic substitutions;
+- captain fallback;
+
+against the full current-Gameweek scenario matrix.
+
+E. ROBUSTNESS AND ALTERNATIVE PLANS
+Apply DMFP-10:
+
+- robust regret;
+- chance constraints;
+- flexibility/terminal value;
+- upside/downside modes;
+- ACT-versus-WAIT.
+
+0.2 WHY MILP IS PRIMARY
+-----------------------
+FPL decisions contain exact discrete constraints:
+
+- own/not own;
+- transfer in/out;
+- fixed squad counts;
+- club limits;
+- position counts;
+- formation;
+- captain/vice;
+- integer budget units;
+- integer free-transfer inventory;
+- transfer hits.
+
+Mixed-integer linear programming provides:
+
+- explicit constraints;
+- reproducible solutions;
+- solver bounds/gaps;
+- infeasibility diagnosis;
+- counterfactual re-solves;
+- warm starts;
+- mature open-source solvers.
+
+Fantasy-sports research has repeatedly formulated roster/lineup selection using
+integer programming. Hunter, Vielma and Zaman demonstrate how constrained
+fantasy lineups and correlation/variance considerations can be expressed through
+integer optimisation. Recent FPL-specific work also formulates deterministic and
+robust lineup/captain models.
+
+0.3 WHY STOCHASTIC PROGRAMMING IS PRIMARY
+-----------------------------------------
+Expected player points are not sufficient because:
+
+- future injuries change transfer recourse;
+- price paths change affordability;
+- future free transfers depend on current moves;
+- postponements create blanks/doubles;
+- lineup uncertainty changes bench value;
+- player points are correlated.
+
+Sample Average Approximation replaces an intractable expectation by a finite
+weighted scenario objective and solves the resulting discrete optimisation
+problem. Kleywegt, Shapiro and Homem-de-Mello provide foundational convergence
+and stopping analysis for stochastic discrete optimisation via SAA.
+
+0.4 WHY MODEL PREDICTIVE CONTROL IS PRIMARY
+--------------------------------------------
+A full-season open-loop plan is brittle.
+
+Model predictive control/receding-horizon control repeatedly:
+
+- predicts;
+- optimises over a horizon;
+- executes the first control;
+- updates state;
+- re-optimises.
+
+This matches FPL's deadline structure and makes future policy conditional rather
+than pretending today's exact eight-week transfer sequence will be executed
+unchanged.
+
+0.5 WHY DYNAMIC PROGRAMMING IS NOT THE V1 CORE
+-----------------------------------------------
+An exact dynamic-programming state would include:
+
+- 15-player squad from hundreds of players;
+- purchase prices/ownership spells;
+- bank;
+- free transfers;
+- chips;
+- injuries;
+- fixtures;
+- rank;
+- information state.
+
+The state/action space is subject to the curse of dimensionality.
+
+Dynamic programming remains valuable for:
+
+- small toy validation;
+- free-transfer state transitions;
+- terminal-value approximation;
+- reduced candidate pools;
+- approximate value functions.
+
+0.6 WHY MONTE CARLO TREE SEARCH IS NOT THE V1 CORE
+---------------------------------------------------
+MCTS is useful for sequential decisions with simulation, but FPL has:
+
+- enormous transfer branching;
+- highly constrained legal actions;
+- expensive stochastic evaluations;
+- many near-duplicate actions;
+- need for auditable optimality bounds;
+- long horizons and sparse observations.
+
+MCTS surveys note that complex, high-branching practical domains usually need
+substantial domain-specific modification.
+
+MCTS remains a challenger after:
+
+- action pruning;
+- strong MILP policy priors;
+- learned terminal value;
+- progressive widening;
+- reproducible simulation budgets.
+
+0.7 SELECTED SOLVER STACK
+-------------------------
+Initial zero-licence-cost production stack:
+
+- Pyomo or a thin native model layer;
+- HiGHS through `highspy`/Pyomo APPSI;
+- optional CBC/SCIP fallback after benchmark;
+- exact enumerator/vectorised NumPy for tactical subproblem.
+
+HiGHS officially supports linear programming, mixed-integer programming and
+quadratic programming and provides a Python interface.
+
+A commercial solver MAY be benchmarked later, but the architecture must not
+depend on one.
+
+0.8 SELECTED V1 DECOMPOSITION
+-----------------------------
+V1 uses:
+
+1. candidate player/action pruning;
+2. rolling-horizon stochastic transfer master;
+3. top-K candidate squad/transfer plans;
+4. exact current tactical evaluator;
+5. scenario-based utility re-evaluation;
+6. local improvement/neighbourhood search;
+7. alternative-plan generation;
+8. SAA replication/stability checks.
+
+V2 may use logic-based Benders decomposition:
+
+- master: squad/transfer path;
+- subproblem: tactical/scenario evaluation;
+- cuts: no-good, dominance and value cuts.
+
+Logic-based Benders is appropriate when fixing strategic variables decomposes a
+hard combinatorial subproblem.
+
+0.9 OPTIMISATION HORIZON
+------------------------
+Default from DMFP-10:
+
+- early season: 6–8 explicit Gameweeks plus terminal value;
+- stable middle: 5–7;
+- before blanks/doubles: extend through the relevant event;
+- late season: all remaining Gameweeks;
+- chip planning: include the candidate chip window.
+
+The horizon is selected by information maturity and fixture structure, not one
+fixed number.
+
+0.10 OUTPUT MODES
+-----------------
+RECOMMENDED:
+DMFP-10 robust-points policy.
+
+CONSERVATIVE:
+downside/availability protected, subject to a bounded expected-utility sacrifice.
+
+HIGH_UPSIDE:
+maximise defined upper-tail/rank-relevant utility subject to a minimum expected
+utility and fragility constraint.
+
+NO_TRANSFER_BASELINE:
+zero current transfers, but optimised XI, bench, captain and vice.
+
+If no materially distinct conservative/upside plan exists, say so rather than
+forcing artificial diversity.
+
+======================================================================
+1. DECISION PROCESS AND STATE
+======================================================================
+
+1.1 DEADLINE EPOCH
+------------------
+Decision epoch t is an official FPL Gameweek deadline.
+
+1.2 MANAGER STATE
+-----------------
+S_t includes:
+
+- current 15-player permanent squad;
+- ownership-spell/purchase price per player;
+- current market price;
+- current selling price;
+- bank;
+- free transfers available;
+- chip inventory/status;
+- current Gameweek;
+- fixture assignments known;
+- ruleset;
+- rank/ownership objective mode;
+- source/model confidence;
+- prior transfer commitments;
+- pending price/news events.
+
+1.3 BELIEF STATE
+----------------
+B_t includes posterior/scenario distributions for:
+
+- FPL points;
+- minutes/availability;
+- future prices;
+- fixture postponement/reassignment;
+- manager/team regimes;
+- information revelation;
+- model/source/rule uncertainty.
+
+1.4 ACTION
+----------
+At current node:
+
+- zero or more permanent transfers;
+- optional transfer timing decision;
+- starting XI;
+- bench goalkeeper;
+- ordered outfield bench;
+- captain;
+- vice-captain;
+- chip interface state.
+
+At future nodes:
+
+- contingent transfers;
+- lineups;
+- captain/vice;
+- chip actions where DMFP-13 integrates them.
+
+1.5 TRANSITION
+--------------
+After action and Gameweek:
+
+- points realized;
+- prices change;
+- purchase-price spells update;
+- bank changes;
+- free transfers transition;
+- injuries/news/fixtures reveal;
+- squad remains or changes;
+- next decision state created.
+
+1.6 REWARD
+----------
+- manager Gameweek points after auto subs/captain;
+- minus transfer hits;
+- plus terminal/future-state approximation at horizon;
+- optional explicit rank utility later.
+
+1.7 POLICY
+----------
+A policy maps observable decision-node state to action.
+
+Future actions cannot use information unavailable at that node.
+
+======================================================================
+2. RULES AND CONSTRAINTS
+======================================================================
+
+2.1 CONFIGURATION
+-----------------
+The solver consumes compiled DMFP-02 rules:
+
+- squad size;
+- position counts;
+- club maximum;
+- budget units;
+- legal formations;
+- starting XI size;
+- bench composition;
+- captain/vice rules;
+- transfer rules;
+- free-transfer transition;
+- hit cost;
+- selling-price rule;
+- chips;
+- special events.
+
+2.2 REFERENCE 2025/26
+---------------------
+REFERENCE_ONLY:
+
+- budget £100.0m;
+- 15 players;
+- 2 GK;
+- 5 DEF;
+- 5 MID;
+- 3 FWD;
+- maximum three per club;
+- XI of 11;
+- one GK;
+- at least 3 DEF;
+- at least 2 MID;
+- at least 1 FWD;
+- one free transfer each Gameweek;
+- up to five banked;
+- extra transfer -4;
+- same-position replacement;
+- captain and vice from XI;
+- vice inherits double points only if captain does not appear;
+- automatic substitutions at Gameweek end.
+
+2.3 RULE TABLES
+---------------
+Do not encode transitions through ad hoc arithmetic where rules can vary.
+
+Use:
+
+- `free_transfer_transition`;
+- `chip_transfer_transition`;
+- `selling_price_function`;
+- `legal_formation`;
+- `special_event_operation`.
+
+2.4 GRANDFATHERED CLUB-QUOTA VIOLATION
+--------------------------------------
+If a real-world player transfer leaves a manager owning more than the allowed
+number from one club, reference official guidance has permitted retaining the
+squad while preventing normal transfers until the quota is repaired.
+
+Represent:
+
+- grandfathered violation state;
+- required repair condition;
+- no silent invalid squad deletion.
+
+Target rule must be verified.
+
+======================================================================
+3. SETS, INDICES AND SCENARIO TREE
+======================================================================
+
+3.1 SETS
+--------
+P:
+candidate players.
+
+T:
+explicit Gameweeks.
+
+N:
+scenario-tree decision nodes.
+
+Omega:
+leaf trajectories/scenarios.
+
+POS:
+FPL positions.
+
+CLUB:
+Premier League clubs.
+
+K_FT:
+possible free-transfer states.
+
+R:
+possible ownership-spell origins/purchase cohorts.
+
+L:
+legal current tactical configurations or generated columns.
+
+3.2 TREE
+--------
+Each node n has:
+
+- stage/gameweek t(n);
+- parent par(n);
+- probability pi_n or conditional probability;
+- observable information state;
+- price vector;
+- fixture state;
+- player availability belief;
+- node-specific points distribution/value inputs.
+
+3.3 ROOT
+--------
+The current deadline is one root decision node.
+
+All root actions are nonanticipative by construction.
+
+3.4 FUTURE INFORMATION
+----------------------
+Different leaves may share one decision node until distinguishing information is
+revealed.
+
+3.5 SCENARIO REDUCTION
+----------------------
+DMFP-10 supplies reduced scenario tree with decision-error diagnostics.
+
+The optimiser must retain:
+
+- scenario probability;
+- rare adverse/upside worlds;
+- model/regime clusters;
+- price/fixture branches.
+
+======================================================================
+4. CORE DECISION VARIABLES
+======================================================================
+
+4.1 SQUAD
+---------
+    x[p,n] in {0,1}
+
+Player p is in permanent squad at node n after transfer action.
+
+4.2 TRANSFERS
+-------------
+    tin[p,n] in {0,1}
+    tout[p,n] in {0,1}
+
+For ownership cohort r:
+
+    tout_cohort[p,r,n] in {0,1}
+
+4.3 OWNERSHIP SPELL
+-------------------
+    own[p,r,n] in {0,1}
+
+Player p is owned at node n under purchase cohort r.
+
+Cohort r is:
+
+- initial ownership spell; or
+- node where player was bought.
+
+4.4 BANK
+--------
+    bank[n] integer
+
+in 0.1m units.
+
+4.5 FREE TRANSFER STATE
+-----------------------
+    ft_state[n,k] in {0,1}
+
+Exactly one state k.
+
+4.6 TRANSFER COUNT ARC
+----------------------
+    transition_arc[n,k,m,c] in {0,1}
+
+Selects:
+
+- free transfers before;
+- transfer count m;
+- chip mode c;
+- resulting free transfers;
+- hit points.
+
+This table-driven arc avoids brittle min/max logic.
+
+4.7 FUTURE LINEUP
+-----------------
+If tactical decisions are embedded:
+
+    start[p,n] in {0,1}
+    bench[p,k,n] in {0,1}
+    captain[p,n] in {0,1}
+    vice[p,n] in {0,1}
+
+For V1, current tactical variables are handled by exact subproblem and future
+lineup value may use generated columns/approximations.
+
+4.8 PLAN-SELECTION COLUMNS
+--------------------------
+    choose_plan[j] in {0,1}
+
+for candidate tactical/squad plans where column generation is used.
+
+======================================================================
+5. SQUAD CONTINUITY
+======================================================================
+
+5.1 BALANCE
+-----------
+For non-chip permanent squads:
+
+    x[p,n]
+      =
+      x[p,par(n)]
+      + tin[p,n]
+      - tout[p,n]
+
+5.2 TRANSFER CONSISTENCY
+------------------------
+- cannot buy an already owned player;
+- cannot sell an unowned player;
+- no player both bought and sold at same node unless rules/transaction semantics
+  deliberately support same-deadline churn, which is normally prohibited in the
+  canonical plan;
+- number in equals number out for permanent transfers.
+
+5.3 POSITION CONSISTENCY
+------------------------
+For each FPL position:
+
+    sum_{p in position} tin[p,n]
+      =
+    sum_{p in position} tout[p,n]
+
+or, equivalently, exact squad position counts at every node.
+
+5.4 OWNERSHIP COHORT
+--------------------
+If retained:
+
+    own[p,r,n] follows parent cohort.
+
+If sold:
+
+    cohort ends.
+
+If bought:
+
+    own[p,n,n] = 1.
+
+A later repurchase creates a new cohort.
+
+5.5 FREE HIT
+------------
+Free Hit temporary squad is a separate layer.
+
+Permanent squad/ownership spells return afterward.
+DMFP-13 controls chip activation, while DMFP-12 exposes the exact state
+transition interface.
+
+======================================================================
+6. SQUAD COMPOSITION CONSTRAINTS
+======================================================================
+
+6.1 TOTAL
+---------
+    sum_p x[p,n] = configured squad size
+
+6.2 POSITIONS
+-------------
+For each position q:
+
+    sum_{p:position(p)=q} x[p,n]
+      =
+      configured squad count[q]
+
+6.3 CLUB
+--------
+For each club c:
+
+    sum_{p:club(p,n)=c} x[p,n]
+      <= max_per_club
+
+subject to grandfathered violation rules.
+
+6.4 PLAYER AVAILABILITY
+-----------------------
+A formally ineligible/nonexistent player cannot be bought.
+
+An injured/rotation-risk player is normally not prohibited; their distribution
+and robust utility decide.
+
+6.5 TRANSFER WINDOW / LEFT LEAGUE
+---------------------------------
+Use canonical current FPL catalogue status.
+
+A player no longer purchasable cannot be transferred in.
+
+======================================================================
+7. BUYING, SELLING, BANK AND OWNERSHIP SPELLS
+======================================================================
+
+7.1 BUY PRICE
+-------------
+At node n/scenario state:
+
+    buy_price[p,n]
+
+integer tenths.
+
+7.2 SELL PRICE
+--------------
+For cohort r:
+
+    sell_price[p,r,n]
+
+precomputed exactly from:
+
+- purchase price at r;
+- current scenario price at n;
+- active ruleset.
+
+Precomputation keeps the master linear.
+
+7.3 BANK TRANSITION
+-------------------
+    bank[n]
+      =
+      bank[par(n)]
+      + sum_{p,r} sell_price[p,r,n] tout_cohort[p,r,n]
+      - sum_p buy_price[p,n] tin[p,n]
+
+7.4 NONNEGATIVE
+---------------
+    bank[n] >= 0
+
+7.5 PATH DEPENDENCE
+-------------------
+Two managers owning the same player can have different selling prices.
+
+The optimiser MUST not use current price as universal sale proceeds.
+
+7.6 PRICE UNCERTAINTY
+---------------------
+Future tree nodes contain price-path values from DMFP-11.
+
+Current root transfer legality uses actual current prices, not expected future
+prices.
+
+7.7 AFFORDABILITY CHANCE
+------------------------
+A proposed delayed transfer must be affordable in the scenario states where the
+policy promises execution.
+
+If action is "wait then buy if affordable," affordability is a branch condition,
+not a guaranteed action.
+
+======================================================================
+8. FREE TRANSFERS AND HITS
+======================================================================
+
+8.1 STATE TRANSITION TABLE
+--------------------------
+For every:
+
+- FT before k;
+- permanent transfer count m;
+- chip state c;
+- special event e;
+
+configuration supplies:
+
+- FT used;
+- paid transfers;
+- hit points;
+- FT next.
+
+8.2 ARC MODEL
+-------------
+Exactly one transition arc selected per node.
+
+Link:
+
+    transfer_count[n] = sum_p tin[p,n]
+
+and transition arc transfer count.
+
+8.3 HIT COST
+------------
+Scenario/Gameweek manager reward subtracts:
+
+    paid_transfers[n] x hit_cost
+
+Hit is not assigned to an individual player unless explanatory allocation is
+computed later.
+
+8.4 ROLL VALUE
+--------------
+Zero transfers can increase next state free-transfer inventory.
+
+The optimiser values the resulting state through:
+
+- future recourse;
+- terminal value;
+- explicit FT marginal value.
+
+8.5 SPEND VALUE
+---------------
+Using a free transfer is rational only if the action utility exceeds the value
+of preserving it.
+
+8.6 TRANSFER CAP
+----------------
+Use configured maximum practical transfer count.
+
+Unlimited Wildcard/Free Hit transfers are chip-specific.
+
+======================================================================
+9. CURRENT-GAMEWEEK TACTICAL SUBPROBLEM
+======================================================================
+
+9.1 WHY EXACT ENUMERATION
+-------------------------
+For a fixed 15-player squad, the tactical action space is finite and relatively
+small compared with transfer selection.
+
+Exact enumeration/vectorised evaluation avoids approximating:
+
+- auto subs;
+- captain fallback;
+- legal formations;
+- bench order;
+- joint distributions.
+
+9.2 LEGAL XI ENUMERATION
+------------------------
+Enumerate all subsets of 11 satisfying:
+
+- exactly one goalkeeper;
+- configured minimum/maximum position counts;
+- every starter belongs to squad.
+
+With 15 players, exhaustive legal enumeration is feasible after position
+filtering.
+
+9.3 BENCH
+---------
+The nonstarting goalkeeper is fixed as bench goalkeeper.
+
+The three nonstarting outfield players have at most:
+
+    3! = 6
+
+orders.
+
+9.4 CAPTAIN/VICE
+----------------
+For each XI:
+
+- captain is one starter;
+- vice is a different starter.
+
+At most:
+
+    11 x 10 = 110
+
+ordered pairs.
+
+9.5 VECTORISED PRUNING
+----------------------
+Before full scenario evaluation:
+
+- upper-bound tactical expected utility;
+- remove dominated XI/bench orders;
+- shortlist captain candidates by expected/tail utility;
+- retain any candidate within configured bound.
+
+Pruning must be certified not to remove a possible optimum under the active
+objective, or labelled heuristic.
+
+9.6 EXACT SCENARIO SCORE
+------------------------
+For each scenario:
+
+1. take selected XI;
+2. determine appearance;
+3. process goalkeeper substitution;
+4. process outfield bench in official priority order;
+5. preserve legal formation;
+6. calculate scoring XI points;
+7. apply captain extra if captain appears;
+8. otherwise apply vice extra if vice appears;
+9. if neither appears, no captain extra;
+10. record bench/autosub outcomes.
+
+9.7 CAPTAIN EXTRA
+-----------------
+Raw DMFP-09 player points already include one copy.
+
+Manager score adds one extra copy for the active captain under normal captaincy.
+
+Triple Captain is DMFP-13.
+
+9.8 TACTICAL OUTPUT
+-------------------
+- XI;
+- formation;
+- bench GK;
+- bench order;
+- captain;
+- vice;
+- expected manager points;
+- point PMF;
+- threshold/tail;
+- probability fielding 11;
+- expected bench contribution;
+- captain fallback probability;
+- tactical covariance.
+
+======================================================================
+10. AUTOMATIC SUBSTITUTION ALGORITHM
+======================================================================
+
+10.1 SOURCE OF TRUTH
+--------------------
+Use active official rules and golden examples.
+
+Reference official guidance:
+
+- substitutions processed at Gameweek end;
+- goalkeeper replaced only by bench goalkeeper if he played;
+- outfield bench priority matters;
+- substitute must have played;
+- final scoring XI must obey formation minimums.
+
+10.2 DETERMINISTIC FUNCTION
+---------------------------
+Implement one canonical function:
+
+    apply_auto_substitutions(
+        selected_xi,
+        bench_order,
+        appearance_vector,
+        positions,
+        formation_rules
+    )
+
+10.3 MULTIPLE NONAPPEARANCES
+----------------------------
+The function processes official bench priority while ensuring a legal final XI.
+
+It must be tested against all combinations of:
+
+- missing starter positions;
+- bench appearances;
+- three-defender constraint;
+- two-midfielder constraint;
+- one-forward constraint.
+
+10.4 NO "BEST BENCH" HINDSIGHT
+------------------------------
+Bench substitutes are not selected after outcomes based on points.
+
+Only saved order controls.
+
+10.5 OUTPUT
+-----------
+- final scoring XI;
+- substitutions;
+- unused bench;
+- reason each bench player entered/failed;
+- formation.
+
+======================================================================
+11. BENCH STRENGTH AND BENCH ORDER
+======================================================================
+
+11.1 BENCH VALUE
+----------------
+Bench value is not simply:
+
+    sum expected bench points
+
+because bench points score only through:
+
+- automatic substitution;
+- future lineup use;
+- Bench Boost later;
+- future squad flexibility.
+
+11.2 CURRENT AUTO-SUB VALUE
+---------------------------
+For bench player p/order k:
+
+    E[realised_auto_sub_points_p]
+      =
+      sum_s w_s
+      x points[p,s]
+      x 1[p enters under saved order]
+
+11.3 COVERAGE
+-------------
+Metrics:
+
+- P(field 11);
+- P(field 10 or fewer);
+- P(no goalkeeper);
+- expected number of starters;
+- expected lost starter points recovered;
+- formation-block probability.
+
+11.4 ORDER DECISION
+-------------------
+The first bench player is not always the highest expected-points bench player.
+
+Order depends on:
+
+- appearance correlation;
+- starter nonappearance positions;
+- formation constraints;
+- point distribution;
+- captain/vice interactions only indirectly.
+
+11.5 FUTURE BENCH STRENGTH
+--------------------------
+Value through future:
+
+- likely starts;
+- fixture rotation;
+- injury resilience;
+- price/transfer flexibility;
+- chip route.
+
+11.6 BENCH OVERINVESTMENT
+-------------------------
+The optimiser can spend on bench only where marginal future utility exceeds
+starting-XI opportunity cost.
+
+Do not hard-code "cheap bench" or "strong bench" as doctrine.
+
+11.7 CHANCE CONSTRAINT
+----------------------
+Optional conservative policy:
+
+    P(field at least 11) >= target
+
+or:
+
+    P(field fewer than 10) <= epsilon.
+
+Configuration and price-of-constraint must be reported.
+
+======================================================================
+12. CAPTAIN AND VICE-CAPTAIN
+======================================================================
+
+12.1 CONSTRAINTS
+----------------
+- exactly one captain;
+- exactly one vice;
+- distinct;
+- both in selected XI;
+- both in squad.
+
+12.2 JOINT EVALUATION
+---------------------
+Use joint scenario points and appearance.
+
+Expected captain extra:
+
+    E[
+      captain_points x 1[captain appears]
+      +
+      vice_points x 1[captain not appears, vice appears]
+    ]
+
+12.3 HIGH P_START IS NOT EVERYTHING
+-----------------------------------
+Vice selection depends on:
+
+- captain nonappearance probability;
+- vice points conditional on captain missing;
+- correlation between their availability/events;
+- vice own appearance;
+- lineup legality.
+
+12.4 CAPTAIN MODE
+-----------------
+DMFP-12 supplies normal captain/vice optimum.
+
+DMFP-13 may change:
+
+- chip;
+- rank utility;
+- horizon;
+- ownership strategy.
+
+12.5 NO EXPECTED-POINT DOUBLE COUNT
+-----------------------------------
+Do not double captain's expected points in the player projection upstream.
+
+Captain multiplier is manager-scenario transformation.
+
+======================================================================
+13. TRANSFER MASTER OBJECTIVE
+======================================================================
+
+13.1 NODE REWARD
+----------------
+At node n:
+
+    reward[n]
+      =
+      expected/weighted tactical manager points
+      - transfer hit
+      + optional explicit immediate price-route term
+      + policy-specific utility.
+
+13.2 HORIZON OBJECTIVE
+----------------------
+    max:
+      sum_n probability[n] reward[n]
+      + expected terminal value
+      - robust regret penalty
+      - lock-in/operational penalties
+      + flexibility value
+
+13.3 NO PRICE DOUBLE COUNT
+-------------------------
+Price affects:
+
+- bank/affordability;
+- terminal/marginal future points;
+- selling value.
+
+Do not also add arbitrary "team value points."
+
+13.4 DISCOUNT
+-------------
+FPL points do not inherently need economic discounting.
+
+A planning discount MAY reflect:
+
+- forecast deterioration;
+- rolling re-optimisation;
+- terminal approximation.
+
+It must be interpreted and calibrated, not chosen for convenience.
+
+13.5 FUTURE LINEUP VALUE
+------------------------
+At future node:
+
+- exact tactical subproblem if computationally feasible;
+- generated lineup-value column;
+- conservative linear approximation;
+- terminal value.
+
+Approximation error is measured.
+
+======================================================================
+14. SCENARIO-BASED STOCHASTIC PROGRAM
+======================================================================
+
+14.1 SAMPLE AVERAGE
+-------------------
+Given scenarios omega with weights w:
+
+    max_a sum_omega w_omega U(a, omega)
+
+subject to legal and nonanticipative decisions.
+
+14.2 REPLICATION
+----------------
+Run multiple independently generated SAA sets.
+
+For each:
+
+- solve;
+- record action/objective;
+- evaluate on larger common holdout;
+- estimate optimism and action stability.
+
+14.3 TRAIN/EVALUATION SCENARIOS
+-------------------------------
+Optimisation scenarios and evaluation scenarios are separate where practical.
+
+Do not report the in-sample SAA objective as unbiased true utility.
+
+14.4 HOLDOUT
+------------
+Top plans are evaluated on a larger untouched scenario set.
+
+14.5 STABILITY
+--------------
+Required:
+
+- selected action frequency across SAA replicates;
+- out-of-sample utility;
+- regret;
+- confidence interval;
+- solver gap.
+
+14.6 SAMPLE SIZE
+----------------
+Adaptive based on:
+
+- plan stability;
+- objective gap;
+- rare event;
+- horizon;
+- scenario weights;
+- compute budget.
+
+14.7 COMMON RANDOM NUMBERS
+--------------------------
+Use common evaluation scenarios for plan differences.
+
+======================================================================
+15. NONANTICIPATIVITY AND RECOURSE
+======================================================================
+
+15.1 RULE
+---------
+Two scenario paths sharing a decision node must select identical actions at that
+node.
+
+15.2 IMPLEMENTATION
+-------------------
+Node-index decisions naturally satisfy nonanticipativity.
+
+If leaf-index variables are used, add equality constraints for shared
+information histories.
+
+15.3 CURRENT ACTION
+-------------------
+Root transfer/lineup/captain is fixed across every scenario.
+
+15.4 FUTURE RECOURSE
+--------------------
+After revealed information, future nodes may:
+
+- transfer injured player;
+- respond to price;
+- change lineup;
+- exploit blank/double;
+- preserve/consume FT.
+
+15.5 PERFECT-INFORMATION BUG
+----------------------------
+A common invalid model lets every scenario choose future actions with knowledge
+of its full leaf outcome.
+
+Automated tests must detect this optimistic upper bound.
+
+15.6 EVPI UPPER BOUND
+---------------------
+A perfect-information solve may be calculated only as a diagnostic upper bound,
+never as the achievable plan.
+
+======================================================================
+16. FIXTURE POSTPONEMENT, BLANK AND DOUBLE SCENARIOS
+======================================================================
+
+16.1 CURRENT POSTPONEMENT
+-------------------------
+If a fixture is postponed after deadline:
+
+- current action remains;
+- players may record zero/no fixture;
+- auto subs operate according to actual appearance rules;
+- captain fallback applies;
+- points scenario reflects blank.
+
+16.2 FUTURE REASSIGNMENT
+------------------------
+Scenario tree branches on:
+
+- postponement;
+- reschedule date;
+- Gameweek assignment;
+- double/blank creation.
+
+16.3 CORRELATION
+----------------
+Affected team players share the same fixture branch.
+
+Do not independently assign each player a blank probability.
+
+16.4 INFORMATION REVELATION
+---------------------------
+Future transfer action may depend on an official announcement only after its
+node.
+
+16.5 ROBUST ROUTE
+-----------------
+Conservative plan may preserve:
+
+- transfer inventory;
+- bench;
+- club slots;
+- chip path;
+
+when schedule uncertainty is material.
+
+16.6 CHANCE/REGRET
+------------------
+Do not blindly avoid all players with postponement risk.
+
+Compare expected points and robust regret.
+
+======================================================================
+17. INJURIES, ROTATION AND FORCED TRANSFERS
+======================================================================
+
+17.1 CURRENT PLAYER
+-------------------
+DMFP-07/09 scenarios already reflect p_start, minutes and points.
+
+17.2 FUTURE STATE
+-----------------
+Scenario transition can create:
+
+- temporary injury;
+- long-term injury;
+- role loss;
+- return;
+- manager change.
+
+17.3 FORCED-TRANSFER COST
+------------------------
+A fragile squad can require future transfer/hit.
+
+Rolling scenario recourse captures this.
+
+17.4 FRAGILITY METRIC
+---------------------
+- expected forced transfers;
+- P(hit required);
+- P(fewer than legal/usable starters);
+- correlated injury/rotation exposure;
+- unavailable bench.
+
+17.5 DO NOT HARD EXCLUDE
+------------------------
+An uncertain player can be optimal if upside and alternatives justify it.
+
+Only formal ineligibility blocks.
+
+======================================================================
+18. EXPECTED PRICE MOVEMENTS AND TRANSFER TIMING
+======================================================================
+
+18.1 ACT NOW VERSUS WAIT
+------------------------
+DMFP-11 supplies timing alternatives and price paths.
+
+The optimiser evaluates both as policies.
+
+18.2 CURRENT ROOT ACTION
+------------------------
+If transfer is executed now:
+
+- current actual buy/sell prices;
+- injury/news risk until deadline;
+- ownership spell begins.
+
+18.3 WAIT POLICY
+----------------
+Branches on information/price state.
+
+Possible actions:
+
+- buy if still optimal/affordable;
+- choose alternative;
+- keep current player;
+- accept changed bank.
+
+18.4 NO ASSUMED EXECUTION
+-------------------------
+A WAIT policy cannot claim the target at old price in every branch.
+
+18.5 PRICE ROUTE VALUE
+----------------------
+Only through future feasible squads and points.
+
+18.6 OUTPUT
+-----------
+- recommended execution timing;
+- latest safe time;
+- probability desired route closes;
+- expected affordability loss;
+- information value;
+- reversal risk.
+
+======================================================================
+19. FUTURE FLEXIBILITY
+======================================================================
+
+19.1 STATE FEATURES
+-------------------
+- free transfers;
+- bank;
+- liquidation value;
+- club slots;
+- price brackets;
+- bench reliability;
+- number of flagged/rotation players;
+- future route distance;
+- chip inventory;
+- formation options.
+
+19.2 ADAPTIVE VALUE
+-------------------
+Preferred:
+
+    future adaptive value
+      =
+      expected value after re-optimising at future information nodes.
+
+19.3 TERMINAL VALUE MODEL
+-------------------------
+For state at horizon end:
+
+    V_terminal(S)
+      =
+      projected continuation points
+      + FT value
+      + marginal bank value
+      + chip value
+      + route/flexibility value
+      - fragility/forced-transfer cost.
+
+All components are fitted/backtested.
+
+19.4 FINITE DIFFERENCES
+-----------------------
+Estimate marginal values by re-solving:
+
+- +£0.1 bank;
+- +1 FT;
+- open club slot;
+- healthier bench;
+- alternative price cohort.
+
+19.5 NO ARBITRARY FLEXIBILITY BONUS
+-----------------------------------
+Count of possible moves is not enough.
+A move has value only if future utility is plausible.
+
+19.6 EARLY/LATE
+----------------
+DMFP-10 changes terminal/flexibility importance by season state.
+
+======================================================================
+20. OPTIMISATION HORIZON SELECTION
+======================================================================
+
+20.1 ADAPTIVE RULE
+------------------
+Choose H to include:
+
+- meaningful fixture swing;
+- known blank/double;
+- chip plan;
+- information event;
+- price route;
+- enough future for transfer cost to amortise.
+
+20.2 TOO SHORT
+--------------
+Causes:
+
+- one-week punts;
+- repeated hits;
+- ignoring fixture reversal;
+- bench underinvestment;
+- team-value myopia.
+
+20.3 TOO LONG
+-------------
+Causes:
+
+- forecast noise;
+- scenario explosion;
+- false confidence;
+- terminal approximation duplication.
+
+20.4 HORIZON SENSITIVITY
+------------------------
+Solve at:
+
+- H-2;
+- H;
+- H+2;
+
+where feasible.
+
+Report action stability.
+
+20.5 TERMINAL STABILITY
+-----------------------
+Vary terminal-value model.
+If action changes, confidence falls.
+
+======================================================================
+21. MULTI-OBJECTIVE PLAN MODES
+======================================================================
+
+21.1 RECOMMENDED PLAN
+---------------------
+Objective:
+
+DMFP-10 robust-points score.
+
+Must remain close to pure expected-points optimum and report price of robustness.
+
+21.2 CONSERVATIVE PLAN
+----------------------
+Use epsilon-constraint:
+
+- expected utility >= recommended expected utility - delta_conservative;
+- minimise robust regret/CVaR shortfall;
+- minimise P(field < target);
+- prefer higher minutes/source confidence;
+- limit irreversible/hit actions.
+
+Do not define conservative as "low variance players" universally.
+
+21.3 HIGH-UPSIDE PLAN
+---------------------
+Subject to:
+
+- expected utility >= recommended expected utility - delta_upside;
+- legal/availability fragility constraints;
+
+maximise one selected upside objective:
+
+- P(points exceed baseline by K);
+- upper-tail expected gain;
+- rank utility from DMFP-14;
+- positive CVaR of gain.
+
+Do not maximise raw variance.
+
+21.4 NO-TRANSFER BASELINE
+-------------------------
+Constraint:
+
+    current permanent transfer count = 0
+
+Then exactly optimise:
+
+- XI;
+- bench;
+- captain;
+- vice.
+
+It remains the baseline even if rolling one FT has future value.
+
+21.5 DIVERSITY
+--------------
+Alternative plans should differ in meaningful root actions.
+
+Use:
+
+- Hamming-distance constraint;
+- no-good cuts;
+- required distinct transfer;
+- objective epsilon.
+
+Do not make a worse plan merely to populate the UI.
+
+21.6 PLAN PARETO FRONT
+----------------------
+Return non-dominated plans across:
+
+- expected utility;
+- robust regret;
+- upside;
+- hit count;
+- flexibility;
+- price route.
+
+======================================================================
+22. MARGINAL VALUE OF EACH MOVE
+======================================================================
+
+22.1 ATOMIC MOVE
+----------------
+An atomic permanent transfer move is:
+
+    OUT player A
+    IN player B
+
+of a compatible FPL position.
+
+A multi-transfer bundle is a set of atomic swaps.
+
+22.2 DROP-ONE RE-OPTIMISATION
+-----------------------------
+For move j in selected plan M:
+
+    marginal_drop_j
+      =
+      V*(M)
+      -
+      V*(best legal plan with j forbidden)
+
+This measures necessity while allowing alternatives.
+
+22.3 ADD-ONE FROM BASELINE
+--------------------------
+    marginal_add_j
+      =
+      V*(baseline plus j, reoptimised)
+      -
+      V*(baseline)
+
+Can differ from drop-one due interactions.
+
+22.4 BUNDLE INTERACTION
+-----------------------
+Two moves can jointly unlock budget/position routes.
+
+Therefore:
+
+    total plan value
+    != sum naive single-transfer values.
+
+22.5 SHAPLEY ALLOCATION
+-----------------------
+For a selected bundle of small size, allocate total bundle value using Shapley
+values across legal atomic moves:
+
+    phi_j
+      =
+      average marginal contribution of j over move-order coalitions.
+
+For up to five moves:
+exact subset evaluation is feasible.
+
+For larger bundles:
+sampled permutation approximation.
+
+Coalition value must preserve legality and reoptimise tactical choices.
+
+22.6 ILLEGAL SUBSET
+-------------------
+If a partial transfer subset is not a valid FPL action:
+
+- define atomic swaps so each subset is balanced; or
+- use path/permutation attribution;
+- do not assign arbitrary zero.
+
+22.7 COMPONENT ATTRIBUTION
+--------------------------
+For each move:
+
+- current GW points;
+- horizon points;
+- captain/lineup effect;
+- hit/FT;
+- selling/buying price;
+- future budget value;
+- flexibility;
+- injury/rotation protection;
+- interaction value.
+
+22.8 MARGINAL PLAYER VALUE
+--------------------------
+Player inclusion marginal:
+
+    V*(best plan requiring player)
+    -
+    V*(best plan forbidding player)
+
+This can be more informative than raw expected points.
+
+======================================================================
+23. EXPLANATIONS AND REASONS
+======================================================================
+
+23.1 REASON TYPES
+-----------------
+- projected points;
+- role/minutes;
+- fixtures;
+- captaincy;
+- bench coverage;
+- club/position scarcity;
+- price/affordability;
+- FT/hit;
+- future route;
+- uncertainty/robustness;
+- postponement;
+- model/source confidence.
+
+23.2 BINDING CONSTRAINTS
+------------------------
+Report constraints that prevented alternatives:
+
+- budget;
+- club limit;
+- position;
+- FT;
+- selling price;
+- formation;
+- captain;
+- player availability.
+
+23.3 COUNTERFACTUAL
+-------------------
+Example:
+
+"Player B projects 0.4 more points over four Gameweeks, but the transfer is not
+recommended because it costs a hit and reduces the probability of fielding 11
+during the subsequent blank."
+
+23.4 FINITE-DIFFERENCE SHADOW VALUES
+------------------------------------
+Report:
+
+- value of £0.1m;
+- value of one FT;
+- value of one club slot;
+- value of bench upgrade;
+- value of waiting.
+
+Use re-solves, not unreliable raw integer-programming duals.
+
+23.5 ACTION SWITCH
+------------------
+Report threshold where recommendation changes:
+
+- p_start;
+- expected minutes;
+- target price;
+- fixture assignment;
+- model weight;
+- horizon.
+
+======================================================================
+24. CONFIDENCE
+======================================================================
+
+24.1 DIMENSIONS
+---------------
+- ruleset state;
+- source/data quality;
+- projection confidence;
+- lineup/minutes;
+- price model;
+- scenario coverage;
+- SAA action stability;
+- solver optimality gap;
+- tactical exactness;
+- terminal-value sensitivity;
+- robust/nominal agreement;
+- timing/execution.
+
+24.2 PLAN CONFIDENCE
+--------------------
+A:
+active rules, exact/near-exact solve, high scenario/action stability, clear gap.
+
+B:
+strong solve/data, moderate sensitivity.
+
+C:
+close alternatives, model disagreement or approximate future tactical value.
+
+D:
+structural uncertainty, weak price/lineup data, high plan switching.
+
+E:
+blocked/infeasible/unverified rules or solver failure.
+
+24.3 PROBABILITY OPTIMAL
+------------------------
+Estimated fraction of model/SAA worlds where plan is best.
+
+Not a formal posterior probability unless exact conditions hold.
+Label method.
+
+24.4 SOLVER GAP
+----------------
+Report:
+
+- incumbent objective;
+- best bound;
+- relative/absolute MIP gap;
+- time limit;
+- status.
+
+A feasible plan with a 5% gap is not "optimal."
+
+24.5 HEURISTIC GAP
+------------------
+For decomposition/exact reevaluation, report:
+
+- master bound;
+- evaluated incumbent;
+- unexplored candidate bound;
+- approximation label.
+
+======================================================================
+25. CANDIDATE PLAYER AND ACTION PRUNING
+======================================================================
+
+25.1 WHY
+--------
+Full Premier League player/action space across scenarios can be large.
+
+25.2 SAFE PRUNING
+-----------------
+Remove player only if formally dominated under all relevant dimensions/bounds:
+
+- same position;
+- higher/equal price;
+- lower points upper bound;
+- no superior uncertainty/flexibility;
+- no route/chip special value.
+
+25.3 UNSAFE HEURISTIC PRUNING
+-----------------------------
+Examples:
+
+- top expected points only;
+- ownership threshold;
+- arbitrary top 20 per position.
+
+If used:
+label and retain escape candidates.
+
+25.4 REQUIRED CANDIDATES
+------------------------
+Always include:
+
+- current squad;
+- likely transfer targets;
+- price-route alternatives;
+- high-uncertainty/upside;
+- all players near dominance bound;
+- players relevant to chip/postponement route.
+
+25.5 ACTION GENERATION
+----------------------
+Generate:
+
+- no transfer;
+- one transfer;
+- multi-transfer bundles;
+- price-timed alternatives;
+- roll;
+- repair illegal club quota.
+
+Use upper bounds to limit.
+
+======================================================================
+26. EXACT, APPROXIMATE AND HEURISTIC MODES
+======================================================================
+
+26.1 EXACT CURRENT TACTICS
+-------------------------
+Required.
+
+26.2 DETERMINISTIC MILP
+-----------------------
+Can be solved to tight optimality.
+
+Used as:
+
+- baseline;
+- upper/lower bound;
+- candidate generation.
+
+26.3 STOCHASTIC EXTENSIVE FORM
+------------------------------
+Solve directly when reduced tree fits.
+
+26.4 DECOMPOSED STOCHASTIC
+--------------------------
+Use V1 hybrid/logic-based Benders for larger instances.
+
+26.5 HEURISTIC LOCAL SEARCH
+---------------------------
+After incumbent:
+
+- one-transfer swap;
+- two-transfer swap;
+- captain/bench exact;
+- price-route neighbour;
+- horizon route.
+
+Only improves; does not replace solver status.
+
+26.6 MCTS CHALLENGER
+--------------------
+Use MILP-generated legal actions and value function as priors/rollout.
+
+Compare out of time.
+
+26.7 APPROXIMATE DYNAMIC PROGRAMMING
+------------------------------------
+Use learned terminal value/policy rollout after enough backtest data.
+
+Must not train on future state leakage.
+
+======================================================================
+27. DECOMPOSITION AND SCALING
+======================================================================
+
+27.1 LOGIC-BASED BENDERS TARGET
+-------------------------------
+Master:
+
+- transfers;
+- permanent squads;
+- bank;
+- FT;
+- price cohorts.
+
+Subproblem:
+
+- tactical lineup/bench/captain;
+- scenario utility;
+- availability/formation.
+
+27.2 CUTS
+---------
+- no-good cut for evaluated squad/transfer state;
+- dominance cuts;
+- upper-bound cuts from player point bounds;
+- feasibility cuts;
+- logic-derived tactical value cuts.
+
+27.3 PROGRESSIVE HEDGING
+------------------------
+Potential heuristic for scenario decomposition.
+
+Progressive hedging relaxes nonanticipativity and coordinates scenario
+subproblems.
+
+For mixed-integer problems it is not automatically an exact algorithm; use as:
+
+- heuristic;
+- bound/support method;
+- warm-start generator.
+
+27.4 BRANCH-AND-BENDERS
+-----------------------
+Future exact/scalable option for integer recourse.
+
+27.5 WARM START
+--------------
+Use:
+
+- previous deadline solution;
+- no-transfer baseline;
+- deterministic solution;
+- conservative/upside plans;
+- human current squad.
+
+27.6 SYMMETRY
+-------------
+Break symmetry in:
+
+- bench order variables;
+- equivalent scenario nodes;
+- transfer cohort labels where possible.
+
+======================================================================
+28. SOLVER CONTROL
+======================================================================
+
+28.1 TIME BUDGET
+----------------
+Current deadline tiers:
+
+FAST:
+30 seconds, good incumbent.
+
+STANDARD:
+2–5 minutes.
+
+DEEP:
+15–30 minutes for close strategic/chip decisions.
+
+28.2 MIP GAP
+-------------
+Targets:
+
+- deterministic core <=0.1% where feasible;
+- stochastic recommended <=0.5–1%;
+- alternatives <=1–2%;
+- all gaps visible.
+
+These are initial operational targets.
+
+28.3 DETERMINISM
+----------------
+Record:
+
+- solver;
+- version;
+- parameters;
+- seed;
+- threads;
+- presolve;
+- cut settings;
+- time limit.
+
+Parallel MIP can be nondeterministic; compare within tolerance and retain
+incumbent/bound.
+
+28.4 NUMERICAL SCALING
+----------------------
+- integer price/points;
+- objective units normalized;
+- avoid huge Big-M;
+- derive tight bounds;
+- validate coefficients.
+
+28.5 INFEASIBILITY
+------------------
+Use:
+
+- solver infeasibility status;
+- irreducible infeasible subsystem where supported;
+- custom rules diagnostic;
+- constraint family relaxation audit.
+
+Never return an old plan as if new solve succeeded.
+
+======================================================================
+29. PLAN OUTPUT CONTRACT
+======================================================================
+
+29.1 RECOMMENDED PLAN
+---------------------
+{
+  "plan_id": "uuid",
+  "plan_type": "RECOMMENDED",
+  "execute": {
+    "timing": "WAIT_UNTIL_EVENT",
+    "latest_safe_time_utc": "...",
+    "transfers": [
+      {"out_player_id": "uuid", "in_player_id": "uuid"}
+    ],
+    "hit_points": 0
+  },
+  "squad_after": [],
+  "starting_xi": [],
+  "bench_goalkeeper": "uuid",
+  "bench_order": ["uuid", "uuid", "uuid"],
+  "captain": "uuid",
+  "vice_captain": "uuid",
+  "bank_after": 7,
+  "free_transfers_after": 2,
+  "expected_points_current_gw": 65.2,
+  "expected_points_horizon": 312.7,
+  "robust_utility": 329.4,
+  "confidence": "B"
+}
+
+29.2 CONSERVATIVE PLAN
+----------------------
+Same structure plus:
+
+- downside metric;
+- availability chance constraint;
+- expected-utility sacrifice;
+- robust regret improvement.
+
+29.3 HIGH-UPSIDE PLAN
+---------------------
+Same structure plus:
+
+- upside definition;
+- P(beat baseline by K);
+- upper-tail utility;
+- expected-utility sacrifice;
+- fragility limit.
+
+29.4 NO-TRANSFER BASELINE
+-------------------------
+- no transfers;
+- tactical optimum;
+- future FT state;
+- expected/robust utility;
+- difference from recommended.
+
+29.5 MARGINAL MOVES
+-------------------
+For every transfer:
+
+- drop-one value;
+- add-one value;
+- Shapley allocation;
+- component attribution;
+- interaction;
+- confidence.
+
+29.6 REASONS
+------------
+Structured reason codes plus human-readable narrative.
+
+29.7 FUTURE POLICY
+-----------------
+Summary of contingent future branches:
+
+- if injury confirmed;
+- if price rises;
+- if fixture postponed;
+- if role changes.
+
+Do not present future policy as a commitment.
+
+======================================================================
+30. ALTERNATIVE PLAN GENERATION
+======================================================================
+
+30.1 EPSILON-CONSTRAINT
+-----------------------
+Rather than arbitrary weighted sums:
+
+1. optimize primary utility;
+2. constrain primary within epsilon;
+3. optimize secondary objective.
+
+30.2 CONSERVATIVE EPSILON
+-------------------------
+Configurable maximum expected-utility sacrifice.
+
+30.3 UPSIDE EPSILON
+-------------------
+Configurable maximum expected-utility sacrifice and downside limit.
+
+30.4 DIVERSITY CUT
+------------------
+Require root transfer Hamming distance >= d when a distinct alternative is
+desired.
+
+30.5 DOMINANCE
+--------------
+Do not show plan dominated in every reported metric.
+
+30.6 PLAN COUNT
+---------------
+Return 3–10 Pareto plans internally.
+UI defaults to required four.
+
+======================================================================
+31. NO-TRANSFER AND ROLL ANALYSIS
+======================================================================
+
+31.1 NO TRANSFER IS AN ACTION
+-----------------------------
+It can be optimal due:
+
+- weak gain;
+- high uncertainty;
+- FT accumulation;
+- imminent information;
+- fixture changes;
+- price route not material.
+
+31.2 ROLL VALUE
+--------------
+Report:
+
+- immediate points foregone/gained;
+- next FT inventory;
+- future route value;
+- probability later use avoids hit;
+- action stability.
+
+31.3 FALSE PASSIVITY
+--------------------
+Do not roll if a robustly superior move exists.
+
+31.4 BASELINE TACTICS
+---------------------
+Even no-transfer baseline optimises XI/bench/captain.
+
+======================================================================
+32. LINEUP, BENCH AND TRANSFER INTERACTIONS
+======================================================================
+
+32.1 TRANSFER VALUE DEPENDS ON TACTICS
+-------------------------------------
+A transfer can:
+
+- enter XI;
+- improve captain;
+- become first bench;
+- improve formation;
+- protect nonappearance;
+- remain unused.
+
+32.2 BENCH TRANSFER
+-------------------
+Evaluate realised auto-sub/future value, not raw projection.
+
+32.3 CAPTAIN TRANSFER
+---------------------
+A transfer's value may be dominated by captain multiplier.
+
+Marginal attribution reports captain effect.
+
+32.4 TWO-TRANSFER STRUCTURE
+---------------------------
+One move may fund another.
+Shapley/interaction needed.
+
+32.5 OPPONENT CORRELATION
+-------------------------
+Lineup decisions use joint scenarios:
+
+- attacker against defender;
+- defensive double-up;
+- teammate attackers.
+
+Do not sum independent means for upside/downside modes.
+
+======================================================================
+33. CHIPS INTERFACE
+======================================================================
+
+33.1 OWNERSHIP
+--------------
+DMFP-13 owns chip timing/policy.
+
+DMFP-12 owns legal squad/transfer/lineup state transitions.
+
+33.2 CHIP VARIABLES
+-------------------
+The engine supports a chip action variable or a fixed chip directive.
+
+33.3 WILDCARD
+-------------
+- unlimited permanent transfers;
+- no hit;
+- ownership spells reset for new purchases;
+- FT transition per rules;
+- squad legal.
+
+33.4 FREE HIT
+-------------
+- temporary squad;
+- permanent squad returns;
+- purchase/sale accounting separate;
+- FT preserved/transition per rules.
+
+33.5 BENCH BOOST
+----------------
+Manager score includes bench points; bench order becomes irrelevant to points
+but remains valid saved state if required.
+
+33.6 TRIPLE CAPTAIN
+-------------------
+Captain extra multiplier changes.
+
+33.7 NO EARLY HARD-CODE
+-----------------------
+Target-season chips verified through DMFP-02.
+
+======================================================================
+34. RANK AND OWNERSHIP INTERFACE
+======================================================================
+
+34.1 DEFAULT
+------------
+Pure/robust points mode.
+
+34.2 DMFP-14
+------------
+May provide:
+
+- rank utility;
+- effective ownership;
+- rival scenarios;
+- upside/differentiation objective.
+
+34.3 CONSTRAINT
+--------------
+Ownership is not intrinsically positive/negative in points mode.
+
+34.4 HIGH-UPSIDE
+----------------
+Before DMFP-14, use absolute points gain/tail, not arbitrary low ownership.
+
+======================================================================
+35. BACKTESTING AND POLICY EVALUATION
+======================================================================
+
+35.1 POLICY BACKTEST
+--------------------
+Run sequentially:
+
+- reconstruct deadline state;
+- solve;
+- execute only root action;
+- update actual state;
+- repeat.
+
+35.2 NO HINDSIGHT
+-----------------
+Use LIVE_OBSERVED bundle.
+
+35.3 COMPARATORS
+----------------
+- no transfer;
+- one-GW greedy;
+- deterministic multi-GW MILP;
+- stochastic MPC;
+- robust MPC;
+- public/simple heuristic;
+- hindsight upper bound;
+- perfect-information diagnostic.
+
+35.4 METRICS
+-------------
+- cumulative points;
+- transfer hits;
+- FT use;
+- team value/liquidation value;
+- forced transfers;
+- bench/autosub points;
+- captain points;
+- robust regret;
+- action stability;
+- rank utility later;
+- solver time/gap.
+
+35.5 DECISION REGRET
+--------------------
+Evaluate against:
+
+- best action under model at time;
+- realised hindsight action;
+- clairvoyant upper bound.
+
+Do not confuse them.
+
+35.6 SAA EVALUATION
+-------------------
+Multiple scenario samples and large holdout.
+
+35.7 POLICY CALIBRATION
+-----------------------
+Tune:
+
+- horizon;
+- terminal value;
+- robust weight;
+- conservative/upside epsilon;
+- scenario count/reduction;
+- candidate pruning.
+
+Use nested/rolling validation, not one season's final points only.
+
+======================================================================
+36. RESEARCH CANDIDATE METHOD DECISIONS
+======================================================================
+
+36.1 MIXED-INTEGER LINEAR PROGRAMMING
+-------------------------------------
+Decision:
+SELECTED CORE.
+
+Best for:
+- exact FPL legal constraints;
+- transfers/budget;
+- explainable bounds;
+- multiobjective re-solves.
+
+Weakness:
+- scenario explosion;
+- auto-sub nonlinearities;
+- integer recourse.
+
+Mitigation:
+decomposition and exact tactical subproblem.
+
+36.2 DYNAMIC PROGRAMMING
+------------------------
+Decision:
+SELECTED FOR SMALL STATES/TERMINAL VALUE; NOT FULL CORE.
+
+Best for:
+- sequential state;
+- FT inventory;
+- reduced candidate sets;
+- value functions.
+
+Weakness:
+curse of dimensionality.
+
+36.3 STOCHASTIC OPTIMISATION
+----------------------------
+Decision:
+SELECTED CORE.
+
+Best for:
+- points/price/injury/fixture scenarios;
+- recourse;
+- nonanticipative future actions.
+
+Weakness:
+size and sampling error.
+
+36.4 SCENARIO-BASED OPTIMISATION / SAA
+--------------------------------------
+Decision:
+SELECTED IMPLEMENTATION.
+
+Best for:
+- directly using DMFP-09 scenario matrices;
+- arbitrary dependence;
+- empirical validation.
+
+Weakness:
+sample optimism and instability.
+
+Mitigation:
+replication/holdout/adaptive sample.
+
+36.5 MODEL-PREDICTIVE CONTROL
+-----------------------------
+Decision:
+SELECTED CONTROL WRAPPER.
+
+Best for:
+- rolling deadlines;
+- updated state;
+- finite horizon.
+
+Weakness:
+terminal-value/horizon sensitivity.
+
+36.6 MONTE CARLO TREE SEARCH
+----------------------------
+Decision:
+RESEARCH CHALLENGER.
+
+Best for:
+- large adaptive tree where exact formulation difficult.
+
+Weakness:
+branching, noisy value, reproducibility, legal action generation, no MIP bound.
+
+36.7 ROBUST OPTIMISATION
+------------------------
+Decision:
+SELECTED OVERLAY THROUGH DMFP-10.
+
+Not a replacement for scenarios.
+
+36.8 GENETIC/EVOLUTIONARY METHODS
+---------------------------------
+Decision:
+FALLBACK/CHALLENGER ONLY.
+
+Useful for:
+- warm starts;
+- complex non-linear objectives.
+
+Not preferred because:
+- no optimality bound;
+- constraint repair;
+- reproducibility;
+- exact MILP structure exists.
+
+36.9 REINFORCEMENT LEARNING
+---------------------------
+Decision:
+DEFERRED.
+
+Could learn terminal policy/value after enough prospective episodes, but one FPL
+season provides little independent data and off-policy evaluation is difficult.
+
+======================================================================
+37. TERMINAL VALUE AND APPROXIMATE DYNAMIC PROGRAMMING
+======================================================================
+
+37.1 PURPOSE
+------------
+Capture value beyond explicit horizon.
+
+37.2 INITIAL TERMINAL MODEL
+---------------------------
+Interpretable linear/piecewise value of:
+
+- future projected squad points;
+- FT inventory;
+- bank marginal value;
+- chips;
+- fixture quality;
+- bench/availability;
+- club/position flexibility;
+- ownership-spell value.
+
+37.3 TRAINING TARGET
+--------------------
+Roll out future rolling optimiser from historical states.
+
+Target:
+
+- realised/estimated continuation utility under policy;
+- not final hindsight optimum.
+
+37.4 CHALLENGER
+--------------
+Gradient-boosted/value network/ADP.
+
+37.5 MONOTONICITY
+-----------------
+Where appropriate:
+
+- extra bank should not reduce feasible optimal value;
+- extra FT should not reduce value;
+- extra chip should not reduce value.
+
+Enforce/test.
+
+37.6 TERMINAL ERROR
+-------------------
+Report sensitivity and uncertainty.
+
+======================================================================
+38. SOLVER AND DECISION AUDIT
+======================================================================
+
+38.1 RUN RECORD
+---------------
+- decision run;
+- state hash;
+- ruleset;
+- scenario set;
+- horizon;
+- candidate pool;
+- formulation version;
+- solver/version;
+- parameters;
+- start/end;
+- incumbent/bound;
+- gap;
+- termination reason;
+- alternatives;
+- output hash.
+
+38.2 MODEL EXPORT
+-----------------
+For critical runs save:
+
+- LP/MPS model where licensing/privacy permits;
+- variable/constraint maps;
+- solver log;
+- solution.
+
+38.3 REPRODUCE
+----------------
+    dmf optimise replay <decision_run_id>
+
+must recreate within tolerance.
+
+38.4 HUMAN OVERRIDE
+-------------------
+Record:
+
+- model plan;
+- selected human plan;
+- difference;
+- reason;
+- execution.
+
+Do not mutate recommendation.
+
+======================================================================
+39. EXAMPLE MATHEMATICAL FORMULATION — DETERMINISTIC CORE
+======================================================================
+
+39.1 PLAYER SQUAD
+-----------------
+For Gameweek t:
+
+    sum_p x[p,t] = SQUAD_SIZE
+
+    sum_{p in pos q} x[p,t] = SQUAD_POSITION_COUNT[q]
+
+    sum_{p in club c} x[p,t] <= MAX_CLUB
+
+39.2 TRANSFER
+-------------
+    x[p,t] = x[p,t-1] + tin[p,t] - tout[p,t]
+
+    tin[p,t] + tout[p,t] <= 1
+
+    sum_p tin[p,t] = sum_p tout[p,t]
+
+39.3 BANK
+---------
+    bank[t]
+      =
+      bank[t-1]
+      + sum_p sale[p,t] tout[p,t]
+      - sum_p buy[p,t] tin[p,t]
+
+    bank[t] >= 0
+
+39.4 LINEUP
+-----------
+    sum_p start[p,t] = XI_SIZE
+
+    start[p,t] <= x[p,t]
+
+    sum_{GK} start = 1
+
+    sum_{DEF} start >= MIN_DEF
+    sum_{MID} start >= MIN_MID
+    sum_{FWD} start >= MIN_FWD
+
+39.5 CAPTAIN
+------------
+    sum_p captain[p,t] = 1
+    sum_p vice[p,t] = 1
+
+    captain[p,t] <= start[p,t]
+    vice[p,t] <= start[p,t]
+
+    captain[p,t] + vice[p,t] <= 1
+
+39.6 EXPECTED-POINT OBJECTIVE BASELINE
+--------------------------------------
+    max sum_t discount[t] [
+        sum_p projected_points[p,t] start[p,t]
+        + sum_p projected_points[p,t] captain[p,t]
+        - hit_cost x paid_transfers[t]
+    ]
+    + terminal_value
+
+This baseline is not the final production model because it ignores automatic
+substitution, captain fallback and joint scenarios.
+
+======================================================================
+40. STOCHASTIC CURRENT-TACTICAL VALUE
+======================================================================
+
+40.1 CONFIGURATION VALUE
+------------------------
+For tactical configuration l and scenario omega:
+
+    manager_points[l,omega]
+
+is computed exactly by the tactical function.
+
+40.2 SELECT
+-----------
+    choose[l] in {0,1}
+    sum_l choose[l] = 1
+
+Objective:
+
+    sum_l choose[l] sum_omega w_omega manager_points[l,omega]
+
+40.3 COLUMN GENERATION
+----------------------
+If all tactical configurations are too many for many candidate squads:
+
+- pricing/subproblem finds best new configuration;
+- master selects among columns.
+
+For one fixed squad, direct enumeration is preferred.
+
+40.4 ROBUST/TAIL
+----------------
+The same scenario values support:
+
+- expected;
+- CVaR;
+- exceedance;
+- regret.
+
+======================================================================
+41. INFEASIBILITY AND SAFE FALLBACK
+======================================================================
+
+41.1 CAUSES
+-----------
+- bad manager state;
+- rules mismatch;
+- price mismatch;
+- candidate pool too narrow;
+- grandfathered quota;
+- missing position;
+- scenario/tree inconsistency.
+
+41.2 FALLBACK ORDER
+-------------------
+1. rerun with full candidate pool;
+2. diagnose/repair data;
+3. deterministic feasible no-transfer tactical plan;
+4. previous legal squad with new tactical optimum;
+5. manual review.
+
+41.3 NEVER
+----------
+- invent bank;
+- ignore club limit;
+- silently drop transfer;
+- return illegal XI;
+- claim optimal.
+
+======================================================================
+42. TESTING STRATEGY
+======================================================================
+
+42.1 RULE CONSTRAINTS
+---------------------
+- squad total;
+- positions;
+- club max;
+- budget;
+- transfer position;
+- free transfers;
+- hits;
+- selling price;
+- grandfathered club violation.
+
+42.2 TACTICAL
+-------------
+- every legal formation;
+- bench order;
+- multiple nonappearances;
+- goalkeeper;
+- captain/vice;
+- neither appears;
+- auto-sub formation block.
+
+42.3 PRICE/OWNERSHIP
+--------------------
+- half-profit;
+- full loss;
+- repurchase cohort;
+- future scenario price;
+- route affordability.
+
+42.4 SCENARIO TREE
+------------------
+- nonanticipativity;
+- future information branch;
+- postponement;
+- injury;
+- price;
+- blank/double.
+
+42.5 EXACT TOY
+-------------
+Small player universe solved by exhaustive enumeration.
+
+MILP/tactical result must match.
+
+42.6 PROPERTY TESTS
+-------------------
+- every output legal;
+- bank nonnegative;
+- position counts;
+- transfer balance;
+- FT transition valid;
+- scenario probabilities;
+- recommended >= baseline under selected score unless constraints explain;
+- marginal/Shapley sum property where defined.
+
+42.7 MUTATION
+--------------
+Change rule constants/constraints and confirm tests fail.
+
+42.8 SAA
+-------
+- replicate stability;
+- holdout;
+- sample increase;
+- scenario reduction.
+
+42.9 SOLVER
+-----------
+- timeout;
+- gap;
+- infeasible;
+- warm start;
+- deterministic replay.
+
+======================================================================
+43. OPERATIONAL PERFORMANCE TARGETS
+======================================================================
+
+43.1 NORMAL DEADLINE
+--------------------
+Within five minutes after upstream scenarios:
+
+- recommended plan;
+- no-transfer baseline;
+- current tactics exact;
+- solver gap within target;
+- reasons/confidence.
+
+43.2 DEEP RUN
+-------------
+Within 30 minutes:
+
+- conservative/upside Pareto set;
+- marginal/Shapley attribution;
+- additional scenarios;
+- horizon sensitivity.
+
+43.3 EMERGENCY
+--------------
+Within 30 seconds:
+
+- legal no-transfer tactical plan;
+- fast deterministic transfer alternative;
+- source/solver warning.
+
+43.4 CACHE
+----------
+Reuse:
+
+- player candidate bounds;
+- tactical configurations;
+- price cohorts;
+- scenario summaries;
+- previous model matrix.
+
+Invalidated by state/rules/source changes.
+
+======================================================================
+44. ALERTS AND MONITORING
+======================================================================
+
+P0:
+- illegal recommended plan;
+- inactive rules;
+- bank mismatch;
+- current squad mismatch;
+- nonanticipativity failure;
+- exact tactical test failure;
+- solver infeasible for known legal state.
+
+P1:
+- time limit with large gap;
+- robust/nominal plans diverge materially;
+- scenario instability;
+- candidate pruning bound unsafe;
+- terminal value dominates action;
+- price model E used to time transfer.
+
+P2:
+- conservative/upside not distinct;
+- marginal attribution unstable;
+- horizon sensitivity;
+- high scenario-reduction error;
+- approximate future tactical value.
+
+Metrics:
+
+- solve time;
+- nodes/iterations;
+- MIP gap;
+- objective/bound;
+- plan stability;
+- baseline gain;
+- hit count;
+- FT value;
+- auto-sub expected value;
+- field-11 probability;
+- marginal bank;
+- policy backtest points/regret.
+
+======================================================================
+45. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+45.1 CODEX MAY
+-------------
+- build MILP models;
+- integrate HiGHS;
+- enumerate tactics;
+- implement scenario objectives;
+- build decomposition/warm starts;
+- calculate alternatives/marginals;
+- create tests/solver audit.
+
+45.2 CODEX MUST NOT
+-------------------
+- hard-code FPL constraints;
+- use current price as selling price;
+- ignore ownership spells;
+- sum independent player means for robust/upside decisions;
+- omit auto subs/captain fallback;
+- rank bench by mean only;
+- treat future scenario actions as clairvoyant;
+- report incumbent as optimal without gap;
+- hide infeasibility;
+- maximise team value;
+- add arbitrary flexibility points;
+- use perfect information as achievable;
+- use MCTS/RL without baseline and evaluation;
+- apply chips outside configured interface;
+- return a plan after deadline source bundle invalidates.
+
+45.3 PULL REQUEST
+-----------------
+Every change states:
+
+- formulation;
+- affected variables/constraints;
+- objective;
+- solver;
+- complexity;
+- rule/config change;
+- test proof;
+- backtest impact;
+- gap/runtime;
+- rollback.
+
+======================================================================
+46. RISK REGISTER
+======================================================================
+
+R-12-001 — Static best XV mistaken for decision engine
+Probability: High
+Impact: Critical
+Mitigation:
+state transitions and rolling horizon.
+
+R-12-002 — Expected points only ignores dependence
+Probability: High
+Impact: Critical
+Mitigation:
+joint scenarios.
+
+R-12-003 — Full-season open-loop plan trusted
+Probability: High
+Impact: Critical
+Mitigation:
+MPC execute-first-action.
+
+R-12-004 — Horizon too short
+Probability: High
+Impact: Critical
+Mitigation:
+adaptive horizon/terminal value.
+
+R-12-005 — Horizon too long/noisy
+Probability: Medium
+Impact: High
+Mitigation:
+sensitivity and rolling re-solve.
+
+R-12-006 — Selling price wrong
+Probability: High
+Impact: Critical
+Mitigation:
+ownership cohorts/precomputed sale.
+
+R-12-007 — Future repurchase cohort wrong
+Probability: Medium
+Impact: Critical
+Mitigation:
+new ownership spell.
+
+R-12-008 — Free-transfer transition wrong
+Probability: High
+Impact: Critical
+Mitigation:
+config transition arcs.
+
+R-12-009 — Hit attributed incorrectly
+Probability: Medium
+Impact: High
+Mitigation:
+bundle utility/Shapley.
+
+R-12-010 — Auto subs approximated
+Probability: High
+Impact: Critical
+Mitigation:
+exact tactical enumerator.
+
+R-12-011 — Bench order by expected points
+Probability: High
+Impact: High
+Mitigation:
+scenario official algorithm.
+
+R-12-012 — Captain ignores vice fallback
+Probability: Medium
+Impact: Critical
+Mitigation:
+joint exact evaluation.
+
+R-12-013 — Current tactical enumeration too slow
+Probability: Low/Medium
+Impact: Medium
+Mitigation:
+pruning/vectorisation/cache.
+
+R-12-014 — Future tactical approximation biases transfers
+Probability: High
+Impact: High
+Mitigation:
+top-K exact reevaluation and error audit.
+
+R-12-015 — Scenario tree clairvoyance
+Probability: Medium
+Impact: Critical
+Mitigation:
+node variables/nonanticipativity tests.
+
+R-12-016 — Scenario reduction drops postponement tail
+Probability: Medium
+Impact: Critical
+Mitigation:
+tail preservation/decision error.
+
+R-12-017 — Price scenarios double counted
+Probability: Medium
+Impact: High
+Mitigation:
+affordability/terminal decomposition.
+
+R-12-018 — Team value becomes objective
+Probability: High
+Impact: Critical
+Mitigation:
+marginal future points only.
+
+R-12-019 — Injury player hard-excluded
+Probability: Medium
+Impact: High
+Mitigation:
+distribution unless formal ineligible.
+
+R-12-020 — Postponement independently sampled per player
+Probability: Medium
+Impact: Critical
+Mitigation:
+fixture-level branch.
+
+R-12-021 — DGW fixtures treated independently
+Probability: High
+Impact: Critical
+Mitigation:
+Gameweek scenarios/transition.
+
+R-12-022 — Candidate pruning removes winner
+Probability: Medium
+Impact: Critical
+Mitigation:
+safe bounds/full rerun/sensitivity.
+
+R-12-023 — SAA overfits scenario sample
+Probability: High
+Impact: High
+Mitigation:
+replicates/holdout.
+
+R-12-024 — Raw scenario count mistaken for information
+Probability: Medium
+Impact: High
+Mitigation:
+ESS/stability.
+
+R-12-025 — Solver timeout plan called optimal
+Probability: Medium
+Impact: Critical
+Mitigation:
+gap/status.
+
+R-12-026 — Big-M numerical instability
+Probability: Medium
+Impact: High
+Mitigation:
+tight formulation/indicator where supported.
+
+R-12-027 — Progressive hedging treated exact for MILP
+Probability: Medium
+Impact: High
+Mitigation:
+heuristic label/bounds.
+
+R-12-028 — MCTS branching explodes
+Probability: High
+Impact: High
+Mitigation:
+challenger only/action priors.
+
+R-12-029 — Terminal value overfits
+Probability: High
+Impact: Critical
+Mitigation:
+rolling validation/monotonic tests.
+
+R-12-030 — Conservative plan merely low variance
+Probability: High
+Impact: High
+Mitigation:
+regret/availability definition.
+
+R-12-031 — Upside plan maximises variance
+Probability: High
+Impact: High
+Mitigation:
+tail gain with expectation floor.
+
+R-12-032 — Alternatives artificially poor
+Probability: Medium
+Impact: Medium
+Mitigation:
+Pareto/epsilon.
+
+R-12-033 — Marginal values ignore interactions
+Probability: High
+Impact: High
+Mitigation:
+drop/add/Shapley.
+
+R-12-034 — Shapley coalition illegal
+Probability: Medium
+Impact: High
+Mitigation:
+atomic swaps/path attribution.
+
+R-12-035 — Rank utility leaks into points mode
+Probability: Medium
+Impact: Critical
+Mitigation:
+explicit DMFP-14 interface.
+
+R-12-036 — Chip transition duplicated
+Probability: Medium
+Impact: Critical
+Mitigation:
+single rules/config interface.
+
+R-12-037 — Solver/library change alters results
+Probability: Medium
+Impact: Medium
+Mitigation:
+versioned audit/replay.
+
+R-12-038 — Recommendation stale before execution
+Probability: High
+Impact: Critical
+Mitigation:
+state hash and pre-execution validation.
+
+R-12-039 — Human override not logged
+Probability: Medium
+Impact: High
+Mitigation:
+immutable decision execution.
+
+R-12-040 — Optimisation sophistication hides forecast weakness
+Probability: High
+Impact: Strategic
+Mitigation:
+confidence/source decomposition and baselines.
+
+======================================================================
+47. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-17
+
+----------------------------------------------------------------------
+SRC-FPL-MANAGE-2025-001
+Title:
+FPL basics explained: Managing your team
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174899/fpl-basics-managing-your-team
+
+Relevant claims:
+Reference starting XI, legal formations, captain/vice rules, automatic
+substitution and bench-order rules.
+
+Reliability:
+HIGH official reference-season source.
+Target-season verification required.
+
+Pulse reliance:
+YES for tactical rule configuration/golden tests.
+
+----------------------------------------------------------------------
+SRC-FPL-TRANSFER-2025-001
+Title:
+FPL basics explained: How to make transfers
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-07-01
+
+URL:
+https://www.premierleague.com/en/news/2174907
+
+Relevant claims:
+Reference free transfers, maximum banked transfers, transfer hits,
+same-position replacement, club maximum and selling-price examples.
+
+Reliability:
+HIGH official reference source.
+
+Pulse reliance:
+YES for transition/configuration examples.
+
+----------------------------------------------------------------------
+SRC-FPL-SQUAD-2025-001
+Title:
+The Scout's golden rules for picking an FPL squad
+
+Organisation:
+Premier League / The Scout
+
+Publication date:
+2025-08-07
+
+URL:
+https://www.premierleague.com/en/news/3587605/the-scouts-golden-rules-for-picking-an-fpl-squad
+
+Relevant claims:
+Reference £100m budget, 15-player positional squad and maximum three players per
+club.
+
+Reliability:
+HIGH official reference source.
+
+Pulse reliance:
+YES for squad constraints.
+
+----------------------------------------------------------------------
+SRC-FPL-LAUNCH-2026-001
+Title:
+All you need to know about 2026/27 Premier League fixtures
+
+Organisation:
+Premier League
+
+Publication date:
+2026-06-18
+
+URL:
+https://www.premierleague.com/en/news/4674573/all-you-need-to-know-for-202627-fixture-release-day/
+
+Relevant claim:
+2026/27 FPL would launch later in summer; season begins 21 August 2026 and ends
+30 May 2027.
+
+Reliability:
+HIGH official current source.
+
+Pulse reliance:
+YES for prelaunch gate.
+
+----------------------------------------------------------------------
+SRC-FPL-OPT-2025-001
+Title:
+Data-Driven Team Selection in Fantasy Premier League Using Integer Programming
+and Predictive Modeling Approach
+
+Author:
+Danial Ramezani
+
+URL:
+https://arxiv.org/abs/2505.02170
+
+Publication date:
+2025
+
+Relevant claim:
+Develops deterministic and robust mixed-integer formulations for FPL team,
+lineup and captain selection.
+
+Reliability:
+MODERATE recent preprint; formulation/evaluation requires reproduction.
+
+Pulse reliance:
+BENCHMARK and FPL-specific optimisation context.
+
+----------------------------------------------------------------------
+SRC-DFS-IP-2016-001
+Title:
+Picking Winners in Daily Fantasy Sports Using Integer Programming
+
+Authors:
+David Scott Hunter, Juan Pablo Vielma, Tauhid Zaman
+
+URL:
+https://arxiv.org/abs/1604.01455
+
+Publication date:
+2016
+
+Relevant claim:
+Uses integer programming for constrained fantasy lineups and incorporates
+variance/correlation considerations for top-heavy objectives.
+
+Reliability:
+HIGH academic research; daily fantasy objective differs from season-long FPL.
+
+Pulse reliance:
+YES for MILP and joint-distribution rationale.
+
+----------------------------------------------------------------------
+SRC-SAA-2002-001
+Title:
+The Sample Average Approximation Method for Stochastic Discrete Optimization
+
+Authors:
+Anton J. Kleywegt, Alexander Shapiro, Tito Homem-de-Mello
+
+Publication:
+SIAM Journal on Optimization, 12(2), 479–502
+
+DOI:
+https://doi.org/10.1137/S1052623499363220
+
+Relevant claim:
+Monte Carlo samples can approximate expected-value stochastic discrete
+optimization, with convergence/stopping analysis and repeated solves.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+YES for scenario-based optimisation.
+
+----------------------------------------------------------------------
+SRC-SAA-GUIDE-2015-001
+Title:
+A Guide to Sample Average Approximation
+
+Authors:
+Sujin Kim, Raghu Pasupathy, Shane G. Henderson
+
+URL:
+https://people.orie.cornell.edu/shane/pubs/SAAGuide.pdf
+
+Relevant claim:
+Reviews when and how to use SAA, sampling error and solution assessment.
+
+Reliability:
+HIGH academic review.
+
+Pulse reliance:
+YES for replication/holdout policy.
+
+----------------------------------------------------------------------
+SRC-MPC-2020-001
+Title:
+Model Predictive Control: Theory, Computation, and Design, 2nd Edition
+
+Authors:
+James B. Rawlings, David Q. Mayne, Moritz M. Diehl
+
+URL:
+https://sites.engineering.ucsb.edu/~jbraw/mpc/MPC-book-2nd-edition-1st-printing.pdf
+
+Relevant claim:
+Model predictive/receding-horizon control repeatedly solves constrained future
+optimisation and implements the first action before updating/re-solving.
+
+Reliability:
+HIGH authoritative text.
+
+Pulse reliance:
+YES for deadline control architecture.
+
+----------------------------------------------------------------------
+SRC-ADP-2011-001
+Title:
+Approximate Dynamic Programming: Solving the Curses of Dimensionality
+
+Author:
+Warren B. Powell
+
+Publication:
+Wiley, 2nd edition
+
+Reference:
+https://collaborate.princeton.edu/en/publications/approximate-dynamic-programming-solving-the-curses-of-dimensional/
+
+Relevant claim:
+Framework for high-dimensional sequential decisions and value-function/policy
+approximations.
+
+Reliability:
+HIGH authoritative operations-research text.
+
+Pulse reliance:
+YES for terminal-value challenger.
+
+----------------------------------------------------------------------
+SRC-MDP-2009-001
+Title:
+Markov Decision Processes: A Tool for Sequential Decision Making under
+Uncertainty
+
+Authors:
+Oguzhan Alagoz et al.
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC3060044/
+
+Relevant claim:
+Tutorial framework for states, actions, transitions, rewards and policy
+evaluation in sequential decisions.
+
+Reliability:
+HIGH peer-reviewed tutorial.
+
+Pulse reliance:
+CONTEXTUAL.
+
+----------------------------------------------------------------------
+SRC-MCTS-2022-001
+Title:
+Monte Carlo Tree Search: A Review of Recent Modifications and Applications
+
+Authors:
+Maciej Świechowski, Konrad Godlewski, Bartosz Sawicki, Jacek Mańdziuk
+
+URL:
+https://arxiv.org/abs/2103.04931
+
+Publication:
+Artificial Intelligence Review, 2022
+
+Relevant claim:
+MCTS supports simulation-based sequential search, but complex high-branching
+practical applications often need domain-specific modifications/hybrids.
+
+Reliability:
+HIGH peer-reviewed survey.
+
+Pulse reliance:
+YES for challenger decision.
+
+----------------------------------------------------------------------
+SRC-SCENARIO-2006-001
+Title:
+Scenario Tree Modelling for Multistage Stochastic Programs
+
+Authors:
+Holger Heitsch, Werner Römisch
+
+URL:
+https://www.wias-berlin.de/people/heitsch/HR05svjour.pdf
+
+Relevant claim:
+Stability-based scenario generation/reduction for multistage stochastic
+programs.
+
+Reliability:
+HIGH peer-reviewed operations research.
+
+Pulse reliance:
+YES for scenario-tree reduction.
+
+----------------------------------------------------------------------
+SRC-ROLLING-2021-001
+Title:
+Rolling Horizon Policies in Multistage Stochastic Programming
+
+Authors:
+Murwan Siddig, Yongjia Song, Amin Khademi
+
+URL:
+https://arxiv.org/abs/2102.04874
+
+Relevant claim:
+Rolling-horizon policies solve sequences of shorter multistage problems and
+depend on horizon/terminal decisions.
+
+Reliability:
+MODERATE/HIGH scholarly research.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-LBBD-2019-001
+Title:
+Logic-Based Benders Decomposition for Large-Scale Optimization
+
+Author:
+J. N. Hooker
+
+URL:
+https://arxiv.org/abs/1910.11944
+
+Relevant claim:
+Generalises Benders decomposition so a master problem can coordinate arbitrary
+optimisation subproblems when fixing variables creates decomposition.
+
+Reliability:
+HIGH authoritative research chapter.
+
+Pulse reliance:
+YES for V2 decomposition.
+
+----------------------------------------------------------------------
+SRC-LBBD-STOCHASTIC-2022-001
+Title:
+Stochastic Planning and Scheduling with Logic-Based Benders Decomposition
+
+Authors:
+Özgün Elçi, J. N. Hooker
+
+DOI:
+https://doi.org/10.1287/ijoc.2022.1184
+
+Preprint:
+https://arxiv.org/abs/2012.14074
+
+Relevant claim:
+Applies LBBD to two-stage stochastic problems with combinatorial second-stage
+recourse and reports substantial computational advantages in that setting.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+CHALLENGER for transfer-master/tactical-subproblem design.
+
+----------------------------------------------------------------------
+SRC-PH-1991-001
+Title:
+Scenarios and Policy Aggregation in Optimization Under Uncertainty
+
+Authors:
+R. Tyrrell Rockafellar, Roger J.-B. Wets
+
+Publication:
+Mathematics of Operations Research, 16(1), 119–147
+
+Relevant claim:
+Introduces progressive hedging for scenario decomposition and policy
+nonanticipativity.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+HEURISTIC/DECOMPOSITION candidate.
+
+----------------------------------------------------------------------
+SRC-ROBUST-2004-001
+Title:
+The Price of Robustness
+
+Authors:
+Dimitris Bertsimas, Melvyn Sim
+
+DOI:
+https://doi.org/10.1287/opre.1030.0065
+
+Relevant claim:
+Budgeted robust optimisation creates a tunable trade-off between nominal
+performance and protection.
+
+Reliability:
+HIGH foundational peer-reviewed research.
+
+Pulse reliance:
+Via DMFP-10 robust overlay.
+
+----------------------------------------------------------------------
+SRC-CVAR-2000-001
+Title:
+Optimization of Conditional Value-at-Risk
+
+Authors:
+R. Tyrrell Rockafellar, Stanislav Uryasev
+
+URL:
+https://sites.math.washington.edu/~rtr/papers/rtr179-CVaR1.pdf
+
+Relevant claim:
+Provides a tractable representation for CVaR optimisation.
+
+Reliability:
+HIGH foundational research.
+
+Pulse reliance:
+Conservative/upside/rank modes through DMFP-10/14.
+
+----------------------------------------------------------------------
+SRC-HIGHS-2026-001
+Title:
+HiGHS — High-performance parallel linear optimization software
+
+Organisation:
+ERGO-Code / HiGHS project
+
+URL:
+https://highs.dev/
+
+Relevant claim:
+Open-source software for LP, MIP and QP with Python and other interfaces.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+YES for initial solver.
+
+----------------------------------------------------------------------
+SRC-PYOMO-2026-001
+Title:
+Pyomo Documentation / HiGHS Interface
+
+Organisation:
+Pyomo project
+
+URL:
+https://pyomo.readthedocs.io/
+
+Relevant claim:
+Python algebraic modelling framework with interfaces including HiGHS.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+CANDIDATE modelling layer.
+
+----------------------------------------------------------------------
+SRC-SHAPLEY-1953-001
+Title:
+A Value for n-Person Games
+
+Author:
+Lloyd S. Shapley
+
+Publication:
+Contributions to the Theory of Games II, 1953
+
+Relevant claim:
+Defines an axiomatic allocation of coalition value through average marginal
+contributions.
+
+Reliability:
+HIGH foundational game theory.
+
+Pulse reliance:
+YES for multi-transfer value attribution.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-02 — FPL Rules, Scoring and Season Configuration
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-09 — FPL Points Distribution Engine
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-10 — Uncertainty, Scenarios and Early-Season Policy
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-11 — Price Change and Team Value Model
+
+Pulse reliance:
+YES.
+
+======================================================================
+48. ACCEPTANCE CRITERIA
+======================================================================
+
+A. CENTRAL ARCHITECTURE
+[ ] Rolling-horizon stochastic MILP/MPC is accepted.
+[ ] Only immediate action is executed.
+[ ] Future actions are nonanticipative.
+[ ] Exact current tactical subproblem is required.
+[ ] Solver/approximation status is visible.
+
+B. FPL RULES
+[ ] Squad/position/club/budget constraints are exact.
+[ ] Buying/selling and ownership spells are exact.
+[ ] Free-transfer transitions and hits are table driven.
+[ ] Lineup, bench, captain/vice and autosubs are exact.
+[ ] Target rules remain activation-gated.
+
+C. UNCERTAINTY
+[ ] Full joint scenario matrices are consumed.
+[ ] Postponement is fixture-level.
+[ ] Injuries/price paths create future recourse.
+[ ] SAA replication/holdout is required.
+[ ] Robust/flexibility policy follows DMFP-10.
+
+D. OUTPUTS
+[ ] Recommended, conservative, upside and no-transfer plans exist.
+[ ] Plans are Pareto/non-dominated or absence is explained.
+[ ] Marginal move value includes interactions.
+[ ] Reasons and confidence are structured.
+[ ] Execution timing is included.
+
+E. SCIENCE/OPERATIONS
+[ ] Baselines and sequential policy backtests exist.
+[ ] MIP gaps and solver logs are retained.
+[ ] Exact toy enumeration validates formulation.
+[ ] Scenario/action stability is reported.
+[ ] No price/team-value double counting.
+[ ] No future information leakage.
+
+======================================================================
+49. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Define compiled optimiser rules interface.
+2. Build exact current-state validator.
+3. Implement ownership-spell/selling-price cohorts.
+4. Implement FT transition-arc table.
+5. Implement deterministic multi-GW MILP baseline.
+6. Integrate HiGHS and solver audit.
+7. Implement legal XI enumerator.
+8. Implement exact auto-sub function.
+9. Implement bench-order evaluation.
+10. Implement captain/vice joint evaluation.
+11. Vectorise current tactical scenario scoring.
+12. Build no-transfer baseline.
+13. Build stochastic node/tree schema.
+14. Implement nonanticipative extensive-form baseline.
+15. Implement SAA replication/holdout.
+16. Implement price-path node affordability.
+17. Implement postponement/blank/double branches.
+18. Implement adaptive horizon/terminal interface.
+19. Implement candidate generation and safe dominance.
+20. Implement top-K exact reevaluation.
+21. Implement robust-regret objective.
+22. Implement conservative/upside epsilon modes.
+23. Implement plan diversity/Pareto generation.
+24. Implement marginal drop/add re-solves.
+25. Implement exact/sampled Shapley move attribution.
+26. Implement ACT-versus-WAIT transfer policy.
+27. Implement reasons/binding counterfactuals.
+28. Implement confidence and solver gap.
+29. Build exhaustive toy tests.
+30. Build sequential backtester.
+31. Benchmark logic-based Benders/progressive hedging after V1.
+32. Do not connect execution pipeline until acceptance tests pass.
+
+Suggested commands:
+
+    dmf optimise validate-state
+    dmf optimise no-transfer
+    dmf optimise tactics
+    dmf optimise deterministic
+    dmf optimise stochastic
+    dmf optimise alternatives
+    dmf optimise marginal-values
+    dmf optimise explain
+    dmf optimise sensitivity
+    dmf optimise replay
+    dmf optimise benchmark
+    dmf optimise validate
+
+======================================================================
+50. OPEN QUESTIONS
+======================================================================
+
+FORMULATION
+-----------
+1. Pyomo or native highspy model layer?
+2. How much future tactical detail belongs in the master?
+3. What exact LBBD/value cuts are strongest?
+4. Can current tactical value be represented by generated columns?
+5. Which constraints need indicator versus linear big-M?
+
+HORIZON/TERMINAL
+----------------
+6. What horizon wins sequential backtests?
+7. What terminal-value features are stable?
+8. How is chip value included without double counting DMFP-13?
+9. What forecast discount, if any, is justified?
+10. How sensitive are moves to H±2?
+
+SCENARIOS
+---------
+11. How many optimisation scenarios and holdout draws?
+12. Which tree branches are decision-critical?
+13. What scenario reduction preserves plan choice?
+14. What probability threshold preserves postponement tails?
+15. How are weighted scenarios passed to solver efficiently?
+
+TACTICS
+-------
+16. What is the exact official autosub ordering for all multi-missing edge cases?
+17. How many configurations survive certified pruning?
+18. Can captain/vice be optimised analytically for each XI/bench?
+19. How should current chip tactics integrate?
+20. What current tactical runtime is acceptable?
+
+TRANSFERS/PRICES
+----------------
+21. What cohort encoding is smallest?
+22. How many future price states are needed?
+23. How is WAIT policy represented without explosion?
+24. How is grandfathered club quota represented target season?
+25. Which price routes materially affect decisions?
+
+ROBUST/ALTERNATIVES
+-------------------
+26. What robust-regret lambda is selected?
+27. What expected-utility epsilon defines conservative/upside?
+28. What tail objective defines high-upside before rank mode?
+29. Which availability chance constraint is useful?
+30. How many alternative plans should UI show?
+
+MARGINAL VALUE
+--------------
+31. What is an atomic move in three-plus transfer bundles?
+32. Exact Shapley up to how many moves?
+33. How are transfer-hit interactions allocated?
+34. Which finite-difference shadow values are reliable?
+
+SOLVER/SCALING
+--------------
+35. HiGHS performance on stochastic instances?
+36. When is SCIP/CBC/commercial benchmark justified?
+37. What MIP gap is decision-negligible?
+38. How are warm starts preserved across deadlines?
+39. Is progressive hedging useful despite integer recourse?
+40. When should MCTS/ADP challengers be implemented?
+
+======================================================================
+51. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-13 — CAPTAINCY AND CHIP OPTIMISER
+
+DMFP-13 will use the central engine's:
+
+- legal squad/transfer state;
+- exact tactical evaluator;
+- joint Gameweek scenario matrix;
+- rolling horizon;
+- chip transition interface;
+- robust/upside policies.
+
+It will optimise:
+
+- captain/vice under rank/ownership modes;
+- Triple Captain;
+- Bench Boost;
+- Free Hit;
+- Wildcard;
+- multi-Gameweek chip timing.
+
+DMFP-12 remains the single source of legal squad, bank, transfer and lineup
+state.
+
+======================================================================
+52. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-17
+
+- Selected rolling-horizon stochastic MILP under MPC.
+- Selected HiGHS/open-source solver stack.
+- Added full manager/belief state.
+- Added scenario-tree/nonanticipative recourse.
+- Added ownership-spell and selling-price cohort formulation.
+- Added table-driven FT/hit transitions.
+- Added exact current XI/bench/captain/vice tactical subproblem.
+- Added official automatic-substitution scenario evaluation.
+- Added bench strength/coverage.
+- Added price timing and ACT-versus-WAIT.
+- Added fixture postponement/blank/double scenarios.
+- Added future flexibility and terminal value.
+- Added SAA replication and holdout.
+- Added conservative, upside and no-transfer plans.
+- Added Pareto/diversity generation.
+- Added marginal add/drop and Shapley move value.
+- Assessed MILP, DP, stochastic optimisation, MCTS, SAA and MPC.
+- Added decomposition, solver controls and audit.
+- Added testing, risks, source register and acceptance criteria.
+
+Future v1.0:
+- Sebastian approves architecture.
+- 2026/27 rules are ACTIVE.
+- deterministic MILP and exact tactics pass golden tests.
+- stochastic extensive form and SAA pass holdout tests.
+- ownership cohorts/FT transitions verified.
+- sequential backtest completed.
+- solver runtime/gap accepted.
+- DMFP-13 and pipeline integration approved.
+
+END OF DOCUMENT

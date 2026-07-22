@@ -1,0 +1,47 @@
+{
+  "artifact_root": {
+    "basis": "nearest_existing_parent",
+    "cleaned_up": true,
+    "error_code": null,
+    "status": "HEALTHY",
+    "writable": true
+  },
+  "config": {
+    "environment": "test",
+    "error_code": null,
+    "source": "built_in",
+    "status": "HEALTHY"
+  },
+  "nvidia": {
+    "blocking": false,
+    "device_count": null,
+    "status": "UNAVAILABLE"
+  },
+  "package_version": "0.1.0",
+  "python": {
+    "compatible": true,
+    "required_minor": "3.13",
+    "version": "3.13.9"
+  },
+  "schema_version": "1.0",
+  "status": "HEALTHY",
+  "system": {
+    "architecture": "x86_64",
+    "operating_system": "TestOS",
+    "platform": "test-platform",
+    "python_implementation": "CPython"
+  },
+  "tools": {
+    "git": {
+      "available": true,
+      "status": "AVAILABLE",
+      "version": "git version 2.50.1"
+    },
+    "uv": {
+      "available": false,
+      "status": "UNAVAILABLE",
+      "version": null
+    }
+  },
+  "utc_time": "2026-07-22T10:30:00Z"
+}

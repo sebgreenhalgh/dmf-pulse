@@ -1,0 +1,4565 @@
+DMF PULSE — RESEARCH STANDARD AND EVIDENCE REGISTER
+===================================================
+
+Document ID: DMFP-01
+Version: 0.9 (Research Governance Baseline)
+Status: Proposed controlling research standard for Sebastian approval
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off for this version: 16 July 2026
+Primary owner and final decision-maker: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+Parent architecture: DMFP-00 — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+Next planned document: DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+
+IMPORTANT PURPOSE NOTE
+----------------------
+Every later DMF Pulse specification will be partly produced through AI-assisted
+web research. That creates speed and breadth, but it also creates material risks:
+
+- invented or misquoted sources;
+- plausible but unsupported claims;
+- outdated API, rule or pricing information;
+- reliance on search-result snippets rather than the source;
+- citation laundering, where many pages repeat one unsupported claim;
+- confusing official claims with independent validation;
+- treating peer review as a guarantee of truth;
+- treating a preprint as settled evidence;
+- ignoring corrections, retractions and version changes;
+- overlooking licence, database-right or contractual restrictions;
+- silently converting uncertainty into certainty;
+- selecting evidence that supports a preferred architecture;
+- allowing ChatGPT summaries to become the source of record.
+
+This document is the control layer designed to prevent those failures.
+
+It governs:
+
+- how research questions are framed;
+- how sources are discovered, retrieved, checked and archived;
+- which sources are authoritative for each type of claim;
+- how claims are atomised and linked to evidence;
+- how reliability and certainty are judged;
+- how conflicting evidence is handled;
+- how ChatGPT may and may not participate;
+- how licensing and data-use rights are recorded;
+- how evidence is refreshed;
+- how research becomes an architecture decision;
+- how Codex validates the evidence register automatically.
+
+This is an operational governance standard. It is not legal advice, a formal
+academic systematic-review protocol, or a substitute for specialist statistical,
+technical or legal review where the risk warrants it.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. A documented architecture decision record is required to deviate.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE CONTROL SUMMARY
+======================================================================
+
+0.1 THE STANDARD IN ONE SENTENCE
+--------------------------------
+No material DMF Pulse claim, dependency or architecture decision may rely on a
+forgotten link, an unverified AI summary, an outdated document or an
+unrecorded assumption.
+
+0.2 THE THREE LINKED REGISTERS
+------------------------------
+Research governance is built around three linked registers:
+
+1. SOURCE REGISTER
+   What is the source, which version was examined, what does it actually say,
+   how reliable is it for this purpose, and what are the usage rights?
+
+2. CLAIM REGISTER
+   What atomic claim is being made, which independent sources support or oppose
+   it, how certain is the claim, and when must it be checked again?
+
+3. DECISION REGISTER
+   Which architectural choice was made, what alternatives were considered,
+   which claims support it, what trade-offs remain, and what evidence would
+   reverse it?
+
+A bibliography alone is insufficient because it does not reveal which source
+supports which claim or how that claim affects a decision.
+
+0.3 CONTROLLING RESEARCH DECISIONS
+----------------------------------
+RD-01-01. No universal evidence hierarchy.
+The best source depends on the claim. Official FPL rules are controlling for FPL
+rules. Official provider documentation is primary for a documented API contract.
+Independent testing is stronger for whether that API works as claimed.
+Peer-reviewed empirical research is stronger than a vendor page for model
+performance. Contracts and legislation are controlling for permitted use.
+
+RD-01-02. Source class is not claim certainty.
+A prestigious source can be indirect, stale or inapplicable. A lower-status
+source can directly document an otherwise undocumented behaviour. Every source
+is assessed in relation to a specific atomic claim.
+
+RD-01-03. ChatGPT is a research instrument, never an evidence source.
+AI output can discover, organise, compare and draft. The underlying human- or
+organisation-authored source is cited and registered. Unsupported model memory
+is not evidence.
+
+RD-01-04. Search snippets are discovery aids only.
+A search-result title or snippet MUST NOT support a material claim. The source
+must be opened, inspected and recorded.
+
+RD-01-05. Important claims require traceable locators.
+The register must record the exact page, section, paragraph, line range, API
+field, endpoint, code commit or contractual clause supporting the claim.
+
+RD-01-06. Recency is a property of the claim.
+FPL rules, API schemas, provider pricing and terms can change quickly and require
+short verification windows. Foundational mathematics may remain valid for years.
+
+RD-01-07. Corroboration must be independent.
+Five articles repeating one press release are one evidence chain. Independence is
+assessed through origin and methodology, not domain count.
+
+RD-01-08. Reproducible evidence receives additional weight.
+Code, data, executable examples, test accounts, schemas and live probes increase
+confidence when they are relevant and independently inspectable.
+
+RD-01-09. Negative and conflicting evidence is retained.
+Evidence that contradicts the selected approach MUST remain in the register.
+Disagreement is not removed by choosing a preferred conclusion.
+
+RD-01-10. Licensing is part of evidence quality.
+A technically useful source that cannot lawfully be stored, transformed or used
+in the intended product is not a viable production dependency.
+
+RD-01-11. Important architecture decisions use a predeclared research protocol.
+The question, scope, search plan, inclusion criteria and stopping rule should be
+written before synthesis to reduce confirmation bias.
+
+RD-01-12. Every critical claim has a refresh trigger.
+A source is not permanently verified. The register records a next-review date or
+an event-based trigger such as FPL launch, API version change, contract renewal,
+new paper version, correction or retraction.
+
+RD-01-13. Research quality is graded, not implied.
+The final specification distinguishes:
+- verified fact;
+- empirical estimate;
+- inference;
+- recommendation;
+- assumption;
+- unresolved question.
+
+RD-01-14. Failure to find evidence is a result.
+The report must say what was searched, what was not found and what uncertainty
+remains. It must not manufacture an answer to complete the architecture.
+
+RD-01-15. Implementation cannot outrun evidence.
+Codex MUST NOT implement a critical dependency or algorithm whose governing
+claim remains unverified or whose usage rights remain unresolved.
+
+======================================================================
+1. PURPOSE, SCOPE AND NON-GOALS
+======================================================================
+
+1.1 PURPOSE
+-----------
+The purpose of DMFP-01 is to make every later specification:
+
+- traceable;
+- current;
+- evidence-aware;
+- reproducible;
+- reviewable;
+- legally usable;
+- resistant to AI confabulation;
+- explicit about uncertainty;
+- capable of being corrected without rewriting history.
+
+It is designed for a mixed evidence environment containing:
+
+- official game rules;
+- undocumented or semi-documented web APIs;
+- commercial data feeds;
+- betting exchange and bookmaker documentation;
+- statistical research;
+- optimisation research;
+- software documentation;
+- legislation, contract terms and intellectual-property guidance;
+- FPL practitioner research;
+- community observations;
+- live tests performed by DMF Pulse.
+
+1.2 IN SCOPE
+------------
+This document governs research used to:
+
+- write all DMFP specification files;
+- select data providers;
+- select algorithms;
+- define mathematical assumptions;
+- interpret FPL rules;
+- assess APIs;
+- assess data licensing;
+- establish backtesting methods;
+- define uncertainty and decision policy;
+- instruct Codex;
+- justify model promotion;
+- publish technical explanations;
+- revise previous decisions.
+
+1.3 OUT OF SCOPE
+----------------
+This document does not:
+
+- declare a single algorithm optimal;
+- replace the module-specific research;
+- conduct legal due diligence;
+- guarantee that a source is truthful;
+- convert every module review into a formal academic systematic review;
+- require paid access to every potentially relevant source;
+- require exhaustive coverage when a targeted operational answer is sufficient;
+- permit copying or redistributing protected content merely because it was cited;
+- allow citation count or journal prestige to replace critical appraisal;
+- treat popularity in the FPL community as validation.
+
+1.4 RELATION TO DMFP-00
+-----------------------
+DMFP-00 requires:
+
+- market-first but not market-only forecasting;
+- time-travel-safe data;
+- configurable rules;
+- probabilistic outputs;
+- reproducibility;
+- legal provider access;
+- no unsupported LLM numbers;
+- a validated vertical slice.
+
+DMFP-01 defines the evidence process by which those architectural commitments
+and all future refinements are checked.
+
+======================================================================
+2. TERMINOLOGY
+======================================================================
+
+2.1 SOURCE
+----------
+A retrievable object that can support, oppose or contextualise a claim.
+
+Examples:
+- official rules page;
+- API documentation;
+- contract;
+- legislation;
+- research paper;
+- dataset;
+- code repository;
+- software release;
+- test result;
+- forum post;
+- press conference transcript.
+
+A ChatGPT answer is not a source.
+
+2.2 PRIMARY SOURCE
+------------------
+The closest available record to the subject or event.
+
+Examples:
+- official FPL rules for scoring;
+- provider's API schema for documented fields;
+- raw odds snapshots for a market;
+- original research paper for a method or result;
+- legislation or signed contract for legal obligations;
+- original code and data for a computational result.
+
+"Primary" does not automatically mean unbiased or correct.
+
+2.3 SECONDARY SOURCE
+--------------------
+A source that analyses, synthesises, explains or reports primary sources.
+
+Examples:
+- systematic review;
+- textbook;
+- technical tutorial;
+- news report;
+- community explanation.
+
+A high-quality secondary source can be more useful than one weak primary study,
+but should not replace the primary contract or rule when the exact wording
+controls implementation.
+
+2.4 ATOMIC CLAIM
+----------------
+One proposition that can be independently supported or contradicted.
+
+Bad:
+"Provider X is the best API because it is cheap, accurate and has historical
+player props."
+
+Atomic:
+- Provider X documents EPL player props.
+- A sample account returned player props for 95% of expected starters.
+- Historical snapshots are available on the selected plan.
+- The contract allows internal storage for 12 months.
+- Monthly cost is £Y on the date checked.
+- Provider X had lower missingness than Provider Z in the sample.
+
+2.5 FACT
+--------
+A claim directly established by controlling or strongly verified evidence.
+
+Example:
+"The official 2026/27 FPL rules assign N points for event X."
+
+It remains time-scoped and version-scoped.
+
+2.6 EMPIRICAL ESTIMATE
+----------------------
+A quantity inferred from observations, with sampling, measurement or model
+uncertainty.
+
+Example:
+"The power de-vigging method had the best mean log score in the 2022–2025 sample."
+
+2.7 INFERENCE
+-------------
+A reasoned conclusion not directly stated by the source.
+
+Example:
+"Because provider coverage is incomplete before line-ups, Pulse will need a
+fallback player-allocation model."
+
+The supporting observations must be cited and the inference labelled.
+
+2.8 RECOMMENDATION
+------------------
+A proposed action based on evidence, constraints and preferences.
+
+Example:
+"Use Provider X as primary and Provider Y as fallback."
+
+A recommendation is not transformed into fact by citing sources.
+
+2.9 ASSUMPTION
+--------------
+A proposition temporarily accepted so work can proceed despite incomplete
+evidence.
+
+Assumptions require:
+- owner;
+- rationale;
+- impact;
+- expiry or verification trigger;
+- sensitivity;
+- status.
+
+2.10 PROVENANCE
+---------------
+Information about the entities, activities and agents involved in producing a
+research object, claim, dataset or decision.
+
+For DMF Pulse this includes:
+- source;
+- version;
+- retrieval time;
+- transformation;
+- researcher or agent;
+- code;
+- data;
+- review;
+- output linkage.
+
+2.11 REPRODUCIBILITY
+--------------------
+DMF Pulse adopts the National Academies' computational meaning:
+
+Obtaining consistent computational results using the same input data,
+computational steps, methods, code and conditions of analysis.
+
+2.12 REPLICABILITY
+------------------
+Obtaining consistent findings when the same question is examined with new data
+or an independently constructed implementation.
+
+2.13 VERIFICATION
+-----------------
+Checking that a source, claim, implementation or transformation matches its
+specified requirement.
+
+2.14 VALIDATION
+---------------
+Checking that the requirement, model or decision is appropriate for the intended
+real-world purpose.
+
+2.15 RELIABILITY
+----------------
+The degree to which a source is dependable for the specific claim at issue.
+
+2.16 CERTAINTY / CONFIDENCE
+---------------------------
+The overall judgement about how likely an atomic claim is to remain materially
+correct for its stated context and time.
+
+2.17 DIRECTNESS
+---------------
+How closely the source addresses the exact population, season, endpoint, market,
+decision or implementation context.
+
+2.18 FRESHNESS
+--------------
+Whether the source is current enough for the claim's rate of change.
+
+2.19 INDEPENDENCE
+-----------------
+Whether evidence was generated from a genuinely separate information or
+methodological chain.
+
+2.20 SOURCE BUNDLE
+------------------
+The immutable manifest of all sources, versions, snapshots, search logs and
+extractions used for one specification or architecture decision.
+
+======================================================================
+3. RESEARCH THREAT MODEL
+======================================================================
+
+3.1 AI CONFABULATION
+--------------------
+Generative AI can produce fluent but false statements, references and
+explanations. Confidence of tone is not confidence of evidence.
+
+Controls:
+- no source exists until opened;
+- verify title, author, date and URL;
+- verify the source supports the exact claim;
+- store a locator;
+- independently inspect all critical citations;
+- label unsuccessful searches;
+- never cite ChatGPT as evidence;
+- require human sign-off for blocking claims.
+
+3.2 AUTOMATION BIAS
+-------------------
+A user may accept an AI synthesis because it is organised and detailed.
+
+Controls:
+- display source grades and dissent;
+- require alternatives;
+- separate extraction from synthesis;
+- require a "what could change this decision?" section;
+- sample-check source-to-claim mappings;
+- use independent review for critical decisions.
+
+3.3 SEARCH ENGINE BIAS
+----------------------
+Search ranking favours popular, optimised, accessible and recent pages rather
+than necessarily the best evidence.
+
+Controls:
+- search official domains directly;
+- use bibliographic databases and DOI registries;
+- use backward and forward citation searching;
+- search for criticism, failure and contrary evidence;
+- record queries;
+- perform lateral reading;
+- do not stop at the first plausible result.
+
+3.4 CONFIRMATION BIAS
+---------------------
+Research may be framed to justify a preferred design.
+
+Controls:
+- predeclare the decision question;
+- list plausible alternatives before searching;
+- include explicit disconfirmation queries;
+- record rejected evidence;
+- separate researcher judgement from source statements;
+- use a stopping rule independent of preferred conclusion.
+
+3.5 CITATION LAUNDERING
+-----------------------
+Multiple sources may repeat a claim that originates from one vendor, press
+release, forum post or misunderstood paper.
+
+Controls:
+- trace claims to their earliest or controlling source;
+- record evidence-chain origin;
+- cluster dependent sources;
+- count independent chains, not URLs;
+- prefer original data or documentation.
+
+3.6 AUTHORITY BIAS
+------------------
+Official, prestigious or highly cited sources may be accepted outside their
+domain of authority.
+
+Examples:
+- a provider is authoritative about its advertised endpoint, not necessarily
+  its real uptime or predictive value;
+- FPL is authoritative about scoring, not about the optimal strategy;
+- a peer-reviewed football paper is not authoritative about a changed FPL rule;
+- a lawyer's blog is not the controlling contract.
+
+3.7 RECENCY BIAS
+----------------
+New research can be interesting but unreplicated. Old research can be robust but
+inapplicable to current APIs or rules.
+
+Controls:
+- separate publication recency from applicability;
+- retain foundational methods;
+- apply stricter verification to recent preprints;
+- version current operational claims;
+- use evidence-age thresholds by claim type.
+
+3.8 SURVIVORSHIP AND PUBLICATION BIAS
+-------------------------------------
+Successful methods and positive findings are more visible than failures.
+
+Controls:
+- search for null results and critiques;
+- inspect unpublished technical reports where credible;
+- rely on prospective evaluation;
+- preserve failed DMF experiments;
+- avoid selecting methods on reported headline performance alone.
+
+3.9 DATA SNOOPING AND LEAKAGE
+-----------------------------
+A method can appear strong because it was selected after seeing the target
+period or used future information.
+
+Controls:
+- require temporal splits;
+- record decision-time information sets;
+- distinguish exploratory from confirmatory results;
+- pre-register prospective tests internally;
+- inspect data construction and timestamps;
+- penalise repeated experimentation on the same holdout.
+
+3.10 LICENSING BLINDNESS
+------------------------
+Technical access may be mistaken for legal permission.
+
+Controls:
+- record contract and terms;
+- distinguish access, storage, transformation, publication and commercial use;
+- require legal review for ambiguous production dependencies;
+- record geographic and account restrictions;
+- do not infer permission from the absence of a technical block.
+
+3.11 VERSION BLINDNESS
+----------------------
+A paper, API, rules page, preprint, package or contract may change.
+
+Controls:
+- record version and date;
+- save permitted snapshots or hashes;
+- check publisher status and corrections;
+- record supersession;
+- use versioned software docs;
+- reverify before implementation and release.
+
+3.12 FALSE PRECISION
+--------------------
+A numerical evidence score can create unjustified confidence.
+
+Control:
+The standard uses structured dimensions and an overall judgement. Dimension
+ratings guide reasoning; they are not blindly summed into a truth score.
+
+======================================================================
+4. ROLES, ACCOUNTABILITY AND SIGN-OFF
+======================================================================
+
+4.1 SEBASTIAN — ACCOUNTABLE OWNER
+---------------------------------
+Sebastian:
+
+- defines the product objective;
+- approves critical architecture decisions;
+- approves use of paid or restricted sources;
+- accepts or rejects residual risk;
+- signs off the official FPL season configuration;
+- approves any manual assumptions used in live decisions;
+- owns the final research and implementation outputs.
+
+4.2 CHATGPT — RESEARCH AGENT
+----------------------------
+ChatGPT may:
+
+- formulate research questions;
+- search the web;
+- locate primary and secondary sources;
+- extract and compare claims;
+- identify uncertainty and contradiction;
+- draft source, claim and decision records;
+- propose implementation implications;
+- create the specification file.
+
+ChatGPT must:
+
+- use current web research where claims may have changed;
+- cite every material external claim in its working answer;
+- open and inspect sources;
+- state when evidence is missing;
+- distinguish fact, inference and recommendation;
+- avoid unsupported numerical claims;
+- avoid presenting its own prose as authority;
+- preserve the source trail.
+
+4.3 HUMAN VERIFIER
+------------------
+For critical claims, Sebastian or a nominated reviewer must:
+
+- open the controlling source;
+- confirm the locator and interpretation;
+- confirm applicability;
+- confirm the licence status or escalate;
+- check key contrary evidence;
+- mark the record VERIFIED_HUMAN.
+
+4.4 CODEX — IMPLEMENTATION AND MACHINE VALIDATION
+-------------------------------------------------
+Codex may implement:
+
+- register schemas;
+- validators;
+- link and metadata checks;
+- document templates;
+- version comparisons;
+- query logs;
+- source-bundle manifests;
+- test probes;
+- evidence dashboards.
+
+Codex must not:
+
+- manufacture missing evidence;
+- infer legal rights;
+- upgrade claim confidence automatically;
+- replace human review for a blocking claim;
+- implement a dependency marked RED or UNRESOLVED;
+- delete contradictory records.
+
+4.5 OPTIONAL SPECIALIST REVIEW
+------------------------------
+Specialist review SHOULD be obtained when:
+
+- a licensing term controls commercial viability;
+- a statistical method materially changes decisions and is not well understood;
+- a security design handles authenticated FPL data;
+- a provider contract creates liability;
+- a method is used outside the population or conditions studied;
+- a novel rank-utility model drives aggressive live decisions.
+
+4.6 SIGN-OFF STATES
+-------------------
+DRAFT_AI:
+Created by ChatGPT, not independently checked.
+
+CHECKED_SOURCE:
+Source opened and metadata/claim checked by the research agent.
+
+VERIFIED_HUMAN:
+Human checked the source, claim and applicability.
+
+SPECIALIST_VERIFIED:
+A relevant specialist checked the claim.
+
+SUPERSEDED:
+Retained for history but no longer current.
+
+REJECTED:
+Insufficient, contradicted or unusable.
+
+BLOCKED:
+Cannot be used until a stated issue is resolved.
+
+======================================================================
+5. CLAIM TAXONOMY AND CRITICALITY
+======================================================================
+
+5.1 CLAIM TYPES
+---------------
+RULE:
+Official FPL or competition rule.
+
+API_CONTRACT:
+Documented endpoint, field, rate limit or behaviour.
+
+OBSERVED_API_BEHAVIOUR:
+What a test call or production probe actually returned.
+
+LICENSING:
+Permitted access, storage, transformation, publication or commercial use.
+
+MATHEMATICAL:
+Theorem, derivation or property of an algorithm.
+
+EMPIRICAL_PERFORMANCE:
+Measured predictive, computational or operational performance.
+
+CAUSAL:
+Claim that one factor causes another.
+
+DESCRIPTIVE:
+Observed frequency, coverage, price or characteristic.
+
+FORECASTING_METHOD:
+Claim that a model/method is appropriate for a prediction task.
+
+OPTIMISATION_METHOD:
+Claim that a formulation or solver is suitable.
+
+SOFTWARE_BEHAVIOUR:
+Versioned package, tool or platform capability.
+
+FPL_STRATEGY:
+Claim about decisions, ownership, prices, chips or rank.
+
+OPERATIONAL:
+Latency, uptime, cost, support or workflow.
+
+SECURITY_PRIVACY:
+Data protection or security requirement.
+
+COMMUNITY_OBSERVATION:
+Anecdotal or crowdsourced observation awaiting validation.
+
+5.2 CRITICALITY
+---------------
+BLOCKING:
+Wrong evidence can make the engine illegal, unusable, unable to run or
+fundamentally incorrect.
+
+Examples:
+- official scoring rule;
+- deadline rule;
+- provider storage right;
+- player identity mapping;
+- information-cut-off rule.
+
+CORE:
+Material to model quality or season decisions.
+
+Examples:
+- de-vigging method;
+- minutes model;
+- optimisation horizon;
+- chip opportunity-cost method.
+
+SUPPORTING:
+Improves a module but has a safe fallback.
+
+Examples:
+- a secondary injury source;
+- an optional calibration diagnostic;
+- one additional provider.
+
+CONTEXT:
+Useful background with no direct production dependency.
+
+5.3 EVIDENCE MINIMUM BY CRITICALITY
+-----------------------------------
+BLOCKING:
+- controlling primary source where one exists;
+- exact locator;
+- CHECKED_SOURCE and VERIFIED_HUMAN;
+- licence field complete if relevant;
+- live test if operational;
+- no unresolved material contradiction;
+- revalidation trigger.
+
+CORE:
+- at least one strong primary or peer-reviewed source;
+- preferably one independent corroborating chain;
+- applicability and limitations recorded;
+- empirical validation plan;
+- human review before production promotion.
+
+SUPPORTING:
+- one credible direct source;
+- limitations recorded;
+- fallback documented.
+
+CONTEXT:
+- credible source and clear citation;
+- no production reliance.
+
+======================================================================
+6. CLAIM-SPECIFIC SOURCE HIERARCHY
+======================================================================
+
+6.1 WHY THERE IS NO SINGLE LADDER
+---------------------------------
+A source hierarchy such as "official, then peer-reviewed, then practitioner" is
+a useful starting point, but it can produce errors when applied mechanically.
+
+Examples:
+- official FPL rules outrank a research paper for scoring;
+- a peer-reviewed benchmark outranks a vendor claim for accuracy;
+- an actual API response can contradict stale official documentation;
+- a signed contract outranks a marketing page for data rights;
+- an independently replicated preprint can be stronger than a weak
+  peer-reviewed study;
+- a community observation can reveal an undocumented price behaviour, but it
+  remains provisional until tested.
+
+The standard therefore uses a general discovery hierarchy plus claim-specific
+rules.
+
+6.2 GENERAL DISCOVERY HIERARCHY
+-------------------------------
+H1 — Controlling official and legal sources
+- official FPL and Premier League rules;
+- official competition announcements;
+- legislation and regulator guidance;
+- signed provider contract, licence or data-processing terms;
+- official standards.
+
+H2 — Official technical sources and direct evidence
+- official API documentation;
+- schemas and changelogs;
+- provider support response;
+- live API probe;
+- raw dataset;
+- source code and versioned release;
+- official methodology note.
+
+H3 — High-quality research synthesis
+- systematic review;
+- meta-analysis;
+- consensus or standards document;
+- evidence-based guideline;
+- well-scoped review with transparent methods.
+
+H4 — Peer-reviewed primary research
+- empirical study;
+- methods paper;
+- validated software paper;
+- replication study.
+
+H5 — Credible working papers and preprints
+- identifiable researchers or institutions;
+- clear methods;
+- data/code where possible;
+- version history;
+- no known correction or retraction.
+
+H6 — Technical books and university materials
+- established textbooks;
+- graduate notes;
+- institutional teaching materials;
+- technical monographs.
+
+H7 — Practitioner research with reproducible evidence
+- documented code;
+- public data;
+- clear timestamp and methodology;
+- benchmark or field report;
+- provider-neutral technical analysis.
+
+H8 — Practitioner commentary and journalism
+- useful context or leads;
+- requires trace-back and corroboration.
+
+H9 — Community observations
+- forum posts;
+- social posts;
+- Discord observations;
+- crowd predictions;
+- undocumented anecdotes.
+
+H10 — Unusable as evidence
+- AI-generated answer without verified sources;
+- search snippet;
+- copied content with unknown origin;
+- anonymous unsupported claim;
+- affiliate page posing as independent analysis;
+- source that cannot be retrieved or checked.
+
+The hierarchy is not a scoring formula.
+
+6.3 OFFICIAL FPL RULE CLAIMS
+----------------------------
+Preferred order:
+1. official in-game rules/help page for the target season;
+2. official Premier League/FPL announcement for the target season;
+3. target-season application behaviour verified in a controlled test;
+4. official clarification/support response;
+5. previous-season rules for comparison only;
+6. respected practitioner explanation;
+7. community observation.
+
+Rule text and observed implementation must both be recorded if they differ.
+
+6.4 FIXTURE, DEADLINE AND PLAYER-STATUS CLAIMS
+----------------------------------------------
+Preferred order:
+1. official FPL game data and official Premier League fixture announcement;
+2. official club/competition announcement;
+3. authoritative data feed;
+4. reputable news source quoting the primary source;
+5. practitioner/community source.
+
+Deadline-sensitive claims require current timestamps.
+
+6.5 API CAPABILITY CLAIMS
+-------------------------
+Preferred order:
+1. signed contract/service schedule;
+2. official versioned API documentation/schema;
+3. official changelog/status page;
+4. live authenticated test;
+5. official support response;
+6. independent implementation experience;
+7. community report.
+
+A documented endpoint is not accepted as production-ready until a live test
+confirms:
+- access;
+- expected fields;
+- target competition/market coverage;
+- latency;
+- rate limit;
+- historical depth where required.
+
+6.6 PROVIDER PERFORMANCE CLAIMS
+-------------------------------
+Preferred order:
+1. DMF's own prospective benchmark;
+2. independent reproducible benchmark;
+3. peer-reviewed comparison;
+4. transparent practitioner comparison;
+5. provider-published benchmark;
+6. customer testimonial.
+
+Vendor evidence is useful but carries an incentive conflict.
+
+6.7 DATA LICENSING CLAIMS
+-------------------------
+Preferred order:
+1. signed contract and service schedule;
+2. legislation;
+3. regulator or official government guidance;
+4. provider terms and licence text;
+5. explicit written provider clarification;
+6. specialist legal advice;
+7. provider FAQ;
+8. community interpretation.
+
+Marketing pages do not establish reuse rights.
+
+6.8 MATHEMATICAL AND STATISTICAL CLAIMS
+---------------------------------------
+Preferred order:
+1. formal proof or established reference;
+2. peer-reviewed methods paper;
+3. authoritative technical monograph;
+4. high-quality university materials;
+5. transparent preprint;
+6. reproducible practitioner derivation;
+7. informal explanation.
+
+For applied suitability, mathematical correctness is necessary but not
+sufficient. Empirical validation is still required.
+
+6.9 EMPIRICAL FORECASTING CLAIMS
+--------------------------------
+Preferred order:
+1. independent replication on relevant out-of-time data;
+2. peer-reviewed study with available data/code;
+3. systematic synthesis of relevant studies;
+4. peer-reviewed study without full artefacts;
+5. credible preprint with reproducible artefacts;
+6. practitioner backtest with strict temporal controls;
+7. in-sample or opaque performance claim.
+
+Relevance to EPL, FPL, player markets and the target information set matters more
+than a headline metric from another domain.
+
+6.10 SOFTWARE AND LIBRARY CLAIMS
+--------------------------------
+Preferred order:
+1. documentation for the exact pinned version;
+2. source code and tests for that version;
+3. release notes/changelog;
+4. executable minimal reproduction;
+5. maintainer issue/discussion;
+6. third-party tutorial;
+7. forum answer.
+
+Never cite "latest documentation" for a pinned old version without checking
+compatibility.
+
+6.11 FPL STRATEGY CLAIMS
+------------------------
+Preferred order:
+1. prospective DMF evaluation;
+2. historical, time-safe reproducible analysis;
+3. peer-reviewed or transparent optimisation research;
+4. robust simulation;
+5. respected practitioner research with data;
+6. community consensus;
+7. anecdote.
+
+A successful manager's opinion is a hypothesis, not proof of causality.
+
+6.12 COMMUNITY OBSERVATIONS
+---------------------------
+Community evidence may:
+- surface undocumented behaviour;
+- identify edge cases;
+- provide test hypotheses;
+- reveal operational changes faster than documentation.
+
+It must be labelled PROVISIONAL and independently verified before it controls
+production.
+
+======================================================================
+7. SOURCE APPRAISAL DIMENSIONS
+======================================================================
+
+Every important source is assessed against the dimensions below. Ratings are:
+
+STRONG
+ADEQUATE
+WEAK
+UNKNOWN
+NOT_APPLICABLE
+
+No automatic sum is used.
+
+7.1 AUTHORITY
+-------------
+Does the author or organisation control, create or possess relevant expertise
+over the subject?
+
+7.2 DIRECTNESS
+--------------
+Does the source address the exact claim, population, season, endpoint, market,
+provider version and decision context?
+
+7.3 METHODOLOGICAL RIGOUR
+-------------------------
+Where empirical:
+- design;
+- sample;
+- measurement;
+- validation;
+- uncertainty;
+- comparators;
+- leakage control;
+- statistical analysis;
+- disclosure of limitations.
+
+7.4 REPRODUCIBILITY
+-------------------
+Are data, code, environment, queries or executable examples available?
+Can the result be recreated?
+Has another party reproduced or replicated it?
+
+7.5 TEMPORAL FIT
+----------------
+Is the source current for the claim?
+Was it published before or after the relevant rule/API change?
+Does it use data from a comparable era?
+
+7.6 APPLICABILITY
+-----------------
+Does the evidence transfer to:
+- Premier League;
+- FPL;
+- pre-deadline information;
+- player-level forecasting;
+- Sebastian's operating context;
+- the 2026/27 rules;
+- the planned provider and software stack?
+
+7.7 INDEPENDENCE
+----------------
+Is the source an independent information chain?
+Does it rely on the same underlying dataset, press release or model as another
+source?
+
+7.8 CONFLICTS AND INCENTIVES
+----------------------------
+Does the author sell the product, method or service?
+Are funding, affiliate relationships or commercial incentives disclosed?
+
+7.9 COMPLETENESS
+----------------
+Can the methods, limitations and scope be inspected?
+Is only an abstract, slide, marketing summary or partial document available?
+
+7.10 STATUS
+-----------
+Is it:
+- current version;
+- peer reviewed;
+- preprint;
+- corrected;
+- retracted;
+- withdrawn;
+- deprecated;
+- superseded;
+- archived?
+
+7.11 ACCESS AND LICENSING
+-------------------------
+Can Pulse:
+- read;
+- cite;
+- store;
+- transform;
+- use internally;
+- use commercially;
+- display outputs;
+- redistribute?
+
+7.12 OVERALL RELIABILITY ASSESSMENT
+-----------------------------------
+A short narrative answers:
+
+"For this precise claim, why should Pulse trust or distrust this source?"
+
+======================================================================
+8. CLAIM CERTAINTY FRAMEWORK
+======================================================================
+
+8.1 CERTAINTY LEVELS
+--------------------
+HIGH:
+The claim is directly supported by controlling or convergent strong evidence,
+has good applicability and no unresolved material contradiction. Further
+evidence is unlikely to change the material conclusion, although current claims
+still need scheduled verification.
+
+MODERATE:
+The claim is probably correct and suitable for provisional architecture, but one
+or more limitations remain: indirectness, incomplete replication, uncertain
+freshness, limited sample or moderate disagreement.
+
+LOW:
+The claim is plausible but materially uncertain. It may guide experimentation,
+not a high-risk production dependency without fallback and sensitivity testing.
+
+VERY_LOW:
+Evidence is anecdotal, indirect, conflicting, opaque or substantially outdated.
+The claim is hypothesis-generating only.
+
+UNRATED:
+Appraisal is incomplete.
+
+CONTRADICTED:
+Strong current evidence indicates the claim is materially false.
+
+8.2 FACTORS THAT LOWER CERTAINTY
+--------------------------------
+- risk of bias;
+- inconsistent findings;
+- indirectness;
+- imprecision;
+- publication or availability bias;
+- stale version;
+- non-independent corroboration;
+- unresolved conflict;
+- missing methods;
+- no temporal controls;
+- selective reporting;
+- licensing uncertainty for a production claim;
+- provider incentive;
+- abstract-only access;
+- target-season mismatch.
+
+These adapt concepts used in GRADE and risk-of-bias frameworks. DMF Pulse does
+not claim formal GRADE compliance because its evidence includes contracts, APIs,
+software and operational tests as well as research studies.
+
+8.3 FACTORS THAT MAY RAISE CERTAINTY
+------------------------------------
+- direct controlling source;
+- exact live behaviour test;
+- independent replication;
+- available code/data;
+- prospective validation;
+- strong out-of-time performance;
+- multiple independent evidence chains;
+- stable result under sensitivity analysis;
+- consistent result across relevant seasons/providers;
+- explicit correction and version history;
+- specialist verification.
+
+8.4 EVIDENCE CLASS AND CERTAINTY ARE DISTINCT
+---------------------------------------------
+Example:
+An official provider page may be H2 but support only MODERATE certainty that a
+market is practically available, because the claim has not been tested in the
+target account and jurisdiction.
+
+Example:
+A high-quality community dataset could be H7 but support HIGH certainty about a
+historical event if it contains immutable raw records independently matched to
+official outcomes.
+
+8.5 DECISION RULE
+-----------------
+A recommendation must state:
+- claim certainty;
+- decision criticality;
+- residual risk;
+- fallback;
+- reversal trigger.
+
+A HIGH certainty claim can still lead to a poor recommendation if the preference
+or trade-off is wrong. Evidence certainty is not decision desirability.
+
+======================================================================
+9. RESEARCH DEPTH LEVELS
+======================================================================
+
+9.1 R0 — DISCOVERY
+------------------
+Purpose:
+Find candidate sources or vocabulary.
+
+Requirements:
+- query recorded;
+- no production claim supported;
+- snippets not cited as evidence.
+
+Use:
+Initial exploration only.
+
+9.2 R1 — TARGETED VERIFICATION
+------------------------------
+Purpose:
+Verify a narrow operational fact.
+
+Examples:
+- current API parameter;
+- publication date;
+- exact FPL rule;
+- package function signature.
+
+Requirements:
+- primary source opened;
+- exact locator;
+- access date;
+- version;
+- one corroborating live test where operational;
+- register entry.
+
+9.3 R2 — STRUCTURED MODULE REVIEW
+---------------------------------
+Default for a normal module design question.
+
+Requirements:
+- written question and scope;
+- alternatives listed;
+- search log;
+- primary and academic sources;
+- inclusion/exclusion rationale;
+- source and claim register;
+- critical appraisal;
+- contrary-evidence search;
+- synthesis;
+- selected approach;
+- empirical validation plan;
+- refresh triggers.
+
+9.4 R3 — CRITICAL ARCHITECTURE REVIEW
+-------------------------------------
+Required for:
+- provider selection;
+- data rights;
+- scoring interpretation;
+- odds normalisation policy;
+- minutes model family;
+- optimisation objective;
+- chip strategy;
+- rank utility;
+- backtesting methodology.
+
+Adds:
+- second human review;
+- independent evidence chain;
+- source-bundle hash;
+- explicit sensitivity;
+- predeclared stopping rule;
+- proof-of-access or executable prototype;
+- formal ADR;
+- no unresolved blocking issue.
+
+9.5 R4 — SYSTEMATIC OR SCOPING REVIEW
+-------------------------------------
+Rare. Used when:
+- the evidence base is broad and disputed;
+- publication-quality synthesis is intended;
+- a major scientific claim requires exhaustive coverage.
+
+Requirements:
+- protocol;
+- database-specific searches;
+- complete eligibility criteria;
+- duplicate screening where feasible;
+- flow diagram;
+- formal appraisal tool where appropriate;
+- PRISMA/PRISMA-S-aligned reporting.
+
+DMF Pulse MUST NOT label an ordinary ChatGPT web search a systematic review.
+
+======================================================================
+10. RESEARCH PROTOCOL
+======================================================================
+
+10.1 PROTOCOL ID
+----------------
+Every R2/R3/R4 review receives:
+
+RP-{module}-{number}-{version}
+
+Example:
+RP-06-001-v1 — Compare de-vigging methods for multi-outcome football markets.
+
+10.2 REQUIRED PROTOCOL FIELDS
+-----------------------------
+- protocol ID;
+- module;
+- owner;
+- review depth;
+- date started;
+- decision deadline;
+- research question;
+- decision that depends on it;
+- claim types;
+- population/context;
+- methods/interventions/options;
+- comparators;
+- outcomes;
+- time period;
+- jurisdiction;
+- target season/provider/software version;
+- source classes;
+- search locations;
+- planned queries;
+- inclusion criteria;
+- exclusion criteria;
+- quality appraisal;
+- synthesis method;
+- stopping rule;
+- update trigger;
+- conflicts of interest;
+- deviations.
+
+10.3 QUESTION FORMULATION
+-------------------------
+The question should be decision-ready.
+
+Weak:
+"What is the best odds API?"
+
+Strong:
+"For a UK-based private FPL decision engine operating before 2026/27 deadlines,
+which legally accessible provider or provider combination supplies current and
+historical EPL team and player markets with sufficient timestamp precision,
+coverage, storage rights, reliability and cost for market-to-FPL projection and
+time-safe backtesting?"
+
+10.4 ALTERNATIVES BEFORE SEARCH
+-------------------------------
+List plausible choices before searching.
+
+This prevents the research from becoming a justification for the first provider
+or model discovered.
+
+10.5 OUTCOMES
+-------------
+Outcomes should include more than predictive performance.
+
+Examples:
+- calibration;
+- log score;
+- coverage;
+- historical depth;
+- latency;
+- missingness;
+- reproducibility;
+- complexity;
+- cost;
+- licence;
+- maintenance;
+- failure behaviour;
+- decision value.
+
+10.6 STOPPING RULE
+------------------
+The review must define when searching ends.
+
+R2 example:
+- controlling official sources found;
+- at least two independent relevant research chains checked;
+- contrary-evidence search completed;
+- saturation reached across two additional query rounds;
+- no unresolved CORE contradiction.
+
+R3 example:
+- all R2 criteria;
+- proof-of-access;
+- licence reviewed;
+- executable comparison;
+- human verification;
+- fallback identified.
+
+Stopping because a preferred answer was found is prohibited.
+
+10.7 PROTOCOL DEVIATIONS
+------------------------
+Any material deviation is logged:
+- what changed;
+- why;
+- date;
+- impact;
+- approver.
+
+======================================================================
+11. SEARCH STRATEGY AND LOGGING
+======================================================================
+
+11.1 SEARCH ORDER
+-----------------
+For each question:
+
+1. Identify controlling official source.
+2. Search official technical documentation and changelogs.
+3. Search academic databases and DOI-indexed literature.
+4. Search references in high-quality reviews/papers.
+5. Search papers that cite key sources.
+6. Search reproducible practitioner work.
+7. Search community sources for edge cases and leads.
+8. Search explicitly for failures, criticism and contrary evidence.
+9. Verify current status, versions, corrections and retractions.
+
+11.2 SEARCH LOCATIONS
+---------------------
+As relevant:
+- official FPL/Premier League domains;
+- official provider domains;
+- Crossref/DOI metadata;
+- Google Scholar or comparable academic search;
+- arXiv;
+- publisher databases;
+- university repositories;
+- standards organisations;
+- government legislation/guidance;
+- GitHub or official code repository;
+- package documentation;
+- practitioner sites;
+- FPL community sites.
+
+Access to a database does not imply permission to bulk harvest it.
+
+11.3 QUERY LOG
+--------------
+Record:
+- query ID;
+- exact query string;
+- search system;
+- filters;
+- date/time;
+- result count where available;
+- pages inspected;
+- sources retained;
+- notes;
+- researcher/agent.
+
+Queries should be reproducible and free of hidden personalisation where
+possible.
+
+11.4 QUERY DESIGN
+-----------------
+Use combinations of:
+- exact product/method name;
+- synonyms;
+- version/year;
+- population/context;
+- outcome metric;
+- "validation";
+- "calibration";
+- "replication";
+- "limitations";
+- "failure";
+- "bias";
+- "benchmark";
+- "terms";
+- "licence";
+- "historical";
+- "changelog";
+- "deprecated".
+
+11.5 DISCONFIRMATION QUERIES
+----------------------------
+At least one explicit contrary query for every CORE/BLOCKING question.
+
+Examples:
+- "[method] limitations football odds";
+- "[provider] missing player props";
+- "[API] deprecated";
+- "[strategy] no effect";
+- "[paper title] critique";
+- "[DOI] correction retraction";
+- "[claim] replication failure".
+
+11.6 LATERAL READING
+--------------------
+Do not judge an unfamiliar source only by its own presentation.
+
+Investigate:
+- who operates it;
+- funding and incentives;
+- external coverage;
+- original source;
+- author expertise;
+- correction history;
+- domain reputation;
+- whether content is copied.
+
+11.7 FORWARD AND BACKWARD SEARCHING
+-----------------------------------
+For important papers:
+- inspect references;
+- inspect later citing work;
+- check corrections;
+- check newer versions;
+- locate code/data;
+- identify independent replications.
+
+11.8 SEARCH EXHAUSTIVENESS
+--------------------------
+The search log must state:
+- databases not accessible;
+- paywalled sources not obtained;
+- language limits;
+- date limits;
+- missing provider documents;
+- incomplete grey literature.
+
+======================================================================
+12. SOURCE RETRIEVAL AND VERIFICATION
+======================================================================
+
+12.1 OPEN THE SOURCE
+--------------------
+A source is eligible only when its relevant content has been opened and
+inspected.
+
+Exceptions:
+- inaccessible source may be registered as NOT_RETRIEVED;
+- it cannot carry a material claim unless independently verified elsewhere.
+
+12.2 METADATA CHECK
+-------------------
+Verify:
+- exact title;
+- author(s);
+- organisation;
+- publisher;
+- publication date;
+- last updated date;
+- version;
+- DOI or persistent ID;
+- canonical URL;
+- source type;
+- peer-review status;
+- correction/retraction status.
+
+12.3 CONTENT CHECK
+------------------
+Verify:
+- exact claim;
+- qualifiers;
+- denominator;
+- time period;
+- jurisdiction;
+- population;
+- outcome definition;
+- method;
+- limitations;
+- whether the claim is measured, inferred or promotional.
+
+12.4 LOCATOR
+------------
+Record one or more:
+- page number;
+- section heading;
+- paragraph;
+- table/figure;
+- equation;
+- line range;
+- API endpoint;
+- JSON path;
+- code file/line;
+- Git commit;
+- contract clause;
+- timestamp in audio/video.
+
+12.5 PDF AND VISUAL SOURCES
+---------------------------
+For a material PDF:
+- inspect parsed text;
+- visually inspect the relevant page;
+- record page number;
+- verify charts/tables in context;
+- avoid OCR unless necessary;
+- preserve a permitted copy or hash.
+
+12.6 ABSTRACT-ONLY EVIDENCE
+---------------------------
+An abstract may support only claims explicitly contained in the abstract.
+
+It cannot support:
+- detailed methodology;
+- subgroup result;
+- limitation;
+- exact implementation;
+- licence;
+- table value not shown.
+
+12.7 PAPER STATUS CHECK
+-----------------------
+For important research:
+- resolve DOI;
+- inspect publisher page;
+- check Crossmark or update metadata where available;
+- check correction/retraction notices;
+- check preprint version history;
+- record version of record;
+- record whether code/data remain available.
+
+Crossmark improves visibility of updates but its presence is not a guarantee.
+
+12.8 API DOCUMENT STATUS
+------------------------
+Record:
+- documentation version;
+- API version;
+- changelog date;
+- deprecation warning;
+- status page;
+- test date;
+- account/plan;
+- jurisdiction;
+- response hash or test fixture.
+
+12.9 ARCHIVING
+--------------
+Where permitted, preserve:
+- downloaded document;
+- raw HTML/PDF;
+- screenshot;
+- JSON response;
+- repository archive;
+- terms version;
+- SHA-256 hash.
+
+If preservation is forbidden:
+- preserve metadata, locator and permitted derived notes;
+- record the restriction;
+- do not circumvent it.
+
+======================================================================
+13. SCREENING AND ELIGIBILITY
+======================================================================
+
+13.1 INCLUSION CRITERIA
+-----------------------
+A source may be included when it:
+- addresses an atomic claim;
+- is retrievable;
+- has identifiable provenance;
+- is sufficiently current or historically relevant;
+- has inspectable methods/content;
+- contributes support, contradiction or limitation;
+- can be lawfully consulted.
+
+13.2 EXCLUSION CRITERIA
+-----------------------
+Exclude as supporting evidence when:
+- origin is unknown;
+- content is AI-generated without primary sources;
+- only a search snippet is available;
+- it duplicates another source without added evidence;
+- it is out of scope;
+- it uses future information for a pre-deadline claim;
+- it is withdrawn/retracted for the relevant reason;
+- it has a fatal methodological flaw;
+- the source cannot be interpreted reliably;
+- it is promotional with no evidence and stronger direct evidence exists.
+
+Retain an exclusion record for important candidates.
+
+13.3 DUPLICATES
+---------------
+Duplicates include:
+- same paper on publisher and preprint server;
+- syndicated press release;
+- copied provider documentation;
+- articles summarising one study.
+
+Choose a canonical record and link alternate locations.
+
+13.4 LANGUAGE
+-------------
+English is the default operational language. Relevant non-English controlling
+sources should be included and translated with:
+- original text locator;
+- translation method;
+- human check for BLOCKING claims.
+
+13.5 PAYWALLS
+-------------
+A paywall is not a quality signal.
+
+If important:
+- seek author manuscript;
+- use institutional access;
+- contact author;
+- purchase if justified;
+- record that full text was unavailable.
+
+Do not infer unavailable details.
+
+======================================================================
+14. EVIDENCE EXTRACTION
+======================================================================
+
+14.1 EXTRACTION RULE
+--------------------
+Extract only what is needed for the claim and decision.
+
+14.2 REQUIRED EXTRACTION FIELDS
+-------------------------------
+- source ID;
+- claim ID;
+- exact source locator;
+- source statement or careful paraphrase;
+- extracted quantitative value and unit;
+- conditions/qualifiers;
+- population/sample;
+- time period;
+- method;
+- comparator;
+- uncertainty;
+- limitations;
+- conflicts/funding;
+- applicability to Pulse;
+- researcher notes;
+- extraction date;
+- extractor;
+- verification state.
+
+14.3 QUOTATION
+--------------
+Use minimal quotation:
+- exact legal/rule wording where necessary;
+- short technical definition;
+- avoid long copyrighted passages;
+- preserve quotation marks and locator;
+- otherwise paraphrase accurately.
+
+14.4 NUMERIC EXTRACTION
+-----------------------
+For every number record:
+- numerator;
+- denominator;
+- units;
+- interval;
+- metric definition;
+- sample;
+- rounding;
+- whether read from text, table or chart;
+- any calculation performed;
+- calculation code where material.
+
+14.5 ASSUMPTIONS DURING EXTRACTION
+----------------------------------
+Do not silently:
+- convert odds formats;
+- infer missing units;
+- equate correlation with causation;
+- infer market availability from a generic list;
+- assume endpoint stability;
+- generalise from another league;
+- treat "up to" as typical performance;
+- treat marketing latency as measured latency.
+
+14.6 DOUBLE EXTRACTION
+----------------------
+For BLOCKING R3 claims, a human should independently verify the extraction.
+
+======================================================================
+15. AI-ASSISTED RESEARCH CONTROL
+======================================================================
+
+15.1 PERMITTED AI USE
+---------------------
+ChatGPT may:
+- broaden queries;
+- translate terminology;
+- classify sources;
+- extract structured metadata;
+- compare methods;
+- identify gaps;
+- draft evidence tables;
+- propose contrary queries;
+- write the specification.
+
+15.2 PROHIBITED AI USE
+----------------------
+ChatGPT MUST NOT:
+- invent a source;
+- cite its own answer;
+- rely on memory for current rules/APIs;
+- fill a missing number with a plausible estimate;
+- claim exhaustive review without protocol;
+- infer licence rights;
+- conceal uncertainty;
+- create a fake quotation;
+- cite a source it did not inspect for a material claim;
+- treat search snippets as evidence;
+- make legal conclusions beyond the source and review level.
+
+15.3 AI SESSION RECORD
+----------------------
+For R3 reviews, record:
+- model/product used;
+- date;
+- user research request;
+- major search prompts or query log;
+- source bundle;
+- output file version;
+- human reviewer;
+- known limitations.
+
+Private chain-of-thought is not required. Store the reproducible research plan,
+queries, evidence, concise rationale and decisions instead.
+
+15.4 CITATION VERIFICATION
+--------------------------
+Every critical AI-proposed citation is checked for:
+- existence;
+- correct authors/title;
+- correct version;
+- source supports claim;
+- locator;
+- status;
+- applicability.
+
+15.5 AI SUMMARISATION RISK
+--------------------------
+A summary can erase qualifiers.
+
+The extractor must preserve:
+- "may";
+- "under these conditions";
+- sample limitations;
+- uncertainty;
+- conditional definitions;
+- negative findings;
+- exclusions.
+
+15.6 NIST-ALIGNED CONTROLS
+--------------------------
+NIST's Generative AI Profile identifies confabulation and recommends reviewing
+and verifying sources/citations and tracking provenance. DMF Pulse operationalises
+that guidance through:
+- mandatory source verification;
+- AI-output status labels;
+- provenance records;
+- human review;
+- no AI evidence class;
+- model/version logging where material.
+
+15.7 OPENAI RESEARCH TOOLS
+--------------------------
+OpenAI research tools can synthesise many sources and provide citations. Their
+output remains a research report, not self-validating evidence. The cited
+sources, activity record and limitations must still be checked under this
+standard.
+
+======================================================================
+16. SYNTHESIS
+======================================================================
+
+16.1 SYNTHESIS OUTPUT
+---------------------
+Every R2/R3 review produces:
+
+1. research question;
+2. sources searched;
+3. included/excluded evidence;
+4. claim table;
+5. evidence quality;
+6. conflicts;
+7. findings;
+8. limitations;
+9. selected approach;
+10. alternatives rejected;
+11. empirical validation plan;
+12. residual uncertainty;
+13. reversal conditions;
+14. refresh schedule.
+
+16.2 FACT / INFERENCE / RECOMMENDATION LABELS
+---------------------------------------------
+Use explicit labels.
+
+FACT:
+"Provider documentation lists endpoint X."
+
+OBSERVATION:
+"Test account returned 72 player selections at 14:00 UTC."
+
+INFERENCE:
+"Coverage may be insufficient before line-ups."
+
+RECOMMENDATION:
+"Use a secondary source or fallback model."
+
+ASSUMPTION:
+"Until a longer sample exists, assume the observed missingness range persists."
+
+16.3 NARRATIVE SYNTHESIS
+------------------------
+When evidence is heterogeneous:
+- group by claim;
+- compare directness and methods;
+- explain disagreement;
+- avoid vote counting;
+- avoid treating the majority as automatically correct;
+- state which evidence carries more weight and why.
+
+16.4 QUANTITATIVE SYNTHESIS
+---------------------------
+Meta-analysis or pooled metrics require:
+- compatible definitions;
+- comparable information sets;
+- comparable outcome units;
+- independence assessment;
+- heterogeneity;
+- uncertainty;
+- documented model choice.
+
+Do not pool incomparable backtests.
+
+16.5 ABSENCE OF EVIDENCE
+------------------------
+Distinguish:
+- evidence of absence;
+- absence of evidence;
+- inaccessible evidence;
+- not searched;
+- not measurable.
+
+Example:
+"No assist market was observed in ten sample fixtures" is not the same as
+"Provider never offers assist markets."
+
+16.6 EVIDENCE CONFLICT
+----------------------
+When sources conflict:
+1. confirm they address the same claim;
+2. check date/version;
+3. identify definitions;
+4. inspect primary data;
+5. assess independence;
+6. assess methodology;
+7. identify rule/context changes;
+8. retain both;
+9. reduce certainty;
+10. define a test or escalation.
+
+16.7 SOURCE INDEPENDENCE GRAPH
+------------------------------
+For critical claims, record common origins.
+
+Example:
+- News A -> Provider press release
+- Blog B -> News A
+- Forum C -> Blog B
+
+This is one chain.
+
+Independent:
+- provider docs;
+- DMF live test;
+- independent benchmark.
+
+16.8 RESEARCHER JUDGEMENT
+-------------------------
+Judgement is unavoidable. It must be visible.
+
+Record:
+- why one source was weighted more;
+- why evidence was indirect;
+- why an alternative was rejected;
+- how uncertainty affected the decision.
+
+======================================================================
+17. LICENSING, COPYRIGHT, DATABASE RIGHTS AND TERMS
+======================================================================
+
+17.1 PRINCIPLE
+--------------
+Citation permission and production permission are different.
+
+A source may be lawful to read and cite while its data may not be lawful to:
+- scrape;
+- store;
+- transform;
+- redistribute;
+- display;
+- train on;
+- use commercially.
+
+17.2 REQUIRED RIGHTS FIELDS
+---------------------------
+For data, API, code and substantial content, record:
+
+- rights holder;
+- governing contract/terms URL;
+- contract version/date;
+- copyright status;
+- database-right status;
+- software licence;
+- data licence;
+- access right;
+- automated-access right;
+- raw-storage right;
+- retention period;
+- backup right;
+- transformation/derivative right;
+- model-training right;
+- internal-use right;
+- public-display right;
+- commercial-use right;
+- redistribution right;
+- attribution requirement;
+- share-alike requirement;
+- noncommercial restriction;
+- no-derivatives restriction;
+- geographic restriction;
+- user/account restriction;
+- termination effect;
+- deletion obligation;
+- audit requirement;
+- legal-review status.
+
+17.3 LICENSING TRAFFIC LIGHT
+----------------------------
+GREEN:
+Rights are explicit and compatible with the planned use.
+
+AMBER:
+Rights are limited, ambiguous, plan-dependent or require written clarification.
+May be used only in the permitted provisional context.
+
+RED:
+Use is prohibited or materially incompatible.
+
+UNKNOWN:
+Not yet assessed. Treated as AMBER/BLOCKED for production.
+
+17.4 OPEN LICENCES
+------------------
+Record exact licence and version.
+
+Creative Commons examples:
+- CC BY permits adaptation and commercial use with attribution.
+- CC BY-SA adds share-alike.
+- CC BY-ND prohibits adaptations.
+- CC BY-NC restricts to noncommercial use.
+- combinations retain their conditions.
+
+Do not write only "Creative Commons."
+
+17.5 SOFTWARE LICENCES
+----------------------
+Use standard SPDX identifiers where possible.
+
+Record:
+- direct dependencies;
+- transitive risk where material;
+- copyleft obligations;
+- attribution;
+- patent terms;
+- compatibility with distribution.
+
+17.6 UK DATABASE RIGHTS
+-----------------------
+UK guidance recognises copyright in original selection/arrangement and separate
+database rights where substantial investment exists. Public availability does
+not remove these rights.
+
+DMF Pulse must not assume:
+- an API response is free to republish;
+- factual data has no database protection;
+- a public endpoint grants bulk storage rights.
+
+17.7 GOVERNMENT / OPEN DATA
+---------------------------
+Record exact open-government licence and attribution requirements. Do not infer
+that all government content has the same terms.
+
+17.8 LEGAL ESCALATION
+---------------------
+Escalate when:
+- raw odds will be retained;
+- data will be displayed publicly;
+- product monetisation begins;
+- terms prohibit benchmarking;
+- derived-data ownership is unclear;
+- provider termination affects stored data;
+- jurisdiction conflicts;
+- substantial database extraction is planned.
+
+The evidence register records operational status; only qualified legal advice
+resolves material ambiguity.
+
+======================================================================
+18. PROVENANCE, FAIRNESS AND REPRODUCIBILITY
+======================================================================
+
+18.1 FAIR-INSPIRED PRINCIPLES
+-----------------------------
+DMF research objects should be:
+
+FINDABLE
+- stable IDs;
+- searchable register;
+- rich metadata;
+- linked claims/decisions.
+
+ACCESSIBLE
+- retrievable through documented paths;
+- access restrictions recorded;
+- metadata retained even if content becomes unavailable.
+
+INTEROPERABLE
+- controlled vocabularies;
+- standard date/time and identifier formats;
+- machine-readable CSV/JSON/YAML;
+- qualified links.
+
+REUSABLE
+- clear licence;
+- provenance;
+- context;
+- version;
+- limitations;
+- domain-relevant standards.
+
+FAIR does not mean open. Restricted sources can have findable metadata and
+documented access controls.
+
+18.2 W3C PROV MAPPING
+---------------------
+ENTITY:
+- source document;
+- dataset;
+- extraction;
+- claim;
+- specification;
+- decision.
+
+ACTIVITY:
+- search;
+- retrieval;
+- extraction;
+- transformation;
+- review;
+- synthesis;
+- approval.
+
+AGENT:
+- Sebastian;
+- ChatGPT;
+- Codex;
+- provider;
+- author;
+- human reviewer.
+
+Relations:
+- wasDerivedFrom;
+- wasGeneratedBy;
+- wasAssociatedWith;
+- used;
+- wasAttributedTo;
+- wasRevisionOf;
+- invalidatedAtTime.
+
+A full RDF implementation is optional; the conceptual relationships are
+mandatory.
+
+18.3 SOURCE BUNDLE MANIFEST
+---------------------------
+Each R2/R3 review should produce:
+
+{
+  "bundle_id": "SB-DMFP06-001-v1",
+  "created_at_utc": "...",
+  "protocol_id": "RP-06-001-v1",
+  "specification_version": "DMFP-06-v0.8",
+  "source_ids": ["SRC-..."],
+  "claim_ids": ["CLM-..."],
+  "decision_ids": ["ADR-..."],
+  "search_log_paths": [],
+  "artifact_paths": [],
+  "hash_algorithm": "SHA-256",
+  "bundle_hash": "...",
+  "research_agent": "ChatGPT",
+  "human_reviewer": "Sebastian",
+  "code_commit": "..."
+}
+
+18.4 REPRODUCIBLE RESEARCH PACKAGE
+----------------------------------
+Where computational:
+- README;
+- data manifest;
+- licence file;
+- environment lock;
+- source code;
+- parameters;
+- seeds;
+- command;
+- expected outputs;
+- tests;
+- machine information where relevant;
+- result tolerances.
+
+ACM's artifact guidance provides a useful quality target:
+documented, consistent, complete and exercisable, with reusable structure where
+practical.
+
+18.5 PERSISTENT IDENTIFIERS
+---------------------------
+Prefer:
+- DOI;
+- SWHID;
+- repository release;
+- Git commit;
+- official version number;
+- canonical URL.
+
+DataCite metadata concepts inform consistent title, creator, publisher, date,
+resource type, related identifier and rights fields.
+
+18.6 HASHES
+-----------
+Hashes establish file identity, not truth.
+
+Use SHA-256 for:
+- downloaded source files;
+- API test fixtures;
+- search logs;
+- evidence register releases;
+- source bundles;
+- specifications.
+
+======================================================================
+19. SOURCE REGISTER SCHEMA
+======================================================================
+
+19.1 CANONICAL FORMAT
+---------------------
+Primary machine-readable register:
+research/registers/sources.csv
+
+Optional richer format:
+research/registers/sources.jsonl
+
+Human-readable excerpts may appear in specification files.
+
+19.2 REQUIRED FIELDS
+--------------------
+Identity:
+- source_id
+- citation_key
+- title
+- authors
+- organisation
+- publisher
+- source_type
+- canonical_url
+- alternate_url
+- doi_or_persistent_id
+
+Date/version:
+- publication_date
+- last_updated_date
+- date_accessed
+- version
+- target_version
+- status
+- peer_review_status
+
+Retrieval:
+- retrieval_state
+- local_artifact_path
+- archive_reference
+- sha256
+- language
+
+Relevance:
+- module_ids
+- claim_ids
+- relevant_claim
+- exact_locator
+- source_statement_summary
+- supports_or_opposes
+- applicability
+
+Reliability:
+- hierarchy_class
+- authority_rating
+- directness_rating
+- methodology_rating
+- reproducibility_rating
+- temporal_fit_rating
+- applicability_rating
+- independence_rating
+- conflict_of_interest
+- completeness_rating
+- reliability_assessment
+- source_limitations
+
+Licensing:
+- licence_name
+- licence_version
+- licence_url
+- terms_url
+- copyright_holder
+- database_rights
+- access_permission
+- automated_access_permission
+- raw_storage_permission
+- derivative_use_permission
+- model_training_permission
+- internal_use_permission
+- public_display_permission
+- commercial_use_permission
+- redistribution_permission
+- attribution_requirement
+- retention_limit
+- geographic_restriction
+- legal_status
+- legal_notes
+
+Pulse dependency:
+- pulse_relies_on
+- dependency_criticality
+- production_approved
+- fallback_source_ids
+
+Verification:
+- research_status
+- checked_by
+- checked_at
+- human_verified_by
+- human_verified_at
+- next_verification_date
+- verification_trigger
+- correction_retraction_checked
+- superseded_by
+- notes
+
+19.3 SOURCE ID FORMAT
+---------------------
+SRC-{CATEGORY}-{YYYY}-{NNN}
+
+Examples:
+SRC-FPL-2026-001
+SRC-API-2026-003
+SRC-RES-2016-001
+SRC-STD-2013-001
+SRC-LEGAL-2026-002
+SRC-COMM-2026-007
+
+19.4 CONTROLLED SOURCE TYPES
+----------------------------
+OFFICIAL_RULE
+OFFICIAL_ANNOUNCEMENT
+LEGISLATION
+REGULATOR_GUIDANCE
+CONTRACT
+TERMS
+API_DOCUMENTATION
+SCHEMA
+CHANGELOG
+STATUS_PAGE
+RAW_DATA
+LIVE_TEST
+STANDARD
+SYSTEMATIC_REVIEW
+META_ANALYSIS
+PEER_REVIEWED_RESEARCH
+PREPRINT
+WORKING_PAPER
+BOOK
+UNIVERSITY_MATERIAL
+SOFTWARE
+CODE_REPOSITORY
+DATASET
+PRACTITIONER_RESEARCH
+JOURNALISM
+COMMUNITY
+SUPPORT_RESPONSE
+AI_OUTPUT_REFERENCE_ONLY
+
+AI_OUTPUT_REFERENCE_ONLY cannot support a claim.
+
+19.5 EXAMPLE SOURCE RECORD
+--------------------------
+source_id:
+SRC-API-2026-001
+
+title:
+Example Provider Player Props API
+
+authors:
+Not stated
+
+organisation:
+Example Provider Ltd
+
+canonical_url:
+https://example.invalid/docs/player-props
+
+publication_date:
+UNKNOWN
+
+last_updated_date:
+2026-06-20
+
+date_accessed:
+2026-07-16
+
+source_type:
+API_DOCUMENTATION
+
+version:
+v3
+
+relevant_claim:
+The endpoint documents EPL anytime-goalscorer selections.
+
+exact_locator:
+Section "Player Props"; market key player_anytime_goal.
+
+reliability_assessment:
+Strong authority for the documented contract; moderate evidence of actual
+coverage until a live UK account test is completed.
+
+licensing_implications:
+Documentation may be cited. Data storage and derived-use rights are unresolved
+and require contract review.
+
+pulse_relies_on:
+CONDITIONAL
+
+dependency_criticality:
+BLOCKING
+
+needs_future_verification:
+YES — test before selection, recheck on changelog or contract update.
+
+======================================================================
+20. CLAIM REGISTER SCHEMA
+======================================================================
+
+20.1 PURPOSE
+------------
+The claim register prevents one source from being cited vaguely for an entire
+paragraph or module.
+
+20.2 REQUIRED FIELDS
+--------------------
+- claim_id
+- atomic_claim
+- claim_type
+- module_id
+- criticality
+- time_scope
+- jurisdiction
+- population_context
+- status
+- supporting_source_ids
+- opposing_source_ids
+- dependent_source_clusters
+- evidence_summary
+- certainty
+- certainty_rationale
+- assumptions
+- limitations
+- decision_ids
+- implementation_effect
+- validation_test
+- owner
+- last_reviewed
+- next_review_date
+- verification_trigger
+- superseded_by
+- notes
+
+20.3 CLAIM ID
+-------------
+CLM-{MODULE}-{NNN}
+
+Example:
+CLM-06-014
+
+20.4 CLAIM STATUS
+-----------------
+PROPOSED
+SUPPORTED
+PROVISIONAL
+VERIFIED
+CONTESTED
+CONTRADICTED
+SUPERSEDED
+UNRESOLVED
+
+20.5 EXAMPLE CLAIM
+------------------
+claim_id:
+CLM-06-014
+
+atomic_claim:
+For the sampled 2024/25 EPL three-way markets, the power de-vigging method had a
+lower out-of-time multiclass log loss than multiplicative normalisation.
+
+claim_type:
+EMPIRICAL_PERFORMANCE
+
+criticality:
+CORE
+
+supporting_sources:
+SRC-RES-..., SRC-DMF-TEST-...
+
+certainty:
+MODERATE
+
+limitations:
+One competition and provider mix; does not establish superiority for player
+props or 2026/27.
+
+implementation_effect:
+Implement both methods, make selection market-type-specific, and continue
+prospective comparison.
+
+======================================================================
+21. DECISION REGISTER AND EVIDENCE-TO-ARCHITECTURE LINK
+======================================================================
+
+21.1 REQUIRED ADR FIELDS
+------------------------
+- decision_id;
+- title;
+- status;
+- date;
+- owner;
+- module;
+- decision question;
+- constraints;
+- options;
+- supporting claim IDs;
+- opposing claim IDs;
+- selected option;
+- rationale;
+- expected benefit;
+- residual risk;
+- sensitivity;
+- fallback;
+- validation plan;
+- reversal conditions;
+- next review;
+- supersedes;
+- superseded by.
+
+21.2 DECISION STATUS
+--------------------
+PROPOSED
+ACCEPTED
+PROVISIONAL
+EXPERIMENTAL
+REJECTED
+SUPERSEDED
+REVERSED
+
+21.3 EVIDENCE GATE
+------------------
+Before ACCEPTED:
+- all BLOCKING claims verified;
+- CORE claims at least MODERATE or explicitly experimental;
+- licensing compatible;
+- alternatives documented;
+- test plan present;
+- owner accepts residual risk.
+
+21.4 REVERSIBILITY
+------------------
+Prefer reversible choices when evidence is weak.
+
+Examples:
+- provider adapter interface rather than provider-coupled schema;
+- feature flag for de-vigging method;
+- configuration-driven thresholds;
+- model registry and rollback;
+- separate projection and utility layers.
+
+======================================================================
+22. CORRECTIONS, RETRACTIONS, VERSIONS AND SUPERSESSION
+======================================================================
+
+22.1 CHECKS
+-----------
+For important scholarly work:
+- publisher status;
+- Crossmark where present;
+- DOI metadata;
+- correction/erratum;
+- retraction;
+- expression of concern;
+- preprint version;
+- withdrawal;
+- updated code/data.
+
+22.2 CROSSMARK
+--------------
+Crossmark can expose corrections, retractions and updates. Its presence is
+helpful but not a guarantee. Record both the status and the date checked.
+
+22.3 PREPRINTS
+--------------
+Record:
+- version number;
+- submission/revision date;
+- later journal publication;
+- withdrawal status;
+- material changes;
+- whether conclusions changed.
+
+Cite the version actually used.
+
+22.4 SOFTWARE
+-------------
+Record:
+- package version;
+- documentation version;
+- release date;
+- deprecations;
+- security advisory;
+- Git commit for source inspection.
+
+22.5 WEB PAGES
+--------------
+Record:
+- access date;
+- page update date if present;
+- snapshot/hash if permitted;
+- material changes on reverification.
+
+22.6 SUPERSESSION
+-----------------
+Never delete a superseded source or claim. Link it to the replacement so the
+decision history remains intelligible.
+
+======================================================================
+23. FRESHNESS AND REVERIFICATION
+======================================================================
+
+23.1 DEFAULT MAXIMUM AGES
+-------------------------
+These are maximums, not guarantees.
+
+Official FPL rules and scoring:
+- verify at game launch;
+- verify after every official rule announcement;
+- verify before production sign-off.
+
+Deadlines and fixtures:
+- ingest continuously;
+- verify before every decision run.
+
+FPL API schema/endpoints:
+- automated contract test daily in season;
+- manual documentation review monthly or on failure.
+
+Odds provider market coverage:
+- automated daily sampling;
+- human review monthly;
+- immediate review on missingness or contract change.
+
+Provider pricing, terms and licence:
+- verify before purchase/renewal;
+- at least every 30 days during selection;
+- quarterly after contract;
+- immediately on notice/change.
+
+Software documentation:
+- tied to pinned version;
+- review on upgrade.
+
+Research methods:
+- review annually or before major model redesign;
+- alert for correction/retraction.
+
+Recent preprints:
+- check every 90 days until published, withdrawn or no longer relied on.
+
+Community observations:
+- expire after 14 days unless verified.
+
+News/injury/status:
+- timestamp at ingestion;
+- short operational expiry defined by module.
+
+23.2 EVENT-BASED TRIGGERS
+-------------------------
+- FPL launch;
+- rule update;
+- provider changelog;
+- API error/schema change;
+- price-plan change;
+- contract renewal;
+- source correction/retraction;
+- new paper version;
+- model failure;
+- prospective calibration drift;
+- new season;
+- public/commercial product launch.
+
+23.3 STALENESS STATES
+---------------------
+CURRENT
+DUE
+STALE
+EXPIRED
+SUPERSEDED
+
+A BLOCKING stale claim prevents production use.
+
+======================================================================
+24. CITATION AND WRITING STANDARD
+======================================================================
+
+24.1 INLINE SUPPORT
+-------------------
+Every material external fact in a specification should have an adjacent citation
+or source ID.
+
+24.2 SOURCE ID AND FULL RECORD
+------------------------------
+Human-facing specification:
+[SRC-RES-2016-001]
+
+Register:
+Full metadata, URL, locator, assessment and licence.
+
+24.3 URL RULES
+--------------
+- store canonical URL without tracking parameters;
+- store DOI when available;
+- retain alternate URL separately;
+- do not use a search-results URL as canonical.
+
+24.4 DATES
+----------
+Use ISO 8601:
+YYYY-MM-DD
+
+Unknown:
+UNKNOWN
+
+Year-only:
+2016
+
+Do not invent a precise date.
+
+24.5 AUTHORS
+------------
+Preserve author order.
+Use organisation for institutional authors.
+Record ORCID where useful.
+
+24.6 CLAIM LANGUAGE
+-------------------
+Use calibrated language:
+- establishes;
+- supports;
+- suggests;
+- is consistent with;
+- does not establish;
+- remains uncertain;
+- provider documents;
+- DMF observed.
+
+Avoid:
+- proves, unless formally justified;
+- always;
+- guaranteed;
+- unquestionably;
+- industry standard, without a standard source;
+- best practice, without defining whose practice and evidence.
+
+24.7 QUOTING
+------------
+Use short quotations only where wording matters. Long copyrighted content is not
+copied into specifications.
+
+24.8 INTERNAL SOURCES
+---------------------
+Internal experiments receive source IDs and full provenance:
+- code commit;
+- data bundle;
+- protocol;
+- output;
+- reviewer.
+
+They are not lower quality merely because unpublished, but their independence
+and replication status are explicit.
+
+======================================================================
+25. RESEARCH REPOSITORY STRUCTURE
+======================================================================
+
+Recommended:
+
+research/
+  README.md
+
+  protocols/
+    RP-02-001-v1.yaml
+    RP-06-001-v1.yaml
+
+  search_logs/
+    RP-06-001-v1_search.csv
+
+  registers/
+    sources.csv
+    sources.jsonl
+    claims.csv
+    decisions.csv
+    exclusions.csv
+    licences.csv
+    retractions_updates.csv
+
+  sources/
+    official/
+    research/
+    provider_docs/
+    legal/
+    community/
+    internal_tests/
+
+  extractions/
+    SRC-RES-2016-001.yaml
+
+  source_bundles/
+    SB-DMFP06-001-v1.json
+
+  snapshots/
+    permitted_only/
+
+  tests/
+    provider_probes/
+    api_contracts/
+    reproductions/
+
+  reports/
+    module_reviews/
+
+  templates/
+    protocol_template.yaml
+    source_template.yaml
+    claim_template.yaml
+    adr_template.yaml
+    research_report_template.txt
+
+  archive/
+    superseded/
+
+Principles:
+- generated outputs separated from source artefacts;
+- restricted material excluded from Git;
+- metadata retained;
+- secrets excluded;
+- hashes recorded;
+- permissions documented.
+
+======================================================================
+26. MACHINE VALIDATION AND CODEX REQUIREMENTS
+======================================================================
+
+26.1 SCHEMA VALIDATION
+----------------------
+Codex should implement Pydantic or JSON Schema validation for:
+- source;
+- claim;
+- protocol;
+- decision;
+- licence;
+- source bundle.
+
+26.2 REQUIRED AUTOMATED CHECKS
+------------------------------
+- unique IDs;
+- valid ISO dates;
+- canonical URL present;
+- no tracking parameters where detectable;
+- DOI format;
+- required fields by source type;
+- required licensing fields for providers/data/code;
+- exact locator for CORE/BLOCKING claims;
+- no AI_OUTPUT_REFERENCE_ONLY supporting claim;
+- no BLOCKING claim without human verification;
+- no production-approved source with RED/UNKNOWN legal status;
+- no accepted decision with unresolved BLOCKING claim;
+- future verification date or trigger;
+- source IDs exist;
+- claim IDs exist;
+- decision links valid;
+- hash format;
+- supersession does not create loops;
+- stale evidence alert.
+
+26.3 LINK CHECKING
+------------------
+Automated link checking MAY:
+- confirm HTTP status;
+- record redirects;
+- flag changed content hash;
+- check DOI resolution.
+
+It MUST NOT equate HTTP 200 with source validity.
+
+26.4 RETRACTION/UPDATE CHECK
+----------------------------
+Where metadata permits:
+- query Crossref/Crossmark;
+- flag update/retraction relation;
+- flag arXiv version change;
+- require human review.
+
+26.5 LICENCE CHECK
+------------------
+Use SPDX identifiers for software when possible.
+Do not automatically infer a data licence from a software repository licence.
+
+26.6 COVERAGE DASHBOARD
+-----------------------
+Useful metrics:
+- claims by certainty;
+- blocking claims unverified;
+- stale sources;
+- sources by hierarchy;
+- decisions with weak evidence;
+- licensing status;
+- source independence count;
+- human verification backlog.
+
+These metrics indicate governance status, not truth.
+
+======================================================================
+27. QUALITY ASSURANCE CHECKLIST
+======================================================================
+
+27.1 BEFORE SEARCH
+------------------
+[ ] Decision question written
+[ ] Claim type identified
+[ ] Criticality assigned
+[ ] Alternatives listed
+[ ] Context/version/jurisdiction defined
+[ ] Review depth selected
+[ ] Inclusion/exclusion criteria defined
+[ ] Stopping rule defined
+[ ] Disconfirmation search planned
+
+27.2 DURING SEARCH
+------------------
+[ ] Official/primary sources searched first
+[ ] Academic evidence searched
+[ ] Contrary evidence searched
+[ ] Query log saved
+[ ] Source opened
+[ ] Metadata checked
+[ ] Exact locator saved
+[ ] Version/status checked
+[ ] Independent source chain assessed
+[ ] Licence considered
+[ ] Missing evidence recorded
+
+27.3 DURING EXTRACTION
+----------------------
+[ ] Claim is atomic
+[ ] Qualifiers retained
+[ ] Numbers include units/denominator
+[ ] Limitations captured
+[ ] Applicability assessed
+[ ] Fact/inference separated
+[ ] No unsupported extrapolation
+[ ] Critical extraction human-checked
+
+27.4 DURING SYNTHESIS
+---------------------
+[ ] Evidence weighted, not vote-counted
+[ ] Dependent sources clustered
+[ ] Conflicts retained
+[ ] Certainty justified
+[ ] Alternative approaches compared
+[ ] Residual uncertainty stated
+[ ] Validation plan defined
+[ ] Reversal conditions stated
+[ ] Refresh trigger stated
+
+27.5 BEFORE IMPLEMENTATION
+--------------------------
+[ ] Blocking evidence verified
+[ ] Legal status compatible
+[ ] Source bundle generated
+[ ] ADR approved
+[ ] Interfaces match evidence
+[ ] Tests derive from claims
+[ ] Fallback exists
+[ ] Model remains experimental if evidence is weak
+
+======================================================================
+28. CHATGPT RESEARCH INSTRUCTION TEMPLATE
+======================================================================
+
+Use the following structure for future module research:
+
+RESEARCH TASK
+-------------
+Create or revise:
+[DMFP document and section]
+
+DECISION TO MAKE
+----------------
+[Concrete decision]
+
+AS-OF DATE
+----------
+[YYYY-MM-DD]
+
+TARGET CONTEXT
+--------------
+- FPL season:
+- jurisdiction:
+- provider/account:
+- software version:
+- information cut-off:
+- production/public/private use:
+
+RESEARCH DEPTH
+--------------
+R1 / R2 / R3 / R4
+
+SOURCE PRIORITY
+---------------
+1. controlling official/legal source;
+2. official technical documentation and live behaviour;
+3. peer-reviewed research and high-quality synthesis;
+4. credible preprints with methods/artefacts;
+5. technical books/university material;
+6. reproducible practitioner evidence;
+7. community observations as hypotheses only.
+
+REQUIRED METHOD
+---------------
+- search current web;
+- open every material source;
+- record exact locator;
+- search for contrary evidence;
+- check versions/corrections/retractions;
+- distinguish independent evidence chains;
+- assess licensing;
+- label fact/inference/recommendation/assumption;
+- state evidence gaps;
+- do not use ChatGPT memory as evidence;
+- do not claim systematic review unless protocol supports it.
+
+REQUIRED OUTPUT
+---------------
+- protocol summary;
+- source register additions;
+- claim register additions;
+- options;
+- evidence appraisal;
+- selected approach;
+- rejected alternatives;
+- implementation contract;
+- validation plan;
+- risks;
+- open questions;
+- source list;
+- update triggers.
+
+======================================================================
+29. EXAMPLE APPLICATIONS
+======================================================================
+
+29.1 OFFICIAL FPL SCORING
+-------------------------
+Question:
+What are the 2026/27 clean-sheet and defensive-contribution points?
+
+Evidence:
+- official target-season rules;
+- official announcement;
+- live scoring test after launch.
+
+Not sufficient:
+- 2025/26 article;
+- FPL community graphic;
+- ChatGPT memory.
+
+Decision:
+Do not sign season configuration until official rules and a representative test
+agree.
+
+29.2 ODDS API SELECTION
+-----------------------
+Question:
+Can Provider X support time-safe EPL player projections?
+
+Evidence:
+- contract;
+- API docs;
+- market list;
+- test account;
+- historical sample;
+- missingness benchmark;
+- latency;
+- licence;
+- support clarification.
+
+Not sufficient:
+- "supports soccer player props" on a marketing page.
+
+29.3 DE-VIGGING METHOD
+----------------------
+Question:
+Which method best converts provider prices for each market type?
+
+Evidence:
+- methods literature;
+- reproducible implementations;
+- historical time-safe dataset;
+- out-of-time log score/calibration;
+- sensitivity by bookmaker and market.
+
+Decision:
+Select by market type; retain alternative methods; continue prospective
+monitoring.
+
+29.4 PRICE-CHANGE MODEL
+-----------------------
+Question:
+Can transfer activity predict the next official price change?
+
+Evidence:
+- time-stamped FPL transfer and price data;
+- reproducible walk-forward benchmark;
+- community hypotheses as features only;
+- prospective test.
+
+Not sufficient:
+- undocumented threshold claims repeated across forums.
+
+29.5 EARLY-SEASON UNCERTAINTY
+-----------------------------
+Question:
+How strongly should new observations update priors?
+
+Evidence:
+- hierarchical/Bayesian methodology;
+- multi-season FPL/football validation;
+- changed-manager and promoted-team subgroups;
+- calibration;
+- decision simulation.
+
+Decision:
+Define a model and test; do not translate generic advice into fixed shrinkage
+without evidence.
+
+======================================================================
+30. INITIAL SEEDED SOURCE REGISTER
+======================================================================
+
+The entries below seed the register for research governance. They are not a
+complete bibliography for later modules.
+
+----------------------------------------------------------------------
+SRC-METHOD-2021-001
+Title:
+PRISMA 2020 Statement
+
+Author/organisation:
+Page MJ et al.; PRISMA Statement
+
+URL:
+https://www.prisma-statement.org/prisma-2020-statement
+
+Publication date:
+2021
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Transparent systematic-review reporting uses a 27-item checklist and flow
+diagrams covering why the review was done, methods and findings.
+
+Reliability assessment:
+HIGH authority for reporting systematic reviews. It is a reporting guideline,
+not proof that a review is unbiased or correct.
+
+Licensing implications:
+Website/papers may be cited and paraphrased. Check the licence of downloaded
+checklists before redistribution.
+
+Pulse relies on it:
+YES, adapted for R4 and selected R3 reporting.
+
+Future verification:
+Annual or when PRISMA publishes a successor.
+
+----------------------------------------------------------------------
+SRC-METHOD-2021-002
+Title:
+PRISMA-S: An extension to the PRISMA Statement for Reporting Literature
+Searches in Systematic Reviews
+
+Author/organisation:
+Rethlefsen ML et al.; PRISMA-S Group
+
+URL:
+https://www.prisma-statement.org/prisma-search
+
+Publication date:
+2021
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+PRISMA-S provides 16 reporting items for reproducible literature searches.
+
+Reliability assessment:
+HIGH for search reporting; designed for systematic reviews and adapted rather
+than claimed as formal compliance for ordinary module research.
+
+Licensing implications:
+Citation and short paraphrase permitted; verify licence before copying forms.
+
+Pulse relies on it:
+YES, for query/search-source reporting.
+
+Future verification:
+Annual or successor release.
+
+----------------------------------------------------------------------
+SRC-METHOD-2015-003
+Title:
+PRESS Peer Review of Electronic Search Strategies: 2015 Guideline Statement
+
+Author/organisation:
+McGowan J et al.
+
+URL:
+https://pubmed.ncbi.nlm.nih.gov/27005575/
+
+Publication date:
+2016 journal publication; guideline developed 2015
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Structured peer review can identify errors and improve electronic search
+strategies.
+
+Reliability assessment:
+HIGH for specialist literature-search review; indirect for general web search.
+
+Licensing implications:
+Citation allowed; full-text reuse subject to publisher terms.
+
+Pulse relies on it:
+CONDITIONAL — used for R4 or unusually important academic searches.
+
+Future verification:
+Every two years or successor guideline.
+
+----------------------------------------------------------------------
+SRC-METHOD-2026-004
+Title:
+Cochrane Handbook Chapter 14 — Completing Summary of Findings Tables and
+Grading the Certainty of the Evidence
+
+Author/organisation:
+Cochrane
+
+URL:
+https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-14
+
+Publication date:
+Living/current handbook
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Certainty assessment considers risk of bias, inconsistency, indirectness,
+imprecision and publication bias, with transparent justification.
+
+Reliability assessment:
+HIGH for evidence synthesis in health research. DMF adapts the dimensions but
+does not claim formal GRADE use across APIs, contracts and software.
+
+Licensing implications:
+Cite/paraphrase; no bulk copying.
+
+Pulse relies on it:
+YES, conceptually.
+
+Future verification:
+Annual.
+
+----------------------------------------------------------------------
+SRC-METHOD-2011-005
+Title:
+Oxford Centre for Evidence-Based Medicine 2011 Levels of Evidence
+
+Author/organisation:
+OCEBM Levels of Evidence Working Group
+
+URL:
+https://www.cebm.ox.ac.uk/resources/levels-of-evidence/ocebm-levels-of-evidence
+
+Publication date:
+2011
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Evidence hierarchy should be applied to a specific question type rather than as
+a context-free prestige ladder.
+
+Reliability assessment:
+HIGH as a recognised clinical evidence framework; indirect for software and FPL.
+
+Licensing implications:
+Cite/paraphrase subject to site terms.
+
+Pulse relies on it:
+CONTEXTUAL — supports claim-specific hierarchy design.
+
+Future verification:
+Every two years.
+
+----------------------------------------------------------------------
+SRC-METHOD-2026-006
+Title:
+Cochrane Risk of Bias Resources
+
+Author/organisation:
+Cochrane
+
+URL:
+https://www.cochrane.org/learn/courses-and-resources/cochrane-methodology/risk-bias
+
+Publication date:
+Living/current
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Risk of bias should be assessed across explicit domains and supported by
+signalling questions rather than one undifferentiated quality label.
+
+Reliability assessment:
+HIGH for study appraisal; DMF uses the principle, not the intervention-specific
+tool for all source types.
+
+Licensing implications:
+Cite/paraphrase.
+
+Pulse relies on it:
+YES, conceptually.
+
+Future verification:
+Annual.
+
+----------------------------------------------------------------------
+SRC-FAIR-2016-001
+Title:
+The FAIR Guiding Principles for Scientific Data Management and Stewardship
+
+Author/organisation:
+Wilkinson MD et al.
+
+URL:
+https://www.nature.com/articles/sdata201618
+
+Publication date:
+2016-03-15
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Research objects should be Findable, Accessible, Interoperable and Reusable,
+with persistent identifiers, rich metadata, explicit licences and detailed
+provenance. The principles also apply to algorithms, tools and workflows.
+
+Reliability assessment:
+HIGH, foundational peer-reviewed open-access guidance.
+
+Licensing implications:
+Open-access article; verify exact article licence for reuse. Citation and
+paraphrase permitted.
+
+Pulse relies on it:
+YES, for register and source-bundle design.
+
+Future verification:
+Stable; review every two years.
+
+----------------------------------------------------------------------
+SRC-STD-2013-001
+Title:
+W3C PROV Overview
+
+Author/organisation:
+World Wide Web Consortium
+
+URL:
+https://www.w3.org/TR/prov-overview/
+
+Publication date:
+2013-04-30
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Provenance describes entities, activities and agents involved in producing a
+thing and supports assessments of quality, reliability and trustworthiness.
+
+Reliability assessment:
+HIGH, official W3C standard-family overview.
+
+Licensing implications:
+Use/citation subject to W3C document licence. No material content copying needed.
+
+Pulse relies on it:
+YES, for provenance relationships.
+
+Future verification:
+Stable; annual check for successor standards.
+
+----------------------------------------------------------------------
+SRC-META-2026-001
+Title:
+DataCite Metadata Schema 4.7
+
+Author/organisation:
+DataCite Metadata Working Group
+
+URL:
+https://schema.datacite.org/
+
+Publication date:
+2026-03-03
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Consistent metadata enables accurate identification, citation and retrieval of
+research resources; schema 4.7 is the current version at access.
+
+Reliability assessment:
+HIGH for DataCite metadata practice.
+
+Licensing implications:
+Use schema terms according to DataCite terms/licence.
+
+Pulse relies on it:
+YES, as a design reference rather than full conformance requirement.
+
+Future verification:
+On DataCite schema release.
+
+----------------------------------------------------------------------
+SRC-SOFTWARE-2016-001
+Title:
+Software Citation Principles
+
+Author/organisation:
+Smith AM, Katz DS, Niemeyer KE; FORCE11 Software Citation Working Group
+
+URL:
+https://doi.org/10.7717/peerj-cs.86
+
+Publication date:
+2016-09-19
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Software citation should support importance, credit/attribution, unique
+identification, persistence, accessibility and specificity.
+
+Reliability assessment:
+HIGH, peer-reviewed community principles.
+
+Licensing implications:
+Open-access paper; record article licence for reuse.
+
+Pulse relies on it:
+YES, for code/version citation.
+
+Future verification:
+Every two years or successor principles.
+
+----------------------------------------------------------------------
+SRC-SOFTWARE-2026-002
+Title:
+ACM Artifact Review and Badging — Current
+
+Author/organisation:
+Association for Computing Machinery
+
+URL:
+https://www.acm.org/publications/policies/artifact-review-and-badging-current
+
+Publication date:
+Current policy page; exact original date not relied on
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Functional artefacts should be documented, consistent, complete and exercisable;
+availability and independently validated results are distinct qualities.
+
+Reliability assessment:
+HIGH for computing artefact-review terminology and practice.
+
+Licensing implications:
+Cite/paraphrase; ACM copyright applies.
+
+Pulse relies on it:
+YES, for research-package acceptance criteria.
+
+Future verification:
+Annual.
+
+----------------------------------------------------------------------
+SRC-REPRO-2019-001
+Title:
+Reproducibility and Replicability in Science
+
+Author/organisation:
+National Academies of Sciences, Engineering, and Medicine
+
+URL:
+https://www.nationalacademies.org/read/25303/chapter/3
+
+Publication date:
+2019
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Reproducibility uses the same data, computational steps, methods, code and
+conditions; replicability uses new data to answer the same scientific question.
+
+Reliability assessment:
+HIGH, authoritative consensus report.
+
+Licensing implications:
+Citation/paraphrase; National Academies usage terms apply.
+
+Pulse relies on it:
+YES, for terminology.
+
+Future verification:
+Stable; every two years.
+
+----------------------------------------------------------------------
+SRC-AI-2024-001
+Title:
+Artificial Intelligence Risk Management Framework: Generative Artificial
+Intelligence Profile (NIST AI 600-1)
+
+Author/organisation:
+National Institute of Standards and Technology
+
+URL:
+https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
+
+Publication date:
+2024-07
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Generative AI creates confabulation and information-integrity risks; sources,
+citations and provenance should be reviewed, verified and documented.
+
+Reliability assessment:
+HIGH, official cross-sector risk guidance.
+
+Licensing implications:
+US government publication; confirm reuse notice for substantial extracts.
+Citation/paraphrase permitted.
+
+Pulse relies on it:
+YES, for AI research controls.
+
+Future verification:
+Annual or new NIST profile.
+
+----------------------------------------------------------------------
+SRC-AI-2026-002
+Title:
+Deep Research in ChatGPT — Help and Product Documentation
+
+Author/organisation:
+OpenAI
+
+URL:
+https://help.openai.com/en/articles/10500283-deep-research
+
+Publication date:
+Living/current product documentation
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Deep research can search, analyse and synthesise sources and provides citations
+and an activity record for verification.
+
+Reliability assessment:
+HIGH for product capability; not independent evidence of output accuracy.
+
+Licensing implications:
+Cite product documentation; terms govern use.
+
+Pulse relies on it:
+CONTEXTUAL — describes tool capability, while NIST-aligned verification remains
+mandatory.
+
+Future verification:
+Before each major research cycle or product change.
+
+----------------------------------------------------------------------
+SRC-STATUS-2020-001
+Title:
+Crossmark
+
+Author/organisation:
+Crossref
+
+URL:
+https://www.crossref.org/services/crossmark/
+
+Publication date:
+Page last updated 2020-04-08
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Crossmark exposes current content status, including corrections, retractions and
+updates, but its presence is not a guarantee.
+
+Reliability assessment:
+HIGH, official service documentation.
+
+Licensing implications:
+Crossref page content is CC BY 4.0 as stated on the page.
+
+Pulse relies on it:
+YES, for scholarly-status checks where available.
+
+Future verification:
+Annual.
+
+----------------------------------------------------------------------
+SRC-STATUS-2025-002
+Title:
+COPE Retraction Guidelines
+
+Author/organisation:
+Committee on Publication Ethics
+
+URL:
+https://publicationethics.org/guidance/guideline/retraction-guidelines
+
+Publication date:
+Updated 2025-08-29
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Retractions and corrections should be interpreted according to explicit
+publication-ethics guidance and linked to the affected record.
+
+Reliability assessment:
+HIGH, recognised publication-ethics guidance.
+
+Licensing implications:
+Cite/paraphrase under site terms.
+
+Pulse relies on it:
+YES, for status workflow.
+
+Future verification:
+Annual.
+
+----------------------------------------------------------------------
+SRC-STATUS-2026-003
+Title:
+arXiv Submission Versioning and Withdrawal Help
+
+Author/organisation:
+arXiv
+
+URL:
+https://info.arxiv.org/help/replace.html
+
+Publication date:
+Living/current
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+arXiv submissions preserve version history; replacement and withdrawal status
+must be considered when relying on preprints.
+
+Reliability assessment:
+HIGH, official platform documentation.
+
+Licensing implications:
+Cite documentation; article licences vary by submission.
+
+Pulse relies on it:
+YES, for preprint version control.
+
+Future verification:
+Annual.
+
+----------------------------------------------------------------------
+SRC-LICENCE-2026-001
+Title:
+Creative Commons Licences
+
+Author/organisation:
+Creative Commons
+
+URL:
+https://creativecommons.org/cc-licenses/
+
+Publication date:
+Living/current
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Six licence types grant different permissions and conditions involving
+attribution, share-alike, noncommercial use and no derivatives.
+
+Reliability assessment:
+HIGH, official licence steward.
+
+Licensing implications:
+Each work's exact licence controls; "CC" alone is insufficient.
+
+Pulse relies on it:
+YES, for rights classification.
+
+Future verification:
+Annual or licence-suite update.
+
+----------------------------------------------------------------------
+SRC-LICENCE-2026-002
+Title:
+SPDX Specifications
+
+Author/organisation:
+SPDX / Linux Foundation
+
+URL:
+https://spdx.dev/use/specifications/
+
+Publication date:
+Current; SPDX specification 3.0 listed at access
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+SPDX is an international open standard and supplies standardised software
+licence identifiers and document formats.
+
+Reliability assessment:
+HIGH, official standard source.
+
+Licensing implications:
+Use identifiers/specification according to SPDX terms.
+
+Pulse relies on it:
+YES, for software licence fields.
+
+Future verification:
+On specification release.
+
+----------------------------------------------------------------------
+SRC-LEGAL-2026-001
+Title:
+Database Rights: The Basics
+
+Author/organisation:
+UK Intellectual Property Office / GOV.UK
+
+URL:
+https://www.gov.uk/guidance/database-rights-the-basics
+
+Publication date:
+Living/current guidance
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+UK law may protect database structure by copyright and database contents through
+a separate database right where substantial investment exists.
+
+Reliability assessment:
+HIGH for official UK guidance; not case-specific legal advice.
+
+Licensing implications:
+Supports the need for provider-specific legal review.
+
+Pulse relies on it:
+YES, for licensing risk.
+
+Future verification:
+Annual or legislative change.
+
+----------------------------------------------------------------------
+SRC-LEGAL-2026-002
+Title:
+How Copyright Protects Your Work
+
+Author/organisation:
+UK Intellectual Property Office / GOV.UK
+
+URL:
+https://www.gov.uk/copyright
+
+Publication date:
+Living/current guidance
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Copyright protection can arise automatically for software, web content and
+databases.
+
+Reliability assessment:
+HIGH official guidance; application to a specific feed requires legal analysis.
+
+Licensing implications:
+Do not copy or redistribute merely because content is accessible.
+
+Pulse relies on it:
+YES, contextually.
+
+Future verification:
+Annual.
+
+----------------------------------------------------------------------
+SRC-LICENCE-2026-003
+Title:
+Open Government Licence for Public Sector Information, Version 3.0
+
+Author/organisation:
+The National Archives
+
+URL:
+https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+
+Publication date:
+Version 3.0
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+OGL permits specified reuse subject to conditions including attribution and
+exclusions.
+
+Reliability assessment:
+HIGH, controlling licence text for covered material.
+
+Licensing implications:
+Applicability must be confirmed for each government resource.
+
+Pulse relies on it:
+CONDITIONAL.
+
+Future verification:
+On licence update.
+
+----------------------------------------------------------------------
+SRC-LITERACY-2017-001
+Title:
+Lateral Reading: Reading Less and Learning More When Evaluating Digital
+Information
+
+Author/organisation:
+Wineburg S, McGrew S
+
+URL:
+https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3048994
+
+Publication date:
+2017
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Professional fact-checkers evaluated unfamiliar digital sources more effectively
+by leaving the site and checking external information rather than reading only
+within the page.
+
+Reliability assessment:
+MODERATE/HIGH, well-known empirical study; domain is web source evaluation rather
+than technical API validation.
+
+Licensing implications:
+Citation/paraphrase; full text subject to repository terms.
+
+Pulse relies on it:
+YES, for lateral-reading procedure.
+
+Future verification:
+Every two years.
+
+----------------------------------------------------------------------
+SRC-LITERACY-2019-002
+Title:
+SIFT — Stop, Investigate the Source, Find Better Coverage, Trace Claims to the
+Original Context
+
+Author/organisation:
+Mike Caulfield
+
+URL:
+https://hapgood.us/2019/06/19/sift-the-four-moves/
+
+Publication date:
+2019
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+A practical source-checking workflow uses source investigation, better coverage
+and tracing to original context.
+
+Reliability assessment:
+MODERATE, practitioner framework consistent with lateral-reading research.
+
+Licensing implications:
+Cite/paraphrase under site terms.
+
+Pulse relies on it:
+SUPPORTING.
+
+Future verification:
+Every two years.
+
+----------------------------------------------------------------------
+SRC-FPL-2026-001
+Title:
+Official Fantasy Premier League Rules for 2026/27
+
+Author/organisation:
+Premier League / Fantasy Premier League
+
+URL:
+TO_BE_CAPTURED_AT_LAUNCH
+
+Publication date:
+UNKNOWN
+
+Date accessed:
+NOT_YET_AVAILABLE at research cut-off
+
+Relevant claim:
+Controlling scoring, squad, transfer, chip and deadline rules for 2026/27.
+
+Reliability assessment:
+BLOCKING source not yet available.
+
+Licensing implications:
+Rules may be cited; copying or automated use subject to site terms.
+
+Pulse relies on it:
+YES — BLOCKING.
+
+Future verification:
+At game launch and every official update.
+
+----------------------------------------------------------------------
+SRC-FPL-API-2026-001
+Title:
+FPL bootstrap-static JSON endpoint
+
+Author/organisation:
+Fantasy Premier League
+
+URL:
+https://fantasy.premierleague.com/api/bootstrap-static/
+
+Publication date:
+Undocumented endpoint
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+The FPL web application exposes structured game data through this endpoint.
+
+Reliability assessment:
+MODERATE for observed availability; weak as a stable contractual API because no
+formal public API commitment is assumed.
+
+Licensing implications:
+Public technical accessibility does not resolve automated-use, storage or
+commercial rights. Terms review required.
+
+Pulse relies on it:
+PROVISIONAL.
+
+Future verification:
+Automated daily contract test and terms review.
+
+----------------------------------------------------------------------
+SRC-PROVIDER-2026-001
+Title:
+Betfair Exchange API Documentation
+
+Author/organisation:
+Betfair
+
+URL:
+https://developer.betfair.com/exchange-api/
+
+Publication date:
+Living/current
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Betfair documents programmatic Exchange access to markets, prices and volume.
+
+Reliability assessment:
+HIGH for documented capability; target market, account and jurisdiction access
+must be tested.
+
+Licensing implications:
+Contract, developer terms, storage and downstream-use rights require review.
+
+Pulse relies on it:
+CANDIDATE, not yet selected.
+
+Future verification:
+Before provider decision and on contract/changelog changes.
+
+----------------------------------------------------------------------
+SRC-PROVIDER-2026-002
+Title:
+Betfair Exchange Historical Data
+
+Author/organisation:
+Betfair
+
+URL:
+https://developer.betfair.com/historical-data-services-api/
+
+Publication date:
+Living/current
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Betfair supplies time-stamped historical Exchange market data through a
+historical-data service.
+
+Reliability assessment:
+HIGH for service existence; exact EPL/player-market coverage and cost require
+sampling.
+
+Licensing implications:
+Historical-data licence and retention/publication rights require review.
+
+Pulse relies on it:
+CANDIDATE.
+
+Future verification:
+Before purchase and contract renewal.
+
+----------------------------------------------------------------------
+SRC-PROVIDER-2026-003
+Title:
+The Odds API V4 Documentation and Market Coverage
+
+Author/organisation:
+The Odds API
+
+URL:
+https://the-odds-api.com/liveapi/guides/v4/
+
+Publication date:
+Living/current
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+The provider documents current and paid-plan historical odds endpoints,
+including event markets; separate market documentation lists soccer player
+props with coverage constraints.
+
+Reliability assessment:
+HIGH for documented capability, MODERATE for suitability until a live coverage
+sample is completed.
+
+Licensing implications:
+Plan terms, historical storage and commercial output require review.
+
+Pulse relies on it:
+CANDIDATE.
+
+Future verification:
+Before selection and monthly during evaluation.
+
+----------------------------------------------------------------------
+SRC-PROVIDER-2026-004
+Title:
+Sportradar Odds Comparison Player Props Overview
+
+Author/organisation:
+Sportradar
+
+URL:
+https://developer.sportradar.com/odds/reference/oc-player-props-overview
+
+Publication date:
+Living/current
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Sportradar documents player-prop odds for supported leagues through a commercial
+odds product.
+
+Reliability assessment:
+HIGH for product documentation; access, EPL fields, history and cost require
+sales confirmation and proof-of-access.
+
+Licensing implications:
+Enterprise contract controls all production uses.
+
+Pulse relies on it:
+CANDIDATE.
+
+Future verification:
+On sales/contract review.
+
+----------------------------------------------------------------------
+SRC-PROVIDER-2026-005
+Title:
+OpticOdds Odds API Getting Started Guide
+
+Author/organisation:
+OpticOdds
+
+URL:
+https://developer.opticodds.com/docs/odds-api-getting-started-guide
+
+Publication date:
+Living/current
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+The provider documents odds, historical odds, player props, injuries, rosters
+and starting-line-up related products.
+
+Reliability assessment:
+HIGH for advertised product structure, MODERATE for target coverage until tested.
+
+Licensing implications:
+Commercial terms, storage and derived-output rights require contract review.
+
+Pulse relies on it:
+CANDIDATE.
+
+Future verification:
+Proof-of-access and contract change.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 — Master Architecture and Product Definition
+
+Author/organisation:
+Sebastian Greenhalgh / ChatGPT research draft
+
+URL:
+Internal file:
+00_MASTER_ARCHITECTURE_AND_PRODUCT_DEFINITION.txt
+
+Publication date:
+2026-07-16
+
+Date accessed:
+2026-07-16
+
+Relevant claim:
+Defines the governing product architecture, including market-first forecasting,
+probabilistic outputs, rolling horizon, temporal integrity and human-in-the-loop
+execution.
+
+Reliability assessment:
+CONTROLLING internal design after Sebastian approval; its external factual
+claims remain dependent on their registered sources.
+
+Licensing implications:
+Owned internal project document.
+
+Pulse relies on it:
+YES.
+
+Future verification:
+Whenever a downstream specification creates a conflict or architecture changes.
+
+======================================================================
+31. RESEARCH GOVERNANCE RISK REGISTER
+======================================================================
+
+RG-001 — AI invents or misattributes a citation
+Probability: Medium
+Impact: High
+Controls:
+Open source; metadata check; locator; human verification for critical claims.
+
+RG-002 — Search result snippet used as evidence
+Probability: Medium
+Impact: High
+Controls:
+Discovery-only state; validator requires retrieval state and locator.
+
+RG-003 — Official source is stale
+Probability: Medium
+Impact: Critical for rules/APIs
+Controls:
+Version/date; live test; changelog; event-based refresh.
+
+RG-004 — Peer-reviewed study is inapplicable
+Probability: High
+Impact: High
+Controls:
+Directness/applicability dimensions; target-context validation.
+
+RG-005 — Preprint treated as settled
+Probability: Medium
+Impact: Medium/High
+Controls:
+Version/status; replication; lower certainty; periodic check.
+
+RG-006 — Citation laundering
+Probability: High
+Impact: High
+Controls:
+Trace origin; evidence-chain clusters; independent corroboration.
+
+RG-007 — Licensing omitted
+Probability: Medium
+Impact: Critical
+Controls:
+Mandatory rights fields; production gate; legal escalation.
+
+RG-008 — Evidence register becomes stale
+Probability: High
+Impact: High
+Controls:
+Dates/triggers; automated alerts; module release gate.
+
+RG-009 — Confirmation bias
+Probability: High
+Impact: High
+Controls:
+Protocol; alternatives; disconfirmation query; retain opposing evidence.
+
+RG-010 — False numerical evidence score
+Probability: Medium
+Impact: Medium
+Controls:
+Narrative appraisal; no automatic total.
+
+RG-011 — Excessive process delays MVP
+Probability: Medium
+Impact: High
+Controls:
+Research depth levels; focus R3 on critical decisions; reversible prototypes.
+
+RG-012 — Weak community evidence ignored entirely
+Probability: Medium
+Impact: Medium
+Controls:
+Use as hypothesis/edge-case signal; rapid verification path.
+
+RG-013 — Full text unavailable
+Probability: Medium
+Impact: Medium
+Controls:
+Alternate manuscript; contact author; abstract-only limitation; do not infer.
+
+RG-014 — Correction/retraction missed
+Probability: Low/Medium
+Impact: High
+Controls:
+DOI/Crossmark/status checks; scheduled refresh.
+
+RG-015 — Internal experiment cannot be reproduced
+Probability: Medium
+Impact: High
+Controls:
+Data bundle; environment; seed; code commit; executable test.
+
+RG-016 — Licence page changes silently
+Probability: Medium
+Impact: Critical
+Controls:
+Version/hash where permitted; contract attachment; revalidation.
+
+RG-017 — Evidence quantity mistaken for independence
+Probability: High
+Impact: High
+Controls:
+Source-origin graph; count evidence chains.
+
+RG-018 — Research language overstates certainty
+Probability: High
+Impact: Medium/High
+Controls:
+Claim labels; calibrated vocabulary; human edit.
+
+RG-019 — Codex implements provisional assumption as permanent logic
+Probability: Medium
+Impact: High
+Controls:
+Assumption IDs; expiry; configuration; TODO gate; tests.
+
+RG-020 — Research file becomes too long to operate
+Probability: Medium
+Impact: Medium
+Controls:
+Machine-readable registers; concise module summaries; source bundles; search.
+
+======================================================================
+32. ACCEPTANCE CRITERIA FOR DMFP-01
+======================================================================
+
+DMFP-01 is accepted when Sebastian agrees that:
+
+A. Evidence model
+[ ] Sources, claims and decisions are separate linked objects.
+[ ] No universal source ladder is applied mechanically.
+[ ] Claim certainty is separate from source prestige.
+[ ] Criticality controls required review depth.
+
+B. AI controls
+[ ] ChatGPT is a research agent, not a source.
+[ ] Search snippets cannot support claims.
+[ ] Critical citations require human verification.
+[ ] Missing evidence is reported, not invented.
+
+C. Research method
+[ ] R1–R4 review levels are practical.
+[ ] R2 is the default for normal modules.
+[ ] R3 is required for critical dependencies and architecture.
+[ ] Searches include contrary evidence and a stopping rule.
+
+D. Licensing
+[ ] Rights are assessed separately for access, storage, transformation,
+    publication and commercial use.
+[ ] Unknown rights block production reliance.
+[ ] Specialist legal review is triggered where material.
+
+E. Reproducibility
+[ ] Queries, sources, versions, locators and hashes are retained.
+[ ] Internal tests are registered as evidence.
+[ ] Source bundles link research to specifications and code.
+
+F. Updating
+[ ] Every critical claim has a date or event trigger.
+[ ] Corrections, retractions and supersession remain visible.
+[ ] Stale blocking evidence stops production.
+
+G. Implementation
+[ ] Codex will implement schemas and validation.
+[ ] Codex cannot upgrade confidence or infer legal rights.
+[ ] No accepted architecture decision can contain an unresolved blocking claim.
+
+======================================================================
+33. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Create the research directory structure in Section 25.
+2. Implement source, claim, protocol, decision and licence schemas.
+3. Convert the seeded register in Section 30 into sources.csv/jsonl.
+4. Create a validator CLI:
+   dmf research validate
+5. Create a stale-evidence report:
+   dmf research stale
+6. Create a blocking-evidence report:
+   dmf research blockers
+7. Create a source-bundle command:
+   dmf research bundle --protocol RP-...
+8. Create templates for DMFP-02 onwards.
+9. Begin RP-02-001:
+   Capture and verify official 2026/27 FPL rules at launch.
+10. Begin RP-04-001 in parallel:
+    Compare odds/data providers with proof-of-access and licensing.
+
+======================================================================
+34. OPEN QUESTIONS
+======================================================================
+
+1. Will Sebastian personally human-verify every BLOCKING source, or should a
+   second reviewer be appointed?
+2. Which bibliographic databases are available through university access?
+3. Which source artefacts may be stored privately under provider contracts?
+4. Should the register use CSV plus JSONL, or a small PostgreSQL schema from the
+   start?
+5. Which web-archiving method is appropriate and permitted?
+6. Should a legal adviser review the provider matrix before purchase?
+7. What evidence threshold promotes a recent FPL preprint into production?
+8. Which critical searches need PRESS-style peer review?
+9. What is the acceptable time cost for an R3 review during deadline week?
+10. How should confidential provider support responses be cited internally?
+11. Should public DMF content expose full evidence grades or a simplified
+    methodology page?
+12. What is the retention policy for AI research transcripts?
+13. Which source-status APIs will be automated?
+14. Should internal prospective hypotheses be timestamped in a public repository
+    or private immutable journal?
+15. Which licence is intended for future DMF code and public methodology?
+16. How will paywalled research be shared with Codex without violating rights?
+17. What reviewer resolves a statistical-method disagreement?
+18. Should source independence be modelled as a graph in PostgreSQL?
+19. What threshold of evidence missingness blocks a module specification?
+20. What research artefacts will be retained after the 2026/27 season?
+
+======================================================================
+35. NEXT DOCUMENT RESEARCH HANDOFF
+======================================================================
+
+Next:
+DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+
+Required review:
+R3 because incorrect rules are BLOCKING.
+
+Required research actions:
+- monitor official FPL launch;
+- capture target-season rules;
+- capture official change announcements;
+- record exact rule locators;
+- inspect official game data;
+- compare against 2025/26;
+- create season configuration;
+- create rule tests;
+- human sign-off;
+- schedule change monitoring.
+
+In parallel:
+Begin the R3 provider/licensing review for DMFP-04 because provider access is a
+critical path for the market-first architecture.
+
+======================================================================
+36. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-16
+- Established source, claim and decision registers.
+- Rejected a universal evidence ladder in favour of claim-specific hierarchy.
+- Added evidence criticality and R0–R4 research levels.
+- Added research protocol, query log and stopping rules.
+- Added AI confabulation and automation-bias controls.
+- Added extraction, synthesis and contradiction procedures.
+- Added licensing, database-right and commercial-use fields.
+- Added FAIR/W3C-PROV-inspired provenance.
+- Added machine validation and Codex requirements.
+- Seeded the initial research-governance source register.
+- Added freshness, correction, retraction and supersession controls.
+
+Future v1.0:
+- Sebastian approves the standard.
+- Machine-readable schemas are implemented.
+- Seed sources are imported and validated.
+- A human verification workflow is assigned.
+- First R3 protocol is run on DMFP-02 or DMFP-04.
+- Any conflicts with DMFP-00 are resolved by ADR.
+
+END OF DOCUMENT

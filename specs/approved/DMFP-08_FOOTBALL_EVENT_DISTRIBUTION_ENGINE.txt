@@ -1,0 +1,3513 @@
+DMF PULSE — FOOTBALL EVENT DISTRIBUTION ENGINE
+===============================================
+
+Document ID: DMFP-08
+Version: 0.9 (Market-Constrained Coherent Match Simulation Architecture)
+Status: PROPOSED — READY FOR BASELINE IMPLEMENTATION AND PROSPECTIVE VALIDATION
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 16 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Upstream inputs:
+- DMFP-02 FPL rules and event/scoring definitions
+- DMFP-03 canonical teams, players, fixtures, markets and events
+- DMFP-04 free data-source architecture
+- DMFP-05 deadline-safe source bundles
+- DMFP-06 market probabilities and uncertainty
+- DMFP-07 coherent lineups, availability and minute distributions
+
+Downstream consumers:
+- DMFP-09 FPL points distribution engine
+- DMFP-12 squad and transfer optimiser
+- DMFP-13 captaincy and chip optimiser
+- DMFP-15 backtesting and calibration
+
+PURPOSE
+-------
+This document defines the engine that converts market information, team/player
+history and coherent lineup/minute scenarios into complete football match-event
+distributions.
+
+It models:
+
+- home and away goals;
+- exact scorelines;
+- team-goal totals;
+- player goals;
+- multiple-goal probabilities;
+- official/provider assists;
+- assistable and unassisted goal mechanisms;
+- clean sheets;
+- goals conceded;
+- team and player shots;
+- shots on target;
+- goalkeeper saves;
+- penalty awards;
+- penalty goals;
+- missed penalties;
+- penalty saves;
+- yellow and red cards;
+- own goals;
+- clearances;
+- blocks;
+- interceptions;
+- tackles;
+- ball recoveries;
+- event timing;
+- correlations between teammates;
+- correlations between opponents;
+- correlations between events in the same match.
+
+The critical requirement is INTERNAL CONSISTENCY.
+
+Examples:
+
+- player goals plus opponent own goals MUST equal team goals in every simulated
+  scenario;
+- player goal expectations cannot imply materially more goals than the team's
+  calibrated goal distribution;
+- a clean sheet is a deterministic consequence of conceding zero goals;
+- saves cannot exceed shots on target faced;
+- a penalty save must correspond to an unscored penalty and a goalkeeper on the
+  pitch;
+- a scorer cannot assist the same goal;
+- an own goal cannot simultaneously be credited as an opponent player goal;
+- a player cannot record events while off the pitch;
+- a player sent off cannot later score, assist or record defensive actions;
+- the team lineup, substitutions and player minutes must remain coherent;
+- every FPL-facing event must be traceable to one simulated match path.
+
+GOVERNING PRINCIPLE
+-------------------
+Pulse will not fit separate independent models for every player statistic and
+hope they add up.
+
+Instead, it will simulate one joint match world:
+
+    MARKET-CALIBRATED SCORE ENVIRONMENT
+    + COHERENT LINEUPS AND MINUTES
+    + SHARED MATCH-STATE FACTORS
+    + CONSTRAINED EVENT ALLOCATION
+    = INTERNALLY CONSISTENT FOOTBALL SCENARIOS
+
+IMPORTANT MODELLING POSITION
+----------------------------
+Poisson models remain powerful football baselines, but they are not treated as
+universal physical laws.
+
+The production engine uses:
+
+1. a flexible prior score model;
+2. a market-constrained joint score matrix;
+3. conditional player/event allocation;
+4. posterior predictive scenario simulation;
+5. challenger count distributions where data show residual under/overdispersion,
+   excess zeros, tail error or dependence.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require a documented architecture decision.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE MODEL DECISION
+======================================================================
+
+0.1 SELECTED PRODUCTION ARCHITECTURE
+------------------------------------
+The initial production engine is a two-stage coherent model.
+
+STAGE 1 — MARKET-CONSTRAINED SCORE DISTRIBUTION
+
+- construct a prior joint score matrix from a dynamic bivariate football model;
+- ingest market probabilities from DMFP-06;
+- reconcile 1X2, totals, team totals, clean sheets, BTTS, correct-score and other
+  compatible markets;
+- solve a constrained information-projection problem;
+- output a proper joint home/away score distribution.
+
+STAGE 2 — CONDITIONAL EVENT ALLOCATION
+
+Conditional on:
+
+- sampled scoreline;
+- coherent lineup/minute scenario;
+- match-state latent factors;
+
+allocate:
+
+- goal times;
+- player scorers;
+- own goals;
+- goal mechanisms;
+- assists;
+- shots and shots on target;
+- saves;
+- penalties;
+- cards;
+- defensive events.
+
+0.2 SCORE-DISTRIBUTION PRIMARY REPRESENTATION
+---------------------------------------------
+The canonical pre-match score forecast is a finite joint probability matrix:
+
+    P(G_home = h, G_away = a)
+
+with adaptive score support and explicit tail treatment.
+
+This matrix is more flexible than exposing only:
+
+    lambda_home
+    lambda_away
+
+It can represent:
+
+- low-score dependence;
+- draw corrections;
+- asymmetric tails;
+- market constraints;
+- overdispersion;
+- score correlation;
+- clean sheets;
+- exact score;
+- all totals and outcome probabilities.
+
+0.3 SCORE PRIOR
+---------------
+Initial prior:
+
+- dynamic bivariate Poisson team-strength model;
+- low-score Dixon–Coles correction;
+- hierarchical Bayesian attack, defence and home effects;
+- time decay / state evolution;
+- lineup/minutes context where available;
+- promoted/new-manager uncertainty.
+
+Challengers:
+
+- independent Poisson;
+- bivariate Poisson without low-score correction;
+- gamma–Poisson / negative-binomial mixture;
+- diagonal-inflated model;
+- double Poisson / Conway–Maxwell–Poisson for underdispersion;
+- bivariate Weibull count;
+- sequential goal-hazard process.
+
+0.4 MARKET RECONCILIATION
+-------------------------
+Primary method:
+
+    soft constrained KL projection
+
+Choose score matrix P that remains close to prior P0 while matching all reliable
+market probabilities within their uncertainty.
+
+Conceptually:
+
+    minimise:
+        KL(P || P0)
+        + 1/2 sum_k [(A_k P - m_k)^2 / sigma_k^2]
+        + optional tail/smoothness penalties
+
+subject to:
+
+    P_h,a >= 0
+    sum_h,a P_h,a = 1
+
+where:
+
+- A_k maps scorelines to market event k;
+- m_k is the DMFP-06 consensus probability;
+- sigma_k reflects market uncertainty/confidence.
+
+Hard equality constraints are used only for deliberately trusted synthetic/unit
+tests or unusually strong, mathematically consistent market inputs.
+
+0.5 PLAYER GOAL ALLOCATION
+---------------------------
+Each sampled team goal is assigned to exactly one category:
+
+- eligible team player;
+- opponent own goal;
+- unresolved/other scorer only where source/model scope requires.
+
+Player scorer shares are constrained to sum one for each team goal and depend
+on:
+
+- whether player is on the pitch at goal time;
+- role;
+- penalty/set-piece role;
+- player scoring ability;
+- team goal mechanism;
+- lineup;
+- opposition;
+- match state.
+
+Player market probabilities calibrate these shares without violating team totals.
+
+0.6 PLAYER GOAL MARKET CALIBRATION
+----------------------------------
+For fixed player goal share s_i and team goal count G:
+
+    P(player i scores at least once)
+    =
+    1 - E[(1 - s_i)^G]
+
+This uses the complete team goal distribution.
+
+If G is Poisson(lambda_team):
+
+    P(G_i >= 1)
+    =
+    1 - exp(-lambda_team s_i)
+
+and:
+
+    lambda_i = -log(1-p_i)
+
+only when the player's event count can validly be represented as a fixed-exposure
+Poisson count.
+
+The engine MUST NOT apply:
+
+    lambda_i = -log(1-p_i)
+
+blindly when:
+
+- starting/minutes are uncertain;
+- the market is conditional on starting;
+- player share changes by lineup/time;
+- team goals are non-Poisson;
+- multiple goal mechanisms exist.
+
+0.7 ASSIST ALLOCATION
+---------------------
+Each non-own-goal team goal receives a mechanism:
+
+- assisted open play;
+- unassisted open play;
+- set piece;
+- penalty;
+- direct free kick;
+- rebound/other provider-defined mechanism.
+
+If assistable, exactly one eligible assister or a no-assist state is selected.
+The scorer cannot assist the same goal.
+
+0.8 SHOTS AND SAVES
+--------------------
+The engine models a coherent shot tree:
+
+    shots
+    -> on target / off target / blocked
+    -> goal / goalkeeper save / last-line block / other result
+
+Goalkeeper saves are derived from on-target shots faced and goal outcomes,
+subject to provider/FPL definitions.
+
+0.9 CORRELATIONS
+----------------
+Correlations arise through shared latent and deterministic structure:
+
+- scoreline;
+- match tempo;
+- team dominance;
+- possession/territory;
+- finishing;
+- discipline;
+- set pieces;
+- lineup/minutes;
+- substitutions;
+- red cards;
+- score state;
+- event conservation constraints.
+
+No arbitrary independent player-event sampling is allowed in production output.
+
+0.10 INITIAL AND ADVANCED SIMULATORS
+------------------------------------
+V1:
+Final-score-first coherent conditional simulator.
+
+V2:
+Sequential marked point-process simulator calibrated/reweighted to the market
+score matrix.
+
+V1 is selected for initial production because it is easier to validate and
+guarantees market-consistent score totals.
+
+======================================================================
+1. FORMAL RANDOM VARIABLES
+======================================================================
+
+1.1 TEAM SCORE
+--------------
+H:
+Home-team goals.
+
+A:
+Away-team goals.
+
+Joint distribution:
+
+    P_HA(h,a)
+
+1.2 PLAYER GOALS
+----------------
+For home players i:
+
+    G_H,i
+
+Opponent own goals benefiting home:
+
+    OG_A_to_H
+
+Constraint:
+
+    sum_i G_H,i + OG_A_to_H = H
+
+Similarly:
+
+    sum_j G_A,j + OG_H_to_A = A
+
+1.3 ASSISTS
+-----------
+For player i:
+
+    AS_i
+
+Goal-level constraint:
+
+- at most one official/provider assist per goal under the configured event
+  taxonomy;
+- no assist on designated nonassistable mechanisms;
+- assister != scorer.
+
+1.4 SHOTS
+---------
+Team/player:
+
+- SH;
+- SOT;
+- blocked;
+- off target;
+- goals from shots.
+
+1.5 SAVES
+---------
+Goalkeeper saves:
+
+    SAVES_team_keeper
+
+with coherence to shots on target and goal mechanisms.
+
+1.6 PENALTIES
+-------------
+- penalties awarded;
+- scored penalties;
+- missed/off-target/woodwork penalties;
+- saved penalties;
+- taker;
+- goalkeeper;
+- retake/void state where modelled.
+
+1.7 DISCIPLINE
+--------------
+- yellow cards;
+- second-yellow red;
+- straight red;
+- dismissal time.
+
+1.8 DEFENSIVE EVENTS
+--------------------
+Per player:
+
+- clearances;
+- blocks;
+- interceptions;
+- tackles;
+- ball recoveries.
+
+1.9 LATENT MATCH FACTORS
+------------------------
+Examples:
+
+- tempo;
+- home dominance;
+- possession share;
+- attacking pressure;
+- finishing state;
+- referee discipline;
+- set-piece intensity;
+- transition openness.
+
+These induce cross-event dependence.
+
+======================================================================
+2. DATA AND INFORMATION CONTRACT
+======================================================================
+
+2.1 REQUIRED UPSTREAM INPUTS
+----------------------------
+From DMFP-05:
+
+- LIVE_OPERATIONAL deadline source bundle;
+- canonical fixture/player/team IDs;
+- source times;
+- quality and missingness;
+- no postcutoff information.
+
+From DMFP-06:
+
+- market probability;
+- consensus probability;
+- bounds;
+- disagreement;
+- freshness;
+- operator/provider counts;
+- confidence;
+- settlement profile.
+
+From DMFP-07:
+
+- coherent lineup samples;
+- p_start/p_bench/p_out;
+- minute PMFs;
+- substitution-path scenarios;
+- injury/rotation uncertainty.
+
+2.2 OPTIONAL INPUTS
+-------------------
+- historical team/player events;
+- official FPL xG/xA and expected involvement fields if available;
+- API-FOOTBALL statistics;
+- StatsBomb open research data;
+- manual market observations;
+- weather/referee where time-safe and validated.
+
+2.3 FORBIDDEN INPUTS
+--------------------
+- postdeadline lineup;
+- closing odds after FPL cutoff;
+- final result;
+- final minutes;
+- final injury duration;
+- corrected event labels learned after cutoff.
+
+2.4 MARKET SEMANTIC MATCH
+-------------------------
+A market constraint enters only if:
+
+- fixture matches;
+- period matches;
+- line matches;
+- settlement is compatible;
+- pre-match status;
+- confidence is not blocking;
+- market outcome can be represented by the score/event state.
+
+======================================================================
+3. EVENT TAXONOMY
+======================================================================
+
+3.1 PURPOSE
+-----------
+Providers use different event definitions.
+
+Pulse needs a canonical taxonomy plus provider mappings.
+
+3.2 GOAL MECHANISM
+------------------
+OPEN_PLAY_ASSISTED
+OPEN_PLAY_UNASSISTED
+SET_PIECE_ASSISTED
+SET_PIECE_UNASSISTED
+PENALTY
+DIRECT_FREE_KICK
+REBOUND
+OPPONENT_OWN_GOAL
+OTHER
+UNKNOWN
+
+3.3 SHOT RESULT
+---------------
+GOAL
+SAVED
+OFF_TARGET
+WOODWORK
+BLOCKED
+LAST_LINE_BLOCK
+OWN_GOAL_CAUSING_ACTION
+OTHER
+
+3.4 PENALTY RESULT
+------------------
+SCORED
+SAVED
+OFF_TARGET
+WOODWORK
+VOID_RETAKEN
+UNKNOWN
+
+3.5 CARD
+--------
+YELLOW
+SECOND_YELLOW_RED
+STRAIGHT_RED
+
+3.6 DEFENSIVE EVENT
+-------------------
+CLEARANCE
+BLOCK
+INTERCEPTION
+TACKLE
+BALL_RECOVERY
+
+3.7 EVENT DEFINITION VERSION
+----------------------------
+Every source mapping records:
+
+- provider;
+- schema version;
+- canonical event;
+- inclusion/exclusion;
+- effective interval;
+- verification.
+
+3.8 FPL ASSIST BOUNDARY
+-----------------------
+This module outputs football/provider event mechanisms.
+
+DMFP-09 applies the target-season FPL assist policy, which can differ from a
+provider's official assist.
+
+The event engine must preserve enough goal-chain information for DMFP-09.
+
+======================================================================
+4. TEAM SCORE PRIOR
+======================================================================
+
+4.1 INDEPENDENT POISSON BASELINE
+--------------------------------
+Baseline:
+
+    H ~ Poisson(lambda_H)
+    A ~ Poisson(lambda_A)
+
+independent conditional on rates.
+
+Advantages:
+
+- simple;
+- interpretable;
+- analytically tractable;
+- often a strong football baseline;
+- exact score matrix easy to compute;
+- Poisson thinning supports player allocation.
+
+Limitations:
+
+- conditional mean equals variance;
+- no score dependence;
+- draw/low-score error;
+- no dynamic match-state feedback;
+- tails can be wrong.
+
+4.2 TEAM-STRENGTH PARAMETERISATION
+----------------------------------
+Historical prior:
+
+    log(lambda_H)
+      = home_advantage
+        + attack_home
+        - defence_away
+        + lineup_context
+        + regime_context
+
+    log(lambda_A)
+      = attack_away
+        - defence_home
+        + lineup_context
+        + regime_context
+
+Attack/defence effects use hierarchical constraints for identifiability.
+
+4.3 DYNAMIC STRENGTH
+--------------------
+Team strengths evolve over time through:
+
+- random walk/state space;
+- discounted observations;
+- manager/lineup regime changes;
+- promoted-team priors;
+- season transitions.
+
+Koopman and Lit's dynamic bivariate Poisson work supports stochastic evolution
+of team attack/defence strengths.
+
+4.4 BIVARIATE POISSON
+---------------------
+One representation:
+
+    H = X_H + X_C
+    A = X_A + X_C
+
+where independent:
+
+    X_H ~ Poisson(lambda_H)
+    X_A ~ Poisson(lambda_A)
+    X_C ~ Poisson(lambda_C)
+
+Then:
+
+    Cov(H,A) = lambda_C >= 0
+
+Advantages:
+- simple positive dependence;
+- shared match factor.
+
+Limitations:
+- only nonnegative covariance;
+- shared component means simultaneous/common-count structure rather than a full
+  causal match process;
+- may not capture score-state feedback or negative dependence.
+
+4.5 DIXON–COLES CORRECTION
+--------------------------
+Dixon and Coles adjust low scoreline probabilities, particularly:
+
+- 0-0;
+- 0-1;
+- 1-0;
+- 1-1.
+
+Use as prior correction, not as a substitute for market calibration.
+
+The correction parameter is:
+
+- time-varying or hierarchically estimated where evidence permits;
+- constrained to valid probabilities;
+- tested prospectively.
+
+4.6 DIAGONAL INFLATION
+----------------------
+Karlis and Ntzoufras describe bivariate Poisson extensions including diagonal
+inflation to improve draw modelling.
+
+Challenger when:
+
+- draw scorelines remain miscalibrated after Dixon–Coles/market constraints;
+- complete-score data justify extra complexity.
+
+4.7 HIERARCHICAL BAYESIAN PRIOR
+-------------------------------
+Baio and Blangiardo show a hierarchical Bayesian structure for attack/defence
+strengths and discuss over-shrinkage of extreme teams.
+
+Pulse must:
+
+- perform prior predictive checks;
+- inspect promoted/elite teams;
+- consider mixture/heavy-tailed team effects if normal priors over-shrink;
+- preserve uncertainty.
+
+4.8 MARKET-AUGMENTED PRIOR
+-------------------------
+Egidi, Pauli and Torelli combine historical scoring parameters with bookmaker
+odds in a hierarchical Poisson model and report improved predictive use.
+
+Pulse goes further by treating the entire score matrix as the market-calibrated
+object.
+
+======================================================================
+5. WHEN POISSON IS ADEQUATE
+======================================================================
+
+5.1 CONDITIONAL, NOT MARGINAL, QUESTION
+---------------------------------------
+Across a whole league, goal counts mix teams and strengths and can be
+overdispersed even when goals are conditionally Poisson.
+
+Test Poisson adequacy after conditioning on:
+
+- team;
+- opponent;
+- home;
+- lineup;
+- market strength;
+- regime;
+- fixture context.
+
+5.2 ADEQUACY DIAGNOSTICS
+------------------------
+- mean/variance of randomized quantile residuals;
+- rootogram;
+- observed versus predicted zeros;
+- tail probabilities;
+- exact-score log score;
+- probability integral transform/rank diagnostics;
+- 1X2/RPS;
+- clean-sheet calibration;
+- total-goal calibration;
+- draw score calibration.
+
+5.3 ACCEPT POISSON WHEN
+-----------------------
+- residual dispersion is close to one;
+- zero and tail calibration acceptable;
+- no material subgroup failure;
+- market constraints are reproduced;
+- challenger fails to improve out-of-time proper scores.
+
+5.4 DO NOT REJECT SOLELY BECAUSE
+--------------------------------
+- marginal league variance exceeds mean;
+- football is "complex";
+- a more flexible model fits training data better.
+
+======================================================================
+6. NEGATIVE BINOMIAL AND OVERDISPERSION
+======================================================================
+
+6.1 GAMMA–POISSON MIXTURE
+-------------------------
+If:
+
+    Lambda ~ Gamma(shape, rate)
+    G | Lambda ~ Poisson(Lambda)
+
+then marginal G is negative binomial.
+
+Interpretation:
+uncertain/random intensity creates overdispersion.
+
+6.2 PREFERRED USE
+-----------------
+Rather than inserting an arbitrary negative-binomial count immediately, Pulse
+can model uncertainty in latent scoring intensity.
+
+This naturally reflects:
+
+- lineup uncertainty;
+- tactical uncertainty;
+- market bounds;
+- finishing environment;
+- regime uncertainty.
+
+6.3 WHEN TO USE
+---------------
+Promote an NB/gamma–Poisson component when:
+
+- residual variance materially exceeds Poisson after conditioning;
+- high-score tail is systematically underestimated;
+- out-of-time log score improves;
+- score-market fit improves;
+- calibration remains stable.
+
+6.4 TEAM-SPECIFIC DISPERSION
+----------------------------
+Do not estimate unrestricted dispersion for every team on one season.
+
+Use hierarchical:
+
+- global;
+- league;
+- team/regime deviations.
+
+6.5 CORRELATION
+---------------
+Independent negative-binomial margins do not by themselves create a coherent
+joint distribution.
+
+Use:
+
+- shared latent gamma factors;
+- copula;
+- score-matrix prior;
+- joint event process.
+
+6.6 CAUTION
+-----------
+Historical research is mixed: some datasets are adequately Poisson after
+conditioning, and underdispersion alternatives can outperform overdispersion
+models in some football samples.
+
+Model selection is empirical.
+
+======================================================================
+7. ZERO INFLATION AND HURDLE MODELS
+======================================================================
+
+7.1 DEFINITION
+--------------
+Zero-inflated model:
+
+    with probability pi:
+      structural zero
+    otherwise:
+      count model.
+
+Hurdle model:
+
+- one model for zero versus positive;
+- separate zero-truncated distribution for positive counts.
+
+7.2 TEAM GOALS
+--------------
+A 0-goal outcome is ordinary in football.
+
+Do not introduce zero inflation merely because zeros are common.
+
+7.3 WHEN PLAUSIBLE
+------------------
+Use only if:
+
+- market-calibrated Poisson/NB still underestimates zero;
+- a plausible latent state exists;
+- out-of-time scoring improves.
+
+Potential structural states:
+
+- severe attacking/lineup impairment;
+- unusual tactical shutdown;
+- red-card match state;
+- player not on pitch.
+
+For team pre-match goals, these are usually better represented by lineup/state
+mixtures than an opaque zero-inflation parameter.
+
+7.4 PLAYER COUNTS
+-----------------
+Player goals/shots often show many zeros because:
+
+- player may not start;
+- player may not appear;
+- minutes vary.
+
+The correct zero mechanism is the DMFP-07 role/minute mixture, not a generic ZIP
+term.
+
+7.5 DEFENSIVE EVENTS
+--------------------
+For low-event player/role categories, hurdle or zero-inflated models may be
+reasonable after exposure is included.
+
+7.6 PROMOTION
+-------------
+Requires:
+
+- residual-zero test;
+- time-safe proper-score improvement;
+- interpretable state;
+- stable parameters;
+- no double counting with minutes/availability.
+
+======================================================================
+8. UNDERDISPERSION AND ALTERNATIVES
+======================================================================
+
+8.1 PROBLEM
+-----------
+Negative binomial handles overdispersion only.
+
+Football counts can be underdispersed conditional on strong information.
+
+8.2 CHALLENGERS
+---------------
+- double Poisson;
+- Conway–Maxwell–Poisson;
+- generalized Poisson;
+- bivariate Weibull count;
+- finite score-matrix model.
+
+8.3 PRODUCTION POLICY
+---------------------
+The market-constrained score matrix is flexible enough to represent either
+dispersion direction.
+
+Parametric challengers are useful for:
+
+- prior;
+- extrapolation;
+- compactness;
+- diagnostics.
+
+======================================================================
+9. ADAPTIVE SCORE GRID AND TAILS
+======================================================================
+
+9.1 GRID
+--------
+Initial support:
+
+    h = 0...G_H_max
+    a = 0...G_A_max
+
+9.2 ADAPTIVE MAXIMUM
+--------------------
+Increase limits until prior tail mass outside the grid is below configured
+tolerance, e.g.:
+
+    < 1e-8
+
+for each marginal/joint approximation.
+
+9.3 MARKET HIGH LINES
+---------------------
+Grid must cover all quoted total/correct-score lines plus safety margin.
+
+9.4 OVERFLOW
+------------
+Preferred:
+expand grid.
+
+Fallback:
+explicit tail states, not silent renormalisation.
+
+9.5 NUMERICAL LOG SPACE
+-----------------------
+Compute low-probability score cells in log space where needed.
+
+======================================================================
+10. MARKET-CONSTRAINED SCORE MATRIX
+======================================================================
+
+10.1 SCORE VECTOR
+-----------------
+Flatten matrix P_h,a into vector p of length K.
+
+10.2 MARKET DESIGN ROWS
+-----------------------
+For event k define indicator/weight vector A_k.
+
+Examples:
+
+Home win:
+    A(h,a) = 1[h>a]
+
+Draw:
+    1[h=a]
+
+Over 2.5:
+    1[h+a >= 3]
+
+Home clean sheet:
+    1[a=0]
+
+BTTS:
+    1[h>=1 and a>=1]
+
+Home team over 1.5:
+    1[h>=2]
+
+Correct score 2-1:
+    1[h=2,a=1]
+
+10.3 INPUT PROBABILITIES
+------------------------
+From DMFP-06:
+
+- calibrated consensus m_k;
+- lower/upper;
+- confidence;
+- disagreement;
+- freshness;
+- operator count.
+
+10.4 SOFT OBJECTIVE
+-------------------
+Recommended:
+
+    L(p)
+      =
+      sum_s p_s log(p_s / p0_s)
+      +
+      1/2 sum_k w_k (A_k p - m_k)^2
+      +
+      tail_penalty
+      +
+      optional roughness_penalty
+
+where:
+
+    w_k = 1 / sigma_k^2
+
+and sigma derives from market uncertainty plus a model floor.
+
+10.5 WHY KL
+-----------
+KL projection:
+
+- preserves prior structure not contradicted by markets;
+- yields a proper distribution;
+- is conservative under incomplete constraints;
+- avoids arbitrary parameter inversion;
+- supports many market types.
+
+10.6 HARD CONSTRAINTS
+---------------------
+May use:
+
+    A_k p = m_k
+
+only if constraints are mutually feasible and deliberately trusted.
+
+Real bookmaker markets often disagree after independent margin treatment.
+Soft constraints are safer.
+
+10.7 CORRELATED MARKET EVIDENCE
+-------------------------------
+1X2, totals, BTTS and correct score are not independent observations.
+
+Do not multiply their likelihoods as independent with full weight.
+
+Use:
+
+- covariance/market-family weighting;
+- operator/source dependence;
+- confidence caps;
+- one market-family composite;
+- robust sensitivity.
+
+10.8 MARKET FAMILY
+------------------
+Suggested:
+
+RESULT
+TOTAL
+TEAM_TOTAL
+BTTS
+CLEAN_SHEET
+CORRECT_SCORE
+HANDICAP
+
+Weights within family are capped.
+
+10.9 OPTIMISATION
+-----------------
+Use:
+
+- convex solver where objective/constraints permit;
+- softmax parameterisation;
+- mirror descent;
+- scipy/cvxpy audited implementation.
+
+Need:
+
+- deterministic convergence;
+- gradient checking;
+- feasibility diagnostics;
+- fallback.
+
+10.10 FALLBACK
+----------------
+If solver fails:
+
+1. use reduced high-confidence constraint set;
+2. fit lambda_H/lambda_A to 1X2 + total;
+3. use market-augmented prior;
+4. lower confidence.
+
+10.11 OUTPUT CHECK
+------------------
+- probabilities nonnegative;
+- sum one;
+- constraint residuals;
+- prior KL;
+- tail mass;
+- effective markets;
+- sensitivity to each market.
+
+======================================================================
+11. SCORE-MATRIX UNCERTAINTY
+======================================================================
+
+11.1 MARKET DRAWS
+-----------------
+Sample market probabilities from DMFP-06 operational uncertainty distributions,
+respecting simplex/market correlations where possible.
+
+11.2 PRIOR DRAWS
+----------------
+Sample:
+
+- team strengths;
+- lineup/minutes;
+- dispersion/dependence;
+- manager regime.
+
+11.3 REFIT
+----------
+For each draw:
+
+- build prior;
+- solve score matrix.
+
+11.4 OUTPUT
+-----------
+Posterior/ensemble of score matrices.
+
+Use for:
+
+- team-goal uncertainty;
+- clean-sheet intervals;
+- downstream event simulation;
+- model uncertainty.
+
+11.5 COMPUTE
+------------
+Near deadline:
+
+- cache prior;
+- use moderate parameter draws;
+- increase Monte Carlo only for close decisions.
+
+======================================================================
+12. TEAM GOALS, CLEAN SHEETS AND GOALS CONCEDED
+======================================================================
+
+12.1 TEAM GOAL PMF
+------------------
+Derive marginals:
+
+    P(H=h) = sum_a P(h,a)
+    P(A=a) = sum_h P(h,a)
+
+12.2 CLEAN SHEET
+----------------
+Home clean sheet:
+
+    P(A=0)
+
+Away clean sheet:
+
+    P(H=0)
+
+12.3 GOALS CONCEDED
+-------------------
+For each team, the opponent goal count is the goals-conceded distribution.
+
+Player-specific goals conceded later depend on DMFP-07 on-pitch intervals and
+red-card/FPL rules.
+
+12.4 OUTCOME PROBABILITIES
+--------------------------
+- home win;
+- draw;
+- away win;
+- totals;
+- BTTS;
+- scoreline.
+
+All are derived from one matrix.
+
+12.5 CONSISTENCY
+----------------
+No separately fitted clean-sheet model may override the score matrix.
+A direct clean-sheet market is a constraint on the matrix.
+
+======================================================================
+13. GOAL TIMING
+======================================================================
+
+13.1 PURPOSE
+------------
+Timing is needed for:
+
+- on-pitch eligibility;
+- substitutions;
+- score-state effects;
+- cards;
+- saves/defensive events;
+- FPL clean-sheet intervals.
+
+13.2 V1 CONDITIONAL TIMING
+--------------------------
+Conditional on sampled H and A:
+
+- sample H home goal times;
+- sample A away goal times;
+- use team-specific inhomogeneous time density;
+- sort events;
+- permit minute/stoppage bins per official data semantics.
+
+13.3 TIME DENSITY
+-----------------
+Model:
+
+- half;
+- minute spline;
+- stoppage-time masses;
+- home/away;
+- pre-match strength;
+- game state in a second-pass adjustment.
+
+13.4 CONDITIONAL COUNT PROPERTY
+-------------------------------
+For an inhomogeneous Poisson process conditional on event count, event times are
+distributed according to normalized intensity.
+
+This provides a principled V1 timing mechanism when state dependence is modest.
+
+13.5 SCORE-STATE ADJUSTMENT
+---------------------------
+V1:
+
+1. initial times from baseline density;
+2. order;
+3. reweight/resample based on resulting score path;
+4. run DMFP-07 substitution refinement once.
+
+13.6 V2 SEQUENTIAL PROCESS
+--------------------------
+Minute/continuous-time hazards:
+
+    lambda_home(t, state, lineup)
+    lambda_away(t, state, lineup)
+
+Simulate next event and update state.
+
+Calibrate scenario weights or parameters to reproduce the pre-match score
+matrix.
+
+13.7 NO UNLIMITED ITERATION
+---------------------------
+Use one controlled refinement pass initially.
+Measure whether additional iterations change distributions materially.
+
+======================================================================
+14. PLAYER GOAL ALLOCATION
+======================================================================
+
+14.1 SCORER CATEGORIES
+----------------------
+For a team goal at time t:
+
+- eligible on-pitch team players;
+- opponent own-goal category;
+- OTHER/UNRESOLVED only in model fallback.
+
+14.2 PLAYER PRIOR ABILITY
+-------------------------
+Hierarchical scoring ability from:
+
+- goals and nonpenalty goals;
+- shots;
+- shots on target;
+- xG where available;
+- penalty role;
+- tactical role;
+- historical rates;
+- team context;
+- promoted/league transfer;
+- player uncertainty.
+
+Whitaker et al. provide an interpretable Bayesian Poisson approach to player
+event abilities and connect player abilities to team scoring rates.
+
+14.3 EXPOSURE
+-------------
+At goal time:
+
+    eligibility_i(t) = 1 if player on pitch and attacking team
+
+Weight:
+
+    w_i(t)
+      =
+      eligibility_i(t)
+      x exp(
+          player_scoring_ability
+          + role_effect
+          + penalty/set_piece_effect
+          + lineup_interaction
+          + opponent_context
+          + score_state_effect
+        )
+
+Normalize across eligible scorer categories.
+
+14.4 GOAL TYPE
+--------------
+Penalty and direct-free-kick goals use specialized taker probabilities.
+Open-play goals use open-play shares.
+
+14.5 SUM CONSTRAINT
+-------------------
+For every goal:
+
+    sum_i scorer_probability_i
+    + P(opponent own goal)
+    + P(other)
+    = 1
+
+14.6 TEAM-LEVEL EXPECTATION
+--------------------------
+Automatically:
+
+    sum_i E[G_i] + E[opponent own goals] = E[team goals]
+
+This is a hard validation property.
+
+======================================================================
+15. DERIVING PLAYER GOAL INTENSITY FROM ANYTIME ODDS
+======================================================================
+
+15.1 SIMPLE POISSON INVERSION
+-----------------------------
+If player goal count X is Poisson(lambda):
+
+    P(X >= 1) = 1 - exp(-lambda)
+
+Therefore:
+
+    lambda = -log(1 - p_anytime)
+
+15.2 LIMITATION
+---------------
+This inversion is valid only under the assumed count distribution and exposure.
+
+It fails or becomes misleading when:
+
+- minutes are random;
+- p is conditional on starting;
+- player's team score is non-Poisson;
+- player goal share changes through time;
+- penalties/open play differ;
+- source probability is uncertain;
+- goals are constrained by the team score matrix.
+
+15.3 MINUTES-MIXTURE INVERSION
+------------------------------
+If scenario s has weight pi_s and player intensity lambda_s(theta):
+
+    p_anytime(theta)
+      =
+      sum_s pi_s [1 - exp(-lambda_s(theta))]
+
+Solve:
+
+    p_anytime(theta) = market p
+
+for player ability/share parameter theta.
+
+15.4 TEAM-COUNT SHARE FORMULA
+-----------------------------
+If each of G team goals is assigned independently to player i with constant
+share s_i:
+
+    P(G_i = 0 | G=g)
+      = (1-s_i)^g
+
+Thus:
+
+    P(G_i >= 1)
+      =
+      1 - sum_g P(G=g)(1-s_i)^g
+
+This is selected for score-matrix consistency.
+
+15.5 MULTIPLE GOALS
+-------------------
+Conditional binomial allocation:
+
+    G_i | G=g ~ Binomial(g, s_i)
+
+Then:
+
+    P(G_i >= 2)
+      =
+      1
+      - sum_g P(G=g) [
+          (1-s_i)^g
+          + g s_i (1-s_i)^(g-1)
+        ]
+
+More generally:
+
+    P(G_i=k)
+      =
+      sum_g P(G=g) BinomialPMF(k; g, s_i)
+
+15.6 TIME-VARYING SHARE
+-----------------------
+With minutes/goal times:
+
+- simulate score count/times;
+- only on-pitch players eligible;
+- compute scenario-specific probability;
+- calibrate by Monte Carlo/root solving.
+
+15.7 CONDITIONAL-ON-START MARKET
+--------------------------------
+If settlement is conditional on start:
+
+- compare to P(score>=1 | START under market rules);
+- do not multiply/decondition without DMFP-07 and exact settlement;
+- retain source uncertainty.
+
+15.8 ONE-SIDED ODDS
+-------------------
+DMFP-06 may provide a raw/estimated market probability with wide bounds.
+
+Use as soft evidence, not exact constraint.
+
+======================================================================
+16. RECONCILING PLAYER MARKETS WITH TEAM TOTALS
+======================================================================
+
+16.1 PRIOR SHARE VECTOR
+-----------------------
+For team T:
+
+    s0 = {
+      player shares,
+      opponent own-goal share,
+      unlisted-other share
+    }
+
+sum s0 = 1.
+
+16.2 MARKET TARGETS
+-------------------
+For listed player i:
+
+- anytime p_i;
+- 2+ p_i;
+- scorer line;
+- penalty-specific market where available.
+
+16.3 CONSTRAINED OPTIMISATION
+-----------------------------
+Choose player ability/share parameters theta to minimize:
+
+    KL(s(theta) || s0)
+    +
+    1/2 sum_i [
+      (P_theta(G_i>=1) - p_i)^2 / sigma_i^2
+    ]
+    +
+    multi_goal penalties
+    +
+    regularisation
+
+subject to:
+
+- shares nonnegative;
+- sum one;
+- own-goal/other minimum priors;
+- on-pitch eligibility;
+- role constraints where justified.
+
+16.4 WHY SOFT
+-------------
+Player markets can be inconsistent because:
+
+- different books;
+- conditional starting rules;
+- margin;
+- sparse coverage;
+- stale prices;
+- team market disagreement.
+
+16.5 UNLISTED PLAYERS
+---------------------
+Unlisted players retain prior shares.
+
+An explicit OTHER/UNLISTED group prevents listed players from absorbing all
+team scoring probability.
+
+16.6 MULTIPLE LINEUPS
+---------------------
+Calibrate over DMFP-07 lineup/minute scenarios.
+
+Player shares differ by who starts and who is on the pitch.
+
+16.7 PENALTY TAKER
+------------------
+Penalty scorer share is modeled separately from open-play share.
+
+Uncertain penalty taker is a latent categorical state.
+
+16.8 CONSISTENCY REPORT
+-----------------------
+Output:
+
+- team expected goals;
+- sum player expected goals;
+- own-goal expectation;
+- other expectation;
+- residual;
+- market residual by player;
+- prior-to-posterior share shift.
+
+Residual must be within numerical tolerance.
+
+======================================================================
+17. ASSIST MODEL
+======================================================================
+
+17.1 GOAL-LEVEL PROCESS
+-----------------------
+For each non-own goal:
+
+1. classify mechanism;
+2. determine whether assistable;
+3. choose assister or NO_ASSIST;
+4. preserve event chain for FPL assist rules.
+
+17.2 ASSISTABILITY
+------------------
+Mechanism probabilities depend on:
+
+- open play;
+- set piece;
+- penalty;
+- direct free kick;
+- rebound;
+- defensive touches;
+- provider event definitions.
+
+DMFP-09 performs target-season FPL assist classification.
+
+17.3 ASSISTER CATEGORIES
+------------------------
+Eligible on-pitch teammates excluding scorer.
+Include:
+
+- NO_ASSIST;
+- OTHER/UNRESOLVED where necessary.
+
+17.4 PRIOR ASSIST ABILITY
+-------------------------
+Hierarchical inputs:
+
+- assists;
+- expected assists;
+- key passes;
+- chances created;
+- set-piece role;
+- crosses;
+- tactical role;
+- minutes;
+- scorer/teammate relationships.
+
+17.5 ALLOCATION
+---------------
+For assistable goal k:
+
+    P(assister=i)
+      proportional to
+      on_pitch_i
+      x exp(assist_ability_i + role + goal_type + scorer_pair_effect)
+
+17.6 SCORER–ASSISTER CORRELATION
+-------------------------------
+The goal event creates:
+
+- positive correlation between scorer and assister outputs;
+- negative within-goal constraint because scorer cannot assist self;
+- teammate competition for the one assist.
+
+17.7 ASSIST MARKET CALIBRATION
+------------------------------
+Analogous to goal allocation:
+
+- P(player >=1 assist);
+- optional multi-assist;
+- soft fit;
+- complete/minutes/settlement scenarios;
+- NO_ASSIST mass retained.
+
+17.8 PAIR EFFECTS
+-----------------
+Player pairs may have sparse data.
+
+Use hierarchical shrinkage.
+Do not fit unrestricted pair parameters.
+
+======================================================================
+18. SHOTS, SHOTS ON TARGET AND SAVES
+======================================================================
+
+18.1 HIERARCHY
+--------------
+A coherent attacking-event tree:
+
+TEAM SHOTS
+  -> PLAYER SHOOTER
+  -> ON TARGET / OFF TARGET / BLOCKED
+  -> if ON TARGET:
+       GOAL / GOALKEEPER SAVE / LAST-LINE BLOCK
+
+18.2 TEAM SHOT COUNT
+--------------------
+Candidate distribution:
+
+- negative binomial / Poisson-lognormal;
+- conditioned on team goals, tempo, possession and pressure.
+
+Shots generally provide larger counts than goals and often show overdispersion.
+
+18.3 PLAYER SHOT ALLOCATION
+---------------------------
+Conditional on team shots:
+
+- multinomial/Dirichlet-multinomial across on-pitch players;
+- shares depend on role, minutes, shot ability and match state.
+
+18.4 GOAL CONSISTENCY
+---------------------
+Every non-own, nonadministrative goal must be associated with a scoring shot
+category.
+
+The number of goal-producing shots cannot exceed shots or SOT.
+
+18.5 ON-TARGET
+--------------
+For each shot:
+
+- probability on target;
+- player finishing/shooting accuracy;
+- location/type where simulated;
+- game state.
+
+18.6 GOALKEEPER SAVES
+---------------------
+For goalkeeper g:
+
+    saves_g
+      =
+      opponent SOT faced while g on pitch
+      - goals from on-target shots conceded while g on pitch
+      - last-line blocks by non-GK
+      + provider-definition adjustments
+
+Penalty saves remain explicitly labelled.
+
+18.7 OWN GOALS
+--------------
+Own goals usually do not count as an opponent player's shot on target under
+standard event definitions.
+
+Provider mapping controls exact statistics.
+
+18.8 KEEPER SUBSTITUTION
+------------------------
+Allocate shots faced and goals by on-pitch interval.
+
+18.9 SAVE MARKET
+----------------
+If a goalkeeper save market exists:
+
+- calibrate keeper-save distribution softly;
+- preserve consistency with opponent SOT and goals.
+
+18.10 SHOT/SOT MARKETS
+----------------------
+Player lines calibrate:
+
+- shot-share;
+- on-target probability;
+- count dispersion.
+
+Do not fit each independently in a way that permits SOT > shots.
+
+======================================================================
+19. PENALTY PROCESS
+======================================================================
+
+19.1 COMPONENTS
+---------------
+- team penalties awarded;
+- taker;
+- keeper;
+- result;
+- goal mechanism;
+- missed penalty;
+- saved penalty;
+- retake/void.
+
+19.2 AWARD COUNT
+----------------
+Rare-event model:
+
+- Bernoulli or low-rate Poisson;
+- optional zero-inflated/hurdle only if justified;
+- team/opponent/referee/match-state effects;
+- market evidence where available.
+
+19.3 SCORELINE CONSISTENCY
+-------------------------
+V1 final-score-first procedure:
+
+1. sample final team goals;
+2. sample how many scored goals are penalties conditional on total goals and
+   penalty-scoring prior;
+3. sample additional unscored penalties;
+4. ensure scored-penalty count <= team goals;
+5. allocate remaining goals to other mechanisms.
+
+19.4 UNCONVERTED PENALTY
+------------------------
+Results:
+
+- saved;
+- off target;
+- woodwork;
+- other/void.
+
+19.5 PENALTY SAVE
+-----------------
+A saved penalty:
+
+- creates one missed penalty for taker;
+- creates one penalty-save event for on-pitch goalkeeper;
+- may count as ordinary save depending provider/FPL definition;
+- does not create a goal.
+
+19.6 PENALTY TAKER
+------------------
+Latent categorical distribution based on:
+
+- recent responsibility;
+- lineup;
+- hierarchy;
+- manager comments;
+- prior events;
+- substitution.
+
+19.7 RETAKE
+-----------
+Provider/official events must distinguish void first attempt and valid retake.
+Do not count both as independent penalties.
+
+======================================================================
+20. CARDS AND DISMISSALS
+======================================================================
+
+20.1 TEAM CARD INTENSITY
+------------------------
+Use:
+
+- hierarchical Poisson/NB;
+- referee;
+- team discipline;
+- opponent;
+- match importance;
+- score state;
+- possession/pressure;
+- derby only if objectively/empirically useful.
+
+20.2 PLAYER ALLOCATION
+----------------------
+Conditional on team card events:
+
+- on-pitch eligibility;
+- foul/tackle role;
+- historical card rate;
+- position;
+- opponent/player matchup where data support;
+- minutes.
+
+20.3 RED CARD PROCESS
+---------------------
+Separate:
+
+- straight red;
+- second-yellow red.
+
+A second-yellow red requires appropriate yellow history.
+
+20.4 MATCH EFFECT
+-----------------
+A dismissal changes:
+
+- player minutes;
+- lineup;
+- goal intensities;
+- shots;
+- possession;
+- defensive events;
+- substitutions.
+
+V1:
+simulate red cards before/within timeline refinement and adjust scenario/event
+allocation.
+
+V2:
+fully state-dependent marked process.
+
+20.5 DOUBLE COUNTING
+--------------------
+A second-yellow dismissal may have both card records, but FPL rules later define
+points treatment. Preserve canonical detail.
+
+======================================================================
+21. OWN GOALS
+======================================================================
+
+21.1 RARE EVENT
+---------------
+Own goals use a hierarchical rare-event model.
+
+Candidate:
+
+- Bernoulli/Poisson per team;
+- score/pressure;
+- defensive actions;
+- minutes/role;
+- own-goal player ability strongly pooled.
+
+21.2 SCORE CONSTRAINT
+---------------------
+An own goal by team A contributes one goal to team B's final score.
+
+21.3 PLAYER ALLOCATION
+----------------------
+Among on-pitch defending players:
+
+- role;
+- minutes;
+- defensive exposure;
+- historical own goals with heavy shrinkage.
+
+21.4 ASSIST
+-----------
+Official/FPL forced-own-goal assist treatment is downstream and depends on goal
+chain.
+
+Store causative attacking action where simulated/known.
+
+21.5 SHOTS
+-----------
+Do not automatically credit opponent player goal/SOT.
+
+======================================================================
+22. DEFENSIVE EVENTS
+======================================================================
+
+22.1 EVENTS
+-----------
+- clearances;
+- blocks;
+- interceptions;
+- tackles;
+- ball recoveries.
+
+22.2 LATENT MATCH STYLE
+-----------------------
+Counts depend heavily on:
+
+- possession;
+- territory;
+- pressure;
+- score state;
+- formation;
+- role;
+- opponent attack;
+- red cards.
+
+22.3 TEAM COUNTS
+----------------
+Use multivariate Poisson-lognormal or negative-binomial structure.
+
+Latent factors:
+
+- defensive pressure;
+- transition intensity;
+- possession deficit;
+- box pressure.
+
+These produce event correlations.
+
+22.4 PLAYER ALLOCATION
+----------------------
+Conditional on team event totals:
+
+- Dirichlet-multinomial/multinomial;
+- on-pitch minutes;
+- tactical role;
+- historical rates;
+- teammate competition;
+- score state.
+
+22.5 OVERDISPERSION
+-------------------
+Player defensive counts commonly need extra-Poisson variation due match style
+and role.
+
+Use hierarchical dispersion.
+
+22.6 EVENT DEFINITIONS
+----------------------
+Provider definitions can differ.
+
+The model predicts canonical events with mapping uncertainty.
+DMFP-09 applies FPL defensive-contribution rules.
+
+22.7 CONSISTENCY
+----------------
+Sum player events equals team canonical event total within each scenario.
+
+======================================================================
+23. LATENT CORRELATION STRUCTURE
+======================================================================
+
+23.1 MATCH TEMPO
+----------------
+Higher tempo can increase:
+
+- shots;
+- transitions;
+- cards;
+- goals;
+- defensive events.
+
+23.2 DOMINANCE/POSSESSION
+------------------------
+Higher home dominance:
+
+- home shots/territory up;
+- away clearances/blocks up;
+- home defensive events potentially down;
+- save distributions shift.
+
+23.3 FINISHING
+--------------
+A shared finishing factor changes goals conditional on shots.
+
+23.4 REFEREE/DISCIPLINE
+-----------------------
+Shared card/penalty environment.
+
+23.5 SET PIECES
+---------------
+Shared corners/free-kick/penalty intensity affects goal mechanisms and aerial
+defensive events.
+
+23.6 SCORE STATE
+----------------
+A leading team may:
+
+- reduce attack;
+- concede possession;
+- record more clearances;
+- change substitutions.
+
+23.7 LINEUP
+-----------
+Lineup/minutes jointly alter:
+
+- team attack;
+- player shares;
+- keeper;
+- set pieces;
+- defensive events.
+
+23.8 EVENT CONSERVATION
+-----------------------
+Structural correlations:
+
+- player goals compete for team goals;
+- assists compete within goals;
+- saves and goals share SOT;
+- team/player events sum;
+- own goals replace credited scorer goals.
+
+======================================================================
+24. V1 COHERENT MATCH SIMULATION
+======================================================================
+
+24.1 INPUT DRAW
+--------------
+For each scenario:
+
+1. draw score matrix version / market uncertainty;
+2. draw coherent lineup/minute scenario;
+3. draw latent match-style factors.
+
+24.2 SAMPLE SCORE
+-----------------
+Draw (H,A) from calibrated joint matrix.
+
+24.3 SAMPLE PRELIMINARY TIMELINE
+-------------------------------
+Draw goal times and team labels conditional on H,A.
+
+24.4 REFINE SUBSTITUTIONS
+-------------------------
+Pass preliminary score path to DMFP-07 substitution model.
+
+Obtain refined on-pitch intervals.
+
+24.5 ASSIGN GOAL MECHANISMS
+---------------------------
+For each team goal:
+
+- own goal?;
+- penalty?;
+- direct free kick?;
+- set piece/open play?;
+- assisted/unassisted?
+
+Respect final counts.
+
+24.6 ASSIGN SCORERS
+-------------------
+Only eligible on-pitch player at goal time.
+Use calibrated shares.
+
+If no eligible category due numerical/logic issue:
+scenario invalid, not silently repaired.
+
+24.7 ASSIGN ASSISTS
+-------------------
+Only eligible teammate, excluding scorer.
+Respect mechanism.
+
+24.8 SHOTS/SAVES
+----------------
+Sample team/player shot tree, conditioning to include sampled goals.
+
+24.9 PENALTIES
+--------------
+Add scored/missed/save events coherently.
+
+24.10 CARDS
+-----------
+Sample cards/timing.
+If dismissal conflicts with later events, either:
+
+- resimulate affected event path;
+- or reject/resample scenario.
+
+24.11 DEFENSIVE EVENTS
+----------------------
+Sample conditional on possession/pressure/score/on-pitch intervals.
+
+24.12 VALIDATE
+----------------
+All conservation and timing checks.
+
+24.13 OUTPUT
+----------------
+Store event log or compressed scenario arrays.
+
+======================================================================
+25. V2 SEQUENTIAL MARKED POINT PROCESS
+======================================================================
+
+25.1 EVENT TYPES
+----------------
+- shot;
+- goal;
+- card;
+- penalty award;
+- substitution;
+- defensive event;
+- match end.
+
+25.2 HAZARDS
+------------
+Each event type has intensity:
+
+    lambda_k(t | state, lineups, latent factors)
+
+25.3 STATE UPDATE
+----------------
+After event:
+
+- score;
+- players on pitch;
+- cards;
+- remaining substitutions;
+- possession/style;
+- time.
+
+25.4 MARKET CALIBRATION
+-----------------------
+Options:
+
+- fit baseline intensity multipliers to market constraints;
+- importance reweight simulated paths;
+- entropy-balance scenario weights;
+- sequential Monte Carlo.
+
+25.5 PROMOTION
+--------------
+V2 replaces V1 only if:
+
+- score-market fit equal/better;
+- player/FPL distributions improve;
+- calibration improves;
+- computational cost acceptable;
+- no scenario degeneracy;
+- implementation auditable.
+
+======================================================================
+26. OUTPUT CONTRACT
+======================================================================
+
+26.1 MATCH DISTRIBUTION
+-----------------------
+- joint score matrix;
+- score support/tail;
+- home/away goal PMFs;
+- 1X2;
+- totals;
+- BTTS;
+- clean sheets;
+- covariance/correlation;
+- market residuals;
+- prior-to-market KL;
+- confidence.
+
+26.2 PLAYER DISTRIBUTION
+-----------------------
+For every player:
+
+- goals PMF;
+- P(1+), P(2+), P(3+);
+- expected goals;
+- assists PMF;
+- P(assist 1+);
+- shots PMF;
+- SOT PMF;
+- cards;
+- own goals;
+- missed penalties;
+- defensive-event PMFs;
+- conditional on start/appearance where useful;
+- uncertainty.
+
+26.3 GOALKEEPER
+---------------
+- saves PMF;
+- penalty saves;
+- goals conceded while on pitch;
+- clean-sheet probability;
+- SOT faced.
+
+26.4 JOINT SCENARIOS
+--------------------
+Parquet/artifact:
+
+- scenario ID;
+- lineup/minutes;
+- final score;
+- event timeline;
+- player events;
+- latent factors;
+- probability/weight;
+- model/source version.
+
+26.5 CORRELATIONS
+----------------
+Selected downstream pair/matrix outputs:
+
+- player points/event covariance;
+- teammate goal covariance;
+- scorer–assister;
+- attacker–opponent keeper;
+- defender/keeper clean sheet;
+- team defensive-event correlations.
+
+Large matrices remain artifacts, not relational wide tables.
+
+26.6 EXAMPLE MATCH SUMMARY
+--------------------------
+{
+  "fixture_id": "uuid",
+  "projection_run_id": "uuid",
+  "as_of_utc": "timestamp",
+  "expected_home_goals": 1.78,
+  "expected_away_goals": 0.91,
+  "p_home_clean_sheet": 0.402,
+  "p_away_clean_sheet": 0.169,
+  "p_btts": 0.498,
+  "score_correlation": 0.04,
+  "score_grid_max": [9, 8],
+  "tail_mass": 2.1e-9,
+  "market_constraint_rmse": 0.009,
+  "confidence_grade": "B"
+}
+
+======================================================================
+27. CONFIGURATION
+======================================================================
+
+config/football_events/
+  event_taxonomy.yaml
+  score_prior.yaml
+  score_grid.yaml
+  market_constraints.yaml
+  score_solver.yaml
+  goal_time.yaml
+  scorer_allocation.yaml
+  assist_allocation.yaml
+  shots.yaml
+  penalties.yaml
+  cards.yaml
+  own_goals.yaml
+  defensive_events.yaml
+  latent_factors.yaml
+  simulation.yaml
+  validation.yaml
+  confidence.yaml
+
+No:
+
+- fixed Gmax;
+- hard-coded penalty rate;
+- universal own-goal probability;
+- universal dispersion;
+- unversioned source mapping.
+
+======================================================================
+28. IMPLEMENTATION ARCHITECTURE
+======================================================================
+
+28.1 PACKAGE
+------------
+src/dmf_pulse/football_events/
+
+- score_prior.py
+- poisson.py
+- bivariate_poisson.py
+- dixon_coles.py
+- dispersion.py
+- score_grid.py
+- market_constraints.py
+- score_projection.py
+- score_uncertainty.py
+- goal_timing.py
+- scorer_model.py
+- assist_model.py
+- shot_model.py
+- goalkeeper_model.py
+- penalty_model.py
+- card_model.py
+- own_goal_model.py
+- defensive_model.py
+- latent_factors.py
+- simulator_v1.py
+- simulator_v2.py
+- coherence.py
+- calibration.py
+- evaluation.py
+- explain.py
+- schemas.py
+
+28.2 PURE INTERFACES
+--------------------
+build_score_prior(fixture_context, model_versions)
+
+build_market_constraint_matrix(markets, score_grid)
+
+project_score_matrix(prior, constraints, policy)
+
+sample_scoreline(score_matrix, rng)
+
+sample_goal_timeline(scoreline, context, rng)
+
+calibrate_player_goal_shares(team_score_pmf, player_priors, markets, minutes)
+
+allocate_goal(goal, eligible_players, calibrated_shares, rng)
+
+allocate_assist(goal, eligible_players, assist_model, rng)
+
+simulate_shot_tree(scoreline, lineups, latent_factors, rng)
+
+simulate_penalties(scoreline, context, rng)
+
+simulate_cards(context, score_path, lineups, rng)
+
+simulate_defensive_events(context, score_path, lineups, rng)
+
+validate_match_scenario(scenario, rules)
+
+28.3 RANDOMNESS
+---------------
+- explicit counter-based/approved RNG;
+- seed recorded;
+- common random numbers for model/decision comparison;
+- deterministic stream allocation by fixture/scenario/module;
+- no accidental result changes from worker order.
+
+======================================================================
+29. COHERENCE VALIDATION
+======================================================================
+
+29.1 HARD INVARIANTS
+--------------------
+For every scenario:
+
+- home/away final scores equal goal events;
+- credited player goals + opponent own goals equal team score;
+- every player event occurs while on pitch;
+- scorer belongs to scoring team;
+- assister belongs to scoring team;
+- assister != scorer;
+- at most one official assist per goal under taxonomy;
+- SOT <= shots;
+- goals from shots <= SOT plus own-goal exceptions;
+- goalkeeper saves >= 0;
+- goalkeeper saves <= SOT faced adjusted by definitions;
+- penalty saved implies missed penalty and eligible keeper;
+- red-carded player has no later events;
+- player defensive sums equal team totals;
+- probability vectors/PMFs sum one;
+- no negative counts.
+
+29.2 SOFT DIAGNOSTICS
+---------------------
+- score matrix market residual;
+- player market residual;
+- team/player expectation residual;
+- unusual tail;
+- extreme latent factor;
+- excessive rejected scenarios.
+
+29.3 SCENARIO REJECTION
+-----------------------
+If hard invariant fails:
+
+- reject/resample;
+- count error;
+- alert if rate exceeds threshold.
+
+Never patch final counts silently.
+
+======================================================================
+30. CALIBRATION AND EVALUATION
+======================================================================
+
+30.1 TEAM SCORE
+---------------
+Primary:
+
+- exact-score log score;
+- ranked probability score for outcome;
+- goal-count log score;
+- CRPS/RPS for total/team goals;
+- clean-sheet Brier/log loss;
+- 1X2 calibration;
+- total-goal calibration;
+- score PIT/rank.
+
+30.2 PLAYER GOALS
+-----------------
+- goal-count log score;
+- Brier/log loss for 1+, 2+;
+- calibration by probability;
+- market-listed/unlisted;
+- start/minutes subgroup.
+
+30.3 ASSISTS
+------------
+- count/log score;
+- 1+ calibration;
+- sparse-source uncertainty.
+
+30.4 SHOTS/SAVES
+----------------
+- count log score;
+- CRPS/RPS;
+- line-market exceedance Brier;
+- coherence error.
+
+30.5 CARDS/PENALTIES/OWN GOALS
+-----------------------------
+Rare-event:
+
+- log score;
+- Brier;
+- calibration with wide intervals;
+- aggregate/hierarchical evaluation;
+- no accuracy percentage as primary.
+
+30.6 DEFENSIVE EVENTS
+---------------------
+- multivariate marginal scores;
+- count calibration;
+- threshold-event Brier for FPL-relevant counts;
+- correlation reproduction.
+
+30.7 CORRELATION
+----------------
+Compare:
+
+- empirical covariance;
+- joint threshold probabilities;
+- portfolio/FPL total variance;
+- energy score/variogram score for multivariate samples where appropriate.
+
+30.8 MARKET REPRODUCTION
+------------------------
+At each deadline:
+
+- predicted market events versus DMFP-06 probabilities;
+- standardized residual;
+- constraint coverage;
+- source confidence.
+
+30.9 PROSPECTIVE
+----------------
+2026/27 LIVE_OPERATIONAL bundles are the gold standard.
+
+======================================================================
+31. MODEL SELECTION RULES
+======================================================================
+
+31.1 POISSON TO CHALLENGER
+--------------------------
+A challenger must improve:
+
+- out-of-time proper score;
+- calibration;
+- tails/zeros;
+- market residual;
+- downstream FPL distribution.
+
+31.2 COMPLEXITY PENALTY
+-----------------------
+Prefer simpler model when:
+
+- differences are within uncertainty;
+- challenger unstable;
+- data sparse;
+- runtime high.
+
+31.3 NO ONE-DATASET DECISION
+----------------------------
+Validate:
+
+- historical seasons;
+- early/late season;
+- favourites/underdogs;
+- new managers;
+- high/low totals;
+- red-card matches;
+- market coverage grades.
+
+31.4 ABLATIONS
+--------------
+- no market calibration;
+- independent Poisson;
+- no Dixon–Coles;
+- no score dependence;
+- no player props;
+- no lineup uncertainty;
+- no latent style factors;
+- no market uncertainty.
+
+======================================================================
+32. BACKTESTING AND LEAKAGE
+======================================================================
+
+32.1 CUTOFF
+-----------
+All markets, lineups, minutes and context:
+
+    usable_at <= FPL deadline
+
+32.2 FINAL LABELS
+-----------------
+Official corrected events may be labels.
+
+32.3 NO CLOSING LINE
+--------------------
+Postdeadline odds cannot calibrate the historical forecast.
+
+32.4 MARKET HISTORY
+-------------------
+Reconstructed football-data/Betfair history is labelled separately from live
+prospective player-prop evaluation.
+
+32.5 PLAYER MARKET MISSINGNESS
+------------------------------
+Backtest must use the market availability state known then.
+Do not backfill missing props from a later provider.
+
+32.6 TEAM MEMBERSHIP
+--------------------
+Player/team mapping as known at cutoff.
+
+======================================================================
+33. EXPLAINABILITY
+======================================================================
+
+33.1 MATCH REPORT
+-----------------
+Explain:
+
+- prior score model;
+- markets used;
+- market constraints and residuals;
+- score distribution;
+- dependence/dispersion;
+- source uncertainty;
+- clean-sheet/team totals.
+
+33.2 PLAYER REPORT
+------------------
+Explain:
+
+- minutes/lineup scenarios;
+- prior goal/assist share;
+- direct market evidence;
+- posterior share;
+- penalty/set-piece role;
+- other/unlisted mass;
+- uncertainty.
+
+33.3 CHANGE ATTRIBUTION
+-----------------------
+Why forecast changed:
+
+- market move;
+- lineup/minutes;
+- injury;
+- penalty taker;
+- teammate availability;
+- new source;
+- model version;
+- fixture change.
+
+33.4 DO NOT CLAIM CAUSALITY
+---------------------------
+Latent-factor contributions are predictive, not necessarily causal.
+
+======================================================================
+34. MONITORING
+======================================================================
+
+34.1 WEEKLY
+-----------
+- score log score;
+- market residual;
+- clean-sheet calibration;
+- player goal calibration;
+- coherence failure rate;
+- rejected scenario rate;
+- run time;
+- missing-market rate;
+- tail mass.
+
+34.2 DRIFT
+----------
+- league scoring rate;
+- home advantage;
+- score dependence;
+- penalty/card rate;
+- substitution/rule changes;
+- provider event definitions;
+- market availability.
+
+34.3 RETRAIN/RECALIBRATE
+------------------------
+- monthly;
+- material drift;
+- rules/source changes;
+- manager regime handled through upstream uncertainty;
+- model failure.
+
+======================================================================
+35. CODEX IMPLEMENTATION CONTRACT
+======================================================================
+
+35.1 CODEX MAY
+-------------
+- implement count models;
+- build score matrices;
+- use convex/numerical optimisation;
+- implement constrained allocation;
+- build Monte Carlo simulators;
+- implement invariants;
+- create reference tests;
+- benchmark challenger distributions.
+
+35.2 CODEX MUST NOT
+-------------------
+- independently predict every player goal without team constraint;
+- normalize player anytime probabilities to sum one;
+- use blind lambda=-log(1-p) under random minutes;
+- use postdeadline markets;
+- create assist for scorer;
+- create saves exceeding SOT;
+- permit off-pitch events;
+- patch inconsistent scenarios silently;
+- hard-code Poisson as permanent;
+- promote zero inflation because zeros look common;
+- use negative binomial without conditional dispersion evidence;
+- treat market constraints as independent;
+- discard market uncertainty;
+- use an LLM for numerical simulation.
+
+35.3 PULL REQUEST
+-----------------
+Each model change must state:
+
+- mathematical model;
+- assumptions;
+- source;
+- input/output;
+- coherence invariants;
+- market constraints;
+- tests;
+- proper-score comparison;
+- runtime;
+- version impact.
+
+======================================================================
+36. RISK REGISTER
+======================================================================
+
+R-08-001 — Player expectations exceed team goals
+Probability: High
+Impact: Critical
+Mitigation:
+conditional goal allocation and conservation.
+
+R-08-002 — Anytime inversion ignores random minutes
+Probability: High
+Impact: Critical
+Mitigation:
+minutes-mixture/team-count calibration.
+
+R-08-003 — Nonexclusive player markets normalized to one
+Probability: Medium
+Impact: Critical
+Mitigation:
+soft player-share model.
+
+R-08-004 — Market constraints conflict
+Probability: High
+Impact: High
+Mitigation:
+soft KL projection and family caps.
+
+R-08-005 — Correlated markets double counted
+Probability: High
+Impact: High
+Mitigation:
+family covariance/weight caps.
+
+R-08-006 — Score grid truncates tail
+Probability: Medium
+Impact: High
+Mitigation:
+adaptive support/tail diagnostics.
+
+R-08-007 — Independent Poisson miscalibrates low scores
+Probability: High
+Impact: High
+Mitigation:
+Dixon–Coles/bivariate/market calibration.
+
+R-08-008 — Bivariate Poisson correlation too restrictive
+Probability: Medium
+Impact: High
+Mitigation:
+score-matrix projection and challengers.
+
+R-08-009 — Negative binomial added unnecessarily
+Probability: Medium
+Impact: Medium
+Mitigation:
+conditional dispersion test and promotion gate.
+
+R-08-010 — Zero inflation double-counts no-appearance
+Probability: High
+Impact: Critical
+Mitigation:
+DMFP-07 mixture first.
+
+R-08-011 — Market-calibrated score matrix overfits one quote
+Probability: Medium
+Impact: High
+Mitigation:
+uncertainty weights and prior KL.
+
+R-08-012 — Correct-score sparse/noisy tail distorts matrix
+Probability: Medium
+Impact: High
+Mitigation:
+low family cap, residual diagnostics.
+
+R-08-013 — Player props conditional settlement misunderstood
+Probability: High
+Impact: Critical
+Mitigation:
+settlement and minutes mixture.
+
+R-08-014 — Unlisted players receive no goal share
+Probability: High
+Impact: Critical
+Mitigation:
+OTHER/unlisted prior mass.
+
+R-08-015 — Penalty/open-play shares conflated
+Probability: High
+Impact: High
+Mitigation:
+goal-type-specific shares.
+
+R-08-016 — Scorer not on pitch
+Probability: Medium
+Impact: Critical
+Mitigation:
+event-time eligibility invariant.
+
+R-08-017 — Assist/scorer impossible pairing
+Probability: Medium
+Impact: Critical
+Mitigation:
+goal-level constrained allocation.
+
+R-08-018 — FPL assist confused with provider assist
+Probability: High
+Impact: Critical
+Mitigation:
+preserve goal chain; DMFP-09 classifier.
+
+R-08-019 — Saves inconsistent with SOT/goals
+Probability: High
+Impact: Critical
+Mitigation:
+shot tree.
+
+R-08-020 — Penalty save double counted incorrectly
+Probability: Medium
+Impact: High
+Mitigation:
+canonical penalty result and downstream rules.
+
+R-08-021 — Own goal credited to attacker
+Probability: Medium
+Impact: High
+Mitigation:
+own-goal scorer category.
+
+R-08-022 — Red-carded player records later events
+Probability: Medium
+Impact: Critical
+Mitigation:
+timeline invariant/resampling.
+
+R-08-023 — Player defensive totals exceed team totals
+Probability: Medium
+Impact: High
+Mitigation:
+conditional allocation.
+
+R-08-024 — Independent event modules lose correlation
+Probability: High
+Impact: Critical
+Mitigation:
+latent factors and joint scenarios.
+
+R-08-025 — Goal timing/substitution circularity
+Probability: High
+Impact: High
+Mitigation:
+controlled V1 refinement, V2 challenger.
+
+R-08-026 — Sequential simulator fails market fit
+Probability: Medium
+Impact: High
+Mitigation:
+V1 score-first production; calibration/reweighting.
+
+R-08-027 — Rare-event model overfits
+Probability: High
+Impact: High
+Mitigation:
+hierarchical pooling.
+
+R-08-028 — Provider event definitions differ
+Probability: High
+Impact: High
+Mitigation:
+versioned taxonomy/mapping.
+
+R-08-029 — Free source has incomplete shots/cards
+Probability: High
+Impact: High
+Mitigation:
+historical priors and uncertainty.
+
+R-08-030 — Corrected events leak into features
+Probability: Medium
+Impact: Critical
+Mitigation:
+DMFP-05 bundles.
+
+R-08-031 — Simulation runtime too high
+Probability: Medium
+Impact: High
+Mitigation:
+cached score matrix, vectorisation, adaptive draws.
+
+R-08-032 — Monte Carlo noise changes decisions
+Probability: Medium
+Impact: High
+Mitigation:
+common random numbers and error estimates.
+
+R-08-033 — Market confidence ignored
+Probability: Medium
+Impact: High
+Mitigation:
+constraint sigma/bounds.
+
+R-08-034 — Exact score accuracy valued over FPL tail quality
+Probability: Medium
+Impact: Strategic
+Mitigation:
+multiobjective evaluation and downstream tests.
+
+======================================================================
+37. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-16
+
+----------------------------------------------------------------------
+SRC-SCORE-1997-001
+Title:
+Modelling Association Football Scores and Inefficiencies in the Football Betting
+Market
+
+Authors:
+Mark J. Dixon, Stuart G. Coles
+
+Publication:
+Journal of the Royal Statistical Society: Series C, 46(2), 265–280
+
+DOI:
+https://doi.org/10.1111/1467-9876.00065
+
+Relevant claim:
+Foundational time-weighted Poisson football score model with low-score
+dependence correction and betting-market application.
+
+Reliability:
+HIGH peer-reviewed foundational football research.
+
+Pulse reliance:
+YES for score prior and low-score challenger.
+
+----------------------------------------------------------------------
+SRC-SCORE-2003-002
+Title:
+Analysis of Sports Data by Using Bivariate Poisson Models
+
+Authors:
+Dimitris Karlis, Ioannis Ntzoufras
+
+Publication:
+The Statistician, 52, 381–393
+
+DOI:
+https://doi.org/10.1111/1467-9884.00366
+
+PDF:
+https://www2.stat-athens.aueb.gr/~jbn/papers2/08_Karlis_Ntzoufras_2003_RSSD.pdf
+
+Relevant claim:
+Bivariate Poisson and extensions model dependence and diagonal inflation in
+sports scores.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for joint-score prior/challengers.
+
+----------------------------------------------------------------------
+SRC-SCORE-2015-003
+Title:
+A Dynamic Bivariate Poisson Model for Analysing and Forecasting Match Results in
+the English Premier League
+
+Authors:
+Siem Jan Koopman, Rutger Lit
+
+Publication:
+Journal of the Royal Statistical Society: Series A, 178(1), 167–186
+
+DOI:
+https://doi.org/10.1111/rssa.12042
+
+Working paper:
+https://papers.tinbergen.nl/12099.pdf
+
+Relevant claim:
+Team attack/defence intensities can evolve stochastically in a dynamic
+bivariate-Poisson state-space model.
+
+Reliability:
+HIGH peer-reviewed EPL-specific research.
+
+Pulse reliance:
+YES for dynamic team-strength prior.
+
+----------------------------------------------------------------------
+SRC-SCORE-2010-004
+Title:
+Bayesian Hierarchical Model for the Prediction of Football Results
+
+Authors:
+Gianluca Baio, Marta Blangiardo
+
+Publication:
+Journal of Applied Statistics, 37(2), 253–264
+
+DOI:
+https://doi.org/10.1080/02664760802684177
+
+Repository:
+https://discovery.ucl.ac.uk/16040/
+
+Relevant claim:
+Hierarchical Bayesian attack/defence framework; authors discuss possible
+over-shrinkage of extreme teams and mixture-model improvements.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for hierarchical prior and prior-check policy.
+
+----------------------------------------------------------------------
+SRC-SCORE-MARKET-2018-001
+Title:
+Combining Historical Data and Bookmakers' Odds in Modelling Football Scores
+
+Authors:
+Leonardo Egidi, Francesco Pauli, Nicola Torelli
+
+Publication:
+Statistical Modelling, 18(5–6), 436–459
+
+DOI:
+https://doi.org/10.1177/1471082X18798414
+
+Preprint:
+https://arxiv.org/abs/1802.08848
+
+Relevant claim:
+A hierarchical Bayesian Poisson model can combine historical team-strength
+information and bookmaker odds.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+YES for market-augmented score architecture.
+
+----------------------------------------------------------------------
+SRC-SCORE-POISSON-2010-001
+Title:
+Soccer: Is Scoring Goals a Predictable Poissonian Process?
+
+Authors:
+Andreas Heuer, Christian Müller, Oliver Rubner
+
+URL:
+https://arxiv.org/abs/1002.0797
+
+Relevant claim:
+Conditional on team fitness, goal scoring was approximately independent
+Poisson in the analysed setting, with minor correlations increasing draws.
+
+Reliability:
+MODERATE/HIGH research/preprint.
+
+Pulse reliance:
+YES for conditional Poisson adequacy position.
+
+----------------------------------------------------------------------
+SRC-SCORE-TAILS-2006-001
+Title:
+Football Fever: Goal Distributions and Non-Gaussian Statistics
+
+Authors:
+Elmar Bittner, Andreas Nussbaumer, Wolfhard Janke, Martin Weigel
+
+URL:
+https://arxiv.org/abs/physics/0606016
+
+Relevant claim:
+Aggregated goal tails can deviate from simple Poisson/binomial descriptions and
+may be captured by negative-binomial or self-affirming mechanisms.
+
+Reliability:
+MODERATE/HIGH academic research.
+
+Pulse reliance:
+CONTEXTUAL for tail challengers.
+
+----------------------------------------------------------------------
+SRC-SCORE-WEIBULL-2017-001
+Title:
+A Bivariate Weibull Count Model for Forecasting Association Football Scores
+
+Authors:
+Georgi N. Boshnakov et al.
+
+Publication:
+International Journal of Forecasting
+
+DOI/URL:
+https://www.sciencedirect.com/science/article/abs/pii/S0169207017300018
+
+Relevant claim:
+Flexible bivariate count alternatives can improve football score forecasting
+relative to standard Poisson-family approaches in some datasets.
+
+Reliability:
+HIGH peer-reviewed.
+
+Pulse reliance:
+CHALLENGER.
+
+----------------------------------------------------------------------
+SRC-SCORE-DOUBLEPOISSON-2022-001
+Title:
+Analysis of a Double Poisson Model for Predicting Football Match Outcomes
+
+URL:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC9119507/
+
+Relevant claim:
+Double-Poisson models permit dispersion different from ordinary Poisson and
+have been applied to football prediction.
+
+Reliability:
+HIGH peer-reviewed/open full text.
+
+Pulse reliance:
+CHALLENGER for under/overdispersion.
+
+----------------------------------------------------------------------
+SRC-ZIP-1992-001
+Title:
+Zero-Inflated Poisson Regression, With an Application to Defects in
+Manufacturing
+
+Author:
+Diane Lambert
+
+Publication:
+Technometrics, 34(1)
+
+PDF:
+https://www.stat.cmu.edu/technometrics/90-00/vol-34-01/v3401001.pdf
+
+Relevant claim:
+Foundational zero-inflated Poisson mixture for structural excess zeros.
+
+Reliability:
+HIGH foundational count-model research.
+
+Pulse reliance:
+CONCEPTUAL; not football-specific.
+
+----------------------------------------------------------------------
+SRC-PLAYER-2021-001
+Title:
+A Bayesian Approach for Determining Player Abilities in Football
+
+Authors:
+Gavin A. Whitaker, Ricardo Silva, Daniel Edwards, Ioannis Kosmidis
+
+PDF:
+https://discovery.ucl.ac.uk/10110616/1/gavin_Paper.pdf
+
+Preprint:
+https://arxiv.org/abs/1710.00001
+
+Relevant claim:
+Hierarchical/interpretable Poisson event models can estimate player-specific
+abilities and connect them to team scoring.
+
+Reliability:
+HIGH peer-reviewed/academic work.
+
+Pulse reliance:
+YES for player event priors.
+
+----------------------------------------------------------------------
+SRC-XG-2023-001
+Title:
+A Machine Learning Approach for Player and Position Adjusted Expected Goals in
+Football
+
+Authors:
+James H. Hewitt, Oktay Karakuş
+
+URL:
+https://arxiv.org/abs/2301.13052
+
+Relevant claim:
+Player/position/context can improve or alter shot-to-goal probability estimates
+relative to uniform finishing assumptions.
+
+Reliability:
+MODERATE/HIGH peer-reviewed/preprint trail.
+
+Pulse reliance:
+SUPPORTING for hierarchical finishing ability.
+
+----------------------------------------------------------------------
+SRC-EVENT-DATA-001
+Title:
+StatsBomb Open Data
+
+Organisation:
+StatsBomb / Hudl
+
+URL:
+https://github.com/statsbomb/open-data
+
+Specification:
+https://github.com/statsbomb/open-data/blob/master/doc/Open%20Data%20Events%20v4.0.0.pdf
+
+Relevant claim:
+Provides structured matches, lineups and event data suitable for research and
+taxonomy/model development.
+
+Reliability:
+HIGH for released data and specification; competition coverage is selective.
+
+Pulse reliance:
+YES for free research/training where licence permits.
+
+----------------------------------------------------------------------
+SRC-EVENT-DEFINITIONS-001
+Title:
+Opta Event Definitions
+
+Organisation:
+Stats Perform
+
+URL:
+https://www.statsperform.com/opta-event-definitions/
+
+Relevant claim:
+Defines events such as shots on target and related football statistics.
+
+Reliability:
+HIGH provider definition for Opta data, not universal across providers.
+
+Pulse reliance:
+YES for provider mapping research.
+
+----------------------------------------------------------------------
+SRC-LAWS-2026-001
+Title:
+Laws of the Game 2026/27
+
+Organisation:
+The International Football Association Board
+
+URL:
+https://www.theifab.com/laws-of-the-game-documents/
+
+Relevant claim:
+Official football-law framework for goals, penalties, cards, substitutions and
+match events.
+
+Reliability:
+HIGH official law source.
+
+Pulse reliance:
+YES for canonical event/legal context.
+
+----------------------------------------------------------------------
+SRC-CALIBRATION-2026-001
+Title:
+A Market-Calibrated Accelerated Failure Time Model for In-Play Football
+Forecasting
+
+Authors:
+Lawrence Clegg, Zixing Song, John Cartlidge
+
+URL:
+https://arxiv.org/abs/2605.16066
+
+Relevant claim:
+Calibrating intensity-based football models to 1X2 and over/under exchange
+prices materially improved forecasting in the reported EPL sample.
+
+Reliability:
+MODERATE recent preprint; requires replication.
+
+Pulse reliance:
+RESEARCH SUPPORT for market calibration dominance, not production result claim.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-00 — Master Architecture and Product Definition
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-03 — Canonical Data Model and Identifiers
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-05 — Ingestion, Storage and Data Quality
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-06 — Odds Normalisation and Market Consensus
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-005
+Title:
+DMFP-07 — Player Availability, Start and Minutes Model
+
+Pulse reliance:
+YES.
+
+======================================================================
+38. ACCEPTANCE CRITERIA
+======================================================================
+
+A. SCORE MODEL
+[ ] Joint score matrix is canonical output.
+[ ] Market constraints are soft and uncertainty-weighted.
+[ ] Team goals, clean sheets and outcomes derive from one matrix.
+[ ] Adaptive tail support is mandatory.
+[ ] Poisson remains baseline, not permanent dogma.
+
+B. PLAYER CONSISTENCY
+[ ] Player goals plus own goals equal team goals in every scenario.
+[ ] Player anytime odds are calibrated through team-count/minutes structure.
+[ ] Unlisted players retain probability mass.
+[ ] Goal-type-specific shares exist.
+[ ] Assister cannot equal scorer.
+
+C. OTHER EVENTS
+[ ] Shots/SOT/saves are one coherent tree.
+[ ] Penalties and penalty saves are linked.
+[ ] Cards affect minutes/state.
+[ ] Own goals are separate scorer categories.
+[ ] Defensive events sum to team totals.
+
+D. CORRELATION
+[ ] Lineup/minutes are shared.
+[ ] Match latent factors induce dependence.
+[ ] Score state affects events.
+[ ] Conservation constraints create correct competition/correlation.
+[ ] Joint scenarios are stored.
+
+E. SCIENCE
+[ ] Poisson/NB/ZIP selection uses conditional diagnostics.
+[ ] Proper scores and calibration are primary.
+[ ] Market residuals are monitored.
+[ ] Prospective deadline data are the gold standard.
+[ ] Complex challengers require out-of-time promotion.
+
+F. IMPLEMENTATION
+[ ] Hard invariants reject invalid scenarios.
+[ ] Monte Carlo is reproducible.
+[ ] No postdeadline leakage.
+[ ] No silent inconsistency repair.
+[ ] Outputs have lineage and uncertainty.
+
+======================================================================
+39. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Define canonical event taxonomy and provider mappings.
+2. Build historical team-score dataset.
+3. Implement independent Poisson baseline.
+4. Implement bivariate Poisson.
+5. Implement Dixon–Coles correction.
+6. Implement adaptive score grid.
+7. Implement market-event design matrix.
+8. Implement soft KL score projection.
+9. Implement market residual/explanation report.
+10. Implement score-matrix uncertainty draws.
+11. Build player goal priors.
+12. Implement scorer-share allocation.
+13. Implement anytime and 2+ probability formulas.
+14. Implement player-market constrained share fit.
+15. Implement goal-time V1.
+16. Implement assist mechanism/allocation.
+17. Implement shot/SOT/save tree.
+18. Implement penalty process.
+19. Implement card/dismissal process.
+20. Implement own-goal process.
+21. Implement defensive-event latent-factor model.
+22. Implement V1 coherent simulator.
+23. Implement hard invariant validator.
+24. Create scenario Parquet schema.
+25. Run historical score-model comparison.
+26. Run synthetic market-consistency tests.
+27. Begin prospective 2026/27 calibration.
+28. Keep V2 sequential process experimental.
+29. Connect DMFP-09 only after scenario coherence passes.
+
+Suggested commands:
+
+    dmf events build-score-prior
+    dmf events market-project
+    dmf events score-explain
+    dmf events calibrate-player-goals
+    dmf events simulate
+    dmf events validate-scenario
+    dmf events evaluate
+    dmf events compare-count-models
+    dmf events coherence-report
+    dmf events export-scenarios
+
+======================================================================
+40. OPEN QUESTIONS
+======================================================================
+
+SCORE MATRIX
+------------
+1. What score-grid tolerance and maximum are optimal?
+2. Which market-family covariance scheme is used?
+3. KL soft constraints or explicit Bayesian likelihood?
+4. Should correct-score markets enter free-source production?
+5. What prior dependence model best survives market projection?
+6. How should score-matrix uncertainty be represented efficiently?
+
+POISSON/DISPERSION
+------------------
+7. Does conditional EPL scoring show over- or underdispersion?
+8. Does bivariate Poisson covariance add value after market calibration?
+9. Is Dixon–Coles still useful after score-matrix projection?
+10. Which challenger wins time-safe log score?
+11. When is zero inflation genuinely structural?
+
+PLAYER GOALS
+------------
+12. What free player-event history is sufficient for priors?
+13. How are transferred/promoted players pooled?
+14. What OTHER/unlisted mass floor is needed?
+15. How are conditional-on-start market rules implemented?
+16. How should uncertain penalty takers be modeled?
+17. How many market-listed players are needed to materially update shares?
+
+ASSISTS
+-------
+18. What canonical goal chain is required for FPL assist rules?
+19. How complete are free assist labels?
+20. Should scorer–assister pair effects be included?
+21. What NO_ASSIST prior is appropriate by mechanism?
+
+SHOTS/SAVES
+-----------
+22. Which provider definitions are selected?
+23. How are last-line blocks represented?
+24. Does penalty save count inside ordinary save labels upstream?
+25. What count model best fits shots/SOT?
+26. Can free goalkeeper-save markets calibrate the model adequately?
+
+CARDS/PENALTIES/DEFENCE
+-----------------------
+27. Which referee data are available?
+28. What penalty-award model is sufficiently stable?
+29. How are rare own goals pooled?
+30. Is multivariate Poisson-lognormal practical for defensive events?
+31. How much event definition mismatch remains across providers?
+
+SIMULATION
+----------
+32. Is one score-state/substitution refinement enough?
+33. How many scenarios are needed per fixture?
+34. What common-random-number design is used?
+35. What rejection rate is acceptable?
+36. When should V2 sequential simulation replace V1?
+
+======================================================================
+41. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-09 — FPL POINTS DISTRIBUTION ENGINE
+
+DMFP-09 will consume coherent scenarios and apply:
+
+- target-season appearance rules;
+- position goal points;
+- FPL assist classification;
+- clean-sheet/minute logic;
+- saves;
+- penalty saves/misses;
+- cards;
+- own goals;
+- defensive-contribution thresholds;
+- BPS and bonus allocation;
+- captain/chip transformations later.
+
+Because DMFP-08 scenarios are internally consistent, DMFP-09 can calculate FPL
+points without independently inventing event components.
+
+======================================================================
+42. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-16
+
+- Selected market-constrained joint score matrix.
+- Added dynamic bivariate Poisson/Dixon–Coles prior.
+- Defined Poisson, negative-binomial and zero-inflation policy.
+- Added adaptive score grid and tails.
+- Added soft KL market projection.
+- Added uncertainty over score matrices.
+- Added coherent player goal allocation.
+- Derived anytime and multiple-goal formulas from team score distribution.
+- Added market-constrained player share fitting.
+- Added goal timing and substitution refinement.
+- Added goal mechanisms and assists.
+- Added coherent shots/SOT/saves.
+- Added penalties, cards and own goals.
+- Added defensive-event latent factors.
+- Added event correlations and conservation.
+- Defined V1 final-score-first and V2 sequential simulators.
+- Added outputs, invariants, evaluation, risks and sources.
+
+Future v1.0:
+- Sebastian approves architecture.
+- score models benchmarked;
+- market projection solver validated;
+- player allocation fits tested;
+- V1 scenario coherence passes;
+- prospective 2026/27 forecasts active;
+- DMFP-09 integration approved.
+
+END OF DOCUMENT

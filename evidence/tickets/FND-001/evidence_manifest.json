@@ -1,0 +1,184 @@
+{
+  "artifacts": [
+    {
+      "bytes": 1528,
+      "path": "evidence/tickets/FND-001/ACCEPTANCE.md",
+      "sha256": "ded125da075059e9a8b0e4833236b5a9b313f2af8d44cdb6765beb1d1750244c"
+    },
+    {
+      "bytes": 2524,
+      "path": "evidence/tickets/FND-001/DEPENDENCY_REPORT.md",
+      "sha256": "951da37c58aa329468bceae44d0082af7471f8138bbfbbbf1d4e421313a81150"
+    },
+    {
+      "bytes": 888,
+      "path": "evidence/tickets/FND-001/KNOWN_LIMITATIONS.md",
+      "sha256": "373874b6a24c95985f6efd958ea2c7eeaf6ffe8e9e138cd4ebda17f3762ae3e4"
+    },
+    {
+      "bytes": 1407,
+      "path": "evidence/tickets/FND-001/PACKAGE_REVIEW.md",
+      "sha256": "c3778034ac6dc41be45b9215ff78e35a7e0d913d689ca540bc483b97bf43e623"
+    },
+    {
+      "bytes": 8867,
+      "path": "evidence/tickets/FND-001/PLAN.md",
+      "sha256": "51108cc850be31133b3ec6de573ef9543581c7691d606a2f04fb060c1c89e4ae"
+    },
+    {
+      "bytes": 1013,
+      "path": "evidence/tickets/FND-001/SECURITY_REVIEW.md",
+      "sha256": "7dbe211f2e0a1b69a3b9dd47560c693b449d3191d006bd1ebeb95572b23ac2b4"
+    },
+    {
+      "bytes": 536,
+      "path": "evidence/tickets/FND-001/TEST_RESULTS.md",
+      "sha256": "addafb2082386ad0788883dd52ca144c00f80300a78e5fe32f72cbf79c843ef9"
+    },
+    {
+      "bytes": 2219,
+      "path": "evidence/tickets/FND-001/acceptance_matrix.json",
+      "sha256": "322a47952642bcc8503c45586b0379b31ef53d7450239fa55cf8ac41b15456f1"
+    },
+    {
+      "bytes": 281,
+      "path": "evidence/tickets/FND-001/baseline_manifest.json",
+      "sha256": "98097c8ad7c4cf11441cfc56263849c226095b0933607fe63d4021af07830fad"
+    },
+    {
+      "bytes": 7363,
+      "path": "evidence/tickets/FND-001/codex_result.json",
+      "sha256": "18ba7b48179d038a08240da58a39502bcc31c57ac7b653915e79042e0b50cc09"
+    },
+    {
+      "bytes": 2164,
+      "path": "evidence/tickets/FND-001/commands.log",
+      "sha256": "08f9cb22c6fad3c8e754e68f0e29a9544f106f1c4832fe3c2ef7c3d24d81009d"
+    },
+    {
+      "bytes": 283771,
+      "path": "evidence/tickets/FND-001/coverage.json",
+      "sha256": "ab1c0fda8d53d8d4d178e7e41dc7982af047c2b9aca085e20ea5ffa48078cda6"
+    },
+    {
+      "bytes": 20262,
+      "path": "evidence/tickets/FND-001/current_manifest.json",
+      "sha256": "0c6325d01f2fccf719180366da2c4d547c8a61e0b2a9ec70d0e3a4bacb353f44"
+    },
+    {
+      "bytes": 7556,
+      "path": "evidence/tickets/FND-001/dependency_report.json",
+      "sha256": "b138398787f4dad37fa5f70baf8879494614bf9feff161d31a7e89b8539a6d17"
+    },
+    {
+      "bytes": 1301,
+      "path": "evidence/tickets/FND-001/package_report.json",
+      "sha256": "877e77f0cf3ffeabf38fe87354b6dad2617991b9c158d55b9f4059df5e92678c"
+    },
+    {
+      "bytes": 59,
+      "path": "evidence/tickets/FND-001/repository_validation_report.json",
+      "sha256": "5121d83305442ff95da3024afcb4738bdee6b2528746584e63e7210e567139a8"
+    },
+    {
+      "bytes": 240,
+      "path": "evidence/tickets/FND-001/tests.json",
+      "sha256": "5c74ecfdbfa03e655161a24e07813a9c86b3b5a41a5c9d9707cc39f1468ffd50"
+    }
+  ],
+  "code_commit": null,
+  "commands": [
+    {
+      "command": "uv sync --all-groups --frozen",
+      "duration_seconds": 0.043,
+      "exit_code": 0,
+      "result": "PASS: frozen all-group sync"
+    },
+    {
+      "command": "uv run ruff format --check .",
+      "duration_seconds": 0.083,
+      "exit_code": 0,
+      "result": "PASS: formatting clean"
+    },
+    {
+      "command": "uv run ruff check .",
+      "duration_seconds": 0.087,
+      "exit_code": 0,
+      "result": "PASS: lint clean"
+    },
+    {
+      "command": "uv run mypy src/dmf_pulse",
+      "duration_seconds": 0.413,
+      "exit_code": 0,
+      "result": "PASS: strict typing clean"
+    },
+    {
+      "command": "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing",
+      "duration_seconds": 21.629,
+      "exit_code": 0,
+      "result": "PASS: 104 tests; 95.19% combined coverage"
+    },
+    {
+      "command": "uv run dmf --version",
+      "duration_seconds": 0.534,
+      "exit_code": 0,
+      "result": "PASS: dmf 0.1.0"
+    },
+    {
+      "command": "uv run dmf doctor --json",
+      "duration_seconds": 3.563,
+      "exit_code": 0,
+      "result": "PASS: doctor status HEALTHY"
+    },
+    {
+      "command": "uv run dmf config validate --environment test --config-root config",
+      "duration_seconds": 0.455,
+      "exit_code": 0,
+      "result": "PASS: test configuration valid"
+    },
+    {
+      "command": "uv run dmf config show --environment test --config-root config --json",
+      "duration_seconds": 0.448,
+      "exit_code": 0,
+      "result": "PASS: deterministic redacted JSON"
+    },
+    {
+      "command": "uv build",
+      "duration_seconds": 2.597,
+      "exit_code": 0,
+      "result": "PASS: sdist and wheel built"
+    },
+    {
+      "command": "uv run python scripts/verify_wheel.py",
+      "duration_seconds": 9.486,
+      "exit_code": 0,
+      "result": "PASS: clean wheel f75311b81b07daa2a0fc80a5ba37a21be5e1103158dc8c3daaadda413fc6c641; doctor HEALTHY"
+    },
+    {
+      "command": "uv run python scripts/validate_repository.py",
+      "duration_seconds": 0.2,
+      "exit_code": 0,
+      "result": "PASS: repository errors 0"
+    },
+    {
+      "command": "uv run python scripts/scan_secrets.py",
+      "duration_seconds": 1.654,
+      "exit_code": 0,
+      "result": "PASS: secret findings 0"
+    },
+    {
+      "command": "uv run dmf review-pack build --ticket FND-001 --output review_pack/FND-001",
+      "duration_seconds": 3.114,
+      "exit_code": 0,
+      "result": "PASS: 20 files; primary payload SHA-256 e01befcfe701e96b1dbdc44341c8d579cd70ab7e73edc97a2f98381a9a297231; archive SHA-256 ba6377978436e0f09a3b4240026b56a28407409fcc6cbd26411a0edf01e52a42"
+    }
+  ],
+  "context_hash": "a236be8f097c2dfb520cfb33100fb515eb322cfd46ae20084f6c89251ed68455",
+  "created_at": "2026-07-22T11:02:25Z",
+  "known_limitations": [
+    "remote CI and human acceptance not run",
+    "final ZIP digest is externally published because an archive cannot self-hash"
+  ],
+  "status": "COMPLETE",
+  "ticket_id": "FND-001"
+}

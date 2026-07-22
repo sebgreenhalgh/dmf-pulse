@@ -1,0 +1,10 @@
+{
+  "branch_coverage_percent": 90.57,
+  "branches_covered": 288,
+  "branches_total": 318,
+  "collected": 104,
+  "failed": 0,
+  "hypothesis_profile": "ci (derandomized, database disabled, 75 examples)",
+  "passed": 104,
+  "status": "PASS"
+}

@@ -1,0 +1,12 @@
+DMF Pulse
+Copyright (c) 2026 Sebastian Greenhalgh
+
+All Rights Reserved.
+
+This software, documentation, and associated files are private and proprietary. No permission is granted to use, copy, modify, publish, distribute, sublicense, sell, disclose, reverse engineer, or create derivative works except under an express written agreement with the copyright holder.
+
+This proprietary claim does not apply to `src/dmf_pulse/_data/zoneinfo/Europe/London`, an IANA
+tzdata 2025b TZif payload whose upstream input is public domain. That narrow third-party asset is
+included only for standard-library timezone validation on platforms without a system database.
+
+THE MATERIALS ARE PROVIDED WITHOUT WARRANTY OF ANY KIND TO THE MAXIMUM EXTENT PERMITTED BY LAW.

@@ -1,0 +1,4512 @@
+DMF PULSE — OBSERVABILITY, REPRODUCIBILITY, SECURITY AND COMPLIANCE
+===================================================================
+
+Document ID: DMFP-17
+Version: 0.9 (Assurance, Security and Governance Baseline)
+Status: PROPOSED — REQUIRED BEFORE PRODUCTION PUBLICATION
+Target programme: DMF Pulse — FPL Decision Engine
+Target season: Fantasy Premier League 2026/27
+Research cut-off: 17 July 2026
+Primary owner and final sign-off: Sebastian Greenhalgh
+Research agent: ChatGPT, under human review
+Implementation agent: Codex, under human review
+
+Parent and dependency documents:
+- DMFP-00 — MASTER ARCHITECTURE AND PRODUCT DEFINITION
+- DMFP-01 — RESEARCH STANDARD AND EVIDENCE REGISTER
+- DMFP-02 — FPL RULES, SCORING AND SEASON CONFIGURATION
+- DMFP-03 — CANONICAL DATA MODEL AND IDENTIFIERS
+- DMFP-04 — DATA SOURCES, MARKETS, APIS AND LICENSING
+- DMFP-05 — INGESTION, STORAGE AND DATA QUALITY
+- DMFP-15 — BACKTESTING, CALIBRATION AND BENCHMARKS
+- DMFP-16 — ORCHESTRATION, APIS AND DECISION PIPELINE
+
+Downstream consumers:
+- DMFP-18 — DECISION UI, REPORTING AND EXPLANATIONS
+- DMFP-19 — CODEX IMPLEMENTATION ROADMAP AND ACCEPTANCE TESTS
+- DMFP-20 — ASSUMPTIONS, DECISIONS AND OPEN QUESTIONS
+
+PURPOSE
+-------
+This document defines the cross-cutting controls that make DMF Pulse observable,
+reproducible, secure, recoverable and lawful enough for private production use.
+
+It covers:
+
+- structured logs;
+- distributed trace correlation;
+- metrics and pipeline-health monitoring;
+- data-freshness alerts;
+- model and calibration drift;
+- secrets management;
+- API-key handling;
+- identity and access;
+- host, network and database protection;
+- backups and disaster recovery;
+- model registry;
+- dataset versioning;
+- dependency locking;
+- software-supply-chain evidence;
+- deterministic simulations;
+- test coverage and quality gates;
+- provider licensing;
+- terms-of-service compliance;
+- data classification;
+- personal-data minimisation;
+- data-retention and deletion rules;
+- incident response;
+- vulnerability management;
+- control evidence and assurance reporting.
+
+The assurance question is:
+
+    CAN PULSE PROVE WHAT RAN, WHAT IT KNEW, WHY IT DECIDED,
+    WHETHER THE RESULT WAS HEALTHY, WHO COULD ACCESS IT,
+    AND WHETHER EVERY INPUT AND OUTPUT WAS USED WITHIN ITS RIGHTS?
+
+If the system cannot answer that question from immutable evidence, the affected
+decision is not production trustworthy.
+
+GOVERNING PRINCIPLE
+-------------------
+Pulse treats assurance as an engineered system, not a checklist.
+
+Every material control must have:
+
+- a control ID;
+- an objective;
+- a system owner;
+- a technical implementation;
+- a monitoring signal;
+- a test;
+- a failure response;
+- retained evidence;
+- a review frequency;
+- a status.
+
+The system will follow these operating principles:
+
+1. TELEMETRY IS STRUCTURED AND CORRELATED.
+2. DEADLINE READINESS IS A USER-FACING RELIABILITY OBJECTIVE.
+3. SECURITY USES LEAST PRIVILEGE AND SHORT-LIVED EXPOSURE.
+4. SECRETS NEVER BECOME CONFIGURATION, LOGS OR DATASETS.
+5. MODELS, DATASETS, CODE AND DEPENDENCIES ARE IMMUTABLE VERSIONS.
+6. SIMULATION RANDOMNESS IS EXPLICIT, HIERARCHICAL AND REPLAYABLE.
+7. BACKUPS ARE ACCEPTED ONLY AFTER VERIFIED RESTORE.
+8. PROVIDER RIGHTS ARE MACHINE-ENFORCED METADATA.
+9. UNKNOWN LICENSING MEANS NO PERSISTENT OR PUBLIC USE.
+10. PERSONAL DATA ARE MINIMISED, PSEUDONYMISED AND RETAINED ONLY FOR A
+    JUSTIFIED PURPOSE.
+11. A DRIFT ALERT DOES NOT AUTOMATICALLY RETRAIN OR PROMOTE A MODEL.
+12. A HIGH TEST-COVERAGE NUMBER DOES NOT REPLACE CORRECTNESS TESTS.
+13. A RELEASE WITHOUT DEPENDENCY, BUILD AND model/data provenance is not a
+    production release.
+14. AN INCIDENT MUST LEAVE A COMPLETE TIMELINE AND CORRECTIVE ACTION RECORD.
+
+IMPORTANT LEGAL POSITION
+------------------------
+This document is an engineering and governance baseline, not legal advice.
+
+Provider rights, privacy law, betting-data restrictions and public/commercial
+use can depend on:
+
+- jurisdiction;
+- account;
+- plan;
+- access method;
+- intended use;
+- storage duration;
+- redistribution;
+- third-party rights.
+
+Ambiguity is escalated for written provider or legal review.
+
+The initial scope is:
+
+    PRIVATE, INTERNAL, NON-BETTING FPL DECISION SUPPORT.
+
+Public display, commercialisation, redistribution and multi-user service are
+new purposes and require a new rights and privacy assessment.
+
+NORMATIVE LANGUAGE
+------------------
+MUST / MUST NOT:
+A non-negotiable requirement.
+
+SHOULD / SHOULD NOT:
+The default. Deviations require an architecture decision record and compensating
+control.
+
+MAY:
+Optional, provided no MUST requirement is violated.
+
+======================================================================
+0. EXECUTIVE CONTROL DECISIONS
+======================================================================
+
+0.1 OBSERVABILITY STACK
+-----------------------
+Selected zero-licence-cost baseline:
+
+- JSON structured application logs;
+- OpenTelemetry trace and log correlation;
+- OpenTelemetry semantic conventions where stable/applicable;
+- Prometheus-format metrics;
+- systemd journal as local log transport;
+- PostgreSQL audit/control records;
+- optional OpenTelemetry Collector for routing/export;
+- a local dashboard and alert process;
+- no requirement for a paid observability service.
+
+0.2 LOGGING DECISION
+--------------------
+Every first-party log is a structured event.
+
+Required event fields include:
+
+- event timestamp;
+- observed timestamp where different;
+- severity number/text;
+- event name;
+- message/body;
+- service/module/version;
+- environment/host/process;
+- trace ID and span ID;
+- run/task/operation ID;
+- manager/Gameweek scope where permitted;
+- information cutoff/deadline;
+- outcome/status;
+- error code;
+- safe attributes.
+
+Free-form strings may supplement the event.
+They cannot replace machine-readable fields.
+
+0.3 METRIC CARDINALITY DECISION
+-------------------------------
+Prometheus labels are limited to bounded dimensions such as:
+
+- environment;
+- service;
+- queue;
+- task type;
+- run type;
+- status;
+- provider;
+- severity.
+
+Do not put:
+
+- player ID;
+- fixture ID;
+- manager ID;
+- run ID;
+- task ID;
+- email;
+- URL;
+- exception text;
+
+into metric labels.
+
+High-cardinality detail belongs in logs, traces and queryable tables.
+
+0.4 DEADLINE RELIABILITY DECISION
+---------------------------------
+The primary operational service-level objective is not generic uptime.
+
+It is:
+
+    PRODUCE A LEGAL, FRESH, EXPLAINED AND PUBLISHABLE DECISION
+    BEFORE THE EXECUTION SAFETY BUFFER.
+
+Deadline readiness, freshness and decision legality are first-class metrics and
+alerts.
+
+0.5 SECRETS DECISION
+--------------------
+Initial Linux-host implementation:
+
+- encrypted systemd service credentials via `systemd-creds` and
+  `LoadCredentialEncrypted=` where the host supports them;
+- service reads secret values from its credential directory;
+- secrets are not placed in environment variables, command lines, Git,
+  `.env` production files, database rows, model artifacts or logs;
+- each service/environment/provider uses a separate credential;
+- an offline recovery copy is encrypted to an `age` recipient and stored
+  separately from the host;
+- a documented root/recovery process exists.
+
+Fallback where encrypted systemd credentials are unavailable:
+
+- root-owned encrypted-at-rest secret file;
+- decrypted only into a protected runtime credential file/tmpfs;
+- `LoadCredential=`;
+- immediate migration plan.
+
+0.6 MODEL REGISTRY DECISION
+---------------------------
+PostgreSQL plus immutable artifacts is the authoritative model registry.
+
+It supports:
+
+- immutable model versions;
+- aliases such as `champion` and `challenger`;
+- tags;
+- approval and withdrawal;
+- complete training-data/code/environment lineage.
+
+MLflow Model Registry MAY be added as an operator UI or compatibility layer.
+It cannot become a second source of truth.
+
+0.7 DATASET VERSIONING DECISION
+-------------------------------
+Every training, validation, test and production dataset is an immutable,
+hash-addressed manifest over immutable Parquet/source artifacts.
+
+No model may reference:
+
+- `latest.parquet`;
+- an unversioned database query;
+- a mutable folder;
+- a floating source alias.
+
+0.8 DEPENDENCY DECISION
+-----------------------
+Python releases use:
+
+- `pyproject.toml`;
+- a standards-compatible `pylock.toml` when supported by the selected toolchain;
+- exact artifact hashes;
+- an archived wheelhouse/build manifest;
+- an exact Python runtime version;
+- operating-system/image identity;
+- an SBOM;
+- vulnerability and licence scans.
+
+Production installation does not resolve new packages from the Internet.
+
+0.9 SOFTWARE-SUPPLY-CHAIN DECISION
+----------------------------------
+Minimum production target:
+
+- source in version control;
+- protected production branch/tag;
+- reproducible, documented build;
+- build provenance equivalent to SLSA Build L1;
+- SBOM;
+- artifact hash verification.
+
+Target when a suitable hosted build platform is used:
+
+- signed, automatically generated provenance equivalent to SLSA Build L2.
+
+Pulse does not claim a SLSA level until every formal requirement is verified.
+
+0.10 DETERMINISTIC SIMULATION DECISION
+--------------------------------------
+Every stochastic run has one stored root seed.
+
+NumPy `SeedSequence` creates named child streams for:
+
+- model;
+- fixture;
+- Gameweek;
+- structural world;
+- parameter draw;
+- simulation batch;
+- worker;
+- module.
+
+No module uses the global NumPy random state.
+
+0.11 BACKUP DECISION
+--------------------
+Production backup layers:
+
+- continuous PostgreSQL WAL archiving;
+- verified PostgreSQL base backups;
+- nightly logical custom-format dumps;
+- immutable artifact replication;
+- encrypted off-host/offline copy;
+- independent backup catalogue and hashes;
+- monthly restore rehearsal;
+- full preseason disaster-recovery rehearsal.
+
+A backup that has not been restored is not accepted as evidence of recoverability.
+
+0.12 PROVIDER-COMPLIANCE DECISION
+---------------------------------
+Every provider has a versioned Rights Profile controlling:
+
+- automated access;
+- quotas;
+- caching;
+- raw storage;
+- derived storage;
+- model training;
+- internal use;
+- public display;
+- redistribution;
+- backup;
+- retention;
+- termination deletion;
+- attribution;
+- geography.
+
+The policy is enforced at ingestion, artifact creation, backup and export.
+
+0.13 DATA-RETENTION DECISION
+----------------------------
+Retention is classification- and provider-specific.
+
+Unknown right or retention period:
+
+- no long-term raw storage;
+- processing/quarantine only for the approved short window;
+- no training or redistribution until review.
+
+0.14 PERSONAL-DATA DECISION
+---------------------------
+Manager and rival data are minimised and pseudonymised.
+
+The operational model uses internal manager UUIDs.
+Names and external IDs are held in a separate restricted mapping.
+
+No public leaderboard/rival dataset is created.
+
+0.15 AUTOMATION DECISION
+------------------------
+No control silently auto-promotes a model, changes a provider right, extends
+retention, rotates to an untested key or executes an FPL action.
+
+Critical transitions require approval and evidence.
+
+======================================================================
+1. ASSURANCE SCOPE AND THREAT MODEL
+======================================================================
+
+1.1 ASSETS
+----------
+Critical assets:
+
+- Sebastian's manager state and decisions;
+- provider API keys;
+- database credentials;
+- model and dataset artifacts;
+- historical deadline bundles;
+- decision bundles;
+- rulesets;
+- code/build provenance;
+- backup encryption identities;
+- private rival/league data;
+- provider terms evidence.
+
+1.2 THREATS
+-----------
+- secret leak through source/log/exception/process list;
+- compromised dependency or build artifact;
+- malicious/accidental code change;
+- stale or corrupted source data;
+- silent model drift;
+- provider terms change;
+- quota or account abuse;
+- unauthorised manager-data access;
+- database or disk loss;
+- backup failure;
+- artifact corruption;
+- tampering with a historical decision;
+- nonreproducible simulation;
+- false confidence from incomplete telemetry;
+- legal/contractual over-retention;
+- accidental public redistribution;
+- host compromise;
+- insider/administrator error.
+
+1.3 TRUST BOUNDARIES
+--------------------
+- Internet providers;
+- host operating system;
+- systemd/service credentials;
+- API process;
+- worker processes;
+- PostgreSQL;
+- artifact storage;
+- backup destination;
+- source-control/build platform;
+- Sebastian's browser/CLI;
+- optional rival data.
+
+1.4 ASSUMED ADVERSARY
+---------------------
+V1 protects against:
+
+- accidental disclosure;
+- routine credential theft;
+- compromised third-party packages;
+- unauthorised local/network access;
+- provider abuse;
+- common web/API attacks;
+- operator mistakes.
+
+It does not claim protection against:
+
+- a fully compromised root administrator and all offline evidence;
+- nation-state compromise of every trusted platform;
+- deliberate provider falsification;
+- physical destruction of all copies.
+
+1.5 RISK ACCEPTANCE
+-------------------
+Every accepted material risk records:
+
+- owner;
+- rationale;
+- compensating controls;
+- expiry/review;
+- impact;
+- evidence.
+
+======================================================================
+2. DATA CLASSIFICATION
+======================================================================
+
+2.1 CLASSES
+-----------
+PUBLIC:
+Official public information safe to display independently of provider rights.
+
+INTERNAL:
+Pulse design, aggregate metrics and nonpersonal operational data.
+
+CONFIDENTIAL:
+Manager state, recommendations, nonpublic model outputs, provider payloads and
+licence-limited data.
+
+RESTRICTED:
+Secrets, private rival data, authentication material, personal-data mapping and
+backup keys.
+
+2.2 LICENCE OVERLAY
+-------------------
+Classification is not a licence.
+
+A public webpage can still have restrictive reuse/storage terms.
+Provider Rights Profile remains controlling.
+
+2.3 REQUIRED TAGS
+-----------------
+Every dataset/artifact has:
+
+- security_classification;
+- personal_data_class;
+- provider_rights_profile;
+- retention_policy;
+- backup_policy;
+- export_policy;
+- owner.
+
+2.4 PERSONAL DATA
+-----------------
+Possible personal data:
+
+- FPL manager name/team name;
+- entry ID;
+- league membership;
+- decision/action history;
+- account-associated email if stored;
+- IP/access logs.
+
+Player professional football data are not automatically treated as private
+manager data, but source rights still apply.
+
+2.5 MINIMISATION
+----------------
+Collect only data needed for:
+
+- private decisions;
+- model evaluation;
+- approved opponent modelling;
+- security/audit.
+
+2.6 EXPORT
+----------
+Exports inherit the strictest classification/rights of included fields unless a
+documented irreversible aggregation/de-identification changes the classification.
+
+======================================================================
+3. STRUCTURED LOGGING
+======================================================================
+
+3.1 FORMAT
+----------
+Newline-delimited JSON at the application boundary.
+
+UTF-8.
+
+One event per record.
+
+3.2 OPEN TELEMETRY MAPPING
+--------------------------
+Map to the stable OpenTelemetry Logs Data Model:
+
+- Timestamp;
+- ObservedTimestamp;
+- SeverityText;
+- SeverityNumber;
+- Body;
+- Resource;
+- InstrumentationScope;
+- Attributes;
+- TraceId;
+- SpanId;
+- EventName.
+
+3.3 REQUIRED RESOURCE FIELDS
+----------------------------
+- service.name;
+- service.version;
+- service.instance.id;
+- deployment.environment.name;
+- host.name;
+- process.pid;
+- process.executable.name;
+- code.namespace where useful.
+
+3.4 PULSE EVENT FIELDS
+----------------------
+- event.name;
+- dmf.run.id;
+- dmf.task.id;
+- dmf.operation.id;
+- dmf.decision.id;
+- dmf.gameweek.id;
+- dmf.run.type;
+- dmf.module;
+- dmf.provider;
+- dmf.information_cutoff;
+- dmf.deadline;
+- dmf.model.version;
+- dmf.ruleset.version;
+- dmf.dataset.version;
+- dmf.cache.status;
+- dmf.status;
+- dmf.error.code;
+- dmf.retryable.
+
+3.5 HIGH-CARDINALITY FIELDS
+---------------------------
+Allowed in logs under access/retention controls:
+
+- player ID;
+- fixture ID;
+- run/task IDs;
+- artifact IDs.
+
+They are not Prometheus labels.
+
+3.6 EVENT TAXONOMY
+------------------
+Examples:
+
+pipeline.run.started
+pipeline.run.completed
+pipeline.task.claimed
+pipeline.task.failed
+source.snapshot.received
+source.schema.changed
+source.quota.low
+model.prediction.completed
+model.drift.detected
+optimiser.solution.found
+optimiser.solution.timeout
+decision.bundle.published
+decision.bundle.withdrawn
+security.secret.accessed
+security.secret.rotated
+compliance.terms.changed
+backup.completed
+backup.restore.verified.
+
+3.7 SEVERITY
+------------
+TRACE:
+Local deep diagnostic; disabled in production by default.
+
+DEBUG:
+Detailed nonsecret diagnostic.
+
+INFO:
+Normal lifecycle event.
+
+WARN:
+Unexpected/degraded but recoverable.
+
+ERROR:
+Task/request failed or control violated.
+
+FATAL:
+Process/system cannot safely continue.
+
+Alert severity is separate from log severity.
+
+3.8 MESSAGE/BODY
+----------------
+Concise human-readable description.
+
+Do not encode critical fields only in the message.
+
+3.9 EXCEPTIONS
+--------------
+Capture:
+
+- exception class;
+- safe message;
+- stack trace;
+- code location;
+- causal chain.
+
+Before capture:
+
+- redact URL query;
+- redact request headers;
+- redact SQL parameters where sensitive;
+- truncate provider bodies;
+- remove personal data not needed.
+
+3.10 LOGGING FAILURES
+---------------------
+Application must not crash solely because a nonaudit log sink is unavailable.
+
+Critical audit events use a durable database/outbox path.
+
+3.11 LOG SAMPLING
+-----------------
+Never sample:
+
+- ERROR/FATAL;
+- security events;
+- publication;
+- overrides;
+- model promotion;
+- terms changes;
+- backups/restores;
+- deadline P0/P1 events.
+
+High-volume successful source/request logs may be sampled after aggregate metrics
+exist.
+
+======================================================================
+4. LOG REDACTION AND SECRET DETECTION
+======================================================================
+
+4.1 ALLOWLIST PRINCIPLE
+-----------------------
+Prefer explicitly safe logged fields over broad object serialization.
+
+4.2 PROHIBITED VALUES
+---------------------
+- API keys;
+- database passwords;
+- cookies;
+- bearer tokens;
+- session IDs;
+- private encryption/signing keys;
+- full provider URLs containing key query parameters;
+- secret environment/credential contents;
+- unredacted private manager/rival payloads.
+
+4.3 KEY-NAME REDACTION
+----------------------
+Automatically redact fields matching case-insensitive patterns:
+
+api_key
+apikey
+token
+secret
+password
+passwd
+authorization
+cookie
+session
+credential
+private_key
+client_secret.
+
+4.4 VALUE DETECTION
+-------------------
+CI and runtime scanning for:
+
+- known provider-key patterns;
+- entropy/high-risk tokens;
+- PEM/private-key markers;
+- accidental `.env` content.
+
+4.5 URL HANDLING
+----------------
+Store:
+
+- scheme/host/path template;
+- safe parameter names;
+- request fingerprint.
+
+Never log a provider key in query parameters.
+
+The Odds API requires an `apiKey` query parameter, so its HTTP-client logging
+adapter MUST strip query values before tracing/logging.
+
+4.6 HTTP HEADERS
+----------------
+Only safe allowlisted response headers:
+
+- status;
+- content type;
+- ETag;
+- Last-Modified;
+- quota fields;
+- request IDs.
+
+4.7 REDACTION TEST
+------------------
+Golden fake secrets injected into:
+
+- exceptions;
+- HTTP requests;
+- Pydantic objects;
+- trace attributes;
+- CLI;
+- SQL errors.
+
+No sink may contain them.
+
+4.8 SECRET-LEAK INCIDENT
+------------------------
+Any confirmed secret in a log:
+
+- P0 security incident;
+- revoke/rotate;
+- isolate affected logs;
+- identify access;
+- purge where lawful/possible;
+- preserve minimum incident evidence;
+- add regression test.
+
+======================================================================
+5. AUDIT AND TAMPER-EVIDENT RECORDS
+======================================================================
+
+5.1 AUDIT EVENTS
+----------------
+- authentication/authorization;
+- override creation/approval/revocation;
+- model approval/promotion/withdrawal;
+- dataset release;
+- ruleset activation;
+- terms/licence approval;
+- retention deletion;
+- secret rotation;
+- decision publication/withdrawal;
+- execution record;
+- backup restore;
+- administrator actions.
+
+5.2 SEPARATE STORE
+------------------
+Audit events are append-only PostgreSQL rows with restricted writer function.
+
+Application roles cannot update/delete audit rows.
+
+5.3 HASH CHAIN
+--------------
+For each audit stream/day:
+
+    event_hash =
+      sha256(
+        previous_hash
+        + canonical_event_json
+      )
+
+Store:
+
+- sequence;
+- previous hash;
+- event hash.
+
+5.4 EXTERNAL ANCHOR
+-------------------
+Daily audit manifest/root hash copied to the separate backup destination.
+
+This makes privileged retrospective tampering detectable unless both systems are
+compromised.
+
+5.5 LIMITATION
+--------------
+A hash chain is tamper-evident, not tamper-proof.
+
+5.6 AUDIT ACCESS
+----------------
+Read limited to Sebastian/admin/auditor role.
+
+5.7 AUDIT RETENTION
+-------------------
+Proposed minimum:
+
+- two years for production security/control audit;
+- longer where needed to reproduce a retained decision;
+- personal fields minimised/pseudonymised.
+
+Provider/right constraints can require shorter raw payload retention; audit
+metadata may remain if permitted.
+
+======================================================================
+6. TRACING
+======================================================================
+
+6.1 TRACE ROOTS
+---------------
+- API request;
+- scheduler run;
+- decision run;
+- historical replay;
+- model training;
+- backup restore.
+
+6.2 CONTEXT PROPAGATION
+-----------------------
+Trace context propagates through:
+
+- API;
+- PostgreSQL task/outbox envelope;
+- worker;
+- artifact creation;
+- publication;
+- evaluation.
+
+6.3 SPANS
+---------
+Examples:
+
+pipeline.plan
+task.execute
+provider.http
+database.transaction
+artifact.write
+model.load
+model.predict
+simulation.batch
+optimiser.solve
+decision.validate
+decision.publish.
+
+6.4 SPAN EVENTS
+---------------
+- retry;
+- cache hit;
+- quota warning;
+- degradation;
+- solver incumbent;
+- deadline threshold crossed.
+
+6.5 STATUS
+----------
+Set error status only for operation failure, not every handled warning.
+
+6.6 ATTRIBUTE LIMITS
+--------------------
+No raw provider body, model feature vector, personal manager payload or secret.
+
+6.7 TRACE SAMPLING
+------------------
+Keep:
+
+- 100% deadline runs;
+- 100% failed/degraded runs;
+- 100% security and publication traces;
+- sampled routine successful daily runs.
+
+6.8 TRACE RETENTION
+-------------------
+Proposed:
+
+- 30 days detailed traces;
+- one year aggregate run/task metrics;
+- selected deadline trace exports retained with Decision Bundle.
+
+======================================================================
+7. METRICS AND PIPELINE HEALTH
+======================================================================
+
+7.1 USER-OUTCOME METRICS
+------------------------
+- decision publishability;
+- seconds to execution buffer;
+- recommendation freshness;
+- legality;
+- latest Decision Bundle age;
+- probability model coverage.
+
+7.2 RED METRICS
+---------------
+For API/tasks:
+
+RATE
+ERRORS
+DURATION.
+
+7.3 USE METRICS
+---------------
+For host/resources:
+
+UTILISATION
+SATURATION
+ERRORS.
+
+7.4 CONTROL-PLANE METRICS
+-------------------------
+- scheduler tick lag;
+- queue depth;
+- oldest ready task;
+- worker heartbeat;
+- lease expiry;
+- task retries;
+- cache hits;
+- artifact failures;
+- database pool;
+- outbox lag;
+- operation duration;
+- publication lag.
+
+7.5 DEADLINE METRICS
+--------------------
+- seconds until FPL deadline;
+- seconds until safe execution cutoff;
+- final-standard status;
+- final-fast status;
+- critical tasks remaining;
+- estimated critical-path completion;
+- current Decision Bundle issue age;
+- state-hash validity.
+
+7.6 DATA METRICS
+----------------
+- source age;
+- usable lag;
+- expected/observed rows;
+- mapping unresolved;
+- schema changes;
+- missing-market count;
+- odds operator coverage;
+- manager-state age;
+- price snapshot age.
+
+7.7 MODEL METRICS
+-----------------
+- prediction latency;
+- distribution validity;
+- model load failures;
+- feature missingness;
+- prediction distribution;
+- calibration rolling score;
+- drift indicators;
+- confidence-grade counts.
+
+7.8 OPTIMISER METRICS
+---------------------
+- solve time;
+- MIP gap;
+- incumbent;
+- feasible-plan count;
+- scenario ESS;
+- plan stability;
+- legality failures.
+
+7.9 BACKUP METRICS
+------------------
+- last successful base backup;
+- WAL archive lag;
+- logical dump age;
+- artifact replication lag;
+- verification status;
+- restore-test age;
+- offsite capacity.
+
+7.10 SECURITY/COMPLIANCE METRICS
+--------------------------------
+- secrets due for rotation;
+- failed authentications;
+- privileged operations;
+- dependency vulnerabilities;
+- terms profiles due;
+- retention deletions overdue;
+- unclassified artifacts;
+- access review age.
+
+======================================================================
+8. SERVICE-LEVEL OBJECTIVES AND ALERT SEVERITY
+======================================================================
+
+8.1 SEVERITY
+------------
+P0 — DECISION/SECURITY EMERGENCY
+
+Examples:
+
+- illegal or corrupted published decision;
+- active secret leak;
+- manager state compromised;
+- rule/deadline integrity failure;
+- final recommendation cannot complete before safety cutoff;
+- database/artifact loss without verified recovery;
+- unauthorised personal-data access.
+
+P1 — MAJOR
+
+- primary source stale near deadline;
+- critical worker/queue failure;
+- model output invalid;
+- optimiser no feasible legal plan;
+- backup/PITR unhealthy;
+- terms change blocks source;
+- severe model drift.
+
+P2 — DEGRADED
+
+- optional provider unavailable;
+- reduced market coverage;
+- moderate data/model drift;
+- challenger failure;
+- retention/access review overdue.
+
+P3 — INFORMATIONAL
+
+- routine schema additive change;
+- approaching capacity;
+- upcoming rotation/review;
+- nonmaterial performance change.
+
+8.2 ALERT PAYLOAD
+-----------------
+- alert ID;
+- severity;
+- opened/updated time;
+- affected environment/run/source/model;
+- user/decision impact;
+- evidence/query link;
+- current fallback;
+- owner;
+- runbook;
+- acknowledgement;
+- expiry/escalation;
+- deduplication key.
+
+8.3 DEDUPLICATION
+-----------------
+One incident per root condition.
+
+Repeated observations update it.
+
+8.4 INHIBITION
+--------------
+A database-down P0 inhibits hundreds of downstream task-failure alerts.
+
+8.5 DEADLINE ESCALATION
+-----------------------
+The same source age can be P2 at D-72h and P0 at D-10m.
+
+8.6 ALERT DELIVERY
+------------------
+MVP:
+
+- dashboard;
+- terminal/CLI;
+- email;
+- local audible/desktop notification for P0/P1 if configured.
+
+8.7 ACKNOWLEDGEMENT
+-------------------
+P0/P1 requires explicit acknowledgement and resolution record.
+
+8.8 SLO REPORT
+--------------
+Monthly:
+
+- availability;
+- deadline success;
+- freshness;
+- legality;
+- recovery;
+- error budget.
+
+======================================================================
+9. DATA-FRESHNESS POLICIES
+======================================================================
+
+9.1 FRESHNESS DEFINITION
+------------------------
+Use source update time when reliable, otherwise receipt time with lower
+confidence.
+
+Expose both:
+
+- source_age;
+- system_usable_age.
+
+9.2 PHASES
+----------
+NORMAL:
+more than 72h to deadline.
+
+PREDEADLINE:
+72h–6h.
+
+CRITICAL:
+6h–60m.
+
+FINAL:
+inside 60m.
+
+9.3 PROPOSED THRESHOLDS
+-----------------------
+Thresholds are configuration and must be tuned to observed provider behaviour.
+
+OFFICIAL FPL PLAYER/PRICE/OWNERSHIP:
+- NORMAL warning 8h, hard 24h;
+- PREDEADLINE warning 2h, hard 6h;
+- CRITICAL warning 30m, hard 90m;
+- FINAL warning 10m, hard 30m.
+
+OFFICIAL DEADLINE/GAMEWEEK:
+- exact current official value required;
+- any unresolved conflict is P0;
+- refresh at every deadline run.
+
+MANAGER STATE:
+- NORMAL warning 6h;
+- PREDEADLINE warning 60m;
+- CRITICAL warning 15m;
+- FINAL warning 5m;
+- prepublication hash mismatch blocks.
+
+FIXTURES/GAMEWEEK ASSIGNMENTS:
+- NORMAL warning 12h;
+- PREDEADLINE warning 2h;
+- CRITICAL warning 30m;
+- material event triggers immediate refresh.
+
+INJURY/AVAILABILITY SOURCES:
+- NORMAL warning 12h;
+- PREDEADLINE warning 3h;
+- CRITICAL warning 45m;
+- FINAL warning 15m;
+- lower-quality source age never overrides official newer evidence.
+
+TEAM ODDS:
+- DMFP-06 market-specific half-life/hard cutoff;
+- final current quote target 10–30m depending source cadence;
+- delayed exchange carries explicit delay.
+
+PLAYER PROPS:
+- absence is a typed coverage state;
+- stale thresholds by provider/market;
+- no prop never treated as zero.
+
+PRICE/TRANSFER FLOWS:
+- daytime warning 90m;
+- broad overnight window warning 20m;
+- narrow learned update window warning 10m/target 5m;
+- current official price required before transfer legality.
+
+RANK/EO SAMPLE:
+- early diagnostic warning 24h;
+- near-deadline target 60m if available;
+- rank-aware override blocked when cohort state is too stale.
+
+9.4 SOURCE SILENCE
+------------------
+No update can mean:
+
+- source stable;
+- source failed;
+- market closed;
+- no new data.
+
+Heartbeat/status checks distinguish them.
+
+9.5 FRESHNESS BUDGET
+--------------------
+Decision Bundle lists:
+
+- oldest critical input;
+- weighted/maximum ages;
+- expired optional inputs;
+- freshness grade.
+
+9.6 ACTION RESTRICTION
+----------------------
+Examples:
+
+- stale price flow disables ACT NOW;
+- stale manager state blocks transfer plan;
+- stale player props degrade player allocation;
+- stale rank cohort falls back to points mode.
+
+======================================================================
+10. PIPELINE-HEALTH MONITORING
+======================================================================
+
+10.1 CRITICAL PATH
+------------------
+Continuously calculate:
+
+- unfinished critical tasks;
+- expected durations;
+- dependencies;
+- estimated publish time;
+- slack to execution buffer.
+
+10.2 QUEUE HEALTH
+-----------------
+Alert on:
+
+- oldest READY age;
+- queue depth;
+- no worker;
+- lease churn;
+- retry storm;
+- one task type starving others.
+
+10.3 SCHEDULER HEALTH
+---------------------
+- tick every minute;
+- expected jobs generated;
+- duplicate logical jobs;
+- next deadline plan exists.
+
+10.4 DATABASE HEALTH
+--------------------
+- connection use;
+- transaction failures;
+- lock waits;
+- replication/WAL archive;
+- disk;
+- vacuum/bloat signals;
+- backup status.
+
+10.5 ARTIFACT HEALTH
+--------------------
+- disk usage;
+- hash failures;
+- orphan files;
+- missing manifests;
+- compaction backlog;
+- retention backlog.
+
+10.6 API HEALTH
+---------------
+- live/ready/deadline probes;
+- latency;
+- errors;
+- authentication;
+- operation backlog.
+
+10.7 HOST HEALTH
+----------------
+- CPU;
+- memory;
+- swap/OOM;
+- disk/inodes;
+- clock synchronization;
+- filesystem errors;
+- process restarts;
+- pending security updates.
+
+10.8 CAPACITY FORECAST
+----------------------
+Forecast disk and database growth to season end.
+Alert before emergency cleanup is required.
+
+======================================================================
+11. MODEL-DRIFT FRAMEWORK
+======================================================================
+
+11.1 DRIFT TYPES
+----------------
+INPUT/DATA DRIFT:
+Feature distribution changes.
+
+MISSINGNESS DRIFT:
+Source coverage/null reasons change.
+
+PRIOR/LABEL SHIFT:
+Outcome prevalence changes.
+
+CONCEPT DRIFT:
+Relationship between input and outcome changes.
+
+CALIBRATION DRIFT:
+Forecast probabilities cease to match outcomes.
+
+RESIDUAL DRIFT:
+Errors change by mean, variance, tails or subgroup.
+
+PREDICTION DRIFT:
+Model output distribution changes before labels arrive.
+
+REGIME DRIFT:
+Manager, rules, season or source structure changes.
+
+MODEL-COMPOSITION DRIFT:
+Ensemble weights/source coverage change.
+
+OPERATIONAL DRIFT:
+Latency, failures or fallback usage change.
+
+11.2 TWO-STAGE MONITORING
+-------------------------
+PRE-LABEL:
+available immediately.
+
+- feature/missingness;
+- source coverage;
+- prediction distribution;
+- confidence;
+- model disagreement;
+- out-of-distribution score.
+
+POST-LABEL:
+after outcome finality.
+
+- log/Brier/RPS/CRPS;
+- calibration;
+- bias;
+- interval coverage;
+- decision utility/regret.
+
+11.3 REFERENCE WINDOWS
+----------------------
+Compare against:
+
+- training distribution;
+- recent rolling window;
+- same season stage;
+- same manager/source regime;
+- prior season;
+- model's expected predictive distribution.
+
+11.4 NUMERICAL DRIFT TESTS
+--------------------------
+Candidate measures:
+
+- standardised mean/quantile shift;
+- Wasserstein distance;
+- Kolmogorov–Smirnov diagnostic;
+- Jensen–Shannon divergence;
+- population stability index as supplementary;
+- unseen-category rate;
+- missingness difference;
+- posterior predictive checks.
+
+No single threshold is universal.
+
+11.5 PROPOSED INITIAL SIGNALS
+-----------------------------
+P2 investigation candidates:
+
+- important feature missingness +5 percentage points;
+- unseen critical category >1%;
+- standardised Wasserstein distance >0.5;
+- categorical JSD >0.10;
+- confidence-grade mix changes >15 percentage points;
+- fallback usage doubles from baseline.
+
+These are alerts, not automatic model invalidation.
+
+11.6 PERFORMANCE DRIFT
+----------------------
+Evaluate rolling and cumulative:
+
+- proper-score skill versus baseline;
+- calibration slope/intercept;
+- prediction-interval coverage;
+- subgroup performance;
+- decision regret.
+
+11.7 SMALL-SAMPLE POLICY
+------------------------
+FPL provides limited weekly outcomes.
+
+Use:
+
+- hierarchical pooling;
+- block bootstrap/posterior intervals;
+- cumulative evidence;
+- high-signal failures;
+- no one-Gameweek automatic retrain.
+
+11.8 STRUCTURAL CHANGE
+----------------------
+Known change:
+
+- new manager;
+- rules;
+- promoted club;
+- provider schema;
+- season start.
+
+Create a new regime; do not label every shift as model failure.
+
+11.9 RESPONSE
+-------------
+1. confirm telemetry/data integrity;
+2. identify source/regime;
+3. quantify user impact;
+4. compare champion/baseline/challenger;
+5. adjust confidence/degrade if needed;
+6. shadow refit/recalibrate;
+7. run DMFP-15 gates;
+8. approve promotion or rollback.
+
+11.10 NO AUTOMATIC PROMOTION
+----------------------------
+Drift can trigger training.
+It cannot automatically make the newly trained model champion.
+
+======================================================================
+12. MODEL PERFORMANCE AND CONFIDENCE MONITORING
+======================================================================
+
+12.1 ROLLING SCORECARDS
+-----------------------
+Per model/module:
+
+- primary metric;
+- benchmark skill;
+- calibration;
+- coverage;
+- decision metric;
+- runtime;
+- data coverage;
+- confidence-grade performance.
+
+12.2 EXPECTED VERSUS OBSERVED
+-----------------------------
+Monitor whether:
+
+- confidence A is genuinely better than C;
+- wider intervals cover more;
+- model disagreement predicts error;
+- degraded source modes perform as assumed.
+
+12.3 ALERT CONDITIONS
+---------------------
+Examples after adequate sample:
+
+- champion loses proper-score skill to baseline over a configured window;
+- calibration slope credible interval excludes acceptable range;
+- 80% interval materially undercovers;
+- p_start/price/rank confidence is overconfident;
+- optimiser policy underperforms no-transfer benchmark;
+- decision legality/reproducibility failure.
+
+12.4 OUTCOME FINALITY
+---------------------
+Score only against configured final outcome.
+Track provisional/final differences.
+
+12.5 SHADOW MODEL
+-----------------
+Challengers run on the same deadline bundle and scenario seeds.
+Comparison is paired.
+
+12.6 ROLLBACK
+-------------
+If champion control fails:
+
+- block affected mode;
+- repoint champion alias;
+- regenerate current recommendation when time permits;
+- preserve incident.
+
+======================================================================
+13. MODEL REGISTRY
+======================================================================
+
+13.1 AUTHORITATIVE STORE
+------------------------
+PostgreSQL metadata + immutable model artifacts.
+
+13.2 MODEL IDENTITY
+-------------------
+- registered model name;
+- immutable version ID;
+- semantic version;
+- artifact hash;
+- model type/module;
+- prediction schema;
+- created/trained time.
+
+13.3 STATES
+-----------
+DRAFT
+TRAINED
+VALIDATION_FAILED
+VALIDATED
+PENDING_APPROVAL
+APPROVED
+CHALLENGER
+SHADOW
+CHAMPION
+RETIRED
+WITHDRAWN
+QUARANTINED.
+
+13.4 ALIASES
+------------
+Mutable pointers:
+
+- champion;
+- challenger;
+- rollback;
+- research.
+
+Alias changes are audited and transactional.
+
+13.5 REQUIRED LINEAGE
+---------------------
+- code commit;
+- build/environment;
+- dependency lock;
+- training/validation/test dataset IDs;
+- feature schema/version;
+- ruleset;
+- source rights;
+- hyperparameters/config;
+- random seeds;
+- calibration;
+- ensemble components;
+- metrics/benchmarks;
+- backtest run;
+- approval;
+- owner.
+
+13.6 MODEL CARD
+---------------
+Required:
+
+- intended use;
+- nonuses;
+- target/horizon;
+- data;
+- assumptions;
+- metrics;
+- subgroups;
+- uncertainty;
+- failure modes;
+- security/privacy;
+- licence;
+- monitoring;
+- rollback.
+
+13.7 ARTIFACT FORMAT
+--------------------
+Prefer safe, inspectable formats:
+
+- JSON/Parquet parameters;
+- NumPy arrays;
+- ONNX where supported;
+- framework-native format with strict provenance.
+
+Avoid untrusted arbitrary Python pickle deserialization.
+
+If pickle/joblib is required:
+
+- artifact must be internally produced;
+- hash/signature verified;
+- isolated trusted environment;
+- no external model upload;
+- explicit high-risk label.
+
+13.8 PROMOTION
+--------------
+Requires DMFP-15 gates and approval.
+
+13.9 WITHDRAWAL
+--------------
+A vulnerable/invalid model:
+
+- alias removed;
+- new decisions blocked;
+- descendants identified;
+- historical decisions unchanged;
+- incident and replacement.
+
+13.10 OPTIONAL MLFLOW
+---------------------
+MLflow's registry concepts of immutable model versions, tags and mutable aliases
+fit the interface.
+
+If adopted:
+
+- PostgreSQL/Pulse registry remains authority;
+- no duplicate lifecycle disagreement;
+- aliases synchronised one-way from Pulse.
+
+======================================================================
+14. DATASET VERSIONING
+======================================================================
+
+14.1 DATASET ID
+---------------
+Immutable UUID plus semantic name/version and manifest hash.
+
+14.2 MANIFEST
+-------------
+- dataset mode;
+- purpose;
+- schema;
+- partitions/files/hashes;
+- row count;
+- min/max times;
+- source bundles;
+- transformations;
+- code/config;
+- mappings;
+- rules;
+- missingness/quality;
+- personal-data class;
+- rights profiles;
+- retention/deletion;
+- split membership;
+- parent datasets.
+
+14.3 DATASET STATES
+-------------------
+DRAFT
+VALIDATED
+APPROVED
+TRAINING_ELIGIBLE
+DEPRECATED
+SUPERSEDED
+WITHDRAWN
+PARTIALLY_DELETED
+UNREPRODUCIBLE_DUE_TO_RIGHTS.
+
+14.4 IMMUTABILITY
+-----------------
+Correction creates a new dataset version.
+
+14.5 SPLITS
+-----------
+Train/validation/test membership:
+
+- deterministic;
+- time-safe;
+- stored/hash-addressed;
+- never regenerated from a mutable query for a published model.
+
+14.6 ALIASES
+------------
+Aliases such as `current_training` resolve to an immutable ID at run planning.
+
+The resolved ID is stored.
+
+14.7 DATASET CARD
+-----------------
+- collection;
+- coverage;
+- rights;
+- intended use;
+- limitations;
+- known biases;
+- missingness;
+- temporal leakage risks;
+- retention.
+
+14.8 SCHEMA EVOLUTION
+---------------------
+Breaking change -> major dataset schema version.
+
+14.9 DELETION
+-------------
+Provider/privacy deletion:
+
+- remove affected bytes;
+- create tombstone;
+- update reproducibility status;
+- identify model descendants;
+- retrain/withdraw if required.
+
+14.10 BACKUP
+----------------
+Backup policy cannot exceed source retention rights.
+
+======================================================================
+15. DEPENDENCY LOCKING AND BUILD REPRODUCIBILITY
+======================================================================
+
+15.1 PYTHON PROJECT
+-------------------
+- exact `requires-python`;
+- `pyproject.toml`;
+- standards-compatible lock file;
+- separated runtime/dev/research groups.
+
+15.2 PYLOCK
+-----------
+Use `pylock.toml` when the chosen installer supports the PyPA standard.
+
+It is designed to specify dependencies for reproducible installation.
+
+15.3 HASHES
+-----------
+Every wheel/source artifact:
+
+- URL/index origin;
+- filename;
+- version;
+- SHA-256;
+- licence;
+- platform tags.
+
+15.4 WHEELHOUSE
+---------------
+Production release builds an internal wheelhouse or immutable package bundle.
+
+Production installation:
+
+- no dependency resolution;
+- no unpinned version;
+- no mutable Git branch;
+- no network where feasible;
+- hashes verified.
+
+15.5 SOURCE DISTRIBUTIONS
+------------------------
+Avoid building arbitrary source distributions on production hosts.
+
+If required:
+
+- controlled build environment;
+- compiler/toolchain recorded;
+- provenance;
+- output wheel hashed/scanned.
+
+15.6 OPERATING SYSTEM
+---------------------
+Record:
+
+- distribution;
+- version;
+- kernel;
+- architecture;
+- package manifest;
+- BLAS/OpenMP;
+- locale/timezone;
+- systemd/PostgreSQL versions.
+
+15.7 CONTAINERS
+---------------
+Optional.
+
+If used:
+
+- reference image by digest;
+- minimal/nonroot;
+- read-only filesystem where practical;
+- SBOM;
+- provenance/signature;
+- no floating `latest`.
+
+15.8 SBOM
+---------
+Generate CycloneDX JSON for every production release.
+
+Include:
+
+- Python;
+- OS/container packages where supported;
+- licences;
+- hashes;
+- dependency relationships.
+
+15.9 BUILD PROVENANCE
+---------------------
+Manifest:
+
+- source commit/tag;
+- builder identity;
+- build definition;
+- external parameters;
+- resolved dependencies;
+- start/end;
+- output hashes.
+
+15.10 SLSA ROADMAP
+------------------
+V1:
+provenance exists and is distributed with release evidence.
+
+Later:
+hosted signed provenance and verification.
+
+No false certification claim.
+
+15.11 DEPENDENCY CONFUSION
+-------------------------
+- explicit approved indexes;
+- internal namespaces reserved;
+- no unqualified private package name fetched from public index;
+- provenance/hash verification.
+
+======================================================================
+16. DETERMINISTIC SIMULATIONS
+======================================================================
+
+16.1 ROOT SEED
+--------------
+Every model training, backtest, simulation and optimiser SAA run stores a
+128-bit-or-greater root seed.
+
+16.2 SEED TREE
+--------------
+Use NumPy `SeedSequence`.
+
+Conceptual spawn key:
+
+    project
+    / run_id
+    / module
+    / model_version
+    / fixture_or_gameweek
+    / structural_world
+    / parameter_draw
+    / batch
+    / worker.
+
+16.3 INDEPENDENT STREAMS
+------------------------
+Changing worker count/order must not change scenario identity.
+
+Assign scenario/batch streams before scheduling.
+
+16.4 NO GLOBAL RNG
+------------------
+Ban:
+
+- `numpy.random.*` global convenience state in production modules;
+- implicit unseeded framework estimators;
+- Python `random` without injected instance;
+- worker PID/time-derived seeds.
+
+16.5 RNG VERSION
+----------------
+Store:
+
+- library;
+- BitGenerator;
+- version;
+- SeedSequence entropy/spawn key;
+- scenario range.
+
+16.6 SORTING
+------------
+Inputs and outputs have deterministic ordering:
+
+- UUID/key sort;
+- stable ties;
+- explicit locale;
+- no set/dict iteration dependence in hashed manifests.
+
+16.7 FLOATING POINT
+-------------------
+Bitwise reproducibility is not guaranteed across:
+
+- CPU architecture;
+- BLAS;
+- compiler;
+- parallel reduction;
+- library version.
+
+Define grades:
+
+A — BITWISE:
+same supported environment, identical hashes.
+
+B — NUMERIC:
+same semantic output within declared tolerance.
+
+C — STATISTICAL:
+distribution/proper scores within Monte Carlo bounds.
+
+Production/replay target:
+A on same release environment; B cross-host; C cross-major environment.
+
+16.8 THREADS
+------------
+Confirmatory/backtest runs:
+
+- fixed thread count;
+- deterministic solver settings where available.
+
+Fast production can use parallelism but records settings and requires numeric
+replay.
+
+16.9 SOLVERS
+------------
+Store:
+
+- solver/version;
+- seed;
+- threads;
+- tolerances;
+- time limit;
+- incumbent/bound.
+
+A timeout can change plan.
+That is recorded as execution variation, not hidden randomness.
+
+16.10 GPU
+----------------
+GPU is not required for V1.
+
+If introduced:
+
+- framework deterministic settings;
+- device/driver/CUDA version;
+- known nondeterministic operations;
+- statistical replay.
+
+16.11 REPRODUCTION TEST
+-----------------------
+Nightly/weekly sample:
+
+- rerun same artifact;
+- compare hash/tolerance;
+- alert.
+
+======================================================================
+17. TEST QUALITY AND COVERAGE
+======================================================================
+
+17.1 TEST PYRAMID
+-----------------
+- unit;
+- property-based;
+- golden rule cases;
+- contract;
+- database;
+- integration;
+- end-to-end;
+- replay;
+- security;
+- chaos;
+- performance;
+- restore.
+
+17.2 COVERAGE TARGETS
+---------------------
+Coverage is a floor, not evidence of correctness.
+
+Proposed production gates:
+
+RULES/SCORING/AUTOSUBS/PRICE/LEGAL CONSTRAINTS:
+- 100% defined rule cases;
+- line coverage >=95%;
+- branch coverage >=95%;
+- mutation score >=90%.
+
+SECURITY/RETENTION/OVERRIDE/PUBLICATION:
+- line >=95%;
+- branch >=90%;
+- mandatory negative/abuse cases.
+
+CORE MODELS/ORCHESTRATION:
+- line >=90%;
+- branch >=85%;
+- property/contract tests.
+
+PROVIDER ADAPTERS/UI/REPORTING:
+- line >=85%;
+- branch >=75%;
+- recorded fixture payloads/contract tests.
+
+Exceptions require approved rationale.
+
+17.3 MUTATION TESTING
+---------------------
+Mutate:
+
+- scoring constants;
+- thresholds;
+- deadline predicates;
+- permissions;
+- redaction;
+- retention;
+- cache signatures;
+- seed assignment;
+- solver constraints.
+
+Tests must fail.
+
+17.4 STATIC ANALYSIS
+--------------------
+- formatter/linter;
+- strict type checking for core;
+- dead-code/import analysis;
+- security scanner;
+- dependency vulnerability scan;
+- secret scan.
+
+17.5 PROPERTY TESTS
+-------------------
+- PMFs sum one;
+- legal plans;
+- cache determinism;
+- no postcutoff data;
+- no secret output;
+- retention monotonicity;
+- audit hash chain;
+- backup manifest integrity.
+
+17.6 CONTRACT TESTS
+-------------------
+- provider schemas;
+- OpenAPI;
+- artifacts;
+- model feature/output schemas;
+- CLI/API parity.
+
+17.7 CHAOS
+----------
+- database restart;
+- provider failure;
+- clock drift;
+- disk full;
+- worker OOM;
+- lost notification;
+- corrupt model;
+- expired secret;
+- revoked rights;
+- restore.
+
+17.8 SECURITY TESTS
+-------------------
+- authorization matrix;
+- path traversal;
+- artifact ID enumeration;
+- SQL injection;
+- malformed JSON;
+- rate limits;
+- log injection;
+- secret redaction;
+- backup access.
+
+17.9 TEST DATA
+--------------
+Synthetic/fake secrets and managers.
+No production secrets in tests.
+
+17.10 FLAKY TESTS
+-----------------
+Quarantine is temporary with:
+
+- owner;
+- issue;
+- expiry.
+
+A flaky critical test blocks release.
+
+======================================================================
+18. SECRETS MANAGEMENT
+======================================================================
+
+18.1 SECRET INVENTORY
+---------------------
+For every secret:
+
+- secret ID;
+- provider/system;
+- owner;
+- environment;
+- purpose;
+- service consumers;
+- creation;
+- rotation due;
+- expiry;
+- revocation method;
+- last access metadata;
+- classification;
+- recovery procedure.
+
+The value is not stored in the inventory database.
+
+18.2 SERVICE CREDENTIALS
+------------------------
+Use systemd credential files.
+
+Service reads:
+
+    $CREDENTIALS_DIRECTORY/<credential_name>
+
+18.3 ENCRYPTED CREDENTIALS
+--------------------------
+`systemd-creds encrypt` produces encrypted credentials for
+`LoadCredentialEncrypted=`.
+
+Use host/TPM-backed encryption where available and operationally understood.
+
+18.4 OFFLINE RECOVERY
+---------------------
+- encrypted `age` file;
+- separate recipient/private identity;
+- private identity held off host;
+- tested recovery;
+- two copies in controlled locations where practical.
+
+18.5 ENVIRONMENT VARIABLES
+--------------------------
+Not used for production secrets because they can leak through:
+
+- process inspection;
+- crash reports;
+- child processes;
+- debugging;
+- accidental dumps.
+
+18.6 COMMAND LINE
+-----------------
+Never pass secret values as CLI arguments.
+
+18.7 FILE PERMISSIONS
+---------------------
+- dedicated service user;
+- credential directory inaccessible to other users;
+- no shared service account;
+- no world/group read.
+
+18.8 SECRET ACCESS
+------------------
+Audit metadata:
+
+- service;
+- credential ID;
+- access/start event;
+- success/failure.
+
+Do not log value or hash that enables offline guessing.
+
+18.9 ROTATION
+----------------
+Baseline:
+
+- provider/API keys: 90 days where supported without service harm;
+- database service credentials: 90 days;
+- internal API tokens/certificates: short-lived/automated where possible;
+- backup encryption identity: annual review/rotation according to cryptoperiod
+  and recoverability;
+- immediate rotation after suspected exposure, staff/host change or provider
+  request.
+
+Provider limitations can change cadence but must be documented.
+
+18.10 ZERO-DOWNTIME ROTATION
+----------------------------
+Where provider supports two active keys:
+
+1. create new;
+2. deploy;
+3. verify;
+4. revoke old.
+
+Where only one key:
+
+- maintenance/retry plan;
+- deadline blackout for planned rotation.
+
+18.11 BREAK-GLASS
+----------------
+Emergency credential:
+
+- sealed/encrypted;
+- access logged;
+- use triggers incident/review;
+- rotated after use.
+
+18.12 SECRET BACKUP
+-------------------
+Only minimum recovery secrets.
+Never put plaintext secrets in general backups.
+
+======================================================================
+19. API-KEY HANDLING
+======================================================================
+
+19.1 ONE KEY PER PURPOSE
+------------------------
+Separate:
+
+- production;
+- development;
+- test;
+- replay where provider access is permitted.
+
+Do not share across unrelated services/users.
+
+19.2 PROVIDER ACCOUNT
+---------------------
+Respect account-seat and sharing rules.
+
+API-Sports terms state accounts are individual, prohibit multiple accounts to
+increase the free-plan limit and prohibit direct resale.
+
+Pulse uses one approved account/key and quota ledger.
+
+19.3 STORAGE
+------------
+Encrypted service credential only.
+
+19.4 TRANSPORT
+-------------
+TLS with certificate validation.
+
+No insecure fallback.
+
+19.5 HTTP CLIENT
+----------------
+Central provider client:
+
+- injects key;
+- redacts logs/traces;
+- enforces host allowlist;
+- sets timeout/rate limit;
+- captures safe quota headers;
+- rejects redirect to unapproved host when credential could follow.
+
+19.6 QUERY-PARAMETER KEYS
+------------------------
+Construct URL safely, but store/log only a sanitised URL template.
+
+19.7 QUOTA
+----------
+- per-key/provider ledger;
+- alert;
+- reserve;
+- no multi-account evasion;
+- no retry storm.
+
+19.8 SCOPE
+----------
+Use least provider permissions where selectable.
+
+No betting/order permissions for a read-only analytics service.
+
+19.9 REVOCATION
+----------------
+Runbook per provider and tested contact/access path.
+
+19.10 CLIENT-SIDE EXPOSURE
+-------------------------
+Provider keys never reach browser, UI bundle or downloadable artifact.
+
+======================================================================
+20. IDENTITY, ACCESS AND HOST SECURITY
+======================================================================
+
+20.1 UNIX USERS
+---------------
+Separate nonlogin service users:
+
+- API;
+- scheduler;
+- workers;
+- PostgreSQL backup;
+- monitoring.
+
+20.2 DATABASE ROLES
+-------------------
+Least privilege:
+
+- read;
+- ingestion;
+- model;
+- publication;
+- audit;
+- migration;
+- backup.
+
+No application superuser.
+
+20.3 ROLE REVIEW
+----------------
+Quarterly and after architecture/personnel change.
+
+20.4 API ACCESS
+---------------
+Private/loopback by default.
+
+If remote:
+
+- TLS;
+- authenticated;
+- firewall/VPN;
+- rate limit;
+- role authorization.
+
+20.5 SSH
+-------
+- key-based;
+- no password root login;
+- restricted users;
+- audited admin access.
+
+20.6 HOST HARDENING
+-------------------
+- supported OS;
+- security updates;
+- firewall default deny;
+- minimal packages;
+- disk encryption where practical;
+- automatic screen/console control;
+- time sync;
+- no unnecessary public services.
+
+20.7 SYSTEMD SANDBOXING
+-----------------------
+As compatible:
+
+- NoNewPrivileges;
+- ProtectSystem;
+- ProtectHome;
+- PrivateTmp;
+- RestrictAddressFamilies;
+- read/write path allowlists;
+- capability bounding;
+- resource limits.
+
+20.8 DATABASE NETWORK
+---------------------
+- Unix socket/local private network;
+- `pg_hba.conf` least access;
+- TLS for cross-host;
+- no public exposure.
+
+20.9 ARTIFACT PERMISSIONS
+------------------------
+Read/write by owning worker/service.
+Published read paths separate from raw/secret paths.
+
+20.10 FPL WRITE ACCESS
+----------------------
+Not stored or supported in V1.
+
+======================================================================
+21. BACKUPS AND DISASTER RECOVERY
+======================================================================
+
+21.1 OBJECTIVES
+---------------
+PROPOSED RPO:
+
+- PostgreSQL/control plane <=15 minutes during deadline week;
+- <=1 hour normal;
+- artifacts <= one completed task/publication.
+
+PROPOSED RTO:
+
+- latest valid read-only decision <=30 minutes;
+- full decision pipeline <=2 hours normal;
+- full historical/research capability <=24 hours.
+
+21.2 POSTGRESQL
+---------------
+- continuous WAL archive;
+- weekly full base backup;
+- optional supported incremental base backups after operational validation;
+- nightly `pg_dump` custom format for selective restore;
+- roles/global objects dump;
+- backup manifest.
+
+21.3 ARTIFACTS
+--------------
+- daily incremental/immutable replication;
+- immediate replication of published Decision Bundles/model/dataset manifests;
+- hash verification.
+
+21.4 THREE-COPY PRINCIPLE
+-------------------------
+Proposed:
+
+1. production;
+2. local separate backup media;
+3. encrypted off-host/offline copy.
+
+At least two failure domains.
+
+21.5 ENCRYPTION
+---------------
+Backups encrypted.
+Key stored separately.
+
+21.6 BACKUP ACCOUNT
+-------------------
+Dedicated least-privilege role.
+Backup destination credentials separate.
+
+21.7 VERIFICATION
+-----------------
+- verify PostgreSQL base backup manifests with `pg_verifybackup`;
+- verify WAL continuity;
+- hash artifact files;
+- test logical dump list/restore;
+- monitor completion.
+
+21.8 RESTORE TEST
+-----------------
+Monthly:
+
+1. isolated host/database;
+2. restore to selected point in time;
+3. verify schema/counts;
+4. verify model/artifact hashes;
+5. recreate one Decision Bundle;
+6. run one replay;
+7. document RPO/RTO.
+
+21.9 PRESEASON REHEARSAL
+------------------------
+Full disaster:
+
+- lost production database;
+- lost local artifact disk;
+- restore from off-host;
+- rotate credentials;
+- run deadline cycle.
+
+21.10 RETENTION
+----------------
+Proposed backup generations, subject to provider/privacy limits:
+
+- WAL/PITR: 14 days;
+- nightly logical: 30 days;
+- weekly base: 8 weeks;
+- monthly archive: 12 months;
+- selected season-end reproducibility backup: project lifetime where rights
+  permit.
+
+21.11 DELETION IN BACKUPS
+-------------------------
+Retention/deletion policy records when deleted data will age out of backups.
+
+For urgent legal/provider deletion:
+
+- restore process includes deletion replay/tombstone;
+- assess whether backup destruction is required;
+- document.
+
+21.12 RANSOMWARE/COMPROMISE
+---------------------------
+At least one backup copy not writable by normal production credentials.
+
+======================================================================
+22. ARTIFACT INTEGRITY AND RELEASE PROVENANCE
+======================================================================
+
+22.1 HASHING
+------------
+SHA-256 for:
+
+- files;
+- manifests;
+- Decision Bundles;
+- models;
+- datasets;
+- builds;
+- audit roots.
+
+22.2 SIGNING
+------------
+Recommended for production releases and promoted model/dataset manifests:
+
+- signing key isolated from build task;
+- signature/attestation stored separately;
+- verification before deployment/load.
+
+22.3 BUILD MANIFEST
+-------------------
+- source revision;
+- clean/dirty state;
+- build command;
+- builder;
+- dependency lock;
+- SBOM;
+- test result;
+- output hashes;
+- provenance.
+
+22.4 RELEASE STATES
+-------------------
+DRAFT
+TESTED
+APPROVED
+DEPLOYED
+ROLLED_BACK
+WITHDRAWN.
+
+22.5 DEPLOYMENT VERIFICATION
+----------------------------
+Before service start:
+
+- release hash;
+- provenance;
+- lock/environment;
+- rules/model aliases.
+
+22.6 UNTRUSTED ARTIFACT
+-----------------------
+Never load an external model, pickle or dataset into production without:
+
+- quarantine;
+- malware/schema scan;
+- rights review;
+- hash/provenance;
+- explicit approval.
+
+======================================================================
+23. PROVIDER LICENSING AND TERMS COMPLIANCE
+======================================================================
+
+23.1 RIGHTS PROFILE
+-------------------
+Fields:
+
+- provider/product/plan/account;
+- terms URL;
+- captured terms artifact/hash;
+- effective/observed date;
+- reviewer;
+- jurisdiction;
+- approved purpose;
+- automation right;
+- rate/quota;
+- account sharing;
+- geography;
+- raw caching;
+- raw retention;
+- derived retention;
+- model training;
+- backups;
+- public display;
+- redistribution;
+- commercial use;
+- attribution;
+- posttermination deletion;
+- third-party rights;
+- review due;
+- status.
+
+23.2 STATUSES
+-------------
+PENDING_REVIEW
+APPROVED_PRIVATE
+APPROVED_DERIVED_ONLY
+RESEARCH_ONLY
+TERMS_REVIEW_REQUIRED
+SUSPENDED
+TERMINATED
+PROHIBITED.
+
+23.3 ENFORCEMENT
+-----------------
+At ingestion:
+
+- active profile required;
+- request within access/quota/geography.
+
+At raw storage:
+
+- raw rights and retention.
+
+At dataset/model:
+
+- training/derived rights.
+
+At backup:
+
+- backup right and expiry.
+
+At export/UI:
+
+- display/redistribution/public rights.
+
+23.4 TERMS MONITORING
+---------------------
+- capture/hash at onboarding;
+- automated weekly page-change check;
+- manual quarterly review;
+- immediate review at launch, renewal, provider notice or material change;
+- old/new diff and decision.
+
+23.5 MATERIAL CHANGE
+--------------------
+Source moves to TERMS_REVIEW_REQUIRED.
+
+New ingestion/storage may be suspended based on risk.
+Existing data remain under the prior agreement/termination policy until reviewed.
+
+23.6 OFFICIAL FPL/PREMIER LEAGUE
+--------------------------------
+Initial status:
+AMBER / APPROVED_PRIVATE only after target-season review.
+
+Controls:
+
+- conservative cached requests;
+- no protected-page automation;
+- no public raw redistribution;
+- no mass manager sampling;
+- no use of logos/images without rights;
+- target-season terms snapshot;
+- personal manager data restricted.
+
+23.7 API-FOOTBALL / API-SPORTS
+------------------------------
+Current terms explicitly state:
+
+- accounts are individual;
+- multiple accounts to increase the free limit are forbidden;
+- direct resale is prohibited;
+- projects such as applications/websites/fantasy games are contemplated;
+- third-party competition/publication rights remain the user's responsibility;
+- the free plan/data can change;
+- service/data are not guaranteed.
+
+Pulse policy:
+
+- one account;
+- no quota evasion;
+- private internal use;
+- no raw resale/publication;
+- third-party rights AMBER;
+- retention/model-training rights recorded conservatively;
+- written clarification before commercial/public use.
+
+23.8 THE ODDS API
+-----------------
+Current documentation supplies:
+
+- API-key access;
+- quota headers;
+- rate-limit behaviour;
+- current/historical endpoint distinctions.
+
+Rights/terms profile MUST be captured from the provider's controlling Terms
+page before production retention.
+
+Until explicit review:
+
+- private transient/current use only;
+- no redistribution;
+- no assumption of indefinite raw retention;
+- historical paid endpoint not used under the zero-cost plan;
+- API key never logged.
+
+23.9 BETFAIR
+------------
+Historical portal terms indicate historical data are for personal/internal use.
+
+Delayed API use remains conditional on account/jurisdiction/licence and the
+written clarification identified in DMFP-04.
+
+Controls:
+
+- no betting/order permission;
+- no public raw redistribution;
+- delay label;
+- geography check;
+- licence/app-key status;
+- historical package rights/retention;
+- suspend if non-betting private analytics is not permitted.
+
+23.10 FOOTBALL-DATA.CO.UK
+-------------------------
+Use as private historical research under the rights position captured in
+DMFP-04.
+
+No public redistribution of files.
+Store attribution/source.
+Review any "all rights reserved" or updated terms.
+
+23.11 MANUAL WEB OBSERVATION
+----------------------------
+- human observation only;
+- no browser automation/scraping;
+- minimal extracted fact;
+- source URL/time;
+- screenshot only where permitted and restricted;
+- no geography bypass.
+
+23.12 PROVIDER IMAGES/LOGOS
+---------------------------
+Excluded by default.
+
+Identity text can be stored only as allowed.
+Visual assets require separate rights.
+
+23.13 TERMINATION
+-----------------
+Run termination workflow:
+
+- disable key;
+- stop jobs;
+- calculate deletion due dates;
+- delete raw/derived/backups as required;
+- tombstone;
+- mark impacted models/datasets;
+- preserve only permitted evidence.
+
+23.14 NO RIGHTS LAUNDERING
+--------------------------
+Transforming provider data does not automatically create unrestricted rights.
+
+======================================================================
+24. DATA RETENTION AND DELETION
+======================================================================
+
+24.1 PRINCIPLE
+--------------
+Retain only what is necessary for:
+
+- live decisions;
+- reproducibility;
+- approved research;
+- security/audit;
+- contractual/legal evidence.
+
+24.2 RETENTION POLICY OBJECT
+----------------------------
+- policy ID/version;
+- data class;
+- purpose;
+- provider;
+- personal-data status;
+- retention start;
+- duration/event;
+- archive;
+- backup;
+- deletion method;
+- owner;
+- authority;
+- exceptions.
+
+24.3 PROPOSED DEFAULT SCHEDULE
+------------------------------
+Subject to stricter provider/privacy controls.
+
+APPLICATION LOGS:
+- hot 30 days;
+- compressed 180 days;
+- selected deadline/error logs up to 2 years.
+
+TRACES:
+- detailed 30 days;
+- selected deadline traces with Decision Bundle up to 2 years.
+
+METRICS:
+- high-resolution 90 days;
+- downsampled aggregates 13 months.
+
+AUDIT/SECURITY EVENTS:
+- 2 years minimum.
+
+API REQUEST METADATA:
+- 90 days;
+- no secret/body.
+
+RAW PROVIDER PAYLOADS:
+- exact provider policy;
+- unknown rights: transient processing/quarantine maximum 24 hours, then delete
+  or block ingestion;
+- no general default extension.
+
+CANONICAL SOURCE FACTS:
+- provider-derived rights profile;
+- minimise reconstructible raw fields when only derived retention is approved.
+
+MODEL/DATASET MANIFESTS:
+- project lifetime plus 2 years after retirement where rights permit.
+
+MODEL ARTIFACTS:
+- champion/challenger and decision-used versions: project lifetime plus 2 years;
+- failed experiments: at least 2 years in metadata, artifacts as storage/rights
+  permit.
+
+DECISION BUNDLES:
+- project lifetime plus 2 years;
+- manager/rival personal fields pseudonymised/minimised.
+
+PRIVATE NAMED-RIVAL DATA:
+- current season plus 90 days unless Sebastian documents continuing purpose;
+- earlier deletion on withdrawal/request where applicable.
+
+BACKUPS:
+- DMFP-17 section 21 and strictest underlying retention.
+
+24.4 EXPIRY JOB
+----------------
+Daily:
+
+- identify due records/files/backups;
+- apply legal hold;
+- delete;
+- verify;
+- tombstone;
+- emit audit event.
+
+24.5 DELETION METHOD
+--------------------
+- database row/delete/crypto erasure as appropriate;
+- file unlink plus storage/version cleanup;
+- backup age-out or destruction;
+- secret revoke and secure erase;
+- cache invalidation.
+
+24.6 TOMBSTONE
+--------------
+Retain permitted nonpersonal metadata:
+
+- object ID/hash;
+- deletion time;
+- reason/policy;
+- actor;
+- affected descendants;
+- reproducibility impact.
+
+24.7 LEGAL/INCIDENT HOLD
+------------------------
+Temporary hold:
+
+- authority;
+- scope;
+- expiry/review;
+- access restriction.
+
+Does not silently override provider prohibition without review.
+
+24.8 RETENTION REVIEW
+---------------------
+Quarterly and on purpose/provider change.
+
+======================================================================
+25. PERSONAL DATA AND PRIVACY
+======================================================================
+
+25.1 APPLICABILITY
+------------------
+If Pulse processes identifiable manager/rival information, applicable data
+protection requirements must be assessed.
+
+For UK operation, engineering follows ICO principles including:
+
+- purpose limitation;
+- data minimisation;
+- accuracy;
+- storage limitation;
+- integrity/confidentiality;
+- accountability.
+
+25.2 LAWFUL PURPOSE
+-------------------
+Document:
+
+- private FPL decision support;
+- exact manager/rival modelling purpose;
+- necessity;
+- lawful basis where required;
+- recipients;
+- retention.
+
+25.3 PSEUDONYMISATION
+---------------------
+Replace manager identifiers in model datasets with internal UUIDs.
+
+Store re-identification mapping separately with restricted access.
+
+Pseudonymised data can remain personal data and is not treated as anonymous.
+
+25.4 NO UNNECESSARY PROFILE
+---------------------------
+Do not collect:
+
+- email;
+- IP;
+- demographic;
+- private communications;
+- location;
+
+unless required for security/operation and documented.
+
+25.5 ACCESS
+-----------
+Private rival-level details visible only to authorised Sebastian/operator roles.
+
+Reports default to aggregate cohorts.
+
+25.6 ACCURACY/CORRECTION
+------------------------
+Manager identity/action correction creates temporal record.
+
+25.7 EXPORT
+-----------
+No manager-level dataset exported or published without a new privacy/terms
+review.
+
+25.8 DATA-PROTECTION DESIGN REVIEW
+----------------------------------
+Required before:
+
+- multi-user product;
+- public rank/opponent service;
+- large manager sampling;
+- personal-data sharing;
+- external hosted analytics.
+
+25.9 BREACH
+-----------
+Security incident process assesses personal-data exposure and applicable
+notification duties.
+
+No specific legal reporting conclusion is automated.
+
+======================================================================
+26. VULNERABILITY AND PATCH MANAGEMENT
+======================================================================
+
+26.1 INVENTORY
+--------------
+SBOM and host package inventory.
+
+26.2 SCANNING
+-------------
+- every pull request/release;
+- daily advisory scan for production lock/SBOM;
+- weekly host package review;
+- provider SDK/client review.
+
+26.3 TRIAGE
+-----------
+Consider:
+
+- exploitability;
+- exposure;
+- affected path;
+- privileges;
+- fix availability;
+- deadline proximity;
+- compensating controls.
+
+CVSS alone does not determine action.
+
+26.4 RESPONSE TARGETS
+---------------------
+Proposed:
+
+CRITICAL exploitable:
+- immediate containment;
+- patch/rollback within 24 hours or service isolation.
+
+HIGH:
+- within 7 days.
+
+MEDIUM:
+- within 30 days.
+
+LOW:
+- scheduled release.
+
+Deadline constraints do not justify keeping an exposed Internet service online.
+
+26.5 DEPENDENCY UPDATE
+----------------------
+- update lock;
+- build;
+- run full tests;
+- generate SBOM/provenance;
+- staged deploy;
+- rollback.
+
+26.6 END-OF-LIFE
+----------------
+Unsupported Python/PostgreSQL/OS/framework:
+
+- upgrade plan;
+- production block after approved grace period.
+
+======================================================================
+27. SECURE DEVELOPMENT AND RELEASE MANAGEMENT
+======================================================================
+
+27.1 SSDF ALIGNMENT
+-------------------
+Pulse adopts NIST SSDF themes:
+
+- prepare the organisation;
+- protect software;
+- produce well-secured software;
+- respond to vulnerabilities.
+
+This is alignment, not certification.
+
+27.2 SOURCE CONTROL
+-------------------
+- all production code/config/migrations;
+- protected production branch/tag;
+- signed/attributed commits where practical;
+- no direct unreviewed production patch.
+
+27.3 REVIEW
+-----------
+Critical changes require Sebastian approval:
+
+- rules/scoring;
+- optimiser legality;
+- security/auth;
+- provider rights;
+- retention;
+- model champion;
+- publication gate.
+
+Where only one implementer exists, automated evidence plus explicit Sebastian
+approval is the compensating control; do not claim two-person review.
+
+27.4 CI GATES
+-------------
+- lock integrity;
+- format/lint/type;
+- unit/property/golden;
+- coverage/mutation thresholds;
+- secret scan;
+- dependency/SBOM;
+- security tests;
+- migration tests;
+- reproducibility;
+- licence checks.
+
+27.5 RELEASE
+------------
+- immutable tag/version;
+- build manifest;
+- SBOM;
+- provenance;
+- test report;
+- approval;
+- artifact hashes;
+- deployment record.
+
+27.6 EMERGENCY PATCH
+--------------------
+Allowed with:
+
+- incident ID;
+- minimal change;
+- immediate tests;
+- explicit approval;
+- retrospective full review;
+- normal release evidence.
+
+======================================================================
+28. INCIDENT RESPONSE
+======================================================================
+
+28.1 INCIDENT TYPES
+-------------------
+SECURITY
+DATA QUALITY
+MODEL
+PROVIDER TERMS
+PRIVACY
+AVAILABILITY
+BACKUP/RECOVERY
+DECISION INTEGRITY.
+
+28.2 PHASES
+-----------
+1. DETECT.
+2. TRIAGE.
+3. CONTAIN.
+4. PRESERVE EVIDENCE.
+5. ERADICATE/FIX.
+6. RECOVER.
+7. VALIDATE.
+8. COMMUNICATE.
+9. POST-INCIDENT REVIEW.
+10. TRACK CORRECTIVE ACTIONS.
+
+28.3 SEVERITY
+-------------
+Use P0–P3 from section 8 with security/privacy impact.
+
+28.4 SECRET INCIDENT
+--------------------
+- revoke/rotate;
+- block affected service;
+- inspect logs/access;
+- replace downstream credentials;
+- preserve safe evidence;
+- invalidate caches/artifacts if integrity uncertain.
+
+28.5 DECISION INCIDENT
+----------------------
+- withdraw Decision Bundle;
+- stop latest pointer;
+- issue correction;
+- identify execution state;
+- notify Sebastian;
+- replay with fixed inputs/code;
+- evaluate downstream impact.
+
+28.6 TERMS INCIDENT
+-------------------
+- stop provider ingestion/export;
+- isolate data;
+- review retention/deletion;
+- contact provider/adviser;
+- document.
+
+28.7 POSTMORTEM
+----------------
+Blameless technical record:
+
+- timeline;
+- detection;
+- impact;
+- root/contributing causes;
+- controls that failed;
+- recovery;
+- corrective owners/dates;
+- test/runbook changes.
+
+28.8 STATUS PAGE
+----------------
+Private operational incident view.
+
+======================================================================
+29. COMPLIANCE CONTROL REGISTER
+======================================================================
+
+29.1 CONTROL FIELDS
+-------------------
+- control ID;
+- domain;
+- objective;
+- risk;
+- implementation;
+- owner;
+- frequency;
+- evidence;
+- test;
+- status;
+- exceptions;
+- last/next review.
+
+29.2 CONTROL DOMAINS
+--------------------
+OBS:
+observability.
+
+SEC:
+security.
+
+IAM:
+identity/access.
+
+BCP:
+backup/recovery.
+
+ML:
+model/dataset.
+
+SDLC:
+software supply chain.
+
+LIC:
+provider licensing.
+
+PRIV:
+privacy.
+
+RET:
+retention.
+
+INC:
+incident.
+
+29.3 EXAMPLE CONTROLS
+---------------------
+OBS-001:
+Every published run has trace/run correlation.
+
+SEC-001:
+No production secret in environment/log/source.
+
+BCP-001:
+Monthly restore recreates a Decision Bundle.
+
+ML-001:
+Champion alias points to approved immutable model.
+
+SDLC-001:
+Release dependencies are locked and hashed.
+
+LIC-001:
+Every provider artifact has an active Rights Profile.
+
+RET-001:
+Daily expiry job verifies due deletion.
+
+PRIV-001:
+Rival model datasets are pseudonymised.
+
+29.4 EVIDENCE BUNDLE
+--------------------
+For each production release/season:
+
+- control register;
+- test report;
+- SBOM/provenance;
+- access review;
+- backup restore;
+- model/data registry;
+- provider terms hashes;
+- retention report;
+- incidents/exceptions.
+
+29.5 NO PAPER COMPLIANCE
+------------------------
+A documented control without working telemetry/test/evidence is NOT_IMPLEMENTED.
+
+======================================================================
+30. CONFIGURATION
+======================================================================
+
+config/assurance/
+  logging.yaml
+  redaction.yaml
+  tracing.yaml
+  metrics.yaml
+  alerts.yaml
+  freshness.yaml
+  drift.yaml
+  model_registry.yaml
+  dataset_registry.yaml
+  reproducibility.yaml
+  test_gates.yaml
+  secrets.yaml
+  access_control.yaml
+  backups.yaml
+  provider_rights.yaml
+  retention.yaml
+  privacy.yaml
+  vulnerability.yaml
+  incident.yaml
+  controls.yaml
+
+Every threshold/policy is:
+
+- versioned;
+- environment-scoped;
+- approved;
+- stored in the run/release manifest.
+
+======================================================================
+31. IMPLEMENTATION ARCHITECTURE
+======================================================================
+
+31.1 PACKAGES
+-------------
+src/dmf_pulse/assurance/
+
+- logging.py
+- redaction.py
+- tracing.py
+- metrics.py
+- alerts.py
+- freshness.py
+- drift.py
+- model_registry.py
+- dataset_registry.py
+- reproducibility.py
+- dependency_manifest.py
+- sbom.py
+- secrets.py
+- access.py
+- backups.py
+- provider_rights.py
+- retention.py
+- privacy.py
+- vulnerabilities.py
+- incidents.py
+- controls.py
+- schemas.py
+
+31.2 DATABASE SCHEMAS
+---------------------
+observability
+security
+registry
+compliance
+retention
+incident
+backup.
+
+31.3 TABLES
+-----------
+observability.alert
+observability.slo_measurement
+observability.freshness_state
+observability.drift_signal
+
+security.secret_metadata
+security.access_event
+security.audit_event
+security.audit_anchor
+security.vulnerability
+
+registry.model
+registry.model_version
+registry.model_alias
+registry.dataset
+registry.dataset_version
+registry.release
+registry.sbom
+registry.build_provenance
+
+compliance.provider_rights_profile
+compliance.terms_snapshot
+compliance.control
+compliance.control_evidence
+compliance.exception
+
+retention.policy
+retention.assignment
+retention.deletion_job
+retention.tombstone
+retention.hold
+
+backup.backup_run
+backup.backup_artifact
+backup.restore_test
+
+incident.incident
+incident.timeline_event
+incident.corrective_action.
+
+31.4 APPLICATION INTERFACES
+---------------------------
+emit_structured_event(event)
+
+record_audit_event(event)
+
+measure_freshness(source, cutoff, policy)
+
+evaluate_drift(model, reference, current)
+
+resolve_model_alias(name, alias)
+
+register_model_version(manifest)
+
+register_dataset_version(manifest)
+
+spawn_rng_stream(run_seed, path)
+
+load_service_credential(name)
+
+authorize(subject, action, resource)
+
+evaluate_provider_rights(profile, intended_use)
+
+apply_retention(policy, object)
+
+verify_backup(backup_id)
+
+open_incident(signal)
+
+======================================================================
+32. CLI COMMANDS
+======================================================================
+
+    dmf assurance doctor
+    dmf logs validate
+    dmf logs redaction-test
+    dmf traces show <run_id>
+    dmf metrics check-cardinality
+    dmf alerts list
+    dmf alerts acknowledge <id>
+    dmf freshness status
+    dmf drift evaluate
+    dmf registry models
+    dmf registry promote-model <version>
+    dmf registry withdraw-model <version>
+    dmf registry datasets
+    dmf registry verify <artifact>
+    dmf reproducibility replay <run_id>
+    dmf reproducibility compare <a> <b>
+    dmf dependencies verify
+    dmf dependencies sbom
+    dmf secrets inventory
+    dmf secrets rotate <id>
+    dmf access review
+    dmf backups run
+    dmf backups verify
+    dmf backups restore-test
+    dmf licensing status
+    dmf licensing capture-terms <provider>
+    dmf licensing diff-terms <provider>
+    dmf retention due
+    dmf retention apply
+    dmf privacy inventory
+    dmf incidents open
+    dmf incidents close
+    dmf controls status
+    dmf controls evidence
+
+======================================================================
+33. TEST AND CONTROL ACCEPTANCE
+======================================================================
+
+33.1 OBSERVABILITY
+------------------
+[ ] Every run/task log is valid JSON.
+[ ] Trace/run/task IDs correlate.
+[ ] Metric labels pass cardinality allowlist.
+[ ] No fake secret reaches any telemetry sink.
+[ ] Deadline dashboard survives a synthetic full run.
+
+33.2 FRESHNESS/DRIFT
+--------------------
+[ ] Every production source has freshness policy.
+[ ] Deadline escalation is tested.
+[ ] Drift distinguishes pre/post-label.
+[ ] Drift cannot auto-promote.
+[ ] Champion rollback works.
+
+33.3 SECRETS/ACCESS
+-------------------
+[ ] Production secrets use credential store.
+[ ] No secret in environment/source/CLI/log.
+[ ] Provider keys are separate by environment.
+[ ] Rotation/revocation is rehearsed.
+[ ] Database/API roles obey least privilege.
+[ ] No official FPL write credentials exist.
+
+33.4 REPRODUCIBILITY
+--------------------
+[ ] Dependency lock/hash verified.
+[ ] Release SBOM/provenance produced.
+[ ] Same-environment simulation reproduces.
+[ ] RNG streams independent of worker order.
+[ ] Model/dataset lineage complete.
+[ ] Historical decision replay succeeds.
+
+33.5 BACKUP
+-----------
+[ ] WAL/base/logical/artifact backups exist.
+[ ] Backup hashes/manifests verify.
+[ ] Monthly restore passes.
+[ ] Off-host copy cannot be overwritten by normal workers.
+[ ] RPO/RTO measured.
+
+33.6 LICENSING/RETENTION
+------------------------
+[ ] Every provider has approved Rights Profile.
+[ ] Terms snapshots/hashes are current.
+[ ] No quota/account evasion.
+[ ] Unknown raw retention fails closed.
+[ ] Backups obey provider retention.
+[ ] Termination deletion workflow tested.
+[ ] Public/commercial export defaults denied.
+
+33.7 PRIVACY
+------------
+[ ] Manager/rival data are inventoried.
+[ ] Pseudonymous IDs used in models.
+[ ] Names/external mapping restricted.
+[ ] Retention/minimisation review exists.
+[ ] Personal-data incident process exists.
+
+33.8 TEST QUALITY
+-----------------
+[ ] Coverage and mutation gates pass.
+[ ] Golden scoring/rules/security cases pass.
+[ ] Chaos and redaction tests pass.
+[ ] Critical flaky tests are zero.
+[ ] Production release evidence is complete.
+
+======================================================================
+34. IMMEDIATE IMPLEMENTATION TASKS
+======================================================================
+
+1. Create observability/security/registry/compliance/retention/backup/incident
+   database schemas.
+2. Implement structured JSON event library.
+3. Implement redaction allowlists and fake-secret tests.
+4. Propagate OpenTelemetry context through PostgreSQL tasks/outbox.
+5. Instrument Prometheus metrics with label allowlists.
+6. Build deadline-health dashboard queries.
+7. Implement alert state/deduplication/inhibition.
+8. Encode source freshness policies.
+9. Implement pre-label and post-label drift jobs.
+10. Build authoritative model registry and aliases.
+11. Build dataset registry/manifests/cards.
+12. Implement model/dataset promotion and withdrawal lineage.
+13. Adopt `pyproject.toml` plus hashed lock/release bundle.
+14. Generate CycloneDX SBOM.
+15. Generate release build provenance.
+16. Implement deterministic SeedSequence stream service.
+17. Add same-run and cross-environment reproducibility tests.
+18. Configure systemd encrypted credentials.
+19. Create secret inventory/rotation runbooks.
+20. Centralise provider HTTP clients and redaction.
+21. Harden Unix users/systemd/PostgreSQL roles.
+22. Configure WAL, base, logical and artifact backups.
+23. Run first isolated restore test.
+24. Implement provider Rights Profile enforcement.
+25. Capture/hash all provider terms.
+26. Implement terms change monitoring.
+27. Implement retention/deletion/tombstones.
+28. Implement manager/rival pseudonymisation and restricted identity map.
+29. Implement vulnerability/SBOM scanning.
+30. Create incident workflow and runbooks.
+31. Create control register/evidence bundle.
+32. Run full preseason assurance rehearsal.
+33. Do not enable production publication until every acceptance gate passes.
+
+======================================================================
+35. OPEN QUESTIONS
+======================================================================
+
+OBSERVABILITY
+-------------
+1. Which local telemetry backend/dashboard is selected?
+2. Is an OpenTelemetry Collector necessary on one host?
+3. What log/trace volume is expected?
+4. Which alerts need email versus desktop notification?
+5. What detailed metrics should be retained for 13 months?
+
+DRIFT
+-----
+6. Which feature/drift thresholds calibrate best by module?
+7. How many outcomes are needed before a performance P1?
+8. Which online change-point methods are useful?
+9. What champion rollback criteria are automatic versus approved?
+10. How are known regimes separated from unexpected drift?
+
+SECRETS
+-------
+11. Does the production host support TPM-bound systemd credentials?
+12. Where is the offline `age` identity held?
+13. Which providers permit multiple active keys for rotation?
+14. What rotation cadence is operationally safe around deadlines?
+15. Is a hardware token required for signing/recovery?
+
+DEPENDENCIES/SUPPLY CHAIN
+-------------------------
+16. Which tool writes/installs `pylock.toml`?
+17. Is a container used or a locked host virtual environment?
+18. Which SBOM/vulnerability scanner is selected?
+19. Can the build platform produce signed SLSA L2-equivalent provenance?
+20. Which packages require source builds?
+
+MODELS/DATASETS
+---------------
+21. Is custom PostgreSQL registry sufficient or is MLflow UI valuable?
+22. Which model formats avoid unsafe pickle?
+23. How are large posterior artifacts versioned?
+24. What rights deletion forces model withdrawal/retraining?
+25. Which dataset aliases are exposed to researchers?
+
+BACKUP
+------
+26. What off-host destination is available?
+27. What exact backup tool handles encrypted artifact replication?
+28. Are PostgreSQL incremental base backups used?
+29. Can RPO 15 minutes be achieved on the selected host?
+30. How much storage is required through the season?
+
+LICENSING
+---------
+31. Which current DMFP-04 provider stack is authoritative?
+32. What raw retention is explicitly approved by each provider?
+33. Does Betfair permit ongoing private delayed-key nonbetting analytics?
+34. What exact The Odds API terms control storage/derived use?
+35. Which source terms require deletion after account termination?
+36. Which provider data may appear in screenshots/reports?
+
+PRIVACY/RETENTION
+-----------------
+37. What lawful basis/purpose assessment applies to named rivals?
+38. How long are private mini-league histories truly necessary?
+39. What user deletion/export workflow is required for a future multi-user app?
+40. Are any historical manager samples sufficiently anonymised?
+41. Should audit/Decision Bundles be retained longer than two years?
+
+======================================================================
+36. RISK REGISTER
+======================================================================
+
+R-17-001 — Secrets logged in query URLs
+Probability: High
+Impact: Critical
+Mitigation:
+central client/redaction and canary tests.
+
+R-17-002 — Secrets stored in environment variables
+Probability: Medium
+Impact: Critical
+Mitigation:
+systemd credentials.
+
+R-17-003 — Shared provider key prevents attribution
+Probability: Medium
+Impact: High
+Mitigation:
+per-environment/service credentials.
+
+R-17-004 — Rotation breaks deadline pipeline
+Probability: Medium
+Impact: Critical
+Mitigation:
+dual-key rollout/blackout window/test.
+
+R-17-005 — Backup includes plaintext secrets
+Probability: Medium
+Impact: Critical
+Mitigation:
+separate encrypted secret recovery.
+
+R-17-006 — High-cardinality metrics exhaust monitoring
+Probability: High
+Impact: High
+Mitigation:
+label allowlist/cardinality test.
+
+R-17-007 — Logs lack trace correlation
+Probability: Medium
+Impact: High
+Mitigation:
+OTel context/task envelope.
+
+R-17-008 — Audit log altered by privileged actor
+Probability: Low/Medium
+Impact: Critical
+Mitigation:
+append-only role/hash chain/off-host anchor.
+
+R-17-009 — Logging outage crashes pipeline
+Probability: Medium
+Impact: High
+Mitigation:
+nonblocking logs/durable audit path.
+
+R-17-010 — Stale source appears healthy
+Probability: High
+Impact: Critical
+Mitigation:
+heartbeat plus freshness basis.
+
+R-17-011 — Freshness thresholds ignore deadline
+Probability: High
+Impact: Critical
+Mitigation:
+phase escalation.
+
+R-17-012 — Alert storm hides root cause
+Probability: High
+Impact: High
+Mitigation:
+deduplication/inhibition.
+
+R-17-013 — Alert has no action/runbook
+Probability: Medium
+Impact: High
+Mitigation:
+required payload/control owner.
+
+R-17-014 — One Gameweek triggers bad retrain
+Probability: High
+Impact: Critical
+Mitigation:
+small-sample drift policy/shadow gates.
+
+R-17-015 — Data drift mistaken for concept drift
+Probability: High
+Impact: High
+Mitigation:
+two-stage diagnosis.
+
+R-17-016 — Known manager regime called model failure
+Probability: Medium
+Impact: High
+Mitigation:
+regime tags.
+
+R-17-017 — Drift auto-promotes unvalidated model
+Probability: Medium
+Impact: Critical
+Mitigation:
+approval and DMFP-15.
+
+R-17-018 — Model registry alias points to unapproved artifact
+Probability: Medium
+Impact: Critical
+Mitigation:
+transactional state/constraints.
+
+R-17-019 — Model artifact loaded from unsafe pickle
+Probability: Medium
+Impact: Critical
+Mitigation:
+safe formats/trusted hash/isolation.
+
+R-17-020 — Dataset alias changes after training
+Probability: High
+Impact: Critical
+Mitigation:
+resolve immutable ID.
+
+R-17-021 — Provider deletion leaves untracked model descendants
+Probability: Medium
+Impact: Critical
+Mitigation:
+lineage/tombstone/withdrawal.
+
+R-17-022 — Dependency resolver installs newer package
+Probability: High
+Impact: Critical
+Mitigation:
+lock/wheelhouse/no network/hash.
+
+R-17-023 — Dependency confusion
+Probability: Medium
+Impact: Critical
+Mitigation:
+approved indexes/names/hash/provenance.
+
+R-17-024 — SBOM incomplete
+Probability: Medium
+Impact: High
+Mitigation:
+build/runtime comparison/manual exceptions.
+
+R-17-025 — False SLSA compliance claim
+Probability: Medium
+Impact: Reputational
+Mitigation:
+requirement-by-requirement verification.
+
+R-17-026 — RNG depends on worker scheduling
+Probability: High
+Impact: Critical
+Mitigation:
+preassigned SeedSequence tree.
+
+R-17-027 — Bitwise replay fails across CPU/BLAS
+Probability: High
+Impact: Medium
+Mitigation:
+reproducibility grades/tolerances/environment.
+
+R-17-028 — Multithreaded solver changes recommendation
+Probability: Medium
+Impact: High
+Mitigation:
+record/gap/common scenarios/confirmatory threads.
+
+R-17-029 — Coverage percentage creates false confidence
+Probability: High
+Impact: High
+Mitigation:
+mutation/golden/property/chaos tests.
+
+R-17-030 — Critical flaky test ignored
+Probability: Medium
+Impact: Critical
+Mitigation:
+release block/expiry.
+
+R-17-031 — Backup succeeds but cannot restore
+Probability: High
+Impact: Critical
+Mitigation:
+monthly restore.
+
+R-17-032 — Backup credentials compromised with host
+Probability: Medium
+Impact: Critical
+Mitigation:
+separate/offline credentials/read-only copy.
+
+R-17-033 — Backup retention violates provider terms
+Probability: Medium
+Impact: Critical
+Mitigation:
+rights-aware backup policy.
+
+R-17-034 — WAL gap destroys PITR
+Probability: Medium
+Impact: Critical
+Mitigation:
+archive monitoring/restore test.
+
+R-17-035 — Terms page changes unnoticed
+Probability: High
+Impact: Critical
+Mitigation:
+hash/diff/review.
+
+R-17-036 — API-Sports free-limit evasion
+Probability: Low/Medium
+Impact: Critical
+Mitigation:
+one account/quota ledger.
+
+R-17-037 — Derived output assumed unrestricted
+Probability: High
+Impact: Critical
+Mitigation:
+rights profile/no laundering.
+
+R-17-038 — Public report redistributes raw provider data
+Probability: Medium
+Impact: Critical
+Mitigation:
+export rights gate.
+
+R-17-039 — Betfair geography/licence changes
+Probability: Medium
+Impact: Critical
+Mitigation:
+periodic account/terms check.
+
+R-17-040 — Official FPL private interface overused
+Probability: Medium
+Impact: High
+Mitigation:
+conservative caching/no mass sampling.
+
+R-17-041 — Personal rival data overcollected
+Probability: Medium
+Impact: High
+Mitigation:
+purpose/minimisation/pseudonymisation.
+
+R-17-042 — Pseudonymised data called anonymous
+Probability: Medium
+Impact: High
+Mitigation:
+privacy classification.
+
+R-17-043 — Retention deletion not applied to caches/backups
+Probability: Medium
+Impact: Critical
+Mitigation:
+lineage/backup age-out/tombstones.
+
+R-17-044 — Security incident not linked to affected decisions
+Probability: Medium
+Impact: High
+Mitigation:
+run/artifact lineage.
+
+R-17-045 — Emergency patch bypasses evidence
+Probability: Medium
+Impact: Critical
+Mitigation:
+incident release process/retrospective review.
+
+R-17-046 — Unsupported dependency remains in production
+Probability: Medium
+Impact: High
+Mitigation:
+EOL inventory/update plan.
+
+R-17-047 — Host disk encryption key unavailable during recovery
+Probability: Low/Medium
+Impact: Critical
+Mitigation:
+tested recovery key process.
+
+R-17-048 — Assurance complexity exceeds one-person operation
+Probability: High
+Impact: Strategic
+Mitigation:
+automation, tiered controls, simple authoritative systems.
+
+======================================================================
+37. SOURCE REGISTER
+======================================================================
+
+Research access date unless stated:
+2026-07-17
+
+----------------------------------------------------------------------
+SRC-OTEL-LOGS-2026-001
+Title:
+OpenTelemetry Logs Data Model
+
+Organisation:
+OpenTelemetry
+
+URL:
+https://opentelemetry.io/docs/specs/otel/logs/data-model/
+
+Relevant claim:
+Defines a stable common model for log records, including timestamps, severity,
+body, resources, attributes and trace correlation.
+
+Reliability:
+HIGH official specification.
+
+Pulse reliance:
+YES for structured logging.
+
+----------------------------------------------------------------------
+SRC-OTEL-CONTEXT-2026-001
+Title:
+OpenTelemetry Context Propagation
+
+Organisation:
+OpenTelemetry
+
+URL:
+https://opentelemetry.io/docs/concepts/context-propagation/
+
+Relevant claim:
+Context propagation correlates traces, metrics and logs across process/service
+boundaries.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-OTEL-SEMCONV-2026-001
+Title:
+OpenTelemetry Semantic Conventions
+
+Organisation:
+OpenTelemetry
+
+URL:
+https://opentelemetry.io/docs/specs/semconv/
+
+Relevant claim:
+Defines common semantic names and meanings for telemetry attributes and signals.
+
+Reliability:
+HIGH official specification; individual conventions can have differing
+stability.
+
+Pulse reliance:
+YES with stability/version capture.
+
+----------------------------------------------------------------------
+SRC-PROM-2026-001
+Title:
+Prometheus Instrumentation Practices
+
+Organisation:
+Prometheus project
+
+URL:
+https://prometheus.io/docs/practices/instrumentation/
+https://prometheus.io/docs/practices/naming/
+
+Relevant claim:
+Metric labels create additional time series; high-cardinality labels should be
+avoided, and metrics should use stable names/base units.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-SSDF-2022-001
+Title:
+Secure Software Development Framework Version 1.1 — NIST SP 800-218
+
+Organisation:
+National Institute of Standards and Technology
+
+URL:
+https://csrc.nist.gov/pubs/sp/800/218/final
+
+Relevant claim:
+Defines a core set of secure software-development practices that can be
+integrated into an SDLC to reduce vulnerabilities and address root causes.
+
+Reliability:
+HIGH official standard/guidance.
+
+Pulse reliance:
+YES for SDLC control structure.
+
+----------------------------------------------------------------------
+SRC-SECRETS-OWASP-2026-001
+Title:
+Secrets Management Cheat Sheet
+
+Organisation:
+OWASP
+
+URL:
+https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+
+Relevant claims:
+Recommends centralised and standardised lifecycle management, access control,
+auditing, rotation, detection and incident handling for API keys and other
+secrets.
+
+Reliability:
+HIGH recognised security guidance.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-KEYS-NIST-2020-001
+Title:
+Recommendation for Key Management, Part 1 Revision 5 — NIST SP 800-57
+
+Organisation:
+NIST
+
+URL:
+https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final
+
+Relevant claim:
+Provides general lifecycle and cryptographic-key-management guidance.
+
+Reliability:
+HIGH official.
+
+Pulse reliance:
+YES conceptually for encryption/signing/backup keys.
+
+----------------------------------------------------------------------
+SRC-SYSTEMD-CREDS-2026-001
+Title:
+systemd-creds and systemd.exec Credentials
+
+Organisation:
+systemd project
+
+URLs:
+https://www.freedesktop.org/software/systemd/man/systemd-creds.html
+https://www.freedesktop.org/software/systemd/man/systemd.exec.html
+
+Relevant claim:
+systemd can pass limited-size credentials securely to service processes and
+supports encrypted credentials through `LoadCredentialEncrypted=`.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for V1 secret delivery.
+
+----------------------------------------------------------------------
+SRC-AGE-2026-001
+Title:
+age — file encryption tool and format
+
+Project:
+FiloSottile/age
+
+URL:
+https://github.com/FiloSottile/age
+
+Relevant claim:
+Provides a small, composable public-key/passphrase file-encryption tool suitable
+for encrypted recovery artifacts.
+
+Reliability:
+HIGH established open-source project; not a regulatory standard.
+
+Pulse reliance:
+YES for offline recovery-copy candidate.
+
+----------------------------------------------------------------------
+SRC-PG-BACKUP-2026-001
+Title:
+PostgreSQL pg_basebackup / Continuous Archiving / pg_verifybackup
+
+Organisation:
+PostgreSQL Global Development Group
+
+URLs:
+https://www.postgresql.org/docs/current/app-pgbasebackup.html
+https://www.postgresql.org/docs/current/continuous-archiving.html
+https://www.postgresql.org/docs/current/app-pgverifybackup.html
+
+Relevant claims:
+Base backups can seed point-in-time recovery; WAL archiving supports recovery;
+backup manifests can be verified.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-PYLOCK-2026-001
+Title:
+pylock.toml Specification
+
+Organisation:
+Python Packaging Authority
+
+URL:
+https://packaging.python.org/en/latest/specifications/pylock-toml/
+
+Relevant claim:
+Defines a lock-file format for reproducible Python environment installation.
+
+Reliability:
+HIGH official Python packaging specification.
+
+Pulse reliance:
+YES when toolchain support is selected.
+
+----------------------------------------------------------------------
+SRC-SLSA-2026-001
+Title:
+SLSA Specification Version 1.2
+
+Organisation:
+SLSA / Linux Foundation
+
+URL:
+https://slsa.dev/spec/v1.2/
+https://slsa.dev/spec/v1.2/build-track-basics
+
+Relevant claims:
+Defines source/build tracks and build levels from provenance existence through
+hosted and hardened builds.
+
+Reliability:
+HIGH official specification.
+
+Pulse reliance:
+YES for supply-chain roadmap, without unsupported certification claims.
+
+----------------------------------------------------------------------
+SRC-CYCLONEDX-2026-001
+Title:
+CycloneDX Bill of Materials Standard
+
+Organisation:
+OWASP / Ecma International
+
+URL:
+https://cyclonedx.org/
+
+Relevant claim:
+Defines an SBOM/BOM standard with component, dependency, licence and security
+metadata.
+
+Reliability:
+HIGH official standard/project.
+
+Pulse reliance:
+YES for release SBOM.
+
+----------------------------------------------------------------------
+SRC-NUMPY-RNG-2026-001
+Title:
+NumPy SeedSequence
+
+Organisation:
+NumPy project
+
+URL:
+https://numpy.org/doc/stable/reference/random/bit_generators/generated/numpy.random.SeedSequence.html
+https://numpy.org/doc/stable/reference/random/index.html
+
+Relevant claim:
+SeedSequence reproducibly mixes entropy and can spawn independent, very probably
+non-overlapping child random streams.
+
+Reliability:
+HIGH official documentation.
+
+Pulse reliance:
+YES for deterministic parallel simulations.
+
+----------------------------------------------------------------------
+SRC-MLFLOW-REGISTRY-2026-001
+Title:
+MLflow Model Registry
+
+Organisation:
+MLflow project
+
+URL:
+https://mlflow.org/docs/latest/ml/model-registry/
+
+Relevant claim:
+A model registry can maintain immutable versions with aliases, tags and
+metadata; aliases can point to a champion version.
+
+Reliability:
+HIGH official project documentation.
+
+Pulse reliance:
+OPTIONAL UI/integration reference.
+
+----------------------------------------------------------------------
+SRC-ICO-MINIMISATION-2026-001
+Title:
+Data minimisation
+
+Organisation:
+UK Information Commissioner's Office
+
+URL:
+https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-protection-principles/a-guide-to-the-data-protection-principles/data-minimisation/
+
+Relevant claim:
+Organisations should identify and hold the minimum personal data needed for
+their stated purpose.
+
+Reliability:
+HIGH official UK regulator guidance.
+
+Pulse reliance:
+YES where UK data protection applies.
+
+----------------------------------------------------------------------
+SRC-ICO-RETENTION-2026-001
+Title:
+Storage limitation
+
+Organisation:
+UK Information Commissioner's Office
+
+URL:
+https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-protection-principles/a-guide-to-the-data-protection-principles/storage-limitation/
+
+Relevant claim:
+Identifiable personal data should not be retained longer than necessary for its
+purpose, subject to applicable safeguards/exceptions.
+
+Reliability:
+HIGH official guidance.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-ICO-SECURITY-2026-001
+Title:
+A guide to data security
+
+Organisation:
+UK Information Commissioner's Office
+
+URL:
+https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/security/a-guide-to-data-security/
+
+Relevant claim:
+Personal data security requires risk-appropriate technical and organisational
+measures covering confidentiality, integrity, availability and recovery.
+
+Reliability:
+HIGH official guidance.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-API-SPORTS-TERMS-2026-001
+Title:
+API-Sports Terms of Service
+
+Organisation:
+API-Sports
+
+URL:
+https://api-sports.io/terms
+
+Relevant claims:
+Accounts are individual; multiple accounts to increase the free limit are
+forbidden; direct resale is prohibited; third-party rights remain the user's
+responsibility; the service/free plan/data are not guaranteed and can change.
+
+Reliability:
+HIGH controlling provider terms, subject to future change.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-ODDSAPI-DOCS-2026-001
+Title:
+The Odds API V4 Documentation
+
+Organisation:
+The Odds API
+
+URL:
+https://the-odds-api.com/liveapi/guides/v4/
+
+Relevant claims:
+Documents API-key use, quota headers, rate limits and current/historical
+endpoint behaviour.
+
+Reliability:
+HIGH provider documentation; controlling storage/use terms require separate
+Terms capture.
+
+Pulse reliance:
+YES for technical/API-key controls.
+
+----------------------------------------------------------------------
+SRC-BETFAIR-HISTORY-2026-001
+Title:
+Betfair Historical Data Portal and Terms
+
+Organisation:
+Betfair
+
+URL:
+https://historicdata.betfair.com/
+
+Relevant claim:
+Historical data portal identifies personal/internal-use restrictions and
+package terms.
+
+Reliability:
+HIGH provider source; exact account/jurisdiction terms must be retained.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-FPL-TERMS-2026-001
+Title:
+Fantasy Premier League Terms and Conditions
+
+Organisation:
+Premier League
+
+URL:
+https://fantasy.premierleague.com/help/terms
+
+Relevant claim:
+Controlling living terms for use of the official FPL game.
+
+Reliability:
+HIGH official; target-season capture required.
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-001
+Title:
+DMFP-04 — Data Sources, Markets, APIs and Licensing
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-002
+Title:
+DMFP-05 — Ingestion, Storage and Data Quality
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-003
+Title:
+DMFP-15 — Backtesting, Calibration and Benchmarks
+
+Pulse reliance:
+YES.
+
+----------------------------------------------------------------------
+SRC-INTERNAL-2026-004
+Title:
+DMFP-16 — Orchestration, APIs and Decision Pipeline
+
+Pulse reliance:
+YES.
+
+======================================================================
+38. NEXT DOCUMENT HANDOFF
+======================================================================
+
+Next:
+DMFP-18 — DECISION UI, REPORTING AND EXPLANATIONS
+
+DMFP-18 must consume the assurance state defined here and show:
+
+- data freshness;
+- degraded dependencies;
+- model/dataset/version lineage;
+- confidence and drift;
+- source/licensing restrictions on display;
+- decision issue/cutoff age;
+- solver/Monte Carlo diagnostics;
+- active overrides;
+- current incidents;
+- replay/evaluation evidence.
+
+No UI may hide a P0/P1 assurance state behind a clean recommendation card.
+
+======================================================================
+39. VERSION HISTORY
+======================================================================
+
+v0.9 — 2026-07-17
+
+- Defined structured OpenTelemetry-compatible logs.
+- Added trace correlation and low-cardinality Prometheus metrics.
+- Added deadline-centred SLOs, freshness and alert severity.
+- Added pipeline, database, artifact, backup and security monitoring.
+- Added multi-stage model-drift detection and response.
+- Defined authoritative model and dataset registries.
+- Added model/dataset cards, aliases, lineage and withdrawal.
+- Selected hashed Python lock/release bundle and SBOM.
+- Added SLSA-aligned build-provenance roadmap.
+- Defined deterministic SeedSequence simulation streams and reproducibility
+  grades.
+- Added coverage, mutation, property, security, chaos and restore testing.
+- Selected encrypted systemd credentials and offline age recovery.
+- Added API-key lifecycle, redaction, quota and revocation controls.
+- Added host, database and access hardening.
+- Defined WAL/base/logical/artifact backups and restore rehearsals.
+- Added tamper-evident audit hash chains and external anchors.
+- Added provider Rights Profiles and terms monitoring.
+- Added source-specific retention/deletion/tombstones.
+- Added personal-data minimisation and pseudonymisation.
+- Added vulnerability, release and incident management.
+- Added control register, evidence bundle, risks, sources and acceptance gates.
+
+Future v1.0:
+- Sebastian approves security and retention decisions.
+- credential store and access roles are configured.
+- logging/redaction/trace/metric tests pass.
+- model/dataset registries are operational.
+- dependency lock, SBOM and build provenance are generated.
+- backup restore and disaster rehearsal pass.
+- all provider rights profiles are approved.
+- retention and privacy reviews are complete.
+- DMFP-18 and production publication are authorised.
+
+END OF DOCUMENT
