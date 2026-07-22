@@ -15,6 +15,7 @@
 - [x] 2026-07-22T14:28:55Z — RUL-002.1: implemented strict safe-subset YAML, exact typed authoring schemas and cross-file coherence, deterministic compilation/hash/diff, in-memory integrity revalidation, and atomic immutable lifecycle gates.
 - [x] 2026-07-22T14:28:55Z — RUL-002.2: implemented pure configured scoring/BPS/competition-ranking/Gameweek aggregation; corrected v1.1 goldens plus boundary, property, lifecycle, schema, and false-success mutation probes pass with 98.84% rules branch coverage in the focused run.
 - [x] 2026-07-22T15:14:18Z — RUL-002.3: exposed all rules CLI commands, updated package/docs/least-privilege CI, and passed the final precommit quality gate with 200 tests, zero skips, 90.81% overall branch coverage, 98.88% rules branch coverage, frozen-lock validation, clean-wheel verification, repository validation, and secret scanning. The exact 19-command final ledger, actual-commit evidence, and 20-file ZIP are deliberately generated from the clean committed tree into ignored evidence/review paths.
+- [x] 2026-07-22T15:19:54Z — RUL-002.4: the first post-commit ledger run exposed a strict-prefix defect for otherwise successful rules commands; changed the generic success summary to the required `PASS:` form and added a focused false-failure regression test before rerunning acceptance from a new commit.
 
 ### RUL-002 decision log
 

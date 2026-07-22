@@ -419,7 +419,7 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
         "uv run python scripts/validate_repository.py": "PASS: repository errors 0",
         "uv run python scripts/scan_secrets.py": "PASS: secret findings 0",
     }
-    return summaries.get(command.display, "PASS")
+    return summaries.get(command.display, "PASS: command completed")
 
 
 def run_command(command: AcceptanceCommand) -> CommandRecord:
