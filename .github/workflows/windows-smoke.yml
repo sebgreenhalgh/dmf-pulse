@@ -15,6 +15,7 @@ jobs:
     timeout-minutes: 15
     env:
       UV_NO_PROGRESS: "1"
+      UV_CACHE_DIR: ${{ runner.temp }}/uv-cache
     steps:
       - name: Check out without persisted credentials
         uses: actions/checkout@v4
@@ -37,6 +38,7 @@ jobs:
           uv run dmf --version
           uv run dmf doctor --json
           uv run dmf config validate --environment test --config-root config
+          uv run dmf rules validate fixtures/rules/RUL-002/synthetic_complete --json
 
       - name: Package smoke outside source tree
         env:

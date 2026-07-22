@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from datetime import UTC, datetime
@@ -16,8 +17,17 @@ from dmf_pulse.assurance.review_pack import calculate_review_payload_digest  # n
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ticket", default="FND-001")
+    parser.add_argument("--baseline")
+    arguments = parser.parse_args()
     generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
-    digest = calculate_review_payload_digest(REPOSITORY_ROOT, generated_at=generated_at)
+    digest = calculate_review_payload_digest(
+        REPOSITORY_ROOT,
+        generated_at=generated_at,
+        ticket=arguments.ticket,
+        baseline=arguments.baseline,
+    )
     print(json.dumps({"payload_sha256": digest}, sort_keys=True))
     return 0
 

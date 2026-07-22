@@ -1,0 +1,6 @@
+sources:
+  - source_id: "SRC-DMFP-02-REFERENCE-2025-26"
+    source_type: "APPROVED_MODULE_SPECIFICATION"
+    status: "VERIFIED"
+    locator: "DMFP-02 section 13.2 and RUL-002 reference contract"
+rule_source_default: "SRC-DMFP-02-REFERENCE-2025-26"

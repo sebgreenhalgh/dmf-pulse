@@ -1,7 +1,426 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DMF Pulse Codex Result",
-  "type": "object",
+  "$defs": {
+    "CommandRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "title": "Command",
+          "type": "string"
+        },
+        "duration_seconds": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Seconds"
+        },
+        "exit_code": {
+          "title": "Exit Code",
+          "type": "integer"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result"
+        }
+      },
+      "required": [
+        "command",
+        "exit_code"
+      ],
+      "title": "CommandRecord",
+      "type": "object"
+    },
+    "FileChange": {
+      "additionalProperties": false,
+      "properties": {
+        "change": {
+          "title": "Change",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "change"
+      ],
+      "title": "FileChange",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "RepositoryState": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseline"
+        },
+        "branch": {
+          "title": "Branch",
+          "type": "string"
+        },
+        "clean": {
+          "title": "Clean",
+          "type": "boolean"
+        },
+        "head": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Head",
+          "type": "string"
+        },
+        "merged": {
+          "title": "Merged",
+          "type": "boolean"
+        },
+        "pushed": {
+          "title": "Pushed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "branch",
+        "head",
+        "clean",
+        "pushed",
+        "merged"
+      ],
+      "title": "RepositoryState",
+      "type": "object"
+    },
+    "ResultStatus": {
+      "enum": [
+        "COMPLETE",
+        "BLOCKED",
+        "FAILED"
+      ],
+      "title": "ResultStatus",
+      "type": "string"
+    },
+    "ReviewPackReference": {
+      "additionalProperties": false,
+      "properties": {
+        "archive_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Archive Sha256"
+        },
+        "file_count": {
+          "maximum": 20,
+          "minimum": 1,
+          "title": "File Count",
+          "type": "integer"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "payload_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Payload Sha256"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        }
+      },
+      "required": [
+        "path",
+        "file_count"
+      ],
+      "title": "ReviewPackReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "COMPLETE"
+          },
+          "ticket_id": {
+            "not": {
+              "const": "FND-001"
+            }
+          }
+        },
+        "required": [
+          "status",
+          "ticket_id"
+        ]
+      },
+      "then": {
+        "properties": {
+          "code_commit": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code_commit"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "ticket_id": {
+            "const": "RUL-002"
+          }
+        },
+        "required": [
+          "ticket_id"
+        ]
+      },
+      "then": {
+        "properties": {
+          "code_commit": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "repository": {
+            "properties": {
+              "baseline": {
+                "const": "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
+              },
+              "branch": {
+                "const": "stage/A2/RUL-002-rules-foundation"
+              },
+              "clean": {
+                "const": true
+              },
+              "merged": {
+                "const": false
+              },
+              "pushed": {
+                "const": false
+              }
+            },
+            "required": [
+              "baseline",
+              "branch",
+              "clean",
+              "head",
+              "merged",
+              "pushed"
+            ],
+            "type": "object"
+          },
+          "review_pack": {
+            "properties": {
+              "archive_sha256": {
+                "type": "null"
+              },
+              "file_count": {
+                "const": 20
+              },
+              "path": {
+                "const": "review_pack/RUL-002/DMF_PULSE_RUL-002_REVIEW.zip"
+              },
+              "sha256": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "file_count",
+              "path",
+              "payload_sha256"
+            ]
+          }
+        },
+        "required": [
+          "code_commit",
+          "repository"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "acceptance": {
+      "items": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "type": "object"
+      },
+      "title": "Acceptance",
+      "type": "array"
+    },
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "code_commit": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Code Commit"
+    },
+    "commands": {
+      "items": {
+        "$ref": "#/$defs/CommandRecord"
+      },
+      "title": "Commands",
+      "type": "array"
+    },
+    "dependency_impact": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Dependency Impact"
+    },
+    "exclusions_verified": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Exclusions Verified",
+      "type": "array"
+    },
+    "files_changed": {
+      "items": {
+        "$ref": "#/$defs/FileChange"
+      },
+      "title": "Files Changed",
+      "type": "array"
+    },
+    "migration_impact": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Migration Impact"
+    },
+    "public_interfaces": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Public Interfaces",
+      "type": "array"
+    },
+    "repository": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RepositoryState"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "review_pack": {
+      "$ref": "#/$defs/ReviewPackReference"
+    },
+    "risks": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Risks",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/ResultStatus"
+    },
+    "summary": {
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "tests": {
+      "items": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "type": "object"
+      },
+      "title": "Tests",
+      "type": "array"
+    },
+    "ticket_id": {
+      "maxLength": 40,
+      "minLength": 3,
+      "pattern": "^[A-Z0-9]+(?:[-.][A-Z0-9]+)*$",
+      "title": "Ticket Id",
+      "type": "string"
+    }
+  },
   "required": [
     "ticket_id",
     "status",
@@ -14,129 +433,6 @@
     "risks",
     "review_pack"
   ],
-  "properties": {
-    "ticket_id": {
-      "const": "FND-001"
-    },
-    "status": {
-      "enum": [
-        "COMPLETE",
-        "BLOCKED",
-        "FAILED"
-      ]
-    },
-    "summary": {
-      "type": "string",
-      "minLength": 1
-    },
-    "files_changed": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "path",
-          "change"
-        ],
-        "properties": {
-          "path": {
-            "type": "string"
-          },
-          "change": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      }
-    },
-    "public_interfaces": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "commands": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "command",
-          "exit_code"
-        ],
-        "properties": {
-          "command": {
-            "type": "string"
-          },
-          "exit_code": {
-            "type": "integer"
-          },
-          "duration_seconds": {
-            "type": "number"
-          },
-          "result": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      }
-    },
-    "tests": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
-    },
-    "acceptance": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
-    },
-    "dependency_impact": {
-      "type": "string"
-    },
-    "migration_impact": {
-      "type": "string"
-    },
-    "assumptions": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "exclusions_verified": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "risks": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "review_pack": {
-      "type": "object",
-      "required": [
-        "path",
-        "file_count",
-        "sha256"
-      ],
-      "properties": {
-        "path": {
-          "type": "string"
-        },
-        "file_count": {
-          "type": "integer",
-          "maximum": 20
-        },
-        "sha256": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
-        }
-      },
-      "additionalProperties": false
-    }
-  },
-  "additionalProperties": false
+  "title": "CodexResult",
+  "type": "object"
 }

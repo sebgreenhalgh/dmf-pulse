@@ -20,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ticket", default="FND-001")
     parser.add_argument("--output", type=Path, default=Path("review_pack/FND-001"))
+    parser.add_argument("--baseline")
     return parser.parse_args()
 
 
@@ -31,6 +32,7 @@ def main() -> int:
             ticket=arguments.ticket,
             output=arguments.output,
             generated_at=datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+            baseline=arguments.baseline,
         )
     except ReviewPackError as exc:
         print(json.dumps(exc.as_error_object(), indent=2, sort_keys=True))
@@ -40,7 +42,8 @@ def main() -> int:
             {
                 "file_count": summary.file_count,
                 "path": summary.path.as_posix(),
-                "sha256": summary.sha256,
+                "archive_sha256": summary.sha256,
+                "payload_sha256": summary.payload_sha256,
                 "status": "PASS",
             },
             indent=2,

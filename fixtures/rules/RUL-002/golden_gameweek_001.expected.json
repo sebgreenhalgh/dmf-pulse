@@ -1,0 +1,17 @@
+{
+  "fixture_ids": [
+    "synthetic-fixture-001",
+    "synthetic-fixture-002"
+  ],
+  "gameweek_id": "synthetic-gw-001",
+  "player_totals": {
+    "away-def": 2,
+    "away-fwd": 2,
+    "home-def": 9,
+    "home-fwd": 14,
+    "home-gk": 8,
+    "home-mid": 8
+  },
+  "ruleset_hash": "<COMPILED_HASH_INSERTED_BY_TEST_FROM_ARTIFACT>",
+  "ruleset_id": "fpl-synthetic-2099-2100"
+}

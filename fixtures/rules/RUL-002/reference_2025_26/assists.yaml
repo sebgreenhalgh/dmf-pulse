@@ -1,0 +1,4 @@
+points: 3
+input_contract: "RESOLVED_ELIGIBLE_ASSIST_COUNT"
+classification_states: ["DEFINITE_ASSIST", "DEFINITE_NO_ASSIST", "AMBIGUOUS_ASSIST"]
+ambiguous_state_allowed_for_exact_scoring: false

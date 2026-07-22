@@ -8,6 +8,7 @@ from typing import Final, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from dmf_pulse.assurance.canonical import sha256_file
+from dmf_pulse.assurance.tickets import validate_ticket_id
 
 EXCLUDED_PARTS: Final = {
     ".git",
@@ -18,13 +19,13 @@ EXCLUDED_PARTS: Final = {
     ".venv",
     ".coverage",
     "__pycache__",
+    "artifacts",
     "build",
     "dist",
     "htmlcov",
     "coverage.xml",
     "review_pack",
 }
-GENERATED_EVIDENCE_PREFIX: Final = "evidence/tickets/FND-001/"
 PRESERVED_EVIDENCE: Final = {"evidence/tickets/FND-001/baseline_manifest.json"}
 CURRENT_MANIFEST_PATH: Final = "evidence/tickets/FND-001/current_manifest.json"
 
@@ -41,7 +42,7 @@ class RepositoryFile(ManifestModel):
 
 class RepositoryManifest(ManifestModel):
     schema_version: Literal["1.0"] = "1.0"
-    ticket_id: Literal["FND-001"] = "FND-001"
+    ticket_id: str = "FND-001"
     scope: Literal["repository-deliverables-excluding-generated-evidence"] = (
         "repository-deliverables-excluding-generated-evidence"
     )
@@ -50,6 +51,7 @@ class RepositoryManifest(ManifestModel):
 
     @model_validator(mode="after")
     def unique_sorted_paths(self) -> RepositoryManifest:
+        validate_ticket_id(self.ticket_id)
         paths = [item.path for item in self.files]
         if paths != sorted(paths):
             raise ValueError("repository manifest paths must be sorted")
@@ -62,23 +64,24 @@ def _excluded(relative: Path) -> bool:
     path = relative.as_posix()
     if any(part in EXCLUDED_PARTS for part in relative.parts):
         return True
-    if path == CURRENT_MANIFEST_PATH:
+    if path.endswith("/current_manifest.json") and path.startswith("evidence/tickets/"):
         return True
-    return path.startswith(GENERATED_EVIDENCE_PREFIX) and path not in PRESERVED_EVIDENCE
+    return path.startswith("evidence/tickets/") and path not in PRESERVED_EVIDENCE
 
 
-def build_repository_manifest(root: Path) -> RepositoryManifest:
+def build_repository_manifest(root: Path, *, ticket_id: str = "FND-001") -> RepositoryManifest:
     """Hash every deliverable except operational output and self-referential evidence."""
 
+    validated_ticket = validate_ticket_id(ticket_id)
     files = []
     for candidate in sorted(root.rglob("*"), key=lambda item: item.as_posix()):
-        if not candidate.is_file():
-            continue
         relative = candidate.relative_to(root)
         if _excluded(relative):
             continue
         if candidate.is_symlink():
             raise ValueError(f"repository manifest refuses symlink: {relative.as_posix()}")
+        if not candidate.is_file():
+            continue
         files.append(
             RepositoryFile(
                 path=relative.as_posix(),
@@ -87,9 +90,10 @@ def build_repository_manifest(root: Path) -> RepositoryManifest:
             )
         )
     return RepositoryManifest(
+        ticket_id=validated_ticket,
         exclusions=[
-            "Git metadata, virtual environments, caches, builds, coverage HTML, and review output",
-            "generated FND-001 evidence except the immutable baseline manifest",
+            "Git metadata, virtual environments, caches, generated artifacts/builds, coverage HTML, and review output",
+            "generated ticket evidence except the immutable FND-001 baseline manifest",
             "the current manifest itself",
         ],
         files=files,
@@ -99,7 +103,7 @@ def build_repository_manifest(root: Path) -> RepositoryManifest:
 def validate_repository_manifest(root: Path, expected: RepositoryManifest) -> list[str]:
     """Return exact current-manifest drift errors."""
 
-    actual = build_repository_manifest(root)
+    actual = build_repository_manifest(root, ticket_id=expected.ticket_id)
     expected_by_path = {item.path: item for item in expected.files}
     actual_by_path = {item.path: item for item in actual.files}
     errors = []

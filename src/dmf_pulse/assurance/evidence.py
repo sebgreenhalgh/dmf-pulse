@@ -9,10 +9,31 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, JsonValue, ValidationError, model_validator
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    ConfigDict,
+    Field,
+    JsonValue,
+    StrictBool,
+    StrictFloat,
+    StrictInt,
+    ValidationError,
+    model_validator,
+)
+
+from dmf_pulse.assurance.tickets import validate_ticket_id
 
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+GIT_COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 MAX_EVIDENCE_BYTES = 10 * 1024 * 1024
+TicketId = Annotated[
+    str,
+    Field(min_length=3, max_length=40, pattern=r"^[A-Z0-9]+(?:[-.][A-Z0-9]+)*$"),
+    AfterValidator(validate_ticket_id),
+]
+Sha256 = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+GitCommit = Annotated[str, Field(pattern=r"^[0-9a-f]{40}$")]
 
 
 class StrictEvidenceModel(BaseModel):
@@ -34,20 +55,116 @@ class FileChange(StrictEvidenceModel):
 
 class CommandRecord(StrictEvidenceModel):
     command: str
-    exit_code: int
-    duration_seconds: float | None = None
+    exit_code: StrictInt
+    duration_seconds: StrictFloat | StrictInt | None = None
     result: str | None = None
 
 
 class ReviewPackReference(StrictEvidenceModel):
     path: str
-    file_count: Annotated[int, Field(ge=1, le=20)]
-    sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    file_count: Annotated[StrictInt, Field(ge=1, le=20)]
+    payload_sha256: Sha256 | None = None
+    archive_sha256: Sha256 | None = None
+    sha256: Sha256 | None = None
+
+    @model_validator(mode="after")
+    def digest_semantics(self) -> ReviewPackReference:
+        if self.payload_sha256 is None and self.sha256 is None:
+            raise ValueError("review pack requires payload_sha256 (or legacy sha256)")
+        if self.payload_sha256 is not None and self.sha256 is not None:
+            raise ValueError("legacy sha256 cannot be combined with payload_sha256")
+        return self
+
+    @property
+    def effective_payload_sha256(self) -> str:
+        """Return the stable payload digest, including the legacy FND field."""
+
+        value = self.payload_sha256 if self.payload_sha256 is not None else self.sha256
+        if value is None:  # pragma: no cover - guarded by validation
+            raise ValueError("review payload digest is unavailable")
+        return value
+
+
+class RepositoryState(StrictEvidenceModel):
+    branch: str
+    head: GitCommit
+    baseline: GitCommit | None = None
+    clean: StrictBool
+    pushed: StrictBool
+    merged: StrictBool
 
 
 class CodexResult(StrictEvidenceModel):
-    ticket_id: Literal["FND-001"]
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "status": {"const": "COMPLETE"},
+                            "ticket_id": {"not": {"const": "FND-001"}},
+                        },
+                        "required": ["status", "ticket_id"],
+                    },
+                    "then": {
+                        "properties": {
+                            "code_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"}
+                        },
+                        "required": ["code_commit"],
+                    },
+                },
+                {
+                    "if": {
+                        "properties": {"ticket_id": {"const": "RUL-002"}},
+                        "required": ["ticket_id"],
+                    },
+                    "then": {
+                        "properties": {
+                            "code_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+                            "repository": {
+                                "properties": {
+                                    "baseline": {
+                                        "const": "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
+                                    },
+                                    "branch": {"const": "stage/A2/RUL-002-rules-foundation"},
+                                    "clean": {"const": True},
+                                    "merged": {"const": False},
+                                    "pushed": {"const": False},
+                                },
+                                "required": [
+                                    "baseline",
+                                    "branch",
+                                    "clean",
+                                    "head",
+                                    "merged",
+                                    "pushed",
+                                ],
+                                "type": "object",
+                            },
+                            "review_pack": {
+                                "properties": {
+                                    "archive_sha256": {"type": "null"},
+                                    "file_count": {"const": 20},
+                                    "path": {
+                                        "const": "review_pack/RUL-002/DMF_PULSE_RUL-002_REVIEW.zip"
+                                    },
+                                    "sha256": {"type": "null"},
+                                },
+                                "required": ["file_count", "path", "payload_sha256"],
+                            },
+                        },
+                        "required": ["code_commit", "repository"],
+                    },
+                },
+            ]
+        },
+    )
+
+    ticket_id: TicketId
     status: ResultStatus
+    code_commit: GitCommit | None = None
     summary: Annotated[str, Field(min_length=1)]
     files_changed: list[FileChange]
     public_interfaces: list[str] = []
@@ -59,41 +176,124 @@ class CodexResult(StrictEvidenceModel):
     assumptions: list[str]
     exclusions_verified: list[str] = []
     risks: list[str]
+    repository: RepositoryState | None = None
     review_pack: ReviewPackReference
+
+    @model_validator(mode="after")
+    def complete_result_has_commit(self) -> CodexResult:
+        legacy_fnd = self.ticket_id == "FND-001" and self.review_pack.sha256 is not None
+        if self.status is ResultStatus.COMPLETE and self.code_commit is None and not legacy_fnd:
+            raise ValueError("COMPLETE evidence requires an exact Git commit")
+        if self.ticket_id == "RUL-002":
+            expected_path = "review_pack/RUL-002/DMF_PULSE_RUL-002_REVIEW.zip"
+            if (
+                self.review_pack.payload_sha256 is None
+                or self.review_pack.sha256 is not None
+                or self.review_pack.archive_sha256 is not None
+                or self.review_pack.path != expected_path
+                or self.review_pack.file_count != 20
+            ):
+                raise ValueError("RUL-002 requires the exact detached 20-file review reference")
+            if (
+                self.repository is None
+                or self.repository.branch != "stage/A2/RUL-002-rules-foundation"
+                or self.repository.head != self.code_commit
+                or self.repository.baseline != "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
+                or not self.repository.clean
+                or self.repository.pushed
+                or self.repository.merged
+            ):
+                raise ValueError("RUL-002 requires exact clean repository provenance")
+        return self
 
 
 class EvidenceArtifact(StrictEvidenceModel):
     path: str
     sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
-    bytes: Annotated[int, Field(ge=0)]
+    bytes: Annotated[StrictInt, Field(ge=0)]
 
 
 class TicketEvidenceManifest(StrictEvidenceModel):
-    ticket_id: str
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "status": {"const": "COMPLETE"},
+                            "ticket_id": {"not": {"const": "FND-001"}},
+                        },
+                        "required": ["status", "ticket_id"],
+                    },
+                    "then": {
+                        "properties": {
+                            "code_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"}
+                        },
+                        "required": ["code_commit"],
+                    },
+                }
+            ]
+        },
+    )
+
+    ticket_id: TicketId
     status: Literal["DRAFT", "COMPLETE", "BLOCKED", "FAILED"]
     created_at: str
-    code_commit: str | None = None
+    code_commit: GitCommit | None = None
     context_hash: str | None = None
     commands: list[dict[str, JsonValue]]
     artifacts: list[EvidenceArtifact]
     known_limitations: list[str] = []
 
+    @model_validator(mode="after")
+    def complete_manifest_has_commit(self) -> TicketEvidenceManifest:
+        if self.status == "COMPLETE" and self.code_commit is None and self.ticket_id != "FND-001":
+            raise ValueError("COMPLETE evidence manifest requires an exact Git commit")
+        return self
+
 
 class ReviewFile(StrictEvidenceModel):
     name: str
     sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
-    bytes: Annotated[int, Field(ge=0)]
+    bytes: Annotated[StrictInt, Field(ge=0)]
     purpose: str
 
 
 class ReviewManifest(StrictEvidenceModel):
-    ticket_id: Literal["FND-001"]
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {"ticket_id": {"const": "RUL-002"}},
+                        "required": ["ticket_id"],
+                    },
+                    "then": {
+                        "properties": {
+                            "archive_sha256": {"type": "null"},
+                            "baseline": {"const": "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"},
+                            "file_count": {"const": 20},
+                        },
+                        "required": ["baseline", "payload_sha256"],
+                    },
+                }
+            ]
+        },
+    )
+
+    ticket_id: TicketId
     generated_at: str
-    repository_head: str
+    repository_head: GitCommit
     baseline: str | None = None
-    file_count: Annotated[int, Field(ge=1, le=20)]
+    file_count: Annotated[StrictInt, Field(ge=1, le=20)]
     files: Annotated[list[ReviewFile], Field(max_length=20)]
     acceptance_status: ResultStatus
+    payload_sha256: Sha256 | None = None
+    archive_sha256: Sha256 | None = None
 
     @model_validator(mode="after")
     def unique_file_names(self) -> ReviewManifest:
@@ -102,6 +302,13 @@ class ReviewManifest(StrictEvidenceModel):
             raise ValueError("review manifest contains duplicate file names")
         if self.file_count < len(self.files):
             raise ValueError("file_count cannot be smaller than the detached file list")
+        if self.ticket_id == "RUL-002" and (
+            self.baseline != "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
+            or self.file_count != 20
+            or self.payload_sha256 is None
+            or self.archive_sha256 is not None
+        ):
+            raise ValueError("RUL-002 review manifest provenance is invalid")
         return self
 
 
@@ -196,8 +403,13 @@ def validate_evidence_file(path: Path) -> ValidatedEvidence:
             "EVIDENCE_FILE_TOO_LARGE", "evidence exceeds the 10 MiB limit"
         )
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        value = json.loads(
+            path.read_text(encoding="utf-8"),
+            parse_constant=lambda value: (_ for _ in ()).throw(
+                ValueError(f"non-finite JSON constant is prohibited: {value}")
+            ),
+        )
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
         raise EvidenceValidationError(
             "EVIDENCE_JSON_INVALID", "evidence is not valid UTF-8 JSON"
         ) from exc

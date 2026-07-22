@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import importlib.metadata
 import json
@@ -138,7 +139,7 @@ def build_report(generated_at: str) -> dict[str, Any]:
     }
 
 
-def _markdown(report: dict[str, Any]) -> str:
+def _markdown(report: dict[str, Any], ticket: str) -> str:
     packages = report["packages"]
     rows = [
         "| Package | Version | Relationship | Licence |",
@@ -153,7 +154,7 @@ def _markdown(report: dict[str, Any]) -> str:
     unknown = report["unknown_license_packages"]
     unknown_text = ", ".join(f"`{name}`" for name in unknown) if unknown else "None."
     return (
-        "# FND-001 dependency report\n\n"
+        f"# {ticket} dependency report\n\n"
         f"Generated: `{report['generated_at']}`\n\n"
         f"Frozen lock SHA-256: `{report['lock_sha256']}`\n\n"
         f"Locked packages: **{report['lock_package_count']}**\n\n"
@@ -170,14 +171,18 @@ def _markdown(report: dict[str, Any]) -> str:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ticket", choices=("FND-001", "RUL-002"), default="FND-001")
+    arguments = parser.parse_args()
     generated_at = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     report = build_report(generated_at)
-    EVIDENCE_ROOT.mkdir(parents=True, exist_ok=True)
-    (EVIDENCE_ROOT / "dependency_report.json").write_text(
+    evidence_root = REPOSITORY_ROOT / "evidence" / "tickets" / arguments.ticket
+    evidence_root.mkdir(parents=True, exist_ok=True)
+    (evidence_root / "dependency_report.json").write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
     )
-    (EVIDENCE_ROOT / "DEPENDENCY_REPORT.md").write_text(
-        _markdown(report), encoding="utf-8", newline="\n"
+    (evidence_root / "DEPENDENCY_REPORT.md").write_text(
+        _markdown(report, arguments.ticket), encoding="utf-8", newline="\n"
     )
     print(
         json.dumps(

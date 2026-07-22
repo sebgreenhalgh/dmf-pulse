@@ -13,6 +13,8 @@ import pytest
 
 
 def _copy_validation_fixture(repository_root: Path, destination: Path) -> None:
+    destination.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(repository_root / "AGENTS.md", destination / "AGENTS.md")
     for directory in ("specs", "docs/implementation", "tickets", "evidence"):
         source = repository_root / directory
         target = destination / directory
@@ -100,6 +102,18 @@ def test_validator_reports_missing_package_files_without_traceback(
     validate_package(tmp_path, errors)
     assert "required repository file missing: .python-version" in errors
     assert "required repository file missing: src/dmf_pulse/__init__.py" in errors
+
+    runtime_directory = tmp_path / "specs/manifests"
+    runtime_directory.mkdir(parents=True)
+    runtime_path = runtime_directory / "runtime_lock_manifest.json"
+    runtime = json.loads(
+        (repository_root / "specs/manifests/runtime_lock_manifest.json").read_text("utf-8")
+    )
+    runtime["packages"][0]["version"] = "999.0.0"
+    runtime_path.write_text(json.dumps(runtime), encoding="utf-8")
+    graph_errors: list[str] = []
+    validate_package(tmp_path, graph_errors)
+    assert any("does not exactly match the uv.lock graph" in error for error in graph_errors)
 
 
 @pytest.mark.integration

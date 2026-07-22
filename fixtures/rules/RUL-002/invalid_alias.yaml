@@ -1,0 +1,3 @@
+base: &base
+  points: 2
+copy: *base

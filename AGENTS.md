@@ -6,17 +6,21 @@ Implement only the active approved milestone. Preserve governance, security, rep
 
 ## Authority
 
-1. Accepted decisions in `specs/manifests/decision_manifest.json`.
-2. The active ticket and acceptance contract under `tickets/` for implementation detail.
-3. The most-specific approved DMFP module in `specs/approved/`.
+1. Current official target-season FPL rules and controlling provider terms.
+2. Newest approved ACTIVE/ACCEPTED DMFP-20 decision.
+3. Most-specific accepted DMFP module specification.
 4. DMFP-00 master architecture.
-5. The implementation playbook, this file, and repository guidance.
+5. Earlier notes and exploratory research.
+6. Implementation convenience.
+
+Tickets constrain scope, allowed files, public contracts, tests and acceptance; they cannot override a higher authority.
+Tickets are subordinate execution contracts to all six authority levels above.
 
 Use `specs/manifests/authority_manifest.json` to resolve each scope. Stop on a genuine conflict and record exact locators/hashes; do not invent FPL rules, provider rights, numerical models, or future architecture decisions.
 
 ## Foundation constraints
 
-- Distribution/import/command: `dmf-pulse`, `dmf_pulse`, and `dmf`; canonical version `0.1.0`.
+- Distribution/import/command: `dmf-pulse`, `dmf_pulse`, and `dmf`; canonical version `0.2.0` for RUL-002.
 - Python 3.13, uv, Hatchling, and `src/` layout.
 - FND-001 runtime dependencies are limited to Pydantic v2, Typer, and PyYAML plus unavoidable transitives.
 - FND-001 development dependencies are limited to Ruff, mypy, pytest, Hypothesis, coverage, build, and unavoidable transitives.
@@ -26,6 +30,14 @@ Use `specs/manifests/authority_manifest.json` to resolve each scope. Stop on a g
 - CPU compatibility is required. NVIDIA/CUDA is optional discovery only and must degrade healthily.
 - Support Windows PowerShell and Linux/POSIX. Canonical automation uses uv/Python, not Bash or Make alone.
 - No broad TODO, `pass`, `NotImplementedError`, hidden stub, fake success, or future-stage placeholder module in accepted scope.
+
+## Rules foundation constraints
+
+- Rules are versioned split YAML compiled to canonical JSON; policy values never hide in scorer code.
+- YAML is a strict safe subset: no duplicate keys, anchors, aliases, merges, custom tags, non-string keys, implicit dates, or binary floats.
+- `REFERENCE_ONLY` may score research/synthetic scenarios. `CAPTURED_UNVERIFIED` may validate, compile, show, and diff but cannot activate; unresolved required values also block scoring.
+- Runtime scoring is pure and explicitly bound to a compiled ruleset hash. Active artifacts are immutable and never resolved through a mutable `latest` alias.
+- Never infer an incomplete target-season rule, source right, approval, or activation state.
 
 ## Repository map
 

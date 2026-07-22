@@ -1,4 +1,33 @@
-# DMF Pulse execution plan — FND-001
+# DMF Pulse execution plans
+
+## RUL-002 — governance remediation and rules foundation
+
+- Ticket/stage: `RUL-002`, A2.
+- Required branch/baseline: `stage/A2/RUL-002-rules-foundation` from `12049a7de23a4a8fcca3d219dbcab1bf5e1027ea`.
+- Outcome: generic governed evidence, a strict split-YAML rules compiler and lifecycle, pure fixture/Gameweek scoring, deterministic CLI contracts, and a validated review ZIP capped at 20 root files.
+- Authority: official target-season rules/provider terms; newest ACTIVE/ACCEPTED DMFP-20 decision; most-specific accepted module; DMFP-00; earlier research; implementation convenience. Ticket contracts are subordinate execution constraints.
+- Constraints: offline; no new dependencies; no database/provider/model/optimiser/UI code; no activation or inferred completion of the partial 2026/27 ruleset; no push or merge.
+
+### RUL-002 checkpoints
+
+- [x] 2026-07-22T12:00:00Z — verified the v1.1 correction notice, all pack and fixture hashes, corrected independent oracles, exact baseline/branch/clean-tree preconditions, and the 104-test FND baseline.
+- [x] 2026-07-22T14:28:55Z — RUL-002.0: generated the complete 94-entry DMFP-20 index, hash-pinned stage authority requirements, generic ticket/evidence/review contracts, and exact runtime lock graph; authority and assurance targeted tests pass.
+- [x] 2026-07-22T14:28:55Z — RUL-002.1: implemented strict safe-subset YAML, exact typed authoring schemas and cross-file coherence, deterministic compilation/hash/diff, in-memory integrity revalidation, and atomic immutable lifecycle gates.
+- [x] 2026-07-22T14:28:55Z — RUL-002.2: implemented pure configured scoring/BPS/competition-ranking/Gameweek aggregation; corrected v1.1 goldens plus boundary, property, lifecycle, schema, and false-success mutation probes pass with 98.84% rules branch coverage in the focused run.
+- [x] 2026-07-22T15:14:18Z — RUL-002.3: exposed all rules CLI commands, updated package/docs/least-privilege CI, and passed the final precommit quality gate with 200 tests, zero skips, 90.81% overall branch coverage, 98.88% rules branch coverage, frozen-lock validation, clean-wheel verification, repository validation, and secret scanning. The exact 19-command final ledger, actual-commit evidence, and 20-file ZIP are deliberately generated from the clean committed tree into ignored evidence/review paths.
+
+### RUL-002 decision log
+
+- The v1.1 fixture family is immutable input. No v1.0 digest, expected output, or manifest is admissible.
+- The checked 2026/27 deltas remain `CAPTURED_UNVERIFIED`; all unannounced rule families are typed blockers, so scoring/activation cannot guess.
+- The reference/synthetic scorer consumes only compiled configuration and explicit aggregate scenario facts. Zero-minute Gameweek placeholders are excluded from BPS/bonus ranking.
+- `payload_sha256` is the stable detached primary-payload digest. `archive_sha256` is reported only after ZIP creation and cannot be embedded as a self-hash.
+- Command 19 is invoked exactly once against a write-ahead ledger; after the invocation, its measured duration replaces the provisional entry and the same assembler refreshes the final archive without rerunning the CLI command. Final archive digest/CRC evidence remains external to avoid self-reference.
+- Two narrow ticket-required changes fall outside the enumerated `allowed_areas`: `src/dmf_pulse/__init__.py` is the existing canonical version source that must become `0.2.0`, and `.gitignore` must exclude regenerable RUL evidence so COMPLETE evidence can name the actual commit while the final tree remains clean. No other out-of-list path is changed.
+
+---
+
+# FND-001 historical execution plan
 
 ## Ticket and outcome
 

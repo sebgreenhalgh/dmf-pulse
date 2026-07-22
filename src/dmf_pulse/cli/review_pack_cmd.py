@@ -20,6 +20,10 @@ review_pack_app = typer.Typer(help="Build and validate capped ticket review pack
 def build_command(
     ticket: Annotated[str, typer.Option("--ticket", help="Exact ticket ID.")],
     output: Annotated[Path, typer.Option("--output", help="ZIP path or output directory.")],
+    baseline: Annotated[
+        str | None,
+        typer.Option("--baseline", help="Exact baseline Git commit for non-bootstrap tickets."),
+    ] = None,
 ) -> None:
     """Build the root-only, maximum-20-file FND-001 review ZIP."""
 
@@ -30,6 +34,7 @@ def build_command(
             ticket=ticket,
             output=output,
             generated_at=generated_at,
+            baseline=baseline,
         )
     except ReviewPackError as exc:
         typer.echo(json.dumps(exc.as_error_object(), sort_keys=True), err=True)
@@ -41,7 +46,7 @@ def build_command(
                 "ok": True,
                 "path": summary.path.as_posix(),
                 "payload_sha256": summary.payload_sha256,
-                "sha256": summary.sha256,
+                "archive_sha256": summary.sha256,
             },
             sort_keys=True,
         )

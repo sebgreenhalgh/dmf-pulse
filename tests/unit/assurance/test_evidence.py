@@ -12,6 +12,7 @@ from dmf_pulse.assurance.evidence import (
     CodexResult,
     EvidenceKind,
     EvidenceValidationError,
+    RepositoryState,
     ReviewManifest,
     TicketEvidenceManifest,
     validate_evidence_data,
@@ -81,6 +82,38 @@ def test_schema_error_is_actionable_and_never_echoes_rejected_input() -> None:
 
 
 @pytest.mark.unit
+def test_machine_evidence_rejects_scalar_coercion() -> None:
+    value = _result()
+    commands = value["commands"]
+    assert isinstance(commands, list)
+    commands[0]["exit_code"] = "0"
+    with pytest.raises(EvidenceValidationError):
+        validate_evidence_data(value)
+
+    with pytest.raises(ValueError):
+        RepositoryState.model_validate(
+            {
+                "branch": "stage/A2/RUL-002-rules-foundation",
+                "head": "a" * 40,
+                "clean": "true",
+                "pushed": 0,
+                "merged": False,
+            }
+        )
+
+    review = {
+        "ticket_id": "FND-001",
+        "generated_at": "2026-07-22T00:00:00Z",
+        "repository_head": "a" * 40,
+        "file_count": "1",
+        "files": [],
+        "acceptance_status": "BLOCKED",
+    }
+    with pytest.raises(ValueError):
+        ReviewManifest.model_validate(review)
+
+
+@pytest.mark.unit
 def test_unknown_shape_and_invalid_json_have_exact_codes(tmp_path: Path) -> None:
     with pytest.raises(EvidenceValidationError) as unknown:
         validate_evidence_data({"ticket_id": "FND-001"})
@@ -91,6 +124,11 @@ def test_unknown_shape_and_invalid_json_have_exact_codes(tmp_path: Path) -> None
     with pytest.raises(EvidenceValidationError) as invalid:
         validate_evidence_file(path)
     assert invalid.value.code == "EVIDENCE_JSON_INVALID"
+
+    path.write_text('{"ticket_id":"FND-001","value":NaN}', encoding="utf-8")
+    with pytest.raises(EvidenceValidationError) as non_finite:
+        validate_evidence_file(path)
+    assert non_finite.value.code == "EVIDENCE_JSON_INVALID"
 
 
 @pytest.mark.unit
@@ -159,6 +197,23 @@ def test_checked_in_schema_surface_matches_pydantic_model(
     schema = json.loads(
         (repository_root / ".codex/schemas" / schema_name).read_text(encoding="utf-8")
     )
-    assert set(schema["properties"]) == set(model.model_fields)
-    model_required = {name for name, field in model.model_fields.items() if field.is_required()}
-    assert set(schema["required"]) == model_required
+    assert schema == model.model_json_schema()
+
+
+@pytest.mark.unit
+def test_codex_result_schema_preserves_exact_legacy_fnd_complete_contract(
+    repository_root: Path,
+) -> None:
+    historical = json.loads(
+        (repository_root / "evidence/tickets/FND-001/codex_result.json").read_text(encoding="utf-8")
+    )
+    assert historical["ticket_id"] == "FND-001"
+    assert historical["status"] == "COMPLETE"
+    assert "code_commit" not in historical
+    assert CodexResult.model_validate(historical).code_commit is None
+
+    schema = CodexResult.model_json_schema()
+    complete_gate = schema["allOf"][0]
+    ticket_condition = complete_gate["if"]["properties"]["ticket_id"]
+    assert ticket_condition == {"not": {"const": "FND-001"}}
+    assert "code_commit" in complete_gate["then"]["required"]

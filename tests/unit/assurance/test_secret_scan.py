@@ -167,3 +167,19 @@ def test_exact_hashed_zoneinfo_binary_is_the_only_binary_exception(
     assert scan_repository(tmp_path) == []
     target.write_bytes(target.read_bytes() + b"tamper")
     assert {finding.rule_id for finding in scan_repository(tmp_path)} == {"BINARY_HASH_MISMATCH"}
+
+
+@pytest.mark.unit
+def test_repository_scan_fails_closed_for_symbolic_links(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    link = tmp_path / "linked.txt"
+    link.write_text("safe\n", encoding="utf-8")
+    original = Path.is_symlink
+    monkeypatch.setattr(
+        Path, "is_symlink", lambda candidate: candidate == link or original(candidate)
+    )
+    findings = scan_repository(tmp_path)
+    assert {(finding.path, finding.rule_id) for finding in findings} == {
+        ("linked.txt", "SCAN_COVERAGE")
+    }

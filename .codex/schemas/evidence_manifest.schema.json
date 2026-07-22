@@ -1,17 +1,119 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DMF Pulse Ticket Evidence Manifest",
-  "type": "object",
-  "required": [
-    "ticket_id",
-    "status",
-    "created_at",
-    "commands",
-    "artifacts"
+  "$defs": {
+    "EvidenceArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "title": "Bytes",
+          "type": "integer"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "bytes"
+      ],
+      "title": "EvidenceArtifact",
+      "type": "object"
+    },
+    "JsonValue": {}
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "COMPLETE"
+          },
+          "ticket_id": {
+            "not": {
+              "const": "FND-001"
+            }
+          }
+        },
+        "required": [
+          "status",
+          "ticket_id"
+        ]
+      },
+      "then": {
+        "properties": {
+          "code_commit": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code_commit"
+        ]
+      }
+    }
   ],
   "properties": {
-    "ticket_id": {
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/EvidenceArtifact"
+      },
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "code_commit": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Code Commit"
+    },
+    "commands": {
+      "items": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "type": "object"
+      },
+      "title": "Commands",
+      "type": "array"
+    },
+    "context_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Context Hash"
+    },
+    "created_at": {
+      "title": "Created At",
       "type": "string"
+    },
+    "known_limitations": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Known Limitations",
+      "type": "array"
     },
     "status": {
       "enum": [
@@ -19,35 +121,25 @@
         "COMPLETE",
         "BLOCKED",
         "FAILED"
-      ]
-    },
-    "created_at": {
+      ],
+      "title": "Status",
       "type": "string"
     },
-    "code_commit": {
+    "ticket_id": {
+      "maxLength": 40,
+      "minLength": 3,
+      "pattern": "^[A-Z0-9]+(?:[-.][A-Z0-9]+)*$",
+      "title": "Ticket Id",
       "type": "string"
-    },
-    "context_hash": {
-      "type": "string"
-    },
-    "commands": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
-    },
-    "artifacts": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
-    },
-    "known_limitations": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
     }
   },
-  "additionalProperties": false
+  "required": [
+    "ticket_id",
+    "status",
+    "created_at",
+    "commands",
+    "artifacts"
+  ],
+  "title": "TicketEvidenceManifest",
+  "type": "object"
 }

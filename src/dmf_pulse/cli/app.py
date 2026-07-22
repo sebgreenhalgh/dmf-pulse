@@ -12,6 +12,7 @@ from dmf_pulse.cli.config_cmd import config_app
 from dmf_pulse.cli.doctor import build_doctor_report
 from dmf_pulse.cli.evidence_cmd import evidence_app
 from dmf_pulse.cli.review_pack_cmd import review_pack_app
+from dmf_pulse.cli.rules_cmd import rules_app
 
 app = typer.Typer(
     add_completion=False,
@@ -23,6 +24,7 @@ app = typer.Typer(
 app.add_typer(config_app, name="config")
 app.add_typer(evidence_app, name="evidence")
 app.add_typer(review_pack_app, name="review-pack")
+app.add_typer(rules_app, name="rules")
 
 DOCTOR_BLOCKING_EXIT = 40
 

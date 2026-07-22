@@ -1,57 +1,1234 @@
 {
   "decisions": [
     {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "fdbf5d56521a23ab70787fe2f23fff47d59befe15cc98ab22fd4a3905b427f1c",
+      "id": "ADR-PROD-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PROD-001 lines 210-237",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Pulse provides recommendations, explanations and an execution checklist. Sebastian performs official FPL transfers, lineups, captaincy and chip activation manually. No official FPL write credential or automated action endpoint is part of V1.",
+      "title": "Private decision support, not automatic FPL execution"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "69f3820d6ae286db0a5c92d2a5da09d2da7b0d15b6fbfa312060a5b0ccfc7cda",
+      "id": "ADR-PROD-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PROD-002 lines 238-265",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Outside an explicitly selected rank or competition objective, Pulse maximises expected cumulative FPL points over the remaining season using rolling-horizon approximation and future-state value.",
+      "title": "Expected remaining-season points is the default objective"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "0bb457614384abb613d35c366ce60aced9bc1e74d550177c7e75b27b726f44a2",
+      "id": "ADR-PROD-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PROD-003 lines 266-293",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Football, minutes, price and FPL-points distributions are identical across points, protection and chasing modes for the same information and model versions. Rank affects only decision utility and opponent comparison.",
+      "title": "Raw projections remain independent of rank strategy"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "a6f9fdae378e94e33af48474b9eed2d7dd7929bc49f41e831bea83d22b98b5db",
       "id": "ADR-PROD-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PROD-004 lines 294-321",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "ACCEPTED",
-      "summary": "Modular monolith before microservices."
+      "summary": "Implement Pulse as one typed Python package with separate scheduler, API and worker processes sharing PostgreSQL and immutable artifacts.",
+      "title": "Modular monolith before microservices"
     },
     {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "3195a4be98d9f98f40a0f269b4284f80135308b61118707b716e65a8afcb4e85",
       "id": "ADR-GOV-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-GOV-001 lines 322-349",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "ACCEPTED",
-      "summary": "DMFP module specifications plus DMFP-20 govern architecture."
+      "summary": "DMFP-00–19 define detailed requirements; DMFP-20 records selected status, rationale, assumptions and review triggers. Conversations and implementation convenience do not override them.",
+      "title": "Module specifications plus DMFP-20 govern architecture"
     },
     {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "601d9d14a7015d1928259364ce29a815106baa3d2037e1a27433e9411a0cc310",
       "id": "ADR-GOV-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-GOV-002 lines 350-377",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "ACCEPTED",
-      "summary": "One validated vertical slice at a time."
+      "summary": "Codex receives one bounded stage ticket at a time. The next stage starts only after runnable acceptance evidence and Sebastian approval.",
+      "title": "One validated vertical slice at a time"
     },
     {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "37629ae30f15e8ece7cbab2d9399644bc560b8af7a7f69b6c326da653ae53acb",
+      "id": "ADR-GOV-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-GOV-003 lines 378-405",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Reference 2025/26 rules may power tests and research, but 2026/27 production scoring, chips, ranks, prices and constraints remain blocked until official target-season rules are captured and activated.",
+      "title": "Official target-season rules are activation gates"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "3c030091e9e1eea899201d7f8a3bcbdd83332c95cefd1f5b10dd606a450587d6",
       "id": "ADR-GOV-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-GOV-004 lines 406-433",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "ACCEPTED",
-      "summary": "No hidden hard-coded policy constants."
+      "summary": "Rules, policy thresholds, confidence gates, horizons, source freshness and robust parameters are versioned configuration or model artifacts, not scattered literals.",
+      "title": "No hidden hard-coded policy constants"
     },
     {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "3f9ec6b6867c2cd66ee454abf13d9566b051f60437f5469ee946422e7427c859",
       "id": "ADR-RES-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-RES-001 lines 434-461",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "ACCEPTED",
-      "summary": "Evidence hierarchy and claim-level source register."
+      "summary": "Material architectural claims use official sources, primary research or clearly labelled practitioner evidence. Each module maintains a source register and separates evidence from Pulse inference.",
+      "title": "Evidence hierarchy and claim-level source register"
     },
     {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "ea86936bd4b5b7805fe931e461571b0c93c60b207db5615d81604ef19e97286a",
+      "id": "ADR-DATA-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-DATA-001 lines 462-489",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Players, teams, fixtures, managers, markets and decisions use stable canonical UUIDs. Provider IDs live in temporal mapping tables.",
+      "title": "Canonical UUID identity separated from provider identifiers"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "68c37b60264146ac21a7c5faaa537264f7a5642f6bba89cf165309a3b11e1b64",
       "id": "ADR-DATA-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-DATA-002 lines 490-517",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "ACCEPTED",
-      "summary": "PostgreSQL operational truth and Parquet analytical archive; no database implementation in FND-001."
+      "summary": "PostgreSQL is authoritative for canonical operational state, control-plane records and temporal queries. Immutable Parquet is the analytical/research artifact format.",
+      "title": "PostgreSQL operational truth and Parquet analytical archive"
     },
     {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "dab572881fea354328582367c542d14366175cf3ca6cc353bb01bf13f4f5d851",
+      "id": "ADR-DATA-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-DATA-003 lines 518-545",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Retrieval is at least once. Every retrieval event is recorded. Raw source observations are immutable where rights permit. Canonical promotion is idempotent/effectively once.",
+      "title": "Immutable raw observations and effectively-once canonical effects"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "5d5f5802b07451a34456014987a566c4d94de319b08cc22bd5bfb6ddcd195072",
+      "id": "ADR-DATA-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-DATA-004 lines 546-573",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Strict live features require `usable_at <= historical decision cutoff`. Provider generation time alone is insufficient.",
+      "title": "usable_at controls historical eligibility"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "9fada49009e4d6e4845c19776f21db5f421cc5649ea0922008cb0d977764eb2d",
+      "id": "ADR-DATA-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-DATA-005 lines 574-601",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Every live decision resolves to an immutable bundle containing exactly the observations, mappings, rules, models and manager state available by the cutoff.",
+      "title": "Immutable deadline information bundles"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "37788ef5a9ff0a63a9277c731d10a92aaa95e41894b8b418f632b46b653c5167",
+      "id": "ADR-DATA-006",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-DATA-006 lines 602-629",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "LIVE_OBSERVED, RAW_OBSERVED, RECONSTRUCTED, FINAL_OUTCOME and COUNTERFACTUAL records/results are labelled and never pooled without separate reporting.",
+      "title": "Data modes remain separate"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "7e2cbef75edeccbc8d6366e97389d295e9d26e1fd46d26579e34789ea95b18a6",
+      "id": "ADR-DATA-007",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-DATA-007 lines 630-657",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Missing sources and outcomes use explicit states such as no market, stale, not applicable, source unavailable, not yet published or mapping unresolved.",
+      "title": "Typed missingness: unknown is never zero"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "a8c83995be404a38fa6ab49bc86e4fd6caa2c807008037276c9622cfc132c4a9",
       "id": "ADR-SRC-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-SRC-001 lines 658-685",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "ACCEPTED",
-      "summary": "Zero-paid-subscription core."
+      "summary": "The core system uses no paid API subscriptions, paid historical packages, compulsory betting turnover, paid scraping or quota-evasion accounts.",
+      "title": "Zero-paid-subscription core"
     },
     {
-      "id": "ADR-IMPL-001",
+      "decision_date": "2026-07-18",
+      "decision_sha256": "87f7c0abb39ae8bae95ad8fa9a5c3b2d3825966c5fe2a929adfe8b87c54f54d4",
+      "id": "ADR-SRC-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-SRC-002 lines 686-713",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "ACCEPTED",
-      "summary": "Stage-gated implementation roadmap."
+      "summary": "Free match markets anchor team outcome probabilities. Pulse allocates player outcomes using its own minutes, role and event models. Missing player markets remain missing.",
+      "title": "Market-anchored, not market-complete"
     },
     {
-      "id": "ADR-IMPL-002",
+      "decision_date": "2026-07-18",
+      "decision_sha256": "45d9aa2eecb4b9e9ed351a3ce458bb3bc8e79d2f7e9cc229437e0e5a1b7d498a",
+      "id": "ADR-SRC-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-SRC-003 lines 714-741",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "PROVISIONAL",
-      "summary": "Python 3.13 baseline and open-source typed toolchain."
+      "summary": "Use official FPL/Premier League data, API-FOOTBALL Free, The Odds API Free Starter where coverage permits, conditional Betfair delayed/historical data, football-data.co.uk and manual human capture fallback.",
+      "title": "Selected initial source stack"
     },
     {
-      "id": "ADR-IMPL-003",
+      "decision_date": "2026-07-18",
+      "decision_sha256": "7d75e7d7f81e164847da7991f412f6d2e1a8d95d3278f592c29f3e0170beec92",
+      "id": "ADR-SRC-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-SRC-004 lines 742-769",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
       "status": "ACCEPTED",
-      "summary": "Stage acceptance is proof, not code volume."
+      "summary": "Pulse uses one approved provider account per permitted purpose and does not create multiple accounts, bypass geography or evade quota/plan restrictions.",
+      "title": "No multi-account or geographic circumvention"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "d3dea960dbe60d0097b75704e2e64b42f5a9c1aefe3af1fe05b192345b4a3809",
+      "id": "ADR-MKT-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MKT-001 lines 770-797",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "For complete mutually exclusive fixed-odds books, calculate proportional and power methods and use power as the initial production default.",
+      "title": "Power normalisation is the initial fixed-odds default"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "c9b9bcff087e266b46ba3ecc8ebe68bc69e34cfd714b836282a02d8f3b43846b",
+      "id": "ADR-MKT-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MKT-002 lines 798-825",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Calculate proportional de-vig for every complete book as a baseline, diagnostic and fallback.",
+      "title": "Proportional normalisation is always retained"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "852dca70123a833f6ec1cc3f91aafb72d65ac411b5dcf7e924c9d86c711729b5",
+      "id": "ADR-MKT-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MKT-003 lines 826-853",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Retain Shin normalisation for sensitivity/research. Do not describe fitted z as measured insider trading or automatically select it.",
+      "title": "Shin is a challenger, not a literal insider estimate"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "ea14ec00ef79e8bebf8d1a45c23a3d443a9e2eef6168ce5debb718a0d2459db7",
+      "id": "ADR-MKT-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MKT-004 lines 854-881",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Multiple API rows representing the same bookmaker/operator are clustered before consensus. Weights include freshness, completeness, source quality, dependence and liquidity/spread where available.",
+      "title": "Consensus is built by independent betting operator"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "a5383698176901efaa66250fbeb96b60a99a477af19340c3d68f75dd9424702b",
+      "id": "ADR-MKT-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MKT-005 lines 882-909",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "A one-sided anytime-scorer or other Yes quote is stored as raw implied probability with uncertainty. It is not forced into a complete exclusive market.",
+      "title": "One-sided player quotes are not fully de-vigged"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "ae7829962f28bbffb1b90f328dc93afd501772b5de8df6e4060b3d4d867ab742",
+      "id": "ADR-MKT-006",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MKT-006 lines 910-937",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Every usable market projection includes central probability, lower/upper bounds, provider/operator counts, disagreement, freshness and confidence.",
+      "title": "Consensus output includes bounds and disagreement"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "2b75923980b87eedf0a6fda242736d5aefbfb60a03e00c74aecbfdbe80dab5c8",
+      "id": "ADR-MIN-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MIN-001 lines 938-965",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Availability modelling uses a coherent three-state role distribution, followed by conditional starter and bench minute distributions.",
+      "title": "START/BENCH/OUT is the primary role state"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "f1fabcdf2db94bd5493b04ec823aab3baf8295eb034285510c13f0c632d1d4ac",
+      "id": "ADR-MIN-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MIN-002 lines 966-993",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "The unconditional minute distribution equals the START, BENCH and OUT mixture, including a point mass at zero.",
+      "title": "Minute PMF is an explicit mixture"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "d0695d9fa1da0be71a609d3f73a20e0a47b8d17b3c2ded29d29593a82abceef2",
+      "id": "ADR-MIN-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MIN-003 lines 994-1021",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Team scenarios contain exactly 11 starters and legal role/goalkeeper constraints, sampled without replacement from player-role utilities.",
+      "title": "Sample coherent team lineups"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "32435372dea44d7f06e8c98144b9b1d6883c03d4951164e5fc6c4cea6e565080",
+      "id": "ADR-MIN-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-MIN-004 lines 1022-1049",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "Use discrete-time cause-specific starter-exit and bench-entry hazards, including tactical, injury, dismissal and forced substitution causes.",
+      "title": "Starter exits and bench entries use competing-risk hazards"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "681ab9b9ca1ce857622d8aae88fbec35f4bfc6db167f42e3c7ce0c49f6379042",
+      "id": "ADR-EVT-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVT-001 lines 1050-1077",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "First construct one coherent joint team score distribution. Then allocate conditional goal times, scorers, assists, shots, saves, penalties, cards and defensive events.",
+      "title": "Two-stage football event architecture"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "06cfc51f473d69c763c2a2cf8f26ce0408c451877baa03d52e90d2f685153f40",
+      "id": "ADR-EVT-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVT-002 lines 1078-1105",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "Project a statistical score prior toward market constraints through a proper nonnegative probability optimisation, using uncertainty-weighted soft constraints rather than forcing every market equality.",
+      "title": "Soft KL/information projection to markets"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "f742a19eb8d84160ff2a74b4d4a1b6161cc93e02c9c951ee4051b957826a641c",
+      "id": "ADR-EVT-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVT-003 lines 1106-1133",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Use Poisson/team-strength as the initial count prior. Promote negative-binomial, Dixon–Coles, double-Poisson, COM-Poisson or other challengers only on out-of-time evidence.",
+      "title": "Poisson is a baseline, not a universal law"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "d9f9c234c9deebddc99be2fce90db9522f45aac303f961bf16aa66e47f32bcce",
+      "id": "ADR-EVT-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVT-004 lines 1134-1161",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Player-goal distributions are derived conditionally from sampled team goals, lineups, minutes and role shares, with explicit own-goal and OTHER mass.",
+      "title": "Player scoring shares preserve team totals"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "328ddaa24900fbb2213ae05cdf8e64384fc11cde92aadcf94c59e3d68e7542a0",
+      "id": "ADR-EVT-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVT-005 lines 1162-1189",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Each goal scenario records mechanism and goal chain, then classifies definite assist, definite no assist or ambiguous FPL assist.",
+      "title": "Goal mechanism precedes FPL assist classification"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "e2b0a1615f84f18196e732ca9b956e689b5befd218b89e48b2e074ce10953196",
+      "id": "ADR-PTS-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PTS-001 lines 1190-1217",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "DMFP-09 does not fit a separate player-points forecast. It applies the active ruleset exactly to coherent football scenarios and aggregates the resulting integer scores.",
+      "title": "FPL points are a pure scenario-level scoring transform"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "653015aef467a0afc3eaa600bfba212fbd1c3f879cb7e0d1929ded4172493f85",
+      "id": "ADR-PTS-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PTS-002 lines 1218-1245",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Calculate scenario BPS for all participants and award bonus through exact tie/competition ranking. Do not predict expected bonus independently.",
+      "title": "Bonus is a joint BPS ranking subsystem"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "8ced6339cefad38fa071d5e77263c0ac985a61165b55891652c519fe5fec98aa",
+      "id": "ADR-PTS-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PTS-003 lines 1246-1273",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Player/Gameweek distributions include effective sample size, Monte Carlo standard errors and deterministic seed lineage. Simulation precision is not mixed with football-model uncertainty.",
+      "title": "Monte Carlo exposes numerical error separately"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "f871359775cb83f850bce98c7f6e69a5137d38ffd2ffa0707a97d3635a1f2dbd",
+      "id": "ADR-PTS-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PTS-004 lines 1274-1301",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "DMFP-09 exports scenario weights and all player points together. The optimiser does not reconstruct dependence from marginal summaries.",
+      "title": "Optimiser receives full joint player-by-scenario matrix"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "a327748fb886ddb135354a6017c3440c010c25e1f043e9a6e5211b84ac47bf3b",
+      "id": "ADR-UNC-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UNC-001 lines 1302-1329",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "The default does not penalise all outcome variance. Robust penalties focus on model, structural, lineup, source, rules and irreversible-action uncertainty.",
+      "title": "Robustness targets epistemic regret, not ordinary football variance"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "b550e10b70c8d4b5fbf5a1322898361f7ace7e738bbadffd001c01ea4f849eed",
+      "id": "ADR-UNC-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UNC-002 lines 1330-1357",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Scenarios retain IDs for structural/model world, parameter draw and aleatoric outcome draw.",
+      "title": "Nested structural, parameter and outcome scenarios"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "df1b41a2350c9768a85e41efb52347cf44fe88896295acc3c3295c467b1a52be",
+      "id": "ADR-UNC-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UNC-003 lines 1358-1385",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Sparse players, promoted teams and new managers partially pool to structured priors. Role, lineup and set-piece states update faster than stable ability parameters.",
+      "title": "Hierarchical shrinkage with parameter-specific learning speed"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "104b4abea7c5eb8392873977aa144254902ddda0302e426629e1846423472f5b",
+      "id": "ADR-UNC-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UNC-004 lines 1386-1413",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "Use a predeclared primary/baseline/challenger mixture initially, then learn time-safe predictive stacking weights from out-of-time proper scores.",
+      "title": "Predictive stacking is the preferred mature ensemble"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "37983ba5c43cd11f2c5fcbb07aeb46bbf1625724235e245300c5704bad26d858",
+      "id": "ADR-UNC-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UNC-005 lines 1414-1441",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Solve a finite multistage horizon at every deadline, execute only the immediate action and re-solve after new information.",
+      "title": "Rolling-horizon reoptimisation"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "bf888fc6a0b39c6af1beb1ec141beab657d3d7ea1b1507f8e3890f6c37226d6f",
+      "id": "ADR-UNC-006",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UNC-006 lines 1442-1469",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Compare expected utility after future information with the price, points, execution and option costs of waiting.",
+      "title": "Value of information determines ACT versus WAIT"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "e2e896503605f320374965adf5015e0dae7e074fe163555d98a3db5753d9a393",
+      "id": "ADR-UNC-007",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UNC-007 lines 1470-1497",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Team value enters through counterfactual future points enabled by bank, selling value and routes. It is never a standalone objective or fixed points conversion.",
+      "title": "Team value is instrumental future affordability"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "440cdaeaec6fdd681dda26c4bddcfe5983860294a99448b675779347c727ca77",
+      "id": "ADR-PRC-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PRC-001 lines 1498-1525",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "Model each overnight opportunity as RISE, FALL or NO_CHANGE with recurrent state after each event.",
+      "title": "Price changes are recurrent competing update events"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "ccbf285320118c56f173b3bdc632a8ddfd6983b901b87f06778069d4933a7bf9",
+      "id": "ADR-PRC-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PRC-002 lines 1526-1553",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Estimate a probabilistic hidden pressure/boundary state and report standardised threshold distance. Do not publish an exact transfers-remaining number as official fact.",
+      "title": "Latent transfer pressure, not claimed exact threshold"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "23921df33f10747afbb9ab7460624be028bd9d78e7a90b3904081a41b0ea648e",
+      "id": "ADR-PRC-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PRC-003 lines 1554-1581",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Model purchase pressure among nonowners and sale pressure among owners alongside absolute flow, velocity and acceleration.",
+      "title": "Ownership-adjusted buy and sell rates"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "63820abaff8929efbcc6199fd90462b334b6b549b7919922c02622d592352f57",
+      "id": "ADR-PRC-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-PRC-004 lines 1582-1609",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Do not assume wildcard transfers count zero or that every raw transfer is unique. Estimate effective flow with chip/repeat proxies and widen uncertainty when unknown.",
+      "title": "Wildcard and repeated-manager effects are latent contamination"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "79574161385145462ebf9ca6a2a011cf2392f6b222eb5be107af36d6af28469a",
+      "id": "ADR-OPT-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPT-001 lines 1610-1637",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "The central engine uses mixed-integer legal/state constraints, weighted scenarios and a model-predictive-control wrapper.",
+      "title": "Rolling-horizon stochastic MILP under MPC"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "dec8c27da400b57ad4ebb204bc4b618bf40294aac28f2270c5681f7982241ec5",
+      "id": "ADR-OPT-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPT-002 lines 1638-1665",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "For a fixed squad, enumerate legal XIs, bench orders and captain/vice pairs and evaluate official autosubs/fallback against joint scenarios.",
+      "title": "Exact current tactical enumeration"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "67ade03e50860591144ab09b058bcd44486548d52ac5293e74be548b4025cec0",
+      "id": "ADR-OPT-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPT-003 lines 1666-1693",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Track each player's purchase/ownership spell. Precompute scenario/node-specific selling price from purchase and current price under active rules.",
+      "title": "Ownership cohorts determine selling prices"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "67d58de4d8d57d2941a501754a7e5697cdbca14e3c504462598861af1c6f8612",
+      "id": "ADR-OPT-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPT-004 lines 1694-1721",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Future actions may depend only on information revealed at their scenario-tree node. Perfect-information policies are diagnostic upper bounds only.",
+      "title": "Scenario nonanticipativity is mandatory"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "55692e59c212fde7b0de8191a1813014340f1501371665079659edc6f75b0a7b",
+      "id": "ADR-OPT-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPT-005 lines 1722-1749",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Return recommended, conservative, high-upside and no-transfer plans, plus points/rank alternatives where relevant. Do not manufacture a distinct plan if none is meaningfully non-dominated.",
+      "title": "Return multiple non-dominated plans"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "c1e109f3f18ba3fc940d863c9ddeba1bf2c95dc9362931c54a20c393b1251fb4",
+      "id": "ADR-OPT-006",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPT-006 lines 1750-1777",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "Use Pyomo for transparent algebraic models and HiGHS as the zero-cost LP/MIP solver.",
+      "title": "Pyomo and HiGHS are the initial optimiser stack"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "4907719e4bae6adc746e4a4b154add1a3385fbe4107f6e3a774de102705ff427",
+      "id": "ADR-CHIP-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-CHIP-001 lines 1778-1805",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Ordinary captain/vice and every chip are optimised in one finite-inventory rolling policy because they compete for future Gameweeks and squad states.",
+      "title": "Captaincy and all chips share one opportunity-allocation module"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "39102dc0c37c1b37976225d48ebf0fd4bbdf694d04a73cbc4df68f97c62cb93a",
+      "id": "ADR-CHIP-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-CHIP-002 lines 1806-1833",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Use-now value is compared with the best adaptive policy that retains the chip. Gross current gain and net policy value are always separate.",
+      "title": "Chips are finite exercise rights with continuation value"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "583b325ecea87765863b65fdba7209e800870a99eaf5cdbd1fe8b1e00324f810",
+      "id": "ADR-CHIP-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-CHIP-003 lines 1834-1861",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "The incremental TC distribution is the scenario effective captain score after vice fallback, with captain/vice selected jointly under the chip policy.",
+      "title": "Triple Captain value is one extra effective-captain copy"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "c9c6ce677ab4e130706f41ef57f7ee01a7ed8b6f9f1b00d892e31bd6370bef83",
+      "id": "ADR-CHIP-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-CHIP-004 lines 1862-1889",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "BB incremental value is all-bench scoring minus points already obtained through normal autosubs, plus/minus tactical changes. Net policy value includes bench capital, transfers and unwinding.",
+      "title": "Bench Boost subtracts autosub overlap and preparation cost"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "9d0903cd28cb7a6edde03207093e664d5f8cc42748f4e7779d54b823c31af553",
+      "id": "ADR-CHIP-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-CHIP-005 lines 1890-1917",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "FH value includes temporary uplift, hits avoided and permanent squad damage avoided relative to an optimised no-FH transfer policy.",
+      "title": "Free Hit compares with best normal transfer policy"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "bfd9d953ef601d465bdaba00a649d3350b6f9f82f4a72f37e398bde94242c612",
+      "id": "ADR-CHIP-006",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-CHIP-006 lines 1918-1945",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Wildcard is a permanent reset option. Compare immediate WC, normal transfers, delayed WC after explicit information and bridge policies such as FH.",
+      "title": "Wildcard compares immediate, normal and delayed policies"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "9f3926f78641ccd54a646df03bb7a6e6fea608ed71933ce6502721e1b672db6e",
+      "id": "ADR-RANK-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-RANK-001 lines 1946-1973",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "EO is computed from actual scenario multipliers after starts, autosubs, captain/vice and chips, with saved and realised EO reported separately.",
+      "title": "Scenario effective ownership uses counted multipliers"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "afed9e314e1b6409ddee67b30c6cb103d3bce8ddae5eb82ae327d7fecfcbe641",
+      "id": "ADR-RANK-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-RANK-002 lines 1974-2001",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Sebastian and all rival/synthetic managers are scored on the same player-event scenarios.",
+      "title": "Shared-scenario opponent simulation"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "05334ae79b8e05aca9ede7cab77ec8ee8f8fda24558f3d8d875a684983fa9adb",
+      "id": "ADR-RANK-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-RANK-003 lines 2002-2029",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Differential value is the change in target/rank utility versus an alternative. Ownership is one explanatory feature, never an intrinsic reward.",
+      "title": "Low ownership is not a decision objective"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "8958aa8c4a9b89b0c600130601450a6903a3730f871bec01f61c8aabf3ea2676",
+      "id": "ADR-RANK-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-RANK-004 lines 2030-2057",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Early: points and flexibility. Middle: measured leverage among near-optimal plans. Late: rank-aware utility when decision-sensitive. Final weeks: explicit target probability.",
+      "title": "Season-stage rank policy"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "a13c2ebe7429b59db11a22f47da82f758ecd65de0664e9c22c46e7d45658ebbe",
+      "id": "ADR-EVAL-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVAL-001 lines 2058-2085",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Outer deadline folds estimate performance. Earlier inner folds choose features, hyperparameters, calibration, ensembles and policy settings. Forecasts are frozen before outcomes.",
+      "title": "Nested walk-forward/prequential evaluation"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "e5fae2469034cdfefb12d35b8d456dbbd44722316135ad4884f1209ac0cfc6c8",
+      "id": "ADR-EVAL-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVAL-002 lines 2086-2113",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "No model is promoted from one headline metric. Evaluate point accuracy, proper probability/distribution scores, joint dependence, downstream decisions and operational fidelity.",
+      "title": "Projection, distribution, decision and operations score separately"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "5e259bf67a50812b0b3b816fa07cac533b465210590bdf4fa1d7279c10acbd3e",
+      "id": "ADR-EVAL-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVAL-003 lines 2114-2141",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Evaluate naive recent points, official FPL form, market only, market+minutes, complete Pulse and labelled perfect-hindsight upper bounds.",
+      "title": "Mandatory benchmark ladder B0–B5"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "92a802461936aa4a28a1bb9ee46a326d7af4529f1d35ee57f3de847ee65938ff",
+      "id": "ADR-EVAL-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVAL-004 lines 2142-2169",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Use log score, Brier, RPS/CRPS, calibration intercept/slope, reproducible reliability diagrams and interval coverage/sharpness.",
+      "title": "Proper scoring and calibration are primary for probabilities"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "4eb36dddf7a63d301e4e316c07f05b6a6ca613cdacda04736b414ede172a353d",
+      "id": "ADR-EVAL-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVAL-005 lines 2170-2197",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Backtests execute only the historical root action, advance manager state using actual outcomes/prices and re-run at later deadlines.",
+      "title": "Sequential policy replay is required for decision claims"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "410efa473e1606fa1427d5825eadcf73b08870e8a14b147ea9eb254647dcd3bb",
+      "id": "ADR-EVAL-006",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-EVAL-006 lines 2198-2225",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Track every tried configuration, separate exploratory and confirmatory work, retain locked contiguous holdouts and require prospective champion/challenger evidence for material promotions.",
+      "title": "Experiment registry and locked/prospective confirmation"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "26d8047cdaf39005d05c46d1028f5578ce32950d76b6ca86781fcc4296225882",
+      "id": "ADR-OPS-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPS-001 lines 2226-2253",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Runs, tasks, leases, dependencies, operations, outbox, cache metadata and publication state live in PostgreSQL.",
+      "title": "PostgreSQL is the durable control-plane queue and ledger"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "53919e4a6d23f7a0af51d1393f84b3a228023b346181d2c45873818127e574a6",
+      "id": "ADR-OPS-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPS-002 lines 2254-2281",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Workers claim READY task rows using row locks with SKIP LOCKED. Transaction-scoped advisory locks protect scheduler/publication/singleton transitions.",
+      "title": "SKIP LOCKED claims and advisory-lock singletons"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "5225e0638939c30ad1a4fb48cc079fe2a0beade45499dc3339d83dae03a86d49",
+      "id": "ADR-OPS-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPS-003 lines 2282-2309",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Durable outbox/task rows are truth. NOTIFY reduces latency but workers also poll/recover.",
+      "title": "LISTEN/NOTIFY is a wake-up hint only"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "f9bf9b6dd45b37d7dcd519bdef4987e64ee88a192ca615fa7ebbe947b059cfeb",
+      "id": "ADR-OPS-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPS-004 lines 2310-2337",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Every published recommendation is immutable and content-addressed. A transactional alias identifies the latest publishable bundle.",
+      "title": "Immutable Decision Bundle and mutable latest pointer"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "b957ba8991adf7d633bdf7c7eb949e885999638dcb11c3635360068a5abb5bb9",
+      "id": "ADR-OPS-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPS-005 lines 2338-2365",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "Run a final standard full recommendation around D-15 minutes and a final fast incremental recommendation around D-5, followed by an exact audit freeze at the deadline.",
+      "title": "Deadline-relative D-15 and D-5 actionable cycles"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "ef9ed512126a3747e4aad3d13077ae2ba5b09a3b795276c1ff4d1287b72d2f8f",
+      "id": "ADR-OPS-006",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-OPS-006 lines 2366-2393",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "API and CLI call one application-service layer. The internal API uses versioned HTTP/JSON, operation resources, RFC 9457 errors and idempotency for mutations.",
+      "title": "FastAPI/OpenAPI private API and Typer CLI share services"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "2b1664c0cc5e6619e4101c397af15078f6b01a4be8a595d254b2c7b9ff646094",
+      "id": "ADR-ASSUR-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-ASSUR-001 lines 2394-2421",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "First-party logs are structured JSON events with trace/run/task correlation and redacted safe attributes.",
+      "title": "Structured OpenTelemetry-correlated logs"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "5211d28645aa1183e746b2162b14c8919e3104c12832cb178b0dba713dcb1d70",
+      "id": "ADR-ASSUR-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-ASSUR-002 lines 2422-2449",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "Use systemd credential delivery and encrypted credentials where the host supports them, with separately encrypted offline recovery.",
+      "title": "Encrypted systemd credentials for V1 secrets"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "be538eb0428986420a72614789f0073ac51961ee20b400970c641aa935e0bc1a",
+      "id": "ADR-ASSUR-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-ASSUR-003 lines 2450-2477",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Model and dataset versions, aliases, approvals and lineage live in Pulse registries. MLflow may be a UI but not a second authority.",
+      "title": "PostgreSQL plus immutable artifacts is the authoritative model/data registry"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "7b8e8a207330aef3861f18d7432da42c7f6a62eb2da34cdc8c7d60e9a8bf6fd4",
+      "id": "ADR-ASSUR-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-ASSUR-004 lines 2478-2505",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Every stochastic run stores a root seed and deterministic named child streams independent of worker scheduling. Global RNG use is prohibited.",
+      "title": "Named SeedSequence RNG tree"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "d5540663dea706fac4d8a4111555905184d4b649e18b2aef30887cef6a3b9f27",
+      "id": "ADR-ASSUR-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-ASSUR-005 lines 2506-2533",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Use WAL/PITR, base backups, logical dumps and immutable artifact replication, with monthly restore and preseason disaster rehearsal.",
+      "title": "Backups require verified restore"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "c37af177fff5bccb3f5ecfe7d23eb85a7d663f93d90eec445877679f4ac4ed2b",
+      "id": "ADR-ASSUR-006",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-ASSUR-006 lines 2534-2561",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Every provider has machine-readable rights metadata controlling automation, caching, training, display, redistribution, backup, retention and termination deletion.",
+      "title": "Provider Rights Profiles enforce use and retention"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "81cfa7c18b3c8494a057b46dc89950aa44e136c1b2ca5c9230104dabdf325ee8",
+      "id": "ADR-UI-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UI-001 lines 2562-2589",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "The primary UI shows action, timing, comparator value, uncertainty, confidence, key assumption and fallback first; deeper views expose scenarios, models and audit.",
+      "title": "Progressive-disclosure Decision Cockpit"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "47c36c98a8942798e0aa09ace076b7f1dd22dc9cda70a302796ca516843b8b07",
+      "id": "ADR-UI-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UI-002 lines 2590-2617",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Show no-transfer comparison, paired p10/median/p90, P(beat baseline), material downside and upside. Plans use common scenarios.",
+      "title": "Paired distribution, not a single expected gain"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "3b26cf262b7df9cf1c434e6cceb9cae02a62f8430a3b3e8cf0f48788c792164c",
+      "id": "ADR-UI-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UI-003 lines 2618-2645",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Reasons, assumptions, counterfactuals, warnings and provenance are structured graph nodes/edges tied to actual run artifacts. Deterministic templates are the primary text renderer.",
+      "title": "Explanation Graph is the evidence source"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "dd8b4259f2fc78b4d6ae0f21e24c5c948be51e64c35e990b7682d93e438db8de",
+      "id": "ADR-UI-004",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UI-004 lines 2646-2673",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Attribute old/new recommendation differences by re-running controlled evidence/model/state groups with common scenarios, including interactions and residual reconciliation.",
+      "title": "Why-changed uses controlled reruns"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "889824eed1db163a5e607f0bea7920cc7d96b839d37b51bd930063dc8061ea1a",
+      "id": "ADR-UI-005",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UI-005 lines 2674-2701",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Show minimal plausible model/input changes that cause a different optimiser action, derived through reoptimisation.",
+      "title": "Counterfactual switch thresholds explain fragility"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "b4129fc6bf94580ff78f92d4d984884ce44e62efc6344d4e9a4fca1415c93715",
+      "id": "ADR-UI-006",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UI-006 lines 2702-2729",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "Use frequency-based quantile dotplots for discrete plan differences and CDF/exceedance views for thresholds, with fan charts over horizons and accessible tables.",
+      "title": "Quantile dotplots and CDFs are initial uncertainty defaults"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "c128f99608d6a6905f3f797508f6f70b019664f51f4739985a2e1306b72c21b1",
+      "id": "ADR-UI-007",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-UI-007 lines 2730-2757",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "All critical UI and reports target WCAG 2.2 AA, including keyboard, contrast, non-colour status, screen-reader summaries, reflow and reduced motion.",
+      "title": "WCAG 2.2 AA target"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "a0346376151cfe13ef8f538eec4e4d9e952229dc44dc9f8522cf58192a79618b",
+      "id": "ADR-IMPL-001",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-IMPL-001 lines 2758-2785",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Implement repository/config through UI in the Stage 1–16 order specified in DMFP-19, with each stage forming a validated vertical slice.",
+      "title": "Sixteen-stage implementation roadmap"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "be0774d0a11a771a8e63a4f92d5873cc5c7793f3c388df00f953c1df14fafc61",
+      "id": "ADR-IMPL-002",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-IMPL-002 lines 2786-2813",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "PROVISIONAL",
+      "summary": "Use Python 3.13 compatibility baseline, PostgreSQL, Pydantic, Alembic, Typer, FastAPI, Pyomo and HiGHS, with Ruff, mypy, pytest, Hypothesis, coverage and mutation testing.",
+      "title": "Python/PostgreSQL/Pyomo/HiGHS baseline toolchain"
+    },
+    {
+      "decision_date": "2026-07-18",
+      "decision_sha256": "12b60af83faa9b79acbc90d9b1b4f2c0d27fb9ce2c983dee2cf1f3a930814fc1",
+      "id": "ADR-IMPL-003",
+      "source": {
+        "document_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+        "locator": "ADR-IMPL-003 lines 2814-4841",
+        "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+      },
+      "status": "ACCEPTED",
+      "summary": "Every stage requires a runnable demo, public contract, fixture pack, migration evidence where relevant, coverage/mutation results and machine-readable acceptance record.",
+      "title": "Stage acceptance is proof, not code volume"
     }
   ],
-  "manifest_version": "1.0",
+  "generated_from": {
+    "document_id": "DMFP-20",
+    "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt",
+    "sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72"
+  },
+  "manifest_version": "2.0",
   "pack_authorisations": [
     {
       "choice": "Python 3.13",
@@ -93,10 +1270,5 @@
       "id": "PACK-FND-001-GPU-001",
       "status": "SANCTIONED_FOR_FND-001"
     }
-  ],
-  "pack_id": "FND-001",
-  "source": {
-    "document_id": "DMFP-20",
-    "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
-  }
+  ]
 }

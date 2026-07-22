@@ -1,7 +1,151 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DMF Pulse Review Pack Manifest",
-  "type": "object",
+  "$defs": {
+    "ResultStatus": {
+      "enum": [
+        "COMPLETE",
+        "BLOCKED",
+        "FAILED"
+      ],
+      "title": "ResultStatus",
+      "type": "string"
+    },
+    "ReviewFile": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "title": "Bytes",
+          "type": "integer"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "purpose": {
+          "title": "Purpose",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "sha256",
+        "bytes",
+        "purpose"
+      ],
+      "title": "ReviewFile",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "ticket_id": {
+            "const": "RUL-002"
+          }
+        },
+        "required": [
+          "ticket_id"
+        ]
+      },
+      "then": {
+        "properties": {
+          "archive_sha256": {
+            "type": "null"
+          },
+          "baseline": {
+            "const": "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
+          },
+          "file_count": {
+            "const": 20
+          }
+        },
+        "required": [
+          "baseline",
+          "payload_sha256"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "acceptance_status": {
+      "$ref": "#/$defs/ResultStatus"
+    },
+    "archive_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Archive Sha256"
+    },
+    "baseline": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseline"
+    },
+    "file_count": {
+      "maximum": 20,
+      "minimum": 1,
+      "title": "File Count",
+      "type": "integer"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/ReviewFile"
+      },
+      "maxItems": 20,
+      "title": "Files",
+      "type": "array"
+    },
+    "generated_at": {
+      "title": "Generated At",
+      "type": "string"
+    },
+    "payload_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Payload Sha256"
+    },
+    "repository_head": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Repository Head",
+      "type": "string"
+    },
+    "ticket_id": {
+      "maxLength": 40,
+      "minLength": 3,
+      "pattern": "^[A-Z0-9]+(?:[-.][A-Z0-9]+)*$",
+      "title": "Ticket Id",
+      "type": "string"
+    }
+  },
   "required": [
     "ticket_id",
     "generated_at",
@@ -10,60 +154,6 @@
     "files",
     "acceptance_status"
   ],
-  "properties": {
-    "ticket_id": {
-      "const": "FND-001"
-    },
-    "generated_at": {
-      "type": "string"
-    },
-    "repository_head": {
-      "type": "string"
-    },
-    "baseline": {
-      "type": "string"
-    },
-    "file_count": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 20
-    },
-    "acceptance_status": {
-      "enum": [
-        "COMPLETE",
-        "BLOCKED",
-        "FAILED"
-      ]
-    },
-    "files": {
-      "type": "array",
-      "maxItems": 20,
-      "items": {
-        "type": "object",
-        "required": [
-          "name",
-          "sha256",
-          "bytes",
-          "purpose"
-        ],
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "sha256": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{64}$"
-          },
-          "bytes": {
-            "type": "integer"
-          },
-          "purpose": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      }
-    }
-  },
-  "additionalProperties": false
+  "title": "ReviewManifest",
+  "type": "object"
 }

@@ -27,7 +27,7 @@ runner = CliRunner()
 def test_version_contract() -> None:
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert result.stdout == "dmf 0.1.0\n"
+    assert result.stdout == "dmf 0.2.0\n"
 
 
 @pytest.mark.unit

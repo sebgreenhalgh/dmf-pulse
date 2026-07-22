@@ -288,13 +288,9 @@ def scan_repository(root: Path, *, allowlist_path: Path | None = None) -> list[S
     allowed = {(item.path, item.rule_id, item.fingerprint) for item in allowlist}
     findings = []
     for candidate in sorted(root.rglob("*"), key=lambda item: item.as_posix()):
-        if not candidate.is_file() or any(part in EXCLUDED_PARTS for part in candidate.parts):
+        if any(part in EXCLUDED_PARTS for part in candidate.parts):
             continue
         relative = candidate.relative_to(root).as_posix()
-        if candidate.name in EXCLUDED_FILE_NAMES:
-            continue
-        if relative == selected_allowlist.relative_to(root).as_posix():
-            continue
         if candidate.is_symlink():
             findings.append(
                 _finding(
@@ -305,6 +301,12 @@ def scan_repository(root: Path, *, allowlist_path: Path | None = None) -> list[S
                     "symbolic-link content was not scanned",
                 )
             )
+            continue
+        if not candidate.is_file():
+            continue
+        if candidate.name in EXCLUDED_FILE_NAMES:
+            continue
+        if relative == selected_allowlist.relative_to(root).as_posix():
             continue
         expected_binary_hash = EXPLICIT_BINARY_FILE_HASHES.get(relative)
         if expected_binary_hash is not None:

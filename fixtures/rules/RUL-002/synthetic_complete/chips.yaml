@@ -1,0 +1,6 @@
+chips:
+  - {key: "WILDCARD", copies: 2}
+  - {key: "FREE_HIT", copies: 2}
+  - {key: "TRIPLE_CAPTAIN", copies: 2}
+  - {key: "BENCH_BOOST", copies: 2}
+concurrency_limit: 1

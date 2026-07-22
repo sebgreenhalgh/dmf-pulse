@@ -1,0 +1,21 @@
+ruleset_id: "fpl-2026-27"
+ruleset_version: "0.1.0-prelaunch.1"
+schema_version: "1.0"
+season_code: "2026/2027"
+status: "CAPTURED_UNVERIFIED"
+production_eligible: false
+required_files:
+  - "positions.yaml"
+  - "scoring.yaml"
+  - "assists.yaml"
+  - "bonus.yaml"
+  - "squad.yaml"
+  - "lineup.yaml"
+  - "transfers.yaml"
+  - "prices.yaml"
+  - "chips.yaml"
+  - "deadlines.yaml"
+  - "special_events.yaml"
+  - "source_manifest.yaml"
+extension_files:
+  - "target_2026_27_claims.yaml"

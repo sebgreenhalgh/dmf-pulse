@@ -1,0 +1,4 @@
+starting_size: 11
+bench_size: 4
+captain_multiplier: 2
+vice_fallback: true

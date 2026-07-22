@@ -27,6 +27,8 @@ def test_repository_manifest_is_sorted_deterministic_and_excludes_generated_evid
     (evidence / "commands.log").write_text("generated\n", encoding="utf-8")
     (tmp_path / ".coverage").write_bytes(b"sqlite\x00generated")
     (tmp_path / "coverage.xml").write_text("<generated/>\n", encoding="utf-8")
+    (tmp_path / "artifacts/rules").mkdir(parents=True)
+    (tmp_path / "artifacts/rules/stale.json").write_text("{}\n", encoding="utf-8")
     first = build_repository_manifest(tmp_path)
     second = build_repository_manifest(tmp_path)
     assert first == second
@@ -36,6 +38,7 @@ def test_repository_manifest_is_sorted_deterministic_and_excludes_generated_evid
     assert "evidence/tickets/FND-001/commands.log" not in paths
     assert ".coverage" not in paths
     assert "coverage.xml" not in paths
+    assert "artifacts/rules/stale.json" not in paths
 
 
 @pytest.mark.unit

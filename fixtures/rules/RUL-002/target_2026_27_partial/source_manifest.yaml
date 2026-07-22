@@ -1,0 +1,14 @@
+sources:
+  - source_id: "SRC-FPL-2026-BPS-001"
+    source_type: "CHECKED_OFFICIAL_SOURCE_METADATA"
+    status: "VERIFIED"
+  - source_id: "SRC-FPL-2026-CHANGES-001"
+    source_type: "CHECKED_OFFICIAL_SOURCE_METADATA"
+    status: "VERIFIED"
+  - source_id: "SRC-FPL-2026-DC-001"
+    source_type: "CHECKED_OFFICIAL_SOURCE_METADATA"
+    status: "VERIFIED"
+  - source_id: "SRC-FPL-2026-PRICE-001"
+    source_type: "CHECKED_OFFICIAL_SOURCE_METADATA"
+    status: "VERIFIED"
+rule_source_default: null

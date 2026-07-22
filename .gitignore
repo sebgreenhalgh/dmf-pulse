@@ -52,3 +52,7 @@ Thumbs.db
 
 # Generated review output
 review_pack/
+
+# Regenerable RUL-002 acceptance evidence (the validated ZIP is the immutable review delivery)
+evidence/tickets/RUL-002/*
+!evidence/tickets/RUL-002/.gitkeep

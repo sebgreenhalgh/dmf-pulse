@@ -1,0 +1,68 @@
+ticket_id: "RUL-002"
+stage: "A2"
+title: "Governance remediation and rules foundation"
+status: "READY"
+owner: "Sebastian Greenhalgh"
+baseline_commit: "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
+required_branch: "stage/A2/RUL-002-rules-foundation"
+objective: >-
+  Correct the FND-001 authority/evidence blockers and deliver an installable,
+  pure, versioned FPL rules compiler and exact synthetic/reference fixture and
+  Gameweek scoring vertical slice while keeping the incomplete 2026/27 ruleset
+  impossible to activate.
+vertical_slice:
+  input: "split YAML rules directory plus coherent fixture/Gameweek scenario JSON"
+  command: "dmf rules score-fixture <compiled-or-source-ruleset> <fixture.json> --json"
+  output: "deterministic per-player integer components, BPS, bonus and totals with ruleset hash"
+  review_zip: "review_pack/RUL-002/DMF_PULSE_RUL-002_REVIEW.zip"
+checkpoints:
+  - id: "RUL-002.0"
+    title: "Foundation remediation"
+    gate: "authority and generic evidence targeted tests plus one full foundation suite pass"
+  - id: "RUL-002.1"
+    title: "Rules authoring/compiler/lifecycle"
+  - id: "RUL-002.2"
+    title: "Fixture/BPS/bonus/Gameweek scoring"
+  - id: "RUL-002.3"
+    title: "CLI, golden tests, package and evidence"
+permissions:
+  network: false
+  migration: false
+  new_dependencies: false
+  workspace_write: true
+allowed_areas:
+  - "AGENTS.md"
+  - "PLANS.md"
+  - ".codex/**"
+  - ".github/**"
+  - "config/rules/**"
+  - "fixtures/rules/**"
+  - "specs/manifests/**"
+  - "docs/adr/**"
+  - "docs/rules/**"
+  - "tickets/RUL-002/**"
+  - "evidence/tickets/RUL-002/**"
+  - "src/dmf_pulse/rules/**"
+  - "src/dmf_pulse/cli/**"
+  - "src/dmf_pulse/assurance/**"
+  - "scripts/**"
+  - "tests/**"
+  - "pyproject.toml"
+  - "uv.lock"
+  - "Makefile"
+  - "README.md"
+  - "CHANGELOG.md"
+  - "review_pack/RUL-002/**"
+forbidden_scope:
+  - "database or Alembic"
+  - "providers or HTTP ingestion"
+  - "odds and forecasting models"
+  - "optimisation"
+  - "FastAPI or UI"
+  - "automatic FPL actions"
+  - "production activation of incomplete 2026/27 rules"
+stop_conditions:
+  - "baseline, branch or clean-tree precondition fails"
+  - "target rule must be invented"
+  - "new dependency/network/database is required"
+  - "golden expected output is inconsistent"

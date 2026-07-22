@@ -22,7 +22,9 @@ def test_wheel_installs_and_runs_outside_source_tree(
     assert report["status"] == "PASS"
     assert report["clean_environment_outside_repository"] is True
     assert report["cleaned_up"] is True
-    assert report["installed_version_output"] == "dmf 0.1.0"
+    assert report["installed_version_output"] == "dmf 0.2.0"
+    assert report["installed_runtime_distributions"]
+    assert report["locked_runtime_manifest_sha256"]
     assert report["doctor_status"] == "HEALTHY"
     wheel = report["wheel"]
     assert isinstance(wheel, dict)

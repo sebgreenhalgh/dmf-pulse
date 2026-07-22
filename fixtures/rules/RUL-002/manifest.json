@@ -1,0 +1,142 @@
+{
+  "files": [
+    {
+      "bytes": 1874,
+      "path": "fixtures/rules/RUL-002/bonus_tie_cases.json",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "bd13afb455a1598ab23cd9e9ed52240483289e58ae1c1c3a74f137ea27f8db70"
+    },
+    {
+      "bytes": 2493,
+      "path": "fixtures/rules/RUL-002/golden_fixture_001.expected.json",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "8de33b939110dade145dba5093de4a3f4ee31da32a57358cce9adb58a51a9c54"
+    },
+    {
+      "bytes": 7755,
+      "path": "fixtures/rules/RUL-002/golden_fixture_001.json",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "b3c85bb5fad3681aa5ad37c027c180ca2a7b6c1be70d954c0de755bbbb0e6f0a"
+    },
+    {
+      "bytes": 371,
+      "path": "fixtures/rules/RUL-002/golden_gameweek_001.expected.json",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "2cda3ac63666f5091b6b0d170b8c0fc978a7c90c011a8cc52b3dd842577da093"
+    },
+    {
+      "bytes": 17909,
+      "path": "fixtures/rules/RUL-002/golden_gameweek_001.json",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "898b3619704ed35f4f163422267a25b85a5eb418ff41d5a344408266cfc824fe"
+    },
+    {
+      "bytes": 36,
+      "path": "fixtures/rules/RUL-002/invalid_alias.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "36cd429d483bbe4f53f6bcdcc1401e5423789983592f91153af7cf9191ce7ca2"
+    },
+    {
+      "bytes": 19,
+      "path": "fixtures/rules/RUL-002/invalid_custom_tag.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "71201b6e53be57e80685382fc41276e127fd1848e056a6d11377a5dfe8f67c0f"
+    },
+    {
+      "bytes": 32,
+      "path": "fixtures/rules/RUL-002/invalid_duplicate_key.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "51186781163504e383df2b178fa1ca3785646e826f80727a95e1f99a607f1474"
+    },
+    {
+      "bytes": 143,
+      "path": "fixtures/rules/RUL-002/invalid_target_approval.json",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "cca4cdc7ff0a1138d20d203079b555a1a894580768cf83ad8e8707d2cb4d508b"
+    },
+    {
+      "bytes": 193,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/assists.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "86d06dd8fdd64e4b4eb4a5af827af3cac70edeb9ea9ffd72acb97883ae3777f7"
+    },
+    {
+      "bytes": 1379,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/bonus.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "e27470d40ec4f5691c8001864984b534faedf041a5a923fbe1f1369012b780d2"
+    },
+    {
+      "bytes": 169,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/chips.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "7dad268916e544972cee9f5e431ae9080c6c571779b14264e6c4be626bb6b33a"
+    },
+    {
+      "bytes": 65,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/deadlines.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "f19d7266b12c3f673b2749bde143357b75acc10658a21c1cf60f67dedb17eebe"
+    },
+    {
+      "bytes": 74,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/lineup.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "633db1fc5b8cae1400a4aef173f69bf6004a55c3134243ab0829b4361594d804"
+    },
+    {
+      "bytes": 333,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/positions.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "f13ad6f19da0b8bec853257419673e794aa649044d73f0c618f8284203b19598"
+    },
+    {
+      "bytes": 78,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/prices.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "b4115a3d689d6025bfcc36003d9294a788216bfc2b65605d4dcdec069bd3d057"
+    },
+    {
+      "bytes": 1447,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/scoring.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "25cbdcd7341126144a141f5fe921bc9a005ee30372093dd7ede93079354e1abd"
+    },
+    {
+      "bytes": 419,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/season_manifest.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "adc520307f4e3923953f2e7e5f956f96639ceeb27f01e835be7d18176461e838"
+    },
+    {
+      "bytes": 193,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/source_manifest.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "2d44e14eecce235d0ed7143adbb1385253e651552e060e2b49003aee61e79fc1"
+    },
+    {
+      "bytes": 11,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/special_events.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "fb9b2e59663fe1741488ac52428726f13fd98f2f28cc73db64f022c8ae629999"
+    },
+    {
+      "bytes": 59,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/squad.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "d204d632e60181b926363c69d4e051d86f834d3dc5a2e4b4f187142ffa8d800f"
+    },
+    {
+      "bytes": 60,
+      "path": "fixtures/rules/RUL-002/synthetic_complete/transfers.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "cbf52dda3a403473e677b61f5949fd030b315eb62d9ca824b3fbfa9426e2a363"
+    },
+    {
+      "bytes": 1877,
+      "path": "fixtures/rules/RUL-002/target_2026_27_claims.yaml",
+      "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
+      "sha256": "da8ac89ac521e213cc9ffc285c736c5ee2ee6e65876def5d3de852f2e7ae8287"
+    }
+  ]
+}

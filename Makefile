@@ -1,4 +1,4 @@
-.PHONY: bootstrap format format-check lint type test build wheel validate scan quality
+.PHONY: bootstrap format format-check lint type test coverage-gates rules-validate rules-golden build wheel validate scan quality
 
 bootstrap:
 	uv sync --all-groups --frozen
@@ -16,7 +16,17 @@ type:
 	uv run mypy src/dmf_pulse
 
 test:
-	uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing
+	uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/RUL-002/coverage.json
+	uv run python scripts/check_coverage_gates.py
+
+coverage-gates:
+	uv run python scripts/check_coverage_gates.py
+
+rules-validate:
+	uv run dmf rules validate fixtures/rules/RUL-002/synthetic_complete --json
+
+rules-golden:
+	uv run pytest tests/golden/rules tests/unit/rules/test_bonus_and_lifecycle.py
 
 build:
 	uv build
@@ -30,4 +40,4 @@ validate:
 scan:
 	uv run python scripts/scan_secrets.py
 
-quality: format-check lint type test build wheel validate scan
+quality: format-check lint type test rules-validate rules-golden build wheel validate scan

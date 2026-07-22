@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -18,11 +19,19 @@ from dmf_pulse.assurance.manifests import (  # noqa: E402
 
 
 def main() -> int:
-    manifest = build_repository_manifest(REPOSITORY_ROOT)
-    output = REPOSITORY_ROOT / CURRENT_MANIFEST_PATH
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ticket", default="FND-001")
+    arguments = parser.parse_args()
+    manifest = build_repository_manifest(REPOSITORY_ROOT, ticket_id=arguments.ticket)
+    output_relative = (
+        CURRENT_MANIFEST_PATH
+        if arguments.ticket == "FND-001"
+        else f"evidence/tickets/{arguments.ticket}/current_manifest.json"
+    )
+    output = REPOSITORY_ROOT / output_relative
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(pretty_json(manifest), encoding="utf-8", newline="\n")
-    print(f"wrote {len(manifest.files)} files to {CURRENT_MANIFEST_PATH}")
+    print(f"wrote {len(manifest.files)} files to {output_relative}")
     return 0
 
 

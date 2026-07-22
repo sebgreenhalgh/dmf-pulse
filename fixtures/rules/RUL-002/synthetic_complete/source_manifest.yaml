@@ -1,0 +1,6 @@
+sources:
+  - source_id: "SRC-SYNTHETIC-RUL-002"
+    source_type: "SYNTHETIC_TEST_CONTRACT"
+    status: "VERIFIED"
+    locator: "Codex Pack RUL-002"
+rule_source_default: "SRC-SYNTHETIC-RUL-002"

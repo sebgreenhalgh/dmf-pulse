@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import zipfile
 from collections.abc import Sequence
@@ -10,8 +11,14 @@ from pathlib import Path
 import pytest
 
 from dmf_pulse.assurance import review_pack as review_pack_module
+from dmf_pulse.assurance.manifests import build_repository_manifest
 from dmf_pulse.assurance.review_pack import (
     REVIEW_ZIP_NAME,
+    RUL_MANDATORY_ACCEPTANCE_COMMANDS,
+    RUL_PREFERRED_NAMES,
+    RUL_REQUIRED_BASELINE,
+    RUL_REVIEW_FINAL_RESULT,
+    RUL_REVIEW_ZIP_NAME,
     ReviewEntry,
     ReviewPackError,
     build_empty_baseline_diff,
@@ -20,14 +27,18 @@ from dmf_pulse.assurance.review_pack import (
     enforce_review_limit,
     validate_review_zip,
 )
-from dmf_pulse.system.process import ProcessResult
+from dmf_pulse.system.process import ProcessResult, SubprocessProcessRunner
 
 
 class GitRunner:
     def run(self, command: Sequence[str], *, timeout_seconds: float) -> ProcessResult:
         assert timeout_seconds == 5
         if "rev-parse" in command:
+            if "--abbrev-ref" in command:
+                return ProcessResult(return_code=0, stdout="stage/A2/RUL-002-rules-foundation\n")
             return ProcessResult(return_code=0, stdout="a" * 40 + "\n")
+        if "--porcelain=v1" in command or "--merges" in command:
+            return ProcessResult(return_code=0, stdout="")
         return ProcessResult(return_code=0, stdout="## test/FND-001\n")
 
 
@@ -39,6 +50,32 @@ class OneResultRunner:
         assert "-C" in command
         assert timeout_seconds == 5
         return self.result
+
+
+class RulGitRunner:
+    def __init__(self) -> None:
+        self.commands: list[tuple[str, ...]] = []
+
+    def run(self, command: Sequence[str], *, timeout_seconds: float) -> ProcessResult:
+        assert timeout_seconds in {5, 30}
+        self.commands.append(tuple(command))
+        if "rev-parse" in command:
+            if "--abbrev-ref" in command:
+                return ProcessResult(return_code=0, stdout="stage/A2/RUL-002-rules-foundation\n")
+            return ProcessResult(return_code=0, stdout="a" * 40 + "\n")
+        if "--porcelain=v1" in command or "--merges" in command:
+            return ProcessResult(return_code=0, stdout="")
+        if "--stat" in command:
+            return ProcessResult(return_code=0, stdout="2 files changed, 4 insertions(+)\n")
+        if "diff" in command:
+            return ProcessResult(
+                return_code=0,
+                stdout=(
+                    "diff --git a/fixtures/rules/RUL-002/reference_2025_26/scoring.yaml "
+                    "b/fixtures/rules/RUL-002/reference_2025_26/scoring.yaml\n"
+                ),
+            )
+        return ProcessResult(return_code=0, stdout="## stage/A2/RUL-002-rules-foundation\n")
 
 
 def _codex_result(*, status: str = "FAILED") -> dict[str, object]:
@@ -93,6 +130,160 @@ def _fixture_repository(root: Path) -> None:
     _write(root / "src/example.py", "VALUE = 1\n")
     _write(root / "uv.lock", "generated lock noise\n")
     _write(root / ".secret-scan-allowlist.json", '{"entries": [], "version": "1.0"}\n')
+
+
+def _rul_fixture_repository(root: Path) -> None:
+    commands = []
+    for index, command in enumerate(RUL_MANDATORY_ACCEPTANCE_COMMANDS, start=1):
+        result_text = "PASS: fixture acceptance"
+        if index == 14:
+            result_text = "PASS: expected blocking exit 4; RULESET_ACTIVATION_BLOCKED"
+        elif index == 19:
+            result_text = RUL_REVIEW_FINAL_RESULT
+        commands.append(
+            {
+                "command": command,
+                "duration_seconds": 0.1,
+                "exit_code": 4 if index == 14 else 0,
+                "result": result_text,
+            }
+        )
+    acceptance = [
+        {
+            "command": record["command"],
+            "duration_seconds": record["duration_seconds"],
+            "exit_code": record["exit_code"],
+            "expected_exit_code": 4 if index == 14 else 0,
+            "status": "PASS",
+        }
+        for index, record in enumerate(commands, start=1)
+    ]
+    tests = {
+        "branch_coverage_percent": 91.0,
+        "branches_covered": 91,
+        "branches_total": 100,
+        "collected": 10,
+        "failed": 0,
+        "passed": 10,
+        "rules_branch_coverage_percent": 96.0,
+        "rules_branches_covered": 96,
+        "rules_branches_total": 100,
+        "skipped": 0,
+        "status": "PASS",
+    }
+    result = _codex_result()
+    result.update(
+        {
+            "acceptance": acceptance,
+            "ticket_id": "RUL-002",
+            "code_commit": "a" * 40,
+            "commands": commands,
+            "review_pack": {
+                "path": "review_pack/RUL-002/" + RUL_REVIEW_ZIP_NAME,
+                "file_count": 20,
+                "payload_sha256": "0" * 64,
+            },
+            "repository": {
+                "baseline": RUL_REQUIRED_BASELINE,
+                "branch": "stage/A2/RUL-002-rules-foundation",
+                "clean": True,
+                "head": "a" * 40,
+                "merged": False,
+                "pushed": False,
+            },
+            "tests": [tests],
+        }
+    )
+    _write(root / "evidence/tickets/RUL-002/codex_result.json", json.dumps(result))
+    _write(
+        root / "evidence/tickets/RUL-002/commands.log",
+        "".join(json.dumps(record, sort_keys=True) + "\n" for record in commands),
+    )
+    _write(root / "evidence/tickets/RUL-002/tests.json", json.dumps(tests))
+    _write(
+        root / "evidence/tickets/RUL-002/acceptance_matrix.json",
+        json.dumps(
+            {
+                "commands": acceptance,
+                "failed": 0,
+                "passed": 19,
+                "status": "COMPLETE",
+                "ticket_id": "RUL-002",
+            }
+        ),
+    )
+    for name in (
+        "TEST_RESULTS.md",
+        "ACCEPTANCE.md",
+        "AUTHORITY_REMEDIATION.md",
+        "RULES_COMPILER_REPORT.md",
+        "GOLDEN_SCORING_REPORT.md",
+        "DEPENDENCY_PACKAGE_REPORT.md",
+        "SECURITY_SOURCE_RIGHTS.md",
+        "KNOWN_LIMITATIONS.md",
+    ):
+        _write(root / "evidence/tickets/RUL-002" / name, f"# {name}\n\nPASS\n")
+    for relative in (
+        "src/dmf_pulse/rules/__init__.py",
+        "src/dmf_pulse/rules/models.py",
+        "src/dmf_pulse/rules/errors.py",
+        "src/dmf_pulse/rules/yaml_loader.py",
+        "src/dmf_pulse/rules/compiler.py",
+        "src/dmf_pulse/rules/lifecycle.py",
+        "src/dmf_pulse/rules/scoring.py",
+        "src/dmf_pulse/rules/bps.py",
+        "src/dmf_pulse/rules/bonus.py",
+        "src/dmf_pulse/rules/aggregation.py",
+        "src/dmf_pulse/cli/rules_cmd.py",
+        "pyproject.toml",
+        ".github/workflows/ci.yml",
+        "fixtures/rules/RUL-002/reference_2025_26/scoring.yaml",
+    ):
+        _write(root / relative, f"# {relative}\n")
+    _write(root / ".secret-scan-allowlist.json", '{"entries": [], "version": "1.0"}\n')
+    for name in ("coverage.json", "dependency_report.json", "package_report.json"):
+        _write(root / "evidence/tickets/RUL-002" / name, "{}\n")
+    _write(
+        root / "evidence/tickets/RUL-002/repository_validation_report.json",
+        json.dumps({"error_count": 0, "errors": [], "status": "PASS"}),
+    )
+    current = build_repository_manifest(root, ticket_id="RUL-002")
+    _write(
+        root / "evidence/tickets/RUL-002/current_manifest.json",
+        json.dumps(current.model_dump(mode="json")),
+    )
+    _refresh_rul_evidence_manifest(root)
+
+
+def _refresh_rul_evidence_manifest(root: Path) -> None:
+    evidence_root = root / "evidence/tickets/RUL-002"
+    result = json.loads((evidence_root / "codex_result.json").read_text(encoding="utf-8"))
+    artifacts = []
+    for path in sorted(evidence_root.iterdir(), key=lambda item: item.name):
+        if path.is_file() and path.name != "evidence_manifest.json":
+            payload = path.read_bytes()
+            artifacts.append(
+                {
+                    "bytes": len(payload),
+                    "path": path.relative_to(root).as_posix(),
+                    "sha256": hashlib.sha256(payload).hexdigest(),
+                }
+            )
+    _write(
+        evidence_root / "evidence_manifest.json",
+        json.dumps(
+            {
+                "artifacts": artifacts,
+                "code_commit": "a" * 40,
+                "commands": result["commands"],
+                "context_hash": "0" * 64,
+                "created_at": "2026-07-22T00:00:00Z",
+                "known_limitations": [],
+                "status": "COMPLETE",
+                "ticket_id": "RUL-002",
+            }
+        ),
+    )
 
 
 @pytest.mark.unit
@@ -200,6 +391,104 @@ def test_full_review_pack_build_validates_and_detects_tamper(tmp_path: Path) -> 
 
 
 @pytest.mark.unit
+def test_rul_review_pack_has_exact_layout_and_keeps_authored_fixtures_in_patch(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "repository"
+    root.mkdir()
+    _rul_fixture_repository(root)
+    runner = RulGitRunner()
+    baseline = RUL_REQUIRED_BASELINE
+    generated_at = "2026-07-22T00:00:00Z"
+    digest = calculate_review_payload_digest(
+        root,
+        ticket="RUL-002",
+        baseline=baseline,
+        generated_at=generated_at,
+        process_runner=runner,
+    )
+    result_path = root / "evidence/tickets/RUL-002/codex_result.json"
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    result["status"] = "COMPLETE"
+    result["review_pack"]["payload_sha256"] = digest
+    result_path.write_text(json.dumps(result), encoding="utf-8")
+    _refresh_rul_evidence_manifest(root)
+
+    summary = build_review_pack(
+        root,
+        ticket="RUL-002",
+        baseline=baseline,
+        output=tmp_path / "output",
+        generated_at=generated_at,
+        process_runner=runner,
+    )
+
+    assert summary.file_count == 20
+    assert summary.path.name == RUL_REVIEW_ZIP_NAME
+    assert validate_review_zip(summary.path).payload_sha256 == digest
+    with zipfile.ZipFile(summary.path) as archive:
+        assert tuple(archive.namelist()) == RUL_PREFERRED_NAMES
+        assert "reference_2025_26/scoring.yaml" in archive.read("04_FULL_DIFF.patch").decode()
+    diff_commands = [command for command in runner.commands if "diff" in command]
+    assert diff_commands
+    assert all(":(exclude)fixtures/rules/RUL-002/**" not in command for command in diff_commands)
+
+
+@pytest.mark.unit
+def test_complete_rul_review_rejects_incomplete_command_evidence(tmp_path: Path) -> None:
+    root = tmp_path / "repository"
+    root.mkdir()
+    _rul_fixture_repository(root)
+    result_path = root / "evidence/tickets/RUL-002/codex_result.json"
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    result["status"] = "COMPLETE"
+    result["commands"] = result["commands"][:1]
+    result_path.write_text(json.dumps(result), encoding="utf-8")
+    with pytest.raises(ReviewPackError) as caught:
+        build_review_pack(
+            root,
+            ticket="RUL-002",
+            baseline=RUL_REQUIRED_BASELINE,
+            output=tmp_path / "output",
+            generated_at="2026-07-22T00:00:00Z",
+            process_runner=RulGitRunner(),
+        )
+    assert caught.value.code == "REVIEW_ACCEPTANCE_INVALID"
+
+
+@pytest.mark.unit
+def test_complete_rul_review_rejects_traversal_evidence_artifact(tmp_path: Path) -> None:
+    root = tmp_path / "repository"
+    root.mkdir()
+    _rul_fixture_repository(root)
+    result_path = root / "evidence/tickets/RUL-002/codex_result.json"
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    result["status"] = "COMPLETE"
+    result_path.write_text(json.dumps(result), encoding="utf-8")
+    _refresh_rul_evidence_manifest(root)
+    manifest_path = root / "evidence/tickets/RUL-002/evidence_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["artifacts"].append(
+        {
+            "bytes": 0,
+            "path": "evidence/tickets/RUL-002/../../outside.txt",
+            "sha256": "0" * 64,
+        }
+    )
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(ReviewPackError) as caught:
+        build_review_pack(
+            root,
+            ticket="RUL-002",
+            baseline=RUL_REQUIRED_BASELINE,
+            output=tmp_path / "output",
+            generated_at="2026-07-22T00:00:00Z",
+            process_runner=RulGitRunner(),
+        )
+    assert caught.value.code == "REVIEW_EVIDENCE_INVALID"
+
+
+@pytest.mark.unit
 def test_builder_rejects_ticket_and_repository_secret(tmp_path: Path) -> None:
     root = tmp_path / "repository"
     root.mkdir()
@@ -300,3 +589,26 @@ def test_git_and_small_review_helper_failure_branches(
     with pytest.raises(ReviewPackError) as incomplete:
         review_pack_module._primary_payload_digest({})
     assert incomplete.value.code == "REVIEW_PRIMARY_PAYLOAD"
+
+
+@pytest.mark.unit
+def test_required_git_capture_does_not_use_diagnostic_truncation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payload = b"x" * 8192
+
+    def fake_run(command, *, stdout, stderr, check, shell, timeout):
+        del command, stderr
+        assert check is False and shell is False and timeout == 30.0
+        stdout.write(payload)
+        return review_pack_module.subprocess.CompletedProcess([], 0)
+
+    monkeypatch.setattr(review_pack_module.shutil, "which", lambda _name: "git")
+    monkeypatch.setattr(review_pack_module.subprocess, "run", fake_run)
+    value = review_pack_module._required_git(
+        tmp_path,
+        ["diff"],
+        SubprocessProcessRunner(),
+        code="TEST_GIT",
+    )
+    assert value == payload.decode("utf-8")
