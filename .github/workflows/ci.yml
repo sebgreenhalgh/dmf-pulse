@@ -15,8 +15,25 @@ jobs:
   quality:
     name: Python 3.13 / Ubuntu
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: dmf_pulse_test
+          POSTGRES_USER: dmf_test
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
     env:
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
       UV_NO_PROGRESS: "1"
       UV_CACHE_DIR: ${{ runner.temp }}/uv-cache
     steps:
@@ -45,11 +62,21 @@ jobs:
       - name: Strict typing
         run: uv run mypy src/dmf_pulse
 
-      - name: Offline tests and branch coverage
-        env:
-          UV_OFFLINE: "1"
+      - name: PostgreSQL migration and vertical slice
         run: |
-          uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/RUL-002/coverage.json
+          uv run alembic upgrade head
+          uv run pytest -m "postgres or migration" tests/integration/data_model tests/integration/migrations
+          uv run alembic downgrade base
+          uv run alembic upgrade head
+          uv run alembic upgrade head --sql > "${{ runner.temp }}/dat003-offline-upgrade.sql"
+          uv run dmf data-model doctor --json
+          uv run dmf data-model schema-manifest --json
+          uv run dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json
+          uv run dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json
+
+      - name: Tests and branch coverage
+        run: |
+          uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/DAT-003/coverage.json
           uv run python scripts/check_coverage_gates.py
 
       - name: Rules source and golden vertical slice
@@ -60,13 +87,9 @@ jobs:
           uv run dmf rules score-gameweek artifacts/rules/rul-002-synthetic.json fixtures/rules/RUL-002/golden_gameweek_001.json --json
 
       - name: Build distributions
-        env:
-          UV_OFFLINE: "1"
         run: uv build
 
       - name: Verify installed wheel outside source tree
-        env:
-          UV_OFFLINE: "1"
         run: uv run python scripts/verify_wheel.py
 
       - name: Validate repository and evidence

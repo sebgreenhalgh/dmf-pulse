@@ -17,13 +17,16 @@ def _checker(repository_root: Path) -> Callable[[Path], dict[str, Any]]:
     return cast(Callable[[Path], dict[str, Any]], namespace["check_coverage"])
 
 
-def _coverage(overall: float, covered: int = 95, total: int = 100) -> dict[str, object]:
+def _coverage(overall: float, covered: int = 98, total: int = 100) -> dict[str, object]:
     return {
         "totals": {"percent_branches_covered": overall},
         "files": {
             "src/dmf_pulse/rules/compiler.py": {
                 "summary": {"covered_branches": covered, "num_branches": total}
-            }
+            },
+            "src/dmf_pulse/data_model/repositories.py": {
+                "summary": {"covered_branches": 92, "num_branches": 100}
+            },
         },
     }
 
@@ -36,15 +39,16 @@ def test_coverage_gate_accepts_both_independent_thresholds(
     path.write_text(json.dumps(_coverage(90.0)), encoding="utf-8")
     report = _checker(repository_root)(path)
     assert report["ok"] is True
-    assert report["rules_branch_coverage_percent"] == 95.0
+    assert report["rules_branch_coverage_percent"] == 98.0
+    assert report["data_model_database_branch_coverage_percent"] == 92.0
 
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
     ("overall", "covered", "total"),
     [
-        (math.nan, 95, 100),
-        (math.inf, 95, 100),
+        (math.nan, 98, 100),
+        (math.inf, 98, 100),
         (90.0, 101, 100),
         (90.0, -1, 100),
     ],

@@ -16,6 +16,9 @@ from typing import Final
 
 from dmf_pulse.assurance.canonical import pretty_json, sha256_file
 from dmf_pulse.assurance.evidence import (
+    DAT_DETACHED_REVIEW_NAMES,
+    DAT_REQUIRED_BASELINE,
+    DAT_REQUIRED_BRANCH,
     CodexResult,
     ReviewFile,
     ReviewManifest,
@@ -33,6 +36,7 @@ RUL_REQUIRED_BASELINE: Final = "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
 RUL_REQUIRED_BRANCH: Final = "stage/A2/RUL-002-rules-foundation"
 REVIEW_ZIP_NAME: Final = "DMF_PULSE_FND-001_REVIEW.zip"
 RUL_REVIEW_ZIP_NAME: Final = "DMF_PULSE_RUL-002_REVIEW.zip"
+DAT_REVIEW_ZIP_NAME: Final = "DMF_PULSE_DAT-003_REVIEW.zip"
 MANIFEST_NAME: Final = "03_REVIEW_MANIFEST.json"
 CHECKSUM_NAME: Final = "20_SHA256SUMS.txt"
 PREFERRED_NAMES: Final = (
@@ -77,6 +81,28 @@ RUL_PREFERRED_NAMES: Final = (
     "17_RULES_PUBLIC_CONTRACTS.txt",
     "18_RULES_IMPLEMENTATION.txt",
     "19_CLI_CONFIG_CI.txt",
+    CHECKSUM_NAME,
+)
+DAT_PREFERRED_NAMES: Final = (
+    "01_REVIEW_INDEX.md",
+    "02_CODEX_RESULT.json",
+    MANIFEST_NAME,
+    "04_FULL_DIFF.patch",
+    "05_DIFF_STAT.txt",
+    "06_GIT_STATUS.txt",
+    "07_FILE_TREE.txt",
+    "08_COMMANDS_LOG.txt",
+    "09_TEST_COVERAGE_MUTATION_ORACLES.md",
+    "10_ACCEPTANCE_MATRIX.md",
+    "11_RUL002_REMEDIATION_MATRIX.md",
+    "12_SCHEMA_MIGRATION.md",
+    "13_TEMPORAL_IDENTITY_ASOF_CONCURRENCY.md",
+    "14_PROVENANCE_IMMUTABILITY_RULES_REGISTRY.md",
+    "15_DEPENDENCY_DOCKER_CI_SECURITY.md",
+    "16_KNOWN_LIMITATIONS.md",
+    "17_DATA_MODEL_PUBLIC_CONTRACTS_MODELS.txt",
+    "18_INITIAL_MIGRATION_CRITICAL_SQL.txt",
+    "19_REPOSITORY_CLI_CONFIG_COMPOSE_CI.txt",
     CHECKSUM_NAME,
 )
 OPERATIONAL_EXCLUDED_PARTS: Final = {
@@ -319,6 +345,7 @@ PRIMARY_PAYLOAD_NAMES: Final = {
     "19_CI_YML.txt",
 }
 RUL_PRIMARY_PAYLOAD_NAMES: Final = set(RUL_PREFERRED_NAMES[3:19])
+DAT_PRIMARY_PAYLOAD_NAMES: Final = set(DAT_PREFERRED_NAMES[3:19])
 RUL_MANDATORY_ACCEPTANCE_COMMANDS: Final = (
     "uv sync --all-groups --frozen",
     "uv run ruff format --check .",
@@ -346,6 +373,43 @@ RUL_REVIEW_WRITE_AHEAD_RESULT: Final = (
 )
 RUL_REVIEW_FINAL_RESULT: Final = (
     "PASS: exact 20-file review build completed; final detached digests are in "
+    "archive_finalization.json"
+)
+DAT_MANDATORY_ACCEPTANCE_COMMANDS: Final = (
+    "uv sync --all-groups --frozen",
+    "uv run ruff format --check .",
+    "uv run ruff check .",
+    "uv run mypy src/dmf_pulse",
+    "docker version",
+    "docker compose version",
+    "docker compose -f compose.test.yaml up -d --wait",
+    "uv run alembic upgrade head",
+    'uv run pytest -m "postgres or migration" tests/integration/data_model tests/integration/migrations',
+    "uv run alembic downgrade base",
+    "uv run alembic upgrade head",
+    "uv run alembic upgrade head --sql > evidence/tickets/DAT-003/offline_upgrade.sql",
+    "uv run dmf data-model doctor --json",
+    "uv run dmf data-model schema-manifest --json",
+    "uv run dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json",
+    "uv run dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json",
+    "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/DAT-003/coverage.json",
+    "uv build",
+    "uv run python scripts/verify_wheel.py",
+    "uv run python scripts/validate_repository.py",
+    "uv run python scripts/scan_secrets.py",
+    f"uv run dmf review-pack build --ticket DAT-003 --baseline {DAT_REQUIRED_BASELINE} --output review_pack/DAT-003",
+    "docker compose -f compose.test.yaml down -v --remove-orphans",
+)
+DAT_REVIEW_WRITE_AHEAD_RESULT: Final = (
+    "PASS: write-ahead record committed only by successful external archive finalization; "
+    "exact duration and digests are in archive_finalization.json"
+)
+DAT_REVIEW_FINAL_RESULT: Final = (
+    "PASS: exact 20-file review build completed; final detached digests are in "
+    "archive_finalization.json"
+)
+DAT_TEARDOWN_WRITE_AHEAD_RESULT: Final = (
+    "PASS: finally-guaranteed PostgreSQL teardown pending; exact duration and result are in "
     "archive_finalization.json"
 )
 
@@ -379,7 +443,13 @@ def calculate_review_payload_digest(
         generated_at=generated_at,
         process_runner=selected_runner,
     )
-    names = RUL_PRIMARY_PAYLOAD_NAMES if ticket == "RUL-002" else PRIMARY_PAYLOAD_NAMES
+    names = (
+        DAT_PRIMARY_PAYLOAD_NAMES
+        if ticket == "DAT-003"
+        else RUL_PRIMARY_PAYLOAD_NAMES
+        if ticket == "RUL-002"
+        else PRIMARY_PAYLOAD_NAMES
+    )
     return _primary_payload_digest({entry.name: entry.data for entry in entries}, names)
 
 
@@ -1071,6 +1141,536 @@ def _assemble_rul_entries(
     return entries
 
 
+def _dat_baseline_diff(root: Path, baseline: str | None, runner: ProcessRunner) -> tuple[str, str]:
+    if baseline != DAT_REQUIRED_BASELINE:
+        raise ReviewPackError(
+            "BASELINE_INVALID", "DAT-003 requires the ticket's exact baseline commit"
+        )
+    exclusions = [
+        ":(exclude)uv.lock",
+        ":(exclude)fixtures/data_model/DAT-003/**",
+        ":(exclude)tickets/DAT-003/ticket.yaml",
+        ":(exclude)tickets/DAT-003/ACCEPTANCE.md",
+        ":(exclude).codex/schemas/*.json",
+        ":(exclude)specs/manifests/runtime_lock_manifest.json",
+        ":(exclude)evidence/tickets/DAT-003/**",
+    ]
+    patch = _required_git(
+        root,
+        ["diff", "--no-ext-diff", "--binary", f"{baseline}..HEAD", "--", ".", *exclusions],
+        runner,
+        code="BASELINE_DIFF_FAILED",
+    )
+    stat = _required_git(
+        root,
+        ["diff", "--stat", f"{baseline}..HEAD", "--", ".", *exclusions],
+        runner,
+        code="BASELINE_DIFF_FAILED",
+    )
+    omissions = (
+        "uv.lock (generated; exact hash/runtime graph are reported in file 15)\n"
+        "Pack 003 supplied fixtures and ticket contracts (hash-validated governed inputs; "
+        "representative final fixture/output are included in file 17)\n"
+        "generated JSON schemas, runtime-lock manifest, ticket evidence, and review output\n"
+    )
+    return patch, stat + "\nOmitted from the human-authored patch:\n" + omissions
+
+
+def _required_dat_git_state(root: Path, baseline: str, runner: ProcessRunner) -> tuple[str, str]:
+    branch = _required_git(
+        root, ["rev-parse", "--abbrev-ref", "HEAD"], runner, code="REVIEW_BRANCH_INVALID"
+    ).strip()
+    if branch != DAT_REQUIRED_BRANCH:
+        raise ReviewPackError(
+            "REVIEW_BRANCH_INVALID", "DAT-003 review must use the required branch"
+        )
+    head = _required_git(
+        root, ["rev-parse", "--verify", "HEAD"], runner, code="REVIEW_HEAD_INVALID"
+    ).strip()
+    if len(head) != 40 or any(character not in "0123456789abcdef" for character in head):
+        raise ReviewPackError("REVIEW_HEAD_INVALID", "DAT-003 repository HEAD is invalid")
+    _required_git(
+        root,
+        ["merge-base", "--is-ancestor", baseline, head],
+        runner,
+        code="REVIEW_BASELINE_ANCESTRY",
+    )
+    merges = _required_git(
+        root,
+        ["rev-list", "--merges", f"{baseline}..{head}"],
+        runner,
+        code="REVIEW_HISTORY_INVALID",
+    )
+    if merges.strip():
+        raise ReviewPackError("REVIEW_HISTORY_INVALID", "DAT-003 history contains a merge commit")
+    dirty = _required_git(
+        root,
+        ["status", "--porcelain=v1", "--untracked-files=all"],
+        runner,
+        code="REVIEW_GIT_STATUS",
+    )
+    if dirty.strip():
+        raise ReviewPackError("REVIEW_TREE_DIRTY", "DAT-003 review requires a clean working tree")
+    return head, (
+        f"branch: {branch}\n"
+        f"head: {head}\n"
+        f"baseline: {baseline}\n"
+        "baseline_is_ancestor: true\n"
+        "clean: true\n"
+        "merge_commits_since_baseline: 0\n"
+        "pushed_by_codex: false\n"
+        "merged_by_codex: false\n"
+    )
+
+
+def _dat_json_object(path: Path) -> dict[str, object]:
+    try:
+        value = json.loads(
+            path.read_text(encoding="utf-8"),
+            parse_constant=lambda constant: (_ for _ in ()).throw(ValueError(constant)),
+        )
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 machine evidence is unavailable or malformed"
+        ) from exc
+    if not isinstance(value, dict):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 machine evidence must be a JSON object"
+        )
+    return value
+
+
+def _valid_duration(value: object) -> bool:
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
+        and value >= 0
+    )
+
+
+def _number_at_least(value: object, minimum: float) -> bool:
+    return _valid_duration(value) and isinstance(value, (int, float)) and float(value) >= minimum
+
+
+def _positive_int(value: object) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
+def _validate_dat_complete_evidence(root: Path, result: CodexResult, head: str) -> None:
+    if result.status.value != "COMPLETE":
+        return
+    records = [item.model_dump(mode="json") for item in result.commands]
+    if [item.get("command") for item in records] != list(DAT_MANDATORY_ACCEPTANCE_COMMANDS):
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID",
+            "COMPLETE DAT-003 review requires the exact ordered 23-command result",
+        )
+    for index, record in enumerate(records, start=1):
+        result_text = record.get("result")
+        duration = record.get("duration_seconds")
+        write_ahead = (
+            (index == 22 and result_text == DAT_REVIEW_WRITE_AHEAD_RESULT)
+            or (index == 23 and result_text == DAT_TEARDOWN_WRITE_AHEAD_RESULT)
+        ) and duration is None
+        if (
+            record.get("exit_code") != 0
+            or not isinstance(result_text, str)
+            or not result_text.startswith("PASS:")
+            or (not write_ahead and not _valid_duration(duration))
+            or (index == 12 and "safe Windows equivalence" not in result_text)
+            or (
+                index == 22
+                and result_text not in {DAT_REVIEW_WRITE_AHEAD_RESULT, DAT_REVIEW_FINAL_RESULT}
+            )
+        ):
+            raise ReviewPackError(
+                "REVIEW_ACCEPTANCE_INVALID",
+                f"COMPLETE DAT-003 command {index} evidence is invalid",
+            )
+
+    evidence_root = root / "evidence/tickets/DAT-003"
+    try:
+        command_values = [
+            json.loads(
+                line,
+                parse_constant=lambda constant: (_ for _ in ()).throw(ValueError(constant)),
+            )
+            for line in (evidence_root / "commands.log").read_text(encoding="utf-8").splitlines()
+        ]
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 command log is malformed"
+        ) from exc
+    if command_values != records:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 command log and result do not match exactly"
+        )
+
+    tests = _dat_json_object(evidence_root / "tests.json")
+    required_test_fields = {
+        "branch_coverage_percent",
+        "branches_covered",
+        "branches_total",
+        "collected",
+        "critical_oracles",
+        "data_database_branch_coverage_percent",
+        "data_database_branches_covered",
+        "data_database_branches_total",
+        "failed",
+        "passed",
+        "rules_branch_coverage_percent",
+        "rules_branches_covered",
+        "rules_branches_total",
+        "skipped",
+        "status",
+    }
+    critical_oracles = tests.get("critical_oracles")
+    if (
+        set(tests) != required_test_fields
+        or tests.get("status") != "PASS"
+        or tests.get("failed") != 0
+        or tests.get("skipped") != 0
+        or not _positive_int(tests.get("passed"))
+        or not _number_at_least(tests.get("branch_coverage_percent"), 90)
+        or not _number_at_least(tests.get("rules_branch_coverage_percent"), 98)
+        or not _number_at_least(tests.get("data_database_branch_coverage_percent"), 92)
+        or not isinstance(critical_oracles, list)
+        or len(critical_oracles) < 7
+        or not all(isinstance(item, str) and item for item in critical_oracles)
+        or result.tests != [tests]
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 test and coverage evidence is incomplete"
+        )
+
+    acceptance = _dat_json_object(evidence_root / "acceptance_matrix.json")
+    expected_rows = [
+        {
+            "command": record["command"],
+            "duration_seconds": record["duration_seconds"],
+            "exit_code": record["exit_code"],
+            "expected_exit_code": 0,
+            "status": "PASS",
+        }
+        for record in records
+    ]
+    if (
+        set(acceptance) != {"commands", "failed", "passed", "status", "ticket_id"}
+        or acceptance.get("ticket_id") != "DAT-003"
+        or acceptance.get("status") != "COMPLETE"
+        or acceptance.get("passed") != 23
+        or acceptance.get("failed") != 0
+        or acceptance.get("commands") != expected_rows
+        or result.acceptance != expected_rows
+    ):
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID", "DAT-003 acceptance matrix is incomplete"
+        )
+
+    validated_manifest = validate_evidence_file(evidence_root / "evidence_manifest.json")
+    if not isinstance(validated_manifest.model, TicketEvidenceManifest):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 evidence manifest has the wrong contract kind"
+        )
+    manifest = validated_manifest.model
+    if (
+        manifest.ticket_id != "DAT-003"
+        or manifest.status != "COMPLETE"
+        or manifest.code_commit != head
+        or manifest.commands != records
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 evidence manifest provenance is incomplete"
+        )
+    artifact_paths = [item.path for item in manifest.artifacts]
+    try:
+        actual_artifacts = {
+            path.relative_to(root).as_posix()
+            for path in evidence_root.iterdir()
+            if path.is_file() and path.name != "evidence_manifest.json"
+        }
+    except OSError as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 evidence directory cannot be inspected"
+        ) from exc
+    if (
+        artifact_paths != sorted(artifact_paths)
+        or len(artifact_paths) != len(set(artifact_paths))
+        or set(artifact_paths) != actual_artifacts
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 evidence manifest does not cover exact files"
+        )
+    evidence_relative = Path("evidence/tickets/DAT-003")
+    for artifact in manifest.artifacts:
+        relative = Path(artifact.path)
+        if (
+            relative.is_absolute()
+            or ".." in relative.parts
+            or relative.parent != evidence_relative
+            or relative.as_posix() != artifact.path
+            or relative.name == "evidence_manifest.json"
+        ):
+            raise ReviewPackError(
+                "REVIEW_EVIDENCE_INVALID", "DAT-003 evidence artifact path is outside its ticket"
+            )
+        path = root / relative
+        try:
+            invalid = (
+                path.is_symlink()
+                or not path.is_file()
+                or path.stat().st_size != artifact.bytes
+                or sha256_file(path) != artifact.sha256
+            )
+        except OSError:
+            invalid = True
+        if invalid:
+            raise ReviewPackError(
+                "REVIEW_EVIDENCE_INVALID", "DAT-003 evidence artifact hash is invalid"
+            )
+
+    try:
+        current_manifest = RepositoryManifest.model_validate(
+            _dat_json_object(evidence_root / "current_manifest.json")
+        )
+    except ValueError as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 current repository manifest is malformed"
+        ) from exc
+    if current_manifest.ticket_id != "DAT-003" or validate_repository_manifest(
+        root, current_manifest
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 current repository manifest has drift"
+        )
+    repository_report = _dat_json_object(evidence_root / "repository_validation_report.json")
+    if repository_report != {"error_count": 0, "errors": [], "status": "PASS"}:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 repository validation report is not PASS"
+        )
+    doctor = _dat_json_object(evidence_root / "database_doctor.json")
+    schema = _dat_json_object(evidence_root / "schema_manifest.json")
+    package = _dat_json_object(evidence_root / "package_report.json")
+    migration = _dat_json_object(evidence_root / "migration_report.json")
+    postgres = doctor.get("postgres")
+    if (
+        doctor.get("status") != "HEALTHY"
+        or not isinstance(postgres, dict)
+        or postgres.get("major") != 18
+        or postgres.get("supported") is not True
+        or schema.get("alembic_revision") != "20260723_0001"
+        or schema.get("schema_sha256") != doctor.get("schema_sha256")
+        or package.get("status") != "PASS"
+        or migration.get("status") != "PASS"
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 database/package evidence is incomplete"
+        )
+    try:
+        offline_sql = (evidence_root / "offline_upgrade.sql").read_bytes()
+    except OSError as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 offline migration SQL is unavailable"
+        ) from exc
+    if len(offline_sql) < 1024:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "DAT-003 offline migration SQL is incomplete"
+        )
+
+
+def _dat_review_index(status: str, head: str, baseline: str, limitations: str) -> str:
+    return f"""# DAT-003 review index
+
+DMF Pulse DAT-003 closes the blocking RUL-002 findings and implements the PostgreSQL 18.4 canonical UUIDv7, bitemporal, immutable-provenance, rules-registry, migration, repository, installed-CLI, and assurance vertical slice. Acceptance status: **{status}**.
+
+Baseline: `{baseline}`. Final repository HEAD: `{head}`. Read files 02, 10, 04, 11-16, then the compact contracts/implementation extracts in 17-19.
+
+`payload_sha256` is the stable digest ledger for files 04-19. File 03 hashes files 01-02 and 04-19; file 20 hashes files 01-19. The actual archive SHA-256 and successful CRC/checksum result are external in `archive_finalization.json`, because the archive cannot embed its own hash.
+
+Commands 22-23 use explicit write-ahead records so the review command runs once and PostgreSQL teardown remains finally-guaranteed. After teardown, the same deterministic assembler refreshes the archive without a second CLI invocation.
+
+## Exact unresolved issues
+
+{limitations.rstrip() or "None."}
+
+No push, merge, rebase, reset, tag, amend, or repository-visibility change is part of this milestone. Human acceptance remains external.
+"""
+
+
+def _assemble_dat_entries(
+    root: Path,
+    *,
+    baseline: str | None,
+    generated_at: str,
+    process_runner: ProcessRunner,
+) -> list[ReviewEntry]:
+    paths = ticket_paths(root, "DAT-003")
+    validated = validate_evidence_file(paths.evidence / "codex_result.json")
+    if not isinstance(validated.model, CodexResult) or validated.model.ticket_id != "DAT-003":
+        raise ReviewPackError(
+            "CODEX_RESULT_INVALID", "DAT-003 codex_result has the wrong evidence kind"
+        )
+    result = validated.model
+    if baseline is None:
+        raise ReviewPackError("BASELINE_INVALID", "DAT-003 baseline is required")
+    head, git_state = _required_dat_git_state(root, baseline, process_runner)
+    diff, diff_stat = _dat_baseline_diff(root, baseline, process_runner)
+    if result.status.value == "COMPLETE" and result.code_commit != head:
+        raise ReviewPackError(
+            "REVIEW_COMMIT_MISMATCH", "COMPLETE result does not identify final HEAD"
+        )
+    _validate_dat_complete_evidence(root, result, head)
+    limitations = _required_text(root, "evidence/tickets/DAT-003/KNOWN_LIMITATIONS.md")
+    entries = [
+        _entry(
+            "01_REVIEW_INDEX.md",
+            _dat_review_index(result.status.value, head, baseline, limitations),
+            "review navigation and detached-hash semantics",
+        ),
+        _entry("02_CODEX_RESULT.json", pretty_json(result), "structured implementation result"),
+        _entry("04_FULL_DIFF.patch", diff, "complete human-authored patch from required baseline"),
+        _entry("05_DIFF_STAT.txt", diff_stat, "human-authored diff stat and exact omissions"),
+        _entry("06_GIT_STATUS.txt", git_state, "branch, HEAD, baseline, and clean-tree state"),
+        _entry("07_FILE_TREE.txt", _file_tree(root), "final non-operational repository tree"),
+        _entry(
+            "08_COMMANDS_LOG.txt",
+            _required_text(root, "evidence/tickets/DAT-003/commands.log"),
+            "exact 23-command ledger",
+        ),
+        _entry(
+            "09_TEST_COVERAGE_MUTATION_ORACLES.md",
+            _required_text(root, "evidence/tickets/DAT-003/TEST_RESULTS.md"),
+            "tests, branch gates, and independent mutation oracles",
+        ),
+        _entry(
+            "10_ACCEPTANCE_MATRIX.md",
+            _required_text(root, "evidence/tickets/DAT-003/ACCEPTANCE.md"),
+            "literal 23-command acceptance matrix",
+        ),
+        _entry(
+            "11_RUL002_REMEDIATION_MATRIX.md",
+            _required_text(root, "evidence/tickets/DAT-003/RUL002_REMEDIATION_MATRIX.md"),
+            "blocking RUL-002 finding-to-code/test closure",
+        ),
+        _entry(
+            "12_SCHEMA_MIGRATION.md",
+            _required_text(root, "evidence/tickets/DAT-003/SCHEMA_MIGRATION.md"),
+            "schema fingerprint and reversible migration evidence",
+        ),
+        _entry(
+            "13_TEMPORAL_IDENTITY_ASOF_CONCURRENCY.md",
+            _required_text(root, "evidence/tickets/DAT-003/TEMPORAL_IDENTITY_ASOF_CONCURRENCY.md"),
+            "UUIDv7, bitemporal, boundary, and concurrent-writer review",
+        ),
+        _entry(
+            "14_PROVENANCE_IMMUTABILITY_RULES_REGISTRY.md",
+            _required_text(
+                root, "evidence/tickets/DAT-003/PROVENANCE_IMMUTABILITY_RULES_REGISTRY.md"
+            ),
+            "source, immutability, correction, and rules-registry review",
+        ),
+        _entry(
+            "15_DEPENDENCY_DOCKER_CI_SECURITY.md",
+            _required_text(root, "evidence/tickets/DAT-003/DEPENDENCY_DOCKER_CI_SECURITY.md"),
+            "lock, wheel, Docker, CI, security, and secret review",
+        ),
+        _entry("16_KNOWN_LIMITATIONS.md", limitations, "exact limitations and open questions"),
+        _entry(
+            "17_DATA_MODEL_PUBLIC_CONTRACTS_MODELS.txt",
+            _concat_sources(
+                root,
+                (
+                    "src/dmf_pulse/data_model/__init__.py",
+                    "src/dmf_pulse/data_model/models.py",
+                    "src/dmf_pulse/data_model/tables.py",
+                    "src/dmf_pulse/database/models.py",
+                    "src/dmf_pulse/database/errors.py",
+                    "fixtures/data_model/DAT-003/demo.json",
+                    "evidence/tickets/DAT-003/demo_result.json",
+                    "evidence/tickets/DAT-003/schema_manifest.json",
+                ),
+            ),
+            "public contracts/models plus representative fixture, result, and schema manifest",
+        ),
+        _entry(
+            "18_INITIAL_MIGRATION_CRITICAL_SQL.txt",
+            _concat_sources(
+                root,
+                (
+                    "src/dmf_pulse/database/migrations/versions/20260723_0001_dat003_foundation.py",
+                    "src/dmf_pulse/database/schema.py",
+                ),
+            ),
+            "complete initial migration and schema inspection contract",
+        ),
+        _entry(
+            "19_REPOSITORY_CLI_CONFIG_COMPOSE_CI.txt",
+            _concat_sources(
+                root,
+                (
+                    "src/dmf_pulse/data_model/repositories.py",
+                    "src/dmf_pulse/data_model/services.py",
+                    "src/dmf_pulse/cli/data_model_cmd.py",
+                    "src/dmf_pulse/database/engine.py",
+                    "alembic.ini",
+                    "compose.test.yaml",
+                    "pyproject.toml",
+                    ".github/workflows/ci.yml",
+                    "fixtures/data_model/DAT-003/expected_schema.json",
+                ),
+            ),
+            "repositories, CLI, config, Compose, CI, and expected schema",
+        ),
+    ]
+    payload = {entry.name: entry.data for entry in entries}
+    payload_sha256 = _primary_payload_digest(payload, DAT_PRIMARY_PAYLOAD_NAMES)
+    manifest = ReviewManifest(
+        ticket_id="DAT-003",
+        generated_at=generated_at,
+        repository_head=head,
+        baseline=baseline,
+        file_count=MAX_REVIEW_FILES,
+        files=[
+            ReviewFile(
+                name=item.name,
+                sha256=_sha256_bytes(item.data),
+                bytes=len(item.data),
+                purpose=item.purpose,
+            )
+            for item in entries
+        ],
+        acceptance_status=result.status,
+        payload_sha256=payload_sha256,
+        archive_sha256=None,
+    )
+    entries.append(_entry(MANIFEST_NAME, pretty_json(manifest), "detached payload manifest"))
+    entries.sort(key=lambda item: item.name)
+    entries.append(
+        _entry(
+            CHECKSUM_NAME,
+            "".join(f"{_sha256_bytes(item.data)}  {item.name}\n" for item in entries),
+            "detached checksum ledger",
+        )
+    )
+    entries.sort(key=lambda item: item.name)
+    enforce_review_limit(entries)
+    if tuple(item.name for item in entries) != DAT_PREFERRED_NAMES:
+        raise ReviewPackError(
+            "REVIEW_PACK_LAYOUT", "DAT-003 review pack does not match its 20-file contract"
+        )
+    if set(item.name for item in entries if item.name not in {MANIFEST_NAME, CHECKSUM_NAME}) != (
+        DAT_DETACHED_REVIEW_NAMES
+    ):
+        raise ReviewPackError("REVIEW_PACK_LAYOUT", "DAT-003 detached manifest layout drifted")
+    for item in entries:
+        if scan_text(item.data.decode("utf-8"), path=item.name):
+            raise ReviewPackError(
+                "REVIEW_PACK_SECRET", f"secret-like content detected in {item.name}"
+            )
+    return entries
+
+
 def _assemble_for_ticket(
     root: Path,
     *,
@@ -1087,6 +1687,13 @@ def _assemble_for_ticket(
         return _assemble_fnd_entries(root, generated_at=generated_at, process_runner=process_runner)
     if validated_ticket == "RUL-002":
         return _assemble_rul_entries(
+            root,
+            baseline=baseline,
+            generated_at=generated_at,
+            process_runner=process_runner,
+        )
+    if validated_ticket == "DAT-003":
+        return _assemble_dat_entries(
             root,
             baseline=baseline,
             generated_at=generated_at,
@@ -1135,7 +1742,11 @@ def build_review_pack(
         process_runner=selected_runner,
     )
     primary_names = (
-        RUL_PRIMARY_PAYLOAD_NAMES if validated_ticket == "RUL-002" else PRIMARY_PAYLOAD_NAMES
+        DAT_PRIMARY_PAYLOAD_NAMES
+        if validated_ticket == "DAT-003"
+        else RUL_PRIMARY_PAYLOAD_NAMES
+        if validated_ticket == "RUL-002"
+        else PRIMARY_PAYLOAD_NAMES
     )
     payload_sha256 = _primary_payload_digest(
         {entry.name: entry.data for entry in entries}, primary_names
@@ -1150,7 +1761,13 @@ def build_review_pack(
             "REVIEW_PAYLOAD_DIGEST",
             "codex_result review-pack digest does not match the detached primary payload",
         )
-    zip_name = RUL_REVIEW_ZIP_NAME if validated_ticket == "RUL-002" else REVIEW_ZIP_NAME
+    zip_name = (
+        DAT_REVIEW_ZIP_NAME
+        if validated_ticket == "DAT-003"
+        else RUL_REVIEW_ZIP_NAME
+        if validated_ticket == "RUL-002"
+        else REVIEW_ZIP_NAME
+    )
     output_path = output if output.suffix.casefold() == ".zip" else output / zip_name
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temporary_zip: Path | None = None
@@ -1218,9 +1835,15 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
 
     try:
         result = CodexResult.model_validate_json(payload["02_CODEX_RESULT.json"])
-        if result.ticket_id not in {"FND-001", "RUL-002"}:
+        if result.ticket_id not in {"FND-001", "RUL-002", "DAT-003"}:
             raise ReviewPackError("REVIEW_TICKET_UNSUPPORTED", "review ZIP ticket is unsupported")
-        preferred = RUL_PREFERRED_NAMES if result.ticket_id == "RUL-002" else PREFERRED_NAMES
+        preferred = (
+            DAT_PREFERRED_NAMES
+            if result.ticket_id == "DAT-003"
+            else RUL_PREFERRED_NAMES
+            if result.ticket_id == "RUL-002"
+            else PREFERRED_NAMES
+        )
         if tuple(sorted(payload)) != preferred:
             raise ReviewPackError("REVIEW_PACK_LAYOUT", "review ZIP root layout is invalid")
         manifest_value = json.loads(payload[MANIFEST_NAME].decode("utf-8"))
@@ -1249,7 +1872,11 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
         if digest != _sha256_bytes(payload[name]):
             raise ReviewPackError("REVIEW_CHECKSUM_HASH", f"checksum mismatch for {name}")
     primary_names = (
-        RUL_PRIMARY_PAYLOAD_NAMES if result.ticket_id == "RUL-002" else PRIMARY_PAYLOAD_NAMES
+        DAT_PRIMARY_PAYLOAD_NAMES
+        if result.ticket_id == "DAT-003"
+        else RUL_PRIMARY_PAYLOAD_NAMES
+        if result.ticket_id == "RUL-002"
+        else PRIMARY_PAYLOAD_NAMES
     )
     payload_sha256 = _primary_payload_digest(payload, primary_names)
     if manifest.ticket_id != result.ticket_id:
@@ -1273,6 +1900,20 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
     if result.ticket_id == "RUL-002" and manifest.payload_sha256 != payload_sha256:
         raise ReviewPackError(
             "REVIEW_PAYLOAD_DIGEST", "review manifest payload digest does not match"
+        )
+    if result.ticket_id == "DAT-003" and (
+        result.code_commit is None
+        or manifest.repository_head != result.code_commit
+        or manifest.baseline != DAT_REQUIRED_BASELINE
+        or result.repository is None
+        or result.repository.head != manifest.repository_head
+    ):
+        raise ReviewPackError(
+            "REVIEW_PROVENANCE_MISMATCH", "DAT-003 review provenance is contradictory"
+        )
+    if result.ticket_id == "DAT-003" and manifest.payload_sha256 != payload_sha256:
+        raise ReviewPackError(
+            "REVIEW_PAYLOAD_DIGEST", "DAT-003 review manifest payload digest does not match"
         )
     if (
         result.status.value == "COMPLETE"

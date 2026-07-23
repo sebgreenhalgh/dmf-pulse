@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
+import shutil
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -57,39 +59,98 @@ def activate_ruleset(
             "ruleset activation is blocked by governance requirements",
             blockers=tuple(sorted(set(blockers))),
         )
+    assert approval.approved_at is not None
     active_value: dict[str, Any] = compiled.model_dump(mode="json")
     active_value["status"] = RulesetStatus.ACTIVE.value
     active_value["ruleset_hash"] = self_hash(active_value)
     active = CompiledRuleset.model_validate(active_value)
-    destination = registry / active.ruleset_id / f"{active.ruleset_version}.json"
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    temporary: Path | None = None
-    try:
-        with tempfile.NamedTemporaryFile(
-            prefix=".activate-", dir=destination.parent, delete=False
-        ) as handle:
-            temporary = Path(handle.name)
-            handle.write(pretty_rules_json(active.model_dump(mode="json")).encode("utf-8"))
-            handle.flush()
-            os.fsync(handle.fileno())
-        try:
-            os.link(temporary, destination)
-        except FileExistsError as exc:
-            raise RulesIntegrityError(
-                "RULESET_ACTIVE_COLLISION", "an active artifact already exists at this ID/version"
-            ) from exc
-        except OSError as exc:
-            raise RulesIntegrityError(
-                "RULESET_ACTIVE_UNAVAILABLE", "active artifact could not be published"
-            ) from exc
-        temporary.unlink()
-        temporary = None
-    finally:
-        if temporary is not None:
-            temporary.unlink(missing_ok=True)
-    return ActivationReceipt(
+    destination = registry / active.ruleset_id / active.ruleset_version
+    approval_bytes = pretty_rules_json(approval.model_dump(mode="json")).encode("utf-8")
+    approval_sha256 = hashlib.sha256(approval_bytes).hexdigest()
+    receipt = ActivationReceipt(
         ruleset_id=active.ruleset_id,
         ruleset_version=active.ruleset_version,
         ruleset_hash=active.ruleset_hash,
+        verified_ruleset_hash=compiled.ruleset_hash,
+        approval_sha256=approval_sha256,
+        activated_at=approval.approved_at,
         artifact=destination.as_posix(),
     )
+    children = {
+        "verified_ruleset.json": pretty_rules_json(compiled.model_dump(mode="json")).encode(
+            "utf-8"
+        ),
+        "active_ruleset.json": pretty_rules_json(active.model_dump(mode="json")).encode("utf-8"),
+        "approval.json": approval_bytes,
+        "activation_receipt.json": pretty_rules_json(receipt.model_dump(mode="json")).encode(
+            "utf-8"
+        ),
+    }
+    manifest: dict[str, Any] = {
+        "active_ruleset_hash": active.ruleset_hash,
+        "children": {
+            filename: {
+                "ruleset_hash": (
+                    compiled.ruleset_hash
+                    if filename == "verified_ruleset.json"
+                    else active.ruleset_hash
+                    if filename in {"active_ruleset.json", "activation_receipt.json"}
+                    else compiled.ruleset_hash
+                ),
+                "ruleset_id": active.ruleset_id,
+                "ruleset_version": active.ruleset_version,
+                "sha256": hashlib.sha256(content).hexdigest(),
+            }
+            for filename, content in sorted(children.items())
+        },
+        "ruleset_id": active.ruleset_id,
+        "ruleset_version": active.ruleset_version,
+        "schema_version": "1.0",
+        "verified_ruleset_hash": compiled.ruleset_hash,
+    }
+    children["activation_manifest.json"] = pretty_rules_json(manifest).encode("utf-8")
+
+    def existing_is_identical() -> bool:
+        if not destination.is_dir():
+            return False
+        actual_names = {entry.name for entry in destination.iterdir() if entry.is_file()}
+        if actual_names != set(children):
+            return False
+        try:
+            return all(
+                (destination / name).read_bytes() == content for name, content in children.items()
+            )
+        except OSError:
+            return False
+
+    if destination.exists():
+        if existing_is_identical():
+            return receipt
+        raise RulesIntegrityError(
+            "RULESET_ACTIVE_COLLISION", "activation directory contains different content"
+        )
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = Path(tempfile.mkdtemp(prefix=".activate-", dir=destination.parent))
+    try:
+        for filename, content in children.items():
+            with (temporary / filename).open("xb") as handle:
+                handle.write(content)
+                handle.flush()
+                os.fsync(handle.fileno())
+        try:
+            os.rename(temporary, destination)
+        except OSError as exc:
+            if destination.exists():
+                if existing_is_identical():
+                    return receipt
+                raise RulesIntegrityError(
+                    "RULESET_ACTIVE_COLLISION",
+                    "activation directory was concurrently created with different content",
+                ) from exc
+            raise RulesIntegrityError(
+                "RULESET_ACTIVE_UNAVAILABLE", "active artifact could not be published"
+            ) from exc
+    finally:
+        if temporary.exists():
+            shutil.rmtree(temporary)
+    return receipt

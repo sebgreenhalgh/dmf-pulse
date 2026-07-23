@@ -3,4 +3,6 @@ sources:
     source_type: "SYNTHETIC_TEST_CONTRACT"
     status: "VERIFIED"
     locator: "Codex Pack RUL-002"
+    accessed_on: "2026-07-22"
+    refresh_trigger: "TEST_CONTRACT_CHANGE"
 rule_source_default: "SRC-SYNTHETIC-RUL-002"

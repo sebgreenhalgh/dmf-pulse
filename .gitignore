@@ -56,3 +56,7 @@ review_pack/
 # Regenerable RUL-002 acceptance evidence (the validated ZIP is the immutable review delivery)
 evidence/tickets/RUL-002/*
 !evidence/tickets/RUL-002/.gitkeep
+
+# Regenerable DAT-003 acceptance evidence (PLAN is the durable implementation ledger)
+evidence/tickets/DAT-003/*
+!evidence/tickets/DAT-003/PLAN.md

@@ -38,7 +38,9 @@ def repository_root() -> Path:
 
 
 @pytest.fixture(autouse=True)
-def isolate_home_and_network(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Iterator[None]:
+def isolate_home_and_network(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, request: pytest.FixtureRequest
+) -> Iterator[None]:
     if "UV_CACHE_DIR" not in os.environ:
         if os.name == "nt":
             cache_root = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData/Local"))
@@ -55,13 +57,17 @@ def isolate_home_and_network(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) ->
     def blocked_network(*_args: object, **_kwargs: object) -> NoReturn:
         raise AssertionError("tests must not access the network")
 
-    monkeypatch.setattr(socket, "create_connection", blocked_network)
-    monkeypatch.setattr(socket, "getaddrinfo", blocked_network)
-    monkeypatch.setattr(socket, "gethostbyaddr", blocked_network)
-    monkeypatch.setattr(socket, "gethostbyname", blocked_network)
-    monkeypatch.setattr(socket, "gethostbyname_ex", blocked_network)
-    monkeypatch.setattr(socket, "getnameinfo", blocked_network)
-    monkeypatch.setattr(socket.socket, "connect", blocked_network)
-    monkeypatch.setattr(socket.socket, "connect_ex", blocked_network)
-    monkeypatch.setattr(socket.socket, "sendto", blocked_network)
+    postgres_allowed = bool(
+        request.node.get_closest_marker("postgres") or request.node.get_closest_marker("migration")
+    )
+    if not postgres_allowed:
+        monkeypatch.setattr(socket, "create_connection", blocked_network)
+        monkeypatch.setattr(socket, "getaddrinfo", blocked_network)
+        monkeypatch.setattr(socket, "gethostbyaddr", blocked_network)
+        monkeypatch.setattr(socket, "gethostbyname", blocked_network)
+        monkeypatch.setattr(socket, "gethostbyname_ex", blocked_network)
+        monkeypatch.setattr(socket, "getnameinfo", blocked_network)
+        monkeypatch.setattr(socket.socket, "connect", blocked_network)
+        monkeypatch.setattr(socket.socket, "connect_ex", blocked_network)
+        monkeypatch.setattr(socket.socket, "sendto", blocked_network)
     yield

@@ -20,8 +20,11 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
+  "alembic==1.18.5",
   "pydantic>=2,<3",
+  "psycopg[binary]==3.3.4",
   "PyYAML>=6,<7",
+  "SQLAlchemy==2.0.51",
   "typer>=0.12,<1",
 ]
 
@@ -72,6 +75,8 @@ markers = [
   "property: deterministic property-based test",
   "integration: cross-boundary integration test",
   "golden: stable serialized contract test",
+  "postgres: requires disposable PostgreSQL 18.4",
+  "migration: exercises Alembic upgrade/downgrade behavior",
 ]
 
 [tool.coverage.run]

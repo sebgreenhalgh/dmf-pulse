@@ -60,6 +60,19 @@ def test_safe_reference_and_placeholder_are_not_findings() -> None:
 
 
 @pytest.mark.unit
+def test_python_session_syntax_and_explicit_placeholders_are_not_credentials() -> None:
+    text = "\n".join(
+        (
+            "def commit_session(session: Session) -> None:",
+            "session = factory()",
+            "value = lambda session: operation(session)",
+            "export PGPASSWORD=changeme",
+        )
+    )
+    assert scan_text(text, path="example.py") == []
+
+
+@pytest.mark.unit
 def test_exact_fingerprint_allowlist_and_malformed_wildcard(tmp_path: Path) -> None:
     fixture_value = _fake_token()
     source = tmp_path / "safe_fixture.txt"

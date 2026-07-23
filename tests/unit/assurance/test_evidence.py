@@ -9,6 +9,10 @@ import pytest
 
 from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
 from dmf_pulse.assurance.evidence import (
+    DAT_DETACHED_REVIEW_NAMES,
+    DAT_REQUIRED_BASELINE,
+    DAT_REQUIRED_BRANCH,
+    DAT_REVIEW_PATH,
     CodexResult,
     EvidenceKind,
     EvidenceValidationError,
@@ -217,3 +221,63 @@ def test_codex_result_schema_preserves_exact_legacy_fnd_complete_contract(
     ticket_condition = complete_gate["if"]["properties"]["ticket_id"]
     assert ticket_condition == {"not": {"const": "FND-001"}}
     assert "code_commit" in complete_gate["then"]["required"]
+
+
+@pytest.mark.unit
+def test_dat003_result_requires_exact_detached_clean_provenance() -> None:
+    value = _result()
+    value.update(
+        {
+            "ticket_id": "DAT-003",
+            "code_commit": "a" * 40,
+            "repository": {
+                "baseline": DAT_REQUIRED_BASELINE,
+                "branch": DAT_REQUIRED_BRANCH,
+                "clean": True,
+                "head": "a" * 40,
+                "merged": False,
+                "pushed": False,
+            },
+            "review_pack": {
+                "path": DAT_REVIEW_PATH,
+                "file_count": 20,
+                "payload_sha256": "1" * 64,
+            },
+        }
+    )
+    assert CodexResult.model_validate(value).ticket_id == "DAT-003"
+
+    repository = value["repository"]
+    assert isinstance(repository, dict)
+    repository["clean"] = False
+    with pytest.raises(ValueError, match="clean repository provenance"):
+        CodexResult.model_validate(value)
+    repository["clean"] = True
+    review_pack = value["review_pack"]
+    assert isinstance(review_pack, dict)
+    review_pack["path"] = "wrong.zip"
+    with pytest.raises(ValueError, match="20-file review reference"):
+        CodexResult.model_validate(value)
+
+
+@pytest.mark.unit
+def test_dat003_review_manifest_requires_exact_detached_layout() -> None:
+    files = [
+        {"name": name, "sha256": "0" * 64, "bytes": 1, "purpose": "contract"}
+        for name in sorted(DAT_DETACHED_REVIEW_NAMES)
+    ]
+    value = {
+        "ticket_id": "DAT-003",
+        "generated_at": "2026-07-23T00:00:00Z",
+        "repository_head": "a" * 40,
+        "baseline": DAT_REQUIRED_BASELINE,
+        "file_count": 20,
+        "files": files,
+        "acceptance_status": "COMPLETE",
+        "payload_sha256": "1" * 64,
+        "archive_sha256": None,
+    }
+    assert ReviewManifest.model_validate(value).ticket_id == "DAT-003"
+    value["files"] = files[:-1]
+    with pytest.raises(ValueError, match="DAT-003 review manifest provenance"):
+        ReviewManifest.model_validate(value)

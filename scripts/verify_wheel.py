@@ -20,7 +20,7 @@ from pathlib import Path
 from packaging.markers import Marker
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_REPORT = REPOSITORY_ROOT / "evidence" / "tickets" / "RUL-002" / "package_report.json"
+DEFAULT_REPORT = REPOSITORY_ROOT / "evidence" / "tickets" / "DAT-003" / "package_report.json"
 RUNTIME_MANIFEST = REPOSITORY_ROOT / "specs" / "manifests" / "runtime_lock_manifest.json"
 BUNDLED_ZONEINFO = "dmf_pulse/_data/zoneinfo/Europe/London"
 BUNDLED_ZONEINFO_SHA256 = "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33"
@@ -112,12 +112,51 @@ def _project_identity() -> tuple[str, str]:
     return name, version
 
 
+def _dependency_request(item: object) -> tuple[str, frozenset[str]] | None:
+    if not isinstance(item, dict) or not isinstance(item.get("name"), str):
+        return None
+    raw_extras = item.get("extra", item.get("extras", []))
+    if not isinstance(raw_extras, list) or not all(isinstance(extra, str) for extra in raw_extras):
+        raise VerificationError("uv.lock dependency extras are malformed")
+    return item["name"], frozenset(raw_extras)
+
+
+def _resolve_runtime_graph(
+    packages: dict[str, dict[str, object]], roots: list[object]
+) -> tuple[dict[str, list[dict[str, object]]], dict[str, set[str]]]:
+    selected_dependencies: dict[str, list[dict[str, object]]] = {}
+    activated_extras: dict[str, set[str]] = {}
+    pending = [request for item in roots if (request := _dependency_request(item))]
+    while pending:
+        name, extras = pending.pop()
+        prior_extras = activated_extras.setdefault(name, set())
+        if name in selected_dependencies and extras.issubset(prior_extras):
+            continue
+        prior_extras.update(extras)
+        package = packages.get(name)
+        if not isinstance(package, dict):
+            raise VerificationError("uv.lock runtime graph is incomplete")
+        dependencies = package.get("dependencies", [])
+        optional = package.get("optional-dependencies", {})
+        if not isinstance(dependencies, list) or not isinstance(optional, dict):
+            raise VerificationError("uv.lock runtime dependency graph is malformed")
+        expanded = list(dependencies)
+        for extra in sorted(prior_extras):
+            extra_dependencies = optional.get(extra)
+            if not isinstance(extra_dependencies, list):
+                raise VerificationError("uv.lock runtime dependency extra is missing")
+            expanded.extend(extra_dependencies)
+        selected_dependencies[name] = expanded
+        pending.extend(request for item in expanded if (request := _dependency_request(item)))
+    return selected_dependencies, activated_extras
+
+
 def _runtime_manifest_from_lock() -> dict[str, object]:
     lock = tomllib.loads((REPOSITORY_ROOT / "uv.lock").read_text(encoding="utf-8"))
     raw_packages = lock.get("package")
     if not isinstance(raw_packages, list):
         raise VerificationError("uv.lock package table is missing")
-    packages = {
+    packages: dict[str, dict[str, object]] = {
         item["name"]: item
         for item in raw_packages
         if isinstance(item, dict) and isinstance(item.get("name"), str)
@@ -126,29 +165,18 @@ def _runtime_manifest_from_lock() -> dict[str, object]:
     if not isinstance(project, dict) or not isinstance(project.get("dependencies"), list):
         raise VerificationError("uv.lock project runtime dependencies are missing")
     roots = project["dependencies"]
-    selected: set[str] = set()
-    pending = [item.get("name") for item in roots if isinstance(item, dict)]
-    while pending:
-        name = pending.pop()
-        if not isinstance(name, str) or name in selected:
-            continue
-        package = packages.get(name)
-        if not isinstance(package, dict):
-            raise VerificationError("uv.lock runtime graph is incomplete")
-        dependencies = package.get("dependencies", [])
-        if not isinstance(dependencies, list):
-            raise VerificationError("uv.lock runtime dependency graph is malformed")
-        selected.add(name)
-        pending.extend(item.get("name") for item in dependencies if isinstance(item, dict))
+    selected_dependencies, activated_extras = _resolve_runtime_graph(packages, roots)
+    selected = set(selected_dependencies)
     records = []
     for name in sorted(selected):
         package = packages[name]
         version = package.get("version")
-        dependencies = package.get("dependencies", [])
-        if not isinstance(version, str) or not isinstance(dependencies, list):
+        dependencies = selected_dependencies[name]
+        if not isinstance(version, str):
             raise VerificationError("uv.lock runtime package metadata is malformed")
         records.append(
             {
+                "activated_extras": sorted(activated_extras[name]),
                 "dependencies": sorted(
                     [
                         {"marker": item.get("marker"), "name": item["name"]}
@@ -165,7 +193,7 @@ def _runtime_manifest_from_lock() -> dict[str, object]:
         )
     return {
         "lock_sha256": _sha256(REPOSITORY_ROOT / "uv.lock"),
-        "manifest_version": "1.0",
+        "manifest_version": "1.1",
         "packages": records,
         "project": "dmf-pulse",
         "roots": sorted(item["name"] for item in roots if isinstance(item, dict)),
@@ -273,8 +301,33 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         )
         environment_python = _environment_python(environment_root)
         environment_dmf = _environment_dmf(environment_root)
+        dependency_environment = dict(offline_environment)
+        dependency_environment["VIRTUAL_ENV"] = str(environment_root)
         _run(
-            [uv, "pip", "install", "--offline", "--python", str(environment_python), str(wheel)],
+            [
+                uv,
+                "sync",
+                "--frozen",
+                "--offline",
+                "--no-dev",
+                "--no-install-project",
+                "--active",
+            ],
+            cwd=REPOSITORY_ROOT,
+            step="locked runtime dependency installation",
+            environment=dependency_environment,
+        )
+        _run(
+            [
+                uv,
+                "pip",
+                "install",
+                "--offline",
+                "--no-deps",
+                "--python",
+                str(environment_python),
+                str(wheel),
+            ],
             cwd=temporary_path,
             step="clean wheel installation",
             environment=offline_environment,
@@ -319,6 +372,81 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
             raise VerificationError("installed rules command did not emit JSON") from exc
         if rules_report.get("ruleset_id") != "fpl-synthetic-2099-2100":
             raise VerificationError("installed rules command did not validate the fixture")
+
+        database_url = clean_environment.get("DMF_TEST_DATABASE_URL")
+        if not database_url:
+            raise VerificationError("DMF_TEST_DATABASE_URL is required for wheel verification")
+        clean_environment["DMF_ENVIRONMENT"] = "TEST"
+        data_model_root = REPOSITORY_ROOT / "fixtures/data_model/DAT-003"
+        database_doctor_result = _run(
+            [str(environment_dmf), "data-model", "doctor", "--json"],
+            cwd=temporary_path,
+            step="installed database doctor",
+            environment=clean_environment,
+        )
+        schema_manifest_result = _run(
+            [str(environment_dmf), "data-model", "schema-manifest", "--json"],
+            cwd=temporary_path,
+            step="installed schema manifest",
+            environment=clean_environment,
+        )
+        demo_result = _run(
+            [
+                str(environment_dmf),
+                "data-model",
+                "demo",
+                "--fixture",
+                str(data_model_root / "demo.json"),
+                "--json",
+            ],
+            cwd=temporary_path,
+            step="installed data-model demo",
+            environment=clean_environment,
+        )
+        as_of_result = _run(
+            [
+                str(environment_dmf),
+                "data-model",
+                "as-of",
+                "--fixture",
+                str(data_model_root / "as_of_queries.json"),
+                "--json",
+            ],
+            cwd=temporary_path,
+            step="installed data-model as-of",
+            environment=clean_environment,
+        )
+        try:
+            database_doctor = json.loads(database_doctor_result.stdout)
+            schema_manifest = json.loads(schema_manifest_result.stdout)
+            demo = json.loads(demo_result.stdout)
+            as_of = json.loads(as_of_result.stdout)
+        except json.JSONDecodeError as exc:
+            raise VerificationError("installed data-model command did not emit JSON") from exc
+        if database_doctor.get("status") != "HEALTHY":
+            raise VerificationError("installed database doctor was not healthy")
+        expected_schema = json.loads((data_model_root / "expected_schema.json").read_text("utf-8"))
+        capabilities = database_doctor.get("capabilities")
+        if not isinstance(capabilities, dict) or set(capabilities) != set(
+            expected_schema["required_capabilities"]
+        ):
+            raise VerificationError("installed database capabilities differ from contract")
+        if not all(value is True for value in capabilities.values()):
+            raise VerificationError("installed database capability probe failed")
+        if schema_manifest.get("schema_sha256") != database_doctor.get("schema_sha256"):
+            raise VerificationError("installed schema manifest differs from database doctor")
+        if not all(item.get("passed") is True for item in demo.get("assertions", [])):
+            raise VerificationError("installed data-model demo assertions failed")
+        if not all(item.get("passed") is True for item in as_of.get("assertions", [])):
+            raise VerificationError("installed data-model as-of assertions failed")
+        installed_database_output = (
+            database_doctor_result.stdout
+            + schema_manifest_result.stdout
+            + demo_result.stdout
+            + as_of_result.stdout
+        )
+        if any(value in installed_database_output for value in ("changeme", "dmf_test_password")):
+            raise VerificationError("installed data-model output exposed a database secret")
 
         zoneinfo_result = _run(
             [
@@ -402,6 +530,12 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
                 {"name": name, "version": version}
                 for name, version in sorted(installed_runtime.items())
             ],
+            "installed_data_model": {
+                "as_of_assertions": len(as_of["assertions"]),
+                "database_status": database_doctor["status"],
+                "demo_assertions": len(demo["assertions"]),
+                "schema_sha256": database_doctor["schema_sha256"],
+            },
             "locked_runtime_manifest_sha256": _sha256(RUNTIME_MANIFEST),
             "installed_zoneinfo_fallback": True,
             "platform": {

@@ -50,6 +50,28 @@ def _boolean(value: object, label: str) -> bool:
     return value
 
 
+def _bonus_rank_awards(ruleset: CompiledRuleset) -> dict[int, int]:
+    bonus = _mapping(ruleset.rules.get("bonus"), "bonus")
+    raw_awards = _mapping(
+        bonus.get("bonus_points_by_competition_rank"),
+        "bonus.bonus_points_by_competition_rank",
+    )
+    awards: dict[int, int] = {}
+    for raw_rank, raw_award in raw_awards.items():
+        if not raw_rank.isdigit() or int(raw_rank) <= 0:
+            raise RulesIntegrityError(
+                "RULESET_BONUS_RANK_INVALID", "compiled bonus rank must be a positive integer"
+            )
+        rank = int(raw_rank)
+        award = _integer(raw_award, "bonus.rank_award")
+        if award < 0:
+            raise RulesIntegrityError(
+                "RULESET_BONUS_RANK_INVALID", "compiled bonus award must be non-negative"
+            )
+        awards[rank] = award
+    return awards
+
+
 def _appearance(config: dict[str, object], minutes: int) -> int:
     matches: list[int] = []
     for raw_band in _sequence(config.get("bands"), "appearance.bands"):
@@ -234,7 +256,7 @@ def score_fixture(ruleset: CompiledRuleset, scenario: FixtureScenario) -> Fixtur
         for player in scenario.players
         if player.minutes > 0
     }
-    bonus = allocate_bonus(eligible_bps)
+    bonus = allocate_bonus(eligible_bps, _bonus_rank_awards(ruleset))
     players: dict[str, PlayerScore] = {}
     for player in sorted(scenario.players, key=lambda item: item.player_id):
         components, bps = calculated[player.player_id]

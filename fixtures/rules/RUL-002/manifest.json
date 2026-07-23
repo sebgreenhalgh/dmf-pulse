@@ -61,16 +61,16 @@
       "sha256": "86d06dd8fdd64e4b4eb4a5af827af3cac70edeb9ea9ffd72acb97883ae3777f7"
     },
     {
-      "bytes": 1379,
+      "bytes": 1385,
       "path": "fixtures/rules/RUL-002/synthetic_complete/bonus.yaml",
       "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
-      "sha256": "e27470d40ec4f5691c8001864984b534faedf041a5a923fbe1f1369012b780d2"
+      "sha256": "b1e311711b861e6d45c5c7ecd3cce7b8459ddf70a14de23f97cbadd9827ebb0f"
     },
     {
-      "bytes": 169,
+      "bytes": 877,
       "path": "fixtures/rules/RUL-002/synthetic_complete/chips.yaml",
       "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
-      "sha256": "7dad268916e544972cee9f5e431ae9080c6c571779b14264e6c4be626bb6b33a"
+      "sha256": "b3d10939c3681530a1b4da56821c96198991b6e470871449baa9dee44ec69037"
     },
     {
       "bytes": 65,
@@ -109,10 +109,10 @@
       "sha256": "adc520307f4e3923953f2e7e5f956f96639ceeb27f01e835be7d18176461e838"
     },
     {
-      "bytes": 193,
+      "bytes": 267,
       "path": "fixtures/rules/RUL-002/synthetic_complete/source_manifest.yaml",
       "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
-      "sha256": "2d44e14eecce235d0ed7143adbb1385253e651552e060e2b49003aee61e79fc1"
+      "sha256": "49155dd86f6f9aec01212f7d8a5a8ba6c04ff70f4f70e670939ee81fb21db953"
     },
     {
       "bytes": 11,

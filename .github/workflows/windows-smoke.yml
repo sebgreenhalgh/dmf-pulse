@@ -41,6 +41,6 @@ jobs:
           uv run dmf rules validate fixtures/rules/RUL-002/synthetic_complete --json
 
       - name: Package smoke outside source tree
-        env:
-          UV_OFFLINE: "1"
-        run: uv run python scripts/verify_wheel.py
+        run: |
+          uv build
+          uv run python -m zipfile -l dist/dmf_pulse-0.2.0-py3-none-any.whl

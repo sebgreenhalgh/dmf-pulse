@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "case_id": "wrong-entity-type",
+      "expect_error": "ENTITY_TYPE_MISMATCH"
+    },
+    {
+      "case_id": "membership-overlap",
+      "expect_error": "TEMPORAL_OVERLAP"
+    },
+    {
+      "case_id": "double-supersession",
+      "expect_error": "TEMPORAL_SUPERSESSION_CONFLICT"
+    },
+    {
+      "case_id": "raw-blob-update",
+      "expect_error": "IMMUTABLE_RECORD"
+    },
+    {
+      "case_id": "source-snapshot-delete",
+      "expect_error": "IMMUTABLE_RECORD"
+    },
+    {
+      "case_id": "invalid-range-bounds",
+      "expect_error": "TEMPORAL_RANGE_INVALID"
+    }
+  ],
+  "fixture_id": "DAT-003-NEGATIVE-001"
+}

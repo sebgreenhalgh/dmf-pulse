@@ -287,6 +287,79 @@
           "repository"
         ]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "ticket_id": {
+            "const": "DAT-003"
+          }
+        },
+        "required": [
+          "ticket_id"
+        ]
+      },
+      "then": {
+        "properties": {
+          "code_commit": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "repository": {
+            "properties": {
+              "baseline": {
+                "const": "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
+              },
+              "branch": {
+                "const": "stage/A3/DAT-003-canonical-foundation"
+              },
+              "clean": {
+                "const": true
+              },
+              "merged": {
+                "const": false
+              },
+              "pushed": {
+                "const": false
+              }
+            },
+            "required": [
+              "baseline",
+              "branch",
+              "clean",
+              "head",
+              "merged",
+              "pushed"
+            ],
+            "type": "object"
+          },
+          "review_pack": {
+            "properties": {
+              "archive_sha256": {
+                "type": "null"
+              },
+              "file_count": {
+                "const": 20
+              },
+              "path": {
+                "const": "review_pack/DAT-003/DMF_PULSE_DAT-003_REVIEW.zip"
+              },
+              "sha256": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "file_count",
+              "path",
+              "payload_sha256"
+            ]
+          }
+        },
+        "required": [
+          "code_commit",
+          "repository"
+        ]
+      }
     }
   ],
   "properties": {

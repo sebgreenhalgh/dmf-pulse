@@ -1,30 +1,9 @@
 # Windows and Linux setup
 
-## Windows PowerShell
+Install Python 3.13 with uv, run `uv sync --all-groups --frozen`, and use the copy-paste PowerShell/POSIX database setup in the root README. The canonical PostgreSQL test endpoint is localhost port 55432, the literal fake password is `changeme`, and `DMF_TEST_DATABASE_URL` should omit credentials while `PGPASSWORD` supplies the fake password to libpq.
 
-```powershell
-git clone <private-repository-url>
-Set-Location dmf-pulse
-uv python install 3.13
-uv sync --all-groups --frozen
-uv run dmf doctor --json
-uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing
-```
+Docker Compose is required only for DAT-003 database integration and acceptance. The image is digest-pinned PostgreSQL 18.4; the named test volume must be removed with `docker compose -f compose.test.yaml down -v --remove-orphans` in `finally`/`trap`. Never point tests at a production host or mount production data.
 
-## Linux, WSL2, or POSIX
+Use uv/Python commands directly; Make targets only delegate. The package retains its hash-pinned `Europe/London` timezone fallback. Provider/network access is never required at runtime or in tests.
 
-```sh
-git clone <private-repository-url>
-cd dmf-pulse
-uv python install 3.13
-uv sync --all-groups --frozen
-uv run dmf doctor --json
-uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing
-```
-
-Use the uv/Python commands directly; Make targets only delegate. The package carries one
-hash-pinned IANA TZif fallback for its `Europe/London` default so stock Windows Python does not
-need an extra timezone dependency. Other display zones still require the host Python timezone
-database. Runtime commands do not need network access.
-
-For a complete local gate, run every command in `tickets/FND-001/ACCEPTANCE.md` literally. Generated builds, coverage, artifacts, and review packs are ignored; ticket evidence is retained.
+Windows CI intentionally remains a scheduled/manual pure portability and installed-wheel smoke. Ubuntu/local Docker is the authoritative PostgreSQL gate.

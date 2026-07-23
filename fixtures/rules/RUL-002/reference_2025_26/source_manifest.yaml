@@ -3,4 +3,6 @@ sources:
     source_type: "APPROVED_MODULE_SPECIFICATION"
     status: "VERIFIED"
     locator: "DMFP-02 section 13.2 and RUL-002 reference contract"
+    accessed_on: "2026-07-22"
+    refresh_trigger: "REFERENCE_FIXTURE_CHANGE"
 rule_source_default: "SRC-DMFP-02-REFERENCE-2025-26"

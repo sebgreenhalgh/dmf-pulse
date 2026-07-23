@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
-from dmf_pulse.rules.models import CompiledRuleset, GameweekScenario, GameweekScoreResult
+from dmf_pulse.rules.models import (
+    CompiledRuleset,
+    GameweekScenario,
+    GameweekScoreResult,
+    PlayerScore,
+)
 from dmf_pulse.rules.scoring import (
     ensure_ruleset_scoring_allowed,
     score_fixture,
@@ -22,15 +27,26 @@ def score_gameweek(ruleset: CompiledRuleset, scenario: GameweekScenario) -> Game
         score_fixture(ruleset, fixture)
         for fixture in sorted(scenario.fixtures, key=lambda item: item.fixture_id)
     )
-    totals: dict[str, int] = {}
+    component_names = tuple(PlayerScore.model_fields)
+    components_by_player: dict[str, dict[str, int]] = {}
     for result in fixture_results:
         for player_id, score in result.players.items():
-            totals[player_id] = totals.get(player_id, 0) + score.total
+            components = components_by_player.setdefault(
+                player_id, {component: 0 for component in component_names}
+            )
+            for component in component_names:
+                components[component] += getattr(score, component)
+    players = {
+        player_id: PlayerScore.model_validate(components)
+        for player_id, components in sorted(components_by_player.items())
+    }
     return GameweekScoreResult(
         fixture_ids=tuple(result.fixture_id for result in fixture_results),
         gameweek_id=scenario.gameweek_id,
-        player_totals=dict(sorted(totals.items())),
+        players=players,
+        player_totals={player_id: score.total for player_id, score in players.items()},
         ruleset_hash=ruleset.ruleset_hash,
         ruleset_id=ruleset.ruleset_id,
+        ruleset_version=ruleset.ruleset_version,
         fixture_results=fixture_results,
     )

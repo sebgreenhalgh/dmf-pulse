@@ -1,0 +1,60 @@
+ticket_id: "DAT-003"
+stage: "A3"
+title: "RUL-002 remediation and minimum canonical temporal PostgreSQL foundation"
+status: "READY"
+owner: "Sebastian Greenhalgh"
+implementer: "GPT-5.6 Sol Ultra under human review"
+required_baseline: "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
+branch: "stage/A3/DAT-003-canonical-foundation"
+objective: >-
+  Correct all blocking RUL-002 review findings, then provide a real PostgreSQL 18.4
+  vertical slice for canonical UUID identity, bitemporal facts, immutable source
+  observations, as-of queries, migrations and deterministic operator CLI evidence.
+public_vertical_slice:
+  - "dmf data-model doctor --json"
+  - "dmf data-model schema-manifest --json"
+  - "dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json"
+  - "dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json"
+authority:
+  documents: ["DMFP-00", "DMFP-01", "DMFP-02", "DMFP-03", "DMFP-04", "DMFP-05", "DMFP-13", "DMFP-16", "DMFP-17", "DMFP-19", "DMFP-20"]
+  decisions: ["ADR-DATA-001", "ADR-DATA-002", "ADR-DATA-003", "ADR-DATA-004", "ADR-DATA-005", "ADR-DATA-006", "ADR-DATA-007", "ADR-IMPL-002"]
+permissions:
+  network:
+    allowed_only_for:
+      - "uv dependency resolution/download for approved packages"
+      - "Docker pull postgres:18.4-bookworm"
+      - "official documentation for a concrete tool error"
+  database: "ephemeral PostgreSQL 18.4 only"
+  migration: true
+  sandbox: "workspace-write"
+  git_push: false
+  git_merge: false
+approved_new_dependencies:
+  runtime:
+    - "SQLAlchemy==2.0.51"
+    - "alembic==1.18.5"
+    - "psycopg[binary]==3.3.4"
+  prohibited:
+    - "SQLAlchemy 2.1 beta"
+    - "SQLAlchemy-Continuum"
+    - "Testcontainers"
+    - "SQLite database substitute"
+checkpoints:
+  - "RUL-002 remediation"
+  - "PostgreSQL toolchain and migration"
+  - "canonical/temporal/provenance schema"
+  - "repositories and CLI vertical slice"
+  - "acceptance/evidence/review pack"
+exclusions:
+  - "live provider/FPL HTTP access"
+  - "odds or market tables"
+  - "predictive models"
+  - "optimisation"
+  - "scheduler/task queue"
+  - "FastAPI/public API"
+  - "UI"
+  - "manager account/squad/transfer/chip execution tables"
+  - "full eventual DMFP-03 ontology"
+review_pack:
+  path: "review_pack/DAT-003/DMF_PULSE_DAT-003_REVIEW.zip"
+  maximum_root_files: 20

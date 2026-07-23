@@ -21,6 +21,7 @@ from dmf_pulse.rules.authoring import (
     PassBand,
     PassCompletionRules,
     PositionRule,
+    SpecialEventsFile,
     TargetClaimsFile,
     validate_and_normalize_authoring_data,
 )
@@ -95,8 +96,38 @@ def test_nested_authoring_invariants_kill_boundary_mutants(repository_root: Path
 
     chips = copy.deepcopy(data["chips.yaml"])
     chips["chips"][-1] = copy.deepcopy(chips["chips"][0])
-    with pytest.raises(ValidationError, match="unique and complete"):
+    with pytest.raises(ValidationError, match="must be unique"):
         ChipsFile.model_validate(chips)
+
+
+@pytest.mark.unit
+def test_future_chip_and_special_event_shapes_are_generic_and_json_safe(
+    repository_root: Path,
+) -> None:
+    root = repository_root / "fixtures/rules/RUL-002/synthetic_complete"
+    _, data = _authoring_data(root)
+    chips = load_rules_yaml(root / "chips.yaml")
+    chips["chips"] = [chips["chips"][0]]
+    chips["chips"][0]["key"] = "MYSTERY_CHIP"
+    chips["chips"][0]["effects"] = [
+        {
+            "surface": "SQUAD_SCORE",
+            "operation": "MULTIPLY",
+            "parameters": {"factor": 3, "enabled": True, "labels": ["captain"], "none": None},
+        }
+    ]
+    assert ChipsFile.model_validate(chips).chips[0].key == "MYSTERY_CHIP"
+    events = {
+        "events": [
+            {
+                "event_id": "MIDSEASON_EVENT",
+                "effective_gameweeks": {"start_gameweek": 10, "end_gameweek": 12},
+                "operation": "DECLARE",
+                "parameters": {"label": "synthetic", "weights": [1, 2]},
+            }
+        ]
+    }
+    assert SpecialEventsFile.model_validate(events).events[0].event_id == "MIDSEASON_EVENT"
     deadlines = copy.deepcopy(data["deadlines.yaml"])
     deadlines["gameweeks"].append(copy.deepcopy(deadlines["gameweeks"][0]))
     with pytest.raises(ValidationError, match="numbers must be unique"):

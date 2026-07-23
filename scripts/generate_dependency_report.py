@@ -172,7 +172,7 @@ def _markdown(report: dict[str, Any], ticket: str) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ticket", choices=("FND-001", "RUL-002"), default="FND-001")
+    parser.add_argument("--ticket", choices=("FND-001", "RUL-002", "DAT-003"), default="FND-001")
     arguments = parser.parse_args()
     generated_at = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     report = build_report(generated_at)

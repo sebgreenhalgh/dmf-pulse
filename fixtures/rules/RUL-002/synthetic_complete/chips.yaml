@@ -1,6 +1,6 @@
 chips:
-  - {key: "WILDCARD", copies: 2}
-  - {key: "FREE_HIT", copies: 2}
-  - {key: "TRIPLE_CAPTAIN", copies: 2}
-  - {key: "BENCH_BOOST", copies: 2}
+  - {key: "WILDCARD", copies: 2, activation_window: {start_gameweek: 1, end_gameweek: 38}, expires_after_gameweek: null, duration_gameweeks: 1, concurrency_group: "SQUAD_CHIP", cancellable: false, effects: []}
+  - {key: "FREE_HIT", copies: 2, activation_window: {start_gameweek: 1, end_gameweek: 38}, expires_after_gameweek: null, duration_gameweeks: 1, concurrency_group: "SQUAD_CHIP", cancellable: false, effects: []}
+  - {key: "TRIPLE_CAPTAIN", copies: 2, activation_window: {start_gameweek: 1, end_gameweek: 38}, expires_after_gameweek: null, duration_gameweeks: 1, concurrency_group: "SQUAD_CHIP", cancellable: false, effects: []}
+  - {key: "BENCH_BOOST", copies: 2, activation_window: {start_gameweek: 1, end_gameweek: 38}, expires_after_gameweek: null, duration_gameweeks: 1, concurrency_group: "SQUAD_CHIP", cancellable: false, effects: []}
 concurrency_limit: 1

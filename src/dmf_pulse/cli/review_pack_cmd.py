@@ -1,4 +1,4 @@
-"""CLI for deterministic FND-001 review-pack assembly."""
+"""CLI for deterministic ticket review-pack assembly."""
 
 from __future__ import annotations
 

@@ -1,0 +1,168 @@
+{
+  "clock": {
+    "correction_known_at": "2026-07-12T12:00:00Z",
+    "seed_known_at": "2026-07-10T10:00:00Z"
+  },
+  "entities": {
+    "competition": {
+      "country_code": "GB",
+      "key": "premier-league",
+      "name": "Premier League"
+    },
+    "fixture": {
+      "away": "south-fc",
+      "home": "north-fc",
+      "key": "north-v-south"
+    },
+    "gameweeks": [
+      {
+        "deadline": "2026-08-21T17:30:00Z",
+        "display_name": "GW1",
+        "number": 1
+      },
+      {
+        "deadline": "2026-08-28T17:30:00Z",
+        "display_name": "GW2",
+        "number": 2
+      }
+    ],
+    "player": {
+      "birth_date": "2000-01-01",
+      "key": "alex-example",
+      "name": "Alex Example"
+    },
+    "providers": [
+      {
+        "key": "manual-official",
+        "name": "Manual Official",
+        "rights_profile": "RP-MANUAL-001",
+        "type": "MANUAL"
+      },
+      {
+        "key": "test-provider",
+        "name": "Synthetic Test Provider",
+        "rights_profile": "RP-SYNTHETIC-001",
+        "type": "INTERNAL"
+      }
+    ],
+    "season": {
+      "code": "2026/27",
+      "ends_on": "2027-05-30",
+      "starts_on": "2026-08-21"
+    },
+    "teams": [
+      {
+        "key": "north-fc",
+        "name": "North FC",
+        "short_name": "NTH"
+      },
+      {
+        "key": "south-fc",
+        "name": "South FC",
+        "short_name": "STH"
+      }
+    ]
+  },
+  "external_identifier_versions": [
+    {
+      "external_id": "player-001",
+      "key": "ext-v1",
+      "known_at": "2026-07-10T10:00:00Z",
+      "namespace": "test.player",
+      "product": "players",
+      "provider": "test-provider",
+      "raw_example": "Alex E",
+      "status": "AUTO_MATCHED",
+      "valid_from": "2026-07-01T00:00:00Z",
+      "valid_until": null
+    },
+    {
+      "external_id": "player-001",
+      "key": "ext-v2",
+      "known_at": "2026-07-12T12:00:00Z",
+      "namespace": "test.player.v2",
+      "product": "players-v2",
+      "provider": "test-provider",
+      "raw_example": "Alex Example",
+      "status": "HUMAN_VERIFIED",
+      "supersedes": "ext-v1",
+      "valid_from": "2026-07-01T00:00:00Z",
+      "valid_until": null
+    }
+  ],
+  "fixture_id": "DAT-003-DEMO-001",
+  "fixture_revisions": [
+    {
+      "key": "fixture-rev-1",
+      "kickoff": "2026-08-21T19:00:00Z",
+      "known_at": "2026-07-10T10:00:00Z",
+      "number": 1,
+      "status": "SCHEDULED",
+      "valid_from": "2026-07-01T00:00:00Z",
+      "valid_until": null
+    },
+    {
+      "key": "fixture-rev-2",
+      "kickoff": "2026-08-22T14:00:00Z",
+      "known_at": "2026-07-20T09:00:00Z",
+      "number": 2,
+      "status": "SCHEDULED",
+      "supersedes": "fixture-rev-1",
+      "valid_from": "2026-07-01T00:00:00Z",
+      "valid_until": null
+    }
+  ],
+  "gameweek_assignments": [
+    {
+      "gameweek": 1,
+      "key": "assign-gw1",
+      "known_at": "2026-07-10T10:00:00Z",
+      "status": "ASSIGNED",
+      "valid_from": "2026-07-01T00:00:00Z",
+      "valid_until": null
+    },
+    {
+      "gameweek": 2,
+      "key": "assign-gw2",
+      "known_at": "2026-07-21T10:00:00Z",
+      "status": "FINAL",
+      "supersedes": "assign-gw1",
+      "valid_from": "2026-07-01T00:00:00Z",
+      "valid_until": null
+    }
+  ],
+  "membership_versions": [
+    {
+      "key": "membership-north",
+      "known_at": "2026-07-10T10:00:00Z",
+      "registration_type": "PERMANENT",
+      "team": "north-fc",
+      "valid_from": "2026-07-01T00:00:00Z",
+      "valid_until": "2026-08-01T00:00:00Z"
+    },
+    {
+      "key": "membership-south",
+      "known_at": "2026-07-10T10:00:00Z",
+      "registration_type": "PERMANENT",
+      "team": "south-fc",
+      "valid_from": "2026-08-01T00:00:00Z",
+      "valid_until": null
+    }
+  ],
+  "raw_observations": {
+    "body_utf8": "{\"synthetic\":true,\"player\":\"player-001\"}",
+    "snapshots": [
+      {
+        "key": "snapshot-1",
+        "received_at": "2026-07-10T09:00:00Z",
+        "usable_at": "2026-07-10T10:00:00Z"
+      },
+      {
+        "key": "snapshot-2",
+        "received_at": "2026-07-10T09:30:00Z",
+        "usable_at": "2026-07-10T10:30:00Z"
+      }
+    ]
+  },
+  "rights": "SYNTHETIC"
+}

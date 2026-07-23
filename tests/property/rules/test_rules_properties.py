@@ -22,7 +22,7 @@ from dmf_pulse.rules.models import GameweekScenario
     )
 )
 def test_bonus_is_bounded_and_equal_bps_always_ties(scores: dict[str, int]) -> None:
-    awards = allocate_bonus(scores)
+    awards = allocate_bonus(scores, {1: 3, 2: 2, 3: 1})
     assert set(awards) == set(scores)
     assert set(awards.values()) <= {0, 1, 2, 3}
     for left, left_score in scores.items():
@@ -43,8 +43,9 @@ def test_bonus_is_bounded_and_equal_bps_always_ties(scores: dict[str, int]) -> N
 def test_adding_a_player_below_every_rank_never_changes_existing_awards(
     scores: dict[str, int],
 ) -> None:
-    before = allocate_bonus(scores)
-    after = allocate_bonus({**scores, "new-low-player": min(scores.values()) - 1})
+    policy = {1: 3, 2: 2, 3: 1}
+    before = allocate_bonus(scores, policy)
+    after = allocate_bonus({**scores, "new-low-player": min(scores.values()) - 1}, policy)
     assert {player: after[player] for player in scores} == before
 
 

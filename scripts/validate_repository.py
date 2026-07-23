@@ -6,7 +6,6 @@ import hashlib
 import json
 import math
 import re
-import subprocess
 import sys
 import tomllib
 from pathlib import Path
@@ -67,10 +66,20 @@ CORE_REQUIRED_FILES = (
     "tickets/FND-001/ticket.yaml",
     "tickets/RUL-002/ACCEPTANCE.md",
     "tickets/RUL-002/ticket.yaml",
+    "tickets/DAT-003/ACCEPTANCE.md",
+    "tickets/DAT-003/DEFINITION_OF_READY.md",
+    "tickets/DAT-003/ticket.yaml",
     "specs/manifests/stage_authority_requirements.json",
     "specs/manifests/runtime_lock_manifest.json",
     "src/dmf_pulse/rules/__init__.py",
     "src/dmf_pulse/cli/rules_cmd.py",
+    "src/dmf_pulse/data_model/__init__.py",
+    "src/dmf_pulse/database/__init__.py",
+    "compose.test.yaml",
+    "alembic.ini",
+    ".codex/schemas/as_of_result.schema.json",
+    ".codex/schemas/database_doctor.schema.json",
+    ".codex/schemas/schema_manifest.schema.json",
     "uv.lock",
 )
 FINAL_EVIDENCE_FILES = (
@@ -553,11 +562,52 @@ def _dependency_name(requirement: object) -> str:
     return re.split(r"[<>=!~;\[ ]", requirement, maxsplit=1)[0].casefold()
 
 
+def _locked_dependency_request(item: object) -> tuple[str, frozenset[str]] | None:
+    if not isinstance(item, dict) or not isinstance(item.get("name"), str):
+        return None
+    raw_extras = item.get("extra", item.get("extras", []))
+    if not isinstance(raw_extras, list) or not all(isinstance(extra, str) for extra in raw_extras):
+        raise ValueError(f"locked dependency extras malformed: {item['name']}")
+    return item["name"], frozenset(raw_extras)
+
+
+def _resolve_locked_runtime_graph(
+    packages: dict[str, dict[str, Any]], roots: list[object]
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, set[str]]]:
+    selected_dependencies: dict[str, list[dict[str, Any]]] = {}
+    activated_extras: dict[str, set[str]] = {}
+    pending = [request for item in roots if (request := _locked_dependency_request(item))]
+    while pending:
+        name, extras = pending.pop()
+        prior_extras = activated_extras.setdefault(name, set())
+        if name in selected_dependencies and extras.issubset(prior_extras):
+            continue
+        prior_extras.update(extras)
+        package = packages.get(name)
+        if not isinstance(package, dict):
+            raise ValueError(f"locked runtime package missing: {name}")
+        dependencies = package.get("dependencies", [])
+        optional = package.get("optional-dependencies", {})
+        if not isinstance(dependencies, list) or not isinstance(optional, dict):
+            raise ValueError(f"locked dependencies malformed: {name}")
+        expanded = list(dependencies)
+        for extra in sorted(prior_extras):
+            extra_dependencies = optional.get(extra)
+            if not isinstance(extra_dependencies, list):
+                raise ValueError(f"locked dependency extra is missing: {name}[{extra}]")
+            expanded.extend(extra_dependencies)
+        selected_dependencies[name] = expanded
+        pending.extend(
+            request for item in expanded if (request := _locked_dependency_request(item))
+        )
+    return selected_dependencies, activated_extras
+
+
 def _runtime_lock_manifest(lock_path: Path, lock: dict[str, Any]) -> dict[str, object]:
     raw_packages = lock.get("package")
     if not isinstance(raw_packages, list):
         raise ValueError("uv.lock package table is missing")
-    packages = {
+    packages: dict[str, dict[str, Any]] = {
         item["name"]: item
         for item in raw_packages
         if isinstance(item, dict) and isinstance(item.get("name"), str)
@@ -566,29 +616,18 @@ def _runtime_lock_manifest(lock_path: Path, lock: dict[str, Any]) -> dict[str, o
     if not isinstance(project, dict) or not isinstance(project.get("dependencies"), list):
         raise ValueError("uv.lock project runtime dependencies are missing")
     roots = project["dependencies"]
-    selected: set[str] = set()
-    pending = [item.get("name") for item in roots if isinstance(item, dict)]
-    while pending:
-        name = pending.pop()
-        if not isinstance(name, str) or name in selected:
-            continue
-        package = packages.get(name)
-        if not isinstance(package, dict):
-            raise ValueError(f"locked runtime package missing: {name}")
-        dependencies = package.get("dependencies", [])
-        if not isinstance(dependencies, list):
-            raise ValueError(f"locked dependencies malformed: {name}")
-        selected.add(name)
-        pending.extend(item.get("name") for item in dependencies if isinstance(item, dict))
+    selected_dependencies, activated_extras = _resolve_locked_runtime_graph(packages, roots)
+    selected = set(selected_dependencies)
     records = []
     for name in sorted(selected):
         package = packages[name]
         version = package.get("version")
-        dependencies = package.get("dependencies", [])
-        if not isinstance(version, str) or not isinstance(dependencies, list):
+        dependencies = selected_dependencies[name]
+        if not isinstance(version, str):
             raise ValueError(f"locked runtime metadata malformed: {name}")
         records.append(
             {
+                "activated_extras": sorted(activated_extras[name]),
                 "dependencies": sorted(
                     [
                         {"marker": item.get("marker"), "name": item["name"]}
@@ -605,7 +644,7 @@ def _runtime_lock_manifest(lock_path: Path, lock: dict[str, Any]) -> dict[str, o
         )
     return {
         "lock_sha256": _sha256(lock_path),
-        "manifest_version": "1.0",
+        "manifest_version": "1.1",
         "packages": records,
         "project": "dmf-pulse",
         "roots": sorted(item["name"] for item in roots if isinstance(item, dict)),
@@ -641,8 +680,19 @@ def _validate_package_contract(root: Path, errors: list[str]) -> None:
         if isinstance(dependencies, list)
         else set()
     )
-    if runtime_names != {"pydantic", "pyyaml", "typer"}:
+    expected_runtime = {"alembic", "psycopg", "pydantic", "pyyaml", "sqlalchemy", "typer"}
+    if runtime_names != expected_runtime:
         errors.append(f"pyproject.toml: unexpected runtime dependencies: {sorted(runtime_names)}")
+    if isinstance(dependencies, list):
+        required_exact = {
+            "SQLAlchemy==2.0.51",
+            "alembic==1.18.5",
+            "psycopg[binary]==3.3.4",
+        }
+        if not required_exact.issubset(set(dependencies)):
+            errors.append(
+                "pyproject.toml: DAT-003 database dependencies must use exact approved pins"
+            )
     dependency_groups = pyproject.get("dependency-groups", {})
     dev_dependencies = (
         dependency_groups.get("dev", []) if isinstance(dependency_groups, dict) else []
@@ -693,7 +743,6 @@ def _validate_package_contract(root: Path, errors: list[str]) -> None:
         else set()
     )
     forbidden = {
-        "alembic",
         "fastapi",
         "highspy",
         "jax",
@@ -701,15 +750,15 @@ def _validate_package_contract(root: Path, errors: list[str]) -> None:
         "numpyro",
         "pandas",
         "polars",
-        "psycopg",
         "pymc",
         "pyomo",
         "scipy",
-        "sqlalchemy",
         "torch",
     }
     if locked_names & forbidden:
         errors.append(f"uv.lock contains forbidden packages: {sorted(locked_names & forbidden)}")
+    if {"sqlite", "pysqlite", "aiosqlite"} & locked_names:
+        errors.append("uv.lock contains a prohibited SQLite dependency")
     if "dmf-pulse" not in locked_names:
         errors.append("uv.lock does not contain the dmf-pulse project")
     runtime_manifest = _read_json(root / "specs/manifests/runtime_lock_manifest.json", errors)
@@ -720,6 +769,64 @@ def _validate_package_contract(root: Path, errors: list[str]) -> None:
     else:
         if runtime_manifest != expected_runtime_manifest:
             errors.append("runtime_lock_manifest.json does not exactly match the uv.lock graph")
+
+
+def _validate_dat_repository_contract(root: Path, errors: list[str]) -> None:
+    compose_path = root / "compose.test.yaml"
+    try:
+        compose = compose_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        errors.append("compose.test.yaml must be readable UTF-8")
+        return
+    required = (
+        "postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296",
+        "POSTGRES_DB: dmf_pulse_test",
+        "POSTGRES_USER: dmf_test",
+        "POSTGRES_PASSWORD: changeme",
+        "127.0.0.1:${DMF_TEST_POSTGRES_PORT:-55432}:5432",
+        "pg_isready -U dmf_test -d dmf_pulse_test",
+    )
+    for fragment in required:
+        if fragment not in compose:
+            errors.append(f"compose.test.yaml missing DAT-003 contract fragment: {fragment}")
+    prohibited_patterns = (
+        re.compile(r"(?:^|\n)\s*(?:from\s+sqlite3\s+import|import\s+sqlite3\b)"),
+        re.compile(r"sqlite(?:\+[^:]+)?://", re.IGNORECASE),
+        re.compile(r"pytest\.mark\.sqlite\b"),
+    )
+    prohibited_suffixes = {".db", ".sqlite", ".sqlite3"}
+    for path in root.rglob("*"):
+        relative = path.relative_to(root)
+        if any(
+            part
+            in {
+                ".git",
+                ".hypothesis",
+                ".mypy_cache",
+                ".pytest_cache",
+                ".ruff_cache",
+                ".venv",
+                "review_pack",
+                "evidence",
+            }
+            for part in relative.parts
+        ):
+            continue
+        if path.is_file() and path.suffix.casefold() in prohibited_suffixes:
+            errors.append(f"prohibited SQLite file exists: {relative.as_posix()}")
+        if not path.is_file() or path.suffix.casefold() not in {".py", ".toml", ".yaml", ".yml"}:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            continue
+        selected_patterns = (
+            prohibited_patterns[2:]
+            if relative.parts and relative.parts[0] == "tests"
+            else prohibited_patterns
+        )
+        if any(pattern.search(text) for pattern in selected_patterns):
+            errors.append(f"prohibited SQLite dependency/driver/test marker: {relative.as_posix()}")
 
 
 def _validate_ci_contract(root: Path, errors: list[str]) -> None:
@@ -739,7 +846,15 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
         "uv run ruff format --check .",
         "uv run ruff check .",
         "uv run mypy src/dmf_pulse",
-        "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing",
+        "postgres:18.4-bookworm@sha256:",
+        "uv run alembic upgrade head",
+        'uv run pytest -m "postgres or migration"',
+        "uv run alembic downgrade base",
+        "uv run dmf data-model doctor --json",
+        "uv run dmf data-model schema-manifest --json",
+        "uv run dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json",
+        "uv run dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json",
+        "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/DAT-003/coverage.json",
         "uv run python scripts/check_coverage_gates.py",
         "uv build",
         "uv run python scripts/verify_wheel.py",
@@ -770,17 +885,20 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
         validate_repository_manifest,
     )
 
-    for path in sorted((root / "evidence/tickets").glob("*/current_manifest.json")):
+    active_path = root / "evidence/tickets/DAT-003/current_manifest.json"
+    for path in [active_path] if active_path.is_file() else []:
         try:
             expected = RepositoryManifest.model_validate_json(path.read_text(encoding="utf-8"))
-            # FND-001 is a frozen historical snapshot. Later tickets validate their own current tree.
-            if expected.ticket_id != "FND-001":
-                errors.extend(validate_repository_manifest(root, expected))
+            errors.extend(validate_repository_manifest(root, expected))
         except (OSError, UnicodeError, ValueError) as exc:
             errors.append(f"current manifest is malformed: {type(exc).__name__}")
 
 
 def _validate_final_evidence(root: Path, errors: list[str]) -> None:
+    if (root / "tickets/DAT-003/ticket.yaml").is_file():
+        # FND-001 is immutable historical evidence; its dependency/package reports describe
+        # the A1 lock and must not be compared to the active DAT-003 lock.
+        return
     result_path = root / "evidence/tickets/FND-001/codex_result.json"
     if not result_path.is_file():
         return
@@ -1009,23 +1127,6 @@ def _validate_rul_coverage(root: Path, errors: list[str]) -> None:
         errors.append("RUL-002 rules branch coverage must be at least 95 percent")
 
 
-def _rul_git_output(root: Path, arguments: list[str]) -> tuple[int, str]:
-    try:
-        result = subprocess.run(
-            ["git", "-C", str(root), *arguments],
-            capture_output=True,
-            check=False,
-            encoding="utf-8",
-            errors="replace",
-            shell=False,
-            text=True,
-            timeout=10,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return 124, ""
-    return result.returncode, result.stdout.strip()
-
-
 def _validate_rul_evidence(root: Path, errors: list[str]) -> None:
     result_path = root / "evidence/tickets/RUL-002/codex_result.json"
     if not result_path.is_file():
@@ -1154,31 +1255,39 @@ def _validate_rul_evidence(root: Path, errors: list[str]) -> None:
         elif candidate.stat().st_size != artifact.bytes or _sha256(candidate) != artifact.sha256:
             errors.append(f"RUL-002 evidence artifact mismatch: {artifact.path}")
 
-    branch_code, branch = _rul_git_output(root, ["branch", "--show-current"])
-    head_code, head = _rul_git_output(root, ["rev-parse", "--verify", "HEAD"])
-    status_code, dirty = _rul_git_output(
-        root, ["status", "--porcelain=v1", "--untracked-files=all"]
-    )
-    ancestor_code, _ = _rul_git_output(
-        root,
-        ["merge-base", "--is-ancestor", "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea", head],
-    )
-    merges_code, merges = _rul_git_output(
-        root,
-        ["rev-list", "--merges", f"12049a7de23a4a8fcca3d219dbcab1bf5e1027ea..{head}"],
-    )
-    if (
-        branch_code != 0
-        or branch != "stage/A2/RUL-002-rules-foundation"
-        or head_code != 0
-        or head != result.code_commit
-        or status_code != 0
-        or dirty
-        or ancestor_code != 0
-        or merges_code != 0
-        or merges
-    ):
-        errors.append("RUL-002 evidence does not match the actual clean non-merge Git state")
+    # RUL-002 is immutable historical evidence once DAT-003 is active. Its artifact
+    # hashes remain validated above; current branch/worktree state belongs to DAT-003.
+
+
+def _validate_dat_evidence(root: Path, errors: list[str]) -> None:
+    result_path = root / "evidence/tickets/DAT-003/codex_result.json"
+    if not result_path.is_file():
+        return
+    source_root = root / "src"
+    if str(source_root) not in sys.path:
+        sys.path.insert(0, str(source_root))
+    try:
+        from dmf_pulse.assurance.evidence import CodexResult, ResultStatus, validate_evidence_file
+        from dmf_pulse.assurance.review_pack import (
+            ReviewPackError,
+            _validate_dat_complete_evidence,
+        )
+
+        validated = validate_evidence_file(result_path)
+        if not isinstance(validated.model, CodexResult) or validated.model.ticket_id != "DAT-003":
+            errors.append("DAT-003 codex result has the wrong evidence kind")
+            return
+        result = validated.model
+        if result.status is not ResultStatus.COMPLETE:
+            return
+        if result.code_commit is None:
+            errors.append("DAT-003 COMPLETE result lacks its code commit")
+            return
+        _validate_dat_complete_evidence(root, result, result.code_commit)
+    except ReviewPackError as exc:
+        errors.append(f"DAT-003 final evidence is invalid: {exc.code}")
+    except (OSError, UnicodeError, ValueError) as exc:
+        errors.append(f"DAT-003 final evidence is malformed: {type(exc).__name__}")
 
 
 def validate_repository(root: Path) -> list[str]:
@@ -1192,11 +1301,13 @@ def validate_repository(root: Path) -> list[str]:
     if (root / "pyproject.toml").is_file():
         _validate_rul_fixtures(root, errors)
         _validate_package_contract(root, errors)
+        _validate_dat_repository_contract(root, errors)
         _validate_ci_contract(root, errors)
         _validate_current_manifest(root, errors)
         _validate_final_evidence(root, errors)
         _validate_rul_coverage(root, errors)
         _validate_rul_evidence(root, errors)
+        _validate_dat_evidence(root, errors)
     return sorted(set(errors))
 
 
@@ -1208,7 +1319,13 @@ def main() -> int:
         "errors": errors,
         "status": "PASS" if not errors else "FAIL",
     }
-    active_ticket = "RUL-002" if (root / "tickets/RUL-002/ticket.yaml").is_file() else "FND-001"
+    active_ticket = (
+        "DAT-003"
+        if (root / "tickets/DAT-003/ticket.yaml").is_file()
+        else "RUL-002"
+        if (root / "tickets/RUL-002/ticket.yaml").is_file()
+        else "FND-001"
+    )
     report_path = (
         root / "evidence" / "tickets" / active_ticket / "repository_validation_report.json"
     )

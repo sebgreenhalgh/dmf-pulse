@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assertions": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "fixture_id": {
+      "type": "string"
+    },
+    "queries": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "known_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "query_id": {
+            "type": "string"
+          },
+          "result": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "valid_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query_id",
+          "valid_at",
+          "known_at",
+          "result"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "fixture_id",
+    "queries",
+    "assertions"
+  ],
+  "title": "DAT-003 As-Of Query Result",
+  "type": "object"
+}

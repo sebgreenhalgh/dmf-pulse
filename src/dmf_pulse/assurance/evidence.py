@@ -27,6 +27,29 @@ from dmf_pulse.assurance.tickets import validate_ticket_id
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 GIT_COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 MAX_EVIDENCE_BYTES = 10 * 1024 * 1024
+DAT_REQUIRED_BASELINE = "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
+DAT_REQUIRED_BRANCH = "stage/A3/DAT-003-canonical-foundation"
+DAT_REVIEW_PATH = "review_pack/DAT-003/DMF_PULSE_DAT-003_REVIEW.zip"
+DAT_DETACHED_REVIEW_NAMES = {
+    "01_REVIEW_INDEX.md",
+    "02_CODEX_RESULT.json",
+    "04_FULL_DIFF.patch",
+    "05_DIFF_STAT.txt",
+    "06_GIT_STATUS.txt",
+    "07_FILE_TREE.txt",
+    "08_COMMANDS_LOG.txt",
+    "09_TEST_COVERAGE_MUTATION_ORACLES.md",
+    "10_ACCEPTANCE_MATRIX.md",
+    "11_RUL002_REMEDIATION_MATRIX.md",
+    "12_SCHEMA_MIGRATION.md",
+    "13_TEMPORAL_IDENTITY_ASOF_CONCURRENCY.md",
+    "14_PROVENANCE_IMMUTABILITY_RULES_REGISTRY.md",
+    "15_DEPENDENCY_DOCKER_CI_SECURITY.md",
+    "16_KNOWN_LIMITATIONS.md",
+    "17_DATA_MODEL_PUBLIC_CONTRACTS_MODELS.txt",
+    "18_INITIAL_MIGRATION_CRITICAL_SQL.txt",
+    "19_REPOSITORY_CLI_CONFIG_COMPOSE_CI.txt",
+}
 TicketId = Annotated[
     str,
     Field(min_length=3, max_length=40, pattern=r"^[A-Z0-9]+(?:[-.][A-Z0-9]+)*$"),
@@ -158,6 +181,45 @@ class CodexResult(StrictEvidenceModel):
                         "required": ["code_commit", "repository"],
                     },
                 },
+                {
+                    "if": {
+                        "properties": {"ticket_id": {"const": "DAT-003"}},
+                        "required": ["ticket_id"],
+                    },
+                    "then": {
+                        "properties": {
+                            "code_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+                            "repository": {
+                                "properties": {
+                                    "baseline": {"const": DAT_REQUIRED_BASELINE},
+                                    "branch": {"const": DAT_REQUIRED_BRANCH},
+                                    "clean": {"const": True},
+                                    "merged": {"const": False},
+                                    "pushed": {"const": False},
+                                },
+                                "required": [
+                                    "baseline",
+                                    "branch",
+                                    "clean",
+                                    "head",
+                                    "merged",
+                                    "pushed",
+                                ],
+                                "type": "object",
+                            },
+                            "review_pack": {
+                                "properties": {
+                                    "archive_sha256": {"type": "null"},
+                                    "file_count": {"const": 20},
+                                    "path": {"const": DAT_REVIEW_PATH},
+                                    "sha256": {"type": "null"},
+                                },
+                                "required": ["file_count", "path", "payload_sha256"],
+                            },
+                        },
+                        "required": ["code_commit", "repository"],
+                    },
+                },
             ]
         },
     )
@@ -204,6 +266,25 @@ class CodexResult(StrictEvidenceModel):
                 or self.repository.merged
             ):
                 raise ValueError("RUL-002 requires exact clean repository provenance")
+        if self.ticket_id == "DAT-003":
+            if (
+                self.review_pack.payload_sha256 is None
+                or self.review_pack.sha256 is not None
+                or self.review_pack.archive_sha256 is not None
+                or self.review_pack.path != DAT_REVIEW_PATH
+                or self.review_pack.file_count != 20
+            ):
+                raise ValueError("DAT-003 requires the exact detached 20-file review reference")
+            if (
+                self.repository is None
+                or self.repository.branch != DAT_REQUIRED_BRANCH
+                or self.repository.head != self.code_commit
+                or self.repository.baseline != DAT_REQUIRED_BASELINE
+                or not self.repository.clean
+                or self.repository.pushed
+                or self.repository.merged
+            ):
+                raise ValueError("DAT-003 requires exact clean repository provenance")
         return self
 
 
@@ -280,7 +361,22 @@ class ReviewManifest(StrictEvidenceModel):
                         },
                         "required": ["baseline", "payload_sha256"],
                     },
-                }
+                },
+                {
+                    "if": {
+                        "properties": {"ticket_id": {"const": "DAT-003"}},
+                        "required": ["ticket_id"],
+                    },
+                    "then": {
+                        "properties": {
+                            "archive_sha256": {"type": "null"},
+                            "baseline": {"const": DAT_REQUIRED_BASELINE},
+                            "file_count": {"const": 20},
+                            "files": {"maxItems": 18, "minItems": 18},
+                        },
+                        "required": ["baseline", "payload_sha256"],
+                    },
+                },
             ]
         },
     )
@@ -309,6 +405,15 @@ class ReviewManifest(StrictEvidenceModel):
             or self.archive_sha256 is not None
         ):
             raise ValueError("RUL-002 review manifest provenance is invalid")
+        if self.ticket_id == "DAT-003" and (
+            self.baseline != DAT_REQUIRED_BASELINE
+            or self.file_count != 20
+            or self.payload_sha256 is None
+            or self.archive_sha256 is not None
+            or set(names) != DAT_DETACHED_REVIEW_NAMES
+            or len(names) != len(DAT_DETACHED_REVIEW_NAMES)
+        ):
+            raise ValueError("DAT-003 review manifest provenance is invalid")
         return self
 
 

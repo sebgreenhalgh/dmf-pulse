@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "capabilities": {
+      "type": "object"
+    },
+    "database": {
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "name"
+      ],
+      "type": "object"
+    },
+    "migration": {
+      "type": "object"
+    },
+    "postgres": {
+      "additionalProperties": false,
+      "properties": {
+        "major": {
+          "const": 18
+        },
+        "supported": {
+          "const": true
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "major",
+        "supported"
+      ],
+      "type": "object"
+    },
+    "schema_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "HEALTHY",
+        "DEGRADED",
+        "BLOCKED"
+      ]
+    }
+  },
+  "required": [
+    "status",
+    "database",
+    "postgres",
+    "migration",
+    "capabilities",
+    "schema_sha256"
+  ],
+  "title": "DAT-003 Database Doctor",
+  "type": "object"
+}

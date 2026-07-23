@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -11,6 +12,7 @@ import pytest
 
 from dmf_pulse.rules.canonical import normalize_json, pretty_rules_json, self_hash
 from dmf_pulse.rules.compiler import (
+    _rule_id,
     compile_ruleset,
     ensure_compiled_ruleset_integrity,
     load_compiled_ruleset,
@@ -65,6 +67,7 @@ def test_supplied_invalid_yaml_is_rejected(rules_fixture: Path, filename: str, c
         ("value: 2026-07-22\n", "RULESET_YAML_TIMESTAMP"),
         ("value: yes\n", "RULESET_YAML_IMPLICIT_BOOLEAN"),
         ("4: value\n", "RULESET_YAML_INVALID"),
+        ("outer:\n  1: value\n", "RULESET_YAML_INVALID"),
         ("? [a, b]\n: value\n", "RULESET_YAML_INVALID"),
     ],
 )
@@ -88,15 +91,72 @@ def test_compilation_is_semantic_and_canonical(rules_fixture: Path, tmp_path: Pa
         encoding="utf-8",
     )
     second = compile_ruleset(copied)
-    assert second.ruleset_hash == first.ruleset_hash
+    assert second.ruleset_hash != first.ruleset_hash
+    assert second.rules == first.rules
     assert second.source_hashes == first.source_hashes
+    assert second.source_bundle_semantic_sha256 == first.source_bundle_semantic_sha256
+    assert second.source_bundle_raw_sha256 != first.source_bundle_raw_sha256
+    assert (
+        second.source_files["scoring.yaml"].raw_sha256
+        != first.source_files["scoring.yaml"].raw_sha256
+    )
+    assert (
+        second.source_files["scoring.yaml"].semantic_sha256
+        == first.source_files["scoring.yaml"].semantic_sha256
+    )
 
     changed_text = scoring.read_text("utf-8").replace("save_points: 5", "save_points: 6")
     scoring.write_text(changed_text, encoding="utf-8")
     changed = compile_ruleset(copied)
     assert changed.ruleset_hash != first.ruleset_hash
+    assert changed.source_bundle_semantic_sha256 != first.source_bundle_semantic_sha256
+    assert changed.source_bundle_raw_sha256 != first.source_bundle_raw_sha256
     diff = diff_rulesets(first, changed)
     assert [item.path for item in diff.changes] == ["$.rules.scoring.penalties.save_points"]
+
+
+@pytest.mark.unit
+def test_rule_level_provenance_has_stable_ids_and_exact_locators(rules_fixture: Path) -> None:
+    compiled = compile_ruleset(rules_fixture / "synthetic_complete")
+    pointer = "/rules/scoring/goals/points_by_position/DEF"
+    provenance = compiled.rule_provenance[pointer]
+    assert provenance.rule_id == "FPL-SCORING-GOALS-POINTS_BY_POSITION-DEF"
+    assert provenance.source_refs == ("SRC-SYNTHETIC-RUL-002",)
+    assert provenance.sources[0].locator == "Codex Pack RUL-002"
+    assert provenance.sources[0].accessed_on == "2026-07-22"
+    identifiers = [entry.rule_id for entry in compiled.rule_provenance.values()]
+    assert len(identifiers) == len(set(identifiers))
+    assert all(len(identifier) <= 96 for identifier in identifiers)
+    assert not any(
+        pointer.startswith("/rules/source_manifest") for pointer in compiled.rule_provenance
+    )
+    long_pointer = "/rules/chips/" + "x" * 120
+    long_identifier = _rule_id(long_pointer, ("rules", "chips", "x" * 120))
+    assert len(long_identifier) == 96
+    assert long_identifier.endswith(
+        hashlib.sha256(long_pointer.encode("utf-8")).hexdigest()[:20].upper()
+    )
+
+
+@pytest.mark.unit
+def test_unimplemented_declarative_effect_is_retained_and_blocks_execution(
+    rules_fixture: Path, tmp_path: Path
+) -> None:
+    source = tmp_path / "declarative-blocker"
+    shutil.copytree(rules_fixture / "synthetic_complete", source)
+    chips = source / "chips.yaml"
+    chips.write_text(
+        chips.read_text("utf-8").replace(
+            "effects: []",
+            'effects: [{surface: "SQUAD_SCORE", operation: "MULTIPLY", parameters: {factor: 3}}]',
+            1,
+        ),
+        encoding="utf-8",
+    )
+    compiled = compile_ruleset(source)
+    assert compiled.rules["chips"]["chips"][0]["effects"][0]["parameters"] == {"factor": 3}
+    assert "unimplemented:chips[0].effects[0]" in compiled.unknown_blockers
+    assert not compiled.production_eligible
 
 
 @pytest.mark.unit
@@ -182,8 +242,14 @@ def _mutated_compiled(compiled: CompiledRuleset, mutation) -> CompiledRuleset:
     ("mutation", "code"),
     [
         (
-            lambda value: value["source_hashes"].update({"unsupported.yaml": "0" * 64}),
+            lambda value: value["source_files"].update(
+                {"unsupported.yaml": {"raw_sha256": "0" * 64, "semantic_sha256": "0" * 64}}
+            ),
             "RULESET_ARTIFACT_SCHEMA",
+        ),
+        (
+            lambda value: value["source_files"].pop("assists.yaml"),
+            "RULESET_SOURCE_HASH_MISMATCH",
         ),
         (
             lambda value: value["source_hashes"].pop("assists.yaml"),
@@ -193,6 +259,10 @@ def _mutated_compiled(compiled: CompiledRuleset, mutation) -> CompiledRuleset:
         (lambda value: value["rules"].update(assists=[]), "RULESET_ARTIFACT_SCHEMA"),
         (
             lambda value: value.update(source_bundle_sha256="0" * 64),
+            "RULESET_SOURCE_HASH_MISMATCH",
+        ),
+        (
+            lambda value: value.update(source_bundle_raw_sha256="0" * 64),
             "RULESET_SOURCE_HASH_MISMATCH",
         ),
         (lambda value: value.update(season_code="2100/2101"), "RULESET_SOURCE_HASH_MISMATCH"),

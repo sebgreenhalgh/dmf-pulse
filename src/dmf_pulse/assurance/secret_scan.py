@@ -163,7 +163,7 @@ def scan_text(text: str, *, path: str = "<memory>") -> list[SecretFinding]:
             )
         for match in QUERY_PATTERN.finditer(line):
             value = match.group(1).rstrip(")]}")
-            if value.casefold() not in {"example", "redacted", "placeholder"}:
+            if value.casefold() not in {"changeme", "example", "redacted", "placeholder"}:
                 findings.add(
                     _finding(
                         path,
@@ -175,6 +175,14 @@ def scan_text(text: str, *, path: str = "<memory>") -> list[SecretFinding]:
                 )
         for match in ASSIGNMENT_PATTERN.finditer(line):
             value = match.group(1).rstrip(")]}")
+            python_syntax = path.casefold().endswith(".py") and (
+                line.lstrip().startswith(("def ", "async def ", "class "))
+                or "lambda " in line
+                or ") ->" in line
+                or "(" in value
+            )
+            if python_syntax:
+                continue
             if value.casefold() not in {"changeme", "example", "redacted", "placeholder"}:
                 findings.add(
                     _finding(

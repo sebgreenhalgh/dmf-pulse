@@ -71,6 +71,39 @@
           "payload_sha256"
         ]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "ticket_id": {
+            "const": "DAT-003"
+          }
+        },
+        "required": [
+          "ticket_id"
+        ]
+      },
+      "then": {
+        "properties": {
+          "archive_sha256": {
+            "type": "null"
+          },
+          "baseline": {
+            "const": "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
+          },
+          "file_count": {
+            "const": 20
+          },
+          "files": {
+            "maxItems": 18,
+            "minItems": 18
+          }
+        },
+        "required": [
+          "baseline",
+          "payload_sha256"
+        ]
+      }
     }
   ],
   "properties": {

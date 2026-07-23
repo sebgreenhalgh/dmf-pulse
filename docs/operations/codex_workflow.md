@@ -9,4 +9,4 @@
 7. Generate schema-valid ticket evidence and a deterministic review ZIP of at most 20 root files.
 8. Hand the branch, repository, evidence, and ZIP to the human owner. Only the human review process may approve merge/tag/release.
 
-Codex must not push, merge, tag, rewrite history, change repository visibility, read secrets, or contact providers/production services under FND-001.
+Codex must not push, merge, rebase, reset, tag, amend prior commits, rewrite history, change repository visibility, read secrets, or contact providers/production services under DAT-003. PostgreSQL use is limited to the disposable 18.4 test service, and teardown must run even after failure.

@@ -13,6 +13,12 @@ import pytest
 from dmf_pulse.assurance import review_pack as review_pack_module
 from dmf_pulse.assurance.manifests import build_repository_manifest
 from dmf_pulse.assurance.review_pack import (
+    DAT_MANDATORY_ACCEPTANCE_COMMANDS,
+    DAT_PREFERRED_NAMES,
+    DAT_REQUIRED_BASELINE,
+    DAT_REVIEW_WRITE_AHEAD_RESULT,
+    DAT_REVIEW_ZIP_NAME,
+    DAT_TEARDOWN_WRITE_AHEAD_RESULT,
     REVIEW_ZIP_NAME,
     RUL_MANDATORY_ACCEPTANCE_COMMANDS,
     RUL_PREFERRED_NAMES,
@@ -76,6 +82,58 @@ class RulGitRunner:
                 ),
             )
         return ProcessResult(return_code=0, stdout="## stage/A2/RUL-002-rules-foundation\n")
+
+
+class DatGitRunner:
+    def __init__(self) -> None:
+        self.commands: list[tuple[str, ...]] = []
+
+    def run(self, command: Sequence[str], *, timeout_seconds: float) -> ProcessResult:
+        assert timeout_seconds in {5, 30}
+        self.commands.append(tuple(command))
+        if "rev-parse" in command:
+            if "--abbrev-ref" in command:
+                return ProcessResult(
+                    return_code=0, stdout="stage/A3/DAT-003-canonical-foundation\n"
+                )
+            return ProcessResult(return_code=0, stdout="a" * 40 + "\n")
+        if "--porcelain=v1" in command or "--merges" in command or "merge-base" in command:
+            return ProcessResult(return_code=0, stdout="")
+        if "--stat" in command:
+            return ProcessResult(return_code=0, stdout="3 files changed, 12 insertions(+)\n")
+        if "diff" in command:
+            return ProcessResult(
+                return_code=0,
+                stdout="diff --git a/src/dmf_pulse/data_model/models.py b/src/dmf_pulse/data_model/models.py\n",
+            )
+        return ProcessResult(return_code=0, stdout="## stage/A3/DAT-003-canonical-foundation\n")
+
+
+class DatStateRunner:
+    def __init__(
+        self,
+        *,
+        branch: str = "stage/A3/DAT-003-canonical-foundation",
+        head: str = "a" * 40,
+        merges: str = "",
+        dirty: str = "",
+    ) -> None:
+        self.branch = branch
+        self.head = head
+        self.merges = merges
+        self.dirty = dirty
+
+    def run(self, command: Sequence[str], *, timeout_seconds: float) -> ProcessResult:
+        assert timeout_seconds == 30
+        if "--abbrev-ref" in command:
+            return ProcessResult(return_code=0, stdout=self.branch + "\n")
+        if "rev-parse" in command:
+            return ProcessResult(return_code=0, stdout=self.head + "\n")
+        if "--merges" in command:
+            return ProcessResult(return_code=0, stdout=self.merges)
+        if "--porcelain=v1" in command:
+            return ProcessResult(return_code=0, stdout=self.dirty)
+        return ProcessResult(return_code=0, stdout="")
 
 
 def _codex_result(*, status: str = "FAILED") -> dict[str, object]:
@@ -286,6 +344,196 @@ def _refresh_rul_evidence_manifest(root: Path) -> None:
     )
 
 
+def _refresh_dat_evidence_manifest(root: Path) -> None:
+    evidence_root = root / "evidence/tickets/DAT-003"
+    result = json.loads((evidence_root / "codex_result.json").read_text(encoding="utf-8"))
+    artifacts = []
+    for path in sorted(evidence_root.iterdir(), key=lambda item: item.name):
+        if path.is_file() and path.name != "evidence_manifest.json":
+            payload = path.read_bytes()
+            artifacts.append(
+                {
+                    "bytes": len(payload),
+                    "path": path.relative_to(root).as_posix(),
+                    "sha256": hashlib.sha256(payload).hexdigest(),
+                }
+            )
+    _write(
+        evidence_root / "evidence_manifest.json",
+        json.dumps(
+            {
+                "artifacts": artifacts,
+                "code_commit": "a" * 40,
+                "commands": result["commands"],
+                "context_hash": "0" * 64,
+                "created_at": "2026-07-23T00:00:00Z",
+                "known_limitations": [],
+                "status": "COMPLETE",
+                "ticket_id": "DAT-003",
+            }
+        ),
+    )
+
+
+def _dat_fixture_repository(root: Path) -> None:
+    evidence_root = root / "evidence/tickets/DAT-003"
+    commands = []
+    for index, command in enumerate(DAT_MANDATORY_ACCEPTANCE_COMMANDS, start=1):
+        result = "PASS: fixture acceptance"
+        duration: float | None = 0.1
+        if index == 12:
+            result = "PASS: offline SQL captured by safe Windows equivalence"
+        elif index == 22:
+            result = DAT_REVIEW_WRITE_AHEAD_RESULT
+            duration = None
+        elif index == 23:
+            result = DAT_TEARDOWN_WRITE_AHEAD_RESULT
+            duration = None
+        commands.append(
+            {
+                "command": command,
+                "duration_seconds": duration,
+                "exit_code": 0,
+                "result": result,
+            }
+        )
+    acceptance = [
+        {
+            "command": record["command"],
+            "duration_seconds": record["duration_seconds"],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "status": "PASS",
+        }
+        for record in commands
+    ]
+    tests = {
+        "branch_coverage_percent": 91.0,
+        "branches_covered": 91,
+        "branches_total": 100,
+        "collected": 12,
+        "critical_oracles": [f"oracle-{index}" for index in range(7)],
+        "data_database_branch_coverage_percent": 93.0,
+        "data_database_branches_covered": 93,
+        "data_database_branches_total": 100,
+        "failed": 0,
+        "passed": 12,
+        "rules_branch_coverage_percent": 99.0,
+        "rules_branches_covered": 99,
+        "rules_branches_total": 100,
+        "skipped": 0,
+        "status": "PASS",
+    }
+    result = {
+        "ticket_id": "DAT-003",
+        "status": "COMPLETE",
+        "code_commit": "a" * 40,
+        "summary": "Fixture DAT foundation complete.",
+        "files_changed": [{"path": "src/example.py", "change": "created"}],
+        "public_interfaces": ["dmf data-model doctor --json"],
+        "commands": commands,
+        "tests": [tests],
+        "acceptance": acceptance,
+        "dependency_impact": "approved only",
+        "migration_impact": "reversible",
+        "assumptions": [],
+        "exclusions_verified": ["no SQLite"],
+        "risks": [],
+        "repository": {
+            "baseline": DAT_REQUIRED_BASELINE,
+            "branch": "stage/A3/DAT-003-canonical-foundation",
+            "clean": True,
+            "head": "a" * 40,
+            "merged": False,
+            "pushed": False,
+        },
+        "review_pack": {
+            "path": "review_pack/DAT-003/DMF_PULSE_DAT-003_REVIEW.zip",
+            "file_count": 20,
+            "payload_sha256": "0" * 64,
+        },
+    }
+    _write(evidence_root / "codex_result.json", json.dumps(result))
+    _write(
+        evidence_root / "commands.log",
+        "".join(json.dumps(record, sort_keys=True) + "\n" for record in commands),
+    )
+    _write(evidence_root / "tests.json", json.dumps(tests))
+    _write(
+        evidence_root / "acceptance_matrix.json",
+        json.dumps(
+            {
+                "commands": acceptance,
+                "failed": 0,
+                "passed": 23,
+                "status": "COMPLETE",
+                "ticket_id": "DAT-003",
+            }
+        ),
+    )
+    for name in (
+        "TEST_RESULTS.md",
+        "ACCEPTANCE.md",
+        "RUL002_REMEDIATION_MATRIX.md",
+        "SCHEMA_MIGRATION.md",
+        "TEMPORAL_IDENTITY_ASOF_CONCURRENCY.md",
+        "PROVENANCE_IMMUTABILITY_RULES_REGISTRY.md",
+        "DEPENDENCY_DOCKER_CI_SECURITY.md",
+        "KNOWN_LIMITATIONS.md",
+    ):
+        _write(evidence_root / name, f"# {name}\n\nPASS\n")
+    schema_hash = "1" * 64
+    _write(
+        evidence_root / "database_doctor.json",
+        json.dumps(
+            {
+                "status": "HEALTHY",
+                "postgres": {"major": 18, "supported": True, "version": "18.4"},
+                "schema_sha256": schema_hash,
+            }
+        ),
+    )
+    _write(
+        evidence_root / "schema_manifest.json",
+        json.dumps({"alembic_revision": "20260723_0001", "schema_sha256": schema_hash}),
+    )
+    _write(evidence_root / "package_report.json", json.dumps({"status": "PASS"}))
+    _write(evidence_root / "migration_report.json", json.dumps({"status": "PASS"}))
+    _write(
+        evidence_root / "repository_validation_report.json",
+        json.dumps({"error_count": 0, "errors": [], "status": "PASS"}),
+    )
+    _write(evidence_root / "demo_result.json", '{"fixture_id":"demo"}\n')
+    _write(evidence_root / "offline_upgrade.sql", "CREATE TABLE safe_fixture(id integer);\n" * 40)
+    for relative in (
+        "src/dmf_pulse/data_model/__init__.py",
+        "src/dmf_pulse/data_model/models.py",
+        "src/dmf_pulse/data_model/tables.py",
+        "src/dmf_pulse/data_model/repositories.py",
+        "src/dmf_pulse/data_model/services.py",
+        "src/dmf_pulse/database/models.py",
+        "src/dmf_pulse/database/errors.py",
+        "src/dmf_pulse/database/schema.py",
+        "src/dmf_pulse/database/engine.py",
+        "src/dmf_pulse/database/migrations/versions/20260723_0001_dat003_foundation.py",
+        "src/dmf_pulse/cli/data_model_cmd.py",
+        "fixtures/data_model/DAT-003/demo.json",
+        "fixtures/data_model/DAT-003/expected_schema.json",
+        "alembic.ini",
+        "compose.test.yaml",
+        "pyproject.toml",
+        ".github/workflows/ci.yml",
+    ):
+        _write(root / relative, f"# {relative}\n")
+    _write(root / ".secret-scan-allowlist.json", '{"entries": [], "version": "1.0"}\n')
+    current = build_repository_manifest(root, ticket_id="DAT-003")
+    _write(
+        evidence_root / "current_manifest.json",
+        json.dumps(current.model_dump(mode="json")),
+    )
+    _refresh_dat_evidence_manifest(root)
+
+
 @pytest.mark.unit
 def test_review_pack_refuses_twenty_one_files() -> None:
     entries = [
@@ -432,6 +680,93 @@ def test_rul_review_pack_has_exact_layout_and_keeps_authored_fixtures_in_patch(
     diff_commands = [command for command in runner.commands if "diff" in command]
     assert diff_commands
     assert all(":(exclude)fixtures/rules/RUL-002/**" not in command for command in diff_commands)
+
+
+@pytest.mark.unit
+def test_dat_review_pack_has_exact_layout_and_complete_evidence(tmp_path: Path) -> None:
+    root = tmp_path / "repository"
+    root.mkdir()
+    _dat_fixture_repository(root)
+    runner = DatGitRunner()
+    generated_at = "2026-07-23T00:00:00Z"
+    digest = calculate_review_payload_digest(
+        root,
+        ticket="DAT-003",
+        baseline=DAT_REQUIRED_BASELINE,
+        generated_at=generated_at,
+        process_runner=runner,
+    )
+    result_path = root / "evidence/tickets/DAT-003/codex_result.json"
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    result["review_pack"]["payload_sha256"] = digest
+    result_path.write_text(json.dumps(result), encoding="utf-8")
+    _refresh_dat_evidence_manifest(root)
+
+    summary = build_review_pack(
+        root,
+        ticket="DAT-003",
+        baseline=DAT_REQUIRED_BASELINE,
+        output=tmp_path / "output",
+        generated_at=generated_at,
+        process_runner=runner,
+    )
+
+    assert summary.file_count == 20
+    assert summary.path.name == DAT_REVIEW_ZIP_NAME
+    assert validate_review_zip(summary.path).payload_sha256 == digest
+    with zipfile.ZipFile(summary.path) as archive:
+        assert tuple(archive.namelist()) == DAT_PREFERRED_NAMES
+        contracts = archive.read("17_DATA_MODEL_PUBLIC_CONTRACTS_MODELS.txt").decode()
+        assert "fixtures/data_model/DAT-003/demo.json" in contracts
+        migration = archive.read("18_INITIAL_MIGRATION_CRITICAL_SQL.txt").decode()
+        assert "20260723_0001_dat003_foundation.py" in migration
+    diff_commands = [command for command in runner.commands if "diff" in command]
+    assert diff_commands
+    assert all(":(exclude)src/dmf_pulse/data_model/**" not in command for command in diff_commands)
+
+
+@pytest.mark.unit
+def test_dat_review_rejects_baseline_and_git_state_false_successes(tmp_path: Path) -> None:
+    with pytest.raises(ReviewPackError) as baseline:
+        review_pack_module._dat_baseline_diff(tmp_path, "0" * 40, DatGitRunner())
+    assert baseline.value.code == "BASELINE_INVALID"
+
+    cases = (
+        (DatStateRunner(branch="wrong"), "REVIEW_BRANCH_INVALID"),
+        (DatStateRunner(head="not-a-commit"), "REVIEW_HEAD_INVALID"),
+        (DatStateRunner(merges="a" * 40), "REVIEW_HISTORY_INVALID"),
+        (DatStateRunner(dirty=" M source.py"), "REVIEW_TREE_DIRTY"),
+    )
+    for runner, code in cases:
+        with pytest.raises(ReviewPackError) as caught:
+            review_pack_module._required_dat_git_state(tmp_path, DAT_REQUIRED_BASELINE, runner)
+        assert caught.value.code == code
+
+
+@pytest.mark.unit
+def test_dat_review_rejects_malformed_machine_evidence_and_command_set(tmp_path: Path) -> None:
+    malformed = tmp_path / "malformed.json"
+    malformed.write_text("{", encoding="utf-8")
+    with pytest.raises(ReviewPackError) as malformed_error:
+        review_pack_module._dat_json_object(malformed)
+    assert malformed_error.value.code == "REVIEW_EVIDENCE_INVALID"
+
+    malformed.write_text("[]", encoding="utf-8")
+    with pytest.raises(ReviewPackError) as scalar_error:
+        review_pack_module._dat_json_object(malformed)
+    assert scalar_error.value.code == "REVIEW_EVIDENCE_INVALID"
+
+    root = tmp_path / "repository"
+    root.mkdir()
+    _dat_fixture_repository(root)
+    result_value = json.loads(
+        (root / "evidence/tickets/DAT-003/codex_result.json").read_text(encoding="utf-8")
+    )
+    result_value["commands"] = result_value["commands"][:1]
+    result = review_pack_module.CodexResult.model_validate(result_value)
+    with pytest.raises(ReviewPackError) as command_error:
+        review_pack_module._validate_dat_complete_evidence(root, result, "a" * 40)
+    assert command_error.value.code == "REVIEW_ACCEPTANCE_INVALID"
 
 
 @pytest.mark.unit

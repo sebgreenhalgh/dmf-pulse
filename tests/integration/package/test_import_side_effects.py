@@ -12,6 +12,7 @@ import pytest
 @pytest.mark.integration
 def test_all_package_modules_import_without_external_effects() -> None:
     script = r"""
+import asyncio
 import builtins
 import logging
 import logging.config
@@ -21,6 +22,7 @@ import pkgutil
 import socket
 import subprocess
 import tempfile
+import sqlalchemy
 
 os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
 environment_before = dict(os.environ)

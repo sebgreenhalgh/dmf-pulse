@@ -83,6 +83,11 @@ class SeasonManifest(RulesModel):
         return self
 
 
+class SourceFileDigest(RulesModel):
+    raw_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    semantic_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+
+
 class RulesetValidationReport(RulesModel):
     ruleset_id: str
     ruleset_version: str
@@ -90,9 +95,38 @@ class RulesetValidationReport(RulesModel):
     production_eligible: bool
     valid: bool
     files: tuple[str, ...]
+    source_files: dict[str, SourceFileDigest]
+    source_bundle_raw_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    source_bundle_semantic_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
     source_hashes: dict[str, str]
     unknown_blockers: tuple[str, ...] = ()
     warnings: tuple[str, ...] = ()
+
+
+class RuleSourceReference(RulesModel):
+    source_id: Annotated[StrictStr, Field(pattern=r"^SRC-[A-Z0-9-]+$")]
+    locator: Annotated[StrictStr, Field(min_length=1)]
+    verification_status: Literal["VERIFIED"]
+    published_on: StrictStr | None = None
+    accessed_on: StrictStr | None = None
+    refresh_trigger: Annotated[StrictStr, Field(min_length=1)]
+
+
+class RuleProvenance(RulesModel):
+    rule_id: Annotated[StrictStr, Field(pattern=r"^FPL-[A-Z0-9_-]+$", max_length=96)]
+    source_refs: Annotated[
+        tuple[Annotated[StrictStr, Field(pattern=r"^SRC-[A-Z0-9-]+$")], ...],
+        Field(min_length=1),
+    ]
+    sources: Annotated[tuple[RuleSourceReference, ...], Field(min_length=1)]
+
+    @model_validator(mode="after")
+    def sources_match_references(self) -> RuleProvenance:
+        if len(self.source_refs) != len(set(self.source_refs)):
+            raise ValueError("rule provenance source references must be unique")
+        if tuple(source.source_id for source in self.sources) != self.source_refs:
+            raise ValueError("rule provenance sources must match source_refs in order")
+        return self
 
 
 class CompiledRuleset(RulesModel):
@@ -103,11 +137,16 @@ class CompiledRuleset(RulesModel):
     season_code: str
     status: RulesetStatus
     production_eligible: bool
+    source_files: dict[str, SourceFileDigest]
+    source_bundle_raw_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    source_bundle_semantic_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    # Deprecated compatibility aliases. New consumers use source_files and the two bundles.
     source_hashes: dict[str, str]
     source_bundle_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
     unknown_blockers: tuple[str, ...] = ()
     warnings: tuple[str, ...] = ()
     rules: dict[str, Any]
+    rule_provenance: dict[str, RuleProvenance]
     ruleset_hash: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 
 
@@ -214,6 +253,10 @@ class PlayerScenario(RulesModel):
                 raise ValueError("zero-minute placeholder cannot have scoring events")
         if not self.dismissed and self.team_goals_after_dismissal:
             raise ValueError("post-dismissal goals require dismissed=true")
+        if self.red_cards > 0 and not self.dismissed:
+            raise ValueError("red cards require dismissed=true")
+        if self.dismissed and self.red_cards == 0:
+            raise ValueError("dismissed=true requires a red card")
         return self
 
 
@@ -342,8 +385,8 @@ class PlayerScore(RulesModel):
         )
         if self.total != sum(components):
             raise ValueError("player total does not equal its components")
-        if self.bonus not in {0, 1, 2, 3}:
-            raise ValueError("bonus must be in 0..3")
+        if self.bonus < 0:
+            raise ValueError("bonus must be non-negative")
         return self
 
 
@@ -368,10 +411,44 @@ class FixtureScoreResult(RulesModel):
 class GameweekScoreResult(RulesModel):
     fixture_ids: tuple[str, ...]
     gameweek_id: str
+    players: dict[str, PlayerScore]
     player_totals: dict[str, int]
     ruleset_hash: str
     ruleset_id: str
-    fixture_results: tuple[FixtureScoreResult, ...] = Field(default=(), exclude=True)
+    ruleset_version: str
+    fixture_results: tuple[FixtureScoreResult, ...]
+
+    @model_validator(mode="after")
+    def aggregate_is_exact(self) -> GameweekScoreResult:
+        if self.fixture_ids != tuple(result.fixture_id for result in self.fixture_results):
+            raise ValueError("fixture_ids must match serialized fixture results")
+        if self.fixture_ids != tuple(sorted(self.fixture_ids)):
+            raise ValueError("fixture results must use deterministic fixture ordering")
+        identity = (self.ruleset_id, self.ruleset_version, self.ruleset_hash)
+        if any(
+            (result.ruleset_id, result.ruleset_version, result.ruleset_hash) != identity
+            for result in self.fixture_results
+        ):
+            raise ValueError("fixture result ruleset identity mismatch")
+        component_names = tuple(PlayerScore.model_fields)
+        expected: dict[str, dict[str, int]] = {}
+        for result in self.fixture_results:
+            for player_id, score in result.players.items():
+                player = expected.setdefault(
+                    player_id, {component: 0 for component in component_names}
+                )
+                for component in component_names:
+                    player[component] += getattr(score, component)
+        expected_players = {
+            player_id: PlayerScore.model_validate(components)
+            for player_id, components in sorted(expected.items())
+        }
+        if self.players != expected_players:
+            raise ValueError("Gameweek player components do not equal fixture component sums")
+        expected_totals = {player_id: score.total for player_id, score in expected_players.items()}
+        if self.player_totals != expected_totals:
+            raise ValueError("player_totals must equal aggregated component totals")
+        return self
 
 
 class ApprovalRecord(RulesModel):
@@ -387,5 +464,8 @@ class ActivationReceipt(RulesModel):
     ruleset_id: str
     ruleset_version: str
     ruleset_hash: str
+    verified_ruleset_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")]
+    approval_sha256: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")]
+    activated_at: StrictStr
     artifact: str
     activated: Literal[True] = True

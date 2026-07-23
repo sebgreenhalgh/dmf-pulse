@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "alembic_revision": {
+      "type": "string"
+    },
+    "extensions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "postgres_version": {
+      "type": "string"
+    },
+    "schema_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schemas": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "postgres_version",
+    "alembic_revision",
+    "extensions",
+    "schemas",
+    "schema_sha256"
+  ],
+  "title": "DAT-003 Schema Manifest",
+  "type": "object"
+}

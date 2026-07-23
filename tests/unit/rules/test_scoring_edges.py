@@ -100,6 +100,7 @@ def test_all_configured_positive_and_negative_bps_categories_are_additive(scorin
         penalty_misses=1,
         yellow_cards=1,
         red_cards=1,
+        dismissed=True,
         own_goals=1,
     )
     raw["defensive_actions"] = {
@@ -244,6 +245,11 @@ def test_unknown_ruleset_scoring_and_invalid_scenarios_fail_closed(
         PlayerScenario.model_validate(
             {**player, "dismissed": False, "team_goals_after_dismissal": 1}
         )
+    with pytest.raises(ValidationError, match="red cards require dismissed"):
+        PlayerScenario.model_validate({**player, "red_cards": 1, "dismissed": False})
+    with pytest.raises(ValidationError, match="requires a red card"):
+        PlayerScenario.model_validate({**player, "red_cards": 0, "dismissed": True})
+    assert PlayerScenario.model_validate({**player, "red_cards": 1, "dismissed": True}).dismissed
     with pytest.raises(ValidationError):
         PlayerScenario.model_validate({**player, "eligible_assists": -1})
     with pytest.raises(ValidationError):
@@ -263,7 +269,7 @@ def test_result_and_gameweek_model_invariants(scoring_inputs) -> None:
         PlayerScore(
             appearance=1,
             assists=0,
-            bonus=4,
+            bonus=0,
             bps=0,
             clean_sheet=0,
             defensive_contributions=0,
@@ -274,7 +280,7 @@ def test_result_and_gameweek_model_invariants(scoring_inputs) -> None:
             penalty_saves=0,
             red_cards=0,
             saves=0,
-            total=1,
+            total=2,
             yellow_cards=0,
         )
 
@@ -282,7 +288,7 @@ def test_result_and_gameweek_model_invariants(scoring_inputs) -> None:
         PlayerScore(
             appearance=1,
             assists=0,
-            bonus=4,
+            bonus=-1,
             bps=0,
             clean_sheet=0,
             defensive_contributions=0,
@@ -293,9 +299,29 @@ def test_result_and_gameweek_model_invariants(scoring_inputs) -> None:
             penalty_saves=0,
             red_cards=0,
             saves=0,
-            total=5,
+            total=0,
             yellow_cards=0,
         )
+    assert (
+        PlayerScore(
+            appearance=1,
+            assists=0,
+            bonus=5,
+            bps=0,
+            clean_sheet=0,
+            defensive_contributions=0,
+            goals=0,
+            goals_conceded=0,
+            own_goals=0,
+            penalty_misses=0,
+            penalty_saves=0,
+            red_cards=0,
+            saves=0,
+            total=6,
+            yellow_cards=0,
+        ).bonus
+        == 5
+    )
 
 
 @pytest.mark.unit
@@ -361,6 +387,7 @@ def test_every_fixture_coherence_false_success_is_rejected(scoring_inputs) -> No
     goalkeeper = next(item for item in post_dismissal["players"] if item["player_id"] == "home-gk")
     goalkeeper.update(
         dismissed=True,
+        red_cards=1,
         goals_conceded_while_eligible=1,
         team_goals_after_dismissal=1,
     )

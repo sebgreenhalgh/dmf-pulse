@@ -34,7 +34,12 @@ def source_copy(repository_root: Path, tmp_path: Path) -> Path:
     [
         ("positions.yaml", "  FWD:", "  XXX:", "RULESET_POSITION_INVALID"),
         ("scoring.yaml", "FWD: 4", 'FWD: "4"', "RULESET_GOAL_POINTS_INVALID"),
-        ("bonus.yaml", "{1: 3, 2: 2, 3: 1}", "{1: 2, 2: 2, 3: 1}", "RULESET_BONUS_RANK_INVALID"),
+        (
+            "bonus.yaml",
+            '{"1": 3, "2": 2, "3": 1}',
+            '{"0": 3, "2": 2, "3": 1}',
+            "RULESET_BONUS_RANK_INVALID",
+        ),
         (
             "assists.yaml",
             '["DEFINITE_ASSIST", "DEFINITE_NO_ASSIST", "AMBIGUOUS_ASSIST"]',
@@ -77,7 +82,7 @@ def test_manifest_required_order_and_unknown_status_mutants(source_copy: Path) -
     )
     with pytest.raises(RulesValidationError) as unknown:
         compile_ruleset(source_copy)
-    assert unknown.value.code == "RULESET_UNKNOWN_STATUS"
+    assert unknown.value.code == "RULESET_DRAFT_SHAPE"
 
 
 @pytest.mark.unit

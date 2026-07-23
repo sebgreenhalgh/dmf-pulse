@@ -1,5 +1,30 @@
 # DMF Pulse execution plans
 
+## DAT-003 - canonical temporal PostgreSQL foundation
+
+- Ticket/stage: `DAT-003`, A3.
+- Required branch/baseline: `stage/A3/DAT-003-canonical-foundation` from `f9b51e965aad1bc94796c17c897f0d99b4c16e1b`.
+- Outcome: close all blocking RUL-002 findings and deliver a PostgreSQL 18.4 vertical slice for UUIDv7 canonical identity, bitemporal corrections/as-of reads, immutable provenance, rules activation registry, reversible migrations, deterministic CLI, and governed evidence.
+- Constraints: disposable local PostgreSQL only; no provider/network access, SQLite, future ontology, models, optimiser, API/UI, account actions, push, merge, rebase, reset, tag, or amend.
+
+### DAT-003 checkpoints
+
+- [x] 2026-07-23T09:00:00Z - verified Pack 003 hashes and exact baseline/branch, captured context evidence, and passed the existing 200-test foundation/rules baseline.
+- [x] 2026-07-23T12:00:00Z - closed RUL-002 P1 findings R1-R8 with direct regression tests while preserving corrected v1.1 goldens.
+- [x] 2026-07-23T15:00:00Z - added the pinned PostgreSQL/SQLAlchemy/Alembic/Psycopg toolchain, exact 20-table migration, UUIDv7/temporal/provenance constraints, functions, triggers, views, schema fingerprint, and downgrade/re-upgrade checks.
+- [x] 2026-07-23T18:00:00Z - implemented explicit repositories and deterministic doctor/schema/demo/as-of CLI with PostgreSQL boundary, concurrent overlap, immutability, rules-registry, clean-wheel, and negative error tests.
+- [x] 2026-07-23T20:00:00Z - strengthened independent branch/mutation oracles to meet the 90% overall, 98% rules, and 92% combined data-model/database gates in focused measurement.
+- [ ] Final - run the literal 23-command acceptance ledger with guaranteed teardown, generate actual-commit evidence, and validate the exact 20-file review ZIP.
+
+### DAT-003 decision log
+
+- PostgreSQL 18.4 server `uuidv7()` is authoritative for persisted identifiers; application code never manufactures persisted UUIDs.
+- Valid time and system-known time are independent closed-open ranges. Corrections close only the superseded system interval and preserve historical rows.
+- Source-less initial fixture assignments/revisions are permitted where the public contract makes provenance optional; every correction requires distinct usable provenance.
+- `validation_status = USABLE` is equivalent to non-null `usable_at`, enforced in PostgreSQL and typed models.
+- The test credential is the literal fake `changeme`; committed settings retain only the `env:DMF_TEST_DATABASE_URL` reference.
+- The review command uses stable write-ahead records for commands 22-23, then refreshes the same deterministic archive after finally-guaranteed teardown without invoking command 22 twice.
+
 ## RUL-002 — governance remediation and rules foundation
 
 - Ticket/stage: `RUL-002`, A2.

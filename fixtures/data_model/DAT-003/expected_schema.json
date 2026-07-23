@@ -1,0 +1,49 @@
+{
+  "extensions": [
+    "btree_gist"
+  ],
+  "postgres_major": 18,
+  "required_capabilities": [
+    "uuidv7",
+    "tstzrange",
+    "gist_exclusion",
+    "controlled_supersession",
+    "immutable_point_observations"
+  ],
+  "schemas": [
+    "core",
+    "football",
+    "fpl",
+    "provenance"
+  ],
+  "tables": [
+    "core.canonical_entity",
+    "core.external_identifier",
+    "core.entity_alias",
+    "core.data_quality_issue",
+    "football.competition",
+    "football.season",
+    "football.team",
+    "football.player",
+    "football.fixture",
+    "football.player_team_membership",
+    "football.fixture_revision",
+    "football.fixture_gameweek_assignment",
+    "fpl.gameweek",
+    "provenance.data_provider",
+    "provenance.raw_blob",
+    "provenance.raw_blob_deletion",
+    "provenance.ingestion_run",
+    "provenance.source_snapshot",
+    "provenance.ruleset_artifact",
+    "provenance.ruleset_activation"
+  ],
+  "views": [
+    "core.current_external_identifier",
+    "core.current_entity_alias",
+    "football.current_player_team_membership",
+    "football.current_fixture_revision",
+    "football.current_fixture_gameweek_assignment",
+    "provenance.available_raw_blob"
+  ]
+}

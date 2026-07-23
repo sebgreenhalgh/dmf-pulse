@@ -20,6 +20,7 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RUL_BASELINE = "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
+DAT_BASELINE = "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
 RUL_WRITE_AHEAD_RESULT = (
     "PASS: write-ahead record committed only by successful external archive finalization; "
     "exact duration and digests are in archive_finalization.json"
@@ -37,6 +38,7 @@ class AcceptanceCommand:
     timeout_seconds: float
     offline: bool = False
     expected_exit: int = 0
+    capture_path: Path | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -315,6 +317,156 @@ def _rul_commands(uv: str) -> tuple[AcceptanceCommand, ...]:
     )
 
 
+def _dat_commands(uv: str, docker: str) -> tuple[AcceptanceCommand, ...]:
+    evidence = REPOSITORY_ROOT / "evidence/tickets/DAT-003"
+    return (
+        AcceptanceCommand(
+            "uv sync --all-groups --frozen", (uv, "sync", "--all-groups", "--frozen"), 300
+        ),
+        AcceptanceCommand(
+            "uv run ruff format --check .", (uv, "run", "ruff", "format", "--check", "."), 180
+        ),
+        AcceptanceCommand("uv run ruff check .", (uv, "run", "ruff", "check", "."), 180),
+        AcceptanceCommand("uv run mypy src/dmf_pulse", (uv, "run", "mypy", "src/dmf_pulse"), 240),
+        AcceptanceCommand("docker version", (docker, "version"), 60),
+        AcceptanceCommand("docker compose version", (docker, "compose", "version"), 60),
+        AcceptanceCommand(
+            "docker compose -f compose.test.yaml up -d --wait",
+            (docker, "compose", "-f", "compose.test.yaml", "up", "-d", "--wait"),
+            300,
+        ),
+        AcceptanceCommand(
+            "uv run alembic upgrade head", (uv, "run", "alembic", "upgrade", "head"), 180
+        ),
+        AcceptanceCommand(
+            'uv run pytest -m "postgres or migration" tests/integration/data_model tests/integration/migrations',
+            (
+                uv,
+                "run",
+                "pytest",
+                "-m",
+                "postgres or migration",
+                "tests/integration/data_model",
+                "tests/integration/migrations",
+            ),
+            600,
+        ),
+        AcceptanceCommand(
+            "uv run alembic downgrade base", (uv, "run", "alembic", "downgrade", "base"), 180
+        ),
+        AcceptanceCommand(
+            "uv run alembic upgrade head", (uv, "run", "alembic", "upgrade", "head"), 180
+        ),
+        AcceptanceCommand(
+            "uv run alembic upgrade head --sql > evidence/tickets/DAT-003/offline_upgrade.sql",
+            (uv, "run", "alembic", "upgrade", "head", "--sql"),
+            180,
+            capture_path=evidence / "offline_upgrade.sql",
+        ),
+        AcceptanceCommand(
+            "uv run dmf data-model doctor --json",
+            (uv, "run", "dmf", "data-model", "doctor", "--json"),
+            180,
+            capture_path=evidence / "database_doctor.json",
+        ),
+        AcceptanceCommand(
+            "uv run dmf data-model schema-manifest --json",
+            (uv, "run", "dmf", "data-model", "schema-manifest", "--json"),
+            180,
+            capture_path=evidence / "schema_manifest.json",
+        ),
+        AcceptanceCommand(
+            "uv run dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "data-model",
+                "demo",
+                "--fixture",
+                "fixtures/data_model/DAT-003/demo.json",
+                "--json",
+            ),
+            180,
+            capture_path=evidence / "demo_result.json",
+        ),
+        AcceptanceCommand(
+            "uv run dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "data-model",
+                "as-of",
+                "--fixture",
+                "fixtures/data_model/DAT-003/as_of_queries.json",
+                "--json",
+            ),
+            180,
+            capture_path=evidence / "as_of_result.json",
+        ),
+        AcceptanceCommand(
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/DAT-003/coverage.json",
+            (
+                uv,
+                "run",
+                "pytest",
+                "--cov=dmf_pulse",
+                "--cov-branch",
+                "--cov-report=term-missing",
+                "--cov-report=json:evidence/tickets/DAT-003/coverage.json",
+            ),
+            900,
+        ),
+        AcceptanceCommand("uv build", (uv, "build"), 300),
+        AcceptanceCommand(
+            "uv run python scripts/verify_wheel.py",
+            (uv, "run", "python", "scripts/verify_wheel.py"),
+            900,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/validate_repository.py",
+            (uv, "run", "python", "scripts/validate_repository.py"),
+            240,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/scan_secrets.py",
+            (uv, "run", "python", "scripts/scan_secrets.py"),
+            240,
+        ),
+        AcceptanceCommand(
+            f"uv run dmf review-pack build --ticket DAT-003 --baseline {DAT_BASELINE} --output review_pack/DAT-003",
+            (
+                uv,
+                "run",
+                "dmf",
+                "review-pack",
+                "build",
+                "--ticket",
+                "DAT-003",
+                "--baseline",
+                DAT_BASELINE,
+                "--output",
+                "review_pack/DAT-003",
+            ),
+            600,
+        ),
+        AcceptanceCommand(
+            "docker compose -f compose.test.yaml down -v --remove-orphans",
+            (
+                docker,
+                "compose",
+                "-f",
+                "compose.test.yaml",
+                "down",
+                "-v",
+                "--remove-orphans",
+            ),
+            300,
+        ),
+    )
+
+
 def _review_command(uv: str, ticket: str) -> AcceptanceCommand:
     if ticket == "RUL-002":
         display = f"uv run dmf review-pack build --ticket RUL-002 --baseline {RUL_BASELINE} --output review_pack/RUL-002"
@@ -403,6 +555,10 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
             f"primary payload SHA-256 {value.get('payload_sha256', 'unavailable')}; "
             f"archive SHA-256 {value.get('archive_sha256', 'unavailable')}"
         )
+    if command.display.startswith("uv run alembic upgrade head --sql >"):
+        return (
+            "PASS: offline upgrade SQL captured by safe Windows equivalence to literal redirection"
+        )
     summaries = {
         "uv sync --all-groups --frozen": "PASS: frozen all-group sync",
         "uv run ruff format --check .": "PASS: formatting clean",
@@ -418,6 +574,28 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
         "uv build": "PASS: sdist and wheel built",
         "uv run python scripts/validate_repository.py": "PASS: repository errors 0",
         "uv run python scripts/scan_secrets.py": "PASS: secret findings 0",
+        "docker version": "PASS: Docker Engine available",
+        "docker compose version": "PASS: Docker Compose available",
+        "docker compose -f compose.test.yaml up -d --wait": (
+            "PASS: PostgreSQL 18.4 service healthy"
+        ),
+        "uv run alembic upgrade head": "PASS: Alembic upgraded to head",
+        "uv run alembic downgrade base": "PASS: Alembic downgraded to base",
+        'uv run pytest -m "postgres or migration" tests/integration/data_model tests/integration/migrations': (
+            "PASS: PostgreSQL and migration suites completed"
+        ),
+        "uv run dmf data-model schema-manifest --json": (
+            "PASS: deterministic schema manifest emitted"
+        ),
+        "uv run dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json": (
+            "PASS: synthetic database demo assertions passed"
+        ),
+        "uv run dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json": (
+            "PASS: bitemporal as-of assertions passed"
+        ),
+        "docker compose -f compose.test.yaml down -v --remove-orphans": (
+            "PASS: PostgreSQL service and volume removed"
+        ),
     }
     return summaries.get(command.display, "PASS: command completed")
 
@@ -425,7 +603,13 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
 def run_command(command: AcceptanceCommand) -> CommandRecord:
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
+    environment.pop("DMF_TEST_POSTGRES_PORT", None)
     environment["PYTHONNOUSERSITE"] = "1"
+    environment["DMF_ENVIRONMENT"] = "TEST"
+    environment["PGPASSWORD"] = "changeme"
+    environment["DMF_TEST_DATABASE_URL"] = (
+        "postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test"
+    )
     if command.offline:
         environment["UV_OFFLINE"] = "1"
     started = time.perf_counter()
@@ -444,6 +628,18 @@ def run_command(command: AcceptanceCommand) -> CommandRecord:
         )
         exit_code = completed.returncode
         output = completed.stdout + "\n" + completed.stderr
+        if exit_code == command.expected_exit and command.capture_path is not None:
+            command.capture_path.parent.mkdir(parents=True, exist_ok=True)
+            temporary = command.capture_path.with_name(f".{command.capture_path.name}.tmp")
+            try:
+                temporary.write_text(
+                    completed.stdout,
+                    encoding="utf-8",
+                    newline="\n",
+                )
+                os.replace(temporary, command.capture_path)
+            finally:
+                temporary.unlink(missing_ok=True)
     except (OSError, subprocess.TimeoutExpired):
         exit_code = 124
         output = ""
@@ -454,6 +650,207 @@ def run_command(command: AcceptanceCommand) -> CommandRecord:
         exit_code=exit_code,
         result=_summary(command, output, exit_code),
     )
+
+
+def _clean_dat_generated_outputs() -> None:
+    evidence_root = REPOSITORY_ROOT / "evidence/tickets/DAT-003"
+    evidence_root.mkdir(parents=True, exist_ok=True)
+    for path in evidence_root.iterdir():
+        if path.is_file() and path.name != "PLAN.md":
+            path.unlink()
+    review_root = REPOSITORY_ROOT / "review_pack/DAT-003"
+    if review_root.is_dir():
+        for path in review_root.iterdir():
+            if path.is_file():
+                path.unlink()
+
+
+def _git_head() -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", "--verify", "HEAD"],
+        cwd=REPOSITORY_ROOT,
+        capture_output=True,
+        check=True,
+        encoding="utf-8",
+        shell=False,
+        text=True,
+    )
+    head = completed.stdout.strip()
+    if re.fullmatch(r"[0-9a-f]{40}", head) is None:
+        raise ValueError("repository HEAD is invalid")
+    return head
+
+
+def _main_dat() -> int:
+    uv = shutil.which("uv")
+    docker = shutil.which("docker")
+    if uv is None or docker is None:
+        print("uv or Docker is unavailable", file=sys.stderr)
+        return 2
+    commands = _dat_commands(uv, docker)
+    command_log = REPOSITORY_ROOT / "evidence/tickets/DAT-003/commands.log"
+    _clean_dat_generated_outputs()
+    records: list[CommandRecord] = []
+    teardown_record: CommandRecord | None = None
+    review_record: CommandRecord | None = None
+    failure = False
+    try:
+        for command in commands[:21]:
+            record = run_command(command)
+            records.append(record)
+            print(f"[{record.exit_code}] {record.command} ({record.duration_seconds:.3f}s)")
+            if record.exit_code != command.expected_exit or not record.result.startswith("PASS:"):
+                failure = True
+                break
+        if not failure:
+            source_root = REPOSITORY_ROOT / "src"
+            if str(source_root) not in sys.path:
+                sys.path.insert(0, str(source_root))
+            from generate_dat003_evidence import generate
+
+            from dmf_pulse.assurance.review_pack import (
+                DAT_REVIEW_FINAL_RESULT,
+                DAT_REVIEW_WRITE_AHEAD_RESULT,
+                DAT_TEARDOWN_WRITE_AHEAD_RESULT,
+                calculate_review_payload_digest,
+            )
+
+            head = _git_head()
+            placeholders = [
+                *[asdict(item) for item in records],
+                asdict(
+                    CommandRecord(
+                        command=commands[21].display,
+                        duration_seconds=None,
+                        exit_code=0,
+                        result=DAT_REVIEW_WRITE_AHEAD_RESULT,
+                    )
+                ),
+                asdict(
+                    CommandRecord(
+                        command=commands[22].display,
+                        duration_seconds=None,
+                        exit_code=0,
+                        result=DAT_TEARDOWN_WRITE_AHEAD_RESULT,
+                    )
+                ),
+            ]
+            _write_command_records(command_log, placeholders)
+            generate(payload_sha256="0" * 64, code_commit=head)
+            generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+            preliminary_digest = calculate_review_payload_digest(
+                REPOSITORY_ROOT,
+                ticket="DAT-003",
+                baseline=DAT_BASELINE,
+                generated_at=generated_at,
+            )
+            generate(payload_sha256=preliminary_digest, code_commit=head)
+            review_record = run_command(commands[21])
+            print(
+                f"[{review_record.exit_code}] {review_record.command} "
+                f"({review_record.duration_seconds:.3f}s)"
+            )
+            if review_record.exit_code != 0 or not review_record.result.startswith("PASS:"):
+                failure = True
+            else:
+                review_record = CommandRecord(
+                    command=review_record.command,
+                    duration_seconds=review_record.duration_seconds,
+                    exit_code=0,
+                    result=DAT_REVIEW_FINAL_RESULT,
+                )
+    except Exception as exc:
+        failure = True
+        print(f"DAT-003 acceptance preparation failed ({type(exc).__name__})", file=sys.stderr)
+    finally:
+        teardown_record = run_command(commands[22])
+        print(
+            f"[{teardown_record.exit_code}] {teardown_record.command} "
+            f"({teardown_record.duration_seconds:.3f}s)"
+        )
+        if teardown_record.exit_code != 0 or not teardown_record.result.startswith("PASS:"):
+            failure = True
+
+    if review_record is None:
+        final_records = [*records, teardown_record]
+        _write_command_records(command_log, [asdict(item) for item in final_records])
+        return 1
+
+    final_records = [*records, review_record, teardown_record]
+    _write_command_records(command_log, [asdict(item) for item in final_records])
+    archive = REPOSITORY_ROOT / "review_pack/DAT-003/DMF_PULSE_DAT-003_REVIEW.zip"
+    finalization_path = REPOSITORY_ROOT / "review_pack/DAT-003/archive_finalization.json"
+    if failure:
+        archive.unlink(missing_ok=True)
+        _write_json_atomic(
+            finalization_path,
+            {
+                "command_22": asdict(review_record),
+                "command_23": asdict(teardown_record),
+                "status": "FAILED",
+            },
+        )
+        return 1
+
+    try:
+        from generate_dat003_evidence import generate
+        from validate_repository import validate_repository
+
+        from dmf_pulse.assurance.review_pack import (
+            build_review_pack,
+            calculate_review_payload_digest,
+            validate_review_zip,
+        )
+
+        head = _git_head()
+        generate(payload_sha256="0" * 64, code_commit=head)
+        generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+        payload_digest = calculate_review_payload_digest(
+            REPOSITORY_ROOT,
+            ticket="DAT-003",
+            baseline=DAT_BASELINE,
+            generated_at=generated_at,
+        )
+        generate(payload_sha256=payload_digest, code_commit=head)
+        final_errors = validate_repository(REPOSITORY_ROOT)
+        if final_errors:
+            raise ValueError("final repository/evidence validation failed")
+        summary = build_review_pack(
+            REPOSITORY_ROOT,
+            ticket="DAT-003",
+            baseline=DAT_BASELINE,
+            output=REPOSITORY_ROOT / "review_pack/DAT-003",
+            generated_at=generated_at,
+        )
+        validated = validate_review_zip(summary.path)
+        with zipfile.ZipFile(summary.path) as review_zip:
+            if review_zip.testzip() is not None:
+                raise ValueError("review archive CRC validation failed")
+        finalization = {
+            "archive_sha256": hashlib.sha256(summary.path.read_bytes()).hexdigest(),
+            "command_22": asdict(review_record),
+            "command_23": asdict(teardown_record),
+            "crc_and_checksum_validated": True,
+            "file_count": validated.file_count,
+            "payload_sha256": validated.payload_sha256,
+            "status": "COMPLETE",
+        }
+        _write_json_atomic(finalization_path, finalization)
+    except Exception as exc:
+        archive.unlink(missing_ok=True)
+        _write_json_atomic(
+            finalization_path,
+            {
+                "command_22": asdict(review_record),
+                "command_23": asdict(teardown_record),
+                "error_type": type(exc).__name__,
+                "status": "FAILED",
+            },
+        )
+        print(f"DAT-003 review archive finalization failed ({type(exc).__name__})")
+        return 1
+    print(json.dumps(finalization, indent=2, sort_keys=True))
+    return 0
 
 
 def main() -> int:
@@ -468,10 +865,16 @@ def main() -> int:
         action="store_true",
         help="append the stable RUL-002 review write-ahead record before digest calculation",
     )
-    parser.add_argument("--ticket", choices=("FND-001", "RUL-002"), default="FND-001")
+    parser.add_argument("--ticket", choices=("FND-001", "RUL-002", "DAT-003"), default="FND-001")
     arguments = parser.parse_args()
     if arguments.review_only and arguments.prepare_review:
         parser.error("--review-only and --prepare-review are mutually exclusive")
+    if arguments.ticket == "DAT-003":
+        if arguments.review_only or arguments.prepare_review:
+            parser.error(
+                "DAT-003 runs its review and teardown inside the exact acceptance sequence"
+            )
+        return _main_dat()
     uv = shutil.which("uv")
     if uv is None:
         print("uv is unavailable", file=sys.stderr)

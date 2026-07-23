@@ -26,6 +26,9 @@ def test_wheel_installs_and_runs_outside_source_tree(
     assert report["installed_runtime_distributions"]
     assert report["locked_runtime_manifest_sha256"]
     assert report["doctor_status"] == "HEALTHY"
+    assert report["installed_data_model"]["database_status"] == "HEALTHY"
+    assert report["installed_data_model"]["demo_assertions"] == 8
+    assert report["installed_data_model"]["as_of_assertions"] == 8
     wheel = report["wheel"]
     assert isinstance(wheel, dict)
     assert wheel["contains_py_typed"] is True

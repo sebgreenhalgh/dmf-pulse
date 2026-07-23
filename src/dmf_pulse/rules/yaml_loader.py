@@ -34,9 +34,7 @@ def _construct_mapping(
     for key_node, value_node in node.value:
         if not isinstance(key_node, ScalarNode):
             raise ConstructorError(None, None, "mapping keys must be strings", key_node.start_mark)
-        if key_node.tag != "tag:yaml.org,2002:str" and not (
-            key_node.tag == "tag:yaml.org,2002:int" and key_node.value in {"1", "2", "3"}
-        ):
+        if key_node.tag != "tag:yaml.org,2002:str":
             raise ConstructorError(None, None, "mapping keys must be strings", key_node.start_mark)
         key = key_node.value
         if key == "<<":
@@ -76,15 +74,9 @@ def _validate_scalar_tree(value: object, path: str = "$") -> None:
         raise RulesValidationError("RULESET_YAML_SCALAR", f"unsupported YAML scalar at {path}")
 
 
-def load_rules_yaml(path: Path) -> dict[str, Any]:
-    """Read one bounded UTF-8 YAML mapping under the strict authoring subset."""
+def load_rules_yaml_bytes(raw: bytes) -> dict[str, Any]:
+    """Parse exact source bytes under the bounded strict authoring subset."""
 
-    try:
-        raw = path.read_bytes()
-    except OSError as exc:
-        raise RulesValidationError(
-            "RULESET_FILE_UNAVAILABLE", "a required rules file is unavailable"
-        ) from exc
     if len(raw) > 1024 * 1024:
         raise RulesValidationError("RULESET_FILE_TOO_LARGE", "a rules YAML file exceeds 1 MiB")
     try:
@@ -119,3 +111,15 @@ def load_rules_yaml(path: Path) -> dict[str, Any]:
         )
     _validate_scalar_tree(value)
     return value
+
+
+def load_rules_yaml(path: Path) -> dict[str, Any]:
+    """Read one bounded UTF-8 YAML mapping under the strict authoring subset."""
+
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise RulesValidationError(
+            "RULESET_FILE_UNAVAILABLE", "a required rules file is unavailable"
+        ) from exc
+    return load_rules_yaml_bytes(raw)

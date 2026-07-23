@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, time
+from datetime import date, datetime, time
 from typing import Annotated, Any, Literal
 
 from pydantic import (
@@ -10,6 +10,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    JsonValue,
     StrictBool,
     StrictInt,
     StrictStr,
@@ -51,7 +52,14 @@ LocalTime = Annotated[
     Field(pattern=r"^\d{2}:\d{2}$"),
     AfterValidator(_valid_local_time),
 ]
+CalendarDate = Annotated[
+    StrictStr,
+    Field(pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    AfterValidator(lambda value: date.fromisoformat(value).isoformat()),
+]
 SourceId = Annotated[StrictStr, Field(pattern=r"^SRC-[A-Z0-9-]+$")]
+RankKey = Annotated[StrictStr, Field(pattern=r"^[1-9]\d*$")]
+StableKey = Annotated[StrictStr, Field(pattern=r"^[A-Z][A-Z0-9_]{1,63}$")]
 RuleEvent = Literal["BALL_RECOVERY", "BLOCK", "CLEARANCE", "INTERCEPTION", "TACKLE"]
 
 
@@ -223,12 +231,6 @@ class AssistsFile(AuthoringModel):
     ambiguous_state_allowed_for_exact_scoring: StrictBool
 
 
-class BonusRanks(AuthoringModel):
-    rank_1: StrictInt = Field(alias="1")
-    rank_2: StrictInt = Field(alias="2")
-    rank_3: StrictInt = Field(alias="3")
-
-
 class BpsAppearanceBand(AuthoringModel):
     min_inclusive: NonNegativeInt | None = None
     min_exclusive: NonNegativeInt | None = None
@@ -360,7 +362,7 @@ class BpsRules(AuthoringModel):
 
 class BonusFile(AuthoringModel):
     scope: Literal["PER_FIXTURE"]
-    bonus_points_by_competition_rank: BonusRanks
+    bonus_points_by_competition_rank: Annotated[dict[RankKey, NonNegativeInt], Field(min_length=1)]
     bps: BpsRules
 
 
@@ -380,7 +382,7 @@ class LineupFile(AuthoringModel):
 class TransfersFile(AuthoringModel):
     free_transfer_cap: PositiveInt
     hit_points: StrictInt
-    state: Literal["REFERENCE_ONLY"]
+    state: Literal["REFERENCE_ONLY", "DRAFT_PRELAUNCH", "CAPTURED_UNVERIFIED", "CONFLICTED"]
 
 
 class PricesFile(AuthoringModel):
@@ -388,9 +390,32 @@ class PricesFile(AuthoringModel):
     change_threshold_algorithm: Literal["UNDISCLOSED"]
 
 
+class GameweekWindow(AuthoringModel):
+    start_gameweek: PositiveInt
+    end_gameweek: PositiveInt
+
+    @model_validator(mode="after")
+    def is_ordered(self) -> GameweekWindow:
+        if self.end_gameweek < self.start_gameweek:
+            raise ValueError("Gameweek range end cannot precede its start")
+        return self
+
+
+class DeclarativeEffect(AuthoringModel):
+    surface: StableKey
+    operation: StableKey
+    parameters: dict[StrictStr, JsonValue]
+
+
 class ChipRule(AuthoringModel):
-    key: Literal["WILDCARD", "FREE_HIT", "TRIPLE_CAPTAIN", "BENCH_BOOST"]
-    copies: PositiveInt
+    key: StableKey
+    copies: PositiveInt | UnknownRule
+    activation_window: GameweekWindow | UnknownRule
+    expires_after_gameweek: PositiveInt | None | UnknownRule
+    duration_gameweeks: PositiveInt | UnknownRule
+    concurrency_group: StableKey | UnknownRule
+    cancellable: StrictBool | UnknownRule
+    effects: tuple[DeclarativeEffect, ...]
 
 
 class ChipsFile(AuthoringModel):
@@ -398,11 +423,10 @@ class ChipsFile(AuthoringModel):
     concurrency_limit: PositiveInt
 
     @model_validator(mode="after")
-    def chip_keys_are_complete(self) -> ChipsFile:
+    def chip_keys_are_unique(self) -> ChipsFile:
         keys = [chip.key for chip in self.chips]
-        expected = {"WILDCARD", "FREE_HIT", "TRIPLE_CAPTAIN", "BENCH_BOOST"}
-        if len(keys) != len(set(keys)) or set(keys) != expected:
-            raise ValueError("chip keys must be unique and complete")
+        if len(keys) != len(set(keys)):
+            raise ValueError("chip keys must be unique")
         return self
 
 
@@ -422,15 +446,32 @@ class DeadlinesFile(AuthoringModel):
         return self
 
 
+class SpecialEvent(AuthoringModel):
+    event_id: StableKey
+    effective_gameweeks: GameweekWindow
+    operation: StableKey
+    parameters: dict[StrictStr, JsonValue]
+
+
 class SpecialEventsFile(AuthoringModel):
-    events: Annotated[tuple[dict[str, object], ...], Field(max_length=0)]
+    events: tuple[SpecialEvent, ...]
+
+    @model_validator(mode="after")
+    def event_ids_are_unique(self) -> SpecialEventsFile:
+        event_ids = [event.event_id for event in self.events]
+        if len(event_ids) != len(set(event_ids)):
+            raise ValueError("special-event IDs must be unique")
+        return self
 
 
 class SourceEntry(AuthoringModel):
     source_id: SourceId
     source_type: Annotated[StrictStr, Field(pattern=r"^[A-Z][A-Z0-9_]*$")]
     status: Literal["VERIFIED"]
-    locator: StrictStr | None = None
+    locator: Annotated[StrictStr, Field(min_length=1)]
+    published_on: CalendarDate | None = None
+    accessed_on: CalendarDate | None = None
+    refresh_trigger: Annotated[StrictStr, Field(min_length=1)]
 
 
 class SourceManifestFile(AuthoringModel):
@@ -493,7 +534,7 @@ class CheckedClaims(AuthoringModel):
 class TargetClaimsFile(AuthoringModel):
     ruleset_id: StrictStr
     ruleset_version: StrictStr
-    status: Literal["CAPTURED_UNVERIFIED"]
+    status: Literal["DRAFT_PRELAUNCH", "CAPTURED_UNVERIFIED", "CONFLICTED"]
     production_eligible: Literal[False]
     checked_claims: CheckedClaims
     unknown_blocking_families: Annotated[tuple[StrictStr, ...], Field(min_length=1)]
@@ -594,7 +635,16 @@ def validate_and_normalize_authoring_data(
     assert isinstance(source_model, SourceManifestFile)
     sources = _source_ids(source_model)
     normalized["source_manifest.yaml"] = source_model.model_dump(mode="json", by_alias=True)
-    if blockers:
+    family_unknowns = {
+        filename: data[filename].get("verification_status") in {"UNKNOWN", "CONFLICTED"}
+        for filename in COMPLETE_FILE_MODELS
+    }
+    if any(family_unknowns.values()):
+        if not all(family_unknowns.values()):
+            raise RulesValidationError(
+                "RULESET_DRAFT_SHAPE",
+                "top-level unknown rule families must cover every complete family",
+            )
         draft_references: set[str] = set()
         for filename in COMPLETE_FILE_MODELS:
             unknown = _validated(UnknownRule, data[filename], filename)
@@ -608,18 +658,22 @@ def validate_and_normalize_authoring_data(
                 "draft rule families contain unknown source references",
                 blockers=tuple(missing_draft_sources),
             )
+        if not manifest.extension_files:
+            raise RulesValidationError(
+                "RULESET_EXTENSION_STATUS", "unknown draft families require target claims"
+            )
         claims_model = _validated(
-            TargetClaimsFile,
-            data.get("target_2026_27_claims.yaml"),
-            "target_2026_27_claims.yaml",
+            TargetClaimsFile, data.get("target_2026_27_claims.yaml"), "target_2026_27_claims.yaml"
         )
         assert isinstance(claims_model, TargetClaimsFile)
         if (
             claims_model.ruleset_id != manifest.ruleset_id
             or claims_model.ruleset_version != manifest.ruleset_version
+            or claims_model.status != manifest.status.value
         ):
             raise RulesValidationError(
-                "RULESET_TARGET_IDENTITY", "target claims identity does not match season manifest"
+                "RULESET_TARGET_IDENTITY",
+                "target claims identity or status does not match season manifest",
             )
         missing_sources = sorted(_target_source_refs(claims_model) - sources)
         if missing_sources:
