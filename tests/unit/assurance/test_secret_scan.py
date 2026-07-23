@@ -71,6 +71,14 @@ def test_python_session_syntax_and_explicit_placeholders_are_not_credentials() -
     )
     assert scan_text(text, path="example.py") == []
 
+    patch = "\n".join(f"+{line}" for line in text.splitlines())
+    assert scan_text(patch, path="04_FULL_DIFF.patch") == []
+
+    fake_password = "Fake" + "CredentialValue987654321"
+    assignment = "+" + "".join(("pass", "word")) + f' = "{fake_password}"'
+    findings = scan_text(assignment, path="04_FULL_DIFF.patch")
+    assert {finding.rule_id for finding in findings} == {"CREDENTIAL_ASSIGNMENT"}
+
 
 @pytest.mark.unit
 def test_exact_fingerprint_allowlist_and_malformed_wildcard(tmp_path: Path) -> None:

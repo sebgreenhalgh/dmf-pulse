@@ -175,13 +175,16 @@ def scan_text(text: str, *, path: str = "<memory>") -> list[SecretFinding]:
                 )
         for match in ASSIGNMENT_PATTERN.finditer(line):
             value = match.group(1).rstrip(")]}")
-            python_syntax = path.casefold().endswith(".py") and (
-                line.lstrip().startswith(("def ", "async def ", "class "))
-                or "lambda " in line
-                or ") ->" in line
+            syntax_line = line
+            if path.casefold().endswith((".diff", ".patch")) and line.startswith(("+", "-")):
+                syntax_line = line[1:]
+            code_syntax = (
+                syntax_line.lstrip().startswith(("def ", "async def ", "class "))
+                or "lambda " in syntax_line
+                or ") ->" in syntax_line
                 or "(" in value
             )
-            if python_syntax:
+            if code_syntax:
                 continue
             if value.casefold() not in {"changeme", "example", "redacted", "placeholder"}:
                 findings.add(
