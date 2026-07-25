@@ -6,6 +6,7 @@ import difflib
 import json
 import math
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -494,7 +495,18 @@ FPL_TEARDOWN_FINAL_RESULT: Final = "PASS: PostgreSQL service and volume removed"
 def _redact_fpl_personal_text(value: str) -> str:
     """Redact only frozen owner/user identifiers from external review material."""
 
-    return value.replace("Sebastian", "<REDACTED_OWNER>").replace("sebgr", "<REDACTED_USER>")
+    value = re.sub(
+        r"(?i)c:\\+users\\+[^\s\"']*",
+        "<REDACTED_USER_PATH>",
+        value,
+    )
+    value = re.sub(
+        r"(?i)sebastian(?:\s+greenhalgh)?",
+        "<REDACTED_OWNER>",
+        value,
+    )
+    value = re.sub(r"(?i)sebgreenhalgh|sebgr", "<REDACTED_USER>", value)
+    return re.sub(r"(?i)greenhalgh", "<REDACTED_OWNER>", value)
 
 
 def _primary_payload_digest(

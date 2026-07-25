@@ -81,6 +81,8 @@ class FplGitRunner:
                 stdout=(
                     "diff --git a/config/rights/fpl_profiles.json b/config/rights/fpl_profiles.json\n"
                     "+account_scope: Sebastian approved private context only\n"
+                    "+lowercase_owner: sebastian\n"
+                    "+local_path: C:\\Users\\sebgr\\Documents\\fixture.json\n"
                     "diff --git a/evidence/tickets/FPL-004/PLAN.md "
                     "b/evidence/tickets/FPL-004/PLAN.md\n"
                     "+Final acceptance remains pending.\n"
@@ -179,7 +181,9 @@ def test_fpl_review_pack_exact_layout_redacts_personal_owner_and_validates(tmp_p
         assert tuple(archive.namelist()) == FPL_PREFERRED_NAMES
         patch = archive.read("03_COMPLETE_HUMAN_PATCH.diff").decode()
         assert "<REDACTED_OWNER>" in patch
-        assert "Sebastian" not in patch
+        assert "sebastian" not in patch.casefold()
+        assert "greenhalgh" not in patch.casefold()
+        assert "c:\\users\\" not in patch.casefold()
         assert "evidence/tickets/FPL-004/PLAN.md" in patch
         manifest = json.loads(archive.read("19_ARCHIVE_MANIFEST.json"))
         assert {item["name"] for item in manifest["files"]} == FPL_DETACHED_REVIEW_NAMES
