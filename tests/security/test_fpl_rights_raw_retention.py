@@ -50,8 +50,6 @@ from dmf_pulse.ingestion.repository import (
 )
 from dmf_pulse.ingestion.rights import decide_rights, load_rights_profiles, require_rights
 
-pytestmark = pytest.mark.security
-
 FAKE_API_KEY = "DMF" + "_TEST" + "_API_KEY_DO_NOT_LOG_7e4df7f7"
 FAKE_DATABASE_URL = (
     "postgresql://" + "dmf_test:" + "SUPER" + "_SECRET_DO_NOT_LOG" + "@localhost/dmf"
@@ -116,6 +114,7 @@ def _current_states(session: Session) -> tuple[str, ...]:
     )
 
 
+@pytest.mark.security
 def test_supplied_profiles_fail_closed_for_every_unapproved_capability() -> None:
     profiles = load_rights_profiles()
     synthetic = profiles["synthetic_test_v1"]
@@ -135,6 +134,7 @@ def test_supplied_profiles_fail_closed_for_every_unapproved_capability() -> None
     assert caught.value.details["transport_call_count"] == 0
 
 
+@pytest.mark.security
 def test_automated_snapshot_is_blocked_before_transport_or_database_resolution(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -360,6 +360,7 @@ def test_exhausted_manual_validation_retry_is_terminal_and_keeps_no_raw_body(
         assert session.scalar(select(func.count()).select_from(raw_blob)) == 0
 
 
+@pytest.mark.security
 def test_volatile_orphan_cleanup_is_process_scoped_and_preserves_caller_inputs(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
