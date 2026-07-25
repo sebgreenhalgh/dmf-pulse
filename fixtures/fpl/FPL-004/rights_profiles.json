@@ -1,0 +1,56 @@
+{
+  "profiles": [
+    {
+      "approved_purpose": "synthetic deterministic tests only",
+      "capabilities": {
+        "automated_access": "DENY",
+        "backup": "ALLOW",
+        "cache": "ALLOW",
+        "derived_storage": "ALLOW",
+        "manual_import": "ALLOW",
+        "model_training": "DENY",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "ALLOW",
+        "redistribution": "ALLOW",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-07-23T00:00:00Z",
+      "profile_version": "1.0.0",
+      "provider_key": "synthetic_fpl",
+      "retention_seconds": null,
+      "rights_profile_id": "synthetic_test_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": false
+    },
+    {
+      "account_scope": "Sebastian approved private context only",
+      "approved_purpose": "bounded transient private manual validation only; no persistent promotion",
+      "capabilities": {
+        "automated_access": "DENY",
+        "backup": "DENY",
+        "cache": "DENY",
+        "derived_storage": "UNKNOWN",
+        "manual_import": "ALLOW",
+        "model_training": "DENY",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "DENY",
+        "redistribution": "DENY",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-07-23T00:00:00Z",
+      "geography_scope": "United Kingdom private use assumption",
+      "profile_version": "1.0.0",
+      "provider_key": "official_fpl",
+      "retention_seconds": 0,
+      "rights_profile_id": "fpl_official_private_manual_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": true,
+      "terms_source": "Premier League Terms and Conditions",
+      "unresolved_rights": [
+        "persistent derived database rights require confirmation"
+      ]
+    }
+  ]
+}

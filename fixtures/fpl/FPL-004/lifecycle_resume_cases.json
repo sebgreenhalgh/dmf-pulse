@@ -1,0 +1,12 @@
+{
+  "expected_duplicate_canonical_effects": 0,
+  "expected_final_state": "USABLE",
+  "expected_semantic_result_equal_to_uninterrupted": true,
+  "stages": [
+    "STORED_OR_RAW_DISCARDED",
+    "PARSED",
+    "VALIDATED",
+    "MAPPED",
+    "PROMOTED"
+  ]
+}

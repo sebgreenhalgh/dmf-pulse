@@ -1,0 +1,91 @@
+{
+  "$id": "dmf://schemas/provider_snapshot_result/v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "canonical_effects": {
+      "type": "object"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "quality": {
+      "$ref": "quality_report.schema.json"
+    },
+    "resources": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "drift": {
+            "type": "string"
+          },
+          "lifecycle_state": {
+            "type": "string"
+          },
+          "raw_retention": {
+            "type": "string"
+          },
+          "resource": {
+            "enum": [
+              "bootstrap",
+              "fixtures"
+            ]
+          },
+          "source_snapshot_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "usable_at": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "resource",
+          "source_snapshot_id",
+          "lifecycle_state"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "rights": {
+      "$ref": "rights_decision.schema.json"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "source_bundle": {
+      "oneOf": [
+        {
+          "$ref": "source_bundle_summary.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "enum": [
+        "USABLE",
+        "USABLE_WITH_WARNINGS",
+        "QUARANTINED",
+        "RIGHTS_BLOCKED",
+        "FAILED"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "provider",
+    "resources",
+    "rights",
+    "quality",
+    "canonical_effects"
+  ],
+  "type": "object"
+}

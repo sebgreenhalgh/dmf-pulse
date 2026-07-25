@@ -1,0 +1,151 @@
+{
+  "entries": [
+    {
+      "bytes": 5272,
+      "path": "fixtures/fpl/FPL-004/changed_snapshot/bootstrap.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "42fbd25117d4cc228786bc5073dd1f9b410abe3ee801416fae32bea0848052d5",
+      "synthetic": true
+    },
+    {
+      "bytes": 400,
+      "path": "fixtures/fpl/FPL-004/changed_snapshot/fixtures.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "20f1a1946d465ae8056f43071bcd051de07b64a16546ce2f9000f09073b4660d",
+      "synthetic": true
+    },
+    {
+      "bytes": 1172,
+      "path": "fixtures/fpl/FPL-004/expected_results.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "5f13f467be0b51895b8e34a7202f62eaa304b6e0deca5119d3ae6e861811ce52",
+      "synthetic": true
+    },
+    {
+      "bytes": 5229,
+      "path": "fixtures/fpl/FPL-004/happy_path/bootstrap.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "b878e03f0eddb88889794f86df486c0d28f33e2498b58b9e66f947dd7c6e611e",
+      "synthetic": true
+    },
+    {
+      "bytes": 400,
+      "path": "fixtures/fpl/FPL-004/happy_path/fixtures.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "c4c5108488ed02c61c933ea4184a23ac0e808f3097f4f36ef25e7fe7a48fd2e0",
+      "synthetic": true
+    },
+    {
+      "bytes": 253,
+      "path": "fixtures/fpl/FPL-004/lifecycle_resume_cases.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "53758ed797b58704587de9c503f115f45612b0299e7f813471a7af0d406263b6",
+      "synthetic": true
+    },
+    {
+      "bytes": 13,
+      "path": "fixtures/fpl/FPL-004/malformed/bootstrap.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "355cdc4a713d760b5f6d1a65a8e5276928a7e7b07b55a8441dee783f38413dc3",
+      "synthetic": true
+    },
+    {
+      "bytes": 400,
+      "path": "fixtures/fpl/FPL-004/malformed/fixtures.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "c4c5108488ed02c61c933ea4184a23ac0e808f3097f4f36ef25e7fe7a48fd2e0",
+      "synthetic": true
+    },
+    {
+      "bytes": 5208,
+      "path": "fixtures/fpl/FPL-004/missing_required/bootstrap.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "5973e8382384c14b345185aef0bbb0982e7a1de3266964c82162fa5621cc7a87",
+      "synthetic": true
+    },
+    {
+      "bytes": 400,
+      "path": "fixtures/fpl/FPL-004/missing_required/fixtures.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "c4c5108488ed02c61c933ea4184a23ac0e808f3097f4f36ef25e7fe7a48fd2e0",
+      "synthetic": true
+    },
+    {
+      "bytes": 5229,
+      "path": "fixtures/fpl/FPL-004/post_cutoff/bootstrap.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "b878e03f0eddb88889794f86df486c0d28f33e2498b58b9e66f947dd7c6e611e",
+      "synthetic": true
+    },
+    {
+      "bytes": 400,
+      "path": "fixtures/fpl/FPL-004/post_cutoff/fixtures.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "c4c5108488ed02c61c933ea4184a23ac0e808f3097f4f36ef25e7fe7a48fd2e0",
+      "synthetic": true
+    },
+    {
+      "bytes": 138,
+      "path": "fixtures/fpl/FPL-004/post_cutoff/scenario.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "2d7714dac46e02b10c3867cbb8d30c013eccd725b5e0f1643e7490ef3e31a233",
+      "synthetic": true
+    },
+    {
+      "bytes": 1889,
+      "path": "fixtures/fpl/FPL-004/rights_profiles.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "1f9ee564a20fd2cef26b8a93f1eb0bb0a9d4066b05ed0156b1364571efa33f04",
+      "synthetic": true
+    },
+    {
+      "bytes": 5350,
+      "path": "fixtures/fpl/FPL-004/unknown_additive/bootstrap.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "325944c0bdfa26598bb07bb24ff9f20c680af6162343d19dfa82117867fe9ac7",
+      "synthetic": true
+    },
+    {
+      "bytes": 454,
+      "path": "fixtures/fpl/FPL-004/unknown_additive/fixtures.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "635abbd3ff63c977e9e4e8cf816da29d74cba93bb3c4bf3568ad8c669b001276",
+      "synthetic": true
+    },
+    {
+      "bytes": 5231,
+      "path": "fixtures/fpl/FPL-004/wrong_type/bootstrap.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "99ab076d517c68bea41e03ed6f5c1b5b3116df02c46c64b1dacdbca31b59a2cc",
+      "synthetic": true
+    },
+    {
+      "bytes": 400,
+      "path": "fixtures/fpl/FPL-004/wrong_type/fixtures.json",
+      "purpose": "FPL-004 deterministic contract fixture",
+      "rights_profile": "synthetic_test_v1",
+      "sha256": "c4c5108488ed02c61c933ea4184a23ac0e808f3097f4f36ef25e7fe7a48fd2e0",
+      "synthetic": true
+    }
+  ],
+  "fixture_count": 18,
+  "manifest_version": "1.0.0",
+  "pack_id": "FPL-004"
+}

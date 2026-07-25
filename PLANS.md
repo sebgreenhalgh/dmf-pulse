@@ -1,5 +1,36 @@
 # DMF Pulse execution plans
 
+## FPL-004 - rights-gated official FPL ingestion foundation
+
+- Ticket/stage: `FPL-004`, A4.
+- Required branch/baseline: `stage/A4/FPL-004-official-ingestion` from `9b3160a2574d2868b5f26e3a2d429924567510b0`.
+- Outcome: remediate DAT-003 lifecycle and relational P1 findings, then ingest approved synthetic FPL-shaped bootstrap/fixtures into immutable retrieval evidence, season-scoped canonical mappings, typed observations, quality records, and a deterministic cutoff-safe source bundle.
+- Constraints: no live FPL/provider request, real FPL payload, authenticated endpoint, automated polling, persistent official-profile raw/derived storage, name-only merge, new dependency without approval, SQLite, models, optimiser, API/UI, push, merge, rebase, reset, tag, or amend.
+
+### FPL-004 checkpoints
+
+- [x] 2026-07-24T20:43:21+01:00 - verified exact branch/baseline/clean-tree preconditions, Pack 004 hashes and synthetic fixture oracles, Docker/PostgreSQL 18.4, accepted DAT-003 head/schema, and the 279-test inherited baseline.
+- [x] 2026-07-25T09:27:45+01:00 - FPL-004.0: closed every mandatory DAT-003 remediation with reversible PostgreSQL constraints and direct adversarial regression tests.
+- [x] 2026-07-25T09:27:45+01:00 - FPL-004.1: implemented immutable versioned Rights Profiles, fail-closed decisions, isolated service-owned volatile copies for ordinary official manual-import paths, crash/concurrency-safe cleanup, and rights-before-transport behavior.
+- [x] 2026-07-25T09:27:45+01:00 - FPL-004.2: implemented retrieval envelopes, append-only lifecycle, authority-bound suffix-only resume, pair locking, and derived usability.
+- [x] 2026-07-25T09:27:45+01:00 - FPL-004.3: implemented strict bounded payload parsing, schema drift/missingness, season-scoped canonical mappings, immutable observations, quality records, atomic promotion, and cutoff-safe bundles.
+- [x] 2026-07-25T09:27:45+01:00 - FPL-004.4: exposed the public CLI and frozen HTTP boundary; 524 tests, strict typing/lint, PostgreSQL migration/concurrency proofs, and 92.30% combined branch coverage pass locally.
+- [x] 2026-07-25T12:18:12+01:00 - FPL-004.5 interruption recovery review: resolved installed exit-code propagation, immutable/strict rights parsing, actual system-time resume and bitemporal semantics, atomic honest promotion, A-B-A observation history, exact retrieval bundle manifests, ingestion run/attempt linkage, strict RFC3339 and transport failures, provider/effective configuration lineage, durable pre-parse raw read-back, and false-COMPLETE archive write-ahead evidence. Focused offline suites (178), unit suite (416), and lifecycle/bundle/security PostgreSQL suite (28) pass.
+- [x] 2026-07-25T13:25:24+01:00 - FPL-004.6 final stabilization: made temporal canonical supersession source-time ordered, added transactional same-time semantic-observation claims, proved mixed-payload contradiction rollback and old-replay non-supersession, hardened error-body transport translation and installed-wheel fixture replay, and closed detached-log/teardown false-COMPLETE paths. Three independent read-only audits found no unresolved P0/P1. The 589-test preacceptance run exposed one evidence-script import defect; its regression now passes. Actual coverage evidence passes the authority-tiered gates at 91.42% combined, 98.33% critical deterministic, 94.44% rights, 84.62% provider, and 100% cutoff predicates.
+- [ ] Final - run all 25 literal acceptance commands, complete ordered self-review, record the final clean commit, and validate the exact 20-file review ZIP.
+
+### FPL-004 decision log
+
+- The supplied rights register is controlling engineering policy, not legal advice. Unknown rights deny; technical reachability never grants permission.
+- Only `synthetic_test_v1` authorizes persistent FPL-004 promotion and bundle creation. `fpl_official_private_manual_v1` is bounded transient validation only and blocks transport before any live snapshot request.
+- Every retrieval has one immutable envelope and append-only lifecycle. Current state and first `usable_at` are derived; legacy DAT-003 lifecycle columns are compatibility data only for new ingestion.
+- Canonical IDs never derive from FPL IDs or names. Provider mappings are provider/resource/type/season scoped, and conflicts quarantine instead of guessing.
+- Source-bundle membership is selected from derived `USABLE` state at or before the declared cutoff; provider-generated time is never a substitute.
+- No real FPL body may enter Git, PostgreSQL, logs, evidence, or the review ZIP during this milestone.
+- Provider and rights JSON are strict packaged runtime authorities. Resume and bundles bind their separate hashes plus one effective configuration hash.
+- Equivalent payload pairs share a semantic bundle hash but retain separate immutable exact-manifest bundles and source snapshot membership.
+- Commands 24-25 remain `PENDING` in a `BLOCKED` preliminary archive; only measured final records after guaranteed teardown may produce a detached-validator-accepted `COMPLETE` archive.
+
 ## DAT-003 - canonical temporal PostgreSQL foundation
 
 - Ticket/stage: `DAT-003`, A3.

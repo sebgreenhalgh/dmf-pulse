@@ -12,18 +12,23 @@ import tempfile
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
+from typing import Any, Final
 
 from dmf_pulse.assurance.canonical import pretty_json, sha256_file
 from dmf_pulse.assurance.evidence import (
     DAT_DETACHED_REVIEW_NAMES,
     DAT_REQUIRED_BASELINE,
     DAT_REQUIRED_BRANCH,
+    FPL_DETACHED_REVIEW_NAMES,
+    FPL_REQUIRED_BASELINE,
+    FPL_REQUIRED_BRANCH,
     CodexResult,
+    CommandRecord,
     ReviewFile,
     ReviewManifest,
     TicketEvidenceManifest,
     validate_evidence_file,
+    validate_ticket_evidence,
 )
 from dmf_pulse.assurance.manifests import RepositoryManifest, validate_repository_manifest
 from dmf_pulse.assurance.secret_scan import scan_repository, scan_text
@@ -37,7 +42,9 @@ RUL_REQUIRED_BRANCH: Final = "stage/A2/RUL-002-rules-foundation"
 REVIEW_ZIP_NAME: Final = "DMF_PULSE_FND-001_REVIEW.zip"
 RUL_REVIEW_ZIP_NAME: Final = "DMF_PULSE_RUL-002_REVIEW.zip"
 DAT_REVIEW_ZIP_NAME: Final = "DMF_PULSE_DAT-003_REVIEW.zip"
+FPL_REVIEW_ZIP_NAME: Final = "DMF_PULSE_FPL-004_REVIEW.zip"
 MANIFEST_NAME: Final = "03_REVIEW_MANIFEST.json"
+FPL_MANIFEST_NAME: Final = "19_ARCHIVE_MANIFEST.json"
 CHECKSUM_NAME: Final = "20_SHA256SUMS.txt"
 PREFERRED_NAMES: Final = (
     "01_REVIEW_INDEX.md",
@@ -104,6 +111,33 @@ DAT_PREFERRED_NAMES: Final = (
     "18_INITIAL_MIGRATION_CRITICAL_SQL.txt",
     "19_REPOSITORY_CLI_CONFIG_COMPOSE_CI.txt",
     CHECKSUM_NAME,
+)
+FPL_PREFERRED_NAMES: Final = (
+    "01_REVIEW_INDEX.md",
+    "02_BASELINE_AND_GIT_STATE.md",
+    "03_COMPLETE_HUMAN_PATCH.diff",
+    "04_FILE_CHANGE_MAP.md",
+    "05_PUBLIC_CONTRACTS.md",
+    "06_MIGRATION_SCHEMA_REVIEW.md",
+    "07_SOURCE_LIFECYCLE_RESUME.md",
+    "08_RIGHTS_RETENTION_REVIEW.md",
+    "09_TEST_COVERAGE_MUTATION.md",
+    "10_ACCEPTANCE_MATRIX.md",
+    "11_DAT003_REMEDIATION.md",
+    "12_FPL_SCHEMA_MAPPING_IDEMPOTENCY.md",
+    "13_SOURCE_BUNDLE_CUTOFF_QUALITY.md",
+    "14_DEPENDENCY_LOCK_PACKAGE.md",
+    "15_SECURITY_AND_SECRET_REVIEW.md",
+    "16_KNOWN_LIMITATIONS.md",
+    "17_COMMANDS_AND_RESULTS.log",
+    "18_CODEX_RESULT.json",
+    FPL_MANIFEST_NAME,
+    CHECKSUM_NAME,
+)
+FPL_FORBIDDEN_MARKERS: Final = (
+    b"RAW_BODY_" + b"MUST_NOT_SURVIVE_FPL004",
+    b"SUPER_" + b"SECRET_DO_NOT_LOG",
+    b"DMF_TEST_" + b"API_KEY_DO_NOT_LOG",
 )
 OPERATIONAL_EXCLUDED_PARTS: Final = {
     ".git",
@@ -346,6 +380,7 @@ PRIMARY_PAYLOAD_NAMES: Final = {
 }
 RUL_PRIMARY_PAYLOAD_NAMES: Final = set(RUL_PREFERRED_NAMES[3:19])
 DAT_PRIMARY_PAYLOAD_NAMES: Final = set(DAT_PREFERRED_NAMES[3:19])
+FPL_PRIMARY_PAYLOAD_NAMES: Final = set(FPL_PREFERRED_NAMES[:17])
 RUL_MANDATORY_ACCEPTANCE_COMMANDS: Final = (
     "uv sync --all-groups --frozen",
     "uv run ruff format --check .",
@@ -412,6 +447,54 @@ DAT_TEARDOWN_WRITE_AHEAD_RESULT: Final = (
     "PASS: finally-guaranteed PostgreSQL teardown pending; exact duration and result are in "
     "archive_finalization.json"
 )
+FPL_MANDATORY_ACCEPTANCE_COMMANDS: Final = (
+    "git diff --check",
+    "uv lock --check",
+    "uv run dmf specs validate",
+    "uv run dmf evidence validate --ticket FPL-004",
+    "uv run ruff format --check .",
+    "uv run ruff check .",
+    "uv run mypy src/dmf_pulse",
+    'uv run pytest -q -m "unit" tests/unit',
+    'uv run pytest -q -m "property" tests/property',
+    'uv run pytest -q -m "contract" tests/contract',
+    'uv run pytest -q -m "security" tests/security',
+    "docker compose -f compose.test.yaml up -d --wait",
+    "uv run python scripts/test_migration_matrix.py --baseline-revision 20260723_0001 --target head",
+    'uv run pytest -q -m "postgres and integration" tests/integration',
+    "uv run pytest -q tests/integration/ingestion/test_fpl_lifecycle_resume.py",
+    "uv run pytest -q tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py",
+    "uv run pytest -q tests/integration/data_model/test_cross_season_competition_constraints.py",
+    "uv run pytest -q tests/security/test_fpl_rights_raw_retention.py",
+    "uv run dmf ingest fpl validate --resource bootstrap --input fixtures/fpl/FPL-004/happy_path/bootstrap.json --contract-version fpl-reference-v1 --output json",
+    "uv run dmf ingest fpl snapshot --resource all --competition-key PL --season-code 2026/27 --rights-profile fpl_official_private_manual_v1 --output json",
+    "uv run python scripts/verify_fpl004_wheel.py",
+    "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-fail-under=90",
+    "uv run python scripts/verify_fpl004_acceptance.py",
+    f"uv run dmf review-pack build --ticket FPL-004 --baseline {FPL_REQUIRED_BASELINE} --output review_pack/FPL-004",
+    "docker compose -f compose.test.yaml down -v --remove-orphans",
+)
+FPL_REVIEW_WRITE_AHEAD_RESULT: Final = (
+    "PENDING: review command has not run; successful external finalization will replace this "
+    "record; "
+    "exact duration and digests are in archive_finalization.json"
+)
+FPL_REVIEW_FINAL_RESULT: Final = (
+    "PASS: exact 20-file FPL-004 review build completed; final detached digests are in "
+    "archive_finalization.json"
+)
+FPL_TEARDOWN_WRITE_AHEAD_RESULT: Final = (
+    "PENDING: finally-guaranteed PostgreSQL teardown has not run; exact duration and result "
+    "will be recorded in "
+    "archive_finalization.json"
+)
+FPL_TEARDOWN_FINAL_RESULT: Final = "PASS: PostgreSQL service and volume removed"
+
+
+def _redact_fpl_personal_text(value: str) -> str:
+    """Redact only frozen owner/user identifiers from external review material."""
+
+    return value.replace("Sebastian", "<REDACTED_OWNER>").replace("sebgr", "<REDACTED_USER>")
 
 
 def _primary_payload_digest(
@@ -444,7 +527,9 @@ def calculate_review_payload_digest(
         process_runner=selected_runner,
     )
     names = (
-        DAT_PRIMARY_PAYLOAD_NAMES
+        FPL_PRIMARY_PAYLOAD_NAMES
+        if ticket == "FPL-004"
+        else DAT_PRIMARY_PAYLOAD_NAMES
         if ticket == "DAT-003"
         else RUL_PRIMARY_PAYLOAD_NAMES
         if ticket == "RUL-002"
@@ -1671,6 +1756,594 @@ def _assemble_dat_entries(
     return entries
 
 
+def _fpl_baseline_diff(root: Path, baseline: str | None, runner: ProcessRunner) -> tuple[str, str]:
+    if baseline != FPL_REQUIRED_BASELINE:
+        raise ReviewPackError(
+            "BASELINE_INVALID", "FPL-004 requires the ticket's exact baseline commit"
+        )
+    exclusions = [
+        ":(exclude)uv.lock",
+        ":(exclude)fixtures/manifest.json",
+        ":(exclude)fixtures/fpl/FPL-004/**",
+        ":(exclude)public_contracts/**",
+        ":(exclude)tickets/FPL-004/**",
+        ":(exclude).codex/schemas/*.json",
+        ":(exclude)specs/manifests/*.json",
+    ]
+    arguments = ["diff", "--no-ext-diff", "--binary", f"{baseline}..HEAD", "--", ".", *exclusions]
+    patch = _redact_fpl_personal_text(
+        _required_git(root, arguments, runner, code="BASELINE_DIFF_FAILED")
+    )
+    stat = _required_git(
+        root,
+        ["diff", "--stat", f"{baseline}..HEAD", "--", ".", *exclusions],
+        runner,
+        code="BASELINE_DIFF_FAILED",
+    )
+    changes = _required_git(
+        root,
+        ["diff", "--name-status", f"{baseline}..HEAD", "--", ".", *exclusions],
+        runner,
+        code="BASELINE_DIFF_FAILED",
+    )
+    hash_paths = (
+        "uv.lock",
+        "fixtures/manifest.json",
+        "src/dmf_pulse/database/migrations/versions/20260724_0002_fpl004_ingestion.py",
+        "evidence/tickets/FPL-004/schema_manifest.json",
+    )
+    hash_lines: list[str] = []
+    for relative in hash_paths:
+        path = root / relative
+        if path.is_file() and not path.is_symlink():
+            hash_lines.append(
+                f"- `{relative}`: {path.stat().st_size} bytes; SHA-256 `{sha256_file(path)}`"
+            )
+    file_map = (
+        "# FPL-004 file change map\n\n"
+        "## Human-authored diff stat\n\n```text\n"
+        + stat.rstrip()
+        + "\n```\n\n## Human-authored name/status map\n\n```text\n"
+        + changes.rstrip()
+        + "\n```\n\n## Exact generated/governed-input hashes\n\n"
+        + ("\n".join(hash_lines) or "No hash inputs were available.")
+        + "\n\nThe full patch intentionally omits only the exact generated lock, supplied synthetic "
+        "fixtures/public schemas/ticket contracts, generated manifests, regenerable ticket "
+        "evidence, and review output. The human-authored FPL-004 PLAN remains in the complete "
+        "patch. Migration and runtime implementation changes remain in full.\n"
+        "The governed repository is unchanged; only personal owner/user identifiers are "
+        "replaced with explicit redaction tokens in this external review rendering.\n"
+    )
+    return patch, file_map
+
+
+def _required_fpl_git_state(root: Path, baseline: str, runner: ProcessRunner) -> tuple[str, str]:
+    branch = _required_git(
+        root, ["rev-parse", "--abbrev-ref", "HEAD"], runner, code="REVIEW_BRANCH_INVALID"
+    ).strip()
+    if branch != FPL_REQUIRED_BRANCH:
+        raise ReviewPackError(
+            "REVIEW_BRANCH_INVALID", "FPL-004 review must use the required branch"
+        )
+    head = _required_git(
+        root, ["rev-parse", "--verify", "HEAD"], runner, code="REVIEW_HEAD_INVALID"
+    ).strip()
+    if len(head) != 40 or any(character not in "0123456789abcdef" for character in head):
+        raise ReviewPackError("REVIEW_HEAD_INVALID", "FPL-004 repository HEAD is invalid")
+    _required_git(
+        root,
+        ["merge-base", "--is-ancestor", baseline, head],
+        runner,
+        code="REVIEW_BASELINE_ANCESTRY",
+    )
+    merges = _required_git(
+        root,
+        ["rev-list", "--merges", f"{baseline}..{head}"],
+        runner,
+        code="REVIEW_HISTORY_INVALID",
+    )
+    if merges.strip():
+        raise ReviewPackError("REVIEW_HISTORY_INVALID", "FPL-004 history contains a merge commit")
+    dirty = _required_git(
+        root,
+        ["status", "--porcelain=v1", "--untracked-files=all"],
+        runner,
+        code="REVIEW_GIT_STATUS",
+    )
+    if dirty.strip():
+        raise ReviewPackError("REVIEW_TREE_DIRTY", "FPL-004 review requires a clean working tree")
+    state = f"""# FPL-004 baseline and Git state
+
+- Required baseline: `{baseline}`
+- Final HEAD: `{head}`
+- Branch: `{branch}`
+- Baseline is ancestor: `true`
+- Clean working tree: `true`
+- Merge commits since baseline: `0`
+- Pushed by Codex: `false`
+- Merged by Codex: `false`
+- Rebased/reset/tagged/amended by Codex: `false`
+"""
+    return head, state
+
+
+def _fpl_json_object(path: Path) -> dict[str, object]:
+    try:
+        value = json.loads(
+            path.read_text(encoding="utf-8"),
+            parse_constant=lambda constant: (_ for _ in ()).throw(ValueError(constant)),
+        )
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "FPL-004 machine evidence is unavailable or malformed"
+        ) from exc
+    if not isinstance(value, dict):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "FPL-004 machine evidence must be a JSON object"
+        )
+    return value
+
+
+def _validate_fpl_complete_result(
+    result: CodexResult,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    if result.status.value != "COMPLETE":
+        return [], []
+    records = [item.model_dump(mode="json") for item in result.commands]
+    if [item.get("command") for item in records] != list(FPL_MANDATORY_ACCEPTANCE_COMMANDS):
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID",
+            "COMPLETE FPL-004 review requires the exact ordered 25-command result",
+        )
+    for index, record in enumerate(records, start=1):
+        result_text = record.get("result")
+        duration = record.get("duration_seconds")
+        expected_exit = 4 if index == 20 else 0
+        if (
+            record.get("exit_code") != expected_exit
+            or not isinstance(result_text, str)
+            or not result_text.startswith("PASS:")
+            or not _valid_duration(duration)
+            or (
+                index == 20
+                and ("RIGHTS_BLOCKED" not in result_text or "zero transport" not in result_text)
+            )
+            or (index == 24 and result_text != FPL_REVIEW_FINAL_RESULT)
+            or (index == 25 and result_text != FPL_TEARDOWN_FINAL_RESULT)
+            or result_text in {FPL_REVIEW_WRITE_AHEAD_RESULT, FPL_TEARDOWN_WRITE_AHEAD_RESULT}
+        ):
+            raise ReviewPackError(
+                "REVIEW_ACCEPTANCE_INVALID",
+                f"COMPLETE FPL-004 command {index} evidence is invalid",
+            )
+
+    expected_rows = [
+        {
+            "command": record["command"],
+            "duration_seconds": record["duration_seconds"],
+            "exit_code": record["exit_code"],
+            "expected_exit_code": 4 if index == 20 else 0,
+            "status": "PASS",
+        }
+        for index, record in enumerate(records, start=1)
+    ]
+    if result.acceptance != expected_rows:
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID",
+            "COMPLETE FPL-004 result acceptance does not match its exact commands",
+        )
+    return records, expected_rows
+
+
+def _parse_fpl_command_log(data: bytes) -> list[dict[str, Any]]:
+    def unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+        value: dict[str, object] = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValueError(f"duplicate command-log key: {key}")
+            value[key] = item
+        return value
+
+    try:
+        lines = data.decode("utf-8").splitlines()
+        if not lines or any(not line.strip() for line in lines):
+            raise ValueError("command log is empty or contains a blank row")
+        values = []
+        for line in lines:
+            raw_value = json.loads(
+                line,
+                parse_constant=lambda constant: (_ for _ in ()).throw(ValueError(constant)),
+                object_pairs_hook=unique_object,
+            )
+            values.append(CommandRecord.model_validate(raw_value).model_dump(mode="json"))
+    except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID", "FPL-004 detached command log is malformed"
+        ) from exc
+    return values
+
+
+def _fpl_coverage_metric_matches(
+    tests: dict[str, Any],
+    *,
+    percent_key: str,
+    covered_key: str,
+    total_key: str,
+    minimum: float | None,
+) -> bool:
+    percent = tests.get(percent_key)
+    covered = tests.get(covered_key)
+    total = tests.get(total_key)
+    if (
+        not isinstance(percent, (int, float))
+        or isinstance(percent, bool)
+        or not math.isfinite(float(percent))
+        or not 0 <= float(percent) <= 100
+        or not isinstance(covered, int)
+        or isinstance(covered, bool)
+        or covered < 0
+        or not isinstance(total, int)
+        or isinstance(total, bool)
+        or total <= 0
+        or covered > total
+    ):
+        return False
+    expected = round(100.0 * covered / total, 6)
+    return math.isclose(float(percent), expected, rel_tol=0.0, abs_tol=1e-6) and (
+        minimum is None or float(percent) >= minimum
+    )
+
+
+def _validate_fpl_complete_evidence(root: Path, result: CodexResult, head: str) -> None:
+    if result.status.value != "COMPLETE":
+        return
+    records, expected_rows = _validate_fpl_complete_result(result)
+
+    evidence_root = root / "evidence/tickets/FPL-004"
+    try:
+        command_values = [
+            json.loads(
+                line,
+                parse_constant=lambda constant: (_ for _ in ()).throw(ValueError(constant)),
+            )
+            for line in (evidence_root / "commands.log").read_text(encoding="utf-8").splitlines()
+        ]
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "FPL-004 command log is malformed"
+        ) from exc
+    if command_values != records:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "FPL-004 command log and result do not match exactly"
+        )
+
+    tests = _fpl_json_object(evidence_root / "tests.json")
+    oracles = tests.get("critical_oracles")
+    cutoff_oracles = tests.get("cutoff_oracles")
+    expected_cutoff_oracles = {
+        "post-cutoff bundle member is rejected",
+        "only POST_CUTOFF is converted to an observed non-bundle outcome",
+        "post-cutoff evidence requires exactly one blocker",
+        "post-cutoff issue publication is idempotent",
+    }
+    required_test_fields = {
+        "critical_deterministic_branch_coverage_percent",
+        "critical_deterministic_branches_covered",
+        "critical_deterministic_branches_total",
+        "critical_oracles",
+        "cutoff_branch_coverage_percent",
+        "cutoff_branches_covered",
+        "cutoff_branches_total",
+        "cutoff_oracles",
+        "failed",
+        "ingestion_package_branch_coverage_percent",
+        "ingestion_package_branches_covered",
+        "ingestion_package_branches_total",
+        "mutation_method",
+        "overall_branch_coverage_percent",
+        "overall_branches_covered",
+        "overall_branches_total",
+        "passed",
+        "provider_adapter_branch_coverage_percent",
+        "provider_adapter_branches_covered",
+        "provider_adapter_branches_total",
+        "repository_combined_coverage_percent",
+        "repository_combined_units_covered",
+        "repository_combined_units_total",
+        "rights_branch_coverage_percent",
+        "rights_branches_covered",
+        "rights_branches_total",
+        "skipped",
+        "status",
+    }
+    if (
+        set(tests) != required_test_fields
+        or tests.get("status") != "PASS"
+        or tests.get("failed") != 0
+        or tests.get("skipped") != 0
+        or not _positive_int(tests.get("passed"))
+        or not isinstance(tests.get("mutation_method"), str)
+        or not tests["mutation_method"]
+        or not _fpl_coverage_metric_matches(
+            tests,
+            percent_key="repository_combined_coverage_percent",
+            covered_key="repository_combined_units_covered",
+            total_key="repository_combined_units_total",
+            minimum=90,
+        )
+        or not _fpl_coverage_metric_matches(
+            tests,
+            percent_key="overall_branch_coverage_percent",
+            covered_key="overall_branches_covered",
+            total_key="overall_branches_total",
+            minimum=None,
+        )
+        or not _fpl_coverage_metric_matches(
+            tests,
+            percent_key="ingestion_package_branch_coverage_percent",
+            covered_key="ingestion_package_branches_covered",
+            total_key="ingestion_package_branches_total",
+            minimum=None,
+        )
+        or not _fpl_coverage_metric_matches(
+            tests,
+            percent_key="critical_deterministic_branch_coverage_percent",
+            covered_key="critical_deterministic_branches_covered",
+            total_key="critical_deterministic_branches_total",
+            minimum=95,
+        )
+        or not _fpl_coverage_metric_matches(
+            tests,
+            percent_key="rights_branch_coverage_percent",
+            covered_key="rights_branches_covered",
+            total_key="rights_branches_total",
+            minimum=90,
+        )
+        or not _fpl_coverage_metric_matches(
+            tests,
+            percent_key="provider_adapter_branch_coverage_percent",
+            covered_key="provider_adapter_branches_covered",
+            total_key="provider_adapter_branches_total",
+            minimum=75,
+        )
+        or not _fpl_coverage_metric_matches(
+            tests,
+            percent_key="cutoff_branch_coverage_percent",
+            covered_key="cutoff_branches_covered",
+            total_key="cutoff_branches_total",
+            minimum=95,
+        )
+        or not isinstance(oracles, list)
+        or len(oracles) < 8
+        or not all(isinstance(item, str) and item for item in oracles)
+        or not isinstance(cutoff_oracles, list)
+        or len(cutoff_oracles) != len(expected_cutoff_oracles)
+        or not all(isinstance(item, str) and " - " in item for item in cutoff_oracles)
+        or {item.rsplit(" - ", 1)[-1] for item in cutoff_oracles} != expected_cutoff_oracles
+        or result.tests != [tests]
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "FPL-004 test, coverage, or mutation evidence is incomplete"
+        )
+
+    acceptance = _fpl_json_object(evidence_root / "acceptance_matrix.json")
+    if (
+        acceptance.get("ticket_id") != "FPL-004"
+        or acceptance.get("status") != "COMPLETE"
+        or acceptance.get("passed") != 25
+        or acceptance.get("failed") != 0
+        or acceptance.get("commands") != expected_rows
+        or result.acceptance != expected_rows
+    ):
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID", "FPL-004 acceptance matrix is incomplete"
+        )
+
+    try:
+        manifest = validate_ticket_evidence(root, "FPL-004")
+    except Exception as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "FPL-004 evidence manifest or artifact hashes are invalid"
+        ) from exc
+    if (
+        manifest.status != "COMPLETE"
+        or manifest.code_commit != head
+        or manifest.commands != records
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "FPL-004 evidence provenance is incomplete"
+        )
+    for name in ("migration_matrix.json", "package_report.json", "acceptance_verification.json"):
+        if _fpl_json_object(evidence_root / name).get("status") != "PASS":
+            raise ReviewPackError("REVIEW_EVIDENCE_INVALID", f"FPL-004 {name} does not record PASS")
+
+
+def _fpl_review_index(status: str, head: str, baseline: str, limitations: str) -> str:
+    return f"""# FPL-004 review index
+
+FPL-004 remediates the DAT-003 findings and implements rights-gated, offline-deterministic official-FPL-shaped ingestion, append-only lifecycle/resume, canonical promotion, cutoff-safe source bundles, and PostgreSQL enforcement. Acceptance status: **{status}**.
+
+Baseline: `{baseline}`. Final repository HEAD: `{head}`. Read files 02, 10, 03, then the focused technical reviews in 05-15.
+
+`payload_sha256` is the stable digest ledger for files 01-17. File 19 hashes files 01-18; file 20 hashes files 01-19. The archive SHA-256 and CRC result are recorded externally after construction because an archive cannot embed its own digest.
+
+Commands 24-25 support explicit write-ahead records so the review command executes exactly once and PostgreSQL teardown remains finally guaranteed. The deterministic assembler may refresh the validated archive after finalization without claiming a second acceptance invocation.
+
+## Exact unresolved issues
+
+{limitations.rstrip() or "None."}
+
+No live FPL/provider request, real payload, push, merge, rebase, reset, tag, amend, or repository-visibility change is part of this milestone.
+"""
+
+
+def _assemble_fpl_entries(
+    root: Path,
+    *,
+    baseline: str | None,
+    generated_at: str,
+    process_runner: ProcessRunner,
+) -> list[ReviewEntry]:
+    paths = ticket_paths(root, "FPL-004")
+    validated = validate_evidence_file(paths.evidence / "codex_result.json")
+    if not isinstance(validated.model, CodexResult) or validated.model.ticket_id != "FPL-004":
+        raise ReviewPackError(
+            "CODEX_RESULT_INVALID", "FPL-004 codex_result has the wrong evidence kind"
+        )
+    result = validated.model
+    if baseline is None:
+        raise ReviewPackError("BASELINE_INVALID", "FPL-004 baseline is required")
+    head, git_state = _required_fpl_git_state(root, baseline, process_runner)
+    patch, file_map = _fpl_baseline_diff(root, baseline, process_runner)
+    if result.status.value == "COMPLETE" and result.code_commit != head:
+        raise ReviewPackError(
+            "REVIEW_COMMIT_MISMATCH", "COMPLETE result does not identify final HEAD"
+        )
+    _validate_fpl_complete_evidence(root, result, head)
+    limitations = _required_text(root, "evidence/tickets/FPL-004/KNOWN_LIMITATIONS.md")
+    entries = [
+        _entry(
+            "01_REVIEW_INDEX.md",
+            _fpl_review_index(result.status.value, head, baseline, limitations),
+            "review navigation and detached-hash semantics",
+        ),
+        _entry("02_BASELINE_AND_GIT_STATE.md", git_state, "exact baseline and clean Git state"),
+        _entry(
+            "03_COMPLETE_HUMAN_PATCH.diff", patch, "complete human-authored patch from baseline"
+        ),
+        _entry("04_FILE_CHANGE_MAP.md", file_map, "change map and generated-input hashes"),
+        _entry(
+            "05_PUBLIC_CONTRACTS.md",
+            _required_text(root, "evidence/tickets/FPL-004/PUBLIC_CONTRACTS.md"),
+            "public API, CLI, model, and JSON Schema contracts",
+        ),
+        _entry(
+            "06_MIGRATION_SCHEMA_REVIEW.md",
+            _required_text(root, "evidence/tickets/FPL-004/MIGRATION_SCHEMA_REVIEW.md"),
+            "migration matrix, schema fingerprint, downgrade and re-upgrade review",
+        ),
+        _entry(
+            "07_SOURCE_LIFECYCLE_RESUME.md",
+            _required_text(root, "evidence/tickets/FPL-004/SOURCE_LIFECYCLE_RESUME.md"),
+            "append-only source lifecycle and interruption/resume review",
+        ),
+        _entry(
+            "08_RIGHTS_RETENTION_REVIEW.md",
+            _required_text(root, "evidence/tickets/FPL-004/RIGHTS_RETENTION_REVIEW.md"),
+            "rights gates, raw retention, deletion, and lineage review",
+        ),
+        _entry(
+            "09_TEST_COVERAGE_MUTATION.md",
+            _required_text(root, "evidence/tickets/FPL-004/TEST_COVERAGE_MUTATION.md"),
+            "tests, branch coverage, and critical mutation oracles",
+        ),
+        _entry(
+            "10_ACCEPTANCE_MATRIX.md",
+            _required_text(root, "evidence/tickets/FPL-004/ACCEPTANCE.md"),
+            "literal 25-command acceptance matrix",
+        ),
+        _entry(
+            "11_DAT003_REMEDIATION.md",
+            _required_text(root, "evidence/tickets/FPL-004/DAT003_REMEDIATION.md"),
+            "mandatory DAT-003 finding-to-code/test closure",
+        ),
+        _entry(
+            "12_FPL_SCHEMA_MAPPING_IDEMPOTENCY.md",
+            _required_text(root, "evidence/tickets/FPL-004/FPL_SCHEMA_MAPPING_IDEMPOTENCY.md"),
+            "strict schema, canonical mapping, and idempotency review",
+        ),
+        _entry(
+            "13_SOURCE_BUNDLE_CUTOFF_QUALITY.md",
+            _required_text(root, "evidence/tickets/FPL-004/SOURCE_BUNDLE_CUTOFF_QUALITY.md"),
+            "source-bundle cutoff, manifest, and quality review",
+        ),
+        _entry(
+            "14_DEPENDENCY_LOCK_PACKAGE.md",
+            _required_text(root, "evidence/tickets/FPL-004/DEPENDENCY_LOCK_PACKAGE.md"),
+            "dependency, lock, SBOM, and installed-wheel provenance",
+        ),
+        _entry(
+            "15_SECURITY_AND_SECRET_REVIEW.md",
+            _required_text(root, "evidence/tickets/FPL-004/SECURITY_AND_SECRET_REVIEW.md"),
+            "security, body/log secrecy, client, and exclusion review",
+        ),
+        _entry("16_KNOWN_LIMITATIONS.md", limitations, "exact limitations and open questions"),
+        _entry(
+            "17_COMMANDS_AND_RESULTS.log",
+            _required_text(root, "evidence/tickets/FPL-004/commands.log"),
+            "exact command, exit, duration, and result ledger",
+        ),
+        _entry("18_CODEX_RESULT.json", pretty_json(result), "structured implementation result"),
+    ]
+    entries = [
+        ReviewEntry(
+            name=item.name,
+            data=_redact_fpl_personal_text(item.data.decode("utf-8")).encode("utf-8"),
+            purpose=item.purpose,
+        )
+        for item in entries
+    ]
+    payload = {entry.name: entry.data for entry in entries}
+    payload_sha256 = _primary_payload_digest(payload, FPL_PRIMARY_PAYLOAD_NAMES)
+    manifest = ReviewManifest(
+        ticket_id="FPL-004",
+        generated_at=generated_at,
+        repository_head=head,
+        baseline=baseline,
+        file_count=MAX_REVIEW_FILES,
+        files=[
+            ReviewFile(
+                name=item.name,
+                sha256=_sha256_bytes(item.data),
+                bytes=len(item.data),
+                purpose=item.purpose,
+            )
+            for item in entries
+        ],
+        acceptance_status=result.status,
+        payload_sha256=payload_sha256,
+        archive_sha256=None,
+    )
+    entries.append(
+        _entry(FPL_MANIFEST_NAME, pretty_json(manifest), "detached archive payload manifest")
+    )
+    entries.sort(key=lambda item: item.name)
+    entries.append(
+        _entry(
+            CHECKSUM_NAME,
+            "".join(f"{_sha256_bytes(item.data)}  {item.name}\n" for item in entries),
+            "detached checksum ledger",
+        )
+    )
+    entries.sort(key=lambda item: item.name)
+    enforce_review_limit(entries)
+    if tuple(item.name for item in entries) != FPL_PREFERRED_NAMES:
+        raise ReviewPackError(
+            "REVIEW_PACK_LAYOUT", "FPL-004 review pack does not match its exact contract"
+        )
+    if set(
+        item.name for item in entries if item.name not in {FPL_MANIFEST_NAME, CHECKSUM_NAME}
+    ) != (FPL_DETACHED_REVIEW_NAMES):
+        raise ReviewPackError("REVIEW_PACK_LAYOUT", "FPL-004 detached manifest layout drifted")
+    for item in entries:
+        lowered = item.data.lower()
+        if b"sebastian" in lowered or b"sebgr" in lowered or b"c:\\users\\" in lowered:
+            raise ReviewPackError(
+                "REVIEW_PACK_PERSONAL_DATA",
+                f"personal identifier or Windows user path detected in {item.name}",
+            )
+        if any(marker in item.data for marker in FPL_FORBIDDEN_MARKERS):
+            raise ReviewPackError(
+                "REVIEW_PACK_RAW_PAYLOAD",
+                f"forbidden raw-body or fake-secret marker detected in {item.name}",
+            )
+        if scan_text(item.data.decode("utf-8"), path=item.name):
+            raise ReviewPackError(
+                "REVIEW_PACK_SECRET", f"secret-like content detected in {item.name}"
+            )
+    return entries
+
+
 def _assemble_for_ticket(
     root: Path,
     *,
@@ -1694,6 +2367,13 @@ def _assemble_for_ticket(
         )
     if validated_ticket == "DAT-003":
         return _assemble_dat_entries(
+            root,
+            baseline=baseline,
+            generated_at=generated_at,
+            process_runner=process_runner,
+        )
+    if validated_ticket == "FPL-004":
+        return _assemble_fpl_entries(
             root,
             baseline=baseline,
             generated_at=generated_at,
@@ -1742,7 +2422,9 @@ def build_review_pack(
         process_runner=selected_runner,
     )
     primary_names = (
-        DAT_PRIMARY_PAYLOAD_NAMES
+        FPL_PRIMARY_PAYLOAD_NAMES
+        if validated_ticket == "FPL-004"
+        else DAT_PRIMARY_PAYLOAD_NAMES
         if validated_ticket == "DAT-003"
         else RUL_PRIMARY_PAYLOAD_NAMES
         if validated_ticket == "RUL-002"
@@ -1751,7 +2433,10 @@ def build_review_pack(
     payload_sha256 = _primary_payload_digest(
         {entry.name: entry.data for entry in entries}, primary_names
     )
-    result_entry = next(item for item in entries if item.name == "02_CODEX_RESULT.json")
+    result_name = (
+        "18_CODEX_RESULT.json" if validated_ticket == "FPL-004" else "02_CODEX_RESULT.json"
+    )
+    result_entry = next(item for item in entries if item.name == result_name)
     result = CodexResult.model_validate_json(result_entry.data)
     if (
         result.status.value == "COMPLETE"
@@ -1762,7 +2447,9 @@ def build_review_pack(
             "codex_result review-pack digest does not match the detached primary payload",
         )
     zip_name = (
-        DAT_REVIEW_ZIP_NAME
+        FPL_REVIEW_ZIP_NAME
+        if validated_ticket == "FPL-004"
+        else DAT_REVIEW_ZIP_NAME
         if validated_ticket == "DAT-003"
         else RUL_REVIEW_ZIP_NAME
         if validated_ticket == "RUL-002"
@@ -1830,15 +2517,54 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
             "REVIEW_ZIP_INVALID", "review ZIP is unavailable or malformed"
         ) from exc
 
-    if {"02_CODEX_RESULT.json", MANIFEST_NAME, CHECKSUM_NAME} - set(payload):
+    fpl_layout = "18_CODEX_RESULT.json" in payload or FPL_MANIFEST_NAME in payload
+    if fpl_layout:
+        for name, data in payload.items():
+            lowered = data.lower()
+            if b"sebastian" in lowered or b"sebgr" in lowered or b"c:\\users\\" in lowered:
+                raise ReviewPackError(
+                    "REVIEW_PACK_PERSONAL_DATA",
+                    f"personal identifier or Windows user path detected in {name}",
+                )
+            if any(marker in data for marker in FPL_FORBIDDEN_MARKERS):
+                raise ReviewPackError(
+                    "REVIEW_PACK_RAW_PAYLOAD",
+                    f"forbidden raw-body or fake-secret marker detected in {name}",
+                )
+            try:
+                secret_findings = scan_text(data.decode("utf-8"), path=name)
+            except UnicodeError as exc:
+                raise ReviewPackError(
+                    "REVIEW_METADATA_INVALID", f"review entry is not UTF-8: {name}"
+                ) from exc
+            if secret_findings:
+                raise ReviewPackError(
+                    "REVIEW_PACK_SECRET", f"secret-like content detected in {name}"
+                )
+    result_name = "18_CODEX_RESULT.json" if fpl_layout else "02_CODEX_RESULT.json"
+    manifest_name = FPL_MANIFEST_NAME if fpl_layout else MANIFEST_NAME
+    if {result_name, manifest_name, CHECKSUM_NAME} - set(payload):
         raise ReviewPackError("REVIEW_PACK_LAYOUT", "review ZIP root layout is invalid")
 
     try:
-        result = CodexResult.model_validate_json(payload["02_CODEX_RESULT.json"])
-        if result.ticket_id not in {"FND-001", "RUL-002", "DAT-003"}:
+        result = CodexResult.model_validate_json(payload[result_name])
+        if result.ticket_id not in {"FND-001", "RUL-002", "DAT-003", "FPL-004"}:
             raise ReviewPackError("REVIEW_TICKET_UNSUPPORTED", "review ZIP ticket is unsupported")
+        if fpl_layout != (result.ticket_id == "FPL-004"):
+            raise ReviewPackError("REVIEW_PACK_LAYOUT", "review ZIP ticket layout is inconsistent")
+        if result.ticket_id == "FPL-004":
+            records, _expected_rows = _validate_fpl_complete_result(result)
+            if result.status.value == "COMPLETE":
+                command_log = payload.get("17_COMMANDS_AND_RESULTS.log")
+                if command_log is None or _parse_fpl_command_log(command_log) != records:
+                    raise ReviewPackError(
+                        "REVIEW_ACCEPTANCE_INVALID",
+                        "FPL-004 detached command log and result do not match exactly",
+                    )
         preferred = (
-            DAT_PREFERRED_NAMES
+            FPL_PREFERRED_NAMES
+            if result.ticket_id == "FPL-004"
+            else DAT_PREFERRED_NAMES
             if result.ticket_id == "DAT-003"
             else RUL_PREFERRED_NAMES
             if result.ticket_id == "RUL-002"
@@ -1846,7 +2572,7 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
         )
         if tuple(sorted(payload)) != preferred:
             raise ReviewPackError("REVIEW_PACK_LAYOUT", "review ZIP root layout is invalid")
-        manifest_value = json.loads(payload[MANIFEST_NAME].decode("utf-8"))
+        manifest_value = json.loads(payload[manifest_name].decode("utf-8"))
         manifest = ReviewManifest.model_validate(manifest_value)
         checksums = _parse_checksums(payload[CHECKSUM_NAME].decode("utf-8"))
     except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
@@ -1855,7 +2581,7 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
         raise ReviewPackError("REVIEW_FILE_COUNT_MISMATCH", "manifest file_count is not ZIP count")
     if result.review_pack.file_count != len(payload):
         raise ReviewPackError("REVIEW_FILE_COUNT_MISMATCH", "result file_count is not ZIP count")
-    expected_manifest_names = set(payload) - {MANIFEST_NAME, CHECKSUM_NAME}
+    expected_manifest_names = set(payload) - {manifest_name, CHECKSUM_NAME}
     if {item.name for item in manifest.files} != expected_manifest_names:
         raise ReviewPackError(
             "REVIEW_MANIFEST_COVERAGE", "detached manifest coverage is incomplete"
@@ -1872,7 +2598,9 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
         if digest != _sha256_bytes(payload[name]):
             raise ReviewPackError("REVIEW_CHECKSUM_HASH", f"checksum mismatch for {name}")
     primary_names = (
-        DAT_PRIMARY_PAYLOAD_NAMES
+        FPL_PRIMARY_PAYLOAD_NAMES
+        if result.ticket_id == "FPL-004"
+        else DAT_PRIMARY_PAYLOAD_NAMES
         if result.ticket_id == "DAT-003"
         else RUL_PRIMARY_PAYLOAD_NAMES
         if result.ticket_id == "RUL-002"
@@ -1914,6 +2642,20 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
     if result.ticket_id == "DAT-003" and manifest.payload_sha256 != payload_sha256:
         raise ReviewPackError(
             "REVIEW_PAYLOAD_DIGEST", "DAT-003 review manifest payload digest does not match"
+        )
+    if result.ticket_id == "FPL-004" and (
+        result.code_commit is None
+        or manifest.repository_head != result.code_commit
+        or manifest.baseline != FPL_REQUIRED_BASELINE
+        or result.repository is None
+        or result.repository.head != manifest.repository_head
+    ):
+        raise ReviewPackError(
+            "REVIEW_PROVENANCE_MISMATCH", "FPL-004 review provenance is contradictory"
+        )
+    if result.ticket_id == "FPL-004" and manifest.payload_sha256 != payload_sha256:
+        raise ReviewPackError(
+            "REVIEW_PAYLOAD_DIGEST", "FPL-004 review manifest payload digest does not match"
         )
     if (
         result.status.value == "COMPLETE"

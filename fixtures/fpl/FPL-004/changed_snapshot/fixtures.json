@@ -1,0 +1,20 @@
+[
+  {
+    "code": 900101,
+    "event": 2,
+    "finished": false,
+    "finished_provisional": false,
+    "id": 101,
+    "kickoff_time": "2026-08-29T16:30:00Z",
+    "minutes": 0,
+    "provisional_start_time": false,
+    "started": false,
+    "stats": [],
+    "team_a": 2,
+    "team_a_difficulty": 3,
+    "team_a_score": null,
+    "team_h": 1,
+    "team_h_difficulty": 3,
+    "team_h_score": null
+  }
+]

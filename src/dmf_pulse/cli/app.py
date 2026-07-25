@@ -6,14 +6,18 @@ import json
 from typing import Annotated
 
 import typer
+from typer._click.exceptions import Abort, Exit, UsageError
 
 from dmf_pulse import __version__
 from dmf_pulse.cli.config_cmd import config_app
 from dmf_pulse.cli.data_model_cmd import data_model_app
 from dmf_pulse.cli.doctor import build_doctor_report
 from dmf_pulse.cli.evidence_cmd import evidence_app
+from dmf_pulse.cli.ingest_cmd import ingest_app
 from dmf_pulse.cli.review_pack_cmd import review_pack_app
 from dmf_pulse.cli.rules_cmd import rules_app
+from dmf_pulse.cli.specs_cmd import specs_app
+from dmf_pulse.ingestion.errors import IngestionError
 
 app = typer.Typer(
     add_completion=False,
@@ -25,8 +29,10 @@ app = typer.Typer(
 app.add_typer(config_app, name="config")
 app.add_typer(data_model_app, name="data-model")
 app.add_typer(evidence_app, name="evidence")
+app.add_typer(ingest_app, name="ingest")
 app.add_typer(review_pack_app, name="review-pack")
 app.add_typer(rules_app, name="rules")
+app.add_typer(specs_app, name="specs")
 
 DOCTOR_BLOCKING_EXIT = 40
 
@@ -77,4 +83,13 @@ def doctor_command(
 def main() -> None:
     """Run the installed console application."""
 
-    app(prog_name="dmf")
+    try:
+        result = app(prog_name="dmf", standalone_mode=False)
+    except Exit as exc:
+        raise SystemExit(exc.exit_code) from None
+    except (UsageError, Abort):
+        error = IngestionError("USAGE_INVALID", "command arguments are invalid")
+        typer.echo(json.dumps(error.as_error_object(), sort_keys=True))
+        raise SystemExit(error.exit_code) from None
+    if isinstance(result, int) and result:
+        raise SystemExit(result)

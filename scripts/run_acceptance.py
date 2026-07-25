@@ -21,6 +21,7 @@ from pathlib import Path
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RUL_BASELINE = "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
 DAT_BASELINE = "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
+FPL_BASELINE = "9b3160a2574d2868b5f26e3a2d429924567510b0"
 RUL_WRITE_AHEAD_RESULT = (
     "PASS: write-ahead record committed only by successful external archive finalization; "
     "exact duration and digests are in archive_finalization.json"
@@ -467,6 +468,212 @@ def _dat_commands(uv: str, docker: str) -> tuple[AcceptanceCommand, ...]:
     )
 
 
+def _fpl_commands(uv: str, docker: str, git: str) -> tuple[AcceptanceCommand, ...]:
+    return (
+        AcceptanceCommand("git diff --check", (git, "diff", "--check"), 60),
+        AcceptanceCommand("uv lock --check", (uv, "lock", "--check"), 180),
+        AcceptanceCommand(
+            "uv run dmf specs validate", (uv, "run", "dmf", "specs", "validate"), 180
+        ),
+        AcceptanceCommand(
+            "uv run dmf evidence validate --ticket FPL-004",
+            (uv, "run", "dmf", "evidence", "validate", "--ticket", "FPL-004"),
+            180,
+        ),
+        AcceptanceCommand(
+            "uv run ruff format --check .", (uv, "run", "ruff", "format", "--check", "."), 180
+        ),
+        AcceptanceCommand("uv run ruff check .", (uv, "run", "ruff", "check", "."), 180),
+        AcceptanceCommand("uv run mypy src/dmf_pulse", (uv, "run", "mypy", "src/dmf_pulse"), 300),
+        AcceptanceCommand(
+            'uv run pytest -q -m "unit" tests/unit',
+            (uv, "run", "pytest", "-q", "-m", "unit", "tests/unit"),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "property" tests/property',
+            (uv, "run", "pytest", "-q", "-m", "property", "tests/property"),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "contract" tests/contract',
+            (uv, "run", "pytest", "-q", "-m", "contract", "tests/contract"),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "security" tests/security',
+            (uv, "run", "pytest", "-q", "-m", "security", "tests/security"),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "docker compose -f compose.test.yaml up -d --wait",
+            (docker, "compose", "-f", "compose.test.yaml", "up", "-d", "--wait"),
+            300,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/test_migration_matrix.py --baseline-revision 20260723_0001 --target head",
+            (
+                uv,
+                "run",
+                "python",
+                "scripts/test_migration_matrix.py",
+                "--baseline-revision",
+                "20260723_0001",
+                "--target",
+                "head",
+            ),
+            600,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "postgres and integration" tests/integration',
+            (uv, "run", "pytest", "-q", "-m", "postgres and integration", "tests/integration"),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/integration/ingestion/test_fpl_lifecycle_resume.py",
+            (uv, "run", "pytest", "-q", "tests/integration/ingestion/test_fpl_lifecycle_resume.py"),
+            600,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py",
+            ),
+            600,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/integration/data_model/test_cross_season_competition_constraints.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/integration/data_model/test_cross_season_competition_constraints.py",
+            ),
+            600,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/security/test_fpl_rights_raw_retention.py",
+            (uv, "run", "pytest", "-q", "tests/security/test_fpl_rights_raw_retention.py"),
+            600,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run dmf ingest fpl validate --resource bootstrap --input fixtures/fpl/FPL-004/happy_path/bootstrap.json --contract-version fpl-reference-v1 --output json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "ingest",
+                "fpl",
+                "validate",
+                "--resource",
+                "bootstrap",
+                "--input",
+                "fixtures/fpl/FPL-004/happy_path/bootstrap.json",
+                "--contract-version",
+                "fpl-reference-v1",
+                "--output",
+                "json",
+            ),
+            180,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run dmf ingest fpl snapshot --resource all --competition-key PL --season-code 2026/27 --rights-profile fpl_official_private_manual_v1 --output json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "ingest",
+                "fpl",
+                "snapshot",
+                "--resource",
+                "all",
+                "--competition-key",
+                "PL",
+                "--season-code",
+                "2026/27",
+                "--rights-profile",
+                "fpl_official_private_manual_v1",
+                "--output",
+                "json",
+            ),
+            180,
+            offline=True,
+            expected_exit=4,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/verify_fpl004_wheel.py",
+            (uv, "run", "python", "scripts/verify_fpl004_wheel.py"),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-fail-under=90",
+            (
+                uv,
+                "run",
+                "pytest",
+                "--cov=dmf_pulse",
+                "--cov-branch",
+                "--cov-report=term-missing",
+                "--cov-fail-under=90",
+            ),
+            1800,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/verify_fpl004_acceptance.py",
+            (uv, "run", "python", "scripts/verify_fpl004_acceptance.py"),
+            600,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            f"uv run dmf review-pack build --ticket FPL-004 --baseline {FPL_BASELINE} --output review_pack/FPL-004",
+            (
+                uv,
+                "run",
+                "dmf",
+                "review-pack",
+                "build",
+                "--ticket",
+                "FPL-004",
+                "--baseline",
+                FPL_BASELINE,
+                "--output",
+                "review_pack/FPL-004",
+            ),
+            900,
+        ),
+        AcceptanceCommand(
+            "docker compose -f compose.test.yaml down -v --remove-orphans",
+            (
+                docker,
+                "compose",
+                "-f",
+                "compose.test.yaml",
+                "down",
+                "-v",
+                "--remove-orphans",
+            ),
+            300,
+        ),
+    )
+
+
 def _review_command(uv: str, ticket: str) -> AcceptanceCommand:
     if ticket == "RUL-002":
         display = f"uv run dmf review-pack build --ticket RUL-002 --baseline {RUL_BASELINE} --output review_pack/RUL-002"
@@ -509,11 +716,32 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
         return f"FAIL: exit code {exit_code}"
     if command.expected_exit != 0:
         lines = [line for line in output.splitlines() if line.strip()]
-        try:
-            value = json.loads(lines[-1]) if lines else {}
-        except json.JSONDecodeError:
-            value = {}
-        code = value.get("error", {}).get("code") if isinstance(value, dict) else None
+        value: object = {}
+        for line in reversed(lines):
+            try:
+                value = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            break
+        error = value.get("error", {}) if isinstance(value, dict) else {}
+        code = error.get("code") if isinstance(error, dict) else None
+        if code is None and isinstance(value, dict):
+            code = value.get("code")
+        if "ingest fpl snapshot" in command.display:
+            effects = value.get("canonical_effects", {}) if isinstance(value, dict) else {}
+            if code is None and isinstance(effects, dict):
+                code = effects.get("error_code")
+            details = error.get("details", {}) if isinstance(error, dict) else {}
+            transport_count = (
+                details.get("transport_call_count") if isinstance(details, dict) else None
+            )
+            if transport_count is None and isinstance(value, dict):
+                transport_count = value.get("transport_call_count")
+            if transport_count is None and isinstance(effects, dict):
+                transport_count = effects.get("transport_call_count")
+            if code != "RIGHTS_BLOCKED" or transport_count != 0:
+                return "FAIL: blocking exit did not prove RIGHTS_BLOCKED before transport"
+            return f"PASS: expected exit {exit_code}; RIGHTS_BLOCKED with zero transport calls"
         if code != "RULESET_ACTIVATION_BLOCKED":
             return "FAIL: blocking exit did not emit RULESET_ACTIVATION_BLOCKED"
         return f"PASS: expected blocking exit {exit_code}; RULESET_ACTIVATION_BLOCKED"
@@ -524,25 +752,33 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
         skipped_count = int(skipped.group(1)) if skipped else 0
         if skipped_count:
             return f"FAIL: {skipped_count} required test(s) skipped"
-        if passed and coverage:
+        if passed and int(passed.group(1)) > 0 and coverage:
             return (
                 f"PASS: {passed.group(1)} tests; 0 skipped; {coverage.group(1)}% combined coverage"
             )
+        return "FAIL: coverage command did not prove nonzero tests and a coverage result"
+    if command.display.startswith("uv run pytest"):
+        passed = re.search(r"(\d+) passed", output)
+        skipped = re.search(r"(\d+) skipped", output)
+        skipped_count = int(skipped.group(1)) if skipped else 0
+        if skipped_count:
+            return f"FAIL: {skipped_count} required test(s) skipped"
+        if passed is None or int(passed.group(1)) <= 0:
+            return "FAIL: pytest command did not prove any executed test"
+        return f"PASS: {passed.group(1)} tests; 0 skipped"
     if command.display.endswith("doctor --json"):
         try:
             value = json.loads(output)
         except json.JSONDecodeError:
             return "PASS: doctor emitted output"
         return f"PASS: doctor status {value.get('status', 'UNKNOWN')}"
-    if command.display.endswith("verify_wheel.py"):
+    if command.display.endswith(("verify_wheel.py", "verify_fpl004_wheel.py")):
         try:
             value = json.loads(output)
         except json.JSONDecodeError:
             return "PASS: clean-wheel verifier completed"
-        return (
-            f"PASS: clean wheel {value.get('wheel', {}).get('sha256', 'hash unavailable')}; "
-            f"doctor {value.get('doctor_status', 'UNKNOWN')}"
-        )
+        wheel = value.get("wheel", {}) if isinstance(value, dict) else {}
+        return f"PASS: clean wheel {wheel.get('sha256', 'hash unavailable')}; installed verifier completed"
     if "review-pack build" in command.display:
         try:
             value = json.loads(output)
@@ -659,6 +895,19 @@ def _clean_dat_generated_outputs() -> None:
         if path.is_file() and path.name != "PLAN.md":
             path.unlink()
     review_root = REPOSITORY_ROOT / "review_pack/DAT-003"
+    if review_root.is_dir():
+        for path in review_root.iterdir():
+            if path.is_file():
+                path.unlink()
+
+
+def _clean_fpl_generated_outputs() -> None:
+    evidence_root = REPOSITORY_ROOT / "evidence/tickets/FPL-004"
+    evidence_root.mkdir(parents=True, exist_ok=True)
+    for path in evidence_root.iterdir():
+        if path.is_file() and path.name != "PLAN.md":
+            path.unlink()
+    review_root = REPOSITORY_ROOT / "review_pack/FPL-004"
     if review_root.is_dir():
         for path in review_root.iterdir():
             if path.is_file():
@@ -853,6 +1102,185 @@ def _main_dat() -> int:
     return 0
 
 
+def _main_fpl() -> int:
+    uv = shutil.which("uv")
+    docker = shutil.which("docker")
+    git = shutil.which("git")
+    if uv is None or docker is None or git is None:
+        print("uv, Docker, or Git is unavailable", file=sys.stderr)
+        return 2
+    commands = _fpl_commands(uv, docker, git)
+    command_log = REPOSITORY_ROOT / "evidence/tickets/FPL-004/commands.log"
+    archive = REPOSITORY_ROOT / "review_pack/FPL-004/DMF_PULSE_FPL-004_REVIEW.zip"
+    finalization_path = REPOSITORY_ROOT / "review_pack/FPL-004/archive_finalization.json"
+    _clean_fpl_generated_outputs()
+    source_root = REPOSITORY_ROOT / "src"
+    if str(source_root) not in sys.path:
+        sys.path.insert(0, str(source_root))
+    from generate_fpl004_evidence import _manifest as write_fpl_manifest
+    from generate_fpl004_evidence import generate as generate_fpl_evidence
+
+    write_fpl_manifest("DRAFT", [], None)
+    records: list[CommandRecord] = []
+    review_record: CommandRecord | None = None
+    teardown_record: CommandRecord | None = None
+    failure = False
+    try:
+        for command in commands[:23]:
+            record = run_command(command)
+            records.append(record)
+            print(f"[{record.exit_code}] {record.command} ({record.duration_seconds:.3f}s)")
+            if record.exit_code != command.expected_exit or not record.result.startswith("PASS:"):
+                failure = True
+                break
+        if not failure:
+            from dmf_pulse.assurance.review_pack import (
+                FPL_REVIEW_FINAL_RESULT,
+                FPL_REVIEW_WRITE_AHEAD_RESULT,
+                FPL_TEARDOWN_WRITE_AHEAD_RESULT,
+                calculate_review_payload_digest,
+            )
+
+            head = _git_head()
+            placeholders = [
+                *[asdict(item) for item in records],
+                asdict(
+                    CommandRecord(
+                        command=commands[23].display,
+                        duration_seconds=None,
+                        exit_code=0,
+                        result=FPL_REVIEW_WRITE_AHEAD_RESULT,
+                    )
+                ),
+                asdict(
+                    CommandRecord(
+                        command=commands[24].display,
+                        duration_seconds=None,
+                        exit_code=0,
+                        result=FPL_TEARDOWN_WRITE_AHEAD_RESULT,
+                    )
+                ),
+            ]
+            _write_command_records(command_log, placeholders)
+            generate_fpl_evidence(status="BLOCKED", payload_sha256="0" * 64, code_commit=head)
+            generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+            digest = calculate_review_payload_digest(
+                REPOSITORY_ROOT,
+                ticket="FPL-004",
+                baseline=FPL_BASELINE,
+                generated_at=generated_at,
+            )
+            generate_fpl_evidence(status="BLOCKED", payload_sha256=digest, code_commit=head)
+            review_record = run_command(commands[23])
+            print(
+                f"[{review_record.exit_code}] {review_record.command} "
+                f"({review_record.duration_seconds:.3f}s)"
+            )
+            if review_record.exit_code != 0 or not review_record.result.startswith("PASS:"):
+                failure = True
+            else:
+                review_record = CommandRecord(
+                    command=review_record.command,
+                    duration_seconds=review_record.duration_seconds,
+                    exit_code=0,
+                    result=FPL_REVIEW_FINAL_RESULT,
+                )
+    except Exception as exc:
+        failure = True
+        print(f"FPL-004 acceptance preparation failed ({type(exc).__name__})", file=sys.stderr)
+    finally:
+        teardown_record = run_command(commands[24])
+        print(
+            f"[{teardown_record.exit_code}] {teardown_record.command} "
+            f"({teardown_record.duration_seconds:.3f}s)"
+        )
+        if teardown_record.exit_code != 0 or not teardown_record.result.startswith("PASS:"):
+            failure = True
+        else:
+            from dmf_pulse.assurance.review_pack import FPL_TEARDOWN_FINAL_RESULT
+
+            teardown_record = CommandRecord(
+                command=teardown_record.command,
+                duration_seconds=teardown_record.duration_seconds,
+                exit_code=0,
+                result=FPL_TEARDOWN_FINAL_RESULT,
+            )
+
+    if review_record is None or teardown_record is None:
+        final_records = [*records, *([teardown_record] if teardown_record is not None else [])]
+        _write_command_records(command_log, [asdict(item) for item in final_records])
+        archive.unlink(missing_ok=True)
+        return 1
+
+    final_records = [*records, review_record, teardown_record]
+    _write_command_records(command_log, [asdict(item) for item in final_records])
+    if failure:
+        archive.unlink(missing_ok=True)
+        _write_json_atomic(
+            finalization_path,
+            {
+                "command_24": asdict(review_record),
+                "command_25": asdict(teardown_record),
+                "status": "FAILED",
+            },
+        )
+        return 1
+
+    try:
+        from dmf_pulse.assurance.review_pack import (
+            build_review_pack,
+            calculate_review_payload_digest,
+            validate_review_zip,
+        )
+
+        head = _git_head()
+        generate_fpl_evidence(status="COMPLETE", payload_sha256="0" * 64, code_commit=head)
+        generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+        digest = calculate_review_payload_digest(
+            REPOSITORY_ROOT,
+            ticket="FPL-004",
+            baseline=FPL_BASELINE,
+            generated_at=generated_at,
+        )
+        generate_fpl_evidence(status="COMPLETE", payload_sha256=digest, code_commit=head)
+        summary = build_review_pack(
+            REPOSITORY_ROOT,
+            ticket="FPL-004",
+            baseline=FPL_BASELINE,
+            output=REPOSITORY_ROOT / "review_pack/FPL-004",
+            generated_at=generated_at,
+        )
+        validated = validate_review_zip(summary.path)
+        with zipfile.ZipFile(summary.path) as review_zip:
+            if review_zip.testzip() is not None:
+                raise ValueError("review archive CRC validation failed")
+        finalization = {
+            "archive_sha256": hashlib.sha256(summary.path.read_bytes()).hexdigest(),
+            "command_24": asdict(review_record),
+            "command_25": asdict(teardown_record),
+            "crc_and_checksum_validated": True,
+            "file_count": validated.file_count,
+            "payload_sha256": validated.payload_sha256,
+            "status": "COMPLETE",
+        }
+        _write_json_atomic(finalization_path, finalization)
+    except Exception as exc:
+        archive.unlink(missing_ok=True)
+        _write_json_atomic(
+            finalization_path,
+            {
+                "command_24": asdict(review_record),
+                "command_25": asdict(teardown_record),
+                "error_type": type(exc).__name__,
+                "status": "FAILED",
+            },
+        )
+        print(f"FPL-004 review archive finalization failed ({type(exc).__name__})")
+        return 1
+    print(json.dumps(finalization, indent=2, sort_keys=True))
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -865,7 +1293,9 @@ def main() -> int:
         action="store_true",
         help="append the stable RUL-002 review write-ahead record before digest calculation",
     )
-    parser.add_argument("--ticket", choices=("FND-001", "RUL-002", "DAT-003"), default="FND-001")
+    parser.add_argument(
+        "--ticket", choices=("FND-001", "RUL-002", "DAT-003", "FPL-004"), default="FND-001"
+    )
     arguments = parser.parse_args()
     if arguments.review_only and arguments.prepare_review:
         parser.error("--review-only and --prepare-review are mutually exclusive")
@@ -875,6 +1305,12 @@ def main() -> int:
                 "DAT-003 runs its review and teardown inside the exact acceptance sequence"
             )
         return _main_dat()
+    if arguments.ticket == "FPL-004":
+        if arguments.review_only or arguments.prepare_review:
+            parser.error(
+                "FPL-004 runs its review and teardown inside the exact acceptance sequence"
+            )
+        return _main_fpl()
     uv = shutil.which("uv")
     if uv is None:
         print("uv is unavailable", file=sys.stderr)

@@ -1,0 +1,215 @@
+{
+  "element_stats": [
+    {
+      "label": "Minutes",
+      "name": "minutes"
+    }
+  ],
+  "element_types": [
+    {
+      "id": 1,
+      "plural_name": "Goalkeepers",
+      "plural_name_short": "GKP",
+      "singular_name": "Goalkeeper",
+      "singular_name_short": "GKP",
+      "squad_max_play": 1,
+      "squad_min_play": 1,
+      "squad_select": 2
+    },
+    {
+      "id": 2,
+      "plural_name": "Defenders",
+      "plural_name_short": "DEF",
+      "singular_name": "Defender",
+      "singular_name_short": "DEF",
+      "squad_max_play": 5,
+      "squad_min_play": 3,
+      "squad_select": 5
+    },
+    {
+      "id": 3,
+      "plural_name": "Midfielders",
+      "plural_name_short": "MID",
+      "singular_name": "Midfielder",
+      "singular_name_short": "MID",
+      "squad_max_play": 5,
+      "squad_min_play": 2,
+      "squad_select": 5
+    },
+    {
+      "id": 4,
+      "plural_name": "Forwards",
+      "plural_name_short": "FWD",
+      "singular_name": "Forward",
+      "singular_name_short": "FWD",
+      "squad_max_play": 3,
+      "squad_min_play": 1,
+      "squad_select": 3
+    }
+  ],
+  "elements": [
+    {
+      "chance_of_playing_next_round": 75,
+      "chance_of_playing_this_round": 100,
+      "code": 20011,
+      "cost_change_event": 0,
+      "cost_change_event_fall": 0,
+      "cost_change_start": 0,
+      "cost_change_start_fall": 0,
+      "element_type": 1,
+      "first_name": "Alice",
+      "id": 11,
+      "minutes": 0,
+      "news": "Synthetic assessment note.",
+      "news_added": "2026-08-24T09:15:00Z",
+      "now_cost": 56,
+      "second_name": "Keeper",
+      "selected_by_percent": "8.4",
+      "status": "d",
+      "team": 1,
+      "transfers_in": 1200,
+      "transfers_in_event": 200,
+      "transfers_out": 300,
+      "transfers_out_event": 40,
+      "web_name": "A. Keeper"
+    },
+    {
+      "chance_of_playing_next_round": null,
+      "chance_of_playing_this_round": null,
+      "code": 20012,
+      "cost_change_event": 0,
+      "cost_change_event_fall": 0,
+      "cost_change_start": 0,
+      "cost_change_start_fall": 0,
+      "element_type": 2,
+      "first_name": "Bruno",
+      "id": 12,
+      "minutes": 0,
+      "news": "",
+      "news_added": null,
+      "now_cost": 50,
+      "second_name": "Back",
+      "selected_by_percent": "4.1",
+      "status": "a",
+      "team": 1,
+      "transfers_in": 500,
+      "transfers_in_event": 100,
+      "transfers_out": 200,
+      "transfers_out_event": 20,
+      "web_name": "B. Back"
+    },
+    {
+      "chance_of_playing_next_round": 100,
+      "chance_of_playing_this_round": 100,
+      "code": 20021,
+      "cost_change_event": 0,
+      "cost_change_event_fall": 0,
+      "cost_change_start": 0,
+      "cost_change_start_fall": 0,
+      "element_type": 3,
+      "first_name": "Cara",
+      "id": 21,
+      "minutes": 0,
+      "news": "",
+      "news_added": null,
+      "now_cost": 75,
+      "second_name": "Midfield",
+      "selected_by_percent": "12.75",
+      "status": "a",
+      "team": 2,
+      "transfers_in": 2400,
+      "transfers_in_event": 300,
+      "transfers_out": 900,
+      "transfers_out_event": 90,
+      "web_name": "C. Midfield"
+    },
+    {
+      "chance_of_playing_next_round": 100,
+      "chance_of_playing_this_round": 100,
+      "code": 20022,
+      "cost_change_event": 0,
+      "cost_change_event_fall": 0,
+      "cost_change_start": 0,
+      "cost_change_start_fall": 0,
+      "element_type": 4,
+      "first_name": "Diego",
+      "id": 22,
+      "minutes": 0,
+      "news": "",
+      "news_added": null,
+      "now_cost": 80,
+      "second_name": "Forward",
+      "selected_by_percent": "21.0",
+      "status": "a",
+      "team": 2,
+      "transfers_in": 5000,
+      "transfers_in_event": 550,
+      "transfers_out": 1100,
+      "transfers_out_event": 120,
+      "web_name": "D. Forward"
+    }
+  ],
+  "events": [
+    {
+      "data_checked": false,
+      "deadline_time": "2026-08-21T17:30:00Z",
+      "finished": false,
+      "id": 1,
+      "is_current": true,
+      "is_next": false,
+      "is_previous": false,
+      "name": "Synthetic Gameweek 1"
+    },
+    {
+      "data_checked": false,
+      "deadline_time": "2026-08-28T18:00:00Z",
+      "finished": false,
+      "id": 2,
+      "is_current": false,
+      "is_next": true,
+      "is_previous": false,
+      "name": "Synthetic Gameweek 2"
+    }
+  ],
+  "game_settings": {
+    "league_join_private_max": 30,
+    "squad_squadplay": 11
+  },
+  "phases": [
+    {
+      "id": 1,
+      "name": "Overall",
+      "start_event": 1,
+      "stop_event": 38
+    }
+  ],
+  "teams": [
+    {
+      "code": 1001,
+      "id": 1,
+      "name": "Alpha Athletic",
+      "short_name": "ALP",
+      "strength": 3,
+      "strength_attack_away": 1080,
+      "strength_attack_home": 1120,
+      "strength_defence_away": 1095,
+      "strength_defence_home": 1100,
+      "strength_overall_away": 1090,
+      "strength_overall_home": 1110
+    },
+    {
+      "code": 1002,
+      "id": 2,
+      "name": "Beta Borough",
+      "short_name": "BET",
+      "strength": 3,
+      "strength_attack_away": 1060,
+      "strength_attack_home": 1075,
+      "strength_defence_away": 1080,
+      "strength_defence_home": 1085,
+      "strength_overall_away": 1070,
+      "strength_overall_home": 1080
+    }
+  ],
+  "total_players": 1000000
+}

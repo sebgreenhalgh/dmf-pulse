@@ -204,4 +204,24 @@ def inspect_schema(connection: Connection) -> SchemaManifest:
         "postgres_version": version,
         "schemas": schemas,
     }
-    return SchemaManifest.model_validate({**body, "schema_sha256": canonical_sha256(body)})
+    # Runtime and deployment metadata remain useful evidence, but they are not part of
+    # the semantic database contract.  A PostgreSQL patch upgrade or a migration-label
+    # change must not alter the schema fingerprint when the inspected objects are
+    # otherwise identical.
+    semantic_schemas: dict[str, dict[str, Any]] = {}
+    for schema_name, schema in schemas.items():
+        semantic_tables: dict[str, dict[str, Any]] = {}
+        for table_name, table in schema["tables"].items():
+            semantic_tables[table_name] = {
+                **table,
+                "columns": sorted(
+                    (
+                        {key: value for key, value in column.items() if key != "ordinal"}
+                        for column in table["columns"]
+                    ),
+                    key=lambda column: str(column["name"]),
+                ),
+            }
+        semantic_schemas[schema_name] = {**schema, "tables": semantic_tables}
+    semantic_body = {"extensions": extensions, "schemas": semantic_schemas}
+    return SchemaManifest.model_validate({**body, "schema_sha256": canonical_sha256(semantic_body)})

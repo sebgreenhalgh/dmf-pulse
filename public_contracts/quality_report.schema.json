@@ -1,0 +1,60 @@
+{
+  "$id": "dmf://schemas/quality_report/v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "blocker_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "issues": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "subject_scope": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "code",
+          "subject_scope"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "PASS_WITH_WARNINGS",
+        "BLOCKED"
+      ]
+    },
+    "warning_count": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "status",
+    "warning_count",
+    "blocker_count",
+    "issues"
+  ],
+  "type": "object"
+}

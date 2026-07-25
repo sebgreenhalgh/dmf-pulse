@@ -1,0 +1,77 @@
+{
+  "profiles": [
+    {
+      "account_scope": "FPL-004 synthetic fixtures only",
+      "approved_at": "2026-07-23T00:00:00Z",
+      "approved_by": "FPL-004 supplied pack authority",
+      "approved_purpose": "synthetic deterministic tests only",
+      "attribution_required": false,
+      "attribution_text": null,
+      "capabilities": {
+        "automated_access": "DENY",
+        "backup": "ALLOW",
+        "cache": "ALLOW",
+        "derived_storage": "ALLOW",
+        "manual_import": "ALLOW",
+        "model_training": "DENY",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "ALLOW",
+        "redistribution": "ALLOW",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-07-23T00:00:00Z",
+      "geography_scope": "local deterministic test environment",
+      "human_approval_id": "09_RIGHTS_RETENTION_AND_RAW_STORAGE_CONTRACT#synthetic_test_v1",
+      "notes": "Approval applies only to manifest-verified synthetic fixtures.",
+      "profile_version": "1.0.0",
+      "provider_key": "synthetic_fpl",
+      "retention_reason": "repository-approved synthetic data has no retention limit",
+      "retention_seconds": null,
+      "rights_profile_id": "synthetic_test_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": false,
+      "terms_source": "FPL-004 synthetic fixture contract",
+      "terms_version": "1.0.0",
+      "unresolved_rights": []
+    },
+    {
+      "account_scope": "Sebastian approved private context only",
+      "approved_at": "2026-07-23T00:00:00Z",
+      "approved_by": "FPL-004 supplied pack authority",
+      "approved_purpose": "bounded transient private manual validation only; no persistent promotion",
+      "attribution_required": false,
+      "attribution_text": null,
+      "capabilities": {
+        "automated_access": "DENY",
+        "backup": "DENY",
+        "cache": "DENY",
+        "derived_storage": "UNKNOWN",
+        "manual_import": "ALLOW",
+        "model_training": "DENY",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "DENY",
+        "redistribution": "DENY",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-07-23T00:00:00Z",
+      "geography_scope": "United Kingdom private use assumption",
+      "human_approval_id": "09_RIGHTS_RETENTION_AND_RAW_STORAGE_CONTRACT#fpl_official_private_manual_v1",
+      "notes": "Engineering fallback only; not legal advice.",
+      "profile_version": "1.0.0",
+      "provider_key": "official_fpl",
+      "retention_reason": "raw body must be destroyed immediately after transient validation",
+      "retention_seconds": 0,
+      "rights_profile_id": "fpl_official_private_manual_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": true,
+      "terms_source": "Premier League Terms and Conditions",
+      "terms_version": "checked-2026-07-23",
+      "unresolved_rights": [
+        "persistent derived database rights require confirmation"
+      ]
+    }
+  ],
+  "schema_version": "1.0.0"
+}

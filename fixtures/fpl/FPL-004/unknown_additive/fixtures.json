@@ -1,0 +1,23 @@
+[
+  {
+    "code": 900101,
+    "event": 1,
+    "finished": false,
+    "finished_provisional": false,
+    "future_fixture_field": {
+      "value": 1
+    },
+    "id": 101,
+    "kickoff_time": "2026-08-22T14:00:00Z",
+    "minutes": 0,
+    "provisional_start_time": false,
+    "started": false,
+    "stats": [],
+    "team_a": 2,
+    "team_a_difficulty": 3,
+    "team_a_score": null,
+    "team_h": 1,
+    "team_h_difficulty": 3,
+    "team_h_score": null
+  }
+]

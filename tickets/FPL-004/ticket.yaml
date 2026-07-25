@@ -1,0 +1,103 @@
+ticket_id: FPL-004
+stage: A4
+title: DAT-003 remediation and rights-gated official FPL snapshot ingestion
+status: READY
+owner: Sebastian Greenhalgh
+implementer_role: codex_implementation
+reviewer_role: independent_chatgpt_and_human
+required_base_commit: 9b3160a2574d2868b5f26e3a2d429924567510b0
+expected_branch: stage/A4/FPL-004-official-ingestion
+objective: >-
+  From rights-approved synthetic or manually supplied official-FPL-shaped
+  bootstrap and fixture payloads, create immutable retrieval evidence, execute
+  an append-only processing lifecycle, validate/map/promote canonical entities
+  and FPL observations, and publish a deterministic source bundle without a
+  live network dependency.
+user_visible_vertical_slice:
+  commands:
+    - dmf ingest fpl replay --fixture-set fixtures/fpl/FPL-004 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_test_v1 --output json
+    - dmf ingest fpl validate --resource bootstrap --input <path> --contract-version fpl-reference-v1 --output json
+    - dmf ingest fpl import --bootstrap <path> --fixtures <path> --competition-key SYNTHETIC_PL --season-code 2026/27 --captured-at <utc> --information-cutoff <utc> --rights-profile synthetic_test_v1 --output json
+    - dmf ingest fpl snapshot --resource all --competition-key PL --season-code 2026/27 --rights-profile fpl_official_private_manual_v1 --output json
+  expected: >-
+    Synthetic replay/import produces the approved canonical summary and immutable source
+    bundle; official-profile import cannot persist derived data, and live snapshot exits
+    RIGHTS_BLOCKED before transport is called.
+authority:
+  documents:
+    - DMFP-00
+    - DMFP-01
+    - DMFP-02
+    - DMFP-03
+    - DMFP-04-ZERO-COST
+    - DMFP-05
+    - DMFP-17
+    - DMFP-19
+    - DMFP-20
+    - CODEX_IMPLEMENTATION_PLAYBOOK
+  decisions:
+    - ADR-DATA-001
+    - ADR-DATA-003
+    - ADR-DATA-004
+    - ADR-DATA-005
+    - ADR-DATA-006
+    - ADR-DATA-007
+    - ADR-SRC-001
+    - ADR-SRC-003
+    - ADR-SRC-004
+    - ADR-ASSUR-006
+public_contracts:
+  - public_contracts/provider_snapshot_result.schema.json
+  - public_contracts/source_bundle_summary.schema.json
+  - public_contracts/quality_report.schema.json
+  - public_contracts/rights_decision.schema.json
+permissions:
+  network: false_for_implementation_and_acceptance
+  migration: one_or_two_ordered_manually_reviewed_alembic_revisions_allowed
+  new_dependency: forbidden_unless_explicitly_justified_and_approved_in_ticket_evidence
+  sandbox: workspace-write
+  docker: local_postgresql_18_4_only
+allowed_areas:
+  - alembic/**
+  - config/providers/**
+  - config/rights/**
+  - src/dmf_pulse/ingestion/**
+  - src/dmf_pulse/data_model/**
+  - src/dmf_pulse/database/**
+  - src/dmf_pulse/cli/**
+  - tests/**
+  - fixtures/fpl/**
+  - evidence/tickets/FPL-004/**
+  - docs/adr/**
+  - specs/manifests/**
+  - pyproject.toml
+  - uv.lock
+  - Makefile
+  - compose.test.yaml
+  - .github/workflows/**
+exclusions:
+  - authenticated FPL manager endpoints
+  - FPL login, cookies or account state
+  - automated production polling
+  - real FPL payload committed to repository or evidence
+  - odds or other provider adapters
+  - price model
+  - projections or optimisation
+  - scheduler, FastAPI or UI
+  - public/commercial data display
+  - model training on official FPL data
+stop_conditions:
+  - baseline or pack integrity failure
+  - dirty initial working tree
+  - Docker/PostgreSQL 18.4 unavailable
+  - rights profile missing, contradictory or permissive beyond the frozen contract
+  - fixture oracle inconsistency
+  - required field semantics absent from the field contract
+  - live request required for deterministic acceptance
+  - name-only canonical merge required
+  - unapproved dependency or migration rewrite required
+  - usable_at or cutoff eligibility cannot be proven
+completion_evidence:
+  path: evidence/tickets/FPL-004/
+  review_zip: review_pack/FPL-004/DMF_PULSE_FPL-004_REVIEW.zip
+  max_review_files: 20

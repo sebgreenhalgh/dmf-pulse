@@ -39,6 +39,8 @@ jobs:
           uv run dmf doctor --json
           uv run dmf config validate --environment test --config-root config
           uv run dmf rules validate fixtures/rules/RUL-002/synthetic_complete --json
+          uv run dmf specs validate
+          uv run dmf ingest fpl validate --resource bootstrap --input fixtures/fpl/FPL-004/happy_path/bootstrap.json --contract-version fpl-reference-v1 --output json
 
       - name: Package smoke outside source tree
         run: |

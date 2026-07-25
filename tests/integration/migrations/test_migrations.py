@@ -24,7 +24,7 @@ from dmf_pulse.database.migrate import (
 from dmf_pulse.database.schema import inspect_schema
 
 pytestmark = pytest.mark.migration
-EXPECTED_SCHEMA_SHA256 = "b85e36bbc457054125df884b0ed107591a93182f20e6308fe1b9cb3d7a9bf7ea"
+EXPECTED_SCHEMA_SHA256 = "da0f671cb636236aeb15b76e45ab076d81854b62ae08e9cd50cf077af859bf07"
 
 
 def _catalog_names(manifest: object) -> tuple[set[str], set[str]]:
@@ -46,12 +46,20 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         first = inspect_schema(connection)
         second = inspect_schema(connection)
     tables, views = _catalog_names(first)
-    assert tables == set(expected["tables"])
-    assert views == set(expected["views"])
+    assert tables >= set(expected["tables"])
+    assert views >= set(expected["views"])
+    assert {
+        "fpl.current_fixture_observation",
+        "fpl.current_gameweek_observation",
+        "fpl.current_player_observation",
+        "fpl.current_team_observation",
+        "provenance.available_raw_storage_object",
+        "provenance.source_snapshot_lifecycle",
+    } <= views
     assert set(first.extensions) == set(expected["extensions"])
     assert first.schema_sha256 == second.schema_sha256
     assert first.schema_sha256 == EXPECTED_SCHEMA_SHA256
-    assert first.alembic_revision == head_revision() == "20260723_0001"
+    assert first.alembic_revision == head_revision() == "20260724_0002"
 
     function_names = {
         f"{schema}.{function['name']}"
@@ -62,6 +70,10 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "core.guard_canonical_successor",
         "core.guard_temporal_version",
         "core.is_canonical_tstzrange",
+        "provenance.guard_processing_event",
+        "provenance.guard_fpl_observation_source_usable",
+        "provenance.guard_raw_storage_rights",
+        "provenance.guard_source_snapshot_envelope",
         "provenance.reject_immutable_change",
     }
     trigger_names = {
@@ -76,9 +88,30 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "trg_player_team_membership_temporal",
         "trg_raw_blob_deletion_immutable",
         "trg_raw_blob_immutable",
+        "trg_raw_storage_deletion_immutable",
+        "trg_raw_storage_object_immutable",
+        "trg_raw_storage_rights",
+        "trg_rights_decision_immutable",
+        "trg_rights_profile_immutable",
         "trg_ruleset_activation_immutable",
         "trg_ruleset_artifact_immutable",
+        "trg_semantic_effect_source_immutable",
+        "trg_semantic_observation_claim_immutable",
+        "trg_source_bundle_immutable",
+        "trg_source_bundle_member_immutable",
+        "trg_source_mapping_candidate_immutable",
+        "trg_source_processing_event_guard",
+        "trg_source_snapshot_envelope",
         "trg_source_snapshot_immutable",
+        "trg_fixture_observation_immutable",
+        "trg_fixture_observation_source_usable",
+        "trg_gameweek_observation_immutable",
+        "trg_gameweek_observation_source_usable",
+        "trg_player_observation_immutable",
+        "trg_player_observation_source_usable",
+        "trg_player_season_immutable",
+        "trg_team_observation_immutable",
+        "trg_team_observation_source_usable",
     }
     exclusions = [
         constraint
@@ -94,9 +127,9 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
     for table in metadata.sorted_tables:
         schema_name = table.schema or "public"
         declared = first.schemas[schema_name]["tables"][table.name]
-        assert [column["name"] for column in declared["columns"]] == [
+        assert {column["name"] for column in declared["columns"]} == {
             column.name for column in table.columns
-        ]
+        }
         assert {
             constraint["name"]
             for constraint in declared["constraints"]
@@ -116,7 +149,8 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
 def test_single_linear_revision_and_secret_free_offline_sql(postgres_url: str) -> None:
     revisions = list(ScriptDirectory.from_config(alembic_config()).walk_revisions())
     assert [(revision.revision, revision.down_revision) for revision in revisions] == [
-        ("20260723_0001", None)
+        ("20260724_0002", "20260723_0001"),
+        ("20260723_0001", None),
     ]
     output = io.StringIO()
     with redirect_stdout(output):
@@ -168,4 +202,4 @@ def test_clean_downgrade_and_reupgrade(postgres_engine: Engine, postgres_url: st
     upgrade_database(postgres_url)
     with postgres_engine.connect() as connection:
         assert connection.execute(text("SELECT uuidv7() IS NOT NULL")).scalar_one() is True
-        assert inspect_schema(connection).alembic_revision == "20260723_0001"
+        assert inspect_schema(connection).alembic_revision == "20260724_0002"

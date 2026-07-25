@@ -1,0 +1,76 @@
+{
+  "$id": "dmf://schemas/source_bundle_summary/v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bundle_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "bundle_type": {
+      "const": "FPL_BOOTSTRAP_FIXTURES"
+    },
+    "competition_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "information_cutoff": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "members": {
+      "items": {
+        "properties": {
+          "role": {
+            "enum": [
+              "BOOTSTRAP",
+              "FIXTURES"
+            ]
+          },
+          "source_snapshot_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "usable_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "source_snapshot_id",
+          "usable_at"
+        ],
+        "type": "object"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "quality_status": {
+      "enum": [
+        "PASS",
+        "PASS_WITH_WARNINGS"
+      ]
+    },
+    "season_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "bundle_id",
+    "bundle_type",
+    "competition_id",
+    "season_id",
+    "information_cutoff",
+    "members",
+    "semantic_sha256",
+    "quality_status"
+  ],
+  "type": "object"
+}

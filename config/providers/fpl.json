@@ -1,0 +1,22 @@
+{
+  "adapter_version": "fpl-reference-v1",
+  "contract_version": "fpl-reference-v1",
+  "max_json_depth": 64,
+  "max_response_bytes": 5242880,
+  "provider_key": "official_fpl",
+  "resources": {
+    "bootstrap": {
+      "host": "fantasy.premierleague.com",
+      "path": "/api/bootstrap-static/"
+    },
+    "fixtures": {
+      "host": "fantasy.premierleague.com",
+      "path": "/api/fixtures/"
+    }
+  },
+  "timeouts_seconds": {
+    "connect": 3,
+    "read": 10,
+    "total": 15
+  }
+}

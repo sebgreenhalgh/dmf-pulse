@@ -49,6 +49,10 @@ path = "src/dmf_pulse/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/dmf_pulse"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"config/providers/fpl.json" = "dmf_pulse/ingestion/resources/fpl.json"
+"config/rights/fpl_profiles.json" = "dmf_pulse/ingestion/resources/fpl_profiles.json"
+
 [tool.ruff]
 target-version = "py313"
 line-length = 100
@@ -77,6 +81,8 @@ markers = [
   "golden: stable serialized contract test",
   "postgres: requires disposable PostgreSQL 18.4",
   "migration: exercises Alembic upgrade/downgrade behavior",
+  "contract: validates frozen public or provider contracts",
+  "security: validates rights, retention, path, and disclosure boundaries",
 ]
 
 [tool.coverage.run]

@@ -7,8 +7,10 @@ For every change:
 1. Update `PLANS.md` when work is nontrivial.
 2. Preserve public contracts unless the ticket explicitly changes them.
 3. Add independent tests for successful and failing behaviour; keep tests offline and isolated from the user home.
-4. Do not add a dependency, migration, service, domain stub, provider call, or `.env` design without explicit authority. DAT-003 migrations must be reversible against PostgreSQL 18.4 and enforce temporal and immutability invariants in the database.
+4. Do not add a dependency, migration, service, domain stub, provider call, or `.env` design without explicit authority. FPL-004 migrations must preserve DAT-003 records, be reversible against PostgreSQL 18.4, and enforce lifecycle, temporal, season/competition, provenance, and immutability invariants in the database.
 5. Run the literal format, lint, mypy, branch-coverage, build, wheel, repository, and secret-scan commands in `README.md`.
 6. Record exact acceptance evidence and review security/scope before requesting review.
 
-Use conventional, focused commit messages when the owner requests commits. Codex must not push, merge, rebase, reset, tag, amend prior commits, rewrite history, or change repository visibility for DAT-003.
+For FPL-004, use only the approved synthetic fixtures and local PostgreSQL in development and acceptance. Do not make a live provider request, retain a real FPL body, weaken a Rights Profile, accept a literal database URL, infer identity from a name, or reinterpret unknown rights as permission.
+
+Use conventional, focused commit messages when the owner requests commits. Codex must not push, merge, rebase, reset, tag, amend prior commits, rewrite history, or change repository visibility for FPL-004.

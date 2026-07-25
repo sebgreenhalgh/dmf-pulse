@@ -1,8 +1,8 @@
 # DMF Pulse
 
-DMF Pulse is a private FPL decision-engine project. DAT-003 adds the minimum governed PostgreSQL 18.4 canonical temporal foundation to the existing strict rules package: server-generated UUIDv7 identity, bitemporal facts and as-of reads, immutable source observations, a rules activation registry, reversible migrations, deterministic data-model CLI, and first-party evidence.
+DMF Pulse is a private FPL decision-engine project. FPL-004 builds on the governed PostgreSQL 18.4 temporal foundation with rights-gated ingestion of official-FPL-shaped bootstrap and fixture data. The accepted full pipeline uses synthetic fixtures to create immutable retrieval envelopes, append-only lifecycle history, season-scoped canonical mappings, typed observations, quality reports, and cutoff-safe source bundles.
 
-The milestone contains no live provider access, SQLite substitute, odds/market schema, model, optimiser, scheduler, server/API, UI, manager-account state, or autonomous FPL action. Pure rules scoring remains database-free; only explicit `dmf data-model` commands and PostgreSQL-marked tests connect to the disposable TEST database.
+The default official FPL profile permits bounded transient manual validation only and blocks live snapshot transport as well as persistent raw/derived storage. No live provider request, real provider payload, authenticated manager access, recurring polling, SQLite substitute, odds/market ingestion, model, optimiser, scheduler, server/API, UI, or autonomous FPL action belongs in this milestone. Pure rules scoring and payload validation remain database-free; explicit persistence commands and PostgreSQL-marked tests use only the disposable TEST database.
 
 ## Requirements
 
@@ -12,6 +12,22 @@ The milestone contains no live provider access, SQLite substitute, odds/market s
 - PostgreSQL image `postgres:18.4-bookworm` (digest pinned in `compose.test.yaml`)
 
 The project is proprietary and All Rights Reserved. Approved architecture lives under `specs/approved/`, with hashes enforced by governed manifests.
+
+## Rights-safe FPL workflow
+
+The deterministic end-to-end example uses only approved synthetic fixtures:
+
+```text
+dmf ingest fpl replay --fixture-set fixtures/fpl/FPL-004 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_test_v1 --output json
+```
+
+Database-free contract validation is available independently:
+
+```text
+dmf ingest fpl validate --resource bootstrap --input fixtures/fpl/FPL-004/happy_path/bootstrap.json --contract-version fpl-reference-v1 --output json
+```
+
+The official-profile snapshot command is a controlled negative operation: it must return `RIGHTS_BLOCKED` with exit code 4 before any transport call. Do not use it as a live smoke test. See `docs/ingestion/README.md` for the command surface, lifecycle, resume, retention, and cutoff boundaries.
 
 ## Disposable PostgreSQL setup
 
@@ -62,18 +78,17 @@ Canonical quality commands are executable without Make:
 uv run ruff format --check .
 uv run ruff check .
 uv run mypy src/dmf_pulse
-uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/DAT-003/coverage.json
-uv run python scripts/check_coverage_gates.py
+uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-fail-under=90
 uv build
-uv run python scripts/verify_wheel.py
+uv run python scripts/verify_fpl004_wheel.py
 uv run python scripts/validate_repository.py
 uv run python scripts/scan_secrets.py
 ```
 
-The literal 23-command gate, guaranteed teardown, final evidence, and exact 20-file archive are orchestrated by:
+The literal 25-command gate, including the expected rights-blocked exit, PostgreSQL teardown, final evidence, and exact 20-file archive is frozen in `tickets/FPL-004/ACCEPTANCE.md`. Its ticket-specific verifier is:
 
 ```text
-uv run python scripts/run_acceptance.py --ticket DAT-003
+uv run python scripts/verify_fpl004_acceptance.py
 ```
 
 Ubuntu CI is the authoritative PostgreSQL gate. The scheduled/manual Windows workflow covers portable package and pure CLI behavior without duplicating Docker database minutes.
@@ -90,4 +105,16 @@ dmf data-model as-of --fixture <path> [--json]
 dmf review-pack build --ticket DAT-003 --baseline <commit> --output <path>
 ```
 
-See `docs/data_model/README.md`, `docs/operations/windows_and_linux_setup.md`, and `tickets/DAT-003/ACCEPTANCE.md` before changing schema, dependencies, temporal semantics, or public contracts.
+FPL-004 adds:
+
+```text
+dmf ingest fpl validate --resource <bootstrap|fixtures> --input <path> --contract-version fpl-reference-v1 --output json
+dmf ingest fpl import --bootstrap <path> --fixtures <path> --competition-key <key> --season-code <code> --captured-at <utc> --information-cutoff <utc> --rights-profile <profile> --database-url-ref <reference> --output json
+dmf ingest fpl replay --fixture-set <directory> --scenario <scenario> --database-url-ref <reference> --output json
+dmf ingest fpl resume --snapshot-id <uuid> --database-url-ref <reference> --output json
+dmf ingest fpl bundle show --bundle-id <uuid> --database-url-ref <reference> --output json
+dmf ingest fpl snapshot --resource <bootstrap|fixtures|all> --competition-key <key> --season-code <code> --rights-profile <profile> --database-url-ref <reference> --output json
+dmf review-pack build --ticket FPL-004 --baseline 9b3160a2574d2868b5f26e3a2d429924567510b0 --output review_pack/FPL-004
+```
+
+See `docs/ingestion/README.md`, `docs/data_model/README.md`, `docs/operations/windows_and_linux_setup.md`, and `tickets/FPL-004/ACCEPTANCE.md` before changing rights, schemas, dependencies, temporal/lifecycle semantics, or public contracts.

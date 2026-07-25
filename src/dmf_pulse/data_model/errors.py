@@ -47,6 +47,8 @@ def translate_database_error(error: DBAPIError) -> DataModelError:
     constraint = getattr(diagnostic, "constraint_name", None)
     sqlstate = getattr(original, "sqlstate", None)
     message = getattr(diagnostic, "message_primary", "")
+    if sqlstate in {"40001", "40P01", "55P03"}:
+        return DataModelError("DATABASE_RETRYABLE", "database transaction must be retried")
     if constraint in OVERLAP_CONSTRAINTS or sqlstate == "23P01":
         return DataModelError("TEMPORAL_OVERLAP", "a current temporal fact overlaps")
     if (

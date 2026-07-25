@@ -146,6 +146,7 @@ season = Table(
         name="fk_season_canonical_type",
         ondelete="RESTRICT",
     ),
+    UniqueConstraint("season_id", "competition_id", name="uq_season_id_competition"),
     UniqueConstraint("competition_id", "season_code", name="uq_season_competition_code"),
     CheckConstraint("entity_type = 'SEASON'", name="ck_season_entity_type"),
     CheckConstraint("ends_on > starts_on", name="ck_season_dates"),
@@ -196,6 +197,42 @@ player = Table(
     schema="football",
 )
 
+team_season = Table(
+    "team_season",
+    metadata,
+    Column("team_season_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")),
+    Column(
+        "team_id",
+        UUID(as_uuid=True),
+        ForeignKey("football.team.team_id", name="fk_team_season_team", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "season_id",
+        UUID(as_uuid=True),
+        ForeignKey("football.season.season_id", name="fk_team_season_season", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_team_season_snapshot",
+            ondelete="RESTRICT",
+        ),
+    ),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("team_id", "season_id", name="uq_team_season_identity"),
+    UniqueConstraint("team_season_id", "season_id", name="uq_team_season_id_season"),
+    schema="football",
+)
+
 fixture = Table(
     "fixture",
     metadata,
@@ -240,6 +277,25 @@ fixture = Table(
         name="fk_fixture_canonical_type",
         ondelete="RESTRICT",
     ),
+    ForeignKeyConstraint(
+        ["season_id", "competition_id"],
+        ["football.season.season_id", "football.season.competition_id"],
+        name="fk_fixture_season_competition",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["home_team_id", "season_id"],
+        ["football.team_season.team_id", "football.team_season.season_id"],
+        name="fk_fixture_home_team_season",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["away_team_id", "season_id"],
+        ["football.team_season.team_id", "football.team_season.season_id"],
+        name="fk_fixture_away_team_season",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint("fixture_id", "season_id", name="uq_fixture_id_season"),
     CheckConstraint("entity_type = 'FIXTURE'", name="ck_fixture_entity_type"),
     CheckConstraint("home_team_id <> away_team_id", name="ck_fixture_distinct_teams"),
     schema="football",
@@ -266,6 +322,7 @@ gameweek = Table(
         ondelete="RESTRICT",
     ),
     UniqueConstraint("season_id", "number", name="uq_gameweek_season_number"),
+    UniqueConstraint("gameweek_id", "season_id", name="uq_gameweek_id_season"),
     CheckConstraint("entity_type = 'GAMEWEEK'", name="ck_gameweek_entity_type"),
     CheckConstraint("number BETWEEN 1 AND 60", name="ck_gameweek_number"),
     CheckConstraint("status IN ('DRAFT','OPEN','CLOSED','FINAL')", name="ck_gameweek_status"),
@@ -307,10 +364,11 @@ raw_blob = Table(
     metadata,
     Column("raw_blob_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")),
     Column("body_sha256", CHAR(64), nullable=False),
+    # DAT-003 compatibility metadata. New FPL-004 writes use raw_storage_object.
     Column("stored_blob_sha256", CHAR(64)),
     Column("byte_size", BigInteger, nullable=False),
     Column("storage_uri", Text),
-    Column("storage_policy", String(24), nullable=False),
+    Column("storage_policy", String(24)),
     Column("content_type", Text),
     Column(
         "created_at",
@@ -319,6 +377,9 @@ raw_blob = Table(
         server_default=text("transaction_timestamp()"),
     ),
     UniqueConstraint("body_sha256", name="uq_raw_blob_body_sha256"),
+    UniqueConstraint(
+        "raw_blob_id", "body_sha256", "byte_size", name="uq_raw_blob_content_coherence"
+    ),
     CheckConstraint("body_sha256 ~ '^[0-9a-f]{64}$'", name="ck_raw_blob_body_hash"),
     CheckConstraint(
         "stored_blob_sha256 IS NULL OR stored_blob_sha256 ~ '^[0-9a-f]{64}$'",
@@ -326,12 +387,139 @@ raw_blob = Table(
     ),
     CheckConstraint("byte_size >= 0", name="ck_raw_blob_byte_size"),
     CheckConstraint(
-        "storage_policy IN ('ALLOWED','FORBIDDEN','EPHEMERAL','DELETED')",
+        "storage_policy IS NULL OR storage_policy IN ('ALLOWED','FORBIDDEN','EPHEMERAL','DELETED')",
         name="ck_raw_blob_policy",
     ),
     CheckConstraint(
         "storage_policy <> 'FORBIDDEN' OR (storage_uri IS NULL AND stored_blob_sha256 IS NULL)",
         name="ck_raw_blob_forbidden_storage",
+    ),
+    schema="provenance",
+)
+
+rights_profile = Table(
+    "rights_profile",
+    metadata,
+    Column(
+        "rights_profile_record_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column("rights_profile_id", String(120), nullable=False),
+    Column("provider_key", String(80), nullable=False),
+    Column("profile_version", String(40), nullable=False),
+    Column("status", String(24), nullable=False),
+    Column("capabilities", JSONB, nullable=False),
+    Column("retention_seconds", BigInteger),
+    Column("retention_reason", Text),
+    Column("termination_deletion_required", Boolean, nullable=False),
+    Column("attribution_required", Boolean, nullable=False),
+    Column("attribution_text", Text),
+    Column("geography_scope", Text, nullable=False),
+    Column("account_scope", Text, nullable=False),
+    Column("approved_purpose", Text, nullable=False),
+    Column("terms_source", Text, nullable=False),
+    Column("terms_version", Text, nullable=False),
+    Column("checked_at", DateTime(timezone=True), nullable=False),
+    Column("human_approval_id", Text, nullable=False),
+    Column("approved_by", Text, nullable=False),
+    Column("approved_at", DateTime(timezone=True), nullable=False),
+    Column("notes", Text, nullable=False, server_default=""),
+    Column("unresolved_rights", JSONB, nullable=False, server_default=text("'[]'::jsonb")),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint(
+        "rights_profile_id", "profile_version", name="uq_rights_profile_identity_version"
+    ),
+    UniqueConstraint(
+        "rights_profile_record_id",
+        "rights_profile_id",
+        "profile_version",
+        name="uq_rights_profile_record_identity_version",
+    ),
+    ForeignKeyConstraint(
+        ["provider_key"],
+        ["provenance.data_provider.provider_key"],
+        name="fk_rights_profile_provider_key",
+        ondelete="RESTRICT",
+    ),
+    CheckConstraint(
+        "status IN ('DRAFT','HUMAN_APPROVED','BLOCKED','SUPERSEDED','WITHDRAWN')",
+        name="ck_rights_profile_status",
+    ),
+    CheckConstraint(
+        "retention_seconds IS NULL OR retention_seconds >= 0",
+        name="ck_rights_profile_retention",
+    ),
+    CheckConstraint(
+        "jsonb_typeof(capabilities) = 'object'",
+        name="ck_rights_profile_capabilities_object",
+    ),
+    schema="provenance",
+)
+
+raw_storage_object = Table(
+    "raw_storage_object",
+    metadata,
+    Column(
+        "raw_storage_object_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "raw_blob_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.raw_blob.raw_blob_id", name="fk_raw_storage_content", ondelete="RESTRICT"
+        ),
+        nullable=False,
+    ),
+    Column(
+        "rights_profile_record_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.rights_profile.rights_profile_record_id",
+            name="fk_raw_storage_rights_profile",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("stored_blob_sha256", CHAR(64), nullable=False),
+    Column("storage_uri", Text, nullable=False),
+    Column("storage_policy", String(24), nullable=False),
+    Column("content_type", Text, nullable=False),
+    Column("retention_seconds", BigInteger),
+    Column("access_allowed", Boolean, nullable=False),
+    Column("export_allowed", Boolean, nullable=False),
+    Column("backup_allowed", Boolean, nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint(
+        "raw_blob_id",
+        "storage_uri",
+        name="uq_raw_storage_context_uri",
+    ),
+    UniqueConstraint(
+        "raw_storage_object_id",
+        "raw_blob_id",
+        "rights_profile_record_id",
+        name="uq_raw_storage_coherence",
+    ),
+    CheckConstraint("stored_blob_sha256 ~ '^[0-9a-f]{64}$'", name="ck_raw_storage_stored_hash"),
+    CheckConstraint("storage_policy IN ('ALLOWED','EPHEMERAL')", name="ck_raw_storage_policy"),
+    CheckConstraint(
+        "retention_seconds IS NULL OR retention_seconds >= 0",
+        name="ck_raw_storage_retention",
     ),
     schema="provenance",
 )
@@ -396,6 +584,7 @@ source_snapshot = Table(
             ondelete="RESTRICT",
         ),
     ),
+    Column("attempt_number", Integer),
     Column(
         "provider_id",
         UUID(as_uuid=True),
@@ -440,6 +629,65 @@ source_snapshot = Table(
         nullable=False,
         server_default=text("transaction_timestamp()"),
     ),
+    Column("body_size", BigInteger),
+    Column("sanitized_target", Text),
+    Column(
+        "raw_storage_object_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.raw_storage_object.raw_storage_object_id",
+            name="fk_source_snapshot_raw_storage",
+            ondelete="RESTRICT",
+        ),
+    ),
+    Column("rights_profile_version", String(40)),
+    Column(
+        "rights_profile_record_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.rights_profile.rights_profile_record_id",
+            name="fk_source_snapshot_rights_profile",
+            ondelete="RESTRICT",
+        ),
+    ),
+    Column("adapter_version", String(40)),
+    Column("contract_version", String(40)),
+    Column("envelope_sha256", CHAR(64)),
+    ForeignKeyConstraint(
+        ["raw_storage_object_id", "raw_blob_id", "rights_profile_record_id"],
+        [
+            "provenance.raw_storage_object.raw_storage_object_id",
+            "provenance.raw_storage_object.raw_blob_id",
+            "provenance.raw_storage_object.rights_profile_record_id",
+        ],
+        name="fk_source_snapshot_raw_storage_coherence",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["raw_blob_id", "body_sha256", "body_size"],
+        [
+            "provenance.raw_blob.raw_blob_id",
+            "provenance.raw_blob.body_sha256",
+            "provenance.raw_blob.byte_size",
+        ],
+        name="fk_source_snapshot_raw_content_coherence",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["rights_profile_record_id", "rights_profile_key", "rights_profile_version"],
+        [
+            "provenance.rights_profile.rights_profile_record_id",
+            "provenance.rights_profile.rights_profile_id",
+            "provenance.rights_profile.profile_version",
+        ],
+        name="fk_source_snapshot_rights_profile_version",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint(
+        "source_snapshot_id",
+        "rights_profile_record_id",
+        name="uq_source_snapshot_rights_profile",
+    ),
     CheckConstraint(
         "request_fingerprint ~ '^[0-9a-f]{64}$'",
         name="ck_source_snapshot_request_hash",
@@ -447,6 +695,16 @@ source_snapshot = Table(
     CheckConstraint(
         "body_sha256 IS NULL OR body_sha256 ~ '^[0-9a-f]{64}$'",
         name="ck_source_snapshot_body_hash",
+    ),
+    CheckConstraint(
+        "envelope_sha256 IS NULL OR envelope_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_source_snapshot_envelope_hash",
+    ),
+    CheckConstraint("body_size IS NULL OR body_size >= 0", name="ck_source_snapshot_body_size"),
+    CheckConstraint(
+        "(ingestion_run_id IS NULL) = (attempt_number IS NULL) "
+        "AND (attempt_number IS NULL OR attempt_number > 0)",
+        name="ck_source_snapshot_attempt",
     ),
     CheckConstraint(
         "schema_fingerprint IS NULL OR schema_fingerprint ~ '^[0-9a-f]{64}$'",
@@ -484,10 +742,189 @@ source_snapshot = Table(
         name="ck_source_snapshot_usable",
     ),
     CheckConstraint(
-        "(raw_storage_policy <> 'FORBIDDEN' OR raw_blob_id IS NULL) "
-        "AND (raw_storage_policy <> 'ALLOWED' OR body_sha256 IS NULL OR raw_blob_id IS NOT NULL) "
+        "(raw_storage_policy <> 'FORBIDDEN' OR raw_storage_object_id IS NULL) "
+        "AND (raw_storage_policy <> 'ALLOWED' OR body_sha256 IS NULL "
+        "OR raw_blob_id IS NOT NULL) "
+        "AND (rights_profile_record_id IS NULL OR raw_storage_policy <> 'ALLOWED' "
+        "OR body_sha256 IS NULL OR raw_storage_object_id IS NOT NULL) "
+        "AND (raw_storage_object_id IS NULL OR raw_blob_id IS NOT NULL) "
+        "AND (raw_storage_object_id IS NULL OR rights_profile_record_id IS NOT NULL) "
+        "AND (rights_profile_record_id IS NULL OR rights_profile_version IS NOT NULL) "
+        "AND (rights_profile_record_id IS NULL OR body_sha256 IS NULL "
+        "OR body_size IS NOT NULL) "
         "AND (raw_blob_id IS NULL OR body_sha256 IS NOT NULL)",
         name="ck_source_snapshot_retention",
+    ),
+    schema="provenance",
+)
+
+rights_decision = Table(
+    "rights_decision",
+    metadata,
+    Column(
+        "rights_decision_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column(
+        "rights_profile_record_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.rights_profile.rights_profile_record_id",
+            name="fk_rights_decision_profile",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("source_snapshot_id", UUID(as_uuid=True)),
+    Column("capability", String(48), nullable=False),
+    Column("decision", String(8), nullable=False),
+    Column("reason_code", String(80), nullable=False),
+    Column("checked_at", DateTime(timezone=True), nullable=False),
+    Column("context_sha256", CHAR(64), nullable=False),
+    ForeignKeyConstraint(
+        ["source_snapshot_id", "rights_profile_record_id"],
+        [
+            "provenance.source_snapshot.source_snapshot_id",
+            "provenance.source_snapshot.rights_profile_record_id",
+        ],
+        name="fk_rights_decision_snapshot_profile",
+        ondelete="RESTRICT",
+    ),
+    CheckConstraint("decision IN ('ALLOW','DENY')", name="ck_rights_decision_value"),
+    CheckConstraint("context_sha256 ~ '^[0-9a-f]{64}$'", name="ck_rights_decision_context_hash"),
+    schema="provenance",
+)
+
+source_processing_event = Table(
+    "source_processing_event",
+    metadata,
+    Column(
+        "processing_event_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_processing_event_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("operation_id", UUID(as_uuid=True), nullable=False),
+    Column(
+        "previous_event_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_processing_event.processing_event_id",
+            name="fk_processing_event_previous",
+            ondelete="RESTRICT",
+        ),
+    ),
+    Column("sequence_number", Integer, nullable=False),
+    Column("stage", String(32), nullable=False),
+    Column("outcome", String(24), nullable=False, server_default="SUCCEEDED"),
+    Column("event_at", DateTime(timezone=True), nullable=False),
+    Column("stage_version", String(40), nullable=False),
+    Column("input_sha256", CHAR(64)),
+    Column("output_sha256", CHAR(64)),
+    Column("event_sha256", CHAR(64), nullable=False),
+    Column("safe_details", JSONB, nullable=False, server_default=text("'{}'::jsonb")),
+    Column("error_code", String(80)),
+    Column("actor", String(80), nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint(
+        "source_snapshot_id", "sequence_number", name="uq_processing_event_snapshot_sequence"
+    ),
+    UniqueConstraint("event_sha256", name="uq_processing_event_hash"),
+    CheckConstraint("sequence_number > 0", name="ck_processing_event_sequence"),
+    CheckConstraint(
+        "stage IN ('RECEIVED','STORED','RAW_DISCARDED','PARSED','VALIDATED','MAPPED',"
+        "'PROMOTED','QUALITY_PASSED','USABLE','QUARANTINED','REJECTED','CANCELLED',"
+        "'FAILED_RETRYABLE','FAILED_PERMANENT')",
+        name="ck_processing_event_stage",
+    ),
+    CheckConstraint(
+        "outcome IN ('SUCCEEDED','FAILED_RETRYABLE','FAILED_PERMANENT')",
+        name="ck_processing_event_outcome",
+    ),
+    CheckConstraint(
+        "input_sha256 IS NULL OR input_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_processing_event_input_hash",
+    ),
+    CheckConstraint(
+        "output_sha256 IS NULL OR output_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_processing_event_output_hash",
+    ),
+    CheckConstraint("event_sha256 ~ '^[0-9a-f]{64}$'", name="ck_processing_event_event_hash"),
+    CheckConstraint(
+        "jsonb_typeof(safe_details) = 'object'", name="ck_processing_event_details_object"
+    ),
+    schema="provenance",
+)
+
+source_mapping_candidate = Table(
+    "source_mapping_candidate",
+    metadata,
+    Column(
+        "mapping_candidate_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "provider_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.data_provider.provider_id",
+            name="fk_mapping_candidate_provider",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("competition_key", String(80), nullable=False),
+    Column("season_code", String(32), nullable=False),
+    Column("provider_product", String(64), nullable=False),
+    Column("identifier_namespace", String(96), nullable=False),
+    Column("entity_type", String(32), nullable=False),
+    Column("external_id_text", Text, nullable=False),
+    Column("planned_entity_id", UUID(as_uuid=True), nullable=False),
+    Column(
+        "evidence_source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_mapping_candidate_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint(
+        "provider_id",
+        "competition_key",
+        "season_code",
+        "provider_product",
+        "identifier_namespace",
+        "entity_type",
+        "external_id_text",
+        name="uq_mapping_candidate_scope",
+    ),
+    CheckConstraint(
+        "entity_type IN ('COMPETITION','SEASON','TEAM','PLAYER','GAMEWEEK','FIXTURE')",
+        name="ck_mapping_candidate_entity_type",
     ),
     schema="provenance",
 )
@@ -512,6 +949,34 @@ raw_blob_deletion = Table(
     Column("approved_by", Text, nullable=False),
     UniqueConstraint("raw_blob_id", name="uq_raw_blob_deletion_raw"),
     CheckConstraint("tombstone_sha256 ~ '^[0-9a-f]{64}$'", name="ck_raw_blob_deletion_hash"),
+    schema="provenance",
+)
+
+raw_storage_deletion = Table(
+    "raw_storage_deletion",
+    metadata,
+    Column(
+        "raw_storage_deletion_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "raw_storage_object_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.raw_storage_object.raw_storage_object_id",
+            name="fk_raw_storage_deletion_object",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("deleted_at", DateTime(timezone=True), nullable=False),
+    Column("reason", Text, nullable=False),
+    Column("tombstone_sha256", CHAR(64), nullable=False),
+    Column("approved_by", Text, nullable=False),
+    UniqueConstraint("raw_storage_object_id", name="uq_raw_storage_deletion_object"),
+    CheckConstraint("tombstone_sha256 ~ '^[0-9a-f]{64}$'", name="ck_raw_storage_deletion_hash"),
     schema="provenance",
 )
 
@@ -583,6 +1048,15 @@ external_identifier = Table(
         "superseded_by_mapping_id",
         "core.external_identifier.external_identifier_id",
         "fk_external_identifier_successor",
+    ),
+    Column(
+        "season_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.season.season_id",
+            name="fk_external_identifier_season",
+            ondelete="RESTRICT",
+        ),
     ),
     ForeignKeyConstraint(
         ["canonical_entity_id", "entity_type"],
@@ -721,6 +1195,12 @@ player_team_membership = Table(
         "football.player_team_membership.membership_id",
         "fk_membership_successor",
     ),
+    ForeignKeyConstraint(
+        ["team_id", "season_id"],
+        ["football.team_season.team_id", "football.team_season.season_id"],
+        name="fk_membership_team_season",
+        ondelete="RESTRICT",
+    ),
     CheckConstraint(_canonical_range_check("valid_during"), name="ck_membership_valid_range"),
     CheckConstraint(_canonical_range_check("system_during"), name="ck_membership_system_range"),
     CheckConstraint(
@@ -825,6 +1305,19 @@ fixture_gameweek_assignment = Table(
         "football.fixture_gameweek_assignment.assignment_id",
         "fk_assignment_successor",
     ),
+    Column("season_id", UUID(as_uuid=True), nullable=False),
+    ForeignKeyConstraint(
+        ["fixture_id", "season_id"],
+        ["football.fixture.fixture_id", "football.fixture.season_id"],
+        name="fk_assignment_fixture_season",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["gameweek_id", "season_id"],
+        ["fpl.gameweek.gameweek_id", "fpl.gameweek.season_id"],
+        name="fk_assignment_gameweek_season",
+        ondelete="RESTRICT",
+    ),
     CheckConstraint(
         "assignment_status IN ('ASSIGNED','UNASSIGNED','PROVISIONAL','FINAL')",
         name="ck_assignment_status",
@@ -838,6 +1331,507 @@ fixture_gameweek_assignment = Table(
     CheckConstraint(_canonical_range_check("valid_during"), name="ck_assignment_valid_range"),
     CheckConstraint(_canonical_range_check("system_during"), name="ck_assignment_system_range"),
     schema="football",
+)
+
+player_season = Table(
+    "player_season",
+    metadata,
+    Column(
+        "player_fpl_season_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "player_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.player.player_id", name="fk_player_season_player", ondelete="RESTRICT"
+        ),
+        nullable=False,
+    ),
+    Column(
+        "season_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.season.season_id", name="fk_player_season_season", ondelete="RESTRICT"
+        ),
+        nullable=False,
+    ),
+    Column("position_code", String(24), nullable=False),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_player_season_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("player_id", "season_id", name="uq_player_season_identity"),
+    UniqueConstraint("player_fpl_season_id", "season_id", name="uq_player_season_id_season"),
+    schema="fpl",
+)
+
+team_observation = Table(
+    "team_observation",
+    metadata,
+    Column(
+        "team_observation_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column(
+        "team_season_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.team_season.team_season_id",
+            name="fk_team_observation_team_season",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("display_name", Text, nullable=False),
+    Column("short_name", String(40), nullable=False),
+    Column("strength", Integer),
+    Column("strength_overall_home", Integer),
+    Column("strength_overall_away", Integer),
+    Column("strength_attack_home", Integer),
+    Column("strength_attack_away", Integer),
+    Column("strength_defence_home", Integer),
+    Column("strength_defence_away", Integer),
+    Column("position", Integer),
+    Column("played", Integer),
+    Column("win", Integer),
+    Column("draw", Integer),
+    Column("loss", Integer),
+    Column("points", Integer),
+    Column("observed_at", DateTime(timezone=True), nullable=False),
+    Column("received_at", DateTime(timezone=True), nullable=False),
+    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_team_observation_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("contract_version", String(40), nullable=False),
+    Column("missingness", JSONB, nullable=False),
+    Column("semantic_sha256", CHAR(64), nullable=False),
+    UniqueConstraint(
+        "semantic_sha256",
+        "source_snapshot_id",
+        name="uq_team_observation_semantic_source",
+    ),
+    CheckConstraint("semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_team_observation_semantic_hash"),
+    CheckConstraint("jsonb_typeof(missingness) = 'object'", name="ck_team_observation_missingness"),
+    CheckConstraint("received_at <= usable_at", name="ck_team_observation_time_order"),
+    schema="fpl",
+)
+
+player_observation = Table(
+    "player_observation",
+    metadata,
+    Column(
+        "player_observation_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "player_fpl_season_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "fpl.player_season.player_fpl_season_id",
+            name="fk_player_observation_player_season",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "team_season_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.team_season.team_season_id",
+            name="fk_player_observation_team_season",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("position_code", String(24), nullable=False),
+    Column("price_tenths", Integer, nullable=False),
+    Column("status", String(24), nullable=False),
+    Column("chance_next_round", SmallInteger),
+    Column("chance_this_round", SmallInteger),
+    Column("news", Text),
+    Column("news_added_at", DateTime(timezone=True)),
+    Column("selected_by_percent", Numeric(7, 3)),
+    Column("transfers_in", BigInteger),
+    Column("transfers_out", BigInteger),
+    Column("transfers_in_event", BigInteger),
+    Column("transfers_out_event", BigInteger),
+    Column("cost_change_start", Integer),
+    Column("cost_change_event", Integer),
+    Column("cost_change_start_fall", Integer),
+    Column("cost_change_event_fall", Integer),
+    Column("minutes", Integer),
+    Column("total_points", Integer),
+    Column("observed_at", DateTime(timezone=True), nullable=False),
+    Column("received_at", DateTime(timezone=True), nullable=False),
+    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_player_observation_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("contract_version", String(40), nullable=False),
+    Column("missingness", JSONB, nullable=False),
+    Column("semantic_sha256", CHAR(64), nullable=False),
+    UniqueConstraint(
+        "semantic_sha256",
+        "source_snapshot_id",
+        name="uq_player_observation_semantic_source",
+    ),
+    CheckConstraint("price_tenths >= 0", name="ck_player_observation_price"),
+    CheckConstraint(
+        "chance_next_round IS NULL OR chance_next_round BETWEEN 0 AND 100",
+        name="ck_player_observation_chance_next",
+    ),
+    CheckConstraint(
+        "chance_this_round IS NULL OR chance_this_round BETWEEN 0 AND 100",
+        name="ck_player_observation_chance_this",
+    ),
+    CheckConstraint(
+        "selected_by_percent IS NULL OR selected_by_percent BETWEEN 0 AND 100",
+        name="ck_player_observation_ownership",
+    ),
+    CheckConstraint(
+        "semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_player_observation_semantic_hash"
+    ),
+    CheckConstraint(
+        "jsonb_typeof(missingness) = 'object'", name="ck_player_observation_missingness"
+    ),
+    CheckConstraint("received_at <= usable_at", name="ck_player_observation_time_order"),
+    schema="fpl",
+)
+
+gameweek_observation = Table(
+    "gameweek_observation",
+    metadata,
+    Column(
+        "gameweek_observation_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "gameweek_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "fpl.gameweek.gameweek_id", name="fk_gameweek_observation_gameweek", ondelete="RESTRICT"
+        ),
+        nullable=False,
+    ),
+    Column("source_event_id", Text, nullable=False),
+    Column("display_name", Text, nullable=False),
+    Column("deadline_at", DateTime(timezone=True), nullable=False),
+    Column("finished", Boolean),
+    Column("data_checked", Boolean),
+    Column("is_previous", Boolean),
+    Column("is_current", Boolean),
+    Column("is_next", Boolean),
+    Column("average_entry_score", Integer),
+    Column("highest_score", Integer),
+    Column("observed_at", DateTime(timezone=True), nullable=False),
+    Column("received_at", DateTime(timezone=True), nullable=False),
+    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_gameweek_observation_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("contract_version", String(40), nullable=False),
+    Column("missingness", JSONB, nullable=False),
+    Column("semantic_sha256", CHAR(64), nullable=False),
+    UniqueConstraint(
+        "semantic_sha256",
+        "source_snapshot_id",
+        name="uq_gameweek_observation_semantic_source",
+    ),
+    CheckConstraint(
+        "semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_gameweek_observation_semantic_hash"
+    ),
+    CheckConstraint(
+        "jsonb_typeof(missingness) = 'object'", name="ck_gameweek_observation_missingness"
+    ),
+    CheckConstraint("received_at <= usable_at", name="ck_gameweek_observation_time_order"),
+    schema="fpl",
+)
+
+fixture_observation = Table(
+    "fixture_observation",
+    metadata,
+    Column(
+        "fixture_observation_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "fixture_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.fixture.fixture_id",
+            name="fk_fixture_observation_fixture",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("source_fixture_id", Text, nullable=False),
+    Column("source_fixture_code", Text, nullable=False),
+    Column("kickoff_at", DateTime(timezone=True)),
+    Column("finished", Boolean, nullable=False),
+    Column("started", Boolean),
+    Column("finished_provisional", Boolean),
+    Column("minutes", Integer),
+    Column("team_h_score", Integer),
+    Column("team_a_score", Integer),
+    Column("team_h_difficulty", Integer),
+    Column("team_a_difficulty", Integer),
+    Column("provisional_start_time", Boolean),
+    Column("observed_at", DateTime(timezone=True), nullable=False),
+    Column("received_at", DateTime(timezone=True), nullable=False),
+    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_fixture_observation_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("contract_version", String(40), nullable=False),
+    Column("missingness", JSONB, nullable=False),
+    Column("semantic_sha256", CHAR(64), nullable=False),
+    UniqueConstraint(
+        "semantic_sha256",
+        "source_snapshot_id",
+        name="uq_fixture_observation_semantic_source",
+    ),
+    CheckConstraint(
+        "semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_fixture_observation_semantic_hash"
+    ),
+    CheckConstraint(
+        "jsonb_typeof(missingness) = 'object'", name="ck_fixture_observation_missingness"
+    ),
+    CheckConstraint("received_at <= usable_at", name="ck_fixture_observation_time_order"),
+    schema="fpl",
+)
+
+semantic_effect_source = Table(
+    "semantic_effect_source",
+    metadata,
+    Column(
+        "semantic_effect_source_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column("effect_type", String(40), nullable=False),
+    Column("semantic_sha256", CHAR(64), nullable=False),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_semantic_effect_source_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("observed_at", DateTime(timezone=True), nullable=False),
+    UniqueConstraint(
+        "effect_type",
+        "semantic_sha256",
+        "source_snapshot_id",
+        name="uq_semantic_effect_source_lineage",
+    ),
+    CheckConstraint("semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_semantic_effect_source_hash"),
+    schema="provenance",
+)
+
+semantic_observation_claim = Table(
+    "semantic_observation_claim",
+    metadata,
+    Column(
+        "semantic_observation_claim_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column("effect_type", String(40), nullable=False),
+    Column("subject_key", UUID(as_uuid=True), nullable=False),
+    Column("observed_at", DateTime(timezone=True), nullable=False),
+    Column("semantic_sha256", CHAR(64), nullable=False),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_semantic_observation_claim_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    UniqueConstraint(
+        "effect_type",
+        "subject_key",
+        "observed_at",
+        name="uq_semantic_observation_claim_subject_time",
+    ),
+    CheckConstraint(
+        "effect_type IN ('TEAM_OBSERVATION','PLAYER_OBSERVATION',"
+        "'GAMEWEEK_OBSERVATION','FIXTURE_OBSERVATION')",
+        name="ck_semantic_observation_claim_type",
+    ),
+    CheckConstraint(
+        "semantic_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_semantic_observation_claim_hash",
+    ),
+    schema="provenance",
+)
+
+source_bundle = Table(
+    "source_bundle",
+    metadata,
+    Column(
+        "source_bundle_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column("bundle_type", String(48), nullable=False),
+    Column(
+        "competition_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.competition.competition_id",
+            name="fk_source_bundle_competition",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "season_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.season.season_id", name="fk_source_bundle_season", ondelete="RESTRICT"
+        ),
+        nullable=False,
+    ),
+    Column("information_cutoff", DateTime(timezone=True), nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("rights_profiles", JSONB, nullable=False),
+    Column("adapter_version", String(40), nullable=False),
+    Column("contract_version", String(40), nullable=False),
+    Column("quality_status", String(32), nullable=False),
+    Column("semantic_sha256", CHAR(64), nullable=False),
+    Column("manifest_sha256", CHAR(64), nullable=False),
+    Column("code_commit", CHAR(40)),
+    Column("config_sha256", CHAR(64), nullable=False),
+    UniqueConstraint("manifest_sha256", name="uq_source_bundle_manifest_hash"),
+    ForeignKeyConstraint(
+        ["season_id", "competition_id"],
+        ["football.season.season_id", "football.season.competition_id"],
+        name="fk_source_bundle_season_competition",
+        ondelete="RESTRICT",
+    ),
+    CheckConstraint("bundle_type = 'FPL_BOOTSTRAP_FIXTURES'", name="ck_source_bundle_type"),
+    CheckConstraint(
+        "quality_status IN ('PASS','PASS_WITH_WARNINGS')",
+        name="ck_source_bundle_quality_status",
+    ),
+    CheckConstraint("semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_source_bundle_semantic_hash"),
+    CheckConstraint("manifest_sha256 ~ '^[0-9a-f]{64}$'", name="ck_source_bundle_manifest_hash"),
+    CheckConstraint("config_sha256 ~ '^[0-9a-f]{64}$'", name="ck_source_bundle_config_hash"),
+    CheckConstraint(
+        "code_commit IS NULL OR code_commit ~ '^[0-9a-f]{40}$'",
+        name="ck_source_bundle_code_commit",
+    ),
+    schema="provenance",
+)
+
+source_bundle_member = Table(
+    "source_bundle_member",
+    metadata,
+    Column(
+        "source_bundle_member_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "source_bundle_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_bundle.source_bundle_id",
+            name="fk_source_bundle_member_bundle",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_snapshot.source_snapshot_id",
+            name="fk_source_bundle_member_snapshot",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("role", String(16), nullable=False),
+    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column("payload_semantic_sha256", CHAR(64), nullable=False),
+    Column("envelope_sha256", CHAR(64), nullable=False),
+    Column("lifecycle_sha256", CHAR(64), nullable=False),
+    Column("schema_drift", JSONB, nullable=False),
+    UniqueConstraint("source_bundle_id", "role", name="uq_source_bundle_member_role"),
+    UniqueConstraint(
+        "source_bundle_id", "source_snapshot_id", name="uq_source_bundle_member_snapshot"
+    ),
+    CheckConstraint("role IN ('BOOTSTRAP','FIXTURES')", name="ck_source_bundle_member_role"),
+    CheckConstraint(
+        "payload_semantic_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_source_bundle_member_payload_hash",
+    ),
+    CheckConstraint(
+        "envelope_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_source_bundle_member_envelope_hash",
+    ),
+    CheckConstraint(
+        "lifecycle_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_source_bundle_member_lifecycle_hash",
+    ),
+    schema="provenance",
 )
 
 data_quality_issue = Table(
@@ -884,8 +1878,22 @@ data_quality_issue = Table(
     Column("owner", Text),
     Column("decision_impact", Text, nullable=False),
     Column("details", JSONB, nullable=False, server_default=text("'{}'::jsonb")),
+    Column(
+        "source_bundle_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.source_bundle.source_bundle_id",
+            name="fk_data_quality_source_bundle",
+            ondelete="RESTRICT",
+        ),
+    ),
+    Column("subject_scope", String(32), nullable=False),
+    Column("stage", String(40), nullable=False),
+    Column("message", Text, nullable=False),
+    Column("review_at", DateTime(timezone=True)),
     CheckConstraint(
-        "severity IN ('INFO','WARN','ERROR','BLOCKING')", name="ck_data_quality_severity"
+        "severity IN ('P0','P1','P2','P3')",
+        name="ck_data_quality_severity",
     ),
     CheckConstraint(
         "status IN ('OPEN','ACKNOWLEDGED','RESOLVED','SUPERSEDED')",
@@ -894,6 +1902,16 @@ data_quality_issue = Table(
     CheckConstraint(
         "resolved_at IS NULL OR resolved_at >= detected_at",
         name="ck_data_quality_resolution",
+    ),
+    CheckConstraint(
+        "(subject_scope = 'SOURCE_SNAPSHOT' AND source_snapshot_id IS NOT NULL) OR "
+        "(subject_scope = 'INGESTION_RUN' AND ingestion_run_id IS NOT NULL) OR "
+        "(subject_scope = 'CANONICAL_ENTITY' AND canonical_entity_id IS NOT NULL) OR "
+        "(subject_scope = 'SOURCE_BUNDLE' AND source_bundle_id IS NOT NULL) OR "
+        "(subject_scope = 'GLOBAL_SYSTEM' AND source_snapshot_id IS NULL "
+        "AND ingestion_run_id IS NULL AND canonical_entity_id IS NULL "
+        "AND source_bundle_id IS NULL)",
+        name="ck_data_quality_subject",
     ),
     schema="core",
 )
@@ -915,8 +1933,7 @@ ruleset_artifact = Table(
     UniqueConstraint(
         "ruleset_id",
         "ruleset_version",
-        "source_ruleset_hash",
-        name="uq_ruleset_artifact_identity_hash",
+        name="uq_ruleset_artifact_identity",
     ),
     CheckConstraint(
         "source_ruleset_hash ~ '^[0-9a-f]{64}$'",
@@ -972,6 +1989,13 @@ ruleset_activation = Table(
 external_identifier.append_constraint(
     ExcludeConstraint(
         (external_identifier.c.provider_id, "="),
+        (
+            func.coalesce(
+                external_identifier.c.season_id,
+                text("'00000000-0000-0000-0000-000000000000'::uuid"),
+            ),
+            "=",
+        ),
         (external_identifier.c.provider_product, "="),
         (external_identifier.c.identifier_namespace, "="),
         (external_identifier.c.entity_type, "="),
@@ -1035,6 +2059,8 @@ fixture_gameweek_assignment.append_constraint(
 )
 
 Index("ix_season_competition", season.c.competition_id)
+Index("ix_team_season_season", team_season.c.season_id)
+Index("ix_team_season_snapshot", team_season.c.source_snapshot_id)
 Index("ix_fixture_competition", fixture.c.competition_id)
 Index("ix_fixture_season", fixture.c.season_id)
 Index("ix_fixture_home_team", fixture.c.home_team_id)
@@ -1044,8 +2070,21 @@ Index("ix_ingestion_run_provider", ingestion_run.c.provider_id)
 Index("ix_source_snapshot_provider", source_snapshot.c.provider_id)
 Index("ix_source_snapshot_run", source_snapshot.c.ingestion_run_id)
 Index("ix_source_snapshot_raw", source_snapshot.c.raw_blob_id)
+Index("ix_source_snapshot_raw_storage", source_snapshot.c.raw_storage_object_id)
+Index("ix_source_snapshot_rights_profile", source_snapshot.c.rights_profile_record_id)
+Index("ix_rights_profile_provider", rights_profile.c.provider_key)
+Index("ix_raw_storage_content", raw_storage_object.c.raw_blob_id)
+Index("ix_raw_storage_rights", raw_storage_object.c.rights_profile_record_id)
+Index("ix_rights_decision_profile", rights_decision.c.rights_profile_record_id)
+Index("ix_rights_decision_snapshot", rights_decision.c.source_snapshot_id)
+Index(
+    "ix_processing_event_snapshot_sequence",
+    source_processing_event.c.source_snapshot_id,
+    source_processing_event.c.sequence_number,
+)
 Index("ix_external_identifier_entity", external_identifier.c.canonical_entity_id)
 Index("ix_external_identifier_provider", external_identifier.c.provider_id)
+Index("ix_external_identifier_season", external_identifier.c.season_id)
 Index(
     "ix_external_identifier_snapshot",
     external_identifier.c.evidence_source_snapshot_id,
@@ -1087,6 +2126,7 @@ Index(
     postgresql_using="gist",
 )
 Index("ix_assignment_gameweek", fixture_gameweek_assignment.c.gameweek_id)
+Index("ix_assignment_season", fixture_gameweek_assignment.c.season_id)
 Index("ix_assignment_snapshot", fixture_gameweek_assignment.c.source_snapshot_id)
 Index(
     "ix_assignment_as_of",
@@ -1098,3 +2138,26 @@ Index(
 Index("ix_data_quality_snapshot", data_quality_issue.c.source_snapshot_id)
 Index("ix_data_quality_entity", data_quality_issue.c.canonical_entity_id)
 Index("ix_data_quality_run", data_quality_issue.c.ingestion_run_id)
+Index("ix_data_quality_bundle", data_quality_issue.c.source_bundle_id)
+Index("ix_player_season_season", player_season.c.season_id)
+Index("ix_player_season_snapshot", player_season.c.source_snapshot_id)
+Index("ix_team_observation_subject", team_observation.c.team_season_id)
+Index("ix_team_observation_snapshot", team_observation.c.source_snapshot_id)
+Index("ix_player_observation_subject", player_observation.c.player_fpl_season_id)
+Index("ix_player_observation_team", player_observation.c.team_season_id)
+Index("ix_player_observation_snapshot", player_observation.c.source_snapshot_id)
+Index("ix_gameweek_observation_subject", gameweek_observation.c.gameweek_id)
+Index("ix_gameweek_observation_snapshot", gameweek_observation.c.source_snapshot_id)
+Index("ix_fixture_observation_subject", fixture_observation.c.fixture_id)
+Index("ix_fixture_observation_snapshot", fixture_observation.c.source_snapshot_id)
+Index("ix_semantic_effect_source_snapshot", semantic_effect_source.c.source_snapshot_id)
+Index(
+    "ix_semantic_observation_claim_snapshot",
+    semantic_observation_claim.c.source_snapshot_id,
+)
+Index(
+    "ix_source_bundle_season_cutoff",
+    source_bundle.c.season_id,
+    source_bundle.c.information_cutoff,
+)
+Index("ix_source_bundle_member_snapshot", source_bundle_member.c.source_snapshot_id)

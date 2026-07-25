@@ -49,8 +49,10 @@ from dmf_pulse.data_model.tables import (
     ruleset_activation,
     ruleset_artifact,
     season,
+    source_processing_event,
     source_snapshot,
     team,
+    team_season,
 )
 from dmf_pulse.rules.compiler import ensure_compiled_ruleset_integrity
 from dmf_pulse.rules.errors import RulesError
@@ -95,11 +97,16 @@ def _validate_usable_snapshot(
 ) -> None:
     row = (
         session.execute(
-            select(
-                source_snapshot.c.provider_id,
-                source_snapshot.c.usable_at,
-                source_snapshot.c.validation_status,
-            ).where(source_snapshot.c.source_snapshot_id == snapshot_id)
+            text(
+                """
+                SELECT snapshot.provider_id, lifecycle.usable_at, lifecycle.current_state
+                FROM provenance.source_snapshot AS snapshot
+                JOIN provenance.source_snapshot_lifecycle AS lifecycle
+                  ON lifecycle.source_snapshot_id = snapshot.source_snapshot_id
+                WHERE snapshot.source_snapshot_id = :snapshot_id
+                """
+            ),
+            {"snapshot_id": snapshot_id},
         )
         .mappings()
         .one_or_none()
@@ -107,7 +114,7 @@ def _validate_usable_snapshot(
     known = require_utc(known_at)
     if (
         row is None
-        or row["validation_status"] != "USABLE"
+        or row["current_state"] != "USABLE"
         or row["usable_at"] is None
         or require_utc(row["usable_at"]) > known
         or (provider_id is not None and row["provider_id"] != provider_id)
@@ -115,6 +122,33 @@ def _validate_usable_snapshot(
         raise DataModelError(
             "PROVENANCE_INTEGRITY", "source snapshot was not usable at the fact's known time"
         )
+
+
+def _ensure_team_season(
+    session: Session,
+    *,
+    team_id: UUID,
+    season_id: UUID,
+    source_snapshot_id: UUID | None = None,
+) -> None:
+    session.execute(
+        postgresql_insert(team_season)
+        .values(
+            team_id=team_id,
+            season_id=season_id,
+            source_snapshot_id=source_snapshot_id,
+        )
+        .on_conflict_do_nothing(index_elements=[team_season.c.team_id, team_season.c.season_id])
+    )
+
+
+def _fixture_season(session: Session, fixture_id: UUID) -> UUID:
+    value = session.execute(
+        select(fixture.c.season_id).where(fixture.c.fixture_id == fixture_id)
+    ).scalar_one_or_none()
+    if value is None:
+        raise DataModelError("CANONICAL_ENTITY_NOT_FOUND", "fixture was not found")
+    return _uuid(value)
 
 
 def commit_session(session: Session) -> None:
@@ -177,12 +211,31 @@ class CanonicalRepository:
             raise DataModelError(
                 "ENTITY_ATTRIBUTES_INVALID", "canonical identity attributes are reserved"
             )
+        fixture_context: tuple[UUID, UUID, UUID] | None = None
+        if entity_type is EntityType.FIXTURE:
+            fixture_context = (
+                _uuid(attributes.get("season_id")),
+                _uuid(attributes.get("home_team_id")),
+                _uuid(attributes.get("away_team_id")),
+            )
         try:
             entity_id = self.session.execute(
                 insert(canonical_entity)
                 .values(entity_type=entity_type.value)
                 .returning(canonical_entity.c.entity_id)
             ).scalar_one()
+            if fixture_context is not None:
+                fixture_season_id, home_team_id, away_team_id = fixture_context
+                _ensure_team_season(
+                    self.session,
+                    team_id=home_team_id,
+                    season_id=fixture_season_id,
+                )
+                _ensure_team_season(
+                    self.session,
+                    team_id=away_team_id,
+                    season_id=fixture_season_id,
+                )
             values = {id_column: entity_id, "entity_type": entity_type.value, **attributes}
             self.session.execute(insert(target).values(**values))
             return _uuid(entity_id)
@@ -277,6 +330,7 @@ class ExternalIdentifierRepository:
         mapping_method: MappingMethod = MappingMethod.DETERMINISTIC,
         first_seen_at: datetime,
         last_seen_at: datetime,
+        season_id: UUID | None = None,
         raw_example: str | None = None,
         evidence_source_snapshot_id: UUID | None = None,
     ) -> UUID:
@@ -295,6 +349,7 @@ class ExternalIdentifierRepository:
                     .values(
                         canonical_entity_id=canonical_entity_id,
                         provider_id=provider_id,
+                        season_id=season_id,
                         provider_product=provider_product,
                         identifier_namespace=identifier_namespace,
                         entity_type=entity_type.value,
@@ -370,6 +425,7 @@ class ExternalIdentifierRepository:
                 .values(
                     canonical_entity_id=old["canonical_entity_id"],
                     provider_id=old["provider_id"],
+                    season_id=old["season_id"],
                     provider_product=provider_product,
                     identifier_namespace=identifier_namespace,
                     entity_type=old["entity_type"],
@@ -408,6 +464,7 @@ class ExternalIdentifierRepository:
         provider_id: UUID | None = None,
         provider_product: str | None = None,
         identifier_namespace: str | None = None,
+        season_id: UUID | None = None,
     ) -> dict[str, Any]:
         statement = _as_of_statement(external_identifier, scope).where(
             external_identifier.c.canonical_entity_id == canonical_entity_id
@@ -420,6 +477,8 @@ class ExternalIdentifierRepository:
             statement = statement.where(
                 external_identifier.c.identifier_namespace == identifier_namespace
             )
+        if season_id is not None:
+            statement = statement.where(external_identifier.c.season_id == season_id)
         rows = self.session.execute(statement).mappings().all()
         if not rows:
             raise DataModelError("AS_OF_NOT_FOUND", "external identifier was not found as-of")
@@ -469,6 +528,12 @@ class PlayerMembershipRepository:
                 self.session, source_snapshot_id, known_at=require_utc(known_at)
             )
         try:
+            _ensure_team_season(
+                self.session,
+                team_id=team_id,
+                season_id=season_id,
+                source_snapshot_id=source_snapshot_id,
+            )
             return _uuid(
                 self.session.execute(
                     insert(player_team_membership)
@@ -532,6 +597,12 @@ class PlayerMembershipRepository:
                     "TEMPORAL_SUPERSESSION_CONFLICT", "temporal version cannot be superseded"
                 )
             self.session.execute(text(f"SET CONSTRAINTS {self.CONSTRAINT} DEFERRED"))
+            _ensure_team_season(
+                self.session,
+                team_id=team_id,
+                season_id=season_id,
+                source_snapshot_id=source_snapshot_id,
+            )
             new_id = self.session.execute(
                 insert(player_team_membership)
                 .values(
@@ -684,6 +755,7 @@ class FixtureRepository:
         source_snapshot_id: UUID | None = None,
         supersedes: UUID | None = None,
     ) -> UUID:
+        season_id = _fixture_season(self.session, fixture_id)
         if supersedes is not None:
             if source_snapshot_id is None:
                 raise DataModelError(
@@ -691,6 +763,7 @@ class FixtureRepository:
                 )
             values: dict[str, object] = {
                 "gameweek_id": gameweek_id,
+                "season_id": season_id,
                 "assignment_status": assignment_status.value,
                 "valid_during": _range(valid_range),
                 "source_snapshot_id": source_snapshot_id,
@@ -703,7 +776,7 @@ class FixtureRepository:
                 constraint=self.ASSIGNMENT_CONSTRAINT,
                 known_at=known_at,
                 values=values,
-                expected_lineage={"fixture_id": fixture_id},
+                expected_lineage={"fixture_id": fixture_id, "season_id": season_id},
             )
         if source_snapshot_id is not None:
             _validate_usable_snapshot(
@@ -716,6 +789,7 @@ class FixtureRepository:
                     .values(
                         fixture_id=fixture_id,
                         gameweek_id=gameweek_id,
+                        season_id=season_id,
                         assignment_status=assignment_status.value,
                         valid_during=_range(valid_range),
                         system_during=Range(require_utc(known_at), None, bounds="[)"),
@@ -874,6 +948,8 @@ class SourceObservationRepository:
         storage_uri: str | None = None,
         stored_blob_sha256: str | None = None,
     ) -> UUID:
+        if storage_policy not in {"ALLOWED", "FORBIDDEN", "EPHEMERAL", "DELETED"}:
+            raise DataModelError("RAW_STORAGE_POLICY_INVALID", "raw storage policy is invalid")
         if storage_policy == "FORBIDDEN":
             raise DataModelError(
                 "RAW_STORAGE_FORBIDDEN", "forbidden raw content cannot create a blob record"
@@ -951,11 +1027,79 @@ class SourceObservationRepository:
         schema_fingerprint: str | None = None,
     ) -> UUID:
         try:
+            accepted_statuses = {
+                "RECEIVED",
+                "VALID",
+                "USABLE",
+                "QUARANTINED",
+                "REJECTED",
+                "CANCELLED",
+                "FAILED_RETRYABLE",
+                "FAILED_PERMANENT",
+            }
+            if validation_status not in accepted_statuses:
+                raise DataModelError(
+                    "PROVENANCE_INTEGRITY", "source snapshot status is unsupported"
+                )
             if (validation_status == "USABLE") != (usable_at is not None):
                 raise DataModelError(
                     "PROVENANCE_INTEGRITY",
                     "usable_at must be present exactly when validation_status is USABLE",
                 )
+            received = require_utc(received_at)
+            event_plan: list[tuple[str, datetime]] = [("RECEIVED", received)]
+            if validation_status != "RECEIVED":
+                storage_time = require_utc(stored_at) if stored_at is not None else received
+                if storage_time < received:
+                    raise DataModelError(
+                        "PROVENANCE_INTEGRITY",
+                        "source snapshot lifecycle timestamps are out of order",
+                    )
+                event_plan.append(
+                    (
+                        "RAW_DISCARDED" if raw_storage_policy == "FORBIDDEN" else "STORED",
+                        storage_time,
+                    )
+                )
+                if validation_status in {"VALID", "USABLE"}:
+                    parsed_time = require_utc(parsed_at) if parsed_at is not None else storage_time
+                    mapped_time = require_utc(mapped_at) if mapped_at is not None else parsed_time
+                    if not (storage_time <= parsed_time <= mapped_time):
+                        raise DataModelError(
+                            "PROVENANCE_INTEGRITY",
+                            "source snapshot lifecycle timestamps are out of order",
+                        )
+                    event_plan.extend((("PARSED", parsed_time), ("VALIDATED", parsed_time)))
+                    if validation_status == "USABLE":
+                        if usable_at is None:
+                            raise DataModelError(
+                                "PROVENANCE_INTEGRITY", "usable snapshot is missing usable_at"
+                            )
+                        final_time = require_utc(usable_at)
+                        if mapped_time > final_time:
+                            raise DataModelError(
+                                "PROVENANCE_INTEGRITY",
+                                "source snapshot lifecycle timestamps are out of order",
+                            )
+                        event_plan.extend(
+                            (
+                                ("MAPPED", mapped_time),
+                                ("PROMOTED", mapped_time),
+                                ("QUALITY_PASSED", mapped_time),
+                                ("USABLE", final_time),
+                            )
+                        )
+                else:
+                    terminal_time = (
+                        require_utc(parsed_at) if parsed_at is not None else storage_time
+                    )
+                    if terminal_time < storage_time:
+                        raise DataModelError(
+                            "PROVENANCE_INTEGRITY",
+                            "source snapshot lifecycle timestamps are out of order",
+                        )
+                    event_plan.append((validation_status, terminal_time))
+            raw: RowMapping | None = None
             if raw_blob_id is not None:
                 raw = (
                     self.session.execute(
@@ -981,7 +1125,10 @@ class SourceObservationRepository:
                     raise DataModelError(
                         "RAW_BLOB_DELETED", "deleted raw content cannot back a source snapshot"
                     )
-            return _uuid(
+            raw_size = (
+                int(raw["byte_size"]) if raw_blob_id is not None and raw is not None else None
+            )
+            snapshot_id = _uuid(
                 self.session.execute(
                     insert(source_snapshot)
                     .values(
@@ -1000,27 +1147,130 @@ class SourceObservationRepository:
                             else None
                         ),
                         request_started_at=require_utc(request_started_at),
-                        received_at=require_utc(received_at),
-                        stored_at=require_utc(stored_at) if stored_at is not None else None,
-                        parsed_at=require_utc(parsed_at) if parsed_at is not None else None,
-                        mapped_at=require_utc(mapped_at) if mapped_at is not None else None,
-                        usable_at=require_utc(usable_at) if usable_at is not None else None,
+                        received_at=received,
+                        stored_at=None,
+                        parsed_at=None,
+                        mapped_at=None,
+                        usable_at=None,
                         http_status=http_status,
                         content_type=content_type,
+                        body_size=raw_size,
                         raw_blob_id=raw_blob_id,
                         raw_storage_policy=raw_storage_policy,
                         body_sha256=body_sha256,
                         schema_fingerprint=schema_fingerprint,
                         terms_version=terms_version,
                         rights_profile_key=rights_profile_key,
-                        validation_status=validation_status,
+                        validation_status="RECEIVED",
                         dataset_mode=dataset_mode,
                     )
                     .returning(source_snapshot.c.source_snapshot_id)
                 ).scalar_one()
             )
+            for stage, event_time in event_plan:
+                self.append_processing_event(
+                    snapshot_id=snapshot_id,
+                    stage=stage,
+                    event_at=event_time,
+                    stage_version="dat003-compat-v1",
+                )
+            return snapshot_id
         except DataModelError:
             raise
+        except DBAPIError as exc:
+            raise translate_database_error(exc) from exc
+
+    def append_processing_event(
+        self,
+        *,
+        snapshot_id: UUID,
+        stage: str,
+        event_at: datetime,
+        stage_version: str,
+        operation_id: UUID | None = None,
+        input_sha256: str | None = None,
+        output_sha256: str | None = None,
+        safe_details: Mapping[str, object] | None = None,
+        error_code: str | None = None,
+        actor: str = "dmf-pulse",
+    ) -> UUID:
+        locked_snapshot = self.session.execute(
+            select(source_snapshot.c.source_snapshot_id)
+            .where(source_snapshot.c.source_snapshot_id == snapshot_id)
+            .with_for_update()
+        ).scalar_one_or_none()
+        if locked_snapshot is None:
+            raise DataModelError("PROVENANCE_INTEGRITY", "source snapshot was not found")
+        previous = (
+            self.session.execute(
+                select(
+                    source_processing_event.c.processing_event_id,
+                    source_processing_event.c.sequence_number,
+                )
+                .where(source_processing_event.c.source_snapshot_id == snapshot_id)
+                .order_by(source_processing_event.c.sequence_number.desc())
+                .limit(1)
+                .with_for_update()
+            )
+            .mappings()
+            .one_or_none()
+        )
+        sequence = 1 if previous is None else int(previous["sequence_number"]) + 1
+        previous_id = None if previous is None else _uuid(previous["processing_event_id"])
+        operation = operation_id or snapshot_id
+        occurred_at = require_utc(event_at)
+        event_body = {
+            "actor": actor,
+            "error_code": error_code,
+            "event_at": _utc_text(occurred_at),
+            "input_sha256": input_sha256,
+            "operation_id": str(operation),
+            "output_sha256": output_sha256,
+            "previous_event_id": str(previous_id) if previous_id is not None else None,
+            "safe_details": dict(safe_details or {}),
+            "sequence_number": sequence,
+            "snapshot_id": str(snapshot_id),
+            "stage": stage,
+            "stage_version": stage_version,
+        }
+        event_sha256 = hashlib.sha256(
+            json.dumps(
+                event_body,
+                ensure_ascii=False,
+                allow_nan=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+        try:
+            return _uuid(
+                self.session.execute(
+                    insert(source_processing_event)
+                    .values(
+                        source_snapshot_id=snapshot_id,
+                        operation_id=operation,
+                        previous_event_id=previous_id,
+                        sequence_number=sequence,
+                        stage=stage,
+                        outcome=(
+                            "FAILED_RETRYABLE"
+                            if stage == "FAILED_RETRYABLE"
+                            else "FAILED_PERMANENT"
+                            if stage == "FAILED_PERMANENT"
+                            else "SUCCEEDED"
+                        ),
+                        event_at=occurred_at,
+                        stage_version=stage_version,
+                        input_sha256=input_sha256,
+                        output_sha256=output_sha256,
+                        event_sha256=event_sha256,
+                        safe_details=dict(safe_details or {}),
+                        error_code=error_code,
+                        actor=actor,
+                    )
+                    .returning(source_processing_event.c.processing_event_id)
+                ).scalar_one()
+            )
         except DBAPIError as exc:
             raise translate_database_error(exc) from exc
 

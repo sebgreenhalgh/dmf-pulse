@@ -1,0 +1,47 @@
+{
+  "changed_snapshot": {
+    "historical_versions_retained": true,
+    "new_fixture_gameweek_assignment": true,
+    "new_fixture_revision": true,
+    "new_gameweek_deadline_observation": true,
+    "new_player_observation": true,
+    "same_canonical_entities": true
+  },
+  "happy_path": {
+    "blocking_quality_issue_count": 0,
+    "competition_count": 1,
+    "fixture_count": 1,
+    "gameweek_count": 2,
+    "player_count": 4,
+    "player_fpl_season_count": 4,
+    "season_count": 1,
+    "source_bundle_count": 1,
+    "source_bundle_member_count": 2,
+    "source_snapshot_count": 2,
+    "status": "USABLE",
+    "team_count": 2,
+    "team_season_count": 2,
+    "usable_snapshot_count": 2
+  },
+  "malformed": {
+    "bundle_created": false,
+    "error_code": "MALFORMED_JSON",
+    "status": "QUARANTINED"
+  },
+  "missing_required": {
+    "bundle_created": false,
+    "status": "QUARANTINED"
+  },
+  "post_cutoff": {
+    "bundle_created": false,
+    "status": "OBSERVED_NOT_BUNDLE_ELIGIBLE"
+  },
+  "unknown_additive": {
+    "drift": "ADDITIVE_UNKNOWN",
+    "status": "USABLE_WITH_WARNINGS"
+  },
+  "wrong_type": {
+    "bundle_created": false,
+    "status": "QUARANTINED"
+  }
+}

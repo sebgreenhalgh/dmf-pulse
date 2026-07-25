@@ -60,3 +60,7 @@ evidence/tickets/RUL-002/*
 # Regenerable DAT-003 acceptance evidence (PLAN is the durable implementation ledger)
 evidence/tickets/DAT-003/*
 !evidence/tickets/DAT-003/PLAN.md
+
+# Regenerable FPL-004 acceptance evidence (PLAN is the durable implementation ledger)
+evidence/tickets/FPL-004/*
+!evidence/tickets/FPL-004/PLAN.md

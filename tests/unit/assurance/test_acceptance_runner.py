@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import runpy
 from collections.abc import Callable
 from pathlib import Path
@@ -10,7 +11,13 @@ from typing import cast
 
 import pytest
 
-from dmf_pulse.assurance.review_pack import DAT_MANDATORY_ACCEPTANCE_COMMANDS
+from dmf_pulse.assurance.review_pack import (
+    DAT_MANDATORY_ACCEPTANCE_COMMANDS,
+    FPL_MANDATORY_ACCEPTANCE_COMMANDS,
+    FPL_REVIEW_WRITE_AHEAD_RESULT,
+    FPL_TEARDOWN_FINAL_RESULT,
+    FPL_TEARDOWN_WRITE_AHEAD_RESULT,
+)
 
 
 @pytest.mark.unit
@@ -21,6 +28,84 @@ def test_unmapped_success_uses_machine_valid_pass_prefix(repository_root: Path) 
     command = command_type("rules contract command", ("dmf",), 1.0)
 
     assert summarize(command, "", 0) == "PASS: command completed"
+
+
+@pytest.mark.unit
+def test_fpl_snapshot_expected_rejection_reads_public_result_contract(
+    repository_root: Path,
+) -> None:
+    namespace = runpy.run_path(str(repository_root / "scripts" / "run_acceptance.py"))
+    command_type = namespace["AcceptanceCommand"]
+    summarize = cast(Callable[[object, str, int], str], namespace["_summary"])
+    command = command_type(
+        "uv run dmf ingest fpl snapshot --resource all",
+        ("dmf",),
+        1.0,
+        expected_exit=4,
+    )
+    output = json.dumps(
+        {
+            "canonical_effects": {
+                "error_code": "RIGHTS_BLOCKED",
+                "transport_call_count": 0,
+            },
+            "status": "RIGHTS_BLOCKED",
+        }
+    )
+
+    assert summarize(command, output, 4) == (
+        "PASS: expected exit 4; RIGHTS_BLOCKED with zero transport calls"
+    )
+
+
+@pytest.mark.unit
+def test_fpl_teardown_has_one_exact_final_result(repository_root: Path) -> None:
+    namespace = runpy.run_path(str(repository_root / "scripts" / "run_acceptance.py"))
+    command_type = namespace["AcceptanceCommand"]
+    summarize = cast(Callable[[object, str, int], str], namespace["_summary"])
+    command = command_type(
+        "docker compose -f compose.test.yaml down -v --remove-orphans",
+        ("docker",),
+        1.0,
+    )
+    assert summarize(command, "", 0) == FPL_TEARDOWN_FINAL_RESULT
+
+
+@pytest.mark.unit
+def test_fpl_write_ahead_is_pending_blocked_evidence_not_false_complete(
+    repository_root: Path,
+) -> None:
+    namespace = runpy.run_path(str(repository_root / "scripts" / "generate_fpl004_evidence.py"))
+    records: list[dict[str, object]] = []
+    for index, command in enumerate(FPL_MANDATORY_ACCEPTANCE_COMMANDS, start=1):
+        records.append(
+            {
+                "command": command,
+                "duration_seconds": 0.1,
+                "exit_code": 4 if index == 20 else 0,
+                "result": (
+                    "PASS: RIGHTS_BLOCKED with zero transport calls"
+                    if index == 20
+                    else "PASS: fixture"
+                ),
+            }
+        )
+    records[23].update(
+        duration_seconds=None,
+        result=FPL_REVIEW_WRITE_AHEAD_RESULT,
+    )
+    records[24].update(
+        duration_seconds=None,
+        result=FPL_TEARDOWN_WRITE_AHEAD_RESULT,
+    )
+
+    rows = namespace["_acceptance"](records)
+    markdown = namespace["_acceptance_markdown"](rows, "BLOCKED")
+
+    assert sum(row["status"] == "PASS" for row in rows) == 23
+    assert rows[23]["status"] == rows[24]["status"] == "NOT_PASSED"
+    assert "Status: **BLOCKED**" in markdown
+    assert "23/25" in markdown
 
 
 @pytest.mark.unit

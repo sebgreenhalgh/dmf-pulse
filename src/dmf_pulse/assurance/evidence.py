@@ -6,6 +6,7 @@ import json
 import re
 from dataclasses import dataclass
 from enum import StrEnum
+from hashlib import sha256
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
@@ -22,7 +23,7 @@ from pydantic import (
     model_validator,
 )
 
-from dmf_pulse.assurance.tickets import validate_ticket_id
+from dmf_pulse.assurance.tickets import TicketIdError, ticket_paths, validate_ticket_id
 
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 GIT_COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
@@ -30,6 +31,9 @@ MAX_EVIDENCE_BYTES = 10 * 1024 * 1024
 DAT_REQUIRED_BASELINE = "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
 DAT_REQUIRED_BRANCH = "stage/A3/DAT-003-canonical-foundation"
 DAT_REVIEW_PATH = "review_pack/DAT-003/DMF_PULSE_DAT-003_REVIEW.zip"
+FPL_REQUIRED_BASELINE = "9b3160a2574d2868b5f26e3a2d429924567510b0"
+FPL_REQUIRED_BRANCH = "stage/A4/FPL-004-official-ingestion"
+FPL_REVIEW_PATH = "review_pack/FPL-004/DMF_PULSE_FPL-004_REVIEW.zip"
 DAT_DETACHED_REVIEW_NAMES = {
     "01_REVIEW_INDEX.md",
     "02_CODEX_RESULT.json",
@@ -49,6 +53,26 @@ DAT_DETACHED_REVIEW_NAMES = {
     "17_DATA_MODEL_PUBLIC_CONTRACTS_MODELS.txt",
     "18_INITIAL_MIGRATION_CRITICAL_SQL.txt",
     "19_REPOSITORY_CLI_CONFIG_COMPOSE_CI.txt",
+}
+FPL_DETACHED_REVIEW_NAMES = {
+    "01_REVIEW_INDEX.md",
+    "02_BASELINE_AND_GIT_STATE.md",
+    "03_COMPLETE_HUMAN_PATCH.diff",
+    "04_FILE_CHANGE_MAP.md",
+    "05_PUBLIC_CONTRACTS.md",
+    "06_MIGRATION_SCHEMA_REVIEW.md",
+    "07_SOURCE_LIFECYCLE_RESUME.md",
+    "08_RIGHTS_RETENTION_REVIEW.md",
+    "09_TEST_COVERAGE_MUTATION.md",
+    "10_ACCEPTANCE_MATRIX.md",
+    "11_DAT003_REMEDIATION.md",
+    "12_FPL_SCHEMA_MAPPING_IDEMPOTENCY.md",
+    "13_SOURCE_BUNDLE_CUTOFF_QUALITY.md",
+    "14_DEPENDENCY_LOCK_PACKAGE.md",
+    "15_SECURITY_AND_SECRET_REVIEW.md",
+    "16_KNOWN_LIMITATIONS.md",
+    "17_COMMANDS_AND_RESULTS.log",
+    "18_CODEX_RESULT.json",
 }
 TicketId = Annotated[
     str,
@@ -285,6 +309,25 @@ class CodexResult(StrictEvidenceModel):
                 or self.repository.merged
             ):
                 raise ValueError("DAT-003 requires exact clean repository provenance")
+        if self.ticket_id == "FPL-004":
+            if (
+                self.review_pack.payload_sha256 is None
+                or self.review_pack.sha256 is not None
+                or self.review_pack.archive_sha256 is not None
+                or self.review_pack.path != FPL_REVIEW_PATH
+                or self.review_pack.file_count != 20
+            ):
+                raise ValueError("FPL-004 requires the exact detached 20-file review reference")
+            if (
+                self.repository is None
+                or self.repository.branch != FPL_REQUIRED_BRANCH
+                or self.repository.head != self.code_commit
+                or self.repository.baseline != FPL_REQUIRED_BASELINE
+                or not self.repository.clean
+                or self.repository.pushed
+                or self.repository.merged
+            ):
+                raise ValueError("FPL-004 requires exact clean repository provenance")
         return self
 
 
@@ -414,6 +457,15 @@ class ReviewManifest(StrictEvidenceModel):
             or len(names) != len(DAT_DETACHED_REVIEW_NAMES)
         ):
             raise ValueError("DAT-003 review manifest provenance is invalid")
+        if self.ticket_id == "FPL-004" and (
+            self.baseline != FPL_REQUIRED_BASELINE
+            or self.file_count != 20
+            or self.payload_sha256 is None
+            or self.archive_sha256 is not None
+            or set(names) != FPL_DETACHED_REVIEW_NAMES
+            or len(names) != len(FPL_DETACHED_REVIEW_NAMES)
+        ):
+            raise ValueError("FPL-004 review manifest provenance is invalid")
         return self
 
 
@@ -519,3 +571,84 @@ def validate_evidence_file(path: Path) -> ValidatedEvidence:
             "EVIDENCE_JSON_INVALID", "evidence is not valid UTF-8 JSON"
         ) from exc
     return validate_evidence_data(value)
+
+
+def _file_sha256(path: Path) -> str:
+    digest = sha256()
+    try:
+        with path.open("rb") as handle:
+            for block in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(block)
+    except OSError as exc:
+        raise EvidenceValidationError(
+            "EVIDENCE_ARTIFACT_UNAVAILABLE", "an evidence artifact is unavailable"
+        ) from exc
+    return digest.hexdigest()
+
+
+def validate_ticket_evidence(root: Path, ticket: str) -> TicketEvidenceManifest:
+    """Validate one ticket's manifest, exact file coverage, containment, size, and hashes."""
+
+    try:
+        paths = ticket_paths(root, ticket)
+    except TicketIdError as exc:
+        raise EvidenceValidationError("EVIDENCE_TICKET_INVALID", str(exc)) from exc
+    validated = validate_evidence_file(paths.evidence / "evidence_manifest.json")
+    if not isinstance(validated.model, TicketEvidenceManifest):
+        raise EvidenceValidationError(
+            "EVIDENCE_MANIFEST_KIND", "ticket evidence_manifest.json has the wrong contract kind"
+        )
+    manifest = validated.model
+    if manifest.ticket_id != paths.ticket_id:
+        raise EvidenceValidationError(
+            "EVIDENCE_TICKET_MISMATCH", "ticket evidence manifest identifies another ticket"
+        )
+    try:
+        actual_paths = {
+            path.relative_to(root).as_posix()
+            for path in paths.evidence.iterdir()
+            if path.is_file() and path.name != "evidence_manifest.json"
+        }
+    except OSError as exc:
+        raise EvidenceValidationError(
+            "EVIDENCE_DIRECTORY_UNAVAILABLE", "ticket evidence directory is unavailable"
+        ) from exc
+    artifact_paths = [item.path for item in manifest.artifacts]
+    if artifact_paths != sorted(artifact_paths) or len(artifact_paths) != len(set(artifact_paths)):
+        raise EvidenceValidationError(
+            "EVIDENCE_ARTIFACT_ORDER", "evidence artifacts must be uniquely path-sorted"
+        )
+    if set(artifact_paths) != actual_paths:
+        raise EvidenceValidationError(
+            "EVIDENCE_ARTIFACT_COVERAGE",
+            "evidence manifest does not cover the exact ticket evidence files",
+        )
+    expected_parent = Path("evidence") / "tickets" / paths.ticket_id
+    for artifact in manifest.artifacts:
+        relative = Path(artifact.path)
+        if (
+            relative.is_absolute()
+            or ".." in relative.parts
+            or relative.parent != expected_parent
+            or relative.as_posix() != artifact.path
+            or relative.name == "evidence_manifest.json"
+        ):
+            raise EvidenceValidationError(
+                "EVIDENCE_ARTIFACT_PATH", "evidence artifact path escapes its ticket directory"
+            )
+        path = root / relative
+        try:
+            invalid = (
+                path.is_symlink()
+                or not path.is_file()
+                or path.stat().st_size != artifact.bytes
+                or _file_sha256(path) != artifact.sha256
+            )
+        except OSError:
+            invalid = True
+        if invalid:
+            raise EvidenceValidationError(
+                "EVIDENCE_ARTIFACT_MISMATCH",
+                f"evidence artifact bytes or SHA-256 mismatch: {artifact.path}",
+            )
+    return manifest

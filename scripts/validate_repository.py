@@ -837,7 +837,7 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
         windows = windows_path.read_text(encoding="utf-8")
     except (OSError, UnicodeError):
         return
-    required_ci_fragments = (
+    common_ci_fragments = (
         "permissions:\n  contents: read",
         "pull_request:",
         "push:",
@@ -847,20 +847,36 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
         "uv run ruff check .",
         "uv run mypy src/dmf_pulse",
         "postgres:18.4-bookworm@sha256:",
-        "uv run alembic upgrade head",
-        'uv run pytest -m "postgres or migration"',
-        "uv run alembic downgrade base",
         "uv run dmf data-model doctor --json",
         "uv run dmf data-model schema-manifest --json",
         "uv run dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json",
         "uv run dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json",
-        "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/DAT-003/coverage.json",
-        "uv run python scripts/check_coverage_gates.py",
         "uv build",
-        "uv run python scripts/verify_wheel.py",
         "uv run python scripts/validate_repository.py",
         "uv run python scripts/scan_secrets.py",
     )
+    stage_ci_fragments = (
+        (
+            "uv run python scripts/test_migration_matrix.py --baseline-revision 20260723_0001 --target head",
+            'uv run pytest -m "postgres or migration" tests/integration',
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/FPL-004/coverage.json",
+            "uv run python scripts/check_fpl004_coverage_gates.py",
+            "uv run dmf specs validate",
+            "uv run dmf ingest fpl validate",
+            "uv run python scripts/verify_fpl004_wheel.py",
+            "uv run python scripts/verify_fpl004_acceptance.py",
+        )
+        if (root / "tickets/FPL-004/ticket.yaml").is_file()
+        else (
+            "uv run alembic upgrade head",
+            'uv run pytest -m "postgres or migration"',
+            "uv run alembic downgrade base",
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/DAT-003/coverage.json",
+            "uv run python scripts/check_coverage_gates.py",
+            "uv run python scripts/verify_wheel.py",
+        )
+    )
+    required_ci_fragments = (*common_ci_fragments, *stage_ci_fragments)
     for fragment in required_ci_fragments:
         if fragment not in ci:
             errors.append(f"ci.yml missing required contract fragment: {fragment}")
@@ -885,7 +901,9 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
         validate_repository_manifest,
     )
 
-    active_path = root / "evidence/tickets/DAT-003/current_manifest.json"
+    fpl_path = root / "evidence/tickets/FPL-004/current_manifest.json"
+    dat_path = root / "evidence/tickets/DAT-003/current_manifest.json"
+    active_path = fpl_path if (root / "tickets/FPL-004/ticket.yaml").is_file() else dat_path
     for path in [active_path] if active_path.is_file() else []:
         try:
             expected = RepositoryManifest.model_validate_json(path.read_text(encoding="utf-8"))
@@ -1267,11 +1285,22 @@ def _validate_dat_evidence(root: Path, errors: list[str]) -> None:
     if str(source_root) not in sys.path:
         sys.path.insert(0, str(source_root))
     try:
-        from dmf_pulse.assurance.evidence import CodexResult, ResultStatus, validate_evidence_file
+        from dmf_pulse.assurance.evidence import (
+            CodexResult,
+            ResultStatus,
+            validate_evidence_file,
+            validate_ticket_evidence,
+        )
         from dmf_pulse.assurance.review_pack import (
             ReviewPackError,
             _validate_dat_complete_evidence,
         )
+
+        if (root / "tickets/FPL-004/ticket.yaml").is_file():
+            historical = validate_ticket_evidence(root, "DAT-003")
+            if historical.status != "COMPLETE":
+                errors.append("DAT-003 historical evidence does not record COMPLETE")
+            return
 
         validated = validate_evidence_file(result_path)
         if not isinstance(validated.model, CodexResult) or validated.model.ticket_id != "DAT-003":
@@ -1320,7 +1349,9 @@ def main() -> int:
         "status": "PASS" if not errors else "FAIL",
     }
     active_ticket = (
-        "DAT-003"
+        "FPL-004"
+        if (root / "tickets/FPL-004/ticket.yaml").is_file()
+        else "DAT-003"
         if (root / "tickets/DAT-003/ticket.yaml").is_file()
         else "RUL-002"
         if (root / "tickets/RUL-002/ticket.yaml").is_file()
