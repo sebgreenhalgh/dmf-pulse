@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/odd-005/provider-failure.schema.json",
+  "title": "ProviderFailure",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["code", "message", "retryable", "transport_called"],
+  "properties": {
+    "code": {
+      "enum": [
+        "RIGHTS_BLOCKED", "CREDENTIAL_UNAVAILABLE", "QUOTA_EXHAUSTED",
+        "CONNECT_TIMEOUT", "READ_TIMEOUT", "TOTAL_TIMEOUT", "HTTP_429",
+        "HTTP_4XX", "HTTP_5XX", "CONTENT_TYPE_INVALID", "PAYLOAD_TOO_LARGE",
+        "MALFORMED_JSON", "REDIRECT_BLOCKED", "TLS_ERROR",
+        "SOURCE_UNAVAILABLE", "CANCELLED"
+      ]
+    },
+    "message": {"type": "string", "minLength": 1, "maxLength": 240},
+    "retryable": {"type": "boolean"},
+    "transport_called": {"type": "boolean"}
+  }
+}

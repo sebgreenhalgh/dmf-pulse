@@ -389,15 +389,26 @@ def _json_type(value: object) -> str:
 
 
 def _type_paths(value: object, path: str = "$") -> dict[str, str]:
-    paths = {path: _json_type(value)}
-    if isinstance(value, dict):
-        for key in sorted(value):
-            paths.update(_type_paths(value[key], f"{path}.{key}"))
-    elif isinstance(value, list):
-        for item in value:
-            for item_path, kind in _type_paths(item, f"{path}[]").items():
-                paths[item_path] = kind
-    return paths
+    """Return an order-independent schema signature without losing array types.
+
+    Array members intentionally share a semantic ``[]`` path.  Every observed
+    JSON type at that path is retained in a sorted, pipe-delimited set instead
+    of allowing the final member to overwrite earlier heterogeneous members.
+    """
+
+    observed: dict[str, set[str]] = {}
+
+    def visit(item: object, item_path: str) -> None:
+        observed.setdefault(item_path, set()).add(_json_type(item))
+        if isinstance(item, dict):
+            for key in sorted(item):
+                visit(item[key], f"{item_path}.{key}")
+        elif isinstance(item, list):
+            for child in item:
+                visit(child, f"{item_path}[]")
+
+    visit(value, path)
+    return {item_path: "|".join(sorted(kinds)) for item_path, kinds in sorted(observed.items())}
 
 
 def _contract_projection(value: object) -> object:
@@ -416,7 +427,10 @@ def _contract_projection(value: object) -> object:
     if isinstance(value, datetime):
         return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
     if isinstance(value, Decimal):
-        return format(value, "f")
+        if value == 0:
+            return "0"
+        rendered = format(value, "f")
+        return rendered.rstrip("0").rstrip(".") if "." in rendered else rendered
     return value
 
 

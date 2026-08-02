@@ -101,8 +101,9 @@ def record_rights_decision(
 ) -> UUID:
     if decision.checked_at is None:
         raise IngestionError("INTERNAL_INVARIANT", "rights decision lacks a check time")
+    context_sha256 = canonical_sha256(context)
     value = session.execute(
-        insert(rights_decision)
+        postgresql_insert(rights_decision)
         .values(
             rights_profile_record_id=rights_profile_record_id,
             source_snapshot_id=source_snapshot_id,
@@ -110,11 +111,41 @@ def record_rights_decision(
             decision=decision.decision,
             reason_code=decision.reason,
             checked_at=require_utc(decision.checked_at),
-            context_sha256=canonical_sha256(context),
+            context_sha256=context_sha256,
         )
+        .on_conflict_do_nothing()
         .returning(rights_decision.c.rights_decision_id)
-    ).scalar_one()
-    return _uuid(value)
+    ).scalar_one_or_none()
+    if value is not None:
+        return _uuid(value)
+
+    snapshot_predicate = (
+        rights_decision.c.source_snapshot_id.is_(None)
+        if source_snapshot_id is None
+        else rights_decision.c.source_snapshot_id == source_snapshot_id
+    )
+    existing = (
+        session.execute(
+            select(rights_decision).where(
+                rights_decision.c.rights_profile_record_id == rights_profile_record_id,
+                snapshot_predicate,
+                rights_decision.c.capability == decision.capability,
+            )
+        )
+        .mappings()
+        .one_or_none()
+    )
+    if existing is None:
+        raise IngestionError("INTERNAL_INVARIANT", "rights decision conflict is unavailable")
+    if (
+        existing["decision"] != decision.decision
+        or existing["reason_code"] != decision.reason
+        or existing["context_sha256"] != context_sha256
+    ):
+        raise IngestionError(
+            "RIGHTS_BLOCKED", "stored rights decision conflicts with configured authority"
+        )
+    return _uuid(existing["rights_decision_id"])
 
 
 def record_ingestion_run(
@@ -124,17 +155,22 @@ def record_ingestion_run(
     pair_key: str,
     started_at: datetime,
     attempt_number: int = 1,
+    logical_prefix: str = "fpl004",
+    resource: str = "bootstrap+fixtures",
+    adapter_version: str = "fpl-reference-v1",
+    code_commit: str | None = None,
 ) -> UUID:
     if attempt_number <= 0:
         raise IngestionError("INTERNAL_INVARIANT", "ingestion attempt must be positive")
-    logical_run_key = f"fpl004:{pair_key}"
+    logical_run_key = f"{logical_prefix}:{pair_key}"
     values = {
         "provider_id": provider_id,
-        "resource": "bootstrap+fixtures",
+        "resource": resource,
         "logical_run_key": logical_run_key,
         "status": "RUNNING",
         "started_at": require_utc(started_at),
-        "adapter_version": "fpl-reference-v1",
+        "adapter_version": adapter_version,
+        "code_commit": code_commit,
         "counts": {"attempt_number": attempt_number},
     }
     created = session.execute(
@@ -262,7 +298,7 @@ def record_received_snapshot(
     attempt_number: int,
     resource: str,
     captured_at: datetime,
-    body: bytes,
+    body: bytes | None,
     raw_blob_id: UUID | None,
     raw_storage_object_id: UUID | None,
     rights_profile_record_id: UUID,
@@ -271,20 +307,55 @@ def record_received_snapshot(
     context: dict[str, object],
     schema_fingerprint: str | None = None,
     raw_storage_policy: str = "ALLOWED",
+    adapter_version: str = "fpl-reference-v1",
+    contract_version: str = "fpl-reference-v1",
+    actor: str = "fpl-reference-adapter",
+    request_fingerprint_override: str | None = None,
+    body_sha256_override: str | None = None,
+    body_size_override: int | None = None,
+    request_started_at: datetime | None = None,
+    http_status: int | None = None,
+    content_type: str | None = "application/json",
 ) -> UUID:
     captured = require_utc(captured_at)
-    body_sha256 = hashlib.sha256(body).hexdigest()
-    request_fingerprint = canonical_sha256(
-        {
-            "resource": resource,
-            "target": sanitized_target,
-            "captured_at": captured.isoformat(),
-        }
+    started = require_utc(request_started_at) if request_started_at is not None else captured
+    if started > captured:
+        raise IngestionError("INTERNAL_INVARIANT", "snapshot request time exceeds receipt time")
+    body_sha256: str | None
+    body_size: int | None
+    if body is not None:
+        body_sha256 = hashlib.sha256(body).hexdigest()
+        body_size = len(body)
+        if body_sha256_override is not None and body_sha256_override != body_sha256:
+            raise IngestionError("INTERNAL_INVARIANT", "snapshot body hash conflicts")
+        if body_size_override is not None and body_size_override != body_size:
+            raise IngestionError("INTERNAL_INVARIANT", "snapshot body size conflicts")
+    else:
+        body_sha256 = body_sha256_override
+        body_size = body_size_override
+    if (body_sha256 is None) != (body_size is None):
+        raise IngestionError("INTERNAL_INVARIANT", "snapshot body metadata is incomplete")
+    if body_sha256 is not None and (
+        len(body_sha256) != 64
+        or any(character not in "0123456789abcdef" for character in body_sha256)
+        or body_size is None
+        or body_size < 0
+    ):
+        raise IngestionError("INTERNAL_INVARIANT", "snapshot body metadata is invalid")
+    if http_status is not None and not 100 <= http_status <= 599:
+        raise IngestionError("INTERNAL_INVARIANT", "snapshot HTTP status is invalid")
+    if request_fingerprint_override is not None and (
+        len(request_fingerprint_override) != 64
+        or any(character not in "0123456789abcdef" for character in request_fingerprint_override)
+    ):
+        raise IngestionError("INTERNAL_INVARIANT", "request fingerprint is invalid")
+    request_fingerprint = request_fingerprint_override or canonical_sha256(
+        {"resource": resource, "target": sanitized_target, "captured_at": captured.isoformat()}
     )
     envelope_sha256 = canonical_sha256(
         {
             "body_sha256": body_sha256,
-            "body_size": len(body),
+            "body_size": body_size,
             "captured_at": captured.isoformat(),
             "context": context,
             "profile_id": profile.rights_profile_id,
@@ -302,9 +373,10 @@ def record_received_snapshot(
                 provider_id=provider_id,
                 resource=resource,
                 request_fingerprint=request_fingerprint,
-                request_started_at=captured,
+                request_started_at=started,
                 received_at=captured,
-                content_type="application/json",
+                http_status=http_status,
+                content_type=content_type,
                 raw_blob_id=raw_blob_id,
                 raw_storage_policy=raw_storage_policy,
                 body_sha256=body_sha256,
@@ -313,13 +385,13 @@ def record_received_snapshot(
                 rights_profile_key=profile.rights_profile_id,
                 validation_status="RECEIVED",
                 dataset_mode="RAW_OBSERVED",
-                body_size=len(body),
+                body_size=body_size,
                 sanitized_target=sanitized_target,
                 raw_storage_object_id=raw_storage_object_id,
                 rights_profile_version=profile.profile_version,
                 rights_profile_record_id=rights_profile_record_id,
-                adapter_version="fpl-reference-v1",
-                contract_version="fpl-reference-v1",
+                adapter_version=adapter_version,
+                contract_version=contract_version,
                 envelope_sha256=envelope_sha256,
             )
             .returning(source_snapshot.c.source_snapshot_id)
@@ -333,6 +405,8 @@ def record_received_snapshot(
         input_sha256=body_sha256,
         output_sha256=envelope_sha256,
         safe_details=context,
+        stage_version=contract_version,
+        actor=actor,
     )
     return snapshot_id
 
@@ -348,6 +422,8 @@ def append_processing_event_idempotent(
     safe_details: dict[str, object] | None = None,
     error_code: str | None = None,
     operation_id: UUID | None = None,
+    stage_version: str = "fpl-reference-v1",
+    actor: str = "fpl-reference-adapter",
 ) -> UUID:
     session.execute(
         select(source_snapshot.c.source_snapshot_id)
@@ -361,7 +437,7 @@ def append_processing_event_idempotent(
                 select(source_processing_event).where(
                     source_processing_event.c.source_snapshot_id == snapshot_id,
                     source_processing_event.c.stage == stage,
-                    source_processing_event.c.stage_version == "fpl-reference-v1",
+                    source_processing_event.c.stage_version == stage_version,
                 )
             )
             .mappings()
@@ -382,13 +458,13 @@ def append_processing_event_idempotent(
         snapshot_id=snapshot_id,
         stage=stage,
         event_at=require_utc(event_at),
-        stage_version="fpl-reference-v1",
+        stage_version=stage_version,
         input_sha256=input_sha256,
         output_sha256=output_sha256,
         safe_details=safe_details,
         error_code=error_code,
         operation_id=operation_id,
-        actor="fpl-reference-adapter",
+        actor=actor,
     )
 
 

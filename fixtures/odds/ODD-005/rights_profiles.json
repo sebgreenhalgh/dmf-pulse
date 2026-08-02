@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "profiles": [
+    {
+      "rights_profile_id": "synthetic_the_odds_api_v1",
+      "profile_version": "1.0.0",
+      "provider_key": "synthetic_the_odds_api",
+      "status": "HUMAN_APPROVED",
+      "approved_purpose": "ODD-005 deterministic synthetic fixtures",
+      "capabilities": {
+        "automated_access": "DENY",
+        "manual_import": "ALLOW",
+        "transient_processing": "ALLOW",
+        "raw_storage": "ALLOW",
+        "derived_storage": "ALLOW",
+        "cache": "ALLOW",
+        "private_internal_use": "ALLOW",
+        "model_training": "DENY",
+        "backup": "ALLOW",
+        "public_display": "DENY",
+        "redistribution": "ALLOW"
+      },
+      "retention_seconds": null,
+      "termination_deletion_required": false,
+      "terms_source": "ODD-005 synthetic fixture authority",
+      "terms_version": "1.0.0",
+      "human_approval_id": "13_ODDS_RIGHTS_RETENTION_AND_EXPORT_CONTRACT#synthetic_the_odds_api_v1",
+      "unresolved_rights": []
+    },
+    {
+      "rights_profile_id": "the_odds_api_private_analytics_v1",
+      "profile_version": "1.0.0",
+      "provider_key": "the_odds_api",
+      "status": "HUMAN_APPROVED",
+      "approved_purpose": "private internal analytical use with credential and quota gate",
+      "capabilities": {
+        "automated_access": "ALLOW",
+        "manual_import": "ALLOW",
+        "transient_processing": "ALLOW",
+        "raw_storage": "UNKNOWN",
+        "derived_storage": "ALLOW",
+        "cache": "ALLOW",
+        "private_internal_use": "ALLOW",
+        "model_training": "UNKNOWN",
+        "backup": "UNKNOWN",
+        "public_display": "DENY",
+        "redistribution": "DENY"
+      },
+      "retention_seconds": 0,
+      "termination_deletion_required": true,
+      "terms_source": "The Odds API Terms and Conditions",
+      "terms_version": "checked-2026-07-25",
+      "human_approval_id": "13_ODDS_RIGHTS_RETENTION_AND_EXPORT_CONTRACT#the_odds_api_private_analytics_v1",
+      "unresolved_rights": [
+        "raw historical retention requires explicit review",
+        "model training and backup require explicit review",
+        "public product is a new purpose"
+      ]
+    }
+  ]
+}

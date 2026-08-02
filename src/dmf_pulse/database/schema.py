@@ -11,7 +11,7 @@ from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.database.errors import DatabaseError
 from dmf_pulse.database.models import SchemaManifest
 
-REQUIRED_SCHEMAS = ("core", "football", "fpl", "provenance")
+REQUIRED_SCHEMAS = ("betting", "core", "football", "fpl", "provenance")
 SPACE = re.compile(r"\s+")
 
 
@@ -55,7 +55,7 @@ def inspect_schema(connection: Connection) -> SchemaManifest:
         name: {"functions": [], "tables": {}, "triggers": [], "views": {}}
         for name in REQUIRED_SCHEMAS
     }
-    schema_filter = "'core','football','fpl','provenance'"
+    schema_filter = "'betting','core','football','fpl','provenance'"
     columns = _rows(
         connection,
         f"""

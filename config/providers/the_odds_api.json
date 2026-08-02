@@ -1,0 +1,30 @@
+{
+  "adapter_version": "the-odds-api-v4-reference-v1",
+  "api_version": "v4",
+  "contract_version": "the-odds-api-v4-reference-v1",
+  "date_format": "iso",
+  "host": "api.the-odds-api.com",
+  "markets": ["h2h"],
+  "max_bookmakers_per_event": 80,
+  "max_events": 1000,
+  "max_json_depth": 64,
+  "max_markets_per_bookmaker": 20,
+  "max_outcomes_per_market": 100,
+  "max_response_bytes": 5242880,
+  "max_text_length": 500,
+  "odds_format": "decimal",
+  "path": "/v4/sports/soccer_epl/odds",
+  "provider_key": "the_odds_api",
+  "regions": ["uk"],
+  "request_cost": 1,
+  "retry": {
+    "max_attempts": 2
+  },
+  "scheme": "https",
+  "sport_keys": ["soccer_epl"],
+  "timeouts_seconds": {
+    "connect": 10,
+    "read": 20,
+    "total": 30
+  }
+}

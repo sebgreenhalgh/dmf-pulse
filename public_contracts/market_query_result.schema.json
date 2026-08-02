@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/odd-005/market-query-result.schema.json",
+  "title": "MarketQueryResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_id", "as_of", "books", "observation_count"],
+  "properties": {
+    "fixture_id": {"type": "string", "format": "uuid"},
+    "as_of": {"type": "string", "format": "date-time"},
+    "observation_count": {"type": "integer", "minimum": 0},
+    "books": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["operator_id", "operator_key", "market_state", "observations"],
+        "properties": {
+          "operator_id": {"type": "string", "format": "uuid"},
+          "operator_key": {"type": "string", "minLength": 1},
+          "market_state": {"enum": ["COMPLETE", "INCOMPLETE", "SUSPENDED", "UNSUPPORTED", "UNAVAILABLE"]},
+          "observations": {
+            "type": "array",
+            "items": {"$ref": "market_observation.schema.json"},
+            "minItems": 0,
+            "maxItems": 3
+          }
+        }
+      }
+    }
+  }
+}

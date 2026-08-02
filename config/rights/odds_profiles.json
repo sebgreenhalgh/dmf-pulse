@@ -1,0 +1,79 @@
+{
+  "profiles": [
+    {
+      "account_scope": "synthetic fixtures only",
+      "approved_at": "2026-07-25T00:00:00Z",
+      "approved_by": "ODD-005 frozen contract",
+      "approved_purpose": "ODD-005 deterministic synthetic fixtures",
+      "attribution_required": false,
+      "attribution_text": null,
+      "capabilities": {
+        "automated_access": "DENY",
+        "backup": "ALLOW",
+        "cache": "ALLOW",
+        "derived_storage": "ALLOW",
+        "manual_import": "ALLOW",
+        "model_training": "DENY",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "ALLOW",
+        "redistribution": "ALLOW",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-07-25T00:00:00Z",
+      "geography_scope": "synthetic fixtures only",
+      "human_approval_id": "13_ODDS_RIGHTS_RETENTION_AND_EXPORT_CONTRACT#synthetic_the_odds_api_v1",
+      "notes": "Bounded synthetic replay authority; not predictive truth.",
+      "profile_version": "1.0.0",
+      "provider_key": "synthetic_the_odds_api",
+      "retention_reason": "Synthetic fixture owner imposes no provider retention limit.",
+      "retention_seconds": null,
+      "rights_profile_id": "synthetic_the_odds_api_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": false,
+      "terms_source": "ODD-005 synthetic fixture authority",
+      "terms_version": "1.0.0",
+      "unresolved_rights": []
+    },
+    {
+      "account_scope": "one future approved private account",
+      "approved_at": "2026-07-25T00:00:00Z",
+      "approved_by": "ODD-005 frozen contract",
+      "approved_purpose": "private internal analytical use with credential and quota gate",
+      "attribution_required": false,
+      "attribution_text": null,
+      "capabilities": {
+        "automated_access": "ALLOW",
+        "backup": "UNKNOWN",
+        "cache": "ALLOW",
+        "derived_storage": "ALLOW",
+        "manual_import": "ALLOW",
+        "model_training": "UNKNOWN",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "UNKNOWN",
+        "redistribution": "DENY",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-07-25T00:00:00Z",
+      "geography_scope": "private UK analytical use",
+      "human_approval_id": "13_ODDS_RIGHTS_RETENTION_AND_EXPORT_CONTRACT#the_odds_api_private_analytics_v1",
+      "notes": "Engineering rights profile; not legal advice.",
+      "profile_version": "1.0.0",
+      "provider_key": "the_odds_api",
+      "retention_reason": null,
+      "retention_seconds": 0,
+      "rights_profile_id": "the_odds_api_private_analytics_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": true,
+      "terms_source": "The Odds API Terms and Conditions",
+      "terms_version": "checked-2026-07-25",
+      "unresolved_rights": [
+        "raw historical retention requires explicit review",
+        "model training and backup require explicit review",
+        "public product is a new purpose"
+      ]
+    }
+  ],
+  "schema_version": "1.0.0"
+}

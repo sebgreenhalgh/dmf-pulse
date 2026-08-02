@@ -1,0 +1,41 @@
+{
+  "contract_version": "odd-005-scenarios-v1",
+  "scenarios": {
+    "happy_path": {
+      "payload": "happy_path.json",
+      "mapping_plan": "mapping_plan.json",
+      "captured_at": "2026-08-20T12:00:00Z",
+      "information_cutoff": "2026-08-21T17:30:00Z",
+      "response_headers": {
+        "content-type": "application/json",
+        "x-requests-remaining": "499",
+        "x-requests-used": "1",
+        "x-requests-last": "1"
+      }
+    },
+    "changed_quote": {
+      "payload": "changed_quote.json",
+      "mapping_plan": "mapping_plan.json",
+      "captured_at": "2026-08-20T13:00:00Z",
+      "information_cutoff": "2026-08-21T17:30:00Z",
+      "response_headers": {
+        "content-type": "application/json",
+        "x-requests-remaining": "498",
+        "x-requests-used": "2",
+        "x-requests-last": "1"
+      }
+    },
+    "post_cutoff": {
+      "payload": "post_cutoff.json",
+      "mapping_plan": "mapping_plan.json",
+      "captured_at": "2026-08-21T17:31:30Z",
+      "information_cutoff": "2026-08-21T17:30:00Z",
+      "response_headers": {
+        "content-type": "application/json",
+        "x-requests-remaining": "497",
+        "x-requests-used": "3",
+        "x-requests-last": "1"
+      }
+    }
+  }
+}

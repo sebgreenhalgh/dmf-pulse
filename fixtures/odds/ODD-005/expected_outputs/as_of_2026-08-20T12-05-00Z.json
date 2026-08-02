@@ -1,0 +1,9 @@
+{
+  "as_of": "2026-08-20T12:05:00Z",
+  "observation_count": 6,
+  "operator_books": 2,
+  "complete_books": 2,
+  "book_alpha": {"HOME": "1.80", "DRAW": "3.60", "AWAY": "4.20"},
+  "book_beta": {"HOME": "1.85", "DRAW": "3.50", "AWAY": "4.10"},
+  "contains_probabilities": false
+}

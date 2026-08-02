@@ -1,4 +1,4 @@
-.PHONY: bootstrap format format-check lint type test coverage-gates rules-validate rules-golden postgres-up postgres-down migrations migration-matrix postgres-test data-model-smoke fpl-validate fpl-replay build wheel validate scan quality
+.PHONY: bootstrap format format-check lint type test coverage-gates rules-validate rules-golden postgres-up postgres-down migrations migration-matrix postgres-test data-model-smoke fpl-validate fpl-replay odds-replay odds-query build wheel validate scan quality
 
 bootstrap:
 	uv sync --all-groups --frozen
@@ -16,11 +16,11 @@ type:
 	uv run mypy src/dmf_pulse
 
 test:
-	uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/FPL-004/coverage.json
-	uv run python scripts/check_fpl004_coverage_gates.py evidence/tickets/FPL-004/coverage.json
+	uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/ODD-005/coverage.json
+	uv run python scripts/check_odd005_coverage_gates.py evidence/tickets/ODD-005/coverage.json
 
 coverage-gates:
-	uv run python scripts/check_fpl004_coverage_gates.py evidence/tickets/FPL-004/coverage.json
+	uv run python scripts/check_odd005_coverage_gates.py evidence/tickets/ODD-005/coverage.json
 
 rules-validate:
 	uv run dmf rules validate fixtures/rules/RUL-002/synthetic_complete --json
@@ -38,10 +38,10 @@ migrations:
 	uv run alembic upgrade head
 
 migration-matrix:
-	uv run python scripts/test_migration_matrix.py --baseline-revision 20260723_0001 --target head
+	uv run python scripts/test_migration_matrix.py --baseline-revision 20260724_0002 --target head
 
 postgres-test:
-	uv run pytest -m "postgres or migration" tests/integration/data_model tests/integration/migrations
+	uv run pytest -q -m "postgres and integration" tests/integration
 
 data-model-smoke:
 	uv run dmf data-model doctor --json
@@ -55,11 +55,17 @@ fpl-validate:
 fpl-replay:
 	uv run dmf ingest fpl replay --fixture-set fixtures/fpl/FPL-004 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_test_v1 --output json
 
+odds-replay:
+	uv run dmf ingest odds replay --fixture-set fixtures/odds/ODD-005 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_the_odds_api_v1 --output json
+
+odds-query:
+	uv run dmf market observations --fixture-external-provider official_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json
+
 build:
 	uv build
 
 wheel:
-	uv run python scripts/verify_fpl004_wheel.py
+	uv run python scripts/verify_odd005_wheel.py
 
 validate:
 	uv run python scripts/validate_repository.py

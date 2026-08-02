@@ -1,0 +1,126 @@
+ticket_id: ODD-005
+pack_version: "1.1"
+stage: A5
+title: FPL-004 remediation and The Odds API market-observation foundation
+status: READY
+owner: Sebastian Greenhalgh
+implementer_role: codex_implementation
+reviewer_role: independent_chatgpt_and_human
+required_base_commit: 7034e38f32cd579c90d35c5fe3f10921c3656be0
+expected_branch: stage/A5/ODD-005-odds-provider-foundation
+objective: >-
+  From manifest-approved synthetic The-Odds-API-shaped EPL 1X2 payloads,
+  create immutable retrieval and quota evidence, map provider events and
+  bookmaker operators through explicit canonical mappings, persist exact
+  pre-match market observations, and retrieve the exact latest eligible quote
+  set as of a cutoff, while remediating the frozen FPL-004 review blockers.
+user_visible_vertical_slice:
+  commands:
+    - dmf ingest odds replay --fixture-set fixtures/odds/ODD-005 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_the_odds_api_v1 --output json
+    - dmf ingest odds validate --provider the_odds_api --input <path> --contract-version the-odds-api-v4-reference-v1 --output json
+    - dmf ingest odds import --provider the_odds_api --input <path> --mapping-plan <path> --captured-at <utc> --information-cutoff <utc> --rights-profile synthetic_the_odds_api_v1 --output json
+    - dmf market observations --fixture-external-provider official_fpl --fixture-external-id 101 --season-code 2026/27 --as-of <utc> --output json
+    - dmf ingest odds snapshot --provider the_odds_api --competition-key PL --sport-key soccer_epl --region uk --market h2h --as-of <utc> --output json
+  expected: >-
+    Synthetic replay/import stores exact immutable 1X2 observations from at
+    least two independent operator books and supports an exact predeadline
+    as-of query. The live command without an approved runtime credential exits
+    CREDENTIAL_UNAVAILABLE before transport.
+authority:
+  documents:
+    - DMFP-00
+    - DMFP-01
+    - DMFP-03
+    - DMFP-04-ZERO-COST-v1.0
+    - DMFP-05
+    - DMFP-06
+    - DMFP-17
+    - DMFP-19
+    - DMFP-20
+    - CODEX_IMPLEMENTATION_PLAYBOOK
+  decisions:
+    - ADR-DATA-001
+    - ADR-DATA-003
+    - ADR-DATA-004
+    - ADR-DATA-005
+    - ADR-DATA-006
+    - ADR-DATA-007
+    - ADR-SRC-001
+    - ADR-SRC-002
+    - ADR-SRC-003
+    - ADR-SRC-004
+    - ADR-MKT-004
+    - ADR-ASSUR-006
+provider_selection:
+  provider: the_odds_api
+  api_contract: v4
+  sport_key: soccer_epl
+  initial_region: uk
+  initial_market: h2h
+  odds_format: decimal
+  decimal_lexical_policy: preserve_approved_source_scale
+  decimal_semantic_hash_policy: canonical_plain_decimal_strip_trailing_zeros
+  reason: DMFP-04_v1_primary_current_market_feed
+public_contracts:
+  - public_contracts/odds_ingestion_result.schema.json
+  - public_contracts/market_observation.schema.json
+  - public_contracts/market_query_result.schema.json
+  - public_contracts/quota_state.schema.json
+  - public_contracts/provider_failure.schema.json
+permissions:
+  network: false_for_implementation_and_acceptance
+  migration: one_or_two_ordered_manually_reviewed_alembic_revisions_allowed
+  new_dependency: forbidden_unless_explicitly_justified_and_approved_in_ticket_evidence
+  sandbox: workspace-write
+  docker: local_postgresql_18_4_only
+allowed_areas:
+  - src/dmf_pulse/ingestion/fpl/**
+  - src/dmf_pulse/ingestion/odds/**
+  - src/dmf_pulse/markets/**
+  - src/dmf_pulse/data_model/**
+  - src/dmf_pulse/database/**
+  - src/dmf_pulse/cli/**
+  - src/dmf_pulse/assurance/**
+  - config/providers/**
+  - config/rights/**
+  - public_contracts/**
+  - fixtures/odds/**
+  - tests/**
+  - scripts/**
+  - docs/ingestion/**
+  - docs/adr/**
+  - tickets/ODD-005/**
+  - evidence/tickets/ODD-005/**
+  - pyproject.toml
+  - uv.lock
+  - Makefile
+  - compose.test.yaml
+  - .github/workflows/**
+exclusions:
+  - live provider request in implementation or acceptance
+  - real API key, cookie, token or provider payload in repository/evidence
+  - API-FOOTBALL adapter
+  - more than one odds provider
+  - odds normalisation, de-vigging or consensus
+  - player props
+  - exchange ladder or commission semantics
+  - in-play odds
+  - automatic fixture or operator identity merge from names
+  - model training or probability forecasts
+  - scheduler, FastAPI, UI or public data product
+  - betting execution or gambling recommendations
+stop_conditions:
+  - baseline, branch, tree or pack integrity failure
+  - Docker/PostgreSQL 18.4 unavailable
+  - FPL-004 inherited regression failure not caused by an approved remediation
+  - provider field or fixture oracle contradiction
+  - a live request is required for deterministic acceptance
+  - provider identity requires name-only merge
+  - rights profile is missing, unknown or more permissive than the frozen contract
+  - expected output or canonical mapping is absent
+  - new dependency or migration rewrite is required outside the ticket
+  - exact as-of eligibility cannot be proven
+completion_evidence:
+  path: evidence/tickets/ODD-005/
+  review_zip: review_pack/ODD-005/DMF_PULSE_ODD-005_REVIEW.zip
+  max_review_files: 20

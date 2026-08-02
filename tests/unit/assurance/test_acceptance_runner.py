@@ -17,6 +17,7 @@ from dmf_pulse.assurance.review_pack import (
     FPL_REVIEW_WRITE_AHEAD_RESULT,
     FPL_TEARDOWN_FINAL_RESULT,
     FPL_TEARDOWN_WRITE_AHEAD_RESULT,
+    ODD_MANDATORY_ACCEPTANCE_COMMANDS,
 )
 
 
@@ -166,3 +167,56 @@ def test_dat003_runner_forces_the_disposable_database_target(
         "postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test"
     )
     assert "DMF_TEST_POSTGRES_PORT" not in environment
+
+
+@pytest.mark.unit
+def test_odd005_runner_scrubs_credentials_and_forces_offline(
+    repository_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    namespace = runpy.run_path(str(repository_root / "scripts" / "run_acceptance.py"))
+    command_type = namespace["AcceptanceCommand"]
+    captured: dict[str, object] = {}
+
+    def fake_subprocess_run(*_args: object, **kwargs: object) -> object:
+        captured.update(kwargs)
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    for name in ("THE_ODDS_API_KEY", "ODDS_API_KEY", "DMF_ODDS_API_KEY"):
+        monkeypatch.setenv(name, "constructed-test-only-value")
+    monkeypatch.setattr(namespace["subprocess"], "run", fake_subprocess_run)
+
+    namespace["run_command"](command_type("safe ODD target", ("dmf",), 1.0), force_offline=True)
+    environment = cast(dict[str, str], captured["env"])
+    assert environment["UV_OFFLINE"] == "1"
+    assert not {
+        "THE_ODDS_API_KEY",
+        "ODDS_API_KEY",
+        "DMF_ODDS_API_KEY",
+    } & set(environment)
+
+
+@pytest.mark.unit
+def test_odd005_setup_failure_still_runs_literal_teardown(
+    repository_root: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    namespace = runpy.run_path(str(repository_root / "scripts" / "run_acceptance.py"))
+    globals_map = namespace["_main_odd"].__globals__
+    globals_map["REPOSITORY_ROOT"] = tmp_path
+    command_type = namespace["AcceptanceCommand"]
+    record_type = namespace["CommandRecord"]
+    calls: list[tuple[str, bool]] = []
+
+    def fail_setup() -> None:
+        raise OSError("injected setup failure")
+
+    def fake_run(command: object, *, force_offline: bool = False) -> object:
+        assert isinstance(command, command_type)
+        calls.append((command.display, force_offline))
+        return record_type(command.display, 0.01, 0, "PASS: teardown")
+
+    globals_map["_clean_odd_generated_outputs"] = fail_setup
+    globals_map["run_command"] = fake_run
+    monkeypatch.setattr(namespace["shutil"], "which", lambda name: name)
+
+    assert namespace["_main_odd"]() == 1
+    assert calls == [(ODD_MANDATORY_ACCEPTANCE_COMMANDS[27], True)]

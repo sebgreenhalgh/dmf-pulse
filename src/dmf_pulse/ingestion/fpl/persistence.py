@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import unicodedata
 from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID
 
@@ -18,6 +20,7 @@ from dmf_pulse.data_model.tables import (
     canonical_entity,
     competition,
     data_provider,
+    data_quality_issue,
     entity_alias,
     external_identifier,
     fixture,
@@ -30,6 +33,8 @@ from dmf_pulse.data_model.tables import (
     player_observation,
     player_season,
     player_team_membership,
+    rights_decision,
+    rights_profile,
     season,
     semantic_effect_source,
     semantic_observation_claim,
@@ -145,14 +150,24 @@ def _range_lower(value: Range[datetime]) -> datetime:
 
 
 def _semantic_fields(values: dict[str, object]) -> dict[str, object]:
-    return {
-        key: _utc_text(value)
-        if isinstance(value, datetime)
-        else str(value)
-        if hasattr(value, "as_tuple")
-        else value
-        for key, value in values.items()
-    }
+    """Canonicalize fact values while raw payload hashes retain lexical scale.
+
+    Decimal semantic identity is numeric: trailing zeroes and the sign of zero
+    do not distinguish canonical facts.  Non-zero values use fixed notation so
+    equivalent exponent forms also hash identically.
+    """
+
+    def semantic_value(value: object) -> object:
+        if isinstance(value, datetime):
+            return _utc_text(value)
+        if isinstance(value, Decimal):
+            if value == 0:
+                return "0"
+            rendered = format(value, "f")
+            return rendered.rstrip("0").rstrip(".") if "." in rendered else rendered
+        return value
+
+    return {key: semantic_value(value) for key, value in values.items()}
 
 
 def _field_missingness(source: Any, fields: dict[str, str]) -> dict[str, str]:
@@ -310,6 +325,7 @@ class FplPersistence:
         season_code: str,
         bootstrap_snapshot_id: UUID,
         fixtures_snapshot_id: UUID,
+        code_commit: str | None = None,
     ) -> None:
         self.session = session
         self.captured_at = require_utc(captured_at)
@@ -322,6 +338,12 @@ class FplPersistence:
         self.season_code = season_code
         self.bootstrap_snapshot_id = bootstrap_snapshot_id
         self.fixtures_snapshot_id = fixtures_snapshot_id
+        if code_commit is not None and (
+            len(code_commit) != 40
+            or any(character not in "0123456789abcdef" for character in code_commit)
+        ):
+            raise IngestionError("CONFIGURATION_INVALID", "code commit identity is invalid")
+        self.code_commit = code_commit
         self.counts = EffectCounts()
 
     def ensure_provider(self) -> UUID:
@@ -991,11 +1013,8 @@ class FplPersistence:
         information_cutoff: datetime,
         bootstrap: ParsedFplResource,
         fixtures: ParsedFplResource,
-        profile_id: str,
-        profile_version: str,
         config_sha256: str,
         mapping_plan_sha256: str,
-        quality_status: str,
     ) -> SourceBundleSummary:
         cutoff = require_utc(information_cutoff)
         _advisory_lock(
@@ -1003,6 +1022,7 @@ class FplPersistence:
             f"bundle:FPL_BOOTSTRAP_FIXTURES:{season_id}:{_utc_text(cutoff)}",
         )
         member_rows: list[dict[str, Any]] = []
+        profile_identities: set[tuple[UUID, str, str]] = set()
         for role, snapshot_id, parsed in (
             ("BOOTSTRAP", self.bootstrap_snapshot_id, bootstrap),
             ("FIXTURES", self.fixtures_snapshot_id, fixtures),
@@ -1012,7 +1032,10 @@ class FplPersistence:
                     text(
                         """
                         SELECT snapshot.envelope_sha256, lifecycle.current_state,
-                               lifecycle.usable_at
+                               lifecycle.usable_at,
+                               snapshot.rights_profile_record_id,
+                               snapshot.rights_profile_key,
+                               snapshot.rights_profile_version
                         FROM provenance.source_snapshot AS snapshot
                         JOIN provenance.source_snapshot_lifecycle AS lifecycle
                           ON lifecycle.source_snapshot_id = snapshot.source_snapshot_id
@@ -1027,6 +1050,29 @@ class FplPersistence:
             usable_at = row["usable_at"]
             if row["current_state"] != "USABLE" or usable_at is None:
                 raise IngestionError("NO_USABLE_BUNDLE", "source snapshot is not usable")
+            profile_record_id = row["rights_profile_record_id"]
+            profile_id = row["rights_profile_key"]
+            profile_version = row["rights_profile_version"]
+            if (
+                not isinstance(profile_record_id, UUID)
+                or not isinstance(profile_id, str)
+                or not isinstance(profile_version, str)
+            ):
+                raise IngestionError("RIGHTS_BLOCKED", "bundle member rights are unavailable")
+            profile_identities.add((profile_record_id, profile_id, profile_version))
+            decisions = set(
+                self.session.execute(
+                    select(rights_decision.c.decision).where(
+                        rights_decision.c.source_snapshot_id == snapshot_id,
+                        rights_decision.c.rights_profile_record_id == profile_record_id,
+                        rights_decision.c.capability == "derived_storage",
+                    )
+                ).scalars()
+            )
+            if decisions != {"ALLOW"}:
+                raise IngestionError(
+                    "RIGHTS_BLOCKED", "bundle publication lacks authoritative rights approval"
+                )
             usable = require_utc(usable_at)
             if usable > cutoff:
                 raise IngestionError("POST_CUTOFF", "source snapshot became usable after cutoff")
@@ -1046,6 +1092,47 @@ class FplPersistence:
                     "schema_drift": parsed.drift.model_dump(mode="json"),
                 }
             )
+        if len(profile_identities) != 1:
+            raise IngestionError("RIGHTS_BLOCKED", "bundle member rights profiles do not match")
+        profile_record_id, profile_id, profile_version = profile_identities.pop()
+        profile_row = (
+            self.session.execute(
+                select(
+                    rights_profile.c.status,
+                    rights_profile.c.capabilities,
+                ).where(
+                    rights_profile.c.rights_profile_record_id == profile_record_id,
+                    rights_profile.c.rights_profile_id == profile_id,
+                    rights_profile.c.profile_version == profile_version,
+                )
+            )
+            .mappings()
+            .one_or_none()
+        )
+        capabilities = dict(profile_row["capabilities"]) if profile_row is not None else {}
+        if (
+            profile_row is None
+            or profile_row["status"] != "HUMAN_APPROVED"
+            or capabilities.get("derived_storage") != "ALLOW"
+            or capabilities.get("private_internal_use") != "ALLOW"
+        ):
+            raise IngestionError(
+                "RIGHTS_BLOCKED", "bundle rights profile is not active and allowed"
+            )
+        member_ids = [item["snapshot_id"] for item in member_rows]
+        open_issues = list(
+            self.session.execute(
+                select(data_quality_issue.c.severity).where(
+                    data_quality_issue.c.source_snapshot_id.in_(member_ids),
+                    data_quality_issue.c.status.in_(("OPEN", "ACKNOWLEDGED")),
+                )
+            ).scalars()
+        )
+        if any(severity in {"P0", "P1"} for severity in open_issues):
+            raise IngestionError(
+                "QUALITY_BLOCKED", "bundle publication is blocked by authoritative quality issues"
+            )
+        quality_status = "PASS_WITH_WARNINGS" if open_issues else "PASS"
         semantic_sha256 = canonical_sha256(
             {
                 "adapter_version": CONTRACT_VERSION,
@@ -1075,6 +1162,7 @@ class FplPersistence:
         manifest_sha256 = canonical_sha256(
             {
                 "bundle_semantic_sha256": semantic_sha256,
+                "code_commit": self.code_commit,
                 "members": [
                     {
                         "envelope_sha256": item["envelope_sha256"],
@@ -1108,12 +1196,13 @@ class FplPersistence:
                     information_cutoff=cutoff,
                     created_at=created_at,
                     rights_profiles=[{"id": profile_id, "version": profile_version}],
+                    rights_profile_record_id=profile_record_id,
                     adapter_version=CONTRACT_VERSION,
                     contract_version=CONTRACT_VERSION,
                     quality_status=quality_status,
                     semantic_sha256=semantic_sha256,
                     manifest_sha256=manifest_sha256,
-                    code_commit=None,
+                    code_commit=self.code_commit,
                     config_sha256=config_sha256,
                 )
                 .returning(source_bundle.c.source_bundle_id)
@@ -1124,6 +1213,7 @@ class FplPersistence:
                 insert(source_bundle_member).values(
                     source_bundle_id=bundle_id,
                     source_snapshot_id=item["snapshot_id"],
+                    rights_profile_record_id=profile_record_id,
                     role=item["role"],
                     usable_at=item["usable_at"],
                     payload_semantic_sha256=item["payload_semantic_sha256"],
@@ -1506,7 +1596,7 @@ class FplPersistence:
             self.session.execute(
                 text("SET CONSTRAINTS core.ex_entity_alias_current_preferred DEFERRED")
             )
-        normalized = raw_text.strip()
+        normalized = unicodedata.normalize("NFC", raw_text).strip()
         new_id = _uuid(
             self.session.execute(
                 insert(entity_alias)

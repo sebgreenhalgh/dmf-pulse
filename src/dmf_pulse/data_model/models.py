@@ -30,6 +30,9 @@ class EntityType(StrEnum):
     PLAYER = "PLAYER"
     FIXTURE = "FIXTURE"
     DATA_PROVIDER = "DATA_PROVIDER"
+    BETTING_OPERATOR = "BETTING_OPERATOR"
+    MARKET = "MARKET"
+    SELECTION = "SELECTION"
 
 
 class MappingStatus(StrEnum):

@@ -9,6 +9,7 @@ import urllib.request
 from email.message import Message
 from io import BytesIO
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -420,3 +421,66 @@ def test_fake_transport_response_is_not_implicitly_parsed(repository_root: Path)
     assert client.fetch(FplResource.BOOTSTRAP) == malformed
     with pytest.raises(json.JSONDecodeError):
         json.loads(malformed)
+
+
+def test_bounded_reader_rejects_missing_and_nonbytes_readers() -> None:
+    request = build_request(FplResource.BOOTSTRAP)
+    transport = UrllibTransport(monotonic=lambda: 0.0)
+    with pytest.raises(IngestionError, match="response is invalid"):
+        transport._read_bounded(object(), request, started_at=0.0)
+
+    class NonBytesResponse:
+        def read(self, _limit: int) -> str:
+            return "not-bytes"
+
+    with pytest.raises(IngestionError, match="response is invalid"):
+        transport._read_bounded(NonBytesResponse(), request, started_at=0.0)
+
+
+def test_bounded_reader_enforces_post_read_deadline_and_size_loop_exit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = build_request(FplResource.BOOTSTRAP)
+    times = iter((0.0, request.total_timeout_seconds))
+    with pytest.raises(TimeoutError, match="deadline"):
+        UrllibTransport(monotonic=lambda: next(times))._read_bounded(
+            FakeUrlResponse(200, "application/json", b"x"),
+            request,
+            started_at=0.0,
+        )
+
+    config = client_module.load_provider_config().model_copy(update={"max_response_bytes": 0})
+    monkeypatch.setattr(client_module, "load_provider_config", lambda: config)
+    assert (
+        UrllibTransport(monotonic=lambda: 0.0)._read_bounded(
+            FakeUrlResponse(200, "application/json", b"x"),
+            request,
+            started_at=0.0,
+        )
+        == b"x"
+    )
+
+
+def test_transport_rechecks_the_rendered_url_before_network(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        urllib.parse,
+        "urlsplit",
+        lambda _url: SimpleNamespace(
+            scheme="https",
+            hostname="different.invalid",
+            path="/api/bootstrap-static/",
+            username=None,
+            password=None,
+            query="",
+            fragment="",
+        ),
+    )
+    monkeypatch.setattr(
+        urllib.request,
+        "build_opener",
+        lambda *_handlers: pytest.fail("opener must not be constructed"),
+    )
+    with pytest.raises(IngestionError, match="URL is not allowlisted"):
+        UrllibTransport().send(build_request(FplResource.BOOTSTRAP))

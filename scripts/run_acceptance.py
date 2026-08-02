@@ -22,6 +22,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RUL_BASELINE = "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
 DAT_BASELINE = "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
 FPL_BASELINE = "9b3160a2574d2868b5f26e3a2d429924567510b0"
+ODD_BASELINE = "7034e38f32cd579c90d35c5fe3f10921c3656be0"
 RUL_WRITE_AHEAD_RESULT = (
     "PASS: write-ahead record committed only by successful external archive finalization; "
     "exact duration and digests are in archive_finalization.json"
@@ -674,6 +675,282 @@ def _fpl_commands(uv: str, docker: str, git: str) -> tuple[AcceptanceCommand, ..
     )
 
 
+def _odd_commands(uv: str, docker: str, git: str) -> tuple[AcceptanceCommand, ...]:
+    return (
+        AcceptanceCommand("git diff --check", (git, "diff", "--check"), 60),
+        AcceptanceCommand("uv lock --check", (uv, "lock", "--check"), 180),
+        AcceptanceCommand(
+            "uv run dmf specs validate", (uv, "run", "dmf", "specs", "validate"), 180
+        ),
+        AcceptanceCommand(
+            "uv run dmf evidence validate --ticket ODD-005",
+            (uv, "run", "dmf", "evidence", "validate", "--ticket", "ODD-005"),
+            180,
+        ),
+        AcceptanceCommand(
+            "uv run ruff format --check .", (uv, "run", "ruff", "format", "--check", "."), 180
+        ),
+        AcceptanceCommand("uv run ruff check .", (uv, "run", "ruff", "check", "."), 180),
+        AcceptanceCommand("uv run mypy src/dmf_pulse", (uv, "run", "mypy", "src/dmf_pulse"), 300),
+        AcceptanceCommand(
+            'uv run pytest -q -m "unit" tests/unit',
+            (uv, "run", "pytest", "-q", "-m", "unit", "tests/unit"),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "property" tests/property',
+            (uv, "run", "pytest", "-q", "-m", "property", "tests/property"),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "contract" tests/contract',
+            (uv, "run", "pytest", "-q", "-m", "contract", "tests/contract"),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "security" tests/security',
+            (uv, "run", "pytest", "-q", "-m", "security", "tests/security"),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "docker compose -f compose.test.yaml up -d --wait",
+            (docker, "compose", "-f", "compose.test.yaml", "up", "-d", "--wait"),
+            300,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/test_migration_matrix.py --baseline-revision 20260724_0002 --target head",
+            (
+                uv,
+                "run",
+                "python",
+                "scripts/test_migration_matrix.py",
+                "--baseline-revision",
+                "20260724_0002",
+                "--target",
+                "head",
+            ),
+            900,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "postgres and integration" tests/integration',
+            (uv, "run", "pytest", "-q", "-m", "postgres and integration", "tests/integration"),
+            1800,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/unit/ingestion/test_fpl_client.py tests/security/test_fpl_tls_retry.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/unit/ingestion/test_fpl_client.py",
+                "tests/security/test_fpl_tls_retry.py",
+            ),
+            600,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/integration/ingestion/test_fpl_bundle_rights_quality_gate.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/integration/ingestion/test_fpl_bundle_rights_quality_gate.py",
+            ),
+            600,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/integration/ingestion/odds/test_the_odds_api_recorded_ingestion.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/integration/ingestion/odds/test_the_odds_api_recorded_ingestion.py",
+            ),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/integration/ingestion/odds/test_odds_idempotency_asof.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/integration/ingestion/odds/test_odds_idempotency_asof.py",
+            ),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/security/test_odds_credentials_quota_retention.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/security/test_odds_credentials_quota_retention.py",
+            ),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run dmf ingest fpl replay --fixture-set fixtures/fpl/FPL-004 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_test_v1 --output json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "ingest",
+                "fpl",
+                "replay",
+                "--fixture-set",
+                "fixtures/fpl/FPL-004",
+                "--scenario",
+                "happy_path",
+                "--information-cutoff",
+                "2026-08-21T17:30:00Z",
+                "--rights-profile",
+                "synthetic_test_v1",
+                "--output",
+                "json",
+            ),
+            300,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run dmf ingest odds replay --fixture-set fixtures/odds/ODD-005 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_the_odds_api_v1 --output json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "ingest",
+                "odds",
+                "replay",
+                "--fixture-set",
+                "fixtures/odds/ODD-005",
+                "--scenario",
+                "happy_path",
+                "--information-cutoff",
+                "2026-08-21T17:30:00Z",
+                "--rights-profile",
+                "synthetic_the_odds_api_v1",
+                "--output",
+                "json",
+            ),
+            300,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run dmf market observations --fixture-external-provider official_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "market",
+                "observations",
+                "--fixture-external-provider",
+                "official_fpl",
+                "--fixture-external-id",
+                "101",
+                "--season-code",
+                "2026/27",
+                "--as-of",
+                "2026-08-20T12:05:00Z",
+                "--output",
+                "json",
+            ),
+            180,
+            offline=True,
+            capture_path=REPOSITORY_ROOT / "evidence/tickets/ODD-005/market_observations.json",
+        ),
+        AcceptanceCommand(
+            "uv run dmf ingest odds snapshot --provider the_odds_api --competition-key PL --sport-key soccer_epl --region uk --market h2h --as-of 2026-08-20T12:05:00Z --output json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "ingest",
+                "odds",
+                "snapshot",
+                "--provider",
+                "the_odds_api",
+                "--competition-key",
+                "PL",
+                "--sport-key",
+                "soccer_epl",
+                "--region",
+                "uk",
+                "--market",
+                "h2h",
+                "--as-of",
+                "2026-08-20T12:05:00Z",
+                "--output",
+                "json",
+            ),
+            180,
+            offline=True,
+            expected_exit=4,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/verify_odd005_wheel.py",
+            (uv, "run", "python", "scripts/verify_odd005_wheel.py"),
+            1500,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-fail-under=90",
+            (
+                uv,
+                "run",
+                "pytest",
+                "--cov=dmf_pulse",
+                "--cov-branch",
+                "--cov-report=term-missing",
+                "--cov-fail-under=90",
+            ),
+            2400,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/verify_odd005_acceptance.py",
+            (uv, "run", "python", "scripts/verify_odd005_acceptance.py"),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            f"uv run dmf review-pack build --ticket ODD-005 --baseline {ODD_BASELINE} --output review_pack/ODD-005",
+            (
+                uv,
+                "run",
+                "dmf",
+                "review-pack",
+                "build",
+                "--ticket",
+                "ODD-005",
+                "--baseline",
+                ODD_BASELINE,
+                "--output",
+                "review_pack/ODD-005",
+            ),
+            900,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "docker compose -f compose.test.yaml down -v --remove-orphans",
+            (docker, "compose", "-f", "compose.test.yaml", "down", "-v", "--remove-orphans"),
+            300,
+        ),
+    )
+
+
 def _review_command(uv: str, ticket: str) -> AcceptanceCommand:
     if ticket == "RUL-002":
         display = f"uv run dmf review-pack build --ticket RUL-002 --baseline {RUL_BASELINE} --output review_pack/RUL-002"
@@ -727,6 +1004,15 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
         code = error.get("code") if isinstance(error, dict) else None
         if code is None and isinstance(value, dict):
             code = value.get("code")
+        if "ingest odds snapshot" in command.display:
+            transport_called = error.get("transport_called") if isinstance(error, dict) else None
+            if code != "CREDENTIAL_UNAVAILABLE" or transport_called is not False:
+                return (
+                    "FAIL: controlled refusal did not prove CREDENTIAL_UNAVAILABLE before transport"
+                )
+            return (
+                f"PASS: expected exit {exit_code}; CREDENTIAL_UNAVAILABLE with zero transport calls"
+            )
         if "ingest fpl snapshot" in command.display:
             effects = value.get("canonical_effects", {}) if isinstance(value, dict) else {}
             if code is None and isinstance(effects, dict):
@@ -772,7 +1058,9 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
         except json.JSONDecodeError:
             return "PASS: doctor emitted output"
         return f"PASS: doctor status {value.get('status', 'UNKNOWN')}"
-    if command.display.endswith(("verify_wheel.py", "verify_fpl004_wheel.py")):
+    if command.display.endswith(
+        ("verify_wheel.py", "verify_fpl004_wheel.py", "verify_odd005_wheel.py")
+    ):
         try:
             value = json.loads(output)
         except json.JSONDecodeError:
@@ -836,17 +1124,19 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
     return summaries.get(command.display, "PASS: command completed")
 
 
-def run_command(command: AcceptanceCommand) -> CommandRecord:
+def run_command(command: AcceptanceCommand, *, force_offline: bool = False) -> CommandRecord:
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
     environment.pop("DMF_TEST_POSTGRES_PORT", None)
+    for credential_name in ("THE_ODDS_API_KEY", "ODDS_API_KEY", "DMF_ODDS_API_KEY"):
+        environment.pop(credential_name, None)
     environment["PYTHONNOUSERSITE"] = "1"
     environment["DMF_ENVIRONMENT"] = "TEST"
     environment["PGPASSWORD"] = "changeme"
     environment["DMF_TEST_DATABASE_URL"] = (
         "postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test"
     )
-    if command.offline:
+    if command.offline or force_offline:
         environment["UV_OFFLINE"] = "1"
     started = time.perf_counter()
     try:
@@ -908,6 +1198,20 @@ def _clean_fpl_generated_outputs() -> None:
         if path.is_file() and path.name != "PLAN.md":
             path.unlink()
     review_root = REPOSITORY_ROOT / "review_pack/FPL-004"
+    if review_root.is_dir():
+        for path in review_root.iterdir():
+            if path.is_file():
+                path.unlink()
+
+
+def _clean_odd_generated_outputs() -> None:
+    evidence_root = REPOSITORY_ROOT / "evidence/tickets/ODD-005"
+    evidence_root.mkdir(parents=True, exist_ok=True)
+    preserved = {".gitignore", "BLOCKED.md", "PLAN.md"}
+    for path in evidence_root.iterdir():
+        if path.is_file() and path.name not in preserved:
+            path.unlink()
+    review_root = REPOSITORY_ROOT / "review_pack/ODD-005"
     if review_root.is_dir():
         for path in review_root.iterdir():
             if path.is_file():
@@ -1281,6 +1585,197 @@ def _main_fpl() -> int:
     return 0
 
 
+def _main_odd() -> int:
+    uv = shutil.which("uv")
+    docker = shutil.which("docker")
+    git = shutil.which("git")
+    if uv is None or docker is None or git is None:
+        print("uv, Docker, or Git is unavailable", file=sys.stderr)
+        return 2
+    commands = _odd_commands(uv, docker, git)
+    command_log = REPOSITORY_ROOT / "evidence/tickets/ODD-005/commands.log"
+    archive = REPOSITORY_ROOT / "review_pack/ODD-005/DMF_PULSE_ODD-005_REVIEW.zip"
+    finalization_path = REPOSITORY_ROOT / "review_pack/ODD-005/archive_finalization.json"
+    records: list[CommandRecord] = []
+    review_record: CommandRecord | None = None
+    teardown_record: CommandRecord | None = None
+    failure = False
+    try:
+        _clean_odd_generated_outputs()
+        source_root = REPOSITORY_ROOT / "src"
+        if str(source_root) not in sys.path:
+            sys.path.insert(0, str(source_root))
+        from generate_odd005_evidence import _manifest as write_odd_manifest
+        from generate_odd005_evidence import generate as generate_odd_evidence
+
+        write_odd_manifest("DRAFT", [], None)
+        for command in commands[:26]:
+            record = run_command(command, force_offline=True)
+            records.append(record)
+            print(f"[{record.exit_code}] {record.command} ({record.duration_seconds:.3f}s)")
+            if record.exit_code != command.expected_exit or not record.result.startswith("PASS:"):
+                failure = True
+                break
+        if not failure:
+            from dmf_pulse.assurance.review_pack import (
+                ODD_REVIEW_FINAL_RESULT,
+                ODD_REVIEW_WRITE_AHEAD_RESULT,
+                ODD_TEARDOWN_WRITE_AHEAD_RESULT,
+                calculate_review_payload_digest,
+            )
+
+            head = _git_head()
+            placeholders = [
+                *[asdict(item) for item in records],
+                asdict(
+                    CommandRecord(
+                        command=commands[26].display,
+                        duration_seconds=None,
+                        exit_code=0,
+                        result=ODD_REVIEW_WRITE_AHEAD_RESULT,
+                    )
+                ),
+                asdict(
+                    CommandRecord(
+                        command=commands[27].display,
+                        duration_seconds=None,
+                        exit_code=0,
+                        result=ODD_TEARDOWN_WRITE_AHEAD_RESULT,
+                    )
+                ),
+            ]
+            _write_command_records(command_log, placeholders)
+            generate_odd_evidence(status="BLOCKED", payload_sha256="0" * 64, code_commit=head)
+            generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+            digest = calculate_review_payload_digest(
+                REPOSITORY_ROOT,
+                ticket="ODD-005",
+                baseline=ODD_BASELINE,
+                generated_at=generated_at,
+            )
+            generate_odd_evidence(status="BLOCKED", payload_sha256=digest, code_commit=head)
+            review_record = run_command(commands[26], force_offline=True)
+            print(
+                f"[{review_record.exit_code}] {review_record.command} "
+                f"({review_record.duration_seconds:.3f}s)"
+            )
+            if review_record.exit_code != 0 or not review_record.result.startswith("PASS:"):
+                failure = True
+            else:
+                review_record = CommandRecord(
+                    command=review_record.command,
+                    duration_seconds=review_record.duration_seconds,
+                    exit_code=0,
+                    result=ODD_REVIEW_FINAL_RESULT,
+                )
+    except Exception as exc:
+        failure = True
+        print(f"ODD-005 acceptance preparation failed ({type(exc).__name__})", file=sys.stderr)
+    finally:
+        teardown_record = run_command(commands[27], force_offline=True)
+        print(
+            f"[{teardown_record.exit_code}] {teardown_record.command} "
+            f"({teardown_record.duration_seconds:.3f}s)"
+        )
+        if teardown_record.exit_code != 0 or not teardown_record.result.startswith("PASS:"):
+            failure = True
+        else:
+            from dmf_pulse.assurance.review_pack import ODD_TEARDOWN_FINAL_RESULT
+
+            teardown_record = CommandRecord(
+                command=teardown_record.command,
+                duration_seconds=teardown_record.duration_seconds,
+                exit_code=0,
+                result=ODD_TEARDOWN_FINAL_RESULT,
+            )
+
+    if review_record is None or teardown_record is None:
+        final_records = [*records, *([teardown_record] if teardown_record is not None else [])]
+        serialized_final_records = [asdict(item) for item in final_records]
+        _write_command_records(command_log, serialized_final_records)
+        with suppress(Exception):
+            write_odd_manifest("BLOCKED", serialized_final_records, _git_head())
+        archive.unlink(missing_ok=True)
+        return 1
+
+    final_records = [*records, review_record, teardown_record]
+    _write_command_records(command_log, [asdict(item) for item in final_records])
+    if failure:
+        archive.unlink(missing_ok=True)
+        with suppress(Exception):
+            write_odd_manifest("BLOCKED", [asdict(item) for item in final_records], _git_head())
+        _write_json_atomic(
+            finalization_path,
+            {
+                "command_27": asdict(review_record),
+                "command_28": asdict(teardown_record),
+                "status": "FAILED",
+            },
+        )
+        return 1
+
+    try:
+        from dmf_pulse.assurance.review_pack import (
+            build_review_pack,
+            calculate_review_payload_digest,
+            validate_review_zip,
+        )
+
+        head = _git_head()
+        generate_odd_evidence(status="COMPLETE", payload_sha256="0" * 64, code_commit=head)
+        generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+        digest = calculate_review_payload_digest(
+            REPOSITORY_ROOT,
+            ticket="ODD-005",
+            baseline=ODD_BASELINE,
+            generated_at=generated_at,
+        )
+        generate_odd_evidence(status="COMPLETE", payload_sha256=digest, code_commit=head)
+        summary = build_review_pack(
+            REPOSITORY_ROOT,
+            ticket="ODD-005",
+            baseline=ODD_BASELINE,
+            output=REPOSITORY_ROOT / "review_pack/ODD-005",
+            generated_at=generated_at,
+        )
+        validated = validate_review_zip(summary.path)
+        with zipfile.ZipFile(summary.path) as review_zip:
+            if review_zip.testzip() is not None:
+                raise ValueError("review archive CRC validation failed")
+        finalization = {
+            "archive_sha256": hashlib.sha256(summary.path.read_bytes()).hexdigest(),
+            "command_27": asdict(review_record),
+            "command_28": asdict(teardown_record),
+            "crc_and_checksum_validated": True,
+            "file_count": validated.file_count,
+            "payload_sha256": validated.payload_sha256,
+            "status": "COMPLETE",
+        }
+        _write_json_atomic(finalization_path, finalization)
+    except Exception as exc:
+        archive.unlink(missing_ok=True)
+        try:
+            generate_odd_evidence(
+                status="BLOCKED", payload_sha256="0" * 64, code_commit=_git_head()
+            )
+        except Exception:
+            with suppress(Exception):
+                write_odd_manifest("BLOCKED", [asdict(item) for item in final_records], _git_head())
+        _write_json_atomic(
+            finalization_path,
+            {
+                "command_27": asdict(review_record),
+                "command_28": asdict(teardown_record),
+                "error_type": type(exc).__name__,
+                "status": "FAILED",
+            },
+        )
+        print(f"ODD-005 review archive finalization failed ({type(exc).__name__})")
+        return 1
+    print(json.dumps(finalization, indent=2, sort_keys=True))
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -1294,7 +1789,9 @@ def main() -> int:
         help="append the stable RUL-002 review write-ahead record before digest calculation",
     )
     parser.add_argument(
-        "--ticket", choices=("FND-001", "RUL-002", "DAT-003", "FPL-004"), default="FND-001"
+        "--ticket",
+        choices=("FND-001", "RUL-002", "DAT-003", "FPL-004", "ODD-005"),
+        default="FND-001",
     )
     arguments = parser.parse_args()
     if arguments.review_only and arguments.prepare_review:
@@ -1311,6 +1808,12 @@ def main() -> int:
                 "FPL-004 runs its review and teardown inside the exact acceptance sequence"
             )
         return _main_fpl()
+    if arguments.ticket == "ODD-005":
+        if arguments.review_only or arguments.prepare_review:
+            parser.error(
+                "ODD-005 runs its review and teardown inside the exact acceptance sequence"
+            )
+        return _main_odd()
     uv = shutil.which("uv")
     if uv is None:
         print("uv is unavailable", file=sys.stderr)

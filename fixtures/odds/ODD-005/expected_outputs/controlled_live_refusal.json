@@ -1,0 +1,9 @@
+{
+  "status": "BLOCKED",
+  "error": {
+    "code": "CREDENTIAL_UNAVAILABLE",
+    "retryable": false,
+    "transport_called": false
+  },
+  "exit_code": 4
+}

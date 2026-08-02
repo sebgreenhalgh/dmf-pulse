@@ -41,6 +41,7 @@ jobs:
           uv run dmf rules validate fixtures/rules/RUL-002/synthetic_complete --json
           uv run dmf specs validate
           uv run dmf ingest fpl validate --resource bootstrap --input fixtures/fpl/FPL-004/happy_path/bootstrap.json --contract-version fpl-reference-v1 --output json
+          uv run dmf ingest odds validate --provider the_odds_api --input fixtures/odds/ODD-005/happy_path.json --contract-version the-odds-api-v4-reference-v1 --output json
 
       - name: Package smoke outside source tree
         run: |

@@ -33,6 +33,7 @@ from dmf_pulse.data_model.models import (
     require_utc,
 )
 from dmf_pulse.data_model.tables import (
+    betting_operator,
     canonical_entity,
     competition,
     data_provider,
@@ -42,6 +43,8 @@ from dmf_pulse.data_model.tables import (
     fixture_gameweek_assignment,
     fixture_revision,
     gameweek,
+    market_selection,
+    operator_fixture_market,
     player,
     player_team_membership,
     raw_blob,
@@ -204,6 +207,9 @@ class CanonicalRepository:
             EntityType.PLAYER: (player, "player_id"),
             EntityType.FIXTURE: (fixture, "fixture_id"),
             EntityType.DATA_PROVIDER: (data_provider, "provider_id"),
+            EntityType.BETTING_OPERATOR: (betting_operator, "operator_id"),
+            EntityType.MARKET: (operator_fixture_market, "market_id"),
+            EntityType.SELECTION: (market_selection, "selection_id"),
         }
         target, id_column = table_map[entity_type]
         reserved = {id_column, "entity_type"} & attributes.keys()

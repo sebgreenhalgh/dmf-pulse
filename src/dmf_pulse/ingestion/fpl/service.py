@@ -87,7 +87,7 @@ from dmf_pulse.ingestion.rights import (
 )
 
 DATABASE_REF = "env:DMF_TEST_DATABASE_URL"
-TARGET_REVISION = "20260724_0002"
+TARGET_REVISION = "20260725_0004"
 DEFAULT_CAPTURED_AT = datetime(2026, 8, 21, 17, 0, tzinfo=UTC)
 DEFAULT_INFORMATION_CUTOFF = datetime(2026, 8, 21, 17, 30, tzinfo=UTC)
 VOLATILE_ROOT_NAME = "dmf-fpl004-volatile"
@@ -639,10 +639,14 @@ class FplIngestionService:
         repository_root: Path | None = None,
         transport_factory: Callable[[], Transport] = UrllibTransport,
         clock: Callable[[], datetime] = _utc_now,
+        code_commit: str | None = None,
     ) -> None:
         self.repository_root = (repository_root or Path.cwd()).resolve()
         self.transport_factory = transport_factory
         self.clock = clock
+        if code_commit is not None and re.fullmatch(r"[0-9a-f]{40}", code_commit) is None:
+            raise IngestionError("CONFIGURATION_INVALID", "code commit identity is invalid")
+        self.code_commit = code_commit
 
     def _operation_time(self, captured_at: datetime) -> datetime:
         captured = require_utc(captured_at)
@@ -1642,6 +1646,7 @@ class FplIngestionService:
                 season_code=request.season_code,
                 bootstrap_snapshot_id=snapshots[0],
                 fixtures_snapshot_id=snapshots[1],
+                code_commit=self.code_commit,
             )
             unit_of_work = persistence.session
             try:
@@ -1695,11 +1700,8 @@ class FplIngestionService:
                             information_cutoff=request.information_cutoff,
                             bootstrap=parsed[0],
                             fixtures=parsed[1],
-                            profile_id=profile.rights_profile_id,
-                            profile_version=profile.profile_version,
                             config_sha256=effective_config_sha256(),
                             mapping_plan_sha256=mapping_hash,
-                            quality_status=quality.status,
                         )
                     except IngestionError as exc:
                         if exc.code != "POST_CUTOFF":

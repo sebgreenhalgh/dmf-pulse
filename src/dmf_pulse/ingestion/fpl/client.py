@@ -173,6 +173,8 @@ class UrllibTransport:
             raise IngestionError("TLS_ERROR", "FPL source TLS validation failed") from None
         except urllib.error.URLError as exc:
             reason = exc.reason
+            if isinstance(reason, (ssl.SSLError, ssl.CertificateError)):
+                raise IngestionError("TLS_ERROR", "FPL source TLS validation failed") from None
             code = "CONNECT_TIMEOUT" if isinstance(reason, TimeoutError) else "SOURCE_UNAVAILABLE"
             raise IngestionError(code, "FPL source is unavailable", retryable=True) from None
         except (OSError, http.client.HTTPException):

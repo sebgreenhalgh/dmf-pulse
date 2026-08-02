@@ -1,0 +1,9 @@
+{
+  "status": "COMPLETE",
+  "new_retrieval_snapshots": 1,
+  "observations_created": 6,
+  "changed_selections": 1,
+  "earlier_as_of_book_alpha_home": "1.80",
+  "later_as_of_book_alpha_home": "1.75",
+  "historical_observations_preserved": true
+}

@@ -22,6 +22,9 @@ ENTITY_TYPE_CONSTRAINTS = {
     "fk_gameweek_canonical_type",
     "fk_provider_canonical_type",
     "fk_external_identifier_canonical_type",
+    "fk_betting_operator_canonical_type",
+    "fk_operator_market_canonical_type",
+    "fk_market_selection_canonical_type",
 }
 TEMPORAL_RANGE_CONSTRAINTS = {
     "ck_external_identifier_valid_range",

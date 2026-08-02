@@ -71,7 +71,8 @@ canonical_entity = Table(
     Column("notes", Text),
     UniqueConstraint("entity_id", "entity_type", name="uq_canonical_entity_id_type"),
     CheckConstraint(
-        "entity_type IN ('COMPETITION','SEASON','GAMEWEEK','TEAM','PLAYER','FIXTURE','DATA_PROVIDER')",
+        "entity_type IN ('COMPETITION','SEASON','GAMEWEEK','TEAM','PLAYER','FIXTURE',"
+        "'DATA_PROVIDER','BETTING_OPERATOR','MARKET','SELECTION')",
         name="ck_canonical_entity_type",
     ),
     CheckConstraint(
@@ -791,6 +792,13 @@ rights_decision = Table(
     ),
     CheckConstraint("decision IN ('ALLOW','DENY')", name="ck_rights_decision_value"),
     CheckConstraint("context_sha256 ~ '^[0-9a-f]{64}$'", name="ck_rights_decision_context_hash"),
+    UniqueConstraint(
+        "rights_profile_record_id",
+        "source_snapshot_id",
+        "capability",
+        name="uq_rights_decision_authority",
+        postgresql_nulls_not_distinct=True,
+    ),
     schema="provenance",
 )
 
@@ -1085,6 +1093,12 @@ external_identifier = Table(
     CheckConstraint(
         "match_probability IS NULL OR match_probability BETWEEN 0 AND 1",
         name="ck_external_identifier_probability",
+    ),
+    CheckConstraint(
+        "identifier_namespace <> 'the_odds_api.bookmaker.key' OR "
+        "(entity_type = 'BETTING_OPERATOR' AND season_id IS NULL "
+        "AND provider_product = 'soccer_epl/odds')",
+        name="ck_external_identifier_odds_operator_scope",
     ),
     CheckConstraint("first_seen_at <= last_seen_at", name="ck_external_identifier_seen_order"),
     schema="core",
@@ -1750,6 +1764,16 @@ source_bundle = Table(
     Column("information_cutoff", DateTime(timezone=True), nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("rights_profiles", JSONB, nullable=False),
+    Column(
+        "rights_profile_record_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.rights_profile.rights_profile_record_id",
+            name="fk_source_bundle_rights_profile",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
     Column("adapter_version", String(40), nullable=False),
     Column("contract_version", String(40), nullable=False),
     Column("quality_status", String(32), nullable=False),
@@ -1758,6 +1782,11 @@ source_bundle = Table(
     Column("code_commit", CHAR(40)),
     Column("config_sha256", CHAR(64), nullable=False),
     UniqueConstraint("manifest_sha256", name="uq_source_bundle_manifest_hash"),
+    UniqueConstraint(
+        "source_bundle_id",
+        "rights_profile_record_id",
+        name="uq_source_bundle_rights_profile",
+    ),
     ForeignKeyConstraint(
         ["season_id", "competition_id"],
         ["football.season.season_id", "football.season.competition_id"],
@@ -1808,6 +1837,7 @@ source_bundle_member = Table(
         ),
         nullable=False,
     ),
+    Column("rights_profile_record_id", UUID(as_uuid=True), nullable=False),
     Column("role", String(16), nullable=False),
     Column("usable_at", DateTime(timezone=True), nullable=False),
     Column("payload_semantic_sha256", CHAR(64), nullable=False),
@@ -1817,6 +1847,24 @@ source_bundle_member = Table(
     UniqueConstraint("source_bundle_id", "role", name="uq_source_bundle_member_role"),
     UniqueConstraint(
         "source_bundle_id", "source_snapshot_id", name="uq_source_bundle_member_snapshot"
+    ),
+    ForeignKeyConstraint(
+        ["source_bundle_id", "rights_profile_record_id"],
+        [
+            "provenance.source_bundle.source_bundle_id",
+            "provenance.source_bundle.rights_profile_record_id",
+        ],
+        name="fk_source_bundle_member_bundle_rights",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["source_snapshot_id", "rights_profile_record_id"],
+        [
+            "provenance.source_snapshot.source_snapshot_id",
+            "provenance.source_snapshot.rights_profile_record_id",
+        ],
+        name="fk_source_bundle_member_snapshot_rights",
+        ondelete="RESTRICT",
     ),
     CheckConstraint("role IN ('BOOTSTRAP','FIXTURES')", name="ck_source_bundle_member_role"),
     CheckConstraint(
@@ -1832,6 +1880,484 @@ source_bundle_member = Table(
         name="ck_source_bundle_member_lifecycle_hash",
     ),
     schema="provenance",
+)
+
+betting_operator = Table(
+    "betting_operator",
+    metadata,
+    *_typed_entity_columns("operator_id", "BETTING_OPERATOR"),
+    Column("operator_key", String(120), nullable=False),
+    Column("display_name", Text, nullable=False),
+    Column("active", Boolean, nullable=False, server_default=text("true")),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    ForeignKeyConstraint(
+        ["operator_id", "entity_type"],
+        ["core.canonical_entity.entity_id", "core.canonical_entity.entity_type"],
+        name="fk_betting_operator_canonical_type",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint("operator_key", name="uq_betting_operator_key"),
+    CheckConstraint("entity_type = 'BETTING_OPERATOR'", name="ck_betting_operator_entity_type"),
+    schema="betting",
+)
+
+market_definition = Table(
+    "market_definition",
+    metadata,
+    Column(
+        "market_definition_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column("definition_key", String(120), nullable=False),
+    Column("definition_version", String(40), nullable=False),
+    Column("scope", String(24), nullable=False),
+    Column("period", String(24), nullable=False),
+    Column("outcomes", JSONB, nullable=False),
+    Column("description", Text, nullable=False),
+    UniqueConstraint("definition_key", "definition_version", name="uq_market_definition_identity"),
+    CheckConstraint(
+        "definition_key = 'MATCH_RESULT_1X2' AND definition_version = '1.0.0'",
+        name="ck_market_definition_reference",
+    ),
+    CheckConstraint("scope = 'FIXTURE'", name="ck_market_definition_scope"),
+    CheckConstraint("period = 'FULL_TIME'", name="ck_market_definition_period"),
+    CheckConstraint(
+        'outcomes = \'["HOME","DRAW","AWAY"]\'::jsonb',
+        name="ck_market_definition_outcomes",
+    ),
+    schema="betting",
+)
+
+settlement_profile = Table(
+    "settlement_profile",
+    metadata,
+    Column(
+        "settlement_profile_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column("profile_key", String(160), nullable=False),
+    Column("profile_version", String(40), nullable=False),
+    Column("period", String(24), nullable=False),
+    Column("includes_extra_time", Boolean, nullable=False),
+    Column("description", Text, nullable=False),
+    UniqueConstraint("profile_key", "profile_version", name="uq_settlement_profile_identity"),
+    CheckConstraint(
+        "profile_key = 'SOCCER_FULL_TIME_90_MINUTES_REFERENCE_V1' AND profile_version = '1.0.0'",
+        name="ck_settlement_profile_reference",
+    ),
+    CheckConstraint("period = 'FULL_TIME'", name="ck_settlement_profile_period"),
+    CheckConstraint("includes_extra_time = false", name="ck_settlement_profile_no_extra_time"),
+    schema="betting",
+)
+
+operator_fixture_market = Table(
+    "operator_fixture_market",
+    metadata,
+    *_typed_entity_columns("market_id", "MARKET"),
+    Column(
+        "fixture_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.fixture.fixture_id", name="fk_operator_market_fixture", ondelete="RESTRICT"
+        ),
+        nullable=False,
+    ),
+    Column(
+        "operator_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "betting.betting_operator.operator_id",
+            name="fk_operator_market_operator",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "market_definition_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "betting.market_definition.market_definition_id",
+            name="fk_operator_market_definition",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("period", String(24), nullable=False),
+    Column("line", Numeric),
+    Column(
+        "settlement_profile_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "betting.settlement_profile.settlement_profile_id",
+            name="fk_operator_market_settlement",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    ForeignKeyConstraint(
+        ["market_id", "entity_type"],
+        ["core.canonical_entity.entity_id", "core.canonical_entity.entity_type"],
+        name="fk_operator_market_canonical_type",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint("market_id", "fixture_id", "operator_id", name="uq_operator_market_scope"),
+    UniqueConstraint("market_id", "operator_id", name="uq_operator_market_operator"),
+    UniqueConstraint(
+        "fixture_id",
+        "operator_id",
+        "market_definition_id",
+        "period",
+        "line",
+        "settlement_profile_id",
+        name="uq_operator_market_identity",
+        postgresql_nulls_not_distinct=True,
+    ),
+    CheckConstraint("entity_type = 'MARKET'", name="ck_operator_market_entity_type"),
+    CheckConstraint("period = 'FULL_TIME'", name="ck_operator_market_period"),
+    CheckConstraint("line IS NULL", name="ck_operator_market_no_line"),
+    schema="betting",
+)
+
+market_selection = Table(
+    "market_selection",
+    metadata,
+    *_typed_entity_columns("selection_id", "SELECTION"),
+    Column(
+        "market_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "betting.operator_fixture_market.market_id",
+            name="fk_market_selection_market",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("outcome", String(16), nullable=False),
+    ForeignKeyConstraint(
+        ["selection_id", "entity_type"],
+        ["core.canonical_entity.entity_id", "core.canonical_entity.entity_type"],
+        name="fk_market_selection_canonical_type",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint("market_id", "outcome", name="uq_market_selection_outcome"),
+    UniqueConstraint("selection_id", "market_id", name="uq_market_selection_scope"),
+    UniqueConstraint(
+        "selection_id", "market_id", "outcome", name="uq_market_selection_outcome_scope"
+    ),
+    CheckConstraint("entity_type = 'SELECTION'", name="ck_market_selection_entity_type"),
+    CheckConstraint("outcome IN ('HOME','DRAW','AWAY')", name="ck_market_selection_outcome"),
+    schema="betting",
+)
+
+provider_market_representation = Table(
+    "provider_market_representation",
+    metadata,
+    Column(
+        "provider_market_representation_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "provider_id",
+        UUID(as_uuid=True),
+        ForeignKey("provenance.data_provider.provider_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "event_mapping_id",
+        UUID(as_uuid=True),
+        ForeignKey("core.external_identifier.external_identifier_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "operator_mapping_id",
+        UUID(as_uuid=True),
+        ForeignKey("core.external_identifier.external_identifier_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "market_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.operator_fixture_market.market_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column("provider_market_key", String(120), nullable=False),
+    Column("representation_version", String(40), nullable=False),
+    Column("mapping_plan_sha256", CHAR(64), nullable=False),
+    UniqueConstraint(
+        "provider_id",
+        "event_mapping_id",
+        "operator_mapping_id",
+        "provider_market_key",
+        "representation_version",
+        name="uq_provider_market_representation",
+    ),
+    CheckConstraint("provider_market_key = 'h2h'", name="ck_provider_market_key"),
+    CheckConstraint(
+        "mapping_plan_sha256 ~ '^[0-9a-f]{64}$'", name="ck_provider_market_mapping_hash"
+    ),
+    schema="betting",
+)
+
+operator_market_observation = Table(
+    "operator_market_observation",
+    metadata,
+    Column(
+        "book_observation_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "market_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.operator_fixture_market.market_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey("provenance.source_snapshot.source_snapshot_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "provider_market_representation_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "betting.provider_market_representation.provider_market_representation_id",
+            name="fk_book_observation_provider_rep",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("market_state", String(24), nullable=False),
+    Column("provider_observed_at", DateTime(timezone=True), nullable=False),
+    Column("received_at", DateTime(timezone=True), nullable=False),
+    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column("missing_outcomes", JSONB, nullable=False, server_default=text("'[]'::jsonb")),
+    Column("semantic_sha256", CHAR(64), nullable=False),
+    Column("source_semantic_sha256", CHAR(64), nullable=False),
+    Column("contract_version", String(48), nullable=False),
+    Column(
+        "rights_profile_record_id",
+        UUID(as_uuid=True),
+        ForeignKey("provenance.rights_profile.rights_profile_record_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("source_snapshot_id", "market_id", name="uq_book_observation_source_market"),
+    UniqueConstraint(
+        "book_observation_id",
+        "source_snapshot_id",
+        "market_id",
+        name="uq_book_observation_scope",
+    ),
+    ForeignKeyConstraint(
+        ["source_snapshot_id", "rights_profile_record_id"],
+        [
+            "provenance.source_snapshot.source_snapshot_id",
+            "provenance.source_snapshot.rights_profile_record_id",
+        ],
+        name="fk_book_observation_snapshot_rights",
+        ondelete="RESTRICT",
+    ),
+    CheckConstraint(
+        "market_state IN ('COMPLETE','INCOMPLETE','SUSPENDED','UNSUPPORTED','UNAVAILABLE')",
+        name="ck_book_observation_state",
+    ),
+    CheckConstraint(
+        "provider_observed_at <= received_at AND received_at <= usable_at",
+        name="ck_book_observation_time_order",
+    ),
+    CheckConstraint("jsonb_typeof(missing_outcomes) = 'array'", name="ck_book_missing_outcomes"),
+    CheckConstraint("semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_book_semantic_hash"),
+    CheckConstraint(
+        "source_semantic_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_book_source_semantic_hash",
+    ),
+    CheckConstraint(
+        "contract_version = 'the-odds-api-v4-reference-v1'",
+        name="ck_book_contract_version",
+    ),
+    schema="betting",
+)
+
+odds_observation = Table(
+    "odds_observation",
+    metadata,
+    Column(
+        "odds_observation_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column("book_observation_id", UUID(as_uuid=True), nullable=False),
+    Column("source_snapshot_id", UUID(as_uuid=True), nullable=False),
+    Column(
+        "fixture_id",
+        UUID(as_uuid=True),
+        ForeignKey("football.fixture.fixture_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column("market_id", UUID(as_uuid=True), nullable=False),
+    Column("selection_id", UUID(as_uuid=True), nullable=False),
+    Column(
+        "operator_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.betting_operator.operator_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column("outcome", String(16), nullable=False),
+    Column("decimal_odds", Numeric, nullable=False),
+    Column("observed_at", DateTime(timezone=True), nullable=False),
+    Column("received_at", DateTime(timezone=True), nullable=False),
+    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column("source_semantic_sha256", CHAR(64), nullable=False),
+    Column("contract_version", String(48), nullable=False),
+    Column(
+        "rights_profile_record_id",
+        UUID(as_uuid=True),
+        ForeignKey("provenance.rights_profile.rights_profile_record_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    ForeignKeyConstraint(
+        ["book_observation_id", "source_snapshot_id", "market_id"],
+        [
+            "betting.operator_market_observation.book_observation_id",
+            "betting.operator_market_observation.source_snapshot_id",
+            "betting.operator_market_observation.market_id",
+        ],
+        name="fk_odds_observation_book_scope",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["selection_id", "market_id"],
+        ["betting.market_selection.selection_id", "betting.market_selection.market_id"],
+        name="fk_odds_observation_selection_scope",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["selection_id", "market_id", "outcome"],
+        [
+            "betting.market_selection.selection_id",
+            "betting.market_selection.market_id",
+            "betting.market_selection.outcome",
+        ],
+        name="fk_odds_observation_selection_outcome",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["market_id", "fixture_id", "operator_id"],
+        [
+            "betting.operator_fixture_market.market_id",
+            "betting.operator_fixture_market.fixture_id",
+            "betting.operator_fixture_market.operator_id",
+        ],
+        name="fk_odds_observation_market_scope",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["source_snapshot_id", "rights_profile_record_id"],
+        [
+            "provenance.source_snapshot.source_snapshot_id",
+            "provenance.source_snapshot.rights_profile_record_id",
+        ],
+        name="fk_odds_observation_snapshot_rights",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint(
+        "source_snapshot_id",
+        "market_id",
+        "selection_id",
+        name="uq_odds_observation_source_effect",
+    ),
+    CheckConstraint("outcome IN ('HOME','DRAW','AWAY')", name="ck_odds_observation_outcome"),
+    CheckConstraint(
+        "decimal_odds > 1 AND decimal_odds <> 'NaN'::numeric "
+        "AND decimal_odds <> 'Infinity'::numeric AND decimal_odds <> '-Infinity'::numeric",
+        name="ck_odds_observation_price",
+    ),
+    CheckConstraint(
+        "observed_at <= received_at AND received_at <= usable_at",
+        name="ck_odds_observation_time_order",
+    ),
+    CheckConstraint(
+        "source_semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_odds_observation_source_hash"
+    ),
+    CheckConstraint(
+        "contract_version = 'the-odds-api-v4-reference-v1'",
+        name="ck_odds_observation_contract_version",
+    ),
+    schema="betting",
+)
+
+provider_quota_observation = Table(
+    "provider_quota_observation",
+    metadata,
+    Column(
+        "quota_observation_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey("provenance.source_snapshot.source_snapshot_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "provider_id",
+        UUID(as_uuid=True),
+        ForeignKey("provenance.data_provider.provider_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column("remaining", Integer, nullable=False),
+    Column("used", Integer, nullable=False),
+    Column("last_cost", Integer, nullable=False),
+    Column("observed_at", DateTime(timezone=True), nullable=False),
+    Column("source", String(32), nullable=False),
+    Column("request_fingerprint", CHAR(64), nullable=False),
+    UniqueConstraint("source_snapshot_id", name="uq_quota_observation_snapshot"),
+    CheckConstraint(
+        "remaining >= 0 AND used >= 0 AND last_cost >= 0 AND last_cost <= used",
+        name="ck_quota_observation_values",
+    ),
+    CheckConstraint(
+        "source IN ('RESPONSE_HEADERS','SYNTHETIC_FIXTURE')",
+        name="ck_quota_observation_source",
+    ),
+    CheckConstraint(
+        "request_fingerprint ~ '^[0-9a-f]{64}$'", name="ck_quota_observation_request_hash"
+    ),
+    schema="betting",
 )
 
 data_quality_issue = Table(
@@ -2161,3 +2687,24 @@ Index(
     source_bundle.c.information_cutoff,
 )
 Index("ix_source_bundle_member_snapshot", source_bundle_member.c.source_snapshot_id)
+Index("ix_operator_market_fixture", operator_fixture_market.c.fixture_id)
+Index("ix_operator_market_operator", operator_fixture_market.c.operator_id)
+Index("ix_market_selection_market", market_selection.c.market_id)
+Index("ix_provider_market_market", provider_market_representation.c.market_id)
+Index(
+    "ix_book_observation_market_usable",
+    operator_market_observation.c.market_id,
+    operator_market_observation.c.usable_at,
+)
+Index("ix_book_observation_snapshot", operator_market_observation.c.source_snapshot_id)
+Index(
+    "ix_odds_observation_fixture_usable",
+    odds_observation.c.fixture_id,
+    odds_observation.c.usable_at,
+)
+Index("ix_odds_observation_book", odds_observation.c.book_observation_id)
+Index(
+    "ix_quota_observation_provider",
+    provider_quota_observation.c.provider_id,
+    provider_quota_observation.c.observed_at,
+)

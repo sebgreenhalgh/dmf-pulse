@@ -1,4 +1,4 @@
-"""Exercise the complete FPL-004 Alembic matrix on the disposable test database.
+"""Exercise the active ingestion Alembic matrix on the disposable test database.
 
 This script is intentionally destructive to the explicitly configured local TEST
 database.  It never creates a database, connects to a non-loopback host, or emits a
@@ -30,9 +30,12 @@ from dmf_pulse.database.migrate import alembic_config
 from dmf_pulse.database.schema import current_alembic_revision, inspect_schema
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_REPORT = REPOSITORY_ROOT / "evidence/tickets/FPL-004/migration_matrix.json"
-DEFAULT_OFFLINE_SQL = REPOSITORY_ROOT / "evidence/tickets/FPL-004/offline_upgrade.sql"
-DEFAULT_SCHEMA_MANIFEST = REPOSITORY_ROOT / "evidence/tickets/FPL-004/schema_manifest.json"
+FPL_REPORT = REPOSITORY_ROOT / "evidence/tickets/FPL-004/migration_matrix.json"
+FPL_OFFLINE_SQL = REPOSITORY_ROOT / "evidence/tickets/FPL-004/offline_upgrade.sql"
+FPL_SCHEMA_MANIFEST = REPOSITORY_ROOT / "evidence/tickets/FPL-004/schema_manifest.json"
+ODD_REPORT = REPOSITORY_ROOT / "evidence/tickets/ODD-005/migration_matrix.json"
+ODD_OFFLINE_SQL = REPOSITORY_ROOT / "evidence/tickets/ODD-005/offline_upgrade.sql"
+ODD_SCHEMA_MANIFEST = REPOSITORY_ROOT / "evidence/tickets/ODD-005/schema_manifest.json"
 EXPECTED_POSTGRES_VERSION = "18.4"
 ALLOWED_TEST_DATABASES = frozenset({"dmf_pulse_test"})
 
@@ -45,7 +48,7 @@ class MatrixError(Exception):
 class RevisionPlan:
     baseline: str
     target: str
-    fpl_revisions: tuple[str, ...]
+    revisions: tuple[str, ...]
 
 
 def _sha256_bytes(value: bytes) -> str:
@@ -119,14 +122,19 @@ def _revision_plan(baseline: str, requested_target: str) -> RevisionPlan:
         down = current.down_revision
         current = scripts.get_revision(down) if isinstance(down, str) else None
     if current is None:
-        raise MatrixError("target is not a linear descendant of the DAT-003 baseline")
+        raise MatrixError("target is not a linear descendant of the requested baseline")
     revisions.reverse()
-    if not 1 <= len(revisions) <= 2:
-        raise MatrixError("FPL-004 must add one or two ordered revisions")
+    if not revisions or len(revisions) > 3:
+        raise MatrixError("migration matrix requires one to three ordered revisions")
+    if baseline_script.revision == "20260724_0002" and tuple(revisions) != (
+        "20260725_0003",
+        "20260725_0004",
+    ):
+        raise MatrixError("ODD-005 requires the exact two-revision path after FPL-004")
     return RevisionPlan(
         baseline=baseline_script.revision,
         target=target_script.revision,
-        fpl_revisions=tuple(revisions),
+        revisions=tuple(revisions),
     )
 
 
@@ -424,6 +432,115 @@ def _assert_seed_preserved(database_url: str, *, fpl_head: bool) -> dict[str, ob
         engine.dispose()
 
 
+def _fpl004_seed_state(database_url: str) -> dict[str, object]:
+    """Return stable accepted FPL evidence that exists in both 0002 and head."""
+
+    engine = create_engine(
+        database_url,
+        poolclass=NullPool,
+        hide_parameters=True,
+        connect_args={"connect_timeout": 5, "options": "-c timezone=UTC"},
+    )
+    try:
+        with engine.connect() as connection:
+            snapshot_rows = connection.execute(
+                text(
+                    """
+                    SELECT snapshot.resource, snapshot.body_sha256,
+                           snapshot.envelope_sha256, lifecycle.current_state,
+                           snapshot.raw_storage_policy
+                    FROM provenance.source_snapshot AS snapshot
+                    JOIN provenance.data_provider AS provider
+                      ON provider.provider_id = snapshot.provider_id
+                    JOIN provenance.source_snapshot_lifecycle AS lifecycle
+                      ON lifecycle.source_snapshot_id = snapshot.source_snapshot_id
+                    WHERE provider.provider_key = 'synthetic_fpl'
+                    ORDER BY snapshot.resource, snapshot.source_snapshot_id
+                    """
+                )
+            ).mappings()
+            snapshots = [
+                {
+                    "body_sha256": str(row["body_sha256"]),
+                    "envelope_sha256": str(row["envelope_sha256"]),
+                    "raw_storage_policy": str(row["raw_storage_policy"]),
+                    "resource": str(row["resource"]),
+                    "lifecycle_state": str(row["current_state"]),
+                }
+                for row in snapshot_rows
+            ]
+            bundle_rows = connection.execute(
+                text(
+                    """
+                    SELECT semantic_sha256, manifest_sha256, quality_status
+                    FROM provenance.source_bundle
+                    ORDER BY semantic_sha256
+                    """
+                )
+            ).mappings()
+            bundles = [
+                {
+                    "manifest_sha256": str(row["manifest_sha256"]),
+                    "quality_status": str(row["quality_status"]),
+                    "semantic_sha256": str(row["semantic_sha256"]),
+                }
+                for row in bundle_rows
+            ]
+            counts = {
+                name: int(connection.execute(text(f"SELECT count(*) FROM {name}")).scalar_one())
+                for name in (
+                    "fpl.fixture_observation",
+                    "fpl.gameweek_observation",
+                    "fpl.player_observation",
+                    "fpl.team_observation",
+                    "provenance.rights_decision",
+                    "provenance.source_bundle_member",
+                )
+            }
+    finally:
+        engine.dispose()
+    state: dict[str, object] = {
+        "bundles": bundles,
+        "counts": counts,
+        "snapshots": snapshots,
+    }
+    if (
+        len(snapshots) != 2
+        or {item["resource"] for item in snapshots} != {"bootstrap", "fixtures"}
+        or any(item["lifecycle_state"] != "USABLE" for item in snapshots)
+        or len(bundles) != 1
+        or bundles[0]["quality_status"] not in {"PASS", "PASS_WITH_WARNINGS"}
+        or counts["provenance.source_bundle_member"] != 2
+        or any(counts[name] <= 0 for name in counts if name != "provenance.rights_decision")
+        or counts["provenance.rights_decision"] < 2
+    ):
+        raise MatrixError("accepted FPL-004 preservation seed is incomplete")
+    return state
+
+
+def _seed_fpl004_data(database_url: str) -> dict[str, object]:
+    """Create accepted synthetic FPL data at head without any provider transport."""
+
+    from dmf_pulse.ingestion.fpl.service import (
+        DATABASE_REF,
+        FplIngestionService,
+        FplReplayRequest,
+    )
+
+    outcome = FplIngestionService(repository_root=REPOSITORY_ROOT).replay(
+        FplReplayRequest(
+            fixture_set=REPOSITORY_ROOT / "fixtures/fpl/FPL-004",
+            scenario="happy_path",
+            information_cutoff=datetime(2026, 8, 21, 17, 30, tzinfo=UTC),
+            rights_profile_id="synthetic_test_v1",
+            database_url_ref=DATABASE_REF,
+        )
+    )
+    if outcome.exit_code != 0 or outcome.result.status != "USABLE":
+        raise MatrixError("synthetic FPL-004 preservation seed was not usable")
+    return _fpl004_seed_state(database_url)
+
+
 def _assert_at_baseline(database_url: str, expected_revision: str) -> dict[str, int | str]:
     engine = create_engine(
         database_url,
@@ -435,8 +552,37 @@ def _assert_at_baseline(database_url: str, expected_revision: str) -> dict[str, 
         with engine.connect() as connection:
             revision = current_alembic_revision(connection)
             if revision != expected_revision:
-                raise MatrixError("downgrade did not reach the DAT-003 baseline")
+                raise MatrixError("downgrade did not reach the requested baseline")
             inspector = inspect(connection)
+            if expected_revision == "20260724_0002":
+                schemas = set(inspector.get_schema_names())
+                fpl_tables = set(inspector.get_table_names(schema="fpl"))
+                required_fpl = {
+                    "fixture_observation",
+                    "gameweek_observation",
+                    "player_observation",
+                    "player_season",
+                    "team_observation",
+                }
+                bundle_columns = {
+                    column["name"]
+                    for column in inspector.get_columns("source_bundle", schema="provenance")
+                }
+                member_columns = {
+                    column["name"]
+                    for column in inspector.get_columns("source_bundle_member", schema="provenance")
+                }
+                if (
+                    "betting" in schemas
+                    or not required_fpl <= fpl_tables
+                    or "rights_profile_record_id" in bundle_columns
+                    or "rights_profile_record_id" in member_columns
+                ):
+                    raise MatrixError("ODD-005 objects remain after FPL-004 baseline downgrade")
+                return {
+                    "fpl_table_count": len(fpl_tables),
+                    "revision": revision,
+                }
             fpl_tables = set(inspector.get_table_names(schema="fpl"))
             actual = {
                 schema: set(inspector.get_table_names(schema=schema))
@@ -475,12 +621,18 @@ def run_matrix(
     *,
     baseline_revision: str,
     target: str,
-    report_path: Path = DEFAULT_REPORT,
-    offline_sql_path: Path = DEFAULT_OFFLINE_SQL,
-    schema_manifest_path: Path = DEFAULT_SCHEMA_MANIFEST,
+    report_path: Path | None = None,
+    offline_sql_path: Path | None = None,
+    schema_manifest_path: Path | None = None,
 ) -> dict[str, Any]:
     """Run the destructive matrix and return its safe structured report."""
 
+    odd005 = baseline_revision == "20260724_0002"
+    report_path = report_path or (ODD_REPORT if odd005 else FPL_REPORT)
+    offline_sql_path = offline_sql_path or (ODD_OFFLINE_SQL if odd005 else FPL_OFFLINE_SQL)
+    schema_manifest_path = schema_manifest_path or (
+        ODD_SCHEMA_MANIFEST if odd005 else FPL_SCHEMA_MANIFEST
+    )
     try:
         report_relative = report_path.relative_to(REPOSITORY_ROOT)
         offline_sql_relative = offline_sql_path.relative_to(REPOSITORY_ROOT)
@@ -496,14 +648,26 @@ def run_matrix(
         stage = "offline SQL generation"
         sql = _offline_sql(database_url, plan.target)
         _assert_secret_free(sql, parsed_url)
-        required_sql = (
+        required_sql = [
             "CREATE TABLE provenance.source_processing_event",
             "CREATE TABLE provenance.source_bundle",
             "CREATE TABLE football.team_season",
             "CREATE TABLE fpl.player_season",
-        )
+        ]
+        if odd005:
+            required_sql.extend(
+                (
+                    "CREATE SCHEMA betting",
+                    "CREATE TABLE betting.betting_operator",
+                    "CREATE TABLE betting.operator_fixture_market",
+                    "CREATE TABLE betting.odds_observation",
+                    "CREATE TABLE betting.provider_quota_observation",
+                    "uq_rights_decision_authority",
+                    "ck_external_identifier_odds_operator_scope",
+                )
+            )
         if not all(fragment in sql for fragment in required_sql):
-            raise MatrixError("offline SQL omits a required FPL-004 schema object")
+            raise MatrixError("offline SQL omits a required ingestion schema object")
 
         destructive_started = True
         stage = "empty database reset"
@@ -514,29 +678,54 @@ def run_matrix(
         if first_manifest["alembic_revision"] != plan.target:
             raise MatrixError("clean database upgrade did not reach the target")
 
-        stage = "DAT-003 baseline downgrade"
-        _alembic("downgrade", database_url, plan.baseline)
-        _assert_at_baseline(database_url, plan.baseline)
-
-        stage = "DAT-003 accepted-data seed"
-        _seed_dat003_data(database_url)
-        baseline_seed = _assert_seed_preserved(database_url, fpl_head=False)
-
-        stage = "DAT-003 to FPL-004 re-upgrade"
-        _alembic("upgrade", database_url, plan.target)
-        head_seed = _assert_seed_preserved(database_url, fpl_head=True)
+        if odd005:
+            stage = "accepted FPL-004 data seed"
+            initial_head_seed = _seed_fpl004_data(database_url)
+            stage = "ODD-005 head to FPL-004 baseline downgrade"
+            _alembic("downgrade", database_url, plan.baseline)
+            baseline_state = _assert_at_baseline(database_url, plan.baseline)
+            baseline_seed = _fpl004_seed_state(database_url)
+            if baseline_seed != initial_head_seed:
+                raise MatrixError("accepted FPL-004 data changed during baseline downgrade")
+            stage = "FPL-004 baseline to ODD-005 re-upgrade"
+            _alembic("upgrade", database_url, plan.target)
+            head_seed = _fpl004_seed_state(database_url)
+            if head_seed != initial_head_seed:
+                raise MatrixError("accepted FPL-004 data changed during ODD-005 upgrade")
+        else:
+            stage = "DAT-003 baseline downgrade"
+            _alembic("downgrade", database_url, plan.baseline)
+            _assert_at_baseline(database_url, plan.baseline)
+            stage = "DAT-003 accepted-data seed"
+            _seed_dat003_data(database_url)
+            baseline_seed = _assert_seed_preserved(database_url, fpl_head=False)
+            stage = "DAT-003 to ingestion-head re-upgrade"
+            _alembic("upgrade", database_url, plan.target)
+            head_seed = _assert_seed_preserved(database_url, fpl_head=True)
         second_manifest = _catalog_state(database_url)
         if first_manifest != second_manifest:
             raise MatrixError("schema manifest changed across clean upgrade and re-upgrade")
 
-        stage = "populated FPL-004 downgrade"
+        stage = "populated ingestion-head downgrade"
         _alembic("downgrade", database_url, plan.baseline)
         baseline_state = _assert_at_baseline(database_url, plan.baseline)
-        downgraded_seed = _assert_seed_preserved(database_url, fpl_head=False)
+        downgraded_seed = (
+            _fpl004_seed_state(database_url)
+            if odd005
+            else _assert_seed_preserved(database_url, fpl_head=False)
+        )
+        if odd005 and downgraded_seed != baseline_seed:
+            raise MatrixError("accepted FPL-004 data changed on populated downgrade")
 
-        stage = "populated FPL-004 final re-upgrade"
+        stage = "populated ingestion-head final re-upgrade"
         _alembic("upgrade", database_url, plan.target)
-        final_seed = _assert_seed_preserved(database_url, fpl_head=True)
+        final_seed = (
+            _fpl004_seed_state(database_url)
+            if odd005
+            else _assert_seed_preserved(database_url, fpl_head=True)
+        )
+        if odd005 and final_seed != head_seed:
+            raise MatrixError("accepted FPL-004 data changed on final re-upgrade")
         final_manifest = _catalog_state(database_url)
         if first_manifest != final_manifest:
             raise MatrixError("schema manifest changed after populated downgrade and re-upgrade")
@@ -586,8 +775,8 @@ def run_matrix(
             "secret_free": True,
             "sha256": _sha256_bytes(sql.encode("utf-8")),
         },
-        "revision_count": len(plan.fpl_revisions),
-        "revisions": list(plan.fpl_revisions),
+        "revision_count": len(plan.revisions),
+        "revisions": list(plan.revisions),
         "schema": first_manifest,
         "schema_manifest": {
             "path": schema_manifest_relative.as_posix(),
@@ -595,7 +784,7 @@ def run_matrix(
         },
         "status": "PASS",
         "target_revision": plan.target,
-        "ticket_id": "FPL-004",
+        "ticket_id": "ODD-005" if odd005 else "FPL-004",
         "baseline_state": baseline_state,
     }
     try:
@@ -609,17 +798,23 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline-revision", required=True)
     parser.add_argument("--target", default="head")
-    parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
-    parser.add_argument("--offline-sql", type=Path, default=DEFAULT_OFFLINE_SQL)
-    parser.add_argument("--schema-manifest", type=Path, default=DEFAULT_SCHEMA_MANIFEST)
+    parser.add_argument("--report", type=Path)
+    parser.add_argument("--offline-sql", type=Path)
+    parser.add_argument("--schema-manifest", type=Path)
     arguments = parser.parse_args()
     try:
         result = run_matrix(
             baseline_revision=arguments.baseline_revision,
             target=arguments.target,
-            report_path=arguments.report.resolve(),
-            offline_sql_path=arguments.offline_sql.resolve(),
-            schema_manifest_path=arguments.schema_manifest.resolve(),
+            report_path=arguments.report.resolve() if arguments.report is not None else None,
+            offline_sql_path=(
+                arguments.offline_sql.resolve() if arguments.offline_sql is not None else None
+            ),
+            schema_manifest_path=(
+                arguments.schema_manifest.resolve()
+                if arguments.schema_manifest is not None
+                else None
+            ),
         )
     except MatrixError as exc:
         print(json.dumps({"error": str(exc), "status": "FAIL"}, sort_keys=True))

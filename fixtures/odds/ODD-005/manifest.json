@@ -1,0 +1,111 @@
+{
+  "entries": [
+    {
+      "bytes": 1153,
+      "path": "fixtures/odds/ODD-005/changed_quote.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "af6084be160311023fb5c4c8bc90e98b4cd25259d09981d8942544d9e995719a",
+      "synthetic": true
+    },
+    {
+      "bytes": 671,
+      "path": "fixtures/odds/ODD-005/duplicate_conflict.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "533325a00026c0dc02c5b20cbdc79b724b8c59e1dff3bb241aeefb72d8194b35",
+      "synthetic": true
+    },
+    {
+      "bytes": 1153,
+      "path": "fixtures/odds/ODD-005/happy_path.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "42edef1f566cf1d296abae5d81c32475d58c7ecbf9c40d3a5c2f1c95fd2c644a",
+      "synthetic": true
+    },
+    {
+      "bytes": 567,
+      "path": "fixtures/odds/ODD-005/incomplete_book.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "de815f063743fbacb8e8b12ddce9ae8fd33b54ffa6f5a6aa1553737b9c6a3613",
+      "synthetic": true
+    },
+    {
+      "bytes": 958,
+      "path": "fixtures/odds/ODD-005/mapping_plan.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "8b49bd896faf2cbcbf3e643c7b55a4fa73eca6a52cbc0dc9c02a1a20889b79bb",
+      "synthetic": true
+    },
+    {
+      "bytes": 614,
+      "path": "fixtures/odds/ODD-005/post_cutoff.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "65e7a80aeafb0d73395864298f1ad0d57001cab369fa765e2bc4a08e4f8ad6ae",
+      "synthetic": true
+    },
+    {
+      "bytes": 128,
+      "path": "fixtures/odds/ODD-005/quota_exhausted.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "a0ebf6c69bfa483514594ae641c8f3b64c4545036d41a8eb67b5dc2340656425",
+      "synthetic": true
+    },
+    {
+      "bytes": 272,
+      "path": "fixtures/odds/ODD-005/raw_forbidden_canary.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "61a4df17cc3f51dc6a93e71877c733c3b126fba24150885ea4d6984bdc22fada",
+      "synthetic": true
+    },
+    {
+      "bytes": 2197,
+      "path": "fixtures/odds/ODD-005/rights_profiles.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "44422be077f414bcb23d5f0c765b075198c03cc5b4fb329249493b42d25d1025",
+      "synthetic": true
+    },
+    {
+      "bytes": 1233,
+      "path": "fixtures/odds/ODD-005/scenarios.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "8f027197c6b89f21e94bf745b059efdd78c8fda8de7cb29a05cd4ea269770824",
+      "synthetic": true
+    },
+    {
+      "bytes": 38,
+      "path": "fixtures/odds/ODD-005/security_fake_credential.txt",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "54642f0ee79525cc9873735df9ca72c617396ee378a061b5172495b29b30f007",
+      "synthetic": true
+    },
+    {
+      "bytes": 777,
+      "path": "fixtures/odds/ODD-005/unknown_market.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "b0c0e9063119f3b9f7c9cc6b972df8fb264d0edddc01ae00c6aa09c45dc1629f",
+      "synthetic": true
+    },
+    {
+      "bytes": 611,
+      "path": "fixtures/odds/ODD-005/unmapped_fixture.json",
+      "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
+      "rights_profile": "synthetic_the_odds_api_v1",
+      "sha256": "ab9282a31f29a0b81c3c77a20b9a30dc260ca2a21aa47825067550626758f5db",
+      "synthetic": true
+    }
+  ],
+  "fixture_count": 13,
+  "manifest_version": "1.0.0",
+  "pack_id": "ODD-005"
+}

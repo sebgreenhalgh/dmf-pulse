@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/odd-005/market-observation.schema.json",
+  "title": "MarketObservation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixture_id",
+    "market_id",
+    "selection_id",
+    "operator_id",
+    "outcome",
+    "decimal_odds",
+    "observed_at",
+    "received_at",
+    "usable_at",
+    "source_snapshot_id",
+    "market_state",
+    "contract_version"
+  ],
+  "properties": {
+    "fixture_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "market_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "selection_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "operator_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "outcome": {
+      "enum": [
+        "HOME",
+        "DRAW",
+        "AWAY"
+      ]
+    },
+    "decimal_odds": {
+      "type": "string",
+      "description": "Source-scale decimal odds string whose exact numeric value is strictly greater than 1; trailing fractional zeros are preserved.",
+      "pattern": "^(?:1\\.\\d*[1-9]\\d*|(?:[2-9]\\d*|1\\d+)(?:\\.\\d+)?)$"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "usable_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_snapshot_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "market_state": {
+      "enum": [
+        "COMPLETE",
+        "INCOMPLETE",
+        "SUSPENDED",
+        "UNSUPPORTED",
+        "UNAVAILABLE"
+      ]
+    },
+    "contract_version": {
+      "const": "the-odds-api-v4-reference-v1"
+    }
+  }
+}

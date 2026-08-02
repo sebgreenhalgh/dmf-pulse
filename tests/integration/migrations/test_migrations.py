@@ -24,7 +24,7 @@ from dmf_pulse.database.migrate import (
 from dmf_pulse.database.schema import inspect_schema
 
 pytestmark = pytest.mark.migration
-EXPECTED_SCHEMA_SHA256 = "da0f671cb636236aeb15b76e45ab076d81854b62ae08e9cd50cf077af859bf07"
+EXPECTED_SCHEMA_SHA256 = "6e49812511020b105e00b1b83f4cdf0caf83c7c936d76720e906732308fa18ad"
 
 
 def _catalog_names(manifest: object) -> tuple[set[str], set[str]]:
@@ -59,7 +59,7 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
     assert set(first.extensions) == set(expected["extensions"])
     assert first.schema_sha256 == second.schema_sha256
     assert first.schema_sha256 == EXPECTED_SCHEMA_SHA256
-    assert first.alembic_revision == head_revision() == "20260724_0002"
+    assert first.alembic_revision == head_revision() == "20260725_0004"
 
     function_names = {
         f"{schema}.{function['name']}"
@@ -67,25 +67,56 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         for function in value["functions"]
     }
     assert function_names == {
+        "betting.guard_book_completeness",
+        "betting.guard_odds_observation_coherence",
+        "betting.guard_odds_quality_subject",
+        "betting.guard_operator_book_observation",
+        "betting.guard_provider_market_representation",
+        "betting.guard_quota_provider",
         "core.guard_canonical_successor",
         "core.guard_temporal_version",
         "core.is_canonical_tstzrange",
         "provenance.guard_processing_event",
         "provenance.guard_fpl_observation_source_usable",
         "provenance.guard_raw_storage_rights",
+        "provenance.guard_source_bundle_publication",
         "provenance.guard_source_snapshot_envelope",
+        "provenance.lock_bundle_quality_subject",
         "provenance.reject_immutable_change",
     }
     trigger_names = {
         trigger["name"] for value in first.schemas.values() for trigger in value["triggers"]
     }
     assert trigger_names == {
+        "trg_betting_operator_immutable",
         "trg_canonical_entity_successor",
+        "trg_data_quality_bundle_lock",
+        "trg_data_quality_odds_guard",
         "trg_entity_alias_temporal",
         "trg_external_identifier_temporal",
         "trg_fixture_gameweek_assignment_temporal",
+        "trg_fixture_observation_immutable",
+        "trg_fixture_observation_source_usable",
         "trg_fixture_revision_temporal",
+        "trg_gameweek_observation_immutable",
+        "trg_gameweek_observation_source_usable",
+        "trg_market_definition_immutable",
+        "trg_market_selection_immutable",
+        "trg_odds_observation_coherence",
+        "trg_odds_observation_completeness",
+        "trg_odds_observation_immutable",
+        "trg_operator_book_completeness",
+        "trg_operator_book_observation_guard",
+        "trg_operator_fixture_market_immutable",
+        "trg_operator_market_observation_immutable",
+        "trg_player_observation_immutable",
+        "trg_player_observation_source_usable",
+        "trg_player_season_immutable",
         "trg_player_team_membership_temporal",
+        "trg_provider_market_representation_guard",
+        "trg_provider_market_representation_immutable",
+        "trg_provider_quota_observation_guard",
+        "trg_provider_quota_observation_immutable",
         "trg_raw_blob_deletion_immutable",
         "trg_raw_blob_immutable",
         "trg_raw_storage_deletion_immutable",
@@ -97,19 +128,15 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "trg_ruleset_artifact_immutable",
         "trg_semantic_effect_source_immutable",
         "trg_semantic_observation_claim_immutable",
+        "trg_settlement_profile_immutable",
         "trg_source_bundle_immutable",
         "trg_source_bundle_member_immutable",
+        "trg_source_bundle_member_publication_guard",
+        "trg_source_bundle_publication_guard",
         "trg_source_mapping_candidate_immutable",
         "trg_source_processing_event_guard",
         "trg_source_snapshot_envelope",
         "trg_source_snapshot_immutable",
-        "trg_fixture_observation_immutable",
-        "trg_fixture_observation_source_usable",
-        "trg_gameweek_observation_immutable",
-        "trg_gameweek_observation_source_usable",
-        "trg_player_observation_immutable",
-        "trg_player_observation_source_usable",
-        "trg_player_season_immutable",
         "trg_team_observation_immutable",
         "trg_team_observation_source_usable",
     }
@@ -133,7 +160,7 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         assert {
             constraint["name"]
             for constraint in declared["constraints"]
-            if constraint["kind"] != "n"
+            if constraint["kind"] not in {"n", "t"}
         } == {constraint.name for constraint in table.constraints}
         assert {index.name for index in table.indexes} <= {
             index["name"] for index in declared["indexes"]
@@ -149,6 +176,8 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
 def test_single_linear_revision_and_secret_free_offline_sql(postgres_url: str) -> None:
     revisions = list(ScriptDirectory.from_config(alembic_config()).walk_revisions())
     assert [(revision.revision, revision.down_revision) for revision in revisions] == [
+        ("20260725_0004", "20260725_0003"),
+        ("20260725_0003", "20260724_0002"),
         ("20260724_0002", "20260723_0001"),
         ("20260723_0001", None),
     ]
@@ -202,4 +231,4 @@ def test_clean_downgrade_and_reupgrade(postgres_engine: Engine, postgres_url: st
     upgrade_database(postgres_url)
     with postgres_engine.connect() as connection:
         assert connection.execute(text("SELECT uuidv7() IS NOT NULL")).scalar_one() is True
-        assert inspect_schema(connection).alembic_revision == "20260724_0002"
+        assert inspect_schema(connection).alembic_revision == "20260725_0004"

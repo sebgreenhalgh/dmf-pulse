@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -11,11 +12,15 @@ from typing import Any
 import pytest
 from typer.testing import CliRunner
 
+import dmf_pulse.assurance.specs as specs_module
 import dmf_pulse.cli.specs_cmd as specs_cmd_module
 from dmf_pulse.assurance.specs import (
     APPROVED_DMFP04,
+    ODD005_FROZEN_INPUTS,
     FrozenInputValidationError,
+    OddFrozenInputValidationError,
     SpecValidationError,
+    validate_odd005_frozen_inputs,
     validate_specifications,
 )
 from dmf_pulse.cli.app import app
@@ -286,3 +291,146 @@ def test_cli_enforces_fpl004_frozen_input_hashes(monkeypatch: pytest.MonkeyPatch
     assert value["ok"] is False
     assert value["error"]["code"] == "SPEC_MANIFEST_INVALID"
     assert "frozen SHA-256 mismatch" in value["error"]["details"][0]
+
+
+def test_current_odd005_frozen_inputs_are_valid(repository_root: Path) -> None:
+    report = validate_odd005_frozen_inputs(repository_root)
+    assert report["ok"] is True
+    assert report["file_count"] == len(ODD005_FROZEN_INPUTS) == 13
+    assert report["fixture_entry_count"] == 13
+
+
+def test_odd005_frozen_inputs_reject_tamper(tmp_path: Path) -> None:
+    for relative in ODD005_FROZEN_INPUTS:
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("tampered\n", encoding="utf-8")
+    with pytest.raises(OddFrozenInputValidationError, match="ODD-005") as caught:
+        validate_odd005_frozen_inputs(tmp_path)
+    assert len(caught.value.errors) >= len(ODD005_FROZEN_INPUTS)
+
+
+def test_cli_enforces_odd005_frozen_input_hashes(monkeypatch: pytest.MonkeyPatch) -> None:
+    def fail_frozen_inputs(_root: Path) -> dict[str, object]:
+        raise OddFrozenInputValidationError(
+            ["public_contracts/market_observation.schema.json: frozen SHA-256 mismatch"]
+        )
+
+    monkeypatch.setattr(specs_cmd_module, "validate_odd005_frozen_inputs", fail_frozen_inputs)
+    result = CliRunner().invoke(app, ["specs", "validate"])
+    assert result.exit_code == 21
+    value = json.loads(result.stdout)
+    assert value["ok"] is False
+    assert value["error"]["code"] == "SPEC_MANIFEST_INVALID"
+    assert "market_observation" in value["error"]["details"][0]
+
+
+def _odd_fixture_root(
+    repository_root: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[Path, Path, dict[str, Any]]:
+    target = tmp_path / "fixtures/odds/ODD-005"
+    shutil.copytree(repository_root / "fixtures/odds/ODD-005", target)
+    monkeypatch.setattr(specs_module, "ODD005_FROZEN_INPUTS", {})
+    manifest_path = target / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    return tmp_path, manifest_path, manifest
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    (
+        "invalid_json",
+        "envelope",
+        "keys",
+        "entry",
+        "missing",
+        "bytes",
+        "hash",
+        "inventory",
+    ),
+)
+def test_odd005_frozen_fixture_manifest_rejects_each_integrity_boundary(
+    repository_root: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutation: str,
+) -> None:
+    root, manifest_path, manifest = _odd_fixture_root(
+        repository_root,
+        tmp_path,
+        monkeypatch,
+    )
+    entries = manifest["entries"]
+    assert isinstance(entries, list)
+    first = entries[0]
+    assert isinstance(first, dict)
+    if mutation == "invalid_json":
+        manifest_path.write_text("{", encoding="utf-8")
+    elif mutation == "envelope":
+        manifest["fixture_count"] = 12
+        _write_json(manifest_path, manifest)
+    elif mutation == "keys":
+        first.pop("purpose")
+        _write_json(manifest_path, manifest)
+    elif mutation == "entry":
+        first["path"] = "../escape.json"
+        _write_json(manifest_path, manifest)
+    elif mutation == "missing":
+        (root / first["path"]).unlink()
+    elif mutation == "bytes":
+        first["bytes"] += 1
+        _write_json(manifest_path, manifest)
+    elif mutation == "hash":
+        first["sha256"] = "0" * 64
+        _write_json(manifest_path, manifest)
+    else:
+        (manifest_path.parent / "unexpected.json").write_text("{}\n", encoding="utf-8")
+
+    with pytest.raises(OddFrozenInputValidationError) as caught:
+        validate_odd005_frozen_inputs(root)
+    assert caught.value.errors
+
+
+def test_fpl_and_odd_frozen_input_pins_reject_missing_and_mismatched_files(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        specs_module,
+        "FPL004_FROZEN_INPUTS",
+        {"missing-fpl.json": "a" * 64},
+    )
+    with pytest.raises(FrozenInputValidationError) as missing_fpl:
+        specs_module.validate_fpl004_frozen_inputs(tmp_path)
+    assert any("missing or non-regular" in item for item in missing_fpl.value.errors)
+
+    fpl_path = tmp_path / "fpl.json"
+    fpl_path.write_text("{}\n", encoding="utf-8")
+    monkeypatch.setattr(
+        specs_module,
+        "FPL004_FROZEN_INPUTS",
+        {"fpl.json": "0" * 64},
+    )
+    with pytest.raises(FrozenInputValidationError) as mismatched_fpl:
+        specs_module.validate_fpl004_frozen_inputs(tmp_path)
+    assert any("SHA-256 mismatch" in item for item in mismatched_fpl.value.errors)
+
+    monkeypatch.setattr(
+        specs_module,
+        "ODD005_FROZEN_INPUTS",
+        {"missing-odd.json": "b" * 64},
+    )
+    with pytest.raises(OddFrozenInputValidationError) as missing_odd:
+        validate_odd005_frozen_inputs(tmp_path)
+    assert any("missing or non-regular" in item for item in missing_odd.value.errors)
+
+
+def test_odd_ticket_requires_the_a5_authority_scope(tmp_path: Path) -> None:
+    _valid_root(tmp_path)
+    ticket = tmp_path / "tickets/ODD-005/ticket.yaml"
+    ticket.parent.mkdir(parents=True)
+    ticket.write_text("ticket_id: ODD-005\n", encoding="utf-8")
+    errors = _errors(tmp_path)
+    assert any("A5-odds-manual-import scope is missing" in item for item in errors)

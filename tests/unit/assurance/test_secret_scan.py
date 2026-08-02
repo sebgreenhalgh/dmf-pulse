@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from dmf_pulse.assurance import secret_scan as secret_scan_module
 from dmf_pulse.assurance.secret_scan import (
     SecretScanConfigurationError,
     load_allowlist,
@@ -54,6 +55,20 @@ def test_fake_secrets_in_strings_urls_exceptions_and_mappings_are_detected() -> 
 
 
 @pytest.mark.unit
+def test_odd005_canaries_are_detected_without_embedding_them_in_findings() -> None:
+    fake_canary = "ODD005_FAKE_API_" + "KEY_DO_NOT_LOG_91d3a5"
+    raw_body = "ODD005_RAW_BODY_" + "CANARY_7c4f91"
+    findings = scan_text(f"{fake_canary}\n{raw_body}", path="unexpected.txt")
+    assert {finding.rule_id for finding in findings} == {
+        "ODD005_FAKE_CREDENTIAL",
+        "ODD005_RAW_BODY_CANARY",
+    }
+    serialized = repr([finding.as_dict() for finding in findings])
+    assert fake_canary not in serialized
+    assert raw_body not in serialized
+
+
+@pytest.mark.unit
 def test_safe_reference_and_placeholder_are_not_findings() -> None:
     assert scan_value({"database_dsn_ref": "systemd/database-dsn"}) == []
     assert scan_text("api_key=placeholder") == []
@@ -73,6 +88,15 @@ def test_python_session_syntax_and_explicit_placeholders_are_not_credentials() -
 
     patch = "\n".join(f"+{line}" for line in text.splitlines())
     assert scan_text(patch, path="04_FULL_DIFF.patch") == []
+
+    code_references = "\n".join(
+        (
+            "self._credential = credential",
+            "request(credential=credential)",
+            "render_as_string(hide_password=False)",
+        )
+    )
+    assert scan_text(code_references, path="example.py") == []
 
     fake_password = "Fake" + "CredentialValue987654321"
     assignment = "+" + "".join(("pass", "word")) + f' = "{fake_password}"'
@@ -204,3 +228,62 @@ def test_repository_scan_fails_closed_for_symbolic_links(
     assert {(finding.path, finding.rule_id) for finding in findings} == {
         ("linked.txt", "SCAN_COVERAGE")
     }
+
+
+@pytest.mark.unit
+def test_odd005_canary_allowlist_is_exact_path_and_fingerprint(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    shutil.copy2(repository_root / ".secret-scan-allowlist.json", tmp_path)
+    for name in ("raw_forbidden_canary.json", "security_fake_credential.txt"):
+        source = repository_root / "fixtures/odds/ODD-005" / name
+        approved = tmp_path / "fixtures/odds/ODD-005" / name
+        approved.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, approved)
+    assert scan_repository(tmp_path) == []
+
+    unexpected = tmp_path / "copied_canary.txt"
+    shutil.copy2(
+        repository_root / "fixtures/odds/ODD-005/security_fake_credential.txt",
+        unexpected,
+    )
+    findings = scan_repository(tmp_path)
+    assert {(item.path, item.rule_id) for item in findings} == {
+        ("copied_canary.txt", "ODD005_FAKE_CREDENTIAL")
+    }
+
+
+@pytest.mark.unit
+def test_scanner_covers_safe_placeholders_refs_scalars_and_excluded_state(
+    tmp_path: Path,
+) -> None:
+    assert secret_scan_module._entropy("") == 0.0
+    assert secret_scan_module._looks_high_risk_opaque("AbCdEfGhIjKlMnOpQrStUvWxYz012345") is False
+    assert scan_text("https://example.invalid/?api_key=placeholder") == []
+    assert scan_text("password=placeholder") == []
+    assert scan_value({"api_key_ref": "env:SAFE_REFERENCE"}) == []
+    assert scan_value(1) == []
+
+    allowlist = tmp_path / "allowlist.json"
+    allowlist.write_text(
+        json.dumps(
+            {
+                "entries": [
+                    {
+                        "fingerprint": "a" * 64,
+                        "path": "safe.txt",
+                        "rationale": "",
+                        "rule_id": "SAFE",
+                    }
+                ],
+                "version": "1.0",
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(SecretScanConfigurationError, match="non-empty"):
+        load_allowlist(allowlist)
+
+    (tmp_path / ".coverage").write_text("token=" + _fake_token(), encoding="utf-8")
+    allowlist.unlink()
+    assert scan_repository(tmp_path) == []

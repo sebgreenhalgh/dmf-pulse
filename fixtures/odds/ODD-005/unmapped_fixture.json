@@ -1,0 +1,26 @@
+[
+  {
+    "id": "todapi-event-unmapped",
+    "sport_key": "soccer_epl",
+    "commence_time": "2026-08-23T14:00:00Z",
+    "home_team": "Gamma United",
+    "away_team": "Delta Town",
+    "bookmakers": [
+      {
+        "key": "book_alpha",
+        "title": "Book Alpha",
+        "last_update": "2026-08-20T11:59:00Z",
+        "markets": [
+          {
+            "key": "h2h",
+            "outcomes": [
+              {"name": "Gamma United", "price": 2.10},
+              {"name": "Draw", "price": 3.20},
+              {"name": "Delta Town", "price": 3.40}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

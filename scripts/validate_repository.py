@@ -857,6 +857,20 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
     )
     stage_ci_fragments = (
         (
+            "uv run python scripts/test_migration_matrix.py --baseline-revision 20260724_0002 --target head",
+            'uv run pytest -m "postgres and integration" tests/integration',
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/ODD-005/coverage.json",
+            "uv run python scripts/check_odd005_coverage_gates.py",
+            "uv run dmf specs validate",
+            "uv run dmf ingest odds replay",
+            "uv run dmf market observations",
+            "uv run python scripts/verify_odd005_wheel.py",
+            "uv run python scripts/verify_odd005_acceptance.py",
+            "uv run python scripts/generate_odd005_evidence.py --status DRAFT",
+            "uv run dmf evidence validate --ticket ODD-005",
+        )
+        if (root / "tickets/ODD-005/ticket.yaml").is_file()
+        else (
             "uv run python scripts/test_migration_matrix.py --baseline-revision 20260723_0001 --target head",
             'uv run pytest -m "postgres or migration" tests/integration',
             "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/FPL-004/coverage.json",
@@ -901,9 +915,16 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
         validate_repository_manifest,
     )
 
+    odd_path = root / "evidence/tickets/ODD-005/current_manifest.json"
     fpl_path = root / "evidence/tickets/FPL-004/current_manifest.json"
     dat_path = root / "evidence/tickets/DAT-003/current_manifest.json"
-    active_path = fpl_path if (root / "tickets/FPL-004/ticket.yaml").is_file() else dat_path
+    active_path = (
+        odd_path
+        if (root / "tickets/ODD-005/ticket.yaml").is_file()
+        else fpl_path
+        if (root / "tickets/FPL-004/ticket.yaml").is_file()
+        else dat_path
+    )
     for path in [active_path] if active_path.is_file() else []:
         try:
             expected = RepositoryManifest.model_validate_json(path.read_text(encoding="utf-8"))
@@ -1349,7 +1370,9 @@ def main() -> int:
         "status": "PASS" if not errors else "FAIL",
     }
     active_ticket = (
-        "FPL-004"
+        "ODD-005"
+        if (root / "tickets/ODD-005/ticket.yaml").is_file()
+        else "FPL-004"
         if (root / "tickets/FPL-004/ticket.yaml").is_file()
         else "DAT-003"
         if (root / "tickets/DAT-003/ticket.yaml").is_file()

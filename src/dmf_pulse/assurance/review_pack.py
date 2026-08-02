@@ -8,6 +8,7 @@ import math
 import os
 import re
 import shutil
+import stat
 import subprocess
 import tempfile
 import zipfile
@@ -23,6 +24,9 @@ from dmf_pulse.assurance.evidence import (
     FPL_DETACHED_REVIEW_NAMES,
     FPL_REQUIRED_BASELINE,
     FPL_REQUIRED_BRANCH,
+    ODD_DETACHED_REVIEW_NAMES,
+    ODD_REQUIRED_BASELINE,
+    ODD_REQUIRED_BRANCH,
     CodexResult,
     CommandRecord,
     ReviewFile,
@@ -44,6 +48,8 @@ REVIEW_ZIP_NAME: Final = "DMF_PULSE_FND-001_REVIEW.zip"
 RUL_REVIEW_ZIP_NAME: Final = "DMF_PULSE_RUL-002_REVIEW.zip"
 DAT_REVIEW_ZIP_NAME: Final = "DMF_PULSE_DAT-003_REVIEW.zip"
 FPL_REVIEW_ZIP_NAME: Final = "DMF_PULSE_FPL-004_REVIEW.zip"
+ODD_REVIEW_ZIP_NAME: Final = "DMF_PULSE_ODD-005_REVIEW.zip"
+ODD_PACK_MANIFEST_SHA256: Final = "c030d775f2c4f5f68910ef443b1f0a86bc2a6e096299d448fbc0d81d48a62a20"
 MANIFEST_NAME: Final = "03_REVIEW_MANIFEST.json"
 FPL_MANIFEST_NAME: Final = "19_ARCHIVE_MANIFEST.json"
 CHECKSUM_NAME: Final = "20_SHA256SUMS.txt"
@@ -135,10 +141,36 @@ FPL_PREFERRED_NAMES: Final = (
     FPL_MANIFEST_NAME,
     CHECKSUM_NAME,
 )
+ODD_PREFERRED_NAMES: Final = (
+    "01_REVIEW_INDEX.md",
+    "02_BASELINE_AND_GIT_STATE.md",
+    "03_COMPLETE_HUMAN_PATCH.diff",
+    "04_FILE_CHANGE_MAP.md",
+    "05_PUBLIC_CONTRACTS.md",
+    "06_MIGRATION_SCHEMA_REVIEW.md",
+    "07_FPL004_REMEDIATION.md",
+    "08_PROVIDER_CLIENT_QUOTA.md",
+    "09_MARKET_MAPPING_SEMANTICS.md",
+    "10_RIGHTS_RETENTION.md",
+    "11_ASOF_IDEMPOTENCY_CONCURRENCY.md",
+    "12_TESTS_AND_COVERAGE.md",
+    "13_SECURITY_AND_SECRET_REVIEW.md",
+    "14_WHEEL_AND_CLI.md",
+    "15_COMMANDS_AND_RESULTS.log",
+    "16_ACCEPTANCE_MANIFEST.json",
+    "17_KNOWN_LIMITATIONS.md",
+    "18_CODEX_RESULT.json",
+    FPL_MANIFEST_NAME,
+    CHECKSUM_NAME,
+)
 FPL_FORBIDDEN_MARKERS: Final = (
     b"RAW_BODY_" + b"MUST_NOT_SURVIVE_FPL004",
     b"SUPER_" + b"SECRET_DO_NOT_LOG",
     b"DMF_TEST_" + b"API_KEY_DO_NOT_LOG",
+)
+ODD_FORBIDDEN_MARKERS: Final = (
+    b"ODD005_RAW_BODY_" + b"CANARY_7c4f91",
+    b"ODD005_FAKE_API_" + b"KEY_DO_NOT_LOG_91d3a5",
 )
 OPERATIONAL_EXCLUDED_PARTS: Final = {
     ".git",
@@ -382,6 +414,7 @@ PRIMARY_PAYLOAD_NAMES: Final = {
 RUL_PRIMARY_PAYLOAD_NAMES: Final = set(RUL_PREFERRED_NAMES[3:19])
 DAT_PRIMARY_PAYLOAD_NAMES: Final = set(DAT_PREFERRED_NAMES[3:19])
 FPL_PRIMARY_PAYLOAD_NAMES: Final = set(FPL_PREFERRED_NAMES[:17])
+ODD_PRIMARY_PAYLOAD_NAMES: Final = set(ODD_PREFERRED_NAMES[:17])
 RUL_MANDATORY_ACCEPTANCE_COMMANDS: Final = (
     "uv sync --all-groups --frozen",
     "uv run ruff format --check .",
@@ -490,6 +523,49 @@ FPL_TEARDOWN_WRITE_AHEAD_RESULT: Final = (
     "archive_finalization.json"
 )
 FPL_TEARDOWN_FINAL_RESULT: Final = "PASS: PostgreSQL service and volume removed"
+ODD_MANDATORY_ACCEPTANCE_COMMANDS: Final = (
+    "git diff --check",
+    "uv lock --check",
+    "uv run dmf specs validate",
+    "uv run dmf evidence validate --ticket ODD-005",
+    "uv run ruff format --check .",
+    "uv run ruff check .",
+    "uv run mypy src/dmf_pulse",
+    'uv run pytest -q -m "unit" tests/unit',
+    'uv run pytest -q -m "property" tests/property',
+    'uv run pytest -q -m "contract" tests/contract',
+    'uv run pytest -q -m "security" tests/security',
+    "docker compose -f compose.test.yaml up -d --wait",
+    "uv run python scripts/test_migration_matrix.py --baseline-revision 20260724_0002 --target head",
+    'uv run pytest -q -m "postgres and integration" tests/integration',
+    "uv run pytest -q tests/unit/ingestion/test_fpl_client.py tests/security/test_fpl_tls_retry.py",
+    "uv run pytest -q tests/integration/ingestion/test_fpl_bundle_rights_quality_gate.py",
+    "uv run pytest -q tests/integration/ingestion/odds/test_the_odds_api_recorded_ingestion.py",
+    "uv run pytest -q tests/integration/ingestion/odds/test_odds_idempotency_asof.py",
+    "uv run pytest -q tests/security/test_odds_credentials_quota_retention.py",
+    "uv run dmf ingest fpl replay --fixture-set fixtures/fpl/FPL-004 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_test_v1 --output json",
+    "uv run dmf ingest odds replay --fixture-set fixtures/odds/ODD-005 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_the_odds_api_v1 --output json",
+    "uv run dmf market observations --fixture-external-provider official_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json",
+    "uv run dmf ingest odds snapshot --provider the_odds_api --competition-key PL --sport-key soccer_epl --region uk --market h2h --as-of 2026-08-20T12:05:00Z --output json",
+    "uv run python scripts/verify_odd005_wheel.py",
+    "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-fail-under=90",
+    "uv run python scripts/verify_odd005_acceptance.py",
+    f"uv run dmf review-pack build --ticket ODD-005 --baseline {ODD_REQUIRED_BASELINE} --output review_pack/ODD-005",
+    "docker compose -f compose.test.yaml down -v --remove-orphans",
+)
+ODD_REVIEW_WRITE_AHEAD_RESULT: Final = (
+    "PENDING: review command has not run; successful external finalization will replace this "
+    "record; exact duration and digests are in archive_finalization.json"
+)
+ODD_REVIEW_FINAL_RESULT: Final = (
+    "PASS: exact 20-file ODD-005 review build completed; final detached digests are in "
+    "archive_finalization.json"
+)
+ODD_TEARDOWN_WRITE_AHEAD_RESULT: Final = (
+    "PENDING: finally-guaranteed PostgreSQL teardown has not run; exact duration and result "
+    "will be recorded in archive_finalization.json"
+)
+ODD_TEARDOWN_FINAL_RESULT: Final = "PASS: PostgreSQL service and volume removed"
 
 
 def _redact_fpl_personal_text(value: str) -> str:
@@ -539,7 +615,9 @@ def calculate_review_payload_digest(
         process_runner=selected_runner,
     )
     names = (
-        FPL_PRIMARY_PAYLOAD_NAMES
+        ODD_PRIMARY_PAYLOAD_NAMES
+        if ticket == "ODD-005"
+        else FPL_PRIMARY_PAYLOAD_NAMES
         if ticket == "FPL-004"
         else DAT_PRIMARY_PAYLOAD_NAMES
         if ticket == "DAT-003"
@@ -2356,6 +2434,657 @@ def _assemble_fpl_entries(
     return entries
 
 
+def _odd_baseline_diff(root: Path, baseline: str | None, runner: ProcessRunner) -> tuple[str, str]:
+    if baseline != ODD_REQUIRED_BASELINE:
+        raise ReviewPackError(
+            "BASELINE_INVALID", "ODD-005 requires the ticket's exact baseline commit"
+        )
+    exclusions = [
+        ":(exclude)uv.lock",
+        ":(exclude)fixtures/odds/ODD-005/**",
+        ":(exclude)public_contracts/market_observation.schema.json",
+        ":(exclude)public_contracts/market_query_result.schema.json",
+        ":(exclude)public_contracts/odds_ingestion_result.schema.json",
+        ":(exclude)public_contracts/provider_failure.schema.json",
+        ":(exclude)public_contracts/quota_state.schema.json",
+        ":(exclude)tickets/ODD-005/**",
+        ":(exclude)specs/manifests/*.json",
+    ]
+    arguments = ["diff", "--no-ext-diff", "--binary", f"{baseline}..HEAD", "--", ".", *exclusions]
+    patch = _redact_fpl_personal_text(
+        _required_git(root, arguments, runner, code="BASELINE_DIFF_FAILED")
+    )
+    stat = _required_git(
+        root,
+        ["diff", "--stat", f"{baseline}..HEAD", "--", ".", *exclusions],
+        runner,
+        code="BASELINE_DIFF_FAILED",
+    )
+    changes = _required_git(
+        root,
+        ["diff", "--name-status", f"{baseline}..HEAD", "--", ".", *exclusions],
+        runner,
+        code="BASELINE_DIFF_FAILED",
+    )
+    hash_paths = (
+        "uv.lock",
+        "fixtures/odds/ODD-005/manifest.json",
+        "public_contracts/market_observation.schema.json",
+        "public_contracts/market_query_result.schema.json",
+        "public_contracts/odds_ingestion_result.schema.json",
+        "public_contracts/provider_failure.schema.json",
+        "public_contracts/quota_state.schema.json",
+        "src/dmf_pulse/database/migrations/versions/20260725_0003_fpl_bundle_authority.py",
+        "src/dmf_pulse/database/migrations/versions/20260725_0004_odd005_market_observations.py",
+        "evidence/tickets/ODD-005/schema_manifest.json",
+    )
+    hash_lines: list[str] = []
+    for relative in hash_paths:
+        path = root / relative
+        if path.is_file() and not path.is_symlink():
+            hash_lines.append(
+                f"- `{relative}`: {path.stat().st_size} bytes; SHA-256 `{sha256_file(path)}`"
+            )
+    file_map = (
+        "# ODD-005 file change map\n\n"
+        "## Human-authored diff stat\n\n```text\n"
+        + stat.rstrip()
+        + "\n```\n\n## Human-authored name/status map\n\n```text\n"
+        + changes.rstrip()
+        + "\n```\n\n## Exact generated or pack-supplied hashes\n\n"
+        + ("\n".join(hash_lines) or "No hash inputs were available.")
+        + "\n\nThe complete patch omits only the generated lock and manifests plus the "
+        "byte-frozen ticket, synthetic fixtures, golden outputs, and public schemas. All "
+        "human-authored FPL remediations, provider, market, migration, CLI, assurance, test, "
+        "documentation, CI, and durable evidence-plan changes remain in full.\n"
+        "Personal owner/user identifiers are replaced with explicit redaction tokens only in "
+        "this external review rendering.\n\n"
+        f"Corrected Pack 1.1 manifest SHA-256: `{ODD_PACK_MANIFEST_SHA256}`. Its 62 "
+        "manifest entries and 62 detached checksums were validated before implementation.\n"
+    )
+    return patch, file_map
+
+
+def _required_odd_git_state(root: Path, baseline: str, runner: ProcessRunner) -> tuple[str, str]:
+    branch = _required_git(
+        root, ["rev-parse", "--abbrev-ref", "HEAD"], runner, code="REVIEW_BRANCH_INVALID"
+    ).strip()
+    if branch != ODD_REQUIRED_BRANCH:
+        raise ReviewPackError(
+            "REVIEW_BRANCH_INVALID", "ODD-005 review must use the required branch"
+        )
+    head = _required_git(
+        root, ["rev-parse", "--verify", "HEAD"], runner, code="REVIEW_HEAD_INVALID"
+    ).strip()
+    if len(head) != 40 or any(character not in "0123456789abcdef" for character in head):
+        raise ReviewPackError("REVIEW_HEAD_INVALID", "ODD-005 repository HEAD is invalid")
+    _required_git(
+        root,
+        ["merge-base", "--is-ancestor", baseline, head],
+        runner,
+        code="REVIEW_BASELINE_ANCESTRY",
+    )
+    merges = _required_git(
+        root,
+        ["rev-list", "--merges", f"{baseline}..{head}"],
+        runner,
+        code="REVIEW_HISTORY_INVALID",
+    )
+    if merges.strip():
+        raise ReviewPackError("REVIEW_HISTORY_INVALID", "ODD-005 history contains a merge commit")
+    dirty = _required_git(
+        root,
+        ["status", "--porcelain=v1", "--untracked-files=all"],
+        runner,
+        code="REVIEW_GIT_STATUS",
+    )
+    if dirty.strip():
+        raise ReviewPackError("REVIEW_TREE_DIRTY", "ODD-005 review requires a clean working tree")
+    state = f"""# ODD-005 baseline and Git state
+
+- Required baseline: `{baseline}`
+- Final HEAD: `{head}`
+- Branch: `{branch}`
+- Baseline is ancestor: `true`
+- Clean working tree: `true`
+- Merge commits since baseline: `0`
+- Pushed by Codex: `false`
+- Merged by Codex: `false`
+- Rebased/reset/tagged/amended by Codex: `false`
+"""
+    return head, state
+
+
+def _validate_odd_complete_result(
+    result: CodexResult,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    if result.status.value != "COMPLETE":
+        return [], []
+    if result.risks:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID",
+            "COMPLETE ODD-005 review requires zero unresolved risks",
+        )
+    records = [item.model_dump(mode="json") for item in result.commands]
+    if [item.get("command") for item in records] != list(ODD_MANDATORY_ACCEPTANCE_COMMANDS):
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID",
+            "COMPLETE ODD-005 review requires the exact ordered 28-command result",
+        )
+    for index, record in enumerate(records, start=1):
+        result_text = record.get("result")
+        duration = record.get("duration_seconds")
+        expected_exit = 4 if index == 23 else 0
+        if (
+            record.get("exit_code") != expected_exit
+            or not isinstance(result_text, str)
+            or not result_text.startswith("PASS:")
+            or not _valid_duration(duration)
+            or (
+                index == 23
+                and (
+                    "CREDENTIAL_UNAVAILABLE" not in result_text
+                    or "zero transport" not in result_text
+                )
+            )
+            or (index == 27 and result_text != ODD_REVIEW_FINAL_RESULT)
+            or (index == 28 and result_text != ODD_TEARDOWN_FINAL_RESULT)
+            or result_text in {ODD_REVIEW_WRITE_AHEAD_RESULT, ODD_TEARDOWN_WRITE_AHEAD_RESULT}
+        ):
+            raise ReviewPackError(
+                "REVIEW_ACCEPTANCE_INVALID",
+                f"COMPLETE ODD-005 command {index} evidence is invalid",
+            )
+    expected_rows = [
+        {
+            "command": record["command"],
+            "duration_seconds": record["duration_seconds"],
+            "exit_code": record["exit_code"],
+            "expected_exit_code": 4 if index == 23 else 0,
+            "status": "PASS",
+        }
+        for index, record in enumerate(records, start=1)
+    ]
+    if result.acceptance != expected_rows:
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID",
+            "COMPLETE ODD-005 result acceptance does not match its exact commands",
+        )
+    return records, expected_rows
+
+
+def _validate_odd_complete_evidence(root: Path, result: CodexResult, head: str) -> None:
+    if result.status.value != "COMPLETE":
+        return
+    records, expected_rows = _validate_odd_complete_result(result)
+    evidence_root = root / "evidence/tickets/ODD-005"
+    command_path = evidence_root / "commands.log"
+    try:
+        command_values = _parse_fpl_command_log(command_path.read_bytes())
+    except OSError as exc:
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID", "ODD-005 command log is unavailable"
+        ) from exc
+    if command_values != records:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "ODD-005 command log and result do not match exactly"
+        )
+
+    tests = _fpl_json_object(evidence_root / "tests.json")
+    required_fields = {
+        "critical_odds_ingestion_branch_coverage_percent",
+        "critical_odds_ingestion_branches_covered",
+        "critical_odds_ingestion_branches_total",
+        "critical_oracles",
+        "cutoff_branch_coverage_percent",
+        "cutoff_branches_covered",
+        "cutoff_branches_total",
+        "failed",
+        "fpl_remediation_branch_coverage_percent",
+        "fpl_remediation_branches_covered",
+        "fpl_remediation_branches_total",
+        "mutation_method",
+        "overall_branch_coverage_percent",
+        "overall_branches_covered",
+        "overall_branches_total",
+        "passed",
+        "quota_branch_coverage_percent",
+        "quota_branches_covered",
+        "quota_branches_total",
+        "repository_combined_coverage_percent",
+        "repository_combined_units_covered",
+        "repository_combined_units_total",
+        "rights_branch_coverage_percent",
+        "rights_branches_covered",
+        "rights_branches_total",
+        "skipped",
+        "status",
+        "tls_branch_coverage_percent",
+        "tls_branches_covered",
+        "tls_branches_total",
+    }
+    metric_specs = (
+        (
+            "repository_combined_coverage_percent",
+            "repository_combined_units_covered",
+            "repository_combined_units_total",
+            90.0,
+        ),
+        (
+            "overall_branch_coverage_percent",
+            "overall_branches_covered",
+            "overall_branches_total",
+            90.0,
+        ),
+        (
+            "critical_odds_ingestion_branch_coverage_percent",
+            "critical_odds_ingestion_branches_covered",
+            "critical_odds_ingestion_branches_total",
+            95.0,
+        ),
+        (
+            "rights_branch_coverage_percent",
+            "rights_branches_covered",
+            "rights_branches_total",
+            95.0,
+        ),
+        (
+            "quota_branch_coverage_percent",
+            "quota_branches_covered",
+            "quota_branches_total",
+            95.0,
+        ),
+        (
+            "cutoff_branch_coverage_percent",
+            "cutoff_branches_covered",
+            "cutoff_branches_total",
+            95.0,
+        ),
+        (
+            "tls_branch_coverage_percent",
+            "tls_branches_covered",
+            "tls_branches_total",
+            95.0,
+        ),
+        (
+            "fpl_remediation_branch_coverage_percent",
+            "fpl_remediation_branches_covered",
+            "fpl_remediation_branches_total",
+            95.0,
+        ),
+    )
+    oracles = tests.get("critical_oracles")
+    if (
+        set(tests) != required_fields
+        or tests.get("status") != "PASS"
+        or tests.get("failed") != 0
+        or tests.get("skipped") != 0
+        or not _positive_int(tests.get("passed"))
+        or not isinstance(tests.get("mutation_method"), str)
+        or not tests["mutation_method"]
+        or not isinstance(oracles, list)
+        or len(oracles) < 10
+        or not all(isinstance(item, str) and item for item in oracles)
+        or any(
+            not _fpl_coverage_metric_matches(
+                tests,
+                percent_key=percent,
+                covered_key=covered,
+                total_key=total,
+                minimum=minimum,
+            )
+            for percent, covered, total, minimum in metric_specs
+        )
+        or result.tests != [tests]
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID",
+            "ODD-005 test, coverage, or critical-oracle evidence is incomplete",
+        )
+
+    acceptance = _fpl_json_object(evidence_root / "acceptance_matrix.json")
+    if (
+        set(acceptance) != {"commands", "failed", "passed", "status", "ticket_id"}
+        or acceptance.get("ticket_id") != "ODD-005"
+        or acceptance.get("status") != "COMPLETE"
+        or acceptance.get("passed") != 28
+        or acceptance.get("failed") != 0
+        or acceptance.get("commands") != expected_rows
+        or result.acceptance != expected_rows
+    ):
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID", "ODD-005 acceptance matrix is incomplete"
+        )
+    try:
+        manifest = validate_ticket_evidence(root, "ODD-005")
+    except Exception as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "ODD-005 evidence manifest or artifact hashes are invalid"
+        ) from exc
+    if (
+        manifest.status != "COMPLETE"
+        or manifest.code_commit != head
+        or manifest.context_hash != ODD_PACK_MANIFEST_SHA256
+        or manifest.commands != records
+        or manifest.known_limitations
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "ODD-005 evidence provenance is incomplete"
+        )
+    migration = _fpl_json_object(evidence_root / "migration_matrix.json")
+    migration_schema = migration.get("schema")
+    migration_database = migration.get("database")
+    migration_offline = migration.get("offline_sql")
+    matrix = migration.get("matrix")
+    expected_matrix = [
+        {"from": "base", "status": "PASS", "to": "20260725_0004"},
+        {"from": "20260725_0004", "status": "PASS", "to": "20260724_0002"},
+        {"from": "20260724_0002", "status": "PASS", "to": "20260725_0004"},
+        {"from": "20260725_0004", "status": "PASS", "to": "20260724_0002"},
+        {"from": "20260724_0002", "status": "PASS", "to": "20260725_0004"},
+    ]
+    if (
+        migration.get("status") != "PASS"
+        or migration.get("ticket_id") != "ODD-005"
+        or migration.get("baseline_revision") != "20260724_0002"
+        or migration.get("target_revision") != "20260725_0004"
+        or migration.get("revisions") != ["20260725_0003", "20260725_0004"]
+        or migration.get("revision_count") != 2
+        or migration.get("metadata_drift_check") != "PASS"
+        or not isinstance(migration_database, dict)
+        or migration_database.get("postgres_version") != "18.4"
+        or not isinstance(migration_offline, dict)
+        or migration_offline.get("secret_free") is not True
+        or migration_offline.get("path") != "evidence/tickets/ODD-005/offline_upgrade.sql"
+        or not isinstance(migration_schema, dict)
+        or migration_schema.get("alembic_revision") != "20260725_0004"
+        or re.fullmatch(r"[0-9a-f]{64}", str(migration_schema.get("schema_sha256"))) is None
+        or matrix != expected_matrix
+    ):
+        raise ReviewPackError("REVIEW_EVIDENCE_INVALID", "ODD-005 migration evidence is incomplete")
+
+    package = _fpl_json_object(evidence_root / "package_report.json")
+    package_foundation = package.get("foundation")
+    package_fpl = package.get("fpl004")
+    package_wheel = package.get("wheel")
+    package_odd = package.get("odd005")
+    refusal = package_odd.get("refusal") if isinstance(package_odd, dict) else None
+    replay = package_odd.get("replay") if isinstance(package_odd, dict) else None
+    market = package_odd.get("market") if isinstance(package_odd, dict) else None
+    expected_prices = {
+        "SYNTHETIC_BOOK_ALPHA": {"AWAY": "4.20", "DRAW": "3.60", "HOME": "1.80"},
+        "SYNTHETIC_BOOK_BETA": {"AWAY": "4.10", "DRAW": "3.50", "HOME": "1.85"},
+    }
+    if (
+        package.get("status") != "PASS"
+        or package.get("network_requests") != 0
+        or package.get("cleaned_up") is not True
+        or package.get("database_isolated") is not True
+        or package.get("database_cleaned_up") is not True
+        or not isinstance(package_foundation, dict)
+        or package_foundation.get("status") != "PASS"
+        or package_foundation.get("cleaned_up") is not True
+        or package_foundation.get("network_fetch_disabled") is not True
+        or package_foundation.get("clean_environment_outside_repository") is not True
+        or not isinstance(package_fpl, dict)
+        or package_fpl.get("status") != "USABLE"
+        or package_fpl.get("bundle_member_count") != 2
+        or re.fullmatch(r"[0-9a-f]{64}", str(package_fpl.get("semantic_sha256"))) is None
+        or not isinstance(package_wheel, dict)
+        or package_wheel.get("contains_odds_resources") is not True
+        or package_wheel.get("contains_py_typed") is not True
+        or package_wheel.get("distribution") != "dmf-pulse==0.2.0"
+        or re.fullmatch(r"[0-9a-f]{64}", str(package_wheel.get("sha256"))) is None
+        or not isinstance(package_odd, dict)
+        or package_odd.get("validation_status") not in {"VALID", "VALID_WITH_WARNINGS"}
+        or replay
+        != {
+            "complete_books_created": 2,
+            "observations_created": 6,
+            "status": "COMPLETE",
+        }
+        or market
+        != {
+            "observation_count": 6,
+            "operator_books": 2,
+            "prices": expected_prices,
+        }
+        or not isinstance(refusal, dict)
+        or refusal.get("code") != "CREDENTIAL_UNAVAILABLE"
+        or refusal.get("transport_called") is not False
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "ODD-005 installed-wheel evidence is incomplete"
+        )
+
+    verification = _fpl_json_object(evidence_root / "acceptance_verification.json")
+    verification_git = verification.get("git")
+    verification_database = verification.get("database")
+    verification_transport = verification.get("transport_preflight")
+    verification_package = verification.get("package")
+    verification_market = verification.get("market")
+    if (
+        verification.get("status") != "PASS"
+        or not isinstance(verification_git, dict)
+        or verification_git.get("baseline") != ODD_REQUIRED_BASELINE
+        or verification_git.get("branch") != ODD_REQUIRED_BRANCH
+        or verification_git.get("clean") is not True
+        or verification_git.get("head") != head
+        or not isinstance(verification_database, dict)
+        or verification_database.get("baseline_revision") != "20260724_0002"
+        or verification_database.get("postgres_version") != "18.4"
+        or re.fullmatch(r"[0-9a-f]{64}", str(verification_database.get("schema_sha256"))) is None
+        or not isinstance(verification_transport, dict)
+        or verification_transport.get("credential_failure") != "CREDENTIAL_UNAVAILABLE"
+        or verification_transport.get("quota_failure") != "QUOTA_EXHAUSTED"
+        or verification_transport.get("transport_call_count") != 0
+        or not isinstance(verification_package, dict)
+        or verification_package.get("network_requests") != 0
+        or verification_package.get("cleaned_up") is not True
+        or not isinstance(verification_market, dict)
+        or verification_market.get("observation_count") != 6
+        or verification_market.get("operator_books") != 2
+        or verification_market.get("source_scale_preserved") is not True
+        or verification_market.get("literal_command_output_validated") is not True
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "ODD-005 independent verification is incomplete"
+        )
+
+    security = _fpl_json_object(evidence_root / "security_scan.json")
+    if security != {"finding_count": 0, "status": "PASS"}:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "ODD-005 security scan does not prove zero findings"
+        )
+
+
+def _odd_review_index(status: str, head: str, baseline: str, limitations: str) -> str:
+    return f"""# ODD-005 review index
+
+ODD-005 closes the mandatory FPL-004 findings and implements the rights-gated, offline-deterministic The Odds API provider foundation, exact market observations, quota evidence, explicit identity mapping, and cutoff-safe as-of queries. Acceptance status: **{status}**.
+
+Baseline: `{baseline}`. Final repository HEAD: `{head}`. Read files 02, 16, 03, then the focused technical reviews in 05-14.
+
+`payload_sha256` is the stable digest ledger for files 01-17. File 19 hashes files 01-18; file 20 hashes files 01-19. The archive SHA-256 and CRC result are recorded externally after construction because an archive cannot embed its own digest.
+
+Commands 27-28 use explicit write-ahead records so the review command executes exactly once and PostgreSQL teardown remains finally guaranteed. The deterministic assembler may refresh the validated archive after finalization without claiming a second acceptance invocation.
+
+## Exact unresolved issues
+
+{limitations.rstrip() or "None."}
+
+No live FPL, The Odds API, or other provider request; real credential; push; merge; rebase; reset; tag; amend; or repository-visibility change is part of this milestone.
+"""
+
+
+def _assemble_odd_entries(
+    root: Path,
+    *,
+    baseline: str | None,
+    generated_at: str,
+    process_runner: ProcessRunner,
+) -> list[ReviewEntry]:
+    paths = ticket_paths(root, "ODD-005")
+    validated = validate_evidence_file(paths.evidence / "codex_result.json")
+    if not isinstance(validated.model, CodexResult) or validated.model.ticket_id != "ODD-005":
+        raise ReviewPackError(
+            "CODEX_RESULT_INVALID", "ODD-005 codex_result has the wrong evidence kind"
+        )
+    result = validated.model
+    if baseline is None:
+        raise ReviewPackError("BASELINE_INVALID", "ODD-005 baseline is required")
+    head, git_state = _required_odd_git_state(root, baseline, process_runner)
+    patch, file_map = _odd_baseline_diff(root, baseline, process_runner)
+    if result.status.value == "COMPLETE" and result.code_commit != head:
+        raise ReviewPackError(
+            "REVIEW_COMMIT_MISMATCH", "COMPLETE result does not identify final HEAD"
+        )
+    _validate_odd_complete_evidence(root, result, head)
+    limitations = _required_text(root, "evidence/tickets/ODD-005/KNOWN_LIMITATIONS.md")
+    entries = [
+        _entry(
+            "01_REVIEW_INDEX.md",
+            _odd_review_index(result.status.value, head, baseline, limitations),
+            "review navigation and detached-hash semantics",
+        ),
+        _entry("02_BASELINE_AND_GIT_STATE.md", git_state, "exact baseline and clean Git state"),
+        _entry(
+            "03_COMPLETE_HUMAN_PATCH.diff", patch, "complete human-authored patch from baseline"
+        ),
+        _entry("04_FILE_CHANGE_MAP.md", file_map, "change map and governed-input hashes"),
+        _entry(
+            "05_PUBLIC_CONTRACTS.md",
+            _required_text(root, "evidence/tickets/ODD-005/PUBLIC_CONTRACTS.md"),
+            "public API, CLI, model, Decimal, and JSON Schema contracts",
+        ),
+        _entry(
+            "06_MIGRATION_SCHEMA_REVIEW.md",
+            _required_text(root, "evidence/tickets/ODD-005/MIGRATION_SCHEMA_REVIEW.md"),
+            "migration matrix, PostgreSQL schema fingerprint, downgrade, and re-upgrade",
+        ),
+        _entry(
+            "07_FPL004_REMEDIATION.md",
+            _required_text(root, "evidence/tickets/ODD-005/FPL004_REMEDIATION.md"),
+            "mandatory inherited FPL-004 finding closure",
+        ),
+        _entry(
+            "08_PROVIDER_CLIENT_QUOTA.md",
+            _required_text(root, "evidence/tickets/ODD-005/PROVIDER_CLIENT_QUOTA.md"),
+            "provider configuration, client, credentials, HTTP, retry, and quota review",
+        ),
+        _entry(
+            "09_MARKET_MAPPING_SEMANTICS.md",
+            _required_text(root, "evidence/tickets/ODD-005/MARKET_MAPPING_SEMANTICS.md"),
+            "explicit mapping, 1X2 semantics, Decimal values, and idempotency review",
+        ),
+        _entry(
+            "10_RIGHTS_RETENTION.md",
+            _required_text(root, "evidence/tickets/ODD-005/RIGHTS_RETENTION.md"),
+            "rights gates, retention, raw deletion, backup, and export review",
+        ),
+        _entry(
+            "11_ASOF_IDEMPOTENCY_CONCURRENCY.md",
+            _required_text(root, "evidence/tickets/ODD-005/ASOF_IDEMPOTENCY_CONCURRENCY.md"),
+            "cutoff, append-only idempotency, and concurrent-writer review",
+        ),
+        _entry(
+            "12_TESTS_AND_COVERAGE.md",
+            _required_text(root, "evidence/tickets/ODD-005/TESTS_AND_COVERAGE.md"),
+            "tests, coverage tiers, mutation-style negative controls, and oracles",
+        ),
+        _entry(
+            "13_SECURITY_AND_SECRET_REVIEW.md",
+            _required_text(root, "evidence/tickets/ODD-005/SECURITY_AND_SECRET_REVIEW.md"),
+            "credentials, canaries, logs, raw bodies, and no-network review",
+        ),
+        _entry(
+            "14_WHEEL_AND_CLI.md",
+            _required_text(root, "evidence/tickets/ODD-005/WHEEL_AND_CLI.md"),
+            "clean installed wheel, CLI outputs, refusal, and cleanup proof",
+        ),
+        _entry(
+            "15_COMMANDS_AND_RESULTS.log",
+            _required_text(root, "evidence/tickets/ODD-005/commands.log"),
+            "exact command, exit, duration, and result ledger",
+        ),
+        _entry(
+            "16_ACCEPTANCE_MANIFEST.json",
+            _required_text(root, "evidence/tickets/ODD-005/acceptance_matrix.json"),
+            "structured exact 28-command acceptance manifest",
+        ),
+        _entry("17_KNOWN_LIMITATIONS.md", limitations, "exact limitations and open questions"),
+        _entry("18_CODEX_RESULT.json", pretty_json(result), "structured implementation result"),
+    ]
+    entries = [
+        ReviewEntry(
+            name=item.name,
+            data=_redact_fpl_personal_text(item.data.decode("utf-8")).encode("utf-8"),
+            purpose=item.purpose,
+        )
+        for item in entries
+    ]
+    payload = {entry.name: entry.data for entry in entries}
+    payload_sha256 = _primary_payload_digest(payload, ODD_PRIMARY_PAYLOAD_NAMES)
+    manifest = ReviewManifest(
+        ticket_id="ODD-005",
+        generated_at=generated_at,
+        repository_head=head,
+        baseline=baseline,
+        file_count=MAX_REVIEW_FILES,
+        files=[
+            ReviewFile(
+                name=item.name,
+                sha256=_sha256_bytes(item.data),
+                bytes=len(item.data),
+                purpose=item.purpose,
+            )
+            for item in entries
+        ],
+        acceptance_status=result.status,
+        payload_sha256=payload_sha256,
+        archive_sha256=None,
+    )
+    entries.append(
+        _entry(FPL_MANIFEST_NAME, pretty_json(manifest), "detached archive payload manifest")
+    )
+    entries.sort(key=lambda item: item.name)
+    entries.append(
+        _entry(
+            CHECKSUM_NAME,
+            "".join(f"{_sha256_bytes(item.data)}  {item.name}\n" for item in entries),
+            "detached checksum ledger",
+        )
+    )
+    entries.sort(key=lambda item: item.name)
+    enforce_review_limit(entries)
+    if tuple(item.name for item in entries) != ODD_PREFERRED_NAMES:
+        raise ReviewPackError(
+            "REVIEW_PACK_LAYOUT", "ODD-005 review pack does not match its exact contract"
+        )
+    if (
+        set(item.name for item in entries if item.name not in {FPL_MANIFEST_NAME, CHECKSUM_NAME})
+        != ODD_DETACHED_REVIEW_NAMES
+    ):
+        raise ReviewPackError("REVIEW_PACK_LAYOUT", "ODD-005 detached manifest layout drifted")
+    for item in entries:
+        lowered = item.data.lower()
+        if b"sebastian" in lowered or b"sebgr" in lowered or b"c:\\users\\" in lowered:
+            raise ReviewPackError(
+                "REVIEW_PACK_PERSONAL_DATA",
+                f"personal identifier or Windows user path detected in {item.name}",
+            )
+        if any(marker in item.data for marker in (*FPL_FORBIDDEN_MARKERS, *ODD_FORBIDDEN_MARKERS)):
+            raise ReviewPackError(
+                "REVIEW_PACK_RAW_PAYLOAD",
+                f"forbidden raw-body or fake-secret marker detected in {item.name}",
+            )
+        if scan_text(item.data.decode("utf-8"), path=item.name):
+            raise ReviewPackError(
+                "REVIEW_PACK_SECRET", f"secret-like content detected in {item.name}"
+            )
+    return entries
+
+
 def _assemble_for_ticket(
     root: Path,
     *,
@@ -2386,6 +3115,13 @@ def _assemble_for_ticket(
         )
     if validated_ticket == "FPL-004":
         return _assemble_fpl_entries(
+            root,
+            baseline=baseline,
+            generated_at=generated_at,
+            process_runner=process_runner,
+        )
+    if validated_ticket == "ODD-005":
+        return _assemble_odd_entries(
             root,
             baseline=baseline,
             generated_at=generated_at,
@@ -2434,7 +3170,9 @@ def build_review_pack(
         process_runner=selected_runner,
     )
     primary_names = (
-        FPL_PRIMARY_PAYLOAD_NAMES
+        ODD_PRIMARY_PAYLOAD_NAMES
+        if validated_ticket == "ODD-005"
+        else FPL_PRIMARY_PAYLOAD_NAMES
         if validated_ticket == "FPL-004"
         else DAT_PRIMARY_PAYLOAD_NAMES
         if validated_ticket == "DAT-003"
@@ -2446,7 +3184,9 @@ def build_review_pack(
         {entry.name: entry.data for entry in entries}, primary_names
     )
     result_name = (
-        "18_CODEX_RESULT.json" if validated_ticket == "FPL-004" else "02_CODEX_RESULT.json"
+        "18_CODEX_RESULT.json"
+        if validated_ticket in {"FPL-004", "ODD-005"}
+        else "02_CODEX_RESULT.json"
     )
     result_entry = next(item for item in entries if item.name == result_name)
     result = CodexResult.model_validate_json(result_entry.data)
@@ -2459,7 +3199,9 @@ def build_review_pack(
             "codex_result review-pack digest does not match the detached primary payload",
         )
     zip_name = (
-        FPL_REVIEW_ZIP_NAME
+        ODD_REVIEW_ZIP_NAME
+        if validated_ticket == "ODD-005"
+        else FPL_REVIEW_ZIP_NAME
         if validated_ticket == "FPL-004"
         else DAT_REVIEW_ZIP_NAME
         if validated_ticket == "DAT-003"
@@ -2510,6 +3252,7 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
     try:
         with zipfile.ZipFile(path) as archive:
             names = archive.namelist()
+            infos = archive.infolist()
             if len(names) > MAX_REVIEW_FILES:
                 raise ReviewPackError(
                     "REVIEW_PACK_FILE_LIMIT",
@@ -2519,6 +3262,15 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
                 raise ReviewPackError("REVIEW_PACK_LAYOUT", "review ZIP contains duplicate entries")
             if any(Path(name).name != name or "/" in name or "\\" in name for name in names):
                 raise ReviewPackError("REVIEW_PACK_NESTED_PATH", "review ZIP contains nested paths")
+            if any(
+                info.is_dir()
+                or stat.S_IFMT((info.external_attr >> 16) & 0xFFFF) not in {0, stat.S_IFREG}
+                for info in infos
+            ):
+                raise ReviewPackError(
+                    "REVIEW_PACK_NONREGULAR_ENTRY",
+                    "review ZIP contains a directory, symbolic link, or non-regular entry",
+                )
             if any(name.casefold().endswith((".zip", ".tar", ".gz", ".7z")) for name in names):
                 raise ReviewPackError(
                     "REVIEW_PACK_NESTED_ARCHIVE", "nested archives are prohibited"
@@ -2529,8 +3281,8 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
             "REVIEW_ZIP_INVALID", "review ZIP is unavailable or malformed"
         ) from exc
 
-    fpl_layout = "18_CODEX_RESULT.json" in payload or FPL_MANIFEST_NAME in payload
-    if fpl_layout:
+    stage_layout = "18_CODEX_RESULT.json" in payload or FPL_MANIFEST_NAME in payload
+    if stage_layout:
         for name, data in payload.items():
             lowered = data.lower()
             if b"sebastian" in lowered or b"sebgr" in lowered or b"c:\\users\\" in lowered:
@@ -2538,7 +3290,7 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
                     "REVIEW_PACK_PERSONAL_DATA",
                     f"personal identifier or Windows user path detected in {name}",
                 )
-            if any(marker in data for marker in FPL_FORBIDDEN_MARKERS):
+            if any(marker in data for marker in (*FPL_FORBIDDEN_MARKERS, *ODD_FORBIDDEN_MARKERS)):
                 raise ReviewPackError(
                     "REVIEW_PACK_RAW_PAYLOAD",
                     f"forbidden raw-body or fake-secret marker detected in {name}",
@@ -2553,16 +3305,16 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
                 raise ReviewPackError(
                     "REVIEW_PACK_SECRET", f"secret-like content detected in {name}"
                 )
-    result_name = "18_CODEX_RESULT.json" if fpl_layout else "02_CODEX_RESULT.json"
-    manifest_name = FPL_MANIFEST_NAME if fpl_layout else MANIFEST_NAME
+    result_name = "18_CODEX_RESULT.json" if stage_layout else "02_CODEX_RESULT.json"
+    manifest_name = FPL_MANIFEST_NAME if stage_layout else MANIFEST_NAME
     if {result_name, manifest_name, CHECKSUM_NAME} - set(payload):
         raise ReviewPackError("REVIEW_PACK_LAYOUT", "review ZIP root layout is invalid")
 
     try:
         result = CodexResult.model_validate_json(payload[result_name])
-        if result.ticket_id not in {"FND-001", "RUL-002", "DAT-003", "FPL-004"}:
+        if result.ticket_id not in {"FND-001", "RUL-002", "DAT-003", "FPL-004", "ODD-005"}:
             raise ReviewPackError("REVIEW_TICKET_UNSUPPORTED", "review ZIP ticket is unsupported")
-        if fpl_layout != (result.ticket_id == "FPL-004"):
+        if stage_layout != (result.ticket_id in {"FPL-004", "ODD-005"}):
             raise ReviewPackError("REVIEW_PACK_LAYOUT", "review ZIP ticket layout is inconsistent")
         if result.ticket_id == "FPL-004":
             records, _expected_rows = _validate_fpl_complete_result(result)
@@ -2573,8 +3325,19 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
                         "REVIEW_ACCEPTANCE_INVALID",
                         "FPL-004 detached command log and result do not match exactly",
                     )
+        if result.ticket_id == "ODD-005":
+            records, _expected_rows = _validate_odd_complete_result(result)
+            if result.status.value == "COMPLETE":
+                command_log = payload.get("15_COMMANDS_AND_RESULTS.log")
+                if command_log is None or _parse_fpl_command_log(command_log) != records:
+                    raise ReviewPackError(
+                        "REVIEW_ACCEPTANCE_INVALID",
+                        "ODD-005 detached command log and result do not match exactly",
+                    )
         preferred = (
-            FPL_PREFERRED_NAMES
+            ODD_PREFERRED_NAMES
+            if result.ticket_id == "ODD-005"
+            else FPL_PREFERRED_NAMES
             if result.ticket_id == "FPL-004"
             else DAT_PREFERRED_NAMES
             if result.ticket_id == "DAT-003"
@@ -2582,7 +3345,7 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
             if result.ticket_id == "RUL-002"
             else PREFERRED_NAMES
         )
-        if tuple(sorted(payload)) != preferred:
+        if tuple(names) != preferred:
             raise ReviewPackError("REVIEW_PACK_LAYOUT", "review ZIP root layout is invalid")
         manifest_value = json.loads(payload[manifest_name].decode("utf-8"))
         manifest = ReviewManifest.model_validate(manifest_value)
@@ -2594,7 +3357,12 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
     if result.review_pack.file_count != len(payload):
         raise ReviewPackError("REVIEW_FILE_COUNT_MISMATCH", "result file_count is not ZIP count")
     expected_manifest_names = set(payload) - {manifest_name, CHECKSUM_NAME}
-    if {item.name for item in manifest.files} != expected_manifest_names:
+    expected_manifest_order = tuple(
+        name for name in preferred if name not in {manifest_name, CHECKSUM_NAME}
+    )
+    if {item.name for item in manifest.files} != expected_manifest_names or tuple(
+        item.name for item in manifest.files
+    ) != expected_manifest_order:
         raise ReviewPackError(
             "REVIEW_MANIFEST_COVERAGE", "detached manifest coverage is incomplete"
         )
@@ -2604,13 +3372,16 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
         ):
             raise ReviewPackError("REVIEW_MANIFEST_HASH", f"manifest mismatch for {item.name}")
     expected_checksum_names = set(payload) - {CHECKSUM_NAME}
-    if set(checksums) != expected_checksum_names:
+    expected_checksum_order = tuple(name for name in preferred if name != CHECKSUM_NAME)
+    if set(checksums) != expected_checksum_names or tuple(checksums) != expected_checksum_order:
         raise ReviewPackError("REVIEW_CHECKSUM_COVERAGE", "checksum ledger coverage is incomplete")
     for name, digest in checksums.items():
         if digest != _sha256_bytes(payload[name]):
             raise ReviewPackError("REVIEW_CHECKSUM_HASH", f"checksum mismatch for {name}")
     primary_names = (
-        FPL_PRIMARY_PAYLOAD_NAMES
+        ODD_PRIMARY_PAYLOAD_NAMES
+        if result.ticket_id == "ODD-005"
+        else FPL_PRIMARY_PAYLOAD_NAMES
         if result.ticket_id == "FPL-004"
         else DAT_PRIMARY_PAYLOAD_NAMES
         if result.ticket_id == "DAT-003"
@@ -2668,6 +3439,20 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
     if result.ticket_id == "FPL-004" and manifest.payload_sha256 != payload_sha256:
         raise ReviewPackError(
             "REVIEW_PAYLOAD_DIGEST", "FPL-004 review manifest payload digest does not match"
+        )
+    if result.ticket_id == "ODD-005" and (
+        result.code_commit is None
+        or manifest.repository_head != result.code_commit
+        or manifest.baseline != ODD_REQUIRED_BASELINE
+        or result.repository is None
+        or result.repository.head != manifest.repository_head
+    ):
+        raise ReviewPackError(
+            "REVIEW_PROVENANCE_MISMATCH", "ODD-005 review provenance is contradictory"
+        )
+    if result.ticket_id == "ODD-005" and manifest.payload_sha256 != payload_sha256:
+        raise ReviewPackError(
+            "REVIEW_PAYLOAD_DIGEST", "ODD-005 review manifest payload digest does not match"
         )
     if (
         result.status.value == "COMPLETE"

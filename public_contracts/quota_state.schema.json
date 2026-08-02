@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/odd-005/quota-state.schema.json",
+  "title": "QuotaState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["remaining", "used", "last_cost", "observed_at", "source"],
+  "properties": {
+    "remaining": {"type": "integer", "minimum": 0},
+    "used": {"type": "integer", "minimum": 0},
+    "last_cost": {"type": "integer", "minimum": 0},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "source": {"enum": ["RESPONSE_HEADERS", "SYNTHETIC_FIXTURE"]}
+  }
+}

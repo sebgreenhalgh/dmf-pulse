@@ -72,7 +72,7 @@ def test_happy_fixtures_have_frozen_hashes_and_typed_values(repository_root: Pat
     )
     assert (
         bootstrap.semantic_sha256
-        == "e05f0104d63b08a040a81ce40fef9e5665013dc6460ea1b64ee12bbe25e2eb82"
+        == "9bad2f61db480f2b607517d83b758884baa1435c59a7186568fd59548bff5e2e"
     )
     assert (
         fixtures.semantic_sha256

@@ -59,6 +59,8 @@ ASSIGNMENT_PATTERN = re.compile(
     rf"(?i)(?:['\"]?(?:{NAME_PATTERN})['\"]?)\s*[:=]\s*['\"]?([^\s,'\"}}]{{8,}})"
 )
 QUERY_PATTERN = re.compile(rf"(?i)(?:{NAME_PATTERN})=([^&\s'\"]{{6,}})")
+ODD005_FAKE_CREDENTIAL_CANARY = "ODD005_FAKE_API_" + "KEY_DO_NOT_LOG_91d3a5"
+ODD005_RAW_BODY_CANARY = "ODD005_RAW_BODY_" + "CANARY_7c4f91"
 
 
 @dataclass(frozen=True, slots=True, order=True)
@@ -131,6 +133,20 @@ def scan_text(text: str, *, path: str = "<memory>") -> list[SecretFinding]:
 
     findings: set[SecretFinding] = set()
     for line_number, line in enumerate(text.splitlines() or [text], start=1):
+        for marker, rule_id, message in (
+            (
+                ODD005_FAKE_CREDENTIAL_CANARY,
+                "ODD005_FAKE_CREDENTIAL",
+                "ODD-005 fake credential canary",
+            ),
+            (
+                ODD005_RAW_BODY_CANARY,
+                "ODD005_RAW_BODY_CANARY",
+                "ODD-005 raw-body canary",
+            ),
+        ):
+            if marker in line:
+                findings.add(_finding(path, line_number, rule_id, marker, message))
         for match in PRIVATE_KEY_PATTERN.finditer(line):
             findings.add(
                 _finding(path, line_number, "PRIVATE_KEY", match.group(0), "private-key marker")
@@ -163,6 +179,9 @@ def scan_text(text: str, *, path: str = "<memory>") -> list[SecretFinding]:
             )
         for match in QUERY_PATTERN.finditer(line):
             value = match.group(1).rstrip(")]}")
+            prefix = line[: match.start()]
+            if "?" not in prefix and "://" not in prefix:
+                continue
             if value.casefold() not in {"changeme", "example", "redacted", "placeholder"}:
                 findings.add(
                     _finding(
@@ -183,6 +202,10 @@ def scan_text(text: str, *, path: str = "<memory>") -> list[SecretFinding]:
                 or "lambda " in syntax_line
                 or ") ->" in syntax_line
                 or "(" in value
+                or (
+                    re.fullmatch(r"[A-Za-z_]\w*", value) is not None
+                    and not any(quote in match.group(0) for quote in ("'", '"'))
+                )
             )
             if code_syntax:
                 continue
@@ -213,8 +236,11 @@ def scan_text(text: str, *, path: str = "<memory>") -> list[SecretFinding]:
 
 def _is_sensitive_key(key: str) -> bool:
     normalized = re.sub(r"[^a-z0-9]+", "_", key.casefold()).strip("_")
-    return normalized in SENSITIVE_NAMES or any(
-        normalized.endswith(f"_{name}") for name in SENSITIVE_NAMES
+    candidates = (normalized, normalized.removesuffix("_ref"))
+    return any(
+        candidate in SENSITIVE_NAMES
+        or any(candidate.endswith(f"_{name}") for name in SENSITIVE_NAMES)
+        for candidate in candidates
     )
 
 

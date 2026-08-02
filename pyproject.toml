@@ -52,6 +52,8 @@ packages = ["src/dmf_pulse"]
 [tool.hatch.build.targets.wheel.force-include]
 "config/providers/fpl.json" = "dmf_pulse/ingestion/resources/fpl.json"
 "config/rights/fpl_profiles.json" = "dmf_pulse/ingestion/resources/fpl_profiles.json"
+"config/providers/the_odds_api.json" = "dmf_pulse/ingestion/resources/the_odds_api.json"
+"config/rights/odds_profiles.json" = "dmf_pulse/ingestion/resources/odds_profiles.json"
 
 [tool.ruff]
 target-version = "py313"

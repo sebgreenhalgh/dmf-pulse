@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/odd-005/odds-ingestion-result.schema.json",
+  "title": "OddsIngestionResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status", "provider", "source_snapshot_id", "events_seen",
+    "operator_books_seen", "complete_books_created", "incomplete_books_created",
+    "observations_created", "observations_reused", "quarantined", "quota",
+    "quality", "error"
+  ],
+  "properties": {
+    "status": {"enum": ["COMPLETE", "OBSERVED_NOT_USABLE", "QUARANTINED", "BLOCKED", "FAILED"]},
+    "provider": {"const": "the_odds_api"},
+    "source_snapshot_id": {"type": ["string", "null"], "format": "uuid"},
+    "events_seen": {"type": "integer", "minimum": 0},
+    "operator_books_seen": {"type": "integer", "minimum": 0},
+    "complete_books_created": {"type": "integer", "minimum": 0},
+    "incomplete_books_created": {"type": "integer", "minimum": 0},
+    "observations_created": {"type": "integer", "minimum": 0},
+    "observations_reused": {"type": "integer", "minimum": 0},
+    "quarantined": {"type": "integer", "minimum": 0},
+    "quota": {"anyOf": [{"$ref": "quota_state.schema.json"}, {"type": "null"}]},
+    "quality": {
+      "type": "object",
+      "required": ["status", "warnings", "blockers"],
+      "properties": {
+        "status": {"enum": ["PASS", "WARNING", "BLOCKING"]},
+        "warnings": {"type": "array", "items": {"type": "string"}},
+        "blockers": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": true
+    },
+    "error": {"anyOf": [{"$ref": "provider_failure.schema.json"}, {"type": "null"}]}
+  }
+}

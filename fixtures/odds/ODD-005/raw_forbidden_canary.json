@@ -1,0 +1,11 @@
+[
+  {
+    "id": "todapi-event-001",
+    "sport_key": "soccer_epl",
+    "commence_time": "2026-08-22T14:00:00Z",
+    "home_team": "Alpha Athletic",
+    "away_team": "Beta Borough",
+    "synthetic_cleanup_marker": "ODD005_RAW_BODY_CANARY_7c4f91",
+    "bookmakers": []
+  }
+]

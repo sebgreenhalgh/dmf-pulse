@@ -1,0 +1,8 @@
+{
+  "status": "COMPLETE",
+  "complete_books_created": 0,
+  "incomplete_books_created": 1,
+  "observations_created": 2,
+  "missing_outcomes": ["DRAW"],
+  "normalisation_present": false
+}

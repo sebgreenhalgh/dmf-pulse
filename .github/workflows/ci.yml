@@ -62,10 +62,10 @@ jobs:
       - name: Strict typing
         run: uv run mypy src/dmf_pulse
 
-      - name: PostgreSQL migration matrix and inherited vertical slice
+      - name: PostgreSQL ODD-005 migration matrix and inherited vertical slice
         run: |
-          uv run python scripts/test_migration_matrix.py --baseline-revision 20260723_0001 --target head
-          uv run pytest -m "postgres or migration" tests/integration
+          uv run python scripts/test_migration_matrix.py --baseline-revision 20260724_0002 --target head
+          uv run pytest -m "postgres and integration" tests/integration
           uv run alembic upgrade head --sql > "${{ runner.temp }}/dat003-offline-upgrade.sql"
           uv run dmf data-model doctor --json
           uv run dmf data-model schema-manifest --json
@@ -74,15 +74,17 @@ jobs:
 
       - name: Tests and branch coverage
         run: |
-          uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/FPL-004/coverage.json
-          uv run python scripts/check_fpl004_coverage_gates.py evidence/tickets/FPL-004/coverage.json
+          uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/ODD-005/coverage.json
+          uv run python scripts/check_odd005_coverage_gates.py evidence/tickets/ODD-005/coverage.json
 
-      - name: FPL synthetic vertical slice and live-rights rejection
+      - name: FPL regression and ODD-005 synthetic vertical slice
         run: |
           uv run dmf specs validate
           uv run dmf ingest fpl validate --resource bootstrap --input fixtures/fpl/FPL-004/happy_path/bootstrap.json --contract-version fpl-reference-v1 --output json
           uv run dmf ingest fpl replay --fixture-set fixtures/fpl/FPL-004 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_test_v1 --output json
-          uv run python -c "from typer.testing import CliRunner; from dmf_pulse.cli.app import app; r=CliRunner().invoke(app,['ingest','fpl','snapshot','--resource','all','--competition-key','PL','--season-code','2026/27','--rights-profile','fpl_official_private_manual_v1','--output','json']); assert r.exit_code == 4 and '\"transport_call_count\": 0' in r.stdout"
+          uv run dmf ingest odds replay --fixture-set fixtures/odds/ODD-005 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_the_odds_api_v1 --output json
+          uv run dmf market observations --fixture-external-provider official_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json
+          uv run python -c "import json; from typer.testing import CliRunner; from dmf_pulse.cli.app import app; r=CliRunner().invoke(app,['ingest','odds','snapshot','--provider','the_odds_api','--competition-key','PL','--sport-key','soccer_epl','--region','uk','--market','h2h','--as-of','2026-08-20T12:05:00Z','--output','json']); value=json.loads(r.stdout); assert r.exit_code == 4 and value['error']['code'] == 'CREDENTIAL_UNAVAILABLE' and value['error']['transport_called'] is False"
 
       - name: Rules source and golden vertical slice
         run: |
@@ -95,19 +97,19 @@ jobs:
         run: uv build
 
       - name: Verify installed wheel outside source tree
-        run: uv run python scripts/verify_fpl004_wheel.py
+        run: uv run python scripts/verify_odd005_wheel.py
 
-      - name: Verify FPL-004 acceptance evidence
+      - name: Verify ODD-005 acceptance evidence
         env:
           DMF_ACCEPTANCE_CI_REF: "1"
         run: |
           uv run python scripts/validate_repository.py
-          uv run python scripts/verify_fpl004_acceptance.py
+          uv run python scripts/verify_odd005_acceptance.py
 
       - name: Validate repository and evidence
         run: |
-          uv run python scripts/generate_fpl004_evidence.py --status DRAFT
-          uv run dmf evidence validate --ticket FPL-004
+          uv run python scripts/generate_odd005_evidence.py --status DRAFT
+          uv run dmf evidence validate --ticket ODD-005
 
       - name: First-party secret scan
         run: uv run python scripts/scan_secrets.py

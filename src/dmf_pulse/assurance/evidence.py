@@ -34,6 +34,9 @@ DAT_REVIEW_PATH = "review_pack/DAT-003/DMF_PULSE_DAT-003_REVIEW.zip"
 FPL_REQUIRED_BASELINE = "9b3160a2574d2868b5f26e3a2d429924567510b0"
 FPL_REQUIRED_BRANCH = "stage/A4/FPL-004-official-ingestion"
 FPL_REVIEW_PATH = "review_pack/FPL-004/DMF_PULSE_FPL-004_REVIEW.zip"
+ODD_REQUIRED_BASELINE = "7034e38f32cd579c90d35c5fe3f10921c3656be0"
+ODD_REQUIRED_BRANCH = "stage/A5/ODD-005-odds-provider-foundation"
+ODD_REVIEW_PATH = "review_pack/ODD-005/DMF_PULSE_ODD-005_REVIEW.zip"
 DAT_DETACHED_REVIEW_NAMES = {
     "01_REVIEW_INDEX.md",
     "02_CODEX_RESULT.json",
@@ -72,6 +75,26 @@ FPL_DETACHED_REVIEW_NAMES = {
     "15_SECURITY_AND_SECRET_REVIEW.md",
     "16_KNOWN_LIMITATIONS.md",
     "17_COMMANDS_AND_RESULTS.log",
+    "18_CODEX_RESULT.json",
+}
+ODD_DETACHED_REVIEW_NAMES = {
+    "01_REVIEW_INDEX.md",
+    "02_BASELINE_AND_GIT_STATE.md",
+    "03_COMPLETE_HUMAN_PATCH.diff",
+    "04_FILE_CHANGE_MAP.md",
+    "05_PUBLIC_CONTRACTS.md",
+    "06_MIGRATION_SCHEMA_REVIEW.md",
+    "07_FPL004_REMEDIATION.md",
+    "08_PROVIDER_CLIENT_QUOTA.md",
+    "09_MARKET_MAPPING_SEMANTICS.md",
+    "10_RIGHTS_RETENTION.md",
+    "11_ASOF_IDEMPOTENCY_CONCURRENCY.md",
+    "12_TESTS_AND_COVERAGE.md",
+    "13_SECURITY_AND_SECRET_REVIEW.md",
+    "14_WHEEL_AND_CLI.md",
+    "15_COMMANDS_AND_RESULTS.log",
+    "16_ACCEPTANCE_MANIFEST.json",
+    "17_KNOWN_LIMITATIONS.md",
     "18_CODEX_RESULT.json",
 }
 TicketId = Annotated[
@@ -328,6 +351,25 @@ class CodexResult(StrictEvidenceModel):
                 or self.repository.merged
             ):
                 raise ValueError("FPL-004 requires exact clean repository provenance")
+        if self.ticket_id == "ODD-005":
+            if (
+                self.review_pack.payload_sha256 is None
+                or self.review_pack.sha256 is not None
+                or self.review_pack.archive_sha256 is not None
+                or self.review_pack.path != ODD_REVIEW_PATH
+                or self.review_pack.file_count != 20
+            ):
+                raise ValueError("ODD-005 requires the exact detached 20-file review reference")
+            if (
+                self.repository is None
+                or self.repository.branch != ODD_REQUIRED_BRANCH
+                or self.repository.head != self.code_commit
+                or self.repository.baseline != ODD_REQUIRED_BASELINE
+                or not self.repository.clean
+                or self.repository.pushed
+                or self.repository.merged
+            ):
+                raise ValueError("ODD-005 requires exact clean repository provenance")
         return self
 
 
@@ -466,6 +508,15 @@ class ReviewManifest(StrictEvidenceModel):
             or len(names) != len(FPL_DETACHED_REVIEW_NAMES)
         ):
             raise ValueError("FPL-004 review manifest provenance is invalid")
+        if self.ticket_id == "ODD-005" and (
+            self.baseline != ODD_REQUIRED_BASELINE
+            or self.file_count != 20
+            or self.payload_sha256 is None
+            or self.archive_sha256 is not None
+            or set(names) != ODD_DETACHED_REVIEW_NAMES
+            or len(names) != len(ODD_DETACHED_REVIEW_NAMES)
+        ):
+            raise ValueError("ODD-005 review manifest provenance is invalid")
         return self
 
 

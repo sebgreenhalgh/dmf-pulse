@@ -1,5 +1,33 @@
 # DMF Pulse execution plans
 
+## ODD-005 - FPL remediation and odds-provider foundation
+
+- Ticket/stage: `ODD-005`, A5.
+- Required branch/baseline: `stage/A5/ODD-005-odds-provider-foundation` from `7034e38f32cd579c90d35c5fe3f10921c3656be0`.
+- Outcome: close the frozen FPL-004 review findings, then ingest manifest-approved synthetic The-Odds-API-shaped EPL 1X2 books into immutable rights/quota/source evidence, explicit canonical mappings, exact Decimal observations, and cutoff-safe as-of queries.
+- Constraints: no live provider request or real API key; one provider/competition/region/market only; no name-only merge, probabilities, normalisation, consensus, forecasts, scheduler, API/UI, betting action, new dependency, SQLite, push, merge, rebase, reset, tag, or amend.
+
+### ODD-005 checkpoints
+
+- [x] 2026-07-25 - verified the exact branch/base/clean-tree gates, all 63 detached pack hashes and 62 manifest entries, Docker Desktop/Compose/PostgreSQL 18.4, Alembic head/current `20260724_0002`, and the unchanged inherited suite at 589 passed with zero skips.
+- [x] 2026-08-02 - resumed the preserved Pack 1.0 worktree under hash-validated corrected Pack 1.1, resolved the frozen decimal lexical-policy blocker, confirmed the exact branch/base, and passed 90 focused offline plus 19 PostgreSQL migration/ingestion tests before further implementation edits.
+- [x] ODD-005.1 - installed the frozen ticket/contracts/schemas/fixtures and completed all six mandatory FPL-004 remediations with direct negative controls.
+- [x] ODD-005.2 - implemented the strict provider/client/quota boundary, rights profiles, payload semantics, explicit mappings, and exact domain models.
+- [x] ODD-005.3 - added the reversible PostgreSQL market schema, bundle publication guards, immutable persistence, idempotency/concurrency, and deterministic as-of query.
+- [x] ODD-005.4 - exposed the approved CLI/public contracts and installed-wheel replay/query/refusal slice.
+- [x] ODD-005.5 - passed focused, full, migration, coverage, security, and independent read-only review gates with no unresolved P0/P1 finding.
+- [ ] Final - commit the accepted ticket, run all 28 literal commands from a clean commit, record measured evidence, and validate the root-only maximum-20-file review ZIP.
+
+### ODD-005 decision log
+
+- The Odds API v4 is the sole Stage A5 provider; `soccer_epl`, `uk`, and `h2h` are frozen, while all implementation and acceptance transport is fake/offline.
+- Provider event and bookmaker keys require explicit provider-scoped mappings; raw labels validate an already resolved identity and never create one.
+- Stage A5 stores offered Decimal odds only. Implied probabilities, margin removal, consensus, forecasting, and betting guidance remain excluded.
+- `usable_at <= as_of` is the sole eligibility boundary; later retrievals and corrections append history and cannot alter an earlier query result.
+- The repository stores Alembic revisions under the ticket-allowed `src/dmf_pulse/database/**` tree; add one ordered revision there and never rewrite a prior revision.
+- The mandatory inherited FPL remediations extend existing shared ingestion primitives for rights-decision idempotency, source envelopes, fixture authority, and exit taxonomy. Those bounded shared edits, `PLANS.md` required by repository governance, and the exact-path security-fixture allowlist are contract-enabling changes; they introduce no new provider or future-stage surface.
+- Final pre-commit verification: 882 tests passed with zero skips/warnings; combined coverage 93.44%, overall branch coverage 90.18%, and all critical ODD/FPL remediation branch gates 100%; the PostgreSQL 18.4 migration/preservation matrix, installed wheel, secret scan, repository validator, lint, formatting, typing, frozen-input validation, CLI replay/query/refusal, and three independent read-only audits passed.
+
 ## FPL-004 - rights-gated official FPL ingestion foundation
 
 - Ticket/stage: `FPL-004`, A4.

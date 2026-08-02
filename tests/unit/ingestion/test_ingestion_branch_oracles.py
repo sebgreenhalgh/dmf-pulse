@@ -184,7 +184,7 @@ def test_parser_private_boundaries_cover_exact_bounded_types(repository_root: Pa
         )
     assert parser_module._json_type(Decimal("1.2")) == "decimal"
     assert parser_module._json_type(object()) == "object"
-    assert parser_module._contract_projection((Decimal("1.20"),)) == ["1.20"]
+    assert parser_module._contract_projection((Decimal("1.20"),)) == ["1.2"]
 
     bootstrap = parse_fpl_payload(
         FplResource.BOOTSTRAP,

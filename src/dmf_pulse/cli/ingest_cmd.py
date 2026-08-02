@@ -12,6 +12,7 @@ from uuid import UUID
 import typer
 from pydantic import BaseModel
 
+from dmf_pulse.cli.odds_cmd import odds_app
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.parser import (
     CONTRACT_VERSION,
@@ -31,6 +32,7 @@ ingest_app = typer.Typer(help="Run explicitly rights-gated ingestion operations.
 fpl_app = typer.Typer(help="Validate and ingest frozen FPL reference payloads.")
 bundle_app = typer.Typer(help="Inspect immutable FPL source bundles.")
 ingest_app.add_typer(fpl_app, name="fpl")
+ingest_app.add_typer(odds_app, name="odds")
 fpl_app.add_typer(bundle_app, name="bundle")
 
 

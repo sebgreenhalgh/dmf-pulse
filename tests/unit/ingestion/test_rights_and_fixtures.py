@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+from dmf_pulse.ingestion import fixtures as fixtures_module
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fixtures import approve_synthetic_fixture
 from dmf_pulse.ingestion.models import (
@@ -299,14 +300,64 @@ def test_fixture_manifest_read_failure_is_typed(
 ) -> None:
     target = _write_fixture_tree(tmp_path)
     manifest_path = tmp_path / "fixtures" / "manifest.json"
-    original = Path.read_text
+    original = Path.read_bytes
 
-    def fail_manifest(path: Path, *args: object, **kwargs: object) -> str:
+    def fail_manifest(path: Path, *args: object, **kwargs: object) -> bytes:
         if path == manifest_path:
             raise OSError("synthetic read failure")
         return original(path, *args, **kwargs)  # type: ignore[arg-type]
 
-    monkeypatch.setattr(Path, "read_text", fail_manifest)
+    monkeypatch.setattr(Path, "read_bytes", fail_manifest)
     with pytest.raises(IngestionError, match="manifest is invalid") as raised:
+        approve_synthetic_fixture(target, profile_id="synthetic_test_v1")
+    assert raised.value.code == "FIXTURE_NOT_APPROVED"
+
+
+def test_fixture_manifest_outside_named_fixture_tree_fails_closed(tmp_path: Path) -> None:
+    target = tmp_path / "case" / "payload.json"
+    target.parent.mkdir()
+    target.write_text("{}", encoding="utf-8")
+    (target.parent / "manifest.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(IngestionError, match="outside fixtures"):
+        approve_synthetic_fixture(target, profile_id="synthetic_test_v1")
+
+
+@pytest.mark.parametrize("case", ("entries", "metadata", "path", "bytes"))
+def test_trusted_manifest_still_rejects_structural_and_content_drift(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    case: str,
+) -> None:
+    body = b'{"synthetic":true}'
+    target = tmp_path / "fixtures" / "case" / "payload.json"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(body)
+    entry = {
+        "bytes": len(body),
+        "path": "fixtures/case/payload.json",
+        "rights_profile": "synthetic_test_v1",
+        "sha256": hashlib.sha256(body).hexdigest(),
+        "synthetic": True,
+    }
+    manifest: dict[str, object] = {
+        "manifest_version": "1.0.0",
+        "pack_id": "SYNTHETIC",
+        "fixture_count": 1,
+        "entries": [entry],
+    }
+    if case == "entries":
+        manifest["entries"] = "invalid"
+    elif case == "metadata":
+        manifest["fixture_count"] = 2
+    elif case == "path":
+        entry["path"] = "fixtures/case/different.json"
+    else:
+        entry["bytes"] = len(body) + 1
+    manifest_path = tmp_path / "fixtures" / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    monkeypatch.setitem(fixtures_module.TRUSTED_MANIFESTS, digest, "SYNTHETIC")
+
+    with pytest.raises(IngestionError) as raised:
         approve_synthetic_fixture(target, profile_id="synthetic_test_v1")
     assert raised.value.code == "FIXTURE_NOT_APPROVED"
