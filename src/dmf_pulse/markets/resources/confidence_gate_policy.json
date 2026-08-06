@@ -1,0 +1,11 @@
+{
+  "policy_id": "market-normalisation-confidence-gates-v1",
+  "version": "1.0.0",
+  "normalisation_policy_sha256": "4cdcc026240ddfab9eda18cbcc60b8757b0ce9238322aa3b9e0798a7f1ebd040",
+  "grades": {
+    "A": {"fallback_allowed": false, "maximum_warning_level": "NONE"},
+    "B": {"fallback_allowed": false, "maximum_warning_level": "NONBLOCKING"},
+    "C": {"fallback_allowed": true, "maximum_warning_level": "BLOCKING"},
+    "D": {"fallback_allowed": true, "maximum_warning_level": "BLOCKING"}
+  }
+}

@@ -9,9 +9,11 @@ import typer
 
 from dmf_pulse.assurance.specs import (
     FrozenInputValidationError,
+    NrmFrozenInputValidationError,
     OddFrozenInputValidationError,
     SpecValidationError,
     validate_fpl004_frozen_inputs,
+    validate_nrm006_frozen_inputs,
     validate_odd005_frozen_inputs,
     validate_specifications,
 )
@@ -28,14 +30,20 @@ def validate_command() -> None:
         validate_fpl004_frozen_inputs(Path.cwd())
         if (Path.cwd() / "tickets/ODD-005/ticket.yaml").is_file():
             validate_odd005_frozen_inputs(Path.cwd())
+        if (Path.cwd() / "tickets/NRM-006/ticket.yaml").is_file():
+            validate_nrm006_frozen_inputs(Path.cwd())
     except SpecValidationError as exc:
         typer.echo(json.dumps(exc.as_error_object(), sort_keys=True))
         raise typer.Exit(21) from exc
-    except FrozenInputValidationError as exc:
+    except NrmFrozenInputValidationError as exc:
         error = SpecValidationError(list(exc.errors))
         typer.echo(json.dumps(error.as_error_object(), sort_keys=True))
         raise typer.Exit(21) from exc
     except OddFrozenInputValidationError as exc:
+        error = SpecValidationError(list(exc.errors))
+        typer.echo(json.dumps(error.as_error_object(), sort_keys=True))
+        raise typer.Exit(21) from exc
+    except FrozenInputValidationError as exc:
         error = SpecValidationError(list(exc.errors))
         typer.echo(json.dumps(error.as_error_object(), sort_keys=True))
         raise typer.Exit(21) from exc

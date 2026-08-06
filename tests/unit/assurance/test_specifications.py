@@ -16,10 +16,15 @@ import dmf_pulse.assurance.specs as specs_module
 import dmf_pulse.cli.specs_cmd as specs_cmd_module
 from dmf_pulse.assurance.specs import (
     APPROVED_DMFP04,
+    NRM006_FIXTURE_ENTRIES,
+    NRM006_FROZEN_INPUTS,
+    NRM006_ORACLE_PATHS,
     ODD005_FROZEN_INPUTS,
     FrozenInputValidationError,
+    NrmFrozenInputValidationError,
     OddFrozenInputValidationError,
     SpecValidationError,
+    validate_nrm006_frozen_inputs,
     validate_odd005_frozen_inputs,
     validate_specifications,
 )
@@ -434,3 +439,130 @@ def test_odd_ticket_requires_the_a5_authority_scope(tmp_path: Path) -> None:
     ticket.write_text("ticket_id: ODD-005\n", encoding="utf-8")
     errors = _errors(tmp_path)
     assert any("A5-odds-manual-import scope is missing" in item for item in errors)
+
+
+def test_current_nrm006_frozen_inputs_are_valid(repository_root: Path) -> None:
+    report = validate_nrm006_frozen_inputs(repository_root)
+    assert report["ok"] is True
+    assert report["file_count"] == len(NRM006_FROZEN_INPUTS) == 18
+    assert report["fixture_entry_count"] == len(NRM006_FIXTURE_ENTRIES) == 12
+    assert report["oracle_count"] == len(NRM006_ORACLE_PATHS) == 11
+
+
+def _nrm_fixture_root(
+    repository_root: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[Path, Path, dict[str, Any]]:
+    target = tmp_path / "fixtures/odds/NRM-006"
+    shutil.copytree(repository_root / "fixtures/odds/NRM-006", target)
+    monkeypatch.setattr(specs_module, "NRM006_FROZEN_INPUTS", {})
+    manifest_path = target / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    return tmp_path, manifest_path, manifest
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    (
+        "invalid_json",
+        "envelope",
+        "keys",
+        "entry",
+        "missing",
+        "bytes",
+        "hash",
+        "inventory",
+        "oracle_inventory",
+    ),
+)
+def test_nrm006_frozen_manifest_rejects_each_integrity_boundary(
+    repository_root: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutation: str,
+) -> None:
+    root, manifest_path, manifest = _nrm_fixture_root(
+        repository_root,
+        tmp_path,
+        monkeypatch,
+    )
+    entries = manifest["entries"]
+    assert isinstance(entries, list)
+    first = entries[0]
+    assert isinstance(first, dict)
+    if mutation == "invalid_json":
+        manifest_path.write_text("{", encoding="utf-8")
+    elif mutation == "envelope":
+        manifest["ticket"] = "WRONG"
+        _write_json(manifest_path, manifest)
+    elif mutation == "keys":
+        first.pop("rights_classification")
+        _write_json(manifest_path, manifest)
+    elif mutation == "entry":
+        first["path"] = "../escape.json"
+        _write_json(manifest_path, manifest)
+    elif mutation == "missing":
+        (root / first["path"]).unlink()
+    elif mutation == "bytes":
+        with (root / first["path"]).open("ab") as handle:
+            handle.write(b"tampered")
+    elif mutation == "hash":
+        first["sha256"] = "0" * 64
+        _write_json(manifest_path, manifest)
+    elif mutation == "inventory":
+        (manifest_path.parent / "unexpected.json").write_text("{}\n", encoding="utf-8")
+    else:
+        (manifest_path.parent / "expected_outputs/unexpected.json").write_text(
+            "{}\n", encoding="utf-8"
+        )
+
+    with pytest.raises(NrmFrozenInputValidationError) as caught:
+        validate_nrm006_frozen_inputs(root)
+    assert caught.value.errors
+
+
+def test_nrm006_direct_frozen_pins_reject_schema_tamper(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    shutil.copytree(
+        repository_root / "fixtures/odds/NRM-006",
+        tmp_path / "fixtures/odds/NRM-006",
+    )
+    for relative in NRM006_FROZEN_INPUTS:
+        source = repository_root / relative
+        target = tmp_path / relative
+        if target.is_file():
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+    schema = tmp_path / "public_contracts/probability.schema.json"
+    schema.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(NrmFrozenInputValidationError) as caught:
+        validate_nrm006_frozen_inputs(tmp_path)
+    assert any("probability.schema.json: frozen" in item for item in caught.value.errors)
+
+
+def test_cli_enforces_nrm006_frozen_input_hashes(monkeypatch: pytest.MonkeyPatch) -> None:
+    def fail_frozen_inputs(_root: Path) -> dict[str, object]:
+        raise NrmFrozenInputValidationError(
+            ["public_contracts/market_consensus.schema.json: frozen SHA-256 mismatch"]
+        )
+
+    monkeypatch.setattr(specs_cmd_module, "validate_nrm006_frozen_inputs", fail_frozen_inputs)
+    result = CliRunner().invoke(app, ["specs", "validate"])
+    assert result.exit_code == 21
+    value = json.loads(result.stdout)
+    assert value["ok"] is False
+    assert value["error"]["code"] == "SPEC_MANIFEST_INVALID"
+    assert "market_consensus" in value["error"]["details"][0]
+
+
+def test_nrm_ticket_requires_the_a6_authority_scope(tmp_path: Path) -> None:
+    _valid_root(tmp_path)
+    ticket = tmp_path / "tickets/NRM-006/ticket.yaml"
+    ticket.parent.mkdir(parents=True)
+    ticket.write_text("ticket_id: NRM-006\n", encoding="utf-8")
+    errors = _errors(tmp_path)
+    assert any("A6-normalisation scope is missing" in item for item in errors)

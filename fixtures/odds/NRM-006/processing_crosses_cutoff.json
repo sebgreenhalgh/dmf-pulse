@@ -1,0 +1,11 @@
+{
+  "received_at": "2026-08-21T17:29:59Z",
+  "activation_transaction_outcome": "COMMITTED",
+  "post_commit_usable_clock_sequence": [
+    "2026-08-21T17:30:02Z"
+  ],
+  "attestation_outcome": "COMMITTED",
+  "information_cutoff": "2026-08-21T17:30:00Z",
+  "expected_status": "OBSERVED_NOT_USABLE",
+  "expected_eligible_before_cutoff": false
+}

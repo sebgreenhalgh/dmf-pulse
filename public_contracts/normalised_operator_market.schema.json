@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/nrm-006/normalised-operator-market.schema.json",
+  "title": "NormalisedOperatorMarket",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixture_id",
+    "market_id",
+    "provider_id",
+    "operator_id",
+    "operator_key",
+    "as_of",
+    "observed_at",
+    "usable_at",
+    "market_state",
+    "primary_method",
+    "fallback_used",
+    "raw_booksum",
+    "overround",
+    "power_exponent",
+    "outcomes",
+    "policy_id",
+    "policy_sha256",
+    "input_signature_sha256",
+    "result_sha256",
+    "source_observation_ids"
+  ],
+  "properties": {
+    "fixture_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "market_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "provider_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "operator_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "operator_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "usable_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "market_state": {
+      "const": "COMPLETE"
+    },
+    "primary_method": {
+      "enum": [
+        "POWER",
+        "PROPORTIONAL"
+      ]
+    },
+    "fallback_used": {
+      "type": "boolean"
+    },
+    "raw_booksum": {
+      "type": "string",
+      "pattern": "^-?\\d+\\.\\d{12}$"
+    },
+    "overround": {
+      "type": "string",
+      "pattern": "^-?\\d+\\.\\d{12}$"
+    },
+    "power_exponent": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^-?\\d+\\.\\d{12}$"
+    },
+    "outcomes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "outcome",
+          "decimal_odds",
+          "raw_implied_probability",
+          "proportional_probability",
+          "market_probability"
+        ],
+        "properties": {
+          "outcome": {
+            "enum": [
+              "HOME",
+              "DRAW",
+              "AWAY"
+            ]
+          },
+          "decimal_odds": {
+            "type": "string",
+            "pattern": "^(?:1\\.\\d*[1-9]\\d*|(?:[2-9]\\d*|1\\d+)(?:\\.\\d+)?)$"
+          },
+          "raw_implied_probability": {
+            "$ref": "probability.schema.json"
+          },
+          "proportional_probability": {
+            "$ref": "probability.schema.json"
+          },
+          "market_probability": {
+            "$ref": "probability.schema.json"
+          }
+        }
+      }
+    },
+    "policy_id": {
+      "const": "market-normalisation-v1"
+    },
+    "policy_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "input_signature_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "result_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_observation_ids": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    }
+  }
+}

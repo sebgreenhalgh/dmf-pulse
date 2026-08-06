@@ -146,12 +146,22 @@ class OddsEvent(OddsPayloadModel):
 
 
 @dataclass(frozen=True, slots=True)
+class DuplicateOutcomeEvidence:
+    event_external_id_sha256: str
+    bookmaker_key: str
+    market_key: str
+    outcome: str
+    duplicate_count: int
+
+
+@dataclass(frozen=True, slots=True)
 class ParsedOddsPayload:
     events: tuple[OddsEvent, ...]
     body_sha256: str
     semantic_sha256: str
     schema_fingerprint: str
     warnings: tuple[str, ...]
+    duplicate_outcomes: tuple[DuplicateOutcomeEvidence, ...]
 
     @property
     def operator_books_seen(self) -> int:
@@ -333,6 +343,21 @@ def _unknown_paths(value: object, path: str = "$") -> list[str]:
     return paths
 
 
+def _safe_outcome_key(event: OddsEvent, name: str) -> str:
+    if name == event.home_team:
+        return "HOME"
+    if name == event.away_team:
+        return "AWAY"
+    if name.casefold() == "draw":
+        return "DRAW"
+    return "UNMAPPED"
+
+
+def _outcome_identity(event: OddsEvent, name: str) -> tuple[str, str]:
+    canonical = _safe_outcome_key(event, name)
+    return ("CANONICAL", canonical) if canonical != "UNMAPPED" else ("SOURCE", name)
+
+
 def _validate_limits(events: tuple[OddsEvent, ...], config: OddsProviderConfig) -> None:
     if len(events) > config.max_events:
         raise IngestionError("PAYLOAD_TOO_LARGE", "provider event count exceeds the limit")
@@ -359,14 +384,53 @@ def _validate_limits(events: tuple[OddsEvent, ...], config: OddsProviderConfig) 
                 market_keys.add(market.key)
                 if len(market.outcomes) > config.max_outcomes_per_market:
                     raise IngestionError("PAYLOAD_TOO_LARGE", "outcome count exceeds the limit")
-                by_name: dict[str, Decimal] = {}
+                by_outcome: dict[tuple[str, str], tuple[Decimal, Decimal | None]] = {}
                 for outcome in market.outcomes:
-                    previous = by_name.get(outcome.name)
-                    if previous is not None and previous != outcome.price:
+                    identity = _outcome_identity(event, outcome.name)
+                    previous = by_outcome.get(identity)
+                    candidate = (outcome.price, outcome.point)
+                    if previous is not None and previous != candidate:
                         raise IngestionError(
                             "VALIDATION_FAILED", "operator market has conflicting outcomes"
                         )
-                    by_name[outcome.name] = outcome.price
+                    by_outcome[identity] = candidate
+
+
+def _deduplicate_equal_outcomes(
+    events: tuple[OddsEvent, ...],
+) -> tuple[tuple[OddsEvent, ...], tuple[DuplicateOutcomeEvidence, ...]]:
+    deduped_events: list[OddsEvent] = []
+    evidence: list[DuplicateOutcomeEvidence] = []
+    for event in events:
+        bookmakers: list[OddsBookmaker] = []
+        for bookmaker in event.bookmakers:
+            markets: list[OddsMarket] = []
+            for market in bookmaker.markets:
+                outcomes: list[OddsOutcome] = []
+                positions: dict[tuple[str, str], int] = {}
+                duplicate_counts: dict[tuple[str, str], int] = {}
+                for outcome in market.outcomes:
+                    identity = _outcome_identity(event, outcome.name)
+                    if identity in positions:
+                        duplicate_counts[identity] = duplicate_counts.get(identity, 0) + 1
+                        continue
+                    positions[identity] = len(outcomes)
+                    outcomes.append(outcome)
+                for identity, count in sorted(duplicate_counts.items()):
+                    retained = outcomes[positions[identity]]
+                    evidence.append(
+                        DuplicateOutcomeEvidence(
+                            event_external_id_sha256=canonical_sha256(event.id),
+                            bookmaker_key=bookmaker.key,
+                            market_key=market.key,
+                            outcome=_safe_outcome_key(event, retained.name),
+                            duplicate_count=count,
+                        )
+                    )
+                markets.append(market.model_copy(update={"outcomes": tuple(outcomes)}))
+            bookmakers.append(bookmaker.model_copy(update={"markets": tuple(markets)}))
+        deduped_events.append(event.model_copy(update={"bookmakers": tuple(bookmakers)}))
+    return tuple(deduped_events), tuple(evidence)
 
 
 def _parse_events(
@@ -425,6 +489,7 @@ def parse_odds_payload(body: bytes) -> ParsedOddsPayload:
             details={"invalid_paths": list(invalid_paths)},
         )
     _validate_limits(events, config)
+    events, duplicate_outcomes = _deduplicate_equal_outcomes(events)
     warnings = [f"ADDITIVE_UNKNOWN:{path}" for event in events for path in _unknown_paths(event)]
     warnings.extend(
         f"UNSUPPORTED_MARKET:{market.key}"
@@ -433,10 +498,13 @@ def parse_odds_payload(body: bytes) -> ParsedOddsPayload:
         for market in bookmaker.markets
         if market.key != "h2h"
     )
+    if duplicate_outcomes:
+        warnings.append("DUPLICATE_OUTCOME_DEDUPED")
     return ParsedOddsPayload(
         events=events,
         body_sha256=hashlib.sha256(body).hexdigest(),
         semantic_sha256=canonical_sha256(_semantic(events)),
         schema_fingerprint=canonical_sha256(_type_paths(raw)),
         warnings=tuple(sorted(set(warnings))),
+        duplicate_outcomes=duplicate_outcomes,
     )

@@ -17,6 +17,7 @@ from dmf_pulse.assurance.review_pack import (
     FPL_REVIEW_WRITE_AHEAD_RESULT,
     FPL_TEARDOWN_FINAL_RESULT,
     FPL_TEARDOWN_WRITE_AHEAD_RESULT,
+    NRM_MANDATORY_ACCEPTANCE_COMMANDS,
     ODD_MANDATORY_ACCEPTANCE_COMMANDS,
 )
 
@@ -220,3 +221,36 @@ def test_odd005_setup_failure_still_runs_literal_teardown(
 
     assert namespace["_main_odd"]() == 1
     assert calls == [(ODD_MANDATORY_ACCEPTANCE_COMMANDS[27], True)]
+
+
+@pytest.mark.unit
+def test_nrm006_runner_has_exact_sequence_and_finally_teardown(
+    repository_root: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    namespace = runpy.run_path(str(repository_root / "scripts" / "run_acceptance.py"))
+    commands = namespace["_nrm_commands"]("uv", "docker", "git")
+    assert tuple(command.display for command in commands) == NRM_MANDATORY_ACCEPTANCE_COMMANDS
+    assert commands[20].capture_path == (
+        repository_root / "evidence/tickets/NRM-006/odds_replay.json"
+    )
+
+    globals_map = namespace["_main_nrm"].__globals__
+    globals_map["REPOSITORY_ROOT"] = tmp_path
+    command_type = namespace["AcceptanceCommand"]
+    record_type = namespace["CommandRecord"]
+    calls: list[tuple[str, bool]] = []
+
+    def fail_setup() -> None:
+        raise OSError("injected setup failure")
+
+    def fake_run(command: object, *, force_offline: bool = False) -> object:
+        assert isinstance(command, command_type)
+        calls.append((command.display, force_offline))
+        return record_type(command.display, 0.01, 0, "PASS: teardown")
+
+    globals_map["_clean_nrm_generated_outputs"] = fail_setup
+    globals_map["run_command"] = fake_run
+    monkeypatch.setattr(namespace["shutil"], "which", lambda name: name)
+
+    assert namespace["_main_nrm"]() == 1
+    assert calls == [(NRM_MANDATORY_ACCEPTANCE_COMMANDS[31], True)]

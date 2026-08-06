@@ -25,7 +25,7 @@ def build_command(
         typer.Option("--baseline", help="Exact baseline Git commit for non-bootstrap tickets."),
     ] = None,
 ) -> None:
-    """Build the root-only, maximum-20-file FND-001 review ZIP."""
+    """Build a root-only, maximum-20-file ticket review ZIP."""
 
     generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     try:

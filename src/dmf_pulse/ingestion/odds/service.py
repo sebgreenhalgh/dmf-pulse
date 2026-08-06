@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import Engine, insert, select
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session, sessionmaker
 
 from dmf_pulse.assurance.canonical import canonical_sha256
@@ -20,13 +22,18 @@ from dmf_pulse.data_model.models import require_utc
 from dmf_pulse.data_model.tables import (
     data_provider,
     data_quality_issue,
+    odds_publication_attestation,
+    odds_publication_batch,
     provider_quota_observation,
+    source_processing_event,
+    source_snapshot,
 )
 from dmf_pulse.database.engine import session_factory
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fixtures import ApprovedFixture, approve_synthetic_fixture
 from dmf_pulse.ingestion.fpl.service import (
     DATABASE_REF,
+    FplImportRequest,
     FplIngestionService,
     FplReplayRequest,
     _validate_database_reference,
@@ -58,7 +65,10 @@ from dmf_pulse.ingestion.odds.models import (
 from dmf_pulse.ingestion.odds.parser import CONTRACT_VERSION, ParsedOddsPayload, parse_odds_payload
 from dmf_pulse.ingestion.odds.persistence import (
     OddsPersistence,
+    PreparedOddsPublication,
     PublishCounts,
+    attest_publication_batch,
+    create_publication_batch,
     ensure_odds_provider,
     ensure_synthetic_odds_provider,
 )
@@ -89,6 +99,7 @@ class OddsImportRequest(_FrozenRequest):
     rights_profile_id: str
     database_url_ref: str = DATABASE_REF
     quota: QuotaState | None = None
+    processing_at: datetime | None = None
 
 
 class OddsReplayRequest(_FrozenRequest):
@@ -111,6 +122,15 @@ class _Envelope:
     rights_profile_record_id: UUID
 
 
+@dataclass(frozen=True, slots=True)
+class _PromotionOutcome:
+    counts: PublishCounts
+    publication_batch_id: UUID
+    usable_at: datetime | None
+    attestation_error: str | None = None
+    temporal_integrity_blocker: bool = False
+
+
 def _read_bounded(path: Path) -> bytes:
     try:
         with path.open("rb") as handle:
@@ -120,10 +140,6 @@ def _read_bounded(path: Path) -> bytes:
     if len(body) > MAX_INPUT_BYTES:
         raise IngestionError("PAYLOAD_TOO_LARGE", "odds input exceeds the byte limit")
     return body
-
-
-def _stage_time(captured_at: datetime, index: int) -> datetime:
-    return require_utc(captured_at) + timedelta(microseconds=index)
 
 
 def _quality(warnings: tuple[str, ...] = (), blockers: tuple[str, ...] = ()) -> OddsQuality:
@@ -166,11 +182,17 @@ class OddsIngestionService:
         credential_provider: CredentialProvider | None = None,
         transport_factory: Callable[[], OddsTransport] = UrllibOddsTransport,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+        processing_clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+        sleeper: Callable[[float], None] = time.sleep,
+        monotonic: Callable[[], float] = time.monotonic,
     ) -> None:
         self.repository_root = (repository_root or Path.cwd()).resolve()
         self.credential_provider = credential_provider or UnavailableCredentialProvider()
         self.transport_factory = transport_factory
         self.clock = clock
+        self.processing_clock = processing_clock
+        self.sleeper = sleeper
+        self.monotonic = monotonic
 
     def validate(
         self,
@@ -209,6 +231,12 @@ class OddsIngestionService:
             captured_at = datetime.fromisoformat(
                 str(scenario["captured_at"]).replace("Z", "+00:00")
             ).astimezone(UTC)
+            processing_at = datetime.fromisoformat(
+                str(scenario["processing_at"]).replace("Z", "+00:00")
+            ).astimezone(UTC)
+            post_commit_usable_at = datetime.fromisoformat(
+                str(scenario["post_commit_usable_at"]).replace("Z", "+00:00")
+            ).astimezone(UTC)
             headers = scenario["response_headers"]
             quota = QuotaState(
                 remaining=int(headers["x-requests-remaining"]),
@@ -223,6 +251,7 @@ class OddsIngestionService:
         mapping = fixture_root / str(mapping_name)
         approve_synthetic_fixture(payload, profile_id=request.rights_profile_id)
         approve_synthetic_fixture(mapping, profile_id=request.rights_profile_id)
+        mapping_plan = load_mapping_plan(mapping)
         fixture_repository_root = next(
             (
                 parent.parent
@@ -239,8 +268,9 @@ class OddsIngestionService:
             request.database_url_ref,
             request.information_cutoff,
             repository_root=fixture_repository_root,
+            schedule_evidence_at=mapping_plan.approved_at,
         )
-        return self.import_payload(
+        return self._import_payload(
             OddsImportRequest(
                 input_path=payload,
                 mapping_plan_path=mapping,
@@ -249,7 +279,9 @@ class OddsIngestionService:
                 rights_profile_id=request.rights_profile_id,
                 database_url_ref=request.database_url_ref,
                 quota=quota,
-            )
+                processing_at=processing_at,
+            ),
+            post_commit_clock=lambda: post_commit_usable_at,
         )
 
     def _seed_fpl_fixture(
@@ -258,23 +290,56 @@ class OddsIngestionService:
         information_cutoff: datetime,
         *,
         repository_root: Path | None = None,
+        schedule_evidence_at: datetime | None = None,
     ) -> None:
+        """Seed synthetic schedule evidence, honoring an explicit historical knowledge time."""
+
         selected_root = (repository_root or self.repository_root).resolve()
-        outcome = FplIngestionService(repository_root=selected_root).replay(
-            FplReplayRequest(
-                fixture_set=selected_root / "fixtures/fpl/FPL-004",
-                scenario="happy_path",
-                information_cutoff=information_cutoff,
-                rights_profile_id="synthetic_test_v1",
-                database_url_ref=database_url_ref,
-                competition_key="SYNTHETIC_PL",
-                season_code="2026/27",
+        if schedule_evidence_at is None:
+            outcome = FplIngestionService(repository_root=selected_root).replay(
+                FplReplayRequest(
+                    fixture_set=selected_root / "fixtures/fpl/FPL-004",
+                    scenario="happy_path",
+                    information_cutoff=information_cutoff,
+                    rights_profile_id="synthetic_test_v1",
+                    database_url_ref=database_url_ref,
+                    competition_key="SYNTHETIC_PL",
+                    season_code="2026/27",
+                )
             )
-        )
+        else:
+            evidence_at = require_utc(schedule_evidence_at)
+            outcome = FplIngestionService(
+                repository_root=selected_root,
+                clock=lambda: evidence_at,
+            ).import_pair(
+                FplImportRequest(
+                    bootstrap_path=(
+                        selected_root / "fixtures/fpl/FPL-004/happy_path/bootstrap.json"
+                    ),
+                    fixtures_path=(selected_root / "fixtures/fpl/FPL-004/happy_path/fixtures.json"),
+                    competition_key="SYNTHETIC_PL",
+                    season_code="2026/27",
+                    captured_at=evidence_at,
+                    information_cutoff=information_cutoff,
+                    rights_profile_id="synthetic_test_v1",
+                    database_url_ref=database_url_ref,
+                )
+            )
         if outcome.exit_code != 0:
             raise IngestionError("MAPPING_CONFLICT", "FPL fixture seed is not usable")
 
     def import_payload(self, request: OddsImportRequest) -> OddsOperationOutcome:
+        """Import an approved payload using only the injected post-commit clock."""
+
+        return self._import_payload(request, post_commit_clock=self.clock)
+
+    def _import_payload(
+        self,
+        request: OddsImportRequest,
+        *,
+        post_commit_clock: Callable[[], datetime],
+    ) -> OddsOperationOutcome:
         _validate_database_reference(request.database_url_ref)
         profiles = load_rights_profiles()
         profile = profiles.get(request.rights_profile_id)
@@ -298,6 +363,8 @@ class OddsIngestionService:
             database_url_ref=request.database_url_ref,
             quota=request.quota,
             operation="synthetic_import",
+            processing_at=request.processing_at,
+            post_commit_clock=post_commit_clock,
         )
 
     def _engine(self, database_url_ref: str) -> Engine:
@@ -361,6 +428,9 @@ class OddsIngestionService:
         captured_prefix_sha256: str | None = None,
         captured_prefix_size: int | None = None,
         quota_header_state: str = "VALID",
+        requested_delay_seconds: int | None = None,
+        applied_delay_seconds: int | None = None,
+        attempt_outcome: str | None = None,
     ) -> _Envelope:
         source_provider_id = ensure_synthetic_odds_provider(session)
         if profile.provider_key != "synthetic_the_odds_api":
@@ -414,6 +484,9 @@ class OddsIngestionService:
             "captured_prefix_size": captured_prefix_size,
             "http_status": http_status,
             "quota_header_state": quota_header_state,
+            "requested_delay_seconds": requested_delay_seconds,
+            "applied_delay_seconds": applied_delay_seconds,
+            "attempt_outcome": attempt_outcome,
         }
         snapshot_id = record_received_snapshot(
             session,
@@ -467,7 +540,7 @@ class OddsIngestionService:
             session,
             snapshot_id=snapshot_id,
             stage="STORED" if raw_policy == "ALLOWED" else "RAW_DISCARDED",
-            event_at=_stage_time(captured_at, 1),
+            event_at=captured_at,
             input_sha256=body_sha256,
             output_sha256=body_sha256,
             safe_details={"raw_storage_policy": raw_policy},
@@ -546,6 +619,9 @@ class OddsIngestionService:
                     captured_prefix_sha256=attempt.captured_prefix_sha256,
                     captured_prefix_size=attempt.captured_prefix_size,
                     quota_header_state=attempt.quota_header_state,
+                    requested_delay_seconds=attempt.requested_delay_seconds,
+                    applied_delay_seconds=attempt.applied_delay_seconds,
+                    attempt_outcome=attempt.attempt_outcome,
                 )
                 final_envelope = envelope
                 if attempt.failure_code is None:
@@ -556,13 +632,16 @@ class OddsIngestionService:
                         issue_type=attempt.failure_code.value,
                         severity="P1",
                         status="OPEN",
-                        detected_at=_stage_time(attempt.received_at, 2),
+                        detected_at=attempt.received_at,
                         decision_impact="BLOCKING",
                         details={
                             "body_capture_state": attempt.body_capture_state,
                             "error_code": attempt.failure_code.value,
                             "http_status": attempt.http_status,
                             "quota_header_state": attempt.quota_header_state,
+                            "requested_delay_seconds": attempt.requested_delay_seconds,
+                            "applied_delay_seconds": attempt.applied_delay_seconds,
+                            "attempt_outcome": attempt.attempt_outcome,
                         },
                         subject_scope="SOURCE_SNAPSHOT",
                         stage="RETRIEVAL",
@@ -573,7 +652,7 @@ class OddsIngestionService:
                     session,
                     snapshot_id=envelope.source_snapshot_id,
                     stage="REJECTED",
-                    event_at=_stage_time(attempt.received_at, 3),
+                    event_at=attempt.received_at,
                     input_sha256=attempt.body_sha256,
                     output_sha256=canonical_sha256(attempt.failure_code.value),
                     error_code=attempt.failure_code.value,
@@ -581,6 +660,9 @@ class OddsIngestionService:
                         "body_capture_state": attempt.body_capture_state,
                         "http_status": attempt.http_status,
                         "quota_header_state": attempt.quota_header_state,
+                        "requested_delay_seconds": attempt.requested_delay_seconds,
+                        "applied_delay_seconds": attempt.applied_delay_seconds,
+                        "attempt_outcome": attempt.attempt_outcome,
                     },
                     stage_version=CONTRACT_VERSION,
                     actor="the-odds-api-reference-adapter",
@@ -603,7 +685,7 @@ class OddsIngestionService:
                     issue_type=error.code[:80],
                     severity="P1",
                     status="OPEN",
-                    detected_at=_stage_time(captured_at, 2),
+                    detected_at=captured_at,
                     decision_impact="BLOCKING",
                     details={"error_code": error.code},
                     subject_scope="SOURCE_SNAPSHOT",
@@ -615,7 +697,7 @@ class OddsIngestionService:
                 session,
                 snapshot_id=envelope.source_snapshot_id,
                 stage="QUARANTINED",
-                event_at=_stage_time(captured_at, 3),
+                event_at=captured_at,
                 error_code=error.code,
                 safe_details={"error_code": error.code},
                 stage_version=CONTRACT_VERSION,
@@ -634,7 +716,7 @@ class OddsIngestionService:
                 session,
                 snapshot_id=envelope.source_snapshot_id,
                 stage="FAILED_RETRYABLE",
-                event_at=_stage_time(captured_at, 2),
+                event_at=captured_at,
                 error_code=error.code,
                 safe_details={"error_code": error.code},
                 stage_version=CONTRACT_VERSION,
@@ -653,9 +735,14 @@ class OddsIngestionService:
         database_url_ref: str,
         quota: QuotaState | None,
         operation: str,
+        processing_at: datetime | None,
+        post_commit_clock: Callable[[], datetime],
     ) -> OddsOperationOutcome:
         captured = require_utc(captured_at)
         cutoff = require_utc(information_cutoff)
+        processing = require_utc(processing_at or self.processing_clock())
+        if processing < captured:
+            raise IngestionError("CLOCK_REGRESSION", "processing clock precedes receipt")
         require_rights(profile, RightsCapability.MANUAL_IMPORT, checked_at=captured)
         require_rights(profile, RightsCapability.TRANSIENT_PROCESSING, checked_at=captured)
         require_rights(profile, RightsCapability.DERIVED_STORAGE, checked_at=captured)
@@ -677,7 +764,7 @@ class OddsIngestionService:
             try:
                 parsed = parse_odds_payload(body)
             except IngestionError as exc:
-                self._quarantine(factory, envelope, captured, exc)
+                self._quarantine(factory, envelope, processing, exc)
                 return OddsOperationOutcome(
                     _empty_result(
                         status="QUARANTINED",
@@ -688,18 +775,21 @@ class OddsIngestionService:
                     exit_code=3,
                 )
             try:
-                counts = self._promote(
+                promotion = self._promote(
                     factory,
                     envelope=envelope,
                     parsed=parsed,
                     mapping_plan=mapping_plan,
                     captured_at=captured,
+                    processing_at=processing,
+                    mapping_cutoff=cutoff,
+                    post_commit_clock=post_commit_clock,
                 )
             except IngestionError as exc:
                 if exc.code == "DATABASE_RETRYABLE":
-                    self._record_retryable_failure(factory, envelope, captured, exc)
+                    self._record_retryable_failure(factory, envelope, processing, exc)
                     raise
-                self._quarantine(factory, envelope, captured, exc)
+                self._quarantine(factory, envelope, processing, exc)
                 return OddsOperationOutcome(
                     OddsIngestionResult(
                         status="QUARANTINED",
@@ -717,12 +807,19 @@ class OddsIngestionService:
                     ),
                     exit_code=3,
                 )
-            post_cutoff = _stage_time(captured, 7) > cutoff
+            counts = promotion.counts
+            post_cutoff = promotion.usable_at is None or promotion.usable_at > cutoff
             warnings = list(parsed.warnings)
             if counts.incomplete_books_created:
                 warnings.append("INCOMPLETE_BOOK")
             if post_cutoff:
                 warnings.append("POST_CUTOFF")
+            blockers: list[str] = []
+            if promotion.attestation_error is not None:
+                if promotion.temporal_integrity_blocker:
+                    blockers.append(promotion.attestation_error)
+                else:
+                    warnings.append(promotion.attestation_error)
             return OddsOperationOutcome(
                 OddsIngestionResult(
                     status="OBSERVED_NOT_USABLE" if post_cutoff else "COMPLETE",
@@ -735,10 +832,10 @@ class OddsIngestionService:
                     observations_reused=counts.observations_reused,
                     quarantined=0,
                     quota=quota,
-                    quality=_quality(tuple(warnings)),
+                    quality=_quality(tuple(warnings), tuple(blockers)),
                     error=None,
                 ),
-                exit_code=2 if post_cutoff else 0,
+                exit_code=4 if blockers else 2 if post_cutoff else 0,
             )
         finally:
             engine.dispose()
@@ -751,14 +848,17 @@ class OddsIngestionService:
         parsed: ParsedOddsPayload,
         mapping_plan: OddsMappingPlan,
         captured_at: datetime,
-    ) -> PublishCounts:
-        usable_at = _stage_time(captured_at, 7)
+        processing_at: datetime,
+        mapping_cutoff: datetime,
+        post_commit_clock: Callable[[], datetime],
+    ) -> _PromotionOutcome:
+        prepared: PreparedOddsPublication
         with factory.begin() as session:
             append_processing_event_idempotent(
                 session,
                 snapshot_id=envelope.source_snapshot_id,
                 stage="PARSED",
-                event_at=_stage_time(captured_at, 2),
+                event_at=processing_at,
                 input_sha256=parsed.body_sha256,
                 output_sha256=parsed.semantic_sha256,
                 safe_details={"schema_fingerprint": parsed.schema_fingerprint},
@@ -769,7 +869,7 @@ class OddsIngestionService:
                 session,
                 snapshot_id=envelope.source_snapshot_id,
                 stage="VALIDATED",
-                event_at=_stage_time(captured_at, 3),
+                event_at=processing_at,
                 input_sha256=parsed.semantic_sha256,
                 output_sha256=parsed.schema_fingerprint,
                 safe_details={"warnings": list(parsed.warnings)},
@@ -781,18 +881,26 @@ class OddsIngestionService:
                 snapshot_id=envelope.source_snapshot_id,
                 rights_profile_record_id=envelope.rights_profile_record_id,
                 captured_at=captured_at,
-                usable_at=usable_at,
+                mapping_cutoff=mapping_cutoff,
                 mapping_plan=mapping_plan,
             )
-            persistence.prepare(parsed)
+            prepared = persistence.prepare(parsed)
             append_processing_event_idempotent(
                 session,
                 snapshot_id=envelope.source_snapshot_id,
                 stage="MAPPED",
-                event_at=_stage_time(captured_at, 4),
+                event_at=processing_at,
                 input_sha256=parsed.semantic_sha256,
                 output_sha256=mapping_plan.sha256,
-                safe_details={"mapping_plan_sha256": mapping_plan.sha256},
+                safe_details={
+                    "approved_at": mapping_plan.approved_at.isoformat(),
+                    "evidence_class": mapping_plan.evidence_class,
+                    "mapping_cutoff": mapping_cutoff.isoformat(),
+                    "mapping_plan_id": mapping_plan.plan_id,
+                    "mapping_plan_sha256": mapping_plan.sha256,
+                    "reviewer": mapping_plan.reviewer,
+                    "status": mapping_plan.status,
+                },
                 stage_version=CONTRACT_VERSION,
                 actor="the-odds-api-reference-adapter",
             )
@@ -800,7 +908,7 @@ class OddsIngestionService:
                 session,
                 snapshot_id=envelope.source_snapshot_id,
                 stage="PROMOTED",
-                event_at=_stage_time(captured_at, 5),
+                event_at=processing_at,
                 input_sha256=mapping_plan.sha256,
                 output_sha256=parsed.semantic_sha256,
                 safe_details={"semantics": "MATCH_RESULT_1X2/FULL_TIME"},
@@ -814,9 +922,25 @@ class OddsIngestionService:
                         issue_type=warning.partition(":")[0][:80],
                         severity="P2",
                         status="OPEN",
-                        detected_at=_stage_time(captured_at, 6),
+                        detected_at=processing_at,
                         decision_impact="NONBLOCKING",
-                        details={"warning_sha256": canonical_sha256(warning)},
+                        details=(
+                            {
+                                "duplicate_outcomes": [
+                                    {
+                                        "bookmaker_key": item.bookmaker_key,
+                                        "duplicate_count": item.duplicate_count,
+                                        "event_external_id_sha256": item.event_external_id_sha256,
+                                        "market_key": item.market_key,
+                                        "outcome": item.outcome,
+                                    }
+                                    for item in parsed.duplicate_outcomes
+                                ],
+                                "warning_sha256": canonical_sha256(warning),
+                            }
+                            if warning == "DUPLICATE_OUTCOME_DEDUPED"
+                            else {"warning_sha256": canonical_sha256(warning)}
+                        ),
                         subject_scope="SOURCE_SNAPSHOT",
                         stage="VALIDATION",
                         message="odds source has bounded nonblocking drift",
@@ -826,25 +950,144 @@ class OddsIngestionService:
                 session,
                 snapshot_id=envelope.source_snapshot_id,
                 stage="QUALITY_PASSED",
-                event_at=_stage_time(captured_at, 6),
+                event_at=processing_at,
                 input_sha256=parsed.schema_fingerprint,
                 output_sha256=canonical_sha256(parsed.warnings),
                 safe_details={"blocking_issues": 0, "warning_count": len(parsed.warnings)},
                 stage_version=CONTRACT_VERSION,
                 actor="the-odds-api-reference-adapter",
             )
-            append_processing_event_idempotent(
+        with factory.begin() as session:
+            activation_event_id = append_processing_event_idempotent(
                 session,
                 snapshot_id=envelope.source_snapshot_id,
                 stage="USABLE",
-                event_at=usable_at,
+                event_at=processing_at,
                 input_sha256=parsed.semantic_sha256,
                 output_sha256=parsed.semantic_sha256,
-                safe_details={"rights": "DERIVED_STORAGE_ALLOWED"},
+                safe_details={"publication_state": "ACTIVATED_UNATTESTED"},
                 stage_version=CONTRACT_VERSION,
                 actor="the-odds-api-reference-adapter",
             )
-            return persistence.publish(parsed)
+            publication_batch_id = create_publication_batch(
+                session,
+                snapshot_id=envelope.source_snapshot_id,
+                activation_event_id=activation_event_id,
+                mapping_cutoff=mapping_cutoff,
+                mapping_plan=mapping_plan,
+            )
+            counts = OddsPersistence.publish_prepared(
+                session,
+                prepared=prepared,
+                snapshot_id=envelope.source_snapshot_id,
+                rights_profile_record_id=envelope.rights_profile_record_id,
+                captured_at=captured_at,
+                publication_batch_id=publication_batch_id,
+            )
+
+        try:
+            sampled = post_commit_clock()
+            usable_at = require_utc(sampled)
+        except Exception:
+            return _PromotionOutcome(
+                counts,
+                publication_batch_id,
+                None,
+                "PUBLICATION_CLOCK_INVALID",
+                True,
+            )
+        if usable_at < captured_at or usable_at < processing_at:
+            return _PromotionOutcome(
+                counts,
+                publication_batch_id,
+                None,
+                "PUBLICATION_CLOCK_REGRESSION",
+                True,
+            )
+        try:
+            with factory.begin() as session:
+                attested = attest_publication_batch(
+                    session,
+                    publication_batch_id=publication_batch_id,
+                    usable_at=usable_at,
+                )
+        except (DBAPIError, IngestionError):
+            return _PromotionOutcome(
+                counts,
+                publication_batch_id,
+                None,
+                "PUBLICATION_ATTESTATION_PENDING",
+            )
+        return _PromotionOutcome(counts, publication_batch_id, attested)
+
+    def repair_publication_attestation(
+        self,
+        *,
+        source_snapshot_id: UUID,
+        database_url_ref: str = DATABASE_REF,
+    ) -> datetime:
+        """Conservatively attest an already committed, still-unattested batch."""
+
+        _validate_database_reference(database_url_ref)
+        engine = self._engine(database_url_ref)
+        try:
+            factory = session_factory(engine)
+            with factory() as session:
+                row = (
+                    session.execute(
+                        select(
+                            odds_publication_batch.c.publication_batch_id,
+                            source_processing_event.c.event_at.label("activation_event_at"),
+                            source_snapshot.c.received_at,
+                            odds_publication_attestation.c.usable_at,
+                        )
+                        .join(
+                            source_snapshot,
+                            source_snapshot.c.source_snapshot_id
+                            == odds_publication_batch.c.source_snapshot_id,
+                        )
+                        .join(
+                            source_processing_event,
+                            source_processing_event.c.processing_event_id
+                            == odds_publication_batch.c.activation_event_id,
+                        )
+                        .outerjoin(
+                            odds_publication_attestation,
+                            odds_publication_attestation.c.publication_batch_id
+                            == odds_publication_batch.c.publication_batch_id,
+                        )
+                        .where(odds_publication_batch.c.source_snapshot_id == source_snapshot_id)
+                    )
+                    .mappings()
+                    .one_or_none()
+                )
+            if row is None:
+                raise IngestionError("ATTESTATION_UNAVAILABLE", "publication batch is unavailable")
+            existing = row["usable_at"]
+            if isinstance(existing, datetime):
+                return require_utc(existing)
+            try:
+                sampled = require_utc(self.clock())
+            except Exception as exc:
+                raise IngestionError(
+                    "CLOCK_INVALID",
+                    "publication repair clock must be timezone-aware UTC",
+                ) from exc
+            captured = require_utc(row["received_at"])
+            activation_event_at = require_utc(row["activation_event_at"])
+            if sampled < captured or sampled < activation_event_at:
+                raise IngestionError(
+                    "CLOCK_REGRESSION",
+                    "publication repair clock precedes receipt or activation event",
+                )
+            with factory.begin() as session:
+                return attest_publication_batch(
+                    session,
+                    publication_batch_id=row["publication_batch_id"],
+                    usable_at=sampled,
+                )
+        finally:
+            engine.dispose()
 
     def snapshot(
         self,
@@ -908,6 +1151,8 @@ class OddsIngestionService:
             credential_provider=self.credential_provider,
             transport_factory=self.transport_factory,
             clock=self.clock,
+            sleeper=self.sleeper,
+            monotonic=self.monotonic,
         )
         try:
             fetched = client.fetch(quota=effective_quota)
@@ -1004,7 +1249,7 @@ class OddsIngestionService:
                     session,
                     snapshot_id=envelope.source_snapshot_id,
                     stage="PARSED",
-                    event_at=_stage_time(captured_at, 2),
+                    event_at=captured_at,
                     input_sha256=parsed.body_sha256,
                     output_sha256=parsed.semantic_sha256,
                     safe_details={"schema_fingerprint": parsed.schema_fingerprint},
@@ -1015,7 +1260,7 @@ class OddsIngestionService:
                     session,
                     snapshot_id=envelope.source_snapshot_id,
                     stage="VALIDATED",
-                    event_at=_stage_time(captured_at, 3),
+                    event_at=captured_at,
                     input_sha256=parsed.semantic_sha256,
                     output_sha256=parsed.schema_fingerprint,
                     safe_details={"warnings": list(parsed.warnings)},
@@ -1028,7 +1273,7 @@ class OddsIngestionService:
                         issue_type="MAPPING_PLAN_REQUIRED",
                         severity="P1",
                         status="OPEN",
-                        detected_at=_stage_time(captured_at, 4),
+                        detected_at=captured_at,
                         decision_impact="BLOCKING",
                         details={"provider": "the_odds_api"},
                         subject_scope="SOURCE_SNAPSHOT",
@@ -1040,7 +1285,7 @@ class OddsIngestionService:
                     session,
                     snapshot_id=envelope.source_snapshot_id,
                     stage="REJECTED",
-                    event_at=_stage_time(captured_at, 5),
+                    event_at=captured_at,
                     input_sha256=parsed.semantic_sha256,
                     output_sha256=canonical_sha256("MAPPING_PLAN_REQUIRED"),
                     error_code="MAPPING_PLAN_REQUIRED",

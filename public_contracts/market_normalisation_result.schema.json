@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/nrm-006/market-normalisation-result.schema.json",
+  "title": "MarketNormalisationResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "fixture_id",
+    "as_of",
+    "consensus",
+    "excluded_books",
+    "warnings",
+    "error_code"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "NORMALISED",
+        "DEGRADED",
+        "INSUFFICIENT",
+        "BLOCKED"
+      ]
+    },
+    "fixture_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "consensus": {
+      "anyOf": [
+        {
+          "$ref": "market_consensus.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "excluded_books": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operator_key",
+          "reason"
+        ],
+        "properties": {
+          "operator_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "enum": [
+              "INCOMPLETE",
+              "STALE",
+              "UNSUPPORTED",
+              "SUSPENDED",
+              "UNAVAILABLE",
+              "RIGHTS_BLOCKED",
+              "QUALITY_BLOCKED",
+              "MAPPING_UNAVAILABLE",
+              "FUTURE_OBSERVATION",
+              "DUPLICATE_OPERATOR"
+            ]
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "error_code": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

@@ -851,6 +851,11 @@ source_processing_event = Table(
     UniqueConstraint(
         "source_snapshot_id", "sequence_number", name="uq_processing_event_snapshot_sequence"
     ),
+    UniqueConstraint(
+        "processing_event_id",
+        "source_snapshot_id",
+        name="uq_processing_event_snapshot_scope",
+    ),
     UniqueConstraint("event_sha256", name="uq_processing_event_hash"),
     CheckConstraint("sequence_number > 0", name="ck_processing_event_sequence"),
     CheckConstraint(
@@ -2108,9 +2113,114 @@ provider_market_representation = Table(
         "representation_version",
         name="uq_provider_market_representation",
     ),
+    UniqueConstraint(
+        "provider_market_representation_id",
+        "mapping_plan_sha256",
+        name="uq_provider_market_representation_plan",
+    ),
     CheckConstraint("provider_market_key = 'h2h'", name="ck_provider_market_key"),
     CheckConstraint(
         "mapping_plan_sha256 ~ '^[0-9a-f]{64}$'", name="ck_provider_market_mapping_hash"
+    ),
+    schema="betting",
+)
+
+odds_publication_batch = Table(
+    "odds_publication_batch",
+    metadata,
+    Column(
+        "publication_batch_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "source_snapshot_id",
+        UUID(as_uuid=True),
+        ForeignKey("provenance.source_snapshot.source_snapshot_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column("activation_event_id", UUID(as_uuid=True), nullable=False),
+    Column("mapping_cutoff", DateTime(timezone=True), nullable=False),
+    Column("mapping_plan_id", String(160), nullable=False),
+    Column("mapping_plan_sha256", CHAR(64), nullable=False),
+    Column("mapping_plan_approved_at", DateTime(timezone=True), nullable=False),
+    Column("mapping_evidence_class", String(24), nullable=False),
+    Column("mapping_reviewer", String(160), nullable=False),
+    Column("mapping_status", String(40), nullable=False),
+    Column(
+        "activation_xid",
+        BigInteger,
+        nullable=False,
+        server_default=text("(pg_current_xact_id()::text)::bigint"),
+    ),
+    Column(
+        "activated_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    ForeignKeyConstraint(
+        ["activation_event_id", "source_snapshot_id"],
+        [
+            "provenance.source_processing_event.processing_event_id",
+            "provenance.source_processing_event.source_snapshot_id",
+        ],
+        name="fk_odds_publication_batch_activation",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint("source_snapshot_id", name="uq_odds_publication_batch_snapshot"),
+    UniqueConstraint("activation_event_id", name="uq_odds_publication_batch_event"),
+    UniqueConstraint(
+        "publication_batch_id",
+        "source_snapshot_id",
+        name="uq_odds_publication_batch_scope",
+    ),
+    UniqueConstraint(
+        "publication_batch_id",
+        "mapping_plan_sha256",
+        name="uq_odds_publication_batch_plan",
+    ),
+    CheckConstraint(
+        "mapping_plan_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_odds_publication_batch_mapping_hash",
+    ),
+    CheckConstraint(
+        "mapping_evidence_class IN ('TEST_ONLY','OFFICIAL','APPROVED_MANUAL')",
+        name="ck_odds_publication_batch_evidence_class",
+    ),
+    CheckConstraint(
+        "mapping_status IN ('APPROVED_FOR_TEST','APPROVED')",
+        name="ck_odds_publication_batch_mapping_status",
+    ),
+    CheckConstraint(
+        "mapping_plan_approved_at <= mapping_cutoff",
+        name="ck_odds_publication_batch_approval_cutoff",
+    ),
+    schema="betting",
+)
+
+odds_publication_attestation = Table(
+    "odds_publication_attestation",
+    metadata,
+    Column(
+        "publication_batch_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.odds_publication_batch.publication_batch_id", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column(
+        "attestation_xid",
+        BigInteger,
+        nullable=False,
+        server_default=text("(pg_current_xact_id()::text)::bigint"),
+    ),
+    Column(
+        "recorded_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
     ),
     schema="betting",
 )
@@ -2136,6 +2246,7 @@ operator_market_observation = Table(
         ForeignKey("provenance.source_snapshot.source_snapshot_id", ondelete="RESTRICT"),
         nullable=False,
     ),
+    Column("publication_batch_id", UUID(as_uuid=True)),
     Column(
         "provider_market_representation_id",
         UUID(as_uuid=True),
@@ -2149,7 +2260,7 @@ operator_market_observation = Table(
     Column("market_state", String(24), nullable=False),
     Column("provider_observed_at", DateTime(timezone=True), nullable=False),
     Column("received_at", DateTime(timezone=True), nullable=False),
-    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column("usable_at", DateTime(timezone=True)),
     Column("missing_outcomes", JSONB, nullable=False, server_default=text("'[]'::jsonb")),
     Column("semantic_sha256", CHAR(64), nullable=False),
     Column("source_semantic_sha256", CHAR(64), nullable=False),
@@ -2173,6 +2284,25 @@ operator_market_observation = Table(
         "market_id",
         name="uq_book_observation_scope",
     ),
+    UniqueConstraint(
+        "provider_market_representation_id",
+        "publication_batch_id",
+        name="uq_book_observation_representation_batch",
+    ),
+    UniqueConstraint(
+        "book_observation_id",
+        "source_snapshot_id",
+        name="uq_book_observation_snapshot_scope",
+    ),
+    ForeignKeyConstraint(
+        ["publication_batch_id", "source_snapshot_id"],
+        [
+            "betting.odds_publication_batch.publication_batch_id",
+            "betting.odds_publication_batch.source_snapshot_id",
+        ],
+        name="fk_book_observation_publication_batch",
+        ondelete="RESTRICT",
+    ),
     ForeignKeyConstraint(
         ["source_snapshot_id", "rights_profile_record_id"],
         [
@@ -2187,7 +2317,9 @@ operator_market_observation = Table(
         name="ck_book_observation_state",
     ),
     CheckConstraint(
-        "provider_observed_at <= received_at AND received_at <= usable_at",
+        "provider_observed_at <= received_at AND "
+        "((publication_batch_id IS NULL AND usable_at IS NOT NULL AND received_at <= usable_at) "
+        "OR (publication_batch_id IS NOT NULL AND usable_at IS NULL))",
         name="ck_book_observation_time_order",
     ),
     CheckConstraint("jsonb_typeof(missing_outcomes) = 'array'", name="ck_book_missing_outcomes"),
@@ -2203,6 +2335,104 @@ operator_market_observation = Table(
     schema="betting",
 )
 
+odds_mapping_dependency = Table(
+    "odds_mapping_dependency",
+    metadata,
+    Column("provider_market_representation_id", UUID(as_uuid=True), primary_key=True),
+    Column("publication_batch_id", UUID(as_uuid=True), primary_key=True),
+    Column("mapping_plan_sha256", CHAR(64), nullable=False),
+    Column(
+        "fixture_lookup_mapping_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "core.external_identifier.external_identifier_id",
+            name="fk_odds_mapping_dependency_fixture_mapping",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "home_team_mapping_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "core.external_identifier.external_identifier_id",
+            name="fk_odds_mapping_dependency_home_mapping",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "away_team_mapping_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "core.external_identifier.external_identifier_id",
+            name="fk_odds_mapping_dependency_away_mapping",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column(
+        "fixture_observation_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "fpl.fixture_observation.fixture_observation_id",
+            name="fk_odds_mapping_dependency_fixture_observation",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("expected_commence_time", DateTime(timezone=True), nullable=False),
+    Column("dependency_sha256", CHAR(64), nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    ForeignKeyConstraint(
+        ["provider_market_representation_id", "mapping_plan_sha256"],
+        [
+            "betting.provider_market_representation.provider_market_representation_id",
+            "betting.provider_market_representation.mapping_plan_sha256",
+        ],
+        name="fk_odds_mapping_dependency_representation_plan",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["publication_batch_id", "mapping_plan_sha256"],
+        [
+            "betting.odds_publication_batch.publication_batch_id",
+            "betting.odds_publication_batch.mapping_plan_sha256",
+        ],
+        name="fk_odds_mapping_dependency_batch_plan",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["provider_market_representation_id", "publication_batch_id"],
+        [
+            "betting.operator_market_observation.provider_market_representation_id",
+            "betting.operator_market_observation.publication_batch_id",
+        ],
+        name="fk_odds_mapping_dependency_book",
+        ondelete="RESTRICT",
+        deferrable=True,
+        initially="DEFERRED",
+    ),
+    CheckConstraint(
+        "mapping_plan_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_odds_mapping_dependency_plan_hash",
+    ),
+    CheckConstraint(
+        "dependency_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_odds_mapping_dependency_hash",
+    ),
+    CheckConstraint(
+        "home_team_mapping_id <> away_team_mapping_id",
+        name="ck_odds_mapping_dependency_distinct_teams",
+    ),
+    schema="betting",
+)
+
 odds_observation = Table(
     "odds_observation",
     metadata,
@@ -2214,6 +2444,7 @@ odds_observation = Table(
     ),
     Column("book_observation_id", UUID(as_uuid=True), nullable=False),
     Column("source_snapshot_id", UUID(as_uuid=True), nullable=False),
+    Column("publication_batch_id", UUID(as_uuid=True)),
     Column(
         "fixture_id",
         UUID(as_uuid=True),
@@ -2232,7 +2463,7 @@ odds_observation = Table(
     Column("decimal_odds", Numeric, nullable=False),
     Column("observed_at", DateTime(timezone=True), nullable=False),
     Column("received_at", DateTime(timezone=True), nullable=False),
-    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column("usable_at", DateTime(timezone=True)),
     Column("source_semantic_sha256", CHAR(64), nullable=False),
     Column("contract_version", String(48), nullable=False),
     Column(
@@ -2246,6 +2477,15 @@ odds_observation = Table(
         DateTime(timezone=True),
         nullable=False,
         server_default=text("transaction_timestamp()"),
+    ),
+    ForeignKeyConstraint(
+        ["publication_batch_id", "source_snapshot_id"],
+        [
+            "betting.odds_publication_batch.publication_batch_id",
+            "betting.odds_publication_batch.source_snapshot_id",
+        ],
+        name="fk_odds_observation_publication_batch",
+        ondelete="RESTRICT",
     ),
     ForeignKeyConstraint(
         ["book_observation_id", "source_snapshot_id", "market_id"],
@@ -2298,6 +2538,17 @@ odds_observation = Table(
         "selection_id",
         name="uq_odds_observation_source_effect",
     ),
+    UniqueConstraint(
+        "odds_observation_id",
+        "source_snapshot_id",
+        name="uq_odds_observation_snapshot_scope",
+    ),
+    UniqueConstraint(
+        "odds_observation_id",
+        "source_snapshot_id",
+        "fixture_id",
+        name="uq_odds_observation_snapshot_fixture_scope",
+    ),
     CheckConstraint("outcome IN ('HOME','DRAW','AWAY')", name="ck_odds_observation_outcome"),
     CheckConstraint(
         "decimal_odds > 1 AND decimal_odds <> 'NaN'::numeric "
@@ -2305,7 +2556,9 @@ odds_observation = Table(
         name="ck_odds_observation_price",
     ),
     CheckConstraint(
-        "observed_at <= received_at AND received_at <= usable_at",
+        "observed_at <= received_at AND "
+        "((publication_batch_id IS NULL AND usable_at IS NOT NULL AND received_at <= usable_at) "
+        "OR (publication_batch_id IS NOT NULL AND usable_at IS NULL))",
         name="ck_odds_observation_time_order",
     ),
     CheckConstraint(
@@ -2315,6 +2568,479 @@ odds_observation = Table(
         "contract_version = 'the-odds-api-v4-reference-v1'",
         name="ck_odds_observation_contract_version",
     ),
+    schema="betting",
+)
+
+market_normalisation_policy = Table(
+    "market_normalisation_policy",
+    metadata,
+    Column("policy_sha256", CHAR(64), primary_key=True),
+    Column("policy_id", String(120), nullable=False),
+    Column("policy_version", String(40), nullable=False),
+    Column("policy_document", JSONB, nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("policy_id", "policy_version", name="uq_market_normalisation_policy_identity"),
+    CheckConstraint("policy_sha256 ~ '^[0-9a-f]{64}$'", name="ck_market_normalisation_policy_hash"),
+    CheckConstraint(
+        "jsonb_typeof(policy_document) = 'object'",
+        name="ck_market_normalisation_policy_document",
+    ),
+    schema="betting",
+)
+
+market_normalisation_run = Table(
+    "market_normalisation_run",
+    metadata,
+    Column(
+        "normalisation_run_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "fixture_id",
+        UUID(as_uuid=True),
+        ForeignKey("football.fixture.fixture_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column("market_definition", String(40), nullable=False),
+    Column("as_of", DateTime(timezone=True), nullable=False),
+    Column("mapping_cutoff", DateTime(timezone=True), nullable=False),
+    Column(
+        "policy_sha256",
+        CHAR(64),
+        ForeignKey("betting.market_normalisation_policy.policy_sha256", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column("code_identity", String(160), nullable=False),
+    Column("input_signature_sha256", CHAR(64), nullable=False, unique=True),
+    Column("semantic_result_sha256", CHAR(64), nullable=False),
+    Column("status", String(24), nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    Column(
+        "published_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint(
+        "normalisation_run_id",
+        "fixture_id",
+        name="uq_market_normalisation_run_scope",
+    ),
+    CheckConstraint(
+        "market_definition = 'FULL_TIME_1X2'",
+        name="ck_market_normalisation_run_definition",
+    ),
+    CheckConstraint(
+        "input_signature_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_market_normalisation_run_input_hash",
+    ),
+    CheckConstraint(
+        "semantic_result_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_market_normalisation_run_result_hash",
+    ),
+    CheckConstraint(
+        "status IN ('NORMALISED','DEGRADED','INSUFFICIENT','BLOCKED')",
+        name="ck_market_normalisation_run_status",
+    ),
+    schema="betting",
+)
+
+market_normalisation_source = Table(
+    "market_normalisation_source",
+    metadata,
+    Column(
+        "normalisation_run_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.market_normalisation_run.normalisation_run_id", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+    Column("odds_observation_id", UUID(as_uuid=True), primary_key=True),
+    Column("source_snapshot_id", UUID(as_uuid=True), nullable=False),
+    Column("fixture_id", UUID(as_uuid=True), nullable=False),
+    UniqueConstraint(
+        "normalisation_run_id",
+        "odds_observation_id",
+        "source_snapshot_id",
+        "fixture_id",
+        name="uq_market_normalisation_source_scope",
+    ),
+    ForeignKeyConstraint(
+        ["odds_observation_id", "source_snapshot_id"],
+        [
+            "betting.odds_observation.odds_observation_id",
+            "betting.odds_observation.source_snapshot_id",
+        ],
+        name="fk_market_normalisation_source_observation",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["normalisation_run_id", "fixture_id"],
+        [
+            "betting.market_normalisation_run.normalisation_run_id",
+            "betting.market_normalisation_run.fixture_id",
+        ],
+        name="fk_market_normalisation_source_run_fixture",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["odds_observation_id", "source_snapshot_id", "fixture_id"],
+        [
+            "betting.odds_observation.odds_observation_id",
+            "betting.odds_observation.source_snapshot_id",
+            "betting.odds_observation.fixture_id",
+        ],
+        name="fk_market_normalisation_source_observation_fixture",
+        ondelete="RESTRICT",
+    ),
+    schema="betting",
+)
+
+market_normalisation_book_source = Table(
+    "market_normalisation_book_source",
+    metadata,
+    Column("normalisation_run_id", UUID(as_uuid=True), primary_key=True),
+    Column("book_observation_id", UUID(as_uuid=True), primary_key=True),
+    Column("source_snapshot_id", UUID(as_uuid=True), nullable=False),
+    Column("fixture_id", UUID(as_uuid=True), nullable=False),
+    ForeignKeyConstraint(
+        ["book_observation_id", "source_snapshot_id"],
+        [
+            "betting.operator_market_observation.book_observation_id",
+            "betting.operator_market_observation.source_snapshot_id",
+        ],
+        name="fk_market_normalisation_book_source_book",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["normalisation_run_id", "fixture_id"],
+        [
+            "betting.market_normalisation_run.normalisation_run_id",
+            "betting.market_normalisation_run.fixture_id",
+        ],
+        name="fk_market_normalisation_book_source_run_fixture",
+        ondelete="RESTRICT",
+    ),
+    schema="betting",
+)
+
+normalised_operator_market = Table(
+    "normalised_operator_market",
+    metadata,
+    Column(
+        "normalised_operator_market_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "normalisation_run_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.market_normalisation_run.normalisation_run_id", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column("fixture_id", UUID(as_uuid=True), nullable=False),
+    Column("market_id", UUID(as_uuid=True), nullable=False),
+    Column("provider_id", UUID(as_uuid=True), nullable=False),
+    Column("operator_id", UUID(as_uuid=True), nullable=False),
+    Column("operator_key", String(120), nullable=False),
+    Column("observed_at", DateTime(timezone=True), nullable=False),
+    Column("usable_at", DateTime(timezone=True), nullable=False),
+    Column("primary_method", String(24), nullable=False),
+    Column("fallback_used", Boolean, nullable=False),
+    Column("raw_booksum", Numeric(60, 50), nullable=False),
+    Column("overround", Numeric(60, 50), nullable=False),
+    Column("power_exponent", Numeric(60, 50)),
+    Column("input_signature_sha256", CHAR(64), nullable=False),
+    Column("result_sha256", CHAR(64), nullable=False),
+    ForeignKeyConstraint(
+        ["normalisation_run_id", "fixture_id"],
+        [
+            "betting.market_normalisation_run.normalisation_run_id",
+            "betting.market_normalisation_run.fixture_id",
+        ],
+        name="fk_normalised_operator_run_fixture",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["market_id", "fixture_id", "operator_id"],
+        [
+            "betting.operator_fixture_market.market_id",
+            "betting.operator_fixture_market.fixture_id",
+            "betting.operator_fixture_market.operator_id",
+        ],
+        name="fk_normalised_operator_market_scope",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["provider_id"],
+        ["provenance.data_provider.provider_id"],
+        name="fk_normalised_operator_provider",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint(
+        "normalisation_run_id", "operator_id", name="uq_normalised_operator_run_operator"
+    ),
+    UniqueConstraint(
+        "normalised_operator_market_id",
+        "normalisation_run_id",
+        name="uq_normalised_operator_scope",
+    ),
+    CheckConstraint(
+        "primary_method IN ('POWER','PROPORTIONAL')",
+        name="ck_normalised_operator_primary_method",
+    ),
+    CheckConstraint(
+        "input_signature_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_normalised_operator_input_hash",
+    ),
+    CheckConstraint(
+        "result_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_normalised_operator_result_hash",
+    ),
+    CheckConstraint(
+        "raw_booksum >= 0 AND raw_booksum <> 'NaN'::numeric "
+        "AND raw_booksum <> 'Infinity'::numeric "
+        "AND raw_booksum <> '-Infinity'::numeric",
+        name="ck_normalised_operator_raw_booksum_finite",
+    ),
+    CheckConstraint(
+        "overround <> 'NaN'::numeric AND overround <> 'Infinity'::numeric "
+        "AND overround <> '-Infinity'::numeric AND overround = raw_booksum - 1",
+        name="ck_normalised_operator_overround_coherence",
+    ),
+    CheckConstraint(
+        "(fallback_used AND primary_method = 'PROPORTIONAL' AND power_exponent IS NULL) "
+        "OR (NOT fallback_used AND primary_method = 'POWER' "
+        "AND power_exponent IS NOT NULL AND power_exponent > 0 "
+        "AND power_exponent <> 'NaN'::numeric "
+        "AND power_exponent <> 'Infinity'::numeric "
+        "AND power_exponent <> '-Infinity'::numeric)",
+        name="ck_normalised_operator_power_state",
+    ),
+    schema="betting",
+)
+
+normalised_operator_outcome = Table(
+    "normalised_operator_outcome",
+    metadata,
+    Column("normalised_operator_market_id", UUID(as_uuid=True), primary_key=True),
+    Column("normalisation_run_id", UUID(as_uuid=True), nullable=False),
+    Column("outcome", String(16), primary_key=True),
+    Column("decimal_odds", Numeric, nullable=False),
+    Column("raw_implied_probability", Numeric(60, 50), nullable=False),
+    Column("proportional_probability", Numeric(13, 12), nullable=False),
+    Column("market_probability", Numeric(13, 12), nullable=False),
+    ForeignKeyConstraint(
+        ["normalised_operator_market_id", "normalisation_run_id"],
+        [
+            "betting.normalised_operator_market.normalised_operator_market_id",
+            "betting.normalised_operator_market.normalisation_run_id",
+        ],
+        name="fk_normalised_operator_outcome_scope",
+        ondelete="RESTRICT",
+    ),
+    CheckConstraint(
+        "outcome IN ('HOME','DRAW','AWAY')",
+        name="ck_normalised_operator_outcome_name",
+    ),
+    CheckConstraint(
+        "decimal_odds > 1 AND decimal_odds <> 'NaN'::numeric "
+        "AND decimal_odds <> 'Infinity'::numeric "
+        "AND decimal_odds <> '-Infinity'::numeric",
+        name="ck_normalised_operator_outcome_decimal_odds_finite",
+    ),
+    CheckConstraint(
+        "raw_implied_probability BETWEEN 0 AND 1",
+        name="ck_normalised_operator_outcome_raw_probability",
+    ),
+    CheckConstraint(
+        "proportional_probability BETWEEN 0 AND 1",
+        name="ck_normalised_operator_outcome_proportional_probability",
+    ),
+    CheckConstraint(
+        "market_probability BETWEEN 0 AND 1",
+        name="ck_normalised_operator_outcome_market_probability",
+    ),
+    schema="betting",
+)
+
+normalised_operator_market_source = Table(
+    "normalised_operator_market_source",
+    metadata,
+    Column("normalised_operator_market_id", UUID(as_uuid=True), primary_key=True),
+    Column("normalisation_run_id", UUID(as_uuid=True), nullable=False),
+    Column("odds_observation_id", UUID(as_uuid=True), primary_key=True),
+    Column("source_snapshot_id", UUID(as_uuid=True), nullable=False),
+    Column("fixture_id", UUID(as_uuid=True), nullable=False),
+    ForeignKeyConstraint(
+        ["normalised_operator_market_id", "normalisation_run_id"],
+        [
+            "betting.normalised_operator_market.normalised_operator_market_id",
+            "betting.normalised_operator_market.normalisation_run_id",
+        ],
+        name="fk_normalised_operator_source_parent",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        [
+            "normalisation_run_id",
+            "odds_observation_id",
+            "source_snapshot_id",
+            "fixture_id",
+        ],
+        [
+            "betting.market_normalisation_source.normalisation_run_id",
+            "betting.market_normalisation_source.odds_observation_id",
+            "betting.market_normalisation_source.source_snapshot_id",
+            "betting.market_normalisation_source.fixture_id",
+        ],
+        name="fk_normalised_operator_source_run_source",
+        ondelete="RESTRICT",
+    ),
+    schema="betting",
+)
+
+market_consensus_result = Table(
+    "market_consensus_result",
+    metadata,
+    Column(
+        "normalisation_run_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.market_normalisation_run.normalisation_run_id", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+    Column("provider_count", Integer, nullable=False),
+    Column("operator_count", Integer, nullable=False),
+    Column("eligible_operator_count", Integer, nullable=False),
+    Column("operator_disagreement", Numeric(13, 12), nullable=False),
+    Column("method_disagreement", Numeric(13, 12), nullable=False),
+    Column("market_disagreement", Numeric(13, 12), nullable=False),
+    Column("minimum_age_seconds", Integer, nullable=False),
+    Column("maximum_age_seconds", Integer, nullable=False),
+    Column("confidence_grade", CHAR(1), nullable=False),
+    Column("input_signature_sha256", CHAR(64), nullable=False),
+    Column("result_sha256", CHAR(64), nullable=False),
+    CheckConstraint("provider_count >= 1", name="ck_market_consensus_provider_count"),
+    CheckConstraint("operator_count >= 1", name="ck_market_consensus_operator_count"),
+    CheckConstraint("eligible_operator_count >= 1", name="ck_market_consensus_eligible_count"),
+    CheckConstraint(
+        "operator_disagreement BETWEEN 0 AND 1",
+        name="ck_market_consensus_operator_disagreement",
+    ),
+    CheckConstraint(
+        "method_disagreement BETWEEN 0 AND 1",
+        name="ck_market_consensus_method_disagreement",
+    ),
+    CheckConstraint(
+        "market_disagreement BETWEEN 0 AND 1",
+        name="ck_market_consensus_market_disagreement",
+    ),
+    CheckConstraint(
+        "market_disagreement = GREATEST(operator_disagreement, method_disagreement)",
+        name="ck_market_consensus_disagreement_coherence",
+    ),
+    CheckConstraint("minimum_age_seconds >= 0", name="ck_market_consensus_minimum_age"),
+    CheckConstraint(
+        "maximum_age_seconds >= minimum_age_seconds",
+        name="ck_market_consensus_maximum_age",
+    ),
+    CheckConstraint(
+        "confidence_grade IN ('A','B','C','D')",
+        name="ck_market_consensus_confidence_grade",
+    ),
+    CheckConstraint(
+        "input_signature_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_market_consensus_input_hash",
+    ),
+    CheckConstraint(
+        "result_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_market_consensus_result_hash",
+    ),
+    schema="betting",
+)
+
+market_consensus_outcome = Table(
+    "market_consensus_outcome",
+    metadata,
+    Column(
+        "normalisation_run_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.market_consensus_result.normalisation_run_id", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+    Column("outcome", String(16), primary_key=True),
+    Column("consensus_probability", Numeric(13, 12), nullable=False),
+    Column("lower_bound", Numeric(13, 12), nullable=False),
+    Column("upper_bound", Numeric(13, 12), nullable=False),
+    CheckConstraint(
+        "outcome IN ('HOME','DRAW','AWAY')",
+        name="ck_market_consensus_outcome_name",
+    ),
+    CheckConstraint(
+        "consensus_probability BETWEEN 0 AND 1",
+        name="ck_market_consensus_outcome_probability",
+    ),
+    CheckConstraint(
+        "lower_bound BETWEEN 0 AND 1",
+        name="ck_market_consensus_outcome_lower_bound",
+    ),
+    CheckConstraint(
+        "upper_bound BETWEEN 0 AND 1",
+        name="ck_market_consensus_outcome_upper_bound",
+    ),
+    CheckConstraint(
+        "lower_bound <= consensus_probability AND consensus_probability <= upper_bound",
+        name="ck_market_consensus_outcome_bounds",
+    ),
+    schema="betting",
+)
+
+market_normalisation_exclusion = Table(
+    "market_normalisation_exclusion",
+    metadata,
+    Column(
+        "normalisation_run_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.market_normalisation_run.normalisation_run_id", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+    Column("sequence_number", Integer, primary_key=True),
+    Column("operator_key", String(120), nullable=False),
+    Column("reason", String(40), nullable=False),
+    CheckConstraint("sequence_number > 0", name="ck_market_normalisation_exclusion_sequence"),
+    CheckConstraint(
+        "reason IN ('INCOMPLETE','STALE','UNSUPPORTED','SUSPENDED','UNAVAILABLE',"
+        "'RIGHTS_BLOCKED','QUALITY_BLOCKED','MAPPING_UNAVAILABLE',"
+        "'FUTURE_OBSERVATION','DUPLICATE_OPERATOR')",
+        name="ck_market_normalisation_exclusion_reason",
+    ),
+    schema="betting",
+)
+
+market_normalisation_warning = Table(
+    "market_normalisation_warning",
+    metadata,
+    Column(
+        "normalisation_run_id",
+        UUID(as_uuid=True),
+        ForeignKey("betting.market_normalisation_run.normalisation_run_id", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+    Column("sequence_number", Integer, primary_key=True),
+    Column("warning_code", String(120), nullable=False),
+    CheckConstraint("sequence_number > 0", name="ck_market_normalisation_warning_sequence"),
     schema="betting",
 )
 
@@ -2691,6 +3417,12 @@ Index("ix_operator_market_fixture", operator_fixture_market.c.fixture_id)
 Index("ix_operator_market_operator", operator_fixture_market.c.operator_id)
 Index("ix_market_selection_market", market_selection.c.market_id)
 Index("ix_provider_market_market", provider_market_representation.c.market_id)
+Index(
+    "ix_odds_publication_attestation_usable",
+    odds_publication_attestation.c.usable_at,
+    odds_publication_attestation.c.publication_batch_id,
+)
+Index("ix_book_observation_batch", operator_market_observation.c.publication_batch_id)
 Index(
     "ix_book_observation_market_usable",
     operator_market_observation.c.market_id,

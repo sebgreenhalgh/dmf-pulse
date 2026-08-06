@@ -25,10 +25,12 @@ from dmf_pulse.ingestion.odds.models import (
 from dmf_pulse.ingestion.odds.service import OddsOperationOutcome
 from dmf_pulse.markets.models import (
     MarketBook,
+    MarketNormalisationResult,
     MarketObservation,
     MarketOutcome,
     MarketQueryResult,
     MarketState,
+    NormalisationStatus,
 )
 
 pytestmark = pytest.mark.unit
@@ -465,3 +467,93 @@ def test_market_observations_cli_service_error_exit_taxonomy(
     result = runner.invoke(app, _market_args())
     assert result.exit_code == expected_exit
     assert json.loads(result.stdout)["error"]["code"] == code
+
+
+def _normalise_args(*extra: str) -> list[str]:
+    return [
+        "market",
+        "normalise",
+        "--fixture-external-provider",
+        "synthetic_fpl",
+        "--fixture-external-id",
+        "101",
+        "--season-code",
+        "2026/27",
+        "--as-of",
+        AS_OF_TEXT,
+        *extra,
+    ]
+
+
+def _non_consensus_result(status: NormalisationStatus) -> MarketNormalisationResult:
+    return MarketNormalisationResult(
+        status=status,
+        fixture_id=UUID(int=1) if status is NormalisationStatus.INSUFFICIENT else None,
+        as_of=AS_OF,
+        consensus=None,
+        excluded_books=(),
+        warnings=(),
+        error_code=(
+            "NO_ELIGIBLE_COMPLETE_BOOK"
+            if status is NormalisationStatus.INSUFFICIENT
+            else "MAPPING_UNAVAILABLE"
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "args",
+    (
+        _normalise_args("--output", "text"),
+        [*_normalise_args(), "--as-of", "invalid"],
+    ),
+)
+def test_market_normalise_rejects_usage_before_service(
+    monkeypatch: pytest.MonkeyPatch,
+    args: list[str],
+) -> None:
+    monkeypatch.setattr(
+        market_cmd.MarketService,
+        "normalise",
+        lambda *_a, **_k: (_ for _ in ()).throw(AssertionError("must not be called")),
+    )
+    result = runner.invoke(app, args)
+    assert result.exit_code == 1
+    assert json.loads(result.stdout)["error"]["code"] == "USAGE_INVALID"
+
+
+@pytest.mark.parametrize(
+    ("code", "expected_exit"),
+    (("MAPPING_CONFLICT", 4), ("QUALITY_BLOCKED", 4), ("DATABASE_UNAVAILABLE", 1)),
+)
+def test_market_normalise_service_error_exit_taxonomy(
+    monkeypatch: pytest.MonkeyPatch,
+    code: str,
+    expected_exit: int,
+) -> None:
+    def fail(*_args: object, **_kwargs: object) -> object:
+        raise IngestionError(code, "safe normalisation failure")
+
+    monkeypatch.setattr(market_cmd.MarketService, "normalise", fail)
+    result = runner.invoke(app, _normalise_args())
+    assert result.exit_code == expected_exit
+    assert json.loads(result.stdout)["error"]["code"] == code
+
+
+@pytest.mark.parametrize(
+    ("status", "expected_exit"),
+    ((NormalisationStatus.INSUFFICIENT, 2), (NormalisationStatus.BLOCKED, 4)),
+)
+def test_market_normalise_emits_typed_non_success_status(
+    monkeypatch: pytest.MonkeyPatch,
+    status: NormalisationStatus,
+    expected_exit: int,
+) -> None:
+    monkeypatch.setattr(
+        market_cmd.MarketService,
+        "normalise",
+        lambda *_a, **_k: _non_consensus_result(status),
+    )
+    result = runner.invoke(app, _normalise_args("--output", "json"))
+    assert result.exit_code == expected_exit
+    assert json.loads(result.stdout)["status"] == status.value

@@ -19,7 +19,7 @@ class _FrozenMapping(BaseModel):
 
 
 class CanonicalFixtureLookup(_FrozenMapping):
-    provider: Literal["official_fpl"]
+    provider: Literal["official_fpl", "synthetic_fpl"]
     namespace: Literal["fpl.fixture.id"]
     external_id: str = Field(min_length=1, max_length=120)
     season_code: Literal["2026/27"]
@@ -32,6 +32,7 @@ class FixtureMapping(_FrozenMapping):
     expected_home_team_external_id: str = Field(min_length=1, max_length=120)
     expected_away_team_external_id: str = Field(min_length=1, max_length=120)
     expected_commence_time: datetime
+    validity_policy: Literal["SEASON_CONTEXT"]
 
     @field_validator("expected_commence_time", mode="before")
     @classmethod
@@ -46,14 +47,27 @@ class OperatorMapping(_FrozenMapping):
     bookmaker_key: str = Field(min_length=1, max_length=500)
     canonical_operator_key: str = Field(min_length=1, max_length=120)
     canonical_display_name: str = Field(min_length=1, max_length=500)
+    validity_policy: Literal["PROVIDER_GUARANTEED_OPEN_ENDED"]
 
 
 class OddsMappingPlan(_FrozenMapping):
-    contract_version: Literal["odd-005-mapping-v1"]
+    contract_version: Literal["nrm-006-mapping-v2"]
+    plan_id: str = Field(min_length=1, max_length=160)
+    approved_at: datetime
+    evidence_class: Literal["TEST_ONLY", "OFFICIAL", "APPROVED_MANUAL"]
+    reviewer: str = Field(min_length=1, max_length=160)
+    status: Literal["APPROVED_FOR_TEST", "APPROVED"]
     competition_key: Literal["SYNTHETIC_PL"]
     season_code: Literal["2026/27"]
     fixture_mappings: tuple[FixtureMapping, ...]
     operator_mappings: tuple[OperatorMapping, ...]
+
+    @field_validator("approved_at", mode="before")
+    @classmethod
+    def parse_approved_at(cls, value: object) -> datetime:
+        if not isinstance(value, str):
+            raise ValueError("mapping approval time must be an RFC3339 string")
+        return parse_rfc3339_timestamp(value)
 
     @model_validator(mode="after")
     def validate_unique_explicit_mappings(self) -> OddsMappingPlan:
@@ -66,6 +80,14 @@ class OddsMappingPlan(_FrozenMapping):
             raise ValueError("provider bookmaker mapping is duplicated")
         if len(operator_keys) != len(set(operator_keys)):
             raise ValueError("canonical operator mapping is duplicated")
+        lookup_providers = {
+            item.canonical_fixture_lookup.provider for item in self.fixture_mappings
+        }
+        if self.evidence_class == "TEST_ONLY":
+            if self.status != "APPROVED_FOR_TEST" or lookup_providers != {"synthetic_fpl"}:
+                raise ValueError("TEST_ONLY mapping plan must use only synthetic_fpl evidence")
+        elif "synthetic_fpl" in lookup_providers or self.status != "APPROVED":
+            raise ValueError("production mapping plan cannot use synthetic evidence")
         return self
 
     @property

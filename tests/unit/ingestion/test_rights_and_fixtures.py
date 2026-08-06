@@ -232,6 +232,17 @@ def test_repository_fixture_is_approved_only_for_its_bound_profile(repository_ro
     assert raised.value.code == "FIXTURE_NOT_APPROVED"
 
 
+def test_nrm006_frozen_manifest_approves_only_synthetic_profiles(repository_root: Path) -> None:
+    path = repository_root / "fixtures/odds/NRM-006/happy_path_market_query.json"
+    approved = approve_synthetic_fixture(path, profile_id="synthetic_the_odds_api_v1")
+    assert approved.relative_path == "fixtures/odds/NRM-006/happy_path_market_query.json"
+    assert approved.sha256 == "ec556ddd6edf2f57f1489fb1c7641fb4cca244c88438c879e353e84dc761eafa"
+
+    with pytest.raises(IngestionError) as raised:
+        approve_synthetic_fixture(path, profile_id="the_odds_api_private_analytics_v1")
+    assert raised.value.code == "FIXTURE_NOT_APPROVED"
+
+
 def test_self_authored_manifest_outside_approved_fixture_root_is_not_authority(
     tmp_path: Path,
 ) -> None:

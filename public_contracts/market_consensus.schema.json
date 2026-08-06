@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/nrm-006/market-consensus.schema.json",
+  "title": "MarketConsensus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixture_id",
+    "as_of",
+    "mapping_cutoff",
+    "market_definition",
+    "provider_count",
+    "operator_count",
+    "eligible_operator_count",
+    "operator_markets",
+    "outcomes",
+    "operator_disagreement",
+    "method_disagreement",
+    "market_disagreement",
+    "freshness",
+    "confidence_grade",
+    "policy_id",
+    "policy_sha256",
+    "input_signature_sha256",
+    "result_sha256"
+  ],
+  "properties": {
+    "fixture_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mapping_cutoff": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "market_definition": {
+      "const": "FULL_TIME_1X2"
+    },
+    "provider_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "operator_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "eligible_operator_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "operator_markets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "normalised_operator_market.schema.json"
+      }
+    },
+    "outcomes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "outcome",
+          "consensus_probability",
+          "lower_bound",
+          "upper_bound"
+        ],
+        "properties": {
+          "outcome": {
+            "enum": [
+              "HOME",
+              "DRAW",
+              "AWAY"
+            ]
+          },
+          "consensus_probability": {
+            "$ref": "probability.schema.json"
+          },
+          "lower_bound": {
+            "$ref": "probability.schema.json"
+          },
+          "upper_bound": {
+            "$ref": "probability.schema.json"
+          }
+        }
+      }
+    },
+    "operator_disagreement": {
+      "type": "string",
+      "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$"
+    },
+    "method_disagreement": {
+      "type": "string",
+      "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$"
+    },
+    "market_disagreement": {
+      "type": "string",
+      "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$"
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_age_seconds",
+        "maximum_age_seconds"
+      ],
+      "properties": {
+        "minimum_age_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maximum_age_seconds": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "confidence_grade": {
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    "policy_id": {
+      "const": "market-normalisation-v1"
+    },
+    "policy_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "input_signature_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "result_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

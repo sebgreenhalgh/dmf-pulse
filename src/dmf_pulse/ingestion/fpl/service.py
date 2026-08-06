@@ -87,7 +87,7 @@ from dmf_pulse.ingestion.rights import (
 )
 
 DATABASE_REF = "env:DMF_TEST_DATABASE_URL"
-TARGET_REVISION = "20260725_0004"
+TARGET_REVISION = "20260803_0005"
 DEFAULT_CAPTURED_AT = datetime(2026, 8, 21, 17, 0, tzinfo=UTC)
 DEFAULT_INFORMATION_CUTOFF = datetime(2026, 8, 21, 17, 30, tzinfo=UTC)
 VOLATILE_ROOT_NAME = "dmf-fpl004-volatile"

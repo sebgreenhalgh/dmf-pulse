@@ -1,5 +1,10 @@
 {
-  "contract_version": "odd-005-mapping-v1",
+  "contract_version": "nrm-006-mapping-v2",
+  "plan_id": "nrm006-synthetic-epl-reference-v1",
+  "approved_at": "2026-08-01T00:00:00Z",
+  "evidence_class": "TEST_ONLY",
+  "reviewer": "NRM-006 synthetic fixture authority",
+  "status": "APPROVED_FOR_TEST",
   "competition_key": "SYNTHETIC_PL",
   "season_code": "2026/27",
   "fixture_mappings": [
@@ -7,14 +12,15 @@
       "provider": "the_odds_api",
       "provider_event_id": "todapi-event-001",
       "canonical_fixture_lookup": {
-        "provider": "official_fpl",
+        "provider": "synthetic_fpl",
         "namespace": "fpl.fixture.id",
         "external_id": "101",
         "season_code": "2026/27"
       },
       "expected_home_team_external_id": "1",
       "expected_away_team_external_id": "2",
-      "expected_commence_time": "2026-08-22T14:00:00Z"
+      "expected_commence_time": "2026-08-22T14:00:00Z",
+      "validity_policy": "SEASON_CONTEXT"
     }
   ],
   "operator_mappings": [
@@ -22,13 +28,15 @@
       "provider": "the_odds_api",
       "bookmaker_key": "book_alpha",
       "canonical_operator_key": "SYNTHETIC_BOOK_ALPHA",
-      "canonical_display_name": "Book Alpha"
+      "canonical_display_name": "Book Alpha",
+      "validity_policy": "PROVIDER_GUARANTEED_OPEN_ENDED"
     },
     {
       "provider": "the_odds_api",
       "bookmaker_key": "book_beta",
       "canonical_operator_key": "SYNTHETIC_BOOK_BETA",
-      "canonical_display_name": "Book Beta"
+      "canonical_display_name": "Book Beta",
+      "validity_policy": "PROVIDER_GUARANTEED_OPEN_ENDED"
     }
   ]
 }

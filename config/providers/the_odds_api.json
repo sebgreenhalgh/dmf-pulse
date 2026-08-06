@@ -18,7 +18,9 @@
   "regions": ["uk"],
   "request_cost": 1,
   "retry": {
-    "max_attempts": 2
+    "default_delay_seconds": 1,
+    "max_attempts": 2,
+    "maximum_retry_after_seconds": 60
   },
   "scheme": "https",
   "sport_keys": ["soccer_epl"],

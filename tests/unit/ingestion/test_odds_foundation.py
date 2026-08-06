@@ -56,6 +56,11 @@ from dmf_pulse.markets.models import (
 pytestmark = pytest.mark.unit
 
 CAPTURED = datetime(2026, 8, 20, 12, tzinfo=UTC)
+VALID_QUOTA_HEADERS = {
+    "x-requests-remaining": "499",
+    "x-requests-used": "1",
+    "x-requests-last": "1",
+}
 
 
 def _fixture(root: Path, name: str) -> bytes:
@@ -187,6 +192,42 @@ def test_conflicting_duplicates_and_invalid_line_are_rejected(repository_root: P
     with pytest.raises(IngestionError) as wrong_point:
         parse_odds_payload(_body(value))
     assert wrong_point.value.code == "VALIDATION_FAILED"
+
+
+def test_canonical_draw_duplicates_emit_exact_evidence_or_fail_closed(
+    repository_root: Path,
+) -> None:
+    value = _happy(repository_root)
+    outcomes = value[0]["bookmakers"][0]["markets"][0]["outcomes"]
+    assert isinstance(outcomes, list)
+    draw = next(item for item in outcomes if item["name"] == "Draw")
+    equal_duplicate = dict(draw)
+    equal_duplicate["name"] = "draw"
+    outcomes.append(equal_duplicate)
+
+    parsed = parse_odds_payload(_body(value))
+
+    parsed_outcomes = parsed.events[0].bookmakers[0].markets[0].outcomes
+    assert len(parsed_outcomes) == 3
+    assert parsed.warnings == ("DUPLICATE_OUTCOME_DEDUPED",)
+    assert len(parsed.duplicate_outcomes) == 1
+    evidence = parsed.duplicate_outcomes[0]
+    assert evidence.bookmaker_key == "book_alpha"
+    assert evidence.market_key == "h2h"
+    assert evidence.outcome == "DRAW"
+    assert evidence.duplicate_count == 1
+    assert len(evidence.event_external_id_sha256) == 64
+
+    equal_duplicate["price"] = 9.99
+    with pytest.raises(IngestionError) as conflicting:
+        parse_odds_payload(_body(value))
+    assert conflicting.value.code == "VALIDATION_FAILED"
+
+    equal_duplicate["price"] = draw["price"]
+    equal_duplicate["point"] = 0.5
+    with pytest.raises(IngestionError) as line_bearing_duplicate:
+        parse_odds_payload(_body(value))
+    assert line_bearing_duplicate.value.code == "VALIDATION_FAILED"
 
 
 def test_provider_and_rights_configuration_is_strict_and_hash_bound(
@@ -504,16 +545,46 @@ def test_client_success_and_bounded_retry_are_typed(repository_root: Path) -> No
     ("response", "code", "retryable"),
     (
         (
-            OddsHttpResponse(302, "text/plain", {}, b"", "https://elsewhere"),
+            OddsHttpResponse(
+                302,
+                "text/plain",
+                VALID_QUOTA_HEADERS,
+                b"",
+                "https://elsewhere",
+            ),
             "REDIRECT_BLOCKED",
             False,
         ),
-        (OddsHttpResponse(400, "application/json", {}, b""), "HTTP_4XX", False),
-        (OddsHttpResponse(429, "application/json", {}, b""), "HTTP_429", True),
-        (OddsHttpResponse(503, "application/json", {}, b""), "HTTP_5XX", True),
-        (OddsHttpResponse(501, "application/json", {}, b""), "HTTP_5XX", False),
-        (OddsHttpResponse(201, "application/json", {}, b""), "SOURCE_UNAVAILABLE", False),
-        (OddsHttpResponse(200, "text/html", {}, b""), "CONTENT_TYPE_INVALID", False),
+        (
+            OddsHttpResponse(400, "application/json", VALID_QUOTA_HEADERS, b""),
+            "HTTP_4XX",
+            False,
+        ),
+        (
+            OddsHttpResponse(429, "application/json", VALID_QUOTA_HEADERS, b""),
+            "HTTP_429",
+            True,
+        ),
+        (
+            OddsHttpResponse(503, "application/json", VALID_QUOTA_HEADERS, b""),
+            "HTTP_5XX",
+            True,
+        ),
+        (
+            OddsHttpResponse(501, "application/json", VALID_QUOTA_HEADERS, b""),
+            "HTTP_5XX",
+            False,
+        ),
+        (
+            OddsHttpResponse(201, "application/json", VALID_QUOTA_HEADERS, b""),
+            "SOURCE_UNAVAILABLE",
+            False,
+        ),
+        (
+            OddsHttpResponse(200, "text/html", VALID_QUOTA_HEADERS, b""),
+            "CONTENT_TYPE_INVALID",
+            False,
+        ),
     ),
 )
 def test_client_response_matrix_is_typed(
@@ -526,6 +597,7 @@ def test_client_response_matrix_is_typed(
         credential_provider=StaticCredentialProvider(_fake_credential(repository_root)),
         transport_factory=lambda: transport,
         clock=lambda: CAPTURED,
+        sleeper=lambda _seconds: None,
     )
     with pytest.raises(OddsFetchFailure) as raised:
         client.fetch()

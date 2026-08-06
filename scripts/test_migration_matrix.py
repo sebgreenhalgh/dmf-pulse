@@ -36,6 +36,9 @@ FPL_SCHEMA_MANIFEST = REPOSITORY_ROOT / "evidence/tickets/FPL-004/schema_manifes
 ODD_REPORT = REPOSITORY_ROOT / "evidence/tickets/ODD-005/migration_matrix.json"
 ODD_OFFLINE_SQL = REPOSITORY_ROOT / "evidence/tickets/ODD-005/offline_upgrade.sql"
 ODD_SCHEMA_MANIFEST = REPOSITORY_ROOT / "evidence/tickets/ODD-005/schema_manifest.json"
+NRM_REPORT = REPOSITORY_ROOT / "evidence/tickets/NRM-006/migration_matrix.json"
+NRM_OFFLINE_SQL = REPOSITORY_ROOT / "evidence/tickets/NRM-006/offline_upgrade.sql"
+NRM_SCHEMA_MANIFEST = REPOSITORY_ROOT / "evidence/tickets/NRM-006/schema_manifest.json"
 EXPECTED_POSTGRES_VERSION = "18.4"
 ALLOWED_TEST_DATABASES = frozenset({"dmf_pulse_test"})
 
@@ -554,6 +557,48 @@ def _assert_at_baseline(database_url: str, expected_revision: str) -> dict[str, 
             if revision != expected_revision:
                 raise MatrixError("downgrade did not reach the requested baseline")
             inspector = inspect(connection)
+            if expected_revision == "20260725_0004":
+                betting_tables = set(inspector.get_table_names(schema="betting"))
+                required_inherited = {
+                    "betting_operator",
+                    "odds_observation",
+                    "operator_fixture_market",
+                    "provider_quota_observation",
+                }
+                forbidden_nrm006 = {
+                    "market_consensus_outcome",
+                    "market_consensus_result",
+                    "market_normalisation_exclusion",
+                    "market_normalisation_policy",
+                    "market_normalisation_run",
+                    "market_normalisation_source",
+                    "market_normalisation_warning",
+                    "normalised_operator_market",
+                    "normalised_operator_outcome",
+                    "odds_publication_attestation",
+                    "odds_publication_batch",
+                }
+                book_columns = {
+                    column["name"]
+                    for column in inspector.get_columns(
+                        "operator_market_observation", schema="betting"
+                    )
+                }
+                quote_columns = {
+                    column["name"]
+                    for column in inspector.get_columns("odds_observation", schema="betting")
+                }
+                if (
+                    not required_inherited <= betting_tables
+                    or betting_tables & forbidden_nrm006
+                    or "publication_batch_id" in book_columns
+                    or "publication_batch_id" in quote_columns
+                ):
+                    raise MatrixError("NRM-006 objects remain after ODD-005 baseline downgrade")
+                return {
+                    "betting_table_count": len(betting_tables),
+                    "revision": revision,
+                }
             if expected_revision == "20260724_0002":
                 schemas = set(inspector.get_schema_names())
                 fpl_tables = set(inspector.get_table_names(schema="fpl"))
@@ -628,10 +673,13 @@ def run_matrix(
     """Run the destructive matrix and return its safe structured report."""
 
     odd005 = baseline_revision == "20260724_0002"
-    report_path = report_path or (ODD_REPORT if odd005 else FPL_REPORT)
-    offline_sql_path = offline_sql_path or (ODD_OFFLINE_SQL if odd005 else FPL_OFFLINE_SQL)
+    nrm006 = baseline_revision == "20260725_0004"
+    report_path = report_path or (NRM_REPORT if nrm006 else ODD_REPORT if odd005 else FPL_REPORT)
+    offline_sql_path = offline_sql_path or (
+        NRM_OFFLINE_SQL if nrm006 else ODD_OFFLINE_SQL if odd005 else FPL_OFFLINE_SQL
+    )
     schema_manifest_path = schema_manifest_path or (
-        ODD_SCHEMA_MANIFEST if odd005 else FPL_SCHEMA_MANIFEST
+        NRM_SCHEMA_MANIFEST if nrm006 else ODD_SCHEMA_MANIFEST if odd005 else FPL_SCHEMA_MANIFEST
     )
     try:
         report_relative = report_path.relative_to(REPOSITORY_ROOT)
@@ -666,6 +714,17 @@ def run_matrix(
                     "ck_external_identifier_odds_operator_scope",
                 )
             )
+        if nrm006:
+            required_sql.extend(
+                (
+                    "CREATE TABLE betting.odds_publication_batch",
+                    "CREATE TABLE betting.odds_publication_attestation",
+                    "CREATE TABLE betting.market_normalisation_policy",
+                    "CREATE TABLE betting.market_normalisation_run",
+                    "CREATE TABLE betting.normalised_operator_market",
+                    "CREATE TABLE betting.market_consensus_result",
+                )
+            )
         if not all(fragment in sql for fragment in required_sql):
             raise MatrixError("offline SQL omits a required ingestion schema object")
 
@@ -692,6 +751,20 @@ def run_matrix(
             head_seed = _fpl004_seed_state(database_url)
             if head_seed != initial_head_seed:
                 raise MatrixError("accepted FPL-004 data changed during ODD-005 upgrade")
+        elif nrm006:
+            stage = "accepted FPL-004 data seed at NRM-006 head"
+            initial_head_seed = _seed_fpl004_data(database_url)
+            stage = "NRM-006 head to ODD-005 baseline downgrade"
+            _alembic("downgrade", database_url, plan.baseline)
+            baseline_state = _assert_at_baseline(database_url, plan.baseline)
+            baseline_seed = _fpl004_seed_state(database_url)
+            if baseline_seed != initial_head_seed:
+                raise MatrixError("accepted FPL-004 data changed during NRM-006 downgrade")
+            stage = "ODD-005 baseline to NRM-006 re-upgrade"
+            _alembic("upgrade", database_url, plan.target)
+            head_seed = _fpl004_seed_state(database_url)
+            if head_seed != initial_head_seed:
+                raise MatrixError("accepted FPL-004 data changed during NRM-006 upgrade")
         else:
             stage = "DAT-003 baseline downgrade"
             _alembic("downgrade", database_url, plan.baseline)
@@ -711,20 +784,20 @@ def run_matrix(
         baseline_state = _assert_at_baseline(database_url, plan.baseline)
         downgraded_seed = (
             _fpl004_seed_state(database_url)
-            if odd005
+            if odd005 or nrm006
             else _assert_seed_preserved(database_url, fpl_head=False)
         )
-        if odd005 and downgraded_seed != baseline_seed:
+        if (odd005 or nrm006) and downgraded_seed != baseline_seed:
             raise MatrixError("accepted FPL-004 data changed on populated downgrade")
 
         stage = "populated ingestion-head final re-upgrade"
         _alembic("upgrade", database_url, plan.target)
         final_seed = (
             _fpl004_seed_state(database_url)
-            if odd005
+            if odd005 or nrm006
             else _assert_seed_preserved(database_url, fpl_head=True)
         )
-        if odd005 and final_seed != head_seed:
+        if (odd005 or nrm006) and final_seed != head_seed:
             raise MatrixError("accepted FPL-004 data changed on final re-upgrade")
         final_manifest = _catalog_state(database_url)
         if first_manifest != final_manifest:
@@ -784,7 +857,7 @@ def run_matrix(
         },
         "status": "PASS",
         "target_revision": plan.target,
-        "ticket_id": "ODD-005" if odd005 else "FPL-004",
+        "ticket_id": "NRM-006" if nrm006 else "ODD-005" if odd005 else "FPL-004",
         "baseline_state": baseline_state,
     }
     try:

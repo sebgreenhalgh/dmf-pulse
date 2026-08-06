@@ -273,8 +273,8 @@ def _assert_market(value: dict[str, Any]) -> dict[str, Any]:
             if isinstance(quote, dict)
         }
     expected = {
-        "SYNTHETIC_BOOK_ALPHA": {"AWAY": "4.20", "DRAW": "3.60", "HOME": "1.80"},
-        "SYNTHETIC_BOOK_BETA": {"AWAY": "4.10", "DRAW": "3.50", "HOME": "1.85"},
+        "book_alpha": {"AWAY": "4.20", "DRAW": "3.60", "HOME": "1.80"},
+        "book_beta": {"AWAY": "4.10", "DRAW": "3.50", "HOME": "1.85"},
     }
     if prices != expected:
         raise VerificationError("installed as-of prices do not preserve source lexical scale")
@@ -488,7 +488,7 @@ def _verify_in_database(database_url: str, inherited: Callable[..., object]) -> 
                     "market",
                     "observations",
                     "--fixture-external-provider",
-                    "official_fpl",
+                    "synthetic_fpl",
                     "--fixture-external-id",
                     "101",
                     "--season-code",

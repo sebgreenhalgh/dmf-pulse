@@ -1,0 +1,35 @@
+{
+  "status": "NORMALISED",
+  "policy_id": "market-normalisation-v1",
+  "policy_sha256": "4cdcc026240ddfab9eda18cbcc60b8757b0ce9238322aa3b9e0798a7f1ebd040",
+  "operator_market": {
+    "operator_key": "balanced_book",
+    "raw_booksum": "1.053240740741",
+    "overround": "0.053240740741",
+    "power_exponent": "1.049708904784",
+    "outcomes": [
+      {
+        "outcome": "HOME",
+        "decimal_odds": "2.70",
+        "raw_implied_probability": "0.370370370370",
+        "proportional_probability": "0.351648351649",
+        "market_probability": "0.352527998745"
+      },
+      {
+        "outcome": "DRAW",
+        "decimal_odds": "3.20",
+        "raw_implied_probability": "0.312500000000",
+        "proportional_probability": "0.296703296703",
+        "market_probability": "0.294944002510"
+      },
+      {
+        "outcome": "AWAY",
+        "decimal_odds": "2.70",
+        "raw_implied_probability": "0.370370370370",
+        "proportional_probability": "0.351648351648",
+        "market_probability": "0.352527998745"
+      }
+    ]
+  },
+  "semantic_result_sha256": "e699a687bb1934ce17627942841caf2f26a7c1d1de865d72b042a59a424cb44b"
+}

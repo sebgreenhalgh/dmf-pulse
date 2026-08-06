@@ -37,6 +37,9 @@ FPL_REVIEW_PATH = "review_pack/FPL-004/DMF_PULSE_FPL-004_REVIEW.zip"
 ODD_REQUIRED_BASELINE = "7034e38f32cd579c90d35c5fe3f10921c3656be0"
 ODD_REQUIRED_BRANCH = "stage/A5/ODD-005-odds-provider-foundation"
 ODD_REVIEW_PATH = "review_pack/ODD-005/DMF_PULSE_ODD-005_REVIEW.zip"
+NRM_REQUIRED_BASELINE = "e36ea84cda9e80191a9160d037f8e7035477b9b1"
+NRM_REQUIRED_BRANCH = "stage/A6/NRM-006-odds-normalisation"
+NRM_REVIEW_PATH = "review_pack/NRM-006/DMF_PULSE_NRM-006_REVIEW.zip"
 DAT_DETACHED_REVIEW_NAMES = {
     "01_REVIEW_INDEX.md",
     "02_CODEX_RESULT.json",
@@ -92,6 +95,26 @@ ODD_DETACHED_REVIEW_NAMES = {
     "12_TESTS_AND_COVERAGE.md",
     "13_SECURITY_AND_SECRET_REVIEW.md",
     "14_WHEEL_AND_CLI.md",
+    "15_COMMANDS_AND_RESULTS.log",
+    "16_ACCEPTANCE_MANIFEST.json",
+    "17_KNOWN_LIMITATIONS.md",
+    "18_CODEX_RESULT.json",
+}
+NRM_DETACHED_REVIEW_NAMES = {
+    "01_REVIEW_INDEX.md",
+    "02_BASELINE_AND_GIT_STATE.md",
+    "03_COMPLETE_HUMAN_PATCH.diff",
+    "04_FILE_CHANGE_MAP.md",
+    "05_PUBLIC_CONTRACTS.md",
+    "06_MIGRATION_SCHEMA_REVIEW.md",
+    "07_ODD005_REMEDIATION.md",
+    "08_TEMPORAL_MAPPING_USABLE_AT.md",
+    "09_RETRY_DUPLICATE_PROVENANCE.md",
+    "10_NORMALISATION_NUMERICS.md",
+    "11_CONSENSUS_CONFIDENCE.md",
+    "12_ASOF_CACHE_CONCURRENCY.md",
+    "13_TESTS_AND_COVERAGE.md",
+    "14_SECURITY_RIGHTS_WHEEL.md",
     "15_COMMANDS_AND_RESULTS.log",
     "16_ACCEPTANCE_MANIFEST.json",
     "17_KNOWN_LIMITATIONS.md",
@@ -370,6 +393,25 @@ class CodexResult(StrictEvidenceModel):
                 or self.repository.merged
             ):
                 raise ValueError("ODD-005 requires exact clean repository provenance")
+        if self.ticket_id == "NRM-006":
+            if (
+                self.review_pack.payload_sha256 is None
+                or self.review_pack.sha256 is not None
+                or self.review_pack.archive_sha256 is not None
+                or self.review_pack.path != NRM_REVIEW_PATH
+                or self.review_pack.file_count != 20
+            ):
+                raise ValueError("NRM-006 requires the exact detached capped review reference")
+            if (
+                self.repository is None
+                or self.repository.branch != NRM_REQUIRED_BRANCH
+                or self.repository.head != self.code_commit
+                or self.repository.baseline != NRM_REQUIRED_BASELINE
+                or not self.repository.clean
+                or self.repository.pushed
+                or self.repository.merged
+            ):
+                raise ValueError("NRM-006 requires exact clean repository provenance")
         return self
 
 
@@ -517,6 +559,15 @@ class ReviewManifest(StrictEvidenceModel):
             or len(names) != len(ODD_DETACHED_REVIEW_NAMES)
         ):
             raise ValueError("ODD-005 review manifest provenance is invalid")
+        if self.ticket_id == "NRM-006" and (
+            self.baseline != NRM_REQUIRED_BASELINE
+            or self.file_count != 20
+            or self.payload_sha256 is None
+            or self.archive_sha256 is not None
+            or set(names) != NRM_DETACHED_REVIEW_NAMES
+            or len(names) != len(NRM_DETACHED_REVIEW_NAMES)
+        ):
+            raise ValueError("NRM-006 review manifest provenance is invalid")
         return self
 
 

@@ -1,0 +1,14 @@
+{
+  "first_source_snapshot_id": "00000000-0000-7000-8000-00000000e001",
+  "second_source_snapshot_id": "00000000-0000-7000-8000-00000000e002",
+  "first_received_at": "2026-08-20T12:00:00Z",
+  "second_received_at": "2026-08-20T12:05:00Z",
+  "odds": {
+    "HOME": "1.80",
+    "DRAW": "3.60",
+    "AWAY": "4.20"
+  },
+  "expected_total_quote_observations": 6,
+  "expected_distinct_normalisation_runs": 2,
+  "expected_semantic_result_hash_equal": true
+}

@@ -10,11 +10,15 @@ from pathlib import Path
 from dmf_pulse.ingestion.errors import IngestionError
 
 TRUSTED_MANIFEST_SHA256 = "a59443aae90ff6f030a39c02d14fc90e3ee2f64b5eb1e2a8cb527224c48f278b"
-ODD005_MANIFEST_SHA256 = "97d123ad5dff035996c26870ad48fc8d6cd8bda99179620a270bb1a977518ebc"
+ODD005_MANIFEST_SHA256 = "b02bb6d02d6454fb39cb79170cc63b5e21e19a639623151a3d11edf3fe564f96"
+NRM006_MANIFEST_SHA256 = "a63bd28ef7fcea90c56697ee0e77dc28ec10f63b53bdd794d21aa84815d85d23"
 TRUSTED_MANIFESTS = {
     TRUSTED_MANIFEST_SHA256: "FPL-004",
     ODD005_MANIFEST_SHA256: "ODD-005",
+    NRM006_MANIFEST_SHA256: "NRM-006",
 }
+
+_SYNTHETIC_TEST_PROFILES = frozenset({"synthetic_test_v1", "synthetic_the_odds_api_v1"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -67,11 +71,36 @@ def approve_synthetic_fixture(path: Path, *, profile_id: str) -> ApprovedFixture
     entries = value.get("entries") if isinstance(value, dict) else None
     if not isinstance(entries, list):
         raise IngestionError("FIXTURE_NOT_APPROVED", "fixture manifest is invalid")
+    paths = {entry.get("path") for entry in entries if isinstance(entry, dict)}
+    legacy_envelope = (
+        value.get("manifest_version") == "1.0.0"
+        and value.get("pack_id") == pack_id
+        and value.get("fixture_count") == len(entries)
+    )
+    nrm006_envelope = (
+        pack_id == "NRM-006"
+        and value.get("fixture_manifest_version") == "nrm-006-fixtures-v1.1"
+        and value.get("ticket") == pack_id
+        and len(entries) == 12
+        and value.get("oracles")
+        == [
+            "expected_outputs/balanced_book.json",
+            "expected_outputs/duplicate_outcome_same_payload.json",
+            "expected_outputs/future_mapping_canaries.json",
+            "expected_outputs/happy_path_consensus.json",
+            "expected_outputs/heavy_favourite.json",
+            "expected_outputs/high_overround.json",
+            "expected_outputs/incomplete_book.json",
+            "expected_outputs/processing_crosses_cutoff.json",
+            "expected_outputs/rate_limit_retry.json",
+            "expected_outputs/same_value_reobservation.json",
+            "expected_outputs/stale_mixed_books.json",
+        ]
+    )
     if (
-        value.get("manifest_version") != "1.0.0"
-        or value.get("pack_id") != pack_id
-        or value.get("fixture_count") != len(entries)
-        or len({entry.get("path") for entry in entries if isinstance(entry, dict)}) != len(entries)
+        not (legacy_envelope or nrm006_envelope)
+        or len(paths) != len(entries)
+        or not all(isinstance(path_value, str) for path_value in paths)
     ):
         raise IngestionError("FIXTURE_NOT_APPROVED", "fixture manifest is invalid")
     matches = [
@@ -80,10 +109,17 @@ def approve_synthetic_fixture(path: Path, *, profile_id: str) -> ApprovedFixture
     if len(matches) != 1:
         raise IngestionError("FIXTURE_NOT_APPROVED", "fixture is not manifest-approved")
     entry = matches[0]
-    if entry.get("synthetic") is not True or entry.get("rights_profile") != profile_id:
+    rights_match = (
+        entry.get("rights_profile") == profile_id
+        if legacy_envelope
+        else entry.get("rights_classification") == "SYNTHETIC_TEST"
+        and profile_id in _SYNTHETIC_TEST_PROFILES
+    )
+    if entry.get("synthetic") is not True or not rights_match:
         raise IngestionError("FIXTURE_NOT_APPROVED", "fixture rights metadata does not match")
     raw = resolved.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
-    if entry.get("sha256") != digest or entry.get("bytes") != len(raw):
+    size_matches = entry.get("bytes") == len(raw) if legacy_envelope else "bytes" not in entry
+    if entry.get("sha256") != digest or not size_matches:
         raise IngestionError("FIXTURE_NOT_APPROVED", "fixture bytes do not match the manifest")
     return ApprovedFixture(path=resolved, relative_path=relative, sha256=digest)

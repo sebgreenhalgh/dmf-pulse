@@ -1,0 +1,53 @@
+{
+  "policy_id": "market-normalisation-v1",
+  "version": "1.0.0",
+  "decimal_context_precision": 60,
+  "rounding": "ROUND_HALF_EVEN",
+  "public_fractional_digits": 12,
+  "vector_residual_outcome_order": [
+    "HOME",
+    "DRAW",
+    "AWAY"
+  ],
+  "primary_method": "POWER",
+  "sensitivity_methods": [
+    "PROPORTIONAL"
+  ],
+  "power": {
+    "bisection_iterations": 256,
+    "maximum_bracket_exponent": "1024"
+  },
+  "consensus": {
+    "operator_weighting": "EQUAL",
+    "bounds": "PUBLIC_VECTOR_ENVELOPE",
+    "disagreement": "MAX_TOTAL_VARIATION"
+  },
+  "freshness": {
+    "stale_after_seconds": 1800
+  },
+  "confidence": {
+    "A": {
+      "minimum_operators": 3,
+      "maximum_age_seconds": 600,
+      "maximum_disagreement": "0.020000000000"
+    },
+    "B": {
+      "minimum_operators": 2,
+      "maximum_age_seconds": 1800,
+      "maximum_disagreement": "0.050000000000"
+    },
+    "C": {
+      "minimum_operators": 1,
+      "maximum_age_seconds": 1800,
+      "maximum_disagreement": "0.100000000000"
+    },
+    "D": {
+      "minimum_operators": 1
+    }
+  },
+  "retry_429": {
+    "maximum_attempts": 2,
+    "default_delay_seconds": 1,
+    "maximum_retry_after_seconds": 60
+  }
+}

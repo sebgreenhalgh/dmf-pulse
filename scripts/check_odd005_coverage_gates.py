@@ -29,12 +29,12 @@ PREDICATES: Final[dict[str, tuple[Predicate, ...]]] = {
         ),
         (
             "src/dmf_pulse/ingestion/odds/parser.py",
-            "if previous is not None and previous != outcome.price:",
-            "contradictory same-book outcomes are blocked",
+            "if previous is not None and previous != candidate:",
+            "contradictory same-book price or line outcomes are blocked",
         ),
         (
             "src/dmf_pulse/ingestion/odds/persistence.py",
-            'if provider_market.key not in {"h2h"}:',
+            'if provider_market.key != "h2h":',
             "unsupported markets are blocked from canonical publication",
         ),
         (

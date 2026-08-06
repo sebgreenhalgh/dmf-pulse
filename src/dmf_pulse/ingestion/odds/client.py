@@ -10,7 +10,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from typing import Literal, Protocol
 
@@ -121,6 +121,9 @@ class OddsRetrievalAttempt:
     quota: QuotaState | None
     provider_request_id_sha256: str | None
     failure_code: ProviderFailureCode | None
+    requested_delay_seconds: int | None
+    applied_delay_seconds: int | None
+    attempt_outcome: Literal["SUCCESS", "RETRY_SCHEDULED", "TERMINAL_FAILURE"]
 
 
 class OddsFetchFailure(IngestionError):
@@ -208,6 +211,7 @@ class UrllibOddsTransport:
             "x-requests-used",
             "x-requests-last",
             "x-request-id",
+            "retry-after",
         )
         return {name: str(value) for name in allowed if (value := getter(name)) is not None}
 
@@ -437,14 +441,15 @@ def _normalized_content_type(value: str) -> str | None:
 def _response_quota(
     response: OddsHttpResponse, observed_at: datetime
 ) -> tuple[QuotaState | None, Literal["ABSENT", "INVALID", "VALID"]]:
+    normalized = {str(key).casefold(): value for key, value in response.headers.items()}
     required = {"x-requests-remaining", "x-requests-used", "x-requests-last"}
-    present = required.intersection(response.headers)
+    present = required.intersection(normalized)
     if not present:
         return None, "ABSENT"
     if present != required:
         return None, "INVALID"
     try:
-        return parse_quota_headers(response.headers, observed_at), "VALID"
+        return parse_quota_headers(normalized, observed_at), "VALID"
     except IngestionError:
         return None, "INVALID"
 
@@ -478,6 +483,50 @@ def _response_failure(
     return None
 
 
+def _retry_delay(response: OddsHttpResponse, config: OddsProviderConfig) -> tuple[int | None, int]:
+    """Return safe requested/applied delta seconds for one 429 retry."""
+
+    normalized = {str(key).casefold(): str(value) for key, value in response.headers.items()}
+    raw = normalized.get("retry-after")
+    requested: int | None = None
+    if raw is not None and raw.isascii() and raw.isdecimal():
+        try:
+            requested = int(raw)
+        except ValueError:  # pragma: no cover - guarded by isdecimal
+            requested = None
+    if requested is not None and 1 <= requested <= config.retry.maximum_retry_after_seconds:
+        return requested, requested
+    return requested, config.retry.default_delay_seconds
+
+
+def _bounded_retry_request(
+    request: OddsHttpRequest,
+    *,
+    deadline_started: float,
+    observed_monotonic: float,
+    minimum_elapsed_seconds: float,
+    delay_seconds: int,
+) -> tuple[OddsHttpRequest | None, float]:
+    """Derive the next attempt's timeouts from the one total request budget."""
+
+    if observed_monotonic < deadline_started:
+        raise IngestionError("INTERNAL_INVARIANT", "odds client monotonic clock regressed")
+    elapsed = max(observed_monotonic - deadline_started, minimum_elapsed_seconds)
+    next_elapsed = elapsed + delay_seconds
+    remaining = request.total_timeout_seconds - next_elapsed
+    if remaining <= 0:
+        return None, next_elapsed
+    return (
+        replace(
+            request,
+            connect_timeout_seconds=min(request.connect_timeout_seconds, remaining),
+            read_timeout_seconds=min(request.read_timeout_seconds, remaining),
+            total_timeout_seconds=remaining,
+        ),
+        next_elapsed,
+    )
+
+
 class OddsClient:
     """Apply config, rights, quota, and credential gates before transport."""
 
@@ -488,11 +537,15 @@ class OddsClient:
         credential_provider: CredentialProvider | None = None,
         transport_factory: Callable[[], OddsTransport] = UrllibOddsTransport,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+        sleeper: Callable[[float], None] = time.sleep,
+        monotonic: Callable[[], float] = time.monotonic,
     ) -> None:
         self._profile = profile
         self._credential_provider = credential_provider or UnavailableCredentialProvider()
         self._transport_factory = transport_factory
         self._clock = clock
+        self._sleeper = sleeper
+        self._monotonic = monotonic
         self.transport_call_count = 0
 
     def fetch(
@@ -528,28 +581,90 @@ class OddsClient:
             )
         last_error: IngestionError | None = None
         attempts: list[OddsRetrievalAttempt] = []
+        deadline_started = self._monotonic()
+        minimum_elapsed_seconds = 0.0
+        attempt_request = request
         for attempt in range(1, config.retry.max_attempts + 1):
+            if attempt > 1:
+                refreshed_request, refreshed_elapsed = _bounded_retry_request(
+                    request,
+                    deadline_started=deadline_started,
+                    observed_monotonic=self._monotonic(),
+                    minimum_elapsed_seconds=minimum_elapsed_seconds,
+                    delay_seconds=0,
+                )
+                if refreshed_request is None:
+                    if last_error is None or not attempts:  # pragma: no cover - retry invariant
+                        raise IngestionError(
+                            "INTERNAL_INVARIANT", "odds retry deadline lacks prior evidence"
+                        )
+                    terminal_error = IngestionError(
+                        last_error.code,
+                        last_error.message,
+                        retryable=False,
+                    )
+                    attempts[-1] = replace(
+                        attempts[-1],
+                        attempt_outcome="TERMINAL_FAILURE",
+                    )
+                    raise OddsFetchFailure(terminal_error, tuple(attempts)) from None
+                attempt_request = refreshed_request
+                minimum_elapsed_seconds = refreshed_elapsed
             started_at = self._clock()
             if started_at.tzinfo is None or started_at.utcoffset() is None:
                 raise IngestionError(
                     "INTERNAL_INVARIANT", "odds client clock must be timezone-aware"
                 )
             self.transport_call_count += 1
-            response, safe_error = _send_transport(transport, request)
+            response, safe_error = _send_transport(transport, attempt_request)
+            transport_finished_monotonic = self._monotonic()
+            if transport_finished_monotonic < deadline_started:
+                raise IngestionError("INTERNAL_INVARIANT", "odds client monotonic clock regressed")
+            total_deadline_expired = (
+                max(
+                    transport_finished_monotonic - deadline_started,
+                    minimum_elapsed_seconds,
+                )
+                >= request.total_timeout_seconds
+            )
             if safe_error is not None:
-                last_error = safe_error
+                if total_deadline_expired:
+                    safe_error = IngestionError(
+                        "TOTAL_TIMEOUT",
+                        "odds provider total deadline expired",
+                        retryable=False,
+                    )
                 finished_at = self._clock()
                 if finished_at.tzinfo is None or finished_at.utcoffset() is None:
                     raise IngestionError(
                         "INTERNAL_INVARIANT", "odds client clock must be timezone-aware"
                     ) from None
+                retry_scheduled = safe_error.retryable and attempt < config.retry.max_attempts
+                next_request: OddsHttpRequest | None = None
+                next_minimum_elapsed = minimum_elapsed_seconds
+                if retry_scheduled:
+                    next_request, next_minimum_elapsed = _bounded_retry_request(
+                        request,
+                        deadline_started=deadline_started,
+                        observed_monotonic=transport_finished_monotonic,
+                        minimum_elapsed_seconds=minimum_elapsed_seconds,
+                        delay_seconds=0,
+                    )
+                    if next_request is None:
+                        safe_error = IngestionError(
+                            safe_error.code,
+                            safe_error.message,
+                            retryable=False,
+                        )
+                        retry_scheduled = False
+                last_error = safe_error
                 attempts.append(
                     OddsRetrievalAttempt(
                         attempt_number=attempt,
                         request_started_at=started_at.astimezone(UTC),
                         received_at=finished_at.astimezone(UTC),
-                        request_fingerprint=request.request_fingerprint,
-                        sanitized_target=request.sanitized_target,
+                        request_fingerprint=attempt_request.request_fingerprint,
+                        sanitized_target=attempt_request.sanitized_target,
                         http_status=None,
                         content_type=None,
                         body_sha256=None,
@@ -561,10 +676,19 @@ class OddsClient:
                         quota=None,
                         provider_request_id_sha256=None,
                         failure_code=_provider_failure_code(safe_error.code),
+                        requested_delay_seconds=None,
+                        applied_delay_seconds=None,
+                        attempt_outcome=(
+                            "RETRY_SCHEDULED" if retry_scheduled else "TERMINAL_FAILURE"
+                        ),
                     )
                 )
-                if not safe_error.retryable or attempt == config.retry.max_attempts:
+                if not retry_scheduled:
                     raise OddsFetchFailure(safe_error, tuple(attempts)) from None
+                if next_request is None:  # pragma: no cover - retry invariant
+                    raise IngestionError("INTERNAL_INVARIANT", "odds retry request is unavailable")
+                attempt_request = next_request
+                minimum_elapsed_seconds = next_minimum_elapsed
                 continue
 
             if response is None:  # pragma: no cover - helper invariant
@@ -582,18 +706,73 @@ class OddsClient:
                 media_type=media_type,
                 quota=quota_value,
             )
+            if total_deadline_expired:
+                response_error = IngestionError(
+                    "TOTAL_TIMEOUT",
+                    "odds provider total deadline expired",
+                    retryable=False,
+                )
+            if quota_header_state != "VALID" and not total_deadline_expired:
+                response_error = IngestionError(
+                    "SOURCE_UNAVAILABLE",
+                    "provider quota headers are invalid",
+                    retryable=False,
+                )
             truncated = len(response.body) > config.max_response_bytes
+            normalized_headers = {
+                str(key).casefold(): str(value) for key, value in response.headers.items()
+            }
             provider_request_id_sha256 = (
-                canonical_sha256(response.headers["x-request-id"])
-                if response.headers.get("x-request-id")
+                canonical_sha256(normalized_headers["x-request-id"])
+                if normalized_headers.get("x-request-id")
                 else None
             )
+            requested_delay: int | None = None
+            applied_delay: int | None = None
+            retry_scheduled = False
+            next_request = None
+            next_minimum_elapsed = minimum_elapsed_seconds
+            if response_error is not None:
+                quota_blocks_retry = (
+                    quota_value is not None and quota_value.remaining < config.request_cost
+                )
+                if quota_blocks_retry and response_error.retryable:
+                    response_error = IngestionError(
+                        response_error.code,
+                        response_error.message,
+                        retryable=False,
+                    )
+                retry_scheduled = (
+                    response_error.retryable
+                    and not quota_blocks_retry
+                    and attempt < config.retry.max_attempts
+                )
+                delay_seconds = 0
+                if retry_scheduled and response.status_code == 429:
+                    requested_delay, applied_delay = _retry_delay(response, config)
+                    delay_seconds = applied_delay
+                if retry_scheduled:
+                    next_request, next_minimum_elapsed = _bounded_retry_request(
+                        request,
+                        deadline_started=deadline_started,
+                        observed_monotonic=transport_finished_monotonic,
+                        minimum_elapsed_seconds=minimum_elapsed_seconds,
+                        delay_seconds=delay_seconds,
+                    )
+                    if next_request is None:
+                        response_error = IngestionError(
+                            response_error.code,
+                            response_error.message,
+                            retryable=False,
+                        )
+                        applied_delay = None
+                        retry_scheduled = False
             retrieval = OddsRetrievalAttempt(
                 attempt_number=attempt,
                 request_started_at=started_at.astimezone(UTC),
                 received_at=finished_at.astimezone(UTC),
-                request_fingerprint=request.request_fingerprint,
-                sanitized_target=request.sanitized_target,
+                request_fingerprint=attempt_request.request_fingerprint,
+                sanitized_target=attempt_request.sanitized_target,
                 http_status=response.status_code,
                 content_type=media_type,
                 body_sha256=(None if truncated else hashlib.sha256(response.body).hexdigest()),
@@ -611,25 +790,27 @@ class OddsClient:
                     if response_error is not None
                     else None
                 ),
+                requested_delay_seconds=requested_delay,
+                applied_delay_seconds=applied_delay,
+                attempt_outcome=(
+                    "SUCCESS"
+                    if response_error is None
+                    else "RETRY_SCHEDULED"
+                    if retry_scheduled
+                    else "TERMINAL_FAILURE"
+                ),
             )
             attempts.append(retrieval)
             if response_error is not None:
                 last_error = response_error
-                quota_blocks_retry = (
-                    quota_value is not None and quota_value.remaining < config.request_cost
-                )
-                if quota_blocks_retry and response_error.retryable:
-                    response_error = IngestionError(
-                        response_error.code,
-                        response_error.message,
-                        retryable=False,
-                    )
-                if (
-                    not response_error.retryable
-                    or quota_blocks_retry
-                    or attempt == config.retry.max_attempts
-                ):
+                if not retry_scheduled:
                     raise OddsFetchFailure(response_error, tuple(attempts)) from None
+                if applied_delay is not None:
+                    self._sleeper(float(applied_delay))
+                if next_request is None:  # pragma: no cover - retry invariant
+                    raise IngestionError("INTERNAL_INVARIANT", "odds retry request is unavailable")
+                attempt_request = next_request
+                minimum_elapsed_seconds = next_minimum_elapsed
                 continue
             if quota_value is None:  # pragma: no cover - response validation invariant
                 raise IngestionError("INTERNAL_INVARIANT", "validated response lacks quota")

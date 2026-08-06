@@ -1,0 +1,68 @@
+ticket_id: "NRM-006"
+stage: "A6"
+pack_version: "1.1"
+title: "Odds normalisation, consensus baseline and ODD-005 temporal remediation"
+status: "READY"
+owner: "Sebastian Greenhalgh"
+implementer_role: "codex_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+
+required_branch: "stage/A6/NRM-006-odds-normalisation"
+required_base_commit: "e36ea84cda9e80191a9160d037f8e7035477b9b1"
+inherited_alembic_head: "20260725_0004"
+proposed_alembic_revision: "20260803_0005"
+
+objective: >-
+  Correct every frozen ODD-005 temporal/provenance finding, then transform
+  complete pre-match full-time 1X2 operator books into auditable raw implied,
+  proportional and power-normalised probabilities and one-provider/multi-operator
+  consensus with uncertainty, freshness and confidence.
+
+user_visible_vertical_slice:
+  command: >-
+    dmf market normalise --fixture-external-provider synthetic_fpl
+    --fixture-external-id 101 --season-code 2026/27
+    --as-of 2026-08-20T12:05:00Z --output json
+  expected: >-
+    A schema-valid deterministic NRM-006 result containing two independently
+    normalised operator books, consensus probabilities that sum exactly to one
+    at the public precision, bounds, disagreement, freshness, confidence B and
+    complete lineage.
+
+mandatory_remediation:
+  - "Post-commit activation acknowledgement controls usable_at through immutable attestation; never provider receipt, pre-commit sampling or artificial offsets."
+  - "Historical mapping, aliases and fixture revisions are resolved as-of an explicit mapping cutoff."
+  - "Synthetic evidence cannot create production-authoritative official_fpl mappings."
+  - "HTTP 429 retry uses bounded Retry-After/backoff through injected sleeper, while preserving the inherited complete three-header quota contract; never immediate retry or invented quota evidence."
+  - "Same-price observations at different retrieval times remain distinct; same-payload duplicate outcomes emit evidence."
+  - "Mapping validity is explicit/context-derived; no hard-coded season dates."
+
+in_scope:
+  - "Full-time pre-match mutually exclusive HOME/DRAW/AWAY books."
+  - "Raw implied probability and overround."
+  - "Proportional normalisation."
+  - "Power normalisation through the frozen Decimal bisection policy."
+  - "Equal canonical-operator weighting after per-operator normalisation."
+  - "Freshness, completeness, method/operator disagreement, bounds and confidence."
+  - "Immutable PostgreSQL normalisation runs/results and exact input signatures."
+  - "CLI, installed-wheel and deterministic as-of behavior."
+
+excluded:
+  - "Live network/provider calls."
+  - "Shin as a production or public method."
+  - "Exchange back/lay and commission."
+  - "Player props, nonexclusive markets, correct score, totals and in-play markets."
+  - "Learned operator weights or trained calibration."
+  - "Football score, player-event, FPL-points or optimiser logic."
+  - "Public odds redistribution or raw-data export."
+
+public_contracts:
+  - "public_contracts/probability.schema.json"
+  - "public_contracts/normalised_operator_market.schema.json"
+  - "public_contracts/market_consensus.schema.json"
+  - "public_contracts/market_normalisation_result.schema.json"
+
+required_review_output: "review_pack/NRM-006/DMF_PULSE_NRM-006_REVIEW.zip"
+review_root_file_cap: 20
+network_allowed: false
+real_credentials_allowed: false

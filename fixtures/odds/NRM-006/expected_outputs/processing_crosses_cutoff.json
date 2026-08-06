@@ -1,0 +1,10 @@
+{
+  "status": "OBSERVED_NOT_USABLE",
+  "received_at": "2026-08-21T17:29:59Z",
+  "activation_transaction_outcome": "COMMITTED",
+  "usable_at": "2026-08-21T17:30:02Z",
+  "usable_at_source": "POST_COMMIT_ATTESTATION",
+  "attestation_outcome": "COMMITTED",
+  "information_cutoff": "2026-08-21T17:30:00Z",
+  "eligible_before_cutoff": false
+}

@@ -1,0 +1,10 @@
+{
+  "mapping_cutoff": "2026-08-20T12:05:00Z",
+  "initial_fixture_kickoff": "2026-08-22T14:00:00Z",
+  "future_mapping_approved_at": "2026-08-20T12:06:00Z",
+  "future_alias_system_from": "2026-08-20T12:06:30Z",
+  "future_fixture_correction_usable_at": "2026-08-20T12:07:00Z",
+  "future_fixture_kickoff": "2026-08-22T15:00:00Z",
+  "expected_strict_mapping_resolved": false,
+  "expected_strict_kickoff": "2026-08-22T14:00:00Z"
+}

@@ -9,9 +9,11 @@ from pathlib import Path
 from uuid import UUID
 
 import pytest
+from psycopg.types.range import Range
 from pydantic import ValidationError
 from sqlalchemy.exc import DBAPIError
 
+import dmf_pulse.ingestion.odds.persistence as persistence_module
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.odds.mapping import (
     OddsMappingPlan,
@@ -24,9 +26,11 @@ from dmf_pulse.ingestion.odds.persistence import (
     _advisory_lock,
     _ensure_external_mapping,
     _uuid,
+    attest_publication_batch,
     ensure_provider,
 )
 from dmf_pulse.markets.models import MarketOutcome, MarketState
+from dmf_pulse.markets.repository import MarketObservationRepository
 from dmf_pulse.markets.repository import _uuid as market_uuid
 
 pytestmark = pytest.mark.unit
@@ -65,6 +69,12 @@ class _SequenceSession:
         if isinstance(value, BaseException):
             raise value
         return _Result(value)
+
+    def scalar(self, *_args: object, **_kwargs: object) -> object:
+        value = self.values.pop(0) if self.values else None
+        if isinstance(value, BaseException):
+            raise value
+        return value
 
 
 class _SqlStateError(Exception):
@@ -138,8 +148,58 @@ def test_provider_and_external_mapping_conflicts_are_rejected() -> None:
             canonical_id=UUID(int=3),
             product="synthetic",
             snapshot_id=UUID(int=4),
-            observed_at=NOW,
+            valid_during=Range(NOW, None, bounds="[)"),
+            resolution_cutoff=NOW,
+            system_known_at=NOW,
+            evidence_class="TEST_ONLY",
+            reviewer="NRM-006 synthetic test",
         )
+
+    with pytest.raises(IngestionError, match="lower bound"):
+        _ensure_external_mapping(
+            _SequenceSession([None, None]),  # type: ignore[arg-type]
+            provider_id=UUID(int=1),
+            season_id=None,
+            namespace="synthetic.namespace",
+            entity_type="BETTING_OPERATOR",
+            external_id="external",
+            canonical_id=UUID(int=3),
+            product="synthetic",
+            snapshot_id=UUID(int=4),
+            valid_during=Range(None, None, bounds="()"),
+            resolution_cutoff=NOW,
+            system_known_at=NOW,
+            evidence_class="TEST_ONLY",
+            reviewer="NRM-006 synthetic test",
+        )
+
+
+def test_publication_attestation_converges_or_fails_retryably() -> None:
+    created = NOW + timedelta(seconds=1)
+    assert (
+        attest_publication_batch(
+            _SequenceSession([created]),  # type: ignore[arg-type]
+            publication_batch_id=UUID(int=1),
+            usable_at=created,
+        )
+        == created
+    )
+    assert (
+        attest_publication_batch(
+            _SequenceSession([None, created]),  # type: ignore[arg-type]
+            publication_batch_id=UUID(int=1),
+            usable_at=created,
+        )
+        == created
+    )
+    with pytest.raises(IngestionError) as raced:
+        attest_publication_batch(
+            _SequenceSession([None, None]),  # type: ignore[arg-type]
+            publication_batch_id=UUID(int=1),
+            usable_at=created,
+        )
+    assert raced.value.code == "DATABASE_RETRYABLE"
+    assert raced.value.retryable is True
 
 
 def _persistence(**values: object) -> OddsPersistence:
@@ -167,35 +227,93 @@ def test_season_fixture_operator_and_team_mapping_conflicts_fail_closed(
     monkeypatch.setattr(
         OddsPersistence,
         "_season_context",
-        lambda _self: (UUID(int=1), UUID(int=2)),
+        lambda _self: (UUID(int=1), UUID(int=2), Range(NOW, None, bounds="[)")),
     )
     with pytest.raises(IngestionError, match="lookup season"):
         fixture_drift.resolve_fixture(event)
 
     unresolved_fixture = _persistence(
-        session=_SequenceSession([[]]), mapping_plan=plan, captured_at=NOW
+        session=_SequenceSession([[]]),
+        mapping_plan=plan,
+        captured_at=NOW,
+        mapping_cutoff=NOW,
     )
-    with pytest.raises(IngestionError, match="official fixture mapping"):
+    with pytest.raises(IngestionError, match="fixture mapping is unresolved"):
         unresolved_fixture.resolve_fixture(event)
 
+    ambiguous_provider = _persistence(
+        session=_SequenceSession(
+            [
+                [
+                    {
+                        "canonical_entity_id": UUID(int=10),
+                        "external_identifier_id": UUID(int=30),
+                        "provider_id": UUID(int=20),
+                        "provider_key": "synthetic_fpl",
+                    },
+                    {
+                        "canonical_entity_id": UUID(int=10),
+                        "external_identifier_id": UUID(int=31),
+                        "provider_id": UUID(int=21),
+                        "provider_key": "synthetic_fpl",
+                    },
+                ]
+            ]
+        ),
+        mapping_plan=plan,
+        captured_at=NOW,
+        mapping_cutoff=NOW,
+    )
+    with pytest.raises(IngestionError, match="provider is ambiguous"):
+        ambiguous_provider.resolve_fixture(event)
+
     fixture_id = UUID(int=10)
+    non_test_plan = plan.model_copy(update={"evidence_class": "OFFICIAL"})
     missing_fixture = _persistence(
         session=_SequenceSession(
             [
                 [
                     {
                         "canonical_entity_id": fixture_id,
+                        "external_identifier_id": UUID(int=30),
                         "provider_key": "official_fpl",
                     }
                 ],
                 None,
             ]
         ),
-        mapping_plan=plan,
+        mapping_plan=non_test_plan,
         captured_at=NOW,
+        mapping_cutoff=NOW,
     )
     with pytest.raises(IngestionError, match="mapped fixture context"):
         missing_fixture.resolve_fixture(event)
+
+    commence_conflict = _persistence(
+        session=_SequenceSession(
+            [
+                [
+                    {
+                        "canonical_entity_id": fixture_id,
+                        "external_identifier_id": UUID(int=30),
+                        "provider_key": "official_fpl",
+                    }
+                ],
+                {
+                    "home_team_id": UUID(int=20),
+                    "away_team_id": UUID(int=21),
+                },
+                None,
+            ]
+        ),
+        mapping_plan=non_test_plan,
+        captured_at=NOW,
+        mapping_cutoff=NOW,
+    )
+    with monkeypatch.context() as local_patch:
+        local_patch.setattr(OddsPersistence, "_validate_team_mapping", lambda *_a, **_k: None)
+        with pytest.raises(IngestionError, match="commence time"):
+            commence_conflict.resolve_fixture(event)
 
     title_drift = _persistence(mapping_plan=plan, session=_SequenceSession([]))
     with pytest.raises(IngestionError, match="title contradicts"):
@@ -210,13 +328,116 @@ def test_season_fixture_operator_and_team_mapping_conflicts_fail_closed(
     with pytest.raises(IngestionError, match="canonical operator conflicts"):
         operator_drift.resolve_operator(bookmaker)
 
-    wrong_team = _persistence(session=_SequenceSession([[UUID(int=99)]]))
+    wrong_team = _persistence(
+        session=_SequenceSession(
+            [
+                [
+                    {
+                        "canonical_entity_id": UUID(int=99),
+                        "external_identifier_id": UUID(int=1),
+                    }
+                ]
+            ]
+        ),
+        mapping_cutoff=NOW,
+    )
     with pytest.raises(IngestionError, match="participant mapping"):
-        wrong_team._validate_team_mapping(UUID(int=1), UUID(int=2), "1", "Home")
+        wrong_team._validate_team_mapping(
+            UUID(int=1),
+            UUID(int=2),
+            "1",
+            "Home",
+            lookup_provider="synthetic_fpl",
+            domain_instant=NOW,
+        )
 
-    wrong_alias = _persistence(session=_SequenceSession([[UUID(int=2)], []]))
+    wrong_alias = _persistence(
+        session=_SequenceSession(
+            [
+                [
+                    {
+                        "canonical_entity_id": UUID(int=2),
+                        "external_identifier_id": UUID(int=1),
+                    }
+                ],
+                [],
+            ]
+        ),
+        mapping_cutoff=NOW,
+    )
     with pytest.raises(IngestionError, match="participant label"):
-        wrong_alias._validate_team_mapping(UUID(int=1), UUID(int=2), "1", "Home")
+        wrong_alias._validate_team_mapping(
+            UUID(int=1),
+            UUID(int=2),
+            "1",
+            "Home",
+            lookup_provider="synthetic_fpl",
+            domain_instant=NOW,
+        )
+
+
+def test_official_fixture_resolution_reuses_unique_mapping_lineage(
+    repository_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    mapping_path = repository_root / "fixtures/odds/ODD-005/mapping_plan.json"
+    value = json.loads(mapping_path.read_text(encoding="utf-8"))
+    value["evidence_class"] = "OFFICIAL"
+    value["status"] = "APPROVED"
+    value["fixture_mappings"][0]["canonical_fixture_lookup"]["provider"] = "official_fpl"
+    plan = OddsMappingPlan.model_validate(value)
+    event = _parsed(repository_root).events[0]
+    fixture_id = UUID(int=10)
+    season_id = UUID(int=11)
+    competition_id = UUID(int=12)
+    home_team_id = UUID(int=20)
+    away_team_id = UUID(int=21)
+    kickoff_at = plan.fixture(event.id).expected_commence_time
+    session = _SequenceSession(
+        [
+            [
+                {
+                    "canonical_entity_id": fixture_id,
+                    "external_identifier_id": UUID(int=30),
+                    "provider_id": UUID(int=31),
+                    "provider_key": "official_fpl",
+                }
+            ],
+            {"home_team_id": home_team_id, "away_team_id": away_team_id},
+            {"fixture_observation_id": UUID(int=50), "kickoff_at": kickoff_at},
+        ]
+    )
+    persistence = _persistence(
+        session=session,
+        mapping_plan=plan,
+        captured_at=NOW,
+        mapping_cutoff=NOW,
+        odds_provider_id=UUID(int=32),
+        snapshot_id=UUID(int=33),
+    )
+    team_lineage = {home_team_id: UUID(int=40), away_team_id: UUID(int=41)}
+    monkeypatch.setattr(
+        OddsPersistence,
+        "_season_context",
+        lambda _self: (season_id, competition_id, Range(NOW, None, bounds="[)")),
+    )
+    monkeypatch.setattr(
+        OddsPersistence,
+        "_validate_team_mapping",
+        lambda _self, _season_id, team_id, *_args, **_kwargs: [team_lineage[team_id]],
+    )
+    monkeypatch.setattr(
+        persistence_module,
+        "_ensure_external_mapping",
+        lambda *_args, **_kwargs: UUID(int=60),
+    )
+
+    resolved = persistence.resolve_fixture(event)
+
+    assert resolved.fixture_mapping_id == UUID(int=30)
+    assert resolved.home_team_mapping_id == UUID(int=40)
+    assert resolved.away_team_mapping_id == UUID(int=41)
+    assert resolved.event_mapping_id == UUID(int=60)
 
 
 def test_pre_match_and_outcome_semantics_reject_unsupported_effects(
@@ -278,6 +499,31 @@ def test_mapping_plan_and_representation_boundary_conflicts(
     with pytest.raises(ValidationError, match="provider event"):
         OddsMappingPlan.model_validate(duplicate_event)
 
+    test_only_official = json.loads(json.dumps(value))
+    test_only_official["fixture_mappings"][0]["canonical_fixture_lookup"]["provider"] = (
+        "official_fpl"
+    )
+    with pytest.raises(ValidationError, match="only synthetic_fpl"):
+        OddsMappingPlan.model_validate(test_only_official)
+
+    production_synthetic = json.loads(json.dumps(value))
+    production_synthetic["evidence_class"] = "OFFICIAL"
+    production_synthetic["status"] = "APPROVED"
+    with pytest.raises(ValidationError, match="cannot use synthetic"):
+        OddsMappingPlan.model_validate(production_synthetic)
+
+    production_wrong_status = json.loads(json.dumps(value))
+    production_wrong_status["evidence_class"] = "OFFICIAL"
+    production_wrong_status["fixture_mappings"][0]["canonical_fixture_lookup"]["provider"] = (
+        "official_fpl"
+    )
+    with pytest.raises(ValidationError, match="production mapping"):
+        OddsMappingPlan.model_validate(production_wrong_status)
+
+    production = json.loads(json.dumps(production_wrong_status))
+    production["status"] = "APPROVED"
+    assert OddsMappingPlan.model_validate(production).evidence_class == "OFFICIAL"
+
     with pytest.raises(ValueError, match="duplicate mapping-plan key"):
         _strict_object([("duplicate", 1), ("duplicate", 2)])
 
@@ -296,3 +542,29 @@ def test_mapping_plan_and_representation_boundary_conflicts(
 
     with pytest.raises(IngestionError, match="invalid identifier"):
         market_uuid("not-a-uuid")
+
+
+def test_public_fixture_resolution_requires_exactly_one_temporal_mapping() -> None:
+    repository = MarketObservationRepository(_SequenceSession([[]]))  # type: ignore[arg-type]
+    with pytest.raises(IngestionError) as missing:
+        repository.resolve_fixture(
+            external_provider="synthetic_fpl",
+            external_id="101",
+            season_code="2026/27",
+            as_of=NOW,
+        )
+    assert missing.value.code == "MAPPING_CONFLICT"
+
+    fixture_id = UUID(int=101)
+    repository = MarketObservationRepository(
+        _SequenceSession([[fixture_id]])  # type: ignore[arg-type]
+    )
+    assert (
+        repository.resolve_fixture(
+            external_provider="synthetic_fpl",
+            external_id="101",
+            season_code="2026/27",
+            as_of=NOW,
+        )
+        == fixture_id
+    )

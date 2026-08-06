@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
@@ -55,13 +55,17 @@ def _replay(root: Path, scenario: str = "happy_path"):
 
 
 def _import(root: Path, name: str, captured_at: datetime):
-    service = OddsIngestionService(repository_root=root)
+    service = OddsIngestionService(
+        repository_root=root,
+        clock=lambda: captured_at + timedelta(seconds=10),
+    )
     service._seed_fpl_fixture(DATABASE_REF, DEFAULT_CUTOFF)
     return service.import_payload(
         OddsImportRequest(
             input_path=root / FIXTURE_ROOT / name,
             mapping_plan_path=root / FIXTURE_ROOT / "mapping_plan.json",
             captured_at=captured_at,
+            processing_at=captured_at + timedelta(seconds=5),
             information_cutoff=DEFAULT_CUTOFF,
             rights_profile_id="synthetic_the_odds_api_v1",
             database_url_ref=DATABASE_REF,
@@ -78,7 +82,7 @@ def _import(root: Path, name: str, captured_at: datetime):
 
 def _query(as_of: datetime):
     return MarketService().observations(
-        fixture_external_provider="official_fpl",
+        fixture_external_provider="synthetic_fpl",
         fixture_external_id="101",
         season_code="2026/27",
         as_of=as_of,
@@ -118,12 +122,12 @@ def test_happy_recorded_replay_persists_exact_relational_evidence(
         for book in result.books
     }
     assert observed == {
-        "SYNTHETIC_BOOK_ALPHA": {
+        "book_alpha": {
             MarketOutcome.HOME: Decimal("1.80"),
             MarketOutcome.DRAW: Decimal("3.60"),
             MarketOutcome.AWAY: Decimal("4.20"),
         },
-        "SYNTHETIC_BOOK_BETA": {
+        "book_beta": {
             MarketOutcome.HOME: Decimal("1.85"),
             MarketOutcome.DRAW: Decimal("3.50"),
             MarketOutcome.AWAY: Decimal("4.10"),

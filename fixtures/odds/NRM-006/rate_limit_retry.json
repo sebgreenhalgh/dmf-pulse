@@ -1,0 +1,27 @@
+{
+  "responses": [
+    {
+      "status": 429,
+      "headers": {
+        "Retry-After": "2",
+        "x-requests-remaining": "498",
+        "x-requests-used": "2",
+        "x-requests-last": "1"
+      }
+    },
+    {
+      "status": 200,
+      "headers": {
+        "x-requests-remaining": "497",
+        "x-requests-used": "3",
+        "x-requests-last": "1"
+      },
+      "fixture": "happy_path_market_query.json"
+    }
+  ],
+  "expected_transport_calls": 2,
+  "expected_sleeper_calls_seconds": [
+    2
+  ],
+  "real_sleep_allowed": false
+}

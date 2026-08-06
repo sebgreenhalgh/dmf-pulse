@@ -74,10 +74,24 @@ def _environment_python(environment_root: Path) -> Path:
     return environment_root / "bin" / "python"
 
 
-def _environment_dmf(environment_root: Path) -> Path:
-    if os.name == "nt":
-        return environment_root / "Scripts" / "dmf.exe"
-    return environment_root / "bin" / "dmf"
+def _environment_dmf(environment_python: Path) -> tuple[str, ...]:
+    """Invoke the installed console entry point without an unsigned launcher shim.
+
+    Windows application-control policies can reject the distlib ``dmf.exe``
+    generated in a disposable directory. Loading the wheel's installed entry
+    point through the clean environment's trusted Python executable exercises
+    the same metadata and callable while remaining portable to POSIX.
+    """
+
+    runner = (
+        "import importlib.metadata as m,sys;"
+        "e=[e for e in m.distribution('dmf-pulse').entry_points "
+        "if e.group=='console_scripts' and e.name=='dmf'];"
+        "ep=e[0] if len(e)==1 else sys.exit(125);"
+        "sys.exit(ep.load()()) "
+        "if ep.value=='dmf_pulse.cli.app:main' else sys.exit(125)"
+    )
+    return (str(environment_python), "-I", "-c", runner)
 
 
 def _sanitized_environment() -> dict[str, str]:
@@ -300,7 +314,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
             environment=offline_environment,
         )
         environment_python = _environment_python(environment_root)
-        environment_dmf = _environment_dmf(environment_root)
+        environment_dmf = _environment_dmf(environment_python)
         dependency_environment = dict(offline_environment)
         dependency_environment["VIRTUAL_ENV"] = str(environment_root)
         _run(
@@ -334,7 +348,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         )
         clean_environment = offline_environment
         version_result = _run(
-            [str(environment_dmf), "--version"],
+            [*environment_dmf, "--version"],
             cwd=temporary_path,
             step="installed dmf version",
             environment=clean_environment,
@@ -342,7 +356,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         if version_result.stdout.strip() != f"dmf {project_version}":
             raise VerificationError("installed dmf version output is not exact")
         doctor_result = _run(
-            [str(environment_dmf), "doctor", "--json"],
+            [*environment_dmf, "doctor", "--json"],
             cwd=temporary_path,
             step="installed dmf doctor",
             environment=clean_environment,
@@ -356,7 +370,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
 
         rules_result = _run(
             [
-                str(environment_dmf),
+                *environment_dmf,
                 "rules",
                 "validate",
                 str(REPOSITORY_ROOT / "fixtures/rules/RUL-002/synthetic_complete"),
@@ -379,20 +393,20 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         clean_environment["DMF_ENVIRONMENT"] = "TEST"
         data_model_root = REPOSITORY_ROOT / "fixtures/data_model/DAT-003"
         database_doctor_result = _run(
-            [str(environment_dmf), "data-model", "doctor", "--json"],
+            [*environment_dmf, "data-model", "doctor", "--json"],
             cwd=temporary_path,
             step="installed database doctor",
             environment=clean_environment,
         )
         schema_manifest_result = _run(
-            [str(environment_dmf), "data-model", "schema-manifest", "--json"],
+            [*environment_dmf, "data-model", "schema-manifest", "--json"],
             cwd=temporary_path,
             step="installed schema manifest",
             environment=clean_environment,
         )
         demo_result = _run(
             [
-                str(environment_dmf),
+                *environment_dmf,
                 "data-model",
                 "demo",
                 "--fixture",
@@ -405,7 +419,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         )
         as_of_result = _run(
             [
-                str(environment_dmf),
+                *environment_dmf,
                 "data-model",
                 "as-of",
                 "--fixture",

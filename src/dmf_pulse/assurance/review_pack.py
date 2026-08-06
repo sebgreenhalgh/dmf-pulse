@@ -24,6 +24,9 @@ from dmf_pulse.assurance.evidence import (
     FPL_DETACHED_REVIEW_NAMES,
     FPL_REQUIRED_BASELINE,
     FPL_REQUIRED_BRANCH,
+    NRM_DETACHED_REVIEW_NAMES,
+    NRM_REQUIRED_BASELINE,
+    NRM_REQUIRED_BRANCH,
     ODD_DETACHED_REVIEW_NAMES,
     ODD_REQUIRED_BASELINE,
     ODD_REQUIRED_BRANCH,
@@ -49,7 +52,9 @@ RUL_REVIEW_ZIP_NAME: Final = "DMF_PULSE_RUL-002_REVIEW.zip"
 DAT_REVIEW_ZIP_NAME: Final = "DMF_PULSE_DAT-003_REVIEW.zip"
 FPL_REVIEW_ZIP_NAME: Final = "DMF_PULSE_FPL-004_REVIEW.zip"
 ODD_REVIEW_ZIP_NAME: Final = "DMF_PULSE_ODD-005_REVIEW.zip"
+NRM_REVIEW_ZIP_NAME: Final = "DMF_PULSE_NRM-006_REVIEW.zip"
 ODD_PACK_MANIFEST_SHA256: Final = "c030d775f2c4f5f68910ef443b1f0a86bc2a6e096299d448fbc0d81d48a62a20"
+NRM_PACK_MANIFEST_SHA256: Final = "6be2a825a90dfa89f7e5ce1da5475c144cb44cee265b33d75396cef3256966e4"
 MANIFEST_NAME: Final = "03_REVIEW_MANIFEST.json"
 FPL_MANIFEST_NAME: Final = "19_ARCHIVE_MANIFEST.json"
 CHECKSUM_NAME: Final = "20_SHA256SUMS.txt"
@@ -156,6 +161,28 @@ ODD_PREFERRED_NAMES: Final = (
     "12_TESTS_AND_COVERAGE.md",
     "13_SECURITY_AND_SECRET_REVIEW.md",
     "14_WHEEL_AND_CLI.md",
+    "15_COMMANDS_AND_RESULTS.log",
+    "16_ACCEPTANCE_MANIFEST.json",
+    "17_KNOWN_LIMITATIONS.md",
+    "18_CODEX_RESULT.json",
+    FPL_MANIFEST_NAME,
+    CHECKSUM_NAME,
+)
+NRM_PREFERRED_NAMES: Final = (
+    "01_REVIEW_INDEX.md",
+    "02_BASELINE_AND_GIT_STATE.md",
+    "03_COMPLETE_HUMAN_PATCH.diff",
+    "04_FILE_CHANGE_MAP.md",
+    "05_PUBLIC_CONTRACTS.md",
+    "06_MIGRATION_SCHEMA_REVIEW.md",
+    "07_ODD005_REMEDIATION.md",
+    "08_TEMPORAL_MAPPING_USABLE_AT.md",
+    "09_RETRY_DUPLICATE_PROVENANCE.md",
+    "10_NORMALISATION_NUMERICS.md",
+    "11_CONSENSUS_CONFIDENCE.md",
+    "12_ASOF_CACHE_CONCURRENCY.md",
+    "13_TESTS_AND_COVERAGE.md",
+    "14_SECURITY_RIGHTS_WHEEL.md",
     "15_COMMANDS_AND_RESULTS.log",
     "16_ACCEPTANCE_MANIFEST.json",
     "17_KNOWN_LIMITATIONS.md",
@@ -415,6 +442,7 @@ RUL_PRIMARY_PAYLOAD_NAMES: Final = set(RUL_PREFERRED_NAMES[3:19])
 DAT_PRIMARY_PAYLOAD_NAMES: Final = set(DAT_PREFERRED_NAMES[3:19])
 FPL_PRIMARY_PAYLOAD_NAMES: Final = set(FPL_PREFERRED_NAMES[:17])
 ODD_PRIMARY_PAYLOAD_NAMES: Final = set(ODD_PREFERRED_NAMES[:17])
+NRM_PRIMARY_PAYLOAD_NAMES: Final = set(NRM_PREFERRED_NAMES[:17])
 RUL_MANDATORY_ACCEPTANCE_COMMANDS: Final = (
     "uv sync --all-groups --frozen",
     "uv run ruff format --check .",
@@ -566,6 +594,53 @@ ODD_TEARDOWN_WRITE_AHEAD_RESULT: Final = (
     "will be recorded in archive_finalization.json"
 )
 ODD_TEARDOWN_FINAL_RESULT: Final = "PASS: PostgreSQL service and volume removed"
+NRM_MANDATORY_ACCEPTANCE_COMMANDS: Final = (
+    "git diff --check",
+    "uv lock --check",
+    "uv run dmf specs validate",
+    "uv run dmf evidence validate --ticket NRM-006",
+    "uv run ruff format --check .",
+    "uv run ruff check .",
+    "uv run mypy src/dmf_pulse",
+    'uv run pytest -q -m "unit" tests/unit',
+    'uv run pytest -q -m "property" tests/property',
+    'uv run pytest -q -m "contract" tests/contract',
+    'uv run pytest -q -m "golden" tests/golden',
+    'uv run pytest -q -m "security" tests/security',
+    "docker compose -f compose.test.yaml up -d --wait",
+    "uv run python scripts/test_migration_matrix.py --baseline-revision 20260725_0004 --target head",
+    'uv run pytest -q -m "postgres and integration" tests/integration',
+    "uv run pytest -q tests/integration/ingestion/odds/test_odds_temporal_publication_mapping.py",
+    "uv run pytest -q tests/security/test_odds_credentials_quota_retention.py tests/security/test_odds_429_retry_policy.py",
+    "uv run pytest -q tests/unit/markets tests/property/markets tests/golden/markets",
+    "uv run pytest -q tests/integration/markets/test_market_normalisation_consensus.py",
+    "uv run pytest -q tests/integration/markets/test_normalisation_asof_cache_concurrency.py",
+    "uv run dmf ingest odds replay --fixture-set fixtures/odds/ODD-005 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_the_odds_api_v1 --output json",
+    "uv run dmf market observations --fixture-external-provider synthetic_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json",
+    "uv run dmf market normalise --fixture-external-provider synthetic_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json",
+    "uv run python scripts/verify_nrm006_goldens.py",
+    "uv run python scripts/verify_nrm006_temporal_canaries.py",
+    "uv run python scripts/verify_nrm006_wheel.py",
+    "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-fail-under=90",
+    "uv run python scripts/verify_nrm006_critical_coverage.py",
+    "uv run python scripts/verify_nrm006_acceptance.py",
+    "git status --short",
+    f"uv run dmf review-pack build --ticket NRM-006 --baseline {NRM_REQUIRED_BASELINE} --output review_pack/NRM-006",
+    "docker compose -f compose.test.yaml down -v --remove-orphans",
+)
+NRM_REVIEW_WRITE_AHEAD_RESULT: Final = (
+    "PENDING: review command has not run; successful external finalization will replace this "
+    "record; exact duration and digests are in archive_finalization.json"
+)
+NRM_REVIEW_FINAL_RESULT: Final = (
+    "PASS: capped flat-root NRM-006 review build completed; final detached digests are in "
+    "archive_finalization.json"
+)
+NRM_TEARDOWN_WRITE_AHEAD_RESULT: Final = (
+    "PENDING: finally-guaranteed PostgreSQL teardown has not run; exact duration and result "
+    "will be recorded in archive_finalization.json"
+)
+NRM_TEARDOWN_FINAL_RESULT: Final = "PASS: PostgreSQL service and volume removed"
 
 
 def _redact_fpl_personal_text(value: str) -> str:
@@ -615,7 +690,9 @@ def calculate_review_payload_digest(
         process_runner=selected_runner,
     )
     names = (
-        ODD_PRIMARY_PAYLOAD_NAMES
+        NRM_PRIMARY_PAYLOAD_NAMES
+        if ticket == "NRM-006"
+        else ODD_PRIMARY_PAYLOAD_NAMES
         if ticket == "ODD-005"
         else FPL_PRIMARY_PAYLOAD_NAMES
         if ticket == "FPL-004"
@@ -3085,6 +3162,490 @@ def _assemble_odd_entries(
     return entries
 
 
+def _nrm_baseline_diff(root: Path, baseline: str | None, runner: ProcessRunner) -> tuple[str, str]:
+    if baseline != NRM_REQUIRED_BASELINE:
+        raise ReviewPackError(
+            "BASELINE_INVALID", "NRM-006 requires the ticket's exact baseline commit"
+        )
+    exclusions = [
+        ":(exclude)uv.lock",
+        ":(exclude)fixtures/odds/NRM-006/**",
+        ":(exclude)public_contracts/probability.schema.json",
+        ":(exclude)public_contracts/normalised_operator_market.schema.json",
+        ":(exclude)public_contracts/market_consensus.schema.json",
+        ":(exclude)public_contracts/market_normalisation_result.schema.json",
+        ":(exclude)tickets/NRM-006/**",
+        ":(exclude)specs/manifests/*.json",
+    ]
+    arguments = ["diff", "--no-ext-diff", "--binary", f"{baseline}..HEAD", "--", ".", *exclusions]
+    patch = _redact_fpl_personal_text(
+        _required_git(root, arguments, runner, code="BASELINE_DIFF_FAILED")
+    )
+    stat_text = _required_git(
+        root,
+        ["diff", "--stat", f"{baseline}..HEAD", "--", ".", *exclusions],
+        runner,
+        code="BASELINE_DIFF_FAILED",
+    )
+    changes = _required_git(
+        root,
+        ["diff", "--name-status", f"{baseline}..HEAD", "--", ".", *exclusions],
+        runner,
+        code="BASELINE_DIFF_FAILED",
+    )
+    hash_paths = (
+        "uv.lock",
+        "fixtures/odds/NRM-006/manifest.json",
+        "fixtures/odds/NRM-006/normalisation_policy.json",
+        "public_contracts/probability.schema.json",
+        "public_contracts/normalised_operator_market.schema.json",
+        "public_contracts/market_consensus.schema.json",
+        "public_contracts/market_normalisation_result.schema.json",
+        "src/dmf_pulse/database/migrations/versions/20260803_0005_nrm006_normalisation.py",
+        "evidence/tickets/NRM-006/schema_manifest.json",
+    )
+    hash_lines: list[str] = []
+    for relative in hash_paths:
+        path = root / relative
+        if path.is_file() and not path.is_symlink():
+            hash_lines.append(
+                f"- `{relative}`: {path.stat().st_size} bytes; SHA-256 `{sha256_file(path)}`"
+            )
+    file_map = (
+        "# NRM-006 file change map\n\n"
+        "## Human-authored diff stat\n\n```text\n"
+        + stat_text.rstrip()
+        + "\n```\n\n## Human-authored name/status map\n\n```text\n"
+        + changes.rstrip()
+        + "\n```\n\n## Exact generated or pack-supplied hashes\n\n"
+        + ("\n".join(hash_lines) or "No hash inputs were available.")
+        + "\n\nThe complete patch omits only the generated lock/manifests and byte-frozen "
+        "NRM-006 ticket, fixtures, expected outputs, and public schemas. Human-authored "
+        "ODD-005 remediation, normalisation, consensus, persistence, CLI, migration, "
+        "assurance, test, documentation, and durable evidence changes remain in full.\n"
+        "Personal owner/user identifiers are replaced with explicit redaction tokens only "
+        "in this external review rendering.\n\n"
+        f"Corrected Pack 1.1 manifest SHA-256: `{NRM_PACK_MANIFEST_SHA256}`. Its 79 "
+        "manifest file entries and 80 detached checksums were validated before implementation.\n"
+    )
+    return patch, file_map
+
+
+def _required_nrm_git_state(root: Path, baseline: str, runner: ProcessRunner) -> tuple[str, str]:
+    branch = _required_git(
+        root, ["rev-parse", "--abbrev-ref", "HEAD"], runner, code="REVIEW_BRANCH_INVALID"
+    ).strip()
+    if branch != NRM_REQUIRED_BRANCH:
+        raise ReviewPackError(
+            "REVIEW_BRANCH_INVALID", "NRM-006 review must use the required branch"
+        )
+    head = _required_git(
+        root, ["rev-parse", "--verify", "HEAD"], runner, code="REVIEW_HEAD_INVALID"
+    ).strip()
+    if len(head) != 40 or any(character not in "0123456789abcdef" for character in head):
+        raise ReviewPackError("REVIEW_HEAD_INVALID", "NRM-006 repository HEAD is invalid")
+    _required_git(
+        root,
+        ["merge-base", "--is-ancestor", baseline, head],
+        runner,
+        code="REVIEW_BASELINE_ANCESTRY",
+    )
+    merges = _required_git(
+        root,
+        ["rev-list", "--merges", f"{baseline}..{head}"],
+        runner,
+        code="REVIEW_HISTORY_INVALID",
+    )
+    if merges.strip():
+        raise ReviewPackError("REVIEW_HISTORY_INVALID", "NRM-006 history contains a merge commit")
+    dirty = _required_git(
+        root,
+        ["status", "--porcelain=v1", "--untracked-files=all"],
+        runner,
+        code="REVIEW_GIT_STATUS",
+    )
+    if dirty.strip():
+        raise ReviewPackError("REVIEW_TREE_DIRTY", "NRM-006 review requires a clean working tree")
+    state = f"""# NRM-006 baseline and Git state
+
+- Required baseline: `{baseline}`
+- Final HEAD: `{head}`
+- Branch: `{branch}`
+- Baseline is ancestor: `true`
+- Clean working tree: `true`
+- Merge commits since baseline: `0`
+- Pushed by Codex: `false`
+- Merged by Codex: `false`
+- Rebased/reset/tagged/amended by Codex: `false`
+"""
+    return head, state
+
+
+def _validate_nrm_complete_result(
+    result: CodexResult,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    if result.status.value != "COMPLETE":
+        return [], []
+    if result.risks:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID",
+            "COMPLETE NRM-006 review requires zero unresolved risks",
+        )
+    records = [item.model_dump(mode="json") for item in result.commands]
+    if [item.get("command") for item in records] != list(NRM_MANDATORY_ACCEPTANCE_COMMANDS):
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID",
+            "COMPLETE NRM-006 review requires the exact ordered 32-command result",
+        )
+    for index, record in enumerate(records, start=1):
+        result_text = record.get("result")
+        if (
+            record.get("exit_code") != 0
+            or not isinstance(result_text, str)
+            or not result_text.startswith("PASS:")
+            or not _valid_duration(record.get("duration_seconds"))
+            or (index == 31 and result_text != NRM_REVIEW_FINAL_RESULT)
+            or (index == 32 and result_text != NRM_TEARDOWN_FINAL_RESULT)
+            or result_text in {NRM_REVIEW_WRITE_AHEAD_RESULT, NRM_TEARDOWN_WRITE_AHEAD_RESULT}
+        ):
+            raise ReviewPackError(
+                "REVIEW_ACCEPTANCE_INVALID",
+                f"COMPLETE NRM-006 command {index} evidence is invalid",
+            )
+    expected_rows = [
+        {
+            "command": record["command"],
+            "duration_seconds": record["duration_seconds"],
+            "exit_code": record["exit_code"],
+            "expected_exit_code": 0,
+            "status": "PASS",
+        }
+        for record in records
+    ]
+    if result.acceptance != expected_rows:
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID",
+            "COMPLETE NRM-006 result acceptance does not match its exact commands",
+        )
+    return records, expected_rows
+
+
+def _nrm_percentage(value: object, minimum: float) -> bool:
+    return (
+        not isinstance(value, bool)
+        and isinstance(value, (int, float))
+        and math.isfinite(float(value))
+        and minimum <= float(value) <= 100.0
+    )
+
+
+def _validate_nrm_complete_evidence(root: Path, result: CodexResult, head: str) -> None:
+    if result.status.value != "COMPLETE":
+        return
+    records, expected_rows = _validate_nrm_complete_result(result)
+    evidence_root = root / "evidence/tickets/NRM-006"
+    try:
+        command_values = _parse_fpl_command_log((evidence_root / "commands.log").read_bytes())
+    except OSError as exc:
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID", "NRM-006 command log is unavailable"
+        ) from exc
+    if command_values != records:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "NRM-006 command log and result do not match exactly"
+        )
+
+    tests = _fpl_json_object(evidence_root / "tests.json")
+    oracles = tests.get("critical_oracles")
+    if (
+        tests.get("status") != "PASS"
+        or tests.get("failed") != 0
+        or tests.get("skipped") != 0
+        or not _positive_int(tests.get("passed"))
+        or not _nrm_percentage(tests.get("overall_branch_coverage_percent"), 90.0)
+        or not _nrm_percentage(tests.get("critical_branch_coverage_percent"), 95.0)
+        or not _nrm_percentage(tests.get("math_branch_coverage_percent"), 100.0)
+        or not isinstance(oracles, list)
+        or len(oracles) < 10
+        or not all(isinstance(item, str) and item for item in oracles)
+        or result.tests != [tests]
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID",
+            "NRM-006 test, coverage, zero-skip, or critical-oracle evidence is incomplete",
+        )
+
+    acceptance = _fpl_json_object(evidence_root / "acceptance_matrix.json")
+    if (
+        set(acceptance) != {"commands", "failed", "passed", "status", "ticket_id"}
+        or acceptance.get("ticket_id") != "NRM-006"
+        or acceptance.get("status") != "COMPLETE"
+        or acceptance.get("passed") != 32
+        or acceptance.get("failed") != 0
+        or acceptance.get("commands") != expected_rows
+        or result.acceptance != expected_rows
+    ):
+        raise ReviewPackError(
+            "REVIEW_ACCEPTANCE_INVALID", "NRM-006 acceptance matrix is incomplete"
+        )
+    try:
+        manifest = validate_ticket_evidence(root, "NRM-006")
+    except Exception as exc:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "NRM-006 evidence manifest or hashes are invalid"
+        ) from exc
+    if (
+        manifest.status != "COMPLETE"
+        or manifest.code_commit != head
+        or manifest.context_hash != NRM_PACK_MANIFEST_SHA256
+        or manifest.commands != records
+        or manifest.known_limitations
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "NRM-006 evidence provenance is incomplete"
+        )
+
+    migration = _fpl_json_object(evidence_root / "migration_matrix.json")
+    database = migration.get("database")
+    offline = migration.get("offline_sql")
+    schema = migration.get("schema")
+    matrix = migration.get("matrix")
+    if (
+        migration.get("status") != "PASS"
+        or migration.get("ticket_id") != "NRM-006"
+        or migration.get("baseline_revision") != "20260725_0004"
+        or migration.get("target_revision") != "20260803_0005"
+        or migration.get("revisions") != ["20260803_0005"]
+        or migration.get("revision_count") != 1
+        or migration.get("metadata_drift_check") != "PASS"
+        or not isinstance(database, dict)
+        or database.get("postgres_version") != "18.4"
+        or not isinstance(offline, dict)
+        or offline.get("secret_free") is not True
+        or offline.get("path") != "evidence/tickets/NRM-006/offline_upgrade.sql"
+        or not isinstance(schema, dict)
+        or schema.get("alembic_revision") != "20260803_0005"
+        or re.fullmatch(r"[0-9a-f]{64}", str(schema.get("schema_sha256"))) is None
+        or not isinstance(matrix, list)
+        or len(matrix) < 3
+        or not all(isinstance(item, dict) and item.get("status") == "PASS" for item in matrix)
+    ):
+        raise ReviewPackError("REVIEW_EVIDENCE_INVALID", "NRM-006 migration evidence is incomplete")
+
+    verification = _fpl_json_object(evidence_root / "acceptance_verification.json")
+    git = verification.get("git")
+    package = verification.get("package")
+    if (
+        verification.get("status") != "PASS"
+        or not isinstance(git, dict)
+        or git.get("baseline") != NRM_REQUIRED_BASELINE
+        or git.get("branch") != NRM_REQUIRED_BRANCH
+        or git.get("clean") is not True
+        or git.get("head") != head
+        or not isinstance(package, dict)
+        or package.get("network_requests") != 0
+        or package.get("cleaned_up") is not True
+    ):
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "NRM-006 independent verification is incomplete"
+        )
+    if _fpl_json_object(evidence_root / "security_scan.json") != {
+        "finding_count": 0,
+        "status": "PASS",
+    }:
+        raise ReviewPackError(
+            "REVIEW_EVIDENCE_INVALID", "NRM-006 security scan does not prove zero findings"
+        )
+
+
+def _nrm_review_index(status: str, head: str, baseline: str, limitations: str) -> str:
+    return f"""# NRM-006 review index
+
+NRM-006 closes the mandatory ODD-005 temporal, retry, duplicate, and provenance findings and implements deterministic Decimal odds normalisation, complete-book filtering, equal-operator consensus, uncertainty, confidence, as-of persistence, and exact cache lineage. Acceptance status: **{status}**.
+
+Baseline: `{baseline}`. Final repository HEAD: `{head}`. Read files 02, 16, 03, then the focused technical reviews in 05-14.
+
+`payload_sha256` is the stable digest ledger for files 01-17. File 19 hashes files 01-18; file 20 hashes files 01-19. The archive SHA-256 and CRC result are recorded externally after construction because an archive cannot embed its own digest.
+
+Commands 31-32 use explicit write-ahead records so review construction executes once and PostgreSQL teardown remains finally guaranteed. The deterministic assembler may refresh the validated archive after finalization without claiming a second acceptance invocation.
+
+## Exact unresolved issues
+
+{limitations.rstrip() or "None."}
+
+No live FPL, The Odds API, or other provider request; real credential; push; merge; rebase; reset; tag; amend; or repository-visibility change is part of this milestone.
+"""
+
+
+def _assemble_nrm_entries(
+    root: Path,
+    *,
+    baseline: str | None,
+    generated_at: str,
+    process_runner: ProcessRunner,
+) -> list[ReviewEntry]:
+    paths = ticket_paths(root, "NRM-006")
+    validated = validate_evidence_file(paths.evidence / "codex_result.json")
+    if not isinstance(validated.model, CodexResult) or validated.model.ticket_id != "NRM-006":
+        raise ReviewPackError(
+            "CODEX_RESULT_INVALID", "NRM-006 codex_result has the wrong evidence kind"
+        )
+    result = validated.model
+    if baseline is None:
+        raise ReviewPackError("BASELINE_INVALID", "NRM-006 baseline is required")
+    head, git_state = _required_nrm_git_state(root, baseline, process_runner)
+    patch, file_map = _nrm_baseline_diff(root, baseline, process_runner)
+    if result.status.value == "COMPLETE" and result.code_commit != head:
+        raise ReviewPackError(
+            "REVIEW_COMMIT_MISMATCH", "COMPLETE result does not identify final HEAD"
+        )
+    _validate_nrm_complete_evidence(root, result, head)
+    evidence_root = "evidence/tickets/NRM-006"
+    limitations = _required_text(root, f"{evidence_root}/KNOWN_LIMITATIONS.md")
+    entries = [
+        _entry(
+            "01_REVIEW_INDEX.md",
+            _nrm_review_index(result.status.value, head, baseline, limitations),
+            "review navigation and detached-hash semantics",
+        ),
+        _entry("02_BASELINE_AND_GIT_STATE.md", git_state, "exact baseline and clean Git state"),
+        _entry(
+            "03_COMPLETE_HUMAN_PATCH.diff", patch, "complete human-authored patch from baseline"
+        ),
+        _entry("04_FILE_CHANGE_MAP.md", file_map, "change map and governed-input hashes"),
+        _entry(
+            "05_PUBLIC_CONTRACTS.md",
+            _required_text(root, f"{evidence_root}/PUBLIC_CONTRACTS.md"),
+            "library, CLI, model, probability, and JSON Schema contracts",
+        ),
+        _entry(
+            "06_MIGRATION_SCHEMA_REVIEW.md",
+            _required_text(root, f"{evidence_root}/MIGRATION_SCHEMA_REVIEW.md"),
+            "migration matrix, immutable schema, constraints, downgrade, and re-upgrade",
+        ),
+        _entry(
+            "07_ODD005_REMEDIATION.md",
+            _required_text(root, f"{evidence_root}/ODD005_REMEDIATION.md"),
+            "mandatory inherited ODD-005 finding closure",
+        ),
+        _entry(
+            "08_TEMPORAL_MAPPING_USABLE_AT.md",
+            _required_text(root, f"{evidence_root}/TEMPORAL_MAPPING_USABLE_AT.md"),
+            "post-commit attestation, mapping cutoff, repair, and temporal canaries",
+        ),
+        _entry(
+            "09_RETRY_DUPLICATE_PROVENANCE.md",
+            _required_text(root, f"{evidence_root}/RETRY_DUPLICATE_PROVENANCE.md"),
+            "bounded 429 retry, quota integrity, duplicate evidence, and provenance",
+        ),
+        _entry(
+            "10_NORMALISATION_NUMERICS.md",
+            _required_text(root, f"{evidence_root}/NORMALISATION_NUMERICS.md"),
+            "Decimal proportional/power mathematics and exact golden projections",
+        ),
+        _entry(
+            "11_CONSENSUS_CONFIDENCE.md",
+            _required_text(root, f"{evidence_root}/CONSENSUS_CONFIDENCE.md"),
+            "operator consensus, completeness, disagreement, freshness, and confidence",
+        ),
+        _entry(
+            "12_ASOF_CACHE_CONCURRENCY.md",
+            _required_text(root, f"{evidence_root}/ASOF_CACHE_CONCURRENCY.md"),
+            "as-of stability, dependency signatures, immutable reuse, and concurrency",
+        ),
+        _entry(
+            "13_TESTS_AND_COVERAGE.md",
+            _required_text(root, f"{evidence_root}/TESTS_AND_COVERAGE.md"),
+            "zero-skip suites, branch coverage, negative controls, and fixture oracles",
+        ),
+        _entry(
+            "14_SECURITY_RIGHTS_WHEEL.md",
+            _required_text(root, f"{evidence_root}/SECURITY_RIGHTS_WHEEL.md"),
+            "rights, secrets, no-network proof, installed wheel, CLI, and cleanup",
+        ),
+        _entry(
+            "15_COMMANDS_AND_RESULTS.log",
+            _required_text(root, f"{evidence_root}/commands.log"),
+            "exact command, exit, duration, and result ledger",
+        ),
+        _entry(
+            "16_ACCEPTANCE_MANIFEST.json",
+            _required_text(root, f"{evidence_root}/acceptance_matrix.json"),
+            "structured exact 32-command acceptance manifest",
+        ),
+        _entry("17_KNOWN_LIMITATIONS.md", limitations, "exact limitations and open questions"),
+        _entry("18_CODEX_RESULT.json", pretty_json(result), "structured implementation result"),
+    ]
+    entries = [
+        ReviewEntry(
+            name=item.name,
+            data=_redact_fpl_personal_text(item.data.decode("utf-8")).encode("utf-8"),
+            purpose=item.purpose,
+        )
+        for item in entries
+    ]
+    payload = {entry.name: entry.data for entry in entries}
+    payload_sha256 = _primary_payload_digest(payload, NRM_PRIMARY_PAYLOAD_NAMES)
+    manifest = ReviewManifest(
+        ticket_id="NRM-006",
+        generated_at=generated_at,
+        repository_head=head,
+        baseline=baseline,
+        file_count=len(NRM_PREFERRED_NAMES),
+        files=[
+            ReviewFile(
+                name=item.name,
+                sha256=_sha256_bytes(item.data),
+                bytes=len(item.data),
+                purpose=item.purpose,
+            )
+            for item in entries
+        ],
+        acceptance_status=result.status,
+        payload_sha256=payload_sha256,
+        archive_sha256=None,
+    )
+    entries.append(
+        _entry(FPL_MANIFEST_NAME, pretty_json(manifest), "detached archive payload manifest")
+    )
+    entries.sort(key=lambda item: item.name)
+    entries.append(
+        _entry(
+            CHECKSUM_NAME,
+            "".join(f"{_sha256_bytes(item.data)}  {item.name}\n" for item in entries),
+            "detached checksum ledger",
+        )
+    )
+    entries.sort(key=lambda item: item.name)
+    enforce_review_limit(entries)
+    if tuple(item.name for item in entries) != NRM_PREFERRED_NAMES:
+        raise ReviewPackError(
+            "REVIEW_PACK_LAYOUT", "NRM-006 review pack does not match its exact capped contract"
+        )
+    if (
+        set(item.name for item in entries if item.name not in {FPL_MANIFEST_NAME, CHECKSUM_NAME})
+        != NRM_DETACHED_REVIEW_NAMES
+    ):
+        raise ReviewPackError("REVIEW_PACK_LAYOUT", "NRM-006 detached manifest layout drifted")
+    for item in entries:
+        lowered = item.data.lower()
+        if b"sebastian" in lowered or b"sebgr" in lowered or b"c:\\users\\" in lowered:
+            raise ReviewPackError(
+                "REVIEW_PACK_PERSONAL_DATA",
+                f"personal identifier or Windows user path detected in {item.name}",
+            )
+        if any(marker in item.data for marker in (*FPL_FORBIDDEN_MARKERS, *ODD_FORBIDDEN_MARKERS)):
+            raise ReviewPackError(
+                "REVIEW_PACK_RAW_PAYLOAD",
+                f"forbidden raw-body or fake-secret marker detected in {item.name}",
+            )
+        if scan_text(item.data.decode("utf-8"), path=item.name):
+            raise ReviewPackError(
+                "REVIEW_PACK_SECRET", f"secret-like content detected in {item.name}"
+            )
+    return entries
+
+
 def _assemble_for_ticket(
     root: Path,
     *,
@@ -3122,6 +3683,13 @@ def _assemble_for_ticket(
         )
     if validated_ticket == "ODD-005":
         return _assemble_odd_entries(
+            root,
+            baseline=baseline,
+            generated_at=generated_at,
+            process_runner=process_runner,
+        )
+    if validated_ticket == "NRM-006":
+        return _assemble_nrm_entries(
             root,
             baseline=baseline,
             generated_at=generated_at,
@@ -3170,7 +3738,9 @@ def build_review_pack(
         process_runner=selected_runner,
     )
     primary_names = (
-        ODD_PRIMARY_PAYLOAD_NAMES
+        NRM_PRIMARY_PAYLOAD_NAMES
+        if validated_ticket == "NRM-006"
+        else ODD_PRIMARY_PAYLOAD_NAMES
         if validated_ticket == "ODD-005"
         else FPL_PRIMARY_PAYLOAD_NAMES
         if validated_ticket == "FPL-004"
@@ -3185,7 +3755,7 @@ def build_review_pack(
     )
     result_name = (
         "18_CODEX_RESULT.json"
-        if validated_ticket in {"FPL-004", "ODD-005"}
+        if validated_ticket in {"FPL-004", "ODD-005", "NRM-006"}
         else "02_CODEX_RESULT.json"
     )
     result_entry = next(item for item in entries if item.name == result_name)
@@ -3199,7 +3769,9 @@ def build_review_pack(
             "codex_result review-pack digest does not match the detached primary payload",
         )
     zip_name = (
-        ODD_REVIEW_ZIP_NAME
+        NRM_REVIEW_ZIP_NAME
+        if validated_ticket == "NRM-006"
+        else ODD_REVIEW_ZIP_NAME
         if validated_ticket == "ODD-005"
         else FPL_REVIEW_ZIP_NAME
         if validated_ticket == "FPL-004"
@@ -3312,9 +3884,16 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
 
     try:
         result = CodexResult.model_validate_json(payload[result_name])
-        if result.ticket_id not in {"FND-001", "RUL-002", "DAT-003", "FPL-004", "ODD-005"}:
+        if result.ticket_id not in {
+            "FND-001",
+            "RUL-002",
+            "DAT-003",
+            "FPL-004",
+            "ODD-005",
+            "NRM-006",
+        }:
             raise ReviewPackError("REVIEW_TICKET_UNSUPPORTED", "review ZIP ticket is unsupported")
-        if stage_layout != (result.ticket_id in {"FPL-004", "ODD-005"}):
+        if stage_layout != (result.ticket_id in {"FPL-004", "ODD-005", "NRM-006"}):
             raise ReviewPackError("REVIEW_PACK_LAYOUT", "review ZIP ticket layout is inconsistent")
         if result.ticket_id == "FPL-004":
             records, _expected_rows = _validate_fpl_complete_result(result)
@@ -3334,8 +3913,19 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
                         "REVIEW_ACCEPTANCE_INVALID",
                         "ODD-005 detached command log and result do not match exactly",
                     )
+        if result.ticket_id == "NRM-006":
+            records, _expected_rows = _validate_nrm_complete_result(result)
+            if result.status.value == "COMPLETE":
+                command_log = payload.get("15_COMMANDS_AND_RESULTS.log")
+                if command_log is None or _parse_fpl_command_log(command_log) != records:
+                    raise ReviewPackError(
+                        "REVIEW_ACCEPTANCE_INVALID",
+                        "NRM-006 detached command log and result do not match exactly",
+                    )
         preferred = (
-            ODD_PREFERRED_NAMES
+            NRM_PREFERRED_NAMES
+            if result.ticket_id == "NRM-006"
+            else ODD_PREFERRED_NAMES
             if result.ticket_id == "ODD-005"
             else FPL_PREFERRED_NAMES
             if result.ticket_id == "FPL-004"
@@ -3379,7 +3969,9 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
         if digest != _sha256_bytes(payload[name]):
             raise ReviewPackError("REVIEW_CHECKSUM_HASH", f"checksum mismatch for {name}")
     primary_names = (
-        ODD_PRIMARY_PAYLOAD_NAMES
+        NRM_PRIMARY_PAYLOAD_NAMES
+        if result.ticket_id == "NRM-006"
+        else ODD_PRIMARY_PAYLOAD_NAMES
         if result.ticket_id == "ODD-005"
         else FPL_PRIMARY_PAYLOAD_NAMES
         if result.ticket_id == "FPL-004"
@@ -3453,6 +4045,20 @@ def validate_review_zip(path: Path) -> ReviewPackSummary:
     if result.ticket_id == "ODD-005" and manifest.payload_sha256 != payload_sha256:
         raise ReviewPackError(
             "REVIEW_PAYLOAD_DIGEST", "ODD-005 review manifest payload digest does not match"
+        )
+    if result.ticket_id == "NRM-006" and (
+        result.code_commit is None
+        or manifest.repository_head != result.code_commit
+        or manifest.baseline != NRM_REQUIRED_BASELINE
+        or result.repository is None
+        or result.repository.head != manifest.repository_head
+    ):
+        raise ReviewPackError(
+            "REVIEW_PROVENANCE_MISMATCH", "NRM-006 review provenance is contradictory"
+        )
+    if result.ticket_id == "NRM-006" and manifest.payload_sha256 != payload_sha256:
+        raise ReviewPackError(
+            "REVIEW_PAYLOAD_DIGEST", "NRM-006 review manifest payload digest does not match"
         )
     if (
         result.status.value == "COMPLETE"

@@ -915,11 +915,14 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
         validate_repository_manifest,
     )
 
+    nrm_path = root / "evidence/tickets/NRM-006/current_manifest.json"
     odd_path = root / "evidence/tickets/ODD-005/current_manifest.json"
     fpl_path = root / "evidence/tickets/FPL-004/current_manifest.json"
     dat_path = root / "evidence/tickets/DAT-003/current_manifest.json"
     active_path = (
-        odd_path
+        nrm_path
+        if (root / "tickets/NRM-006/ticket.yaml").is_file()
+        else odd_path
         if (root / "tickets/ODD-005/ticket.yaml").is_file()
         else fpl_path
         if (root / "tickets/FPL-004/ticket.yaml").is_file()
@@ -1370,7 +1373,9 @@ def main() -> int:
         "status": "PASS" if not errors else "FAIL",
     }
     active_ticket = (
-        "ODD-005"
+        "NRM-006"
+        if (root / "tickets/NRM-006/ticket.yaml").is_file()
+        else "ODD-005"
         if (root / "tickets/ODD-005/ticket.yaml").is_file()
         else "FPL-004"
         if (root / "tickets/FPL-004/ticket.yaml").is_file()

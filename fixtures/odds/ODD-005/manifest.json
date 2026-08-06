@@ -33,11 +33,11 @@
       "synthetic": true
     },
     {
-      "bytes": 958,
+      "bytes": 1330,
       "path": "fixtures/odds/ODD-005/mapping_plan.json",
       "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
       "rights_profile": "synthetic_the_odds_api_v1",
-      "sha256": "8b49bd896faf2cbcbf3e643c7b55a4fa73eca6a52cbc0dc9c02a1a20889b79bb",
+      "sha256": "e6d46fd345c83ff303b1fbbdf1cf1720bfa2c84a828e4373affe32ff570a96c0",
       "synthetic": true
     },
     {
@@ -73,11 +73,11 @@
       "synthetic": true
     },
     {
-      "bytes": 1233,
+      "bytes": 1539,
       "path": "fixtures/odds/ODD-005/scenarios.json",
       "purpose": "ODD-005 deterministic synthetic provider-shaped fixture",
       "rights_profile": "synthetic_the_odds_api_v1",
-      "sha256": "8f027197c6b89f21e94bf745b059efdd78c8fda8de7cb29a05cd4ea269770824",
+      "sha256": "98de1cd312fbe80498ca282791d59a5249b62fd408542e3bcd7163d5473e2050",
       "synthetic": true
     },
     {

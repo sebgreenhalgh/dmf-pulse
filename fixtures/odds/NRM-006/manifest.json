@@ -1,0 +1,92 @@
+{
+  "fixture_manifest_version": "nrm-006-fixtures-v1.1",
+  "ticket": "NRM-006",
+  "generated_at": "2026-08-06T14:15:00Z",
+  "entries": [
+    {
+      "path": "fixtures/odds/NRM-006/balanced_book.json",
+      "sha256": "c04738977d654f1a9a62f2d9b225d1690feaef54f0ae80324ccec6bdcda6d600",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/duplicate_outcome_same_payload.json",
+      "sha256": "ba9891d639e728a8b9de258798b1aae947ae48b4e71fdbeb8949fdc210f0378d",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/future_mapping_canaries.json",
+      "sha256": "471dd13ac95f27f0e34b6352e50253ea5139bdbc1b202ba4c43278282f217b7c",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/happy_path_market_query.json",
+      "sha256": "ec556ddd6edf2f57f1489fb1c7641fb4cca244c88438c879e353e84dc761eafa",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/heavy_favourite.json",
+      "sha256": "568426cc222f4ab9ab259786e861f4d4f54d23787a17c8b127e595a6e17da63f",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/high_overround.json",
+      "sha256": "f21e20f565703a212f5580df584a8c57b26bbd384d75ea222ada84e40d320d1e",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/incomplete_book.json",
+      "sha256": "20f22c958c19949a786a009d17386687abf737e08c288081c76461b8d2d263f9",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/normalisation_policy.json",
+      "sha256": "201a3450482287b6e9a7929bc25f2c97375d1eccf67b239462644ae983242f18",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/processing_crosses_cutoff.json",
+      "sha256": "e70a03b0d1d3195ae83a97ce2671d94abb15b4765e34bb210a5cbb33a8aba715",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/rate_limit_retry.json",
+      "sha256": "f5e85faa12fd1655f70b405c3ddd0cc801edca27c1b0607c5838af6bdeeb68e6",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/same_value_reobservation.json",
+      "sha256": "b92d987a289a0ac91b97be2e108c6f97b104c7b836f4d2b88686f8cde9702283",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/odds/NRM-006/stale_mixed_books.json",
+      "sha256": "935fef14f59f47cd8a547db4a5773c0f13bf1c8178f11f06d4d09e1820ada4c7",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    }
+  ],
+  "oracles": [
+    "expected_outputs/balanced_book.json",
+    "expected_outputs/duplicate_outcome_same_payload.json",
+    "expected_outputs/future_mapping_canaries.json",
+    "expected_outputs/happy_path_consensus.json",
+    "expected_outputs/heavy_favourite.json",
+    "expected_outputs/high_overround.json",
+    "expected_outputs/incomplete_book.json",
+    "expected_outputs/processing_crosses_cutoff.json",
+    "expected_outputs/rate_limit_retry.json",
+    "expected_outputs/same_value_reobservation.json",
+    "expected_outputs/stale_mixed_books.json"
+  ]
+}

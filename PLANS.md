@@ -1,5 +1,33 @@
 # DMF Pulse execution plans
 
+## NRM-006 - odds normalisation and consensus baseline
+
+- Ticket/stage: `NRM-006`, A6.
+- Required branch/baseline: `stage/A6/NRM-006-odds-normalisation` from `e36ea84cda9e80191a9160d037f8e7035477b9b1`.
+- Outcome: close every frozen ODD-005 temporal/provenance finding, then transform complete operator-specific full-time 1X2 observations into exact raw implied, proportional, power, equal-operator consensus, uncertainty, freshness, confidence, and immutable as-of output.
+- Constraints: offline synthetic/fake/scripted inputs only; no real credential, additional provider, raw odds redistribution, Shin production, exchange/player-prop/other market family, learned calibration, forecast, optimiser, scheduler, API/UI, new dependency, SQLite, push, merge, rebase, reset, tag, or amend.
+
+### NRM-006 checkpoints
+
+- [x] 2026-08-06 - validated corrected Pack 1.1 (79 manifest entries, 80 detached checksums, zero errors), exact branch/base and sole permitted Pack 1.0 blocker residue, complete corrected quota fixture, Docker/Compose/PostgreSQL 18.4, Alembic head `20260725_0004`, and the inherited suite at 882 passed with zero skips.
+- [x] NRM-006.0 - preserved the Pack 1.0 blocker byte-for-byte and recorded Pack 1.1 quota and post-commit-attestation authority resolution.
+- [x] NRM-006.1 - implemented post-commit publication attestation and cutoff-safe historical mapping across odds promotion and strict reads.
+- [x] NRM-006.2 - closed 429 retry, synthetic provenance, duplicate-evidence, reobservation-lineage, and mapping-validity findings.
+- [x] NRM-006.3 - implemented exact Decimal proportional/power normalisation, operator grouping, consensus, uncertainty, freshness, confidence, and frozen goldens.
+- [x] NRM-006.4 - added immutable PostgreSQL persistence, reversible `20260803_0005` migration, as-of/cache/concurrency guarantees, CLI/API, wheel, and assurance tooling.
+- [x] 2026-08-06 - passed pre-commit Ruff, strict mypy, PostgreSQL migration, golden, temporal, installed-wheel, security, critical-coverage, and full-suite gates; the final full regression recorded 1,056 passed with zero skips before the fail-closed Windows entry-point hardening, whose focused unit and installed-wheel checks also passed.
+- [x] 2026-08-06 - closed the subsequent independent P1 audit findings: post-commit clock ownership, single-budget retry/quota behavior, canonical duplicate identity, historical mapping/rights/quality revalidation, operator/fixture grouping, policy-driven confidence, code/dependency identity, relational lineage, and correction concurrency. The post-remediation full suite, migration/concurrency matrix, static gates, and focused security/temporal checks passed with zero skips; a final independent read-only audit found no remaining P0/P1 issue.
+- [ ] Final - resolve independent P0/P1 review, commit the green ticket, run all 32 literal acceptance commands, and validate the capped root-only review ZIP.
+
+### NRM-006 decision log
+
+- Pack 1.1 preserves the inherited all-or-nothing quota-header rule and corrects the frozen retry fixture; partial evidence stays invalid.
+- Strict eligibility requires an immutable post-commit attestation. Canonical activation and USABLE lifecycle commit atomically first; the injected clock is sampled only after acknowledgement, and failed attestation cannot backdate recovery.
+- Strict replay uses one explicit mapping cutoff for valid/system-time mappings, aliases, and attested fixture schedule observations. Synthetic evidence is TEST_ONLY and cannot assert official-source verification.
+- POWER is primary and PROPORTIONAL is retained baseline/fallback under local Decimal precision 60, HALF_EVEN, exactly 256 bisections, and exact 12-place public vector residual handling.
+- Normalise complete operator books separately, then use equal canonical-operator consensus. No cross-operator book, stale fill, learned weight, or future-stage market/model capability is permitted.
+- Exact dependency signatures and immutable source-observation IDs govern cache reuse; equal prices from a later retrieval retain distinct run/evidence lineage.
+
 ## ODD-005 - FPL remediation and odds-provider foundation
 
 - Ticket/stage: `ODD-005`, A5.

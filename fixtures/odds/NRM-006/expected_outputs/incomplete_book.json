@@ -1,0 +1,15 @@
+{
+  "status": "INSUFFICIENT",
+  "reason": "NO_ELIGIBLE_COMPLETE_BOOK",
+  "eligible_operator_count": 0,
+  "excluded_books": [
+    {
+      "operator_key": "book_incomplete",
+      "reason": "INCOMPLETE"
+    }
+  ],
+  "contains_probabilities": false,
+  "policy_id": "market-normalisation-v1",
+  "policy_sha256": "4cdcc026240ddfab9eda18cbcc60b8757b0ce9238322aa3b9e0798a7f1ebd040",
+  "semantic_result_sha256": "21b9f850927d323cf351e8e3a502865573892b3e66c2e8319d528ec1167b44bd"
+}

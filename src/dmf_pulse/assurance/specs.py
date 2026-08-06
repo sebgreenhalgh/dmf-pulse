@@ -28,7 +28,7 @@ FPL004_FROZEN_INPUTS = {
 }
 ODD005_FROZEN_INPUTS = {
     "fixtures/odds/ODD-005/manifest.json": (
-        "97d123ad5dff035996c26870ad48fc8d6cd8bda99179620a270bb1a977518ebc"
+        "b02bb6d02d6454fb39cb79170cc63b5e21e19a639623151a3d11edf3fe564f96"
     ),
     "public_contracts/market_observation.schema.json": (
         "be1e753ad192368fbd8a2b82383cd86e07be2104ba5595e1ea81b5581144f217"
@@ -67,6 +67,143 @@ ODD005_FROZEN_INPUTS = {
         "584e2a60ccaf4876f979510b7866a37ee27357e487f8fc48c87f6a181bf6ca37"
     ),
 }
+NRM006_FROZEN_INPUTS = {
+    "tickets/NRM-006/ticket.yaml": (
+        "932cc44fe23c92b3ac01d027b9eb1d768fe7797cf1b2a0cf8148575e9bc16f0a",
+        3363,
+    ),
+    "tickets/NRM-006/ACCEPTANCE.md": (
+        "3b15b46472b9b2ee73abbb69f5ce481ec51132c96ae56435ed1f9f05aa8656f8",
+        10572,
+    ),
+    "public_contracts/probability.schema.json": (
+        "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
+        338,
+    ),
+    "public_contracts/normalised_operator_market.schema.json": (
+        "b2c9e4fe19edeec5dd45debc14de159a7233cc97b9b00edd14e37312977fc06e",
+        3278,
+    ),
+    "public_contracts/market_consensus.schema.json": (
+        "2a44943bf1e6fc0530c390d7da30a043c8ad1d3af528ee30fd6f35df5c6ba306",
+        3313,
+    ),
+    "public_contracts/market_normalisation_result.schema.json": (
+        "4a8fb4925fede0b569913ad252fd483f1f04d28f2167c328ebefe3fa12cc7164",
+        1829,
+    ),
+    "fixtures/odds/NRM-006/manifest.json": (
+        "a63bd28ef7fcea90c56697ee0e77dc28ec10f63b53bdd794d21aa84815d85d23",
+        3518,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/balanced_book.json": (
+        "148a7d2d8af16d62f87fe72d37c557ebe21c8bde85d4a7a8d07a8d320daf058e",
+        1144,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/duplicate_outcome_same_payload.json": (
+        "18afaec209296e018fa63ece08c6201fb5c2c9666135c2f99cc7f09c92b13dfd",
+        101,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/future_mapping_canaries.json": (
+        "ac17153205e345694b883e1d9dfe7e80351299a3bfe5c457bd3935aa714cfc89",
+        165,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/happy_path_consensus.json": (
+        "7b26a39f14b497d2d68a4e063be5feba1dd8e974214251c2136745ef148a7a31",
+        3127,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/heavy_favourite.json": (
+        "36a15135519b9223a04fb6df84df8950005fe32cf61c7839e3e7aa55e549237c",
+        1147,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/high_overround.json": (
+        "159261037ef45b93fc54743572dee28ace007b223df162782d66a1c9cf1128b8",
+        1145,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/incomplete_book.json": (
+        "804eec074eab35e3da8eed245508b5a306948eb2ca98791f03b60c53d6ee5640",
+        473,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/processing_crosses_cutoff.json": (
+        "638f01644ec20302cfab2749fff4df5d22179174d7f6e7aedbb554f0f4290f9a",
+        337,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/rate_limit_retry.json": (
+        "72431b449f943b3980cea059a98201c92e38b4f9f315de245b3aa1bcd0291fd6",
+        130,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/same_value_reobservation.json": (
+        "e78f4a350c511137b74df1e06806e6ff79ceeb82557b298d304fcbdf85393d95",
+        145,
+    ),
+    "fixtures/odds/NRM-006/expected_outputs/stale_mixed_books.json": (
+        "abeaa6958631527a6323ad7ad0f12ed4695bcefe1ae115aeece417aee1e28315",
+        2303,
+    ),
+}
+NRM006_FIXTURE_ENTRIES = {
+    "fixtures/odds/NRM-006/balanced_book.json": (
+        "c04738977d654f1a9a62f2d9b225d1690feaef54f0ae80324ccec6bdcda6d600",
+        236,
+    ),
+    "fixtures/odds/NRM-006/duplicate_outcome_same_payload.json": (
+        "ba9891d639e728a8b9de258798b1aae947ae48b4e71fdbeb8949fdc210f0378d",
+        453,
+    ),
+    "fixtures/odds/NRM-006/future_mapping_canaries.json": (
+        "471dd13ac95f27f0e34b6352e50253ea5139bdbc1b202ba4c43278282f217b7c",
+        425,
+    ),
+    "fixtures/odds/NRM-006/happy_path_market_query.json": (
+        "ec556ddd6edf2f57f1489fb1c7641fb4cca244c88438c879e353e84dc761eafa",
+        4434,
+    ),
+    "fixtures/odds/NRM-006/heavy_favourite.json": (
+        "568426cc222f4ab9ab259786e861f4d4f54d23787a17c8b127e595a6e17da63f",
+        239,
+    ),
+    "fixtures/odds/NRM-006/high_overround.json": (
+        "f21e20f565703a212f5580df584a8c57b26bbd384d75ea222ada84e40d320d1e",
+        237,
+    ),
+    "fixtures/odds/NRM-006/incomplete_book.json": (
+        "20f22c958c19949a786a009d17386687abf737e08c288081c76461b8d2d263f9",
+        218,
+    ),
+    "fixtures/odds/NRM-006/normalisation_policy.json": (
+        "201a3450482287b6e9a7929bc25f2c97375d1eccf67b239462644ae983242f18",
+        1186,
+    ),
+    "fixtures/odds/NRM-006/processing_crosses_cutoff.json": (
+        "e70a03b0d1d3195ae83a97ce2671d94abb15b4765e34bb210a5cbb33a8aba715",
+        340,
+    ),
+    "fixtures/odds/NRM-006/rate_limit_retry.json": (
+        "f5e85faa12fd1655f70b405c3ddd0cc801edca27c1b0607c5838af6bdeeb68e6",
+        540,
+    ),
+    "fixtures/odds/NRM-006/same_value_reobservation.json": (
+        "b92d987a289a0ac91b97be2e108c6f97b104c7b836f4d2b88686f8cde9702283",
+        449,
+    ),
+    "fixtures/odds/NRM-006/stale_mixed_books.json": (
+        "935fef14f59f47cd8a547db4a5773c0f13bf1c8178f11f06d4d09e1820ada4c7",
+        4434,
+    ),
+}
+NRM006_ORACLE_PATHS = (
+    "expected_outputs/balanced_book.json",
+    "expected_outputs/duplicate_outcome_same_payload.json",
+    "expected_outputs/future_mapping_canaries.json",
+    "expected_outputs/happy_path_consensus.json",
+    "expected_outputs/heavy_favourite.json",
+    "expected_outputs/high_overround.json",
+    "expected_outputs/incomplete_book.json",
+    "expected_outputs/processing_crosses_cutoff.json",
+    "expected_outputs/rate_limit_retry.json",
+    "expected_outputs/same_value_reobservation.json",
+    "expected_outputs/stale_mixed_books.json",
+)
 
 
 class SpecValidationError(ValueError):
@@ -94,6 +231,12 @@ class FrozenInputValidationError(ValueError):
 class OddFrozenInputValidationError(FrozenInputValidationError):
     def __init__(self, errors: list[str]) -> None:
         ValueError.__init__(self, "ODD-005 frozen inputs are invalid")
+        self.errors = tuple(errors)
+
+
+class NrmFrozenInputValidationError(FrozenInputValidationError):
+    def __init__(self, errors: list[str]) -> None:
+        ValueError.__init__(self, "NRM-006 frozen inputs are invalid")
         self.errors = tuple(errors)
 
 
@@ -224,6 +367,138 @@ def validate_odd005_frozen_inputs(root: Path) -> dict[str, object]:
         "fixture_entry_count": len(fixture_actual),
         "fixture_files": dict(sorted(fixture_actual.items())),
         "ok": True,
+    }
+
+
+def validate_nrm006_frozen_inputs(root: Path) -> dict[str, object]:
+    """Verify every installed Pack 1.1 NRM fixture, oracle, schema, and ticket byte."""
+
+    root = root.resolve()
+    errors: list[str] = []
+    actual: dict[str, str] = {}
+    for relative, (expected_digest, expected_bytes) in NRM006_FROZEN_INPUTS.items():
+        path = root / relative
+        if path.is_symlink() or not path.is_file():
+            errors.append(f"{relative}: missing or non-regular frozen input")
+            continue
+        try:
+            size = path.stat().st_size
+            digest = _digest(path)
+        except OSError:
+            errors.append(f"{relative}: unavailable frozen input")
+            continue
+        actual[relative] = digest
+        if size != expected_bytes:
+            errors.append(f"{relative}: frozen byte-size mismatch")
+        if digest != expected_digest:
+            errors.append(f"{relative}: frozen SHA-256 mismatch")
+
+    fixture_root = (root / "fixtures/odds/NRM-006").resolve()
+    manifest_path = fixture_root / "manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        errors.append(f"fixtures/odds/NRM-006/manifest.json: invalid: {type(exc).__name__}")
+        manifest = {}
+    entries = manifest.get("entries") if isinstance(manifest, dict) else None
+    oracles = manifest.get("oracles") if isinstance(manifest, dict) else None
+    if (
+        not isinstance(manifest, dict)
+        or set(manifest)
+        != {"entries", "fixture_manifest_version", "generated_at", "oracles", "ticket"}
+        or manifest.get("fixture_manifest_version") != "nrm-006-fixtures-v1.1"
+        or manifest.get("ticket") != "NRM-006"
+        or manifest.get("generated_at") != "2026-08-06T14:15:00Z"
+        or not isinstance(entries, list)
+        or len(entries) != len(NRM006_FIXTURE_ENTRIES)
+        or not isinstance(oracles, list)
+        or oracles != list(NRM006_ORACLE_PATHS)
+    ):
+        errors.append("fixtures/odds/NRM-006/manifest.json: invalid frozen envelope")
+        entries = []
+        oracles = []
+
+    fixture_actual: dict[str, str] = {}
+    seen_paths: set[str] = set()
+    required_entry_keys = {"path", "rights_classification", "sha256", "synthetic"}
+    for index, entry in enumerate(entries):
+        label = f"fixtures/odds/NRM-006/manifest.json entry {index + 1}"
+        if not isinstance(entry, dict) or set(entry) != required_entry_keys:
+            errors.append(f"{label}: invalid keys")
+            continue
+        raw_relative = entry.get("path")
+        expected = (
+            NRM006_FIXTURE_ENTRIES.get(raw_relative) if isinstance(raw_relative, str) else None
+        )
+        if (
+            not isinstance(raw_relative, str)
+            or not raw_relative.startswith("fixtures/odds/NRM-006/")
+            or "\\" in raw_relative
+            or raw_relative.startswith("/")
+            or ".." in Path(raw_relative).parts
+            or raw_relative in seen_paths
+            or expected is None
+            or entry.get("sha256") != expected[0]
+            or entry.get("synthetic") is not True
+            or entry.get("rights_classification") != "SYNTHETIC_TEST"
+        ):
+            errors.append(f"{label}: invalid frozen entry")
+            continue
+        seen_paths.add(raw_relative)
+        candidate = root / raw_relative
+        try:
+            candidate.resolve().relative_to(fixture_root)
+        except (OSError, ValueError):
+            errors.append(f"{raw_relative}: fixture path escapes its frozen root")
+            continue
+        if candidate.is_symlink() or not candidate.is_file():
+            errors.append(f"{raw_relative}: missing or non-regular frozen fixture")
+            continue
+        try:
+            size = candidate.stat().st_size
+            digest = _digest(candidate)
+        except OSError:
+            errors.append(f"{raw_relative}: unavailable frozen fixture")
+            continue
+        fixture_actual[raw_relative] = digest
+        if size != expected[1]:
+            errors.append(f"{raw_relative}: frozen byte-size mismatch")
+        if digest != expected[0]:
+            errors.append(f"{raw_relative}: frozen SHA-256 mismatch")
+    if seen_paths != set(NRM006_FIXTURE_ENTRIES):
+        errors.append("fixtures/odds/NRM-006/manifest.json: fixture entry inventory mismatch")
+
+    try:
+        discovered_fixtures = {
+            path.relative_to(root).as_posix()
+            for path in fixture_root.rglob("*")
+            if path.is_file()
+            and path.name != "manifest.json"
+            and "expected_outputs" not in path.relative_to(fixture_root).parts
+        }
+        discovered_oracles = {
+            path.relative_to(fixture_root).as_posix()
+            for path in (fixture_root / "expected_outputs").rglob("*")
+            if path.is_file()
+        }
+    except OSError:
+        discovered_fixtures = set()
+        discovered_oracles = set()
+        errors.append("fixtures/odds/NRM-006: frozen inventory is unavailable")
+    if discovered_fixtures != set(NRM006_FIXTURE_ENTRIES):
+        errors.append("fixtures/odds/NRM-006/manifest.json: fixture inventory mismatch")
+    if discovered_oracles != set(NRM006_ORACLE_PATHS):
+        errors.append("fixtures/odds/NRM-006/manifest.json: oracle inventory mismatch")
+
+    if errors:
+        raise NrmFrozenInputValidationError(errors)
+    return {
+        "file_count": len(actual),
+        "files": dict(sorted(actual.items())),
+        "fixture_entry_count": len(fixture_actual),
+        "fixture_files": dict(sorted(fixture_actual.items())),
+        "ok": True,
+        "oracle_count": len(oracles),
     }
 
 
@@ -394,6 +669,8 @@ def validate_specifications(root: Path) -> dict[str, object]:
         root / "tickets/ODD-005/ticket.yaml"
     ).is_file() and "A5-odds-manual-import" not in scope_map:
         errors.append("authority_manifest: A5-odds-manual-import scope is missing")
+    if (root / "tickets/NRM-006/ticket.yaml").is_file() and "A6-normalisation" not in scope_map:
+        errors.append("authority_manifest: A6-normalisation scope is missing")
     if errors:
         raise SpecValidationError(errors)
     return {
@@ -406,11 +683,16 @@ def validate_specifications(root: Path) -> dict[str, object]:
 
 __all__ = [
     "FPL004_FROZEN_INPUTS",
+    "NRM006_FIXTURE_ENTRIES",
+    "NRM006_FROZEN_INPUTS",
+    "NRM006_ORACLE_PATHS",
     "ODD005_FROZEN_INPUTS",
     "FrozenInputValidationError",
+    "NrmFrozenInputValidationError",
     "OddFrozenInputValidationError",
     "SpecValidationError",
     "validate_fpl004_frozen_inputs",
+    "validate_nrm006_frozen_inputs",
     "validate_odd005_frozen_inputs",
     "validate_specifications",
 ]

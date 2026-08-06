@@ -35,6 +35,14 @@ class ProviderTimeouts(_FrozenConfig):
 
 class RetryPolicy(_FrozenConfig):
     max_attempts: int = Field(ge=1, le=3)
+    default_delay_seconds: int = Field(ge=1, le=60)
+    maximum_retry_after_seconds: int = Field(ge=1, le=60)
+
+    @model_validator(mode="after")
+    def validate_delay(self) -> RetryPolicy:
+        if self.default_delay_seconds > self.maximum_retry_after_seconds:
+            raise ValueError("retry delay policy is inconsistent")
+        return self
 
 
 class OddsProviderConfig(_FrozenConfig):

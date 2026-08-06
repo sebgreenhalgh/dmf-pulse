@@ -1,0 +1,11 @@
+{
+  "contract_version": "nrm-006-math-book-v1",
+  "operator_key": "heavy_favourite",
+  "observed_at": "2026-08-20T12:00:00Z",
+  "as_of": "2026-08-20T12:05:00Z",
+  "odds": {
+    "HOME": "1.20",
+    "DRAW": "7.50",
+    "AWAY": "15.00"
+  }
+}

@@ -23,6 +23,7 @@ from dmf_pulse.data_model.tables import (
     market_definition,
     market_selection,
     odds_observation,
+    odds_publication_batch,
     operator_fixture_market,
     operator_market_observation,
     provider_market_representation,
@@ -66,11 +67,15 @@ def _replay(root: Path, scenario: str):
 
 
 def _import(root: Path, name: str, captured_at: datetime):
-    return OddsIngestionService(repository_root=root).import_payload(
+    return OddsIngestionService(
+        repository_root=root,
+        clock=lambda: captured_at + timedelta(seconds=10),
+    ).import_payload(
         OddsImportRequest(
             input_path=root / "fixtures/odds/ODD-005" / name,
             mapping_plan_path=root / "fixtures/odds/ODD-005/mapping_plan.json",
             captured_at=captured_at,
+            processing_at=captured_at + timedelta(seconds=5),
             information_cutoff=DEFAULT_CUTOFF,
             rights_profile_id="synthetic_the_odds_api_v1",
             database_url_ref=DATABASE_REF,
@@ -87,7 +92,7 @@ def _import(root: Path, name: str, captured_at: datetime):
 
 def _query(as_of: datetime):
     return MarketService().observations(
-        fixture_external_provider="official_fpl",
+        fixture_external_provider="synthetic_fpl",
         fixture_external_id="101",
         season_code="2026/27",
         as_of=as_of,
@@ -165,14 +170,22 @@ def test_reprocessing_one_source_snapshot_cannot_duplicate_quote_effects(
             )
         )
         assert profile_id is not None
-        counts = OddsPersistence(
+        publication_batch_id = session.scalar(
+            select(odds_publication_batch.c.publication_batch_id).where(
+                odds_publication_batch.c.source_snapshot_id == outcome.result.source_snapshot_id
+            )
+        )
+        assert publication_batch_id is not None
+        persistence = OddsPersistence(
             session,
             snapshot_id=outcome.result.source_snapshot_id,
             rights_profile_record_id=profile_id,
             captured_at=CAPTURED,
-            usable_at=CAPTURED + timedelta(microseconds=7),
+            mapping_cutoff=DEFAULT_CUTOFF,
             mapping_plan=mapping,
-        ).publish(parsed)
+        )
+        prepared = persistence.prepare(parsed)
+        counts = persistence.publish(prepared, publication_batch_id=publication_batch_id)
         assert counts.observations_created == 0
         assert counts.observations_reused == 6
 
@@ -193,8 +206,8 @@ def test_later_change_appends_and_cannot_rewrite_earlier_asof(
 
     assert first.exit_code == changed.exit_code == 0
     assert earlier_after.model_dump(mode="json") == earlier_before.model_dump(mode="json")
-    assert _price(earlier_after, "SYNTHETIC_BOOK_ALPHA", MarketOutcome.HOME) == Decimal("1.80")
-    assert _price(later, "SYNTHETIC_BOOK_ALPHA", MarketOutcome.HOME) == Decimal("1.75")
+    assert _price(earlier_after, "book_alpha", MarketOutcome.HOME) == Decimal("1.80")
+    assert _price(later, "book_alpha", MarketOutcome.HOME) == Decimal("1.75")
     assert earlier_after.observation_count == later.observation_count == 6
     with postgres_session_factory() as session:
         assert _count(session, odds_observation) == 12
@@ -213,8 +226,8 @@ def test_latest_incomplete_book_does_not_stale_fill_missing_selection(
     assert incomplete.exit_code == 0
 
     result = _query(datetime(2026, 8, 20, 13, 5, tzinfo=UTC))
-    alpha = next(book for book in result.books if book.operator_key == "SYNTHETIC_BOOK_ALPHA")
-    beta = next(book for book in result.books if book.operator_key == "SYNTHETIC_BOOK_BETA")
+    alpha = next(book for book in result.books if book.operator_key == "book_alpha")
+    beta = next(book for book in result.books if book.operator_key == "book_beta")
     assert alpha.market_state is MarketState.INCOMPLETE
     assert {quote.outcome for quote in alpha.observations} == {
         MarketOutcome.HOME,

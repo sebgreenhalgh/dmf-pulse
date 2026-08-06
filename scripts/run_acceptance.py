@@ -23,6 +23,7 @@ RUL_BASELINE = "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
 DAT_BASELINE = "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
 FPL_BASELINE = "9b3160a2574d2868b5f26e3a2d429924567510b0"
 ODD_BASELINE = "7034e38f32cd579c90d35c5fe3f10921c3656be0"
+NRM_BASELINE = "e36ea84cda9e80191a9160d037f8e7035477b9b1"
 RUL_WRITE_AHEAD_RESULT = (
     "PASS: write-ahead record committed only by successful external archive finalization; "
     "exact duration and digests are in archive_finalization.json"
@@ -951,6 +952,292 @@ def _odd_commands(uv: str, docker: str, git: str) -> tuple[AcceptanceCommand, ..
     )
 
 
+def _nrm_commands(uv: str, docker: str, git: str) -> tuple[AcceptanceCommand, ...]:
+    evidence = REPOSITORY_ROOT / "evidence/tickets/NRM-006"
+    return (
+        AcceptanceCommand("git diff --check", (git, "diff", "--check"), 60),
+        AcceptanceCommand("uv lock --check", (uv, "lock", "--check"), 180),
+        AcceptanceCommand(
+            "uv run dmf specs validate", (uv, "run", "dmf", "specs", "validate"), 180
+        ),
+        AcceptanceCommand(
+            "uv run dmf evidence validate --ticket NRM-006",
+            (uv, "run", "dmf", "evidence", "validate", "--ticket", "NRM-006"),
+            180,
+        ),
+        AcceptanceCommand(
+            "uv run ruff format --check .", (uv, "run", "ruff", "format", "--check", "."), 180
+        ),
+        AcceptanceCommand("uv run ruff check .", (uv, "run", "ruff", "check", "."), 180),
+        AcceptanceCommand("uv run mypy src/dmf_pulse", (uv, "run", "mypy", "src/dmf_pulse"), 300),
+        AcceptanceCommand(
+            'uv run pytest -q -m "unit" tests/unit',
+            (uv, "run", "pytest", "-q", "-m", "unit", "tests/unit"),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "property" tests/property',
+            (uv, "run", "pytest", "-q", "-m", "property", "tests/property"),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "contract" tests/contract',
+            (uv, "run", "pytest", "-q", "-m", "contract", "tests/contract"),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "golden" tests/golden',
+            (uv, "run", "pytest", "-q", "-m", "golden", "tests/golden"),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "security" tests/security',
+            (uv, "run", "pytest", "-q", "-m", "security", "tests/security"),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "docker compose -f compose.test.yaml up -d --wait",
+            (docker, "compose", "-f", "compose.test.yaml", "up", "-d", "--wait"),
+            300,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/test_migration_matrix.py --baseline-revision 20260725_0004 --target head",
+            (
+                uv,
+                "run",
+                "python",
+                "scripts/test_migration_matrix.py",
+                "--baseline-revision",
+                "20260725_0004",
+                "--target",
+                "head",
+            ),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            'uv run pytest -q -m "postgres and integration" tests/integration',
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "-m",
+                "postgres and integration",
+                "tests/integration",
+            ),
+            2400,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/integration/ingestion/odds/test_odds_temporal_publication_mapping.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/integration/ingestion/odds/test_odds_temporal_publication_mapping.py",
+            ),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/security/test_odds_credentials_quota_retention.py tests/security/test_odds_429_retry_policy.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/security/test_odds_credentials_quota_retention.py",
+                "tests/security/test_odds_429_retry_policy.py",
+            ),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/unit/markets tests/property/markets tests/golden/markets",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/unit/markets",
+                "tests/property/markets",
+                "tests/golden/markets",
+            ),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/integration/markets/test_market_normalisation_consensus.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/integration/markets/test_market_normalisation_consensus.py",
+            ),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest -q tests/integration/markets/test_normalisation_asof_cache_concurrency.py",
+            (
+                uv,
+                "run",
+                "pytest",
+                "-q",
+                "tests/integration/markets/test_normalisation_asof_cache_concurrency.py",
+            ),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run dmf ingest odds replay --fixture-set fixtures/odds/ODD-005 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_the_odds_api_v1 --output json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "ingest",
+                "odds",
+                "replay",
+                "--fixture-set",
+                "fixtures/odds/ODD-005",
+                "--scenario",
+                "happy_path",
+                "--information-cutoff",
+                "2026-08-21T17:30:00Z",
+                "--rights-profile",
+                "synthetic_the_odds_api_v1",
+                "--output",
+                "json",
+            ),
+            600,
+            offline=True,
+            capture_path=evidence / "odds_replay.json",
+        ),
+        AcceptanceCommand(
+            "uv run dmf market observations --fixture-external-provider synthetic_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "market",
+                "observations",
+                "--fixture-external-provider",
+                "synthetic_fpl",
+                "--fixture-external-id",
+                "101",
+                "--season-code",
+                "2026/27",
+                "--as-of",
+                "2026-08-20T12:05:00Z",
+                "--output",
+                "json",
+            ),
+            300,
+            offline=True,
+            capture_path=evidence / "market_observations.json",
+        ),
+        AcceptanceCommand(
+            "uv run dmf market normalise --fixture-external-provider synthetic_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json",
+            (
+                uv,
+                "run",
+                "dmf",
+                "market",
+                "normalise",
+                "--fixture-external-provider",
+                "synthetic_fpl",
+                "--fixture-external-id",
+                "101",
+                "--season-code",
+                "2026/27",
+                "--as-of",
+                "2026-08-20T12:05:00Z",
+                "--output",
+                "json",
+            ),
+            300,
+            offline=True,
+            capture_path=evidence / "market_normalisation.json",
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/verify_nrm006_goldens.py",
+            (uv, "run", "python", "scripts/verify_nrm006_goldens.py"),
+            600,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/verify_nrm006_temporal_canaries.py",
+            (uv, "run", "python", "scripts/verify_nrm006_temporal_canaries.py"),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/verify_nrm006_wheel.py",
+            (uv, "run", "python", "scripts/verify_nrm006_wheel.py"),
+            1800,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-fail-under=90",
+            (
+                uv,
+                "run",
+                "pytest",
+                "--cov=dmf_pulse",
+                "--cov-branch",
+                "--cov-report=term-missing",
+                "--cov-fail-under=90",
+            ),
+            3000,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/verify_nrm006_critical_coverage.py",
+            (uv, "run", "python", "scripts/verify_nrm006_critical_coverage.py"),
+            600,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "uv run python scripts/verify_nrm006_acceptance.py",
+            (uv, "run", "python", "scripts/verify_nrm006_acceptance.py"),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand("git status --short", (git, "status", "--short"), 60),
+        AcceptanceCommand(
+            f"uv run dmf review-pack build --ticket NRM-006 --baseline {NRM_BASELINE} --output review_pack/NRM-006",
+            (
+                uv,
+                "run",
+                "dmf",
+                "review-pack",
+                "build",
+                "--ticket",
+                "NRM-006",
+                "--baseline",
+                NRM_BASELINE,
+                "--output",
+                "review_pack/NRM-006",
+            ),
+            1200,
+            offline=True,
+        ),
+        AcceptanceCommand(
+            "docker compose -f compose.test.yaml down -v --remove-orphans",
+            (docker, "compose", "-f", "compose.test.yaml", "down", "-v", "--remove-orphans"),
+            300,
+        ),
+    )
+
+
 def _review_command(uv: str, ticket: str) -> AcceptanceCommand:
     if ticket == "RUL-002":
         display = f"uv run dmf review-pack build --ticket RUL-002 --baseline {RUL_BASELINE} --output review_pack/RUL-002"
@@ -1059,7 +1346,12 @@ def _summary(command: AcceptanceCommand, output: str, exit_code: int) -> str:
             return "PASS: doctor emitted output"
         return f"PASS: doctor status {value.get('status', 'UNKNOWN')}"
     if command.display.endswith(
-        ("verify_wheel.py", "verify_fpl004_wheel.py", "verify_odd005_wheel.py")
+        (
+            "verify_wheel.py",
+            "verify_fpl004_wheel.py",
+            "verify_odd005_wheel.py",
+            "verify_nrm006_wheel.py",
+        )
     ):
         try:
             value = json.loads(output)
@@ -1212,6 +1504,20 @@ def _clean_odd_generated_outputs() -> None:
         if path.is_file() and path.name not in preserved:
             path.unlink()
     review_root = REPOSITORY_ROOT / "review_pack/ODD-005"
+    if review_root.is_dir():
+        for path in review_root.iterdir():
+            if path.is_file():
+                path.unlink()
+
+
+def _clean_nrm_generated_outputs() -> None:
+    evidence_root = REPOSITORY_ROOT / "evidence/tickets/NRM-006"
+    evidence_root.mkdir(parents=True, exist_ok=True)
+    preserved = {".gitignore", "AUTHORITY_RESOLUTION.md", "PLAN.md"}
+    for path in evidence_root.iterdir():
+        if path.is_file() and path.name not in preserved:
+            path.unlink()
+    review_root = REPOSITORY_ROOT / "review_pack/NRM-006"
     if review_root.is_dir():
         for path in review_root.iterdir():
             if path.is_file():
@@ -1776,6 +2082,199 @@ def _main_odd() -> int:
     return 0
 
 
+def _main_nrm() -> int:
+    uv = shutil.which("uv")
+    docker = shutil.which("docker")
+    git = shutil.which("git")
+    if uv is None or docker is None or git is None:
+        print("uv, Docker, or Git is unavailable", file=sys.stderr)
+        return 2
+    commands = _nrm_commands(uv, docker, git)
+    command_log = REPOSITORY_ROOT / "evidence/tickets/NRM-006/commands.log"
+    archive = REPOSITORY_ROOT / "review_pack/NRM-006/DMF_PULSE_NRM-006_REVIEW.zip"
+    finalization_path = REPOSITORY_ROOT / "review_pack/NRM-006/archive_finalization.json"
+    records: list[CommandRecord] = []
+    review_record: CommandRecord | None = None
+    teardown_record: CommandRecord | None = None
+    failure = False
+    write_nrm_manifest = None
+    generate_nrm_evidence = None
+    try:
+        _clean_nrm_generated_outputs()
+        source_root = REPOSITORY_ROOT / "src"
+        scripts_root = REPOSITORY_ROOT / "scripts"
+        for import_root in (source_root, scripts_root):
+            if str(import_root) not in sys.path:
+                sys.path.insert(0, str(import_root))
+        from generate_nrm006_evidence import _manifest as write_nrm_manifest
+        from generate_nrm006_evidence import generate as generate_nrm_evidence
+
+        write_nrm_manifest("DRAFT", [], None)
+        for command in commands[:30]:
+            record = run_command(command, force_offline=True)
+            records.append(record)
+            print(f"[{record.exit_code}] {record.command} ({record.duration_seconds:.3f}s)")
+            if record.exit_code != command.expected_exit or not record.result.startswith("PASS:"):
+                failure = True
+                break
+        if not failure:
+            from dmf_pulse.assurance.review_pack import (
+                NRM_REVIEW_FINAL_RESULT,
+                NRM_REVIEW_WRITE_AHEAD_RESULT,
+                NRM_TEARDOWN_WRITE_AHEAD_RESULT,
+                calculate_review_payload_digest,
+            )
+
+            head = _git_head()
+            placeholders = [
+                *[asdict(item) for item in records],
+                asdict(
+                    CommandRecord(
+                        command=commands[30].display,
+                        duration_seconds=None,
+                        exit_code=0,
+                        result=NRM_REVIEW_WRITE_AHEAD_RESULT,
+                    )
+                ),
+                asdict(
+                    CommandRecord(
+                        command=commands[31].display,
+                        duration_seconds=None,
+                        exit_code=0,
+                        result=NRM_TEARDOWN_WRITE_AHEAD_RESULT,
+                    )
+                ),
+            ]
+            _write_command_records(command_log, placeholders)
+            generate_nrm_evidence(status="BLOCKED", payload_sha256="0" * 64, code_commit=head)
+            generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+            digest = calculate_review_payload_digest(
+                REPOSITORY_ROOT,
+                ticket="NRM-006",
+                baseline=NRM_BASELINE,
+                generated_at=generated_at,
+            )
+            generate_nrm_evidence(status="BLOCKED", payload_sha256=digest, code_commit=head)
+            review_record = run_command(commands[30], force_offline=True)
+            print(
+                f"[{review_record.exit_code}] {review_record.command} "
+                f"({review_record.duration_seconds:.3f}s)"
+            )
+            if review_record.exit_code != 0 or not review_record.result.startswith("PASS:"):
+                failure = True
+            else:
+                review_record = CommandRecord(
+                    command=review_record.command,
+                    duration_seconds=review_record.duration_seconds,
+                    exit_code=0,
+                    result=NRM_REVIEW_FINAL_RESULT,
+                )
+    except Exception as exc:
+        failure = True
+        print(f"NRM-006 acceptance preparation failed ({type(exc).__name__})", file=sys.stderr)
+    finally:
+        teardown_record = run_command(commands[31], force_offline=True)
+        print(
+            f"[{teardown_record.exit_code}] {teardown_record.command} "
+            f"({teardown_record.duration_seconds:.3f}s)"
+        )
+        if teardown_record.exit_code != 0 or not teardown_record.result.startswith("PASS:"):
+            failure = True
+        else:
+            from dmf_pulse.assurance.review_pack import NRM_TEARDOWN_FINAL_RESULT
+
+            teardown_record = CommandRecord(
+                command=teardown_record.command,
+                duration_seconds=teardown_record.duration_seconds,
+                exit_code=0,
+                result=NRM_TEARDOWN_FINAL_RESULT,
+            )
+
+    if review_record is None or teardown_record is None:
+        final_records = [*records, *([teardown_record] if teardown_record is not None else [])]
+        serialized_final_records = [asdict(item) for item in final_records]
+        _write_command_records(command_log, serialized_final_records)
+        if write_nrm_manifest is not None:
+            with suppress(Exception):
+                write_nrm_manifest("BLOCKED", serialized_final_records, _git_head())
+        archive.unlink(missing_ok=True)
+        return 1
+
+    final_records = [*records, review_record, teardown_record]
+    _write_command_records(command_log, [asdict(item) for item in final_records])
+    if failure or generate_nrm_evidence is None or write_nrm_manifest is None:
+        archive.unlink(missing_ok=True)
+        with suppress(Exception):
+            write_nrm_manifest("BLOCKED", [asdict(item) for item in final_records], _git_head())
+        _write_json_atomic(
+            finalization_path,
+            {
+                "command_31": asdict(review_record),
+                "command_32": asdict(teardown_record),
+                "status": "FAILED",
+            },
+        )
+        return 1
+
+    try:
+        from dmf_pulse.assurance.review_pack import (
+            build_review_pack,
+            calculate_review_payload_digest,
+            validate_review_zip,
+        )
+
+        head = _git_head()
+        generate_nrm_evidence(status="COMPLETE", payload_sha256="0" * 64, code_commit=head)
+        generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+        digest = calculate_review_payload_digest(
+            REPOSITORY_ROOT,
+            ticket="NRM-006",
+            baseline=NRM_BASELINE,
+            generated_at=generated_at,
+        )
+        generate_nrm_evidence(status="COMPLETE", payload_sha256=digest, code_commit=head)
+        summary = build_review_pack(
+            REPOSITORY_ROOT,
+            ticket="NRM-006",
+            baseline=NRM_BASELINE,
+            output=REPOSITORY_ROOT / "review_pack/NRM-006",
+            generated_at=generated_at,
+        )
+        validated = validate_review_zip(summary.path)
+        with zipfile.ZipFile(summary.path) as review_zip:
+            if review_zip.testzip() is not None:
+                raise ValueError("review archive CRC validation failed")
+        finalization = {
+            "archive_sha256": hashlib.sha256(summary.path.read_bytes()).hexdigest(),
+            "command_31": asdict(review_record),
+            "command_32": asdict(teardown_record),
+            "crc_and_checksum_validated": True,
+            "file_count": validated.file_count,
+            "payload_sha256": validated.payload_sha256,
+            "status": "COMPLETE",
+        }
+        _write_json_atomic(finalization_path, finalization)
+    except Exception as exc:
+        archive.unlink(missing_ok=True)
+        with suppress(Exception):
+            generate_nrm_evidence(
+                status="BLOCKED", payload_sha256="0" * 64, code_commit=_git_head()
+            )
+        _write_json_atomic(
+            finalization_path,
+            {
+                "command_31": asdict(review_record),
+                "command_32": asdict(teardown_record),
+                "error_type": type(exc).__name__,
+                "status": "FAILED",
+            },
+        )
+        print(f"NRM-006 review archive finalization failed ({type(exc).__name__})")
+        return 1
+    print(json.dumps(finalization, indent=2, sort_keys=True))
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -1790,7 +2289,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--ticket",
-        choices=("FND-001", "RUL-002", "DAT-003", "FPL-004", "ODD-005"),
+        choices=("FND-001", "RUL-002", "DAT-003", "FPL-004", "ODD-005", "NRM-006"),
         default="FND-001",
     )
     arguments = parser.parse_args()
@@ -1814,6 +2313,12 @@ def main() -> int:
                 "ODD-005 runs its review and teardown inside the exact acceptance sequence"
             )
         return _main_odd()
+    if arguments.ticket == "NRM-006":
+        if arguments.review_only or arguments.prepare_review:
+            parser.error(
+                "NRM-006 runs its review and teardown inside the exact acceptance sequence"
+            )
+        return _main_nrm()
     uv = shutil.which("uv")
     if uv is None:
         print("uv is unavailable", file=sys.stderr)

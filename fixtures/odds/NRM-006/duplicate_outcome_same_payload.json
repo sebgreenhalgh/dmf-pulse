@@ -1,0 +1,25 @@
+{
+  "operator_key": "book_alpha",
+  "market_key": "h2h",
+  "outcomes": [
+    {
+      "name": "Alpha Athletic",
+      "price": "1.80"
+    },
+    {
+      "name": "Alpha Athletic",
+      "price": "1.8"
+    },
+    {
+      "name": "Draw",
+      "price": "3.60"
+    },
+    {
+      "name": "Beta Borough",
+      "price": "4.20"
+    }
+  ],
+  "expected_warning": "DUPLICATE_OUTCOME_DEDUPED",
+  "expected_duplicate_count": 1,
+  "expected_canonical_outcomes": 3
+}
