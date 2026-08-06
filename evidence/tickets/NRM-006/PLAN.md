@@ -141,6 +141,15 @@ core branch coverage. Ruff, strict mypy, lock/spec/repository validation,
 secret scanning, wheel, golden, temporal, and migration-matrix checks are
 green.
 
+The first literal ledger attempt passed commands 1-25 and correctly stopped at
+command 26: the fresh wheel verifier had replayed its synthetic FPL schedule at
+2026-08-21 before requesting the frozen 2026-08-20 market result. The strict
+reader correctly returned `MAPPING_UNAVAILABLE`. The verifier now imports the
+same manifest-approved synthetic schedule at 2026-08-20T11:50:00Z, before the
+12:05 cutoff, while retaining the odds replay and all isolated wheel/query/
+normalisation checks. Focused assurance tests and the actual clean installed
+wheel pass; the complete 32-command ledger must be rerun from command 1.
+
 Run the 32 commands from `22_ACCEPTANCE_COMMANDS.txt` literally and record each
 command, start/end/duration, exit code, and actual result. Command 23 must match
 the frozen happy-path semantic projection. Command 30 must be empty after the

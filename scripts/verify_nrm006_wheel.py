@@ -27,6 +27,8 @@ REPORT_PATH = REPOSITORY_ROOT / "evidence/tickets/NRM-006/package_report.json"
 FPL_FIXTURES = REPOSITORY_ROOT / "fixtures/fpl/FPL-004"
 ODD_FIXTURES = REPOSITORY_ROOT / "fixtures/odds/ODD-005"
 HAPPY_GOLDEN = REPOSITORY_ROOT / "fixtures/odds/NRM-006/expected_outputs/happy_path_consensus.json"
+FPL_CAPTURED_AT = "2026-08-20T11:50:00Z"
+MARKET_AS_OF = "2026-08-20T12:05:00Z"
 
 
 class VerificationError(Exception):
@@ -140,6 +142,33 @@ def _dmf(python: Path) -> tuple[str, ...]:
         "if ep.value=='dmf_pulse.cli.app:main' else sys.exit(125)"
     )
     return (str(python), "-I", "-c", runner)
+
+
+def _fpl_seed_command(dmf: Sequence[str]) -> tuple[str, ...]:
+    """Build an approved schedule import that is knowable at the market cutoff."""
+
+    return (
+        *dmf,
+        "ingest",
+        "fpl",
+        "import",
+        "--bootstrap",
+        str(FPL_FIXTURES / "happy_path/bootstrap.json"),
+        "--fixtures",
+        str(FPL_FIXTURES / "happy_path/fixtures.json"),
+        "--competition-key",
+        "SYNTHETIC_PL",
+        "--season-code",
+        "2026/27",
+        "--captured-at",
+        FPL_CAPTURED_AT,
+        "--information-cutoff",
+        MARKET_AS_OF,
+        "--rights-profile",
+        "synthetic_test_v1",
+        "--output",
+        "json",
+    )
 
 
 @contextmanager
@@ -303,27 +332,12 @@ def _verify(database_url: str) -> dict[str, Any]:
 
         fpl = _json_object(
             _run(
-                [
-                    *dmf,
-                    "ingest",
-                    "fpl",
-                    "replay",
-                    "--fixture-set",
-                    str(FPL_FIXTURES),
-                    "--scenario",
-                    "happy_path",
-                    "--information-cutoff",
-                    "2026-08-21T17:30:00Z",
-                    "--rights-profile",
-                    "synthetic_test_v1",
-                    "--output",
-                    "json",
-                ],
+                _fpl_seed_command(dmf),
                 cwd=temporary_path,
                 environment=environment,
-                step="installed FPL replay",
+                step="installed cutoff-safe FPL import",
             ).stdout,
-            "installed FPL replay",
+            "installed cutoff-safe FPL import",
         )
         odds = _json_object(
             _run(
@@ -362,7 +376,7 @@ def _verify(database_url: str) -> dict[str, Any]:
                     "--season-code",
                     "2026/27",
                     "--as-of",
-                    "2026-08-20T12:05:00Z",
+                    MARKET_AS_OF,
                     "--output",
                     "json",
                 ],
@@ -385,7 +399,7 @@ def _verify(database_url: str) -> dict[str, Any]:
                     "--season-code",
                     "2026/27",
                     "--as-of",
-                    "2026-08-20T12:05:00Z",
+                    MARKET_AS_OF,
                     "--output",
                     "json",
                 ],
