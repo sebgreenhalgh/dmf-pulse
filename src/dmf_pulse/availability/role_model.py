@@ -428,17 +428,24 @@ def _player(
     allowed = {"hard_ineligible", "new_signing", "player_id"}
     if set(overrides) - allowed:
         raise RoleModelValidationError("player override contains unresolved eligibility fields")
+    override_new_signing: bool | None = None
     for key in ("hard_ineligible", "new_signing"):
         if key in overrides:
-            selected[key] = _strict_bool(overrides[key], label=f"player override {key}")
+            override_value = _strict_bool(overrides[key], label=f"player override {key}")
+            selected[key] = override_value
+            if key == "new_signing":
+                override_new_signing = override_value
     if "player_id" in overrides:
         override_player_id = _uuid_text(overrides["player_id"], label="player override player_id")
-        if override_player_id != selected["player_id"] and override_player_id in (
-            roster_player_ids | {str(row.player_id) for row in rows}
-        ):
-            raise RoleModelValidationError(
-                "player override player_id collides with another identity"
-            )
+        if override_player_id != selected["player_id"]:
+            if override_player_id in roster_player_ids | {str(row.player_id) for row in rows}:
+                raise RoleModelValidationError(
+                    "player override player_id collides with another identity"
+                )
+            if override_new_signing is not True:
+                raise RoleModelValidationError(
+                    "distinct player override requires explicit new_signing: true"
+                )
         selected["player_id"] = override_player_id
     return selected
 

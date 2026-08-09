@@ -20,6 +20,8 @@ from dmf_pulse.availability.role_model import (
 
 pytestmark = pytest.mark.unit
 
+FRESH_PLAYER_ID = str(uuid5(NAMESPACE_URL, "min007r2-fresh-player"))
+
 
 def _read(path: Path) -> object:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -138,7 +140,10 @@ def test_r4_rejects_cross_player_canonical_id_override(
     artifact = fit_role_baseline(training, policy=policy)
     changed = copy.deepcopy(stable_context)
     changed["player_overrides"] = {
-        stable_context["focus_player_key"]: {"player_id": "06527612-3dbd-5207-869f-a09b477baa3d"}
+        stable_context["focus_player_key"]: {
+            "player_id": "06527612-3dbd-5207-869f-a09b477baa3d",
+            "new_signing": True,
+        }
     }
     with pytest.raises(RoleModelValidationError, match="collides with another identity"):
         predict_role_utilities(
@@ -148,3 +153,112 @@ def test_r4_rejects_cross_player_canonical_id_override(
             player_key=stable_context["focus_player_key"],
             policy=policy,
         )
+
+
+def test_r4_rejects_distinct_uuid_without_new_signing(
+    history: dict[str, object],
+    stable_context: dict[str, object],
+    training: dict[str, object],
+    policy: dict[str, object],
+) -> None:
+    artifact = fit_role_baseline(training, policy=policy)
+    changed = copy.deepcopy(stable_context)
+    changed["player_overrides"] = {
+        stable_context["focus_player_key"]: {"player_id": FRESH_PLAYER_ID}
+    }
+    with pytest.raises(
+        RoleModelValidationError, match="distinct player override requires explicit new_signing"
+    ):
+        predict_role_utilities(
+            history,
+            artifact,
+            context=changed,
+            player_key=stable_context["focus_player_key"],
+            policy=policy,
+        )
+
+
+def test_r4_rejects_distinct_uuid_with_false_new_signing(
+    history: dict[str, object],
+    stable_context: dict[str, object],
+    training: dict[str, object],
+    policy: dict[str, object],
+) -> None:
+    artifact = fit_role_baseline(training, policy=policy)
+    changed = copy.deepcopy(stable_context)
+    changed["player_overrides"] = {
+        stable_context["focus_player_key"]: {
+            "player_id": FRESH_PLAYER_ID,
+            "new_signing": False,
+        }
+    }
+    with pytest.raises(
+        RoleModelValidationError, match="distinct player override requires explicit new_signing"
+    ):
+        predict_role_utilities(
+            history,
+            artifact,
+            context=changed,
+            player_key=stable_context["focus_player_key"],
+            policy=policy,
+        )
+
+
+def test_r4_accepts_distinct_uuid_with_true_new_signing_without_borrowed_history(
+    history: dict[str, object],
+    stable_context: dict[str, object],
+    training: dict[str, object],
+    policy: dict[str, object],
+) -> None:
+    artifact = fit_role_baseline(training, policy=policy)
+    changed = copy.deepcopy(stable_context)
+    changed["player_overrides"] = {
+        stable_context["focus_player_key"]: {
+            "player_id": FRESH_PLAYER_ID,
+            "new_signing": True,
+        }
+    }
+    result = predict_role_utilities(
+        history,
+        artifact,
+        context=changed,
+        player_key=stable_context["focus_player_key"],
+        policy=policy,
+    )
+    assert result.target_team_competitive_history_count == 0
+    assert result.confidence_grade == "D"
+    assert "NEW_SIGNING" in result.confidence_reasons
+
+
+def test_r4_same_uuid_existing_player_path_is_unchanged(
+    history: dict[str, object],
+    stable_context: dict[str, object],
+    training: dict[str, object],
+    policy: dict[str, object],
+) -> None:
+    artifact = fit_role_baseline(training, policy=policy)
+    baseline = predict_role_utilities(
+        history,
+        artifact,
+        context=stable_context,
+        player_key=stable_context["focus_player_key"],
+        policy=policy,
+    )
+    roster = history["rosters"][stable_context["team_key"]]
+    player = next(
+        item for item in roster if item["player_key"] == stable_context["focus_player_key"]
+    )
+    changed = copy.deepcopy(stable_context)
+    changed["player_overrides"] = {
+        stable_context["focus_player_key"]: {"player_id": player["player_id"]}
+    }
+    assert (
+        predict_role_utilities(
+            history,
+            artifact,
+            context=changed,
+            player_key=stable_context["focus_player_key"],
+            policy=policy,
+        )
+        == baseline
+    )

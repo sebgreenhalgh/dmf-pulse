@@ -1,0 +1,14 @@
+{
+  "ticket_id": "MIN-007R2",
+  "required_parent": "11acd4a0f7eee89a7c59ca5209dfa89999627145",
+  "training_dataset_semantic_sha256": "1466a5dcc9104a2d26f9c6b286d2717b6460423503026f05a58d3a26de040be3",
+  "role_artifact_semantic_sha256": "baf70ee76b8a51f4cf3bfda1a1cc33d6ba3f6c304617c8bc42aefdee2b2a1c96",
+  "nrm_happy_path_semantic_sha256": "bd8840cceed27199e3b10945ef54529a517df68b522a82ab0c935c460116a499",
+  "nrm_two_clean_plus_stale_semantic_sha256": "84c22958b67d2f7d578460c018b71755ec23477f0cef1368a9f68732a00b0790",
+  "public_schema_sha256": {
+    "probability.schema.json": "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
+    "normalised_operator_market.schema.json": "c2851ca0c051c61aaa404fb290f6974640b2b1453f8c5a43e8d89502d0ee21fb",
+    "market_consensus.schema.json": "60e59a14cb5c3a9abdbac5c7b4c929c9a38993a07a0b71cdc80704517fc56ad4",
+    "market_normalisation_result.schema.json": "b9a39f8f2a612645ddde141f8e9c8df340d65d1b1a8a4e01b42bb2f64a1eb789"
+  }
+}

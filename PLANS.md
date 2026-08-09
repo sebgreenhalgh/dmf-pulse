@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## MIN-007R2 - explicit new-signing identity override
+
+- Ticket/stage: `MIN-007R2`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `11acd4a0f7eee89a7c59ca5209dfa89999627145`.
+- Scope: require explicit validated boolean `new_signing: true` for distinct canonical player-ID overrides and add direct identity/evidence-ownership regressions.
+- Constraints: preserve all accepted A/B/C/R1 and NRM identities; no 007D work, dependency, network, provider, credential, database, migration or CLI changes.
+
+### MIN-007R2 checkpoints
+
+- [x] 2026-08-10 - Added the distinct-identity guard and direct missing/false/true/collision/cold-start/same-UUID regressions.
+- [x] 2026-08-10 - Ran all 13 literal acceptance commands with zero final failures, recorded evidence, and prepared the exact ticket commit pending final clean-tree verification.
+
 ## MIN-007R1 - AUDIT-007-1 remediation
 
 - Ticket/stage: `MIN-007R1`, A7.
