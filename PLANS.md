@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## MIN-007C - regularised role baseline
+
+- Ticket/stage: `MIN-007C`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `d54eae162386901f9710d7212b5dfb89174cfa31`.
+- Scope: fit frozen position START/BENCH/OUT priors and produce cutoff-safe internal role sampling utilities with explicit confidence metadata, manager/preseason weighting and trusted hard-ineligibility handling.
+- Constraints: no PMFs, coherent lineup sampler, public coherent marginals, persistence/migration, CLI, evaluation, dependency, network/credential, or redesign of MIN-007A/MIN-007B.
+
+### MIN-007C checkpoints
+
+- [x] 2026-08-09 - validated Pack 007C (`21` manifest entries; frozen artifact and nine-canary oracle PASS), confirmed the exact MIN-007B parent and clean preflight, and read the frozen role contract/oracles.
+- [x] 2026-08-09 - implemented the pure Decimal role baseline, reproduced the frozen artifact and nine canaries, passed the 13-command ledger, and prepared the exact bounded commit with clean-tree verification pending after commit.
+
 ## MIN-007B - cutoff-safe minutes training dataset builder
 
 - Ticket/stage: `MIN-007B`, A7.
