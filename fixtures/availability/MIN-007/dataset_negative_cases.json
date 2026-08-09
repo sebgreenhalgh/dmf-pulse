@@ -1,0 +1,96 @@
+{
+  "cases": [
+    {
+      "case_id": "missing_role_label",
+      "expected": "REJECT",
+      "mutation": {
+        "remove": "role_label"
+      }
+    },
+    {
+      "case_id": "invalid_role_label",
+      "expected": "REJECT",
+      "mutation": {
+        "set": {
+          "role_label": "UNKNOWN_ROLE"
+        }
+      }
+    },
+    {
+      "case_id": "minutes_above_90",
+      "expected": "REJECT",
+      "mutation": {
+        "set": {
+          "minutes_label": 91
+        }
+      }
+    },
+    {
+      "case_id": "minutes_below_zero",
+      "expected": "REJECT",
+      "mutation": {
+        "set": {
+          "minutes_label": -1
+        }
+      }
+    },
+    {
+      "case_id": "out_with_positive_minutes",
+      "expected": "REJECT",
+      "mutation": {
+        "set": {
+          "minutes_label": 15,
+          "role_label": "OUT"
+        }
+      }
+    },
+    {
+      "case_id": "start_with_zero_minutes",
+      "expected": "REJECT",
+      "mutation": {
+        "set": {
+          "minutes_label": 0,
+          "role_label": "START"
+        }
+      }
+    },
+    {
+      "case_id": "future_label",
+      "expected": "EXCLUDE",
+      "mutation": {
+        "set": {
+          "label_usable_at": "2026-06-08T17:00:01Z"
+        }
+      }
+    },
+    {
+      "case_id": "evaluation_even_if_pre_cutoff",
+      "expected": "EXCLUDE",
+      "mutation": {
+        "set": {
+          "label_usable_at": "2026-06-08T16:59:59Z",
+          "split": "EVAL"
+        }
+      }
+    },
+    {
+      "case_id": "feature_cutoff_after_training_cutoff",
+      "expected": "EXCLUDE",
+      "mutation": {
+        "set": {
+          "feature_cutoff": "2026-06-08T17:00:01Z",
+          "label_usable_at": "2026-06-08T17:00:01Z"
+        }
+      }
+    },
+    {
+      "case_id": "duplicate_example_id",
+      "expected": "REJECT",
+      "mutation": {
+        "duplicate_row": true
+      }
+    }
+  ],
+  "schema_version": "min007b-negative-cases-v1",
+  "training_cutoff": "2026-06-08T17:00:00Z"
+}

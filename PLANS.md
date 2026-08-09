@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## MIN-007B - cutoff-safe minutes training dataset builder
+
+- Ticket/stage: `MIN-007B`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `84697a464af17a909e28a6870d764617098fc30a`.
+- Scope: create the pure, deterministic, synthetic-history-to-TRAIN-dataset slice with explicit role/minutes labels, cutoff-safe eligibility, canonical ordering, duplicate rejection and semantic hashing.
+- Constraints: no role model, PMFs, lineup sampler, persistence/migration, CLI, evaluation, dependency, network/credential, or MIN-007A market changes.
+
+### MIN-007B checkpoints
+
+- [x] 2026-08-09 - validated Pack 007B (`17` hashed files; frozen dataset oracle PASS), confirmed the exact MIN-007A parent and clean worktree, and read the D1-D9 contract and stop rules.
+- [x] 2026-08-09 - implemented and verified the pure cutoff-safe builder against the frozen 368-row oracle, passed the literal acceptance ledger, and prepared the exact bounded commit with clean-tree verification pending after commit.
+
 ## MIN-007A - NRM public-contract and confidence hardening
 
 - Ticket/stage: `MIN-007A`, A7.
