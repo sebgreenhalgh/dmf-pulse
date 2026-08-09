@@ -14,8 +14,16 @@ from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from typing import Any, Literal, Self
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationError,
+    field_serializer,
+    model_validator,
+)
 
+from dmf_pulse.availability.dataset import validate_history_identities
 from dmf_pulse.availability.models import HistoryRow, Position, RoleLabel, parse_utc
 
 ROLE_ORDER: tuple[RoleLabel, ...] = ("START", "BENCH", "OUT")
@@ -73,7 +81,7 @@ class RoleUtilityPrediction(_FrozenModel):
     schema_version: Literal["role-utility-prediction-v1"]
     player_key: str = Field(min_length=1)
     position: Position
-    role_utilities: dict[RoleLabel, str]
+    role_utilities: dict[RoleLabel, Decimal]
     target_team_competitive_history_count: int = Field(ge=0)
     confidence_grade: Literal["B", "C", "D"]
     confidence_reasons: tuple[str, ...]
@@ -82,6 +90,14 @@ class RoleUtilityPrediction(_FrozenModel):
     def validate_roles(self) -> Self:
         if set(self.role_utilities) != set(ROLE_ORDER):
             raise RoleModelValidationError("role utility roles are incomplete or unknown")
+        utilities = tuple(self.role_utilities[role] for role in ROLE_ORDER)
+        if any(
+            not isinstance(value, Decimal) or not Decimal(0) <= value <= Decimal(1)
+            for value in utilities
+        ):
+            raise RoleModelValidationError("role utilities must be Decimal values in [0, 1]")
+        if sum(utilities, Decimal(0)) != Decimal(1):
+            raise RoleModelValidationError("role utilities must sum exactly to one")
         if tuple(sorted(self.confidence_reasons)) != self.confidence_reasons:
             raise RoleModelValidationError("confidence reasons must be lexicographically sorted")
         if len(set(self.confidence_reasons)) != len(self.confidence_reasons):
@@ -89,6 +105,12 @@ class RoleUtilityPrediction(_FrozenModel):
         if "BASELINE_MODEL_CAP_B" not in self.confidence_reasons:
             raise RoleModelValidationError("baseline confidence cap reason is required")
         return self
+
+    @field_serializer("role_utilities", when_used="json")
+    def serialize_role_utilities(self, value: dict[RoleLabel, Decimal]) -> dict[RoleLabel, str]:
+        """Project internal Decimal weights to the frozen JSON representation."""
+
+        return {role: _serialized_decimal(value[role]) for role in ROLE_ORDER}
 
 
 def _canonical_sha256(value: object) -> str:
@@ -195,6 +217,10 @@ def _as_history_rows(history: object) -> tuple[HistoryRow, ...]:
         if isinstance(exc, RoleModelValidationError):
             raise
         raise RoleModelValidationError("history contains an invalid role row") from exc
+    try:
+        validate_history_identities(rows)
+    except ValueError as exc:
+        raise RoleModelValidationError(str(exc)) from exc
     return tuple(rows)
 
 
@@ -228,6 +254,18 @@ def _serialized_decimal(value: Decimal) -> str:
         context.prec = DECIMAL_PRECISION
         context.rounding = ROUNDING_MODE
         return format(value.quantize(SERIAL_SCALE), ".12f")
+
+
+def _normalise_scores(scores: Mapping[RoleLabel, Decimal]) -> dict[RoleLabel, Decimal]:
+    total = sum(scores.values(), Decimal(0))
+    if total <= 0:
+        raise RoleModelValidationError("role utility normalisation has no positive mass")
+    raw = tuple(scores[role] / total for role in ROLE_ORDER)
+    residual = Decimal(1) - sum(raw, Decimal(0))
+    largest_index = max(range(len(ROLE_ORDER)), key=lambda index: (raw[index], -index))
+    corrected = list(raw)
+    corrected[largest_index] += residual
+    return dict(zip(ROLE_ORDER, corrected, strict=True))
 
 
 def _public_vector(values: tuple[Decimal, ...]) -> tuple[Decimal, ...]:
@@ -344,7 +382,12 @@ def _context_mapping(context: object) -> dict[str, Any]:
     return value
 
 
-def _player(history: object, context: Mapping[str, Any], player_key: str) -> dict[str, Any]:
+def _player(
+    history: object,
+    rows: Sequence[HistoryRow],
+    context: Mapping[str, Any],
+    player_key: str,
+) -> dict[str, Any]:
     value = _mapping(history, label="history")
     rosters = value.get("rosters")
     if not isinstance(rosters, Mapping):
@@ -352,13 +395,22 @@ def _player(history: object, context: Mapping[str, Any], player_key: str) -> dic
     roster = rosters.get(context["team_key"])
     if not isinstance(roster, Sequence) or isinstance(roster, (str, bytes, bytearray)):
         raise RoleModelValidationError("target team roster is missing")
+    roster_player_ids: set[str] = set()
+    for raw_roster in rosters.values():
+        if not isinstance(raw_roster, Sequence) or isinstance(raw_roster, (str, bytes, bytearray)):
+            raise RoleModelValidationError("history roster identities are invalid")
+        for raw in raw_roster:
+            if not isinstance(raw, Mapping):
+                raise RoleModelValidationError("roster players must be mappings")
+            roster_player_ids.add(_uuid_text(raw.get("player_id"), label="roster.player_id"))
     selected: dict[str, Any] | None = None
     for raw in roster:
         if not isinstance(raw, Mapping):
             raise RoleModelValidationError("roster players must be mappings")
         if raw.get("player_key") == player_key:
+            if selected is not None:
+                raise RoleModelValidationError("roster contains duplicate player_key")
             selected = dict(raw)
-            break
     if selected is None:
         raise RoleModelValidationError("player is not present on target team roster")
     for key in ("player_id", "team_id"):
@@ -380,9 +432,14 @@ def _player(history: object, context: Mapping[str, Any], player_key: str) -> dic
         if key in overrides:
             selected[key] = _strict_bool(overrides[key], label=f"player override {key}")
     if "player_id" in overrides:
-        selected["player_id"] = _uuid_text(
-            overrides["player_id"], label="player override player_id"
-        )
+        override_player_id = _uuid_text(overrides["player_id"], label="player override player_id")
+        if override_player_id != selected["player_id"] and override_player_id in (
+            roster_player_ids | {str(row.player_id) for row in rows}
+        ):
+            raise RoleModelValidationError(
+                "player override player_id collides with another identity"
+            )
+        selected["player_id"] = override_player_id
     return selected
 
 
@@ -450,9 +507,13 @@ def predict_role_utilities(
     context_value = _context_mapping(context)
     if not isinstance(player_key, str) or not player_key:
         raise RoleModelValidationError("player_key must be non-empty")
-    player = _player(history_value, context_value, player_key)
+    player = _player(history_value, rows, context_value, player_key)
     if player.get("hard_ineligible", False):
-        utilities = {"START": Decimal(0), "BENCH": Decimal(0), "OUT": Decimal(1)}
+        utilities: dict[RoleLabel, Decimal] = {
+            "START": Decimal(0),
+            "BENCH": Decimal(0),
+            "OUT": Decimal(1),
+        }
         retained: tuple[HistoryRow, ...] = ()
     else:
         priors = artifact_value["role_priors"][player["position"]]
@@ -473,17 +534,14 @@ def predict_role_utilities(
                 scores[row.role_label] += (
                     Decimal(policy_value["recency_decay"]) ** age
                 ) * multiplier
-            total = sum(scores.values(), Decimal(0))
-            if total <= 0:
-                raise RoleModelValidationError("role utility normalisation has no positive mass")
-            utilities = {role: scores[role] / total for role in ROLE_ORDER}
+            utilities = _normalise_scores(scores)
     competitive_count = sum(row.evidence_type == "COMPETITIVE" for row in retained)
     grade, reasons = _confidence(player, context_value, competitive_count)
     result = {
         "schema_version": "role-utility-prediction-v1",
         "player_key": player_key,
         "position": player["position"],
-        "role_utilities": {role: _serialized_decimal(utilities[role]) for role in ROLE_ORDER},
+        "role_utilities": utilities,
         "target_team_competitive_history_count": competitive_count,
         "confidence_grade": grade,
         "confidence_reasons": reasons,

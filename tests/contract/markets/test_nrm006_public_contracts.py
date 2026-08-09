@@ -21,6 +21,7 @@ from dmf_pulse.markets import (
     normalise_complete_market,
     raw_implied_probability,
 )
+from tests.contract.markets._draft2020 import SchemaValidationError, validate_instance
 
 pytestmark = pytest.mark.contract
 
@@ -95,44 +96,28 @@ def test_frozen_library_surface_and_enums_are_exposed() -> None:
 
 def test_min007a_schema_constraints_reject_supplied_negative_cases(repository_root: Path) -> None:
     cases = json.loads(
-        (repository_root / "fixtures" / "contracts" / "nrm_schema_negative_cases.json").read_text(
+        (repository_root / "fixtures" / "nrm_schema_negative_instances.json").read_text(
             encoding="utf-8"
         )
     )["cases"]
     schemas: dict[str, dict[str, Any]] = {
         name: json.loads((repository_root / "public_contracts" / name).read_text(encoding="utf-8"))
         for name in {
+            "probability.schema.json",
             "normalised_operator_market.schema.json",
             "market_consensus.schema.json",
             "market_normalisation_result.schema.json",
         }
     }
-    assert all(case["must_validate"] is False for case in cases)
-
-    operator = schemas["normalised_operator_market.schema.json"]
-    assert operator["properties"]["source_observation_ids"]["maxItems"] == 3
-    assert operator["properties"]["source_observation_ids"]["uniqueItems"] is True
-    assert [
-        item["properties"]["outcome"]["const"]
-        for item in operator["properties"]["outcomes"]["prefixItems"]
-    ] == [
-        "HOME",
-        "DRAW",
-        "AWAY",
+    assert [case["name"] for case in cases] == [
+        "operator_source_ids_too_many",
+        "operator_source_ids_duplicate",
+        "operator_duplicate_home_outcome",
+        "consensus_wrong_outcome_order",
+        "normalised_null_consensus",
+        "blocked_with_consensus",
     ]
-    consensus = schemas["market_consensus.schema.json"]
-    assert consensus["properties"]["operator_markets"]["uniqueItems"] is True
-    assert [
-        item["properties"]["outcome"]["const"]
-        for item in consensus["properties"]["outcomes"]["prefixItems"]
-    ] == [
-        "HOME",
-        "DRAW",
-        "AWAY",
-    ]
-    result = schemas["market_normalisation_result.schema.json"]
-    assert result["properties"]["excluded_books"]["uniqueItems"] is True
-    assert result["properties"]["warnings"]["uniqueItems"] is True
-    assert len(result["allOf"]) == 2
-    assert result["allOf"][0]["then"]["properties"]["error_code"] == {"type": "null"}
-    assert result["allOf"][1]["then"]["properties"]["consensus"] == {"type": "null"}
+    for case in cases:
+        assert case["must_validate"] is False
+        with pytest.raises(SchemaValidationError):
+            validate_instance(case["instance"], schemas[case["target"]], registry=schemas)

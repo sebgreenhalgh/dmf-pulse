@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, Literal, Self
 from uuid import UUID
@@ -22,6 +23,10 @@ Split = Literal["TRAIN", "EVAL"]
 
 POSITION_RANK: dict[str, int] = {"GK": 0, "DEF": 1, "MID": 2, "FWD": 3}
 
+_RFC3339_UTC_PATTERN = re.compile(
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|\+00:00)$"
+)
+
 
 class DatasetValidationError(ValueError):
     """A supplied history row or dataset violates the frozen contract."""
@@ -31,15 +36,17 @@ def parse_utc(value: object, *, field_name: str) -> datetime:
     """Parse an explicitly UTC timestamp and reject naive/non-UTC values."""
 
     if isinstance(value, str):
+        if _RFC3339_UTC_PATTERN.fullmatch(value) is None:
+            raise ValueError(f"{field_name} must be an RFC3339 UTC timestamp")
         text = value[:-1] + "+00:00" if value.endswith("Z") else value
         try:
             parsed = datetime.fromisoformat(text)
         except ValueError as exc:
-            raise ValueError(f"{field_name} must be an RFC3339 timestamp") from exc
+            raise ValueError(f"{field_name} must be an RFC3339 UTC timestamp") from exc
     elif isinstance(value, datetime):
         parsed = value
     else:
-        raise ValueError(f"{field_name} must be an RFC3339 timestamp")
+        raise ValueError(f"{field_name} must be an RFC3339 UTC timestamp")
     if parsed.tzinfo is None or parsed.utcoffset() is None:
         raise ValueError(f"{field_name} must be timezone-aware")
     if parsed.utcoffset() != timedelta(0):

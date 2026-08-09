@@ -64,14 +64,11 @@ def _canonical_row_key(row: HistoryRow) -> tuple[str, datetime, int, str, str]:
     )
 
 
-def build_training_dataset(history: object, *, training_cutoff: str) -> TrainingDataset:
-    """Validate history and construct the cutoff-safe TRAIN-only dataset."""
+def validate_history_identities(rows: Sequence[HistoryRow]) -> None:
+    """Reject duplicate immutable history identities before any filtering."""
 
-    cutoff = parse_utc(training_cutoff, field_name="training_cutoff")
-    rows = _as_rows(history)
     seen_examples: set[str] = set()
     seen_targets: set[tuple[str, str]] = set()
-    eligible: list[HistoryRow] = []
     for row in rows:
         example_id = str(row.example_id)
         if example_id in seen_examples:
@@ -81,6 +78,16 @@ def build_training_dataset(history: object, *, training_cutoff: str) -> Training
         if target in seen_targets:
             raise DatasetValidationError("duplicate player-fixture target")
         seen_targets.add(target)
+
+
+def build_training_dataset(history: object, *, training_cutoff: str) -> TrainingDataset:
+    """Validate history and construct the cutoff-safe TRAIN-only dataset."""
+
+    cutoff = parse_utc(training_cutoff, field_name="training_cutoff")
+    rows = _as_rows(history)
+    validate_history_identities(rows)
+    eligible: list[HistoryRow] = []
+    for row in rows:
         if row.split != "TRAIN":
             continue
         if row.feature_cutoff > cutoff or row.label_usable_at > cutoff:
@@ -112,4 +119,4 @@ def semantic_dataset_hash(dataset: object) -> str:
     return hashlib.sha256(_canonical_bytes(value)).hexdigest()
 
 
-__all__ = ["build_training_dataset", "semantic_dataset_hash"]
+__all__ = ["build_training_dataset", "semantic_dataset_hash", "validate_history_identities"]

@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## MIN-007R1 - AUDIT-007-1 remediation
+
+- Ticket/stage: `MIN-007R1`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `2be9852da08913a07678bd6235edbe56d6a4664d`.
+- Scope: strict UTC timestamp boundaries, shared history identity validation, full-precision Decimal role utilities, canonical-ID override collision rejection and concrete frozen-schema negative tests.
+- Constraints: preserve all accepted A/B/C hashes, canaries, coefficients and NRM schemas; no 007D work, dependency, network, provider, credential, database, migration or CLI changes.
+
+### MIN-007R1 checkpoints
+
+- [x] 2026-08-09 - validated the remediation pack, reproduced all four P1 probes, implemented the five narrow remediations and added direct regression coverage.
+- [x] 2026-08-09 - ran all 16 literal acceptance commands with zero failures, recorded evidence, and prepared the single frozen-parent remediation commit pending final clean-tree verification.
+
 ## MIN-007C - regularised role baseline
 
 - Ticket/stage: `MIN-007C`, A7.
