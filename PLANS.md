@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## MIN-007A - NRM public-contract and confidence hardening
+
+- Ticket/stage: `MIN-007A`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `253baf3f19661a5704bb1fad2f7ac60e1db288eb`.
+- Scope: install the three supplied superseding NRM public schemas, preserve the probability dependency, and separate ordinary degradation evidence from blocking confidence warnings without changing NRM math, policy, freshness, persistence, or database objects.
+- Constraints: offline synthetic fixtures only; no provider/network/credential, dependency, migration, minutes model, broad refactor, push, merge, rebase, reset, tag, or amend.
+
+### MIN-007A checkpoints
+
+- [x] 2026-08-09 - validated Pack 007A (`23` hashed files), confirmed the exact branch/parent and clean worktree, read the frozen H1/H2 contracts, and passed the pre-edit focused NRM contract/unit/golden suite (`73 passed`).
+- [ ] Final - install exact schemas, add negative and canary regressions, pass all literal commands, commit with the exact ticket message, and leave the worktree clean.
+
 ## NRM-006 - odds normalisation and consensus baseline
 
 - Ticket/stage: `NRM-006`, A6.

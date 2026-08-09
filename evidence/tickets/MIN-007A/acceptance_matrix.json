@@ -1,0 +1,89 @@
+{
+  "ticket_id": "MIN-007A",
+  "commands": [
+    {
+      "order": 1,
+      "command": "git diff --check",
+      "exit_code": 0,
+      "duration_seconds": 2.6,
+      "result": "PASS"
+    },
+    {
+      "order": 2,
+      "command": "uv run ruff format --check src/dmf_pulse/markets tests/contract/markets tests/unit/markets tests/golden/markets",
+      "exit_code": 0,
+      "duration_seconds": 2.7,
+      "result": "PASS"
+    },
+    {
+      "order": 3,
+      "command": "uv run ruff check src/dmf_pulse/markets tests/contract/markets tests/unit/markets tests/golden/markets",
+      "exit_code": 0,
+      "duration_seconds": 2.8,
+      "result": "PASS"
+    },
+    {
+      "order": 4,
+      "command": "uv run mypy src/dmf_pulse/markets",
+      "exit_code": 0,
+      "duration_seconds": 7.8,
+      "result": "PASS: no issues found in 9 source files"
+    },
+    {
+      "order": 5,
+      "command": "uv run pytest -q tests/contract/markets",
+      "exit_code": 0,
+      "duration_seconds": 3.9,
+      "result": "PASS: 7 passed"
+    },
+    {
+      "order": 6,
+      "command": "uv run pytest -q tests/unit/markets",
+      "exit_code": 0,
+      "duration_seconds": 12.8,
+      "result": "PASS: 60 passed"
+    },
+    {
+      "order": 7,
+      "command": "uv run pytest -q tests/golden/markets",
+      "exit_code": 0,
+      "duration_seconds": 6.1,
+      "result": "PASS: 8 passed"
+    },
+    {
+      "order": 8,
+      "command": "uv run pytest -q -m \"not postgres and not integration\"",
+      "exit_code": 0,
+      "duration_seconds": 168.1,
+      "result": "PASS: 1054 passed, 128 deselected"
+    },
+    {
+      "order": 9,
+      "command": "uv run dmf specs validate",
+      "exit_code": 0,
+      "duration_seconds": 5.5,
+      "result": "PASS: ok=true, 94 decisions, 22 documents, 19 scopes"
+    },
+    {
+      "order": 10,
+      "command": "uv run python scripts/validate_repository.py",
+      "exit_code": 0,
+      "duration_seconds": 4.7,
+      "result": "PASS: error_count=0"
+    },
+    {
+      "order": 11,
+      "command": "uv run python scripts/scan_secrets.py",
+      "exit_code": 0,
+      "duration_seconds": 8.3,
+      "result": "PASS: finding_count=0"
+    },
+    {
+      "order": 12,
+      "command": "git diff --check",
+      "exit_code": 0,
+      "duration_seconds": 2.9,
+      "result": "PASS"
+    }
+  ]
+}

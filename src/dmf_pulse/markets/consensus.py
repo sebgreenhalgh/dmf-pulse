@@ -41,6 +41,12 @@ from dmf_pulse.markets.policy import (
 )
 
 _OUTCOMES = tuple(MarketOutcome)
+_NON_BLOCKING_EXCLUSION_REASONS = frozenset(ExclusionReason)
+_EXPLICIT_BLOCKING_WARNING_PREFIXES = (
+    "BLOCKING_",
+    "MODEL_BLOCKING_",
+    "QUALITY_BLOCKING_",
+)
 
 
 class NoEligibleMarketError(MarketNormalisationError):
@@ -135,6 +141,35 @@ def _confidence_grade(
             continue
         return grade
     raise MarketNormalisationError("confidence policy rejects an eligible market")
+
+
+def _confidence_warning_flags(
+    exclusions: Sequence[ExcludedBook],
+    warnings: Sequence[str],
+    *,
+    fallback_used: bool,
+) -> tuple[bool, bool]:
+    """Classify degradation evidence without making every exclusion blocking.
+
+    Exclusions are public evidence of a degraded result, but the frozen H2
+    contract makes every current exclusion reason non-blocking solely by its
+    presence.  Blocking severity is reserved for a normalisation fallback or
+    an explicitly typed model/quality warning.  The helper is deliberately
+    pure so its policy boundary is easy to exercise without changing the
+    consensus math or persistence shape.
+    """
+
+    has_warning = bool(exclusions or warnings)
+    all_exclusions_are_non_blocking = all(
+        exclusion.reason in _NON_BLOCKING_EXCLUSION_REASONS for exclusion in exclusions
+    )
+    has_explicit_blocking_warning = any(
+        warning.startswith(_EXPLICIT_BLOCKING_WARNING_PREFIXES) for warning in warnings
+    )
+    has_blocking_warning = (
+        fallback_used or has_explicit_blocking_warning or not all_exclusions_are_non_blocking
+    )
+    return has_warning, has_blocking_warning
 
 
 def _group_observations(
@@ -288,14 +323,19 @@ def evaluate_market_consensus(
     fallback_used = any(item.result.fallback_used for item in eligible)
     provider_count = len({item.result.provider_id for item in eligible})
     operator_count = len({item.result.operator_id for item in eligible})
+    has_warning, has_blocking_warning = _confidence_warning_flags(
+        exclusions,
+        warnings,
+        fallback_used=fallback_used,
+    )
     confidence_grade = _confidence_grade(
         operator_count=operator_count,
         maximum_age_seconds=max(ages),
         disagreement=market_disagreement,
         fallback_used=fallback_used,
         policy=policy,
-        has_warning=bool(warnings),
-        has_blocking_warning=bool(exclusions),
+        has_warning=has_warning,
+        has_blocking_warning=has_blocking_warning,
     )
     exclusion_material = [item.model_dump(mode="json") for item in exclusions]
     input_signature = canonical_json_sha256(

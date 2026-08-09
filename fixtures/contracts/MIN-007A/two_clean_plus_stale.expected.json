@@ -1,0 +1,109 @@
+{
+  "status": "DEGRADED",
+  "as_of": "2026-08-20T12:05:00Z",
+  "mapping_cutoff": "2026-08-20T12:05:00Z",
+  "market_definition": "FULL_TIME_1X2",
+  "policy_id": "market-normalisation-v1",
+  "policy_sha256": "4cdcc026240ddfab9eda18cbcc60b8757b0ce9238322aa3b9e0798a7f1ebd040",
+  "provider_count": 1,
+  "operator_count": 2,
+  "eligible_operator_count": 2,
+  "operator_markets": [
+    {
+      "operator_key": "book_alpha",
+      "raw_booksum": "1.071428571429",
+      "overround": "0.071428571429",
+      "power_exponent": "1.072594229814",
+      "outcomes": [
+        {
+          "outcome": "HOME",
+          "decimal_odds": "1.80",
+          "raw_implied_probability": "0.555555555556",
+          "proportional_probability": "0.518518518519",
+          "market_probability": "0.532348683014"
+        },
+        {
+          "outcome": "DRAW",
+          "decimal_odds": "3.60",
+          "raw_implied_probability": "0.277777777778",
+          "proportional_probability": "0.259259259259",
+          "market_probability": "0.253112240216"
+        },
+        {
+          "outcome": "AWAY",
+          "decimal_odds": "4.20",
+          "raw_implied_probability": "0.238095238095",
+          "proportional_probability": "0.222222222222",
+          "market_probability": "0.214539076770"
+        }
+      ]
+    },
+    {
+      "operator_key": "book_beta",
+      "raw_booksum": "1.070157265279",
+      "overround": "0.070157265279",
+      "power_exponent": "1.070467040285",
+      "outcomes": [
+        {
+          "outcome": "HOME",
+          "decimal_odds": "1.85",
+          "raw_implied_probability": "0.540540540541",
+          "proportional_probability": "0.505103836678",
+          "market_probability": "0.517608584723"
+        },
+        {
+          "outcome": "DRAW",
+          "decimal_odds": "3.50",
+          "raw_implied_probability": "0.285714285714",
+          "proportional_probability": "0.266983456529",
+          "market_probability": "0.261573106897"
+        },
+        {
+          "outcome": "AWAY",
+          "decimal_odds": "4.10",
+          "raw_implied_probability": "0.243902439024",
+          "proportional_probability": "0.227912706793",
+          "market_probability": "0.220818308380"
+        }
+      ]
+    }
+  ],
+  "outcomes": [
+    {
+      "outcome": "HOME",
+      "consensus_probability": "0.524978633868",
+      "lower_bound": "0.505103836678",
+      "upper_bound": "0.532348683014"
+    },
+    {
+      "outcome": "DRAW",
+      "consensus_probability": "0.257342673557",
+      "lower_bound": "0.253112240216",
+      "upper_bound": "0.266983456529"
+    },
+    {
+      "outcome": "AWAY",
+      "consensus_probability": "0.217678692575",
+      "lower_bound": "0.214539076770",
+      "upper_bound": "0.227912706793"
+    }
+  ],
+  "operator_disagreement": "0.014740098291",
+  "method_disagreement": "0.013830164495",
+  "market_disagreement": "0.014740098291",
+  "freshness": {
+    "minimum_age_seconds": 360,
+    "maximum_age_seconds": 420
+  },
+  "confidence_grade": "B",
+  "excluded_books": [
+    {
+      "operator_key": "book_gamma",
+      "reason": "STALE"
+    }
+  ],
+  "warnings": [
+    "BOOK_EXCLUDED_STALE"
+  ],
+  "semantic_result_sha256": "84c22958b67d2f7d578460c018b71755ec23477f0cef1368a9f68732a00b0790"
+}

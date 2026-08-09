@@ -1,0 +1,154 @@
+{
+  "fixture_id": "00000000-0000-7000-8000-000000000101",
+  "as_of": "2026-08-20T12:05:00Z",
+  "observation_count": 9,
+  "books": [
+    {
+      "operator_id": "00000000-0000-7000-8000-00000000a001",
+      "operator_key": "book_alpha",
+      "market_state": "COMPLETE",
+      "observations": [
+        {
+          "fixture_id": "00000000-0000-7000-8000-000000000101",
+          "market_id": "00000000-0000-7000-8000-00000000b001",
+          "selection_id": "00000000-0000-7000-8000-00000000c001",
+          "operator_id": "00000000-0000-7000-8000-00000000a001",
+          "outcome": "HOME",
+          "decimal_odds": "1.80",
+          "observed_at": "2026-08-20T11:59:00Z",
+          "received_at": "2026-08-20T12:00:05Z",
+          "usable_at": "2026-08-20T12:00:10Z",
+          "source_snapshot_id": "00000000-0000-7000-8000-00000000d001",
+          "market_state": "COMPLETE",
+          "contract_version": "the-odds-api-v4-reference-v1"
+        },
+        {
+          "fixture_id": "00000000-0000-7000-8000-000000000101",
+          "market_id": "00000000-0000-7000-8000-00000000b001",
+          "selection_id": "00000000-0000-7000-8000-00000000c002",
+          "operator_id": "00000000-0000-7000-8000-00000000a001",
+          "outcome": "DRAW",
+          "decimal_odds": "3.60",
+          "observed_at": "2026-08-20T11:59:00Z",
+          "received_at": "2026-08-20T12:00:05Z",
+          "usable_at": "2026-08-20T12:00:10Z",
+          "source_snapshot_id": "00000000-0000-7000-8000-00000000d002",
+          "market_state": "COMPLETE",
+          "contract_version": "the-odds-api-v4-reference-v1"
+        },
+        {
+          "fixture_id": "00000000-0000-7000-8000-000000000101",
+          "market_id": "00000000-0000-7000-8000-00000000b001",
+          "selection_id": "00000000-0000-7000-8000-00000000c003",
+          "operator_id": "00000000-0000-7000-8000-00000000a001",
+          "outcome": "AWAY",
+          "decimal_odds": "4.20",
+          "observed_at": "2026-08-20T11:59:00Z",
+          "received_at": "2026-08-20T12:00:05Z",
+          "usable_at": "2026-08-20T12:00:10Z",
+          "source_snapshot_id": "00000000-0000-7000-8000-00000000d003",
+          "market_state": "COMPLETE",
+          "contract_version": "the-odds-api-v4-reference-v1"
+        }
+      ]
+    },
+    {
+      "operator_id": "00000000-0000-7000-8000-00000000a002",
+      "operator_key": "book_beta",
+      "market_state": "COMPLETE",
+      "observations": [
+        {
+          "fixture_id": "00000000-0000-7000-8000-000000000101",
+          "market_id": "00000000-0000-7000-8000-00000000b002",
+          "selection_id": "00000000-0000-7000-8000-00000000c004",
+          "operator_id": "00000000-0000-7000-8000-00000000a002",
+          "outcome": "HOME",
+          "decimal_odds": "1.85",
+          "observed_at": "2026-08-20T11:58:00Z",
+          "received_at": "2026-08-20T12:00:05Z",
+          "usable_at": "2026-08-20T12:00:10Z",
+          "source_snapshot_id": "00000000-0000-7000-8000-00000000d004",
+          "market_state": "COMPLETE",
+          "contract_version": "the-odds-api-v4-reference-v1"
+        },
+        {
+          "fixture_id": "00000000-0000-7000-8000-000000000101",
+          "market_id": "00000000-0000-7000-8000-00000000b002",
+          "selection_id": "00000000-0000-7000-8000-00000000c005",
+          "operator_id": "00000000-0000-7000-8000-00000000a002",
+          "outcome": "DRAW",
+          "decimal_odds": "3.50",
+          "observed_at": "2026-08-20T11:58:00Z",
+          "received_at": "2026-08-20T12:00:05Z",
+          "usable_at": "2026-08-20T12:00:10Z",
+          "source_snapshot_id": "00000000-0000-7000-8000-00000000d005",
+          "market_state": "COMPLETE",
+          "contract_version": "the-odds-api-v4-reference-v1"
+        },
+        {
+          "fixture_id": "00000000-0000-7000-8000-000000000101",
+          "market_id": "00000000-0000-7000-8000-00000000b002",
+          "selection_id": "00000000-0000-7000-8000-00000000c006",
+          "operator_id": "00000000-0000-7000-8000-00000000a002",
+          "outcome": "AWAY",
+          "decimal_odds": "4.10",
+          "observed_at": "2026-08-20T11:58:00Z",
+          "received_at": "2026-08-20T12:00:05Z",
+          "usable_at": "2026-08-20T12:00:10Z",
+          "source_snapshot_id": "00000000-0000-7000-8000-00000000d006",
+          "market_state": "COMPLETE",
+          "contract_version": "the-odds-api-v4-reference-v1"
+        }
+      ]
+    },
+    {
+      "operator_id": "00000000-0000-7000-8000-00000000a003",
+      "operator_key": "book_gamma",
+      "market_state": "COMPLETE",
+      "observations": [
+        {
+          "fixture_id": "00000000-0000-7000-8000-000000000101",
+          "market_id": "00000000-0000-7000-8000-00000000b003",
+          "selection_id": "00000000-0000-7000-8000-00000000c101",
+          "operator_id": "00000000-0000-7000-8000-00000000a003",
+          "outcome": "HOME",
+          "decimal_odds": "1.85",
+          "observed_at": "2026-08-20T10:00:00Z",
+          "received_at": "2026-08-20T10:00:05Z",
+          "usable_at": "2026-08-20T10:00:10Z",
+          "source_snapshot_id": "00000000-0000-7000-8000-00000000d101",
+          "market_state": "COMPLETE",
+          "contract_version": "the-odds-api-v4-reference-v1"
+        },
+        {
+          "fixture_id": "00000000-0000-7000-8000-000000000101",
+          "market_id": "00000000-0000-7000-8000-00000000b003",
+          "selection_id": "00000000-0000-7000-8000-00000000c102",
+          "operator_id": "00000000-0000-7000-8000-00000000a003",
+          "outcome": "DRAW",
+          "decimal_odds": "3.50",
+          "observed_at": "2026-08-20T10:00:00Z",
+          "received_at": "2026-08-20T10:00:05Z",
+          "usable_at": "2026-08-20T10:00:10Z",
+          "source_snapshot_id": "00000000-0000-7000-8000-00000000d102",
+          "market_state": "COMPLETE",
+          "contract_version": "the-odds-api-v4-reference-v1"
+        },
+        {
+          "fixture_id": "00000000-0000-7000-8000-000000000101",
+          "market_id": "00000000-0000-7000-8000-00000000b003",
+          "selection_id": "00000000-0000-7000-8000-00000000c103",
+          "operator_id": "00000000-0000-7000-8000-00000000a003",
+          "outcome": "AWAY",
+          "decimal_odds": "4.10",
+          "observed_at": "2026-08-20T10:00:00Z",
+          "received_at": "2026-08-20T10:00:05Z",
+          "usable_at": "2026-08-20T10:00:10Z",
+          "source_snapshot_id": "00000000-0000-7000-8000-00000000d103",
+          "market_state": "COMPLETE",
+          "contract_version": "the-odds-api-v4-reference-v1"
+        }
+      ]
+    }
+  ]
+}

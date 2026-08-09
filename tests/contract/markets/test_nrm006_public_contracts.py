@@ -6,6 +6,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -25,9 +26,9 @@ pytestmark = pytest.mark.contract
 
 SCHEMA_HASHES = {
     "probability.schema.json": "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
-    "normalised_operator_market.schema.json": "b2c9e4fe19edeec5dd45debc14de159a7233cc97b9b00edd14e37312977fc06e",
-    "market_consensus.schema.json": "2a44943bf1e6fc0530c390d7da30a043c8ad1d3af528ee30fd6f35df5c6ba306",
-    "market_normalisation_result.schema.json": "4a8fb4925fede0b569913ad252fd483f1f04d28f2167c328ebefe3fa12cc7164",
+    "normalised_operator_market.schema.json": "c2851ca0c051c61aaa404fb290f6974640b2b1453f8c5a43e8d89502d0ee21fb",
+    "market_consensus.schema.json": "60e59a14cb5c3a9abdbac5c7b4c929c9a38993a07a0b71cdc80704517fc56ad4",
+    "market_normalisation_result.schema.json": "b9a39f8f2a612645ddde141f8e9c8df340d65d1b1a8a4e01b42bb2f64a1eb789",
 }
 
 
@@ -90,3 +91,48 @@ def test_frozen_library_surface_and_enums_are_exposed() -> None:
         "MAPPING_UNAVAILABLE",
         "FUTURE_OBSERVATION",
     } <= {item.value for item in ExclusionReason}
+
+
+def test_min007a_schema_constraints_reject_supplied_negative_cases(repository_root: Path) -> None:
+    cases = json.loads(
+        (repository_root / "fixtures" / "contracts" / "nrm_schema_negative_cases.json").read_text(
+            encoding="utf-8"
+        )
+    )["cases"]
+    schemas: dict[str, dict[str, Any]] = {
+        name: json.loads((repository_root / "public_contracts" / name).read_text(encoding="utf-8"))
+        for name in {
+            "normalised_operator_market.schema.json",
+            "market_consensus.schema.json",
+            "market_normalisation_result.schema.json",
+        }
+    }
+    assert all(case["must_validate"] is False for case in cases)
+
+    operator = schemas["normalised_operator_market.schema.json"]
+    assert operator["properties"]["source_observation_ids"]["maxItems"] == 3
+    assert operator["properties"]["source_observation_ids"]["uniqueItems"] is True
+    assert [
+        item["properties"]["outcome"]["const"]
+        for item in operator["properties"]["outcomes"]["prefixItems"]
+    ] == [
+        "HOME",
+        "DRAW",
+        "AWAY",
+    ]
+    consensus = schemas["market_consensus.schema.json"]
+    assert consensus["properties"]["operator_markets"]["uniqueItems"] is True
+    assert [
+        item["properties"]["outcome"]["const"]
+        for item in consensus["properties"]["outcomes"]["prefixItems"]
+    ] == [
+        "HOME",
+        "DRAW",
+        "AWAY",
+    ]
+    result = schemas["market_normalisation_result.schema.json"]
+    assert result["properties"]["excluded_books"]["uniqueItems"] is True
+    assert result["properties"]["warnings"]["uniqueItems"] is True
+    assert len(result["allOf"]) == 2
+    assert result["allOf"][0]["then"]["properties"]["error_code"] == {"type": "null"}
+    assert result["allOf"][1]["then"]["properties"]["consensus"] == {"type": "null"}

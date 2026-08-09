@@ -54,3 +54,37 @@ def test_standalone_verifier_covers_every_required_golden(repository_root: Path)
     assert report["network_requests"] == 0
     assert report["case_count"] == 6
     assert tuple(report["semantic_result_sha256"]) == GOLDEN_NAMES
+
+
+def test_two_clean_plus_stale_canary_is_degraded_b_without_math_drift(
+    repository_root: Path,
+) -> None:
+    namespace = runpy.run_path(str(repository_root / "scripts" / "verify_nrm006_goldens.py"))
+    fixture = json.loads(
+        (
+            repository_root / "fixtures" / "contracts" / "MIN-007A" / "two_clean_plus_stale.json"
+        ).read_text(encoding="utf-8")
+    )
+    expected = json.loads(
+        (
+            repository_root
+            / "fixtures"
+            / "contracts"
+            / "MIN-007A"
+            / "two_clean_plus_stale.expected.json"
+        ).read_text(encoding="utf-8")
+    )
+    project = cast(Callable[..., dict[str, Any]], namespace["_consensus_projection"])
+    actual = project(
+        fixture,
+        case_name="two_clean_plus_stale.json",
+        policy=namespace["load_market_normalisation_policy"](),
+    )
+    assert actual == expected
+    assert actual["status"] == "DEGRADED"
+    assert actual["confidence_grade"] == "B"
+    assert actual["eligible_operator_count"] == 2
+    assert actual["excluded_books"] == [{"operator_key": "book_gamma", "reason": "STALE"}]
+    assert actual["semantic_result_sha256"] == (
+        "84c22958b67d2f7d578460c018b71755ec23477f0cef1368a9f68732a00b0790"
+    )

@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "name": "operator_source_ids_too_many",
+      "target": "normalised_operator_market.schema.json",
+      "mutation": "source_observation_ids has 4 UUIDs",
+      "must_validate": false
+    },
+    {
+      "name": "operator_source_ids_duplicate",
+      "target": "normalised_operator_market.schema.json",
+      "mutation": "source_observation_ids repeats one UUID",
+      "must_validate": false
+    },
+    {
+      "name": "operator_duplicate_home_outcome",
+      "target": "normalised_operator_market.schema.json",
+      "mutation": "outcomes are HOME,HOME,AWAY",
+      "must_validate": false
+    },
+    {
+      "name": "consensus_wrong_outcome_order",
+      "target": "market_consensus.schema.json",
+      "mutation": "outcomes are DRAW,HOME,AWAY",
+      "must_validate": false
+    },
+    {
+      "name": "normalised_null_consensus",
+      "target": "market_normalisation_result.schema.json",
+      "mutation": "status NORMALISED with consensus null",
+      "must_validate": false
+    },
+    {
+      "name": "blocked_with_consensus",
+      "target": "market_normalisation_result.schema.json",
+      "mutation": "status BLOCKED with non-null consensus and null error",
+      "must_validate": false
+    }
+  ]
+}

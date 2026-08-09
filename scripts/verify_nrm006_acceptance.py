@@ -50,13 +50,13 @@ HAPPY_SEMANTIC_SHA256 = "bd8840cceed27199e3b10945ef54529a517df68b522a82ab0c935c4
 SCHEMA_HASHES: dict[str, str] = {
     "probability.schema.json": "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
     "normalised_operator_market.schema.json": (
-        "b2c9e4fe19edeec5dd45debc14de159a7233cc97b9b00edd14e37312977fc06e"
+        "c2851ca0c051c61aaa404fb290f6974640b2b1453f8c5a43e8d89502d0ee21fb"
     ),
     "market_consensus.schema.json": (
-        "2a44943bf1e6fc0530c390d7da30a043c8ad1d3af528ee30fd6f35df5c6ba306"
+        "60e59a14cb5c3a9abdbac5c7b4c929c9a38993a07a0b71cdc80704517fc56ad4"
     ),
     "market_normalisation_result.schema.json": (
-        "4a8fb4925fede0b569913ad252fd483f1f04d28f2167c328ebefe3fa12cc7164"
+        "b9a39f8f2a612645ddde141f8e9c8df340d65d1b1a8a4e01b42bb2f64a1eb789"
     ),
 }
 EXPECTED_MATRIX = [
