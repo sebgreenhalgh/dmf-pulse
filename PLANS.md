@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## MIN-007D - conditional minutes PMFs
+
+- Ticket/stage: `MIN-007D`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `6d31e3e46a9f3609efab9a2a9ca28f269b5ef6bb`.
+- Scope: fit typed Decimal START/BENCH minute priors and predict cutoff-safe conditional 91-point minute PMFs.
+- Constraints: preserve accepted A/B/C/R1/R2 and NRM identities; no coherent sampler, public role marginals, overall player PMF, persistence, CLI, evaluation, network, provider, or credential work.
+
+### MIN-007D checkpoints
+
+- [x] 2026-08-10 - Implemented Decimal position/role minute priors, cutoff-safe conditional PMFs, reduced synthetic weighting support, and focused unit/property/golden tests; frozen artifact and independent canaries pass.
+- [x] 2026-08-10 - Ran all 15 literal acceptance commands with zero final failures, recorded evidence, and prepared the exact ticket commit pending final clean-tree and review-pack validation.
+
 ## MIN-007R2 - explicit new-signing identity override
 
 - Ticket/stage: `MIN-007R2`, A7.
