@@ -41,6 +41,8 @@ POSITION_ORDER: tuple[Position, ...] = ("GK", "DEF", "MID", "FWD")
 MINUTE_ROLE_ORDER: tuple[Literal["START", "BENCH"], ...] = ("START", "BENCH")
 MINUTE_COUNT = 91
 DECIMAL_PRECISION = 60
+INTEGRITY_PRECISION = 256
+INTEGRITY_VERIFICATION_PRECISION = 200
 ROUNDING_MODE = ROUND_HALF_EVEN
 SERIAL_SCALE = Decimal("0.000000000001")
 MINUTE_ARTIFACT_SHA256 = "8e0b410e37d33127dc26937f9fe7c6ff60867b4f60f0f7a87679f951c5f7e422"
@@ -120,6 +122,49 @@ def _public_vector(values: Sequence[Decimal]) -> tuple[Decimal, ...]:
         if sum(quantized, Decimal(0)) != Decimal(1):
             raise MinuteModelValidationError("minute-vector residual correction failed")
         return tuple(quantized)
+
+
+def _validate_stored_pmf(values: Sequence[Decimal], *, role: str) -> None:
+    """Validate the exact stored Decimal PMF invariant."""
+
+    if len(values) != MINUTE_COUNT:
+        raise MinuteModelValidationError("minute_pmf must contain 91 Decimal bins")
+    for value in values:
+        if not isinstance(value, Decimal) or not value.is_finite() or value < 0:
+            raise MinuteModelValidationError("minute_pmf must contain finite non-negative Decimals")
+    if role == "START" and values[0] != Decimal(0):
+        raise MinuteModelValidationError("START minute zero must be zero")
+    with localcontext() as context:
+        context.prec = INTEGRITY_PRECISION
+        if sum(values, Decimal(0)) != Decimal(1):
+            raise MinuteModelValidationError("minute_pmf does not sum exactly to one")
+    with localcontext() as context:
+        context.prec = INTEGRITY_VERIFICATION_PRECISION
+        if sum(values, Decimal(0)) != Decimal(1):
+            raise MinuteModelValidationError("minute_pmf fails high-precision simplex verification")
+
+
+def _correct_stored_pmf(values: Sequence[Decimal], *, role: str) -> tuple[Decimal, ...]:
+    """Apply an internal high-precision residual without public rounding."""
+
+    if len(values) != MINUTE_COUNT:
+        raise MinuteModelValidationError("minute_pmf must contain 91 Decimal bins")
+    for value in values:
+        if not isinstance(value, Decimal) or not value.is_finite() or value < 0:
+            raise MinuteModelValidationError("minute_pmf must contain finite non-negative Decimals")
+    correction_index = max(range(MINUTE_COUNT), key=lambda index: (values[index], -index))
+    if role == "START" and correction_index == 0:
+        raise MinuteModelValidationError("START minute zero cannot receive simplex correction")
+    corrected = list(values)
+    with localcontext() as context:
+        context.prec = INTEGRITY_PRECISION
+        other_sum = sum(
+            (value for index, value in enumerate(values) if index != correction_index),
+            Decimal(0),
+        )
+        corrected[correction_index] = Decimal(1) - other_sum
+        _validate_stored_pmf(tuple(corrected), role=role)
+    return tuple(corrected)
 
 
 def _mapping(value: object, *, label: str) -> dict[str, Any]:
@@ -263,13 +308,24 @@ class MinuteConditionalPrediction(_FrozenModel):
             UUID(self.player_id)
         except ValueError as exc:
             raise MinuteModelValidationError("player_id must be a UUID string") from exc
-        if len(self.minute_pmf) != MINUTE_COUNT:
-            raise MinuteModelValidationError("minute_pmf must contain 91 Decimal bins")
-        if any(not isinstance(value, Decimal) or value < 0 for value in self.minute_pmf):
-            raise MinuteModelValidationError("minute_pmf must contain non-negative Decimals")
+        _validate_stored_pmf(self.minute_pmf, role=self.role)
         if self.matching_role_history_count > self.eligible_history_count:
             raise MinuteModelValidationError("matching history count exceeds eligible history")
         return self
+
+    def model_copy(
+        self,
+        *,
+        update: Mapping[str, Any] | None = None,
+        deep: bool = False,
+    ) -> Self:
+        """Revalidate merged updates instead of using Pydantic's unsafe copy path."""
+
+        del deep
+        data = self.model_dump(mode="python")
+        if update is not None:
+            data.update(dict(update))
+        return type(self).model_validate(data)
 
     @field_serializer("minute_pmf", when_used="json")
     def serialize_pmf(self, value: tuple[Decimal, ...]) -> list[str]:
@@ -462,12 +518,16 @@ def _history_rows_checked(history: object) -> tuple[_MinuteHistoryRow, ...]:
             raise MinuteModelValidationError("history rows must be mappings")
         if parsed.evidence_type not in {"COMPETITIVE", "PRESEASON"}:
             raise MinuteModelValidationError("history evidence type is not supported")
-        if parsed.example_id in seen_examples:
+        try:
+            example_identity = str(UUID(parsed.example_id))
+        except ValueError:
+            example_identity = parsed.example_id
+        if example_identity in seen_examples:
             raise MinuteModelValidationError("history contains duplicate example_id")
         target = (parsed.player_id, parsed.fixture_id)
         if target in seen_targets:
             raise MinuteModelValidationError("history contains duplicate player-fixture target")
-        seen_examples.add(parsed.example_id)
+        seen_examples.add(example_identity)
         seen_targets.add(target)
         rows.append(parsed)
     return tuple(rows)
@@ -613,7 +673,7 @@ def predict_conditional_minutes(
         total = sum(counts, Decimal(0))
         if total <= 0:
             raise MinuteModelValidationError("minute PMF has no positive mass")
-        pmf = tuple(value / total for value in counts)
+        pmf = _correct_stored_pmf(tuple(value / total for value in counts), role=role)
     try:
         return MinuteConditionalPrediction.model_validate(
             {

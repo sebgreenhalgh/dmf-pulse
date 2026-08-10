@@ -1,5 +1,16 @@
 # DMF Pulse execution plans
 
+## MIN-007R3D - harden conditional minute invariants
+
+- Ticket/stage: `MIN-007R3D`, A7; required parent `64f6b168db496c6c3aabe39dda82ad7843266a2a`.
+- Scope: exact stored Decimal conditional-PMF simplex, UUID-shaped example duplicate identity, and validated minute-result copy boundaries.
+- Constraints: preserve frozen B/C/D/E identities; do not modify `lineup.py` or begin MIN-007F.
+
+### MIN-007R3D checkpoints
+
+- [x] Implemented the three assigned AUDIT-007-2 D remediations and focused adversarial tests.
+- [x] Run all acceptance commands, record evidence, and create the single bounded ticket commit.
+
 ## MIN-007E - coherent lineup sampler
 
 - Ticket/stage: `MIN-007E`, A7.
