@@ -1,5 +1,16 @@
 # DMF Pulse execution plans
 
+## MIN-007R3E - harden coherent lineup invariants
+
+- Ticket/stage: `MIN-007R3E`, A7; required parent `9848c3ff3d68d75e31ffa55085ff033177aec312`.
+- Scope: one-to-one candidate identity, context-independent weight constraints, strict seed suffixes, and truthful projected-result validation.
+- Constraints: preserve frozen B/C/D/E identities and race algorithm; do not begin MIN-007F.
+
+### MIN-007R3E checkpoints
+
+- [x] Implemented the four AUDIT-007-2 lineup remediations and focused adversarial probes.
+- [x] Run all acceptance commands, record evidence, and create the single bounded ticket commit.
+
 ## MIN-007R3D - harden conditional minute invariants
 
 - Ticket/stage: `MIN-007R3D`, A7; required parent `64f6b168db496c6c3aabe39dda82ad7843266a2a`.

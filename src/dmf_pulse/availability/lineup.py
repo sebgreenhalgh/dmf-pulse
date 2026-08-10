@@ -31,6 +31,7 @@ from dmf_pulse.availability.role_model import (
 )
 
 DECIMAL_PRECISION = 60
+INTEGRITY_PRECISION = 256
 ROUNDING_MODE = ROUND_HALF_EVEN
 SAMPLER_ID = "DETERMINISTIC_EXPONENTIAL_RACE_V1"
 COHERENCE_MODEL = "COHERENCE_MODEL_V1"
@@ -51,6 +52,20 @@ class LineupModelValidationError(ValueError):
 
 class _FrozenModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    def model_copy(
+        self,
+        *,
+        update: Mapping[str, Any] | None = None,
+        deep: bool = False,
+    ) -> Self:
+        """Revalidate merged updates through the complete typed boundary."""
+
+        del deep
+        data = self.model_dump(mode="python")
+        if update is not None:
+            data.update(dict(update))
+        return type(self).model_validate(data)
 
 
 @dataclass(frozen=True)
@@ -95,8 +110,17 @@ class RoleMarginal(_FrozenModel):
     @model_validator(mode="after")
     def validate_vector(self) -> Self:
         values = (self.p_start, self.p_bench, self.p_out)
-        if any(value < 0 for value in values) or sum(values, Decimal(0)) != Decimal(1):
+        if any(not value.is_finite() or value < 0 for value in values):
+            raise LineupModelValidationError(
+                "role marginal probabilities must be finite and non-negative"
+            )
+        with localcontext() as context:
+            context.prec = INTEGRITY_PRECISION
+            total = sum(values, Decimal(0))
+        if total != Decimal(1):
             raise LineupModelValidationError("role marginal must be non-negative and sum to one")
+        if not isinstance(self.player_key, str) or not self.player_key:
+            raise LineupModelValidationError("role marginal player key must be non-empty")
         return self
 
     @field_serializer("p_start", "p_bench", "p_out", when_used="json")
@@ -123,13 +147,81 @@ class ProjectedLineupResult(_FrozenModel):
     def validate_projection(self) -> Self:
         if len(self.scenarios) != SAMPLE_COUNT or len(self.first_scenarios) != 3:
             raise LineupModelValidationError("projected result has the wrong scenario count")
-        if self.sum_p_start != Decimal(11):
-            raise LineupModelValidationError("starting marginal sum is not eleven")
-        if self.sum_p_bench != Decimal(self.bench_size):
-            raise LineupModelValidationError("bench marginal sum is not configured bench size")
-        expected_out = len(self.role_marginals) - 11 - self.bench_size
-        if self.sum_p_out != Decimal(expected_out):
-            raise LineupModelValidationError("OUT marginal sum is inconsistent")
+        if self.bench_goalkeeper_slots > self.bench_size:
+            raise LineupModelValidationError("bench goalkeeper slots exceed bench size")
+
+        marginal_by_id: dict[str, RoleMarginal] = {}
+        key_to_id: dict[str, str] = {}
+        for marginal in self.role_marginals:
+            player_id = _canonical_result_player_id(
+                marginal.player_id, label="role marginal.player_id"
+            )
+            if player_id in marginal_by_id:
+                raise LineupModelValidationError("role marginals contain duplicate player_id")
+            prior_id = key_to_id.get(marginal.player_key)
+            if prior_id is not None and prior_id != player_id:
+                raise LineupModelValidationError("role marginals contain duplicate player_key")
+            marginal_by_id[player_id] = marginal
+            key_to_id[marginal.player_key] = player_id
+        if not marginal_by_id:
+            raise LineupModelValidationError("projected result has no roster marginals")
+
+        scenario_indices = [scenario.scenario_index for scenario in self.scenarios]
+        if scenario_indices != list(range(SAMPLE_COUNT)):
+            raise LineupModelValidationError("scenario indexes must be unique and contiguous")
+        scenario_hashes: list[str] = []
+        counts = {player_id: {"START": 0, "BENCH": 0, "OUT": 0} for player_id in marginal_by_id}
+        for scenario in self.scenarios:
+            scenario_hashes.append(
+                _validate_projected_scenario(scenario, self, marginal_by_id, counts)
+            )
+        expected_set_hash = hashlib.sha256("".join(scenario_hashes).encode("utf-8")).hexdigest()
+        if self.scenario_set_sha256 != expected_set_hash:
+            raise LineupModelValidationError("scenario-set hash does not match scenarios")
+        for index, first in enumerate(self.first_scenarios):
+            scenario = self.scenarios[index]
+            if (
+                first.scenario_index != scenario.scenario_index
+                or first.starters != scenario.starters
+                or first.bench != scenario.bench
+                or first.scenario_sha256 != scenario.scenario_sha256
+            ):
+                raise LineupModelValidationError(
+                    "first-scenario diagnostics do not match scenarios"
+                )
+
+        with localcontext() as context:
+            context.prec = INTEGRITY_PRECISION
+            denominator = Decimal(SAMPLE_COUNT)
+            for player_id, marginal in marginal_by_id.items():
+                expected = {
+                    role: Decimal(counts[player_id][role]) / denominator
+                    for role in ("START", "BENCH", "OUT")
+                }
+                if (
+                    marginal.p_start != expected["START"]
+                    or marginal.p_bench != expected["BENCH"]
+                    or marginal.p_out != expected["OUT"]
+                ):
+                    raise LineupModelValidationError("role marginal does not match scenario counts")
+            derived_start = sum((m.p_start for m in marginal_by_id.values()), Decimal(0))
+            derived_bench = sum((m.p_bench for m in marginal_by_id.values()), Decimal(0))
+            derived_out = sum((m.p_out for m in marginal_by_id.values()), Decimal(0))
+            if (
+                self.sum_p_start != derived_start
+                or self.sum_p_bench != derived_bench
+                or self.sum_p_out != derived_out
+            ):
+                raise LineupModelValidationError(
+                    "advertised marginal sums do not match derived sums"
+                )
+            expected_out = Decimal(len(marginal_by_id) - 11 - self.bench_size)
+            if derived_start != Decimal(11):
+                raise LineupModelValidationError("starting marginal sum is not eleven")
+            if derived_bench != Decimal(self.bench_size):
+                raise LineupModelValidationError("bench marginal sum is not configured bench size")
+            if derived_out != expected_out:
+                raise LineupModelValidationError("OUT marginal sum is inconsistent")
         return self
 
     @field_serializer("sum_p_start", "sum_p_bench", "sum_p_out", when_used="json")
@@ -148,8 +240,8 @@ class ProjectedLineupResult(_FrozenModel):
 class BlockedLineupResult(_FrozenModel):
     status: Literal["BLOCKED"]
     error_code: Literal["INSUFFICIENT_ELIGIBLE_SQUAD"]
-    fixture_id: str
-    team_id: str
+    fixture_id: str = Field(min_length=1)
+    team_id: str = Field(min_length=1)
     sample_count: Literal[256]
 
     @property
@@ -159,7 +251,7 @@ class BlockedLineupResult(_FrozenModel):
 
 class InvalidLineupResult(_FrozenModel):
     status: Literal["INVALID"]
-    error_code: str
+    error_code: str = Field(min_length=1)
 
     @property
     def semantic_sha256(self) -> str:
@@ -174,6 +266,97 @@ def _canonical_sha256(value: object) -> str:
         value, ensure_ascii=False, allow_nan=False, separators=(",", ":"), sort_keys=True
     ).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()
+
+
+def _canonical_result_player_id(value: object, *, label: str) -> str:
+    """Return a canonical result identity and reject UUID aliases."""
+
+    if not isinstance(value, str):
+        raise LineupModelValidationError(f"{label} must be a UUID string")
+    try:
+        canonical = str(UUID(value))
+    except ValueError as exc:
+        raise LineupModelValidationError(f"{label} must be a UUID string") from exc
+    if canonical != value:
+        raise LineupModelValidationError(f"{label} must use canonical UUID spelling")
+    return canonical
+
+
+def _validate_projected_scenario(
+    scenario: LineupScenario,
+    result: ProjectedLineupResult,
+    marginal_by_id: Mapping[str, RoleMarginal],
+    counts: dict[str, dict[str, int]],
+) -> str:
+    """Validate one scenario and update independently derived role counts."""
+
+    starters = tuple(scenario.starters)
+    bench = tuple(scenario.bench)
+    if len(starters) != 11 or len(set(starters)) != 11:
+        raise LineupModelValidationError("scenario must contain eleven unique starters")
+    if len(bench) != result.bench_size or len(set(bench)) != result.bench_size:
+        raise LineupModelValidationError("scenario bench size or uniqueness is invalid")
+    if tuple(sorted(starters)) != starters or tuple(sorted(bench)) != bench:
+        raise LineupModelValidationError("scenario roster lists must be sorted")
+    if set(starters) & set(bench):
+        raise LineupModelValidationError("scenario START and BENCH roles overlap")
+    canonical_starters = {
+        _canonical_result_player_id(player_id, label="scenario.starters") for player_id in starters
+    }
+    canonical_bench = {
+        _canonical_result_player_id(player_id, label="scenario.bench") for player_id in bench
+    }
+    marginal_ids = set(marginal_by_id)
+    if not canonical_starters <= marginal_ids or not canonical_bench <= marginal_ids:
+        raise LineupModelValidationError("scenario references an unknown player")
+    if sum(marginal_by_id[player_id].position == "GK" for player_id in canonical_starters) != 1:
+        raise LineupModelValidationError("scenario must contain exactly one starting goalkeeper")
+    if (
+        sum(marginal_by_id[player_id].position == "GK" for player_id in canonical_bench)
+        != result.bench_goalkeeper_slots
+    ):
+        raise LineupModelValidationError("scenario bench goalkeeper count is invalid")
+    member_ids: list[str] = []
+    member_payload: list[dict[str, object]] = []
+    for member in scenario.members:
+        player_id = _canonical_result_player_id(member.player_id, label="scenario member.player_id")
+        member_ids.append(player_id)
+        expected_role = (
+            "START"
+            if player_id in canonical_starters
+            else "BENCH"
+            if player_id in canonical_bench
+            else "OUT"
+        )
+        marginal = marginal_by_id.get(player_id)
+        if marginal is None or member.role != expected_role or member.position != marginal.position:
+            raise LineupModelValidationError("scenario member role or position is incoherent")
+        member_payload.append(
+            {"player_id": player_id, "role": member.role, "position": member.position}
+        )
+        counts[player_id][member.role] += 1
+    if len(member_ids) != len(marginal_by_id) or len(set(member_ids)) != len(member_ids):
+        raise LineupModelValidationError(
+            "scenario members must contain each roster player exactly once"
+        )
+    if set(member_ids) != set(marginal_by_id):
+        raise LineupModelValidationError("scenario members do not match roster marginals")
+    if tuple(member_ids) != tuple(sorted(member_ids)):
+        raise LineupModelValidationError("scenario members must be sorted by player_id")
+    if sum(member.role == "START" for member in scenario.members) != 11:
+        raise LineupModelValidationError("scenario START member count is invalid")
+    if sum(member.role == "BENCH" for member in scenario.members) != result.bench_size:
+        raise LineupModelValidationError("scenario BENCH member count is invalid")
+    body = {
+        "scenario_index": scenario.scenario_index,
+        "starters": sorted(canonical_starters),
+        "bench": sorted(canonical_bench),
+        "members": member_payload,
+    }
+    expected_hash = _canonical_sha256(body)
+    if scenario.scenario_sha256 != expected_hash:
+        raise LineupModelValidationError("scenario hash does not match scenario contents")
+    return expected_hash
 
 
 def _mapping(value: object, *, label: str) -> dict[str, Any]:
@@ -239,12 +422,17 @@ def _candidate_rows(candidates: object) -> tuple[_Candidate, ...]:
         player_key = value["player_key"]
         if not isinstance(player_key, str) or not player_key:
             raise LineupModelValidationError("invalid player key")
+        if any(row.player_key == player_key for row in rows):
+            raise LineupModelValidationError("duplicate player key")
         start = _decimal(value["start_weight"], label="candidate.start_weight")
         bench = _decimal(value["bench_weight"], label="candidate.bench_weight")
         hard = value["hard_ineligible"]
         if not isinstance(hard, bool):
             raise LineupModelValidationError("hard_ineligible must be boolean")
-        if start < 0 or bench < 0 or start + bench > Decimal(1):
+        with localcontext() as context:
+            context.prec = INTEGRITY_PRECISION
+            total_weight = start + bench
+        if start < 0 or bench < 0 or total_weight > Decimal(1):
             raise LineupModelValidationError("invalid role weights")
         if hard and (start != 0 or bench != 0):
             raise LineupModelValidationError("contradictory ineligible weights")
@@ -355,7 +543,9 @@ def sample_coherent_lineups(
     try:
         fixture = _validate_text(fixture_id, label="fixture_id")
         team = _validate_text(team_id, label="team_id")
-        suffix = _validate_text(seed_suffix, label="seed_suffix") if seed_suffix else ""
+        if not isinstance(seed_suffix, str):
+            raise LineupModelValidationError("seed_suffix must be a string")
+        suffix = seed_suffix
         if isinstance(bench_size, bool) or not isinstance(bench_size, int) or bench_size < 0:
             raise LineupModelValidationError("invalid bench configuration")
         if (
@@ -369,13 +559,17 @@ def sample_coherent_lineups(
         rows = _candidate_rows(candidates)
     except LineupModelValidationError as exc:
         message = str(exc)
-        if "duplicate player" in message:
+        if "duplicate player ID" in message:
             code = "DUPLICATE_PLAYER_ID"
+        elif "duplicate player key" in message:
+            code = "DUPLICATE_PLAYER_KEY"
+        elif "seed_suffix" in message:
+            code = "INVALID_SEED_SUFFIX"
         elif "invalid position" in message:
             code = "INVALID_POSITION"
         elif "contradictory" in message:
             code = "CONTRADICTORY_INELIGIBLE_WEIGHTS"
-        elif "weights" in message:
+        elif "weights" in message or "weight" in message or "finite" in message:
             code = "INVALID_ROLE_WEIGHTS"
         elif "bench" in message:
             code = "INVALID_BENCH_CONFIGURATION"
