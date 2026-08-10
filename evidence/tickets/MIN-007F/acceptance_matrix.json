@@ -1,0 +1,30 @@
+{
+  "ticket_id": "MIN-007F",
+  "status": "PASS",
+  "passed": 22,
+  "failed": 0,
+  "commands": [
+    {"number": 1, "status": "PASS", "result": "git diff --check"},
+    {"number": 2, "status": "PASS", "result": "ruff format check"},
+    {"number": 3, "status": "PASS", "result": "ruff check"},
+    {"number": 4, "status": "PASS", "result": "mypy availability"},
+    {"number": 5, "status": "PASS", "result": "registry unit tests: 3 passed"},
+    {"number": 6, "status": "PASS", "result": "registry oracle"},
+    {"number": 7, "status": "PASS", "result": "PostgreSQL 18.4 healthy"},
+    {"number": 8, "status": "PASS", "result": "Alembic upgrade head"},
+    {"number": 9, "status": "PASS", "result": "migration matrix"},
+    {"number": 10, "status": "PASS", "result": "migration tests: 63 passed"},
+    {"number": 11, "status": "PASS", "result": "persistence integration: 2 passed"},
+    {"number": 12, "status": "PASS", "result": "constraint integration: 1 passed"},
+    {"number": 13, "status": "PASS", "result": "as-of integration: 1 passed"},
+    {"number": 14, "status": "PASS", "result": "concurrency integration: 1 passed"},
+    {"number": 15, "status": "PASS", "result": "R3D oracle"},
+    {"number": 16, "status": "PASS", "result": "R3E oracle"},
+    {"number": 17, "status": "PASS", "result": "availability regression: 124 passed"},
+    {"number": 18, "status": "PASS", "result": "markets regression: 75 passed"},
+    {"number": 19, "status": "PASS", "result": "repository validator"},
+    {"number": 20, "status": "PASS", "result": "secret scan: 0 findings"},
+    {"number": 21, "status": "PASS", "result": "PostgreSQL teardown"},
+    {"number": 22, "status": "PASS", "result": "git diff --check"}
+  ]
+}

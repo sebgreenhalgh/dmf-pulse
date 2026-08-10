@@ -25,7 +25,7 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import JSONB, TSTZRANGE, UUID, ExcludeConstraint
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TSTZRANGE, UUID, ExcludeConstraint
 from sqlalchemy.types import DateTime
 
 metadata = MetaData(
@@ -3238,6 +3238,462 @@ ruleset_activation = Table(
     schema="provenance",
 )
 
+# MIN-007F availability registry and immutable prediction bundle.
+dataset_version = Table(
+    "dataset_version",
+    metadata,
+    Column(
+        "dataset_version_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column("dataset_semantic_sha256", CHAR(64), nullable=False),
+    Column("dataset_key", String(160), nullable=False),
+    Column("schema_version", String(80), nullable=False),
+    Column("competition_code", String(80), nullable=False),
+    Column("season_code", String(40), nullable=False),
+    Column("training_cutoff", DateTime(timezone=True), nullable=False),
+    Column("source_dataset_sha256", CHAR(64)),
+    Column("policy_sha256", CHAR(64), nullable=False),
+    Column("declared_training_example_count", Integer, nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("dataset_semantic_sha256", name="uq_dataset_version_semantic_hash"),
+    CheckConstraint(
+        "dataset_semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_dataset_version_semantic_hash"
+    ),
+    CheckConstraint(
+        "source_dataset_sha256 IS NULL OR source_dataset_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_dataset_version_source_hash",
+    ),
+    CheckConstraint("policy_sha256 ~ '^[0-9a-f]{64}$'", name="ck_dataset_version_policy_hash"),
+    CheckConstraint(
+        "declared_training_example_count >= 0", name="ck_dataset_version_example_count"
+    ),
+    schema="provenance",
+)
+
+dataset_training_example = Table(
+    "dataset_training_example",
+    metadata,
+    Column(
+        "training_example_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column(
+        "dataset_version_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.dataset_version.dataset_version_id",
+            name="fk_dataset_example_version",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("example_id", String(160), nullable=False),
+    Column("fixture_id", String(160), nullable=False),
+    Column("fixture_key", String(160), nullable=False),
+    Column("feature_cutoff", DateTime(timezone=True), nullable=False),
+    Column("label_usable_at", DateTime(timezone=True), nullable=False),
+    Column("manager_regime_id", String(160), nullable=False),
+    Column("minutes_label", SmallInteger, nullable=False),
+    Column("player_id", String(160), nullable=False),
+    Column("player_key", String(160), nullable=False),
+    Column("position", String(8), nullable=False),
+    Column("role_label", String(8), nullable=False),
+    Column("sequence_index", Integer, nullable=False),
+    Column("split", String(16), nullable=False, server_default=text("'TRAIN'")),
+    Column("team_id", String(160), nullable=False),
+    Column("team_key", String(160), nullable=False),
+    Column("evidence_type", String(40), nullable=False),
+    Column("lineage_sha256", CHAR(64), nullable=False),
+    Column("source_lineage", JSONB, nullable=False, server_default=text("'{}'::jsonb")),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("dataset_version_id", "example_id", name="uq_dataset_example_identity"),
+    CheckConstraint("lineage_sha256 ~ '^[0-9a-f]{64}$'", name="ck_dataset_example_lineage_hash"),
+    CheckConstraint("minutes_label BETWEEN 0 AND 90", name="ck_dataset_example_minutes"),
+    CheckConstraint("role_label IN ('START','BENCH','OUT')", name="ck_dataset_example_role"),
+    CheckConstraint("position IN ('GK','DEF','MID','FWD')", name="ck_dataset_example_position"),
+    CheckConstraint("split = 'TRAIN'", name="ck_dataset_example_split"),
+    CheckConstraint("sequence_index > 0", name="ck_dataset_example_sequence"),
+    CheckConstraint("label_usable_at >= feature_cutoff", name="ck_dataset_example_time_order"),
+    schema="provenance",
+)
+
+model_version = Table(
+    "model_version",
+    metadata,
+    Column(
+        "model_version_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column("model_semantic_sha256", CHAR(64), nullable=False),
+    Column("model_key", String(160), nullable=False),
+    Column("schema_version", String(80), nullable=False),
+    Column("dataset_version_sha256", CHAR(64), nullable=False),
+    Column("role_artifact_sha256", CHAR(64), nullable=False),
+    Column("minute_artifact_sha256", CHAR(64), nullable=False),
+    Column("policy_sha256", CHAR(64), nullable=False),
+    Column("model_family", String(160), nullable=False),
+    Column("code_identity", String(160), nullable=False),
+    Column("artifact", JSONB, nullable=False, server_default=text("'{}'::jsonb")),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    ForeignKeyConstraint(
+        ["dataset_version_sha256"],
+        ["provenance.dataset_version.dataset_semantic_sha256"],
+        name="fk_model_dataset_version",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint("model_semantic_sha256", name="uq_model_version_semantic_hash"),
+    CheckConstraint(
+        "model_semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_model_version_semantic_hash"
+    ),
+    CheckConstraint(
+        "dataset_version_sha256 ~ '^[0-9a-f]{64}$'", name="ck_model_version_dataset_hash"
+    ),
+    CheckConstraint("role_artifact_sha256 ~ '^[0-9a-f]{64}$'", name="ck_model_version_role_hash"),
+    CheckConstraint(
+        "minute_artifact_sha256 ~ '^[0-9a-f]{64}$'", name="ck_model_version_minute_hash"
+    ),
+    CheckConstraint("policy_sha256 ~ '^[0-9a-f]{64}$'", name="ck_model_version_policy_hash"),
+    schema="provenance",
+)
+
+model_evaluation = Table(
+    "model_evaluation",
+    metadata,
+    Column(
+        "model_evaluation_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column(
+        "model_version_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "provenance.model_version.model_version_id",
+            name="fk_model_evaluation_model",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("evaluation_semantic_sha256", CHAR(64), nullable=False),
+    Column("status", String(24), nullable=False),
+    Column("evaluation", JSONB, nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("evaluation_semantic_sha256", name="uq_model_evaluation_semantic_hash"),
+    CheckConstraint(
+        "evaluation_semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_model_evaluation_semantic_hash"
+    ),
+    CheckConstraint(
+        "status IN ('PENDING','COMPLETE','BLOCKED')", name="ck_model_evaluation_status"
+    ),
+    schema="provenance",
+)
+
+prediction_run = Table(
+    "prediction_run",
+    metadata,
+    Column(
+        "prediction_run_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column("prediction_input_signature_sha256", CHAR(64), nullable=False),
+    Column("output_semantic_sha256", CHAR(64), nullable=False),
+    Column("fixture_id", UUID(as_uuid=True), nullable=False),
+    Column("team_id", UUID(as_uuid=True), nullable=False),
+    Column("as_of", DateTime(timezone=True), nullable=False),
+    Column("feature_cutoff", DateTime(timezone=True)),
+    Column("model_version_sha256", CHAR(64), nullable=False),
+    Column("dataset_version_sha256", CHAR(64), nullable=False),
+    Column("policy_sha256", CHAR(64), nullable=False),
+    Column("manager_regime_id", String(160), nullable=False),
+    Column("manager_context", JSONB, nullable=False, server_default=text("'{}'::jsonb")),
+    Column("seed", String(160), nullable=False),
+    Column("sample_count", Integer, nullable=False),
+    Column("bench_size", SmallInteger, nullable=False),
+    Column("bench_goalkeeper_slots", SmallInteger, nullable=False),
+    Column("code_identity", String(160), nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    ForeignKeyConstraint(
+        ["model_version_sha256"],
+        ["provenance.model_version.model_semantic_sha256"],
+        name="fk_prediction_model_version",
+        ondelete="RESTRICT",
+    ),
+    ForeignKeyConstraint(
+        ["dataset_version_sha256"],
+        ["provenance.dataset_version.dataset_semantic_sha256"],
+        name="fk_prediction_dataset_version",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint("prediction_input_signature_sha256", name="uq_prediction_input_signature"),
+    CheckConstraint(
+        "prediction_input_signature_sha256 ~ '^[0-9a-f]{64}$'", name="ck_prediction_input_signature"
+    ),
+    CheckConstraint("output_semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_prediction_output_hash"),
+    CheckConstraint(
+        "sample_count > 0 AND bench_size >= 0 AND bench_goalkeeper_slots >= 0 AND bench_goalkeeper_slots <= bench_size",
+        name="ck_prediction_configuration",
+    ),
+    schema="football",
+)
+
+prediction_dependency = Table(
+    "prediction_dependency",
+    metadata,
+    Column(
+        "prediction_dependency_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "prediction_run_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.prediction_run.prediction_run_id",
+            name="fk_prediction_dependency_run",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("dependency_type", String(64), nullable=False),
+    Column("dependency_key", String(200), nullable=False),
+    Column("semantic_sha256", CHAR(64), nullable=False),
+    Column("ordinal", Integer, nullable=False),
+    UniqueConstraint(
+        "prediction_run_id",
+        "dependency_type",
+        "dependency_key",
+        name="uq_prediction_dependency_key",
+    ),
+    CheckConstraint("semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_prediction_dependency_hash"),
+    CheckConstraint("ordinal >= 0", name="ck_prediction_dependency_ordinal"),
+    schema="football",
+)
+
+prediction_hard_eligibility = Table(
+    "prediction_hard_eligibility",
+    metadata,
+    Column(
+        "prediction_hard_eligibility_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "prediction_run_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.prediction_run.prediction_run_id",
+            name="fk_prediction_hard_eligibility_run",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("player_id", String(160), nullable=False),
+    Column("reason", String(240), nullable=False),
+    Column("hard_ineligible", Boolean, nullable=False, server_default=text("true")),
+    UniqueConstraint(
+        "prediction_run_id", "player_id", name="uq_prediction_hard_eligibility_player"
+    ),
+    schema="football",
+)
+
+role_marginal = Table(
+    "role_marginal",
+    metadata,
+    Column(
+        "role_marginal_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column(
+        "prediction_run_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.prediction_run.prediction_run_id",
+            name="fk_role_marginal_run",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("player_id", String(160), nullable=False),
+    Column("player_key", String(160), nullable=False),
+    Column("position", String(8), nullable=False),
+    Column("p_start", Numeric, nullable=False),
+    Column("p_bench", Numeric, nullable=False),
+    Column("p_out", Numeric, nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("prediction_run_id", "player_id", name="uq_role_marginal_player"),
+    CheckConstraint("position IN ('GK','DEF','MID','FWD')", name="ck_role_marginal_position"),
+    CheckConstraint(
+        "p_start >= 0 AND p_start <= 1 AND p_bench >= 0 AND p_bench <= 1 AND p_out >= 0 AND p_out <= 1",
+        name="ck_role_marginal_bounds",
+    ),
+    CheckConstraint("p_start + p_bench + p_out = 1", name="ck_role_marginal_exact_sum"),
+    schema="football",
+)
+
+conditional_minute_pmf = Table(
+    "conditional_minute_pmf",
+    metadata,
+    Column(
+        "conditional_minute_pmf_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "prediction_run_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.prediction_run.prediction_run_id",
+            name="fk_minute_pmf_run",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("player_id", String(160), nullable=False),
+    Column("role", String(8), nullable=False),
+    Column("minute_pmf", ARRAY(Numeric), nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("prediction_run_id", "player_id", "role", name="uq_minute_pmf_player_role"),
+    CheckConstraint("role IN ('START','BENCH')", name="ck_minute_pmf_role"),
+    CheckConstraint(
+        "football.validate_minute_pmf(minute_pmf, role)", name="ck_minute_pmf_exact_simplex"
+    ),
+    schema="football",
+)
+
+lineup_scenario = Table(
+    "lineup_scenario",
+    metadata,
+    Column(
+        "lineup_scenario_id", UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    ),
+    Column(
+        "prediction_run_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.prediction_run.prediction_run_id",
+            name="fk_lineup_scenario_run",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("scenario_index", Integer, nullable=False),
+    Column("scenario_sha256", CHAR(64), nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("prediction_run_id", "scenario_index", name="uq_lineup_scenario_index"),
+    UniqueConstraint("prediction_run_id", "scenario_sha256", name="uq_lineup_scenario_hash"),
+    UniqueConstraint("lineup_scenario_id", "prediction_run_id", name="uq_lineup_scenario_id_run"),
+    CheckConstraint("scenario_index >= 0", name="ck_lineup_scenario_index"),
+    CheckConstraint("scenario_sha256 ~ '^[0-9a-f]{64}$'", name="ck_lineup_scenario_hash"),
+    schema="football",
+)
+
+lineup_scenario_member = Table(
+    "lineup_scenario_member",
+    metadata,
+    Column(
+        "lineup_scenario_member_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column("lineup_scenario_id", UUID(as_uuid=True), nullable=False),
+    Column("prediction_run_id", UUID(as_uuid=True), nullable=False),
+    Column("player_id", String(160), nullable=False),
+    Column("role", String(8), nullable=False),
+    Column("position", String(8), nullable=False),
+    ForeignKeyConstraint(
+        ["lineup_scenario_id", "prediction_run_id"],
+        [
+            "football.lineup_scenario.lineup_scenario_id",
+            "football.lineup_scenario.prediction_run_id",
+        ],
+        name="fk_lineup_member_scenario_run",
+        ondelete="RESTRICT",
+    ),
+    UniqueConstraint("lineup_scenario_id", "player_id", name="uq_lineup_member_player"),
+    CheckConstraint("role IN ('START','BENCH','OUT')", name="ck_lineup_member_role"),
+    CheckConstraint("position IN ('GK','DEF','MID','FWD')", name="ck_lineup_member_position"),
+    schema="football",
+)
+
+player_minutes_projection = Table(
+    "player_minutes_projection",
+    metadata,
+    Column(
+        "player_minutes_projection_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuidv7()"),
+    ),
+    Column(
+        "prediction_run_id",
+        UUID(as_uuid=True),
+        ForeignKey(
+            "football.prediction_run.prediction_run_id",
+            name="fk_player_minutes_projection_run",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    ),
+    Column("player_id", String(160), nullable=False),
+    Column("p_start", Numeric, nullable=False),
+    Column("p_bench", Numeric, nullable=False),
+    Column("p_out", Numeric, nullable=False),
+    Column("minute_pmf", ARRAY(Numeric), nullable=False),
+    Column("p_zero", Numeric, nullable=False),
+    Column("p_60_plus", Numeric, nullable=False),
+    Column("expected_minutes", Numeric, nullable=False),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("transaction_timestamp()"),
+    ),
+    UniqueConstraint("prediction_run_id", "player_id", name="uq_player_minutes_projection_player"),
+    CheckConstraint(
+        "football.validate_player_minutes_projection(p_start, p_bench, p_out, minute_pmf, p_zero, p_60_plus, expected_minutes)",
+        name="ck_player_minutes_projection_consistent",
+    ),
+    schema="football",
+)
+
 external_identifier.append_constraint(
     ExcludeConstraint(
         (external_identifier.c.provider_id, "="),
@@ -3440,3 +3896,18 @@ Index(
     provider_quota_observation.c.provider_id,
     provider_quota_observation.c.observed_at,
 )
+Index("ix_dataset_training_example_version", dataset_training_example.c.dataset_version_id)
+Index("ix_model_version_dataset", model_version.c.dataset_version_sha256)
+Index(
+    "ix_prediction_run_fixture_team_asof",
+    prediction_run.c.fixture_id,
+    prediction_run.c.team_id,
+    prediction_run.c.as_of,
+)
+Index("ix_prediction_dependency_run", prediction_dependency.c.prediction_run_id)
+Index("ix_prediction_hard_eligibility_run", prediction_hard_eligibility.c.prediction_run_id)
+Index("ix_role_marginal_run", role_marginal.c.prediction_run_id)
+Index("ix_minute_pmf_run", conditional_minute_pmf.c.prediction_run_id)
+Index("ix_lineup_scenario_run", lineup_scenario.c.prediction_run_id)
+Index("ix_lineup_member_scenario", lineup_scenario_member.c.lineup_scenario_id)
+Index("ix_player_minutes_projection_run", player_minutes_projection.c.prediction_run_id)

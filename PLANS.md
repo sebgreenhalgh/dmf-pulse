@@ -1,5 +1,16 @@
 # DMF Pulse execution plans
 
+## MIN-007F - PostgreSQL registry, persistence and historical as-of
+
+- Ticket/stage: `MIN-007F`, A7; required parent `0e3b21a702fece94cb0ee6d61867e6fb17574d0a`.
+- Scope: immutable dataset/example lineage, model/evaluation registry, prediction bundle persistence, exact numeric database constraints, concurrency-safe idempotency, and historical as-of lookup.
+- Constraints: preserve frozen B/C/D/E identities; no final minute mixture, evaluation calculation, CLI, provider, Stage-8, or Stage-9 code.
+
+### MIN-007F checkpoints
+
+- [x] Implemented registry hashes, PostgreSQL migration `20260807_0006`, persistence repositories, and focused tests.
+- [x] Ran all 22 literal acceptance commands, recorded evidence, tore down PostgreSQL, and prepared the single bounded ticket commit.
+
 ## MIN-007R4 - exact Decimal boundary hardening
 
 - Ticket/stage: `MIN-007R4`, A7; required parent `1ea36d831e18157a669b257a3761f8a9c9a5cdf7`.

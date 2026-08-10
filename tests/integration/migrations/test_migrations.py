@@ -58,7 +58,7 @@ from dmf_pulse.ingestion.fpl.service import DATABASE_REF
 from dmf_pulse.ingestion.odds.service import DEFAULT_CUTOFF, OddsIngestionService, OddsReplayRequest
 
 pytestmark = pytest.mark.migration
-EXPECTED_SCHEMA_SHA256 = "d944116eecf9d756241d75e4a4a50194403123b2241485214f7bdeb04c7119d6"
+EXPECTED_SCHEMA_SHA256 = "d4a9c172bb57df2c1af7ef293b64437eea5b2c39ee002fd467c3651e0ff2924b"
 NORMALISATION_AS_OF = datetime(2026, 8, 20, 12, 5, tzinfo=UTC)
 NRM006_TABLES = {
     "betting.market_consensus_outcome",
@@ -110,7 +110,7 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
     assert set(first.extensions) == set(expected["extensions"])
     assert first.schema_sha256 == second.schema_sha256
     assert first.schema_sha256 == EXPECTED_SCHEMA_SHA256
-    assert first.alembic_revision == head_revision() == "20260803_0005"
+    assert first.alembic_revision == head_revision() == "20260807_0006"
 
     function_names = {
         f"{schema}.{function['name']}"
@@ -140,6 +140,10 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "core.guard_canonical_successor",
         "core.guard_temporal_version",
         "core.is_canonical_tstzrange",
+        "football.reject_immutable_availability_change",
+        "football.validate_lineup_scenario",
+        "football.validate_minute_pmf",
+        "football.validate_player_minutes_projection",
         "provenance.guard_processing_event",
         "provenance.guard_fpl_observation_source_usable",
         "provenance.guard_raw_storage_rights",
@@ -245,6 +249,20 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "trg_source_snapshot_immutable",
         "trg_team_observation_immutable",
         "trg_team_observation_source_usable",
+        "trg_min007f_immutable_0",
+        "trg_min007f_immutable_1",
+        "trg_min007f_immutable_2",
+        "trg_min007f_immutable_3",
+        "trg_min007f_immutable_4",
+        "trg_min007f_immutable_5",
+        "trg_min007f_immutable_6",
+        "trg_min007f_immutable_7",
+        "trg_min007f_immutable_8",
+        "trg_min007f_immutable_9",
+        "trg_min007f_immutable_10",
+        "trg_min007f_immutable_11",
+        "trg_min007f_scenario_parent",
+        "trg_min007f_scenario_member",
     }
     trigger_definitions = {
         trigger["name"]: trigger["definition"]
@@ -302,6 +320,7 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
 def test_single_linear_revision_and_secret_free_offline_sql(postgres_url: str) -> None:
     revisions = list(ScriptDirectory.from_config(alembic_config()).walk_revisions())
     assert [(revision.revision, revision.down_revision) for revision in revisions] == [
+        ("20260807_0006", "20260803_0005"),
         ("20260803_0005", "20260725_0004"),
         ("20260725_0004", "20260725_0003"),
         ("20260725_0003", "20260724_0002"),
@@ -2097,7 +2116,7 @@ def test_nrm_downgrade_fails_closed_for_unattested_publication(
         with pytest.raises(DBAPIError, match="NRM006_DOWNGRADE_UNATTESTED_PUBLICATION"):
             command.downgrade(alembic_config(postgres_url), "20260725_0004")
         with postgres_engine.connect() as connection:
-            assert inspect_schema(connection).alembic_revision == "20260803_0005"
+            assert inspect_schema(connection).alembic_revision == "20260807_0006"
             assert (
                 connection.scalar(
                     select(func.count())
@@ -2286,4 +2305,4 @@ def test_clean_downgrade_and_reupgrade(postgres_engine: Engine, postgres_url: st
     upgrade_database(postgres_url)
     with postgres_engine.connect() as connection:
         assert connection.execute(text("SELECT uuidv7() IS NOT NULL")).scalar_one() is True
-        assert inspect_schema(connection).alembic_revision == "20260803_0005"
+        assert inspect_schema(connection).alembic_revision == "20260807_0006"
