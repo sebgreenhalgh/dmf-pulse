@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## MIN-007E - coherent lineup sampler
+
+- Ticket/stage: `MIN-007E`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `60c583aa5dafff90aeaf2647d2b6cf9eeef950e9`.
+- Scope: deterministic Decimal exponential-race sampling of coherent 11-player lineups and configured benches.
+- Constraints: preserve accepted A/B/C/D identities; no minute-PMF coupling, overall minute projection, persistence, CLI, evaluation, network, provider, or credential work.
+
+### MIN-007E checkpoints
+
+- [x] 2026-08-10 - Implemented the exact four-phase Decimal sampler, typed projected/blocked results, semantic scenario hashes, and focused tests.
+- [x] 2026-08-10 - Ran all 15 literal acceptance commands with zero final failures, recorded evidence, and prepared the exact ticket commit pending final clean-tree verification.
+
 ## MIN-007D - conditional minutes PMFs
 
 - Ticket/stage: `MIN-007D`, A7.
