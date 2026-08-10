@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/min-007/minutes-model-evaluation.schema.json",
+  "title": "MinutesModelEvaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evaluation_kind",
+    "n_examples",
+    "role_log_loss",
+    "persistence_role_log_loss",
+    "role_multiclass_brier",
+    "persistence_role_multiclass_brier",
+    "p_zero_brier",
+    "persistence_p_zero_brier",
+    "p_60_plus_brier",
+    "persistence_p_60_plus_brier",
+    "expected_minutes_mae",
+    "baseline_decision",
+    "production_calibration_claim",
+    "evaluation_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "minutes-model-evaluation-v1"
+    },
+    "evaluation_kind": {
+      "const": "SYNTHETIC_CONTRACT_EVALUATION"
+    },
+    "n_examples": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "role_log_loss": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{6}$"
+    },
+    "persistence_role_log_loss": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{6}$"
+    },
+    "role_multiclass_brier": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{6}$"
+    },
+    "persistence_role_multiclass_brier": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{6}$"
+    },
+    "p_zero_brier": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{6}$"
+    },
+    "persistence_p_zero_brier": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{6}$"
+    },
+    "p_60_plus_brier": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{6}$"
+    },
+    "persistence_p_60_plus_brier": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{6}$"
+    },
+    "expected_minutes_mae": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{6}$"
+    },
+    "baseline_decision": {
+      "enum": [
+        "PROMOTE_BASELINE",
+        "RETAIN_EQUAL_BASELINE"
+      ]
+    },
+    "production_calibration_claim": {
+      "const": false
+    },
+    "evaluation_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

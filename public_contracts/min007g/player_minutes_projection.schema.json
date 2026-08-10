@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/min-007/player-minutes-projection.schema.json",
+  "title": "PlayerMinutesProjection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "player_id",
+    "position",
+    "p_start",
+    "p_bench",
+    "p_out_of_squad",
+    "p_appearance",
+    "p_zero_minutes",
+    "p_60_plus",
+    "expected_minutes",
+    "minute_pmf",
+    "confidence_grade",
+    "confidence_reasons",
+    "projection_sha256"
+  ],
+  "properties": {
+    "player_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "position": {
+      "enum": [
+        "GK",
+        "DEF",
+        "MID",
+        "FWD"
+      ]
+    },
+    "p_start": {
+      "$ref": "probability.schema.json"
+    },
+    "p_bench": {
+      "$ref": "probability.schema.json"
+    },
+    "p_out_of_squad": {
+      "$ref": "probability.schema.json"
+    },
+    "p_appearance": {
+      "$ref": "probability.schema.json"
+    },
+    "p_zero_minutes": {
+      "$ref": "probability.schema.json"
+    },
+    "p_60_plus": {
+      "$ref": "probability.schema.json"
+    },
+    "expected_minutes": {
+      "type": "string",
+      "pattern": "^(?:[0-8]?\\d|90)\\.\\d{6}$"
+    },
+    "minute_pmf": {
+      "type": "array",
+      "minItems": 91,
+      "maxItems": 91,
+      "items": {
+        "$ref": "probability.schema.json"
+      }
+    },
+    "confidence_grade": {
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    "confidence_reasons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "HARD_INELIGIBLE_OVERRIDE",
+          "NO_TARGET_TEAM_COMPETITIVE_HISTORY",
+          "THIN_PLAYER_HISTORY",
+          "NEW_SIGNING",
+          "NEW_MANAGER_REGIME",
+          "PROMOTED_TEAM_EARLY_REGIME",
+          "BASELINE_MODEL_CAP_B"
+        ]
+      }
+    },
+    "projection_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

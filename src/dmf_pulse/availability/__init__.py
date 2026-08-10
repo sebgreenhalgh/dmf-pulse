@@ -6,11 +6,31 @@ from dmf_pulse.availability.models import (
     HistoryRow,
     TrainingDataset,
 )
+from dmf_pulse.availability.pipeline import (
+    MinutesModelArtifact,
+    MinutesModelEvaluation,
+    evaluate_minutes_baseline,
+    fit_projection_artifact,
+    predict_minutes_baseline,
+)
+from dmf_pulse.availability.projection import (
+    MinutesPredictionResult,
+    PlayerMinutesProjection,
+    TeamMinutesProjection,
+)
 
 __all__ = [
     "DatasetValidationError",
     "HistoryRow",
+    "MinutesModelArtifact",
+    "MinutesModelEvaluation",
+    "MinutesPredictionResult",
+    "PlayerMinutesProjection",
+    "TeamMinutesProjection",
     "TrainingDataset",
     "build_training_dataset",
+    "evaluate_minutes_baseline",
+    "fit_projection_artifact",
+    "predict_minutes_baseline",
     "semantic_dataset_hash",
 ]

@@ -125,8 +125,8 @@
     },
     {
       "path": "PLANS.md",
-      "bytes": 39338,
-      "sha256": "6bfbb18727e9fea480deb06f5bc4b6be0f6f5e9e01e4b11494c0330e1626229d"
+      "bytes": 40363,
+      "sha256": "b31ddc70c41e9e09f23e9428eef4005ec272184ab59d938e3b7c4f97a80e653a"
     },
     {
       "path": "README.md",
@@ -347,6 +347,61 @@
       "path": "fixtures/availability/MIN-007C/role_weight_case.json",
       "bytes": 3443,
       "sha256": "17ff3fc8056eed5d906157df83dde1338ef3b262704f489ab276a8ac15b5bd1a"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/contexts/goalkeeper.json",
+      "bytes": 513,
+      "sha256": "7a1794003b2e0d68cc58b705bf7e65fe302cceadbe681491d6a8f375b543b95a"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/contexts/hard_ineligible.json",
+      "bytes": 557,
+      "sha256": "27f192a8f925ac895bb37f1e9ecf245ff478bfa776ce08d6a157e528a9ba8585"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/contexts/high_rotation.json",
+      "bytes": 515,
+      "sha256": "a7bbcfb0c31dace93273bb2313ddaaf40dc733ed033d0b29ad9e551bab42c807"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/contexts/insufficient_eligible_squad.json",
+      "bytes": 763,
+      "sha256": "609bf472d44622e40cd70e427fdfe1d48527c68468e77bfb485fa2780e500412"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/contexts/new_manager.json",
+      "bytes": 514,
+      "sha256": "e6dab44a74dd81d4df85c535c576e9d02bafbc2bab003945fe759438221fc1bd"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/contexts/new_signing.json",
+      "bytes": 600,
+      "sha256": "e34e4a192ff7b493152a08d713f945f2a11462117c976e983a47d0b3a9a6bee4"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/contexts/promoted_team.json",
+      "bytes": 514,
+      "sha256": "50ca71a90174dcd2bbfb607a2023d0d12baafd433250b0f69bcfd9be55cdd56c"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/contexts/rare_bench_60_plus.json",
+      "bytes": 522,
+      "sha256": "5f90b04cac926a0715c0f45488cfac34d095a2db91aaef1feba94b5224c51b8a"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/contexts/stable_xi.json",
+      "bytes": 513,
+      "sha256": "88ce923fe3e6a749497595d8c3ec36415dda897e222dbf47510cb8c8b81da174"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/evaluation_dataset.json",
+      "bytes": 49789,
+      "sha256": "2366aa4e3b0144a6053ee00f64e5f74f92286f2e39acfc1a76b691348914d602"
+    },
+    {
+      "path": "fixtures/availability/MIN-007G/minutes_baseline_policy.json",
+      "bytes": 848,
+      "sha256": "d54afbb27f4ea2512801e1e8588c8c6c4454388c824dacd00f18fecdb35c6994"
     },
     {
       "path": "fixtures/contracts/MIN-007A/two_clean_plus_stale.expected.json",
@@ -954,6 +1009,11 @@
       "sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2"
     },
     {
+      "path": "public_contracts/lineup_scenario.schema.json",
+      "bytes": 1399,
+      "sha256": "566e61629ba81e7a2c72d34978421676ed3ddfca113a3f4d1ad83ceac39a2fc5"
+    },
+    {
       "path": "public_contracts/market_consensus.schema.json",
       "bytes": 4764,
       "sha256": "60e59a14cb5c3a9abdbac5c7b4c929c9a38993a07a0b71cdc80704517fc56ad4"
@@ -974,6 +1034,56 @@
       "sha256": "24b5268c4e22a2b99ac7eefc4073045f2f95a71071556c74e3394a7472aafa46"
     },
     {
+      "path": "public_contracts/min007g/lineup_scenario.schema.json",
+      "bytes": 1399,
+      "sha256": "566e61629ba81e7a2c72d34978421676ed3ddfca113a3f4d1ad83ceac39a2fc5"
+    },
+    {
+      "path": "public_contracts/min007g/minutes_model_artifact.schema.json",
+      "bytes": 3317,
+      "sha256": "4135abf07f8078c1a089b28b42ac5fe361e3490d4ebe731dcf5652befc8c0f97"
+    },
+    {
+      "path": "public_contracts/min007g/minutes_model_evaluation.schema.json",
+      "bytes": 2074,
+      "sha256": "788c55e436fd5a1bd998cb39a1cf0a279055fb6fc241466a86443c10e5caa0b4"
+    },
+    {
+      "path": "public_contracts/min007g/minutes_prediction_result.schema.json",
+      "bytes": 1780,
+      "sha256": "a24f97ce6178e3d3badc6453b2caf993b56f24285fa68850f85da123567a96b0"
+    },
+    {
+      "path": "public_contracts/min007g/player_minutes_projection.schema.json",
+      "bytes": 1987,
+      "sha256": "d91198c6e837f775ada38f511cf26dc08993c63e5b859d408cbfd86651b11705"
+    },
+    {
+      "path": "public_contracts/min007g/probability.schema.json",
+      "bytes": 338,
+      "sha256": "6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b"
+    },
+    {
+      "path": "public_contracts/min007g/team_minutes_projection.schema.json",
+      "bytes": 2012,
+      "sha256": "c7e738545760f566371e59bc01803864c51d9904f262fc404fecad3d1dc9cf10"
+    },
+    {
+      "path": "public_contracts/minutes_model_artifact.schema.json",
+      "bytes": 3317,
+      "sha256": "4135abf07f8078c1a089b28b42ac5fe361e3490d4ebe731dcf5652befc8c0f97"
+    },
+    {
+      "path": "public_contracts/minutes_model_evaluation.schema.json",
+      "bytes": 2074,
+      "sha256": "788c55e436fd5a1bd998cb39a1cf0a279055fb6fc241466a86443c10e5caa0b4"
+    },
+    {
+      "path": "public_contracts/minutes_prediction_result.schema.json",
+      "bytes": 1780,
+      "sha256": "a24f97ce6178e3d3badc6453b2caf993b56f24285fa68850f85da123567a96b0"
+    },
+    {
       "path": "public_contracts/normalised_operator_market.schema.json",
       "bytes": 5197,
       "sha256": "c2851ca0c051c61aaa404fb290f6974640b2b1453f8c5a43e8d89502d0ee21fb"
@@ -982,6 +1092,11 @@
       "path": "public_contracts/odds_ingestion_result.schema.json",
       "bytes": 1696,
       "sha256": "4b64765a95b3ce05ec4f0170baa069f871aec98c170232c1e97a6d029f7014d3"
+    },
+    {
+      "path": "public_contracts/player_minutes_projection.schema.json",
+      "bytes": 1987,
+      "sha256": "d91198c6e837f775ada38f511cf26dc08993c63e5b859d408cbfd86651b11705"
     },
     {
       "path": "public_contracts/probability.schema.json",
@@ -1017,6 +1132,11 @@
       "path": "public_contracts/source_bundle_summary.schema.json",
       "bytes": 1547,
       "sha256": "aec43210bee973712b21b45244db0bf4d2d00812b08b74e05a4000f395bfe679"
+    },
+    {
+      "path": "public_contracts/team_minutes_projection.schema.json",
+      "bytes": 2012,
+      "sha256": "c7e738545760f566371e59bc01803864c51d9904f262fc404fecad3d1dc9cf10"
     },
     {
       "path": "pyproject.toml",
@@ -1360,8 +1480,8 @@
     },
     {
       "path": "src/dmf_pulse/availability/__init__.py",
-      "bytes": 408,
-      "sha256": "393b6cce2bbea87bb61e0d98977a85a249e49c7485c798b753295ee1ed28dfa5"
+      "bytes": 980,
+      "sha256": "51adfc09afb56d393cf65fcc65a8ab4b701577b462a92eec8d5ee3a30f685975"
     },
     {
       "path": "src/dmf_pulse/availability/dataset.py",
@@ -1390,8 +1510,18 @@
     },
     {
       "path": "src/dmf_pulse/availability/persistence.py",
-      "bytes": 28529,
-      "sha256": "761a4160fc7fdcbf360355c3ee3f7dc7e277ba81eeddafb49ac7136634a93199"
+      "bytes": 31196,
+      "sha256": "05ddc098461dd945b8b3a0b847b326fa364f6b4ebdc2d060480ad549f36cc824"
+    },
+    {
+      "path": "src/dmf_pulse/availability/pipeline.py",
+      "bytes": 23917,
+      "sha256": "e3af27aa4cef317460ee69f05757122c8cbac0400a07ca42261814249d10823e"
+    },
+    {
+      "path": "src/dmf_pulse/availability/projection.py",
+      "bytes": 16299,
+      "sha256": "2cb0f91cca6da77c4efd231b55324e49b7ee7a8f724fbf07d80649adbbe19f93"
     },
     {
       "path": "src/dmf_pulse/availability/registry.py",
@@ -1410,8 +1540,13 @@
     },
     {
       "path": "src/dmf_pulse/cli/app.py",
-      "bytes": 3264,
-      "sha256": "bff10153d9a610515015800f3f5c820337d3f96875f977db2454a8aee8606d38"
+      "bytes": 3377,
+      "sha256": "bc95e6e9b4df9aaf4f4f4fd4d606316ab0f9488e001f29cc3adfc16b52cb5ac0"
+    },
+    {
+      "path": "src/dmf_pulse/cli/availability_cmd.py",
+      "bytes": 13425,
+      "sha256": "5e373e341ed35dff4f07ddd9e7fd8a58979baad81a0784354a4f2badb7199a4d"
     },
     {
       "path": "src/dmf_pulse/cli/config_cmd.py",
@@ -1869,6 +2004,11 @@
       "sha256": "5be6b83908f93a6096a78c7abcb5cecef79ffd3a29d166398628cdb48eaf3864"
     },
     {
+      "path": "tests/contract/availability/test_min007_public_contracts.py",
+      "bytes": 1574,
+      "sha256": "3c7bedd953a3cac9a5df1e8f57fd7b86087a6c5a2b898f35da576b602c0fa59c"
+    },
+    {
       "path": "tests/contract/fpl/test_cli_usage_contract.py",
       "bytes": 3331,
       "sha256": "184173da9a70d89e6f09cc20ceae7c0e3b4a5d1c76be1b85f26b61a245db5040"
@@ -1917,6 +2057,16 @@
       "path": "tests/golden/availability/test_min007e_lineup.py",
       "bytes": 2562,
       "sha256": "0a96d438ddb3b09938b7232fd88300f35f3d38c1de7b7c09a3d9f01e288acff0"
+    },
+    {
+      "path": "tests/golden/availability/test_min007g_evaluation.py",
+      "bytes": 999,
+      "sha256": "96a250cc97e6cc7fb94c4c2fe19f90c0bf075f2da20bd69b9d64893530991dd0"
+    },
+    {
+      "path": "tests/golden/availability/test_min007g_predictions.py",
+      "bytes": 1347,
+      "sha256": "d88e931bd49fa578b0e01b0dc7bcf7d40aba1535d8ff5c843932b721cc38ecb5"
     },
     {
       "path": "tests/golden/config_error.json",
@@ -1972,6 +2122,21 @@
       "path": "tests/integration/availability/test_min007f_persistence.py",
       "bytes": 2312,
       "sha256": "90b8659c6c95d06e049fa5cf5845e9dac6206200a105d7591f2a5d1aa3ab701a"
+    },
+    {
+      "path": "tests/integration/availability/test_min007g_cli.py",
+      "bytes": 914,
+      "sha256": "b91dd84c2c989f00a708693ae29fa22134e32a8ea6cd534f6bee8a8594674342"
+    },
+    {
+      "path": "tests/integration/availability/test_min007g_persistence.py",
+      "bytes": 346,
+      "sha256": "435c2d349b061f2c946b8f666aa9de5656554835de34f8dbb267148c1a0d2eed"
+    },
+    {
+      "path": "tests/integration/availability/test_min007g_service.py",
+      "bytes": 1078,
+      "sha256": "6311446c6727869778d809292db106d855fca3b4793a0587a30cf2f017e8109f"
     },
     {
       "path": "tests/integration/conftest.py",
@@ -2097,6 +2262,11 @@
       "path": "tests/property/availability/test_minutes_properties.py",
       "bytes": 1849,
       "sha256": "2dbe74719d7e90e42f9229fee5f80ebcd9f3abea61911bbc91838af610add32b"
+    },
+    {
+      "path": "tests/property/availability/test_projection_properties.py",
+      "bytes": 1054,
+      "sha256": "98ef76c102b1b8e45b6617c6b9416c99b0be107c0bc7c029a53b789fba27c9db"
     },
     {
       "path": "tests/property/availability/test_role_model_properties.py",
@@ -2274,6 +2444,11 @@
       "sha256": "ba2834544ba6fd68b6b3f865634bb36971fe89845d4372e963932ae9012db5da"
     },
     {
+      "path": "tests/unit/availability/test_evaluation.py",
+      "bytes": 1060,
+      "sha256": "b96fefd3469974f0e49d8121c231699f064f9afcde90940f2093636bdb92be34"
+    },
+    {
       "path": "tests/unit/availability/test_lineup.py",
       "bytes": 4653,
       "sha256": "8f88dd6638fabfd44de3099f323c600677e00592da8f5c2fb3fc1d6c02bcb634"
@@ -2282,6 +2457,11 @@
       "path": "tests/unit/availability/test_minutes.py",
       "bytes": 5442,
       "sha256": "fcd4dcd6ae05105fbaaf5b272a4409871ccec958700366fd2d22a7a35eecf5d0"
+    },
+    {
+      "path": "tests/unit/availability/test_projection.py",
+      "bytes": 1497,
+      "sha256": "ae69563715dfc8aebd2af772cd4cde6a6d940a6c20e0b4d291c79ca76ec1f1d3"
     },
     {
       "path": "tests/unit/availability/test_registry.py",

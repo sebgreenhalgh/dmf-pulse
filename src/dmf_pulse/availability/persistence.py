@@ -28,6 +28,7 @@ from dmf_pulse.data_model.tables import (
     lineup_scenario_member,
     model_evaluation,
     model_version,
+    player_minutes_projection,
     prediction_dependency,
     prediction_hard_eligibility,
     prediction_run,
@@ -351,21 +352,19 @@ def _prediction_output_hash(
     role_marginals: Sequence[object],
     minute_pmfs: Sequence[object],
     scenarios: Sequence[object],
+    final_projection: object | None = None,
 ) -> str:
     declared = prediction.get("output_semantic_sha256")
     if declared is not None:
         return _hash(declared, label="output_semantic_sha256")
-    return canonical_semantic_sha256(
-        _semantic_json(
-            {
-                "role_marginals": [
-                    _mapping(value, label="role marginal") for value in role_marginals
-                ],
-                "minute_pmfs": [_mapping(value, label="minute PMF") for value in minute_pmfs],
-                "scenarios": [_mapping(value, label="scenario") for value in scenarios],
-            }
-        )
-    )
+    output: dict[str, Any] = {
+        "role_marginals": [_mapping(value, label="role marginal") for value in role_marginals],
+        "minute_pmfs": [_mapping(value, label="minute PMF") for value in minute_pmfs],
+        "scenarios": [_mapping(value, label="scenario") for value in scenarios],
+    }
+    if final_projection is not None:
+        output["final_projection"] = _mapping(final_projection, label="final projection")
+    return canonical_semantic_sha256(_semantic_json(output))
 
 
 def register_prediction_bundle(
@@ -376,6 +375,7 @@ def register_prediction_bundle(
     minute_pmfs: Sequence[object] | None = None,
     scenarios: Sequence[object] | None = None,
     hard_eligibility: Sequence[object] | None = None,
+    final_projection: object | None = None,
 ) -> UUID:
     """Publish one complete immutable prediction graph in the caller's transaction."""
 
@@ -394,7 +394,9 @@ def register_prediction_bundle(
     if hard_eligibility is not None:
         signature_value = {**value, "hard_eligibility": list(hard_values)}
     signature = prediction_input_signature_sha256(signature_value)
-    output_hash = _prediction_output_hash(value, marginal_values, pmf_values, scenario_values)
+    output_hash = _prediction_output_hash(
+        value, marginal_values, pmf_values, scenario_values, final_projection
+    )
     model_hash = value.get("model_version_sha256", value.get("model_semantic_sha256"))
     dataset_hash = value.get("dataset_version_sha256", value.get("dataset_semantic_sha256"))
     manager_context = _mapping(value.get("manager_context", {}), label="manager_context")
@@ -528,7 +530,52 @@ def register_prediction_bundle(
                         position=str(row.get("position", "")),
                     )
                 )
+        if final_projection is not None:
+            register_final_player_projections(session, identifier, final_projection)
         return identifier
+    except DataModelError:
+        raise
+    except DBAPIError as exc:
+        raise _safe_db_error(exc) from exc
+
+
+def register_final_player_projections(
+    session: Session, prediction_run_id: UUID, projection: object
+) -> None:
+    """Persist the MIN-007G public player mixture in the F reserved table."""
+
+    value = _mapping(projection, label="final projection")
+    players = value.get("players", ())
+    if not isinstance(players, Sequence) or isinstance(players, (str, bytes, bytearray)):
+        raise DataModelError("AVAILABILITY_INPUT_INVALID", "final projection players are invalid")
+    try:
+        for item in players:
+            player = _mapping(item, label="final player projection")
+            pmf = player.get("minute_pmf")
+            if not isinstance(pmf, Sequence) or isinstance(pmf, (str, bytes, bytearray)):
+                raise DataModelError("AVAILABILITY_INPUT_INVALID", "final minute PMF is invalid")
+            session.execute(
+                postgresql_insert(player_minutes_projection)
+                .values(
+                    prediction_run_id=prediction_run_id,
+                    player_id=str(player.get("player_id", "")),
+                    p_start=_decimal(player.get("p_start"), label="p_start"),
+                    p_bench=_decimal(player.get("p_bench"), label="p_bench"),
+                    p_out=_decimal(player.get("p_out_of_squad"), label="p_out_of_squad"),
+                    minute_pmf=[_decimal(entry, label="minute PMF") for entry in pmf],
+                    p_zero=_decimal(player.get("p_zero_minutes"), label="p_zero_minutes"),
+                    p_60_plus=_decimal(player.get("p_60_plus"), label="p_60_plus"),
+                    expected_minutes=_decimal(
+                        player.get("expected_minutes"), label="expected_minutes"
+                    ),
+                )
+                .on_conflict_do_nothing(
+                    index_elements=[
+                        player_minutes_projection.c.prediction_run_id,
+                        player_minutes_projection.c.player_id,
+                    ]
+                )
+            )
     except DataModelError:
         raise
     except DBAPIError as exc:
@@ -678,10 +725,13 @@ class AvailabilityPersistence:
     ) -> UUID:
         return register_model_evaluation(self.session, model_version_id, evaluation, status=status)
 
-    def register_prediction_bundle(
-        self, prediction: Mapping[str, Any], **parts: Sequence[object]
-    ) -> UUID:
+    def register_prediction_bundle(self, prediction: Mapping[str, Any], **parts: Any) -> UUID:
         return register_prediction_bundle(self.session, prediction, **parts)
+
+    def register_final_player_projections(
+        self, prediction_run_id: UUID, projection: object
+    ) -> None:
+        register_final_player_projections(self.session, prediction_run_id, projection)
 
     def get_prediction_run(self, signature: str) -> dict[str, Any]:
         return get_prediction_run(self.session, signature)
@@ -699,6 +749,7 @@ __all__ = [
     "latest_unambiguous_prediction",
     "list_prediction_runs_as_of",
     "register_dataset_version",
+    "register_final_player_projections",
     "register_model_evaluation",
     "register_model_version",
     "register_prediction_bundle",

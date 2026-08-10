@@ -1,0 +1,15 @@
+{
+  "ticket_id": "MIN-007G",
+  "status": "PASS",
+  "oracle_scenarios": 9,
+  "model_artifact_sha256": "80d1aa4cfd4a80eb7f7b291899fd9cf6173b017e308ea3b41d450a7bc87e2aeb",
+  "prediction_registry_semantic_sha256": "895a7e2a870192ba3ab395d459235f5ed374a562acd5628121de30f8e8ea4c72",
+  "rounding": "ROUND_HALF_EVEN; PMF 12 decimals; expected minutes 6 decimals",
+  "pmf": "91 bins; exact Decimal simplex; residual assigned to largest unrounded bin with lower-minute tie-break",
+  "frozen_modelling_identities": {
+    "dataset_sha256": "1466a5dcc9104a2d26f9c6b286d2717b6460423503026f05a58d3a26de040be3",
+    "role_artifact_sha256": "baf70ee76b8a51f4cf3bfda1a1cc33d6ba3f6c304617c8bc42aefdee2b2a1c96",
+    "minute_artifact_sha256": "8e0b410e37d33127dc26937f9fe7c6ff60867b4f60f0f7a87679f951c5f7e422",
+    "policy_sha256": "d54afbb27f4ea2512801e1e8588c8c6c4454388c824dacd00f18fecdb35c6994"
+  }
+}

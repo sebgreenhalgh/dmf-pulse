@@ -1,5 +1,18 @@
 # DMF Pulse execution plans
 
+## MIN-007G - final minutes projection, synthetic evaluation and CLI
+
+- Ticket/stage: `MIN-007G`, A7; required parent `9ca984b785b681531b7c0648cfbbb45c436dc075`.
+- Scope: compose the accepted C/D/E outputs into strict public player/team projections, freeze synthetic evaluation, persist final projections/evaluations through the MIN-007F reserved tables, and expose the TEST/REPLAY availability CLI.
+- Constraints: no migration, no Stage-8 logic, no live provider/network/credential access, preserve all frozen B/C/D/E/F identities and Alembic head `20260807_0006`.
+
+### MIN-007G checkpoints
+
+- [x] Read and validate the G pack; confirm branch, parent, clean worktree, and Alembic head.
+- [x] Implement pure projection, pipeline, evaluation, strict public models, fixture loader, and CLI with focused tests.
+- [x] Integrate final projection/evaluation persistence without changing the F schema.
+- [x] Run all 24 literal acceptance commands, collect evidence, remove PostgreSQL, and create exactly one bounded ticket commit.
+
 ## MIN-007F - PostgreSQL registry, persistence and historical as-of
 
 - Ticket/stage: `MIN-007F`, A7; required parent `0e3b21a702fece94cb0ee6d61867e6fb17574d0a`.
