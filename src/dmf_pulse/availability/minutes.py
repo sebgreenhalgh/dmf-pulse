@@ -2,8 +2,9 @@
 
 The module deliberately keeps the numerical PMF separate from the role model:
 it fits position/role minute priors and then conditions those priors on a
-single player's cutoff-safe history.  All arithmetic is performed with
-``Decimal`` at the frozen precision; JSON is only a twelve-decimal diagnostic
+single player's cutoff-safe history.  Probabilistic arithmetic remains
+``Decimal`` at the frozen precision, while stored-PMF invariants use exact
+coefficient/exponent arithmetic; JSON is only a twelve-decimal diagnostic
 projection.
 """
 
@@ -27,6 +28,11 @@ from pydantic import (
     model_validator,
 )
 
+from dmf_pulse.availability.decimal_integrity import (
+    exact_decimal_sum,
+    exact_one_minus,
+    exact_sum_equals_one,
+)
 from dmf_pulse.availability.models import HistoryRow, Position, parse_utc
 from dmf_pulse.availability.role_model import (
     FROZEN_POLICY_SHA256,
@@ -41,8 +47,6 @@ POSITION_ORDER: tuple[Position, ...] = ("GK", "DEF", "MID", "FWD")
 MINUTE_ROLE_ORDER: tuple[Literal["START", "BENCH"], ...] = ("START", "BENCH")
 MINUTE_COUNT = 91
 DECIMAL_PRECISION = 60
-INTEGRITY_PRECISION = 256
-INTEGRITY_VERIFICATION_PRECISION = 200
 ROUNDING_MODE = ROUND_HALF_EVEN
 SERIAL_SCALE = Decimal("0.000000000001")
 MINUTE_ARTIFACT_SHA256 = "8e0b410e37d33127dc26937f9fe7c6ff60867b4f60f0f7a87679f951c5f7e422"
@@ -134,14 +138,8 @@ def _validate_stored_pmf(values: Sequence[Decimal], *, role: str) -> None:
             raise MinuteModelValidationError("minute_pmf must contain finite non-negative Decimals")
     if role == "START" and values[0] != Decimal(0):
         raise MinuteModelValidationError("START minute zero must be zero")
-    with localcontext() as context:
-        context.prec = INTEGRITY_PRECISION
-        if sum(values, Decimal(0)) != Decimal(1):
-            raise MinuteModelValidationError("minute_pmf does not sum exactly to one")
-    with localcontext() as context:
-        context.prec = INTEGRITY_VERIFICATION_PRECISION
-        if sum(values, Decimal(0)) != Decimal(1):
-            raise MinuteModelValidationError("minute_pmf fails high-precision simplex verification")
+    if not exact_sum_equals_one(values):
+        raise MinuteModelValidationError("minute_pmf does not sum exactly to one")
 
 
 def _correct_stored_pmf(values: Sequence[Decimal], *, role: str) -> tuple[Decimal, ...]:
@@ -156,14 +154,11 @@ def _correct_stored_pmf(values: Sequence[Decimal], *, role: str) -> tuple[Decima
     if role == "START" and correction_index == 0:
         raise MinuteModelValidationError("START minute zero cannot receive simplex correction")
     corrected = list(values)
-    with localcontext() as context:
-        context.prec = INTEGRITY_PRECISION
-        other_sum = sum(
-            (value for index, value in enumerate(values) if index != correction_index),
-            Decimal(0),
-        )
-        corrected[correction_index] = Decimal(1) - other_sum
-        _validate_stored_pmf(tuple(corrected), role=role)
+    other_sum = exact_decimal_sum(
+        value for index, value in enumerate(values) if index != correction_index
+    )
+    corrected[correction_index] = exact_one_minus(other_sum)
+    _validate_stored_pmf(tuple(corrected), role=role)
     return tuple(corrected)
 
 
@@ -250,7 +245,7 @@ class MinutePriorArtifact(_FrozenModel):
                 vector = roles[role]
                 if len(vector) != MINUTE_COUNT or any(value < 0 for value in vector):
                     raise MinuteModelValidationError("minute artifact vectors are invalid")
-                if sum(vector, Decimal(0)) != Decimal(1):
+                if not exact_sum_equals_one(vector):
                     raise MinuteModelValidationError("minute artifact vector does not sum to one")
                 if role == "START" and vector[0] != Decimal(0):
                     raise MinuteModelValidationError("START minute zero must be zero")

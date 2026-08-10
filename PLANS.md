@@ -1,5 +1,16 @@
 # DMF Pulse execution plans
 
+## MIN-007R4 - exact Decimal boundary hardening
+
+- Ticket/stage: `MIN-007R4`, A7; required parent `1ea36d831e18157a669b257a3761f8a9c9a5cdf7`.
+- Scope: context-independent exact stored minute-PMF simplex/correction, exact candidate START+BENCH inequality, adversarial regressions, and ticket evidence.
+- Constraints: preserve frozen precision-60 calculations and B/C/D/E identities; no sampler, mixture, persistence, CLI, provider, network, or MIN-007F work.
+
+### MIN-007R4 checkpoints
+
+- [x] Implemented the shared exact finite-Decimal invariant utility and focused boundary probes.
+- [x] Ran all 15 literal acceptance commands, recorded evidence, and prepared the single bounded ticket commit.
+
 ## MIN-007R3E - harden coherent lineup invariants
 
 - Ticket/stage: `MIN-007R3E`, A7; required parent `9848c3ff3d68d75e31ffa55085ff033177aec312`.

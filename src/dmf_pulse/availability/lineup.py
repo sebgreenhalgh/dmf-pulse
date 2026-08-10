@@ -25,6 +25,7 @@ from pydantic import (
     model_validator,
 )
 
+from dmf_pulse.availability.decimal_integrity import exact_sum_leq_one
 from dmf_pulse.availability.role_model import (
     RoleModelValidationError,
     _policy_mapping,
@@ -429,10 +430,7 @@ def _candidate_rows(candidates: object) -> tuple[_Candidate, ...]:
         hard = value["hard_ineligible"]
         if not isinstance(hard, bool):
             raise LineupModelValidationError("hard_ineligible must be boolean")
-        with localcontext() as context:
-            context.prec = INTEGRITY_PRECISION
-            total_weight = start + bench
-        if start < 0 or bench < 0 or total_weight > Decimal(1):
+        if start < 0 or bench < 0 or not exact_sum_leq_one((start, bench)):
             raise LineupModelValidationError("invalid role weights")
         if hard and (start != 0 or bench != 0):
             raise LineupModelValidationError("contradictory ineligible weights")
