@@ -1,0 +1,18 @@
+{
+  "ticket": "MIN-007R5F2",
+  "status": "PASS",
+  "scenario_marginal_coherence": {
+    "player_sets_equal": true,
+    "positions_equal": true,
+    "cross_run_attachment_rejected": true,
+    "arbitrary_players_without_marginals_rejected": true,
+    "start_bench_goalkeeper_counts_preserved": true
+  },
+  "final_projection_binding": {
+    "fixture_team_asof_mismatch_rejected": true,
+    "dataset_identity_mismatch_rejected": true,
+    "model_artifact_mismatch_rejected": true,
+    "player_set_and_position_mismatch_rejected": true,
+    "partial_rows_on_failure": false
+  }
+}

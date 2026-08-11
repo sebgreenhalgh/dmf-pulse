@@ -1,5 +1,16 @@
 # DMF Pulse execution plans
 
+## MIN-007R5F2 - relational and evaluation integrity remediation
+
+- Ticket/stage: `MIN-007R5F2`, A7; required parent `6fc063424ed8e5c4a688432ccf54770f0c8137eb`.
+- Scope: close only AUDIT-007-3 findings 6–8: canonical PMF arrays and exact HALF_EVEN projection checks, scenario/final cross-graph coherence, and strict model-bound evaluation persistence.
+- Constraints: modify only unmerged migration `20260807_0006`; preserve R5F1 atomicity and all frozen F/G identities; do not fix CLI/public-schema/P2 findings or start MIN-007H.
+
+### MIN-007R5F2 checkpoints
+
+- [x] Add focused public identity, DB relational/numeric, and evaluation integrity regressions.
+- [x] Run all 23 literal acceptance commands, record evidence, remove PostgreSQL, and create the single bounded ticket commit.
+
 ## MIN-007R5F1 - registry identity and publication atomicity remediation
 
 - Ticket/stage: `MIN-007R5F1`, A7; required parent `7ed2379f551690f04b85dc53a45237f649990894`.

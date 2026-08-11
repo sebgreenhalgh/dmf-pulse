@@ -1,0 +1,30 @@
+{
+  "ticket": "MIN-007R5F2",
+  "status": "PASS",
+  "commands": [
+    {"id": 1, "command": "git diff --check", "status": "PASS"},
+    {"id": 2, "command": "ruff format --check", "status": "PASS"},
+    {"id": 3, "command": "ruff check", "status": "PASS"},
+    {"id": 4, "command": "mypy availability", "status": "PASS"},
+    {"id": 5, "command": "public identity unit tests", "status": "PASS", "tests": 2},
+    {"id": 6, "command": "docker compose up", "status": "PASS"},
+    {"id": 7, "command": "alembic upgrade head", "status": "PASS"},
+    {"id": 8, "command": "DB relational integrity tests", "status": "PASS", "tests": 3},
+    {"id": 9, "command": "evaluation integrity tests", "status": "PASS", "tests": 2},
+    {"id": 10, "command": "MIN-007F constraints", "status": "PASS", "tests": 1},
+    {"id": 11, "command": "MIN-007G service and persistence", "status": "PASS", "tests": 2},
+    {"id": 12, "command": "R5F1 registry atomicity", "status": "PASS", "tests": 6},
+    {"id": 13, "command": "migration tests", "status": "PASS", "tests": 63},
+    {"id": 14, "command": "migration matrix", "status": "PASS"},
+    {"id": 15, "command": "MIN-007G frozen oracle", "status": "PASS", "scenarios": 9},
+    {"id": 16, "command": "availability unit/property/golden", "status": "PASS", "tests": 135},
+    {"id": 17, "command": "markets contract/unit/golden", "status": "PASS", "tests": 75},
+    {"id": 18, "command": "validate_repository.py", "status": "PASS"},
+    {"id": 19, "command": "scan_secrets.py", "status": "PASS", "findings": 0},
+    {"id": 20, "command": "alembic heads", "status": "PASS", "head": "20260807_0006"},
+    {"id": 21, "command": "alembic check", "status": "PASS"},
+    {"id": 22, "command": "docker compose down -v --remove-orphans", "status": "PASS"},
+    {"id": 23, "command": "git diff --check", "status": "PASS"}
+  ],
+  "summary": {"passed": 23, "total": 23, "postgresql": "removed"}
+}

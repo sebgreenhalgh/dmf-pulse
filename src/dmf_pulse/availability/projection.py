@@ -263,6 +263,16 @@ class MinutesPredictionResult(_FrozenModel):
             raise ValueError("projected results require a projection and no error")
         if self.status == "BLOCKED" and (self.projection is not None or not self.error_code):
             raise ValueError("blocked results require an error and no projection")
+        if (
+            self.status == "PROJECTED"
+            and self.projection is not None
+            and (
+                self.fixture_id != self.projection.fixture_id
+                or self.team_id != self.projection.team_id
+                or self.as_of != self.projection.as_of
+            )
+        ):
+            raise ValueError("outer prediction identity does not match nested projection")
         return self
 
 

@@ -3401,6 +3401,10 @@ model_evaluation = Table(
     CheckConstraint(
         "status IN ('PENDING','COMPLETE','BLOCKED')", name="ck_model_evaluation_status"
     ),
+    CheckConstraint(
+        "evaluation->>'production_calibration_claim' = 'false'",
+        name="ck_model_evaluation_not_production_calibration",
+    ),
     schema="provenance",
 )
 

@@ -3943,7 +3943,12 @@ DECLARE
   value numeric;
   total numeric := 0;
 BEGIN
-  IF p_values IS NULL OR array_ndims(p_values) <> 1 OR cardinality(p_values) <> 91
+  IF p_values IS NULL
+     OR COALESCE(array_ndims(p_values), 0) <> 1
+     OR COALESCE(array_lower(p_values, 1), 0) <> 1
+     OR COALESCE(array_upper(p_values, 1), 0) <> 91
+     OR COALESCE(cardinality(p_values), 0) <> 91
+     OR requested_role IS NULL
      OR requested_role NOT IN ('START','BENCH') THEN
     RETURN false;
   END IF;
@@ -3957,6 +3962,26 @@ BEGIN
     RETURN false;
   END IF;
   RETURN requested_role <> 'START' OR p_values[1] = 0;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION football.round_half_even_6(value numeric)
+RETURNS numeric LANGUAGE plpgsql IMMUTABLE AS $$
+DECLARE
+  scaled numeric;
+  base numeric;
+  fraction numeric;
+BEGIN
+  IF value IS NULL THEN
+    RETURN NULL;
+  END IF;
+  scaled := value * 1000000;
+  base := trunc(scaled);
+  fraction := scaled - base;
+  IF fraction > 0.5 OR (fraction = 0.5 AND mod(base, 2) <> 0) THEN
+    base := base + 1;
+  END IF;
+  RETURN base / 1000000;
 END
 $$;
 
@@ -3974,7 +3999,9 @@ DECLARE
   mean_value numeric := 0;
   tail_value numeric := 0;
 BEGIN
-  IF start_probability < 0 OR start_probability > 1
+  IF start_probability IS NULL OR bench_probability IS NULL OR out_probability IS NULL
+     OR zero_probability IS NULL OR sixty_plus_probability IS NULL OR expected IS NULL
+     OR start_probability < 0 OR start_probability > 1
      OR bench_probability < 0 OR bench_probability > 1
      OR out_probability < 0 OR out_probability > 1
      OR start_probability + bench_probability + out_probability <> 1
@@ -3989,7 +4016,8 @@ BEGIN
       tail_value := tail_value + p_values[index_value];
     END IF;
   END LOOP;
-  RETURN sixty_plus_probability = tail_value AND round(expected, 6) = round(mean_value, 6);
+  RETURN sixty_plus_probability = tail_value
+     AND expected = football.round_half_even_6(mean_value);
 END
 $$;
 
@@ -4085,6 +4113,7 @@ CREATE TABLE provenance.model_evaluation (
     CONSTRAINT uq_model_evaluation_semantic_hash UNIQUE (evaluation_semantic_sha256), 
     CONSTRAINT ck_model_evaluation_semantic_hash CHECK (evaluation_semantic_sha256 ~ '^[0-9a-f]{64}$'), 
     CONSTRAINT ck_model_evaluation_status CHECK (status IN ('PENDING','COMPLETE','BLOCKED')), 
+    CONSTRAINT ck_model_evaluation_not_production_calibration CHECK (evaluation->>'production_calibration_claim' = 'false'),
     CONSTRAINT fk_model_evaluation_model FOREIGN KEY(model_version_id) REFERENCES provenance.model_version (model_version_id) ON DELETE RESTRICT
 );
 
@@ -4286,6 +4315,26 @@ BEGIN
        AND blocked.hard_ineligible
   ) THEN
     RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'LINEUP_HARD_INELIGIBLE_MEMBER';
+  END IF;
+  IF EXISTS (
+    SELECT 1
+      FROM football.lineup_scenario_member AS member
+      LEFT JOIN football.role_marginal AS marginal
+        ON marginal.prediction_run_id = target_run
+       AND marginal.player_id = member.player_id
+     WHERE member.lineup_scenario_id = target_scenario
+       AND (marginal.player_id IS NULL OR marginal.position <> member.position)
+  ) OR EXISTS (
+    SELECT 1
+      FROM football.role_marginal AS marginal
+      LEFT JOIN football.lineup_scenario_member AS member
+        ON member.prediction_run_id = target_run
+       AND member.lineup_scenario_id = target_scenario
+       AND member.player_id = marginal.player_id
+     WHERE marginal.prediction_run_id = target_run
+       AND member.player_id IS NULL
+  ) THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'LINEUP_MARGINAL_COHERENCE_INVALID';
   END IF;
   RETURN NULL;
 END

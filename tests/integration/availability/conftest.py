@@ -89,18 +89,25 @@ def bundle_parts() -> dict[str, list[dict[str, object]]]:
         {"player_id": f"bench-{index}", "role": "BENCH", "position": "GK" if index == 0 else "DEF"}
         for index in range(9)
     )
+    marginals = [
+        {
+            "player_id": member["player_id"],
+            "player_key": member["player_id"],
+            "position": member["position"],
+            "p_start": Decimal("0.8") if member["role"] == "START" else Decimal("0.1"),
+            "p_bench": Decimal("0.1") if member["role"] == "START" else Decimal("0.8"),
+            "p_out": Decimal("0.1"),
+        }
+        for member in members
+    ]
+    minute_pmfs = [
+        {"player_id": member["player_id"], "role": role, "minute_pmf": pmf}
+        for member in members
+        for role in ("START", "BENCH")
+    ]
     return {
-        "role_marginals": [
-            {
-                "player_id": "starter-0",
-                "player_key": "starter-0",
-                "position": "GK",
-                "p_start": Decimal("0.8"),
-                "p_bench": Decimal("0.1"),
-                "p_out": Decimal("0.1"),
-            }
-        ],
-        "minute_pmfs": [{"player_id": "starter-0", "role": "START", "minute_pmf": pmf}],
+        "role_marginals": marginals,
+        "minute_pmfs": minute_pmfs,
         "scenarios": [{"scenario_index": 0, "scenario_sha256": "a" * 64, "members": members}],
     }
 

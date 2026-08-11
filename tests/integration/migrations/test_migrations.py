@@ -58,7 +58,7 @@ from dmf_pulse.ingestion.fpl.service import DATABASE_REF
 from dmf_pulse.ingestion.odds.service import DEFAULT_CUTOFF, OddsIngestionService, OddsReplayRequest
 
 pytestmark = pytest.mark.migration
-EXPECTED_SCHEMA_SHA256 = "f692ce995e5ea7e12d62ccddee583620647d66c65bef784c46a7f7931ee10ae0"
+EXPECTED_SCHEMA_SHA256 = "9d15f10b4129f3846a22875c1482001e3975dead606848119fb440cbfc9796c3"
 NORMALISATION_AS_OF = datetime(2026, 8, 20, 12, 5, tzinfo=UTC)
 NRM006_TABLES = {
     "betting.market_consensus_outcome",
@@ -145,6 +145,7 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "football.validate_minute_pmf",
         "football.validate_player_minutes_projection",
         "football.validate_prediction_complete",
+        "football.round_half_even_6",
         "provenance.guard_processing_event",
         "provenance.guard_fpl_observation_source_usable",
         "provenance.guard_raw_storage_rights",

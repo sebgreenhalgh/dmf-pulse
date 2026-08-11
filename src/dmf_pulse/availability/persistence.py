@@ -94,6 +94,54 @@ def _decimal(value: object, *, label: str) -> Decimal:
     return result
 
 
+def _validate_scenario_marginal_coherence(
+    role_marginals: Sequence[object], scenarios: Sequence[object]
+) -> None:
+    """Check the complete scenario/marginal player graph before any inserts."""
+
+    marginal_positions: dict[str, str] = {}
+    for item in role_marginals:
+        value = _mapping(item, label="role marginal")
+        player_id = str(value.get("player_id", ""))
+        position = str(value.get("position", ""))
+        if not player_id or player_id in marginal_positions:
+            raise DataModelError(
+                "SCENARIO_MARGINAL_COHERENCE", "role marginal player identities are not unique"
+            )
+        marginal_positions[player_id] = position
+    if not marginal_positions:
+        if scenarios:
+            raise DataModelError("SCENARIO_MARGINAL_COHERENCE", "prediction has no role marginals")
+        return
+    for item in scenarios:
+        scenario = _mapping(item, label="lineup scenario")
+        members = scenario.get("members", ())
+        if not isinstance(members, Sequence) or isinstance(members, (str, bytes, bytearray)):
+            raise DataModelError(
+                "AVAILABILITY_INPUT_INVALID", "scenario members must be a sequence"
+            )
+        member_positions: dict[str, str] = {}
+        for member in members:
+            row = _mapping(member, label="scenario member")
+            player_id = str(row.get("player_id", ""))
+            if not player_id or player_id in member_positions:
+                raise DataModelError(
+                    "SCENARIO_MARGINAL_COHERENCE", "scenario member identities are not unique"
+                )
+            member_positions[player_id] = str(row.get("position", ""))
+        if set(member_positions) != set(marginal_positions):
+            raise DataModelError(
+                "SCENARIO_MARGINAL_COHERENCE",
+                "scenario member players must equal the role-marginal players",
+            )
+        if any(
+            marginal_positions[player] != position for player, position in member_positions.items()
+        ):
+            raise DataModelError(
+                "SCENARIO_MARGINAL_COHERENCE", "scenario member positions differ from marginals"
+            )
+
+
 def _hash(value: object, *, label: str) -> str:
     if (
         not isinstance(value, str)
@@ -375,9 +423,26 @@ def register_model_evaluation(
 ) -> UUID:
     """Register one immutable synthetic evaluation result."""
 
-    value = _mapping(evaluation, label="evaluation")
-    semantic_hash = canonical_semantic_sha256(value)
     try:
+        from dmf_pulse.availability.pipeline import MinutesModelEvaluation
+
+        validated = MinutesModelEvaluation.model_validate(evaluation)
+    except Exception as exc:
+        raise DataModelError(
+            "EVALUATION_INVALID", "evaluation does not satisfy the strict runtime contract"
+        ) from exc
+    value = validated.model_dump(mode="json")
+    semantic_hash = canonical_semantic_sha256(value)
+    if status not in {"PENDING", "COMPLETE", "BLOCKED"}:
+        raise DataModelError("EVALUATION_STATUS_INVALID", "evaluation status is invalid")
+    try:
+        target = session.execute(
+            select(model_version.c.model_version_id).where(
+                model_version.c.model_version_id == model_version_id
+            )
+        ).scalar_one_or_none()
+        if target is None:
+            raise DataModelError("EVALUATION_MODEL_NOT_FOUND", "evaluation model is not registered")
         identifier = session.execute(
             postgresql_insert(model_evaluation)
             .values(
@@ -390,14 +455,32 @@ def register_model_evaluation(
             .returning(model_evaluation.c.model_evaluation_id)
         ).scalar_one_or_none()
         if identifier is None:
-            identifier = session.execute(
-                select(model_evaluation.c.model_evaluation_id).where(
-                    model_evaluation.c.evaluation_semantic_sha256 == semantic_hash
+            existing = (
+                session.execute(
+                    select(model_evaluation).where(
+                        model_evaluation.c.evaluation_semantic_sha256 == semantic_hash
+                    )
                 )
-            ).scalar_one()
+                .mappings()
+                .one()
+            )
+            if existing["model_version_id"] != model_version_id:
+                raise DataModelError(
+                    "EVALUATION_MODEL_CONFLICT", "evaluation identity is bound to another model"
+                )
+            if (
+                existing["status"] != status
+                or canonical_semantic_sha256(existing["evaluation"]) != semantic_hash
+            ):
+                raise DataModelError(
+                    "EVALUATION_CONFLICT", "evaluation identity has different status or content"
+                )
+            identifier = existing["model_evaluation_id"]
         if not isinstance(identifier, UUID):
             raise DataModelError("DATABASE_RESULT_INVALID", "evaluation identifier is invalid")
         return identifier
+    except DataModelError:
+        raise
     except DBAPIError as exc:
         raise _safe_db_error(exc) from exc
 
@@ -505,6 +588,7 @@ def register_prediction_bundle(
         "bench_goalkeeper_slots": int(value.get("bench_goalkeeper_slots", 0)),
         "code_identity": str(value.get("code_identity", "")),
     }
+    _validate_scenario_marginal_coherence(marginal_values, scenario_values)
     try:
         identifier = session.execute(
             postgresql_insert(prediction_run)
@@ -623,14 +707,140 @@ def register_prediction_bundle(
 
 
 def register_final_player_projections(
-    session: Session, prediction_run_id: UUID, projection: object
+    session: Session, prediction_run_id: UUID, projection: object, *, _atomic: bool = True
 ) -> None:
     """Persist the MIN-007G public player mixture in the F reserved table."""
+
+    if _atomic:
+        with session.begin_nested():
+            register_final_player_projections(session, prediction_run_id, projection, _atomic=False)
+        return
 
     value = _mapping(projection, label="final projection")
     players = value.get("players", ())
     if not isinstance(players, Sequence) or isinstance(players, (str, bytes, bytearray)):
         raise DataModelError("AVAILABILITY_INPUT_INVALID", "final projection players are invalid")
+    run = (
+        session.execute(
+            select(prediction_run).where(prediction_run.c.prediction_run_id == prediction_run_id)
+        )
+        .mappings()
+        .one_or_none()
+    )
+    if run is None:
+        raise DataModelError("FINAL_PROJECTION_RUN_NOT_FOUND", "prediction run is not registered")
+    graph_counts = {
+        "dependency_count": session.scalar(
+            select(func.count())
+            .select_from(prediction_dependency)
+            .where(prediction_dependency.c.prediction_run_id == prediction_run_id)
+        ),
+        "hard_eligibility_count": session.scalar(
+            select(func.count())
+            .select_from(prediction_hard_eligibility)
+            .where(prediction_hard_eligibility.c.prediction_run_id == prediction_run_id)
+        ),
+        "role_marginal_count": session.scalar(
+            select(func.count())
+            .select_from(role_marginal)
+            .where(role_marginal.c.prediction_run_id == prediction_run_id)
+        ),
+        "minute_pmf_count": session.scalar(
+            select(func.count())
+            .select_from(conditional_minute_pmf)
+            .where(conditional_minute_pmf.c.prediction_run_id == prediction_run_id)
+        ),
+        "scenario_count": session.scalar(
+            select(func.count())
+            .select_from(lineup_scenario)
+            .where(lineup_scenario.c.prediction_run_id == prediction_run_id)
+        ),
+    }
+    if (
+        any(
+            int(graph_counts[key] or 0) != int(run[key])
+            for key in (
+                "dependency_count",
+                "hard_eligibility_count",
+                "role_marginal_count",
+                "minute_pmf_count",
+                "scenario_count",
+            )
+        )
+        or int(graph_counts["role_marginal_count"] or 0) == 0
+    ):
+        raise DataModelError(
+            "FINAL_PROJECTION_RUN_INCOMPLETE", "final projection requires a complete run"
+        )
+    fixture_id = _uuid(value.get("fixture_id"), label="final projection fixture_id")
+    team_id = _uuid(value.get("team_id"), label="final projection team_id")
+    as_of = _utc(value.get("as_of"), label="final projection as_of")
+    if fixture_id != run["fixture_id"] or team_id != run["team_id"] or as_of != run["as_of"]:
+        raise DataModelError(
+            "FINAL_PROJECTION_RUN_MISMATCH", "final projection team identity differs from run"
+        )
+    dataset_row = (
+        session.execute(
+            select(
+                dataset_version.c.source_dataset_sha256,
+                dataset_version.c.dataset_semantic_sha256,
+            ).where(dataset_version.c.dataset_semantic_sha256 == run["dataset_version_sha256"])
+        )
+        .mappings()
+        .one_or_none()
+    )
+    if dataset_row is None:
+        raise DataModelError("FINAL_PROJECTION_DATASET_MISMATCH", "run dataset is not registered")
+    expected_dataset = (
+        dataset_row["source_dataset_sha256"] or dataset_row["dataset_semantic_sha256"]
+    )
+    if str(value.get("dataset_sha256", "")) != str(expected_dataset):
+        raise DataModelError(
+            "FINAL_PROJECTION_DATASET_MISMATCH", "final projection dataset differs from run"
+        )
+    model = (
+        session.execute(
+            select(model_version.c.artifact, model_version.c.model_family).where(
+                model_version.c.model_semantic_sha256 == run["model_version_sha256"]
+            )
+        )
+        .mappings()
+        .one_or_none()
+    )
+    if model is None or not isinstance(model["artifact"], Mapping):
+        raise DataModelError("FINAL_PROJECTION_MODEL_MISMATCH", "run model is not registered")
+    expected_artifact = model["artifact"].get("artifact_sha256")
+    if str(value.get("model_artifact_sha256", "")) != str(expected_artifact):
+        raise DataModelError(
+            "FINAL_PROJECTION_MODEL_MISMATCH", "final projection artifact differs from run model"
+        )
+    if str(value.get("model_family", "")) != str(model["model_family"]):
+        raise DataModelError(
+            "FINAL_PROJECTION_MODEL_MISMATCH", "final projection model family differs from run"
+        )
+    marginals = session.execute(
+        select(role_marginal.c.player_id, role_marginal.c.position).where(
+            role_marginal.c.prediction_run_id == prediction_run_id
+        )
+    ).all()
+    marginal_positions = {str(row.player_id): str(row.position) for row in marginals}
+    if len(marginal_positions) != len(marginals):
+        raise DataModelError("FINAL_PROJECTION_PLAYER_MISMATCH", "run marginals contain duplicates")
+    player_positions: dict[str, str] = {}
+    for item in players:
+        player = _mapping(item, label="final player projection")
+        player_id = str(player.get("player_id", ""))
+        if not player_id or player_id in player_positions:
+            raise DataModelError("FINAL_PROJECTION_PLAYER_MISMATCH", "final players are not unique")
+        player_positions[player_id] = str(player.get("position", ""))
+    if set(player_positions) != set(marginal_positions):
+        raise DataModelError(
+            "FINAL_PROJECTION_PLAYER_MISMATCH", "final players must equal run role marginals"
+        )
+    if any(marginal_positions[player] != position for player, position in player_positions.items()):
+        raise DataModelError(
+            "FINAL_PROJECTION_PLAYER_MISMATCH", "final player positions differ from marginals"
+        )
     try:
         for item in players:
             player = _mapping(item, label="final player projection")
