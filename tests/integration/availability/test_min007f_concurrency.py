@@ -22,6 +22,7 @@ def test_independent_sessions_converge_on_registry_rows(
     dataset: dict[str, object],
     model: dict[str, object],
     prediction: dict[str, object],
+    bundle_parts: dict[str, list[dict[str, object]]],
 ) -> None:
     barrier = Barrier(2)
 
@@ -53,7 +54,7 @@ def test_independent_sessions_converge_on_registry_rows(
     def register_prediction() -> object:
         with postgres_session_factory.begin() as session:
             barrier.wait()
-            return register_prediction_bundle(session, prediction)
+            return register_prediction_bundle(session, prediction, **bundle_parts)
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         prediction_ids = list(executor.map(lambda _: register_prediction(), range(2)))

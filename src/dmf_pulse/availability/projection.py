@@ -244,6 +244,10 @@ class MinutesPredictionResult(_FrozenModel):
     error_code: str | None
     first_scenarios: tuple[dict[str, Any], ...] = Field(default=(), exclude=True)
     player_keys: tuple[tuple[str, str], ...] = Field(default=(), exclude=True)
+    core_role_marginals: tuple[dict[str, Any], ...] = Field(default=(), exclude=True)
+    core_minute_pmfs: tuple[dict[str, Any], ...] = Field(default=(), exclude=True)
+    core_scenarios: tuple[dict[str, Any], ...] = Field(default=(), exclude=True)
+    core_hard_eligibility: tuple[dict[str, Any], ...] = Field(default=(), exclude=True)
 
     @model_validator(mode="after")
     def validate_result(self) -> Self:

@@ -67,7 +67,7 @@ def prediction() -> dict[str, object]:
         "hard_eligibility": [],
         "manager_context": {"manager_regime_id": "integration"},
         "seed": "integration",
-        "sample_count": 2,
+        "sample_count": 1,
         "bench_size": 9,
         "bench_goalkeeper_slots": 1,
         "code_identity": "MIN-007F-INTEGRATION",

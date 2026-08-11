@@ -3423,6 +3423,11 @@ prediction_run = Table(
     Column("manager_context", JSONB, nullable=False, server_default=text("'{}'::jsonb")),
     Column("seed", String(160), nullable=False),
     Column("sample_count", Integer, nullable=False),
+    Column("dependency_count", Integer, nullable=False, server_default=text("0")),
+    Column("hard_eligibility_count", Integer, nullable=False, server_default=text("0")),
+    Column("role_marginal_count", Integer, nullable=False, server_default=text("0")),
+    Column("minute_pmf_count", Integer, nullable=False, server_default=text("0")),
+    Column("scenario_count", Integer, nullable=False, server_default=text("0")),
     Column("bench_size", SmallInteger, nullable=False),
     Column("bench_goalkeeper_slots", SmallInteger, nullable=False),
     Column("code_identity", String(160), nullable=False),
@@ -3452,6 +3457,10 @@ prediction_run = Table(
     CheckConstraint(
         "sample_count > 0 AND bench_size >= 0 AND bench_goalkeeper_slots >= 0 AND bench_goalkeeper_slots <= bench_size",
         name="ck_prediction_configuration",
+    ),
+    CheckConstraint(
+        "dependency_count >= 0 AND hard_eligibility_count >= 0 AND role_marginal_count > 0 AND minute_pmf_count > 0 AND scenario_count = sample_count",
+        name="ck_prediction_publication_counts",
     ),
     schema="football",
 )

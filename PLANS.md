@@ -1,5 +1,16 @@
 # DMF Pulse execution plans
 
+## MIN-007R5F1 - registry identity and publication atomicity remediation
+
+- Ticket/stage: `MIN-007R5F1`, A7; required parent `7ed2379f551690f04b85dc53a45237f649990894`.
+- Scope: close only AUDIT-007-3 findings 1-5: typed semantic hash allowlists, atomic/complete dataset lineage, model artifact conflict truthfulness, prediction graph atomicity/completeness, and recomputed output identity.
+- Constraints: preserve frozen B-G identities and Alembic head `20260807_0006`; no fixes for findings 6-12, no new migration revision, no MIN-007H.
+
+### MIN-007R5F1 checkpoints
+
+- [x] Implement typed registry normalization, DB-gated completeness, conflict checks, publication state/atomicity, and output-hash recomputation with focused regressions.
+- [x] Run all 20 literal acceptance commands, record evidence, tear down PostgreSQL, and create the single bounded ticket commit.
+
 ## MIN-007G - final minutes projection, synthetic evaluation and CLI
 
 - Ticket/stage: `MIN-007G`, A7; required parent `9ca984b785b681531b7c0648cfbbb45c436dc075`.

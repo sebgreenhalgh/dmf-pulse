@@ -21,14 +21,15 @@ def test_latest_asof_and_ambiguity_fail_closed(
     dataset: dict[str, object],
     model: dict[str, object],
     prediction: dict[str, object],
+    bundle_parts: dict[str, list[dict[str, object]]],
 ) -> None:
     with postgres_session_factory.begin() as session:
         register_dataset_version(session, dataset)
         register_model_version(session, model)
-        first = register_prediction_bundle(session, prediction)
+        first = register_prediction_bundle(session, prediction, **bundle_parts)
         later = dict(prediction)
         later["as_of"] = "2026-08-14T18:00:00Z"
-        second = register_prediction_bundle(session, later)
+        second = register_prediction_bundle(session, later, **bundle_parts)
         assert first != second
         chosen = latest_unambiguous_prediction(
             session,
@@ -40,7 +41,7 @@ def test_latest_asof_and_ambiguity_fail_closed(
         assert chosen["prediction_run_id"] == second
         ambiguous = dict(prediction)
         ambiguous["code_identity"] = "different"
-        register_prediction_bundle(session, ambiguous)
+        register_prediction_bundle(session, ambiguous, **bundle_parts)
         with pytest.raises(DataModelError) as error:
             latest_unambiguous_prediction(
                 session,

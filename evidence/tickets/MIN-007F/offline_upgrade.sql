@@ -4103,6 +4103,11 @@ CREATE TABLE football.prediction_run (
     manager_context JSONB DEFAULT '{}'::jsonb NOT NULL, 
     seed VARCHAR(160) NOT NULL, 
     sample_count INTEGER NOT NULL, 
+    dependency_count INTEGER DEFAULT 0 NOT NULL,
+    hard_eligibility_count INTEGER DEFAULT 0 NOT NULL,
+    role_marginal_count INTEGER DEFAULT 0 NOT NULL,
+    minute_pmf_count INTEGER DEFAULT 0 NOT NULL,
+    scenario_count INTEGER DEFAULT 0 NOT NULL,
     bench_size SMALLINT NOT NULL, 
     bench_goalkeeper_slots SMALLINT NOT NULL, 
     code_identity VARCHAR(160) NOT NULL, 
@@ -4113,7 +4118,8 @@ CREATE TABLE football.prediction_run (
     CONSTRAINT uq_prediction_input_signature UNIQUE (prediction_input_signature_sha256), 
     CONSTRAINT ck_prediction_input_signature CHECK (prediction_input_signature_sha256 ~ '^[0-9a-f]{64}$'), 
     CONSTRAINT ck_prediction_output_hash CHECK (output_semantic_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_prediction_configuration CHECK (sample_count > 0 AND bench_size >= 0 AND bench_goalkeeper_slots >= 0 AND bench_goalkeeper_slots <= bench_size)
+    CONSTRAINT ck_prediction_configuration CHECK (sample_count > 0 AND bench_size >= 0 AND bench_goalkeeper_slots >= 0 AND bench_goalkeeper_slots <= bench_size),
+    CONSTRAINT ck_prediction_publication_counts CHECK (dependency_count >= 0 AND hard_eligibility_count >= 0 AND role_marginal_count > 0 AND minute_pmf_count > 0 AND scenario_count = sample_count)
 );
 
 CREATE INDEX ix_prediction_run_fixture_team_asof ON football.prediction_run (fixture_id, team_id, as_of);
@@ -4285,6 +4291,95 @@ BEGIN
 END
 $$;
 
+CREATE OR REPLACE FUNCTION provenance.validate_dataset_complete()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  expected integer;
+  actual integer;
+BEGIN
+  SELECT declared_training_example_count INTO expected
+    FROM provenance.dataset_version
+   WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id);
+  IF expected IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_NOT_FOUND';
+  END IF;
+  SELECT count(*) INTO actual
+    FROM provenance.dataset_training_example
+   WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id);
+  IF actual <> expected THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_LINEAGE_INCOMPLETE';
+  END IF;
+  RETURN NULL;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION provenance.validate_model_dataset_complete()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  expected integer;
+  actual integer;
+BEGIN
+  SELECT dataset.declared_training_example_count INTO expected
+    FROM provenance.dataset_version AS dataset
+   WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256;
+  IF expected IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_NOT_FOUND';
+  END IF;
+  SELECT count(*) INTO actual
+    FROM provenance.dataset_training_example AS example
+    JOIN provenance.dataset_version AS dataset
+      ON dataset.dataset_version_id = example.dataset_version_id
+   WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256;
+  IF actual <> expected THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_INCOMPLETE';
+  END IF;
+  RETURN NULL;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION football.validate_prediction_complete()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  dependency_total integer;
+  hard_total integer;
+  marginal_total integer;
+  pmf_total integer;
+  scenario_total integer;
+  role_total integer;
+BEGIN
+  SELECT count(*) INTO dependency_total
+    FROM football.prediction_dependency
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO hard_total
+    FROM football.prediction_hard_eligibility
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO marginal_total
+    FROM football.role_marginal
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO pmf_total
+    FROM football.conditional_minute_pmf
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO scenario_total
+    FROM football.lineup_scenario
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO role_total
+    FROM football.conditional_minute_pmf
+   WHERE prediction_run_id = NEW.prediction_run_id
+     AND role IN ('START', 'BENCH');
+  IF dependency_total <> NEW.dependency_count
+     OR hard_total <> NEW.hard_eligibility_count
+     OR marginal_total <> NEW.role_marginal_count
+     OR pmf_total <> NEW.minute_pmf_count
+     OR scenario_total <> NEW.scenario_count
+     OR marginal_total = 0
+     OR pmf_total = 0
+     OR role_total <> pmf_total THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_GRAPH_INCOMPLETE';
+  END IF;
+  RETURN NULL;
+END
+$$;
+
 CREATE OR REPLACE FUNCTION football.reject_immutable_availability_change()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
@@ -4320,7 +4415,12 @@ CREATE CONSTRAINT TRIGGER trg_min007f_scenario_parent AFTER INSERT OR UPDATE ON 
 
 CREATE CONSTRAINT TRIGGER trg_min007f_scenario_member AFTER INSERT OR UPDATE OR DELETE ON football.lineup_scenario_member DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION football.validate_lineup_scenario();
 
+CREATE CONSTRAINT TRIGGER trg_min007f_dataset_complete AFTER INSERT OR UPDATE ON provenance.dataset_version DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION provenance.validate_dataset_complete();
+
+CREATE CONSTRAINT TRIGGER trg_min007f_model_dataset_complete AFTER INSERT OR UPDATE ON provenance.model_version DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION provenance.validate_model_dataset_complete();
+
+CREATE CONSTRAINT TRIGGER trg_min007f_prediction_complete AFTER INSERT OR UPDATE ON football.prediction_run DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION football.validate_prediction_complete();
+
 UPDATE public.alembic_version SET version_num='20260807_0006' WHERE public.alembic_version.version_num = '20260803_0005';
 
 COMMIT;
-

@@ -58,7 +58,7 @@ from dmf_pulse.ingestion.fpl.service import DATABASE_REF
 from dmf_pulse.ingestion.odds.service import DEFAULT_CUTOFF, OddsIngestionService, OddsReplayRequest
 
 pytestmark = pytest.mark.migration
-EXPECTED_SCHEMA_SHA256 = "d4a9c172bb57df2c1af7ef293b64437eea5b2c39ee002fd467c3651e0ff2924b"
+EXPECTED_SCHEMA_SHA256 = "f692ce995e5ea7e12d62ccddee583620647d66c65bef784c46a7f7931ee10ae0"
 NORMALISATION_AS_OF = datetime(2026, 8, 20, 12, 5, tzinfo=UTC)
 NRM006_TABLES = {
     "betting.market_consensus_outcome",
@@ -144,6 +144,7 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "football.validate_lineup_scenario",
         "football.validate_minute_pmf",
         "football.validate_player_minutes_projection",
+        "football.validate_prediction_complete",
         "provenance.guard_processing_event",
         "provenance.guard_fpl_observation_source_usable",
         "provenance.guard_raw_storage_rights",
@@ -151,6 +152,8 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "provenance.guard_source_snapshot_envelope",
         "provenance.lock_bundle_quality_subject",
         "provenance.reject_immutable_change",
+        "provenance.validate_dataset_complete",
+        "provenance.validate_model_dataset_complete",
     }
     trigger_names = {
         trigger["name"] for value in first.schemas.values() for trigger in value["triggers"]
@@ -263,6 +266,9 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "trg_min007f_immutable_11",
         "trg_min007f_scenario_parent",
         "trg_min007f_scenario_member",
+        "trg_min007f_dataset_complete",
+        "trg_min007f_model_dataset_complete",
+        "trg_min007f_prediction_complete",
     }
     trigger_definitions = {
         trigger["name"]: trigger["definition"]

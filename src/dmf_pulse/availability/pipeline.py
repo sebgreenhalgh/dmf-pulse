@@ -328,6 +328,7 @@ def predict_minutes_baseline(
         raise ValueError("lineup sampler returned an invalid result")
     by_key = {str(item["player_key"]): item for item in candidates}
     players: list[PlayerMinutesProjection] = []
+    core_pmfs: list[dict[str, Any]] = []
     for marginal in lineup.role_marginals:
         candidate = by_key[
             next(
@@ -356,6 +357,12 @@ def predict_minutes_baseline(
                 role="BENCH",
                 policy=policy,
             )
+        core_pmfs.extend(
+            (
+                start.model_dump(mode="json"),
+                bench.model_dump(mode="json"),
+            )
+        )
         players.append(
             compose_player_minutes_projection(
                 marginal,
@@ -378,6 +385,16 @@ def predict_minutes_baseline(
         model_artifact_sha256=str(artifact_value["artifact_sha256"]),
     )
     first = tuple(item.model_dump(mode="json") for item in lineup.first_scenarios)
+    core_scenarios = tuple(item.model_dump(mode="json") for item in lineup.scenarios)
+    core_hard = tuple(
+        {
+            "player_id": str(item["player_id"]),
+            "reason": "HARD_INELIGIBLE_OVERRIDE",
+            "hard_ineligible": True,
+        }
+        for item in candidates
+        if item["hard_ineligible"]
+    )
     return MinutesPredictionResult(
         status="PROJECTED",
         fixture_id=projection.fixture_id,
@@ -387,6 +404,10 @@ def predict_minutes_baseline(
         error_code=None,
         first_scenarios=first,
         player_keys=tuple((str(item["player_id"]), key) for key, item in by_key.items()),
+        core_role_marginals=tuple(item.model_dump(mode="json") for item in lineup.role_marginals),
+        core_minute_pmfs=tuple(core_pmfs),
+        core_scenarios=core_scenarios,
+        core_hard_eligibility=core_hard,
     )
 
 

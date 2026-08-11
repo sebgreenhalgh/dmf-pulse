@@ -49,11 +49,12 @@ def test_committed_prediction_rows_are_immutable(
     dataset: dict[str, object],
     model: dict[str, object],
     prediction: dict[str, object],
+    bundle_parts: dict[str, list[dict[str, object]]],
 ) -> None:
     with pytest.raises(DBAPIError), postgres_session_factory.begin() as session:
         register_dataset_version(session, dataset)
         register_model_version(session, model)
-        run_id = register_prediction_bundle(session, prediction)
+        run_id = register_prediction_bundle(session, prediction, **bundle_parts)
         session.execute(
             update(prediction_run)
             .where(prediction_run.c.prediction_run_id == run_id)

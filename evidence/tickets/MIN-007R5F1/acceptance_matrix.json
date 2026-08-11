@@ -1,0 +1,31 @@
+{
+  "ticket": "MIN-007R5F1",
+  "status": "PASS",
+  "commands": [
+    {"id": 1, "command": "git diff --check", "status": "PASS"},
+    {"id": 2, "command": "uv run ruff format --check ...", "status": "PASS"},
+    {"id": 3, "command": "uv run ruff check ...", "status": "PASS"},
+    {"id": 4, "command": "uv run mypy src/dmf_pulse/availability", "status": "PASS"},
+    {"id": 5, "command": "pytest registry remediation unit tests", "status": "PASS", "tests": 6},
+    {"id": 6, "command": "docker compose up", "status": "PASS"},
+    {"id": 7, "command": "alembic upgrade head", "status": "PASS"},
+    {"id": 8, "command": "pytest registry atomicity integration tests", "status": "PASS", "tests": 6},
+    {"id": 9, "command": "pytest persistence and as-of tests", "status": "PASS", "tests": 3},
+    {"id": 10, "command": "pytest concurrency tests", "status": "PASS", "tests": 1},
+    {"id": 11, "command": "pytest migration tests", "status": "PASS", "tests": 63},
+    {"id": 12, "command": "test migration matrix", "status": "PASS"},
+    {"id": 13, "command": "pytest availability unit/property/golden", "status": "PASS", "tests": 133},
+    {"id": 14, "command": "pytest markets contract/unit/golden", "status": "PASS", "tests": 75},
+    {"id": 15, "command": "validate_repository.py", "status": "PASS"},
+    {"id": 16, "command": "scan_secrets.py", "status": "PASS", "findings": 0},
+    {"id": 17, "command": "alembic heads", "status": "PASS", "head": "20260807_0006"},
+    {"id": 18, "command": "alembic check", "status": "PASS"},
+    {"id": 19, "command": "docker compose down -v --remove-orphans", "status": "PASS"},
+    {"id": 20, "command": "git diff --check", "status": "PASS"}
+  ],
+  "summary": {
+    "passed": 20,
+    "total": 20,
+    "postgresql": "removed"
+  }
+}

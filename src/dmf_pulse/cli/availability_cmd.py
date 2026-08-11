@@ -326,10 +326,10 @@ def predict_command(
                 register_prediction_bundle(
                     session,
                     prediction,
-                    role_marginals=(),
-                    minute_pmfs=(),
-                    scenarios=(),
-                    hard_eligibility=(),
+                    role_marginals=result.core_role_marginals,
+                    minute_pmfs=result.core_minute_pmfs,
+                    scenarios=result.core_scenarios,
+                    hard_eligibility=result.core_hard_eligibility,
                     final_projection=result.projection,
                 )
         finally:

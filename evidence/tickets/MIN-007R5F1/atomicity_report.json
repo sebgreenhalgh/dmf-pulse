@@ -1,0 +1,32 @@
+{
+  "ticket": "MIN-007R5F1",
+  "status": "PASS",
+  "closures": {
+    "finding_1_semantic_allowlists": {
+      "status": "CLOSED",
+      "detail": "Dataset, model, and prediction identities normalize explicit typed semantic fields; unknown runtime metadata is ignored and mapping order remains canonical."
+    },
+    "finding_2_dataset_lineage": {
+      "status": "CLOSED",
+      "detail": "Dataset publication uses a nested atomic boundary and deferred database completeness validation; duplicate or incomplete lineage cannot remain publishable, and model registration rechecks lineage completeness."
+    },
+    "finding_3_model_artifact_conflict": {
+      "status": "CLOSED",
+      "detail": "Idempotency compares canonical persisted artifact JSON and all semantic model fields; exact duplicates return the row while conflicts raise MODEL_IDENTITY_COLLISION."
+    },
+    "finding_4_prediction_atomicity": {
+      "status": "CLOSED",
+      "detail": "Prediction publication rolls back on late validation failures and deferred database triggers enforce declared dependency, hard-eligibility, role-marginal, PMF, and scenario counts before commit. Historical reads are therefore restricted to complete graph rows."
+    },
+    "finding_5_output_identity": {
+      "status": "CLOSED",
+      "detail": "Output identity is recomputed from actual supplied bundle contents; a mismatched caller declaration raises OUTPUT_IDENTITY_MISMATCH and altered output cannot be treated as idempotent."
+    }
+  },
+  "probe_results": {
+    "atomicity_integration": "6 passed",
+    "persistence_asof": "3 passed",
+    "concurrency": "1 passed",
+    "migration": "63 passed"
+  }
+}

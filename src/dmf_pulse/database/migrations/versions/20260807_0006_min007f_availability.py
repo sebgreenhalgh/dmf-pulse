@@ -179,6 +179,101 @@ END
 $$
 """
 
+DATASET_COMPLETENESS_FUNCTION = """
+CREATE OR REPLACE FUNCTION provenance.validate_dataset_complete()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  expected integer;
+  actual integer;
+BEGIN
+  SELECT declared_training_example_count INTO expected
+    FROM provenance.dataset_version
+   WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id);
+  IF expected IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_NOT_FOUND';
+  END IF;
+  SELECT count(*) INTO actual
+    FROM provenance.dataset_training_example
+   WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id);
+  IF actual <> expected THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_LINEAGE_INCOMPLETE';
+  END IF;
+  RETURN NULL;
+END
+$$
+"""
+
+MODEL_DATASET_FUNCTION = """
+CREATE OR REPLACE FUNCTION provenance.validate_model_dataset_complete()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  expected integer;
+  actual integer;
+BEGIN
+  SELECT dataset.declared_training_example_count INTO expected
+    FROM provenance.dataset_version AS dataset
+   WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256;
+  IF expected IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_NOT_FOUND';
+  END IF;
+  SELECT count(*) INTO actual
+    FROM provenance.dataset_training_example AS example
+    JOIN provenance.dataset_version AS dataset
+      ON dataset.dataset_version_id = example.dataset_version_id
+   WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256;
+  IF actual <> expected THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_INCOMPLETE';
+  END IF;
+  RETURN NULL;
+END
+$$
+"""
+
+PREDICTION_COMPLETENESS_FUNCTION = """
+CREATE OR REPLACE FUNCTION football.validate_prediction_complete()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  dependency_total integer;
+  hard_total integer;
+  marginal_total integer;
+  pmf_total integer;
+  scenario_total integer;
+  role_total integer;
+BEGIN
+  SELECT count(*) INTO dependency_total
+    FROM football.prediction_dependency
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO hard_total
+    FROM football.prediction_hard_eligibility
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO marginal_total
+    FROM football.role_marginal
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO pmf_total
+    FROM football.conditional_minute_pmf
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO scenario_total
+    FROM football.lineup_scenario
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO role_total
+    FROM football.conditional_minute_pmf
+   WHERE prediction_run_id = NEW.prediction_run_id
+     AND role IN ('START', 'BENCH');
+  IF dependency_total <> NEW.dependency_count
+     OR hard_total <> NEW.hard_eligibility_count
+     OR marginal_total <> NEW.role_marginal_count
+     OR pmf_total <> NEW.minute_pmf_count
+     OR scenario_total <> NEW.scenario_count
+     OR marginal_total = 0
+     OR pmf_total = 0
+     OR role_total <> pmf_total THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_GRAPH_INCOMPLETE';
+  END IF;
+  RETURN NULL;
+END
+$$
+"""
+
 
 def upgrade() -> None:
     bind = op.get_bind()
@@ -187,6 +282,9 @@ def upgrade() -> None:
     for table in TABLES:
         table.create(bind=bind, checkfirst=False)
     op.execute(SCENARIO_FUNCTION)
+    op.execute(DATASET_COMPLETENESS_FUNCTION)
+    op.execute(MODEL_DATASET_FUNCTION)
+    op.execute(PREDICTION_COMPLETENESS_FUNCTION)
     op.execute(IMMUTABLE_FUNCTION)
     for index, table_name in enumerate(IMMUTABLE_TABLES):
         op.execute(
@@ -206,6 +304,24 @@ def upgrade() -> None:
         "DEFERRABLE INITIALLY DEFERRED FOR EACH ROW "
         "EXECUTE FUNCTION football.validate_lineup_scenario()"
     )
+    op.execute(
+        "CREATE CONSTRAINT TRIGGER trg_min007f_dataset_complete "
+        "AFTER INSERT OR UPDATE ON provenance.dataset_version "
+        "DEFERRABLE INITIALLY DEFERRED FOR EACH ROW "
+        "EXECUTE FUNCTION provenance.validate_dataset_complete()"
+    )
+    op.execute(
+        "CREATE CONSTRAINT TRIGGER trg_min007f_model_dataset_complete "
+        "AFTER INSERT OR UPDATE ON provenance.model_version "
+        "DEFERRABLE INITIALLY DEFERRED FOR EACH ROW "
+        "EXECUTE FUNCTION provenance.validate_model_dataset_complete()"
+    )
+    op.execute(
+        "CREATE CONSTRAINT TRIGGER trg_min007f_prediction_complete "
+        "AFTER INSERT OR UPDATE ON football.prediction_run "
+        "DEFERRABLE INITIALLY DEFERRED FOR EACH ROW "
+        "EXECUTE FUNCTION football.validate_prediction_complete()"
+    )
 
 
 def downgrade() -> None:
@@ -217,11 +333,19 @@ def downgrade() -> None:
     op.execute(
         "DROP TRIGGER IF EXISTS trg_min007f_scenario_member ON football.lineup_scenario_member"
     )
+    op.execute("DROP TRIGGER IF EXISTS trg_min007f_dataset_complete ON provenance.dataset_version")
+    op.execute(
+        "DROP TRIGGER IF EXISTS trg_min007f_model_dataset_complete ON provenance.model_version"
+    )
+    op.execute("DROP TRIGGER IF EXISTS trg_min007f_prediction_complete ON football.prediction_run")
     # Table CHECK constraints depend on the PMF/projection validator
     # functions, so remove the tables before dropping those functions.
     for table in reversed(TABLES):
         table.drop(bind=op.get_bind(), checkfirst=False)
     op.execute("DROP FUNCTION IF EXISTS football.validate_lineup_scenario()")
+    op.execute("DROP FUNCTION IF EXISTS provenance.validate_dataset_complete()")
+    op.execute("DROP FUNCTION IF EXISTS provenance.validate_model_dataset_complete()")
+    op.execute("DROP FUNCTION IF EXISTS football.validate_prediction_complete()")
     op.execute("DROP FUNCTION IF EXISTS football.reject_immutable_availability_change()")
     op.execute(
         "DROP FUNCTION IF EXISTS football.validate_player_minutes_projection(numeric,numeric,numeric,numeric[],numeric,numeric,numeric)"

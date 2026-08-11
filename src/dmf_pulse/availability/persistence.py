@@ -160,8 +160,15 @@ def register_dataset_version(
     dataset: Mapping[str, Any],
     *,
     training_examples: Sequence[Mapping[str, Any]] | None = None,
+    _atomic: bool = True,
 ) -> UUID:
     """Register one immutable dataset version and its optional complete lineage."""
+
+    if _atomic:
+        with session.begin_nested():
+            return register_dataset_version(
+                session, dataset, training_examples=training_examples, _atomic=False
+            )
 
     value = _mapping(dataset, label="dataset")
     semantic_hash = dataset_version_semantic_sha256(value)
@@ -266,8 +273,13 @@ def register_model_version(
     model: Mapping[str, Any],
     *,
     artifact: Mapping[str, Any] | None = None,
+    _atomic: bool = True,
 ) -> UUID:
     """Register one immutable model artifact version bound to a dataset hash."""
+
+    if _atomic:
+        with session.begin_nested():
+            return register_model_version(session, model, artifact=artifact, _atomic=False)
 
     value = _mapping(model, label="model")
     semantic_hash = model_version_semantic_sha256(value)
@@ -290,6 +302,23 @@ def register_model_version(
         "artifact": dict(artifact or value.get("artifact", {})),
     }
     try:
+        dataset_row = session.execute(
+            select(
+                dataset_version.c.dataset_version_id,
+                dataset_version.c.declared_training_example_count,
+            ).where(dataset_version.c.dataset_semantic_sha256 == values["dataset_version_sha256"])
+        ).one_or_none()
+        if dataset_row is None:
+            raise DataModelError("DATASET_NOT_FOUND", "model dataset provenance is not registered")
+        lineage_count = session.execute(
+            select(func.count())
+            .select_from(dataset_training_example)
+            .where(dataset_training_example.c.dataset_version_id == dataset_row.dataset_version_id)
+        ).scalar_one()
+        if int(lineage_count) != int(dataset_row.declared_training_example_count):
+            raise DataModelError(
+                "DATASET_INCOMPLETE", "model cannot reference incomplete dataset provenance"
+            )
         identifier = session.execute(
             postgresql_insert(model_version)
             .values(**values)
@@ -297,11 +326,37 @@ def register_model_version(
             .returning(model_version.c.model_version_id)
         ).scalar_one_or_none()
         if identifier is None:
-            identifier = session.execute(
-                select(model_version.c.model_version_id).where(
-                    model_version.c.model_semantic_sha256 == semantic_hash
+            existing = (
+                session.execute(
+                    select(model_version).where(
+                        model_version.c.model_semantic_sha256 == semantic_hash
+                    )
                 )
-            ).scalar_one()
+                .mappings()
+                .one()
+            )
+            for field in (
+                "model_key",
+                "schema_version",
+                "dataset_version_sha256",
+                "role_artifact_sha256",
+                "minute_artifact_sha256",
+                "policy_sha256",
+                "model_family",
+                "code_identity",
+            ):
+                if existing[field] != values[field]:
+                    raise DataModelError(
+                        "MODEL_IDENTITY_COLLISION",
+                        "model identity maps to different semantic fields",
+                    )
+            if canonical_semantic_sha256(
+                _semantic_json(existing["artifact"])
+            ) != canonical_semantic_sha256(_semantic_json(values["artifact"])):
+                raise DataModelError(
+                    "MODEL_IDENTITY_COLLISION", "model identity maps to different artifact content"
+                )
+            identifier = existing["model_version_id"]
         if not isinstance(identifier, UUID):
             raise DataModelError("DATABASE_RESULT_INVALID", "model version identifier is invalid")
         return identifier
@@ -354,9 +409,6 @@ def _prediction_output_hash(
     scenarios: Sequence[object],
     final_projection: object | None = None,
 ) -> str:
-    declared = prediction.get("output_semantic_sha256")
-    if declared is not None:
-        return _hash(declared, label="output_semantic_sha256")
     output: dict[str, Any] = {
         "role_marginals": [_mapping(value, label="role marginal") for value in role_marginals],
         "minute_pmfs": [_mapping(value, label="minute PMF") for value in minute_pmfs],
@@ -376,8 +428,22 @@ def register_prediction_bundle(
     scenarios: Sequence[object] | None = None,
     hard_eligibility: Sequence[object] | None = None,
     final_projection: object | None = None,
+    _atomic: bool = True,
 ) -> UUID:
     """Publish one complete immutable prediction graph in the caller's transaction."""
+
+    if _atomic:
+        with session.begin_nested():
+            return register_prediction_bundle(
+                session,
+                prediction,
+                role_marginals=role_marginals,
+                minute_pmfs=minute_pmfs,
+                scenarios=scenarios,
+                hard_eligibility=hard_eligibility,
+                final_projection=final_projection,
+                _atomic=False,
+            )
 
     value = _mapping(prediction, label="prediction")
     marginal_values = tuple(role_marginals or value.get("role_marginals", ()))
@@ -395,8 +461,20 @@ def register_prediction_bundle(
         signature_value = {**value, "hard_eligibility": list(hard_values)}
     signature = prediction_input_signature_sha256(signature_value)
     output_hash = _prediction_output_hash(
-        value, marginal_values, pmf_values, scenario_values, final_projection
+        {key: item for key, item in value.items() if key != "output_semantic_sha256"},
+        marginal_values,
+        pmf_values,
+        scenario_values,
+        final_projection,
     )
+    declared_output_hash = value.get("output_semantic_sha256")
+    if (
+        declared_output_hash is not None
+        and _hash(declared_output_hash, label="output_semantic_sha256") != output_hash
+    ):
+        raise DataModelError(
+            "OUTPUT_IDENTITY_MISMATCH", "declared output identity does not match supplied bundle"
+        )
     model_hash = value.get("model_version_sha256", value.get("model_semantic_sha256"))
     dataset_hash = value.get("dataset_version_sha256", value.get("dataset_semantic_sha256"))
     manager_context = _mapping(value.get("manager_context", {}), label="manager_context")
@@ -418,6 +496,11 @@ def register_prediction_bundle(
         "manager_context": manager_context,
         "seed": str(value.get("seed", "")),
         "sample_count": int(value.get("sample_count", 0)),
+        "dependency_count": len(value.get("source_dependencies", ())),
+        "hard_eligibility_count": len(hard_values),
+        "role_marginal_count": len(marginal_values),
+        "minute_pmf_count": len(pmf_values),
+        "scenario_count": len(scenario_values),
         "bench_size": int(value.get("bench_size", 0)),
         "bench_goalkeeper_slots": int(value.get("bench_goalkeeper_slots", 0)),
         "code_identity": str(value.get("code_identity", "")),
