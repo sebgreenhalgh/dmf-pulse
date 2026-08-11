@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## MIN-007R5G - CLI public assurance remediation
+
+- Ticket/stage: `MIN-007R5G`, A7; required parent `2986433e32d55aa3153003b3cc98a098c3a9c071`.
+- Scope: close AUDIT-007-3 findings 9–12 only: strict CLI cutoff/seed semantics, data-driven synthetic mapping, superseding public probability schema, portable repository goldens, substantive PostgreSQL G persistence, and all-scenario CLI assurance.
+- Constraints: preserve MIN-007R5F1/F2 architecture and frozen model/registry identities; no migration, Stage-7H work, live provider/network/credential access, or numerical formula changes.
+
+### MIN-007R5G checkpoints
+
+- [x] Reconcile existing implementation against the corrected R5G contracts and add repository-contained authority assets and portability guards.
+- [x] Implement strict cutoff/seed/mapping/public-schema semantics and substantive PostgreSQL/CLI assurance regressions.
+- [x] Run all 23 literal acceptance commands, record evidence, remove PostgreSQL, commit once, and verify a clean worktree.
+
 ## MIN-007R5F2 - relational and evaluation integrity remediation
 
 - Ticket/stage: `MIN-007R5F2`, A7; required parent `6fc063424ed8e5c4a688432ccf54770f0c8137eb`.

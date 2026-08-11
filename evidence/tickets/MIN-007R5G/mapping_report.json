@@ -1,0 +1,20 @@
+{
+  "ticket_id": "MIN-007R5G",
+  "status": "PASS",
+  "mapping_plan": "fixtures/availability/MIN-007/external_mapping_plan.json",
+  "mapping_sha256": "490585bed1bce6f9d904ddb12b6df6b6a4d04caca91fb1160af53e83578a3550",
+  "provider": "synthetic_availability",
+  "season": "2026/27",
+  "environment_scope": ["TEST", "REPLAY"],
+  "scenarios": [
+    {"external_id": 701, "scenario": "stable_xi", "status": "PROJECTED"},
+    {"external_id": 702, "scenario": "high_rotation", "status": "PROJECTED"},
+    {"external_id": 703, "scenario": "hard_ineligible", "status": "PROJECTED"},
+    {"external_id": 704, "scenario": "new_signing", "status": "PROJECTED"},
+    {"external_id": 705, "scenario": "promoted_team", "status": "PROJECTED"},
+    {"external_id": 706, "scenario": "new_manager", "status": "PROJECTED"},
+    {"external_id": 707, "scenario": "rare_bench_60_plus", "status": "PROJECTED"},
+    {"external_id": 708, "scenario": "goalkeeper", "status": "PROJECTED"},
+    {"external_id": 709, "scenario": "insufficient_eligible_squad", "status": "BLOCKED", "error_code": "INSUFFICIENT_ELIGIBLE_SQUAD"}
+  ]
+}

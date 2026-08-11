@@ -1,0 +1,23 @@
+{
+  "ticket_id": "MIN-007R5G",
+  "status": "PASS",
+  "policy_seed": "MIN-007-COHERENCE-V1",
+  "frozen_as_of": "2026-08-14T17:30:00Z",
+  "alternate_as_of": "2026-08-14T17:29:59Z",
+  "accepted_window": "training_cutoff <= as_of < mapped fixture kickoff",
+  "frozen_identity": {
+    "fixture_external_id": 701,
+    "fixture_id": "943094f5-1d10-5d96-b88b-d271464f3e48",
+    "team_id": "cc1083fa-0c4a-59ab-b6c5-60c04f760782",
+    "team_result_sha256": "04808edd9083f2305396c70acf41bddfc405da4736807f412bce2123c1791cc3"
+  },
+  "rejections": [
+    {"case": "1900 cutoff", "exit_code": 3, "publication": false},
+    {"case": "2099 cutoff", "exit_code": 3, "publication": false},
+    {"case": "exact kickoff", "exit_code": 3, "publication": false},
+    {"case": "wrong seed", "exit_code": 3, "publication": false},
+    {"case": "Python non-string seed", "exit_code": 3, "publication": false},
+    {"case": "unsupported provider/fixture/season/side", "exit_code": 3, "publication": false}
+  ],
+  "diagnostics": "invalid availability commands emit typed JSON diagnostics on stderr; successful and blocked results remain JSON stdout"
+}

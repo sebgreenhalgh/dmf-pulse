@@ -26,7 +26,7 @@ from tests.contract.markets._draft2020 import SchemaValidationError, validate_in
 pytestmark = pytest.mark.contract
 
 SCHEMA_HASHES = {
-    "probability.schema.json": "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
+    "probability.schema.json": "6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b",
     "normalised_operator_market.schema.json": "c2851ca0c051c61aaa404fb290f6974640b2b1453f8c5a43e8d89502d0ee21fb",
     "market_consensus.schema.json": "60e59a14cb5c3a9abdbac5c7b4c929c9a38993a07a0b71cdc80704517fc56ad4",
     "market_normalisation_result.schema.json": "b9a39f8f2a612645ddde141f8e9c8df340d65d1b1a8a4e01b42bb2f64a1eb789",

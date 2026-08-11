@@ -77,7 +77,7 @@ NRM006_FROZEN_INPUTS = {
         10572,
     ),
     "public_contracts/probability.schema.json": (
-        "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
+        "6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b",
         338,
     ),
     "public_contracts/normalised_operator_market.schema.json": (

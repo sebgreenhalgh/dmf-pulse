@@ -6,12 +6,13 @@ import json
 import os
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, NoReturn
 
 import typer
 from sqlalchemy import Engine
 
 from dmf_pulse.availability.dataset import semantic_dataset_hash
+from dmf_pulse.availability.models import format_utc, parse_utc
 from dmf_pulse.availability.persistence import (
     register_dataset_version,
     register_model_evaluation,
@@ -34,11 +35,13 @@ from dmf_pulse.database.engine import (
     session_factory,
 )
 from dmf_pulse.database.models import DatabaseSettings
+from dmf_pulse.ingestion.errors import IngestionError
 
 availability_app = typer.Typer(help="Run the deterministic TEST/REPLAY availability pipeline.")
 dataset_app = typer.Typer(help="Build synthetic availability datasets.")
 availability_app.add_typer(dataset_app, name="dataset")
 BLOCKED_EXIT = 42
+POLICY_SEED = "MIN-007-COHERENCE-V1"
 
 
 def _root() -> Path:
@@ -60,6 +63,68 @@ def _fixtures() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     policy = _read_json(root / "fixtures/availability/MIN-007G/minutes_baseline_policy.json")
     evaluation = _read_json(root / "fixtures/availability/MIN-007G/evaluation_dataset.json")
     return history, policy, evaluation
+
+
+def _mapping_plan() -> dict[str, Any]:
+    """Load the repository-contained TEST/REPLAY fixture authority."""
+
+    plan = _read_json(_root() / "fixtures/availability/MIN-007/external_mapping_plan.json")
+    if (
+        plan.get("schema_version") != "min007-synthetic-mapping-plan-v1"
+        or plan.get("provider_key") != "synthetic_availability"
+        or plan.get("season_code") != "2026/27"
+        or plan.get("environment_scope") != ["TEST", "REPLAY"]
+    ):
+        raise ValueError("synthetic mapping plan is invalid")
+    return plan
+
+
+def _resolve_fixture(
+    plan: Mapping[str, Any], *, external_id: int, team_side: str
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    fixtures = plan.get("target_fixtures")
+    teams = plan.get("teams")
+    if not isinstance(fixtures, list) or not isinstance(teams, list):
+        raise ValueError("synthetic mapping plan is incomplete")
+    fixture = next(
+        (
+            item
+            for item in fixtures
+            if isinstance(item, Mapping) and item.get("external_id") == str(external_id)
+        ),
+        None,
+    )
+    if not isinstance(fixture, Mapping):
+        raise ValueError("fixture external ID is not in the TEST mapping plan")
+    side_key = {"HOME": "home_team_external_id", "AWAY": "away_team_external_id"}.get(team_side)
+    if side_key is None:
+        raise ValueError("team side is not supported by the synthetic mapping plan")
+    external_team_id = fixture.get(side_key)
+    team = next(
+        (
+            item
+            for item in teams
+            if isinstance(item, Mapping) and item.get("external_id") == external_team_id
+        ),
+        None,
+    )
+    if not isinstance(team, Mapping):
+        raise ValueError("mapped team identity is unavailable")
+    return dict(fixture), dict(team)
+
+
+def _requested_as_of(value: str, *, training_cutoff: str, kickoff: str) -> str:
+    """Validate and canonically render the strict requested prediction cutoff."""
+
+    try:
+        requested = parse_utc(value, field_name="as_of")
+        cutoff = parse_utc(training_cutoff, field_name="training_cutoff")
+        fixture_kickoff = parse_utc(kickoff, field_name="fixture kickoff")
+    except ValueError as exc:
+        _reject(str(exc))
+    if not cutoff <= requested < fixture_kickoff:
+        _reject("--as-of must satisfy training_cutoff <= as_of < mapped fixture kickoff")
+    return format_utc(requested)
 
 
 def _training(history: Mapping[str, Any]) -> dict[str, Any]:
@@ -111,12 +176,18 @@ def _emit(value: object) -> None:
     typer.echo(json.dumps(data, ensure_ascii=False, allow_nan=False, sort_keys=True))
 
 
+def _reject(message: str) -> NoReturn:
+    """Emit availability diagnostics on stderr without contaminating stdout."""
+
+    error = IngestionError("USAGE_INVALID", message)
+    typer.echo(json.dumps(error.as_error_object(), sort_keys=True), err=True)
+    raise typer.Exit(error.exit_code)
+
+
 def _guard_environment() -> None:
     environment = os.environ.get("DMF_ENVIRONMENT", "").upper()
     if environment not in {"TEST", "REPLAY"}:
-        raise typer.BadParameter(
-            "MIN-007G synthetic fixtures require DMF_ENVIRONMENT TEST or REPLAY"
-        )
+        _reject("MIN-007G synthetic fixtures require DMF_ENVIRONMENT TEST or REPLAY")
 
 
 @dataset_app.command("build")
@@ -258,18 +329,37 @@ def predict_command(
     """Predict one mapped synthetic fixture without any provider access."""
 
     _guard_environment()
-    if (
-        fixture_external_provider != "synthetic_availability"
-        or team_side != "HOME"
-        or season_code != "2026/27"
-    ):
-        raise typer.BadParameter("only the frozen synthetic HOME fixture mapping is supported")
-    name = {701: "stable_xi", 709: "insufficient_eligible_squad"}.get(fixture_external_id)
-    if name is None:
-        raise typer.BadParameter("fixture external ID is not in the TEST mapping plan")
     history, policy, _ = _fixtures()
-    context = _read_json(_root() / f"fixtures/availability/MIN-007G/contexts/{name}.json")
     training = _training(history)
+    if not isinstance(seed, str) or seed != policy.get("seed", POLICY_SEED):
+        _reject("seed must exactly match the loaded MIN-007 coherence policy")
+    try:
+        plan = _mapping_plan()
+        if fixture_external_provider != plan["provider_key"]:
+            _reject("fixture provider is not supported by the synthetic mapping plan")
+        if season_code != plan["season_code"]:
+            _reject("season is not supported by the synthetic mapping plan")
+        fixture, team = _resolve_fixture(plan, external_id=fixture_external_id, team_side=team_side)
+        cutoff = str(training["training_cutoff"])
+        requested_as_of = _requested_as_of(
+            as_of, training_cutoff=cutoff, kickoff=str(fixture["kickoff"])
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        _reject(str(exc))
+    scenario = fixture.get("scenario")
+    if not isinstance(scenario, str) or not scenario:
+        _reject("mapped fixture scenario is invalid")
+    try:
+        context = _read_json(_root() / f"fixtures/availability/MIN-007G/contexts/{scenario}.json")
+    except (OSError, ValueError):
+        _reject("mapped fixture has no repository-contained context")
+    if (
+        context.get("fixture_id") != fixture.get("fixture_id")
+        or context.get("team_id") != team.get("team_id")
+        or context.get("team_key") != team.get("team_key")
+    ):
+        _reject("mapped fixture context identity is inconsistent")
+    context["as_of"] = requested_as_of
     artifact = fit_projection_artifact(training, policy=policy)
     result = predict_minutes_baseline(history, artifact, context=context, policy=policy)
     if result.status == "BLOCKED":
@@ -284,7 +374,7 @@ def predict_command(
                     "min007-synthetic-train-v1",
                     "SYNTH_EPL",
                     "2026/27",
-                    "2026-06-08T17:00:00Z",
+                    cutoff,
                     training,
                     policy,
                 )

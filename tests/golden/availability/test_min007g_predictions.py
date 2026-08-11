@@ -21,9 +21,7 @@ def test_stable_and_blocked_canaries(repository_root: Path) -> None:
     policy = json.loads(
         (root / "fixtures/availability/MIN-007G/minutes_baseline_policy.json").read_text()
     )
-    expected_path = Path(
-        r"C:\Users\sebgr\Documents\dmf-pulse-context\CodexPacks\DMF_PULSE_CODEX_PACK_007\007G_PROJECTION_EVALUATION_CLI\expected_outputs\prediction_registry.json"
-    )
+    expected_path = root / "fixtures/availability/MIN-007G/prediction_registry.json"
     expected = json.loads(expected_path.read_text())
     artifact = fit_projection_artifact(training, policy=policy)
     for name in ("stable_xi", "insufficient_eligible_squad"):
