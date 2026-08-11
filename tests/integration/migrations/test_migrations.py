@@ -58,7 +58,7 @@ from dmf_pulse.ingestion.fpl.service import DATABASE_REF
 from dmf_pulse.ingestion.odds.service import DEFAULT_CUTOFF, OddsIngestionService, OddsReplayRequest
 
 pytestmark = pytest.mark.migration
-EXPECTED_SCHEMA_SHA256 = "9d15f10b4129f3846a22875c1482001e3975dead606848119fb440cbfc9796c3"
+EXPECTED_SCHEMA_SHA256 = "deae79d0b3e36449fc9df42ff168332d6b4e112ddfe05d0adf8368930eb94bf7"
 NORMALISATION_AS_OF = datetime(2026, 8, 20, 12, 5, tzinfo=UTC)
 NRM006_TABLES = {
     "betting.market_consensus_outcome",
@@ -145,6 +145,10 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "football.validate_minute_pmf",
         "football.validate_player_minutes_projection",
         "football.validate_prediction_complete",
+        "football.validate_prediction_lifecycle",
+        "football.reject_complete_core_mutation",
+        "football.reject_frozen_final_output_mutation",
+        "football.validate_final_output_complete",
         "football.round_half_even_6",
         "provenance.guard_processing_event",
         "provenance.guard_fpl_observation_source_usable",
@@ -155,6 +159,8 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "provenance.reject_immutable_change",
         "provenance.validate_dataset_complete",
         "provenance.validate_model_dataset_complete",
+        "provenance.validate_dataset_lifecycle",
+        "provenance.reject_complete_dataset_lineage_mutation",
     }
     trigger_names = {
         trigger["name"] for value in first.schemas.values() for trigger in value["triggers"]
@@ -263,13 +269,22 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "trg_min007f_immutable_7",
         "trg_min007f_immutable_8",
         "trg_min007f_immutable_9",
-        "trg_min007f_immutable_10",
-        "trg_min007f_immutable_11",
         "trg_min007f_scenario_parent",
         "trg_min007f_scenario_member",
         "trg_min007f_dataset_complete",
+        "trg_min007f_dataset_lifecycle",
+        "trg_min007f_dataset_lineage_freeze",
         "trg_min007f_model_dataset_complete",
         "trg_min007f_prediction_complete",
+        "trg_min007f_prediction_lifecycle",
+        "trg_min007f_final_output_complete",
+        "trg_min007f_final_output_freeze",
+        "trg_min007f_core_freeze_0",
+        "trg_min007f_core_freeze_1",
+        "trg_min007f_core_freeze_2",
+        "trg_min007f_core_freeze_3",
+        "trg_min007f_core_freeze_4",
+        "trg_min007f_core_freeze_5",
     }
     trigger_definitions = {
         trigger["name"]: trigger["definition"]

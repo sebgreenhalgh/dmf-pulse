@@ -46,10 +46,10 @@
   ],
   "metadata_drift_check": "PASS",
   "offline_sql": {
-    "bytes": 225356,
+    "bytes": 234144,
     "path": "evidence/tickets/MIN-007F/offline_upgrade.sql",
     "secret_free": true,
-    "sha256": "818cef0a78b55ae7098beda5e1b7ea84089771f13cccdf5e078944a8ba4ef3d8"
+    "sha256": "4f2a3f9b2ad452ce4f617341b054975c688522ad0a3b86b776549a94b804a7b9"
   },
   "revision_count": 1,
   "revisions": [
@@ -57,13 +57,13 @@
   ],
   "schema": {
     "alembic_revision": "20260807_0006",
-    "schema_sha256": "9d15f10b4129f3846a22875c1482001e3975dead606848119fb440cbfc9796c3",
+    "schema_sha256": "deae79d0b3e36449fc9df42ff168332d6b4e112ddfe05d0adf8368930eb94bf7",
     "table_count": 71,
     "view_count": 12
   },
   "schema_manifest": {
     "path": "evidence/tickets/MIN-007F/schema_manifest.json",
-    "sha256": "8992157f02499a1aa8712a5713db8d71c3c5d4d439ec0964b10ccb929d84734e"
+    "sha256": "d680782f54bd647b312ec2105d1b6c608fc7bc3ef36f003b4f1226871c4c7844"
   },
   "status": "PASS",
   "target_revision": "20260807_0006",

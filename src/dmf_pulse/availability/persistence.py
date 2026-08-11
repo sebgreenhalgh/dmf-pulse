@@ -156,7 +156,7 @@ def _semantic_json(value: object) -> object:
     """Convert exact database values to the JSON scalar representation used for hashes."""
 
     if isinstance(value, Decimal):
-        return format(value, "f")
+        return format(value.normalize(), "f")
     if isinstance(value, UUID):
         return str(value)
     if isinstance(value, datetime):
@@ -200,6 +200,7 @@ def _dataset_values(dataset: Mapping[str, Any], semantic_hash: str) -> dict[str,
         ),
         "policy_sha256": _hash(dataset.get("policy_sha256"), label="policy_sha256"),
         "declared_training_example_count": int(dataset.get("training_example_count", 0)),
+        "publication_state": "DRAFT",
     }
 
 
@@ -237,9 +238,17 @@ def register_dataset_version(
             ).scalar_one()
         if not isinstance(identifier, UUID):
             raise DataModelError("DATABASE_RESULT_INVALID", "dataset version identifier is invalid")
+        existing_state = session.execute(
+            select(dataset_version.c.publication_state).where(
+                dataset_version.c.dataset_version_id == identifier
+            )
+        ).scalar_one()
         if training_examples is not None:
-            for example in training_examples:
-                _insert_training_example(session, identifier, example)
+            if existing_state == "COMPLETE":
+                _verify_frozen_training_examples(session, identifier, training_examples)
+            else:
+                for example in training_examples:
+                    _insert_training_example(session, identifier, example)
         expected = int(values["declared_training_example_count"])
         actual = session.execute(
             select(func.count())
@@ -250,6 +259,12 @@ def register_dataset_version(
             raise DataModelError(
                 "DATASET_LINEAGE_INCOMPLETE",
                 "dataset lineage count does not match the declared count",
+            )
+        if existing_state == "DRAFT":
+            session.execute(
+                dataset_version.update()
+                .where(dataset_version.c.dataset_version_id == identifier)
+                .values(publication_state="COMPLETE")
             )
         return identifier
     except DataModelError:
@@ -316,6 +331,26 @@ def _insert_training_example(
     return identifier
 
 
+def _verify_frozen_training_examples(
+    session: Session, dataset_id: UUID, examples: Sequence[Mapping[str, Any]]
+) -> None:
+    """Verify an exact replay without attempting to mutate frozen lineage."""
+
+    for example in examples:
+        value = _mapping(example, label="training example")
+        example_id = str(value.get("example_id", ""))
+        row = session.execute(
+            select(dataset_training_example.c.lineage_sha256).where(
+                dataset_training_example.c.dataset_version_id == dataset_id,
+                dataset_training_example.c.example_id == example_id,
+            )
+        ).scalar_one_or_none()
+        if row is None or row != canonical_semantic_sha256(value):
+            raise DataModelError(
+                "DATASET_LINEAGE_COLLISION", "completed dataset lineage differs from replay"
+            )
+
+
 def register_model_version(
     session: Session,
     model: Mapping[str, Any],
@@ -354,10 +389,15 @@ def register_model_version(
             select(
                 dataset_version.c.dataset_version_id,
                 dataset_version.c.declared_training_example_count,
+                dataset_version.c.publication_state,
             ).where(dataset_version.c.dataset_semantic_sha256 == values["dataset_version_sha256"])
         ).one_or_none()
         if dataset_row is None:
             raise DataModelError("DATASET_NOT_FOUND", "model dataset provenance is not registered")
+        if dataset_row.publication_state != "COMPLETE":
+            raise DataModelError(
+                "DATASET_INCOMPLETE", "model cannot reference draft dataset provenance"
+            )
         lineage_count = session.execute(
             select(func.count())
             .select_from(dataset_training_example)
@@ -417,37 +457,63 @@ def register_model_version(
 def register_model_evaluation(
     session: Session,
     model_version_id: UUID,
-    evaluation: Mapping[str, Any],
+    evaluation: object,
     *,
     status: str = "COMPLETE",
 ) -> UUID:
     """Register one immutable synthetic evaluation result."""
 
     try:
-        from dmf_pulse.availability.pipeline import MinutesModelEvaluation
-
-        validated = MinutesModelEvaluation.model_validate(evaluation)
-    except Exception as exc:
+        from dmf_pulse.availability.pipeline import ModelEvaluationPublication
+    except ImportError as exc:  # pragma: no cover - package import invariant
+        raise DataModelError("EVALUATION_INVALID", "evaluation contract is unavailable") from exc
+    if not isinstance(evaluation, ModelEvaluationPublication):
         raise DataModelError(
-            "EVALUATION_INVALID", "evaluation does not satisfy the strict runtime contract"
-        ) from exc
-    value = validated.model_dump(mode="json")
+            "EVALUATION_PROVENANCE_REQUIRED",
+            "evaluation persistence requires a model-bound publication envelope",
+        )
+    value = evaluation.evaluation.model_dump(mode="json")
+    evaluated_model_sha = _hash(
+        evaluation.model_version_semantic_sha256, label="evaluated model semantic sha256"
+    )
+    evaluated_artifact_sha = _hash(
+        evaluation.model_artifact_sha256, label="evaluated model artifact sha256"
+    )
+    evaluated_family = evaluation.model_family
     semantic_hash = canonical_semantic_sha256(value)
     if status not in {"PENDING", "COMPLETE", "BLOCKED"}:
         raise DataModelError("EVALUATION_STATUS_INVALID", "evaluation status is invalid")
     try:
-        target = session.execute(
-            select(model_version.c.model_version_id).where(
-                model_version.c.model_version_id == model_version_id
+        target = (
+            session.execute(
+                select(model_version).where(model_version.c.model_version_id == model_version_id)
             )
-        ).scalar_one_or_none()
+            .mappings()
+            .one_or_none()
+        )
         if target is None:
             raise DataModelError("EVALUATION_MODEL_NOT_FOUND", "evaluation model is not registered")
+        artifact = target["artifact"]
+        expected_artifact = (
+            artifact.get("artifact_sha256") if isinstance(artifact, Mapping) else None
+        )
+        if (
+            evaluated_model_sha != target["model_semantic_sha256"]
+            or evaluated_artifact_sha != expected_artifact
+            or evaluated_family != target["model_family"]
+        ):
+            raise DataModelError(
+                "EVALUATION_PROVENANCE_MISMATCH",
+                "evaluation provenance does not bind to the target model",
+            )
         identifier = session.execute(
             postgresql_insert(model_evaluation)
             .values(
                 model_version_id=model_version_id,
                 evaluation_semantic_sha256=semantic_hash,
+                evaluated_model_semantic_sha256=evaluated_model_sha,
+                evaluated_model_artifact_sha256=evaluated_artifact_sha,
+                evaluated_model_family=evaluated_family,
                 status=status,
                 evaluation=value,
             )
@@ -470,6 +536,9 @@ def register_model_evaluation(
                 )
             if (
                 existing["status"] != status
+                or existing["evaluated_model_semantic_sha256"] != evaluated_model_sha
+                or existing["evaluated_model_artifact_sha256"] != evaluated_artifact_sha
+                or existing["evaluated_model_family"] != evaluated_family
                 or canonical_semantic_sha256(existing["evaluation"]) != semantic_hash
             ):
                 raise DataModelError(
@@ -500,6 +569,139 @@ def _prediction_output_hash(
     if final_projection is not None:
         output["final_projection"] = _mapping(final_projection, label="final projection")
     return canonical_semantic_sha256(_semantic_json(output))
+
+
+def _persisted_core_payload(session: Session, prediction_run_id: UUID) -> dict[str, Any]:
+    """Reconstruct the canonical core identity from rows actually persisted."""
+
+    marginals = [
+        {
+            "player_id": row.player_id,
+            "player_key": row.player_key,
+            "position": row.position,
+            "p_start": row.p_start,
+            "p_bench": row.p_bench,
+            "p_out": row.p_out,
+        }
+        for row in session.execute(
+            select(role_marginal)
+            .where(role_marginal.c.prediction_run_id == prediction_run_id)
+            .order_by(role_marginal.c.role_marginal_id)
+        ).mappings()
+    ]
+    pmfs = [
+        {"player_id": row.player_id, "role": row.role, "minute_pmf": row.minute_pmf}
+        for row in session.execute(
+            select(conditional_minute_pmf)
+            .where(conditional_minute_pmf.c.prediction_run_id == prediction_run_id)
+            .order_by(conditional_minute_pmf.c.conditional_minute_pmf_id)
+        ).mappings()
+    ]
+    scenarios: list[dict[str, Any]] = []
+    for scenario in session.execute(
+        select(lineup_scenario)
+        .where(lineup_scenario.c.prediction_run_id == prediction_run_id)
+        .order_by(lineup_scenario.c.scenario_index)
+    ).mappings():
+        scenarios.append(
+            {
+                "scenario_index": scenario["scenario_index"],
+                "scenario_sha256": scenario["scenario_sha256"],
+                "members": [
+                    {
+                        "player_id": member.player_id,
+                        "role": member.role,
+                        "position": member.position,
+                    }
+                    for member in session.execute(
+                        select(lineup_scenario_member)
+                        .where(
+                            lineup_scenario_member.c.lineup_scenario_id
+                            == scenario["lineup_scenario_id"]
+                        )
+                        .order_by(lineup_scenario_member.c.lineup_scenario_member_id)
+                    ).mappings()
+                ],
+            }
+        )
+    return _canonical_core_payload(marginals, pmfs, scenarios)
+
+
+def _canonical_core_payload(
+    marginals: Sequence[object], pmfs: Sequence[object], scenarios: Sequence[object]
+) -> dict[str, Any]:
+    """Canonicalise core rows independently of database-generated UUID order."""
+
+    marginal_rows = [
+        {
+            key: _mapping(item, label="role marginal")[key]
+            for key in ("player_id", "player_key", "position", "p_start", "p_bench", "p_out")
+        }
+        for item in marginals
+    ]
+    pmf_rows = [
+        {
+            key: _mapping(item, label="minute PMF")[key]
+            for key in ("player_id", "role", "minute_pmf")
+        }
+        for item in pmfs
+    ]
+    for row in marginal_rows:
+        for field in ("p_start", "p_bench", "p_out"):
+            if field in row:
+                row[field] = _decimal(row[field], label=field)
+    for row in pmf_rows:
+        if "minute_pmf" in row:
+            row["minute_pmf"] = [
+                _decimal(item, label="minute PMF value") for item in row["minute_pmf"]
+            ]
+    scenario_rows: list[dict[str, Any]] = []
+    for item in scenarios:
+        source = _mapping(item, label="scenario")
+        scenario = {
+            "scenario_index": source["scenario_index"],
+            "scenario_sha256": source["scenario_sha256"],
+        }
+        members = source.get("members", [])
+        member_rows = [
+            {
+                key: _mapping(member, label="scenario member")[key]
+                for key in ("player_id", "role", "position")
+            }
+            for member in members
+        ]
+        member_rows.sort(
+            key=lambda row: (
+                {"START": 0, "BENCH": 1, "OUT": 2}.get(str(row.get("role", "")), 9),
+                str(row.get("player_id", "")),
+            )
+        )
+        scenario_rows.append({**scenario, "members": member_rows})
+    marginal_rows.sort(key=lambda row: str(row.get("player_id", "")))
+    pmf_rows.sort(key=lambda row: (str(row.get("player_id", "")), str(row.get("role", ""))))
+    scenario_rows.sort(key=lambda row: int(row.get("scenario_index", -1)))
+    return {
+        "role_marginals": _semantic_json(marginal_rows),
+        "minute_pmfs": _semantic_json(pmf_rows),
+        "scenarios": _semantic_json(scenario_rows),
+    }
+
+
+def _core_output_hash(payload: Mapping[str, Any], final: object | None = None) -> str:
+    return canonical_semantic_sha256(
+        _semantic_json(
+            {
+                "role_marginals": payload.get("role_marginals", []),
+                "minute_pmfs": payload.get("minute_pmfs", []),
+                "scenarios": payload.get("scenarios", []),
+                **(
+                    {"final_projection": _mapping(final, label="final projection")}
+                    if final is not None
+                    else {}
+                ),
+            }
+        )
+    )
 
 
 def register_prediction_bundle(
@@ -543,13 +745,8 @@ def register_prediction_bundle(
     if hard_eligibility is not None:
         signature_value = {**value, "hard_eligibility": list(hard_values)}
     signature = prediction_input_signature_sha256(signature_value)
-    output_hash = _prediction_output_hash(
-        {key: item for key, item in value.items() if key != "output_semantic_sha256"},
-        marginal_values,
-        pmf_values,
-        scenario_values,
-        final_projection,
-    )
+    core_input_payload = _canonical_core_payload(marginal_values, pmf_values, scenario_values)
+    output_hash = _core_output_hash(core_input_payload, final_projection)
     declared_output_hash = value.get("output_semantic_sha256")
     if (
         declared_output_hash is not None
@@ -584,6 +781,9 @@ def register_prediction_bundle(
         "role_marginal_count": len(marginal_values),
         "minute_pmf_count": len(pmf_values),
         "scenario_count": len(scenario_values),
+        "core_state": "DRAFT",
+        "final_output_state": "NONE",
+        "final_output_count": 0,
         "bench_size": int(value.get("bench_size", 0)),
         "bench_goalkeeper_slots": int(value.get("bench_goalkeeper_slots", 0)),
         "code_identity": str(value.get("code_identity", "")),
@@ -605,6 +805,10 @@ def register_prediction_bundle(
                 ).where(prediction_run.c.prediction_input_signature_sha256 == signature)
             ).one()
             if existing.output_semantic_sha256 != output_hash:
+                if final_projection is not None and isinstance(existing.prediction_run_id, UUID):
+                    register_final_player_projections(
+                        session, existing.prediction_run_id, final_projection
+                    )
                 raise DataModelError(
                     "PREDICTION_SIGNATURE_COLLISION",
                     "prediction signature maps to a different output",
@@ -697,6 +901,18 @@ def register_prediction_bundle(
                         position=str(row.get("position", "")),
                     )
                 )
+        core_payload = _persisted_core_payload(session, identifier)
+        actual_core_hash = _core_output_hash(core_payload)
+        if actual_core_hash != _core_output_hash(core_input_payload):
+            raise DataModelError(
+                "OUTPUT_IDENTITY_MISMATCH",
+                "persisted core identity differs from input",
+            )
+        session.execute(
+            prediction_run.update()
+            .where(prediction_run.c.prediction_run_id == identifier)
+            .values(core_state="COMPLETE", core_output_payload=core_payload)
+        )
         if final_projection is not None:
             register_final_player_projections(session, identifier, final_projection)
         return identifier
@@ -729,6 +945,23 @@ def register_final_player_projections(
     )
     if run is None:
         raise DataModelError("FINAL_PROJECTION_RUN_NOT_FOUND", "prediction run is not registered")
+    if run["core_state"] != "COMPLETE":
+        raise DataModelError("FINAL_PROJECTION_RUN_INCOMPLETE", "prediction core is not complete")
+    final_hash = canonical_semantic_sha256(_semantic_json(value))
+    if run["final_output_state"] == "COMPLETE":
+        if (
+            run["final_output_semantic_sha256"] != final_hash
+            or canonical_semantic_sha256(_semantic_json(run["final_output_payload"] or {}))
+            != final_hash
+        ):
+            raise DataModelError(
+                "FINAL_OUTPUT_COLLISION", "final output identity maps to different content"
+            )
+        return
+    if run["final_output_state"] != "NONE":
+        raise DataModelError(
+            "FINAL_OUTPUT_STATE_INVALID", "final output lifecycle state is invalid"
+        )
     graph_counts = {
         "dependency_count": session.scalar(
             select(func.count())
@@ -842,6 +1075,11 @@ def register_final_player_projections(
             "FINAL_PROJECTION_PLAYER_MISMATCH", "final player positions differ from marginals"
         )
     try:
+        session.execute(
+            prediction_run.update()
+            .where(prediction_run.c.prediction_run_id == prediction_run_id)
+            .values(final_output_state="DRAFT")
+        )
         for item in players:
             player = _mapping(item, label="final player projection")
             pmf = player.get("minute_pmf")
@@ -869,6 +1107,31 @@ def register_final_player_projections(
                     ]
                 )
             )
+        persisted_final_count = int(
+            session.scalar(
+                select(func.count())
+                .select_from(player_minutes_projection)
+                .where(player_minutes_projection.c.prediction_run_id == prediction_run_id)
+            )
+            or 0
+        )
+        if persisted_final_count != len(players):
+            raise DataModelError("FINAL_OUTPUT_COLLISION", "persisted final row count differs")
+        core_payload = run["core_output_payload"]
+        if not isinstance(core_payload, Mapping):
+            core_payload = _persisted_core_payload(session, prediction_run_id)
+        combined_hash = _core_output_hash(core_payload, value)
+        session.execute(
+            prediction_run.update()
+            .where(prediction_run.c.prediction_run_id == prediction_run_id)
+            .values(
+                final_output_state="COMPLETE",
+                final_output_count=persisted_final_count,
+                final_output_semantic_sha256=final_hash,
+                final_output_payload=_semantic_json(value),
+                output_semantic_sha256=combined_hash,
+            )
+        )
     except DataModelError:
         raise
     except DBAPIError as exc:
@@ -938,6 +1201,15 @@ def get_prediction_run(session: Session, signature: str) -> dict[str, Any]:
         ]
         scenarios.append(value)
     result["scenarios"] = scenarios
+    if result.get("final_output_state") == "COMPLETE":
+        result["final_players"] = [
+            dict(item)
+            for item in session.execute(
+                select(player_minutes_projection).where(
+                    player_minutes_projection.c.prediction_run_id == run_id
+                )
+            ).mappings()
+        ]
     return result
 
 
@@ -958,6 +1230,7 @@ def list_prediction_runs_as_of(
             prediction_run.c.team_id == _uuid(team_id, label="team_id"),
             prediction_run.c.model_version_sha256
             == _hash(model_version_sha256, label="model_version_sha256"),
+            prediction_run.c.core_state == "COMPLETE",
             prediction_run.c.as_of <= _utc(cutoff, label="cutoff"),
         )
         .order_by(prediction_run.c.as_of.desc(), prediction_run.c.prediction_input_signature_sha256)

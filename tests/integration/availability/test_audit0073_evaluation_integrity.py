@@ -10,6 +10,8 @@ from dmf_pulse.availability.persistence import (
     register_model_evaluation,
     register_model_version,
 )
+from dmf_pulse.availability.pipeline import MinutesModelEvaluation, ModelEvaluationPublication
+from dmf_pulse.availability.registry import model_version_semantic_sha256
 from dmf_pulse.data_model.errors import DataModelError
 from dmf_pulse.data_model.tables import model_evaluation
 
@@ -42,10 +44,16 @@ def test_evaluation_is_strictly_bound_and_idempotent(
     with postgres_session_factory.begin() as session:
         register_dataset_version(session, dataset)
         model_id = register_model_version(session, model, artifact={"artifact_sha256": "c" * 64})
-        first = register_model_evaluation(session, model_id, EVALUATION)
-        assert register_model_evaluation(session, model_id, EVALUATION) == first
+        publication = ModelEvaluationPublication(
+            evaluation=MinutesModelEvaluation.model_validate(EVALUATION),
+            model_version_semantic_sha256=model_version_semantic_sha256(model),
+            model_artifact_sha256="c" * 64,
+            model_family=model["model_family"],
+        )
+        first = register_model_evaluation(session, model_id, publication)
+        assert register_model_evaluation(session, model_id, publication) == first
         with pytest.raises(DataModelError) as status_error:
-            register_model_evaluation(session, model_id, EVALUATION, status="BLOCKED")
+            register_model_evaluation(session, model_id, publication, status="BLOCKED")
         assert status_error.value.code == "EVALUATION_CONFLICT"
 
         second_model = dict(model, model_key="second-model", code_identity="second-code")
@@ -53,13 +61,16 @@ def test_evaluation_is_strictly_bound_and_idempotent(
             session, second_model, artifact={"artifact_sha256": "c" * 64}
         )
         with pytest.raises(DataModelError) as model_error:
-            register_model_evaluation(session, second_id, EVALUATION)
-        assert model_error.value.code == "EVALUATION_MODEL_CONFLICT"
+            register_model_evaluation(session, second_id, publication)
+        assert model_error.value.code == "EVALUATION_PROVENANCE_MISMATCH"
 
-        production_claim = dict(EVALUATION, production_calibration_claim=True)
-        with pytest.raises(DataModelError) as claim_error:
-            register_model_evaluation(session, model_id, production_claim)
-        assert claim_error.value.code == "EVALUATION_INVALID"
+        with pytest.raises(Exception):
+            ModelEvaluationPublication(
+                evaluation={**EVALUATION, "production_calibration_claim": True},
+                model_version_semantic_sha256=model_version_semantic_sha256(model),
+                model_artifact_sha256="c" * 64,
+                model_family=model["model_family"],
+            )
 
 
 def test_database_rejects_production_calibration_claim_bypass(

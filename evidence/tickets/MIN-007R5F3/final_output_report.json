@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "final_lifecycle": "NONE -> DRAFT -> COMPLETE",
+  "final_output_requires_complete_core": true,
+  "final_output_draft_to_complete_atomic": true,
+  "rogue_final_insert_after_output_complete_rejected": true,
+  "final_update_after_output_complete_rejected": true,
+  "final_delete_after_output_complete_rejected": true,
+  "final_output_identity_recomputed_from_actual_rows": true,
+  "exact_final_output_repeat_idempotent": true,
+  "altered_final_output_collision_rejected": true,
+  "blocked_run_has_no_final_output": true,
+  "evidence_test": "tests/integration/availability/test_audit0073b_final_output_freeze.py"
+}

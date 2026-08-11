@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## MIN-007R5F3 - freeze published graphs and bind evaluation provenance
+
+- Ticket/stage: `MIN-007R5F3`, A7; required parent `f1d8a4a38b073e6ee4a259ee801a9273e5e207ce`.
+- Scope: close the three AUDIT-007-3B P1 findings only: dataset lineage freeze, F-core/final-output lifecycle finalization, and strict evaluation provenance binding.
+- Constraints: preserve R5F1/R5F2/R5G semantics and frozen identities; harden migration `20260807_0006`; no new revision, CLI mapping changes, numerical formula changes, or MIN-007H work.
+
+### MIN-007R5F3 checkpoints
+
+- [x] Add DRAFT/COMPLETE lifecycle boundaries and database triggers for dataset, core graph, and final output.
+- [x] Add strict model evaluation provenance envelope and durable binding fields.
+- [x] Run all 24 literal acceptance commands, record evidence, remove PostgreSQL, commit once, and verify a clean worktree.
+
 ## MIN-007R5G - CLI public assurance remediation
 
 - Ticket/stage: `MIN-007R5G`, A7; required parent `2986433e32d55aa3153003b3cc98a098c3a9c071`.

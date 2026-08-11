@@ -3254,6 +3254,7 @@ dataset_version = Table(
     Column("source_dataset_sha256", CHAR(64)),
     Column("policy_sha256", CHAR(64), nullable=False),
     Column("declared_training_example_count", Integer, nullable=False),
+    Column("publication_state", String(16), nullable=False, server_default=text("'DRAFT'")),
     Column(
         "created_at",
         DateTime(timezone=True),
@@ -3271,6 +3272,9 @@ dataset_version = Table(
     CheckConstraint("policy_sha256 ~ '^[0-9a-f]{64}$'", name="ck_dataset_version_policy_hash"),
     CheckConstraint(
         "declared_training_example_count >= 0", name="ck_dataset_version_example_count"
+    ),
+    CheckConstraint(
+        "publication_state IN ('DRAFT','COMPLETE')", name="ck_dataset_version_publication_state"
     ),
     schema="provenance",
 )
@@ -3386,6 +3390,9 @@ model_evaluation = Table(
         nullable=False,
     ),
     Column("evaluation_semantic_sha256", CHAR(64), nullable=False),
+    Column("evaluated_model_semantic_sha256", CHAR(64), nullable=False),
+    Column("evaluated_model_artifact_sha256", CHAR(64), nullable=False),
+    Column("evaluated_model_family", String(160), nullable=False),
     Column("status", String(24), nullable=False),
     Column("evaluation", JSONB, nullable=False),
     Column(
@@ -3397,6 +3404,14 @@ model_evaluation = Table(
     UniqueConstraint("evaluation_semantic_sha256", name="uq_model_evaluation_semantic_hash"),
     CheckConstraint(
         "evaluation_semantic_sha256 ~ '^[0-9a-f]{64}$'", name="ck_model_evaluation_semantic_hash"
+    ),
+    CheckConstraint(
+        "evaluated_model_semantic_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_model_evaluation_model_hash",
+    ),
+    CheckConstraint(
+        "evaluated_model_artifact_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_model_evaluation_artifact_hash",
     ),
     CheckConstraint(
         "status IN ('PENDING','COMPLETE','BLOCKED')", name="ck_model_evaluation_status"
@@ -3416,6 +3431,7 @@ prediction_run = Table(
     ),
     Column("prediction_input_signature_sha256", CHAR(64), nullable=False),
     Column("output_semantic_sha256", CHAR(64), nullable=False),
+    Column("core_output_payload", JSONB),
     Column("fixture_id", UUID(as_uuid=True), nullable=False),
     Column("team_id", UUID(as_uuid=True), nullable=False),
     Column("as_of", DateTime(timezone=True), nullable=False),
@@ -3432,6 +3448,11 @@ prediction_run = Table(
     Column("role_marginal_count", Integer, nullable=False, server_default=text("0")),
     Column("minute_pmf_count", Integer, nullable=False, server_default=text("0")),
     Column("scenario_count", Integer, nullable=False, server_default=text("0")),
+    Column("core_state", String(16), nullable=False, server_default=text("'DRAFT'")),
+    Column("final_output_state", String(16), nullable=False, server_default=text("'NONE'")),
+    Column("final_output_count", Integer, nullable=False, server_default=text("0")),
+    Column("final_output_semantic_sha256", CHAR(64)),
+    Column("final_output_payload", JSONB),
     Column("bench_size", SmallInteger, nullable=False),
     Column("bench_goalkeeper_slots", SmallInteger, nullable=False),
     Column("code_identity", String(160), nullable=False),
@@ -3465,6 +3486,20 @@ prediction_run = Table(
     CheckConstraint(
         "dependency_count >= 0 AND hard_eligibility_count >= 0 AND role_marginal_count > 0 AND minute_pmf_count > 0 AND scenario_count = sample_count",
         name="ck_prediction_publication_counts",
+    ),
+    CheckConstraint("core_state IN ('DRAFT','COMPLETE')", name="ck_prediction_core_state"),
+    CheckConstraint(
+        "final_output_state IN ('NONE','DRAFT','COMPLETE')",
+        name="ck_prediction_final_output_state",
+    ),
+    CheckConstraint("final_output_count >= 0", name="ck_prediction_final_output_count"),
+    CheckConstraint(
+        "final_output_semantic_sha256 IS NULL OR final_output_semantic_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_prediction_final_output_hash",
+    ),
+    CheckConstraint(
+        "(final_output_state = 'NONE' AND final_output_count = 0 AND final_output_semantic_sha256 IS NULL AND final_output_payload IS NULL) OR (final_output_state IN ('DRAFT','COMPLETE'))",
+        name="ck_prediction_final_output_payload_state",
     ),
     schema="football",
 )

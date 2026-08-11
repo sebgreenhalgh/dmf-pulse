@@ -134,6 +134,15 @@ class MinutesModelEvaluation(_FrozenValidatedModel):
         return self
 
 
+class ModelEvaluationPublication(_FrozenValidatedModel):
+    """Internal persistence envelope binding public metrics to one model artifact."""
+
+    evaluation: MinutesModelEvaluation
+    model_version_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    model_artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    model_family: str = Field(min_length=1)
+
+
 def _mapping(value: object, *, label: str) -> dict[str, Any]:
     if isinstance(value, Mapping):
         return dict(value)
@@ -587,6 +596,7 @@ __all__ = [
     "EVALUATION_SHA256",
     "MinutesModelArtifact",
     "MinutesModelEvaluation",
+    "ModelEvaluationPublication",
     "evaluate_minutes_baseline",
     "fit_projection_artifact",
     "predict_minutes_baseline",

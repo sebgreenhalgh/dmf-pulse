@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE TABLE public.alembic_version (
-    version_num VARCHAR(32) NOT NULL, 
+    version_num VARCHAR(32) NOT NULL,
     CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
 );
 
@@ -4022,250 +4022,268 @@ END
 $$;
 
 CREATE TABLE provenance.dataset_version (
-    dataset_version_id UUID DEFAULT uuidv7() NOT NULL, 
-    dataset_semantic_sha256 CHAR(64) NOT NULL, 
-    dataset_key VARCHAR(160) NOT NULL, 
-    schema_version VARCHAR(80) NOT NULL, 
-    competition_code VARCHAR(80) NOT NULL, 
-    season_code VARCHAR(40) NOT NULL, 
-    training_cutoff TIMESTAMP WITH TIME ZONE NOT NULL, 
-    source_dataset_sha256 CHAR(64), 
-    policy_sha256 CHAR(64) NOT NULL, 
-    declared_training_example_count INTEGER NOT NULL, 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL, 
-    CONSTRAINT pk_dataset_version PRIMARY KEY (dataset_version_id), 
-    CONSTRAINT uq_dataset_version_semantic_hash UNIQUE (dataset_semantic_sha256), 
-    CONSTRAINT ck_dataset_version_semantic_hash CHECK (dataset_semantic_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_dataset_version_source_hash CHECK (source_dataset_sha256 IS NULL OR source_dataset_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_dataset_version_policy_hash CHECK (policy_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_dataset_version_example_count CHECK (declared_training_example_count >= 0)
+    dataset_version_id UUID DEFAULT uuidv7() NOT NULL,
+    dataset_semantic_sha256 CHAR(64) NOT NULL,
+    dataset_key VARCHAR(160) NOT NULL,
+    schema_version VARCHAR(80) NOT NULL,
+    competition_code VARCHAR(80) NOT NULL,
+    season_code VARCHAR(40) NOT NULL,
+    training_cutoff TIMESTAMP WITH TIME ZONE NOT NULL,
+    source_dataset_sha256 CHAR(64),
+    policy_sha256 CHAR(64) NOT NULL,
+    declared_training_example_count INTEGER NOT NULL,
+    publication_state VARCHAR(16) DEFAULT 'DRAFT' NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL,
+    CONSTRAINT pk_dataset_version PRIMARY KEY (dataset_version_id),
+    CONSTRAINT uq_dataset_version_semantic_hash UNIQUE (dataset_semantic_sha256),
+    CONSTRAINT ck_dataset_version_semantic_hash CHECK (dataset_semantic_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_dataset_version_source_hash CHECK (source_dataset_sha256 IS NULL OR source_dataset_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_dataset_version_policy_hash CHECK (policy_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_dataset_version_example_count CHECK (declared_training_example_count >= 0),
+    CONSTRAINT ck_dataset_version_publication_state CHECK (publication_state IN ('DRAFT','COMPLETE'))
 );
 
 CREATE TABLE provenance.dataset_training_example (
-    training_example_id UUID DEFAULT uuidv7() NOT NULL, 
-    dataset_version_id UUID NOT NULL, 
-    example_id VARCHAR(160) NOT NULL, 
-    fixture_id VARCHAR(160) NOT NULL, 
-    fixture_key VARCHAR(160) NOT NULL, 
-    feature_cutoff TIMESTAMP WITH TIME ZONE NOT NULL, 
-    label_usable_at TIMESTAMP WITH TIME ZONE NOT NULL, 
-    manager_regime_id VARCHAR(160) NOT NULL, 
-    minutes_label SMALLINT NOT NULL, 
-    player_id VARCHAR(160) NOT NULL, 
-    player_key VARCHAR(160) NOT NULL, 
-    position VARCHAR(8) NOT NULL, 
-    role_label VARCHAR(8) NOT NULL, 
-    sequence_index INTEGER NOT NULL, 
-    split VARCHAR(16) DEFAULT 'TRAIN' NOT NULL, 
-    team_id VARCHAR(160) NOT NULL, 
-    team_key VARCHAR(160) NOT NULL, 
-    evidence_type VARCHAR(40) NOT NULL, 
-    lineage_sha256 CHAR(64) NOT NULL, 
-    source_lineage JSONB DEFAULT '{}'::jsonb NOT NULL, 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL, 
-    CONSTRAINT pk_dataset_training_example PRIMARY KEY (training_example_id), 
-    CONSTRAINT uq_dataset_example_identity UNIQUE (dataset_version_id, example_id), 
-    CONSTRAINT ck_dataset_example_lineage_hash CHECK (lineage_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_dataset_example_minutes CHECK (minutes_label BETWEEN 0 AND 90), 
-    CONSTRAINT ck_dataset_example_role CHECK (role_label IN ('START','BENCH','OUT')), 
-    CONSTRAINT ck_dataset_example_position CHECK (position IN ('GK','DEF','MID','FWD')), 
-    CONSTRAINT ck_dataset_example_split CHECK (split = 'TRAIN'), 
-    CONSTRAINT ck_dataset_example_sequence CHECK (sequence_index > 0), 
-    CONSTRAINT ck_dataset_example_time_order CHECK (label_usable_at >= feature_cutoff), 
+    training_example_id UUID DEFAULT uuidv7() NOT NULL,
+    dataset_version_id UUID NOT NULL,
+    example_id VARCHAR(160) NOT NULL,
+    fixture_id VARCHAR(160) NOT NULL,
+    fixture_key VARCHAR(160) NOT NULL,
+    feature_cutoff TIMESTAMP WITH TIME ZONE NOT NULL,
+    label_usable_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    manager_regime_id VARCHAR(160) NOT NULL,
+    minutes_label SMALLINT NOT NULL,
+    player_id VARCHAR(160) NOT NULL,
+    player_key VARCHAR(160) NOT NULL,
+    position VARCHAR(8) NOT NULL,
+    role_label VARCHAR(8) NOT NULL,
+    sequence_index INTEGER NOT NULL,
+    split VARCHAR(16) DEFAULT 'TRAIN' NOT NULL,
+    team_id VARCHAR(160) NOT NULL,
+    team_key VARCHAR(160) NOT NULL,
+    evidence_type VARCHAR(40) NOT NULL,
+    lineage_sha256 CHAR(64) NOT NULL,
+    source_lineage JSONB DEFAULT '{}'::jsonb NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL,
+    CONSTRAINT pk_dataset_training_example PRIMARY KEY (training_example_id),
+    CONSTRAINT uq_dataset_example_identity UNIQUE (dataset_version_id, example_id),
+    CONSTRAINT ck_dataset_example_lineage_hash CHECK (lineage_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_dataset_example_minutes CHECK (minutes_label BETWEEN 0 AND 90),
+    CONSTRAINT ck_dataset_example_role CHECK (role_label IN ('START','BENCH','OUT')),
+    CONSTRAINT ck_dataset_example_position CHECK (position IN ('GK','DEF','MID','FWD')),
+    CONSTRAINT ck_dataset_example_split CHECK (split = 'TRAIN'),
+    CONSTRAINT ck_dataset_example_sequence CHECK (sequence_index > 0),
+    CONSTRAINT ck_dataset_example_time_order CHECK (label_usable_at >= feature_cutoff),
     CONSTRAINT fk_dataset_example_version FOREIGN KEY(dataset_version_id) REFERENCES provenance.dataset_version (dataset_version_id) ON DELETE RESTRICT
 );
 
 CREATE INDEX ix_dataset_training_example_version ON provenance.dataset_training_example (dataset_version_id);
 
 CREATE TABLE provenance.model_version (
-    model_version_id UUID DEFAULT uuidv7() NOT NULL, 
-    model_semantic_sha256 CHAR(64) NOT NULL, 
-    model_key VARCHAR(160) NOT NULL, 
-    schema_version VARCHAR(80) NOT NULL, 
-    dataset_version_sha256 CHAR(64) NOT NULL, 
-    role_artifact_sha256 CHAR(64) NOT NULL, 
-    minute_artifact_sha256 CHAR(64) NOT NULL, 
-    policy_sha256 CHAR(64) NOT NULL, 
-    model_family VARCHAR(160) NOT NULL, 
-    code_identity VARCHAR(160) NOT NULL, 
-    artifact JSONB DEFAULT '{}'::jsonb NOT NULL, 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL, 
-    CONSTRAINT pk_model_version PRIMARY KEY (model_version_id), 
-    CONSTRAINT fk_model_dataset_version FOREIGN KEY(dataset_version_sha256) REFERENCES provenance.dataset_version (dataset_semantic_sha256) ON DELETE RESTRICT, 
-    CONSTRAINT uq_model_version_semantic_hash UNIQUE (model_semantic_sha256), 
-    CONSTRAINT ck_model_version_semantic_hash CHECK (model_semantic_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_model_version_dataset_hash CHECK (dataset_version_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_model_version_role_hash CHECK (role_artifact_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_model_version_minute_hash CHECK (minute_artifact_sha256 ~ '^[0-9a-f]{64}$'), 
+    model_version_id UUID DEFAULT uuidv7() NOT NULL,
+    model_semantic_sha256 CHAR(64) NOT NULL,
+    model_key VARCHAR(160) NOT NULL,
+    schema_version VARCHAR(80) NOT NULL,
+    dataset_version_sha256 CHAR(64) NOT NULL,
+    role_artifact_sha256 CHAR(64) NOT NULL,
+    minute_artifact_sha256 CHAR(64) NOT NULL,
+    policy_sha256 CHAR(64) NOT NULL,
+    model_family VARCHAR(160) NOT NULL,
+    code_identity VARCHAR(160) NOT NULL,
+    artifact JSONB DEFAULT '{}'::jsonb NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL,
+    CONSTRAINT pk_model_version PRIMARY KEY (model_version_id),
+    CONSTRAINT fk_model_dataset_version FOREIGN KEY(dataset_version_sha256) REFERENCES provenance.dataset_version (dataset_semantic_sha256) ON DELETE RESTRICT,
+    CONSTRAINT uq_model_version_semantic_hash UNIQUE (model_semantic_sha256),
+    CONSTRAINT ck_model_version_semantic_hash CHECK (model_semantic_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_model_version_dataset_hash CHECK (dataset_version_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_model_version_role_hash CHECK (role_artifact_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_model_version_minute_hash CHECK (minute_artifact_sha256 ~ '^[0-9a-f]{64}$'),
     CONSTRAINT ck_model_version_policy_hash CHECK (policy_sha256 ~ '^[0-9a-f]{64}$')
 );
 
 CREATE INDEX ix_model_version_dataset ON provenance.model_version (dataset_version_sha256);
 
 CREATE TABLE provenance.model_evaluation (
-    model_evaluation_id UUID DEFAULT uuidv7() NOT NULL, 
-    model_version_id UUID NOT NULL, 
-    evaluation_semantic_sha256 CHAR(64) NOT NULL, 
-    status VARCHAR(24) NOT NULL, 
-    evaluation JSONB NOT NULL, 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL, 
-    CONSTRAINT pk_model_evaluation PRIMARY KEY (model_evaluation_id), 
-    CONSTRAINT uq_model_evaluation_semantic_hash UNIQUE (evaluation_semantic_sha256), 
-    CONSTRAINT ck_model_evaluation_semantic_hash CHECK (evaluation_semantic_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_model_evaluation_status CHECK (status IN ('PENDING','COMPLETE','BLOCKED')), 
+    model_evaluation_id UUID DEFAULT uuidv7() NOT NULL,
+    model_version_id UUID NOT NULL,
+    evaluation_semantic_sha256 CHAR(64) NOT NULL,
+    evaluated_model_semantic_sha256 CHAR(64) NOT NULL,
+    evaluated_model_artifact_sha256 CHAR(64) NOT NULL,
+    evaluated_model_family VARCHAR(160) NOT NULL,
+    status VARCHAR(24) NOT NULL,
+    evaluation JSONB NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL,
+    CONSTRAINT pk_model_evaluation PRIMARY KEY (model_evaluation_id),
+    CONSTRAINT uq_model_evaluation_semantic_hash UNIQUE (evaluation_semantic_sha256),
+    CONSTRAINT ck_model_evaluation_semantic_hash CHECK (evaluation_semantic_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_model_evaluation_model_hash CHECK (evaluated_model_semantic_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_model_evaluation_artifact_hash CHECK (evaluated_model_artifact_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_model_evaluation_status CHECK (status IN ('PENDING','COMPLETE','BLOCKED')),
     CONSTRAINT ck_model_evaluation_not_production_calibration CHECK (evaluation->>'production_calibration_claim' = 'false'),
     CONSTRAINT fk_model_evaluation_model FOREIGN KEY(model_version_id) REFERENCES provenance.model_version (model_version_id) ON DELETE RESTRICT
 );
 
 CREATE TABLE football.prediction_run (
-    prediction_run_id UUID DEFAULT uuidv7() NOT NULL, 
-    prediction_input_signature_sha256 CHAR(64) NOT NULL, 
-    output_semantic_sha256 CHAR(64) NOT NULL, 
-    fixture_id UUID NOT NULL, 
-    team_id UUID NOT NULL, 
-    as_of TIMESTAMP WITH TIME ZONE NOT NULL, 
-    feature_cutoff TIMESTAMP WITH TIME ZONE, 
-    model_version_sha256 CHAR(64) NOT NULL, 
-    dataset_version_sha256 CHAR(64) NOT NULL, 
-    policy_sha256 CHAR(64) NOT NULL, 
-    manager_regime_id VARCHAR(160) NOT NULL, 
-    manager_context JSONB DEFAULT '{}'::jsonb NOT NULL, 
-    seed VARCHAR(160) NOT NULL, 
-    sample_count INTEGER NOT NULL, 
+    prediction_run_id UUID DEFAULT uuidv7() NOT NULL,
+    prediction_input_signature_sha256 CHAR(64) NOT NULL,
+    output_semantic_sha256 CHAR(64) NOT NULL,
+    core_output_payload JSONB,
+    fixture_id UUID NOT NULL,
+    team_id UUID NOT NULL,
+    as_of TIMESTAMP WITH TIME ZONE NOT NULL,
+    feature_cutoff TIMESTAMP WITH TIME ZONE,
+    model_version_sha256 CHAR(64) NOT NULL,
+    dataset_version_sha256 CHAR(64) NOT NULL,
+    policy_sha256 CHAR(64) NOT NULL,
+    manager_regime_id VARCHAR(160) NOT NULL,
+    manager_context JSONB DEFAULT '{}'::jsonb NOT NULL,
+    seed VARCHAR(160) NOT NULL,
+    sample_count INTEGER NOT NULL,
     dependency_count INTEGER DEFAULT 0 NOT NULL,
     hard_eligibility_count INTEGER DEFAULT 0 NOT NULL,
     role_marginal_count INTEGER DEFAULT 0 NOT NULL,
     minute_pmf_count INTEGER DEFAULT 0 NOT NULL,
     scenario_count INTEGER DEFAULT 0 NOT NULL,
-    bench_size SMALLINT NOT NULL, 
-    bench_goalkeeper_slots SMALLINT NOT NULL, 
-    code_identity VARCHAR(160) NOT NULL, 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL, 
-    CONSTRAINT pk_prediction_run PRIMARY KEY (prediction_run_id), 
-    CONSTRAINT fk_prediction_model_version FOREIGN KEY(model_version_sha256) REFERENCES provenance.model_version (model_semantic_sha256) ON DELETE RESTRICT, 
-    CONSTRAINT fk_prediction_dataset_version FOREIGN KEY(dataset_version_sha256) REFERENCES provenance.dataset_version (dataset_semantic_sha256) ON DELETE RESTRICT, 
-    CONSTRAINT uq_prediction_input_signature UNIQUE (prediction_input_signature_sha256), 
-    CONSTRAINT ck_prediction_input_signature CHECK (prediction_input_signature_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_prediction_output_hash CHECK (output_semantic_sha256 ~ '^[0-9a-f]{64}$'), 
+    core_state VARCHAR(16) DEFAULT 'DRAFT' NOT NULL,
+    final_output_state VARCHAR(16) DEFAULT 'NONE' NOT NULL,
+    final_output_count INTEGER DEFAULT 0 NOT NULL,
+    final_output_semantic_sha256 CHAR(64),
+    final_output_payload JSONB,
+    bench_size SMALLINT NOT NULL,
+    bench_goalkeeper_slots SMALLINT NOT NULL,
+    code_identity VARCHAR(160) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL,
+    CONSTRAINT pk_prediction_run PRIMARY KEY (prediction_run_id),
+    CONSTRAINT fk_prediction_model_version FOREIGN KEY(model_version_sha256) REFERENCES provenance.model_version (model_semantic_sha256) ON DELETE RESTRICT,
+    CONSTRAINT fk_prediction_dataset_version FOREIGN KEY(dataset_version_sha256) REFERENCES provenance.dataset_version (dataset_semantic_sha256) ON DELETE RESTRICT,
+    CONSTRAINT uq_prediction_input_signature UNIQUE (prediction_input_signature_sha256),
+    CONSTRAINT ck_prediction_input_signature CHECK (prediction_input_signature_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_prediction_output_hash CHECK (output_semantic_sha256 ~ '^[0-9a-f]{64}$'),
     CONSTRAINT ck_prediction_configuration CHECK (sample_count > 0 AND bench_size >= 0 AND bench_goalkeeper_slots >= 0 AND bench_goalkeeper_slots <= bench_size),
-    CONSTRAINT ck_prediction_publication_counts CHECK (dependency_count >= 0 AND hard_eligibility_count >= 0 AND role_marginal_count > 0 AND minute_pmf_count > 0 AND scenario_count = sample_count)
+    CONSTRAINT ck_prediction_publication_counts CHECK (dependency_count >= 0 AND hard_eligibility_count >= 0 AND role_marginal_count > 0 AND minute_pmf_count > 0 AND scenario_count = sample_count),
+    CONSTRAINT ck_prediction_core_state CHECK (core_state IN ('DRAFT','COMPLETE')),
+    CONSTRAINT ck_prediction_final_output_state CHECK (final_output_state IN ('NONE','DRAFT','COMPLETE')),
+    CONSTRAINT ck_prediction_final_output_count CHECK (final_output_count >= 0),
+    CONSTRAINT ck_prediction_final_output_hash CHECK (final_output_semantic_sha256 IS NULL OR final_output_semantic_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_prediction_final_output_payload_state CHECK ((final_output_state = 'NONE' AND final_output_count = 0 AND final_output_semantic_sha256 IS NULL AND final_output_payload IS NULL) OR (final_output_state IN ('DRAFT','COMPLETE')))
 );
 
 CREATE INDEX ix_prediction_run_fixture_team_asof ON football.prediction_run (fixture_id, team_id, as_of);
 
 CREATE TABLE football.prediction_dependency (
-    prediction_dependency_id UUID DEFAULT uuidv7() NOT NULL, 
-    prediction_run_id UUID NOT NULL, 
-    dependency_type VARCHAR(64) NOT NULL, 
-    dependency_key VARCHAR(200) NOT NULL, 
-    semantic_sha256 CHAR(64) NOT NULL, 
-    ordinal INTEGER NOT NULL, 
-    CONSTRAINT pk_prediction_dependency PRIMARY KEY (prediction_dependency_id), 
-    CONSTRAINT uq_prediction_dependency_key UNIQUE (prediction_run_id, dependency_type, dependency_key), 
-    CONSTRAINT ck_prediction_dependency_hash CHECK (semantic_sha256 ~ '^[0-9a-f]{64}$'), 
-    CONSTRAINT ck_prediction_dependency_ordinal CHECK (ordinal >= 0), 
+    prediction_dependency_id UUID DEFAULT uuidv7() NOT NULL,
+    prediction_run_id UUID NOT NULL,
+    dependency_type VARCHAR(64) NOT NULL,
+    dependency_key VARCHAR(200) NOT NULL,
+    semantic_sha256 CHAR(64) NOT NULL,
+    ordinal INTEGER NOT NULL,
+    CONSTRAINT pk_prediction_dependency PRIMARY KEY (prediction_dependency_id),
+    CONSTRAINT uq_prediction_dependency_key UNIQUE (prediction_run_id, dependency_type, dependency_key),
+    CONSTRAINT ck_prediction_dependency_hash CHECK (semantic_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_prediction_dependency_ordinal CHECK (ordinal >= 0),
     CONSTRAINT fk_prediction_dependency_run FOREIGN KEY(prediction_run_id) REFERENCES football.prediction_run (prediction_run_id) ON DELETE RESTRICT
 );
 
 CREATE INDEX ix_prediction_dependency_run ON football.prediction_dependency (prediction_run_id);
 
 CREATE TABLE football.prediction_hard_eligibility (
-    prediction_hard_eligibility_id UUID DEFAULT uuidv7() NOT NULL, 
-    prediction_run_id UUID NOT NULL, 
-    player_id VARCHAR(160) NOT NULL, 
-    reason VARCHAR(240) NOT NULL, 
-    hard_ineligible BOOLEAN DEFAULT true NOT NULL, 
-    CONSTRAINT pk_prediction_hard_eligibility PRIMARY KEY (prediction_hard_eligibility_id), 
-    CONSTRAINT uq_prediction_hard_eligibility_player UNIQUE (prediction_run_id, player_id), 
+    prediction_hard_eligibility_id UUID DEFAULT uuidv7() NOT NULL,
+    prediction_run_id UUID NOT NULL,
+    player_id VARCHAR(160) NOT NULL,
+    reason VARCHAR(240) NOT NULL,
+    hard_ineligible BOOLEAN DEFAULT true NOT NULL,
+    CONSTRAINT pk_prediction_hard_eligibility PRIMARY KEY (prediction_hard_eligibility_id),
+    CONSTRAINT uq_prediction_hard_eligibility_player UNIQUE (prediction_run_id, player_id),
     CONSTRAINT fk_prediction_hard_eligibility_run FOREIGN KEY(prediction_run_id) REFERENCES football.prediction_run (prediction_run_id) ON DELETE RESTRICT
 );
 
 CREATE INDEX ix_prediction_hard_eligibility_run ON football.prediction_hard_eligibility (prediction_run_id);
 
 CREATE TABLE football.role_marginal (
-    role_marginal_id UUID DEFAULT uuidv7() NOT NULL, 
-    prediction_run_id UUID NOT NULL, 
-    player_id VARCHAR(160) NOT NULL, 
-    player_key VARCHAR(160) NOT NULL, 
-    position VARCHAR(8) NOT NULL, 
-    p_start NUMERIC NOT NULL, 
-    p_bench NUMERIC NOT NULL, 
-    p_out NUMERIC NOT NULL, 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL, 
-    CONSTRAINT pk_role_marginal PRIMARY KEY (role_marginal_id), 
-    CONSTRAINT uq_role_marginal_player UNIQUE (prediction_run_id, player_id), 
-    CONSTRAINT ck_role_marginal_position CHECK (position IN ('GK','DEF','MID','FWD')), 
-    CONSTRAINT ck_role_marginal_bounds CHECK (p_start >= 0 AND p_start <= 1 AND p_bench >= 0 AND p_bench <= 1 AND p_out >= 0 AND p_out <= 1), 
-    CONSTRAINT ck_role_marginal_exact_sum CHECK (p_start + p_bench + p_out = 1), 
+    role_marginal_id UUID DEFAULT uuidv7() NOT NULL,
+    prediction_run_id UUID NOT NULL,
+    player_id VARCHAR(160) NOT NULL,
+    player_key VARCHAR(160) NOT NULL,
+    position VARCHAR(8) NOT NULL,
+    p_start NUMERIC NOT NULL,
+    p_bench NUMERIC NOT NULL,
+    p_out NUMERIC NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL,
+    CONSTRAINT pk_role_marginal PRIMARY KEY (role_marginal_id),
+    CONSTRAINT uq_role_marginal_player UNIQUE (prediction_run_id, player_id),
+    CONSTRAINT ck_role_marginal_position CHECK (position IN ('GK','DEF','MID','FWD')),
+    CONSTRAINT ck_role_marginal_bounds CHECK (p_start >= 0 AND p_start <= 1 AND p_bench >= 0 AND p_bench <= 1 AND p_out >= 0 AND p_out <= 1),
+    CONSTRAINT ck_role_marginal_exact_sum CHECK (p_start + p_bench + p_out = 1),
     CONSTRAINT fk_role_marginal_run FOREIGN KEY(prediction_run_id) REFERENCES football.prediction_run (prediction_run_id) ON DELETE RESTRICT
 );
 
 CREATE INDEX ix_role_marginal_run ON football.role_marginal (prediction_run_id);
 
 CREATE TABLE football.conditional_minute_pmf (
-    conditional_minute_pmf_id UUID DEFAULT uuidv7() NOT NULL, 
-    prediction_run_id UUID NOT NULL, 
-    player_id VARCHAR(160) NOT NULL, 
-    role VARCHAR(8) NOT NULL, 
-    minute_pmf NUMERIC[] NOT NULL, 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL, 
-    CONSTRAINT pk_conditional_minute_pmf PRIMARY KEY (conditional_minute_pmf_id), 
-    CONSTRAINT uq_minute_pmf_player_role UNIQUE (prediction_run_id, player_id, role), 
-    CONSTRAINT ck_minute_pmf_role CHECK (role IN ('START','BENCH')), 
-    CONSTRAINT ck_minute_pmf_exact_simplex CHECK (football.validate_minute_pmf(minute_pmf, role)), 
+    conditional_minute_pmf_id UUID DEFAULT uuidv7() NOT NULL,
+    prediction_run_id UUID NOT NULL,
+    player_id VARCHAR(160) NOT NULL,
+    role VARCHAR(8) NOT NULL,
+    minute_pmf NUMERIC[] NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL,
+    CONSTRAINT pk_conditional_minute_pmf PRIMARY KEY (conditional_minute_pmf_id),
+    CONSTRAINT uq_minute_pmf_player_role UNIQUE (prediction_run_id, player_id, role),
+    CONSTRAINT ck_minute_pmf_role CHECK (role IN ('START','BENCH')),
+    CONSTRAINT ck_minute_pmf_exact_simplex CHECK (football.validate_minute_pmf(minute_pmf, role)),
     CONSTRAINT fk_minute_pmf_run FOREIGN KEY(prediction_run_id) REFERENCES football.prediction_run (prediction_run_id) ON DELETE RESTRICT
 );
 
 CREATE INDEX ix_minute_pmf_run ON football.conditional_minute_pmf (prediction_run_id);
 
 CREATE TABLE football.lineup_scenario (
-    lineup_scenario_id UUID DEFAULT uuidv7() NOT NULL, 
-    prediction_run_id UUID NOT NULL, 
-    scenario_index INTEGER NOT NULL, 
-    scenario_sha256 CHAR(64) NOT NULL, 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL, 
-    CONSTRAINT pk_lineup_scenario PRIMARY KEY (lineup_scenario_id), 
-    CONSTRAINT uq_lineup_scenario_index UNIQUE (prediction_run_id, scenario_index), 
-    CONSTRAINT uq_lineup_scenario_hash UNIQUE (prediction_run_id, scenario_sha256), 
-    CONSTRAINT uq_lineup_scenario_id_run UNIQUE (lineup_scenario_id, prediction_run_id), 
-    CONSTRAINT ck_lineup_scenario_index CHECK (scenario_index >= 0), 
-    CONSTRAINT ck_lineup_scenario_hash CHECK (scenario_sha256 ~ '^[0-9a-f]{64}$'), 
+    lineup_scenario_id UUID DEFAULT uuidv7() NOT NULL,
+    prediction_run_id UUID NOT NULL,
+    scenario_index INTEGER NOT NULL,
+    scenario_sha256 CHAR(64) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL,
+    CONSTRAINT pk_lineup_scenario PRIMARY KEY (lineup_scenario_id),
+    CONSTRAINT uq_lineup_scenario_index UNIQUE (prediction_run_id, scenario_index),
+    CONSTRAINT uq_lineup_scenario_hash UNIQUE (prediction_run_id, scenario_sha256),
+    CONSTRAINT uq_lineup_scenario_id_run UNIQUE (lineup_scenario_id, prediction_run_id),
+    CONSTRAINT ck_lineup_scenario_index CHECK (scenario_index >= 0),
+    CONSTRAINT ck_lineup_scenario_hash CHECK (scenario_sha256 ~ '^[0-9a-f]{64}$'),
     CONSTRAINT fk_lineup_scenario_run FOREIGN KEY(prediction_run_id) REFERENCES football.prediction_run (prediction_run_id) ON DELETE RESTRICT
 );
 
 CREATE INDEX ix_lineup_scenario_run ON football.lineup_scenario (prediction_run_id);
 
 CREATE TABLE football.lineup_scenario_member (
-    lineup_scenario_member_id UUID DEFAULT uuidv7() NOT NULL, 
-    lineup_scenario_id UUID NOT NULL, 
-    prediction_run_id UUID NOT NULL, 
-    player_id VARCHAR(160) NOT NULL, 
-    role VARCHAR(8) NOT NULL, 
-    position VARCHAR(8) NOT NULL, 
-    CONSTRAINT pk_lineup_scenario_member PRIMARY KEY (lineup_scenario_member_id), 
-    CONSTRAINT fk_lineup_member_scenario_run FOREIGN KEY(lineup_scenario_id, prediction_run_id) REFERENCES football.lineup_scenario (lineup_scenario_id, prediction_run_id) ON DELETE RESTRICT, 
-    CONSTRAINT uq_lineup_member_player UNIQUE (lineup_scenario_id, player_id), 
-    CONSTRAINT ck_lineup_member_role CHECK (role IN ('START','BENCH','OUT')), 
+    lineup_scenario_member_id UUID DEFAULT uuidv7() NOT NULL,
+    lineup_scenario_id UUID NOT NULL,
+    prediction_run_id UUID NOT NULL,
+    player_id VARCHAR(160) NOT NULL,
+    role VARCHAR(8) NOT NULL,
+    position VARCHAR(8) NOT NULL,
+    CONSTRAINT pk_lineup_scenario_member PRIMARY KEY (lineup_scenario_member_id),
+    CONSTRAINT fk_lineup_member_scenario_run FOREIGN KEY(lineup_scenario_id, prediction_run_id) REFERENCES football.lineup_scenario (lineup_scenario_id, prediction_run_id) ON DELETE RESTRICT,
+    CONSTRAINT uq_lineup_member_player UNIQUE (lineup_scenario_id, player_id),
+    CONSTRAINT ck_lineup_member_role CHECK (role IN ('START','BENCH','OUT')),
     CONSTRAINT ck_lineup_member_position CHECK (position IN ('GK','DEF','MID','FWD'))
 );
 
 CREATE INDEX ix_lineup_member_scenario ON football.lineup_scenario_member (lineup_scenario_id);
 
 CREATE TABLE football.player_minutes_projection (
-    player_minutes_projection_id UUID DEFAULT uuidv7() NOT NULL, 
-    prediction_run_id UUID NOT NULL, 
-    player_id VARCHAR(160) NOT NULL, 
-    p_start NUMERIC NOT NULL, 
-    p_bench NUMERIC NOT NULL, 
-    p_out NUMERIC NOT NULL, 
-    minute_pmf NUMERIC[] NOT NULL, 
-    p_zero NUMERIC NOT NULL, 
-    p_60_plus NUMERIC NOT NULL, 
-    expected_minutes NUMERIC NOT NULL, 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL, 
-    CONSTRAINT pk_player_minutes_projection PRIMARY KEY (player_minutes_projection_id), 
-    CONSTRAINT uq_player_minutes_projection_player UNIQUE (prediction_run_id, player_id), 
-    CONSTRAINT ck_player_minutes_projection_consistent CHECK (football.validate_player_minutes_projection(p_start, p_bench, p_out, minute_pmf, p_zero, p_60_plus, expected_minutes)), 
+    player_minutes_projection_id UUID DEFAULT uuidv7() NOT NULL,
+    prediction_run_id UUID NOT NULL,
+    player_id VARCHAR(160) NOT NULL,
+    p_start NUMERIC NOT NULL,
+    p_bench NUMERIC NOT NULL,
+    p_out NUMERIC NOT NULL,
+    minute_pmf NUMERIC[] NOT NULL,
+    p_zero NUMERIC NOT NULL,
+    p_60_plus NUMERIC NOT NULL,
+    expected_minutes NUMERIC NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT transaction_timestamp() NOT NULL,
+    CONSTRAINT pk_player_minutes_projection PRIMARY KEY (player_minutes_projection_id),
+    CONSTRAINT uq_player_minutes_projection_player UNIQUE (prediction_run_id, player_id),
+    CONSTRAINT ck_player_minutes_projection_consistent CHECK (football.validate_player_minutes_projection(p_start, p_bench, p_out, minute_pmf, p_zero, p_60_plus, expected_minutes)),
     CONSTRAINT fk_player_minutes_projection_run FOREIGN KEY(prediction_run_id) REFERENCES football.prediction_run (prediction_run_id) ON DELETE RESTRICT
 );
 
@@ -4340,6 +4358,118 @@ BEGIN
 END
 $$;
 
+CREATE OR REPLACE FUNCTION provenance.validate_dataset_lifecycle()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_OP = 'UPDATE'
+     AND OLD.publication_state = 'DRAFT'
+     AND NEW.publication_state = 'COMPLETE'
+     AND (to_jsonb(OLD) - 'publication_state') IS NOT DISTINCT FROM (to_jsonb(NEW) - 'publication_state') THEN
+    RETURN NEW;
+  END IF;
+  RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'DATASET_IMMUTABLE';
+END
+$$;
+
+CREATE OR REPLACE FUNCTION provenance.reject_complete_dataset_lineage_mutation()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  target_dataset uuid;
+  target_state text;
+BEGIN
+  target_dataset := COALESCE(NEW.dataset_version_id, OLD.dataset_version_id);
+  SELECT publication_state INTO target_state
+    FROM provenance.dataset_version
+   WHERE dataset_version_id = target_dataset;
+  IF target_state IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_NOT_FOUND';
+  END IF;
+  IF target_state = 'COMPLETE' THEN
+    RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'DATASET_LINEAGE_FROZEN';
+  END IF;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION football.validate_prediction_lifecycle()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_OP = 'UPDATE'
+     AND OLD.core_state = 'DRAFT'
+     AND NEW.core_state = 'COMPLETE'
+     AND OLD.final_output_state = NEW.final_output_state
+     AND (to_jsonb(OLD) - ARRAY['core_state','core_output_payload']) IS NOT DISTINCT FROM
+         (to_jsonb(NEW) - ARRAY['core_state','core_output_payload']) THEN
+    RETURN NEW;
+  END IF;
+  IF TG_OP = 'UPDATE'
+     AND OLD.core_state = 'COMPLETE'
+     AND OLD.final_output_state = 'NONE'
+     AND NEW.final_output_state = 'DRAFT'
+     AND (to_jsonb(OLD) - 'final_output_state') IS NOT DISTINCT FROM (to_jsonb(NEW) - 'final_output_state') THEN
+    RETURN NEW;
+  END IF;
+  IF TG_OP = 'UPDATE'
+     AND OLD.core_state = 'COMPLETE'
+     AND OLD.final_output_state = 'DRAFT'
+     AND NEW.final_output_state = 'COMPLETE'
+     AND (to_jsonb(OLD) - ARRAY['final_output_state','final_output_count','final_output_semantic_sha256','final_output_payload','output_semantic_sha256']) IS NOT DISTINCT FROM
+         (to_jsonb(NEW) - ARRAY['final_output_state','final_output_count','final_output_semantic_sha256','final_output_payload','output_semantic_sha256']) THEN
+    RETURN NEW;
+  END IF;
+  RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'PREDICTION_RUN_IMMUTABLE';
+END
+$$;
+
+CREATE OR REPLACE FUNCTION football.reject_complete_core_mutation()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  target_run uuid;
+  target_state text;
+BEGIN
+  target_run := COALESCE(NEW.prediction_run_id, OLD.prediction_run_id);
+  SELECT core_state INTO target_state
+    FROM football.prediction_run
+   WHERE prediction_run_id = target_run;
+  IF target_state IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_RUN_NOT_FOUND';
+  END IF;
+  IF target_state = 'COMPLETE' THEN
+    RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'PREDICTION_CORE_FROZEN';
+  END IF;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION football.reject_frozen_final_output_mutation()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  target_run uuid;
+  target_state text;
+BEGIN
+  target_run := COALESCE(NEW.prediction_run_id, OLD.prediction_run_id);
+  SELECT final_output_state INTO target_state
+    FROM football.prediction_run
+   WHERE prediction_run_id = target_run;
+  IF target_state IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_RUN_NOT_FOUND';
+  END IF;
+  IF target_state <> 'DRAFT' THEN
+    RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'FINAL_OUTPUT_FROZEN';
+  END IF;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
+END
+$$;
+
 CREATE OR REPLACE FUNCTION provenance.validate_dataset_complete()
 RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
@@ -4351,6 +4481,10 @@ BEGIN
    WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id);
   IF expected IS NULL THEN
     RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_NOT_FOUND';
+  END IF;
+  IF (SELECT publication_state FROM provenance.dataset_version
+       WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id)) <> 'COMPLETE' THEN
+    RETURN NULL;
   END IF;
   SELECT count(*) INTO actual
     FROM provenance.dataset_training_example
@@ -4374,6 +4508,11 @@ BEGIN
   IF expected IS NULL THEN
     RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_NOT_FOUND';
   END IF;
+  IF (SELECT dataset.publication_state
+        FROM provenance.dataset_version AS dataset
+       WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256) <> 'COMPLETE' THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_INCOMPLETE';
+  END IF;
   SELECT count(*) INTO actual
     FROM provenance.dataset_training_example AS example
     JOIN provenance.dataset_version AS dataset
@@ -4396,6 +4535,9 @@ DECLARE
   scenario_total integer;
   role_total integer;
 BEGIN
+  IF NEW.core_state <> 'COMPLETE' THEN
+    RETURN NULL;
+  END IF;
   SELECT count(*) INTO dependency_total
     FROM football.prediction_dependency
    WHERE prediction_run_id = NEW.prediction_run_id;
@@ -4429,6 +4571,40 @@ BEGIN
 END
 $$;
 
+CREATE OR REPLACE FUNCTION football.validate_final_output_complete()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  final_total integer;
+  marginal_total integer;
+  mismatch integer;
+BEGIN
+  IF NEW.final_output_state <> 'COMPLETE' THEN
+    RETURN NULL;
+  END IF;
+  IF NEW.core_state <> 'COMPLETE' OR NEW.final_output_payload IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_CORE_INCOMPLETE';
+  END IF;
+  SELECT count(*) INTO final_total
+    FROM football.player_minutes_projection
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO marginal_total
+    FROM football.role_marginal
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO mismatch
+    FROM (
+      (SELECT player_id FROM football.player_minutes_projection WHERE prediction_run_id = NEW.prediction_run_id
+       EXCEPT SELECT player_id FROM football.role_marginal WHERE prediction_run_id = NEW.prediction_run_id)
+      UNION ALL
+      (SELECT player_id FROM football.role_marginal WHERE prediction_run_id = NEW.prediction_run_id
+       EXCEPT SELECT player_id FROM football.player_minutes_projection WHERE prediction_run_id = NEW.prediction_run_id)
+    ) AS differences;
+  IF final_total <> NEW.final_output_count OR final_total = 0 OR final_total <> marginal_total OR mismatch <> 0 THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_GRAPH_INCOMPLETE';
+  END IF;
+  RETURN NULL;
+END
+$$;
+
 CREATE OR REPLACE FUNCTION football.reject_immutable_availability_change()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
@@ -4436,29 +4612,45 @@ BEGIN
 END
 $$;
 
-CREATE TRIGGER trg_min007f_immutable_0 BEFORE UPDATE OR DELETE ON provenance.dataset_version FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_0 BEFORE UPDATE OR DELETE ON provenance.dataset_training_example FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_1 BEFORE UPDATE OR DELETE ON provenance.dataset_training_example FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_1 BEFORE UPDATE OR DELETE ON provenance.model_version FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_2 BEFORE UPDATE OR DELETE ON provenance.model_version FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_2 BEFORE UPDATE OR DELETE ON provenance.model_evaluation FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_3 BEFORE UPDATE OR DELETE ON provenance.model_evaluation FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_3 BEFORE UPDATE OR DELETE ON football.prediction_dependency FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_4 BEFORE UPDATE OR DELETE ON football.prediction_run FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_4 BEFORE UPDATE OR DELETE ON football.prediction_hard_eligibility FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_5 BEFORE UPDATE OR DELETE ON football.prediction_dependency FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_5 BEFORE UPDATE OR DELETE ON football.role_marginal FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_6 BEFORE UPDATE OR DELETE ON football.prediction_hard_eligibility FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_6 BEFORE UPDATE OR DELETE ON football.conditional_minute_pmf FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_7 BEFORE UPDATE OR DELETE ON football.role_marginal FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_7 BEFORE UPDATE OR DELETE ON football.lineup_scenario FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_8 BEFORE UPDATE OR DELETE ON football.conditional_minute_pmf FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_8 BEFORE UPDATE OR DELETE ON football.lineup_scenario_member FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_9 BEFORE UPDATE OR DELETE ON football.lineup_scenario FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_immutable_9 BEFORE UPDATE OR DELETE ON football.player_minutes_projection FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
 
-CREATE TRIGGER trg_min007f_immutable_10 BEFORE UPDATE OR DELETE ON football.lineup_scenario_member FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_dataset_lifecycle BEFORE UPDATE ON provenance.dataset_version FOR EACH ROW EXECUTE FUNCTION provenance.validate_dataset_lifecycle();
 
-CREATE TRIGGER trg_min007f_immutable_11 BEFORE UPDATE OR DELETE ON football.player_minutes_projection FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change();
+CREATE TRIGGER trg_min007f_dataset_lineage_freeze BEFORE INSERT OR UPDATE OR DELETE ON provenance.dataset_training_example FOR EACH ROW EXECUTE FUNCTION provenance.reject_complete_dataset_lineage_mutation();
+
+CREATE TRIGGER trg_min007f_prediction_lifecycle BEFORE UPDATE ON football.prediction_run FOR EACH ROW EXECUTE FUNCTION football.validate_prediction_lifecycle();
+
+CREATE TRIGGER trg_min007f_core_freeze_0 BEFORE INSERT OR UPDATE OR DELETE ON football.prediction_dependency FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation();
+
+CREATE TRIGGER trg_min007f_core_freeze_1 BEFORE INSERT OR UPDATE OR DELETE ON football.prediction_hard_eligibility FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation();
+
+CREATE TRIGGER trg_min007f_core_freeze_2 BEFORE INSERT OR UPDATE OR DELETE ON football.role_marginal FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation();
+
+CREATE TRIGGER trg_min007f_core_freeze_3 BEFORE INSERT OR UPDATE OR DELETE ON football.conditional_minute_pmf FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation();
+
+CREATE TRIGGER trg_min007f_core_freeze_4 BEFORE INSERT OR UPDATE OR DELETE ON football.lineup_scenario FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation();
+
+CREATE TRIGGER trg_min007f_core_freeze_5 BEFORE INSERT OR UPDATE OR DELETE ON football.lineup_scenario_member FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation();
+
+CREATE TRIGGER trg_min007f_final_output_freeze BEFORE INSERT OR UPDATE OR DELETE ON football.player_minutes_projection FOR EACH ROW EXECUTE FUNCTION football.reject_frozen_final_output_mutation();
 
 CREATE CONSTRAINT TRIGGER trg_min007f_scenario_parent AFTER INSERT OR UPDATE ON football.lineup_scenario DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION football.validate_lineup_scenario();
 
@@ -4469,6 +4661,8 @@ CREATE CONSTRAINT TRIGGER trg_min007f_dataset_complete AFTER INSERT OR UPDATE ON
 CREATE CONSTRAINT TRIGGER trg_min007f_model_dataset_complete AFTER INSERT OR UPDATE ON provenance.model_version DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION provenance.validate_model_dataset_complete();
 
 CREATE CONSTRAINT TRIGGER trg_min007f_prediction_complete AFTER INSERT OR UPDATE ON football.prediction_run DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION football.validate_prediction_complete();
+
+CREATE CONSTRAINT TRIGGER trg_min007f_final_output_complete AFTER UPDATE ON football.prediction_run DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION football.validate_final_output_complete();
 
 UPDATE public.alembic_version SET version_num='20260807_0006' WHERE public.alembic_version.version_num = '20260803_0005';
 

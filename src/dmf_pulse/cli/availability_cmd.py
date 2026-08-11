@@ -20,6 +20,7 @@ from dmf_pulse.availability.persistence import (
     register_prediction_bundle,
 )
 from dmf_pulse.availability.pipeline import (
+    ModelEvaluationPublication,
     evaluate_minutes_baseline,
     fit_projection_artifact,
     predict_minutes_baseline,
@@ -309,7 +310,16 @@ def evaluate_command(
                 model_id = register_model_version(
                     session, model, artifact=artifact.model_dump(mode="json")
                 )
-                register_model_evaluation(session, model_id, result.model_dump(mode="json"))
+                register_model_evaluation(
+                    session,
+                    model_id,
+                    ModelEvaluationPublication(
+                        evaluation=result,
+                        model_version_semantic_sha256=model_version_semantic_sha256(model),
+                        model_artifact_sha256=artifact.artifact_sha256,
+                        model_family=artifact.model_family,
+                    ),
+                )
         finally:
             engine.dispose()
     _emit(result)

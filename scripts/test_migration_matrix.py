@@ -166,7 +166,8 @@ def _offline_sql(url: str, revision: str) -> str:
     sql = output.getvalue()
     if errors.getvalue().strip():
         raise MatrixError("offline Alembic generation wrote diagnostics")
-    return sql.replace("\r\n", "\n")
+    normalised = sql.replace("\r\n", "\n")
+    return "\n".join(line.rstrip() for line in normalised.splitlines()).rstrip() + "\n"
 
 
 def _assert_secret_free(sql: str, url: URL) -> None:

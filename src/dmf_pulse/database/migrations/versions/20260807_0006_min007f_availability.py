@@ -44,11 +44,9 @@ TABLES = (
 )
 
 IMMUTABLE_TABLES = (
-    "provenance.dataset_version",
     "provenance.dataset_training_example",
     "provenance.model_version",
     "provenance.model_evaluation",
-    "football.prediction_run",
     "football.prediction_dependency",
     "football.prediction_hard_eligibility",
     "football.role_marginal",
@@ -57,6 +55,128 @@ IMMUTABLE_TABLES = (
     "football.lineup_scenario_member",
     "football.player_minutes_projection",
 )
+
+DATASET_LIFECYCLE_FUNCTION = """
+CREATE OR REPLACE FUNCTION provenance.validate_dataset_lifecycle()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_OP = 'UPDATE'
+     AND OLD.publication_state = 'DRAFT'
+     AND NEW.publication_state = 'COMPLETE'
+     AND (to_jsonb(OLD) - 'publication_state') IS NOT DISTINCT FROM (to_jsonb(NEW) - 'publication_state') THEN
+    RETURN NEW;
+  END IF;
+  RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'DATASET_IMMUTABLE';
+END
+$$
+"""
+
+DATASET_LINEAGE_MUTATION_FUNCTION = """
+CREATE OR REPLACE FUNCTION provenance.reject_complete_dataset_lineage_mutation()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  target_dataset uuid;
+  target_state text;
+BEGIN
+  target_dataset := COALESCE(NEW.dataset_version_id, OLD.dataset_version_id);
+  SELECT publication_state INTO target_state
+    FROM provenance.dataset_version
+   WHERE dataset_version_id = target_dataset;
+  IF target_state IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_NOT_FOUND';
+  END IF;
+  IF target_state = 'COMPLETE' THEN
+    RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'DATASET_LINEAGE_FROZEN';
+  END IF;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
+END
+$$
+"""
+
+PREDICTION_LIFECYCLE_FUNCTION = """
+CREATE OR REPLACE FUNCTION football.validate_prediction_lifecycle()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_OP = 'UPDATE'
+     AND OLD.core_state = 'DRAFT'
+     AND NEW.core_state = 'COMPLETE'
+     AND OLD.final_output_state = NEW.final_output_state
+     AND (to_jsonb(OLD) - ARRAY['core_state','core_output_payload']) IS NOT DISTINCT FROM
+         (to_jsonb(NEW) - ARRAY['core_state','core_output_payload']) THEN
+    RETURN NEW;
+  END IF;
+  IF TG_OP = 'UPDATE'
+     AND OLD.core_state = 'COMPLETE'
+     AND OLD.final_output_state = 'NONE'
+     AND NEW.final_output_state = 'DRAFT'
+     AND (to_jsonb(OLD) - 'final_output_state') IS NOT DISTINCT FROM (to_jsonb(NEW) - 'final_output_state') THEN
+    RETURN NEW;
+  END IF;
+  IF TG_OP = 'UPDATE'
+     AND OLD.core_state = 'COMPLETE'
+     AND OLD.final_output_state = 'DRAFT'
+     AND NEW.final_output_state = 'COMPLETE'
+     AND (to_jsonb(OLD) - ARRAY['final_output_state','final_output_count','final_output_semantic_sha256','final_output_payload','output_semantic_sha256']) IS NOT DISTINCT FROM
+         (to_jsonb(NEW) - ARRAY['final_output_state','final_output_count','final_output_semantic_sha256','final_output_payload','output_semantic_sha256']) THEN
+    RETURN NEW;
+  END IF;
+  RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'PREDICTION_RUN_IMMUTABLE';
+END
+$$
+"""
+
+CORE_MUTATION_FUNCTION = """
+CREATE OR REPLACE FUNCTION football.reject_complete_core_mutation()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  target_run uuid;
+  target_state text;
+BEGIN
+  target_run := COALESCE(NEW.prediction_run_id, OLD.prediction_run_id);
+  SELECT core_state INTO target_state
+    FROM football.prediction_run
+   WHERE prediction_run_id = target_run;
+  IF target_state IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_RUN_NOT_FOUND';
+  END IF;
+  IF target_state = 'COMPLETE' THEN
+    RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'PREDICTION_CORE_FROZEN';
+  END IF;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
+END
+$$
+"""
+
+FINAL_OUTPUT_MUTATION_FUNCTION = """
+CREATE OR REPLACE FUNCTION football.reject_frozen_final_output_mutation()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  target_run uuid;
+  target_state text;
+BEGIN
+  target_run := COALESCE(NEW.prediction_run_id, OLD.prediction_run_id);
+  SELECT final_output_state INTO target_state
+    FROM football.prediction_run
+   WHERE prediction_run_id = target_run;
+  IF target_state IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_RUN_NOT_FOUND';
+  END IF;
+  IF target_state <> 'DRAFT' THEN
+    RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'FINAL_OUTPUT_FROZEN';
+  END IF;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
+END
+$$
+"""
 
 
 PMF_FUNCTION = """
@@ -242,6 +362,10 @@ BEGIN
   IF expected IS NULL THEN
     RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_NOT_FOUND';
   END IF;
+  IF (SELECT publication_state FROM provenance.dataset_version
+       WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id)) <> 'COMPLETE' THEN
+    RETURN NULL;
+  END IF;
   SELECT count(*) INTO actual
     FROM provenance.dataset_training_example
    WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id);
@@ -265,6 +389,11 @@ BEGIN
    WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256;
   IF expected IS NULL THEN
     RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_NOT_FOUND';
+  END IF;
+  IF (SELECT dataset.publication_state
+        FROM provenance.dataset_version AS dataset
+       WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256) <> 'COMPLETE' THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_INCOMPLETE';
   END IF;
   SELECT count(*) INTO actual
     FROM provenance.dataset_training_example AS example
@@ -290,6 +419,9 @@ DECLARE
   scenario_total integer;
   role_total integer;
 BEGIN
+  IF NEW.core_state <> 'COMPLETE' THEN
+    RETURN NULL;
+  END IF;
   SELECT count(*) INTO dependency_total
     FROM football.prediction_dependency
    WHERE prediction_run_id = NEW.prediction_run_id;
@@ -324,6 +456,42 @@ END
 $$
 """
 
+FINAL_OUTPUT_COMPLETENESS_FUNCTION = """
+CREATE OR REPLACE FUNCTION football.validate_final_output_complete()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  final_total integer;
+  marginal_total integer;
+  mismatch integer;
+BEGIN
+  IF NEW.final_output_state <> 'COMPLETE' THEN
+    RETURN NULL;
+  END IF;
+  IF NEW.core_state <> 'COMPLETE' OR NEW.final_output_payload IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_CORE_INCOMPLETE';
+  END IF;
+  SELECT count(*) INTO final_total
+    FROM football.player_minutes_projection
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO marginal_total
+    FROM football.role_marginal
+   WHERE prediction_run_id = NEW.prediction_run_id;
+  SELECT count(*) INTO mismatch
+    FROM (
+      (SELECT player_id FROM football.player_minutes_projection WHERE prediction_run_id = NEW.prediction_run_id
+       EXCEPT SELECT player_id FROM football.role_marginal WHERE prediction_run_id = NEW.prediction_run_id)
+      UNION ALL
+      (SELECT player_id FROM football.role_marginal WHERE prediction_run_id = NEW.prediction_run_id
+       EXCEPT SELECT player_id FROM football.player_minutes_projection WHERE prediction_run_id = NEW.prediction_run_id)
+    ) AS differences;
+  IF final_total <> NEW.final_output_count OR final_total = 0 OR final_total <> marginal_total OR mismatch <> 0 THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_GRAPH_INCOMPLETE';
+  END IF;
+  RETURN NULL;
+END
+$$
+"""
+
 
 def upgrade() -> None:
     bind = op.get_bind()
@@ -333,9 +501,15 @@ def upgrade() -> None:
     for table in TABLES:
         table.create(bind=bind, checkfirst=False)
     op.execute(SCENARIO_FUNCTION)
+    op.execute(DATASET_LIFECYCLE_FUNCTION)
+    op.execute(DATASET_LINEAGE_MUTATION_FUNCTION)
+    op.execute(PREDICTION_LIFECYCLE_FUNCTION)
+    op.execute(CORE_MUTATION_FUNCTION)
+    op.execute(FINAL_OUTPUT_MUTATION_FUNCTION)
     op.execute(DATASET_COMPLETENESS_FUNCTION)
     op.execute(MODEL_DATASET_FUNCTION)
     op.execute(PREDICTION_COMPLETENESS_FUNCTION)
+    op.execute(FINAL_OUTPUT_COMPLETENESS_FUNCTION)
     op.execute(IMMUTABLE_FUNCTION)
     for index, table_name in enumerate(IMMUTABLE_TABLES):
         op.execute(
@@ -343,6 +517,41 @@ def upgrade() -> None:
             f"BEFORE UPDATE OR DELETE ON {table_name} "
             "FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()"
         )
+    op.execute(
+        "CREATE TRIGGER trg_min007f_dataset_lifecycle "
+        "BEFORE UPDATE ON provenance.dataset_version FOR EACH ROW "
+        "EXECUTE FUNCTION provenance.validate_dataset_lifecycle()"
+    )
+    op.execute(
+        "CREATE TRIGGER trg_min007f_dataset_lineage_freeze "
+        "BEFORE INSERT OR UPDATE OR DELETE ON provenance.dataset_training_example "
+        "FOR EACH ROW EXECUTE FUNCTION provenance.reject_complete_dataset_lineage_mutation()"
+    )
+    op.execute(
+        "CREATE TRIGGER trg_min007f_prediction_lifecycle "
+        "BEFORE UPDATE ON football.prediction_run FOR EACH ROW "
+        "EXECUTE FUNCTION football.validate_prediction_lifecycle()"
+    )
+    for index, table_name in enumerate(
+        (
+            "football.prediction_dependency",
+            "football.prediction_hard_eligibility",
+            "football.role_marginal",
+            "football.conditional_minute_pmf",
+            "football.lineup_scenario",
+            "football.lineup_scenario_member",
+        )
+    ):
+        op.execute(
+            f"CREATE TRIGGER trg_min007f_core_freeze_{index} "
+            f"BEFORE INSERT OR UPDATE OR DELETE ON {table_name} FOR EACH ROW "
+            "EXECUTE FUNCTION football.reject_complete_core_mutation()"
+        )
+    op.execute(
+        "CREATE TRIGGER trg_min007f_final_output_freeze "
+        "BEFORE INSERT OR UPDATE OR DELETE ON football.player_minutes_projection "
+        "FOR EACH ROW EXECUTE FUNCTION football.reject_frozen_final_output_mutation()"
+    )
     op.execute(
         "CREATE CONSTRAINT TRIGGER trg_min007f_scenario_parent "
         "AFTER INSERT OR UPDATE ON football.lineup_scenario "
@@ -373,6 +582,12 @@ def upgrade() -> None:
         "DEFERRABLE INITIALLY DEFERRED FOR EACH ROW "
         "EXECUTE FUNCTION football.validate_prediction_complete()"
     )
+    op.execute(
+        "CREATE CONSTRAINT TRIGGER trg_min007f_final_output_complete "
+        "AFTER UPDATE ON football.prediction_run "
+        "DEFERRABLE INITIALLY DEFERRED FOR EACH ROW "
+        "EXECUTE FUNCTION football.validate_final_output_complete()"
+    )
 
 
 def downgrade() -> None:
@@ -389,6 +604,28 @@ def downgrade() -> None:
         "DROP TRIGGER IF EXISTS trg_min007f_model_dataset_complete ON provenance.model_version"
     )
     op.execute("DROP TRIGGER IF EXISTS trg_min007f_prediction_complete ON football.prediction_run")
+    op.execute("DROP TRIGGER IF EXISTS trg_min007f_dataset_lifecycle ON provenance.dataset_version")
+    op.execute(
+        "DROP TRIGGER IF EXISTS trg_min007f_dataset_lineage_freeze ON provenance.dataset_training_example"
+    )
+    op.execute("DROP TRIGGER IF EXISTS trg_min007f_prediction_lifecycle ON football.prediction_run")
+    for index, table_name in enumerate(
+        (
+            "football.prediction_dependency",
+            "football.prediction_hard_eligibility",
+            "football.role_marginal",
+            "football.conditional_minute_pmf",
+            "football.lineup_scenario",
+            "football.lineup_scenario_member",
+        )
+    ):
+        op.execute(f"DROP TRIGGER IF EXISTS trg_min007f_core_freeze_{index} ON {table_name}")
+    op.execute(
+        "DROP TRIGGER IF EXISTS trg_min007f_final_output_freeze ON football.player_minutes_projection"
+    )
+    op.execute(
+        "DROP TRIGGER IF EXISTS trg_min007f_final_output_complete ON football.prediction_run"
+    )
     # Table CHECK constraints depend on the PMF/projection validator
     # functions, so remove the tables before dropping those functions.
     for table in reversed(TABLES):
@@ -397,6 +634,12 @@ def downgrade() -> None:
     op.execute("DROP FUNCTION IF EXISTS provenance.validate_dataset_complete()")
     op.execute("DROP FUNCTION IF EXISTS provenance.validate_model_dataset_complete()")
     op.execute("DROP FUNCTION IF EXISTS football.validate_prediction_complete()")
+    op.execute("DROP FUNCTION IF EXISTS provenance.validate_dataset_lifecycle()")
+    op.execute("DROP FUNCTION IF EXISTS provenance.reject_complete_dataset_lineage_mutation()")
+    op.execute("DROP FUNCTION IF EXISTS football.validate_prediction_lifecycle()")
+    op.execute("DROP FUNCTION IF EXISTS football.reject_complete_core_mutation()")
+    op.execute("DROP FUNCTION IF EXISTS football.reject_frozen_final_output_mutation()")
+    op.execute("DROP FUNCTION IF EXISTS football.validate_final_output_complete()")
     op.execute("DROP FUNCTION IF EXISTS football.reject_immutable_availability_change()")
     op.execute(
         "DROP FUNCTION IF EXISTS football.validate_player_minutes_projection(numeric,numeric,numeric,numeric[],numeric,numeric,numeric)"

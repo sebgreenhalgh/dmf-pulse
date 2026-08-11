@@ -4,7 +4,7 @@
     "btree_gist"
   ],
   "postgres_version": "18.4 (Debian 18.4-1.pgdg12+1)",
-  "schema_sha256": "9d15f10b4129f3846a22875c1482001e3975dead606848119fb440cbfc9796c3",
+  "schema_sha256": "deae79d0b3e36449fc9df42ff168332d6b4e112ddfe05d0adf8368930eb94bf7",
   "schemas": {
     "betting": {
       "functions": [
@@ -6190,6 +6190,16 @@
       "functions": [
         {
           "arguments": "",
+          "definition": "CREATE OR REPLACE FUNCTION football.reject_complete_core_mutation() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE target_run uuid; target_state text; BEGIN target_run := COALESCE(NEW.prediction_run_id, OLD.prediction_run_id); SELECT core_state INTO target_state FROM football.prediction_run WHERE prediction_run_id = target_run; IF target_state IS NULL THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_RUN_NOT_FOUND'; END IF; IF target_state = 'COMPLETE' THEN RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'PREDICTION_CORE_FROZEN'; END IF; IF TG_OP = 'DELETE' THEN RETURN OLD; END IF; RETURN NEW; END $function$",
+          "name": "reject_complete_core_mutation"
+        },
+        {
+          "arguments": "",
+          "definition": "CREATE OR REPLACE FUNCTION football.reject_frozen_final_output_mutation() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE target_run uuid; target_state text; BEGIN target_run := COALESCE(NEW.prediction_run_id, OLD.prediction_run_id); SELECT final_output_state INTO target_state FROM football.prediction_run WHERE prediction_run_id = target_run; IF target_state IS NULL THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_RUN_NOT_FOUND'; END IF; IF target_state <> 'DRAFT' THEN RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'FINAL_OUTPUT_FROZEN'; END IF; IF TG_OP = 'DELETE' THEN RETURN OLD; END IF; RETURN NEW; END $function$",
+          "name": "reject_frozen_final_output_mutation"
+        },
+        {
+          "arguments": "",
           "definition": "CREATE OR REPLACE FUNCTION football.reject_immutable_availability_change() RETURNS trigger LANGUAGE plpgsql AS $function$ BEGIN RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'IMMUTABLE_RECORD'; END $function$",
           "name": "reject_immutable_availability_change"
         },
@@ -6197,6 +6207,11 @@
           "arguments": "value numeric",
           "definition": "CREATE OR REPLACE FUNCTION football.round_half_even_6(value numeric) RETURNS numeric LANGUAGE plpgsql IMMUTABLE AS $function$ DECLARE scaled numeric; base numeric; fraction numeric; BEGIN IF value IS NULL THEN RETURN NULL; END IF; scaled := value * 1000000; base := trunc(scaled); fraction := scaled - base; IF fraction > 0.5 OR (fraction = 0.5 AND mod(base, 2) <> 0) THEN base := base + 1; END IF; RETURN base / 1000000; END $function$",
           "name": "round_half_even_6"
+        },
+        {
+          "arguments": "",
+          "definition": "CREATE OR REPLACE FUNCTION football.validate_final_output_complete() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE final_total integer; marginal_total integer; mismatch integer; BEGIN IF NEW.final_output_state <> 'COMPLETE' THEN RETURN NULL; END IF; IF NEW.core_state <> 'COMPLETE' OR NEW.final_output_payload IS NULL THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_CORE_INCOMPLETE'; END IF; SELECT count(*) INTO final_total FROM football.player_minutes_projection WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO marginal_total FROM football.role_marginal WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO mismatch FROM ( (SELECT player_id FROM football.player_minutes_projection WHERE prediction_run_id = NEW.prediction_run_id EXCEPT SELECT player_id FROM football.role_marginal WHERE prediction_run_id = NEW.prediction_run_id) UNION ALL (SELECT player_id FROM football.role_marginal WHERE prediction_run_id = NEW.prediction_run_id EXCEPT SELECT player_id FROM football.player_minutes_projection WHERE prediction_run_id = NEW.prediction_run_id) ) AS differences; IF final_total <> NEW.final_output_count OR final_total = 0 OR final_total <> marginal_total OR mismatch <> 0 THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_GRAPH_INCOMPLETE'; END IF; RETURN NULL; END $function$",
+          "name": "validate_final_output_complete"
         },
         {
           "arguments": "",
@@ -6215,8 +6230,13 @@
         },
         {
           "arguments": "",
-          "definition": "CREATE OR REPLACE FUNCTION football.validate_prediction_complete() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE dependency_total integer; hard_total integer; marginal_total integer; pmf_total integer; scenario_total integer; role_total integer; BEGIN SELECT count(*) INTO dependency_total FROM football.prediction_dependency WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO hard_total FROM football.prediction_hard_eligibility WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO marginal_total FROM football.role_marginal WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO pmf_total FROM football.conditional_minute_pmf WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO scenario_total FROM football.lineup_scenario WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO role_total FROM football.conditional_minute_pmf WHERE prediction_run_id = NEW.prediction_run_id AND role IN ('START', 'BENCH'); IF dependency_total <> NEW.dependency_count OR hard_total <> NEW.hard_eligibility_count OR marginal_total <> NEW.role_marginal_count OR pmf_total <> NEW.minute_pmf_count OR scenario_total <> NEW.scenario_count OR marginal_total = 0 OR pmf_total = 0 OR role_total <> pmf_total THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_GRAPH_INCOMPLETE'; END IF; RETURN NULL; END $function$",
+          "definition": "CREATE OR REPLACE FUNCTION football.validate_prediction_complete() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE dependency_total integer; hard_total integer; marginal_total integer; pmf_total integer; scenario_total integer; role_total integer; BEGIN IF NEW.core_state <> 'COMPLETE' THEN RETURN NULL; END IF; SELECT count(*) INTO dependency_total FROM football.prediction_dependency WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO hard_total FROM football.prediction_hard_eligibility WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO marginal_total FROM football.role_marginal WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO pmf_total FROM football.conditional_minute_pmf WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO scenario_total FROM football.lineup_scenario WHERE prediction_run_id = NEW.prediction_run_id; SELECT count(*) INTO role_total FROM football.conditional_minute_pmf WHERE prediction_run_id = NEW.prediction_run_id AND role IN ('START', 'BENCH'); IF dependency_total <> NEW.dependency_count OR hard_total <> NEW.hard_eligibility_count OR marginal_total <> NEW.role_marginal_count OR pmf_total <> NEW.minute_pmf_count OR scenario_total <> NEW.scenario_count OR marginal_total = 0 OR pmf_total = 0 OR role_total <> pmf_total THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'PREDICTION_GRAPH_INCOMPLETE'; END IF; RETURN NULL; END $function$",
           "name": "validate_prediction_complete"
+        },
+        {
+          "arguments": "",
+          "definition": "CREATE OR REPLACE FUNCTION football.validate_prediction_lifecycle() RETURNS trigger LANGUAGE plpgsql AS $function$ BEGIN IF TG_OP = 'UPDATE' AND OLD.core_state = 'DRAFT' AND NEW.core_state = 'COMPLETE' AND OLD.final_output_state = NEW.final_output_state AND (to_jsonb(OLD) - ARRAY['core_state','core_output_payload']) IS NOT DISTINCT FROM (to_jsonb(NEW) - ARRAY['core_state','core_output_payload']) THEN RETURN NEW; END IF; IF TG_OP = 'UPDATE' AND OLD.core_state = 'COMPLETE' AND OLD.final_output_state = 'NONE' AND NEW.final_output_state = 'DRAFT' AND (to_jsonb(OLD) - 'final_output_state') IS NOT DISTINCT FROM (to_jsonb(NEW) - 'final_output_state') THEN RETURN NEW; END IF; IF TG_OP = 'UPDATE' AND OLD.core_state = 'COMPLETE' AND OLD.final_output_state = 'DRAFT' AND NEW.final_output_state = 'COMPLETE' AND (to_jsonb(OLD) - ARRAY['final_output_state','final_output_count','final_output_semantic_sha256','final_output_payload','output_semantic_sha256']) IS NOT DISTINCT FROM (to_jsonb(NEW) - ARRAY['final_output_state','final_output_count','final_output_semantic_sha256','final_output_payload','output_semantic_sha256']) THEN RETURN NEW; END IF; RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'PREDICTION_RUN_IMMUTABLE'; END $function$",
+          "name": "validate_prediction_lifecycle"
         }
       ],
       "tables": {
@@ -8359,15 +8379,15 @@
             },
             {
               "default": null,
-              "name": "fixture_id",
-              "nullable": false,
+              "name": "core_output_payload",
+              "nullable": true,
               "ordinal": 4,
-              "type": "uuid",
-              "udt": "pg_catalog.uuid"
+              "type": "jsonb",
+              "udt": "pg_catalog.jsonb"
             },
             {
               "default": null,
-              "name": "team_id",
+              "name": "fixture_id",
               "nullable": false,
               "ordinal": 5,
               "type": "uuid",
@@ -8375,9 +8395,17 @@
             },
             {
               "default": null,
-              "name": "as_of",
+              "name": "team_id",
               "nullable": false,
               "ordinal": 6,
+              "type": "uuid",
+              "udt": "pg_catalog.uuid"
+            },
+            {
+              "default": null,
+              "name": "as_of",
+              "nullable": false,
+              "ordinal": 7,
               "type": "timestamp with time zone",
               "udt": "pg_catalog.timestamptz"
             },
@@ -8385,7 +8413,7 @@
               "default": null,
               "name": "feature_cutoff",
               "nullable": true,
-              "ordinal": 7,
+              "ordinal": 8,
               "type": "timestamp with time zone",
               "udt": "pg_catalog.timestamptz"
             },
@@ -8393,7 +8421,7 @@
               "default": null,
               "name": "model_version_sha256",
               "nullable": false,
-              "ordinal": 8,
+              "ordinal": 9,
               "type": "character",
               "udt": "pg_catalog.bpchar"
             },
@@ -8401,7 +8429,7 @@
               "default": null,
               "name": "dataset_version_sha256",
               "nullable": false,
-              "ordinal": 9,
+              "ordinal": 10,
               "type": "character",
               "udt": "pg_catalog.bpchar"
             },
@@ -8409,7 +8437,7 @@
               "default": null,
               "name": "policy_sha256",
               "nullable": false,
-              "ordinal": 10,
+              "ordinal": 11,
               "type": "character",
               "udt": "pg_catalog.bpchar"
             },
@@ -8417,7 +8445,7 @@
               "default": null,
               "name": "manager_regime_id",
               "nullable": false,
-              "ordinal": 11,
+              "ordinal": 12,
               "type": "character varying",
               "udt": "pg_catalog.varchar"
             },
@@ -8425,7 +8453,7 @@
               "default": "'{}'::jsonb",
               "name": "manager_context",
               "nullable": false,
-              "ordinal": 12,
+              "ordinal": 13,
               "type": "jsonb",
               "udt": "pg_catalog.jsonb"
             },
@@ -8433,7 +8461,7 @@
               "default": null,
               "name": "seed",
               "nullable": false,
-              "ordinal": 13,
+              "ordinal": 14,
               "type": "character varying",
               "udt": "pg_catalog.varchar"
             },
@@ -8441,7 +8469,7 @@
               "default": null,
               "name": "sample_count",
               "nullable": false,
-              "ordinal": 14,
+              "ordinal": 15,
               "type": "integer",
               "udt": "pg_catalog.int4"
             },
@@ -8449,7 +8477,7 @@
               "default": "0",
               "name": "dependency_count",
               "nullable": false,
-              "ordinal": 15,
+              "ordinal": 16,
               "type": "integer",
               "udt": "pg_catalog.int4"
             },
@@ -8457,7 +8485,7 @@
               "default": "0",
               "name": "hard_eligibility_count",
               "nullable": false,
-              "ordinal": 16,
+              "ordinal": 17,
               "type": "integer",
               "udt": "pg_catalog.int4"
             },
@@ -8465,7 +8493,7 @@
               "default": "0",
               "name": "role_marginal_count",
               "nullable": false,
-              "ordinal": 17,
+              "ordinal": 18,
               "type": "integer",
               "udt": "pg_catalog.int4"
             },
@@ -8473,7 +8501,7 @@
               "default": "0",
               "name": "minute_pmf_count",
               "nullable": false,
-              "ordinal": 18,
+              "ordinal": 19,
               "type": "integer",
               "udt": "pg_catalog.int4"
             },
@@ -8481,15 +8509,55 @@
               "default": "0",
               "name": "scenario_count",
               "nullable": false,
-              "ordinal": 19,
+              "ordinal": 20,
+              "type": "integer",
+              "udt": "pg_catalog.int4"
+            },
+            {
+              "default": "'DRAFT'::character varying",
+              "name": "core_state",
+              "nullable": false,
+              "ordinal": 21,
+              "type": "character varying",
+              "udt": "pg_catalog.varchar"
+            },
+            {
+              "default": "'NONE'::character varying",
+              "name": "final_output_state",
+              "nullable": false,
+              "ordinal": 22,
+              "type": "character varying",
+              "udt": "pg_catalog.varchar"
+            },
+            {
+              "default": "0",
+              "name": "final_output_count",
+              "nullable": false,
+              "ordinal": 23,
               "type": "integer",
               "udt": "pg_catalog.int4"
             },
             {
               "default": null,
+              "name": "final_output_semantic_sha256",
+              "nullable": true,
+              "ordinal": 24,
+              "type": "character",
+              "udt": "pg_catalog.bpchar"
+            },
+            {
+              "default": null,
+              "name": "final_output_payload",
+              "nullable": true,
+              "ordinal": 25,
+              "type": "jsonb",
+              "udt": "pg_catalog.jsonb"
+            },
+            {
+              "default": null,
               "name": "bench_size",
               "nullable": false,
-              "ordinal": 20,
+              "ordinal": 26,
               "type": "smallint",
               "udt": "pg_catalog.int2"
             },
@@ -8497,7 +8565,7 @@
               "default": null,
               "name": "bench_goalkeeper_slots",
               "nullable": false,
-              "ordinal": 21,
+              "ordinal": 27,
               "type": "smallint",
               "udt": "pg_catalog.int2"
             },
@@ -8505,7 +8573,7 @@
               "default": null,
               "name": "code_identity",
               "nullable": false,
-              "ordinal": 22,
+              "ordinal": 28,
               "type": "character varying",
               "udt": "pg_catalog.varchar"
             },
@@ -8513,7 +8581,7 @@
               "default": "transaction_timestamp()",
               "name": "created_at",
               "nullable": false,
-              "ordinal": 23,
+              "ordinal": 29,
               "type": "timestamp with time zone",
               "udt": "pg_catalog.timestamptz"
             }
@@ -8525,6 +8593,41 @@
               "initially_deferred": false,
               "kind": "CHECK",
               "name": "ck_prediction_configuration"
+            },
+            {
+              "deferrable": false,
+              "definition": "CHECK (core_state::text = ANY (ARRAY['DRAFT'::character varying, 'COMPLETE'::character varying]::text[]))",
+              "initially_deferred": false,
+              "kind": "CHECK",
+              "name": "ck_prediction_core_state"
+            },
+            {
+              "deferrable": false,
+              "definition": "CHECK (final_output_count >= 0)",
+              "initially_deferred": false,
+              "kind": "CHECK",
+              "name": "ck_prediction_final_output_count"
+            },
+            {
+              "deferrable": false,
+              "definition": "CHECK (final_output_semantic_sha256 IS NULL OR final_output_semantic_sha256 ~ '^[0-9a-f]{64}$'::text)",
+              "initially_deferred": false,
+              "kind": "CHECK",
+              "name": "ck_prediction_final_output_hash"
+            },
+            {
+              "deferrable": false,
+              "definition": "CHECK (final_output_state::text = 'NONE'::text AND final_output_count = 0 AND final_output_semantic_sha256 IS NULL AND final_output_payload IS NULL OR (final_output_state::text = ANY (ARRAY['DRAFT'::character varying, 'COMPLETE'::character varying]::text[])))",
+              "initially_deferred": false,
+              "kind": "CHECK",
+              "name": "ck_prediction_final_output_payload_state"
+            },
+            {
+              "deferrable": false,
+              "definition": "CHECK (final_output_state::text = ANY (ARRAY['NONE'::character varying, 'DRAFT'::character varying, 'COMPLETE'::character varying]::text[]))",
+              "initially_deferred": false,
+              "kind": "CHECK",
+              "name": "ck_prediction_final_output_state"
             },
             {
               "deferrable": false,
@@ -8598,6 +8701,13 @@
             },
             {
               "deferrable": false,
+              "definition": "NOT NULL core_state",
+              "initially_deferred": false,
+              "kind": "n",
+              "name": "prediction_run_core_state_not_null"
+            },
+            {
+              "deferrable": false,
               "definition": "NOT NULL created_at",
               "initially_deferred": false,
               "kind": "n",
@@ -8616,6 +8726,20 @@
               "initially_deferred": false,
               "kind": "n",
               "name": "prediction_run_dependency_count_not_null"
+            },
+            {
+              "deferrable": false,
+              "definition": "NOT NULL final_output_count",
+              "initially_deferred": false,
+              "kind": "n",
+              "name": "prediction_run_final_output_count_not_null"
+            },
+            {
+              "deferrable": false,
+              "definition": "NOT NULL final_output_state",
+              "initially_deferred": false,
+              "kind": "n",
+              "name": "prediction_run_final_output_state_not_null"
             },
             {
               "deferrable": false,
@@ -8721,6 +8845,13 @@
               "initially_deferred": false,
               "kind": "n",
               "name": "prediction_run_team_id_not_null"
+            },
+            {
+              "deferrable": true,
+              "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+              "initially_deferred": true,
+              "kind": "t",
+              "name": "trg_min007f_final_output_complete"
             },
             {
               "deferrable": true,
@@ -9354,9 +9485,15 @@
       },
       "triggers": [
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_8 BEFORE DELETE OR UPDATE ON football.conditional_minute_pmf FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_core_freeze_3 BEFORE INSERT OR DELETE OR UPDATE ON football.conditional_minute_pmf FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_8",
+          "name": "trg_min007f_core_freeze_3",
+          "table": "conditional_minute_pmf"
+        },
+        {
+          "definition": "CREATE TRIGGER trg_min007f_immutable_6 BEFORE DELETE OR UPDATE ON football.conditional_minute_pmf FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "enabled": "O",
+          "name": "trg_min007f_immutable_6",
           "table": "conditional_minute_pmf"
         },
         {
@@ -9372,9 +9509,15 @@
           "table": "fixture_revision"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_9 BEFORE DELETE OR UPDATE ON football.lineup_scenario FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_core_freeze_4 BEFORE INSERT OR DELETE OR UPDATE ON football.lineup_scenario FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_9",
+          "name": "trg_min007f_core_freeze_4",
+          "table": "lineup_scenario"
+        },
+        {
+          "definition": "CREATE TRIGGER trg_min007f_immutable_7 BEFORE DELETE OR UPDATE ON football.lineup_scenario FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "enabled": "O",
+          "name": "trg_min007f_immutable_7",
           "table": "lineup_scenario"
         },
         {
@@ -9384,9 +9527,15 @@
           "table": "lineup_scenario"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_10 BEFORE DELETE OR UPDATE ON football.lineup_scenario_member FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_core_freeze_5 BEFORE INSERT OR DELETE OR UPDATE ON football.lineup_scenario_member FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_10",
+          "name": "trg_min007f_core_freeze_5",
+          "table": "lineup_scenario_member"
+        },
+        {
+          "definition": "CREATE TRIGGER trg_min007f_immutable_8 BEFORE DELETE OR UPDATE ON football.lineup_scenario_member FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "enabled": "O",
+          "name": "trg_min007f_immutable_8",
           "table": "lineup_scenario_member"
         },
         {
@@ -9396,9 +9545,15 @@
           "table": "lineup_scenario_member"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_11 BEFORE DELETE OR UPDATE ON football.player_minutes_projection FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_final_output_freeze BEFORE INSERT OR DELETE OR UPDATE ON football.player_minutes_projection FOR EACH ROW EXECUTE FUNCTION football.reject_frozen_final_output_mutation()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_11",
+          "name": "trg_min007f_final_output_freeze",
+          "table": "player_minutes_projection"
+        },
+        {
+          "definition": "CREATE TRIGGER trg_min007f_immutable_9 BEFORE DELETE OR UPDATE ON football.player_minutes_projection FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "enabled": "O",
+          "name": "trg_min007f_immutable_9",
           "table": "player_minutes_projection"
         },
         {
@@ -9408,21 +9563,33 @@
           "table": "player_team_membership"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_5 BEFORE DELETE OR UPDATE ON football.prediction_dependency FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_core_freeze_0 BEFORE INSERT OR DELETE OR UPDATE ON football.prediction_dependency FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_5",
+          "name": "trg_min007f_core_freeze_0",
           "table": "prediction_dependency"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_6 BEFORE DELETE OR UPDATE ON football.prediction_hard_eligibility FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_immutable_3 BEFORE DELETE OR UPDATE ON football.prediction_dependency FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_6",
+          "name": "trg_min007f_immutable_3",
+          "table": "prediction_dependency"
+        },
+        {
+          "definition": "CREATE TRIGGER trg_min007f_core_freeze_1 BEFORE INSERT OR DELETE OR UPDATE ON football.prediction_hard_eligibility FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation()",
+          "enabled": "O",
+          "name": "trg_min007f_core_freeze_1",
           "table": "prediction_hard_eligibility"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_4 BEFORE DELETE OR UPDATE ON football.prediction_run FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_immutable_4 BEFORE DELETE OR UPDATE ON football.prediction_hard_eligibility FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
           "enabled": "O",
           "name": "trg_min007f_immutable_4",
+          "table": "prediction_hard_eligibility"
+        },
+        {
+          "definition": "CREATE CONSTRAINT TRIGGER trg_min007f_final_output_complete AFTER UPDATE ON football.prediction_run DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION football.validate_final_output_complete()",
+          "enabled": "O",
+          "name": "trg_min007f_final_output_complete",
           "table": "prediction_run"
         },
         {
@@ -9432,9 +9599,21 @@
           "table": "prediction_run"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_7 BEFORE DELETE OR UPDATE ON football.role_marginal FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_prediction_lifecycle BEFORE UPDATE ON football.prediction_run FOR EACH ROW EXECUTE FUNCTION football.validate_prediction_lifecycle()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_7",
+          "name": "trg_min007f_prediction_lifecycle",
+          "table": "prediction_run"
+        },
+        {
+          "definition": "CREATE TRIGGER trg_min007f_core_freeze_2 BEFORE INSERT OR DELETE OR UPDATE ON football.role_marginal FOR EACH ROW EXECUTE FUNCTION football.reject_complete_core_mutation()",
+          "enabled": "O",
+          "name": "trg_min007f_core_freeze_2",
+          "table": "role_marginal"
+        },
+        {
+          "definition": "CREATE TRIGGER trg_min007f_immutable_5 BEFORE DELETE OR UPDATE ON football.role_marginal FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "enabled": "O",
+          "name": "trg_min007f_immutable_5",
           "table": "role_marginal"
         }
       ],
@@ -11286,17 +11465,27 @@
         },
         {
           "arguments": "",
+          "definition": "CREATE OR REPLACE FUNCTION provenance.reject_complete_dataset_lineage_mutation() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE target_dataset uuid; target_state text; BEGIN target_dataset := COALESCE(NEW.dataset_version_id, OLD.dataset_version_id); SELECT publication_state INTO target_state FROM provenance.dataset_version WHERE dataset_version_id = target_dataset; IF target_state IS NULL THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_NOT_FOUND'; END IF; IF target_state = 'COMPLETE' THEN RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'DATASET_LINEAGE_FROZEN'; END IF; IF TG_OP = 'DELETE' THEN RETURN OLD; END IF; RETURN NEW; END $function$",
+          "name": "reject_complete_dataset_lineage_mutation"
+        },
+        {
+          "arguments": "",
           "definition": "CREATE OR REPLACE FUNCTION provenance.reject_immutable_change() RETURNS trigger LANGUAGE plpgsql AS $function$ BEGIN RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'IMMUTABLE_RECORD'; END $function$",
           "name": "reject_immutable_change"
         },
         {
           "arguments": "",
-          "definition": "CREATE OR REPLACE FUNCTION provenance.validate_dataset_complete() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE expected integer; actual integer; BEGIN SELECT declared_training_example_count INTO expected FROM provenance.dataset_version WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id); IF expected IS NULL THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_NOT_FOUND'; END IF; SELECT count(*) INTO actual FROM provenance.dataset_training_example WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id); IF actual <> expected THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_LINEAGE_INCOMPLETE'; END IF; RETURN NULL; END $function$",
+          "definition": "CREATE OR REPLACE FUNCTION provenance.validate_dataset_complete() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE expected integer; actual integer; BEGIN SELECT declared_training_example_count INTO expected FROM provenance.dataset_version WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id); IF expected IS NULL THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_NOT_FOUND'; END IF; IF (SELECT publication_state FROM provenance.dataset_version WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id)) <> 'COMPLETE' THEN RETURN NULL; END IF; SELECT count(*) INTO actual FROM provenance.dataset_training_example WHERE dataset_version_id = COALESCE(NEW.dataset_version_id, OLD.dataset_version_id); IF actual <> expected THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DATASET_LINEAGE_INCOMPLETE'; END IF; RETURN NULL; END $function$",
           "name": "validate_dataset_complete"
         },
         {
           "arguments": "",
-          "definition": "CREATE OR REPLACE FUNCTION provenance.validate_model_dataset_complete() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE expected integer; actual integer; BEGIN SELECT dataset.declared_training_example_count INTO expected FROM provenance.dataset_version AS dataset WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256; IF expected IS NULL THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_NOT_FOUND'; END IF; SELECT count(*) INTO actual FROM provenance.dataset_training_example AS example JOIN provenance.dataset_version AS dataset ON dataset.dataset_version_id = example.dataset_version_id WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256; IF actual <> expected THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_INCOMPLETE'; END IF; RETURN NULL; END $function$",
+          "definition": "CREATE OR REPLACE FUNCTION provenance.validate_dataset_lifecycle() RETURNS trigger LANGUAGE plpgsql AS $function$ BEGIN IF TG_OP = 'UPDATE' AND OLD.publication_state = 'DRAFT' AND NEW.publication_state = 'COMPLETE' AND (to_jsonb(OLD) - 'publication_state') IS NOT DISTINCT FROM (to_jsonb(NEW) - 'publication_state') THEN RETURN NEW; END IF; RAISE EXCEPTION USING ERRCODE = '55000', MESSAGE = 'DATASET_IMMUTABLE'; END $function$",
+          "name": "validate_dataset_lifecycle"
+        },
+        {
+          "arguments": "",
+          "definition": "CREATE OR REPLACE FUNCTION provenance.validate_model_dataset_complete() RETURNS trigger LANGUAGE plpgsql AS $function$ DECLARE expected integer; actual integer; BEGIN SELECT dataset.declared_training_example_count INTO expected FROM provenance.dataset_version AS dataset WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256; IF expected IS NULL THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_NOT_FOUND'; END IF; IF (SELECT dataset.publication_state FROM provenance.dataset_version AS dataset WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256) <> 'COMPLETE' THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_INCOMPLETE'; END IF; SELECT count(*) INTO actual FROM provenance.dataset_training_example AS example JOIN provenance.dataset_version AS dataset ON dataset.dataset_version_id = example.dataset_version_id WHERE dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256; IF actual <> expected THEN RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'MODEL_DATASET_INCOMPLETE'; END IF; RETURN NULL; END $function$",
           "name": "validate_model_dataset_complete"
         }
       ],
@@ -11953,10 +12142,18 @@
               "udt": "pg_catalog.int4"
             },
             {
+              "default": "'DRAFT'::character varying",
+              "name": "publication_state",
+              "nullable": false,
+              "ordinal": 11,
+              "type": "character varying",
+              "udt": "pg_catalog.varchar"
+            },
+            {
               "default": "transaction_timestamp()",
               "name": "created_at",
               "nullable": false,
-              "ordinal": 11,
+              "ordinal": 12,
               "type": "timestamp with time zone",
               "udt": "pg_catalog.timestamptz"
             }
@@ -11975,6 +12172,13 @@
               "initially_deferred": false,
               "kind": "CHECK",
               "name": "ck_dataset_version_policy_hash"
+            },
+            {
+              "deferrable": false,
+              "definition": "CHECK (publication_state::text = ANY (ARRAY['DRAFT'::character varying, 'COMPLETE'::character varying]::text[]))",
+              "initially_deferred": false,
+              "kind": "CHECK",
+              "name": "ck_dataset_version_publication_state"
             },
             {
               "deferrable": false,
@@ -12038,6 +12242,13 @@
               "initially_deferred": false,
               "kind": "n",
               "name": "dataset_version_policy_sha256_not_null"
+            },
+            {
+              "deferrable": false,
+              "definition": "NOT NULL publication_state",
+              "initially_deferred": false,
+              "kind": "n",
+              "name": "dataset_version_publication_state_not_null"
             },
             {
               "deferrable": false,
@@ -12329,9 +12540,33 @@
             },
             {
               "default": null,
-              "name": "status",
+              "name": "evaluated_model_semantic_sha256",
               "nullable": false,
               "ordinal": 4,
+              "type": "character",
+              "udt": "pg_catalog.bpchar"
+            },
+            {
+              "default": null,
+              "name": "evaluated_model_artifact_sha256",
+              "nullable": false,
+              "ordinal": 5,
+              "type": "character",
+              "udt": "pg_catalog.bpchar"
+            },
+            {
+              "default": null,
+              "name": "evaluated_model_family",
+              "nullable": false,
+              "ordinal": 6,
+              "type": "character varying",
+              "udt": "pg_catalog.varchar"
+            },
+            {
+              "default": null,
+              "name": "status",
+              "nullable": false,
+              "ordinal": 7,
               "type": "character varying",
               "udt": "pg_catalog.varchar"
             },
@@ -12339,7 +12574,7 @@
               "default": null,
               "name": "evaluation",
               "nullable": false,
-              "ordinal": 5,
+              "ordinal": 8,
               "type": "jsonb",
               "udt": "pg_catalog.jsonb"
             },
@@ -12347,12 +12582,26 @@
               "default": "transaction_timestamp()",
               "name": "created_at",
               "nullable": false,
-              "ordinal": 6,
+              "ordinal": 9,
               "type": "timestamp with time zone",
               "udt": "pg_catalog.timestamptz"
             }
           ],
           "constraints": [
+            {
+              "deferrable": false,
+              "definition": "CHECK (evaluated_model_artifact_sha256 ~ '^[0-9a-f]{64}$'::text)",
+              "initially_deferred": false,
+              "kind": "CHECK",
+              "name": "ck_model_evaluation_artifact_hash"
+            },
+            {
+              "deferrable": false,
+              "definition": "CHECK (evaluated_model_semantic_sha256 ~ '^[0-9a-f]{64}$'::text)",
+              "initially_deferred": false,
+              "kind": "CHECK",
+              "name": "ck_model_evaluation_model_hash"
+            },
             {
               "deferrable": false,
               "definition": "CHECK ((evaluation ->> 'production_calibration_claim'::text) = 'false'::text)",
@@ -12387,6 +12636,27 @@
               "initially_deferred": false,
               "kind": "n",
               "name": "model_evaluation_created_at_not_null"
+            },
+            {
+              "deferrable": false,
+              "definition": "NOT NULL evaluated_model_artifact_sha256",
+              "initially_deferred": false,
+              "kind": "n",
+              "name": "model_evaluation_evaluated_model_artifact_sha256_not_null"
+            },
+            {
+              "deferrable": false,
+              "definition": "NOT NULL evaluated_model_family",
+              "initially_deferred": false,
+              "kind": "n",
+              "name": "model_evaluation_evaluated_model_family_not_null"
+            },
+            {
+              "deferrable": false,
+              "definition": "NOT NULL evaluated_model_semantic_sha256",
+              "initially_deferred": false,
+              "kind": "n",
+              "name": "model_evaluation_evaluated_model_semantic_sha256_not_null"
             },
             {
               "deferrable": false,
@@ -16315,9 +16585,15 @@
       },
       "triggers": [
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_1 BEFORE DELETE OR UPDATE ON provenance.dataset_training_example FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_dataset_lineage_freeze BEFORE INSERT OR DELETE OR UPDATE ON provenance.dataset_training_example FOR EACH ROW EXECUTE FUNCTION provenance.reject_complete_dataset_lineage_mutation()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_1",
+          "name": "trg_min007f_dataset_lineage_freeze",
+          "table": "dataset_training_example"
+        },
+        {
+          "definition": "CREATE TRIGGER trg_min007f_immutable_0 BEFORE DELETE OR UPDATE ON provenance.dataset_training_example FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "enabled": "O",
+          "name": "trg_min007f_immutable_0",
           "table": "dataset_training_example"
         },
         {
@@ -16327,21 +16603,21 @@
           "table": "dataset_version"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_0 BEFORE DELETE OR UPDATE ON provenance.dataset_version FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_dataset_lifecycle BEFORE UPDATE ON provenance.dataset_version FOR EACH ROW EXECUTE FUNCTION provenance.validate_dataset_lifecycle()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_0",
+          "name": "trg_min007f_dataset_lifecycle",
           "table": "dataset_version"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_3 BEFORE DELETE OR UPDATE ON provenance.model_evaluation FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_immutable_2 BEFORE DELETE OR UPDATE ON provenance.model_evaluation FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_3",
+          "name": "trg_min007f_immutable_2",
           "table": "model_evaluation"
         },
         {
-          "definition": "CREATE TRIGGER trg_min007f_immutable_2 BEFORE DELETE OR UPDATE ON provenance.model_version FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
+          "definition": "CREATE TRIGGER trg_min007f_immutable_1 BEFORE DELETE OR UPDATE ON provenance.model_version FOR EACH ROW EXECUTE FUNCTION football.reject_immutable_availability_change()",
           "enabled": "O",
-          "name": "trg_min007f_immutable_2",
+          "name": "trg_min007f_immutable_1",
           "table": "model_version"
         },
         {

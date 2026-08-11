@@ -1,0 +1,31 @@
+{
+  "ticket": "MIN-007R5F3",
+  "commands": 24,
+  "status": "PASS",
+  "results": [
+    {"index": 1, "status": "PASS", "command": "git diff --check"},
+    {"index": 2, "status": "PASS", "command": "uv run ruff format --check src/dmf_pulse/availability src/dmf_pulse/data_model src/dmf_pulse/database tests/unit/availability tests/integration/availability tests/integration/migrations"},
+    {"index": 3, "status": "PASS", "command": "uv run ruff check src/dmf_pulse/availability src/dmf_pulse/data_model src/dmf_pulse/database tests/unit/availability tests/integration/availability tests/integration/migrations"},
+    {"index": 4, "status": "PASS", "command": "uv run mypy src/dmf_pulse/availability"},
+    {"index": 5, "status": "PASS", "command": "uv run pytest -q tests/unit/availability/test_audit0073b_finalization_provenance.py"},
+    {"index": 6, "status": "PASS", "command": "docker compose -f compose.test.yaml up -d --wait"},
+    {"index": 7, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run alembic upgrade head"},
+    {"index": 8, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_audit0073b_dataset_freeze.py"},
+    {"index": 9, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_audit0073b_prediction_graph_freeze.py"},
+    {"index": 10, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_audit0073b_final_output_freeze.py"},
+    {"index": 11, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_audit0073b_evaluation_provenance.py"},
+    {"index": 12, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_audit0073_registry_atomicity.py tests/integration/availability/test_audit0073_db_relational_integrity.py tests/integration/availability/test_audit0073_evaluation_integrity.py"},
+    {"index": 13, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_min007f_persistence.py tests/integration/availability/test_min007f_asof.py tests/integration/availability/test_min007f_concurrency.py"},
+    {"index": 14, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_min007g_service.py tests/integration/availability/test_min007g_persistence.py tests/integration/availability/test_audit0073_g_persistence_assurance.py"},
+    {"index": 15, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/migrations/test_migrations.py"},
+    {"index": 16, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head"},
+    {"index": 17, "status": "PASS", "command": "uv run pytest -q tests/unit/availability tests/property/availability tests/golden/availability"},
+    {"index": 18, "status": "PASS", "command": "uv run pytest -q tests/contract/availability tests/contract/markets tests/unit/markets tests/golden/markets"},
+    {"index": 19, "status": "PASS", "command": "uv run python scripts/validate_repository.py"},
+    {"index": 20, "status": "PASS", "command": "uv run python scripts/scan_secrets.py"},
+    {"index": 21, "status": "PASS", "command": "uv run alembic heads"},
+    {"index": 22, "status": "PASS", "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run alembic check"},
+    {"index": 23, "status": "PASS", "command": "docker compose -f compose.test.yaml down -v --remove-orphans"},
+    {"index": 24, "status": "PASS", "command": "git diff --check"}
+  ]
+}
