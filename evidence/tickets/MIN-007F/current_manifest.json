@@ -2564,6 +2564,11 @@
       "sha256": "8f88dd6638fabfd44de3099f323c600677e00592da8f5c2fb3fc1d6c02bcb634"
     },
     {
+      "path": "tests/unit/availability/test_min007_role_model_coverage.py",
+      "bytes": 16900,
+      "sha256": "d42c4c9db6d0b51e230cf8feb0af90ac0beed9fb481764ff153a742faa4dc1b9"
+    },
+    {
       "path": "tests/unit/availability/test_minutes.py",
       "bytes": 5442,
       "sha256": "fcd4dcd6ae05105fbaaf5b272a4409871ccec958700366fd2d22a7a35eecf5d0"
