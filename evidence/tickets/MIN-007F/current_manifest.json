@@ -1215,8 +1215,8 @@
     },
     {
       "path": "scripts/generate_min007f_manifest.py",
-      "bytes": 588,
-      "sha256": "55286d157f151cbc27523ef67e8149d563229a1847e28b85f9cb67d3d534648a"
+      "bytes": 587,
+      "sha256": "9307176091b5b17751cab8eb1c3bed358487e7cac0e004d7e3dba4a589d798c9"
     },
     {
       "path": "scripts/generate_nrm006_evidence.py",
@@ -1255,8 +1255,8 @@
     },
     {
       "path": "scripts/validate_repository.py",
-      "bytes": 66013,
-      "sha256": "88b70e33db4d6a3c9e05ffb1656cabe7c0e33a06ffbd4ffff9242fd8ae143310"
+      "bytes": 66005,
+      "sha256": "1b8e659acfc1378be26d5690845456912e336e81e9bd7a63938c0a16d0bb9a9a"
     },
     {
       "path": "scripts/verify_fpl004_acceptance.py",

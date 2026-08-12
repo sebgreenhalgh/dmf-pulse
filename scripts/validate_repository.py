@@ -923,8 +923,7 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
     active_path = (
         min007f_path
         if min007f_path.is_file()
-        else
-        nrm_path
+        else nrm_path
         if (root / "tickets/NRM-006/ticket.yaml").is_file()
         else odd_path
         if (root / "tickets/ODD-005/ticket.yaml").is_file()

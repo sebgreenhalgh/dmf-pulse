@@ -6,7 +6,6 @@ from pathlib import Path
 
 from dmf_pulse.assurance.manifests import build_repository_manifest
 
-
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "evidence/tickets/MIN-007F/current_manifest.json"
 
