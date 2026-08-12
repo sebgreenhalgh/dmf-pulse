@@ -1,0 +1,11 @@
+{
+  "head": "20260807_0006",
+  "identities": {
+    "B_dataset": "93c32a0f17de60a7cf37d6202f8d415b404856d8c1fc5dd45d2820b356d8ae6f",
+    "F_prediction": "06c21bcd7458b08fb5bd16e441c9c10866168e88151893d123d800a8ae2409a9",
+    "G_evaluation": "50da09c3327d616ae1e2f16ba711358d85131056689d6b624fd53aa7b188d417",
+    "G_registry": "3feb7b3dcd00518e60fdc2c703d5a5e4071261d25fc8652f006408b79c83a513"
+  },
+  "note": "Frozen identities checked against accepted MIN-007F evidence.",
+  "status": "PASS"
+}

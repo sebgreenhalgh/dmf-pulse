@@ -1,0 +1,7 @@
+{
+  "network_requests": 0,
+  "no_live_provider_requests": true,
+  "portable_paths": "PASS",
+  "secret_scan": "PASS",
+  "status": "PASS"
+}

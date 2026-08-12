@@ -1,0 +1,1 @@
+{"status":"PASS","postgres_version":"18.4","alembic_head":"20260807_0006","matrix":"PASS","integration_tests":{"passed":112,"skipped":0}}

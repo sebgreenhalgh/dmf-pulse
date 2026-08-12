@@ -1,0 +1,2 @@
+tests/unit/availability/test_min007_remaining_math_core_coverage.py
+evidence/tickets/MIN-007F/current_manifest.json

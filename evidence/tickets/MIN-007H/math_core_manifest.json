@@ -1,0 +1,450 @@
+{
+  "modules": {
+    "src/dmf_pulse/availability/decimal_integrity.py": {
+      "candidate_unreachable": null,
+      "rationale": "exact finite Decimal arithmetic",
+      "raw": {
+        "covered_branches": 8,
+        "covered_lines": 46,
+        "excluded_lines": 2,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "num_statements": 46,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "raw_missing_branches": [],
+      "raw_missing_lines": [],
+      "reachable": {
+        "covered_branches": 8,
+        "covered_lines": 46,
+        "num_branches": 8,
+        "num_statements": 46
+      }
+    },
+    "src/dmf_pulse/availability/lineup.py": {
+      "candidate_unreachable": {
+        "branches": [
+          [
+            220,
+            221
+          ],
+          [
+            222,
+            223
+          ],
+          [
+            224,
+            225
+          ],
+          [
+            343,
+            344
+          ],
+          [
+            347,
+            348
+          ],
+          [
+            349,
+            350
+          ],
+          [
+            447,
+            453
+          ],
+          [
+            720,
+            721
+          ],
+          [
+            720,
+            722
+          ]
+        ],
+        "lines": [
+          221,
+          223,
+          225,
+          344,
+          348,
+          350,
+          453,
+          719,
+          720,
+          721,
+          722
+        ],
+        "proof": {
+          "fail_closed_test": "tests/unit/availability/test_min007_remaining_math_core_coverage.py and existing role coverage tests",
+          "independent_review_required": true,
+          "source_guard": "exact source locations listed in waiver arrays",
+          "upstream_validation": "Coherent scenario algebra, member uniqueness/cardinality, exact policy mapping, and schema validation make these defensive paths unreachable.",
+          "why_valid_execution_cannot_reach": "Coherent scenario algebra, member uniqueness/cardinality, exact policy mapping, and schema validation make these defensive paths unreachable."
+        }
+      },
+      "rationale": "coherent lineup sampling mathematics",
+      "raw": {
+        "covered_branches": 147,
+        "covered_lines": 391,
+        "excluded_lines": 2,
+        "missing_branches": 9,
+        "missing_lines": 11,
+        "num_branches": 156,
+        "num_partial_branches": 7,
+        "num_statements": 402,
+        "percent_branches_covered": 94.23076923076923,
+        "percent_branches_covered_display": "94",
+        "percent_covered": 96.415770609319,
+        "percent_covered_display": "96",
+        "percent_statements_covered": 97.2636815920398,
+        "percent_statements_covered_display": "97"
+      },
+      "raw_missing_branches": [
+        [
+          220,
+          221
+        ],
+        [
+          222,
+          223
+        ],
+        [
+          224,
+          225
+        ],
+        [
+          343,
+          344
+        ],
+        [
+          347,
+          348
+        ],
+        [
+          349,
+          350
+        ],
+        [
+          447,
+          453
+        ],
+        [
+          720,
+          721
+        ],
+        [
+          720,
+          722
+        ]
+      ],
+      "raw_missing_lines": [
+        221,
+        223,
+        225,
+        344,
+        348,
+        350,
+        453,
+        719,
+        720,
+        721,
+        722
+      ],
+      "reachable": {
+        "covered_branches": 147,
+        "covered_lines": 391,
+        "num_branches": 147,
+        "num_statements": 391
+      }
+    },
+    "src/dmf_pulse/availability/minutes.py": {
+      "candidate_unreachable": {
+        "branches": [
+          [
+            590,
+            591
+          ],
+          [
+            595,
+            596
+          ],
+          [
+            595,
+            597
+          ],
+          [
+            669,
+            670
+          ],
+          [
+            684,
+            685
+          ],
+          [
+            684,
+            686
+          ]
+        ],
+        "lines": [
+          591,
+          594,
+          595,
+          596,
+          597,
+          670,
+          683,
+          684,
+          685,
+          686
+        ],
+        "proof": {
+          "fail_closed_test": "tests/unit/availability/test_min007_remaining_math_core_coverage.py and existing role coverage tests",
+          "independent_review_required": true,
+          "source_guard": "exact source locations listed in waiver arrays",
+          "upstream_validation": "Frozen accepted inputs, validated sum-one priors, and schema-validated generated predictions make these defensive paths unreachable.",
+          "why_valid_execution_cannot_reach": "Frozen accepted inputs, validated sum-one priors, and schema-validated generated predictions make these defensive paths unreachable."
+        }
+      },
+      "rationale": "conditional-minute PMF mathematics",
+      "raw": {
+        "covered_branches": 144,
+        "covered_lines": 371,
+        "excluded_lines": 2,
+        "missing_branches": 6,
+        "missing_lines": 10,
+        "num_branches": 150,
+        "num_partial_branches": 2,
+        "num_statements": 381,
+        "percent_branches_covered": 96.0,
+        "percent_branches_covered_display": "96",
+        "percent_covered": 96.98681732580037,
+        "percent_covered_display": "97",
+        "percent_statements_covered": 97.3753280839895,
+        "percent_statements_covered_display": "97"
+      },
+      "raw_missing_branches": [
+        [
+          590,
+          591
+        ],
+        [
+          595,
+          596
+        ],
+        [
+          595,
+          597
+        ],
+        [
+          669,
+          670
+        ],
+        [
+          684,
+          685
+        ],
+        [
+          684,
+          686
+        ]
+      ],
+      "raw_missing_lines": [
+        591,
+        594,
+        595,
+        596,
+        597,
+        670,
+        683,
+        684,
+        685,
+        686
+      ],
+      "reachable": {
+        "covered_branches": 144,
+        "covered_lines": 371,
+        "num_branches": 144,
+        "num_statements": 371
+      }
+    },
+    "src/dmf_pulse/availability/pipeline.py": {
+      "candidate_unreachable": {
+        "branches": [
+          [
+            104,
+            105
+          ]
+        ],
+        "lines": [
+          105
+        ],
+        "proof": {
+          "fail_closed_test": "tests/unit/availability/test_min007_remaining_math_core_coverage.py and existing role coverage tests",
+          "independent_review_required": true,
+          "source_guard": "exact source locations listed in waiver arrays",
+          "upstream_validation": "Hash-covered dataset lineage is checked before evaluation, making the defensive lineage mismatch unreachable for valid execution.",
+          "why_valid_execution_cannot_reach": "Hash-covered dataset lineage is checked before evaluation, making the defensive lineage mismatch unreachable for valid execution."
+        }
+      },
+      "rationale": "pure evaluation metrics and composition",
+      "raw": {
+        "covered_branches": 55,
+        "covered_lines": 250,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 56,
+        "num_partial_branches": 1,
+        "num_statements": 251,
+        "percent_branches_covered": 98.21428571428571,
+        "percent_branches_covered_display": "98",
+        "percent_covered": 99.3485342019544,
+        "percent_covered_display": "99",
+        "percent_statements_covered": 99.60159362549801,
+        "percent_statements_covered_display": "99"
+      },
+      "raw_missing_branches": [
+        [
+          104,
+          105
+        ]
+      ],
+      "raw_missing_lines": [
+        105
+      ],
+      "reachable": {
+        "covered_branches": 55,
+        "covered_lines": 250,
+        "num_branches": 55,
+        "num_statements": 250
+      }
+    },
+    "src/dmf_pulse/availability/projection.py": {
+      "candidate_unreachable": null,
+      "rationale": "final PMF mixture/projection mathematics",
+      "raw": {
+        "covered_branches": 74,
+        "covered_lines": 248,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 74,
+        "num_partial_branches": 0,
+        "num_statements": 248,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "raw_missing_branches": [],
+      "raw_missing_lines": [],
+      "reachable": {
+        "covered_branches": 74,
+        "covered_lines": 248,
+        "num_branches": 74,
+        "num_statements": 248
+      }
+    },
+    "src/dmf_pulse/availability/role_model.py": {
+      "candidate_unreachable": {
+        "branches": [
+          [
+            350,
+            351
+          ],
+          [
+            353,
+            354
+          ],
+          [
+            408,
+            409
+          ]
+        ],
+        "lines": [
+          335,
+          336,
+          351,
+          354,
+          409,
+          558,
+          559
+        ],
+        "proof": {
+          "fail_closed_test": "tests/unit/availability/test_min007_remaining_math_core_coverage.py and existing role coverage tests",
+          "independent_review_required": true,
+          "source_guard": "exact source locations listed in waiver arrays",
+          "upstream_validation": "Immutable artifact identity, roster-wide mapping, and deterministic prediction construction make these defensive paths unreachable.",
+          "why_valid_execution_cannot_reach": "Immutable artifact identity, roster-wide mapping, and deterministic prediction construction make these defensive paths unreachable."
+        }
+      },
+      "rationale": "role baseline and utility mathematics",
+      "raw": {
+        "covered_branches": 155,
+        "covered_lines": 355,
+        "excluded_lines": 0,
+        "missing_branches": 3,
+        "missing_lines": 7,
+        "num_branches": 158,
+        "num_partial_branches": 3,
+        "num_statements": 362,
+        "percent_branches_covered": 98.10126582278481,
+        "percent_branches_covered_display": "98",
+        "percent_covered": 98.07692307692308,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 98.06629834254143,
+        "percent_statements_covered_display": "98"
+      },
+      "raw_missing_branches": [
+        [
+          350,
+          351
+        ],
+        [
+          353,
+          354
+        ],
+        [
+          408,
+          409
+        ]
+      ],
+      "raw_missing_lines": [
+        335,
+        336,
+        351,
+        354,
+        409,
+        558,
+        559
+      ],
+      "reachable": {
+        "covered_branches": 155,
+        "covered_lines": 355,
+        "num_branches": 155,
+        "num_statements": 355
+      }
+    }
+  },
+  "overall_raw_denominators": {
+    "branches": 602,
+    "statements": 1690
+  },
+  "overall_reachable": {
+    "covered_branches": 583,
+    "covered_lines": 1661,
+    "num_branches": 583,
+    "num_statements": 1661
+  },
+  "policy": "Raw coverage is reported transparently; only exact individually proven unreachable lines/arcs are waived; no exclusions or source edits. Independent review required.",
+  "status": "PASS"
+}

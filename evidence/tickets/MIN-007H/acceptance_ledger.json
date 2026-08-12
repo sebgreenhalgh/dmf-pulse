@@ -1,0 +1,161 @@
+﻿{
+    "contract":  "MIN-007H v1.4",
+    "command_count":  31,
+    "records":  [
+                    {
+                        "number":  1,
+                        "command":  "git diff --check",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  2,
+                        "command":  "uv run ruff format --check .",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  3,
+                        "command":  "uv run ruff check .",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  4,
+                        "command":  "uv run mypy src/dmf_pulse",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  5,
+                        "command":  "uv run python scripts/validate_repository.py",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  6,
+                        "command":  "uv run python scripts/scan_secrets.py",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  7,
+                        "command":  "uv run pytest -q tests/unit/assurance/test_nrm006_acceptance_verifier.py::test_nrm006_real_frozen_inputs_and_goldens_are_self_consistent",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  8,
+                        "command":  "uv run pytest -q tests/unit/availability tests/property/availability tests/golden/availability --cov=dmf_pulse.availability --cov-branch --cov-report=term-missing --cov-report=json:.min007_math_core_inventory.json --cov-fail-under=0",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  9,
+                        "command":  "uv run python evidence/tickets/MIN-007H/validate_math_core_inventory.py",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  10,
+                        "command":  "docker compose -f compose.test.yaml up -d --wait",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  11,
+                        "command":  "uv run alembic upgrade head",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  12,
+                        "command":  "uv run pytest -q --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/MIN-007H/coverage.json --cov-fail-under=90",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  13,
+                        "command":  "uv run python evidence/tickets/MIN-007H/check_math_core_coverage.py",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  14,
+                        "command":  "uv run pytest -q tests/integration/migrations tests/integration/availability tests/integration/markets",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  15,
+                        "command":  "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  16,
+                        "command":  "uv run alembic check",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  17,
+                        "command":  "uv run alembic heads",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  18,
+                        "command":  "uv run pytest -q tests/contract tests/golden tests/property",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  19,
+                        "command":  "uv build --wheel",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  20,
+                        "command":  "uv run python evidence/tickets/MIN-007H/verify_installed_wheel.py",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  21,
+                        "command":  "uv run python evidence/tickets/MIN-007H/verify_frozen_identities.py",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  22,
+                        "command":  "uv run python evidence/tickets/MIN-007H/verify_stage7_security_portability.py",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  23,
+                        "command":  "uv run python evidence/tickets/MIN-007H/validate_acceptance_ledger.py",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  24,
+                        "command":  "git diff --check",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  25,
+                        "command":  "git diff --name-only",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  26,
+                        "command":  "docker compose -f compose.test.yaml down -v --remove-orphans",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  27,
+                        "command":  "Remove-Item -Force .min007_math_core_inventory.json -ErrorAction SilentlyContinue",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  28,
+                        "command":  "uv run python evidence/tickets/MIN-007H/validate_final_evidence.py",
+                        "status":  "PASS"
+                    },
+                    {
+                        "number":  29,
+                        "command":  "uv run python evidence/tickets/MIN-007H/build_final_review_pack.py",
+                        "status":  "PENDING"
+                    },
+                    {
+                        "number":  30,
+                        "command":  "uv run python evidence/tickets/MIN-007H/validate_final_review_pack.py",
+                        "status":  "PENDING"
+                    },
+                    {
+                        "number":  31,
+                        "command":  "git status --short",
+                        "status":  "PENDING"
+                    }
+                ]
+}
