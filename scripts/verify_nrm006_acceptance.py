@@ -48,7 +48,6 @@ TARGET_REVISION = "20260803_0005"
 FIXTURE_MANIFEST_SHA256 = "a63bd28ef7fcea90c56697ee0e77dc28ec10f63b53bdd794d21aa84815d85d23"
 HAPPY_SEMANTIC_SHA256 = "bd8840cceed27199e3b10945ef54529a517df68b522a82ab0c935c460116a499"
 SCHEMA_HASHES: dict[str, str] = {
-    "probability.schema.json": "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
     "normalised_operator_market.schema.json": (
         "c2851ca0c051c61aaa404fb290f6974640b2b1453f8c5a43e8d89502d0ee21fb"
     ),
@@ -59,6 +58,11 @@ SCHEMA_HASHES: dict[str, str] = {
         "b9a39f8f2a612645ddde141f8e9c8df340d65d1b1a8a4e01b42bb2f64a1eb789"
     ),
 }
+HISTORICAL_PROBABILITY_PATH = EVIDENCE_ROOT / "frozen_public_contracts" / "probability.schema.json"
+HISTORICAL_PROBABILITY_SHA256 = "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df"
+CURRENT_PROBABILITY_SHA256 = "6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b"
+HISTORICAL_PROBABILITY_ID = "https://dmf-pulse.local/contracts/nrm-006/probability.schema.json"
+CURRENT_PROBABILITY_ID = "https://dmf-pulse.local/contracts/min-007/probability.schema.json"
 EXPECTED_MATRIX = [
     {"from": "base", "status": "PASS", "to": TARGET_REVISION},
     {"from": TARGET_REVISION, "status": "PASS", "to": BASELINE_REVISION},
@@ -160,6 +164,39 @@ def _verify_git() -> dict[str, Any]:
     }
 
 
+def _verify_probability_schema_authorities() -> dict[str, str]:
+    historical_probability = _read_json(HISTORICAL_PROBABILITY_PATH)
+    current_probability = _read_json(REPOSITORY_ROOT / "public_contracts/probability.schema.json")
+    if _sha256(HISTORICAL_PROBABILITY_PATH) != HISTORICAL_PROBABILITY_SHA256:
+        raise AcceptanceError("historical NRM-006 probability schema hash differs")
+    if (
+        _sha256(REPOSITORY_ROOT / "public_contracts/probability.schema.json")
+        != CURRENT_PROBABILITY_SHA256
+    ):
+        raise AcceptanceError("current canonical probability schema hash differs")
+    if historical_probability.get("$id") != HISTORICAL_PROBABILITY_ID:
+        raise AcceptanceError("historical NRM-006 probability schema authority differs")
+    if current_probability.get("$id") != CURRENT_PROBABILITY_ID:
+        raise AcceptanceError("current MIN-007 probability schema authority differs")
+    probability_keys = ("$schema", "title", "type", "description", "pattern")
+    if any(
+        historical_probability.get(key) != current_probability.get(key) for key in probability_keys
+    ):
+        raise AcceptanceError("historical and current probability schema semantics differ")
+    return {
+        "current_probability_schema_id": CURRENT_PROBABILITY_ID,
+        "current_probability_schema_sha256": CURRENT_PROBABILITY_SHA256,
+        "historical_probability_schema_id": HISTORICAL_PROBABILITY_ID,
+        "historical_probability_schema_sha256": HISTORICAL_PROBABILITY_SHA256,
+    }
+
+
+def _verify_other_public_schema_hashes() -> None:
+    for name, expected_hash in SCHEMA_HASHES.items():
+        if _sha256(REPOSITORY_ROOT / "public_contracts" / name) != expected_hash:
+            raise AcceptanceError("a frozen NRM-006 public schema hash differs")
+
+
 def _verify_frozen_inputs() -> dict[str, Any]:
     manifest_path = FIXTURE_ROOT / "manifest.json"
     if _sha256(manifest_path) != FIXTURE_MANIFEST_SHA256:
@@ -227,9 +264,8 @@ def _verify_frozen_inputs() -> dict[str, Any]:
         or gate_policy.normalisation_policy_sha256 != POLICY_SHA256
     ):
         raise AcceptanceError("frozen normalisation policy identity differs")
-    for name, expected_hash in SCHEMA_HASHES.items():
-        if _sha256(REPOSITORY_ROOT / "public_contracts" / name) != expected_hash:
-            raise AcceptanceError("a frozen NRM-006 public schema hash differs")
+    probability_identities = _verify_probability_schema_authorities()
+    _verify_other_public_schema_hashes()
     return {
         "fixture_entry_count": len(entries),
         "fixture_manifest_sha256": FIXTURE_MANIFEST_SHA256,
@@ -237,8 +273,9 @@ def _verify_frozen_inputs() -> dict[str, Any]:
         "oracle_count": len(oracles),
         "policy_id": loaded.policy_id,
         "policy_sha256": loaded.sha256,
-        "public_schema_count": len(SCHEMA_HASHES),
+        "public_schema_count": len(SCHEMA_HASHES) + 1,
         "rights_classification": "SYNTHETIC_TEST",
+        **probability_identities,
     }
 
 

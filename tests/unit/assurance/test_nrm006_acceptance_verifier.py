@@ -171,11 +171,124 @@ def test_nrm006_real_frozen_inputs_and_goldens_are_self_consistent(
     assert frozen["oracle_count"] == 11
     assert frozen["confidence_gate_policy_sha256"] == namespace["CONFIDENCE_GATE_POLICY_SHA256"]
     assert frozen["policy_sha256"] == namespace["POLICY_SHA256"]
+    assert (
+        frozen["historical_probability_schema_sha256"] == namespace["HISTORICAL_PROBABILITY_SHA256"]
+    )
+    assert frozen["current_probability_schema_sha256"] == namespace["CURRENT_PROBABILITY_SHA256"]
     assert goldens["case_count"] == 6
     assert (
         goldens["semantic_result_sha256"]["happy_path_consensus.json"]
         == namespace["HAPPY_SEMANTIC_SHA256"]
     )
+
+
+def test_nrm006_probability_schema_authorities_are_independently_fail_closed(
+    repository_root: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    namespace = _namespace(repository_root)
+    root = tmp_path / "repository"
+    historical = root / "evidence/tickets/NRM-006/frozen_public_contracts/probability.schema.json"
+    current = root / "public_contracts/probability.schema.json"
+    historical.parent.mkdir(parents=True)
+    current.parent.mkdir(parents=True)
+    historical.write_bytes(
+        (
+            repository_root
+            / "evidence/tickets/NRM-006/frozen_public_contracts/probability.schema.json"
+        ).read_bytes()
+    )
+    current.write_bytes((repository_root / "public_contracts/probability.schema.json").read_bytes())
+    function_globals = namespace["_verify_probability_schema_authorities"].__globals__
+    monkeypatch.setitem(function_globals, "REPOSITORY_ROOT", root)
+    monkeypatch.setitem(function_globals, "HISTORICAL_PROBABILITY_PATH", historical)
+    report = namespace["_verify_probability_schema_authorities"]()
+    assert (
+        report["historical_probability_schema_sha256"] == namespace["HISTORICAL_PROBABILITY_SHA256"]
+    )
+    assert report["current_probability_schema_sha256"] == namespace["CURRENT_PROBABILITY_SHA256"]
+
+    historical.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(
+        namespace["AcceptanceError"], match="historical NRM-006 probability schema hash"
+    ):
+        namespace["_verify_probability_schema_authorities"]()
+    historical.write_bytes(
+        (
+            repository_root
+            / "evidence/tickets/NRM-006/frozen_public_contracts/probability.schema.json"
+        ).read_bytes()
+    )
+
+    current.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(
+        namespace["AcceptanceError"], match="current canonical probability schema hash"
+    ):
+        namespace["_verify_probability_schema_authorities"]()
+    current.write_bytes((repository_root / "public_contracts/probability.schema.json").read_bytes())
+
+    historical_value = json.loads(historical.read_text(encoding="utf-8"))
+    historical_value["$id"] = "https://dmf-pulse.local/contracts/wrong.json"
+    historical.write_text(json.dumps(historical_value), encoding="utf-8")
+    monkeypatch.setitem(
+        function_globals,
+        "HISTORICAL_PROBABILITY_SHA256",
+        namespace["_sha256"](historical),
+    )
+    with pytest.raises(
+        namespace["AcceptanceError"], match="historical NRM-006 probability schema authority"
+    ):
+        namespace["_verify_probability_schema_authorities"]()
+
+    historical_value["$id"] = namespace["HISTORICAL_PROBABILITY_ID"]
+    historical_value["pattern"] = "^broken$"
+    historical.write_text(json.dumps(historical_value), encoding="utf-8")
+    monkeypatch.setitem(
+        function_globals,
+        "HISTORICAL_PROBABILITY_SHA256",
+        namespace["_sha256"](historical),
+    )
+    with pytest.raises(namespace["AcceptanceError"], match="probability schema semantics"):
+        namespace["_verify_probability_schema_authorities"]()
+
+    historical.write_bytes(
+        (
+            repository_root
+            / "evidence/tickets/NRM-006/frozen_public_contracts/probability.schema.json"
+        ).read_bytes()
+    )
+    monkeypatch.setitem(
+        function_globals,
+        "HISTORICAL_PROBABILITY_SHA256",
+        namespace["HISTORICAL_PROBABILITY_SHA256"],
+    )
+    current_value = json.loads(current.read_text(encoding="utf-8"))
+    current_value["$id"] = "https://dmf-pulse.local/contracts/wrong.json"
+    current.write_text(json.dumps(current_value), encoding="utf-8")
+    monkeypatch.setitem(
+        function_globals, "CURRENT_PROBABILITY_SHA256", namespace["_sha256"](current)
+    )
+    with pytest.raises(
+        namespace["AcceptanceError"], match="current MIN-007 probability schema authority"
+    ):
+        namespace["_verify_probability_schema_authorities"]()
+
+
+def test_nrm006_other_public_schema_hashes_remain_fail_closed(
+    repository_root: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    namespace = _namespace(repository_root)
+    root = tmp_path / "repository"
+    contracts = root / "public_contracts"
+    contracts.mkdir(parents=True)
+    for name in namespace["SCHEMA_HASHES"]:
+        (contracts / name).write_bytes((repository_root / "public_contracts" / name).read_bytes())
+    function_globals = namespace["_verify_other_public_schema_hashes"].__globals__
+    monkeypatch.setitem(function_globals, "REPOSITORY_ROOT", root)
+    namespace["_verify_other_public_schema_hashes"]()
+    candidate = contracts / "market_consensus.schema.json"
+    candidate.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(namespace["AcceptanceError"], match="frozen NRM-006 public schema hash"):
+        namespace["_verify_other_public_schema_hashes"]()
 
 
 def test_nrm006_optional_observation_capture_preserves_lexical_odds(

@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/nrm-006/probability.schema.json",
+  "title": "PublicProbability12",
+  "type": "string",
+  "description": "Decimal probability string with exactly 12 fractional digits in [0,1].",
+  "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$"
+}

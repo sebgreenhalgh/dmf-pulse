@@ -1270,8 +1270,8 @@
     },
     {
       "path": "scripts/verify_nrm006_acceptance.py",
-      "bytes": 24422,
-      "sha256": "bdb0dba5f4760a9d4e28ab6eba1429a9d93a1ba2b65bb314af240b52e0987567"
+      "bytes": 26526,
+      "sha256": "04e1eaa7df8a4d67f6bc6f3c884aba21df3b812eec794eedfce3e088f2c69ead"
     },
     {
       "path": "scripts/verify_nrm006_critical_coverage.py",
@@ -2440,8 +2440,8 @@
     },
     {
       "path": "tests/unit/assurance/test_nrm006_acceptance_verifier.py",
-      "bytes": 8908,
-      "sha256": "1ca15442c38227bbce07c69f2584a3fe7ac7acca11323cc80b115903a1ca94ca"
+      "bytes": 13975,
+      "sha256": "e687c4754a05139a1502ac4d892b0a5e51d7072ef3ff15f5a5bf74aa09dbf15f"
     },
     {
       "path": "tests/unit/assurance/test_nrm006_coverage_gate.py",
