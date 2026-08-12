@@ -8,7 +8,7 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, insert, select
+from sqlalchemy import func, insert, select, text
 from sqlalchemy.dialects.postgresql import insert as postgresql_insert
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
@@ -1085,11 +1085,19 @@ def register_final_player_projections(
             pmf = player.get("minute_pmf")
             if not isinstance(pmf, Sequence) or isinstance(pmf, (str, bytes, bytearray)):
                 raise DataModelError("AVAILABILITY_INPUT_INVALID", "final minute PMF is invalid")
+            confidence_reasons = player.get("confidence_reasons")
+            if not isinstance(confidence_reasons, Sequence) or isinstance(
+                confidence_reasons, (str, bytes, bytearray)
+            ):
+                raise DataModelError(
+                    "AVAILABILITY_INPUT_INVALID", "final confidence reasons are invalid"
+                )
             session.execute(
                 postgresql_insert(player_minutes_projection)
                 .values(
                     prediction_run_id=prediction_run_id,
                     player_id=str(player.get("player_id", "")),
+                    position=str(player.get("position", "")),
                     p_start=_decimal(player.get("p_start"), label="p_start"),
                     p_bench=_decimal(player.get("p_bench"), label="p_bench"),
                     p_out=_decimal(player.get("p_out_of_squad"), label="p_out_of_squad"),
@@ -1099,6 +1107,8 @@ def register_final_player_projections(
                     expected_minutes=_decimal(
                         player.get("expected_minutes"), label="expected_minutes"
                     ),
+                    confidence_grade=str(player.get("confidence_grade", "")),
+                    confidence_reasons=[str(reason) for reason in confidence_reasons],
                 )
                 .on_conflict_do_nothing(
                     index_elements=[
@@ -1132,6 +1142,7 @@ def register_final_player_projections(
                 output_semantic_sha256=combined_hash,
             )
         )
+        session.execute(text("SET CONSTRAINTS ALL IMMEDIATE"))
     except DataModelError:
         raise
     except DBAPIError as exc:
@@ -1144,7 +1155,8 @@ def get_prediction_run(session: Session, signature: str) -> dict[str, Any]:
     row = (
         session.execute(
             select(prediction_run).where(
-                prediction_run.c.prediction_input_signature_sha256 == signature
+                prediction_run.c.prediction_input_signature_sha256 == signature,
+                prediction_run.c.core_state == "COMPLETE",
             )
         )
         .mappings()

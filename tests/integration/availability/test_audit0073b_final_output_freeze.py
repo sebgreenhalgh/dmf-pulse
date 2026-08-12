@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from decimal import Decimal
-
 import pytest
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.exc import DBAPIError
@@ -19,45 +17,15 @@ from dmf_pulse.data_model.tables import player_minutes_projection, prediction_ru
 pytestmark = [pytest.mark.integration, pytest.mark.postgres]
 
 
-def _projection(
-    prediction: dict[str, object],
-    dataset: dict[str, object],
-    parts: dict[str, list[dict[str, object]]],
-) -> dict[str, object]:
-    pmf = [Decimal(1)] + [Decimal(0)] * 90
-    players = [
-        {
-            "player_id": str(row["player_id"]),
-            "position": str(row["position"]),
-            "p_start": "0.8" if str(row["player_id"]).startswith("starter") else "0.1",
-            "p_bench": "0.1" if str(row["player_id"]).startswith("starter") else "0.8",
-            "p_out_of_squad": "0.1",
-            "p_zero_minutes": "1",
-            "p_60_plus": "0",
-            "expected_minutes": "0",
-            "minute_pmf": pmf,
-        }
-        for row in parts["role_marginals"]
-    ]
-    return {
-        "fixture_id": prediction["fixture_id"],
-        "team_id": prediction["team_id"],
-        "as_of": prediction["as_of"],
-        "model_family": "INTEGRATION",
-        "dataset_sha256": dataset["dataset_sha256"],
-        "model_artifact_sha256": "c" * 64,
-        "players": players,
-    }
-
-
 def test_final_output_has_own_lifecycle_and_freeze(
     postgres_session_factory: sessionmaker[Session],
     dataset: dict[str, object],
     model: dict[str, object],
     prediction: dict[str, object],
     bundle_parts: dict[str, list[dict[str, object]]],
+    final_projection: dict[str, object],
 ) -> None:
-    final = _projection(prediction, dataset, bundle_parts)
+    final = final_projection
     with postgres_session_factory.begin() as session:
         register_dataset_version(session, dataset)
         register_model_version(session, model, artifact={"artifact_sha256": "c" * 64})

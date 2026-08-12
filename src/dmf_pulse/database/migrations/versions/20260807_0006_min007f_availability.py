@@ -247,6 +247,89 @@ END
 $$
 """
 
+
+CONFIDENCE_REASONS_FUNCTION = """
+CREATE OR REPLACE FUNCTION football.validate_minutes_confidence_reasons(reasons varchar[])
+RETURNS boolean LANGUAGE sql IMMUTABLE AS $$
+  SELECT reasons IS NOT NULL
+     AND COALESCE(array_ndims(reasons), 1) = 1
+     AND NOT EXISTS (
+       SELECT 1
+         FROM unnest(reasons) AS reason
+        WHERE reason IS NULL
+           OR reason NOT IN (
+             'HARD_INELIGIBLE_OVERRIDE',
+             'NO_TARGET_TEAM_COMPETITIVE_HISTORY',
+             'THIN_PLAYER_HISTORY',
+             'NEW_SIGNING',
+             'NEW_MANAGER_REGIME',
+             'PROMOTED_TEAM_EARLY_REGIME',
+             'BASELINE_MODEL_CAP_B'
+           )
+     )
+     AND cardinality(reasons) = (
+       SELECT count(DISTINCT reason) FROM unnest(reasons) AS reason
+     )
+$$
+"""
+
+
+CANONICAL_JSON_FUNCTION = """
+CREATE OR REPLACE FUNCTION football.canonical_json_text(value jsonb)
+RETURNS text LANGUAGE plpgsql IMMUTABLE STRICT AS $$
+DECLARE
+  kind text;
+  rendered text;
+BEGIN
+  kind := jsonb_typeof(value);
+  IF kind = 'object' THEN
+    SELECT '{' || COALESCE(
+      string_agg(to_jsonb(key)::text || ':' || football.canonical_json_text(entry), ','
+                 ORDER BY key COLLATE "C"),
+      ''
+    ) || '}'
+      INTO rendered
+      FROM jsonb_each(value) AS item(key, entry);
+    RETURN rendered;
+  END IF;
+  IF kind = 'array' THEN
+    SELECT '[' || COALESCE(
+      string_agg(football.canonical_json_text(entry), ',' ORDER BY ordinal),
+      ''
+    ) || ']'
+      INTO rendered
+      FROM jsonb_array_elements(value) WITH ORDINALITY AS item(entry, ordinal);
+    RETURN rendered;
+  END IF;
+  RETURN value::text;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION football.canonical_json_sha256(value jsonb)
+RETURNS text LANGUAGE sql IMMUTABLE STRICT AS $$
+  SELECT encode(pg_catalog.sha256(convert_to(football.canonical_json_text(value), 'UTF8')), 'hex')
+$$;
+
+CREATE OR REPLACE FUNCTION football.render_final_probability(value numeric)
+RETURNS text LANGUAGE sql IMMUTABLE STRICT AS $$
+  SELECT to_char(value, 'FM999999999990.000000000000')
+$$;
+
+CREATE OR REPLACE FUNCTION football.render_final_minutes(value numeric)
+RETURNS text LANGUAGE sql IMMUTABLE STRICT AS $$
+  SELECT to_char(value, 'FM999999990.000000')
+$$;
+
+CREATE OR REPLACE FUNCTION football.render_final_as_of(value timestamptz)
+RETURNS text LANGUAGE sql IMMUTABLE STRICT AS $$
+  SELECT CASE
+    WHEN date_trunc('second', value) = value
+      THEN to_char(value AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+    ELSE to_char(value AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')
+  END
+$$
+"""
+
 HALF_EVEN_FUNCTION = """
 CREATE OR REPLACE FUNCTION football.round_half_even_6(value numeric)
 RETURNS numeric LANGUAGE plpgsql IMMUTABLE AS $$
@@ -463,6 +546,16 @@ DECLARE
   final_total integer;
   marginal_total integer;
   mismatch integer;
+  model_family text;
+  artifact_sha text;
+  dataset_sha text;
+  scenario_set_sha text;
+  actual_players jsonb;
+  result_body jsonb;
+  actual_result jsonb;
+  expected_final_sha text;
+  expected_output_sha text;
+  top_level_mismatch text;
 BEGIN
   IF NEW.final_output_state <> 'COMPLETE' THEN
     RETURN NULL;
@@ -487,6 +580,169 @@ BEGIN
   IF final_total <> NEW.final_output_count OR final_total = 0 OR final_total <> marginal_total OR mismatch <> 0 THEN
     RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_GRAPH_INCOMPLETE';
   END IF;
+  IF EXISTS (
+    SELECT 1
+      FROM football.player_minutes_projection AS projection
+      LEFT JOIN football.role_marginal AS marginal
+        ON marginal.prediction_run_id = projection.prediction_run_id
+       AND marginal.player_id = projection.player_id
+     WHERE projection.prediction_run_id = NEW.prediction_run_id
+       AND (
+         marginal.player_id IS NULL
+         OR projection.position <> marginal.position
+         OR projection.p_start <> marginal.p_start
+         OR projection.p_bench <> marginal.p_bench
+         OR projection.p_out <> marginal.p_out
+       )
+  ) THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_ROW_MISMATCH';
+  END IF;
+  IF EXISTS (
+    SELECT 1
+      FROM football.player_minutes_projection AS projection
+     WHERE projection.prediction_run_id = NEW.prediction_run_id
+       AND (
+         projection.p_start <> trunc(projection.p_start * 1000000000000) / 1000000000000
+         OR projection.p_bench <> trunc(projection.p_bench * 1000000000000) / 1000000000000
+         OR projection.p_out <> trunc(projection.p_out * 1000000000000) / 1000000000000
+         OR projection.p_zero <> trunc(projection.p_zero * 1000000000000) / 1000000000000
+         OR projection.p_60_plus <> trunc(projection.p_60_plus * 1000000000000) / 1000000000000
+         OR projection.expected_minutes <> trunc(projection.expected_minutes * 1000000) / 1000000
+         OR EXISTS (
+           SELECT 1
+             FROM unnest(projection.minute_pmf) AS minute_value
+            WHERE minute_value <> trunc(minute_value * 1000000000000) / 1000000000000
+         )
+       )
+  ) THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_SCALE_INVALID';
+  END IF;
+  SELECT model.model_family,
+         model.artifact ->> 'artifact_sha256',
+         COALESCE(dataset.source_dataset_sha256, dataset.dataset_semantic_sha256)
+    INTO model_family, artifact_sha, dataset_sha
+    FROM provenance.model_version AS model
+    JOIN provenance.dataset_version AS dataset
+      ON dataset.dataset_semantic_sha256 = NEW.dataset_version_sha256
+   WHERE model.model_semantic_sha256 = NEW.model_version_sha256;
+  IF model_family IS NULL OR artifact_sha IS NULL OR dataset_sha IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_PROVENANCE_INVALID';
+  END IF;
+  SELECT encode(
+           pg_catalog.sha256(
+             convert_to(
+               COALESCE(string_agg(scenario.scenario_sha256, '' ORDER BY scenario.scenario_index), ''),
+               'UTF8'
+             )
+           ),
+           'hex'
+         )
+    INTO scenario_set_sha
+    FROM football.lineup_scenario AS scenario
+   WHERE scenario.prediction_run_id = NEW.prediction_run_id;
+  SELECT jsonb_agg(player_payload ORDER BY player_id)
+    INTO actual_players
+    FROM (
+      SELECT projection.player_id,
+             player_body || jsonb_build_object(
+               'projection_sha256', football.canonical_json_sha256(player_body)
+             ) AS player_payload
+        FROM football.player_minutes_projection AS projection
+        CROSS JOIN LATERAL jsonb_build_object(
+          'player_id', projection.player_id,
+          'position', projection.position,
+          'p_start', football.render_final_probability(projection.p_start),
+          'p_bench', football.render_final_probability(projection.p_bench),
+          'p_out_of_squad', football.render_final_probability(projection.p_out),
+          'p_appearance', football.render_final_probability(1 - projection.p_zero),
+          'p_zero_minutes', football.render_final_probability(projection.p_zero),
+          'p_60_plus', football.render_final_probability(projection.p_60_plus),
+          'expected_minutes', football.render_final_minutes(projection.expected_minutes),
+          'minute_pmf', (
+            SELECT jsonb_agg(football.render_final_probability(minute_value) ORDER BY ordinal)
+              FROM unnest(projection.minute_pmf) WITH ORDINALITY AS pmf(minute_value, ordinal)
+          ),
+          'confidence_grade', projection.confidence_grade,
+          'confidence_reasons', to_jsonb(projection.confidence_reasons)
+        ) AS player_body
+       WHERE projection.prediction_run_id = NEW.prediction_run_id
+    ) AS persisted_player;
+  result_body := jsonb_build_object(
+    'schema_version', 'team-minutes-projection-v1',
+    'fixture_id', NEW.fixture_id::text,
+    'team_id', NEW.team_id::text,
+    'as_of', football.render_final_as_of(NEW.as_of),
+    'model_family', model_family,
+    'dataset_sha256', dataset_sha,
+    'model_artifact_sha256', artifact_sha,
+    'sample_count', NEW.sample_count,
+    'bench_size', NEW.bench_size,
+    'bench_goalkeeper_slots', NEW.bench_goalkeeper_slots,
+    'players', actual_players,
+    'scenario_set_sha256', scenario_set_sha,
+    'sum_p_start', football.render_final_probability((
+      SELECT sum(projection.p_start)
+        FROM football.player_minutes_projection AS projection
+       WHERE projection.prediction_run_id = NEW.prediction_run_id
+    )),
+    'sum_p_bench', football.render_final_probability((
+      SELECT sum(projection.p_bench)
+        FROM football.player_minutes_projection AS projection
+       WHERE projection.prediction_run_id = NEW.prediction_run_id
+    )),
+    'sum_p_out', football.render_final_probability((
+      SELECT sum(projection.p_out)
+        FROM football.player_minutes_projection AS projection
+       WHERE projection.prediction_run_id = NEW.prediction_run_id
+    ))
+  );
+  actual_result := result_body || jsonb_build_object(
+    'result_sha256', football.canonical_json_sha256(result_body)
+  );
+  IF NEW.final_output_payload -> 'players' IS DISTINCT FROM actual_players THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_PLAYER_PAYLOAD_MISMATCH';
+  END IF;
+  IF (NEW.final_output_payload - ARRAY['players', 'result_sha256'])
+       IS DISTINCT FROM (result_body - 'players') THEN
+    SELECT string_agg(
+             key || ': expected=' || entry::text || ', supplied=' || COALESCE(NEW.final_output_payload -> key, 'null'::jsonb)::text,
+             ';' ORDER BY key
+           )
+      INTO top_level_mismatch
+      FROM jsonb_each(result_body) AS item(key, entry)
+     WHERE key <> 'players'
+       AND entry IS DISTINCT FROM NEW.final_output_payload -> key;
+    RAISE EXCEPTION USING
+      ERRCODE = '23514',
+      MESSAGE = 'FINAL_OUTPUT_TEAM_PAYLOAD_MISMATCH',
+      DETAIL = COALESCE(top_level_mismatch, 'unknown top-level field');
+  END IF;
+  IF NEW.final_output_payload ->> 'result_sha256' <> actual_result ->> 'result_sha256' THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_RESULT_HASH_MISMATCH';
+  END IF;
+  IF NEW.final_output_payload IS DISTINCT FROM actual_result THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_PAYLOAD_MISMATCH';
+  END IF;
+  expected_final_sha := football.canonical_json_sha256(actual_result);
+  IF NEW.final_output_semantic_sha256 <> expected_final_sha THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_SEMANTIC_HASH_MISMATCH';
+  END IF;
+  IF NEW.core_output_payload IS NULL
+     OR jsonb_typeof(NEW.core_output_payload) <> 'object'
+     OR NEW.core_output_payload -> 'role_marginals' IS NULL
+     OR NEW.core_output_payload -> 'minute_pmfs' IS NULL
+     OR NEW.core_output_payload -> 'scenarios' IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_CORE_INCOMPLETE';
+  END IF;
+  expected_output_sha := football.canonical_json_sha256(jsonb_build_object(
+    'role_marginals', NEW.core_output_payload -> 'role_marginals',
+    'minute_pmfs', NEW.core_output_payload -> 'minute_pmfs',
+    'scenarios', NEW.core_output_payload -> 'scenarios',
+    'final_projection', actual_result
+  ));
+  IF NEW.output_semantic_sha256 <> expected_output_sha THEN
+    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'FINAL_OUTPUT_OUTPUT_HASH_MISMATCH';
+  END IF;
   RETURN NULL;
 END
 $$
@@ -498,6 +754,8 @@ def upgrade() -> None:
     op.execute(PMF_FUNCTION)
     op.execute(HALF_EVEN_FUNCTION)
     op.execute(PROJECTION_FUNCTION)
+    op.execute(CONFIDENCE_REASONS_FUNCTION)
+    op.execute(CANONICAL_JSON_FUNCTION)
     for table in TABLES:
         table.create(bind=bind, checkfirst=False)
     op.execute(SCENARIO_FUNCTION)
@@ -640,6 +898,12 @@ def downgrade() -> None:
     op.execute("DROP FUNCTION IF EXISTS football.reject_complete_core_mutation()")
     op.execute("DROP FUNCTION IF EXISTS football.reject_frozen_final_output_mutation()")
     op.execute("DROP FUNCTION IF EXISTS football.validate_final_output_complete()")
+    op.execute("DROP FUNCTION IF EXISTS football.render_final_as_of(timestamptz)")
+    op.execute("DROP FUNCTION IF EXISTS football.render_final_minutes(numeric)")
+    op.execute("DROP FUNCTION IF EXISTS football.render_final_probability(numeric)")
+    op.execute("DROP FUNCTION IF EXISTS football.canonical_json_sha256(jsonb)")
+    op.execute("DROP FUNCTION IF EXISTS football.canonical_json_text(jsonb)")
+    op.execute("DROP FUNCTION IF EXISTS football.validate_minutes_confidence_reasons(varchar[])")
     op.execute("DROP FUNCTION IF EXISTS football.reject_immutable_availability_change()")
     op.execute(
         "DROP FUNCTION IF EXISTS football.validate_player_minutes_projection(numeric,numeric,numeric,numeric[],numeric,numeric,numeric)"

@@ -125,8 +125,8 @@
     },
     {
       "path": "PLANS.md",
-      "bytes": 43897,
-      "sha256": "8b78e24a73deba47acd13c86a01cedc56f043d998bac3b5ced35089165813980"
+      "bytes": 44802,
+      "sha256": "fe248dc681f6b7d96cdc66ffe406374375a8af739de9518f45042023b156d71e"
     },
     {
       "path": "README.md",
@@ -1525,8 +1525,8 @@
     },
     {
       "path": "src/dmf_pulse/availability/persistence.py",
-      "bytes": 55515,
-      "sha256": "3c33fa95316a5b59ceea6e6ff107cbe84c5deadd060c1836852210045f78f917"
+      "bytes": 56232,
+      "sha256": "efd92f5f768bf0979fa974021c086f395b314901fa472dabfcb78bc9441b68d8"
     },
     {
       "path": "src/dmf_pulse/availability/pipeline.py",
@@ -1670,8 +1670,8 @@
     },
     {
       "path": "src/dmf_pulse/data_model/tables.py",
-      "bytes": 143105,
-      "sha256": "b50c3fafced359e87ecbdeb330976800921510d5ce9520acd7c874adca300a84"
+      "bytes": 143712,
+      "sha256": "3e091ac3fd053216e3364b85e8d04ede11cf72e6ccd38591a6294803921ba92a"
     },
     {
       "path": "src/dmf_pulse/database/__init__.py",
@@ -1735,8 +1735,8 @@
     },
     {
       "path": "src/dmf_pulse/database/migrations/versions/20260807_0006_min007f_availability.py",
-      "bytes": 23851,
-      "sha256": "8e85222050a9be4480ff086882d661c9552b5bf2038d5d7cc04816a8e07e8f0c"
+      "bytes": 35143,
+      "sha256": "fe407e9e53a45223eb2712d108c9071abb8b1ee5ed3619893a0690deda7fa448"
     },
     {
       "path": "src/dmf_pulse/database/migrations/versions/__init__.py",
@@ -2120,8 +2120,8 @@
     },
     {
       "path": "tests/integration/availability/conftest.py",
-      "bytes": 3894,
-      "sha256": "f4dfdeafcd964b116d95c6f2ca823da4bcbbc2dea436d4f12aebe2a38b525437"
+      "bytes": 6293,
+      "sha256": "e6b838a5d95cc9bd158beafc8aa4ef3432a3530cf884951b38193430b7871cd6"
     },
     {
       "path": "tests/integration/availability/test_audit0073_cli_mapping.py",
@@ -2160,13 +2160,23 @@
     },
     {
       "path": "tests/integration/availability/test_audit0073b_final_output_freeze.py",
-      "bytes": 3877,
-      "sha256": "323fa10befde637ecde7c54226ea2a8c1cd5f3167bde3f2a7cd92d922eea2b6c"
+      "bytes": 2824,
+      "sha256": "66e3f3d73069ce35ef1764648b898f56eedfd9f347859af6120c05961e3729d9"
     },
     {
       "path": "tests/integration/availability/test_audit0073b_prediction_graph_freeze.py",
       "bytes": 3585,
       "sha256": "705da50d8e0242defcd7e727291b8328c2ef55537c94a740dc7864f1445839cc"
+    },
+    {
+      "path": "tests/integration/availability/test_audit0073c_exact_lookup_visibility.py",
+      "bytes": 3998,
+      "sha256": "eb0481e0d5f408be1114470d01d534f867ae416be9351d554ef1e9da7880ee01"
+    },
+    {
+      "path": "tests/integration/availability/test_audit0073c_final_output_truthfulness.py",
+      "bytes": 7163,
+      "sha256": "e5d68983eefa56765524a6f0b30aa52b905266340ebd19fd0f23b50db4a81045"
     },
     {
       "path": "tests/integration/availability/test_min007f_asof.py",
@@ -2285,8 +2295,8 @@
     },
     {
       "path": "tests/integration/migrations/test_migrations.py",
-      "bytes": 93972,
-      "sha256": "ca7e8cec2c4d60bc4997554f2562648e72dde912c226a807202653f463375589"
+      "bytes": 94235,
+      "sha256": "4afdae4a3065075a9a77d3c3589ed66fce290a9b4b28b6b4ad37cf8fb57e7398"
     },
     {
       "path": "tests/integration/package/test_import_side_effects.py",
@@ -2522,6 +2532,11 @@
       "path": "tests/unit/availability/test_audit0073b_finalization_provenance.py",
       "bytes": 2030,
       "sha256": "dd73bc19c483d2ee6f6662dc3d7b8ae4e167d01af925e4fdf888021450a27daf"
+    },
+    {
+      "path": "tests/unit/availability/test_audit0073c_final_output_lookup.py",
+      "bytes": 1185,
+      "sha256": "c26b6646ba0edeb90021ac9276d6c651966a61a64e0f5059a31fd1f49499ddaf"
     },
     {
       "path": "tests/unit/availability/test_dataset.py",

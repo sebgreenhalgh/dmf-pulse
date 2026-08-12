@@ -1,5 +1,22 @@
 # DMF Pulse execution plans
 
+## MIN-007R5F4 - final-output truthfulness and complete-only exact lookup
+
+- Ticket/stage: `MIN-007R5F4`, A7; required parent `3867877d4c2d1c3febcdf4b456703e3356d9a8af`.
+- Scope: close only the two AUDIT-007-3C P1s: derive and validate final-output
+  identity from durable rows at the database boundary, and hide committed core
+  drafts from every exact lookup.
+- Constraints: harden unmerged migration `20260807_0006` without a new revision;
+  preserve R5F1/R5F2/R5G/R5F3 freeze, numeric, provenance, and frozen-hash
+  protections; no CLI/model/provider/network/MIN-007H work.
+
+### MIN-007R5F4 checkpoints
+
+- [x] Add database finalization reconstruction and direct-SQL truthfulness probes.
+- [x] Require complete core state for exact/public prediction reads and cover aliases.
+- [x] Run all 23 literal acceptance commands, record evidence, remove PostgreSQL,
+  commit once, and verify a clean worktree.
+
 ## MIN-007R5F3 - freeze published graphs and bind evaluation provenance
 
 - Ticket/stage: `MIN-007R5F3`, A7; required parent `f1d8a4a38b073e6ee4a259ee801a9273e5e207ce`.

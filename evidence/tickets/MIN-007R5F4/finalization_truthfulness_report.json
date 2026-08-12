@@ -1,0 +1,51 @@
+{
+  "ticket_id": "MIN-007R5F4",
+  "status": "PASS",
+  "boundary": "football.validate_final_output_complete on DRAFT to COMPLETE",
+  "derivation": {
+    "authoritative_inputs": [
+      "prediction_run fixture_id, team_id, as_of, model_version_sha256 and dataset_version_sha256",
+      "role_marginal player_id and position",
+      "player_minutes_projection durable rows",
+      "lineup_scenario ordered scenario hashes",
+      "prediction_run core_output_payload"
+    ],
+    "assertion_only_fields": [
+      "final_output_payload",
+      "final_output_count",
+      "player projection_sha256",
+      "result_sha256",
+      "final_output_semantic_sha256",
+      "output_semantic_sha256"
+    ]
+  },
+  "direct_sql_probes": {
+    "wrong_position_vs_marginal_rejected": "FINAL_OUTPUT_ROW_MISMATCH",
+    "payload_vs_persisted_expected_minutes_rejected": "FINAL_OUTPUT_PLAYER_PAYLOAD_MISMATCH",
+    "wrong_player_hash_rejected": "FINAL_OUTPUT_PLAYER_PAYLOAD_MISMATCH",
+    "wrong_team_result_hash_rejected": "FINAL_OUTPUT_RESULT_HASH_MISMATCH",
+    "wrong_output_semantic_hash_rejected": "FINAL_OUTPUT_OUTPUT_HASH_MISMATCH",
+    "valid_actual_finalization_accepted": true,
+    "final_identity_recomputed_from_actual_rows": true,
+    "direct_sql_complete_transition_validated": true
+  },
+  "post_complete_freeze": {
+    "insert_rejected": true,
+    "update_rejected": true,
+    "delete_rejected": true,
+    "regression_test": "tests/integration/availability/test_audit0073b_final_output_freeze.py"
+  },
+  "verification": {
+    "test": "tests/integration/availability/test_audit0073c_final_output_truthfulness.py",
+    "result": "1 passed"
+  },
+  "frozen_identities_unchanged": {
+    "F_dataset": "5c76f5a41d9926dc0e4f0e15e2100c103d85768893c4ad8b52fe69a44d365da1",
+    "F_model": "724eecb596b09074b4014d82ec8d0831c4580751af1ad8cb3991f4704f553e9c",
+    "F_prediction": "5662bdec99552813e54453726c9ffdb30ef23365dab8548e78132a2c9d397ed6",
+    "G_artifact": "80d1aa4cfd4a80eb7f7b291899fd9cf6173b017e308ea3b41d450a7bc87e2aeb",
+    "G_evaluation": "f2d075a9497331b73bf896be4610b684f8a3ed41eb17248a27284c79556cd748",
+    "G_registry": "895a7e2a870192ba3ab395d459235f5ed374a562acd5628121de30f8e8ea4c72",
+    "probability_schema": "6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b"
+  }
+}

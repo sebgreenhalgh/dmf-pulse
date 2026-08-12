@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
 
 import pytest
 
+from dmf_pulse.availability.projection import canonical_sha256
 from dmf_pulse.availability.registry import (
     dataset_version_semantic_sha256,
     model_version_semantic_sha256,
@@ -110,6 +112,62 @@ def bundle_parts() -> dict[str, list[dict[str, object]]]:
         "minute_pmfs": minute_pmfs,
         "scenarios": [{"scenario_index": 0, "scenario_sha256": "a" * 64, "members": members}],
     }
+
+
+def build_final_projection(
+    prediction: dict[str, object],
+    dataset: dict[str, object],
+    parts: dict[str, list[dict[str, object]]],
+) -> dict[str, object]:
+    """Build deterministic public final output matching the durable test graph."""
+
+    pmf = ["1.000000000000"] + ["0.000000000000"] * 90
+    players: list[dict[str, object]] = []
+    for row in sorted(parts["role_marginals"], key=lambda item: str(item["player_id"])):
+        starter = str(row["player_id"]).startswith("starter")
+        player: dict[str, object] = {
+            "player_id": str(row["player_id"]),
+            "position": str(row["position"]),
+            "p_start": "0.800000000000" if starter else "0.100000000000",
+            "p_bench": "0.100000000000" if starter else "0.800000000000",
+            "p_out_of_squad": "0.100000000000",
+            "p_appearance": "0.000000000000",
+            "p_zero_minutes": "1.000000000000",
+            "p_60_plus": "0.000000000000",
+            "expected_minutes": "0.000000",
+            "minute_pmf": pmf,
+            "confidence_grade": "B",
+            "confidence_reasons": ["BASELINE_MODEL_CAP_B"],
+        }
+        player["projection_sha256"] = canonical_sha256(player)
+        players.append(player)
+    body: dict[str, object] = {
+        "schema_version": "team-minutes-projection-v1",
+        "fixture_id": prediction["fixture_id"],
+        "team_id": prediction["team_id"],
+        "as_of": prediction["as_of"],
+        "model_family": "INTEGRATION",
+        "dataset_sha256": dataset["dataset_sha256"],
+        "model_artifact_sha256": "c" * 64,
+        "sample_count": prediction["sample_count"],
+        "bench_size": prediction["bench_size"],
+        "bench_goalkeeper_slots": prediction["bench_goalkeeper_slots"],
+        "players": players,
+        "scenario_set_sha256": hashlib.sha256(("a" * 64).encode("utf-8")).hexdigest(),
+        "sum_p_start": "9.700000000000",
+        "sum_p_bench": "8.300000000000",
+        "sum_p_out": "2.000000000000",
+    }
+    return {**body, "result_sha256": canonical_sha256(body)}
+
+
+@pytest.fixture
+def final_projection(
+    prediction: dict[str, object],
+    dataset: dict[str, object],
+    bundle_parts: dict[str, list[dict[str, object]]],
+) -> dict[str, object]:
+    return build_final_projection(prediction, dataset, bundle_parts)
 
 
 @pytest.fixture

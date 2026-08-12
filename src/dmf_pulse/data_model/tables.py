@@ -3721,6 +3721,7 @@ player_minutes_projection = Table(
         nullable=False,
     ),
     Column("player_id", String(160), nullable=False),
+    Column("position", String(8), nullable=False),
     Column("p_start", Numeric, nullable=False),
     Column("p_bench", Numeric, nullable=False),
     Column("p_out", Numeric, nullable=False),
@@ -3728,6 +3729,8 @@ player_minutes_projection = Table(
     Column("p_zero", Numeric, nullable=False),
     Column("p_60_plus", Numeric, nullable=False),
     Column("expected_minutes", Numeric, nullable=False),
+    Column("confidence_grade", String(1), nullable=False),
+    Column("confidence_reasons", ARRAY(String(64)), nullable=False),
     Column(
         "created_at",
         DateTime(timezone=True),
@@ -3738,6 +3741,17 @@ player_minutes_projection = Table(
     CheckConstraint(
         "football.validate_player_minutes_projection(p_start, p_bench, p_out, minute_pmf, p_zero, p_60_plus, expected_minutes)",
         name="ck_player_minutes_projection_consistent",
+    ),
+    CheckConstraint(
+        "position IN ('GK','DEF','MID','FWD')", name="ck_player_minutes_projection_position"
+    ),
+    CheckConstraint(
+        "confidence_grade IN ('A','B','C','D')",
+        name="ck_player_minutes_projection_confidence_grade",
+    ),
+    CheckConstraint(
+        "football.validate_minutes_confidence_reasons(confidence_reasons)",
+        name="ck_player_minutes_projection_confidence_reasons",
     ),
     schema="football",
 )
