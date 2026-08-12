@@ -1505,18 +1505,18 @@
     },
     {
       "path": "src/dmf_pulse/availability/decimal_integrity.py",
-      "bytes": 3154,
-      "sha256": "4386bd60ce03ba6bc346610037d2810fab0fc4d597b0f6336a07575dabe3ee7c"
+      "bytes": 3109,
+      "sha256": "0b0df0f0b25887e442abc4522293886371e5b3db1dd91bc6f4742743522d93c0"
     },
     {
       "path": "src/dmf_pulse/availability/lineup.py",
-      "bytes": 29257,
-      "sha256": "287888c8be5defd6f7d23e0ec303dfc470ec8b082962460b66315d5267910055"
+      "bytes": 29206,
+      "sha256": "d91bcd5b1aae4e7122a9e2496b6c57be257cc312b20e602077c76c490e6b7b85"
     },
     {
       "path": "src/dmf_pulse/availability/minutes.py",
-      "bytes": 30445,
-      "sha256": "71e8bc084adcb461e7f86cbb1067a88a79bdaf219374c8a5c7893d46385c0436"
+      "bytes": 30391,
+      "sha256": "b8e0d2568cae0a8b7959ca1c034424d5f69f17c0a960031f999d39d47857a4c9"
     },
     {
       "path": "src/dmf_pulse/availability/models.py",
@@ -2562,6 +2562,11 @@
       "path": "tests/unit/availability/test_lineup.py",
       "bytes": 4653,
       "sha256": "8f88dd6638fabfd44de3099f323c600677e00592da8f5c2fb3fc1d6c02bcb634"
+    },
+    {
+      "path": "tests/unit/availability/test_min007_decimal_guard_coverage.py",
+      "bytes": 3866,
+      "sha256": "a5efe6b806903a37a5b77e5f6a31fc06b14b9d4086569775c500750b2a895040"
     },
     {
       "path": "tests/unit/availability/test_min007_remaining_math_core_coverage.py",

@@ -100,7 +100,7 @@ def _decimal(value: object, *, label: str) -> Decimal:
     if isinstance(value, (str, int)):
         try:
             return Decimal(value)
-        except Exception as exc:  # pragma: no cover - Decimal gives varied exceptions
+        except Exception as exc:
             raise MinuteModelValidationError(f"{label} must be a decimal") from exc
     raise MinuteModelValidationError(f"{label} must be a decimal")
 

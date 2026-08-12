@@ -379,7 +379,7 @@ def _decimal(value: object, *, label: str) -> Decimal:
     elif isinstance(value, (str, int)):
         try:
             result = Decimal(value)
-        except Exception as exc:  # pragma: no cover - Decimal exception types vary
+        except Exception as exc:
             raise LineupModelValidationError(f"{label} is not a Decimal") from exc
     else:
         raise LineupModelValidationError(f"{label} is not a Decimal")

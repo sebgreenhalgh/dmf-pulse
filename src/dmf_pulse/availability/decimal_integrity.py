@@ -12,7 +12,7 @@ def _parts(value: Decimal) -> tuple[int, int]:
     if not isinstance(value, Decimal) or not value.is_finite():
         raise ValueError("exact Decimal arithmetic requires finite Decimal values")
     sign, digits, exponent = value.as_tuple()
-    if not isinstance(exponent, int):  # pragma: no cover - guarded by is_finite()
+    if not isinstance(exponent, int):
         raise ValueError("exact Decimal arithmetic requires finite Decimal values")
     coefficient = int("".join(str(digit) for digit in digits) or "0")
     return (-coefficient if sign else coefficient), exponent
