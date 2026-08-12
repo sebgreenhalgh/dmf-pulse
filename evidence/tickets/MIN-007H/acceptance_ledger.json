@@ -155,7 +155,7 @@
                     {
                         "number":  31,
                         "command":  "git status --short",
-                        "status":  "PENDING"
+                        "status":  "PASS"
                     }
                 ]
 }
