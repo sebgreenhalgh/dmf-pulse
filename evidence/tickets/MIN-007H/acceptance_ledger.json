@@ -145,12 +145,12 @@
                     {
                         "number":  29,
                         "command":  "uv run python evidence/tickets/MIN-007H/build_final_review_pack.py",
-                        "status":  "PENDING"
+                        "status":  "PASS"
                     },
                     {
                         "number":  30,
                         "command":  "uv run python evidence/tickets/MIN-007H/validate_final_review_pack.py",
-                        "status":  "PENDING"
+                        "status":  "PASS"
                     },
                     {
                         "number":  31,
@@ -159,4 +159,3 @@
                     }
                 ]
 }
-
