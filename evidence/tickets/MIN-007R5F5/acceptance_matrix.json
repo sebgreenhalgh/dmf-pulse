@@ -1,0 +1,34 @@
+{
+  "ticket_id": "MIN-007R5F5",
+  "required_parent": "94b561f427e18e6200acb892d44b99e1038a70eb",
+  "branch": "stage/A7/MIN-007-basic-minutes-model",
+  "alembic_head": "20260807_0006",
+  "status": "PASS",
+  "completed_commands": [
+    {"ordinal": 1, "status": "PASS", "result": "git diff --check"},
+    {"ordinal": 2, "status": "PASS", "result": "ruff format --check"},
+    {"ordinal": 3, "status": "PASS", "result": "ruff check"},
+    {"ordinal": 4, "status": "PASS", "result": "mypy src/dmf_pulse/availability"},
+    {"ordinal": 5, "status": "PASS", "result": "constraint-scope unit test: 1 passed"},
+    {"ordinal": 6, "status": "PASS", "result": "Docker PostgreSQL healthy"},
+    {"ordinal": 7, "status": "PASS", "result": "Alembic upgraded to 20260807_0006"},
+    {"ordinal": 8, "status": "PASS", "result": "constraint-scope integration: 1 passed"},
+    {"ordinal": 9, "status": "PASS", "result": "truthfulness and lookup: 2 passed"},
+    {"ordinal": 10, "status": "PASS", "result": "R5F3 regressions: 4 passed"},
+    {"ordinal": 11, "status": "PASS", "result": "R5F1 regressions: 11 passed"},
+    {"ordinal": 12, "status": "PASS", "result": "MIN-007F regressions: 5 passed"},
+    {"ordinal": 13, "status": "PASS", "result": "migration suite: 63 passed"},
+    {"ordinal": 14, "status": "PASS", "result": "migration matrix PASS"},
+    {"ordinal": 15, "status": "PASS", "result": "availability unit/property/golden: 149 passed"},
+    {"ordinal": 16, "status": "PASS", "result": "availability/markets contracts: 79 passed"},
+    {"ordinal": 17, "status": "PASS", "result": "repository validation: 0 errors"},
+    {"ordinal": 18, "status": "PASS", "result": "secret scan: 0 findings"},
+    {"ordinal": 19, "status": "PASS", "result": "20260807_0006 is sole Alembic head"},
+    {"ordinal": 20, "status": "PASS", "result": "Alembic check: no new upgrade operations"},
+    {"ordinal": 21, "status": "PASS", "result": "Docker teardown"},
+    {"ordinal": 22, "status": "PASS", "result": "final git diff --check"}
+  ],
+  "notes": [
+    "The initial repository validation reported expected manifest drift from intentional edits; MIN-007F current_manifest.json was regenerated and the command was rerun successfully."
+  ]
+}

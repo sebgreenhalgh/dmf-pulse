@@ -1,0 +1,14 @@
+{
+  "ticket_id": "MIN-007R5F5",
+  "status": "PASS",
+  "forbidden_statement_absent": true,
+  "final_trigger_immediate_feedback": true,
+  "final_trigger_restored_deferred": true,
+  "unrelated_deferred_constraints_untouched": true,
+  "source": "src/dmf_pulse/availability/persistence.py",
+  "final_trigger": "football.trg_min007f_final_output_complete",
+  "scenario_triggers": [
+    "trg_min007f_scenario_parent",
+    "trg_min007f_scenario_member"
+  ]
+}

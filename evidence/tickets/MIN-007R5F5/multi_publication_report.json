@@ -1,0 +1,17 @@
+{
+  "ticket_id": "MIN-007R5F5",
+  "status": "PASS",
+  "outer_transaction_publications": 2,
+  "publication_a": "COMPLETE",
+  "publication_b": "COMPLETE",
+  "b_deferred_scenario_member_intermediate_state": "PASS",
+  "commit": "PASS",
+  "post_commit": {
+    "a_core_state": "COMPLETE",
+    "a_final_output_state": "COMPLETE",
+    "b_core_state": "COMPLETE",
+    "b_final_output_state": "COMPLETE",
+    "final_output_count": 20
+  },
+  "test": "tests/integration/availability/test_audit0073d_constraint_scope.py"
+}

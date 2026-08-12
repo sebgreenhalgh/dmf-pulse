@@ -1142,7 +1142,14 @@ def register_final_player_projections(
                 output_semantic_sha256=combined_hash,
             )
         )
-        session.execute(text("SET CONSTRAINTS ALL IMMEDIATE"))
+        # Flush only the final-output validator for immediate feedback.  The
+        # scenario/core graph validators are intentionally deferred until the
+        # caller's transaction boundary; changing all constraint modes here
+        # leaks into unrelated publications in that transaction.
+        session.execute(
+            text("SET CONSTRAINTS football.trg_min007f_final_output_complete IMMEDIATE")
+        )
+        session.execute(text("SET CONSTRAINTS football.trg_min007f_final_output_complete DEFERRED"))
     except DataModelError:
         raise
     except DBAPIError as exc:

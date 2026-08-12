@@ -428,3 +428,11 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - Bundle the single public-domain IANA tzdata 2025b `Europe/London` TZif payload with an enforced SHA-256 so stock Windows Python can validate the sanctioned default without an unapproved runtime dependency.
 - Define `codex_result.review_pack.sha256` as the detached digest of stable primary review files 04-05 and 07-19; publish the separately validated final archive SHA-256 externally because an archive cannot contain its own digest.
 - Read-only self-review found no authority/scope P0 issue and drove fixes for credential-shape leakage, CPU fallback coercion, fail-open scan coverage, PEM detection, missing-config doctor false health, Windows timezone portability, branch-metric reporting, clean-clone package provenance, evidence semantic checks, and atomic review placement.
+## MIN-007R5F5 - final-output constraint scope remediation
+
+- Ticket/stage: `MIN-007R5F5`, A7; required parent `94b561f427e18e6200acb892d44b99e1038a70eb`.
+- Scope: remove transaction-wide `SET CONSTRAINTS ALL IMMEDIATE` from final publication.
+- [x] Read and validate the remediation pack; verified branch, clean baseline, and Alembic head.
+- [x] Scoped immediate validation to `trg_min007f_final_output_complete`, restoring it to deferred.
+- [x] Added unit guard and one-outer-transaction A/B publication regression.
+- [x] Ran all 22 acceptance commands; generated evidence and review archive.

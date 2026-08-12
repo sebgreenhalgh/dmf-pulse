@@ -125,8 +125,8 @@
     },
     {
       "path": "PLANS.md",
-      "bytes": 44802,
-      "sha256": "fe248dc681f6b7d96cdc66ffe406374375a8af739de9518f45042023b156d71e"
+      "bytes": 45397,
+      "sha256": "9783aa05627fc74b110b1615fd981ac38729c9dab64c5e7a5ffce3dd21ca9bc4"
     },
     {
       "path": "README.md",
@@ -1525,8 +1525,8 @@
     },
     {
       "path": "src/dmf_pulse/availability/persistence.py",
-      "bytes": 56232,
-      "sha256": "efd92f5f768bf0979fa974021c086f395b314901fa472dabfcb78bc9441b68d8"
+      "bytes": 56690,
+      "sha256": "0ed60e85d2565366bf6e13df91aaa748f6ab0fe82a1d63f31bee2e4c44763eb3"
     },
     {
       "path": "src/dmf_pulse/availability/pipeline.py",
@@ -2179,6 +2179,11 @@
       "sha256": "e5d68983eefa56765524a6f0b30aa52b905266340ebd19fd0f23b50db4a81045"
     },
     {
+      "path": "tests/integration/availability/test_audit0073d_constraint_scope.py",
+      "bytes": 2818,
+      "sha256": "705a13d1dda2ab3d475bcde58f3ccb8a7fca1e7614131feef2f132feb116ba23"
+    },
+    {
       "path": "tests/integration/availability/test_min007f_asof.py",
       "bytes": 2226,
       "sha256": "45adefeaa72096173f08b8105c0412beafaff71fc38c71bb8b70d0e04bf08b11"
@@ -2537,6 +2542,11 @@
       "path": "tests/unit/availability/test_audit0073c_final_output_lookup.py",
       "bytes": 1185,
       "sha256": "c26b6646ba0edeb90021ac9276d6c651966a61a64e0f5059a31fd1f49499ddaf"
+    },
+    {
+      "path": "tests/unit/availability/test_audit0073d_constraint_scope.py",
+      "bytes": 484,
+      "sha256": "1b134a0f490c1ff1ed4feb64e2fe4c0b218b03aca5239e634e791d1af319bba4"
     },
     {
       "path": "tests/unit/availability/test_dataset.py",
