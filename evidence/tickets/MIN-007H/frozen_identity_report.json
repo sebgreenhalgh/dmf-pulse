@@ -1,11 +1,143 @@
 {
-  "head": "20260807_0006",
   "identities": {
-    "B_dataset": "93c32a0f17de60a7cf37d6202f8d415b404856d8c1fc5dd45d2820b356d8ae6f",
-    "F_prediction": "06c21bcd7458b08fb5bd16e441c9c10866168e88151893d123d800a8ae2409a9",
-    "G_evaluation": "50da09c3327d616ae1e2f16ba711358d85131056689d6b624fd53aa7b188d417",
-    "G_registry": "3feb7b3dcd00518e60fdc2c703d5a5e4071261d25fc8652f006408b79c83a513"
+    "B_dataset": {
+      "derived": true,
+      "expected": "1466a5dcc9104a2d26f9c6b286d2717b6460423503026f05a58d3a26de040be3",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "1466a5dcc9104a2d26f9c6b286d2717b6460423503026f05a58d3a26de040be3",
+      "source_paths": [
+        "fixtures/availability/MIN-007/training_dataset.json"
+      ],
+      "status": "PASS"
+    },
+    "C_role": {
+      "derived": true,
+      "expected": "baf70ee76b8a51f4cf3bfda1a1cc33d6ba3f6c304617c8bc42aefdee2b2a1c96",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "baf70ee76b8a51f4cf3bfda1a1cc33d6ba3f6c304617c8bc42aefdee2b2a1c96",
+      "source_paths": [
+        "fixtures/availability/MIN-007/training_dataset.json",
+        "fixtures/availability/MIN-007G/minutes_baseline_policy.json"
+      ],
+      "status": "PASS"
+    },
+    "D_minutes": {
+      "derived": true,
+      "expected": "8e0b410e37d33127dc26937f9fe7c6ff60867b4f60f0f7a87679f951c5f7e422",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "8e0b410e37d33127dc26937f9fe7c6ff60867b4f60f0f7a87679f951c5f7e422",
+      "source_paths": [
+        "fixtures/availability/MIN-007/training_dataset.json",
+        "fixtures/availability/MIN-007G/minutes_baseline_policy.json"
+      ],
+      "status": "PASS"
+    },
+    "E_stable_scenario": {
+      "derived": true,
+      "expected": "60afa72dbc0340615e2786783ec56186ce1a2e11a497aa4f872a9b0890bc10ee",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "60afa72dbc0340615e2786783ec56186ce1a2e11a497aa4f872a9b0890bc10ee",
+      "source_paths": [
+        "fixtures/availability/MIN-007/canonical_history.json",
+        "fixtures/availability/MIN-007G/contexts/stable_xi.json"
+      ],
+      "status": "PASS"
+    },
+    "F_dataset_registry": {
+      "derived": true,
+      "expected": "5c76f5a41d9926dc0e4f0e15e2100c103d85768893c4ad8b52fe69a44d365da1",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "5c76f5a41d9926dc0e4f0e15e2100c103d85768893c4ad8b52fe69a44d365da1",
+      "source_paths": [
+        "fixtures/availability/MIN-007/training_dataset.json"
+      ],
+      "status": "PASS"
+    },
+    "F_model_registry": {
+      "derived": true,
+      "expected": "724eecb596b09074b4014d82ec8d0831c4580751af1ad8cb3991f4704f553e9c",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "724eecb596b09074b4014d82ec8d0831c4580751af1ad8cb3991f4704f553e9c",
+      "source_paths": [
+        "fixtures/availability/MIN-007/training_dataset.json"
+      ],
+      "status": "PASS"
+    },
+    "F_prediction_signature": {
+      "derived": true,
+      "expected": "5662bdec99552813e54453726c9ffdb30ef23365dab8548e78132a2c9d397ed6",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "5662bdec99552813e54453726c9ffdb30ef23365dab8548e78132a2c9d397ed6",
+      "source_paths": [
+        "fixtures/availability/MIN-007/training_dataset.json"
+      ],
+      "status": "PASS"
+    },
+    "G_evaluation": {
+      "derived": true,
+      "expected": "f2d075a9497331b73bf896be4610b684f8a3ed41eb17248a27284c79556cd748",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "f2d075a9497331b73bf896be4610b684f8a3ed41eb17248a27284c79556cd748",
+      "source_paths": [
+        "fixtures/availability/MIN-007G/evaluation_dataset.json",
+        "src/dmf_pulse/availability/pipeline.py"
+      ],
+      "status": "PASS"
+    },
+    "G_model_artifact": {
+      "derived": true,
+      "expected": "80d1aa4cfd4a80eb7f7b291899fd9cf6173b017e308ea3b41d450a7bc87e2aeb",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "80d1aa4cfd4a80eb7f7b291899fd9cf6173b017e308ea3b41d450a7bc87e2aeb",
+      "source_paths": [
+        "fixtures/availability/MIN-007/training_dataset.json"
+      ],
+      "status": "PASS"
+    },
+    "G_prediction_registry": {
+      "derived": true,
+      "expected": "895a7e2a870192ba3ab395d459235f5ed374a562acd5628121de30f8e8ea4c72",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "895a7e2a870192ba3ab395d459235f5ed374a562acd5628121de30f8e8ea4c72",
+      "source_paths": [
+        "fixtures/availability/MIN-007G/prediction_registry.json"
+      ],
+      "status": "PASS"
+    },
+    "current_probability_schema": {
+      "derived": true,
+      "expected": "6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b",
+      "source_paths": [
+        "public_contracts/probability.schema.json"
+      ],
+      "status": "PASS"
+    },
+    "historical_nrm_probability_schema": {
+      "derived": true,
+      "expected": "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
+      "source_paths": [
+        "evidence/tickets/NRM-006/frozen_public_contracts/probability.schema.json"
+      ],
+      "status": "PASS"
+    },
+    "mapping_plan": {
+      "derived": true,
+      "expected": "490585bed1bce6f9d904ddb12b6df6b6a4d04caca91fb1160af53e83578a3550",
+      "method": "production canonical semantic function or SHA-256 over the specified fixture bytes",
+      "observed": "490585bed1bce6f9d904ddb12b6df6b6a4d04caca91fb1160af53e83578a3550",
+      "source_paths": [
+        "fixtures/availability/MIN-007/external_mapping_plan.json"
+      ],
+      "status": "PASS"
+    }
   },
-  "note": "Frozen identities checked against accepted MIN-007F evidence.",
+  "mutation_self_tests": {
+    "runtime_metadata_is_neutral": true,
+    "semantic_leaf_changes_identity": true
+  },
   "status": "PASS"
 }

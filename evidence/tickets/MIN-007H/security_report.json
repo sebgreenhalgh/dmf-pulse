@@ -1,7 +1,19 @@
 {
-  "network_requests": 0,
-  "no_live_provider_requests": true,
-  "portable_paths": "PASS",
-  "secret_scan": "PASS",
+  "network": {
+    "guarded": true,
+    "non_loopback_attempts": [],
+    "non_loopback_count": 0,
+    "result_status": "PROJECTED",
+    "scope": "frozen TEST/REPLAY 701 production smoke"
+  },
+  "portable_source_scan": {
+    "files_scanned": 293,
+    "violations": {}
+  },
+  "scope": "Only the measured frozen production smoke is covered; no claim is made for unmeasured providers or full-suite network behavior.",
+  "secret_scan": {
+    "exit_code": 0,
+    "stdout_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+  },
   "status": "PASS"
 }

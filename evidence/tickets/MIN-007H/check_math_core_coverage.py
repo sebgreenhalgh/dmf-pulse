@@ -1,33 +1,43 @@
-"""Validate final full-suite coverage against the exhaustive core manifest."""
+"""Independently compare full-suite coverage to the durable core manifest."""
 
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE = ROOT / "evidence/tickets/MIN-007H"
+EXCLUSION = re.compile(
+    r"pragma\s*:\s*no\s*(?:cover|branch)|coverage\s*:\s*(?:ignore|exclude)|no[-_ ]cover", re.I
+)
 
 
-def main() -> None:
-    manifest = json.loads((EVIDENCE / "math_core_manifest.json").read_text())
-    coverage = json.loads((EVIDENCE / "coverage.json").read_text())
-    if manifest.get("status") != "PASS":
-        raise SystemExit("manifest is not PASS")
+def main() -> int:
+    manifest = json.loads((EVIDENCE / "math_core_manifest.json").read_text(encoding="utf-8"))
+    coverage = json.loads((EVIDENCE / "coverage.json").read_text(encoding="utf-8"))
+    if manifest.get("status") != "PASS" or len(manifest.get("modules", {})) != 6:
+        raise SystemExit("incomplete manifest")
     for path, item in manifest["modules"].items():
-        found = [v for p, v in coverage["files"].items() if p.replace("\\", "/").endswith(path)]
-        if len(found) != 1:
-            raise SystemExit(f"missing {path}")
-        current = found[0]
+        source = ROOT / path
+        if EXCLUSION.search(source.read_text(encoding="utf-8")):
+            raise SystemExit(f"source exclusion: {path}")
+        found = [v for key, v in coverage["files"].items() if key.replace("\\", "/").endswith(path)]
+        if len(found) != 1 or found[0].get("excluded_lines", []) != []:
+            raise SystemExit(f"coverage exclusion: {path}")
         if (
-            current["missing_lines"] != item["raw_missing_lines"]
-            or current["missing_branches"] != item["raw_missing_branches"]
+            found[0]["missing_lines"] != item["raw_missing_lines"]
+            or found[0]["missing_branches"] != item["raw_missing_branches"]
         ):
-            raise SystemExit(f"full-suite gap drift: {path}")
-    print(
-        "PASS: full-suite exhaustive reachable math-core coverage is 100% line and branch covered"
-    )
+            raise SystemExit(f"coverage drift: {path}")
+        if (
+            item["reachable"]["covered_lines"] != item["reachable"]["num_statements"]
+            or item["reachable"]["covered_branches"] != item["reachable"]["num_branches"]
+        ):
+            raise SystemExit(f"reachable gap: {path}")
+    print("PASS: full-suite raw/reachable math-core consistency")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

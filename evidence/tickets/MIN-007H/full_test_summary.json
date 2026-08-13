@@ -1,1 +1,22 @@
-{"status":"PASS","passed":1385,"failed":0,"skipped":0,"duration_seconds":844.52,"coverage_percent":92.54,"branch_coverage_percent":89.40,"exit_code":0,"output":"full_test_output.txt"}
+{
+  "coverage": {
+    "covered_branches": 3901,
+    "covered_lines": 13150,
+    "excluded_lines": 64,
+    "missing_branches": 461,
+    "missing_lines": 909,
+    "num_branches": 4362,
+    "num_partial_branches": 387,
+    "num_statements": 14059,
+    "percent_branches_covered": 89.43145346171481,
+    "percent_branches_covered_display": "89",
+    "percent_covered": 92.56283589381684,
+    "percent_covered_display": "93",
+    "percent_statements_covered": 93.53439078170567,
+    "percent_statements_covered_display": "94"
+  },
+  "full_suite_gate": "full_suite",
+  "status": "PASS",
+  "tests_passed": 1388,
+  "tests_skipped": 0
+}

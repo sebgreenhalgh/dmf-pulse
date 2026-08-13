@@ -1,9 +1,6 @@
-# MIN-007H v1.4 assurance
+# MIN-007H2 recovery assurance
 
-Parent: `1599e8fae8156e19da078cba0dffb9afb47ddc49`; stage base:
-`253baf3f19661a5704bb1fad2f7ac60e1db288eb`.
-
-This directory contains assurance evidence only. The focused inventory uses
-`--cov-fail-under=0`; the repository suite retains the configured 90% gate.
-The six pure mathematical modules are inventoried exhaustively with exact
-provisional unreachable-path waivers and independent-review-required proofs.
+This directory contains durable assurance evidence rebuilt from R6 commit
+`2277e1d10bb4bf46ea244d847b30b79cf90fe895`. The ledger covers pre-commit gates
+only. Post-commit Git range material is generated directly by the review-pack
+builder and is not committed here.

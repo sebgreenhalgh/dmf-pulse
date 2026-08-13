@@ -1,1 +1,11 @@
-{"status":"PASS","postgres_version":"18.4","alembic_head":"20260807_0006","matrix":"PASS","integration_tests":{"passed":112,"skipped":0}}
+{
+  "alembic_head": "20260807_0006",
+  "gates": [
+    "alembic_upgrade",
+    "integrations",
+    "migration_matrix",
+    "alembic_check",
+    "alembic_heads"
+  ],
+  "status": "PASS"
+}
