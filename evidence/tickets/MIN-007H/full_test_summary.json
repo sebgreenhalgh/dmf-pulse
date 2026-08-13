@@ -1,22 +1,22 @@
 {
   "coverage": {
-    "covered_branches": 3901,
-    "covered_lines": 13150,
+    "covered_branches": 3903,
+    "covered_lines": 13158,
     "excluded_lines": 64,
     "missing_branches": 461,
-    "missing_lines": 909,
-    "num_branches": 4362,
+    "missing_lines": 911,
+    "num_branches": 4364,
     "num_partial_branches": 387,
-    "num_statements": 14059,
-    "percent_branches_covered": 89.43145346171481,
+    "num_statements": 14069,
+    "percent_branches_covered": 89.43629697525206,
     "percent_branches_covered_display": "89",
-    "percent_covered": 92.56283589381684,
+    "percent_covered": 92.55682742906744,
     "percent_covered_display": "93",
-    "percent_statements_covered": 93.53439078170567,
+    "percent_statements_covered": 93.52477077262066,
     "percent_statements_covered_display": "94"
   },
   "full_suite_gate": "full_suite",
   "status": "PASS",
-  "tests_passed": 1388,
+  "tests_passed": 1405,
   "tests_skipped": 0
 }

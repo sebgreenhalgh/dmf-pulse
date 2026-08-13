@@ -41,7 +41,20 @@ def main() -> int:
         if archive.testzip() is not None or tuple(archive.namelist()) != NAMES:
             raise SystemExit("archive roots/CRC mismatch")
         manifest = json.loads(archive.read("17_REVIEW_MANIFEST.json"))
-        if manifest.get("root_file_count") != 17 or manifest.get("roots") != list(NAMES):
+        final_sha = (
+            subprocess.check_output(
+                ["git", "rev-parse", f"{args.final_commit}^{{commit}}"], cwd=ROOT
+            )
+            .decode()
+            .strip()
+        )
+        if (
+            manifest.get("root_file_count") != 17
+            or manifest.get("roots") != list(NAMES)
+            or manifest.get("stage_base") != BASE
+            or manifest.get("final_commit") != final_sha
+            or set(manifest.get("files", {})) != set(NAMES[:-1])
+        ):
             raise SystemExit("manifest root mismatch")
         for name in NAMES[:-1]:
             data = archive.read(name)
@@ -52,10 +65,17 @@ def main() -> int:
         changed = subprocess.check_output(["git", "diff", "--name-only", revision], cwd=ROOT)
         diffstat = subprocess.check_output(["git", "diff", "--stat", revision], cwd=ROOT)
         patch = subprocess.check_output(["git", "diff", "--binary", revision], cwd=ROOT)
+        git_log = subprocess.check_output(["git", "log", "-12", "--oneline"], cwd=ROOT)
+        changed_count = len([line for line in changed.decode().splitlines() if line])
+        wheel_sha = json.loads(archive.read("09_INSTALLED_WHEEL_REPORT.json"))["sha256"]
         if (
-            archive.read("14_CHANGED_FILES.txt") != changed
+            archive.read("13_GIT_LOG.txt") != git_log
+            or archive.read("14_CHANGED_FILES.txt") != changed
             or archive.read("15_STAGE7_DIFFSTAT.txt") != diffstat
             or archive.read("16_STAGE7.patch") != patch
+            or manifest.get("changed_file_count") != changed_count
+            or manifest.get("patch_sha256") != hashlib.sha256(patch).hexdigest()
+            or manifest.get("wheel_sha256") != wheel_sha
         ):
             raise SystemExit("Git range bytes mismatch")
         subprocess.run(["git", "diff", "--check", revision], cwd=ROOT, check=True)

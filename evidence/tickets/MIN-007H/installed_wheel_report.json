@@ -1,8 +1,112 @@
 {
-  "metadata_contains_name": true,
+  "additional_contexts": {
+    "702": {
+      "exit_code": 0,
+      "status": "PROJECTED"
+    },
+    "709": {
+      "error_code": "INSUFFICIENT_ELIGIBLE_SQUAD",
+      "exit_code": 42,
+      "status": "BLOCKED"
+    }
+  },
+  "isolated_runtime": {
+    "cleaned_up": true,
+    "current_working_directory": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-min007-installed-jxhfz2kw",
+    "entry_point": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-min007-installed-jxhfz2kw\\runtime\\Scripts\\dmf.exe",
+    "import_path": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-min007-installed-jxhfz2kw\\runtime\\Lib\\site-packages\\dmf_pulse\\__init__.py",
+    "interpreter": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-min007-installed-jxhfz2kw\\runtime\\Scripts\\python.exe",
+    "repository_source_on_sys_path": false,
+    "resource_count": 14
+  },
+  "network_guard": null,
+  "public_701": {
+    "as_of": "2026-08-14T17:30:00Z",
+    "command": "dmf availability predict --fixture-external-provider synthetic_availability --fixture-external-id 701 --season-code 2026/27 --team-side HOME --as-of 2026-08-14T17:30:00Z --model-key min007-baseline-v1 --seed MIN-007-COHERENCE-V1 --output json",
+    "entry_point": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-min007-installed-jxhfz2kw\\runtime\\Scripts\\dmf.exe",
+    "exit_code": 0,
+    "fixture_external_id": 701,
+    "fixture_id": "943094f5-1d10-5d96-b88b-d271464f3e48",
+    "mapping_provider": "synthetic_availability",
+    "mapping_resolution_success": true,
+    "projection_present": true,
+    "result_sha256": "04808edd9083f2305396c70acf41bddfc405da4736807f412bce2123c1791cc3",
+    "status": "PROJECTED",
+    "stdout_sha256": "6e7c06e21b3dc98d55a53f466cc174f7451f518dfb9c7521537b611be70079ad",
+    "team_id": "cc1083fa-0c4a-59ab-b6c5-60c04f760782"
+  },
   "python": "3.13.9",
-  "sha256": "257c38cdb5758a1acd113c716451c7fa5654d6edabf0843c2cd7310992bec3f6",
-  "size": 377657,
+  "sha256": "601679d6ee699ce315f9e1990b767865bb564f90e2d72310eede767119682ff2",
+  "size": 424209,
   "status": "PASS",
-  "wheel": "dist/dmf_pulse-0.2.0-py3-none-any.whl"
+  "wheel": "dist/dmf_pulse-0.2.0-py3-none-any.whl",
+  "wheel_integrity": {
+    "metadata_name": "dmf-pulse",
+    "metadata_version": "0.2.0",
+    "record": {
+      "entry_count": 139,
+      "record_path": "dmf_pulse-0.2.0.dist-info/RECORD",
+      "status": "PASS"
+    },
+    "resource_count": 14,
+    "resources": {
+      "MIN-007/canonical_history.json": {
+        "sha256": "23cc133b26beba0455ca50e66cbd4fca5bde8b1b38a4b946b197d53039982096",
+        "size": 256283
+      },
+      "MIN-007/external_mapping_plan.json": {
+        "sha256": "490585bed1bce6f9d904ddb12b6df6b6a4d04caca91fb1160af53e83578a3550",
+        "size": 2913
+      },
+      "MIN-007/training_dataset.json": {
+        "sha256": "4f8624d95517e42cf4403e0356b28f6061f4d6c525f75bfff6d7ad07b9f5a6c5",
+        "size": 199031
+      },
+      "MIN-007G/contexts/goalkeeper.json": {
+        "sha256": "7a1794003b2e0d68cc58b705bf7e65fe302cceadbe681491d6a8f375b543b95a",
+        "size": 513
+      },
+      "MIN-007G/contexts/hard_ineligible.json": {
+        "sha256": "27f192a8f925ac895bb37f1e9ecf245ff478bfa776ce08d6a157e528a9ba8585",
+        "size": 557
+      },
+      "MIN-007G/contexts/high_rotation.json": {
+        "sha256": "a7bbcfb0c31dace93273bb2313ddaaf40dc733ed033d0b29ad9e551bab42c807",
+        "size": 515
+      },
+      "MIN-007G/contexts/insufficient_eligible_squad.json": {
+        "sha256": "609bf472d44622e40cd70e427fdfe1d48527c68468e77bfb485fa2780e500412",
+        "size": 763
+      },
+      "MIN-007G/contexts/new_manager.json": {
+        "sha256": "e6dab44a74dd81d4df85c535c576e9d02bafbc2bab003945fe759438221fc1bd",
+        "size": 514
+      },
+      "MIN-007G/contexts/new_signing.json": {
+        "sha256": "e34e4a192ff7b493152a08d713f945f2a11462117c976e983a47d0b3a9a6bee4",
+        "size": 600
+      },
+      "MIN-007G/contexts/promoted_team.json": {
+        "sha256": "50ca71a90174dcd2bbfb607a2023d0d12baafd433250b0f69bcfd9be55cdd56c",
+        "size": 514
+      },
+      "MIN-007G/contexts/rare_bench_60_plus.json": {
+        "sha256": "5f90b04cac926a0715c0f45488cfac34d095a2db91aaef1feba94b5224c51b8a",
+        "size": 522
+      },
+      "MIN-007G/contexts/stable_xi.json": {
+        "sha256": "88ce923fe3e6a749497595d8c3ec36415dda897e222dbf47510cb8c8b81da174",
+        "size": 513
+      },
+      "MIN-007G/evaluation_dataset.json": {
+        "sha256": "2366aa4e3b0144a6053ee00f64e5f74f92286f2e39acfc1a76b691348914d602",
+        "size": 49789
+      },
+      "MIN-007G/minutes_baseline_policy.json": {
+        "sha256": "d54afbb27f4ea2512801e1e8588c8c6c4454388c824dacd00f18fecdb35c6994",
+        "size": 848
+      }
+    },
+    "status": "PASS"
+  }
 }

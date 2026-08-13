@@ -1,46 +1,46 @@
 {
-  "contract": "MIN-007H2 recovery pre-commit assurance",
-  "gate_count": 23,
-  "plan_sha256": "f7b674e94070d739e969121e72f826bab8e2fcdee5665b7026c44f0a127b5cb5",
+  "contract": "MIN-007H3 final pre-commit assurance",
+  "gate_count": 24,
+  "plan_sha256": "5900760d8fc2e6e1af57dc9750288c24d15811490ba2ff4e04da5779ea828a39",
   "records": [
     {
       "artifacts": {},
       "command": "git diff --check",
-      "duration_seconds": 0.085,
-      "end": "2026-08-13T14:30:51.447751Z",
+      "duration_seconds": 0.145,
+      "end": "2026-08-13T16:59:57.842022Z",
       "exit_code": 0,
       "id": "diff_check",
       "number": 1,
-      "output_summary": "\nwarning: in the working copy of 'evidence/tickets/MIN-007H/RESULT.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/tickets/MIN-007H/acceptance_ledger.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/tickets/MIN-007H/audit_closure_history.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/tickets/MIN-007H/coverage_summary.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/tickets/MIN-007H/frozen_identity_report.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/tickets/MIN-007H/full_test_summary.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/tickets/MIN-007H/installed_wheel_report.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/tickets/MIN-007H/math_core_manifest.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/tickets/MIN-007H/migration_report.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/tickets/MIN-007H/security_report.json', CRLF will be replaced by LF the next time Git touches it\n",
-      "start": "2026-08-13T14:30:51.363008Z",
+      "output_summary": "warning: in the working copy of 'evidence/tickets/MIN-007F/current_manifest.json', CRLF will be replaced by LF the next time Git touches it\n",
+      "start": "2026-08-13T16:59:57.697295Z",
       "status": "PASS",
-      "stderr_sha256": "987a42138f16c6be4dcb525fa7e52a3bf395aa5acd3f052f1c9bfd8bd1e80dff",
+      "stderr_sha256": "a5c3d5023b5c9d43e6dedfba88a6d1e5ce8558bcb2c2203009316bcf4ba5d541",
       "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
       "artifacts": {},
       "command": "uv run ruff format --check .",
-      "duration_seconds": 0.078,
-      "end": "2026-08-13T14:30:51.525424Z",
+      "duration_seconds": 0.155,
+      "end": "2026-08-13T16:59:57.997240Z",
       "exit_code": 0,
       "id": "format",
       "number": 2,
-      "output_summary": "293 files already formatted\n\n",
-      "start": "2026-08-13T14:30:51.447798Z",
+      "output_summary": "298 files already formatted\n",
+      "start": "2026-08-13T16:59:57.842094Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "7d5676735e72aeace4deaf518d63d3b46ff71d60fab4c86359dbf6b3c9f04874"
+      "stdout_sha256": "9a5619a25c32a8f39f0bb1d9b3330bd6f749c97aacc71a5270b01ece69d70e7f"
     },
     {
       "artifacts": {},
       "command": "uv run ruff check .",
-      "duration_seconds": 0.083,
-      "end": "2026-08-13T14:30:51.608793Z",
+      "duration_seconds": 0.143,
+      "end": "2026-08-13T16:59:58.140301Z",
       "exit_code": 0,
       "id": "ruff",
       "number": 3,
-      "output_summary": "All checks passed!\n\n",
-      "start": "2026-08-13T14:30:51.525453Z",
+      "output_summary": "All checks passed!\n",
+      "start": "2026-08-13T16:59:57.997308Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
@@ -48,27 +48,27 @@
     {
       "artifacts": {},
       "command": "uv run mypy src/dmf_pulse",
-      "duration_seconds": 0.369,
-      "end": "2026-08-13T14:30:51.978096Z",
+      "duration_seconds": 0.727,
+      "end": "2026-08-13T16:59:58.867594Z",
       "exit_code": 0,
       "id": "mypy",
       "number": 4,
-      "output_summary": "Success: no issues found in 109 source files\n\n",
-      "start": "2026-08-13T14:30:51.608824Z",
+      "output_summary": "Success: no issues found in 110 source files\n",
+      "start": "2026-08-13T16:59:58.140349Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "92c3e508c3f44192b3ed08c24db6fda1c9011bc0b04adc58ad6dc43ff2d9fac0"
+      "stdout_sha256": "c68f50a89794521a4d43d1354657bb2b465570f85b8cf4a226fc9f9fa7200852"
     },
     {
       "artifacts": {},
       "command": "uv run python scripts/validate_repository.py",
-      "duration_seconds": 1.202,
-      "end": "2026-08-13T14:30:53.180032Z",
+      "duration_seconds": 2.42,
+      "end": "2026-08-13T17:00:01.288088Z",
       "exit_code": 0,
       "id": "repository",
       "number": 5,
-      "output_summary": "{\n  \"error_count\": 0,\n  \"errors\": [],\n  \"status\": \"PASS\"\n}\n\n",
-      "start": "2026-08-13T14:30:51.978124Z",
+      "output_summary": "{\n  \"error_count\": 0,\n  \"errors\": [],\n  \"status\": \"PASS\"\n}\n",
+      "start": "2026-08-13T16:59:58.867643Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_sha256": "5121d83305442ff95da3024afcb4738bdee6b2528746584e63e7210e567139a8"
@@ -76,13 +76,13 @@
     {
       "artifacts": {},
       "command": "uv run python scripts/scan_secrets.py",
-      "duration_seconds": 3.297,
-      "end": "2026-08-13T14:30:56.476893Z",
+      "duration_seconds": 6.296,
+      "end": "2026-08-13T17:00:07.584587Z",
       "exit_code": 0,
       "id": "secrets",
       "number": 6,
-      "output_summary": "{\n  \"finding_count\": 0,\n  \"findings\": [],\n  \"status\": \"PASS\"\n}\n\n",
-      "start": "2026-08-13T14:30:53.180060Z",
+      "output_summary": "{\n  \"finding_count\": 0,\n  \"findings\": [],\n  \"status\": \"PASS\"\n}\n",
+      "start": "2026-08-13T17:00:01.288137Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
@@ -90,55 +90,64 @@
     {
       "artifacts": {},
       "command": "uv run pytest -q tests/unit/assurance/test_nrm006_acceptance_verifier.py::test_nrm006_real_frozen_inputs_and_goldens_are_self_consistent",
-      "duration_seconds": 3.036,
-      "end": "2026-08-13T14:30:59.513153Z",
+      "duration_seconds": 3.808,
+      "end": "2026-08-13T17:00:11.392185Z",
       "exit_code": 0,
       "id": "nrm_regression",
       "number": 7,
-      "output_summary": ".                                                                        [100%]\n1 passed in 2.33s\n\n",
-      "start": "2026-08-13T14:30:56.476923Z",
+      "output_summary": ".                                                                        [100%]\n1 passed in 2.44s\n",
+      "start": "2026-08-13T17:00:07.584633Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "7c0fdb691f3513ce0b6ee669f8a369b8f9d36703c5a74532d484fc5fa48fcba7"
+      "stdout_sha256": "b40307e8f303809355413848a6a81c33b612281ff8e50f28e7426da7a0593d34"
     },
     {
       "artifacts": {},
       "command": "uv run pytest -q tests/unit/availability/test_min007_decimal_guard_coverage.py",
-      "duration_seconds": 0.867,
-      "end": "2026-08-13T14:31:00.380544Z",
+      "duration_seconds": 2.624,
+      "end": "2026-08-13T17:00:14.015944Z",
       "exit_code": 0,
       "id": "decimal_guards",
       "number": 8,
-      "output_summary": "...                                                                      [100%]\n3 passed in 0.21s\n\n",
-      "start": "2026-08-13T14:30:59.513182Z",
+      "output_summary": "...                                                                      [100%]\n3 passed in 1.32s\n",
+      "start": "2026-08-13T17:00:11.392231Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "4a6070b078e8713685bb7d423b62e85d6415f822c5c557fbcd20f48e88981629"
+      "stdout_sha256": "a421dab8384c4fc3c23dae30db1f5d786442e3e067ab59d296f67c09d6c2ea5d"
     },
     {
       "artifacts": {},
       "command": "uv run pytest -q tests/unit/availability tests/property/availability tests/golden/availability --cov=dmf_pulse.availability --cov-branch --cov-report=json:evidence/tickets/MIN-007H/focused_core_coverage.json --cov-fail-under=0",
-      "duration_seconds": 102.548,
-      "end": "2026-08-13T14:32:42.929070Z",
+      "duration_seconds": 204.726,
+      "end": "2026-08-13T17:03:38.741696Z",
       "exit_code": 0,
       "id": "focused_core",
       "number": 9,
-      "output_summary": "........................................................................ [ 41%]\n........................................................................ [ 83%]\n............................                                             [100%]\n=============================== tests coverage ================================\n_______________ coverage: platform win32, python 3.13.9-final-0 _______________\n\nCoverage JSON written to file evidence/tickets/MIN-007H/focused_core_coverage.json\n172 passed in 101.52s (0:01:41)\n\n",
-      "start": "2026-08-13T14:31:00.380573Z",
+      "output_summary": "........................................................................ [ 41%]\n........................................................................ [ 83%]\n............................                                             [100%]\n=============================== tests coverage ================================\n_______________ coverage: platform win32, python 3.13.9-final-0 _______________\n\nCoverage JSON written to file evidence/tickets/MIN-007H/focused_core_coverage.json\n172 passed in 202.57s (0:03:22)\n",
+      "start": "2026-08-13T17:00:14.015994Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "225fb2207d9447a8ed337067f2b1c37a550f646f0e458b490aeab84da491515f"
+      "stdout_sha256": "8ebad388ebb4240da05e6c7ea01b856d4ce803e5a1a8bf67d3567636557f7fe5"
     },
     {
-      "artifacts": {},
+      "artifacts": {
+        "evidence/tickets/MIN-007H/coverage_summary.json": {
+          "sha256": "8ebfa4d14995ea21a79189a3c922abcff471c7e6e7c68bdc8a75e4a70f16ba71",
+          "size": 12967
+        },
+        "evidence/tickets/MIN-007H/math_core_manifest.json": {
+          "sha256": "e604b90823072ef740de6629959a781e3f06ea3d69d458075cedbc044db328e3",
+          "size": 12569
+        }
+      },
       "command": "uv run python evidence/tickets/MIN-007H/validate_math_core_inventory.py --coverage evidence/tickets/MIN-007H/focused_core_coverage.json",
-      "duration_seconds": 0.128,
-      "end": "2026-08-13T14:32:43.057103Z",
+      "duration_seconds": 0.214,
+      "end": "2026-08-13T17:03:38.955869Z",
       "exit_code": 0,
       "id": "core_inventory",
       "number": 10,
-      "output_summary": "PASS: reachable math core 1666/1666 lines and 584/584 branches\n\n",
-      "start": "2026-08-13T14:32:42.929203Z",
+      "output_summary": "PASS: reachable math core 1666/1666 lines and 584/584 branches\n",
+      "start": "2026-08-13T17:03:38.741784Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_sha256": "52789095be3b982db3b854e90d696b9bb74bcf1fd7ae19d0edb95a9a92a2e26f"
@@ -146,55 +155,64 @@
     {
       "artifacts": {},
       "command": "docker compose -f compose.test.yaml up -d --wait",
-      "duration_seconds": 2.96,
-      "end": "2026-08-13T14:32:46.017132Z",
+      "duration_seconds": 13.785,
+      "end": "2026-08-13T17:03:52.740640Z",
       "exit_code": 0,
       "id": "postgres_up",
       "number": 11,
-      "output_summary": "\n Network dmf-pulse-dat003_default Creating \n Network dmf-pulse-dat003_default Created \n Volume dmf-pulse-dat003_dat003-postgres Creating \n Volume dmf-pulse-dat003_dat003-postgres Created \n Container dmf-pulse-dat003-postgres-1 Creating \n Container dmf-pulse-dat003-postgres-1 Created \n Container dmf-pulse-dat003-postgres-1 Starting \n Container dmf-pulse-dat003-postgres-1 Started \n Container dmf-pulse-dat003-postgres-1 Waiting \n Container dmf-pulse-dat003-postgres-1 Healthy \n",
-      "start": "2026-08-13T14:32:43.057135Z",
+      "output_summary": " Image postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296 Pulling \n Image postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296 Pulled \n Network dmf-pulse-dat003_default Creating \n Network dmf-pulse-dat003_default Created \n Volume dmf-pulse-dat003_dat003-postgres Creating \n Volume dmf-pulse-dat003_dat003-postgres Created \n Container dmf-pulse-dat003-postgres-1 Creating \n Container dmf-pulse-dat003-postgres-1 Created \n Container dmf-pulse-dat003-postgres-1 Starting \n Container dmf-pulse-dat003-postgres-1 Started \n Container dmf-pulse-dat003-postgres-1 Waiting \n Container dmf-pulse-dat003-postgres-1 Healthy \n",
+      "start": "2026-08-13T17:03:38.955919Z",
       "status": "PASS",
-      "stderr_sha256": "1813b1728b424c216b6b22877b546c10ef66f86b6a3295a118bbde7c38c79a84",
+      "stderr_sha256": "9b08556dea244edfc5545bf854d254add08f86135e8a9d8a072444311ce226b0",
       "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
       "artifacts": {},
       "command": "uv run alembic upgrade head",
-      "duration_seconds": 1.53,
-      "end": "2026-08-13T14:32:47.547005Z",
+      "duration_seconds": 3.143,
+      "end": "2026-08-13T17:03:55.883886Z",
       "exit_code": 0,
       "id": "alembic_upgrade",
       "number": 12,
-      "output_summary": "\nINFO  [alembic.runtime.migration] Context impl PostgresqlImpl.\nINFO  [alembic.runtime.migration] Will assume transactional DDL.\nINFO  [alembic.runtime.migration] Running upgrade  -> 20260723_0001, Create the DAT-003 canonical temporal PostgreSQL foundation.\nINFO  [alembic.runtime.migration] Running upgrade 20260723_0001 -> 20260724_0002, Remediate DAT-003 and add the FPL-004 ingestion foundation.\nINFO  [alembic.runtime.migration] Running upgrade 20260724_0002 -> 20260725_0003, Bind FPL bundles to authoritative rights and persisted quality.\nINFO  [alembic.runtime.migration] Running upgrade 20260725_0003 -> 20260725_0004, Add canonical operators, markets, exact odds, and quota evidence.\nINFO  [alembic.runtime.migration] Running upgrade 20260725_0004 -> 20260803_0005, NRM-006 post-commit odds publication and normalisation persistence.\nINFO  [alembic.runtime.migration] Running upgrade 20260803_0005 -> 20260807_0006, MIN-007F immutable availability registry and prediction persistence.\n",
-      "start": "2026-08-13T14:32:46.017160Z",
+      "output_summary": "INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.\nINFO  [alembic.runtime.migration] Will assume transactional DDL.\nINFO  [alembic.runtime.migration] Running upgrade  -> 20260723_0001, Create the DAT-003 canonical temporal PostgreSQL foundation.\nINFO  [alembic.runtime.migration] Running upgrade 20260723_0001 -> 20260724_0002, Remediate DAT-003 and add the FPL-004 ingestion foundation.\nINFO  [alembic.runtime.migration] Running upgrade 20260724_0002 -> 20260725_0003, Bind FPL bundles to authoritative rights and persisted quality.\nINFO  [alembic.runtime.migration] Running upgrade 20260725_0003 -> 20260725_0004, Add canonical operators, markets, exact odds, and quota evidence.\nINFO  [alembic.runtime.migration] Running upgrade 20260725_0004 -> 20260803_0005, NRM-006 post-commit odds publication and normalisation persistence.\nINFO  [alembic.runtime.migration] Running upgrade 20260803_0005 -> 20260807_0006, MIN-007F immutable availability registry and prediction persistence.\n",
+      "start": "2026-08-13T17:03:52.740690Z",
       "status": "PASS",
       "stderr_sha256": "ef76065a8bcf9dca95cdbaa7af02a4f61063d2b6198c7e558a9628ec23cb5675",
       "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "artifacts": {},
+      "artifacts": {
+        "evidence/tickets/MIN-007H/coverage.json": {
+          "sha256": "1a513ab66d072b0213a6833e5c0eb7f8cc5dc9d570b775012218a6b34f1fc9a5",
+          "size": 1286891
+        },
+        "evidence/tickets/MIN-007H/full_test_summary.json": {
+          "sha256": "3cc224e2b72cfa69ad6def96035cb8fcd1dfb6f4884e4acdf32917a74f0c1347",
+          "size": 650
+        }
+      },
       "command": "uv run pytest -q --cov=dmf_pulse --cov-branch --cov-report=json:evidence/tickets/MIN-007H/coverage.json --cov-fail-under=90",
-      "duration_seconds": 577.199,
-      "end": "2026-08-13T14:42:24.745699Z",
+      "duration_seconds": 674.491,
+      "end": "2026-08-13T17:15:10.374522Z",
       "exit_code": 0,
       "id": "full_suite",
       "number": 13,
-      "output_summary": "............................................. [ 31%]\n........................................................................ [ 36%]\n........................................................................ [ 41%]\n........................................................................ [ 46%]\n........................................................................ [ 51%]\n........................................................................ [ 57%]\n........................................................................ [ 62%]\n........................................................................ [ 67%]\n........................................................................ [ 72%]\n........................................................................ [ 77%]\n........................................................................ [ 82%]\n........................................................................ [ 88%]\n........................................................................ [ 93%]\n........................................................................ [ 98%]\n....................                                                     [100%]\n=============================== tests coverage ================================\n_______________ coverage: platform win32, python 3.13.9-final-0 _______________\n\nCoverage JSON written to file evidence/tickets/MIN-007H/coverage.json\nRequired test coverage of 90% reached. Total coverage: 92.56%\n1388 passed in 575.94s (0:09:35)\n\n",
-      "start": "2026-08-13T14:32:47.547034Z",
+      "output_summary": ".............................................. [ 30%]\n........................................................................ [ 35%]\n........................................................................ [ 40%]\n........................................................................ [ 46%]\n........................................................................ [ 51%]\n........................................................................ [ 56%]\n........................................................................ [ 61%]\n........................................................................ [ 66%]\n........................................................................ [ 71%]\n........................................................................ [ 76%]\n........................................................................ [ 81%]\n........................................................................ [ 87%]\n........................................................................ [ 92%]\n........................................................................ [ 97%]\n.....................................                                    [100%]\n=============================== tests coverage ================================\n_______________ coverage: platform win32, python 3.13.9-final-0 _______________\n\nCoverage JSON written to file evidence/tickets/MIN-007H/coverage.json\nRequired test coverage of 90% reached. Total coverage: 92.56%\n1405 passed in 672.50s (0:11:12)\n",
+      "start": "2026-08-13T17:03:55.883932Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "3f195c8136ff50ce6141b5c7cb321901b983fc545897f60ef923e672415bf6f2"
+      "stdout_sha256": "8027c40539fe8ed2de7824cb6d5e66b46deedb8e767de3d312d28653cd308db0"
     },
     {
       "artifacts": {},
       "command": "uv run python evidence/tickets/MIN-007H/check_math_core_coverage.py",
-      "duration_seconds": 0.125,
-      "end": "2026-08-13T14:42:24.870948Z",
+      "duration_seconds": 0.12,
+      "end": "2026-08-13T17:15:10.494991Z",
       "exit_code": 0,
       "id": "core_full_check",
       "number": 14,
-      "output_summary": "PASS: full-suite raw/reachable math-core consistency\n\n",
-      "start": "2026-08-13T14:42:24.745733Z",
+      "output_summary": "PASS: full-suite raw/reachable math-core consistency\n",
+      "start": "2026-08-13T17:15:10.374578Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_sha256": "9df337dc27c9ccc6dd408769029b1284a89ada498d5c3d97981285a9f4273496"
@@ -202,27 +220,32 @@
     {
       "artifacts": {},
       "command": "uv run pytest -q tests/integration/migrations tests/integration/availability tests/integration/markets",
-      "duration_seconds": 222.08,
-      "end": "2026-08-13T14:46:06.950570Z",
+      "duration_seconds": 220.21,
+      "end": "2026-08-13T17:18:50.704634Z",
       "exit_code": 0,
       "id": "integrations",
       "number": 15,
-      "output_summary": "........................................................................ [ 64%]\n........................................                                 [100%]\n112 passed in 220.60s (0:03:40)\n\n",
-      "start": "2026-08-13T14:42:24.870976Z",
+      "output_summary": "........................................................................ [ 64%]\n........................................                                 [100%]\n112 passed in 218.74s (0:03:38)\n",
+      "start": "2026-08-13T17:15:10.495024Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "8ce499ed08d29ee6cb9370434fdaa2a8a065eb420c4fe70a7ed24e923e8935c9"
+      "stdout_sha256": "81fc66415876a3b6cf60e3960e9d6f9f82ff67e30842cfbcfc88da3747c25065"
     },
     {
-      "artifacts": {},
+      "artifacts": {
+        "evidence/tickets/MIN-007H/migration_report.json": {
+          "sha256": "f662c98458594d1f94d96673ae6ebb21892592b7701009753656ea2f89e9a2da",
+          "size": 195
+        }
+      },
       "command": "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
-      "duration_seconds": 3.562,
-      "end": "2026-08-13T14:46:10.512846Z",
+      "duration_seconds": 3.423,
+      "end": "2026-08-13T17:18:54.127188Z",
       "exit_code": 0,
       "id": "migration_matrix",
       "number": 16,
-      "output_summary": "{\n    \"baseline_seed\": {},\n    \"downgraded_seed\": {},\n    \"final_seed\": {},\n    \"head_seed\": {},\n    \"status\": \"PASS\"\n  },\n  \"database\": {\n    \"host\": \"127.0.0.1\",\n    \"name\": \"dmf_pulse_test\",\n    \"port\": 55432,\n    \"postgres_version\": \"18.4\"\n  },\n  \"matrix\": [\n    {\n      \"from\": \"base\",\n      \"status\": \"PASS\",\n      \"to\": \"20260807_0006\"\n    },\n    {\n      \"from\": \"20260807_0006\",\n      \"status\": \"PASS\",\n      \"to\": \"20260803_0005\"\n    },\n    {\n      \"from\": \"20260803_0005\",\n      \"status\": \"PASS\",\n      \"to\": \"20260807_0006\"\n    },\n    {\n      \"from\": \"20260807_0006\",\n      \"status\": \"PASS\",\n      \"to\": \"20260803_0005\"\n    },\n    {\n      \"from\": \"20260803_0005\",\n      \"status\": \"PASS\",\n      \"to\": \"20260807_0006\"\n    }\n  ],\n  \"metadata_drift_check\": \"PASS\",\n  \"offline_sql\": {\n    \"bytes\": 245242,\n    \"path\": \"evidence/tickets/MIN-007F/offline_upgrade.sql\",\n    \"secret_free\": true,\n    \"sha256\": \"393b10e6fb6c7f734b0d8a5852e5bab5d13b13b9d3af01c530d404658f394881\"\n  },\n  \"revision_count\": 1,\n  \"revisions\": [\n    \"20260807_0006\"\n  ],\n  \"schema\": {\n    \"alembic_revision\": \"20260807_0006\",\n    \"schema_sha256\": \"7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc\",\n    \"table_count\": 71,\n    \"view_count\": 12\n  },\n  \"schema_manifest\": {\n    \"path\": \"evidence/tickets/MIN-007F/schema_manifest.json\",\n    \"sha256\": \"b0f8b2c1f193fe1a1ec5c892db72ffa1369b0fb14eb84aaf8f5be8f965d59ea3\"\n  },\n  \"status\": \"PASS\",\n  \"target_revision\": \"20260807_0006\",\n  \"ticket_id\": \"MIN-007F\"\n}\n\n",
-      "start": "2026-08-13T14:46:06.950597Z",
+      "output_summary": " {\n    \"baseline_seed\": {},\n    \"downgraded_seed\": {},\n    \"final_seed\": {},\n    \"head_seed\": {},\n    \"status\": \"PASS\"\n  },\n  \"database\": {\n    \"host\": \"127.0.0.1\",\n    \"name\": \"dmf_pulse_test\",\n    \"port\": 55432,\n    \"postgres_version\": \"18.4\"\n  },\n  \"matrix\": [\n    {\n      \"from\": \"base\",\n      \"status\": \"PASS\",\n      \"to\": \"20260807_0006\"\n    },\n    {\n      \"from\": \"20260807_0006\",\n      \"status\": \"PASS\",\n      \"to\": \"20260803_0005\"\n    },\n    {\n      \"from\": \"20260803_0005\",\n      \"status\": \"PASS\",\n      \"to\": \"20260807_0006\"\n    },\n    {\n      \"from\": \"20260807_0006\",\n      \"status\": \"PASS\",\n      \"to\": \"20260803_0005\"\n    },\n    {\n      \"from\": \"20260803_0005\",\n      \"status\": \"PASS\",\n      \"to\": \"20260807_0006\"\n    }\n  ],\n  \"metadata_drift_check\": \"PASS\",\n  \"offline_sql\": {\n    \"bytes\": 245242,\n    \"path\": \"evidence/tickets/MIN-007F/offline_upgrade.sql\",\n    \"secret_free\": true,\n    \"sha256\": \"393b10e6fb6c7f734b0d8a5852e5bab5d13b13b9d3af01c530d404658f394881\"\n  },\n  \"revision_count\": 1,\n  \"revisions\": [\n    \"20260807_0006\"\n  ],\n  \"schema\": {\n    \"alembic_revision\": \"20260807_0006\",\n    \"schema_sha256\": \"7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc\",\n    \"table_count\": 71,\n    \"view_count\": 12\n  },\n  \"schema_manifest\": {\n    \"path\": \"evidence/tickets/MIN-007F/schema_manifest.json\",\n    \"sha256\": \"b0f8b2c1f193fe1a1ec5c892db72ffa1369b0fb14eb84aaf8f5be8f965d59ea3\"\n  },\n  \"status\": \"PASS\",\n  \"target_revision\": \"20260807_0006\",\n  \"ticket_id\": \"MIN-007F\"\n}\n",
+      "start": "2026-08-13T17:18:50.704663Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_sha256": "dc360804825bbab55a84b6cd64d13cb45c42c10b8e61cca6650f3442cf0030aa"
@@ -230,13 +253,13 @@
     {
       "artifacts": {},
       "command": "uv run alembic check",
-      "duration_seconds": 1.743,
-      "end": "2026-08-13T14:46:12.255876Z",
+      "duration_seconds": 1.734,
+      "end": "2026-08-13T17:18:55.861515Z",
       "exit_code": 0,
       "id": "alembic_check",
       "number": 17,
       "output_summary": "No new upgrade operations detected.\n\nINFO  [alembic.runtime.migration] Context impl PostgresqlImpl.\nINFO  [alembic.runtime.migration] Will assume transactional DDL.\nINFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas\nINFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables\nINFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types\nINFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints\nINFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults\nINFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments\n",
-      "start": "2026-08-13T14:46:10.512877Z",
+      "start": "2026-08-13T17:18:54.127228Z",
       "status": "PASS",
       "stderr_sha256": "64a15f3b59f1485c444d84f639109f236d94d1a9455f7c3dcab09cb49e12f1df",
       "stdout_sha256": "43d345b67ace77ab8c4cbf575a3baddf66e8623cf7d1e0b78e602b1d641ecf50"
@@ -244,13 +267,13 @@
     {
       "artifacts": {},
       "command": "uv run alembic heads",
-      "duration_seconds": 0.891,
-      "end": "2026-08-13T14:46:13.146823Z",
+      "duration_seconds": 0.898,
+      "end": "2026-08-13T17:18:56.759818Z",
       "exit_code": 0,
       "id": "alembic_heads",
       "number": 18,
-      "output_summary": "20260807_0006 (head)\n\n",
-      "start": "2026-08-13T14:46:12.255909Z",
+      "output_summary": "20260807_0006 (head)\n",
+      "start": "2026-08-13T17:18:55.861550Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_sha256": "acaaae6885490a2cfcb7c56ab492df4965659524355ac0df6965048851affffb"
@@ -258,72 +281,106 @@
     {
       "artifacts": {},
       "command": "uv run pytest -q tests/contract tests/golden tests/property",
-      "duration_seconds": 46.687,
-      "end": "2026-08-13T14:46:59.833583Z",
+      "duration_seconds": 45.133,
+      "end": "2026-08-13T17:19:41.892388Z",
       "exit_code": 0,
       "id": "contracts_goldens_property",
       "number": 19,
-      "output_summary": "........................................................................ [ 75%]\n........................                                                 [100%]\n96 passed in 45.84s\n\n",
-      "start": "2026-08-13T14:46:13.146853Z",
+      "output_summary": "........................................................................ [ 73%]\n..........................                                               [100%]\n98 passed in 44.29s\n",
+      "start": "2026-08-13T17:18:56.759847Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "4ada15b1b9dd12aec7a61df88f8afbfabbbb6dd96ec9a164a4974335e0c15e3e"
+      "stdout_sha256": "8ba1b1b2a459a3f49ba1838e64fc7cc8225b33cf9e74f03aa51eab2cb5931ce2"
     },
     {
       "artifacts": {},
+      "command": "uv run pytest -q tests/unit/assurance/test_min007h_fail_closed.py",
+      "duration_seconds": 4.883,
+      "end": "2026-08-13T17:19:46.775017Z",
+      "exit_code": 0,
+      "id": "assurance_mutations",
+      "number": 20,
+      "output_summary": "..............                                                           [100%]\n14 passed in 4.28s\n",
+      "start": "2026-08-13T17:19:41.892419Z",
+      "status": "PASS",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "417ce6a6e74259e31d22f55718c4ed3b91b0c699c0820eb7fc2ff063dad2cd75"
+    },
+    {
+      "artifacts": {
+        "dist/dmf_pulse-0.2.0-py3-none-any.whl": {
+          "sha256": "601679d6ee699ce315f9e1990b767865bb564f90e2d72310eede767119682ff2",
+          "size": 424209
+        }
+      },
       "command": "uv build --wheel",
-      "duration_seconds": 0.857,
-      "end": "2026-08-13T14:47:00.690415Z",
+      "duration_seconds": 0.969,
+      "end": "2026-08-13T17:19:47.744482Z",
       "exit_code": 0,
       "id": "wheel_build",
-      "number": 20,
-      "output_summary": "\nBuilding wheel...\nSuccessfully built dist\\dmf_pulse-0.2.0-py3-none-any.whl\n",
-      "start": "2026-08-13T14:46:59.833611Z",
+      "number": 21,
+      "output_summary": "Building wheel...\nSuccessfully built dist\\dmf_pulse-0.2.0-py3-none-any.whl\n",
+      "start": "2026-08-13T17:19:46.775047Z",
       "status": "PASS",
       "stderr_sha256": "0a1d47aa78aeb4ad112a8a5722753a8437e4f2b2e52340701000b4caf2800957",
       "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "artifacts": {},
+      "artifacts": {
+        "evidence/tickets/MIN-007H/installed_wheel_report.json": {
+          "sha256": "60a03e896694f971fe473f07a2bef7568b68bbe658e31ad5c9a3659b67d64e7a",
+          "size": 4677
+        }
+      },
       "command": "uv run python evidence/tickets/MIN-007H/verify_installed_wheel.py",
-      "duration_seconds": 0.138,
-      "end": "2026-08-13T14:47:00.828788Z",
+      "duration_seconds": 10.304,
+      "end": "2026-08-13T17:19:58.048033Z",
       "exit_code": 0,
       "id": "installed_wheel",
-      "number": 21,
-      "output_summary": "PASS: wheel dist/dmf_pulse-0.2.0-py3-none-any.whl sha256=257c38cdb5758a1acd113c716451c7fa5654d6edabf0843c2cd7310992bec3f6\n\n",
-      "start": "2026-08-13T14:47:00.690446Z",
+      "number": 22,
+      "output_summary": "PASS: isolated installed wheel public 701 PROJECTED; sha256=601679d6ee699ce315f9e1990b767865bb564f90e2d72310eede767119682ff2\n",
+      "start": "2026-08-13T17:19:47.744512Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "b683896f89927e5b7a04afd2059c6cf1c5759ab748a022d26504de78740e5896"
+      "stdout_sha256": "fdd215f63431723d48e3b2404730f81c77bcc7aaa4d94f437fb7acb4f0f29ed8"
     },
     {
-      "artifacts": {},
+      "artifacts": {
+        "evidence/tickets/MIN-007H/frozen_identity_report.json": {
+          "sha256": "81b70f14d1602f8028222426b02604598dea08e6f34775448cd4495be091b6d7",
+          "size": 6418
+        }
+      },
       "command": "uv run python evidence/tickets/MIN-007H/verify_frozen_identities.py",
-      "duration_seconds": 7.838,
-      "end": "2026-08-13T14:47:08.666745Z",
+      "duration_seconds": 7.622,
+      "end": "2026-08-13T17:20:05.670421Z",
       "exit_code": 0,
       "id": "frozen_identities",
-      "number": 22,
-      "output_summary": "PASS: recomputed frozen identities and mutation self-tests\n\n",
-      "start": "2026-08-13T14:47:00.828818Z",
+      "number": 23,
+      "output_summary": "PASS: recomputed frozen identities and mutation self-tests\n",
+      "start": "2026-08-13T17:19:58.048062Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_sha256": "267459c2565070cdcc32d591c244e2b7da22af495e4084013e8621043db0c9a4"
     },
     {
-      "artifacts": {},
+      "artifacts": {
+        "evidence/tickets/MIN-007H/security_report.json": {
+          "sha256": "af29a7b290e867d4a972d83dfb4533c0699ed0181e7855ffb93a8821b5558f0d",
+          "size": 1974
+        }
+      },
       "command": "uv run python evidence/tickets/MIN-007H/verify_stage7_security_portability.py",
-      "duration_seconds": 5.164,
-      "end": "2026-08-13T14:47:13.830464Z",
+      "duration_seconds": 9.492,
+      "end": "2026-08-13T17:20:15.162085Z",
       "exit_code": 0,
       "id": "security_portability",
-      "number": 23,
-      "output_summary": "PASS: measured security, portability, and zero non-loopback replay attempts\n\n",
-      "start": "2026-08-13T14:47:08.666777Z",
+      "number": 24,
+      "output_summary": "PASS: isolated installed-wheel public 701 measured zero non-loopback attempts\n",
+      "start": "2026-08-13T17:20:05.670449Z",
       "status": "PASS",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "4bcd3e4ebac02320520d3709ed74bc3734a722556f144948439e828a8382486f"
+      "stdout_sha256": "ceda0fc592eec680ce54c1b299171c759896304a4ae9599dfd0680151eaa83ba"
     }
   ],
   "scope": "PRE-COMMIT gates only; post-commit archive commands are excluded.",

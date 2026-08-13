@@ -1,3 +1,3 @@
-# MIN-007H2 result
+# MIN-007H3 result
 
-Pre-commit gates: 23/23. Full-suite tests passed: 1388; skipped: 0; coverage totals are recorded in `full_test_summary.json`. Reachable core coverage and frozen identity reports are independently validated.
+Pre-commit gates: 24/24. Full-suite tests passed: 1405; skipped: 0. Coverage, installed-wheel execution, network measurement, frozen identities, and declared artifact hashes are recorded in durable evidence.

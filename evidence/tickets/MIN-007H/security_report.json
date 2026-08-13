@@ -1,18 +1,41 @@
 {
   "network": {
-    "guarded": true,
+    "attempted_endpoints": [],
+    "claim": "the isolated installed-wheel public REPLAY external-ID-701 CLI produced zero measured non-loopback network attempts under this guard",
+    "command": "dmf availability predict --fixture-external-provider synthetic_availability --fixture-external-id 701 --season-code 2026/27 --team-side HOME --as-of 2026-08-14T17:30:00Z --model-key min007-baseline-v1 --seed MIN-007-COHERENCE-V1 --output json",
+    "entry_point": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-min007-installed-kcugrstc\\runtime\\Scripts\\dmf.exe",
+    "exit_code": 0,
+    "fixture_external_id": 701,
+    "fixture_id": "943094f5-1d10-5d96-b88b-d271464f3e48",
+    "guard_active": true,
+    "guard_hooks": [
+      "socket.socket.connect",
+      "socket.socket.connect_ex",
+      "socket.create_connection",
+      "socket.getaddrinfo",
+      "socket.gethostbyname",
+      "socket.gethostbyname_ex",
+      "socket.getnameinfo"
+    ],
+    "installed_interpreter": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-min007-installed-kcugrstc\\runtime\\Scripts\\python.exe",
+    "mapping_provider": "synthetic_availability",
+    "mapping_resolution_success": true,
     "non_loopback_attempts": [],
     "non_loopback_count": 0,
-    "result_status": "PROJECTED",
-    "scope": "frozen TEST/REPLAY 701 production smoke"
+    "result_sha256": "04808edd9083f2305396c70acf41bddfc405da4736807f412bce2123c1791cc3",
+    "status": "PROJECTED",
+    "stdout_sha256": "6e7c06e21b3dc98d55a53f466cc174f7451f518dfb9c7521537b611be70079ad",
+    "team_id": "cc1083fa-0c4a-59ab-b6c5-60c04f760782"
   },
   "portable_source_scan": {
-    "files_scanned": 293,
+    "files_scanned": 298,
     "violations": {}
   },
-  "scope": "Only the measured frozen production smoke is covered; no claim is made for unmeasured providers or full-suite network behavior.",
+  "scope": "the isolated installed-wheel public REPLAY external-ID-701 CLI produced zero measured non-loopback network attempts under this guard",
   "secret_scan": {
     "exit_code": 0,
+    "finding_count": 0,
+    "status": "PASS",
     "stdout_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
   },
   "status": "PASS"

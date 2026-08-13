@@ -1,23 +1,20 @@
-"""Measure secret, portability, and frozen replay network behavior."""
+"""Measure security and network behavior at the installed public 701 boundary."""
 
 from __future__ import annotations
 
 import hashlib
 import json
-import socket
 import subprocess
 import sys
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+from installed_wheel_runtime import ROOT, WheelRuntimeError, run_installed_wheel
+
 EVIDENCE = ROOT / "evidence/tickets/MIN-007H"
 NEEDLES = ("C:" + "\\Users\\", "dmf-" + "pulse-context", "Codex" + "Packs")
-
-
-def read(relative: str) -> dict[str, object]:
-    value = json.loads((ROOT / relative).read_text(encoding="utf-8"))
-    assert isinstance(value, dict)
-    return value
+SCOPE = (
+    "the isolated installed-wheel public REPLAY external-ID-701 CLI produced zero measured "
+    "non-loopback network attempts under this guard"
+)
 
 
 def main() -> int:
@@ -28,6 +25,10 @@ def main() -> int:
         capture_output=True,
         check=False,
     )
+    try:
+        secret_value = json.loads(secret.stdout)
+    except json.JSONDecodeError as exc:
+        raise SystemExit("secret scan output is not JSON") from exc
     paths = [
         *ROOT.glob("src/dmf_pulse/**/*.py"),
         *ROOT.glob("tests/**/*.py"),
@@ -41,62 +42,58 @@ def main() -> int:
         for needle in NEEDLES
         if needle in path.read_text(encoding="utf-8", errors="replace")
     }
-    attempts = []
-    original = socket.socket.connect
-
-    def guarded(self: socket.socket, address: object) -> object:
-        host = str(address[0]) if isinstance(address, tuple) and address else ""
-        if host not in {"127.0.0.1", "::1", "localhost"}:
-            attempts.append(host)
-            raise RuntimeError("non-loopback network blocked")
-        return original(self, address)
-
-    socket.socket.connect = guarded
     try:
-        from dmf_pulse.availability.pipeline import (
-            fit_projection_artifact,
-            predict_minutes_baseline,
-        )
-
-        training = read("fixtures/availability/MIN-007/training_dataset.json")
-        policy = read("fixtures/availability/MIN-007G/minutes_baseline_policy.json")
-        history = read("fixtures/availability/MIN-007/canonical_history.json")
-        context = read("fixtures/availability/MIN-007G/contexts/stable_xi.json")
-        result = predict_minutes_baseline(
-            history,
-            fit_projection_artifact(training, policy=policy),
-            context=context,
-            policy=policy,
-        )
-    finally:
-        socket.socket.connect = original
+        installed = run_installed_wheel(network_guard=True, additional_contexts=False)
+    except WheelRuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
+    public = installed.get("public_701")
+    network = installed.get("network_guard")
+    if not isinstance(public, dict) or not isinstance(network, dict):
+        raise SystemExit("installed public network measurement is incomplete")
     report = {
-        "status": "PASS"
-        if secret.returncode == 0
-        and not violations
-        and not attempts
-        and result.status == "PROJECTED"
-        else "FAIL",
-        "secret_scan": {
-            "exit_code": secret.returncode,
-            "stdout_sha256": hashlib.sha256(secret.stdout.encode()).hexdigest(),
+        "network": {
+            **network,
+            "claim": SCOPE,
+            "command": public["command"],
+            "entry_point": public["entry_point"],
+            "exit_code": public["exit_code"],
+            "fixture_external_id": public["fixture_external_id"],
+            "fixture_id": public["fixture_id"],
+            "installed_interpreter": installed["isolated_runtime"]["interpreter"],
+            "mapping_provider": public["mapping_provider"],
+            "mapping_resolution_success": public["mapping_resolution_success"],
+            "result_sha256": public["result_sha256"],
+            "status": public["status"],
+            "stdout_sha256": public["stdout_sha256"],
+            "team_id": public["team_id"],
         },
         "portable_source_scan": {"files_scanned": len(paths), "violations": violations},
-        "network": {
-            "scope": "frozen TEST/REPLAY 701 production smoke",
-            "guarded": True,
-            "non_loopback_attempts": attempts,
-            "non_loopback_count": len(attempts),
-            "result_status": result.status,
+        "scope": SCOPE,
+        "secret_scan": {
+            "exit_code": secret.returncode,
+            "finding_count": secret_value.get("finding_count"),
+            "status": secret_value.get("status"),
+            "stdout_sha256": hashlib.sha256(secret.stdout.encode()).hexdigest(),
         },
-        "scope": "Only the measured frozen production smoke is covered; no claim is made for unmeasured providers or full-suite network behavior.",
     }
+    report["status"] = (
+        "PASS"
+        if secret.returncode == 0
+        and report["secret_scan"]["status"] == "PASS"
+        and report["secret_scan"]["finding_count"] == 0
+        and not violations
+        and public["exit_code"] == 0
+        and public["status"] == "PROJECTED"
+        and network["guard_active"] is True
+        and network["non_loopback_count"] == 0
+        else "FAIL"
+    )
     (EVIDENCE / "security_report.json").write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     if report["status"] != "PASS":
-        raise SystemExit("security portability measurement failed")
-    print("PASS: measured security, portability, and zero non-loopback replay attempts")
+        raise SystemExit("installed public 701 security measurement failed")
+    print("PASS: isolated installed-wheel public 701 measured zero non-loopback attempts")
     return 0
 
 

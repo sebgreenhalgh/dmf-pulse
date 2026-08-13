@@ -53,8 +53,18 @@ def main() -> int:
         .strip()
     )
     files = {
-        "01_REVIEW_PROMPT.txt": b"Fresh independent Stage-7 review must recheck all six findings and accept only P0=0, P1=0, and no blocking P2.\n",
-        "02_README.md": b"MIN-007H2 recovery independent-review handoff.\n",
+        "01_REVIEW_PROMPT.txt": (
+            b"Perform a fresh independent Stage-7 acceptance review. Read all 17 root files and "
+            b"independently verify the patch and evidence. First attack: (A) fail-closed ledger and "
+            b"final-evidence mutation resistance, including declared artifact hashes; (B) exact "
+            b"isolated installed-wheel public external-ID-701 CLI operation using packaged REPLAY "
+            b"resources, with no checkout import/path; and (C) network measurement at that exact "
+            b"installed public external-ID-701 boundary. Recheck the three findings already closed: "
+            b"mathematical-core exclusions/reachability waivers, frozen semantic identity "
+            b"recomputation, and exact full-stage changed-files/diffstat/patch plus ranged diff-check. "
+            b"Return ACCEPT_STAGE_7 only if P0=0, P1=0, and there is no blocking P2.\n"
+        ),
+        "02_README.md": b"MIN-007 R7 + H3 final independent-review handoff.\n",
         "03_RESULT.md": (EVIDENCE / "RESULT.md").read_bytes(),
         "04_ACCEPTANCE_LEDGER.json": (EVIDENCE / "acceptance_ledger.json").read_bytes(),
         "05_FULL_TEST_SUMMARY.json": (EVIDENCE / "full_test_summary.json").read_bytes(),
