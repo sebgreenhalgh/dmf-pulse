@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Mapping
-from pathlib import Path
 from typing import Annotated, Any, NoReturn
 
 import typer
@@ -29,6 +28,7 @@ from dmf_pulse.availability.registry import (
     dataset_version_semantic_sha256,
     model_version_semantic_sha256,
 )
+from dmf_pulse.availability.resources import availability_resource_json
 from dmf_pulse.availability.role_model import FROZEN_POLICY_SHA256
 from dmf_pulse.database.engine import (
     create_database_engine,
@@ -45,31 +45,17 @@ BLOCKED_EXIT = 42
 POLICY_SEED = "MIN-007-COHERENCE-V1"
 
 
-def _root() -> Path:
-    # Source-tree execution is the canonical repository command boundary.  The
-    # package remains import-safe because fixture reads occur only inside commands.
-    return Path(__file__).resolve().parents[3]
-
-
-def _read_json(path: Path) -> dict[str, Any]:
-    value = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(value, dict):
-        raise ValueError(f"fixture {path.name} must contain an object")
-    return value
-
-
 def _fixtures() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    root = _root()
-    history = _read_json(root / "fixtures/availability/MIN-007/canonical_history.json")
-    policy = _read_json(root / "fixtures/availability/MIN-007G/minutes_baseline_policy.json")
-    evaluation = _read_json(root / "fixtures/availability/MIN-007G/evaluation_dataset.json")
+    history = availability_resource_json("MIN-007/canonical_history.json")
+    policy = availability_resource_json("MIN-007G/minutes_baseline_policy.json")
+    evaluation = availability_resource_json("MIN-007G/evaluation_dataset.json")
     return history, policy, evaluation
 
 
 def _mapping_plan() -> dict[str, Any]:
-    """Load the repository-contained TEST/REPLAY fixture authority."""
+    """Load the wheel-contained TEST/REPLAY fixture authority."""
 
-    plan = _read_json(_root() / "fixtures/availability/MIN-007/external_mapping_plan.json")
+    plan = availability_resource_json("MIN-007/external_mapping_plan.json")
     if (
         plan.get("schema_version") != "min007-synthetic-mapping-plan-v1"
         or plan.get("provider_key") != "synthetic_availability"
@@ -128,10 +114,8 @@ def _requested_as_of(value: str, *, training_cutoff: str, kickoff: str) -> str:
     return format_utc(requested)
 
 
-def _training(history: Mapping[str, Any]) -> dict[str, Any]:
-    root = _root()
-    path = root / "fixtures/availability/MIN-007/training_dataset.json"
-    return _read_json(path)
+def _training() -> dict[str, Any]:
+    return availability_resource_json("MIN-007/training_dataset.json")
 
 
 def _dataset_payload(
@@ -202,8 +186,8 @@ def dataset_build_command(
     """Build and register the frozen synthetic TRAIN dataset."""
 
     _guard_environment()
-    history, policy, _ = _fixtures()
-    training = _training(history)
+    _, policy, _ = _fixtures()
+    training = _training()
     payload = _dataset_payload(
         dataset_key, competition_code, season_code, training_cutoff, training, policy
     )
@@ -229,8 +213,8 @@ def fit_command(
     """Fit and register the frozen compatibility model artifact."""
 
     _guard_environment()
-    history, policy, _ = _fixtures()
-    training = _training(history)
+    _, policy, _ = _fixtures()
+    training = _training()
     artifact = fit_projection_artifact(training, policy=policy)
     payload = {
         "schema_version": "minutes-dataset-version-v1",
@@ -278,7 +262,7 @@ def evaluate_command(
 
     _guard_environment()
     history, policy, evaluation = _fixtures()
-    training = _training(history)
+    training = _training()
     artifact = fit_projection_artifact(training, policy=policy)
     result = evaluate_minutes_baseline(history, artifact, evaluation, policy=policy)
     runtime = _database()
@@ -340,7 +324,7 @@ def predict_command(
 
     _guard_environment()
     history, policy, _ = _fixtures()
-    training = _training(history)
+    training = _training()
     if not isinstance(seed, str) or seed != policy.get("seed", POLICY_SEED):
         _reject("seed must exactly match the loaded MIN-007 coherence policy")
     try:
@@ -360,9 +344,9 @@ def predict_command(
     if not isinstance(scenario, str) or not scenario:
         _reject("mapped fixture scenario is invalid")
     try:
-        context = _read_json(_root() / f"fixtures/availability/MIN-007G/contexts/{scenario}.json")
+        context = availability_resource_json(f"MIN-007G/contexts/{scenario}.json")
     except (OSError, ValueError):
-        _reject("mapped fixture has no repository-contained context")
+        _reject("mapped fixture has no packaged context")
     if (
         context.get("fixture_id") != fixture.get("fixture_id")
         or context.get("team_id") != team.get("team_id")

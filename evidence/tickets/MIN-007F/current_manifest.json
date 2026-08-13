@@ -125,8 +125,8 @@
     },
     {
       "path": "PLANS.md",
-      "bytes": 45397,
-      "sha256": "9783aa05627fc74b110b1615fd981ac38729c9dab64c5e7a5ffce3dd21ca9bc4"
+      "bytes": 46744,
+      "sha256": "ab1b0dee62e95bafcc731e0897091e7acf939af5baca9fdcf76bd093038f19fb"
     },
     {
       "path": "README.md",
@@ -1544,6 +1544,81 @@
       "sha256": "8ded00281a9dccbcce4764c78d35bf63b362d5debb5287a395adf189b1bfe7f8"
     },
     {
+      "path": "src/dmf_pulse/availability/resources/MIN-007/canonical_history.json",
+      "bytes": 256283,
+      "sha256": "23cc133b26beba0455ca50e66cbd4fca5bde8b1b38a4b946b197d53039982096"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007/external_mapping_plan.json",
+      "bytes": 2913,
+      "sha256": "490585bed1bce6f9d904ddb12b6df6b6a4d04caca91fb1160af53e83578a3550"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007/training_dataset.json",
+      "bytes": 199031,
+      "sha256": "4f8624d95517e42cf4403e0356b28f6061f4d6c525f75bfff6d7ad07b9f5a6c5"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/contexts/goalkeeper.json",
+      "bytes": 513,
+      "sha256": "7a1794003b2e0d68cc58b705bf7e65fe302cceadbe681491d6a8f375b543b95a"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/contexts/hard_ineligible.json",
+      "bytes": 557,
+      "sha256": "27f192a8f925ac895bb37f1e9ecf245ff478bfa776ce08d6a157e528a9ba8585"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/contexts/high_rotation.json",
+      "bytes": 515,
+      "sha256": "a7bbcfb0c31dace93273bb2313ddaaf40dc733ed033d0b29ad9e551bab42c807"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/contexts/insufficient_eligible_squad.json",
+      "bytes": 763,
+      "sha256": "609bf472d44622e40cd70e427fdfe1d48527c68468e77bfb485fa2780e500412"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/contexts/new_manager.json",
+      "bytes": 514,
+      "sha256": "e6dab44a74dd81d4df85c535c576e9d02bafbc2bab003945fe759438221fc1bd"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/contexts/new_signing.json",
+      "bytes": 600,
+      "sha256": "e34e4a192ff7b493152a08d713f945f2a11462117c976e983a47d0b3a9a6bee4"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/contexts/promoted_team.json",
+      "bytes": 514,
+      "sha256": "50ca71a90174dcd2bbfb607a2023d0d12baafd433250b0f69bcfd9be55cdd56c"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/contexts/rare_bench_60_plus.json",
+      "bytes": 522,
+      "sha256": "5f90b04cac926a0715c0f45488cfac34d095a2db91aaef1feba94b5224c51b8a"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/contexts/stable_xi.json",
+      "bytes": 513,
+      "sha256": "88ce923fe3e6a749497595d8c3ec36415dda897e222dbf47510cb8c8b81da174"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/evaluation_dataset.json",
+      "bytes": 49789,
+      "sha256": "2366aa4e3b0144a6053ee00f64e5f74f92286f2e39acfc1a76b691348914d602"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/MIN-007G/minutes_baseline_policy.json",
+      "bytes": 848,
+      "sha256": "d54afbb27f4ea2512801e1e8588c8c6c4454388c824dacd00f18fecdb35c6994"
+    },
+    {
+      "path": "src/dmf_pulse/availability/resources/__init__.py",
+      "bytes": 1890,
+      "sha256": "26744a03daf89506eeca8e04b214371bae180d9c5f59fae6b9c06b6e322ff40f"
+    },
+    {
       "path": "src/dmf_pulse/availability/role_model.py",
       "bytes": 24730,
       "sha256": "fea033aea6fdb92000563a0571c30f11048fa7ff80fc3c888112afa0749abb10"
@@ -1560,8 +1635,8 @@
     },
     {
       "path": "src/dmf_pulse/cli/availability_cmd.py",
-      "bytes": 17672,
-      "sha256": "e23d8be1da672f7676ae3f054192293ad35aa1b89a79e1bf9142f52ad36412f5"
+      "bytes": 17035,
+      "sha256": "70bf7a246551bfcee8e69632c03251374272a72df1ed8f50f0edfdd40e1cf501"
     },
     {
       "path": "src/dmf_pulse/cli/config_cmd.py",
@@ -2024,6 +2099,11 @@
       "sha256": "d823cfbd813d86b7c74a653260a387b64a4a413b306a5d874c76118665cf8bd2"
     },
     {
+      "path": "tests/contract/availability/test_min007_packaged_resources.py",
+      "bytes": 1658,
+      "sha256": "ab0c30f73d2699b2de1be7a81567acb90fc1053d88bb7b1e437df840a714d5e8"
+    },
+    {
       "path": "tests/contract/availability/test_min007_public_contracts.py",
       "bytes": 1574,
       "sha256": "3c7bedd953a3cac9a5df1e8f57fd7b86087a6c5a2b898f35da576b602c0fa59c"
@@ -2312,6 +2392,11 @@
       "path": "tests/integration/package/test_installed_wheel.py",
       "bytes": 1275,
       "sha256": "7834e9087daca307889d753d195d2fa2710be516f56bc19f0772df09c4538876"
+    },
+    {
+      "path": "tests/integration/package/test_min007_installed_wheel.py",
+      "bytes": 5858,
+      "sha256": "6fe763e5d07fb1fa26074d2a175c2ec9d7a5c09cd30f4bf316377d71f96effd7"
     },
     {
       "path": "tests/integration/repository/test_authority_stage_map.py",

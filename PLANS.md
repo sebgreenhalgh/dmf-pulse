@@ -1,5 +1,29 @@
 # DMF Pulse execution plans
 
+## MIN-007R7 + MIN-007H3 - final packaged replay and assurance remediation
+
+- Ticket/stage: `MIN-007R7` then `MIN-007H3`, A7; required starting parent
+  `d94410b0ddd9c6689226c10bebcf9dc52e7ca346` on
+  `stage/A7/MIN-007-final-recovery`.
+- R7 scope: package the frozen TEST/REPLAY availability resources, load them
+  through `importlib.resources`, and prove the public 701 command from an
+  isolated installed wheel without repository source-path access.
+- H3 scope: make the acceptance ledger and final-evidence validators
+  structurally and semantically fail closed, bind required gate artifacts,
+  and measure network attempts at the exact installed-wheel public 701 CLI
+  boundary.
+- Constraints: preserve all frozen semantic identities, mathematical formulas,
+  exact reachability waivers, Alembic revision `20260807_0006`, and the full
+  stage range; no self-acceptance in this implementation conversation.
+
+### MIN-007R7 + MIN-007H3 checkpoints
+
+- [ ] Add synchronized packaged availability resources and public CLI loading.
+- [ ] Prove isolated-wheel 701/alternate/709 behavior and create the exact R7 commit.
+- [ ] Harden the assurance runner, validators, artifact bindings, and mutation tests.
+- [ ] Run the complete assurance ledger, create the exact H3 commit, and rebuild the
+  17-root review archive for a fresh independent reviewer.
+
 ## MIN-007R5F4 - final-output truthfulness and complete-only exact lookup
 
 - Ticket/stage: `MIN-007R5F4`, A7; required parent `3867877d4c2d1c3febcdf4b456703e3356d9a8af`.
