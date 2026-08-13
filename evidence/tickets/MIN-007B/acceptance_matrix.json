@@ -1,0 +1,96 @@
+{
+  "ticket_id": "MIN-007B",
+  "commands": [
+    {
+      "order": 1,
+      "command": "git diff --check",
+      "exit_code": 0,
+      "duration_seconds": 2.0,
+      "result": "PASS"
+    },
+    {
+      "order": 2,
+      "command": "uv run ruff format --check src/dmf_pulse/availability tests/unit/availability tests/property/availability tests/golden/availability",
+      "exit_code": 0,
+      "duration_seconds": 2.0,
+      "result": "PASS: 6 files already formatted"
+    },
+    {
+      "order": 3,
+      "command": "uv run ruff check src/dmf_pulse/availability tests/unit/availability tests/property/availability tests/golden/availability",
+      "exit_code": 0,
+      "duration_seconds": 2.0,
+      "result": "PASS: all checks passed"
+    },
+    {
+      "order": 4,
+      "command": "uv run mypy src/dmf_pulse/availability",
+      "exit_code": 0,
+      "duration_seconds": 2.2,
+      "result": "PASS: no issues found in 3 source files"
+    },
+    {
+      "order": 5,
+      "command": "uv run pytest -q tests/unit/availability/test_dataset.py",
+      "exit_code": 0,
+      "duration_seconds": 2.7,
+      "result": "PASS: 14 passed"
+    },
+    {
+      "order": 6,
+      "command": "uv run pytest -q tests/property/availability/test_dataset_properties.py",
+      "exit_code": 0,
+      "duration_seconds": 3.1,
+      "result": "PASS: 2 passed"
+    },
+    {
+      "order": 7,
+      "command": "uv run pytest -q tests/golden/availability/test_min007b_dataset.py",
+      "exit_code": 0,
+      "duration_seconds": 2.6,
+      "result": "PASS: 2 passed"
+    },
+    {
+      "order": 8,
+      "command": "uv run python \"C:\\Users\\sebgr\\Documents\\dmf-pulse-context\\CodexPacks\\DMF_PULSE_CODEX_PACK_007\\007B_DATASET_BUILDER\\reference\\min007b_dataset_oracle.py\" --repo .",
+      "exit_code": 0,
+      "duration_seconds": 2.1,
+      "result": "PASS: training_rows=368, source_sha256=23cc133b26beba0455ca50e66cbd4fca5bde8b1b38a4b946b197d53039982096, semantic_sha256=1466a5dcc9104a2d26f9c6b286d2717b6460423503026f05a58d3a26de040be3"
+    },
+    {
+      "order": 9,
+      "command": "uv run pytest -q tests/unit/availability tests/property/availability tests/golden/availability",
+      "exit_code": 0,
+      "duration_seconds": 3.1,
+      "result": "PASS: 18 passed"
+    },
+    {
+      "order": 10,
+      "command": "uv run pytest -q tests/contract/markets tests/unit/markets tests/golden/markets",
+      "exit_code": 0,
+      "duration_seconds": 9.4,
+      "result": "PASS: 75 passed"
+    },
+    {
+      "order": 11,
+      "command": "uv run python scripts/validate_repository.py",
+      "exit_code": 0,
+      "duration_seconds": 3.1,
+      "result": "PASS: error_count=0"
+    },
+    {
+      "order": 12,
+      "command": "uv run python scripts/scan_secrets.py",
+      "exit_code": 0,
+      "duration_seconds": 6.1,
+      "result": "PASS: finding_count=0"
+    },
+    {
+      "order": 13,
+      "command": "git diff --check",
+      "exit_code": 0,
+      "duration_seconds": 2.0,
+      "result": "PASS"
+    }
+  ]
+}

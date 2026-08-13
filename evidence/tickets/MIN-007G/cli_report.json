@@ -1,0 +1,12 @@
+{
+  "ticket_id": "MIN-007G",
+  "status": "PASS",
+  "environment": "TEST/REPLAY only",
+  "dataset_sha256": "1466a5dcc9104a2d26f9c6b286d2717b6460423503026f05a58d3a26de040be3",
+  "artifact_sha256": "80d1aa4cfd4a80eb7f7b291899fd9cf6173b017e308ea3b41d450a7bc87e2aeb",
+  "evaluation_sha256": "f2d075a9497331b73bf896be4610b684f8a3ed41eb17248a27284c79556cd748",
+  "projected_fixture": "synthetic_availability/701 -> PROJECTED",
+  "blocked_fixture": "synthetic_availability/709 -> BLOCKED / INSUFFICIENT_ELIGIBLE_SQUAD / exit 42",
+  "blocked_persistence": "no projection rows added; stable fixture retained 23 rows",
+  "db_persistence": "one model, one evaluation, one prediction run, 23 player projection rows"
+}

@@ -1,0 +1,10 @@
+{
+  "ticket_id": "MIN-007R1",
+  "findings": [
+    {"id": "P1-1", "regression_test": "test_r1_accepts_only_frozen_explicit_utc_timestamp_lexemes", "status": "PASS"},
+    {"id": "P1-2", "regression_test": "test_r2_prediction_rejects_duplicate_player_fixture_before_filtering", "status": "PASS"},
+    {"id": "P1-3", "regression_test": "test_r3_retains_decimal_utilities_and_exact_json_projection", "status": "PASS"},
+    {"id": "P1-4", "regression_test": "test_r4_rejects_cross_player_canonical_id_override", "status": "PASS"},
+    {"id": "P2-1", "regression_test": "test_min007a_schema_constraints_reject_supplied_negative_cases", "status": "PASS"}
+  ]
+}

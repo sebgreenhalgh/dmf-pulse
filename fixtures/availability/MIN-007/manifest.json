@@ -1,0 +1,22 @@
+{
+  "fixture_manifest_version": "min007b-availability-v1",
+  "ticket": "MIN-007B",
+  "entries": [
+    {
+      "path": "fixtures/availability/MIN-007/canonical_history.json",
+      "sha256": "23cc133b26beba0455ca50e66cbd4fca5bde8b1b38a4b946b197d53039982096",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/availability/MIN-007/dataset_negative_cases.json",
+      "sha256": "c708dfec90468b4cb8d8a4759b971b1e0fdb6b488808d8af8e05c91784473842",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    }
+  ],
+  "oracles": [
+    "training_dataset.json",
+    "training_dataset_summary.json"
+  ]
+}

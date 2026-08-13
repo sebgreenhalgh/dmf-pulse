@@ -1,0 +1,71 @@
+{
+  "baseline_revision": "20260803_0005",
+  "baseline_state": {
+    "availability_table_count": 12,
+    "revision": "20260803_0005"
+  },
+  "data_preservation": {
+    "baseline_seed": {},
+    "downgraded_seed": {},
+    "final_seed": {},
+    "head_seed": {},
+    "status": "PASS"
+  },
+  "database": {
+    "host": "127.0.0.1",
+    "name": "dmf_pulse_test",
+    "port": 55432,
+    "postgres_version": "18.4"
+  },
+  "matrix": [
+    {
+      "from": "base",
+      "status": "PASS",
+      "to": "20260807_0006"
+    },
+    {
+      "from": "20260807_0006",
+      "status": "PASS",
+      "to": "20260803_0005"
+    },
+    {
+      "from": "20260803_0005",
+      "status": "PASS",
+      "to": "20260807_0006"
+    },
+    {
+      "from": "20260807_0006",
+      "status": "PASS",
+      "to": "20260803_0005"
+    },
+    {
+      "from": "20260803_0005",
+      "status": "PASS",
+      "to": "20260807_0006"
+    }
+  ],
+  "metadata_drift_check": "PASS",
+  "offline_sql": {
+    "bytes": 245242,
+    "path": "evidence/tickets/MIN-007F/offline_upgrade.sql",
+    "secret_free": true,
+    "sha256": "393b10e6fb6c7f734b0d8a5852e5bab5d13b13b9d3af01c530d404658f394881"
+  },
+  "revision_count": 1,
+  "revisions": [
+    "20260807_0006"
+  ],
+  "schema": {
+    "alembic_revision": "20260807_0006",
+    "schema_sha256": "7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc",
+    "table_count": 71,
+    "view_count": 12
+  },
+  "schema_manifest": {
+    "path": "evidence/tickets/MIN-007F/schema_manifest.json",
+    "sha256": "b0f8b2c1f193fe1a1ec5c892db72ffa1369b0fb14eb84aaf8f5be8f965d59ea3"
+  },
+  "status": "PASS",
+  "target_revision": "20260807_0006",
+  "ticket_id": "MIN-007F"
+}

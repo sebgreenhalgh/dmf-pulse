@@ -1,0 +1,13 @@
+{
+  "ticket_id": "MIN-007G",
+  "status": "PASS",
+  "evaluation_sha256": "f2d075a9497331b73bf896be4610b684f8a3ed41eb17248a27284c79556cd748",
+  "n_examples": 92,
+  "baseline_decision": "PROMOTE_BASELINE",
+  "production_calibration_claim": false,
+  "role_log_loss": "0.594149",
+  "role_multiclass_brier": "0.104682",
+  "p_zero_brier": "0.160983",
+  "p_60_plus_brier": "0.119925",
+  "expected_minutes_mae": "23.587945"
+}

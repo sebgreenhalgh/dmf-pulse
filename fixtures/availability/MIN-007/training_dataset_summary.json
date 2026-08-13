@@ -1,0 +1,31 @@
+{
+  "excluded_non_train_row_count": 92,
+  "maximum_bench_minutes": 65,
+  "out_rows_with_positive_minutes": 0,
+  "position_counts": {
+    "DEF": 112,
+    "FWD": 96,
+    "GK": 48,
+    "MID": 112
+  },
+  "positive_minute_bench_rows": 44,
+  "production_calibration_claim": false,
+  "role_counts": {
+    "BENCH": 144,
+    "OUT": 48,
+    "START": 176
+  },
+  "rows_with_label_exactly_at_training_cutoff": 46,
+  "schema_version": "min007b-dataset-build-summary-v1",
+  "source_history_file_sha256": "23cc133b26beba0455ca50e66cbd4fca5bde8b1b38a4b946b197d53039982096",
+  "source_history_schema_version": "min007-synthetic-history-v1",
+  "source_row_count": 460,
+  "start_rows_with_zero_minutes": 0,
+  "training_cutoff": "2026-06-08T17:00:00Z",
+  "training_dataset_file_sha256": "4f8624d95517e42cf4403e0356b28f6061f4d6c525f75bfff6d7ad07b9f5a6c5",
+  "training_dataset_semantic_sha256": "1466a5dcc9104a2d26f9c6b286d2717b6460423503026f05a58d3a26de040be3",
+  "training_row_count": 368,
+  "unique_fixture_count": 16,
+  "unique_player_count": 46,
+  "unique_team_count": 2
+}

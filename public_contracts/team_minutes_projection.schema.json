@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/min-007/team-minutes-projection.schema.json",
+  "title": "TeamMinutesProjection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "fixture_id",
+    "team_id",
+    "as_of",
+    "model_family",
+    "dataset_sha256",
+    "model_artifact_sha256",
+    "sample_count",
+    "bench_size",
+    "bench_goalkeeper_slots",
+    "players",
+    "scenario_set_sha256",
+    "sum_p_start",
+    "sum_p_bench",
+    "sum_p_out",
+    "result_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "team-minutes-projection-v1"
+    },
+    "fixture_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "team_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "model_family": {
+      "const": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"
+    },
+    "dataset_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "model_artifact_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "sample_count": {
+      "const": 256
+    },
+    "bench_size": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "bench_goalkeeper_slots": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "players": {
+      "type": "array",
+      "minItems": 11,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "player_minutes_projection.schema.json"
+      }
+    },
+    "scenario_set_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "sum_p_start": {
+      "type": "string",
+      "pattern": "^11\\.000000000000$"
+    },
+    "sum_p_bench": {
+      "type": "string",
+      "pattern": "^\\d+\\.000000000000$"
+    },
+    "sum_p_out": {
+      "type": "string",
+      "pattern": "^\\d+\\.000000000000$"
+    },
+    "result_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

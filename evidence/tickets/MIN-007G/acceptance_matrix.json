@@ -1,0 +1,32 @@
+{
+  "ticket_id": "MIN-007G",
+  "status": "PASS",
+  "passed": 24,
+  "failed": 0,
+  "commands": [
+    {"number": 1, "status": "PASS", "result": "git diff --check"},
+    {"number": 2, "status": "PASS", "result": "ruff format check"},
+    {"number": 3, "status": "PASS", "result": "ruff check"},
+    {"number": 4, "status": "PASS", "result": "mypy availability and CLI"},
+    {"number": 5, "status": "PASS", "result": "projection/evaluation unit tests: 3 passed"},
+    {"number": 6, "status": "PASS", "result": "projection property tests: 1 passed"},
+    {"number": 7, "status": "PASS", "result": "public contract tests: 2 passed"},
+    {"number": 8, "status": "PASS", "result": "G golden tests: 2 passed"},
+    {"number": 9, "status": "PASS", "result": "G oracle: 9 scenarios"},
+    {"number": 10, "status": "PASS", "result": "availability regression: 130 passed"},
+    {"number": 11, "status": "PASS", "result": "markets regression: 75 passed"},
+    {"number": 12, "status": "PASS", "result": "PostgreSQL 18.4 healthy"},
+    {"number": 13, "status": "PASS", "result": "Alembic upgrade head"},
+    {"number": 14, "status": "PASS", "result": "G service/persistence integration: 2 passed"},
+    {"number": 15, "status": "PASS", "result": "CLI dataset build"},
+    {"number": 16, "status": "PASS", "result": "CLI fit"},
+    {"number": 17, "status": "PASS", "result": "CLI evaluate"},
+    {"number": 18, "status": "PASS", "result": "CLI predict fixture 701"},
+    {"number": 19, "status": "PASS", "result": "CLI integration: 1 passed"},
+    {"number": 20, "status": "PASS", "result": "repository validator"},
+    {"number": 21, "status": "PASS", "result": "secret scan: 0 findings"},
+    {"number": 22, "status": "PASS", "result": "single Alembic head 20260807_0006"},
+    {"number": 23, "status": "PASS", "result": "PostgreSQL teardown"},
+    {"number": 24, "status": "PASS", "result": "git diff --check"}
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "ticket_id": "MIN-007F",
+  "status": "PASS",
+  "migration_revision": "20260807_0006",
+  "schema_sha256": "d4a9c172bb57df2c1af7ef293b64437eea5b2c39ee002fd467c3651e0ff2924b",
+  "tables": 12,
+  "idempotency": {
+    "dataset": "one canonical row",
+    "model": "one canonical row",
+    "prediction": "one canonical run",
+    "different_output_same_signature": "fail closed"
+  },
+  "immutability": "UPDATE and DELETE triggers reject committed registry and prediction rows",
+  "numeric_constraints": "exact NUMERIC role sums and 91-point PMF simplex checks",
+  "atomic_publication": "bundle failures roll back the run and all child rows",
+  "as_of": "exact signature lookup, deterministic cutoff list, and ambiguity rejection"
+}

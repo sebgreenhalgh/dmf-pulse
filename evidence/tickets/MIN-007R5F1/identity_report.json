@@ -1,0 +1,19 @@
+{
+  "ticket": "MIN-007R5F1",
+  "status": "PASS",
+  "alembic": {
+    "parent": "20260803_0005",
+    "revision": "20260807_0006",
+    "head": "20260807_0006",
+    "new_revision_added": false
+  },
+  "frozen_registry_identities": {
+    "dataset": "5c76f5a41d9926dc0e4f0e15e2100c103d85768893c4ad8b52fe69a44d365da1",
+    "model": "724eecb596b09074b4014d82ec8d0831c4580751af1ad8cb3991f4704f553e9c",
+    "prediction": "5662bdec99552813e54453726c9ffdb30ef23365dab8548e78132a2c9d397ed6"
+  },
+  "frozen_modelling_identities_unchanged": true,
+  "as_of_ambiguity": "historical/as-of publication requires a unique signature and complete graph; incomplete or ambiguous candidates are not returned",
+  "idempotency": "exact semantic duplicates return the existing immutable row; semantic, artifact, or recomputed-output conflicts raise typed errors",
+  "immutability": "published dataset, model, and prediction rows are protected by immutable triggers and complete-graph gates"
+}

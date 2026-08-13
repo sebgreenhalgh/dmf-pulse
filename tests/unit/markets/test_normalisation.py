@@ -657,7 +657,7 @@ def test_confidence_rejects_copied_policy_drift_and_blocking_warnings_cap_grade(
         policy=policy,
     )
     assert with_exclusion.consensus is not None
-    assert with_exclusion.consensus.confidence_grade == "C"
+    assert with_exclusion.consensus.confidence_grade == "B"
     assert with_exclusion.exclusions
 
     clean_observations = tuple(
@@ -696,7 +696,7 @@ def test_confidence_rejects_copied_policy_drift_and_blocking_warnings_cap_grade(
     assert evaluation.consensus is not None
     assert with_initial_exclusion.consensus is not None
     assert evaluation.consensus.confidence_grade == "B"
-    assert with_initial_exclusion.consensus.confidence_grade == "C"
+    assert with_initial_exclusion.consensus.confidence_grade == "B"
     assert evaluation.warnings == ("DUPLICATE_OUTCOME_DEDUPED",)
     assert clean.consensus.input_signature_sha256 != evaluation.consensus.input_signature_sha256
     assert clean.consensus.result_sha256 != evaluation.consensus.result_sha256
@@ -717,6 +717,15 @@ def test_confidence_rejects_copied_policy_drift_and_blocking_warnings_cap_grade(
         )
         == "C"
     )
+    blocking_warning = evaluate_market_consensus(
+        clean_observations,
+        as_of=AS_OF,
+        mapping_cutoff=AS_OF,
+        policy=policy,
+        initial_warnings=("BLOCKING_MODEL_WARNING",),
+    )
+    assert blocking_warning.consensus is not None
+    assert blocking_warning.consensus.confidence_grade == "C"
 
 
 def test_operator_signature_binds_mapping_cutoff_and_exact_source_build(tmp_path) -> None:

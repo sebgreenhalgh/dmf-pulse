@@ -58,7 +58,7 @@ from dmf_pulse.ingestion.fpl.service import DATABASE_REF
 from dmf_pulse.ingestion.odds.service import DEFAULT_CUTOFF, OddsIngestionService, OddsReplayRequest
 
 pytestmark = pytest.mark.migration
-EXPECTED_SCHEMA_SHA256 = "d944116eecf9d756241d75e4a4a50194403123b2241485214f7bdeb04c7119d6"
+EXPECTED_SCHEMA_SHA256 = "7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc"
 NORMALISATION_AS_OF = datetime(2026, 8, 20, 12, 5, tzinfo=UTC)
 NRM006_TABLES = {
     "betting.market_consensus_outcome",
@@ -110,7 +110,7 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
     assert set(first.extensions) == set(expected["extensions"])
     assert first.schema_sha256 == second.schema_sha256
     assert first.schema_sha256 == EXPECTED_SCHEMA_SHA256
-    assert first.alembic_revision == head_revision() == "20260803_0005"
+    assert first.alembic_revision == head_revision() == "20260807_0006"
 
     function_names = {
         f"{schema}.{function['name']}"
@@ -140,6 +140,22 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "core.guard_canonical_successor",
         "core.guard_temporal_version",
         "core.is_canonical_tstzrange",
+        "football.reject_immutable_availability_change",
+        "football.canonical_json_sha256",
+        "football.canonical_json_text",
+        "football.render_final_as_of",
+        "football.render_final_minutes",
+        "football.render_final_probability",
+        "football.validate_lineup_scenario",
+        "football.validate_minutes_confidence_reasons",
+        "football.validate_minute_pmf",
+        "football.validate_player_minutes_projection",
+        "football.validate_prediction_complete",
+        "football.validate_prediction_lifecycle",
+        "football.reject_complete_core_mutation",
+        "football.reject_frozen_final_output_mutation",
+        "football.validate_final_output_complete",
+        "football.round_half_even_6",
         "provenance.guard_processing_event",
         "provenance.guard_fpl_observation_source_usable",
         "provenance.guard_raw_storage_rights",
@@ -147,6 +163,10 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "provenance.guard_source_snapshot_envelope",
         "provenance.lock_bundle_quality_subject",
         "provenance.reject_immutable_change",
+        "provenance.validate_dataset_complete",
+        "provenance.validate_model_dataset_complete",
+        "provenance.validate_dataset_lifecycle",
+        "provenance.reject_complete_dataset_lineage_mutation",
     }
     trigger_names = {
         trigger["name"] for value in first.schemas.values() for trigger in value["triggers"]
@@ -245,6 +265,32 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         "trg_source_snapshot_immutable",
         "trg_team_observation_immutable",
         "trg_team_observation_source_usable",
+        "trg_min007f_immutable_0",
+        "trg_min007f_immutable_1",
+        "trg_min007f_immutable_2",
+        "trg_min007f_immutable_3",
+        "trg_min007f_immutable_4",
+        "trg_min007f_immutable_5",
+        "trg_min007f_immutable_6",
+        "trg_min007f_immutable_7",
+        "trg_min007f_immutable_8",
+        "trg_min007f_immutable_9",
+        "trg_min007f_scenario_parent",
+        "trg_min007f_scenario_member",
+        "trg_min007f_dataset_complete",
+        "trg_min007f_dataset_lifecycle",
+        "trg_min007f_dataset_lineage_freeze",
+        "trg_min007f_model_dataset_complete",
+        "trg_min007f_prediction_complete",
+        "trg_min007f_prediction_lifecycle",
+        "trg_min007f_final_output_complete",
+        "trg_min007f_final_output_freeze",
+        "trg_min007f_core_freeze_0",
+        "trg_min007f_core_freeze_1",
+        "trg_min007f_core_freeze_2",
+        "trg_min007f_core_freeze_3",
+        "trg_min007f_core_freeze_4",
+        "trg_min007f_core_freeze_5",
     }
     trigger_definitions = {
         trigger["name"]: trigger["definition"]
@@ -302,6 +348,7 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
 def test_single_linear_revision_and_secret_free_offline_sql(postgres_url: str) -> None:
     revisions = list(ScriptDirectory.from_config(alembic_config()).walk_revisions())
     assert [(revision.revision, revision.down_revision) for revision in revisions] == [
+        ("20260807_0006", "20260803_0005"),
         ("20260803_0005", "20260725_0004"),
         ("20260725_0004", "20260725_0003"),
         ("20260725_0003", "20260724_0002"),
@@ -2097,7 +2144,7 @@ def test_nrm_downgrade_fails_closed_for_unattested_publication(
         with pytest.raises(DBAPIError, match="NRM006_DOWNGRADE_UNATTESTED_PUBLICATION"):
             command.downgrade(alembic_config(postgres_url), "20260725_0004")
         with postgres_engine.connect() as connection:
-            assert inspect_schema(connection).alembic_revision == "20260803_0005"
+            assert inspect_schema(connection).alembic_revision == "20260807_0006"
             assert (
                 connection.scalar(
                     select(func.count())
@@ -2286,4 +2333,4 @@ def test_clean_downgrade_and_reupgrade(postgres_engine: Engine, postgres_url: st
     upgrade_database(postgres_url)
     with postgres_engine.connect() as connection:
         assert connection.execute(text("SELECT uuidv7() IS NOT NULL")).scalar_one() is True
-        assert inspect_schema(connection).alembic_revision == "20260803_0005"
+        assert inspect_schema(connection).alembic_revision == "20260807_0006"

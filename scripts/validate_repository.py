@@ -916,11 +916,14 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
     )
 
     nrm_path = root / "evidence/tickets/NRM-006/current_manifest.json"
+    min007f_path = root / "evidence/tickets/MIN-007F/current_manifest.json"
     odd_path = root / "evidence/tickets/ODD-005/current_manifest.json"
     fpl_path = root / "evidence/tickets/FPL-004/current_manifest.json"
     dat_path = root / "evidence/tickets/DAT-003/current_manifest.json"
     active_path = (
-        nrm_path
+        min007f_path
+        if min007f_path.is_file()
+        else nrm_path
         if (root / "tickets/NRM-006/ticket.yaml").is_file()
         else odd_path
         if (root / "tickets/ODD-005/ticket.yaml").is_file()

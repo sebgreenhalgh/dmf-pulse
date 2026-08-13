@@ -1,0 +1,11 @@
+{
+  "ticket": "MIN-007R5F2",
+  "status": "PASS",
+  "strict_runtime_validation": true,
+  "production_calibration_claim_true_service_rejected": true,
+  "production_calibration_claim_true_database_rejected": true,
+  "wrong_model_rejected": true,
+  "status_conflict_rejected": true,
+  "exact_duplicate_idempotent": true,
+  "frozen_evaluation_sha256": "f2d075a9497331b73bf896be4610b684f8a3ed41eb17248a27284c79556cd748"
+}

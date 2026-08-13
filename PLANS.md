@@ -1,5 +1,233 @@
 # DMF Pulse execution plans
 
+## MIN-007R7 + MIN-007H3 - final packaged replay and assurance remediation
+
+- Ticket/stage: `MIN-007R7` then `MIN-007H3`, A7; required starting parent
+  `d94410b0ddd9c6689226c10bebcf9dc52e7ca346` on
+  `stage/A7/MIN-007-final-recovery`.
+- R7 scope: package the frozen TEST/REPLAY availability resources, load them
+  through `importlib.resources`, and prove the public 701 command from an
+  isolated installed wheel without repository source-path access.
+- H3 scope: make the acceptance ledger and final-evidence validators
+  structurally and semantically fail closed, bind required gate artifacts,
+  and measure network attempts at the exact installed-wheel public 701 CLI
+  boundary.
+- Constraints: preserve all frozen semantic identities, mathematical formulas,
+  exact reachability waivers, Alembic revision `20260807_0006`, and the full
+  stage range; no self-acceptance in this implementation conversation.
+
+### MIN-007R7 + MIN-007H3 checkpoints
+
+- [ ] Add synchronized packaged availability resources and public CLI loading.
+- [ ] Prove isolated-wheel 701/alternate/709 behavior and create the exact R7 commit.
+- [ ] Harden the assurance runner, validators, artifact bindings, and mutation tests.
+- [ ] Run the complete assurance ledger, create the exact H3 commit, and rebuild the
+  17-root review archive for a fresh independent reviewer.
+
+## MIN-007R5F4 - final-output truthfulness and complete-only exact lookup
+
+- Ticket/stage: `MIN-007R5F4`, A7; required parent `3867877d4c2d1c3febcdf4b456703e3356d9a8af`.
+- Scope: close only the two AUDIT-007-3C P1s: derive and validate final-output
+  identity from durable rows at the database boundary, and hide committed core
+  drafts from every exact lookup.
+- Constraints: harden unmerged migration `20260807_0006` without a new revision;
+  preserve R5F1/R5F2/R5G/R5F3 freeze, numeric, provenance, and frozen-hash
+  protections; no CLI/model/provider/network/MIN-007H work.
+
+### MIN-007R5F4 checkpoints
+
+- [x] Add database finalization reconstruction and direct-SQL truthfulness probes.
+- [x] Require complete core state for exact/public prediction reads and cover aliases.
+- [x] Run all 23 literal acceptance commands, record evidence, remove PostgreSQL,
+  commit once, and verify a clean worktree.
+
+## MIN-007R5F3 - freeze published graphs and bind evaluation provenance
+
+- Ticket/stage: `MIN-007R5F3`, A7; required parent `f1d8a4a38b073e6ee4a259ee801a9273e5e207ce`.
+- Scope: close the three AUDIT-007-3B P1 findings only: dataset lineage freeze, F-core/final-output lifecycle finalization, and strict evaluation provenance binding.
+- Constraints: preserve R5F1/R5F2/R5G semantics and frozen identities; harden migration `20260807_0006`; no new revision, CLI mapping changes, numerical formula changes, or MIN-007H work.
+
+### MIN-007R5F3 checkpoints
+
+- [x] Add DRAFT/COMPLETE lifecycle boundaries and database triggers for dataset, core graph, and final output.
+- [x] Add strict model evaluation provenance envelope and durable binding fields.
+- [x] Run all 24 literal acceptance commands, record evidence, remove PostgreSQL, commit once, and verify a clean worktree.
+
+## MIN-007R5G - CLI public assurance remediation
+
+- Ticket/stage: `MIN-007R5G`, A7; required parent `2986433e32d55aa3153003b3cc98a098c3a9c071`.
+- Scope: close AUDIT-007-3 findings 9–12 only: strict CLI cutoff/seed semantics, data-driven synthetic mapping, superseding public probability schema, portable repository goldens, substantive PostgreSQL G persistence, and all-scenario CLI assurance.
+- Constraints: preserve MIN-007R5F1/F2 architecture and frozen model/registry identities; no migration, Stage-7H work, live provider/network/credential access, or numerical formula changes.
+
+### MIN-007R5G checkpoints
+
+- [x] Reconcile existing implementation against the corrected R5G contracts and add repository-contained authority assets and portability guards.
+- [x] Implement strict cutoff/seed/mapping/public-schema semantics and substantive PostgreSQL/CLI assurance regressions.
+- [x] Run all 23 literal acceptance commands, record evidence, remove PostgreSQL, commit once, and verify a clean worktree.
+
+## MIN-007R5F2 - relational and evaluation integrity remediation
+
+- Ticket/stage: `MIN-007R5F2`, A7; required parent `6fc063424ed8e5c4a688432ccf54770f0c8137eb`.
+- Scope: close only AUDIT-007-3 findings 6–8: canonical PMF arrays and exact HALF_EVEN projection checks, scenario/final cross-graph coherence, and strict model-bound evaluation persistence.
+- Constraints: modify only unmerged migration `20260807_0006`; preserve R5F1 atomicity and all frozen F/G identities; do not fix CLI/public-schema/P2 findings or start MIN-007H.
+
+### MIN-007R5F2 checkpoints
+
+- [x] Add focused public identity, DB relational/numeric, and evaluation integrity regressions.
+- [x] Run all 23 literal acceptance commands, record evidence, remove PostgreSQL, and create the single bounded ticket commit.
+
+## MIN-007R5F1 - registry identity and publication atomicity remediation
+
+- Ticket/stage: `MIN-007R5F1`, A7; required parent `7ed2379f551690f04b85dc53a45237f649990894`.
+- Scope: close only AUDIT-007-3 findings 1-5: typed semantic hash allowlists, atomic/complete dataset lineage, model artifact conflict truthfulness, prediction graph atomicity/completeness, and recomputed output identity.
+- Constraints: preserve frozen B-G identities and Alembic head `20260807_0006`; no fixes for findings 6-12, no new migration revision, no MIN-007H.
+
+### MIN-007R5F1 checkpoints
+
+- [x] Implement typed registry normalization, DB-gated completeness, conflict checks, publication state/atomicity, and output-hash recomputation with focused regressions.
+- [x] Run all 20 literal acceptance commands, record evidence, tear down PostgreSQL, and create the single bounded ticket commit.
+
+## MIN-007G - final minutes projection, synthetic evaluation and CLI
+
+- Ticket/stage: `MIN-007G`, A7; required parent `9ca984b785b681531b7c0648cfbbb45c436dc075`.
+- Scope: compose the accepted C/D/E outputs into strict public player/team projections, freeze synthetic evaluation, persist final projections/evaluations through the MIN-007F reserved tables, and expose the TEST/REPLAY availability CLI.
+- Constraints: no migration, no Stage-8 logic, no live provider/network/credential access, preserve all frozen B/C/D/E/F identities and Alembic head `20260807_0006`.
+
+### MIN-007G checkpoints
+
+- [x] Read and validate the G pack; confirm branch, parent, clean worktree, and Alembic head.
+- [x] Implement pure projection, pipeline, evaluation, strict public models, fixture loader, and CLI with focused tests.
+- [x] Integrate final projection/evaluation persistence without changing the F schema.
+- [x] Run all 24 literal acceptance commands, collect evidence, remove PostgreSQL, and create exactly one bounded ticket commit.
+
+## MIN-007F - PostgreSQL registry, persistence and historical as-of
+
+- Ticket/stage: `MIN-007F`, A7; required parent `0e3b21a702fece94cb0ee6d61867e6fb17574d0a`.
+- Scope: immutable dataset/example lineage, model/evaluation registry, prediction bundle persistence, exact numeric database constraints, concurrency-safe idempotency, and historical as-of lookup.
+- Constraints: preserve frozen B/C/D/E identities; no final minute mixture, evaluation calculation, CLI, provider, Stage-8, or Stage-9 code.
+
+### MIN-007F checkpoints
+
+- [x] Implemented registry hashes, PostgreSQL migration `20260807_0006`, persistence repositories, and focused tests.
+- [x] Ran all 22 literal acceptance commands, recorded evidence, tore down PostgreSQL, and prepared the single bounded ticket commit.
+
+## MIN-007R4 - exact Decimal boundary hardening
+
+- Ticket/stage: `MIN-007R4`, A7; required parent `1ea36d831e18157a669b257a3761f8a9c9a5cdf7`.
+- Scope: context-independent exact stored minute-PMF simplex/correction, exact candidate START+BENCH inequality, adversarial regressions, and ticket evidence.
+- Constraints: preserve frozen precision-60 calculations and B/C/D/E identities; no sampler, mixture, persistence, CLI, provider, network, or MIN-007F work.
+
+### MIN-007R4 checkpoints
+
+- [x] Implemented the shared exact finite-Decimal invariant utility and focused boundary probes.
+- [x] Ran all 15 literal acceptance commands, recorded evidence, and prepared the single bounded ticket commit.
+
+## MIN-007R3E - harden coherent lineup invariants
+
+- Ticket/stage: `MIN-007R3E`, A7; required parent `9848c3ff3d68d75e31ffa55085ff033177aec312`.
+- Scope: one-to-one candidate identity, context-independent weight constraints, strict seed suffixes, and truthful projected-result validation.
+- Constraints: preserve frozen B/C/D/E identities and race algorithm; do not begin MIN-007F.
+
+### MIN-007R3E checkpoints
+
+- [x] Implemented the four AUDIT-007-2 lineup remediations and focused adversarial probes.
+- [x] Run all acceptance commands, record evidence, and create the single bounded ticket commit.
+
+## MIN-007R3D - harden conditional minute invariants
+
+- Ticket/stage: `MIN-007R3D`, A7; required parent `64f6b168db496c6c3aabe39dda82ad7843266a2a`.
+- Scope: exact stored Decimal conditional-PMF simplex, UUID-shaped example duplicate identity, and validated minute-result copy boundaries.
+- Constraints: preserve frozen B/C/D/E identities; do not modify `lineup.py` or begin MIN-007F.
+
+### MIN-007R3D checkpoints
+
+- [x] Implemented the three assigned AUDIT-007-2 D remediations and focused adversarial tests.
+- [x] Run all acceptance commands, record evidence, and create the single bounded ticket commit.
+
+## MIN-007E - coherent lineup sampler
+
+- Ticket/stage: `MIN-007E`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `60c583aa5dafff90aeaf2647d2b6cf9eeef950e9`.
+- Scope: deterministic Decimal exponential-race sampling of coherent 11-player lineups and configured benches.
+- Constraints: preserve accepted A/B/C/D identities; no minute-PMF coupling, overall minute projection, persistence, CLI, evaluation, network, provider, or credential work.
+
+### MIN-007E checkpoints
+
+- [x] 2026-08-10 - Implemented the exact four-phase Decimal sampler, typed projected/blocked results, semantic scenario hashes, and focused tests.
+- [x] 2026-08-10 - Ran all 15 literal acceptance commands with zero final failures, recorded evidence, and prepared the exact ticket commit pending final clean-tree verification.
+
+## MIN-007D - conditional minutes PMFs
+
+- Ticket/stage: `MIN-007D`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `6d31e3e46a9f3609efab9a2a9ca28f269b5ef6bb`.
+- Scope: fit typed Decimal START/BENCH minute priors and predict cutoff-safe conditional 91-point minute PMFs.
+- Constraints: preserve accepted A/B/C/R1/R2 and NRM identities; no coherent sampler, public role marginals, overall player PMF, persistence, CLI, evaluation, network, provider, or credential work.
+
+### MIN-007D checkpoints
+
+- [x] 2026-08-10 - Implemented Decimal position/role minute priors, cutoff-safe conditional PMFs, reduced synthetic weighting support, and focused unit/property/golden tests; frozen artifact and independent canaries pass.
+- [x] 2026-08-10 - Ran all 15 literal acceptance commands with zero final failures, recorded evidence, and prepared the exact ticket commit pending final clean-tree and review-pack validation.
+
+## MIN-007R2 - explicit new-signing identity override
+
+- Ticket/stage: `MIN-007R2`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `11acd4a0f7eee89a7c59ca5209dfa89999627145`.
+- Scope: require explicit validated boolean `new_signing: true` for distinct canonical player-ID overrides and add direct identity/evidence-ownership regressions.
+- Constraints: preserve all accepted A/B/C/R1 and NRM identities; no 007D work, dependency, network, provider, credential, database, migration or CLI changes.
+
+### MIN-007R2 checkpoints
+
+- [x] 2026-08-10 - Added the distinct-identity guard and direct missing/false/true/collision/cold-start/same-UUID regressions.
+- [x] 2026-08-10 - Ran all 13 literal acceptance commands with zero final failures, recorded evidence, and prepared the exact ticket commit pending final clean-tree verification.
+
+## MIN-007R1 - AUDIT-007-1 remediation
+
+- Ticket/stage: `MIN-007R1`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `2be9852da08913a07678bd6235edbe56d6a4664d`.
+- Scope: strict UTC timestamp boundaries, shared history identity validation, full-precision Decimal role utilities, canonical-ID override collision rejection and concrete frozen-schema negative tests.
+- Constraints: preserve all accepted A/B/C hashes, canaries, coefficients and NRM schemas; no 007D work, dependency, network, provider, credential, database, migration or CLI changes.
+
+### MIN-007R1 checkpoints
+
+- [x] 2026-08-09 - validated the remediation pack, reproduced all four P1 probes, implemented the five narrow remediations and added direct regression coverage.
+- [x] 2026-08-09 - ran all 16 literal acceptance commands with zero failures, recorded evidence, and prepared the single frozen-parent remediation commit pending final clean-tree verification.
+
+## MIN-007C - regularised role baseline
+
+- Ticket/stage: `MIN-007C`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `d54eae162386901f9710d7212b5dfb89174cfa31`.
+- Scope: fit frozen position START/BENCH/OUT priors and produce cutoff-safe internal role sampling utilities with explicit confidence metadata, manager/preseason weighting and trusted hard-ineligibility handling.
+- Constraints: no PMFs, coherent lineup sampler, public coherent marginals, persistence/migration, CLI, evaluation, dependency, network/credential, or redesign of MIN-007A/MIN-007B.
+
+### MIN-007C checkpoints
+
+- [x] 2026-08-09 - validated Pack 007C (`21` manifest entries; frozen artifact and nine-canary oracle PASS), confirmed the exact MIN-007B parent and clean preflight, and read the frozen role contract/oracles.
+- [x] 2026-08-09 - implemented the pure Decimal role baseline, reproduced the frozen artifact and nine canaries, passed the 13-command ledger, and prepared the exact bounded commit with clean-tree verification pending after commit.
+
+## MIN-007B - cutoff-safe minutes training dataset builder
+
+- Ticket/stage: `MIN-007B`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `84697a464af17a909e28a6870d764617098fc30a`.
+- Scope: create the pure, deterministic, synthetic-history-to-TRAIN-dataset slice with explicit role/minutes labels, cutoff-safe eligibility, canonical ordering, duplicate rejection and semantic hashing.
+- Constraints: no role model, PMFs, lineup sampler, persistence/migration, CLI, evaluation, dependency, network/credential, or MIN-007A market changes.
+
+### MIN-007B checkpoints
+
+- [x] 2026-08-09 - validated Pack 007B (`17` hashed files; frozen dataset oracle PASS), confirmed the exact MIN-007A parent and clean worktree, and read the D1-D9 contract and stop rules.
+- [x] 2026-08-09 - implemented and verified the pure cutoff-safe builder against the frozen 368-row oracle, passed the literal acceptance ledger, and prepared the exact bounded commit with clean-tree verification pending after commit.
+
+## MIN-007A - NRM public-contract and confidence hardening
+
+- Ticket/stage: `MIN-007A`, A7.
+- Required branch/parent: `stage/A7/MIN-007-basic-minutes-model` from `253baf3f19661a5704bb1fad2f7ac60e1db288eb`.
+- Scope: install the three supplied superseding NRM public schemas, preserve the probability dependency, and separate ordinary degradation evidence from blocking confidence warnings without changing NRM math, policy, freshness, persistence, or database objects.
+- Constraints: offline synthetic fixtures only; no provider/network/credential, dependency, migration, minutes model, broad refactor, push, merge, rebase, reset, tag, or amend.
+
+### MIN-007A checkpoints
+
+- [x] 2026-08-09 - validated Pack 007A (`23` hashed files), confirmed the exact branch/parent and clean worktree, read the frozen H1/H2 contracts, and passed the pre-edit focused NRM contract/unit/golden suite (`73 passed`).
+- [ ] Final - install exact schemas, add negative and canary regressions, pass all literal commands, commit with the exact ticket message, and leave the worktree clean.
+
 ## NRM-006 - odds normalisation and consensus baseline
 
 - Ticket/stage: `NRM-006`, A6.
@@ -224,3 +452,11 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - Bundle the single public-domain IANA tzdata 2025b `Europe/London` TZif payload with an enforced SHA-256 so stock Windows Python can validate the sanctioned default without an unapproved runtime dependency.
 - Define `codex_result.review_pack.sha256` as the detached digest of stable primary review files 04-05 and 07-19; publish the separately validated final archive SHA-256 externally because an archive cannot contain its own digest.
 - Read-only self-review found no authority/scope P0 issue and drove fixes for credential-shape leakage, CPU fallback coercion, fail-open scan coverage, PEM detection, missing-config doctor false health, Windows timezone portability, branch-metric reporting, clean-clone package provenance, evidence semantic checks, and atomic review placement.
+## MIN-007R5F5 - final-output constraint scope remediation
+
+- Ticket/stage: `MIN-007R5F5`, A7; required parent `94b561f427e18e6200acb892d44b99e1038a70eb`.
+- Scope: remove transaction-wide `SET CONSTRAINTS ALL IMMEDIATE` from final publication.
+- [x] Read and validate the remediation pack; verified branch, clean baseline, and Alembic head.
+- [x] Scoped immediate validation to `trg_min007f_final_output_complete`, restoring it to deferred.
+- [x] Added unit guard and one-outer-transaction A/B publication regression.
+- [x] Ran all 22 acceptance commands; generated evidence and review archive.

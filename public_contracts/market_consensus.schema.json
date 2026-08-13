@@ -57,40 +57,88 @@
       "minItems": 1,
       "items": {
         "$ref": "normalised_operator_market.schema.json"
-      }
+      },
+      "uniqueItems": true
     },
     "outcomes": {
       "type": "array",
       "minItems": 3,
       "maxItems": 3,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "outcome",
-          "consensus_probability",
-          "lower_bound",
-          "upper_bound"
-        ],
-        "properties": {
-          "outcome": {
-            "enum": [
-              "HOME",
-              "DRAW",
-              "AWAY"
-            ]
-          },
-          "consensus_probability": {
-            "$ref": "probability.schema.json"
-          },
-          "lower_bound": {
-            "$ref": "probability.schema.json"
-          },
-          "upper_bound": {
-            "$ref": "probability.schema.json"
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outcome",
+            "consensus_probability",
+            "lower_bound",
+            "upper_bound"
+          ],
+          "properties": {
+            "outcome": {
+              "const": "HOME"
+            },
+            "consensus_probability": {
+              "$ref": "probability.schema.json"
+            },
+            "lower_bound": {
+              "$ref": "probability.schema.json"
+            },
+            "upper_bound": {
+              "$ref": "probability.schema.json"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outcome",
+            "consensus_probability",
+            "lower_bound",
+            "upper_bound"
+          ],
+          "properties": {
+            "outcome": {
+              "const": "DRAW"
+            },
+            "consensus_probability": {
+              "$ref": "probability.schema.json"
+            },
+            "lower_bound": {
+              "$ref": "probability.schema.json"
+            },
+            "upper_bound": {
+              "$ref": "probability.schema.json"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outcome",
+            "consensus_probability",
+            "lower_bound",
+            "upper_bound"
+          ],
+          "properties": {
+            "outcome": {
+              "const": "AWAY"
+            },
+            "consensus_probability": {
+              "$ref": "probability.schema.json"
+            },
+            "lower_bound": {
+              "$ref": "probability.schema.json"
+            },
+            "upper_bound": {
+              "$ref": "probability.schema.json"
+            }
           }
         }
-      }
+      ],
+      "items": false
     },
     "operator_disagreement": {
       "type": "string",
@@ -145,5 +193,6 @@
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
     }
-  }
+  },
+  "$comment": "MIN-007 hardening: canonical outcome order and duplicate operator-market payload rejection at the public-schema boundary."
 }

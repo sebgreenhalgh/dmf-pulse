@@ -90,39 +90,96 @@
       "type": "array",
       "minItems": 3,
       "maxItems": 3,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "outcome",
-          "decimal_odds",
-          "raw_implied_probability",
-          "proportional_probability",
-          "market_probability"
-        ],
-        "properties": {
-          "outcome": {
-            "enum": [
-              "HOME",
-              "DRAW",
-              "AWAY"
-            ]
-          },
-          "decimal_odds": {
-            "type": "string",
-            "pattern": "^(?:1\\.\\d*[1-9]\\d*|(?:[2-9]\\d*|1\\d+)(?:\\.\\d+)?)$"
-          },
-          "raw_implied_probability": {
-            "$ref": "probability.schema.json"
-          },
-          "proportional_probability": {
-            "$ref": "probability.schema.json"
-          },
-          "market_probability": {
-            "$ref": "probability.schema.json"
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outcome",
+            "decimal_odds",
+            "raw_implied_probability",
+            "proportional_probability",
+            "market_probability"
+          ],
+          "properties": {
+            "outcome": {
+              "const": "HOME"
+            },
+            "decimal_odds": {
+              "type": "string",
+              "pattern": "^(?:1\\.\\d*[1-9]\\d*|(?:[2-9]\\d*|1\\d+)(?:\\.\\d+)?)$"
+            },
+            "raw_implied_probability": {
+              "$ref": "probability.schema.json"
+            },
+            "proportional_probability": {
+              "$ref": "probability.schema.json"
+            },
+            "market_probability": {
+              "$ref": "probability.schema.json"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outcome",
+            "decimal_odds",
+            "raw_implied_probability",
+            "proportional_probability",
+            "market_probability"
+          ],
+          "properties": {
+            "outcome": {
+              "const": "DRAW"
+            },
+            "decimal_odds": {
+              "type": "string",
+              "pattern": "^(?:1\\.\\d*[1-9]\\d*|(?:[2-9]\\d*|1\\d+)(?:\\.\\d+)?)$"
+            },
+            "raw_implied_probability": {
+              "$ref": "probability.schema.json"
+            },
+            "proportional_probability": {
+              "$ref": "probability.schema.json"
+            },
+            "market_probability": {
+              "$ref": "probability.schema.json"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outcome",
+            "decimal_odds",
+            "raw_implied_probability",
+            "proportional_probability",
+            "market_probability"
+          ],
+          "properties": {
+            "outcome": {
+              "const": "AWAY"
+            },
+            "decimal_odds": {
+              "type": "string",
+              "pattern": "^(?:1\\.\\d*[1-9]\\d*|(?:[2-9]\\d*|1\\d+)(?:\\.\\d+)?)$"
+            },
+            "raw_implied_probability": {
+              "$ref": "probability.schema.json"
+            },
+            "proportional_probability": {
+              "$ref": "probability.schema.json"
+            },
+            "market_probability": {
+              "$ref": "probability.schema.json"
+            }
           }
         }
-      }
+      ],
+      "items": false
     },
     "policy_id": {
       "const": "market-normalisation-v1"
@@ -145,7 +202,10 @@
       "items": {
         "type": "string",
         "format": "uuid"
-      }
+      },
+      "maxItems": 3,
+      "uniqueItems": true
     }
-  }
+  },
+  "$comment": "MIN-007 hardening: exact HOME/DRAW/AWAY ordering and exactly three unique source observations."
 }

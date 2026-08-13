@@ -1,0 +1,20 @@
+{
+  "ticket_id": "MIN-007R5G",
+  "status": "PASS",
+  "root_probability_schema_sha256": "6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b",
+  "schema_id": "https://dmf-pulse.local/contracts/min-007/probability.schema.json",
+  "golden_assets": "repository-contained; no external Codex pack paths",
+  "availability_regression": {"passed": 145, "skipped": 0},
+  "market_regression": {"passed": 75, "skipped": 0},
+  "postgres_graph": {
+    "fixture_external_id": 701,
+    "role_marginal_rows": 23,
+    "conditional_pmf_rows": 46,
+    "scenario_rows": 256,
+    "final_player_rows": 23,
+    "repeat_idempotent": true,
+    "altered_output_collision_rejected": true,
+    "blocked_709_final_rows_added": 0
+  },
+  "migration_head": "20260807_0006"
+}

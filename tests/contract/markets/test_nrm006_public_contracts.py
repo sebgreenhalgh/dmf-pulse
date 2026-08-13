@@ -6,6 +6,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -20,14 +21,15 @@ from dmf_pulse.markets import (
     normalise_complete_market,
     raw_implied_probability,
 )
+from tests.contract.markets._draft2020 import SchemaValidationError, validate_instance
 
 pytestmark = pytest.mark.contract
 
 SCHEMA_HASHES = {
-    "probability.schema.json": "b2900cdbdb3c6d5dd4300eaa14508c8eb09852dc917d7fa95b5df15cfcba63df",
-    "normalised_operator_market.schema.json": "b2c9e4fe19edeec5dd45debc14de159a7233cc97b9b00edd14e37312977fc06e",
-    "market_consensus.schema.json": "2a44943bf1e6fc0530c390d7da30a043c8ad1d3af528ee30fd6f35df5c6ba306",
-    "market_normalisation_result.schema.json": "4a8fb4925fede0b569913ad252fd483f1f04d28f2167c328ebefe3fa12cc7164",
+    "probability.schema.json": "6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b",
+    "normalised_operator_market.schema.json": "c2851ca0c051c61aaa404fb290f6974640b2b1453f8c5a43e8d89502d0ee21fb",
+    "market_consensus.schema.json": "60e59a14cb5c3a9abdbac5c7b4c929c9a38993a07a0b71cdc80704517fc56ad4",
+    "market_normalisation_result.schema.json": "b9a39f8f2a612645ddde141f8e9c8df340d65d1b1a8a4e01b42bb2f64a1eb789",
 }
 
 
@@ -90,3 +92,32 @@ def test_frozen_library_surface_and_enums_are_exposed() -> None:
         "MAPPING_UNAVAILABLE",
         "FUTURE_OBSERVATION",
     } <= {item.value for item in ExclusionReason}
+
+
+def test_min007a_schema_constraints_reject_supplied_negative_cases(repository_root: Path) -> None:
+    cases = json.loads(
+        (repository_root / "fixtures" / "nrm_schema_negative_instances.json").read_text(
+            encoding="utf-8"
+        )
+    )["cases"]
+    schemas: dict[str, dict[str, Any]] = {
+        name: json.loads((repository_root / "public_contracts" / name).read_text(encoding="utf-8"))
+        for name in {
+            "probability.schema.json",
+            "normalised_operator_market.schema.json",
+            "market_consensus.schema.json",
+            "market_normalisation_result.schema.json",
+        }
+    }
+    assert [case["name"] for case in cases] == [
+        "operator_source_ids_too_many",
+        "operator_source_ids_duplicate",
+        "operator_duplicate_home_outcome",
+        "consensus_wrong_outcome_order",
+        "normalised_null_consensus",
+        "blocked_with_consensus",
+    ]
+    for case in cases:
+        assert case["must_validate"] is False
+        with pytest.raises(SchemaValidationError):
+            validate_instance(case["instance"], schemas[case["target"]], registry=schemas)

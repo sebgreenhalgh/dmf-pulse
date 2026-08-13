@@ -1,0 +1,26 @@
+{
+  "ticket_id": "MIN-007R3D",
+  "branch": "stage/A7/MIN-007-basic-minutes-model",
+  "required_parent": "64f6b168db496c6c3aabe39dda82ad7843266a2a",
+  "status": "PASS",
+  "command_count": 15,
+  "passed": 15,
+  "failed": 0,
+  "commands": [
+    {"index": 1, "command": "git diff --check", "exit_code": 0, "result": "PASS"},
+    {"index": 2, "command": "uv run ruff format --check src/dmf_pulse/availability tests/unit/availability tests/property/availability tests/golden/availability", "exit_code": 0, "result": "PASS: 20 files already formatted"},
+    {"index": 3, "command": "uv run ruff check src/dmf_pulse/availability tests/unit/availability tests/property/availability tests/golden/availability", "exit_code": 0, "result": "PASS: All checks passed"},
+    {"index": 4, "command": "uv run mypy src/dmf_pulse/availability", "exit_code": 0, "result": "PASS: no issues found in 6 source files"},
+    {"index": 5, "command": "uv run pytest -q tests/unit/availability/test_audit0072_minutes_remediation.py", "exit_code": 0, "result": "PASS: 7 passed"},
+    {"index": 6, "command": "uv run pytest -q tests/unit/availability/test_minutes.py tests/property/availability/test_minutes_properties.py", "exit_code": 0, "result": "PASS: 6 passed"},
+    {"index": 7, "command": "uv run pytest -q tests/golden/availability/test_min007d_minutes.py", "exit_code": 0, "result": "PASS: 2 passed"},
+    {"index": 8, "command": "uv run pytest -q tests/unit/availability tests/property/availability tests/golden/availability", "exit_code": 0, "result": "PASS: 61 passed"},
+    {"index": 9, "command": "uv run python \"C:\\Users\\sebgr\\Documents\\dmf-pulse-context\\CodexPacks\\DMF_PULSE_CODEX_PACK_007\\007C_ROLE_BASELINE\\reference\\min007c_role_oracle.py\" --repo .", "exit_code": 0, "result": "PASS: artifact baf70ee76b8a51f4cf3bfda1a1cc33d6ba3f6c304617c8bc42aefdee2b2a1c96; 9 canaries; training dataset 1466a5dcc9104a2d26f9c6b286d2717b6460423503026f05a58d3a26de040be3"},
+    {"index": 10, "command": "uv run python \"C:\\Users\\sebgr\\Documents\\dmf-pulse-context\\CodexPacks\\DMF_PULSE_CODEX_PACK_007\\007R3D_AUDIT_2_MINUTES_REMEDIATION_v1.1\\reference\\min007r3d_corrected_oracle.py\" --repo .", "exit_code": 0, "result": "PASS: artifact 8e0b410e37d33127dc26937f9fe7c6ff60867b4f60f0f7a87679f951c5f7e422; authority R3D_V1_1_EXACT_SIMPLEX; 9 canaries; frozen 12dp projection unchanged; exact sum precision 256"},
+    {"index": 11, "command": "uv run python \"C:\\Users\\sebgr\\Documents\\dmf-pulse-context\\CodexPacks\\DMF_PULSE_CODEX_PACK_007\\007E_COHERENT_LINEUP_SAMPLER\\reference\\min007e_sampler_oracle.py\" --repo .", "exit_code": 0, "result": "PASS: 7 scenarios; stable scenario set 60afa72dbc0340615e2786783ec56186ce1a2e11a497aa4f872a9b0890bc10ee"},
+    {"index": 12, "command": "uv run pytest -q tests/contract/markets tests/unit/markets tests/golden/markets", "exit_code": 0, "result": "PASS: 75 passed"},
+    {"index": 13, "command": "uv run python scripts/validate_repository.py", "exit_code": 0, "result": "PASS: error_count 0"},
+    {"index": 14, "command": "uv run python scripts/scan_secrets.py", "exit_code": 0, "result": "PASS: finding_count 0"},
+    {"index": 15, "command": "git diff --check", "exit_code": 0, "result": "PASS"}
+  ]
+}

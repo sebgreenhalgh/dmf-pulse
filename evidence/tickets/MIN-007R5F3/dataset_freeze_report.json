@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "publication_lifecycle": "DRAFT -> COMPLETE -> frozen",
+  "dataset_lineage_insert_after_complete_rejected": true,
+  "dataset_lineage_update_after_complete_rejected": true,
+  "dataset_lineage_delete_after_complete_rejected": true,
+  "existing_model_still_uses_unchanged_dataset": true,
+  "exact_duplicate_replay_idempotent": true,
+  "evidence_test": "tests/integration/availability/test_audit0073b_dataset_freeze.py"
+}

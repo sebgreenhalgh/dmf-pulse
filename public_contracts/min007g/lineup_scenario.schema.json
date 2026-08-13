@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/min-007/lineup-scenario.schema.json",
+  "title": "LineupScenario",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scenario_index",
+    "fixture_id",
+    "team_id",
+    "starters",
+    "bench",
+    "bench_size",
+    "bench_goalkeeper_slots",
+    "starter_goalkeeper_count",
+    "weight",
+    "scenario_sha256"
+  ],
+  "properties": {
+    "scenario_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "fixture_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "team_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "starters": {
+      "type": "array",
+      "minItems": 11,
+      "maxItems": 11,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "bench": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "bench_size": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "bench_goalkeeper_slots": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "starter_goalkeeper_count": {
+      "const": 1
+    },
+    "weight": {
+      "$ref": "probability.schema.json"
+    },
+    "scenario_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

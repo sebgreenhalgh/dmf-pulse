@@ -1,0 +1,22 @@
+{
+  "ticket_id": "MIN-007R1",
+  "command_count": 16,
+  "commands": [
+    {"index": 1, "command": "git diff --check", "exit_code": 0, "result": "PASS"},
+    {"index": 2, "command": "uv run ruff format --check src/dmf_pulse/availability tests/unit/availability tests/property/availability tests/golden/availability tests/contract/markets", "exit_code": 0, "result": "PASS: 13 files already formatted"},
+    {"index": 3, "command": "uv run ruff check src/dmf_pulse/availability tests/unit/availability tests/property/availability tests/golden/availability tests/contract/markets", "exit_code": 0, "result": "PASS"},
+    {"index": 4, "command": "uv run mypy src/dmf_pulse/availability", "exit_code": 0, "result": "PASS: no issues in 4 source files"},
+    {"index": 5, "command": "uv run pytest -q tests/unit/availability/test_audit0071_remediation.py", "exit_code": 0, "result": "PASS: 4 passed"},
+    {"index": 6, "command": "uv run pytest -q tests/unit/availability/test_dataset.py tests/property/availability/test_dataset_properties.py", "exit_code": 0, "result": "PASS: 16 passed"},
+    {"index": 7, "command": "uv run pytest -q tests/unit/availability/test_role_model.py tests/property/availability/test_role_model_properties.py", "exit_code": 0, "result": "PASS: 11 passed"},
+    {"index": 8, "command": "uv run pytest -q tests/golden/availability/test_min007b_dataset.py tests/golden/availability/test_min007c_role_model.py", "exit_code": 0, "result": "PASS: 5 passed"},
+    {"index": 9, "command": "uv run python \"C:\\Users\\sebgr\\Documents\\dmf-pulse-context\\CodexPacks\\DMF_PULSE_CODEX_PACK_007\\007B_DATASET_BUILDER\\reference\\min007b_dataset_oracle.py\" --repo .", "exit_code": 0, "result": "PASS: semantic 1466a5dcc9104a2d26f9c6b286d2717b6460423503026f05a58d3a26de040be3, 368 rows"},
+    {"index": 10, "command": "uv run python \"C:\\Users\\sebgr\\Documents\\dmf-pulse-context\\CodexPacks\\DMF_PULSE_CODEX_PACK_007\\007C_ROLE_BASELINE\\reference\\min007c_role_oracle.py\" --repo .", "exit_code": 0, "result": "PASS: artifact baf70ee76b8a51f4cf3bfda1a1cc33d6ba3f6c304617c8bc42aefdee2b2a1c96, 9 canaries"},
+    {"index": 11, "command": "uv run pytest -q tests/contract/markets/test_nrm006_public_contracts.py", "exit_code": 0, "result": "PASS: 7 passed"},
+    {"index": 12, "command": "uv run pytest -q tests/contract/markets tests/unit/markets tests/golden/markets", "exit_code": 0, "result": "PASS: 75 passed"},
+    {"index": 13, "command": "uv run pytest -q tests/unit/availability tests/property/availability tests/golden/availability", "exit_code": 0, "result": "PASS: 36 passed"},
+    {"index": 14, "command": "uv run python scripts/validate_repository.py", "exit_code": 0, "result": "PASS: error_count 0"},
+    {"index": 15, "command": "uv run python scripts/scan_secrets.py", "exit_code": 0, "result": "PASS: finding_count 0"},
+    {"index": 16, "command": "git diff --check", "exit_code": 0, "result": "PASS"}
+  ]
+}

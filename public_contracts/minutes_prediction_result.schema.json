@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/min-007/minutes-prediction-result.schema.json",
+  "title": "MinutesPredictionResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "fixture_id",
+    "team_id",
+    "as_of",
+    "projection",
+    "error_code"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "PROJECTED",
+        "BLOCKED"
+      ]
+    },
+    "fixture_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "team_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "projection": {
+      "anyOf": [
+        {
+          "$ref": "team_minutes_projection.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "error_code": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "PROJECTED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "projection": {
+            "$ref": "team_minutes_projection.schema.json"
+          },
+          "error_code": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "BLOCKED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "projection": {
+            "type": "null"
+          },
+          "error_code": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

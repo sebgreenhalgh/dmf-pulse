@@ -1,0 +1,20 @@
+{
+  "ticket_id": "MIN-007R5F4",
+  "status": "PASS",
+  "policy": "Every exact prediction lookup requires prediction_run.core_state = COMPLETE. Final rows are returned only when final_output_state = COMPLETE.",
+  "committed_core_draft": {
+    "exact_lookup_hidden": true,
+    "facade_lookup_hidden": true,
+    "as_of_lookup_hidden": true,
+    "latest_lookup_unavailable": true,
+    "public_final_rows_hidden": true
+  },
+  "complete_core": {
+    "exact_lookup_unchanged": true,
+    "final_draft_returns_no_final_players": true
+  },
+  "verification": {
+    "unit_test": "tests/unit/availability/test_audit0073c_final_output_lookup.py: 1 passed",
+    "integration_test": "tests/integration/availability/test_audit0073c_exact_lookup_visibility.py: 1 passed"
+  }
+}

@@ -72,14 +72,16 @@
             ]
           }
         }
-      }
+      },
+      "uniqueItems": true
     },
     "warnings": {
       "type": "array",
       "items": {
         "type": "string",
         "minLength": 1
-      }
+      },
+      "uniqueItems": true
     },
     "error_code": {
       "type": [
@@ -87,5 +89,63 @@
         "null"
       ]
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "NORMALISED",
+              "DEGRADED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "consensus": {
+            "$ref": "market_consensus.schema.json"
+          },
+          "error_code": {
+            "type": "null"
+          },
+          "fixture_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "INSUFFICIENT",
+              "BLOCKED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "consensus": {
+            "type": "null"
+          },
+          "error_code": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ],
+  "$comment": "MIN-007 hardening: status/consensus/error relationships are enforced by JSON Schema, not only runtime models."
 }

@@ -1,0 +1,24 @@
+{
+  "ticket": "MIN-007R5F2",
+  "status": "PASS",
+  "pmf_shape": {
+    "array_ndims": 1,
+    "lower_bound": 1,
+    "upper_bound": 91,
+    "cardinality": 91,
+    "alternate_0_to_90_rejected": true,
+    "malformed_validation_returns_false": true,
+    "hidden_1e-300_excess_rejected": true
+  },
+  "half_even_ties": {
+    "0.123456500000": "0.123456",
+    "0.123457500000": "0.123458",
+    "1.234566500000": "1.234566",
+    "1.234567500000": "1.234568"
+  },
+  "derived_checks": [
+    "p_zero_minutes equals pmf[1]",
+    "p_60_plus equals pmf[61:91]",
+    "expected_minutes equals six-decimal HALF_EVEN mean"
+  ]
+}

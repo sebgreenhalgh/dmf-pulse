@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "core_lifecycle": "DRAFT -> COMPLETE -> frozen",
+  "extra_source_dependency_after_core_complete_rejected": true,
+  "extra_hard_eligibility_after_core_complete_rejected": true,
+  "extra_marginal_after_core_complete_rejected": true,
+  "extra_conditional_pmf_after_core_complete_rejected": true,
+  "extra_scenario_after_core_complete_rejected": true,
+  "extra_scenario_member_after_core_complete_rejected": true,
+  "core_update_delete_rejected": true,
+  "counts_recomputed_from_persisted_rows": true,
+  "evidence_test": "tests/integration/availability/test_audit0073b_prediction_graph_freeze.py"
+}

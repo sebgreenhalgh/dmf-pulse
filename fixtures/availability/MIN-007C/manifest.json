@@ -1,0 +1,47 @@
+{
+  "fixture_manifest_version": "min007c-availability-v1",
+  "ticket": "MIN-007C",
+  "entries": [
+    {
+      "path": "fixtures/availability/MIN-007C/role_canaries.json",
+      "sha256": "9a3a6842d86fd85932c2ee36bff59b365e6ba0df522f073fee84f35b83696b0f",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/availability/MIN-007C/role_weight_case.json",
+      "sha256": "17ff3fc8056eed5d906157df83dde1338ef3b262704f489ab276a8ac15b5bd1a",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/availability/MIN-007C/role_artifact.json",
+      "sha256": "5028789a467082f526d54572fe3c095025c50cf27c0717a3cefd7452e85997e0",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/availability/MIN-007C/expected_role_canaries.json",
+      "sha256": "62609452daa0f8115893cf4e08c9323850d66f49bcae09b19afb7d9adc393270",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/availability/MIN-007C/expected_role_weight_case.json",
+      "sha256": "436f43bcf6338df00cea11edaf7155d2c7fc1b8ab7e4f22932e1e5b1a59633ad",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    },
+    {
+      "path": "fixtures/availability/MIN-007C/minutes_baseline_policy.json",
+      "sha256": "99faa598bf1e59a21c967d8649a911c5df2e39bbed07b3e86f53683f0ab1817f",
+      "synthetic": true,
+      "rights_classification": "SYNTHETIC_TEST"
+    }
+  ],
+  "oracles": [
+    "fixtures/availability/MIN-007C/role_artifact.json",
+    "fixtures/availability/MIN-007C/expected_role_canaries.json",
+    "fixtures/availability/MIN-007C/expected_role_weight_case.json"
+  ]
+}

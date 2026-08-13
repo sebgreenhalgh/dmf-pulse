@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmf-pulse.local/contracts/min-007/minutes-model-artifact.schema.json",
+  "title": "MinutesModelArtifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "model_family",
+    "training_split",
+    "training_example_count",
+    "training_fixture_count",
+    "config",
+    "role_priors",
+    "minute_priors",
+    "dataset_sha256",
+    "artifact_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "minutes-model-artifact-v1"
+    },
+    "model_family": {
+      "const": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"
+    },
+    "training_split": {
+      "const": "TRAIN"
+    },
+    "training_example_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "training_fixture_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "config": {
+      "type": "object"
+    },
+    "role_priors": {
+      "type": "object",
+      "required": [
+        "GK",
+        "DEF",
+        "MID",
+        "FWD"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "GK": {
+          "type": "object",
+          "required": [
+            "START",
+            "BENCH",
+            "OUT"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "START": {
+              "$ref": "probability.schema.json"
+            },
+            "BENCH": {
+              "$ref": "probability.schema.json"
+            },
+            "OUT": {
+              "$ref": "probability.schema.json"
+            }
+          }
+        },
+        "DEF": {
+          "type": "object",
+          "required": [
+            "START",
+            "BENCH",
+            "OUT"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "START": {
+              "$ref": "probability.schema.json"
+            },
+            "BENCH": {
+              "$ref": "probability.schema.json"
+            },
+            "OUT": {
+              "$ref": "probability.schema.json"
+            }
+          }
+        },
+        "MID": {
+          "type": "object",
+          "required": [
+            "START",
+            "BENCH",
+            "OUT"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "START": {
+              "$ref": "probability.schema.json"
+            },
+            "BENCH": {
+              "$ref": "probability.schema.json"
+            },
+            "OUT": {
+              "$ref": "probability.schema.json"
+            }
+          }
+        },
+        "FWD": {
+          "type": "object",
+          "required": [
+            "START",
+            "BENCH",
+            "OUT"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "START": {
+              "$ref": "probability.schema.json"
+            },
+            "BENCH": {
+              "$ref": "probability.schema.json"
+            },
+            "OUT": {
+              "$ref": "probability.schema.json"
+            }
+          }
+        }
+      }
+    },
+    "minute_priors": {
+      "type": "object"
+    },
+    "dataset_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "artifact_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

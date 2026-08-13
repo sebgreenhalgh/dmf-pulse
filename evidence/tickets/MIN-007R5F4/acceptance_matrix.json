@@ -1,0 +1,37 @@
+{
+  "ticket_id": "MIN-007R5F4",
+  "required_parent": "3867877d4c2d1c3febcdf4b456703e3356d9a8af",
+  "branch": "stage/A7/MIN-007-basic-minutes-model",
+  "alembic_head": "20260807_0006",
+  "status": "PASS",
+  "completed_commands": [
+    {"ordinal": 1, "status": "PASS", "result": "git diff --check"},
+    {"ordinal": 2, "status": "PASS", "result": "69 files already formatted"},
+    {"ordinal": 3, "status": "PASS", "result": "ruff check passed"},
+    {"ordinal": 4, "status": "PASS", "result": "mypy: 11 source files, no issues"},
+    {"ordinal": 5, "status": "PASS", "result": "1 passed"},
+    {"ordinal": 6, "status": "PASS", "result": "Docker PostgreSQL healthy"},
+    {"ordinal": 7, "status": "PASS", "result": "Alembic upgraded to 20260807_0006"},
+    {"ordinal": 8, "status": "PASS", "result": "truthfulness probe: 1 passed"},
+    {"ordinal": 9, "status": "PASS", "result": "lookup visibility probe: 1 passed"},
+    {"ordinal": 10, "status": "PASS", "result": "R5F3 regressions: 4 passed"},
+    {"ordinal": 11, "status": "PASS", "result": "R5F1 regressions: 11 passed"},
+    {"ordinal": 12, "status": "PASS", "result": "MIN-007F regressions: 4 passed"},
+    {"ordinal": 13, "status": "PASS", "result": "MIN-007G regressions: 3 passed"},
+    {"ordinal": 14, "status": "PASS", "result": "migration suite: 63 passed"},
+    {"ordinal": 15, "status": "PASS", "result": "migration matrix PASS; PostgreSQL 18.4"},
+    {"ordinal": 16, "status": "PASS", "result": "availability unit/property/golden: 148 passed"},
+    {"ordinal": 17, "status": "PASS", "result": "availability/markets contract/unit/golden: 79 passed"},
+    {"ordinal": 18, "status": "PASS", "result": "repository validation: 0 errors"},
+    {"ordinal": 19, "status": "PASS", "result": "secret scan: 0 findings"},
+    {"ordinal": 20, "status": "PASS", "result": "20260807_0006 is the sole Alembic head"},
+    {"ordinal": 21, "status": "PASS", "result": "No new upgrade operations detected"},
+    {"ordinal": 22, "status": "PASS", "result": "disposable PostgreSQL container, network, and volume removed"},
+    {"ordinal": 23, "status": "PASS", "result": "git diff --check passed after final source, test, manifest, and plan updates"}
+  ],
+  "pending_ordinals": [],
+  "notes": [
+    "The initial repository-validation run identified expected manifest drift for the intentional R5F4 edits; scripts/generate_min007f_manifest.py regenerated the governed current manifest and the literal validation rerun passed with zero errors.",
+    "The initial isolated alembic-check shell lacked the test URL established by command 7. The literal check rerun with that test-only inherited setting passed with no new upgrade operations."
+  ]
+}

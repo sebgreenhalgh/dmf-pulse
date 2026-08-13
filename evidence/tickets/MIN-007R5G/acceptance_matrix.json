@@ -1,0 +1,30 @@
+{
+  "ticket_id": "MIN-007R5G",
+  "status": "PASS",
+  "command_count": 23,
+  "commands": [
+    {"id": 1, "command": "git diff --check", "exit_code": 0, "result": "PASS"},
+    {"id": 2, "command": "uv run ruff format --check src/dmf_pulse/availability src/dmf_pulse/cli tests/unit/availability tests/golden/availability tests/contract/availability tests/integration/availability", "exit_code": 0, "result": "59 files already formatted"},
+    {"id": 3, "command": "uv run ruff check src/dmf_pulse/availability src/dmf_pulse/cli tests/unit/availability tests/golden/availability tests/contract/availability tests/integration/availability", "exit_code": 0, "result": "All checks passed"},
+    {"id": 4, "command": "uv run mypy src/dmf_pulse/availability src/dmf_pulse/cli", "exit_code": 0, "result": "24 source files; no issues"},
+    {"id": 5, "command": "uv run pytest -q tests/unit/availability/test_audit0073_cli_semantics.py", "exit_code": 0, "result": "10 passed"},
+    {"id": 6, "command": "uv run pytest -q tests/contract/availability/test_min007_public_contracts.py tests/contract/availability/test_audit0073_portability.py", "exit_code": 0, "result": "4 passed"},
+    {"id": 7, "command": "uv run pytest -q tests/golden/availability/test_min007g_predictions.py tests/golden/availability/test_min007g_evaluation.py", "exit_code": 0, "result": "2 passed"},
+    {"id": 8, "command": "uv run python -c \"from pathlib import Path; import hashlib; p=Path('public_contracts/probability.schema.json'); assert hashlib.sha256(p.read_bytes()).hexdigest() == '6a0dcfb79f5e8939dd54f889b61236783d8c4e05a4bd0272eae25599c2373f9b'\"", "exit_code": 0, "result": "approved schema SHA passed"},
+    {"id": 9, "command": "uv run python -c \"from pathlib import Path; import hashlib; p=Path('fixtures/availability/MIN-007/external_mapping_plan.json'); assert hashlib.sha256(p.read_bytes()).hexdigest() == '490585bed1bce6f9d904ddb12b6df6b6a4d04caca91fb1160af53e83578a3550'\"", "exit_code": 0, "result": "approved mapping SHA passed"},
+    {"id": 10, "command": "uv run python \"C:\\Users\\sebgr\\Documents\\dmf-pulse-context\\CodexPacks\\DMF_PULSE_CODEX_PACK_007\\007G_PROJECTION_EVALUATION_CLI\\reference\\min007g_pipeline_oracle.py\" --repo .", "exit_code": 0, "result": "PASS; 9 scenarios; artifact/evaluation/registry hashes exact"},
+    {"id": 11, "command": "docker compose -f compose.test.yaml up -d --wait", "exit_code": 0, "result": "PostgreSQL 18.4 healthy"},
+    {"id": 12, "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run alembic upgrade head", "exit_code": 0, "result": "head upgraded; no migration drift"},
+    {"id": 13, "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_min007g_persistence.py tests/integration/availability/test_audit0073_g_persistence_assurance.py", "exit_code": 0, "result": "2 passed"},
+    {"id": 14, "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_min007g_cli.py tests/integration/availability/test_audit0073_cli_mapping.py", "exit_code": 0, "result": "2 passed; 701-709 mapping"},
+    {"id": 15, "command": "$env:DMF_ENVIRONMENT='TEST'; $env:PGPASSWORD='changeme'; $env:DMF_TEST_DATABASE_URL='postgresql+psycopg://dmf_test@127.0.0.1:55432/dmf_pulse_test'; uv run pytest -q tests/integration/availability/test_audit0073_registry_atomicity.py tests/integration/availability/test_audit0073_db_relational_integrity.py tests/integration/availability/test_audit0073_evaluation_integrity.py", "exit_code": 0, "result": "11 passed"},
+    {"id": 16, "command": "uv run pytest -q tests/unit/availability tests/property/availability tests/golden/availability", "exit_code": 0, "result": "145 passed; zero skips"},
+    {"id": 17, "command": "uv run pytest -q tests/contract/markets tests/unit/markets tests/golden/markets", "exit_code": 0, "result": "75 passed; zero skips"},
+    {"id": 18, "command": "uv run python scripts/validate_repository.py", "exit_code": 0, "result": "repository validator PASS; 0 errors"},
+    {"id": 19, "command": "uv run python scripts/scan_secrets.py", "exit_code": 0, "result": "0 findings"},
+    {"id": 20, "command": "uv run alembic heads", "exit_code": 0, "result": "20260807_0006 (head)"},
+    {"id": 21, "command": "uv run alembic check", "exit_code": 0, "result": "No new upgrade operations detected"},
+    {"id": 22, "command": "docker compose -f compose.test.yaml down -v --remove-orphans", "exit_code": 0, "result": "PostgreSQL container, volume, and network removed"},
+    {"id": 23, "command": "git diff --check", "exit_code": 0, "result": "PASS"}
+  ]
+}

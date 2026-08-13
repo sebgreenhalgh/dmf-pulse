@@ -1,0 +1,10 @@
+{
+  "ticket_id": "MIN-007F",
+  "status": "PASS",
+  "mechanism": "independent PostgreSQL sessions with concurrent INSERT ... ON CONFLICT",
+  "dataset_duplicate": "one canonical identifier",
+  "model_duplicate": "one canonical identifier",
+  "prediction_duplicate": "one canonical identifier",
+  "partial_bundle_after_failure": "none",
+  "in_process_mutex": false
+}

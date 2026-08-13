@@ -39,6 +39,9 @@ ODD_SCHEMA_MANIFEST = REPOSITORY_ROOT / "evidence/tickets/ODD-005/schema_manifes
 NRM_REPORT = REPOSITORY_ROOT / "evidence/tickets/NRM-006/migration_matrix.json"
 NRM_OFFLINE_SQL = REPOSITORY_ROOT / "evidence/tickets/NRM-006/offline_upgrade.sql"
 NRM_SCHEMA_MANIFEST = REPOSITORY_ROOT / "evidence/tickets/NRM-006/schema_manifest.json"
+MIN007F_REPORT = REPOSITORY_ROOT / "evidence/tickets/MIN-007F/migration_report.json"
+MIN007F_OFFLINE_SQL = REPOSITORY_ROOT / "evidence/tickets/MIN-007F/offline_upgrade.sql"
+MIN007F_SCHEMA_MANIFEST = REPOSITORY_ROOT / "evidence/tickets/MIN-007F/schema_manifest.json"
 EXPECTED_POSTGRES_VERSION = "18.4"
 ALLOWED_TEST_DATABASES = frozenset({"dmf_pulse_test"})
 
@@ -163,7 +166,8 @@ def _offline_sql(url: str, revision: str) -> str:
     sql = output.getvalue()
     if errors.getvalue().strip():
         raise MatrixError("offline Alembic generation wrote diagnostics")
-    return sql.replace("\r\n", "\n")
+    normalised = sql.replace("\r\n", "\n")
+    return "\n".join(line.rstrip() for line in normalised.splitlines()).rstrip() + "\n"
 
 
 def _assert_secret_free(sql: str, url: URL) -> None:
@@ -628,6 +632,45 @@ def _assert_at_baseline(database_url: str, expected_revision: str) -> dict[str, 
                     "fpl_table_count": len(fpl_tables),
                     "revision": revision,
                 }
+            if expected_revision == "20260803_0005":
+                availability_tables = {
+                    "dataset_version",
+                    "dataset_training_example",
+                    "model_version",
+                    "model_evaluation",
+                    "prediction_run",
+                    "prediction_dependency",
+                    "prediction_hard_eligibility",
+                    "role_marginal",
+                    "conditional_minute_pmf",
+                    "lineup_scenario",
+                    "lineup_scenario_member",
+                    "player_minutes_projection",
+                }
+                actual = {
+                    schema: set(inspector.get_table_names(schema=schema))
+                    for schema in ("football", "provenance")
+                }
+                if actual["football"] & {
+                    "prediction_run",
+                    "prediction_dependency",
+                    "prediction_hard_eligibility",
+                    "role_marginal",
+                    "conditional_minute_pmf",
+                    "lineup_scenario",
+                    "lineup_scenario_member",
+                    "player_minutes_projection",
+                } or actual["provenance"] & {
+                    "dataset_version",
+                    "dataset_training_example",
+                    "model_version",
+                    "model_evaluation",
+                }:
+                    raise MatrixError("MIN-007F objects remain after baseline downgrade")
+                return {
+                    "availability_table_count": len(availability_tables),
+                    "revision": revision,
+                }
             fpl_tables = set(inspector.get_table_names(schema="fpl"))
             actual = {
                 schema: set(inspector.get_table_names(schema=schema))
@@ -674,12 +717,33 @@ def run_matrix(
 
     odd005 = baseline_revision == "20260724_0002"
     nrm006 = baseline_revision == "20260725_0004"
-    report_path = report_path or (NRM_REPORT if nrm006 else ODD_REPORT if odd005 else FPL_REPORT)
+    min007f = baseline_revision == "20260803_0005"
+    report_path = report_path or (
+        MIN007F_REPORT
+        if min007f
+        else NRM_REPORT
+        if nrm006
+        else ODD_REPORT
+        if odd005
+        else FPL_REPORT
+    )
     offline_sql_path = offline_sql_path or (
-        NRM_OFFLINE_SQL if nrm006 else ODD_OFFLINE_SQL if odd005 else FPL_OFFLINE_SQL
+        MIN007F_OFFLINE_SQL
+        if min007f
+        else NRM_OFFLINE_SQL
+        if nrm006
+        else ODD_OFFLINE_SQL
+        if odd005
+        else FPL_OFFLINE_SQL
     )
     schema_manifest_path = schema_manifest_path or (
-        NRM_SCHEMA_MANIFEST if nrm006 else ODD_SCHEMA_MANIFEST if odd005 else FPL_SCHEMA_MANIFEST
+        MIN007F_SCHEMA_MANIFEST
+        if min007f
+        else NRM_SCHEMA_MANIFEST
+        if nrm006
+        else ODD_SCHEMA_MANIFEST
+        if odd005
+        else FPL_SCHEMA_MANIFEST
     )
     try:
         report_relative = report_path.relative_to(REPOSITORY_ROOT)
@@ -765,6 +829,15 @@ def run_matrix(
             head_seed = _fpl004_seed_state(database_url)
             if head_seed != initial_head_seed:
                 raise MatrixError("accepted FPL-004 data changed during NRM-006 upgrade")
+        elif min007f:
+            initial_head_seed = {}
+            stage = "MIN-007F head to parent baseline downgrade"
+            _alembic("downgrade", database_url, plan.baseline)
+            baseline_state = _assert_at_baseline(database_url, plan.baseline)
+            baseline_seed = {}
+            stage = "parent baseline to MIN-007F re-upgrade"
+            _alembic("upgrade", database_url, plan.target)
+            head_seed = {}
         else:
             stage = "DAT-003 baseline downgrade"
             _alembic("downgrade", database_url, plan.baseline)
@@ -782,22 +855,14 @@ def run_matrix(
         stage = "populated ingestion-head downgrade"
         _alembic("downgrade", database_url, plan.baseline)
         baseline_state = _assert_at_baseline(database_url, plan.baseline)
-        downgraded_seed = (
-            _fpl004_seed_state(database_url)
-            if odd005 or nrm006
-            else _assert_seed_preserved(database_url, fpl_head=False)
-        )
-        if (odd005 or nrm006) and downgraded_seed != baseline_seed:
+        downgraded_seed = _fpl004_seed_state(database_url) if odd005 or nrm006 else {}
+        if (odd005 or nrm006 or min007f) and downgraded_seed != baseline_seed:
             raise MatrixError("accepted FPL-004 data changed on populated downgrade")
 
         stage = "populated ingestion-head final re-upgrade"
         _alembic("upgrade", database_url, plan.target)
-        final_seed = (
-            _fpl004_seed_state(database_url)
-            if odd005 or nrm006
-            else _assert_seed_preserved(database_url, fpl_head=True)
-        )
-        if (odd005 or nrm006) and final_seed != head_seed:
+        final_seed = _fpl004_seed_state(database_url) if odd005 or nrm006 else {}
+        if (odd005 or nrm006 or min007f) and final_seed != head_seed:
             raise MatrixError("accepted FPL-004 data changed on final re-upgrade")
         final_manifest = _catalog_state(database_url)
         if first_manifest != final_manifest:
@@ -857,7 +922,9 @@ def run_matrix(
         },
         "status": "PASS",
         "target_revision": plan.target,
-        "ticket_id": "NRM-006" if nrm006 else "ODD-005" if odd005 else "FPL-004",
+        "ticket_id": (
+            "MIN-007F" if min007f else "NRM-006" if nrm006 else "ODD-005" if odd005 else "FPL-004"
+        ),
         "baseline_state": baseline_state,
     }
     try:

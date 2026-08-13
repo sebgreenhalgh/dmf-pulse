@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "evaluation_correct_model_provenance_accepted": true,
+  "evaluation_wrong_first_model_rejected": true,
+  "evaluation_wrong_artifact_rejected": true,
+  "raw_unbound_evaluation_registration_rejected": true,
+  "evaluation_public_sha_unchanged": "f2d075a9497331b73bf896be4610b684f8a3ed41eb17248a27284c79556cd748",
+  "binding_columns": ["evaluated_model_semantic_sha256", "evaluated_model_artifact_sha256", "evaluated_model_family"],
+  "evidence_test": "tests/integration/availability/test_audit0073b_evaluation_provenance.py"
+}
