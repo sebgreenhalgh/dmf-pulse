@@ -1,0 +1,41 @@
+{
+  "schema_version": "score-distribution-request-v1",
+  "fixture_id": "10000000-0000-7000-8000-000000000807",
+  "home_team_id": "20000000-0000-7000-8000-000000000001",
+  "away_team_id": "20000000-0000-7000-8000-000000000002",
+  "as_of": "2026-08-20T12:00:00Z",
+  "fixture_status": "POSTPONED",
+  "minutes_context": {
+    "schema_version": "stage7-minutes-context-v1",
+    "home": {
+      "schema_version": "team-minutes-projection-v1",
+      "fixture_id": "10000000-0000-7000-8000-000000000807",
+      "team_id": "20000000-0000-7000-8000-000000000001",
+      "as_of": "2026-08-20T11:50:00Z",
+      "model_family": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+      "dataset_sha256": "3c80f7ed5bfb636a6954468f539803e63cc25ff0c8a5601775e74bc29e7ae241",
+      "model_artifact_sha256": "c425b93468a3f0decf4258347a0fb53b5a2dd7c395425ce925b5949744999575",
+      "sample_count": 256,
+      "scenario_set_sha256": "99b74fb66686e8cc929881c28e00c76b1a569bbe6ab24841efede2c7a7e3dfdd",
+      "result_sha256": "7b6ee97b532aa770f4d98cb07f987ef2d873b8b59e8f40b05d2c1613a25185ff"
+    },
+    "away": {
+      "schema_version": "team-minutes-projection-v1",
+      "fixture_id": "10000000-0000-7000-8000-000000000807",
+      "team_id": "20000000-0000-7000-8000-000000000002",
+      "as_of": "2026-08-20T11:50:00Z",
+      "model_family": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+      "dataset_sha256": "3c80f7ed5bfb636a6954468f539803e63cc25ff0c8a5601775e74bc29e7ae241",
+      "model_artifact_sha256": "c425b93468a3f0decf4258347a0fb53b5a2dd7c395425ce925b5949744999575",
+      "sample_count": 256,
+      "scenario_set_sha256": "47cb57be0f8d781b0d75e60f4b5928468ab8e48686fe211a7834fd4ac943679c",
+      "result_sha256": "9cb41890c3b4abec480c33c01ccb63aa3d68ce8dcd4536b90a56dee4370f996c"
+    }
+  },
+  "prior": {
+    "away_goal_rate": "1.100000",
+    "home_goal_rate": "1.400000",
+    "model_family": "INDEPENDENT_POISSON_V1"
+  },
+  "constraints": []
+}

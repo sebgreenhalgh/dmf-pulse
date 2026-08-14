@@ -32,6 +32,8 @@ data/
 artifacts/*
 !artifacts/.gitkeep
 models/
+!config/models/
+!config/models/score_baseline.yaml
 checkpoints/
 backups/
 logs/

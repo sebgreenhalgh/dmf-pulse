@@ -857,37 +857,55 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
     )
     stage_ci_fragments = (
         (
-            "uv run python scripts/test_migration_matrix.py --baseline-revision 20260724_0002 --target head",
+            "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
             'uv run pytest -m "postgres and integration" tests/integration',
-            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/ODD-005/coverage.json",
-            "uv run python scripts/check_odd005_coverage_gates.py",
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/GCS-008/coverage.json",
+            "uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/GCS-008/coverage.json",
             "uv run dmf specs validate",
             "uv run dmf ingest odds replay",
             "uv run dmf market observations",
+            "uv run pytest tests/unit/football_events tests/unit/scripts/test_gcs008_acceptance.py tests/unit/scripts/test_gcs008_coverage_gate.py tests/unit/scripts/test_gcs008_scope.py tests/unit/scripts/test_gcs008_wheel.py tests/property/football_events tests/contract/football_events tests/golden/football_events tests/integration/football_events",
+            "uv run dmf events score-distribution",
+            "uv run dmf events explain-market-fit",
             "uv run python scripts/verify_odd005_wheel.py",
-            "uv run python scripts/verify_odd005_acceptance.py",
-            "uv run python scripts/generate_odd005_evidence.py --status DRAFT",
-            "uv run dmf evidence validate --ticket ODD-005",
+            "uv run python scripts/verify_gcs008_wheel.py",
+            "uv run python scripts/validate_gcs008_acceptance.py",
         )
-        if (root / "tickets/ODD-005/ticket.yaml").is_file()
+        if (root / "tickets/GCS-008/ticket.yaml").is_file()
         else (
-            "uv run python scripts/test_migration_matrix.py --baseline-revision 20260723_0001 --target head",
-            'uv run pytest -m "postgres or migration" tests/integration',
-            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/FPL-004/coverage.json",
-            "uv run python scripts/check_fpl004_coverage_gates.py",
-            "uv run dmf specs validate",
-            "uv run dmf ingest fpl validate",
-            "uv run python scripts/verify_fpl004_wheel.py",
-            "uv run python scripts/verify_fpl004_acceptance.py",
-        )
-        if (root / "tickets/FPL-004/ticket.yaml").is_file()
-        else (
-            "uv run alembic upgrade head",
-            'uv run pytest -m "postgres or migration"',
-            "uv run alembic downgrade base",
-            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/DAT-003/coverage.json",
-            "uv run python scripts/check_coverage_gates.py",
-            "uv run python scripts/verify_wheel.py",
+            (
+                "uv run python scripts/test_migration_matrix.py --baseline-revision 20260724_0002 --target head",
+                'uv run pytest -m "postgres and integration" tests/integration',
+                "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/ODD-005/coverage.json",
+                "uv run python scripts/check_odd005_coverage_gates.py",
+                "uv run dmf specs validate",
+                "uv run dmf ingest odds replay",
+                "uv run dmf market observations",
+                "uv run python scripts/verify_odd005_wheel.py",
+                "uv run python scripts/verify_odd005_acceptance.py",
+                "uv run python scripts/generate_odd005_evidence.py --status DRAFT",
+                "uv run dmf evidence validate --ticket ODD-005",
+            )
+            if (root / "tickets/ODD-005/ticket.yaml").is_file()
+            else (
+                "uv run python scripts/test_migration_matrix.py --baseline-revision 20260723_0001 --target head",
+                'uv run pytest -m "postgres or migration" tests/integration',
+                "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/FPL-004/coverage.json",
+                "uv run python scripts/check_fpl004_coverage_gates.py",
+                "uv run dmf specs validate",
+                "uv run dmf ingest fpl validate",
+                "uv run python scripts/verify_fpl004_wheel.py",
+                "uv run python scripts/verify_fpl004_acceptance.py",
+            )
+            if (root / "tickets/FPL-004/ticket.yaml").is_file()
+            else (
+                "uv run alembic upgrade head",
+                'uv run pytest -m "postgres or migration"',
+                "uv run alembic downgrade base",
+                "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/DAT-003/coverage.json",
+                "uv run python scripts/check_coverage_gates.py",
+                "uv run python scripts/verify_wheel.py",
+            )
         )
     )
     required_ci_fragments = (*common_ci_fragments, *stage_ci_fragments)
@@ -915,13 +933,16 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
         validate_repository_manifest,
     )
 
+    gcs008_path = root / "evidence/tickets/GCS-008/current_manifest.json"
     nrm_path = root / "evidence/tickets/NRM-006/current_manifest.json"
     min007f_path = root / "evidence/tickets/MIN-007F/current_manifest.json"
     odd_path = root / "evidence/tickets/ODD-005/current_manifest.json"
     fpl_path = root / "evidence/tickets/FPL-004/current_manifest.json"
     dat_path = root / "evidence/tickets/DAT-003/current_manifest.json"
     active_path = (
-        min007f_path
+        gcs008_path
+        if gcs008_path.is_file()
+        else min007f_path
         if min007f_path.is_file()
         else nrm_path
         if (root / "tickets/NRM-006/ticket.yaml").is_file()
@@ -1367,6 +1388,13 @@ def validate_repository(root: Path) -> list[str]:
     return sorted(set(errors))
 
 
+def _active_ticket(root: Path) -> str:
+    for ticket_id in ("GCS-008", "NRM-006", "ODD-005", "FPL-004", "DAT-003", "RUL-002"):
+        if (root / f"tickets/{ticket_id}/ticket.yaml").is_file():
+            return ticket_id
+    return "FND-001"
+
+
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     errors = validate_repository(root)
@@ -1375,19 +1403,7 @@ def main() -> int:
         "errors": errors,
         "status": "PASS" if not errors else "FAIL",
     }
-    active_ticket = (
-        "NRM-006"
-        if (root / "tickets/NRM-006/ticket.yaml").is_file()
-        else "ODD-005"
-        if (root / "tickets/ODD-005/ticket.yaml").is_file()
-        else "FPL-004"
-        if (root / "tickets/FPL-004/ticket.yaml").is_file()
-        else "DAT-003"
-        if (root / "tickets/DAT-003/ticket.yaml").is_file()
-        else "RUL-002"
-        if (root / "tickets/RUL-002/ticket.yaml").is_file()
-        else "FND-001"
-    )
+    active_ticket = _active_ticket(root)
     report_path = (
         root / "evidence" / "tickets" / active_ticket / "repository_validation_report.json"
     )

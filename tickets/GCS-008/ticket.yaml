@@ -1,0 +1,58 @@
+ticket_id: "GCS-008"
+stage: "A8"
+pack_version: "1.0"
+title: "Goal and clean-sheet distributions"
+status: "DRAFT"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+
+required_branch: "stage/A8/GCS-008-goal-clean-sheet-distributions"
+required_base_commit: "a5a0b66afd6e9645f971976d723e238824bee6a8"
+inherited_alembic_head: "20260807_0006"
+proposed_alembic_revision: null
+
+objective: >-
+  Produce one deterministic market-constrained joint team-score matrix per fixture
+  and derive coherent team goal, goals-conceded, result, totals, clean-sheet, BTTS,
+  and scoreline distributions from that matrix.
+
+user_visible_vertical_slice:
+  command: >-
+    dmf events score-distribution --fixture
+    fixtures/events/score/GCS-008/balanced_fixture.json
+    --artifact-root artifacts/gcs008 --output json
+  expected: >-
+    A schema-valid deterministic score-distribution result whose exact Decimal
+    score matrix and every derived team probability are cutoff-safe, coherent,
+    content-addressed, and bound to accepted Stage-6 and Stage-7 identities.
+
+frozen_dependencies:
+  - "Stage-7 availability/start/minutes mathematics, public identities, persistence, packaged replay, migration, CLI, and assurance."
+  - "Stage-6 market-normalisation mathematics, public identities, cutoff semantics, persistence, and assurance."
+  - "Alembic history through 20260807_0006 and all dependency lock files."
+
+in_scope:
+  - "Exact-Decimal independent-Poisson score prior."
+  - "Adaptive finite score support with explicit omitted-tail diagnostics."
+  - "Strict Stage-6 FULL_TIME_1X2 consensus and synthetic market-constraint inputs."
+  - "Read-only Stage-7 home/away team-minutes identity and cutoff binding."
+  - "Generic market design rows and deterministic soft KL projection."
+  - "Team goal and goals-conceded PMFs, expected goals, 1X2, totals, clean sheets, BTTS, and top scorelines."
+  - "Diagnostics, residuals, confidence, semantic hashes, replay artifacts, CLI, evaluation, schemas, and assurance gates."
+
+excluded:
+  - "Live network/provider calls or real credentials."
+  - "Production bivariate Poisson or Dixon-Coles."
+  - "Player goal/assist allocation."
+  - "Shots, saves, cards, penalties, own goals, defensive events, event timing, and full timelines."
+  - "New dependencies, Stage-7 redesign, or database migration."
+
+public_contracts:
+  - "public_contracts/score_distribution_request.schema.json"
+  - "public_contracts/joint_score_distribution.schema.json"
+  - "public_contracts/score_distribution_result.schema.json"
+
+required_review_output: "review_pack/GCS-008/DMF_PULSE_GCS-008_REVIEW.zip"
+network_allowed: false
+real_credentials_allowed: false

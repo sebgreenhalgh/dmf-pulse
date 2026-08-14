@@ -1,0 +1,37 @@
+schema_version: "score-baseline-policy-v1"
+model_family: "INDEPENDENT_POISSON_SOFT_KL_V1"
+decimal_precision: 60
+grid:
+  minimum_max_goals: 6
+  maximum_max_goals: 36
+  tail_tolerance: "0.000000000100"
+  hard_tail_limit: "0.000000010000"
+projection:
+  max_iterations: 80
+  gradient_tolerance: "0.000000000000000001"
+  line_search_min_step: "0.000000000001"
+  market_uncertainty_floor: "0.005000000000"
+  allow_prior_fallback: true
+  maximum_prior_goal_rate: "8.000000"
+  family_weight_caps:
+    - family: "1X2"
+      maximum_total_weight: "1.000000"
+    - family: "TOTALS"
+      maximum_total_weight: "1.000000"
+    - family: "TEAM_TOTAL"
+      maximum_total_weight: "1.000000"
+    - family: "CLEAN_SHEET"
+      maximum_total_weight: "0.750000"
+    - family: "BTTS"
+      maximum_total_weight: "0.750000"
+    - family: "CORRECT_SCORE"
+      maximum_total_weight: "0.250000"
+derived_outputs:
+  total_goal_lines:
+    - "0.5"
+    - "1.5"
+    - "2.5"
+    - "3.5"
+    - "4.5"
+    - "5.5"
+  top_scoreline_count: 10
