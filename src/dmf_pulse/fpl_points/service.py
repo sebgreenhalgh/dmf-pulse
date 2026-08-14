@@ -207,6 +207,7 @@ class FplPointsService:
                 upstream_score_distribution=request.score_distribution,
                 upstream_stage8_sha256=request.score_distribution.result_sha256,
                 result_sha256=None,
+                monte_carlo_policy=self._mc_policy,
                 warnings=warnings,
             )
             digest = semantic_sha256(base)

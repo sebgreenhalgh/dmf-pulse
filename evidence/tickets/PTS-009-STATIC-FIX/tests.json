@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "scoped_tests_passed": 94,
+  "scoped_tests_failed": 0,
+  "performance": {
+    "marker": "performance",
+    "scenario_count": 1000,
+    "elapsed_seconds": 17.449,
+    "budget_seconds": 20.0,
+    "coverage_instrumentation": false
+  },
+  "coverage_excluding_performance": {
+    "statement_percent": 92.390357,
+    "branch_percent": 88.990639,
+    "gcs008_gate": "PASS",
+    "note": "The exact repository-wide command timed out in the local environment after writing the coverage report; the generated report remained above the 90% repository line gate and the required GCS-008 gate passed. GitHub Actions remains the authoritative full-run result."
+  }
+}

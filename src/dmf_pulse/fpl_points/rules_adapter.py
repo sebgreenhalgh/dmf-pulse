@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
@@ -15,6 +17,169 @@ from dmf_pulse.fpl_points.models import (
     RulesetIdentity,
 )
 from dmf_pulse.rules.errors import RulesError
+
+
+def _parse_approval_time(value: str) -> datetime | None:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.utcoffset() == UTC.utcoffset(parsed) else None
+
+
+def _load_approval(path: Path, models: Any) -> Any:
+    try:
+        return models.ApprovalRecord.model_validate(json.loads(path.read_text(encoding="utf-8")))
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise FplPointsError(
+            "RULESET_APPROVAL_INVALID", "ruleset approval record is unavailable or invalid"
+        ) from exc
+
+
+def _load_canonical_json(path: Path, *, code: str) -> tuple[dict[str, Any], bytes]:
+    canonical = importlib.import_module("dmf_pulse.rules.canonical")
+    try:
+        raw = path.read_bytes()
+        value = json.loads(raw.decode("utf-8"))
+        if not isinstance(value, dict):
+            raise ValueError("activation child must be a JSON object")
+        expected = canonical.pretty_rules_json(value).encode("utf-8")
+        if raw != expected:
+            raise ValueError("activation child is not canonical JSON")
+        return value, raw
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise FplPointsError(code, "ruleset activation bundle is unavailable or invalid") from exc
+
+
+def _load_activation_bundle(
+    ruleset_path: Path, compiler: Any, models: Any, approval_path: Path | None
+) -> tuple[Any, bool]:
+    """Load and cross-check the immutable Stage-2 activation directory.
+
+    An ACTIVE JSON file is not sufficient evidence of activation: all four Stage-2
+    children and their manifest hashes must agree.  In particular, an approval file
+    supplied from outside the activation directory is never accepted as a substitute.
+    """
+
+    integrity = importlib.import_module("dmf_pulse.rules.compiler")
+    active_path = ruleset_path.resolve()
+    directory = active_path.parent
+    expected_names = {
+        "verified_ruleset.json",
+        "active_ruleset.json",
+        "approval.json",
+        "activation_receipt.json",
+        "activation_manifest.json",
+    }
+    if active_path.name != "active_ruleset.json" or not directory.is_dir():
+        raise FplPointsError(
+            "RULESET_ACTIVATION_BUNDLE_REQUIRED",
+            "production scoring requires an accepted Stage-2 activation bundle",
+        )
+    try:
+        actual_names = {entry.name for entry in directory.iterdir() if entry.is_file()}
+    except OSError as exc:
+        raise FplPointsError(
+            "RULESET_ACTIVATION_BUNDLE_INVALID", "activation bundle directory is unavailable"
+        ) from exc
+    if actual_names != expected_names:
+        raise FplPointsError(
+            "RULESET_ACTIVATION_BUNDLE_INVALID",
+            "activation bundle must contain exactly the accepted Stage-2 children",
+        )
+    if approval_path is not None and approval_path.resolve() != directory / "approval.json":
+        raise FplPointsError(
+            "RULESET_ACTIVATION_BUNDLE_INVALID",
+            "production approval must be the approval child of the activation bundle",
+        )
+    try:
+        verified = compiler.load_compiled_ruleset(directory / "verified_ruleset.json")
+        active = compiler.load_compiled_ruleset(active_path)
+        approval_value, approval_bytes = _load_canonical_json(
+            directory / "approval.json", code="RULESET_ACTIVATION_BUNDLE_INVALID"
+        )
+        receipt_value, receipt_bytes = _load_canonical_json(
+            directory / "activation_receipt.json", code="RULESET_ACTIVATION_BUNDLE_INVALID"
+        )
+        manifest, _manifest_bytes = _load_canonical_json(
+            directory / "activation_manifest.json", code="RULESET_ACTIVATION_BUNDLE_INVALID"
+        )
+        approval = models.ApprovalRecord.model_validate(approval_value)
+        receipt = models.ActivationReceipt.model_validate(receipt_value)
+        integrity.ensure_compiled_ruleset_integrity(verified)
+        integrity.ensure_compiled_ruleset_integrity(active)
+    except RulesError as exc:
+        raise FplPointsError(exc.code, exc.message, blockers=exc.blockers) from exc
+    except (ValueError, TypeError) as exc:
+        raise FplPointsError(
+            "RULESET_ACTIVATION_BUNDLE_INVALID", "activation bundle contains invalid metadata"
+        ) from exc
+    if active_path != (directory / "active_ruleset.json").resolve():
+        raise FplPointsError("RULESET_ACTIVATION_BUNDLE_INVALID", "active artifact path is invalid")
+    if (
+        verified.status.value != "VERIFIED"
+        or active.status.value != "ACTIVE"
+        or not active.production_eligible
+        or (verified.ruleset_id, verified.ruleset_version)
+        != (active.ruleset_id, active.ruleset_version)
+        or approval.ruleset_id != verified.ruleset_id
+        or approval.ruleset_version != verified.ruleset_version
+        or not approval.approved
+        or approval.approved_at is None
+        or approval.approved_by is None
+        or not approval.approved_by.strip()
+        or not approval.approved_at.endswith("Z")
+        or _parse_approval_time(approval.approved_at) is None
+        or approval.ruleset_hash != verified.ruleset_hash
+        or receipt.ruleset_id != active.ruleset_id
+        or receipt.ruleset_version != active.ruleset_version
+        or receipt.ruleset_hash != active.ruleset_hash
+        or receipt.verified_ruleset_hash != verified.ruleset_hash
+        or receipt.approval_sha256 != hashlib.sha256(approval_bytes).hexdigest()
+        or receipt.activated_at != approval.approved_at
+        or receipt.artifact != directory.as_posix()
+    ):
+        raise FplPointsError(
+            "RULESET_ACTIVATION_BUNDLE_INVALID",
+            "activation receipt and approval are not linked to the verified and active rulesets",
+        )
+    children = manifest.get("children")
+    if (
+        manifest.get("schema_version") != "1.0"
+        or manifest.get("ruleset_id") != active.ruleset_id
+        or manifest.get("ruleset_version") != active.ruleset_version
+        or manifest.get("active_ruleset_hash") != active.ruleset_hash
+        or manifest.get("verified_ruleset_hash") != verified.ruleset_hash
+        or not isinstance(children, dict)
+        or set(children) != expected_names - {"activation_manifest.json"}
+    ):
+        raise FplPointsError(
+            "RULESET_ACTIVATION_BUNDLE_INVALID", "activation manifest identity is invalid"
+        )
+    expected_hashes = {
+        "verified_ruleset.json": verified.ruleset_hash,
+        "active_ruleset.json": active.ruleset_hash,
+        "approval.json": verified.ruleset_hash,
+        "activation_receipt.json": active.ruleset_hash,
+    }
+    for filename, expected_hash in expected_hashes.items():
+        child = children[filename]
+        if (
+            not isinstance(child, dict)
+            or child.get("ruleset_id") != active.ruleset_id
+            or child.get("ruleset_version") != active.ruleset_version
+            or child.get("ruleset_hash") != expected_hash
+            or child.get("sha256")
+            != hashlib.sha256((directory / filename).read_bytes()).hexdigest()
+        ):
+            raise FplPointsError(
+                "RULESET_ACTIVATION_BUNDLE_INVALID",
+                "activation manifest child hash does not match its file",
+            )
+    # Keep the receipt bytes referenced so a malformed/unused child cannot be ignored.
+    if hashlib.sha256(receipt_bytes).hexdigest() != children["activation_receipt.json"]["sha256"]:
+        raise FplPointsError("RULESET_ACTIVATION_BUNDLE_INVALID", "receipt hash is invalid")
+    return approval, True
 
 
 @runtime_checkable
@@ -30,15 +195,25 @@ class RulesEngine(Protocol):
 class AcceptedRulesAdapter:
     """Thin runtime wrapper; all numerical FPL rules remain in ``dmf_pulse.rules``."""
 
-    def __init__(self, compiled: Any, approval: Any | None = None) -> None:
+    def __init__(
+        self,
+        compiled: Any,
+        approval: Any | None = None,
+        *,
+        activation_bundle_verified: bool = False,
+    ) -> None:
         self._compiled = compiled
         self._approval = approval
+        self._activation_bundle_verified = activation_bundle_verified
         approved = bool(
-            approval is not None
-            and getattr(approval, "approved", False)
-            and getattr(approval, "ruleset_id", None) == compiled.ruleset_id
-            and getattr(approval, "ruleset_version", None) == compiled.ruleset_version
-            and getattr(approval, "ruleset_hash", None) == compiled.ruleset_hash
+            activation_bundle_verified
+            or (
+                approval is not None
+                and getattr(approval, "approved", False)
+                and getattr(approval, "ruleset_id", None) == compiled.ruleset_id
+                and getattr(approval, "ruleset_version", None) == compiled.ruleset_version
+                and getattr(approval, "ruleset_hash", None) == compiled.ruleset_hash
+            )
         )
         self._identity = RulesetIdentity(
             ruleset_id=compiled.ruleset_id,
@@ -63,16 +238,18 @@ class AcceptedRulesAdapter:
         except RulesError as exc:
             raise FplPointsError(exc.code, exc.message, blockers=exc.blockers) from exc
         approval = None
-        if approval_path is not None:
-            try:
-                approval = models.ApprovalRecord.model_validate(
-                    json.loads(approval_path.read_text(encoding="utf-8"))
-                )
-            except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
-                raise FplPointsError(
-                    "RULESET_APPROVAL_INVALID", "ruleset approval record is unavailable or invalid"
-                ) from exc
-        return cls(compiled, approval)
+        activation_bundle_verified = False
+        if getattr(getattr(compiled, "status", None), "value", compiled.status) == "ACTIVE":
+            approval, activation_bundle_verified = _load_activation_bundle(
+                ruleset_path, compiler, models, approval_path
+            )
+        elif approval_path is not None:
+            approval = _load_approval(approval_path, models)
+        return cls(
+            compiled,
+            approval,
+            activation_bundle_verified=activation_bundle_verified,
+        )
 
     @property
     def identity(self) -> RulesetIdentity:
@@ -99,6 +276,11 @@ class AcceptedRulesAdapter:
             if not identity.human_approval_recorded:
                 raise FplPointsError(
                     "RULESET_APPROVAL_MISSING", "production projection requires human approval"
+                )
+            if not self._activation_bundle_verified:
+                raise FplPointsError(
+                    "RULESET_ACTIVATION_BUNDLE_REQUIRED",
+                    "production projection requires an accepted Stage-2 activation bundle",
                 )
         elif identity.status not in {"REFERENCE_ONLY", "VERIFIED", "ACTIVE"}:
             raise FplPointsError(
@@ -163,7 +345,12 @@ class AcceptedRulesAdapter:
             result = scoring.score_fixture(self._compiled, accepted)
         except RulesError as exc:
             raise FplPointsError(exc.code, exc.message, blockers=exc.blockers) from exc
-        bps_values = {player_id: score.bps for player_id, score in result.players.items()}
+        minutes_by_player = {player.player_id: player.minutes for player in scenario.players}
+        bps_values = {
+            player_id: score.bps
+            for player_id, score in result.players.items()
+            if minutes_by_player.get(player_id, 0) > 0
+        }
         ranks = competition_ranks(bps_values)
         tie_counts: dict[int, int] = {}
         for rank in ranks.values():

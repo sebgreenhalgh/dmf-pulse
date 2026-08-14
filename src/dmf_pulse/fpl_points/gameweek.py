@@ -72,6 +72,12 @@ def assemble_gameweek(
         )
     if any(result.status is not SimulationStatus.SUCCESS for result in fixture_results):
         raise FplPointsError("GAMEWEEK_FIXTURE_BLOCKED", "all fixture projections must succeed")
+    fixture_ids = tuple(result.fixture_id for result in fixture_results)
+    if len(set(fixture_ids)) != len(fixture_ids):
+        raise FplPointsError(
+            "GAMEWEEK_FIXTURE_DUPLICATE",
+            "Gameweek assembly requires unique fixture identities",
+        )
     gameweeks = {result.gameweek_id for result in fixture_results}
     if len(gameweeks) != 1:
         raise FplPointsError("GAMEWEEK_ID_MISMATCH", "fixtures belong to different Gameweeks")

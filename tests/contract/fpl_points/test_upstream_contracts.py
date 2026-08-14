@@ -182,6 +182,14 @@ def test_stage7_path_adapter_uses_accepted_team_and_player_identities() -> None:
         (lambda rows: rows[0].update(position="INVALID"), "STAGE7_POSITION_INVALID"),
         (lambda rows: rows[0].pop("entry_minute"), "STAGE7_INTERVAL_MISSING"),
         (lambda rows: rows[0].update(starter=1), "STAGE7_BOOLEAN_INVALID"),
+        (lambda rows: rows[0].update(team_id=AWAY_TEAM_ID), "STAGE7_PLAYER_TEAM_MISMATCH"),
+        (lambda rows: rows[0].update(position="DEF"), "STAGE7_PLAYER_POSITION_MISMATCH"),
+        (lambda rows: rows[0].update(official_minutes=91), "STAGE7_MINUTES_INVALID"),
+        (
+            lambda rows: rows[0].update(official_minutes=89, entry_minute=0, exit_minute=89),
+            "STAGE7_MINUTE_PMF_ZERO",
+        ),
+        (lambda rows: rows[0].update(exit_minute=89), "STAGE7_INTERVAL_INVALID"),
     ],
 )
 def test_stage7_path_adapter_rejects_bad_explicit_rows(mutation, code: str) -> None:

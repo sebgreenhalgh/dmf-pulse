@@ -2,13 +2,19 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
 from types import ModuleType
 
 import pytest
 from pydantic import ValidationError
 
-from dmf_pulse.fpl_points.artifacts import semantic_sha256
+from dmf_pulse.fpl_points.artifacts import (
+    canonical_json_bytes,
+    load_verified_model,
+    semantic_sha256,
+    sha256_bytes,
+)
 from dmf_pulse.fpl_points.models import FixtureProjectionResult, ProjectionMode
 from dmf_pulse.fpl_points.service import FplPointsService
 from tests.support.factories import make_request, mc_policy, reference_engine
@@ -111,6 +117,82 @@ def test_successful_artifact_assurance_requires_rules_recomputation() -> None:
     assert "RULESET_RECOMPUTE_REQUIRED" in module.validate_projection(_result())
 
 
+@pytest.mark.parametrize("tamper", ("summary", "dependence", "monte_carlo"))
+def test_artifact_assurance_recomputes_all_derived_outputs_after_hash_repair(tamper: str) -> None:
+    module = _load_script("check_stage9_artifact")
+    result = _result()
+    if tamper == "summary":
+        player_id = next(iter(result.player_summaries))
+        summary = result.player_summaries[player_id].model_copy(
+            update={"expected_points": result.player_summaries[player_id].expected_points + 100.0}
+        )
+        tampered = result.model_copy(
+            update={
+                "player_summaries": {**result.player_summaries, player_id: summary},
+                "result_sha256": None,
+            }
+        )
+        expected = "PLAYER_SUMMARIES_TAMPERED"
+    elif tamper == "dependence":
+        matrix = result.joint_matrix
+        assert matrix is not None
+        left = matrix.player_ids[0]
+        right = matrix.player_ids[1]
+        dependence = matrix.dependence[left][right].model_copy(
+            update={"covariance": matrix.dependence[left][right].covariance + 1.0}
+        )
+        rows = {player: dict(values) for player, values in matrix.dependence.items()}
+        rows[left][right] = dependence
+        tampered_matrix = matrix.model_copy(update={"dependence": rows})
+        tampered = result.model_copy(
+            update={"joint_matrix": tampered_matrix, "result_sha256": None}
+        )
+        expected = "JOINT_MATRIX_TAMPERED"
+    else:
+        assert result.monte_carlo is not None
+        diagnostics = result.monte_carlo.model_copy(
+            update={"max_scenario_weight": result.monte_carlo.max_scenario_weight / 2}
+        )
+        tampered = result.model_copy(update={"monte_carlo": diagnostics, "result_sha256": None})
+        expected = "MONTE_CARLO_DIAGNOSTICS_TAMPERED"
+    tampered = tampered.model_copy(update={"result_sha256": semantic_sha256(tampered)})
+    assert expected in module.validate_projection(tampered, reference_engine())
+
+
+def test_artifact_assurance_accepts_valid_49_scenario_result() -> None:
+    module = _load_script("check_stage9_artifact")
+    result = FplPointsService(reference_engine(), mc_policy()).project(
+        make_request(scenario_count=49, root_seed=4900)
+    )
+    assert module.validate_projection(result, reference_engine()) == []
+
+
+def test_old_success_artifact_without_policy_requires_recomputation() -> None:
+    module = _load_script("check_stage9_artifact")
+    old = _result().model_copy(update={"monte_carlo_policy": None, "result_sha256": None})
+    errors = module.validate_projection(old, reference_engine())
+    assert "MONTE_CARLO_POLICY_RECOMPUTE_REQUIRED" in errors
+
+
+def test_old_policyless_artifact_still_loads_for_independent_assurance(tmp_path: Path) -> None:
+    module = _load_script("check_stage9_artifact")
+    payload = _result().model_dump(mode="json")
+    payload.pop("monte_carlo_policy")
+    semantic_payload = dict(payload)
+    semantic_payload["result_sha256"] = None
+    payload["result_sha256"] = semantic_sha256(semantic_payload)
+    data = canonical_json_bytes(payload)
+    artifact = tmp_path / "legacy-result.json"
+    artifact.write_bytes(data)
+    artifact.with_suffix(".sha256").write_text(
+        f"{sha256_bytes(data)}  {artifact.name}\n", encoding="ascii"
+    )
+    loaded = load_verified_model(artifact, FixtureProjectionResult)
+    errors = module.validate_projection(loaded, reference_engine())
+    assert "MONTE_CARLO_POLICY_RECOMPUTE_REQUIRED" in errors
+    assert "ARTIFACT_EMBEDDED_HASH_MISMATCH" not in errors
+
+
 @pytest.mark.parametrize(
     ("mutator", "message"),
     [
@@ -199,6 +281,43 @@ def test_scope_assurance_rejects_manager_state_module(tmp_path: Path) -> None:
         handle.write(forbidden + "\n")
     errors = module.validate_scope(tmp_path)
     assert f"STAGE10_PLUS_SCOPE_VIOLATION:{forbidden}" in errors
+
+
+def test_scope_assurance_uses_real_git_diff_when_declaration_omits_forbidden_path(
+    tmp_path: Path,
+) -> None:
+    module = _load_script("check_stage9_scope")
+    _materialize_scope_root(tmp_path, module)
+    subprocess.run(["git", "-C", str(tmp_path), "init"], check=True, capture_output=True)
+    subprocess.run(
+        ["git", "-C", str(tmp_path), "config", "user.email", "scope-test@example.invalid"],
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(tmp_path), "config", "user.name", "scope-test"],
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(["git", "-C", str(tmp_path), "add", "-A"], check=True, capture_output=True)
+    subprocess.run(
+        ["git", "-C", str(tmp_path), "commit", "-m", "baseline"],
+        check=True,
+        capture_output=True,
+    )
+    parent = subprocess.run(
+        ["git", "-C", str(tmp_path), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    forbidden = tmp_path / "src/dmf_pulse/optimisation/stage10.py"
+    forbidden.parent.mkdir(parents=True, exist_ok=True)
+    forbidden.write_text("def optimise():\n    return 1\n", encoding="utf-8")
+    errors = module.validate_scope(tmp_path, parent_revision=parent)
+    relative = "src/dmf_pulse/optimisation/stage10.py"
+    assert f"SCOPE_DECLARATION_MISSING:{relative}" in errors
+    assert f"STAGE10_PLUS_SCOPE_VIOLATION:{relative}" in errors
 
 
 def _coverage_payload(module: ModuleType) -> dict[str, object]:

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import subprocess
 from pathlib import Path
 
 REQUIRED_FILES = (
@@ -78,6 +79,8 @@ REQUIRED_FILES = (
     "evidence/tickets/GCS-008/current_manifest.json",
 )
 
+ACCEPTED_PARENT_REVISION = "9d7c360ab6a4cc7bfc6d6f41e44be6b47512b272"
+
 FORBIDDEN_PREFIXES = (
     "src/dmf_pulse/optimisation/",
     "src/dmf_pulse/optimization/",
@@ -113,9 +116,12 @@ ALLOWED_ROOT_FILES = {
     "UPSTREAM_CONTRACT_MAP.md",
     "evidence/tickets/GCS-008/current_manifest.json",
     "tests/__init__.py",
+    ".github/workflows/ci.yml",
+    "pyproject.toml",
 }
 ALLOWED_PREFIXES = (
     "config/models/",
+    "evidence/tickets/PTS-009-STATIC-FIX/",
     "docs/stages/09/",
     "evidence/stages/09/",
     "fixtures/points/PTS-009/",
@@ -160,7 +166,42 @@ def _changed_files(root: Path) -> tuple[str, ...]:
     )
 
 
-def validate_scope(root: Path) -> list[str]:
+def _git_changed_files(
+    root: Path, parent_revision: str
+) -> tuple[tuple[str, ...] | None, str | None]:
+    """Resolve the real parent-to-working-tree diff, failing closed on git errors."""
+
+    try:
+        top_level = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        if Path(top_level).resolve() != root.resolve():
+            return None, "GIT_ROOT_MISMATCH"
+        diff = subprocess.run(
+            ["git", "-C", str(root), "diff", "--name-only", parent_revision, "--"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.splitlines()
+        status = subprocess.run(
+            ["git", "-C", str(root), "status", "--porcelain=v1", "-uall"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.splitlines()
+    except (OSError, subprocess.CalledProcessError):
+        return None, "GIT_DIFF_UNAVAILABLE"
+    changed = {line.strip().replace("\\", "/") for line in diff if line.strip()}
+    for line in status:
+        if len(line) >= 4 and line[:2] == "??":
+            changed.add(line[3:].replace("\\", "/"))
+    return tuple(sorted(changed)), None
+
+
+def validate_scope(root: Path, *, parent_revision: str = ACCEPTED_PARENT_REVISION) -> list[str]:
     errors: list[str] = []
     for relative in REQUIRED_FILES:
         path = root / relative
@@ -174,10 +215,22 @@ def validate_scope(root: Path) -> list[str]:
     if len(changed) != len(set(changed)):
         errors.append("CHANGED_FILES_DUPLICATE_ENTRY")
     changed_set = set(changed)
+    actual, git_error = _git_changed_files(root, parent_revision)
+    if git_error is not None:
+        errors.append(git_error)
+        scope_paths = changed
+    else:
+        assert actual is not None
+        actual_set = set(actual)
+        for relative in sorted(actual_set - changed_set):
+            errors.append(f"SCOPE_DECLARATION_MISSING:{relative}")
+        for relative in sorted(changed_set - actual_set):
+            errors.append(f"SCOPE_DECLARATION_EXTRA:{relative}")
+        scope_paths = actual
     for relative in REQUIRED_FILES:
         if relative != "CHANGED_FILES.txt" and relative not in changed_set:
             errors.append(f"REQUIRED_FILE_NOT_LISTED:{relative}")
-    for relative in changed:
+    for relative in scope_paths:
         if relative.startswith(FORBIDDEN_PREFIXES):
             errors.append(f"STAGE10_PLUS_SCOPE_VIOLATION:{relative}")
         if relative in FORBIDDEN_ACCEPTED_RULE_MUTATIONS:

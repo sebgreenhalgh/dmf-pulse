@@ -50,6 +50,8 @@ def embedded_semantic_sha256(value: BaseModel) -> str | None:
         return None
     payload = value.model_dump(mode="json")
     payload["result_sha256"] = None
+    if getattr(value, "_legacy_policy_omitted", False):
+        payload.pop("monte_carlo_policy", None)
     return sha256_bytes(canonical_json_bytes(payload))
 
 
@@ -126,10 +128,22 @@ def load_verified_model[T: BaseModel](path: Path, model_type: type[T]) -> T:
     if actual != sidecar:
         raise FplPointsError("ARTIFACT_HASH_MISMATCH", "artifact detached hash does not match")
     try:
-        value = model_type.model_validate(json.loads(data.decode("utf-8")))
+        payload = json.loads(data.decode("utf-8"))
+        legacy_policy_omitted = (
+            model_type.__name__ == "FixtureProjectionResult"
+            and isinstance(payload, dict)
+            and "monte_carlo_policy" not in payload
+        )
+        value = model_type.model_validate(payload)
     except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
         raise FplPointsError("ARTIFACT_INVALID", "artifact payload is invalid") from exc
-    if canonical_json_bytes(value) != data:
+    if legacy_policy_omitted:
+        canonical_payload = canonical_json_bytes(payload)
+    else:
+        canonical_payload = canonical_json_bytes(value)
+    if canonical_payload != data:
         raise FplPointsError("ARTIFACT_NONCANONICAL", "artifact is not canonical JSON")
+    if legacy_policy_omitted:
+        object.__setattr__(value, "_legacy_policy_omitted", True)
     verify_embedded_semantic_hash(value)
     return value

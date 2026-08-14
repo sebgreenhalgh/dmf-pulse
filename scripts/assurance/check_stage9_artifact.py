@@ -14,7 +14,13 @@ from dmf_pulse.fpl_points.artifacts import (
 )
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import FixtureProjectionResult, ProjectionMode, SimulationStatus
+from dmf_pulse.fpl_points.monte_carlo import monte_carlo_diagnostics
 from dmf_pulse.fpl_points.rules_adapter import AcceptedRulesAdapter, RulesEngine
+from dmf_pulse.fpl_points.summaries import (
+    build_joint_matrix,
+    normalize_weights,
+    summarize_fixture_scenarios,
+)
 from dmf_pulse.rules.errors import RulesError
 
 
@@ -27,6 +33,8 @@ def validate_projection(
     except FplPointsError as exc:
         errors.append(exc.code)
     if result.status is SimulationStatus.SUCCESS:
+        if result.result_sha256 is None:
+            errors.append("RESULT_SEMANTIC_HASH_REQUIRED")
         try:
             JointScoreDistribution.model_validate(
                 result.upstream_score_distribution.model_dump(mode="python")
@@ -41,6 +49,7 @@ def validate_projection(
             errors.append("JOINT_MATRIX_MISSING")
         else:
             scenario_map = {scenario.scenario_id: scenario for scenario in result.scenarios}
+            normalized_weights = normalize_weights(tuple(item.weight for item in result.scenarios))
             for row_index, scenario_id in enumerate(result.joint_matrix.scenario_ids):
                 scenario = scenario_map.get(scenario_id)
                 if scenario is None:
@@ -54,8 +63,24 @@ def validate_projection(
                     errors.append(f"JOINT_ROW_MISMATCH:{scenario_id}")
                 if result.joint_matrix.outcome_draw_ids[row_index] != scenario.outcome_draw_id:
                     errors.append(f"JOINT_DRAW_MISMATCH:{scenario_id}")
-                if result.joint_matrix.weights[row_index] != scenario.weight:
+                if result.joint_matrix.weights[row_index] != normalized_weights[row_index]:
                     errors.append(f"JOINT_WEIGHT_MISMATCH:{scenario_id}")
+        if result.monte_carlo_policy is None:
+            errors.append("MONTE_CARLO_POLICY_RECOMPUTE_REQUIRED")
+        else:
+            try:
+                diagnostics = monte_carlo_diagnostics(result.scenarios, result.monte_carlo_policy)
+                matrix = build_joint_matrix(result.scenarios)
+                summaries = summarize_fixture_scenarios(result.scenarios, diagnostics=diagnostics)
+            except (FplPointsError, ValueError) as exc:
+                errors.append(f"DERIVED_RECOMPUTE_FAILED:{type(exc).__name__}")
+            else:
+                if result.monte_carlo != diagnostics:
+                    errors.append("MONTE_CARLO_DIAGNOSTICS_TAMPERED")
+                if result.joint_matrix != matrix:
+                    errors.append("JOINT_MATRIX_TAMPERED")
+                if result.player_summaries != summaries:
+                    errors.append("PLAYER_SUMMARIES_TAMPERED")
         for scenario in result.scenarios:
             event_ids = {player.player_id for player in scenario.event_scenario.players}
             score_ids = set(scenario.players)

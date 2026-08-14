@@ -13,6 +13,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    PrivateAttr,
     StrictBool,
     StrictInt,
     field_validator,
@@ -824,6 +825,7 @@ class MonteCarloPolicy(PointsModel):
 
 
 class FixtureProjectionResult(PointsModel):
+    _legacy_policy_omitted: bool = PrivateAttr(default=False)
     schema_version: Literal["fpl-points-fixture-result-v1"]
     status: SimulationStatus
     fixture_id: str
@@ -839,6 +841,7 @@ class FixtureProjectionResult(PointsModel):
     upstream_score_distribution: JointScoreDistribution
     upstream_stage8_sha256: Sha256
     result_sha256: Sha256 | None = None
+    monte_carlo_policy: MonteCarloPolicy | None = None
     error_code: str | None = None
     error_message: str | None = None
     warnings: tuple[str, ...] = ()
@@ -903,6 +906,10 @@ class GameweekPointScenario(PointsModel):
 
     @model_validator(mode="after")
     def player_totals_are_exact(self) -> GameweekPointScenario:
+        if len(self.fixture_ids) != len(set(self.fixture_ids)):
+            raise ValueError(
+                "GAMEWEEK_FIXTURE_DUPLICATE: Gameweek fixture identities must be unique"
+            )
         ids = set(self.player_points)
         if (
             set(self.player_components) != ids

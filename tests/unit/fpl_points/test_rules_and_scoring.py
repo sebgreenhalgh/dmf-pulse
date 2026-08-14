@@ -125,6 +125,23 @@ def test_competition_ranking_and_more_than_three_bonus_recipients() -> None:
     assert all(score.bps_tied_at_rank for score in scores.values())
 
 
+def test_zero_minute_players_do_not_enter_bps_competition() -> None:
+    zero_minutes = event_player(
+        "h-zero",
+        "HOME",
+        PlayerPosition.FWD,
+        minutes=0,
+    )
+    eligible = event_player("a-eligible", "AWAY", PlayerPosition.FWD)
+    scores = reference_engine().score_fixture(
+        event_fixture(home_goals=0, away_goals=0, players=(zero_minutes, eligible))
+    )
+    assert scores["h-zero"].bps_competition_rank is None
+    assert scores["h-zero"].bps_tied_at_rank is False
+    assert scores["a-eligible"].bps_competition_rank == 1
+    assert scores["a-eligible"].bonus == 3
+
+
 def test_bps_event_values_are_scenario_level_integers() -> None:
     player = event_player(
         "h-mid",

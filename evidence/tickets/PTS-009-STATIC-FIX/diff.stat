@@ -1,0 +1,24 @@
+ CHANGED_FILES.txt                                  |   8 +
+ PLANS.md                                           |  17 ++
+ .../tickets/PTS-009-STATIC-FIX/FINDING_CLOSURE.md  |  12 ++
+ evidence/tickets/PTS-009-STATIC-FIX/PLAN.md        |  13 ++
+ evidence/tickets/PTS-009-STATIC-FIX/codex_result.json |   9 +
+ evidence/tickets/PTS-009-STATIC-FIX/commands.log   |   6 +
+ evidence/tickets/PTS-009-STATIC-FIX/diff.stat      |  23 +++
+ evidence/tickets/PTS-009-STATIC-FIX/tests.json     |  18 ++
+ fixtures/points/PTS-009/manifest.json              |   4 +-
+ fixtures/points/PTS-009/schemas/fixture_result.schema.json |  69 +++++++
+ scripts/assurance/check_stage9_artifact.py         |  27 ++-
+ scripts/assurance/check_stage9_scope.py            |  57 +++++-
+ src/dmf_pulse/fpl_points/artifacts.py              |  18 +-
+ src/dmf_pulse/fpl_points/gameweek.py               |   6 +
+ src/dmf_pulse/fpl_points/models.py                 |   7 +
+ src/dmf_pulse/fpl_points/rules_adapter.py          | 221 +++++++++++++++++++--
+ src/dmf_pulse/fpl_points/service.py                |   1 +
+ src/dmf_pulse/fpl_points/upstream.py               | 103 +++++++++-
+ tests/assurance/fpl_points/test_assurance_mutations.py | 121 ++++++++++-
+ tests/contract/fpl_points/test_upstream_contracts.py |   8 +
+ tests/unit/fpl_points/test_accepted_rules_adapter.py |  70 ++++++-
+ tests/unit/fpl_points/test_fail_closed_edges.py    |   3 +
+ tests/unit/fpl_points/test_rules_and_scoring.py    |  17 ++
+ 23 files changed, 802 insertions(+), 36 deletions(-)

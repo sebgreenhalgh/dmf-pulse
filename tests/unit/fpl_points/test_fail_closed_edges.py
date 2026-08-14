@@ -5,6 +5,7 @@ import copy
 import pytest
 from pydantic import ValidationError
 
+from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.gameweek import assemble_blank_gameweek, assemble_gameweek
 from dmf_pulse.fpl_points.models import (
     AssistClassification,
@@ -204,6 +205,8 @@ def test_gameweek_models_reject_mixed_and_incomplete_scenarios() -> None:
     with pytest.raises(Exception, match="blank Gameweek"):
         assemble_gameweek(())
     first = service.project(make_request(fixture_id=FIXTURE_A, scenario_count=4))
+    with pytest.raises(FplPointsError, match="unique fixture"):
+        assemble_gameweek((first, first))
     second = service.project(make_request(fixture_id=FIXTURE_B, scenario_count=4))
     with pytest.raises(Exception, match="different Gameweeks"):
         changed = second.model_copy(update={"gameweek_id": "GW-OTHER"})

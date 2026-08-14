@@ -1,5 +1,6 @@
 # Repository-relative Stage-9 candidate overlay.
 # Every listed path must be reviewed/applied; no Stage-10-plus business logic is included.
+.github/workflows/ci.yml
 ACCEPTANCE_COMMANDS.ps1
 APPLY_INSTRUCTIONS.md
 ASSUMPTIONS_AND_DEVIATIONS.md
@@ -9,12 +10,19 @@ IMPLEMENTATION_PLAN.md
 IMPLEMENTATION_RESULT.md
 PLANS.md
 PR_DESCRIPTION.md
+pyproject.toml
 RULESET_READINESS.md
 SPEC_RECONCILIATION.md
 UPSTREAM_CONTRACT_MAP.md
 config/models/event_allocation_baseline.yaml
 config/models/fpl_points_simulation.yaml
 docs/stages/09/README.md
+evidence/tickets/PTS-009-STATIC-FIX/PLAN.md
+evidence/tickets/PTS-009-STATIC-FIX/FINDING_CLOSURE.md
+evidence/tickets/PTS-009-STATIC-FIX/commands.log
+evidence/tickets/PTS-009-STATIC-FIX/tests.json
+evidence/tickets/PTS-009-STATIC-FIX/diff.stat
+evidence/tickets/PTS-009-STATIC-FIX/codex_result.json
 evidence/stages/09/STAGE_ACCEPTANCE.md
 evidence/stages/09/coverage.json
 evidence/stages/09/repository_coverage.json

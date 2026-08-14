@@ -1272,6 +1272,64 @@
       "title": "MonteCarloDiagnostics",
       "type": "object"
     },
+    "MonteCarloPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_count": {
+          "maximum": 20,
+          "minimum": 2,
+          "title": "Batch Count",
+          "type": "integer"
+        },
+        "maximum_mean_mcse": {
+          "exclusiveMinimum": 0.0,
+          "title": "Maximum Mean Mcse",
+          "type": "number"
+        },
+        "maximum_probability_se": {
+          "exclusiveMinimum": 0.0,
+          "title": "Maximum Probability Se",
+          "type": "number"
+        },
+        "maximum_quantile_span": {
+          "minimum": 0,
+          "title": "Maximum Quantile Span",
+          "type": "integer"
+        },
+        "minimum_effective_scenarios": {
+          "exclusiveMinimum": 0.0,
+          "title": "Minimum Effective Scenarios",
+          "type": "number"
+        },
+        "quantiles": {
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "title": "Quantiles",
+          "type": "array"
+        },
+        "thresholds": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Thresholds",
+          "type": "array"
+        }
+      },
+      "required": [
+        "minimum_effective_scenarios",
+        "maximum_mean_mcse",
+        "maximum_probability_se",
+        "maximum_quantile_span",
+        "quantiles",
+        "thresholds",
+        "batch_count"
+      ],
+      "title": "MonteCarloPolicy",
+      "type": "object"
+    },
     "OneXTwoDistribution": {
       "additionalProperties": false,
       "properties": {
@@ -2100,6 +2158,17 @@
           "type": "null"
         }
       ]
+    },
+    "monte_carlo_policy": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MonteCarloPolicy"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "player_summaries": {
       "additionalProperties": {

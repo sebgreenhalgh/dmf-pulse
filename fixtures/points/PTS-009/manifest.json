@@ -17,8 +17,8 @@
       "sha256": "289ea4483e201ee5a16f4827993849836c827953be678b0046cf2b6ffd167197"
     },
     "schemas/fixture_result.schema.json": {
-      "bytes": 55508,
-      "sha256": "ec091f6e4c9d6c067020f9097ecd11322b2c4c5e85a0c1a95fd29e753dadb887"
+      "bytes": 57209,
+      "sha256": "10c70f9c9c8ea9dcd5b60303f8a1ca343d0844a099b4700dc595bd9eb582e99f"
     },
     "schemas/gameweek_result.schema.json": {
       "bytes": 17675,

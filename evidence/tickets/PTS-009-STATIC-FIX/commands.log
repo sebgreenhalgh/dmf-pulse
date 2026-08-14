@@ -1,0 +1,6 @@
+{"command":"uv run pytest tests/unit/fpl_points tests/contract/fpl_points tests/integration/fpl_points tests/golden/fpl_points tests/property/fpl_points tests/assurance/fpl_points -q","exit_code":0,"result":"PASS: 94 tests"}
+{"command":"uv run pytest -m performance tests/performance","exit_code":0,"elapsed_seconds":17.449,"result":"PASS: 1 test; uninstrumented wall clock 17.449 seconds"}
+{"command":"uv run python scripts/assurance/check_stage9_resources.py --write","exit_code":0,"result":"PASS: synchronized Stage-9 schemas and manifest"}
+{"command":"uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/GCS-008/coverage.json","exit_code":0,"result":"PASS: GCS-008 coverage gate"}
+{"command":"uv run ruff check src/dmf_pulse/fpl_points scripts/assurance/check_stage9_artifact.py scripts/assurance/check_stage9_scope.py tests/unit/fpl_points tests/contract/fpl_points/test_upstream_contracts.py tests/assurance/fpl_points/test_assurance_mutations.py","exit_code":0,"result":"PASS: targeted lint"}
+{"command":"uv run pytest -m \"not performance\" --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/GCS-008/coverage.json","exit_code":124,"result":"TIMEOUT after 304 seconds; generated coverage JSON totals 92.390357% statements and the GCS-008 gate passed"}

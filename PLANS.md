@@ -1,5 +1,22 @@
 # DMF Pulse execution plans
 
+## PTS-009 static acceptance repair (LUNA pack, 2026-08-14)
+
+- Parent: `9d7c360ab6a4cc7bfc6d6f41e44be6b47512b272`; preserve the existing
+  Stage-9 product and CI behavior while closing findings F1-F6.
+- Scope: require the accepted Stage-2 activation bundle for production, bind
+  Stage-7 participation rows, reject duplicate Gameweek fixtures, recompute all
+  serialized derived artifact fields, exclude zero-minute BPS rows, and derive
+  scope from the real Git diff.
+- Validation: affected Stage-9 tests, uninstrumented performance smoke, the
+  non-performance coverage gate, Ruff, and fail-closed scope/resource checks.
+
+### PTS-009 static acceptance checkpoints
+
+- [x] Implement F1-F6 with adversarial regressions.
+- [x] Run scoped tests, performance smoke, coverage gate, and static checks.
+- [ ] Commit once as `fix(fpl-points): address static acceptance findings` and push.
+
 ## PTS-009 - bounded FPL-points simulation clean-checkout integration
 
 - Ticket/stage: `PTS-009`, A9; required parent

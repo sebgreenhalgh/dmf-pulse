@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -11,6 +12,9 @@ import dmf_pulse.fpl_points.rules_adapter as adapter_module
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import PlayerPosition, ProjectionMode
 from dmf_pulse.fpl_points.rules_adapter import AcceptedRulesAdapter
+from dmf_pulse.rules.compiler import compile_ruleset
+from dmf_pulse.rules.lifecycle import activate_ruleset
+from dmf_pulse.rules.models import ApprovalRecord
 from tests.support.factories import (
     RULESET_HASH,
     RULESET_ID,
@@ -19,6 +23,8 @@ from tests.support.factories import (
     event_player,
     reference_engine,
 )
+
+ROOT = Path(__file__).resolve().parents[3]
 
 
 class _Validator:
@@ -100,7 +106,11 @@ def test_identity_and_mode_gates_cover_reference_active_approval_and_blockers() 
         unapproved.assert_mode_allowed(ProjectionMode.PRODUCTION)
     assert exc.value.code == "RULESET_APPROVAL_MISSING"
 
-    active = AcceptedRulesAdapter(_compiled(status="ACTIVE", production_eligible=True), _approval())
+    active = AcceptedRulesAdapter(
+        _compiled(status="ACTIVE", production_eligible=True),
+        _approval(),
+        activation_bundle_verified=True,
+    )
     active.assert_mode_allowed(ProjectionMode.PRODUCTION)
     assert active.identity.human_approval_recorded is True
 
@@ -184,3 +194,61 @@ def test_from_paths_loads_compiled_rules_and_matching_approval(
     with pytest.raises(FplPointsError) as exc:
         AcceptedRulesAdapter.from_paths(rules_path, approval_path)
     assert exc.value.code == "RULESET_APPROVAL_INVALID"
+
+
+def _active_bundle(tmp_path: Path) -> tuple[Path, Path]:
+    source = tmp_path / "verified-source"
+    shutil.copytree(ROOT / "fixtures/rules/RUL-002/synthetic_complete", source)
+    manifest = source / "season_manifest.yaml"
+    manifest.write_text(
+        manifest.read_text(encoding="utf-8")
+        .replace('status: "REFERENCE_ONLY"', 'status: "VERIFIED"')
+        .replace("production_eligible: false", "production_eligible: true"),
+        encoding="utf-8",
+    )
+    compiled = compile_ruleset(source)
+    approval = ApprovalRecord(
+        ruleset_id=compiled.ruleset_id,
+        ruleset_version=compiled.ruleset_version,
+        ruleset_hash=compiled.ruleset_hash,
+        approved=True,
+        approved_at="2026-08-14T12:00:00Z",
+        approved_by="static-fix-test",
+    )
+    registry = tmp_path / "registry"
+    activate_ruleset(compiled, approval, registry)
+    directory = registry / compiled.ruleset_id / compiled.ruleset_version
+    return directory / "active_ruleset.json", directory / "approval.json"
+
+
+def test_production_requires_genuine_activation_bundle_and_rejects_forgery(tmp_path: Path) -> None:
+    active_path, approval_path = _active_bundle(tmp_path)
+    adapter = AcceptedRulesAdapter.from_paths(active_path, approval_path)
+    adapter.assert_mode_allowed(ProjectionMode.PRODUCTION)
+
+    forged = tmp_path / "forged-approval.json"
+    forged.write_bytes(approval_path.read_bytes())
+    with pytest.raises(FplPointsError) as exc:
+        AcceptedRulesAdapter.from_paths(active_path, forged)
+    assert exc.value.code == "RULESET_ACTIVATION_BUNDLE_INVALID"
+
+    receipt = active_path.parent / "activation_receipt.json"
+    receipt.write_text(
+        receipt.read_text(encoding="utf-8").replace('"activated": true', '"activated": false'),
+        encoding="utf-8",
+    )
+    with pytest.raises(FplPointsError) as exc:
+        AcceptedRulesAdapter.from_paths(active_path, approval_path)
+    assert exc.value.code == "RULESET_ACTIVATION_BUNDLE_INVALID"
+
+    manifest_active, manifest_approval = _active_bundle(tmp_path / "manifest-case")
+    manifest = manifest_active.parent / "activation_manifest.json"
+    manifest.write_text(
+        manifest.read_text(encoding="utf-8").replace(
+            '"active_ruleset_hash":', '"active_ruleset_hash": "' + "0" * 64 + '", "_tampered":'
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(FplPointsError) as exc:
+        AcceptedRulesAdapter.from_paths(manifest_active, manifest_approval)
+    assert exc.value.code == "RULESET_ACTIVATION_BUNDLE_INVALID"
