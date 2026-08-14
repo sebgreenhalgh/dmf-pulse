@@ -1,0 +1,699 @@
+{
+  "$defs": {
+    "BpsCompletenessMode": {
+      "enum": [
+        "EVENT_LINKED_ONLY",
+        "EVENT_LINKED_PLUS_AUXILIARY_BASELINE"
+      ],
+      "title": "BpsCompletenessMode",
+      "type": "string"
+    },
+    "ComponentSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_points": {
+          "title": "Expected Points",
+          "type": "number"
+        },
+        "maximum": {
+          "title": "Maximum",
+          "type": "integer"
+        },
+        "minimum": {
+          "title": "Minimum",
+          "type": "integer"
+        },
+        "probability_nonzero": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Nonzero",
+          "type": "number"
+        },
+        "variance": {
+          "minimum": 0.0,
+          "title": "Variance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "expected_points",
+        "probability_nonzero",
+        "minimum",
+        "maximum",
+        "variance"
+      ],
+      "title": "ComponentSummary",
+      "type": "object"
+    },
+    "GameweekAssemblyMode": {
+      "enum": [
+        "BLANK",
+        "SINGLE_FIXTURE",
+        "SHARED_OUTCOME_DRAW"
+      ],
+      "title": "GameweekAssemblyMode",
+      "type": "string"
+    },
+    "GameweekBpsBonusSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "bps_variance": {
+          "minimum": 0.0,
+          "title": "Bps Variance",
+          "type": "number"
+        },
+        "completeness_mode": {
+          "$ref": "#/$defs/BpsCompletenessMode"
+        },
+        "expected_bonus": {
+          "title": "Expected Bonus",
+          "type": "number"
+        },
+        "expected_bps": {
+          "title": "Expected Bps",
+          "type": "number"
+        },
+        "probability_any_bonus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Any Bonus",
+          "type": "number"
+        }
+      },
+      "required": [
+        "expected_bps",
+        "bps_variance",
+        "expected_bonus",
+        "probability_any_bonus",
+        "completeness_mode"
+      ],
+      "title": "GameweekBpsBonusSummary",
+      "type": "object"
+    },
+    "GameweekPlayerProjectionSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "bps_bonus": {
+          "$ref": "#/$defs/GameweekBpsBonusSummary"
+        },
+        "component_breakdown": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ComponentSummary"
+          },
+          "title": "Component Breakdown",
+          "type": "object"
+        },
+        "component_covariance": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object"
+          },
+          "title": "Component Covariance",
+          "type": "object"
+        },
+        "confidence_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+          ],
+          "title": "Confidence Grade",
+          "type": "string"
+        },
+        "dataset_version_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dataset Version Ids",
+          "type": "array"
+        },
+        "expected_points": {
+          "title": "Expected Points",
+          "type": "number"
+        },
+        "median_points": {
+          "title": "Median Points",
+          "type": "integer"
+        },
+        "model_version_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Model Version Ids",
+          "type": "array"
+        },
+        "monte_carlo_mean_se": {
+          "minimum": 0.0,
+          "title": "Monte Carlo Mean Se",
+          "type": "number"
+        },
+        "player_id": {
+          "title": "Player Id",
+          "type": "string"
+        },
+        "pmf": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Pmf",
+          "type": "object"
+        },
+        "points_standard_deviation": {
+          "minimum": 0.0,
+          "title": "Points Standard Deviation",
+          "type": "number"
+        },
+        "points_variance": {
+          "minimum": 0.0,
+          "title": "Points Variance",
+          "type": "number"
+        },
+        "probability_10_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 10 Plus",
+          "type": "number"
+        },
+        "probability_15_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 15 Plus",
+          "type": "number"
+        },
+        "probability_1_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 1 Plus",
+          "type": "number"
+        },
+        "probability_2_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 2 Plus",
+          "type": "number"
+        },
+        "probability_5_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 5 Plus",
+          "type": "number"
+        },
+        "probability_negative_points": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Negative Points",
+          "type": "number"
+        },
+        "probability_zero_points": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Zero Points",
+          "type": "number"
+        },
+        "ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ruleset Hash",
+          "type": "string"
+        },
+        "scenario_effective_sample_size": {
+          "exclusiveMinimum": 0.0,
+          "title": "Scenario Effective Sample Size",
+          "type": "number"
+        },
+        "selected_percentiles": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Selected Percentiles",
+          "type": "object"
+        },
+        "source_bundle_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Bundle Ids",
+          "type": "array"
+        },
+        "threshold_probability_se": {
+          "additionalProperties": {
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "title": "Threshold Probability Se",
+          "type": "object"
+        },
+        "upstream_stage8_sha256s": {
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Upstream Stage8 Sha256S",
+          "type": "array"
+        }
+      },
+      "required": [
+        "player_id",
+        "expected_points",
+        "median_points",
+        "points_variance",
+        "points_standard_deviation",
+        "probability_negative_points",
+        "probability_zero_points",
+        "probability_1_plus",
+        "probability_2_plus",
+        "probability_5_plus",
+        "probability_10_plus",
+        "probability_15_plus",
+        "selected_percentiles",
+        "pmf",
+        "component_breakdown",
+        "component_covariance",
+        "bps_bonus",
+        "monte_carlo_mean_se",
+        "threshold_probability_se",
+        "scenario_effective_sample_size",
+        "confidence_grade",
+        "ruleset_hash",
+        "model_version_ids",
+        "dataset_version_ids",
+        "source_bundle_ids",
+        "upstream_stage8_sha256s"
+      ],
+      "title": "GameweekPlayerProjectionSummary",
+      "type": "object"
+    },
+    "GameweekPointScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "approximation_labels": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Approximation Labels",
+          "type": "array"
+        },
+        "assembly_mode": {
+          "$ref": "#/$defs/GameweekAssemblyMode"
+        },
+        "fixture_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Fixture Ids",
+          "type": "array"
+        },
+        "gameweek_id": {
+          "title": "Gameweek Id",
+          "type": "string"
+        },
+        "outcome_draw_id": {
+          "title": "Outcome Draw Id",
+          "type": "string"
+        },
+        "player_bonus": {
+          "additionalProperties": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "title": "Player Bonus",
+          "type": "object"
+        },
+        "player_bps": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Player Bps",
+          "type": "object"
+        },
+        "player_components": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "title": "Player Components",
+          "type": "object"
+        },
+        "player_points": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Player Points",
+          "type": "object"
+        },
+        "scenario_id": {
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "weight": {
+          "exclusiveMinimum": 0.0,
+          "maximum": 1.0,
+          "title": "Weight",
+          "type": "number"
+        }
+      },
+      "required": [
+        "scenario_id",
+        "outcome_draw_id",
+        "weight",
+        "gameweek_id",
+        "fixture_ids",
+        "player_points",
+        "player_components",
+        "player_bps",
+        "player_bonus",
+        "assembly_mode",
+        "approximation_labels"
+      ],
+      "title": "GameweekPointScenario",
+      "type": "object"
+    },
+    "GameweekScenarioSet": {
+      "additionalProperties": false,
+      "properties": {
+        "assembly_mode": {
+          "$ref": "#/$defs/GameweekAssemblyMode"
+        },
+        "bps_completeness_mode": {
+          "$ref": "#/$defs/BpsCompletenessMode"
+        },
+        "confidence_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+          ],
+          "title": "Confidence Grade",
+          "type": "string"
+        },
+        "dataset_version_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dataset Version Ids",
+          "type": "array"
+        },
+        "gameweek_id": {
+          "title": "Gameweek Id",
+          "type": "string"
+        },
+        "model_version_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Model Version Ids",
+          "type": "array"
+        },
+        "player_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Player Ids",
+          "type": "array"
+        },
+        "ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ruleset Hash",
+          "type": "string"
+        },
+        "scenarios": {
+          "items": {
+            "$ref": "#/$defs/GameweekPointScenario"
+          },
+          "title": "Scenarios",
+          "type": "array"
+        },
+        "source_bundle_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Bundle Ids",
+          "type": "array"
+        },
+        "upstream_stage8_sha256s": {
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Upstream Stage8 Sha256S",
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "gameweek_id",
+        "scenarios",
+        "player_ids",
+        "ruleset_hash",
+        "assembly_mode",
+        "bps_completeness_mode",
+        "confidence_grade",
+        "model_version_ids",
+        "dataset_version_ids",
+        "source_bundle_ids",
+        "upstream_stage8_sha256s",
+        "warnings"
+      ],
+      "title": "GameweekScenarioSet",
+      "type": "object"
+    },
+    "JointScenarioMatrix": {
+      "additionalProperties": false,
+      "properties": {
+        "dependence": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "$ref": "#/$defs/PairDependence"
+            },
+            "type": "object"
+          },
+          "title": "Dependence",
+          "type": "object"
+        },
+        "outcome_draw_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Outcome Draw Ids",
+          "type": "array"
+        },
+        "player_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Player Ids",
+          "type": "array"
+        },
+        "points": {
+          "items": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "title": "Points",
+          "type": "array"
+        },
+        "ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ruleset Hash",
+          "type": "string"
+        },
+        "scenario_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Scenario Ids",
+          "type": "array"
+        },
+        "weights": {
+          "items": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "type": "number"
+          },
+          "title": "Weights",
+          "type": "array"
+        }
+      },
+      "required": [
+        "scenario_ids",
+        "outcome_draw_ids",
+        "player_ids",
+        "weights",
+        "points",
+        "ruleset_hash",
+        "dependence"
+      ],
+      "title": "JointScenarioMatrix",
+      "type": "object"
+    },
+    "MonteCarloDiagnostics": {
+      "additionalProperties": false,
+      "properties": {
+        "effective_sample_size": {
+          "exclusiveMinimum": 0.0,
+          "title": "Effective Sample Size",
+          "type": "number"
+        },
+        "max_scenario_weight": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Max Scenario Weight",
+          "type": "number"
+        },
+        "mean_mcse_by_player": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Mean Mcse By Player",
+          "type": "object"
+        },
+        "normalized_weight_sum": {
+          "title": "Normalized Weight Sum",
+          "type": "number"
+        },
+        "quantile_stability_max_span_by_player": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "title": "Quantile Stability Max Span By Player",
+          "type": "object"
+        },
+        "scenario_count": {
+          "minimum": 0,
+          "title": "Scenario Count",
+          "type": "integer"
+        },
+        "stopping_reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Stopping Reasons",
+          "type": "array"
+        },
+        "stopping_result": {
+          "enum": [
+            "PASS",
+            "CONTINUE",
+            "BLOCKED"
+          ],
+          "title": "Stopping Result",
+          "type": "string"
+        },
+        "threshold_probability_se_by_player": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object"
+          },
+          "title": "Threshold Probability Se By Player",
+          "type": "object"
+        }
+      },
+      "required": [
+        "scenario_count",
+        "normalized_weight_sum",
+        "effective_sample_size",
+        "max_scenario_weight",
+        "mean_mcse_by_player",
+        "threshold_probability_se_by_player",
+        "quantile_stability_max_span_by_player",
+        "stopping_result",
+        "stopping_reasons"
+      ],
+      "title": "MonteCarloDiagnostics",
+      "type": "object"
+    },
+    "PairDependence": {
+      "additionalProperties": false,
+      "properties": {
+        "correlation": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": -1.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Correlation"
+        },
+        "correlation_undefined_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Correlation Undefined Reason"
+        },
+        "covariance": {
+          "title": "Covariance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "covariance",
+        "correlation",
+        "correlation_undefined_reason"
+      ],
+      "title": "PairDependence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "joint_matrix": {
+      "$ref": "#/$defs/JointScenarioMatrix"
+    },
+    "monte_carlo": {
+      "$ref": "#/$defs/MonteCarloDiagnostics"
+    },
+    "player_summaries": {
+      "additionalProperties": {
+        "$ref": "#/$defs/GameweekPlayerProjectionSummary"
+      },
+      "title": "Player Summaries",
+      "type": "object"
+    },
+    "scenario_set": {
+      "$ref": "#/$defs/GameweekScenarioSet"
+    },
+    "schema_version": {
+      "const": "fpl-points-gameweek-result-v1",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "scenario_set",
+    "player_summaries",
+    "joint_matrix",
+    "monte_carlo"
+  ],
+  "title": "GameweekProjectionResult",
+  "type": "object"
+}

@@ -1,0 +1,611 @@
+{
+  "cases": [
+    {
+      "away_goals": 0,
+      "case_id": "zero_zero_appearance_clean_sheet",
+      "expected": {
+        "a-fwd": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 2,
+          "bps": 6,
+          "bps_competition_rank": 2,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 4,
+          "yellow_cards": 0
+        },
+        "h-def": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 18,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 4,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 9,
+          "yellow_cards": 0
+        },
+        "h-mid-59": {
+          "appearance": 1,
+          "assists": 0,
+          "bonus": 1,
+          "bps": 3,
+          "bps_competition_rank": 3,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 2,
+          "yellow_cards": 0
+        }
+      },
+      "home_goals": 0,
+      "players": [
+        {
+          "minutes": 90,
+          "player_id": "h-def",
+          "position": "DEF",
+          "team_id": "HOME"
+        },
+        {
+          "minutes": 59,
+          "player_id": "h-mid-59",
+          "position": "MID",
+          "team_id": "HOME"
+        },
+        {
+          "minutes": 90,
+          "player_id": "a-fwd",
+          "position": "FWD",
+          "team_id": "AWAY"
+        }
+      ]
+    },
+    {
+      "away_goals": 1,
+      "case_id": "two_one_scorer_assist",
+      "expected": {
+        "a-fwd": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 2,
+          "bps": 30,
+          "bps_competition_rank": 2,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 4,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 8,
+          "yellow_cards": 0
+        },
+        "h-def": {
+          "appearance": 2,
+          "assists": 3,
+          "bonus": 1,
+          "bps": 11,
+          "bps_competition_rank": 3,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 6,
+          "yellow_cards": 0
+        },
+        "h-mid": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 45,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 1,
+          "defensive_contributions": 0,
+          "goals": 10,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 16,
+          "yellow_cards": 0
+        }
+      },
+      "home_goals": 2,
+      "players": [
+        {
+          "goals_non_penalty": 2,
+          "player_id": "h-mid",
+          "position": "MID",
+          "team_id": "HOME"
+        },
+        {
+          "assists": 1,
+          "conceded": 1,
+          "player_id": "h-def",
+          "position": "DEF",
+          "team_id": "HOME"
+        },
+        {
+          "conceded": 2,
+          "goals_non_penalty": 1,
+          "player_id": "a-fwd",
+          "position": "FWD",
+          "team_id": "AWAY"
+        }
+      ]
+    },
+    {
+      "away_goals": 0,
+      "case_id": "goalkeeper_saves_penalty_save",
+      "expected": {
+        "a-fwd": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 2,
+          "bps": 0,
+          "bps_competition_rank": 2,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": -2,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 2,
+          "yellow_cards": 0
+        },
+        "h-gk": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 26,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 4,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 5,
+          "red_cards": 0,
+          "saves": 2,
+          "total": 16,
+          "yellow_cards": 0
+        }
+      },
+      "home_goals": 0,
+      "players": [
+        {
+          "penalty_saves": 1,
+          "player_id": "h-gk",
+          "position": "GK",
+          "saves": 7,
+          "team_id": "HOME"
+        },
+        {
+          "penalty_misses": 1,
+          "player_id": "a-fwd",
+          "position": "FWD",
+          "team_id": "AWAY"
+        }
+      ]
+    },
+    {
+      "away_goals": 0,
+      "case_id": "defensive_threshold",
+      "expected": {
+        "a-def-10": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 23,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 4,
+          "defensive_contributions": 2,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 11,
+          "yellow_cards": 0
+        },
+        "h-def-9": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 2,
+          "bps": 22,
+          "bps_competition_rank": 2,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 4,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 8,
+          "yellow_cards": 0
+        }
+      },
+      "home_goals": 0,
+      "players": [
+        {
+          "defensive": {
+            "clearances": 9
+          },
+          "player_id": "h-def-9",
+          "position": "DEF",
+          "team_id": "HOME"
+        },
+        {
+          "defensive": {
+            "clearances": 10
+          },
+          "player_id": "a-def-10",
+          "position": "DEF",
+          "team_id": "AWAY"
+        }
+      ]
+    },
+    {
+      "away_goals": 1,
+      "case_id": "card_and_own_goal",
+      "expected": {
+        "a-fwd": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 6,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 5,
+          "yellow_cards": 0
+        },
+        "h-def": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 2,
+          "bps": -7,
+          "bps_competition_rank": 2,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": -2,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 1,
+          "yellow_cards": -1
+        }
+      },
+      "home_goals": 0,
+      "players": [
+        {
+          "conceded": 1,
+          "own_goals": 1,
+          "player_id": "h-def",
+          "position": "DEF",
+          "team_id": "HOME",
+          "yellow": 1
+        },
+        {
+          "player_id": "a-fwd",
+          "position": "FWD",
+          "team_id": "AWAY"
+        }
+      ]
+    },
+    {
+      "away_goals": 0,
+      "case_id": "bonus_tie_more_than_three",
+      "expected": {
+        "a1": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 6,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": true,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 5,
+          "yellow_cards": 0
+        },
+        "a2": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 6,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": true,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 5,
+          "yellow_cards": 0
+        },
+        "h1": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 6,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": true,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 5,
+          "yellow_cards": 0
+        },
+        "h2": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 6,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": true,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 5,
+          "yellow_cards": 0
+        }
+      },
+      "home_goals": 0,
+      "players": [
+        {
+          "player_id": "h1",
+          "position": "FWD",
+          "team_id": "HOME"
+        },
+        {
+          "player_id": "h2",
+          "position": "FWD",
+          "team_id": "HOME"
+        },
+        {
+          "player_id": "a1",
+          "position": "FWD",
+          "team_id": "AWAY"
+        },
+        {
+          "player_id": "a2",
+          "position": "FWD",
+          "team_id": "AWAY"
+        }
+      ]
+    },
+    {
+      "away_goals": 0,
+      "case_id": "substitute_minute_boundary",
+      "expected": {
+        "a-fwd": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 6,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 5,
+          "yellow_cards": 0
+        },
+        "h-mid-59": {
+          "appearance": 1,
+          "assists": 0,
+          "bonus": 2,
+          "bps": 3,
+          "bps_competition_rank": 2,
+          "bps_tied_at_rank": true,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 3,
+          "yellow_cards": 0
+        },
+        "h-mid-60": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 2,
+          "bps": 3,
+          "bps_competition_rank": 2,
+          "bps_tied_at_rank": true,
+          "clean_sheet": 1,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 5,
+          "yellow_cards": 0
+        }
+      },
+      "home_goals": 0,
+      "players": [
+        {
+          "minutes": 59,
+          "player_id": "h-mid-59",
+          "position": "MID",
+          "team_id": "HOME"
+        },
+        {
+          "minutes": 60,
+          "player_id": "h-mid-60",
+          "position": "MID",
+          "team_id": "HOME"
+        },
+        {
+          "player_id": "a-fwd",
+          "position": "FWD",
+          "team_id": "AWAY"
+        }
+      ]
+    },
+    {
+      "away_goals": 1,
+      "case_id": "negative_score",
+      "expected": {
+        "a-fwd": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 3,
+          "bps": 6,
+          "bps_competition_rank": 1,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": 0,
+          "penalty_misses": 0,
+          "penalty_saves": 0,
+          "red_cards": 0,
+          "saves": 0,
+          "total": 5,
+          "yellow_cards": 0
+        },
+        "h-def": {
+          "appearance": 2,
+          "assists": 0,
+          "bonus": 2,
+          "bps": -19,
+          "bps_competition_rank": 2,
+          "bps_tied_at_rank": false,
+          "clean_sheet": 0,
+          "defensive_contributions": 0,
+          "goals": 0,
+          "goals_conceded": 0,
+          "own_goals": -2,
+          "penalty_misses": -2,
+          "penalty_saves": 0,
+          "red_cards": -3,
+          "saves": 0,
+          "total": -3,
+          "yellow_cards": 0
+        }
+      },
+      "home_goals": 0,
+      "players": [
+        {
+          "conceded": 1,
+          "own_goals": 1,
+          "penalty_misses": 1,
+          "player_id": "h-def",
+          "position": "DEF",
+          "red": 1,
+          "team_id": "HOME"
+        },
+        {
+          "player_id": "a-fwd",
+          "position": "FWD",
+          "team_id": "AWAY"
+        }
+      ]
+    }
+  ],
+  "mode": "REFERENCE/TEST_ONLY",
+  "ruleset_hash": "12271ab0b32a461baa3778f2e914f45744ccf9d5302c37c4a5f2ffb89e0c1139",
+  "ruleset_id": "fpl-reference-2025-26",
+  "ruleset_version": "1.0.0",
+  "schema_version": "pts-009-reference-goldens-v1"
+}

@@ -1,0 +1,7 @@
+minimum_effective_scenarios: 1000
+maximum_mean_mcse: 0.10
+maximum_probability_se: 0.01
+maximum_quantile_span: 3
+quantiles: [0.10, 0.50, 0.90]
+thresholds: [5, 10, 15]
+batch_count: 4

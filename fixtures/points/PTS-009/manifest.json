@@ -1,0 +1,29 @@
+{
+  "files": {
+    "fixture_request_example.json": {
+      "bytes": 56779,
+      "sha256": "fb8ed57b63087ae3563fdf37ca4e8a77e71a8af333a4668e9a960eb0eace40af"
+    },
+    "golden_cases.json": {
+      "bytes": 15065,
+      "sha256": "9bf3657baac70e768747a592b1da2ef2fc24aa774857f43deae2ae8c0df90c19"
+    },
+    "reference_ruleset_test_only.json": {
+      "bytes": 124745,
+      "sha256": "f4fb6a5458b3956cb300b822539772904e61036f7571aba7c04284458680f271"
+    },
+    "schemas/fixture_request.schema.json": {
+      "bytes": 34351,
+      "sha256": "289ea4483e201ee5a16f4827993849836c827953be678b0046cf2b6ffd167197"
+    },
+    "schemas/fixture_result.schema.json": {
+      "bytes": 55508,
+      "sha256": "ec091f6e4c9d6c067020f9097ecd11322b2c4c5e85a0c1a95fd29e753dadb887"
+    },
+    "schemas/gameweek_result.schema.json": {
+      "bytes": 17675,
+      "sha256": "289a99e2ae557354130692cd6f03ebc66ff71ca296e5b2a3ac78df6e6a4da706"
+    }
+  },
+  "schema_version": "pts-009-fixture-manifest-v1"
+}

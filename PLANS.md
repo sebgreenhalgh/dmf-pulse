@@ -1,5 +1,41 @@
 # DMF Pulse execution plans
 
+## PTS-009 - bounded FPL-points simulation clean-checkout integration
+
+- Ticket/stage: `PTS-009`, A9; required parent
+  `9d7c360ab6a4cc7bfc6d6f41e44be6b47512b272` on
+  `stage/A9/PTS-009-fpl-points-simulation`.
+- Candidate: `dmf-pulse-stage9-candidate.zip`, 58 entries, SHA-256
+  `d01bd3868dcecf5f5165680ec2c0a4a08a0fa18dedc0833f1223792cf72fe002`.
+- Scope: implement only DMFP-19 items 19.09.01 through 19.09.06: coherent
+  player-event allocation, exact rules-driven scenario scoring and joint BPS/bonus,
+  weighted fixture/Gameweek distributions and joint matrices, Monte Carlo diagnostics,
+  immutable offline artifacts, and the Stage-9 CLI.
+- Final upstream authority: accepted Stage-8 merge parent `9d7c360...`, with GCS-008
+  implementation lineage ending at `69b6653...`; consume its exact Decimal
+  `JointScoreDistribution.probabilities`, `result_sha256`, policy/prior/input identities,
+  cutoff, degradation and embedded `Stage7MinutesContext`. Consume accepted Stage-7
+  team projection identities; do not invent per-player public projection-result identities.
+- Constraints: preserve fail-closed target-season production rules behavior; reference
+  rules are TEST/REPLAY only; no RUL-002 changes, migration, Stage-10+ manager-state or
+  optimiser logic, hidden scoring constants, duplicated upstream mathematics, undeclared
+  NumPy dependency, merge, PR, or self-acceptance.
+
+### PTS-009 checkpoints
+
+- [x] Apply the reviewed candidate overlay and manually reconcile the existing CLI.
+- [x] Reconcile Stage-7/Stage-8 adapters and identities to the final accepted contracts.
+- [x] Replace NumPy RNG/weighted-choice use with deterministic standard-library logic
+  unless measured correctness/performance evidence proves a governed dependency is needed.
+- [x] Pass focused unit/property/contract/golden/integration/performance suites and
+  adversarial assurance mutations, including artifact identity and coverage fail-closed gates.
+- [x] Pass relevant inherited Stage-2/7/8 compatibility, one final complete repository
+  regression, Ruff, strict mypy, repository validation, secret scan, Alembic/PostgreSQL,
+  wheel RECORD, and installed-wheel offline CLI gates.
+- [x] Rebuild truthful manifests/evidence/docs from the final product tree and prepare
+  the exact one-commit/push handoff; commit and remote SHA verification are terminal Git
+  actions recorded outside this pre-commit execution plan.
+
 ## MIN-007R7 + MIN-007H3 - final packaged replay and assurance remediation
 
 - Ticket/stage: `MIN-007R7` then `MIN-007H3`, A7; required starting parent

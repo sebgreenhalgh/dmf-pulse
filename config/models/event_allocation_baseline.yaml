@@ -1,0 +1,23 @@
+schema_version: event-allocation-baseline-v1
+model_version_id: pts-event-allocation-temp-evt-002-v1
+source_tag: TEMP-EVT-002
+bps_completeness_mode: EVENT_LINKED_PLUS_AUXILIARY_BASELINE
+auxiliary_source_tag: TEMP-PTS-001
+notes:
+  - Team goals are conserved exactly and allocated only to on-pitch eligible players.
+  - Rates are model inputs, never FPL scoring rules.
+  - Values below are illustrative defaults for controlled TEST/REPLAY fixtures only.
+  - Production calibration is deferred and this file is not a target-season ruleset.
+parameters:
+  match_minutes: 90.0
+  goal_time_lower: 0.01
+  goal_time_upper: 89.99
+  penalty_goal_probability: 0.08
+  set_piece_goal_probability: 0.18
+  direct_free_kick_goal_probability: 0.02
+  own_goal_probability: 0.02
+  assistable_probability: 0.72
+  ambiguous_assist_probability: 0.10
+  ambiguous_assist_eligible_probability: 0.50
+  extra_penalty_attempt_probability: 0.03
+  extra_penalty_save_probability: 0.20

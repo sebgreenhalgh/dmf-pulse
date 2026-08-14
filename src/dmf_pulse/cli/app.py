@@ -15,6 +15,7 @@ from dmf_pulse.cli.data_model_cmd import data_model_app
 from dmf_pulse.cli.doctor import build_doctor_report
 from dmf_pulse.cli.events import events_app
 from dmf_pulse.cli.evidence_cmd import evidence_app
+from dmf_pulse.cli.fpl_points import fpl_points_app
 from dmf_pulse.cli.ingest_cmd import ingest_app
 from dmf_pulse.cli.market_cmd import market_app
 from dmf_pulse.cli.review_pack_cmd import review_pack_app
@@ -34,6 +35,7 @@ app.add_typer(availability_app, name="availability")
 app.add_typer(data_model_app, name="data-model")
 app.add_typer(evidence_app, name="evidence")
 app.add_typer(events_app, name="events")
+app.add_typer(fpl_points_app, name="fpl-points")
 app.add_typer(ingest_app, name="ingest")
 app.add_typer(market_app, name="market")
 app.add_typer(review_pack_app, name="review-pack")

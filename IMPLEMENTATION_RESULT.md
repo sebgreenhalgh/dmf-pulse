@@ -1,78 +1,177 @@
-# GCS-008 implementation result
+# DMF Pulse Stage 9 — PTS-009 integration result
 
 ## Status
 
-The complete Stage-8 implementation and the six GCS-008 R1 independent-review remediations are present on `stage/A8/GCS-008-goal-clean-sheet-distributions`. Stage 8 is based on required parent `a5a0b66afd6e9645f971976d723e238824bee6a8`; R1 started from exact implementation commit `668662a1c9a3f3a92d1c0305e6dfbf6b1d32a07a`.
+**Implementation and clean-checkout integration complete; independent review and
+human acceptance remain separate.** Production 2026/27 output is not ready because
+the target ruleset is not verified, approved, production eligible, or ACTIVE.
 
-The complete 3,513-line `08_FOOTBALL_EVENT_DISTRIBUTION_ENGINE(6).txt` specification (SHA-256 `7cb378f26741d28e6b900530102dfdbd2286470c5b8920764792eb70834c18ff`) and accepted repository contracts were reconciled before implementation. `main` and PR #2 remain unmerged.
+## Source and Git basis
 
-## Implemented
+- Candidate ZIP SHA-256:
+  `d01bd3868dcecf5f5165680ec2c0a4a08a0fa18dedc0833f1223792cf72fe002`
+- ZIP entries independently enumerated: 58
+- Branch: `stage/A9/PTS-009-fpl-points-simulation`
+- Accepted parent: `9d7c360ab6a4cc7bfc6d6f41e44be6b47512b272`
+- Final GCS-008 implementation lineage:
+  `69b665315ab20b8ac13a38fafed7b5c64ff7e7ce`
 
-- Exact-Decimal independent-Poisson home/away score prior.
-- Adaptive score support with explicit omitted-tail diagnostics and fail-closed maximum support.
-- Typed score-grid events for 1X2, totals, team totals, clean sheets, BTTS, and exact scores.
-- Strict accepted Stage-6 `MarketConsensus`/`MarketNormalisationResult` input, including fixture, cutoff, outer and nested `as_of`, bounds, disagreement, freshness, operator lineage, and semantic-hash validation.
-- Read-only Stage-7 home/away projection identity contract with fixture/team/cutoff validation and replay-hash binding; no Stage-7 formula or public contract was altered.
-- Market-family weight caps and deterministic uncertainty-weighted soft KL projection.
-- Visible typed prior fallback only when the immutable policy permits it.
-- Canonical `joint-score-distribution-v1` containing the matrix, goal PMFs, goals-conceded PMFs, expected goals, 1X2, totals, BTTS, clean sheets, scorelines, residuals, diagnostics, confidence, and complete lineage.
-- Independent coherence validation and canonical SHA-256 identities.
-- Atomic content-addressed JSON persistence with identity-conflict rejection.
-- Offline Typer commands for projection, market-fit explanation, validation, and realized-score evaluation.
-- Canonical fixed-precision public Decimal schemas in repository contracts and packaged resources.
-- Proper-score evaluation for exact score, team goals, 1X2, clean sheets, and BTTS.
-- Synthetic TEST/REPLAY fixtures, checksum manifest, reviewed golden output, scope/coverage/acceptance validators, and installed-wheel verification.
-- R1 matrix-derived validation of every supported market residual and aggregate market-fit diagnostic.
-- R1 tracked baseline policy, non-empty coverage denominators, and explicit Stage-8 production allowlist.
-- Unit, property, contract, golden, integration, CLI, and adversarial tests.
-- Linux CI and Windows smoke workflows.
+The initial branch, parent, worktree, and origin branch matched the request before
+application. `src/dmf_pulse/cli/app.py` was manually reconciled so all accepted
+commands remain registered.
 
-## Deliberately unchanged
+## Material integration work
 
-- Accepted Stage-7 algorithms, public models, persistence, packaged replay resources, migration, CLI, and assurance machinery.
-- Accepted Stage-6 normalization mathematics and persistence.
-- Joint-score projection mathematics and published probability matrix.
-- Alembic head `20260807_0006`.
-- `pyproject.toml`, `uv.lock`, `pylock.toml`, and the dependency set.
-- `main`.
+- Replaced provisional Stage 8 aliases with the final accepted
+  `JointScoreDistribution`, exact 12-place matrix, cutoff/as-of, semantic hash, and
+  `Stage7MinutesContext` contracts.
+- Bound actual Stage 7 `MinutesPredictionResult` / `TeamMinutesProjection` and every
+  accepted player projection hash; no Stage 7/8 mathematics was copied.
+- Removed NumPy and implemented versioned SHA-256-derived standard-library named RNG
+  streams plus exact 10^12 matrix sampling. Dependencies and `uv.lock` are unchanged.
+- Replaced the candidate's duplicate reference arithmetic with an actual compiled
+  reference artifact and `AcceptedRulesAdapter`.
+- Strengthened goal/assist/mechanism/team/player reconciliation and joint BPS handling.
+- Added byte-identical packaged model resources and deterministic resource generation.
+- Hardened artifact, coverage, scope, resource, and installed-wheel verification with
+  fail-closed and mutation tests.
+- Corrected acceptance ordering so migration precedes database tests and wall-clock
+  performance is measured outside coverage instrumentation.
 
-## Actually executed in this implementation environment
+## Executed gates
 
-The following results were measured under Python 3.13.9 in the complete repository after all R1 product, test, schema, and resource changes:
+Toolchain: Python 3.13.9, pytest 9.1.1, coverage.py 7.15.2, Ruff 0.15.22,
+mypy 1.20.2, uv frozen environment, PostgreSQL 18.4.
 
-1. Frozen sync and static assurance: `uv sync --all-groups --frozen`, `git diff --check`, Ruff format/lint, and strict mypy all passed; Ruff checked 340 files and mypy checked 124 source files.
-2. Combined GCS-008 unit, property, contract, golden, integration, CLI, and assurance selection: 209 passed (187 unit/assurance, 5 property, 17 contract/golden/integration).
-3. Final complete repository regression: 1,614 passed in 678.60 seconds. Coverage was 14,713/15,744 statements (93.451474%), 4,373/4,914 branches (88.990639%), and 92.390357% combined.
-4. Critical GCS-008 coverage gate: 93.066348% statements and 85.818182% branches across 14 required files, with positive, count-consistent denominators for every required module.
-5. Fail-closed GCS-008 acceptance validation: 79 parent-to-tree files, 23 tracked acceptance inputs, 9 fixture files, 3 synchronized public schemas, 7 projected fixtures, and 1 correctly blocked fixture; status PASS.
-6. All four public CLIs passed against a fresh content-addressed artifact root: `score-distribution`, `explain-market-fit`, matrix-recomputing `validate`, and `evaluate`.
-7. PostgreSQL 18.4 migration matrix passed through Alembic head `20260807_0006`; canonical schema SHA-256 `7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc`. The PostgreSQL integration selection passed 110 tests with 110 deselected.
-8. `uv build` and isolated installed-wheel verification passed. All 158 RECORD members and the four GCS-008 packaged resources were verified. Wheel SHA-256: `8203c9cc0db9a945804890a62162c5f4567f7785ad0c18db9a44034c9a2dfd66`.
-9. Repository validation and the first-party secret scan passed with zero findings.
-10. Balanced-fixture identities: input signature `92c3603ce9356f04e2a1611a2e272282703a19dd9d559e3b190c4bc96d042753`; result identity `31d41317c0cf06002edd8e8fb47c4702706661f2227304182e3c4b8995e06b7e`. The input signature and probability matrix are unchanged; the result identity changed because residual records now publish the exact-score coordinates required for independent reconstruction.
+### Static, build, and dependency gates
 
-## Independently reproduced R1 findings
+```text
+uv sync --all-groups --frozen                         PASS
+python -m compileall -q src tests scripts            PASS
+ruff format --check .                                PASS (379 files)
+ruff check .                                         PASS
+mypy src/dmf_pulse                                   PASS (140 source files)
+```
 
-1. Stage-6 envelope tests accept outer/nested timestamps at the cutoff and reject post-cutoff, malformed, naive, and inconsistent outer envelopes without weakening nested checks.
-2. Validation mutation tests cover all 14 supported score events plus projected, residual, standardized residual, RMSE, and maximum-residual fields; the reviewer-style recomputed-self-hash attack is rejected as `ARTIFACT_INVALID`.
-3. Public schemas accept only canonical fixed-precision Decimal strings; JSON numbers and trailing-zero aliases are rejected at runtime and cannot acquire a second semantic identity. Repository and packaged schema copies are byte-synchronized.
-4. `config/models/score_baseline.yaml` is tracked through an exact `.gitignore` exception, byte-equal to its packaged resource, and included in the validator's Git-index inventory.
-5. Coverage mutation tests reject all-zero, zero-statement, zero-branch, missing, malformed, duplicate, impossible, and percentage-conflicting records while accepting genuine current coverage.
-6. The scope validator uses an explicit Stage-8 production allowlist and rejects later-stage scorer, assist, card, save, penalty, timing, simulation, FPL-points, optimizer, and optimisation modules.
+No dependency file changed.
 
-## Tests requiring PostgreSQL or Docker
+### Stage 9 tests and coverage
 
-GCS-008 adds no database model, table, or migration. The inherited disposable-PostgreSQL migration matrix and integration suite were nevertheless executed and passed as recorded above, proving the unchanged Stage-7 Alembic head and inherited persistence paths remain valid.
+```text
+pytest [Stage-9 unit/property/contract/golden/integration/assurance with branch coverage]
+80 passed in 38.84s
+pytest -q tests/performance/fpl_points
+1 passed in 12.60s
+```
 
-## Assumptions and decisions
+Collection by layer: 40 unit, 6 Hypothesis property, 10 contract, 4 golden,
+7 integration, 13 assurance mutation, and 1 performance test.
 
-- The accepted Stage-8 roadmap controls this ticket-sized implementation slice over the broader eventual event-engine architecture.
-- Stage 7 is consumed as immutable projection provenance and cutoff context. No player-minutes mathematics is copied into Stage 8.
-- Explicit home/away Poisson rates are upstream-conditioned request inputs; fitting dynamic attack/defence strengths is outside GCS-008.
-- A finite matrix is published only after the omitted tail is within policy. Material overflow is not silently renormalized.
-- File artifact persistence is sufficient for this vertical slice; relational run registration belongs to later orchestration.
-- Baseline confidence does not establish production promotion without later walk-forward and prospective calibration evidence.
+Stage 9 package coverage:
 
-## Unresolved blockers
+- statements: 1,650 / 1,786 = 92.38521836506159%
+- branches: 428 / 542 = 78.96678966789668%
+- combined: 89.26116838487972%
+- required gate: at least 85% statements and 70% branches, PASS
 
-No local implementation or validation blocker remains. GitHub Actions, fresh independent review, and human stage approval remain external and are not self-asserted here.
+### Inherited compatibility
+
+```text
+accepted Stage 2 rules                  75 passed
+accepted Stage 7 availability          168 passed
+final Stage 8 football-events          168 passed
+```
+
+Total directly relevant inherited coverage: 411 passed.
+
+### Final repository regression
+
+The final product/test/resource tree ran once with the separately passed performance
+test excluded from coverage instrumentation:
+
+```text
+pytest -q --ignore=tests/performance --cov=dmf_pulse --cov-branch \
+  --cov-report=json:evidence/stages/09/repository_coverage.json
+1694 passed in 640.05s
+```
+
+- statements: 16,406 / 17,588 = 93.27950875596999%
+- branches: 4,804 / 5,462 = 87.95313072134749%
+- coverage.py combined: 92.0173535791757%
+- repository 90% combined gate: PASS
+- skipped/xfail: 0 reported
+
+Earlier diagnostic runs are not acceptance evidence: the first reached an unmigrated
+database, and the second identified a deliberately stale repository snapshot plus the
+invalidity of enforcing a real-time performance budget under branch coverage. Both
+gate-order defects were corrected before the final green run.
+
+### Mathematical and assurance gates
+
+The real Hypothesis suite and deterministic contract/golden tests verify goal
+conservation, on-pitch eligibility, scorer/assist separation, exact Stage 8 scorelines,
+integer components/BPS/totals, component sums, negative support, normalized weights
+and PMFs, monotone quantiles/thresholds, joint-matrix dimensions/mapping, seed and
+partition invariance, blank Gameweeks, exact multi-fixture sums, production rules
+blocking, complete BPS universes, and joint bonus ranking.
+
+All 13 assurance mutation tests passed. Independent artifact assurance rejects
+semantic/matrix/ruleset/player/upstream/component tampering and requires accepted-rules
+recomputation. Scope, resource, and coverage assurance each returned PASS.
+
+### Database
+
+- Alembic heads: one, `20260807_0006`
+- Migration matrix: 5/5 transitions PASS from baseline `20260803_0005` to head
+- Metadata drift and preservation: PASS
+- PostgreSQL integration: 110 passed, 117 deselected in 198.90s
+- PostgreSQL: 18.4; 71 tables; 12 views
+- Schema SHA-256:
+  `7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc`
+- Disposable container/network/volume removed after the gate
+
+PTS-009 adds no migration.
+
+### CLI, artifacts, and wheel
+
+Repository TEST CLI `simulate-fixture`, `validate`, and `mc-diagnostics` passed; the
+independent artifact checker passed. The deterministic 32-scenario result has semantic
+SHA-256 `41082efbf1d2d795681f4e37ca3b7a42415ea8c03ab3d70cd3d3f5863e5f3b27`
+and canonical artifact SHA-256
+`ea264381d307af719f4a58591396296ff425560b4b0000f15f8778310f768111`.
+
+The built wheel `dmf_pulse-0.2.0-py3-none-any.whl` has SHA-256
+`07bf255008dcb840816e6557de0c9943e6d6eac3483089656b5c9f5bc8059a38`.
+The isolated verifier checked all 176 RECORD members, installed outside the checkout
+without `PYTHONPATH`, imported Stage 9 from temporary `site-packages`, exercised the
+TEST CLI, and confirmed PRODUCTION exits 4 with `RULESET_NOT_ACTIVE`.
+
+Repository validation and the secret scan pass after mechanically refreshing the
+714-file current repository snapshot. Independent Stage 9 review, merge, and human
+acceptance were not performed.
+
+## Frozen Stage 9 identities
+
+- fixture manifest SHA-256:
+  `457698f877ad1dc79bcbe1c3f8e707b664f1bab27df61c0dd93008973d3b9347`
+- request SHA-256:
+  `fb8ed57b63087ae3563fdf37ca4e8a77e71a8af333a4668e9a960eb0eace40af`
+- golden cases SHA-256:
+  `9bf3657baac70e768747a592b1da2ef2fc24aa774857f43deae2ae8c0df90c19`
+- Stage 7 context semantic SHA-256:
+  `d5af65b3be0bc6ca02759953b2599cf8a98c2ad198c83e4aa230c726a89d20c2`
+- Stage 8 result SHA-256:
+  `31d41317c0cf06002edd8e8fb47c4702706661f2227304182e3c4b8995e06b7e`
+- reference rules embedded hash:
+  `12271ab0b32a461baa3778f2e914f45744ccf9d5302c37c4a5f2ffb89e0c1139`
+- event-allocation config SHA-256:
+  `4d5aba182310ce70ed2bf6f0abfed4a4b1fc9ef9ca8f3abf7363ec21f0e8c85e`
+- Monte Carlo config SHA-256:
+  `14107f715769abb2d1bfc2937753c820a7d3eb02c23ae8e8a76350eaa88c0454`
+
+## Remaining modeling limits
+
+TEMP-EVT-002 and TEMP-PTS-001 require production calibration. Multiple-fixture
+Gameweeks omit sequential readiness transitions. Advanced prop reconciliation, full
+event/BPS residual modeling, and every Stage 10+ manager-state/optimisation feature
+remain deliberately excluded.
