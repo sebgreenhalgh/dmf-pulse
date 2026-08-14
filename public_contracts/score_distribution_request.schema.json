@@ -308,10 +308,7 @@
         "line": {
           "anyOf": [
             {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "pattern": "^\\d+\\.5$",
               "type": "string"
             },
             {
@@ -322,17 +319,10 @@
           "title": "Line"
         },
         "market_disagreement": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
           "default": "0",
-          "title": "Market Disagreement"
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Market Disagreement",
+          "type": "string"
         },
         "maximum_age_seconds": {
           "anyOf": [
@@ -384,28 +374,14 @@
           "title": "Source Result Sha256"
         },
         "target_probability": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
-          "title": "Target Probability"
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Target Probability",
+          "type": "string"
         },
         "uncertainty": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
-          "title": "Uncertainty"
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Uncertainty",
+          "type": "string"
         },
         "usable_at": {
           "format": "date-time",
@@ -413,17 +389,10 @@
           "type": "string"
         },
         "weight": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
           "default": "1",
-          "title": "Weight"
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Weight",
+          "type": "string"
         }
       },
       "required": [
@@ -838,28 +807,14 @@
       "additionalProperties": false,
       "properties": {
         "away_goal_rate": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
-          "title": "Away Goal Rate"
+          "pattern": "^\\d+\\.\\d{6}$",
+          "title": "Away Goal Rate",
+          "type": "string"
         },
         "home_goal_rate": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
-          "title": "Home Goal Rate"
+          "pattern": "^\\d+\\.\\d{6}$",
+          "title": "Home Goal Rate",
+          "type": "string"
         },
         "model_family": {
           "const": "INDEPENDENT_POISSON_V1",

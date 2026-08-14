@@ -77,6 +77,27 @@ def test_scope_rejects_prefix_lookalike_paths() -> None:
         module.validate_changed_paths(["docs/stages/GCS-008.md.backup"])
 
 
+@pytest.mark.parametrize(
+    "path",
+    [
+        "src/dmf_pulse/football_events/player_scorer.py",
+        "src/dmf_pulse/football_events/player_assists.py",
+        "src/dmf_pulse/football_events/card_model.py",
+        "src/dmf_pulse/football_events/goalkeeper_saves.py",
+        "src/dmf_pulse/football_events/penalty_events.py",
+        "src/dmf_pulse/football_events/event_timing.py",
+        "src/dmf_pulse/football_events/full_event_simulation.py",
+        "src/dmf_pulse/football_events/fpl_points.py",
+        "src/dmf_pulse/football_events/fpl_points_optimizer.py",
+        "src/dmf_pulse/football_events/fpl_points_optimisation.py",
+    ],
+)
+def test_scope_rejects_later_stage_event_modules(path: str) -> None:
+    module = _module()
+    with pytest.raises(module.ScopeError, match="outside GCS-008"):
+        module.validate_changed_paths([path])
+
+
 def test_git_changed_paths_includes_uncommitted_and_untracked(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

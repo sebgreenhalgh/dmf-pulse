@@ -1,16 +1,18 @@
 # GCS-008 new and modified repository-relative files
 #
-# The ZIP also contains PLANS_GCS008_APPEND.patch as a temporary delivery helper.
-# Apply it to create the listed PLANS.md change, then delete the helper before staging.
+# Mechanically reconciled against required parent
+# a5a0b66afd6e9645f971976d723e238824bee6a8 after the R1 remediation.
 
 .github/workflows/ci.yml
 .github/workflows/windows-smoke.yml
+.gitignore
 ACCEPTANCE_COMMANDS.ps1
 APPLY_INSTRUCTIONS.md
 CHANGED_FILES.txt
 IMPLEMENTATION_PLAN.md
 IMPLEMENTATION_RESULT.md
 PLANS.md
+config/models/score_baseline.yaml
 docs/stages/GCS-008.md
 evidence/tickets/GCS-008/README.md
 evidence/tickets/GCS-008/coverage.json

@@ -19,5 +19,5 @@ def test_balanced_fixture_matches_reviewed_golden_output() -> None:
     expected = json.loads((ROOT / "balanced_fixture.expected.json").read_text(encoding="utf-8"))
     assert result.distribution.model_dump(mode="json") == expected
     assert result.distribution.result_sha256 == (
-        "6537d930643e91629ee793d15aa6f4f86930a36640862aa99b13a201d62b94ea"
+        "31d41317c0cf06002edd8e8fb47c4702706661f2227304182e3c4b8995e06b7e"
     )

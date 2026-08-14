@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from decimal import Decimal, localcontext
-from typing import Any, Literal, Self
+from typing import Annotated, Any, Literal, Self
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -24,7 +24,12 @@ from dmf_pulse.football_events._decimal import (
     quantize_probability,
     rounded_simplex,
 )
-from dmf_pulse.football_events.market_constraints import MarketConstraintSet
+from dmf_pulse.football_events.market_constraints import (
+    MarketConstraint,
+    MarketConstraintSet,
+    MarketFamily,
+    ScoreEvent,
+)
 from dmf_pulse.football_events.minutes_context import (
     Stage7MinutesContext,
     validate_stage7_context,
@@ -39,6 +44,7 @@ PROBABILITY_PATTERN = r"^(?:0\.\d{12}|1\.000000000000)$"
 NONNEGATIVE_MEASURE_PATTERN = r"^\d+\.\d{6}$"
 SIGNED_DECIMAL_12_PATTERN = r"^-?\d+\.\d{12}$"
 SIGNED_DECIMAL_6_PATTERN = r"^-?\d+\.\d{6}$"
+ProbabilityText = Annotated[str, Field(pattern=PROBABILITY_PATTERN)]
 
 
 def _probability_text(value: str, *, label: str) -> Decimal:
@@ -127,6 +133,8 @@ class MarketResidual(_FrozenModel):
     family: str = Field(min_length=1)
     event: str = Field(min_length=1)
     line: str | None
+    home_goals: int | None = Field(default=None, ge=0)
+    away_goals: int | None = Field(default=None, ge=0)
     target_probability: str = Field(pattern=PROBABILITY_PATTERN)
     projected_probability: str = Field(pattern=PROBABILITY_PATTERN)
     residual: str = Field(pattern=SIGNED_DECIMAL_12_PATTERN)
@@ -167,6 +175,34 @@ class ProjectionDiagnostics(_FrozenModel):
     constraint_count: int = Field(ge=0)
 
 
+def _constraint_from_public_residual(
+    residual: MarketResidual,
+    *,
+    as_of: str,
+    home_max: int,
+    away_max: int,
+) -> MarketConstraint:
+    if (residual.home_goals is not None and residual.home_goals > home_max) or (
+        residual.away_goals is not None and residual.away_goals > away_max
+    ):
+        raise ValueError("market residual score coordinates exceed matrix support")
+    return MarketConstraint.model_validate(
+        {
+            "away_goals": residual.away_goals,
+            "constraint_id": residual.constraint_id,
+            "event": ScoreEvent(residual.event),
+            "family": MarketFamily(residual.family),
+            "home_goals": residual.home_goals,
+            "line": residual.line,
+            "source_result_sha256": residual.source_result_sha256,
+            "target_probability": Decimal(residual.target_probability),
+            "uncertainty": Decimal(residual.uncertainty),
+            "usable_at": as_of,
+            "weight": Decimal(residual.weight),
+        }
+    )
+
+
 class JointScoreDistribution(_FrozenModel):
     """Canonical Stage-8 public output; all probabilities are exact strings."""
 
@@ -186,12 +222,12 @@ class JointScoreDistribution(_FrozenModel):
     prior_away_goal_rate: str = Field(pattern=r"^\d+\.\d{6}$")
     home_max: int = Field(ge=0)
     away_max: int = Field(ge=0)
-    probabilities: tuple[tuple[str, ...], ...]
+    probabilities: tuple[tuple[ProbabilityText, ...], ...]
     tail_mass: str = Field(pattern=PROBABILITY_PATTERN)
-    home_goal_pmf: tuple[str, ...]
-    away_goal_pmf: tuple[str, ...]
-    home_goals_conceded_pmf: tuple[str, ...]
-    away_goals_conceded_pmf: tuple[str, ...]
+    home_goal_pmf: tuple[ProbabilityText, ...]
+    away_goal_pmf: tuple[ProbabilityText, ...]
+    home_goals_conceded_pmf: tuple[ProbabilityText, ...]
+    away_goals_conceded_pmf: tuple[ProbabilityText, ...]
     expected_home_goals: str = Field(pattern=NONNEGATIVE_MEASURE_PATTERN)
     expected_away_goals: str = Field(pattern=NONNEGATIVE_MEASURE_PATTERN)
     one_x_two: OneXTwoDistribution
@@ -403,6 +439,63 @@ class JointScoreDistribution(_FrozenModel):
         ]
         if supplied_top != expected_top:
             raise ValueError("top_scorelines do not match deterministic matrix ranking")
+        residual_constraints = tuple(
+            _constraint_from_public_residual(
+                item,
+                as_of=self.as_of,
+                home_max=self.home_max,
+                away_max=self.away_max,
+            )
+            for item in self.market_residuals
+        )
+        projected_residual_probabilities = constraint_probabilities(
+            matrix,
+            residual_constraints,
+        )
+        residual_values: list[Decimal] = []
+        for residual, projected in zip(
+            self.market_residuals,
+            projected_residual_probabilities,
+            strict=True,
+        ):
+            expected_projected = quantize_probability(projected)
+            if public_probability_text(expected_projected) != residual.projected_probability:
+                raise ValueError(
+                    "market residual projected_probability does not match score matrix"
+                )
+            expected_residual = quantize_probability(
+                expected_projected - Decimal(residual.target_probability)
+            )
+            if format(expected_residual, ".12f") != residual.residual:
+                raise ValueError("market residual does not match matrix projection")
+            uncertainty = Decimal(residual.uncertainty)
+            expected_standardized = quantize_measure(expected_residual / uncertainty)
+            if format(expected_standardized, ".6f") != residual.standardized_residual:
+                raise ValueError(
+                    "market residual standardized_residual does not match frozen policy"
+                )
+            residual_values.append(expected_residual)
+        with localcontext() as context:
+            context.prec = DECIMAL_PRECISION
+            expected_rmse = (
+                decimal_sqrt(
+                    sum((value * value for value in residual_values), Decimal(0))
+                    / Decimal(len(residual_values))
+                )
+                if residual_values
+                else Decimal(0)
+            )
+        expected_maximum = max(
+            (abs(value) for value in residual_values),
+            default=Decimal(0),
+        )
+        if public_probability_text(expected_rmse) != self.diagnostics.market_rmse:
+            raise ValueError("market_rmse does not match market residuals")
+        if (
+            public_probability_text(expected_maximum)
+            != self.diagnostics.maximum_absolute_market_residual
+        ):
+            raise ValueError("maximum_absolute_market_residual does not match market residuals")
         if len(set(self.confidence_reasons)) != len(self.confidence_reasons):
             raise ValueError("confidence_reasons must be unique")
         if self.diagnostics.constraint_count != len(self.market_residuals):
@@ -572,19 +665,22 @@ def compose_joint_score_distribution(
         projected_public = quantize_probability(projected)
         residual = quantize_probability(projected_public - target_public)
         residual_values.append(residual)
-        standardized = quantize_measure(residual / constraint.uncertainty)
+        uncertainty_public = quantize_probability(constraint.uncertainty)
+        standardized = quantize_measure(residual / uncertainty_public)
         residuals.append(
             {
+                "away_goals": constraint.away_goals,
                 "constraint_id": constraint.constraint_id,
                 "event": constraint.event.value,
                 "family": constraint.family.value,
+                "home_goals": constraint.home_goals,
                 "line": None if constraint.line is None else format(constraint.line, "f"),
                 "projected_probability": public_probability_text(projected_public),
                 "residual": format(residual, ".12f"),
                 "source_result_sha256": constraint.source_result_sha256,
                 "standardized_residual": format(standardized, ".6f"),
                 "target_probability": public_probability_text(target_public),
-                "uncertainty": format(quantize_probability(constraint.uncertainty), ".12f"),
+                "uncertainty": format(uncertainty_public, ".12f"),
                 "weight": format(quantize_probability(constraint.weight), ".12f"),
             }
         )

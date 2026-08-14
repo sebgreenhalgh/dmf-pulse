@@ -2,14 +2,22 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from datetime import datetime
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from enum import StrEnum
-from typing import Any, Literal, Self
+from typing import Annotated, Any, Literal, Self
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 from dmf_pulse.football_events._decimal import (
     DECIMAL_PRECISION,
@@ -48,6 +56,28 @@ class ScoreEvent(StrEnum):
     BTTS_YES = "BTTS_YES"
     BTTS_NO = "BTTS_NO"
     EXACT_SCORE = "EXACT_SCORE"
+
+
+CANONICAL_PROBABILITY_PATTERN = r"^(?:0\.\d{12}|1\.000000000000)$"
+CANONICAL_POSITIVE_12_PATTERN = r"^\d+\.\d{12}$"
+CANONICAL_HALF_GOAL_PATTERN = r"^\d+\.5$"
+ProbabilityJsonInput = Annotated[str, Field(pattern=CANONICAL_PROBABILITY_PATTERN)]
+PositiveDecimal12JsonInput = Annotated[
+    str,
+    Field(pattern=CANONICAL_POSITIVE_12_PATTERN),
+]
+HalfGoalJsonInput = Annotated[str, Field(pattern=CANONICAL_HALF_GOAL_PATTERN)]
+
+
+def _require_canonical_json_decimal(
+    value: object,
+    *,
+    info: ValidationInfo,
+    pattern: str,
+    label: str,
+) -> None:
+    if info.mode == "json" and (not isinstance(value, str) or re.fullmatch(pattern, value) is None):
+        raise ValueError(f"{label} must use its canonical public decimal string")
 
 
 class _FrozenModel(BaseModel):
@@ -99,24 +129,66 @@ class MarketConstraint(_FrozenModel):
     market_disagreement: Decimal = Decimal(0)
     confidence_grade: Literal["A", "B", "C", "D"] = "D"
 
-    @field_validator("target_probability", mode="before")
+    @field_validator(
+        "target_probability",
+        mode="before",
+        json_schema_input_type=ProbabilityJsonInput,
+    )
     @classmethod
-    def validate_target(cls, value: object) -> Decimal:
+    def validate_target(cls, value: object, info: ValidationInfo) -> Decimal:
+        _require_canonical_json_decimal(
+            value,
+            info=info,
+            pattern=CANONICAL_PROBABILITY_PATTERN,
+            label="target_probability",
+        )
         return probability(value, label="target_probability")
 
-    @field_validator("market_disagreement", mode="before")
+    @field_validator(
+        "market_disagreement",
+        mode="before",
+        json_schema_input_type=ProbabilityJsonInput,
+    )
     @classmethod
-    def validate_disagreement(cls, value: object) -> Decimal:
+    def validate_disagreement(cls, value: object, info: ValidationInfo) -> Decimal:
+        _require_canonical_json_decimal(
+            value,
+            info=info,
+            pattern=CANONICAL_PROBABILITY_PATTERN,
+            label="market_disagreement",
+        )
         return probability(value, label="market_disagreement")
 
-    @field_validator("uncertainty", "weight", mode="before")
+    @field_validator(
+        "uncertainty",
+        "weight",
+        mode="before",
+        json_schema_input_type=PositiveDecimal12JsonInput,
+    )
     @classmethod
-    def validate_positive_decimal(cls, value: object, info: Any) -> Decimal:
+    def validate_positive_decimal(cls, value: object, info: ValidationInfo) -> Decimal:
+        _require_canonical_json_decimal(
+            value,
+            info=info,
+            pattern=CANONICAL_POSITIVE_12_PATTERN,
+            label=str(info.field_name),
+        )
         return positive_decimal(value, label=str(info.field_name))
 
-    @field_validator("line", mode="before")
+    @field_validator(
+        "line",
+        mode="before",
+        json_schema_input_type=HalfGoalJsonInput | None,
+    )
     @classmethod
-    def validate_line(cls, value: object) -> Decimal | None:
+    def validate_line(cls, value: object, info: ValidationInfo) -> Decimal | None:
+        if value is not None:
+            _require_canonical_json_decimal(
+                value,
+                info=info,
+                pattern=CANONICAL_HALF_GOAL_PATTERN,
+                label="line",
+            )
         return None if value is None else exact_decimal(value, label="line")
 
     @field_validator("usable_at", mode="before")
@@ -395,19 +467,25 @@ def build_design_matrix(
     )
 
 
-def _consensus_body(consensus: object) -> tuple[dict[str, Any], object | None]:
+def _consensus_body(
+    consensus: object,
+) -> tuple[dict[str, Any], object | None, object | None]:
     body = mapping(consensus, label="market consensus")
     outer_fixture_id: object | None = None
+    outer_as_of: object | None = None
     if "consensus" in body:
         status = str(body.get("status"))
         if status not in {"NORMALISED", "DEGRADED"}:
             raise ValueError("market normalisation result has no usable consensus")
         outer_fixture_id = body.get("fixture_id")
+        outer_as_of = body.get("as_of")
+        if outer_fixture_id is None or outer_as_of is None:
+            raise ValueError("market normalisation result requires fixture_id and as_of")
         nested = body.get("consensus")
         if nested is None:
             raise ValueError("market normalisation result has no consensus")
         body = mapping(nested, label="market consensus")
-    return body, outer_fixture_id
+    return body, outer_fixture_id, outer_as_of
 
 
 def _validated_fixture_id(value: object, *, label: str) -> UUID:
@@ -433,7 +511,7 @@ def constraints_from_market_consensus(
     cutoff = parse_utc(as_of, field_name="as_of")
     floor = positive_decimal(uncertainty_floor, label="uncertainty_floor")
     expected_fixture_id = _validated_fixture_id(fixture_id, label="fixture_id")
-    body, outer_fixture_id = _consensus_body(consensus)
+    body, outer_fixture_id, outer_as_of = _consensus_body(consensus)
     nested_fixture_id = _validated_fixture_id(
         body.get("fixture_id"),
         label="market consensus fixture_id",
@@ -458,6 +536,20 @@ def constraints_from_market_consensus(
     )
     if mapping_cutoff > consensus_as_of:
         raise ValueError("market consensus mapping_cutoff is after its as_of")
+    if outer_fixture_id is not None:
+        result_as_of = parse_utc(
+            outer_as_of,
+            field_name="market normalisation result as_of",
+        )
+        if consensus_as_of > result_as_of:
+            raise ValueError(
+                "market normalisation timestamp envelope is inconsistent: "
+                "consensus as_of is after result as_of"
+            )
+        if result_as_of > cutoff:
+            raise ValueError(
+                "POST_CUTOFF_MARKET: Stage-6 normalisation result is after Stage-8 cutoff"
+            )
     if consensus_as_of > cutoff or mapping_cutoff > cutoff:
         raise ValueError("POST_CUTOFF_MARKET: Stage-6 consensus is after Stage-8 cutoff")
     eligible_operator_count = body.get("eligible_operator_count")

@@ -20,7 +20,7 @@ from typing import Any
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = REPOSITORY_ROOT / "fixtures/events/score/GCS-008/balanced_fixture.json"
-EXPECTED_RESULT_SHA256 = "6537d930643e91629ee793d15aa6f4f86930a36640862aa99b13a201d62b94ea"
+EXPECTED_RESULT_SHA256 = "31d41317c0cf06002edd8e8fb47c4702706661f2227304182e3c4b8995e06b7e"
 REQUIRED_WHEEL_MEMBERS = {
     "dmf_pulse/football_events/resources/score_baseline.yaml",
     "dmf_pulse/football_events/resources/score_distribution_request.schema.json",

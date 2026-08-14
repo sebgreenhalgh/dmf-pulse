@@ -45,6 +45,19 @@
     "MarketResidual": {
       "additionalProperties": false,
       "properties": {
+        "away_goals": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Away Goals"
+        },
         "constraint_id": {
           "minLength": 1,
           "title": "Constraint Id",
@@ -59,6 +72,19 @@
           "minLength": 1,
           "title": "Family",
           "type": "string"
+        },
+        "home_goals": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Home Goals"
         },
         "line": {
           "anyOf": [
@@ -384,6 +410,7 @@
     },
     "away_goal_pmf": {
       "items": {
+        "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
         "type": "string"
       },
       "title": "Away Goal Pmf",
@@ -391,6 +418,7 @@
     },
     "away_goals_conceded_pmf": {
       "items": {
+        "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
         "type": "string"
       },
       "title": "Away Goals Conceded Pmf",
@@ -457,6 +485,7 @@
     },
     "home_goal_pmf": {
       "items": {
+        "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
         "type": "string"
       },
       "title": "Home Goal Pmf",
@@ -464,6 +493,7 @@
     },
     "home_goals_conceded_pmf": {
       "items": {
+        "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
         "type": "string"
       },
       "title": "Home Goals Conceded Pmf",
@@ -525,6 +555,7 @@
     "probabilities": {
       "items": {
         "items": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
           "type": "string"
         },
         "type": "array"

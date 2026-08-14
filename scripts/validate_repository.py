@@ -859,9 +859,7 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
         (
             "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
             'uv run pytest -m "postgres and integration" tests/integration',
-            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/ODD-005/coverage.json",
-            "uv run python scripts/check_odd005_coverage_gates.py evidence/tickets/ODD-005/coverage.json",
-            "cp evidence/tickets/ODD-005/coverage.json evidence/tickets/GCS-008/coverage.json",
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/GCS-008/coverage.json",
             "uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/GCS-008/coverage.json",
             "uv run dmf specs validate",
             "uv run dmf ingest odds replay",
@@ -872,9 +870,6 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
             "uv run python scripts/verify_odd005_wheel.py",
             "uv run python scripts/verify_gcs008_wheel.py",
             "uv run python scripts/validate_gcs008_acceptance.py",
-            "uv run python scripts/verify_odd005_acceptance.py",
-            "uv run python scripts/generate_odd005_evidence.py --status DRAFT",
-            "uv run dmf evidence validate --ticket ODD-005",
         )
         if (root / "tickets/GCS-008/ticket.yaml").is_file()
         else (

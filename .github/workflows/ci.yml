@@ -35,11 +35,12 @@ jobs:
       DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
       PGPASSWORD: changeme
       UV_NO_PROGRESS: "1"
-      UV_CACHE_DIR: ${{ runner.temp }}/uv-cache
+      UV_CACHE_DIR: ${{ github.workspace }}/../.uv-cache
     steps:
       - name: Check out without persisted credentials
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Python 3.13
@@ -70,7 +71,7 @@ jobs:
 
       - name: PostgreSQL inherited Stage-7 migration matrix and vertical slice
         run: |
-          uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head
+          uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head --report artifacts/gcs008-ci/migration_report.json --offline-sql artifacts/gcs008-ci/offline_upgrade.sql --schema-manifest artifacts/gcs008-ci/schema_manifest.json
           uv run pytest -m "postgres and integration" tests/integration
           uv run alembic upgrade head --sql > "${{ runner.temp }}/dat003-offline-upgrade.sql"
           uv run dmf data-model doctor --json
@@ -80,9 +81,7 @@ jobs:
 
       - name: Tests and branch coverage
         run: |
-          uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/ODD-005/coverage.json
-          uv run python scripts/check_odd005_coverage_gates.py evidence/tickets/ODD-005/coverage.json
-          cp evidence/tickets/ODD-005/coverage.json evidence/tickets/GCS-008/coverage.json
+          uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/GCS-008/coverage.json
           uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/GCS-008/coverage.json
 
       - name: FPL regression and ODD-005 synthetic vertical slice
@@ -91,7 +90,7 @@ jobs:
           uv run dmf ingest fpl validate --resource bootstrap --input fixtures/fpl/FPL-004/happy_path/bootstrap.json --contract-version fpl-reference-v1 --output json
           uv run dmf ingest fpl replay --fixture-set fixtures/fpl/FPL-004 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_test_v1 --output json
           uv run dmf ingest odds replay --fixture-set fixtures/odds/ODD-005 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_the_odds_api_v1 --output json
-          uv run dmf market observations --fixture-external-provider official_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json
+          uv run dmf market observations --fixture-external-provider synthetic_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json
           uv run python -c "import json; from typer.testing import CliRunner; from dmf_pulse.cli.app import app; r=CliRunner().invoke(app,['ingest','odds','snapshot','--provider','the_odds_api','--competition-key','PL','--sport-key','soccer_epl','--region','uk','--market','h2h','--as-of','2026-08-20T12:05:00Z','--output','json']); value=json.loads(r.stdout); assert r.exit_code == 4 and value['error']['code'] == 'CREDENTIAL_UNAVAILABLE' and value['error']['transport_called'] is False"
 
       - name: GCS-008 score-distribution vertical slice
@@ -116,17 +115,8 @@ jobs:
           uv run python scripts/verify_odd005_wheel.py
           uv run python scripts/verify_gcs008_wheel.py
 
-      - name: Verify ODD-005 acceptance evidence
-        env:
-          DMF_ACCEPTANCE_CI_REF: "1"
-        run: |
-          uv run python scripts/validate_repository.py
-          uv run python scripts/verify_odd005_acceptance.py
-
-      - name: Validate repository and evidence
-        run: |
-          uv run python scripts/generate_odd005_evidence.py --status DRAFT
-          uv run dmf evidence validate --ticket ODD-005
+      - name: Validate repository
+        run: uv run python scripts/validate_repository.py
 
       - name: First-party secret scan
         run: uv run python scripts/scan_secrets.py

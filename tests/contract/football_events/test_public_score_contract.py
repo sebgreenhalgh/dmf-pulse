@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
 from dmf_pulse.football_events.score_distribution import JointScoreDistribution
 from dmf_pulse.football_events.service import (
@@ -14,6 +15,7 @@ from dmf_pulse.football_events.service import (
 
 pytestmark = pytest.mark.contract
 FIXTURE = Path("fixtures/events/score/GCS-008/stage6_consensus_fixture.json")
+BALANCED_FIXTURE = Path("fixtures/events/score/GCS-008/balanced_fixture.json")
 
 
 def _walk(value: Any):
@@ -41,6 +43,38 @@ def test_public_request_and_output_schemas_are_versioned_and_closed() -> None:
         "#/$defs/MarketNormalisationResult",
     }
     assert output_schema["properties"]["schema_version"]["const"] == ("joint-score-distribution-v1")
+
+
+def test_public_decimal_schema_uses_only_canonical_strings() -> None:
+    request_schema = ScoreDistributionRequest.model_json_schema()
+    constraint = request_schema["$defs"]["MarketConstraint"]["properties"]
+    assert constraint["target_probability"] == {
+        "pattern": r"^(?:0\.\d{12}|1\.000000000000)$",
+        "title": "Target Probability",
+        "type": "string",
+    }
+    assert constraint["uncertainty"]["type"] == "string"
+    assert constraint["weight"]["type"] == "string"
+    prior = request_schema["$defs"]["ScorePriorRequest"]["properties"]
+    assert prior["home_goal_rate"]["pattern"] == r"^\d+\.\d{6}$"
+    assert prior["home_goal_rate"]["type"] == "string"
+
+    output_schema = JointScoreDistribution.model_json_schema()
+    probability_cell = output_schema["properties"]["probabilities"]["items"]["items"]
+    assert probability_cell["pattern"] == r"^(?:0\.\d{12}|1\.000000000000)$"
+    assert probability_cell["type"] == "string"
+
+
+def test_schema_and_runtime_both_reject_json_numeric_exact_decimals() -> None:
+    payload = json.loads(BALANCED_FIXTURE.read_text(encoding="utf-8"))
+    payload["constraints"][0]["target_probability"] = 0.47
+    with pytest.raises(ValidationError, match="canonical public decimal string"):
+        ScoreDistributionRequest.model_validate_json(json.dumps(payload))
+
+    stage6_payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    stage6_payload["market_consensus"]["market_disagreement"] = 0.01
+    with pytest.raises(ValidationError, match="accepted Stage-6 public contract"):
+        ScoreDistributionRequest.model_validate_json(json.dumps(stage6_payload))
 
 
 def test_stage6_fixture_is_accepted_by_the_frozen_stage6_contract() -> None:

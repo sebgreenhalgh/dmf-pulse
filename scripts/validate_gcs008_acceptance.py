@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import subprocess
 import sys
 from importlib.resources import files
 from pathlib import Path
@@ -52,6 +53,25 @@ EXPECTED_STATUS = {
     "stage6_consensus_fixture.json": "PROJECTED",
     "strong_home_favourite.json": "PROJECTED",
 }
+REQUIRED_TRACKED_ACCEPTANCE_INPUTS = {
+    "config/models/score_baseline.yaml",
+    "evidence/tickets/GCS-008/coverage.json",
+    "fixtures/events/score/GCS-008/manifest.json",
+    "public_contracts/joint_score_distribution.schema.json",
+    "public_contracts/score_distribution_request.schema.json",
+    "public_contracts/score_distribution_result.schema.json",
+    "scripts/check_gcs008_coverage_gates.py",
+    "scripts/validate_gcs008_acceptance.py",
+    "scripts/validate_gcs008_scope.py",
+    "scripts/verify_gcs008_wheel.py",
+    "src/dmf_pulse/football_events/resources/joint_score_distribution.schema.json",
+    "src/dmf_pulse/football_events/resources/score_baseline.yaml",
+    "src/dmf_pulse/football_events/resources/score_distribution_request.schema.json",
+    "src/dmf_pulse/football_events/resources/score_distribution_result.schema.json",
+} | {
+    f"fixtures/events/score/GCS-008/{name}"
+    for name in (*EXPECTED_STATUS, "balanced_fixture.expected.json")
+}
 
 
 class AcceptanceError(RuntimeError):
@@ -60,6 +80,32 @@ class AcceptanceError(RuntimeError):
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _tracked_repository_paths() -> set[str]:
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "--cached"],
+            cwd=REPOSITORY_ROOT,
+            check=False,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise AcceptanceError("tracked repository inventory is unavailable") from exc
+    if result.returncode != 0:
+        raise AcceptanceError("tracked repository inventory is unavailable")
+    return {line.replace("\\", "/") for line in result.stdout.splitlines() if line}
+
+
+def _validate_tracked_acceptance_inputs() -> int:
+    missing = sorted(REQUIRED_TRACKED_ACCEPTANCE_INPUTS - _tracked_repository_paths())
+    if missing:
+        raise AcceptanceError(f"acceptance input is not tracked: {missing}")
+    return len(REQUIRED_TRACKED_ACCEPTANCE_INPUTS)
 
 
 def _validate_manifest() -> int:
@@ -162,6 +208,7 @@ def _validate_measured_state() -> tuple[dict[str, Any], int]:
 
 def validate() -> dict[str, Any]:
     coverage, changed_file_count = _validate_measured_state()
+    tracked_acceptance_inputs = _validate_tracked_acceptance_inputs()
     fixture_files = _validate_manifest()
     schema_files = _validate_schemas()
     projected, blocked = _validate_fixtures()
@@ -174,6 +221,7 @@ def validate() -> dict[str, Any]:
         "schema_files_verified": schema_files,
         "schema_version": "gcs008-acceptance-validation-v1",
         "status": "PASS",
+        "tracked_acceptance_inputs": tracked_acceptance_inputs,
     }
 
 

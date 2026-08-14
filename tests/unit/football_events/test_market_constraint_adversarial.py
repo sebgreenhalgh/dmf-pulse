@@ -174,6 +174,7 @@ def test_adapter_accepts_normalisation_result_wrapper() -> None:
     wrapped = {
         "status": "NORMALISED",
         "fixture_id": FIXTURE_ID,
+        "as_of": "2026-08-20T12:00:00Z",
         "consensus": _valid_consensus(),
     }
     result = constraints_from_market_consensus(
@@ -187,6 +188,49 @@ def test_adapter_accepts_normalisation_result_wrapper() -> None:
     assert max(item.weight for item in result.constraints) - min(
         item.weight for item in result.constraints
     ) <= Decimal("0.000000000001")
+
+
+def test_adapter_rejects_post_cutoff_outer_normalisation_result() -> None:
+    wrapped = {
+        "status": "NORMALISED",
+        "fixture_id": FIXTURE_ID,
+        "as_of": "2026-08-20T12:00:01Z",
+        "consensus": _valid_consensus(),
+    }
+    with pytest.raises(ValueError, match="POST_CUTOFF_MARKET"):
+        constraints_from_market_consensus(
+            wrapped,
+            fixture_id=FIXTURE_ID,
+            as_of=AS_OF,
+            uncertainty_floor=Decimal("0.005"),
+        )
+
+
+@pytest.mark.parametrize(
+    ("outer_as_of", "match"),
+    [
+        (None, "requires fixture_id and as_of"),
+        ("2026-08-20T12:00:00", "RFC3339 UTC"),
+        ("2026-08-20T11:58:59Z", "timestamp envelope is inconsistent"),
+    ],
+)
+def test_adapter_rejects_malformed_or_inconsistent_outer_timestamp_envelope(
+    outer_as_of: str | None,
+    match: str,
+) -> None:
+    wrapped = {
+        "status": "NORMALISED",
+        "fixture_id": FIXTURE_ID,
+        "as_of": outer_as_of,
+        "consensus": _valid_consensus(),
+    }
+    with pytest.raises(ValueError, match=match):
+        constraints_from_market_consensus(
+            wrapped,
+            fixture_id=FIXTURE_ID,
+            as_of=AS_OF,
+            uncertainty_floor=Decimal("0.005"),
+        )
 
 
 @pytest.mark.parametrize(

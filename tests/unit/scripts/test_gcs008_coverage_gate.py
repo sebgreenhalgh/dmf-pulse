@@ -116,6 +116,73 @@ def test_coverage_gate_rejects_impossible_counts(tmp_path: Path) -> None:
         module.evaluate(path)
 
 
+def test_coverage_gate_rejects_all_zero_required_modules(tmp_path: Path) -> None:
+    module = _module()
+    path = tmp_path / "coverage.json"
+    path.write_text(
+        json.dumps(
+            _payload(
+                module,
+                _summary(statements=0, covered=0, branches=0, branch_covered=0),
+            )
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(module.CoverageGateError, match="zero statements"):
+        module.evaluate(path)
+
+
+def test_coverage_gate_rejects_one_empty_critical_module(tmp_path: Path) -> None:
+    module = _module()
+    payload = _payload(module)
+    files = payload["files"]
+    assert isinstance(files, dict)
+    name = sorted(module.CRITICAL_FILES)[0]
+    files[name] = {"summary": _summary(statements=0, covered=0)}
+    path = tmp_path / "coverage.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(module.CoverageGateError, match="zero statements"):
+        module.evaluate(path)
+
+
+def test_coverage_gate_rejects_zero_branch_denominator_for_critical_module(
+    tmp_path: Path,
+) -> None:
+    module = _module()
+    payload = _payload(module)
+    files = payload["files"]
+    assert isinstance(files, dict)
+    name = sorted(module.CRITICAL_FILES)[0]
+    files[name] = {"summary": _summary(branches=0, branch_covered=0)}
+    path = tmp_path / "coverage.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(module.CoverageGateError, match="zero branches"):
+        module.evaluate(path)
+
+
+def test_coverage_gate_rejects_reported_percentages_that_conflict_with_counts(
+    tmp_path: Path,
+) -> None:
+    module = _module()
+    payload = _payload(module)
+    files = payload["files"]
+    assert isinstance(files, dict)
+    name = sorted(module.CRITICAL_FILES)[0]
+    summary = _summary()
+    summary["percent_statements_covered"] = 12.5  # type: ignore[assignment]
+    files[name] = {"summary": summary}
+    path = tmp_path / "coverage.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(module.CoverageGateError, match="conflicts with coverage counts"):
+        module.evaluate(path)
+
+
+def test_coverage_gate_passes_current_genuine_coverage() -> None:
+    module = _module()
+    report = module.evaluate(Path("evidence/tickets/GCS-008/coverage.json"))
+    assert report["status"] == "PASS"
+
+
 def test_coverage_gate_rejects_unreadable_json(tmp_path: Path) -> None:
     module = _module()
     path = tmp_path / "coverage.json"

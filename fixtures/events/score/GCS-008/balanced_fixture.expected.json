@@ -105,9 +105,11 @@
   "input_signature_sha256": "92c3603ce9356f04e2a1611a2e272282703a19dd9d559e3b190c4bc96d042753",
   "market_residuals": [
     {
+      "away_goals": null,
       "constraint_id": "synthetic-1x2-home",
       "event": "HOME_WIN",
       "family": "1X2",
+      "home_goals": null,
       "line": null,
       "projected_probability": "0.469924387121",
       "residual": "-0.000075612879",
@@ -118,9 +120,11 @@
       "weight": "0.333333333334"
     },
     {
+      "away_goals": null,
       "constraint_id": "synthetic-1x2-draw",
       "event": "DRAW",
       "family": "1X2",
+      "home_goals": null,
       "line": null,
       "projected_probability": "0.269905871359",
       "residual": "-0.000094128641",
@@ -131,9 +135,11 @@
       "weight": "0.333333333333"
     },
     {
+      "away_goals": null,
       "constraint_id": "synthetic-1x2-away",
       "event": "AWAY_WIN",
       "family": "1X2",
+      "home_goals": null,
       "line": null,
       "projected_probability": "0.260169741520",
       "residual": "0.000169741520",
@@ -144,9 +150,11 @@
       "weight": "0.333333333333"
     },
     {
+      "away_goals": null,
       "constraint_id": "synthetic-total-over-2.5",
       "event": "TOTAL_OVER",
       "family": "TOTALS",
+      "home_goals": null,
       "line": "2.5",
       "projected_probability": "0.509849676353",
       "residual": "-0.000150323647",
@@ -425,7 +433,7 @@
       "0.000000000000"
     ]
   ],
-  "result_sha256": "6537d930643e91629ee793d15aa6f4f86930a36640862aa99b13a201d62b94ea",
+  "result_sha256": "31d41317c0cf06002edd8e8fb47c4702706661f2227304182e3c4b8995e06b7e",
   "schema_version": "joint-score-distribution-v1",
   "source_away_minutes_sha256": "991b5101e285402e90076ddbfe7fa53c92e9319d14184ed0bd29ce54c4c2638e",
   "source_home_minutes_sha256": "aea7fc06e745457451e441042569833485f964a8d06dd67ea97e6236ea95f6c2",

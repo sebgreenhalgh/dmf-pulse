@@ -31,7 +31,7 @@ def test_score_distribution_cli_persists_and_reuses_artifact(tmp_path: Path) -> 
     artifact = Path(first_payload["artifact_path"])
     assert artifact.exists()
     assert first_payload["result"]["distribution"]["result_sha256"] == (
-        "6537d930643e91629ee793d15aa6f4f86930a36640862aa99b13a201d62b94ea"
+        "31d41317c0cf06002edd8e8fb47c4702706661f2227304182e3c4b8995e06b7e"
     )
 
 

@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -14,11 +15,18 @@ from dmf_pulse.football_events.market_constraints import (
     constraints_from_market_consensus,
     event_matches,
 )
+from dmf_pulse.football_events.service import load_score_distribution_request
+from dmf_pulse.markets.models import (
+    MarketConsensus,
+    MarketNormalisationResult,
+    NormalisationStatus,
+)
 
 pytestmark = pytest.mark.unit
 
 AS_OF = datetime(2026, 8, 20, 12, tzinfo=UTC)
 FIXTURE_ID = "10000000-0000-7000-8000-000000000808"
+STAGE6_FIXTURE = Path("fixtures/events/score/GCS-008/stage6_consensus_fixture.json")
 
 
 def _constraint(event: ScoreEvent, target: str) -> MarketConstraint:
@@ -128,6 +136,44 @@ def test_stage6_consensus_adapter_preserves_hash_cutoff_and_bounds() -> None:
     )
     assert all(item.uncertainty == Decimal("0.02") for item in result.constraints)
     assert sum((item.weight for item in result.constraints), Decimal(0)) == Decimal("0.75")
+
+
+def test_real_stage6_result_enforces_outer_and_nested_cutoffs() -> None:
+    request = load_score_distribution_request(STAGE6_FIXTURE)
+    assert isinstance(request.market_consensus, MarketConsensus)
+    accepted = MarketNormalisationResult(
+        status=NormalisationStatus.NORMALISED,
+        fixture_id=request.fixture_id,
+        as_of=AS_OF,
+        consensus=request.market_consensus,
+        excluded_books=(),
+        warnings=(),
+        error_code=None,
+    )
+    constraints = constraints_from_market_consensus(
+        accepted,
+        fixture_id=request.fixture_id,
+        as_of=AS_OF,
+        uncertainty_floor=Decimal("0.005"),
+    )
+    assert len(constraints.constraints) == 3
+
+    post_cutoff = MarketNormalisationResult(
+        status=NormalisationStatus.NORMALISED,
+        fixture_id=request.fixture_id,
+        as_of=datetime(2026, 8, 20, 12, 0, 1, tzinfo=UTC),
+        consensus=request.market_consensus,
+        excluded_books=(),
+        warnings=(),
+        error_code=None,
+    )
+    with pytest.raises(ValueError, match="POST_CUTOFF_MARKET"):
+        constraints_from_market_consensus(
+            post_cutoff,
+            fixture_id=request.fixture_id,
+            as_of=AS_OF,
+            uncertainty_floor=Decimal("0.005"),
+        )
 
 
 def test_stage6_future_consensus_is_rejected() -> None:

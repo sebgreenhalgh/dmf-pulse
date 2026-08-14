@@ -66,19 +66,19 @@
       "sha256": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2"
     },
     {
-      "bytes": 6464,
+      "bytes": 6139,
       "path": ".github/workflows/ci.yml",
-      "sha256": "511ae9b366b7c94bfd05577e30223810ea7cfc761c5d62d79f170fa27ed7dd77"
+      "sha256": "a91bd1b2ee6785978dc93a2b39f56de2f3b8ce57220bafea81f0b0020dd1afff"
     },
     {
-      "bytes": 1731,
+      "bytes": 1740,
       "path": ".github/workflows/windows-smoke.yml",
-      "sha256": "91f794907567e4165d203538dca195719e96f580a9707a460b6ea77361046e06"
+      "sha256": "f04ce4d61d35f007b53e87d0eb26a35d212f0e6e0023288e793cc6066678c6ee"
     },
     {
-      "bytes": 1033,
+      "bytes": 1084,
       "path": ".gitignore",
-      "sha256": "42d0565befdb5d26ed85fe172de3ef95bc778a683262f09f5f59a1610e67d424"
+      "sha256": "e20605822a75dd2742ebc97b0256ffaa1a6c8d342da56db637d4630acc2d3ac0"
     },
     {
       "bytes": 5,
@@ -106,9 +106,9 @@
       "sha256": "35ba4b53389c88ee5c751bbcb9beddcea04a5b1e5ba06c8ecc0148982cff767d"
     },
     {
-      "bytes": 3800,
+      "bytes": 3794,
       "path": "CHANGED_FILES.txt",
-      "sha256": "d59d989f0aaecd27163e5fc191c1b209356c19abc7b9b06b875af6fb0494b690"
+      "sha256": "42937189a0ecd16ddb06685f5380076ac0223a7dba7ef56f042d9029f5927157"
     },
     {
       "bytes": 1305,
@@ -131,9 +131,9 @@
       "sha256": "d6ffa0b8ea39418c67da75426b4c1e36e2883212c3588c4ccd67603f30b72ba6"
     },
     {
-      "bytes": 7143,
+      "bytes": 7841,
       "path": "IMPLEMENTATION_RESULT.md",
-      "sha256": "dd11aaad584ddfd00783589a0df4ec2e251bac1d089ca31bda3c90c16166bd10"
+      "sha256": "886125196656cd1fb65689cf8abfc87f5196c216fd1afbcb892c1fa0af741bc7"
     },
     {
       "bytes": 749,
@@ -146,9 +146,9 @@
       "sha256": "b55a46160208fca4d2d6ddc720a90b29a3e978a435b8101b0e7e96be05a3bc1d"
     },
     {
-      "bytes": 48817,
+      "bytes": 49917,
       "path": "PLANS.md",
-      "sha256": "d64e902ccc4f37ed43035cd9f15175e349a4720b68760e6e461c590eb82ad996"
+      "sha256": "c08c049ca81e27c4e72653aaedcc64d530592a4de236b8de145adc7104158cf7"
     },
     {
       "bytes": 6265,
@@ -486,9 +486,9 @@
       "sha256": "9941bf73d333373e2d26dc84ada8baf65c10ac2fbaef525059b6a4e7bd241c47"
     },
     {
-      "bytes": 13987,
+      "bytes": 14195,
       "path": "fixtures/events/score/GCS-008/balanced_fixture.expected.json",
-      "sha256": "05adff7a3f0e8b2b001b7824db52d8e12427dd05e7263cccea22e08a347196af"
+      "sha256": "c2a5beb7542e92eb268c4462dedd601301e7d65d1e41dd9f415fab107f9e986e"
     },
     {
       "bytes": 3268,
@@ -513,7 +513,7 @@
     {
       "bytes": 2248,
       "path": "fixtures/events/score/GCS-008/manifest.json",
-      "sha256": "606ccff1d488b170535d0092a7e479c5f7fcf8e84288384125e59a02c27e48c4"
+      "sha256": "c53c381a88a037563b39a0b5537876a7a4067b2507510b1c0686e52784de03fb"
     },
     {
       "bytes": 1930,
@@ -1106,9 +1106,9 @@
       "sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2"
     },
     {
-      "bytes": 16147,
+      "bytes": 16982,
       "path": "public_contracts/joint_score_distribution.schema.json",
-      "sha256": "94079470c85877505a68c7f29975e649b8bca0d0b968c37a4c8167f0c7181cfd"
+      "sha256": "c63e4040f63584ed31b5163b63057bb2f444431aa210a6a04908297fda4b20ba"
     },
     {
       "bytes": 1399,
@@ -1231,14 +1231,14 @@
       "sha256": "dffa2b0dd6dbbdc7a280b91e8753274bcc58c9fcc2e63421e5864409ac8ac33c"
     },
     {
-      "bytes": 25471,
+      "bytes": 24546,
       "path": "public_contracts/score_distribution_request.schema.json",
-      "sha256": "17f87d3f22dc402b506585c66d21fa138b1346635d78697b2e348a4208a6ff3d"
+      "sha256": "e8a0f0aed7bb8b1158bd679f3306819c5950873535f9e131861c3ba32dd0f977"
     },
     {
-      "bytes": 18450,
+      "bytes": 19305,
       "path": "public_contracts/score_distribution_result.schema.json",
-      "sha256": "1129dc93fdee3359d8a693f6d0be5e9f7985ee7daa143824f2e25efc37e372a0"
+      "sha256": "cbedc237e60f8ba044822dc24217b74adca92fadc6d56b846d511c317fe294e8"
     },
     {
       "bytes": 1547,
@@ -1276,9 +1276,9 @@
       "sha256": "9adfd19cb48bb44b09f8d68607713f70ef3a7838a2e5a851e45a0d41b8d979e0"
     },
     {
-      "bytes": 5873,
+      "bytes": 7950,
       "path": "scripts/check_gcs008_coverage_gates.py",
-      "sha256": "7c6792fcbffcb0ada859b1705cd2a91e80f649ae0bbcb2d3ca27889427aeeb87"
+      "sha256": "07c3dd3179114f7ff13ac35cd22e400b5f6aeb00dde79aaa7ffebd43e089e6d2"
     },
     {
       "bytes": 11677,
@@ -1356,19 +1356,19 @@
       "sha256": "57a61640e4f242c750eaec8aafac3b22b1a580debb2654579d0775815f693037"
     },
     {
-      "bytes": 8069,
+      "bytes": 10155,
       "path": "scripts/validate_gcs008_acceptance.py",
-      "sha256": "48887f4a2053162b3dc939bcf60c7622cd61e4f78515b617f604578625cc75ad"
+      "sha256": "2c32f1d357215cb9ee92a703368f6b1d51fc9f7c8477e43af61295fbc675465f"
     },
     {
-      "bytes": 5774,
+      "bytes": 6811,
       "path": "scripts/validate_gcs008_scope.py",
-      "sha256": "db1075f4b71083ce4841c66468744852b177a481043e3c22688a40585282660b"
+      "sha256": "dd362da8a9a81be532f0e6901045b6dfca7998d113b5c070a9448e01070d8998"
     },
     {
-      "bytes": 67821,
+      "bytes": 67412,
       "path": "scripts/validate_repository.py",
-      "sha256": "d1334d55b8a953c29d8f9b5d9ddf438d0e50f9218016f4e7073fea966a28b52a"
+      "sha256": "7a2cec2a962ac22117925aec41ebbd458f28ac5ad445aece2465af9a25e67720"
     },
     {
       "bytes": 18042,
@@ -1383,7 +1383,7 @@
     {
       "bytes": 11418,
       "path": "scripts/verify_gcs008_wheel.py",
-      "sha256": "3957c18266e1fbda4e8d4fb783bbdb0477c21583c85360a2a0140a6bc3414cd4"
+      "sha256": "e8f36ea6af6689beb7c3d33439ed57beccbf85c76e707932ed0f3acb5d53c808"
     },
     {
       "bytes": 26526,
@@ -1976,9 +1976,9 @@
       "sha256": "0265bd3edadfc5ef3e8a6e50098ead04fc73cb252fa08478e531103980024416"
     },
     {
-      "bytes": 23312,
+      "bytes": 26125,
       "path": "src/dmf_pulse/football_events/market_constraints.py",
-      "sha256": "138c51de61f469480de8b6385b3346db2e6919210239ee67c024d54435a10283"
+      "sha256": "2f5a8f7490a3d5d87d1884d785bd22703e442ce2e817620a7b8d8e6430061a9c"
     },
     {
       "bytes": 6291,
@@ -1996,9 +1996,9 @@
       "sha256": "a0e63893332b2bbbf68a2979d34eb5e1052cdcb7d6ce460375d5d37a1cf651a5"
     },
     {
-      "bytes": 16147,
+      "bytes": 16982,
       "path": "src/dmf_pulse/football_events/resources/joint_score_distribution.schema.json",
-      "sha256": "94079470c85877505a68c7f29975e649b8bca0d0b968c37a4c8167f0c7181cfd"
+      "sha256": "c63e4040f63584ed31b5163b63057bb2f444431aa210a6a04908297fda4b20ba"
     },
     {
       "bytes": 1007,
@@ -2006,19 +2006,19 @@
       "sha256": "43172c2639fb07eb5e98537c761373fa318161d31dace804dfe594c3853720ae"
     },
     {
-      "bytes": 25471,
+      "bytes": 24546,
       "path": "src/dmf_pulse/football_events/resources/score_distribution_request.schema.json",
-      "sha256": "17f87d3f22dc402b506585c66d21fa138b1346635d78697b2e348a4208a6ff3d"
+      "sha256": "e8a0f0aed7bb8b1158bd679f3306819c5950873535f9e131861c3ba32dd0f977"
     },
     {
-      "bytes": 18450,
+      "bytes": 19305,
       "path": "src/dmf_pulse/football_events/resources/score_distribution_result.schema.json",
-      "sha256": "1129dc93fdee3359d8a693f6d0be5e9f7985ee7daa143824f2e25efc37e372a0"
+      "sha256": "cbedc237e60f8ba044822dc24217b74adca92fadc6d56b846d511c317fe294e8"
     },
     {
-      "bytes": 28237,
+      "bytes": 32285,
       "path": "src/dmf_pulse/football_events/score_distribution.py",
-      "sha256": "cfd2c554b7963c882824613e8c55c84b2ef142053f3ed6cfe4986d5c72cc2565"
+      "sha256": "41f47c2c1080dacac8b6b37b7d35242cb7e5ed937f784adfb152ecc168d06124"
     },
     {
       "bytes": 4931,
@@ -2036,9 +2036,9 @@
       "sha256": "4fe24403bcca9ba55d767becb2862bbd3912e4bd72aea6c38bf2ec37076b7857"
     },
     {
-      "bytes": 25938,
+      "bytes": 28109,
       "path": "src/dmf_pulse/football_events/service.py",
-      "sha256": "ffa080de9e3564991cf1ad6d7f24aed0310d2f91989d5d0ff5b6534f13fb4ba2"
+      "sha256": "213e91b8e20fe8871ead161e3c3de95d4b81d52b6df2a87610758792bd6faf12"
     },
     {
       "bytes": 224,
@@ -2321,9 +2321,9 @@
       "sha256": "3c7bedd953a3cac9a5df1e8f57fd7b86087a6c5a2b898f35da576b602c0fa59c"
     },
     {
-      "bytes": 3371,
+      "bytes": 5120,
       "path": "tests/contract/football_events/test_public_score_contract.py",
-      "sha256": "251a77b51de31b230fb9d8d739700913e56d2d7e533debac97ac5189311e80d7"
+      "sha256": "ea727b35648e8c4996bc53e246d92976bef3263105a7cf793066340214bb20c2"
     },
     {
       "bytes": 3331,
@@ -2408,7 +2408,7 @@
     {
       "bytes": 791,
       "path": "tests/golden/football_events/test_balanced_fixture_golden.py",
-      "sha256": "24fc57bd51b20b5dfd03473d813dd90880b8d2ed325460c8240427caac1f8193"
+      "sha256": "09827061cb9ca5927aea756f8e89ca6c8a87750bc5b41bbd8584693ef7e71a8a"
     },
     {
       "bytes": 3013,
@@ -2548,12 +2548,12 @@
     {
       "bytes": 3305,
       "path": "tests/integration/football_events/test_events_cli.py",
-      "sha256": "58e777dd2b287ea3df19b1b527fffd2e37c59fdef1b6d43c5cc1f316c32d41ee"
+      "sha256": "f9bbf1a66abf1d7446960d303c5ea6a61b7060b12dc60c95d3835e049d2352aa"
     },
     {
-      "bytes": 3753,
+      "bytes": 4997,
       "path": "tests/integration/football_events/test_events_cli_adversarial.py",
-      "sha256": "3a2577b207ef3d7c63dd2c7f2ac8ff71909270bc929a798950c7cc1c1a0ad5dd"
+      "sha256": "f8bacbb5566e67dc7df370d76c76c2d76a970237597f8cfa71c77d4e7059eeda"
     },
     {
       "bytes": 16410,
@@ -2981,14 +2981,14 @@
       "sha256": "6b84a50e8661fa18c0447ef47859697265875f0d5b3fda63ddb60805ab51080e"
     },
     {
-      "bytes": 7703,
+      "bytes": 9002,
       "path": "tests/unit/football_events/test_market_constraint_adversarial.py",
-      "sha256": "b81d516e15d45357a391c01ef0b1e0d247843cf830971d41e997898755c2b5dd"
+      "sha256": "5c37a7181fa7e89e456b1236797c90a67030e10d55a5d6f2094b6b6f36a5367c"
     },
     {
-      "bytes": 9343,
+      "bytes": 10921,
       "path": "tests/unit/football_events/test_market_constraints.py",
-      "sha256": "15974e82ec0e6ee85d82d6674a923835c1529d6c642bf7d6bcdf70448b5e28fc"
+      "sha256": "9c897a235ebaa1566db330bf2c4477e293e7e65ea3cabfc3ad2aaac0f3eca814"
     },
     {
       "bytes": 4228,
@@ -3011,9 +3011,9 @@
       "sha256": "dbd4c39fcbc1d8c72afaf28c546372204add376ce68d105fcb9be97dd992b595"
     },
     {
-      "bytes": 10425,
+      "bytes": 15191,
       "path": "tests/unit/football_events/test_public_model_boundaries.py",
-      "sha256": "94225f736d6d362d50ac57e20743f777fb7a16cf47d998d1fdfdc1336a6c5800"
+      "sha256": "0b9a8727f9c0782137041a9b3e0f484fcf49af245af08e6780abfe87f7cb34a8"
     },
     {
       "bytes": 2684,
@@ -3151,19 +3151,19 @@
       "sha256": "5f7ef7aa4316c9ef67fc4c7020a62d7c56a3ddef6425658b9ac32e00926eafa0"
     },
     {
-      "bytes": 3306,
+      "bytes": 4064,
       "path": "tests/unit/scripts/test_gcs008_acceptance.py",
-      "sha256": "604d6b7a16e90b8309533e3e9b36e017bb73c4db1d40327c5f48493d38759e60"
+      "sha256": "d8e8645751a845b2df9b40f1052c2162a471422bcac819ed46e68d79e81cc588"
     },
     {
-      "bytes": 4076,
+      "bytes": 6443,
       "path": "tests/unit/scripts/test_gcs008_coverage_gate.py",
-      "sha256": "f70bdf7fea24350f4d8d31637dac10af8aaf5ccb8a35c1b9839e4a2a3c290c47"
+      "sha256": "e644ba5efa46b041fbb29e3f25b2cdc711406486be12da284e803739e50ef468"
     },
     {
-      "bytes": 4735,
+      "bytes": 5599,
       "path": "tests/unit/scripts/test_gcs008_scope.py",
-      "sha256": "fa216ad4885a43c5d7aced7b1afe22d35c2f3cb2ebe57d4297c412418b60373f"
+      "sha256": "b35e94097970109cd87f342f9df9b4aed5b8efbd6051e458d9636fd8a01a1ec8"
     },
     {
       "bytes": 1865,

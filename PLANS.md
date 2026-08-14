@@ -497,3 +497,26 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   a typed failure rather than silent renormalization.
 - This vertical slice persists content-addressed JSON replay artifacts only. It
   deliberately adds no database table or migration.
+
+## GCS-008 R1 - independent acceptance remediation
+
+- Ticket/stage: `GCS-008 R1`, A8; required parent
+  `668662a1c9a3f3a92d1c0305e6dfbf6b1d32a07a` on
+  `stage/A8/GCS-008-goal-clean-sheet-distributions`.
+- Scope: close only the six independent-review findings: Stage-6 outer-cutoff
+  enforcement, matrix-derived market-fit validation, canonical Decimal public
+  contracts, tracked baseline policy, fail-closed coverage input, and bounded
+  scope validation.
+- Constraints: preserve the accepted joint-score mathematics, Stage-7 binding,
+  frozen probability outputs, Alembic head, dependency graph, and PR #2; no
+  merge or self-acceptance.
+
+### GCS-008 R1 checkpoints
+
+- [x] Add focused mutation/regression tests for all six independent findings.
+- [x] Implement the six narrow remediations and prove each reviewer reproduction.
+- [x] Run combined GCS-008, static, repository, secret, scope, coverage, wheel,
+  and PostgreSQL/Alembic gates.
+- [x] Run one complete final-tree regression and refresh mechanical evidence.
+- [ ] Create
+  exactly one remediation commit, and push the existing PR branch.

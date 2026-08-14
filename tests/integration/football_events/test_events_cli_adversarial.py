@@ -5,6 +5,7 @@ import pytest
 from typer.testing import CliRunner
 
 from dmf_pulse.cli.events import events_app
+from dmf_pulse.football_events._decimal import canonical_json_sha256
 
 pytestmark = pytest.mark.integration
 RUNNER = CliRunner()
@@ -70,6 +71,40 @@ def test_validate_command_accepts_valid_and_rejects_mutated_artifact(tmp_path: P
     invalid = RUNNER.invoke(events_app, ["validate", "--distribution", str(artifact)])
     assert invalid.exit_code == 2
     assert json.loads(invalid.stdout)["error"]["code"] == "ARTIFACT_INVALID"
+
+
+def test_validate_rejects_self_hashed_market_fit_claim_that_disagrees_with_matrix(
+    tmp_path: Path,
+) -> None:
+    build = RUNNER.invoke(
+        events_app,
+        [
+            "score-distribution",
+            "--fixture",
+            str(FIXTURES / "balanced_fixture.json"),
+            "--artifact-root",
+            str(tmp_path),
+        ],
+    )
+    artifact = Path(json.loads(build.stdout)["artifact_path"])
+    body = json.loads(artifact.read_text(encoding="utf-8"))
+    body["market_residuals"][0].update(
+        {
+            "projected_probability": "0.900000000000",
+            "residual": "0.100000000000",
+            "standardized_residual": "5.000000",
+            "target_probability": "0.800000000000",
+        }
+    )
+    body_without_hash = dict(body)
+    body_without_hash.pop("result_sha256")
+    body["result_sha256"] = canonical_json_sha256(body_without_hash)
+    artifact.write_text(json.dumps(body), encoding="utf-8")
+
+    invalid = RUNNER.invoke(events_app, ["validate", "--distribution", str(artifact)])
+    assert invalid.exit_code == 2
+    payload = json.loads(invalid.stdout)
+    assert payload["error"]["code"] == "ARTIFACT_INVALID"
 
 
 def test_evaluation_outside_support_is_typed(tmp_path: Path) -> None:

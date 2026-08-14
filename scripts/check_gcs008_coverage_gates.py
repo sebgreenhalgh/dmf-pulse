@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -29,7 +30,28 @@ class CoverageGateError(ValueError):
 
 
 def _percentage(covered: int, total: int) -> float:
-    return 100.0 if total == 0 else 100.0 * covered / total
+    if total <= 0:
+        raise CoverageGateError("coverage denominator must be positive")
+    return 100.0 * covered / total
+
+
+def _validate_reported_percentage(
+    value: dict[str, object],
+    *,
+    key: str,
+    expected: float,
+    label: str,
+) -> None:
+    if key not in value:
+        return
+    reported = value[key]
+    if (
+        isinstance(reported, bool)
+        or not isinstance(reported, (int, float))
+        or not math.isfinite(float(reported))
+        or abs(float(reported) - expected) > 0.000001
+    ):
+        raise CoverageGateError(f"{label} {key} conflicts with coverage counts")
 
 
 def _summary(value: object, *, label: str) -> dict[str, int]:
@@ -46,6 +68,40 @@ def _summary(value: object, *, label: str) -> dict[str, int]:
         raise CoverageGateError(f"{label} line coverage is impossible")
     if parsed["covered_branches"] > parsed["num_branches"]:
         raise CoverageGateError(f"{label} branch coverage is impossible")
+    statement_percent = (
+        100.0
+        if parsed["num_statements"] == 0
+        else 100.0 * parsed["covered_lines"] / parsed["num_statements"]
+    )
+    branch_percent = (
+        100.0
+        if parsed["num_branches"] == 0
+        else 100.0 * parsed["covered_branches"] / parsed["num_branches"]
+    )
+    combined_total = parsed["num_statements"] + parsed["num_branches"]
+    combined_percent = (
+        100.0
+        if combined_total == 0
+        else 100.0 * (parsed["covered_lines"] + parsed["covered_branches"]) / combined_total
+    )
+    _validate_reported_percentage(
+        value,
+        key="percent_statements_covered",
+        expected=statement_percent,
+        label=label,
+    )
+    _validate_reported_percentage(
+        value,
+        key="percent_branches_covered",
+        expected=branch_percent,
+        label=label,
+    )
+    _validate_reported_percentage(
+        value,
+        key="percent_covered",
+        expected=combined_percent,
+        label=label,
+    )
     return parsed
 
 
@@ -75,6 +131,15 @@ def evaluate(path: Path) -> dict[str, Any]:
         missing.append(CLI_PATH)
     if missing:
         raise CoverageGateError(f"mandatory GCS-008 files are absent: {missing}")
+    required_files = CRITICAL_FILES | {CLI_PATH}
+    empty_statements = sorted(
+        name for name in required_files if selected[name]["num_statements"] == 0
+    )
+    if empty_statements:
+        raise CoverageGateError(f"mandatory GCS-008 files have zero statements: {empty_statements}")
+    empty_branches = sorted(name for name in CRITICAL_FILES if selected[name]["num_branches"] == 0)
+    if empty_branches:
+        raise CoverageGateError(f"critical GCS-008 files have zero branches: {empty_branches}")
     totals = {
         key: sum(summary[key] for summary in selected.values())
         for key in ("covered_lines", "num_statements", "covered_branches", "num_branches")

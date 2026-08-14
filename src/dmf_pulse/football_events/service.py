@@ -4,16 +4,24 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from collections.abc import Mapping
 from datetime import datetime
 from decimal import ROUND_CEILING, Decimal
 from importlib.resources import files
 from pathlib import Path
-from typing import Any, Literal, Self
+from typing import Annotated, Any, Literal, Self
 from uuid import UUID
 
 import yaml  # type: ignore[import-untyped]
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 from dmf_pulse.football_events._decimal import (
     canonical_decimal_text,
@@ -69,6 +77,47 @@ class _FrozenModel(BaseModel):
         if update:
             data.update(dict(update))
         return type(self).model_validate(data)
+
+
+CANONICAL_NONNEGATIVE_MEASURE_PATTERN = r"^\d+\.\d{6}$"
+CANONICAL_DECIMAL_12_PATTERN = r"^-?\d+\.\d{12}$"
+NonnegativeMeasureJsonInput = Annotated[
+    str,
+    Field(pattern=CANONICAL_NONNEGATIVE_MEASURE_PATTERN),
+]
+
+
+def _require_canonical_embedded_decimals(
+    supplied: object,
+    canonical: object,
+    *,
+    path: str,
+) -> None:
+    if isinstance(canonical, Mapping) and isinstance(supplied, Mapping):
+        for key, canonical_value in canonical.items():
+            if key in supplied:
+                _require_canonical_embedded_decimals(
+                    supplied[key],
+                    canonical_value,
+                    path=f"{path}.{key}",
+                )
+        return
+    if isinstance(canonical, (list, tuple)) and isinstance(supplied, (list, tuple)):
+        for index, (supplied_item, canonical_item) in enumerate(
+            zip(supplied, canonical, strict=False)
+        ):
+            _require_canonical_embedded_decimals(
+                supplied_item,
+                canonical_item,
+                path=f"{path}[{index}]",
+            )
+        return
+    if (
+        isinstance(canonical, str)
+        and re.fullmatch(CANONICAL_DECIMAL_12_PATTERN, canonical) is not None
+        and supplied != canonical
+    ):
+        raise ValueError(f"{path} must use its canonical public decimal string")
 
 
 class ScoreGridPolicy(_FrozenModel):
@@ -232,9 +281,19 @@ class ScorePriorRequest(_FrozenModel):
     home_goal_rate: Decimal
     away_goal_rate: Decimal
 
-    @field_validator("home_goal_rate", "away_goal_rate", mode="before")
+    @field_validator(
+        "home_goal_rate",
+        "away_goal_rate",
+        mode="before",
+        json_schema_input_type=NonnegativeMeasureJsonInput,
+    )
     @classmethod
-    def validate_rate(cls, value: object, info: Any) -> Decimal:
+    def validate_rate(cls, value: object, info: ValidationInfo) -> Decimal:
+        if info.mode == "json" and (
+            not isinstance(value, str)
+            or re.fullmatch(CANONICAL_NONNEGATIVE_MEASURE_PATTERN, value) is None
+        ):
+            raise ValueError(f"{info.field_name} must use its canonical public decimal string")
         return nonnegative_decimal(value, label=str(info.field_name))
 
     def public_dict(self) -> dict[str, str]:
@@ -267,6 +326,7 @@ class ScoreDistributionRequest(_FrozenModel):
     def validate_market_consensus(
         cls,
         value: object,
+        info: ValidationInfo,
     ) -> MarketConsensus | MarketNormalisationResult | None:
         if value is None or isinstance(value, (MarketConsensus, MarketNormalisationResult)):
             return value
@@ -280,8 +340,18 @@ class ScoreDistributionRequest(_FrozenModel):
         )
         try:
             if "consensus" in body:
-                return MarketNormalisationResult.model_validate_json(serialized)
-            return MarketConsensus.model_validate_json(serialized)
+                parsed: MarketConsensus | MarketNormalisationResult = (
+                    MarketNormalisationResult.model_validate_json(serialized)
+                )
+            else:
+                parsed = MarketConsensus.model_validate_json(serialized)
+            if info.mode == "json":
+                _require_canonical_embedded_decimals(
+                    body,
+                    parsed.model_dump(mode="json"),
+                    path="market_consensus",
+                )
+            return parsed
         except ValueError as exc:
             raise ValueError(
                 "market_consensus violates the accepted Stage-6 public contract"

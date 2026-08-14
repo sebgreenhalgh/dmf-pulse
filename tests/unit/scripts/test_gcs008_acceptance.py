@@ -55,6 +55,27 @@ def test_measured_state_fails_closed_for_out_of_scope_diff(
         module._validate_measured_state()
 
 
+def test_clean_checkout_acceptance_inputs_are_all_tracked() -> None:
+    module = _module()
+    assert module._tracked_repository_paths() >= module.REQUIRED_TRACKED_ACCEPTANCE_INPUTS
+    assert module._validate_tracked_acceptance_inputs() == len(
+        module.REQUIRED_TRACKED_ACCEPTANCE_INPUTS
+    )
+
+
+def test_tracked_input_inventory_fails_closed_on_missing_policy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _module()
+    monkeypatch.setattr(
+        module,
+        "_tracked_repository_paths",
+        lambda: module.REQUIRED_TRACKED_ACCEPTANCE_INPUTS - {"config/models/score_baseline.yaml"},
+    )
+    with pytest.raises(module.AcceptanceError, match=r"score_baseline\.yaml"):
+        module._validate_tracked_acceptance_inputs()
+
+
 def test_literal_ledger_uses_accepted_stage7_matrix_and_guaranteed_teardown() -> None:
     ledger = Path("ACCEPTANCE_COMMANDS.ps1").read_text(encoding="utf-8")
     assert "--baseline-revision 20260803_0005 --target head" in ledger

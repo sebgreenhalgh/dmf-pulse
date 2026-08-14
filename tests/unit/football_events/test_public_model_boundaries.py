@@ -1,12 +1,17 @@
 from datetime import UTC, datetime
 from decimal import Decimal
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
+from dmf_pulse.football_events._decimal import canonical_json_sha256
 from dmf_pulse.football_events.market_constraints import (
+    MarketConstraint,
     MarketConstraintSet,
+    MarketFamily,
+    ScoreEvent,
 )
 from dmf_pulse.football_events.score_distribution import (
     JointScoreDistribution,
@@ -39,11 +44,87 @@ def _body() -> dict:
     return _distribution().model_dump(mode="json")
 
 
+@lru_cache(maxsize=1)
+def _all_supported_market_distribution() -> JointScoreDistribution:
+    request = load_score_distribution_request(FIXTURE)
+    specifications = (
+        (MarketFamily.ONE_X_TWO, ScoreEvent.HOME_WIN, "0.400000000000", {}),
+        (MarketFamily.ONE_X_TWO, ScoreEvent.DRAW, "0.300000000000", {}),
+        (MarketFamily.ONE_X_TWO, ScoreEvent.AWAY_WIN, "0.300000000000", {}),
+        (MarketFamily.TOTALS, ScoreEvent.TOTAL_OVER, "0.500000000000", {"line": "2.5"}),
+        (MarketFamily.TOTALS, ScoreEvent.TOTAL_UNDER, "0.500000000000", {"line": "2.5"}),
+        (
+            MarketFamily.TEAM_TOTAL,
+            ScoreEvent.HOME_TEAM_TOTAL_OVER,
+            "0.500000000000",
+            {"line": "1.5"},
+        ),
+        (
+            MarketFamily.TEAM_TOTAL,
+            ScoreEvent.HOME_TEAM_TOTAL_UNDER,
+            "0.500000000000",
+            {"line": "1.5"},
+        ),
+        (
+            MarketFamily.TEAM_TOTAL,
+            ScoreEvent.AWAY_TEAM_TOTAL_OVER,
+            "0.500000000000",
+            {"line": "1.5"},
+        ),
+        (
+            MarketFamily.TEAM_TOTAL,
+            ScoreEvent.AWAY_TEAM_TOTAL_UNDER,
+            "0.500000000000",
+            {"line": "1.5"},
+        ),
+        (MarketFamily.CLEAN_SHEET, ScoreEvent.HOME_CLEAN_SHEET, "0.350000000000", {}),
+        (MarketFamily.CLEAN_SHEET, ScoreEvent.AWAY_CLEAN_SHEET, "0.250000000000", {}),
+        (MarketFamily.BTTS, ScoreEvent.BTTS_YES, "0.500000000000", {}),
+        (MarketFamily.BTTS, ScoreEvent.BTTS_NO, "0.500000000000", {}),
+        (
+            MarketFamily.CORRECT_SCORE,
+            ScoreEvent.EXACT_SCORE,
+            "0.100000000000",
+            {"home_goals": 1, "away_goals": 0},
+        ),
+    )
+    constraints = tuple(
+        MarketConstraint.model_validate(
+            {
+                "constraint_id": f"all-events-{event.value.lower()}",
+                "event": event,
+                "family": family,
+                "target_probability": Decimal(target),
+                "uncertainty": Decimal("0.200000000000"),
+                "usable_at": request.as_of,
+                "weight": Decimal("0.010000000000"),
+                **extra,
+            }
+        )
+        for family, event, target, extra in specifications
+    )
+    amended = request.model_copy(update={"constraints": constraints})
+    result = ScoreDistributionService().project(amended)
+    assert result.distribution is not None
+    return result.distribution
+
+
 def test_public_decimal_parsers_reject_non_string_values() -> None:
     with pytest.raises(ValueError, match="public decimal string"):
         _probability_text(Decimal("0.5"), label="p")  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="public decimal string"):
         _decimal_text(Decimal("0.5"), label="x")  # type: ignore[arg-type]
+
+
+def test_noncanonical_probability_lexeme_cannot_create_a_second_identity() -> None:
+    body = _body()
+    original = body["probabilities"][0][0]
+    body["probabilities"][0][0] = original + "0"
+    unhashed = dict(body)
+    unhashed.pop("result_sha256")
+    body["result_sha256"] = canonical_json_sha256(unhashed)
+    with pytest.raises(ValidationError, match="string_pattern_mismatch"):
+        JointScoreDistribution.model_validate(body)
 
 
 def test_nested_public_simplexes_and_residuals_fail_closed() -> None:
@@ -73,6 +154,54 @@ def test_nested_public_simplexes_and_residuals_fail_closed() -> None:
     wrong_hash = dict(valid, source_result_sha256="bad")
     with pytest.raises(ValidationError, match="SHA-256"):
         MarketResidual.model_validate(wrong_hash)
+
+
+@pytest.mark.parametrize("event", tuple(ScoreEvent))
+def test_matrix_recomputes_every_supported_market_residual(event: ScoreEvent) -> None:
+    body = _all_supported_market_distribution().model_dump(mode="json")
+    residual = next(item for item in body["market_residuals"] if item["event"] == event.value)
+    residual.update(
+        {
+            "projected_probability": "0.900000000000",
+            "residual": "0.100000000000",
+            "standardized_residual": "0.500000",
+            "target_probability": "0.800000000000",
+        }
+    )
+    unhashed = dict(body)
+    unhashed.pop("result_sha256")
+    body["result_sha256"] = canonical_json_sha256(unhashed)
+    with pytest.raises(ValidationError, match="projected_probability"):
+        JointScoreDistribution.model_validate(body)
+
+
+@pytest.mark.parametrize(
+    ("mutate", "match"),
+    [
+        (
+            lambda body: body["market_residuals"][0].update(standardized_residual="9.000000"),
+            "standardized_residual",
+        ),
+        (
+            lambda body: body["diagnostics"].update(market_rmse="0.900000000000"),
+            "market_rmse",
+        ),
+        (
+            lambda body: body["diagnostics"].update(
+                maximum_absolute_market_residual="0.900000000000"
+            ),
+            "maximum_absolute_market_residual",
+        ),
+    ],
+)
+def test_market_fit_aggregate_diagnostics_are_recomputed(mutate, match: str) -> None:
+    body = _body()
+    mutate(body)
+    unhashed = dict(body)
+    unhashed.pop("result_sha256")
+    body["result_sha256"] = canonical_json_sha256(unhashed)
+    with pytest.raises(ValidationError, match=match):
+        JointScoreDistribution.model_validate(body)
 
 
 def test_frozen_model_copy_revalidates_updates() -> None:

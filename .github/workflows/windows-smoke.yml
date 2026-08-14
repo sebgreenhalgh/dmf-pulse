@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 15
     env:
       UV_NO_PROGRESS: "1"
-      UV_CACHE_DIR: ${{ runner.temp }}/uv-cache
+      UV_CACHE_DIR: ${{ github.workspace }}/../.uv-cache
     steps:
       - name: Check out without persisted credentials
         uses: actions/checkout@v4
