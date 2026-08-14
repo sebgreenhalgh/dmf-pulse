@@ -578,8 +578,8 @@
         }
       ]
     },
-    "/rules/assists/eligibility_policy/set_pieces/defensive_touch_before_handball_disqualifies": {
-      "rule_id": "FPL-ASSISTS-ELIGIBILITY_POLICY-SET_PIECES-DEFENSIVE_TOUCH_BEFORE_HANDBALL_DISQUALIFIES",
+    "/rules/assists/eligibility_policy/set_pieces/foul_winner_eligible_if_directly_scored": {
+      "rule_id": "FPL-ASSISTS-ELIGIBILITY_POLICY-SET_PIECES-FOUL_WINNER_ELIGIBLE_IF_DIRECTLY_SCORED",
       "source_refs": [
         "SRC-FPL-2026-RULES-001"
       ],
@@ -594,8 +594,56 @@
         }
       ]
     },
-    "/rules/assists/eligibility_policy/set_pieces/foul_winner_eligible_if_directly_scored": {
-      "rule_id": "FPL-ASSISTS-ELIGIBILITY_POLICY-SET_PIECES-FOUL_WINNER_ELIGIBLE_IF_DIRECTLY_SCORED",
+    "/rules/assists/eligibility_policy/set_pieces/handball/pass_or_touch/defensive_touch_before_handball_disqualifies": {
+      "rule_id": "FPL-ASSISTS-ELIGIBILITY_POLICY-SET_PIECES-HANDBALL-PASS_OR_TOUCH-DEFENSIVE_-FA1452B0F341C905399F",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/assists/eligibility_policy/set_pieces/handball/shot/direct_shot_required": {
+      "rule_id": "FPL-ASSISTS-ELIGIBILITY_POLICY-SET_PIECES-HANDBALL-SHOT-DIRECT_SHOT_REQUIRED",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/assists/eligibility_policy/set_pieces/handball/shot/on_target_after_deflection_required": {
+      "rule_id": "FPL-ASSISTS-ELIGIBILITY_POLICY-SET_PIECES-HANDBALL-SHOT-ON_TARGET_AFTER_DEFLECTION_REQUIRED",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/assists/eligibility_policy/set_pieces/handball/shot/on_target_before_deflection_required": {
+      "rule_id": "FPL-ASSISTS-ELIGIBILITY_POLICY-SET_PIECES-HANDBALL-SHOT-ON_TARGET_BEFORE_DEFLECTION_REQUIRED",
       "source_refs": [
         "SRC-FPL-2026-RULES-001"
       ],
@@ -4267,8 +4315,17 @@
         "scorer_loses_and_regains_possession_disqualifies": true,
         "set_pieces": {
           "corner_or_throw_in_direct_assist": false,
-          "defensive_touch_before_handball_disqualifies": true,
           "foul_winner_eligible_if_directly_scored": true,
+          "handball": {
+            "pass_or_touch": {
+              "defensive_touch_before_handball_disqualifies": true
+            },
+            "shot": {
+              "direct_shot_required": true,
+              "on_target_after_deflection_required": true,
+              "on_target_before_deflection_required": true
+            }
+          },
           "last_attacker_before_handball_eligible_if_directly_scored": true,
           "taker_who_won_foul_ineligible": true
         },
@@ -4420,6 +4477,7 @@
             "PLAYER_POINTS"
           ],
           "rule_paths": [
+            "/rules/positions",
             "/rules/squad",
             "/rules/lineup/starting_size",
             "/rules/lineup/bench_size",
@@ -4433,7 +4491,6 @@
         "PLAYER_POINTS": {
           "inherits": [],
           "rule_paths": [
-            "/rules/positions",
             "/rules/scoring",
             "/rules/assists",
             "/rules/bonus"
@@ -4532,6 +4589,7 @@
     "rule_verification": {
       "rules": [
         {
+          "interpretation_approval_states": {},
           "interpretation_decision_ids": [],
           "interpretation_note": null,
           "rule_path": "/rules/positions",
@@ -4546,6 +4604,7 @@
           "verification_status": "VERIFIED"
         },
         {
+          "interpretation_approval_states": {},
           "interpretation_decision_ids": [],
           "interpretation_note": null,
           "rule_path": "/rules/scoring",
@@ -4558,6 +4617,7 @@
           "verification_status": "VERIFIED"
         },
         {
+          "interpretation_approval_states": {},
           "interpretation_decision_ids": [],
           "interpretation_note": null,
           "rule_path": "/rules/scoring/defensive_contributions",
@@ -4572,6 +4632,7 @@
           "verification_status": "VERIFIED"
         },
         {
+          "interpretation_approval_states": {},
           "interpretation_decision_ids": [],
           "interpretation_note": null,
           "rule_path": "/rules/assists",
@@ -4584,6 +4645,7 @@
           "verification_status": "VERIFIED"
         },
         {
+          "interpretation_approval_states": {},
           "interpretation_decision_ids": [],
           "interpretation_note": null,
           "rule_path": "/rules/bonus",
@@ -4596,6 +4658,7 @@
           "verification_status": "VERIFIED"
         },
         {
+          "interpretation_approval_states": {},
           "interpretation_decision_ids": [],
           "interpretation_note": null,
           "rule_path": "/rules/bonus/bps",
@@ -4610,10 +4673,13 @@
           "verification_status": "VERIFIED"
         },
         {
+          "interpretation_approval_states": {
+            "INT-FPL-2026-BONUS-TIES-001": "APPROVED"
+          },
           "interpretation_decision_ids": [
             "INT-FPL-2026-BONUS-TIES-001"
           ],
-          "interpretation_note": "Candidate general competition ranking is distinct from the official examples and remains unapproved.",
+          "interpretation_note": "The official sources publish specific bonus-tie examples but do not state a complete arbitrary-cardinality algorithm. GENERAL_COMPETITION_RANKING is the separately recorded, human-approved PLAYER_POINTS interpretation in INT-FPL-2026-BONUS-TIES-001.",
           "rule_path": "/rules/bonus/tie_allocation",
           "source_locators": {
             "SRC-FPL-2026-RULES-001": "Rules > Bonus points > published tie examples"
@@ -4954,26 +5020,26 @@
       "verification_status": "UNKNOWN"
     }
   },
-  "ruleset_hash": "afa1364d7d7adfc632d73782f46707bb4f92d3961ca1946d4c8cab0496c2f8ff",
+  "ruleset_hash": "c9fee6287bcb12170aa2f046d486dd812cfa0404efe214344e39f5aeb739cccf",
   "ruleset_id": "fpl-2026-27",
   "ruleset_version": "0.1.0-prelaunch.1",
   "schema_version": "1.1",
   "season_code": "2026/2027",
-  "source_bundle_raw_sha256": "235be9001d3122351f6d291982be1e392d1e97158b6fbd33e9a3e7485f5bc394",
-  "source_bundle_semantic_sha256": "efd6e3764edb29dc38a50c7ec825c532cc5184e837541fbb16a1bed49cfd7bf1",
-  "source_bundle_sha256": "efd6e3764edb29dc38a50c7ec825c532cc5184e837541fbb16a1bed49cfd7bf1",
+  "source_bundle_raw_sha256": "eb5512bcf73975f0611d33079bcbc8090e9f7241ab14a41357e70370210f55fd",
+  "source_bundle_semantic_sha256": "b7e688dc7c5012591cd942300ea659bbfdbf530f5a07146502d5af4e0fc23fff",
+  "source_bundle_sha256": "b7e688dc7c5012591cd942300ea659bbfdbf530f5a07146502d5af4e0fc23fff",
   "source_files": {
     "assists.yaml": {
-      "raw_sha256": "d59b117c6b63e03a3b15183e1b450dfc15db59c80f5040f0be0639c9102b6d2b",
-      "semantic_sha256": "ab4e85f5cdef35a484105157a61e631ecb771bbf754cc402fecbc9238f8b85ed"
+      "raw_sha256": "f5e6cbacc0192e93eea057304d84b865c5c9305321f13b423226c4c6b4f24c1e",
+      "semantic_sha256": "efb9c816a412067da468fc8c26b95e8ab72b68487a1dd696502d249f01f7f476"
     },
     "bonus.yaml": {
       "raw_sha256": "2e680264528f8897665e7c31338b7e5faa1de44ad7d66274abc4eeae4c7a73d6",
       "semantic_sha256": "5c30787a8a75b90f1c509dd842697350f98eb33942058337fde7c829d1783eef"
     },
     "capabilities.yaml": {
-      "raw_sha256": "4410ff1416da6910263a3c100dc606b59d2ad4b054e283dd2b68fc80180a457c",
-      "semantic_sha256": "684aaccbbf33b7f7f5a2e6f33e9afb5eca5dd2b99a3b85d12834ac31d3164410"
+      "raw_sha256": "ef6a1a55eff8e7600a7dceedf8c100035fe9955227a45a67498487457281940b",
+      "semantic_sha256": "1e2544df0974cc8d06d481c609d58261ef412de3db9b5cf362a1eac18417dc2c"
     },
     "chips.yaml": {
       "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
@@ -5000,8 +5066,8 @@
       "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
     },
     "rule_verification.yaml": {
-      "raw_sha256": "323ad789428ff5837cae69892c6ffe80965e14f4636c3e0795370f8604dea1a1",
-      "semantic_sha256": "a2eeafa0528c335e237f7131f7deaa9f334ac0f1918b83e57ae12164623c4b94"
+      "raw_sha256": "c63032b53018ec03fcf5c6cac08bd4514855a168d4eb4287a3a0fae2dc429966",
+      "semantic_sha256": "eefad1c43528999e37bbdbb72d20ee0334eebdd8f2fe9b356b74a710d7fba227"
     },
     "scoring.yaml": {
       "raw_sha256": "4c9e6c62a86ab49769711558abf1e4f677fbd954a55e485de57a6fb52c2aef73",
@@ -5033,16 +5099,16 @@
     }
   },
   "source_hashes": {
-    "assists.yaml": "ab4e85f5cdef35a484105157a61e631ecb771bbf754cc402fecbc9238f8b85ed",
+    "assists.yaml": "efb9c816a412067da468fc8c26b95e8ab72b68487a1dd696502d249f01f7f476",
     "bonus.yaml": "5c30787a8a75b90f1c509dd842697350f98eb33942058337fde7c829d1783eef",
-    "capabilities.yaml": "684aaccbbf33b7f7f5a2e6f33e9afb5eca5dd2b99a3b85d12834ac31d3164410",
+    "capabilities.yaml": "1e2544df0974cc8d06d481c609d58261ef412de3db9b5cf362a1eac18417dc2c",
     "chips.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
     "deadlines.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
     "interpretations.yaml": "e09ac5166167d33c5a6c913a7dbccc1652a76e88ace19e79825437862bfcd9a3",
     "lineup.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
     "positions.yaml": "d7c31ad54f2b88381382f823f8ba022bc40a5467aa6f75e0947e51fef3f13cb5",
     "prices.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
-    "rule_verification.yaml": "a2eeafa0528c335e237f7131f7deaa9f334ac0f1918b83e57ae12164623c4b94",
+    "rule_verification.yaml": "eefad1c43528999e37bbdbb72d20ee0334eebdd8f2fe9b356b74a710d7fba227",
     "scoring.yaml": "e98e0dbb0509a6c6ea531f7bc3c4497800480b6e365d2bd1f1dc6ac4d2126258",
     "season_manifest.yaml": "5dd91010127e368494110cb454f180aca6eb3fe0771babe1c48b3c180ed64be8",
     "source_manifest.yaml": "e4f527b169ed1b9cd5211964e67276a1bc09b8ab61ac9b696c06a0df0c30963a",

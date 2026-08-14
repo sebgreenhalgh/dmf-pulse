@@ -29,7 +29,6 @@ CAPABILITY_CONTRACT: Final[dict[RuleCapability, dict[str, tuple[str, ...]]]] = {
     RuleCapability.PLAYER_POINTS: {
         "inherits": (),
         "rule_paths": (
-            "/rules/positions",
             "/rules/scoring",
             "/rules/assists",
             "/rules/bonus",
@@ -38,6 +37,7 @@ CAPABILITY_CONTRACT: Final[dict[RuleCapability, dict[str, tuple[str, ...]]]] = {
     RuleCapability.GW1_INITIAL_SQUAD: {
         "inherits": (RuleCapability.PLAYER_POINTS.value,),
         "rule_paths": (
+            "/rules/positions",
             "/rules/squad",
             "/rules/lineup/starting_size",
             "/rules/lineup/bench_size",
@@ -132,7 +132,8 @@ def validate_v11_governance(rules: dict[str, Any], season_code: str) -> None:
         ) from exc
     validate_capability_contract(capabilities)
     _validate_interpretation_hashes(interpretations.decisions)
-    decision_ids = {decision.decision_id for decision in interpretations.decisions}
+    decisions = {decision.decision_id: decision for decision in interpretations.decisions}
+    decision_ids = set(decisions)
     for decision in interpretations.decisions:
         if decision.season != season_code:
             raise RulesValidationError(
@@ -146,6 +147,14 @@ def validate_v11_governance(rules: dict[str, Any], season_code: str) -> None:
                 "rule verification references an unknown interpretation decision",
                 blockers=tuple(sorted(missing)),
             )
+        for decision_id in record.interpretation_decision_ids:
+            expected = "APPROVED" if decisions[decision_id].approved else "UNAPPROVED"
+            if record.interpretation_approval_states.get(decision_id) != expected:
+                raise RulesValidationError(
+                    "RULESET_INTERPRETATION_APPROVAL_STATE",
+                    "rule verification approval state contradicts its interpretation decision",
+                    blockers=(decision_id,),
+                )
 
 
 def _pointer_tokens(pointer: str) -> tuple[str, ...]:

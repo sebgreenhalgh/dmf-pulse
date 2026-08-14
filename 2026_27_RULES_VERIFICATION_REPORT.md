@@ -240,8 +240,8 @@ decision and cannot inherit the bounded approval.
   the installed-wheel test had the same missing database prerequisite; one
   database-boundary test skipped; and the commit-bound current-manifest test
   failed as expected on the uncommitted tree. Follow-up execution using the
-  canonical PostgreSQL 18.4 container, migrations, `PGPASSWORD=changeme`, and
-  the credential-free test URL passed all 205 PostgreSQL tests, the wheel test,
+  canonical PostgreSQL 18.4 container, migrations, and the credential-free test
+  URL passed all 205 PostgreSQL tests, the wheel test,
   and the boundary test. Thus all 1,433 product tests are accounted for as
   passing; only the intentionally stale commit-bound manifest test remains.
 

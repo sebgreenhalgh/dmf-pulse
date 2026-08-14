@@ -121,6 +121,27 @@ class AcceptedRulesAdapter:
             )
         models = importlib.import_module("dmf_pulse.rules.models")
         scoring = importlib.import_module("dmf_pulse.rules.scoring")
+        if getattr(self._compiled, "schema_version", "1.0") == "1.1":
+            assists = importlib.import_module("dmf_pulse.rules.assists")
+            for goal in scenario.goals:
+                if goal.assist_context is None:
+                    if goal.assister_player_id is None:
+                        continue
+                    raise FplPointsError(
+                        "RULESET_ASSIST_CONTEXT_REQUIRED",
+                        "schema-v1.1 assists require a typed goal-chain context",
+                    )
+                resolved = assists.classify_assist(self._compiled, goal.assist_context)
+                expected_award = resolved.value == "DEFINITE_ASSIST"
+                if (
+                    resolved.value != goal.assist_classification.value
+                    or goal.assist_awarded != expected_award
+                    or (goal.assister_player_id is not None) != expected_award
+                ):
+                    raise FplPointsError(
+                        "RULESET_ASSIST_CLASSIFICATION",
+                        "goal-chain context and awarded assist disagree with compiled policy",
+                    )
         players = tuple(
             models.PlayerScenario(
                 player_id=player.player_id,

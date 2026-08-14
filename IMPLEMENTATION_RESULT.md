@@ -1,5 +1,73 @@
 # DMF Pulse Stage 9 — PTS-009 integration result
 
+# RUL-002R3 PLAYER_POINTS static-review remediation
+
+## Identity
+
+- Starting branch / reviewed HEAD: `stage/R2/FPL-2026-27-rules` / `7041e04bda669f6e478aa69f1d8d2a7c0ff7ee7c`.
+- Accepted base and merge-base: `9d7c360ab6a4cc7bfc6d6f41e44be6b47512b272`.
+- Reconstructed lineage before this remediation: accepted Stage 9 `b8107aa413bc8483d6506288738a96b1f3fbd7e4`, then replayed R2 implementation `3fe71f9` and prior evidence `0bfaffb`.
+- The final commit identity is reported by the completion response after the required evidence-only commit; recording a commit's own object ID in its content would be self-referential.
+
+## Finding disposition
+
+| Finding | Disposition | Implemented evidence |
+| --- | --- | --- |
+| P1-1 manager-state leakage | FIXED | `src/dmf_pulse/rules/capabilities.py`, target `capabilities.yaml`, and `test_player_points_dependency_closure_excludes_manager_state` remove `/rules/positions` from PLAYER_POINTS and recursively reject manager leaves. |
+| P1-2 save/BPS contract | FIXED | `src/dmf_pulse/rules/bps.py`, `models.py`, and Stage-9 allocation/adapter retain additive `big_chance_saves`, total-save semantics, subset checks at schema v1.1 scoring, and non-GK save participation. `test_2026_27_save_contract.py` is the exact matrix. |
+| P1-3 executable assists | FIXED | `src/dmf_pulse/rules/assists.py`, typed `AssistDecisionContext`, target `assists.yaml`, and `AcceptedRulesAdapter` execute compiled policy before an assist is counted. `test_versioned_assist_classification.py` runs cases A-R through the Stage-9 boundary. |
+| P2-1 interpretation evidence | FIXED | Structured approval-state consistency in `authoring.py` and `capabilities.py`; the target verification note correctly identifies `INT-FPL-2026-BONUS-TIES-001` as a separately human-approved PLAYER_POINTS interpretation. |
+| P2-2 accepted-base reconstruction | FIXED | The reviewed R2 work was replayed onto accepted base `9d7c360...`; local `origin/main` matched that accepted commit. No network access was used, as required by the remediation pack. |
+
+## Capability matrix
+
+| Capability | Source-backed | Ready | Production eligible | Blockers |
+| --- | ---: | ---: | ---: | --- |
+| PLAYER_POINTS | true | true | true | `[]` |
+| GW1_INITIAL_SQUAD | false | false | false | unresolved squad, lineup, initial/current price, and GW1 deadline rules; bonus interpretation is out of scope |
+| TRANSFER_STATE | false | false | false | GW1 blockers plus transfers and selling-price rules; bonus interpretation is out of scope |
+| CHIP_STATE | false | false | false | transfer-state blockers plus chips and automatic substitutions; bonus interpretation is out of scope |
+| FULL_SEASON | false | false | false | manager-state blockers including prices, deadlines, special events, transfers, chips, and bonus interpretation out of scope |
+
+PLAYER_POINTS dependency paths are exactly `/rules/scoring`, `/rules/assists`, and `/rules/bonus`. The recursive leaf scan found no manager-state path or `squad_quota`, `lineup_min`, `lineup_max`, or bench leaf.
+
+## Rule identities and deterministic artifacts
+
+- Schema-v1.0 reference hash: `12271ab0b32a461baa3778f2e914f45744ccf9d5302c37c4a5f2ffb89e0c1139`.
+- Schema-v1.0 synthetic hash: `98e8614d9971ec2b1e45a357e89f79172bbc5dd4dc87044c3c131b3de6b0aab8`.
+- Schema-v1.1 ruleset hash: `afa1364d7d7adfc632d73782f46707bb4f92d3961ca1946d4c8cab0496c2f8ff` -> `c9fee6287bcb12170aa2f046d486dd812cfa0404efe214344e39f5aeb739cccf`.
+- PLAYER_POINTS capability hash: `2f0fcaee9e5670dcc83d7704de0d220eacbc7f532d862504f530fe57795267b4` -> `68898c5c9c4f2e2b14001cc1a1625a169eb9858fe20b7e31a45c359077bdec51`.
+- Approved interpretation hash: unchanged, `dfe10d4dabf8183c10f4a61d3bd2361bd54ee78d24c96ee9d38da42becfbaa49`.
+- Rules artifact SHA-256: `f13dd31faa8013df59688adb63d49ab4b59a763246ec6b1ec88af8a0ed5c3574`.
+- PLAYER_POINTS artifact SHA-256: `380a8be997bc286033bc78dbfbae2d628818ee3bf5b7cb43aac87667e51b42fb`.
+- Two independent compilations produced byte-identical rules and capability artifacts.
+
+The global target remains `CAPTURED_UNVERIFIED` and `production_eligible=false`; no capability other than PLAYER_POINTS is promoted and the global ruleset is not ACTIVE.
+
+## Exact scenario matrices
+
+Assist cases A-R all pass through `Stage-9 GoalEvent -> AcceptedRulesAdapter -> rules classifier -> exact assist component`: direct pass; one/two defensive touches; defensive pass; outside-box intent; rebound/save; further touch; own rebound; own-goal actions; penalty/free-kick foul winner and self-taker; pass/touch handball; on-target/off-target deflected-shot handball; and corner/throw-in exclusion.
+
+The save/BPS matrix passes: outside, inside, big-chance, inside big-chance, neutral/unlocated, saved penalty, three-save FPL point grouping, non-GK save participation, contradictory subset rejection, and Stage-9 adapter preservation. The saved-penalty BPS total is 17, comprising appearance 6 plus save components 7 + 2 + 1 + 1.
+
+## Executed evidence
+
+```text
+uv run pytest tests/unit/rules/test_schema_v11_capabilities.py tests/unit/rules/test_2026_27_save_contract.py tests/unit/fpl_points/test_versioned_assist_classification.py tests/unit/rules/test_scoring_edges.py tests/property/rules/test_rules_properties.py tests/contract/fpl_points tests/golden/fpl_points -q
+96 passed
+
+uv run pytest tests/unit/rules/test_schema_v11_capabilities.py tests/unit/rules/test_yaml_and_compiler.py tests/unit/rules/test_authoring_schema.py tests/unit/rules/test_2026_27_verification_gate.py tests/unit/rules/test_2026_27_save_contract.py tests/unit/fpl_points/test_versioned_assist_classification.py -q
+110 passed
+
+uv run pytest tests/unit/rules tests/property/rules tests/golden/rules tests/contract/fpl tests/unit/fpl_points tests/contract/fpl_points tests/integration/fpl_points tests/golden/fpl_points tests/property/fpl_points -q
+249 passed
+
+uv run pytest -q --ignore=tests/performance
+1570 passed, 1 skipped; 205 PostgreSQL-dependent errors because DMF_TEST_DATABASE_URL was intentionally absent; two expected pre-evidence failures (wheel requires that same database URL and stale current manifest).
+```
+
+No network, dependency, migration, Stage-7, or Stage-8 changes were made. The remaining limitation is intentionally unresolved manager-state/full-season functionality; it does not qualify PLAYER_POINTS as global activation.
+
 ## Status
 
 **Implementation and clean-checkout integration complete; independent review and

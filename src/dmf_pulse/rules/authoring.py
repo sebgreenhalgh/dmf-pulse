@@ -274,11 +274,26 @@ class AssistReboundPolicy(AuthoringModel):
     obvious_pass_or_cross_is_shot: Literal[False]
 
 
+class AssistPassTouchHandballPolicy(AuthoringModel):
+    defensive_touch_before_handball_disqualifies: Literal[True]
+
+
+class AssistShotHandballPolicy(AuthoringModel):
+    direct_shot_required: Literal[True]
+    on_target_before_deflection_required: Literal[True]
+    on_target_after_deflection_required: Literal[True]
+
+
+class AssistHandballPolicy(AuthoringModel):
+    pass_or_touch: AssistPassTouchHandballPolicy
+    shot: AssistShotHandballPolicy
+
+
 class AssistSetPiecePolicy(AuthoringModel):
     foul_winner_eligible_if_directly_scored: Literal[True]
     last_attacker_before_handball_eligible_if_directly_scored: Literal[True]
     taker_who_won_foul_ineligible: Literal[True]
-    defensive_touch_before_handball_disqualifies: Literal[True]
+    handball: AssistHandballPolicy
     corner_or_throw_in_direct_assist: Literal[False]
 
 
@@ -722,6 +737,10 @@ class RuleVerificationRecord(AuthoringModel):
     interpretation_decision_ids: tuple[
         Annotated[StrictStr, Field(pattern=r"^INT-[A-Z0-9-]+$")], ...
     ] = ()
+    interpretation_approval_states: dict[
+        Annotated[StrictStr, Field(pattern=r"^INT-[A-Z0-9-]+$")],
+        Literal["APPROVED", "UNAPPROVED"],
+    ] = {}
     interpretation_note: Annotated[StrictStr, Field(min_length=1)] | None = None
 
     @model_validator(mode="after")
@@ -742,8 +761,12 @@ class RuleVerificationRecord(AuthoringModel):
         if self.verification_status is VerificationStatus.INTERPRETATION_REQUIRED:
             if not self.interpretation_decision_ids or self.interpretation_note is None:
                 raise ValueError("interpreted rules require decisions and an interpretation note")
+            if set(self.interpretation_approval_states) != set(self.interpretation_decision_ids):
+                raise ValueError("interpreted rules require an approval state for every decision")
         elif self.interpretation_decision_ids:
             raise ValueError("official-source claims cannot cite interpretation decisions")
+        elif self.interpretation_approval_states:
+            raise ValueError("official-source claims cannot describe interpretation approval")
         return self
 
 

@@ -2,9 +2,8 @@
   "artifact_type": "DMF_RULE_CAPABILITY",
   "blockers": [],
   "capability": "PLAYER_POINTS",
-  "capability_hash": "2f0fcaee9e5670dcc83d7704de0d220eacbc7f532d862504f530fe57795267b4",
+  "capability_hash": "68898c5c9c4f2e2b14001cc1a1625a169eb9858fe20b7e31a45c359077bdec51",
   "dependency_paths": [
-    "/rules/positions",
     "/rules/scoring",
     "/rules/assists",
     "/rules/bonus"
@@ -764,7 +763,7 @@
     {
       "interpretation_decision_ids": [],
       "interpretation_note": null,
-      "rule_path": "/rules/assists/eligibility_policy/set_pieces/defensive_touch_before_handball_disqualifies",
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/foul_winner_eligible_if_directly_scored",
       "source_refs": [
         "SRC-FPL-2026-RULES-001"
       ],
@@ -784,7 +783,67 @@
     {
       "interpretation_decision_ids": [],
       "interpretation_note": null,
-      "rule_path": "/rules/assists/eligibility_policy/set_pieces/foul_winner_eligible_if_directly_scored",
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/handball/pass_or_touch/defensive_touch_before_handball_disqualifies",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/handball/shot/direct_shot_required",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/handball/shot/on_target_after_deflection_required",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/handball/shot/on_target_before_deflection_required",
       "source_refs": [
         "SRC-FPL-2026-RULES-001"
       ],
@@ -2812,7 +2871,7 @@
       "interpretation_decision_ids": [
         "INT-FPL-2026-BONUS-TIES-001"
       ],
-      "interpretation_note": "Candidate general competition ranking is distinct from the official examples and remains unapproved.",
+      "interpretation_note": "The official sources publish specific bonus-tie examples but do not state a complete arbitrary-cardinality algorithm. GENERAL_COMPETITION_RANKING is the separately recorded, human-approved PLAYER_POINTS interpretation in INT-FPL-2026-BONUS-TIES-001.",
       "rule_path": "/rules/bonus/tie_allocation",
       "source_refs": [
         "SRC-FPL-2026-RULES-001"
@@ -2829,470 +2888,6 @@
       ],
       "value": "GENERAL_COMPETITION_RANKING",
       "verification_status": "INTERPRETATION_REQUIRED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/DEF/display_name",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": "Defender",
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/DEF/lineup_max",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 5,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/DEF/lineup_min",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 3,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/DEF/squad_quota",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 5,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/FWD/display_name",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": "Forward",
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/FWD/lineup_max",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 3,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/FWD/lineup_min",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 1,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/FWD/squad_quota",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 3,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/GK/display_name",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": "Goalkeeper",
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/GK/lineup_max",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 1,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/GK/lineup_min",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 1,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/GK/squad_quota",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 2,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/MID/display_name",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": "Midfielder",
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/MID/lineup_max",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 5,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/MID/lineup_min",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 2,
-      "verification_status": "VERIFIED"
-    },
-    {
-      "interpretation_decision_ids": [],
-      "interpretation_note": null,
-      "rule_path": "/rules/positions/positions/MID/squad_quota",
-      "source_refs": [
-        "SRC-FPL-2026-BOOTSTRAP-001",
-        "SRC-FPL-2026-RULES-001"
-      ],
-      "sources": [
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "element_types: squad_select, squad_min_play, squad_max_play",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
-          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
-          "verification_status": "VERIFIED"
-        },
-        {
-          "accessed_on": "2026-08-14",
-          "locator": "Rules > Selecting your initial squad and Managing your squad",
-          "published_on": null,
-          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
-          "source_id": "SRC-FPL-2026-RULES-001",
-          "verification_status": "VERIFIED"
-        }
-      ],
-      "value": 5,
-      "verification_status": "VERIFIED"
     },
     {
       "interpretation_decision_ids": [],
@@ -5116,8 +4711,17 @@
         "scorer_loses_and_regains_possession_disqualifies": true,
         "set_pieces": {
           "corner_or_throw_in_direct_assist": false,
-          "defensive_touch_before_handball_disqualifies": true,
           "foul_winner_eligible_if_directly_scored": true,
+          "handball": {
+            "pass_or_touch": {
+              "defensive_touch_before_handball_disqualifies": true
+            },
+            "shot": {
+              "direct_shot_required": true,
+              "on_target_after_deflection_required": true,
+              "on_target_before_deflection_required": true
+            }
+          },
           "last_attacker_before_handball_eligible_if_directly_scored": true,
           "taker_who_won_foul_ineligible": true
         },
@@ -5231,34 +4835,6 @@
       },
       "scope": "PER_FIXTURE",
       "tie_allocation": "GENERAL_COMPETITION_RANKING"
-    },
-    "/rules/positions": {
-      "positions": {
-        "DEF": {
-          "display_name": "Defender",
-          "lineup_max": 5,
-          "lineup_min": 3,
-          "squad_quota": 5
-        },
-        "FWD": {
-          "display_name": "Forward",
-          "lineup_max": 3,
-          "lineup_min": 1,
-          "squad_quota": 3
-        },
-        "GK": {
-          "display_name": "Goalkeeper",
-          "lineup_max": 1,
-          "lineup_min": 1,
-          "squad_quota": 2
-        },
-        "MID": {
-          "display_name": "Midfielder",
-          "lineup_max": 5,
-          "lineup_min": 2,
-          "squad_quota": 5
-        }
-      }
     },
     "/rules/scoring": {
       "appearance": {

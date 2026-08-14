@@ -1,10 +1,11 @@
 capabilities:
   PLAYER_POINTS:
     inherits: []
-    rule_paths: ["/rules/positions", "/rules/scoring", "/rules/assists", "/rules/bonus"]
+    rule_paths: ["/rules/scoring", "/rules/assists", "/rules/bonus"]
   GW1_INITIAL_SQUAD:
     inherits: ["PLAYER_POINTS"]
     rule_paths:
+      - "/rules/positions"
       - "/rules/squad"
       - "/rules/lineup/starting_size"
       - "/rules/lineup/bench_size"

@@ -13,6 +13,10 @@ class RulesModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
 
+NonNegativeInt = Annotated[StrictInt, Field(ge=0)]
+Minutes = Annotated[StrictInt, Field(ge=0, le=130)]
+
+
 class FPLPosition(StrEnum):
     GK = "GK"
     DEF = "DEF"
@@ -45,6 +49,63 @@ class AssistEligibility(StrEnum):
     DEFINITE_ASSIST = "DEFINITE_ASSIST"
     DEFINITE_NO_ASSIST = "DEFINITE_NO_ASSIST"
     AMBIGUOUS_ASSIST = "AMBIGUOUS_ASSIST"
+
+
+class AssistAction(StrEnum):
+    PASS = "PASS"
+    CROSS = "CROSS"
+    INADVERTENT_TOUCH = "INADVERTENT_TOUCH"
+    SHOT = "SHOT"
+    CROSS_SHOT = "CROSS_SHOT"
+    FOUL_WON = "FOUL_WON"
+    FORCED_OWN_GOAL_ACTION = "FORCED_OWN_GOAL_ACTION"
+
+
+class AssistReceptionZone(StrEnum):
+    INSIDE_BOX = "INSIDE_BOX"
+    OUTSIDE_BOX = "OUTSIDE_BOX"
+
+
+class AssistReboundIntervention(StrEnum):
+    NONE = "NONE"
+    GOALKEEPER_SAVE = "GOALKEEPER_SAVE"
+    DEFENSIVE_BLOCK = "DEFENSIVE_BLOCK"
+    WOODWORK = "WOODWORK"
+
+
+class AssistSetPieceRoute(StrEnum):
+    NONE = "NONE"
+    FOUL_WON = "FOUL_WON"
+    HANDBALL_AFTER_PASS_TOUCH = "HANDBALL_AFTER_PASS_TOUCH"
+    HANDBALL_AFTER_SHOT = "HANDBALL_AFTER_SHOT"
+    CORNER_OR_THROW_IN = "CORNER_OR_THROW_IN"
+
+
+class AssistGoalKind(StrEnum):
+    OPEN_PLAY = "OPEN_PLAY"
+    OWN_GOAL = "OWN_GOAL"
+    DIRECT_PENALTY = "DIRECT_PENALTY"
+    DIRECT_FREE_KICK = "DIRECT_FREE_KICK"
+
+
+class AssistDecisionContext(RulesModel):
+    """Closed, replayable facts for the versioned assist classifier."""
+
+    goal_kind: AssistGoalKind
+    action: AssistAction
+    defensive_touches: NonNegativeInt = 0
+    defensive_touch_is_pass: StrictBool = False
+    scorer_reception_zone: AssistReceptionZone = AssistReceptionZone.INSIDE_BOX
+    intended_for_scorer: StrictBool = True
+    scorer_loses_and_regains_possession: StrictBool = False
+    inadvertent_touch_reaches_scorer_directly: StrictBool = True
+    rebound_intervention: AssistReboundIntervention = AssistReboundIntervention.NONE
+    defensive_touch_after_rebound: StrictBool = False
+    scorer_converts_own_rebound: StrictBool = False
+    shot_on_target_before_deflection: StrictBool = False
+    shot_on_target_after_deflection: StrictBool = False
+    set_piece_route: AssistSetPieceRoute = AssistSetPieceRoute.NONE
+    candidate_is_scorer: StrictBool = False
 
 
 class UnknownRule(RulesModel):
@@ -175,10 +236,6 @@ class RulesetDiff(RulesModel):
     changes: tuple[RuleChange, ...]
 
 
-NonNegativeInt = Annotated[StrictInt, Field(ge=0)]
-Minutes = Annotated[StrictInt, Field(ge=0, le=130)]
-
-
 class DefensiveActions(RulesModel):
     ball_recoveries: NonNegativeInt
     blocks: NonNegativeInt
@@ -216,8 +273,6 @@ class BpsEvents(RulesModel):
     def pass_counts_are_coherent(self) -> BpsEvents:
         if self.passes_completed > self.pass_attempts:
             raise ValueError("passes_completed cannot exceed pass_attempts")
-        if self.big_chance_saves > self.saves_inside_box + self.saves_outside_box:
-            raise ValueError("big_chance_saves must be a subset of recorded saves")
         return self
 
 
@@ -273,6 +328,22 @@ class PlayerScenario(RulesModel):
         return self
 
 
+def validate_v11_save_contract(player: PlayerScenario) -> None:
+    """Validate 2026/27 additive save facts without changing v1.0 parsing."""
+
+    located_saves = player.bps.saves_inside_box + player.bps.saves_outside_box
+    if located_saves > player.saves:
+        raise ValueError("located saves cannot exceed total saves")
+    if player.bps.big_chance_saves > player.saves:
+        raise ValueError("big-chance saves cannot exceed total saves")
+    if player.penalty_saves > player.saves:
+        raise ValueError("penalty saves cannot exceed total saves")
+    if player.penalty_saves > player.bps.saves_inside_box:
+        raise ValueError("penalty saves must be inside-box saves")
+    if player.penalty_saves > player.bps.big_chance_saves:
+        raise ValueError("penalty saves must be big-chance saves")
+
+
 class FixtureScenario(RulesModel):
     fixture_id: str
     gameweek_id: str
@@ -304,14 +375,6 @@ class FixtureScenario(RulesModel):
                 raise ValueError("on-pitch and post-dismissal goals exceed the fixture score")
             if player.bps.match_winning_goals > player.goals_non_penalty + player.goals_penalty:
                 raise ValueError("match-winning goal requires a scored goal")
-            if player.position is not FPLPosition.GK and (
-                player.saves
-                or player.penalty_saves
-                or player.bps.saves_inside_box
-                or player.bps.saves_outside_box
-                or player.bps.big_chance_saves
-            ):
-                raise ValueError("goalkeeper save events require GK position")
         home_players = [player for player in self.players if player.team_id == self.home_team_id]
         away_players = [player for player in self.players if player.team_id == self.away_team_id]
         derived_home = sum(

@@ -592,6 +592,15 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Recompile ruleset and PLAYER_POINTS artifacts twice and independently verify new hashes.
 - [x] Run targeted checks, the focused RUL-002 suite, static/security checks, then one complete repository regression on the final product tree.
 
+# RUL-002R3 PLAYER_POINTS static-review remediation
+
+- [x] Read the frozen remediation pack, DMFP-02 boundary requirements, and inspect the reviewed branch against the accepted main base.
+- [x] Reconstruct the rules remediation on the accepted `origin/main` lineage while preserving the accepted Stage-9 interface.
+- [x] Remove PLAYER_POINTS manager-state dependency leakage and add semantic closure guards.
+- [x] Correct save/BPS and Stage-9 event/adaptation contracts, including non-GK save participation.
+- [x] Implement versioned assist classification through the Stage-9 boundary and consistency governance.
+- [ ] Recompile deterministic artifacts, run focused gates, refresh governed evidence, and prepare the review result.
+
 # RUL-002R1 target-season schema v1.1 and capability activation
 
 - [x] Read the controlling DMFP-02 rules/model, provenance, ambiguity, schema-evolution, and activation requirements.

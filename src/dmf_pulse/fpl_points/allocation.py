@@ -26,6 +26,7 @@ from dmf_pulse.fpl_points.models import (
     ScorelineCell,
 )
 from dmf_pulse.fpl_points.seed import NamedRandom, rng_for, stable_identifier
+from dmf_pulse.rules.models import AssistAction, AssistDecisionContext, AssistGoalKind
 
 
 def validate_goal_share_simplex(
@@ -120,6 +121,7 @@ class _Accumulator:
     bps: dict[str, int] = field(
         default_factory=lambda: {
             "big_chances_created": 0,
+            "big_chance_saves": 0,
             "big_chances_missed": 0,
             "errors_leading_attempt": 0,
             "errors_leading_goal": 0,
@@ -326,6 +328,7 @@ def _allocate_goals(
         assister: _Accumulator | None = None
         classification = AssistClassification.DEFINITE_NO_ASSIST
         assist_awarded = False
+        assist_context: AssistDecisionContext | None = None
         if mechanism is GoalMechanism.OPPONENT_OWN_GOAL:
             own_candidates = _eligible(accumulators, conceding_team, minute)
             eligible_own = tuple(
@@ -379,6 +382,11 @@ def _allocate_goals(
                 )
                 if assister is not None:
                     assister.eligible_assists += 1
+                    if classification is AssistClassification.DEFINITE_ASSIST:
+                        assist_context = AssistDecisionContext(
+                            goal_kind=AssistGoalKind.OPEN_PLAY,
+                            action=AssistAction.PASS,
+                        )
         events.append(
             GoalEvent(
                 goal_id=stable_identifier("goal", root_seed, scenario_index, sequence),
@@ -395,6 +403,7 @@ def _allocate_goals(
                 ),
                 assist_classification=classification,
                 assist_awarded=assist_awarded,
+                assist_context=assist_context,
             )
         )
     return sorted(events, key=lambda event: (event.minute, event.goal_id))
@@ -549,6 +558,9 @@ def _generate_extra_penalty(
     taker.penalty_misses += 1
     if float(rng.random()) < config.extra_penalty_save_probability:
         keeper.penalty_saves += 1
+        keeper.saves += 1
+        keeper.bps["saves_inside_box"] += 1
+        keeper.bps["big_chance_saves"] += 1
 
 
 def allocate_fixture_events(

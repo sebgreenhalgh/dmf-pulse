@@ -21,6 +21,7 @@ from pydantic import (
 
 from dmf_pulse.football_events.minutes_context import Stage7MinutesContext
 from dmf_pulse.football_events.score_distribution import JointScoreDistribution
+from dmf_pulse.rules.models import AssistDecisionContext
 
 
 class PointsModel(BaseModel):
@@ -398,6 +399,7 @@ class DefensiveActions(PointsModel):
 
 class BpsEvents(PointsModel):
     big_chances_created: NonNegativeInt
+    big_chance_saves: NonNegativeInt = 0
     big_chances_missed: NonNegativeInt
     errors_leading_attempt: NonNegativeInt
     errors_leading_goal: NonNegativeInt
@@ -438,14 +440,13 @@ class GoalEvent(PointsModel):
     assister_player_id: str | None
     assist_classification: AssistClassification
     assist_awarded: StrictBool
+    assist_context: AssistDecisionContext | None = None
 
     @model_validator(mode="after")
     def goal_is_coherent(self) -> GoalEvent:
         if self.mechanism is GoalMechanism.OPPONENT_OWN_GOAL:
             if self.scorer_player_id is not None or self.own_goal_player_id is None:
                 raise ValueError("own goal must have an own-goal player and no credited scorer")
-            if self.assister_player_id is not None or self.assist_awarded:
-                raise ValueError("own goal baseline cannot award an assist")
         else:
             if self.scorer_player_id is None or self.own_goal_player_id is not None:
                 raise ValueError("credited goal must have exactly one scorer")
@@ -557,7 +558,11 @@ class FixtureEventScenario(PointsModel):
                 own_goals[own_goal_player.player_id] += 1
             if goal.assister_player_id is not None:
                 assister = player_map.get(goal.assister_player_id)
-                if assister is None or assister.team_id != goal.scoring_team_id:
+                if (
+                    assister is None
+                    or assister.team_id != goal.scoring_team_id
+                    or assister.minutes == 0
+                ):
                     raise ValueError("assister identity is outside the scoring team")
                 assists[assister.player_id] += 1
         for player in self.players:

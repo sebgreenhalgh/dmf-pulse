@@ -94,14 +94,15 @@ def test_manager_state_schema_shapes_are_available_without_player_points_depende
 @pytest.mark.unit
 def test_2026_27_save_bps_events_stack_additively(target_ruleset) -> None:
     inside = _plain_goalkeeper(
-        bps=_plain_goalkeeper().bps.model_copy(update={"saves_inside_box": 1})
+        saves=1, bps=_plain_goalkeeper().bps.model_copy(update={"saves_inside_box": 1})
     )
     assert calculate_bps(target_ruleset, inside, clean_sheet_eligible=False, goals_conceded=0) == 9
 
     outside_big = _plain_goalkeeper(
+        saves=1,
         bps=_plain_goalkeeper().bps.model_copy(
             update={"saves_outside_box": 1, "big_chance_saves": 1}
-        )
+        ),
     )
     assert (
         calculate_bps(target_ruleset, outside_big, clean_sheet_eligible=False, goals_conceded=0)
@@ -109,9 +110,10 @@ def test_2026_27_save_bps_events_stack_additively(target_ruleset) -> None:
     )
 
     inside_big = _plain_goalkeeper(
+        saves=1,
         bps=_plain_goalkeeper().bps.model_copy(
             update={"saves_inside_box": 1, "big_chance_saves": 1}
-        )
+        ),
     )
     assert (
         calculate_bps(target_ruleset, inside_big, clean_sheet_eligible=False, goals_conceded=0)
@@ -122,6 +124,7 @@ def test_2026_27_save_bps_events_stack_additively(target_ruleset) -> None:
 @pytest.mark.unit
 def test_penalty_save_composes_with_all_save_bps(target_ruleset) -> None:
     player = _plain_goalkeeper(
+        saves=1,
         penalty_saves=1,
         bps=_plain_goalkeeper().bps.model_copy(
             update={"saves_inside_box": 1, "big_chance_saves": 1}
@@ -180,7 +183,38 @@ def test_player_points_dependency_closure_excludes_manager_state(target_ruleset)
         for record in artifact.rule_verification
         for source in record["sources"]
     )
-    assert not any("transfer" in path or "chip" in path for path in artifact.dependency_paths)
+    forbidden_paths = {
+        "/rules/positions",
+        "/rules/squad",
+        "/rules/lineup",
+        "/rules/transfers",
+        "/rules/prices",
+        "/rules/chips",
+        "/rules/deadlines",
+        "/rules/special_events",
+    }
+    forbidden_leaf_names = {"squad_quota", "lineup_min", "lineup_max", "bench"}
+    assert not set(artifact.dependency_paths) & forbidden_paths
+
+    def leaf_paths(value: object, path: str = "") -> set[str]:
+        if isinstance(value, dict):
+            return {
+                item for key, child in value.items() for item in leaf_paths(child, f"{path}/{key}")
+            }
+        if isinstance(value, list):
+            return {
+                item
+                for index, child in enumerate(value)
+                for item in leaf_paths(child, f"{path}/{index}")
+            }
+        return {path}
+
+    leaves = {
+        leaf.rsplit("/", maxsplit=1)[-1]
+        for selected in artifact.selected_rules.values()
+        for leaf in leaf_paths(selected)
+    }
+    assert not leaves & forbidden_leaf_names
     assert (
         compile_capability_artifact(target_ruleset, RuleCapability.PLAYER_POINTS).capability_hash
         == artifact.capability_hash
@@ -208,9 +242,25 @@ def test_full_season_remains_blocked_by_manager_state(target_ruleset) -> None:
     assert not artifact.ready_for_human_approval
     assert not artifact.production_eligible
     assert any(blocker == "unknown:/rules/transfers" for blocker in artifact.blockers)
-    assert any(blocker == "unknown:/rules/prices" for blocker in artifact.blockers)
-    assert any(blocker == "unknown:/rules/chips" for blocker in artifact.blockers)
-    assert any(blocker == "unknown:/rules/deadlines" for blocker in artifact.blockers)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("capability", "expected_blocker"),
+    (
+        (RuleCapability.GW1_INITIAL_SQUAD, "unknown:/rules/squad"),
+        (RuleCapability.TRANSFER_STATE, "unknown:/rules/transfers"),
+        (RuleCapability.CHIP_STATE, "unknown:/rules/chips"),
+        (RuleCapability.FULL_SEASON, "unknown:/rules/special_events"),
+    ),
+)
+def test_manager_state_capabilities_remain_blocked(
+    target_ruleset, capability, expected_blocker
+) -> None:
+    artifact = compile_capability_artifact(target_ruleset, capability)
+    assert not artifact.production_eligible
+    assert artifact.blockers
+    assert expected_blocker in artifact.blockers
     assert "interpretation:INT-FPL-2026-BONUS-TIES-001:out_of_scope" in artifact.blockers
 
 
@@ -238,6 +288,21 @@ def test_capability_dependencies_cannot_be_weakened(repository_root: Path, tmp_p
     shutil.copytree(_target(repository_root), target)
     capabilities = load_rules_yaml(target / "capabilities.yaml")
     capabilities["capabilities"]["PLAYER_POINTS"]["rule_paths"].remove("/rules/assists")
+    (target / "capabilities.yaml").write_text(
+        yaml.safe_dump(capabilities, sort_keys=False), encoding="utf-8"
+    )
+    with pytest.raises(RulesValidationError, match="dependencies"):
+        compile_ruleset(target)
+
+
+@pytest.mark.unit
+def test_player_points_rejects_reintroduced_manager_state_dependency(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    target = tmp_path / "target"
+    shutil.copytree(_target(repository_root), target)
+    capabilities = load_rules_yaml(target / "capabilities.yaml")
+    capabilities["capabilities"]["PLAYER_POINTS"]["rule_paths"].append("/rules/positions")
     (target / "capabilities.yaml").write_text(
         yaml.safe_dump(capabilities, sort_keys=False), encoding="utf-8"
     )
@@ -281,6 +346,11 @@ def test_unapproved_interpretation_cannot_satisfy_capability(
     raw = interpretations["decisions"][0]
     raw.update(approved=False, approved_by=None, approved_at=None)
     raw["decision_hash"] = interpretation_decision_hash(raw)
+    verification = load_rules_yaml(target / "rule_verification.yaml")
+    verification["rules"][-1]["interpretation_approval_states"] = {raw["decision_id"]: "UNAPPROVED"}
+    (target / "rule_verification.yaml").write_text(
+        yaml.safe_dump(verification, sort_keys=False), encoding="utf-8"
+    )
     (target / "interpretations.yaml").write_text(
         yaml.safe_dump(interpretations, sort_keys=False), encoding="utf-8"
     )
@@ -290,3 +360,20 @@ def test_unapproved_interpretation_cannot_satisfy_capability(
     artifact = compile_capability_artifact(ruleset, RuleCapability.PLAYER_POINTS)
     assert not artifact.production_eligible
     assert artifact.blockers == ("interpretation:INT-FPL-2026-BONUS-TIES-001:unapproved",)
+
+
+@pytest.mark.unit
+def test_approved_interpretation_metadata_cannot_claim_unapproved(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    target = tmp_path / "target"
+    shutil.copytree(_target(repository_root), target)
+    verification = load_rules_yaml(target / "rule_verification.yaml")
+    verification["rules"][-1]["interpretation_approval_states"] = {
+        "INT-FPL-2026-BONUS-TIES-001": "UNAPPROVED"
+    }
+    (target / "rule_verification.yaml").write_text(
+        yaml.safe_dump(verification, sort_keys=False), encoding="utf-8"
+    )
+    with pytest.raises(RulesValidationError, match="approval state"):
+        compile_ruleset(target)

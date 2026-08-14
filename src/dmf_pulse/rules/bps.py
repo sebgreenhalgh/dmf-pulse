@@ -121,8 +121,7 @@ def calculate_bps(
         total += _integer(clean.get("bps"), "bps.clean_sheet.bps")
     total += player.penalty_saves * _integer(config.get("penalty_save"), "bps.penalty_save")
     if "save_any" in config:
-        total_saves = player.bps.saves_inside_box + player.bps.saves_outside_box
-        total += total_saves * _integer(config.get("save_any"), "bps.save_any")
+        total += player.saves * _integer(config.get("save_any"), "bps.save_any")
         total += player.bps.saves_inside_box * _integer(
             config.get("save_inside_box_additional"), "bps.save_inside_box_additional"
         )

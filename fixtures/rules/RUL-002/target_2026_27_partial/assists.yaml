@@ -31,6 +31,12 @@ eligibility_policy:
     foul_winner_eligible_if_directly_scored: true
     last_attacker_before_handball_eligible_if_directly_scored: true
     taker_who_won_foul_ineligible: true
-    defensive_touch_before_handball_disqualifies: true
+    handball:
+      pass_or_touch:
+        defensive_touch_before_handball_disqualifies: true
+      shot:
+        direct_shot_required: true
+        on_target_before_deflection_required: true
+        on_target_after_deflection_required: true
     corner_or_throw_in_direct_assist: false
   official_fpl_final_decision_controls: true

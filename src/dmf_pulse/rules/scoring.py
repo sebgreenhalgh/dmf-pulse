@@ -15,6 +15,7 @@ from dmf_pulse.rules.models import (
     PlayerScenario,
     PlayerScore,
     RulesetStatus,
+    validate_v11_save_contract,
 )
 
 
@@ -243,6 +244,13 @@ def ensure_ruleset_scoring_allowed(ruleset: CompiledRuleset) -> None:
     """Validate artifact integrity and lifecycle before any scoring path."""
 
     ensure_compiled_ruleset_integrity(ruleset)
+    if ruleset.schema_version == "1.1":
+        from dmf_pulse.rules.capabilities import compile_capability_artifact
+        from dmf_pulse.rules.models import RuleCapability
+
+        player_points = compile_capability_artifact(ruleset, RuleCapability.PLAYER_POINTS)
+        if player_points.production_eligible:
+            return
     if ruleset.unknown_blockers:
         raise RulesValidationError(
             "RULESET_SCORING_BLOCKED",
@@ -263,6 +271,9 @@ def score_fixture(ruleset: CompiledRuleset, scenario: FixtureScenario) -> Fixtur
     """Score a coherent fixture without I/O or mutable global state."""
 
     ensure_ruleset_scoring_allowed(ruleset)
+    if ruleset.schema_version == "1.1":
+        for player in scenario.players:
+            validate_v11_save_contract(player)
     validate_scenario_ruleset_identity(
         ruleset,
         ruleset_id=scenario.ruleset_id,

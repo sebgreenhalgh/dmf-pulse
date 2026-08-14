@@ -50,4 +50,5 @@ rules:
     source_locators:
       SRC-FPL-2026-RULES-001: "Rules > Bonus points > published tie examples"
     interpretation_decision_ids: ["INT-FPL-2026-BONUS-TIES-001"]
-    interpretation_note: "Candidate general competition ranking is distinct from the official examples and remains unapproved."
+    interpretation_approval_states: {"INT-FPL-2026-BONUS-TIES-001": "APPROVED"}
+    interpretation_note: "The official sources publish specific bonus-tie examples but do not state a complete arbitrary-cardinality algorithm. GENERAL_COMPETITION_RANKING is the separately recorded, human-approved PLAYER_POINTS interpretation in INT-FPL-2026-BONUS-TIES-001."
