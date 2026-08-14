@@ -599,7 +599,7 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Remove PLAYER_POINTS manager-state dependency leakage and add semantic closure guards.
 - [x] Correct save/BPS and Stage-9 event/adaptation contracts, including non-GK save participation.
 - [x] Implement versioned assist classification through the Stage-9 boundary and consistency governance.
-- [ ] Recompile deterministic artifacts, run focused gates, refresh governed evidence, and prepare the review result.
+- [x] Recompile deterministic artifacts, run focused gates, refresh governed evidence, and prepare the review result.
 
 # RUL-002R1 target-season schema v1.1 and capability activation
 
