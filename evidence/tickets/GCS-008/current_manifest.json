@@ -66,9 +66,9 @@
       "sha256": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2"
     },
     {
-      "bytes": 6139,
+      "bytes": 6272,
       "path": ".github/workflows/ci.yml",
-      "sha256": "a91bd1b2ee6785978dc93a2b39f56de2f3b8ce57220bafea81f0b0020dd1afff"
+      "sha256": "872cb86b6255b8baf96afb4101bc32f08204b2cd9bd5ef5dc14254052c49b1ff"
     },
     {
       "bytes": 1740,
@@ -1371,9 +1371,9 @@
       "sha256": "c7e738545760f566371e59bc01803864c51d9904f262fc404fecad3d1dc9cf10"
     },
     {
-      "bytes": 2586,
+      "bytes": 2638,
       "path": "pyproject.toml",
-      "sha256": "6a23395c3e543ae809650a1abc2a6dae413ee9ba9f2b05c3cc149902ada7ac6b"
+      "sha256": "cb4ca48c6ac0e40e97eea3e7565d33162b8873b1f72d8b288ab91e6fe62c6523"
     },
     {
       "bytes": 5158,
@@ -2921,9 +2921,9 @@
       "sha256": "bee1ab9096d300437c7f29fa45b89de893367aca42c2c276e1070a0458414e75"
     },
     {
-      "bytes": 590,
+      "bytes": 630,
       "path": "tests/performance/fpl_points/test_smoke_budget.py",
-      "sha256": "53cffe2a03130784cab8cb1e18d03a7f67ababddb2cab8e3086de5e9ea159ba6"
+      "sha256": "bc1d42e2faab8214ad7f0ac4e8dd641276c0c97ea6b399da4ab5fcab0043d5ef"
     },
     {
       "bytes": 1882,

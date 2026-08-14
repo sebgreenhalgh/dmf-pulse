@@ -81,7 +81,7 @@ jobs:
 
       - name: Tests and branch coverage
         run: |
-          uv run pytest -m "not performance" --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/GCS-008/coverage.json
+          uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/GCS-008/coverage.json -m "not performance"
           uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/GCS-008/coverage.json
 
       - name: Performance smoke (without coverage)
