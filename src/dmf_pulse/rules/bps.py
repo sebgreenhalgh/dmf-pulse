@@ -120,12 +120,22 @@ def calculate_bps(
     ):
         total += _integer(clean.get("bps"), "bps.clean_sheet.bps")
     total += player.penalty_saves * _integer(config.get("penalty_save"), "bps.penalty_save")
-    total += player.bps.saves_inside_box * _integer(
-        config.get("save_inside_box"), "bps.save_inside_box"
-    )
-    total += player.bps.saves_outside_box * _integer(
-        config.get("save_outside_box"), "bps.save_outside_box"
-    )
+    if "save_any" in config:
+        total_saves = player.bps.saves_inside_box + player.bps.saves_outside_box
+        total += total_saves * _integer(config.get("save_any"), "bps.save_any")
+        total += player.bps.saves_inside_box * _integer(
+            config.get("save_inside_box_additional"), "bps.save_inside_box_additional"
+        )
+        total += player.bps.big_chance_saves * _integer(
+            config.get("save_big_chance_additional"), "bps.save_big_chance_additional"
+        )
+    else:
+        total += player.bps.saves_inside_box * _integer(
+            config.get("save_inside_box"), "bps.save_inside_box"
+        )
+        total += player.bps.saves_outside_box * _integer(
+            config.get("save_outside_box"), "bps.save_outside_box"
+        )
     positive = (
         (player.bps.successful_open_play_crosses, "successful_open_play_cross"),
         (player.bps.big_chances_created, "big_chance_created"),
@@ -158,7 +168,7 @@ def calculate_bps(
         total += goals_conceded * _integer(
             negatives.get("goal_conceded_gk_def"), "bps.negatives.goal_conceded"
         )
-    negative = (
+    negative = [
         (player.bps.penalties_conceded, "penalty_conceded"),
         (player.penalty_misses, "penalty_miss"),
         (player.yellow_cards, "yellow"),
@@ -167,11 +177,19 @@ def calculate_bps(
         (player.bps.big_chances_missed, "big_chance_missed"),
         (player.bps.errors_leading_goal, "error_leading_goal"),
         (player.bps.errors_leading_attempt, "error_leading_attempt"),
-        (player.bps.times_tackled, "being_tackled"),
         (player.bps.fouls_conceded, "foul_conceded"),
         (player.bps.offsides, "offside"),
         (player.bps.shots_off_target, "shot_off_target"),
-    )
+    ]
+    being_tackled = negatives.get("being_tackled")
+    if being_tackled == "REMOVED":
+        pass
+    elif isinstance(being_tackled, int) and not isinstance(being_tackled, bool):
+        negative.append((player.bps.times_tackled, "being_tackled"))
+    else:
+        raise RulesIntegrityError(
+            "RULESET_SCORING_CONFIG", "compiled being-tackled BPS rule is invalid"
+        )
     total += sum(
         count * _integer(negatives.get(key), f"bps.negatives.{key}") for count, key in negative
     )

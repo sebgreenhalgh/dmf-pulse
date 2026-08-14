@@ -27,6 +27,40 @@ def test_all_supplied_competition_ranking_oracles(repository_root: Path) -> None
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize(
+    ("scores", "expected"),
+    [
+        ({"a": 30, "b": 20, "c": 10}, {"a": 3, "b": 2, "c": 1}),
+        ({"a": 30, "b": 30, "c": 20}, {"a": 3, "b": 3, "c": 1}),
+        ({"a": 30, "b": 20, "c": 20}, {"a": 3, "b": 2, "c": 2}),
+        ({"a": 30, "b": 20, "c": 10, "d": 10}, {"a": 3, "b": 2, "c": 1, "d": 1}),
+        ({"a": 30, "b": 30, "c": 30, "d": 20}, {"a": 3, "b": 3, "c": 3, "d": 0}),
+        ({"a": 30, "b": 20, "c": 20, "d": 20}, {"a": 3, "b": 2, "c": 2, "d": 2}),
+        (
+            {"a": 30, "b": 20, "c": 10, "d": 10, "e": 10},
+            {"a": 3, "b": 2, "c": 1, "d": 1, "e": 1},
+        ),
+        ({"a": 30, "b": 30, "c": 20, "d": 20}, {"a": 3, "b": 3, "c": 1, "d": 1}),
+    ],
+)
+def test_approved_general_competition_ranking_shapes(
+    scores: dict[str, int], expected: dict[str, int]
+) -> None:
+    awards = {1: 3, 2: 2, 3: 1}
+    assert allocate_bonus(scores, awards) == expected
+    assert allocate_bonus(dict(reversed(tuple(scores.items()))), awards) == expected
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("expected_bps", [1.5, True, "2.0"])
+def test_expected_or_noninteger_bps_cannot_enter_exact_bonus_ranking(
+    expected_bps: object,
+) -> None:
+    with pytest.raises(ValueError, match="exact integer scenario BPS"):
+        allocate_bonus({"projection": expected_bps}, {1: 3, 2: 2, 3: 1})  # type: ignore[dict-item]
+
+
+@pytest.mark.unit
 def test_nonstandard_bonus_policy_drives_generic_ranking() -> None:
     assert allocate_bonus({"alpha": 10, "beta": 9, "gamma": 8}, {1: 5, 2: 3, 3: 2}) == {
         "alpha": 5,

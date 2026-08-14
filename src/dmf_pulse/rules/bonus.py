@@ -20,6 +20,10 @@ def allocate_bonus(
         for rank, award in rank_awards.items()
     ):
         raise ValueError("bonus rank keys must be positive integers and awards non-negative")
+    if any(
+        not isinstance(value, int) or isinstance(value, bool) for value in bps_by_player.values()
+    ):
+        raise ValueError("bonus allocation requires exact integer scenario BPS")
 
     result = {player_id: 0 for player_id in bps_by_player}
     rank = 1

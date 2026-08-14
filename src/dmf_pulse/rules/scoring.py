@@ -52,6 +52,11 @@ def _boolean(value: object, label: str) -> bool:
 
 def _bonus_rank_awards(ruleset: CompiledRuleset) -> dict[int, int]:
     bonus = _mapping(ruleset.rules.get("bonus"), "bonus")
+    tie_allocation = bonus.get("tie_allocation")
+    if tie_allocation is not None and tie_allocation != "GENERAL_COMPETITION_RANKING":
+        raise RulesIntegrityError(
+            "RULESET_BONUS_TIE_INVALID", "compiled bonus tie allocation is unsupported"
+        )
     raw_awards = _mapping(
         bonus.get("bonus_points_by_competition_rank"),
         "bonus.bonus_points_by_competition_rank",
@@ -124,6 +129,20 @@ def _defensive_contribution(player: PlayerScenario, config: dict[str, object]) -
 
 def _components(ruleset: CompiledRuleset, player: PlayerScenario) -> tuple[dict[str, int], int]:
     scoring = _mapping(ruleset.rules.get("scoring"), "scoring")
+    participation = scoring.get("participation")
+    if participation is not None:
+        expected = {
+            "appearance_eligibility": "OFFICIAL_MINUTES_GREATER_THAN_ZERO",
+            "bonus_eligibility": "OFFICIAL_MINUTES_GREATER_THAN_ZERO",
+            "fixture_scope": True,
+            "minute_basis": "OFFICIAL_MINUTES_EXCLUDING_STOPPAGE_TIME",
+            "position_basis": "TARGET_SEASON_FPL_POSITION",
+            "reject_unmapped_position": True,
+        }
+        if _mapping(participation, "scoring.participation") != expected:
+            raise RulesIntegrityError(
+                "RULESET_PARTICIPATION_INVALID", "compiled participation policy is unsupported"
+            )
     conceded = _effective_conceded(player, scoring)
     appearance = _appearance(_mapping(scoring.get("appearance"), "appearance"), player.minutes)
     goals_config = _mapping(scoring.get("goals"), "goals")

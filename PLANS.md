@@ -36,6 +36,34 @@
   the exact one-commit/push handoff; commit and remote SHA verification are terminal Git
   actions recorded outside this pre-commit execution plan.
 
+## FPL 2026/27 rules launch verification
+
+- Scope: independently verify every required `fpl-2026-27` rule family against
+  current official 2026/27 FPL sources, compile and diff the captured artifact,
+  and stop before human activation.
+- Constraint: rules-data verification only; do not redesign the rules engine or
+  silently carry 2025/26 values forward.
+
+### Verification checkpoints
+
+- [x] Resolve governing authority, clean worktree, target manifest, CLI, and
+  focused rules assurance contracts.
+- [x] Recheck the live official Help/Rules application, official 2026/27 launch
+  announcements, and target-season bootstrap configuration.
+- [x] Identify exact authoritative values and compare them with the 2025/26
+  reference, including every published 2026/27 BPS change.
+- [ ] Encode a production-eligible ruleset only after an approved schema/ADR can
+  represent big-chance saves, split chip inventories/windows and effects,
+  transfer transitions, selling-price rules, and per-rule provenance.
+- [ ] Human approval and activation (explicitly outside this task).
+
+### Verification decision log
+
+- DMFP-02 section 27.5 requires an ADR/schema revision when a target-season rule
+  cannot be expressed. The current schema cannot faithfully encode several
+  verified 2026/27 rules, so the target remains fail-closed and the outcome is
+  `BLOCKED_RULESET_VERIFICATION`, not a false `VERIFIED` artifact.
+
 ## MIN-007R7 + MIN-007H3 - final packaged replay and assurance remediation
 
 - Ticket/stage: `MIN-007R7` then `MIN-007H3`, A7; required starting parent
@@ -496,7 +524,6 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Scoped immediate validation to `trg_min007f_final_output_complete`, restoring it to deferred.
 - [x] Added unit guard and one-outer-transaction A/B publication regression.
 - [x] Ran all 22 acceptance commands; generated evidence and review archive.
-
 ## GCS-008 - goal and clean-sheet distributions
 
 - Ticket/stage: `GCS-008`, A8; required parent `a5a0b66afd6e9645f971976d723e238824bee6a8`.
@@ -556,3 +583,19 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Run one complete final-tree regression and refresh mechanical evidence.
 - [ ] Create
   exactly one remediation commit, and push the existing PR branch.
+
+# RUL-002R2 bounded PLAYER_POINTS interpretation approval
+
+- [x] Verify the exact unapproved decision hash before mutation.
+- [x] Bind the approved interpretation semantics and UTC human provenance to PLAYER_POINTS only.
+- [x] Add approval-scope and arbitrary competition-ranking regressions.
+- [x] Recompile ruleset and PLAYER_POINTS artifacts twice and independently verify new hashes.
+- [x] Run targeted checks, the focused RUL-002 suite, static/security checks, then one complete repository regression on the final product tree.
+
+# RUL-002R1 target-season schema v1.1 and capability activation
+
+- [x] Read the controlling DMFP-02 rules/model, provenance, ambiguity, schema-evolution, and activation requirements.
+- [x] Add backward-compatible schema v1.1 authoring for capability verification, rule-level provenance, assist eligibility, additive save BPS, explicit removed events, participation semantics, manager-state transitions, and immutable interpretations.
+- [x] Convert the captured 2026/27 PLAYER_POINTS families without discarding unresolved manager-state research.
+- [x] Add compatibility, capability-closure, interpretation, and 2026/27 scoring regressions.
+- [x] Compile and independently reproduce the PLAYER_POINTS capability hash; leave FULL_SEASON and global activation blocked.

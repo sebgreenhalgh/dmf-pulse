@@ -36,7 +36,8 @@ def test_synthetic_and_partial_target_validate_compile_and_diff(rules_fixture: P
     assert synthetic.valid and not synthetic.unknown_blockers
     target = validate_ruleset_directory(rules_fixture / "target_2026_27_partial")
     assert target.valid and not target.production_eligible
-    assert "target:complete_scoring_table" in target.unknown_blockers
+    assert not any("player_points" in blocker for blocker in target.unknown_blockers)
+    assert "target:transfer_state_transitions_not_yet_promoted" in target.unknown_blockers
     difference = diff_rulesets(
         rules_fixture / "reference_2025_26", rules_fixture / "target_2026_27_partial"
     )

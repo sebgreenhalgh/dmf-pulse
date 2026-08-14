@@ -19,7 +19,13 @@ from pydantic import (
 )
 
 from dmf_pulse.rules.errors import RulesValidationError
-from dmf_pulse.rules.models import SeasonManifest, UnknownRule
+from dmf_pulse.rules.models import (
+    InterpretationDecision,
+    RuleCapability,
+    SeasonManifest,
+    UnknownRule,
+    VerificationStatus,
+)
 
 NonNegativeInt = Annotated[StrictInt, Field(ge=0)]
 PositiveInt = Annotated[StrictInt, Field(gt=0)]
@@ -220,6 +226,19 @@ class ScoringFile(AuthoringModel):
     defensive_contributions: DefensiveContributionRules
 
 
+class ParticipationRules(AuthoringModel):
+    fixture_scope: Literal[True]
+    appearance_eligibility: Literal["OFFICIAL_MINUTES_GREATER_THAN_ZERO"]
+    bonus_eligibility: Literal["OFFICIAL_MINUTES_GREATER_THAN_ZERO"]
+    minute_basis: Literal["OFFICIAL_MINUTES_EXCLUDING_STOPPAGE_TIME"]
+    position_basis: Literal["TARGET_SEASON_FPL_POSITION"]
+    reject_unmapped_position: Literal[True]
+
+
+class ScoringFileV11(ScoringFile):
+    participation: ParticipationRules
+
+
 class AssistsFile(AuthoringModel):
     points: StrictInt
     input_contract: Literal["RESOLVED_ELIGIBLE_ASSIST_COUNT"]
@@ -229,6 +248,64 @@ class AssistsFile(AuthoringModel):
         Literal["AMBIGUOUS_ASSIST"],
     ]
     ambiguous_state_allowed_for_exact_scoring: StrictBool
+
+
+class DefensiveTouchZonePolicy(AuthoringModel):
+    max_defensive_touches: NonNegativeInt
+    intended_destination_required: StrictBool
+
+
+class AssistDefensiveTouchPolicy(AuthoringModel):
+    inside_box: DefensiveTouchZonePolicy
+    outside_box: DefensiveTouchZonePolicy
+    two_or_more_touches_disqualify: Literal[True]
+    defender_attempted_pass_disqualifies: Literal[True]
+    woodwork_is_defensive_touch: Literal[False]
+
+
+class AssistReboundPolicy(AuthoringModel):
+    qualifying_origins: tuple[Literal["SHOT", "CROSS_SHOT"], ...]
+    qualifying_interventions: tuple[Literal["GOALKEEPER_SAVE", "DEFENSIVE_BLOCK", "WOODWORK"], ...]
+    must_reach_scorer_directly: Literal[True]
+    defensive_touch_after_rebound_disqualifies: Literal[True]
+    scorer_own_rebound_disqualifies: Literal[True]
+    multiple_save_touches_are_one_intervention: Literal[True]
+    shot_must_be_on_target: Literal[False]
+    obvious_pass_or_cross_is_shot: Literal[False]
+
+
+class AssistSetPiecePolicy(AuthoringModel):
+    foul_winner_eligible_if_directly_scored: Literal[True]
+    last_attacker_before_handball_eligible_if_directly_scored: Literal[True]
+    taker_who_won_foul_ineligible: Literal[True]
+    defensive_touch_before_handball_disqualifies: Literal[True]
+    corner_or_throw_in_direct_assist: Literal[False]
+
+
+class AssistOwnGoalPolicy(AuthoringModel):
+    forcing_shot_or_pass_eligible: Literal[True]
+    requires_identifiable_forcing_action: Literal[True]
+
+
+class AssistEligibilityPolicy(AuthoringModel):
+    policy_version: Annotated[StrictStr, Field(pattern=r"^\d+\.\d+$")]
+    final_qualifying_attacking_touch_required: Literal[True]
+    eligible_attacking_actions: tuple[
+        Literal["PASS", "CROSS", "INADVERTENT_TOUCH", "SHOT", "FOUL_WON", "FORCED_OWN_GOAL_ACTION"],
+        ...,
+    ]
+    inadvertent_touch_must_reach_scorer_directly: Literal[True]
+    scorer_loses_and_regains_possession_disqualifies: Literal[True]
+    tackle_or_interception_pass_requires_teammate_intent: Literal[True]
+    defensive_touches: AssistDefensiveTouchPolicy
+    rebounds: AssistReboundPolicy
+    own_goals: AssistOwnGoalPolicy
+    set_pieces: AssistSetPiecePolicy
+    official_fpl_final_decision_controls: Literal[True]
+
+
+class AssistsFileV11(AssistsFile):
+    eligibility_policy: AssistEligibilityPolicy
 
 
 class BpsAppearanceBand(AuthoringModel):
@@ -321,6 +398,22 @@ class BpsNegativeRules(AuthoringModel):
     shot_off_target: StrictInt
 
 
+class BpsNegativeRulesV11(AuthoringModel):
+    goal_conceded_gk_def: StrictInt
+    penalty_conceded: StrictInt
+    penalty_miss: StrictInt
+    yellow: StrictInt
+    red: StrictInt
+    own_goal: StrictInt
+    big_chance_missed: StrictInt
+    error_leading_goal: StrictInt
+    error_leading_attempt: StrictInt
+    being_tackled: Literal["REMOVED"]
+    foul_conceded: StrictInt
+    offside: StrictInt
+    shot_off_target: StrictInt
+
+
 class BpsRules(AuthoringModel):
     appearance_bands: Annotated[tuple[BpsAppearanceBand, ...], Field(min_length=1)]
     goals: BpsGoalRules
@@ -360,10 +453,57 @@ class BpsRules(AuthoringModel):
         return self
 
 
+class BpsRulesV11(AuthoringModel):
+    appearance_bands: Annotated[tuple[BpsAppearanceBand, ...], Field(min_length=1)]
+    goals: BpsGoalRules
+    assist: StrictInt
+    clean_sheet: BpsCleanSheetRules
+    penalty_save: StrictInt
+    save_any: StrictInt
+    save_inside_box_additional: StrictInt
+    save_big_chance_additional: StrictInt
+    successful_open_play_cross: StrictInt
+    big_chance_created: StrictInt
+    cbi_group: GroupedBps
+    recovery_group: GroupedBps
+    key_pass: StrictInt
+    successful_tackle: StrictInt
+    successful_dribble: StrictInt
+    match_winning_goal: StrictInt
+    goal_line_clearance: StrictInt
+    foul_won: StrictInt
+    shot_on_target: StrictInt
+    pass_completion: PassCompletionRules
+    negatives: BpsNegativeRulesV11
+
+    @model_validator(mode="after")
+    def appearance_bands_are_total_and_exclusive(self) -> BpsRulesV11:
+        for minute in range(1, 131):
+            matches = 0
+            for band in self.appearance_bands:
+                lower = (
+                    minute >= band.min_inclusive
+                    if band.min_inclusive is not None
+                    else band.min_exclusive is not None and minute > band.min_exclusive
+                )
+                if lower and (band.max_inclusive is None or minute <= band.max_inclusive):
+                    matches += 1
+            if matches != 1:
+                raise ValueError("BPS appearance bands must be total and mutually exclusive")
+        return self
+
+
 class BonusFile(AuthoringModel):
     scope: Literal["PER_FIXTURE"]
     bonus_points_by_competition_rank: Annotated[dict[RankKey, NonNegativeInt], Field(min_length=1)]
     bps: BpsRules
+
+
+class BonusFileV11(AuthoringModel):
+    scope: Literal["PER_FIXTURE"]
+    tie_allocation: Literal["GENERAL_COMPETITION_RANKING"]
+    bonus_points_by_competition_rank: Annotated[dict[RankKey, NonNegativeInt], Field(min_length=1)]
+    bps: BpsRulesV11
 
 
 class SquadFile(AuthoringModel):
@@ -379,14 +519,60 @@ class LineupFile(AuthoringModel):
     vice_fallback: StrictBool
 
 
+class AutomaticSubstitutionRules(AuthoringModel):
+    evaluation_scope: Literal["AFTER_ALL_GAMEWEEK_FIXTURES"]
+    absent_definition: Literal["ZERO_OFFICIAL_APPEARANCE_MINUTES"]
+    goalkeeper_replacement: Literal["DESIGNATED_BENCH_GOALKEEPER_IF_APPEARED"]
+    outfield_order: Literal["MANAGER_BENCH_ORDER"]
+    maintain_legal_formation: Literal[True]
+
+
+class LineupFileV11(LineupFile):
+    automatic_substitutions: AutomaticSubstitutionRules | UnknownRule
+
+
 class TransfersFile(AuthoringModel):
     free_transfer_cap: PositiveInt
     hit_points: StrictInt
     state: Literal["REFERENCE_ONLY", "DRAFT_PRELAUNCH", "CAPTURED_UNVERIFIED", "CONFLICTED"]
 
 
+class TransferTransitionRules(AuthoringModel):
+    preseason_unlimited: StrictBool
+    earned_per_deadline: NonNegativeInt
+    free_transfer_cap: PositiveInt
+    hit_points: StrictInt
+    outgoing_and_incoming_same_position: Literal[True]
+    club_quota_repair_required: Literal[True]
+    transfer_accounting_order: tuple[StableKey, ...]
+
+
+class TransfersFileV11(AuthoringModel):
+    transition: TransferTransitionRules
+    chip_interactions: dict[StableKey, tuple[StableKey, ...] | UnknownRule]
+
+
 class PricesFile(AuthoringModel):
     price_unit: Literal["TENTHS_OF_MILLION_GBP"]
+    change_threshold_algorithm: Literal["UNDISCLOSED"]
+
+
+class SellingPriceBranch(AuthoringModel):
+    condition: Literal["CURRENT_AT_OR_BELOW_PURCHASE", "CURRENT_ABOVE_PURCHASE"]
+    formula: Literal["CURRENT_PRICE", "PURCHASE_PLUS_FLOOR_HALF_PROFIT"]
+
+
+class SellingPriceRules(AuthoringModel):
+    above_purchase: SellingPriceBranch
+    at_or_below_purchase: SellingPriceBranch | UnknownRule
+
+
+class PricesFileV11(AuthoringModel):
+    price_unit: Literal["TENTHS_OF_MILLION_GBP"]
+    integer_only: Literal[True]
+    initial_purchase_price_basis: Literal["CURRENT_PLAYER_PRICE_AT_INITIAL_SELECTION"]
+    current_purchase_price_basis: Literal["PRICE_PAID_FOR_CURRENT_OWNERSHIP"]
+    selling_price: SellingPriceRules
     change_threshold_algorithm: Literal["UNDISCLOSED"]
 
 
@@ -418,6 +604,33 @@ class ChipRule(AuthoringModel):
     effects: tuple[DeclarativeEffect, ...]
 
 
+class ChipInventory(AuthoringModel):
+    copies: PositiveInt
+    windows: Annotated[tuple[GameweekWindow, ...], Field(min_length=1)]
+    unused_copy_expires_at_window_end: Literal[True]
+
+
+class ChipRuleV11(AuthoringModel):
+    key: StableKey
+    inventory: ChipInventory | UnknownRule
+    duration_gameweeks: PositiveInt | UnknownRule
+    concurrency_group: StableKey | UnknownRule
+    cancellable_before_deadline: StrictBool | UnknownRule
+    effects: tuple[DeclarativeEffect, ...] | UnknownRule
+
+
+class ChipsFileV11(AuthoringModel):
+    chips: Annotated[tuple[ChipRuleV11, ...], Field(min_length=1)]
+    concurrency_limit: PositiveInt
+
+    @model_validator(mode="after")
+    def chip_keys_are_unique(self) -> ChipsFileV11:
+        keys = [chip.key for chip in self.chips]
+        if len(keys) != len(set(keys)):
+            raise ValueError("chip keys must be unique")
+        return self
+
+
 class ChipsFile(AuthoringModel):
     chips: Annotated[tuple[ChipRule, ...], Field(min_length=1)]
     concurrency_limit: PositiveInt
@@ -444,6 +657,23 @@ class DeadlinesFile(AuthoringModel):
         if len(numbers) != len(set(numbers)):
             raise ValueError("deadline Gameweek numbers must be unique")
         return self
+
+
+class GameweekFinalityRules(AuthoringModel):
+    states: tuple[
+        Literal["PROVISIONAL"],
+        Literal["REVIEW_WINDOW"],
+        Literal["FINAL"],
+        Literal["CORRECTED_AFTER_FINAL"],
+    ]
+    final_time_local: LocalTime
+    timezone: Literal["Europe/London"]
+    day_offset_after_final_match: PositiveInt
+    corrections_after_final_supported: Literal[True]
+
+
+class DeadlinesFileV11(DeadlinesFile):
+    gameweek_finality: GameweekFinalityRules | UnknownRule
 
 
 class SpecialEvent(AuthoringModel):
@@ -477,6 +707,83 @@ class SourceEntry(AuthoringModel):
 class SourceManifestFile(AuthoringModel):
     sources: Annotated[tuple[SourceEntry, ...], Field(min_length=1)]
     rule_source_default: SourceId | None
+
+
+class RuleVerificationRecord(AuthoringModel):
+    rule_path: Annotated[StrictStr, Field(pattern=r"^/rules/[a-z0-9_/-]+$")]
+    verification_status: Literal[
+        VerificationStatus.VERIFIED,
+        VerificationStatus.INTERPRETATION_REQUIRED,
+        VerificationStatus.UNKNOWN,
+        VerificationStatus.CONFLICTED,
+    ]
+    source_refs: tuple[SourceId, ...]
+    source_locators: dict[SourceId, Annotated[StrictStr, Field(min_length=1)]]
+    interpretation_decision_ids: tuple[
+        Annotated[StrictStr, Field(pattern=r"^INT-[A-Z0-9-]+$")], ...
+    ] = ()
+    interpretation_note: Annotated[StrictStr, Field(min_length=1)] | None = None
+
+    @model_validator(mode="after")
+    def record_is_coherent(self) -> RuleVerificationRecord:
+        if len(self.source_refs) != len(set(self.source_refs)):
+            raise ValueError("rule verification source references must be unique")
+        if set(self.source_locators) != set(self.source_refs):
+            raise ValueError("rule source locators must match source_refs exactly")
+        if (
+            self.verification_status
+            in {
+                VerificationStatus.VERIFIED,
+                VerificationStatus.INTERPRETATION_REQUIRED,
+            }
+            and not self.source_refs
+        ):
+            raise ValueError("verified or interpreted rules require official evidence")
+        if self.verification_status is VerificationStatus.INTERPRETATION_REQUIRED:
+            if not self.interpretation_decision_ids or self.interpretation_note is None:
+                raise ValueError("interpreted rules require decisions and an interpretation note")
+        elif self.interpretation_decision_ids:
+            raise ValueError("official-source claims cannot cite interpretation decisions")
+        return self
+
+
+class RuleVerificationFile(AuthoringModel):
+    rules: Annotated[tuple[RuleVerificationRecord, ...], Field(min_length=1)]
+
+    @model_validator(mode="after")
+    def paths_are_unique(self) -> RuleVerificationFile:
+        paths = [rule.rule_path for rule in self.rules]
+        if len(paths) != len(set(paths)):
+            raise ValueError("rule verification paths must be unique")
+        return self
+
+
+class CapabilityDefinition(AuthoringModel):
+    inherits: tuple[RuleCapability, ...]
+    rule_paths: tuple[Annotated[StrictStr, Field(pattern=r"^/rules/[a-z0-9_/-]+$")], ...]
+
+
+class CapabilityDefinitions(AuthoringModel):
+    PLAYER_POINTS: CapabilityDefinition
+    GW1_INITIAL_SQUAD: CapabilityDefinition
+    TRANSFER_STATE: CapabilityDefinition
+    CHIP_STATE: CapabilityDefinition
+    FULL_SEASON: CapabilityDefinition
+
+
+class CapabilitiesFile(AuthoringModel):
+    capabilities: CapabilityDefinitions
+
+
+class InterpretationsFile(AuthoringModel):
+    decisions: tuple[InterpretationDecision, ...]
+
+    @model_validator(mode="after")
+    def decisions_are_unique(self) -> InterpretationsFile:
+        identifiers = [decision.decision_id for decision in self.decisions]
+        if len(identifiers) != len(set(identifiers)):
+            raise ValueError("interpretation decision IDs must be unique")
+        return self
 
 
 class VerifiedValueClaim(AuthoringModel):
@@ -560,6 +867,25 @@ COMPLETE_FILE_MODELS: dict[str, type[AuthoringModel]] = {
     "special_events.yaml": SpecialEventsFile,
 }
 
+V11_FILE_MODELS: dict[str, type[AuthoringModel]] = {
+    **COMPLETE_FILE_MODELS,
+    "scoring.yaml": ScoringFileV11,
+    "assists.yaml": AssistsFileV11,
+    "bonus.yaml": BonusFileV11,
+    "lineup.yaml": LineupFileV11,
+    "transfers.yaml": TransfersFileV11,
+    "prices.yaml": PricesFileV11,
+    "chips.yaml": ChipsFileV11,
+    "deadlines.yaml": DeadlinesFileV11,
+}
+
+V11_EXTENSION_MODELS: dict[str, type[AuthoringModel]] = {
+    "capabilities.yaml": CapabilitiesFile,
+    "interpretations.yaml": InterpretationsFile,
+    "rule_verification.yaml": RuleVerificationFile,
+    "target_2026_27_claims.yaml": TargetClaimsFile,
+}
+
 
 def _validated(model_type: type[BaseModel], value: object, filename: str) -> BaseModel:
     try:
@@ -635,6 +961,87 @@ def validate_and_normalize_authoring_data(
     assert isinstance(source_model, SourceManifestFile)
     sources = _source_ids(source_model)
     normalized["source_manifest.yaml"] = source_model.model_dump(mode="json", by_alias=True)
+    if manifest.schema_version == "1.1":
+        expected_extensions = set(V11_EXTENSION_MODELS)
+        if set(manifest.extension_files) != expected_extensions:
+            raise RulesValidationError(
+                "RULESET_EXTENSION_STATUS",
+                "schema 1.1 requires capability, interpretation, rule-verification, and target-claim extensions",
+            )
+        family_unknowns = {
+            filename: data[filename].get("verification_status") in {"UNKNOWN", "CONFLICTED"}
+            for filename in V11_FILE_MODELS
+        }
+        referenced_sources: set[str] = set()
+        for filename, model_type in V11_FILE_MODELS.items():
+            if family_unknowns[filename]:
+                model = _validated(UnknownRule, data[filename], filename)
+                assert isinstance(model, UnknownRule)
+                referenced_sources.update(model.source_refs)
+            else:
+                model = _validated(model_type, data[filename], filename)
+            normalized[filename] = model.model_dump(mode="json", by_alias=True)
+
+        for filename, model_type in V11_EXTENSION_MODELS.items():
+            model = _validated(model_type, data[filename], filename)
+            normalized[filename] = model.model_dump(mode="json", by_alias=True)
+        claims_model = TargetClaimsFile.model_validate(normalized["target_2026_27_claims.yaml"])
+        if (
+            claims_model.ruleset_id != manifest.ruleset_id
+            or claims_model.ruleset_version != manifest.ruleset_version
+            or claims_model.status != manifest.status.value
+        ):
+            raise RulesValidationError(
+                "RULESET_TARGET_IDENTITY",
+                "target claims identity or status does not match season manifest",
+            )
+        verification = RuleVerificationFile.model_validate(normalized["rule_verification.yaml"])
+        interpretations = InterpretationsFile.model_validate(normalized["interpretations.yaml"])
+        referenced_sources.update(_target_source_refs(claims_model))
+        for rule in verification.rules:
+            referenced_sources.update(rule.source_refs)
+        for decision in interpretations.decisions:
+            referenced_sources.update(decision.evidence_source_refs)
+        missing_sources = sorted(referenced_sources - sources)
+        if missing_sources:
+            raise RulesValidationError(
+                "RULESET_SOURCE_REFERENCE",
+                "schema 1.1 metadata contains unknown source references",
+                blockers=tuple(missing_sources),
+            )
+        if (
+            not family_unknowns["positions.yaml"]
+            and not family_unknowns["scoring.yaml"]
+            and not family_unknowns["assists.yaml"]
+        ):
+            scoring = ScoringFileV11.model_validate(normalized["scoring.yaml"])
+            assists = AssistsFileV11.model_validate(normalized["assists.yaml"])
+            if assists.points != scoring.assists.points:
+                raise RulesValidationError(
+                    "RULESET_ASSIST_POINTS_MISMATCH",
+                    "assists.yaml and scoring.yaml must define the same points value",
+                )
+        if (
+            not family_unknowns["positions.yaml"]
+            and not family_unknowns["squad.yaml"]
+            and not family_unknowns["lineup.yaml"]
+        ):
+            positions = PositionsFile.model_validate(normalized["positions.yaml"])
+            squad = SquadFile.model_validate(normalized["squad.yaml"])
+            lineup = LineupFileV11.model_validate(normalized["lineup.yaml"])
+            position_rules = tuple(
+                getattr(positions.positions, position) for position in ("GK", "DEF", "MID", "FWD")
+            )
+            if sum(rule.squad_quota for rule in position_rules) != squad.squad_size:
+                raise RulesValidationError(
+                    "RULESET_SQUAD_INVALID", "position quotas must equal squad size"
+                )
+            if lineup.starting_size + lineup.bench_size != squad.squad_size:
+                raise RulesValidationError(
+                    "RULESET_LINEUP_INVALID", "starting and bench sizes must equal squad size"
+                )
+        return normalized
+
     family_unknowns = {
         filename: data[filename].get("verification_status") in {"UNKNOWN", "CONFLICTED"}
         for filename in COMPLETE_FILE_MODELS
@@ -662,27 +1069,27 @@ def validate_and_normalize_authoring_data(
             raise RulesValidationError(
                 "RULESET_EXTENSION_STATUS", "unknown draft families require target claims"
             )
-        claims_model = _validated(
+        legacy_claims = _validated(
             TargetClaimsFile, data.get("target_2026_27_claims.yaml"), "target_2026_27_claims.yaml"
         )
-        assert isinstance(claims_model, TargetClaimsFile)
+        assert isinstance(legacy_claims, TargetClaimsFile)
         if (
-            claims_model.ruleset_id != manifest.ruleset_id
-            or claims_model.ruleset_version != manifest.ruleset_version
-            or claims_model.status != manifest.status.value
+            legacy_claims.ruleset_id != manifest.ruleset_id
+            or legacy_claims.ruleset_version != manifest.ruleset_version
+            or legacy_claims.status != manifest.status.value
         ):
             raise RulesValidationError(
                 "RULESET_TARGET_IDENTITY",
                 "target claims identity or status does not match season manifest",
             )
-        missing_sources = sorted(_target_source_refs(claims_model) - sources)
+        missing_sources = sorted(_target_source_refs(legacy_claims) - sources)
         if missing_sources:
             raise RulesValidationError(
                 "RULESET_SOURCE_REFERENCE",
                 "target claims contain unknown source references",
                 blockers=tuple(missing_sources),
             )
-        normalized["target_2026_27_claims.yaml"] = claims_model.model_dump(
+        normalized["target_2026_27_claims.yaml"] = legacy_claims.model_dump(
             mode="json", by_alias=True
         )
         return normalized

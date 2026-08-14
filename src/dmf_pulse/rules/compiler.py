@@ -13,8 +13,13 @@ from typing import Any, Final
 from pydantic import ValidationError
 
 from dmf_pulse import __version__
-from dmf_pulse.rules.authoring import validate_and_normalize_authoring_data
+from dmf_pulse.rules.authoring import (
+    RuleVerificationFile,
+    RuleVerificationRecord,
+    validate_and_normalize_authoring_data,
+)
 from dmf_pulse.rules.canonical import canonical_rules_sha256, pretty_rules_json, self_hash
+from dmf_pulse.rules.capabilities import validate_v11_governance
 from dmf_pulse.rules.errors import RulesIntegrityError, RulesValidationError
 from dmf_pulse.rules.models import (
     CompiledRuleset,
@@ -45,8 +50,19 @@ REQUIRED_FILES: Final = (
     "special_events.yaml",
     "source_manifest.yaml",
 )
-SUPPORTED_EXTENSIONS: Final = {"target_2026_27_claims.yaml"}
-NON_EXECUTABLE_FAMILIES: Final = {"source_manifest", "target_2026_27_claims"}
+SUPPORTED_EXTENSIONS: Final = {
+    "capabilities.yaml",
+    "interpretations.yaml",
+    "rule_verification.yaml",
+    "target_2026_27_claims.yaml",
+}
+NON_EXECUTABLE_FAMILIES: Final = {
+    "capabilities",
+    "interpretations",
+    "rule_verification",
+    "source_manifest",
+    "target_2026_27_claims",
+}
 RULE_TOKEN: Final = re.compile(r"[^A-Z0-9]+")
 
 
@@ -129,8 +145,23 @@ def _build_rule_provenance(rules: dict[str, Any]) -> dict[str, RuleProvenance]:
         sources[source.source_id] = source
     default_source = raw_manifest.get("rule_source_default")
     default_refs = (default_source,) if isinstance(default_source, str) else ()
+    verification = (
+        RuleVerificationFile.model_validate(rules["rule_verification"])
+        if "rule_verification" in rules
+        else None
+    )
     provenance: dict[str, RuleProvenance] = {}
     seen_ids: set[str] = set()
+
+    def record_for(pointer: str) -> RuleVerificationRecord | None:
+        if verification is None:
+            return None
+        matches = [
+            record
+            for record in verification.rules
+            if pointer == record.rule_path or pointer.startswith(record.rule_path + "/")
+        ]
+        return max(matches, key=lambda record: len(record.rule_path), default=None)
 
     def visit(value: object, tokens: tuple[str, ...], inherited_refs: tuple[str, ...]) -> None:
         if isinstance(value, dict):
@@ -154,6 +185,10 @@ def _build_rule_provenance(rules: dict[str, Any]) -> dict[str, RuleProvenance]:
             for index, item in enumerate(value):
                 visit(item, (*tokens, str(index)), inherited_refs)
             return
+        pointer = _json_pointer(tokens)
+        record = record_for(pointer)
+        if record is not None:
+            inherited_refs = record.source_refs
         if not inherited_refs:
             raise RulesValidationError(
                 "RULESET_SOURCE_REFERENCE",
@@ -166,17 +201,22 @@ def _build_rule_provenance(rules: dict[str, Any]) -> dict[str, RuleProvenance]:
                 "rule provenance references unknown sources",
                 blockers=missing,
             )
-        pointer = _json_pointer(tokens)
         identifier = _rule_id(pointer, tokens)
         if identifier in seen_ids:
             raise RulesValidationError(
                 "RULESET_RULE_ID_COLLISION", "rule provenance identifiers collide"
             )
         seen_ids.add(identifier)
+        resolved_sources = []
+        for ref in inherited_refs:
+            source = sources[ref]
+            if record is not None:
+                source = source.model_copy(update={"locator": record.source_locators[ref]})
+            resolved_sources.append(source)
         provenance[pointer] = RuleProvenance(
             rule_id=identifier,
             source_refs=inherited_refs,
-            sources=tuple(sources[ref] for ref in inherited_refs),
+            sources=tuple(resolved_sources),
         )
 
     for family in sorted(rules):
@@ -335,7 +375,8 @@ def _load_source(
             value, raw_sha256 = _read_source(root / filename)
         data[filename] = value
         raw_hashes[filename] = raw_sha256
-        blockers.extend(_unknown_blockers(value, filename))
+        if filename != "rule_verification.yaml":
+            blockers.extend(_unknown_blockers(value, filename))
     blockers.extend(_declarative_execution_blockers(data))
     if manifest.extension_files:
         claims = data.get("target_2026_27_claims.yaml")
@@ -368,6 +409,11 @@ def _load_source(
         _validate_complete_rule_shapes(data)
     normalized_blockers = tuple(sorted(set(blockers)))
     data = validate_and_normalize_authoring_data(manifest, data, normalized_blockers)
+    if manifest.schema_version == "1.1":
+        normalized_rules = {
+            Path(name).stem: value for name, value in data.items() if name != "season_manifest.yaml"
+        }
+        validate_v11_governance(normalized_rules, manifest.season_code)
     try:
         semantic_hashes = {
             filename: canonical_rules_sha256(value) for filename, value in data.items()
@@ -503,6 +549,13 @@ def ensure_compiled_ruleset_integrity(compiled: CompiledRuleset) -> None:
         raise RulesIntegrityError(
             "RULESET_ARTIFACT_SCHEMA", "compiled rules fail the authoring schema"
         ) from exc
+    if compiled.schema_version == "1.1":
+        try:
+            validate_v11_governance(compiled.rules, compiled.season_code)
+        except RulesValidationError as exc:
+            raise RulesIntegrityError(
+                "RULESET_CAPABILITY_SCHEMA", "compiled capability governance is invalid"
+            ) from exc
     semantic_hashes = {
         filename: canonical_rules_sha256(normalized[filename]) for filename in expected_files
     }

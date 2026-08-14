@@ -222,7 +222,13 @@ def test_target_claim_identity_sources_and_blocker_uniqueness(repository_root: P
     assert reference.value.code == "RULESET_SOURCE_REFERENCE"
 
     data = copy.deepcopy(source)
-    data["scoring.yaml"]["source_refs"] = ["SRC-NOT-REGISTERED"]
+    scoring_record = next(
+        record
+        for record in data["rule_verification.yaml"]["rules"]
+        if record["rule_path"] == "/rules/scoring"
+    )
+    scoring_record["source_refs"] = ["SRC-NOT-REGISTERED"]
+    scoring_record["source_locators"] = {"SRC-NOT-REGISTERED": "mutant"}
     with pytest.raises(RulesValidationError) as draft_reference:
         validate_and_normalize_authoring_data(manifest, data, blockers)
     assert draft_reference.value.code == "RULESET_SOURCE_REFERENCE"
