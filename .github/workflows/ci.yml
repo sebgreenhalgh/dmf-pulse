@@ -53,6 +53,12 @@ jobs:
       - name: Frozen dependency sync
         run: uv sync --all-groups --frozen
 
+      - name: Validate GCS-008 frozen scope
+        if: >-
+          github.ref_name == 'stage/A8/GCS-008-goal-clean-sheet-distributions' ||
+          github.head_ref == 'stage/A8/GCS-008-goal-clean-sheet-distributions'
+        run: uv run python scripts/validate_gcs008_scope.py
+
       - name: Formatting
         run: uv run ruff format --check .
 
@@ -62,9 +68,9 @@ jobs:
       - name: Strict typing
         run: uv run mypy src/dmf_pulse
 
-      - name: PostgreSQL ODD-005 migration matrix and inherited vertical slice
+      - name: PostgreSQL inherited Stage-7 migration matrix and vertical slice
         run: |
-          uv run python scripts/test_migration_matrix.py --baseline-revision 20260724_0002 --target head
+          uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head
           uv run pytest -m "postgres and integration" tests/integration
           uv run alembic upgrade head --sql > "${{ runner.temp }}/dat003-offline-upgrade.sql"
           uv run dmf data-model doctor --json
@@ -76,6 +82,8 @@ jobs:
         run: |
           uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/ODD-005/coverage.json
           uv run python scripts/check_odd005_coverage_gates.py evidence/tickets/ODD-005/coverage.json
+          cp evidence/tickets/ODD-005/coverage.json evidence/tickets/GCS-008/coverage.json
+          uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/GCS-008/coverage.json
 
       - name: FPL regression and ODD-005 synthetic vertical slice
         run: |
@@ -85,6 +93,13 @@ jobs:
           uv run dmf ingest odds replay --fixture-set fixtures/odds/ODD-005 --scenario happy_path --information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_the_odds_api_v1 --output json
           uv run dmf market observations --fixture-external-provider official_fpl --fixture-external-id 101 --season-code 2026/27 --as-of 2026-08-20T12:05:00Z --output json
           uv run python -c "import json; from typer.testing import CliRunner; from dmf_pulse.cli.app import app; r=CliRunner().invoke(app,['ingest','odds','snapshot','--provider','the_odds_api','--competition-key','PL','--sport-key','soccer_epl','--region','uk','--market','h2h','--as-of','2026-08-20T12:05:00Z','--output','json']); value=json.loads(r.stdout); assert r.exit_code == 4 and value['error']['code'] == 'CREDENTIAL_UNAVAILABLE' and value['error']['transport_called'] is False"
+
+      - name: GCS-008 score-distribution vertical slice
+        run: |
+          uv run pytest tests/unit/football_events tests/unit/scripts/test_gcs008_acceptance.py tests/unit/scripts/test_gcs008_coverage_gate.py tests/unit/scripts/test_gcs008_scope.py tests/unit/scripts/test_gcs008_wheel.py tests/property/football_events tests/contract/football_events tests/golden/football_events tests/integration/football_events
+          uv run dmf events score-distribution --fixture fixtures/events/score/GCS-008/balanced_fixture.json --artifact-root artifacts/gcs008-ci --output json
+          uv run dmf events explain-market-fit --fixture fixtures/events/score/GCS-008/inconsistent_markets.json --output json
+          uv run python scripts/validate_gcs008_acceptance.py
 
       - name: Rules source and golden vertical slice
         run: |
@@ -96,8 +111,10 @@ jobs:
       - name: Build distributions
         run: uv build
 
-      - name: Verify installed wheel outside source tree
-        run: uv run python scripts/verify_odd005_wheel.py
+      - name: Verify installed wheels outside source tree
+        run: |
+          uv run python scripts/verify_odd005_wheel.py
+          uv run python scripts/verify_gcs008_wheel.py
 
       - name: Verify ODD-005 acceptance evidence
         env:

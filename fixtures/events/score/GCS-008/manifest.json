@@ -1,0 +1,62 @@
+{
+  "fixture_family_id": "GCS-008",
+  "fixtures": [
+    {
+      "file": "balanced_fixture.expected.json",
+      "rights_classification": "INTERNAL_SYNTHETIC",
+      "sha256": "05adff7a3f0e8b2b001b7824db52d8e12427dd05e7263cccea22e08a347196af",
+      "source_mode": "SYNTHETIC"
+    },
+    {
+      "file": "balanced_fixture.json",
+      "rights_classification": "INTERNAL_SYNTHETIC",
+      "sha256": "fbc906467c61842575cd9625cd68453c7da9133fe025d6797b0a6266a86a72b0",
+      "source_mode": "SYNTHETIC"
+    },
+    {
+      "file": "high_total.json",
+      "rights_classification": "INTERNAL_SYNTHETIC",
+      "sha256": "13b248c00f164dcac7668f3cd8f915b68cad3323751c9b53d42e5e94bb063748",
+      "source_mode": "SYNTHETIC"
+    },
+    {
+      "file": "inconsistent_markets.json",
+      "rights_classification": "INTERNAL_SYNTHETIC",
+      "sha256": "4d0251a23fa705eeaf56ff93c7d8c52636449e577d730ab061f48a7141e40c28",
+      "source_mode": "SYNTHETIC"
+    },
+    {
+      "file": "low_total.json",
+      "rights_classification": "INTERNAL_SYNTHETIC",
+      "sha256": "7a2875f535df809d67d4307dcc05dc1ee2daed70056e9a35252c1dd7e1ecc827",
+      "source_mode": "SYNTHETIC"
+    },
+    {
+      "file": "market_missing.json",
+      "rights_classification": "INTERNAL_SYNTHETIC",
+      "sha256": "79bca870ba0fc7f1e6a76963f7e5898ecfb094f0945393d74a5b21002cb12c09",
+      "source_mode": "SYNTHETIC"
+    },
+    {
+      "file": "postponed_fixture.json",
+      "rights_classification": "INTERNAL_SYNTHETIC",
+      "sha256": "012e9d70d122ece0677548d7af2808e9a3cf6865d2223a223a0c84b13efe52a4",
+      "source_mode": "SYNTHETIC"
+    },
+    {
+      "file": "stage6_consensus_fixture.json",
+      "rights_classification": "INTERNAL_SYNTHETIC",
+      "sha256": "f3b1860cac6e731f2d232c9b09e0a4a4ed6f7370f9d96e34da3a4cab4dc0130b",
+      "source_mode": "SYNTHETIC"
+    },
+    {
+      "file": "strong_home_favourite.json",
+      "rights_classification": "INTERNAL_SYNTHETIC",
+      "sha256": "61a78c3780dccfe298aae26fd59ccc60cae65648755e920f1c0f2ea553921533",
+      "source_mode": "SYNTHETIC"
+    }
+  ],
+  "generated_at": "2026-08-13T00:00:00Z",
+  "purpose": "Goal and clean-sheet score-distribution baseline, adversarial and replay cases.",
+  "schema_version": "fixture-manifest-v1"
+}

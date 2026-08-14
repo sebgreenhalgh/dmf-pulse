@@ -1,0 +1,1050 @@
+{
+  "$defs": {
+    "ConsensusOutcome": {
+      "additionalProperties": false,
+      "properties": {
+        "consensus_probability": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Consensus Probability"
+        },
+        "lower_bound": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Lower Bound"
+        },
+        "outcome": {
+          "$ref": "#/$defs/MarketOutcome"
+        },
+        "upper_bound": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Upper Bound"
+        }
+      },
+      "required": [
+        "outcome",
+        "consensus_probability",
+        "lower_bound",
+        "upper_bound"
+      ],
+      "title": "ConsensusOutcome",
+      "type": "object"
+    },
+    "ExcludedBook": {
+      "additionalProperties": false,
+      "properties": {
+        "operator_key": {
+          "minLength": 1,
+          "title": "Operator Key",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/ExclusionReason"
+        }
+      },
+      "required": [
+        "operator_key",
+        "reason"
+      ],
+      "title": "ExcludedBook",
+      "type": "object"
+    },
+    "ExclusionReason": {
+      "enum": [
+        "INCOMPLETE",
+        "STALE",
+        "UNSUPPORTED",
+        "SUSPENDED",
+        "UNAVAILABLE",
+        "RIGHTS_BLOCKED",
+        "QUALITY_BLOCKED",
+        "MAPPING_UNAVAILABLE",
+        "FUTURE_OBSERVATION",
+        "DUPLICATE_OPERATOR"
+      ],
+      "title": "ExclusionReason",
+      "type": "string"
+    },
+    "MarketConsensus": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "confidence_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "title": "Confidence Grade",
+          "type": "string"
+        },
+        "eligible_operator_count": {
+          "minimum": 1,
+          "title": "Eligible Operator Count",
+          "type": "integer"
+        },
+        "fixture_id": {
+          "format": "uuid",
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "freshness": {
+          "$ref": "#/$defs/MarketFreshness"
+        },
+        "input_signature_sha256": {
+          "title": "Input Signature Sha256",
+          "type": "string"
+        },
+        "mapping_cutoff": {
+          "format": "date-time",
+          "title": "Mapping Cutoff",
+          "type": "string"
+        },
+        "market_definition": {
+          "const": "FULL_TIME_1X2",
+          "title": "Market Definition",
+          "type": "string"
+        },
+        "market_disagreement": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Market Disagreement"
+        },
+        "method_disagreement": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Method Disagreement"
+        },
+        "operator_count": {
+          "minimum": 1,
+          "title": "Operator Count",
+          "type": "integer"
+        },
+        "operator_disagreement": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Operator Disagreement"
+        },
+        "operator_markets": {
+          "items": {
+            "$ref": "#/$defs/NormalisedOperatorMarket"
+          },
+          "minItems": 1,
+          "title": "Operator Markets",
+          "type": "array"
+        },
+        "outcomes": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "$ref": "#/$defs/ConsensusOutcome"
+            },
+            {
+              "$ref": "#/$defs/ConsensusOutcome"
+            },
+            {
+              "$ref": "#/$defs/ConsensusOutcome"
+            }
+          ],
+          "title": "Outcomes",
+          "type": "array"
+        },
+        "policy_id": {
+          "const": "market-normalisation-v1",
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "policy_sha256": {
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "provider_count": {
+          "minimum": 1,
+          "title": "Provider Count",
+          "type": "integer"
+        },
+        "result_sha256": {
+          "title": "Result Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fixture_id",
+        "as_of",
+        "mapping_cutoff",
+        "market_definition",
+        "provider_count",
+        "operator_count",
+        "eligible_operator_count",
+        "operator_markets",
+        "outcomes",
+        "operator_disagreement",
+        "method_disagreement",
+        "market_disagreement",
+        "freshness",
+        "confidence_grade",
+        "policy_id",
+        "policy_sha256",
+        "input_signature_sha256",
+        "result_sha256"
+      ],
+      "title": "MarketConsensus",
+      "type": "object"
+    },
+    "MarketConstraint": {
+      "additionalProperties": false,
+      "description": "One soft score-matrix event target with explicit uncertainty.",
+      "properties": {
+        "away_goals": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Away Goals"
+        },
+        "confidence_grade": {
+          "default": "D",
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "title": "Confidence Grade",
+          "type": "string"
+        },
+        "constraint_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Constraint Id",
+          "type": "string"
+        },
+        "event": {
+          "$ref": "#/$defs/ScoreEvent"
+        },
+        "family": {
+          "$ref": "#/$defs/MarketFamily"
+        },
+        "home_goals": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Home Goals"
+        },
+        "line": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Line"
+        },
+        "market_disagreement": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Market Disagreement"
+        },
+        "maximum_age_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Age Seconds"
+        },
+        "operator_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Operator Count",
+          "type": "integer"
+        },
+        "period": {
+          "const": "FULL_TIME",
+          "default": "FULL_TIME",
+          "title": "Period",
+          "type": "string"
+        },
+        "provider_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Provider Count",
+          "type": "integer"
+        },
+        "settlement_profile": {
+          "const": "FULL_TIME_90",
+          "default": "FULL_TIME_90",
+          "title": "Settlement Profile",
+          "type": "string"
+        },
+        "source_result_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Result Sha256"
+        },
+        "target_probability": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Target Probability"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Uncertainty"
+        },
+        "usable_at": {
+          "format": "date-time",
+          "title": "Usable At",
+          "type": "string"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "default": "1",
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "constraint_id",
+        "family",
+        "event",
+        "target_probability",
+        "uncertainty",
+        "usable_at"
+      ],
+      "title": "MarketConstraint",
+      "type": "object"
+    },
+    "MarketFamily": {
+      "enum": [
+        "1X2",
+        "TOTALS",
+        "TEAM_TOTAL",
+        "CLEAN_SHEET",
+        "BTTS",
+        "CORRECT_SCORE"
+      ],
+      "title": "MarketFamily",
+      "type": "string"
+    },
+    "MarketFreshness": {
+      "additionalProperties": false,
+      "properties": {
+        "maximum_age_seconds": {
+          "minimum": 0,
+          "title": "Maximum Age Seconds",
+          "type": "integer"
+        },
+        "minimum_age_seconds": {
+          "minimum": 0,
+          "title": "Minimum Age Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "minimum_age_seconds",
+        "maximum_age_seconds"
+      ],
+      "title": "MarketFreshness",
+      "type": "object"
+    },
+    "MarketNormalisationResult": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "consensus": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MarketConsensus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Code"
+        },
+        "excluded_books": {
+          "items": {
+            "$ref": "#/$defs/ExcludedBook"
+          },
+          "title": "Excluded Books",
+          "type": "array"
+        },
+        "fixture_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fixture Id"
+        },
+        "status": {
+          "$ref": "#/$defs/NormalisationStatus"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "status",
+        "fixture_id",
+        "as_of",
+        "consensus",
+        "excluded_books",
+        "warnings",
+        "error_code"
+      ],
+      "title": "MarketNormalisationResult",
+      "type": "object"
+    },
+    "MarketOutcome": {
+      "enum": [
+        "HOME",
+        "DRAW",
+        "AWAY"
+      ],
+      "title": "MarketOutcome",
+      "type": "string"
+    },
+    "NormalisationMethod": {
+      "enum": [
+        "POWER",
+        "PROPORTIONAL"
+      ],
+      "title": "NormalisationMethod",
+      "type": "string"
+    },
+    "NormalisationStatus": {
+      "enum": [
+        "NORMALISED",
+        "DEGRADED",
+        "INSUFFICIENT",
+        "BLOCKED"
+      ],
+      "title": "NormalisationStatus",
+      "type": "string"
+    },
+    "NormalisedOperatorMarket": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "fallback_used": {
+          "title": "Fallback Used",
+          "type": "boolean"
+        },
+        "fixture_id": {
+          "format": "uuid",
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "input_signature_sha256": {
+          "title": "Input Signature Sha256",
+          "type": "string"
+        },
+        "market_id": {
+          "format": "uuid",
+          "title": "Market Id",
+          "type": "string"
+        },
+        "market_state": {
+          "const": "COMPLETE",
+          "title": "Market State",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "operator_id": {
+          "format": "uuid",
+          "title": "Operator Id",
+          "type": "string"
+        },
+        "operator_key": {
+          "minLength": 1,
+          "title": "Operator Key",
+          "type": "string"
+        },
+        "outcomes": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "$ref": "#/$defs/NormalisedOutcome"
+            },
+            {
+              "$ref": "#/$defs/NormalisedOutcome"
+            },
+            {
+              "$ref": "#/$defs/NormalisedOutcome"
+            }
+          ],
+          "title": "Outcomes",
+          "type": "array"
+        },
+        "overround": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Overround"
+        },
+        "policy_id": {
+          "const": "market-normalisation-v1",
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "policy_sha256": {
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "power_exponent": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Power Exponent"
+        },
+        "primary_method": {
+          "$ref": "#/$defs/NormalisationMethod"
+        },
+        "provider_id": {
+          "format": "uuid",
+          "title": "Provider Id",
+          "type": "string"
+        },
+        "raw_booksum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Raw Booksum"
+        },
+        "result_sha256": {
+          "title": "Result Sha256",
+          "type": "string"
+        },
+        "source_observation_ids": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Source Observation Ids",
+          "type": "array"
+        },
+        "usable_at": {
+          "format": "date-time",
+          "title": "Usable At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fixture_id",
+        "market_id",
+        "provider_id",
+        "operator_id",
+        "operator_key",
+        "as_of",
+        "observed_at",
+        "usable_at",
+        "market_state",
+        "primary_method",
+        "fallback_used",
+        "raw_booksum",
+        "overround",
+        "power_exponent",
+        "outcomes",
+        "policy_id",
+        "policy_sha256",
+        "input_signature_sha256",
+        "result_sha256",
+        "source_observation_ids"
+      ],
+      "title": "NormalisedOperatorMarket",
+      "type": "object"
+    },
+    "NormalisedOutcome": {
+      "additionalProperties": false,
+      "properties": {
+        "decimal_odds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Decimal Odds"
+        },
+        "market_probability": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Market Probability"
+        },
+        "outcome": {
+          "$ref": "#/$defs/MarketOutcome"
+        },
+        "proportional_probability": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Proportional Probability"
+        },
+        "raw_implied_probability": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Raw Implied Probability"
+        }
+      },
+      "required": [
+        "outcome",
+        "decimal_odds",
+        "raw_implied_probability",
+        "proportional_probability",
+        "market_probability"
+      ],
+      "title": "NormalisedOutcome",
+      "type": "object"
+    },
+    "ScoreEvent": {
+      "enum": [
+        "HOME_WIN",
+        "DRAW",
+        "AWAY_WIN",
+        "TOTAL_OVER",
+        "TOTAL_UNDER",
+        "HOME_TEAM_TOTAL_OVER",
+        "HOME_TEAM_TOTAL_UNDER",
+        "AWAY_TEAM_TOTAL_OVER",
+        "AWAY_TEAM_TOTAL_UNDER",
+        "HOME_CLEAN_SHEET",
+        "AWAY_CLEAN_SHEET",
+        "BTTS_YES",
+        "BTTS_NO",
+        "EXACT_SCORE"
+      ],
+      "title": "ScoreEvent",
+      "type": "string"
+    },
+    "ScorePriorRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "away_goal_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Away Goal Rate"
+        },
+        "home_goal_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Home Goal Rate"
+        },
+        "model_family": {
+          "const": "INDEPENDENT_POISSON_V1",
+          "default": "INDEPENDENT_POISSON_V1",
+          "title": "Model Family",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home_goal_rate",
+        "away_goal_rate"
+      ],
+      "title": "ScorePriorRequest",
+      "type": "object"
+    },
+    "Stage7MinutesContext": {
+      "additionalProperties": false,
+      "description": "Home/away Stage-7 identities consumed by one Stage-8 fixture forecast.",
+      "properties": {
+        "away": {
+          "$ref": "#/$defs/TeamMinutesProjectionIdentity"
+        },
+        "home": {
+          "$ref": "#/$defs/TeamMinutesProjectionIdentity"
+        },
+        "schema_version": {
+          "const": "stage7-minutes-context-v1",
+          "default": "stage7-minutes-context-v1",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home",
+        "away"
+      ],
+      "title": "Stage7MinutesContext",
+      "type": "object"
+    },
+    "TeamMinutesProjectionIdentity": {
+      "additionalProperties": false,
+      "description": "Immutable identity projection of an accepted Stage-7 team output.\n\nStage 8 deliberately does not copy or reinterpret Stage-7 player mathematics. The\nupstream projection remains authoritative; this compact contract binds the score\nprior to its fixture, team, cutoff, model and semantic result identities.",
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "dataset_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dataset Sha256",
+          "type": "string"
+        },
+        "fixture_id": {
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "model_artifact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Model Artifact Sha256",
+          "type": "string"
+        },
+        "model_family": {
+          "const": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+          "title": "Model Family",
+          "type": "string"
+        },
+        "result_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Result Sha256",
+          "type": "string"
+        },
+        "sample_count": {
+          "const": 256,
+          "title": "Sample Count",
+          "type": "integer"
+        },
+        "scenario_set_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scenario Set Sha256",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "team-minutes-projection-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "team_id": {
+          "title": "Team Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "fixture_id",
+        "team_id",
+        "as_of",
+        "model_family",
+        "dataset_sha256",
+        "model_artifact_sha256",
+        "sample_count",
+        "scenario_set_sha256",
+        "result_sha256"
+      ],
+      "title": "TeamMinutesProjectionIdentity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "away_team_id": {
+      "format": "uuid",
+      "title": "Away Team Id",
+      "type": "string"
+    },
+    "constraints": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/MarketConstraint"
+      },
+      "title": "Constraints",
+      "type": "array"
+    },
+    "fixture_id": {
+      "format": "uuid",
+      "title": "Fixture Id",
+      "type": "string"
+    },
+    "fixture_status": {
+      "default": "SCHEDULED",
+      "enum": [
+        "SCHEDULED",
+        "POSTPONED",
+        "CANCELLED",
+        "ABANDONED"
+      ],
+      "title": "Fixture Status",
+      "type": "string"
+    },
+    "home_team_id": {
+      "format": "uuid",
+      "title": "Home Team Id",
+      "type": "string"
+    },
+    "market_consensus": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MarketConsensus"
+        },
+        {
+          "$ref": "#/$defs/MarketNormalisationResult"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Market Consensus"
+    },
+    "minutes_context": {
+      "$ref": "#/$defs/Stage7MinutesContext"
+    },
+    "prior": {
+      "$ref": "#/$defs/ScorePriorRequest"
+    },
+    "schema_version": {
+      "const": "score-distribution-request-v1",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "fixture_id",
+    "home_team_id",
+    "away_team_id",
+    "as_of",
+    "minutes_context",
+    "prior"
+  ],
+  "title": "ScoreDistributionRequest",
+  "type": "object"
+}

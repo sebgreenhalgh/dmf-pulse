@@ -460,3 +460,40 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Scoped immediate validation to `trg_min007f_final_output_complete`, restoring it to deferred.
 - [x] Added unit guard and one-outer-transaction A/B publication regression.
 - [x] Ran all 22 acceptance commands; generated evidence and review archive.
+
+## GCS-008 - goal and clean-sheet distributions
+
+- Ticket/stage: `GCS-008`, A8; required parent `a5a0b66afd6e9645f971976d723e238824bee6a8`.
+- Scope: one fixture's market-constrained joint team-score matrix and the coherent
+  goal, outcome, total, BTTS and clean-sheet distributions derived from it.
+- Constraints: preserve accepted Stage-7 mathematics, identities, persistence,
+  replay resources, migrations, CLI and assurance; no live provider/network use,
+  no player event allocation and no new dependency or Alembic revision.
+
+### GCS-008 checkpoints
+
+- [x] Reconciled DMFP-08 Stage-8 mathematics with the accepted repository and
+  Stage-6/Stage-7 public contracts.
+- [x] Implemented exact-Decimal independent-Poisson priors, adaptive support,
+  deterministic soft-KL market projection, diagnostics and typed fallback.
+- [x] Added strict Stage-7 identity/cutoff lineage, public schemas, immutable
+  replay artifacts, CLI commands and realized-score evaluation.
+- [x] Added unit, property, contract, golden, integration, adversarial, scope,
+  coverage and installed-wheel assurance assets.
+- [ ] Run every literal acceptance command from a complete clean checkout, bind
+  evidence to measured exits and CI identities, and obtain independent/human
+  acceptance before merge.
+
+### GCS-008 decision log
+
+- The canonical public object is one finite joint score matrix; all published
+  marginals and market views are independently revalidated against that matrix.
+- Stage 7 is consumed only as immutable home/away projection provenance and one
+  cutoff. Stage 8 does not copy, refit or alter player-minutes probabilities.
+- The production baseline uses uncertainty-weighted soft KL projection with
+  market-family caps. Inconsistent markets remain visible as residuals instead
+  of being silently repaired.
+- Adaptive support must satisfy the configured tail bound; material overflow is
+  a typed failure rather than silent renormalization.
+- This vertical slice persists content-addressed JSON replay artifacts only. It
+  deliberately adds no database table or migration.

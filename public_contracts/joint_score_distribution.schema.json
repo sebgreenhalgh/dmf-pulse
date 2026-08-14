@@ -1,0 +1,641 @@
+{
+  "$defs": {
+    "BinaryProbability": {
+      "additionalProperties": false,
+      "properties": {
+        "no": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "No",
+          "type": "string"
+        },
+        "yes": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Yes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "yes",
+        "no"
+      ],
+      "title": "BinaryProbability",
+      "type": "object"
+    },
+    "CleanSheetDistribution": {
+      "additionalProperties": false,
+      "properties": {
+        "away_clean_sheet": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Away Clean Sheet",
+          "type": "string"
+        },
+        "home_clean_sheet": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Home Clean Sheet",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home_clean_sheet",
+        "away_clean_sheet"
+      ],
+      "title": "CleanSheetDistribution",
+      "type": "object"
+    },
+    "MarketResidual": {
+      "additionalProperties": false,
+      "properties": {
+        "constraint_id": {
+          "minLength": 1,
+          "title": "Constraint Id",
+          "type": "string"
+        },
+        "event": {
+          "minLength": 1,
+          "title": "Event",
+          "type": "string"
+        },
+        "family": {
+          "minLength": 1,
+          "title": "Family",
+          "type": "string"
+        },
+        "line": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Line"
+        },
+        "projected_probability": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Projected Probability",
+          "type": "string"
+        },
+        "residual": {
+          "pattern": "^-?\\d+\\.\\d{12}$",
+          "title": "Residual",
+          "type": "string"
+        },
+        "source_result_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Result Sha256"
+        },
+        "standardized_residual": {
+          "pattern": "^-?\\d+\\.\\d{6}$",
+          "title": "Standardized Residual",
+          "type": "string"
+        },
+        "target_probability": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Target Probability",
+          "type": "string"
+        },
+        "uncertainty": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Uncertainty",
+          "type": "string"
+        },
+        "weight": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Weight",
+          "type": "string"
+        }
+      },
+      "required": [
+        "constraint_id",
+        "family",
+        "event",
+        "line",
+        "target_probability",
+        "projected_probability",
+        "residual",
+        "standardized_residual",
+        "uncertainty",
+        "weight",
+        "source_result_sha256"
+      ],
+      "title": "MarketResidual",
+      "type": "object"
+    },
+    "OneXTwoDistribution": {
+      "additionalProperties": false,
+      "properties": {
+        "away_win": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Away Win",
+          "type": "string"
+        },
+        "draw": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Draw",
+          "type": "string"
+        },
+        "home_win": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Home Win",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home_win",
+        "draw",
+        "away_win"
+      ],
+      "title": "OneXTwoDistribution",
+      "type": "object"
+    },
+    "ProjectionDiagnostics": {
+      "additionalProperties": false,
+      "properties": {
+        "constraint_count": {
+          "minimum": 0,
+          "title": "Constraint Count",
+          "type": "integer"
+        },
+        "market_rmse": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Market Rmse",
+          "type": "string"
+        },
+        "maximum_absolute_market_residual": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Maximum Absolute Market Residual",
+          "type": "string"
+        },
+        "prior_to_projected_kl": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Prior To Projected Kl",
+          "type": "string"
+        },
+        "projection_status": {
+          "enum": [
+            "PROJECTED",
+            "PRIOR_ONLY",
+            "DEGRADED"
+          ],
+          "title": "Projection Status",
+          "type": "string"
+        },
+        "solver_converged": {
+          "title": "Solver Converged",
+          "type": "boolean"
+        },
+        "solver_error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Solver Error Code"
+        },
+        "solver_iterations": {
+          "minimum": 0,
+          "title": "Solver Iterations",
+          "type": "integer"
+        },
+        "tail_treatment": {
+          "const": "RENORMALISED_TRUNCATION",
+          "title": "Tail Treatment",
+          "type": "string"
+        }
+      },
+      "required": [
+        "projection_status",
+        "solver_converged",
+        "solver_iterations",
+        "solver_error_code",
+        "tail_treatment",
+        "prior_to_projected_kl",
+        "market_rmse",
+        "maximum_absolute_market_residual",
+        "constraint_count"
+      ],
+      "title": "ProjectionDiagnostics",
+      "type": "object"
+    },
+    "ScorelineProbability": {
+      "additionalProperties": false,
+      "properties": {
+        "away_goals": {
+          "minimum": 0,
+          "title": "Away Goals",
+          "type": "integer"
+        },
+        "home_goals": {
+          "minimum": 0,
+          "title": "Home Goals",
+          "type": "integer"
+        },
+        "probability": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Probability",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home_goals",
+        "away_goals",
+        "probability"
+      ],
+      "title": "ScorelineProbability",
+      "type": "object"
+    },
+    "Stage7MinutesContext": {
+      "additionalProperties": false,
+      "description": "Home/away Stage-7 identities consumed by one Stage-8 fixture forecast.",
+      "properties": {
+        "away": {
+          "$ref": "#/$defs/TeamMinutesProjectionIdentity"
+        },
+        "home": {
+          "$ref": "#/$defs/TeamMinutesProjectionIdentity"
+        },
+        "schema_version": {
+          "const": "stage7-minutes-context-v1",
+          "default": "stage7-minutes-context-v1",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home",
+        "away"
+      ],
+      "title": "Stage7MinutesContext",
+      "type": "object"
+    },
+    "TeamMinutesProjectionIdentity": {
+      "additionalProperties": false,
+      "description": "Immutable identity projection of an accepted Stage-7 team output.\n\nStage 8 deliberately does not copy or reinterpret Stage-7 player mathematics. The\nupstream projection remains authoritative; this compact contract binds the score\nprior to its fixture, team, cutoff, model and semantic result identities.",
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "dataset_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dataset Sha256",
+          "type": "string"
+        },
+        "fixture_id": {
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "model_artifact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Model Artifact Sha256",
+          "type": "string"
+        },
+        "model_family": {
+          "const": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+          "title": "Model Family",
+          "type": "string"
+        },
+        "result_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Result Sha256",
+          "type": "string"
+        },
+        "sample_count": {
+          "const": 256,
+          "title": "Sample Count",
+          "type": "integer"
+        },
+        "scenario_set_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scenario Set Sha256",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "team-minutes-projection-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "team_id": {
+          "title": "Team Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "fixture_id",
+        "team_id",
+        "as_of",
+        "model_family",
+        "dataset_sha256",
+        "model_artifact_sha256",
+        "sample_count",
+        "scenario_set_sha256",
+        "result_sha256"
+      ],
+      "title": "TeamMinutesProjectionIdentity",
+      "type": "object"
+    },
+    "TotalGoalsProbability": {
+      "additionalProperties": false,
+      "properties": {
+        "line": {
+          "pattern": "^\\d+\\.5$",
+          "title": "Line",
+          "type": "string"
+        },
+        "over": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Over",
+          "type": "string"
+        },
+        "under": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Under",
+          "type": "string"
+        }
+      },
+      "required": [
+        "line",
+        "under",
+        "over"
+      ],
+      "title": "TotalGoalsProbability",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Canonical Stage-8 public output; all probabilities are exact strings.",
+  "properties": {
+    "as_of": {
+      "title": "As Of",
+      "type": "string"
+    },
+    "away_goal_pmf": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Away Goal Pmf",
+      "type": "array"
+    },
+    "away_goals_conceded_pmf": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Away Goals Conceded Pmf",
+      "type": "array"
+    },
+    "away_max": {
+      "minimum": 0,
+      "title": "Away Max",
+      "type": "integer"
+    },
+    "away_team_id": {
+      "title": "Away Team Id",
+      "type": "string"
+    },
+    "both_teams_to_score": {
+      "$ref": "#/$defs/BinaryProbability"
+    },
+    "clean_sheets": {
+      "$ref": "#/$defs/CleanSheetDistribution"
+    },
+    "confidence_grade": {
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "title": "Confidence Grade",
+      "type": "string"
+    },
+    "confidence_reasons": {
+      "items": {
+        "enum": [
+          "BASELINE_MODEL_CAP_B",
+          "MARKET_CONSTRAINED",
+          "NO_MARKET_CONSTRAINTS",
+          "MARKET_RESIDUAL_HIGH",
+          "LOW_MARKET_CONFIDENCE",
+          "NUMERICAL_FALLBACK_TO_PRIOR",
+          "TAIL_RENORMALISED",
+          "STAGE7_MINUTES_CONTEXT_BOUND"
+        ],
+        "type": "string"
+      },
+      "title": "Confidence Reasons",
+      "type": "array"
+    },
+    "diagnostics": {
+      "$ref": "#/$defs/ProjectionDiagnostics"
+    },
+    "expected_away_goals": {
+      "pattern": "^\\d+\\.\\d{6}$",
+      "title": "Expected Away Goals",
+      "type": "string"
+    },
+    "expected_home_goals": {
+      "pattern": "^\\d+\\.\\d{6}$",
+      "title": "Expected Home Goals",
+      "type": "string"
+    },
+    "fixture_id": {
+      "title": "Fixture Id",
+      "type": "string"
+    },
+    "home_goal_pmf": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Home Goal Pmf",
+      "type": "array"
+    },
+    "home_goals_conceded_pmf": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Home Goals Conceded Pmf",
+      "type": "array"
+    },
+    "home_max": {
+      "minimum": 0,
+      "title": "Home Max",
+      "type": "integer"
+    },
+    "home_team_id": {
+      "title": "Home Team Id",
+      "type": "string"
+    },
+    "information_cutoff": {
+      "title": "Information Cutoff",
+      "type": "string"
+    },
+    "input_signature_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Input Signature Sha256",
+      "type": "string"
+    },
+    "market_residuals": {
+      "items": {
+        "$ref": "#/$defs/MarketResidual"
+      },
+      "title": "Market Residuals",
+      "type": "array"
+    },
+    "model_family": {
+      "const": "INDEPENDENT_POISSON_SOFT_KL_V1",
+      "title": "Model Family",
+      "type": "string"
+    },
+    "one_x_two": {
+      "$ref": "#/$defs/OneXTwoDistribution"
+    },
+    "policy_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Policy Sha256",
+      "type": "string"
+    },
+    "prior_away_goal_rate": {
+      "pattern": "^\\d+\\.\\d{6}$",
+      "title": "Prior Away Goal Rate",
+      "type": "string"
+    },
+    "prior_home_goal_rate": {
+      "pattern": "^\\d+\\.\\d{6}$",
+      "title": "Prior Home Goal Rate",
+      "type": "string"
+    },
+    "prior_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Prior Sha256",
+      "type": "string"
+    },
+    "probabilities": {
+      "items": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "title": "Probabilities",
+      "type": "array"
+    },
+    "result_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Result Sha256",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "joint-score-distribution-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_away_minutes_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Away Minutes Sha256",
+      "type": "string"
+    },
+    "source_home_minutes_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Home Minutes Sha256",
+      "type": "string"
+    },
+    "source_market_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Market Sha256"
+    },
+    "source_minutes_as_of": {
+      "title": "Source Minutes As Of",
+      "type": "string"
+    },
+    "source_minutes_context": {
+      "$ref": "#/$defs/Stage7MinutesContext"
+    },
+    "source_minutes_context_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Minutes Context Sha256",
+      "type": "string"
+    },
+    "tail_mass": {
+      "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+      "title": "Tail Mass",
+      "type": "string"
+    },
+    "top_scorelines": {
+      "items": {
+        "$ref": "#/$defs/ScorelineProbability"
+      },
+      "title": "Top Scorelines",
+      "type": "array"
+    },
+    "total_goals": {
+      "items": {
+        "$ref": "#/$defs/TotalGoalsProbability"
+      },
+      "title": "Total Goals",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "fixture_id",
+    "home_team_id",
+    "away_team_id",
+    "as_of",
+    "information_cutoff",
+    "source_minutes_as_of",
+    "source_home_minutes_sha256",
+    "source_away_minutes_sha256",
+    "source_minutes_context",
+    "source_minutes_context_sha256",
+    "model_family",
+    "prior_home_goal_rate",
+    "prior_away_goal_rate",
+    "home_max",
+    "away_max",
+    "probabilities",
+    "tail_mass",
+    "home_goal_pmf",
+    "away_goal_pmf",
+    "home_goals_conceded_pmf",
+    "away_goals_conceded_pmf",
+    "expected_home_goals",
+    "expected_away_goals",
+    "one_x_two",
+    "total_goals",
+    "clean_sheets",
+    "both_teams_to_score",
+    "top_scorelines",
+    "market_residuals",
+    "diagnostics",
+    "confidence_grade",
+    "confidence_reasons",
+    "policy_sha256",
+    "prior_sha256",
+    "input_signature_sha256",
+    "result_sha256"
+  ],
+  "title": "JointScoreDistribution",
+  "type": "object"
+}

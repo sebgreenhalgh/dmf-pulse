@@ -1,0 +1,87 @@
+{
+  "schema_version": "score-distribution-request-v1",
+  "fixture_id": "10000000-0000-7000-8000-000000000804",
+  "home_team_id": "20000000-0000-7000-8000-000000000001",
+  "away_team_id": "20000000-0000-7000-8000-000000000002",
+  "as_of": "2026-08-20T12:00:00Z",
+  "fixture_status": "SCHEDULED",
+  "minutes_context": {
+    "schema_version": "stage7-minutes-context-v1",
+    "home": {
+      "schema_version": "team-minutes-projection-v1",
+      "fixture_id": "10000000-0000-7000-8000-000000000804",
+      "team_id": "20000000-0000-7000-8000-000000000001",
+      "as_of": "2026-08-20T11:50:00Z",
+      "model_family": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+      "dataset_sha256": "3c80f7ed5bfb636a6954468f539803e63cc25ff0c8a5601775e74bc29e7ae241",
+      "model_artifact_sha256": "c425b93468a3f0decf4258347a0fb53b5a2dd7c395425ce925b5949744999575",
+      "sample_count": 256,
+      "scenario_set_sha256": "9b2e3ec91bb2e9f70e7cb053aafc88a010f2a9f61a47c7c591e4d975503c7a40",
+      "result_sha256": "3aad2034c7f68b8371f8233e37dac235540140fa989e32fbeafaab31023b4c26"
+    },
+    "away": {
+      "schema_version": "team-minutes-projection-v1",
+      "fixture_id": "10000000-0000-7000-8000-000000000804",
+      "team_id": "20000000-0000-7000-8000-000000000002",
+      "as_of": "2026-08-20T11:50:00Z",
+      "model_family": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+      "dataset_sha256": "3c80f7ed5bfb636a6954468f539803e63cc25ff0c8a5601775e74bc29e7ae241",
+      "model_artifact_sha256": "c425b93468a3f0decf4258347a0fb53b5a2dd7c395425ce925b5949744999575",
+      "sample_count": 256,
+      "scenario_set_sha256": "7028737f03ba98b116adad0defcfae1db524679aa6af8b1f8a01835a543d6887",
+      "result_sha256": "92f561a2f807e17c4d476a5b0e31936f2d7fe988c73fb18f47e8a343f88943eb"
+    }
+  },
+  "prior": {
+    "away_goal_rate": "1.650000",
+    "home_goal_rate": "2.000000",
+    "model_family": "INDEPENDENT_POISSON_V1"
+  },
+  "constraints": [
+    {
+      "confidence_grade": "B",
+      "constraint_id": "1-home_win",
+      "event": "HOME_WIN",
+      "family": "1X2",
+      "operator_count": 4,
+      "target_probability": "0.490000000000",
+      "uncertainty": "0.020000000000",
+      "usable_at": "2026-08-20T11:55:00Z",
+      "weight": "1.000000000000"
+    },
+    {
+      "confidence_grade": "B",
+      "constraint_id": "2-draw",
+      "event": "DRAW",
+      "family": "1X2",
+      "operator_count": 4,
+      "target_probability": "0.230000000000",
+      "uncertainty": "0.020000000000",
+      "usable_at": "2026-08-20T11:55:00Z",
+      "weight": "1.000000000000"
+    },
+    {
+      "confidence_grade": "B",
+      "constraint_id": "3-away_win",
+      "event": "AWAY_WIN",
+      "family": "1X2",
+      "operator_count": 4,
+      "target_probability": "0.280000000000",
+      "uncertainty": "0.020000000000",
+      "usable_at": "2026-08-20T11:55:00Z",
+      "weight": "1.000000000000"
+    },
+    {
+      "confidence_grade": "B",
+      "constraint_id": "4-total_over",
+      "event": "TOTAL_OVER",
+      "family": "TOTALS",
+      "line": "2.5",
+      "operator_count": 4,
+      "target_probability": "0.720000000000",
+      "uncertainty": "0.025000000000",
+      "usable_at": "2026-08-20T11:55:00Z",
+      "weight": "1.000000000000"
+    }
+  ]
+}
