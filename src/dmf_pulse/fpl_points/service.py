@@ -110,6 +110,11 @@ def generate_fixture_scenarios(
             projection_mode=request.projection_mode,
             root_seed=fixture_seed,
             scenario_index=scenario_index,
+            assist_classifier=(
+                rules_engine.classify_generated_assist
+                if rules_engine.uses_versioned_assist_policy
+                else None
+            ),
         )
         player_scores = rules_engine.score_fixture(event_scenario)
         confidence: Literal["D", "E"] = (

@@ -275,6 +275,8 @@ class EventAllocationConfig(PointsModel):
     direct_free_kick_goal_probability: Probability
     own_goal_probability: Probability
     assistable_probability: Probability
+    # TEMP-EVT-002 legacy-model controls. Target schema-v1.1 exact scoring resolves
+    # generated facts through compiled policy and never emits either as final eligibility.
     ambiguous_assist_probability: Probability
     ambiguous_assist_eligible_probability: Probability
     extra_penalty_attempt_probability: Probability

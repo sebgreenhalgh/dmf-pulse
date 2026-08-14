@@ -11,13 +11,24 @@ future work.
 - Team totals come only from the sampled final Stage 8 score matrix.
 - Every goal is assigned exactly once to an eligible on-pitch scorer or an opponent
   own-goal player; scorer/team/mechanism and all player event vectors reconcile.
-- An assist is definite, ambiguous-eligible, or absent according to explicit model
-  inputs; a scorer never assists the same goal.
+- For schema-v1.0 compatibility, legacy TEMP-EVT-002 ambiguity controls retain their
+  historical modelling scope. For target schema-v1.1 exact PLAYER_POINTS scoring,
+  allocation samples only replayable goal-chain facts and the compiled rules classifier
+  resolves each evaluated candidate to a definite assist/no-assist result; raw model
+  ambiguity never supplies final FPL eligibility. A scorer never assists the same goal.
 - Goal time, cards, goalkeeper saves, an extra penalty path, and defensive actions are
   sampled only inside valid participation.
 - Goal/assist/player shares are transparent model inputs, not FPL rule constants.
 - The baseline is deterministic under root seed, scenario index, and named subsystem
   stream. It is not production player-prop calibration.
+
+### Non-GK save-generation limitation (nonblocking)
+
+The 2026/27 scoring and Stage-9 event contract correctly allow an outfield FPL-position
+player temporarily keeping goal to receive save points. TEMP-EVT-002 ordinary-save
+sampling still uses the participant's FPL `GK` position and therefore does not generate
+that temporary-role case. This is an explicit nonblocking generator limitation; no
+Stage-7 role/state model is introduced here merely to synthesize it.
 
 ## TEMP-PTS-001 auxiliary BPS baseline
 

@@ -18,7 +18,9 @@ from dmf_pulse.fpl_points.models import (
     ProjectionMode,
     SimulationStatus,
 )
+from dmf_pulse.fpl_points.rules_adapter import AcceptedRulesAdapter
 from dmf_pulse.fpl_points.service import FplPointsService
+from dmf_pulse.rules.compiler import compile_ruleset
 from tests.support.factories import (
     FIXTURE_A,
     FIXTURE_B,
@@ -28,6 +30,12 @@ from tests.support.factories import (
     mc_policy,
     reference_engine,
 )
+
+
+def _target_engine(repository_root: Path) -> AcceptedRulesAdapter:
+    return AcceptedRulesAdapter(
+        compile_ruleset(repository_root / "fixtures/rules/RUL-002/target_2026_27_partial")
+    )
 
 
 def test_stage7_stage8_to_fixture_points_vertical_slice() -> None:
@@ -45,6 +53,35 @@ def test_stage7_stage8_to_fixture_points_vertical_slice() -> None:
         set(scenario.players) == set(scenario.stage7_player_projection_sha256s)
         for scenario in result.scenarios
     )
+
+
+def test_target_player_points_service_routes_generated_penalties_through_rules_classifier(
+    repository_root: Path,
+) -> None:
+    engine = _target_engine(repository_root)
+    request = make_request(
+        scenario_count=16,
+        config=make_request().allocation_config.model_copy(
+            update={
+                "penalty_goal_probability": 1.0,
+                "ambiguous_assist_probability": 1.0,
+                "ambiguous_assist_eligible_probability": 0.0,
+            }
+        ),
+    ).model_copy(
+        update={
+            "expected_ruleset_id": engine.identity.ruleset_id,
+            "expected_ruleset_version": engine.identity.ruleset_version,
+            "expected_ruleset_hash": engine.identity.ruleset_hash,
+        }
+    )
+    result = FplPointsService(engine, mc_policy()).project(request)
+    assert result.status is SimulationStatus.SUCCESS
+    goals = [goal for scenario in result.scenarios for goal in scenario.event_scenario.goals]
+    assert goals
+    assert all(goal.mechanism.value == "PENALTY" for goal in goals)
+    assert all(goal.assist_context is not None for goal in goals)
+    assert all(goal.assist_classification.value != "AMBIGUOUS_ASSIST" for goal in goals)
 
 
 def test_fixture_bonus_is_ranked_jointly_across_complete_participant_universe() -> None:

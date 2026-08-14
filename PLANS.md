@@ -601,6 +601,14 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Implement versioned assist classification through the Stage-9 boundary and consistency governance.
 - [x] Recompile deterministic artifacts, run focused gates, refresh governed evidence, and prepare the review result.
 
+# RUL-002R4 Stage-9 versioned-assist allocation remediation
+
+- [x] Confirm the reviewed R3 branch identity and read the controlling rules and Stage-9 boundary contracts.
+- [x] Route generated target-v1.1 assist contexts through the compiled rules classifier for every supported goal mechanism.
+- [x] Add generator/service/adapter regressions for penalty, free-kick, own-goal, ambiguity, determinism, and reconciliation.
+- [x] Update non-GK-save limitation and PR handoff material without changing official rules data or activation state.
+- [ ] Run focused verification, preserve deterministic identities, refresh governed evidence, and prepare static rereview.
+
 # RUL-002R1 target-season schema v1.1 and capability activation
 
 - [x] Read the controlling DMFP-02 rules/model, provenance, ambiguity, schema-evolution, and activation requirements.

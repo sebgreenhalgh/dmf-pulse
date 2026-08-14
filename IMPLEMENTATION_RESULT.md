@@ -68,6 +68,39 @@ uv run pytest -q --ignore=tests/performance
 
 No network, dependency, migration, Stage-7, or Stage-8 changes were made. The remaining limitation is intentionally unresolved manager-state/full-season functionality; it does not qualify PLAYER_POINTS as global activation.
 
+# RUL-002R4 Stage-9 assist-allocation remediation
+
+The R4 implementation preserves the R3 rules artifacts and approvals while closing the
+remaining generator-path gap: `allocation.py` samples candidate/goal-mechanism facts,
+then invokes `AcceptedRulesAdapter.classify_generated_assist`, which delegates to the
+compiled `dmf_pulse.rules.assists.classify_assist` policy. Only a
+`DEFINITE_ASSIST` increments the candidate's `eligible_assists`; every evaluated
+target-v1.1 candidate records its typed context and result on `GoalEvent`.
+
+- PENALTY and DIRECT_FREE_KICK emit `DIRECT_*` / `FOUL_WON` contexts. The compiled
+  policy awards a different foul winner and rejects a self-taking candidate.
+- OPPONENT_OWN_GOAL emits `OWN_GOAL` / `FORCED_OWN_GOAL_ACTION`, preserving the
+  conceding-side own-goal player and allowing a scoring-side forcing-action assist.
+- Target-v1.1 rejects unresolved `AMBIGUOUS_ASSIST`, including no-context bypasses.
+  Legacy schema-v1.0 allocation preserves its existing compatible ambiguity path.
+- `PLAYER_POINTS` remains independently eligible; the global ruleset remains
+  `CAPTURED_UNVERIFIED`, not production eligible, and not ACTIVE. Ruleset hash,
+  capability hash, and approved interpretation hash are unchanged from R3.
+
+The ordinary TEMP-EVT-002 save generator still samples only FPL-position GKs. The
+scoring/event contract permits temporary non-GK goalkeeping, but generating that role
+requires future role-state modelling and is documented as nonblocking rather than
+misrepresented as fixed.
+
+R4 focused verification: 63 allocation/adapter/service tests, 49 rules/capability
+tests, and 109 Stage-9 affected tests passed. `ruff format --check .`, `ruff check .`,
+`mypy src/dmf_pulse`, deterministic PLAYER_POINTS recompilation, and the secret scan
+passed. No rules-data artifact changed: target hash remains
+`c9fee6287bcb12170aa2f046d486dd812cfa0404efe214344e39f5aeb739cccf`, capability
+hash remains `68898c5c9c4f2e2b14001cc1a1625a169eb9858fe20b7e31a45c359077bdec51`,
+and the approved interpretation hash remains
+`dfe10d4dabf8183c10f4a61d3bd2361bd54ee78d24c96ee9d38da42becfbaa49`.
+
 ## Status
 
 **Implementation and clean-checkout integration complete; independent review and

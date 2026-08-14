@@ -9,12 +9,14 @@ from typing import Any, Protocol, runtime_checkable
 
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import (
+    AssistClassification,
     FixtureEventScenario,
     PlayerScenarioScore,
     ProjectionMode,
     RulesetIdentity,
 )
 from dmf_pulse.rules.errors import RulesError
+from dmf_pulse.rules.models import AssistDecisionContext
 
 
 @runtime_checkable
@@ -23,6 +25,13 @@ class RulesEngine(Protocol):
     def identity(self) -> RulesetIdentity: ...
 
     def assert_mode_allowed(self, mode: ProjectionMode) -> None: ...
+
+    @property
+    def uses_versioned_assist_policy(self) -> bool: ...
+
+    def classify_generated_assist(
+        self, context: AssistDecisionContext
+    ) -> AssistClassification | None: ...
 
     def score_fixture(self, scenario: FixtureEventScenario) -> dict[str, PlayerScenarioScore]: ...
 
@@ -78,8 +87,14 @@ class AcceptedRulesAdapter:
     def identity(self) -> RulesetIdentity:
         return self._identity
 
+    @property
+    def uses_versioned_assist_policy(self) -> bool:
+        return getattr(self._compiled, "schema_version", "1.0") == "1.1"
+
     def assert_mode_allowed(self, mode: ProjectionMode) -> None:
         identity = self.identity
+        if mode is not ProjectionMode.PRODUCTION and self._player_points_eligible():
+            return
         if identity.unknown_blockers:
             raise FplPointsError(
                 "RULESET_SCORING_BLOCKED",
@@ -106,6 +121,28 @@ class AcceptedRulesAdapter:
                 "TEST/REPLAY requires a complete reference, verified, or active ruleset",
             )
 
+    def _player_points_eligible(self) -> bool:
+        """Permit scoped schema-v1.1 raw scoring without global activation."""
+
+        if getattr(self._compiled, "schema_version", "1.0") != "1.1":
+            return False
+        capabilities = importlib.import_module("dmf_pulse.rules.capabilities")
+        models = importlib.import_module("dmf_pulse.rules.models")
+        artifact = capabilities.compile_capability_artifact(
+            self._compiled, models.RuleCapability.PLAYER_POINTS
+        )
+        return bool(artifact.production_eligible)
+
+    def classify_generated_assist(
+        self, context: AssistDecisionContext
+    ) -> AssistClassification | None:
+        """Resolve a generated fact pattern only through compiled schema-v1.1 policy."""
+
+        if getattr(self._compiled, "schema_version", "1.0") != "1.1":
+            return None
+        assists = importlib.import_module("dmf_pulse.rules.assists")
+        return AssistClassification(assists.classify_assist(self._compiled, context).value)
+
     def score_fixture(self, scenario: FixtureEventScenario) -> dict[str, PlayerScenarioScore]:
         if (
             scenario.ruleset_id,
@@ -122,19 +159,28 @@ class AcceptedRulesAdapter:
         models = importlib.import_module("dmf_pulse.rules.models")
         scoring = importlib.import_module("dmf_pulse.rules.scoring")
         if getattr(self._compiled, "schema_version", "1.0") == "1.1":
-            assists = importlib.import_module("dmf_pulse.rules.assists")
             for goal in scenario.goals:
                 if goal.assist_context is None:
+                    if goal.assist_classification is AssistClassification.AMBIGUOUS_ASSIST:
+                        raise FplPointsError(
+                            "RULESET_ASSIST_AMBIGUOUS",
+                            "schema-v1.1 exact scoring rejects an unresolved assist",
+                        )
                     if goal.assister_player_id is None:
                         continue
                     raise FplPointsError(
                         "RULESET_ASSIST_CONTEXT_REQUIRED",
                         "schema-v1.1 assists require a typed goal-chain context",
                     )
-                resolved = assists.classify_assist(self._compiled, goal.assist_context)
-                expected_award = resolved.value == "DEFINITE_ASSIST"
+                resolved = self.classify_generated_assist(goal.assist_context)
+                if resolved is None or resolved is AssistClassification.AMBIGUOUS_ASSIST:
+                    raise FplPointsError(
+                        "RULESET_ASSIST_AMBIGUOUS",
+                        "schema-v1.1 exact scoring rejects an unresolved assist",
+                    )
+                expected_award = resolved is AssistClassification.DEFINITE_ASSIST
                 if (
-                    resolved.value != goal.assist_classification.value
+                    resolved is not goal.assist_classification
                     or goal.assist_awarded != expected_award
                     or (goal.assister_player_id is not None) != expected_award
                 ):

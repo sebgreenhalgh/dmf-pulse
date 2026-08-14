@@ -26,7 +26,12 @@ from dmf_pulse.fpl_points.models import (
     ScorelineCell,
 )
 from dmf_pulse.fpl_points.seed import NamedRandom, rng_for, stable_identifier
-from dmf_pulse.rules.models import AssistAction, AssistDecisionContext, AssistGoalKind
+from dmf_pulse.rules.models import (
+    AssistAction,
+    AssistDecisionContext,
+    AssistGoalKind,
+    AssistSetPieceRoute,
+)
 
 
 def validate_goal_share_simplex(
@@ -225,7 +230,7 @@ def _sample_goal_mechanism(config: EventAllocationConfig, rng: NamedRandom) -> G
     return GoalMechanism.OPEN_PLAY
 
 
-def _allocate_assist(
+def _allocate_legacy_assist(
     *,
     scorer: _Accumulator,
     candidates: tuple[_Accumulator, ...],
@@ -250,6 +255,63 @@ def _allocate_assist(
         rng,
     )
     return assister, classification, True
+
+
+def _allocate_versioned_assist(
+    *,
+    scorer: _Accumulator | None,
+    candidates: tuple[_Accumulator, ...],
+    mechanism: GoalMechanism,
+    config: EventAllocationConfig,
+    rng: NamedRandom,
+    classifier: Callable[[AssistDecisionContext], AssistClassification | None],
+) -> tuple[_Accumulator | None, AssistClassification, bool, AssistDecisionContext | None]:
+    """Sample model facts, then let the compiled rules decide exact eligibility."""
+
+    if float(rng.random()) >= config.assistable_probability:
+        return None, AssistClassification.DEFINITE_NO_ASSIST, False, None
+    eligible = tuple(candidate for candidate in candidates if candidate.profile.assist_share > 0.0)
+    if not eligible:
+        return None, AssistClassification.DEFINITE_NO_ASSIST, False, None
+    candidate = _sample_weighted(
+        eligible,
+        tuple(item.profile.assist_share for item in eligible),
+        rng,
+    )
+    goal_kind, action, route = {
+        GoalMechanism.PENALTY: (
+            AssistGoalKind.DIRECT_PENALTY,
+            AssistAction.FOUL_WON,
+            AssistSetPieceRoute.FOUL_WON,
+        ),
+        GoalMechanism.DIRECT_FREE_KICK: (
+            AssistGoalKind.DIRECT_FREE_KICK,
+            AssistAction.FOUL_WON,
+            AssistSetPieceRoute.FOUL_WON,
+        ),
+        GoalMechanism.OPPONENT_OWN_GOAL: (
+            AssistGoalKind.OWN_GOAL,
+            AssistAction.FORCED_OWN_GOAL_ACTION,
+            AssistSetPieceRoute.NONE,
+        ),
+    }.get(
+        mechanism,
+        (AssistGoalKind.OPEN_PLAY, AssistAction.PASS, AssistSetPieceRoute.NONE),
+    )
+    context = AssistDecisionContext(
+        goal_kind=goal_kind,
+        action=action,
+        set_piece_route=route,
+        candidate_is_scorer=candidate is scorer,
+    )
+    classification = classifier(context)
+    if classification is None or classification is AssistClassification.AMBIGUOUS_ASSIST:
+        raise FplPointsError(
+            "RULESET_ASSIST_AMBIGUOUS",
+            "schema-v1.1 exact scoring requires a definite compiled assist decision",
+        )
+    awarded = classification is AssistClassification.DEFINITE_ASSIST
+    return candidate if awarded else None, classification, awarded, context
 
 
 def _initialize_accumulators(
@@ -304,6 +366,7 @@ def _allocate_goals(
     root_seed: int,
     scenario_index: int,
     degradation: list[str],
+    assist_classifier: Callable[[AssistDecisionContext], AssistClassification | None] | None,
 ) -> list[GoalEvent]:
     goal_specs = [participation.home_team_id] * cell.home_goals + [
         participation.away_team_id
@@ -329,6 +392,7 @@ def _allocate_goals(
         classification = AssistClassification.DEFINITE_NO_ASSIST
         assist_awarded = False
         assist_context: AssistDecisionContext | None = None
+        scoring_candidates = _eligible(accumulators, scoring_team, minute)
         if mechanism is GoalMechanism.OPPONENT_OWN_GOAL:
             own_candidates = _eligible(accumulators, conceding_team, minute)
             eligible_own = tuple(
@@ -345,7 +409,6 @@ def _allocate_goals(
                 mechanism = GoalMechanism.OPEN_PLAY
                 degradation.append("OWN_GOAL_SHARE_FALLBACK_TO_CREDITED_SCORER")
         if mechanism is not GoalMechanism.OPPONENT_OWN_GOAL:
-            scoring_candidates = _eligible(accumulators, scoring_team, minute)
             weight = (
                 (lambda item: item.profile.penalty_taker_share)
                 if mechanism is GoalMechanism.PENALTY
@@ -373,8 +436,11 @@ def _allocate_goals(
             else:
                 scorer.goals_non_penalty += 1
             scorer.bps["shots_on_target"] += 1
-            if mechanism in {GoalMechanism.OPEN_PLAY, GoalMechanism.SET_PIECE}:
-                assister, classification, assist_awarded = _allocate_assist(
+            if assist_classifier is None and mechanism in {
+                GoalMechanism.OPEN_PLAY,
+                GoalMechanism.SET_PIECE,
+            }:
+                assister, classification, assist_awarded = _allocate_legacy_assist(
                     scorer=scorer,
                     candidates=scoring_candidates,
                     config=config,
@@ -387,6 +453,17 @@ def _allocate_goals(
                             goal_kind=AssistGoalKind.OPEN_PLAY,
                             action=AssistAction.PASS,
                         )
+        if assist_classifier is not None:
+            assister, classification, assist_awarded, assist_context = _allocate_versioned_assist(
+                scorer=scorer,
+                candidates=scoring_candidates,
+                mechanism=mechanism,
+                config=config,
+                rng=rng,
+                classifier=assist_classifier,
+            )
+            if assister is not None:
+                assister.eligible_assists += 1
         events.append(
             GoalEvent(
                 goal_id=stable_identifier("goal", root_seed, scenario_index, sequence),
@@ -573,6 +650,7 @@ def allocate_fixture_events(
     projection_mode: ProjectionMode,
     root_seed: int,
     scenario_index: int,
+    assist_classifier: Callable[[AssistDecisionContext], AssistClassification | None] | None = None,
 ) -> tuple[FixtureEventScenario, tuple[str, ...]]:
     """Allocate one coherent exact event vector conditional on score and minutes."""
 
@@ -595,6 +673,7 @@ def allocate_fixture_events(
         root_seed=root_seed,
         scenario_index=scenario_index,
         degradation=degradation,
+        assist_classifier=assist_classifier,
     )
     _mark_match_winning_goal(events, accumulators, cell, participation)
     _assign_conceded(events, accumulators)

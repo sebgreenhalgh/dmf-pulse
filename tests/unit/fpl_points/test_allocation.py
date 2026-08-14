@@ -126,7 +126,7 @@ def test_ambiguous_assist_classification_is_explicit() -> None:
     assert goal.assist_awarded is False
 
 
-def test_penalty_goal_uses_on_pitch_taker_and_no_assist() -> None:
+def test_penalty_goal_uses_an_on_pitch_taker() -> None:
     scenario, _ = _allocate(
         seed=3,
         cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
@@ -136,7 +136,6 @@ def test_penalty_goal_uses_on_pitch_taker_and_no_assist() -> None:
     goal = scenario.goals[0]
     assert goal.mechanism.value == "PENALTY"
     assert goal.scorer_player_id == H_MID
-    assert goal.assister_player_id is None
     assert next(p for p in scenario.players if p.player_id == H_MID).goals_penalty == 1
 
 
