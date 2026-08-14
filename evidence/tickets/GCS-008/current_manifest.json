@@ -111,9 +111,9 @@
       "sha256": "85d671f601021e26df2ea9d15ccdbc9892e6bfaa38145d2c88857cdad3e53caa"
     },
     {
-      "bytes": 3048,
+      "bytes": 3810,
       "path": "ASSUMPTIONS_AND_DEVIATIONS.md",
-      "sha256": "8e76134db9fb2a68f4f729dfb089c73661ac078a45e810590ab98eab4601a624"
+      "sha256": "4dec7b4194043f1dd4528b9050f79ae671e001570902045e3247b857ce2259c5"
     },
     {
       "bytes": 2837,
@@ -146,9 +146,9 @@
       "sha256": "6d75299c639a78de15efff6b8c33a057127fc97655d319ffd2c3783385460de4"
     },
     {
-      "bytes": 13815,
+      "bytes": 16084,
       "path": "IMPLEMENTATION_RESULT.md",
-      "sha256": "014e4c7f209a75213f6168eac92abd2031c2748742181a719557a98731f12e1b"
+      "sha256": "d9a76d7a17a3f12b2052520c4868773b38dd6edd1a88c2325259e5f32a4b3bfe"
     },
     {
       "bytes": 749,
@@ -161,14 +161,14 @@
       "sha256": "b55a46160208fca4d2d6ddc720a90b29a3e978a435b8101b0e7e96be05a3bc1d"
     },
     {
-      "bytes": 55762,
+      "bytes": 56424,
       "path": "PLANS.md",
-      "sha256": "8eb47e66e1211f33bdadb740cd563ff100bf8d33144e4785fae0af3727ebac16"
+      "sha256": "30eeb6f78a60554bfa86a78f68671729a6c3b48a4fe6b930c51e74d9dabbf6ff"
     },
     {
-      "bytes": 1435,
+      "bytes": 2761,
       "path": "PR_DESCRIPTION.md",
-      "sha256": "f5257316ca78b1d3c410266e744faaf3c62a4bae09810a387ac1201d3880e8bf"
+      "sha256": "61be6787023b0d4309c47cf3551c7a095a816ba0a922f62d4d2e3c2f8bb8e174"
     },
     {
       "bytes": 6265,
@@ -2196,9 +2196,9 @@
       "sha256": "85fe4a17db8f163e8dfbb7f20f6326afe570f2806f2596f92a80f82a84499e64"
     },
     {
-      "bytes": 25264,
+      "bytes": 28296,
       "path": "src/dmf_pulse/fpl_points/allocation.py",
-      "sha256": "2ebb45587a8e311be4aa974150073e42bb2bbd2a550d80cb6d0cf1620fd92929"
+      "sha256": "b065cc7ca0ed2b8fa4c93769337c13be4bc5f14fde7b43960573768fcb907bfe"
     },
     {
       "bytes": 4530,
@@ -2226,9 +2226,9 @@
       "sha256": "d813e9cd89bd416c80e827e9691e1246ddf8d4aba1c7599cbe0157e58509f4de"
     },
     {
-      "bytes": 42841,
+      "bytes": 43016,
       "path": "src/dmf_pulse/fpl_points/models.py",
-      "sha256": "ec7fe6eca28624c5f4838edee1c4228fb90d819ece71523f5c3ede0b5753e6b2"
+      "sha256": "cec32a6845562007555b06f6fa13b5a5d6cc039dfe9101ff43e4eaf3e4bef5a6"
     },
     {
       "bytes": 3833,
@@ -2251,9 +2251,9 @@
       "sha256": "14107f715769abb2d1bfc2937753c820a7d3eb02c23ae8e8a76350eaa88c0454"
     },
     {
-      "bytes": 9482,
+      "bytes": 11538,
       "path": "src/dmf_pulse/fpl_points/rules_adapter.py",
-      "sha256": "10a60043b1e7e421fbeb6951ca1a94ad7909ee43a1aa7cbfc709499e09b0533c"
+      "sha256": "241c608c8b8abc7c043653a8cef4dbe757f50bde3f74fa4a9877895a5a53c28d"
     },
     {
       "bytes": 3615,
@@ -2261,9 +2261,9 @@
       "sha256": "15c6ad93b8a3ad556c6916b2e1f3859a7fb6439e7ae750eb612b5faf46ba9fe0"
     },
     {
-      "bytes": 10085,
+      "bytes": 10274,
       "path": "src/dmf_pulse/fpl_points/service.py",
-      "sha256": "20cd469acdfd69502244cf9803d02679699180193092037f0b3ea7b5b26debdb"
+      "sha256": "4fc015ca05af2dc505c6be981c856c329142f60bcf83782ff61efb24ab3ac9e7"
     },
     {
       "bytes": 14861,
@@ -2826,9 +2826,9 @@
       "sha256": "f8bacbb5566e67dc7df370d76c76c2d76a970237597f8cfa71c77d4e7059eeda"
     },
     {
-      "bytes": 6667,
+      "bytes": 8197,
       "path": "tests/integration/fpl_points/test_fixture_pipeline.py",
-      "sha256": "b77129cddbc23d71ebf81cb282d4a43f7265c257437bae8316a9e95aa18b8677"
+      "sha256": "b41ece81f6afbaac4d8d221bdb2fc6ed4ba68e50d4930717ab7eef642c10db77"
     },
     {
       "bytes": 16410,
@@ -3346,9 +3346,9 @@
       "sha256": "b18c1ee344209525eb62309f1a3476b38e08c93822dd664b3c637b8d72efb6f0"
     },
     {
-      "bytes": 6861,
+      "bytes": 6807,
       "path": "tests/unit/fpl_points/test_allocation.py",
-      "sha256": "149bda188ba40f534fa489e8254a3fa842e01af9caa0ec6d4c315211ad189cb6"
+      "sha256": "80f838d9707ccb5359cb618d8e5fac11c4f32f63ba5c124d978aa0cb4983bc24"
     },
     {
       "bytes": 3371,
@@ -3376,9 +3376,9 @@
       "sha256": "97e3734a239178cff2a85517b0509ca893b8ca1816925dcd588b707fdf0973ac"
     },
     {
-      "bytes": 8970,
+      "bytes": 15666,
       "path": "tests/unit/fpl_points/test_versioned_assist_classification.py",
-      "sha256": "f36dccd3fd3f652b689f812db720feedb94ec1c3d5064519b273021f809fe310"
+      "sha256": "b230077c40008873ef9c862aec04a9020f0513da1e92d8bf6aade4caa4ffe814"
     },
     {
       "bytes": 16492,

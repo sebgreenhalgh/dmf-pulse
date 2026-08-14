@@ -100,6 +100,8 @@ passed. No rules-data artifact changed: target hash remains
 hash remains `68898c5c9c4f2e2b14001cc1a1625a169eb9858fe20b7e31a45c359077bdec51`,
 and the approved interpretation hash remains
 `dfe10d4dabf8183c10f4a61d3bd2361bd54ee78d24c96ee9d38da42becfbaa49`.
+The implementation commit is `acb632c`; the final evidence-commit ID is reported by
+the completion response after the commit-bound manifest refresh.
 
 ## Status
 

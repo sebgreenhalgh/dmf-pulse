@@ -607,7 +607,7 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Route generated target-v1.1 assist contexts through the compiled rules classifier for every supported goal mechanism.
 - [x] Add generator/service/adapter regressions for penalty, free-kick, own-goal, ambiguity, determinism, and reconciliation.
 - [x] Update non-GK-save limitation and PR handoff material without changing official rules data or activation state.
-- [ ] Run focused verification, preserve deterministic identities, refresh governed evidence, and prepare static rereview.
+- [x] Run focused verification, preserve deterministic identities, refresh governed evidence, and prepare static rereview.
 
 # RUL-002R1 target-season schema v1.1 and capability activation
 

@@ -7,6 +7,8 @@ RUL-002R4 remediates the remaining PLAYER_POINTS static-review P1 on branch
 `9d7c360ab6a4cc7bfc6d6f41e44be6b47512b272`. It preserves the accepted Stage-9
 integration while routing generated target-schema-v1.1 assist facts through the
 compiled 2026/27 assist policy before a player event vector receives an assist.
+The R4 implementation commit is `acb632c`; the governed evidence refresh follows as
+a separate mechanical commit.
 
 ## Material integration changes
 
