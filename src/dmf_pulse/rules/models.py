@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 
@@ -10,6 +11,10 @@ from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, Strict
 
 class RulesModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+NonNegativeInt = Annotated[StrictInt, Field(ge=0)]
+Minutes = Annotated[StrictInt, Field(ge=0, le=130)]
 
 
 class FPLPosition(StrEnum):
@@ -35,6 +40,7 @@ class VerificationStatus(StrEnum):
     UNCONFIRMED = "UNCONFIRMED"
     PROVISIONAL = "PROVISIONAL"
     VERIFIED = "VERIFIED"
+    INTERPRETATION_REQUIRED = "INTERPRETATION_REQUIRED"
     CONFLICTED = "CONFLICTED"
     SUPERSEDED = "SUPERSEDED"
 
@@ -43,6 +49,63 @@ class AssistEligibility(StrEnum):
     DEFINITE_ASSIST = "DEFINITE_ASSIST"
     DEFINITE_NO_ASSIST = "DEFINITE_NO_ASSIST"
     AMBIGUOUS_ASSIST = "AMBIGUOUS_ASSIST"
+
+
+class AssistAction(StrEnum):
+    PASS = "PASS"
+    CROSS = "CROSS"
+    INADVERTENT_TOUCH = "INADVERTENT_TOUCH"
+    SHOT = "SHOT"
+    CROSS_SHOT = "CROSS_SHOT"
+    FOUL_WON = "FOUL_WON"
+    FORCED_OWN_GOAL_ACTION = "FORCED_OWN_GOAL_ACTION"
+
+
+class AssistReceptionZone(StrEnum):
+    INSIDE_BOX = "INSIDE_BOX"
+    OUTSIDE_BOX = "OUTSIDE_BOX"
+
+
+class AssistReboundIntervention(StrEnum):
+    NONE = "NONE"
+    GOALKEEPER_SAVE = "GOALKEEPER_SAVE"
+    DEFENSIVE_BLOCK = "DEFENSIVE_BLOCK"
+    WOODWORK = "WOODWORK"
+
+
+class AssistSetPieceRoute(StrEnum):
+    NONE = "NONE"
+    FOUL_WON = "FOUL_WON"
+    HANDBALL_AFTER_PASS_TOUCH = "HANDBALL_AFTER_PASS_TOUCH"
+    HANDBALL_AFTER_SHOT = "HANDBALL_AFTER_SHOT"
+    CORNER_OR_THROW_IN = "CORNER_OR_THROW_IN"
+
+
+class AssistGoalKind(StrEnum):
+    OPEN_PLAY = "OPEN_PLAY"
+    OWN_GOAL = "OWN_GOAL"
+    DIRECT_PENALTY = "DIRECT_PENALTY"
+    DIRECT_FREE_KICK = "DIRECT_FREE_KICK"
+
+
+class AssistDecisionContext(RulesModel):
+    """Closed, replayable facts for the versioned assist classifier."""
+
+    goal_kind: AssistGoalKind
+    action: AssistAction
+    defensive_touches: NonNegativeInt = 0
+    defensive_touch_is_pass: StrictBool = False
+    scorer_reception_zone: AssistReceptionZone = AssistReceptionZone.INSIDE_BOX
+    intended_for_scorer: StrictBool = True
+    scorer_loses_and_regains_possession: StrictBool = False
+    inadvertent_touch_reaches_scorer_directly: StrictBool = True
+    rebound_intervention: AssistReboundIntervention = AssistReboundIntervention.NONE
+    defensive_touch_after_rebound: StrictBool = False
+    scorer_converts_own_rebound: StrictBool = False
+    shot_on_target_before_deflection: StrictBool = False
+    shot_on_target_after_deflection: StrictBool = False
+    set_piece_route: AssistSetPieceRoute = AssistSetPieceRoute.NONE
+    candidate_is_scorer: StrictBool = False
 
 
 class UnknownRule(RulesModel):
@@ -57,12 +120,20 @@ class UnknownRule(RulesModel):
         return self
 
 
+class RuleCapability(StrEnum):
+    PLAYER_POINTS = "PLAYER_POINTS"
+    GW1_INITIAL_SQUAD = "GW1_INITIAL_SQUAD"
+    TRANSFER_STATE = "TRANSFER_STATE"
+    CHIP_STATE = "CHIP_STATE"
+    FULL_SEASON = "FULL_SEASON"
+
+
 class SeasonManifest(RulesModel):
     ruleset_id: Annotated[
         str, Field(min_length=3, max_length=100, pattern=r"^[a-z0-9][a-z0-9.-]+$")
     ]
     ruleset_version: Annotated[str, Field(pattern=r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")]
-    schema_version: Literal["1.0"]
+    schema_version: Literal["1.0", "1.1"]
     season_code: Annotated[StrictStr, Field(pattern=r"^\d{4}/\d{4}$")]
     status: RulesetStatus
     production_eligible: StrictBool
@@ -131,7 +202,7 @@ class RuleProvenance(RulesModel):
 
 class CompiledRuleset(RulesModel):
     compiler_version: str
-    schema_version: Literal["1.0"]
+    schema_version: Literal["1.0", "1.1"]
     ruleset_id: str
     ruleset_version: str
     season_code: str
@@ -165,10 +236,6 @@ class RulesetDiff(RulesModel):
     changes: tuple[RuleChange, ...]
 
 
-NonNegativeInt = Annotated[StrictInt, Field(ge=0)]
-Minutes = Annotated[StrictInt, Field(ge=0, le=130)]
-
-
 class DefensiveActions(RulesModel):
     ball_recoveries: NonNegativeInt
     blocks: NonNegativeInt
@@ -179,6 +246,7 @@ class DefensiveActions(RulesModel):
 
 class BpsEvents(RulesModel):
     big_chances_created: NonNegativeInt
+    big_chance_saves: NonNegativeInt = 0
     big_chances_missed: NonNegativeInt
     errors_leading_attempt: NonNegativeInt
     errors_leading_goal: NonNegativeInt
@@ -260,6 +328,22 @@ class PlayerScenario(RulesModel):
         return self
 
 
+def validate_v11_save_contract(player: PlayerScenario) -> None:
+    """Validate 2026/27 additive save facts without changing v1.0 parsing."""
+
+    located_saves = player.bps.saves_inside_box + player.bps.saves_outside_box
+    if located_saves > player.saves:
+        raise ValueError("located saves cannot exceed total saves")
+    if player.bps.big_chance_saves > player.saves:
+        raise ValueError("big-chance saves cannot exceed total saves")
+    if player.penalty_saves > player.saves:
+        raise ValueError("penalty saves cannot exceed total saves")
+    if player.penalty_saves > player.bps.saves_inside_box:
+        raise ValueError("penalty saves must be inside-box saves")
+    if player.penalty_saves > player.bps.big_chance_saves:
+        raise ValueError("penalty saves must be big-chance saves")
+
+
 class FixtureScenario(RulesModel):
     fixture_id: str
     gameweek_id: str
@@ -291,13 +375,6 @@ class FixtureScenario(RulesModel):
                 raise ValueError("on-pitch and post-dismissal goals exceed the fixture score")
             if player.bps.match_winning_goals > player.goals_non_penalty + player.goals_penalty:
                 raise ValueError("match-winning goal requires a scored goal")
-            if player.position is not FPLPosition.GK and (
-                player.saves
-                or player.penalty_saves
-                or player.bps.saves_inside_box
-                or player.bps.saves_outside_box
-            ):
-                raise ValueError("goalkeeper save events require GK position")
         home_players = [player for player in self.players if player.team_id == self.home_team_id]
         away_players = [player for player in self.players if player.team_id == self.away_team_id]
         derived_home = sum(
@@ -458,6 +535,63 @@ class ApprovalRecord(RulesModel):
     approved_at: StrictStr | None
     approved_by: StrictStr | None
     ruleset_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")] | None = None
+
+
+class InterpretationDecision(RulesModel):
+    decision_id: Annotated[StrictStr, Field(pattern=r"^INT-[A-Z0-9-]+$")]
+    affected_rule: Annotated[StrictStr, Field(pattern=r"^/rules/.+")]
+    season: Annotated[StrictStr, Field(pattern=r"^\d{4}/\d{4}$")]
+    interpretation: Annotated[StrictStr, Field(min_length=1)]
+    scope: Annotated[tuple[RuleCapability, ...], Field(min_length=1)]
+    meaning: Annotated[tuple[Annotated[StrictStr, Field(min_length=1)], ...], Field(min_length=1)]
+    evidence_source_refs: Annotated[
+        tuple[Annotated[StrictStr, Field(pattern=r"^SRC-[A-Z0-9-]+$")], ...],
+        Field(min_length=1),
+    ]
+    rationale: Annotated[StrictStr, Field(min_length=1)]
+    risk: Annotated[StrictStr, Field(min_length=1)]
+    approved: StrictBool
+    approved_by: Annotated[StrictStr, Field(min_length=1)] | None
+    approved_at: (
+        Annotated[StrictStr, Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")] | None
+    )
+    review_trigger: Annotated[StrictStr, Field(min_length=1)]
+    decision_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")]
+
+    @model_validator(mode="after")
+    def approval_fields_are_coherent(self) -> InterpretationDecision:
+        if self.approved != (self.approved_by is not None and self.approved_at is not None):
+            raise ValueError(
+                "interpretation approval fields must be complete exactly when approved"
+            )
+        if self.approved_at is not None:
+            try:
+                datetime.strptime(self.approved_at, "%Y-%m-%dT%H:%M:%SZ")
+            except ValueError as exc:
+                raise ValueError("interpretation approval time must be a real UTC instant") from exc
+        if len(self.evidence_source_refs) != len(set(self.evidence_source_refs)):
+            raise ValueError("interpretation evidence references must be unique")
+        if len(self.scope) != len(set(self.scope)):
+            raise ValueError("interpretation capability scope must be unique")
+        return self
+
+
+class CapabilityArtifact(RulesModel):
+    artifact_type: Literal["DMF_RULE_CAPABILITY"] = "DMF_RULE_CAPABILITY"
+    schema_version: Literal["1.1"]
+    ruleset_id: StrictStr
+    ruleset_version: StrictStr
+    season_code: StrictStr
+    capability: RuleCapability
+    dependency_paths: tuple[StrictStr, ...]
+    source_backed: StrictBool
+    ready_for_human_approval: StrictBool
+    production_eligible: StrictBool
+    blockers: tuple[StrictStr, ...]
+    selected_rules: dict[StrictStr, Any]
+    rule_verification: tuple[dict[StrictStr, Any], ...]
+    interpretations: tuple[InterpretationDecision, ...]
+    capability_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")]
 
 
 class ActivationReceipt(RulesModel):

@@ -1,3 +1,5 @@
-verification_status: "UNKNOWN"
-value: null
-source_refs: []
+positions:
+  GK: {display_name: "Goalkeeper", squad_quota: 2, lineup_min: 1, lineup_max: 1}
+  DEF: {display_name: "Defender", squad_quota: 5, lineup_min: 3, lineup_max: 5}
+  MID: {display_name: "Midfielder", squad_quota: 5, lineup_min: 2, lineup_max: 5}
+  FWD: {display_name: "Forward", squad_quota: 3, lineup_min: 1, lineup_max: 3}

@@ -11,14 +11,15 @@ checked_claims:
   bps.penalty_save: {verification_status: "VERIFIED", value: 7, source_refs: ["SRC-FPL-2026-BPS-001"]}
   defensive_contributions.defender: {verification_status: "VERIFIED", threshold: 10, points: 2, cap: 2, events: ["CLEARANCE", "BLOCK", "INTERCEPTION", "TACKLE"], source_refs: ["SRC-FPL-2026-DC-001"]}
   defensive_contributions.mid_fwd: {verification_status: "VERIFIED", threshold: 12, points: 2, cap: 2, events: ["CLEARANCE", "BLOCK", "INTERCEPTION", "TACKLE", "BALL_RECOVERY"], source_refs: ["SRC-FPL-2026-DC-001"]}
-  free_transfer_cap: {verification_status: "VERIFIED", value: 5, source_refs: ["SRC-FPL-2026-CHANGES-001"]}
+  free_transfer_cap: {verification_status: "VERIFIED", value: 5, source_refs: ["SRC-FPL-2026-RULES-001", "SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-CHANGES-001"]}
   gameweek_finality: {verification_status: "VERIFIED", local_time: "09:00", day_offset_after_final_match: 1, source_refs: ["SRC-FPL-2026-CHANGES-001"]}
-  gw1_deadline: {verification_status: "VERIFIED", value: "2026-08-21T17:30:00Z", displayed_source_time: "2026-08-21 18:30 BST", source_refs: ["SRC-FPL-2026-PRICE-001"]}
+  gw1_deadline: {verification_status: "VERIFIED", value: "2026-08-21T17:30:00Z", displayed_source_time: "2026-08-21 18:30 BST", source_refs: ["SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-PRICE-001"]}
 unknown_blocking_families:
-  - "complete_scoring_table"
-  - "complete_assist_policy"
-  - "squad_and_formation"
-  - "transfer_state_transitions"
-  - "selling_price_rules"
-  - "complete_chip_semantics"
-  - "complete_BPS_overlap_semantics"
+  - "official_source_selling_price_loss_branch"
+  - "gw1_initial_squad_rules_not_yet_promoted"
+  - "automatic_substitution_rules_not_yet_promoted"
+  - "transfer_state_transitions_not_yet_promoted"
+  - "selling_price_rules_not_yet_promoted"
+  - "split_chip_inventory_windows_and_effects_not_yet_promoted"
+  - "gameweek_finality_not_yet_promoted"
+  - "full_season_special_events_not_yet_promoted"

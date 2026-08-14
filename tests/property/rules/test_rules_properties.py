@@ -78,6 +78,4 @@ def test_fixture_order_does_not_change_gameweek_sums(repository_root: Path) -> N
 
     target = compile_ruleset(root / "target_2026_27_partial")
     empty = GameweekScenario(gameweek_id="blank", fixtures=())
-    with pytest.raises(RulesValidationError) as blocked:
-        score_gameweek(target, empty)
-    assert blocked.value.code == "RULESET_SCORING_BLOCKED"
+    assert score_gameweek(target, empty).player_totals == {}

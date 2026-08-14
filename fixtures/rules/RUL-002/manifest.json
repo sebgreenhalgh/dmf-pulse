@@ -133,10 +133,10 @@
       "sha256": "cbf52dda3a403473e677b61f5949fd030b315eb62d9ca824b3fbfa9426e2a363"
     },
     {
-      "bytes": 1877,
+      "bytes": 2148,
       "path": "fixtures/rules/RUL-002/target_2026_27_claims.yaml",
       "rights": "SYNTHETIC_OR_SHORT_PARAPHRASED_CLAIM",
-      "sha256": "da8ac89ac521e213cc9ffc285c736c5ee2ee6e65876def5d3de852f2e7ae8287"
+      "sha256": "21d7b9960f3e7a358ea120ed57c389876b7a6d13f03714b32244f1904f1ff201"
     }
   ]
 }

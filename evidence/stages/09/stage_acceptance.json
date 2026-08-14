@@ -1,0 +1,66 @@
+{
+  "accepted": false,
+  "archive": {
+    "entry_count": 58,
+    "sha256": "d01bd3868dcecf5f5165680ec2c0a4a08a0fa18dedc0833f1223792cf72fe002"
+  },
+  "artifacts": {
+    "fixture_manifest_sha256": "457698f877ad1dc79bcbe1c3f8e707b664f1bab27df61c0dd93008973d3b9347",
+    "reference_request_sha256": "fb8ed57b63087ae3563fdf37ca4e8a77e71a8af333a4668e9a960eb0eace40af",
+    "reference_result_sha256": "41082efbf1d2d795681f4e37ca3b7a42415ea8c03ab3d70cd3d3f5863e5f3b27",
+    "reference_result_artifact_sha256": "ea264381d307af719f4a58591396296ff425560b4b0000f15f8778310f768111",
+    "stage7_context_sha256": "d5af65b3be0bc6ca02759953b2599cf8a98c2ad198c83e4aa230c726a89d20c2",
+    "stage8_result_sha256": "31d41317c0cf06002edd8e8fb47c4702706661f2227304182e3c4b8995e06b7e"
+  },
+  "branch": "stage/A9/PTS-009-fpl-points-simulation",
+  "clean_checkout_regression": {
+    "coverage": {
+      "branch_percent": 87.95313072134749,
+      "combined_percent": 92.0173535791757,
+      "statement_percent": 93.27950875596999
+    },
+    "failed": 0,
+    "passed": 1694,
+    "skipped_or_xfail_reported": 0
+  },
+  "database": {
+    "alembic_head": "20260807_0006",
+    "integration_passed": 110,
+    "migration_matrix_status": "PASS",
+    "postgres_version": "18.4",
+    "schema_sha256": "7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc"
+  },
+  "generated_at_utc": "2026-08-14T13:44:18Z",
+  "independent_review": null,
+  "parent_sha": "9d7c360ab6a4cc7bfc6d6f41e44be6b47512b272",
+  "production_ruleset_active": false,
+  "repository_validator": "PASS",
+  "rules": {
+    "production_probe": "BLOCKED:RULESET_NOT_ACTIVE",
+    "reference_artifact_sha256": "f4fb6a5458b3956cb300b822539772904e61036f7571aba7c04284458680f271",
+    "reference_ruleset_hash": "12271ab0b32a461baa3778f2e914f45744ccf9d5302c37c4a5f2ffb89e0c1139",
+    "target_ruleset_status": "CAPTURED_UNVERIFIED"
+  },
+  "schema_version": "pts-009-clean-checkout-evidence-v1",
+  "secret_scan": "PASS",
+  "stage": 9,
+  "stage9_suite": {
+    "assurance_mutation_passed": 13,
+    "coverage": {
+      "branch_percent": 78.96678966789668,
+      "combined_percent": 89.26116838487972,
+      "statement_percent": 92.38521836506159
+    },
+    "failed": 0,
+    "passed": 80,
+    "performance_passed": 1,
+    "performance_seconds": 12.6
+  },
+  "status": "IMPLEMENTATION_COMPLETE_REVIEW_PENDING",
+  "ticket": "PTS-009",
+  "wheel": {
+    "record_members_verified": 176,
+    "sha256": "07bf255008dcb840816e6557de0c9943e6d6eac3483089656b5c9f5bc8059a38",
+    "test_cli": "PASS"
+  }
+}

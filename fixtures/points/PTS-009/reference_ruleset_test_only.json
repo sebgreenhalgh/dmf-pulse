@@ -1,0 +1,3699 @@
+{
+  "compiler_version": "0.2.0",
+  "production_eligible": false,
+  "rule_provenance": {
+    "/rules/assists/ambiguous_state_allowed_for_exact_scoring": {
+      "rule_id": "FPL-ASSISTS-AMBIGUOUS_STATE_ALLOWED_FOR_EXACT_SCORING",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/assists/classification_states/0": {
+      "rule_id": "FPL-ASSISTS-CLASSIFICATION_STATES-0",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/assists/classification_states/1": {
+      "rule_id": "FPL-ASSISTS-CLASSIFICATION_STATES-1",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/assists/classification_states/2": {
+      "rule_id": "FPL-ASSISTS-CLASSIFICATION_STATES-2",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/assists/input_contract": {
+      "rule_id": "FPL-ASSISTS-INPUT_CONTRACT",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/assists/points": {
+      "rule_id": "FPL-ASSISTS-POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bonus_points_by_competition_rank/1": {
+      "rule_id": "FPL-BONUS-BONUS_POINTS_BY_COMPETITION_RANK-1",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bonus_points_by_competition_rank/2": {
+      "rule_id": "FPL-BONUS-BONUS_POINTS_BY_COMPETITION_RANK-2",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bonus_points_by_competition_rank/3": {
+      "rule_id": "FPL-BONUS-BONUS_POINTS_BY_COMPETITION_RANK-3",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/appearance_bands/0/bps": {
+      "rule_id": "FPL-BONUS-BPS-APPEARANCE_BANDS-0-BPS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/appearance_bands/0/max_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-APPEARANCE_BANDS-0-MAX_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/appearance_bands/0/min_exclusive": {
+      "rule_id": "FPL-BONUS-BPS-APPEARANCE_BANDS-0-MIN_EXCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/appearance_bands/0/min_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-APPEARANCE_BANDS-0-MIN_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/appearance_bands/1/bps": {
+      "rule_id": "FPL-BONUS-BPS-APPEARANCE_BANDS-1-BPS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/appearance_bands/1/max_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-APPEARANCE_BANDS-1-MAX_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/appearance_bands/1/min_exclusive": {
+      "rule_id": "FPL-BONUS-BPS-APPEARANCE_BANDS-1-MIN_EXCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/appearance_bands/1/min_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-APPEARANCE_BANDS-1-MIN_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/assist": {
+      "rule_id": "FPL-BONUS-BPS-ASSIST",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/big_chance_created": {
+      "rule_id": "FPL-BONUS-BPS-BIG_CHANCE_CREATED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/cbi_group/bps_per_group": {
+      "rule_id": "FPL-BONUS-BPS-CBI_GROUP-BPS_PER_GROUP",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/cbi_group/group_size": {
+      "rule_id": "FPL-BONUS-BPS-CBI_GROUP-GROUP_SIZE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/clean_sheet/bps": {
+      "rule_id": "FPL-BONUS-BPS-CLEAN_SHEET-BPS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/clean_sheet/min_minutes": {
+      "rule_id": "FPL-BONUS-BPS-CLEAN_SHEET-MIN_MINUTES",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/clean_sheet/positions/0": {
+      "rule_id": "FPL-BONUS-BPS-CLEAN_SHEET-POSITIONS-0",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/clean_sheet/positions/1": {
+      "rule_id": "FPL-BONUS-BPS-CLEAN_SHEET-POSITIONS-1",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/foul_won": {
+      "rule_id": "FPL-BONUS-BPS-FOUL_WON",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/goal_line_clearance": {
+      "rule_id": "FPL-BONUS-BPS-GOAL_LINE_CLEARANCE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/goals/non_penalty_by_position/DEF": {
+      "rule_id": "FPL-BONUS-BPS-GOALS-NON_PENALTY_BY_POSITION-DEF",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/goals/non_penalty_by_position/FWD": {
+      "rule_id": "FPL-BONUS-BPS-GOALS-NON_PENALTY_BY_POSITION-FWD",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/goals/non_penalty_by_position/GK": {
+      "rule_id": "FPL-BONUS-BPS-GOALS-NON_PENALTY_BY_POSITION-GK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/goals/non_penalty_by_position/MID": {
+      "rule_id": "FPL-BONUS-BPS-GOALS-NON_PENALTY_BY_POSITION-MID",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/goals/penalty_direct/bps": {
+      "rule_id": "FPL-BONUS-BPS-GOALS-PENALTY_DIRECT-BPS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/goals/penalty_direct/exclusive_with_non_penalty_position_goal": {
+      "rule_id": "FPL-BONUS-BPS-GOALS-PENALTY_DIRECT-EXCLUSIVE_WITH_NON_PENALTY_POSITION_GOAL",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/key_pass": {
+      "rule_id": "FPL-BONUS-BPS-KEY_PASS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/match_winning_goal": {
+      "rule_id": "FPL-BONUS-BPS-MATCH_WINNING_GOAL",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/being_tackled": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-BEING_TACKLED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/big_chance_missed": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-BIG_CHANCE_MISSED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/error_leading_attempt": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-ERROR_LEADING_ATTEMPT",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/error_leading_goal": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-ERROR_LEADING_GOAL",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/foul_conceded": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-FOUL_CONCEDED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/goal_conceded_gk_def": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-GOAL_CONCEDED_GK_DEF",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/offside": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-OFFSIDE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/own_goal": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-OWN_GOAL",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/penalty_conceded": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-PENALTY_CONCEDED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/penalty_miss": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-PENALTY_MISS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/red": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-RED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/shot_off_target": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-SHOT_OFF_TARGET",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/negatives/yellow": {
+      "rule_id": "FPL-BONUS-BPS-NEGATIVES-YELLOW",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/0/bps": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-0-BPS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/0/max_pct_exclusive": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-0-MAX_PCT_EXCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/0/max_pct_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-0-MAX_PCT_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/0/min_pct_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-0-MIN_PCT_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/1/bps": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-1-BPS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/1/max_pct_exclusive": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-1-MAX_PCT_EXCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/1/max_pct_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-1-MAX_PCT_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/1/min_pct_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-1-MIN_PCT_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/2/bps": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-2-BPS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/2/max_pct_exclusive": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-2-MAX_PCT_EXCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/2/max_pct_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-2-MAX_PCT_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/bands/2/min_pct_inclusive": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-BANDS-2-MIN_PCT_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/combination": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-COMBINATION",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/pass_completion/min_attempts": {
+      "rule_id": "FPL-BONUS-BPS-PASS_COMPLETION-MIN_ATTEMPTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/penalty_save": {
+      "rule_id": "FPL-BONUS-BPS-PENALTY_SAVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/recovery_group/bps_per_group": {
+      "rule_id": "FPL-BONUS-BPS-RECOVERY_GROUP-BPS_PER_GROUP",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/recovery_group/group_size": {
+      "rule_id": "FPL-BONUS-BPS-RECOVERY_GROUP-GROUP_SIZE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/save_inside_box": {
+      "rule_id": "FPL-BONUS-BPS-SAVE_INSIDE_BOX",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/save_outside_box": {
+      "rule_id": "FPL-BONUS-BPS-SAVE_OUTSIDE_BOX",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/shot_on_target": {
+      "rule_id": "FPL-BONUS-BPS-SHOT_ON_TARGET",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/successful_dribble": {
+      "rule_id": "FPL-BONUS-BPS-SUCCESSFUL_DRIBBLE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/successful_open_play_cross": {
+      "rule_id": "FPL-BONUS-BPS-SUCCESSFUL_OPEN_PLAY_CROSS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/bps/successful_tackle": {
+      "rule_id": "FPL-BONUS-BPS-SUCCESSFUL_TACKLE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/bonus/scope": {
+      "rule_id": "FPL-BONUS-SCOPE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/0/activation_window/end_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-0-ACTIVATION_WINDOW-END_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/0/activation_window/start_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-0-ACTIVATION_WINDOW-START_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/0/cancellable": {
+      "rule_id": "FPL-CHIPS-CHIPS-0-CANCELLABLE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/0/concurrency_group": {
+      "rule_id": "FPL-CHIPS-CHIPS-0-CONCURRENCY_GROUP",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/0/copies": {
+      "rule_id": "FPL-CHIPS-CHIPS-0-COPIES",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/0/duration_gameweeks": {
+      "rule_id": "FPL-CHIPS-CHIPS-0-DURATION_GAMEWEEKS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/0/expires_after_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-0-EXPIRES_AFTER_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/0/key": {
+      "rule_id": "FPL-CHIPS-CHIPS-0-KEY",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/1/activation_window/end_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-1-ACTIVATION_WINDOW-END_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/1/activation_window/start_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-1-ACTIVATION_WINDOW-START_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/1/cancellable": {
+      "rule_id": "FPL-CHIPS-CHIPS-1-CANCELLABLE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/1/concurrency_group": {
+      "rule_id": "FPL-CHIPS-CHIPS-1-CONCURRENCY_GROUP",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/1/copies": {
+      "rule_id": "FPL-CHIPS-CHIPS-1-COPIES",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/1/duration_gameweeks": {
+      "rule_id": "FPL-CHIPS-CHIPS-1-DURATION_GAMEWEEKS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/1/expires_after_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-1-EXPIRES_AFTER_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/1/key": {
+      "rule_id": "FPL-CHIPS-CHIPS-1-KEY",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/2/activation_window/end_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-2-ACTIVATION_WINDOW-END_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/2/activation_window/start_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-2-ACTIVATION_WINDOW-START_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/2/cancellable": {
+      "rule_id": "FPL-CHIPS-CHIPS-2-CANCELLABLE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/2/concurrency_group": {
+      "rule_id": "FPL-CHIPS-CHIPS-2-CONCURRENCY_GROUP",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/2/copies": {
+      "rule_id": "FPL-CHIPS-CHIPS-2-COPIES",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/2/duration_gameweeks": {
+      "rule_id": "FPL-CHIPS-CHIPS-2-DURATION_GAMEWEEKS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/2/expires_after_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-2-EXPIRES_AFTER_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/2/key": {
+      "rule_id": "FPL-CHIPS-CHIPS-2-KEY",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/3/activation_window/end_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-3-ACTIVATION_WINDOW-END_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/3/activation_window/start_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-3-ACTIVATION_WINDOW-START_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/3/cancellable": {
+      "rule_id": "FPL-CHIPS-CHIPS-3-CANCELLABLE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/3/concurrency_group": {
+      "rule_id": "FPL-CHIPS-CHIPS-3-CONCURRENCY_GROUP",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/3/copies": {
+      "rule_id": "FPL-CHIPS-CHIPS-3-COPIES",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/3/duration_gameweeks": {
+      "rule_id": "FPL-CHIPS-CHIPS-3-DURATION_GAMEWEEKS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/3/expires_after_gameweek": {
+      "rule_id": "FPL-CHIPS-CHIPS-3-EXPIRES_AFTER_GAMEWEEK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/chips/3/key": {
+      "rule_id": "FPL-CHIPS-CHIPS-3-KEY",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/chips/concurrency_limit": {
+      "rule_id": "FPL-CHIPS-CONCURRENCY_LIMIT",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/deadlines/gameweeks/0/deadline_utc": {
+      "rule_id": "FPL-DEADLINES-GAMEWEEKS-0-DEADLINE_UTC",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/deadlines/gameweeks/0/number": {
+      "rule_id": "FPL-DEADLINES-GAMEWEEKS-0-NUMBER",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/bench_size": {
+      "rule_id": "FPL-LINEUP-BENCH_SIZE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/captain_multiplier": {
+      "rule_id": "FPL-LINEUP-CAPTAIN_MULTIPLIER",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/starting_size": {
+      "rule_id": "FPL-LINEUP-STARTING_SIZE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/vice_fallback": {
+      "rule_id": "FPL-LINEUP-VICE_FALLBACK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/DEF/display_name": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-DEF-DISPLAY_NAME",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/DEF/lineup_max": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-DEF-LINEUP_MAX",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/DEF/lineup_min": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-DEF-LINEUP_MIN",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/DEF/squad_quota": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-DEF-SQUAD_QUOTA",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/FWD/display_name": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-FWD-DISPLAY_NAME",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/FWD/lineup_max": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-FWD-LINEUP_MAX",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/FWD/lineup_min": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-FWD-LINEUP_MIN",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/FWD/squad_quota": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-FWD-SQUAD_QUOTA",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/GK/display_name": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-GK-DISPLAY_NAME",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/GK/lineup_max": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-GK-LINEUP_MAX",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/GK/lineup_min": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-GK-LINEUP_MIN",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/GK/squad_quota": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-GK-SQUAD_QUOTA",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/MID/display_name": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-MID-DISPLAY_NAME",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/MID/lineup_max": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-MID-LINEUP_MAX",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/MID/lineup_min": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-MID-LINEUP_MIN",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/MID/squad_quota": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-MID-SQUAD_QUOTA",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/prices/change_threshold_algorithm": {
+      "rule_id": "FPL-PRICES-CHANGE_THRESHOLD_ALGORITHM",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/prices/price_unit": {
+      "rule_id": "FPL-PRICES-PRICE_UNIT",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/bands/0/id": {
+      "rule_id": "FPL-SCORING-APPEARANCE-BANDS-0-ID",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/bands/0/max_exclusive": {
+      "rule_id": "FPL-SCORING-APPEARANCE-BANDS-0-MAX_EXCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/bands/0/min_inclusive": {
+      "rule_id": "FPL-SCORING-APPEARANCE-BANDS-0-MIN_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/bands/0/points": {
+      "rule_id": "FPL-SCORING-APPEARANCE-BANDS-0-POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/bands/1/id": {
+      "rule_id": "FPL-SCORING-APPEARANCE-BANDS-1-ID",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/bands/1/max_exclusive": {
+      "rule_id": "FPL-SCORING-APPEARANCE-BANDS-1-MAX_EXCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/bands/1/min_inclusive": {
+      "rule_id": "FPL-SCORING-APPEARANCE-BANDS-1-MIN_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/bands/1/points": {
+      "rule_id": "FPL-SCORING-APPEARANCE-BANDS-1-POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/combination": {
+      "rule_id": "FPL-SCORING-APPEARANCE-COMBINATION",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/min_minutes_for_any_points": {
+      "rule_id": "FPL-SCORING-APPEARANCE-MIN_MINUTES_FOR_ANY_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/appearance/stoppage_time_included": {
+      "rule_id": "FPL-SCORING-APPEARANCE-STOPPAGE_TIME_INCLUDED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/assists/points": {
+      "rule_id": "FPL-SCORING-ASSISTS-POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/cards/red_points": {
+      "rule_id": "FPL-SCORING-CARDS-RED_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/cards/yellow_points": {
+      "rule_id": "FPL-SCORING-CARDS-YELLOW_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/clean_sheets/continue_goals_after_dismissal": {
+      "rule_id": "FPL-SCORING-CLEAN_SHEETS-CONTINUE_GOALS_AFTER_DISMISSAL",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/clean_sheets/evaluate_goals_while_player_eligible": {
+      "rule_id": "FPL-SCORING-CLEAN_SHEETS-EVALUATE_GOALS_WHILE_PLAYER_ELIGIBLE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/clean_sheets/min_minutes_inclusive": {
+      "rule_id": "FPL-SCORING-CLEAN_SHEETS-MIN_MINUTES_INCLUSIVE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/clean_sheets/points_by_position/DEF": {
+      "rule_id": "FPL-SCORING-CLEAN_SHEETS-POINTS_BY_POSITION-DEF",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/clean_sheets/points_by_position/FWD": {
+      "rule_id": "FPL-SCORING-CLEAN_SHEETS-POINTS_BY_POSITION-FWD",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/clean_sheets/points_by_position/GK": {
+      "rule_id": "FPL-SCORING-CLEAN_SHEETS-POINTS_BY_POSITION-GK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/clean_sheets/points_by_position/MID": {
+      "rule_id": "FPL-SCORING-CLEAN_SHEETS-POINTS_BY_POSITION-MID",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/clean_sheets/retain_after_normal_substitution": {
+      "rule_id": "FPL-SCORING-CLEAN_SHEETS-RETAIN_AFTER_NORMAL_SUBSTITUTION",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/DEF/enabled": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-DEF-ENABLED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/DEF/event_types/0": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-DEF-EVENT_TYPES-0",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/DEF/event_types/1": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-DEF-EVENT_TYPES-1",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/DEF/event_types/2": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-DEF-EVENT_TYPES-2",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/DEF/event_types/3": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-DEF-EVENT_TYPES-3",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/DEF/max_points": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-DEF-MAX_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/DEF/points": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-DEF-POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/DEF/threshold": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-DEF-THRESHOLD",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/FWD/enabled": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-FWD-ENABLED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/FWD/event_types/0": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-FWD-EVENT_TYPES-0",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/FWD/event_types/1": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-FWD-EVENT_TYPES-1",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/FWD/event_types/2": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-FWD-EVENT_TYPES-2",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/FWD/event_types/3": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-FWD-EVENT_TYPES-3",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/FWD/event_types/4": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-FWD-EVENT_TYPES-4",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/FWD/max_points": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-FWD-MAX_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/FWD/points": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-FWD-POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/FWD/threshold": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-FWD-THRESHOLD",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/GK/enabled": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-GK-ENABLED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/GK/max_points": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-GK-MAX_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/GK/points": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-GK-POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/GK/threshold": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-GK-THRESHOLD",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/MID/enabled": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-MID-ENABLED",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/MID/event_types/0": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-MID-EVENT_TYPES-0",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/MID/event_types/1": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-MID-EVENT_TYPES-1",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/MID/event_types/2": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-MID-EVENT_TYPES-2",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/MID/event_types/3": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-MID-EVENT_TYPES-3",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/MID/event_types/4": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-MID-EVENT_TYPES-4",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/MID/max_points": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-MID-MAX_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/MID/points": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-MID-POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/by_position/MID/threshold": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-BY_POSITION-MID-THRESHOLD",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/defensive_contributions/scope": {
+      "rule_id": "FPL-SCORING-DEFENSIVE_CONTRIBUTIONS-SCOPE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goalkeeper_saves/cap_per_fixture": {
+      "rule_id": "FPL-SCORING-GOALKEEPER_SAVES-CAP_PER_FIXTURE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goalkeeper_saves/points_per_group": {
+      "rule_id": "FPL-SCORING-GOALKEEPER_SAVES-POINTS_PER_GROUP",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goalkeeper_saves/saves_per_point": {
+      "rule_id": "FPL-SCORING-GOALKEEPER_SAVES-SAVES_PER_POINT",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goals/points_by_position/DEF": {
+      "rule_id": "FPL-SCORING-GOALS-POINTS_BY_POSITION-DEF",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goals/points_by_position/FWD": {
+      "rule_id": "FPL-SCORING-GOALS-POINTS_BY_POSITION-FWD",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goals/points_by_position/GK": {
+      "rule_id": "FPL-SCORING-GOALS-POINTS_BY_POSITION-GK",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goals/points_by_position/MID": {
+      "rule_id": "FPL-SCORING-GOALS-POINTS_BY_POSITION-MID",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goals_conceded/goals_per_deduction": {
+      "rule_id": "FPL-SCORING-GOALS_CONCEDED-GOALS_PER_DEDUCTION",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goals_conceded/points_per_group": {
+      "rule_id": "FPL-SCORING-GOALS_CONCEDED-POINTS_PER_GROUP",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goals_conceded/positions/0": {
+      "rule_id": "FPL-SCORING-GOALS_CONCEDED-POSITIONS-0",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/goals_conceded/positions/1": {
+      "rule_id": "FPL-SCORING-GOALS_CONCEDED-POSITIONS-1",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/own_goals/points": {
+      "rule_id": "FPL-SCORING-OWN_GOALS-POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/penalties/miss_points": {
+      "rule_id": "FPL-SCORING-PENALTIES-MISS_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/penalties/save_points": {
+      "rule_id": "FPL-SCORING-PENALTIES-SAVE_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/scoring/penalties/shootout_eligible": {
+      "rule_id": "FPL-SCORING-PENALTIES-SHOOTOUT_ELIGIBLE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/squad/initial_budget_tenths": {
+      "rule_id": "FPL-SQUAD-INITIAL_BUDGET_TENTHS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/squad/max_per_club": {
+      "rule_id": "FPL-SQUAD-MAX_PER_CLUB",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/squad/squad_size": {
+      "rule_id": "FPL-SQUAD-SQUAD_SIZE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/transfers/free_transfer_cap": {
+      "rule_id": "FPL-TRANSFERS-FREE_TRANSFER_CAP",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/transfers/hit_points": {
+      "rule_id": "FPL-TRANSFERS-HIT_POINTS",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/transfers/state": {
+      "rule_id": "FPL-TRANSFERS-STATE",
+      "source_refs": [
+        "SRC-DMFP-02-REFERENCE-2025-26"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    }
+  },
+  "rules": {
+    "assists": {
+      "ambiguous_state_allowed_for_exact_scoring": false,
+      "classification_states": [
+        "DEFINITE_ASSIST",
+        "DEFINITE_NO_ASSIST",
+        "AMBIGUOUS_ASSIST"
+      ],
+      "input_contract": "RESOLVED_ELIGIBLE_ASSIST_COUNT",
+      "points": 3
+    },
+    "bonus": {
+      "bonus_points_by_competition_rank": {
+        "1": 3,
+        "2": 2,
+        "3": 1
+      },
+      "bps": {
+        "appearance_bands": [
+          {
+            "bps": 3,
+            "max_inclusive": 60,
+            "min_exclusive": null,
+            "min_inclusive": 1
+          },
+          {
+            "bps": 6,
+            "max_inclusive": null,
+            "min_exclusive": 60,
+            "min_inclusive": null
+          }
+        ],
+        "assist": 9,
+        "big_chance_created": 3,
+        "cbi_group": {
+          "bps_per_group": 1,
+          "group_size": 2
+        },
+        "clean_sheet": {
+          "bps": 12,
+          "min_minutes": 60,
+          "positions": [
+            "GK",
+            "DEF"
+          ]
+        },
+        "foul_won": 1,
+        "goal_line_clearance": 9,
+        "goals": {
+          "non_penalty_by_position": {
+            "DEF": 12,
+            "FWD": 24,
+            "GK": 12,
+            "MID": 18
+          },
+          "penalty_direct": {
+            "bps": 12,
+            "exclusive_with_non_penalty_position_goal": true
+          }
+        },
+        "key_pass": 1,
+        "match_winning_goal": 3,
+        "negatives": {
+          "being_tackled": -1,
+          "big_chance_missed": -3,
+          "error_leading_attempt": -1,
+          "error_leading_goal": -3,
+          "foul_conceded": -1,
+          "goal_conceded_gk_def": -4,
+          "offside": -1,
+          "own_goal": -6,
+          "penalty_conceded": -3,
+          "penalty_miss": -6,
+          "red": -9,
+          "shot_off_target": -1,
+          "yellow": -3
+        },
+        "pass_completion": {
+          "bands": [
+            {
+              "bps": 2,
+              "max_pct_exclusive": 80,
+              "max_pct_inclusive": null,
+              "min_pct_inclusive": 70
+            },
+            {
+              "bps": 4,
+              "max_pct_exclusive": 90,
+              "max_pct_inclusive": null,
+              "min_pct_inclusive": 80
+            },
+            {
+              "bps": 6,
+              "max_pct_exclusive": null,
+              "max_pct_inclusive": 100,
+              "min_pct_inclusive": 90
+            }
+          ],
+          "combination": "HIGHEST_MATCHING_ONLY",
+          "min_attempts": 30
+        },
+        "penalty_save": 8,
+        "recovery_group": {
+          "bps_per_group": 1,
+          "group_size": 3
+        },
+        "save_inside_box": 3,
+        "save_outside_box": 2,
+        "shot_on_target": 2,
+        "successful_dribble": 1,
+        "successful_open_play_cross": 1,
+        "successful_tackle": 2
+      },
+      "scope": "PER_FIXTURE"
+    },
+    "chips": {
+      "chips": [
+        {
+          "activation_window": {
+            "end_gameweek": 38,
+            "start_gameweek": 1
+          },
+          "cancellable": false,
+          "concurrency_group": "SQUAD_CHIP",
+          "copies": 2,
+          "duration_gameweeks": 1,
+          "effects": [],
+          "expires_after_gameweek": null,
+          "key": "WILDCARD"
+        },
+        {
+          "activation_window": {
+            "end_gameweek": 38,
+            "start_gameweek": 1
+          },
+          "cancellable": false,
+          "concurrency_group": "SQUAD_CHIP",
+          "copies": 2,
+          "duration_gameweeks": 1,
+          "effects": [],
+          "expires_after_gameweek": null,
+          "key": "FREE_HIT"
+        },
+        {
+          "activation_window": {
+            "end_gameweek": 38,
+            "start_gameweek": 1
+          },
+          "cancellable": false,
+          "concurrency_group": "SQUAD_CHIP",
+          "copies": 2,
+          "duration_gameweeks": 1,
+          "effects": [],
+          "expires_after_gameweek": null,
+          "key": "TRIPLE_CAPTAIN"
+        },
+        {
+          "activation_window": {
+            "end_gameweek": 38,
+            "start_gameweek": 1
+          },
+          "cancellable": false,
+          "concurrency_group": "SQUAD_CHIP",
+          "copies": 2,
+          "duration_gameweeks": 1,
+          "effects": [],
+          "expires_after_gameweek": null,
+          "key": "BENCH_BOOST"
+        }
+      ],
+      "concurrency_limit": 1
+    },
+    "deadlines": {
+      "gameweeks": [
+        {
+          "deadline_utc": "2099-08-01T17:30:00Z",
+          "number": 1
+        }
+      ]
+    },
+    "lineup": {
+      "bench_size": 4,
+      "captain_multiplier": 2,
+      "starting_size": 11,
+      "vice_fallback": true
+    },
+    "positions": {
+      "positions": {
+        "DEF": {
+          "display_name": "Defender",
+          "lineup_max": 5,
+          "lineup_min": 3,
+          "squad_quota": 5
+        },
+        "FWD": {
+          "display_name": "Forward",
+          "lineup_max": 3,
+          "lineup_min": 1,
+          "squad_quota": 3
+        },
+        "GK": {
+          "display_name": "Goalkeeper",
+          "lineup_max": 1,
+          "lineup_min": 1,
+          "squad_quota": 2
+        },
+        "MID": {
+          "display_name": "Midfielder",
+          "lineup_max": 5,
+          "lineup_min": 2,
+          "squad_quota": 5
+        }
+      }
+    },
+    "prices": {
+      "change_threshold_algorithm": "UNDISCLOSED",
+      "price_unit": "TENTHS_OF_MILLION_GBP"
+    },
+    "scoring": {
+      "appearance": {
+        "bands": [
+          {
+            "id": "SHORT",
+            "max_exclusive": 60,
+            "min_inclusive": 1,
+            "points": 1
+          },
+          {
+            "id": "LONG",
+            "max_exclusive": null,
+            "min_inclusive": 60,
+            "points": 2
+          }
+        ],
+        "combination": "HIGHEST_MATCHING_ONLY",
+        "min_minutes_for_any_points": 1,
+        "stoppage_time_included": false
+      },
+      "assists": {
+        "points": 3
+      },
+      "cards": {
+        "red_points": -3,
+        "yellow_points": -1
+      },
+      "clean_sheets": {
+        "continue_goals_after_dismissal": true,
+        "evaluate_goals_while_player_eligible": true,
+        "min_minutes_inclusive": 60,
+        "points_by_position": {
+          "DEF": 4,
+          "FWD": 0,
+          "GK": 4,
+          "MID": 1
+        },
+        "retain_after_normal_substitution": true
+      },
+      "defensive_contributions": {
+        "by_position": {
+          "DEF": {
+            "enabled": true,
+            "event_types": [
+              "CLEARANCE",
+              "BLOCK",
+              "INTERCEPTION",
+              "TACKLE"
+            ],
+            "max_points": 2,
+            "points": 2,
+            "threshold": 10
+          },
+          "FWD": {
+            "enabled": true,
+            "event_types": [
+              "CLEARANCE",
+              "BLOCK",
+              "INTERCEPTION",
+              "TACKLE",
+              "BALL_RECOVERY"
+            ],
+            "max_points": 2,
+            "points": 2,
+            "threshold": 12
+          },
+          "GK": {
+            "enabled": false,
+            "event_types": [],
+            "max_points": 0,
+            "points": 0,
+            "threshold": null
+          },
+          "MID": {
+            "enabled": true,
+            "event_types": [
+              "CLEARANCE",
+              "BLOCK",
+              "INTERCEPTION",
+              "TACKLE",
+              "BALL_RECOVERY"
+            ],
+            "max_points": 2,
+            "points": 2,
+            "threshold": 12
+          }
+        },
+        "scope": "PER_FIXTURE"
+      },
+      "goalkeeper_saves": {
+        "cap_per_fixture": null,
+        "points_per_group": 1,
+        "saves_per_point": 3
+      },
+      "goals": {
+        "points_by_position": {
+          "DEF": 6,
+          "FWD": 4,
+          "GK": 10,
+          "MID": 5
+        }
+      },
+      "goals_conceded": {
+        "goals_per_deduction": 2,
+        "points_per_group": -1,
+        "positions": [
+          "GK",
+          "DEF"
+        ]
+      },
+      "own_goals": {
+        "points": -2
+      },
+      "penalties": {
+        "miss_points": -2,
+        "save_points": 5,
+        "shootout_eligible": false
+      }
+    },
+    "source_manifest": {
+      "rule_source_default": "SRC-DMFP-02-REFERENCE-2025-26",
+      "sources": [
+        {
+          "accessed_on": "2026-07-22",
+          "locator": "DMFP-02 section 13.2 and RUL-002 reference contract",
+          "published_on": null,
+          "refresh_trigger": "REFERENCE_FIXTURE_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE-2025-26",
+          "source_type": "APPROVED_MODULE_SPECIFICATION",
+          "status": "VERIFIED"
+        }
+      ]
+    },
+    "special_events": {
+      "events": []
+    },
+    "squad": {
+      "initial_budget_tenths": 1000,
+      "max_per_club": 3,
+      "squad_size": 15
+    },
+    "transfers": {
+      "free_transfer_cap": 5,
+      "hit_points": -4,
+      "state": "REFERENCE_ONLY"
+    }
+  },
+  "ruleset_hash": "12271ab0b32a461baa3778f2e914f45744ccf9d5302c37c4a5f2ffb89e0c1139",
+  "ruleset_id": "fpl-reference-2025-26",
+  "ruleset_version": "1.0.0",
+  "schema_version": "1.0",
+  "season_code": "2025/2026",
+  "source_bundle_raw_sha256": "41dbbad0a632fd9aa13cc7f1134c4a3c3b4ddde23e8b5c84ca31d4eab10f15df",
+  "source_bundle_semantic_sha256": "c98be55f1007461e276f44447919fd9711fbcb9f8680965cf01f2ac6bcde28cb",
+  "source_bundle_sha256": "c98be55f1007461e276f44447919fd9711fbcb9f8680965cf01f2ac6bcde28cb",
+  "source_files": {
+    "assists.yaml": {
+      "raw_sha256": "86d06dd8fdd64e4b4eb4a5af827af3cac70edeb9ea9ffd72acb97883ae3777f7",
+      "semantic_sha256": "398b240132618d677d624887b3edaf11193e3379eeb04531473aa2d8bdd842c2"
+    },
+    "bonus.yaml": {
+      "raw_sha256": "b1e311711b861e6d45c5c7ecd3cce7b8459ddf70a14de23f97cbadd9827ebb0f",
+      "semantic_sha256": "74d3c8696b195fab03606af90ec0310ac01a008bab25300908b0a7c3fe7bac6a"
+    },
+    "chips.yaml": {
+      "raw_sha256": "b3d10939c3681530a1b4da56821c96198991b6e470871449baa9dee44ec69037",
+      "semantic_sha256": "95171c5cfaacad36bdded25736b09ac948f3647b47c2e57f247d85754388155b"
+    },
+    "deadlines.yaml": {
+      "raw_sha256": "f19d7266b12c3f673b2749bde143357b75acc10658a21c1cf60f67dedb17eebe",
+      "semantic_sha256": "6380469040e0569c77e441643850dc1fdb355f977c63bcb41e03548411522a32"
+    },
+    "lineup.yaml": {
+      "raw_sha256": "633db1fc5b8cae1400a4aef173f69bf6004a55c3134243ab0829b4361594d804",
+      "semantic_sha256": "25153af4dc278244e51fb1f455e85211457bd250f8d17a9e7aebf94a2d942bd7"
+    },
+    "positions.yaml": {
+      "raw_sha256": "f13ad6f19da0b8bec853257419673e794aa649044d73f0c618f8284203b19598",
+      "semantic_sha256": "d7c31ad54f2b88381382f823f8ba022bc40a5467aa6f75e0947e51fef3f13cb5"
+    },
+    "prices.yaml": {
+      "raw_sha256": "b4115a3d689d6025bfcc36003d9294a788216bfc2b65605d4dcdec069bd3d057",
+      "semantic_sha256": "e03665ee9d3ddabd1f7e349d92c060cd4b47dfc0ce1f2a1e8661eaf7e82dd0a5"
+    },
+    "scoring.yaml": {
+      "raw_sha256": "25cbdcd7341126144a141f5fe921bc9a005ee30372093dd7ede93079354e1abd",
+      "semantic_sha256": "fa6a8d6f34dafff33731ba0f21e9ec82b365ffb5fab4ff9334c99a8ea138e0fb"
+    },
+    "season_manifest.yaml": {
+      "raw_sha256": "fb01edf01d4ddad1f58d5eed206c119ee1ef6e992696f235e2e6c3b76f16aa10",
+      "semantic_sha256": "df01d0980ce47e67d20156e63c79e271bf7ac5e0993e4d2e29a7be99f73d33e4"
+    },
+    "source_manifest.yaml": {
+      "raw_sha256": "93fdd174c8f38bbf817b808d72e43ebf4dd7223c238eee971ebcce364a4a0ca3",
+      "semantic_sha256": "73fa133b8572ab0016424a4e359fb7ca0d2aca14b439ce71f8c943ccebe7e637"
+    },
+    "special_events.yaml": {
+      "raw_sha256": "fb9b2e59663fe1741488ac52428726f13fd98f2f28cc73db64f022c8ae629999",
+      "semantic_sha256": "24de1c4a19c43ad41b013f13dcd858c17b0daa7f33a53f19913e5b11366d1c2e"
+    },
+    "squad.yaml": {
+      "raw_sha256": "d204d632e60181b926363c69d4e051d86f834d3dc5a2e4b4f187142ffa8d800f",
+      "semantic_sha256": "950a0a33447f79a6cb27ec4b12cc1efb4cbcf19fe53dc5f87334efe5f8f8cf1b"
+    },
+    "transfers.yaml": {
+      "raw_sha256": "cbf52dda3a403473e677b61f5949fd030b315eb62d9ca824b3fbfa9426e2a363",
+      "semantic_sha256": "2cb8a619e618a10fc96a11c31c0b615646cbaf660af014e10b71c6e5214b6fa1"
+    }
+  },
+  "source_hashes": {
+    "assists.yaml": "398b240132618d677d624887b3edaf11193e3379eeb04531473aa2d8bdd842c2",
+    "bonus.yaml": "74d3c8696b195fab03606af90ec0310ac01a008bab25300908b0a7c3fe7bac6a",
+    "chips.yaml": "95171c5cfaacad36bdded25736b09ac948f3647b47c2e57f247d85754388155b",
+    "deadlines.yaml": "6380469040e0569c77e441643850dc1fdb355f977c63bcb41e03548411522a32",
+    "lineup.yaml": "25153af4dc278244e51fb1f455e85211457bd250f8d17a9e7aebf94a2d942bd7",
+    "positions.yaml": "d7c31ad54f2b88381382f823f8ba022bc40a5467aa6f75e0947e51fef3f13cb5",
+    "prices.yaml": "e03665ee9d3ddabd1f7e349d92c060cd4b47dfc0ce1f2a1e8661eaf7e82dd0a5",
+    "scoring.yaml": "fa6a8d6f34dafff33731ba0f21e9ec82b365ffb5fab4ff9334c99a8ea138e0fb",
+    "season_manifest.yaml": "df01d0980ce47e67d20156e63c79e271bf7ac5e0993e4d2e29a7be99f73d33e4",
+    "source_manifest.yaml": "73fa133b8572ab0016424a4e359fb7ca0d2aca14b439ce71f8c943ccebe7e637",
+    "special_events.yaml": "24de1c4a19c43ad41b013f13dcd858c17b0daa7f33a53f19913e5b11366d1c2e",
+    "squad.yaml": "950a0a33447f79a6cb27ec4b12cc1efb4cbcf19fe53dc5f87334efe5f8f8cf1b",
+    "transfers.yaml": "2cb8a619e618a10fc96a11c31c0b615646cbaf660af014e10b71c6e5214b6fa1"
+  },
+  "status": "REFERENCE_ONLY",
+  "unknown_blockers": [],
+  "warnings": []
+}

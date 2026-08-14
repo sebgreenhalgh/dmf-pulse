@@ -1,0 +1,54 @@
+rules:
+  - rule_path: "/rules/positions"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-BOOTSTRAP-001: "element_types: squad_select, squad_min_play, squad_max_play"
+      SRC-FPL-2026-RULES-001: "Rules > Selecting your initial squad and Managing your squad"
+    interpretation_decision_ids: []
+    interpretation_note: null
+  - rule_path: "/rules/scoring"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Rules > Scoring points; Player scoring; Clean sheets; Red cards"
+    interpretation_decision_ids: []
+    interpretation_note: null
+  - rule_path: "/rules/scoring/defensive_contributions"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-DC-001", "SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-DC-001: "2026/27 defensive-contribution thresholds, event sets and two-point cap"
+      SRC-FPL-2026-RULES-001: "Rules > Scoring points > Defensive contributions"
+    interpretation_decision_ids: []
+    interpretation_note: null
+  - rule_path: "/rules/assists"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions"
+    interpretation_decision_ids: []
+    interpretation_note: null
+  - rule_path: "/rules/bonus"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Rules > Bonus points and Bonus Points System"
+    interpretation_decision_ids: []
+    interpretation_note: null
+  - rule_path: "/rules/bonus/bps"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-RULES-001", "SRC-FPL-2026-BPS-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Rules > Bonus Points System > full event-value table"
+      SRC-FPL-2026-BPS-001: "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal"
+    interpretation_decision_ids: []
+    interpretation_note: null
+  - rule_path: "/rules/bonus/tie_allocation"
+    verification_status: "INTERPRETATION_REQUIRED"
+    source_refs: ["SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Rules > Bonus points > published tie examples"
+    interpretation_decision_ids: ["INT-FPL-2026-BONUS-TIES-001"]
+    interpretation_approval_states: {"INT-FPL-2026-BONUS-TIES-001": "APPROVED"}
+    interpretation_note: "The official sources publish specific bonus-tie examples but do not state a complete arbitrary-cardinality algorithm. GENERAL_COMPETITION_RANKING is the separately recorded, human-approved PLAYER_POINTS interpretation in INT-FPL-2026-BONUS-TIES-001."

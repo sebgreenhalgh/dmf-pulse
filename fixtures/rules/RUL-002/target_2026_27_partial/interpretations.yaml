@@ -1,0 +1,21 @@
+decisions:
+  - decision_id: "INT-FPL-2026-BONUS-TIES-001"
+    affected_rule: "/rules/bonus/tie_allocation"
+    season: "2026/2027"
+    interpretation: "GENERAL_COMPETITION_RANKING"
+    scope: ["PLAYER_POINTS"]
+    meaning:
+      - "Players are ranked by exact scenario-level BPS, descending."
+      - "Equal BPS values receive the same competition rank."
+      - "Award-bearing competition ranks map rank 1 to 3 points, rank 2 to 2 points, and rank 3 to 1 point."
+      - "After a tie, subsequent competition ranks skip by the number of players occupying the tied rank."
+      - "Every player occupying an award-bearing rank receives that rank's bonus."
+      - "Expected-BPS ranking is prohibited."
+    evidence_source_refs: ["SRC-FPL-2026-RULES-001"]
+    rationale: "This is the deterministic generalisation consistent with the official published 2026/27 tie examples and the accepted DMF Pulse joint BPS/bonus engine. It is an approved interpretation, not a claim that FPL explicitly published the complete general algorithm."
+    risk: "An unshown tie cardinality could be treated differently by the official game."
+    approved: true
+    approved_by: "Sebastian Greenhalgh"
+    approved_at: "2026-08-14T15:08:25Z"
+    review_trigger: "Immediately revisit if official FPL/Premier League rules, API configuration, official scoring output, or another authoritative source publishes or demonstrates a conflicting general tie allocation rule."
+    decision_hash: "dfe10d4dabf8183c10f4a61d3bd2361bd54ee78d24c96ee9d38da42becfbaa49"

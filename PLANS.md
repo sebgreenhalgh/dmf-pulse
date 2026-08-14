@@ -1,5 +1,69 @@
 # DMF Pulse execution plans
 
+## PTS-009 - bounded FPL-points simulation clean-checkout integration
+
+- Ticket/stage: `PTS-009`, A9; required parent
+  `9d7c360ab6a4cc7bfc6d6f41e44be6b47512b272` on
+  `stage/A9/PTS-009-fpl-points-simulation`.
+- Candidate: `dmf-pulse-stage9-candidate.zip`, 58 entries, SHA-256
+  `d01bd3868dcecf5f5165680ec2c0a4a08a0fa18dedc0833f1223792cf72fe002`.
+- Scope: implement only DMFP-19 items 19.09.01 through 19.09.06: coherent
+  player-event allocation, exact rules-driven scenario scoring and joint BPS/bonus,
+  weighted fixture/Gameweek distributions and joint matrices, Monte Carlo diagnostics,
+  immutable offline artifacts, and the Stage-9 CLI.
+- Final upstream authority: accepted Stage-8 merge parent `9d7c360...`, with GCS-008
+  implementation lineage ending at `69b6653...`; consume its exact Decimal
+  `JointScoreDistribution.probabilities`, `result_sha256`, policy/prior/input identities,
+  cutoff, degradation and embedded `Stage7MinutesContext`. Consume accepted Stage-7
+  team projection identities; do not invent per-player public projection-result identities.
+- Constraints: preserve fail-closed target-season production rules behavior; reference
+  rules are TEST/REPLAY only; no RUL-002 changes, migration, Stage-10+ manager-state or
+  optimiser logic, hidden scoring constants, duplicated upstream mathematics, undeclared
+  NumPy dependency, merge, PR, or self-acceptance.
+
+### PTS-009 checkpoints
+
+- [x] Apply the reviewed candidate overlay and manually reconcile the existing CLI.
+- [x] Reconcile Stage-7/Stage-8 adapters and identities to the final accepted contracts.
+- [x] Replace NumPy RNG/weighted-choice use with deterministic standard-library logic
+  unless measured correctness/performance evidence proves a governed dependency is needed.
+- [x] Pass focused unit/property/contract/golden/integration/performance suites and
+  adversarial assurance mutations, including artifact identity and coverage fail-closed gates.
+- [x] Pass relevant inherited Stage-2/7/8 compatibility, one final complete repository
+  regression, Ruff, strict mypy, repository validation, secret scan, Alembic/PostgreSQL,
+  wheel RECORD, and installed-wheel offline CLI gates.
+- [x] Rebuild truthful manifests/evidence/docs from the final product tree and prepare
+  the exact one-commit/push handoff; commit and remote SHA verification are terminal Git
+  actions recorded outside this pre-commit execution plan.
+
+## FPL 2026/27 rules launch verification
+
+- Scope: independently verify every required `fpl-2026-27` rule family against
+  current official 2026/27 FPL sources, compile and diff the captured artifact,
+  and stop before human activation.
+- Constraint: rules-data verification only; do not redesign the rules engine or
+  silently carry 2025/26 values forward.
+
+### Verification checkpoints
+
+- [x] Resolve governing authority, clean worktree, target manifest, CLI, and
+  focused rules assurance contracts.
+- [x] Recheck the live official Help/Rules application, official 2026/27 launch
+  announcements, and target-season bootstrap configuration.
+- [x] Identify exact authoritative values and compare them with the 2025/26
+  reference, including every published 2026/27 BPS change.
+- [ ] Encode a production-eligible ruleset only after an approved schema/ADR can
+  represent big-chance saves, split chip inventories/windows and effects,
+  transfer transitions, selling-price rules, and per-rule provenance.
+- [ ] Human approval and activation (explicitly outside this task).
+
+### Verification decision log
+
+- DMFP-02 section 27.5 requires an ADR/schema revision when a target-season rule
+  cannot be expressed. The current schema cannot faithfully encode several
+  verified 2026/27 rules, so the target remains fail-closed and the outcome is
+  `BLOCKED_RULESET_VERIFICATION`, not a false `VERIFIED` artifact.
+
 ## MIN-007R7 + MIN-007H3 - final packaged replay and assurance remediation
 
 - Ticket/stage: `MIN-007R7` then `MIN-007H3`, A7; required starting parent
@@ -460,7 +524,6 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Scoped immediate validation to `trg_min007f_final_output_complete`, restoring it to deferred.
 - [x] Added unit guard and one-outer-transaction A/B publication regression.
 - [x] Ran all 22 acceptance commands; generated evidence and review archive.
-
 ## GCS-008 - goal and clean-sheet distributions
 
 - Ticket/stage: `GCS-008`, A8; required parent `a5a0b66afd6e9645f971976d723e238824bee6a8`.
@@ -520,3 +583,36 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Run one complete final-tree regression and refresh mechanical evidence.
 - [ ] Create
   exactly one remediation commit, and push the existing PR branch.
+
+# RUL-002R2 bounded PLAYER_POINTS interpretation approval
+
+- [x] Verify the exact unapproved decision hash before mutation.
+- [x] Bind the approved interpretation semantics and UTC human provenance to PLAYER_POINTS only.
+- [x] Add approval-scope and arbitrary competition-ranking regressions.
+- [x] Recompile ruleset and PLAYER_POINTS artifacts twice and independently verify new hashes.
+- [x] Run targeted checks, the focused RUL-002 suite, static/security checks, then one complete repository regression on the final product tree.
+
+# RUL-002R3 PLAYER_POINTS static-review remediation
+
+- [x] Read the frozen remediation pack, DMFP-02 boundary requirements, and inspect the reviewed branch against the accepted main base.
+- [x] Reconstruct the rules remediation on the accepted `origin/main` lineage while preserving the accepted Stage-9 interface.
+- [x] Remove PLAYER_POINTS manager-state dependency leakage and add semantic closure guards.
+- [x] Correct save/BPS and Stage-9 event/adaptation contracts, including non-GK save participation.
+- [x] Implement versioned assist classification through the Stage-9 boundary and consistency governance.
+- [x] Recompile deterministic artifacts, run focused gates, refresh governed evidence, and prepare the review result.
+
+# RUL-002R4 Stage-9 versioned-assist allocation remediation
+
+- [x] Confirm the reviewed R3 branch identity and read the controlling rules and Stage-9 boundary contracts.
+- [x] Route generated target-v1.1 assist contexts through the compiled rules classifier for every supported goal mechanism.
+- [x] Add generator/service/adapter regressions for penalty, free-kick, own-goal, ambiguity, determinism, and reconciliation.
+- [x] Update non-GK-save limitation and PR handoff material without changing official rules data or activation state.
+- [x] Run focused verification, preserve deterministic identities, refresh governed evidence, and prepare static rereview.
+
+# RUL-002R1 target-season schema v1.1 and capability activation
+
+- [x] Read the controlling DMFP-02 rules/model, provenance, ambiguity, schema-evolution, and activation requirements.
+- [x] Add backward-compatible schema v1.1 authoring for capability verification, rule-level provenance, assist eligibility, additive save BPS, explicit removed events, participation semantics, manager-state transitions, and immutable interpretations.
+- [x] Convert the captured 2026/27 PLAYER_POINTS families without discarding unresolved manager-state research.
+- [x] Add compatibility, capability-closure, interpretation, and 2026/27 scoring regressions.
+- [x] Compile and independently reproduce the PLAYER_POINTS capability hash; leave FULL_SEASON and global activation blocked.

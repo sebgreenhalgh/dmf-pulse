@@ -1,0 +1,359 @@
+{
+  "compiler_version": "0.2.0",
+  "production_eligible": false,
+  "rule_provenance": {},
+  "rules": {
+    "assists": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "bonus": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "chips": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "deadlines": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "lineup": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "positions": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "prices": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "scoring": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "source_manifest": {
+      "rule_source_default": null,
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "https://www.premierleague.com/en/news/4679946/whats-new-in-202627-fantasy-changes-to-bonus-points-system",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "source_type": "CHECKED_OFFICIAL_SOURCE_METADATA",
+          "status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "https://www.premierleague.com/en/news/4679873/all-you-need-to-know-about-changes-to-fpl-for-202627",
+          "published_on": "2026-07-31",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-CHANGES-001",
+          "source_type": "CHECKED_OFFICIAL_SOURCE_METADATA",
+          "status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "https://www.premierleague.com/en/news/4361991/whats-happening-with-defensive-contribution-points-in-202627-fantasy",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "source_type": "CHECKED_OFFICIAL_SOURCE_METADATA",
+          "status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "https://www.premierleague.com/en/news/4680462/whats-new-in-202627-fantasy-price-change-predictor",
+          "published_on": "2026-07-21",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-PRICE-001",
+          "source_type": "CHECKED_OFFICIAL_SOURCE_METADATA",
+          "status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "https://www.premierleague.com/en/news/4679879/whats-happening-with-fpl-chips-in-202627",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-CHIPS-001",
+          "source_type": "CHECKED_OFFICIAL_SOURCE_METADATA",
+          "status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "https://fantasy.premierleague.com/help/rules",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "source_type": "CHECKED_OFFICIAL_SOURCE_METADATA",
+          "status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "https://fantasy.premierleague.com/api/bootstrap-static/",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_GAME_CONFIGURATION_CHANGE",
+          "source_id": "SRC-FPL-2026-BOOTSTRAP-001",
+          "source_type": "CHECKED_OFFICIAL_SOURCE_METADATA",
+          "status": "VERIFIED"
+        }
+      ]
+    },
+    "special_events": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "squad": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "target_2026_27_claims": {
+      "checked_claims": {
+        "bps.any_save": {
+          "source_refs": [
+            "SRC-FPL-2026-BPS-001"
+          ],
+          "value": 2,
+          "verification_status": "VERIFIED"
+        },
+        "bps.being_tackled": {
+          "operation": "REMOVE",
+          "source_refs": [
+            "SRC-FPL-2026-BPS-001"
+          ],
+          "value": null,
+          "verification_status": "VERIFIED"
+        },
+        "bps.big_chance_save_extra": {
+          "source_refs": [
+            "SRC-FPL-2026-BPS-001"
+          ],
+          "value": 1,
+          "verification_status": "VERIFIED"
+        },
+        "bps.cbi_group_size": {
+          "source_refs": [
+            "SRC-FPL-2026-BPS-001"
+          ],
+          "value": 3,
+          "verification_status": "VERIFIED"
+        },
+        "bps.inside_box_save_extra": {
+          "source_refs": [
+            "SRC-FPL-2026-BPS-001"
+          ],
+          "value": 1,
+          "verification_status": "VERIFIED"
+        },
+        "bps.penalty_save": {
+          "source_refs": [
+            "SRC-FPL-2026-BPS-001"
+          ],
+          "value": 7,
+          "verification_status": "VERIFIED"
+        },
+        "defensive_contributions.defender": {
+          "cap": 2,
+          "events": [
+            "CLEARANCE",
+            "BLOCK",
+            "INTERCEPTION",
+            "TACKLE"
+          ],
+          "points": 2,
+          "source_refs": [
+            "SRC-FPL-2026-DC-001"
+          ],
+          "threshold": 10,
+          "verification_status": "VERIFIED"
+        },
+        "defensive_contributions.mid_fwd": {
+          "cap": 2,
+          "events": [
+            "CLEARANCE",
+            "BLOCK",
+            "INTERCEPTION",
+            "TACKLE",
+            "BALL_RECOVERY"
+          ],
+          "points": 2,
+          "source_refs": [
+            "SRC-FPL-2026-DC-001"
+          ],
+          "threshold": 12,
+          "verification_status": "VERIFIED"
+        },
+        "free_transfer_cap": {
+          "source_refs": [
+            "SRC-FPL-2026-RULES-001",
+            "SRC-FPL-2026-BOOTSTRAP-001",
+            "SRC-FPL-2026-CHANGES-001"
+          ],
+          "value": 5,
+          "verification_status": "VERIFIED"
+        },
+        "gameweek_finality": {
+          "day_offset_after_final_match": 1,
+          "local_time": "09:00",
+          "source_refs": [
+            "SRC-FPL-2026-CHANGES-001"
+          ],
+          "verification_status": "VERIFIED"
+        },
+        "gw1_deadline": {
+          "displayed_source_time": "2026-08-21 18:30 BST",
+          "source_refs": [
+            "SRC-FPL-2026-BOOTSTRAP-001",
+            "SRC-FPL-2026-PRICE-001"
+          ],
+          "value": "2026-08-21T17:30:00Z",
+          "verification_status": "VERIFIED"
+        }
+      },
+      "production_eligible": false,
+      "ruleset_id": "fpl-2026-27",
+      "ruleset_version": "0.1.0-prelaunch.1",
+      "status": "CAPTURED_UNVERIFIED",
+      "unknown_blocking_families": [
+        "official_source_bonus_ties_beyond_published_examples",
+        "official_source_selling_price_loss_branch",
+        "engine_schema_big_chance_save_BPS",
+        "engine_schema_complete_assist_policy",
+        "engine_schema_split_chip_inventory_windows_and_effects",
+        "engine_schema_lineup_auto_substitution",
+        "engine_schema_transfer_state_transitions",
+        "engine_schema_selling_price_formula",
+        "engine_schema_gameweek_finality",
+        "engine_schema_per_rule_source_provenance"
+      ]
+    },
+    "transfers": {
+      "source_refs": [],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    }
+  },
+  "ruleset_hash": "c0d9e0b7b420c25dbc56180621fb1d6b189eac66b8ecd76532e7798a2af1f865",
+  "ruleset_id": "fpl-2026-27",
+  "ruleset_version": "0.1.0-prelaunch.1",
+  "schema_version": "1.0",
+  "season_code": "2026/2027",
+  "source_bundle_raw_sha256": "1d90e779e735634474b734902e77c6de25c7fb5c62935eb6fea880b8980b9237",
+  "source_bundle_semantic_sha256": "7c6817257fb646bba2ff9c50946ea70afac3c2154e65849689b82bc4501ff363",
+  "source_bundle_sha256": "7c6817257fb646bba2ff9c50946ea70afac3c2154e65849689b82bc4501ff363",
+  "source_files": {
+    "assists.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "bonus.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "chips.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "deadlines.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "lineup.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "positions.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "prices.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "scoring.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "season_manifest.yaml": {
+      "raw_sha256": "e45f4aea11298298353166dcbe5db50a34dc2d2427376b1224266c44b3cd3cfb",
+      "semantic_sha256": "56d3499037a4ac290fa1da613d36ce5b827a2d00dac69a819b5fb184677f7fe3"
+    },
+    "source_manifest.yaml": {
+      "raw_sha256": "7ef746331e2e300638c98b5e8da63353e71508136fc60303b350b654f78e17ed",
+      "semantic_sha256": "e4f527b169ed1b9cd5211964e67276a1bc09b8ab61ac9b696c06a0df0c30963a"
+    },
+    "special_events.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "squad.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    },
+    "target_2026_27_claims.yaml": {
+      "raw_sha256": "10d33af06a876ee80d0ec6c0e65a6419bf7b81b473ad36a71dd2926d58abd5dc",
+      "semantic_sha256": "43320dee71ca368195a451bc0a29a1471b4af237a5f3e86c9fcc112d618b61ec"
+    },
+    "transfers.yaml": {
+      "raw_sha256": "ed345f6c45aa3fddae3ff88363f590e87f536872504918b4488d061baf2ddcb2",
+      "semantic_sha256": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+    }
+  },
+  "source_hashes": {
+    "assists.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "bonus.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "chips.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "deadlines.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "lineup.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "positions.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "prices.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "scoring.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "season_manifest.yaml": "56d3499037a4ac290fa1da613d36ce5b827a2d00dac69a819b5fb184677f7fe3",
+    "source_manifest.yaml": "e4f527b169ed1b9cd5211964e67276a1bc09b8ab61ac9b696c06a0df0c30963a",
+    "special_events.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "squad.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b",
+    "target_2026_27_claims.yaml": "43320dee71ca368195a451bc0a29a1471b4af237a5f3e86c9fcc112d618b61ec",
+    "transfers.yaml": "b19f1e58e4e0e7d550cfdcbceac3f0cf46ed96adc00b19cae111fa3b0ccfd20b"
+  },
+  "status": "CAPTURED_UNVERIFIED",
+  "unknown_blockers": [
+    "assists.yaml",
+    "bonus.yaml",
+    "chips.yaml",
+    "deadlines.yaml",
+    "lineup.yaml",
+    "positions.yaml",
+    "prices.yaml",
+    "scoring.yaml",
+    "special_events.yaml",
+    "squad.yaml",
+    "target:engine_schema_big_chance_save_BPS",
+    "target:engine_schema_complete_assist_policy",
+    "target:engine_schema_gameweek_finality",
+    "target:engine_schema_lineup_auto_substitution",
+    "target:engine_schema_per_rule_source_provenance",
+    "target:engine_schema_selling_price_formula",
+    "target:engine_schema_split_chip_inventory_windows_and_effects",
+    "target:engine_schema_transfer_state_transitions",
+    "target:official_source_bonus_ties_beyond_published_examples",
+    "target:official_source_selling_price_loss_branch",
+    "transfers.yaml"
+  ],
+  "warnings": [
+    "ruleset contains unresolved required values"
+  ]
+}

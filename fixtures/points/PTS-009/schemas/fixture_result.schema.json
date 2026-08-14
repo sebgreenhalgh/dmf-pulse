@@ -1,0 +1,2187 @@
+{
+  "$defs": {
+    "AssistClassification": {
+      "enum": [
+        "DEFINITE_ASSIST",
+        "DEFINITE_NO_ASSIST",
+        "AMBIGUOUS_ASSIST"
+      ],
+      "title": "AssistClassification",
+      "type": "string"
+    },
+    "BinaryProbability": {
+      "additionalProperties": false,
+      "properties": {
+        "no": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "No",
+          "type": "string"
+        },
+        "yes": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Yes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "yes",
+        "no"
+      ],
+      "title": "BinaryProbability",
+      "type": "object"
+    },
+    "BpsBonusSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "bps_quantiles": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Bps Quantiles",
+          "type": "object"
+        },
+        "bps_variance": {
+          "minimum": 0.0,
+          "title": "Bps Variance",
+          "type": "number"
+        },
+        "completeness_mode": {
+          "$ref": "#/$defs/BpsCompletenessMode"
+        },
+        "expected_bonus": {
+          "title": "Expected Bonus",
+          "type": "number"
+        },
+        "expected_bps": {
+          "title": "Expected Bps",
+          "type": "number"
+        },
+        "expected_competition_rank": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expected Competition Rank"
+        },
+        "probability_any_bonus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Any Bonus",
+          "type": "number"
+        },
+        "probability_bonus_0": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Bonus 0",
+          "type": "number"
+        },
+        "probability_bonus_1": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Bonus 1",
+          "type": "number"
+        },
+        "probability_bonus_2": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Bonus 2",
+          "type": "number"
+        },
+        "probability_bonus_3": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Bonus 3",
+          "type": "number"
+        },
+        "probability_rank_1": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Rank 1",
+          "type": "number"
+        },
+        "probability_rank_2": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Rank 2",
+          "type": "number"
+        },
+        "probability_rank_3": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Rank 3",
+          "type": "number"
+        },
+        "tie_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Tie Probability",
+          "type": "number"
+        }
+      },
+      "required": [
+        "expected_bps",
+        "bps_variance",
+        "bps_quantiles",
+        "probability_bonus_0",
+        "probability_bonus_1",
+        "probability_bonus_2",
+        "probability_bonus_3",
+        "expected_bonus",
+        "probability_any_bonus",
+        "expected_competition_rank",
+        "probability_rank_1",
+        "probability_rank_2",
+        "probability_rank_3",
+        "tie_probability",
+        "completeness_mode"
+      ],
+      "title": "BpsBonusSummary",
+      "type": "object"
+    },
+    "BpsCompletenessMode": {
+      "enum": [
+        "EVENT_LINKED_ONLY",
+        "EVENT_LINKED_PLUS_AUXILIARY_BASELINE"
+      ],
+      "title": "BpsCompletenessMode",
+      "type": "string"
+    },
+    "BpsEvents": {
+      "additionalProperties": false,
+      "properties": {
+        "big_chances_created": {
+          "minimum": 0,
+          "title": "Big Chances Created",
+          "type": "integer"
+        },
+        "big_chances_missed": {
+          "minimum": 0,
+          "title": "Big Chances Missed",
+          "type": "integer"
+        },
+        "errors_leading_attempt": {
+          "minimum": 0,
+          "title": "Errors Leading Attempt",
+          "type": "integer"
+        },
+        "errors_leading_goal": {
+          "minimum": 0,
+          "title": "Errors Leading Goal",
+          "type": "integer"
+        },
+        "fouls_conceded": {
+          "minimum": 0,
+          "title": "Fouls Conceded",
+          "type": "integer"
+        },
+        "fouls_won": {
+          "minimum": 0,
+          "title": "Fouls Won",
+          "type": "integer"
+        },
+        "goal_line_clearances": {
+          "minimum": 0,
+          "title": "Goal Line Clearances",
+          "type": "integer"
+        },
+        "key_passes": {
+          "minimum": 0,
+          "title": "Key Passes",
+          "type": "integer"
+        },
+        "match_winning_goals": {
+          "minimum": 0,
+          "title": "Match Winning Goals",
+          "type": "integer"
+        },
+        "offsides": {
+          "minimum": 0,
+          "title": "Offsides",
+          "type": "integer"
+        },
+        "pass_attempts": {
+          "minimum": 0,
+          "title": "Pass Attempts",
+          "type": "integer"
+        },
+        "passes_completed": {
+          "minimum": 0,
+          "title": "Passes Completed",
+          "type": "integer"
+        },
+        "penalties_conceded": {
+          "minimum": 0,
+          "title": "Penalties Conceded",
+          "type": "integer"
+        },
+        "recoveries": {
+          "minimum": 0,
+          "title": "Recoveries",
+          "type": "integer"
+        },
+        "saves_inside_box": {
+          "minimum": 0,
+          "title": "Saves Inside Box",
+          "type": "integer"
+        },
+        "saves_outside_box": {
+          "minimum": 0,
+          "title": "Saves Outside Box",
+          "type": "integer"
+        },
+        "shots_off_target": {
+          "minimum": 0,
+          "title": "Shots Off Target",
+          "type": "integer"
+        },
+        "shots_on_target": {
+          "minimum": 0,
+          "title": "Shots On Target",
+          "type": "integer"
+        },
+        "successful_dribbles": {
+          "minimum": 0,
+          "title": "Successful Dribbles",
+          "type": "integer"
+        },
+        "successful_open_play_crosses": {
+          "minimum": 0,
+          "title": "Successful Open Play Crosses",
+          "type": "integer"
+        },
+        "successful_tackles": {
+          "minimum": 0,
+          "title": "Successful Tackles",
+          "type": "integer"
+        },
+        "times_tackled": {
+          "minimum": 0,
+          "title": "Times Tackled",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "big_chances_created",
+        "big_chances_missed",
+        "errors_leading_attempt",
+        "errors_leading_goal",
+        "fouls_conceded",
+        "fouls_won",
+        "goal_line_clearances",
+        "key_passes",
+        "match_winning_goals",
+        "offsides",
+        "pass_attempts",
+        "passes_completed",
+        "penalties_conceded",
+        "recoveries",
+        "saves_inside_box",
+        "saves_outside_box",
+        "shots_off_target",
+        "shots_on_target",
+        "successful_dribbles",
+        "successful_open_play_crosses",
+        "successful_tackles",
+        "times_tackled"
+      ],
+      "title": "BpsEvents",
+      "type": "object"
+    },
+    "CleanSheetDistribution": {
+      "additionalProperties": false,
+      "properties": {
+        "away_clean_sheet": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Away Clean Sheet",
+          "type": "string"
+        },
+        "home_clean_sheet": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Home Clean Sheet",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home_clean_sheet",
+        "away_clean_sheet"
+      ],
+      "title": "CleanSheetDistribution",
+      "type": "object"
+    },
+    "ComponentSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_points": {
+          "title": "Expected Points",
+          "type": "number"
+        },
+        "maximum": {
+          "title": "Maximum",
+          "type": "integer"
+        },
+        "minimum": {
+          "title": "Minimum",
+          "type": "integer"
+        },
+        "probability_nonzero": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Nonzero",
+          "type": "number"
+        },
+        "variance": {
+          "minimum": 0.0,
+          "title": "Variance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "expected_points",
+        "probability_nonzero",
+        "minimum",
+        "maximum",
+        "variance"
+      ],
+      "title": "ComponentSummary",
+      "type": "object"
+    },
+    "DefensiveActions": {
+      "additionalProperties": false,
+      "properties": {
+        "ball_recoveries": {
+          "minimum": 0,
+          "title": "Ball Recoveries",
+          "type": "integer"
+        },
+        "blocks": {
+          "minimum": 0,
+          "title": "Blocks",
+          "type": "integer"
+        },
+        "clearances": {
+          "minimum": 0,
+          "title": "Clearances",
+          "type": "integer"
+        },
+        "interceptions": {
+          "minimum": 0,
+          "title": "Interceptions",
+          "type": "integer"
+        },
+        "tackles": {
+          "minimum": 0,
+          "title": "Tackles",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ball_recoveries",
+        "blocks",
+        "clearances",
+        "interceptions",
+        "tackles"
+      ],
+      "title": "DefensiveActions",
+      "type": "object"
+    },
+    "FixtureEventScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "away_goals": {
+          "minimum": 0,
+          "title": "Away Goals",
+          "type": "integer"
+        },
+        "away_team_id": {
+          "title": "Away Team Id",
+          "type": "string"
+        },
+        "fixture_id": {
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "gameweek_id": {
+          "title": "Gameweek Id",
+          "type": "string"
+        },
+        "goals": {
+          "items": {
+            "$ref": "#/$defs/GoalEvent"
+          },
+          "title": "Goals",
+          "type": "array"
+        },
+        "home_goals": {
+          "minimum": 0,
+          "title": "Home Goals",
+          "type": "integer"
+        },
+        "home_team_id": {
+          "title": "Home Team Id",
+          "type": "string"
+        },
+        "participant_universe_complete": {
+          "const": true,
+          "title": "Participant Universe Complete",
+          "type": "boolean"
+        },
+        "players": {
+          "items": {
+            "$ref": "#/$defs/PlayerEventVector"
+          },
+          "title": "Players",
+          "type": "array"
+        },
+        "ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ruleset Hash",
+          "type": "string"
+        },
+        "ruleset_id": {
+          "title": "Ruleset Id",
+          "type": "string"
+        },
+        "ruleset_version": {
+          "title": "Ruleset Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fixture_id",
+        "gameweek_id",
+        "home_team_id",
+        "away_team_id",
+        "home_goals",
+        "away_goals",
+        "participant_universe_complete",
+        "players",
+        "goals",
+        "ruleset_id",
+        "ruleset_version",
+        "ruleset_hash"
+      ],
+      "title": "FixtureEventScenario",
+      "type": "object"
+    },
+    "FixturePointScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "bps_completeness_mode": {
+          "$ref": "#/$defs/BpsCompletenessMode"
+        },
+        "confidence_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+          ],
+          "title": "Confidence Grade",
+          "type": "string"
+        },
+        "dataset_version_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dataset Version Ids",
+          "type": "array"
+        },
+        "degradation_reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Degradation Reasons",
+          "type": "array"
+        },
+        "event_scenario": {
+          "$ref": "#/$defs/FixtureEventScenario"
+        },
+        "fixture_id": {
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "gameweek_id": {
+          "title": "Gameweek Id",
+          "type": "string"
+        },
+        "information_cutoff_utc": {
+          "title": "Information Cutoff Utc",
+          "type": "string"
+        },
+        "model_version_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Model Version Ids",
+          "type": "array"
+        },
+        "outcome_draw_id": {
+          "title": "Outcome Draw Id",
+          "type": "string"
+        },
+        "participation_scenario_id": {
+          "title": "Participation Scenario Id",
+          "type": "string"
+        },
+        "players": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PlayerScenarioScore"
+          },
+          "title": "Players",
+          "type": "object"
+        },
+        "projection_mode": {
+          "$ref": "#/$defs/ProjectionMode"
+        },
+        "rng_algorithm": {
+          "const": "python-mt19937-pts-v1",
+          "title": "Rng Algorithm",
+          "type": "string"
+        },
+        "root_seed": {
+          "minimum": 0,
+          "title": "Root Seed",
+          "type": "integer"
+        },
+        "ruleset": {
+          "$ref": "#/$defs/RulesetIdentity"
+        },
+        "scenario_id": {
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "scenario_index": {
+          "minimum": 0,
+          "title": "Scenario Index",
+          "type": "integer"
+        },
+        "seed_namespace": {
+          "title": "Seed Namespace",
+          "type": "string"
+        },
+        "source_bundle_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Bundle Ids",
+          "type": "array"
+        },
+        "stage7_minutes_context": {
+          "$ref": "#/$defs/Stage7MinutesContext"
+        },
+        "stage7_player_projection_sha256s": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Stage7 Player Projection Sha256S",
+          "type": "object"
+        },
+        "upstream_score_probability": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Upstream Score Probability",
+          "type": "string"
+        },
+        "upstream_scoreline": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "minimum": 0,
+              "type": "integer"
+            }
+          ],
+          "title": "Upstream Scoreline",
+          "type": "array"
+        },
+        "upstream_stage8_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Upstream Stage8 Sha256",
+          "type": "string"
+        },
+        "weight": {
+          "exclusiveMinimum": 0.0,
+          "maximum": 1.0,
+          "title": "Weight",
+          "type": "number"
+        }
+      },
+      "required": [
+        "scenario_id",
+        "outcome_draw_id",
+        "scenario_index",
+        "weight",
+        "upstream_score_probability",
+        "upstream_scoreline",
+        "upstream_stage8_sha256",
+        "participation_scenario_id",
+        "stage7_minutes_context",
+        "stage7_player_projection_sha256s",
+        "fixture_id",
+        "gameweek_id",
+        "players",
+        "event_scenario",
+        "ruleset",
+        "projection_mode",
+        "root_seed",
+        "seed_namespace",
+        "rng_algorithm",
+        "model_version_ids",
+        "dataset_version_ids",
+        "source_bundle_ids",
+        "information_cutoff_utc",
+        "bps_completeness_mode",
+        "confidence_grade",
+        "degradation_reasons"
+      ],
+      "title": "FixturePointScenario",
+      "type": "object"
+    },
+    "GoalEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "assist_awarded": {
+          "title": "Assist Awarded",
+          "type": "boolean"
+        },
+        "assist_classification": {
+          "$ref": "#/$defs/AssistClassification"
+        },
+        "assister_player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Assister Player Id"
+        },
+        "conceding_team_id": {
+          "title": "Conceding Team Id",
+          "type": "string"
+        },
+        "goal_id": {
+          "title": "Goal Id",
+          "type": "string"
+        },
+        "mechanism": {
+          "$ref": "#/$defs/GoalMechanism"
+        },
+        "minute": {
+          "maximum": 130.0,
+          "minimum": 0.0,
+          "title": "Minute",
+          "type": "number"
+        },
+        "own_goal_player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Own Goal Player Id"
+        },
+        "scorer_player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Scorer Player Id"
+        },
+        "scoring_team_id": {
+          "title": "Scoring Team Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "goal_id",
+        "minute",
+        "scoring_team_id",
+        "conceding_team_id",
+        "mechanism",
+        "scorer_player_id",
+        "own_goal_player_id",
+        "assister_player_id",
+        "assist_classification",
+        "assist_awarded"
+      ],
+      "title": "GoalEvent",
+      "type": "object"
+    },
+    "GoalMechanism": {
+      "enum": [
+        "OPEN_PLAY",
+        "SET_PIECE",
+        "PENALTY",
+        "DIRECT_FREE_KICK",
+        "OPPONENT_OWN_GOAL"
+      ],
+      "title": "GoalMechanism",
+      "type": "string"
+    },
+    "JointScenarioMatrix": {
+      "additionalProperties": false,
+      "properties": {
+        "dependence": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "$ref": "#/$defs/PairDependence"
+            },
+            "type": "object"
+          },
+          "title": "Dependence",
+          "type": "object"
+        },
+        "outcome_draw_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Outcome Draw Ids",
+          "type": "array"
+        },
+        "player_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Player Ids",
+          "type": "array"
+        },
+        "points": {
+          "items": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "title": "Points",
+          "type": "array"
+        },
+        "ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ruleset Hash",
+          "type": "string"
+        },
+        "scenario_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Scenario Ids",
+          "type": "array"
+        },
+        "weights": {
+          "items": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "type": "number"
+          },
+          "title": "Weights",
+          "type": "array"
+        }
+      },
+      "required": [
+        "scenario_ids",
+        "outcome_draw_ids",
+        "player_ids",
+        "weights",
+        "points",
+        "ruleset_hash",
+        "dependence"
+      ],
+      "title": "JointScenarioMatrix",
+      "type": "object"
+    },
+    "JointScoreDistribution": {
+      "additionalProperties": false,
+      "description": "Canonical Stage-8 public output; all probabilities are exact strings.",
+      "properties": {
+        "as_of": {
+          "title": "As Of",
+          "type": "string"
+        },
+        "away_goal_pmf": {
+          "items": {
+            "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+            "type": "string"
+          },
+          "title": "Away Goal Pmf",
+          "type": "array"
+        },
+        "away_goals_conceded_pmf": {
+          "items": {
+            "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+            "type": "string"
+          },
+          "title": "Away Goals Conceded Pmf",
+          "type": "array"
+        },
+        "away_max": {
+          "minimum": 0,
+          "title": "Away Max",
+          "type": "integer"
+        },
+        "away_team_id": {
+          "title": "Away Team Id",
+          "type": "string"
+        },
+        "both_teams_to_score": {
+          "$ref": "#/$defs/BinaryProbability"
+        },
+        "clean_sheets": {
+          "$ref": "#/$defs/CleanSheetDistribution"
+        },
+        "confidence_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "title": "Confidence Grade",
+          "type": "string"
+        },
+        "confidence_reasons": {
+          "items": {
+            "enum": [
+              "BASELINE_MODEL_CAP_B",
+              "MARKET_CONSTRAINED",
+              "NO_MARKET_CONSTRAINTS",
+              "MARKET_RESIDUAL_HIGH",
+              "LOW_MARKET_CONFIDENCE",
+              "NUMERICAL_FALLBACK_TO_PRIOR",
+              "TAIL_RENORMALISED",
+              "STAGE7_MINUTES_CONTEXT_BOUND"
+            ],
+            "type": "string"
+          },
+          "title": "Confidence Reasons",
+          "type": "array"
+        },
+        "diagnostics": {
+          "$ref": "#/$defs/ProjectionDiagnostics"
+        },
+        "expected_away_goals": {
+          "pattern": "^\\d+\\.\\d{6}$",
+          "title": "Expected Away Goals",
+          "type": "string"
+        },
+        "expected_home_goals": {
+          "pattern": "^\\d+\\.\\d{6}$",
+          "title": "Expected Home Goals",
+          "type": "string"
+        },
+        "fixture_id": {
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "home_goal_pmf": {
+          "items": {
+            "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+            "type": "string"
+          },
+          "title": "Home Goal Pmf",
+          "type": "array"
+        },
+        "home_goals_conceded_pmf": {
+          "items": {
+            "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+            "type": "string"
+          },
+          "title": "Home Goals Conceded Pmf",
+          "type": "array"
+        },
+        "home_max": {
+          "minimum": 0,
+          "title": "Home Max",
+          "type": "integer"
+        },
+        "home_team_id": {
+          "title": "Home Team Id",
+          "type": "string"
+        },
+        "information_cutoff": {
+          "title": "Information Cutoff",
+          "type": "string"
+        },
+        "input_signature_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Input Signature Sha256",
+          "type": "string"
+        },
+        "market_residuals": {
+          "items": {
+            "$ref": "#/$defs/MarketResidual"
+          },
+          "title": "Market Residuals",
+          "type": "array"
+        },
+        "model_family": {
+          "const": "INDEPENDENT_POISSON_SOFT_KL_V1",
+          "title": "Model Family",
+          "type": "string"
+        },
+        "one_x_two": {
+          "$ref": "#/$defs/OneXTwoDistribution"
+        },
+        "policy_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "prior_away_goal_rate": {
+          "pattern": "^\\d+\\.\\d{6}$",
+          "title": "Prior Away Goal Rate",
+          "type": "string"
+        },
+        "prior_home_goal_rate": {
+          "pattern": "^\\d+\\.\\d{6}$",
+          "title": "Prior Home Goal Rate",
+          "type": "string"
+        },
+        "prior_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Prior Sha256",
+          "type": "string"
+        },
+        "probabilities": {
+          "items": {
+            "items": {
+              "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Probabilities",
+          "type": "array"
+        },
+        "result_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Result Sha256",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "joint-score-distribution-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_away_minutes_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Away Minutes Sha256",
+          "type": "string"
+        },
+        "source_home_minutes_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Home Minutes Sha256",
+          "type": "string"
+        },
+        "source_market_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Market Sha256"
+        },
+        "source_minutes_as_of": {
+          "title": "Source Minutes As Of",
+          "type": "string"
+        },
+        "source_minutes_context": {
+          "$ref": "#/$defs/Stage7MinutesContext"
+        },
+        "source_minutes_context_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Minutes Context Sha256",
+          "type": "string"
+        },
+        "tail_mass": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Tail Mass",
+          "type": "string"
+        },
+        "top_scorelines": {
+          "items": {
+            "$ref": "#/$defs/ScorelineProbability"
+          },
+          "title": "Top Scorelines",
+          "type": "array"
+        },
+        "total_goals": {
+          "items": {
+            "$ref": "#/$defs/TotalGoalsProbability"
+          },
+          "title": "Total Goals",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "fixture_id",
+        "home_team_id",
+        "away_team_id",
+        "as_of",
+        "information_cutoff",
+        "source_minutes_as_of",
+        "source_home_minutes_sha256",
+        "source_away_minutes_sha256",
+        "source_minutes_context",
+        "source_minutes_context_sha256",
+        "model_family",
+        "prior_home_goal_rate",
+        "prior_away_goal_rate",
+        "home_max",
+        "away_max",
+        "probabilities",
+        "tail_mass",
+        "home_goal_pmf",
+        "away_goal_pmf",
+        "home_goals_conceded_pmf",
+        "away_goals_conceded_pmf",
+        "expected_home_goals",
+        "expected_away_goals",
+        "one_x_two",
+        "total_goals",
+        "clean_sheets",
+        "both_teams_to_score",
+        "top_scorelines",
+        "market_residuals",
+        "diagnostics",
+        "confidence_grade",
+        "confidence_reasons",
+        "policy_sha256",
+        "prior_sha256",
+        "input_signature_sha256",
+        "result_sha256"
+      ],
+      "title": "JointScoreDistribution",
+      "type": "object"
+    },
+    "MarketResidual": {
+      "additionalProperties": false,
+      "properties": {
+        "away_goals": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Away Goals"
+        },
+        "constraint_id": {
+          "minLength": 1,
+          "title": "Constraint Id",
+          "type": "string"
+        },
+        "event": {
+          "minLength": 1,
+          "title": "Event",
+          "type": "string"
+        },
+        "family": {
+          "minLength": 1,
+          "title": "Family",
+          "type": "string"
+        },
+        "home_goals": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Home Goals"
+        },
+        "line": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Line"
+        },
+        "projected_probability": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Projected Probability",
+          "type": "string"
+        },
+        "residual": {
+          "pattern": "^-?\\d+\\.\\d{12}$",
+          "title": "Residual",
+          "type": "string"
+        },
+        "source_result_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Result Sha256"
+        },
+        "standardized_residual": {
+          "pattern": "^-?\\d+\\.\\d{6}$",
+          "title": "Standardized Residual",
+          "type": "string"
+        },
+        "target_probability": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Target Probability",
+          "type": "string"
+        },
+        "uncertainty": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Uncertainty",
+          "type": "string"
+        },
+        "weight": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Weight",
+          "type": "string"
+        }
+      },
+      "required": [
+        "constraint_id",
+        "family",
+        "event",
+        "line",
+        "target_probability",
+        "projected_probability",
+        "residual",
+        "standardized_residual",
+        "uncertainty",
+        "weight",
+        "source_result_sha256"
+      ],
+      "title": "MarketResidual",
+      "type": "object"
+    },
+    "MonteCarloDiagnostics": {
+      "additionalProperties": false,
+      "properties": {
+        "effective_sample_size": {
+          "exclusiveMinimum": 0.0,
+          "title": "Effective Sample Size",
+          "type": "number"
+        },
+        "max_scenario_weight": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Max Scenario Weight",
+          "type": "number"
+        },
+        "mean_mcse_by_player": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Mean Mcse By Player",
+          "type": "object"
+        },
+        "normalized_weight_sum": {
+          "title": "Normalized Weight Sum",
+          "type": "number"
+        },
+        "quantile_stability_max_span_by_player": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "title": "Quantile Stability Max Span By Player",
+          "type": "object"
+        },
+        "scenario_count": {
+          "minimum": 0,
+          "title": "Scenario Count",
+          "type": "integer"
+        },
+        "stopping_reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Stopping Reasons",
+          "type": "array"
+        },
+        "stopping_result": {
+          "enum": [
+            "PASS",
+            "CONTINUE",
+            "BLOCKED"
+          ],
+          "title": "Stopping Result",
+          "type": "string"
+        },
+        "threshold_probability_se_by_player": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object"
+          },
+          "title": "Threshold Probability Se By Player",
+          "type": "object"
+        }
+      },
+      "required": [
+        "scenario_count",
+        "normalized_weight_sum",
+        "effective_sample_size",
+        "max_scenario_weight",
+        "mean_mcse_by_player",
+        "threshold_probability_se_by_player",
+        "quantile_stability_max_span_by_player",
+        "stopping_result",
+        "stopping_reasons"
+      ],
+      "title": "MonteCarloDiagnostics",
+      "type": "object"
+    },
+    "OneXTwoDistribution": {
+      "additionalProperties": false,
+      "properties": {
+        "away_win": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Away Win",
+          "type": "string"
+        },
+        "draw": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Draw",
+          "type": "string"
+        },
+        "home_win": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Home Win",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home_win",
+        "draw",
+        "away_win"
+      ],
+      "title": "OneXTwoDistribution",
+      "type": "object"
+    },
+    "PairDependence": {
+      "additionalProperties": false,
+      "properties": {
+        "correlation": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": -1.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Correlation"
+        },
+        "correlation_undefined_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Correlation Undefined Reason"
+        },
+        "covariance": {
+          "title": "Covariance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "covariance",
+        "correlation",
+        "correlation_undefined_reason"
+      ],
+      "title": "PairDependence",
+      "type": "object"
+    },
+    "PlayerEventVector": {
+      "additionalProperties": false,
+      "properties": {
+        "auxiliary_source_tag": {
+          "title": "Auxiliary Source Tag",
+          "type": "string"
+        },
+        "bps": {
+          "$ref": "#/$defs/BpsEvents"
+        },
+        "defensive_actions": {
+          "$ref": "#/$defs/DefensiveActions"
+        },
+        "dismissed": {
+          "title": "Dismissed",
+          "type": "boolean"
+        },
+        "eligible_assists": {
+          "minimum": 0,
+          "title": "Eligible Assists",
+          "type": "integer"
+        },
+        "goals_conceded_while_eligible": {
+          "minimum": 0,
+          "title": "Goals Conceded While Eligible",
+          "type": "integer"
+        },
+        "goals_non_penalty": {
+          "minimum": 0,
+          "title": "Goals Non Penalty",
+          "type": "integer"
+        },
+        "goals_penalty": {
+          "minimum": 0,
+          "title": "Goals Penalty",
+          "type": "integer"
+        },
+        "minutes": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minutes",
+          "type": "integer"
+        },
+        "own_goals": {
+          "minimum": 0,
+          "title": "Own Goals",
+          "type": "integer"
+        },
+        "penalty_misses": {
+          "minimum": 0,
+          "title": "Penalty Misses",
+          "type": "integer"
+        },
+        "penalty_saves": {
+          "minimum": 0,
+          "title": "Penalty Saves",
+          "type": "integer"
+        },
+        "player_id": {
+          "title": "Player Id",
+          "type": "string"
+        },
+        "position": {
+          "$ref": "#/$defs/PlayerPosition"
+        },
+        "red_cards": {
+          "minimum": 0,
+          "title": "Red Cards",
+          "type": "integer"
+        },
+        "saves": {
+          "minimum": 0,
+          "title": "Saves",
+          "type": "integer"
+        },
+        "team_goals_after_dismissal": {
+          "minimum": 0,
+          "title": "Team Goals After Dismissal",
+          "type": "integer"
+        },
+        "team_id": {
+          "title": "Team Id",
+          "type": "string"
+        },
+        "yellow_cards": {
+          "minimum": 0,
+          "title": "Yellow Cards",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "player_id",
+        "team_id",
+        "position",
+        "minutes",
+        "goals_non_penalty",
+        "goals_penalty",
+        "eligible_assists",
+        "goals_conceded_while_eligible",
+        "saves",
+        "penalty_saves",
+        "penalty_misses",
+        "yellow_cards",
+        "red_cards",
+        "own_goals",
+        "defensive_actions",
+        "bps",
+        "dismissed",
+        "team_goals_after_dismissal",
+        "auxiliary_source_tag"
+      ],
+      "title": "PlayerEventVector",
+      "type": "object"
+    },
+    "PlayerPosition": {
+      "enum": [
+        "GK",
+        "DEF",
+        "MID",
+        "FWD"
+      ],
+      "title": "PlayerPosition",
+      "type": "string"
+    },
+    "PlayerProjectionSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "bps_bonus": {
+          "$ref": "#/$defs/BpsBonusSummary"
+        },
+        "component_breakdown": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ComponentSummary"
+          },
+          "title": "Component Breakdown",
+          "type": "object"
+        },
+        "component_covariance": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object"
+          },
+          "title": "Component Covariance",
+          "type": "object"
+        },
+        "confidence_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+          ],
+          "title": "Confidence Grade",
+          "type": "string"
+        },
+        "dataset_version_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dataset Version Ids",
+          "type": "array"
+        },
+        "expected_points": {
+          "title": "Expected Points",
+          "type": "number"
+        },
+        "median_points": {
+          "title": "Median Points",
+          "type": "integer"
+        },
+        "model_version_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Model Version Ids",
+          "type": "array"
+        },
+        "monte_carlo_mean_se": {
+          "minimum": 0.0,
+          "title": "Monte Carlo Mean Se",
+          "type": "number"
+        },
+        "player_id": {
+          "title": "Player Id",
+          "type": "string"
+        },
+        "pmf": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Pmf",
+          "type": "object"
+        },
+        "points_standard_deviation": {
+          "minimum": 0.0,
+          "title": "Points Standard Deviation",
+          "type": "number"
+        },
+        "points_variance": {
+          "minimum": 0.0,
+          "title": "Points Variance",
+          "type": "number"
+        },
+        "probability_10_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 10 Plus",
+          "type": "number"
+        },
+        "probability_15_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 15 Plus",
+          "type": "number"
+        },
+        "probability_1_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 1 Plus",
+          "type": "number"
+        },
+        "probability_2_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 2 Plus",
+          "type": "number"
+        },
+        "probability_5_plus": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability 5 Plus",
+          "type": "number"
+        },
+        "probability_negative_points": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Negative Points",
+          "type": "number"
+        },
+        "probability_zero_points": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability Zero Points",
+          "type": "number"
+        },
+        "ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ruleset Hash",
+          "type": "string"
+        },
+        "scenario_effective_sample_size": {
+          "exclusiveMinimum": 0.0,
+          "title": "Scenario Effective Sample Size",
+          "type": "number"
+        },
+        "selected_percentiles": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Selected Percentiles",
+          "type": "object"
+        },
+        "source_bundle_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Bundle Ids",
+          "type": "array"
+        },
+        "threshold_probability_se": {
+          "additionalProperties": {
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "title": "Threshold Probability Se",
+          "type": "object"
+        },
+        "upstream_stage8_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Upstream Stage8 Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "player_id",
+        "expected_points",
+        "median_points",
+        "points_variance",
+        "points_standard_deviation",
+        "probability_negative_points",
+        "probability_zero_points",
+        "probability_1_plus",
+        "probability_2_plus",
+        "probability_5_plus",
+        "probability_10_plus",
+        "probability_15_plus",
+        "selected_percentiles",
+        "pmf",
+        "component_breakdown",
+        "component_covariance",
+        "bps_bonus",
+        "monte_carlo_mean_se",
+        "threshold_probability_se",
+        "scenario_effective_sample_size",
+        "confidence_grade",
+        "ruleset_hash",
+        "model_version_ids",
+        "dataset_version_ids",
+        "source_bundle_ids",
+        "upstream_stage8_sha256"
+      ],
+      "title": "PlayerProjectionSummary",
+      "type": "object"
+    },
+    "PlayerScenarioScore": {
+      "additionalProperties": false,
+      "properties": {
+        "appearance": {
+          "title": "Appearance",
+          "type": "integer"
+        },
+        "assists": {
+          "title": "Assists",
+          "type": "integer"
+        },
+        "bonus": {
+          "minimum": 0,
+          "title": "Bonus",
+          "type": "integer"
+        },
+        "bps": {
+          "title": "Bps",
+          "type": "integer"
+        },
+        "bps_competition_rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Bps Competition Rank"
+        },
+        "bps_tied_at_rank": {
+          "title": "Bps Tied At Rank",
+          "type": "boolean"
+        },
+        "clean_sheet": {
+          "title": "Clean Sheet",
+          "type": "integer"
+        },
+        "defensive_contributions": {
+          "title": "Defensive Contributions",
+          "type": "integer"
+        },
+        "goals": {
+          "title": "Goals",
+          "type": "integer"
+        },
+        "goals_conceded": {
+          "title": "Goals Conceded",
+          "type": "integer"
+        },
+        "own_goals": {
+          "title": "Own Goals",
+          "type": "integer"
+        },
+        "penalty_misses": {
+          "title": "Penalty Misses",
+          "type": "integer"
+        },
+        "penalty_saves": {
+          "title": "Penalty Saves",
+          "type": "integer"
+        },
+        "red_cards": {
+          "title": "Red Cards",
+          "type": "integer"
+        },
+        "saves": {
+          "title": "Saves",
+          "type": "integer"
+        },
+        "total": {
+          "title": "Total",
+          "type": "integer"
+        },
+        "yellow_cards": {
+          "title": "Yellow Cards",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "appearance",
+        "assists",
+        "bonus",
+        "bps",
+        "clean_sheet",
+        "defensive_contributions",
+        "goals",
+        "goals_conceded",
+        "own_goals",
+        "penalty_misses",
+        "penalty_saves",
+        "red_cards",
+        "saves",
+        "total",
+        "yellow_cards",
+        "bps_competition_rank",
+        "bps_tied_at_rank"
+      ],
+      "title": "PlayerScenarioScore",
+      "type": "object"
+    },
+    "ProjectionDiagnostics": {
+      "additionalProperties": false,
+      "properties": {
+        "constraint_count": {
+          "minimum": 0,
+          "title": "Constraint Count",
+          "type": "integer"
+        },
+        "market_rmse": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Market Rmse",
+          "type": "string"
+        },
+        "maximum_absolute_market_residual": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Maximum Absolute Market Residual",
+          "type": "string"
+        },
+        "prior_to_projected_kl": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Prior To Projected Kl",
+          "type": "string"
+        },
+        "projection_status": {
+          "enum": [
+            "PROJECTED",
+            "PRIOR_ONLY",
+            "DEGRADED"
+          ],
+          "title": "Projection Status",
+          "type": "string"
+        },
+        "solver_converged": {
+          "title": "Solver Converged",
+          "type": "boolean"
+        },
+        "solver_error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Solver Error Code"
+        },
+        "solver_iterations": {
+          "minimum": 0,
+          "title": "Solver Iterations",
+          "type": "integer"
+        },
+        "tail_treatment": {
+          "const": "RENORMALISED_TRUNCATION",
+          "title": "Tail Treatment",
+          "type": "string"
+        }
+      },
+      "required": [
+        "projection_status",
+        "solver_converged",
+        "solver_iterations",
+        "solver_error_code",
+        "tail_treatment",
+        "prior_to_projected_kl",
+        "market_rmse",
+        "maximum_absolute_market_residual",
+        "constraint_count"
+      ],
+      "title": "ProjectionDiagnostics",
+      "type": "object"
+    },
+    "ProjectionMode": {
+      "enum": [
+        "PRODUCTION",
+        "TEST",
+        "REPLAY"
+      ],
+      "title": "ProjectionMode",
+      "type": "string"
+    },
+    "RulesetIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "human_approval_recorded": {
+          "title": "Human Approval Recorded",
+          "type": "boolean"
+        },
+        "production_eligible": {
+          "title": "Production Eligible",
+          "type": "boolean"
+        },
+        "ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ruleset Hash",
+          "type": "string"
+        },
+        "ruleset_id": {
+          "title": "Ruleset Id",
+          "type": "string"
+        },
+        "ruleset_version": {
+          "title": "Ruleset Version",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "unknown_blockers": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Unknown Blockers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "ruleset_id",
+        "ruleset_version",
+        "ruleset_hash",
+        "status",
+        "production_eligible",
+        "human_approval_recorded"
+      ],
+      "title": "RulesetIdentity",
+      "type": "object"
+    },
+    "ScorelineProbability": {
+      "additionalProperties": false,
+      "properties": {
+        "away_goals": {
+          "minimum": 0,
+          "title": "Away Goals",
+          "type": "integer"
+        },
+        "home_goals": {
+          "minimum": 0,
+          "title": "Home Goals",
+          "type": "integer"
+        },
+        "probability": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Probability",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home_goals",
+        "away_goals",
+        "probability"
+      ],
+      "title": "ScorelineProbability",
+      "type": "object"
+    },
+    "SimulationStatus": {
+      "enum": [
+        "SUCCESS",
+        "BLOCKED"
+      ],
+      "title": "SimulationStatus",
+      "type": "string"
+    },
+    "Stage7MinutesContext": {
+      "additionalProperties": false,
+      "description": "Home/away Stage-7 identities consumed by one Stage-8 fixture forecast.",
+      "properties": {
+        "away": {
+          "$ref": "#/$defs/TeamMinutesProjectionIdentity"
+        },
+        "home": {
+          "$ref": "#/$defs/TeamMinutesProjectionIdentity"
+        },
+        "schema_version": {
+          "const": "stage7-minutes-context-v1",
+          "default": "stage7-minutes-context-v1",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "home",
+        "away"
+      ],
+      "title": "Stage7MinutesContext",
+      "type": "object"
+    },
+    "TeamMinutesProjectionIdentity": {
+      "additionalProperties": false,
+      "description": "Immutable identity projection of an accepted Stage-7 team output.\n\nStage 8 deliberately does not copy or reinterpret Stage-7 player mathematics. The\nupstream projection remains authoritative; this compact contract binds the score\nprior to its fixture, team, cutoff, model and semantic result identities.",
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "dataset_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dataset Sha256",
+          "type": "string"
+        },
+        "fixture_id": {
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "model_artifact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Model Artifact Sha256",
+          "type": "string"
+        },
+        "model_family": {
+          "const": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+          "title": "Model Family",
+          "type": "string"
+        },
+        "result_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Result Sha256",
+          "type": "string"
+        },
+        "sample_count": {
+          "const": 256,
+          "title": "Sample Count",
+          "type": "integer"
+        },
+        "scenario_set_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scenario Set Sha256",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "team-minutes-projection-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "team_id": {
+          "title": "Team Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "fixture_id",
+        "team_id",
+        "as_of",
+        "model_family",
+        "dataset_sha256",
+        "model_artifact_sha256",
+        "sample_count",
+        "scenario_set_sha256",
+        "result_sha256"
+      ],
+      "title": "TeamMinutesProjectionIdentity",
+      "type": "object"
+    },
+    "TotalGoalsProbability": {
+      "additionalProperties": false,
+      "properties": {
+        "line": {
+          "pattern": "^\\d+\\.5$",
+          "title": "Line",
+          "type": "string"
+        },
+        "over": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Over",
+          "type": "string"
+        },
+        "under": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "Under",
+          "type": "string"
+        }
+      },
+      "required": [
+        "line",
+        "under",
+        "over"
+      ],
+      "title": "TotalGoalsProbability",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "error_code": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error Code"
+    },
+    "error_message": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error Message"
+    },
+    "fixture_id": {
+      "title": "Fixture Id",
+      "type": "string"
+    },
+    "gameweek_id": {
+      "title": "Gameweek Id",
+      "type": "string"
+    },
+    "information_cutoff_utc": {
+      "title": "Information Cutoff Utc",
+      "type": "string"
+    },
+    "joint_matrix": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/JointScenarioMatrix"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "monte_carlo": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MonteCarloDiagnostics"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "player_summaries": {
+      "additionalProperties": {
+        "$ref": "#/$defs/PlayerProjectionSummary"
+      },
+      "title": "Player Summaries",
+      "type": "object"
+    },
+    "projection_mode": {
+      "$ref": "#/$defs/ProjectionMode"
+    },
+    "result_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Result Sha256"
+    },
+    "ruleset": {
+      "$ref": "#/$defs/RulesetIdentity"
+    },
+    "scenarios": {
+      "items": {
+        "$ref": "#/$defs/FixturePointScenario"
+      },
+      "title": "Scenarios",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "fpl-points-fixture-result-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_bundle_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Bundle Ids",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/SimulationStatus"
+    },
+    "upstream_score_distribution": {
+      "$ref": "#/$defs/JointScoreDistribution"
+    },
+    "upstream_stage8_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Upstream Stage8 Sha256",
+      "type": "string"
+    },
+    "warnings": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "fixture_id",
+    "gameweek_id",
+    "scenarios",
+    "player_summaries",
+    "joint_matrix",
+    "monte_carlo",
+    "ruleset",
+    "projection_mode",
+    "information_cutoff_utc",
+    "source_bundle_ids",
+    "upstream_score_distribution",
+    "upstream_stage8_sha256"
+  ],
+  "title": "FixtureProjectionResult",
+  "type": "object"
+}

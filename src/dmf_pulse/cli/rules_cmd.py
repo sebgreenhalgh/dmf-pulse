@@ -12,6 +12,7 @@ from pydantic import BaseModel, ValidationError
 
 from dmf_pulse.rules.aggregation import score_gameweek
 from dmf_pulse.rules.canonical import pretty_rules_json
+from dmf_pulse.rules.capabilities import compile_capability_artifact, write_capability_artifact
 from dmf_pulse.rules.compiler import (
     compile_ruleset,
     load_compiled_ruleset,
@@ -24,9 +25,11 @@ from dmf_pulse.rules.errors import RulesError, RulesValidationError
 from dmf_pulse.rules.lifecycle import activate_ruleset
 from dmf_pulse.rules.models import (
     ApprovalRecord,
+    CapabilityArtifact,
     CompiledRuleset,
     FixtureScenario,
     GameweekScenario,
+    RuleCapability,
 )
 from dmf_pulse.rules.scoring import score_fixture
 
@@ -115,6 +118,33 @@ def hash_command(
     compiled = _run(lambda: load_compiled_ruleset(compiled_file))
     value = {"ruleset_hash": compiled.ruleset_hash, "ruleset_id": compiled.ruleset_id}
     _emit(value, as_json=as_json, human=compiled.ruleset_hash)
+
+
+@rules_app.command("compile-capability")
+def compile_capability_command(
+    ruleset: Path,
+    capability: RuleCapability,
+    output: Annotated[Path, typer.Option("--output", help="Canonical capability JSON output.")],
+    as_json: Annotated[bool, typer.Option("--json", help="Emit deterministic JSON.")] = False,
+) -> None:
+    def operation() -> CapabilityArtifact:
+        artifact = compile_capability_artifact(resolve_ruleset(ruleset), capability)
+        write_capability_artifact(artifact, output)
+        return artifact
+
+    artifact = _run(operation)
+    value = {
+        "blockers": list(artifact.blockers),
+        "capability": artifact.capability.value,
+        "capability_hash": artifact.capability_hash,
+        "output": output.as_posix(),
+        "production_eligible": artifact.production_eligible,
+        "ready_for_human_approval": artifact.ready_for_human_approval,
+        "ruleset_id": artifact.ruleset_id,
+        "ruleset_version": artifact.ruleset_version,
+        "source_backed": artifact.source_backed,
+    }
+    _emit(value, as_json=as_json, human=pretty_rules_json(value).rstrip())
 
 
 @rules_app.command("show")

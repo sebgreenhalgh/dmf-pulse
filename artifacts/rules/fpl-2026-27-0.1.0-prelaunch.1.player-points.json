@@ -1,0 +1,4968 @@
+{
+  "artifact_type": "DMF_RULE_CAPABILITY",
+  "blockers": [],
+  "capability": "PLAYER_POINTS",
+  "capability_hash": "68898c5c9c4f2e2b14001cc1a1625a169eb9858fe20b7e31a45c359077bdec51",
+  "dependency_paths": [
+    "/rules/scoring",
+    "/rules/assists",
+    "/rules/bonus"
+  ],
+  "interpretations": [
+    {
+      "affected_rule": "/rules/bonus/tie_allocation",
+      "approved": true,
+      "approved_at": "2026-08-14T15:08:25Z",
+      "approved_by": "Sebastian Greenhalgh",
+      "decision_hash": "dfe10d4dabf8183c10f4a61d3bd2361bd54ee78d24c96ee9d38da42becfbaa49",
+      "decision_id": "INT-FPL-2026-BONUS-TIES-001",
+      "evidence_source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "interpretation": "GENERAL_COMPETITION_RANKING",
+      "meaning": [
+        "Players are ranked by exact scenario-level BPS, descending.",
+        "Equal BPS values receive the same competition rank.",
+        "Award-bearing competition ranks map rank 1 to 3 points, rank 2 to 2 points, and rank 3 to 1 point.",
+        "After a tie, subsequent competition ranks skip by the number of players occupying the tied rank.",
+        "Every player occupying an award-bearing rank receives that rank's bonus.",
+        "Expected-BPS ranking is prohibited."
+      ],
+      "rationale": "This is the deterministic generalisation consistent with the official published 2026/27 tie examples and the accepted DMF Pulse joint BPS/bonus engine. It is an approved interpretation, not a claim that FPL explicitly published the complete general algorithm.",
+      "review_trigger": "Immediately revisit if official FPL/Premier League rules, API configuration, official scoring output, or another authoritative source publishes or demonstrates a conflicting general tie allocation rule.",
+      "risk": "An unshown tie cardinality could be treated differently by the official game.",
+      "scope": [
+        "PLAYER_POINTS"
+      ],
+      "season": "2026/2027"
+    }
+  ],
+  "production_eligible": true,
+  "ready_for_human_approval": true,
+  "rule_verification": [
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/ambiguous_state_allowed_for_exact_scoring",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": false,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/classification_states/0",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "DEFINITE_ASSIST",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/classification_states/1",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "DEFINITE_NO_ASSIST",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/classification_states/2",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "AMBIGUOUS_ASSIST",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/defensive_touches/defender_attempted_pass_disqualifies",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/defensive_touches/inside_box/intended_destination_required",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": false,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/defensive_touches/inside_box/max_defensive_touches",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/defensive_touches/outside_box/intended_destination_required",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/defensive_touches/outside_box/max_defensive_touches",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/defensive_touches/two_or_more_touches_disqualify",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/defensive_touches/woodwork_is_defensive_touch",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": false,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/eligible_attacking_actions/0",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "PASS",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/eligible_attacking_actions/1",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "CROSS",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/eligible_attacking_actions/2",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "INADVERTENT_TOUCH",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/eligible_attacking_actions/3",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "SHOT",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/eligible_attacking_actions/4",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "FOUL_WON",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/eligible_attacking_actions/5",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "FORCED_OWN_GOAL_ACTION",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/final_qualifying_attacking_touch_required",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/inadvertent_touch_must_reach_scorer_directly",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/official_fpl_final_decision_controls",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/own_goals/forcing_shot_or_pass_eligible",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/own_goals/requires_identifiable_forcing_action",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/policy_version",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "2026.1",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/defensive_touch_after_rebound_disqualifies",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/multiple_save_touches_are_one_intervention",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/must_reach_scorer_directly",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/obvious_pass_or_cross_is_shot",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": false,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/qualifying_interventions/0",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "GOALKEEPER_SAVE",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/qualifying_interventions/1",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "DEFENSIVE_BLOCK",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/qualifying_interventions/2",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "WOODWORK",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/qualifying_origins/0",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "SHOT",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/qualifying_origins/1",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "CROSS_SHOT",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/scorer_own_rebound_disqualifies",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/rebounds/shot_must_be_on_target",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": false,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/scorer_loses_and_regains_possession_disqualifies",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/corner_or_throw_in_direct_assist",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": false,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/foul_winner_eligible_if_directly_scored",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/handball/pass_or_touch/defensive_touch_before_handball_disqualifies",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/handball/shot/direct_shot_required",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/handball/shot/on_target_after_deflection_required",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/handball/shot/on_target_before_deflection_required",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/last_attacker_before_handball_eligible_if_directly_scored",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/set_pieces/taker_who_won_foul_ineligible",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/eligibility_policy/tackle_or_interception_pass_requires_teammate_intent",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/input_contract",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "RESOLVED_ELIGIBLE_ASSIST_COUNT",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/assists/points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Assists, including defensive touches, rebounds, own goals, set pieces and exclusions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bonus_points_by_competition_rank/1",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus points and Bonus Points System",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bonus_points_by_competition_rank/2",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus points and Bonus Points System",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bonus_points_by_competition_rank/3",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus points and Bonus Points System",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/appearance_bands/0/bps",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/appearance_bands/0/max_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 60,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/appearance_bands/0/min_exclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": null,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/appearance_bands/0/min_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/appearance_bands/1/bps",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 6,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/appearance_bands/1/max_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": null,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/appearance_bands/1/min_exclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 60,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/appearance_bands/1/min_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": null,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/assist",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 9,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/big_chance_created",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/cbi_group/bps_per_group",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/cbi_group/group_size",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/clean_sheet/bps",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 12,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/clean_sheet/min_minutes",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 60,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/clean_sheet/positions/0",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "GK",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/clean_sheet/positions/1",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "DEF",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/foul_won",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/goal_line_clearance",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 9,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/goals/non_penalty_by_position/DEF",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 12,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/goals/non_penalty_by_position/FWD",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 24,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/goals/non_penalty_by_position/GK",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 12,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/goals/non_penalty_by_position/MID",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 18,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/goals/penalty_direct/bps",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 12,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/goals/penalty_direct/exclusive_with_non_penalty_position_goal",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/key_pass",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/match_winning_goal",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/being_tackled",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "REMOVED",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/big_chance_missed",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/error_leading_attempt",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/error_leading_goal",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/foul_conceded",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/goal_conceded_gk_def",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -4,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/offside",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/own_goal",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -6,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/penalty_conceded",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/penalty_miss",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -6,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/red",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -9,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/shot_off_target",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/negatives/yellow",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/0/bps",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/0/max_pct_exclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 80,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/0/max_pct_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": null,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/0/min_pct_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 70,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/1/bps",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 4,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/1/max_pct_exclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 90,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/1/max_pct_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": null,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/1/min_pct_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 80,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/2/bps",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 6,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/2/max_pct_exclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": null,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/2/max_pct_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 100,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/bands/2/min_pct_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 90,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/combination",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "HIGHEST_MATCHING_ONLY",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/pass_completion/min_attempts",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 30,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/penalty_save",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 7,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/recovery_group/bps_per_group",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/recovery_group/group_size",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/save_any",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/save_big_chance_additional",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/save_inside_box_additional",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/shot_on_target",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/successful_dribble",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/successful_open_play_cross",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/bps/successful_tackle",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001",
+        "SRC-FPL-2026-BPS-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus Points System > full event-value table",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 BPS changes: saves, big-chance saves, CBI, penalty saves and being-tackled removal",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-BPS-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/bonus/scope",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus points and Bonus Points System",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "PER_FIXTURE",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [
+        "INT-FPL-2026-BONUS-TIES-001"
+      ],
+      "interpretation_note": "The official sources publish specific bonus-tie examples but do not state a complete arbitrary-cardinality algorithm. GENERAL_COMPETITION_RANKING is the separately recorded, human-approved PLAYER_POINTS interpretation in INT-FPL-2026-BONUS-TIES-001.",
+      "rule_path": "/rules/bonus/tie_allocation",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Bonus points > published tie examples",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "GENERAL_COMPETITION_RANKING",
+      "verification_status": "INTERPRETATION_REQUIRED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/bands/0/id",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "SHORT",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/bands/0/max_exclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 60,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/bands/0/min_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/bands/0/points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/bands/1/id",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "LONG",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/bands/1/max_exclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": null,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/bands/1/min_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 60,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/bands/1/points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/combination",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "HIGHEST_MATCHING_ONLY",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/min_minutes_for_any_points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/appearance/stoppage_time_included",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": false,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/assists/points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/cards/red_points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/cards/yellow_points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/clean_sheets/continue_goals_after_dismissal",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/clean_sheets/evaluate_goals_while_player_eligible",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/clean_sheets/min_minutes_inclusive",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 60,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/clean_sheets/points_by_position/DEF",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 4,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/clean_sheets/points_by_position/FWD",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 0,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/clean_sheets/points_by_position/GK",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 4,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/clean_sheets/points_by_position/MID",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/clean_sheets/retain_after_normal_substitution",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/DEF/enabled",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/DEF/event_types/0",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "CLEARANCE",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/DEF/event_types/1",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "BLOCK",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/DEF/event_types/2",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "INTERCEPTION",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/DEF/event_types/3",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "TACKLE",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/DEF/max_points",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/DEF/points",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/DEF/threshold",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 10,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/FWD/enabled",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/FWD/event_types/0",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "CLEARANCE",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/FWD/event_types/1",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "BLOCK",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/FWD/event_types/2",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "INTERCEPTION",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/FWD/event_types/3",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "TACKLE",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/FWD/event_types/4",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "BALL_RECOVERY",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/FWD/max_points",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/FWD/points",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/FWD/threshold",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 12,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/GK/enabled",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": false,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/GK/max_points",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 0,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/GK/points",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 0,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/GK/threshold",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": null,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/MID/enabled",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/MID/event_types/0",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "CLEARANCE",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/MID/event_types/1",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "BLOCK",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/MID/event_types/2",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "INTERCEPTION",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/MID/event_types/3",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "TACKLE",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/MID/event_types/4",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "BALL_RECOVERY",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/MID/max_points",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/MID/points",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/by_position/MID/threshold",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 12,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/defensive_contributions/scope",
+      "source_refs": [
+        "SRC-FPL-2026-DC-001",
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "2026/27 defensive-contribution thresholds, event sets and two-point cap",
+          "published_on": "2026-07-20",
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-DC-001",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points > Defensive contributions",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "PER_FIXTURE",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goalkeeper_saves/cap_per_fixture",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": null,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goalkeeper_saves/points_per_group",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goalkeeper_saves/saves_per_point",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 3,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goals/points_by_position/DEF",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 6,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goals/points_by_position/FWD",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 4,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goals/points_by_position/GK",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 10,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goals/points_by_position/MID",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 5,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goals_conceded/goals_per_deduction",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goals_conceded/points_per_group",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -1,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goals_conceded/positions/0",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "GK",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/goals_conceded/positions/1",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "DEF",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/own_goals/points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/participation/appearance_eligibility",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "OFFICIAL_MINUTES_GREATER_THAN_ZERO",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/participation/bonus_eligibility",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "OFFICIAL_MINUTES_GREATER_THAN_ZERO",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/participation/fixture_scope",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/participation/minute_basis",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "OFFICIAL_MINUTES_EXCLUDING_STOPPAGE_TIME",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/participation/position_basis",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": "TARGET_SEASON_FPL_POSITION",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/participation/reject_unmapped_position",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": true,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/penalties/miss_points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": -2,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/penalties/save_points",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": 5,
+      "verification_status": "VERIFIED"
+    },
+    {
+      "interpretation_decision_ids": [],
+      "interpretation_note": null,
+      "rule_path": "/rules/scoring/penalties/shootout_eligible",
+      "source_refs": [
+        "SRC-FPL-2026-RULES-001"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-14",
+          "locator": "Rules > Scoring points; Player scoring; Clean sheets; Red cards",
+          "published_on": null,
+          "refresh_trigger": "TARGET_SEASON_OFFICIAL_RULE_CHANGE",
+          "source_id": "SRC-FPL-2026-RULES-001",
+          "verification_status": "VERIFIED"
+        }
+      ],
+      "value": false,
+      "verification_status": "VERIFIED"
+    }
+  ],
+  "ruleset_id": "fpl-2026-27",
+  "ruleset_version": "0.1.0-prelaunch.1",
+  "schema_version": "1.1",
+  "season_code": "2026/2027",
+  "selected_rules": {
+    "/rules/assists": {
+      "ambiguous_state_allowed_for_exact_scoring": false,
+      "classification_states": [
+        "DEFINITE_ASSIST",
+        "DEFINITE_NO_ASSIST",
+        "AMBIGUOUS_ASSIST"
+      ],
+      "eligibility_policy": {
+        "defensive_touches": {
+          "defender_attempted_pass_disqualifies": true,
+          "inside_box": {
+            "intended_destination_required": false,
+            "max_defensive_touches": 1
+          },
+          "outside_box": {
+            "intended_destination_required": true,
+            "max_defensive_touches": 1
+          },
+          "two_or_more_touches_disqualify": true,
+          "woodwork_is_defensive_touch": false
+        },
+        "eligible_attacking_actions": [
+          "PASS",
+          "CROSS",
+          "INADVERTENT_TOUCH",
+          "SHOT",
+          "FOUL_WON",
+          "FORCED_OWN_GOAL_ACTION"
+        ],
+        "final_qualifying_attacking_touch_required": true,
+        "inadvertent_touch_must_reach_scorer_directly": true,
+        "official_fpl_final_decision_controls": true,
+        "own_goals": {
+          "forcing_shot_or_pass_eligible": true,
+          "requires_identifiable_forcing_action": true
+        },
+        "policy_version": "2026.1",
+        "rebounds": {
+          "defensive_touch_after_rebound_disqualifies": true,
+          "multiple_save_touches_are_one_intervention": true,
+          "must_reach_scorer_directly": true,
+          "obvious_pass_or_cross_is_shot": false,
+          "qualifying_interventions": [
+            "GOALKEEPER_SAVE",
+            "DEFENSIVE_BLOCK",
+            "WOODWORK"
+          ],
+          "qualifying_origins": [
+            "SHOT",
+            "CROSS_SHOT"
+          ],
+          "scorer_own_rebound_disqualifies": true,
+          "shot_must_be_on_target": false
+        },
+        "scorer_loses_and_regains_possession_disqualifies": true,
+        "set_pieces": {
+          "corner_or_throw_in_direct_assist": false,
+          "foul_winner_eligible_if_directly_scored": true,
+          "handball": {
+            "pass_or_touch": {
+              "defensive_touch_before_handball_disqualifies": true
+            },
+            "shot": {
+              "direct_shot_required": true,
+              "on_target_after_deflection_required": true,
+              "on_target_before_deflection_required": true
+            }
+          },
+          "last_attacker_before_handball_eligible_if_directly_scored": true,
+          "taker_who_won_foul_ineligible": true
+        },
+        "tackle_or_interception_pass_requires_teammate_intent": true
+      },
+      "input_contract": "RESOLVED_ELIGIBLE_ASSIST_COUNT",
+      "points": 3
+    },
+    "/rules/bonus": {
+      "bonus_points_by_competition_rank": {
+        "1": 3,
+        "2": 2,
+        "3": 1
+      },
+      "bps": {
+        "appearance_bands": [
+          {
+            "bps": 3,
+            "max_inclusive": 60,
+            "min_exclusive": null,
+            "min_inclusive": 1
+          },
+          {
+            "bps": 6,
+            "max_inclusive": null,
+            "min_exclusive": 60,
+            "min_inclusive": null
+          }
+        ],
+        "assist": 9,
+        "big_chance_created": 3,
+        "cbi_group": {
+          "bps_per_group": 1,
+          "group_size": 3
+        },
+        "clean_sheet": {
+          "bps": 12,
+          "min_minutes": 60,
+          "positions": [
+            "GK",
+            "DEF"
+          ]
+        },
+        "foul_won": 1,
+        "goal_line_clearance": 9,
+        "goals": {
+          "non_penalty_by_position": {
+            "DEF": 12,
+            "FWD": 24,
+            "GK": 12,
+            "MID": 18
+          },
+          "penalty_direct": {
+            "bps": 12,
+            "exclusive_with_non_penalty_position_goal": true
+          }
+        },
+        "key_pass": 1,
+        "match_winning_goal": 3,
+        "negatives": {
+          "being_tackled": "REMOVED",
+          "big_chance_missed": -3,
+          "error_leading_attempt": -1,
+          "error_leading_goal": -3,
+          "foul_conceded": -1,
+          "goal_conceded_gk_def": -4,
+          "offside": -1,
+          "own_goal": -6,
+          "penalty_conceded": -3,
+          "penalty_miss": -6,
+          "red": -9,
+          "shot_off_target": -1,
+          "yellow": -3
+        },
+        "pass_completion": {
+          "bands": [
+            {
+              "bps": 2,
+              "max_pct_exclusive": 80,
+              "max_pct_inclusive": null,
+              "min_pct_inclusive": 70
+            },
+            {
+              "bps": 4,
+              "max_pct_exclusive": 90,
+              "max_pct_inclusive": null,
+              "min_pct_inclusive": 80
+            },
+            {
+              "bps": 6,
+              "max_pct_exclusive": null,
+              "max_pct_inclusive": 100,
+              "min_pct_inclusive": 90
+            }
+          ],
+          "combination": "HIGHEST_MATCHING_ONLY",
+          "min_attempts": 30
+        },
+        "penalty_save": 7,
+        "recovery_group": {
+          "bps_per_group": 1,
+          "group_size": 3
+        },
+        "save_any": 2,
+        "save_big_chance_additional": 1,
+        "save_inside_box_additional": 1,
+        "shot_on_target": 2,
+        "successful_dribble": 1,
+        "successful_open_play_cross": 1,
+        "successful_tackle": 2
+      },
+      "scope": "PER_FIXTURE",
+      "tie_allocation": "GENERAL_COMPETITION_RANKING"
+    },
+    "/rules/scoring": {
+      "appearance": {
+        "bands": [
+          {
+            "id": "SHORT",
+            "max_exclusive": 60,
+            "min_inclusive": 1,
+            "points": 1
+          },
+          {
+            "id": "LONG",
+            "max_exclusive": null,
+            "min_inclusive": 60,
+            "points": 2
+          }
+        ],
+        "combination": "HIGHEST_MATCHING_ONLY",
+        "min_minutes_for_any_points": 1,
+        "stoppage_time_included": false
+      },
+      "assists": {
+        "points": 3
+      },
+      "cards": {
+        "red_points": -3,
+        "yellow_points": -1
+      },
+      "clean_sheets": {
+        "continue_goals_after_dismissal": true,
+        "evaluate_goals_while_player_eligible": true,
+        "min_minutes_inclusive": 60,
+        "points_by_position": {
+          "DEF": 4,
+          "FWD": 0,
+          "GK": 4,
+          "MID": 1
+        },
+        "retain_after_normal_substitution": true
+      },
+      "defensive_contributions": {
+        "by_position": {
+          "DEF": {
+            "enabled": true,
+            "event_types": [
+              "CLEARANCE",
+              "BLOCK",
+              "INTERCEPTION",
+              "TACKLE"
+            ],
+            "max_points": 2,
+            "points": 2,
+            "threshold": 10
+          },
+          "FWD": {
+            "enabled": true,
+            "event_types": [
+              "CLEARANCE",
+              "BLOCK",
+              "INTERCEPTION",
+              "TACKLE",
+              "BALL_RECOVERY"
+            ],
+            "max_points": 2,
+            "points": 2,
+            "threshold": 12
+          },
+          "GK": {
+            "enabled": false,
+            "event_types": [],
+            "max_points": 0,
+            "points": 0,
+            "threshold": null
+          },
+          "MID": {
+            "enabled": true,
+            "event_types": [
+              "CLEARANCE",
+              "BLOCK",
+              "INTERCEPTION",
+              "TACKLE",
+              "BALL_RECOVERY"
+            ],
+            "max_points": 2,
+            "points": 2,
+            "threshold": 12
+          }
+        },
+        "scope": "PER_FIXTURE"
+      },
+      "goalkeeper_saves": {
+        "cap_per_fixture": null,
+        "points_per_group": 1,
+        "saves_per_point": 3
+      },
+      "goals": {
+        "points_by_position": {
+          "DEF": 6,
+          "FWD": 4,
+          "GK": 10,
+          "MID": 5
+        }
+      },
+      "goals_conceded": {
+        "goals_per_deduction": 2,
+        "points_per_group": -1,
+        "positions": [
+          "GK",
+          "DEF"
+        ]
+      },
+      "own_goals": {
+        "points": -2
+      },
+      "participation": {
+        "appearance_eligibility": "OFFICIAL_MINUTES_GREATER_THAN_ZERO",
+        "bonus_eligibility": "OFFICIAL_MINUTES_GREATER_THAN_ZERO",
+        "fixture_scope": true,
+        "minute_basis": "OFFICIAL_MINUTES_EXCLUDING_STOPPAGE_TIME",
+        "position_basis": "TARGET_SEASON_FPL_POSITION",
+        "reject_unmapped_position": true
+      },
+      "penalties": {
+        "miss_points": -2,
+        "save_points": 5,
+        "shootout_eligible": false
+      }
+    }
+  },
+  "source_backed": true
+}
