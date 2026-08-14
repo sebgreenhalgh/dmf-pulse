@@ -85,6 +85,7 @@ markers = [
   "migration: exercises Alembic upgrade/downgrade behavior",
   "contract: validates frozen public or provider contracts",
   "security: validates rights, retention, path, and disclosure boundaries",
+  "performance: wall-clock/performance smoke test",
 ]
 
 [tool.coverage.run]
