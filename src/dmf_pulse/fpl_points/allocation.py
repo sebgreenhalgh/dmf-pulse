@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from decimal import Decimal
-from math import ceil, exp
+from math import exp
 
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import (
@@ -343,16 +343,7 @@ def _initialize_accumulators(
             if float(rng.random()) < _event_probability(
                 profile.red_cards_per90, participant.official_minutes
             ):
-                lower = participant.interval.start_minute + 0.01
-                upper = participant.interval.end_minute
-                dismissal = float(rng.uniform(lower, upper))
-                accumulator.dismissed_at = dismissal
-                accumulator.effective_end = dismissal
                 accumulator.red_cards = 1
-                accumulator.minutes = min(
-                    participant.official_minutes,
-                    max(1, ceil(dismissal - participant.interval.start_minute)),
-                )
         accumulators[participant.player_id] = accumulator
     return accumulators
 

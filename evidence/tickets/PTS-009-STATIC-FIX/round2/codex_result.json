@@ -1,0 +1,13 @@
+{
+  "schema_version": "pts-009-static-fix-r2-result-v1",
+  "status": "COMPLETE",
+  "pinned_parent": "43270ee54ceff6c4692a6a84118565c16fa6be72",
+  "branch": "stage/A9/PTS-009-static-acceptance-r2",
+  "implementation_status": "PASS",
+  "full_acceptance_status": "PASS",
+  "owner_scope_amendment_1": "Approved exactly evidence/tickets/GCS-008/current_manifest.json as the mutable active-repository snapshot.",
+  "production_activation": "UNCHANGED: target-season rules remain CAPTURED_UNVERIFIED and no Stage-2 activation was created.",
+  "dependency_or_migration_change": false,
+  "human_acceptance_limitation": "The symlink-escape executable case could not run on this Windows host because symlink creation was denied; Linux/CI must exercise that case before human acceptance.",
+  "commit_created": false
+}

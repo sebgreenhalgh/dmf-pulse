@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
 from types import ModuleType
 
@@ -29,6 +30,11 @@ def _result() -> FixtureProjectionResult:
     return FplPointsService(reference_engine(), mc_policy()).project(
         make_request(scenario_count=8, root_seed=1919)
     )
+
+
+def _rehash(result: FixtureProjectionResult) -> FixtureProjectionResult:
+    unhashed = result.model_copy(update={"result_sha256": None})
+    return unhashed.model_copy(update={"result_sha256": semantic_sha256(unhashed)})
 
 
 def test_artifact_assurance_recomputes_rules_and_detects_bps_bonus_tampering() -> None:
@@ -111,6 +117,112 @@ def test_successful_artifact_assurance_requires_rules_recomputation() -> None:
     assert "RULESET_RECOMPUTE_REQUIRED" in module.validate_projection(_result())
 
 
+def test_artifact_assurance_regenerates_primitives_and_every_derivation() -> None:
+    module = _load_script("check_stage9_artifact")
+    result = FplPointsService(reference_engine(), mc_policy()).project(
+        make_request(scenario_count=49, root_seed=1919)
+    )
+    assert module.validate_projection(result, reference_engine()) == []
+
+    scenario = result.scenarios[0]
+    event_player = scenario.event_scenario.players[0].model_copy(update={"minutes": 1})
+    event = scenario.event_scenario.model_copy(
+        update={"players": (event_player, *scenario.event_scenario.players[1:])}
+    )
+    primitive_tamper = _rehash(
+        result.model_copy(
+            update={
+                "scenarios": (
+                    scenario.model_copy(update={"event_scenario": event}),
+                    *result.scenarios[1:],
+                )
+            }
+        )
+    )
+    assert "SCENARIO_REGENERATION_MISMATCH" in module.validate_projection(
+        primitive_tamper, reference_engine()
+    )
+
+    goal_scenario = next(scenario for scenario in result.scenarios if scenario.event_scenario.goals)
+    moved_goal = goal_scenario.event_scenario.goals[0].model_copy(update={"minute": 129.0})
+    moved_event = goal_scenario.event_scenario.model_copy(
+        update={"goals": (moved_goal, *goal_scenario.event_scenario.goals[1:])}
+    )
+    goal_tamper = _rehash(
+        result.model_copy(
+            update={
+                "scenarios": tuple(
+                    goal_scenario.model_copy(update={"event_scenario": moved_event})
+                    if scenario.scenario_id == goal_scenario.scenario_id
+                    else scenario
+                    for scenario in result.scenarios
+                )
+            }
+        )
+    )
+    assert "SCENARIO_REGENERATION_MISMATCH" in module.validate_projection(
+        goal_tamper, reference_engine()
+    )
+
+    changed_request = result.simulation_request.model_copy(
+        update={
+            "allocation_config": result.simulation_request.allocation_config.model_copy(
+                update={"goal_time_lower": 2.0}
+            )
+        }
+    )
+    request_tamper = _rehash(
+        result.model_copy(
+            update={
+                "simulation_request": changed_request,
+                "simulation_request_sha256": semantic_sha256(changed_request),
+            }
+        )
+    )
+    assert "SCENARIO_REGENERATION_MISMATCH" in module.validate_projection(
+        request_tamper, reference_engine()
+    )
+
+    player_id = next(iter(result.player_summaries))
+    changed_summaries = dict(result.player_summaries)
+    changed_summaries[player_id] = changed_summaries[player_id].model_copy(
+        update={"expected_points": changed_summaries[player_id].expected_points + 1.0}
+    )
+    summary_tamper = _rehash(result.model_copy(update={"player_summaries": changed_summaries}))
+    assert "SUMMARY_RECOMPUTE_MISMATCH" in module.validate_projection(
+        summary_tamper, reference_engine()
+    )
+
+    matrix = result.joint_matrix
+    assert matrix is not None
+    left, right = matrix.player_ids[:2]
+    dependence = {key: dict(row) for key, row in matrix.dependence.items()}
+    dependence[left][right] = dependence[left][right].model_copy(update={"covariance": 0.123})
+    dependence_tamper = _rehash(
+        result.model_copy(
+            update={"joint_matrix": matrix.model_copy(update={"dependence": dependence})}
+        )
+    )
+    assert "JOINT_MATRIX_RECOMPUTE_MISMATCH" in module.validate_projection(
+        dependence_tamper, reference_engine()
+    )
+
+    diagnostics = result.monte_carlo
+    assert diagnostics is not None
+    diagnostics_tamper = _rehash(
+        result.model_copy(
+            update={
+                "monte_carlo": diagnostics.model_copy(
+                    update={"max_scenario_weight": diagnostics.max_scenario_weight / 2}
+                )
+            }
+        )
+    )
+    assert "MONTE_CARLO_RECOMPUTE_MISMATCH" in module.validate_projection(
+        diagnostics_tamper, reference_engine()
+    )
+
+
 @pytest.mark.parametrize(
     ("mutator", "message"),
     [
@@ -173,32 +285,84 @@ def _materialize_scope_root(root: Path, module: ModuleType) -> None:
     (root / "CHANGED_FILES.txt").write_text("\n".join(changed) + "\n", encoding="utf-8")
 
 
+def _prepare_scope_repository(root: Path, module: ModuleType) -> str:
+    _materialize_scope_root(root, module)
+
+    def git(*args: str) -> str:
+        result = subprocess.run(
+            ("git", *args), cwd=root, check=True, capture_output=True, text=True
+        )
+        return result.stdout.strip()
+
+    git("init")
+    git("config", "user.email", "pts009@example.invalid")
+    git("config", "user.name", "PTS-009 test")
+    git("add", ".")
+    git("commit", "-m", "baseline")
+    return git("rev-parse", "HEAD")
+
+
+def _write_scope_declaration(root: Path, entries: tuple[str, ...]) -> Path:
+    declaration = root / "evidence/tickets/PTS-009-STATIC-FIX/round2/CHANGED_FILES.txt"
+    declaration.parent.mkdir(parents=True, exist_ok=True)
+    declaration.write_text("\n".join(entries) + "\n", encoding="utf-8")
+    return declaration
+
+
 def test_scope_assurance_rejects_stage10_module_and_missing_resource(tmp_path: Path) -> None:
     module = _load_script("check_stage9_scope")
-    _materialize_scope_root(tmp_path, module)
+    parent = _prepare_scope_repository(tmp_path, module)
     forbidden = "src/dmf_pulse/optimisation/stage10.py"
     path = tmp_path / forbidden
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("def optimise():\n    return 1\n", encoding="utf-8")
-    with (tmp_path / "CHANGED_FILES.txt").open("a", encoding="utf-8") as handle:
-        handle.write(forbidden + "\n")
+    (tmp_path / "PLANS.md").write_text("changed\n", encoding="utf-8")
+    declaration = _write_scope_declaration(
+        tmp_path,
+        (
+            "PLANS.md",
+            "evidence/tickets/PTS-009-STATIC-FIX/round2/CHANGED_FILES.txt",
+        ),
+    )
     (tmp_path / "config/models/fpl_points_simulation.yaml").unlink()
-    errors = module.validate_scope(tmp_path)
+    errors = module.validate_scope(
+        tmp_path, parent_revision=parent, declaration=declaration.relative_to(tmp_path)
+    )
     assert f"STAGE10_PLUS_SCOPE_VIOLATION:{forbidden}" in errors
+    assert f"DECLARATION_MISSING_ACTUAL:{forbidden}" in errors
     assert "MISSING_REQUIRED_FILE:config/models/fpl_points_simulation.yaml" in errors
 
 
 def test_scope_assurance_rejects_manager_state_module(tmp_path: Path) -> None:
     module = _load_script("check_stage9_scope")
-    _materialize_scope_root(tmp_path, module)
+    parent = _prepare_scope_repository(tmp_path, module)
     forbidden = "src/dmf_pulse/manager_state/autosubs.py"
     path = tmp_path / forbidden
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("def autosub():\n    return 1\n", encoding="utf-8")
-    with (tmp_path / "CHANGED_FILES.txt").open("a", encoding="utf-8") as handle:
-        handle.write(forbidden + "\n")
-    errors = module.validate_scope(tmp_path)
+    declaration = _write_scope_declaration(
+        tmp_path, ("evidence/tickets/PTS-009-STATIC-FIX/round2/CHANGED_FILES.txt",)
+    )
+    errors = module.validate_scope(
+        tmp_path, parent_revision=parent, declaration=declaration.relative_to(tmp_path)
+    )
     assert f"STAGE10_PLUS_SCOPE_VIOLATION:{forbidden}" in errors
+
+
+def test_scope_assurance_rejects_extra_declared_real_diff_file(tmp_path: Path) -> None:
+    module = _load_script("check_stage9_scope")
+    parent = _prepare_scope_repository(tmp_path, module)
+    declaration = _write_scope_declaration(
+        tmp_path,
+        (
+            "evidence/tickets/PTS-009-STATIC-FIX/round2/CHANGED_FILES.txt",
+            "not-really-changed.txt",
+        ),
+    )
+    errors = module.validate_scope(
+        tmp_path, parent_revision=parent, declaration=declaration.relative_to(tmp_path)
+    )
+    assert "DECLARATION_EXTRA:not-really-changed.txt" in errors
 
 
 def _coverage_payload(module: ModuleType) -> dict[str, object]:

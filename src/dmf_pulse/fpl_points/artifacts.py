@@ -96,6 +96,45 @@ def _write_once(path: Path, data: bytes) -> None:
             temporary.unlink(missing_ok=True)
 
 
+def _safe_path_segment(value: str, *, label: str) -> str:
+    """Validate a single portable artifact identity path segment."""
+
+    if (
+        not isinstance(value, str)
+        or not value
+        or value in {".", ".."}
+        or "/" in value
+        or "\\" in value
+        or ":" in value
+        or "\x00" in value
+        or Path(value).is_absolute()
+    ):
+        raise FplPointsError(
+            "ARTIFACT_IDENTITY_INVALID", f"{label} must be one safe artifact path segment"
+        )
+    return value
+
+
+def _contained_artifact_directory(
+    artifact_root: Path, category: str, identity_parts: tuple[str, ...]
+) -> Path:
+    safe_category = _safe_path_segment(category, label="category")
+    safe_parts = tuple(
+        _safe_path_segment(part, label=f"identity part {index}")
+        for index, part in enumerate(identity_parts)
+    )
+    try:
+        root = artifact_root.resolve()
+        candidate = (root / "fpl_points" / safe_category).joinpath(*safe_parts)
+        resolved = candidate.resolve()
+        resolved.relative_to(root)
+    except (OSError, ValueError) as exc:
+        raise FplPointsError(
+            "ARTIFACT_PATH_ESCAPE", "artifact path escapes the configured artifact root"
+        ) from exc
+    return candidate
+
+
 def persist_model_artifact(
     value: BaseModel,
     *,
@@ -105,9 +144,7 @@ def persist_model_artifact(
 ) -> Path:
     data = canonical_json_bytes(value)
     digest = sha256_bytes(data)
-    directory = artifact_root / "fpl_points" / category
-    for part in identity_parts:
-        directory /= part
+    directory = _contained_artifact_directory(artifact_root, category, identity_parts)
     path = directory / f"{digest}.json"
     _write_once(path, data)
     _write_once(path.with_suffix(".sha256"), f"{digest}  {path.name}\n".encode("ascii"))

@@ -1,0 +1,18 @@
+{
+  "schema_version": "pts-009-static-fix-r2-tests-v1",
+  "full_acceptance": {"status": "PASS", "duration_seconds": 1353.4},
+  "focused_stage9": {"status": "PASS", "passed": 148, "duration_seconds": 63.12},
+  "stage9_coverage_gate": {"status": "PASS", "minimum_line_percent": 85, "minimum_branch_percent": 70},
+  "performance": {"status": "PASS", "passed": 1, "duration_seconds": 7.2},
+  "rules_regression": {"status": "PASS", "passed": 123},
+  "availability_regression": {"status": "PASS", "passed": 168},
+  "football_events_regression": {"status": "PASS", "passed": 168},
+  "migration_matrix": {"status": "PASS", "baseline_revision": "20260803_0005", "target_revision": "20260807_0006"},
+  "postgres_integration": {"status": "PASS", "passed": 110, "deselected": 118, "duration_seconds": 240.08},
+  "repository_regression": {"status": "PASS", "passed": 1810, "coverage_percent": 91.44, "duration_seconds": 911.32},
+  "cli_artifact_replay": {"status": "PASS", "result_sha256": "d6d0d5be0373988ecb0a5cdbb8ed86a7f2b4e92753e3aeaba909ccdc5e17f9d5"},
+  "wheel_verification": {"status": "PASS", "wheel_sha256": "f343d8d2fb498b6ff1e065adcf34597840f0fcb7384fe26ca5c554f98b06bce4"},
+  "scope_assurance": {"status": "PASS"},
+  "repository_validation": {"status": "PASS"},
+  "secret_scan": {"status": "PASS", "finding_count": 0}
+}

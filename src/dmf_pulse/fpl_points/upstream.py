@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from pydantic import ValidationError
@@ -128,29 +129,117 @@ def build_participation_scenario(
     if (home.team_id, away.team_id) != (home_team_id, away_team_id):
         raise FplPointsError("STAGE7_TEAM_MISMATCH", "Stage-7 projection teams differ")
     context = Stage7MinutesContext.from_projections(home, away)
+    projections: dict[str, tuple[str, Any]] = {}
+    for projection in (home, away):
+        for player in projection.players:
+            if player.player_id in projections:
+                raise FplPointsError(
+                    "STAGE7_PLAYER_ID_COLLISION",
+                    "home and away projections share a player identity",
+                )
+            projections[player.player_id] = (projection.team_id, player)
     participants: list[ParticipantState] = []
     for row in participant_rows:
-        minutes = int(_read(row, "official_minutes"))
+        player_id = str(_read(row, "player_id"))
+        team_id = str(_read(row, "team_id"))
+        position = _position(_read(row, "position"))
+        raw_minutes = _read(row, "official_minutes")
+        if isinstance(raw_minutes, bool) or not isinstance(raw_minutes, int):
+            raise FplPointsError(
+                "STAGE7_MINUTES_INVALID", "official minutes must be an integer in [0, 90]"
+            )
+        minutes = raw_minutes
+        if not 0 <= minutes <= 90:
+            raise FplPointsError(
+                "STAGE7_MINUTES_INVALID", "official minutes must be an integer in [0, 90]"
+            )
+        bound = projections.get(player_id)
+        if bound is None:
+            raise FplPointsError(
+                "STAGE7_PLAYER_MISMATCH", "participation row is not bound to a Stage-7 player"
+            )
+        expected_team, projection = bound
+        if team_id != expected_team:
+            raise FplPointsError(
+                "STAGE7_PLAYER_TEAM_MISMATCH", "participation team differs from projection"
+            )
+        if position.value != projection.position:
+            raise FplPointsError(
+                "STAGE7_PLAYER_POSITION_MISMATCH", "participation position differs from projection"
+            )
+        try:
+            pmf_at_minutes = Decimal(projection.minute_pmf[minutes])
+            p_start = Decimal(projection.p_start)
+            p_bench = Decimal(projection.p_bench)
+            p_out = Decimal(projection.p_out_of_squad)
+        except (InvalidOperation, IndexError) as exc:
+            raise FplPointsError(
+                "STAGE7_PROJECTION_INVALID", "Stage-7 minute probabilities are invalid"
+            ) from exc
+        if pmf_at_minutes <= 0:
+            raise FplPointsError(
+                "STAGE7_MINUTE_PMF_ZERO", "selected official minutes have zero Stage-7 probability"
+            )
         start = _optional(row, "entry_minute")
         end = _optional(row, "exit_minute")
-        interval = None
-        if minutes > 0:
-            if start is None or end is None:
-                raise FplPointsError(
-                    "STAGE7_INTERVAL_MISSING", "positive minutes require entry and exit minutes"
-                )
-            interval = OnPitchInterval(start_minute=float(start), end_minute=float(end))
         hard_ineligible = _optional(row, "hard_ineligible", False)
         starter = _optional(row, "starter", False)
         if not isinstance(hard_ineligible, bool) or not isinstance(starter, bool):
             raise FplPointsError(
                 "STAGE7_BOOLEAN_INVALID", "hard_ineligible and starter must be booleans"
             )
+        interval = None
+        if minutes > 0:
+            if start is None or end is None:
+                raise FplPointsError(
+                    "STAGE7_INTERVAL_MISSING", "positive minutes require entry and exit minutes"
+                )
+            try:
+                start_decimal = Decimal(str(start))
+                end_decimal = Decimal(str(end))
+            except (InvalidOperation, ValueError) as exc:
+                raise FplPointsError(
+                    "STAGE7_INTERVAL_INVALID", "participation interval is not numeric"
+                ) from exc
+            if (
+                not start_decimal.is_finite()
+                or not end_decimal.is_finite()
+                or start_decimal < 0
+                or end_decimal > 90
+                or end_decimal <= start_decimal
+                or end_decimal - start_decimal != minutes
+            ):
+                raise FplPointsError(
+                    "STAGE7_INTERVAL_INVALID",
+                    "participation interval must exactly cover official minutes inside [0, 90]",
+                )
+            if starter and start_decimal != 0:
+                raise FplPointsError("STAGE7_INTERVAL_INVALID", "starter must begin at kickoff")
+            if not starter and start_decimal <= 0:
+                raise FplPointsError(
+                    "STAGE7_INTERVAL_INVALID", "bench appearance must begin after kickoff"
+                )
+            if hard_ineligible or (starter and p_start <= 0) or (not starter and p_bench <= 0):
+                raise FplPointsError(
+                    "STAGE7_ROLE_MISMATCH",
+                    "positive-minute row is incompatible with projection role",
+                )
+            interval = OnPitchInterval(start_minute=float(start), end_minute=float(end))
+        else:
+            if start is not None or end is not None or starter or (hard_ineligible and p_out <= 0):
+                raise FplPointsError(
+                    "STAGE7_INTERVAL_INVALID",
+                    "zero-minute row cannot carry an on-pitch interval or starter role",
+                )
+            if p_bench <= 0 and p_out <= 0:
+                raise FplPointsError(
+                    "STAGE7_ROLE_MISMATCH", "zero-minute row is incompatible with projection role"
+                )
         participants.append(
             ParticipantState(
-                player_id=str(_read(row, "player_id")),
-                team_id=str(_read(row, "team_id")),
-                position=_position(_read(row, "position")),
+                player_id=player_id,
+                team_id=team_id,
+                position=position,
                 official_minutes=minutes,
                 interval=interval,
                 hard_ineligible=hard_ineligible,
@@ -176,6 +265,8 @@ def build_participation_scenario(
             participants=tuple(participants),
             stage7_minutes_context=context,
             stage7_player_projection_sha256s=player_hashes,
+            stage7_home_projection=home,
+            stage7_away_projection=away,
             information_cutoff_utc=information_cutoff_utc,
         )
     except ValidationError as exc:

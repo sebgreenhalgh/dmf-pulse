@@ -5,6 +5,7 @@ import copy
 import pytest
 from pydantic import ValidationError
 
+from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.gameweek import assemble_blank_gameweek, assemble_gameweek
 from dmf_pulse.fpl_points.models import (
     AssistClassification,
@@ -98,7 +99,7 @@ def test_participation_contract_rejects_identity_cutoff_hash_and_universe_mutati
     for row in value["participants"]:
         if row["team_id"] == HOME_TEAM_ID and row["position"] == "GK":
             row["position"] = "DEF"
-    mutations.append((value, "goalkeeper"))
+    mutations.append((value, "exact Stage-7 projection"))
     for payload, message in mutations:
         _validation(ParticipationScenario, payload, message)
 
@@ -205,6 +206,13 @@ def test_gameweek_models_reject_mixed_and_incomplete_scenarios() -> None:
         assemble_gameweek(())
     first = service.project(make_request(fixture_id=FIXTURE_A, scenario_count=4))
     second = service.project(make_request(fixture_id=FIXTURE_B, scenario_count=4))
+    with pytest.raises(FplPointsError) as duplicate:
+        assemble_gameweek((first, first))
+    assert duplicate.value.code == "GAMEWEEK_FIXTURE_DUPLICATE"
+    single = assemble_gameweek((first,))
+    duplicate_payload = single.scenarios[0].model_dump(mode="python")
+    duplicate_payload["fixture_ids"] = (FIXTURE_A, FIXTURE_A)
+    _validation(GameweekPointScenario, duplicate_payload, "fixture IDs must be unique")
     with pytest.raises(Exception, match="different Gameweeks"):
         changed = second.model_copy(update={"gameweek_id": "GW-OTHER"})
         assemble_gameweek((first, changed))
@@ -219,3 +227,28 @@ def test_gameweek_models_reject_mixed_and_incomplete_scenarios() -> None:
     set_payload = blank.model_dump(mode="python")
     set_payload["scenarios"] = []
     _validation(GameweekScenarioSet, set_payload, "cannot be empty")
+
+
+def test_new_ruleset_and_gameweek_contract_branches_fail_closed() -> None:
+    result = FplPointsService(reference_engine(), mc_policy()).project(
+        make_request(scenario_count=4)
+    )
+    identity = result.ruleset.model_dump(mode="python")
+    identity["human_approval_recorded"] = True
+    _validation(type(result.ruleset), identity, "only through activation evidence")
+
+    blank = assemble_blank_gameweek(gameweek_id="GW-B", player_ids=(H_MID,), ruleset_hash="1" * 64)
+    point = blank.scenarios[0].model_dump(mode="python")
+    point["player_appeared"][H_MID] = True
+    _validation(GameweekPointScenario, point, "derived from official minutes")
+    point = blank.scenarios[0].model_dump(mode="python")
+    point["fixture_ids"] = ("fixture",)
+    _validation(GameweekPointScenario, point, "blank Gameweek")
+
+    blank_set = blank.model_dump(mode="python")
+    blank_set["fixture_result_sha256_by_fixture"] = {"fixture": "1" * 64}
+    _validation(GameweekScenarioSet, blank_set, "must not have fixture-result lineage")
+
+    single = assemble_gameweek((result,)).model_dump(mode="python")
+    single["fixture_result_sha256_by_fixture"] = {}
+    _validation(GameweekScenarioSet, single, "requires fixture-result lineage")

@@ -43,6 +43,8 @@ def assemble_blank_gameweek(
         },
         player_bps={player_id: 0 for player_id in players},
         player_bonus={player_id: 0 for player_id in players},
+        player_minutes={player_id: 0 for player_id in players},
+        player_appeared={player_id: False for player_id in players},
         assembly_mode=GameweekAssemblyMode.BLANK,
         approximation_labels=(),
     )
@@ -58,6 +60,7 @@ def assemble_blank_gameweek(
         dataset_version_ids=tuple(sorted(set(dataset_version_ids))),
         source_bundle_ids=tuple(sorted(set(source_bundle_ids))),
         upstream_stage8_sha256s=tuple(sorted(set(upstream_stage8_sha256s))),
+        fixture_result_sha256_by_fixture={},
         warnings=(),
     )
 
@@ -70,8 +73,22 @@ def assemble_gameweek(
             "GAMEWEEK_FIXTURES_EMPTY",
             "use assemble_blank_gameweek for a blank Gameweek",
         )
+    fixture_ids = tuple(result.fixture_id for result in fixture_results)
+    if len(set(fixture_ids)) != len(fixture_ids):
+        raise FplPointsError(
+            "GAMEWEEK_FIXTURE_DUPLICATE",
+            "Gameweek assembly requires unique fixture identities",
+        )
     if any(result.status is not SimulationStatus.SUCCESS for result in fixture_results):
         raise FplPointsError("GAMEWEEK_FIXTURE_BLOCKED", "all fixture projections must succeed")
+    if any(result.result_sha256 is None for result in fixture_results):
+        raise FplPointsError(
+            "GAMEWEEK_FIXTURE_HASH_MISSING", "successful fixture projection requires a result hash"
+        )
+    fixture_result_hashes: dict[str, str] = {}
+    for result in fixture_results:
+        assert result.result_sha256 is not None
+        fixture_result_hashes[result.fixture_id] = result.result_sha256
     gameweeks = {result.gameweek_id for result in fixture_results}
     if len(gameweeks) != 1:
         raise FplPointsError("GAMEWEEK_ID_MISMATCH", "fixtures belong to different Gameweeks")
@@ -109,6 +126,13 @@ def assemble_gameweek(
                 player_bonus={
                     player_id: score.bonus for player_id, score in scenario.players.items()
                 },
+                player_minutes={
+                    player.player_id: player.minutes for player in scenario.event_scenario.players
+                },
+                player_appeared={
+                    player.player_id: player.minutes > 0
+                    for player in scenario.event_scenario.players
+                },
                 assembly_mode=GameweekAssemblyMode.SINGLE_FIXTURE,
                 approximation_labels=(),
             )
@@ -139,6 +163,9 @@ def assemble_gameweek(
                 )
             ),
             upstream_stage8_sha256s=(result.upstream_stage8_sha256,),
+            fixture_result_sha256_by_fixture={
+                result.fixture_id: fixture_result_hashes[result.fixture_id]
+            },
             warnings=(),
         )
     maps = [
@@ -167,6 +194,7 @@ def assemble_gameweek(
         components: dict[str, dict[str, int]] = {}
         bps_totals: dict[str, int] = {}
         bonus_totals: dict[str, int] = {}
+        minutes_totals: dict[str, int] = {}
         for scenario in fixture_scenarios:
             for player_id, score in scenario.players.items():
                 totals[player_id] = totals.get(player_id, 0) + score.total
@@ -178,6 +206,10 @@ def assemble_gameweek(
                 bps_totals[player_id] = bps_totals.get(player_id, 0) + score.bps
                 bonus_totals[player_id] = bonus_totals.get(player_id, 0) + score.bonus
                 all_players.add(player_id)
+            for player in scenario.event_scenario.players:
+                minutes_totals[player.player_id] = (
+                    minutes_totals.get(player.player_id, 0) + player.minutes
+                )
         assembled.append(
             GameweekPointScenario(
                 scenario_id=stable_identifier(
@@ -191,6 +223,10 @@ def assemble_gameweek(
                 player_components={key: components[key] for key in sorted(components)},
                 player_bps=dict(sorted(bps_totals.items())),
                 player_bonus=dict(sorted(bonus_totals.items())),
+                player_minutes=dict(sorted(minutes_totals.items())),
+                player_appeared={
+                    player_id: minutes > 0 for player_id, minutes in sorted(minutes_totals.items())
+                },
                 assembly_mode=GameweekAssemblyMode.SHARED_OUTCOME_DRAW,
                 approximation_labels=("NO_SEQUENTIAL_CROSS_FIXTURE_TRANSITION",),
             )
@@ -246,6 +282,10 @@ def assemble_gameweek(
         upstream_stage8_sha256s=tuple(
             sorted({result.upstream_stage8_sha256 for result in fixture_results})
         ),
+        fixture_result_sha256_by_fixture={
+            result.fixture_id: fixture_result_hashes[result.fixture_id]
+            for result in fixture_results
+        },
         warnings=(
             "Cross-fixture injuries, dismissals, fatigue, and readiness transitions are not yet "
             "propagated; fixture draws share deterministic latent draw identity only.",

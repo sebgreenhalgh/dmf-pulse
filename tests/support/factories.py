@@ -7,7 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from dmf_pulse.football_events import JointScoreDistribution
+from dmf_pulse.availability import TeamMinutesProjection
+from dmf_pulse.availability.projection import canonical_sha256
+from dmf_pulse.football_events import JointScoreDistribution, Stage7MinutesContext
 from dmf_pulse.football_events._decimal import canonical_json_sha256
 from dmf_pulse.fpl_points.models import (
     BpsAuxiliaryRates,
@@ -267,6 +269,62 @@ def allocation_config(**updates: Any) -> EventAllocationConfig:
     return EventAllocationConfig(**values)
 
 
+def _stage7_projection(
+    *,
+    fixture_id: str,
+    team_id: str,
+    cutoff: str,
+    players: tuple[ParticipantState, ...],
+) -> TeamMinutesProjection:
+    rows: list[dict[str, object]] = []
+    for participant_state in sorted(players, key=lambda item: item.player_id):
+        pmf = ["0.000000000000"] * 91
+        pmf[participant_state.official_minutes] = "1.000000000000"
+        p_start = "1.000000000000" if participant_state.starter else "0.000000000000"
+        p_bench = "0.000000000000" if participant_state.starter else "1.000000000000"
+        player: dict[str, object] = {
+            "player_id": participant_state.player_id,
+            "position": participant_state.position.value,
+            "p_start": p_start,
+            "p_bench": p_bench,
+            "p_out_of_squad": "0.000000000000",
+            "p_appearance": "1.000000000000"
+            if participant_state.official_minutes > 0
+            else "0.000000000000",
+            "p_zero_minutes": "0.000000000000"
+            if participant_state.official_minutes > 0
+            else "1.000000000000",
+            "p_60_plus": "1.000000000000"
+            if participant_state.official_minutes >= 60
+            else "0.000000000000",
+            "expected_minutes": f"{participant_state.official_minutes}.000000",
+            "minute_pmf": pmf,
+            "confidence_grade": "B",
+            "confidence_reasons": ("BASELINE_MODEL_CAP_B",),
+        }
+        player["projection_sha256"] = canonical_sha256(player)
+        rows.append(player)
+    body: dict[str, object] = {
+        "schema_version": "team-minutes-projection-v1",
+        "fixture_id": fixture_id,
+        "team_id": team_id,
+        "as_of": cutoff,
+        "model_family": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+        "dataset_sha256": "3" * 64,
+        "model_artifact_sha256": "4" * 64,
+        "sample_count": 256,
+        "bench_size": 9,
+        "bench_goalkeeper_slots": 1,
+        "players": rows,
+        "scenario_set_sha256": "5" * 64,
+        "sum_p_start": f"{sum(player.starter for player in players)}.000000000000",
+        "sum_p_bench": f"{sum(not player.starter for player in players)}.000000000000",
+        "sum_p_out": "0.000000000000",
+    }
+    body["result_sha256"] = canonical_sha256(body)
+    return TeamMinutesProjection.model_validate(body)
+
+
 def make_request(
     *,
     fixture_id: str = FIXTURE_ID,
@@ -284,11 +342,34 @@ def make_request(
 ) -> FixtureSimulationRequest:
     participants = participants or base_participants()
     profiles = profiles or base_profiles()
+    home_projection = _stage7_projection(
+        fixture_id=fixture_id,
+        team_id=home_team_id,
+        cutoff=cutoff,
+        players=tuple(item for item in participants if item.team_id == home_team_id),
+    )
+    away_projection = _stage7_projection(
+        fixture_id=fixture_id,
+        team_id=away_team_id,
+        cutoff=cutoff,
+        players=tuple(item for item in participants if item.team_id == away_team_id),
+    )
     stage8 = stage8_distribution(
         fixture_id=fixture_id,
         home_team_id=home_team_id,
         away_team_id=away_team_id,
     )
+    stage8_payload = stage8.model_dump(mode="json")
+    stage8_context = Stage7MinutesContext.from_projections(home_projection, away_projection)
+    stage8_payload["source_minutes_context"] = stage8_context.public_dict()
+    stage8_payload["source_minutes_context_sha256"] = stage8_context.semantic_sha256
+    stage8_payload["source_minutes_as_of"] = cutoff
+    stage8_payload["source_home_minutes_sha256"] = home_projection.result_sha256
+    stage8_payload["source_away_minutes_sha256"] = away_projection.result_sha256
+    stage8_payload["result_sha256"] = canonical_json_sha256(
+        {key: value for key, value in stage8_payload.items() if key != "result_sha256"}
+    )
+    stage8 = JointScoreDistribution.model_validate(stage8_payload)
     participation = ParticipationScenario(
         scenario_id=f"participation-{fixture_id}",
         fixture_id=fixture_id,
@@ -299,7 +380,13 @@ def make_request(
         participant_universe_complete=True,
         participants=participants,
         stage7_minutes_context=stage8.source_minutes_context,
-        stage7_player_projection_sha256s={item.player_id: CHECKSUM for item in participants},
+        stage7_player_projection_sha256s={
+            player.player_id: player.projection_sha256
+            for projection in (home_projection, away_projection)
+            for player in projection.players
+        },
+        stage7_home_projection=home_projection,
+        stage7_away_projection=away_projection,
         information_cutoff_utc=cutoff,
     )
     return FixtureSimulationRequest(

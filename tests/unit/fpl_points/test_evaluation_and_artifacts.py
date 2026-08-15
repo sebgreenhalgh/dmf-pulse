@@ -54,6 +54,54 @@ def test_write_once_collision_and_sidecar_failures(tmp_path: Path) -> None:
     assert exc.value.code == "ARTIFACT_COLLISION"
 
 
+@pytest.mark.parametrize(
+    ("category", "identity_parts"),
+    [
+        ("/tmp/escape", ("GW", "FIX")),
+        ("../escape", ("GW", "FIX")),
+        ("a/b", ("GW", "FIX")),
+        ("a\\b", ("GW", "FIX")),
+        (".", ("GW", "FIX")),
+        ("..", ("GW", "FIX")),
+        ("fixture", ("C:escape",)),
+        ("fixture", ("..",)),
+    ],
+)
+def test_artifact_identity_segments_cannot_escape_artifact_root(
+    tmp_path: Path, category: str, identity_parts: tuple[str, ...]
+) -> None:
+    before = set(tmp_path.iterdir())
+    with pytest.raises(FplPointsError) as exc:
+        persist_model_artifact(
+            _result(),
+            artifact_root=tmp_path,
+            category=category,
+            identity_parts=identity_parts,
+        )
+    assert exc.value.code == "ARTIFACT_IDENTITY_INVALID"
+    assert set(tmp_path.iterdir()) == before
+
+
+def test_artifact_symlink_escape_is_rejected_before_writing(tmp_path: Path) -> None:
+    escape = tmp_path.parent / "outside-artifact-root"
+    escape.mkdir()
+    target = tmp_path / "fpl_points" / "fixture" / "GW"
+    target.parent.mkdir(parents=True)
+    try:
+        target.symlink_to(escape, target_is_directory=True)
+    except OSError as exc:
+        # Windows Developer Mode / symlink privilege is unavailable in this test process.
+        # The platform cannot materialise the adversarial filesystem state in that case.
+        assert not target.exists(), str(exc)
+        return
+    with pytest.raises(FplPointsError) as caught:
+        persist_model_artifact(
+            _result(), artifact_root=tmp_path, category="fixture", identity_parts=("GW",)
+        )
+    assert caught.value.code == "ARTIFACT_PATH_ESCAPE"
+    assert not any(escape.iterdir())
+
+
 def test_invalid_noncanonical_and_embedded_hash_fail_closed(tmp_path: Path) -> None:
     result = _result()
     path = persist_model_artifact(

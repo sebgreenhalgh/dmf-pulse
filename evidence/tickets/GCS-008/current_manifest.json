@@ -96,9 +96,9 @@
       "sha256": "12ee3c80b687a24e26e93bdb371f4588c72b8be427bec67484d9882db949aa51"
     },
     {
-      "bytes": 5741,
+      "bytes": 5898,
       "path": "ACCEPTANCE_COMMANDS.ps1",
-      "sha256": "aa2b4a648c8d548f62e8b37731b89bb699594ae659ec2eeaee42cdc5adcda562"
+      "sha256": "0fd531a18e427674a5c14ce210c42102ac276ea854c48acf6cb7ca6be080bcd3"
     },
     {
       "bytes": 3956,
@@ -161,9 +161,9 @@
       "sha256": "b55a46160208fca4d2d6ddc720a90b29a3e978a435b8101b0e7e96be05a3bc1d"
     },
     {
-      "bytes": 56424,
+      "bytes": 58096,
       "path": "PLANS.md",
-      "sha256": "30eeb6f78a60554bfa86a78f68671729a6c3b48a4fe6b930c51e74d9dabbf6ff"
+      "sha256": "55501a91fc06552978a5adca782d409f35ca05dc57c9429d30eecc3a202a902e"
     },
     {
       "bytes": 2761,
@@ -371,14 +371,14 @@
       "sha256": "d39f15ed44988186701f5fef3094fbb050a64308d1e6629f7b91ff151386f344"
     },
     {
-      "bytes": 162545,
+      "bytes": 182302,
       "path": "evidence/stages/09/coverage.json",
-      "sha256": "04f923f28cdc86b6af423403956ed0f912056900c1b2a7f5d2ad360044c69b88"
+      "sha256": "ac1129bc9d33393aee1138204bd8c9a23cd71ddc76dbb965bdb6ac52c435aa4e"
     },
     {
-      "bytes": 1608561,
+      "bytes": 1690500,
       "path": "evidence/stages/09/repository_coverage.json",
-      "sha256": "f0a8036b4ee2f0e1e275fb9c18e33f92aa6a8ac5e5bc8682f6809b910ca28f1e"
+      "sha256": "477f7b1badd320161a7a7cc5e67ab527c1b024a44b125a4817cad0112ad9d761"
     },
     {
       "bytes": 2516,
@@ -921,9 +921,9 @@
       "sha256": "ab9282a31f29a0b81c3c77a20b9a30dc260ca2a21aa47825067550626758f5db"
     },
     {
-      "bytes": 56779,
+      "bytes": 138158,
       "path": "fixtures/points/PTS-009/fixture_request_example.json",
-      "sha256": "fb8ed57b63087ae3563fdf37ca4e8a77e71a8af333a4668e9a960eb0eace40af"
+      "sha256": "d9966362ec8a47b0232eea96729bc5c410094bb29da647aaa6f14824024abf2c"
     },
     {
       "bytes": 15065,
@@ -931,9 +931,9 @@
       "sha256": "9bf3657baac70e768747a592b1da2ef2fc24aa774857f43deae2ae8c0df90c19"
     },
     {
-      "bytes": 985,
+      "bytes": 986,
       "path": "fixtures/points/PTS-009/manifest.json",
-      "sha256": "457698f877ad1dc79bcbe1c3f8e707b664f1bab27df61c0dd93008973d3b9347"
+      "sha256": "17f650c6420971c329a4bc578ab63b211c9960f3dff2945e90e08a286378d851"
     },
     {
       "bytes": 124745,
@@ -941,19 +941,19 @@
       "sha256": "f4fb6a5458b3956cb300b822539772904e61036f7571aba7c04284458680f271"
     },
     {
-      "bytes": 34351,
+      "bytes": 40236,
       "path": "fixtures/points/PTS-009/schemas/fixture_request.schema.json",
-      "sha256": "289ea4483e201ee5a16f4827993849836c827953be678b0046cf2b6ffd167197"
+      "sha256": "a05e3e2a5b3f9dcb404583f6c3436efbd13b82bbda709d3b67f22ae5e98bec95"
     },
     {
-      "bytes": 55508,
+      "bytes": 85116,
       "path": "fixtures/points/PTS-009/schemas/fixture_result.schema.json",
-      "sha256": "ec091f6e4c9d6c067020f9097ecd11322b2c4c5e85a0c1a95fd29e753dadb887"
+      "sha256": "35eb3c6542ac2ce2bffac1ec09593b7ada8dbde832a05eea388121b2ac290c02"
     },
     {
-      "bytes": 17675,
+      "bytes": 18664,
       "path": "fixtures/points/PTS-009/schemas/gameweek_result.schema.json",
-      "sha256": "289a99e2ae557354130692cd6f03ebc66ff71ca296e5b2a3ac78df6e6a4da706"
+      "sha256": "79bd367564e94979d367860821a50a8d8db02257bd76835048ca63cc37ff8cbb"
     },
     {
       "bytes": 1874,
@@ -1376,9 +1376,9 @@
       "sha256": "cb4ca48c6ac0e40e97eea3e7565d33162b8873b1f72d8b288ab91e6fe62c6523"
     },
     {
-      "bytes": 5158,
+      "bytes": 6274,
       "path": "scripts/assurance/check_stage9_artifact.py",
-      "sha256": "a33b1e3862ddfdb65e84d8b49713b89e22264ac4da6734a7532a64cdbb470115"
+      "sha256": "e22fbd58ac318e02f981f839529387b50a2bca052bb00e93e9ab9ae2b4e0f3fa"
     },
     {
       "bytes": 6988,
@@ -1391,9 +1391,9 @@
       "sha256": "d6ce8be218295acb3f5841045edd947bed8018f29cba0ef6cd4335baa25b5177"
     },
     {
-      "bytes": 8852,
+      "bytes": 10869,
       "path": "scripts/assurance/check_stage9_scope.py",
-      "sha256": "e03d41478921dd53cf9687ccca62a223a322c75d064aa0d9c20b8d5a47f74001"
+      "sha256": "fd8bfe0530e1248387d3538e19df129ccd6323f4c455be5b79f33c987b276c38"
     },
     {
       "bytes": 1669,
@@ -2196,14 +2196,14 @@
       "sha256": "85fe4a17db8f163e8dfbb7f20f6326afe570f2806f2596f92a80f82a84499e64"
     },
     {
-      "bytes": 28296,
+      "bytes": 27809,
       "path": "src/dmf_pulse/fpl_points/allocation.py",
-      "sha256": "b065cc7ca0ed2b8fa4c93769337c13be4bc5f14fde7b43960573768fcb907bfe"
+      "sha256": "1b4b3d3c1af18d3d6c6c59f775cf1cd65d2e4cde51f48e0d0a3543d4fb6a68c9"
     },
     {
-      "bytes": 4530,
+      "bytes": 5759,
       "path": "src/dmf_pulse/fpl_points/artifacts.py",
-      "sha256": "70c25a5e1bb3a124b620b29c5b076e08a877361ea2ae15e0d8b162cfb8327f61"
+      "sha256": "c88f6ef06e5cd3ad5cbf9b713c0eb556be8d4bb67b81322e579e6946be207870"
     },
     {
       "bytes": 579,
@@ -2216,19 +2216,19 @@
       "sha256": "2acbfc3971c8c9a5f3dc5832e14578c91f35d4092ceac967706564b843a21240"
     },
     {
-      "bytes": 10537,
+      "bytes": 12508,
       "path": "src/dmf_pulse/fpl_points/gameweek.py",
-      "sha256": "da178a686528fae48c68e1789d36f53721fc18a900d60a36150f1ed302ccfa71"
+      "sha256": "1d6ce6333cc2498fd055656f14716d038620e8fd9080e01f60d8de77dc538d07"
     },
     {
-      "bytes": 11036,
+      "bytes": 11365,
       "path": "src/dmf_pulse/fpl_points/gameweek_summaries.py",
-      "sha256": "d813e9cd89bd416c80e827e9691e1246ddf8d4aba1c7599cbe0157e58509f4de"
+      "sha256": "4e0fdfbb6e90e918dc3e84fcc2847c15325110d1bb896df9ff7e8c1276905b07"
     },
     {
-      "bytes": 43016,
+      "bytes": 50155,
       "path": "src/dmf_pulse/fpl_points/models.py",
-      "sha256": "cec32a6845562007555b06f6fa13b5a5d6cc039dfe9101ff43e4eaf3e4bef5a6"
+      "sha256": "986f3c7daa9b74f7ef30fef793406a21995368515a22c7cff1e7746d7a5d8faa"
     },
     {
       "bytes": 3833,
@@ -2251,9 +2251,9 @@
       "sha256": "14107f715769abb2d1bfc2937753c820a7d3eb02c23ae8e8a76350eaa88c0454"
     },
     {
-      "bytes": 11538,
+      "bytes": 21185,
       "path": "src/dmf_pulse/fpl_points/rules_adapter.py",
-      "sha256": "241c608c8b8abc7c043653a8cef4dbe757f50bde3f74fa4a9877895a5a53c28d"
+      "sha256": "32a252f8ef6c2cec24c2b1a0ab9fe7a68d553a6a4892c44ed518555378d973ea"
     },
     {
       "bytes": 3615,
@@ -2261,9 +2261,9 @@
       "sha256": "15c6ad93b8a3ad556c6916b2e1f3859a7fb6439e7ae750eb612b5faf46ba9fe0"
     },
     {
-      "bytes": 10274,
+      "bytes": 11141,
       "path": "src/dmf_pulse/fpl_points/service.py",
-      "sha256": "4fc015ca05af2dc505c6be981c856c329142f60bcf83782ff61efb24ab3ac9e7"
+      "sha256": "4d591e926f5297c6066ee01128043f47fa739af36c36d2b523cee49d1fb0ef22"
     },
     {
       "bytes": 14861,
@@ -2271,9 +2271,9 @@
       "sha256": "65ce7028bd4a1abe66757012ad9af5559308de4b05183e9fe4c4f37dca837a97"
     },
     {
-      "bytes": 7497,
+      "bytes": 11755,
       "path": "src/dmf_pulse/fpl_points/upstream.py",
-      "sha256": "0d75c21977c4456b876d0ef6ba626a4558dca0903e3166f038b7031bf075f387"
+      "sha256": "cd82ec707d24dd29ab17ac017fabebcdc9a6c78db8d60118995549119cf3202a"
     },
     {
       "bytes": 224,
@@ -2551,9 +2551,9 @@
       "sha256": "0684f0a36af288bcb1a29da35bbca5ee00d64f534a9c14e2b945fdb9d77923b1"
     },
     {
-      "bytes": 10966,
+      "bytes": 17063,
       "path": "tests/assurance/fpl_points/test_assurance_mutations.py",
-      "sha256": "da8aefde4e52d7bef121b7b4b7c9647d6a34af73cf4d229b9f234fe81f6619bd"
+      "sha256": "e3f7d92bbd794b8c949d66ccdf214d271490085518b9341755753d24e24c53aa"
     },
     {
       "bytes": 2814,
@@ -2601,9 +2601,9 @@
       "sha256": "eb1f8d705c277f1d568b76abf1e8e2f4f01e305a321abbc2ef1aa7283c92619b"
     },
     {
-      "bytes": 10592,
+      "bytes": 13113,
       "path": "tests/contract/fpl_points/test_upstream_contracts.py",
-      "sha256": "9314c4733a220aa304559e80d6a6e04f559b059f5afed91f420952c8cf838690"
+      "sha256": "aeabfd8a3dae645df07f0cbbdff044de834e3d2e6a67f709e1d832e3d6e2abdd"
     },
     {
       "bytes": 6465,
@@ -2826,9 +2826,9 @@
       "sha256": "f8bacbb5566e67dc7df370d76c76c2d76a970237597f8cfa71c77d4e7059eeda"
     },
     {
-      "bytes": 8197,
+      "bytes": 9821,
       "path": "tests/integration/fpl_points/test_fixture_pipeline.py",
-      "sha256": "b41ece81f6afbaac4d8d221bdb2fc6ed4ba68e50d4930717ab7eef642c10db77"
+      "sha256": "f204f5857c3e0d1d128f92096bb981e6d180705ab6da53d09c3d9aeb8dc22097"
     },
     {
       "bytes": 16410,
@@ -3016,9 +3016,9 @@
       "sha256": "4db50062b392508fc2f0b62a327d431008d85f6f529e4dcb81edf336339a4d6b"
     },
     {
-      "bytes": 17529,
+      "bytes": 21401,
       "path": "tests/support/factories.py",
-      "sha256": "7db30d2fd450d05eedad795cfe63647880c8efd8cd665bad6466d755a47b19ae"
+      "sha256": "53e220d2941015bd37d165e584910b94305d817e18df44a6a2f31b9a3d00fde2"
     },
     {
       "bytes": 442,
@@ -3341,9 +3341,9 @@
       "sha256": "654570b7dabaebbdb76e039c72672de05c0cbc328f70e06969e7cf38a863bd3f"
     },
     {
-      "bytes": 6431,
+      "bytes": 10410,
       "path": "tests/unit/fpl_points/test_accepted_rules_adapter.py",
-      "sha256": "b18c1ee344209525eb62309f1a3476b38e08c93822dd664b3c637b8d72efb6f0"
+      "sha256": "ea25097d6cf317309b6fb3a2aedd09d1b5e5ddb7fb6c5be1b5005a3c7777e898"
     },
     {
       "bytes": 6807,
@@ -3351,19 +3351,19 @@
       "sha256": "80f838d9707ccb5359cb618d8e5fac11c4f32f63ba5c124d978aa0cb4983bc24"
     },
     {
-      "bytes": 3371,
+      "bytes": 5088,
       "path": "tests/unit/fpl_points/test_evaluation_and_artifacts.py",
-      "sha256": "7e6fc7f804f6b809379185f5ccfeafc723f709852b2fcb089afb83a86668796e"
+      "sha256": "5a2b90c51110c660cec27c9ca2c35e96eee367ba41b9209333b47e5507936e65"
     },
     {
-      "bytes": 8794,
+      "bytes": 10517,
       "path": "tests/unit/fpl_points/test_fail_closed_edges.py",
-      "sha256": "c4f7c27c0e88f72ea8ceb739ae56037f8c43b18656406093e89e016f420dd3b4"
+      "sha256": "423cda07b77c836aa6cd593d67846a5a9110c041621792f88b3fe32ded806e05"
     },
     {
-      "bytes": 5087,
+      "bytes": 5809,
       "path": "tests/unit/fpl_points/test_rules_and_scoring.py",
-      "sha256": "e6b498b20660bb65b0e2f5afc777b1363a4b51e1bb564e872f8a324684421f7d"
+      "sha256": "c481e6588c7e2815713092f31176d700c958db7e5388aa804252285c46276e87"
     },
     {
       "bytes": 1859,

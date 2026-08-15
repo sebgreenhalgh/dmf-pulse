@@ -134,16 +134,53 @@ def test_single_blank_and_double_gameweek_pipeline() -> None:
     first = service.project(make_request(fixture_id=FIXTURE_A, root_seed=88, scenario_count=20))
     single = assemble_gameweek((first,))
     assert single.assembly_mode.value == "SINGLE_FIXTURE"
+    assert single.fixture_result_sha256_by_fixture == {FIXTURE_A: first.result_sha256}
+    assert all(
+        scenario.player_appeared[player_id] == (scenario.player_minutes[player_id] > 0)
+        for scenario in single.scenarios
+        for player_id in scenario.player_points
+    )
+    assert all(
+        gameweek_scenario.player_minutes[player.player_id] == player.minutes
+        for gameweek_scenario, fixture_scenario in zip(
+            single.scenarios, first.scenarios, strict=True
+        )
+        for player in fixture_scenario.event_scenario.players
+    )
     blank = assemble_blank_gameweek(
         gameweek_id="GW-B", player_ids=single.player_ids, ruleset_hash="1" * 64
     )
     assert build_gameweek_projection(blank, mc_policy()).player_summaries[H_MID].pmf == {0: 1.0}
+    assert blank.fixture_result_sha256_by_fixture == {}
+    assert blank.scenarios[0].player_minutes[H_MID] == 0
+    assert blank.scenarios[0].player_appeared[H_MID] is False
     second = service.project(make_request(fixture_id=FIXTURE_B, root_seed=88, scenario_count=20))
     double = assemble_gameweek((first, second))
     projection = build_gameweek_projection(double, mc_policy())
     assert double.assembly_mode.value == "SHARED_OUTCOME_DRAW"
     assert "NO_SEQUENTIAL_CROSS_FIXTURE_TRANSITION" in double.scenarios[0].approximation_labels
+    assert double.fixture_result_sha256_by_fixture == {
+        FIXTURE_A: first.result_sha256,
+        FIXTURE_B: second.result_sha256,
+    }
+    first_by_draw = {scenario.outcome_draw_id: scenario for scenario in first.scenarios}
+    second_by_draw = {scenario.outcome_draw_id: scenario for scenario in second.scenarios}
+    assert all(
+        gameweek_scenario.player_minutes[H_MID]
+        == next(
+            player.minutes
+            for player in first_by_draw[gameweek_scenario.outcome_draw_id].event_scenario.players
+            if player.player_id == H_MID
+        )
+        + next(
+            player.minutes
+            for player in second_by_draw[gameweek_scenario.outcome_draw_id].event_scenario.players
+            if player.player_id == H_MID
+        )
+        for gameweek_scenario in double.scenarios
+    )
     assert len(projection.joint_matrix.points) == 20
+    assert projection.result_sha256 is not None
     assert projection.player_summaries[H_MID].expected_points == pytest.approx(
         2 * single.scenarios[0].player_points[H_MID], abs=100
     )

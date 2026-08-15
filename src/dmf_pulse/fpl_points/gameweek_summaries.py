@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from math import sqrt
 
+from dmf_pulse.fpl_points.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.models import (
     POINT_COMPONENT_NAMES,
     ComponentSummary,
@@ -250,12 +251,19 @@ def build_gameweek_projection(
     scenario_set: GameweekScenarioSet, policy: MonteCarloPolicy
 ) -> GameweekProjectionResult:
     diagnostics = gameweek_monte_carlo_diagnostics(scenario_set, policy)
-    return GameweekProjectionResult(
-        schema_version="fpl-points-gameweek-result-v1",
-        scenario_set=scenario_set,
-        player_summaries=summarize_gameweek(scenario_set, diagnostics),
-        joint_matrix=build_gameweek_joint_matrix(scenario_set),
-        monte_carlo=diagnostics,
+    base = {
+        "schema_version": "fpl-points-gameweek-result-v1",
+        "scenario_set": scenario_set,
+        "player_summaries": summarize_gameweek(scenario_set, diagnostics),
+        "joint_matrix": build_gameweek_joint_matrix(scenario_set),
+        "monte_carlo": diagnostics,
+        "result_sha256": None,
+    }
+    payload = GameweekProjectionResult.model_construct(
+        **base  # type: ignore[arg-type]
+    ).model_dump(mode="json")
+    return GameweekProjectionResult.model_validate(
+        {**payload, "result_sha256": semantic_sha256(payload)}
     )
 
 

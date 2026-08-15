@@ -1,0 +1,66 @@
+PTS-009-STATIC-FIX-R2 command record
+Pinned parent: 43270ee54ceff6c4692a6a84118565c16fa6be72
+Branch: stage/A9/PTS-009-static-acceptance-r2
+
+PASS  git diff --check
+PASS  uv run ruff format --check .
+PASS  uv run ruff check .
+PASS  uv run mypy src/dmf_pulse
+PASS  uv sync --all-groups --frozen
+PASS  uv run python scripts/scan_secrets.py (0 findings)
+PASS  uv run python scripts/assurance/check_stage9_resources.py --write
+PASS  uv run pytest -q --cov=src/dmf_pulse/fpl_points --cov-branch --cov-fail-under=0 --cov-report=term-missing --cov-report=json:evidence/stages/09/coverage.json tests/unit/fpl_points tests/property/fpl_points tests/contract/fpl_points tests/golden/fpl_points tests/integration/fpl_points tests/assurance/fpl_points
+PASS  uv run python scripts/assurance/check_stage9_coverage.py evidence/stages/09/coverage.json --minimum-line-percent 85 --minimum-branch-percent 70
+PASS  uv run pytest -q tests/performance/fpl_points
+PASS  uv run pytest -q tests/unit/rules tests/property/rules tests/golden/rules
+PASS  uv run pytest -q tests/contract/availability tests/unit/availability tests/property/availability
+PASS  uv run pytest -q tests/unit/football_events tests/property/football_events tests/contract/football_events tests/golden/football_events tests/integration/football_events
+PASS  uv run pytest -q tests/unit/fpl_points/test_versioned_assist_classification.py tests/unit/rules/test_2026_27_verification_gate.py tests/unit/rules/test_schema_v11_capabilities.py tests/unit/rules/test_scoring_edges.py
+PASS  uv build
+PASS  uv run python scripts/verify_pts009_wheel.py
+PASS  uv run dmf fpl-points simulate-fixture --request fixtures/points/PTS-009/fixture_request_example.json --ruleset fixtures/points/PTS-009/reference_ruleset_test_only.json --mc-policy config/models/fpl_points_simulation.yaml --artifact-root <temporary-directory> --output json
+PASS  uv run dmf fpl-points validate --artifact <generated-artifact> --output json
+PASS  uv run dmf fpl-points mc-diagnostics --artifact <generated-artifact> --output json
+PASS  uv run python scripts/assurance/check_stage9_artifact.py <generated-artifact> --ruleset fixtures/points/PTS-009/reference_ruleset_test_only.json
+PASS  uv run python scripts/assurance/check_stage9_scope.py --root . --parent-revision 43270ee54ceff6c4692a6a84118565c16fa6be72 --declaration evidence/tickets/PTS-009-STATIC-FIX/round2/CHANGED_FILES.txt
+FAIL  uv run python scripts/validate_repository.py
+      The current immutable repository manifest predates this ticket and reported 52 byte/hash mismatches. Refreshing it requires an out-of-scope file; see FINDING_CLOSURE.md.
+FAIL  uv run python scripts/generate_repository_manifest.py --ticket PTS-009-STATIC-FIX/round2
+      The generator rejects slash-qualified identifiers, so it cannot target the allowed R2 evidence directory.
+
+## Owner Scope Amendment 1 continuation
+
+PASS  git rev-parse HEAD -> 43270ee54ceff6c4692a6a84118565c16fa6be72
+PASS  git branch --show-current -> stage/A9/PTS-009-static-acceptance-r2
+INFO  git status --short -> expected R2 working changes present; no unrelated change accepted.
+PASS  uv run python scripts/generate_repository_manifest.py --ticket GCS-008
+PASS  uv run python scripts/assurance/check_stage9_scope.py --root . --parent-revision 43270ee54ceff6c4692a6a84118565c16fa6be72 --declaration evidence/tickets/PTS-009-STATIC-FIX/round2/CHANGED_FILES.txt
+PASS  uv run python scripts/validate_repository.py
+
+FAIL  & .\\ACCEPTANCE_COMMANDS.ps1
+      First complete attempt stopped at the performance smoke: 23.45 seconds exceeds 20 seconds.
+PASS  uv run pytest -q tests/unit/fpl_points/test_accepted_rules_adapter.py tests/performance/fpl_points/test_smoke_budget.py
+      8 passed in 15.12 seconds after caching immutable compiled-ruleset integrity verification per adapter runtime.
+TIMEOUT  & .\\ACCEPTANCE_COMMANDS.ps1
+      A 20-minute tool window expired after database teardown and wheel build; no gate failure was reported.
+PASS  uv run python scripts/verify_pts009_wheel.py
+FAIL  & .\\ACCEPTANCE_COMMANDS.ps1
+      Restarted run correctly rejected the generated repository_coverage.json absent from the exact declaration.
+PASS  & .\\ACCEPTANCE_COMMANDS.ps1
+      Complete extended run: all prescribed acceptance gates passed in 1353.4 seconds.
+
+Measured complete-run results:
+- Stage-9 suite: 148 passed in 63.12 seconds; coverage gate passed.
+- Performance smoke: 1 passed in 7.20 seconds.
+- Rules, availability, and football-event regressions: 123, 168, and 168 passed.
+- Migration matrix: PASS; PostgreSQL integration: 110 passed, 118 deselected in 240.08 seconds.
+- Complete repository regression: 1810 passed in 911.32 seconds, 91.44% coverage.
+- Stage-9 CLI validation, diagnostics, and independent artifact assurance: PASS.
+- Wheel isolation, final GCS-008 manifest refresh, repository validation, secret scan, and final git diff --check: PASS.
+
+Final evidence-inclusive reconciliation (all PASS):
+- `uv run python scripts/generate_repository_manifest.py --ticket GCS-008`
+- `uv run python scripts/assurance/check_stage9_scope.py --root . --parent-revision 43270ee54ceff6c4692a6a84118565c16fa6be72 --declaration evidence/tickets/PTS-009-STATIC-FIX/round2/CHANGED_FILES.txt`
+- `uv run python scripts/validate_repository.py`
+- `uv run python scripts/scan_secrets.py`
+- `git diff --check`

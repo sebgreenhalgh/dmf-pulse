@@ -616,3 +616,34 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Convert the captured 2026/27 PLAYER_POINTS families without discarding unresolved manager-state research.
 - [x] Add compatibility, capability-closure, interpretation, and 2026/27 scoring regressions.
 - [x] Compile and independently reproduce the PLAYER_POINTS capability hash; leave FULL_SEASON and global activation blocked.
+
+# PTS-009-STATIC-FIX-R2 Stage-9 static acceptance remediation
+
+- Ticket/stage: `PTS-009-STATIC-FIX-R2`, A9; pinned parent
+  `43270ee54ceff6c4692a6a84118565c16fa6be72` on
+  `stage/A9/PTS-009-static-acceptance-r2`.
+- Scope: recover Stage-9 provenance, immutable Stage-7 participation binding,
+  artifact replay/assurance, Gameweek lineage, confinement, and real-diff
+  assurance without altering accepted rules, availability, or event code.
+- Owner Scope Amendment 1 additionally permits only
+  `evidence/tickets/GCS-008/current_manifest.json` as the mutable active
+  repository snapshot. No PTS manifest, generator/validator change, or other
+  scope expansion is authorized.
+
+### PTS-009 R2 checkpoints
+
+- [x] Verify pinned HEAD, branch, clean worktree, R2 pack integrity/context, and
+  controlling Stage-2/7/9 authority.
+- [x] Add mutation/regression coverage for F1-F6 and N01-N03 before or alongside
+  the corresponding production repair.
+- [x] Bind production to immutable Stage-2 activation evidence and preserve
+  schema-v1.1 PLAYER_POINTS/assist behaviour.
+- [x] Persist exact Stage-7 projections in participation requests; make event
+  allocation preserve selected official minutes.
+- [x] Regenerate fixture primitives and all derivations during independent
+  artifact assurance; add Gameweek minutes/appearance/result lineage.
+- [x] Constrain artifact paths and make scope assurance compare the actual Git
+  worktree diff against this ticket declaration.
+- [x] Run every literal acceptance gate, including PostgreSQL, migration, complete
+  repository coverage, wheel isolation, final GCS-008 manifest validation, and
+  secret scan; record only measured evidence.

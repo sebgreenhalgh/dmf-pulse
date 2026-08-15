@@ -1,0 +1,6 @@
+Tracked diff from 43270ee54ceff6c4692a6a84118565c16fa6be72:
+
+28 files changed, 5208 insertions(+), 247 deletions(-)
+
+The seven untracked R2 evidence files are listed in CHANGED_FILES.txt and are
+intentionally not included by `git diff --stat`.

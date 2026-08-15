@@ -314,6 +314,13 @@
           "title": "Outcome Draw Id",
           "type": "string"
         },
+        "player_appeared": {
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "title": "Player Appeared",
+          "type": "object"
+        },
         "player_bonus": {
           "additionalProperties": {
             "minimum": 0,
@@ -337,6 +344,14 @@
             "type": "object"
           },
           "title": "Player Components",
+          "type": "object"
+        },
+        "player_minutes": {
+          "additionalProperties": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "title": "Player Minutes",
           "type": "object"
         },
         "player_points": {
@@ -367,6 +382,8 @@
         "player_components",
         "player_bps",
         "player_bonus",
+        "player_minutes",
+        "player_appeared",
         "assembly_mode",
         "approximation_labels"
       ],
@@ -399,6 +416,14 @@
           },
           "title": "Dataset Version Ids",
           "type": "array"
+        },
+        "fixture_result_sha256_by_fixture": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Fixture Result Sha256 By Fixture",
+          "type": "object"
         },
         "gameweek_id": {
           "title": "Gameweek Id",
@@ -465,6 +490,7 @@
         "dataset_version_ids",
         "source_bundle_ids",
         "upstream_stage8_sha256s",
+        "fixture_result_sha256_by_fixture",
         "warnings"
       ],
       "title": "GameweekScenarioSet",
@@ -677,6 +703,19 @@
       },
       "title": "Player Summaries",
       "type": "object"
+    },
+    "result_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Result Sha256"
     },
     "scenario_set": {
       "$ref": "#/$defs/GameweekScenarioSet"
