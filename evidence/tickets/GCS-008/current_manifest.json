@@ -161,9 +161,9 @@
       "sha256": "b55a46160208fca4d2d6ddc720a90b29a3e978a435b8101b0e7e96be05a3bc1d"
     },
     {
-      "bytes": 58096,
+      "bytes": 58976,
       "path": "PLANS.md",
-      "sha256": "55501a91fc06552978a5adca782d409f35ca05dc57c9429d30eecc3a202a902e"
+      "sha256": "49b525e7283270df74d1ac4dc26c66f2e22dee729a18df8e07ded7a6f7764b98"
     },
     {
       "bytes": 2761,
@@ -2196,9 +2196,9 @@
       "sha256": "85fe4a17db8f163e8dfbb7f20f6326afe570f2806f2596f92a80f82a84499e64"
     },
     {
-      "bytes": 27809,
+      "bytes": 27884,
       "path": "src/dmf_pulse/fpl_points/allocation.py",
-      "sha256": "1b4b3d3c1af18d3d6c6c59f775cf1cd65d2e4cde51f48e0d0a3543d4fb6a68c9"
+      "sha256": "cbd2b8c8faa802350696d31d92db670390942a0b890223986bafecad2ad93b74"
     },
     {
       "bytes": 5759,
@@ -2601,9 +2601,9 @@
       "sha256": "eb1f8d705c277f1d568b76abf1e8e2f4f01e305a321abbc2ef1aa7283c92619b"
     },
     {
-      "bytes": 13113,
+      "bytes": 13369,
       "path": "tests/contract/fpl_points/test_upstream_contracts.py",
-      "sha256": "aeabfd8a3dae645df07f0cbbdff044de834e3d2e6a67f709e1d832e3d6e2abdd"
+      "sha256": "06c312ceb9389776bb24eef83eeb060b06666adcea4bff63363caeea239e7dc8"
     },
     {
       "bytes": 6465,
@@ -3346,9 +3346,9 @@
       "sha256": "ea25097d6cf317309b6fb3a2aedd09d1b5e5ddb7fb6c5be1b5005a3c7777e898"
     },
     {
-      "bytes": 6807,
+      "bytes": 9595,
       "path": "tests/unit/fpl_points/test_allocation.py",
-      "sha256": "80f838d9707ccb5359cb618d8e5fac11c4f32f63ba5c124d978aa0cb4983bc24"
+      "sha256": "6bfd78770b342f9c7fcc6c4d903b8531c7a5abf981a5974234ed407b3fa6ee64"
     },
     {
       "bytes": 5088,
