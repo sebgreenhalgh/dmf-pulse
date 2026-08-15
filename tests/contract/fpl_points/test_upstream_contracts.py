@@ -20,6 +20,7 @@ from dmf_pulse.fpl_points.upstream import (
 from tests.support.factories import (
     AWAY_TEAM_ID,
     FIXTURE_ID,
+    H_DEF,
     HOME_TEAM_ID,
     make_request,
     mc_policy,
@@ -264,6 +265,15 @@ def test_stage9_allocation_never_rewrites_stage7_selected_minutes() -> None:
         event_player.minutes == selected[event_player.player_id]
         for scenario in result.scenarios
         for event_player in scenario.event_scenario.players
+    )
+    assert all(
+        next(
+            event_player
+            for event_player in scenario.event_scenario.players
+            if event_player.player_id == H_DEF
+        ).minutes
+        == 90
+        for scenario in result.scenarios
     )
 
 

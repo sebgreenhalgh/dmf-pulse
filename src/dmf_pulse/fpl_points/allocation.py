@@ -344,6 +344,7 @@ def _initialize_accumulators(
                 profile.red_cards_per90, participant.official_minutes
             ):
                 accumulator.red_cards = 1
+                accumulator.dismissed_at = participant.interval.end_minute
         accumulators[participant.player_id] = accumulator
     return accumulators
 

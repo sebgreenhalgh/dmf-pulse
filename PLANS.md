@@ -36,6 +36,19 @@
   the exact one-commit/push handoff; commit and remote SHA verification are terminal Git
   actions recorded outside this pre-commit execution plan.
 
+## PTS-009 R3 - preserve red-card dismissal semantics without rewriting Stage-7 minutes
+
+- [x] Confirm the corrective-ticket boundary at `fad2fc1fb2503e4de0d5db730fe2a763f2cbd12c`
+  and review the accepted Stage-2/7/8/9 authority plus PTS-009 R2 closure evidence.
+- [x] Add focused deterministic counterexamples for a 60-minute dismissed defender,
+  post-dismissal conceded goals, the normal-substitution control, and Stage-7 90-minute
+  authority.
+- [x] Bind the internal dismissal endpoint to the selected Stage-7 interval endpoint only;
+  do not alter intervals, effective endpoints, official minutes, or scoring rules.
+- [x] Run the ticket's focused, Stage-9 deterministic, quality, and static-analysis checks;
+  record the generated counterexample values. The Linux symlink-confinement probe is
+  explicitly `NOT_EXECUTED` because this Windows host lacks symlink privilege.
+
 ## FPL 2026/27 rules launch verification
 
 - Scope: independently verify every required `fpl-2026-27` rule family against
