@@ -1,0 +1,15 @@
+{
+  "stage": 10,
+  "ticket": "OPT-010",
+  "objective": "bounded exact one-gameweek manager-tactics optimisation",
+  "governance": "Gate 0 resolved and frozen",
+  "tests": {
+    "stage10_targeted": "PASS",
+    "repository": "PASS:1835 passed",
+    "repository_coverage_percent": 91.46,
+    "critical_branch_coverage": "PASS"
+  },
+  "production_gate": "BLOCKED:MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
+  "stage_acceptance": "NOT_SELF_ACCEPTED",
+  "status": "READY_FOR_INDEPENDENT_SOL_REVIEW"
+}

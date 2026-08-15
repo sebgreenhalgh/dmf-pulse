@@ -1,0 +1,28 @@
+{
+  "critical_branch_percent": {
+    "src/dmf_pulse/optimisation/artifacts.py": 100.0,
+    "src/dmf_pulse/optimisation/autosub_evaluator.py": 100.0,
+    "src/dmf_pulse/optimisation/legality.py": 97.05882352941177,
+    "src/dmf_pulse/optimisation/tactics.py": 97.05882352941177,
+    "src/dmf_pulse/rules/one_gameweek.py": 100.0
+  },
+  "ok": true,
+  "required_aggregate_percent": 90,
+  "required_critical_branch_percent": 95,
+  "totals": {
+    "covered_branches": 218,
+    "covered_lines": 697,
+    "excluded_lines": 0,
+    "missing_branches": 24,
+    "missing_lines": 26,
+    "num_branches": 242,
+    "num_partial_branches": 22,
+    "num_statements": 723,
+    "percent_branches_covered": 90.08264462809917,
+    "percent_branches_covered_display": "90",
+    "percent_covered": 94.81865284974093,
+    "percent_covered_display": "95",
+    "percent_statements_covered": 96.40387275242047,
+    "percent_statements_covered_display": "96"
+  }
+}

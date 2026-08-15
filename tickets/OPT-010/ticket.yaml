@@ -1,0 +1,530 @@
+ticket_id: "OPT-010"
+stage: "A10"
+title: "Exact bounded one-Gameweek squad and tactical optimiser"
+status: "READY"
+owner: "Sebastian Greenhalgh"
+implementer_role: "Luna implementation worker"
+reviewer_role: "fresh independent review and human acceptance"
+gate0_frozen_on: "2026-08-15"
+
+required_base_commit: "a33f46cd7ec190fbd4959e2840527116f22547ac"
+expected_branch: "stage/A10/OPT-010-one-gameweek-optimiser"
+inherited_alembic_head: "20260807_0006"
+proposed_alembic_revision: null
+
+objective: >-
+  Consume one accepted coherent Stage-9 Gameweek projection and a complete governed
+  manager-tactics rules view, then exhaust the declared bounded search scope and return the
+  exact legal squad, XI, bench goalkeeper, ordered outfield bench, captain and vice that
+  maximises EXPECTED_CURRENT_GAMEWEEK_MANAGER_POINTS, or a typed fail-closed result.
+
+objective_limitations:
+  - "Bounded Stage-10 proof objective only."
+  - "Not the eventual rolling-horizon remaining-season objective."
+  - "Not rank-aware, price-forecast-aware or chip-aware."
+  - "No manager account, transfer state, recourse or execution action."
+
+user_visible_vertical_slice:
+  optimise_command: >-
+    dmf optimise one-gameweek --request <request.json> --gameweek-artifact
+    <stage9-gameweek.json> --ruleset <compiled-ruleset.json> [--capability
+    <capability.json>] --artifact-root <directory> --output json
+  validate_command: >-
+    dmf optimise validate-plan --request <request.json> --gameweek-artifact
+    <stage9-gameweek.json> --ruleset <compiled-ruleset.json> [--capability
+    <capability.json>] --artifact <one-gameweek-result.json> --output json
+  expected: >-
+    Offline canonical JSON with verified input/result lineage, a legal exact plan only when
+    complete exhaustion and every upstream/rules gate pass, deterministic solver evidence,
+    scenario-native manager scores and structured explanations.
+
+authority:
+  precedence:
+    - "Current official target-season FPL rules and controlling provider terms."
+    - "Newest approved ACTIVE/ACCEPTED DMFP-20 decision."
+    - "Most-specific accepted DMFP module specification."
+    - "DMFP-00 master architecture."
+    - "Earlier notes and exploratory research."
+    - "Implementation convenience."
+  scope: "A10-one-GW-optimiser"
+  manifests:
+    authority: "specs/manifests/authority_manifest.json"
+    stage_requirements: "specs/manifests/stage_authority_requirements.json"
+    documents: "specs/manifests/document_manifest.json"
+    decisions: "specs/manifests/decision_manifest.json"
+  documents:
+    - "DMFP-00"
+    - "DMFP-01"
+    - "DMFP-02"
+    - "DMFP-03"
+    - "DMFP-05"
+    - "DMFP-09"
+    - "DMFP-10"
+    - "DMFP-12"
+    - "DMFP-15"
+    - "DMFP-17"
+    - "DMFP-19"
+    - "DMFP-20"
+    - "DMF-PULSE-CODEX-PLAYBOOK"
+  decisions:
+    accepted:
+      - "ADR-PROD-002"
+      - "ADR-GOV-003"
+      - "ADR-DATA-005"
+      - "ADR-PTS-004"
+      - "ADR-UNC-001"
+      - "ADR-UNC-002"
+      - "ADR-OPT-001"
+      - "ADR-OPT-002"
+      - "ADR-OPT-004"
+      - "ADR-OPT-005"
+      - "ADR-EVAL-002"
+      - "ADR-EVAL-005"
+      - "ADR-IMPL-001"
+      - "ADR-IMPL-003"
+    provisional_not_relied_upon:
+      - "ADR-OPT-006"
+      - "ADR-IMPL-002"
+  reconciliation_plan: "OPT-010_SOL_PLAN.md"
+
+gate0_rulings:
+  G0-1_fixed_squad:
+    decision: "APPROVED"
+    contract: >-
+      FIXED_SQUAD is exactly 15 supplied canonical player IDs and is a stateless tactical
+      candidate only. It has no manager, price, bank, free-transfer, history, transfer-action
+      or no-transfer economic meaning.
+    supported_search_scopes:
+      - "FIXED_SQUAD"
+      - "PROVIDED_SQUADS"
+      - "BOUNDED_PLAYER_POOL"
+  G0-2_production_capability:
+    decision: "FULL_SEASON_REQUIRED_CONSERVATIVELY"
+    contract: >-
+      Do not create a capability. Production requires a canonical FULL_SEASON capability
+      artifact recomputed from the exact compiled ruleset, source_backed=true,
+      production_eligible=true and blockers empty. This is intentionally over-restrictive.
+      PLAYER_POINTS and every narrower existing capability are insufficient.
+    current_target_result:
+      status: "BLOCKED"
+      error_code: "MANAGER_TACTICS_CAPABILITY_UNAVAILABLE"
+      recommended_plan: null
+    production_gate_order:
+      - "Verify request, Stage-9 artifact, compiled-rules and optional capability integrity."
+      - >-
+        Recompute and evaluate FULL_SEASON; any absent, wrong-scope, noncanonical, non-source-backed,
+        non-production-eligible or blocked artifact returns MANAGER_TACTICS_CAPABILITY_UNAVAILABLE.
+      - >-
+        Only after FULL_SEASON passes, require independently provable Stage-9 cutoff lineage;
+        absence returns STAGE9_CUTOFF_LINEAGE_UNAVAILABLE.
+  G0-3_test_replay_rules:
+    decision: "COMPILED_RULESET_ONLY"
+    contract: >-
+      TEST/REPLAY accepts only a complete integrity-checked REFERENCE_ONLY or test-synthetic
+      compiled ruleset. Requests contain no rule constants. Golden semantics are frozen in
+      this ticket and tickets/OPT-010/ACCEPTANCE.md and are never claimed as 2026/27 rules.
+  G0-4_search:
+    decision: "EXACT_BOUNDED_EXHAUSTIVE_ONLY"
+    full_universe_supported: false
+    pyomo_highs: false
+    heuristic_pruning: false
+  G0-5_caps:
+    decision: "PACKAGED_POLICY_V1"
+    objective_tolerance: null
+    wall_clock_acceptance_threshold: null
+  G0-6_resource_limit:
+    decision: "NO_RECOMMENDATION_OR_INCUMBENT"
+  G0-7_cli:
+    decision: "EXPLICIT_OFFLINE_ARTIFACT_PATHS"
+    gameweek_id_resolver: false
+  G0-8_monte_carlo:
+    PASS: "Eligible for exact search subject to every other gate."
+    CONTINUE: >-
+      Return BLOCKED with UPSTREAM_MONTE_CARLO_CONTINUE before search, preserve upstream status
+      and reasons, guarantee NONE, and expose no plan, ties or conditional diagnostic incumbent.
+    BLOCKED: >-
+      Return BLOCKED with UPSTREAM_MONTE_CARLO_BLOCKED before search, preserve upstream status
+      and reasons, guarantee NONE, and expose no plan or ties.
+  G0-9_objective:
+    decision: "EXPECTED_CURRENT_GAMEWEEK_MANAGER_POINTS"
+  G0-10_baseline:
+    decision: "NO_SEMANTIC_BASELINE"
+    test_comparator: "A named synthetic/reference tactical comparator may exist only in tests."
+  G0-11_budget:
+    decision: "INITIAL_SQUAD_SELECTION_COST_ONLY"
+    contract: >-
+      BOUNDED_PLAYER_POOL uses initial_budget_tenths from the compiled rules view and requires
+      every candidate's initial_selection_cost_tenths. FIXED_SQUAD and PROVIDED_SQUADS ignore
+      and must not report cost/budget fields. No request-supplied budget, bank, purchase price,
+      selling price or current-manager affordability exists.
+  G0-12_stage9_cutoff:
+    decision: "NO_STAGE9_CONTRACT_CHANGE_AND_PRODUCTION_FAIL_CLOSED"
+    contract: >-
+      Bind only the lineage actually present in GameweekProjectionResult. After the production
+      FULL_SEASON gate passes, absence of independently provable Gameweek cutoff/projection-mode
+      lineage returns BLOCKED with STAGE9_CUTOFF_LINEAGE_UNAVAILABLE and no plan. Any Stage-9
+      extension is a separate ticket.
+
+reference_test_rules:
+  lifecycle: "REFERENCE_ONLY or TEST-synthetic; never production"
+  source_basis:
+    - "fixtures/rules/RUL-002/reference_2025_26/positions.yaml"
+    - "fixtures/rules/RUL-002/reference_2025_26/squad.yaml"
+    - "fixtures/rules/RUL-002/reference_2025_26/lineup.yaml"
+    - "DMFP-02 sections 16.1 through 16.8"
+  frozen_values:
+    squad_size: 15
+    squad_positions: {GK: 2, DEF: 5, MID: 5, FWD: 3}
+    initial_budget_tenths: 1000
+    max_per_club: 3
+    starting_size: 11
+    bench_size: 4
+    formation_minimums: {GK: 1, DEF: 3, MID: 2, FWD: 1}
+    formation_maximums: {GK: 1, DEF: 5, MID: 5, FWD: 3}
+    captain_multiplier: 2
+    vice_fallback: true
+    automatic_substitutions:
+      evaluation_scope: "AFTER_ALL_GAMEWEEK_FIXTURES"
+      absent_definition: "ZERO_OFFICIAL_APPEARANCE_MINUTES"
+      goalkeeper_replacement: "DESIGNATED_BENCH_GOALKEEPER_IF_APPEARED"
+      outfield_order: "MANAGER_BENCH_ORDER"
+      maintain_legal_formation: true
+  test_only_multiple_absence_resolution: >-
+    Choose the maximum-cardinality formation-feasible subset of appearing outfield substitutes;
+    among equal cardinality choose the lexicographically greatest bench-inclusion vector so
+    slot 1 outranks slot 2 and slot 2 outranks slot 3. Pair selected incoming players with the
+    lexicographically smallest formation-feasible tuple of absent starters for audit output.
+    This resolves only the frozen reference/test fixture and is not a 2026/27 production claim.
+
+search_contract:
+  backend: "DETERMINISTIC_EXHAUSTIVE_ENUMERATOR"
+  guarantees:
+    FIXED_SQUAD: "EXACT_FIXED_SQUAD"
+    PROVIDED_SQUADS: "EXACT_PROVIDED_SET"
+    BOUNDED_PLAYER_POOL: "EXACT_DECLARED_PLAYER_POOL"
+  success_requires:
+    - "The conservative preflight is within every packaged cap."
+    - "The complete declared scope is exhausted."
+    - "Every selected and returned tied plan passes the independent legality validator."
+    - "Upstream Monte Carlo status is PASS and all rules/integrity gates pass."
+  tie_order: >-
+    Compare exact Decimal-from-canonical-float-token weighted integer-score numerators with no
+    tolerance; only exact equality is a tie. Choose by (sorted squad, sorted XI, bench
+    goalkeeper, ordered outfield bench, captain, vice).
+  preflight: >-
+    Compute squad count, exact rules-derived tactical count and tactical count multiplied by
+    Stage-9 scenario count with Python integers before generating combinations. Do not use
+    club/budget filtering to lower the conservative bounded-player-pool squad upper bound.
+  failure: >-
+    Any exceeded cap returns RESOURCE_LIMIT, guarantee NONE, no recommended_plan, no returned
+    ties and no incumbent before enumeration starts.
+
+packaged_policy:
+  schema_version: "one-gameweek-optimiser-policy-v1"
+  config_path: "config/optimisation/one_gameweek.yaml"
+  package_path: "src/dmf_pulse/optimisation/resources/one_gameweek.yaml"
+  byte_identical: true
+  max_squad_candidates: 12
+  max_tactical_configurations: 5000000
+  max_scenario_score_operations: 20000000
+  max_returned_ties: 16
+  objective_tolerance: null
+  rationale: >-
+    Under the frozen reference 2/5/5/3 squad, all legal XI, six outfield bench orders and 110
+    captain/vice pairs total 363,000 tactical configurations per squad. Twelve complete squads
+    need 4,356,000 configurations; the four-scenario acceptance fixture needs 17,424,000 score
+    operations. The rounded caps admit that proof fixture with bounded headroom, block a 13th
+    declared squad at the squad cap and prevent accidental full-universe expansion. Wall-clock
+    time is telemetry only.
+
+accepted_upstream_contracts:
+  - "dmf_pulse.fpl_points.models.GameweekProjectionResult"
+  - "dmf_pulse.fpl_points.models.GameweekScenarioSet"
+  - "dmf_pulse.fpl_points.models.GameweekPointScenario"
+  - "dmf_pulse.fpl_points.models.JointScenarioMatrix"
+  - "dmf_pulse.fpl_points.models.MonteCarloDiagnostics"
+  - "dmf_pulse.fpl_points.models.GameweekAssemblyMode"
+  - "dmf_pulse.fpl_points.models.PlayerPosition"
+  - "dmf_pulse.rules.models.CompiledRuleset"
+  - "dmf_pulse.rules.models.CapabilityArtifact"
+  - "dmf_pulse.rules.models.RuleCapability"
+  - "dmf_pulse.rules.capabilities.compile_capability_artifact"
+  - "dmf_pulse.rules.capabilities.load_capability_artifact"
+  - "dmf_pulse.fpl_points.artifacts canonical/hash/write-once/load conventions"
+
+public_contracts:
+  contract_source: "OPT-010_SOL_PLAN.md section 5 as amended by gate0_rulings"
+  models:
+    - "OptimisationStatus"
+    - "SearchScope"
+    - "OptimalityGuarantee"
+    - "CandidatePlayer"
+    - "CandidatePoolSnapshot"
+    - "CandidateSquad"
+    - "OneGameweekOptimisationRequest"
+    - "OneGameweekOptimiserPolicy"
+    - "OneGameweekRulesView"
+    - "TacticalConfiguration"
+    - "AutosubEvent"
+    - "CaptainResolution"
+    - "ScenarioManagerScore"
+    - "PointMass"
+    - "PointDistributionSummary"
+    - "LegalityIssue"
+    - "LegalityReport"
+    - "SolverStatus"
+    - "OptimisationLineage"
+    - "ExplanationItem"
+    - "OneGameweekPlan"
+    - "OneGameweekOptimisationResult"
+  functions:
+    - "build_one_gameweek_rules_view"
+    - "evaluate_tactical_configuration"
+    - "validate_plan_against_request"
+    - "optimise_one_gameweek"
+  request_amendments:
+    - "Remove request.budget_tenths."
+    - "Rename candidate cost to initial_selection_cost_tenths: NonNegativeInt | None."
+    - "For FIXED_SQUAD/PROVIDED_SQUADS cost is ignored and plan cost/budget fields are null."
+    - "For BOUNDED_PLAYER_POOL every cost is required and compiled initial budget is enforced."
+  forbidden_request_fields:
+    - "Stage-9 points or appearance matrices"
+    - "raw manager rules"
+    - "capability eligibility booleans"
+    - "resource caps or objective tolerance"
+    - "manager account, bank, transfer or chip state"
+
+status_contract:
+  SUCCESS:
+    exit_code: 0
+    plan: "required"
+    guarantee: "one exact guarantee matching declared scope"
+  BLOCKED:
+    exit_code: 3
+    plan: null
+    guarantee: "NONE"
+  INFEASIBLE:
+    exit_code: 4
+    plan: null
+    guarantee: "NONE"
+  RESOURCE_LIMIT:
+    exit_code: 5
+    plan: null
+    guarantee: "NONE"
+  invalid_input_or_integrity:
+    exit_code: 2
+    plan: null
+  stable_error_codes:
+    - "MANAGER_TACTICS_CAPABILITY_UNAVAILABLE"
+    - "STAGE9_CUTOFF_LINEAGE_UNAVAILABLE"
+    - "UPSTREAM_MONTE_CARLO_CONTINUE"
+    - "UPSTREAM_MONTE_CARLO_BLOCKED"
+    - "STAGE9_CONTRACT_MISMATCH"
+    - "RULESET_IDENTITY_MISMATCH"
+    - "ONE_GAMEWEEK_INFEASIBLE"
+    - "ONE_GAMEWEEK_RESOURCE_LIMIT"
+    - "OPTIMISER_EMITTED_ILLEGAL_PLAN"
+    - "OPTIMISATION_INPUT_INVALID"
+    - "OPTIMISATION_ARTIFACT_INVALID"
+
+permissions:
+  network: false
+  database: "Inherited PostgreSQL regression only; optimizer has no database access."
+  migration: false
+  new_dependencies: false
+  sandbox: "workspace-write"
+  git_push: false
+  git_merge: false
+  real_credentials: false
+
+dependency_policy:
+  pyproject_change: false
+  lockfile_change: false
+  pyomo: false
+  highs: false
+  implementation: "Python 3.13 standard library plus already locked dependencies only."
+
+allowed_files:
+  create:
+    - "config/optimisation/one_gameweek.yaml"
+    - "fixtures/optimisation/one_gameweek/**"
+    - "src/dmf_pulse/optimisation/**"
+    - "src/dmf_pulse/rules/one_gameweek.py"
+    - "src/dmf_pulse/cli/optimise.py"
+    - "tests/unit/optimisation/**"
+    - "tests/property/optimisation/**"
+    - "tests/contract/optimisation/**"
+    - "tests/golden/optimisation/**"
+    - "tests/integration/optimisation/**"
+    - "tests/performance/optimisation/**"
+    - "tests/assurance/optimisation/**"
+    - "tests/support/optimisation_factories.py"
+    - "tests/support/optimisation_oracle.py"
+    - "tests/unit/rules/test_one_gameweek.py"
+    - "tests/golden/rules/test_one_gameweek.py"
+    - "scripts/assurance/check_opt010_scope.py"
+    - "scripts/assurance/check_opt010_resources.py"
+    - "scripts/assurance/check_opt010_artifact.py"
+    - "scripts/assurance/check_opt010_coverage.py"
+    - "scripts/assurance/run_opt010_cli_acceptance.py"
+    - "scripts/verify_opt010_wheel.py"
+    - "tests/unit/scripts/test_opt010_repository_validation.py"
+    - "evidence/tickets/OPT-010/**"
+    - "evidence/stages/10/**"
+    - "review_pack/OPT-010/**"
+  modify:
+    - "PLANS.md"
+    - "src/dmf_pulse/cli/app.py"
+    - "scripts/validate_repository.py"
+  forbidden:
+    - "pyproject.toml"
+    - "uv.lock"
+    - "src/dmf_pulse/fpl_points/**"
+    - "src/dmf_pulse/rules/models.py"
+    - "src/dmf_pulse/rules/authoring.py"
+    - "src/dmf_pulse/rules/capabilities.py"
+    - "config/rules/**"
+    - "fixtures/rules/**"
+    - "artifacts/rules/**"
+    - "src/dmf_pulse/database/**"
+    - "src/dmf_pulse/data_model/**"
+    - "src/dmf_pulse/ingestion/**"
+    - "src/dmf_pulse/markets/**"
+    - "src/dmf_pulse/availability/**"
+    - "src/dmf_pulse/football_events/**"
+    - "alembic.ini"
+    - "compose.test.yaml"
+    - ".github/**"
+    - "public_contracts/**"
+
+tests_first:
+  required_categories:
+    - "unit"
+    - "property/Hypothesis"
+    - "contract"
+    - "golden"
+    - "integration"
+    - "adversarial/assurance"
+    - "independent exhaustive oracle equivalence"
+    - "deterministic replay"
+    - "hash mutation"
+    - "performance telemetry"
+    - "installed-wheel CLI"
+  hypothesis:
+    max_examples: 100
+    deadline: null
+    derandomize: true
+  required_cases:
+    - "Every reference legal formation and invalid two-defender formation."
+    - "Bench goalkeeper and exactly three ordered outfield substitutes."
+    - "Normal, formation-preserving, multiple-absence and goalkeeper substitutions."
+    - "Captain appears, captain fails to vice, and both fail."
+    - "Negative points, blank Gameweek, single fixture and shared-draw/DGW."
+    - "Correlated nonappearance and no marginal reconstruction."
+    - "Tied optima, exact tie equality and canonical tie-break."
+    - "All status/capability/Monte-Carlo/cutoff fail-closed branches."
+    - "Independent oracle has no production search/autosub/legality helper imports."
+    - "Every semantic input/result/artifact mutation invalidates its hash."
+    - "Unsafe path, collision, noncanonical JSON and detached-hash attacks."
+
+coverage_thresholds:
+  repository_aggregate: ">=90% under existing branch=true coverage configuration"
+  optimisation_package_branch: ">=90%"
+  critical_deterministic_files_branch: ">=95% each"
+  critical_files:
+    - "src/dmf_pulse/rules/one_gameweek.py"
+    - "src/dmf_pulse/optimisation/autosub_evaluator.py"
+    - "src/dmf_pulse/optimisation/legality.py"
+    - "src/dmf_pulse/optimisation/tactics.py"
+    - "src/dmf_pulse/optimisation/artifacts.py"
+  broad_coverage_pragmas: false
+
+acceptance_commands:
+  - "git diff --check"
+  - "uv sync --all-groups --frozen"
+  - "uv run python scripts/assurance/check_opt010_scope.py --root . --parent-revision a33f46cd7ec190fbd4959e2840527116f22547ac --ticket tickets/OPT-010/ticket.yaml"
+  - "uv run python scripts/assurance/check_opt010_resources.py"
+  - "uv run ruff format --check ."
+  - "uv run ruff check ."
+  - "uv run mypy src/dmf_pulse"
+  - "uv run pytest -q tests/unit/rules/test_one_gameweek.py tests/golden/rules/test_one_gameweek.py"
+  - "uv run pytest -q tests/unit/optimisation tests/contract/optimisation"
+  - "uv run pytest -q tests/property/optimisation tests/golden/optimisation tests/integration/optimisation tests/assurance/optimisation --cov=dmf_pulse.optimisation --cov=dmf_pulse.rules.one_gameweek --cov-branch --cov-report=term-missing --cov-report=json:evidence/stages/10/coverage.json"
+  - "uv run python scripts/assurance/check_opt010_coverage.py evidence/stages/10/coverage.json"
+  - "uv run pytest -q tests/performance/optimisation"
+  - "uv run pytest -q tests/unit/rules tests/property/rules tests/golden/rules"
+  - "uv run pytest -q tests/unit/fpl_points tests/property/fpl_points tests/contract/fpl_points tests/golden/fpl_points tests/integration/fpl_points tests/assurance/fpl_points"
+  - "docker compose -f compose.test.yaml config --quiet"
+  - "docker compose -f compose.test.yaml up -d --wait"
+  - "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head"
+  - "uv run pytest -q -m \"postgres and integration\" tests/integration"
+  - "docker compose -f compose.test.yaml down -v --remove-orphans"
+  - "uv run pytest -q --ignore=tests/performance --cov=dmf_pulse --cov-branch --cov-report=json:evidence/stages/10/repository_coverage.json"
+  - "uv run python scripts/assurance/run_opt010_cli_acceptance.py --fixture-root fixtures/optimisation/one_gameweek"
+  - "uv build"
+  - "uv run python scripts/verify_opt010_wheel.py"
+  - "uv run python scripts/generate_repository_manifest.py --ticket OPT-010"
+  - "uv run dmf specs validate"
+  - "uv run python scripts/validate_repository.py"
+  - "uv run python scripts/scan_secrets.py"
+  - "uv run alembic heads"
+  - "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- pyproject.toml uv.lock"
+  - "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- src/dmf_pulse/database/migrations"
+  - "git diff --check"
+
+required_evidence:
+  ticket_root: "evidence/tickets/OPT-010/"
+  stage_root: "evidence/stages/10/"
+  files:
+    - "evidence/tickets/OPT-010/command_ledger.json"
+    - "evidence/tickets/OPT-010/scope_report.json"
+    - "evidence/tickets/OPT-010/resource_report.json"
+    - "evidence/tickets/OPT-010/artifact_assurance.json"
+    - "evidence/tickets/OPT-010/wheel_report.json"
+    - "evidence/tickets/OPT-010/runtime_telemetry.json"
+    - "evidence/tickets/OPT-010/review.json"
+    - "evidence/tickets/OPT-010/current_manifest.json"
+    - "evidence/stages/10/coverage.json"
+    - "evidence/stages/10/repository_coverage.json"
+    - "evidence/stages/10/stage_acceptance.json"
+    - "evidence/stages/10/STAGE_ACCEPTANCE.md"
+  review_zip: "review_pack/OPT-010/DMF_PULSE_OPT-010_REVIEW.zip"
+  review_root_file_cap: 20
+
+exclusions:
+  - "Existing manager reconstruction or account state."
+  - "Purchase/selling prices, bank, free transfers, hits or transfer history/actions."
+  - "Unrestricted whole-FPL-universe optimisation."
+  - "Pyomo, HiGHS, MILP, heuristic pruning or top-K approximation."
+  - "Multi-Gameweek horizon, future recourse, terminal value or ACT/WAIT."
+  - "Chips, price prediction, rank/EO strategy or risk-objective selection."
+  - "Stage-9 contract extension or scenario reconstruction."
+  - "Rules capability/schema changes or target-season rule inference."
+  - "Database/migration, provider/network, API/UI or automated FPL action."
+
+stop_conditions:
+  - "HEAD is not descended from the exact required base or the branch name differs."
+  - "Initial implementation worktree contains changes beyond these approved Gate-0 files."
+  - "Any authority manifest reference or accepted upstream contract does not resolve."
+  - "A target-season manager rule or production eligibility value would need inference."
+  - "The frozen reference/test fixture cannot express an exact required semantic."
+  - "Complete preflight proof cannot fit the packaged caps."
+  - "A heuristic, solver dependency, migration, network access or forbidden file is required."
+  - "Stage-9 cutoff/projection-mode lineage must be extended for production."
+  - "An acceptance command, exact golden or independent oracle cannot pass without changing this ticket."
+  - "Any P0/P1 independent-review finding remains unresolved."
+
+reviewer_requirements:
+  independent: true
+  implementation_agent_may_self_accept: false
+  human_acceptance_required: true
+  merge_is_separate: true
+  no_unresolved_severity:
+    - "P0"
+    - "P1"
+  required_checks:
+    - "Recompute toy-universe optimum and complete tie set independently."
+    - "Revalidate production capability leakage and current target BLOCKED result."
+    - "Recompute request/input/plan/result and detached artifact hashes."
+    - "Confirm scope, dependency, migration, network and Stage-11 exclusions."
+    - "Validate installed-wheel commands outside the source tree."

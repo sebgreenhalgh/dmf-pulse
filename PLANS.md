@@ -1,5 +1,26 @@
 # DMF Pulse execution plans
 
+## OPT-010 - exact bounded one-Gameweek optimiser
+
+- Ticket/stage: `OPT-010`, A10; immutable parent
+  `a33f46cd7ec190fbd4959e2840527116f22547ac`; implementation branch
+  `stage/A10/OPT-010-one-gameweek-optimiser`.
+- Gate 0: frozen in `tickets/OPT-010/ticket.yaml`; implementation status `READY`.
+- Scope: exact bounded `FIXED_SQUAD`, `PROVIDED_SQUADS` and preflight-bounded
+  `BOUNDED_PLAYER_POOL` squad/XI/bench/captain/vice optimisation over accepted Stage-9 coherent
+  scenarios.
+- Safety: current production is fail-closed behind conservatively required `FULL_SEASON`;
+  no Stage-9/rules-schema/dependency/migration change, heuristic, incumbent, manager state or
+  Stage-11 behavior.
+
+### OPT-010 checkpoints
+
+- [x] Reconcile the provisional proposal against accepted Stage 9 and rules capabilities.
+- [x] Resolve Gate 0 and freeze ticket, public contract, caps, tests and acceptance commands.
+- [ ] Implement contracts/rules boundary/independent legality and exact tactical evaluation.
+- [ ] Implement preflight-bounded search, oracle, service, hashes, artifacts and offline CLI.
+- [ ] Run every literal acceptance gate and prepare capped independent-review evidence.
+
 ## PTS-009 - bounded FPL-points simulation clean-checkout integration
 
 - Ticket/stage: `PTS-009`, A9; required parent

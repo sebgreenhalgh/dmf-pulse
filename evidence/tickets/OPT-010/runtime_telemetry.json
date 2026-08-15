@@ -1,0 +1,22 @@
+{
+  "ticket": "OPT-010",
+  "search_backend": "DETERMINISTIC_EXHAUSTIVE_ENUMERATOR",
+  "reference_fixed_squad": {
+    "squads_examined": 1,
+    "tactical_configurations_examined": 363000,
+    "scenario_score_operations": 363000,
+    "wall_clock_seconds_observed": 43.4,
+    "guarantee": "EXACT_FIXED_SQUAD"
+  },
+  "packaged_caps": {
+    "max_squad_candidates": 12,
+    "max_tactical_configurations": 5000000,
+    "max_scenario_score_operations": 20000000,
+    "max_returned_ties": 16,
+    "objective_tolerance": null
+  },
+  "resource_limit_behavior": "preflight returns RESOURCE_LIMIT before enumeration and emits no plan or incumbent",
+  "network": false,
+  "database_access": false,
+  "status": "PASS"
+}
