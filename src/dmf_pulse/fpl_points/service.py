@@ -26,7 +26,7 @@ from dmf_pulse.fpl_points.models import (
     SimulationStatus,
 )
 from dmf_pulse.fpl_points.monte_carlo import monte_carlo_diagnostics
-from dmf_pulse.fpl_points.rules_adapter import RulesEngine
+from dmf_pulse.fpl_points.rules_adapter import AcceptedRulesAdapter, RulesEngine
 from dmf_pulse.fpl_points.seed import RNG_ALGORITHM, derive_seed, stable_identifier
 from dmf_pulse.fpl_points.summaries import build_joint_matrix, summarize_fixture_scenarios
 from dmf_pulse.fpl_points.upstream import scoreline_cells
@@ -66,6 +66,13 @@ def generate_fixture_scenarios(
     scenario_indices: Iterable[int],
 ) -> tuple[FixturePointScenario, ...]:
     identity = rules_engine.identity
+    if request.projection_mode is ProjectionMode.PRODUCTION and not isinstance(
+        rules_engine, AcceptedRulesAdapter
+    ):
+        raise FplPointsError(
+            "RULESET_ACTIVATION_BUNDLE_REQUIRED",
+            "production projection requires the verified Stage-2 rules adapter",
+        )
     if request.fixture_readiness.value != "SCHEDULED":
         raise FplPointsError(
             "FIXTURE_NOT_PLAYABLE",
@@ -196,26 +203,33 @@ class FplPointsService:
                     {reason for scenario in scenarios for reason in scenario.degradation_reasons}
                 )
             )
-            base = FixtureProjectionResult(
-                schema_version="fpl-points-fixture-result-v1",
-                status=SimulationStatus.SUCCESS,
-                fixture_id=request.score_distribution.fixture_id,
-                gameweek_id=request.gameweek_id,
-                scenarios=scenarios,
-                player_summaries=summaries,
-                joint_matrix=matrix,
-                monte_carlo=diagnostics,
-                ruleset=self._rules_engine.identity,
-                projection_mode=request.projection_mode,
-                information_cutoff_utc=request.information_cutoff_utc,
-                source_bundle_ids=_source_identities(request),
-                upstream_score_distribution=request.score_distribution,
-                upstream_stage8_sha256=request.score_distribution.result_sha256,
-                result_sha256=None,
-                warnings=warnings,
+            base = {
+                "schema_version": "fpl-points-fixture-result-v1",
+                "status": SimulationStatus.SUCCESS,
+                "fixture_id": request.score_distribution.fixture_id,
+                "gameweek_id": request.gameweek_id,
+                "scenarios": scenarios,
+                "player_summaries": summaries,
+                "joint_matrix": matrix,
+                "monte_carlo": diagnostics,
+                "ruleset": self._rules_engine.identity,
+                "projection_mode": request.projection_mode,
+                "information_cutoff_utc": request.information_cutoff_utc,
+                "simulation_request": request,
+                "simulation_request_sha256": semantic_sha256(request),
+                "monte_carlo_policy": self._mc_policy,
+                "source_bundle_ids": _source_identities(request),
+                "upstream_score_distribution": request.score_distribution,
+                "upstream_stage8_sha256": request.score_distribution.result_sha256,
+                "result_sha256": None,
+                "warnings": warnings,
+            }
+            payload = FixtureProjectionResult.model_construct(
+                **base  # type: ignore[arg-type]
+            ).model_dump(mode="json")
+            return FixtureProjectionResult.model_validate(
+                {**payload, "result_sha256": semantic_sha256(payload)}
             )
-            digest = semantic_sha256(base)
-            return base.model_copy(update={"result_sha256": digest})
         except FplPointsError as exc:
             return FixtureProjectionResult(
                 schema_version="fpl-points-fixture-result-v1",
@@ -229,6 +243,9 @@ class FplPointsService:
                 ruleset=self._rules_engine.identity,
                 projection_mode=request.projection_mode,
                 information_cutoff_utc=request.information_cutoff_utc,
+                simulation_request=request,
+                simulation_request_sha256=semantic_sha256(request),
+                monte_carlo_policy=self._mc_policy,
                 source_bundle_ids=_source_identities(request),
                 upstream_score_distribution=request.score_distribution,
                 upstream_stage8_sha256=request.score_distribution.result_sha256,

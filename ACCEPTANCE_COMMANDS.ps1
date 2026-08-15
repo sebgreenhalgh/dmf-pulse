@@ -1,8 +1,9 @@
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$RequiredParent = "9d7c360ab6a4cc7bfc6d6f41e44be6b47512b272"
-$ExpectedBranch = "stage/A9/PTS-009-fpl-points-simulation"
+$RequiredParent = "43270ee54ceff6c4692a6a84118565c16fa6be72"
+$ExpectedBranch = "stage/A9/PTS-009-static-acceptance-r2"
+$ScopeDeclaration = "evidence/tickets/PTS-009-STATIC-FIX/round2/CHANGED_FILES.txt"
 $Stage9Coverage = "evidence/stages/09/coverage.json"
 $RepositoryCoverage = "evidence/stages/09/repository_coverage.json"
 
@@ -12,7 +13,7 @@ function Assert-NativeSuccess {
 }
 
 if ((git merge-base HEAD $RequiredParent) -ne $RequiredParent) {
-    throw "HEAD is not descended from the required GCS-008 parent."
+    throw "HEAD is not descended from the required PTS-009 R2 parent."
 }
 if ((git branch --show-current) -ne $ExpectedBranch) {
     throw "Run acceptance on $ExpectedBranch."
@@ -22,7 +23,8 @@ git diff --check
 Assert-NativeSuccess "git diff --check"
 uv sync --all-groups --frozen
 Assert-NativeSuccess "frozen dependency sync"
-uv run python scripts/assurance/check_stage9_scope.py --root .
+uv run python scripts/assurance/check_stage9_scope.py --root . `
+    --parent-revision $RequiredParent --declaration $ScopeDeclaration
 Assert-NativeSuccess "Stage-9 scope"
 uv run python scripts/assurance/check_stage9_resources.py
 Assert-NativeSuccess "Stage-9 generated resources"

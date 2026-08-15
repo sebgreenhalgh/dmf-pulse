@@ -19,6 +19,7 @@ from pydantic import (
     model_validator,
 )
 
+from dmf_pulse.availability import TeamMinutesProjection
 from dmf_pulse.football_events.minutes_context import Stage7MinutesContext
 from dmf_pulse.football_events.score_distribution import JointScoreDistribution
 from dmf_pulse.rules.models import AssistDecisionContext
@@ -32,7 +33,7 @@ class PointsModel(BaseModel):
 
 Probability = Annotated[float, Field(ge=0.0, le=1.0)]
 NonNegativeInt = Annotated[StrictInt, Field(ge=0)]
-Minutes = Annotated[StrictInt, Field(ge=0, le=130)]
+Minutes = Annotated[StrictInt, Field(ge=0, le=90)]
 Sha256 = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 ProbabilityText = Annotated[str, Field(pattern=r"^(?:0\.\d{12}|1\.000000000000)$")]
 ConfidenceGrade = Literal["A", "B", "C", "D", "E"]
@@ -158,6 +159,17 @@ class ParticipantState(PointsModel):
             raise ValueError("zero-minute participant cannot have an on-pitch interval")
         if self.official_minutes > 0 and self.interval is None:
             raise ValueError("positive minutes require an on-pitch interval")
+        if self.official_minutes > 0:
+            assert self.interval is not None
+            if (
+                self.interval.end_minute > 90
+                or (self.interval.end_minute - self.interval.start_minute) != self.official_minutes
+            ):
+                raise ValueError("on-pitch interval must exactly equal official minutes in [0, 90]")
+            if self.starter and self.interval.start_minute != 0:
+                raise ValueError("positive-minute starter interval must begin at kickoff")
+            if not self.starter and self.interval.start_minute <= 0:
+                raise ValueError("positive-minute bench interval must begin after kickoff")
         return self
 
 
@@ -172,6 +184,8 @@ class ParticipationScenario(PointsModel):
     participants: tuple[ParticipantState, ...]
     stage7_minutes_context: Stage7MinutesContext
     stage7_player_projection_sha256s: dict[str, Sha256]
+    stage7_home_projection: TeamMinutesProjection
+    stage7_away_projection: TeamMinutesProjection
     information_cutoff_utc: str
 
     @field_validator("information_cutoff_utc")
@@ -204,6 +218,49 @@ class ParticipationScenario(PointsModel):
             raise ValueError("POST_CUTOFF_MINUTES: Stage-7 projection is after Stage-9 cutoff")
         if set(self.stage7_player_projection_sha256s) != set(ids):
             raise ValueError("Stage-7 player projection hashes must map one-to-one to participants")
+        home_projection = self.stage7_home_projection
+        away_projection = self.stage7_away_projection
+        if Stage7MinutesContext.from_projections(home_projection, away_projection) != context:
+            raise ValueError("exact Stage-7 projections do not match Stage-7 context")
+        projection_players = {
+            player.player_id: (projection.team_id, player)
+            for projection in (home_projection, away_projection)
+            for player in projection.players
+        }
+        if len(projection_players) != len(home_projection.players) + len(away_projection.players):
+            raise ValueError("Stage-7 projection player identities must be globally unique")
+        if set(projection_players) != set(ids):
+            raise ValueError(
+                "complete participant universe requires at least 11 players per team and exact Stage-7 coverage"
+            )
+        for participant in self.participants:
+            projection_team, projection = projection_players[participant.player_id]
+            if participant.team_id != projection_team:
+                raise ValueError("participant team differs from exact Stage-7 projection")
+            if participant.position.value != projection.position:
+                raise ValueError("participant position differs from exact Stage-7 projection")
+            if (
+                self.stage7_player_projection_sha256s[participant.player_id]
+                != projection.projection_sha256
+            ):
+                raise ValueError(
+                    "participant projection hash differs from exact Stage-7 projection"
+                )
+            if projection.minute_pmf[participant.official_minutes] == "0.000000000000":
+                raise ValueError("official minutes have zero Stage-7 probability")
+            if participant.official_minutes > 0:
+                if participant.starter and projection.p_start == "0.000000000000":
+                    raise ValueError("starter role has zero Stage-7 probability")
+                if not participant.starter and projection.p_bench == "0.000000000000":
+                    raise ValueError("bench role has zero Stage-7 probability")
+            elif participant.hard_ineligible:
+                if projection.p_out_of_squad == "0.000000000000":
+                    raise ValueError("hard-ineligible role has zero Stage-7 probability")
+            elif (
+                projection.p_bench == "0.000000000000"
+                and projection.p_out_of_squad == "0.000000000000"
+            ):
+                raise ValueError("zero-minute role has zero Stage-7 probability")
         for team_id in valid_teams:
             team_players = [
                 participant for participant in self.participants if participant.team_id == team_id
@@ -302,6 +359,18 @@ class EventAllocationConfig(PointsModel):
         return self
 
 
+class RulesetActivationEvidence(PointsModel):
+    """Immutable hashes binding an ACTIVE ruleset to its Stage-2 activation bundle."""
+
+    ruleset_id: str
+    ruleset_version: str
+    verified_ruleset_hash: Sha256
+    active_ruleset_hash: Sha256
+    approval_sha256: Sha256
+    activation_receipt_sha256: Sha256
+    activation_manifest_sha256: Sha256
+
+
 class RulesetIdentity(PointsModel):
     ruleset_id: str
     ruleset_version: str
@@ -310,6 +379,19 @@ class RulesetIdentity(PointsModel):
     production_eligible: StrictBool
     human_approval_recorded: StrictBool
     unknown_blockers: tuple[str, ...] = ()
+    activation_evidence: RulesetActivationEvidence | None = None
+
+    @model_validator(mode="after")
+    def approval_is_bound_to_evidence(self) -> RulesetIdentity:
+        if self.human_approval_recorded != (self.activation_evidence is not None):
+            raise ValueError("human approval is recorded only through activation evidence")
+        if self.activation_evidence is not None and (
+            self.activation_evidence.ruleset_id != self.ruleset_id
+            or self.activation_evidence.ruleset_version != self.ruleset_version
+            or self.activation_evidence.active_ruleset_hash != self.ruleset_hash
+        ):
+            raise ValueError("activation evidence does not match the active ruleset identity")
+        return self
 
 
 class FixtureSimulationRequest(PointsModel):
@@ -842,6 +924,9 @@ class FixtureProjectionResult(PointsModel):
     ruleset: RulesetIdentity
     projection_mode: ProjectionMode
     information_cutoff_utc: str
+    simulation_request: FixtureSimulationRequest
+    simulation_request_sha256: Sha256
+    monte_carlo_policy: MonteCarloPolicy
     source_bundle_ids: tuple[str, ...]
     upstream_score_distribution: JointScoreDistribution
     upstream_stage8_sha256: Sha256
@@ -884,6 +969,21 @@ class FixtureProjectionResult(PointsModel):
             raise ValueError("embedded Stage-8 fixture identity mismatch")
         if self.upstream_score_distribution.information_cutoff != self.information_cutoff_utc:
             raise ValueError("embedded Stage-8 cutoff identity mismatch")
+        request = self.simulation_request
+        if (
+            request.score_distribution.fixture_id != self.fixture_id
+            or request.gameweek_id != self.gameweek_id
+            or request.information_cutoff_utc != self.information_cutoff_utc
+        ):
+            raise ValueError("serialized simulation request identity mismatch")
+        if self.status is SimulationStatus.SUCCESS and (
+            request.expected_ruleset_id != self.ruleset.ruleset_id
+            or request.expected_ruleset_version != self.ruleset.ruleset_version
+            or request.expected_ruleset_hash != self.ruleset.ruleset_hash
+        ):
+            raise ValueError("serialized simulation request ruleset identity mismatch")
+        if self.status is SimulationStatus.SUCCESS and self.result_sha256 is None:
+            raise ValueError("successful projection requires a semantic result hash")
         for scenario in self.scenarios:
             if scenario.upstream_stage8_sha256 != self.upstream_stage8_sha256:
                 raise ValueError("scenario Stage-8 identity mismatch")
@@ -905,6 +1005,8 @@ class GameweekPointScenario(PointsModel):
     player_components: dict[str, dict[str, StrictInt]]
     player_bps: dict[str, StrictInt]
     player_bonus: dict[str, Annotated[StrictInt, Field(ge=0)]]
+    player_minutes: dict[str, NonNegativeInt]
+    player_appeared: dict[str, StrictBool]
     assembly_mode: GameweekAssemblyMode
     approximation_labels: tuple[str, ...]
 
@@ -915,6 +1017,8 @@ class GameweekPointScenario(PointsModel):
             set(self.player_components) != ids
             or set(self.player_bps) != ids
             or set(self.player_bonus) != ids
+            or set(self.player_minutes) != ids
+            or set(self.player_appeared) != ids
         ):
             raise ValueError("Gameweek player mappings must be one-to-one")
         for player_id, total in self.player_points.items():
@@ -925,6 +1029,16 @@ class GameweekPointScenario(PointsModel):
                 raise ValueError("Gameweek total does not equal component sum")
             if components["bonus"] != self.player_bonus[player_id]:
                 raise ValueError("Gameweek bonus mapping differs from component vector")
+            if self.player_appeared[player_id] != (self.player_minutes[player_id] > 0):
+                raise ValueError("Gameweek appearance must be derived from official minutes")
+        if len(self.fixture_ids) != len(set(self.fixture_ids)):
+            raise ValueError("Gameweek scenario fixture IDs must be unique")
+        if self.assembly_mode is GameweekAssemblyMode.BLANK and (
+            self.fixture_ids
+            or any(self.player_minutes.values())
+            or any(self.player_appeared.values())
+        ):
+            raise ValueError("blank Gameweek must have no fixtures, minutes, or appearances")
         return self
 
 
@@ -940,6 +1054,7 @@ class GameweekScenarioSet(PointsModel):
     dataset_version_ids: tuple[str, ...]
     source_bundle_ids: tuple[str, ...]
     upstream_stage8_sha256s: tuple[Sha256, ...]
+    fixture_result_sha256_by_fixture: dict[str, Sha256]
     warnings: tuple[str, ...]
 
     @model_validator(mode="after")
@@ -955,6 +1070,14 @@ class GameweekScenarioSet(PointsModel):
             raise ValueError("Gameweek assembly mode mismatch")
         if any(set(scenario.player_points) != expected_players for scenario in self.scenarios):
             raise ValueError("every Gameweek scenario must retain the full player universe")
+        fixture_ids = set(self.fixture_result_sha256_by_fixture)
+        if self.assembly_mode is GameweekAssemblyMode.BLANK:
+            if fixture_ids:
+                raise ValueError("blank Gameweek must not have fixture-result lineage")
+        elif not fixture_ids:
+            raise ValueError("nonblank Gameweek requires fixture-result lineage")
+        if any(set(scenario.fixture_ids) != fixture_ids for scenario in self.scenarios):
+            raise ValueError("Gameweek scenario fixtures must match fixture-result lineage")
         if not isclose(
             sum(scenario.weight for scenario in self.scenarios), 1.0, rel_tol=0.0, abs_tol=1e-10
         ):
@@ -1005,6 +1128,7 @@ class GameweekProjectionResult(PointsModel):
     player_summaries: dict[str, GameweekPlayerProjectionSummary]
     joint_matrix: JointScenarioMatrix
     monte_carlo: MonteCarloDiagnostics
+    result_sha256: Sha256 | None = None
 
     @model_validator(mode="after")
     def output_is_aligned(self) -> GameweekProjectionResult:
@@ -1013,6 +1137,8 @@ class GameweekProjectionResult(PointsModel):
             raise ValueError("Gameweek summaries and joint matrix player mapping differ")
         if self.joint_matrix.ruleset_hash != self.scenario_set.ruleset_hash:
             raise ValueError("Gameweek joint matrix ruleset mismatch")
+        if self.result_sha256 is None:
+            raise ValueError("Gameweek projection requires a semantic result hash")
         return self
 
 

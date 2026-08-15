@@ -746,7 +746,7 @@
           ]
         },
         "official_minutes": {
-          "maximum": 130,
+          "maximum": 90,
           "minimum": 0,
           "title": "Official Minutes",
           "type": "integer"
@@ -828,6 +828,12 @@
           "title": "Scenario Id",
           "type": "string"
         },
+        "stage7_away_projection": {
+          "$ref": "#/$defs/TeamMinutesProjection"
+        },
+        "stage7_home_projection": {
+          "$ref": "#/$defs/TeamMinutesProjection"
+        },
         "stage7_minutes_context": {
           "$ref": "#/$defs/Stage7MinutesContext"
         },
@@ -851,6 +857,8 @@
         "participants",
         "stage7_minutes_context",
         "stage7_player_projection_sha256s",
+        "stage7_home_projection",
+        "stage7_away_projection",
         "information_cutoff_utc"
       ],
       "title": "ParticipationScenario",
@@ -956,6 +964,115 @@
         "bps_auxiliary"
       ],
       "title": "PlayerAllocationProfile",
+      "type": "object"
+    },
+    "PlayerMinutesProjection": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "title": "Confidence Grade",
+          "type": "string"
+        },
+        "confidence_reasons": {
+          "items": {
+            "enum": [
+              "HARD_INELIGIBLE_OVERRIDE",
+              "NO_TARGET_TEAM_COMPETITIVE_HISTORY",
+              "THIN_PLAYER_HISTORY",
+              "NEW_SIGNING",
+              "NEW_MANAGER_REGIME",
+              "PROMOTED_TEAM_EARLY_REGIME",
+              "BASELINE_MODEL_CAP_B"
+            ],
+            "type": "string"
+          },
+          "title": "Confidence Reasons",
+          "type": "array"
+        },
+        "expected_minutes": {
+          "pattern": "^(?:[0-8]?\\d|90)\\.\\d{6}$",
+          "title": "Expected Minutes",
+          "type": "string"
+        },
+        "minute_pmf": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Minute Pmf",
+          "type": "array"
+        },
+        "p_60_plus": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P 60 Plus",
+          "type": "string"
+        },
+        "p_appearance": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Appearance",
+          "type": "string"
+        },
+        "p_bench": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Bench",
+          "type": "string"
+        },
+        "p_out_of_squad": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Out Of Squad",
+          "type": "string"
+        },
+        "p_start": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Start",
+          "type": "string"
+        },
+        "p_zero_minutes": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Zero Minutes",
+          "type": "string"
+        },
+        "player_id": {
+          "title": "Player Id",
+          "type": "string"
+        },
+        "position": {
+          "enum": [
+            "GK",
+            "DEF",
+            "MID",
+            "FWD"
+          ],
+          "title": "Position",
+          "type": "string"
+        },
+        "projection_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Projection Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "player_id",
+        "position",
+        "p_start",
+        "p_bench",
+        "p_out_of_squad",
+        "p_appearance",
+        "p_zero_minutes",
+        "p_60_plus",
+        "expected_minutes",
+        "minute_pmf",
+        "confidence_grade",
+        "confidence_reasons",
+        "projection_sha256"
+      ],
+      "title": "PlayerMinutesProjection",
       "type": "object"
     },
     "PlayerPosition": {
@@ -1098,6 +1215,110 @@
         "away"
       ],
       "title": "Stage7MinutesContext",
+      "type": "object"
+    },
+    "TeamMinutesProjection": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "title": "As Of",
+          "type": "string"
+        },
+        "bench_goalkeeper_slots": {
+          "minimum": 0,
+          "title": "Bench Goalkeeper Slots",
+          "type": "integer"
+        },
+        "bench_size": {
+          "minimum": 0,
+          "title": "Bench Size",
+          "type": "integer"
+        },
+        "dataset_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dataset Sha256",
+          "type": "string"
+        },
+        "fixture_id": {
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "model_artifact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Model Artifact Sha256",
+          "type": "string"
+        },
+        "model_family": {
+          "const": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+          "title": "Model Family",
+          "type": "string"
+        },
+        "players": {
+          "items": {
+            "$ref": "#/$defs/PlayerMinutesProjection"
+          },
+          "title": "Players",
+          "type": "array"
+        },
+        "result_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Result Sha256",
+          "type": "string"
+        },
+        "sample_count": {
+          "const": 256,
+          "title": "Sample Count",
+          "type": "integer"
+        },
+        "scenario_set_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scenario Set Sha256",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "team-minutes-projection-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sum_p_bench": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Sum P Bench",
+          "type": "string"
+        },
+        "sum_p_out": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Sum P Out",
+          "type": "string"
+        },
+        "sum_p_start": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Sum P Start",
+          "type": "string"
+        },
+        "team_id": {
+          "title": "Team Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "fixture_id",
+        "team_id",
+        "as_of",
+        "model_family",
+        "dataset_sha256",
+        "model_artifact_sha256",
+        "sample_count",
+        "bench_size",
+        "bench_goalkeeper_slots",
+        "players",
+        "scenario_set_sha256",
+        "sum_p_start",
+        "sum_p_bench",
+        "sum_p_out",
+        "result_sha256"
+      ],
+      "title": "TeamMinutesProjection",
       "type": "object"
     },
     "TeamMinutesProjectionIdentity": {

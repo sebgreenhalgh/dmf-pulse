@@ -10,10 +10,11 @@ from dmf_pulse.fpl_points.allocation import (
     validate_goal_share_simplex,
 )
 from dmf_pulse.fpl_points.errors import FplPointsError
-from dmf_pulse.fpl_points.models import ProjectionMode, ScorelineCell
+from dmf_pulse.fpl_points.models import OnPitchInterval, ProjectionMode, ScorelineCell
 from tests.support.factories import (
     A_FWD,
     AWAY_TEAM_ID,
+    H_DEF,
     H_MID,
     HOME_TEAM_ID,
     allocation_config,
@@ -43,6 +44,41 @@ def _allocate(
         ruleset=reference_engine().identity,
         projection_mode=ProjectionMode.TEST,
         root_seed=seed,
+        scenario_index=0,
+    )
+
+
+def _allocate_60_minute_defender_counterexample(*, red_card: bool):
+    participants = tuple(
+        participant.model_copy(
+            update={
+                "official_minutes": 60,
+                "interval": OnPitchInterval(start_minute=0.0, end_minute=60.0),
+            }
+        )
+        if participant.player_id == H_DEF
+        else participant
+        for participant in make_request().participation_scenarios[0].participants
+    )
+    profiles = tuple(
+        profile.model_copy(update={"red_cards_per90": 1000.0 if red_card else 0.0})
+        if profile.player_id == H_DEF
+        else profile
+        for profile in base_profiles()
+    )
+    request = make_request(
+        participants=participants,
+        profiles=profiles,
+        config=allocation_config(goal_time_lower=70.0, goal_time_upper=80.0),
+    )
+    return allocate_fixture_events(
+        cell=ScorelineCell(home_goals=0, away_goals=2, probability="1.000000000000"),
+        participation=request.participation_scenarios[0],
+        profiles=request.allocation_profiles,
+        config=request.allocation_config,
+        ruleset=reference_engine().identity,
+        projection_mode=ProjectionMode.TEST,
+        root_seed=request.root_seed,
         scenario_index=0,
     )
 
@@ -111,6 +147,43 @@ def test_same_seed_produces_identical_semantic_event_scenario() -> None:
     right, right_reasons = _allocate(seed=99)
     assert left == right
     assert left_reasons == right_reasons
+
+
+def test_red_card_uses_stage7_endpoint_for_post_dismissal_conceded_goals() -> None:
+    scenario, _ = _allocate_60_minute_defender_counterexample(red_card=True)
+    defender = next(player for player in scenario.players if player.player_id == H_DEF)
+
+    assert all(goal.minute > 60.0 for goal in scenario.goals)
+    assert defender.minutes == 60
+    assert defender.red_cards == 1
+    assert defender.dismissed is True
+    assert defender.goals_conceded_while_eligible == 0
+    assert defender.team_goals_after_dismissal == 2
+
+    score = reference_engine().score_fixture(scenario)[H_DEF]
+    assert score.clean_sheet == 0
+    assert score.goals_conceded == -1
+    assert score.red_cards == -3
+
+
+def test_normal_substitution_does_not_create_post_dismissal_conceded_goals() -> None:
+    scenario, _ = _allocate_60_minute_defender_counterexample(red_card=False)
+    defender = next(player for player in scenario.players if player.player_id == H_DEF)
+
+    assert defender.minutes == 60
+    assert defender.dismissed is False
+    assert defender.goals_conceded_while_eligible == 0
+    assert defender.team_goals_after_dismissal == 0
+
+    score = reference_engine().score_fixture(scenario)[H_DEF]
+    assert score.clean_sheet == 4
+    assert score.goals_conceded == 0
+
+
+def test_forced_red_card_counterexample_is_deterministic() -> None:
+    left = _allocate_60_minute_defender_counterexample(red_card=True)
+    right = _allocate_60_minute_defender_counterexample(red_card=True)
+    assert left == right
 
 
 def test_ambiguous_assist_classification_is_explicit() -> None:

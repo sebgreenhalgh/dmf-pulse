@@ -20,6 +20,7 @@ from dmf_pulse.fpl_points.upstream import (
 from tests.support.factories import (
     AWAY_TEAM_ID,
     FIXTURE_ID,
+    H_DEF,
     HOME_TEAM_ID,
     make_request,
     mc_policy,
@@ -140,6 +141,8 @@ def test_stage7_path_adapter_uses_accepted_team_and_player_identities() -> None:
     )
     assert len(scenario.participants) == 22
     assert scenario.stage7_minutes_context.home.result_sha256 == home.result_sha256
+    assert scenario.stage7_home_projection == home
+    assert scenario.stage7_away_projection == away
     assert scenario.stage7_player_projection_sha256s == {
         player.player_id: player.projection_sha256 for player in (*home.players, *away.players)
     }
@@ -203,6 +206,75 @@ def test_stage7_path_adapter_rejects_bad_explicit_rows(mutation, code: str) -> N
             information_cutoff_utc="2026-08-20T12:00:00Z",
         )
     assert exc.value.code == code
+
+
+@pytest.mark.parametrize(
+    ("mutate", "code"),
+    [
+        (lambda rows: rows[0].update(official_minutes=True), "STAGE7_MINUTES_INVALID"),
+        (lambda rows: rows[0].update(official_minutes=90.0), "STAGE7_MINUTES_INVALID"),
+        (lambda rows: rows[0].update(official_minutes="90"), "STAGE7_MINUTES_INVALID"),
+        (lambda rows: rows[0].update(official_minutes=91), "STAGE7_MINUTES_INVALID"),
+        (lambda rows: rows[0].update(official_minutes=0), "STAGE7_MINUTE_PMF_ZERO"),
+        (lambda rows: rows[0].update(entry_minute=1, exit_minute=91), "STAGE7_INTERVAL_INVALID"),
+        (lambda rows: rows[3].update(entry_minute=0, exit_minute=30), "STAGE7_INTERVAL_INVALID"),
+        (
+            lambda rows: rows[0].update(team_id=AWAY_TEAM_ID),
+            "STAGE7_PLAYER_TEAM_MISMATCH",
+        ),
+        (lambda rows: rows[0].update(position="MID"), "STAGE7_PLAYER_POSITION_MISMATCH"),
+    ],
+)
+def test_stage7_path_adapter_enforces_exact_minutes_roles_and_projection_binding(
+    mutate, code: str
+) -> None:
+    home = _team_projection(HOME_TEAM_ID, 40000000)
+    away = _team_projection(AWAY_TEAM_ID, 50000000)
+    rows = [dict(row) for row in _rows(home, away)]
+    mutate(rows)
+    with pytest.raises(FplPointsError) as exc:
+        build_participation_scenario(
+            scenario_id="invalid-binding",
+            probability=1.0,
+            fixture_id=FIXTURE_ID,
+            gameweek_id="GW-1",
+            home_team_id=HOME_TEAM_ID,
+            away_team_id=AWAY_TEAM_ID,
+            participant_rows=rows,
+            home_projection=home,
+            away_projection=away,
+            information_cutoff_utc="2026-08-20T12:00:00Z",
+        )
+    assert exc.value.code == code
+
+
+def test_stage9_allocation_never_rewrites_stage7_selected_minutes() -> None:
+    request = make_request(
+        scenario_count=8,
+        profiles=tuple(
+            profile.model_copy(update={"red_cards_per90": 1000.0})
+            for profile in make_request().allocation_profiles
+        ),
+    )
+    result = FplPointsService(reference_engine(), mc_policy()).project(request)
+    selected = {
+        item.player_id: item.official_minutes
+        for item in request.participation_scenarios[0].participants
+    }
+    assert all(
+        event_player.minutes == selected[event_player.player_id]
+        for scenario in result.scenarios
+        for event_player in scenario.event_scenario.players
+    )
+    assert all(
+        next(
+            event_player
+            for event_player in scenario.event_scenario.players
+            if event_player.player_id == H_DEF
+        ).minutes
+        == 90
+        for scenario in result.scenarios
+    )
 
 
 def test_stage7_path_adapter_rejects_blocked_mismatched_and_colliding_projections() -> None:

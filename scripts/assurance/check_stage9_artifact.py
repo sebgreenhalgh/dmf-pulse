@@ -10,11 +10,15 @@ from pathlib import Path
 from dmf_pulse.football_events import JointScoreDistribution
 from dmf_pulse.fpl_points.artifacts import (
     load_verified_model,
+    semantic_sha256,
     verify_embedded_semantic_hash,
 )
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import FixtureProjectionResult, ProjectionMode, SimulationStatus
+from dmf_pulse.fpl_points.monte_carlo import monte_carlo_diagnostics
 from dmf_pulse.fpl_points.rules_adapter import AcceptedRulesAdapter, RulesEngine
+from dmf_pulse.fpl_points.service import generate_fixture_scenarios
+from dmf_pulse.fpl_points.summaries import build_joint_matrix, summarize_fixture_scenarios
 from dmf_pulse.rules.errors import RulesError
 
 
@@ -35,8 +39,19 @@ def validate_projection(
             errors.append("UPSTREAM_STAGE8_IDENTITY_INVALID")
         if rules_engine is None:
             errors.append("RULESET_RECOMPUTE_REQUIRED")
+        elif not isinstance(rules_engine, AcceptedRulesAdapter):
+            errors.append("RULESET_RECOMPUTE_ENGINE_INVALID")
         elif rules_engine.identity != result.ruleset:
             errors.append("RULESET_IDENTITY_MISMATCH")
+        if semantic_sha256(result.simulation_request) != result.simulation_request_sha256:
+            errors.append("SIMULATION_REQUEST_HASH_MISMATCH")
+        request = result.simulation_request
+        if (
+            request.score_distribution != result.upstream_score_distribution
+            or request.score_distribution.result_sha256 != result.upstream_stage8_sha256
+            or request.projection_mode is not result.projection_mode
+        ):
+            errors.append("SIMULATION_REQUEST_IDENTITY_MISMATCH")
         if result.joint_matrix is None:
             errors.append("JOINT_MATRIX_MISSING")
         else:
@@ -54,29 +69,36 @@ def validate_projection(
                     errors.append(f"JOINT_ROW_MISMATCH:{scenario_id}")
                 if result.joint_matrix.outcome_draw_ids[row_index] != scenario.outcome_draw_id:
                     errors.append(f"JOINT_DRAW_MISMATCH:{scenario_id}")
-                if result.joint_matrix.weights[row_index] != scenario.weight:
-                    errors.append(f"JOINT_WEIGHT_MISMATCH:{scenario_id}")
-        for scenario in result.scenarios:
-            event_ids = {player.player_id for player in scenario.event_scenario.players}
-            score_ids = set(scenario.players)
-            stage7_ids = set(scenario.stage7_player_projection_sha256s)
-            if event_ids != score_ids or stage7_ids != score_ids:
-                errors.append(f"PARTICIPANT_UNIVERSE_MISMATCH:{scenario.scenario_id}")
-            if scenario.upstream_stage8_sha256 != result.upstream_stage8_sha256:
-                errors.append(f"UPSTREAM_IDENTITY_MISMATCH:{scenario.scenario_id}")
-            if (
-                scenario.stage7_minutes_context.semantic_sha256
-                != result.upstream_score_distribution.source_minutes_context_sha256
-            ):
-                errors.append(f"STAGE7_IDENTITY_MISMATCH:{scenario.scenario_id}")
-            if rules_engine is not None:
+        if (
+            isinstance(rules_engine, AcceptedRulesAdapter)
+            and rules_engine.identity == result.ruleset
+        ):
+            for scenario in result.scenarios:
                 try:
-                    recomputed = rules_engine.score_fixture(scenario.event_scenario)
+                    recomputed_scores = rules_engine.score_fixture(scenario.event_scenario)
                 except (FplPointsError, RulesError) as exc:
                     errors.append(f"RULES_RECOMPUTE_FAILED:{scenario.scenario_id}:{exc.code}")
                 else:
-                    if recomputed != scenario.players:
+                    if recomputed_scores != scenario.players:
                         errors.append(f"BPS_OR_SCORE_TAMPERED:{scenario.scenario_id}")
+            try:
+                regenerated = generate_fixture_scenarios(
+                    request, rules_engine, range(request.scenario_count)
+                )
+            except (FplPointsError, RulesError) as exc:
+                errors.append(f"SCENARIO_REGENERATION_FAILED:{exc.code}")
+            else:
+                if regenerated != result.scenarios:
+                    errors.append("SCENARIO_REGENERATION_MISMATCH")
+                diagnostics = monte_carlo_diagnostics(regenerated, result.monte_carlo_policy)
+                summaries = summarize_fixture_scenarios(regenerated, diagnostics=diagnostics)
+                matrix = build_joint_matrix(regenerated)
+                if result.joint_matrix != matrix:
+                    errors.append("JOINT_MATRIX_RECOMPUTE_MISMATCH")
+                if result.player_summaries != summaries:
+                    errors.append("SUMMARY_RECOMPUTE_MISMATCH")
+                if result.monte_carlo != diagnostics:
+                    errors.append("MONTE_CARLO_RECOMPUTE_MISMATCH")
     if (
         result.projection_mode is ProjectionMode.PRODUCTION
         and result.status is SimulationStatus.SUCCESS

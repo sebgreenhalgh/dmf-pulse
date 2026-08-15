@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import subprocess
 from pathlib import Path
 
 REQUIRED_FILES = (
@@ -117,6 +118,7 @@ ALLOWED_ROOT_FILES = {
 ALLOWED_PREFIXES = (
     "config/models/",
     "docs/stages/09/",
+    "evidence/tickets/PTS-009-STATIC-FIX/round2/",
     "evidence/stages/09/",
     "fixtures/points/PTS-009/",
     "scripts/assurance/check_stage9_",
@@ -149,18 +151,48 @@ def _normalized_symbol(value: str) -> str:
     return "".join(character for character in value.lower() if character.isalnum())
 
 
-def _changed_files(root: Path) -> tuple[str, ...]:
-    path = root / "CHANGED_FILES.txt"
-    if not path.exists():
+def _declared_files(root: Path, declaration: Path) -> tuple[str, ...]:
+    path = declaration if declaration.is_absolute() else root / declaration
+    try:
+        return tuple(
+            line.strip().replace("\\", "/")
+            for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        )
+    except (OSError, UnicodeError):
         return ()
-    return tuple(
-        line.strip().replace("\\", "/")
-        for line in path.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.lstrip().startswith("#")
-    )
 
 
-def validate_scope(root: Path) -> list[str]:
+def _run_git(root: Path, *args: str) -> str:
+    try:
+        result = subprocess.run(
+            ("git", *args),
+            cwd=root,
+            capture_output=True,
+            check=False,
+            encoding="utf-8",
+            errors="strict",
+        )
+    except (OSError, UnicodeError) as exc:
+        raise RuntimeError("Git is unavailable") from exc
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or "Git command failed")
+    return result.stdout
+
+
+def _actual_changed_files(root: Path, parent_revision: str) -> tuple[str, ...]:
+    git_root = Path(_run_git(root, "rev-parse", "--show-toplevel").strip()).resolve()
+    if git_root != root.resolve():
+        raise RuntimeError("scope root is not the Git repository root")
+    _run_git(root, "rev-parse", "--verify", f"{parent_revision}^{{commit}}")
+    tracked = _run_git(root, "diff", "--name-only", parent_revision, "--").splitlines()
+    untracked = _run_git(root, "ls-files", "--others", "--exclude-standard").splitlines()
+    return tuple(sorted({path.replace("\\", "/") for path in (*tracked, *untracked) if path}))
+
+
+def validate_scope(
+    root: Path, *, parent_revision: str | None = None, declaration: Path | None = None
+) -> list[str]:
     errors: list[str] = []
     for relative in REQUIRED_FILES:
         path = root / relative
@@ -168,16 +200,26 @@ def validate_scope(root: Path) -> list[str]:
             errors.append(f"MISSING_REQUIRED_FILE:{relative}")
         elif path.stat().st_size == 0:
             errors.append(f"EMPTY_REQUIRED_FILE:{relative}")
-    changed = _changed_files(root)
-    if not changed:
+    if parent_revision is None or declaration is None:
+        return [*errors, "SCOPE_GIT_INPUT_REQUIRED"]
+    declared = _declared_files(root, declaration)
+    if not declared:
         errors.append("CHANGED_FILES_EMPTY_OR_MISSING")
-    if len(changed) != len(set(changed)):
+    if len(declared) != len(set(declared)):
         errors.append("CHANGED_FILES_DUPLICATE_ENTRY")
-    changed_set = set(changed)
-    for relative in REQUIRED_FILES:
-        if relative != "CHANGED_FILES.txt" and relative not in changed_set:
-            errors.append(f"REQUIRED_FILE_NOT_LISTED:{relative}")
-    for relative in changed:
+    try:
+        actual = _actual_changed_files(root, parent_revision)
+    except RuntimeError:
+        return [*errors, "SCOPE_GIT_RESOLUTION_FAILED"]
+    if not actual:
+        errors.append("SCOPE_REAL_DIFF_EMPTY")
+    declared_set = set(declared)
+    actual_set = set(actual)
+    for relative in sorted(actual_set - declared_set):
+        errors.append(f"DECLARATION_MISSING_ACTUAL:{relative}")
+    for relative in sorted(declared_set - actual_set):
+        errors.append(f"DECLARATION_EXTRA:{relative}")
+    for relative in actual:
         if relative.startswith(FORBIDDEN_PREFIXES):
             errors.append(f"STAGE10_PLUS_SCOPE_VIOLATION:{relative}")
         if relative in FORBIDDEN_ACCEPTED_RULE_MUTATIONS:
@@ -223,8 +265,14 @@ def validate_scope(root: Path) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path.cwd())
+    parser.add_argument("--parent-revision", required=True)
+    parser.add_argument("--declaration", type=Path, required=True)
     args = parser.parse_args()
-    errors = validate_scope(args.root.resolve())
+    errors = validate_scope(
+        args.root.resolve(),
+        parent_revision=args.parent_revision,
+        declaration=args.declaration,
+    )
     payload = {
         "schema_version": "pts-009-scope-assurance-v1",
         "status": "PASS" if not errors else "FAIL",

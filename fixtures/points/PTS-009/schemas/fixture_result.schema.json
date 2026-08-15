@@ -1,5 +1,18 @@
 {
   "$defs": {
+    "AssistAction": {
+      "enum": [
+        "PASS",
+        "CROSS",
+        "INADVERTENT_TOUCH",
+        "SHOT",
+        "CROSS_SHOT",
+        "FOUL_WON",
+        "FORCED_OWN_GOAL_ACTION"
+      ],
+      "title": "AssistAction",
+      "type": "string"
+    },
     "AssistClassification": {
       "enum": [
         "DEFINITE_ASSIST",
@@ -7,6 +20,126 @@
         "AMBIGUOUS_ASSIST"
       ],
       "title": "AssistClassification",
+      "type": "string"
+    },
+    "AssistDecisionContext": {
+      "additionalProperties": false,
+      "description": "Closed, replayable facts for the versioned assist classifier.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/AssistAction"
+        },
+        "candidate_is_scorer": {
+          "default": false,
+          "title": "Candidate Is Scorer",
+          "type": "boolean"
+        },
+        "defensive_touch_after_rebound": {
+          "default": false,
+          "title": "Defensive Touch After Rebound",
+          "type": "boolean"
+        },
+        "defensive_touch_is_pass": {
+          "default": false,
+          "title": "Defensive Touch Is Pass",
+          "type": "boolean"
+        },
+        "defensive_touches": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Defensive Touches",
+          "type": "integer"
+        },
+        "goal_kind": {
+          "$ref": "#/$defs/AssistGoalKind"
+        },
+        "inadvertent_touch_reaches_scorer_directly": {
+          "default": true,
+          "title": "Inadvertent Touch Reaches Scorer Directly",
+          "type": "boolean"
+        },
+        "intended_for_scorer": {
+          "default": true,
+          "title": "Intended For Scorer",
+          "type": "boolean"
+        },
+        "rebound_intervention": {
+          "$ref": "#/$defs/AssistReboundIntervention",
+          "default": "NONE"
+        },
+        "scorer_converts_own_rebound": {
+          "default": false,
+          "title": "Scorer Converts Own Rebound",
+          "type": "boolean"
+        },
+        "scorer_loses_and_regains_possession": {
+          "default": false,
+          "title": "Scorer Loses And Regains Possession",
+          "type": "boolean"
+        },
+        "scorer_reception_zone": {
+          "$ref": "#/$defs/AssistReceptionZone",
+          "default": "INSIDE_BOX"
+        },
+        "set_piece_route": {
+          "$ref": "#/$defs/AssistSetPieceRoute",
+          "default": "NONE"
+        },
+        "shot_on_target_after_deflection": {
+          "default": false,
+          "title": "Shot On Target After Deflection",
+          "type": "boolean"
+        },
+        "shot_on_target_before_deflection": {
+          "default": false,
+          "title": "Shot On Target Before Deflection",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "goal_kind",
+        "action"
+      ],
+      "title": "AssistDecisionContext",
+      "type": "object"
+    },
+    "AssistGoalKind": {
+      "enum": [
+        "OPEN_PLAY",
+        "OWN_GOAL",
+        "DIRECT_PENALTY",
+        "DIRECT_FREE_KICK"
+      ],
+      "title": "AssistGoalKind",
+      "type": "string"
+    },
+    "AssistReboundIntervention": {
+      "enum": [
+        "NONE",
+        "GOALKEEPER_SAVE",
+        "DEFENSIVE_BLOCK",
+        "WOODWORK"
+      ],
+      "title": "AssistReboundIntervention",
+      "type": "string"
+    },
+    "AssistReceptionZone": {
+      "enum": [
+        "INSIDE_BOX",
+        "OUTSIDE_BOX"
+      ],
+      "title": "AssistReceptionZone",
+      "type": "string"
+    },
+    "AssistSetPieceRoute": {
+      "enum": [
+        "NONE",
+        "FOUL_WON",
+        "HANDBALL_AFTER_PASS_TOUCH",
+        "HANDBALL_AFTER_SHOT",
+        "CORNER_OR_THROW_IN"
+      ],
+      "title": "AssistSetPieceRoute",
       "type": "string"
     },
     "BinaryProbability": {
@@ -28,6 +161,118 @@
         "no"
       ],
       "title": "BinaryProbability",
+      "type": "object"
+    },
+    "BpsAuxiliaryRates": {
+      "additionalProperties": false,
+      "properties": {
+        "big_chances_created_per90": {
+          "minimum": 0.0,
+          "title": "Big Chances Created Per90",
+          "type": "number"
+        },
+        "big_chances_missed_per90": {
+          "minimum": 0.0,
+          "title": "Big Chances Missed Per90",
+          "type": "number"
+        },
+        "errors_leading_attempt_per90": {
+          "minimum": 0.0,
+          "title": "Errors Leading Attempt Per90",
+          "type": "number"
+        },
+        "errors_leading_goal_per90": {
+          "minimum": 0.0,
+          "title": "Errors Leading Goal Per90",
+          "type": "number"
+        },
+        "fouls_conceded_per90": {
+          "minimum": 0.0,
+          "title": "Fouls Conceded Per90",
+          "type": "number"
+        },
+        "fouls_won_per90": {
+          "minimum": 0.0,
+          "title": "Fouls Won Per90",
+          "type": "number"
+        },
+        "goal_line_clearances_per90": {
+          "minimum": 0.0,
+          "title": "Goal Line Clearances Per90",
+          "type": "number"
+        },
+        "key_passes_per90": {
+          "minimum": 0.0,
+          "title": "Key Passes Per90",
+          "type": "number"
+        },
+        "offsides_per90": {
+          "minimum": 0.0,
+          "title": "Offsides Per90",
+          "type": "number"
+        },
+        "pass_attempts_per90": {
+          "minimum": 0.0,
+          "title": "Pass Attempts Per90",
+          "type": "number"
+        },
+        "pass_completion_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Pass Completion Probability",
+          "type": "number"
+        },
+        "recoveries_per90": {
+          "minimum": 0.0,
+          "title": "Recoveries Per90",
+          "type": "number"
+        },
+        "shots_off_target_per90": {
+          "minimum": 0.0,
+          "title": "Shots Off Target Per90",
+          "type": "number"
+        },
+        "shots_on_target_non_goal_per90": {
+          "minimum": 0.0,
+          "title": "Shots On Target Non Goal Per90",
+          "type": "number"
+        },
+        "successful_dribbles_per90": {
+          "minimum": 0.0,
+          "title": "Successful Dribbles Per90",
+          "type": "number"
+        },
+        "successful_open_play_crosses_per90": {
+          "minimum": 0.0,
+          "title": "Successful Open Play Crosses Per90",
+          "type": "number"
+        },
+        "times_tackled_per90": {
+          "minimum": 0.0,
+          "title": "Times Tackled Per90",
+          "type": "number"
+        }
+      },
+      "required": [
+        "big_chances_created_per90",
+        "big_chances_missed_per90",
+        "errors_leading_attempt_per90",
+        "errors_leading_goal_per90",
+        "fouls_conceded_per90",
+        "fouls_won_per90",
+        "goal_line_clearances_per90",
+        "key_passes_per90",
+        "offsides_per90",
+        "pass_attempts_per90",
+        "pass_completion_probability",
+        "recoveries_per90",
+        "shots_off_target_per90",
+        "shots_on_target_non_goal_per90",
+        "successful_dribbles_per90",
+        "successful_open_play_crosses_per90",
+        "times_tackled_per90"
+      ],
+      "title": "BpsAuxiliaryRates",
       "type": "object"
     },
     "BpsBonusSummary": {
@@ -153,6 +398,12 @@
     "BpsEvents": {
       "additionalProperties": false,
       "properties": {
+        "big_chance_saves": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Big Chance Saves",
+          "type": "integer"
+        },
         "big_chances_created": {
           "minimum": 0,
           "title": "Big Chances Created",
@@ -386,6 +637,127 @@
         "tackles"
       ],
       "title": "DefensiveActions",
+      "type": "object"
+    },
+    "EventAllocationConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ambiguous_assist_eligible_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Ambiguous Assist Eligible Probability",
+          "type": "number"
+        },
+        "ambiguous_assist_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Ambiguous Assist Probability",
+          "type": "number"
+        },
+        "assistable_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Assistable Probability",
+          "type": "number"
+        },
+        "auxiliary_source_tag": {
+          "enum": [
+            "TEMP-PTS-001",
+            "NONE",
+            "TEST_SYNTHETIC"
+          ],
+          "title": "Auxiliary Source Tag",
+          "type": "string"
+        },
+        "bps_completeness_mode": {
+          "$ref": "#/$defs/BpsCompletenessMode"
+        },
+        "direct_free_kick_goal_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Direct Free Kick Goal Probability",
+          "type": "number"
+        },
+        "extra_penalty_attempt_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Extra Penalty Attempt Probability",
+          "type": "number"
+        },
+        "extra_penalty_save_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Extra Penalty Save Probability",
+          "type": "number"
+        },
+        "goal_time_lower": {
+          "maximum": 130.0,
+          "minimum": 0.0,
+          "title": "Goal Time Lower",
+          "type": "number"
+        },
+        "goal_time_upper": {
+          "exclusiveMinimum": 0.0,
+          "maximum": 130.0,
+          "title": "Goal Time Upper",
+          "type": "number"
+        },
+        "match_minutes": {
+          "exclusiveMinimum": 0.0,
+          "maximum": 130.0,
+          "title": "Match Minutes",
+          "type": "number"
+        },
+        "model_version_id": {
+          "title": "Model Version Id",
+          "type": "string"
+        },
+        "own_goal_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Own Goal Probability",
+          "type": "number"
+        },
+        "penalty_goal_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Penalty Goal Probability",
+          "type": "number"
+        },
+        "set_piece_goal_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Set Piece Goal Probability",
+          "type": "number"
+        },
+        "source_tag": {
+          "enum": [
+            "TEMP-EVT-002",
+            "TEST_SYNTHETIC"
+          ],
+          "title": "Source Tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_version_id",
+        "source_tag",
+        "bps_completeness_mode",
+        "auxiliary_source_tag",
+        "match_minutes",
+        "goal_time_lower",
+        "goal_time_upper",
+        "penalty_goal_probability",
+        "set_piece_goal_probability",
+        "direct_free_kick_goal_probability",
+        "own_goal_probability",
+        "assistable_probability",
+        "ambiguous_assist_probability",
+        "ambiguous_assist_eligible_probability",
+        "extra_penalty_attempt_probability",
+        "extra_penalty_save_probability"
+      ],
+      "title": "EventAllocationConfig",
       "type": "object"
     },
     "FixtureEventScenario": {
@@ -646,6 +1018,108 @@
       "title": "FixturePointScenario",
       "type": "object"
     },
+    "FixtureReadiness": {
+      "enum": [
+        "SCHEDULED",
+        "POSTPONED",
+        "CANCELLED",
+        "UNKNOWN"
+      ],
+      "title": "FixtureReadiness",
+      "type": "string"
+    },
+    "FixtureSimulationRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "allocation_config": {
+          "$ref": "#/$defs/EventAllocationConfig"
+        },
+        "allocation_profiles": {
+          "items": {
+            "$ref": "#/$defs/PlayerAllocationProfile"
+          },
+          "title": "Allocation Profiles",
+          "type": "array"
+        },
+        "as_of_utc": {
+          "title": "As Of Utc",
+          "type": "string"
+        },
+        "expected_ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Expected Ruleset Hash",
+          "type": "string"
+        },
+        "expected_ruleset_id": {
+          "title": "Expected Ruleset Id",
+          "type": "string"
+        },
+        "expected_ruleset_version": {
+          "title": "Expected Ruleset Version",
+          "type": "string"
+        },
+        "fixture_readiness": {
+          "$ref": "#/$defs/FixtureReadiness",
+          "default": "SCHEDULED"
+        },
+        "gameweek_id": {
+          "title": "Gameweek Id",
+          "type": "string"
+        },
+        "information_cutoff_utc": {
+          "title": "Information Cutoff Utc",
+          "type": "string"
+        },
+        "participation_scenarios": {
+          "items": {
+            "$ref": "#/$defs/ParticipationScenario"
+          },
+          "title": "Participation Scenarios",
+          "type": "array"
+        },
+        "projection_mode": {
+          "$ref": "#/$defs/ProjectionMode"
+        },
+        "root_seed": {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "Root Seed",
+          "type": "integer"
+        },
+        "scenario_count": {
+          "maximum": 1000000,
+          "minimum": 1,
+          "title": "Scenario Count",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "fpl-points-fixture-request-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "score_distribution": {
+          "$ref": "#/$defs/JointScoreDistribution"
+        }
+      },
+      "required": [
+        "schema_version",
+        "gameweek_id",
+        "projection_mode",
+        "as_of_utc",
+        "information_cutoff_utc",
+        "root_seed",
+        "scenario_count",
+        "score_distribution",
+        "participation_scenarios",
+        "allocation_profiles",
+        "allocation_config",
+        "expected_ruleset_id",
+        "expected_ruleset_version",
+        "expected_ruleset_hash"
+      ],
+      "title": "FixtureSimulationRequest",
+      "type": "object"
+    },
     "GoalEvent": {
       "additionalProperties": false,
       "properties": {
@@ -655,6 +1129,17 @@
         },
         "assist_classification": {
           "$ref": "#/$defs/AssistClassification"
+        },
+        "assist_context": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AssistDecisionContext"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "assister_player_id": {
           "anyOf": [
@@ -1272,6 +1757,88 @@
       "title": "MonteCarloDiagnostics",
       "type": "object"
     },
+    "MonteCarloPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_count": {
+          "maximum": 20,
+          "minimum": 2,
+          "title": "Batch Count",
+          "type": "integer"
+        },
+        "maximum_mean_mcse": {
+          "exclusiveMinimum": 0.0,
+          "title": "Maximum Mean Mcse",
+          "type": "number"
+        },
+        "maximum_probability_se": {
+          "exclusiveMinimum": 0.0,
+          "title": "Maximum Probability Se",
+          "type": "number"
+        },
+        "maximum_quantile_span": {
+          "minimum": 0,
+          "title": "Maximum Quantile Span",
+          "type": "integer"
+        },
+        "minimum_effective_scenarios": {
+          "exclusiveMinimum": 0.0,
+          "title": "Minimum Effective Scenarios",
+          "type": "number"
+        },
+        "quantiles": {
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "title": "Quantiles",
+          "type": "array"
+        },
+        "thresholds": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Thresholds",
+          "type": "array"
+        }
+      },
+      "required": [
+        "minimum_effective_scenarios",
+        "maximum_mean_mcse",
+        "maximum_probability_se",
+        "maximum_quantile_span",
+        "quantiles",
+        "thresholds",
+        "batch_count"
+      ],
+      "title": "MonteCarloPolicy",
+      "type": "object"
+    },
+    "OnPitchInterval": {
+      "additionalProperties": false,
+      "description": "Half-open participation interval: ``[start_minute, end_minute)``.",
+      "properties": {
+        "end_minute": {
+          "maximum": 130.0,
+          "minimum": 0.0,
+          "title": "End Minute",
+          "type": "number"
+        },
+        "start_minute": {
+          "maximum": 130.0,
+          "minimum": 0.0,
+          "title": "Start Minute",
+          "type": "number"
+        }
+      },
+      "required": [
+        "start_minute",
+        "end_minute"
+      ],
+      "title": "OnPitchInterval",
+      "type": "object"
+    },
     "OneXTwoDistribution": {
       "additionalProperties": false,
       "properties": {
@@ -1339,6 +1906,245 @@
       "title": "PairDependence",
       "type": "object"
     },
+    "ParticipantState": {
+      "additionalProperties": false,
+      "properties": {
+        "hard_ineligible": {
+          "default": false,
+          "title": "Hard Ineligible",
+          "type": "boolean"
+        },
+        "interval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OnPitchInterval"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "official_minutes": {
+          "maximum": 90,
+          "minimum": 0,
+          "title": "Official Minutes",
+          "type": "integer"
+        },
+        "player_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Player Id",
+          "type": "string"
+        },
+        "position": {
+          "$ref": "#/$defs/PlayerPosition"
+        },
+        "starter": {
+          "default": false,
+          "title": "Starter",
+          "type": "boolean"
+        },
+        "team_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Team Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "player_id",
+        "team_id",
+        "position",
+        "official_minutes",
+        "interval"
+      ],
+      "title": "ParticipantState",
+      "type": "object"
+    },
+    "ParticipationScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "away_team_id": {
+          "title": "Away Team Id",
+          "type": "string"
+        },
+        "fixture_id": {
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "gameweek_id": {
+          "title": "Gameweek Id",
+          "type": "string"
+        },
+        "home_team_id": {
+          "title": "Home Team Id",
+          "type": "string"
+        },
+        "information_cutoff_utc": {
+          "title": "Information Cutoff Utc",
+          "type": "string"
+        },
+        "participant_universe_complete": {
+          "const": true,
+          "title": "Participant Universe Complete",
+          "type": "boolean"
+        },
+        "participants": {
+          "items": {
+            "$ref": "#/$defs/ParticipantState"
+          },
+          "title": "Participants",
+          "type": "array"
+        },
+        "probability": {
+          "exclusiveMinimum": 0.0,
+          "maximum": 1.0,
+          "title": "Probability",
+          "type": "number"
+        },
+        "scenario_id": {
+          "minLength": 1,
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "stage7_away_projection": {
+          "$ref": "#/$defs/TeamMinutesProjection"
+        },
+        "stage7_home_projection": {
+          "$ref": "#/$defs/TeamMinutesProjection"
+        },
+        "stage7_minutes_context": {
+          "$ref": "#/$defs/Stage7MinutesContext"
+        },
+        "stage7_player_projection_sha256s": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Stage7 Player Projection Sha256S",
+          "type": "object"
+        }
+      },
+      "required": [
+        "scenario_id",
+        "fixture_id",
+        "gameweek_id",
+        "home_team_id",
+        "away_team_id",
+        "probability",
+        "participant_universe_complete",
+        "participants",
+        "stage7_minutes_context",
+        "stage7_player_projection_sha256s",
+        "stage7_home_projection",
+        "stage7_away_projection",
+        "information_cutoff_utc"
+      ],
+      "title": "ParticipationScenario",
+      "type": "object"
+    },
+    "PlayerAllocationProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "assist_share": {
+          "minimum": 0.0,
+          "title": "Assist Share",
+          "type": "number"
+        },
+        "ball_recoveries_per90": {
+          "minimum": 0.0,
+          "title": "Ball Recoveries Per90",
+          "type": "number"
+        },
+        "blocks_per90": {
+          "minimum": 0.0,
+          "title": "Blocks Per90",
+          "type": "number"
+        },
+        "bps_auxiliary": {
+          "$ref": "#/$defs/BpsAuxiliaryRates"
+        },
+        "clearances_per90": {
+          "minimum": 0.0,
+          "title": "Clearances Per90",
+          "type": "number"
+        },
+        "goal_share": {
+          "minimum": 0.0,
+          "title": "Goal Share",
+          "type": "number"
+        },
+        "goalkeeper_saves_per90": {
+          "minimum": 0.0,
+          "title": "Goalkeeper Saves Per90",
+          "type": "number"
+        },
+        "interceptions_per90": {
+          "minimum": 0.0,
+          "title": "Interceptions Per90",
+          "type": "number"
+        },
+        "own_goal_share": {
+          "minimum": 0.0,
+          "title": "Own Goal Share",
+          "type": "number"
+        },
+        "penalty_taker_share": {
+          "minimum": 0.0,
+          "title": "Penalty Taker Share",
+          "type": "number"
+        },
+        "player_id": {
+          "title": "Player Id",
+          "type": "string"
+        },
+        "red_cards_per90": {
+          "minimum": 0.0,
+          "title": "Red Cards Per90",
+          "type": "number"
+        },
+        "saves_inside_box_fraction": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Saves Inside Box Fraction",
+          "type": "number"
+        },
+        "tackles_per90": {
+          "minimum": 0.0,
+          "title": "Tackles Per90",
+          "type": "number"
+        },
+        "team_id": {
+          "title": "Team Id",
+          "type": "string"
+        },
+        "yellow_cards_per90": {
+          "minimum": 0.0,
+          "title": "Yellow Cards Per90",
+          "type": "number"
+        }
+      },
+      "required": [
+        "player_id",
+        "team_id",
+        "goal_share",
+        "assist_share",
+        "penalty_taker_share",
+        "own_goal_share",
+        "goalkeeper_saves_per90",
+        "saves_inside_box_fraction",
+        "yellow_cards_per90",
+        "red_cards_per90",
+        "clearances_per90",
+        "blocks_per90",
+        "interceptions_per90",
+        "tackles_per90",
+        "ball_recoveries_per90",
+        "bps_auxiliary"
+      ],
+      "title": "PlayerAllocationProfile",
+      "type": "object"
+    },
     "PlayerEventVector": {
       "additionalProperties": false,
       "properties": {
@@ -1377,7 +2183,7 @@
           "type": "integer"
         },
         "minutes": {
-          "maximum": 130,
+          "maximum": 90,
           "minimum": 0,
           "title": "Minutes",
           "type": "integer"
@@ -1451,6 +2257,115 @@
         "auxiliary_source_tag"
       ],
       "title": "PlayerEventVector",
+      "type": "object"
+    },
+    "PlayerMinutesProjection": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "title": "Confidence Grade",
+          "type": "string"
+        },
+        "confidence_reasons": {
+          "items": {
+            "enum": [
+              "HARD_INELIGIBLE_OVERRIDE",
+              "NO_TARGET_TEAM_COMPETITIVE_HISTORY",
+              "THIN_PLAYER_HISTORY",
+              "NEW_SIGNING",
+              "NEW_MANAGER_REGIME",
+              "PROMOTED_TEAM_EARLY_REGIME",
+              "BASELINE_MODEL_CAP_B"
+            ],
+            "type": "string"
+          },
+          "title": "Confidence Reasons",
+          "type": "array"
+        },
+        "expected_minutes": {
+          "pattern": "^(?:[0-8]?\\d|90)\\.\\d{6}$",
+          "title": "Expected Minutes",
+          "type": "string"
+        },
+        "minute_pmf": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Minute Pmf",
+          "type": "array"
+        },
+        "p_60_plus": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P 60 Plus",
+          "type": "string"
+        },
+        "p_appearance": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Appearance",
+          "type": "string"
+        },
+        "p_bench": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Bench",
+          "type": "string"
+        },
+        "p_out_of_squad": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Out Of Squad",
+          "type": "string"
+        },
+        "p_start": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Start",
+          "type": "string"
+        },
+        "p_zero_minutes": {
+          "pattern": "^(?:0\\.\\d{12}|1\\.000000000000)$",
+          "title": "P Zero Minutes",
+          "type": "string"
+        },
+        "player_id": {
+          "title": "Player Id",
+          "type": "string"
+        },
+        "position": {
+          "enum": [
+            "GK",
+            "DEF",
+            "MID",
+            "FWD"
+          ],
+          "title": "Position",
+          "type": "string"
+        },
+        "projection_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Projection Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "player_id",
+        "position",
+        "p_start",
+        "p_bench",
+        "p_out_of_squad",
+        "p_appearance",
+        "p_zero_minutes",
+        "p_60_plus",
+        "expected_minutes",
+        "minute_pmf",
+        "confidence_grade",
+        "confidence_reasons",
+        "projection_sha256"
+      ],
+      "title": "PlayerMinutesProjection",
       "type": "object"
     },
     "PlayerPosition": {
@@ -1840,9 +2755,70 @@
       "title": "ProjectionMode",
       "type": "string"
     },
+    "RulesetActivationEvidence": {
+      "additionalProperties": false,
+      "description": "Immutable hashes binding an ACTIVE ruleset to its Stage-2 activation bundle.",
+      "properties": {
+        "activation_manifest_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Activation Manifest Sha256",
+          "type": "string"
+        },
+        "activation_receipt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Activation Receipt Sha256",
+          "type": "string"
+        },
+        "active_ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Active Ruleset Hash",
+          "type": "string"
+        },
+        "approval_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Approval Sha256",
+          "type": "string"
+        },
+        "ruleset_id": {
+          "title": "Ruleset Id",
+          "type": "string"
+        },
+        "ruleset_version": {
+          "title": "Ruleset Version",
+          "type": "string"
+        },
+        "verified_ruleset_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Verified Ruleset Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ruleset_id",
+        "ruleset_version",
+        "verified_ruleset_hash",
+        "active_ruleset_hash",
+        "approval_sha256",
+        "activation_receipt_sha256",
+        "activation_manifest_sha256"
+      ],
+      "title": "RulesetActivationEvidence",
+      "type": "object"
+    },
     "RulesetIdentity": {
       "additionalProperties": false,
       "properties": {
+        "activation_evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RulesetActivationEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "human_approval_recorded": {
           "title": "Human Approval Recorded",
           "type": "boolean"
@@ -1945,6 +2921,110 @@
         "away"
       ],
       "title": "Stage7MinutesContext",
+      "type": "object"
+    },
+    "TeamMinutesProjection": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "title": "As Of",
+          "type": "string"
+        },
+        "bench_goalkeeper_slots": {
+          "minimum": 0,
+          "title": "Bench Goalkeeper Slots",
+          "type": "integer"
+        },
+        "bench_size": {
+          "minimum": 0,
+          "title": "Bench Size",
+          "type": "integer"
+        },
+        "dataset_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dataset Sha256",
+          "type": "string"
+        },
+        "fixture_id": {
+          "title": "Fixture Id",
+          "type": "string"
+        },
+        "model_artifact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Model Artifact Sha256",
+          "type": "string"
+        },
+        "model_family": {
+          "const": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+          "title": "Model Family",
+          "type": "string"
+        },
+        "players": {
+          "items": {
+            "$ref": "#/$defs/PlayerMinutesProjection"
+          },
+          "title": "Players",
+          "type": "array"
+        },
+        "result_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Result Sha256",
+          "type": "string"
+        },
+        "sample_count": {
+          "const": 256,
+          "title": "Sample Count",
+          "type": "integer"
+        },
+        "scenario_set_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scenario Set Sha256",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "team-minutes-projection-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sum_p_bench": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Sum P Bench",
+          "type": "string"
+        },
+        "sum_p_out": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Sum P Out",
+          "type": "string"
+        },
+        "sum_p_start": {
+          "pattern": "^\\d+\\.\\d{12}$",
+          "title": "Sum P Start",
+          "type": "string"
+        },
+        "team_id": {
+          "title": "Team Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "fixture_id",
+        "team_id",
+        "as_of",
+        "model_family",
+        "dataset_sha256",
+        "model_artifact_sha256",
+        "sample_count",
+        "bench_size",
+        "bench_goalkeeper_slots",
+        "players",
+        "scenario_set_sha256",
+        "sum_p_start",
+        "sum_p_bench",
+        "sum_p_out",
+        "result_sha256"
+      ],
+      "title": "TeamMinutesProjection",
       "type": "object"
     },
     "TeamMinutesProjectionIdentity": {
@@ -2101,6 +3181,9 @@
         }
       ]
     },
+    "monte_carlo_policy": {
+      "$ref": "#/$defs/MonteCarloPolicy"
+    },
     "player_summaries": {
       "additionalProperties": {
         "$ref": "#/$defs/PlayerProjectionSummary"
@@ -2137,6 +3220,14 @@
     "schema_version": {
       "const": "fpl-points-fixture-result-v1",
       "title": "Schema Version",
+      "type": "string"
+    },
+    "simulation_request": {
+      "$ref": "#/$defs/FixtureSimulationRequest"
+    },
+    "simulation_request_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Simulation Request Sha256",
       "type": "string"
     },
     "source_bundle_ids": {
@@ -2178,6 +3269,9 @@
     "ruleset",
     "projection_mode",
     "information_cutoff_utc",
+    "simulation_request",
+    "simulation_request_sha256",
+    "monte_carlo_policy",
     "source_bundle_ids",
     "upstream_score_distribution",
     "upstream_stage8_sha256"
