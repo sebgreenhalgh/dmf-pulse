@@ -8,6 +8,7 @@
   "artifact_assurance": "PASS",
   "cli_current_target": "BLOCKED:MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
   "critical_branch_coverage": "PASS",
+  "formatting_remediation": "PASS: Ruff-only formatting in two files; no semantic change",
   "dependency_and_migration_drift": "PASS",
   "status": "READY_FOR_INDEPENDENT_SOL_REVIEW"
 }

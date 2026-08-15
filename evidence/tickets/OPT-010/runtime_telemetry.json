@@ -16,6 +16,14 @@
     "objective_tolerance": null
   },
   "resource_limit_behavior": "preflight returns RESOURCE_LIMIT before enumeration and emits no plan or incumbent",
+  "remediation": {
+    "formatting_only": true,
+    "files": [
+      "src/dmf_pulse/optimisation/tactics.py",
+      "tests/unit/scripts/test_opt010_repository_validation.py"
+    ],
+    "ruff_format_check": "PASS"
+  },
   "network": false,
   "database_access": false,
   "status": "PASS"

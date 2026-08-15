@@ -162,7 +162,7 @@ def evaluate_tactical_configuration(
     signature = "|".join(
         (
             ",".join(sorted(squad.player_ids)),
-        ",".join(sorted(tactic.starting_xi)),
+            ",".join(sorted(tactic.starting_xi)),
             tactic.bench_goalkeeper,
             ",".join(tactic.outfield_bench_order),
             tactic.captain,

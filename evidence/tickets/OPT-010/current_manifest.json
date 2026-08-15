@@ -396,24 +396,24 @@
       "sha256": "ba9500148c70614286c254f493597bdd53b2285dfc7326054d3fdd641ff809fb"
     },
     {
-      "bytes": 666,
+      "bytes": 925,
       "path": "evidence/stages/10/STAGE_ACCEPTANCE.md",
-      "sha256": "3e56fed2796dfd61820cd42fbb5291dd490effcb260bfc41c067fcc1225b195c"
+      "sha256": "7d59875203a85e2d7ec96f871f9a7800533fec01d052b6193d4706db8ee423ca"
     },
     {
-      "bytes": 79492,
+      "bytes": 79584,
       "path": "evidence/stages/10/coverage.json",
-      "sha256": "8e178b4d83253e9c084fc306b26af063eb14fa6c4c61a6cb8fade4c7c8e7086c"
+      "sha256": "a1c151ab4f886afe3414327badbe9723b3a107457ffbccf59f5366cac0899b75"
     },
     {
-      "bytes": 1774210,
+      "bytes": 1774225,
       "path": "evidence/stages/10/repository_coverage.json",
-      "sha256": "fcd3466aefbfe1d6aa02607d02f432a6d57acb34d015e9dcc1d9804badd984be"
+      "sha256": "5c569496bd21d43706a9f5555e1e88726e8200e485fc02fa001c513a7b5c4e32"
     },
     {
-      "bytes": 492,
+      "bytes": 600,
       "path": "evidence/stages/10/stage_acceptance.json",
-      "sha256": "2918177d543a70002fdc5a6c0cf20f840fe8bbbd189ff1ed945f0aefcac1f186"
+      "sha256": "9f2b2e326faafeff34b0fe29c0a43c200788d29e4643f010ddff52577f48f279"
     },
     {
       "bytes": 281,
@@ -2566,9 +2566,9 @@
       "sha256": "9e5d14620737ded4a16f55a716edb3c584140b7d5ac4501faf2c820e3418ef1e"
     },
     {
-      "bytes": 7899,
+      "bytes": 7903,
       "path": "src/dmf_pulse/optimisation/tactics.py",
-      "sha256": "d6a32eca597ae15d2fa3ef7d209c9cfdbed06d8111fdd3197297f0775334ca1c"
+      "sha256": "7672c9754bb8531ebd30156e2d73b1bf3452709507382f423226572451a5606d"
     },
     {
       "bytes": 1343,
@@ -3731,9 +3731,9 @@
       "sha256": "7075b5e83a78ce705fd3941d277c7bd51da58e657c1e43cda84c82aedf432ae2"
     },
     {
-      "bytes": 297,
+      "bytes": 296,
       "path": "tests/unit/scripts/test_opt010_repository_validation.py",
-      "sha256": "c1df510e972a6232c588718b1aa2015f07ae8930a3d6c8469a6cc6217365d771"
+      "sha256": "99bf4647b80f26ff66dea3942e3437864c8f011105bc2958abfe499dc24ce270"
     },
     {
       "bytes": 8568,
