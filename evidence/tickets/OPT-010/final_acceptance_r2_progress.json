@@ -1,0 +1,7 @@
+﻿{
+    "status":  "RUNNING",
+    "ordinal":  11,
+    "command":  "uv run python scripts/assurance/check_opt010_coverage.py evidence/stages/10/coverage.json",
+    "executed_command":  "uv run python scripts/assurance/check_opt010_coverage.py evidence/stages/10/coverage.json",
+    "started_utc":  "2026-08-16T02:48:35.1258311Z"
+}
