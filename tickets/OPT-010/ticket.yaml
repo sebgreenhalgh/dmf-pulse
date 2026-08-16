@@ -466,6 +466,13 @@ acceptance_invocation_policy:
     are not fallback aliases. No semantic-equivalence substitution beyond these exact forms is
     permitted. Evidence records the amended literals. This is a platform-portability change only
     and does not alter acceptance meaning.
+  execution_order: >-
+    Repository coverage executes TEST-database integration tests and repository-manifest
+    validation. The canonical 31-command sequence therefore retains the compose TEST database
+    through repository coverage, regenerates the current repository manifest immediately before
+    that coverage command, and performs the mandatory teardown immediately afterwards. This is
+    an execution-order change only; it does not alter any gate, target, option, threshold,
+    environment meaning, or implementation semantics.
 
 acceptance_commands:
   - "git diff --check"
@@ -486,12 +493,12 @@ acceptance_commands:
   - "docker compose -f compose.test.yaml up -d --wait"
   - "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head"
   - "uv run python -m pytest -q -m \"postgres and integration\" tests/integration"
-  - "docker compose -f compose.test.yaml down -v --remove-orphans"
+  - "uv run python scripts/generate_repository_manifest.py --ticket OPT-010"
   - "uv run python -m pytest -q --ignore=tests/performance --cov=dmf_pulse --cov-branch --cov-report=json:evidence/stages/10/repository_coverage.json"
+  - "docker compose -f compose.test.yaml down -v --remove-orphans"
   - "uv run python scripts/assurance/run_opt010_cli_acceptance.py --fixture-root fixtures/optimisation/one_gameweek"
   - "uv build"
   - "uv run python scripts/verify_opt010_wheel.py"
-  - "uv run python scripts/generate_repository_manifest.py --ticket OPT-010"
   - "uv run dmf specs validate"
   - "uv run python scripts/validate_repository.py"
   - "uv run python scripts/scan_secrets.py"

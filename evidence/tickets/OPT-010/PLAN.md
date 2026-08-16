@@ -70,3 +70,19 @@ authorized only the canonical `uv run python -m mypy` and `uv run python -m pyte
 forms in the ticket; no test selection, option, threshold, environment requirement, or semantic
 behavior changed. No full acceptance was run after the R2F literal-entry-point blocker. A fresh
 31-command ledger is required against the new R2G governance commit.
+
+## R2H acceptance-order authorization
+
+The first R2G ledger was invalidated at command 20. Commands 1–18 passed with the established
+TEST database environment, but the former command 19 had correctly torn that database down
+before repository-wide coverage. That suite contains database-requiring integration tests and
+also checks that the repository manifest reflects the current governed bytes; the former
+manifest-generation command was scheduled after it.
+
+The repository owner authorized a narrow order-only amendment that retains exactly 31 commands:
+the existing manifest command moves from ordinal 24 to 19, repository coverage remains ordinal
+20 while the TEST database is available, and the existing mandatory teardown moves from ordinal
+19 to 21. No command literal other than its position, target, assertion, threshold, fixture,
+dependency, production rule, or optimiser semantic changed. The invalidated R2G generated
+coverage and transcripts were removed; this history remains authoritative. A fresh 31-command
+ledger is required against the R2H governance commit.

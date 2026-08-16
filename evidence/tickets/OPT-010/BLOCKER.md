@@ -87,3 +87,15 @@ The repository owner authorized a narrow ticket amendment that makes only the li
 command launch form only: all selected targets, arguments, thresholds, policy, and production
 semantics remain frozen. No full acceptance was run after this environment blocker; a fresh
 ledger is required against the R2G governance commit.
+
+## R2H acceptance-order resolution
+
+The first R2G ledger was invalidated at repository coverage: the prior sequence required its
+mandatory compose teardown before a later coverage suite that executes TEST-database integration
+tests, and it generated the repository manifest only after that suite had validated it. The
+repository owner authorized an additive order-only ticket amendment. It preserves the 31
+commands, keeps the TEST database available through repository coverage, moves the existing
+manifest command to immediately before coverage, and moves the existing teardown to immediately
+afterwards. No rules, fixture, production eligibility, implementation, test selection, or
+acceptance threshold changed. The R2G generated outputs are invalidated and must not be used as
+final PASS evidence; a new full ledger is required against the R2H governance commit.
