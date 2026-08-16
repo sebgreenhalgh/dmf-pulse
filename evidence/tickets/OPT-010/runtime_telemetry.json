@@ -1,5 +1,5 @@
 {
-  "acceptance_execution_mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
+  "acceptance_execution_mode": "FRESH_MONOLITHIC_LITERAL_SEQUENCE",
   "database_access": false,
   "network": false,
   "packaged_caps": {
@@ -13,21 +13,17 @@
     "guarantee": "EXACT_FIXED_SQUAD",
     "scenario_score_operations": 363000,
     "squads_examined": 1,
-    "tactical_configurations_examined": 363000,
-    "wall_clock_seconds_observed": 43.4
+    "tactical_configurations_examined": 363000
   },
   "remediation": {
-    "files": [
-      "src/dmf_pulse/optimisation/tactics.py",
-      "tests/unit/scripts/test_opt010_repository_validation.py"
-    ],
-    "formatting_only": true,
-    "ruff_format_check": "PASS"
+    "formatting_only": false,
+    "implementation_revision": "590740bfc6f139b193550dc32047625a24d3e29f",
+    "scope": "frozen-contract, lineage, validation, artifact-safety, and assurance fixes"
   },
   "resource_limit_behavior": "preflight returns RESOURCE_LIMIT before enumeration and emits no plan or incumbent",
   "search_backend": "DETERMINISTIC_EXHAUSTIVE_ENUMERATOR",
   "status": "PASS",
-  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
-  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
+  "tested_revision": "590740bfc6f139b193550dc32047625a24d3e29f",
+  "tested_tree": "563c415c61e2b3114fdc2cf6b0059a90944f1cb1",
   "ticket": "OPT-010"
 }

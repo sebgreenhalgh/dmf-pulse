@@ -107,3 +107,27 @@ Status: `READY_FOR_INDEPENDENT_SOL_REREVIEW`. The final evidence is explicitly a
 `CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT`; it does not claim an uninterrupted 31-command
 wall-clock run. Implementation self-acceptance remains false, and independent Sol review plus
 human acceptance remain required.
+
+## R3 independent-rereview remediation
+
+The fresh independent rereview identified contract, lineage, validation, artifact-safety,
+factory-semantics, and coverage gaps. The remediation aligns the public optimiser models with
+the frozen SOL plan, binds request and Stage-9 lineage hashes, validates the Stage-9 player
+universe before search, performs independent exact plan recomputation, rejects artifact leaf
+symlinks (including the race branch), preserves explicit appearance independently of points,
+and strengthens exact public-contract and artifact-assurance regressions.
+
+The first complete R3 acceptance attempt against
+`1782171fc8be5691d96d30386786a36eaf0b3b6c` passed commands 1–10 and then truthfully failed
+command 11 because critical branch coverage for `optimisation/artifacts.py` was 85.71%, below
+the frozen 95% threshold. A tests-only follow-up covered the missing safety branches and was
+committed as `590740bfc6f139b193550dc32047625a24d3e29f`.
+
+The final R3B ledger then executed all 31 literal commands, in frozen order, as one fresh
+monolithic sequence against revision `590740bfc6f139b193550dc32047625a24d3e29f` and tree
+`563c415c61e2b3114fdc2cf6b0059a90944f1cb1`. All 31 passed. The exact repository-wide command
+passed 1,872 tests at 91.55% combined coverage; Stage-10 targeted coverage passed at 91.70%,
+with every critical-file branch threshold at or above 95%.
+
+Status: `READY_FOR_INDEPENDENT_SOL_REREVIEW`. Implementation self-acceptance remains false;
+independent review and human acceptance remain separate.

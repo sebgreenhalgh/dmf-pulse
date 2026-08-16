@@ -1,5 +1,4 @@
 {
-  "acceptance_execution_mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
   "critical_branch_percent": {
     "src/dmf_pulse/optimisation/artifacts.py": 100.0,
     "src/dmf_pulse/optimisation/autosub_evaluator.py": 100.0,
@@ -10,23 +9,20 @@
   "ok": true,
   "required_aggregate_percent": 90,
   "required_critical_branch_percent": 95,
-  "status": "PASS",
-  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
-  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
   "totals": {
-    "covered_branches": 314,
-    "covered_lines": 960,
+    "covered_branches": 338,
+    "covered_lines": 1098,
     "excluded_lines": 0,
-    "missing_branches": 34,
-    "missing_lines": 37,
-    "num_branches": 348,
-    "num_partial_branches": 32,
-    "num_statements": 997,
-    "percent_branches_covered": 90.22988505747126,
-    "percent_branches_covered_display": "90",
-    "percent_covered": 94.72118959107807,
-    "percent_covered_display": "95",
-    "percent_statements_covered": 96.28886659979939,
-    "percent_statements_covered_display": "96"
+    "missing_branches": 54,
+    "missing_lines": 76,
+    "num_branches": 392,
+    "num_partial_branches": 48,
+    "num_statements": 1174,
+    "percent_branches_covered": 86.22448979591837,
+    "percent_branches_covered_display": "86",
+    "percent_covered": 91.69859514687101,
+    "percent_covered_display": "92",
+    "percent_statements_covered": 93.52640545144804,
+    "percent_statements_covered_display": "94"
   }
 }

@@ -119,3 +119,20 @@ target-season production gate remains correctly blocked with
 Status: `RESOLVED_FOR_INDEPENDENT_SOL_REREVIEW`. This records successful completion of the
 implementation acceptance evidence only; it is not self-acceptance, human acceptance, or a
 merge authorization.
+
+## R3 rereview resolution
+
+The independent-rereview findings are resolved in implementation revision
+`590740bfc6f139b193550dc32047625a24d3e29f`. The initial R3 acceptance attempt is retained as
+superseded evidence because its critical artifact branch coverage failed the frozen threshold.
+The tests-only follow-up restored that assurance without changing production semantics.
+
+The replacement R3B run executed the exact 31-command acceptance sequence from a fresh start
+against one immutable revision and tree. It passed 31/31, including the monolithic 1,872-test
+repository gate, installed-wheel solve and validate-plan proof, repository validation, secret
+scan, dependency and migration drift checks, and final whitespace validation. The original
+test-synthetic governance resolution remains narrow and unchanged; production eligibility and
+the current target-season blocked result are unchanged.
+
+Status: `RESOLVED_FOR_INDEPENDENT_SOL_REREVIEW`. No implementation self-acceptance, human
+acceptance, merge authorization, or production-rules promotion is claimed.

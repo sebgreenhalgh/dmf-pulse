@@ -1,5 +1,4 @@
 {
-  "acceptance_execution_mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
   "blocked": {
     "error_code": "MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
     "exit_code": 3,
@@ -16,8 +15,6 @@
     "ok": true,
     "status": "SUCCESS"
   },
-  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
-  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
   "validate_plan": {
     "exit_code": 0,
     "legal": true,
