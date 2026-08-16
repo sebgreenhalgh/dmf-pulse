@@ -22,6 +22,10 @@ from dmf_pulse.optimisation.validation import validate_result_against_request
 from tests.support.optimisation_factories import projection, request, synthetic_ruleset
 
 
+class OptionalSnapshotDigest(BaseModel):
+    snapshot_sha256: str | None = None
+
+
 def _rehash[ArtifactModel: BaseModel](value: ArtifactModel, field: str) -> ArtifactModel:
     payload = value.model_dump(mode="json")
     payload[field] = None
@@ -140,6 +144,15 @@ def test_artifact_helpers_fail_closed_for_hashless_and_concurrent_paths(
         gameweek_id="GW",
         request_id="r",
     )
+    hashless_value = OptionalSnapshotDigest()
+    artifacts._verify_embedded_hash(hashless_value)
+    with pytest.raises(OptimisationError, match="missing required snapshot_sha256"):
+        persist_result(
+            hashless_value,
+            artifact_root=tmp_path,
+            gameweek_id="GW",
+            request_id="hashless",
+        )
     hashless = tmp_path / "hashless.json"
     hashless_pool = request().candidate_pool.model_copy(update={"snapshot_sha256": None})
     hashless.write_bytes(canonical_json_bytes(hashless_pool))
@@ -161,6 +174,17 @@ def test_artifact_helpers_fail_closed_for_hashless_and_concurrent_paths(
     )
     with pytest.raises(OptimisationError, match="destination cannot be a symbolic link"):
         artifacts._write_once(tmp_path / "leaf.json", b"bytes", root=tmp_path)
+    monkeypatch.undo()
+
+    symlink_checks = iter((False, True))
+    monkeypatch.setattr(artifacts.Path, "is_symlink", lambda _path: next(symlink_checks))
+    monkeypatch.setattr(
+        artifacts.os,
+        "link",
+        lambda _source, _target: (_ for _ in ()).throw(FileExistsError()),
+    )
+    with pytest.raises(OptimisationError, match="destination cannot be a symbolic link"):
+        artifacts._write_once(tmp_path / "racing-link.json", b"bytes", root=tmp_path)
     monkeypatch.undo()
 
     monkeypatch.setattr(artifacts.Path, "resolve", lambda _path: (_ for _ in ()).throw(OSError()))
