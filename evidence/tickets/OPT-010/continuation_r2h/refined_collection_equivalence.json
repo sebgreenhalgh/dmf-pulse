@@ -1,0 +1,33 @@
+{
+    "D":  {
+              "parent":  "D",
+              "parent_count":  236,
+              "child_sum":  236,
+              "union_count":  236,
+              "duplicate_count":  0,
+              "missing_count":  0,
+              "unexpected_count":  0,
+              "equivalent":  true
+          },
+    "E":  {
+              "parent":  "E",
+              "parent_count":  86,
+              "child_sum":  86,
+              "union_count":  86,
+              "duplicate_count":  0,
+              "missing_count":  0,
+              "unexpected_count":  0,
+              "equivalent":  true
+          },
+    "F":  {
+              "parent":  "F",
+              "parent_count":  143,
+              "child_sum":  143,
+              "union_count":  143,
+              "duplicate_count":  0,
+              "missing_count":  0,
+              "unexpected_count":  0,
+              "equivalent":  true
+          },
+    "tested_revision":  "79102d41fc5d4e2c70d8251d643b705602573045"
+}

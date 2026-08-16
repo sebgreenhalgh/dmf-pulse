@@ -1,0 +1,6 @@
+schema_version: one-gameweek-optimiser-policy-v1
+max_squad_candidates: 12
+max_tactical_configurations: 5000000
+max_scenario_score_operations: 20000000
+max_returned_ties: 16
+objective_tolerance: null

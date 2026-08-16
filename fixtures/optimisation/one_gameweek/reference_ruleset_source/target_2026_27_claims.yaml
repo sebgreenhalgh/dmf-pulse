@@ -1,0 +1,7 @@
+ruleset_id: "opt010-test-synthetic"
+ruleset_version: "1.0.0"
+status: "REFERENCE_ONLY"
+production_eligible: false
+checked_claims: null
+unknown_blocking_families:
+  - "test_synthetic_reference_only"

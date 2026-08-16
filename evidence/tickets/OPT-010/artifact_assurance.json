@@ -1,0 +1,8 @@
+{
+  "acceptance_execution_mode": "FRESH_MONOLITHIC_LITERAL_SEQUENCE",
+  "immutable_hash_convention": true,
+  "ok": true,
+  "policy_byte_identical": true,
+  "tested_revision": "590740bfc6f139b193550dc32047625a24d3e29f",
+  "tested_tree": "563c415c61e2b3114fdc2cf6b0059a90944f1cb1"
+}

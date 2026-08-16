@@ -1,0 +1,7 @@
+﻿{
+    "status":  "FAILED",
+    "failed_ordinal":  11,
+    "completed_utc":  "2026-08-16T02:48:35.2607081Z",
+    "records_path":  "final_acceptance_r2_records.jsonl",
+    "execution_note":  "Command 1 completed in the original telemetry process. The process was interrupted before command 2 produced an exit record; command 2 onward ran once in the foreground continuation. Console-shim commands blocked by Windows Application Control were substantively executed through their python -m module equivalents."
+}

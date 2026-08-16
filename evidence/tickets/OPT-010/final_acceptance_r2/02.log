@@ -1,0 +1,6 @@
+uv : Checked 40 packages in 3ms
+At line:1 char:1
++ uv sync --all-groups --frozen
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Checked 40 packages in 3ms:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError

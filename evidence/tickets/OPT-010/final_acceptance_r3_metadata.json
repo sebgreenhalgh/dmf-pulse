@@ -1,0 +1,14 @@
+{
+  "tested_revision": "1782171fc8be5691d96d30386786a36eaf0b3b6c",
+  "tested_tree": "340128e100c3918911c5a7f3038dc83b461a66c7",
+  "started_utc": "2026-08-16T18:58:59.474552Z",
+  "execution_mode": "FRESH_MONOLITHIC_LITERAL_SEQUENCE",
+  "command_count": 31,
+  "environment": {
+    "UV_OFFLINE": "1",
+    "DMF_ENVIRONMENT": "TEST",
+    "DMF_TEST_DATABASE_URL": "SET_REDACTED",
+    "PGPASSWORD": "redacted"
+  },
+  "recorder": "subprocess transcript recorder"
+}

@@ -1,0 +1,572 @@
+{
+  "acceptance_execution": {
+    "ended_utc": "2026-08-16T21:41:42.907151Z",
+    "implementation_revision": "590740bfc6f139b193550dc32047625a24d3e29f",
+    "implementation_tree": "563c415c61e2b3114fdc2cf6b0059a90944f1cb1",
+    "mode": "FRESH_MONOLITHIC_LITERAL_SEQUENCE",
+    "records": [
+      {
+        "ordinal": 1,
+        "command": "git diff --check",
+        "started_utc": "2026-08-16T19:29:19.973002Z",
+        "ended_utc": "2026-08-16T19:29:20.063392Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/01.log",
+        "transcript_sha256": "77498abd75da51b3a4c205d9592b078faec861076b5adf2616cdb8e545826abc",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 2,
+        "command": "uv sync --all-groups --frozen",
+        "started_utc": "2026-08-16T19:29:20.064433Z",
+        "ended_utc": "2026-08-16T19:29:20.151678Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/02.log",
+        "transcript_sha256": "49a15645bad588ecf360c1e82cdd71f6f55826e75288d9a56a44bc3fa392e7da",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 3,
+        "command": "uv run python scripts/assurance/check_opt010_scope.py --root . --parent-revision a33f46cd7ec190fbd4959e2840527116f22547ac --ticket tickets/OPT-010/ticket.yaml",
+        "started_utc": "2026-08-16T19:29:20.152562Z",
+        "ended_utc": "2026-08-16T19:29:20.664898Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/03.log",
+        "transcript_sha256": "8387716b5e74c32cd21000bc092ef9bd3345b45a6dfbcc2538023781777d4e5d",
+        "generated_artifacts": [
+          {
+            "path": "evidence/tickets/OPT-010/scope_report.json",
+            "sha256": "2f0a93bd3a277f31f58612ec33f10b081131c414f40f2a95d6f9359cc778ea24"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 4,
+        "command": "uv run python scripts/assurance/check_opt010_resources.py",
+        "started_utc": "2026-08-16T19:29:20.666173Z",
+        "ended_utc": "2026-08-16T19:29:20.839165Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/04.log",
+        "transcript_sha256": "47aa8b47f9e1d54980c8ca1f6c7a6375ede7b2fa0ee133f4dc5b5bee5b7b4b12",
+        "generated_artifacts": [
+          {
+            "path": "evidence/tickets/OPT-010/resource_report.json",
+            "sha256": "ea4940342c00ec5ec777a8f0327cb69b0e212b17e9cb1a5ede1821775e138682"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 5,
+        "command": "uv run ruff format --check .",
+        "started_utc": "2026-08-16T19:29:20.840309Z",
+        "ended_utc": "2026-08-16T19:29:21.008279Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/05.log",
+        "transcript_sha256": "2a4dee4493012f745dae192ceef7745e5561032ab7e91d86dee2def69871b239",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 6,
+        "command": "uv run ruff check .",
+        "started_utc": "2026-08-16T19:29:21.009226Z",
+        "ended_utc": "2026-08-16T19:29:21.180049Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/06.log",
+        "transcript_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 7,
+        "command": "uv run python -m mypy src/dmf_pulse",
+        "started_utc": "2026-08-16T19:29:21.180971Z",
+        "ended_utc": "2026-08-16T19:29:21.936466Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/07.log",
+        "transcript_sha256": "610c3f8aec7dd5bdcb599052a5d122d72c10c912cff4f281c3166f8dc0e3ff46",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 8,
+        "command": "uv run python -m pytest -q tests/unit/rules/test_one_gameweek.py tests/golden/rules/test_one_gameweek.py",
+        "started_utc": "2026-08-16T19:29:21.937408Z",
+        "ended_utc": "2026-08-16T19:29:23.540362Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/08.log",
+        "transcript_sha256": "f45f868d8aa06b206a57b1222c20fe0f56111900750d0ced0adc003a189e65c2",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 9,
+        "command": "uv run python -m pytest -q tests/unit/optimisation tests/contract/optimisation",
+        "started_utc": "2026-08-16T19:29:23.541462Z",
+        "ended_utc": "2026-08-16T19:35:30.018151Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/09.log",
+        "transcript_sha256": "39ac4cbf55ff7f14b1fbd62aa7790d18394fe8af6d4740625b52ca5524beff5d",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 10,
+        "command": "uv run python -m pytest -q tests/property/optimisation tests/golden/optimisation tests/integration/optimisation tests/assurance/optimisation --cov=dmf_pulse.optimisation --cov=dmf_pulse.rules.one_gameweek --cov-branch --cov-report=term-missing --cov-report=json:evidence/stages/10/coverage.json",
+        "started_utc": "2026-08-16T19:35:30.019411Z",
+        "ended_utc": "2026-08-16T20:05:12.283534Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/10.log",
+        "transcript_sha256": "9d8a22a2e0f0b7665afe7203619db2d5e30370c2afed5d5bfa2352764165cec3",
+        "generated_artifacts": [
+          {
+            "path": "evidence/stages/10/coverage.json",
+            "sha256": "63ff9be03cb2b8099ee24af4eb8d7e596e720c8d1325a93bdd906c82ba3b707f"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 11,
+        "command": "uv run python scripts/assurance/check_opt010_coverage.py evidence/stages/10/coverage.json",
+        "started_utc": "2026-08-16T20:05:12.286087Z",
+        "ended_utc": "2026-08-16T20:05:12.527470Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/11.log",
+        "transcript_sha256": "b84354ee7b349f5949fc5cbe011b4052189cfb6e80cb05571d989174acf8d215",
+        "generated_artifacts": [
+          {
+            "path": "evidence/tickets/OPT-010/coverage_assurance.json",
+            "sha256": "7938a0e8c3f9414ef2bd3af3b402641d6c8ae03793f2434e5b0864f9c6dc0123"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 12,
+        "command": "uv run python -m pytest -q tests/performance/optimisation",
+        "started_utc": "2026-08-16T20:05:12.528968Z",
+        "ended_utc": "2026-08-16T20:05:14.962780Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/12.log",
+        "transcript_sha256": "01311baa852db076753814271165a33a7a35b7e0b63de979423ac3269388316e",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 13,
+        "command": "uv run python -m pytest -q tests/unit/rules tests/property/rules tests/golden/rules",
+        "started_utc": "2026-08-16T20:05:14.967646Z",
+        "ended_utc": "2026-08-16T20:05:28.817372Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/13.log",
+        "transcript_sha256": "bd028795479697440ea60a5aa0e7a2b8110174176008f8acf85ba555082c9efa",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 14,
+        "command": "uv run python -m pytest -q tests/unit/fpl_points tests/property/fpl_points tests/contract/fpl_points tests/golden/fpl_points tests/integration/fpl_points tests/assurance/fpl_points",
+        "started_utc": "2026-08-16T20:05:28.818566Z",
+        "ended_utc": "2026-08-16T20:06:17.055886Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/14.log",
+        "transcript_sha256": "066f03ac95cab26a52e8187b799987e9626b519f6c90944ebb9902302224668c",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 15,
+        "command": "docker compose -f compose.test.yaml config --quiet",
+        "started_utc": "2026-08-16T20:06:17.057542Z",
+        "ended_utc": "2026-08-16T20:06:17.452105Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1",
+          "DMF_ENVIRONMENT": "TEST",
+          "DMF_TEST_DATABASE_URL": "SET_REDACTED",
+          "PGPASSWORD": "redacted"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/15.log",
+        "transcript_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 16,
+        "command": "docker compose -f compose.test.yaml up -d --wait",
+        "started_utc": "2026-08-16T20:06:17.453220Z",
+        "ended_utc": "2026-08-16T20:06:31.554260Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1",
+          "DMF_ENVIRONMENT": "TEST",
+          "DMF_TEST_DATABASE_URL": "SET_REDACTED",
+          "PGPASSWORD": "redacted"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/16.log",
+        "transcript_sha256": "55b49a793e61834e36ea3faac9177769bdce05946b6152613efcc19ccac68fb6",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 17,
+        "command": "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
+        "started_utc": "2026-08-16T20:06:31.555699Z",
+        "ended_utc": "2026-08-16T20:06:38.519237Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1",
+          "DMF_ENVIRONMENT": "TEST",
+          "DMF_TEST_DATABASE_URL": "SET_REDACTED",
+          "PGPASSWORD": "redacted"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/17.log",
+        "transcript_sha256": "dc360804825bbab55a84b6cd64d13cb45c42c10b8e61cca6650f3442cf0030aa",
+        "generated_artifacts": [
+          {
+            "path": "evidence/tickets/MIN-007F/offline_upgrade.sql",
+            "sha256": "393b10e6fb6c7f734b0d8a5852e5bab5d13b13b9d3af01c530d404658f394881"
+          },
+          {
+            "path": "evidence/tickets/MIN-007F/schema_manifest.json",
+            "sha256": "b0f8b2c1f193fe1a1ec5c892db72ffa1369b0fb14eb84aaf8f5be8f965d59ea3"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 18,
+        "command": "uv run python -m pytest -q -m \"postgres and integration\" tests/integration",
+        "started_utc": "2026-08-16T20:06:38.522661Z",
+        "ended_utc": "2026-08-16T20:11:31.220967Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1",
+          "DMF_ENVIRONMENT": "TEST",
+          "DMF_TEST_DATABASE_URL": "SET_REDACTED",
+          "PGPASSWORD": "redacted"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/18.log",
+        "transcript_sha256": "db21a79f4c312a3df79aaa845b7801ed9ca2c4bf749328f133cb74e74ce287c8",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 19,
+        "command": "uv run python scripts/generate_repository_manifest.py --ticket OPT-010",
+        "started_utc": "2026-08-16T20:11:31.221977Z",
+        "ended_utc": "2026-08-16T20:11:32.405854Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1",
+          "DMF_ENVIRONMENT": "TEST",
+          "DMF_TEST_DATABASE_URL": "SET_REDACTED",
+          "PGPASSWORD": "redacted"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/19.log",
+        "transcript_sha256": "3d7da84f7f2150d3700a52f5e72182c3bc8aad169c8d952c9931ed9cd53f7025",
+        "generated_artifacts": [
+          {
+            "path": "evidence/tickets/OPT-010/current_manifest.json",
+            "sha256": "35d05c3460d58419ef93cde16bba9a19b29d1081a1e54dd2c5522bbbf53087eb"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 20,
+        "command": "uv run python -m pytest -q --ignore=tests/performance --cov=dmf_pulse --cov-branch --cov-report=json:evidence/stages/10/repository_coverage.json",
+        "started_utc": "2026-08-16T20:11:32.406946Z",
+        "ended_utc": "2026-08-16T21:37:19.654300Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1",
+          "DMF_ENVIRONMENT": "TEST",
+          "DMF_TEST_DATABASE_URL": "SET_REDACTED",
+          "PGPASSWORD": "redacted"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/20.log",
+        "transcript_sha256": "caec68206359ca708d3136150fa45349910e6c95f964af02b4011101ba14a6e1",
+        "generated_artifacts": [
+          {
+            "path": "evidence/stages/10/repository_coverage.json",
+            "sha256": "99951bd6881f10d7e592a6e2c044d51b9f5d36b6fa030c89f598ac647250853a"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 21,
+        "command": "docker compose -f compose.test.yaml down -v --remove-orphans",
+        "started_utc": "2026-08-16T21:37:20.678225Z",
+        "ended_utc": "2026-08-16T21:37:21.708030Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/21.log",
+        "transcript_sha256": "e73a0efcc4692d4833350d9f2b01e4425fe5fa06aa66c11d31b4065f82272b97",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 22,
+        "command": "uv run python scripts/assurance/run_opt010_cli_acceptance.py --fixture-root fixtures/optimisation/one_gameweek",
+        "started_utc": "2026-08-16T21:37:21.708746Z",
+        "ended_utc": "2026-08-16T21:39:24.417030Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/22.log",
+        "transcript_sha256": "d1c549a9b1b981130ee0c6889962ef76ae58f0d397167df98ec6dd7c399f3e3c",
+        "generated_artifacts": [
+          {
+            "path": "evidence/tickets/OPT-010/artifact_assurance.json",
+            "sha256": "83677f0e627c7733145a9bcb283b1c73268d6a2adf332ed3158bfd28ae50373a"
+          },
+          {
+            "path": "evidence/tickets/OPT-010/cli_acceptance.json",
+            "sha256": "0496e7594656c0bc7f5b7bd8f8c602593c09c8dab0933200042e200da60ad9d2"
+          },
+          {
+            "path": "evidence/tickets/OPT-010/runtime_telemetry.json",
+            "sha256": "23008d7a9a208b36128cc5406a7a20f19bd8a86cebc9de63ce0dfff08c969549"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 23,
+        "command": "uv build",
+        "started_utc": "2026-08-16T21:39:24.418281Z",
+        "ended_utc": "2026-08-16T21:39:27.530988Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/23.log",
+        "transcript_sha256": "5ab92d4d490fa8d351e3681a94996bcf6833fffd7c97304012ca12990ae1cc05",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 24,
+        "command": "uv run python scripts/verify_opt010_wheel.py",
+        "started_utc": "2026-08-16T21:39:27.531762Z",
+        "ended_utc": "2026-08-16T21:41:32.757372Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/24.log",
+        "transcript_sha256": "78b7d2ee1e7356e42e094bd96335051ef17aadfa1f57bdc3e7905b65cd371c3e",
+        "generated_artifacts": [
+          {
+            "path": "evidence/tickets/OPT-010/wheel_report.json",
+            "sha256": "f4e00ff574640fba6cfc985daacc7532ee1593a5abc039f94feb0f267607e8b1"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 25,
+        "command": "uv run dmf specs validate",
+        "started_utc": "2026-08-16T21:41:32.758654Z",
+        "ended_utc": "2026-08-16T21:41:34.330052Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/25.log",
+        "transcript_sha256": "26ac86de368d285e21ed4291717fe4b5a0b2ff25b135b0b31c26c5bd25b2e06c",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 26,
+        "command": "uv run python scripts/validate_repository.py",
+        "started_utc": "2026-08-16T21:41:34.330804Z",
+        "ended_utc": "2026-08-16T21:41:35.767677Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/26.log",
+        "transcript_sha256": "5121d83305442ff95da3024afcb4738bdee6b2528746584e63e7210e567139a8",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 27,
+        "command": "uv run python scripts/scan_secrets.py",
+        "started_utc": "2026-08-16T21:41:35.768396Z",
+        "ended_utc": "2026-08-16T21:41:41.683599Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/27.log",
+        "transcript_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 28,
+        "command": "uv run alembic heads",
+        "started_utc": "2026-08-16T21:41:41.684285Z",
+        "ended_utc": "2026-08-16T21:41:42.707359Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/28.log",
+        "transcript_sha256": "acaaae6885490a2cfcb7c56ab492df4965659524355ac0df6965048851affffb",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 29,
+        "command": "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- pyproject.toml uv.lock",
+        "started_utc": "2026-08-16T21:41:42.708211Z",
+        "ended_utc": "2026-08-16T21:41:42.766977Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/29.log",
+        "transcript_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 30,
+        "command": "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- src/dmf_pulse/database/migrations",
+        "started_utc": "2026-08-16T21:41:42.767936Z",
+        "ended_utc": "2026-08-16T21:41:42.819850Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/30.log",
+        "transcript_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "generated_artifacts": [],
+        "status": "PASS"
+      },
+      {
+        "ordinal": 31,
+        "command": "git diff --check",
+        "started_utc": "2026-08-16T21:41:42.820571Z",
+        "ended_utc": "2026-08-16T21:41:42.906375Z",
+        "exit_code": 0,
+        "environment": {
+          "UV_OFFLINE": "1"
+        },
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/31.log",
+        "transcript_sha256": "e45f677e3ed804065ab6355b629cfa96523bdc222a3908952734ea41b03f9e61",
+        "generated_artifacts": [],
+        "status": "PASS"
+      }
+    ],
+    "semantic_bytes_changed_during_run": false,
+    "started_utc": "2026-08-16T19:29:19.973002Z",
+    "generated_evidence_bookkeeping": [
+      {
+        "after_ordinal": 20,
+        "command": "uv run python scripts/generate_repository_manifest.py --ticket OPT-010",
+        "reason": "Command 20 regenerated the manifest-tracked repository coverage report.",
+        "status": "PASS",
+        "transcript": "evidence/tickets/OPT-010/final_acceptance_r3b/20_manifest_refresh_after_coverage.log",
+        "transcript_sha256": "3d7da84f7f2150d3700a52f5e72182c3bc8aad169c8d952c9931ed9cd53f7025"
+      }
+    ]
+  },
+  "branch": "stage/A10/OPT-010-one-gameweek-optimiser",
+  "governance": "Gate 0 remains resolved and frozen; the test-synthetic fixture is REFERENCE_ONLY and non-production.",
+  "human_acceptance_required": true,
+  "final_evidence_assurance": {
+    "manifest_refresh": {
+      "command": "uv run python scripts/generate_repository_manifest.py --ticket OPT-010",
+      "status": "PASS"
+    },
+    "repository_validation": {
+      "command": "uv run python scripts/validate_repository.py",
+      "status": "PASS"
+    },
+    "secret_scan": {
+      "command": "uv run python scripts/scan_secrets.py",
+      "status": "PASS"
+    },
+    "whitespace": {
+      "command": "git diff --check",
+      "status": "PASS"
+    }
+  },
+  "implementation_self_acceptance": false,
+  "independent_sol_review_required": true,
+  "objective": "bounded exact one-gameweek manager-tactics optimisation",
+  "parent_revision": "a33f46cd7ec190fbd4959e2840527116f22547ac",
+  "production_gate": "BLOCKED:MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
+  "stage": 10,
+  "stage_acceptance": "NOT_SELF_ACCEPTED",
+  "status": "READY_FOR_INDEPENDENT_SOL_REREVIEW",
+  "tested_revision": "590740bfc6f139b193550dc32047625a24d3e29f",
+  "tested_tree": "563c415c61e2b3114fdc2cf6b0059a90944f1cb1",
+  "tests": {
+    "critical_branch_coverage": "PASS",
+    "repository": "PASS: 1872 non-performance tests via the exact monolithic command",
+    "repository_branch_coverage_percent": 87.07721761327377,
+    "repository_coverage_percent": 91.5484860099655,
+    "stage10_targeted": "PASS",
+    "targeted_branch_coverage_percent": 86.22448979591837,
+    "targeted_coverage_percent": 91.69859514687101
+  },
+  "ticket": "OPT-010"
+}

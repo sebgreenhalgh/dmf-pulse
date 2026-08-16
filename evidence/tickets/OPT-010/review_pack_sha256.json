@@ -1,0 +1,31 @@
+{
+  "archive_sha256": "cf820fe8d021842f9459cf380d0205ab4c942866017d494a2db30aded58387d0",
+  "entries": [
+    "ACCEPTANCE.md",
+    "DEFINITION_OF_READY.md",
+    "ticket.yaml",
+    "OPT-010_SOL_PLAN.md",
+    "PLAN.md",
+    "BLOCKER.md",
+    "command_ledger.json",
+    "scope_report.json",
+    "resource_report.json",
+    "artifact_assurance.json",
+    "cli_acceptance.json",
+    "coverage_assurance.json",
+    "current_manifest.json",
+    "coverage.json",
+    "repository_coverage.json",
+    "stage_acceptance.json",
+    "STAGE_ACCEPTANCE.md",
+    "review.json",
+    "runtime_telemetry.json",
+    "wheel_report.json"
+  ],
+  "file_count": 20,
+  "path": "review_pack/OPT-010/DMF_PULSE_OPT-010_REVIEW.zip",
+  "status": "PASS",
+  "tested_revision": "590740bfc6f139b193550dc32047625a24d3e29f",
+  "tested_tree": "563c415c61e2b3114fdc2cf6b0059a90944f1cb1",
+  "ticket": "OPT-010"
+}

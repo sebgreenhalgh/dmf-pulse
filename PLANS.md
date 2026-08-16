@@ -1,5 +1,40 @@
 # DMF Pulse execution plans
 
+## OPT-010 - exact bounded one-Gameweek optimiser
+
+- Ticket/stage: `OPT-010`, A10; immutable parent
+  `a33f46cd7ec190fbd4959e2840527116f22547ac`; implementation branch
+  `stage/A10/OPT-010-one-gameweek-optimiser`.
+- Gate 0: frozen in `tickets/OPT-010/ticket.yaml`; implementation status `READY`.
+- Scope: exact bounded `FIXED_SQUAD`, `PROVIDED_SQUADS` and preflight-bounded
+  `BOUNDED_PLAYER_POOL` squad/XI/bench/captain/vice optimisation over accepted Stage-9 coherent
+  scenarios.
+- Safety: current production is fail-closed behind conservatively required `FULL_SEASON`;
+  no Stage-9/rules-schema/dependency/migration change, heuristic, incumbent, manager state or
+  Stage-11 behavior.
+
+### OPT-010 checkpoints
+
+- [x] Reconcile the provisional proposal against accepted Stage 9 and rules capabilities.
+- [x] Resolve Gate 0 and freeze ticket, public contract, caps, tests and acceptance commands.
+- [ ] Implement contracts/rules boundary/independent legality and exact tactical evaluation.
+- [ ] Implement preflight-bounded search, oracle, service, hashes, artifacts and offline CLI.
+- [ ] Run every literal acceptance gate and prepare capped independent-review evidence.
+
+### OPT-010 R2 independent-review remediation
+
+- Starting remediation head: `3f1550e3838e6f44c31990dcf83b2bc6ed7dc6fd`; immutable base remains
+  `a33f46cd7ec190fbd4959e2840527116f22547ac`.
+- [ ] R2A: bind the frozen public contract, accepted Stage-9 scenario lineage, and derived
+  production capability/cutoff gates without changing Stage-9 or capability schemas.
+- [ ] R2B: correct exact exhaustive search/tie/cap arithmetic, rules-owned autosub audit
+  semantics, independent legality and Decimal-context determinism.
+- [ ] R2C: harden immutable artifacts and make both offline CLI commands substantively verify
+  hashes, lineage and legality.
+- [ ] R2D: strengthen the independent oracle/adversarial proof, installed-wheel acceptance and
+  final-head evidence; then run every frozen acceptance command.
+- [ ] Obtain a fresh read-only Sol review. No self-acceptance, merge or PR-ready action.
+
 ## PTS-009 - bounded FPL-points simulation clean-checkout integration
 
 - Ticket/stage: `PTS-009`, A9; required parent
@@ -660,3 +695,30 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Run every literal acceptance gate, including PostgreSQL, migration, complete
   repository coverage, wheel isolation, final GCS-008 manifest validation, and
   secret scan; record only measured evidence.
+
+# OPT-010 R3 independent final-rereview remediation
+
+- Ticket/stage: `OPT-010`, A10; required base
+  `a33f46cd7ec190fbd4959e2840527116f22547ac` on
+  `stage/A10/OPT-010-one-gameweek-optimiser`.
+- Scope: close the independent rereview's remaining Stage-9 lineage, frozen
+  public-contract, legality-validation, artifact-confinement, oracle-fixture,
+  and acceptance-evidence findings without changing Stage-10 objective or
+  manager-tactics semantics.
+- Acceptance: execute the existing 31 literal commands once, in order, on the
+  final implementation revision. No reuse, sharding, or equivalence
+  substitution is permitted.
+
+### OPT-010 R3 checkpoints
+
+- [x] Add adversarial regressions for detached Stage-9 identity, complete public
+  result bindings, pre-search player-universe rejection, leaf-symlink attacks,
+  and appearance-independent test data.
+- [x] Align the public models and immutable hashes with the frozen Section 5
+  contract while preserving deterministic exhaustive search.
+- [x] Regenerate canonical request/result fixtures and pass focused static and
+  behavioural checks.
+- [ ] Commit the final implementation, run all 31 literal acceptance commands
+  in order, and retain complete unsharded evidence.
+- [ ] Regenerate the review pack, commit only evidence after the tested
+  implementation revision, and push the existing draft PR branch.

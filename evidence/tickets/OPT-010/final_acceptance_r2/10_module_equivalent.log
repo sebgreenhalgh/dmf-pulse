@@ -1,0 +1,24 @@
+.......................                                                  [100%]
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.9-final-0 _______________
+
+Name                                              Stmts   Miss Branch BrPart  Cover   Missing
+---------------------------------------------------------------------------------------------
+src\dmf_pulse\optimisation\__init__.py                0      0      0      0   100%
+src\dmf_pulse\optimisation\artifacts.py              99      0     26      0   100%
+src\dmf_pulse\optimisation\autosub_evaluator.py      38      0      8      0   100%
+src\dmf_pulse\optimisation\candidate_pool.py         76      6     44      7    89%   70, 71->78, 77, 81, 97, 103, 106
+src\dmf_pulse\optimisation\errors.py                 14      0      0      0   100%
+src\dmf_pulse\optimisation\legality.py               69      0     58      2    98%   79->89, 106->110
+src\dmf_pulse\optimisation\models.py                246     13     38     13    91%   98, 100, 102, 104, 107, 109, 111, 113, 160, 162, 304, 306, 308
+src\dmf_pulse\optimisation\policy.py                  8      0      0      0   100%
+src\dmf_pulse\optimisation\service.py                73      0     22      0   100%
+src\dmf_pulse\optimisation\solver.py                 63     10     22      5    80%   50-69, 79, 84, 107->97, 116
+src\dmf_pulse\optimisation\tactics.py                91      1     40      2    98%   133->125, 164
+src\dmf_pulse\optimisation\validation.py             88      8     34      8    87%   48, 63, 79, 110, 171, 177, 208, 213
+src\dmf_pulse\rules\one_gameweek.py                 132      6     56      3    95%   81, 143, 148, 266-267, 282
+---------------------------------------------------------------------------------------------
+TOTAL                                               997     44    348     40    94%
+Coverage JSON written to file evidence/stages/10/coverage.json
+Required test coverage of 90.0% reached. Total coverage: 93.61%
+23 passed in 783.77s (0:13:03)

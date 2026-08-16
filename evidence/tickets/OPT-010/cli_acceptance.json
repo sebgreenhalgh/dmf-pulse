@@ -1,0 +1,23 @@
+{
+  "blocked": {
+    "error_code": "MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
+    "exit_code": 3,
+    "ok": true
+  },
+  "invalid": {
+    "error_code": "RULESET_ARTIFACT_INVALID",
+    "exit_code": 2,
+    "ok": true
+  },
+  "ok": true,
+  "one_gameweek": {
+    "exit_code": 0,
+    "ok": true,
+    "status": "SUCCESS"
+  },
+  "validate_plan": {
+    "exit_code": 0,
+    "legal": true,
+    "ok": true
+  }
+}

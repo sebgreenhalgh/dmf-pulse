@@ -1,0 +1,31 @@
+git : warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/03.log', CRLF will be replaced by
+LF the next time Git touches it
+At line:6 char:1
++ git diff --check *> $tempLog
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: in the... Git touches it:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/04.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/05.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/06.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/07_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/08_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/09_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/10_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/11.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2_records.jsonl', CRLF will be replaced by
+LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/scope_report.json', CRLF will be replaced by LF the next
+time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/wheel_report.json', CRLF will be replaced by LF the next
+time Git touches it
+evidence/tickets/OPT-010/final_acceptance_r2/02.log:7: new blank line at EOF.

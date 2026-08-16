@@ -1,0 +1,24 @@
+...............................                                          [100%]
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.9-final-0 _______________
+
+Name                                              Stmts   Miss Branch BrPart  Cover   Missing
+---------------------------------------------------------------------------------------------
+src\dmf_pulse\optimisation\__init__.py                0      0      0      0   100%
+src\dmf_pulse\optimisation\artifacts.py             101      0     28      0   100%
+src\dmf_pulse\optimisation\autosub_evaluator.py      40      0      8      0   100%
+src\dmf_pulse\optimisation\candidate_pool.py         76      0     44      0   100%
+src\dmf_pulse\optimisation\errors.py                 14      0      0      0   100%
+src\dmf_pulse\optimisation\legality.py               69      0     58      2    98%   79->89, 106->110
+src\dmf_pulse\optimisation\models.py                372     43     66     23    84%   64, 66, 77, 111, 113, 115, 117, 120, 123, 125, 131, 133, 135, 141, 143, 145, 209, 211, 213, 229, 278, 282, 286, 323, 327, 331, 335, 339, 343, 347, 365, 369, 373, 425, 429-431, 461, 470, 473, 475, 477, 482
+src\dmf_pulse\optimisation\policy.py                  8      0      0      0   100%
+src\dmf_pulse\optimisation\service.py                84      2     20      0    98%   247-248
+src\dmf_pulse\optimisation\solver.py                 73     10     24      5    82%   61-80, 92, 97, 126->110, 135
+src\dmf_pulse\optimisation\tactics.py                97      1     40      2    98%   139->131, 177
+src\dmf_pulse\optimisation\validation.py            108     15     48     14    80%   46, 63-70, 72, 77, 93, 107, 109, 190, 196, 243, 248, 258, 265, 280->287
+src\dmf_pulse\rules\one_gameweek.py                 132      5     56      2    96%   143, 148, 273-274, 289
+---------------------------------------------------------------------------------------------
+TOTAL                                              1174     76    392     48    92%
+Coverage JSON written to file evidence/stages/10/coverage.json
+Required test coverage of 90.0% reached. Total coverage: 91.70%
+31 passed in 1779.01s (0:29:39)

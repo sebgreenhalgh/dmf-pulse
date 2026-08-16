@@ -1,0 +1,6 @@
+uv.exe : Wrote JSON report to evidence/stages/10/repository_coverage.json
+At line:2 char:84
++ ... e]::UtcNow; & uv run python -m coverage json --data-file=.coverage -- ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Wrote JSON repo...y_coverage.json:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError

@@ -1,0 +1,8 @@
+uv : error: Failed to spawn: `mypy`
+At line:1 char:1
++ uv run mypy src/dmf_pulse
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: Failed to spawn: `mypy`:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+  Caused by: An Application Control policy has blocked this file. (os error 4551)

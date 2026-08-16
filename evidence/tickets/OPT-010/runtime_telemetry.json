@@ -1,0 +1,29 @@
+{
+  "acceptance_execution_mode": "FRESH_MONOLITHIC_LITERAL_SEQUENCE",
+  "database_access": false,
+  "network": false,
+  "packaged_caps": {
+    "max_returned_ties": 16,
+    "max_scenario_score_operations": 20000000,
+    "max_squad_candidates": 12,
+    "max_tactical_configurations": 5000000,
+    "objective_tolerance": null
+  },
+  "reference_fixed_squad": {
+    "guarantee": "EXACT_FIXED_SQUAD",
+    "scenario_score_operations": 363000,
+    "squads_examined": 1,
+    "tactical_configurations_examined": 363000
+  },
+  "remediation": {
+    "formatting_only": false,
+    "implementation_revision": "590740bfc6f139b193550dc32047625a24d3e29f",
+    "scope": "frozen-contract, lineage, validation, artifact-safety, and assurance fixes"
+  },
+  "resource_limit_behavior": "preflight returns RESOURCE_LIMIT before enumeration and emits no plan or incumbent",
+  "search_backend": "DETERMINISTIC_EXHAUSTIVE_ENUMERATOR",
+  "status": "PASS",
+  "tested_revision": "590740bfc6f139b193550dc32047625a24d3e29f",
+  "tested_tree": "563c415c61e2b3114fdc2cf6b0059a90944f1cb1",
+  "ticket": "OPT-010"
+}

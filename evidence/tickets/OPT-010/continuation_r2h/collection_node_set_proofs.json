@@ -1,0 +1,77 @@
+{
+    "tested_revision":  "79102d41fc5d4e2c70d8251d643b705602573045",
+    "collection_command":  "uv run python -m pytest --collect-only -q tests --ignore=tests/performance",
+    "node_set_proofs":  {
+                            "baseline":  {
+                                             "count":  1868,
+                                             "sha256":  "848f7aee5f5cf8d397b3ed05f78dc23155a5afe6a566b1f31f4dfc540d14de57"
+                                         },
+                            "shard_A":  {
+                                            "count":  611,
+                                            "sha256":  "ccc7619e0b785e64188a3391f02525228bcd1fc1b81b62dabd1f9215b548c52b"
+                                        },
+                            "shard_B":  {
+                                            "count":  608,
+                                            "sha256":  "8cf0164ad55dedcc21757f3db2e033d6e50d57ccb1489baa96b02ea03cc56736"
+                                        },
+                            "shard_C":  {
+                                            "count":  184,
+                                            "sha256":  "1a3e8b18857267325e62984a29de98c157bb29c203a219d26a548c746b6f6f7a"
+                                        },
+                            "shard_D":  {
+                                            "count":  236,
+                                            "sha256":  "c633e7aacf32852eec6578c05267ce3c161507e3cb8c6d9f0a97ead4469c9351"
+                                        },
+                            "shard_D1":  {
+                                             "count":  154,
+                                             "sha256":  "1a08b03297f4a48c627bb2456c703b4c1303b525cf6bbe6cf2fd9a25728c4bd8"
+                                         },
+                            "shard_D2":  {
+                                             "count":  41,
+                                             "sha256":  "4f2982b4aa7dadd24687df5e1178a686aee3a65943e67c60d535b43fdc6cfd09"
+                                         },
+                            "shard_D3":  {
+                                             "count":  41,
+                                             "sha256":  "1029855a3c4a722601150fa9399262297428969f3268a06fd7cdb9d3dd6e7f13"
+                                         },
+                            "shard_E":  {
+                                            "count":  86,
+                                            "sha256":  "10ae05d9423f3b6c4d9afeb2e5138ae485faa73ab03c3270cb89f8709b8b50e1"
+                                        },
+                            "shard_E1":  {
+                                             "count":  65,
+                                             "sha256":  "28a3d9ffb8d7ba807a9cb17ff8aa3f5bd54f910bc9b48243ef966e619e6cea68"
+                                         },
+                            "shard_E2":  {
+                                             "count":  12,
+                                             "sha256":  "d82f50e02909de33b2d791664adeaebe976eb36ed5e948ddbb8535fd498191c6"
+                                         },
+                            "shard_E3":  {
+                                             "count":  9,
+                                             "sha256":  "c8dd932186b72b0de8d8995da8c2a1268146f4d9d6e5848ee5f15aaa4ebf22a4"
+                                         },
+                            "shard_F":  {
+                                            "count":  143,
+                                            "sha256":  "fc7fe819430b05f505c3c1e285d7a3729fa1b0016b1270ec96b92475c32adac7"
+                                        },
+                            "shard_F1":  {
+                                             "count":  59,
+                                             "sha256":  "7739338d185e54184d4db8fa0cd038cd8811400e2a7c4740cd9947d2bc990f27"
+                                         },
+                            "shard_F2":  {
+                                             "count":  21,
+                                             "sha256":  "9948d72c13ed8557eff649c87a9d0245527dfed84064544dd445e3c56ba0b929"
+                                         },
+                            "shard_F3":  {
+                                             "count":  63,
+                                             "sha256":  "fc6454f929397ebd7fed8660efde0878ccceb33502bfe2f139fcfcd7d033ca8d"
+                                         }
+                        },
+    "equivalence_reports":  [
+                                "collection_equivalence.json",
+                                "refined_collection_equivalence.json"
+                            ],
+    "raw_node_lists_removed":  true,
+    "raw_collection_transcripts_removed":  true,
+    "reason":  "Node identifiers include deliberate secret-scan canary test names; counts and SHA-256 set proofs retain exact collection evidence without persisting scanner-triggering identifiers."
+}

@@ -1,0 +1,208 @@
+{
+  "acceptance_execution": {
+    "command_21": {
+      "provenance": "SPECIFIC_RERUN_FOR_MISSING_TEARDOWN_TRANSCRIPT",
+      "status": "PASS",
+      "transcript": "evidence//tickets//OPT-010//continuation_r2h//21_revalidated_teardown.run.log",
+      "transcript_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "commands_1_19": {
+      "command_count": 19,
+      "source_run": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "status": "REUSED_PASS_FROM_R2H",
+      "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+      "transcript_root": "evidence/tickets/OPT-010/final_acceptance_r2h/"
+    },
+    "commands_22_31": {
+      "command_count": 10,
+      "records": {
+        "22": {
+          "command": "uv run python scripts/assurance/run_opt010_cli_acceptance.py --fixture-root fixtures/optimisation/one_gameweek",
+          "status": "PASS",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/22.run.log",
+          "transcript_sha256": "d1c549a9b1b981130ee0c6889962ef76ae58f0d397167df98ec6dd7c399f3e3c"
+        },
+        "23": {
+          "command": "uv build",
+          "status": "PASS",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/23.run.log",
+          "transcript_sha256": "d5bbe2656b7aecb51abe4147de85c0dccc5f8ba45a412e76d09bd302d1f9be4d"
+        },
+        "24": {
+          "command": "uv run python scripts/verify_opt010_wheel.py",
+          "status": "PASS",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/24.run.log",
+          "transcript_sha256": "433c928d2abb387aae211c0f4ce855ec634f39dfb40247cfa131ecc2cbbd7085"
+        },
+        "25": {
+          "command": "uv run dmf specs validate",
+          "status": "PASS",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/25.run.log",
+          "transcript_sha256": "26ac86de368d285e21ed4291717fe4b5a0b2ff25b135b0b31c26c5bd25b2e06c"
+        },
+        "26": {
+          "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+          "command": "uv run python scripts/validate_repository.py",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//26_final_retry_after_stage_evidence_whitespace_fix.run.log",
+          "transcript_sha256": "5121d83305442ff95da3024afcb4738bdee6b2528746584e63e7210e567139a8"
+        },
+        "27": {
+          "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+          "command": "uv run python scripts/scan_secrets.py",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//27_final_retry_after_stage_evidence_whitespace_fix.run.log",
+          "transcript_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+        },
+        "28": {
+          "command": "uv run alembic heads",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//28_final.run.log",
+          "transcript_sha256": "acaaae6885490a2cfcb7c56ab492df4965659524355ac0df6965048851affffb"
+        },
+        "29": {
+          "command": "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- pyproject.toml uv.lock",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//29_final.run.log",
+          "transcript_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "30": {
+          "command": "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- src/dmf_pulse/database/migrations",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//30_final.run.log",
+          "transcript_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "31": {
+          "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+          "command": "git diff --check",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//31_final_retry_after_stage_evidence_whitespace_fix.run.log",
+          "transcript_sha256": "e1d9917cec1b9f6637b9e3aa49e9b056bbcb8788d932ffe172187b1694a17917"
+        }
+      },
+      "status": "FRESH_PASS"
+    },
+    "final_evidence_assurance": {
+      "git_diff_check": {
+        "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+        "command": "git diff --check",
+        "status": "PASS",
+        "transcript": "evidence//tickets//OPT-010//continuation_r2h//31_final_retry_after_stage_evidence_whitespace_fix.run.log",
+        "transcript_sha256": "e1d9917cec1b9f6637b9e3aa49e9b056bbcb8788d932ffe172187b1694a17917"
+      },
+      "repository_validation": {
+        "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+        "command": "uv run python scripts/validate_repository.py",
+        "status": "PASS",
+        "transcript": "evidence//tickets//OPT-010//continuation_r2h//26_final_retry_after_stage_evidence_whitespace_fix.run.log",
+        "transcript_sha256": "5121d83305442ff95da3024afcb4738bdee6b2528746584e63e7210e567139a8"
+      },
+      "secret_scan": {
+        "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+        "command": "uv run python scripts/scan_secrets.py",
+        "status": "PASS",
+        "transcript": "evidence//tickets//OPT-010//continuation_r2h//27_final_retry_after_stage_evidence_whitespace_fix.run.log",
+        "transcript_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+      }
+    },
+    "implementation_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+    "implementation_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
+    "mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
+    "repository_coverage": {
+      "aggregate_branch_coverage_percent": 87.37146529562982,
+      "aggregate_report": "evidence/stages/10/repository_coverage.json",
+      "aggregate_statement_line_coverage_percent": 91.83578800881364,
+      "baseline_collection_command": "uv run python -m pytest --collect-only -q tests --ignore=tests/performance",
+      "baseline_nodes": 1868,
+      "collection_equivalence": "evidence/tickets/OPT-010/continuation_r2h/collection_equivalence.json",
+      "continuation": "PASS",
+      "method": "PATH_B_SHARDED_FULL_GATE",
+      "ordinal": 20,
+      "previously_completed_nodes": 0,
+      "prior_attempt": "INTERRUPTED_BY_EXTERNAL_RUNNER_LIMIT",
+      "refined_collection_equivalence": "evidence/tickets/OPT-010/continuation_r2h/refined_collection_equivalence.json",
+      "remaining_nodes": 1868,
+      "shards": [
+        {
+          "duration_seconds": 93.976,
+          "node_count": 611,
+          "shard": "A",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_A.run.log"
+        },
+        {
+          "duration_seconds": 52.11,
+          "node_count": 608,
+          "shard": "B",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_B.run.log"
+        },
+        {
+          "duration_seconds": 438.523,
+          "node_count": 184,
+          "shard": "C",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_C.run.log"
+        },
+        {
+          "duration_seconds": 506.152,
+          "node_count": 154,
+          "shard": "D1",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_D1.run.log"
+        },
+        {
+          "duration_seconds": 652.832,
+          "node_count": 41,
+          "shard": "D2",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_D2.run.log"
+        },
+        {
+          "duration_seconds": 6.259,
+          "node_count": 41,
+          "shard": "D3_RETRY_AFTER_SCHEMA_INITIALIZATION",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_D3_retry.run.log"
+        },
+        {
+          "duration_seconds": 159.562,
+          "node_count": 65,
+          "shard": "E1",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_E1.run.log"
+        },
+        {
+          "duration_seconds": 132.68,
+          "node_count": 12,
+          "shard": "E2",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_E2.run.log"
+        },
+        {
+          "duration_seconds": 35.773,
+          "node_count": 9,
+          "shard": "E3",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_E3.run.log"
+        },
+        {
+          "duration_seconds": 92.687,
+          "node_count": 59,
+          "shard": "F1",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_F1.run.log"
+        },
+        {
+          "duration_seconds": 49.831,
+          "node_count": 21,
+          "shard": "F2",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_F2.run.log"
+        },
+        {
+          "duration_seconds": 87.212,
+          "node_count": 63,
+          "shard": "F3",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_F3.run.log"
+        }
+      ]
+    },
+    "semantic_bytes_changed_between_segments": false
+  },
+  "branch": "stage/A10/OPT-010-one-gameweek-optimiser",
+  "parent_revision": "a33f46cd7ec190fbd4959e2840527116f22547ac",
+  "status": "PASS",
+  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
+  "ticket": "OPT-010"
+}

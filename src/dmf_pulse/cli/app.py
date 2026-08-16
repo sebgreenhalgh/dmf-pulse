@@ -18,6 +18,7 @@ from dmf_pulse.cli.evidence_cmd import evidence_app
 from dmf_pulse.cli.fpl_points import fpl_points_app
 from dmf_pulse.cli.ingest_cmd import ingest_app
 from dmf_pulse.cli.market_cmd import market_app
+from dmf_pulse.cli.optimise import optimise_app
 from dmf_pulse.cli.review_pack_cmd import review_pack_app
 from dmf_pulse.cli.rules_cmd import rules_app
 from dmf_pulse.cli.specs_cmd import specs_app
@@ -40,6 +41,7 @@ app.add_typer(ingest_app, name="ingest")
 app.add_typer(market_app, name="market")
 app.add_typer(review_pack_app, name="review-pack")
 app.add_typer(rules_app, name="rules")
+app.add_typer(optimise_app, name="optimise")
 app.add_typer(specs_app, name="specs")
 
 DOCTOR_BLOCKING_EXIT = 40

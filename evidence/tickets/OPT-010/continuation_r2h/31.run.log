@@ -1,0 +1,45 @@
+git : warning: in the working copy of 'evidence/tickets/OPT-010/cli_acceptance.json', CRLF will be replaced by LF the
+next time Git touches it
+At line:19 char:40
++ Invoke-R2HTail 31 'git diff --check' { git diff --check }
++                                        ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: in the... Git touches it:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/02.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/03.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/04.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/05.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/06.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/07.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/07_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/08.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/08_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/09_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/10_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/11.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2_records.jsonl', CRLF will be replaced by
+LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/scope_report.json', CRLF will be replaced by LF the next
+time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/wheel_report.json', CRLF will be replaced by LF the next
+time Git touches it
+evidence/tickets/OPT-010/final_acceptance_r2/02.log:7: trailing whitespace.
++
+evidence/tickets/OPT-010/final_acceptance_r2/02.log:7: new blank line at EOF.
+evidence/tickets/OPT-010/final_acceptance_r2/07.log:7: trailing whitespace.
++
+evidence/tickets/OPT-010/final_acceptance_r2/08.log:7: trailing whitespace.
++

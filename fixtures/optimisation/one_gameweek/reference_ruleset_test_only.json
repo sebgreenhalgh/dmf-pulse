@@ -1,0 +1,1082 @@
+{
+  "compiler_version": "0.2.0",
+  "production_eligible": false,
+  "rule_provenance": {
+    "/rules/lineup/automatic_substitutions/absent_definition": {
+      "rule_id": "FPL-LINEUP-AUTOMATIC_SUBSTITUTIONS-ABSENT_DEFINITION",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 16.1-16.8",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/automatic_substitutions/evaluation_scope": {
+      "rule_id": "FPL-LINEUP-AUTOMATIC_SUBSTITUTIONS-EVALUATION_SCOPE",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 16.1-16.8",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/automatic_substitutions/goalkeeper_replacement": {
+      "rule_id": "FPL-LINEUP-AUTOMATIC_SUBSTITUTIONS-GOALKEEPER_REPLACEMENT",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 16.1-16.8",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/automatic_substitutions/maintain_legal_formation": {
+      "rule_id": "FPL-LINEUP-AUTOMATIC_SUBSTITUTIONS-MAINTAIN_LEGAL_FORMATION",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 16.1-16.8",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/automatic_substitutions/outfield_order": {
+      "rule_id": "FPL-LINEUP-AUTOMATIC_SUBSTITUTIONS-OUTFIELD_ORDER",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 16.1-16.8",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/bench_size": {
+      "rule_id": "FPL-LINEUP-BENCH_SIZE",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 16.1-16.8",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/captain_multiplier": {
+      "rule_id": "FPL-LINEUP-CAPTAIN_MULTIPLIER",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 16.1-16.8",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/starting_size": {
+      "rule_id": "FPL-LINEUP-STARTING_SIZE",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 16.1-16.8",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/lineup/vice_fallback": {
+      "rule_id": "FPL-LINEUP-VICE_FALLBACK",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 16.1-16.8",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/DEF/display_name": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-DEF-DISPLAY_NAME",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/DEF/lineup_max": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-DEF-LINEUP_MAX",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/DEF/lineup_min": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-DEF-LINEUP_MIN",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/DEF/squad_quota": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-DEF-SQUAD_QUOTA",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/FWD/display_name": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-FWD-DISPLAY_NAME",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/FWD/lineup_max": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-FWD-LINEUP_MAX",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/FWD/lineup_min": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-FWD-LINEUP_MIN",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/FWD/squad_quota": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-FWD-SQUAD_QUOTA",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/GK/display_name": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-GK-DISPLAY_NAME",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/GK/lineup_max": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-GK-LINEUP_MAX",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/GK/lineup_min": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-GK-LINEUP_MIN",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/GK/squad_quota": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-GK-SQUAD_QUOTA",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/MID/display_name": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-MID-DISPLAY_NAME",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/MID/lineup_max": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-MID-LINEUP_MAX",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/MID/lineup_min": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-MID-LINEUP_MIN",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/positions/positions/MID/squad_quota": {
+      "rule_id": "FPL-POSITIONS-POSITIONS-MID-SQUAD_QUOTA",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1 and 16.1-16.2",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/squad/initial_budget_tenths": {
+      "rule_id": "FPL-SQUAD-INITIAL_BUDGET_TENTHS",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 section 15.1",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/squad/max_per_club": {
+      "rule_id": "FPL-SQUAD-MAX_PER_CLUB",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 section 15.1",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "/rules/squad/squad_size": {
+      "rule_id": "FPL-SQUAD-SQUAD_SIZE",
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT",
+        "SRC-DMFP-02-REFERENCE"
+      ],
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "verification_status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 section 15.1",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "verification_status": "VERIFIED"
+        }
+      ]
+    }
+  },
+  "rules": {
+    "assists": {
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT"
+      ],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "bonus": {
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT"
+      ],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "capabilities": {
+      "capabilities": {
+        "CHIP_STATE": {
+          "inherits": [
+            "TRANSFER_STATE"
+          ],
+          "rule_paths": [
+            "/rules/chips",
+            "/rules/lineup/automatic_substitutions"
+          ]
+        },
+        "FULL_SEASON": {
+          "inherits": [
+            "PLAYER_POINTS",
+            "GW1_INITIAL_SQUAD",
+            "TRANSFER_STATE",
+            "CHIP_STATE"
+          ],
+          "rule_paths": [
+            "/rules/positions",
+            "/rules/scoring",
+            "/rules/assists",
+            "/rules/bonus",
+            "/rules/squad",
+            "/rules/lineup",
+            "/rules/transfers",
+            "/rules/prices",
+            "/rules/chips",
+            "/rules/deadlines",
+            "/rules/special_events"
+          ]
+        },
+        "GW1_INITIAL_SQUAD": {
+          "inherits": [
+            "PLAYER_POINTS"
+          ],
+          "rule_paths": [
+            "/rules/positions",
+            "/rules/squad",
+            "/rules/lineup/starting_size",
+            "/rules/lineup/bench_size",
+            "/rules/prices/price_unit",
+            "/rules/prices/integer_only",
+            "/rules/prices/initial_purchase_price_basis",
+            "/rules/prices/current_purchase_price_basis",
+            "/rules/deadlines/gameweeks/0"
+          ]
+        },
+        "PLAYER_POINTS": {
+          "inherits": [],
+          "rule_paths": [
+            "/rules/scoring",
+            "/rules/assists",
+            "/rules/bonus"
+          ]
+        },
+        "TRANSFER_STATE": {
+          "inherits": [
+            "GW1_INITIAL_SQUAD"
+          ],
+          "rule_paths": [
+            "/rules/transfers",
+            "/rules/prices/selling_price"
+          ]
+        }
+      }
+    },
+    "chips": {
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT"
+      ],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "deadlines": {
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT"
+      ],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "interpretations": {
+      "decisions": []
+    },
+    "lineup": {
+      "automatic_substitutions": {
+        "absent_definition": "ZERO_OFFICIAL_APPEARANCE_MINUTES",
+        "evaluation_scope": "AFTER_ALL_GAMEWEEK_FIXTURES",
+        "goalkeeper_replacement": "DESIGNATED_BENCH_GOALKEEPER_IF_APPEARED",
+        "maintain_legal_formation": true,
+        "outfield_order": "MANAGER_BENCH_ORDER"
+      },
+      "bench_size": 4,
+      "captain_multiplier": 2,
+      "starting_size": 11,
+      "vice_fallback": true
+    },
+    "positions": {
+      "positions": {
+        "DEF": {
+          "display_name": "Defender",
+          "lineup_max": 5,
+          "lineup_min": 3,
+          "squad_quota": 5
+        },
+        "FWD": {
+          "display_name": "Forward",
+          "lineup_max": 3,
+          "lineup_min": 1,
+          "squad_quota": 3
+        },
+        "GK": {
+          "display_name": "Goalkeeper",
+          "lineup_max": 1,
+          "lineup_min": 1,
+          "squad_quota": 2
+        },
+        "MID": {
+          "display_name": "Midfielder",
+          "lineup_max": 5,
+          "lineup_min": 2,
+          "squad_quota": 5
+        }
+      }
+    },
+    "prices": {
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT"
+      ],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "rule_verification": {
+      "rules": [
+        {
+          "interpretation_approval_states": {},
+          "interpretation_decision_ids": [],
+          "interpretation_note": null,
+          "rule_path": "/rules/positions",
+          "source_locators": {
+            "SRC-DMFP-02-REFERENCE": "DMFP-02 sections 15.1 and 16.1-16.2",
+            "SRC-OPT-010-TEST-CONTRACT": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values"
+          },
+          "source_refs": [
+            "SRC-OPT-010-TEST-CONTRACT",
+            "SRC-DMFP-02-REFERENCE"
+          ],
+          "verification_status": "VERIFIED"
+        },
+        {
+          "interpretation_approval_states": {},
+          "interpretation_decision_ids": [],
+          "interpretation_note": null,
+          "rule_path": "/rules/squad",
+          "source_locators": {
+            "SRC-DMFP-02-REFERENCE": "DMFP-02 section 15.1",
+            "SRC-OPT-010-TEST-CONTRACT": "tickets/OPT-010/ticket.yaml reference_test_rules.frozen_values"
+          },
+          "source_refs": [
+            "SRC-OPT-010-TEST-CONTRACT",
+            "SRC-DMFP-02-REFERENCE"
+          ],
+          "verification_status": "VERIFIED"
+        },
+        {
+          "interpretation_approval_states": {},
+          "interpretation_decision_ids": [],
+          "interpretation_note": null,
+          "rule_path": "/rules/lineup",
+          "source_locators": {
+            "SRC-DMFP-02-REFERENCE": "DMFP-02 sections 16.1-16.8",
+            "SRC-OPT-010-TEST-CONTRACT": "tickets/OPT-010/ticket.yaml reference_test_rules"
+          },
+          "source_refs": [
+            "SRC-OPT-010-TEST-CONTRACT",
+            "SRC-DMFP-02-REFERENCE"
+          ],
+          "verification_status": "VERIFIED"
+        },
+        {
+          "interpretation_approval_states": {},
+          "interpretation_decision_ids": [],
+          "interpretation_note": null,
+          "rule_path": "/rules/special_events",
+          "source_locators": {
+            "SRC-OPT-010-TEST-CONTRACT": "OPT-010 excludes chips and special events"
+          },
+          "source_refs": [
+            "SRC-OPT-010-TEST-CONTRACT"
+          ],
+          "verification_status": "VERIFIED"
+        }
+      ]
+    },
+    "scoring": {
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT"
+      ],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    },
+    "source_manifest": {
+      "rule_source_default": "SRC-OPT-010-TEST-CONTRACT",
+      "sources": [
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "tickets/OPT-010/ticket.yaml reference_test_rules and tickets/OPT-010/ACCEPTANCE.md",
+          "published_on": null,
+          "refresh_trigger": "OPT-010_TEST_CONTRACT_CHANGE",
+          "source_id": "SRC-OPT-010-TEST-CONTRACT",
+          "source_type": "SYNTHETIC_TEST_CONTRACT",
+          "status": "VERIFIED"
+        },
+        {
+          "accessed_on": "2026-08-16",
+          "locator": "DMFP-02 sections 15.1-16.8; REFERENCE_ONLY test semantics",
+          "published_on": null,
+          "refresh_trigger": "DMFP-02_REFERENCE_CONTRACT_CHANGE",
+          "source_id": "SRC-DMFP-02-REFERENCE",
+          "source_type": "APPROVED_MODULE_SPECIFICATION",
+          "status": "VERIFIED"
+        }
+      ]
+    },
+    "special_events": {
+      "events": []
+    },
+    "squad": {
+      "initial_budget_tenths": 1000,
+      "max_per_club": 3,
+      "squad_size": 15
+    },
+    "target_2026_27_claims": {
+      "checked_claims": null,
+      "production_eligible": false,
+      "ruleset_id": "opt010-test-synthetic",
+      "ruleset_version": "1.0.0",
+      "status": "REFERENCE_ONLY",
+      "unknown_blocking_families": [
+        "test_synthetic_reference_only"
+      ]
+    },
+    "transfers": {
+      "source_refs": [
+        "SRC-OPT-010-TEST-CONTRACT"
+      ],
+      "value": null,
+      "verification_status": "UNKNOWN"
+    }
+  },
+  "ruleset_hash": "adb24ef11bae13a131dd27434ad87e43a1a0dbbff95ba5f70c89aafbe6ebe188",
+  "ruleset_id": "opt010-test-synthetic",
+  "ruleset_version": "1.0.0",
+  "schema_version": "1.1",
+  "season_code": "2099/2100",
+  "source_bundle_raw_sha256": "0e093a399d932ccb209f9f3567af942a9ce64b026c2e80815952ad7f8c60dcd4",
+  "source_bundle_semantic_sha256": "1987cfe276dbbc2b6ac000f0078b17baa40f6701f84715601c447230cf9a8a69",
+  "source_bundle_sha256": "1987cfe276dbbc2b6ac000f0078b17baa40f6701f84715601c447230cf9a8a69",
+  "source_files": {
+    "assists.yaml": {
+      "raw_sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036",
+      "semantic_sha256": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880"
+    },
+    "bonus.yaml": {
+      "raw_sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036",
+      "semantic_sha256": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880"
+    },
+    "capabilities.yaml": {
+      "raw_sha256": "ef6a1a55eff8e7600a7dceedf8c100035fe9955227a45a67498487457281940b",
+      "semantic_sha256": "1e2544df0974cc8d06d481c609d58261ef412de3db9b5cf362a1eac18417dc2c"
+    },
+    "chips.yaml": {
+      "raw_sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036",
+      "semantic_sha256": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880"
+    },
+    "deadlines.yaml": {
+      "raw_sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036",
+      "semantic_sha256": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880"
+    },
+    "interpretations.yaml": {
+      "raw_sha256": "1dabbdbd4f1fc2520595c34d45e1c5ac08dca5b204bb1d1f06ae455cc42fa5a3",
+      "semantic_sha256": "422428b889260cb0c98537dbc35df3f6d617224568aefec05f4421cc472a80f8"
+    },
+    "lineup.yaml": {
+      "raw_sha256": "f82b34545f17556aa1e818572d4b2205a8500f2eb6c6715e15715a6e25eb7283",
+      "semantic_sha256": "90937b574d97bf53642ec351f00298fc70a98fccfcc6e9427d1b51852de1ca1b"
+    },
+    "positions.yaml": {
+      "raw_sha256": "f13ad6f19da0b8bec853257419673e794aa649044d73f0c618f8284203b19598",
+      "semantic_sha256": "d7c31ad54f2b88381382f823f8ba022bc40a5467aa6f75e0947e51fef3f13cb5"
+    },
+    "prices.yaml": {
+      "raw_sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036",
+      "semantic_sha256": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880"
+    },
+    "rule_verification.yaml": {
+      "raw_sha256": "7716f40e652d82ab0d898b4fba3f0fe592c4e27e2281ac88928c62644d04dcdf",
+      "semantic_sha256": "31ae02a97968583d1d1c7e8f0ad202baeadbaa973cb3ffbeb5c9ce050f44d979"
+    },
+    "scoring.yaml": {
+      "raw_sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036",
+      "semantic_sha256": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880"
+    },
+    "season_manifest.yaml": {
+      "raw_sha256": "4785ceef133b1360ed9c2a4771850bee976b7d90e3b8ac3da2844aaf59e9cb42",
+      "semantic_sha256": "d861562c946f8914b8758f5a3786b9c94c10a0d69bcaf552deb68a74afc03c47"
+    },
+    "source_manifest.yaml": {
+      "raw_sha256": "d63f48a76a5f96a2e7fe90e0ed3bdf97dd060688b34153220de8181ae2d7af15",
+      "semantic_sha256": "f56b6dee8d67bd34ab9bb40f15bfc6b9682ec1b2e8005304850e964196eff2e1"
+    },
+    "special_events.yaml": {
+      "raw_sha256": "fb9b2e59663fe1741488ac52428726f13fd98f2f28cc73db64f022c8ae629999",
+      "semantic_sha256": "24de1c4a19c43ad41b013f13dcd858c17b0daa7f33a53f19913e5b11366d1c2e"
+    },
+    "squad.yaml": {
+      "raw_sha256": "d204d632e60181b926363c69d4e051d86f834d3dc5a2e4b4f187142ffa8d800f",
+      "semantic_sha256": "950a0a33447f79a6cb27ec4b12cc1efb4cbcf19fe53dc5f87334efe5f8f8cf1b"
+    },
+    "target_2026_27_claims.yaml": {
+      "raw_sha256": "445dc69378f7d13953ceb14c5bab2431bba3594187db0de1063793b7b02883f4",
+      "semantic_sha256": "2e5e18b646d915f655a7334c51550aa07371963e94a4f07d3c934c22f967d9a8"
+    },
+    "transfers.yaml": {
+      "raw_sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036",
+      "semantic_sha256": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880"
+    }
+  },
+  "source_hashes": {
+    "assists.yaml": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880",
+    "bonus.yaml": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880",
+    "capabilities.yaml": "1e2544df0974cc8d06d481c609d58261ef412de3db9b5cf362a1eac18417dc2c",
+    "chips.yaml": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880",
+    "deadlines.yaml": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880",
+    "interpretations.yaml": "422428b889260cb0c98537dbc35df3f6d617224568aefec05f4421cc472a80f8",
+    "lineup.yaml": "90937b574d97bf53642ec351f00298fc70a98fccfcc6e9427d1b51852de1ca1b",
+    "positions.yaml": "d7c31ad54f2b88381382f823f8ba022bc40a5467aa6f75e0947e51fef3f13cb5",
+    "prices.yaml": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880",
+    "rule_verification.yaml": "31ae02a97968583d1d1c7e8f0ad202baeadbaa973cb3ffbeb5c9ce050f44d979",
+    "scoring.yaml": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880",
+    "season_manifest.yaml": "d861562c946f8914b8758f5a3786b9c94c10a0d69bcaf552deb68a74afc03c47",
+    "source_manifest.yaml": "f56b6dee8d67bd34ab9bb40f15bfc6b9682ec1b2e8005304850e964196eff2e1",
+    "special_events.yaml": "24de1c4a19c43ad41b013f13dcd858c17b0daa7f33a53f19913e5b11366d1c2e",
+    "squad.yaml": "950a0a33447f79a6cb27ec4b12cc1efb4cbcf19fe53dc5f87334efe5f8f8cf1b",
+    "target_2026_27_claims.yaml": "2e5e18b646d915f655a7334c51550aa07371963e94a4f07d3c934c22f967d9a8",
+    "transfers.yaml": "9a50adaf788ad4eac1150e853cbcff6188cbcd5665ce8ff55787faad64c5c880"
+  },
+  "status": "REFERENCE_ONLY",
+  "unknown_blockers": [
+    "assists.yaml",
+    "bonus.yaml",
+    "chips.yaml",
+    "deadlines.yaml",
+    "prices.yaml",
+    "scoring.yaml",
+    "target:test_synthetic_reference_only",
+    "transfers.yaml"
+  ],
+  "warnings": [
+    "ruleset contains unresolved required values"
+  ]
+}

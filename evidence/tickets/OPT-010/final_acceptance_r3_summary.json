@@ -1,0 +1,9 @@
+{
+  "status": "FAIL",
+  "tested_revision": "1782171fc8be5691d96d30386786a36eaf0b3b6c",
+  "tested_tree": "340128e100c3918911c5a7f3038dc83b461a66c7",
+  "passed": 10,
+  "command_count": 31,
+  "failed_ordinal": 11,
+  "ended_utc": "2026-08-16T19:27:19.141503Z"
+}
