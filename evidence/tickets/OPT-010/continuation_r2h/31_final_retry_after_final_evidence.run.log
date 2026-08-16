@@ -1,0 +1,30 @@
+evidence/stages/10/STAGE_ACCEPTANCE.md:3: trailing whitespace.
++Tested implementation revision: `79102d41fc5d4e2c70d8251d643b705602573045`
+evidence/stages/10/STAGE_ACCEPTANCE.md:4: trailing whitespace.
++Tested tree: `f1d5987331517e3aaae794594923c80f16e7ec3a`
+git : warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/03.log', CRLF will be replaced by
+LF the next time Git touches it
+At line:7 char:1
++ git diff --check 1> $tempOut 2> $tempErr
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: in the... Git touches it:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/04.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/05.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/06.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/07_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/08_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/09_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/10_module_equivalent.log', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2/11.log', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'evidence/tickets/OPT-010/final_acceptance_r2_records.jsonl', CRLF will be replaced by
+LF the next time Git touches it

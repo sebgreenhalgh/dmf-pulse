@@ -1,0 +1,10 @@
+uv.exe : Building source distribution...
+At line:2 char:170
++ ... t '23.run.log'; $start=[DateTime]::UtcNow; & uv build *> $log; $exitC ...
++                                                ~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Building source distribution...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Building wheel from source distribution...
+Successfully built dist\dmf_pulse-0.2.0.tar.gz
+Successfully built dist\dmf_pulse-0.2.0-py3-none-any.whl

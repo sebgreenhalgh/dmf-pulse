@@ -1,0 +1,20 @@
+{
+    "baseline_count":  1868,
+    "shard_counts":  {
+                         "A":  611,
+                         "B":  608,
+                         "C":  184,
+                         "D":  236,
+                         "E":  86,
+                         "F":  143
+                     },
+    "shard_sum":  1868,
+    "union_count":  1868,
+    "duplicate_count":  0,
+    "missing_count":  0,
+    "unexpected_count":  0,
+    "performance_count":  0,
+    "equivalent":  true,
+    "tested_revision":  "79102d41fc5d4e2c70d8251d643b705602573045",
+    "collection_command":  "uv run python -m pytest --collect-only -q tests --ignore=tests/performance"
+}

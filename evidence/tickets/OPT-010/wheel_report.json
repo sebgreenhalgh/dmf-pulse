@@ -1,6 +1,7 @@
 {
+  "acceptance_execution_mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
   "create_exit_code": 0,
-  "import_path": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\opt010-wheel-8mjtr52n\\venv\\Lib\\site-packages\\dmf_pulse\\__init__.py",
+  "import_path": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\opt010-wheel-pmycarti\\venv\\Lib\\site-packages\\dmf_pulse\\__init__.py",
   "install_exit_code": 0,
   "network_mode": "OFFLINE",
   "ok": true,
@@ -11,6 +12,8 @@
   },
   "packaged_policy_matches": true,
   "source_checkout_absent_from_import_path": true,
+  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
   "validate_plan": {
     "exit_code": 0,
     "legal": true,

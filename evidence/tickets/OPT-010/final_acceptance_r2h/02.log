@@ -1,0 +1,6 @@
+uv.exe : Checked 40 packages in 2ms
+At line:23 char:59
++ ... 2 'uv sync --all-groups --frozen' { & uv sync --all-groups --frozen }
++                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Checked 40 packages in 2ms:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError

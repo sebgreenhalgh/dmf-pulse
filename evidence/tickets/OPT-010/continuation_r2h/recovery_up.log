@@ -1,0 +1,16 @@
+docker.exe :  Network dmf-pulse-dat003_default Creating
+At line:2 char:108
++ ... ation_r2h'; & docker compose -f compose.test.yaml up -d --wait *> (Jo ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Network dmf-pu...fault Creating :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+ Network dmf-pulse-dat003_default Created
+ Volume dmf-pulse-dat003_dat003-postgres Creating
+ Volume dmf-pulse-dat003_dat003-postgres Created
+ Container dmf-pulse-dat003-postgres-1 Creating
+ Container dmf-pulse-dat003-postgres-1 Created
+ Container dmf-pulse-dat003-postgres-1 Starting
+ Container dmf-pulse-dat003-postgres-1 Started
+ Container dmf-pulse-dat003-postgres-1 Waiting
+ Container dmf-pulse-dat003-postgres-1 Healthy

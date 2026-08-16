@@ -1,4 +1,5 @@
 {
+  "acceptance_execution_mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
   "critical_branch_percent": {
     "src/dmf_pulse/optimisation/artifacts.py": 100.0,
     "src/dmf_pulse/optimisation/autosub_evaluator.py": 100.0,
@@ -9,6 +10,9 @@
   "ok": true,
   "required_aggregate_percent": 90,
   "required_critical_branch_percent": 95,
+  "status": "PASS",
+  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
   "totals": {
     "covered_branches": 314,
     "covered_lines": 960,

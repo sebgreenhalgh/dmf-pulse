@@ -1,0 +1,19 @@
+docker.exe :  Image postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+Pulling
+At line:37 char:79
++ ... d --wait' { & docker compose -f compose.test.yaml up -d --wait }; $sc ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Image postgres...ca9296 Pulling :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+ Image postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296 Pulled
+ Network dmf-pulse-dat003_default Creating
+ Network dmf-pulse-dat003_default Created
+ Volume dmf-pulse-dat003_dat003-postgres Creating
+ Volume dmf-pulse-dat003_dat003-postgres Created
+ Container dmf-pulse-dat003-postgres-1 Creating
+ Container dmf-pulse-dat003-postgres-1 Created
+ Container dmf-pulse-dat003-postgres-1 Starting
+ Container dmf-pulse-dat003-postgres-1 Started
+ Container dmf-pulse-dat003-postgres-1 Waiting
+ Container dmf-pulse-dat003-postgres-1 Healthy

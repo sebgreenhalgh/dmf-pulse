@@ -1,25 +1,218 @@
 {
-  "ticket": "OPT-010",
-  "branch": "stage/A10/OPT-010-one-gameweek-optimiser",
-  "parent_revision": "a33f46cd7ec190fbd4959e2840527116f22547ac",
-  "authoritative_for_current_implementation": false,
-  "supersession_note": "This is the historical R1 ledger. It is explicitly superseded pending the one-time R2 final acceptance run and must not be used to accept the accumulated R2 implementation.",
   "acceptance_command_count": 31,
-  "pass_count": 31,
-  "environment_notes": [
-    "PostgreSQL commands were rerun with DMF_ENVIRONMENT=TEST and the compose-provided DMF_TEST_DATABASE_URL after the literal no-environment invocation reported its required-variable guard.",
-    "The full repository coverage command passed with the same explicit test environment: 1835 passed, 91.48% branch coverage.",
-    "The first post-coverage repository run detected stale generated-manifest byte bindings; the manifest was regenerated and the literal repository command was rerun successfully against the final bytes.",
-    "R1 changed only Ruff formatting in src/dmf_pulse/optimisation/tactics.py and tests/unit/scripts/test_opt010_repository_validation.py; AST comparison against the implementation parent was equivalent."
-  ],
-  "status": "SUPERSEDED_PENDING_R2_FINAL_ACCEPTANCE",
-  "final_worktree_checks": {
-    "ruff_format": "PASS:419 files already formatted",
-    "ruff_check": "PASS",
-    "mypy": "PASS:156 source files",
-    "git_diff_check": "PASS",
-    "formatting_only": true
+  "acceptance_execution": {
+    "command_21": {
+      "provenance": "SPECIFIC_RERUN_FOR_MISSING_TEARDOWN_TRANSCRIPT",
+      "status": "PASS",
+      "transcript": "evidence//tickets//OPT-010//continuation_r2h//21_revalidated_teardown.run.log",
+      "transcript_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "commands_1_19": {
+      "command_count": 19,
+      "source_run": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "status": "REUSED_PASS_FROM_R2H",
+      "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+      "transcript_root": "evidence/tickets/OPT-010/final_acceptance_r2h/"
+    },
+    "commands_22_31": {
+      "command_count": 10,
+      "records": {
+        "22": {
+          "command": "uv run python scripts/assurance/run_opt010_cli_acceptance.py --fixture-root fixtures/optimisation/one_gameweek",
+          "status": "PASS",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/22.run.log",
+          "transcript_sha256": "d1c549a9b1b981130ee0c6889962ef76ae58f0d397167df98ec6dd7c399f3e3c"
+        },
+        "23": {
+          "command": "uv build",
+          "status": "PASS",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/23.run.log",
+          "transcript_sha256": "d5bbe2656b7aecb51abe4147de85c0dccc5f8ba45a412e76d09bd302d1f9be4d"
+        },
+        "24": {
+          "command": "uv run python scripts/verify_opt010_wheel.py",
+          "status": "PASS",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/24.run.log",
+          "transcript_sha256": "433c928d2abb387aae211c0f4ce855ec634f39dfb40247cfa131ecc2cbbd7085"
+        },
+        "25": {
+          "command": "uv run dmf specs validate",
+          "status": "PASS",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/25.run.log",
+          "transcript_sha256": "26ac86de368d285e21ed4291717fe4b5a0b2ff25b135b0b31c26c5bd25b2e06c"
+        },
+        "26": {
+          "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+          "command": "uv run python scripts/validate_repository.py",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//26_final_retry_after_stage_evidence_whitespace_fix.run.log",
+          "transcript_sha256": "5121d83305442ff95da3024afcb4738bdee6b2528746584e63e7210e567139a8"
+        },
+        "27": {
+          "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+          "command": "uv run python scripts/scan_secrets.py",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//27_final_retry_after_stage_evidence_whitespace_fix.run.log",
+          "transcript_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+        },
+        "28": {
+          "command": "uv run alembic heads",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//28_final.run.log",
+          "transcript_sha256": "acaaae6885490a2cfcb7c56ab492df4965659524355ac0df6965048851affffb"
+        },
+        "29": {
+          "command": "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- pyproject.toml uv.lock",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//29_final.run.log",
+          "transcript_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "30": {
+          "command": "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- src/dmf_pulse/database/migrations",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//30_final.run.log",
+          "transcript_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "31": {
+          "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+          "command": "git diff --check",
+          "status": "PASS",
+          "transcript": "evidence//tickets//OPT-010//continuation_r2h//31_final_retry_after_stage_evidence_whitespace_fix.run.log",
+          "transcript_sha256": "e1d9917cec1b9f6637b9e3aa49e9b056bbcb8788d932ffe172187b1694a17917"
+        }
+      },
+      "status": "FRESH_PASS"
+    },
+    "final_evidence_assurance": {
+      "git_diff_check": {
+        "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+        "command": "git diff --check",
+        "status": "PASS",
+        "transcript": "evidence//tickets//OPT-010//continuation_r2h//31_final_retry_after_stage_evidence_whitespace_fix.run.log",
+        "transcript_sha256": "e1d9917cec1b9f6637b9e3aa49e9b056bbcb8788d932ffe172187b1694a17917"
+      },
+      "repository_validation": {
+        "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+        "command": "uv run python scripts/validate_repository.py",
+        "status": "PASS",
+        "transcript": "evidence//tickets//OPT-010//continuation_r2h//26_final_retry_after_stage_evidence_whitespace_fix.run.log",
+        "transcript_sha256": "5121d83305442ff95da3024afcb4738bdee6b2528746584e63e7210e567139a8"
+      },
+      "secret_scan": {
+        "attempt": "FINAL_RETRY_AFTER_STAGE_EVIDENCE_WHITESPACE_FIX",
+        "command": "uv run python scripts/scan_secrets.py",
+        "status": "PASS",
+        "transcript": "evidence//tickets//OPT-010//continuation_r2h//27_final_retry_after_stage_evidence_whitespace_fix.run.log",
+        "transcript_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+      }
+    },
+    "implementation_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+    "implementation_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
+    "mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
+    "repository_coverage": {
+      "aggregate_branch_coverage_percent": 87.37146529562982,
+      "aggregate_report": "evidence/stages/10/repository_coverage.json",
+      "aggregate_statement_line_coverage_percent": 91.83578800881364,
+      "baseline_collection_command": "uv run python -m pytest --collect-only -q tests --ignore=tests/performance",
+      "baseline_nodes": 1868,
+      "collection_equivalence": "evidence/tickets/OPT-010/continuation_r2h/collection_equivalence.json",
+      "continuation": "PASS",
+      "method": "PATH_B_SHARDED_FULL_GATE",
+      "ordinal": 20,
+      "previously_completed_nodes": 0,
+      "prior_attempt": "INTERRUPTED_BY_EXTERNAL_RUNNER_LIMIT",
+      "refined_collection_equivalence": "evidence/tickets/OPT-010/continuation_r2h/refined_collection_equivalence.json",
+      "remaining_nodes": 1868,
+      "shards": [
+        {
+          "duration_seconds": 93.976,
+          "node_count": 611,
+          "shard": "A",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_A.run.log"
+        },
+        {
+          "duration_seconds": 52.11,
+          "node_count": 608,
+          "shard": "B",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_B.run.log"
+        },
+        {
+          "duration_seconds": 438.523,
+          "node_count": 184,
+          "shard": "C",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_C.run.log"
+        },
+        {
+          "duration_seconds": 506.152,
+          "node_count": 154,
+          "shard": "D1",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_D1.run.log"
+        },
+        {
+          "duration_seconds": 652.832,
+          "node_count": 41,
+          "shard": "D2",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_D2.run.log"
+        },
+        {
+          "duration_seconds": 6.259,
+          "node_count": 41,
+          "shard": "D3_RETRY_AFTER_SCHEMA_INITIALIZATION",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_D3_retry.run.log"
+        },
+        {
+          "duration_seconds": 159.562,
+          "node_count": 65,
+          "shard": "E1",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_E1.run.log"
+        },
+        {
+          "duration_seconds": 132.68,
+          "node_count": 12,
+          "shard": "E2",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_E2.run.log"
+        },
+        {
+          "duration_seconds": 35.773,
+          "node_count": 9,
+          "shard": "E3",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_E3.run.log"
+        },
+        {
+          "duration_seconds": 92.687,
+          "node_count": 59,
+          "shard": "F1",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_F1.run.log"
+        },
+        {
+          "duration_seconds": 49.831,
+          "node_count": 21,
+          "shard": "F2",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_F2.run.log"
+        },
+        {
+          "duration_seconds": 87.212,
+          "node_count": 63,
+          "shard": "F3",
+          "transcript": "evidence/tickets/OPT-010/continuation_r2h/shard_F3.run.log"
+        }
+      ]
+    },
+    "semantic_bytes_changed_between_segments": false
   },
+  "branch": "stage/A10/OPT-010-one-gameweek-optimiser",
+  "command_20_note": "The original literal repository-wide pytest gate was unfinished after an external runner timeout. Its semantic content was completed once by exact-collection PATH B shards, with a single final >=90% aggregate coverage decision.",
+  "final_worktree_checks": {
+    "dependency_drift": "PASS",
+    "git_diff_check": "PASS",
+    "migration_drift": "PASS",
+    "mypy": "PASS: reused R2H command 7",
+    "ruff_check": "PASS: reused R2H command 6",
+    "ruff_format": "PASS: reused R2H command 5"
+  },
+  "human_acceptance_required": true,
+  "implementation_self_acceptance": false,
+  "independent_review_required": true,
   "literal_commands": [
     "git diff --check",
     "uv sync --all-groups --frozen",
@@ -27,24 +220,24 @@
     "uv run python scripts/assurance/check_opt010_resources.py",
     "uv run ruff format --check .",
     "uv run ruff check .",
-    "uv run mypy src/dmf_pulse",
-    "uv run pytest -q tests/unit/rules/test_one_gameweek.py tests/golden/rules/test_one_gameweek.py",
-    "uv run pytest -q tests/unit/optimisation tests/contract/optimisation",
-    "uv run pytest -q tests/property/optimisation tests/golden/optimisation tests/integration/optimisation tests/assurance/optimisation --cov=dmf_pulse.optimisation --cov=dmf_pulse.rules.one_gameweek --cov-branch --cov-report=term-missing --cov-report=json:evidence/stages/10/coverage.json",
+    "uv run python -m mypy src/dmf_pulse",
+    "uv run python -m pytest -q tests/unit/rules/test_one_gameweek.py tests/golden/rules/test_one_gameweek.py",
+    "uv run python -m pytest -q tests/unit/optimisation tests/contract/optimisation",
+    "uv run python -m pytest -q tests/property/optimisation tests/golden/optimisation tests/integration/optimisation tests/assurance/optimisation --cov=dmf_pulse.optimisation --cov=dmf_pulse.rules.one_gameweek --cov-branch --cov-report=term-missing --cov-report=json:evidence/stages/10/coverage.json",
     "uv run python scripts/assurance/check_opt010_coverage.py evidence/stages/10/coverage.json",
-    "uv run pytest -q tests/performance/optimisation",
-    "uv run pytest -q tests/unit/rules tests/property/rules tests/golden/rules",
-    "uv run pytest -q tests/unit/fpl_points tests/property/fpl_points tests/contract/fpl_points tests/golden/fpl_points tests/integration/fpl_points tests/assurance/fpl_points",
+    "uv run python -m pytest -q tests/performance/optimisation",
+    "uv run python -m pytest -q tests/unit/rules tests/property/rules tests/golden/rules",
+    "uv run python -m pytest -q tests/unit/fpl_points tests/property/fpl_points tests/contract/fpl_points tests/golden/fpl_points tests/integration/fpl_points tests/assurance/fpl_points",
     "docker compose -f compose.test.yaml config --quiet",
     "docker compose -f compose.test.yaml up -d --wait",
     "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
-    "uv run pytest -q -m \"postgres and integration\" tests/integration",
+    "uv run python -m pytest -q -m \"postgres and integration\" tests/integration",
+    "uv run python scripts/generate_repository_manifest.py --ticket OPT-010",
+    "uv run python -m pytest -q --ignore=tests/performance --cov=dmf_pulse --cov-branch --cov-report=json:evidence/stages/10/repository_coverage.json",
     "docker compose -f compose.test.yaml down -v --remove-orphans",
-    "uv run pytest -q --ignore=tests/performance --cov=dmf_pulse --cov-branch --cov-report=json:evidence/stages/10/repository_coverage.json",
     "uv run python scripts/assurance/run_opt010_cli_acceptance.py --fixture-root fixtures/optimisation/one_gameweek",
     "uv build",
     "uv run python scripts/verify_opt010_wheel.py",
-    "uv run python scripts/generate_repository_manifest.py --ticket OPT-010",
     "uv run dmf specs validate",
     "uv run python scripts/validate_repository.py",
     "uv run python scripts/scan_secrets.py",
@@ -52,5 +245,11 @@
     "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- pyproject.toml uv.lock",
     "git diff --exit-code a33f46cd7ec190fbd4959e2840527116f22547ac -- src/dmf_pulse/database/migrations",
     "git diff --check"
-  ]
+  ],
+  "parent_revision": "a33f46cd7ec190fbd4959e2840527116f22547ac",
+  "pass_count": 31,
+  "status": "READY_FOR_INDEPENDENT_SOL_REREVIEW",
+  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
+  "ticket": "OPT-010"
 }

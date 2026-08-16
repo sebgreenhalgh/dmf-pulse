@@ -1,0 +1,8 @@
+{
+  "error_count": 2,
+  "errors": [
+    "current manifest byte mismatch: evidence/stages/10/repository_coverage.json: expected 1774225, got 1789923",
+    "current manifest hash mismatch: evidence/stages/10/repository_coverage.json"
+  ],
+  "status": "FAIL"
+}

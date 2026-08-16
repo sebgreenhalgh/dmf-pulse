@@ -1,0 +1,14 @@
+{
+    "tested_revision":  "79102d41fc5d4e2c70d8251d643b705602573045",
+    "tested_tree":  "f1d5987331517e3aaae794594923c80f16e7ec3a",
+    "started_utc":  "2026-08-16T04:35:03.0168724Z",
+    "acceptance_order":  "R2H",
+    "command_count":  31,
+    "environment":  {
+                        "UV_OFFLINE":  "1",
+                        "DMF_TEST_DATABASE_URL":  "SET_REDACTED",
+                        "PGPASSWORD":  "redacted",
+                        "DMF_ENVIRONMENT":  "TEST"
+                    },
+    "recorder":  "direct transcript redirection"
+}

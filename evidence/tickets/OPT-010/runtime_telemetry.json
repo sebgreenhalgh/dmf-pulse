@@ -1,30 +1,33 @@
 {
-  "ticket": "OPT-010",
-  "search_backend": "DETERMINISTIC_EXHAUSTIVE_ENUMERATOR",
-  "reference_fixed_squad": {
-    "squads_examined": 1,
-    "tactical_configurations_examined": 363000,
-    "scenario_score_operations": 363000,
-    "wall_clock_seconds_observed": 43.4,
-    "guarantee": "EXACT_FIXED_SQUAD"
-  },
+  "acceptance_execution_mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
+  "database_access": false,
+  "network": false,
   "packaged_caps": {
+    "max_returned_ties": 16,
+    "max_scenario_score_operations": 20000000,
     "max_squad_candidates": 12,
     "max_tactical_configurations": 5000000,
-    "max_scenario_score_operations": 20000000,
-    "max_returned_ties": 16,
     "objective_tolerance": null
   },
-  "resource_limit_behavior": "preflight returns RESOURCE_LIMIT before enumeration and emits no plan or incumbent",
+  "reference_fixed_squad": {
+    "guarantee": "EXACT_FIXED_SQUAD",
+    "scenario_score_operations": 363000,
+    "squads_examined": 1,
+    "tactical_configurations_examined": 363000,
+    "wall_clock_seconds_observed": 43.4
+  },
   "remediation": {
-    "formatting_only": true,
     "files": [
       "src/dmf_pulse/optimisation/tactics.py",
       "tests/unit/scripts/test_opt010_repository_validation.py"
     ],
+    "formatting_only": true,
     "ruff_format_check": "PASS"
   },
-  "network": false,
-  "database_access": false,
-  "status": "PASS"
+  "resource_limit_behavior": "preflight returns RESOURCE_LIMIT before enumeration and emits no plan or incumbent",
+  "search_backend": "DETERMINISTIC_EXHAUSTIVE_ENUMERATOR",
+  "status": "PASS",
+  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a",
+  "ticket": "OPT-010"
 }

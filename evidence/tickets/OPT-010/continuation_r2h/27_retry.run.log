@@ -1,0 +1,426 @@
+{
+  "finding_count": 60,
+  "findings": [
+    {
+      "fingerprint": "09a8ec5449f1ed2827d50e6c5d1dac7a0f1cf7586d585b43161591ebfb3f0585",
+      "line": 619,
+      "message": "ODD-005 raw-body canary",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "ODD005_RAW_BODY_CANARY"
+    },
+    {
+      "fingerprint": "65b92565daa0e6489e7ac60c6791342a3d1861cb9ccbf282f7d4e79ee303058f",
+      "line": 620,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "c7dbd057fa5529879b57a54d477bf5b68de80cd3093316278b06eb4c998269bf",
+      "line": 1022,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "25c6c14fbff5b660411e950a362fbd87d900065bc441e26cb1864d94e7c7fc4e",
+      "line": 1023,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "09de8dd4b39c8c811ce33614a0a1474dd7a747834a73ca43c93a3215ba1a5665",
+      "line": 1024,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 1025,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 1026,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "line": 1035,
+      "message": "private-key marker",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "PRIVATE_KEY"
+    },
+    {
+      "fingerprint": "e8118df08dd0a39c4c5b0cc43625ded53b2b20ef6a4318e00ae18d5aa0d6ce56",
+      "line": 1037,
+      "message": "URL or DSN contains credentials",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "CREDENTIAL_URL"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 1038,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 1038,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 1039,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 1040,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2",
+      "line": 1338,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "09a8ec5449f1ed2827d50e6c5d1dac7a0f1cf7586d585b43161591ebfb3f0585",
+      "line": 619,
+      "message": "ODD-005 raw-body canary",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "ODD005_RAW_BODY_CANARY"
+    },
+    {
+      "fingerprint": "65b92565daa0e6489e7ac60c6791342a3d1861cb9ccbf282f7d4e79ee303058f",
+      "line": 620,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "c7dbd057fa5529879b57a54d477bf5b68de80cd3093316278b06eb4c998269bf",
+      "line": 1022,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "25c6c14fbff5b660411e950a362fbd87d900065bc441e26cb1864d94e7c7fc4e",
+      "line": 1023,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "09de8dd4b39c8c811ce33614a0a1474dd7a747834a73ca43c93a3215ba1a5665",
+      "line": 1024,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 1025,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 1026,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "line": 1035,
+      "message": "private-key marker",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "PRIVATE_KEY"
+    },
+    {
+      "fingerprint": "e8118df08dd0a39c4c5b0cc43625ded53b2b20ef6a4318e00ae18d5aa0d6ce56",
+      "line": 1037,
+      "message": "URL or DSN contains credentials",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "CREDENTIAL_URL"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 1038,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 1038,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 1039,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 1040,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2",
+      "line": 1338,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "09a8ec5449f1ed2827d50e6c5d1dac7a0f1cf7586d585b43161591ebfb3f0585",
+      "line": 154,
+      "message": "ODD-005 raw-body canary",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "ODD005_RAW_BODY_CANARY"
+    },
+    {
+      "fingerprint": "65b92565daa0e6489e7ac60c6791342a3d1861cb9ccbf282f7d4e79ee303058f",
+      "line": 155,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "c7dbd057fa5529879b57a54d477bf5b68de80cd3093316278b06eb4c998269bf",
+      "line": 557,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "25c6c14fbff5b660411e950a362fbd87d900065bc441e26cb1864d94e7c7fc4e",
+      "line": 558,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "09de8dd4b39c8c811ce33614a0a1474dd7a747834a73ca43c93a3215ba1a5665",
+      "line": 559,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 560,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 561,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "line": 570,
+      "message": "private-key marker",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "PRIVATE_KEY"
+    },
+    {
+      "fingerprint": "e8118df08dd0a39c4c5b0cc43625ded53b2b20ef6a4318e00ae18d5aa0d6ce56",
+      "line": 572,
+      "message": "URL or DSN contains credentials",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "CREDENTIAL_URL"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 573,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 573,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 574,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 575,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "09a8ec5449f1ed2827d50e6c5d1dac7a0f1cf7586d585b43161591ebfb3f0585",
+      "line": 154,
+      "message": "ODD-005 raw-body canary",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "ODD005_RAW_BODY_CANARY"
+    },
+    {
+      "fingerprint": "65b92565daa0e6489e7ac60c6791342a3d1861cb9ccbf282f7d4e79ee303058f",
+      "line": 155,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "c7dbd057fa5529879b57a54d477bf5b68de80cd3093316278b06eb4c998269bf",
+      "line": 557,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "25c6c14fbff5b660411e950a362fbd87d900065bc441e26cb1864d94e7c7fc4e",
+      "line": 558,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "09de8dd4b39c8c811ce33614a0a1474dd7a747834a73ca43c93a3215ba1a5665",
+      "line": 559,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 560,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 561,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "line": 570,
+      "message": "private-key marker",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "PRIVATE_KEY"
+    },
+    {
+      "fingerprint": "e8118df08dd0a39c4c5b0cc43625ded53b2b20ef6a4318e00ae18d5aa0d6ce56",
+      "line": 572,
+      "message": "URL or DSN contains credentials",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "CREDENTIAL_URL"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 573,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 573,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 574,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 575,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2",
+      "line": 262,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_B.collect.log",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2",
+      "line": 262,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_B.nodes.txt",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 10,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_metadata.json",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 17,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 18,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 19,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    }
+  ],
+  "status": "FAIL"
+}

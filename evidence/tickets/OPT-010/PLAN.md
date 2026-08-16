@@ -86,3 +86,24 @@ the existing manifest command moves from ordinal 24 to 19, repository coverage r
 dependency, production rule, or optimiser semantic changed. The invalidated R2G generated
 coverage and transcripts were removed; this history remains authoritative. A fresh 31-command
 ledger is required against the R2H governance commit.
+
+## R2H continuation acceptance — complete
+
+The R2H full acceptance run reached command 20 with commands 1–19 proven PASS against
+implementation/governance revision `79102d41fc5d4e2c70d8251d643b705602573045` and tree
+`f1d5987331517e3aaae794594923c80f16e7ec3a`, then an external one-hour runner limit terminated
+the still-running repository-wide command. No semantic repository byte changed after that
+checkpoint.
+
+The unfinished command-20 semantic gate was completed once under the authorized PATH B
+continuation: exact collection proved a disjoint union of 1,868 non-performance pytest nodes,
+all successful shards completed, and the final aggregate repository coverage command passed at
+91.84% combined line/statement coverage (87.37% branch coverage). The previous environment
+teardown record lacked its transcript, so only that idempotent command was specifically rerun
+and recorded; this was not a broad acceptance restart. Commands 22–31 then passed with final
+retry records for generated-evidence-only manifest, secret-scan, and whitespace repairs.
+
+Status: `READY_FOR_INDEPENDENT_SOL_REREVIEW`. The final evidence is explicitly a
+`CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT`; it does not claim an uninterrupted 31-command
+wall-clock run. Implementation self-acceptance remains false, and independent Sol review plus
+human acceptance remain required.

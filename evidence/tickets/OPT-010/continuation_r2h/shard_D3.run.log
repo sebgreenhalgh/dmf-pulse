@@ -1,0 +1,2286 @@
+.....EEE.EEE.........................EEEE                                [100%]
+=================================== ERRORS ====================================
+_ ERROR at setup of test_official_manual_validation_leaves_no_raw_body_or_secret_in_result_or_logs _
+
+self = <sqlalchemy.engine.base.Connection object at 0x00000127690D2660>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x00000127690D1D30>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x0000012769126190>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127690D2F90>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x127691410d0>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        """Provide the real PostgreSQL fixture outside the integration subtree."""
+
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_fpl_rights_raw_retention.py:78:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x127691410d0>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+_ ERROR at setup of test_official_manual_validation_retries_in_memory_then_reaches_terminal_rejection _
+
+self = <sqlalchemy.engine.base.Connection object at 0x00000127692ECE10>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x000001276917BC50>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x000001276912B680>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127692ED090>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x127691422d0>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        """Provide the real PostgreSQL fixture outside the integration subtree."""
+
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_fpl_rights_raw_retention.py:78:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x127691422d0>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+_ ERROR at setup of test_exhausted_manual_validation_retry_is_terminal_and_keeps_no_raw_body _
+
+self = <sqlalchemy.engine.base.Connection object at 0x000001276960CC30>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x00000127692EE0D0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x00000127695FC550>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127692EE710>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769142ed0>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        """Provide the real PostgreSQL fixture outside the integration subtree."""
+
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_fpl_rights_raw_retention.py:78:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769142ed0>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+_ ERROR at setup of test_database_rejects_raw_storage_under_denied_profile_and_retains_only_hashes _
+
+self = <sqlalchemy.engine.base.Connection object at 0x000001276912B9B0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x00000127692ECCD0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x00000127695FC450>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127692EC690>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x127691428d0>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        """Provide the real PostgreSQL fixture outside the integration subtree."""
+
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_fpl_rights_raw_retention.py:78:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x127691428d0>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+_ ERROR at setup of test_raw_storage_tombstone_hides_object_and_prevents_reuse _
+
+self = <sqlalchemy.engine.base.Connection object at 0x00000127695FCD50>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x00000127692ED1D0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x00000127695FD550>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127692ECF50>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769141e50>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        """Provide the real PostgreSQL fixture outside the integration subtree."""
+
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_fpl_rights_raw_retention.py:78:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769141e50>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+__________ ERROR at setup of test_rights_profile_rows_are_immutable ___________
+
+self = <sqlalchemy.engine.base.Connection object at 0x00000127691CF6B0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x00000127692ED810>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x00000127695FD450>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127692EEFD0>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769143410>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        """Provide the real PostgreSQL fixture outside the integration subtree."""
+
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_fpl_rights_raw_retention.py:78:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769143410>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+_ ERROR at setup of test_raw_forbidden_success_persists_only_hash_metadata_and_quota _
+
+self = <sqlalchemy.engine.base.Connection object at 0x00000127691CA7B0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x00000127692EF4D0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x00000127695FEC50>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127692EF9D0>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769142f90>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-odd005-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_odds_credentials_quota_retention.py:64:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769142f90>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+_ ERROR at setup of test_http_failure_attempt_and_quota_are_retained_without_raw_body _
+
+self = <sqlalchemy.engine.base.Connection object at 0x0000012769360130>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x00000127692EF110>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x00000127695FFD50>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127692ED310>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769143650>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-odd005-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_odds_credentials_quota_retention.py:64:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769143650>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+_ ERROR at setup of test_persisted_quota_depletion_blocks_next_credential_and_transport_call _
+
+self = <sqlalchemy.engine.base.Connection object at 0x00000127691C99B0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x00000127692EF750>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x00000127695FF850>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127692EF390>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769140c50>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-odd005-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_odds_credentials_quota_retention.py:64:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769140c50>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+____ ERROR at setup of test_odds_and_quota_evidence_are_database_immutable ____
+
+self = <sqlalchemy.engine.base.Connection object at 0x0000012769360590>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x00000127692EEFD0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x00000127695FDF50>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x00000127692EF890>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+
+        if self._echo:
+            self._log_info(str_statement)
+
+            stats = context._get_cache_stats()
+
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769142450>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidSchemaName: schema "betting" does not exist
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: InvalidSchemaName
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture
+    def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
+        database_url = os.environ.get("DMF_TEST_DATABASE_URL")
+        if database_url is None:
+            pytest.fail("DMF_TEST_DATABASE_URL is required for PostgreSQL security tests")
+        engine = create_database_engine(
+            database_url,
+            DatabaseSettings(
+                url_secret_ref=DATABASE_REF,
+                application_name="dmf-pulse-odd005-security-tests",
+            ),
+        )
+        tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+        with engine.begin() as connection:
+>           connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
+
+tests\security\test_odds_credentials_quota_retention.py:64:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+.venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=55432 user=dmf_test database=dmf_pulse_test) at 0x12769142450>
+query = 'TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canon...s_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE'
+params = {}, prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.InvalidSchemaName) schema "betting" does not exist
+E           [SQL: TRUNCATE TABLE betting.market_definition, betting.market_normalisation_policy, betting.settlement_profile, core.canonical_entity, provenance.dataset_version, provenance.raw_blob, provenance.ruleset_artifact, betting.betting_operator, football.competition, football.player, football.team, provenance.data_provider, provenance.dataset_training_example, provenance.model_version, provenance.raw_blob_deletion, provenance.ruleset_activation, football.prediction_run, football.season, provenance.ingestion_run, provenance.model_evaluation, provenance.rights_profile, football.conditional_minute_pmf, football.lineup_scenario, football.player_minutes_projection, football.prediction_dependency, football.prediction_hard_eligibility, football.role_marginal, fpl.gameweek, provenance.raw_storage_object, provenance.source_bundle, football.lineup_scenario_member, provenance.raw_storage_deletion, provenance.source_snapshot, betting.provider_quota_observation, core.data_quality_issue, core.entity_alias, core.external_identifier, football.team_season, fpl.gameweek_observation, fpl.player_season, provenance.rights_decision, provenance.semantic_effect_source, provenance.semantic_observation_claim, provenance.source_bundle_member, provenance.source_mapping_candidate, provenance.source_processing_event, betting.odds_publication_batch, football.fixture, football.player_team_membership, fpl.player_observation, fpl.team_observation, betting.market_normalisation_run, betting.odds_publication_attestation, betting.operator_fixture_market, football.fixture_gameweek_assignment, football.fixture_revision, fpl.fixture_observation, betting.market_consensus_result, betting.market_normalisation_exclusion, betting.market_normalisation_warning, betting.market_selection, betting.normalised_operator_market, betting.provider_market_representation, betting.market_consensus_outcome, betting.normalised_operator_outcome, betting.operator_market_observation, betting.market_normalisation_book_source, betting.odds_mapping_dependency, betting.odds_observation, betting.market_normalisation_source, betting.normalised_operator_market_source RESTART IDENTITY CASCADE]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: ProgrammingError
+=========================== short test summary info ===========================
+ERROR tests/security/test_fpl_rights_raw_retention.py::test_official_manual_validation_leaves_no_raw_body_or_secret_in_result_or_logs
+ERROR tests/security/test_fpl_rights_raw_retention.py::test_official_manual_validation_retries_in_memory_then_reaches_terminal_rejection
+ERROR tests/security/test_fpl_rights_raw_retention.py::test_exhausted_manual_validation_retry_is_terminal_and_keeps_no_raw_body
+ERROR tests/security/test_fpl_rights_raw_retention.py::test_database_rejects_raw_storage_under_denied_profile_and_retains_only_hashes
+ERROR tests/security/test_fpl_rights_raw_retention.py::test_raw_storage_tombstone_hides_object_and_prevents_reuse
+ERROR tests/security/test_fpl_rights_raw_retention.py::test_rights_profile_rows_are_immutable
+ERROR tests/security/test_odds_credentials_quota_retention.py::test_raw_forbidden_success_persists_only_hash_metadata_and_quota
+ERROR tests/security/test_odds_credentials_quota_retention.py::test_http_failure_attempt_and_quota_are_retained_without_raw_body
+ERROR tests/security/test_odds_credentials_quota_retention.py::test_persisted_quota_depletion_blocks_next_credential_and_transport_call
+ERROR tests/security/test_odds_credentials_quota_retention.py::test_odds_and_quota_evidence_are_database_immutable
+31 passed, 10 errors in 5.81s

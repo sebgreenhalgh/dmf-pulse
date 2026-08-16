@@ -1,0 +1,34 @@
+{
+  "finding_count": 4,
+  "findings": [
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 10,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_metadata.json",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 17,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 18,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 19,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    }
+  ],
+  "status": "FAIL"
+}

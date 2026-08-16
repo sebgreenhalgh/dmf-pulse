@@ -1,8 +1,9 @@
 {
+  "acceptance_execution_mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
   "branch": "stage/A10/OPT-010-one-gameweek-optimiser",
   "expected_branch": "stage/A10/OPT-010-one-gameweek-optimiser",
   "forbidden_paths": [],
-  "head": "2230052a0789c3b145b034581dbeedb17a16bcb7",
+  "head": "79102d41fc5d4e2c70d8251d643b705602573045",
   "merge_base": "a33f46cd7ec190fbd4959e2840527116f22547ac",
   "ok": true,
   "paths": [
@@ -38,6 +39,11 @@
     "evidence/tickets/OPT-010/final_acceptance_r2_progress.json",
     "evidence/tickets/OPT-010/final_acceptance_r2_records.jsonl",
     "evidence/tickets/OPT-010/final_acceptance_r2_summary.json",
+    "evidence/tickets/OPT-010/final_acceptance_r2h/01.log",
+    "evidence/tickets/OPT-010/final_acceptance_r2h/02.log",
+    "evidence/tickets/OPT-010/final_acceptance_r2h/03.log",
+    "evidence/tickets/OPT-010/final_acceptance_r2h_metadata.json",
+    "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
     "evidence/tickets/OPT-010/resource_report.json",
     "evidence/tickets/OPT-010/review.json",
     "evidence/tickets/OPT-010/runtime_telemetry.json",
@@ -113,5 +119,7 @@
     "tickets/OPT-010/DEFINITION_OF_READY.md",
     "tickets/OPT-010/ticket.yaml"
   ],
-  "required_base_commit": "a33f46cd7ec190fbd4959e2840527116f22547ac"
+  "required_base_commit": "a33f46cd7ec190fbd4959e2840527116f22547ac",
+  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a"
 }

@@ -1,6 +1,9 @@
 {
+  "acceptance_execution_mode": "CONTINUATION_AFTER_INFRASTRUCTURE_TIMEOUT",
   "database_imports": false,
   "forbidden_solver_tokens": [],
   "network": false,
-  "ok": true
+  "ok": true,
+  "tested_revision": "79102d41fc5d4e2c70d8251d643b705602573045",
+  "tested_tree": "f1d5987331517e3aaae794594923c80f16e7ec3a"
 }

@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 60150,
+      "bytes": 61047,
       "path": "PLANS.md",
-      "sha256": "773d5ca147a64a5729b32818900fb351936fac1fbb18bc23965b8a5d8b1c30bb"
+      "sha256": "ceed13b6f2db8f8e8dfd92f0cac24063d6ec1e610b6fc16480a85d11b7e02ed1"
     },
     {
       "bytes": 2761,
@@ -396,24 +396,24 @@
       "sha256": "ba9500148c70614286c254f493597bdd53b2285dfc7326054d3fdd641ff809fb"
     },
     {
-      "bytes": 925,
+      "bytes": 1336,
       "path": "evidence/stages/10/STAGE_ACCEPTANCE.md",
-      "sha256": "7d59875203a85e2d7ec96f871f9a7800533fec01d052b6193d4706db8ee423ca"
+      "sha256": "a84adbd5100a4b88ab34965c664a64a99bdc2bbb24e1c4e6a9836f114affb40e"
     },
     {
-      "bytes": 79584,
+      "bytes": 94033,
       "path": "evidence/stages/10/coverage.json",
-      "sha256": "a1c151ab4f886afe3414327badbe9723b3a107457ffbccf59f5366cac0899b75"
+      "sha256": "b6f41599efb5e846cd1cee729d50271ee87eeb410a91bf3e1f735850f39abf74"
     },
     {
-      "bytes": 1774225,
+      "bytes": 1789923,
       "path": "evidence/stages/10/repository_coverage.json",
-      "sha256": "5c569496bd21d43706a9f5555e1e88726e8200e485fc02fa001c513a7b5c4e32"
+      "sha256": "ef635f5dd12e8a30167ddb6fb0f9961167502da20425d0df84b64bc13f7feca8"
     },
     {
-      "bytes": 600,
+      "bytes": 8855,
       "path": "evidence/stages/10/stage_acceptance.json",
-      "sha256": "9f2b2e326faafeff34b0fe29c0a43c200788d29e4643f010ddff52577f48f279"
+      "sha256": "9851c02940189dbd6769d36165183277c25eba41ff97e5a4dde223c3721b88f2"
     },
     {
       "bytes": 281,
@@ -951,9 +951,114 @@
       "sha256": "ab9282a31f29a0b81c3c77a20b9a30dc260ca2a21aa47825067550626758f5db"
     },
     {
-      "bytes": 358,
+      "bytes": 1020,
       "path": "fixtures/optimisation/one_gameweek/README.md",
-      "sha256": "6c11fe7d00cd8e2ee230b670050f221bf2825269462c999aa2e8a386c3e31d46"
+      "sha256": "221c27ec0ea4dff7464d2cc6f95fa950b4d2d1f0662f270eef8e63cc9be50a20"
+    },
+    {
+      "bytes": 86,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/assists.yaml",
+      "sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036"
+    },
+    {
+      "bytes": 86,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/bonus.yaml",
+      "sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036"
+    },
+    {
+      "bytes": 1165,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/capabilities.yaml",
+      "sha256": "ef6a1a55eff8e7600a7dceedf8c100035fe9955227a45a67498487457281940b"
+    },
+    {
+      "bytes": 86,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/chips.yaml",
+      "sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036"
+    },
+    {
+      "bytes": 86,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/deadlines.yaml",
+      "sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036"
+    },
+    {
+      "bytes": 14,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/interpretations.yaml",
+      "sha256": "1dabbdbd4f1fc2520595c34d45e1c5ac08dca5b204bb1d1f06ae455cc42fa5a3"
+    },
+    {
+      "bytes": 346,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/lineup.yaml",
+      "sha256": "f82b34545f17556aa1e818572d4b2205a8500f2eb6c6715e15715a6e25eb7283"
+    },
+    {
+      "bytes": 333,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/positions.yaml",
+      "sha256": "f13ad6f19da0b8bec853257419673e794aa649044d73f0c618f8284203b19598"
+    },
+    {
+      "bytes": 86,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/prices.yaml",
+      "sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036"
+    },
+    {
+      "bytes": 1166,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/rule_verification.yaml",
+      "sha256": "7716f40e652d82ab0d898b4fba3f0fe592c4e27e2281ac88928c62644d04dcdf"
+    },
+    {
+      "bytes": 86,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/scoring.yaml",
+      "sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036"
+    },
+    {
+      "bytes": 547,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/season_manifest.yaml",
+      "sha256": "4785ceef133b1360ed9c2a4771850bee976b7d90e3b8ac3da2844aaf59e9cb42"
+    },
+    {
+      "bytes": 618,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/source_manifest.yaml",
+      "sha256": "d63f48a76a5f96a2e7fe90e0ed3bdf97dd060688b34153220de8181ae2d7af15"
+    },
+    {
+      "bytes": 11,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/special_events.yaml",
+      "sha256": "fb9b2e59663fe1741488ac52428726f13fd98f2f28cc73db64f022c8ae629999"
+    },
+    {
+      "bytes": 59,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/squad.yaml",
+      "sha256": "d204d632e60181b926363c69d4e051d86f834d3dc5a2e4b4f187142ffa8d800f"
+    },
+    {
+      "bytes": 197,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/target_2026_27_claims.yaml",
+      "sha256": "445dc69378f7d13953ceb14c5bab2431bba3594187db0de1063793b7b02883f4"
+    },
+    {
+      "bytes": 86,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_source/transfers.yaml",
+      "sha256": "eac34caf8f2dbcf81dd0a9f3eb3d287cfbbcefba68072efdf229e179ecc88036"
+    },
+    {
+      "bytes": 38365,
+      "path": "fixtures/optimisation/one_gameweek/reference_ruleset_test_only.json",
+      "sha256": "a89d2912e9278c4a55a017525e9f7beb93494357a9902bf7a7b62805cd61a204"
+    },
+    {
+      "bytes": 2062,
+      "path": "fixtures/optimisation/one_gameweek/request.json",
+      "sha256": "53da9787fb9a2caf29526e208d02ec9712281e7888b14ec02a29f0725c48a19e"
+    },
+    {
+      "bytes": 110955,
+      "path": "fixtures/optimisation/one_gameweek/stage9_gameweek_result.json",
+      "sha256": "9331a09411b36e44c8f61dc5d38765cc99815e5c8dc375afc2a74b3243c3bb67"
+    },
+    {
+      "bytes": 95,
+      "path": "fixtures/optimisation/one_gameweek/stage9_gameweek_result.sha256",
+      "sha256": "a636e9962abd61f7f54999f7761f67fc850b0b8e71b1fbf6b6fc9561cf9c0338"
     },
     {
       "bytes": 138158,
@@ -1451,9 +1556,9 @@
       "sha256": "fd8bfe0530e1248387d3538e19df129ccd6323f4c455be5b79f33c987b276c38"
     },
     {
-      "bytes": 2617,
+      "bytes": 6420,
       "path": "scripts/assurance/run_opt010_cli_acceptance.py",
-      "sha256": "e8ec2dd362804bff507dbd1265a116f339bc4d35100dd98dc6624f98abd1ddaa"
+      "sha256": "a2f2c92f59042a6512d4d9a925e073c479fe5544dc12bb98cd796664e42a84ec"
     },
     {
       "bytes": 1669,
@@ -1621,9 +1726,9 @@
       "sha256": "5793aabb9ed49e162d35216262e52b6cfc499cffa7fa14f6e2e5f27118ef1281"
     },
     {
-      "bytes": 1021,
+      "bytes": 6478,
       "path": "scripts/verify_opt010_wheel.py",
-      "sha256": "8a771c8334e26b5e9d3b64f0b1a8301b7cba187381b938743a0301eb32106394"
+      "sha256": "c0644779ca59d23224fc43d176698ba4348ea132174089ee709b6d853afaa872"
     },
     {
       "bytes": 12612,
@@ -2011,9 +2116,9 @@
       "sha256": "a726e9f9615d0e5407add95cc072be8bd31f97d62f4b536aca62232216514d12"
     },
     {
-      "bytes": 4453,
+      "bytes": 4558,
       "path": "src/dmf_pulse/cli/optimise.py",
-      "sha256": "004c3fadd90a274063291c7e7ec18a17e8dda610c58992f857e3dfd30dbb7f46"
+      "sha256": "f67631973f703f8c803dba3dff7b3b7da1a3be6e350ba8fae5f73a340053c59e"
     },
     {
       "bytes": 1660,
@@ -2516,34 +2621,34 @@
       "sha256": "70cc7f4b31970f453bac28b9c5c730202b24dd6f5531feab28d3ed056be2602e"
     },
     {
-      "bytes": 1879,
+      "bytes": 6343,
       "path": "src/dmf_pulse/optimisation/artifacts.py",
-      "sha256": "eb0e737bf4cfc062059a85ca101200ae392fd0c9ecb5587a8125cc95b4a9b8f2"
+      "sha256": "4806c61900131741c93fe2d753ff21e4ebacf6b6efe3a237669149415f835f98"
     },
     {
-      "bytes": 4146,
+      "bytes": 4219,
       "path": "src/dmf_pulse/optimisation/autosub_evaluator.py",
-      "sha256": "8ae8027470732d720844d48551217a8d981aca1d8052c8f7876700da233f95a4"
+      "sha256": "b0854e5ea40e14f49d8350cb2535c769773f73fd26e2b66e3f3853f4bbf6ea69"
     },
     {
-      "bytes": 5210,
+      "bytes": 5498,
       "path": "src/dmf_pulse/optimisation/candidate_pool.py",
-      "sha256": "b4455cf4921a99ba5f7c44afb0de030d1d6911f64b5b56f41d0bf01384900336"
+      "sha256": "40be27fc3b46b48720a1477aa85081368c339a0ca71a96778f5e3d0e66655cd2"
     },
     {
-      "bytes": 692,
+      "bytes": 775,
       "path": "src/dmf_pulse/optimisation/errors.py",
-      "sha256": "e2f890b12d39ca51559a2091beb7be3d635f3c4e8c9fed1d0aad0c64026ecf99"
+      "sha256": "48c0af35a99583b3c1372c82351c3772f74cb0391d4d1d7f66e5903f0a4cdf88"
     },
     {
-      "bytes": 4343,
+      "bytes": 7804,
       "path": "src/dmf_pulse/optimisation/legality.py",
-      "sha256": "5e67851cda814b2d865f222163ef00ce8a6d2f01139c058a9dbf218d8a2e3253"
+      "sha256": "ac86d87196eeb8d095db92bf0af325262cb9cf8386a62dc42049b5bbd52b1813"
     },
     {
-      "bytes": 10167,
+      "bytes": 12088,
       "path": "src/dmf_pulse/optimisation/models.py",
-      "sha256": "61af990fc0f3e2d46e8879cce96d366edebd60b35e340fd38f5ac9985357478a"
+      "sha256": "f61d4060ebe2eab6fd5cda994f93b11f90d1ef0bbfbf96dfc0678c90db716322"
     },
     {
       "bytes": 520,
@@ -2556,24 +2661,24 @@
       "sha256": "91b5baa912c75966e846ceffbdc19441068c8dc11e516a8855716d57b5e7ae80"
     },
     {
-      "bytes": 9170,
+      "bytes": 10227,
       "path": "src/dmf_pulse/optimisation/service.py",
-      "sha256": "fa0703dfa2cf6efb489398ea3ca5f2b3b54b9fcd523b7ffa44451e084672fdba"
+      "sha256": "c5877160ace06e6831fffe29bb9e8330f8632824528302f74528bada5b387ff1"
     },
     {
-      "bytes": 4321,
+      "bytes": 5380,
       "path": "src/dmf_pulse/optimisation/solver.py",
-      "sha256": "9e5d14620737ded4a16f55a716edb3c584140b7d5ac4501faf2c820e3418ef1e"
+      "sha256": "71e91a90ac50aa161d65e25fb7f374e786e03b7e398d2ee5f89a3f5a572472b1"
     },
     {
-      "bytes": 7903,
+      "bytes": 11347,
       "path": "src/dmf_pulse/optimisation/tactics.py",
-      "sha256": "7672c9754bb8531ebd30156e2d73b1bf3452709507382f423226572451a5606d"
+      "sha256": "1e2cfb323cc0ae530f88272c9dab987691b59c457e4aece6f825645b9a60da55"
     },
     {
-      "bytes": 1343,
+      "bytes": 9654,
       "path": "src/dmf_pulse/optimisation/validation.py",
-      "sha256": "6ac09b209132ece7247b6a94355eed2489f3cce91dab3a22a4fa9082fb6fcf8d"
+      "sha256": "7b3e2ab8e0d10a1fd05d5e688cef6e8a76f51a53afaf49215bbe162b9c2656e5"
     },
     {
       "bytes": 1,
@@ -2601,9 +2706,9 @@
       "sha256": "121c15af2f6e6073dc473d9de5421d7acce65bf963379d2885abfe60d6b5a246"
     },
     {
-      "bytes": 41084,
+      "bytes": 41503,
       "path": "src/dmf_pulse/rules/authoring.py",
-      "sha256": "5dcc914263b560f487ae036f92f35f451bf52ff396b044eb2aae543e3727bd77"
+      "sha256": "a085b8c20a2a4e53219205ca7597d38cf75eac5231b7fe7fdbc9b755ebab3b16"
     },
     {
       "bytes": 1270,
@@ -2651,9 +2756,9 @@
       "sha256": "bc7e9ff3404f4724bb1b7054f3ff27c82614f9c97f53dc10e412ab116f7d23ee"
     },
     {
-      "bytes": 9631,
+      "bytes": 11456,
       "path": "src/dmf_pulse/rules/one_gameweek.py",
-      "sha256": "8305c724314daaf69343dcd380e03764aa397f5d83979151e171d5e10354cc4b"
+      "sha256": "d86e572eade281be7b4ff94cebcc85b5d66efcf001bbe3c2344dddbb506e4b11"
     },
     {
       "bytes": 12954,
@@ -2701,9 +2806,24 @@
       "sha256": "e13ff972dc9d371532e8324ca21ca30a612dbc4e2275857a2935fb9d13a6eac4"
     },
     {
-      "bytes": 20739,
+      "bytes": 7881,
+      "path": "tests/assurance/optimisation/test_r2c_artifact_validation.py",
+      "sha256": "d2d702a850ecbc526e50a307f52d91736edc0d85e2150037e099466ffe55dd27"
+    },
+    {
+      "bytes": 2647,
+      "path": "tests/assurance/optimisation/test_r2c_cli_contract.py",
+      "sha256": "28c96f2aa003fdc4997b9cab51d30d71de6697367b9c63dd68d1298e93e7899f"
+    },
+    {
+      "bytes": 4743,
+      "path": "tests/assurance/optimisation/test_r2f_coverage_regressions.py",
+      "sha256": "c6187cf41b81a234b51a53829b66abe47955a90cf8370aadb8ef22ef3a249160"
+    },
+    {
+      "bytes": 25117,
       "path": "tests/assurance/optimisation/test_surface.py",
-      "sha256": "c8e147d9ae9da55a3c73ab946890e9bed910b929891f0220d8b0e0337ba53e05"
+      "sha256": "e82ae8df493aa1c6f726df4a149cacee426ed7cca8ac1c0aaa5d28608b50a857"
     },
     {
       "bytes": 2814,
@@ -2774,6 +2894,11 @@
       "bytes": 303,
       "path": "tests/contract/optimisation/test_contract.py",
       "sha256": "6865323f0e00dd3392adac168aee5e8930727babe6f31da0c3481baab5e652cd"
+    },
+    {
+      "bytes": 3724,
+      "path": "tests/contract/optimisation/test_r2a_contract_gates.py",
+      "sha256": "caf13f1be0e52d6d39c276f66218e4889dde3cc480b4ac8171f7695909b509a7"
     },
     {
       "bytes": 1972,
@@ -3156,6 +3281,11 @@
       "sha256": "5d34f419380d4cec7937c1b317e5a07ad37ff6fc2f5262bcb8e25f1f4021c0c3"
     },
     {
+      "bytes": 6905,
+      "path": "tests/property/optimisation/test_oracle_equivalence.py",
+      "sha256": "343b38f662dcab2a7e11d48de33cb736209fa5d9bd3d7fb1f7462b7d417a9268"
+    },
+    {
       "bytes": 474,
       "path": "tests/property/optimisation/test_properties.py",
       "sha256": "2ed6c8c8e56fbb272db0695a566fddf88468a5a7dd381ab1dc87fcc4c57a74f0"
@@ -3201,14 +3331,14 @@
       "sha256": "53e220d2941015bd37d165e584910b94305d817e18df44a6a2f31b9a3d00fde2"
     },
     {
-      "bytes": 6316,
+      "bytes": 5854,
       "path": "tests/support/optimisation_factories.py",
-      "sha256": "c86c8e535a21a70393efd42b598c172cbe9398df4885c8c40488b6a0f47bb9f8"
+      "sha256": "b386c1586c017aef58ff9c64c516cc25da78b11427b052cca5c82d0148e12db6"
     },
     {
-      "bytes": 682,
+      "bytes": 10144,
       "path": "tests/support/optimisation_oracle.py",
-      "sha256": "1e84c6a8642e3a9c6566d6ea5ee7cf546667f3d34d29b377c51f5e17ee19161a"
+      "sha256": "cc10a43061093ca5ba50fa6f60e40c5aadae9ccacd2e605ce38234c7df41e418"
     },
     {
       "bytes": 442,
@@ -3656,6 +3786,11 @@
       "sha256": "5d66e8094b7b4cebacd823549a71b39c3777402a2ced6fb38d96dc05611efbd3"
     },
     {
+      "bytes": 7597,
+      "path": "tests/unit/optimisation/test_r2b_semantics.py",
+      "sha256": "25d1793d41cd445de70b4668f34eec6a089a8bb16fa58ead13dd61237a8297e3"
+    },
+    {
       "bytes": 1485,
       "path": "tests/unit/optimisation/test_service.py",
       "sha256": "d3a5856d103cb3f42c956f854ca815543f855e0a388899f881b60192555dcfa4"
@@ -3691,9 +3826,9 @@
       "sha256": "f89e66cc62d2719a430389e5be54412926dc0f478b4e61e8dcd0cd3e48ee8cf9"
     },
     {
-      "bytes": 569,
+      "bytes": 4003,
       "path": "tests/unit/rules/test_one_gameweek.py",
-      "sha256": "1efa9a2b5f4f836a8da6938151dc9f31ad4fbe4e8bf6c7daa3ee925eec5de0f2"
+      "sha256": "b88086645e22cf48c8518bb5791435842e018b7e0b94378ee626133cf20b3b22"
     },
     {
       "bytes": 14525,
@@ -3826,9 +3961,9 @@
       "sha256": "7adcf017408f5fc6a9a1585240d9b9dbe0c79c621690e470aeaf72e34bd0f111"
     },
     {
-      "bytes": 22997,
+      "bytes": 25358,
       "path": "tickets/OPT-010/ticket.yaml",
-      "sha256": "3eb133e0a989b47091151828338cc60c3229bf8bdfe661c0bcf6ef9a22cecb13"
+      "sha256": "15fb30a51802a1c75d3afc82a1ffb637d63f036902aa296d58fc70bfc996fc6b"
     },
     {
       "bytes": 4490,

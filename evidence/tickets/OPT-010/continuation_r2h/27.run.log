@@ -1,0 +1,825 @@
+{
+  "finding_count": 117,
+  "findings": [
+    {
+      "fingerprint": "d4cf13d0cc4080d253abea73436e5b5263e823a2bd4c798e64b8508c83b2e8ab",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/22.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "481761aaabcbe8423847b90ad4f57186cf1f66bdc49bcdb1de2497b88bcd2c21",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/23.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "d9ea2e079c3cddf108433850861537f594bb53a5c8a9e37caed3e6b306b934b5",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/24.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "73853215bfda89e42722bd0ad87976123938e810704ed83f3aae1f199aa52937",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/25.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "5219b75a4a0a8f4e88904fc7442eae81d906a0e562b49abe31acad6e6e884829",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/26.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "ecdce6daa9c5eb6ab4d5828e747e528ac13158b0dfd5bf236c5fc7fbff1c4597",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/26_retry.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "5ae2baf127f9b0cf43f2d3ad2e8a7a7f572c5629892e09d3619c1d28b369d315",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "09a8ec5449f1ed2827d50e6c5d1dac7a0f1cf7586d585b43161591ebfb3f0585",
+      "line": 619,
+      "message": "ODD-005 raw-body canary",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "ODD005_RAW_BODY_CANARY"
+    },
+    {
+      "fingerprint": "65b92565daa0e6489e7ac60c6791342a3d1861cb9ccbf282f7d4e79ee303058f",
+      "line": 620,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "c7dbd057fa5529879b57a54d477bf5b68de80cd3093316278b06eb4c998269bf",
+      "line": 1022,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "25c6c14fbff5b660411e950a362fbd87d900065bc441e26cb1864d94e7c7fc4e",
+      "line": 1023,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "09de8dd4b39c8c811ce33614a0a1474dd7a747834a73ca43c93a3215ba1a5665",
+      "line": 1024,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 1025,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 1026,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "line": 1035,
+      "message": "private-key marker",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "PRIVATE_KEY"
+    },
+    {
+      "fingerprint": "e8118df08dd0a39c4c5b0cc43625ded53b2b20ef6a4318e00ae18d5aa0d6ce56",
+      "line": 1037,
+      "message": "URL or DSN contains credentials",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "CREDENTIAL_URL"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 1038,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 1038,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 1039,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 1040,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2",
+      "line": 1338,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/baseline.nodes.txt",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 1,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/environment_recovery_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "61e8ceb968adf23f5d54f9e0d1796ad8db78d82a9c68f5094fd03dbab2556a44",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/manifest_refresh_after_coverage.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "4758cd43e3bcbadd57faa459e6e5ef80bd5911de5ca5c42bb1838a8064b09096",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/recovery_migration_matrix.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "85731073f3d72776828ded9add54a39c831a4e4ccd6d53ea9bcedd983d781598",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/recovery_up.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "4166fb8b9737f6ff4da825f2f4c45f4eff6f5ef524536c23c60417dbbea01d36",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/repository_coverage_aggregate.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "ac8ea112864d4ce054a76cc60315aa93b2887c8d57ff5fe2eed6e4bc641a7bd3",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/setup_manifest.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "fe156a88ac74c1e87ea09c86fa1743ebda97f18d99687ad1d25ab2a009cbfa2b",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "09a8ec5449f1ed2827d50e6c5d1dac7a0f1cf7586d585b43161591ebfb3f0585",
+      "line": 154,
+      "message": "ODD-005 raw-body canary",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "ODD005_RAW_BODY_CANARY"
+    },
+    {
+      "fingerprint": "65b92565daa0e6489e7ac60c6791342a3d1861cb9ccbf282f7d4e79ee303058f",
+      "line": 155,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "c7dbd057fa5529879b57a54d477bf5b68de80cd3093316278b06eb4c998269bf",
+      "line": 557,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "25c6c14fbff5b660411e950a362fbd87d900065bc441e26cb1864d94e7c7fc4e",
+      "line": 558,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "09de8dd4b39c8c811ce33614a0a1474dd7a747834a73ca43c93a3215ba1a5665",
+      "line": 559,
+      "message": "known token prefix",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "KNOWN_TOKEN"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 560,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 561,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "line": 570,
+      "message": "private-key marker",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "PRIVATE_KEY"
+    },
+    {
+      "fingerprint": "e8118df08dd0a39c4c5b0cc43625ded53b2b20ef6a4318e00ae18d5aa0d6ce56",
+      "line": 572,
+      "message": "URL or DSN contains credentials",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "CREDENTIAL_URL"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 573,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "ba28947e7a80c30d6a909834240883bf6736713e77b8039493683a7b04b4da07",
+      "line": 573,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "06a785e2b216613807fadedd23621c32541e6614ae177ad483b90ddc0be714a2",
+      "line": 574,
+      "message": "JWT-like token",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "JWT"
+    },
+    {
+      "fingerprint": "1a5d44a2dca19669d72edf4c4f1c27c4c1ca4b4408fbb17f6ce4ad452d78ddb3",
+      "line": 575,
+      "message": "AWS access-key identifier",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.nodes.txt",
+      "rule_id": "AWS_ACCESS_KEY"
+    },
+    {
+      "fingerprint": "a5b338d5417f4613fc1b17bf578e29d5c1296c6a6a9af6372601b21bbdb4a28e",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_A.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "7ac4b414955fe192010853bc7b0ef727f18227f9a2d60c6c85ac2b48ca1fa01e",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_B.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2",
+      "line": 262,
+      "message": "sensitive URL query value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_B.nodes.txt",
+      "rule_id": "SENSITIVE_QUERY_VALUE"
+    },
+    {
+      "fingerprint": "660be767d1d00abec232130ba2a768aa5fe9f4c185e6ca6a5592e998b155bd0d",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_B.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "bd60c5b278f8346703f1b30eed2837c27a44d52d5a152b1a93c6771aac3fe15a",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_C.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "0e36ae434136ff2ee0145bd938384ab4c7a85e820a5aaf42f5eebc8604ad57e3",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_C.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "73b8a2814eeb0b9465fe0cd9ea87ed3fa98cff44eed0d3f0fceef26562c30a1a",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_D.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "f439a9750bbde896bc9318405c7a1d363ea93cc90e6b5ca46947afdcacda2ee8",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_D.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "94a023be68fee2341150172c4d475f3a67fa267180cc5972e249bedd2fd6bb7a",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_D1.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "8b59bb88fad38aa1d44f08819d84c0ed4ed1faa959660f43cac6010019cbe91e",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_D1.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "f192894a81683617a5b87219a5364d192e4848bd9e2d78b76f209b0ea0fdb03a",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_D2.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "b19470e89e10d39cba8a187e874a2b70106fe2abf54f696f2d26e02d0a5d6c6d",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_D2.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "1ca3b235f55ddb53a2445161512d58056c5d978872264ff54e46ac611a60079c",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_D3.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "62a6128887e2affd8802cb7218e4d7698a4bcbd3d00b8d7203c1991b43a68ecb",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_D3.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "5379b2b6bd78ffc90d6901d723962b7e078af0b91918baa40619a2d6e71cec07",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_D3_retry.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "2063519a09a33fd953493db042595f8272028886af15eb6bf0cfdbccd6b7c5d6",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_E.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "1e51172277700e87682c5e59eb7e4e5d11dbbcb7e834131233c1297a9d0b50b2",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_E1.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "a12de40657730c040a6458d297c9f5cb7523d3b2f43208acdcde57221fb7daa0",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_E1.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "e4fe2f2e62ca5cba12c48d90dd297d3f0e167f7ff2c8487e67b1af8a7f3ec709",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_E2.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "dcd825a8a88dbabb1a7b2d1fc34bf94da88c1df1a00e223c5b836a5768c8628d",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_E2.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "f37ae1b20d2a5ac84a3ab60dab3d915780d25efe8c19a2460f67134bfbe31002",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_E3.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "b9a853c2195896a980c8c708ca1998a3af5ed380c111a0e7d6d2d95c19b4a6ba",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_E3.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "3ba9886bb6d538884d136bd112c1d2ea262ac09416fe6be14862ba1b30c69149",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_F.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "e2c870162cd0519c490ac322e36cc9c616adbda1fd007d6281c9aef5eccc02f2",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_F1.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "18f1e81b52bbcc1b30a38f992cfaad6a28754d429bb9eb48dbf8c1b3202ebb48",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_F1.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "c559e2ebcfb00c0dbff77f0fc8fb67f2c9e3ff21134193dbff4e70256b19f3ec",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_F2.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "5aa48beaa49ec8b72f951e9790d9f74b421f990b69f409f2cd8b49dd2f0ec5de",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_F2.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "bc593667d47f03b8694a4261064e2e5b1a7115048a2adb2b58649a06ca6ba5f0",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_F3.collect.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "3dd851f3c7bc33295b7951c519fb2425f3eec331a57d1b9d325606a03e584d69",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_F3.run.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 1,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 2,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 3,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 4,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 5,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 6,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 7,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 8,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 9,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 10,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 11,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 12,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 13,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/continuation_r2h/shard_execution_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "dba4f8889bca3f1bf204c244683c957973a7a3e13dba5c160f5f2ea663a8e893",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/02.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "1a8804fb5bf9224708711f4bacdf10f3cc971539f5368ec7121806d9164d287f",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/03.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "12f03a1de7cc36a1f07afc3e3dbebadfc5026b1f9f22ff975b3f2cbe3b16bb22",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/04.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "38b169f03aac1eec274f54db271cd96cb223d645a17c101c94f8e436a0aad7fc",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/05.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "8b180ea9ba4178c701837414d92beb295d270931bdec7996f6d8b0c2c813dc17",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/06.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "938e15b8fd69e9a3bc1ebe3b6390312f292df79e864caea5209342a0ee8242d3",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/07.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "86df1e5df9681c45751ddf2d1600880bb56378ca34db8c56d2c5422efa4d3b0f",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/07_module_equivalent.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "722b2014818f9344037519650bc7bb4687486775f05ab5983b17ab2be78933ad",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/08.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "efbbd72135e37fc5a7631b23d21695a9f5e28e01e61a936111a9fa956d27031f",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/08_module_equivalent.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "46dea48c3c27b2a7fd4026a80725761adf08b141fc504184b0ccea616d97535f",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/09_module_equivalent.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "8fa94e2a86a029c137bfab17c1e0c7fbdb40e7e5278fc2277081027b6959086b",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/10_module_equivalent.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "7fdaf10c82ced8ebb62b1556000935475cbe7852e360b2a36acc949150178645",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2/11.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "ecc51d75e75f5dc61444b3458fdcc966ac470ed27fb3a8f126111640b2b9f22e",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/02.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "614f6eba6eb12aa5c864ad2c8b1f6b26a395cb990666c5e5a71d046591e9bfc2",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/03.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "547c25e8d793aa67c9ac3c97d859974b2e8b0ea996f90964e110a154207bc87e",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/04.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "9be5d2fa24651732c7cd470a2848cd8c3511551cbd88fdeb4b3718f6e06b3f80",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/05.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "fa90abbc06362e283724ef51505595e9539f212424dc8f8c4c5d411e0d3bd3fb",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/06.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "14a828cadec61968585ad2d1d1d53da7bfd70855055a54442a300e12cab53bae",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/07.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "bcbe91bbb30b31d1c64e8f5d204949fd9d52355015161906768e1415aec53237",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/08.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "eeb6210fcbf1ec36e3847760bdeb5db282c2a4fa867404f075a9d1ab2cde3871",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/09.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "d73536bb5bcc9b355dbf9ba4b524187ab376b5244e128b7c4feed4029b23f326",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/10.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "41a8ae309f9a5f0b0706aba3f56189c4a39b4c628f2b35ee7424a71e6a4dd9e2",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/11.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "316e0a54d08243d59918444452e8442bfde71ee9e1e3d5af811de7c11f18e13c",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/12.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "c5ab67cdd1558aa4497b23de28b03547d5289fcc802ac4e70208a9de655494c8",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/13.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "2ece02f79d6bebd5b88f9671d9cae9b4879f0cf7b1c6b1749446c3053b9eed52",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/14.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "18bf8245ea19636853b98e0d879f54eb31ac153b34d49d39cd3a96f649871830",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/16.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "9889a152caac797fc486c67336c2a85e1662252aaf5846948d5635291f8c4df7",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/17.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "ddb91c54f6a6a48afb5bc18c2b3b4534f7fc1bee530c9c61b3e31153dc8a8943",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/18.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "b28e4ccb966ad7e04a28336e4ffe63b5b1fab0f6d0daca15ce60b050ad9bdca1",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/19.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "551dc48cb5c4a9a85e24da877682ed1da7edea041963a258236f32c585c199ad",
+      "line": 0,
+      "message": "file could not be scanned as UTF-8 text",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h/20.log",
+      "rule_id": "SCAN_COVERAGE"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 10,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_metadata.json",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 17,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 18,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    },
+    {
+      "fingerprint": "83619cf37861a923374e3ce5de63bc1b7a1d4b83d2a2846bdc8f262bf19ce377",
+      "line": 19,
+      "message": "sensitive key has a likely raw value",
+      "path": "evidence/tickets/OPT-010/final_acceptance_r2h_records.jsonl",
+      "rule_id": "CREDENTIAL_ASSIGNMENT"
+    }
+  ],
+  "status": "FAIL"
+}

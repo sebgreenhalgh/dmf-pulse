@@ -99,3 +99,23 @@ manifest command to immediately before coverage, and moves the existing teardown
 afterwards. No rules, fixture, production eligibility, implementation, test selection, or
 acceptance threshold changed. The R2G generated outputs are invalidated and must not be used as
 final PASS evidence; a new full ledger is required against the R2H governance commit.
+
+## R2H continuation resolution
+
+The replacement R2H ledger reached the repository-wide coverage gate after commands 1–19 had
+passed at implementation/governance revision `79102d41fc5d4e2c70d8251d643b705602573045`. An
+external runner limit interrupted that one command only. The continuation eligibility proof
+established the same revision and tree with no semantic delta, so commands 1–19 were reused
+rather than rerun.
+
+The unfinished repository-wide gate is now resolved with the authorized PATH B exact shard
+proof: 1,868 collected non-performance nodes, zero overlaps or omissions, every successful
+shard recorded, and a final 91.84% combined repository coverage result. The successful CLI,
+installed-wheel, specifications, repository-validation, secret-scan, Alembic, dependency-drift,
+migration-drift, and final-diff gates are recorded in the continuation ledger. The current
+target-season production gate remains correctly blocked with
+`MANAGER_TACTICS_CAPABILITY_UNAVAILABLE`.
+
+Status: `RESOLVED_FOR_INDEPENDENT_SOL_REREVIEW`. This records successful completion of the
+implementation acceptance evidence only; it is not self-acceptance, human acceptance, or a
+merge authorization.
