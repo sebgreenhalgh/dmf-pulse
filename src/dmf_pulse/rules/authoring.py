@@ -864,15 +864,19 @@ class CheckedClaims(AuthoringModel):
 class TargetClaimsFile(AuthoringModel):
     ruleset_id: StrictStr
     ruleset_version: StrictStr
-    status: Literal["DRAFT_PRELAUNCH", "CAPTURED_UNVERIFIED", "CONFLICTED"]
+    status: Literal["DRAFT_PRELAUNCH", "CAPTURED_UNVERIFIED", "CONFLICTED", "REFERENCE_ONLY"]
     production_eligible: Literal[False]
-    checked_claims: CheckedClaims
+    checked_claims: CheckedClaims | None
     unknown_blocking_families: Annotated[tuple[StrictStr, ...], Field(min_length=1)]
 
     @model_validator(mode="after")
     def blockers_are_unique(self) -> TargetClaimsFile:
         if len(self.unknown_blocking_families) != len(set(self.unknown_blocking_families)):
             raise ValueError("target blocking families must be unique")
+        if self.status == "REFERENCE_ONLY" and self.checked_claims is not None:
+            raise ValueError("REFERENCE_ONLY synthetic rules must not carry target-season claims")
+        if self.status != "REFERENCE_ONLY" and self.checked_claims is None:
+            raise ValueError("target-season rules require checked claims")
         return self
 
 
@@ -933,6 +937,8 @@ def _source_ids(source_manifest: SourceManifestFile) -> set[str]:
 
 def _target_source_refs(claims: TargetClaimsFile) -> set[str]:
     references: set[str] = set()
+    if claims.checked_claims is None:
+        return references
     for _, claim in claims.checked_claims:
         references.update(claim.source_refs)
     return references

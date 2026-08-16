@@ -8,10 +8,12 @@ production requires the separately verified FULL_SEASON capability.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import permutations
 from typing import Any
 
 from dmf_pulse.fpl_points.models import PlayerPosition, ProjectionMode
 from dmf_pulse.optimisation.models import OneGameweekRulesView
+from dmf_pulse.rules.capabilities import compile_capability_artifact
 from dmf_pulse.rules.errors import RulesValidationError
 from dmf_pulse.rules.models import (
     CapabilityArtifact,
@@ -73,21 +75,38 @@ def _bool(value: Any, path: str) -> bool:
     return value
 
 
+def _literal(value: Any, expected: str, path: str) -> str:
+    value = _plain(value, path)
+    if value != expected:
+        raise RulesValidationError(
+            "RULESET_VALUE_INVALID", f"required controlled value is invalid: {path}"
+        )
+    return expected
+
+
 def _capability_allows_production(
     compiled: CompiledRuleset, capability: CapabilityArtifact | None
 ) -> None:
-    if (  # pragma: no branch - every production capability failure is fail-closed
+    if (
         compiled.status is not RulesetStatus.ACTIVE
         or not compiled.production_eligible
         or capability is None
         or capability.capability is not RuleCapability.FULL_SEASON
-        or not capability.source_backed
-        or not capability.production_eligible
-        or capability.blockers
     ):
         raise RulesValidationError(
             "MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
             "FULL_SEASON manager-tactics capability is not production eligible",
+        )
+    expected = compile_capability_artifact(compiled, RuleCapability.FULL_SEASON)
+    if (
+        capability.model_dump(mode="json") != expected.model_dump(mode="json")
+        or not expected.source_backed
+        or not expected.production_eligible
+        or expected.blockers
+    ):
+        raise RulesValidationError(
+            "MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
+            "FULL_SEASON manager-tactics capability does not match the compiled ruleset",
         )
 
 
@@ -142,10 +161,30 @@ def build_one_gameweek_rules_view(
 
     starting_size = get_int("starting_size", lineup, "rules/lineup")
     bench_size = get_int("bench_size", lineup, "rules/lineup")
-    budget = _int(squad.get("budget_tenths"), "/rules/squad/budget_tenths")
-    clubs = _int(squad.get("max_players_per_club"), "/rules/squad/max_players_per_club")
+    budget = _int(squad.get("initial_budget_tenths"), "/rules/squad/initial_budget_tenths")
+    clubs = _int(squad.get("max_per_club"), "/rules/squad/max_per_club")
     multiplier = get_int("captain_multiplier", lineup, "rules/lineup")
-    vice = _bool(lineup.get("vice_captain_fallback"), "/rules/lineup/vice_captain_fallback")
+    vice = _bool(lineup.get("vice_fallback"), "/rules/lineup/vice_fallback")
+    timing = _literal(
+        auto.get("evaluation_scope"),
+        "AFTER_ALL_GAMEWEEK_FIXTURES",
+        "/rules/lineup/automatic_substitutions/evaluation_scope",
+    )
+    _literal(
+        auto.get("absent_definition"),
+        "ZERO_OFFICIAL_APPEARANCE_MINUTES",
+        "/rules/lineup/automatic_substitutions/absent_definition",
+    )
+    _literal(
+        auto.get("goalkeeper_replacement"),
+        "DESIGNATED_BENCH_GOALKEEPER_IF_APPEARED",
+        "/rules/lineup/automatic_substitutions/goalkeeper_replacement",
+    )
+    _literal(
+        auto.get("outfield_order"),
+        "MANAGER_BENCH_ORDER",
+        "/rules/lineup/automatic_substitutions/outfield_order",
+    )
     return OneGameweekRulesView(
         ruleset_id=compiled.ruleset_id,
         ruleset_version=compiled.ruleset_version,
@@ -161,21 +200,10 @@ def build_one_gameweek_rules_view(
         max_players_per_club=clubs,
         captain_multiplier=multiplier,
         vice_captain_fallback=vice,
-        auto_substitution_timing=str(
-            _plain(auto.get("timing"), "/rules/lineup/automatic_substitutions/timing")
-        ),
-        auto_substitution_zero_appearance_minutes=_int(
-            auto.get("zero_official_appearance_minutes"),
-            "/rules/lineup/automatic_substitutions/zero_official_appearance_minutes",
-        ),
-        designated_bench_goalkeeper_if_appeared=_bool(
-            auto.get("designated_bench_goalkeeper_if_appeared"),
-            "/rules/lineup/automatic_substitutions/designated_bench_goalkeeper_if_appeared",
-        ),
-        manager_bench_order=_bool(
-            auto.get("manager_bench_order"),
-            "/rules/lineup/automatic_substitutions/manager_bench_order",
-        ),
+        auto_substitution_timing=timing,
+        auto_substitution_zero_appearance_minutes=0,
+        designated_bench_goalkeeper_if_appeared=True,
+        manager_bench_order=True,
         maintain_legal_formation=_bool(
             auto.get("maintain_legal_formation"),
             "/rules/lineup/automatic_substitutions/maintain_legal_formation",
@@ -195,13 +223,19 @@ def resolve_outfield_substitutions(
     lineup_min: dict[PlayerPosition, int],
     lineup_max: dict[PlayerPosition, int],
 ) -> tuple[AutoSubstitutionResolution, ...]:
-    """Apply the frozen reference/test multiple-absence algorithm deterministically."""
+    """Apply the frozen reference/test bench-order semantics deterministically.
+
+    The accepted fixture needs the complete maximum-cardinality subset of appearing bench
+    players, with earlier bench slots preferred.  Audit pairs are then selected so each
+    sequential substitution leaves a legal formation; this avoids the historical bug that
+    paired an incoming forward with the lexically first absent defender merely for reporting.
+    """
 
     absent = tuple(player for player in starting_outfield if player not in appeared)
     eligible = tuple(player for player in bench_outfield if player in appeared)
     if not absent or not eligible:
         return ()
-    best: tuple[tuple[int, ...], tuple[str, ...], tuple[tuple[str, str], ...]] | None = None
+    best: tuple[tuple[int, ...], tuple[str, ...]] | None = None
     n = len(eligible)
     for mask in range(1 << n):
         selected = tuple(eligible[i] for i in range(n) if mask & (1 << i))
@@ -216,18 +250,37 @@ def resolve_outfield_substitutions(
         }
         if any(counts[p] < lineup_min[p] or counts[p] > lineup_max[p] for p in outfield_positions):
             continue
-        incoming = tuple(sorted(selected))
-        outgoing = tuple(sorted(absent[: len(selected)]))
         vector = tuple(1 if mask & (1 << i) else 0 for i in range(n))
-        candidate = (vector, incoming, tuple(zip(outgoing, selected, strict=True)))
-        if best is None or (len(selected), vector, tuple(-ord(c) for c in "".join(incoming))) > (
-            len(best[2]),
-            best[0],
-            tuple(-ord(c) for c in "".join(best[1])),
-        ):
+        candidate = (vector, selected)
+        if best is None or (len(selected), vector) > (len(best[1]), best[0]):
             best = candidate
     if best is None:
         return ()
+    selected = best[1]
+    pairings: list[tuple[str, ...]] = []
+    for outgoing in permutations(absent, len(selected)):
+        active = list(starting_outfield)
+        valid = True
+        for player_out, player_in in zip(outgoing, selected, strict=True):
+            if player_out not in active:
+                valid = False
+                break
+            active[active.index(player_out)] = player_in
+            counts = {
+                position: sum(positions[player] is position for player in active)
+                for position in (PlayerPosition.DEF, PlayerPosition.MID, PlayerPosition.FWD)
+            }
+            if any(
+                counts[position] < lineup_min[position] or counts[position] > lineup_max[position]
+                for position in counts
+            ):
+                valid = False
+                break
+        if valid:
+            pairings.append(outgoing)
+    if not pairings:
+        return ()
+    outgoing = min(pairings)
     return tuple(
         AutoSubstitutionResolution(
             player_out=out,
@@ -235,5 +288,5 @@ def resolve_outfield_substitutions(
             slot=bench_outfield.index(inc) + 1,
             position=positions[inc],
         )
-        for out, inc in best[2]
+        for out, inc in zip(outgoing, selected, strict=True)
     )

@@ -1,6 +1,8 @@
 {
   "stage": 10,
   "ticket": "OPT-010",
+  "authoritative_for_current_implementation": false,
+  "supersession_note": "Historical R1 Stage-10 summary; superseded pending R2 final acceptance evidence bound to the implementation freeze commit.",
   "objective": "bounded exact one-gameweek manager-tactics optimisation",
   "governance": "Gate 0 resolved and frozen",
   "tests": {
@@ -13,5 +15,5 @@
   "production_gate": "BLOCKED:MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
   "stage_acceptance": "NOT_SELF_ACCEPTED",
   "formatting_remediation": "PASS: two Ruff-normalized files only",
-  "status": "READY_FOR_INDEPENDENT_SOL_REVIEW"
+  "status": "SUPERSEDED_PENDING_R2_FINAL_ACCEPTANCE"
 }

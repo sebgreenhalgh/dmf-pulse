@@ -10,8 +10,13 @@ import typer
 from pydantic import BaseModel
 
 from dmf_pulse.fpl_points.artifacts import load_verified_model
+from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import GameweekProjectionResult
-from dmf_pulse.optimisation.artifacts import load_canonical_json, persist_result
+from dmf_pulse.optimisation.artifacts import (
+    load_canonical_json,
+    load_verified_artifact,
+    persist_result,
+)
 from dmf_pulse.optimisation.errors import OptimisationError
 from dmf_pulse.optimisation.models import (
     OneGameweekOptimisationRequest,
@@ -19,9 +24,10 @@ from dmf_pulse.optimisation.models import (
     OptimisationStatus,
 )
 from dmf_pulse.optimisation.service import optimise_one_gameweek
-from dmf_pulse.optimisation.validation import validate_plan_against_request
+from dmf_pulse.optimisation.validation import validate_result_against_request
 from dmf_pulse.rules.capabilities import load_capability_artifact
 from dmf_pulse.rules.compiler import load_compiled_ruleset
+from dmf_pulse.rules.errors import RulesError
 from dmf_pulse.rules.models import CapabilityArtifact
 
 optimise_app = typer.Typer(add_completion=False, no_args_is_help=True)
@@ -44,6 +50,21 @@ def _exit_for(status: OptimisationStatus) -> None:
     )
 
 
+def _integrity_failure(
+    exc: OptimisationError | FplPointsError | RulesError, *, validate: bool = False
+) -> None:
+    payload: dict[str, object] = {
+        "error_code": exc.code,
+        "error_message": exc.message,
+    }
+    if validate:
+        payload["legal"] = False
+    else:
+        payload["status"] = "BLOCKED"
+    typer.echo(json.dumps(payload, sort_keys=True))
+    raise typer.Exit(2)
+
+
 @optimise_app.command("one-gameweek")
 def one_gameweek(
     request: Annotated[Path, typer.Option("--request")],
@@ -63,15 +84,14 @@ def one_gameweek(
             load_capability_artifact(capability) if capability else None
         )
         result = optimise_one_gameweek(req, projection, compiled, capability=cap)
-        persist_result(result, artifact_root=artifact_root, gameweek_id=req.gameweek_id)
-    except OptimisationError as exc:
-        typer.echo(
-            json.dumps(
-                {"status": "BLOCKED", "error_code": exc.code, "error_message": exc.message},
-                sort_keys=True,
-            )
+        persist_result(
+            result,
+            artifact_root=artifact_root,
+            gameweek_id=req.gameweek_id,
+            request_id=req.request_id,
         )
-        raise typer.Exit(2) from None
+    except (OptimisationError, FplPointsError, RulesError) as exc:
+        _integrity_failure(exc)
     _emit(result)
     _exit_for(result.status)
 
@@ -94,21 +114,9 @@ def validate_plan(
         cap: CapabilityArtifact | None = (
             load_capability_artifact(capability) if capability else None
         )
-        result = load_canonical_json(artifact, OneGameweekOptimisationResult)
-        if result.recommended_plan is None:
-            raise OptimisationError(
-                "OPTIMISATION_ARTIFACT_INVALID", "artifact has no recommended plan"
-            )
-        report = validate_plan_against_request(
-            req, projection, compiled, result.recommended_plan, capability=cap
-        )
+        result = load_verified_artifact(artifact, OneGameweekOptimisationResult)
+        report = validate_result_against_request(req, projection, compiled, result, capability=cap)
         _emit(report)
         raise typer.Exit(0 if report.legal else 2)
-    except OptimisationError as exc:
-        typer.echo(
-            json.dumps(
-                {"legal": False, "error_code": exc.code, "error_message": exc.message},
-                sort_keys=True,
-            )
-        )
-        raise typer.Exit(2) from None
+    except (OptimisationError, FplPointsError, RulesError) as exc:
+        _integrity_failure(exc, validate=True)

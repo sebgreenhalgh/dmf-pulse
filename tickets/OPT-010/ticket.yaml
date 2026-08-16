@@ -123,6 +123,24 @@ gate0_rulings:
       TEST/REPLAY accepts only a complete integrity-checked REFERENCE_ONLY or test-synthetic
       compiled ruleset. Requests contain no rule constants. Golden semantics are frozen in
       this ticket and tickets/OPT-010/ACCEPTANCE.md and are never claimed as 2026/27 rules.
+    schema_v11_test_synthetic_exception:
+      authority: "APPROVED_ADDITIVE_R2E"
+      location: "fixtures/optimisation/one_gameweek/**"
+      contract: >-
+        OPT-010 may author and compile a schema-1.1 test-synthetic ruleset only for offline
+        TEST/REPLAY acceptance. It must use a clearly synthetic non-target identity, status
+        REFERENCE_ONLY and production_eligible=false, and must bind canonical source, semantic,
+        bundle and ruleset hashes to the frozen OPT-010 reference/test values and provenance.
+      constraints:
+        - "No target-season rule, verification or lifecycle state is inferred or promoted."
+        - "Production activation and the conservative FULL_SEASON gate are unchanged."
+        - "fixtures/rules/** and artifacts/rules/** remain forbidden."
+        - "Rules public models and capability schemas remain unchanged."
+        - "No Stage-9 extension or Stage-11+ implementation is authorized."
+        - >-
+          src/dmf_pulse/rules/authoring.py may change only to admit this non-production
+          REFERENCE_ONLY schema-1.1 authoring path while preserving target-season fail-closed
+          behavior.
   G0-4_search:
     decision: "EXACT_BOUNDED_EXHAUSTIVE_ONLY"
     full_universe_supported: false
@@ -374,6 +392,8 @@ allowed_files:
     - "review_pack/OPT-010/**"
   modify:
     - "PLANS.md"
+    - "tickets/OPT-010/ticket.yaml"
+    - "src/dmf_pulse/rules/authoring.py"
     - "src/dmf_pulse/cli/app.py"
     - "scripts/validate_repository.py"
   forbidden:

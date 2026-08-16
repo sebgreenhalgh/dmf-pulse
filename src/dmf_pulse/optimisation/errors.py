@@ -12,8 +12,9 @@ class OptimisationError(Exception):
 
 
 class ResourceLimitError(OptimisationError):
-    def __init__(self, message: str) -> None:
+    def __init__(self, message: str, *, solver_status: object | None = None) -> None:
         super().__init__("ONE_GAMEWEEK_RESOURCE_LIMIT", message, status="RESOURCE_LIMIT")
+        self.solver_status = solver_status
 
 
 class InfeasibleError(OptimisationError):

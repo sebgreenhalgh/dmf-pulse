@@ -93,10 +93,14 @@ def enumerate_squads(
         raise ResourceLimitError(f"conservative squad upper bound {upper} exceeds cap")
     snapshot = request.candidate_pool
     if request.search_scope is SearchScope.FIXED_SQUAD:
-        assert request.fixed_squad is not None
+        if request.fixed_squad is None:
+            raise InfeasibleError("FIXED_SQUAD requires one supplied fixed squad")
         _validate_squad(request.fixed_squad, snapshot, rules, request)
         return iter((request.fixed_squad,)), upper
     if request.search_scope is SearchScope.PROVIDED_SQUADS:
+        signatures = tuple(squad.player_ids for squad in request.provided_squads)
+        if len(signatures) != len(set(signatures)):
+            raise InfeasibleError("provided candidate squads must be unique")
         for squad in request.provided_squads:
             _validate_squad(squad, snapshot, rules, request)
         return iter(request.provided_squads), upper

@@ -2,6 +2,8 @@
   "ticket": "OPT-010",
   "branch": "stage/A10/OPT-010-one-gameweek-optimiser",
   "parent_revision": "a33f46cd7ec190fbd4959e2840527116f22547ac",
+  "authoritative_for_current_implementation": false,
+  "supersession_note": "This is the historical R1 ledger. It is explicitly superseded pending the one-time R2 final acceptance run and must not be used to accept the accumulated R2 implementation.",
   "acceptance_command_count": 31,
   "pass_count": 31,
   "environment_notes": [
@@ -10,7 +12,7 @@
     "The first post-coverage repository run detected stale generated-manifest byte bindings; the manifest was regenerated and the literal repository command was rerun successfully against the final bytes.",
     "R1 changed only Ruff formatting in src/dmf_pulse/optimisation/tactics.py and tests/unit/scripts/test_opt010_repository_validation.py; AST comparison against the implementation parent was equivalent."
   ],
-  "status": "PASS_WITH_EXPLICIT_TEST_ENVIRONMENT",
+  "status": "SUPERSEDED_PENDING_R2_FINAL_ACCEPTANCE",
   "final_worktree_checks": {
     "ruff_format": "PASS:419 files already formatted",
     "ruff_check": "PASS",

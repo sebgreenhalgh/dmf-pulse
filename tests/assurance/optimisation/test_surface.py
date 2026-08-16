@@ -1,8 +1,9 @@
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
 
-from dmf_pulse.fpl_points.artifacts import canonical_json_bytes
+from dmf_pulse.fpl_points.artifacts import canonical_json_bytes, semantic_sha256
 from dmf_pulse.fpl_points.models import PlayerPosition, ProjectionMode
 from dmf_pulse.optimisation.artifacts import load_canonical_json, persist_result
 from dmf_pulse.optimisation.autosub_evaluator import evaluate_scenario
@@ -30,12 +31,15 @@ from dmf_pulse.optimisation.models import (
 )
 from dmf_pulse.optimisation.policy import load_policy
 from dmf_pulse.optimisation.tactics import (
+    _quantile,
     enumerate_tactical_configurations,
     evaluate_tactical_configuration,
     tactical_configuration_upper_bound,
 )
 from dmf_pulse.optimisation.validation import validate_plan_against_request
+from dmf_pulse.rules.capabilities import load_capability_artifact
 from dmf_pulse.rules.errors import RulesValidationError
+from dmf_pulse.rules.models import RuleCapability, RulesetStatus
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 from tests.support.optimisation_factories import (
     players,
@@ -85,9 +89,10 @@ def test_candidate_preflight_bounded_and_resource_failures() -> None:
     rules = synthetic_ruleset()
     view = build_one_gameweek_rules_view(rules, projection_mode=ProjectionMode.TEST)
     priced = CandidatePoolSnapshot(
+        information_cutoff_utc="2026-08-16T00:00:00Z",
         candidates=tuple(
             player.model_copy(update={"initial_selection_cost_tenths": 1}) for player in players()
-        )
+        ),
     )
     bounded = request(scope=SearchScope.BOUNDED_PLAYER_POOL).model_copy(
         update={"candidate_pool": priced}
@@ -109,9 +114,10 @@ def test_candidate_preflight_bounded_and_resource_failures() -> None:
             request().model_copy(update={"required_player_ids": ("not-in-pool",)}), view, _policy()
         )
     expensive = CandidatePoolSnapshot(
+        information_cutoff_utc="2026-08-16T00:00:00Z",
         candidates=tuple(
             player.model_copy(update={"initial_selection_cost_tenths": 100}) for player in players()
-        )
+        ),
     )
     generated, _ = enumerate_squads(
         bounded.model_copy(update={"candidate_pool": expensive}), view, _policy()
@@ -224,6 +230,13 @@ def test_fail_closed_upstream_and_rules_errors() -> None:
             )
         }
     )
+    continued = continued.model_copy(
+        update={
+            "result_sha256": semantic_sha256(
+                {**continued.model_dump(mode="json"), "result_sha256": None}
+            )
+        }
+    )
     from dmf_pulse.optimisation.service import optimise_one_gameweek
 
     assert (
@@ -233,6 +246,13 @@ def test_fail_closed_upstream_and_rules_errors() -> None:
         update={
             "monte_carlo": base.monte_carlo.model_copy(
                 update={"stopping_result": "BLOCKED", "stopping_reasons": ("test",)}
+            )
+        }
+    )
+    blocked = blocked.model_copy(
+        update={
+            "result_sha256": semantic_sha256(
+                {**blocked.model_dump(mode="json"), "result_sha256": None}
             )
         }
     )
@@ -327,6 +347,90 @@ def test_legality_reports_each_structural_issue() -> None:
             CandidateSquad(player_ids=tuple(player_map)), capped_players, view
         ).issues
     )
+
+
+def test_legality_boundary_inputs_and_rule_capability_forgery(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rules = synthetic_ruleset()
+    view = build_one_gameweek_rules_view(rules, projection_mode=ProjectionMode.TEST)
+    player_map = {player.player_id: player for player in players()}
+    squad = CandidateSquad(player_ids=tuple(player_map))
+    stage9_report = validate_squad_legality(
+        squad,
+        player_map,
+        view,
+        stage9_player_ids=tuple(player_id for player_id in player_map if player_id != "p00"),
+    )
+    assert "STAGE9_PLAYER_UNIVERSE" in {issue.code for issue in stage9_report.issues}
+    boundary_report = validate_squad_legality(
+        squad,
+        player_map,
+        view,
+        required_player_ids=("required-but-missing",),
+        excluded_player_ids=("p00",),
+    )
+    assert {issue.code for issue in boundary_report.issues} >= {
+        "REQUIRED_PLAYER_MISSING",
+        "EXCLUDED_PLAYER_INCLUDED",
+    }
+    assert "BUDGET_INPUT_UNAVAILABLE" in {
+        issue.code
+        for issue in validate_squad_legality(squad, player_map, view, enforce_budget=True).issues
+    }
+    priced = {
+        player_id: player.model_copy(update={"initial_selection_cost_tenths": 1})
+        for player_id, player in player_map.items()
+    }
+    limited = view.model_copy(update={"initial_budget_tenths": 1})
+    assert "BUDGET_CAP" in {
+        issue.code
+        for issue in validate_squad_legality(squad, priced, limited, enforce_budget=True).issues
+    }
+    tactic = next(enumerate_tactical_configurations(squad, player_map, view, _policy())[0])
+    malformed = TacticalConfiguration.model_construct(
+        starting_xi=(*tactic.starting_xi[1:], tactic.starting_xi[1]),
+        bench_goalkeeper=tactic.bench_goalkeeper,
+        outfield_bench_order=("p00", "outside", tactic.outfield_bench_order[-1]),
+        captain=tactic.captain,
+        vice_captain=tactic.vice_captain,
+    )
+    tactic_report = validate_tactical_configuration(squad, malformed, player_map, view)
+    assert {issue.code for issue in tactic_report.issues} >= {
+        "TACTIC_DUPLICATE_PLAYER",
+        "BENCH_OUTSIDE_SQUAD",
+        "STARTING_GK",
+        "OUTFIELD_BENCH_GK",
+    }
+    active = rules.model_copy(update={"status": RulesetStatus.ACTIVE, "production_eligible": True})
+    supplied = load_capability_artifact(
+        Path("artifacts/rules/fpl-2026-27-0.1.0-prelaunch.1.player-points.json")
+    ).model_copy(update={"capability": RuleCapability.FULL_SEASON, "source_backed": False})
+    monkeypatch.setattr(
+        "dmf_pulse.rules.one_gameweek.compile_capability_artifact",
+        lambda *_args: supplied,
+    )
+    with pytest.raises(RulesValidationError, match="does not match"):
+        build_one_gameweek_rules_view(
+            active, projection_mode=ProjectionMode.PRODUCTION, capability=supplied
+        )
+    verified = supplied.model_copy(
+        update={
+            "source_backed": True,
+            "production_eligible": True,
+            "blockers": (),
+        }
+    )
+    monkeypatch.setattr(
+        "dmf_pulse.rules.one_gameweek.compile_capability_artifact",
+        lambda *_args: verified,
+    )
+    production_view = build_one_gameweek_rules_view(
+        active, projection_mode=ProjectionMode.PRODUCTION, capability=verified
+    )
+    assert production_view.capability == RuleCapability.FULL_SEASON.value
+    with pytest.raises(ValueError, match="point-mass probabilities"):
+        _quantile({}, Fraction(1, 2))
 
 
 def test_rules_scalar_resolution_errors() -> None:
@@ -505,9 +609,15 @@ def test_service_error_branches_are_fail_closed(monkeypatch: pytest.MonkeyPatch)
 def test_public_model_validators_reject_noncanonical_shapes() -> None:
     pool = request().candidate_pool
     with pytest.raises(ValueError):
-        CandidatePoolSnapshot(candidates=tuple(reversed(pool.candidates)))
+        CandidatePoolSnapshot(
+            information_cutoff_utc=pool.information_cutoff_utc,
+            candidates=tuple(reversed(pool.candidates)),
+        )
     with pytest.raises(ValueError):
-        CandidatePoolSnapshot(candidates=(pool.candidates[0], pool.candidates[0]))
+        CandidatePoolSnapshot(
+            information_cutoff_utc=pool.information_cutoff_utc,
+            candidates=(pool.candidates[0], pool.candidates[0]),
+        )
     with pytest.raises(ValueError):
         CandidateSquad(player_ids=("p01", "p00"))
     with pytest.raises(ValueError):

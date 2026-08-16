@@ -1,5 +1,7 @@
 {
   "ticket": "OPT-010",
+  "authoritative_for_current_implementation": false,
+  "supersession_note": "Historical R1 review summary; superseded pending R2 final acceptance evidence bound to the implementation freeze commit.",
   "implementation_self_acceptance": false,
   "independent_review_required": true,
   "human_acceptance_required": true,
@@ -10,5 +12,5 @@
   "critical_branch_coverage": "PASS",
   "formatting_remediation": "PASS: Ruff-only formatting in two files; no semantic change",
   "dependency_and_migration_drift": "PASS",
-  "status": "READY_FOR_INDEPENDENT_SOL_REVIEW"
+  "status": "SUPERSEDED_PENDING_R2_FINAL_ACCEPTANCE"
 }

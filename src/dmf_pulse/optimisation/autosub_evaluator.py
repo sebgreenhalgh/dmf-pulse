@@ -95,7 +95,8 @@ def evaluate_scenario(
         multiplier_player=multiplier_player,
         multiplier=rules.captain_multiplier if multiplier_player else 1,
     )
-    score = sum(scenario.player_points[player] for player in active)
+    counted = tuple(player for player in active if player in appeared)
+    score = sum(scenario.player_points[player] for player in counted)
     if multiplier_player is not None:
         score += (rules.captain_multiplier - 1) * scenario.player_points[multiplier_player]
     token = canonical_weight_token(scenario.weight)
@@ -107,7 +108,7 @@ def evaluate_scenario(
             weighted_numerator=weighted.numerator,
             weight_token=token,
             manager_points=score,
-            player_points={player: scenario.player_points[player] for player in sorted(active)},
+            player_points={player: scenario.player_points[player] for player in sorted(counted)},
             autosub_events=tuple(events),
             captain_resolution=captain_resolution,
         ),

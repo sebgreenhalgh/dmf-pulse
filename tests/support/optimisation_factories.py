@@ -22,7 +22,7 @@ from dmf_pulse.optimisation.models import (
     SearchScope,
 )
 from dmf_pulse.rules.compiler import load_compiled_ruleset
-from dmf_pulse.rules.models import CompiledRuleset, RulesetStatus
+from dmf_pulse.rules.models import CompiledRuleset
 
 POINT_COMPONENTS = (
     "appearance",
@@ -42,39 +42,8 @@ POINT_COMPONENTS = (
 
 
 def synthetic_ruleset() -> CompiledRuleset:
-    source = load_compiled_ruleset(
-        Path("artifacts/rules/fpl-2026-27-0.1.0-prelaunch.1.schema-v1.1.json")
-    )
-    rules = {
-        "positions": {
-            "positions": {
-                "GK": {"squad_quota": 2, "lineup_min": 1, "lineup_max": 1},
-                "DEF": {"squad_quota": 5, "lineup_min": 3, "lineup_max": 5},
-                "MID": {"squad_quota": 5, "lineup_min": 2, "lineup_max": 5},
-                "FWD": {"squad_quota": 3, "lineup_min": 1, "lineup_max": 3},
-            }
-        },
-        "squad": {"budget_tenths": 1000, "max_players_per_club": 3},
-        "lineup": {
-            "starting_size": 11,
-            "bench_size": 4,
-            "captain_multiplier": 2,
-            "vice_captain_fallback": True,
-            "automatic_substitutions": {
-                "timing": "AFTER_ALL_GAMEWEEK_FIXTURES",
-                "zero_official_appearance_minutes": 0,
-                "designated_bench_goalkeeper_if_appeared": True,
-                "manager_bench_order": True,
-                "maintain_legal_formation": True,
-            },
-        },
-    }
-    return source.model_copy(
-        update={
-            "status": RulesetStatus.REFERENCE_ONLY,
-            "production_eligible": False,
-            "rules": rules,
-        }
+    return load_compiled_ruleset(
+        Path("fixtures/optimisation/one_gameweek/reference_ruleset_test_only.json")
     )
 
 
@@ -100,6 +69,7 @@ def scenario_set(
     ruleset_hash: str,
     *,
     values: tuple[dict[str, int], ...] | None = None,
+    appeared_values: tuple[dict[str, bool], ...] | None = None,
     weights: tuple[float, ...] | None = None,
     gameweek_id: str = "GW1",
 ) -> GameweekScenarioSet:
@@ -108,7 +78,11 @@ def scenario_set(
     weights = weights or tuple(1.0 / len(values) for _ in values)
     scenarios: list[GameweekPointScenario] = []
     for index, point_map in enumerate(values):
-        appeared = {player: point_map.get(player, 0) != 0 for player in candidate_ids}
+        appeared_source = appeared_values[index] if appeared_values is not None else {}
+        appeared = {
+            player: appeared_source.get(player, point_map.get(player, 0) != 0)
+            for player in candidate_ids
+        }
         points = {player: point_map.get(player, 0) for player in candidate_ids}
         components = {
             player: {
@@ -153,9 +127,16 @@ def scenario_set(
 
 def projection(ruleset_hash: str, **kwargs: object):
     scenario_values = kwargs.pop("values", None)
+    scenario_appearances = kwargs.pop("appeared_values", None)
+    scenario_weights = kwargs.pop("weights", None)
     return build_gameweek_projection(
         scenario_set(
-            ruleset_hash, values=scenario_values if isinstance(scenario_values, tuple) else None
+            ruleset_hash,
+            values=scenario_values if isinstance(scenario_values, tuple) else None,
+            appeared_values=(
+                scenario_appearances if isinstance(scenario_appearances, tuple) else None
+            ),
+            weights=scenario_weights if isinstance(scenario_weights, tuple) else None,
         ),
         MonteCarloPolicy(
             minimum_effective_scenarios=1,
@@ -175,12 +156,15 @@ def request(
     scope: SearchScope = SearchScope.FIXED_SQUAD,
 ) -> OneGameweekOptimisationRequest:
     pool = CandidatePoolSnapshot(
-        candidates=tuple(sorted(players(), key=lambda item: item.player_id))
+        information_cutoff_utc="2026-08-16T00:00:00Z",
+        candidates=tuple(sorted(players(), key=lambda item: item.player_id)),
     )
     squad = CandidateSquad(player_ids=tuple(player.player_id for player in players()))
     return OneGameweekOptimisationRequest(
+        request_id="request-1",
         gameweek_id="GW1",
         projection_mode=projection_mode,
+        information_cutoff_utc="2026-08-16T00:00:00Z",
         search_scope=scope,
         candidate_pool=pool,
         fixed_squad=squad if scope is SearchScope.FIXED_SQUAD else None,

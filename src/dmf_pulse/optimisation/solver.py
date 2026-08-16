@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from decimal import Decimal
 from fractions import Fraction
 
 from dmf_pulse.fpl_points.models import GameweekPointScenario
@@ -41,10 +42,9 @@ def solve(
     if request.search_scope.value != "BOUNDED_PLAYER_POOL":
         candidates = list(squads)
         squads = iter(candidates)
-        for squad in candidates:
-            tactical_upper = max(
-                tactical_upper, tactical_configuration_upper_bound(squad, players, rules)
-            )
+        tactical_upper = sum(
+            tactical_configuration_upper_bound(squad, players, rules) for squad in candidates
+        )
     else:
         # Shape-only preflight uses one complete legal squad shape, independent of player IDs.
         grouped = {
@@ -66,11 +66,24 @@ def solve(
         from dmf_pulse.optimisation.models import CandidateSquad
 
         representative = CandidateSquad(player_ids=representative_ids)
-        tactical_upper = tactical_configuration_upper_bound(representative, players, rules)
-    operation_upper = squad_upper * tactical_upper * len(scenarios)
+        tactical_upper = squad_upper * tactical_configuration_upper_bound(
+            representative, players, rules
+        )
+    operation_upper = tactical_upper * len(scenarios)
+    preflight = SolverStatus(
+        conservative_squad_upper_bound=squad_upper,
+        conservative_tactical_upper_bound=tactical_upper,
+        conservative_operation_upper_bound=operation_upper,
+    )
+    if tactical_upper > policy.max_tactical_configurations:
+        raise ResourceLimitError(
+            f"conservative tactical upper bound {tactical_upper} exceeds cap",
+            solver_status=preflight,
+        )
     if operation_upper > policy.max_scenario_score_operations:
         raise ResourceLimitError(
-            f"conservative scenario operation upper bound {operation_upper} exceeds cap"
+            f"conservative scenario operation upper bound {operation_upper} exceeds cap",
+            solver_status=preflight,
         )
     best: Fraction | None = None
     ties: list[OneGameweekPlan] = []
@@ -95,6 +108,10 @@ def solve(
                 total_ties += 1
                 if len(ties) < policy.max_returned_ties:
                     ties.append(plan)
+                else:
+                    largest = max(range(len(ties)), key=lambda index: ties[index].signature)
+                    if plan.signature < ties[largest].signature:
+                        ties[largest] = plan
     if best is None:
         raise InfeasibleError("declared search scope contains no legal plan")
     ties.sort(key=lambda plan: plan.signature)
@@ -102,6 +119,7 @@ def solve(
         plans=tuple(ties[: policy.max_returned_ties]),
         objective=best,
         status=SolverStatus(
+            termination="OPTIMAL",
             squads_examined=squads_examined,
             tactical_configurations_examined=tactics_examined,
             scenario_score_operations=operations,
@@ -109,5 +127,11 @@ def solve(
             conservative_tactical_upper_bound=tactical_upper,
             conservative_operation_upper_bound=operation_upper,
             total_optimal_ties=total_ties,
+            returned_ties=len(ties[: policy.max_returned_ties]),
+            ties_truncated=total_ties > policy.max_returned_ties,
+            objective_value=ties[0].expected_manager_points,
+            best_bound=ties[0].expected_manager_points,
+            absolute_gap=Decimal(0),
+            relative_gap=Decimal(0),
         ),
     )

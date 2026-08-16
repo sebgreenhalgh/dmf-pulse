@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from decimal import Decimal
+from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from fractions import Fraction
 from itertools import combinations, permutations, product
 from math import factorial
@@ -23,6 +23,17 @@ from dmf_pulse.optimisation.models import (
     ScenarioManagerScore,
     TacticalConfiguration,
 )
+
+CANONICAL_DECIMAL_CONTEXT = Context(prec=50, rounding=ROUND_HALF_EVEN)
+
+
+def _quantile(masses: dict[int, Fraction], probability: Fraction) -> int:
+    accumulated = Fraction(0)
+    for points, mass in sorted(masses.items()):
+        accumulated += mass
+        if accumulated >= probability:
+            return points
+    raise ValueError("point-mass probabilities must be positive")
 
 
 def _players_by_position(
@@ -148,17 +159,94 @@ def evaluate_tactical_configuration(
         masses_by_points[score.manager_points] = masses_by_points.get(
             score.manager_points, Fraction(0)
         ) + Fraction(Decimal(score.weight_token))
-    masses = tuple(
-        PointMass(points=points, probability=Decimal(prob.numerator) / Decimal(prob.denominator))
-        for points, prob in sorted(masses_by_points.items())
+    total_weight = sum(masses_by_points.values(), Fraction(0))
+    if total_weight <= 0:
+        raise ValueError("scenario weights must sum to a positive value")
+    normalized_masses = {
+        points: probability / total_weight for points, probability in masses_by_points.items()
+    }
+    fallback = (
+        sum(
+            Fraction(Decimal(score.weight_token))
+            for score in scores
+            if score.captain_resolution.multiplier_player == tactic.vice_captain
+        )
+        / total_weight
     )
-    expected = Decimal(total.numerator) / Decimal(total.denominator)
-    distribution = PointDistributionSummary(
-        expected_points=expected,
-        minimum_points=min(masses_by_points),
-        maximum_points=max(masses_by_points),
-        masses=masses,
+    captain_and_vice_failure = (
+        sum(
+            Fraction(Decimal(score.weight_token))
+            for score in scores
+            if score.captain_resolution.multiplier_player is None
+        )
+        / total_weight
     )
+    field_11 = (
+        sum(
+            Fraction(Decimal(score.weight_token))
+            for score in scores
+            if len(score.player_points) == rules.starting_size
+        )
+        / total_weight
+    )
+    expected_bench = (
+        sum(
+            Fraction(Decimal(score.weight_token))
+            * sum(
+                scenario.player_points[event.player_in]
+                for event in score.autosub_events
+                for scenario in scenarios
+                if scenario.scenario_id == score.scenario_id
+            )
+            for score in scores
+        )
+        / total_weight
+    )
+    expectation = total / total_weight
+    manager_values = tuple(score.manager_points for score in scores)
+    manager_weights = tuple(
+        Fraction(Decimal(score.weight_token)) / total_weight for score in scores
+    )
+    variance = sum(
+        weight * (value - expectation) ** 2
+        for value, weight in zip(manager_values, manager_weights, strict=True)
+    )
+    with localcontext(CANONICAL_DECIMAL_CONTEXT):
+        masses = tuple(
+            PointMass(
+                points=points,
+                probability=Decimal(prob.numerator) / Decimal(prob.denominator),
+            )
+            for points, prob in sorted(normalized_masses.items())
+        )
+        expected = Decimal(expectation.numerator) / Decimal(expectation.denominator)
+        distribution = PointDistributionSummary(
+            expected_points=expected,
+            minimum_points=min(normalized_masses),
+            maximum_points=max(normalized_masses),
+            masses=masses,
+            p10=_quantile(normalized_masses, Fraction(1, 10)),
+            median=_quantile(normalized_masses, Fraction(1, 2)),
+            p90=_quantile(normalized_masses, Fraction(9, 10)),
+            probability_field_11=Decimal(field_11.numerator) / Decimal(field_11.denominator),
+            probability_field_10_or_fewer=Decimal(1)
+            - Decimal(field_11.numerator) / Decimal(field_11.denominator),
+            captain_fallback_probability=Decimal(fallback.numerator)
+            / Decimal(fallback.denominator),
+            captain_and_vice_failure_probability=(
+                Decimal(captain_and_vice_failure.numerator)
+                / Decimal(captain_and_vice_failure.denominator)
+            ),
+            expected_bench_contribution=(
+                Decimal(expected_bench.numerator) / Decimal(expected_bench.denominator)
+            ),
+            component_means={"manager_points": expected},
+            component_covariance={
+                "manager_points": {
+                    "manager_points": Decimal(variance.numerator) / Decimal(variance.denominator)
+                }
+            },
+        )
     signature = "|".join(
         (
             ",".join(sorted(squad.player_ids)),

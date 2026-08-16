@@ -21,6 +21,20 @@
 - [ ] Implement preflight-bounded search, oracle, service, hashes, artifacts and offline CLI.
 - [ ] Run every literal acceptance gate and prepare capped independent-review evidence.
 
+### OPT-010 R2 independent-review remediation
+
+- Starting remediation head: `3f1550e3838e6f44c31990dcf83b2bc6ed7dc6fd`; immutable base remains
+  `a33f46cd7ec190fbd4959e2840527116f22547ac`.
+- [ ] R2A: bind the frozen public contract, accepted Stage-9 scenario lineage, and derived
+  production capability/cutoff gates without changing Stage-9 or capability schemas.
+- [ ] R2B: correct exact exhaustive search/tie/cap arithmetic, rules-owned autosub audit
+  semantics, independent legality and Decimal-context determinism.
+- [ ] R2C: harden immutable artifacts and make both offline CLI commands substantively verify
+  hashes, lineage and legality.
+- [ ] R2D: strengthen the independent oracle/adversarial proof, installed-wheel acceptance and
+  final-head evidence; then run every frozen acceptance command.
+- [ ] Obtain a fresh read-only Sol review. No self-acceptance, merge or PR-ready action.
+
 ## PTS-009 - bounded FPL-points simulation clean-checkout integration
 
 - Ticket/stage: `PTS-009`, A9; required parent

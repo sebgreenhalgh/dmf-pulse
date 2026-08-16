@@ -46,7 +46,10 @@ class CandidatePlayer(OptimisationModel):
 
 
 class CandidatePoolSnapshot(OptimisationModel):
+    schema_version: Literal["one-gameweek-candidate-pool-v1"] = "one-gameweek-candidate-pool-v1"
+    information_cutoff_utc: StrictStr = Field(min_length=1)
     candidates: tuple[CandidatePlayer, ...] = Field(min_length=1)
+    source_bundle_ids: tuple[StrictStr, ...] = ()
     candidate_snapshot_sha256: Sha256 | None = None
 
     @model_validator(mode="after")
@@ -77,9 +80,10 @@ class OneGameweekOptimisationRequest(OptimisationModel):
     schema_version: Literal["one-gameweek-optimisation-request-v1"] = (
         "one-gameweek-optimisation-request-v1"
     )
+    request_id: StrictStr = Field(min_length=1, max_length=100)
     gameweek_id: StrictStr = Field(min_length=1, max_length=100)
     projection_mode: ProjectionMode
-    information_cutoff_utc: StrictStr | None = None
+    information_cutoff_utc: StrictStr = Field(min_length=1)
     search_scope: SearchScope
     candidate_pool: CandidatePoolSnapshot
     fixed_squad: CandidateSquad | None = None
@@ -98,6 +102,9 @@ class OneGameweekOptimisationRequest(OptimisationModel):
             raise ValueError("PROVIDED_SQUADS requires provided_squads")
         if self.search_scope is not SearchScope.PROVIDED_SQUADS and self.provided_squads:
             raise ValueError("provided_squads is only valid for PROVIDED_SQUADS")
+        provided_signatures = tuple(squad.player_ids for squad in self.provided_squads)
+        if len(provided_signatures) != len(set(provided_signatures)):
+            raise ValueError("provided squads must be unique")
         if len(set(self.required_player_ids)) != len(self.required_player_ids):
             raise ValueError("required players must be unique")
         if len(set(self.excluded_player_ids)) != len(self.excluded_player_ids):
@@ -193,6 +200,16 @@ class PointDistributionSummary(OptimisationModel):
     minimum_points: StrictInt
     maximum_points: StrictInt
     masses: tuple[PointMass, ...]
+    p10: StrictInt
+    median: StrictInt
+    p90: StrictInt
+    probability_field_11: Decimal = Field(ge=Decimal("0"), le=Decimal("1"))
+    probability_field_10_or_fewer: Decimal = Field(ge=Decimal("0"), le=Decimal("1"))
+    captain_fallback_probability: Decimal = Field(ge=Decimal("0"), le=Decimal("1"))
+    captain_and_vice_failure_probability: Decimal = Field(ge=Decimal("0"), le=Decimal("1"))
+    expected_bench_contribution: Decimal
+    component_means: dict[StrictStr, Decimal]
+    component_covariance: dict[StrictStr, dict[StrictStr, Decimal]]
 
 
 class LegalityIssue(OptimisationModel):
@@ -207,6 +224,8 @@ class LegalityReport(OptimisationModel):
 
 
 class SolverStatus(OptimisationModel):
+    backend: Literal["DETERMINISTIC_EXHAUSTIVE_ENUMERATOR"] = "DETERMINISTIC_EXHAUSTIVE_ENUMERATOR"
+    termination: Literal["OPTIMAL", "INFEASIBLE", "RESOURCE_LIMIT", "BLOCKED"] = "BLOCKED"
     squads_examined: NonNegativeInt = 0
     tactical_configurations_examined: NonNegativeInt = 0
     scenario_score_operations: NonNegativeInt = 0
@@ -214,15 +233,24 @@ class SolverStatus(OptimisationModel):
     conservative_tactical_upper_bound: NonNegativeInt = 0
     conservative_operation_upper_bound: NonNegativeInt = 0
     total_optimal_ties: NonNegativeInt = 0
+    returned_ties: NonNegativeInt = 0
+    ties_truncated: StrictBool = False
+    objective_value: Decimal | None = None
+    best_bound: Decimal | None = None
+    absolute_gap: Decimal | None = None
+    relative_gap: Decimal | None = None
 
 
 class OptimisationLineage(OptimisationModel):
     request_sha256: Sha256
     candidate_snapshot_sha256: Sha256
     gameweek_artifact_sha256: Sha256
+    stage9_scenario_set_sha256: Sha256 | None = None
+    stage9_joint_matrix_sha256: Sha256 | None = None
     ruleset_hash: Sha256
     capability_hash: Sha256 | None
     input_sha256: Sha256
+    policy_sha256: Sha256 | None = None
     plan_sha256: Sha256 | None
     result_sha256: Sha256 | None
 
@@ -251,12 +279,19 @@ class OneGameweekOptimisationResult(OptimisationModel):
         "one-gameweek-optimisation-result-v1"
     )
     status: OptimisationStatus
+    request_id: StrictStr
+    gameweek_id: StrictStr
+    objective: Literal["EXPECTED_CURRENT_GAMEWEEK_MANAGER_POINTS"] = (
+        "EXPECTED_CURRENT_GAMEWEEK_MANAGER_POINTS"
+    )
     search_scope: SearchScope
     optimality_guarantee: OptimalityGuarantee
     recommended_plan: OneGameweekPlan | None = None
     tied_plans: tuple[OneGameweekPlan, ...] = ()
     solver_status: SolverStatus
     lineage: OptimisationLineage
+    upstream_mc_status: Literal["PASS", "CONTINUE", "BLOCKED"]
+    upstream_warnings: tuple[StrictStr, ...] = ()
     explanations: tuple[ExplanationItem, ...] = ()
     error_code: StrictStr | None = None
     error_message: StrictStr | None = None
