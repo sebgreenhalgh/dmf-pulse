@@ -61,3 +61,12 @@ coverage of 100% artifacts, 100% autosub evaluator, 96.55% legality, 95% tactics
 rules/one_gameweek. The coverage checker passed with the unchanged 90% aggregate and 95%
 critical thresholds. This is a pre-freeze gate only, not final acceptance; one fresh full ledger
 remains required after the R2F implementation commit.
+
+## R2G portable acceptance invocation authorization
+
+Windows Application Control blocked the generated `mypy` console launcher with os error 4551,
+although the same locked module executed through `uv run python -m mypy`. The repository owner
+authorized only the canonical `uv run python -m mypy` and `uv run python -m pytest` invocation
+forms in the ticket; no test selection, option, threshold, environment requirement, or semantic
+behavior changed. No full acceptance was run after the R2F literal-entry-point blocker. A fresh
+31-command ledger is required against the new R2G governance commit.

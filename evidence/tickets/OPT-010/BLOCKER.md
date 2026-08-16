@@ -77,3 +77,13 @@ production rejection, current-target blocking, source-tree one-gameweek and `val
 and offline installed-wheel isolation. The governance blocker is therefore resolved for the
 targeted pass. The comprehensive 31-command ledger, repository test/coverage run, final
 evidence refresh, and independent Sol review remain intentionally deferred.
+
+## R2G platform-portable acceptance invocation resolution
+
+The R2F preflight established that Windows Application Control blocks the generated `mypy`
+console launcher with os error 4551, while `uv run python -m mypy` executes the locked module.
+The repository owner authorized a narrow ticket amendment that makes only the listed
+`python -m mypy` and `python -m pytest` forms canonical OPT-010 acceptance commands. It changes
+command launch form only: all selected targets, arguments, thresholds, policy, and production
+semantics remain frozen. No full acceptance was run after this environment blocker; a fresh
+ledger is required against the R2G governance commit.

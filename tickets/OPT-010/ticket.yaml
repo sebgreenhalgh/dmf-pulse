@@ -459,6 +459,14 @@ coverage_thresholds:
     - "src/dmf_pulse/optimisation/artifacts.py"
   broad_coverage_pragmas: false
 
+acceptance_invocation_policy:
+  python_module_portability: >-
+    The canonical OPT-010 mypy and pytest acceptance commands use the exact `uv run python -m`
+    forms listed below. They execute the same locked modules under the uv run environment; they
+    are not fallback aliases. No semantic-equivalence substitution beyond these exact forms is
+    permitted. Evidence records the amended literals. This is a platform-portability change only
+    and does not alter acceptance meaning.
+
 acceptance_commands:
   - "git diff --check"
   - "uv sync --all-groups --frozen"
@@ -466,20 +474,20 @@ acceptance_commands:
   - "uv run python scripts/assurance/check_opt010_resources.py"
   - "uv run ruff format --check ."
   - "uv run ruff check ."
-  - "uv run mypy src/dmf_pulse"
-  - "uv run pytest -q tests/unit/rules/test_one_gameweek.py tests/golden/rules/test_one_gameweek.py"
-  - "uv run pytest -q tests/unit/optimisation tests/contract/optimisation"
-  - "uv run pytest -q tests/property/optimisation tests/golden/optimisation tests/integration/optimisation tests/assurance/optimisation --cov=dmf_pulse.optimisation --cov=dmf_pulse.rules.one_gameweek --cov-branch --cov-report=term-missing --cov-report=json:evidence/stages/10/coverage.json"
+  - "uv run python -m mypy src/dmf_pulse"
+  - "uv run python -m pytest -q tests/unit/rules/test_one_gameweek.py tests/golden/rules/test_one_gameweek.py"
+  - "uv run python -m pytest -q tests/unit/optimisation tests/contract/optimisation"
+  - "uv run python -m pytest -q tests/property/optimisation tests/golden/optimisation tests/integration/optimisation tests/assurance/optimisation --cov=dmf_pulse.optimisation --cov=dmf_pulse.rules.one_gameweek --cov-branch --cov-report=term-missing --cov-report=json:evidence/stages/10/coverage.json"
   - "uv run python scripts/assurance/check_opt010_coverage.py evidence/stages/10/coverage.json"
-  - "uv run pytest -q tests/performance/optimisation"
-  - "uv run pytest -q tests/unit/rules tests/property/rules tests/golden/rules"
-  - "uv run pytest -q tests/unit/fpl_points tests/property/fpl_points tests/contract/fpl_points tests/golden/fpl_points tests/integration/fpl_points tests/assurance/fpl_points"
+  - "uv run python -m pytest -q tests/performance/optimisation"
+  - "uv run python -m pytest -q tests/unit/rules tests/property/rules tests/golden/rules"
+  - "uv run python -m pytest -q tests/unit/fpl_points tests/property/fpl_points tests/contract/fpl_points tests/golden/fpl_points tests/integration/fpl_points tests/assurance/fpl_points"
   - "docker compose -f compose.test.yaml config --quiet"
   - "docker compose -f compose.test.yaml up -d --wait"
   - "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head"
-  - "uv run pytest -q -m \"postgres and integration\" tests/integration"
+  - "uv run python -m pytest -q -m \"postgres and integration\" tests/integration"
   - "docker compose -f compose.test.yaml down -v --remove-orphans"
-  - "uv run pytest -q --ignore=tests/performance --cov=dmf_pulse --cov-branch --cov-report=json:evidence/stages/10/repository_coverage.json"
+  - "uv run python -m pytest -q --ignore=tests/performance --cov=dmf_pulse --cov-branch --cov-report=json:evidence/stages/10/repository_coverage.json"
   - "uv run python scripts/assurance/run_opt010_cli_acceptance.py --fixture-root fixtures/optimisation/one_gameweek"
   - "uv build"
   - "uv run python scripts/verify_opt010_wheel.py"
