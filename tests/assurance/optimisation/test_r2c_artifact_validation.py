@@ -13,7 +13,7 @@ from dmf_pulse.fpl_points.models import GameweekProjectionResult
 from dmf_pulse.optimisation.artifacts import load_verified_artifact, persist_result
 from dmf_pulse.optimisation.errors import OptimisationError
 from dmf_pulse.optimisation.models import (
-    CandidateSquad,
+    CandidatePoolSnapshot,
     OneGameweekOptimisationRequest,
     OneGameweekOptimisationResult,
 )
@@ -25,8 +25,6 @@ from tests.support.optimisation_factories import projection, request, synthetic_
 def _rehash[ArtifactModel: BaseModel](value: ArtifactModel, field: str) -> ArtifactModel:
     payload = value.model_dump(mode="json")
     payload[field] = None
-    if field == "result_sha256" and isinstance(payload.get("lineage"), dict):
-        payload["lineage"]["result_sha256"] = None
     return value.model_copy(update={field: semantic_sha256(payload)})
 
 
@@ -78,28 +76,18 @@ def test_validate_result_recomputes_plan_evaluation_and_lineage(tmp_path: Path) 
     )
     altered_plan = _rehash(
         result.recommended_plan.model_copy(
-            update={"distribution": altered_distribution, "plan_sha256": None}
+            update={"point_distribution": altered_distribution, "plan_sha256": "0" * 64}
         ),
         "plan_sha256",
     )
     altered_result = result.model_copy(
         update={
             "recommended_plan": altered_plan,
-            "tied_plans": (altered_plan,),
-            "lineage": result.lineage.model_copy(
-                update={"plan_sha256": altered_plan.plan_sha256, "result_sha256": None}
-            ),
-            "result_sha256": None,
+            "tied_optimal_plans": (altered_plan,),
+            "result_sha256": "0" * 64,
         }
     )
     altered_result = _rehash(altered_result, "result_sha256")
-    altered_result = altered_result.model_copy(
-        update={
-            "lineage": altered_result.lineage.model_copy(
-                update={"result_sha256": altered_result.result_sha256}
-            )
-        }
-    )
     artifact = persist_result(
         altered_result,
         artifact_root=tmp_path,
@@ -109,7 +97,10 @@ def test_validate_result_recomputes_plan_evaluation_and_lineage(tmp_path: Path) 
     loaded = load_verified_artifact(artifact, OneGameweekOptimisationResult)
     report = validate_result_against_request(req, stage9, rules, loaded)
     assert not report.legal
-    assert {issue.code for issue in report.issues} == {"PLAN_EVALUATION_MISMATCH"}
+    assert {issue.code for issue in report.issues} == {
+        "PLAN_EVALUATION_MISMATCH",
+        "RESULT_RECOMPUTATION_MISMATCH",
+    }
 
 
 def test_result_artifact_path_is_confined_and_immutable(tmp_path: Path) -> None:
@@ -150,21 +141,26 @@ def test_artifact_helpers_fail_closed_for_hashless_and_concurrent_paths(
         request_id="r",
     )
     hashless = tmp_path / "hashless.json"
-    hashless.write_bytes(canonical_json_bytes(CandidateSquad(player_ids=("p00",))))
+    hashless_pool = request().candidate_pool.model_copy(update={"snapshot_sha256": None})
+    hashless.write_bytes(canonical_json_bytes(hashless_pool))
     hashless.with_suffix(".sha256").write_bytes(
         f"{sha256_bytes(hashless.read_bytes())}  {hashless.name}\n".encode("ascii")
     )
-    with pytest.raises(OptimisationError, match="missing required squad_sha256"):
-        load_verified_artifact(hashless, CandidateSquad)
-    signed_squad = _rehash(
-        CandidateSquad(player_ids=("p00",)).model_copy(update={"squad_sha256": None}),
-        "squad_sha256",
-    )
-    persist_result(signed_squad, artifact_root=tmp_path, gameweek_id="GW", request_id="signed")
+    with pytest.raises(OptimisationError, match="invalid artifact"):
+        load_verified_artifact(hashless, CandidatePoolSnapshot)
 
     monkeypatch.setattr(artifacts.Path, "is_symlink", lambda _path: True)
     with pytest.raises(OptimisationError, match="root cannot itself be a symbolic link"):
         artifacts._contained_directory(tmp_path, gameweek_id="GW", request_id="r")
+    monkeypatch.undo()
+
+    monkeypatch.setattr(
+        artifacts.Path,
+        "is_symlink",
+        lambda path: path.name == "leaf.json",
+    )
+    with pytest.raises(OptimisationError, match="destination cannot be a symbolic link"):
+        artifacts._write_once(tmp_path / "leaf.json", b"bytes", root=tmp_path)
     monkeypatch.undo()
 
     monkeypatch.setattr(artifacts.Path, "resolve", lambda _path: (_ for _ in ()).throw(OSError()))

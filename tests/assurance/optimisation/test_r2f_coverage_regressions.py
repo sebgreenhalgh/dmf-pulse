@@ -6,19 +6,17 @@ from copy import deepcopy
 
 import pytest
 
-from dmf_pulse.fpl_points.models import ProjectionMode
+from dmf_pulse.fpl_points.models import PlayerPosition, ProjectionMode
 from dmf_pulse.optimisation.candidate_pool import enumerate_squads
 from dmf_pulse.optimisation.errors import InfeasibleError
 from dmf_pulse.optimisation.models import (
-    CandidatePoolSnapshot,
-    CandidateSquad,
     OneGameweekOptimisationRequest,
     OneGameweekOptimiserPolicy,
     SearchScope,
 )
 from dmf_pulse.rules.errors import RulesValidationError
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
-from tests.support.optimisation_factories import players, request, synthetic_ruleset
+from tests.support.optimisation_factories import candidate_pool, players, request, synthetic_ruleset
 
 
 def _policy() -> OneGameweekOptimiserPolicy:
@@ -40,10 +38,19 @@ def test_candidate_preflight_rejects_an_illegal_position_quota() -> None:
     base = request()
     view = build_one_gameweek_rules_view(synthetic_ruleset(), projection_mode=ProjectionMode.TEST)
     assert base.fixed_squad is not None
-    squad = CandidateSquad.model_construct(player_ids=("p02", *base.fixed_squad.player_ids[1:]))
+    wrong_position_pool = candidate_pool(
+        tuple(
+            player.model_copy(update={"position": PlayerPosition.DEF})
+            if player.player_id == "p00"
+            else player
+            for player in players()
+        )
+    )
 
     with pytest.raises(InfeasibleError, match="position quotas"):
-        enumerate_squads(base.model_copy(update={"fixed_squad": squad}), view, _policy())
+        enumerate_squads(
+            base.model_copy(update={"candidate_pool": wrong_position_pool}), view, _policy()
+        )
 
 
 def test_candidate_preflight_accepts_a_rules_view_without_a_club_cap() -> None:
@@ -60,9 +67,8 @@ def test_candidate_preflight_accepts_a_rules_view_without_a_club_cap() -> None:
 def test_candidate_preflight_rejects_a_compiled_club_cap_breach() -> None:
     base = request()
     view = build_one_gameweek_rules_view(synthetic_ruleset(), projection_mode=ProjectionMode.TEST)
-    same_club_pool = CandidatePoolSnapshot(
-        information_cutoff_utc=base.candidate_pool.information_cutoff_utc,
-        candidates=tuple(player.model_copy(update={"club_id": "one-club"}) for player in players()),
+    same_club_pool = candidate_pool(
+        tuple(player.model_copy(update={"club_id": "one-club"}) for player in players())
     )
 
     with pytest.raises(InfeasibleError, match="club cap"):
@@ -72,7 +78,13 @@ def test_candidate_preflight_rejects_a_compiled_club_cap_breach() -> None:
 
 
 def test_bounded_pool_requires_complete_selection_costs() -> None:
-    bounded = request(scope=SearchScope.BOUNDED_PLAYER_POOL)
+    valid = request(scope=SearchScope.BOUNDED_PLAYER_POOL)
+    unpriced_pool = request().candidate_pool
+    payload = valid.model_dump(mode="python")
+    payload["candidate_pool"] = unpriced_pool
+    with pytest.raises(ValueError, match="requires every candidate cost"):
+        OneGameweekOptimisationRequest.model_validate(payload)
+    bounded = valid.model_construct(**{**valid.__dict__, "candidate_pool": unpriced_pool})
     view = build_one_gameweek_rules_view(synthetic_ruleset(), projection_mode=ProjectionMode.TEST)
 
     squads, upper = enumerate_squads(bounded, view, _policy())
@@ -86,7 +98,7 @@ def test_fixed_scope_requires_a_fixed_squad() -> None:
     view = build_one_gameweek_rules_view(synthetic_ruleset(), projection_mode=ProjectionMode.TEST)
 
     with pytest.raises(InfeasibleError, match="requires one supplied fixed squad"):
-        enumerate_squads(_constructed_request(base, fixed_squad=None), view, _policy())
+        enumerate_squads(_constructed_request(base, fixed_squad_ids=None), view, _policy())
 
 
 def test_provided_scope_rejects_duplicate_unvalidated_squads() -> None:
@@ -94,7 +106,8 @@ def test_provided_scope_rejects_duplicate_unvalidated_squads() -> None:
     view = build_one_gameweek_rules_view(synthetic_ruleset(), projection_mode=ProjectionMode.TEST)
     assert base.provided_squads
     duplicate = _constructed_request(
-        base, provided_squads=(base.provided_squads[0], base.provided_squads[0])
+        base,
+        provided_candidate_squads=(base.provided_squads[0], base.provided_squads[0]),
     )
 
     with pytest.raises(InfeasibleError, match="must be unique"):
@@ -106,7 +119,7 @@ def test_provided_scope_allows_an_empty_unvalidated_collection() -> None:
     view = build_one_gameweek_rules_view(synthetic_ruleset(), projection_mode=ProjectionMode.TEST)
 
     squads, upper = enumerate_squads(
-        _constructed_request(base, provided_squads=()), view, _policy()
+        _constructed_request(base, provided_candidate_squads=()), view, _policy()
     )
 
     assert upper == 0

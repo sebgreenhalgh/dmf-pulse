@@ -23,7 +23,7 @@ def snapshot_hash(snapshot: CandidatePoolSnapshot) -> str:
     from dmf_pulse.fpl_points.artifacts import semantic_sha256
 
     payload = snapshot.model_dump(mode="json")
-    payload["candidate_snapshot_sha256"] = None
+    payload["snapshot_sha256"] = None
     return semantic_sha256(payload)
 
 
@@ -113,12 +113,7 @@ def enumerate_squads(
     def generator() -> Iterator[CandidateSquad]:
         for selected in product(*choices):
             players = tuple(sorted(item.player_id for group in selected for item in group))
-            squad = CandidateSquad(
-                player_ids=players,
-                initial_selection_cost_tenths=sum(
-                    item.initial_selection_cost_tenths or 0 for group in selected for item in group
-                ),
-            )
+            squad = CandidateSquad(player_ids=players)
             try:
                 _validate_squad(squad, snapshot, rules, request)
             except InfeasibleError:

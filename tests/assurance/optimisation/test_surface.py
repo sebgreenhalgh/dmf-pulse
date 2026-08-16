@@ -19,6 +19,7 @@ from dmf_pulse.optimisation.legality import (
 from dmf_pulse.optimisation.models import (
     CandidatePoolSnapshot,
     CandidateSquad,
+    CaptainResolution,
     LegalityReport,
     OneGameweekOptimisationResult,
     OneGameweekOptimiserPolicy,
@@ -42,10 +43,12 @@ from dmf_pulse.rules.errors import RulesValidationError
 from dmf_pulse.rules.models import RuleCapability, RulesetStatus
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 from tests.support.optimisation_factories import (
+    candidate_pool,
     players,
     projection,
     request,
     scenario_set,
+    seal_request,
     synthetic_ruleset,
 )
 
@@ -88,36 +91,41 @@ def test_artifacts_policy_and_candidate_snapshot(tmp_path: Path) -> None:
 def test_candidate_preflight_bounded_and_resource_failures() -> None:
     rules = synthetic_ruleset()
     view = build_one_gameweek_rules_view(rules, projection_mode=ProjectionMode.TEST)
-    priced = CandidatePoolSnapshot(
-        information_cutoff_utc="2026-08-16T00:00:00Z",
-        candidates=tuple(
+    priced = candidate_pool(
+        tuple(
             player.model_copy(update={"initial_selection_cost_tenths": 1}) for player in players()
-        ),
+        )
     )
-    bounded = request(scope=SearchScope.BOUNDED_PLAYER_POOL).model_copy(
-        update={"candidate_pool": priced}
+    bounded = seal_request(
+        request(scope=SearchScope.BOUNDED_PLAYER_POOL).model_copy(
+            update={"candidate_pool": priced, "request_sha256": "0" * 64}
+        )
     )
     squads, upper = enumerate_squads(bounded, view, _policy())
     assert upper == 1
-    assert next(squads).initial_selection_cost_tenths == 15
-    with pytest.raises(ResourceLimitError):
-        enumerate_squads(request(), view, _policy().model_copy(update={"max_squad_candidates": 0}))
+    assert len(next(squads).player_ids) == 15
+    with pytest.raises(ValueError):
+        _policy().model_copy(update={"max_squad_candidates": 0}, deep=True).__class__(
+            **{
+                **_policy().model_dump(),
+                "max_squad_candidates": 0,
+            }
+        )
     with pytest.raises(ResourceLimitError):
         enumerate_tactical_configurations(
             CandidateSquad(player_ids=tuple(player.player_id for player in players())),
             {player.player_id: player for player in players()},
             view,
-            _policy().model_copy(update={"max_tactical_configurations": 0}),
+            _policy().model_copy(update={"max_tactical_configurations": 1}),
         )
     with pytest.raises(InfeasibleError):
         enumerate_squads(
             request().model_copy(update={"required_player_ids": ("not-in-pool",)}), view, _policy()
         )
-    expensive = CandidatePoolSnapshot(
-        information_cutoff_utc="2026-08-16T00:00:00Z",
-        candidates=tuple(
+    expensive = candidate_pool(
+        tuple(
             player.model_copy(update={"initial_selection_cost_tenths": 100}) for player in players()
-        ),
+        )
     )
     generated, _ = enumerate_squads(
         bounded.model_copy(update={"candidate_pool": expensive}), view, _policy()
@@ -127,7 +135,11 @@ def test_candidate_preflight_bounded_and_resource_failures() -> None:
     with pytest.raises(InfeasibleError):
         enumerate_squads(
             provided.model_copy(
-                update={"provided_squads": (CandidateSquad.model_construct(player_ids=("p00",)),)}
+                update={
+                    "provided_candidate_squads": (
+                        CandidateSquad.model_construct(player_ids=("p00",)),
+                    )
+                }
             ),
             view,
             _policy(),
@@ -136,7 +148,7 @@ def test_candidate_preflight_bounded_and_resource_failures() -> None:
         enumerate_squads(
             provided.model_copy(
                 update={
-                    "provided_squads": (
+                    "provided_candidate_squads": (
                         CandidateSquad.model_construct(player_ids=("unknown",) * 15),
                     )
                 }
@@ -171,8 +183,19 @@ def test_tactic_legality_autosub_and_plan_evaluation() -> None:
     for player in tactic.outfield_bench_order:
         values[player] = 2
     values[tactic.bench_goalkeeper] = 2
+    only_bench_appears = {
+        player: player == tactic.bench_goalkeeper or player in tactic.outfield_bench_order
+        for player in player_map
+    }
     active_score, _ = evaluate_scenario(
-        scenario_set(rules.ruleset_hash, values=(values,)).scenarios[0], tactic, player_map, view
+        scenario_set(
+            rules.ruleset_hash,
+            values=(values,),
+            appeared_values=(only_bench_appears,),
+        ).scenarios[0],
+        tactic,
+        player_map,
+        view,
     )
     assert active_score.autosub_events
     starter_def = next(
@@ -188,13 +211,21 @@ def test_tactic_legality_autosub_and_plan_evaluation() -> None:
     for bench in tactic.outfield_bench_order:
         event_values[bench] = 0
     event_values[bench_def] = 1
+    event_appearances = {player: True for player in player_map}
+    event_appearances[starter_def] = False
     outfield_score, _ = evaluate_scenario(
-        scenario_set(rules.ruleset_hash, values=(event_values,)).scenarios[0],
+        scenario_set(
+            rules.ruleset_hash,
+            values=(event_values,),
+            appeared_values=(event_appearances,),
+        ).scenarios[0],
         tactic,
         player_map,
         view,
     )
-    assert any(event.position is PlayerPosition.DEF for event in outfield_score.autosub_events)
+    assert any(
+        event.reason_code == "OUTFIELD_BENCH_ORDER" for event in outfield_score.autosub_events
+    )
     all_appeared = {player: 1 for player in player_map}
     captain_score, _ = evaluate_scenario(
         scenario_set(rules.ruleset_hash, values=(all_appeared,)).scenarios[0],
@@ -202,14 +233,15 @@ def test_tactic_legality_autosub_and_plan_evaluation() -> None:
         player_map,
         view,
     )
-    assert captain_score.captain_resolution.multiplier_player == tactic.captain
+    assert captain_score.captain_resolution is CaptainResolution.CAPTAIN
+    assert captain_score.effective_captain_id == tactic.captain
     with pytest.raises(ValueError):
         evaluate_tactical_configuration(
             squad,
             TacticalConfiguration.model_construct(
                 starting_xi=("p00",),
                 bench_goalkeeper="p01",
-                outfield_bench_order=(),
+                bench_order=(),
                 captain="p00",
                 vice_captain="p00",
             ),
@@ -264,7 +296,11 @@ def test_fail_closed_upstream_and_rules_errors() -> None:
         == "OPTIMISATION_INPUT_INVALID"
     )
     assert (
-        optimise_one_gameweek(req.model_copy(update={"gameweek_id": "GW2"}), base, rules).error_code
+        optimise_one_gameweek(
+            seal_request(req.model_copy(update={"gameweek_id": "GW2", "request_sha256": "0" * 64})),
+            base,
+            rules,
+        ).error_code
         == "STAGE9_CONTRACT_MISMATCH"
     )
     assert (
@@ -320,7 +356,7 @@ def test_legality_reports_each_structural_issue() -> None:
     bad_tactic = TacticalConfiguration.model_construct(
         starting_xi=("p00",),
         bench_goalkeeper="p02",
-        outfield_bench_order=(),
+        bench_order=(),
         captain="unknown",
         vice_captain="unknown",
     )
@@ -391,7 +427,7 @@ def test_legality_boundary_inputs_and_rule_capability_forgery(
     malformed = TacticalConfiguration.model_construct(
         starting_xi=(*tactic.starting_xi[1:], tactic.starting_xi[1]),
         bench_goalkeeper=tactic.bench_goalkeeper,
-        outfield_bench_order=("p00", "outside", tactic.outfield_bench_order[-1]),
+        bench_order=("p00", "outside", tactic.outfield_bench_order[-1]),
         captain=tactic.captain,
         vice_captain=tactic.vice_captain,
     )
@@ -550,14 +586,18 @@ def test_service_error_branches_are_fail_closed(monkeypatch: pytest.MonkeyPatch)
     req = request()
     base = projection(rules.ruleset_hash)
     original_build = service.build_one_gameweek_rules_view
-    bad_snapshot = req.candidate_pool.model_copy(update={"candidate_snapshot_sha256": "0" * 64})
+    bad_snapshot = req.candidate_pool.model_copy(update={"snapshot_sha256": "0" * 64})
     assert (
         service.optimise_one_gameweek(
             req.model_copy(update={"candidate_pool": bad_snapshot}), base, rules
         ).error_code
         == "OPTIMISATION_INPUT_INVALID"
     )
-    production = req.model_copy(update={"projection_mode": ProjectionMode.PRODUCTION})
+    production = seal_request(
+        req.model_copy(
+            update={"projection_mode": ProjectionMode.PRODUCTION, "request_sha256": "0" * 64}
+        )
+    )
     view = build_one_gameweek_rules_view(rules, projection_mode=ProjectionMode.TEST)
     monkeypatch.setattr(service, "build_one_gameweek_rules_view", lambda *args, **kwargs: view)
     assert (
@@ -567,7 +607,14 @@ def test_service_error_branches_are_fail_closed(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setattr(
         service,
         "solve",
-        lambda *args, **kwargs: SearchOutput(plans=(), objective=None, status=SolverStatus()),
+        lambda *args, **kwargs: SearchOutput(
+            plans=(),
+            objective=None,
+            status=SolverStatus(
+                search_scope=SearchScope.FIXED_SQUAD,
+                guarantee=OptimalityGuarantee.NONE,
+            ),
+        ),
     )
     assert service.optimise_one_gameweek(req, base, rules).error_code == "ONE_GAMEWEEK_INFEASIBLE"
     monkeypatch.setattr(
@@ -580,7 +627,14 @@ def test_service_error_branches_are_fail_closed(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setattr(
         service,
         "solve",
-        lambda *args, **kwargs: SearchOutput(plans=(), objective=None, status=SolverStatus()),
+        lambda *args, **kwargs: SearchOutput(
+            plans=(),
+            objective=None,
+            status=SolverStatus(
+                search_scope=SearchScope.FIXED_SQUAD,
+                guarantee=OptimalityGuarantee.NONE,
+            ),
+        ),
     )
     assert (
         service.optimise_one_gameweek(req, base, rules.model_copy(update={"rules": {}})).error_code
@@ -592,12 +646,36 @@ def test_service_error_branches_are_fail_closed(monkeypatch: pytest.MonkeyPatch)
     plan, _ = evaluate_tactical_configuration(
         squad, next(tactics), (base.scenario_set.scenarios[0],), player_map, view
     )
-    bad_plan = plan.model_copy(update={"legality_report": LegalityReport(legal=False, issues=())})
+    bad_plan = plan.model_copy(update={"legality": LegalityReport(legal=False, issues=())})
     monkeypatch.setattr(
         service,
         "solve",
         lambda *args, **kwargs: SearchOutput(
-            plans=(bad_plan,), objective=None, status=SolverStatus()
+            plans=(bad_plan,),
+            objective=None,
+            status=SolverStatus(
+                search_scope=SearchScope.FIXED_SQUAD,
+                guarantee=OptimalityGuarantee.NONE,
+            ),
+        ),
+    )
+    assert (
+        service.optimise_one_gameweek(req, base, rules).error_code
+        == "OPTIMISER_EMITTED_ILLEGAL_PLAN"
+    )
+    bad_payload = bad_plan.model_dump(mode="json")
+    bad_payload["plan_sha256"] = None
+    bad_plan = bad_plan.model_copy(update={"plan_sha256": semantic_sha256(bad_payload)})
+    monkeypatch.setattr(
+        service,
+        "solve",
+        lambda *args, **kwargs: SearchOutput(
+            plans=(bad_plan,),
+            objective=None,
+            status=SolverStatus(
+                search_scope=SearchScope.FIXED_SQUAD,
+                guarantee=OptimalityGuarantee.NONE,
+            ),
         ),
     )
     assert (
@@ -611,12 +689,14 @@ def test_public_model_validators_reject_noncanonical_shapes() -> None:
     with pytest.raises(ValueError):
         CandidatePoolSnapshot(
             information_cutoff_utc=pool.information_cutoff_utc,
-            candidates=tuple(reversed(pool.candidates)),
+            players=tuple(reversed(pool.candidates)),
+            snapshot_sha256="0" * 64,
         )
     with pytest.raises(ValueError):
         CandidatePoolSnapshot(
             information_cutoff_utc=pool.information_cutoff_utc,
-            candidates=(pool.candidates[0], pool.candidates[0]),
+            players=(pool.candidates[0], pool.candidates[0]),
+            snapshot_sha256="0" * 64,
         )
     with pytest.raises(ValueError):
         CandidateSquad(player_ids=("p01", "p00"))
@@ -626,25 +706,34 @@ def test_public_model_validators_reject_noncanonical_shapes() -> None:
         TacticalConfiguration(
             starting_xi=("p00",),
             bench_goalkeeper="p01",
-            outfield_bench_order=(),
+            bench_order=(),
             captain="p00",
             vice_captain="p00",
         )
+    base_projection = projection(synthetic_ruleset().ruleset_hash)
     lineage = OptimisationLineage(
+        stage9_result_sha256=base_projection.result_sha256,
+        stage9_artifact_sha256="0" * 64,
+        stage9_scenario_set_sha256="0" * 64,
+        stage9_joint_matrix_sha256="0" * 64,
+        candidate_pool_sha256="0" * 64,
         request_sha256="0" * 64,
-        candidate_snapshot_sha256="0" * 64,
-        gameweek_artifact_sha256="0" * 64,
         ruleset_hash="0" * 64,
-        capability_hash=None,
+        manager_capability=None,
+        manager_capability_hash=None,
+        policy_sha256="0" * 64,
         input_sha256="0" * 64,
-        plan_sha256=None,
-        result_sha256=None,
     )
     with pytest.raises(ValueError):
         OneGameweekOptimisationResult(
             status=OptimisationStatus.SUCCESS,
-            search_scope=SearchScope.FIXED_SQUAD,
-            optimality_guarantee=OptimalityGuarantee.EXACT_FIXED_SQUAD,
-            solver_status=SolverStatus(),
+            solver_status=SolverStatus(
+                search_scope=SearchScope.FIXED_SQUAD,
+                guarantee=OptimalityGuarantee.NONE,
+            ),
             lineage=lineage,
+            request_id="request",
+            gameweek_id="GW1",
+            upstream_mc_status="PASS",
+            result_sha256="0" * 64,
         )

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from dmf_pulse.fpl_points.artifacts import semantic_sha256
+from dmf_pulse.fpl_points.artifacts import canonical_json_bytes, semantic_sha256, sha256_bytes
 from dmf_pulse.fpl_points.models import GameweekProjectionResult
 from dmf_pulse.optimisation.candidate_pool import snapshot_hash
 from dmf_pulse.optimisation.errors import OptimisationError
@@ -26,8 +26,6 @@ from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 def _hash_without(value: Any, field: str) -> str:
     payload = value.model_dump(mode="json")
     payload[field] = None
-    if field == "result_sha256" and isinstance(payload.get("lineage"), dict):
-        payload["lineage"]["result_sha256"] = None
     return semantic_sha256(payload)
 
 
@@ -59,6 +57,22 @@ def validate_stage9_boundary(
         raise OptimisationError(
             "RULESET_IDENTITY_MISMATCH", "Stage-9 and compiled ruleset hashes differ"
         )
+    stage9_players = set(player_ids)
+    if request.search_scope.value == "FIXED_SQUAD":
+        selected_players = set(request.fixed_squad_ids or ())
+    elif request.search_scope.value == "PROVIDED_SQUADS":
+        selected_players = {
+            player_id
+            for squad in request.provided_candidate_squads
+            for player_id in squad.player_ids
+        }
+    else:
+        selected_players = {player.player_id for player in request.candidate_pool.players}
+    if not selected_players <= stage9_players:
+        raise OptimisationError(
+            "STAGE9_CONTRACT_MISMATCH",
+            "declared search scope contains a player outside the Stage-9 universe",
+        )
     if matrix.player_ids != player_ids:
         raise OptimisationError(
             "STAGE9_CONTRACT_MISMATCH", "Stage-9 player ordering differs from the joint matrix"
@@ -86,14 +100,16 @@ def validate_request_boundary(request: OneGameweekOptimisationRequest) -> None:
     """Validate caller-provided semantic identities before any Stage-10 computation."""
 
     request_hash = _hash_without(request, "request_sha256")
-    if request.request_sha256 is not None and request.request_sha256 != request_hash:
+    if request.request_sha256 != request_hash:
         raise OptimisationError("OPTIMISATION_INPUT_INVALID", "request semantic hash mismatch")
     actual_snapshot = snapshot_hash(request.candidate_pool)
-    if (
-        request.candidate_pool.candidate_snapshot_sha256 is not None
-        and request.candidate_pool.candidate_snapshot_sha256 != actual_snapshot
-    ):
+    if request.candidate_pool.snapshot_sha256 != actual_snapshot:
         raise OptimisationError("OPTIMISATION_INPUT_INVALID", "candidate snapshot hash mismatch")
+    if request.information_cutoff_utc != request.candidate_pool.information_cutoff_utc:
+        raise OptimisationError(
+            "OPTIMISATION_INPUT_INVALID",
+            "request and candidate snapshot information cutoffs differ",
+        )
 
 
 def validate_plan_against_request(
@@ -106,7 +122,7 @@ def validate_plan_against_request(
 ) -> LegalityReport:
     validate_request_boundary(request)
     validate_stage9_boundary(request, projection, ruleset_hash=rules.ruleset_hash)
-    if plan.plan_sha256 is not None and plan.plan_sha256 != _hash_without(plan, "plan_sha256"):
+    if plan.plan_sha256 != _hash_without(plan, "plan_sha256"):
         raise OptimisationError("OPTIMISATION_ARTIFACT_INVALID", "plan semantic hash mismatch")
     view = build_one_gameweek_rules_view(
         rules, projection_mode=request.projection_mode, capability=capability
@@ -140,11 +156,14 @@ def validate_plan_against_request(
             projection.scenario_set.scenarios,
             players,
             view,
+            search_scope=request.search_scope,
+            report_budget=request.search_scope.value == "BOUNDED_PLAYER_POOL",
         )
         actual_payload = plan.model_dump(mode="json")
-        actual_payload["plan_sha256"] = None
         expected_payload = expected_plan.model_dump(mode="json")
-        expected_payload["plan_sha256"] = None
+        for field in ("plan_sha256", "solver_status", "explanations"):
+            actual_payload.pop(field)
+            expected_payload.pop(field)
         if actual_payload != expected_payload:
             issues += (
                 LegalityIssue(
@@ -179,13 +198,20 @@ def validate_result_against_request(
     request_hash = _hash_without(request, "request_sha256")
     snapshot = snapshot_hash(request.candidate_pool)
     policy_hash = semantic_sha256(policy)
+    stage9_artifact_hash = sha256_bytes(canonical_json_bytes(projection))
+    manager_capability = capability.capability.value if capability is not None else None
+    manager_capability_hash = capability.capability_hash if capability is not None else None
     expected_input_hash = semantic_sha256(
         {
             "request_sha256": request_hash,
-            "candidate_snapshot_sha256": snapshot,
-            "gameweek_result_sha256": projection.result_sha256,
+            "candidate_pool_sha256": snapshot,
+            "stage9_result_sha256": projection.result_sha256,
+            "stage9_artifact_sha256": stage9_artifact_hash,
+            "stage9_scenario_set_sha256": semantic_sha256(projection.scenario_set),
+            "stage9_joint_matrix_sha256": semantic_sha256(projection.joint_matrix),
             "ruleset_hash": rules.ruleset_hash,
-            "capability_hash": capability.capability_hash if capability else None,
+            "manager_capability": manager_capability,
+            "manager_capability_hash": manager_capability_hash,
             "policy_sha256": policy_hash,
         }
     )
@@ -193,22 +219,31 @@ def validate_result_against_request(
     if (
         result.request_id != request.request_id
         or result.gameweek_id != request.gameweek_id
+        or result.search_scope is not request.search_scope
+        or result.optimality_guarantee.value
+        != {
+            "FIXED_SQUAD": "EXACT_FIXED_SQUAD",
+            "PROVIDED_SQUADS": "EXACT_PROVIDED_SET",
+            "BOUNDED_PLAYER_POOL": "EXACT_DECLARED_PLAYER_POOL",
+        }[request.search_scope.value]
+        or result.upstream_mc_status != projection.monte_carlo.stopping_result
+        or result.upstream_warnings != projection.scenario_set.warnings
         or lineage.request_sha256 != request_hash
-        or lineage.candidate_snapshot_sha256 != snapshot
-        or lineage.gameweek_artifact_sha256 != projection.result_sha256
+        or lineage.candidate_pool_sha256 != snapshot
+        or lineage.stage9_result_sha256 != projection.result_sha256
+        or lineage.stage9_artifact_sha256 != stage9_artifact_hash
         or lineage.stage9_scenario_set_sha256 != semantic_sha256(projection.scenario_set)
         or lineage.stage9_joint_matrix_sha256 != semantic_sha256(projection.joint_matrix)
         or lineage.ruleset_hash != rules.ruleset_hash
-        or lineage.capability_hash != (capability.capability_hash if capability else None)
+        or lineage.manager_capability != manager_capability
+        or lineage.manager_capability_hash != manager_capability_hash
         or lineage.policy_sha256 != policy_hash
         or lineage.input_sha256 != expected_input_hash
-        or lineage.plan_sha256 != result.recommended_plan.plan_sha256
-        or lineage.result_sha256 != result.result_sha256
     ):
         raise OptimisationError(
             "OPTIMISATION_ARTIFACT_INVALID", "result lineage does not bind inputs"
         )
-    plans = result.tied_plans
+    plans = result.tied_optimal_plans
     if not plans or result.recommended_plan.signature != min(plan.signature for plan in plans):
         raise OptimisationError(
             "OPTIMISATION_ARTIFACT_INVALID", "result recommendation is not canonical among ties"
@@ -219,4 +254,34 @@ def validate_result_against_request(
             request, projection, rules, plan, capability=capability
         )
         issues += report.issues
+    if len({plan.signature for plan in plans}) != len(plans):
+        issues += (
+            LegalityIssue(
+                code="RESULT_DUPLICATE_TIE",
+                message="result contains duplicate tied plans",
+            ),
+        )
+    if any(plan.expected_manager_points != plans[0].expected_manager_points for plan in plans):
+        issues += (
+            LegalityIssue(
+                code="RESULT_NON_TIED_PLAN",
+                message="returned plans do not have exactly equal objectives",
+            ),
+        )
+    from dmf_pulse.optimisation.service import optimise_one_gameweek
+
+    recomputed = optimise_one_gameweek(
+        request,
+        projection,
+        rules,
+        capability=capability,
+        policy=policy,
+    )
+    if recomputed != result:
+        issues += (
+            LegalityIssue(
+                code="RESULT_RECOMPUTATION_MISMATCH",
+                message="result does not match a fresh exact deterministic optimisation",
+            ),
+        )
     return LegalityReport(legal=not issues, issues=issues)

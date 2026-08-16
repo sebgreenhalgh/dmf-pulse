@@ -695,3 +695,30 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Run every literal acceptance gate, including PostgreSQL, migration, complete
   repository coverage, wheel isolation, final GCS-008 manifest validation, and
   secret scan; record only measured evidence.
+
+# OPT-010 R3 independent final-rereview remediation
+
+- Ticket/stage: `OPT-010`, A10; required base
+  `a33f46cd7ec190fbd4959e2840527116f22547ac` on
+  `stage/A10/OPT-010-one-gameweek-optimiser`.
+- Scope: close the independent rereview's remaining Stage-9 lineage, frozen
+  public-contract, legality-validation, artifact-confinement, oracle-fixture,
+  and acceptance-evidence findings without changing Stage-10 objective or
+  manager-tactics semantics.
+- Acceptance: execute the existing 31 literal commands once, in order, on the
+  final implementation revision. No reuse, sharding, or equivalence
+  substitution is permitted.
+
+### OPT-010 R3 checkpoints
+
+- [x] Add adversarial regressions for detached Stage-9 identity, complete public
+  result bindings, pre-search player-universe rejection, leaf-symlink attacks,
+  and appearance-independent test data.
+- [x] Align the public models and immutable hashes with the frozen Section 5
+  contract while preserving deterministic exhaustive search.
+- [x] Regenerate canonical request/result fixtures and pass focused static and
+  behavioural checks.
+- [ ] Commit the final implementation, run all 31 literal acceptance commands
+  in order, and retain complete unsharded evidence.
+- [ ] Regenerate the review pack, commit only evidence after the tested
+  implementation revision, and push the existing draft PR branch.

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from fractions import Fraction
 
+from dmf_pulse.fpl_points.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.models import GameweekPointScenario
 from dmf_pulse.optimisation.candidate_pool import enumerate_squads
 from dmf_pulse.optimisation.errors import InfeasibleError, ResourceLimitError
@@ -14,6 +15,8 @@ from dmf_pulse.optimisation.models import (
     OneGameweekOptimiserPolicy,
     OneGameweekPlan,
     OneGameweekRulesView,
+    OptimalityGuarantee,
+    SearchScope,
     SolverStatus,
 )
 from dmf_pulse.optimisation.tactics import (
@@ -28,6 +31,14 @@ class SearchOutput:
     plans: tuple[OneGameweekPlan, ...]
     objective: Fraction | None
     status: SolverStatus
+
+
+def _guarantee(scope: SearchScope) -> OptimalityGuarantee:
+    return {
+        SearchScope.FIXED_SQUAD: OptimalityGuarantee.EXACT_FIXED_SQUAD,
+        SearchScope.PROVIDED_SQUADS: OptimalityGuarantee.EXACT_PROVIDED_SET,
+        SearchScope.BOUNDED_PLAYER_POOL: OptimalityGuarantee.EXACT_DECLARED_PLAYER_POOL,
+    }[scope]
 
 
 def solve(
@@ -71,9 +82,11 @@ def solve(
         )
     operation_upper = tactical_upper * len(scenarios)
     preflight = SolverStatus(
-        conservative_squad_upper_bound=squad_upper,
-        conservative_tactical_upper_bound=tactical_upper,
-        conservative_operation_upper_bound=operation_upper,
+        search_scope=request.search_scope,
+        guarantee=OptimalityGuarantee.NONE,
+        squad_upper_bound=squad_upper,
+        tactical_upper_bound=tactical_upper,
+        scenario_operation_upper_bound=operation_upper,
     )
     if tactical_upper > policy.max_tactical_configurations:
         raise ResourceLimitError(
@@ -98,7 +111,13 @@ def solve(
             tactics_examined += 1
             operations += len(scenarios)
             plan, objective = evaluate_tactical_configuration(
-                squad, tactic, scenarios, players, rules
+                squad,
+                tactic,
+                scenarios,
+                players,
+                rules,
+                search_scope=request.search_scope,
+                report_budget=request.search_scope is SearchScope.BOUNDED_PLAYER_POOL,
             )
             if best is None or objective > best:
                 best = objective
@@ -115,23 +134,29 @@ def solve(
     if best is None:
         raise InfeasibleError("declared search scope contains no legal plan")
     ties.sort(key=lambda plan: plan.signature)
-    return SearchOutput(
-        plans=tuple(ties[: policy.max_returned_ties]),
-        objective=best,
-        status=SolverStatus(
-            termination="OPTIMAL",
-            squads_examined=squads_examined,
-            tactical_configurations_examined=tactics_examined,
-            scenario_score_operations=operations,
-            conservative_squad_upper_bound=squad_upper,
-            conservative_tactical_upper_bound=tactical_upper,
-            conservative_operation_upper_bound=operation_upper,
-            total_optimal_ties=total_ties,
-            returned_ties=len(ties[: policy.max_returned_ties]),
-            ties_truncated=total_ties > policy.max_returned_ties,
-            objective_value=ties[0].expected_manager_points,
-            best_bound=ties[0].expected_manager_points,
-            absolute_gap=Decimal(0),
-            relative_gap=Decimal(0),
-        ),
+    status = SolverStatus(
+        termination="OPTIMAL",
+        search_scope=request.search_scope,
+        guarantee=_guarantee(request.search_scope),
+        squad_upper_bound=squad_upper,
+        tactical_upper_bound=tactical_upper,
+        scenario_operation_upper_bound=operation_upper,
+        squad_candidates_evaluated=squads_examined,
+        legal_squads_evaluated=squads_examined,
+        tactical_configurations_evaluated=tactics_examined,
+        scenario_operations_evaluated=operations,
+        tied_optima_total=total_ties,
+        returned_ties=len(ties[: policy.max_returned_ties]),
+        ties_truncated=total_ties > policy.max_returned_ties,
+        objective_value=ties[0].expected_manager_points,
+        best_bound=ties[0].expected_manager_points,
+        absolute_gap=Decimal(0),
+        relative_gap=Decimal(0),
     )
+    final_plans: list[OneGameweekPlan] = []
+    for plan in ties[: policy.max_returned_ties]:
+        updated = plan.model_copy(update={"solver_status": status, "plan_sha256": "0" * 64})
+        payload = updated.model_dump(mode="json")
+        payload["plan_sha256"] = None
+        final_plans.append(updated.model_copy(update={"plan_sha256": semantic_sha256(payload)}))
+    return SearchOutput(plans=tuple(final_plans), objective=best, status=status)

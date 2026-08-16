@@ -7,20 +7,26 @@ from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from fractions import Fraction
 from itertools import combinations, permutations, product
 from math import factorial
+from typing import cast
 
+from dmf_pulse.fpl_points.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.models import GameweekPointScenario, PlayerPosition
-from dmf_pulse.optimisation.autosub_evaluator import evaluate_scenario
+from dmf_pulse.optimisation.autosub_evaluator import evaluate_scenario, weight_fraction
 from dmf_pulse.optimisation.errors import ResourceLimitError
 from dmf_pulse.optimisation.legality import validate_tactical_configuration
 from dmf_pulse.optimisation.models import (
     CandidatePlayer,
     CandidateSquad,
+    ExplanationItem,
     OneGameweekOptimiserPolicy,
     OneGameweekPlan,
     OneGameweekRulesView,
+    OptimalityGuarantee,
     PointDistributionSummary,
     PointMass,
     ScenarioManagerScore,
+    SearchScope,
+    SolverStatus,
     TacticalConfiguration,
 )
 
@@ -126,7 +132,7 @@ def enumerate_tactical_configurations(
                                 tactic = TacticalConfiguration(
                                     starting_xi=selected,
                                     bench_goalkeeper=bench_gk,
-                                    outfield_bench_order=bench_order,
+                                    bench_order=cast(tuple[str, str, str], bench_order),
                                     captain=captain,
                                     vice_captain=vice,
                                 )
@@ -144,6 +150,9 @@ def evaluate_tactical_configuration(
     scenarios: tuple[GameweekPointScenario, ...],
     players: dict[str, CandidatePlayer],
     rules: OneGameweekRulesView,
+    *,
+    search_scope: SearchScope = SearchScope.FIXED_SQUAD,
+    report_budget: bool = False,
 ) -> tuple[OneGameweekPlan, Fraction]:
     report = validate_tactical_configuration(squad, tactic, players, rules)
     if not report.legal:
@@ -154,11 +163,15 @@ def evaluate_tactical_configuration(
         score, weighted = evaluate_scenario(scenario, tactic, players, rules)
         scores.append(score)
         total += weighted
+    weighted_scores = tuple(
+        (score, weight_fraction(scenario.weight))
+        for score, scenario in zip(scores, scenarios, strict=True)
+    )
     masses_by_points: dict[int, Fraction] = {}
-    for score in scores:
-        masses_by_points[score.manager_points] = masses_by_points.get(
-            score.manager_points, Fraction(0)
-        ) + Fraction(Decimal(score.weight_token))
+    for score, weight in weighted_scores:
+        masses_by_points[score.manager_points] = (
+            masses_by_points.get(score.manager_points, Fraction(0)) + weight
+        )
     total_weight = sum(masses_by_points.values(), Fraction(0))
     if total_weight <= 0:
         raise ValueError("scenario weights must sum to a positive value")
@@ -167,46 +180,35 @@ def evaluate_tactical_configuration(
     }
     fallback = (
         sum(
-            Fraction(Decimal(score.weight_token))
-            for score in scores
-            if score.captain_resolution.multiplier_player == tactic.vice_captain
+            weight
+            for score, weight in weighted_scores
+            if score.captain_resolution.value == "VICE_CAPTAIN"
         )
         / total_weight
     )
     captain_and_vice_failure = (
         sum(
-            Fraction(Decimal(score.weight_token))
-            for score in scores
-            if score.captain_resolution.multiplier_player is None
+            weight
+            for score, weight in weighted_scores
+            if score.captain_resolution.value == "NEITHER"
         )
         / total_weight
     )
     field_11 = (
         sum(
-            Fraction(Decimal(score.weight_token))
-            for score in scores
-            if len(score.player_points) == rules.starting_size
+            weight
+            for score, weight in weighted_scores
+            if len(score.counted_player_ids) == rules.starting_size
         )
         / total_weight
     )
     expected_bench = (
-        sum(
-            Fraction(Decimal(score.weight_token))
-            * sum(
-                scenario.player_points[event.player_in]
-                for event in score.autosub_events
-                for scenario in scenarios
-                if scenario.scenario_id == score.scenario_id
-            )
-            for score in scores
-        )
+        sum(weight * score.bench_contribution_points for score, weight in weighted_scores)
         / total_weight
     )
     expectation = total / total_weight
     manager_values = tuple(score.manager_points for score in scores)
-    manager_weights = tuple(
-        Fraction(Decimal(score.weight_token)) / total_weight for score in scores
-    )
+    manager_weights = tuple(weight / total_weight for _, weight in weighted_scores)
     variance = sum(
         weight * (value - expectation) ** 2
         for value, weight in zip(manager_values, manager_weights, strict=True)
@@ -221,13 +223,13 @@ def evaluate_tactical_configuration(
         )
         expected = Decimal(expectation.numerator) / Decimal(expectation.denominator)
         distribution = PointDistributionSummary(
+            pmf=masses,
             expected_points=expected,
-            minimum_points=min(normalized_masses),
-            maximum_points=max(normalized_masses),
-            masses=masses,
+            minimum=min(normalized_masses),
             p10=_quantile(normalized_masses, Fraction(1, 10)),
             median=_quantile(normalized_masses, Fraction(1, 2)),
             p90=_quantile(normalized_masses, Fraction(9, 10)),
+            maximum=max(normalized_masses),
             probability_field_11=Decimal(field_11.numerator) / Decimal(field_11.denominator),
             probability_field_10_or_fewer=Decimal(1)
             - Decimal(field_11.numerator) / Decimal(field_11.denominator),
@@ -247,27 +249,37 @@ def evaluate_tactical_configuration(
                 }
             },
         )
-    signature = "|".join(
-        (
-            ",".join(sorted(squad.player_ids)),
-            ",".join(sorted(tactic.starting_xi)),
-            tactic.bench_goalkeeper,
-            ",".join(tactic.outfield_bench_order),
-            tactic.captain,
-            tactic.vice_captain,
-        )
+    total_cost = (
+        sum(players[player_id].initial_selection_cost_tenths or 0 for player_id in squad.player_ids)
+        if report_budget
+        else None
+    )
+    remaining_budget = (
+        rules.initial_budget_tenths - total_cost
+        if report_budget and total_cost is not None and rules.initial_budget_tenths is not None
+        else None
     )
     plan = OneGameweekPlan(
-        candidate_squad=squad,
+        squad=squad.player_ids,
         tactical_configuration=tactic,
         scenario_scores=tuple(scores),
-        distribution=distribution,
+        point_distribution=distribution,
         expected_manager_points=expected,
-        initial_selection_cost_tenths=squad.initial_selection_cost_tenths,
-        budget_tenths=rules.initial_budget_tenths
-        if squad.initial_selection_cost_tenths is not None
-        else None,
-        signature=signature,
-        legality_report=report,
+        total_cost_tenths=total_cost,
+        remaining_budget_tenths=remaining_budget,
+        legality=report,
+        solver_status=SolverStatus(
+            search_scope=search_scope,
+            guarantee=OptimalityGuarantee.NONE,
+        ),
+        explanations=(
+            ExplanationItem(
+                code="EXACT_EXHAUSTIVE_SEARCH",
+                message="plan was evaluated within the complete declared search scope",
+            ),
+        ),
+        plan_sha256="0" * 64,
     )
-    return plan, total
+    payload = plan.model_dump(mode="json")
+    payload["plan_sha256"] = None
+    return plan.model_copy(update={"plan_sha256": semantic_sha256(payload)}), total

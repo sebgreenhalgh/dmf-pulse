@@ -208,9 +208,16 @@ def build_one_gameweek_rules_view(
             auto.get("maintain_legal_formation"),
             "/rules/lineup/automatic_substitutions/maintain_legal_formation",
         ),
-        capability=RuleCapability.FULL_SEASON.value
-        if projection_mode is ProjectionMode.PRODUCTION
-        else "REFERENCE_ONLY",
+        manager_capability=(
+            RuleCapability.FULL_SEASON.value
+            if projection_mode is ProjectionMode.PRODUCTION
+            else "REFERENCE_ONLY"
+        ),
+        manager_capability_hash=(
+            capability.capability_hash
+            if projection_mode is ProjectionMode.PRODUCTION and capability is not None
+            else None
+        ),
     )
 
 

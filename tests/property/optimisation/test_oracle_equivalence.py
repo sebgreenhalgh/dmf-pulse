@@ -58,7 +58,7 @@ def test_independent_oracle_matches_every_scenario_score(
         OracleTactic(
             starting_xi=production_tactic.starting_xi,
             bench_goalkeeper=production_tactic.bench_goalkeeper,
-            outfield_bench_order=production_tactic.outfield_bench_order,
+            outfield_bench_order=production_tactic.bench_order,
             captain=production_tactic.captain,
             vice_captain=production_tactic.vice_captain,
         ),
@@ -68,15 +68,21 @@ def test_independent_oracle_matches_every_scenario_score(
     production, weighted = production_score(scenario, production_tactic, player_map, view)
     assert weighted == oracle.weighted
     assert production.manager_points == oracle.manager_points
-    assert production.player_points == oracle.player_points
-    assert production.captain_resolution.multiplier_player == oracle.multiplier_player
-    assert production.captain_resolution.multiplier == oracle.multiplier
-    assert tuple(
-        (event.player_out, event.player_in, event.slot, event.position)
-        for event in production.autosub_events
-    ) == tuple(
-        (event.player_out, event.player_in, event.slot, event.position) for event in oracle.autosubs
+    assert production.counted_player_ids == tuple(sorted(oracle.player_points))
+    assert production.base_points == sum(oracle.player_points.values())
+    assert production.captain_bonus_points == oracle.manager_points - sum(
+        oracle.player_points.values()
     )
+    assert production.bench_contribution_points == sum(
+        scenario.player_points[event.player_in] for event in oracle.autosubs
+    )
+    assert production.effective_captain_id == oracle.multiplier_player
+    assert (
+        view.captain_multiplier if production.effective_captain_id is not None else 1
+    ) == oracle.multiplier
+    assert tuple(
+        (event.player_out, event.player_in, event.bench_slot) for event in production.autosubs
+    ) == tuple((event.player_out, event.player_in, event.slot) for event in oracle.autosubs)
 
 
 def _toy_rules_view() -> OneGameweekRulesView:
@@ -85,15 +91,15 @@ def _toy_rules_view() -> OneGameweekRulesView:
         ruleset_version="1.0.0",
         ruleset_hash="0" * 64,
         projection_mode=ProjectionMode.TEST,
-        squad_size=7,
+        squad_size=9,
         position_squad_quota={
             PlayerPosition.GK: 2,
-            PlayerPosition.DEF: 2,
+            PlayerPosition.DEF: 3,
             PlayerPosition.MID: 2,
-            PlayerPosition.FWD: 1,
+            PlayerPosition.FWD: 2,
         },
         starting_size=5,
-        bench_size=2,
+        bench_size=4,
         lineup_min={
             PlayerPosition.GK: 1,
             PlayerPosition.DEF: 1,
@@ -102,9 +108,9 @@ def _toy_rules_view() -> OneGameweekRulesView:
         },
         lineup_max={
             PlayerPosition.GK: 1,
-            PlayerPosition.DEF: 2,
+            PlayerPosition.DEF: 3,
             PlayerPosition.MID: 2,
-            PlayerPosition.FWD: 1,
+            PlayerPosition.FWD: 2,
         },
         initial_budget_tenths=None,
         max_players_per_club=None,
@@ -115,21 +121,24 @@ def _toy_rules_view() -> OneGameweekRulesView:
         designated_bench_goalkeeper_if_appeared=True,
         manager_bench_order=True,
         maintain_legal_formation=True,
-        capability="REFERENCE_ONLY",
+        manager_capability="REFERENCE_ONLY",
+        manager_capability_hash=None,
     )
 
 
 def test_independent_exhaustive_oracle_matches_exact_global_optimum() -> None:
     rules = synthetic_ruleset()
-    squad_ids = ("p00", "p01", "p02", "p03", "p07", "p08", "p12")
+    squad_ids = ("p00", "p01", "p02", "p03", "p04", "p07", "p08", "p12", "p13")
     positions = {
         "p00": PlayerPosition.GK,
         "p01": PlayerPosition.GK,
         "p02": PlayerPosition.DEF,
         "p03": PlayerPosition.DEF,
+        "p04": PlayerPosition.DEF,
         "p07": PlayerPosition.MID,
         "p08": PlayerPosition.MID,
         "p12": PlayerPosition.FWD,
+        "p13": PlayerPosition.FWD,
     }
     player_map = {
         player_id: CandidatePlayer(

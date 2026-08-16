@@ -52,11 +52,10 @@ def evaluate_scenario(
         active[starting_gk_index] = tactic.bench_goalkeeper
         events.append(
             AutosubEvent(
-                scenario_id=scenario.scenario_id,
                 player_out=player_out,
                 player_in=tactic.bench_goalkeeper,
-                slot=1,
-                position=PlayerPosition.GK,
+                bench_slot=1,
+                reason_code="GOALKEEPER_REPLACEMENT",
             )
         )
     starting_outfield = tuple(
@@ -75,11 +74,10 @@ def evaluate_scenario(
             active[active.index(item.player_out)] = item.player_in
             events.append(
                 AutosubEvent(
-                    scenario_id=scenario.scenario_id,
                     player_out=item.player_out,
                     player_in=item.player_in,
-                    slot=item.slot,
-                    position=item.position,
+                    bench_slot=item.slot,
+                    reason_code="OUTFIELD_BENCH_ORDER",
                 )
             )
     captain_appeared = tactic.captain in appeared
@@ -89,28 +87,38 @@ def evaluate_scenario(
         if captain_appeared
         else (tactic.vice_captain if rules.vice_captain_fallback and vice_appeared else None)
     )
-    captain_resolution = CaptainResolution(
-        captain=tactic.captain,
-        vice_captain=tactic.vice_captain,
-        multiplier_player=multiplier_player,
-        multiplier=rules.captain_multiplier if multiplier_player else 1,
+    captain_resolution = (
+        CaptainResolution.CAPTAIN
+        if multiplier_player == tactic.captain
+        else (
+            CaptainResolution.VICE_CAPTAIN
+            if multiplier_player == tactic.vice_captain
+            else CaptainResolution.NEITHER
+        )
     )
-    counted = tuple(player for player in active if player in appeared)
-    score = sum(scenario.player_points[player] for player in counted)
+    counted = tuple(sorted(player for player in active if player in appeared))
+    base_points = sum(scenario.player_points[player] for player in counted)
+    captain_bonus_points = 0
     if multiplier_player is not None:
-        score += (rules.captain_multiplier - 1) * scenario.player_points[multiplier_player]
-    token = canonical_weight_token(scenario.weight)
+        captain_bonus_points = (rules.captain_multiplier - 1) * scenario.player_points[
+            multiplier_player
+        ]
+    score = base_points + captain_bonus_points
+    bench_contribution_points = sum(scenario.player_points[event.player_in] for event in events)
     fraction = weight_fraction(scenario.weight)
     weighted = fraction * score
     return (
         ScenarioManagerScore(
             scenario_id=scenario.scenario_id,
-            weighted_numerator=weighted.numerator,
-            weight_token=token,
-            manager_points=score,
-            player_points={player: scenario.player_points[player] for player in sorted(counted)},
-            autosub_events=tuple(events),
+            outcome_draw_id=scenario.outcome_draw_id,
+            counted_player_ids=counted,
+            autosubs=tuple(events),
             captain_resolution=captain_resolution,
+            effective_captain_id=multiplier_player,
+            base_points=base_points,
+            captain_bonus_points=captain_bonus_points,
+            bench_contribution_points=bench_contribution_points,
+            manager_points=score,
         ),
         weighted,
     )

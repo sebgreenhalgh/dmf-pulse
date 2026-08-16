@@ -12,6 +12,8 @@ def test_fixed_squad_blank_gameweek_is_exact_success() -> None:
     assert result.solver_status.tactical_configurations_examined == 363_000
     assert result.recommended_plan is not None
     assert result.recommended_plan.expected_manager_points == 0
+    assert result.recommended_plan.total_cost_tenths is None
+    assert result.recommended_plan.remaining_budget_tenths is None
 
 
 def test_production_current_target_fails_closed() -> None:
@@ -30,3 +32,6 @@ def test_provided_scope_has_exact_set_guarantee() -> None:
     )
     assert result.status is OptimisationStatus.SUCCESS
     assert result.optimality_guarantee.value == "EXACT_PROVIDED_SET"
+    assert result.recommended_plan is not None
+    assert result.recommended_plan.total_cost_tenths is None
+    assert result.recommended_plan.remaining_budget_tenths is None

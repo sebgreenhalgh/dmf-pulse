@@ -6,7 +6,7 @@ from decimal import ROUND_DOWN, ROUND_UP, localcontext
 
 import pytest
 
-from dmf_pulse.fpl_points.artifacts import canonical_json_bytes
+from dmf_pulse.fpl_points.artifacts import canonical_json_bytes, semantic_sha256
 from dmf_pulse.fpl_points.models import PlayerPosition, ProjectionMode
 from dmf_pulse.optimisation.autosub_evaluator import evaluate_scenario
 from dmf_pulse.optimisation.candidate_pool import enumerate_squads
@@ -44,6 +44,23 @@ def _policy(**updates: int) -> OneGameweekOptimiserPolicy:
     return OneGameweekOptimiserPolicy(**values)
 
 
+def _seal_pool(candidates: tuple[CandidatePlayer, ...]) -> CandidatePoolSnapshot:
+    pool = CandidatePoolSnapshot(
+        information_cutoff_utc="2026-08-16T00:00:00Z",
+        players=candidates,
+        snapshot_sha256="0" * 64,
+    )
+    payload = pool.model_dump(mode="json")
+    payload["snapshot_sha256"] = None
+    return pool.model_copy(update={"snapshot_sha256": semantic_sha256(payload)})
+
+
+def _seal_request(req: OneGameweekOptimisationRequest) -> OneGameweekOptimisationRequest:
+    payload = req.model_dump(mode="json")
+    payload["request_sha256"] = None
+    return req.model_copy(update={"request_sha256": semantic_sha256(payload)})
+
+
 def test_multiple_absence_audit_pairs_follow_formation_feasible_bench_order() -> None:
     rules = synthetic_ruleset()
     view = build_one_gameweek_rules_view(rules, projection_mode=ProjectionMode.TEST)
@@ -51,7 +68,7 @@ def test_multiple_absence_audit_pairs_follow_formation_feasible_bench_order() ->
     tactic = TacticalConfiguration(
         starting_xi=("p00", "p02", "p03", "p04", "p07", "p08", "p09", "p10", "p11", "p12", "p13"),
         bench_goalkeeper="p01",
-        outfield_bench_order=("p14", "p05", "p06"),
+        bench_order=("p14", "p05", "p06"),
         captain="p07",
         vice_captain="p08",
     )
@@ -109,17 +126,17 @@ def test_aggregate_tactical_cap_blocks_multiple_provided_squads_before_enumerati
                     )
                 )
         squads.append(CandidateSquad(player_ids=tuple(sorted(ids))))
-    req = OneGameweekOptimisationRequest(
-        request_id="provided-cap-request",
-        gameweek_id="GW1",
-        projection_mode=ProjectionMode.TEST,
-        information_cutoff_utc="2026-08-16T00:00:00Z",
-        search_scope=SearchScope.PROVIDED_SQUADS,
-        candidate_pool=CandidatePoolSnapshot(
+    req = _seal_request(
+        OneGameweekOptimisationRequest(
+            request_id="provided-cap-request",
+            projection_mode=ProjectionMode.TEST,
+            gameweek_id="GW1",
             information_cutoff_utc="2026-08-16T00:00:00Z",
-            candidates=tuple(sorted(candidates, key=lambda item: item.player_id)),
-        ),
-        provided_squads=tuple(squads),
+            search_scope=SearchScope.PROVIDED_SQUADS,
+            candidate_pool=_seal_pool(tuple(sorted(candidates, key=lambda item: item.player_id))),
+            provided_candidate_squads=tuple(squads),
+            request_sha256="0" * 64,
+        )
     )
     with pytest.raises(ResourceLimitError) as raised:
         solve(
@@ -141,7 +158,7 @@ def test_decimal_context_cannot_change_semantic_tactical_output() -> None:
     tactic = TacticalConfiguration(
         starting_xi=("p00", "p02", "p03", "p04", "p07", "p08", "p09", "p10", "p12", "p13", "p14"),
         bench_goalkeeper="p01",
-        outfield_bench_order=("p05", "p06", "p11"),
+        bench_order=("p05", "p06", "p11"),
         captain="p07",
         vice_captain="p08",
     )
@@ -177,14 +194,15 @@ def test_duplicate_provided_squads_are_rejected_before_caps_or_ties() -> None:
             information_cutoff_utc=base.information_cutoff_utc,
             search_scope=SearchScope.PROVIDED_SQUADS,
             candidate_pool=base.candidate_pool,
-            provided_squads=(base.provided_squads[0], base.provided_squads[0]),
+            provided_candidate_squads=(base.provided_squads[0], base.provided_squads[0]),
+            request_sha256="0" * 64,
         )
     rules = synthetic_ruleset()
     view = build_one_gameweek_rules_view(rules, projection_mode=ProjectionMode.TEST)
     duplicated = base.model_construct(
         **{
             **base.model_dump(),
-            "provided_squads": (base.provided_squads[0], base.provided_squads[0]),
+            "provided_candidate_squads": (base.provided_squads[0], base.provided_squads[0]),
         }
     )
     with pytest.raises(Exception):

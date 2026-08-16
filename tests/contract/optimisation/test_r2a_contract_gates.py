@@ -8,7 +8,13 @@ from dmf_pulse.fpl_points.models import ProjectionMode
 from dmf_pulse.optimisation.models import OptimisationStatus
 from dmf_pulse.optimisation.service import optimise_one_gameweek
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
-from tests.support.optimisation_factories import projection, request, synthetic_ruleset
+from tests.support.optimisation_factories import (
+    candidate_pool,
+    projection,
+    request,
+    seal_request,
+    synthetic_ruleset,
+)
 
 
 @pytest.mark.parametrize(
@@ -63,7 +69,53 @@ def test_appearance_is_not_inferred_from_zero_or_negative_points() -> None:
     assert result.status is OptimisationStatus.SUCCESS
     assert result.recommended_plan is not None
     score = result.recommended_plan.scenario_scores[0]
-    assert score.player_points["p00"] == 0
+    assert "p00" in score.counted_player_ids
+    assert score.base_points <= score.manager_points
+
+
+def test_scenario_factory_never_derives_appearance_from_points() -> None:
+    rules = synthetic_ruleset()
+    defaulted = projection(rules.ruleset_hash, values=({"p00": 0, "p01": -2},))
+    assert defaulted.scenario_set.scenarios[0].player_appeared["p00"] is True
+    assert defaulted.scenario_set.scenarios[0].player_appeared["p01"] is True
+    explicit = projection(
+        rules.ruleset_hash,
+        values=({"p00": 10},),
+        appeared_values=({"p00": False},),
+    )
+    assert explicit.scenario_set.scenarios[0].player_appeared["p00"] is False
+
+
+def test_declared_player_outside_stage9_universe_fails_before_search(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rules = synthetic_ruleset()
+    base_request = request()
+    foreign_players = tuple(
+        player.model_copy(update={"player_id": "z99"}) if player.player_id == "p14" else player
+        for player in base_request.candidate_pool.players
+    )
+    foreign_pool = candidate_pool(foreign_players)
+    foreign_request = seal_request(
+        base_request.model_copy(
+            update={
+                "candidate_pool": foreign_pool,
+                "fixed_squad_ids": tuple(player.player_id for player in foreign_pool.players),
+                "request_sha256": "0" * 64,
+            }
+        )
+    )
+    monkeypatch.setattr(
+        "dmf_pulse.optimisation.service.solve",
+        lambda *args, **kwargs: pytest.fail("search must not run with a foreign Stage-9 player"),
+    )
+    result = optimise_one_gameweek(
+        foreign_request,
+        projection(rules.ruleset_hash),
+        rules,
+    )
+    assert result.status is OptimisationStatus.BLOCKED
+    assert result.error_code == "STAGE9_CONTRACT_MISMATCH"
 
 
 def test_production_cutoff_is_checked_only_after_capability_and_never_from_request(

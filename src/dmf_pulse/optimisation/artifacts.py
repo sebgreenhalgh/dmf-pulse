@@ -13,9 +13,8 @@ from dmf_pulse.fpl_points.artifacts import canonical_json_bytes, sha256_bytes
 from dmf_pulse.optimisation.errors import OptimisationError
 
 _SEMANTIC_HASH_FIELDS = (
-    "candidate_snapshot_sha256",
+    "snapshot_sha256",
     "request_sha256",
-    "squad_sha256",
     "plan_sha256",
     "result_sha256",
 )
@@ -24,10 +23,6 @@ _SEMANTIC_HASH_FIELDS = (
 def _semantic_hash(value: BaseModel, field: str) -> str:
     payload = value.model_dump(mode="json")
     payload[field] = None
-    if field == "result_sha256" and isinstance(payload.get("lineage"), dict):
-        # The result digest is also recorded in lineage for consumers.  It is an identifier of
-        # this payload rather than a recursive input to its own digest.
-        payload["lineage"]["result_sha256"] = None
     return sha256_bytes(canonical_json_bytes(payload))
 
 
@@ -133,6 +128,10 @@ def _write_once(path: Path, data: bytes, *, root: Path) -> None:
         raise OptimisationError(
             "OPTIMISATION_ARTIFACT_INVALID", "artifact path escapes the configured root"
         ) from exc
+    if path.is_symlink():
+        raise OptimisationError(
+            "OPTIMISATION_ARTIFACT_INVALID", "artifact destination cannot be a symbolic link"
+        )
     if path.exists():
         if path.read_bytes() != data:
             raise OptimisationError("OPTIMISATION_ARTIFACT_INVALID", "immutable artifact collision")
@@ -147,6 +146,11 @@ def _write_once(path: Path, data: bytes, *, root: Path) -> None:
         try:
             os.link(temporary, path)
         except FileExistsError:
+            if path.is_symlink():
+                raise OptimisationError(
+                    "OPTIMISATION_ARTIFACT_INVALID",
+                    "artifact destination cannot be a symbolic link",
+                ) from None
             if path.read_bytes() != data:
                 raise OptimisationError(
                     "OPTIMISATION_ARTIFACT_INVALID", "immutable artifact collision"
@@ -167,7 +171,7 @@ def persist_result(
 ) -> Path:
     """Publish exact bytes once below a verified root-confined identity path."""
 
-    _verify_embedded_hash(result)
+    _verify_embedded_hash(result, required=True)
     data = canonical_json_bytes(result)
     digest = sha256_bytes(data)
     directory = _contained_directory(artifact_root, gameweek_id=gameweek_id, request_id=request_id)

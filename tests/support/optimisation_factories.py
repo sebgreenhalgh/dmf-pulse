@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from dmf_pulse.fpl_points.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.gameweek_summaries import build_gameweek_projection
 from dmf_pulse.fpl_points.models import (
     BpsCompletenessMode,
@@ -65,6 +66,27 @@ def players() -> tuple[CandidatePlayer, ...]:
     return tuple(values)
 
 
+def candidate_pool(
+    candidates: tuple[CandidatePlayer, ...] | None = None,
+) -> CandidatePoolSnapshot:
+    pool = CandidatePoolSnapshot(
+        information_cutoff_utc="2026-08-16T00:00:00Z",
+        players=tuple(sorted(candidates or players(), key=lambda item: item.player_id)),
+        snapshot_sha256="0" * 64,
+    )
+    payload = pool.model_dump(mode="json")
+    payload["snapshot_sha256"] = None
+    return pool.model_copy(update={"snapshot_sha256": semantic_sha256(payload)})
+
+
+def seal_request(
+    value: OneGameweekOptimisationRequest,
+) -> OneGameweekOptimisationRequest:
+    payload = value.model_dump(mode="json")
+    payload["request_sha256"] = None
+    return value.model_copy(update={"request_sha256": semantic_sha256(payload)})
+
+
 def scenario_set(
     ruleset_hash: str,
     *,
@@ -79,10 +101,7 @@ def scenario_set(
     scenarios: list[GameweekPointScenario] = []
     for index, point_map in enumerate(values):
         appeared_source = appeared_values[index] if appeared_values is not None else {}
-        appeared = {
-            player: appeared_source.get(player, point_map.get(player, 0) != 0)
-            for player in candidate_ids
-        }
+        appeared = {player: appeared_source.get(player, True) for player in candidate_ids}
         points = {player: point_map.get(player, 0) for player in candidate_ids}
         components = {
             player: {
@@ -155,18 +174,25 @@ def request(
     projection_mode: ProjectionMode = ProjectionMode.TEST,
     scope: SearchScope = SearchScope.FIXED_SQUAD,
 ) -> OneGameweekOptimisationRequest:
-    pool = CandidatePoolSnapshot(
-        information_cutoff_utc="2026-08-16T00:00:00Z",
-        candidates=tuple(sorted(players(), key=lambda item: item.player_id)),
-    )
-    squad = CandidateSquad(player_ids=tuple(player.player_id for player in players()))
-    return OneGameweekOptimisationRequest(
+    candidate_values = players()
+    if scope is SearchScope.BOUNDED_PLAYER_POOL:
+        candidate_values = tuple(
+            player.model_copy(update={"initial_selection_cost_tenths": 1})
+            for player in candidate_values
+        )
+    pool = candidate_pool(candidate_values)
+    squad_ids = tuple(player.player_id for player in candidate_values)
+    req = OneGameweekOptimisationRequest(
         request_id="request-1",
-        gameweek_id="GW1",
         projection_mode=projection_mode,
+        gameweek_id="GW1",
         information_cutoff_utc="2026-08-16T00:00:00Z",
         search_scope=scope,
         candidate_pool=pool,
-        fixed_squad=squad if scope is SearchScope.FIXED_SQUAD else None,
-        provided_squads=(squad,) if scope is SearchScope.PROVIDED_SQUADS else (),
+        fixed_squad_ids=squad_ids if scope is SearchScope.FIXED_SQUAD else None,
+        provided_candidate_squads=(CandidateSquad(player_ids=squad_ids),)
+        if scope is SearchScope.PROVIDED_SQUADS
+        else (),
+        request_sha256="0" * 64,
     )
+    return seal_request(req)
