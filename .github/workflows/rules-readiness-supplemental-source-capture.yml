@@ -1,0 +1,101 @@
+name: rules-readiness-supplemental-source-capture
+
+on:
+  push:
+    branches:
+      - readiness/RUL-2026-27-full-season-activation
+
+permissions:
+  contents: read
+
+jobs:
+  capture-official-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact pushed revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Capture supplemental official sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/rules-supplemental-source-capture"
+          mkdir -p "$root/payloads" "$root/headers"
+          cat > "$root/SOURCE_URLS.tsv" <<'EOF'
+          transfer-basics	https://www.premierleague.com/en/news/2174907
+          squad-basics	https://www.premierleague.com/en/news/2174419/fpl-basics-how-to-pick-a-squad
+          chip-basics	https://www.premierleague.com/en/news/2174900
+          help-copilot	https://www.premierleague.com/en/news/4681092/fpl-help-copilot
+          faq-copilot	https://www.premierleague.com/en/news/4661030
+          price-explainer	https://www.premierleague.com/en/news/2858775/1000
+          EOF
+          while IFS=$'\t' read -r key url; do
+            curl \
+              --fail \
+              --location \
+              --compressed \
+              --retry 4 \
+              --retry-all-errors \
+              --connect-timeout 20 \
+              --max-time 120 \
+              --user-agent 'DMF-Pulse-Rules-Readiness/1.0 (+official-source-verification)' \
+              --dump-header "$root/headers/$key.headers" \
+              --output "$root/payloads/$key.body" \
+              "$url"
+            test -s "$root/payloads/$key.body"
+          done < "$root/SOURCE_URLS.tsv"
+          python - "$root" <<'PY'
+          from __future__ import annotations
+          import hashlib
+          import json
+          import pathlib
+          import subprocess
+          import sys
+          from datetime import UTC, datetime
+
+          root = pathlib.Path(sys.argv[1])
+          records = []
+          for line in (root / "SOURCE_URLS.tsv").read_text("utf-8").splitlines():
+              key, url = line.split("\t", 1)
+              body = (root / "payloads" / f"{key}.body").read_bytes()
+              headers = (root / "headers" / f"{key}.headers").read_bytes()
+              records.append(
+                  {
+                      "key": key,
+                      "url": url,
+                      "bytes": len(body),
+                      "sha256": hashlib.sha256(body).hexdigest(),
+                      "headers_sha256": hashlib.sha256(headers).hexdigest(),
+                  }
+              )
+          manifest = {
+              "schema_version": "dmf-official-source-capture-v1",
+              "retrieved_at_utc": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+              "repository": "sebgreenhalgh/dmf-pulse",
+              "branch": "readiness/RUL-2026-27-full-season-activation",
+              "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+              "sources": records,
+          }
+          (root / "SOURCE_CAPTURE.json").write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          PY
+          (
+            cd "$root"
+            find payloads headers -type f -print0 | sort -z | xargs -0 sha256sum > MANIFEST.sha256
+            sha256sum SOURCE_CAPTURE.json SOURCE_URLS.tsv >> MANIFEST.sha256
+            sha256sum -c MANIFEST.sha256
+          )
+
+      - name: Upload supplemental official source capture
+        uses: actions/upload-artifact@v4
+        with:
+          name: rules-official-supplemental-source-capture-${{ github.sha }}
+          path: ${{ runner.temp }}/rules-supplemental-source-capture
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
