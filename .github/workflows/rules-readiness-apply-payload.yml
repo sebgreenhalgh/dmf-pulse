@@ -29,9 +29,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          payload=automation/rules-readiness-payload.tar.gz.b64
-          test -s "$payload"
-          base64 --decode "$payload" > "$RUNNER_TEMP/rules-readiness-payload.tar.gz"
+          sentinel=automation/rules-readiness-payload.tar.gz.b64
+          assembled="$RUNNER_TEMP/rules-readiness-payload.b64"
+          test -s "$sentinel"
+          if compgen -G 'automation/rules-readiness-payload.part-*' >/dev/null; then
+            find automation -maxdepth 1 -type f -name 'rules-readiness-payload.part-*' -print0 \
+              | sort -z \
+              | xargs -0 cat > "$assembled"
+          else
+            cp "$sentinel" "$assembled"
+          fi
+          base64 --decode "$assembled" > "$RUNNER_TEMP/rules-readiness-payload.tar.gz"
           python - "$RUNNER_TEMP/rules-readiness-payload.tar.gz" <<'PY'
           from __future__ import annotations
           import pathlib
@@ -51,10 +59,26 @@ jobs:
                   if member.issym() or member.islnk() or member.isdev():
                       raise SystemExit(f"unsupported payload member: {member.name}")
               tar.extractall(root, members=members, filter="data")
+          delete_list = root / ".rules-readiness-delete-paths"
+          if delete_list.exists():
+              for raw in delete_list.read_text("utf-8").splitlines():
+                  if not raw or raw.startswith("#"):
+                      continue
+                  name = pathlib.PurePosixPath(raw)
+                  if name.is_absolute() or ".." in name.parts or name.parts[:1] == (".git",):
+                      raise SystemExit(f"unsafe delete path: {raw}")
+                  target = root.joinpath(*name.parts)
+                  if target.is_dir():
+                      raise SystemExit(f"directory deletion is unsupported: {raw}")
+                  target.unlink(missing_ok=True)
           PY
           test -s .rules-readiness-commit-message
           commit_message="$(cat .rules-readiness-commit-message)"
-          rm -f .rules-readiness-commit-message "$payload"
+          rm -f \
+            .rules-readiness-commit-message \
+            .rules-readiness-delete-paths \
+            "$sentinel" \
+            automation/rules-readiness-payload.part-*
           git config user.name "DMF Pulse Rules Readiness"
           git config user.email "actions@users.noreply.github.com"
           git add -A
