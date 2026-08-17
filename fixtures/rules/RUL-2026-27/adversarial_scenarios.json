@@ -1,0 +1,134 @@
+{
+  "schema_version": "dmf-rules-2026-27-adversarial-scenarios-v1",
+  "target_season": "2026/27",
+  "squad_and_lineup": [
+    {
+      "id": "SQUAD-BUDGET-EXACT",
+      "budget_tenths": 1000,
+      "prices_tenths": [45, 45, 40, 40, 40, 40, 40, 45, 45, 45, 45, 45, 45, 45, 45],
+      "expected_legal": true
+    },
+    {
+      "id": "SQUAD-BUDGET-OVER",
+      "budget_tenths": 1000,
+      "prices_tenths": [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+      "expected_legal": false
+    },
+    {
+      "id": "FORMATION-VALID-343",
+      "formation": {"GK": 1, "DEF": 3, "MID": 4, "FWD": 3},
+      "expected_legal": true
+    },
+    {
+      "id": "FORMATION-VALID-541",
+      "formation": {"GK": 1, "DEF": 5, "MID": 4, "FWD": 1},
+      "expected_legal": true
+    },
+    {
+      "id": "FORMATION-INVALID-253",
+      "formation": {"GK": 1, "DEF": 2, "MID": 5, "FWD": 3},
+      "expected_legal": false
+    },
+    {
+      "id": "CLUB-QUOTA-FOUR",
+      "club_counts": {"club-a": 4},
+      "expected_legal": false
+    }
+  ],
+  "player_points_boundaries": [
+    {"id": "MINUTES-0", "minutes": 0, "appearance_points": 0},
+    {"id": "MINUTES-1", "minutes": 1, "appearance_points": 1},
+    {"id": "MINUTES-59", "minutes": 59, "appearance_points": 1},
+    {"id": "MINUTES-60", "minutes": 60, "appearance_points": 2}
+  ],
+  "selling_price": [
+    {
+      "id": "SELL-INCREASE-EVEN-PROFIT",
+      "purchase_price_tenths": 50,
+      "current_price_tenths": 54,
+      "expected_selling_price_tenths": 52
+    },
+    {
+      "id": "SELL-INCREASE-ODD-PROFIT-FLOOR",
+      "purchase_price_tenths": 50,
+      "current_price_tenths": 53,
+      "expected_selling_price_tenths": 51
+    },
+    {
+      "id": "SELL-EQUAL",
+      "purchase_price_tenths": 50,
+      "current_price_tenths": 50,
+      "expected_selling_price_tenths": 50
+    },
+    {
+      "id": "SELL-BELOW",
+      "purchase_price_tenths": 50,
+      "current_price_tenths": 48,
+      "expected_selling_price_tenths": 48
+    }
+  ],
+  "transfer_state": [
+    {
+      "id": "PRESEASON-UNLIMITED",
+      "phase": "PRESEASON",
+      "transfers": 20,
+      "expected_hit_points": 0
+    },
+    {
+      "id": "BANK-CAP",
+      "initial_free_transfers": 5,
+      "earned": 1,
+      "used": 0,
+      "expected_next_free_transfers": 5
+    },
+    {
+      "id": "ONE-PAID-TRANSFER",
+      "available_free_transfers": 1,
+      "transfers": 2,
+      "expected_hit_points": -4
+    },
+    {
+      "id": "THREE-PAID-TRANSFERS",
+      "available_free_transfers": 1,
+      "transfers": 4,
+      "expected_hit_points": -12
+    },
+    {
+      "id": "MAX-TRANSFERS-PER-GW",
+      "transfers": 20,
+      "expected_legal": true
+    },
+    {
+      "id": "OVER-MAX-TRANSFERS-PER-GW",
+      "transfers": 21,
+      "expected_legal": false
+    },
+    {
+      "id": "BANK-CONSERVATION",
+      "initial_bank_tenths": 10,
+      "sold_value_tenths": 52,
+      "bought_value_tenths": 54,
+      "expected_bank_tenths": 8
+    }
+  ],
+  "chips": [
+    {"id": "CHIP-FIRST-HALF-LAST-GW", "gameweek": 19, "inventory_window": 1, "expected_available": true},
+    {"id": "CHIP-FIRST-HALF-EXPIRED", "gameweek": 20, "inventory_window": 1, "expected_available": false},
+    {"id": "CHIP-SECOND-HALF-FIRST-GW", "gameweek": 20, "inventory_window": 2, "expected_available": true},
+    {"id": "CHIP-ONE-PER-GW", "requested": ["BENCH_BOOST", "TRIPLE_CAPTAIN"], "expected_legal": false},
+    {"id": "FREE-HIT-NON-CONSECUTIVE", "previous_gameweek": 10, "requested_gameweek": 11, "expected_legal": false},
+    {"id": "FREE-HIT-RESTORES-SQUAD", "expected_restoration": true},
+    {"id": "WILDCARD-PERMANENT-TRANSFERS", "expected_restoration": false},
+    {"id": "TRIPLE-CAPTAIN-MULTIPLIER", "expected_captain_multiplier": 3},
+    {"id": "BENCH-BOOST-COUNTS-BENCH", "expected_bench_points_counted": true}
+  ],
+  "governance": [
+    {"id": "ACTIVATION-WITHOUT-APPROVAL", "approval_status": "PENDING_HUMAN_APPROVAL", "expected_activation": false},
+    {"id": "FORGED-APPROVAL", "approved": true, "approved_by": "Sebastian Greenhalgh", "approval_hash": "forged", "expected_activation": false},
+    {"id": "APPROVAL-HASH-MISMATCH", "approved": true, "approval_hash_matches_ruleset": false, "expected_activation": false},
+    {"id": "TAMPERED-COMPILED-ARTIFACT", "compiled_hash_matches": false, "expected_activation": false},
+    {"id": "STALE-CONTROLLING-SOURCE", "source_fresh": false, "expected_activation": false},
+    {"id": "CONFLICTING-OFFICIAL-SOURCE", "source_conflict": true, "expected_activation": false},
+    {"id": "UNRESOLVED-REQUIRED-RULE", "unresolved_required_fields": 1, "expected_activation": false}
+  ]
+}
