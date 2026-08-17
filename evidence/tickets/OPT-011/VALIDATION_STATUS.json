@@ -74,6 +74,36 @@
       "classification": "PASS",
       "detail": "20 fixtures, config/package parity, no solver dependency tokens",
       "name": "artifact_assurance"
+    },
+    {
+      "classification": "PASS",
+      "detail": "92 changed files; non-empty production, test, and fixture scope from exact parent",
+      "name": "scope_assurance"
+    },
+    {
+      "classification": "PASS",
+      "detail": "0 errors after OPT-011 current manifest",
+      "name": "repository_validation"
+    },
+    {
+      "classification": "PASS",
+      "detail": "0 findings",
+      "name": "secret_scan"
+    },
+    {
+      "classification": "PASS",
+      "detail": "Stage-11 source and assurance scripts compile",
+      "name": "compileall"
+    },
+    {
+      "classification": "PASS",
+      "detail": "no whitespace errors",
+      "name": "git_diff_check"
+    },
+    {
+      "classification": "PASS",
+      "detail": "three representative fixtures, three runs per case",
+      "name": "benchmark_smoke"
     }
   ],
   "implementation_branch": "stage/A11/OPT-011-multi-gameweek-transfer-optimiser",

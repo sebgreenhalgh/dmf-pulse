@@ -18,6 +18,11 @@
 | Installed-wheel Stage-11 optimise/advance | PASS; both exit 0, result advances to GW2 |
 | Source CLI optimise/advance acceptance | PASS with immutable artifacts |
 | Artifact/config/fixture assurance | PASS, exact 20-case set |
+| Exact-parent scope assurance | PASS, 92 changed files with production/tests/fixtures present |
+| Repository validation | PASS, zero errors |
+| Secret scan | PASS, zero findings |
+| Compileall | PASS for Stage-11 source and assurance scripts |
+| `git diff --check` | PASS |
 | Benchmark smoke | PASS, three representative cases, three runs each |
 
 The independent oracle is test-owned. Source-assurance tests prohibit production solver and
