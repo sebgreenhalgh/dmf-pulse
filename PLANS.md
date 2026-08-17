@@ -788,7 +788,7 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   point/probability/distribution/joint metrics; calibration; stateful root-action replay; regret;
   leakage blocking; immutable reports/artifacts; offline CLI.
 - Safety: synthetic acceptance only; no Stage 13+ models, paid history, provider access,
-  production promotion, FPL execution, push, merge or self-acceptance.
+  production promotion, FPL execution, merge or self-acceptance.
 
 ## EVAL-012 checkpoints
 

@@ -16,5 +16,5 @@ Local branch identity: `stage/A12/EVAL-012-backtesting-framework`.
 - [x] Produce truthful implementation evidence and a self-contained independent-review bundle.
 - [x] Complete fresh independent Sol review, adversarial remediation, focused coverage, broader
   regression, canonical static/build and installed-wheel verification.
-- [ ] Push the review-ready branch and create the unmerged human-review PR.
+- [x] Push the review-ready branch and create the unmerged human-review PR.
 - [ ] Human acceptance, merge and accepted tag.
