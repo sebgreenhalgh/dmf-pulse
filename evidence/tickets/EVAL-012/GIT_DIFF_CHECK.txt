@@ -3,4 +3,6 @@ base=4f1274ccef419a7c0bde335c48bd4070e248b2e6
 commands=git diff --check; git diff --cached --check
 unstaged_whitespace_errors=0
 staged_whitespace_errors=0
-final_commit_check=PENDING_COMMIT
+review_implementation_commit=778c532a92010b747de70d8e5438cb769c0cd615
+review_implementation_commit_check=PASS
+publication_tree_check=PASS

@@ -801,6 +801,6 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   proper-scoring, scenario-weight, Stage-11 replay, artifact and reporting findings.
 - [x] Pass the 104-test focused suite, 90% branch-aware coverage, canonical Ruff/mypy/build,
   installed-wheel six-command smoke, leakage canaries and dependency-relevant regressions.
-- [ ] Complete final repository/evidence assurance, push the review-ready branch and open the
+- [x] Complete final repository/evidence assurance, push the review-ready branch and open the
   unmerged PR to `main`.
 - [ ] Human acceptance, merge and accepted tag.

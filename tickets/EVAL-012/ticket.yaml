@@ -10,7 +10,7 @@ implemented_on: "2026-08-17"
 required_base_branch: "main"
 required_base_commit: "4f1274ccef419a7c0bde335c48bd4070e248b2e6"
 implementation_branch: "stage/A12/EVAL-012-backtesting-framework"
-pull_request: null
+pull_request: 9
 objective: >-
   Implement a deterministic, time-travel-safe, nested walk-forward and prequential evaluation
   framework that freezes historical information sets, forecasts and decisions before outcomes;
