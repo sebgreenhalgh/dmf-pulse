@@ -1,0 +1,352 @@
+name: rules-readiness-finalize
+
+on:
+  push:
+    branches:
+      - readiness/RUL-2026-27-full-season-activation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  UV_NO_PROGRESS: "1"
+  UV_CACHE_DIR: ${{ github.workspace }}/../.uv-cache-rules-readiness
+  IMMUTABLE_PARENT: 4f1274ccef419a7c0bde335c48bd4070e248b2e6
+
+jobs:
+  finalization:
+    name: 2026/27 rules readiness / Python 3.13 / Ubuntu
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: dmf_pulse_test
+          POSTGRES_USER: dmf_test
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
+
+    steps:
+      - name: Check out exact review branch without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Prove immutable ancestry and record identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "${IMMUTABLE_PARENT}^{commit}"
+          test "$(git merge-base "${IMMUTABLE_PARENT}" HEAD)" = "${IMMUTABLE_PARENT}"
+          test "$(git branch --show-current)" = "readiness/RUL-2026-27-full-season-activation"
+          mkdir -p artifacts/rules-readiness-final
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          parent = "4f1274ccef419a7c0bde335c48bd4070e248b2e6"
+          head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          main = subprocess.check_output(
+              ["git", "ls-remote", "https://github.com/sebgreenhalgh/dmf-pulse.git", "refs/heads/main"],
+              text=True,
+          ).split()[0]
+          branch = subprocess.check_output(
+              ["git", "ls-remote", "https://github.com/sebgreenhalgh/dmf-pulse.git", "refs/heads/readiness/RUL-2026-27-full-season-activation"],
+              text=True,
+          ).split()[0]
+          payload = {
+              "schema_version": "dmf-rules-final-identities-v1",
+              "repository": "sebgreenhalgh/dmf-pulse",
+              "branch": "readiness/RUL-2026-27-full-season-activation",
+              "immutable_parent": parent,
+              "final_commit": head,
+              "remote_main": main,
+              "remote_branch": branch,
+              "remote_branch_verified": branch == head,
+              "main_diverged_from_immutable_parent": main != parent,
+          }
+          if branch != head:
+              raise SystemExit("remote review branch does not resolve to checked-out commit")
+          Path("artifacts/rules-readiness-final/commit_identities.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          PY
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned uv frontend and frozen dependencies
+        run: |
+          python -m pip install --disable-pip-version-check uv==0.11.26
+          uv sync --all-groups --frozen
+
+      - name: Discover target ruleset and record CLI surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run dmf rules --help > artifacts/rules-readiness-final/rules_cli_help.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          candidates = []
+          for path in Path('.').rglob('*.yaml'):
+              if any(part in {'.git', '.venv', 'site-packages'} for part in path.parts):
+                  continue
+              text = path.read_text(encoding='utf-8', errors='ignore')
+              score = 0
+              if '2026/27' in text or '2026-27' in text or '2026_27' in text:
+                  score += 20
+              if 'target' in path.as_posix().lower():
+                  score += 8
+              if 'rules' in path.parts or 'rules' in path.as_posix().lower():
+                  score += 5
+              if score:
+                  candidates.append((score, len(path.parts), path.parent.as_posix(), path.as_posix()))
+          if not candidates:
+              raise SystemExit('no 2026/27 target rules YAML found')
+          candidates.sort(key=lambda item: (-item[0], item[1], item[2], item[3]))
+          target_dir = candidates[0][2]
+          Path('artifacts/rules-readiness-final/target_dir.txt').write_text(target_dir + '\n')
+          Path('artifacts/rules-readiness-final/target_discovery.json').write_text(
+              json.dumps(
+                  {'target_dir': target_dir, 'candidates': candidates[:50]},
+                  indent=2,
+                  sort_keys=True,
+              ) + '\n',
+              encoding='utf-8',
+          )
+          print(target_dir)
+          PY
+          echo "TARGET_RULESET=$(cat artifacts/rules-readiness-final/target_dir.txt)" >> "$GITHUB_ENV"
+
+      - name: Formatting, lint and strict typing
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run ruff format --check . | tee artifacts/rules-readiness-final/ruff_format.txt
+          uv run ruff check . | tee artifacts/rules-readiness-final/ruff_lint.txt
+          uv run mypy src/dmf_pulse | tee artifacts/rules-readiness-final/mypy.txt
+
+      - name: Validate and deterministically compile target rules twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run dmf rules validate "$TARGET_RULESET" --json | tee artifacts/rules-readiness-final/target_validation.json
+          uv run dmf rules compile "$TARGET_RULESET" --output artifacts/rules-readiness-final/compiled_2026_27_a.json --json | tee artifacts/rules-readiness-final/compile_a.json
+          uv run dmf rules compile "$TARGET_RULESET" --output artifacts/rules-readiness-final/compiled_2026_27_b.json --json | tee artifacts/rules-readiness-final/compile_b.json
+          cmp artifacts/rules-readiness-final/compiled_2026_27_a.json artifacts/rules-readiness-final/compiled_2026_27_b.json
+          sha256sum artifacts/rules-readiness-final/compiled_2026_27_a.json > artifacts/rules-readiness-final/compiled_2026_27.sha256
+
+      - name: Assert target capability and approval governance evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, re
+          from pathlib import Path
+          target = Path(Path('artifacts/rules-readiness-final/target_dir.txt').read_text().strip())
+          texts = []
+          for p in target.rglob('*'):
+              if p.is_file() and p.suffix.lower() in {'.yaml', '.yml', '.json', '.md'}:
+                  texts.append(p.read_text(encoding='utf-8', errors='ignore'))
+          joined = '\n'.join(texts)
+          required = ['PLAYER_POINTS', 'GW1_INITIAL_SQUAD', 'TRANSFER_STATE', 'CHIP_STATE', 'FULL_SEASON']
+          missing = [value for value in required if value not in joined]
+          approval_pending = 'PENDING_HUMAN_APPROVAL' in joined or any(
+              'PENDING_HUMAN_APPROVAL' in p.read_text(encoding='utf-8', errors='ignore')
+              for p in Path('.').rglob('*')
+              if p.is_file() and p.stat().st_size < 2_000_000 and p.suffix.lower() in {'.json','.yaml','.yml','.md'}
+          )
+          forbidden = []
+          patterns = [r'approved_by\s*[:=]\s*["\']?Sebastian Greenhalgh', r'approved\s*[:=]\s*true', r'\bACTIVE\b']
+          for path in list(target.rglob('*')) + list(Path('evidence/tickets/RUL-2026-27').rglob('*') if Path('evidence/tickets/RUL-2026-27').exists() else []):
+              if not path.is_file() or path.stat().st_size > 2_000_000:
+                  continue
+              text = path.read_text(encoding='utf-8', errors='ignore')
+              for pattern in patterns:
+                  if re.search(pattern, text, re.IGNORECASE):
+                      # Reports may state NOT ACTIVE; only structured/affirmative forms are forbidden.
+                      if pattern == r'\bACTIVE\b' and re.search(r'NOT\s+ACTIVE|never\s+ACTIVE|must not.*ACTIVE', text, re.IGNORECASE):
+                          continue
+                      forbidden.append({'path': path.as_posix(), 'pattern': pattern})
+          payload = {
+              'required_capability_names_present': not missing,
+              'missing_capability_names': missing,
+              'pending_human_approval_present': approval_pending,
+              'forbidden_approval_or_activation_assertions': forbidden,
+          }
+          Path('artifacts/rules-readiness-final/governance_scan.json').write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          if missing or not approval_pending or forbidden:
+              raise SystemExit(json.dumps(payload, sort_keys=True))
+          PY
+
+      - name: Focused rules, optimiser and adversarial tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t TEST_PATHS < <(find tests -type f -name '*.py' \( -ipath '*rules*' -o -ipath '*transfer*' -o -ipath '*lineup*' -o -ipath '*captain*' -o -ipath '*chip*' -o -ipath '*price*' \) -printf '%h\n' | sort -u)
+          if [ "${#TEST_PATHS[@]}" -eq 0 ]; then
+            echo 'No focused rules/consumer tests discovered' >&2
+            exit 1
+          fi
+          uv run pytest "${TEST_PATHS[@]}" --maxfail=1 | tee artifacts/rules-readiness-final/focused_pytest.txt
+
+      - name: Repository tests excluding documented performance gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run pytest -m "not performance" --maxfail=1 | tee artifacts/rules-readiness-final/repository_pytest.txt
+
+      - name: PostgreSQL integration gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run pytest -m "postgres and integration" tests/integration --maxfail=1 | tee artifacts/rules-readiness-final/postgres_pytest.txt
+
+      - name: Existing rules regression vertical slice
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run dmf rules validate fixtures/rules/RUL-002/synthetic_complete --json | tee artifacts/rules-readiness-final/synthetic_validate.json
+          uv run dmf rules compile fixtures/rules/RUL-002/synthetic_complete --output artifacts/rules-readiness-final/rul_002_synthetic.json --json | tee artifacts/rules-readiness-final/synthetic_compile.json
+          uv run dmf rules score-fixture artifacts/rules-readiness-final/rul_002_synthetic.json fixtures/rules/RUL-002/golden_fixture_001.json --json | tee artifacts/rules-readiness-final/synthetic_score_fixture.json
+          uv run dmf rules score-gameweek artifacts/rules-readiness-final/rul_002_synthetic.json fixtures/rules/RUL-002/golden_gameweek_001.json --json | tee artifacts/rules-readiness-final/synthetic_score_gameweek.json
+
+      - name: Build, wheel verification, repository validation and secret scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv build | tee artifacts/rules-readiness-final/build.txt
+          for verifier in scripts/verify_*_wheel.py; do
+            [ -f "$verifier" ] || continue
+            uv run python "$verifier" | tee -a artifacts/rules-readiness-final/wheel_verification.txt
+          done
+          uv run python scripts/validate_repository.py | tee artifacts/rules-readiness-final/repository_validation.txt
+          uv run python scripts/scan_secrets.py | tee artifacts/rules-readiness-final/secret_scan.txt
+          git diff --check | tee artifacts/rules-readiness-final/git_diff_check.txt
+
+      - name: Activation must fail closed before human approval
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          help_text = Path('artifacts/rules-readiness-final/rules_cli_help.txt').read_text(encoding='utf-8')
+          candidates = []
+          for command in ('activate', 'activation-check', 'activation-status', 'promote'):
+              if command in help_text:
+                  candidates.append(command)
+          evidence = {'candidate_commands': candidates, 'attempts': []}
+          target = Path('artifacts/rules-readiness-final/target_dir.txt').read_text().strip()
+          compiled = 'artifacts/rules-readiness-final/compiled_2026_27_a.json'
+          for command in candidates:
+              argv = ['uv', 'run', 'dmf', 'rules', command, target, '--json']
+              result = subprocess.run(argv, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+              evidence['attempts'].append(
+                  {'argv': argv, 'returncode': result.returncode, 'stdout': result.stdout, 'stderr': result.stderr}
+              )
+              if result.returncode == 0:
+                  raise SystemExit(f'pre-approval activation command unexpectedly succeeded: {argv}')
+          if not candidates:
+              # The accepted activation contract may be exercised only by tests rather than a public CLI.
+              matches = [
+                  p.as_posix() for p in Path('tests').rglob('*.py')
+                  if 'activation' in p.read_text(encoding='utf-8', errors='ignore').lower()
+                  and ('approval' in p.read_text(encoding='utf-8', errors='ignore').lower())
+              ]
+              evidence['activation_governance_tests'] = matches
+              if not matches:
+                  raise SystemExit('no activation CLI and no activation/approval governance tests found')
+          Path('artifacts/rules-readiness-final/activation_fail_closed.json').write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          PY
+
+      - name: Create final command ledger and deterministic review bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          evidence = Path('artifacts/rules-readiness-final')
+          files = sorted(p.as_posix() for p in evidence.rglob('*') if p.is_file())
+          ledger = {
+              'schema_version': 'dmf-rules-readiness-command-ledger-v1',
+              'final_commit': subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(),
+              'status': 'PASS',
+              'artifacts': files,
+              'commands': [
+                  'uv sync --all-groups --frozen',
+                  'uv run ruff format --check .',
+                  'uv run ruff check .',
+                  'uv run mypy src/dmf_pulse',
+                  'uv run dmf rules validate <target> --json',
+                  'uv run dmf rules compile <target> (twice; byte comparison)',
+                  'uv run pytest <focused rules and consumers>',
+                  'uv run pytest -m not performance',
+                  'uv run pytest -m postgres and integration tests/integration',
+                  'uv build',
+                  'uv run python scripts/validate_repository.py',
+                  'uv run python scripts/scan_secrets.py',
+                  'git diff --check',
+              ],
+          }
+          (evidence / 'command_ledger.json').write_text(
+              json.dumps(ledger, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          PY
+          OUT="$RUNNER_TEMP/dmf-rules-review"
+          mkdir -p "$OUT"
+          uv run python scripts/build_ruleset_review_bundle_2026_27.py \
+            --repo-root . \
+            --output-dir "$OUT" \
+            --parent "$IMMUTABLE_PARENT" \
+            --commit HEAD
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          out = Path(os.environ['RUNNER_TEMP']) / 'dmf-rules-review'
+          assurance_path = out / 'DMF_PULSE_2026_27_RULESET_BUNDLE_ASSURANCE.json'
+          value = json.loads(assurance_path.read_text(encoding='utf-8'))
+          remote = subprocess.check_output(
+              ['git','ls-remote','https://github.com/sebgreenhalgh/dmf-pulse.git','refs/heads/readiness/RUL-2026-27-full-season-activation'],
+              text=True,
+          ).split()[0]
+          head = subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
+          value['remote_branch_verified'] = remote == head
+          value['status'] = 'PASS' if value['status'] == 'PASS' and value['remote_branch_verified'] else 'FAIL'
+          assurance_path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          if value['status'] != 'PASS':
+              raise SystemExit(json.dumps(value, sort_keys=True))
+          PY
+
+      - name: Upload independently verified review handoff
+        uses: actions/upload-artifact@v4
+        with:
+          name: DMF_PULSE_2026_27_RULESET_REVIEW_HANDOFF-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/dmf-rules-review/DMF_PULSE_2026_27_RULESET_REVIEW_BUNDLE.zip
+            ${{ runner.temp }}/dmf-rules-review/DMF_PULSE_2026_27_RULESET_REVIEW_BUNDLE.zip.sha256
+            ${{ runner.temp }}/dmf-rules-review/DMF_PULSE_2026_27_RULESET_BUNDLE_ASSURANCE.json
+            artifacts/rules-readiness-final/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
