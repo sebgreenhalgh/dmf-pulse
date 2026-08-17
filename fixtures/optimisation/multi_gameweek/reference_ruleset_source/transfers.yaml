@@ -1,0 +1,15 @@
+transition:
+  preseason_unlimited: true
+  earned_per_deadline: 1
+  free_transfer_cap: 5
+  hit_points: -4
+  outgoing_and_incoming_same_position: true
+  club_quota_repair_required: true
+  transfer_accounting_order:
+    - "SELL_OUTGOING_AT_SELLING_PRICE"
+    - "BUY_INCOMING_AT_CURRENT_PRICE"
+    - "CONSUME_FREE_TRANSFERS"
+    - "APPLY_TRANSFER_HITS"
+    - "EARN_NEXT_DEADLINE_TRANSFER"
+    - "CAP_FREE_TRANSFERS"
+chip_interactions: {}

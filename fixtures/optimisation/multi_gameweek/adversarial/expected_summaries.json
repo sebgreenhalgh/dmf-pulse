@@ -1,0 +1,182 @@
+{
+  "clairvoyance_trap": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|mid_1->mid_6",
+    "error_code": null,
+    "objective": "63.0",
+    "request_sha256": "7a90fdc354e25c572a44c4d2e53014b0bbcab50f8fa05533fa043acb73fdbac0",
+    "result_sha256": "68bbd3278b8395e7618fbd548f616d6f6e4aab0fb4a07ff3e735a40ab783a819",
+    "status": "SUCCESS"
+  },
+  "funding_transfer_bundle": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|def_1,mid_1->def_6,mid_6",
+    "error_code": null,
+    "objective": "74",
+    "request_sha256": "159075a4b34b889811f9b755b80121c6edc2023a3d4f24762eaae704f2ada879",
+    "result_sha256": "cd6a6b7913dad8d7926834cbec3586ef890266e8935920f16217e57ccc67e61c",
+    "status": "SUCCESS"
+  },
+  "futures_identical_until_revelation": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|->",
+    "error_code": null,
+    "objective": "100.0",
+    "request_sha256": "26aeaf5d4e6b585e172ce6259bd86b085623007d5fa5f6c36bcfeececfe1ac23",
+    "result_sha256": "3c84d52617f7cf7c7f4f509a29814654d15058b8e90e2ad2049132d66edab7bd",
+    "status": "SUCCESS"
+  },
+  "horizon_reversal": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|->",
+    "error_code": null,
+    "objective": "71",
+    "request_sha256": "9860c9b099414281d46d3df06b04852dd792057c08f92146eb5b75a319f194b3",
+    "result_sha256": "4fe5e9ea49cf681599985b689273236bfde681128605a11a498cca77d58bdad7",
+    "status": "SUCCESS"
+  },
+  "illegal_manager_state": {
+    "backend_status": "INPUT_CAPABILITY_BLOCKED",
+    "current_action": null,
+    "error_code": "MULTI_GAMEWEEK_INPUT_INVALID",
+    "objective": null,
+    "request_sha256": "4bd2f1a7188aa59e7e0057d20ecd42bb0b3d8731c95a808948302fea9d240826",
+    "result_sha256": "eccc3c55e6fd42c56b4d1651818108fa66a92dc14ed94c60de4df66fedb999cb",
+    "status": "BLOCKED"
+  },
+  "infeasible_future_state": {
+    "backend_status": "INFEASIBLE",
+    "current_action": null,
+    "error_code": "MULTI_GAMEWEEK_INFEASIBLE",
+    "objective": null,
+    "request_sha256": "43270e3a53c512fb8cb11fedee2d906f66d5d24ceff5c68177f5a7201f595147",
+    "result_sha256": "61a467762b049f60c26b47b9b3c7816cfca18b51d3c3f8d2b0219f5351a1c781",
+    "status": "INFEASIBLE"
+  },
+  "injury_revealed_after_current_decision": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|->",
+    "error_code": null,
+    "objective": "70.0",
+    "request_sha256": "d06c853464ac25ddbfd1642399a30195f474ad0773d8e3a4da19dd086d87af5d",
+    "result_sha256": "f60986da0474e65c1ad8899e324da82ccb6245aee33628f6c04f3dcab21b26b1",
+    "status": "SUCCESS"
+  },
+  "malformed_scenario_probabilities_tree": {
+    "backend_status": "INPUT_CAPABILITY_BLOCKED",
+    "current_action": null,
+    "error_code": "MULTI_GAMEWEEK_INPUT_INVALID",
+    "objective": null,
+    "request_sha256": "3be9a1f9684249017cb569a5c8b32b832ae49bb10b8a7fe89a58762b9665759b",
+    "result_sha256": "d599d2caca4eeefdf00aaedc43d7687263b40484b55c75f1505aa70e6e3d029b",
+    "status": "BLOCKED"
+  },
+  "no_materially_distinct_alternative": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|->",
+    "error_code": null,
+    "objective": "30",
+    "request_sha256": "455697108bc39e558230a6b96f7e2fc8982af2e3ec23c2bf75bf43498c4241cb",
+    "result_sha256": "e63a8c879e771a893d2042cb555fd4a73b3189a354abaa41b5bde9538497bdc3",
+    "status": "SUCCESS"
+  },
+  "postponed_reassigned_fixture": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|->",
+    "error_code": null,
+    "objective": "70.0",
+    "request_sha256": "665c0bfd7d324d2ee54f8750b3d9f93fc905c34299e2f5933cf7fc18a649e661",
+    "result_sha256": "4eda98708795140280ec737f1e72ecff6a5552170dc2b9026f28bf0910761674",
+    "status": "SUCCESS"
+  },
+  "price_change_blocks_later_route": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|mid_1->mid_6",
+    "error_code": null,
+    "objective": "68",
+    "request_sha256": "42e56be2ac8befaa2047290fb0a4421c2c9637c5afc5f63954b40a5841277d3e",
+    "result_sha256": "b25e80cbf65c03423f9c6fd788ace21233fe338912f94eab6e9a9b4366fd6533",
+    "status": "SUCCESS"
+  },
+  "price_fall": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|mid_1->mid_6",
+    "error_code": null,
+    "objective": "72",
+    "request_sha256": "057e33d508f1384ed480afb234e26520996241d7e8c8f047c267c6592a69ac66",
+    "result_sha256": "68e294bdea2d695d4e308c21ea70f68340f35033adcf9b6edb37bff99c3e4f3c",
+    "status": "SUCCESS"
+  },
+  "rational_hit": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|def_1,mid_1->def_6,mid_6",
+    "error_code": null,
+    "objective": "76",
+    "request_sha256": "3317bbd015cab889c31681651d06254f05f9d1a74a5e2c541c746f876f67b999",
+    "result_sha256": "1b3b1fd6675d9ee5d79d49c8603950fb2366713909a11fcb293aaa5c6b6fe34b",
+    "status": "SUCCESS"
+  },
+  "repurchase_resets_cohort": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|mid_1->mid_6",
+    "error_code": null,
+    "objective": "142",
+    "request_sha256": "38291686c316fde2498c1fbba9fec82ce98dede793a0e6707c91048672654bc2",
+    "result_sha256": "521703008aa13612f8e1e18c224fc47aa801f169173c1bc3dc6c7b1751794134",
+    "status": "SUCCESS"
+  },
+  "resource_limit_incumbent": {
+    "backend_status": "TIME_RESOURCE_LIMIT_WITH_INCUMBENT",
+    "current_action": "NORMAL|->",
+    "error_code": null,
+    "objective": "30",
+    "request_sha256": "0eaa0e1fc00fea72cf2042f27dfb9f2771c95a4cf1a6f580fbaa159de031b935",
+    "result_sha256": "bc83e1f9acb496227bbac15be79bd6d42046ffd7c89d64e33f19262aa59f31c8",
+    "status": "RESOURCE_LIMIT"
+  },
+  "retained_selling_profit": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|mid_1->mid_6",
+    "error_code": null,
+    "objective": "72",
+    "request_sha256": "629db342ba56b26f104f8364356d0cba20305d07244099f9da4b55a58a6bbe7f",
+    "result_sha256": "daf2ecaf48518698cd541bd15e9278125969e57e70b00bf5a1dac150971cc7a5",
+    "status": "SUCCESS"
+  },
+  "roll_ft": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|->",
+    "error_code": null,
+    "objective": "66",
+    "request_sha256": "8fa65bcf4550a160cd0d4b50d5d9b51c2922f7680c427edb3d72231243ef4eca",
+    "result_sha256": "695d2a8697e2e903b3bc4073bfc250f175080c78e7d6b077ca4b73167b5ccc7c",
+    "status": "SUCCESS"
+  },
+  "simple_one_ft": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|mid_1->mid_6",
+    "error_code": null,
+    "objective": "72",
+    "request_sha256": "90cf49dde909f34512614b22a91fb852c3a79638260b645c1a372c6f12e537d4",
+    "result_sha256": "bcb7923798e266b8d6c49d67e5b41eb0ee4c580892a2b415928f989db0c2bce3",
+    "status": "SUCCESS"
+  },
+  "terminal_value_reversal": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|mid_1->mid_6",
+    "error_code": null,
+    "objective": "34.5",
+    "request_sha256": "cd88fef10fff72c0616fa0e7fa5fec3511c1dd2f4e74b7ede191d02da3773315",
+    "result_sha256": "0dbf529bd60d7417a5aaf8a0ece16b50bbd2a5cae94e3cf82cc25120482387f4",
+    "status": "SUCCESS"
+  },
+  "tied_plans": {
+    "backend_status": "OPTIMAL",
+    "current_action": "NORMAL|mid_1,mid_2->mid_6,mid_7",
+    "error_code": null,
+    "objective": "72",
+    "request_sha256": "9bccbe2ff2abec1d89410392587d22d8717d94304858b68d8f9b09fc1772c6f6",
+    "result_sha256": "b8c98172aeb4655e74d29c0c8bbc5d50046978b606ac08f744ed17986630e622",
+    "status": "SUCCESS"
+  }
+}

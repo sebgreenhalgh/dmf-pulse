@@ -1,0 +1,10 @@
+starting_size: 11
+bench_size: 4
+captain_multiplier: 2
+vice_fallback: true
+automatic_substitutions:
+  evaluation_scope: "AFTER_ALL_GAMEWEEK_FIXTURES"
+  absent_definition: "ZERO_OFFICIAL_APPEARANCE_MINUTES"
+  goalkeeper_replacement: "DESIGNATED_BENCH_GOALKEEPER_IF_APPEARED"
+  outfield_order: "MANAGER_BENCH_ORDER"
+  maintain_legal_formation: true

@@ -1,0 +1,27 @@
+{
+  "advance": {
+    "artifact_count": 1,
+    "current_gameweek": 2,
+    "exit_code": 0,
+    "observed_node_id": "gw2-price-rise",
+    "ok": true
+  },
+  "ok": true,
+  "optimise": {
+    "artifact_count": 1,
+    "current_action": {
+      "action_id": "transfer-250f37d87772f045824dc6324849311c",
+      "transfers_in": [
+        "p15"
+      ],
+      "transfers_out": [
+        "p07"
+      ],
+      "transition_event": "NORMAL"
+    },
+    "exit_code": 0,
+    "ok": true,
+    "status": "SUCCESS"
+  },
+  "schema_version": "opt-011-cli-acceptance-v1"
+}

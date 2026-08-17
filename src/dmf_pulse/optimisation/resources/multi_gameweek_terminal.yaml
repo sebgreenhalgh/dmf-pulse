@@ -1,0 +1,7 @@
+schema_version: "multi-gameweek-terminal-policy-v1"
+policy_id: "ZERO_FLEXIBILITY_BASELINE_V1"
+policy_version: "1.0.0"
+enabled: false
+bank_points_per_tenth: "0"
+free_transfer_points: "0"
+liquidation_points_per_tenth: "0"
