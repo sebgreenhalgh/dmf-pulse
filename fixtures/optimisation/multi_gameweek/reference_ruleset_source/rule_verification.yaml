@@ -1,0 +1,36 @@
+rules:
+  - rule_path: "/rules/positions"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-OPT-011-TEST-CONTRACT", "SRC-DMFP-02-REFERENCE"]
+    source_locators:
+      SRC-OPT-011-TEST-CONTRACT: "tickets/OPT-011/ticket.yaml reference_test_rules.frozen_values"
+      SRC-DMFP-02-REFERENCE: "DMFP-02 sections 15.1 and 16.1-16.2"
+  - rule_path: "/rules/squad"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-OPT-011-TEST-CONTRACT", "SRC-DMFP-02-REFERENCE"]
+    source_locators:
+      SRC-OPT-011-TEST-CONTRACT: "tickets/OPT-011/ticket.yaml reference_test_rules.frozen_values"
+      SRC-DMFP-02-REFERENCE: "DMFP-02 section 15.1"
+  - rule_path: "/rules/lineup"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-OPT-011-TEST-CONTRACT", "SRC-DMFP-02-REFERENCE"]
+    source_locators:
+      SRC-OPT-011-TEST-CONTRACT: "tickets/OPT-011/ticket.yaml reference_test_rules"
+      SRC-DMFP-02-REFERENCE: "DMFP-02 sections 16.1-16.8"
+  - rule_path: "/rules/special_events"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-OPT-011-TEST-CONTRACT"]
+    source_locators:
+      SRC-OPT-011-TEST-CONTRACT: "OPT-011 excludes chips and special events"
+  - rule_path: "/rules/transfers"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-OPT-011-TEST-CONTRACT", "SRC-DMFP-02-REFERENCE"]
+    source_locators:
+      SRC-OPT-011-TEST-CONTRACT: "DMFP-12 synthetic/reference transfer transition fixture"
+      SRC-DMFP-02-REFERENCE: "DMFP-02 sections 15.2-15.4"
+  - rule_path: "/rules/prices"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-OPT-011-TEST-CONTRACT", "SRC-DMFP-02-REFERENCE"]
+    source_locators:
+      SRC-OPT-011-TEST-CONTRACT: "DMFP-11 synthetic/reference price-state fixture"
+      SRC-DMFP-02-REFERENCE: "DMFP-02 selling-value semantics"

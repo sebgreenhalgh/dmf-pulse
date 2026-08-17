@@ -1,0 +1,12 @@
+price_unit: "TENTHS_OF_MILLION_GBP"
+integer_only: true
+initial_purchase_price_basis: "CURRENT_PLAYER_PRICE_AT_INITIAL_SELECTION"
+current_purchase_price_basis: "PRICE_PAID_FOR_CURRENT_OWNERSHIP"
+selling_price:
+  above_purchase:
+    condition: "CURRENT_ABOVE_PURCHASE"
+    formula: "PURCHASE_PLUS_FLOOR_HALF_PROFIT"
+  at_or_below_purchase:
+    condition: "CURRENT_AT_OR_BELOW_PURCHASE"
+    formula: "CURRENT_PRICE"
+change_threshold_algorithm: "UNDISCLOSED"

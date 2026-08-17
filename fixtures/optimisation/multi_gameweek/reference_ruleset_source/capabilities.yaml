@@ -1,0 +1,36 @@
+capabilities:
+  PLAYER_POINTS:
+    inherits: []
+    rule_paths: ["/rules/scoring", "/rules/assists", "/rules/bonus"]
+  GW1_INITIAL_SQUAD:
+    inherits: ["PLAYER_POINTS"]
+    rule_paths:
+      - "/rules/positions"
+      - "/rules/squad"
+      - "/rules/lineup/starting_size"
+      - "/rules/lineup/bench_size"
+      - "/rules/prices/price_unit"
+      - "/rules/prices/integer_only"
+      - "/rules/prices/initial_purchase_price_basis"
+      - "/rules/prices/current_purchase_price_basis"
+      - "/rules/deadlines/gameweeks/0"
+  TRANSFER_STATE:
+    inherits: ["GW1_INITIAL_SQUAD"]
+    rule_paths: ["/rules/transfers", "/rules/prices/selling_price"]
+  CHIP_STATE:
+    inherits: ["TRANSFER_STATE"]
+    rule_paths: ["/rules/chips", "/rules/lineup/automatic_substitutions"]
+  FULL_SEASON:
+    inherits: ["PLAYER_POINTS", "GW1_INITIAL_SQUAD", "TRANSFER_STATE", "CHIP_STATE"]
+    rule_paths:
+      - "/rules/positions"
+      - "/rules/scoring"
+      - "/rules/assists"
+      - "/rules/bonus"
+      - "/rules/squad"
+      - "/rules/lineup"
+      - "/rules/transfers"
+      - "/rules/prices"
+      - "/rules/chips"
+      - "/rules/deadlines"
+      - "/rules/special_events"

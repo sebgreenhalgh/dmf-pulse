@@ -1,0 +1,86 @@
+{
+  "gates": [
+    {
+      "classification": "PASS",
+      "detail": "40 packages audited",
+      "name": "frozen_sync"
+    },
+    {
+      "classification": "PASS",
+      "detail": "453 files already formatted",
+      "name": "ruff_format"
+    },
+    {
+      "classification": "PASS",
+      "detail": "all checks passed",
+      "name": "ruff_lint"
+    },
+    {
+      "classification": "PASS",
+      "detail": "165 source files",
+      "name": "mypy"
+    },
+    {
+      "classification": "PASS",
+      "detail": "268 passed in 59.22s",
+      "name": "stage11_focused_tests"
+    },
+    {
+      "classification": "PASS",
+      "detail": "430 passed in 468.52s",
+      "name": "relevant_inherited_regressions"
+    },
+    {
+      "classification": "PASS",
+      "detail": "205 passed in 308.33s against disposable PostgreSQL 18.4",
+      "name": "postgres_migration_tests"
+    },
+    {
+      "classification": "PASS",
+      "detail": "2193/2404 statement and branch opportunities = 91.222962%",
+      "name": "coverage_stage11_modules"
+    },
+    {
+      "classification": "PASS",
+      "detail": "2285/2521 statement and branch opportunities = 90.638635%",
+      "name": "coverage_stage11_plus_cli"
+    },
+    {
+      "classification": "PASS",
+      "detail": "2142 passed in 1346.40s against disposable PostgreSQL 18.4",
+      "name": "full_pytest"
+    },
+    {
+      "classification": "RESOURCE_LIMIT",
+      "detail": "clean instrumented full-suite attempt exceeded the 30-minute command cap",
+      "name": "full_repository_coverage"
+    },
+    {
+      "classification": "PASS",
+      "detail": "dmf_pulse-0.2.0 sdist and wheel",
+      "name": "build"
+    },
+    {
+      "classification": "PASS",
+      "detail": "general verifier plus public Stage-11 optimise/advance outside source tree",
+      "name": "installed_wheel"
+    },
+    {
+      "classification": "PASS",
+      "detail": "optimise and advance both exit 0 with immutable artifacts",
+      "name": "cli_acceptance"
+    },
+    {
+      "classification": "PASS",
+      "detail": "20 fixtures, config/package parity, no solver dependency tokens",
+      "name": "artifact_assurance"
+    }
+  ],
+  "implementation_branch": "stage/A11/OPT-011-multi-gameweek-transfer-optimiser",
+  "implementation_status": "REVIEW_COMPLETE_AWAITING_HUMAN_ACCEPTANCE",
+  "parent_branch": "stage/A10/OPT-010-one-gameweek-optimiser",
+  "parent_sha": "49103e03bb1e7500aff5c15b90b136f2cc476405",
+  "production_activation": "BLOCKED_BACKEND_AND_CAPABILITY_UNAVAILABLE",
+  "schema_version": "opt-011-validation-status-v1",
+  "stage_accepted": false
+}

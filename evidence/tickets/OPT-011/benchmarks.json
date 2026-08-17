@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "actions_generated": 17,
+      "backend": "BOUNDED_EXACT_MULTISTAGE_ENUMERATOR",
+      "decision_nodes": 2,
+      "fixture": "simple_one_ft",
+      "guarantee": "EXACT_DECLARED_TREE_AND_ACTION_SPACE",
+      "horizon_gameweeks": 2,
+      "label": "tiny_oracle",
+      "players": 16,
+      "policy_candidates": 17,
+      "runtime_ms_max": 35.827,
+      "runtime_ms_median": 34.857,
+      "runtime_ms_min": 33.496,
+      "scenario_leaves": 1,
+      "state_expansions": 6,
+      "status": "OPTIMAL"
+    },
+    {
+      "actions_generated": 12,
+      "backend": "BOUNDED_EXACT_MULTISTAGE_ENUMERATOR",
+      "decision_nodes": 2,
+      "fixture": "price_change_blocks_later_route",
+      "guarantee": "EXACT_DECLARED_TREE_AND_ACTION_SPACE",
+      "horizon_gameweeks": 2,
+      "label": "deterministic_multi_gameweek",
+      "players": 16,
+      "policy_candidates": 12,
+      "runtime_ms_max": 27.756,
+      "runtime_ms_median": 26.835,
+      "runtime_ms_min": 26.536,
+      "scenario_leaves": 1,
+      "state_expansions": 6,
+      "status": "OPTIMAL"
+    },
+    {
+      "actions_generated": 203,
+      "backend": "BOUNDED_EXACT_MULTISTAGE_ENUMERATOR",
+      "decision_nodes": 3,
+      "fixture": "injury_revealed_after_current_decision",
+      "guarantee": "EXACT_DECLARED_TREE_AND_ACTION_SPACE",
+      "horizon_gameweeks": 2,
+      "label": "scenario_tree",
+      "players": 17,
+      "policy_candidates": 203,
+      "runtime_ms_max": 277.009,
+      "runtime_ms_median": 267.356,
+      "runtime_ms_min": 265.726,
+      "scenario_leaves": 2,
+      "state_expansions": 42,
+      "status": "OPTIMAL"
+    }
+  ],
+  "runs_per_case": 3,
+  "schema_version": "opt-011-benchmark-v1",
+  "timing_note": "External wall-clock evidence; not part of deterministic result hashes."
+}

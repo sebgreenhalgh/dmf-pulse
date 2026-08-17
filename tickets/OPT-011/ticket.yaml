@@ -1,0 +1,78 @@
+ticket_id: "OPT-011"
+stage: "A11"
+title: "Multi-Gameweek transfer optimisation"
+status: "REVIEW_COMPLETE_AWAITING_HUMAN_ACCEPTANCE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "GPT-5.6 Pro primary implementation engineer"
+reviewer_role: "independent GPT-5.6 Sol review complete; human acceptance pending"
+implemented_on: "2026-08-17"
+
+required_base_branch: "stage/A10/OPT-010-one-gameweek-optimiser"
+required_base_commit: "49103e03bb1e7500aff5c15b90b136f2cc476405"
+implementation_branch: "stage/A11/OPT-011-multi-gameweek-transfer-optimiser"
+
+objective: >-
+  Extend the accepted Stage-10 tactical subsystem with immutable manager state, exact
+  buying/selling/bank/free-transfer transitions, bounded exact deterministic and
+  nonanticipative scenario-tree policy search, rolling current-action execution, a transparent
+  terminal baseline, truthful alternatives, bundle-aware move attribution, immutable artifacts,
+  and one supported offline CLI vertical slice.
+
+backend:
+  name: "BOUNDED_EXACT_MULTISTAGE_ENUMERATOR"
+  modes: ["TEST", "REPLAY"]
+  guarantee: "Exact over the complete declared bounded action and scenario-tree space."
+  production: "FAIL_CLOSED"
+  production_blocker: "No approved unrestricted production solver/capability is installed."
+  new_runtime_dependency: null
+
+rules:
+  price_units: "integer tenths"
+  purchase_price_stateful: true
+  ownership_spells_append_only: true
+  retained_profit: "configured integer numerator/denominator with floor"
+  loss: "current price passed through"
+  free_transfer_transition: "configured rules only"
+  target_season_claim: false
+
+nonanticipativity:
+  decision_index: "scenario-tree node"
+  indistinguishable_histories: "must share one normalized decision node"
+  perfect_information_policy: "diagnostic only; never selectable by production service"
+
+terminal_value:
+  policy_id: "ZERO_FLEXIBILITY_BASELINE_V1"
+  enabled: false
+  reason: "No calibrated continuation-value model is authorised yet."
+
+vertical_slice:
+  optimise: >-
+    dmf optimise multi-gameweek --request <request.json> --ruleset <compiled-ruleset.json>
+    --artifact-root <directory> --output json
+  advance: >-
+    dmf optimise advance-multi-gameweek --request <request.json> --result <result.json>
+    --artifact-root <directory> [--observed-node <node-id>] --output json
+  rolling: >-
+    advance_current_action executes only the root transition; reroot_request_after_observation
+    builds the next canonical request for a fresh solve.
+
+explicit_exclusions:
+  - "Chip scheduling"
+  - "Rank/ownership strategy"
+  - "Learned price forecasting"
+  - "Calibrated robust regret"
+  - "Learned terminal value"
+  - "Unrestricted production MILP"
+  - "Automated FPL execution"
+
+acceptance:
+  required:
+    - "Stage-11 source, tests and fixtures physically exist."
+    - "Tiny 2-GW and 3-GW cases match independent exhaustive oracles."
+    - "Clairvoyance trap cannot be selected."
+    - "Manager-state and budget/FT invariants hold."
+    - "CLI optimise and current-action advance execute through the application service."
+    - "Production mode fails closed."
+    - "Review archive contains a non-empty exact-parent patch."
+  human_acceptance: false
+  independent_review_complete: true

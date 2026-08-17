@@ -722,3 +722,59 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   in order, and retain complete unsharded evidence.
 - [ ] Regenerate the review pack, commit only evidence after the tested
   implementation revision, and push the existing draft PR branch.
+
+# OPT-011 Stage-11 multi-Gameweek transfer optimisation
+
+- Ticket/stage: `OPT-011`, DMFP-19 implementation Stage 11; immutable parent
+  `49103e03bb1e7500aff5c15b90b136f2cc476405` from draft PR #7 branch
+  `stage/A10/OPT-010-one-gameweek-optimiser`.
+- Branch: `stage/A11/OPT-011-multi-gameweek-transfer-optimiser`.
+- Scope: immutable manager state and ownership spells; configured integer sell/buy/bank/FT/hit
+  transitions; deterministic multi-Gameweek scenario-tree search; node-indexed nonanticipative
+  recourse; rolling current action; transparent terminal baseline; alternatives and interaction
+  attribution; existing Stage-10 tactical adapter; deterministic CLI and evidence.
+- Backend: no new solver dependency. The bounded exact enumerator is supported only for declared
+  TEST/REPLAY trees, action sets and tactical candidates; PRODUCTION fails closed until an
+  approved unrestricted backend and complete active transfer/price capability exist.
+- Safety: no dependency, migration, provider, account-action, chip, rank/EO, price-prediction or
+  target-season-rule inference; no merge or self-acceptance.
+
+### OPT-011 checkpoints
+
+- [x] Resolve and record the live PR #7 head branch/SHA without modifying Stage 10 or main.
+- [x] Inspect repository authority, Stage-9/10 contracts, rules capability, CLI, tests, fixtures,
+  assurance and dependency lock.
+- [x] Implement typed manager-state, price, ownership-spell, bank, FT and hit transitions.
+- [x] Implement validated scenario trees and exact nonanticipative bounded dynamic programme.
+- [x] Reuse Stage-10 tactical evaluation through one explicit adapter.
+- [x] Implement rolling advancement, terminal baseline, alternatives and bundle attribution.
+- [x] Add supported CLI, adversarial fixtures, unit/property/oracle/integration tests.
+- [x] Run focused and inherited validation, repair defects, benchmark, and record exact results.
+- [ ] Build and independently assure `DMF_PULSE_STAGE11_SOL_REVIEW.zip` without merging.
+
+# OPT-011 independent Sol review and remediation
+
+- Review base: exact Stage-10 parent `49103e03bb1e7500aff5c15b90b136f2cc476405`;
+  supplied implementation commit `9f1cdff6b6ad29d9d258013466105a65c5a257ec` reconstructed
+  from the verified review patch.
+- Remote safety: preserve pre-review Stage-11 export commit
+  `dc2ed6ef4ca59e1946e7cc2814013aa317286ff0` as local
+  `backup/stage11-pre-sol-review`; never modify or merge `main`.
+- Acceptance: resolve every P0/P1, reach at least 90% meaningful Stage-11 branch coverage,
+  run all achievable repository gates, refresh final-branch evidence, and push only a
+  review-ready branch with human acceptance still pending.
+
+### Independent review checkpoints
+
+- [x] Verify bundle/member hashes, remote lineage, PR #7 parent identity, backup ref, clean
+  reconstruction, expected changed-file inventory, and untouched 125-test baseline.
+- [x] Independently audit authority, contracts, manager-state economics, scenario timing,
+  nonanticipativity, tactical reuse, objective reconciliation, search truthfulness, hashes,
+  artifacts, CLI execution, fixtures, and test-oracle independence.
+- [x] Add adversarial regression/coverage tests and remediate every valid in-scope finding.
+- [x] Run frozen sync, static checks, focused/inherited/full tests, branch coverage, build,
+  installed-wheel CLI, benchmark, repository/artifact/scope validation, secret scan, and diff
+  assurance; record exact results without upgrading unavailable gates to PASS.
+- [ ] Refresh OPT-011/stage evidence against the final code, perform hostile pre-push review,
+  commit, push safely with lease protection if replacement is required, verify remote equality,
+  and create or update the unmerged human-review PR.

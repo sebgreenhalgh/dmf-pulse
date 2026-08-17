@@ -1,0 +1,10 @@
+schema_version: "multi-gameweek-search-policy-v1"
+backend: "BOUNDED_EXACT_MULTISTAGE_ENUMERATOR"
+max_transfers_per_node: 2
+max_actions_per_state: 5000
+max_state_expansions: 25000
+max_policy_candidates: 250000
+max_returned_root_candidates: 1000
+alternative_expected_sacrifice_points: "4"
+material_difference_points: "0.1"
+deterministic_seed: 0
