@@ -31,7 +31,6 @@ jobs:
           chip-basics	https://www.premierleague.com/en/news/2174900
           help-copilot	https://www.premierleague.com/en/news/4681092/fpl-help-copilot
           faq-copilot	https://www.premierleague.com/en/news/4661030
-          price-explainer	https://www.premierleague.com/en/news/2858775/1000
           EOF
           while IFS=$'\t' read -r key url; do
             curl \
