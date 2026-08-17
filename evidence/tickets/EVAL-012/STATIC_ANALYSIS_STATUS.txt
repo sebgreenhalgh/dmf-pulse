@@ -1,0 +1,10 @@
+ruff_format=PASS
+ruff_format_result=43 files already formatted
+ruff_lint=PASS
+ruff_lint_result=All checks passed
+mypy=PASS
+mypy_scope=src/dmf_pulse/evaluation src/dmf_pulse/cli/app.py src/dmf_pulse/cli/evaluate.py
+mypy_result=Success: no issues found in 22 source files
+supplemental_ast_static=PASS
+supplemental_ast_result=PASS files=20
+configuration_weakened=false

@@ -1,0 +1,31 @@
+{
+  "dataset_mode": "LIVE_OBSERVED",
+  "forecast_origin": "2026-11-09T10:00:00Z",
+  "records": [
+    {
+      "corrected_at": null,
+      "current_vintage": false,
+      "dataset_mode": "LIVE_OBSERVED",
+      "entity_id": "player-alpha",
+      "feature_intended": true,
+      "gameweek": 1,
+      "kind": "MODEL_SELECTION",
+      "mapped_at": "2026-11-09T08:00:00Z",
+      "mapping_version_id": "mapping:outer_fold_contamination",
+      "operational_usability": "LIVE_OPERATIONAL",
+      "received_at": "2026-11-09T08:00:00Z",
+      "record_id": "outer_fold_contamination",
+      "role": "FEATURE",
+      "source_snapshot_id": "snapshot:outer_fold_contamination",
+      "source_timestamp": "2026-11-09T08:00:00Z",
+      "target_id": "leak-target",
+      "target_outcome_at": null,
+      "usable_at": "2026-11-09T09:00:00Z",
+      "valid_from": null,
+      "values": {
+        "provenance_class": "SYNTHETIC",
+        "uses_outer_fold_outcome": true
+      }
+    }
+  ]
+}

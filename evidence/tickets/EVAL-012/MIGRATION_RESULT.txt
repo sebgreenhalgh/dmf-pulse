@@ -1,0 +1,7 @@
+stage12_status=NOT_APPLICABLE
+reason=Stage 12 introduces immutable evaluation artifacts and changes no accepted relational schema.
+new_revision=NONE
+repository_test_setup=PASS
+repository_test_setup_command=uv run alembic upgrade head
+inherited_head=20260807_0006
+note=The inherited migration was applied only to provision the isolated PostgreSQL test database.

@@ -1,0 +1,48 @@
+{
+  "config": {
+    "dataset_mode": "COUNTERFACTUAL",
+    "holdout_origins": 1,
+    "inner_minimum_training_origins": 1,
+    "minimum_training_origins": 1,
+    "rolling_window_origins": null,
+    "window": "EXPANDING"
+  },
+  "origins": [
+    {
+      "forecast_origin": "2026-08-01T10:00:00Z",
+      "information_cutoff": "2026-08-01T10:00:00Z",
+      "label_available_at": "2026-08-03T10:00:00Z",
+      "origin_id": "gw1"
+    },
+    {
+      "forecast_origin": "2026-08-08T10:00:00Z",
+      "information_cutoff": "2026-08-08T10:00:00Z",
+      "label_available_at": "2026-08-10T10:00:00Z",
+      "origin_id": "gw2"
+    },
+    {
+      "forecast_origin": "2026-08-15T10:00:00Z",
+      "information_cutoff": "2026-08-15T10:00:00Z",
+      "label_available_at": "2026-08-17T10:00:00Z",
+      "origin_id": "gw3"
+    },
+    {
+      "forecast_origin": "2026-08-22T10:00:00Z",
+      "information_cutoff": "2026-08-22T10:00:00Z",
+      "label_available_at": "2026-08-24T10:00:00Z",
+      "origin_id": "gw4"
+    },
+    {
+      "forecast_origin": "2026-08-29T10:00:00Z",
+      "information_cutoff": "2026-08-29T10:00:00Z",
+      "label_available_at": "2026-08-31T10:00:00Z",
+      "origin_id": "gw5"
+    },
+    {
+      "forecast_origin": "2026-09-05T10:00:00Z",
+      "information_cutoff": "2026-09-05T10:00:00Z",
+      "label_available_at": "2026-09-07T10:00:00Z",
+      "origin_id": "gw6"
+    }
+  ]
+}

@@ -1,0 +1,299 @@
+{
+  "cases": [
+    {
+      "fixture": "closing_odds_trap",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "post-cutoff closing odds entered a predeadline feature bundle",
+            "finding_id": "CLOSING_ODDS_AFTER_CUTOFF:closing_odds_trap",
+            "kind": "CLOSING_ODDS_AFTER_CUTOFF",
+            "record_ids": [
+              "closing_odds_trap"
+            ]
+          },
+          {
+            "blocking": true,
+            "explanation": "entity mapping became usable only after the historical cutoff",
+            "finding_id": "LATE_ENTITY_MAPPING:closing_odds_trap",
+            "kind": "LATE_ENTITY_MAPPING",
+            "record_ids": [
+              "closing_odds_trap"
+            ]
+          },
+          {
+            "blocking": true,
+            "explanation": "record was received after the historical cutoff",
+            "finding_id": "LATE_PROVIDER_CORRECTION:closing_odds_trap",
+            "kind": "LATE_PROVIDER_CORRECTION",
+            "record_ids": [
+              "closing_odds_trap"
+            ]
+          },
+          {
+            "blocking": true,
+            "explanation": "record was not operationally usable by the historical cutoff",
+            "finding_id": "USABLE_AT_AFTER_CUTOFF:closing_odds_trap",
+            "kind": "USABLE_AT_AFTER_CUTOFF",
+            "record_ids": [
+              "closing_odds_trap"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "23fbdf1e0fb4237fc5a94b5b6a9a8eb446bb18774da769d66a2971c6b4fab691",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    },
+    {
+      "fixture": "current_vintage_contamination",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "current-vintage corrected record entered strict historical replay",
+            "finding_id": "CURRENT_VINTAGE_CONTAMINATION:current_vintage_contamination",
+            "kind": "CURRENT_VINTAGE_CONTAMINATION",
+            "record_ids": [
+              "current_vintage_contamination"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "e5a701cb6150d6ab3cf19e61183d7c8e4e776a43f1df6cbd74272985165b93d0",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    },
+    {
+      "fixture": "fixture_moved_after_cutoff",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "fixture assignment was learned after the historical cutoff",
+            "finding_id": "FIXTURE_MOVED_AFTER_CUTOFF:fixture_moved_after_cutoff",
+            "kind": "FIXTURE_MOVED_AFTER_CUTOFF",
+            "record_ids": [
+              "fixture_moved_after_cutoff"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "2a217e460d53e0f4a96ef9dcefc6672372814668247c5a3e85067b5c1b8ab02b",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    },
+    {
+      "fixture": "future_leakage_canary",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "synthetic future-data canary reached the historical feature path",
+            "finding_id": "FUTURE_LEAKAGE_CANARY:future_leakage_canary",
+            "kind": "FUTURE_LEAKAGE_CANARY",
+            "record_ids": [
+              "future_leakage_canary"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "a38848262e1a761538c3e083992425c3be9cd10c2c25184d21f64bcab842c656",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    },
+    {
+      "fixture": "future_result_recent_window",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "recent-points window includes an appearance completed after forecast origin",
+            "finding_id": "FUTURE_RESULT_IN_RECENT_WINDOW:future_result_recent_window",
+            "kind": "FUTURE_RESULT_IN_RECENT_WINDOW",
+            "record_ids": [
+              "future_result_recent_window"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "ab2e171d646c0c56523ae36ab684063cf33dc4432c9442da04e3fc9fa0fc8c9e",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    },
+    {
+      "fixture": "late_entity_mapping",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "entity mapping became usable only after the historical cutoff",
+            "finding_id": "LATE_ENTITY_MAPPING:late_entity_mapping",
+            "kind": "LATE_ENTITY_MAPPING",
+            "record_ids": [
+              "late_entity_mapping"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "901fb3fd00939a107600e6981b29f40c0514cfdf576e3a7770fecdc196dbe0f3",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    },
+    {
+      "fixture": "late_provider_correction",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "record was received after the historical cutoff",
+            "finding_id": "LATE_PROVIDER_CORRECTION:late_provider_correction",
+            "kind": "LATE_PROVIDER_CORRECTION",
+            "record_ids": [
+              "late_provider_correction"
+            ]
+          },
+          {
+            "blocking": true,
+            "explanation": "record was not operationally usable by the historical cutoff",
+            "finding_id": "USABLE_AT_AFTER_CUTOFF:late_provider_correction",
+            "kind": "USABLE_AT_AFTER_CUTOFF",
+            "record_ids": [
+              "late_provider_correction"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "350b75909a07d6f6a209adf73325b2b008c7025b09cc2e98a7e9d5d2cf4d9b10",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    },
+    {
+      "fixture": "outer_fold_contamination",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "outer-fold outcome was used to choose a reported model or policy",
+            "finding_id": "OUTER_FOLD_CONTAMINATION:outer_fold_contamination",
+            "kind": "OUTER_FOLD_CONTAMINATION",
+            "record_ids": [
+              "outer_fold_contamination"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "2fedf9c28a12d1d8eddc4b85cb4d6a9c513a9f6600c9513cb952518384067de2",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    },
+    {
+      "fixture": "postdeadline_lineup",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "entity mapping became usable only after the historical cutoff",
+            "finding_id": "LATE_ENTITY_MAPPING:postdeadline_lineup",
+            "kind": "LATE_ENTITY_MAPPING",
+            "record_ids": [
+              "postdeadline_lineup"
+            ]
+          },
+          {
+            "blocking": true,
+            "explanation": "record was received after the historical cutoff",
+            "finding_id": "LATE_PROVIDER_CORRECTION:postdeadline_lineup",
+            "kind": "LATE_PROVIDER_CORRECTION",
+            "record_ids": [
+              "postdeadline_lineup"
+            ]
+          },
+          {
+            "blocking": true,
+            "explanation": "official lineup published at or after deadline entered the feature bundle",
+            "finding_id": "POSTDEADLINE_LINEUP:postdeadline_lineup",
+            "kind": "POSTDEADLINE_LINEUP",
+            "record_ids": [
+              "postdeadline_lineup"
+            ]
+          },
+          {
+            "blocking": true,
+            "explanation": "record was not operationally usable by the historical cutoff",
+            "finding_id": "USABLE_AT_AFTER_CUTOFF:postdeadline_lineup",
+            "kind": "USABLE_AT_AFTER_CUTOFF",
+            "record_ids": [
+              "postdeadline_lineup"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "f3deedf3eff0e33e2da2c620f80ead1b307e4280cba489024a51e4de5728ef31",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    },
+    {
+      "fixture": "price_correction",
+      "report": {
+        "checked_record_count": 1,
+        "dataset_mode": "LIVE_OBSERVED",
+        "findings": [
+          {
+            "blocking": true,
+            "explanation": "later correction was presented as a historical feature",
+            "finding_id": "PRICE_CORRECTION_AFTER_CUTOFF:price_correction",
+            "kind": "PRICE_CORRECTION_AFTER_CUTOFF",
+            "record_ids": [
+              "price_correction"
+            ]
+          }
+        ],
+        "forecast_origin": "2026-11-09T10:00:00Z",
+        "report_sha256": "229070843e79f2d3ab78fca93e7042056e84b6088449495849f371cc0389b2ba",
+        "schema_version": "leakage-report-v1",
+        "status": "BLOCKED"
+      },
+      "returncode": 3
+    }
+  ],
+  "schema_version": "eval-012-leakage-assurance-v1",
+  "status": "PASS"
+}

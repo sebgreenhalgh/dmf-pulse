@@ -1,0 +1,31 @@
+{
+  "dataset_mode": "LIVE_OBSERVED",
+  "forecast_origin": "2026-11-09T10:00:00Z",
+  "records": [
+    {
+      "corrected_at": null,
+      "current_vintage": false,
+      "dataset_mode": "LIVE_OBSERVED",
+      "entity_id": "player-alpha",
+      "feature_intended": true,
+      "gameweek": 1,
+      "kind": "MARKET",
+      "mapped_at": "2026-11-09T11:00:00Z",
+      "mapping_version_id": "mapping:closing_odds_trap",
+      "operational_usability": "LIVE_OPERATIONAL",
+      "received_at": "2026-11-09T11:00:00Z",
+      "record_id": "closing_odds_trap",
+      "role": "FEATURE",
+      "source_snapshot_id": "snapshot:closing_odds_trap",
+      "source_timestamp": "2026-11-09T11:00:00Z",
+      "target_id": "leak-target",
+      "target_outcome_at": null,
+      "usable_at": "2026-11-09T11:00:00Z",
+      "valid_from": null,
+      "values": {
+        "closing_odds": true,
+        "provenance_class": "SYNTHETIC"
+      }
+    }
+  ]
+}

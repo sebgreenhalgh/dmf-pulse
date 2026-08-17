@@ -1,0 +1,16 @@
+{
+  "cumulative_utility": "30",
+  "dataset_mode": "COUNTERFACTUAL",
+  "forecast_frozen_before_outcome": true,
+  "policy_received_sanitized_deadline_only": true,
+  "provenance_class": "SYNTHETIC",
+  "real_stage11_service_path_tested": true,
+  "root_action_only": true,
+  "schema_version": "eval-012-replay-acceptance-v1",
+  "stage11_root_action_preserves_bank_ft_hit_price_and_ownership": true,
+  "state_chain_continuous": true,
+  "status": "PASS",
+  "steps": 5,
+  "trajectory_id": "synthetic-five-gw-policy",
+  "trajectory_sha256": "6b3d1462c077c38a27d5cbdb51946276e738e4af9cdc414574e87981aa0647ac"
+}

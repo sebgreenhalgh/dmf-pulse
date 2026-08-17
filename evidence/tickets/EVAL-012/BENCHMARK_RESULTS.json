@@ -1,0 +1,19 @@
+{
+  "benchmarks": [
+    {"benchmark_id":"B0A_RECENT_POINTS_LAST_3","family":"B0","feasible":true,"oracle":false,"point_forecast":"8","projection_sha256":"6e29e45578e4990bb717d92fee8192c9908b2ca64a5628e1457b45a7e318d193"},
+    {"benchmark_id":"B0B_RECENT_POINTS_LAST_5","family":"B0","feasible":true,"oracle":false,"point_forecast":"6","projection_sha256":"2f5f16bcf1e8822eaffe1c6ed41c0451fa530d534ce79eb05b5b81195085cda9"},
+    {"benchmark_id":"B0C_RECENT_POINTS_EWMA","family":"B0","feasible":true,"oracle":false,"point_forecast":"7.8750","projection_sha256":"c85aee340c4adccc84c1aa81cef0c71be5487d80295f97828adb5e25261a67f8"},
+    {"benchmark_id":"B1_OFFICIAL_FPL_FORM","family":"B1","feasible":true,"oracle":false,"point_forecast":"6.2","projection_sha256":"cc3a7ca4e9c06e97c05a557ff67c2a91c9c49cce9e023fd990bc6f84679b95e8"},
+    {"benchmark_id":"B2_MARKET_ONLY","family":"B2","feasible":true,"oracle":false,"point_forecast":"5.5","projection_sha256":"27fdea1c9c5a7d486c176a74613ac2aee7ea99d392c6716ed71ddba3470ebc77"},
+    {"benchmark_id":"B3_MARKET_PLUS_MINUTES","family":"B3","feasible":true,"oracle":false,"point_forecast":"5.6000000","projection_sha256":"308c3fbfccb1b33c2333a0a5d2a33195d0285887b56575c05ca04340407d47e2"},
+    {"benchmark_id":"B4_ACCEPTED_PULSE_BASELINE","family":"B4","feasible":true,"oracle":false,"point_forecast":"6.1","projection_sha256":"5941ed6c8c78a2afbed2671edf42ce71f8f491a66a198f65c36defecb860e621"},
+    {"benchmark_id":"B5A_PERFECT_LINEUP_MINUTES","family":"B5","feasible":false,"oracle":true,"point_forecast":"7","projection_sha256":"fd89b324d4a0f66d5cb30e575f47e84b8626585472631ded406c3be71205bc1e"},
+    {"benchmark_id":"B5B_PERFECT_FOOTBALL_OUTCOMES","family":"B5","feasible":false,"oracle":true,"point_forecast":"11","projection_sha256":"2a91df692f06f76773564879c70aad03f014efcf3809b30c6a2610d97b5d918b"},
+    {"benchmark_id":"B5C_PERFECT_GAMEWEEK_TRANSFERS","family":"B5","feasible":false,"oracle":true,"point_forecast":"12","projection_sha256":"c3584c9668526eaeeae254510d88acf4b50210b7a5c201c8423427dcb44503f9"},
+    {"benchmark_id":"B5D_PERFECT_SEASON_POLICY","family":"B5","feasible":false,"oracle":true,"point_forecast":"15","projection_sha256":"b6a3ad743284d907a87ad37b9cc9c23c137511901d68328c9d9c988a3d1ec909"}
+  ],
+  "dataset_mode": "COUNTERFACTUAL",
+  "provenance_class": "SYNTHETIC",
+  "schema_version": "eval-012-benchmark-results-v1",
+  "status": "PASS"
+}

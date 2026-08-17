@@ -1,0 +1,262 @@
+{
+  "$defs": {
+    "CalibrationConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": [
+            "IDENTITY",
+            "LOGISTIC",
+            "ISOTONIC"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "reliability_bins": {
+          "exclusiveMinimum": 0,
+          "title": "Reliability Bins",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "reliability_bins",
+        "method"
+      ],
+      "title": "CalibrationConfig",
+      "type": "object"
+    },
+    "DatasetMode": {
+      "enum": [
+        "LIVE_OBSERVED",
+        "RAW_OBSERVED",
+        "RECONSTRUCTED",
+        "FINAL_OUTCOME",
+        "COUNTERFACTUAL"
+      ],
+      "title": "DatasetMode",
+      "type": "string"
+    },
+    "DistributionScoringConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "central_coverage": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Central Coverage"
+        },
+        "quantile_alpha": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Quantile Alpha"
+        }
+      },
+      "required": [
+        "central_coverage",
+        "quantile_alpha"
+      ],
+      "title": "DistributionScoringConfig",
+      "type": "object"
+    },
+    "FoldWindow": {
+      "enum": [
+        "EXPANDING",
+        "ROLLING"
+      ],
+      "title": "FoldWindow",
+      "type": "string"
+    },
+    "MultivariateScoringConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "variogram_power": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "maximum": 2.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Variogram Power"
+        }
+      },
+      "required": [
+        "variogram_power"
+      ],
+      "title": "MultivariateScoringConfig",
+      "type": "object"
+    },
+    "PolicyReplayConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "execute_root_action_only": {
+          "const": true,
+          "title": "Execute Root Action Only",
+          "type": "boolean"
+        },
+        "freeze_forecast_before_outcome": {
+          "const": true,
+          "title": "Freeze Forecast Before Outcome",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "execute_root_action_only",
+        "freeze_forecast_before_outcome"
+      ],
+      "title": "PolicyReplayConfig",
+      "type": "object"
+    },
+    "ProbabilityBoundaryPolicy": {
+      "enum": [
+        "EXACT",
+        "DECLARED_EPSILON"
+      ],
+      "title": "ProbabilityBoundaryPolicy",
+      "type": "string"
+    },
+    "ProbabilityScoringConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "boundary_policy": {
+          "$ref": "#/$defs/ProbabilityBoundaryPolicy"
+        },
+        "declared_epsilon": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Declared Epsilon"
+        }
+      },
+      "required": [
+        "boundary_policy"
+      ],
+      "title": "ProbabilityScoringConfig",
+      "type": "object"
+    },
+    "WalkForwardDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "holdout_origins": {
+          "minimum": 0,
+          "title": "Holdout Origins",
+          "type": "integer"
+        },
+        "inner_minimum_training_origins": {
+          "exclusiveMinimum": 0,
+          "title": "Inner Minimum Training Origins",
+          "type": "integer"
+        },
+        "minimum_training_origins": {
+          "exclusiveMinimum": 0,
+          "title": "Minimum Training Origins",
+          "type": "integer"
+        },
+        "rolling_window_origins": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rolling Window Origins"
+        },
+        "window": {
+          "$ref": "#/$defs/FoldWindow"
+        }
+      },
+      "required": [
+        "window",
+        "minimum_training_origins",
+        "inner_minimum_training_origins",
+        "holdout_origins"
+      ],
+      "title": "WalkForwardDefaults",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "benchmark_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Benchmark Ids",
+      "type": "array"
+    },
+    "calibration": {
+      "$ref": "#/$defs/CalibrationConfig"
+    },
+    "dataset_mode": {
+      "$ref": "#/$defs/DatasetMode"
+    },
+    "distribution_scoring": {
+      "$ref": "#/$defs/DistributionScoringConfig"
+    },
+    "multivariate_scoring": {
+      "$ref": "#/$defs/MultivariateScoringConfig"
+    },
+    "policy_replay": {
+      "$ref": "#/$defs/PolicyReplayConfig"
+    },
+    "probability_scoring": {
+      "$ref": "#/$defs/ProbabilityScoringConfig"
+    },
+    "schema_version": {
+      "const": "evaluation-config-v1",
+      "default": "evaluation-config-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "walk_forward": {
+      "$ref": "#/$defs/WalkForwardDefaults"
+    }
+  },
+  "required": [
+    "dataset_mode",
+    "walk_forward",
+    "probability_scoring",
+    "calibration",
+    "distribution_scoring",
+    "multivariate_scoring",
+    "policy_replay",
+    "benchmark_ids"
+  ],
+  "title": "EvaluationConfig",
+  "type": "object"
+}

@@ -1,0 +1,30 @@
+{
+  "dataset_mode": "LIVE_OBSERVED",
+  "forecast_origin": "2026-11-09T10:00:00Z",
+  "records": [
+    {
+      "corrected_at": null,
+      "current_vintage": false,
+      "dataset_mode": "LIVE_OBSERVED",
+      "entity_id": "player-alpha",
+      "feature_intended": true,
+      "gameweek": 1,
+      "kind": "RECENT_POINTS",
+      "mapped_at": "2026-11-09T08:00:00Z",
+      "mapping_version_id": "mapping:future_result_recent_window",
+      "operational_usability": "LIVE_OPERATIONAL",
+      "received_at": "2026-11-09T08:00:00Z",
+      "record_id": "future_result_recent_window",
+      "role": "FEATURE",
+      "source_snapshot_id": "snapshot:future_result_recent_window",
+      "source_timestamp": "2026-11-09T08:00:00Z",
+      "target_id": "leak-target",
+      "target_outcome_at": "2026-11-09T13:00:00Z",
+      "usable_at": "2026-11-09T09:00:00Z",
+      "valid_from": null,
+      "values": {
+        "provenance_class": "SYNTHETIC"
+      }
+    }
+  ]
+}

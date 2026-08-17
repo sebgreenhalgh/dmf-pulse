@@ -1,0 +1,34 @@
+EVAL-012 TARGETED INHERITED REGRESSION SCOPE
+============================================
+
+Status: PASS (100 passed, 0 failed, 0 skipped)
+
+Stage 5/7/8/9 interface slice — 63 passed:
+- tests/unit/markets/test_policy_boundaries.py
+- tests/unit/markets/test_service_boundaries.py
+- tests/unit/availability/test_projection.py
+- tests/unit/football_events/test_projection_boundaries.py
+- tests/unit/fpl_points/test_evaluation_and_artifacts.py
+- tests/unit/fpl_points/test_fail_closed_edges.py
+- tests/contract/fpl_points/test_upstream_contracts.py
+Reason: historical cutoff semantics, accepted minutes identity, market/event projection boundaries,
+frozen Stage-9 scenario artifacts and weighted joint input contracts.
+
+Stage 10/11 selected semantic slice — 10 passed:
+- five immutable manager-state/ownership/economics tests from
+  tests/unit/optimisation/test_multi_gameweek_state.py
+- two nonanticipativity/clairvoyance tests from
+  tests/unit/optimisation/test_multi_gameweek_tree.py
+- three Stage-9/10/11 adapter-contract tests from
+  tests/contract/optimisation/test_stage11_integration.py
+Reason: bank/FT/hit/selling-price/ownership transitions, future revelation boundaries, frozen
+Stage-10 records and the accepted Stage-11 integration adapter.
+
+Rules and data-contract slice — 27 passed:
+- tests/unit/rules/test_yaml_and_compiler.py
+- database registry tests were initially blocked until the repository's inherited Alembic head was
+  applied; representative corrected database/migration/package checks then passed (10 passed).
+
+Stage 12 also executes the real accepted Stage-11 optimise/advance service path in
+tests/replay/evaluation/test_policy_replay.py, preserving the complete root NodeDecision and
+verifying bank, FT, hit, selling/buying prices, current Gameweek and ownership cohort transitions.

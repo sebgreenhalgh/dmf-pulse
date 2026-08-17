@@ -778,3 +778,29 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Refresh OPT-011/stage evidence against the final code, perform hostile pre-push review,
   commit, push safely with lease protection if replacement is required, verify remote equality,
   and create or update the unmerged human-review PR.
+
+# EVAL-012 Stage-12 backtesting framework
+
+- Ticket/stage: `EVAL-012`, DMFP-19 Stage 12 / playbook B1; immutable parent
+  `4f1274ccef419a7c0bde335c48bd4070e248b2e6` on `main`.
+- Branch: `stage/A12/EVAL-012-backtesting-framework`.
+- Scope: strict information sets/vintages; nested walk-forward/prequential folds; B0-B5;
+  point/probability/distribution/joint metrics; calibration; stateful root-action replay; regret;
+  leakage blocking; immutable reports/artifacts; offline CLI.
+- Safety: synthetic acceptance only; no Stage 13+ models, paid history, provider access,
+  production promotion, FPL execution, push, merge or self-acceptance.
+
+## EVAL-012 checkpoints
+
+- [x] Verify exact Stage-11 merge parent, repository authority and accepted interfaces.
+- [x] Implement production evaluation contracts, metrics, replay, reports and CLI.
+- [x] Add synthetic five-GW and ten adversarial leakage fixture families.
+- [x] Run focused Stage-12 suite, branch coverage and offline vertical slice.
+- [x] Record truthful limitations and create the self-contained Sol review bundle.
+- [x] Complete fresh Sol review and remediation: close forecast-first, temporal, B0-B5,
+  proper-scoring, scenario-weight, Stage-11 replay, artifact and reporting findings.
+- [x] Pass the 104-test focused suite, 90% branch-aware coverage, canonical Ruff/mypy/build,
+  installed-wheel six-command smoke, leakage canaries and dependency-relevant regressions.
+- [ ] Complete final repository/evidence assurance, push the review-ready branch and open the
+  unmerged PR to `main`.
+- [ ] Human acceptance, merge and accepted tag.

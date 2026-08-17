@@ -1,0 +1,10 @@
+status=PASS
+canonical_json=PASS
+embedded_semantic_hash_verification=PASS
+detached_sha256_verification=PASS
+content_addressed_filename_verification=PASS
+canonical_sidecar_filename_and_bytes=PASS
+immutable_collision_detection=PASS
+portable_identity_and_path_confinement=PASS
+nested_payload_tamper_detection=PASS
+isolated_wheel_persistence_smoke=PASS
