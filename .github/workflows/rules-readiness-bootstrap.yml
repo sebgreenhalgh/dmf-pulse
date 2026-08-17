@@ -1,0 +1,51 @@
+name: rules-readiness-bootstrap
+
+on:
+  push:
+    branches:
+      - readiness/RUL-2026-27-full-season-activation
+
+permissions:
+  contents: read
+
+jobs:
+  export-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact pushed revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Record source identity
+        run: |
+          git rev-parse HEAD > SOURCE_COMMIT.txt
+          git rev-parse HEAD^ > SOURCE_PARENT.txt
+
+      - name: Build clean source archive
+        run: |
+          tar \
+            --exclude=.git \
+            --exclude=.venv \
+            --exclude=.uv-cache \
+            --exclude='**/__pycache__' \
+            --exclude='.pytest_cache' \
+            --exclude='.mypy_cache' \
+            --exclude='.ruff_cache' \
+            -czf /tmp/dmf-pulse-source.tar.gz .
+          test -s /tmp/dmf-pulse-source.tar.gz
+          tar -tzf /tmp/dmf-pulse-source.tar.gz >/dev/null
+          sha256sum /tmp/dmf-pulse-source.tar.gz > /tmp/dmf-pulse-source.tar.gz.sha256
+
+      - name: Upload exact source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmf-pulse-source-${{ github.sha }}
+          path: |
+            /tmp/dmf-pulse-source.tar.gz
+            /tmp/dmf-pulse-source.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
