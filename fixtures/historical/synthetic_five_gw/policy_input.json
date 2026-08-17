@@ -1,0 +1,261 @@
+{
+  "dataset_mode": "COUNTERFACTUAL",
+  "deadlines": [
+    {
+      "deadline_id": "gw1",
+      "forecast_origin": "2026-08-01T10:00:00Z",
+      "gameweek": 1,
+      "information_cutoff": "2026-08-01T10:00:00Z",
+      "observed_node_id": null,
+      "outcome_revealed_at": "2026-08-03T10:00:00Z",
+      "realised_outcome": "4",
+      "utility_includes_hit_costs": true,
+      "records": [
+        {
+          "corrected_at": null,
+          "current_vintage": false,
+          "dataset_mode": "COUNTERFACTUAL",
+          "entity_id": "player-alpha",
+          "feature_intended": true,
+          "gameweek": 1,
+          "kind": "PULSE_PROJECTION",
+          "mapped_at": "2026-08-01T06:00:00Z",
+          "mapping_version_id": "mapping:synthetic-pulse-gw1",
+          "operational_usability": "COUNTERFACTUAL_ONLY",
+          "received_at": "2026-08-01T06:00:00Z",
+          "record_id": "synthetic-pulse-gw1",
+          "role": "FEATURE",
+          "source_snapshot_id": "snapshot:synthetic-pulse-gw1",
+          "source_timestamp": "2026-08-01T06:00:00Z",
+          "target_id": "gw1",
+          "target_outcome_at": null,
+          "usable_at": "2026-08-01T07:00:00Z",
+          "valid_from": null,
+          "values": {
+            "accepted_modules": [
+              "MARKETS",
+              "MINUTES",
+              "EVENTS",
+              "FPL_POINTS",
+              "ONE_GW_OPTIMISER",
+              "MULTI_GW_OPTIMISER"
+            ],
+            "accepted_parent_commit": "4f1274ccef419a7c0bde335c48bd4070e248b2e6",
+            "expected_points": "5.2",
+            "provenance_class": "SYNTHETIC"
+          }
+        }
+      ]
+    },
+    {
+      "deadline_id": "gw2",
+      "forecast_origin": "2026-08-08T10:00:00Z",
+      "gameweek": 2,
+      "information_cutoff": "2026-08-08T10:00:00Z",
+      "observed_node_id": null,
+      "outcome_revealed_at": "2026-08-10T10:00:00Z",
+      "realised_outcome": "8",
+      "utility_includes_hit_costs": true,
+      "records": [
+        {
+          "corrected_at": null,
+          "current_vintage": false,
+          "dataset_mode": "COUNTERFACTUAL",
+          "entity_id": "player-alpha",
+          "feature_intended": true,
+          "gameweek": 2,
+          "kind": "PULSE_PROJECTION",
+          "mapped_at": "2026-08-08T06:00:00Z",
+          "mapping_version_id": "mapping:synthetic-pulse-gw2",
+          "operational_usability": "COUNTERFACTUAL_ONLY",
+          "received_at": "2026-08-08T06:00:00Z",
+          "record_id": "synthetic-pulse-gw2",
+          "role": "FEATURE",
+          "source_snapshot_id": "snapshot:synthetic-pulse-gw2",
+          "source_timestamp": "2026-08-08T06:00:00Z",
+          "target_id": "gw2",
+          "target_outcome_at": null,
+          "usable_at": "2026-08-08T07:00:00Z",
+          "valid_from": null,
+          "values": {
+            "accepted_modules": [
+              "MARKETS",
+              "MINUTES",
+              "EVENTS",
+              "FPL_POINTS",
+              "ONE_GW_OPTIMISER",
+              "MULTI_GW_OPTIMISER"
+            ],
+            "accepted_parent_commit": "4f1274ccef419a7c0bde335c48bd4070e248b2e6",
+            "expected_points": "6.4",
+            "provenance_class": "SYNTHETIC"
+          }
+        }
+      ]
+    },
+    {
+      "deadline_id": "gw3",
+      "forecast_origin": "2026-08-15T10:00:00Z",
+      "gameweek": 3,
+      "information_cutoff": "2026-08-15T10:00:00Z",
+      "observed_node_id": null,
+      "outcome_revealed_at": "2026-08-17T10:00:00Z",
+      "realised_outcome": "6",
+      "utility_includes_hit_costs": true,
+      "records": [
+        {
+          "corrected_at": null,
+          "current_vintage": false,
+          "dataset_mode": "COUNTERFACTUAL",
+          "entity_id": "player-alpha",
+          "feature_intended": true,
+          "gameweek": 3,
+          "kind": "PULSE_PROJECTION",
+          "mapped_at": "2026-08-15T06:00:00Z",
+          "mapping_version_id": "mapping:synthetic-pulse-gw3",
+          "operational_usability": "COUNTERFACTUAL_ONLY",
+          "received_at": "2026-08-15T06:00:00Z",
+          "record_id": "synthetic-pulse-gw3",
+          "role": "FEATURE",
+          "source_snapshot_id": "snapshot:synthetic-pulse-gw3",
+          "source_timestamp": "2026-08-15T06:00:00Z",
+          "target_id": "gw3",
+          "target_outcome_at": null,
+          "usable_at": "2026-08-15T07:00:00Z",
+          "valid_from": null,
+          "values": {
+            "accepted_modules": [
+              "MARKETS",
+              "MINUTES",
+              "EVENTS",
+              "FPL_POINTS",
+              "ONE_GW_OPTIMISER",
+              "MULTI_GW_OPTIMISER"
+            ],
+            "accepted_parent_commit": "4f1274ccef419a7c0bde335c48bd4070e248b2e6",
+            "expected_points": "7.1",
+            "provenance_class": "SYNTHETIC"
+          }
+        }
+      ]
+    },
+    {
+      "deadline_id": "gw4",
+      "forecast_origin": "2026-08-22T10:00:00Z",
+      "gameweek": 4,
+      "information_cutoff": "2026-08-22T10:00:00Z",
+      "observed_node_id": null,
+      "outcome_revealed_at": "2026-08-24T10:00:00Z",
+      "realised_outcome": "3",
+      "utility_includes_hit_costs": true,
+      "records": [
+        {
+          "corrected_at": null,
+          "current_vintage": false,
+          "dataset_mode": "COUNTERFACTUAL",
+          "entity_id": "player-alpha",
+          "feature_intended": true,
+          "gameweek": 4,
+          "kind": "PULSE_PROJECTION",
+          "mapped_at": "2026-08-22T06:00:00Z",
+          "mapping_version_id": "mapping:synthetic-pulse-gw4",
+          "operational_usability": "COUNTERFACTUAL_ONLY",
+          "received_at": "2026-08-22T06:00:00Z",
+          "record_id": "synthetic-pulse-gw4",
+          "role": "FEATURE",
+          "source_snapshot_id": "snapshot:synthetic-pulse-gw4",
+          "source_timestamp": "2026-08-22T06:00:00Z",
+          "target_id": "gw4",
+          "target_outcome_at": null,
+          "usable_at": "2026-08-22T07:00:00Z",
+          "valid_from": null,
+          "values": {
+            "accepted_modules": [
+              "MARKETS",
+              "MINUTES",
+              "EVENTS",
+              "FPL_POINTS",
+              "ONE_GW_OPTIMISER",
+              "MULTI_GW_OPTIMISER"
+            ],
+            "accepted_parent_commit": "4f1274ccef419a7c0bde335c48bd4070e248b2e6",
+            "expected_points": "4.8",
+            "provenance_class": "SYNTHETIC"
+          }
+        }
+      ]
+    },
+    {
+      "deadline_id": "gw5",
+      "forecast_origin": "2026-08-29T10:00:00Z",
+      "gameweek": 5,
+      "information_cutoff": "2026-08-29T10:00:00Z",
+      "observed_node_id": null,
+      "outcome_revealed_at": "2026-08-31T10:00:00Z",
+      "realised_outcome": "9",
+      "utility_includes_hit_costs": true,
+      "records": [
+        {
+          "corrected_at": null,
+          "current_vintage": false,
+          "dataset_mode": "COUNTERFACTUAL",
+          "entity_id": "player-alpha",
+          "feature_intended": true,
+          "gameweek": 5,
+          "kind": "PULSE_PROJECTION",
+          "mapped_at": "2026-08-29T06:00:00Z",
+          "mapping_version_id": "mapping:synthetic-pulse-gw5",
+          "operational_usability": "COUNTERFACTUAL_ONLY",
+          "received_at": "2026-08-29T06:00:00Z",
+          "record_id": "synthetic-pulse-gw5",
+          "role": "FEATURE",
+          "source_snapshot_id": "snapshot:synthetic-pulse-gw5",
+          "source_timestamp": "2026-08-29T06:00:00Z",
+          "target_id": "gw5",
+          "target_outcome_at": null,
+          "usable_at": "2026-08-29T07:00:00Z",
+          "valid_from": null,
+          "values": {
+            "accepted_modules": [
+              "MARKETS",
+              "MINUTES",
+              "EVENTS",
+              "FPL_POINTS",
+              "ONE_GW_OPTIMISER",
+              "MULTI_GW_OPTIMISER"
+            ],
+            "accepted_parent_commit": "4f1274ccef419a7c0bde335c48bd4070e248b2e6",
+            "expected_points": "6.0",
+            "provenance_class": "SYNTHETIC"
+          }
+        }
+      ]
+    }
+  ],
+  "initial_state": {
+    "action_count": 0,
+    "cumulative_points": "0",
+    "free_transfers": 1,
+    "gameweek": 1
+  },
+  "lineage": {
+    "benchmark_config_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "code_commit": "4f1274ccef419a7c0bde335c48bd4070e248b2e6",
+    "dataset_manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "fold_sha256": null,
+    "forecast_origin": "2026-08-01T10:00:00Z",
+    "information_cutoff": "2026-08-01T10:00:00Z",
+    "input_manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "label_finality_cutoff": "2026-09-30T10:00:00Z",
+    "metric_config_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "model_version_ids": [
+      "pulse-accepted-stage12-parent"
+    ],
+    "random_seed": 120012,
+    "ruleset_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "ruleset_id": "synthetic-reference-rules",
+    "training_cutoff": "2026-07-31T10:00:00Z",
+    "usable_at_cutoff": "2026-08-01T10:00:00Z"
+  },
+  "trajectory_id": "synthetic-five-gw-policy"
+}

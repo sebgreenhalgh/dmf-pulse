@@ -1,0 +1,48 @@
+{
+  "coverage": {
+    "branch_aware_percent": 90,
+    "fail_under": 90,
+    "scope": "src/dmf_pulse/evaluation/* + src/dmf_pulse/cli/evaluate.py",
+    "status": "PASS"
+  },
+  "focused": {
+    "failed": 0,
+    "passed": 104,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "full_repository_pytest": {
+    "failed": 0,
+    "initial_attempt": "INFRASTRUCTURE_SETUP_FAILURE_MIGRATIONS_NOT_APPLIED",
+    "passed": 2246,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "installed_wheel": {
+    "commands_passed": 6,
+    "contamination_exit_code": 3,
+    "status": "PASS"
+  },
+  "mypy": {
+    "source_files": 22,
+    "status": "PASS"
+  },
+  "repository_wide_coverage": {
+    "status": "NOT_RUN_BY_DESIGN"
+  },
+  "ruff": {
+    "status": "PASS"
+  },
+  "schema_version": "eval-012-test-results-v1",
+  "status": "PASS",
+  "supplemental_static": {
+    "files": 20,
+    "status": "PASS"
+  },
+  "targeted_inherited": {
+    "failed": 0,
+    "passed": 100,
+    "skipped": 0,
+    "status": "PASS"
+  }
+}

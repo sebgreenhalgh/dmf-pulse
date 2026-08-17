@@ -13,6 +13,7 @@ from dmf_pulse.cli.availability_cmd import availability_app
 from dmf_pulse.cli.config_cmd import config_app
 from dmf_pulse.cli.data_model_cmd import data_model_app
 from dmf_pulse.cli.doctor import build_doctor_report
+from dmf_pulse.cli.evaluate import evaluate_app
 from dmf_pulse.cli.events import events_app
 from dmf_pulse.cli.evidence_cmd import evidence_app
 from dmf_pulse.cli.fpl_points import fpl_points_app
@@ -35,6 +36,7 @@ app.add_typer(config_app, name="config")
 app.add_typer(availability_app, name="availability")
 app.add_typer(data_model_app, name="data-model")
 app.add_typer(evidence_app, name="evidence")
+app.add_typer(evaluate_app, name="evaluate")
 app.add_typer(events_app, name="events")
 app.add_typer(fpl_points_app, name="fpl-points")
 app.add_typer(ingest_app, name="ingest")

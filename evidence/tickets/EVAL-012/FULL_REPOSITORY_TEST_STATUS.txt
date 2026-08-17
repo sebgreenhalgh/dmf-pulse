@@ -1,0 +1,14 @@
+status=PASS
+canonical_command=uv run pytest -q
+environment=TEST with pinned PostgreSQL 18.4 test service
+final_result=2246 passed, 0 failed, 0 skipped
+final_duration_seconds=1294.66
+final_duration=00:21:34
+initial_attempt=FAIL_INFRASTRUCTURE_SETUP
+initial_cause=healthy empty PostgreSQL database had not received inherited Alembic migrations
+corrective_setup=uv run alembic upgrade head (20260807_0006)
+targeted_corrective_checks=PASS (10 passed)
+corrective_full_rerun=PASS
+stage12_caused_failures=0
+postgres_teardown=PASS with volume removal
+repository_wide_coverage=NOT_RUN_BY_DESIGN per review brief

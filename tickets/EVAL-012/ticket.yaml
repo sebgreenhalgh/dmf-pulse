@@ -1,0 +1,46 @@
+ticket_id: "EVAL-012"
+stage: "B1"
+roadmap_stage: 12
+title: "Backtesting framework"
+status: "REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "GPT-5.6 Pro primary implementation engineer"
+reviewer_role: "fresh independent GPT-5.6 Sol required"
+implemented_on: "2026-08-17"
+required_base_branch: "main"
+required_base_commit: "4f1274ccef419a7c0bde335c48bd4070e248b2e6"
+implementation_branch: "stage/A12/EVAL-012-backtesting-framework"
+pull_request: 9
+objective: >-
+  Implement a deterministic, time-travel-safe, nested walk-forward and prequential evaluation
+  framework that freezes historical information sets, forecasts and decisions before outcomes;
+  separates forecast, distribution, decision and operational scorecards; exposes B0-B5 benchmark
+  contracts; replays only the current Stage-11 action before re-solving; detects leakage as a
+  blocking failure; and demonstrates the full vertical slice offline with a synthetic five-GW run.
+vertical_slice:
+  build_folds: "dmf evaluate build-folds --input <json> --output json"
+  benchmark: "dmf evaluate benchmark --input <json> --output json"
+  projections: "dmf evaluate projections --input <json> --output json"
+  policy: "dmf evaluate policy --input <json> --artifact-root <dir> --output json"
+  leakage: "dmf evaluate leakage --input <json> --output json"
+  report: "dmf evaluate report --input <json> --artifact-root <dir> --output json"
+benchmark_contracts:
+  feasible: ["B0A", "B0B", "B0C", "B1", "B2", "B3", "B4"]
+  oracle_only: ["B5A", "B5B", "B5C", "B5D"]
+  b4_boundary: "Only modules accepted at the immutable Stage-12 parent."
+explicit_exclusions:
+  - "Stage-13 price prediction"
+  - "Stage-14 chip scheduling"
+  - "Stage-15 rank/effective-ownership strategy"
+  - "New production football, minutes or event models"
+  - "Autonomous FPL execution"
+  - "Public UI"
+  - "Production champion promotion"
+  - "Paid or licence-uncertain historical datasets"
+migration:
+  required: false
+  reason: "Immutable evaluation artifacts; no relational persistence contract change."
+acceptance:
+  human_acceptance: false
+  independent_review_complete: true
+  implementation_status: "REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"

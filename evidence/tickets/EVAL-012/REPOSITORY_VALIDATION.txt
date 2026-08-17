@@ -1,0 +1,10 @@
+status=PASS
+command=uv run python scripts/validate_repository.py
+error_count=0
+active_manifest=evidence/tickets/EVAL-012/current_manifest.json
+manifest_files=950
+manifest_contract_test=PASS (1 passed)
+json_files_validated=43
+evaluation_schema=PASS
+benchmark_contracts=11
+synthetic_fixture_families=12

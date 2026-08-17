@@ -1,0 +1,17 @@
+status=PASS
+base=4f1274ccef419a7c0bde335c48bd4070e248b2e6
+changed_files=105
+production_files=23
+test_files=17
+fixture_files=28
+config_files=2
+scripts=4
+ticket_files=3
+evidence_files=27
+other_files=1
+unexpected_files=0
+future_stage_production_files=0
+new_runtime_dependencies=0
+new_database_migrations=0
+human_acceptance_false=PASS
+merge_or_tag_created=false

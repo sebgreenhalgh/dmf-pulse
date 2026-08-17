@@ -1,0 +1,6 @@
+Stage-12 branch-aware coverage: 90% PASS
+Scope: src/dmf_pulse/evaluation/* and src/dmf_pulse/cli/evaluate.py
+Command: uv run coverage run --branch -m pytest -q tests/unit/evaluation tests/contract/evaluation tests/integration/evaluation tests/replay/evaluation tests/property/evaluation tests/golden/evaluation
+Gate: uv run coverage report --include="src/dmf_pulse/evaluation/*,src/dmf_pulse/cli/evaluate.py" --show-missing --fail-under=90
+Result: 104 passed in 3.71s; 2093 statements, 152 missed, 812 branches, 139 partial branches; total 90%
+Repository-wide coverage: NOT_RUN_BY_DESIGN per independent-review brief.

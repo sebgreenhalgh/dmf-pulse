@@ -1,0 +1,11 @@
+status=PASS
+review_zip_sha256=f9dea9bffcd496d46f81f41758b9ea97783a07d5c996936045426585e0240257
+archive_members=201
+payload_members=200
+payload_hash_mismatches=0
+path_confinement=PASS
+patch_apply_check=PASS
+patch_apply=PASS
+exact_parent=4f1274ccef419a7c0bde335c48bd4070e248b2e6
+governing_spec_hashes_match_repository=PASS
+extraction_debris_in_repository=NONE

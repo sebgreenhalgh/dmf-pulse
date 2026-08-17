@@ -1,0 +1,34 @@
+schema_version: evaluation-config-v1
+dataset_mode: COUNTERFACTUAL
+walk_forward:
+  window: EXPANDING
+  minimum_training_origins: 1
+  inner_minimum_training_origins: 1
+  rolling_window_origins: null
+  holdout_origins: 0
+probability_scoring:
+  boundary_policy: EXACT
+  declared_epsilon: null
+calibration:
+  reliability_bins: 10
+  method: LOGISTIC
+distribution_scoring:
+  central_coverage: "0.80"
+  quantile_alpha: "0.50"
+multivariate_scoring:
+  variogram_power: "0.50"
+policy_replay:
+  execute_root_action_only: true
+  freeze_forecast_before_outcome: true
+benchmark_ids:
+  - B0A_RECENT_POINTS_LAST_3
+  - B0B_RECENT_POINTS_LAST_5
+  - B0C_RECENT_POINTS_EWMA
+  - B1_OFFICIAL_FPL_FORM
+  - B2_MARKET_ONLY
+  - B3_MARKET_PLUS_MINUTES
+  - B4_ACCEPTED_PULSE_BASELINE
+  - B5A_PERFECT_LINEUP_MINUTES
+  - B5B_PERFECT_FOOTBALL_OUTCOMES
+  - B5C_PERFECT_GAMEWEEK_TRANSFERS
+  - B5D_PERFECT_SEASON_POLICY

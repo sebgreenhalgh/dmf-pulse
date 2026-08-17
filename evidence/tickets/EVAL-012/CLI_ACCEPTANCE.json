@@ -1,0 +1,15 @@
+{
+  "commands": [
+    {"command":"cli_build_folds","output_sha256":"05c1bae632b8340e575766b261f7b013ec383b22468081bb3b72099530e73e8d","status":"PASS"},
+    {"command":"cli_benchmark","output_sha256":"2b74846aecd5b8b43ba96b864b85c919245397032abcbcb7955d2e4b4b803dbb","status":"PASS"},
+    {"command":"cli_projections","output_sha256":"d1b944808cf766a642b978f47e9c736b80c3e8edd0dbb15a2f629a62a6d684b4","status":"PASS"},
+    {"command":"cli_policy","output_sha256":"0971f188e4ccfdf9c0c3176d5704f4a6eb5b0736ba2ab453a16b0995c606d6ce","status":"PASS"},
+    {"command":"cli_leakage_clean","output_sha256":"999c828c1b85032d50e789e02055b8d36721148082fd3519a074b0b81a270785","status":"PASS"},
+    {"command":"cli_report","output_sha256":"96af87534208e6b306f228080144985dd1d617d8b0019faa9a79ce1582cd9612","status":"PASS"}
+  ],
+  "installed_wheel": true,
+  "outside_source_tree": true,
+  "pythonpath_removed": true,
+  "schema_version": "eval-012-cli-acceptance-v1",
+  "status": "PASS"
+}

@@ -1,0 +1,13 @@
+status=PASS
+generator=scripts/assurance/build_stage12_review_pack.py
+path=review_pack/DMF_PULSE_STAGE12_SOL_FINAL_REVIEW.zip
+members=20
+member_cap=20
+root_only=PASS
+pack_sha256_inventory=PASS
+patch_nonempty=PASS
+changed_file_inventory=PASS
+final_evidence_included=PASS
+archive_sha256=7bea96def6b834e8863f243af7cf44f2c34220e4d9e5a10b4e03c2342399e385
+generated_output_tracked=false
+human_acceptance=false
