@@ -10,6 +10,7 @@ implemented_on: "2026-08-17"
 required_base_branch: "stage/A10/OPT-010-one-gameweek-optimiser"
 required_base_commit: "49103e03bb1e7500aff5c15b90b136f2cc476405"
 implementation_branch: "stage/A11/OPT-011-multi-gameweek-transfer-optimiser"
+pull_request: "https://github.com/sebgreenhalgh/dmf-pulse/pull/8"
 
 objective: >-
   Extend the accepted Stage-10 tactical subsystem with immutable manager state, exact

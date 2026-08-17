@@ -7,6 +7,7 @@
   `49103e03bb1e7500aff5c15b90b136f2cc476405`
 - Supplied implementation commit identity: `9f1cdff6b6ad29d9d258013466105a65c5a257ec`
 - Stage-11 branch: `stage/A11/OPT-011-multi-gameweek-transfer-optimiser`
+- Human-review PR: `https://github.com/sebgreenhalgh/dmf-pulse/pull/8` (draft, unmerged)
 - Status: `REVIEW_COMPLETE_AWAITING_HUMAN_ACCEPTANCE`
 - Acceptance: not granted; no merge or accepted tag was performed.
 

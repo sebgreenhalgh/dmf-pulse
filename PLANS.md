@@ -775,6 +775,6 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Run frozen sync, static checks, focused/inherited/full tests, branch coverage, build,
   installed-wheel CLI, benchmark, repository/artifact/scope validation, secret scan, and diff
   assurance; record exact results without upgrading unavailable gates to PASS.
-- [ ] Refresh OPT-011/stage evidence against the final code, perform hostile pre-push review,
+- [x] Refresh OPT-011/stage evidence against the final code, perform hostile pre-push review,
   commit, push safely with lease protection if replacement is required, verify remote equality,
   and create or update the unmerged human-review PR.
