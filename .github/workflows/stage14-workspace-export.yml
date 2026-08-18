@@ -1,22 +1,23 @@
-name: stage14-checkpoint-transport
+name: stage14-workspace-export
 
 on:
   push:
     branches:
       - stage/A14/CHIP-014-chip-optimisation
-    paths:
-      - recovery/stage14-apply.json
+    paths-ignore:
+      - recovery/stage14-workspace-artifact.json
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: write
 
 concurrency:
-  group: stage14-checkpoint-transport-${{ github.ref }}
-  cancel-in-progress: false
+  group: stage14-workspace-export-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  apply:
+  export:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -25,37 +26,59 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Apply verified checkpoint transport
-        shell: bash
+      - name: Fetch canonical refs and export exact workspace
         run: |
           set -euo pipefail
-          transport="recovery/stage14-apply.json"
-          if [[ ! -f "$transport" ]]; then
-            echo "No checkpoint transport is present; nothing to apply."
-            exit 0
-          fi
+          git fetch --no-tags origin \
+            main:refs/remotes/origin/main \
+            stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          git archive --format=zip --output=dmf-pulse-source.zip HEAD
+          git bundle create dmf-pulse-stage14.bundle \
+            refs/remotes/origin/main \
+            refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
 
+      - name: Upload workspace archive
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage14-workspace-${{ github.sha }}
+          path: |
+            dmf-pulse-source.zip
+            dmf-pulse-stage14.bundle
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Publish recovery artifact locator
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          RUN_ID: ${{ github.run_id }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p recovery
           python - <<'PY'
-          import base64
-          import gzip
           import json
+          import os
           from pathlib import Path
 
-          path = Path("recovery/stage14-apply.json")
-          payload = json.loads(path.read_text(encoding="utf-8"))
-          patch = gzip.decompress(base64.b64decode(payload["patch_gzip_base64"]))
-          Path("/tmp/stage14.patch").write_bytes(patch)
-          Path("/tmp/stage14-message.txt").write_text(
-              str(payload["message"]) + "\n", encoding="utf-8"
+          Path("recovery/stage14-workspace-artifact.json").write_text(
+              json.dumps(
+                  {
+                      "artifact_id": int(os.environ["ARTIFACT_ID"]),
+                      "artifact_url": os.environ["ARTIFACT_URL"],
+                      "run_id": int(os.environ["RUN_ID"]),
+                      "source_sha": os.environ["SOURCE_SHA"],
+                  },
+                  indent=2,
+                  sort_keys=True,
+              )
+              + "\n",
+              encoding="utf-8",
           )
           PY
-
-          git apply --check --whitespace=error /tmp/stage14.patch
-          git apply --index --whitespace=error /tmp/stage14.patch
-          git rm "$transport"
-          git diff --cached --check
-
-          git config user.name "Sebastian Greenhalgh"
-          git config user.email "seb.greenhalgh@outlook.com"
-          git commit -F /tmp/stage14-message.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add recovery/stage14-workspace-artifact.json
+          git commit -m "checkpoint(chips): publish Stage 14 recovery artifact [skip ci]"
           git push origin HEAD:stage/A14/CHIP-014-chip-optimisation
