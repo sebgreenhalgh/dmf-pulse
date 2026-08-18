@@ -9,76 +9,84 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: read
   contents: write
 
 concurrency:
   group: stage14-workspace-export-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  export:
+  materialise:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out Stage 14
+      - name: Check out canonical Stage 14 branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Fetch canonical refs and export exact workspace
+      - name: Verify and materialise scheduler payload
+        shell: bash
         run: |
           set -euo pipefail
           git fetch --no-tags origin \
-            main:refs/remotes/origin/main \
             stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
-          git archive --format=zip --output=dmf-pulse-source.zip HEAD
-          git bundle create dmf-pulse-stage14.bundle \
-            refs/remotes/origin/main \
-            refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
-
-      - name: Upload workspace archive
-        id: upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: stage14-workspace-${{ github.sha }}
-          path: |
-            dmf-pulse-source.zip
-            dmf-pulse-stage14.bundle
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Publish recovery artifact locator
-        env:
-          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
-          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
-          RUN_ID: ${{ github.run_id }}
-          SOURCE_SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          mkdir -p recovery
+          git reset --hard refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          test -f recovery/stage14-checkpoint-parts/manifest.json
           python - <<'PY'
+          import base64
+          import gzip
+          import hashlib
           import json
-          import os
           from pathlib import Path
 
-          Path("recovery/stage14-workspace-artifact.json").write_text(
-              json.dumps(
-                  {
-                      "artifact_id": int(os.environ["ARTIFACT_ID"]),
-                      "artifact_url": os.environ["ARTIFACT_URL"],
-                      "run_id": int(os.environ["RUN_ID"]),
-                      "source_sha": os.environ["SOURCE_SHA"],
-                  },
-                  indent=2,
-                  sort_keys=True,
+          root = Path("recovery/stage14-checkpoint-parts")
+          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          parts = sorted(root.glob("part-*"))
+          expected_names = [f"part-{index:02d}" for index in range(manifest["parts"])]
+          if [path.name for path in parts] != expected_names:
+              raise SystemExit(
+                  f"unexpected payload parts: {[path.name for path in parts]!r}"
               )
-              + "\n",
-              encoding="utf-8",
-          )
+          encoded = b"".join(path.read_bytes() for path in parts)
+          if len(encoded) != 42317:
+              raise SystemExit(f"unexpected compressed payload size: {len(encoded)}")
+          if hashlib.sha256(encoded).hexdigest() != manifest["b64_sha256"]:
+              raise SystemExit("compressed payload checksum mismatch")
+          decoded = gzip.decompress(base64.b64decode(encoded))
+          if len(decoded) != manifest["raw_size"]:
+              raise SystemExit("decoded payload size mismatch")
+          if hashlib.sha256(decoded).hexdigest() != manifest["raw_sha256"]:
+              raise SystemExit("decoded payload checksum mismatch")
+          json.loads(decoded)
+          Path("recovery/stage14-checkpoint.json").write_bytes(decoded)
+          for path in parts:
+              path.unlink()
+          (root / "manifest.json").unlink()
+          root.rmdir()
+          Path("recovery/stage14-workspace-artifact.json").unlink(missing_ok=True)
+          Path("recovery/stage14-sync-probe.txt").unlink(missing_ok=True)
+          Path(
+              ".github/workflows/stage14-chunked-checkpoint-dispatch.yml"
+          ).unlink(missing_ok=True)
           PY
+          git cat-file blob 24a84fff4d5a8409c52d018887750d820409c1cd \
+            > .github/workflows/stage14-workspace-export.yml
+          git cat-file blob 88b3f1b08e95de4da0d30532eff05a1c34300a61 \
+            > .github/workflows/stage14-compressed-payload-unpack.yml
+          git add -A
+          git diff --cached --check
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add recovery/stage14-workspace-artifact.json
-          git commit -m "checkpoint(chips): publish Stage 14 recovery artifact [skip ci]"
-          git push origin HEAD:stage/A14/CHIP-014-chip-optimisation
+          git commit -m "checkpoint(chips): materialise verified scheduler payload"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:stage/A14/CHIP-014-chip-optimisation; then
+              break
+            fi
+            if [[ "$attempt" == 5 ]]; then
+              exit 1
+            fi
+            git fetch --no-tags origin \
+              stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+            git rebase refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          done
