@@ -16,6 +16,7 @@
 - Resumed session verification on `2026-08-18`: current `origin/main` is still exactly `a8796d4edacea4c87ee6461d381f4df87e1ef39c`.
 - The remote Stage-14 branch compares `ahead_by=7`, `behind_by=0` against the immutable parent; merge-base is the immutable parent.
 - Remote progress is authoritative and identifies `14.04 Free Hit` as the first unfinished checkpoint.
+- The recovered workspace was reconciled to remote commit `50cc44c9a06b8564718794a8fa5abdc10acecf0e` before implementation resumed.
 - Branch created directly from the immutable parent.
 - Ordinary container Git transport is unavailable because this execution container cannot resolve `github.com`.
 - Durable publication uses authenticated GitHub Git-data/contents APIs with non-force fast-forward updates.
@@ -34,6 +35,18 @@
 | 14.05 Wildcard | NOT_STARTED | — | — | — |
 | 14.06 scheduler/continuation | NOT_STARTED | — | — | — |
 | 14.07 CLI/evaluation/evidence | NOT_STARTED | — | — | — |
+
+## Resume confidence remediation
+
+- Minimal resumed confidence testing exposed a genuine completed-checkpoint defect: the generic
+  compiler hard-blocked `vice_fallback: false` instead of leaving rules reconciliation to the
+  captaincy evaluator.
+- The compiler now accepts strict booleans while retaining multiplier validation.
+- An explicit compiler regression and the existing captaincy mismatch regression cover the
+  boundary.
+- Focused result: `75 passed`; full existing chip confidence: `126 passed`; see
+  `evidence/tickets/CHIP-014/RESUME_REGRESSION.md`.
+- This remediation preserves the target-season rule declaration and completed public contracts.
 
 ## Completed capability
 

@@ -58,9 +58,7 @@ _EFFECTS: dict[tuple[str, str], EffectContract] = {
     ("TRANSFERS", "PRESERVE_SAVED_FREE_TRANSFERS"): EffectContract(
         frozenset(),
         frozenset(),
-        frozenset(
-            {EffectCapability.TRANSFER_TRANSFORM, EffectCapability.FREE_TRANSFER_TRANSFORM}
-        ),
+        frozenset({EffectCapability.TRANSFER_TRANSFORM, EffectCapability.FREE_TRANSFER_TRANSFORM}),
     ),
     ("TRANSFERS", "SET_HIT_COST"): EffectContract(
         frozenset({"points_per_paid_transfer"}),
@@ -135,7 +133,7 @@ def _semantic_blockers(effect: ChipEffect) -> tuple[str, ...]:
         if (
             not _is_int(params["multiplier"])
             or int(params["multiplier"]) <= 1
-            or params["vice_fallback"] is not True
+            or type(params["vice_fallback"]) is not bool
         ):
             blockers.append("INVALID_CAPTAIN_MULTIPLIER")
     elif key == ("SCORING", "MULTIPLY_POINTS"):

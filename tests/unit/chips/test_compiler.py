@@ -112,6 +112,13 @@ def test_invalid_known_semantics_fail_closed() -> None:
     assert "INVALID_CAPTAIN_MULTIPLIER" in compiled.blockers
 
 
+def test_generic_captain_effect_accepts_boolean_fallback_for_rules_reconciliation() -> None:
+    compiled = compile_chip_definition(
+        _definition("CAPTAIN", "SET_MULTIPLIER", {"multiplier": 3, "vice_fallback": False})
+    )
+    assert compiled.activation_status == ActivationStatus.READY
+
+
 def test_rules_view_is_adapted_without_copying_target_constants() -> None:
     view = RulesView(
         ruleset_id="FPL-2026-27",
