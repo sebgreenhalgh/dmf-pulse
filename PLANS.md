@@ -45,7 +45,7 @@
   complete repository pytest suite.
 - [x] Run frozen sync, Ruff, strict mypy, build, clean installed-wheel CLI and assurance gates;
   update truthful independent-review evidence.
-- [ ] Commit remediation above the preserved implementation SHA, push normally, verify remote
+- [x] Commit remediation above the preserved implementation SHA, push normally, verify remote
   equality and create a draft PR to `main`; do not merge, accept or tag.
 
 ## OPT-010 - exact bounded one-Gameweek optimiser

@@ -168,7 +168,7 @@
     {
       "bytes": 70910,
       "path": "PLANS.md",
-      "sha256": "c70f6737769e03a2191eeead2cb9163603c06b5c4727eb6928e5728d423787dd"
+      "sha256": "693fa2db30075502d3b18a67869e14751327e339705626597e09814a41c581ad"
     },
     {
       "bytes": 2761,
@@ -461,9 +461,9 @@
       "sha256": "7c0a88b972491bed0fd390635a6494f9bcf4c846a212dafed8b793f6aafc5823"
     },
     {
-      "bytes": 419,
+      "bytes": 516,
       "path": "evidence/stages/13/STATUS.md",
-      "sha256": "ca8dd0ca77c8537cf41da827bc9410c952d152acd78d34a39306ffe1e93d36b7"
+      "sha256": "ef28241e6fa0eb9481bc04a918b32d799f2abbccd5d9e30d1468dd061aa3a536"
     },
     {
       "bytes": 281,
@@ -4966,9 +4966,9 @@
       "sha256": "b130ceb515928644becc44885df6426ff6876181b6dee9937d23c39246e555c5"
     },
     {
-      "bytes": 2232,
+      "bytes": 2230,
       "path": "tickets/PRC-013/ticket.yaml",
-      "sha256": "a7c088037938c1aa51ec49e5c3079f1e914914192b82693504c3881cdbac7e85"
+      "sha256": "f157961151c3f5dbbb80bcc1fe9a7d1c0c9eefad5a283e470ff23ab7b9efc290"
     },
     {
       "bytes": 4490,

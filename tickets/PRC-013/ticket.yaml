@@ -9,7 +9,7 @@ reviewer_role: "GPT-5.6 Sol independent reviewer (completed)"
 required_base_branch: "main"
 required_base_commit: "ce7fe8f4354d95a477afcf6eed45f63cf0ab772e"
 implementation_branch: "stage/A13/PRC-013-price-prediction"
-pull_request: null
+pull_request: 12
 objective: >-
   Implement a deterministic, time-safe Stage-13 vertical slice that turns immutable price and
   transfer observations into recurrent rise/fall/no-change probabilities, discrete future market

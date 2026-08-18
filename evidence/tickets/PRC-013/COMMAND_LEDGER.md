@@ -42,7 +42,9 @@ workspace-contained base temp because the sandbox cannot enumerate the default p
     - PASS; zero unallowlisted findings.
 15. `git diff --check`, worktree inventory, recovery/archive absence, package-resource equivalence
     and complete base-to-head scope review.
-    - PASS; only intended Stage-13 remediation/evidence files are pending commit, packaged and root
+    - PASS; only intended Stage-13 remediation/evidence files were committed, packaged and root
       price configurations are byte-identical, and no recovery/archive material is present.
-16. GitHub publication commands follow the final review commit; the draft PR remains unmerged and
-    human acceptance remains false.
+16. Commit/push/remote-equality check and GitHub draft-PR creation.
+    - PASS; remediation commit `1ebbbde0e80829c8c3c23a676c814a2f80487371` was pushed normally,
+      local and remote HEAD matched, and draft PR #12 was opened against `main`. The PR remains
+      unmerged and human acceptance remains false.

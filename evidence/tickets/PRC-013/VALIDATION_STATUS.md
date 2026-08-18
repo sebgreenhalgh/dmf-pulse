@@ -11,3 +11,6 @@ Default activation remains the sorted set:
 `production_actionable=false`; `automated_provider_capture=false`; P3 is
 `DEPENDENCY_NOT_APPROVED`; P4 is deferred. Independent Sol engineering review is complete. Human
 acceptance, merge and accepted tagging remain pending.
+
+Publication: draft PR #12 targets `main`; the independently reviewed source branch was pushed and
+its local/remote HEAD equality was verified. The PR remains unmerged.
