@@ -1,20 +1,10 @@
 name: stage14-workspace-export
 
 on:
-  push:
-    branches:
-      - stage/A14/CHIP-014-chip-optimisation
-    paths-ignore:
-      - recovery/stage14-workspace-artifact.json
   workflow_dispatch:
 
 permissions:
-  actions: read
-  contents: write
-
-concurrency:
-  group: stage14-workspace-export-${{ github.ref }}
-  cancel-in-progress: true
+  contents: read
 
 jobs:
   export:
@@ -25,58 +15,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Fetch immutable parent and canonical branch refs
-        run: |
-          git fetch --no-tags origin \
-            main:refs/remotes/origin/main \
-            stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
-
-      - name: Export exact repository tree and Git bundle
-        run: |
-          git archive --format=zip --output=dmf-pulse-source.zip HEAD
-          git bundle create dmf-pulse-stage14.bundle \
-            refs/remotes/origin/main \
-            refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
-          git bundle verify dmf-pulse-stage14.bundle
+      - name: Export exact repository tree
+        run: git archive --format=zip --output=dmf-pulse-source.zip HEAD
 
       - name: Upload workspace archive
-        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: stage14-workspace-${{ github.sha }}
-          path: |
-            dmf-pulse-source.zip
-            dmf-pulse-stage14.bundle
+          path: dmf-pulse-source.zip
           if-no-files-found: error
           retention-days: 1
-
-      - name: Publish recovery artifact locator
-        env:
-          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
-          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
-          RUN_ID: ${{ github.run_id }}
-          SOURCE_SHA: ${{ github.sha }}
-        run: |
-          mkdir -p recovery
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          payload = {
-              "artifact_id": int(os.environ["ARTIFACT_ID"]),
-              "artifact_url": os.environ["ARTIFACT_URL"],
-              "run_id": int(os.environ["RUN_ID"]),
-              "source_sha": os.environ["SOURCE_SHA"],
-          }
-          Path("recovery/stage14-workspace-artifact.json").write_text(
-              json.dumps(payload, indent=2, sort_keys=True) + "\n",
-              encoding="utf-8",
-          )
-          PY
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add recovery/stage14-workspace-artifact.json
-          git commit -m "checkpoint(chips): publish Stage 14 recovery artifact [skip ci]"
-          git push origin HEAD:stage/A14/CHIP-014-chip-optimisation
