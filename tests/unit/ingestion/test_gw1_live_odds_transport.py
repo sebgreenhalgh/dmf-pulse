@@ -23,7 +23,7 @@ from dmf_pulse.ingestion.odds.service import OddsIngestionService
 pytestmark = pytest.mark.unit
 
 CAPTURED = datetime(2026, 8, 20, 12, tzinfo=UTC)
-DUMMY_CREDENTIAL = "dummy-live-odds-key-1234567890"
+DUMMY_RUNTIME_VALUE = "dummy-live-odds-key-1234567890"
 QUOTA_HEADERS = {
     "x-requests-remaining": "499",
     "x-requests-used": "1",
@@ -73,7 +73,7 @@ def test_live_service_defaults_to_runtime_credential_provider() -> None:
 
 
 def test_local_quota_gate_precedes_credential_resolution_and_transport() -> None:
-    provider = _CredentialProvider(DUMMY_CREDENTIAL)
+    provider = _CredentialProvider(DUMMY_RUNTIME_VALUE)
     transport = _Transport([])
     client = _client(provider, transport)
     exhausted = QuotaState(
@@ -90,7 +90,7 @@ def test_local_quota_gate_precedes_credential_resolution_and_transport() -> None
     assert raised.value.code == "QUOTA_EXHAUSTED"
     assert provider.calls == 0
     assert transport.requests == []
-    assert DUMMY_CREDENTIAL not in repr(raised.value)
+    assert DUMMY_RUNTIME_VALUE not in repr(raised.value)
 
 
 @pytest.mark.parametrize("value", (None, "", "short", "contains space 1234567890"))
@@ -113,7 +113,7 @@ def test_valid_dummy_credential_reaches_only_transport_boundary_without_leakage(
     repository_root: Path,
 ) -> None:
     body = (repository_root / "fixtures/odds/ODD-005/happy_path.json").read_bytes()
-    provider = _CredentialProvider(DUMMY_CREDENTIAL)
+    provider = _CredentialProvider(DUMMY_RUNTIME_VALUE)
     transport = _Transport(
         [
             OddsHttpResponse(
@@ -131,16 +131,16 @@ def test_valid_dummy_credential_reaches_only_transport_boundary_without_leakage(
     assert provider.calls == 1
     assert len(transport.requests) == 1
     request = transport.requests[0]
-    assert request.credential == DUMMY_CREDENTIAL
+    assert request.credential == DUMMY_RUNTIME_VALUE
     assert request.scheme == "https"
     assert request.host == "api.the-odds-api.com"
     assert request.path == "/v4/sports/soccer_epl/odds"
     assert "apiKey" not in request.sanitized_target
-    assert DUMMY_CREDENTIAL not in request.sanitized_target
-    assert DUMMY_CREDENTIAL not in request.request_fingerprint
-    assert DUMMY_CREDENTIAL not in repr(request)
-    assert DUMMY_CREDENTIAL not in repr(fetched)
-    assert DUMMY_CREDENTIAL not in repr(fetched.attempts)
+    assert DUMMY_RUNTIME_VALUE not in request.sanitized_target
+    assert DUMMY_RUNTIME_VALUE not in request.request_fingerprint
+    assert DUMMY_RUNTIME_VALUE not in repr(request)
+    assert DUMMY_RUNTIME_VALUE not in repr(fetched)
+    assert DUMMY_RUNTIME_VALUE not in repr(fetched.attempts)
 
 
 @pytest.mark.parametrize(
@@ -155,7 +155,7 @@ def test_valid_dummy_credential_reaches_only_transport_boundary_without_leakage(
 def test_redirects_are_blocked_on_first_response_without_credential_forwarding(
     location: str,
 ) -> None:
-    provider = _CredentialProvider(DUMMY_CREDENTIAL)
+    provider = _CredentialProvider(DUMMY_RUNTIME_VALUE)
     transport = _Transport(
         [
             OddsHttpResponse(
@@ -177,5 +177,5 @@ def test_redirects_are_blocked_on_first_response_without_credential_forwarding(
     assert len(transport.requests) == 1
     assert len(raised.value.attempts) == 1
     assert raised.value.attempts[0].failure_code is ProviderFailureCode.REDIRECT_BLOCKED
-    assert DUMMY_CREDENTIAL not in repr(raised.value)
-    assert DUMMY_CREDENTIAL not in repr(raised.value.attempts)
+    assert DUMMY_RUNTIME_VALUE not in repr(raised.value)
+    assert DUMMY_RUNTIME_VALUE not in repr(raised.value.attempts)

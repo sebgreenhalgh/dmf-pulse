@@ -89,6 +89,12 @@ jobs:
             echo '```text'
             tail -n 80 "$log_dir/focused_pytest.log" 2>/dev/null || true
             echo '```'
+            echo
+            echo '## Secret scan output'
+            echo
+            echo '```json'
+            tail -n 120 "$log_dir/secret_scan.log" 2>/dev/null || true
+            echo '```'
           } >"$report"
 
           git config user.name 'dmf-pulse-gw1-validation-bot'
