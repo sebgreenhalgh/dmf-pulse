@@ -282,6 +282,29 @@ def test_free_hit_preserves_valuable_purchase_price_spell() -> None:
     assert result.use_now is True
 
 
+def test_free_hit_reconciles_information_and_affordability_route_costs() -> None:
+    normal_costs = PolicyCostProfile(
+        information_delay_cost_points=2.5,
+        affordability_route_cost_points=3.5,
+    )
+    free_hit_costs = PolicyCostProfile(
+        information_delay_cost_points=0.5,
+        affordability_route_cost_points=1.0,
+    )
+    _, result = _evaluate(
+        normal_points=(30.0,),
+        free_hit_points=(30.0,),
+        normal_costs=normal_costs,
+        free_hit_costs=free_hit_costs,
+    )
+    assert result.information_timing_value_preserved == 2.0
+    assert result.affordability_route_value_preserved == 2.5
+    assert result.net_policy_value == 4.5
+    assert result.net_policy_value == (
+        result.free_hit_policy.policy_value - result.normal_policy.policy_value
+    )
+
+
 def test_permanent_squad_bank_and_purchase_prices_restore_exactly() -> None:
     request, result = _evaluate()
     restored = result.restored_state

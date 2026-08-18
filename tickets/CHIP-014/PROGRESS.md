@@ -31,7 +31,7 @@
 | 14.01 generic chip definition/inventory | COMPLETE | `3173c97f5d04b3b0fe65c8e9b17876d257b233be` | 58 passed | 98% branch coverage for compiler/inventory. |
 | 14.02 captain/vice/Triple Captain | COMPLETE | `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2` | 41 passed | 99% branch coverage for captaincy/TC. |
 | 14.03 Bench Boost | COMPLETE | `f1c384972567befbe4713c56bfaaa4a481135687` | 67 passed | 26 new BB tests; 94% combined affected coverage. |
-| 14.04 Free Hit | COMPLETE | self-referencing capability commit; exact SHA is recorded by branch history | @@FOCUSED_PASSED@@ focused; @@ALL_CHIP_PASSED@@ all chip unit | Best legal temporary policy versus best legal normal-transfer policy; exact permanent restoration. |
+| 14.04 Free Hit | COMPLETE_LOCAL / PUSH_PENDING | local capability commit; exact SHA is recorded by branch history | 23 focused; 149 all chip unit/property | Best legal temporary policy versus best legal normal-transfer policy; exact permanent restoration. |
 | 14.05 Wildcard | NOT_STARTED | — | — | — |
 | 14.06 scheduler/continuation | NOT_STARTED | — | — | — |
 | 14.07 CLI/evaluation/evidence | NOT_STARTED | — | — | — |
@@ -86,8 +86,8 @@
 - Applies the free-transfer transition from configured Stage-11 event rules and verifies the
   temporary policy is hit-free.
 - Proves temporary purchase cohorts cannot contaminate permanent ownership history.
-- Focused adversarial tests: `@@FOCUSED_PASSED@@ passed`; complete chip unit confidence:
-  `@@ALL_CHIP_PASSED@@ passed`; chip-package branch coverage: `@@COVERAGE_PERCENT@@%`.
+- Focused adversarial tests: `23 passed`; complete chip unit/property confidence:
+  `149 passed`; chip-package combined branch coverage: `93.58%` (`396 / 456` branches).
 - Evidence: `evidence/tickets/CHIP-014/CHECKPOINT_14_04.md`.
 
 ## Validation
@@ -128,7 +128,8 @@ Deferred gates remain truthfully unpassed:
 - Sophisticated continuation methods remain open by specification and are not claimed solved.
 - Temporary branch-only recovery transport/export workflows remain and must be removed before final delivery.
 - Focused 14.04 Ruff and strict mypy checks pass; final frozen sync, full Stage-14 static analysis, build, wheel, installed-wheel CLI and targeted inherited regressions remain pending.
+- The current connector exposes repository reads but no file/ref write action, while container Git cannot resolve GitHub. The local 14.04 capability commit is therefore publication-pending; no force/reset/squash was used.
 
 ## Exact resume state
 
-Resume from remote branch HEAD, verify ancestry, read this file, then continue checkpoint 14.04. Do not recreate or reset checkpoints 14.01–14.03.
+Resume from the local branch history and the verified remote lineage. Publish the local 14.04 capability commit by a non-force fast-forward as soon as a GitHub write transport is available, then continue checkpoint 14.05 without recreating or resetting checkpoints 14.01–14.04.

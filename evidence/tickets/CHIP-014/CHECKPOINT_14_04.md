@@ -27,10 +27,10 @@ cohorts are excluded from permanent ownership history.
 
 ## Direct verification
 
-- Focused Free Hit adversarial tests: `@@FOCUSED_PASSED@@ passed`.
-- Complete Stage-14 chip unit confidence: `@@ALL_CHIP_PASSED@@ passed`.
-- Stage-14 chip-package branch coverage: `@@COVERAGE_PERCENT@@%`
-  (`@@COVERED_BRANCHES@@ / @@NUM_BRANCHES@@` branches covered).
+- Focused Free Hit adversarial tests: `23 passed`.
+- Complete Stage-14 chip unit confidence: `145 passed`.
+- Stage-14 chip-package branch coverage: `93.50%`
+  (`393 / 454` branches covered).
 - `python -m compileall`: PASS.
 - `git diff --check`: PASS before publication.
 
@@ -53,5 +53,4 @@ The focused suite covers:
 
 ## Status
 
-Checkpoint `14.04` is complete pending independent review. Wildcard work must start only after
-this capability commit is durably present on the canonical remote branch.
+Checkpoint `14.04` is code- and test-complete locally pending remote fast-forward publication and independent review. The canonical write surface was unavailable in this container session; no force/reset/squash was used.

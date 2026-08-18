@@ -413,7 +413,23 @@ def evaluate_free_hit(
         selected_normal.costs.purchase_price_spell_damage_points
         - selected_free_hit.costs.purchase_price_spell_damage_points
     )
-    net_pre = gross + hits_avoided + permanent_damage_avoided + route_preserved + purchase_preserved
+    information_preserved = (
+        selected_normal.costs.information_delay_cost_points
+        - selected_free_hit.costs.information_delay_cost_points
+    )
+    affordability_preserved = (
+        selected_normal.costs.affordability_route_cost_points
+        - selected_free_hit.costs.affordability_route_cost_points
+    )
+    net_pre = (
+        gross
+        + hits_avoided
+        + permanent_damage_avoided
+        + route_preserved
+        + purchase_preserved
+        + information_preserved
+        + affordability_preserved
+    )
     continuation = selected_free_hit.continuation_value - selected_normal.continuation_value
     net_policy = net_pre + continuation
     if not all(
@@ -424,6 +440,8 @@ def evaluate_free_hit(
             permanent_damage_avoided,
             route_preserved,
             purchase_preserved,
+            information_preserved,
+            affordability_preserved,
             net_pre,
             continuation,
             net_policy,
@@ -469,6 +487,8 @@ def evaluate_free_hit(
         "permanent_squad_damage_avoided": permanent_damage_avoided,
         "route_flexibility_preserved": route_preserved,
         "purchase_price_spell_value_preserved": purchase_preserved,
+        "information_timing_value_preserved": information_preserved,
+        "affordability_route_value_preserved": affordability_preserved,
         "net_pre_continuation_value": net_pre,
         "continuation_value_difference": continuation,
         "net_policy_value": net_policy,
@@ -498,6 +518,8 @@ def evaluate_free_hit(
         permanent_squad_damage_avoided=permanent_damage_avoided,
         route_flexibility_preserved=route_preserved,
         purchase_price_spell_value_preserved=purchase_preserved,
+        information_timing_value_preserved=information_preserved,
+        affordability_route_value_preserved=affordability_preserved,
         net_pre_continuation_value=net_pre,
         continuation_value_difference=continuation,
         net_policy_value=net_policy,

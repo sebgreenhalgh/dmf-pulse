@@ -17,7 +17,6 @@ from dmf_pulse.chips.definitions import (
     Sha256,
     semantic_sha256,
 )
-
 from dmf_pulse.optimisation.manager_state import ManagerState
 
 FiniteFloat = Annotated[StrictFloat, Field(allow_inf_nan=False)]
@@ -89,12 +88,9 @@ class CaptainViceDecision(FrozenModel):
             raise ValueError("captain scenario identities must be non-empty and unique")
         if abs(sum(item.weight for item in self.scenario_scores) - 1.0) > 1e-9:
             raise ValueError("captain scenario weights must sum to one")
-        expected_manager = sum(
-            item.weight * item.manager_points for item in self.scenario_scores
-        )
+        expected_manager = sum(item.weight * item.manager_points for item in self.scenario_scores)
         expected_raw = sum(
-            item.weight * item.effective_captain_raw_points
-            for item in self.scenario_scores
+            item.weight * item.effective_captain_raw_points for item in self.scenario_scores
         )
         vice_probability = sum(
             item.weight
@@ -102,16 +98,12 @@ class CaptainViceDecision(FrozenModel):
             if item.captain_resolution == "VICE_CAPTAIN"
         )
         vice_incremental = sum(
-            item.weight
-            * (self.captain_multiplier - 1)
-            * item.effective_captain_raw_points
+            item.weight * (self.captain_multiplier - 1) * item.effective_captain_raw_points
             for item in self.scenario_scores
             if item.captain_resolution == "VICE_CAPTAIN"
         )
         neither_probability = sum(
-            item.weight
-            for item in self.scenario_scores
-            if item.captain_resolution == "NEITHER"
+            item.weight for item in self.scenario_scores if item.captain_resolution == "NEITHER"
         )
         checks = (
             (self.expected_manager_points, expected_manager, "expected manager points"),
@@ -172,17 +164,13 @@ class TripleCaptainEvaluation(FrozenModel):
             (item.scenario_id, item.outcome_draw_id) for item in self.ordinary.scenario_scores
         )
         triple_ids = tuple(
-            (item.scenario_id, item.outcome_draw_id)
-            for item in self.triple_captain.scenario_scores
+            (item.scenario_id, item.outcome_draw_id) for item in self.triple_captain.scenario_scores
         )
-        value_ids = tuple(
-            (item.scenario_id, item.outcome_draw_id) for item in self.scenario_values
-        )
+        value_ids = tuple((item.scenario_id, item.outcome_draw_id) for item in self.scenario_values)
         if ordinary_ids != triple_ids or ordinary_ids != value_ids:
             raise ValueError("Triple Captain policies must use the same ordered scenario set")
         expected = (
-            self.triple_captain.expected_manager_points
-            - self.ordinary.expected_manager_points
+            self.triple_captain.expected_manager_points - self.ordinary.expected_manager_points
         )
         weighted_increment = sum(
             item.weight * item.gross_increment for item in self.scenario_values
@@ -285,12 +273,8 @@ class BenchBoostRouteEvaluation(FrozenModel):
             raise ValueError("Bench Boost scenario identities must be non-empty and unique")
         if abs(sum(item.weight for item in self.scenario_values) - 1.0) > 1e-9:
             raise ValueError("Bench Boost scenario weights must sum to one")
-        expected_normal = sum(
-            item.weight * item.normal_points for item in self.scenario_values
-        )
-        expected_boost = sum(
-            item.weight * item.bench_boost_points for item in self.scenario_values
-        )
+        expected_normal = sum(item.weight * item.normal_points for item in self.scenario_values)
+        expected_boost = sum(item.weight * item.bench_boost_points for item in self.scenario_values)
         if abs(expected_normal - self.expected_normal_points) > 1e-9:
             raise ValueError("Bench Boost expected normal points do not reconcile")
         if abs(expected_boost - self.expected_bench_boost_points) > 1e-9:
@@ -368,6 +352,7 @@ class BenchBoostEvaluation(FrozenModel):
         if semantic_sha256(payload) != self.evaluation_hash:
             raise ValueError("Bench Boost evaluation hash mismatch")
         return self
+
 
 PolicyRole = Literal[
     "NORMAL_TRANSFER",
@@ -496,6 +481,8 @@ class FreeHitEvaluation(FrozenModel):
     permanent_squad_damage_avoided: FiniteFloat
     route_flexibility_preserved: FiniteFloat
     purchase_price_spell_value_preserved: FiniteFloat
+    information_timing_value_preserved: FiniteFloat
+    affordability_route_value_preserved: FiniteFloat
     net_pre_continuation_value: FiniteFloat
     continuation_value_difference: FiniteFloat
     net_policy_value: FiniteFloat
@@ -541,6 +528,8 @@ class FreeHitEvaluation(FrozenModel):
             + self.permanent_squad_damage_avoided
             + self.route_flexibility_preserved
             + self.purchase_price_spell_value_preserved
+            + self.information_timing_value_preserved
+            + self.affordability_route_value_preserved
         )
         if abs(expected_pre - self.net_pre_continuation_value) > 1e-9:
             raise ValueError("Free Hit pre-continuation value does not reconcile")
@@ -553,6 +542,13 @@ class FreeHitEvaluation(FrozenModel):
             > 1e-9
         ):
             raise ValueError("Free Hit net policy value does not reconcile")
+        selected_policy_difference = (
+            self.free_hit_policy.policy_value - self.normal_policy.policy_value
+        )
+        if abs(self.net_policy_value - selected_policy_difference) > 1e-9:
+            raise ValueError(
+                "Free Hit decomposition must equal the selected policy-value difference"
+            )
         if abs(self.exercise_advantage - self.net_policy_value) > 1e-9:
             raise ValueError("Free Hit exercise advantage must equal use-now versus hold value")
         if self.use_now != (self.exercise_advantage > 0.0):
