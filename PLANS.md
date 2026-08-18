@@ -24,7 +24,7 @@
   reasonable in-scope P2 with focused adversarial/regression coverage.
 - [x] Run repository-prescribed focused/full/static/PostgreSQL/build/wheel/
   repository/secret/diff gates and record non-executed gates truthfully.
-- [ ] Replace transient handoff material with final-code evidence, commit the
+- [x] Replace transient handoff material with final-code evidence, commit the
   complete remediation, push the same branch, and verify remote SHA equality.
 
 Validation note: the exact repository-wide branch-coverage command reached a

@@ -14,7 +14,7 @@
   },
   "human_approval_status": "PENDING_HUMAN_APPROVAL",
   "immutable_parent": "4f1274ccef419a7c0bde335c48bd4070e248b2e6",
-  "implementation_commit": "PENDING_FINAL_VALIDATION_COMMIT",
+  "implementation_commit": "c8ff0aafbd9bbbd49c0f07540bee2927964d3a6f",
   "original_branch_head": "56287412ec441af140b290e849428b15f0c7cd2d",
   "production_activation_status": "NOT_ACTIVE",
   "representative_official_match_reconciliation": "TEMPORARILY_UNAVAILABLE",
