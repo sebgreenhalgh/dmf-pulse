@@ -1,45 +1,55 @@
-name: stage13-parent-git-bundle
+name: stage13-finalize-clean-branch
 
 on:
   push:
     branches:
       - stage/A13/PRC-013-price-prediction
+    paths:
+      - recovery/stage13-payload.tar.gz
+      - recovery/stage13-payload.tar.gz.sha256
 
 permissions:
   contents: write
 
 jobs:
-  bundle:
-    if: github.actor != 'github-actions[bot]'
+  finalize:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Check out full repository history
+      - name: Check out publication payload
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Create exact immutable-parent Git bundle
+      - name: Verify payload and construct exact clean commit
+        env:
+          IMMUTABLE_PARENT: ce7fe8f4354d95a477afcf6eed45f63cf0ab772e
+          EXPECTED_TREE: bcba32d37b1dfe6641ca47ce62f9f1969e650297
+          EXPECTED_COMMIT: 0dfdb83af82b7f5b42602d37f83fc53170c3b125
+          FINAL_BRANCH: stage/A13/PRC-013-price-prediction
+          FINAL_DATE: 2026-08-18T01:10:00Z
         run: |
-          git branch bundle-parent ce7fe8f4354d95a477afcf6eed45f63cf0ab772e
-          git bundle create "$RUNNER_TEMP/dmf-pulse-parent.bundle" bundle-parent
-          git bundle verify "$RUNNER_TEMP/dmf-pulse-parent.bundle"
-          sha256sum "$RUNNER_TEMP/dmf-pulse-parent.bundle" > "$RUNNER_TEMP/dmf-pulse-parent.bundle.sha256"
-      - name: Upload Git bundle
-        uses: actions/upload-artifact@v4
-        with:
-          name: dmf-pulse-parent-git-bundle
-          path: |
-            ${{ runner.temp }}/dmf-pulse-parent.bundle
-            ${{ runner.temp }}/dmf-pulse-parent.bundle.sha256
-          if-no-files-found: error
-          retention-days: 1
-      - name: Record bundle run ID
-        run: |
-          mkdir -p recovery
-          printf '%s\n' "$GITHUB_RUN_ID" > recovery/BUNDLE_RUN_ID.txt
-          printf '%s\n' "$GITHUB_SHA" > recovery/BUNDLE_SOURCE_COMMIT.txt
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add recovery/BUNDLE_RUN_ID.txt recovery/BUNDLE_SOURCE_COMMIT.txt
-          git commit -m 'chore: record Stage 13 parent bundle run'
-          git push
+          expected_payload=$(awk '{print $1}' recovery/stage13-payload.tar.gz.sha256)
+          actual_payload=$(sha256sum recovery/stage13-payload.tar.gz | awk '{print $1}')
+          test "$expected_payload" = "$actual_payload"
+
+          final_root="$RUNNER_TEMP/stage13-final"
+          git worktree add --detach "$final_root" "$IMMUTABLE_PARENT"
+          tar -xzf recovery/stage13-payload.tar.gz -C "$final_root"
+
+          cd "$final_root"
+          test "$(git rev-parse HEAD)" = "$IMMUTABLE_PARENT"
+          git diff --check
+          git add -A
+          git diff --cached --check
+          test "$(git write-tree)" = "$EXPECTED_TREE"
+
+          git config user.name 'Sebastian Greenhalgh'
+          git config user.email 'seb.greenhalgh@outlook.com'
+          export GIT_AUTHOR_DATE="$FINAL_DATE"
+          export GIT_COMMITTER_DATE="$FINAL_DATE"
+          git commit -m 'feat(prices): implement Stage 13 price prediction and ACT-WAIT'
+          test "$(git rev-parse HEAD)" = "$EXPECTED_COMMIT"
+          test "$(git rev-parse HEAD^)" = "$IMMUTABLE_PARENT"
+          test -z "$(git status --short)"
+
+          git push --force origin "HEAD:refs/heads/$FINAL_BRANCH"
