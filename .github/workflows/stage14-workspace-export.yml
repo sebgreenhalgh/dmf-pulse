@@ -1,13 +1,22 @@
-name: stage14-workspace-export
+name: stage14-checkpoint-transport
 
 on:
+  push:
+    branches:
+      - stage/A14/CHIP-014-chip-optimisation
+    paths:
+      - recovery/stage14-apply.json
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: stage14-checkpoint-transport-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  export:
+  apply:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -15,15 +24,38 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false
 
-      - name: Export exact repository tree
-        run: git archive --format=zip --output=dmf-pulse-source.zip HEAD
+      - name: Apply verified checkpoint transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          transport="recovery/stage14-apply.json"
+          if [[ ! -f "$transport" ]]; then
+            echo "No checkpoint transport is present; nothing to apply."
+            exit 0
+          fi
 
-      - name: Upload workspace archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: stage14-workspace-${{ github.sha }}
-          path: dmf-pulse-source.zip
-          if-no-files-found: error
-          retention-days: 1
+          python - <<'PY'
+          import base64
+          import gzip
+          import json
+          from pathlib import Path
+
+          path = Path("recovery/stage14-apply.json")
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          patch = gzip.decompress(base64.b64decode(payload["patch_gzip_base64"]))
+          Path("/tmp/stage14.patch").write_bytes(patch)
+          Path("/tmp/stage14-message.txt").write_text(
+              str(payload["message"]) + "\n", encoding="utf-8"
+          )
+          PY
+
+          git apply --check --whitespace=error /tmp/stage14.patch
+          git apply --index --whitespace=error /tmp/stage14.patch
+          git rm "$transport"
+          git diff --cached --check
+
+          git config user.name "Sebastian Greenhalgh"
+          git config user.email "seb.greenhalgh@outlook.com"
+          git commit -F /tmp/stage14-message.txt
+          git push origin HEAD:stage/A14/CHIP-014-chip-optimisation
