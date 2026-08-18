@@ -1,2 +1,2 @@
-Stage 14 canonical workspace export refresh requested after verified Wildcard HEAD 0449dd7c47ae983a78fb8ef9098ce604ae3022db.
-Temporary recovery marker; remove before final Stage-14 handoff.
+Stage 14 checkpoint 14.06 atomic publisher trigger.
+Temporary recovery marker; removed by the verified scheduler payload.
