@@ -7,7 +7,7 @@
 - Publication-reconciliation starting branch head — `d75a172018f932693c4d51dc3d803819075c3cac`
 - Checkpoint 1.1 implementation commit — `448749c072900642a922ae1456d0d30111a3e9ea`
 - Checkpoint 1.2 capability commit — `d8e95a442d24d0547a2b7a5fb585da94f66dcfe4`
-- Checkpoint 1.2 evidence commit — `PENDING_FINAL_ATTESTATION`
+- Checkpoint 1.2 evidence commit — `36a5c755330d5d7eeb465cbfa0e21b70cc0bf777`
 - Publication workflow run — `32182179765`
 
 ## Checkpoint status
