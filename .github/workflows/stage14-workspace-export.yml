@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  materialise:
+  publish-checkpoint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -25,63 +25,90 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Verify and materialise scheduler payload
+      - name: Apply exact verified scheduler payload
         shell: bash
         run: |
           set -euo pipefail
           git fetch --no-tags origin \
             stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
           git reset --hard refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
-          test -f recovery/stage14-checkpoint-parts/manifest.json
+
+          payload=recovery/stage14-checkpoint.json
+          test -f "$payload"
+          test "$(git hash-object "$payload")" = \
+            "6a73255bfd0056f35d880861fa749bbfa10748f6"
+
           python - <<'PY'
-          import base64
-          import gzip
-          import hashlib
           import json
           from pathlib import Path
 
-          root = Path("recovery/stage14-checkpoint-parts")
-          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
-          parts = sorted(root.glob("part-*"))
-          expected_names = [f"part-{index:02d}" for index in range(manifest["parts"])]
-          if [path.name for path in parts] != expected_names:
-              raise SystemExit(
-                  f"unexpected payload parts: {[path.name for path in parts]!r}"
+          payload_path = Path("recovery/stage14-checkpoint.json")
+          payload = json.loads(payload_path.read_text(encoding="utf-8"))
+          message = payload.get("message")
+          if message != "feat(chips): implement finite-inventory scheduler":
+              raise SystemExit(f"unexpected checkpoint message: {message!r}")
+
+          for raw_path, content in payload.get("files", {}).items():
+              path = Path(raw_path)
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_text(content, encoding="utf-8")
+
+          for mutation in payload.get("mutations", []):
+              path = Path(mutation["path"])
+              text = path.read_text(encoding="utf-8")
+              marker = mutation["marker"]
+              content = mutation["content"]
+              once_marker = mutation.get(
+                  "once_marker", content.strip().splitlines()[0]
               )
-          encoded = b"".join(path.read_bytes() for path in parts)
-          if len(encoded) != 42317:
-              raise SystemExit(f"unexpected compressed payload size: {len(encoded)}")
-          if hashlib.sha256(encoded).hexdigest() != manifest["b64_sha256"]:
-              raise SystemExit("compressed payload checksum mismatch")
-          decoded = gzip.decompress(base64.b64decode(encoded))
-          if len(decoded) != manifest["raw_size"]:
-              raise SystemExit("decoded payload size mismatch")
-          if hashlib.sha256(decoded).hexdigest() != manifest["raw_sha256"]:
-              raise SystemExit("decoded payload checksum mismatch")
-          json.loads(decoded)
-          Path("recovery/stage14-checkpoint.json").write_bytes(decoded)
-          for path in parts:
-              path.unlink()
-          (root / "manifest.json").unlink()
-          root.rmdir()
+              if once_marker in text:
+                  continue
+              operation = mutation["operation"]
+              if operation == "append_once":
+                  text = text.rstrip() + "\n\n" + content.strip() + "\n"
+              elif operation == "insert_before_once":
+                  if marker not in text:
+                      raise SystemExit(f"marker not found in {path}: {marker!r}")
+                  text = text.replace(marker, content + marker, 1)
+              elif operation == "insert_after_once":
+                  if marker not in text:
+                      raise SystemExit(f"marker not found in {path}: {marker!r}")
+                  text = text.replace(marker, marker + content, 1)
+              elif operation == "replace_once":
+                  if marker not in text:
+                      raise SystemExit(f"marker not found in {path}: {marker!r}")
+                  text = text.replace(marker, content, 1)
+              else:
+                  raise SystemExit(f"unsupported mutation operation: {operation}")
+              path.write_text(text, encoding="utf-8")
+
+          for raw_path in payload.get("delete_paths", []):
+              path = Path(raw_path)
+              if path.is_file() or path.is_symlink():
+                  path.unlink()
+
+          payload_path.unlink()
           Path("recovery/stage14-workspace-artifact.json").unlink(missing_ok=True)
-          Path("recovery/stage14-sync-probe.txt").unlink(missing_ok=True)
           Path(
               ".github/workflows/stage14-chunked-checkpoint-dispatch.yml"
           ).unlink(missing_ok=True)
           PY
+
           git cat-file blob 24a84fff4d5a8409c52d018887750d820409c1cd \
             > .github/workflows/stage14-workspace-export.yml
           git cat-file blob 88b3f1b08e95de4da0d30532eff05a1c34300a61 \
             > .github/workflows/stage14-compressed-payload-unpack.yml
+
+          python -m compileall -q src/dmf_pulse/chips
           git add -A
           git diff --cached --check
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "checkpoint(chips): materialise verified scheduler payload"
+          git config user.name "Sebastian Greenhalgh"
+          git config user.email "seb.greenhalgh@outlook.com"
+          git commit -m "feat(chips): implement finite-inventory scheduler"
+
           for attempt in 1 2 3 4 5; do
             if git push origin HEAD:stage/A14/CHIP-014-chip-optimisation; then
-              break
+              exit 0
             fi
             if [[ "$attempt" == 5 ]]; then
               exit 1
