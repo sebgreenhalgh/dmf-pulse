@@ -19,8 +19,8 @@
 
 - [x] Verify remote ancestry/progress and recover the exact Git workspace without restarting
   completed checkpoints.
-- [ ] Remediate the discovered generic vice-fallback compiler regression and publish it durably.
-- [ ] Complete and publish 14.04 Free Hit.
+- [x] Remediate the discovered generic vice-fallback compiler regression and publish it durably.
+- [x] Complete and publish 14.04 Free Hit.
 - [ ] Complete and publish 14.05 Wildcard.
 - [ ] Complete and publish 14.06 scheduler/continuation.
 - [ ] Complete and publish 14.07 service/CLI/replay/evidence.

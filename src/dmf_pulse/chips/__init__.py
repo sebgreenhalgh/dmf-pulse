@@ -19,6 +19,11 @@ from dmf_pulse.chips.definitions import (
     EffectCapability,
     InventoryGrant,
 )
+from dmf_pulse.chips.free_hit import (
+    evaluate_free_hit,
+    make_policy_candidate,
+    policy_candidate_from_stage11,
+)
 from dmf_pulse.chips.inventory import (
     ChipInventory,
     ChipInventoryToken,
@@ -38,6 +43,11 @@ from dmf_pulse.chips.policy_models import (
     BenchBoostRouteEvaluation,
     BenchBoostScenarioValue,
     CaptainViceDecision,
+    ChipPolicyCandidate,
+    FreeHitEvaluation,
+    FreeHitScenarioValue,
+    PolicyCostProfile,
+    PolicyScenarioScore,
     TripleCaptainEvaluation,
     WildcardBenchBoostSynergy,
 )
@@ -55,10 +65,15 @@ __all__ = [
     "ChipEffect",
     "ChipInventory",
     "ChipInventoryToken",
+    "ChipPolicyCandidate",
     "CompiledChipBundle",
     "CompiledChipDefinition",
     "EffectCapability",
+    "FreeHitEvaluation",
+    "FreeHitScenarioValue",
     "InventoryGrant",
+    "PolicyCostProfile",
+    "PolicyScenarioScore",
     "TokenEvent",
     "TokenEventKind",
     "TokenStatus",
@@ -74,7 +89,10 @@ __all__ = [
     "compile_synthetic_bundle",
     "definition_from_rules_runtime",
     "evaluate_bench_boost",
+    "evaluate_free_hit",
     "evaluate_triple_captain",
+    "make_policy_candidate",
     "optimise_captain_vice",
+    "policy_candidate_from_stage11",
     "select_token",
 ]

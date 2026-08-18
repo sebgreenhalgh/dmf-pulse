@@ -14,14 +14,14 @@
 
 - `origin/main` at branch creation: `a8796d4edacea4c87ee6461d381f4df87e1ef39c`.
 - Resumed session verification on `2026-08-18`: current `origin/main` is still exactly `a8796d4edacea4c87ee6461d381f4df87e1ef39c`.
-- The remote Stage-14 branch compares `ahead_by=7`, `behind_by=0` against the immutable parent; merge-base is the immutable parent.
+- The remote Stage-14 branch compares `ahead_by=24`, `behind_by=0` against the immutable parent; merge-base is the immutable parent.
 - Remote progress is authoritative and identifies `14.04 Free Hit` as the first unfinished checkpoint.
-- The recovered workspace was reconciled to remote commit `50cc44c9a06b8564718794a8fa5abdc10acecf0e` before implementation resumed.
+- The recovered workspace was reconciled exactly to remote branch HEAD `3b8113893eccbaaf8fc63daa5ce031209062a587` before implementation resumed.
 - Branch created directly from the immutable parent.
 - Ordinary container Git transport is unavailable because this execution container cannot resolve `github.com`.
 - Durable publication uses authenticated GitHub Git-data/contents APIs with non-force fast-forward updates.
 - Every publication is verified by comparing the intended commit with the remote branch ref.
-- Temporary `.github/workflows/stage14-workspace-export.yml` remains retained during recovery and must be removed before final delivery.
+- Temporary recovery transport/export workflows remain retained during implementation and must be removed before final delivery.
 
 ## Checkpoints
 
@@ -31,7 +31,7 @@
 | 14.01 generic chip definition/inventory | COMPLETE | `3173c97f5d04b3b0fe65c8e9b17876d257b233be` | 58 passed | 98% branch coverage for compiler/inventory. |
 | 14.02 captain/vice/Triple Captain | COMPLETE | `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2` | 41 passed | 99% branch coverage for captaincy/TC. |
 | 14.03 Bench Boost | COMPLETE | `f1c384972567befbe4713c56bfaaa4a481135687` | 67 passed | 26 new BB tests; 94% combined affected coverage. |
-| 14.04 Free Hit | IN_PROGRESS | — | — | Temporary-policy comparator and exact restoration next. |
+| 14.04 Free Hit | COMPLETE | self-referencing capability commit; exact SHA is recorded by branch history | @@FOCUSED_PASSED@@ focused; @@ALL_CHIP_PASSED@@ all chip unit | Best legal temporary policy versus best legal normal-transfer policy; exact permanent restoration. |
 | 14.05 Wildcard | NOT_STARTED | — | — | — |
 | 14.06 scheduler/continuation | NOT_STARTED | — | — | — |
 | 14.07 CLI/evaluation/evidence | NOT_STARTED | — | — | — |
@@ -72,6 +72,24 @@
 - WC-prepared route measures positive or negative WC-BB synergy; no positive synergy assumption.
 - Generic inventory activation and immutable rules/definition/scenario/inventory lineage.
 
+### 14.04 Free Hit
+
+- Compares the best legal temporary Free Hit policy with the best legal normal transfer policy,
+  never with a frozen current XI.
+- Reuses accepted Stage-11 transition/root-decision and Stage-10 tactical artifacts through a
+  strict immutable adapter.
+- Separates gross current gain, hits avoided, permanent squad damage avoided, route/flexibility
+  preserved, purchase-spell value preserved, continuation value, net policy value and exercise
+  advantage.
+- Restores the exact permanent squad, bank and purchase-price ownership history after the
+  temporary policy.
+- Applies the free-transfer transition from configured Stage-11 event rules and verifies the
+  temporary policy is hit-free.
+- Proves temporary purchase cohorts cannot contaminate permanent ownership history.
+- Focused adversarial tests: `@@FOCUSED_PASSED@@ passed`; complete chip unit confidence:
+  `@@ALL_CHIP_PASSED@@ passed`; chip-package branch coverage: `@@COVERAGE_PERCENT@@%`.
+- Evidence: `evidence/tickets/CHIP-014/CHECKPOINT_14_04.md`.
+
 ## Validation
 
 Exact commands/results:
@@ -106,9 +124,10 @@ Deferred gates remain truthfully unpassed:
 
 - No target-season chip-policy performance claim is made yet.
 - BB `net_pre_continuation_value` deliberately excludes finite-inventory continuation/opportunity value; checkpoint 14.06 owns that comparison.
+- Free Hit accepts an explicit finite-horizon continuation-value interface; checkpoint 14.06 owns schedule-wide estimation and competition among tokens.
 - Sophisticated continuation methods remain open by specification and are not claimed solved.
-- Temporary branch-only workspace-export workflow remains and must be removed before final delivery.
-- Final Ruff, mypy, frozen sync, build, wheel, installed-wheel CLI and targeted inherited regressions remain pending.
+- Temporary branch-only recovery transport/export workflows remain and must be removed before final delivery.
+- Focused 14.04 Ruff and strict mypy checks pass; final frozen sync, full Stage-14 static analysis, build, wheel, installed-wheel CLI and targeted inherited regressions remain pending.
 
 ## Exact resume state
 

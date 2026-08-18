@@ -18,6 +18,8 @@ from dmf_pulse.chips.definitions import (
     semantic_sha256,
 )
 
+from dmf_pulse.optimisation.manager_state import ManagerState
+
 FiniteFloat = Annotated[StrictFloat, Field(allow_inf_nan=False)]
 Probability = Annotated[StrictFloat, Field(ge=0.0, le=1.0, allow_inf_nan=False)]
 CaptainResolution = Literal["CAPTAIN", "VICE_CAPTAIN", "NEITHER"]
@@ -365,4 +367,199 @@ class BenchBoostEvaluation(FrozenModel):
         payload = self.model_dump(mode="json", exclude={"evaluation_hash"})
         if semantic_sha256(payload) != self.evaluation_hash:
             raise ValueError("Bench Boost evaluation hash mismatch")
+        return self
+
+PolicyRole = Literal[
+    "NORMAL_TRANSFER",
+    "FREE_HIT_TEMPORARY",
+    "WILDCARD_IMMEDIATE",
+    "WILDCARD_DELAYED",
+    "FREE_HIT_BRIDGE",
+    "HOLD",
+]
+
+
+class PolicyScenarioScore(FrozenModel):
+    """One common-scenario manager score for a frozen root policy."""
+
+    scenario_id: StrictStr = Field(min_length=1)
+    outcome_draw_id: StrictStr = Field(min_length=1)
+    weight: Probability
+    manager_points: FiniteFloat
+
+
+class PolicyCostProfile(FrozenModel):
+    """Transparent non-score costs attached to a permanent or temporary route."""
+
+    permanent_squad_damage_points: NonNegativeFloat = 0.0
+    route_flexibility_cost_points: NonNegativeFloat = 0.0
+    purchase_price_spell_damage_points: NonNegativeFloat = 0.0
+    information_delay_cost_points: NonNegativeFloat = 0.0
+    affordability_route_cost_points: NonNegativeFloat = 0.0
+
+    @property
+    def total_cost_points(self) -> float:
+        return float(
+            self.permanent_squad_damage_points
+            + self.route_flexibility_cost_points
+            + self.purchase_price_spell_damage_points
+            + self.information_delay_cost_points
+            + self.affordability_route_cost_points
+        )
+
+
+class ChipPolicyCandidate(FrozenModel):
+    """Immutable Stage-11/Stage-10 root-policy snapshot used by chip comparators."""
+
+    policy_id: StrictStr = Field(min_length=1)
+    policy_role: PolicyRole
+    state_before_sha256: Sha256
+    state_after_sha256: Sha256
+    transition_event: StrictStr = Field(min_length=1)
+    squad_ids: tuple[StrictStr, ...]
+    bank_tenths: NonNegativeInt
+    active_purchase_spell_ids: tuple[StrictStr, ...]
+    free_transfers_after: NonNegativeInt
+    transfer_count: NonNegativeInt
+    transfer_hit_points: NonNegativeFloat
+    tactical_plan_sha256: Sha256
+    scenario_scores: tuple[PolicyScenarioScore, ...]
+    expected_current_points: FiniteFloat
+    costs: PolicyCostProfile = PolicyCostProfile()
+    continuation_value: FiniteFloat = 0.0
+    candidate_hash: Sha256
+
+    @model_validator(mode="after")
+    def candidate_reconciles(self) -> ChipPolicyCandidate:
+        if self.squad_ids != tuple(sorted(self.squad_ids)):
+            raise ValueError("chip-policy squad IDs must be sorted")
+        if not self.squad_ids or len(self.squad_ids) != len(set(self.squad_ids)):
+            raise ValueError("chip-policy squad IDs must be non-empty and unique")
+        if self.active_purchase_spell_ids != tuple(sorted(self.active_purchase_spell_ids)):
+            raise ValueError("chip-policy purchase-spell IDs must be sorted")
+        if len(self.active_purchase_spell_ids) != len(set(self.active_purchase_spell_ids)):
+            raise ValueError("chip-policy purchase-spell IDs must be unique")
+        identities = tuple(
+            (item.scenario_id, item.outcome_draw_id) for item in self.scenario_scores
+        )
+        if not identities or identities != tuple(sorted(identities)):
+            raise ValueError("chip-policy scenario identities must be non-empty and sorted")
+        if len(identities) != len(set(identities)):
+            raise ValueError("chip-policy scenario identities must be unique")
+        if abs(sum(item.weight for item in self.scenario_scores) - 1.0) > 1e-9:
+            raise ValueError("chip-policy scenario weights must sum to one")
+        expected = sum(item.weight * item.manager_points for item in self.scenario_scores)
+        if abs(expected - self.expected_current_points) > 1e-9:
+            raise ValueError("chip-policy expected current points do not reconcile")
+        payload = self.model_dump(mode="json", exclude={"candidate_hash"})
+        if semantic_sha256(payload) != self.candidate_hash:
+            raise ValueError("chip-policy candidate hash mismatch")
+        return self
+
+    @property
+    def net_pre_continuation_value(self) -> float:
+        return float(
+            self.expected_current_points - self.transfer_hit_points - self.costs.total_cost_points
+        )
+
+    @property
+    def policy_value(self) -> float:
+        return float(self.net_pre_continuation_value + self.continuation_value)
+
+
+class FreeHitScenarioValue(FrozenModel):
+    """Common-scenario Free Hit score relative to the best normal policy."""
+
+    scenario_id: StrictStr = Field(min_length=1)
+    outcome_draw_id: StrictStr = Field(min_length=1)
+    weight: Probability
+    normal_points: FiniteFloat
+    free_hit_points: FiniteFloat
+    gross_current_increment: FiniteFloat
+
+    @model_validator(mode="after")
+    def scenario_reconciles(self) -> FreeHitScenarioValue:
+        if abs(self.gross_current_increment - (self.free_hit_points - self.normal_points)) > 1e-9:
+            raise ValueError("Free Hit scenario increment must compare common-scenario scores")
+        return self
+
+
+class FreeHitEvaluation(FrozenModel):
+    """Best temporary Free Hit route versus the best legal normal transfer route."""
+
+    chip_key: Literal["FREE_HIT"] = "FREE_HIT"
+    normal_policy: ChipPolicyCandidate
+    free_hit_policy: ChipPolicyCandidate
+    scenario_values: tuple[FreeHitScenarioValue, ...]
+    gross_current_gain: FiniteFloat
+    transfer_hits_avoided: FiniteFloat
+    permanent_squad_damage_avoided: FiniteFloat
+    route_flexibility_preserved: FiniteFloat
+    purchase_price_spell_value_preserved: FiniteFloat
+    net_pre_continuation_value: FiniteFloat
+    continuation_value_difference: FiniteFloat
+    net_policy_value: FiniteFloat
+    exercise_advantage: FiniteFloat
+    use_now: StrictBool
+    permanent_squad_restored: Literal[True]
+    permanent_bank_restored: Literal[True]
+    purchase_prices_restored: Literal[True]
+    temporary_purchases_excluded_from_permanent_cohorts: Literal[True]
+    restored_state: ManagerState
+    token_id: StrictStr = Field(min_length=1)
+    inventory_before_hash: Sha256
+    inventory_after_activation_hash: Sha256
+    scenario_set_hash: Sha256
+    ruleset_id: StrictStr = Field(min_length=1)
+    ruleset_version: StrictStr = Field(min_length=1)
+    ruleset_hash: Sha256
+    chip_definition_hash: Sha256
+    evaluation_hash: Sha256
+
+    @model_validator(mode="after")
+    def evaluation_reconciles(self) -> FreeHitEvaluation:
+        if self.normal_policy.policy_role != "NORMAL_TRANSFER":
+            raise ValueError("Free Hit comparator requires a normal transfer policy")
+        if self.free_hit_policy.policy_role != "FREE_HIT_TEMPORARY":
+            raise ValueError("Free Hit route must be marked temporary")
+        normal_ids = tuple(
+            (item.scenario_id, item.outcome_draw_id) for item in self.normal_policy.scenario_scores
+        )
+        free_hit_ids = tuple(
+            (item.scenario_id, item.outcome_draw_id)
+            for item in self.free_hit_policy.scenario_scores
+        )
+        value_ids = tuple((item.scenario_id, item.outcome_draw_id) for item in self.scenario_values)
+        if normal_ids != free_hit_ids or normal_ids != value_ids:
+            raise ValueError("Free Hit policies must use the same ordered scenario set")
+        weighted = sum(item.weight * item.gross_current_increment for item in self.scenario_values)
+        if abs(weighted - self.gross_current_gain) > 1e-9:
+            raise ValueError("Free Hit gross current gain does not reconcile")
+        expected_pre = (
+            self.gross_current_gain
+            + self.transfer_hits_avoided
+            + self.permanent_squad_damage_avoided
+            + self.route_flexibility_preserved
+            + self.purchase_price_spell_value_preserved
+        )
+        if abs(expected_pre - self.net_pre_continuation_value) > 1e-9:
+            raise ValueError("Free Hit pre-continuation value does not reconcile")
+        if (
+            abs(
+                self.net_pre_continuation_value
+                + self.continuation_value_difference
+                - self.net_policy_value
+            )
+            > 1e-9
+        ):
+            raise ValueError("Free Hit net policy value does not reconcile")
+        if abs(self.exercise_advantage - self.net_policy_value) > 1e-9:
+            raise ValueError("Free Hit exercise advantage must equal use-now versus hold value")
+        if self.use_now != (self.exercise_advantage > 0.0):
+            raise ValueError("Free Hit use-now decision differs from exercise advantage")
+        if self.inventory_before_hash == self.inventory_after_activation_hash:
+            raise ValueError("Free Hit activation must change projected inventory")
+        payload = self.model_dump(mode="json", exclude={"evaluation_hash"})
+        if semantic_sha256(payload) != self.evaluation_hash:
+            raise ValueError("Free Hit evaluation hash mismatch")
         return self
