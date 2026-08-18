@@ -1,0 +1,56 @@
+name: gw1-session1-bootstrap
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-session1-bootstrap.yml
+
+permissions:
+  contents: write
+
+jobs:
+  export-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build exact clean source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git merge-base 9eb57143f6ee92f67c78607cc386678d962e62d4 HEAD)" = "9eb57143f6ee92f67c78607cc386678d962e62d4"
+          source_commit=$(git rev-parse HEAD)
+          mkdir -p artifacts/gw1-session1-bootstrap
+          tar \
+            --exclude=.git \
+            --exclude=.venv \
+            --exclude=.uv-cache \
+            --exclude='**/__pycache__' \
+            --exclude=.pytest_cache \
+            --exclude=.mypy_cache \
+            --exclude=.ruff_cache \
+            --exclude=.github/workflows/gw1-session1-bootstrap.yml \
+            --exclude=artifacts/gw1-session1-bootstrap \
+            -czf artifacts/gw1-session1-bootstrap/dmf-pulse-source.tar.gz .
+          test -s artifacts/gw1-session1-bootstrap/dmf-pulse-source.tar.gz
+          tar -tzf artifacts/gw1-session1-bootstrap/dmf-pulse-source.tar.gz >/dev/null
+          sha256sum artifacts/gw1-session1-bootstrap/dmf-pulse-source.tar.gz \
+            > artifacts/gw1-session1-bootstrap/dmf-pulse-source.tar.gz.sha256
+          printf '%s\n' "$source_commit" > artifacts/gw1-session1-bootstrap/SOURCE_COMMIT.txt
+
+      - name: Publish source snapshot and remove exporter
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/gw1-session1-bootstrap.yml
+          git config user.name "dmf-pulse-gw1-session1-bot"
+          git config user.email "dmf-pulse-gw1-session1-bot@users.noreply.github.com"
+          git add -A
+          git add -f artifacts/gw1-session1-bootstrap
+          git commit -m "chore(gw1): publish recoverable session-1 source snapshot"
+          git push origin HEAD:refs/heads/readiness/GW1-2026-27-live-input-initial-squad
