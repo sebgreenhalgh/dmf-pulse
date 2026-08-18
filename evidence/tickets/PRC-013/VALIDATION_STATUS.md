@@ -18,3 +18,6 @@ its local/remote HEAD equality was verified. The PR remains unmerged.
 Final main integration gates pass against `9eb57143f6ee92f67c78607cc386678d962e62d4` while the
 reviewed pre-integration HEAD remains preserved. Verified deterministic 2026/27 rules do not change
 the predictive model's `SHADOW_ONLY`, `TARGET_SEASON_UNCALIBRATED` or rights-blocked status.
+Integration merge commit `6dc58db48415d831b37a10b423a9a555aa9fe833` is published normally;
+PR #12 is open, draft, unmerged and reported `MERGEABLE` with merge-state status `UNSTABLE`.
+Human acceptance and PR merge remain pending.

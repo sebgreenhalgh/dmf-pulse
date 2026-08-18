@@ -93,3 +93,13 @@ workspace-contained base temp because the sandbox cannot enumerate the default p
     - PASS; zero repository errors and zero unallowlisted secret findings.
 30. `git diff --check` and unmerged-path inspection.
     - PASS; no whitespace errors and no unresolved merge entries.
+31. Explicit merge commit and normal push to
+    `stage/A13/PRC-013-price-prediction`.
+    - PASS; integration commit `6dc58db48415d831b37a10b423a9a555aa9fe833` has parents
+      `b0e3b0724b92ec2d483191f0329c0c38ae8a9e08` and
+      `9eb57143f6ee92f67c78607cc386678d962e62d4`; no force push was used, and
+      local/remote HEAD equality was verified after fetch.
+32. Draft PR #12 body update and live GitHub state check after clearing stale token overrides.
+    - PASS; PR #12 targets `main`, remains open, draft and unmerged, and reports `MERGEABLE` with
+      merge-state status `UNSTABLE`. This is not a code-conflict state and is not treated as human
+      acceptance or a completed required-check gate.

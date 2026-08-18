@@ -59,7 +59,7 @@
 - [x] Make one bounded post-integration repository attempt and preserve `RESOURCE_LIMIT` without
   relabeling or rerunning it.
 - [x] Pass frozen sync, Ruff, mypy, build, clean external-wheel rules/price CLI and assurance gates.
-- [ ] Commit the explicit integration, push normally, verify remote equality and update draft PR
+- [x] Commit the explicit integration, push normally, verify remote equality and update draft PR
   #12; do not merge, accept or tag.
 
 ## RUL-2026-27 independent full-ruleset review and remediation

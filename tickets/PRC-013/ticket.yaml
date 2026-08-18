@@ -11,6 +11,7 @@ required_base_commit: "ce7fe8f4354d95a477afcf6eed45f63cf0ab772e"
 reviewed_pre_integration_commit: "b0e3b0724b92ec2d483191f0329c0c38ae8a9e08"
 integrated_main_commit: "9eb57143f6ee92f67c78607cc386678d962e62d4"
 integration_method: "EXPLICIT_MERGE_COMMIT"
+integration_commit: "6dc58db48415d831b37a10b423a9a555aa9fe833"
 implementation_branch: "stage/A13/PRC-013-price-prediction"
 pull_request: 12
 objective: >-

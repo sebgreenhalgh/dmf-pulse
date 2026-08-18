@@ -9,6 +9,8 @@
 - Preserved local backup ref: `backup/stage13-pre-main-integration` at the reviewed HEAD.
 - Method: explicit non-fast-forward merge of `origin/main` into the Stage-13 branch; reviewed
   implementation and remediation commits were not rewritten.
+- Integration merge commit: `6dc58db48415d831b37a10b423a9a555aa9fe833`, with the reviewed
+  Stage-13 HEAD and integrated `main` SHA as its two parents.
 
 The original implementation lineage remains authoritative historical fact. This section records
 the subsequent final integrated lineage and does not replace it.
@@ -64,3 +66,8 @@ block remain in force.
 Verified deterministic 2026/27 rules do not calibrate or activate the predictive price model.
 Stage 13 remains `SHADOW_ONLY`, `TARGET_SEASON_UNCALIBRATED` and `RIGHTS_BLOCKED`. Independent
 review is complete; human acceptance, merge and accepted tagging remain pending.
+
+The integration merge commit was pushed normally without force, and local/remote equality was
+verified before the publication attestation update. Draft PR #12 remains open, draft and unmerged.
+GitHub reports it `MERGEABLE` with merge-state status `UNSTABLE`; this is not a code-conflict state
+and is not represented as human acceptance or a completed required-check gate.
