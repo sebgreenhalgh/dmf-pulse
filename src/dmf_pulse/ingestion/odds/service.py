@@ -48,10 +48,13 @@ from dmf_pulse.ingestion.odds.client import (
     OddsFetchFailure,
     OddsRetrievalAttempt,
     OddsTransport,
-    UnavailableCredentialProvider,
     UrllibOddsTransport,
 )
 from dmf_pulse.ingestion.odds.config import load_provider_config, load_rights_profiles
+from dmf_pulse.ingestion.odds.credentials import (
+    RuntimeOddsCredentialProvider,
+    credential_is_configured,
+)
 from dmf_pulse.ingestion.odds.mapping import OddsMappingPlan, load_mapping_plan
 from dmf_pulse.ingestion.odds.models import (
     OddsIngestionResult,
@@ -187,7 +190,7 @@ class OddsIngestionService:
         monotonic: Callable[[], float] = time.monotonic,
     ) -> None:
         self.repository_root = (repository_root or Path.cwd()).resolve()
-        self.credential_provider = credential_provider or UnavailableCredentialProvider()
+        self.credential_provider = credential_provider or RuntimeOddsCredentialProvider()
         self.transport_factory = transport_factory
         self.clock = clock
         self.processing_clock = processing_clock
@@ -1128,7 +1131,7 @@ class OddsIngestionService:
         if quota_lookup_failed:
             # The default credential-free command remains a deterministic,
             # offline refusal when its referenced database is unavailable.
-            if isinstance(self.credential_provider, UnavailableCredentialProvider):
+            if not credential_is_configured(self.credential_provider):
                 code = ProviderFailureCode.CREDENTIAL_UNAVAILABLE
                 return OddsOperationOutcome(
                     _empty_result(

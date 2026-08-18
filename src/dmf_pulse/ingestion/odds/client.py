@@ -18,36 +18,30 @@ from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.models import RightsCapability, RightsProfile
 from dmf_pulse.ingestion.odds.config import OddsProviderConfig, load_provider_config
+from dmf_pulse.ingestion.odds.credentials import (
+    CredentialProvider,
+    StaticCredentialProvider,
+    UnavailableCredentialProvider,
+    validate_runtime_credential,
+)
 from dmf_pulse.ingestion.odds.models import ProviderFailureCode, QuotaSource, QuotaState
 from dmf_pulse.ingestion.rights import require_rights
 
-
-class CredentialProvider(Protocol):
-    """Resolve a credential at the final pre-transport boundary."""
-
-    def get_credential(self) -> str | None: ...
-
-
-class UnavailableCredentialProvider:
-    """Safe default: no ambient environment or filesystem credential lookup."""
-
-    def get_credential(self) -> None:
-        return None
-
-
-class StaticCredentialProvider:
-    """Explicit test-only/runtime injection without a revealing repr."""
-
-    __slots__ = ("_credential",)
-
-    def __init__(self, credential: str) -> None:
-        self._credential = credential
-
-    def __repr__(self) -> str:
-        return "StaticCredentialProvider(<redacted>)"
-
-    def get_credential(self) -> str:
-        return self._credential
+__all__ = [
+    "CredentialProvider",
+    "OddsClient",
+    "OddsFetchFailure",
+    "OddsFetchResult",
+    "OddsHttpRequest",
+    "OddsHttpResponse",
+    "OddsRetrievalAttempt",
+    "OddsTransport",
+    "StaticCredentialProvider",
+    "UnavailableCredentialProvider",
+    "UrllibOddsTransport",
+    "build_request",
+    "parse_quota_headers",
+]
 
 
 @dataclass(frozen=True, slots=True)
@@ -303,12 +297,7 @@ def build_request(
     commence_to: datetime | None = None,
 ) -> OddsHttpRequest:
     config = load_provider_config()
-    if (
-        not credential
-        or len(credential) > 512
-        or any(character.isspace() for character in credential)
-    ):
-        raise IngestionError("CREDENTIAL_UNAVAILABLE", "approved runtime credential is unavailable")
+    credential = validate_runtime_credential(credential)
     return OddsHttpRequest(
         method="GET",
         scheme=config.scheme,

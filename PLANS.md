@@ -1,3 +1,11 @@
+## GW1 2026/27 readiness — Session 1 live input foundation
+
+- Branch: `readiness/GW1-2026-27-live-input-initial-squad`.
+- Immutable parent: `9eb57143f6ee92f67c78607cc386678d962e62d4`.
+- Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
+- Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.
+- Exclusions: no live key, provider success claim, FPL current-input changes, identity mapping, projections, optimiser, squad, captaincy, prospective logging, PR, merge, or activation.
+
 # DMF Pulse execution plans
 
 ## RUL-2026-27 independent full-ruleset review and remediation

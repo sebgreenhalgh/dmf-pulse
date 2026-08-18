@@ -14,6 +14,10 @@ from pydantic import BaseModel
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.parser import parse_rfc3339_timestamp
 from dmf_pulse.ingestion.fpl.service import DATABASE_REF
+from dmf_pulse.ingestion.odds.credentials import (
+    RuntimeOddsCredentialProvider,
+    credential_is_configured,
+)
 from dmf_pulse.ingestion.odds.parser import CONTRACT_VERSION
 from dmf_pulse.ingestion.odds.service import (
     OddsImportRequest,
@@ -103,6 +107,24 @@ def _emit(outcome: OddsOperationOutcome) -> None:
     typer.echo(_json(outcome.result))
     if outcome.exit_code:
         raise typer.Exit(outcome.exit_code)
+
+
+@odds_app.command("credential-status")
+def credential_status_command(
+    output: Annotated[str, typer.Option("--output")] = "json",
+) -> None:
+    """Report only whether a valid runtime credential is configured."""
+
+    def operation() -> dict[str, object]:
+        _require_json(output)
+        return {
+            "configured": credential_is_configured(RuntimeOddsCredentialProvider()),
+        }
+
+    result = _safe(operation)
+    if not isinstance(result, dict) or set(result) != {"configured"}:
+        _failure(IngestionError("INTERNAL_INVARIANT", "credential diagnostic is invalid"))
+    typer.echo(_json(result))
 
 
 @odds_app.command("validate")
