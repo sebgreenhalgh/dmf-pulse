@@ -559,3 +559,285 @@ class FreeHitEvaluation(FrozenModel):
         if semantic_sha256(payload) != self.evaluation_hash:
             raise ValueError("Free Hit evaluation hash mismatch")
         return self
+
+
+WildcardRouteRole = Literal[
+    "WILDCARD_IMMEDIATE",
+    "WILDCARD_DELAYED",
+    "FREE_HIT_BRIDGE",
+    "HOLD",
+]
+
+
+class WildcardFutureOutcome(FrozenModel):
+    """One information-contingent continuation outcome for a Wildcard route."""
+
+    outcome_id: StrictStr = Field(min_length=1)
+    probability: Probability
+    future_squad_points: FiniteFloat = 0.0
+    transfer_hits_saved: FiniteFloat = 0.0
+    price_route_value: FiniteFloat = 0.0
+    flexibility_value: FiniteFloat = 0.0
+    forced_transfer_value: FiniteFloat = 0.0
+    bench_boost_synergy: FiniteFloat = 0.0
+    free_hit_synergy: FiniteFloat = 0.0
+    triple_captain_synergy: FiniteFloat = 0.0
+    terminal_value: FiniteFloat = 0.0
+
+    @property
+    def total_value(self) -> float:
+        """Return the transparent sum of future continuation components."""
+
+        return float(
+            self.future_squad_points
+            + self.transfer_hits_saved
+            + self.price_route_value
+            + self.flexibility_value
+            + self.forced_transfer_value
+            + self.bench_boost_synergy
+            + self.free_hit_synergy
+            + self.triple_captain_synergy
+            + self.terminal_value
+        )
+
+
+class WildcardRouteCostProfile(FrozenModel):
+    """Explicit delay, affordability, expiry and execution costs for one route."""
+
+    information_delay: NonNegativeFloat = 0.0
+    affordability_loss: NonNegativeFloat = 0.0
+    expiry_loss: NonNegativeFloat = 0.0
+    execution_risk: NonNegativeFloat = 0.0
+
+    @property
+    def total_cost(self) -> float:
+        return float(
+            self.information_delay
+            + self.affordability_loss
+            + self.expiry_loss
+            + self.execution_risk
+        )
+
+
+class WildcardRouteCandidate(FrozenModel):
+    """One immutable now, later, bridge or hold policy route."""
+
+    route_id: StrictStr = Field(min_length=1)
+    route_role: WildcardRouteRole
+    current_policy: ChipPolicyCandidate
+    permanent_state_after_current_action: ManagerState
+    activation_gameweek: PositiveInt | None = None
+    information_event_id: StrictStr | None = None
+    information_outcomes: tuple[WildcardFutureOutcome, ...]
+    token_consumed_now: StrictBool
+    expires_without_use: StrictBool
+    information_value: FiniteFloat = 0.0
+    route_costs: WildcardRouteCostProfile = WildcardRouteCostProfile()
+    current_net_value: FiniteFloat
+    expected_future_value: FiniteFloat
+    route_value: FiniteFloat
+    route_hash: Sha256
+
+    @model_validator(mode="after")
+    def route_reconciles(self) -> WildcardRouteCandidate:
+        if self.route_role != self.current_policy.policy_role:
+            raise ValueError("Wildcard route role must match the current policy role")
+        outcome_ids = tuple(item.outcome_id for item in self.information_outcomes)
+        if not outcome_ids:
+            raise ValueError("Wildcard information outcomes must be non-empty")
+        if outcome_ids != tuple(sorted(outcome_ids)):
+            raise ValueError("Wildcard information outcomes must be sorted")
+        if len(outcome_ids) != len(set(outcome_ids)):
+            raise ValueError("Wildcard information outcome IDs must be unique")
+        if abs(sum(item.probability for item in self.information_outcomes) - 1.0) > 1e-9:
+            raise ValueError("Wildcard information outcome probabilities must sum to one")
+
+        if self.route_role == "WILDCARD_IMMEDIATE":
+            if not self.token_consumed_now or self.activation_gameweek is None:
+                raise ValueError("immediate Wildcard route must consume the token now")
+            if self.information_event_id is not None:
+                raise ValueError("immediate Wildcard route cannot be delayed by information")
+            if self.expires_without_use:
+                raise ValueError("immediate Wildcard route cannot expire unused")
+        elif self.route_role in {"WILDCARD_DELAYED", "FREE_HIT_BRIDGE"}:
+            if self.token_consumed_now:
+                raise ValueError("delayed/bridge Wildcard route retains the token now")
+            if self.activation_gameweek is None or not self.information_event_id:
+                raise ValueError(
+                    "delayed/bridge Wildcard route requires an explicit information event"
+                )
+            if self.expires_without_use:
+                raise ValueError("delayed/bridge Wildcard route cannot expire unused")
+        else:
+            if self.activation_gameweek is not None or self.information_event_id is not None:
+                raise ValueError("hold route cannot declare future activation or information")
+            if self.token_consumed_now:
+                raise ValueError("hold route cannot consume the token now")
+
+        expected_current = self.current_policy.net_pre_continuation_value
+        expected_future = sum(
+            item.probability * item.total_value for item in self.information_outcomes
+        )
+        expected_route = (
+            expected_current
+            + expected_future
+            + self.information_value
+            - self.route_costs.total_cost
+        )
+        if abs(self.current_net_value - expected_current) > 1e-9:
+            raise ValueError("Wildcard route current net value does not reconcile")
+        if abs(self.expected_future_value - expected_future) > 1e-9:
+            raise ValueError("Wildcard route expected future value does not reconcile")
+        if abs(self.route_value - expected_route) > 1e-9:
+            raise ValueError("Wildcard route value does not reconcile")
+        payload = self.model_dump(mode="json", exclude={"route_hash"})
+        if semantic_sha256(payload) != self.route_hash:
+            raise ValueError("Wildcard route hash mismatch")
+        return self
+
+
+class WildcardScenarioValue(FrozenModel):
+    """Current-scenario immediate Wildcard value versus the best retained route."""
+
+    scenario_id: StrictStr = Field(min_length=1)
+    outcome_draw_id: StrictStr = Field(min_length=1)
+    weight: Probability
+    hold_points: FiniteFloat
+    immediate_wildcard_points: FiniteFloat
+    gross_current_increment: FiniteFloat
+
+    @model_validator(mode="after")
+    def scenario_reconciles(self) -> WildcardScenarioValue:
+        expected = self.immediate_wildcard_points - self.hold_points
+        if abs(self.gross_current_increment - expected) > 1e-9:
+            raise ValueError("Wildcard scenario increment does not reconcile")
+        return self
+
+
+class WildcardEvaluation(FrozenModel):
+    """Immediate permanent reset versus the best policy retaining Wildcard now."""
+
+    chip_key: Literal["WILDCARD"] = "WILDCARD"
+    routes: tuple[WildcardRouteCandidate, ...]
+    best_immediate_route: WildcardRouteCandidate
+    best_hold_route: WildcardRouteCandidate
+    selected_route: WildcardRouteCandidate
+    scenario_values: tuple[WildcardScenarioValue, ...]
+    gross_current_gain: FiniteFloat
+    current_transfer_hits_saved: FiniteFloat
+    current_policy_costs_avoided: FiniteFloat
+    future_squad_value_difference: FiniteFloat
+    future_transfer_hit_value_difference: FiniteFloat
+    price_route_value_difference: FiniteFloat
+    flexibility_value_difference: FiniteFloat
+    forced_transfer_value_difference: FiniteFloat
+    bench_boost_synergy_difference: FiniteFloat
+    free_hit_synergy_difference: FiniteFloat
+    triple_captain_synergy_difference: FiniteFloat
+    terminal_value_difference: FiniteFloat
+    information_value_difference: FiniteFloat
+    route_costs_avoided: FiniteFloat
+    net_policy_value: FiniteFloat
+    exercise_advantage: FiniteFloat
+    use_now: StrictBool
+    immediate_wildcard_state: ManagerState
+    incoming_purchase_spell_ids: tuple[StrictStr, ...]
+    token_id: StrictStr = Field(min_length=1)
+    inventory_before_hash: Sha256
+    inventory_after_activation_hash: Sha256
+    scenario_set_hash: Sha256
+    ruleset_id: StrictStr = Field(min_length=1)
+    ruleset_version: StrictStr = Field(min_length=1)
+    ruleset_hash: Sha256
+    chip_definition_hash: Sha256
+    evaluation_hash: Sha256
+
+    @model_validator(mode="after")
+    def evaluation_reconciles(self) -> WildcardEvaluation:
+        ordered = tuple(sorted(self.routes, key=lambda item: item.route_hash))
+        if not self.routes or self.routes != ordered:
+            raise ValueError("Wildcard routes must be non-empty and sorted")
+        hashes = tuple(item.route_hash for item in self.routes)
+        if len(hashes) != len(set(hashes)):
+            raise ValueError("Wildcard routes must be unique")
+        if self.best_immediate_route.route_role != "WILDCARD_IMMEDIATE":
+            raise ValueError("best immediate Wildcard route has the wrong role")
+        if self.best_hold_route.route_role not in {
+            "WILDCARD_DELAYED",
+            "FREE_HIT_BRIDGE",
+            "HOLD",
+        }:
+            raise ValueError("best hold route must retain the token now")
+        if self.best_immediate_route.route_hash not in set(hashes):
+            raise ValueError("best immediate route is not in evaluated routes")
+        if self.best_hold_route.route_hash not in set(hashes):
+            raise ValueError("best hold route is not in evaluated routes")
+        if self.immediate_wildcard_state != (
+            self.best_immediate_route.permanent_state_after_current_action
+        ):
+            raise ValueError("immediate state differs from the best immediate route")
+
+        immediate_ids = tuple(
+            (item.scenario_id, item.outcome_draw_id)
+            for item in self.best_immediate_route.current_policy.scenario_scores
+        )
+        hold_ids = tuple(
+            (item.scenario_id, item.outcome_draw_id)
+            for item in self.best_hold_route.current_policy.scenario_scores
+        )
+        scenario_ids = tuple(
+            (item.scenario_id, item.outcome_draw_id) for item in self.scenario_values
+        )
+        if immediate_ids != hold_ids or immediate_ids != scenario_ids:
+            raise ValueError("Wildcard policies must use one common scenario set")
+        expected_gross = (
+            self.best_immediate_route.current_policy.expected_current_points
+            - self.best_hold_route.current_policy.expected_current_points
+        )
+        weighted = sum(item.weight * item.gross_current_increment for item in self.scenario_values)
+        if (
+            abs(self.gross_current_gain - expected_gross) > 1e-9
+            or abs(weighted - expected_gross) > 1e-9
+        ):
+            raise ValueError("Wildcard gross current gain does not reconcile")
+
+        components = (
+            self.gross_current_gain,
+            self.current_transfer_hits_saved,
+            self.current_policy_costs_avoided,
+            self.future_squad_value_difference,
+            self.future_transfer_hit_value_difference,
+            self.price_route_value_difference,
+            self.flexibility_value_difference,
+            self.forced_transfer_value_difference,
+            self.bench_boost_synergy_difference,
+            self.free_hit_synergy_difference,
+            self.triple_captain_synergy_difference,
+            self.terminal_value_difference,
+            self.information_value_difference,
+            self.route_costs_avoided,
+        )
+        expected_net = float(sum(components))
+        if abs(self.net_policy_value - expected_net) > 1e-9:
+            raise ValueError("Wildcard value decomposition does not reconcile")
+        expected_advantage = (
+            self.best_immediate_route.route_value - self.best_hold_route.route_value
+        )
+        if abs(self.exercise_advantage - expected_advantage) > 1e-9:
+            raise ValueError("Wildcard exercise advantage does not reconcile")
+        expected_use_now = expected_advantage > 0.0
+        if self.use_now != expected_use_now:
+            raise ValueError("Wildcard use-now flag does not reconcile")
+        expected_selected = self.best_immediate_route if expected_use_now else self.best_hold_route
+        if self.selected_route.route_hash != expected_selected.route_hash:
+            raise ValueError("Wildcard selected route does not reconcile")
+        if self.inventory_before_hash == self.inventory_after_activation_hash:
+            raise ValueError("Wildcard activation must change projected inventory")
+        if self.incoming_purchase_spell_ids != tuple(sorted(self.incoming_purchase_spell_ids)):
+            raise ValueError("Wildcard incoming purchase-spell IDs must be sorted")
+        if len(self.incoming_purchase_spell_ids) != len(set(self.incoming_purchase_spell_ids)):
+            raise ValueError("Wildcard incoming purchase-spell IDs must be unique")
+        payload = self.model_dump(mode="json", exclude={"evaluation_hash"})
+        if semantic_sha256(payload) != self.evaluation_hash:
+            raise ValueError("Wildcard evaluation hash mismatch")
+        return self

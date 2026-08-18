@@ -32,7 +32,7 @@
 | 14.02 captain/vice/Triple Captain | COMPLETE | `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2` | 41 passed | 99% branch coverage for captaincy/TC. |
 | 14.03 Bench Boost | COMPLETE | `f1c384972567befbe4713c56bfaaa4a481135687` | 67 passed | 26 new BB tests; 94% combined affected coverage. |
 | 14.04 Free Hit | COMPLETE_LOCAL / PUSH_PENDING | local capability commit; exact SHA is recorded by branch history | 23 focused; 149 all chip unit/property | Best legal temporary policy versus best legal normal-transfer policy; exact permanent restoration. |
-| 14.05 Wildcard | NOT_STARTED | — | — | — |
+| 14.05 Wildcard | COMPLETE_LOCAL / PUSH_PENDING | local capability commit; exact SHA is recorded by branch history | 58 focused; 207 all chip unit/property | Immediate, delayed, Free Hit bridge and hold/expiry routes; exact permanent reset and purchase cohorts. |
 | 14.06 scheduler/continuation | NOT_STARTED | — | — | — |
 | 14.07 CLI/evaluation/evidence | NOT_STARTED | — | — | — |
 
@@ -90,6 +90,20 @@
   `149 passed`; chip-package combined branch coverage: `93.58%` (`396 / 456` branches).
 - Evidence: `evidence/tickets/CHIP-014/CHECKPOINT_14_04.md`.
 
+### 14.05 Wildcard
+
+- Compares immediate Wildcard with ordinary-transfer repair, delayed-after-information, Free Hit
+  bridge and hold/expiry routes.
+- Applies the permanent reset through the accepted Stage-11 transfer transition; no duplicate
+  squad, bank, selling-price, free-transfer or ownership-cohort mechanics.
+- Separates current points/hits/costs, permanent squad value, future hits, price/flexibility/forced
+  transfer value, BB/FH/TC synergy, terminal value, information value and route costs.
+- Reconciles the transparent decomposition exactly to immediate-versus-retained exercise value.
+- Focused acceptance/contracts: `58 passed`; complete chip unit/property confidence: `207 passed`.
+- New evaluator branch coverage: `94.19%` (`81 / 86`); new model branch coverage: `94.59%`
+  (`70 / 74`).
+- Evidence: `evidence/tickets/CHIP-014/CHECKPOINT_14_05.md`.
+
 ## Validation
 
 Exact commands/results:
@@ -126,10 +140,11 @@ Deferred gates remain truthfully unpassed:
 - BB `net_pre_continuation_value` deliberately excludes finite-inventory continuation/opportunity value; checkpoint 14.06 owns that comparison.
 - Free Hit accepts an explicit finite-horizon continuation-value interface; checkpoint 14.06 owns schedule-wide estimation and competition among tokens.
 - Sophisticated continuation methods remain open by specification and are not claimed solved.
+- Wildcard information outcomes and continuation components are explicit inputs; checkpoint 14.06 owns finite-inventory schedule optimisation and nonanticipative continuation.
 - Temporary branch-only recovery transport/export workflows remain and must be removed before final delivery.
 - Focused 14.04 Ruff and strict mypy checks pass; final frozen sync, full Stage-14 static analysis, build, wheel, installed-wheel CLI and targeted inherited regressions remain pending.
 - The current connector exposes repository reads but no file/ref write action, while container Git cannot resolve GitHub. The local 14.04 capability commit is therefore publication-pending; no force/reset/squash was used.
 
 ## Exact resume state
 
-Resume from the local branch history and the verified remote lineage. Publish the local 14.04 capability commit by a non-force fast-forward as soon as a GitHub write transport is available, then continue checkpoint 14.05 without recreating or resetting checkpoints 14.01–14.04.
+Resume from the local branch history and the verified remote lineage. Publish the local 14.04 and 14.05 capability commits by a non-force fast-forward as soon as a GitHub write transport is available, then continue checkpoint 14.06 without recreating or resetting checkpoints 14.01–14.05.

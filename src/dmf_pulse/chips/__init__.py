@@ -50,6 +50,17 @@ from dmf_pulse.chips.policy_models import (
     PolicyScenarioScore,
     TripleCaptainEvaluation,
     WildcardBenchBoostSynergy,
+    WildcardEvaluation,
+    WildcardFutureOutcome,
+    WildcardRouteCandidate,
+    WildcardRouteCostProfile,
+    WildcardRouteRole,
+    WildcardScenarioValue,
+)
+from dmf_pulse.chips.wildcard import (
+    apply_wildcard_reset,
+    evaluate_wildcard,
+    make_wildcard_route_candidate,
 )
 
 __all__ = [
@@ -79,8 +90,15 @@ __all__ = [
     "TokenStatus",
     "TripleCaptainEvaluation",
     "WildcardBenchBoostSynergy",
+    "WildcardEvaluation",
+    "WildcardFutureOutcome",
+    "WildcardRouteCandidate",
+    "WildcardRouteCostProfile",
+    "WildcardRouteRole",
+    "WildcardScenarioValue",
     "activate_token",
     "advance_inventory",
+    "apply_wildcard_reset",
     "available_token_ids",
     "build_chip_inventory",
     "cancel_token",
@@ -91,7 +109,9 @@ __all__ = [
     "evaluate_bench_boost",
     "evaluate_free_hit",
     "evaluate_triple_captain",
+    "evaluate_wildcard",
     "make_policy_candidate",
+    "make_wildcard_route_candidate",
     "optimise_captain_vice",
     "policy_candidate_from_stage11",
     "select_token",

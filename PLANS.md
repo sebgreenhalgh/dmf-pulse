@@ -6,7 +6,7 @@
   `a8796d4edacea4c87ee6461d381f4df87e1ef39c`; implementation branch
   `stage/A14/CHIP-014-chip-optimisation`.
 - Resume boundary: checkpoints 14.01 generic inventory, 14.02 captain/vice/TC and
-  14.03 Bench Boost are preserved; 14.04 Free Hit is locally complete and publication-pending; 14.05 Wildcard is the first unfinished capability.
+  14.03 Bench Boost are preserved; 14.04 Free Hit is locally complete and publication-pending; 14.05 Wildcard is locally complete and publication-pending; 14.06 scheduler/continuation is the first unfinished capability.
 - Scope: best-policy Free Hit comparison with exact permanent-state restoration; immediate,
   delayed and bridge Wildcard policies; transparent finite-inventory scheduling with an exact
   tiny-instance oracle and nonanticipativity; shared service/CLI, Stage-12 rolling replay and
@@ -21,7 +21,7 @@
   completed checkpoints.
 - [x] Remediate the discovered generic vice-fallback compiler regression and publish it durably.
 - [x] Complete 14.04 Free Hit locally; remote publication remains pending transport recovery.
-- [ ] Complete and publish 14.05 Wildcard.
+- [x] Complete 14.05 Wildcard locally; remote publication remains pending transport recovery.
 - [ ] Complete and publish 14.06 scheduler/continuation.
 - [ ] Complete and publish 14.07 service/CLI/replay/evidence.
 - [ ] Run focused coverage, inherited regressions, static/build/wheel/installed-CLI and final
