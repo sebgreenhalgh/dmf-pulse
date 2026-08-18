@@ -5,7 +5,7 @@
 - Immutable original parent: `a8796d4edacea4c87ee6461d381f4df87e1ef39c`
 - Branch: `stage/A14/CHIP-014-chip-optimisation`
 - Delivery mode: Git-first, resumable checkpoint publication.
-- Current engineering status: `IN_PROGRESS — 14.06 COMPLETE_PENDING_PUBLICATION`
+- Current engineering status: `IN_PROGRESS — 14.06 COMPLETE / REMOTE; 14.07 NOT_STARTED`
 - Human acceptance: `false`
 - Merged: `false`
 - Accepted tag: none
@@ -37,7 +37,7 @@
 | 14.03 Bench Boost | COMPLETE | `f1c384972567befbe4713c56bfaaa4a481135687` | 67 passed | Natural/engineered BB routes. |
 | 14.04 Free Hit | COMPLETE / REMOTE | `ef3f5b2` | 23 focused; 149 then-current chip tests | Best temporary versus best normal policy; exact restoration. |
 | 14.05 Wildcard | COMPLETE / REMOTE | `0449dd7c47ae983a78fb8ef9098ce604ae3022db` | 58 focused; 207 then-current chip tests | Immediate/delayed/FH-bridge/hold routes. |
-| 14.06 scheduler/continuation | COMPLETE_PENDING_PUBLICATION | pending capability commit | 75 focused; 282 all chip unit/property | Exact/beam finite-inventory policy, diagnostics, nonanticipativity and oracle. |
+| 14.06 scheduler/continuation | COMPLETE / REMOTE | `cc62e21a3a085fc6a5cec959881f075f6dfa13c1` | 75 focused; 282 all chip unit/property | Exact/beam finite-inventory policy, diagnostics, nonanticipativity and oracle. |
 | 14.07 service/replay/CLI/artifacts | NOT_STARTED | — | — | Must not start before 14.06 remote verification. |
 | Final acceptance/evidence/cleanup | NOT_STARTED | — | — | Includes transport cleanup; no PR/merge/tag. |
 
@@ -81,15 +81,12 @@ coverage is not represented as aggregate package coverage.
 
 ## Remaining mandatory work
 
-1. Publish checkpoint 14.06 by non-force fast-forward transport.
-2. Fetch/inspect the remote tree and prove local/remote HEAD equality.
-3. Implement checkpoint 14.07 service, sequential replay, CLI and artifacts from
-   that published state.
-4. Resolve Free Hit direct branch coverage truthfully.
-5. Run the bounded Stage-14 test/static/build/installed-wheel matrix and targeted
+1. Implement checkpoint 14.07 service, sequential replay, CLI and artifacts from
+   published scheduler capability `cc62e21a3a085fc6a5cec959881f075f6dfa13c1`.
+2. Run the bounded Stage-14 test/static/build/installed-wheel matrix and targeted
    inherited regressions.
-6. Publish checkpoint 14.07.
-7. Produce final evidence, remove all transient Stage-14 recovery/transport
+3. Publish checkpoint 14.07.
+4. Produce final evidence, remove all transient Stage-14 recovery/transport
    workflows and `recovery/`, validate/secret-scan, then publish final cleanup.
 
 `FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_INDEPENDENT_SOL_REVIEW`
@@ -108,10 +105,12 @@ unless a later bounded reason is recorded.
 
 ## Exact resume state
 
-- Actual remote branch state at this recovery point: `de1204ac60437fc9c8f4fccf99bdab79df471af4`.
-- Published product capability beneath transport commits: Wildcard `0449dd7c47ae983a78fb8ef9098ce604ae3022db`.
+- Published scheduler capability: `cc62e21a3a085fc6a5cec959881f075f6dfa13c1`.
+- The exported canonical bundle resolves the Stage-14 branch capability ref to
+  that SHA; scheduler production, test and evidence blobs match the validated
+  local Git hashes.
 - Reported scheduler commit `3935bc00ff760a6c76bb6115e142aa273affc371`: not recovered.
 - Reported 14.07 stash `stage14-service-cli-replay-wip-after-scheduler`: not recovered.
 - Recovery mode: truthful Case B; only checkpoint 14.06 was reconstructed.
-- 14.06 is complete locally and must be published before any 14.07 file is created or changed.
+- Checkpoint 14.07 starts from the published `cc62e21a...` canonical tree.
 - Temporary Stage-14 transport/export workflows and `recovery/` remain only until final cleanup.

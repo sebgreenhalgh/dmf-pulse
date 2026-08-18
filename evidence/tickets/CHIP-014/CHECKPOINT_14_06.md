@@ -14,11 +14,12 @@ workspace were reconciled against the canonical branch, reviewed, extended with
 adversarial tests, and validated. This record does not claim recovery of the
 missing commit.
 
-The implementation parent for this capability is remote transport commit
-`de1204ac60437fc9c8f4fccf99bdab79df471af4`, whose product capability parent is
-the published Wildcard commit `0449dd7c47ae983a78fb8ef9098ce604ae3022db`.
-The two intervening transport/export commits are temporary recovery machinery
-and are scheduled for deletion at final Stage-14 cleanup.
+The published scheduler capability commit is
+`cc62e21a3a085fc6a5cec959881f075f6dfa13c1`. Its immediate parent is the final
+recovery trigger commit, while its product capability ancestor is the published
+Wildcard commit `0449dd7c47ae983a78fb8ef9098ce604ae3022db`. Temporary
+transport/export history remains non-product recovery machinery and is scheduled
+for deletion at final Stage-14 cleanup.
 
 ## Capability
 
@@ -138,7 +139,8 @@ canonical remote branch.
 
 ## Status
 
-`COMPLETE_LOCAL / PUBLICATION_PENDING` at the time this evidence was written.
-The final publication SHA and local/remote equality are recorded in
-`tickets/CHIP-014/PROGRESS.md` immediately after the mandatory durable
-checkpoint publication.
+`COMPLETE / REMOTE` at capability commit
+`cc62e21a3a085fc6a5cec959881f075f6dfa13c1`. The exported canonical bundle
+resolved the Stage-14 branch ref to that SHA, and the scheduler production,
+test and evidence blobs matched the locally validated Git hashes. No PR, merge,
+tag or human acceptance occurred.
