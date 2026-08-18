@@ -5,7 +5,7 @@ on:
     branches:
       - stage/A13/PRC-013-price-prediction
     paths:
-      - recovery/stage13-payload.tar.gz
+      - recovery/stage13-payload.part-*
       - recovery/stage13-payload.tar.gz.sha256
 
 permissions:
@@ -28,13 +28,15 @@ jobs:
           FINAL_BRANCH: stage/A13/PRC-013-price-prediction
           FINAL_DATE: 2026-08-18T01:10:00Z
         run: |
+          payload="$RUNNER_TEMP/stage13-payload.tar.gz"
+          cat recovery/stage13-payload.part-* > "$payload"
           expected_payload=$(awk '{print $1}' recovery/stage13-payload.tar.gz.sha256)
-          actual_payload=$(sha256sum recovery/stage13-payload.tar.gz | awk '{print $1}')
+          actual_payload=$(sha256sum "$payload" | awk '{print $1}')
           test "$expected_payload" = "$actual_payload"
 
           final_root="$RUNNER_TEMP/stage13-final"
           git worktree add --detach "$final_root" "$IMMUTABLE_PARENT"
-          tar -xzf recovery/stage13-payload.tar.gz -C "$final_root"
+          tar -xzf "$payload" -C "$final_root"
 
           cd "$final_root"
           test "$(git rev-parse HEAD)" = "$IMMUTABLE_PARENT"
