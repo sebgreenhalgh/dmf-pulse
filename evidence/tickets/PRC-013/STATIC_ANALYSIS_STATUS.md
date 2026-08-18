@@ -5,3 +5,10 @@
 - `uv run ruff check .`: PASS.
 - `uv run mypy src/dmf_pulse`: PASS, 208 source files with no issues.
 - Final `git diff --check`: PASS.
+
+## Final main integration
+
+- `uv sync --all-groups --frozen`: PASS, 40 packages checked.
+- `uv run ruff format --check .`: PASS, 539 files already formatted.
+- `uv run ruff check .`: PASS.
+- `uv run mypy src/dmf_pulse`: PASS, 209 source files with no issues.

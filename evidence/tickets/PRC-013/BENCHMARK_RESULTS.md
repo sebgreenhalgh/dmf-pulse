@@ -9,3 +9,8 @@
 
 Synthetic/replay tests validate contract behavior. They are not reported as real target-season
 predictive performance.
+
+Final main integration recognizes the official 2026/27 predictor's displayed/predicted progress
+and categorical signals as first-party benchmark observations. Values above 100 remain progress,
+not probabilities; the hidden threshold algorithm is still undisclosed, and automated capture
+remains rights-blocked.

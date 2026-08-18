@@ -18,3 +18,37 @@ Reason: Stage 13 preserves integer price/rule interfaces without activating inco
 
 Independent-review result: 17 passed in 1.29 seconds. The single full repository pytest run later
 reached its 20-minute execution ceiling and is recorded separately as RESOURCE_LIMIT.
+
+FINAL MAIN INTEGRATION
+
+The same 17 exact inherited nodes were rerun after integration and passed in 1.12 seconds:
+- tests/unit/ingestion/test_rights_and_fixtures.py::test_required_profiles_encode_the_conservative_capability_matrix
+- tests/unit/ingestion/test_rights_and_fixtures.py::test_rights_decision_time_is_distinct_from_terms_check_time
+- tests/unit/ingestion/test_rights_and_fixtures.py::test_require_rights_has_stable_secret_safe_failure
+- tests/unit/ingestion/test_rights_and_fixtures.py::test_repository_fixture_is_approved_only_for_its_bound_profile
+- tests/unit/optimisation/test_multi_gameweek_state.py::test_selling_price_retains_floor_half_profit_and_full_loss
+- tests/unit/optimisation/test_multi_gameweek_state.py::test_sell_then_repurchase_creates_second_append_only_spell
+- tests/unit/optimisation/test_multi_gameweek_state.py::test_unaffordable_transfer_cannot_make_bank_negative
+- tests/unit/optimisation/test_multi_gameweek_solver.py::test_repurchase_closes_old_spell_and_creates_new_purchase_cohort
+- tests/unit/optimisation/test_multi_gameweek_solver.py::test_advance_executes_only_current_action
+- tests/unit/evaluation/test_information_and_vintages.py::test_temporal_eligibility_requires_all_system_times
+- tests/unit/evaluation/test_information_and_vintages.py::test_blocking_leakage_raises_in_strict_builder
+- tests/unit/evaluation/test_folds.py::test_expanding_folds_are_nested_and_hash_deterministic
+- tests/unit/evaluation/test_calibration.py::test_calibration_artifact_excludes_outer_fold_and_future_training
+- tests/unit/evaluation/test_regret_reports_artifacts.py::test_decision_regret_separates_feasible_and_oracle_comparators
+- tests/unit/evaluation/test_regret_reports_artifacts.py::test_immutable_artifact_hash_tamper_collision_and_confinement
+- tests/unit/rules/test_schema_v11_capabilities.py::test_manager_state_schema_shapes_are_available_without_player_points_dependency
+- tests/unit/rules/test_2026_27_verification_gate.py::test_2026_27_checked_claims_and_sources_are_current
+
+The exact current-main file selectors below ran every collected node in those files and passed 104
+tests in 5.50 seconds:
+- tests/contract/rules/test_2026_27_full_season_readiness.py
+- tests/contract/rules/test_2026_27_final_evidence.py
+- tests/unit/rules/test_schema_v11_capabilities.py
+- tests/unit/rules/test_bonus_and_lifecycle.py
+- tests/contract/optimisation/test_multi_gameweek_integration.py
+- tests/unit/optimisation/test_multi_gameweek_assurance.py
+
+The four new target-rules/Stage-13 reconciliation nodes in
+tests/integration/prices/test_current_rules_integration.py are included in the final 116-test
+Stage-13 coverage suite.

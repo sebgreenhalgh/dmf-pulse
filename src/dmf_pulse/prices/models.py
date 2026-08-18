@@ -230,6 +230,10 @@ class ExternalPredictorObservation(PriceModel):
     displayed_progress: Decimal | None = Field(default=None, ge=Decimal(0))
     predicted_progress: Decimal | None = Field(default=None, ge=Decimal(0))
     displayed_categorical_signal: StrictStr | None = None
+    signal_semantics: Literal["PROGRESS_SIGNAL_NOT_CALIBRATED_PROBABILITY"] = (
+        "PROGRESS_SIGNAL_NOT_CALIBRATED_PROBABILITY"
+    )
+    threshold_algorithm_disclosed: Literal[False] = False
     predicted_progress_available_at: datetime | None = None
     observed_at: datetime
     received_at: datetime

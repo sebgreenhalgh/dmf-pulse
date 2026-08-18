@@ -14,3 +14,7 @@ acceptance, merge and accepted tagging remain pending.
 
 Publication: draft PR #12 targets `main`; the independently reviewed source branch was pushed and
 its local/remote HEAD equality was verified. The PR remains unmerged.
+
+Final main integration gates pass against `9eb57143f6ee92f67c78607cc386678d962e62d4` while the
+reviewed pre-integration HEAD remains preserved. Verified deterministic 2026/27 rules do not change
+the predictive model's `SHADOW_ONLY`, `TARGET_SEASON_UNCALIBRATED` or rights-blocked status.

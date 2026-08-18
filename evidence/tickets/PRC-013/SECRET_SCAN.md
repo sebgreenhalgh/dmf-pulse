@@ -7,3 +7,7 @@ The initial scan correctly surfaced a lexical false positive for the public doma
 enum assignment. The serialized/API term is retained, and its exact path/rule/fingerprint is
 narrowly allowlisted in `.secret-scan-allowlist.json` with a rationale.
 No wildcard or raw secret is allowlisted. No credentials were read, stored or printed.
+
+The final integrated-tree secret scan also passed with zero unallowlisted findings. Current-main's
+narrow source-capture allowlist entries and the Stage-13 supersession entry were preserved without
+wildcards or credential values.

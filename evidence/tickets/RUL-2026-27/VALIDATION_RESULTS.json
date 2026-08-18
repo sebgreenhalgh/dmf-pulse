@@ -1,0 +1,161 @@
+{
+  "artifact_type": "DMF_RULES_INDEPENDENT_REVIEW_VALIDATION",
+  "branch": "readiness/RUL-2026-27-full-season-activation",
+  "checked_at": "2026-08-18T01:27:33Z",
+  "coverage_gate": {
+    "artifact_created": false,
+    "attempts": [
+      {
+        "elapsed_seconds": 1204,
+        "result": "TIMEOUT"
+      },
+      {
+        "elapsed_seconds": 1804,
+        "postgresql_test_environment": true,
+        "result": "TIMEOUT"
+      }
+    ],
+    "command": "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/RUL-002/coverage.json",
+    "overall_branch_coverage_certified": false,
+    "result": "TIMEOUT",
+    "rules_branch_coverage_certified": false
+  },
+  "database_validation": [
+    {
+      "command": "uv run alembic upgrade head",
+      "result": "PASS",
+      "target_revision": "20260807_0006"
+    },
+    {
+      "command": "uv run pytest -m \"postgres or migration\" tests/integration/data_model tests/integration/migrations -q --tb=short --maxfail=10",
+      "elapsed_seconds": 162.02,
+      "passed": 90,
+      "result": "PASS"
+    },
+    {
+      "command": "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
+      "result": "PASS",
+      "transitions_passed": 5
+    }
+  ],
+  "exact_rul_002_acceptance": [
+    {
+      "command": "uv sync --all-groups --frozen",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run ruff format --check .",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run ruff check .",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run mypy src/dmf_pulse",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/RUL-002/coverage.json",
+      "elapsed_seconds": 1804,
+      "result": "TIMEOUT"
+    },
+    {
+      "command": "uv run dmf --version",
+      "output": "dmf 0.2.0",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run dmf doctor --json",
+      "result": "PASS",
+      "status": "HEALTHY"
+    },
+    {
+      "command": "uv run dmf rules validate fixtures/rules/RUL-002/synthetic_complete --json",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run dmf rules compile fixtures/rules/RUL-002/synthetic_complete --output artifacts/rules/rul-002-synthetic.json --json",
+      "result": "PASS",
+      "ruleset_hash": "98e8614d9971ec2b1e45a357e89f79172bbc5dd4dc87044c3c131b3de6b0aab8"
+    },
+    {
+      "command": "uv run dmf rules hash artifacts/rules/rul-002-synthetic.json --json",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run dmf rules score-fixture artifacts/rules/rul-002-synthetic.json fixtures/rules/RUL-002/golden_fixture_001.json --json",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run dmf rules score-gameweek artifacts/rules/rul-002-synthetic.json fixtures/rules/RUL-002/golden_gameweek_001.json --json",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run dmf rules diff fixtures/rules/RUL-002/reference_2025_26 fixtures/rules/RUL-002/target_2026_27_partial --json",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run dmf rules activate fixtures/rules/RUL-002/target_2026_27_partial --approval fixtures/rules/RUL-002/invalid_target_approval.json --json",
+      "expected_exit_code": 1,
+      "result": "PASS_EXPECTED_BLOCK"
+    },
+    {
+      "command": "uv build",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run python scripts/verify_wheel.py",
+      "result": "PASS",
+      "wheel_sha256": "6e32f7ab879012f83928e4d9862e41a18b9d282eec45e8ba49533befdcef2d43"
+    },
+    {
+      "command": "uv run python scripts/validate_repository.py",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run python scripts/scan_secrets.py",
+      "finding_count": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "uv run dmf review-pack build --ticket RUL-002 --baseline 12049a7de23a4a8fcca3d219dbcab1bf5e1027ea --output review_pack/RUL-002",
+      "reason": "The user explicitly prohibited creation of a review pack for this branch remediation.",
+      "result": "NOT_RUN_USER_SCOPE_OVERRIDE"
+    }
+  ],
+  "focused_validation": [
+    {
+      "command": "uv run pytest tests/unit/rules tests/contract/rules -q",
+      "passed": 141,
+      "result": "PASS"
+    },
+    {
+      "command": "uv run pytest tests/unit/optimisation/test_multi_gameweek_state.py tests/unit/optimisation/test_multi_gameweek_tree.py tests/unit/optimisation/test_multi_gameweek_contract_hardening.py tests/unit/optimisation/test_multi_gameweek_cli_hardening.py -q",
+      "passed": 123,
+      "result": "PASS"
+    },
+    {
+      "command": "uv run pytest tests/unit/optimisation/test_multi_gameweek_assurance.py tests/contract/optimisation/test_stage11_multi_gameweek.py tests/integration/optimisation/test_stage11_multi_gameweek.py -q",
+      "passed": 52,
+      "result": "PASS"
+    },
+    {
+      "command": "uv run python scripts/verify_2026_27_source_manifest.py --repo-root .",
+      "result": "PASS"
+    },
+    {
+      "command": "target FULL_SEASON pending-approval activation probe",
+      "result": "PASS_EXPECTED_BLOCK",
+      "stable_blockers": [
+        "approval:binding_missing",
+        "approval:false",
+        "approval:not_trusted",
+        "approval:provenance_missing",
+        "evidence:reconciliation_incomplete"
+      ]
+    }
+  ],
+  "review_pack_created": false,
+  "validation_status": "INCOMPLETE_FULL_SUITE_TIMEOUT"
+}

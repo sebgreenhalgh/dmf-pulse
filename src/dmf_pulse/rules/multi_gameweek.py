@@ -159,6 +159,12 @@ def build_multi_gameweek_transfer_rules(
 
     _literal(prices.get("price_unit"), "TENTHS_OF_MILLION_GBP", "/rules/prices/price_unit")
     _literal(prices.get("integer_only"), True, "/rules/prices/integer_only")
+    if prices.get("authoritative_manager_selling_price_preferred") is not None:
+        _literal(
+            prices.get("authoritative_manager_selling_price_preferred"),
+            True,
+            "/rules/prices/authoritative_manager_selling_price_preferred",
+        )
     _literal(
         prices.get("initial_purchase_price_basis"),
         "CURRENT_PLAYER_PRICE_AT_INITIAL_SELECTION",
@@ -189,6 +195,12 @@ def build_multi_gameweek_transfer_rules(
         "CURRENT_PRICE",
         "/rules/prices/selling_price/at_or_below_purchase/formula",
     )
+    if prices.get("retained_profit_rounding") is not None:
+        _literal(
+            prices.get("retained_profit_rounding"),
+            "FLOOR_TO_TENTH",
+            "/rules/prices/retained_profit_rounding",
+        )
     _literal(
         transfers.get("outgoing_and_incoming_same_position"),
         True,
@@ -199,6 +211,18 @@ def build_multi_gameweek_transfer_rules(
         True,
         "/rules/transfers/transition/club_quota_repair_required",
     )
+    if transfers.get("confirmed_transfers_irreversible") is not None:
+        _literal(
+            transfers.get("confirmed_transfers_irreversible"),
+            True,
+            "/rules/transfers/transition/confirmed_transfers_irreversible",
+        )
+    if transfers.get("confirmed_transfer_effect") is not None:
+        _literal(
+            transfers.get("confirmed_transfer_effect"),
+            "NEXT_GAMEWEEK",
+            "/rules/transfers/transition/confirmed_transfer_effect",
+        )
     order = _plain(
         transfers.get("transfer_accounting_order"),
         "/rules/transfers/transition/transfer_accounting_order",
@@ -228,6 +252,16 @@ def build_multi_gameweek_transfer_rules(
             "RULESET_VALUE_INVALID",
             "configured transfer hit_points must be a negative scoring adjustment",
         )
+    configured_max_transfers = transfers.get("max_transfers_per_deadline")
+    max_transfers_per_deadline = (
+        tactical.squad_size
+        if configured_max_transfers is None
+        else _integer(
+            configured_max_transfers,
+            "/rules/transfers/transition/max_transfers_per_deadline",
+            minimum=1,
+        )
+    )
     preseason_unlimited = _plain(
         transfers.get("preseason_unlimited"),
         "/rules/transfers/transition/preseason_unlimited",
@@ -244,6 +278,28 @@ def build_multi_gameweek_transfer_rules(
     }
     if preseason_unlimited:
         events["PRESEASON"] = FreeTransferEventRule(
+            unlimited_transfers_without_hits=True,
+            reset_before=0,
+            earn_for_next_deadline=earned,
+            carry_unused=False,
+            cap_after=free_transfer_cap,
+        )
+    configured_late_entry = transfers.get("late_entry_unlimited_until_first_deadline")
+    late_entry_unlimited = (
+        False
+        if configured_late_entry is None
+        else _plain(
+            configured_late_entry,
+            "/rules/transfers/transition/late_entry_unlimited_until_first_deadline",
+        )
+    )
+    if not isinstance(late_entry_unlimited, bool):
+        raise RulesValidationError(
+            "RULESET_VALUE_INVALID",
+            "late_entry_unlimited_until_first_deadline must be boolean",
+        )
+    if late_entry_unlimited:
+        events["LATE_ENTRY"] = FreeTransferEventRule(
             unlimited_transfers_without_hits=True,
             reset_before=0,
             earn_for_next_deadline=earned,
@@ -275,7 +331,7 @@ def build_multi_gameweek_transfer_rules(
         max_players_per_club=tactical.max_players_per_club,
         maximum_free_transfers=free_transfer_cap,
         hit_cost_per_paid_transfer=abs(hit_points),
-        max_transfers_per_deadline=tactical.squad_size,
+        max_transfers_per_deadline=max_transfers_per_deadline,
         selling_price_rule=SellingPriceRule(
             rule_id="PURCHASE_PLUS_FLOOR_HALF_PROFIT_OR_CURRENT_LOSS",
             retained_profit_numerator=1,

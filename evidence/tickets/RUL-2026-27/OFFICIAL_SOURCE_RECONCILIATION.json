@@ -1,0 +1,17 @@
+{
+  "blocking_findings": [],
+  "coverage": {
+    "chips": true,
+    "deadlines": true,
+    "player_points": true,
+    "selling_price": true,
+    "squad": true,
+    "transfers": true
+  },
+  "current_season_specific": true,
+  "fresh_bootstrap": true,
+  "official_help": true,
+  "schema_version": "dmf-rules-source-manifest-verification-v1",
+  "source_count": 10,
+  "status": "PASS"
+}

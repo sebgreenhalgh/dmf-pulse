@@ -337,10 +337,7 @@ def test_closed_ownership_spell_rechecks_realised_selling_price() -> None:
 
 @pytest.mark.parametrize(
     ("update", "message"),
-    (
-        ({"max_transfers_per_deadline": 16}, "cannot exceed squad size"),
-        ({"position_squad_quota": {"GK": 2, "DEF": 5, "MID": 6, "FWD": 3}}, "sum"),
-    ),
+    (({"position_squad_quota": {"GK": 2, "DEF": 5, "MID": 6, "FWD": 3}}, "sum"),),
 )
 def test_transfer_rules_reject_impossible_global_limits(
     update: dict[str, object], message: str
@@ -350,6 +347,13 @@ def test_transfer_rules_reject_impossible_global_limits(
     payload.update(update)
     with pytest.raises(ValidationError, match=message):
         TransferRules.model_validate(payload)
+
+
+def test_transfer_rules_allow_official_deadline_cap_above_final_squad_size() -> None:
+    request = _request("simple_one_ft")
+    payload = request.rules.model_dump(mode="json")
+    payload["max_transfers_per_deadline"] = 20
+    assert TransferRules.model_validate(payload).max_transfers_per_deadline == 20
 
 
 def test_artifact_persistence_rejects_embedded_semantic_hash_mismatch(

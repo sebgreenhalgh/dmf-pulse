@@ -10,3 +10,11 @@ External delta read from
 first-party predictor displays are benchmark evidence only, rights remain controlling, and hidden
 algorithm/timing/threshold values must not be asserted. No external numerical claim was promoted
 into code.
+
+## Final main integration
+
+Current-main official evidence `SRC-FPL-2026-PRICE-001` establishes a first-party progress display,
+15-minute page refreshes and daily 00:00 UK price-change processing. It explicitly describes the
+display as guidance rather than a guarantee. Stage 13 therefore retains displayed and predicted
+progress as non-probability benchmark observations; it does not infer the hidden algorithm or
+promote progress to calibrated probability. Rights gates continue to control capture.

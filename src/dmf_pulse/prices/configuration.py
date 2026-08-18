@@ -20,7 +20,9 @@ from dmf_pulse.prices.models import (
     PriceStatus,
     Sha256,
 )
+from dmf_pulse.rules.canonical import self_hash
 from dmf_pulse.rules.errors import RulesValidationError
+from dmf_pulse.rules.models import CompiledRuleset
 from dmf_pulse.rules.yaml_loader import load_rules_yaml_bytes
 
 
@@ -105,7 +107,10 @@ class UpdateCyclePolicy(PriceModel):
 
 
 class PricePathPolicy(PriceModel):
-    price_step_units: StrictInt = Field(gt=0)
+    mechanics_authority: Literal["DMFP-02_RULESET"]
+    price_unit_reference: Literal["TENTHS_OF_MILLION_GBP"]
+    price_step_units_role: Literal["RULESET_VALIDATION_REFERENCE"]
+    price_step_units: Literal[1]
     minimum_price_units: StrictInt = Field(ge=0)
     maximum_price_units: StrictInt = Field(gt=0)
     updates_24h: StrictInt = Field(gt=0)
@@ -199,6 +204,82 @@ class PriceConfig(PriceModel):
         if self.benchmark_ids != tuple(sorted(set(self.benchmark_ids))):
             raise ValueError("benchmark IDs must be sorted and unique")
         return self
+
+
+class PriceRulesReconciliation(PriceModel):
+    """Rules-owned deterministic mechanics bound to Stage-13 model policy."""
+
+    schema_version: Literal["price-rules-reconciliation-v1"] = "price-rules-reconciliation-v1"
+    ruleset_id: StrictStr
+    ruleset_version: StrictStr
+    ruleset_hash: Sha256
+    price_unit: Literal["TENTHS_OF_MILLION_GBP"]
+    integer_only: Literal[True]
+    price_step_units: Literal[1]
+    mechanics_authority: Literal["DMFP-02_RULESET"] = "DMFP-02_RULESET"
+    selling_price_rule_id: Literal["PURCHASE_PLUS_FLOOR_HALF_PROFIT_OR_CURRENT_LOSS"] = (
+        "PURCHASE_PLUS_FLOOR_HALF_PROFIT_OR_CURRENT_LOSS"
+    )
+    change_threshold_algorithm: Literal["UNDISCLOSED"]
+
+
+def reconcile_price_config_with_rules(
+    config: PriceConfig,
+    compiled: CompiledRuleset,
+) -> PriceRulesReconciliation:
+    """Fail closed unless Stage-13 mechanics references match compiled DMFP-02 rules."""
+
+    if self_hash(compiled.model_dump(mode="json")) != compiled.ruleset_hash:
+        raise PriceError(
+            "PRICE_RULESET_MISMATCH",
+            "compiled ruleset hash does not match its deterministic price mechanics",
+        )
+    try:
+        prices = compiled.rules["prices"]
+        selling = prices["selling_price"]
+        above = selling["above_purchase"]
+        below = selling["at_or_below_purchase"]
+    except (KeyError, TypeError) as exc:
+        raise PriceError(
+            "PRICE_RULESET_MISMATCH",
+            "compiled rules omit required deterministic price mechanics",
+        ) from exc
+    expected = {
+        "price_unit": "TENTHS_OF_MILLION_GBP",
+        "integer_only": True,
+        "initial_purchase_price_basis": "CURRENT_PLAYER_PRICE_AT_INITIAL_SELECTION",
+        "current_purchase_price_basis": "PRICE_PAID_FOR_CURRENT_OWNERSHIP",
+        "retained_profit_rounding": "FLOOR_TO_TENTH",
+        "change_threshold_algorithm": "UNDISCLOSED",
+    }
+    actual = {key: prices.get(key) for key in expected}
+    branch_contract = (
+        above.get("condition") == "CURRENT_ABOVE_PURCHASE"
+        and above.get("formula") == "PURCHASE_PLUS_FLOOR_HALF_PROFIT"
+        and below.get("condition") == "CURRENT_AT_OR_BELOW_PURCHASE"
+        and below.get("formula") == "CURRENT_PRICE"
+    )
+    policy = config.price_paths
+    reference_contract = (
+        policy.mechanics_authority == "DMFP-02_RULESET"
+        and policy.price_unit_reference == expected["price_unit"]
+        and policy.price_step_units_role == "RULESET_VALIDATION_REFERENCE"
+        and policy.price_step_units == 1
+    )
+    if actual != expected or not branch_contract or not reference_contract:
+        raise PriceError(
+            "PRICE_RULESET_MISMATCH",
+            "Stage-13 price references disagree with authoritative compiled rules",
+        )
+    return PriceRulesReconciliation(
+        ruleset_id=compiled.ruleset_id,
+        ruleset_version=compiled.ruleset_version,
+        ruleset_hash=compiled.ruleset_hash,
+        price_unit="TENTHS_OF_MILLION_GBP",
+        integer_only=True,
+        price_step_units=1,
+        change_threshold_algorithm="UNDISCLOSED",
+    )
 
 
 def load_price_config(path: Path | None = None) -> PriceConfig:

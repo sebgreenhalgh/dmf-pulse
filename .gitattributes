@@ -4,6 +4,9 @@
 docs/implementation/DMF_PULSE_CODEX_IMPLEMENTATION_PLAYBOOK_v1.txt whitespace=-trailing-space
 evidence/tickets/NRM-006/prior_blockers/PACK_1_0_BLOCKER.md whitespace=-blank-at-eof
 
+# Immutable official-source captures retain the provider's response bytes.
+evidence/tickets/RUL-2026-27/sources/*.html binary
+
 src/dmf_pulse/_data/zoneinfo/Europe/London binary
 *.zip binary
 *.whl binary

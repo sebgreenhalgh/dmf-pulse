@@ -1,0 +1,29 @@
+transition:
+  preseason_unlimited: true
+  late_entry_unlimited_until_first_deadline: true
+  earned_per_deadline: 1
+  free_transfer_cap: 5
+  max_transfers_per_deadline: 20
+  hit_points: -4
+  outgoing_and_incoming_same_position: true
+  club_quota_repair_required: true
+  confirmed_transfers_irreversible: true
+  confirmed_transfer_effect: "NEXT_GAMEWEEK"
+  transfer_accounting_order:
+    - "SELL_OUTGOING_AT_SELLING_PRICE"
+    - "BUY_INCOMING_AT_CURRENT_PRICE"
+    - "CONSUME_FREE_TRANSFERS"
+    - "APPLY_TRANSFER_HITS"
+    - "EARN_NEXT_DEADLINE_TRANSFER"
+    - "CAP_FREE_TRANSFERS"
+chip_interactions:
+  WILDCARD:
+    - "UNLIMITED_FREE_TRANSFERS"
+    - "REMOVE_CURRENT_GAMEWEEK_HITS"
+    - "PRESERVE_SAVED_FREE_TRANSFERS"
+  FREE_HIT:
+    - "UNLIMITED_FREE_TRANSFERS"
+    - "PRESERVE_SAVED_FREE_TRANSFERS"
+    - "RESTORE_SQUAD_BANK_AND_PURCHASE_PRICES_NEXT_DEADLINE"
+  TRIPLE_CAPTAIN: []
+  BENCH_BOOST: []

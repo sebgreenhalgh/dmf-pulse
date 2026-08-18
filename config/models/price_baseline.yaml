@@ -99,6 +99,9 @@ recurrent_pressure:
   score_cap: "50"
   threshold_interval_z: "1.281551565545"
 price_paths:
+  mechanics_authority: "DMFP-02_RULESET"
+  price_unit_reference: "TENTHS_OF_MILLION_GBP"
+  price_step_units_role: "RULESET_VALIDATION_REFERENCE"
   price_step_units: 1
   minimum_price_units: 1
   maximum_price_units: 200

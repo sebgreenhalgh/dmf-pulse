@@ -1,0 +1,42 @@
+points: 3
+input_contract: "RESOLVED_ELIGIBLE_ASSIST_COUNT"
+classification_states: ["DEFINITE_ASSIST", "DEFINITE_NO_ASSIST", "AMBIGUOUS_ASSIST"]
+ambiguous_state_allowed_for_exact_scoring: false
+eligibility_policy:
+  policy_version: "2026.1"
+  final_qualifying_attacking_touch_required: true
+  eligible_attacking_actions: ["PASS", "CROSS", "INADVERTENT_TOUCH", "SHOT", "FOUL_WON", "FORCED_OWN_GOAL_ACTION"]
+  inadvertent_touch_must_reach_scorer_directly: true
+  scorer_loses_and_regains_possession_disqualifies: true
+  tackle_or_interception_pass_requires_teammate_intent: true
+  defensive_touches:
+    inside_box: {max_defensive_touches: 1, intended_destination_required: false}
+    outside_box: {max_defensive_touches: 1, intended_destination_required: true}
+    two_or_more_touches_disqualify: true
+    defender_attempted_pass_disqualifies: true
+    woodwork_is_defensive_touch: false
+  rebounds:
+    qualifying_origins: ["SHOT", "CROSS_SHOT"]
+    qualifying_interventions: ["GOALKEEPER_SAVE", "DEFENSIVE_BLOCK", "WOODWORK"]
+    must_reach_scorer_directly: true
+    defensive_touch_after_rebound_disqualifies: true
+    scorer_own_rebound_disqualifies: true
+    multiple_save_touches_are_one_intervention: true
+    shot_must_be_on_target: false
+    obvious_pass_or_cross_is_shot: false
+  own_goals:
+    forcing_shot_or_pass_eligible: true
+    requires_identifiable_forcing_action: true
+  set_pieces:
+    foul_winner_eligible_if_directly_scored: true
+    last_attacker_before_handball_eligible_if_directly_scored: true
+    taker_who_won_foul_ineligible: true
+    handball:
+      pass_or_touch:
+        defensive_touch_before_handball_disqualifies: true
+      shot:
+        direct_shot_required: true
+        on_target_before_deflection_required: true
+        on_target_after_deflection_required: true
+    corner_or_throw_in_direct_assist: false
+  official_fpl_final_decision_controls: true

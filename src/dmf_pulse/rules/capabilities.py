@@ -232,6 +232,24 @@ def _dependency_closure(
     return tuple(paths)
 
 
+def _capability_lineage(
+    capability: RuleCapability, capabilities: CapabilitiesFile
+) -> frozenset[RuleCapability]:
+    """Return the requested capability and every governed inherited capability."""
+
+    lineage: set[RuleCapability] = set()
+
+    def visit(item: RuleCapability) -> None:
+        if item in lineage:
+            return
+        lineage.add(item)
+        for inherited in getattr(capabilities.capabilities, item.value).inherits:
+            visit(inherited)
+
+    visit(capability)
+    return frozenset(lineage)
+
+
 def compile_capability_artifact(
     compiled: CompiledRuleset, capability: RuleCapability
 ) -> CapabilityArtifact:
@@ -250,6 +268,7 @@ def compile_capability_artifact(
     interpretation_file = InterpretationsFile.model_validate(compiled.rules["interpretations"])
     decisions = {decision.decision_id: decision for decision in interpretation_file.decisions}
     dependency_paths = _dependency_closure(capability, capabilities)
+    capability_lineage = _capability_lineage(capability, capabilities)
     root = {"rules": compiled.rules}
     selected_rules: dict[str, Any] = {}
     expanded_verification: dict[str, dict[str, Any]] = {}
@@ -302,7 +321,7 @@ def compile_capability_artifact(
                         blockers.append(f"interpretation:{decision_id}:wrong_rule")
                     elif not decision.approved:
                         blockers.append(f"interpretation:{decision_id}:unapproved")
-                    elif capability not in decision.scope:
+                    elif not capability_lineage.intersection(decision.scope):
                         blockers.append(f"interpretation:{decision_id}:out_of_scope")
     blockers_tuple = tuple(sorted(set(blockers)))
     approval_only = bool(blockers_tuple) and all(

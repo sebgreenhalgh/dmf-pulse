@@ -1,3 +1,7 @@
 FULL_REPOSITORY_PYTEST = RESOURCE_LIMIT
 The single complete repository run reached the 20-minute execution ceiling without a final pytest
 summary or emitted failure trace. It was not rerun unchanged and is not reported as PASS.
+
+FINAL_MAIN_INTEGRATION_PYTEST = RESOURCE_LIMIT
+The single post-integration repository run reached the 1204-second command ceiling without a final
+pytest summary or emitted failure trace. It was not rerun unchanged and is not reported as PASS.

@@ -1,0 +1,38 @@
+appearance:
+  min_minutes_for_any_points: 1
+  stoppage_time_included: false
+  bands:
+    - {id: "SHORT", min_inclusive: 1, max_exclusive: 60, points: 1}
+    - {id: "LONG", min_inclusive: 60, max_exclusive: null, points: 2}
+  combination: "HIGHEST_MATCHING_ONLY"
+goals:
+  points_by_position: {GK: 10, DEF: 6, MID: 5, FWD: 4}
+assists: {points: 3}
+clean_sheets:
+  points_by_position: {GK: 4, DEF: 4, MID: 1, FWD: 0}
+  min_minutes_inclusive: 60
+  evaluate_goals_while_player_eligible: true
+  retain_after_normal_substitution: true
+  continue_goals_after_dismissal: true
+goals_conceded:
+  positions: ["GK", "DEF"]
+  goals_per_deduction: 2
+  points_per_group: -1
+goalkeeper_saves: {saves_per_point: 3, points_per_group: 1, cap_per_fixture: null}
+penalties: {save_points: 5, miss_points: -2, shootout_eligible: false}
+cards: {yellow_points: -1, red_points: -3}
+own_goals: {points: -2}
+defensive_contributions:
+  scope: "PER_FIXTURE"
+  by_position:
+    GK: {enabled: false, event_types: [], threshold: null, points: 0, max_points: 0}
+    DEF: {enabled: true, event_types: ["CLEARANCE", "BLOCK", "INTERCEPTION", "TACKLE"], threshold: 10, points: 2, max_points: 2}
+    MID: {enabled: true, event_types: ["CLEARANCE", "BLOCK", "INTERCEPTION", "TACKLE", "BALL_RECOVERY"], threshold: 12, points: 2, max_points: 2}
+    FWD: {enabled: true, event_types: ["CLEARANCE", "BLOCK", "INTERCEPTION", "TACKLE", "BALL_RECOVERY"], threshold: 12, points: 2, max_points: 2}
+participation:
+  fixture_scope: true
+  appearance_eligibility: "OFFICIAL_MINUTES_GREATER_THAN_ZERO"
+  bonus_eligibility: "OFFICIAL_MINUTES_GREATER_THAN_ZERO"
+  minute_basis: "OFFICIAL_MINUTES_EXCLUDING_STOPPAGE_TIME"
+  position_basis: "TARGET_SEASON_FPL_POSITION"
+  reject_unmapped_position: true

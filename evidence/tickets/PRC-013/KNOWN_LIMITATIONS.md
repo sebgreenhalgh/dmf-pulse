@@ -2,7 +2,9 @@
 
 - No approved target-season event history exists, so no real 2026/27 performance or calibration
   claim is made.
-- The provider algorithm, threshold and update timing remain undisclosed; threshold distance is
+- The provider algorithm and exact threshold calculation remain undisclosed. Official 2026/27
+  evidence now establishes daily 00:00 UK changes and a 15-minute predictor-page refresh, but
+  Stage-13 opportunity counts remain provisional model policy. Threshold distance is
   model-inferred latent-pressure distance, never effective transfers remaining.
 - External predictors have observation/rights/availability contracts only. Automated capture and
   scraping are absent and rights-blocked.
@@ -16,3 +18,5 @@
 - Windows Application Control blocked the generated `dmf.exe` launcher under the temporary clean
   environment. The installed wheel import and identical Typer application entry point passed from
   that environment with no repository `PYTHONPATH`.
+- The post-integration complete repository pytest attempt also reached the 1204-second ceiling
+  without a final summary or emitted failure trace. Its status is `RESOURCE_LIMIT`, not `PASS`.

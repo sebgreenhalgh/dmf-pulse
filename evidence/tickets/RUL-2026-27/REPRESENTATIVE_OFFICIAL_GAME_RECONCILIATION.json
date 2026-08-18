@@ -1,0 +1,14 @@
+{
+  "checked_at": "2026-08-17T23:42:00Z",
+  "completed_target_season_matches": 0,
+  "official_bootstrap_sha256": "faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7",
+  "official_state": {
+    "all_events_data_checked": false,
+    "all_events_finished": false,
+    "first_gameweek_deadline_utc": "2026-08-21T17:30:00Z"
+  },
+  "production_activation_blocker": true,
+  "reason": "No 2026/27 Premier League fixture has completed; representative official FPL scoring output does not yet exist.",
+  "status": "TEMPORARILY_UNAVAILABLE",
+  "waived": false
+}

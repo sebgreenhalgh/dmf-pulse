@@ -8,6 +8,9 @@ implementer_role: "GPT-5.6 Pro primary implementation engineer"
 reviewer_role: "GPT-5.6 Sol independent reviewer (completed)"
 required_base_branch: "main"
 required_base_commit: "ce7fe8f4354d95a477afcf6eed45f63cf0ab772e"
+reviewed_pre_integration_commit: "b0e3b0724b92ec2d483191f0329c0c38ae8a9e08"
+integrated_main_commit: "9eb57143f6ee92f67c78607cc386678d962e62d4"
+integration_method: "EXPLICIT_MERGE_COMMIT"
 implementation_branch: "stage/A13/PRC-013-price-prediction"
 pull_request: 12
 objective: >-
@@ -43,5 +46,6 @@ acceptance:
   human_acceptance: false
   independent_review_complete: true
   full_repository_pytest: >-
-    RESOURCE_LIMIT — the single complete run reached the 20-minute execution ceiling without a
-    final pytest summary or emitted failure trace
+    RESOURCE_LIMIT — both the independently reviewed and post-main-integration bounded attempts
+    reached their 20-minute execution ceilings without a final pytest summary or emitted failure
+    trace; neither is reported as PASS

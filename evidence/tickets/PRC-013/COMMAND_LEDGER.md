@@ -48,3 +48,48 @@ workspace-contained base temp because the sandbox cannot enumerate the default p
     - PASS; remediation commit `1ebbbde0e80829c8c3c23a676c814a2f80487371` was pushed normally,
       local and remote HEAD matched, and draft PR #12 was opened against `main`. The PR remains
       unmerged and human acceptance remains false.
+
+## Final main integration
+
+17. Cleared stale `GH_TOKEN`/`GITHUB_TOKEN` process overrides, then ran
+    `gh auth status -h github.com` and `gh api user --jq .login`.
+    - PASS; host-keyring identity `sebgreenhalgh` authenticated.
+18. `git fetch --all --prune`, exact remote SHA checks and local backup-ref creation.
+    - PASS; remote Stage-13 HEAD `b0e3b0724b92ec2d483191f0329c0c38ae8a9e08`, remote
+      `main` `9eb57143f6ee92f67c78607cc386678d962e62d4`, and
+      `backup/stage13-pre-main-integration` preserved at the reviewed HEAD.
+19. `git merge --no-ff --no-commit origin/main`.
+    - One conflict: `PLANS.md`; resolved semantically by retaining both complete histories. All
+      other current-main rules, engine, evidence and allowlist changes merged cleanly.
+20. Integration smoke over the new price/rules contract and directly changed configuration and
+    observation tests.
+    - PASS; 28 tests in 1.49 seconds.
+21. Complete Stage-13 unit/property/contract/golden/integration/replay/performance suite with
+    branch coverage over `dmf_pulse.prices` and `dmf_pulse.cli.prices` and
+    `--cov-fail-under=90`.
+    - PASS; 116 tests in 14.92 seconds, 90.56% branch-aware coverage.
+22. Exact preserved 17-node inherited command recorded in `TARGETED_REGRESSION_SCOPE.txt`.
+    - PASS; 17 tests in 1.12 seconds.
+23. Current-main dependency command over the six exact rule/schema/lifecycle/Stage-11 selectors
+    recorded in `TARGETED_REGRESSION_SCOPE.txt`.
+    - PASS; 104 tests in 5.50 seconds.
+24. Post-integration complete repository command:
+    `.venv/Scripts/python.exe -m pytest -q -p no:cacheprovider
+    --basetemp=review_pack/prc013-main-integration-full-repository`.
+    - RESOURCE_LIMIT; one run reached the 1204-second command ceiling without a final pytest
+      summary or emitted failure trace. It was not rerun unchanged and is not PASS.
+25. `uv sync --all-groups --frozen`, Ruff format/lint and strict mypy.
+    - PASS; 40 packages checked, 539 files formatted, lint clean and 209 source files typed.
+26. `uv run python -m build` plus ZIP/member/hash checks.
+    - PASS; wheel and sdist hashes are recorded in `BUILD_WHEEL_RESULT.md`.
+27. New external Python 3.13 environment, integrated wheel install and installed Typer entrypoint
+    for version, current-rules show, price validation, path simulation and ACT/WAIT.
+    - PASS; 23 packages installed outside the repository with `PYTHONPATH` removed. Exact results
+      are recorded in `CLI_ACCEPTANCE.md`.
+28. `uv run python scripts/generate_repository_manifest.py --ticket PRC-013`.
+    - PASS; 1021 deliverable files recorded from the integrated tree.
+29. `uv run python scripts/validate_repository.py` and
+    `uv run python scripts/scan_secrets.py`.
+    - PASS; zero repository errors and zero unallowlisted secret findings.
+30. `git diff --check` and unmerged-path inspection.
+    - PASS; no whitespace errors and no unresolved merge entries.
