@@ -15,6 +15,7 @@ from dmf_pulse.prices.configuration import PriceConfig, load_price_config
 from dmf_pulse.prices.latent_pressure import initial_latent_pressure
 from dmf_pulse.prices.models import (
     ChipContaminationState,
+    CompetingLogitArtifact,
     EarlyTransferAction,
     EarlyTransferAlternative,
     FeatureValue,
@@ -136,7 +137,11 @@ def vector(
 
 
 @lru_cache
-def fitted_model():
+def fitted_model() -> CompetingLogitArtifact:
+    return fitted_model_for_config(config())
+
+
+def fitted_model_for_config(price_config: PriceConfig) -> CompetingLogitArtifact:
     events = (
         PriceEvent.FALL,
         PriceEvent.NO_CHANGE,
@@ -162,7 +167,7 @@ def fitted_model():
     return fit_competing_logit(
         examples,
         training_cutoff=BASE - timedelta(days=3),
-        config=config(),
+        config=price_config,
     )
 
 

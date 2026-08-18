@@ -8,7 +8,11 @@ import pytest
 
 from dmf_pulse.evaluation.artifacts import verify_sealed
 from dmf_pulse.evaluation.models import DatasetMode
-from dmf_pulse.prices.artifacts import load_price_artifact, persist_price_artifact
+from dmf_pulse.prices.artifacts import (
+    load_price_artifact,
+    persist_price_artifact,
+    seal_projection,
+)
 from dmf_pulse.prices.configuration import load_price_config
 from dmf_pulse.prices.early_transfer import evaluate_act_now_vs_wait
 from dmf_pulse.prices.evaluation import evaluate_price_forecasts
@@ -24,6 +28,7 @@ from dmf_pulse.prices.models import (
 from dmf_pulse.prices.service import PriceService
 from tests.prices_helpers import (
     BASE,
+    ZERO,
     alternative,
     config,
     fitted_model,
@@ -88,9 +93,20 @@ def test_act_wait_uses_complete_utility_not_probability_threshold() -> None:
 
 
 def test_live_mode_fails_closed_even_when_act_has_highest_utility() -> None:
+    base_projection = projection()
+    live_projection = seal_projection(
+        base_projection.model_copy(
+            update={
+                "lineage": base_projection.lineage.model_copy(
+                    update={"dataset_mode": DatasetMode.LIVE_OBSERVED}
+                ),
+                "projection_sha256": ZERO,
+            }
+        )
+    )
     decision = evaluate_act_now_vs_wait(
         _alternatives(act="20", wait="1"),
-        projection=projection(),
+        projection=live_projection,
         dataset_mode=DatasetMode.LIVE_OBSERVED,
         config=config(),
     )
@@ -114,7 +130,7 @@ def test_price_only_hit_false_alarm_does_not_force_act_now() -> None:
     decision = evaluate_act_now_vs_wait(
         alternatives,
         projection=projection(),
-        dataset_mode=DatasetMode.COUNTERFACTUAL,
+        dataset_mode=DatasetMode.RECONSTRUCTED,
         config=config(),
     )
     assert decision.recommended_action is EarlyTransferAction.WAIT_FOR_INFORMATION
@@ -151,9 +167,11 @@ def test_stage12_price_scorecard_includes_probability_distribution_and_regret() 
         probability_epsilon=config().evaluation.probability_epsilon,
     )
     assert report.row_count == 3
+    assert report.price_horizon == "24h"
     assert report.multiclass_brier >= 0
     assert report.rise_precision == Decimal(1)
     assert report.fall_recall == Decimal(1)
+    assert report.no_change_calibration_status
     assert report.mean_decision_regret == Decimal(3)
     assert len(report.stage12_metric_lineage) == 4
 
@@ -172,6 +190,14 @@ def test_evaluation_rejects_future_labels_and_nonchronological_rows() -> None:
         evaluate_price_forecasts(
             (first,),
             evaluation_cutoff=BASE,
+            alert_probability=config().evaluation.alert_probability,
+            probability_epsilon=config().evaluation.probability_epsilon,
+        )
+    mixed_horizon = second.model_copy(update={"horizon": "7d"})
+    with pytest.raises(ValueError, match="mix forecast horizons"):
+        evaluate_price_forecasts(
+            (first, mixed_horizon),
+            evaluation_cutoff=BASE + timedelta(days=3),
             alert_probability=config().evaluation.alert_probability,
             probability_epsilon=config().evaluation.probability_epsilon,
         )
@@ -215,3 +241,6 @@ def test_configuration_and_validation_declare_p0_p1_p2_and_block_production() ->
     assert report.challenger_status.value == "DEPENDENCY_NOT_APPROVED"
     assert report.production_actionable is False
     assert report.automated_provider_capture is False
+    assert report.configuration_role == "POLICY_CONFIGURATION"
+    assert report.parameter_status == "PROVISIONAL_MODEL_PARAMETER"
+    assert report.evidence_status == "SYNTHETIC_REFERENCE"

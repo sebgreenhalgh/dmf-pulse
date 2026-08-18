@@ -169,6 +169,9 @@ class PriceEvaluationPolicy(PriceModel):
 class PriceConfig(PriceModel):
     schema_version: Literal["price-config-v1"] = "price-config-v1"
     configuration_id: StrictStr
+    configuration_role: Literal["POLICY_CONFIGURATION"]
+    parameter_status: Literal["PROVISIONAL_MODEL_PARAMETER"]
+    evidence_status: Literal["SYNTHETIC_REFERENCE"]
     transfer_features: TransferFeaturePolicy
     update_cycles: UpdateCyclePolicy
     competing_logit: CompetingLogitPolicy

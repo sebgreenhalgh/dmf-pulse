@@ -188,7 +188,6 @@ def build_transfer_flow_features(
             tuple(item for item in observations if item.player_id == player_id),
             "input snapshots were not supplied in chronological canonical order",
         )
-    deduplicated: list[PriceObservation] = []
     seen_payload_hashes: set[str] = set()
     for item in eligible:
         if item.payload_hash in seen_payload_hashes:
@@ -196,12 +195,10 @@ def build_transfer_flow_features(
                 anomalies,
                 FlowAnomalyKind.DUPLICATE_SNAPSHOT,
                 (item,),
-                "semantic duplicate ignored for interval construction",
+                "repeated identical payload retained because observation time is informative",
             )
-            continue
         seen_payload_hashes.add(item.payload_hash)
-        deduplicated.append(item)
-    canonical = tuple(deduplicated)
+    canonical = eligible
     if len(canonical) < 2:
         if canonical:
             _append_anomaly(

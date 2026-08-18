@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from dmf_pulse.evaluation.artifacts import semantic_sha256
+from dmf_pulse.evaluation.artifacts import semantic_sha256, verify_sealed
 from dmf_pulse.evaluation.models import DatasetMode
 from dmf_pulse.prices.artifacts import seal_early_transfer_decision
-from dmf_pulse.prices.configuration import PriceConfig
+from dmf_pulse.prices.configuration import PriceConfig, price_config_sha256
 from dmf_pulse.prices.models import (
     EarlyTransferAction,
     EarlyTransferAlternative,
@@ -23,6 +23,13 @@ def evaluate_act_now_vs_wait(
 ) -> EarlyTransferDecision:
     """Select by complete utility; P(rise) is lineage context, never a decision rule."""
 
+    verify_sealed(projection, "projection_sha256")
+    if dataset_mode is not projection.lineage.dataset_mode:
+        raise ValueError("ACT/WAIT dataset mode differs from its sealed price projection")
+    if projection.lineage.configuration_sha256 != price_config_sha256(config):
+        raise ValueError("ACT/WAIT price projection differs from the active configuration")
+    if projection.activation_statuses != config.activation.production_statuses:
+        raise ValueError("ACT/WAIT projection activation status differs from active policy")
     if not alternatives:
         raise ValueError("ACT/WAIT evaluation requires alternatives")
     keys = tuple((item.action, item.route_id) for item in alternatives)

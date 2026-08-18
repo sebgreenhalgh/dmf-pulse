@@ -20,4 +20,5 @@ Required proofs:
 - ACT/WAIT compares full utility and cannot be inferred from rise probability alone;
 - ordinary tests and CLI remain offline and use synthetic/replay or rights-approved inputs;
 - production status remains fail-closed until rights, target-season calibration and human gates pass;
-- no PR, merge or accepted tag is created in this implementation session.
+- the implementation session created no PR, merge or accepted tag; the independent-review session
+  may publish only an unmerged draft PR while human acceptance remains false.

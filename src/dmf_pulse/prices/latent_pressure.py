@@ -126,6 +126,9 @@ def transition_after_price_event(
 
     if event not in {PriceEvent.FALL, PriceEvent.NO_CHANGE, PriceEvent.RISE}:
         raise ValueError("simulated state requires a modeled event")
+    as_of = require_utc(as_of, field_name="as_of")
+    if as_of < previous.as_of:
+        raise ValueError("recurrent price state cannot move backward in time")
     policy = config.recurrent_pressure
     rise = previous.rise_pressure * policy.persistence
     fall = previous.fall_pressure * policy.persistence
@@ -138,7 +141,7 @@ def transition_after_price_event(
     return LatentPressureState(
         state_id=state_id,
         player_id=previous.player_id,
-        as_of=require_utc(as_of, field_name="as_of"),
+        as_of=as_of,
         rise_pressure=rise,
         fall_pressure=fall,
         uncertainty=previous.uncertainty,

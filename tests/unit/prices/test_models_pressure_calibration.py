@@ -6,6 +6,7 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
+from dmf_pulse.evaluation.artifacts import seal
 from dmf_pulse.evaluation.models import CalibrationArtifact, DatasetMode
 from dmf_pulse.prices.artifacts import seal_price_calibration
 from dmf_pulse.prices.calibration import apply_price_calibration, fit_price_calibration
@@ -223,14 +224,17 @@ def test_recurrent_transition_rejects_unmodeled_event_and_time_reversal() -> Non
 
 
 def _binary_calibrator(method: str, parameters: dict[str, Decimal]) -> CalibrationArtifact:
-    return CalibrationArtifact(
-        calibration_id=f"binary-{method.lower()}",
-        method=method,
-        training_cutoff=BASE,
-        training_record_ids=("row",),
-        excluded_outer_origin_ids=(),
-        parameters=parameters,
-        artifact_sha256=ZERO,
+    return seal(
+        CalibrationArtifact(
+            calibration_id=f"binary-{method.lower()}",
+            method=method,
+            training_cutoff=BASE,
+            training_record_ids=("row",),
+            excluded_outer_origin_ids=(),
+            parameters=parameters,
+            artifact_sha256=ZERO,
+        ),
+        "artifact_sha256",
     )
 
 

@@ -30,7 +30,7 @@ from tests.prices_helpers import (
     ZERO,
     alternative,
     config,
-    fitted_model,
+    fitted_model_for_config,
     flow_context,
     observation,
 )
@@ -51,6 +51,7 @@ def _small_config():
 
 
 def test_synthetic_observation_to_decision_and_scorecard_vertical_slice() -> None:
+    price_config = _small_config()
     observations = (
         observation("flow-0", hour=0, transfers_in_total=1000, transfers_out_total=500),
         observation("flow-1", hour=2, transfers_in_total=1400, transfers_out_total=550),
@@ -63,33 +64,33 @@ def test_synthetic_observation_to_decision_and_scorecard_vertical_slice() -> Non
         cutoff=cutoff,
         dataset_mode=DatasetMode.RECONSTRUCTED,
         context=flow_context(),
-        config=_small_config(),
+        config=price_config,
     )
     initial = initial_latent_pressure(
         state_id="initial",
         player_id="player-1",
         as_of=BASE,
-        config=_small_config(),
+        config=price_config,
     )
     pressure = update_latent_pressure(
         initial,
         features,
         state_id="after-flow",
-        config=_small_config(),
+        config=price_config,
     )
-    vector = transfer_features_to_vector(features, pressure=pressure, config=_small_config())
+    vector = transfer_features_to_vector(features, pressure=pressure, config=price_config)
     projection = predict_price(
         player_id="player-1",
         current_price_units=75,
         feature_vector=vector,
-        model=fitted_model(),
+        model=fitted_model_for_config(price_config),
         pressure_state=pressure,
         source_observation_ids=tuple(item.observation_id for item in observations),
         source_semantic_hashes=tuple(item.semantic_hash for item in observations),
         ruleset_id="synthetic-rules",
         ruleset_hash=ZERO,
         dataset_mode=DatasetMode.RECONSTRUCTED,
-        config=_small_config(),
+        config=price_config,
     )
     assert projection.price_pmf_7d.expected_price_units == projection.expected_price_7d
     assert ActivationStatus.SHADOW_ONLY in projection.activation_statuses
@@ -113,7 +114,7 @@ def test_synthetic_observation_to_decision_and_scorecard_vertical_slice() -> Non
         ),
         projection=projection,
         dataset_mode=DatasetMode.RECONSTRUCTED,
-        config=_small_config(),
+        config=price_config,
     )
     assert decision.recommended_action is EarlyTransferAction.WAIT_FOR_INFORMATION
     report = evaluate_price_forecasts(
@@ -136,8 +137,8 @@ def test_synthetic_observation_to_decision_and_scorecard_vertical_slice() -> Non
             ),
         ),
         evaluation_cutoff=cutoff + timedelta(days=1),
-        alert_probability=_small_config().evaluation.alert_probability,
-        probability_epsilon=_small_config().evaluation.probability_epsilon,
+        alert_probability=price_config.evaluation.alert_probability,
+        probability_epsilon=price_config.evaluation.probability_epsilon,
     )
     assert report.row_count == 1
     assert report.mean_decision_regret == Decimal(1)

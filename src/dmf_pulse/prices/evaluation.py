@@ -73,6 +73,9 @@ def evaluate_price_forecasts(
     canonical = tuple(sorted(rows, key=lambda row: (row.forecast_origin, row.row_id)))
     if rows != canonical:
         raise ValueError("price evaluation rows must be chronologically ordered")
+    horizons = {row.horizon for row in rows}
+    if len(horizons) != 1:
+        raise ValueError("one price evaluation report cannot mix forecast horizons")
     if any(row.label_available_at > evaluation_cutoff for row in rows):
         raise ValueError("evaluation cutoff precedes one or more outcome labels")
     vectors = tuple(
@@ -129,6 +132,10 @@ def evaluate_price_forecasts(
         tuple(row.probabilities.probability_fall for row in rows),
         tuple(int(row.observed_event is PriceEvent.FALL) for row in rows),
     )
+    no_change_calibration = calibration_intercept_slope(
+        tuple(row.probabilities.probability_no_change for row in rows),
+        tuple(int(row.observed_event is PriceEvent.NO_CHANGE) for row in rows),
+    )
     regrets = tuple(
         calculate_decision_regret(
             decision_id=row.row_id,
@@ -143,6 +150,7 @@ def evaluate_price_forecasts(
     fall_precision, fall_recall = _precision_recall(rows, PriceEvent.FALL)
     return PriceEvaluationReport(
         row_count=len(rows),
+        price_horizon=rows[0].horizon,
         multiclass_log_loss=multiclass.log_loss,
         multiclass_brier=multiclass.brier_score,
         rise_precision=rise_precision,
@@ -158,6 +166,9 @@ def evaluate_price_forecasts(
         fall_calibration_status=fall_calibration.status,
         fall_calibration_intercept=fall_calibration.intercept,
         fall_calibration_slope=fall_calibration.slope,
+        no_change_calibration_status=no_change_calibration.status,
+        no_change_calibration_intercept=no_change_calibration.intercept,
+        no_change_calibration_slope=no_change_calibration.slope,
         mean_ranked_probability_score=sum(
             (item.ranked_probability_score for item in distribution_scores), Decimal(0)
         )

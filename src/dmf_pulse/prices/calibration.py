@@ -114,6 +114,8 @@ def apply_price_calibration(
     artifact: PriceCalibrationArtifact,
 ) -> PriceProbabilityVector:
     verify_sealed(artifact, "artifact_sha256")
+    for nested in (artifact.fall, artifact.no_change, artifact.rise):
+        verify_sealed(nested, "artifact_sha256")
     values = (
         _apply_binary(
             probabilities.probability_fall,

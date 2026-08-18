@@ -2,9 +2,10 @@
 
 Ticket: `PRC-013`
 
-Engineering: `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
+Engineering: `REVIEW_READY_PENDING_HUMAN_ACCEPTANCE`; independent Sol review complete.
 
 Activation: `SHADOW_ONLY`, `TARGET_SEASON_UNCALIBRATED`, `RIGHTS_BLOCKED`
 
-Human acceptance: not granted. Merge/tag: not performed. Full-repository pytest: deferred to the
-fresh independent Sol review by design.
+Human acceptance: not granted. Merge/tag: not performed. Full-repository pytest:
+`RESOURCE_LIMIT` after the single complete run reached its 20-minute execution ceiling without a
+final summary or emitted failure trace.

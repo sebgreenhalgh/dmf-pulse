@@ -3,12 +3,13 @@
 Canonical command `uv run python -m build`: **PASS**.
 
 - Wheel: `dmf_pulse-0.2.0-py3-none-any.whl`
-- Size: 683800 bytes
-- SHA-256: `b8a2fa4d97476f2361140a9e5a428ba246d58e14b599b8fe6da2673b557fc52a`
+- Size: 687335 bytes
+- SHA-256: `517ab108cebfdf2d65e88c3a0c002cc77800dd281ee4fb09410b53e65e985a60`
 - Wheel ZIP integrity: PASS; 249 members.
-- Required installed members present: packaged price YAML, price service and price CLI.
-- Sdist also built successfully.
+- Sdist: 3435828 bytes; SHA-256
+  `1d816e574fbb63914c711b4bf05a0c9831d12bb55eafbdc96cd6524efedb97d1`.
+- Required installed members present: packaged price YAML, service and CLI.
 
-The wheel was installed into a new Python 3.13 environment at
-`C:\Users\sebgr\Documents\dmf-pulse-prc013-wheel-20260818`, outside the source tree.
-Installed `dmf --version` returned `dmf 0.2.0`; no source-tree import was used.
+The wheel was installed into a new Python 3.13 environment under the operating-system temp root,
+outside the source tree. It installed 23 packages and imported `dmf_pulse` from that environment's
+`site-packages`; no source-tree import or `PYTHONPATH` was used.

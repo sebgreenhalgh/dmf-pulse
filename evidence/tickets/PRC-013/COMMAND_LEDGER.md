@@ -1,32 +1,48 @@
-# PRC-013 command ledger
+# PRC-013 independent-review command ledger
 
-All commands ran from the repository root on Windows PowerShell with Python 3.13.9. Pytest used a
-workspace-contained base temp because the sandbox cannot enumerate the user's default pytest temp.
+Commands ran from the repository root on Windows PowerShell with Python 3.13.9. Pytest used a
+workspace-contained base temp because the sandbox cannot enumerate the default pytest temp.
 
-1. `uv sync --all-groups --frozen`
+1. Corrected lineage gate: `git fetch --all --prune`, remote/head/parent/tree/diff checks.
+   - PASS; remote baseline `a2fdeea7b6514cb8f37b2f687d892998a1422973`, direct parent
+     `ce7fe8f4354d95a477afcf6eed45f63cf0ab772e`; price package present; recovery material absent.
+2. Focused red review regressions before remediation.
+   - Expected red state observed: 11 independent-review failures exposed the initial defects.
+3. Final Stage-13 coverage command over unit/property/contract/golden/integration/replay/performance
+   price scopes with `--cov-branch --cov-fail-under=90`.
+   - PASS; 112 tests, 90.57% branch-aware coverage.
+4. Targeted inherited command listing the 17 nodes in `TARGETED_REGRESSION_SCOPE.txt`.
+   - PASS; 17 tests in 1.29 seconds.
+5. Complete repository command:
+   `.venv/Scripts/python.exe -m pytest -q -p no:cacheprovider
+   --basetemp=review_pack/prc013-sol-full-repository`.
+   - RESOURCE_LIMIT; the single complete run reached the 20-minute execution ceiling without a
+     final summary or emitted failure trace. It was not rerun unchanged.
+6. `uv sync --all-groups --frozen`.
    - PASS; 40 packages checked; no lock mutation.
-2. `uv run ruff format --check <Stage-13 production, CLI, tests, pack script>`
-   - PASS; 40 files already formatted after the pack script was formatted once.
-3. `uv run ruff check <same scope>`
-   - PASS.
-4. `uv run mypy src/dmf_pulse/prices src/dmf_pulse/cli/prices.py src/dmf_pulse/cli/app.py`
-   - PASS; no issues in 23 source files.
-5. `uv run pytest -q -p no:cacheprovider --basetemp=review_pack/prc013-final-coverage-20260818 tests/unit/prices tests/property/prices tests/contract/prices tests/golden/prices tests/integration/prices tests/replay/prices tests/performance/prices --cov=dmf_pulse.prices --cov=dmf_pulse.cli.prices --cov-branch --cov-report=term --cov-report=json:evidence/tickets/PRC-013/coverage.json --cov-fail-under=90`
-   - PASS; 88 passed; 91.44% branch-aware coverage.
-6. Targeted inherited pytest command listing the 17 nodes recorded in
-   `TARGETED_REGRESSION_SCOPE.txt`.
-   - PASS; 17 passed in 0.88s.
-7. `uv run python -m build`
-   - PASS; canonical sdist and wheel built once.
-8. Clean external venv: `uv venv --python 3.13 <external-dir>` then
-   `uv pip install --python <external-python> dist/dmf_pulse-0.2.0-py3-none-any.whl`.
-   - PASS; installed 23 packages including `dmf-pulse==0.2.0` from the local wheel.
-9. External installed commands `dmf --version`, `dmf prices validate`, and
-   `dmf prices simulate-path --input <absolute synthetic fixture>`.
-   - PASS; version 0.2.0, fail-closed validation, 2187 paths.
-10. Read-only first-party repository validation against the refreshed PRC-013 manifest.
+7. `uv run ruff format --check .` and `uv run ruff check .`.
+   - PASS; 533 files formatted, lint clean.
+8. `uv run mypy src/dmf_pulse`.
+   - PASS; no issues in 208 source files.
+9. `uv run python -m build`.
+   - PASS; canonical Hatchling sdist and wheel built.
+10. Clean external venv: `uv venv --python 3.13 <external-dir>` then
+    `uv pip install --python <external-python> dist/dmf_pulse-0.2.0-py3-none-any.whl`.
+    - PASS; installed 23 packages including `dmf-pulse==0.2.0`; import resolved to external
+      `site-packages` with repository `PYTHONPATH` removed.
+11. Installed application version/help/validation/simulation through the wheel's Typer entry point.
+    - PASS WITH ENVIRONMENT LIMITATION; `dmf 0.2.0`, ten price commands present, fail-closed
+      validation, 2187 paths. Windows Application Control blocked the generated temp `dmf.exe`, so
+      the same entry point ran through the external environment's Python process.
+12. `uv run python scripts/generate_repository_manifest.py --ticket PRC-013`.
+    - PASS; 997 deliverable files recorded.
+13. `uv run python scripts/validate_repository.py`.
     - PASS; zero errors.
-11. `.venv/Scripts/python.exe scripts/scan_secrets.py`.
+14. `uv run python scripts/scan_secrets.py`.
     - PASS; zero unallowlisted findings.
-
-Full repository pytest was not run by design and is deferred to independent Sol review.
+15. `git diff --check`, worktree inventory, recovery/archive absence, package-resource equivalence
+    and complete base-to-head scope review.
+    - PASS; only intended Stage-13 remediation/evidence files are pending commit, packaged and root
+      price configurations are byte-identical, and no recovery/archive material is present.
+16. GitHub publication commands follow the final review commit; the draft PR remains unmerged and
+    human acceptance remains false.

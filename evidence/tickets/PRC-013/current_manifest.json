@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 69931,
+      "bytes": 70910,
       "path": "PLANS.md",
-      "sha256": "1f6489e6c49e3894979367781c1960917748446034f28cd01e0aa7e712e31c78"
+      "sha256": "c70f6737769e03a2191eeead2cb9163603c06b5c4727eb6928e5728d423787dd"
     },
     {
       "bytes": 2761,
@@ -256,9 +256,9 @@
       "sha256": "14107f715769abb2d1bfc2937753c820a7d3eb02c23ae8e8a76350eaa88c0454"
     },
     {
-      "bytes": 3875,
+      "bytes": 4005,
       "path": "config/models/price_baseline.yaml",
-      "sha256": "86682300e61d15d667076948cc2881d94b30e673b2595bb7d47b1263df2782fb"
+      "sha256": "47bca916a27ddfb5bfd1bebf51b0239f6aa1fa224208df8e021f667a1630fd22"
     },
     {
       "bytes": 1007,
@@ -461,9 +461,9 @@
       "sha256": "7c0a88b972491bed0fd390635a6494f9bcf4c846a212dafed8b793f6aafc5823"
     },
     {
-      "bytes": 305,
+      "bytes": 419,
       "path": "evidence/stages/13/STATUS.md",
-      "sha256": "2c481dcf56941bb591e3dae76a75dc2b986008c4d03a8898636fe6d53a27fff3"
+      "sha256": "ca8dd0ca77c8537cf41da827bc9410c952d152acd78d34a39306ffe1e93d36b7"
     },
     {
       "bytes": 281,
@@ -1491,9 +1491,9 @@
       "sha256": "79bd367564e94979d367860821a50a8d8db02257bd76835048ca63cc37ff8cbb"
     },
     {
-      "bytes": 2681,
+      "bytes": 3198,
       "path": "fixtures/prices/adversarial_cases.json",
-      "sha256": "0a5abfae9660e3b322cea16506f4696feb5bd350fc3b867df63321a1ae93c8bc"
+      "sha256": "8da5ca77ddb8643b7467ecf2da4a04738e7c32ac3c27859ba7edb2566821136b"
     },
     {
       "bytes": 734,
@@ -3296,9 +3296,9 @@
       "sha256": "6413d4b637fcf7c6e2595605992cc0d21b1de68d5b003d76115adf707c5d0154"
     },
     {
-      "bytes": 2319,
+      "bytes": 2429,
       "path": "src/dmf_pulse/prices/artifacts.py",
-      "sha256": "3eabdfbac0bb11f34d402c0e0a17fd8261a7c8f30912eb814c45c2bea3c07d00"
+      "sha256": "4c94d4734222fecde039d6e3b20ee61f30d7da9d034324abc686c5ca44f85806"
     },
     {
       "bytes": 449,
@@ -3306,9 +3306,9 @@
       "sha256": "7f32ccecb97344cb644fab92fd221b2d6c5aed00d23e1b2b21cb653a999644f5"
     },
     {
-      "bytes": 4922,
+      "bytes": 5041,
       "path": "src/dmf_pulse/prices/calibration.py",
-      "sha256": "d6b3f589f69293ecffc65af3d4d2a07b7f9b8dff9d0f15e8169c379c685e23eb"
+      "sha256": "e6137f8dd4417103ae392a22fe03638c1f5dd866e2f388eb431b8fd45350e6df"
     },
     {
       "bytes": 7754,
@@ -3316,14 +3316,14 @@
       "sha256": "2523084a165d4131d9183830dbc61756cce3248a98010f87dde695019c6cb577"
     },
     {
-      "bytes": 9710,
+      "bytes": 9879,
       "path": "src/dmf_pulse/prices/configuration.py",
-      "sha256": "20341aece074f3ecbb6b8b82dabc5feda8db29190250488d377f3985568cac62"
+      "sha256": "2542b97789ffc4f7e23cc46cf7946c6b68fbecd71d2159143b756e87d7511e26"
     },
     {
-      "bytes": 3221,
+      "bytes": 3803,
       "path": "src/dmf_pulse/prices/early_transfer.py",
-      "sha256": "842d9651d4c206d7ab52cb0b50f3d0f105e685cd7f82ec407451451f7eb93f58"
+      "sha256": "619406281ac161c27dcc9b9e31e14cc0aebc30a147512f9eba7451fe4d65939f"
     },
     {
       "bytes": 750,
@@ -3331,19 +3331,19 @@
       "sha256": "68b63f60e403e0a0d612b7d7b7034366bee43facf96b5b5c04aeb87b837322d0"
     },
     {
-      "bytes": 7350,
+      "bytes": 7966,
       "path": "src/dmf_pulse/prices/evaluation.py",
-      "sha256": "35afc92975007b7af84d584ff5835a20cd3095cee6db1d1efad6432e4f2d3872"
+      "sha256": "ca0c37d53b1c5f300cce85053be02a354801d9addccf763a235a908982ca519b"
     },
     {
-      "bytes": 6035,
+      "bytes": 6163,
       "path": "src/dmf_pulse/prices/latent_pressure.py",
-      "sha256": "5ef1572310da5014db773080cb14d66225d9fd3af6d337405049f56f95f1d268"
+      "sha256": "ac799afad804ec2719c21589f2c036ed083dc96b3095c91c53e390a797ba2f49"
     },
     {
-      "bytes": 39407,
+      "bytes": 48345,
       "path": "src/dmf_pulse/prices/models.py",
-      "sha256": "9e05b98fe4b152cfb9c77911f8a6c36cdcfb70f11d5efc7463b0e3e41995996f"
+      "sha256": "505fb069842e82f31dbf0187abbd008d0d95b94faab3c9957b344caa38402bb8"
     },
     {
       "bytes": 6901,
@@ -3356,9 +3356,9 @@
       "sha256": "ed944b2082a244ce9eeb31fdc8f07b492635b45a542505b08798b251903e2a5f"
     },
     {
-      "bytes": 7428,
+      "bytes": 9421,
       "path": "src/dmf_pulse/prices/price_paths.py",
-      "sha256": "bf40b4faa2de6bfd8c537e320d932cf3109a246618bf7b7511d44150fe1e9959"
+      "sha256": "9229a1d8a67ac8b3e98ec42ef5b80268bdf751536ff158fc15f4f41cf150088b"
     },
     {
       "bytes": 3946,
@@ -3371,19 +3371,19 @@
       "sha256": "d6f7e867d29f0c29a3d4e48dfcf132e7fd19455deb70873e9096ef4da5b3e677"
     },
     {
-      "bytes": 3875,
+      "bytes": 4005,
       "path": "src/dmf_pulse/prices/resources/default.yaml",
-      "sha256": "86682300e61d15d667076948cc2881d94b30e673b2595bb7d47b1263df2782fb"
+      "sha256": "47bca916a27ddfb5bfd1bebf51b0239f6aa1fa224208df8e021f667a1630fd22"
     },
     {
-      "bytes": 3108,
+      "bytes": 3569,
       "path": "src/dmf_pulse/prices/selling_value.py",
-      "sha256": "9a5033beb278b88ee62c2b1b86ef84df041d5f25b310883e1cf3f683b4f903d6"
+      "sha256": "47906ac3a482efecdb571386329a8288ecec0303e4fdb9565d65efc91fbc57ce"
     },
     {
-      "bytes": 14145,
+      "bytes": 18101,
       "path": "src/dmf_pulse/prices/service.py",
-      "sha256": "d079b13cce1ab549270bb69af324b007dab152982d1e62d882c70d656a2808c0"
+      "sha256": "84d9c6f781ce4687bb0461ea5813535d6df8055f90068b2cd609eb7f14bc5b4f"
     },
     {
       "bytes": 1047,
@@ -3391,14 +3391,14 @@
       "sha256": "afad1135eee09847a0b3574467dcb391c703ace33546caa338e288f4aded9553"
     },
     {
-      "bytes": 14114,
+      "bytes": 14025,
       "path": "src/dmf_pulse/prices/transfer_flows.py",
-      "sha256": "16d6d0c4b2bf4c042512577764ee4951ee1b523279c0777eae718693cb55a520"
+      "sha256": "48de6064a8284f25974d3beab15756778c0b2ea0caf7ae518b2ca0f9f4a22d1f"
     },
     {
-      "bytes": 5564,
+      "bytes": 6942,
       "path": "src/dmf_pulse/prices/update_cycles.py",
-      "sha256": "ab0ae39d3e85d7b9a054e8e799a26cca104c1c0f5f050d7b29e464058e95f6ff"
+      "sha256": "f9161b1b8e9dbcf3146cb2cb4870fca44653c50d1f991665e4c7698a35360957"
     },
     {
       "bytes": 1,
@@ -3751,9 +3751,9 @@
       "sha256": "d2b145dc39e30faa301486c23ffa55194991a203db54344de83a3e8f9ca933dc"
     },
     {
-      "bytes": 589,
+      "bytes": 734,
       "path": "tests/golden/prices/validation_report.json",
-      "sha256": "b2c1849782ef57ac31be798e2526a159a661d1ac3162cf35cda0bbf1125d239e"
+      "sha256": "b64620c1e7fdddadf38ed989bff2e20ee137dbc2a4a82c2a93eecdfb4de247f3"
     },
     {
       "bytes": 494,
@@ -3991,9 +3991,9 @@
       "sha256": "6fe763e5d07fb1fa26074d2a175c2ec9d7a5c09cd30f4bf316377d71f96effd7"
     },
     {
-      "bytes": 5705,
+      "bytes": 5750,
       "path": "tests/integration/prices/test_price_workflow.py",
-      "sha256": "01683e9b4cf0e740134c9df903f0a0160ed1b2841dcb2eaa452fcac48884fe08"
+      "sha256": "8fef56e0d55f620f668c3b285e96e9908374f915dda081467faac21e2e390262"
     },
     {
       "bytes": 4603,
@@ -4026,9 +4026,9 @@
       "sha256": "c20ebc473d597f9000b5664d0c92e93f3671eea3d42580c3c6e50e38ccd06b89"
     },
     {
-      "bytes": 7538,
+      "bytes": 7725,
       "path": "tests/prices_helpers.py",
-      "sha256": "846bd45a4d78c9673de1516728686a02a7f7b207a99de800739f579929859666"
+      "sha256": "a3a6aa79514cfef1bd6ff55efe68648739feb9bd041f9f9e67007d3169d688d3"
     },
     {
       "bytes": 1882,
@@ -4121,9 +4121,9 @@
       "sha256": "1f348b8ac850e1be13ac9420aad67bd43f29f248e387bd1cbc33f406ce224db9"
     },
     {
-      "bytes": 7840,
+      "bytes": 8051,
       "path": "tests/replay/prices/test_adversarial_replay.py",
-      "sha256": "81d0b97e0ed5f85e4984b24e938da37b8b703b40a8c2ba16cbed7032163559f1"
+      "sha256": "206344e79ced54f54ca93b6241afe267375428ad022ec5da1f102d9e8e0c6035"
     },
     {
       "bytes": 3417,
@@ -4731,14 +4731,19 @@
       "sha256": "bd5a3244883cc7401fc8c73aaa82966242f037a761147947572be411fea889bd"
     },
     {
-      "bytes": 7720,
+      "bytes": 8810,
       "path": "tests/unit/prices/test_decisions_evaluation_artifacts.py",
-      "sha256": "6742be9e96b1457c6620d8b9b6eaedb156af3fbcb17ece0ffd6637f323ddbe2e"
+      "sha256": "6955c7e4928fe512170512fcd47d8a33ee744d6a298eff05346516c906e83dd1"
     },
     {
-      "bytes": 12140,
+      "bytes": 19932,
+      "path": "tests/unit/prices/test_independent_review_remediation.py",
+      "sha256": "fb65c86572c26fa46655decbb47faaecd2c92c4b9e86d62a9ab05ff0c07e19a0"
+    },
+    {
+      "bytes": 12268,
       "path": "tests/unit/prices/test_models_pressure_calibration.py",
-      "sha256": "854f5f367917cb98e2ecb3e80db39afa806cfceb97e5015ddce2aad7da67fb2b"
+      "sha256": "f3a0042c9a4710d1a8f535169c0ed15fe055fceb9c396d2880195cb7db80d0df"
     },
     {
       "bytes": 7467,
@@ -4756,9 +4761,9 @@
       "sha256": "aa2315eaa01f298db7bbeb5bac3d2557d1cdb301a9fb04ab92596edb26c02547"
     },
     {
-      "bytes": 7029,
+      "bytes": 7237,
       "path": "tests/unit/prices/test_transfer_flows.py",
-      "sha256": "26edc24014236a839030c567763748d0178ead92378a9eb4980b2cc0c27fda48"
+      "sha256": "b75772c6f82ad4416f17de53f0294abbf1f2ee513dbff2dfcd2d3c2b538419df"
     },
     {
       "bytes": 5609,
@@ -4956,14 +4961,14 @@
       "sha256": "11c62d42f440171df1cf24469fbdcdd23ee8eafba578b516ca0faa0e3f3058d7"
     },
     {
-      "bytes": 1435,
+      "bytes": 1537,
       "path": "tickets/PRC-013/ACCEPTANCE.md",
-      "sha256": "2a539b52e2d7b2104c31651c54bd78994f4168222847968dd037fe5163dd7f23"
+      "sha256": "b130ceb515928644becc44885df6426ff6876181b6dee9937d23c39246e555c5"
     },
     {
-      "bytes": 2138,
+      "bytes": 2232,
       "path": "tickets/PRC-013/ticket.yaml",
-      "sha256": "92f155f23011ed34dd519a6cfb59419612c67aaf20e4c19fd089dff8f80732cd"
+      "sha256": "a7c088037938c1aa51ec49e5c3079f1e914914192b82693504c3881cdbac7e85"
     },
     {
       "bytes": 4490,

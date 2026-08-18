@@ -28,6 +28,11 @@
     {"id": "stale_snapshot", "domain": "flow", "expected": "STALE_SNAPSHOT"},
     {"id": "press_conference_information_event", "domain": "decision", "expected": "WAIT_INFORMATION_VALUE"},
     {"id": "price_only_hit", "domain": "decision", "expected": "NO_PRICE_CHASING"},
-    {"id": "ft_otherwise_expiring", "domain": "decision", "expected": "FREE_TRANSFER_VALUE_INCLUDED"}
+    {"id": "ft_otherwise_expiring", "domain": "decision", "expected": "FREE_TRANSFER_VALUE_INCLUDED"},
+    {"id": "future_model_artifact_leak", "domain": "temporal", "expected": "BLOCKED_LEAKAGE"},
+    {"id": "act_wait_dataset_mode_bypass", "domain": "activation", "expected": "VALIDATION_BLOCKED"},
+    {"id": "repeated_identical_snapshot_timing", "domain": "flow", "expected": "RETAINED_WITH_DUPLICATE_ANOMALY"},
+    {"id": "multi_unit_boundary_escape", "domain": "paths", "expected": "LEGAL_SUPPORT_ONLY"},
+    {"id": "same_valid_time_correction_precedence", "domain": "labels", "expected": "LATEST_SYSTEM_VERSION"}
   ]
 }

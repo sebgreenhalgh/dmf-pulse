@@ -1,9 +1,7 @@
 # Static analysis and frozen sync
 
 - `uv sync --all-groups --frozen`: PASS, 40 packages checked; lock unchanged.
-- Ruff format check over Stage-13 production, modified CLI, tests, pack script and repository
-  validator: PASS, 40 files already formatted.
-- Ruff lint over the same scope: PASS.
-- Strict mypy over `src/dmf_pulse/prices`, `cli/prices.py` and modified `cli/app.py`: PASS,
-  23 source files with no issues.
-- `git diff --check`: PASS.
+- `uv run ruff format --check .`: PASS, 533 files already formatted.
+- `uv run ruff check .`: PASS.
+- `uv run mypy src/dmf_pulse`: PASS, 208 source files with no issues.
+- Final `git diff --check`: PASS.

@@ -7,7 +7,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from pydantic import TypeAdapter
+from pydantic import StrictBool, StrictInt, StrictStr, TypeAdapter
 
 from dmf_pulse.evaluation.artifacts import semantic_sha256, verify_sealed
 from dmf_pulse.evaluation.models import DatasetMode
@@ -19,6 +19,7 @@ from dmf_pulse.prices.calibration import apply_price_calibration
 from dmf_pulse.prices.classifier import fit_competing_logit, predict_competing_logit
 from dmf_pulse.prices.configuration import PriceConfig, load_price_config, price_config_sha256
 from dmf_pulse.prices.early_transfer import evaluate_act_now_vs_wait
+from dmf_pulse.prices.errors import PriceLeakageError
 from dmf_pulse.prices.evaluation import evaluate_price_forecasts
 from dmf_pulse.prices.models import (
     ArtifactReceipt,
@@ -55,6 +56,46 @@ from dmf_pulse.prices.selling_value import (
 )
 from dmf_pulse.prices.transfer_flows import build_transfer_flow_features
 from dmf_pulse.prices.update_cycles import build_price_update_cycles
+
+_STRICT_BOOL = TypeAdapter(StrictBool)
+_STRICT_INT = TypeAdapter(StrictInt)
+_STRICT_STR = TypeAdapter(StrictStr)
+_STRICT_STR_TUPLE = TypeAdapter(tuple[StrictStr, ...])
+
+
+def _strict_int(payload: dict[str, Any], key: str) -> int:
+    return _STRICT_INT.validate_python(payload[key])
+
+
+def _strict_str(payload: dict[str, Any], key: str) -> str:
+    return _STRICT_STR.validate_python(payload[key])
+
+
+def _strict_datetime(payload: dict[str, Any], key: str) -> datetime:
+    return datetime.fromisoformat(_strict_str(payload, key).replace("Z", "+00:00"))
+
+
+def _strict_decimal(payload: dict[str, Any], key: str, default: Decimal) -> Decimal:
+    value = payload.get(key, default)
+    if isinstance(value, (bool, float)):
+        raise ValueError(f"{key} binary floats/booleans are prohibited")
+    return Decimal(value)
+
+
+def _canonical_source_lineage(
+    observation_ids: tuple[str, ...],
+    semantic_hashes: tuple[str, ...],
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    if not observation_ids or len(observation_ids) != len(semantic_hashes):
+        raise ValueError("projection requires one semantic hash per source observation")
+    pairs = tuple(zip(observation_ids, semantic_hashes, strict=True))
+    if len({observation_id for observation_id, _ in pairs}) != len(pairs):
+        raise ValueError("projection source observation IDs must be unique")
+    canonical = tuple(sorted(pairs, key=lambda item: item[0]))
+    return (
+        tuple(observation_id for observation_id, _ in canonical),
+        tuple(semantic_hash for _, semantic_hash in canonical),
+    )
 
 
 def _confidence(state: LatentPressureState, *, config: PriceConfig) -> ConfidenceGrade:
@@ -98,6 +139,35 @@ def predict_price(
         raise ValueError("projection player identity differs across model inputs")
     if feature_vector.information_cutoff != pressure_state.as_of:
         raise ValueError("feature and recurrent-state cutoffs differ")
+    verify_sealed(model, "artifact_sha256")
+    cutoff = feature_vector.information_cutoff
+    if model.training_cutoff > cutoff:
+        raise PriceLeakageError(
+            "PRICE_MODEL_FUTURE_TRAINING_BLOCKED",
+            "model training cutoff follows the prediction information cutoff",
+        )
+    if model.configuration_sha256 != price_config_sha256(config):
+        raise ValueError("model artifact configuration hash differs from the active price policy")
+    if (
+        model.model_version != config.competing_logit.model_version
+        or model.feature_schema_version != config.competing_logit.feature_schema_version
+        or model.feature_names != config.competing_logit.feature_names
+    ):
+        raise ValueError("model artifact identity/schema differs from the active price policy")
+    if pressure_state.state_version != config.recurrent_pressure.state_version:
+        raise ValueError("latent pressure state version differs from the active price policy")
+    if calibration is not None:
+        if calibration.training_cutoff > cutoff:
+            raise PriceLeakageError(
+                "PRICE_CALIBRATION_FUTURE_TRAINING_BLOCKED",
+                "calibration training cutoff follows the prediction information cutoff",
+            )
+        if (
+            calibration.calibration_version != config.competing_logit.calibration_version
+            or calibration.probability_epsilon
+            != config.competing_logit.calibration_probability_epsilon
+        ):
+            raise ValueError("calibration artifact identity differs from the active price policy")
     p1 = predict_competing_logit(model, feature_vector)
     if calibration is not None:
         verify_sealed(calibration, "artifact_sha256")
@@ -114,6 +184,10 @@ def predict_price(
         else ModelDisagreementStatus.AGREEMENT
     )
     model_lineage = tuple(sorted({model.model_version, pressure_state.state_version}))
+    canonical_source_ids, canonical_source_hashes = _canonical_source_lineage(
+        source_observation_ids,
+        source_semantic_hashes,
+    )
     paths = simulate_price_paths(
         current_price_units=current_price_units,
         state=pressure_state,
@@ -123,12 +197,18 @@ def predict_price(
     )
     h24, h72, h7d = paths.horizons
     lineage = ProjectionLineage(
-        source_observation_ids=tuple(sorted(set(source_observation_ids))),
-        source_semantic_hashes=tuple(sorted(set(source_semantic_hashes))),
+        source_observation_ids=canonical_source_ids,
+        source_semantic_hashes=canonical_source_hashes,
         model_version_ids=model_lineage,
         calibration_version_ids=(
             (calibration.calibration_version,) if calibration is not None else ()
         ),
+        model_artifact_sha256=model.artifact_sha256,
+        calibration_artifact_sha256=(
+            calibration.artifact_sha256 if calibration is not None else None
+        ),
+        price_path_distribution_sha256=paths.distribution_sha256,
+        configuration_sha256=price_config_sha256(config),
         ruleset_id=ruleset_id,
         ruleset_hash=ruleset_hash,
         dataset_mode=dataset_mode,
@@ -191,7 +271,7 @@ class PriceService:
         return build_price_update_cycles(
             observations,
             windows,
-            player_id=str(payload["player_id"]),
+            player_id=_strict_str(payload, "player_id"),
             dataset_mode=DatasetMode(payload["dataset_mode"]),
             maximum_label_interval=timedelta(
                 minutes=self.config.update_cycles.maximum_label_interval_minutes
@@ -204,14 +284,12 @@ class PriceService:
         )
         return build_transfer_flow_features(
             observations,
-            player_id=str(payload["player_id"]),
-            cutoff=datetime.fromisoformat(
-                str(payload["information_cutoff"]).replace("Z", "+00:00")
-            ),
+            player_id=_strict_str(payload, "player_id"),
+            cutoff=_strict_datetime(payload, "information_cutoff"),
             dataset_mode=DatasetMode(payload["dataset_mode"]),
             context=TransferFlowContext.model_validate(payload["context"]),
             config=self.config,
-            strict_temporal=bool(payload.get("strict_temporal", True)),
+            strict_temporal=_STRICT_BOOL.validate_python(payload.get("strict_temporal", True)),
         )
 
     def train_baseline(
@@ -225,9 +303,7 @@ class PriceService:
         )
         artifact = fit_competing_logit(
             examples,
-            training_cutoff=datetime.fromisoformat(
-                str(payload["training_cutoff"]).replace("Z", "+00:00")
-            ),
+            training_cutoff=_strict_datetime(payload, "training_cutoff"),
             config=self.config,
         )
         if artifact_root is None:
@@ -243,15 +319,19 @@ class PriceService:
     def predict(self, payload: dict[str, Any]) -> PriceProjection:
         calibration_payload = payload.get("calibration")
         return predict_price(
-            player_id=str(payload["player_id"]),
-            current_price_units=int(payload["current_price_units"]),
+            player_id=_strict_str(payload, "player_id"),
+            current_price_units=_strict_int(payload, "current_price_units"),
             feature_vector=PriceFeatureVector.model_validate(payload["feature_vector"]),
             model=CompetingLogitArtifact.model_validate(payload["model"]),
             pressure_state=LatentPressureState.model_validate(payload["pressure_state"]),
-            source_observation_ids=tuple(payload["source_observation_ids"]),
-            source_semantic_hashes=tuple(payload["source_semantic_hashes"]),
-            ruleset_id=str(payload["ruleset_id"]),
-            ruleset_hash=str(payload["ruleset_hash"]),
+            source_observation_ids=_STRICT_STR_TUPLE.validate_python(
+                payload["source_observation_ids"]
+            ),
+            source_semantic_hashes=_STRICT_STR_TUPLE.validate_python(
+                payload["source_semantic_hashes"]
+            ),
+            ruleset_id=_strict_str(payload, "ruleset_id"),
+            ruleset_hash=_strict_str(payload, "ruleset_hash"),
             dataset_mode=DatasetMode(payload["dataset_mode"]),
             config=self.config,
             calibration=(
@@ -263,11 +343,11 @@ class PriceService:
 
     def simulate(self, payload: dict[str, Any]) -> PricePathDistribution:
         return simulate_price_paths(
-            current_price_units=int(payload["current_price_units"]),
+            current_price_units=_strict_int(payload, "current_price_units"),
             state=LatentPressureState.model_validate(payload["pressure_state"]),
             baseline=PriceProbabilityVector.model_validate(payload["baseline"]),
             config=self.config,
-            model_lineage=tuple(payload["model_lineage"]),
+            model_lineage=_STRICT_STR_TUPLE.validate_python(payload["model_lineage"]),
         )
 
     def selling_value(self, payload: dict[str, Any]) -> PricePmf:
@@ -281,10 +361,10 @@ class PriceService:
         spell_payload = payload.get("ownership_spell")
         rule_payload = payload.get("selling_price_rule")
         return build_optimiser_price_scenarios(
-            player_id=str(payload["player_id"]),
-            horizon=str(payload["horizon"]),
+            player_id=_strict_str(payload, "player_id"),
+            horizon=_strict_str(payload, "horizon"),
             market_price_pmf=PricePmf.model_validate(payload["market_price_pmf"]),
-            maximum_support=int(
+            maximum_support=_STRICT_INT.validate_python(
                 payload.get("maximum_support", self.config.price_paths.maximum_optimiser_support)
             ),
             ownership_spell=(
@@ -294,7 +374,7 @@ class PriceService:
                 SellingPriceRule.model_validate(rule_payload) if rule_payload is not None else None
             ),
             route_budget_units=(
-                int(payload["route_budget_units"])
+                _strict_int(payload, "route_budget_units")
                 if payload.get("route_budget_units") is not None
                 else None
             ),
@@ -315,11 +395,11 @@ class PriceService:
         rows = TypeAdapter(tuple[PriceEvaluationRow, ...]).validate_python(payload["rows"])
         return evaluate_price_forecasts(
             rows,
-            evaluation_cutoff=datetime.fromisoformat(
-                str(payload["evaluation_cutoff"]).replace("Z", "+00:00")
-            ),
-            alert_probability=Decimal(
-                str(payload.get("alert_probability", self.config.evaluation.alert_probability))
+            evaluation_cutoff=_strict_datetime(payload, "evaluation_cutoff"),
+            alert_probability=_strict_decimal(
+                payload,
+                "alert_probability",
+                self.config.evaluation.alert_probability,
             ),
             probability_epsilon=self.config.evaluation.probability_epsilon,
         )
@@ -328,6 +408,9 @@ class PriceService:
         return PriceValidationReport(
             configuration_id=self.config.configuration_id,
             configuration_sha256=price_config_sha256(self.config),
+            configuration_role=self.config.configuration_role,
+            parameter_status=self.config.parameter_status,
+            evidence_status=self.config.evidence_status,
             implemented_models=(
                 ModelFamily.P0_NO_CHANGE,
                 ModelFamily.P1_REGULARIZED_COMPETING_LOGIT,

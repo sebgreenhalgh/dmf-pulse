@@ -27,6 +27,35 @@ def _event_from_prices(prior: int, resulting: int) -> PriceEvent:
     return PriceEvent.AMBIGUOUS
 
 
+def _latest_pre_update(
+    observations: tuple[PriceObservation, ...],
+) -> PriceObservation | None:
+    if not observations:
+        return None
+    return max(
+        observations,
+        key=lambda item: (
+            item.observed_at,
+            item.received_at,
+            item.usable_at,
+            item.observation_id,
+        ),
+    )
+
+
+def _first_post_update(
+    observations: tuple[PriceObservation, ...],
+) -> PriceObservation | None:
+    if not observations:
+        return None
+    first_observed_at = min(item.observed_at for item in observations)
+    same_valid_time = tuple(item for item in observations if item.observed_at == first_observed_at)
+    return max(
+        same_valid_time,
+        key=lambda item: (item.received_at, item.usable_at, item.observation_id),
+    )
+
+
 def build_price_update_cycles(
     observations: tuple[PriceObservation, ...],
     windows: tuple[PriceUpdateWindow, ...],
@@ -38,24 +67,35 @@ def build_price_update_cycles(
     """Build one immutable label per declared update opportunity without inventing time."""
 
     relevant = tuple(item for item in observations if item.player_id == player_id)
+    observation_ids = tuple(item.observation_id for item in relevant)
+    if len(observation_ids) != len(set(observation_ids)):
+        raise ValueError("price-cycle observations must have unique observation IDs")
+    known_ids = set(observation_ids)
     for item in relevant:
         verify_sealed(item, "semantic_hash")
         if item.dataset_mode is not dataset_mode:
             raise ValueError("price-cycle observations must share the requested dataset mode")
-    ordered = tuple(sorted(relevant, key=lambda item: (item.observed_at, item.observation_id)))
+        if (
+            item.supersedes_observation_id is not None
+            and item.supersedes_observation_id not in known_ids
+        ):
+            raise ValueError("price-cycle correction lineage references an unavailable predecessor")
+    window_ids = tuple(item.cycle_id for item in windows)
+    if len(window_ids) != len(set(window_ids)):
+        raise ValueError("price update windows must have unique cycle IDs")
     values: list[PriceUpdateCycle] = []
     for window in sorted(windows, key=lambda item: (item.cycle_start, item.cycle_id)):
         before = tuple(
             item
-            for item in ordered
+            for item in relevant
             if item.observed_at <= window.cycle_start
             and item.usable_at <= window.information_cutoff
         )
         after = tuple(
-            item for item in ordered if window.cycle_start < item.observed_at <= window.cycle_end
+            item for item in relevant if window.cycle_start < item.observed_at <= window.cycle_end
         )
-        pre = before[-1] if before else None
-        post = after[0] if after else None
+        pre = _latest_pre_update(before)
+        post = _first_post_update(after)
         if pre is None or post is None:
             exemplar = pre if pre is not None else post
             values.append(

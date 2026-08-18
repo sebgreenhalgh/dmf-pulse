@@ -1,6 +1,7 @@
 # Secret scan
 
-First-party deterministic repository scan: **PASS**, zero unallowlisted findings.
+Final independent-review first-party deterministic repository scan: **PASS**, zero unallowlisted
+findings.
 
 The initial scan correctly surfaced a lexical false positive for the public domain supersession
 enum assignment. The serialized/API term is retained, and its exact path/rule/fingerprint is

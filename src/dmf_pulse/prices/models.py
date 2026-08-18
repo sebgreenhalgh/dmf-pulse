@@ -344,6 +344,37 @@ class PriceUpdateCycle(PriceModel):
             and self.label_confidence is not LabelConfidence.AMBIGUOUS
         ):
             raise ValueError("ambiguous event requires ambiguous confidence")
+        if self.prior_price_units is not None and self.resulting_price_units is not None:
+            difference = self.resulting_price_units - self.prior_price_units
+            expected_difference = {
+                PriceEvent.FALL: -1,
+                PriceEvent.NO_CHANGE: 0,
+                PriceEvent.RISE: 1,
+            }
+            if self.event in expected_difference and difference != expected_difference[self.event]:
+                raise ValueError("price-cycle event does not match its integer price transition")
+        interval_values = (
+            self.event_effective_interval_start,
+            self.event_effective_interval_end,
+            self.event_first_observed_at,
+        )
+        changed = self.event in {PriceEvent.FALL, PriceEvent.RISE, PriceEvent.AMBIGUOUS}
+        if changed and any(value is None for value in interval_values):
+            raise ValueError("changed/ambiguous cycle requires a complete observation interval")
+        if not changed and any(value is not None for value in interval_values):
+            raise ValueError("unchanged/missing cycle cannot declare a change interval")
+        if all(value is not None for value in interval_values):
+            interval_start, interval_end, first_observed = interval_values
+            assert interval_start is not None
+            assert interval_end is not None
+            assert first_observed is not None
+            if not interval_start < interval_end or first_observed != interval_end:
+                raise ValueError("price-cycle observation interval is inconsistent")
+        if self.event_effective_at is not None:
+            if self.label_confidence is not LabelConfidence.EXACT or not changed:
+                raise ValueError("exact event time requires an exact changed-cycle label")
+            if not start <= self.event_effective_at <= end:
+                raise ValueError("exact event time lies outside the declared update cycle")
         return self
 
 
@@ -684,6 +715,11 @@ class HorizonPriceDistribution(PriceModel):
 class PricePathDistribution(PriceModel):
     schema_version: Literal["price-path-distribution-v1"] = "price-path-distribution-v1"
     current_price_units: NonNegativeInt
+    price_step_units: PositiveInt
+    minimum_price_units: NonNegativeInt
+    maximum_price_units: PositiveInt
+    initial_rises_this_gameweek: NonNegativeInt
+    initial_falls_this_gameweek: NonNegativeInt
     information_cutoff: datetime
     horizons: tuple[HorizonPriceDistribution, HorizonPriceDistribution, HorizonPriceDistribution]
     scenarios_7d: tuple[PricePathScenario, ...]
@@ -696,12 +732,89 @@ class PricePathDistribution(PriceModel):
     @model_validator(mode="after")
     def path_contract(self) -> PricePathDistribution:
         require_utc(self.information_cutoff, field_name="information_cutoff")
+        if not self.minimum_price_units < self.maximum_price_units:
+            raise ValueError("price path bounds must be ordered")
+        if not self.minimum_price_units <= self.current_price_units <= self.maximum_price_units:
+            raise ValueError("price path current price lies outside its declared support")
         if tuple(item.horizon for item in self.horizons) != ("24h", "72h", "7d"):
             raise ValueError("price path horizons must be ordered 24h, 72h, 7d")
+        update_counts = tuple(item.update_count for item in self.horizons)
+        if update_counts != tuple(sorted(update_counts)):
+            raise ValueError("price path horizon update counts must be nondecreasing")
+        if any(
+            not self.minimum_price_units <= mass.price_units <= self.maximum_price_units
+            for horizon in self.horizons
+            for mass in horizon.price_pmf.support
+        ):
+            raise ValueError("price horizon PMF escapes configured legal support")
         if sum((item.probability for item in self.scenarios_7d), Decimal(0)) != Decimal(1):
             raise ValueError("7d path scenario probabilities must sum exactly to one")
-        if self.model_lineage != tuple(sorted(set(self.model_lineage))):
-            raise ValueError("model lineage must be sorted and unique")
+        if not self.model_lineage or self.model_lineage != tuple(sorted(set(self.model_lineage))):
+            raise ValueError("model lineage must be non-empty, sorted and unique")
+        scenario_keys = tuple((item.events, item.prices_units) for item in self.scenarios_7d)
+        if len(scenario_keys) != len(set(scenario_keys)):
+            raise ValueError("7d price path scenarios must be unique")
+        final_update_count = self.horizons[-1].update_count
+        final_masses: dict[int, Decimal] = {}
+        any_rise = Decimal(0)
+        any_fall = Decimal(0)
+        multiple_rises = Decimal(0)
+        multiple_falls = Decimal(0)
+        expected_delta = {
+            PriceEvent.FALL: -self.price_step_units,
+            PriceEvent.NO_CHANGE: 0,
+            PriceEvent.RISE: self.price_step_units,
+        }
+        for scenario in self.scenarios_7d:
+            if len(scenario.events) != final_update_count:
+                raise ValueError("7d scenario length differs from its declared update count")
+            if scenario.prices_units[0] != self.current_price_units:
+                raise ValueError("price path scenario does not begin at the current price")
+            for event, previous, current in zip(
+                scenario.events,
+                scenario.prices_units[:-1],
+                scenario.prices_units[1:],
+                strict=True,
+            ):
+                if current - previous != expected_delta[event]:
+                    raise ValueError("price path event does not match its configured price step")
+                if not self.minimum_price_units <= current <= self.maximum_price_units:
+                    raise ValueError("price path scenario escapes configured legal support")
+            final_price = scenario.prices_units[-1]
+            final_masses[final_price] = (
+                final_masses.get(final_price, Decimal(0)) + scenario.probability
+            )
+            if PriceEvent.RISE in scenario.events:
+                any_rise += scenario.probability
+            if PriceEvent.FALL in scenario.events:
+                any_fall += scenario.probability
+            if self.initial_rises_this_gameweek + scenario.events.count(PriceEvent.RISE) >= 2:
+                multiple_rises += scenario.probability
+            if self.initial_falls_this_gameweek + scenario.events.count(PriceEvent.FALL) >= 2:
+                multiple_falls += scenario.probability
+        ordered_final_masses = tuple(sorted(final_masses.items()))
+        final_total = sum((value for _, value in ordered_final_masses), Decimal(0))
+        normalized_final = [value / final_total for _, value in ordered_final_masses]
+        normalized_final[-1] = Decimal(1) - sum(normalized_final[:-1], Decimal(0))
+        normalized_masses = {
+            price: probability
+            for (price, _), probability in zip(ordered_final_masses, normalized_final, strict=True)
+        }
+        declared_masses = {
+            item.price_units: item.probability for item in self.horizons[-1].price_pmf.support
+        }
+        if normalized_masses != declared_masses:
+            raise ValueError("7d price PMF does not match the exact recurrent scenarios")
+        if (
+            self.horizons[-1].probability_any_rise != any_rise
+            or self.horizons[-1].probability_any_fall != any_fall
+        ):
+            raise ValueError("7d any-change probabilities do not match recurrent scenarios")
+        if (
+            self.probability_multiple_rises_gameweek != multiple_rises
+            or self.probability_multiple_falls_gameweek != multiple_falls
+        ):
+            raise ValueError("multiple-change probabilities do not match recurrent scenarios")
         return self
 
 
@@ -710,6 +823,10 @@ class ProjectionLineage(PriceModel):
     source_semantic_hashes: tuple[Sha256, ...]
     model_version_ids: tuple[StrictStr, ...]
     calibration_version_ids: tuple[StrictStr, ...]
+    model_artifact_sha256: Sha256
+    calibration_artifact_sha256: Sha256 | None
+    price_path_distribution_sha256: Sha256
+    configuration_sha256: Sha256
     ruleset_id: StrictStr
     ruleset_hash: Sha256
     dataset_mode: DatasetMode
@@ -720,13 +837,22 @@ class ProjectionLineage(PriceModel):
         require_utc(self.information_cutoff, field_name="information_cutoff")
         for name in (
             "source_observation_ids",
-            "source_semantic_hashes",
             "model_version_ids",
             "calibration_version_ids",
         ):
             values = getattr(self, name)
             if values != tuple(sorted(set(values))):
                 raise ValueError(f"{name} must be sorted and unique")
+        if not self.source_observation_ids or len(self.source_observation_ids) != len(
+            self.source_semantic_hashes
+        ):
+            raise ValueError("projection lineage requires one semantic hash per source observation")
+        if not self.model_version_ids:
+            raise ValueError("projection lineage requires at least one model version")
+        if bool(self.calibration_version_ids) != (self.calibration_artifact_sha256 is not None):
+            raise ValueError(
+                "projection calibration version/hash lineage must be supplied together"
+            )
         return self
 
 
@@ -886,20 +1012,45 @@ class EarlyTransferDecision(PriceModel):
         }
         if not required <= {item.action for item in self.alternatives}:
             raise ValueError("ACT, WAIT and DO_NOT_TRANSFER alternatives are required")
-        utilities = sorted(
-            (item.components.net_utility for item in self.alternatives), reverse=True
+        keys = tuple((item.action, item.route_id) for item in self.alternatives)
+        if len(keys) != len(set(keys)):
+            raise ValueError("ACT/WAIT alternatives must be unique")
+        ranked = tuple(
+            sorted(
+                self.alternatives,
+                key=lambda item: (-item.components.net_utility, item.action.value, item.route_id),
+            )
         )
+        utilities = tuple(item.components.net_utility for item in ranked)
         if self.expected_utility != utilities[0] or self.second_best_utility != utilities[1]:
             raise ValueError("decision utility summary does not match alternatives")
         if self.utility_gap != self.expected_utility - self.second_best_utility:
             raise ValueError("decision utility gap does not reconcile")
-        if self.actionable and self.recommended_action is EarlyTransferAction.MANUAL_REVIEW:
-            raise ValueError("manual review cannot be actionable")
+        if self.actionable:
+            if self.recommended_action is EarlyTransferAction.MANUAL_REVIEW:
+                raise ValueError("manual review cannot be actionable")
+            if (
+                self.recommended_action is not ranked[0].action
+                or self.selected_route_id != ranked[0].route_id
+            ):
+                raise ValueError("actionable decision must select the complete-utility maximum")
+        elif (
+            self.recommended_action is not EarlyTransferAction.MANUAL_REVIEW
+            or self.selected_route_id is not None
+        ):
+            raise ValueError("non-actionable decision must fail closed to manual review")
+        if not self.activation_statuses or self.activation_statuses != tuple(
+            sorted(set(self.activation_statuses), key=str)
+        ):
+            raise ValueError("decision activation statuses must be sorted, unique and non-empty")
+        if ActivationStatus.PRODUCTION_ELIGIBLE in self.activation_statuses:
+            raise ValueError("Stage-13 ACT/WAIT decision cannot claim production eligibility")
         return self
 
 
 class PriceEvaluationRow(PriceModel):
     row_id: StrictStr
+    horizon: Literal["24h", "72h", "7d"] = "24h"
     forecast_origin: datetime
     label_available_at: datetime
     probabilities: PriceProbabilityVector
@@ -931,6 +1082,7 @@ class PriceEvaluationRow(PriceModel):
 class PriceEvaluationReport(PriceModel):
     schema_version: Literal["price-evaluation-report-v1"] = "price-evaluation-report-v1"
     row_count: PositiveInt
+    price_horizon: Literal["24h", "72h", "7d"]
     multiclass_log_loss: Decimal | None
     multiclass_brier: Decimal
     rise_precision: Decimal | None
@@ -946,6 +1098,9 @@ class PriceEvaluationReport(PriceModel):
     fall_calibration_status: StrictStr
     fall_calibration_intercept: Decimal | None
     fall_calibration_slope: Decimal | None
+    no_change_calibration_status: StrictStr
+    no_change_calibration_intercept: Decimal | None
+    no_change_calibration_slope: Decimal | None
     mean_ranked_probability_score: Decimal
     expected_price_mae: Decimal
     expected_price_rmse: Decimal
@@ -966,6 +1121,9 @@ class PriceValidationReport(PriceModel):
     status: Literal["ENGINEERING_READY"] = "ENGINEERING_READY"
     configuration_id: StrictStr
     configuration_sha256: Sha256
+    configuration_role: Literal["POLICY_CONFIGURATION"]
+    parameter_status: Literal["PROVISIONAL_MODEL_PARAMETER"]
+    evidence_status: Literal["SYNTHETIC_REFERENCE"]
     implemented_models: tuple[ModelFamily, ...]
     challenger_status: ChallengerStatus
     activation_statuses: tuple[ActivationStatus, ...]

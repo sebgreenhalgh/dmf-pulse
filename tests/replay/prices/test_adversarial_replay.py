@@ -79,9 +79,14 @@ def test_physical_fixture_manifest_covers_all_required_adversarial_and_ordinary_
         "regime_drift_2026",
         "route_blocked_by_price_rise",
         "act_now_false_alarm",
+        "future_model_artifact_leak",
+        "act_wait_dataset_mode_bypass",
+        "repeated_identical_snapshot_timing",
+        "multi_unit_boundary_escape",
+        "same_valid_time_correction_precedence",
     }
     assert required <= set(ids)
-    assert len(ids) == 27
+    assert len(ids) == 32
     assert len(ids) == len(set(ids))
     assert all(item["expected"] for item in fixture["cases"])
 

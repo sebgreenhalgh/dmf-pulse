@@ -39,6 +39,8 @@ def seal_competing_logit(value: CompetingLogitArtifact) -> CompetingLogitArtifac
 
 
 def seal_price_calibration(value: PriceCalibrationArtifact) -> PriceCalibrationArtifact:
+    for nested in (value.fall, value.no_change, value.rise):
+        verify_sealed(nested, "artifact_sha256")
     return seal(value, "artifact_sha256")
 
 

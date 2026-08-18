@@ -14,6 +14,7 @@ folds; outer/future calibration exclusion; decision regret; immutable artifact h
 confinement. Reason: Stage 13 reuses these temporal, metric and artifact boundaries.
 
 Rules (2): v1.1 manager-state price/selling schema surface; current 2026/27 checked source claims.
-Reason: Stage 13 must preserve integer price/rule interfaces without activating incomplete rules.
+Reason: Stage 13 preserves integer price/rule interfaces without activating incomplete rules.
 
-Result: 17 passed. Full repository pytest intentionally deferred to independent Sol review.
+Independent-review result: 17 passed in 1.29 seconds. The single full repository pytest run later
+reached its 20-minute execution ceiling and is recorded separately as RESOURCE_LIMIT.

@@ -33,6 +33,21 @@
 - [ ] Finalize truthful evidence, inspect the exact-parent diff, commit, push and verify remote
   equality; only then build and integrity-check the compact independent-Sol review bundle.
 
+### PRC-013 independent Sol review and remediation
+
+- Corrected pre-review baseline: `a2fdeea7b6514cb8f37b2f687d892998a1422973`; immutable
+  parent remains `ce7fe8f4354d95a477afcf6eed45f63cf0ab772e`.
+- [x] Verify the corrected GitHub lineage, complete Stage-13 tree and absence of recovery material.
+- [x] Review repository authority, every Stage-13 production boundary and the complete baseline
+  diff; classify P0/P1/P2/P3 findings independently.
+- [x] Remediate every valid P0/P1 and material P2 with focused adversarial regressions.
+- [x] Run the final Stage-13 coverage suite, inherited Stage-5/11/12/rules regressions and one
+  complete repository pytest suite.
+- [x] Run frozen sync, Ruff, strict mypy, build, clean installed-wheel CLI and assurance gates;
+  update truthful independent-review evidence.
+- [ ] Commit remediation above the preserved implementation SHA, push normally, verify remote
+  equality and create a draft PR to `main`; do not merge, accept or tag.
+
 ## OPT-010 - exact bounded one-Gameweek optimiser
 
 - Ticket/stage: `OPT-010`, A10; immutable parent

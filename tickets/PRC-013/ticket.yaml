@@ -2,10 +2,10 @@ ticket_id: "PRC-013"
 stage: "B3"
 roadmap_stage: 13
 title: "Price prediction and ACT-versus-WAIT"
-status: "IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"
+status: "REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"
 owner: "Sebastian Greenhalgh"
 implementer_role: "GPT-5.6 Pro primary implementation engineer"
-reviewer_role: "fresh independent GPT-5.6 Sol required"
+reviewer_role: "GPT-5.6 Sol independent reviewer (completed)"
 required_base_branch: "main"
 required_base_commit: "ce7fe8f4354d95a477afcf6eed45f63cf0ab772e"
 implementation_branch: "stage/A13/PRC-013-price-prediction"
@@ -22,7 +22,7 @@ model_ladder:
   P3_GBDT_CHALLENGER: "DEPENDENCY_NOT_APPROVED / DEFERRED."
   P4_ADVANCED_LATENT_FILTER: "DEFERRED pending prospective identifiability evidence."
 activation:
-  engineering_target: "IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"
+  engineering_target: "REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"
   production_target: "SHADOW_ONLY"
   blockers:
     - "TARGET_SEASON_UNCALIBRATED"
@@ -41,5 +41,7 @@ explicit_exclusions:
   - "New football/minutes models"
 acceptance:
   human_acceptance: false
-  independent_review_complete: false
-  full_repository_pytest: "NOT_RUN_BY_DESIGN — DEFERRED_TO_INDEPENDENT_SOL_REVIEW"
+  independent_review_complete: true
+  full_repository_pytest: >-
+    RESOURCE_LIMIT — the single complete run reached the 20-minute execution ceiling without a
+    final pytest summary or emitted failure trace

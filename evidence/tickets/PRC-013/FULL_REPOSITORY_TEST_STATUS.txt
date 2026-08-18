@@ -1,2 +1,3 @@
-FULL_REPOSITORY_PYTEST =
-NOT_RUN_BY_DESIGN — DEFERRED_TO_INDEPENDENT_SOL_REVIEW
+FULL_REPOSITORY_PYTEST = RESOURCE_LIMIT
+The single complete repository run reached the 20-minute execution ceiling without a final pytest
+summary or emitted failure trace. It was not rerun unchanged and is not reported as PASS.

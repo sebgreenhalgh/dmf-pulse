@@ -1,5 +1,8 @@
 schema_version: "price-config-v1"
 configuration_id: "PRC-013-SYNTHETIC-REFERENCE-V1"
+configuration_role: "POLICY_CONFIGURATION"
+parameter_status: "PROVISIONAL_MODEL_PARAMETER"
+evidence_status: "SYNTHETIC_REFERENCE"
 transfer_features:
   short_half_life_hours: "3"
   long_half_life_hours: "12"

@@ -37,14 +37,15 @@ def _bounded_probabilities(
     price_units: int,
     minimum: int,
     maximum: int,
+    step: int,
 ) -> PriceProbabilityVector:
     fall = probabilities.probability_fall
     no_change = probabilities.probability_no_change
     rise = probabilities.probability_rise
-    if price_units <= minimum:
+    if price_units - step < minimum:
         no_change += fall
         fall = Decimal(0)
-    if price_units >= maximum:
+    if price_units + step > maximum:
         no_change += rise
         rise = Decimal(0)
     return PriceProbabilityVector(
@@ -102,6 +103,39 @@ def _horizon(
     )
 
 
+def _scenario_horizon(
+    scenarios: tuple[PricePathScenario, ...],
+    *,
+    update_count: int,
+) -> HorizonPriceDistribution:
+    masses: dict[int, Decimal] = {}
+    any_rise = Decimal(0)
+    any_fall = Decimal(0)
+    for scenario in scenarios:
+        final_price = scenario.prices_units[-1]
+        masses[final_price] = masses.get(final_price, Decimal(0)) + scenario.probability
+        if PriceEvent.RISE in scenario.events:
+            any_rise += scenario.probability
+        if PriceEvent.FALL in scenario.events:
+            any_fall += scenario.probability
+    ordered = tuple(sorted(masses.items()))
+    probabilities = _normalized(tuple(value for _, value in ordered))
+    pmf = PricePmf(
+        support=tuple(
+            PriceMass(price_units=price, probability=probability)
+            for (price, _), probability in zip(ordered, probabilities, strict=True)
+        )
+    )
+    return HorizonPriceDistribution(
+        horizon="7d",
+        update_count=update_count,
+        price_pmf=pmf,
+        expected_price_units=pmf.expected_price_units,
+        probability_any_rise=any_rise,
+        probability_any_fall=any_fall,
+    )
+
+
 def simulate_price_paths(
     *,
     current_price_units: int,
@@ -113,6 +147,10 @@ def simulate_price_paths(
     """Enumerate every configured recurrent path and recompute hazard after each event."""
 
     policy = config.price_paths
+    if state.state_version != config.recurrent_pressure.state_version:
+        raise ValueError("latent pressure state version differs from the active price policy")
+    if not model_lineage:
+        raise ValueError("price path simulation requires non-empty model lineage")
     if not policy.minimum_price_units <= current_price_units <= policy.maximum_price_units:
         raise ValueError("current price lies outside configured legal support")
     paths: tuple[_Path, ...] = (
@@ -132,6 +170,7 @@ def simulate_price_paths(
                 price_units=path.prices[-1],
                 minimum=policy.minimum_price_units,
                 maximum=policy.maximum_price_units,
+                step=policy.price_step_units,
             )
             event_probabilities = (
                 probabilities.probability_fall,
@@ -166,11 +205,8 @@ def simulate_price_paths(
             raise ValueError("exact price path count exceeds configured cap")
         if update in {policy.updates_24h, policy.updates_72h, policy.updates_7d}:
             horizons[update] = paths
-    horizon_values = (
-        _horizon("24h", horizons[policy.updates_24h], policy.updates_24h),
-        _horizon("72h", horizons[policy.updates_72h], policy.updates_72h),
-        _horizon("7d", horizons[policy.updates_7d], policy.updates_7d),
-    )
+    horizon_24h = _horizon("24h", horizons[policy.updates_24h], policy.updates_24h)
+    horizon_72h = _horizon("72h", horizons[policy.updates_72h], policy.updates_72h)
     path_probabilities = _normalized(tuple(item.probability for item in paths))
     scenarios = tuple(
         PricePathScenario(
@@ -180,16 +216,34 @@ def simulate_price_paths(
         )
         for path, probability in zip(paths, path_probabilities, strict=True)
     )
+    horizon_values = (
+        horizon_24h,
+        horizon_72h,
+        _scenario_horizon(scenarios, update_count=policy.updates_7d),
+    )
     multiple_rises = sum(
-        (item.probability for item in scenarios if item.events.count(PriceEvent.RISE) >= 2),
+        (
+            item.probability
+            for item in scenarios
+            if state.rises_this_gameweek + item.events.count(PriceEvent.RISE) >= 2
+        ),
         Decimal(0),
     )
     multiple_falls = sum(
-        (item.probability for item in scenarios if item.events.count(PriceEvent.FALL) >= 2),
+        (
+            item.probability
+            for item in scenarios
+            if state.falls_this_gameweek + item.events.count(PriceEvent.FALL) >= 2
+        ),
         Decimal(0),
     )
     value = PricePathDistribution(
         current_price_units=current_price_units,
+        price_step_units=policy.price_step_units,
+        minimum_price_units=policy.minimum_price_units,
+        maximum_price_units=policy.maximum_price_units,
+        initial_rises_this_gameweek=state.rises_this_gameweek,
+        initial_falls_this_gameweek=state.falls_this_gameweek,
         information_cutoff=state.as_of,
         horizons=horizon_values,
         scenarios_7d=scenarios,

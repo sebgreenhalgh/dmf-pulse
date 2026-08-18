@@ -1,7 +1,10 @@
 # Price-path assurance
 
-Paths recompute the three-way hazard after every event, retain event-dependent recurrent state,
-and enumerate every configured branch exactly. Bounds move impossible rise/fall mass to no-change.
-All prices are integer tenths, PMFs sum exactly to one, expected prices are derived from PMFs, and
-repeat-rise, repeat-fall and rise-then-fall paths retain positive mass. Same inputs/configuration
-produce the same sealed distribution.
+Paths recompute the three-way hazard after every event and retain event-dependent recurrent state.
+All configured branches are enumerated exactly; impossible boundary events move to no-change using
+the complete configured step. Prices remain integer tenths. PMFs sum exactly to one, expected
+prices derive from PMFs, and repeat/opposite-direction paths retain positive mass.
+
+The sealed artifact declares its step, bounds, initial Gameweek event counts and model lineage.
+Rehydration reconciles horizon order/counts, scenario uniqueness/length/transitions/support, final
+PMF, any-event and multiple-event probabilities. Adversarial mutations are rejected.

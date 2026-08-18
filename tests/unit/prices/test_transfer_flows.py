@@ -165,7 +165,7 @@ def test_feature_vector_matches_versioned_schema() -> None:
     assert value.information_cutoff == features.information_cutoff
 
 
-def test_insufficient_or_duplicate_only_history_is_rejected() -> None:
+def test_insufficient_history_is_rejected_but_repeated_observation_is_retained() -> None:
     with pytest.raises(PriceError, match="at least two"):
         _features((observation("only", hour=0),))
     first = observation("first", hour=0)
@@ -179,5 +179,8 @@ def test_insufficient_or_duplicate_only_history_is_rejected() -> None:
     from dmf_pulse.prices.artifacts import seal_observation
 
     second = seal_observation(second.model_copy(update={"semantic_hash": "0" * 64}))
-    with pytest.raises(PriceError, match="two distinct"):
-        _features((first, second))
+    features = _features((first, second))
+    assert features.net_increment == 0
+    assert features.elapsed_hours == Decimal(1)
+    assert features.observation_ids == ("first", "second")
+    assert {item.kind for item in features.anomalies} == {FlowAnomalyKind.DUPLICATE_SNAPSHOT}

@@ -23,6 +23,8 @@ def selling_value_distribution(
 ) -> PricePmf:
     """Map market-price branches through Stage 11's accepted integer rule."""
 
+    if not spell.active:
+        raise ValueError("selling-value paths require the active ownership spell")
     masses: dict[int, Decimal] = {}
     for item in market_price_pmf.support:
         selling = selling_price_tenths(
@@ -58,6 +60,13 @@ def build_optimiser_price_scenarios(
         raise ValueError("price PMF exceeds exact bounded Stage-11 scenario support")
     if (ownership_spell is None) != (selling_price_rule is None):
         raise ValueError("ownership spell and selling rule must be supplied together")
+    if ownership_spell is not None:
+        if not ownership_spell.active:
+            raise ValueError("optimiser price scenarios require the active ownership spell")
+        if ownership_spell.player_id != player_id:
+            raise ValueError(
+                "optimiser price scenarios and ownership spell must refer to same player"
+            )
     scenarios = tuple(
         OptimiserPriceScenario(
             scenario_id=f"{player_id}:{horizon}:{item.price_units}",
