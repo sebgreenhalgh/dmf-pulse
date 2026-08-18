@@ -19,6 +19,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Publish workflow run identifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'dmf-pulse-gw1-reconciliation-bot'
+          git config user.email 'dmf-pulse-gw1-reconciliation-bot@users.noreply.github.com'
+          mkdir -p .recovery/gw1-checkpoint-1-2-package
+          printf '%s\n' "$GITHUB_RUN_ID" > .recovery/gw1-checkpoint-1-2-package/RUN_ID.txt
+          git add .recovery/gw1-checkpoint-1-2-package/RUN_ID.txt
+          git commit -m "chore(gw1): record reconciliation workflow run $GITHUB_RUN_ID"
+          git push origin 'HEAD:refs/heads/recovery/GW1-checkpoint-1-2-publish'
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
