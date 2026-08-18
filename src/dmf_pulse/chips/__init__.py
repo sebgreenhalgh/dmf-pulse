@@ -1,5 +1,6 @@
 """Stage-14 finite-inventory chip policy package."""
 
+from dmf_pulse.chips.bench_boost import evaluate_bench_boost
 from dmf_pulse.chips.captaincy import evaluate_triple_captain, optimise_captain_vice
 from dmf_pulse.chips.compiler import (
     COMPILER_VERSION,
@@ -31,12 +32,24 @@ from dmf_pulse.chips.inventory import (
     cancel_token,
     select_token,
 )
-from dmf_pulse.chips.policy_models import CaptainViceDecision, TripleCaptainEvaluation
+from dmf_pulse.chips.policy_models import (
+    BenchBoostCostProfile,
+    BenchBoostEvaluation,
+    BenchBoostRouteEvaluation,
+    BenchBoostScenarioValue,
+    CaptainViceDecision,
+    TripleCaptainEvaluation,
+    WildcardBenchBoostSynergy,
+)
 
 __all__ = [
     "COMPILER_VERSION",
     "ActivationRoute",
     "ActivationStatus",
+    "BenchBoostCostProfile",
+    "BenchBoostEvaluation",
+    "BenchBoostRouteEvaluation",
+    "BenchBoostScenarioValue",
     "CaptainViceDecision",
     "ChipDefinition",
     "ChipEffect",
@@ -50,6 +63,7 @@ __all__ = [
     "TokenEventKind",
     "TokenStatus",
     "TripleCaptainEvaluation",
+    "WildcardBenchBoostSynergy",
     "activate_token",
     "advance_inventory",
     "available_token_ids",
@@ -59,6 +73,7 @@ __all__ = [
     "compile_optimisation_chip_rules",
     "compile_synthetic_bundle",
     "definition_from_rules_runtime",
+    "evaluate_bench_boost",
     "evaluate_triple_captain",
     "optimise_captain_vice",
     "select_token",

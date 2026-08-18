@@ -10,7 +10,13 @@ from typing import Annotated, Literal
 
 from pydantic import Field, StrictBool, StrictFloat, StrictStr, model_validator
 
-from dmf_pulse.chips.definitions import FrozenModel, PositiveInt, Sha256, semantic_sha256
+from dmf_pulse.chips.definitions import (
+    FrozenModel,
+    NonNegativeInt,
+    PositiveInt,
+    Sha256,
+    semantic_sha256,
+)
 
 FiniteFloat = Annotated[StrictFloat, Field(allow_inf_nan=False)]
 Probability = Annotated[StrictFloat, Field(ge=0.0, le=1.0, allow_inf_nan=False)]
@@ -192,4 +198,171 @@ class TripleCaptainEvaluation(FrozenModel):
         payload = self.model_dump(mode="json", exclude={"evaluation_hash"})
         if semantic_sha256(payload) != self.evaluation_hash:
             raise ValueError("Triple Captain evaluation hash mismatch")
+        return self
+
+
+NonNegativeFloat = Annotated[StrictFloat, Field(ge=0.0, allow_inf_nan=False)]
+
+
+class BenchBoostCostProfile(FrozenModel):
+    """Explicit preparation and post-use costs before chip continuation value."""
+
+    plan_id: StrictStr = Field(min_length=1)
+    is_natural: StrictBool
+    preparation_transfer_count: NonNegativeInt = 0
+    preparation_hit_cost_points: NonNegativeFloat = 0.0
+    budget_shift_cost_points: NonNegativeFloat = 0.0
+    future_starting_xi_cost_points: NonNegativeFloat = 0.0
+    post_boost_unwind_cost_points: NonNegativeFloat = 0.0
+    price_route_cost_points: NonNegativeFloat = 0.0
+
+    @property
+    def total_cost_points(self) -> float:
+        """Return the transparent sum of declared policy costs."""
+
+        return float(
+            self.preparation_hit_cost_points
+            + self.budget_shift_cost_points
+            + self.future_starting_xi_cost_points
+            + self.post_boost_unwind_cost_points
+            + self.price_route_cost_points
+        )
+
+
+class BenchBoostScenarioValue(FrozenModel):
+    """Scenario-level Bench Boost result after ordinary autosub overlap."""
+
+    scenario_id: StrictStr = Field(min_length=1)
+    outcome_draw_id: StrictStr = Field(min_length=1)
+    weight: Probability
+    normal_points: FiniteFloat
+    bench_boost_points: FiniteFloat
+    gross_increment: FiniteFloat
+    bench_appeared_ids: tuple[StrictStr, ...]
+    normal_autosub_overlap_ids: tuple[StrictStr, ...]
+    bench_raw_points: FiniteFloat
+    autosub_overlap_points: FiniteFloat
+
+    @model_validator(mode="after")
+    def scenario_arithmetic_is_coherent(self) -> BenchBoostScenarioValue:
+        if abs(self.gross_increment - (self.bench_boost_points - self.normal_points)) > 1e-9:
+            raise ValueError("Bench Boost gross increment must compare common-scenario policies")
+        if len(self.bench_appeared_ids) != len(set(self.bench_appeared_ids)):
+            raise ValueError("appearing bench player IDs must be unique")
+        if len(self.normal_autosub_overlap_ids) != len(set(self.normal_autosub_overlap_ids)):
+            raise ValueError("autosub-overlap player IDs must be unique")
+        if not set(self.normal_autosub_overlap_ids) <= set(self.bench_appeared_ids):
+            raise ValueError("autosub overlap must be a subset of appearing bench players")
+        return self
+
+
+class BenchBoostRouteEvaluation(FrozenModel):
+    """One natural or engineered Bench Boost preparation route."""
+
+    plan_id: StrictStr = Field(min_length=1)
+    is_natural: StrictBool
+    normal_tactic_signature: Sha256
+    bench_boost_tactic_signature: Sha256
+    expected_normal_points: FiniteFloat
+    expected_bench_boost_points: FiniteFloat
+    gross_current_gain: FiniteFloat
+    costs: BenchBoostCostProfile
+    net_pre_continuation_value: FiniteFloat
+    evaluated_tactics: PositiveInt
+    scenario_values: tuple[BenchBoostScenarioValue, ...]
+    route_hash: Sha256
+
+    @model_validator(mode="after")
+    def route_arithmetic_is_coherent(self) -> BenchBoostRouteEvaluation:
+        if self.plan_id != self.costs.plan_id or self.is_natural != self.costs.is_natural:
+            raise ValueError("Bench Boost route identity must match its cost profile")
+        identities = tuple(
+            (item.scenario_id, item.outcome_draw_id) for item in self.scenario_values
+        )
+        if not identities or len(identities) != len(set(identities)):
+            raise ValueError("Bench Boost scenario identities must be non-empty and unique")
+        if abs(sum(item.weight for item in self.scenario_values) - 1.0) > 1e-9:
+            raise ValueError("Bench Boost scenario weights must sum to one")
+        expected_normal = sum(
+            item.weight * item.normal_points for item in self.scenario_values
+        )
+        expected_boost = sum(
+            item.weight * item.bench_boost_points for item in self.scenario_values
+        )
+        if abs(expected_normal - self.expected_normal_points) > 1e-9:
+            raise ValueError("Bench Boost expected normal points do not reconcile")
+        if abs(expected_boost - self.expected_bench_boost_points) > 1e-9:
+            raise ValueError("Bench Boost expected chip points do not reconcile")
+        if abs(self.gross_current_gain - (expected_boost - expected_normal)) > 1e-9:
+            raise ValueError("Bench Boost gross current gain does not reconcile")
+        expected_net = self.gross_current_gain - self.costs.total_cost_points
+        if abs(self.net_pre_continuation_value - expected_net) > 1e-9:
+            raise ValueError("Bench Boost net pre-continuation value does not reconcile")
+        payload = self.model_dump(mode="json", exclude={"route_hash"})
+        if semantic_sha256(payload) != self.route_hash:
+            raise ValueError("Bench Boost route hash mismatch")
+        return self
+
+
+class WildcardBenchBoostSynergy(FrozenModel):
+    """Measured route difference; positive synergy is never assumed."""
+
+    standalone_route_hash: Sha256
+    wildcard_prepared_route_hash: Sha256
+    measured_synergy: FiniteFloat
+    positive: StrictBool
+    synergy_hash: Sha256
+
+    @model_validator(mode="after")
+    def sign_and_hash_are_coherent(self) -> WildcardBenchBoostSynergy:
+        if self.positive != (self.measured_synergy > 0.0):
+            raise ValueError("Wildcard-Bench Boost synergy sign is inconsistent")
+        payload = self.model_dump(mode="json", exclude={"synergy_hash"})
+        if semantic_sha256(payload) != self.synergy_hash:
+            raise ValueError("Wildcard-Bench Boost synergy hash mismatch")
+        return self
+
+
+class BenchBoostEvaluation(FrozenModel):
+    """Bench Boost evaluation with explicit current and preparation value."""
+
+    chip_key: Literal["BENCH_BOOST"] = "BENCH_BOOST"
+    standalone_route: BenchBoostRouteEvaluation
+    wildcard_prepared_route: BenchBoostRouteEvaluation | None
+    wildcard_synergy: WildcardBenchBoostSynergy | None
+    chip_consumed: Literal[True]
+    continuation_value_included: Literal[False]
+    token_id: StrictStr = Field(min_length=1)
+    inventory_before_hash: Sha256
+    inventory_after_activation_hash: Sha256
+    scenario_set_hash: Sha256
+    ruleset_id: StrictStr = Field(min_length=1)
+    ruleset_version: StrictStr = Field(min_length=1)
+    ruleset_hash: Sha256
+    chip_definition_hash: Sha256
+    evaluation_hash: Sha256
+
+    @model_validator(mode="after")
+    def route_and_lineage_are_coherent(self) -> BenchBoostEvaluation:
+        if (self.wildcard_prepared_route is None) != (self.wildcard_synergy is None):
+            raise ValueError("Wildcard-Bench Boost route and synergy must be supplied together")
+        if self.wildcard_prepared_route is not None and self.wildcard_synergy is not None:
+            expected = (
+                self.wildcard_prepared_route.net_pre_continuation_value
+                - self.standalone_route.net_pre_continuation_value
+            )
+            if abs(expected - self.wildcard_synergy.measured_synergy) > 1e-9:
+                raise ValueError("Wildcard-Bench Boost measured synergy does not reconcile")
+            if self.wildcard_synergy.standalone_route_hash != self.standalone_route.route_hash:
+                raise ValueError("Wildcard-Bench Boost standalone route hash differs")
+            if (
+                self.wildcard_synergy.wildcard_prepared_route_hash
+                != self.wildcard_prepared_route.route_hash
+            ):
+                raise ValueError("Wildcard-Bench Boost prepared route hash differs")
+        if self.inventory_before_hash == self.inventory_after_activation_hash:
+            raise ValueError("consuming Bench Boost must change projected inventory state")
+        payload = self.model_dump(mode="json", exclude={"evaluation_hash"})
+        if semantic_sha256(payload) != self.evaluation_hash:
+            raise ValueError("Bench Boost evaluation hash mismatch")
         return self
