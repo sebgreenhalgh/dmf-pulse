@@ -1,0 +1,30 @@
+name: stage13-source-recovery
+
+on:
+  push:
+    branches:
+      - stage/A13/PRC-013-price-prediction
+
+permissions:
+  contents: read
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Build source archive
+        run: |
+          tar --exclude=.git --exclude=.venv --exclude=.pytest_cache --exclude='**/__pycache__' -czf "$RUNNER_TEMP/dmf-pulse-source.tar.gz" .
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmf-pulse-source
+          path: ${{ runner.temp }}/dmf-pulse-source.tar.gz
+          if-no-files-found: error
+          retention-days: 1
