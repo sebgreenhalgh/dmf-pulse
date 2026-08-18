@@ -1,0 +1,96 @@
+name: stage14-chunked-checkpoint-dispatch
+
+on:
+  push:
+    branches:
+      - stage/A14/CHIP-014-chip-optimisation
+    paths:
+      - recovery/stage14-checkpoint-parts/manifest.json
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: stage14-chunked-checkpoint-dispatch
+  cancel-in-progress: false
+
+jobs:
+  unpack-and-dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out canonical Stage 14 branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rebase on latest branch after locator publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 45
+          git fetch --no-tags origin \
+            stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          git reset --hard refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          test -f recovery/stage14-checkpoint-parts/manifest.json
+
+      - name: Verify, unpack and publish ordinary payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64
+          import gzip
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("recovery/stage14-checkpoint-parts")
+          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          parts = sorted(root.glob("part-*"))
+          if len(parts) != manifest["parts"]:
+              raise SystemExit(
+                  f"expected {manifest['parts']} parts, found {len(parts)}"
+              )
+          encoded = b"".join(part.read_bytes() for part in parts)
+          if hashlib.sha256(encoded).hexdigest() != manifest["b64_sha256"]:
+              raise SystemExit("compressed payload checksum mismatch")
+          decoded = gzip.decompress(base64.b64decode(encoded))
+          if len(decoded) != manifest["raw_size"]:
+              raise SystemExit("decoded payload size mismatch")
+          if hashlib.sha256(decoded).hexdigest() != manifest["raw_sha256"]:
+              raise SystemExit("decoded payload checksum mismatch")
+          json.loads(decoded)
+          Path("recovery/stage14-checkpoint.json").write_bytes(decoded)
+          for path in parts:
+              path.unlink()
+          (root / "manifest.json").unlink()
+          root.rmdir()
+          Path(".github/workflows/stage14-chunked-checkpoint-dispatch.yml").unlink()
+          PY
+          git add -A
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "checkpoint(chips): materialise Stage 14 scheduler payload"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:stage/A14/CHIP-014-chip-optimisation; then
+              break
+            fi
+            if [[ "$attempt" == 5 ]]; then
+              exit 1
+            fi
+            git fetch --no-tags origin \
+              stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+            git rebase refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          done
+
+      - name: Dispatch canonical checkpoint transport
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run stage14-checkpoint-transport.yml \
+            --ref stage/A14/CHIP-014-chip-optimisation
