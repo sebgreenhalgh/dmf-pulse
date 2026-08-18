@@ -1,0 +1,66 @@
+name: stage14-compressed-payload-unpack
+
+on:
+  push:
+    branches:
+      - stage/A14/CHIP-014-chip-optimisation
+    paths:
+      - recovery/stage14-checkpoint.json.gz.b64
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage14-compressed-payload-unpack
+  cancel-in-progress: false
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out canonical Stage 14 branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard absent compressed payload
+        id: guard
+        shell: bash
+        run: |
+          if [[ -f recovery/stage14-checkpoint.json.gz.b64 ]]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Decode and publish ordinary checkpoint payload
+        if: steps.guard.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64
+          import gzip
+          from pathlib import Path
+
+          compressed = Path("recovery/stage14-checkpoint.json.gz.b64")
+          decoded = gzip.decompress(base64.b64decode(compressed.read_bytes()))
+          Path("recovery/stage14-checkpoint.json").write_bytes(decoded)
+          compressed.unlink()
+          PY
+          git add -A
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "checkpoint(chips): materialise compressed Stage 14 payload [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:stage/A14/CHIP-014-chip-optimisation; then
+              break
+            fi
+            if [[ "$attempt" == 5 ]]; then
+              exit 1
+            fi
+            git fetch --no-tags origin stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+            git rebase refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          done
