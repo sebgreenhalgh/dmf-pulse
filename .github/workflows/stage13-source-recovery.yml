@@ -1,4 +1,4 @@
-name: stage13-offline-wheelhouse
+name: stage13-parent-git-bundle
 
 on:
   push:
@@ -9,44 +9,37 @@ permissions:
   contents: write
 
 jobs:
-  wheelhouse:
+  bundle:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
-      - name: Check out exact branch
+      - name: Check out full repository history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - name: Install pinned uv
-        run: python -m pip install --disable-pip-version-check uv==0.11.26
-      - name: Export and download locked dependencies
+      - name: Create exact immutable-parent Git bundle
         run: |
-          uv export --all-groups --frozen --no-emit-project --no-hashes --format requirements-txt --output-file "$RUNNER_TEMP/requirements.txt"
-          python -m pip download --disable-pip-version-check --dest "$RUNNER_TEMP/wheelhouse" --requirement "$RUNNER_TEMP/requirements.txt"
-          python -m pip download --disable-pip-version-check --dest "$RUNNER_TEMP/wheelhouse" 'editables==0.5'
-          tar -C "$RUNNER_TEMP" -czf "$RUNNER_TEMP/dmf-pulse-wheelhouse.tar.gz" requirements.txt wheelhouse
-          sha256sum "$RUNNER_TEMP/dmf-pulse-wheelhouse.tar.gz" > "$RUNNER_TEMP/dmf-pulse-wheelhouse.tar.gz.sha256"
-      - name: Upload locked wheelhouse
+          git branch bundle-parent ce7fe8f4354d95a477afcf6eed45f63cf0ab772e
+          git bundle create "$RUNNER_TEMP/dmf-pulse-parent.bundle" bundle-parent
+          git bundle verify "$RUNNER_TEMP/dmf-pulse-parent.bundle"
+          sha256sum "$RUNNER_TEMP/dmf-pulse-parent.bundle" > "$RUNNER_TEMP/dmf-pulse-parent.bundle.sha256"
+      - name: Upload Git bundle
         uses: actions/upload-artifact@v4
         with:
-          name: dmf-pulse-wheelhouse
+          name: dmf-pulse-parent-git-bundle
           path: |
-            ${{ runner.temp }}/dmf-pulse-wheelhouse.tar.gz
-            ${{ runner.temp }}/dmf-pulse-wheelhouse.tar.gz.sha256
+            ${{ runner.temp }}/dmf-pulse-parent.bundle
+            ${{ runner.temp }}/dmf-pulse-parent.bundle.sha256
           if-no-files-found: error
           retention-days: 1
-      - name: Record wheelhouse run ID
+      - name: Record bundle run ID
         run: |
           mkdir -p recovery
-          printf '%s\n' "$GITHUB_RUN_ID" > recovery/WHEELHOUSE_RUN_ID.txt
-          printf '%s\n' "$GITHUB_SHA" > recovery/WHEELHOUSE_SOURCE_COMMIT.txt
+          printf '%s\n' "$GITHUB_RUN_ID" > recovery/BUNDLE_RUN_ID.txt
+          printf '%s\n' "$GITHUB_SHA" > recovery/BUNDLE_SOURCE_COMMIT.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add recovery/WHEELHOUSE_RUN_ID.txt recovery/WHEELHOUSE_SOURCE_COMMIT.txt
-          git commit -m 'chore: record Stage 13 wheelhouse run'
+          git add recovery/BUNDLE_RUN_ID.txt recovery/BUNDLE_SOURCE_COMMIT.txt
+          git commit -m 'chore: record Stage 13 parent bundle run'
           git push
