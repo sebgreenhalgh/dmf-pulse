@@ -4,9 +4,9 @@
 
 - Original immutable GW1 parent: `9eb57143f6ee92f67c78607cc386678d962e62d4`
 - Working branch: `readiness/GW1-2026-27-live-input-initial-squad`
-- Starting remote SHA for this Pro session: `2a06f154c6ac7f0edef314daea534b916c0a4dad`
-- Recovery workflow trigger SHA: `74db662037af0b369d3686a4ce04e263c55803a4`
-- Recovery workflow run ID: `32146531054`
+- Starting remote SHA for this Pro session: `0353e2013a7c6065c011a287814bdaf554e0516f`
+- Recovery workflow trigger SHA: `9344beb6b33a80b0119f58ec57967aa24ef1fa5c`
+- Recovery workflow run ID: `32152205877`
 - Latest pushed SHA: recorded in the recovery bundle as `BUNDLE_HEAD.txt`; refreshed after each capability checkpoint.
 
 ## Checkpoint status
