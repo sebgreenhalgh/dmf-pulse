@@ -1,0 +1,33 @@
+{
+  "schema_version": "prc-013-adversarial-fixtures-v1",
+  "dataset_mode": "SYNTHETIC_REPLAY_ONLY",
+  "cases": [
+    {"id": "post_midnight_snapshot_leak", "domain": "temporal", "expected": "BLOCKED_LEAKAGE"},
+    {"id": "future_price_event_canary", "domain": "temporal", "expected": "BLOCKED_LEAKAGE"},
+    {"id": "late_received_transfer_snapshot", "domain": "temporal", "expected": "BLOCKED_LEAKAGE"},
+    {"id": "ambiguous_price_window", "domain": "labels", "expected": "AMBIGUOUS"},
+    {"id": "gw_counter_reset", "domain": "flow", "expected": "GAMEWEEK_COUNTER_RESET"},
+    {"id": "source_correction_counter_drop", "domain": "flow", "expected": "SOURCE_CORRECTION_COUNTER_DROP"},
+    {"id": "double_rise_recurrent", "domain": "paths", "expected": "POSITIVE_MULTIPLE_RISE_MASS"},
+    {"id": "rise_then_fall", "domain": "paths", "expected": "PATH_PRESENT"},
+    {"id": "external_predictor_future_leak", "domain": "external", "expected": "BLOCKED_LEAKAGE"},
+    {"id": "external_predictor_field_not_yet_available", "domain": "external", "expected": "VALIDATION_BLOCKED"},
+    {"id": "wildcard_activity_spike", "domain": "flow", "expected": "CHIP_UNCERTAINTY_FAIL_CLOSED"},
+    {"id": "flag_transition_folklore", "domain": "status", "expected": "NO_HARDCODED_PROTECTION"},
+    {"id": "ownership_rounding_boundary", "domain": "ownership", "expected": "DENOMINATOR_UNCERTAINTY"},
+    {"id": "integer_price_support", "domain": "paths", "expected": "INTEGER_ONLY"},
+    {"id": "repurchase_resets_cohort", "domain": "selling", "expected": "NEW_PURCHASE_PRICE"},
+    {"id": "profit_retention_path", "domain": "selling", "expected": "STAGE11_EXACT"},
+    {"id": "outer_fold_calibration_leak", "domain": "calibration", "expected": "BLOCKED_LEAKAGE"},
+    {"id": "regime_drift_2026", "domain": "activation", "expected": "TARGET_SEASON_UNCALIBRATED"},
+    {"id": "route_blocked_by_price_rise", "domain": "optimiser", "expected": "AFFORDABILITY_FALSE"},
+    {"id": "act_now_false_alarm", "domain": "decision", "expected": "WAIT_BY_COMPLETE_UTILITY"},
+    {"id": "clean_rise_no_change_fall_sequence", "domain": "labels", "expected": "THREE_EVENTS"},
+    {"id": "low_ownership", "domain": "ownership", "expected": "LOW_REGIME"},
+    {"id": "injury_sales_surge", "domain": "flow", "expected": "NEGATIVE_PRESSURE"},
+    {"id": "stale_snapshot", "domain": "flow", "expected": "STALE_SNAPSHOT"},
+    {"id": "press_conference_information_event", "domain": "decision", "expected": "WAIT_INFORMATION_VALUE"},
+    {"id": "price_only_hit", "domain": "decision", "expected": "NO_PRICE_CHASING"},
+    {"id": "ft_otherwise_expiring", "domain": "decision", "expected": "FREE_TRANSFER_VALUE_INCLUDED"}
+  ]
+}

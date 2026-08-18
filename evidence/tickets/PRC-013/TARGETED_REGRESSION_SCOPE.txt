@@ -1,0 +1,19 @@
+PRC-013 targeted inherited regression scope
+
+Stage 5 / ingestion (4): conservative rights capability matrix; terms/decision-time separation;
+secret-safe rights denial; fixture/profile binding. Reason: Stage 13 retains rights identifiers and
+must not elevate synthetic/external evidence.
+
+Stage 11 / optimisation (5): floor-half-profit/full-loss selling value; sell/repurchase ownership
+cohort reset; unaffordable route rejection; repurchase state transition; current-action-only
+execution. Reason: Stage 13 calls the accepted selling function and exports discrete affordability
+branches without copying Stage-11 economics.
+
+Stage 12 / evaluation (6): system-time eligibility; strict leakage blocking; deterministic expanding
+folds; outer/future calibration exclusion; decision regret; immutable artifact hash/collision/path
+confinement. Reason: Stage 13 reuses these temporal, metric and artifact boundaries.
+
+Rules (2): v1.1 manager-state price/selling schema surface; current 2026/27 checked source claims.
+Reason: Stage 13 must preserve integer price/rule interfaces without activating incomplete rules.
+
+Result: 17 passed. Full repository pytest intentionally deferred to independent Sol review.

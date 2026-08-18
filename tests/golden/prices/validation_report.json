@@ -1,0 +1,19 @@
+{
+  "activation_statuses": [
+    "RIGHTS_BLOCKED",
+    "SHADOW_ONLY",
+    "TARGET_SEASON_UNCALIBRATED"
+  ],
+  "automated_provider_capture": false,
+  "challenger_status": "DEPENDENCY_NOT_APPROVED",
+  "configuration_id": "PRC-013-SYNTHETIC-REFERENCE-V1",
+  "configuration_sha256": "2b840e1ffa24a90fff8a4448e1084b637c94b75817ad5f58e04fea3b69c44791",
+  "implemented_models": [
+    "P0_NO_CHANGE",
+    "P1_REGULARIZED_COMPETING_LOGIT",
+    "P2_RECURRENT_LATENT_PRESSURE"
+  ],
+  "production_actionable": false,
+  "schema_version": "price-validation-report-v1",
+  "status": "ENGINEERING_READY"
+}

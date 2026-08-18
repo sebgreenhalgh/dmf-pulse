@@ -1,5 +1,38 @@
 # DMF Pulse execution plans
 
+## PRC-013 Stage-13 price prediction and ACT/WAIT
+
+- Ticket/stage: `PRC-013`, DMFP-19 Stage 13 / playbook B3; immutable parent
+  `ce7fe8f4354d95a477afcf6eed45f63cf0ab772e` on `main`.
+- Branch: `stage/A13/PRC-013-price-prediction`.
+- Scope: immutable cutoff-safe price observations and update cycles; transfer-flow,
+  ownership, status, calendar and recurrent features; deterministic P0 no-change,
+  P1 regularized competing-logit and P2 recurrent latent-pressure baselines; calibrated
+  next-update probabilities; recurrent 24h/72h/7d discrete price paths; exact Stage-11
+  selling-value/scenario integration; Stage-12 chronological evaluation; complete
+  ACT/WAIT utility; offline CLI and immutable artifacts.
+- Safety: synthetic/replay and rights-approved inputs only; `usable_at` is the governing
+  feature boundary; no hidden-threshold, wildcard, flag-lock, exact update-minute or weekly-cap
+  claim; no predictor scraping; no new dependency, migration, Stage 14+ logic, live-history
+  fabrication, PR, merge, accepted tag or production promotion.
+- Model status: engineering implementation may become `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`;
+  target-season use remains `SHADOW_ONLY`, `TARGET_SEASON_UNCALIBRATED` and rights-gated.
+
+### PRC-013 checkpoints
+
+- [x] Verify the immutable Stage-12 parent, advanced `main`, branch ancestry, repository
+  authority and the complete external-research delta.
+- [x] Freeze the ticket contract, model/dependency/rights boundary and focused acceptance plan.
+- [x] Implement public contracts, temporal observations/cycles/features and the P0/P1/P2 ladder.
+- [x] Implement recurrent price PMFs, Stage-11 selling/scenario reuse, Stage-12 evaluation and
+  ACT/WAIT decision integration.
+- [x] Add physical adversarial fixtures plus unit/property/contract/golden/integration/replay/CLI
+  and artifact tests.
+- [x] Run focused acceptance, targeted inherited regressions and >=90% Stage-13 branch coverage.
+- [x] Run final Ruff, mypy, frozen sync, build, installed-wheel and CLI gates.
+- [ ] Finalize truthful evidence, inspect the exact-parent diff, commit, push and verify remote
+  equality; only then build and integrity-check the compact independent-Sol review bundle.
+
 ## OPT-010 - exact bounded one-Gameweek optimiser
 
 - Ticket/stage: `OPT-010`, A10; immutable parent
