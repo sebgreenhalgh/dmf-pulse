@@ -9,7 +9,6 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: write
   contents: write
 
 concurrency:
@@ -17,40 +16,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  export-or-publish:
+  materialise:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 10
     steps:
       - name: Check out Stage 14
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v6
-        with:
-          enable-cache: false
-
-      - name: Rebase on latest canonical branch
+      - name: Materialise verified scheduler payload when staged
         shell: bash
         run: |
           set -euo pipefail
           git fetch --no-tags origin \
-            main:refs/remotes/origin/main \
             stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
           git reset --hard refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
-
-      - name: Verify and materialise staged scheduler payload
-        id: payload
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ ! -f recovery/stage14-checkpoint-parts/manifest.json \
-                && ! -f recovery/stage14-checkpoint.json.gz.b64 ]]; then
-            echo "present=false" >> "$GITHUB_OUTPUT"
+          if [[ ! -f recovery/stage14-checkpoint-parts/manifest.json ]]; then
+            echo "No staged scheduler payload is present."
             exit 0
           fi
-          echo "present=true" >> "$GITHUB_OUTPUT"
           python - <<'PY'
           import base64
           import gzip
@@ -58,208 +43,41 @@ jobs:
           import json
           from pathlib import Path
 
-          parts_root = Path("recovery/stage14-checkpoint-parts")
-          compressed = Path("recovery/stage14-checkpoint.json.gz.b64")
-          output = Path("recovery/stage14-checkpoint.json")
-
-          if (parts_root / "manifest.json").exists():
-              manifest = json.loads(
-                  (parts_root / "manifest.json").read_text(encoding="utf-8")
+          root = Path("recovery/stage14-checkpoint-parts")
+          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          parts = sorted(root.glob("part-*"))
+          if len(parts) != manifest["parts"]:
+              raise SystemExit(
+                  f"expected {manifest['parts']} parts, found {len(parts)}"
               )
-              parts = sorted(parts_root.glob("part-*"))
-              if len(parts) != manifest["parts"]:
-                  raise SystemExit(
-                      f"expected {manifest['parts']} parts, found {len(parts)}"
-                  )
-              encoded = b"".join(part.read_bytes() for part in parts)
-              if hashlib.sha256(encoded).hexdigest() != manifest["b64_sha256"]:
-                  raise SystemExit("compressed payload checksum mismatch")
-              decoded = gzip.decompress(base64.b64decode(encoded))
-              if len(decoded) != manifest["raw_size"]:
-                  raise SystemExit("decoded payload size mismatch")
-              if hashlib.sha256(decoded).hexdigest() != manifest["raw_sha256"]:
-                  raise SystemExit("decoded payload checksum mismatch")
-              json.loads(decoded)
-              output.write_bytes(decoded)
-              for path in parts:
-                  path.unlink()
-              (parts_root / "manifest.json").unlink()
-              parts_root.rmdir()
-          elif compressed.exists():
-              decoded = gzip.decompress(base64.b64decode(compressed.read_bytes()))
-              json.loads(decoded)
-              output.write_bytes(decoded)
-              compressed.unlink()
-          else:
-              raise SystemExit("staged payload vanished during verification")
-          PY
-
-      - name: Materialise checkpoint files and restore transport helpers
-        if: steps.payload.outputs.present == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          payload_path = Path("recovery/stage14-checkpoint.json")
-          payload = json.loads(payload_path.read_text(encoding="utf-8"))
-          message = payload.get("message")
-          if not isinstance(message, str) or not message.strip():
-              raise SystemExit("checkpoint message must be a non-empty string")
-
-          for raw_path, content in payload.get("files", {}).items():
-              path = Path(raw_path)
-              path.parent.mkdir(parents=True, exist_ok=True)
-              path.write_text(content, encoding="utf-8")
-
-          for mutation in payload.get("mutations", []):
-              path = Path(mutation["path"])
-              text = path.read_text(encoding="utf-8")
-              marker = mutation["marker"]
-              content = mutation["content"]
-              once_marker = mutation.get(
-                  "once_marker", content.strip().splitlines()[0]
-              )
-              if once_marker in text:
-                  continue
-              operation = mutation["operation"]
-              if operation == "append_once":
-                  text = text.rstrip() + "\n\n" + content.strip() + "\n"
-              elif operation == "insert_before_once":
-                  if marker not in text:
-                      raise SystemExit(f"marker not found in {path}: {marker!r}")
-                  text = text.replace(marker, content + marker, 1)
-              elif operation == "insert_after_once":
-                  if marker not in text:
-                      raise SystemExit(f"marker not found in {path}: {marker!r}")
-                  text = text.replace(marker, marker + content, 1)
-              elif operation == "replace_once":
-                  if marker not in text:
-                      raise SystemExit(f"marker not found in {path}: {marker!r}")
-                  text = text.replace(marker, content, 1)
-              else:
-                  raise SystemExit(f"unsupported mutation operation: {operation}")
-              path.write_text(text, encoding="utf-8")
-
-          for raw_path in payload.get("delete_paths", []):
-              path = Path(raw_path)
-              if path.is_file() or path.is_symlink():
-                  path.unlink()
-
-          payload_path.unlink()
+          encoded = b"".join(part.read_bytes() for part in parts)
+          if hashlib.sha256(encoded).hexdigest() != manifest["b64_sha256"]:
+              raise SystemExit("compressed payload checksum mismatch")
+          decoded = gzip.decompress(base64.b64decode(encoded))
+          if len(decoded) != manifest["raw_size"]:
+              raise SystemExit("decoded payload size mismatch")
+          if hashlib.sha256(decoded).hexdigest() != manifest["raw_sha256"]:
+              raise SystemExit("decoded payload checksum mismatch")
+          json.loads(decoded)
+          Path("recovery/stage14-checkpoint.json").write_bytes(decoded)
+          for path in parts:
+              path.unlink()
+          (root / "manifest.json").unlink()
+          root.rmdir()
           Path("recovery/stage14-workspace-artifact.json").unlink(missing_ok=True)
           Path(
               ".github/workflows/stage14-chunked-checkpoint-dispatch.yml"
           ).unlink(missing_ok=True)
-          Path("/tmp/stage14-message.txt").write_text(
-              message.strip() + "\n", encoding="utf-8"
-          )
-          Path("/tmp/stage14-format-paths.txt").write_text(
-              "\n".join(payload.get("format_paths", [])) + "\n",
-              encoding="utf-8",
-          )
-          Path("/tmp/stage14-lint-paths.txt").write_text(
-              "\n".join(payload.get("lint_paths", [])) + "\n",
-              encoding="utf-8",
-          )
-          Path("/tmp/stage14-mypy-paths.txt").write_text(
-              "\n".join(payload.get("mypy_paths", [])) + "\n",
-              encoding="utf-8",
-          )
-          Path("/tmp/stage14-test-commands.sh").write_text(
-              "set -euo pipefail\n"
-              + "\n".join(payload.get("test_commands", []))
-              + "\n",
-              encoding="utf-8",
-          )
           PY
           git show 24a84fff4d5a8409c52d018887750d820409c1cd \
             > .github/workflows/stage14-workspace-export.yml
           git show 88b3f1b08e95de4da0d30532eff05a1c34300a61 \
             > .github/workflows/stage14-compressed-payload-unpack.yml
-
-      - name: Sync locked environment
-        if: steps.payload.outputs.present == 'true'
-        run: uv sync --all-groups --frozen
-
-      - name: Format and execute scheduler verification
-        if: steps.payload.outputs.present == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t format_paths < <(grep -v '^$' /tmp/stage14-format-paths.txt || true)
-          mapfile -t lint_paths < <(grep -v '^$' /tmp/stage14-lint-paths.txt || true)
-          mapfile -t mypy_paths < <(grep -v '^$' /tmp/stage14-mypy-paths.txt || true)
-          if (( ${#format_paths[@]} )); then
-            uv run ruff format "${format_paths[@]}"
-            uv run ruff format --check "${format_paths[@]}"
-          fi
-          if (( ${#lint_paths[@]} )); then
-            uv run ruff check "${lint_paths[@]}"
-          fi
-          if (( ${#mypy_paths[@]} )); then
-            uv run mypy --strict "${mypy_paths[@]}"
-          fi
-          bash /tmp/stage14-test-commands.sh
-
-      - name: Resolve verification placeholders
-        if: steps.payload.outputs.present == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          import re
-          from pathlib import Path
-
-          replacements = {}
-          focused = Path("/tmp/stage14-focused.log")
-          all_tests = Path("/tmp/stage14-all.log")
-          coverage = Path("/tmp/stage14-coverage.json")
-          if focused.exists():
-              match = re.search(r"(\d+) passed", focused.read_text(encoding="utf-8"))
-              if match:
-                  replacements["@@FOCUSED_PASSED@@"] = match.group(1)
-          if all_tests.exists():
-              match = re.search(r"(\d+) passed", all_tests.read_text(encoding="utf-8"))
-              if match:
-                  replacements["@@ALL_CHIP_PASSED@@"] = match.group(1)
-          if coverage.exists():
-              totals = json.loads(coverage.read_text(encoding="utf-8"))["totals"]
-              replacements.update(
-                  {
-                      "@@COVERAGE_PERCENT@@": f"{totals['percent_covered']:.2f}",
-                      "@@COVERED_BRANCHES@@": str(totals["covered_branches"]),
-                      "@@NUM_BRANCHES@@": str(totals["num_branches"]),
-                  }
-              )
-          for path in Path(".").rglob("*"):
-              if not path.is_file() or ".git" in path.parts or ".venv" in path.parts:
-                  continue
-              try:
-                  text = path.read_text(encoding="utf-8")
-              except UnicodeDecodeError:
-                  continue
-              updated = text
-              for token, value in replacements.items():
-                  updated = updated.replace(token, value)
-              if updated != text:
-                  path.write_text(updated, encoding="utf-8")
-          PY
-
-      - name: Commit and push coherent scheduler capability
-        if: steps.payload.outputs.present == 'true'
-        id: commit
-        shell: bash
-        run: |
-          set -euo pipefail
           git add -A
           git diff --cached --check
-          git config user.name "Sebastian Greenhalgh"
-          git config user.email "seb.greenhalgh@outlook.com"
-          git commit -F /tmp/stage14-message.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "checkpoint(chips): materialise verified scheduler payload [skip ci]"
           for attempt in 1 2 3 4 5; do
             if git push origin HEAD:stage/A14/CHIP-014-chip-optimisation; then
               break
@@ -271,80 +89,3 @@ jobs:
               stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
             git rebase refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
           done
-          capability_sha="$(git rev-parse HEAD)"
-          git fetch --no-tags origin \
-            stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
-          remote_sha="$(git rev-parse refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation)"
-          test "$capability_sha" = "$remote_sha"
-          echo "capability_sha=$capability_sha" >> "$GITHUB_OUTPUT"
-
-      - name: Export exact canonical workspace
-        id: source
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch --no-tags origin \
-            main:refs/remotes/origin/main \
-            stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
-          git reset --hard refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
-          source_sha="$(git rev-parse HEAD)"
-          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
-          git archive --format=zip --output=dmf-pulse-source.zip HEAD
-          git bundle create dmf-pulse-stage14.bundle \
-            HEAD \
-            refs/remotes/origin/main
-
-      - name: Upload exact canonical workspace
-        id: upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: stage14-workspace-${{ steps.source.outputs.source_sha }}
-          path: |
-            dmf-pulse-source.zip
-            dmf-pulse-stage14.bundle
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Publish recovery locator on auxiliary branch
-        env:
-          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
-          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
-          RUN_ID: ${{ github.run_id }}
-          SOURCE_SHA: ${{ steps.source.outputs.source_sha }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git ls-remote --exit-code --heads origin stage14-toolchain-transport >/dev/null; then
-            git fetch --no-tags origin \
-              stage14-toolchain-transport:refs/remotes/origin/stage14-toolchain-transport
-            git switch --detach refs/remotes/origin/stage14-toolchain-transport
-          else
-            git switch --orphan stage14-toolchain-transport
-            git rm -rf --ignore-unmatch .
-          fi
-          mkdir -p recovery
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          Path("recovery/stage14-transport-result.json").write_text(
-              json.dumps(
-                  {
-                      "artifact_id": int(os.environ["ARTIFACT_ID"]),
-                      "artifact_url": os.environ["ARTIFACT_URL"],
-                      "capability_sha": os.environ["SOURCE_SHA"],
-                      "run_id": int(os.environ["RUN_ID"]),
-                  },
-                  indent=2,
-                  sort_keys=True,
-              )
-              + "\n",
-              encoding="utf-8",
-          )
-          PY
-          git add recovery/stage14-transport-result.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "checkpoint(chips): publish Stage 14 transport result [skip ci]"
-          git push origin HEAD:stage14-toolchain-transport
