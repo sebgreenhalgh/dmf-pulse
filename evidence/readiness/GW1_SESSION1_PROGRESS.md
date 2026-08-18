@@ -18,7 +18,7 @@
 | 1.0 Remote state / progress bootstrap | COMPLETE | Immutable-parent ancestry and branch head verified. |
 | 1.1 Runtime odds credential foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
 | 1.2 Current official FPL input foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
-| 1.3 Live The Odds API input foundation | IN_PROGRESS | Checkpoint 1.3A capability is published; scan-safe fixture remediation and repeat validation are in progress. |
+| 1.3 Live The Odds API input foundation | IN_PROGRESS | Checkpoint 1.3A is complete and remotely validated; Checkpoint 1.3B is the exact next action. |
 | 1.4 FPL / odds identity integrity | INCOMPLETE | Not started. |
 | 1.5 Session-1 artifacts / operator workflow | INCOMPLETE | Not started. |
 
@@ -30,7 +30,10 @@
 - Focused validation workflow commit — `a318175ec82d39df7458d9dc003a5a54a481827a`.
 - First validation evidence commit — `0c19357bd7e525ea4b7205f6768f941444772815`.
 - First validation workflow run — `32191636148`.
-- Remote branch was verified at `0c19357bd7e525ea4b7205f6768f941444772815` before this remediation publication.
+- Scan-safe remediation commit — `f23396a6d254cf681da0816f739dc3dc4428cebb`.
+- Passing validation evidence commit — `ffe97f623f65c533379c65372672ff037683ebbc`.
+- Passing validation workflow run — `32192196539`.
+- Latest pushed and verified remote SHA before this attestation — `ffe97f623f65c533379c65372672ff037683ebbc`.
 
 ### Capability proved
 
@@ -50,12 +53,17 @@
 - `git diff --check` — PASS.
 - First-party secret scan — FAIL because the synthetic test constant name matched the repository scanner's sensitive-assignment heuristic; no real credential was present.
 
-### Remediation in the commit containing this update
+### Passing repeat validation and attestation
 
-- Rename the synthetic raw test constant so the scanner does not classify an intentionally fake value as a likely sensitive assignment.
-- Preserve all secret-nondisclosure assertions and credential-to-transport behavior.
-- Extend the focused validation evidence report to include the scanner's fingerprint-only JSON output.
-- Trigger the branch-scoped focused validation workflow again; Checkpoint 1.3A remains `IN_PROGRESS` until the repeat run passes and an exact-SHA attestation is published.
+- Focused pytest — PASS, `11 passed in 2.08s`.
+- Ruff format — PASS.
+- Ruff lint — PASS.
+- Strict mypy on `src/dmf_pulse/ingestion/odds/client.py` and `service.py` — PASS.
+- `git diff --check` — PASS.
+- First-party secret scan — PASS, `finding_count=0`.
+- The validated commit was `f23396a6d254cf681da0816f739dc3dc4428cebb`; machine-written evidence is committed at `ffe97f623f65c533379c65372672ff037683ebbc`.
+- Checkpoint 1.3A status — `COMPLETE`.
+- Publication state — all 1.3A changes and evidence are pushed; remote ref equals the latest verified commit above.
 
 ## Rights and storage state
 
@@ -76,4 +84,4 @@
 - PostgreSQL-backed provider-native current-input evidence is not part of 1.3A and remains for 1.3B validation.
 - No real credentialled provider call has occurred.
 - Checkpoint 1.4 cross-provider identity mapping has not been started.
-- Exact next action after repeat 1.3A validation and attestation: **CHECKPOINT 1.3B — QUOTA / RETRIES / PROVIDER VALIDATION**.
+- Exact next action: **CHECKPOINT 1.3B — QUOTA / RETRIES / PROVIDER VALIDATION**.
