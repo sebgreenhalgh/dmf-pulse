@@ -1,0 +1,75 @@
+name: gw1-session1-dependency-export
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-session1-dependency-export.yml
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned uv and frozen dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check uv==0.11.26
+          uv sync --all-groups --frozen
+
+      - name: Package site-packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          root = Path('.venv/lib')
+          matches = sorted(root.glob('python*/site-packages'))
+          if len(matches) != 1:
+              raise SystemExit(f'expected one site-packages directory, got {matches!r}')
+          Path('artifacts/gw1-session1-bootstrap/DEPS_SITE_PACKAGES_PATH.txt').write_text(
+              matches[0].as_posix() + '\n', encoding='utf-8'
+          )
+          PY
+          site_packages=$(cat artifacts/gw1-session1-bootstrap/DEPS_SITE_PACKAGES_PATH.txt)
+          tar -czf artifacts/gw1-session1-bootstrap/dmf-pulse-gw1-deps.tar.gz -C "$(dirname "$site_packages")" site-packages
+          sha256sum artifacts/gw1-session1-bootstrap/dmf-pulse-gw1-deps.tar.gz > artifacts/gw1-session1-bootstrap/dmf-pulse-gw1-deps.tar.gz.sha256
+
+      - name: Upload dependency artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmf-pulse-gw1-deps-${{ github.run_id }}
+          path: |
+            artifacts/gw1-session1-bootstrap/dmf-pulse-gw1-deps.tar.gz
+            artifacts/gw1-session1-bootstrap/dmf-pulse-gw1-deps.tar.gz.sha256
+            artifacts/gw1-session1-bootstrap/DEPS_SITE_PACKAGES_PATH.txt
+          if-no-files-found: error
+          retention-days: 2
+          compression-level: 0
+
+      - name: Record run ID and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' "$GITHUB_RUN_ID" > artifacts/gw1-session1-bootstrap/DEPS_ARTIFACT_RUN_ID.txt
+          rm -f .github/workflows/gw1-session1-dependency-export.yml
+          git config user.name "dmf-pulse-gw1-session1-bot"
+          git config user.email "dmf-pulse-gw1-session1-bot@users.noreply.github.com"
+          git add -A
+          git add -f artifacts/gw1-session1-bootstrap/DEPS_ARTIFACT_RUN_ID.txt
+          git commit -m "chore(gw1): record dependency artifact run"
+          git push origin HEAD:refs/heads/readiness/GW1-2026-27-live-input-initial-squad
