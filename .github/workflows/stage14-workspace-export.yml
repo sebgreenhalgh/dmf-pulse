@@ -1,29 +1,93 @@
 name: stage14-workspace-export
 
 on:
+  push:
+    branches:
+      - stage/A14/CHIP-014-chip-optimisation
+    paths-ignore:
+      - recovery/stage14-toolchain-artifact.json
   workflow_dispatch:
 
 permissions:
-  contents: read
+  actions: read
+  contents: write
+
+concurrency:
+  group: stage14-toolchain-export-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   export:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Check out Stage 14
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false
 
-      - name: Export exact repository tree
-        run: git archive --format=zip --output=dmf-pulse-source.zip HEAD
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
-      - name: Upload workspace archive
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.10.0"
+
+      - name: Restore exact frozen development environment
+        run: uv sync --all-groups --frozen
+
+      - name: Export exact repository and toolchain
+        run: |
+          git fetch --no-tags origin \
+            main:refs/remotes/origin/main \
+            stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          git bundle create dmf-pulse-stage14.bundle \
+            refs/remotes/origin/main \
+            refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          git bundle verify dmf-pulse-stage14.bundle
+          tar -czf dmf-pulse-stage14-toolchain.tar.gz .venv
+
+      - name: Upload workspace and toolchain
+        id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: stage14-workspace-${{ github.sha }}
-          path: dmf-pulse-source.zip
+          name: stage14-toolchain-${{ github.sha }}
+          path: |
+            dmf-pulse-stage14.bundle
+            dmf-pulse-stage14-toolchain.tar.gz
           if-no-files-found: error
           retention-days: 1
+
+      - name: Publish toolchain artifact locator
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          RUN_ID: ${{ github.run_id }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p recovery
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          payload = {
+              "artifact_id": int(os.environ["ARTIFACT_ID"]),
+              "artifact_url": os.environ["ARTIFACT_URL"],
+              "run_id": int(os.environ["RUN_ID"]),
+              "source_sha": os.environ["SOURCE_SHA"],
+              "frozen_sync": "PASS",
+          }
+          Path("recovery/stage14-toolchain-artifact.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add recovery/stage14-toolchain-artifact.json
+          git commit -m "checkpoint(chips): publish Stage 14 frozen toolchain [skip ci]"
+          git push origin HEAD:stage/A14/CHIP-014-chip-optimisation
