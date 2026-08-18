@@ -1,0 +1,53 @@
+name: gw1-session1-bootstrap
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-session1-bootstrap.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact pushed revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Record source identity
+        run: |
+          git rev-parse HEAD > SOURCE_COMMIT.txt
+          git merge-base 9eb57143f6ee92f67c78607cc386678d962e62d4 HEAD > SOURCE_MERGE_BASE.txt
+
+      - name: Build clean source archive
+        run: |
+          tar \
+            --exclude=.git \
+            --exclude=.venv \
+            --exclude=.uv-cache \
+            --exclude='**/__pycache__' \
+            --exclude=.pytest_cache \
+            --exclude=.mypy_cache \
+            --exclude=.ruff_cache \
+            -czf /tmp/dmf-pulse-gw1-session1-source.tar.gz .
+          test -s /tmp/dmf-pulse-gw1-session1-source.tar.gz
+          tar -tzf /tmp/dmf-pulse-gw1-session1-source.tar.gz >/dev/null
+          sha256sum /tmp/dmf-pulse-gw1-session1-source.tar.gz > /tmp/dmf-pulse-gw1-session1-source.tar.gz.sha256
+
+      - name: Upload exact source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmf-pulse-gw1-session1-source-${{ github.sha }}
+          path: |
+            /tmp/dmf-pulse-gw1-session1-source.tar.gz
+            /tmp/dmf-pulse-gw1-session1-source.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 2
+          compression-level: 0
