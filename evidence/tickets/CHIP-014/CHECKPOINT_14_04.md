@@ -53,4 +53,4 @@ The focused suite covers:
 
 ## Status
 
-Checkpoint `14.04` is code- and test-complete locally pending remote fast-forward publication and independent review. The canonical write surface was unavailable in this container session; no force/reset/squash was used.
+Checkpoint `14.04` is published on the canonical Stage-14 branch at capability commit `ef3f5b2`. Publication was non-force and the remote tree contains the Free Hit implementation, tests and evidence. Independent review and human acceptance remain pending; no merge, PR or tag was created.

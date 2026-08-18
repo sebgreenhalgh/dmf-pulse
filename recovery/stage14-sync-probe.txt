@@ -1,2 +1,0 @@
-Stage 14 checkpoint 14.06 atomic publisher trigger.
-Temporary recovery marker; removed by the verified scheduler payload.

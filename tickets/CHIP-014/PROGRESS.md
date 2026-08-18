@@ -5,146 +5,113 @@
 - Immutable original parent: `a8796d4edacea4c87ee6461d381f4df87e1ef39c`
 - Branch: `stage/A14/CHIP-014-chip-optimisation`
 - Delivery mode: Git-first, resumable checkpoint publication.
-- Current engineering status: `IN_PROGRESS`
+- Current engineering status: `IN_PROGRESS — 14.06 COMPLETE_PENDING_PUBLICATION`
 - Human acceptance: `false`
 - Merged: `false`
 - Accepted tag: none
 
-## Startup verification
+## Startup and recovery verification
 
-- `origin/main` at branch creation: `a8796d4edacea4c87ee6461d381f4df87e1ef39c`.
-- Resumed session verification on `2026-08-18`: current `origin/main` is still exactly `a8796d4edacea4c87ee6461d381f4df87e1ef39c`.
-- The remote Stage-14 branch compares `ahead_by=24`, `behind_by=0` against the immutable parent; merge-base is the immutable parent.
-- Remote progress is authoritative and identifies `14.04 Free Hit` as the first unfinished checkpoint.
-- The recovered workspace was reconciled exactly to remote branch HEAD `3b8113893eccbaaf8fc63daa5ce031209062a587` before implementation resumed.
-- Branch created directly from the immutable parent.
-- Ordinary container Git transport is unavailable because this execution container cannot resolve `github.com`.
-- Durable publication uses authenticated GitHub Git-data/contents APIs with non-force fast-forward updates.
-- Every publication is verified by comparing the intended commit with the remote branch ref.
-- Temporary recovery transport/export workflows remain retained during implementation and must be removed before final delivery.
+- `origin/main` remained exactly the immutable Stage-14 parent at resume.
+- The canonical remote branch was verified through Wildcard capability
+  `0449dd7c47ae983a78fb8ef9098ce604ae3022db` before unfinished work resumed.
+- The previously reported local scheduler commit
+  `3935bc00ff760a6c76bb6115e142aa273affc371` was absent from the recovered
+  repository, workspace export, reflog/object store and stash. It is not claimed
+  as recovered.
+- The reported 14.07 stash was also absent. Checkpoint 14.07 will be implemented
+  from the published 14.06 state, not reconstructed from an invented stash.
+- Checkpoint 14.06 was reimplemented only, using recovered uncommitted remnants
+  as guidance; checkpoints 14.01–14.05 were not rebuilt.
+- Ordinary Git network transport is unavailable in this execution environment.
+  Authenticated GitHub contents/workflow transport remains temporarily retained
+  for non-force checkpoint publication and will be removed before final handoff.
 
 ## Checkpoints
 
-| Checkpoint | Status | Latest pushed capability commit | Direct tests | Notes |
+| Checkpoint | Status | Latest pushed capability commit | Direct verification | Notes |
 |---|---|---|---|---|
-| Bootstrap | COMPLETE | `6b7f1d528a85f474e2affe912b72d6d24881839e` | not applicable | Remote resumable branch and progress record created. |
-| 14.01 generic chip definition/inventory | COMPLETE | `3173c97f5d04b3b0fe65c8e9b17876d257b233be` | 58 passed | 98% branch coverage for compiler/inventory. |
-| 14.02 captain/vice/Triple Captain | COMPLETE | `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2` | 41 passed | 99% branch coverage for captaincy/TC. |
-| 14.03 Bench Boost | COMPLETE | `f1c384972567befbe4713c56bfaaa4a481135687` | 67 passed | 26 new BB tests; 94% combined affected coverage. |
-| 14.04 Free Hit | COMPLETE_LOCAL / PUSH_PENDING | local capability commit; exact SHA is recorded by branch history | 23 focused; 149 all chip unit/property | Best legal temporary policy versus best legal normal-transfer policy; exact permanent restoration. |
-| 14.05 Wildcard | COMPLETE_LOCAL / PUSH_PENDING | local capability commit; exact SHA is recorded by branch history | 58 focused; 207 all chip unit/property | Immediate, delayed, Free Hit bridge and hold/expiry routes; exact permanent reset and purchase cohorts. |
-| 14.06 scheduler/continuation | NOT_STARTED | — | — | — |
-| 14.07 CLI/evaluation/evidence | NOT_STARTED | — | — | — |
+| Bootstrap | COMPLETE | `6b7f1d528a85f474e2affe912b72d6d24881839e` | not applicable | Resumable branch/progress record. |
+| 14.01 generic chip definition/inventory | COMPLETE | `3173c97f5d04b3b0fe65c8e9b17876d257b233be` | 58 passed | Compiler/inventory contracts. |
+| 14.02 captain/vice/Triple Captain | COMPLETE | `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2` | 41 passed | Joint captain/vice/TC evaluator. |
+| 14.03 Bench Boost | COMPLETE | `f1c384972567befbe4713c56bfaaa4a481135687` | 67 passed | Natural/engineered BB routes. |
+| 14.04 Free Hit | COMPLETE / REMOTE | `ef3f5b2` | 23 focused; 149 then-current chip tests | Best temporary versus best normal policy; exact restoration. |
+| 14.05 Wildcard | COMPLETE / REMOTE | `0449dd7c47ae983a78fb8ef9098ce604ae3022db` | 58 focused; 207 then-current chip tests | Immediate/delayed/FH-bridge/hold routes. |
+| 14.06 scheduler/continuation | COMPLETE_PENDING_PUBLICATION | pending capability commit | 75 focused; 282 all chip unit/property | Exact/beam finite-inventory policy, diagnostics, nonanticipativity and oracle. |
+| 14.07 service/replay/CLI/artifacts | NOT_STARTED | — | — | Must not start before 14.06 remote verification. |
+| Final acceptance/evidence/cleanup | NOT_STARTED | — | — | Includes transport cleanup; no PR/merge/tag. |
 
-## Resume confidence remediation
+## 14.06 completed capability
 
-- Minimal resumed confidence testing exposed a genuine completed-checkpoint defect: the generic
-  compiler hard-blocked `vice_fallback: false` instead of leaving rules reconciliation to the
-  captaincy evaluator.
-- The compiler now accepts strict booleans while retaining multiplier validation.
-- An explicit compiler regression and the existing captaincy mismatch regression cover the
-  boundary.
-- Focused result: `75 passed`; full existing chip confidence: `126 passed`; see
-  `evidence/tickets/CHIP-014/RESUME_REGRESSION.md`.
-- This remediation preserves the target-season rule declaration and completed public contracts.
+- Immutable scheduler request, opportunity, scenario, objective, policy,
+  disposition, diagnostic and lineage contracts.
+- Exact exhaustive/dynamic search below a configurable state threshold.
+- Deterministic bounded beam search above the threshold.
+- Finite inventory, multiple copies, windows, expiry, duration, concurrency,
+  minimum gaps, one-use and duplicate-token rejection.
+- Expected, robust/risk-adjusted and cash-like terminal-state objectives.
+- Common-scenario alignment and sealed current-cutoff-only inputs.
+- Explicit use-now, delay, never-use, `HOLD` and `EXPIRE_UNUSED` comparison.
+- Prefix-sensitive state identity and finite-state optimistic bounds.
+- Perfect-information diagnostic upper bound isolated from executable policy.
+- Correct per-Gameweek concurrency enforcement for staggered intervals.
 
-## Completed capability
+Evidence: `evidence/tickets/CHIP-014/CHECKPOINT_14_06.md`.
 
-### 14.01 generic definition/inventory
+## 14.06 validation
 
-- Closed optimisation effect grammar compiled from accepted rules-layer public views.
-- Fail-closed unknown/invalid effects; multiple copies, future acquisition, windows, expiry, selection/cancellation/use, minimum gaps, concurrency and multi-week occupancy.
-- Deterministic definition, bundle and inventory semantic hashes.
+- Focused scheduler unit/property: `75 passed`.
+- Complete current chip unit/property: `282 passed`.
+- `schedule_models.py` branch-only coverage: `145 / 154` = `94.155844%`;
+  coverage.py branch-mode raw line+branch ratio: `96.896552%`.
+- `scheduler.py` branch-only coverage: `149 / 154` = `96.753247%`;
+  coverage.py branch-mode raw line+branch ratio: `97.972973%`.
+- Combined scheduler branch-only coverage: `294 / 308` = `95.454545%`;
+  combined raw line+branch ratio: `1142 / 1172` = `97.440273%`.
+- Entire chip package raw line+branch ratio: `3300 / 3461` = `95.348165%`.
+- Direct `free_hit.py` raw line+branch ratio: `171 / 185` = `92.432432%`;
+  this is not inferred from package aggregate coverage.
+- Changed-file Ruff format/lint: PASS.
+- Strict mypy for changed production modules: PASS.
+- Compileall: PASS.
+- `git diff --check`: PASS.
 
-### 14.02 captain/vice/Triple Captain
+These percentages are deliberately distinguished: per-module raw branch
+coverage is not represented as aggregate package coverage.
 
-- Exact ordered captain/vice search on common coherent Stage-9 scenarios.
-- Default delegation to accepted Stage-10 tactical/autosub scoring.
-- Conditional vice fallback value and correlated joint nonappearance.
-- Rules-bound TC multiplier, independent normal/TC pair optimisation and projected token consumption even at zero extra score.
+## Remaining mandatory work
 
-### 14.03 Bench Boost
+1. Publish checkpoint 14.06 by non-force fast-forward transport.
+2. Fetch/inspect the remote tree and prove local/remote HEAD equality.
+3. Implement checkpoint 14.07 service, sequential replay, CLI and artifacts from
+   that published state.
+4. Resolve Free Hit direct branch coverage truthfully.
+5. Run the bounded Stage-14 test/static/build/installed-wheel matrix and targeted
+   inherited regressions.
+6. Publish checkpoint 14.07.
+7. Produce final evidence, remove all transient Stage-14 recovery/transport
+   workflows and `recovery/`, validate/secret-scan, then publish final cleanup.
 
-- BB score compared with the best normal tactical policy, not a frozen XI.
-- Four bench players including goalkeeper; ordinary autosub overlap removed scenario by scenario.
-- Natural and engineered routes with explicit hits, budget shift, future-XI, unwind and price-route costs.
-- Gross current gain kept separate from net pre-continuation value.
-- WC-prepared route measures positive or negative WC-BB synergy; no positive synergy assumption.
-- Generic inventory activation and immutable rules/definition/scenario/inventory lineage.
-
-### 14.04 Free Hit
-
-- Compares the best legal temporary Free Hit policy with the best legal normal transfer policy,
-  never with a frozen current XI.
-- Reuses accepted Stage-11 transition/root-decision and Stage-10 tactical artifacts through a
-  strict immutable adapter.
-- Separates gross current gain, hits avoided, permanent squad damage avoided, route/flexibility
-  preserved, purchase-spell value preserved, continuation value, net policy value and exercise
-  advantage.
-- Restores the exact permanent squad, bank and purchase-price ownership history after the
-  temporary policy.
-- Applies the free-transfer transition from configured Stage-11 event rules and verifies the
-  temporary policy is hit-free.
-- Proves temporary purchase cohorts cannot contaminate permanent ownership history.
-- Focused adversarial tests: `23 passed`; complete chip unit/property confidence:
-  `149 passed`; chip-package combined branch coverage: `93.58%` (`396 / 456` branches).
-- Evidence: `evidence/tickets/CHIP-014/CHECKPOINT_14_04.md`.
-
-### 14.05 Wildcard
-
-- Compares immediate Wildcard with ordinary-transfer repair, delayed-after-information, Free Hit
-  bridge and hold/expiry routes.
-- Applies the permanent reset through the accepted Stage-11 transfer transition; no duplicate
-  squad, bank, selling-price, free-transfer or ownership-cohort mechanics.
-- Separates current points/hits/costs, permanent squad value, future hits, price/flexibility/forced
-  transfer value, BB/FH/TC synergy, terminal value, information value and route costs.
-- Reconciles the transparent decomposition exactly to immediate-versus-retained exercise value.
-- Focused acceptance/contracts: `58 passed`; complete chip unit/property confidence: `207 passed`.
-- New evaluator branch coverage: `94.19%` (`81 / 86`); new model branch coverage: `94.59%`
-  (`70 / 74`).
-- Evidence: `evidence/tickets/CHIP-014/CHECKPOINT_14_05.md`.
-
-## Validation
-
-Exact commands/results:
-
-- `evidence/tickets/CHIP-014/CHECKPOINT_14_01.md`
-- `evidence/tickets/CHIP-014/CHECKPOINT_14_02.md`
-- `evidence/tickets/CHIP-014/CHECKPOINT_14_03.md`
-
-Results:
-
-- 14.01: `58 passed`; `98%` branch coverage; compileall `PASS`.
-- 14.02: `41 passed`; `99%` branch coverage; compileall `PASS`.
-- 14.03: `67 passed` (`41` inherited captaincy/TC + `26` BB); `94%` combined affected branch coverage (`586` statements, `24` missed; `204` branches, `25` partial); compileall/whitespace `PASS`.
-
-Deferred gates remain truthfully unpassed:
-
-- Ruff/mypy: final Stage-14 acceptance.
-- Build/wheel/installed CLI: final Stage-14 acceptance.
-- Targeted inherited regressions: final dependency scope after all integrations exist.
-- Full repository pytest: not run by design.
-
-## Push/equality record
-
-- 14.01 capability `3173c97f5d04b3b0fe65c8e9b17876d257b233be`: remote `identical`, ahead `0`, behind `0`.
-- 14.02 capability `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2`: remote `identical`, ahead `0`, behind `0`.
-- 14.03 capability `f1c384972567befbe4713c56bfaaa4a481135687`: remote `identical`, ahead `0`, behind `0`.
-- Force push: `false` for all capability publications.
-- 14.03 publication contained only coherent BB production code, contracts, tests, exports and evidence.
-- Container-side Git worktree unavailable; validated offline scratch passed syntax and whitespace checks before publication.
+`FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_INDEPENDENT_SOL_REVIEW`
+unless a later bounded reason is recorded.
 
 ## Known limitations
 
-- No target-season chip-policy performance claim is made yet.
-- BB `net_pre_continuation_value` deliberately excludes finite-inventory continuation/opportunity value; checkpoint 14.06 owns that comparison.
-- Free Hit accepts an explicit finite-horizon continuation-value interface; checkpoint 14.06 owns schedule-wide estimation and competition among tokens.
-- Sophisticated continuation methods remain open by specification and are not claimed solved.
-- Wildcard information outcomes and continuation components are explicit inputs; checkpoint 14.06 owns finite-inventory schedule optimisation and nonanticipative continuation.
-- Temporary branch-only recovery transport/export workflows remain and must be removed before final delivery.
-- Focused 14.04 Ruff and strict mypy checks pass; final frozen sync, full Stage-14 static analysis, build, wheel, installed-wheel CLI and targeted inherited regressions remain pending.
-- The current connector exposes repository reads but no file/ref write action, while container Git cannot resolve GitHub. The local 14.04 capability commit is therefore publication-pending; no force/reset/squash was used.
+- No target-season chip-policy performance claim is made.
+- Checkpoint 14.06 consumes explicit opportunity/scenario values; checkpoint
+  14.07 owns the public service/replay composition and artifact surface.
+- Final repository-wide static/build/installed-wheel/secret-scan gates remain
+  pending.
+- Temporary Stage-14 publication/recovery material remains only because it is
+  still required to publish the remaining checkpoints; it is not product code.
+- No PR, merge, accepted tag or human acceptance has occurred.
 
 ## Exact resume state
 
-Resume from the local branch history and the verified remote lineage. Publish the local 14.04 and 14.05 capability commits by a non-force fast-forward as soon as a GitHub write transport is available, then continue checkpoint 14.06 without recreating or resetting checkpoints 14.01–14.05.
+- Actual remote branch state at this recovery point: `de1204ac60437fc9c8f4fccf99bdab79df471af4`.
+- Published product capability beneath transport commits: Wildcard `0449dd7c47ae983a78fb8ef9098ce604ae3022db`.
+- Reported scheduler commit `3935bc00ff760a6c76bb6115e142aa273affc371`: not recovered.
+- Reported 14.07 stash `stage14-service-cli-replay-wip-after-scheduler`: not recovered.
+- Recovery mode: truthful Case B; only checkpoint 14.06 was reconstructed.
+- 14.06 is complete locally and must be published before any 14.07 file is created or changed.
+- Temporary Stage-14 transport/export workflows and `recovery/` remain only until final cleanup.

@@ -52,6 +52,7 @@ The focused suite covers:
 
 ## Status
 
-Checkpoint `14.05` is code-, test- and local-Git-complete pending a non-force remote fast-forward
-and independent review. The connected GitHub surface exposed repository reads but no write action,
-while container Git could not resolve GitHub; no force, reset, squash, merge, PR or tag was used.
+Checkpoint `14.05` is published on the canonical Stage-14 branch at capability commit
+`0449dd7c47ae983a78fb8ef9098ce604ae3022db`. Publication was non-force and the remote tree
+contains the Wildcard implementation, tests and evidence. Independent review and human acceptance
+remain pending; no merge, PR or tag was created.
