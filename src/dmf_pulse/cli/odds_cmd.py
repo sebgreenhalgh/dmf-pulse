@@ -1,4 +1,4 @@
-"""Typer surface for ODD-005 validation, replay, import, and refusal."""
+"""Typer surface for governed The Odds API validation and current retrieval."""
 
 from __future__ import annotations
 
@@ -18,10 +18,11 @@ from dmf_pulse.ingestion.odds.credentials import (
     RuntimeOddsCredentialProvider,
     credential_is_configured,
 )
+from dmf_pulse.ingestion.odds.live import LiveOddsOperationOutcome, LiveOddsSnapshotService
 from dmf_pulse.ingestion.odds.parser import CONTRACT_VERSION
 from dmf_pulse.ingestion.odds.service import (
     OddsImportRequest,
-    OddsIngestionService,
+    OddsIngestionService as ReferenceOddsIngestionService,
     OddsOperationOutcome,
     OddsReplayRequest,
 )
@@ -54,6 +55,50 @@ _PROVIDER_CODES = {
     "SOURCE_UNAVAILABLE",
     "CANCELLED",
 }
+
+
+class OddsIngestionService:
+    """CLI facade retaining ODD-005 commands and selecting the live current path."""
+
+    def validate(
+        self,
+        input_path: Path,
+        *,
+        provider: str = "the_odds_api",
+        contract_version: str = CONTRACT_VERSION,
+    ) -> BaseModel:
+        return ReferenceOddsIngestionService().validate(
+            input_path,
+            provider=provider,
+            contract_version=contract_version,
+        )
+
+    def import_payload(self, request: OddsImportRequest) -> OddsOperationOutcome:
+        return ReferenceOddsIngestionService().import_payload(request)
+
+    def replay(self, request: OddsReplayRequest) -> OddsOperationOutcome:
+        return ReferenceOddsIngestionService().replay(request)
+
+    def snapshot(
+        self,
+        *,
+        provider: str,
+        competition_key: str,
+        sport_key: str,
+        region: str,
+        market: str,
+        as_of: datetime,
+        database_url_ref: str = DATABASE_REF,
+    ) -> LiveOddsOperationOutcome:
+        return LiveOddsSnapshotService(database_url_ref=database_url_ref).snapshot(
+            provider=provider,
+            competition_key=competition_key,
+            sport_key=sport_key,
+            region=region,
+            market=market,
+            as_of=as_of,
+            database_url_ref=database_url_ref,
+        )
 
 
 def _odd_exit_code(code: str) -> int:
@@ -103,7 +148,7 @@ def _require_json(output: str) -> None:
         raise IngestionError("USAGE_INVALID", "--output must be json")
 
 
-def _emit(outcome: OddsOperationOutcome) -> None:
+def _emit(outcome: OddsOperationOutcome | LiveOddsOperationOutcome) -> None:
     typer.echo(_json(outcome.result))
     if outcome.exit_code:
         raise typer.Exit(outcome.exit_code)
@@ -216,7 +261,7 @@ def snapshot_command(
     database_url_ref: Annotated[str, typer.Option("--database-url-ref")] = DATABASE_REF,
     output: Annotated[str, typer.Option("--output")] = "json",
 ) -> None:
-    def operation() -> OddsOperationOutcome:
+    def operation() -> LiveOddsOperationOutcome:
         _require_json(output)
         return OddsIngestionService().snapshot(
             provider=provider,
@@ -229,6 +274,6 @@ def snapshot_command(
         )
 
     result = _safe(operation)
-    if not isinstance(result, OddsOperationOutcome):
+    if not isinstance(result, LiveOddsOperationOutcome | OddsOperationOutcome):
         _failure(IngestionError("INTERNAL_INVARIANT", "odds snapshot result is invalid"))
     _emit(result)
