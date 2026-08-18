@@ -4,11 +4,11 @@
 
 - Original immutable GW1 parent — `9eb57143f6ee92f67c78607cc386678d962e62d4`
 - Canonical working branch — `readiness/GW1-2026-27-live-input-initial-squad`
-- Publication-reconciliation starting branch head — `d75a172018f932693c4d51dc3d803819075c3cac`
+- Checkpoint 1.3 session starting remote SHA — `4b813ff411908de9c1f35ae19494b619ed1391b5`
 - Checkpoint 1.1 implementation commit — `448749c072900642a922ae1456d0d30111a3e9ea`
 - Checkpoint 1.2 capability commit — `d8e95a442d24d0547a2b7a5fb585da94f66dcfe4`
 - Checkpoint 1.2 evidence commit — `36a5c755330d5d7eeb465cbfa0e21b70cc0bf777`
-- Publication workflow run — `32182179765`
+- Checkpoint 1.2 publication-reconciliation commit — `4b813ff411908de9c1f35ae19494b619ed1391b5`
 
 ## Checkpoint status
 
@@ -16,51 +16,61 @@
 |---|---|---|
 | 1.0 Remote state / progress bootstrap | COMPLETE | Immutable-parent ancestry and recovery-bundle continuity verified. |
 | 1.1 Runtime odds credential foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
-| 1.2 Current official FPL input foundation | COMPLETE | Capability commit above provides the governed manual/transient current-input contract, service, CLI, operator documentation and tests. |
-| 1.3 Live The Odds API input foundation | INCOMPLETE | Not started in this reconciliation. |
+| 1.2 Current official FPL input foundation | COMPLETE | Governed manual/transient official-FPL current-input capability is published. |
+| 1.3 Live The Odds API input foundation | IN_PROGRESS | Subcheckpoint 1.3A implementation is staged in the commit containing this progress update; remote validation and exact-SHA attestation remain required. |
 | 1.4 FPL / odds identity integrity | INCOMPLETE | Not started. |
 | 1.5 Session-1 artifacts / operator workflow | INCOMPLETE | Not started. |
 
-## Publication reconciliation
+## Checkpoint 1.3A — live credential / transport wiring
 
-- The previously claimed Checkpoint 1.2 capability and evidence commits were not present on the canonical branch, temporary branches or retained recovery bundle.
-- Commit `2a06f154c6ac7f0edef314daea534b916c0a4dad` contained only a malformed compressed publication payload; it never produced a valid capability commit.
-- The minimum missing Checkpoint 1.2 implementation was reconstructed from the accepted branch architecture, retained partial operator documentation and the frozen Checkpoint 1.2 requirements.
-- Publication is a normal fast-forward continuation from `d75a172018f932693c4d51dc3d803819075c3cac`; Checkpoint 1.1 ancestry is preserved and no force update is used.
+### Starting state
 
-## Checkpoint 1.2 capability
+- Exact starting remote SHA — `4b813ff411908de9c1f35ae19494b619ed1391b5`.
+- Merge base with the immutable GW1 parent — `9eb57143f6ee92f67c78607cc386678d962e62d4`.
+- Repository inspection confirmed Checkpoints 1.1 and 1.2 complete and Checkpoint 1.3 next.
+- Existing ODD-005 client/parser/quota/rights/persistence infrastructure is reused; no parallel provider client, parser or persistence stack is introduced.
 
-- Governed current official-FPL inputs: players and element IDs, teams, positions, current prices, official status/availability fields, fixtures, Gameweek/event identity, GW1 deadline and bootstrap game settings.
-- Provenance and temporal fields: source paths and hashes, `captured_at`, `received_at`, `information_cutoff`, official deadline, `usable_at`, configuration hashes and rights decisions.
-- Canonical identity boundary: exact season-scoped provider identities with deterministic canonical lookup digests; cross-provider mapping remains out of scope.
-- Data-quality controls: duplicate/missing/unknown identity checks, target-Gameweek and deadline consistency, team/position references, positive prices, fixture scheduling, schema-drift warnings and fail-closed malformed-input handling.
-- Rights status: manual import, transient processing and private internal use are allowed; automated access and raw storage are denied; unresolved derived storage is denied fail-closed.
-- Runtime effects: no network request, database open, raw write or derived write occurs; the operator remains responsible for deleting manually captured source files after validation.
+### Capability proved in this implementation commit
 
-## Temporal-integrity status
+- The accepted runtime `DMF_PULSE_ODDS_API_KEY` provider remains the default on `OddsIngestionService`; no alternate or test-only provider is instantiated by the live service.
+- Focused tests prove the existing service-to-client-to-transport wiring resolves credentials lazily and passes a valid dummy value only at the final transport boundary.
+- Focused tests prove local quota refusal precedes credential resolution and transport construction.
+- Focused tests prove the accepted request remains locked to the configured HTTPS host/path and that credential material is absent from sanitized targets, fingerprints, representations and returned fetch evidence.
+- Focused tests prove every redirect response is terminal on the first transport call, including same-host, cross-host, HTTP-downgrade and repeated-chain-shaped locations.
+- Existing ODD-005 transport, parser, quota, rights and persistence infrastructure is reused unchanged; no parallel provider stack is introduced.
+- Provider-native output, response-quality hardening and operator acceptance remain explicitly deferred to 1.3B/1.3C.
 
-- Timezone-aware timestamps are mandatory.
-- `captured_at <= received_at <= information_cutoff <= official GW1 deadline` is enforced.
-- `usable_at` is the validation receipt time and cannot exceed the cutoff.
-- Post-cutoff availability evidence is rejected, target fixtures must kick off after the official deadline, and the paired bootstrap/fixtures capture shares one operator-declared capture time.
-- The official resources expose no independent provider publication timestamp; this is recorded as unavailable rather than fabricated.
+### Focused tests added
 
-## Validation
+- Default live service uses `RuntimeOddsCredentialProvider`.
+- Valid dummy runtime credential reaches only the final transport boundary.
+- Missing, blank and malformed credentials return controlled `CREDENTIAL_UNAVAILABLE` without transport.
+- Local quota exhaustion blocks before credential resolution or transport.
+- Same-host, cross-host, HTTP-downgrade and repeated-chain-shaped redirects fail closed after one call.
+- Credential material is absent from errors, fetch evidence, request representations, sanitized targets and request fingerprints.
 
-- Focused current-input tests — `36 passed`.
-- Wider affected FPL regression — `196 passed, 6 deselected`; the deselected tests require PostgreSQL and the capability intentionally opens no database.
-- Ruff format — PASS.
-- Ruff lint — PASS.
-- Strict mypy on affected production modules — PASS.
-- CLI synthetic current-input smoke — PASS, including redaction and no-transport/no-persistence assertions.
-- First-party repository secret scan — executed after evidence attestation.
+### Validation before publication
 
-## Known limitations
+- Python compilation of the new focused test module — PASS.
+- Full repository pytest / Ruff / strict mypy — pending remote branch validation because this execution environment does not contain an authenticated full checkout or a locally cached Ruff binary.
+- `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
 
-- A real operator-captured 2026/27 official payload was not supplied to this workflow; the production manual capture remains an operator checkpoint.
-- Automated official-FPL retrieval remains denied by the current rights profile.
-- No raw or derived persistence, cross-provider identity mapping, odds retrieval, projections, optimisation, squad recommendation, captaincy, prospective logging, PR, merge or production activation is included.
+### Rights and storage state
 
-## Restart handoff
+- Automated access, transient processing, derived storage and private internal use must be declared and effectively allowed.
+- Raw storage is declared `UNKNOWN`, effective `DENY`; raw retention is `0` seconds and `raw_payload_retained=false`.
+- Public display and redistribution are declared/effective `DENY`.
+- Backup and model training are declared `UNKNOWN`, effective `DENY`.
 
-- Exact next action: **CHECKPOINT 1.3 — LIVE THE ODDS API INPUT FOUNDATION**.
+### Secret state
+
+- Tests use the dummy value `dummy-odds-key-1234567890` only.
+- No real Sebastian credential is requested, stored, logged, committed or used.
+- No credential-bearing URL or raw live provider payload is committed.
+
+### Known limitations and next action
+
+- No real credentialled provider call has occurred.
+- PostgreSQL-backed evidence recording has not yet been validated in this subcheckpoint publication.
+- Checkpoint 1.4 cross-provider identity mapping has not been started.
+- Exact next action after remote validation and exact-SHA attestation: **CHECKPOINT 1.3B — QUOTA / RETRIES / PROVIDER VALIDATION**.
