@@ -535,6 +535,46 @@ class ApprovalRecord(RulesModel):
     approved_at: StrictStr | None
     approved_by: StrictStr | None
     ruleset_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")] | None = None
+    status: Literal["PENDING_HUMAN_APPROVAL", "APPROVED"] | None = None
+    approval_id: Annotated[StrictStr, Field(pattern=r"^APR-[A-Z0-9-]+$")] | None = None
+    approval_kind: Literal["HUMAN_RULESET_ACTIVATION"] | None = None
+    capability_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")] | None = None
+    activation_evidence_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")] | None = None
+    approval_statement: StrictStr | None = None
+    record_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")] | None = None
+
+
+class ActivationCheck(RulesModel):
+    status: Literal["PASS", "TEMPORARILY_UNAVAILABLE", "FAIL"]
+    artifact_sha256: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")] | None
+    note: Annotated[StrictStr, Field(min_length=1)]
+
+
+class ActivationEvidence(RulesModel):
+    artifact_type: Literal["DMF_RULE_ACTIVATION_EVIDENCE"] = "DMF_RULE_ACTIVATION_EVIDENCE"
+    schema_version: Literal["1.0"] = "1.0"
+    ruleset_id: StrictStr
+    ruleset_version: StrictStr
+    ruleset_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")]
+    capability: Literal[RuleCapability.FULL_SEASON]
+    capability_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")]
+    source_manifest_sha256: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")]
+    source_checked_at: StrictStr
+    source_fresh_until: StrictStr
+    official_conflicts: tuple[StrictStr, ...]
+    unresolved_required_rules: tuple[StrictStr, ...]
+    golden_tests: ActivationCheck
+    differential_tests: ActivationCheck
+    representative_official_match: ActivationCheck
+    no_newer_governing_conflict: StrictBool
+    evidence_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")]
+
+
+class ApprovalTrustStore(RulesModel):
+    artifact_type: Literal["DMF_RULE_APPROVAL_TRUST_STORE"] = "DMF_RULE_APPROVAL_TRUST_STORE"
+    schema_version: Literal["1.0"] = "1.0"
+    trusted_approval_hashes: tuple[Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")], ...]
+    store_hash: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")]
 
 
 class InterpretationDecision(RulesModel):

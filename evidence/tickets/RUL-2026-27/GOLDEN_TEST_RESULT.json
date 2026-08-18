@@ -1,0 +1,13 @@
+{
+  "command": ".venv\\Scripts\\python.exe -m pytest tests/unit/rules tests/contract/rules --ignore=tests/contract/rules/test_2026_27_final_evidence.py -q",
+  "exit_code": 0,
+  "passed": 132,
+  "scope": [
+    "accepted fixture and Gameweek goldens",
+    "0/1/59/60 minute boundaries",
+    "goals, assists, clean sheets, saves, penalties, cards, defensive contributions and BPS",
+    "bonus ties and assist-policy boundaries",
+    "2026/27 full-season rules and executable chips"
+  ],
+  "status": "PASS"
+}

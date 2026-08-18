@@ -1,0 +1,94 @@
+rules:
+  - rule_path: "/rules/positions"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-BOOTSTRAP-001: "element_types: squad_select, squad_min_play, squad_max_play"
+      SRC-FPL-2026-RULES-001: "Selecting your initial squad and managing your squad"
+  - rule_path: "/rules/scoring"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Scoring points, clean sheets, cards and player-scoring table"
+  - rule_path: "/rules/scoring/defensive_contributions"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-RULES-001", "SRC-FPL-2026-DC-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Scoring points > Defensive contributions"
+      SRC-FPL-2026-DC-001: "2026/27 thresholds, qualifying actions and per-fixture points"
+  - rule_path: "/rules/assists"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-RULES-001", "SRC-FPL-2026-FAQ-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Scoring points > Assists, defensive touches, rebounds, own goals and set pieces"
+      SRC-FPL-2026-FAQ-001: "Current assist clarification topics and official-final-decision policy"
+  - rule_path: "/rules/bonus"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Bonus points and complete Bonus Points System table"
+  - rule_path: "/rules/bonus/bps"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-RULES-001", "SRC-FPL-2026-BPS-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Bonus Points System event-value table"
+      SRC-FPL-2026-BPS-001: "2026/27 saves, CBI, penalty-save and being-tackled changes"
+  - rule_path: "/rules/bonus/tie_allocation"
+    verification_status: "INTERPRETATION_REQUIRED"
+    source_refs: ["SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-RULES-001: "Bonus points published tie examples"
+    interpretation_decision_ids: ["INT-FPL-2026-BONUS-TIES-001"]
+    interpretation_approval_states: {"INT-FPL-2026-BONUS-TIES-001": "APPROVED"}
+    interpretation_note: "Official examples do not state an arbitrary-cardinality algorithm; the separately approved PLAYER_POINTS interpretation supplies general competition ranking."
+  - rule_path: "/rules/squad"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-RULES-001"]
+    source_locators:
+      SRC-FPL-2026-BOOTSTRAP-001: "game_settings: squad_squadsize, squad_team_limit, squad_total_spend"
+      SRC-FPL-2026-RULES-001: "Selecting your initial squad"
+  - rule_path: "/rules/lineup"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-RULES-001", "SRC-FPL-2026-FAQ-001"]
+    source_locators:
+      SRC-FPL-2026-BOOTSTRAP-001: "game_settings and element_types lineup constraints"
+      SRC-FPL-2026-RULES-001: "Managing your squad: captain, vice-captain and automatic substitutions"
+      SRC-FPL-2026-FAQ-001: "End-of-Gameweek autosub and captain processing clarifications"
+  - rule_path: "/rules/transfers"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-RULES-001", "SRC-FPL-2026-FAQ-001", "SRC-FPL-2026-TRANSFERS-001", "SRC-FPL-2026-CHANGES-001"]
+    source_locators:
+      SRC-FPL-2026-BOOTSTRAP-001: "game_settings: transfers_cap and max_extra_free_transfers"
+      SRC-FPL-2026-RULES-001: "Transfers rules, 20-transfer limit and chip exceptions"
+      SRC-FPL-2026-FAQ-001: "Transfer finality, banking, late entry and chip/saved-transfer clarifications"
+      SRC-FPL-2026-TRANSFERS-001: "20 Jul 2026 transfer allowance, hits, same-position, budget and club constraints"
+      SRC-FPL-2026-CHANGES-001: "31 Jul 2026 statement that no AFCON transfer grant applies in 2026/27"
+  - rule_path: "/rules/prices"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-RULES-001", "SRC-FPL-2026-FAQ-001", "SRC-FPL-2026-TRANSFERS-001", "SRC-FPL-2026-PRICE-001"]
+    source_locators:
+      SRC-FPL-2026-BOOTSTRAP-001: "game_settings: transfers_sell_on_fee and integer price units"
+      SRC-FPL-2026-RULES-001: "Player prices and retained-profit rounding"
+      SRC-FPL-2026-FAQ-001: "Manager transfer-page purchase/current/selling value clarification"
+      SRC-FPL-2026-TRANSFERS-001: "Profit examples and explicit full-loss example below purchase price"
+      SRC-FPL-2026-PRICE-001: "2026/27 official price-change timing and undisclosed threshold predictor"
+  - rule_path: "/rules/chips"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-RULES-001", "SRC-FPL-2026-FAQ-001", "SRC-FPL-2026-CHIPS-001"]
+    source_locators:
+      SRC-FPL-2026-BOOTSTRAP-001: "chips: two inventory windows and GW availability"
+      SRC-FPL-2026-RULES-001: "Chip effects, windows, concurrency, cancellation and saved transfers"
+      SRC-FPL-2026-FAQ-001: "Wildcard threshold, Free Hit restoration, vice fallback and cancellation clarifications"
+      SRC-FPL-2026-CHIPS-001: "20 Jul 2026 inventory, effects, GW1 and consecutive Free Hit restrictions"
+  - rule_path: "/rules/deadlines"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-BOOTSTRAP-001", "SRC-FPL-2026-RULES-001", "SRC-FPL-2026-CHANGES-001"]
+    source_locators:
+      SRC-FPL-2026-BOOTSTRAP-001: "events[0..37].deadline_time"
+      SRC-FPL-2026-RULES-001: "Deadline table and 24-hour change policy"
+      SRC-FPL-2026-CHANGES-001: "09:00 UK finality on day after final Gameweek match"
+  - rule_path: "/rules/special_events"
+    verification_status: "VERIFIED"
+    source_refs: ["SRC-FPL-2026-CHANGES-001"]
+    source_locators:
+      SRC-FPL-2026-CHANGES-001: "No AFCON-specific free transfers in 2026/27"

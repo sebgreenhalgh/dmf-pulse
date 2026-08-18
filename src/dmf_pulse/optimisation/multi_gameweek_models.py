@@ -68,8 +68,6 @@ class TransferRules(OptimisationModel):
             raise ValueError("position quotas must cover every FPL position")
         if any(value < 0 for value in self.position_squad_quota.values()):
             raise ValueError("position quotas cannot be negative")
-        if self.max_transfers_per_deadline > self.squad_size:
-            raise ValueError("deadline transfer maximum cannot exceed squad size")
         if "NORMAL" not in self.event_rules:
             raise ValueError("transfer rules require a NORMAL event")
         for event in self.event_rules.values():

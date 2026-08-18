@@ -1,0 +1,31 @@
+{
+  "artifact_type": "DMF_RULE_ACTIVATION_EVIDENCE",
+  "capability": "FULL_SEASON",
+  "capability_hash": "d680aa138a0f637d12c0389d0e3295c0fd4acbd1ffd8d8fcae811c0114bd972d",
+  "differential_tests": {
+    "artifact_sha256": "b7933ac35afbc8dbcdfb092947ba9a025db3a6ee1b18f3844dfeaab63ef73630",
+    "note": "Target/reference differential and immutable reference-hash regressions pass.",
+    "status": "PASS"
+  },
+  "evidence_hash": "54021365ceb5a9d81cc56b68f11133cab7eb6ccdcbdcbb31404aa59a07e01169",
+  "golden_tests": {
+    "artifact_sha256": "ef590070ff39f7b76cabab59aa2e82f23765646d0e3bec3c0f63d449b99f73d6",
+    "note": "Rules unit, contract, property and golden coverage passes.",
+    "status": "PASS"
+  },
+  "no_newer_governing_conflict": true,
+  "official_conflicts": [],
+  "representative_official_match": {
+    "artifact_sha256": "cf3804fad742aa52232144a5de4785bf987a59e9b77c89fae984b42cb5b49186",
+    "note": "No target-season match has completed; this normative activation requirement is not waived.",
+    "status": "TEMPORARILY_UNAVAILABLE"
+  },
+  "ruleset_hash": "c2883ad9bf1497dad9c2eba69422e14937ddc072f9b3a95c5005a312c38f7d56",
+  "ruleset_id": "fpl-2026-27",
+  "ruleset_version": "1.0.0",
+  "schema_version": "1.0",
+  "source_checked_at": "2026-08-17T23:42:00Z",
+  "source_fresh_until": "2026-08-19T23:42:00Z",
+  "source_manifest_sha256": "3351d5993daacc26f2d9c9dd3ec27c94563c187dc5ddbee33665d2e332d8fc71",
+  "unresolved_required_rules": []
+}

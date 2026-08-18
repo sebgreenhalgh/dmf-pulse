@@ -1,0 +1,45 @@
+gameweeks:
+  - {number: 1, deadline_utc: "2026-08-21T17:30:00Z"}
+  - {number: 2, deadline_utc: "2026-08-28T17:30:00Z"}
+  - {number: 3, deadline_utc: "2026-09-04T17:30:00Z"}
+  - {number: 4, deadline_utc: "2026-09-12T12:30:00Z"}
+  - {number: 5, deadline_utc: "2026-09-18T17:30:00Z"}
+  - {number: 6, deadline_utc: "2026-10-10T10:00:00Z"}
+  - {number: 7, deadline_utc: "2026-10-17T10:00:00Z"}
+  - {number: 8, deadline_utc: "2026-10-23T17:30:00Z"}
+  - {number: 9, deadline_utc: "2026-10-31T11:00:00Z"}
+  - {number: 10, deadline_utc: "2026-11-07T13:30:00Z"}
+  - {number: 11, deadline_utc: "2026-11-21T13:30:00Z"}
+  - {number: 12, deadline_utc: "2026-11-28T13:30:00Z"}
+  - {number: 13, deadline_utc: "2026-12-02T18:30:00Z"}
+  - {number: 14, deadline_utc: "2026-12-05T13:30:00Z"}
+  - {number: 15, deadline_utc: "2026-12-12T13:30:00Z"}
+  - {number: 16, deadline_utc: "2026-12-19T13:30:00Z"}
+  - {number: 17, deadline_utc: "2026-12-26T13:30:00Z"}
+  - {number: 18, deadline_utc: "2026-12-30T18:30:00Z"}
+  - {number: 19, deadline_utc: "2027-01-02T13:30:00Z"}
+  - {number: 20, deadline_utc: "2027-01-06T18:30:00Z"}
+  - {number: 21, deadline_utc: "2027-01-16T13:30:00Z"}
+  - {number: 22, deadline_utc: "2027-01-23T13:30:00Z"}
+  - {number: 23, deadline_utc: "2027-01-30T13:30:00Z"}
+  - {number: 24, deadline_utc: "2027-02-06T13:30:00Z"}
+  - {number: 25, deadline_utc: "2027-02-10T18:30:00Z"}
+  - {number: 26, deadline_utc: "2027-02-20T13:30:00Z"}
+  - {number: 27, deadline_utc: "2027-02-27T13:30:00Z"}
+  - {number: 28, deadline_utc: "2027-03-03T18:30:00Z"}
+  - {number: 29, deadline_utc: "2027-03-13T13:30:00Z"}
+  - {number: 30, deadline_utc: "2027-03-20T13:30:00Z"}
+  - {number: 31, deadline_utc: "2027-04-10T12:30:00Z"}
+  - {number: 32, deadline_utc: "2027-04-17T12:30:00Z"}
+  - {number: 33, deadline_utc: "2027-04-24T12:30:00Z"}
+  - {number: 34, deadline_utc: "2027-05-01T12:30:00Z"}
+  - {number: 35, deadline_utc: "2027-05-08T12:30:00Z"}
+  - {number: 36, deadline_utc: "2027-05-15T12:30:00Z"}
+  - {number: 37, deadline_utc: "2027-05-23T12:30:00Z"}
+  - {number: 38, deadline_utc: "2027-05-30T13:30:00Z"}
+gameweek_finality:
+  states: ["PROVISIONAL", "REVIEW_WINDOW", "FINAL", "CORRECTED_AFTER_FINAL"]
+  final_time_local: "09:00"
+  timezone: "Europe/London"
+  day_offset_after_final_match: 1
+  corrections_after_final_supported: true
