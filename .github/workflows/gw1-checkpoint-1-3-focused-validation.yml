@@ -1,0 +1,99 @@
+name: gw1-checkpoint-1-3-focused-validation
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-checkpoint-1-3-focused-validation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  validate-1-3a:
+    name: Checkpoint 1.3A focused validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate and publish evidence
+        shell: bash
+        run: |
+          set +e
+          report='evidence/readiness/GW1_SESSION1_VALIDATION_1_3A.md'
+          log_dir="${RUNNER_TEMP}/gw1-1-3a"
+          mkdir -p "$log_dir" evidence/readiness
+          overall=0
+
+          run_check() {
+            name="$1"
+            shift
+            "$@" >"$log_dir/$name.log" 2>&1
+            rc=$?
+            printf '%s=%s\n' "$name" "$rc" >>"$log_dir/status"
+            if [ "$rc" -ne 0 ]; then
+              overall=1
+            fi
+          }
+
+          run_check install_uv python -m pip install --disable-pip-version-check uv==0.11.26
+          if grep -q '^install_uv=0$' "$log_dir/status"; then
+            run_check frozen_sync uv sync --all-groups --frozen
+          else
+            printf 'frozen_sync=125\n' >>"$log_dir/status"
+            overall=1
+          fi
+
+          if grep -q '^frozen_sync=0$' "$log_dir/status"; then
+            run_check focused_pytest uv run pytest -q tests/unit/ingestion/test_gw1_live_odds_transport.py
+            run_check ruff_format uv run ruff format --check tests/unit/ingestion/test_gw1_live_odds_transport.py
+            run_check ruff_lint uv run ruff check tests/unit/ingestion/test_gw1_live_odds_transport.py
+            run_check strict_mypy uv run mypy \
+              src/dmf_pulse/ingestion/odds/client.py \
+              src/dmf_pulse/ingestion/odds/service.py
+            run_check secret_scan uv run python scripts/scan_secrets.py
+          else
+            for name in focused_pytest ruff_format ruff_lint strict_mypy secret_scan; do
+              printf '%s=125\n' "$name" >>"$log_dir/status"
+            done
+            overall=1
+          fi
+          run_check diff_check git diff --check "${GITHUB_SHA}^" "$GITHUB_SHA"
+
+          {
+            echo '# GW1 Checkpoint 1.3A Focused Validation'
+            echo
+            echo "- Workflow run — \`${GITHUB_RUN_ID}\`"
+            echo "- Validated commit — \`${GITHUB_SHA}\`"
+            echo "- Branch — \`${GITHUB_REF_NAME}\`"
+            echo "- Overall — \`$([ "$overall" -eq 0 ] && echo PASS || echo FAIL)\`"
+            echo '- Real credentialled provider call — `OPERATOR_CHECKPOINT`'
+            echo
+            echo '## Exit codes'
+            echo
+            while IFS='=' read -r name rc; do
+              if [ "$rc" -eq 0 ]; then state=PASS; elif [ "$rc" -eq 125 ]; then state=NOT_RUN; else state=FAIL; fi
+              echo "- \`${name}\` — \`${state}\` (exit \`${rc}\`)"
+            done <"$log_dir/status"
+            echo
+            echo '## Focused pytest output'
+            echo
+            echo '```text'
+            tail -n 80 "$log_dir/focused_pytest.log" 2>/dev/null || true
+            echo '```'
+          } >"$report"
+
+          git config user.name 'dmf-pulse-gw1-validation-bot'
+          git config user.email 'dmf-pulse-gw1-validation-bot@users.noreply.github.com'
+          git add "$report"
+          git commit -m "ci(gw1): record checkpoint 1.3A validation ${GITHUB_RUN_ID}"
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+          exit "$overall"
