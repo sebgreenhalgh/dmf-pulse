@@ -554,11 +554,15 @@ class TransfersFile(AuthoringModel):
 
 class TransferTransitionRules(AuthoringModel):
     preseason_unlimited: StrictBool
+    late_entry_unlimited_until_first_deadline: Literal[True] | None = None
     earned_per_deadline: NonNegativeInt
     free_transfer_cap: PositiveInt
+    max_transfers_per_deadline: PositiveInt | None = None
     hit_points: StrictInt
     outgoing_and_incoming_same_position: Literal[True]
     club_quota_repair_required: Literal[True]
+    confirmed_transfers_irreversible: Literal[True] | None = None
+    confirmed_transfer_effect: Literal["NEXT_GAMEWEEK"] | None = None
     transfer_accounting_order: tuple[StableKey, ...]
 
 
@@ -585,9 +589,11 @@ class SellingPriceRules(AuthoringModel):
 class PricesFileV11(AuthoringModel):
     price_unit: Literal["TENTHS_OF_MILLION_GBP"]
     integer_only: Literal[True]
+    authoritative_manager_selling_price_preferred: Literal[True] | None = None
     initial_purchase_price_basis: Literal["CURRENT_PLAYER_PRICE_AT_INITIAL_SELECTION"]
     current_purchase_price_basis: Literal["PRICE_PAID_FOR_CURRENT_OWNERSHIP"]
     selling_price: SellingPriceRules
+    retained_profit_rounding: Literal["FLOOR_TO_TENTH"] | None = None
     change_threshold_algorithm: Literal["UNDISCLOSED"]
 
 
@@ -621,8 +627,32 @@ class ChipRule(AuthoringModel):
 
 class ChipInventory(AuthoringModel):
     copies: PositiveInt
+    copies_per_window: PositiveInt
     windows: Annotated[tuple[GameweekWindow, ...], Field(min_length=1)]
     unused_copy_expires_at_window_end: Literal[True]
+
+    @model_validator(mode="after")
+    def inventory_matches_windows(self) -> ChipInventory:
+        if self.copies != self.copies_per_window * len(self.windows):
+            raise ValueError("chip copies must equal copies-per-window times window count")
+        for previous, current in zip(self.windows, self.windows[1:], strict=False):
+            if current.start_gameweek <= previous.end_gameweek:
+                raise ValueError("chip inventory windows must be ordered and non-overlapping")
+        return self
+
+
+class ChipActivationRules(AuthoringModel):
+    route: Literal["PICK_TEAM_SAVE", "CONFIRMED_TRANSFERS"]
+    lock_after_confirmed_transfer_count: PositiveInt | None
+    cancellable_before_deadline: StrictBool
+
+    @model_validator(mode="after")
+    def activation_route_is_coherent(self) -> ChipActivationRules:
+        if self.route == "PICK_TEAM_SAVE" and self.lock_after_confirmed_transfer_count is not None:
+            raise ValueError("Pick Team chips cannot use a confirmed-transfer lock threshold")
+        if self.route == "CONFIRMED_TRANSFERS" and self.lock_after_confirmed_transfer_count is None:
+            raise ValueError("transfer chips require a confirmed-transfer lock threshold")
+        return self
 
 
 class ChipRuleV11(AuthoringModel):
@@ -630,7 +660,9 @@ class ChipRuleV11(AuthoringModel):
     inventory: ChipInventory | UnknownRule
     duration_gameweeks: PositiveInt | UnknownRule
     concurrency_group: StableKey | UnknownRule
-    cancellable_before_deadline: StrictBool | UnknownRule
+    activation: ChipActivationRules | UnknownRule
+    excluded_gameweeks: tuple[PositiveInt, ...] | UnknownRule
+    minimum_gap_gameweeks: NonNegativeInt | UnknownRule
     effects: tuple[DeclarativeEffect, ...] | UnknownRule
 
 
@@ -716,7 +748,25 @@ class SourceEntry(AuthoringModel):
     locator: Annotated[StrictStr, Field(min_length=1)]
     published_on: CalendarDate | None = None
     accessed_on: CalendarDate | None = None
+    retrieved_at: UtcTimestamp | None = None
+    content_sha256: Annotated[StrictStr, Field(pattern=r"^[0-9a-f]{64}$")] | None = None
+    content_path: (
+        Annotated[
+            StrictStr,
+            Field(pattern=r"^evidence/tickets/[A-Z0-9-]+/sources/[A-Za-z0-9._-]+$"),
+        ]
+        | None
+    ) = None
     refresh_trigger: Annotated[StrictStr, Field(min_length=1)]
+
+    @model_validator(mode="after")
+    def capture_fields_are_all_or_none(self) -> SourceEntry:
+        fields = (self.retrieved_at, self.content_sha256, self.content_path)
+        if any(value is not None for value in fields) and not all(
+            value is not None for value in fields
+        ):
+            raise ValueError("source capture timestamp, digest and path must be supplied together")
+        return self
 
 
 class SourceManifestFile(AuthoringModel):
@@ -864,10 +914,12 @@ class CheckedClaims(AuthoringModel):
 class TargetClaimsFile(AuthoringModel):
     ruleset_id: StrictStr
     ruleset_version: StrictStr
-    status: Literal["DRAFT_PRELAUNCH", "CAPTURED_UNVERIFIED", "CONFLICTED", "REFERENCE_ONLY"]
-    production_eligible: Literal[False]
+    status: Literal[
+        "DRAFT_PRELAUNCH", "CAPTURED_UNVERIFIED", "CONFLICTED", "REFERENCE_ONLY", "VERIFIED"
+    ]
+    production_eligible: StrictBool
     checked_claims: CheckedClaims | None
-    unknown_blocking_families: Annotated[tuple[StrictStr, ...], Field(min_length=1)]
+    unknown_blocking_families: tuple[StrictStr, ...]
 
     @model_validator(mode="after")
     def blockers_are_unique(self) -> TargetClaimsFile:
@@ -877,6 +929,13 @@ class TargetClaimsFile(AuthoringModel):
             raise ValueError("REFERENCE_ONLY synthetic rules must not carry target-season claims")
         if self.status != "REFERENCE_ONLY" and self.checked_claims is None:
             raise ValueError("target-season rules require checked claims")
+        if self.status == "VERIFIED":
+            if not self.production_eligible or self.unknown_blocking_families:
+                raise ValueError("VERIFIED target claims must be eligible with no unknown families")
+        elif self.production_eligible or not self.unknown_blocking_families:
+            raise ValueError(
+                "non-VERIFIED target claims must remain ineligible and enumerate blockers"
+            )
         return self
 
 
@@ -989,7 +1048,26 @@ def validate_and_normalize_authoring_data(
     )
     assert isinstance(source_model, SourceManifestFile)
     sources = _source_ids(source_model)
-    normalized["source_manifest.yaml"] = source_model.model_dump(mode="json", by_alias=True)
+    if manifest.schema_version == "1.1" and manifest.production_eligible:
+        uncaptured = tuple(
+            source.source_id
+            for source in source_model.sources
+            if source.retrieved_at is None
+            or source.content_sha256 is None
+            or source.content_path is None
+        )
+        if uncaptured:
+            raise RulesValidationError(
+                "RULESET_SOURCE_CAPTURE_MISSING",
+                "production-eligible schema 1.1 sources require immutable captures",
+                blockers=uncaptured,
+            )
+    source_value = source_model.model_dump(mode="json", by_alias=True)
+    for source in source_value["sources"]:
+        for capture_field in ("retrieved_at", "content_sha256", "content_path"):
+            if source[capture_field] is None:
+                source.pop(capture_field)
+    normalized["source_manifest.yaml"] = source_value
     if manifest.schema_version == "1.1":
         expected_extensions = set(V11_EXTENSION_MODELS)
         if set(manifest.extension_files) != expected_extensions:
@@ -1009,7 +1087,47 @@ def validate_and_normalize_authoring_data(
                 referenced_sources.update(model.source_refs)
             else:
                 model = _validated(model_type, data[filename], filename)
-            normalized[filename] = model.model_dump(mode="json", by_alias=True)
+            normalized_value = model.model_dump(mode="json", by_alias=True)
+            if filename == "transfers.yaml" and "transition" in normalized_value:
+                for field in (
+                    "late_entry_unlimited_until_first_deadline",
+                    "max_transfers_per_deadline",
+                    "confirmed_transfers_irreversible",
+                    "confirmed_transfer_effect",
+                ):
+                    if normalized_value["transition"].get(field) is None:
+                        normalized_value["transition"].pop(field, None)
+            if filename == "prices.yaml":
+                for field in (
+                    "authoritative_manager_selling_price_preferred",
+                    "retained_profit_rounding",
+                ):
+                    if normalized_value.get(field) is None:
+                        normalized_value.pop(field, None)
+            normalized[filename] = normalized_value
+
+        if manifest.production_eligible:
+            transition = normalized["transfers.yaml"].get("transition", {})
+            required_transfer_fields = {
+                "late_entry_unlimited_until_first_deadline",
+                "max_transfers_per_deadline",
+                "confirmed_transfers_irreversible",
+                "confirmed_transfer_effect",
+            }
+            missing_transfer_fields = tuple(sorted(required_transfer_fields - set(transition)))
+            required_price_fields = {
+                "authoritative_manager_selling_price_preferred",
+                "retained_profit_rounding",
+            }
+            missing_price_fields = tuple(
+                sorted(required_price_fields - set(normalized["prices.yaml"]))
+            )
+            if missing_transfer_fields or missing_price_fields:
+                raise RulesValidationError(
+                    "RULESET_MANAGER_STATE_INCOMPLETE",
+                    "production-eligible schema 1.1 rules require complete manager-state semantics",
+                    blockers=(*missing_transfer_fields, *missing_price_fields),
+                )
 
         for filename, model_type in V11_EXTENSION_MODELS.items():
             model = _validated(model_type, data[filename], filename)

@@ -19,10 +19,9 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
-import xml.etree.ElementTree as ET
-from dataclasses import dataclass, asdict
+from collections.abc import Iterable, Sequence
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterable, Sequence
 
 OFFICIAL_HOSTS = {
     "fantasy.premierleague.com",
@@ -34,9 +33,44 @@ HELP_URLS = (
     "https://fantasy.premierleague.com/help/",
     "https://fantasy.premierleague.com/help/rules",
 )
-SITEMAP_SEEDS = (
-    "https://www.premierleague.com/robots.txt",
-    "https://www.premierleague.com/sitemap.xml",
+ANNOUNCEMENT_SOURCES = (
+    (
+        "https://www.premierleague.com/en/news/4679873/all-you-need-to-know-about-changes-to-fpl-for-202627",
+        [
+            "2026/27 finality at 09:00 UK time",
+            "five-transfer bank",
+            "two chip sets",
+            "no 2026/27 AFCON transfer grant",
+        ],
+    ),
+    (
+        "https://www.premierleague.com/en/news/4679879/whats-happening-with-fpl-chips-in-202627",
+        [
+            "chip inventory and half-season windows",
+            "one-chip concurrency",
+            "Wildcard, Free Hit, Triple Captain and Bench Boost effects",
+            "Free Hit GW1 and consecutive-Gameweek restrictions",
+        ],
+    ),
+    (
+        "https://www.premierleague.com/en/news/4679946/whats-new-in-202627-fantasy-changes-to-bonus-points-system",
+        ["2026/27 Bonus Points System values"],
+    ),
+    (
+        "https://www.premierleague.com/en/news/4361991/whats-happening-with-defensive-contribution-points-in-202627-fantasy",
+        ["2026/27 defensive-contribution scoring"],
+    ),
+    (
+        "https://www.premierleague.com/en/news/4680462/whats-new-in-202627-fantasy-price-change-predictor",
+        ["2026/27 price-change timing and official predictor"],
+    ),
+    (
+        "https://www.premierleague.com/en/news/2174907",
+        [
+            "transfer allowance, banking, hits and constraints",
+            "selling-price profit, equal-price and full-loss branches",
+        ],
+    ),
 )
 USER_AGENT = "DMF-Pulse-Rules-Evidence/1.0 (+independent review capture)"
 MAX_BYTES = 15 * 1024 * 1024
@@ -65,7 +99,7 @@ class SourceRecord:
 
 
 def _now() -> str:
-    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
+    return dt.datetime.now(dt.UTC).replace(microsecond=0).isoformat()
 
 
 def _fetch(url: str) -> tuple[bytes, str, str | None]:
@@ -128,15 +162,30 @@ def _existing_digests(evidence_root: Path) -> dict[str, str]:
         sources = value.get("sources") if isinstance(value, dict) else None
         if isinstance(sources, list):
             for source in sources:
-                if isinstance(source, dict) and isinstance(source.get("url"), str) and isinstance(source.get("sha256"), str):
+                if (
+                    isinstance(source, dict)
+                    and isinstance(source.get("url"), str)
+                    and isinstance(source.get("sha256"), str)
+                ):
                     records[source["url"]] = source["sha256"]
     return records
 
 
-def _save_content(evidence_root: Path, body: bytes, final_url: str, content_type: str) -> tuple[Path, str]:
+def _save_content(
+    evidence_root: Path, body: bytes, final_url: str, content_type: str
+) -> tuple[Path, str]:
     digest = hashlib.sha256(body).hexdigest()
-    suffix = ".json" if "json" in content_type or body.lstrip().startswith((b"{", b"[")) else ".html"
-    slug = re.sub(r"[^a-z0-9]+", "-", urllib.parse.urlparse(final_url).path.lower()).strip("-") or "root"
+    suffix = (
+        ".json"
+        if "json" in content_type or body.lstrip().startswith((b"{", b"["))
+        else ".js"
+        if urllib.parse.urlparse(final_url).path.endswith(".js")
+        else ".html"
+    )
+    slug = (
+        re.sub(r"[^a-z0-9]+", "-", urllib.parse.urlparse(final_url).path.lower()).strip("-")
+        or "root"
+    )
     path = evidence_root / "sources" / f"{slug[:80]}-{digest}{suffix}"
     path.parent.mkdir(parents=True, exist_ok=True)
     if not path.exists():
@@ -182,83 +231,43 @@ def _record(
     return record, _strip_markup(body)
 
 
-def _sitemap_candidates() -> list[str]:
-    sitemap_urls: list[str] = []
-    page_urls: set[str] = set()
-    for seed in SITEMAP_SEEDS:
-        try:
-            body, final_url, _ = _fetch(seed)
-        except SourceError:
-            continue
-        text = body.decode("utf-8", errors="replace")
-        if final_url.endswith("robots.txt") or "Sitemap:" in text:
-            sitemap_urls.extend(re.findall(r"(?im)^Sitemap:\s*(https://\S+)", text))
-        else:
-            sitemap_urls.append(final_url)
-    seen: set[str] = set()
-    queue = list(dict.fromkeys(sitemap_urls))[:20]
-    while queue and len(seen) < 40 and len(page_urls) < 500:
-        url = queue.pop(0)
-        if url in seen:
-            continue
-        seen.add(url)
-        try:
-            body, _, _ = _fetch(url)
-            root = ET.fromstring(body)
-        except (SourceError, ET.ParseError):
-            continue
-        locations = [element.text.strip() for element in root.iter() if element.tag.endswith("loc") and element.text]
-        for location in locations:
-            host = urllib.parse.urlparse(location).hostname
-            if host not in OFFICIAL_HOSTS:
-                continue
-            lowered = location.lower()
-            if lowered.endswith((".xml", ".xml.gz")) or "sitemap" in lowered:
-                if len(queue) < 40:
-                    queue.append(location)
-            elif any(term in lowered for term in ("fantasy", "fpl")) and any(term in lowered for term in ("2026", "2027", "change", "rule", "chip", "transfer")):
-                page_urls.add(location)
-    return sorted(page_urls)
+def _help_asset_urls() -> tuple[str, str]:
+    """Resolve the content-bearing rules and FAQ chunks from the current help SPA."""
 
-
-def _discover_announcements(limit: int = 8) -> list[str]:
-    ranked: list[tuple[int, str]] = []
-    for url in _sitemap_candidates():
-        lowered = url.lower()
-        score = 0
-        score += 10 if "2026" in lowered or "2027" in lowered else 0
-        score += 8 if "change" in lowered or "new" in lowered else 0
-        score += 6 if "chip" in lowered or "transfer" in lowered else 0
-        score += 4 if "fantasy" in lowered or "fpl" in lowered else 0
-        ranked.append((score, url))
-    return [url for _, url in sorted(ranked, key=lambda item: (-item[0], item[1]))[:limit]]
-
-
-def _classify_rules(text: str) -> list[str]:
-    lowered = text.lower()
-    rules = []
-    checks = {
-        "squad, lineup and automatic substitutions": ("15-player", "automatic substitution"),
-        "player scoring and bonus": ("bonus points", "clean sheet"),
-        "transfer banking, hits and limits": ("free transfer", "transfer"),
-        "selling price and retained profit": ("selling price", "purchase price"),
-        "chip inventory, windows and effects": ("free hit", "bench boost", "triple captain"),
-        "2026/27 season-specific changes": ("2026/27", "2026-27"),
-        "AFCON transfer policy": ("afcon", "africa cup of nations"),
-    }
-    for label, terms in checks.items():
-        if any(term in lowered for term in terms):
-            rules.append(label)
-    return rules
+    shell, _, _ = _fetch(HELP_URLS[0])
+    shell_text = shell.decode("utf-8", errors="replace")
+    index_match = re.search(r"/assets/index-[A-Za-z0-9_-]+\.js", shell_text)
+    if index_match is None:
+        raise SourceError("official help shell does not identify its current application bundle")
+    index_url = urllib.parse.urljoin(HELP_URLS[0], index_match.group(0))
+    index, _, _ = _fetch(index_url)
+    index_text = index.decode("utf-8", errors="replace")
+    resolved = []
+    for prefix in ("Rules", "FAQs"):
+        match = re.search(rf"{prefix}-[A-Za-z0-9_-]+\.js", index_text)
+        if match is None:
+            raise SourceError(f"official help bundle does not identify its {prefix} content chunk")
+        resolved.append(urllib.parse.urljoin(index_url, match.group(0)))
+    return resolved[0], resolved[1]
 
 
 def _selling_price_evidence(texts: Iterable[str]) -> dict[str, bool]:
     combined = "\n".join(texts).lower()
     return {
-        "increase_branch": all(term in combined for term in ("purchase price", "profit")) and any(term in combined for term in ("£0.2", "0.2m", "50%", "half")),
-        "equal_branch": "same as" in combined or "equal" in combined or "no change" in combined,
-        "below_purchase_branch": any(phrase in combined for phrase in ("price falls", "fallen in price", "less than you paid", "current price")),
-        "rounding_branch": any(term in combined for term in ("£0.1", "0.1m", "rounded down", "round down")),
+        "increase_branch": all(term in combined for term in ("purchase price", "profit"))
+        and any(term in combined for term in ("£0.2", "0.2m", "50%", "half")),
+        # The official transfer article defines the transfer-page amount as the
+        # selling price, then identifies increases and decreases as the only
+        # conditions that make that amount differ from the unchanged price.
+        "equal_branch": "amount you will get for selling" in combined
+        and "may differ from the player's current purchase price" in combined,
+        "below_purchase_branch": any(
+            phrase in combined
+            for phrase in ("price falls", "fallen in price", "less than you paid", "current price")
+        ),
+        "rounding_branch": any(
+            term in combined for term in ("£0.1", "0.1m", "rounded down", "round down")
+        ),
     }
 
 
@@ -280,7 +289,12 @@ def run(repo: Path) -> dict[str, object]:
                 "chip inventory windows",
                 "position and scoring configuration",
             ],
-            {"events": "$.events[*]", "game_settings": "$.game_settings", "chips": "$.chips[*]", "element_types": "$.element_types[*]"},
+            {
+                "events": "$.events[*]",
+                "game_settings": "$.game_settings",
+                "chips": "$.chips[*]",
+                "element_types": "$.element_types[*]",
+            },
             True,
         ),
         (
@@ -330,24 +344,46 @@ def run(repo: Path) -> dict[str, object]:
             break
 
     announcement_errors: list[str] = []
-    for url in _discover_announcements():
+    explicit_sources = list(ANNOUNCEMENT_SOURCES)
+    try:
+        rules_asset, faq_asset = _help_asset_urls()
+        explicit_sources.extend(
+            (
+                (
+                    rules_asset,
+                    [
+                        "official current FPL rules text",
+                        "squad, lineup, scoring, transfers, prices, chips and deadlines",
+                    ],
+                ),
+                (
+                    faq_asset,
+                    [
+                        "official current FPL clarifications",
+                        "chip cancellation and activation",
+                        "saved transfers and Free Hit restoration",
+                    ],
+                ),
+            )
+        )
+    except SourceError as exc:
+        announcement_errors.append(str(exc))
+    for url, supported in explicit_sources:
         try:
             record, text = _record(
                 repo,
                 evidence_root,
                 url,
-                rules_supported=[],
-                locator={"article": "headline, publication metadata and article body"},
+                rules_supported=supported,
+                locator={
+                    "content": "official article body or current FPL help application rule text"
+                },
                 controlling=True,
                 previous=previous,
             )
         except SourceError as exc:
             announcement_errors.append(str(exc))
             continue
-        classified = _classify_rules(text)
-        if not classified:
-            continue
-        record = SourceRecord(**{**asdict(record), "rules_supported": classified})
         records.append(record)
         texts[record.url] = text
 
@@ -362,7 +398,11 @@ def run(repo: Path) -> dict[str, object]:
             existing = {}
         fresh_urls = {record.url for record in records}
         for source in existing.get("sources", []) if isinstance(existing, dict) else []:
-            if isinstance(source, dict) and source.get("url") not in fresh_urls and urllib.parse.urlparse(str(source.get("url", ""))).hostname in OFFICIAL_HOSTS:
+            if (
+                isinstance(source, dict)
+                and source.get("url") not in fresh_urls
+                and urllib.parse.urlparse(str(source.get("url", ""))).hostname in OFFICIAL_HOSTS
+            ):
                 preserved.append(source)
 
     manifest = {
@@ -379,15 +419,27 @@ def run(repo: Path) -> dict[str, object]:
         ],
         "mutation_policy": "A new digest creates a review trigger; it does not silently mutate an accepted rule value.",
     }
-    existing_manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    existing_manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
     selling = _selling_price_evidence(texts.values())
     help_text = "\n".join(text for url, text in texts.items() if "help" in url).lower()
-    announcement_text = "\n".join(text for url, text in texts.items() if "premierleague.com" in url and "help" not in url).lower()
+    announcement_text = "\n".join(
+        text for url, text in texts.items() if "premierleague.com" in url and "help" not in url
+    ).lower()
     stale_afcon_help = "afcon" in help_text or "africa cup of nations" in help_text
-    season_specific_no_grant = ("2026/27" in announcement_text or "2026-27" in announcement_text) and any(
+    season_specific_no_grant = (
+        "2026/27" in announcement_text or "2026-27" in announcement_text
+    ) and any(
         phrase in announcement_text
-        for phrase in ("no extra free transfers", "no additional free transfers", "without extra free transfers", "no afcon transfer")
+        for phrase in (
+            "no extra free transfers",
+            "no additional free transfers",
+            "without extra free transfers",
+            "no afcon transfer",
+            "that will not happen this season",
+        )
     )
     conflict_status = "NOT_PRESENT"
     if stale_afcon_help and season_specific_no_grant:
@@ -399,8 +451,12 @@ def run(repo: Path) -> dict[str, object]:
         "schema_version": "dmf-rules-interpretation-v1",
         "interpretation_id": "RUL-2026-27-AFCON-TRANSFER-POLICY",
         "status": conflict_status,
-        "decision": "No AFCON-specific free-transfer grant is encoded for 2026/27" if conflict_status == "RESOLVED_BY_NEWER_SEASON_SPECIFIC_OFFICIAL_SOURCE" else None,
-        "basis": "newer, season-specific official announcement controls over stale generic help wording" if conflict_status == "RESOLVED_BY_NEWER_SEASON_SPECIFIC_OFFICIAL_SOURCE" else None,
+        "decision": "No AFCON-specific free-transfer grant is encoded for 2026/27"
+        if conflict_status == "RESOLVED_BY_NEWER_SEASON_SPECIFIC_OFFICIAL_SOURCE"
+        else None,
+        "basis": "newer, season-specific official announcement controls over stale generic help wording"
+        if conflict_status == "RESOLVED_BY_NEWER_SEASON_SPECIFIC_OFFICIAL_SOURCE"
+        else None,
         "human_approval_conflated": False,
         "production_activation_authorised": False,
         "review_required_on_new_source": True,
@@ -424,12 +480,18 @@ def run(repo: Path) -> dict[str, object]:
     }
     if not any(record.url.startswith(BOOTSTRAP_URL) for record in records):
         result["blocking_findings"].append("official bootstrap missing")
-    if not any("help" in record.url for record in records) and not any("official FPL rules" in str(source.get("rules_supported")) for source in preserved):
+    if not any("help" in record.url for record in records) and not any(
+        "official FPL rules" in str(source.get("rules_supported")) for source in preserved
+    ):
         result["blocking_findings"].append("official FPL rules/help capture missing")
     if not all(selling.values()):
-        result["blocking_findings"].append("official selling-price evidence does not establish every branch")
+        result["blocking_findings"].append(
+            "official selling-price evidence does not establish every branch"
+        )
     if conflict_status == "UNRESOLVED_BLOCKER":
-        result["blocking_findings"].append("stale AFCON help conflict lacks newer season-specific resolution")
+        result["blocking_findings"].append(
+            "stale AFCON help conflict lacks newer season-specific resolution"
+        )
     if result["blocking_findings"]:
         result["status"] = "BLOCKED"
     (evidence_root / "OFFICIAL_SOURCE_RECONCILIATION.json").write_text(
@@ -446,7 +508,10 @@ def run(repo: Path) -> dict[str, object]:
         "",
         "## Selling price",
         "",
-        *[f"- {name}: {'established' if value else 'not established'}" for name, value in selling.items()],
+        *[
+            f"- {name}: {'established' if value else 'not established'}"
+            for name, value in selling.items()
+        ],
         "",
         "## Official-source conflict",
         "",
@@ -454,7 +519,9 @@ def run(repo: Path) -> dict[str, object]:
         "",
         "No source reconciliation result constitutes human approval or production activation.",
     ]
-    (evidence_root / "OFFICIAL_RULES_VERIFICATION.md").write_text("\n".join(report) + "\n", encoding="utf-8")
+    (evidence_root / "OFFICIAL_RULES_VERIFICATION.md").write_text(
+        "\n".join(report) + "\n", encoding="utf-8"
+    )
     if result["status"] != "PASS":
         raise SourceError(json.dumps(result, sort_keys=True))
     return result

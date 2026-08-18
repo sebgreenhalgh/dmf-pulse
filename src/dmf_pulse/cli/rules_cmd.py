@@ -24,7 +24,9 @@ from dmf_pulse.rules.diff import diff_rulesets
 from dmf_pulse.rules.errors import RulesError, RulesValidationError
 from dmf_pulse.rules.lifecycle import activate_ruleset
 from dmf_pulse.rules.models import (
+    ActivationEvidence,
     ApprovalRecord,
+    ApprovalTrustStore,
     CapabilityArtifact,
     CompiledRuleset,
     FixtureScenario,
@@ -207,6 +209,18 @@ def score_gameweek_command(
 def activate_command(
     ruleset: Path,
     approval: Annotated[Path, typer.Option("--approval", help="Exact approval record JSON.")],
+    capability: Annotated[
+        Path | None,
+        typer.Option("--capability", help="Exact FULL_SEASON capability artifact for schema 1.1."),
+    ] = None,
+    evidence: Annotated[
+        Path | None,
+        typer.Option("--evidence", help="Exact activation-evidence artifact for schema 1.1."),
+    ] = None,
+    approval_trust: Annotated[
+        Path | None,
+        typer.Option("--approval-trust", help="Hash-bound approval trust store for schema 1.1."),
+    ] = None,
     registry: Annotated[
         Path, typer.Option("--registry", help="Immutable active-artifact registry.")
     ] = Path("artifacts/rules/active"),
@@ -217,6 +231,15 @@ def activate_command(
             resolve_ruleset(ruleset),
             _read_model(approval, ApprovalRecord),
             registry,
+            capability=(
+                _read_model(capability, CapabilityArtifact) if capability is not None else None
+            ),
+            evidence=(_read_model(evidence, ActivationEvidence) if evidence is not None else None),
+            approval_trust=(
+                _read_model(approval_trust, ApprovalTrustStore)
+                if approval_trust is not None
+                else None
+            ),
         )
     )
     _emit(

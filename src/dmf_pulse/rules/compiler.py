@@ -20,6 +20,7 @@ from dmf_pulse.rules.authoring import (
 )
 from dmf_pulse.rules.canonical import canonical_rules_sha256, pretty_rules_json, self_hash
 from dmf_pulse.rules.capabilities import validate_v11_governance
+from dmf_pulse.rules.chips import declarative_chip_blockers
 from dmf_pulse.rules.errors import RulesIntegrityError, RulesValidationError
 from dmf_pulse.rules.models import (
     CompiledRuleset,
@@ -90,14 +91,19 @@ def _read_source(path: Path) -> tuple[dict[str, Any], str]:
     return load_rules_yaml_bytes(raw), hashlib.sha256(raw).hexdigest()
 
 
-def _declarative_execution_blockers(data: dict[str, dict[str, Any]]) -> list[str]:
+def _declarative_execution_blockers(
+    data: dict[str, dict[str, Any]], *, schema_version: str = "1.0"
+) -> list[str]:
     blockers: list[str] = []
     chips = data.get("chips.yaml", {})
-    for chip_index, chip in enumerate(chips.get("chips", [])):
-        if not isinstance(chip, dict):
-            continue
-        for effect_index, _effect in enumerate(chip.get("effects", [])):
-            blockers.append(f"unimplemented:chips[{chip_index}].effects[{effect_index}]")
+    if schema_version == "1.1":
+        blockers.extend(declarative_chip_blockers(chips))
+    else:
+        for chip_index, chip in enumerate(chips.get("chips", [])):
+            if not isinstance(chip, dict):
+                continue
+            for effect_index, _effect in enumerate(chip.get("effects", [])):
+                blockers.append(f"unimplemented:chips[{chip_index}].effects[{effect_index}]")
     special_events = data.get("special_events.yaml", {})
     for event_index, _event in enumerate(special_events.get("events", [])):
         blockers.append(f"unimplemented:special_events.events[{event_index}]")
@@ -377,15 +383,21 @@ def _load_source(
         raw_hashes[filename] = raw_sha256
         if filename != "rule_verification.yaml":
             blockers.extend(_unknown_blockers(value, filename))
-    blockers.extend(_declarative_execution_blockers(data))
+    blockers.extend(_declarative_execution_blockers(data, schema_version=manifest.schema_version))
     if manifest.extension_files:
         claims = data.get("target_2026_27_claims.yaml")
         families = claims.get("unknown_blocking_families") if isinstance(claims, dict) else None
-        if (
-            not isinstance(families, list)
-            or not families
-            or not all(isinstance(item, str) for item in families)
-        ):
+        if not isinstance(families, list) or not all(isinstance(item, str) for item in families):
+            raise RulesValidationError(
+                "RULESET_TARGET_BLOCKERS_MISSING", "target claims must enumerate blocking families"
+            )
+        if manifest.status is RulesetStatus.VERIFIED and families:
+            raise RulesValidationError(
+                "RULESET_TARGET_BLOCKERS_PRESENT",
+                "VERIFIED target claims cannot retain blocking families",
+                blockers=tuple(families),
+            )
+        if manifest.status is not RulesetStatus.VERIFIED and not families:
             raise RulesValidationError(
                 "RULESET_TARGET_BLOCKERS_MISSING", "target draft must enumerate blocking families"
             )

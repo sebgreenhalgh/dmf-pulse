@@ -1,0 +1,15 @@
+{
+  "activation_evidence_hash": null,
+  "approval_id": null,
+  "approval_kind": null,
+  "approval_statement": null,
+  "approved": false,
+  "approved_at": null,
+  "approved_by": null,
+  "capability_hash": null,
+  "record_hash": null,
+  "ruleset_hash": "c2883ad9bf1497dad9c2eba69422e14937ddc072f9b3a95c5005a312c38f7d56",
+  "ruleset_id": "fpl-2026-27",
+  "ruleset_version": "1.0.0",
+  "status": "PENDING_HUMAN_APPROVAL"
+}

@@ -1,5 +1,37 @@
 # DMF Pulse execution plans
 
+## RUL-2026-27 independent full-ruleset review and remediation
+
+- Repository/branch: `sebgreenhalgh/dmf-pulse`,
+  `readiness/RUL-2026-27-full-season-activation`.
+- Immutable parent: `4f1274ccef419a7c0bde335c48bd4070e248b2e6`.
+- Pre-review branch HEAD: `56287412ec441af140b290e849428b15f0c7cd2d`;
+  separately observed remote `main`: `ce7fe8f4354d95a477afcf6eed45f63cf0ab772e`.
+- Scope: independently verify and remediate the complete 2026/27 rules-data,
+  executable manager-state semantics, governance, activation gates, accepted
+  Stage-1–11 consumers, tests, and final evidence. Do not incorporate Stage-12+
+  modelling work, merge, activate production, or fabricate human approval.
+
+### Independent-review checkpoints
+
+- [x] Fetch and verify remote lineage; check out the dedicated branch without
+  rebasing or merging later-stage work.
+- [x] Resolve governing authority and freshly capture/compare official 2026/27
+  rules, configuration, corrections, and representative-match availability.
+- [x] Hostile-review rules data, compiler/runtime behavior, capabilities,
+  approval/activation gates, consumers, tests, and temporary transport files.
+- [x] Record severity-classified findings; fix every substantiated P0/P1 and
+  reasonable in-scope P2 with focused adversarial/regression coverage.
+- [x] Run repository-prescribed focused/full/static/PostgreSQL/build/wheel/
+  repository/secret/diff gates and record non-executed gates truthfully.
+- [ ] Replace transient handoff material with final-code evidence, commit the
+  complete remediation, push the same branch, and verify remote SHA equality.
+
+Validation note: the exact repository-wide branch-coverage command reached a
+30-minute cap without producing its JSON report. Focused rules/optimisation,
+PostgreSQL, migration, static, package, repository, and secret gates passed; the
+timeout is retained in `evidence/tickets/RUL-2026-27/VALIDATION_RESULTS.json`.
+
 ## OPT-010 - exact bounded one-Gameweek optimiser
 
 - Ticket/stage: `OPT-010`, A10; immutable parent

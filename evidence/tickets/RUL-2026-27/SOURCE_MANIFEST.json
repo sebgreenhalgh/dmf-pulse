@@ -1,0 +1,248 @@
+{
+  "coverage": {
+    "chips": true,
+    "deadlines": true,
+    "player_points": true,
+    "selling_price": true,
+    "squad": true,
+    "transfers": true
+  },
+  "generated_at": "2026-08-17T23:42:00+00:00",
+  "immutable_parent": "4f1274ccef419a7c0bde335c48bd4070e248b2e6",
+  "mutation_policy": "A new digest creates a review trigger; it does not silently mutate an accepted rule value.",
+  "schema_version": "dmf-rules-source-manifest-v3",
+  "source_authority_policy": [
+    "current official season-specific source",
+    "accepted DMFP-20 interpretation",
+    "most-specific governing DMFP specification",
+    "accepted repository contracts"
+  ],
+  "sources": [
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/api-bootstrap-static-faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7.json",
+      "controlling": true,
+      "locator": {
+        "chips": "$.chips[*]",
+        "element_types": "$.element_types[*]",
+        "events": "$.events[*]",
+        "game_settings": "$.game_settings"
+      },
+      "previous_sha256": "41447871d7c4e3e9b8fef088d16c47533d622d058ed35eba6d691461bc549cb2",
+      "publication_or_update_date": null,
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:41:56+00:00",
+      "review_disposition": {
+        "effect": "target rules revalidated; no silent production mutation",
+        "reviewed_at": "2026-08-18T01:29:22+00:00",
+        "scope": "RUL-2026-27 full-season readiness",
+        "status": "REVIEWED"
+      },
+      "review_triggered": true,
+      "rules_supported": [
+        "gameweek deadlines",
+        "squad configuration",
+        "transfer limit, cost, banking and retained-profit percentage",
+        "chip inventory windows",
+        "position and scoring configuration"
+      ],
+      "sha256": "faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7",
+      "source_id": "official-faff6a660d48d3fd",
+      "title": "https://fantasy.premierleague.com/api/bootstrap-static/",
+      "url": "https://fantasy.premierleague.com/api/bootstrap-static/"
+    },
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/help-f1d1d03dec18102ef26b2530d518feab9d302ba465908b3324e1f2cf037abbcf.html",
+      "controlling": true,
+      "locator": {
+        "page": "rendered help content and linked rule topics"
+      },
+      "previous_sha256": "f1d1d03dec18102ef26b2530d518feab9d302ba465908b3324e1f2cf037abbcf",
+      "publication_or_update_date": "Thu, 13 Aug 2026 17:53:54 GMT",
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:41:56+00:00",
+      "review_triggered": false,
+      "rules_supported": [
+        "official FPL rules and help index"
+      ],
+      "sha256": "f1d1d03dec18102ef26b2530d518feab9d302ba465908b3324e1f2cf037abbcf",
+      "source_id": "official-f1d1d03dec18102e",
+      "title": "Fantasy Premier League, Official Fantasy Football Game of the Premier League",
+      "url": "https://fantasy.premierleague.com/help/"
+    },
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/en-news-4679873-all-you-need-to-know-about-changes-to-fpl-for-202627-aae7f3d49630d81d7e9c8db3fd955c60af3adfa74a8b56fdcc2c1d41c641c4fe.html",
+      "controlling": true,
+      "locator": {
+        "content": "official article body or current FPL help application rule text"
+      },
+      "previous_sha256": null,
+      "publication_or_update_date": null,
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:41:57+00:00",
+      "review_triggered": false,
+      "rules_supported": [
+        "2026/27 finality at 09:00 UK time",
+        "five-transfer bank",
+        "two chip sets",
+        "no 2026/27 AFCON transfer grant"
+      ],
+      "sha256": "aae7f3d49630d81d7e9c8db3fd955c60af3adfa74a8b56fdcc2c1d41c641c4fe",
+      "source_id": "official-aae7f3d49630d81d",
+      "title": "All you need to know about changes to FPL for 2026/27",
+      "url": "https://www.premierleague.com/en/news/4679873/all-you-need-to-know-about-changes-to-fpl-for-202627"
+    },
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/en-news-4679879-whats-happening-with-fpl-chips-in-202627-3766ee82c12145f9500f8c86d94ae50be874eedd05c4f15c70da1cb9f30c7bc7.html",
+      "controlling": true,
+      "locator": {
+        "content": "official article body or current FPL help application rule text"
+      },
+      "previous_sha256": null,
+      "publication_or_update_date": null,
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:41:57+00:00",
+      "review_triggered": false,
+      "rules_supported": [
+        "chip inventory and half-season windows",
+        "one-chip concurrency",
+        "Wildcard, Free Hit, Triple Captain and Bench Boost effects",
+        "Free Hit GW1 and consecutive-Gameweek restrictions"
+      ],
+      "sha256": "3766ee82c12145f9500f8c86d94ae50be874eedd05c4f15c70da1cb9f30c7bc7",
+      "source_id": "official-3766ee82c12145f9",
+      "title": "What\u2019s happening with FPL chips in 2026/27",
+      "url": "https://www.premierleague.com/en/news/4679879/whats-happening-with-fpl-chips-in-202627"
+    },
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/en-news-4679946-whats-new-in-202627-fantasy-changes-to-bonus-points-system-76f5d7026a6a29d4cb69e33d9cc805f9d98adaa763e5169c56bdad44bf92508e.html",
+      "controlling": true,
+      "locator": {
+        "content": "official article body or current FPL help application rule text"
+      },
+      "previous_sha256": null,
+      "publication_or_update_date": null,
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:41:58+00:00",
+      "review_triggered": false,
+      "rules_supported": [
+        "2026/27 Bonus Points System values"
+      ],
+      "sha256": "76f5d7026a6a29d4cb69e33d9cc805f9d98adaa763e5169c56bdad44bf92508e",
+      "source_id": "official-76f5d7026a6a29d4",
+      "title": "What\u2019s new in 2026/27 Fantasy: Changes to Bonus Points System",
+      "url": "https://www.premierleague.com/en/news/4679946/whats-new-in-202627-fantasy-changes-to-bonus-points-system"
+    },
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/en-news-4361991-whats-happening-with-defensive-contribution-points-in-202627-fan-e339b508e28d7de4379d1c2d31da0fc4dc55b3e69ffd322cfbcc9d1080215d55.html",
+      "controlling": true,
+      "locator": {
+        "content": "official article body or current FPL help application rule text"
+      },
+      "previous_sha256": null,
+      "publication_or_update_date": null,
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:41:58+00:00",
+      "review_triggered": false,
+      "rules_supported": [
+        "2026/27 defensive-contribution scoring"
+      ],
+      "sha256": "e339b508e28d7de4379d1c2d31da0fc4dc55b3e69ffd322cfbcc9d1080215d55",
+      "source_id": "official-e339b508e28d7de4",
+      "title": "What\u2019s happening with defensive contribution points in 2026/27 Fantasy?",
+      "url": "https://www.premierleague.com/en/news/4361991/whats-happening-with-defensive-contribution-points-in-202627-fantasy"
+    },
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/en-news-4680462-whats-new-in-202627-fantasy-price-change-predictor-6812f82e05142398824548a87089547e3493895c4659cb92d456fa91b0a3d9d3.html",
+      "controlling": true,
+      "locator": {
+        "content": "official article body or current FPL help application rule text"
+      },
+      "previous_sha256": null,
+      "publication_or_update_date": null,
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:41:59+00:00",
+      "review_triggered": false,
+      "rules_supported": [
+        "2026/27 price-change timing and official predictor"
+      ],
+      "sha256": "6812f82e05142398824548a87089547e3493895c4659cb92d456fa91b0a3d9d3",
+      "source_id": "official-6812f82e05142398",
+      "title": "What\u2019s new in 2026/27 Fantasy: Price Change Predictor",
+      "url": "https://www.premierleague.com/en/news/4680462/whats-new-in-202627-fantasy-price-change-predictor"
+    },
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/en-news-2174907-d6d13f0a4358d0bdb0c43815dcd700cc054686e21198eaf57079e6a1fc3a9d15.html",
+      "controlling": true,
+      "locator": {
+        "content": "official article body or current FPL help application rule text"
+      },
+      "previous_sha256": null,
+      "publication_or_update_date": null,
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:41:59+00:00",
+      "review_triggered": false,
+      "rules_supported": [
+        "transfer allowance, banking, hits and constraints",
+        "selling-price profit, equal-price and full-loss branches"
+      ],
+      "sha256": "d6d13f0a4358d0bdb0c43815dcd700cc054686e21198eaf57079e6a1fc3a9d15",
+      "source_id": "official-d6d13f0a4358d0bd",
+      "title": "FPL basics explained: How to make transfers",
+      "url": "https://www.premierleague.com/en/news/2174907"
+    },
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/assets-rules-bzxb8a2h-js-77a0cd19b8c9259676d13445c303edeba89efcfef0537457d0559a8dc0ac0a6c.js",
+      "controlling": true,
+      "locator": {
+        "content": "official article body or current FPL help application rule text"
+      },
+      "previous_sha256": null,
+      "publication_or_update_date": "Thu, 13 Aug 2026 17:53:54 GMT",
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:42:00+00:00",
+      "review_triggered": false,
+      "rules_supported": [
+        "official current FPL rules text",
+        "squad, lineup, scoring, transfers, prices, chips and deadlines"
+      ],
+      "sha256": "77a0cd19b8c9259676d13445c303edeba89efcfef0537457d0559a8dc0ac0a6c",
+      "source_id": "official-77a0cd19b8c92596",
+      "title": "https://fantasy.premierleague.com/assets/Rules-BZxb8A2H.js",
+      "url": "https://fantasy.premierleague.com/assets/Rules-BZxb8A2H.js"
+    },
+    {
+      "content_path": "evidence/tickets/RUL-2026-27/sources/assets-faqs-djycw4i3-js-6c174b245becbca3cfd88800ba04eab7736490e4fc07385dec92b250ab7ce1da.js",
+      "controlling": true,
+      "locator": {
+        "content": "official article body or current FPL help application rule text"
+      },
+      "previous_sha256": null,
+      "publication_or_update_date": "Thu, 13 Aug 2026 17:53:54 GMT",
+      "publisher": "Fantasy Premier League / Premier League",
+      "refresh_trigger": "new official digest, newer publication/update date, official correction, or pre-activation freshness check",
+      "retrieved_at": "2026-08-17T23:42:00+00:00",
+      "review_triggered": false,
+      "rules_supported": [
+        "official current FPL clarifications",
+        "chip cancellation and activation",
+        "saved transfers and Free Hit restoration"
+      ],
+      "sha256": "6c174b245becbca3cfd88800ba04eab7736490e4fc07385dec92b250ab7ce1da",
+      "source_id": "official-6c174b245becbca3",
+      "title": "https://fantasy.premierleague.com/assets/FAQs-DJYCW4i3.js",
+      "url": "https://fantasy.premierleague.com/assets/FAQs-DJYCW4i3.js"
+    }
+  ],
+  "target_season": "2026/27",
+  "verification_status": "PASS",
+  "verified_at": "2026-08-18T01:29:22+00:00"
+}

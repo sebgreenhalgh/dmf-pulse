@@ -1,0 +1,6 @@
+{
+  "artifact_type": "DMF_RULE_APPROVAL_TRUST_STORE",
+  "schema_version": "1.0",
+  "store_hash": "538b36b200a8f7edd5afbdf40d1f75cd4d998081dd668db6877abecc6596d6bf",
+  "trusted_approval_hashes": []
+}

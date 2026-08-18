@@ -1,362 +1,297 @@
+"""Contract tests for the durable 2026/27 target-season ruleset."""
+
 from __future__ import annotations
 
 import ast
+import copy
 import hashlib
-import json
-import re
-import shutil
-import subprocess
-import tempfile
-from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
 
 import pytest
-import yaml
+
+from dmf_pulse.fpl_points.models import ProjectionMode
+from dmf_pulse.optimisation.manager_state import selling_price_tenths
+from dmf_pulse.rules.capabilities import compile_capability_artifact
+from dmf_pulse.rules.chips import (
+    ChipManagerState,
+    build_chip_rules_view,
+    cancel_pending_chip,
+    complete_chip_gameweek,
+    confirm_chip_transfers,
+    declarative_chip_blockers,
+    finalise_chip_deadline,
+    play_chip,
+    replace_chip_squad,
+    score_chip_gameweek,
+    transfer_hit_points,
+)
+from dmf_pulse.rules.compiler import compile_ruleset
+from dmf_pulse.rules.models import RuleCapability, RulesetStatus
+from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-TARGET_SEASON_FORMS = ("2026/27", "2026-27", "2026_27")
-REQUIRED_CAPABILITIES = (
-    "PLAYER_POINTS",
-    "GW1_INITIAL_SQUAD",
-    "TRANSFER_STATE",
-    "CHIP_STATE",
-    "FULL_SEASON",
-)
+TARGET = REPO_ROOT / "config/rules/fpl-2026-27"
 
 
-def _normal(value: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
+@pytest.fixture(scope="module")
+def compiled():
+    return compile_ruleset(TARGET)
 
 
-def _candidate_yaml() -> Iterator[Path]:
-    for path in REPO_ROOT.rglob("*.yaml"):
-        if any(part in {".git", ".venv", "site-packages"} for part in path.parts):
-            continue
-        yield path
-    for path in REPO_ROOT.rglob("*.yml"):
-        if any(part in {".git", ".venv", "site-packages"} for part in path.parts):
-            continue
-        yield path
-
-
-def _target_root() -> Path:
-    author_report = REPO_ROOT / "evidence" / "tickets" / "RUL-2026-27" / "TARGET_AUTHORING_REPORT.json"
-    if author_report.exists():
-        value = json.loads(author_report.read_text(encoding="utf-8"))
-        candidate = REPO_ROOT / value["target_root"]
-        if candidate.is_dir():
-            return candidate
-    scored: dict[Path, int] = {}
-    for path in _candidate_yaml():
-        text = path.read_text(encoding="utf-8", errors="ignore")
-        score = sum(20 for form in TARGET_SEASON_FORMS if form in text or form in path.as_posix())
-        if "target" in path.as_posix().lower():
-            score += 10
-        if "rules" in path.as_posix().lower():
-            score += 5
-        if any(token in path.as_posix().lower() for token in ("fixture", "test", "evidence")):
-            score -= 12
-        if score > 0:
-            scored[path.parent] = scored.get(path.parent, 0) + score
-    assert scored, "No 2026/27 target split-YAML ruleset found"
-    return sorted(scored, key=lambda path: (-scored[path], len(path.parts), path.as_posix()))[0]
-
-
-def _documents() -> list[tuple[Path, Any]]:
-    root = _target_root()
-    paths = sorted([*root.rglob("*.yaml"), *root.rglob("*.yml")])
-    assert paths, f"No YAML documents under target root {root}"
-    return [(path, yaml.safe_load(path.read_text(encoding="utf-8"))) for path in paths]
-
-
-def _flatten(value: Any, trail: tuple[str, ...] = ()) -> Iterator[tuple[tuple[str, ...], Any]]:
-    if isinstance(value, dict):
-        for key, child in value.items():
-            yield from _flatten(child, (*trail, _normal(str(key))))
-    elif isinstance(value, list):
-        for index, child in enumerate(value):
-            yield from _flatten(child, (*trail, str(index)))
-    else:
-        yield trail, value
-
-
-def _target_values() -> list[tuple[str, Any]]:
-    rows: list[tuple[str, Any]] = []
-    for path, document in _documents():
-        rows.extend((f"{path.name}:{'.'.join(trail)}", value) for trail, value in _flatten(document))
-    return rows
-
-
-def _target_text() -> str:
-    return "\n".join(
-        path.read_text(encoding="utf-8", errors="ignore") for path, _ in _documents()
+def _state(compiled, gameweek: int = 10) -> ChipManagerState:
+    squad = tuple(f"p{index:02d}" for index in range(15))
+    return ChipManagerState(
+        ruleset_id=compiled.ruleset_id,
+        ruleset_version=compiled.ruleset_version,
+        ruleset_hash=compiled.ruleset_hash,
+        gameweek=gameweek,
+        saved_free_transfers=3,
+        permanent_squad=squad,
+        active_squad=squad,
+        bank_tenths=10,
+        purchase_prices_tenths={player_id: 50 for player_id in squad},
     )
 
 
-def _has_path_value(rows: list[tuple[str, Any]], terms: tuple[str, ...], values: set[Any]) -> bool:
-    return any(all(term in path for term in terms) and value in values for path, value in rows)
+def test_target_compiles_to_source_backed_full_season_capability(compiled) -> None:
+    assert compiled.status is RulesetStatus.VERIFIED
+    assert compiled.production_eligible
+    assert compiled.unknown_blockers == ()
+    artifact = compile_capability_artifact(compiled, RuleCapability.FULL_SEASON)
+    assert artifact.source_backed
+    assert artifact.ready_for_human_approval
+    assert artifact.production_eligible
+    assert artifact.blockers == ()
+    assert all(source["content_sha256"] for source in compiled.rules["source_manifest"]["sources"])
 
 
-def _scenario_matrix() -> dict[str, Any]:
-    path = REPO_ROOT / "fixtures" / "rules" / "RUL-2026-27" / "adversarial_scenarios.json"
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def _selling_price(purchase: int, current: int) -> int:
-    if current <= purchase:
-        return current
-    return purchase + (current - purchase) // 2
-
-
-def _try_cli(commands: list[list[str]]) -> tuple[list[str], subprocess.CompletedProcess[str]]:
-    failures: list[dict[str, Any]] = []
-    for command in commands:
-        result = subprocess.run(
-            command,
-            cwd=REPO_ROOT,
-            check=False,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        if result.returncode == 0:
-            return command, result
-        failures.append(
-            {
-                "command": command,
-                "returncode": result.returncode,
-                "stdout": result.stdout,
-                "stderr": result.stderr,
-            }
-        )
-    pytest.fail(f"No accepted CLI form succeeded: {json.dumps(failures, indent=2)}")
-
-
-def test_adversarial_matrix_is_complete_and_self_consistent() -> None:
-    matrix = _scenario_matrix()
-    assert matrix["schema_version"] == "dmf-rules-2026-27-adversarial-scenarios-v1"
-    assert matrix["target_season"] == "2026/27"
-    assert {row["id"] for row in matrix["player_points_boundaries"]} == {
-        "MINUTES-0",
-        "MINUTES-1",
-        "MINUTES-59",
-        "MINUTES-60",
+def test_exact_squad_lineup_transfer_and_deadline_contract(compiled) -> None:
+    positions = compiled.rules["positions"]["positions"]
+    assert {key: value["squad_quota"] for key, value in positions.items()} == {
+        "GK": 2,
+        "DEF": 5,
+        "MID": 5,
+        "FWD": 3,
     }
-    for row in matrix["selling_price"]:
-        assert _selling_price(row["purchase_price_tenths"], row["current_price_tenths"]) == row[
-            "expected_selling_price_tenths"
-        ]
-    assert any(row["id"] == "SELL-BELOW" for row in matrix["selling_price"])
-    assert any(row["id"] == "FREE-HIT-RESTORES-SQUAD" for row in matrix["chips"])
-    assert any(row["id"] == "ACTIVATION-WITHOUT-APPROVAL" for row in matrix["governance"])
-
-
-def test_target_squad_budget_formation_and_club_quota() -> None:
-    values = _target_values()
-    text = _target_text().lower()
-    assert _has_path_value(values, ("squad", "size"), {15}) or _has_path_value(
-        values, ("squadsize",), {15}
-    )
-    assert _has_path_value(values, ("budget",), {1000, 100, 100.0})
-    assert any(
-        ("club" in path or "team_limit" in path) and value == 3 for path, value in values
-    )
-    for position, quota in {"gk": 2, "def": 5, "mid": 5, "fwd": 3}.items():
-        assert any(position in path and ("squad" in path or "quota" in path) and value == quota for path, value in values), position
-    for token in ("captain", "vice", "automatic", "substitution", "formation"):
-        assert token in text
-    assert ("goalkeeper" in text or "gk" in text) and "bench" in text
-
-
-def test_target_player_points_contract_preserves_accepted_boundaries() -> None:
-    values = _target_values()
-    text = _target_text().lower()
-    assert any("appearance" in path and "threshold" in path and value in {1, 60} for path, value in values)
-    for token in (
-        "assist",
-        "clean_sheet",
-        "save",
-        "penalty_save",
-        "penalty_miss",
-        "own_goal",
-        "yellow",
-        "red",
-        "bps",
-        "bonus",
-        "defensive",
-    ):
-        assert token in text, token
-    assert "tie" in text and "bonus" in text
-    assert "60" in text and "59" in text or "minutes" in text
-
-
-def test_target_transfer_and_selling_price_state_is_closed() -> None:
-    values = _target_values()
-    text = _target_text().lower()
-    assert any("bank" in path and "max" in path and value == 5 for path, value in values)
-    assert any("transfer" in path and ("hit" in path or "cost" in path) and abs(float(value)) == 4 for path, value in values if isinstance(value, (int, float)))
-    assert any("transfer" in path and ("limit" in path or "max" in path) and value == 20 for path, value in values)
-    for token in ("purchase", "current", "selling", "profit", "round"):
-        assert token in text, token
-    assert "below" in text or "current_price < purchase_price" in text
-    assert "equal" in text or "current_price == purchase_price" in text
-    assert "0.1" in text or "tenths" in text or "integer" in text
-    for token in ("afford", "bank", "club", "position"):
-        assert token in text
-
-
-def test_target_chip_state_machine_has_both_windows_and_executable_effects() -> None:
-    text = _target_text().lower().replace("-", "_").replace(" ", "_")
-    for token in ("wildcard", "free_hit", "triple_captain", "bench_boost"):
-        assert token in text, token
-    for boundary in ("1", "19", "20", "38"):
-        assert boundary in text
-    for token in ("expire", "one_chip", "cancel", "restore", "consecutive"):
-        assert token in text, token
-    assert "saved" in text and "transfer" in text
-    assert "multiplier" in text or "triple" in text
-    assert "bench" in text and ("count" in text or "score" in text)
-
-
-def test_target_has_all_38_official_deadlines() -> None:
-    deadline_values = {
-        value
-        for path, value in _target_values()
-        if "deadline" in path and isinstance(value, str) and re.match(r"^2026-\d{2}-\d{2}T", value)
+    assert compiled.rules["squad"] == {
+        "initial_budget_tenths": 1000,
+        "max_per_club": 3,
+        "squad_size": 15,
     }
-    assert len(deadline_values) == 38
+    assert compiled.rules["lineup"]["starting_size"] == 11
+    assert compiled.rules["lineup"]["bench_size"] == 4
+    transition = compiled.rules["transfers"]["transition"]
+    assert transition["free_transfer_cap"] == 5
+    assert transition["max_transfers_per_deadline"] == 20
+    assert transition["hit_points"] == -4
+    deadlines = compiled.rules["deadlines"]["gameweeks"]
+    assert [row["number"] for row in deadlines] == list(range(1, 39))
+    assert deadlines[0]["deadline_utc"] == "2026-08-21T17:30:00Z"
+    assert deadlines[18]["deadline_utc"] == "2027-01-02T13:30:00Z"
+    assert deadlines[-1]["deadline_utc"] == "2027-05-30T13:30:00Z"
 
 
-def test_target_capability_names_are_explicit() -> None:
-    text = _target_text().upper()
-    for capability in REQUIRED_CAPABILITIES:
-        assert capability in text, capability
+def test_stage_11_consumes_twenty_transfer_cap_and_all_selling_branches(compiled) -> None:
+    rules = build_multi_gameweek_transfer_rules(compiled, projection_mode=ProjectionMode.TEST)
+    assert rules.max_transfers_per_deadline == 20
+    assert rules.maximum_free_transfers == 5
+    assert rules.hit_cost_per_paid_transfer == 4
+    assert set(rules.event_rules) == {"NORMAL", "PRESEASON", "LATE_ENTRY"}
+    expected = {(50, 54): 52, (50, 53): 51, (50, 50): 50, (50, 47): 47}
+    for (purchase, current), selling in expected.items():
+        assert (
+            selling_price_tenths(
+                purchase_price_tenths=purchase,
+                current_price_tenths=current,
+                rule=rules.selling_price_rule,
+            )
+            == selling
+        )
 
 
-def test_source_manifest_has_digests_locators_and_refresh_triggers() -> None:
-    manifest_path = REPO_ROOT / "evidence" / "tickets" / "RUL-2026-27" / "SOURCE_MANIFEST.json"
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    assert manifest["target_season"] == "2026/27"
-    assert manifest["sources"]
-    for source in manifest["sources"]:
-        assert source["publisher"]
-        assert source["title"]
-        assert source["url"].startswith("https://")
-        assert source["retrieved_at"]
-        assert re.fullmatch(r"[0-9a-f]{64}", source["sha256"])
-        assert source["locator"]
-        assert source["rules_supported"]
-        assert source["refresh_trigger"]
-    bootstrap_sources = [source for source in manifest["sources"] if "bootstrap" in source["title"].lower()]
-    assert bootstrap_sources
-    for source in bootstrap_sources:
-        matches = list((manifest_path.parent / "sources").glob(f"*{source['sha256']}*"))
-        assert matches
-        assert hashlib.sha256(matches[0].read_bytes()).hexdigest() == source["sha256"]
+def test_wildcard_pending_threshold_cancellation_hits_and_permanence(compiled) -> None:
+    rules = build_chip_rules_view(compiled)
+    original = _state(compiled)
+    pending = play_chip(original, rules, "WILDCARD", confirmed_transfer_count=1)
+    assert pending.pending_chip == "WILDCARD"
+    assert cancel_pending_chip(pending, rules).pending_chip is None
+    active = confirm_chip_transfers(pending, rules, confirmed_transfer_count=2)
+    assert active.active_chip == "WILDCARD"
+    assert transfer_hit_points(active, rules, transfer_count=20, available_free_transfers=1) == 0
+    replacement = tuple(f"w{index:02d}" for index in range(15))
+    changed = replace_chip_squad(
+        active,
+        rules,
+        squad=replacement,
+        bank_tenths=5,
+        purchase_prices_tenths={player_id: 55 for player_id in replacement},
+    )
+    completed = complete_chip_gameweek(changed, rules, next_gameweek=11)
+    assert completed.permanent_squad == replacement
+    assert completed.active_squad == replacement
+    assert completed.saved_free_transfers == 3
 
 
-def test_no_forged_human_approval_or_active_target() -> None:
-    evidence_root = REPO_ROOT / "evidence" / "tickets" / "RUL-2026-27"
-    approval_path = evidence_root / "PENDING_HUMAN_APPROVAL.json"
-    approval = json.loads(approval_path.read_text(encoding="utf-8"))
-    assert approval["status"] == "PENDING_HUMAN_APPROVAL"
-    assert approval["approved"] is False
-    assert approval["approved_by"] is None
-    assert approval["approved_at"] is None
-    for path in [*_target_root().rglob("*.yaml"), *evidence_root.rglob("*.json")]:
-        text = path.read_text(encoding="utf-8", errors="ignore")
-        assert not re.search(r"approved_by\s*[\":= ]+Sebastian Greenhalgh", text, re.IGNORECASE)
-        assert not re.search(r"approved\s*[\":= ]+true", text, re.IGNORECASE)
+def test_free_hit_restores_squad_bank_prices_and_rejects_consecutive_use(compiled) -> None:
+    rules = build_chip_rules_view(compiled)
+    original = _state(compiled, gameweek=19)
+    active = play_chip(original, rules, "FREE_HIT", confirmed_transfer_count=1)
+    replacement = tuple(f"f{index:02d}" for index in range(15))
+    changed = replace_chip_squad(
+        active,
+        rules,
+        squad=replacement,
+        bank_tenths=2,
+        purchase_prices_tenths={player_id: 60 for player_id in replacement},
+    )
+    restored = complete_chip_gameweek(changed, rules, next_gameweek=20)
+    assert restored.active_squad == original.permanent_squad
+    assert restored.bank_tenths == original.bank_tenths
+    assert restored.purchase_prices_tenths == original.purchase_prices_tenths
+    assert restored.saved_free_transfers == original.saved_free_transfers
+    with pytest.raises(ValueError, match="configured Gameweek gap"):
+        play_chip(restored, rules, "FREE_HIT", confirmed_transfer_count=1)
 
 
-def test_target_season_policy_is_not_encoded_as_runtime_conditionals() -> None:
+def test_chip_inventory_windows_gw1_and_one_chip_constraint(compiled) -> None:
+    rules = build_chip_rules_view(compiled)
+    gw1 = _state(compiled, gameweek=1)
+    with pytest.raises(ValueError, match="outside its configured inventory window"):
+        play_chip(gw1, rules, "FREE_HIT", confirmed_transfer_count=1)
+    bench_boost = play_chip(gw1, rules, "BENCH_BOOST")
+    with pytest.raises(ValueError, match="only one chip"):
+        play_chip(bench_boost, rules, "TRIPLE_CAPTAIN")
+    cancelled = cancel_pending_chip(bench_boost, rules)
+    assert cancelled.pending_chip is None
+
+    used = finalise_chip_deadline(play_chip(gw1, rules, "TRIPLE_CAPTAIN"), rules)
+    next_state = complete_chip_gameweek(used, rules, next_gameweek=2).model_copy(
+        update={"gameweek": 20}
+    )
+    second = finalise_chip_deadline(play_chip(next_state, rules, "TRIPLE_CAPTAIN"), rules)
+    assert len(second.use_history) == 2
+
+
+def test_triple_captain_vice_fallback_and_bench_boost_scoring(compiled) -> None:
+    rules = build_chip_rules_view(compiled)
+    base = _state(compiled)
+    points = {player_id: 1 for player_id in base.active_squad}
+    starters = base.active_squad[:11]
+    bench = base.active_squad[11:]
+    triple = finalise_chip_deadline(play_chip(base, rules, "TRIPLE_CAPTAIN"), rules)
+    result = score_chip_gameweek(
+        triple,
+        rules,
+        player_points=points,
+        starter_ids=starters,
+        bench_ids=bench,
+        captain_id=starters[0],
+        vice_captain_id=starters[1],
+        appeared_player_ids=frozenset({starters[1]}),
+        normal_captain_multiplier=2,
+    )
+    assert result.effective_captain == starters[1]
+    assert result.captain_multiplier == 3
+    assert result.total_points == 13
+
+    boosted = finalise_chip_deadline(play_chip(base, rules, "BENCH_BOOST"), rules)
+    result = score_chip_gameweek(
+        boosted,
+        rules,
+        player_points=points,
+        starter_ids=starters,
+        bench_ids=bench,
+        captain_id=starters[0],
+        vice_captain_id=starters[1],
+        appeared_player_ids=frozenset(starters),
+        normal_captain_multiplier=2,
+    )
+    assert result.bench_included
+    assert result.total_points == 16
+
+
+def test_captain_multiplier_is_executed_from_rules_data(compiled) -> None:
+    chips = copy.deepcopy(compiled.rules["chips"])
+    triple_data = next(chip for chip in chips["chips"] if chip["key"] == "TRIPLE_CAPTAIN")
+    triple_data["effects"][0]["parameters"]["multiplier"] = 4
+    assert declarative_chip_blockers(chips) == ()
+
+    rules = build_chip_rules_view(compiled)
+    triple_index = next(
+        index for index, chip in enumerate(rules.chips) if chip.key == "TRIPLE_CAPTAIN"
+    )
+    triple_rule = rules.chips[triple_index]
+    effect = triple_rule.effects[0].model_copy(
+        update={"parameters": {"multiplier": 4, "vice_fallback": True}}
+    )
+    data_driven_rule = triple_rule.model_copy(update={"effects": (effect,)})
+    data_driven_rules = rules.model_copy(
+        update={
+            "chips": tuple(
+                data_driven_rule if index == triple_index else chip
+                for index, chip in enumerate(rules.chips)
+            )
+        }
+    )
+    base = _state(compiled)
+    active = finalise_chip_deadline(
+        play_chip(base, data_driven_rules, "TRIPLE_CAPTAIN"), data_driven_rules
+    )
+    points = {player_id: 1 for player_id in base.active_squad}
+    result = score_chip_gameweek(
+        active,
+        data_driven_rules,
+        player_points=points,
+        starter_ids=base.active_squad[:11],
+        bench_ids=base.active_squad[11:],
+        captain_id=base.active_squad[0],
+        vice_captain_id=base.active_squad[1],
+        appeared_player_ids=frozenset(base.active_squad[:11]),
+        normal_captain_multiplier=2,
+    )
+    assert result.captain_multiplier == 4
+    assert result.total_points == 14
+
+
+def test_official_source_captures_are_locatable_and_digest_bound(compiled) -> None:
+    for source in compiled.rules["source_manifest"]["sources"]:
+        capture = REPO_ROOT / source["content_path"]
+        assert capture.is_file()
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == source["content_sha256"]
+
+
+def test_reference_and_synthetic_hashes_remain_unchanged() -> None:
+    root = REPO_ROOT / "fixtures/rules/RUL-002"
+    assert compile_ruleset(root / "reference_2025_26").ruleset_hash == (
+        "12271ab0b32a461baa3778f2e914f45744ccf9d5302c37c4a5f2ffb89e0c1139"
+    )
+    assert compile_ruleset(root / "synthetic_complete").ruleset_hash == (
+        "98e8614d9971ec2b1e45a357e89f79172bbc5dd4dc87044c3c131b3de6b0aab8"
+    )
+
+
+def test_target_policy_is_not_a_runtime_season_conditional() -> None:
     violations: list[str] = []
-    for path in (REPO_ROOT / "src" / "dmf_pulse").rglob("*.py"):
+    paths = [
+        *(REPO_ROOT / "src/dmf_pulse/rules").rglob("*.py"),
+        REPO_ROOT / "src/dmf_pulse/optimisation/manager_state.py",
+        REPO_ROOT / "src/dmf_pulse/optimisation/multi_gameweek_models.py",
+    ]
+    for path in paths:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=path.as_posix())
         for node in ast.walk(tree):
             if not isinstance(node, (ast.If, ast.IfExp, ast.Match)):
                 continue
             constants = {
-                value.value
-                for value in ast.walk(node)
-                if isinstance(value, ast.Constant) and isinstance(value.value, (str, int))
+                child.value
+                for child in ast.walk(node)
+                if isinstance(child, ast.Constant) and isinstance(child.value, (str, int))
             }
-            if 2026 in constants or any(form in constants for form in TARGET_SEASON_FORMS):
-                violations.append(f"{path.relative_to(REPO_ROOT)}:{getattr(node, 'lineno', 0)}")
-    assert not violations, violations
+            if 2026 in constants or constants.intersection({"2026/27", "2026/2027"}):
+                violations.append(f"{path.relative_to(REPO_ROOT)}:{node.lineno}")
+    assert violations == []
 
 
-def test_target_validation_and_compilation_are_deterministic(tmp_path: Path) -> None:
-    assert shutil.which("dmf"), "dmf console script is not installed"
-    target = _target_root().as_posix()
-    _try_cli(
-        [
-            ["dmf", "rules", "validate", target, "--json"],
-            ["dmf", "rules", "validate", "--source", target, "--json"],
-            ["dmf", "rules", "validate", "--ruleset", target, "--json"],
-        ]
-    )
-    first = tmp_path / "compiled-a.json"
-    second = tmp_path / "compiled-b.json"
-    compile_commands = lambda output: [
-        ["dmf", "rules", "compile", target, "--output", output.as_posix(), "--json"],
-        ["dmf", "rules", "compile", "--source", target, "--output", output.as_posix(), "--json"],
-        ["dmf", "rules", "compile", "--ruleset", target, "--output", output.as_posix(), "--json"],
-    ]
-    _try_cli(compile_commands(first))
-    _try_cli(compile_commands(second))
-    assert first.read_bytes() == second.read_bytes()
-
-
-def test_activation_fails_closed_without_human_approval() -> None:
-    assert shutil.which("dmf"), "dmf console script is not installed"
-    help_result = subprocess.run(
-        ["dmf", "rules", "--help"],
-        cwd=REPO_ROOT,
-        check=True,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    target = _target_root().as_posix()
-    commands = [name for name in ("activate", "activation-check", "promote") if name in help_result.stdout]
-    if commands:
-        for name in commands:
-            result = subprocess.run(
-                ["dmf", "rules", name, target, "--json"],
-                cwd=REPO_ROOT,
-                check=False,
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            assert result.returncode != 0, (name, result.stdout, result.stderr)
-        return
-    activation_tests = [
-        path
-        for path in (REPO_ROOT / "tests").rglob("*.py")
-        if path != Path(__file__)
-        and "activation" in path.read_text(encoding="utf-8", errors="ignore").lower()
-        and "approval" in path.read_text(encoding="utf-8", errors="ignore").lower()
-    ]
-    assert activation_tests, "No activation CLI and no independent activation/approval contract tests"
-
-
-def test_reference_and_synthetic_rulesets_remain_valid() -> None:
-    assert shutil.which("dmf"), "dmf console script is not installed"
-    candidates = [
-        REPO_ROOT / "fixtures" / "rules" / "RUL-002" / "synthetic_complete",
-        REPO_ROOT / "fixtures" / "rules" / "RUL-002" / "optimiser_reference_v1_0",
-        REPO_ROOT / "fixtures" / "rules" / "RUL-002" / "optimiser_reference_v1_1",
-    ]
-    existing = [path for path in candidates if path.exists()]
-    assert existing
-    for ruleset in existing:
-        _try_cli(
-            [
-                ["dmf", "rules", "validate", ruleset.as_posix(), "--json"],
-                ["dmf", "rules", "validate", "--source", ruleset.as_posix(), "--json"],
-                ["dmf", "rules", "validate", "--ruleset", ruleset.as_posix(), "--json"],
-            ]
-        )
+def test_temporary_transport_machinery_is_absent() -> None:
+    assert not list((REPO_ROOT / "automation").glob("rules-readiness-payload.part-*"))
+    assert not list((REPO_ROOT / ".github/workflows").glob("rules-readiness-*.yml"))

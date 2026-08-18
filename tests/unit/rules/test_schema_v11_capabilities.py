@@ -261,7 +261,7 @@ def test_manager_state_capabilities_remain_blocked(
     assert not artifact.production_eligible
     assert artifact.blockers
     assert expected_blocker in artifact.blockers
-    assert "interpretation:INT-FPL-2026-BONUS-TIES-001:out_of_scope" in artifact.blockers
+    assert "interpretation:INT-FPL-2026-BONUS-TIES-001:out_of_scope" not in artifact.blockers
 
 
 @pytest.mark.unit

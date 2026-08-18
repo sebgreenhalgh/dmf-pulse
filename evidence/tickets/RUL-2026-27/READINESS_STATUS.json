@@ -1,0 +1,25 @@
+{
+  "activation_blockers": [
+    "PENDING_HUMAN_APPROVAL",
+    "REPRESENTATIVE_OFFICIAL_MATCH_RECONCILIATION_TEMPORARILY_UNAVAILABLE"
+  ],
+  "branch": "readiness/RUL-2026-27-full-season-activation",
+  "engineering_review_status": "COMPLETE",
+  "full_season_capability": {
+    "blockers": [],
+    "capability_hash": "d680aa138a0f637d12c0389d0e3295c0fd4acbd1ffd8d8fcae811c0114bd972d",
+    "production_eligible": true,
+    "ready_for_human_approval": true,
+    "source_backed": true
+  },
+  "human_approval_status": "PENDING_HUMAN_APPROVAL",
+  "immutable_parent": "4f1274ccef419a7c0bde335c48bd4070e248b2e6",
+  "implementation_commit": "PENDING_FINAL_VALIDATION_COMMIT",
+  "original_branch_head": "56287412ec441af140b290e849428b15f0c7cd2d",
+  "production_activation_status": "NOT_ACTIVE",
+  "representative_official_match_reconciliation": "TEMPORARILY_UNAVAILABLE",
+  "ruleset_hash": "c2883ad9bf1497dad9c2eba69422e14937ddc072f9b3a95c5005a312c38f7d56",
+  "ruleset_id": "fpl-2026-27",
+  "ruleset_lifecycle_status": "VERIFIED",
+  "ruleset_version": "1.0.0"
+}

@@ -1,0 +1,81 @@
+chips:
+  - key: "WILDCARD"
+    inventory:
+      copies: 2
+      copies_per_window: 1
+      windows:
+        - {start_gameweek: 2, end_gameweek: 19}
+        - {start_gameweek: 20, end_gameweek: 38}
+      unused_copy_expires_at_window_end: true
+    duration_gameweeks: 1
+    concurrency_group: "SQUAD_CHIP"
+    activation:
+      route: "CONFIRMED_TRANSFERS"
+      lock_after_confirmed_transfer_count: 2
+      cancellable_before_deadline: true
+    excluded_gameweeks: [1]
+    minimum_gap_gameweeks: 0
+    effects:
+      - {surface: "TRANSFERS", operation: "UNLIMITED_FREE", parameters: {}}
+      - {surface: "TRANSFERS", operation: "REMOVE_CURRENT_GAMEWEEK_HITS", parameters: {}}
+      - {surface: "TRANSFERS", operation: "PRESERVE_SAVED_FREE_TRANSFERS", parameters: {}}
+      - {surface: "SQUAD", operation: "PERMANENT", parameters: {}}
+  - key: "FREE_HIT"
+    inventory:
+      copies: 2
+      copies_per_window: 1
+      windows:
+        - {start_gameweek: 2, end_gameweek: 19}
+        - {start_gameweek: 20, end_gameweek: 38}
+      unused_copy_expires_at_window_end: true
+    duration_gameweeks: 1
+    concurrency_group: "SQUAD_CHIP"
+    activation:
+      route: "CONFIRMED_TRANSFERS"
+      lock_after_confirmed_transfer_count: 1
+      cancellable_before_deadline: true
+    excluded_gameweeks: [1]
+    minimum_gap_gameweeks: 1
+    effects:
+      - {surface: "TRANSFERS", operation: "UNLIMITED_FREE", parameters: {}}
+      - {surface: "TRANSFERS", operation: "PRESERVE_SAVED_FREE_TRANSFERS", parameters: {}}
+      - {surface: "SQUAD", operation: "RESTORE_NEXT_DEADLINE", parameters: {}}
+      - {surface: "BANK", operation: "RESTORE_NEXT_DEADLINE", parameters: {}}
+      - {surface: "PURCHASE_PRICES", operation: "RESTORE_NEXT_DEADLINE", parameters: {}}
+  - key: "TRIPLE_CAPTAIN"
+    inventory:
+      copies: 2
+      copies_per_window: 1
+      windows:
+        - {start_gameweek: 1, end_gameweek: 19}
+        - {start_gameweek: 20, end_gameweek: 38}
+      unused_copy_expires_at_window_end: true
+    duration_gameweeks: 1
+    concurrency_group: "SQUAD_CHIP"
+    activation:
+      route: "PICK_TEAM_SAVE"
+      lock_after_confirmed_transfer_count: null
+      cancellable_before_deadline: true
+    excluded_gameweeks: []
+    minimum_gap_gameweeks: 0
+    effects:
+      - {surface: "CAPTAIN", operation: "SET_MULTIPLIER", parameters: {multiplier: 3, vice_fallback: true}}
+  - key: "BENCH_BOOST"
+    inventory:
+      copies: 2
+      copies_per_window: 1
+      windows:
+        - {start_gameweek: 1, end_gameweek: 19}
+        - {start_gameweek: 20, end_gameweek: 38}
+      unused_copy_expires_at_window_end: true
+    duration_gameweeks: 1
+    concurrency_group: "SQUAD_CHIP"
+    activation:
+      route: "PICK_TEAM_SAVE"
+      lock_after_confirmed_transfer_count: null
+      cancellable_before_deadline: true
+    excluded_gameweeks: []
+    minimum_gap_gameweeks: 0
+    effects:
+      - {surface: "LINEUP", operation: "INCLUDE_BENCH_POINTS", parameters: {}}
+concurrency_limit: 1

@@ -1,181 +1,193 @@
+"""Governance and evidence regressions for 2026/27 activation readiness."""
+
 from __future__ import annotations
 
-import hashlib
 import json
-import re
 from pathlib import Path
-from typing import Any, Iterator
 
-import yaml
+import pytest
+
+from dmf_pulse.rules.capabilities import compile_capability_artifact
+from dmf_pulse.rules.compiler import compile_ruleset
+from dmf_pulse.rules.errors import RulesActivationError, RulesIntegrityError
+from dmf_pulse.rules.lifecycle import (
+    activate_ruleset,
+    activation_evidence_hash,
+    approval_trust_store_hash,
+)
+from dmf_pulse.rules.models import (
+    ActivationEvidence,
+    ApprovalRecord,
+    ApprovalTrustStore,
+    CompiledRuleset,
+    RuleCapability,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-EVIDENCE = REPO_ROOT / "evidence" / "tickets" / "RUL-2026-27"
-REQUIRED_CAPABILITIES = {
-    "PLAYER_POINTS",
-    "GW1_INITIAL_SQUAD",
-    "TRANSFER_STATE",
-    "CHIP_STATE",
-    "FULL_SEASON",
-}
-ACCEPTED_TECHNICAL_STATUSES = {
-    "PASS",
-    "PASSED",
-    "READY",
-    "VERIFIED",
-    "TECHNICALLY_VERIFIED",
-    "COMPLETE",
-    "AVAILABLE",
-    "SUPPORTED",
-    "ENABLED",
-}
+TARGET = REPO_ROOT / "config/rules/fpl-2026-27"
+EVIDENCE = REPO_ROOT / "evidence/tickets/RUL-2026-27"
 
 
-def _load(path: Path) -> dict[str, Any]:
+def _load(path: Path) -> dict[str, object]:
     value = json.loads(path.read_text(encoding="utf-8"))
     assert isinstance(value, dict)
     return value
 
 
-def _sha(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+@pytest.fixture(scope="module")
+def compiled() -> CompiledRuleset:
+    return compile_ruleset(TARGET)
 
 
-def _flatten(value: Any, trail: tuple[str, ...] = ()) -> Iterator[tuple[tuple[str, ...], Any]]:
-    if isinstance(value, dict):
-        for key, child in value.items():
-            yield from _flatten(child, (*trail, str(key)))
-    elif isinstance(value, list):
-        for index, child in enumerate(value):
-            yield from _flatten(child, (*trail, str(index)))
-    else:
-        yield trail, value
+@pytest.fixture(scope="module")
+def capability(compiled):
+    return compile_capability_artifact(compiled, RuleCapability.FULL_SEASON)
 
 
-def _target_values() -> list[tuple[str, Any]]:
-    authoring = _load(EVIDENCE / "TARGET_AUTHORING_REPORT.json")
-    root = REPO_ROOT / authoring["target_root"]
-    values: list[tuple[str, Any]] = []
-    for pattern in ("*.yaml", "*.yml"):
-        for path in sorted(root.rglob(pattern)):
-            document = yaml.safe_load(path.read_text(encoding="utf-8"))
-            values.extend((f"{path.name}:{'.'.join(trail)}".lower(), value) for trail, value in _flatten(document))
-    return values
+@pytest.fixture(scope="module")
+def activation_evidence() -> ActivationEvidence:
+    return ActivationEvidence.model_validate_json(
+        (EVIDENCE / "ACTIVATION_EVIDENCE.json").read_bytes()
+    )
 
 
-def test_acceptance_and_compiled_hash_are_canonical() -> None:
-    acceptance = _load(EVIDENCE / "ACCEPTANCE_RESULT.json")
-    assert acceptance["status"] == "PASS"
-    assert acceptance["production_status"] == "NOT_ACTIVE"
-    assert acceptance["human_approval_status"] == "PENDING_HUMAN_APPROVAL"
-    compiled = REPO_ROOT / acceptance["compiled_artifact"]
-    assert compiled.is_file() and compiled.stat().st_size > 0
-    assert _sha(compiled) == acceptance["compiled_sha256"]
-    json.loads(compiled.read_text(encoding="utf-8"))
+@pytest.fixture(scope="module")
+def pending_approval() -> ApprovalRecord:
+    return ApprovalRecord.model_validate_json(
+        (EVIDENCE / "PENDING_HUMAN_APPROVAL.json").read_bytes()
+    )
 
 
-def test_capability_closure_comes_from_machine_readable_evidence() -> None:
-    artifact = _load(EVIDENCE / "CAPABILITY_READINESS.json")
-    assert artifact["production_status"] == "NOT_ACTIVE"
-    assert artifact["human_approval_status"] == "PENDING_HUMAN_APPROVAL"
-    assert set(artifact["capabilities"]) == REQUIRED_CAPABILITIES
-    for name, state in artifact["capabilities"].items():
-        assert name in REQUIRED_CAPABILITIES
-        assert state["verified"] is True
-        assert state["status"] in ACCEPTED_TECHNICAL_STATUSES
-        assert state["blockers"] == []
-        assert state.get("active") is not True
+@pytest.fixture(scope="module")
+def trust_store() -> ApprovalTrustStore:
+    return ApprovalTrustStore.model_validate_json(
+        (TARGET / "approval_trust_store.json").read_bytes()
+    )
 
 
-def test_pending_human_approval_is_not_forged() -> None:
-    approval = _load(EVIDENCE / "PENDING_HUMAN_APPROVAL.json")
-    assert approval["status"] == "PENDING_HUMAN_APPROVAL"
-    assert approval["approved"] is False
-    assert approval["approved_by"] is None
-    assert approval["approved_at"] is None
-    assert approval.get("ruleset_hash") in (None, "")
+def test_pending_approval_and_empty_trust_store_are_explicit(pending_approval, trust_store) -> None:
+    assert pending_approval.status == "PENDING_HUMAN_APPROVAL"
+    assert pending_approval.approved is False
+    assert pending_approval.approved_by is None
+    assert pending_approval.record_hash is None
+    assert trust_store.trusted_approval_hashes == ()
+    assert approval_trust_store_hash(trust_store) == trust_store.store_hash
 
 
-def test_activation_is_explicitly_fail_closed() -> None:
-    evidence = _load(EVIDENCE / "ACTIVATION_FAIL_CLOSED.json")
-    assert evidence["status"] == "PASS"
-    assert evidence["human_approval_status"] == "PENDING_HUMAN_APPROVAL"
-    assert evidence["production_status"] == "NOT_ACTIVE"
-    assert evidence["activation_cli_failure"] or evidence["activation_governance_tests"]
+def test_activation_evidence_is_hash_bound_but_reconciliation_unavailable(
+    compiled, capability, activation_evidence
+) -> None:
+    assert activation_evidence_hash(activation_evidence) == activation_evidence.evidence_hash
+    assert activation_evidence.ruleset_hash == compiled.ruleset_hash
+    assert activation_evidence.capability_hash == capability.capability_hash
+    assert activation_evidence.golden_tests.status == "PASS"
+    assert activation_evidence.differential_tests.status == "PASS"
+    assert activation_evidence.representative_official_match.status == ("TEMPORARILY_UNAVAILABLE")
 
 
-def test_every_official_source_record_is_locatable_and_hashed() -> None:
-    manifest = _load(EVIDENCE / "SOURCE_MANIFEST.json")
-    assert manifest["target_season"] == "2026/27"
-    assert len(manifest["sources"]) >= 2
-    for source in manifest["sources"]:
-        for key in (
-            "url",
-            "publisher",
-            "title",
-            "retrieved_at",
-            "sha256",
-            "locator",
-            "rules_supported",
-            "refresh_trigger",
-        ):
-            assert source[key]
-        assert source["url"].startswith("https://")
-        assert re.fullmatch(r"[0-9a-f]{64}", source["sha256"])
-        if source.get("content_path"):
-            capture = REPO_ROOT / source["content_path"]
-            assert capture.is_file()
-            assert _sha(capture) == source["sha256"]
-
-
-def test_target_contains_all_38_official_deadlines() -> None:
-    deadlines = {
-        value
-        for path, value in _target_values()
-        if "deadline" in path
-        and isinstance(value, str)
-        and re.fullmatch(r"2026-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", value)
+def test_activation_without_human_approval_and_reconciliation_fails_closed(
+    tmp_path: Path,
+    compiled,
+    capability,
+    activation_evidence,
+    pending_approval,
+    trust_store,
+) -> None:
+    with pytest.raises(RulesActivationError) as caught:
+        activate_ruleset(
+            compiled,
+            pending_approval,
+            tmp_path / "active",
+            capability=capability,
+            evidence=activation_evidence,
+            approval_trust=trust_store,
+        )
+    assert set(caught.value.blockers) >= {
+        "approval:false",
+        "approval:binding_missing",
+        "approval:not_trusted",
+        "evidence:reconciliation_incomplete",
     }
-    assert len(deadlines) == 38
+    assert not (tmp_path / "active").exists()
 
 
-def test_target_encodes_integer_selling_price_branches() -> None:
-    values = _target_values()
-    text = "\n".join(str(value).lower() for _, value in values)
-    paths = "\n".join(path for path, _ in values)
-    assert "purchase" in paths or "purchase" in text
-    assert "current" in paths or "current" in text
-    assert "selling" in paths or "selling" in text
-    assert "below" in text or "current_price < purchase_price" in text
-    assert "equal" in text or "current_price == purchase_price" in text
-    assert "floor" in text or "round" in text
-    assert "tenths" in text or "integer" in text or "0.1" in text
+def test_forged_or_tampered_governance_artifacts_fail_closed(
+    tmp_path: Path,
+    compiled,
+    capability,
+    activation_evidence,
+    trust_store,
+) -> None:
+    forged = ApprovalRecord(
+        ruleset_id=compiled.ruleset_id,
+        ruleset_version=compiled.ruleset_version,
+        ruleset_hash=compiled.ruleset_hash,
+        status="APPROVED",
+        approved=True,
+        approved_at="2026-08-18T00:00:00Z",
+        approved_by="Sebastian Greenhalgh",
+        approval_id="APR-FORGED-001",
+        approval_kind="HUMAN_RULESET_ACTIVATION",
+        capability_hash=capability.capability_hash,
+        activation_evidence_hash=activation_evidence.evidence_hash,
+        approval_statement="forged",
+        record_hash="0" * 64,
+    )
+    with pytest.raises(RulesActivationError) as caught:
+        activate_ruleset(
+            compiled,
+            forged,
+            tmp_path / "active",
+            capability=capability,
+            evidence=activation_evidence,
+            approval_trust=trust_store,
+        )
+    assert "approval:record_hash_mismatch" in caught.value.blockers
+    assert "approval:not_trusted" in caught.value.blockers
+
+    tampered = activation_evidence.model_copy(update={"no_newer_governing_conflict": False})
+    with pytest.raises(RulesActivationError) as evidence_error:
+        activate_ruleset(
+            compiled,
+            forged,
+            tmp_path / "active",
+            capability=capability,
+            evidence=tampered,
+            approval_trust=trust_store,
+        )
+    assert "evidence:hash_mismatch" in evidence_error.value.blockers
+    assert "evidence:newer_governing_conflict" in evidence_error.value.blockers
 
 
-def test_chip_windows_and_effects_are_data_driven() -> None:
-    values = _target_values()
-    text = "\n".join(f"{path}={value}" for path, value in values).lower().replace("-", "_").replace(" ", "_")
-    for token in ("wildcard", "free_hit", "triple_captain", "bench_boost"):
-        assert token in text
-    for boundary in ("gameweek_1", "gameweek_19", "gameweek_20", "gameweek_38"):
-        assert boundary in text or boundary.split("_")[-1] in text
-    for semantic in ("restore", "consecutive", "one_chip", "saved_transfer"):
-        assert semantic in text
+def test_tampered_compiled_artifact_is_rejected_before_governance(
+    tmp_path: Path, compiled, pending_approval
+) -> None:
+    tampered = compiled.model_copy(update={"ruleset_version": "9.9.9"})
+    with pytest.raises(RulesIntegrityError, match="self-hash"):
+        activate_ruleset(tampered, pending_approval, tmp_path / "active")
 
 
-def test_post_match_reconciliation_is_not_silently_waived() -> None:
-    evidence = _load(EVIDENCE / "REPRESENTATIVE_OFFICIAL_GAME_RECONCILIATION.json")
-    assert evidence["status"] == "TEMPORALLY_UNAVAILABLE"
-    assert evidence["pre_gameweek_official_configuration_reconciliation"] == "PASS"
-    assert evidence["production_activation_blocker"] is True
-    assert evidence["waived"] is False
+def test_source_manifest_verification_and_reconciliation_are_green() -> None:
+    manifest = _load(EVIDENCE / "SOURCE_MANIFEST.json")
+    reconciliation = _load(EVIDENCE / "OFFICIAL_SOURCE_RECONCILIATION.json")
+    assert manifest["verification_status"] == "PASS"
+    assert reconciliation["status"] == "PASS"
+    assert reconciliation["blocking_findings"] == []
+    assert all(manifest["coverage"].values())
 
 
-def test_final_handoff_is_review_ready_but_not_active() -> None:
-    handoff = _load(EVIDENCE / "FINAL_READINESS_HANDOFF.json")
-    assert handoff["review_handoff_status"] == "READY_FOR_INDEPENDENT_REVIEW"
-    assert handoff["human_approval_status"] == "PENDING_HUMAN_APPROVAL"
-    assert handoff["production_activation_status"] == "BLOCKED"
-    assert handoff["review_handoff_blockers"] == []
-    blocker_codes = {row["code"] for row in handoff["production_activation_blockers"]}
-    assert "HUMAN_APPROVAL_PENDING" in blocker_codes
-    assert "POST_MATCH_RECONCILIATION_TEMPORALLY_UNAVAILABLE" in blocker_codes
+def test_representative_match_is_not_waived() -> None:
+    reconciliation = _load(EVIDENCE / "REPRESENTATIVE_OFFICIAL_GAME_RECONCILIATION.json")
+    assert reconciliation["status"] == "TEMPORARILY_UNAVAILABLE"
+    assert reconciliation["production_activation_blocker"] is True
+    assert reconciliation["waived"] is False
+    assert reconciliation["completed_target_season_matches"] == 0
+
+
+def test_final_evidence_describes_reviewed_not_active_state() -> None:
+    readiness = _load(EVIDENCE / "READINESS_STATUS.json")
+    assert readiness["engineering_review_status"] == "COMPLETE"
+    assert readiness["human_approval_status"] == "PENDING_HUMAN_APPROVAL"
+    assert readiness["production_activation_status"] == "NOT_ACTIVE"
+    assert readiness["full_season_capability"]["production_eligible"] is True
+    assert readiness["full_season_capability"]["blockers"] == []

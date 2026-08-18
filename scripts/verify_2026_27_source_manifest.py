@@ -10,8 +10,9 @@ import json
 import re
 import sys
 import urllib.parse
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any
 
 OFFICIAL_HOSTS = {
     "fantasy.premierleague.com",
@@ -43,8 +44,8 @@ def _sha(path: Path) -> str:
 def _timestamp(value: str) -> dt.datetime:
     parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=dt.timezone.utc)
-    return parsed.astimezone(dt.timezone.utc)
+        parsed = parsed.replace(tzinfo=dt.UTC)
+    return parsed.astimezone(dt.UTC)
 
 
 def _source_text(repo: Path, source: dict[str, Any]) -> str:
@@ -75,8 +76,11 @@ def _coverage(corpus: str) -> dict[str, bool]:
                 and any(term in corpus for term in ("round", "floor", "0.1", "£0.1"))
             )
         elif family == "chips":
-            result[family] = all(term in corpus for term in ("wildcard", "free hit", "triple captain", "bench boost")) and any(
-                term in corpus for term in ("window", "gameweek 19", "gameweek 20", "first half", "second half")
+            result[family] = all(
+                term in corpus for term in ("wildcard", "free hit", "triple captain", "bench boost")
+            ) and any(
+                term in corpus
+                for term in ("window", "gameweek 19", "gameweek 20", "first half", "second half")
             )
         else:
             result[family] = any(term in corpus for term in terms)
@@ -95,7 +99,7 @@ def run(repo: Path) -> dict[str, Any]:
     if not isinstance(sources, list) or not sources:
         raise VerificationError("source manifest is empty")
 
-    now = dt.datetime.now(dt.timezone.utc)
+    now = dt.datetime.now(dt.UTC)
     errors: list[str] = []
     corpus_parts: list[str] = []
     fresh_bootstrap = False
@@ -162,7 +166,11 @@ def run(repo: Path) -> dict[str, Any]:
         errors.append("no official FPL help/rules record")
     if not current_season_specific:
         errors.append("no current-season-specific official record")
-    errors.extend(f"official evidence coverage missing: {family}" for family, present in coverage.items() if not present)
+    errors.extend(
+        f"official evidence coverage missing: {family}"
+        for family, present in coverage.items()
+        if not present
+    )
 
     interpretation_path = evidence / "INTERPRETATION_AFCON_TRANSFER_POLICY.json"
     if interpretation_path.exists():
@@ -177,7 +185,9 @@ def run(repo: Path) -> dict[str, Any]:
     manifest["verification_status"] = "PASS" if not errors else "FAIL"
     manifest["coverage"] = coverage
     manifest["sources"] = sources
-    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
     result = {
         "schema_version": "dmf-rules-source-manifest-verification-v1",

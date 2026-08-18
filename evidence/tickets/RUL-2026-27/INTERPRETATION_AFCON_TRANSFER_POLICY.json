@@ -1,0 +1,22 @@
+{
+  "basis": null,
+  "decision": null,
+  "human_approval_conflated": false,
+  "interpretation_id": "RUL-2026-27-AFCON-TRANSFER-POLICY",
+  "production_activation_authorised": false,
+  "review_required_on_new_source": true,
+  "schema_version": "dmf-rules-interpretation-v1",
+  "source_urls": [
+    "https://fantasy.premierleague.com/api/bootstrap-static/",
+    "https://fantasy.premierleague.com/assets/FAQs-DJYCW4i3.js",
+    "https://fantasy.premierleague.com/assets/Rules-BZxb8A2H.js",
+    "https://fantasy.premierleague.com/help/",
+    "https://www.premierleague.com/en/news/2174907",
+    "https://www.premierleague.com/en/news/4361991/whats-happening-with-defensive-contribution-points-in-202627-fantasy",
+    "https://www.premierleague.com/en/news/4679873/all-you-need-to-know-about-changes-to-fpl-for-202627",
+    "https://www.premierleague.com/en/news/4679879/whats-happening-with-fpl-chips-in-202627",
+    "https://www.premierleague.com/en/news/4679946/whats-new-in-202627-fantasy-changes-to-bonus-points-system",
+    "https://www.premierleague.com/en/news/4680462/whats-new-in-202627-fantasy-price-change-predictor"
+  ],
+  "status": "NOT_PRESENT"
+}
