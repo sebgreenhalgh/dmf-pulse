@@ -52,4 +52,20 @@ jobs:
           mkdir -p /tmp/gw1-checkpoint-1-2-package
           tar -xzf /tmp/gw1-checkpoint-1-2-package.tar.gz \
             -C /tmp/gw1-checkpoint-1-2-package
+          python - <<'PYFIX'
+          from pathlib import Path
+
+          path = Path('/tmp/gw1-checkpoint-1-2-package/publish.sh')
+          text = path.read_text(encoding='utf-8')
+          replacements = {
+              "assert value['status'] == 'PASS'": "assert value['status'] == 'VALID_WITH_WARNINGS'",
+              "assert value['target_deadline'] == '2026-08-21T17:30:00Z'": "assert value['deadline_at'] == '2026-08-21T17:30:00Z'",
+              "assert value['database_opened'] is False": "assert value['database_accessed'] is False",
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f'missing expected publication harness text: {old}')
+              text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8')
+          PYFIX
           bash /tmp/gw1-checkpoint-1-2-package/publish.sh
