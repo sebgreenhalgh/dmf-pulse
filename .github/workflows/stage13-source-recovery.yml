@@ -28,6 +28,7 @@ jobs:
         run: |
           uv export --all-groups --frozen --no-emit-project --no-hashes --format requirements-txt --output-file "$RUNNER_TEMP/requirements.txt"
           python -m pip download --disable-pip-version-check --dest "$RUNNER_TEMP/wheelhouse" --requirement "$RUNNER_TEMP/requirements.txt"
+          python -m pip download --disable-pip-version-check --dest "$RUNNER_TEMP/wheelhouse" 'editables==0.5'
           tar -C "$RUNNER_TEMP" -czf "$RUNNER_TEMP/dmf-pulse-wheelhouse.tar.gz" requirements.txt wheelhouse
           sha256sum "$RUNNER_TEMP/dmf-pulse-wheelhouse.tar.gz" > "$RUNNER_TEMP/dmf-pulse-wheelhouse.tar.gz.sha256"
       - name: Upload locked wheelhouse
