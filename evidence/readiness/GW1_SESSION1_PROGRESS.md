@@ -4,48 +4,54 @@
 
 - Original immutable GW1 parent: `9eb57143f6ee92f67c78607cc386678d962e62d4`
 - Working branch: `readiness/GW1-2026-27-live-input-initial-squad`
-- Starting remote SHA for this Pro session: `0353e2013a7c6065c011a287814bdaf554e0516f`
-- Recovery workflow trigger SHA: `9344beb6b33a80b0119f58ec57967aa24ef1fa5c`
-- Recovery workflow run ID: `32152205877`
-- Latest pushed SHA: recorded in the recovery bundle as `BUNDLE_HEAD.txt`; refreshed after each capability checkpoint.
+- Starting remote SHA for this resumed Pro execution: `dc12ab2ef5bd576307a4e685770b2e9cfbce371c`
+- Remote SHA immediately before the Checkpoint-1.1 attestation publication: `a6097b198852418156bd6f8d9698618970a023a4`
+- Exact downloaded recovery workflow run ID: `32152205877`
+- Exact downloaded recovery artifact ID: `9330181632`
+- Checkpoint-1.1 capability commit: `448749c072900642a922ae1456d0d30111a3e9ea`
 
 ## Checkpoint status
 
 | Checkpoint | Status | Durable evidence |
 |---|---|---|
-| 1.0 Remote state / progress bootstrap | COMPLETE | Branch ancestry verified; source, dependency and tool recovery artifacts verified; this record published on the working branch. |
-| 1.1 Runtime odds credential foundation | INCOMPLETE | Not yet implemented. |
-| 1.2 Current official FPL input foundation | INCOMPLETE | Not yet implemented. |
-| 1.3 Live The Odds API input foundation | INCOMPLETE | Not yet implemented. |
-| 1.4 FPL / odds identity integrity | INCOMPLETE | Not yet implemented. |
-| 1.5 Session-1 artifacts / operator workflow | INCOMPLETE | Not yet implemented. |
+| 1.0 Remote state / progress bootstrap | COMPLETE | Immutable-parent ancestry verified; the downloaded recovery bundle and remote branch both resolve to the recorded starting SHA. |
+| 1.1 Runtime odds credential foundation | COMPLETE | Runtime-only credential resolution, fail-closed validation, redaction, non-disclosing diagnostics, CLI/service wiring and focused tests verified on the recovered branch. |
+| 1.2 Current official FPL input foundation | INCOMPLETE | Not yet implemented in this resumed execution. |
+| 1.3 Live The Odds API input foundation | INCOMPLETE | Not started. |
+| 1.4 FPL / odds identity integrity | INCOMPLETE | Not started. |
+| 1.5 Session-1 artifacts / operator workflow | INCOMPLETE | Not started. |
 
-## Existing branch state inspected
+## Remote and recovery verification
 
-- The branch is descended from the immutable parent and already contains recoverability-only bootstrap commits and artifacts.
-- No Session-1 credential, current-input, live-odds, identity-mapping or operator-workflow capability was found in the recovered source snapshot.
-- No prior Session-1 progress record was present.
-- Existing accepted FPL and odds ingestion foundations remain in place and will be extended rather than replaced.
+- The branch merge base with the immutable parent is exactly `9eb57143f6ee92f67c78607cc386678d962e62d4`.
+- `BUNDLE_HEAD.txt` and `REMOTE_HEAD.txt` in the downloaded recovery artifact both contain `dc12ab2ef5bd576307a4e685770b2e9cfbce371c`.
+- The recovered worktree was clean before the attestation correction.
+- Direct Git HTTPS remains unavailable from the execution container; GitHub-connected inspection and downloaded workflow artifacts are the remote truth boundary for this resumed execution.
+- A failed, temporary verification trigger and a corrupt staged publication workflow were removed; neither represented product capability.
 
-## Validation performed for checkpoint 1.0
+## Checkpoint 1.1 evidence
 
-- Immutable-parent ancestry: PASS.
-- Remote branch discovery: PASS.
-- Recoverable source archive checksum and extraction: PASS.
-- Offline dependency archive checksum and extraction: PASS.
-- Offline Ruff binary checksum and execution: PASS.
-- Direct Git HTTPS from the execution container: RESOURCE_LIMIT (outbound DNS/network unavailable).
-- GitHub-connected publication and branch inspection: PASS.
+- Relevant implementation files: `src/dmf_pulse/ingestion/odds/credentials.py`, `src/dmf_pulse/ingestion/odds/client.py`, `src/dmf_pulse/ingestion/odds/service.py`, `src/dmf_pulse/cli/odds_cmd.py`, and their focused tests.
+- Runtime source identifiers: `CREDENTIALS_DIRECTORY/the_odds_api_key` (preferred) and process-scoped `DMF_PULSE_ODDS_API_KEY` fallback.
+- No API-key CLI option exists.
+- Diagnostic: `dmf ingest odds credential-status --output json`; output contains one boolean field only.
+- The secret is resolved lazily at the final transport boundary and is not held in ordinary application configuration.
+- Missing, malformed or unreadable credentials fail closed with `CREDENTIAL_UNAVAILABLE` and a non-disclosing message.
+- Focused verification command covered runtime credentials, credential-status CLI, odds foundation, model/config, persistence/publication/transport boundaries, retry policy, non-PostgreSQL security, public contracts and affected CLI tests.
+- Focused verification result: `193 passed, 4 deselected in 4.27s` with `-m "not postgres"`.
+- PostgreSQL-only credential/quota-retention tests: `RESOURCE_LIMIT` because `DMF_TEST_DATABASE_URL` is unavailable; this is not a product failure.
+- Ruff format on affected files: `PASS`.
+- Ruff lint on affected files: `PASS`.
+- Strict mypy on the four affected production modules: `PASS`.
+- Actual provider call: `NOT_EXECUTED`; Sebastian's key remains an operator-only runtime input.
 
 ## Known blockers and limitations
 
 - Sebastian's actual The Odds API key is intentionally unavailable and must never be pasted into ChatGPT or committed.
-- A real credentialled provider call remains an OPERATOR CHECKPOINT.
-- Automated official-FPL transport remains subject to the existing rights profile; Session 1 must preserve the compliant transient/manual path unless governance changes independently.
-- No projection, optimiser, squad recommendation, captaincy, prospective logging or later-stage work is in scope.
+- A real credentialled provider call remains an `OPERATOR_CHECKPOINT`.
+- Automated official-FPL transport remains denied by the current rights profile. Checkpoint 1.2 must use a manual-capture, transient-processing, no-raw-storage route and must not claim broader rights.
+- No projection, player-points integration, Stage-10 optimiser integration, initial-squad recommendation, Stage-12 prospective logging, captaincy, chip work, PR, merge or production activation is in scope.
 
 ## Restart handoff
 
-- Worktree clean at checkpoint publication: verified by the recovery workflow before push.
-- Local/remote equality: verified by the recovery workflow after push and captured in the recovery bundle.
-- Exact next action: implement checkpoint 1.1, the secret-safe runtime Odds API credential provider and its focused tests.
+- Exact next action: implement Checkpoint 1.2A, the current official-FPL contracts, parsing and canonical validation, then test and publish it before beginning the governed service path.
