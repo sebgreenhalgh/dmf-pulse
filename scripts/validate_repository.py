@@ -933,6 +933,7 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
         validate_repository_manifest,
     )
 
+    prc013_path = root / "evidence/tickets/PRC-013/current_manifest.json"
     eval012_path = root / "evidence/tickets/EVAL-012/current_manifest.json"
     opt011_path = root / "evidence/tickets/OPT-011/current_manifest.json"
     opt010_path = root / "evidence/tickets/OPT-010/current_manifest.json"
@@ -943,7 +944,9 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
     fpl_path = root / "evidence/tickets/FPL-004/current_manifest.json"
     dat_path = root / "evidence/tickets/DAT-003/current_manifest.json"
     active_path = (
-        eval012_path
+        prc013_path
+        if prc013_path.is_file()
+        else eval012_path
         if eval012_path.is_file()
         else opt011_path
         if opt011_path.is_file()

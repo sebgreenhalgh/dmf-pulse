@@ -1,0 +1,52 @@
+ticket_id: "PRC-013"
+stage: "B3"
+roadmap_stage: 13
+title: "Price prediction and ACT-versus-WAIT"
+status: "REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "GPT-5.6 Pro primary implementation engineer"
+reviewer_role: "GPT-5.6 Sol independent reviewer (completed)"
+required_base_branch: "main"
+required_base_commit: "ce7fe8f4354d95a477afcf6eed45f63cf0ab772e"
+reviewed_pre_integration_commit: "b0e3b0724b92ec2d483191f0329c0c38ae8a9e08"
+integrated_main_commit: "9eb57143f6ee92f67c78607cc386678d962e62d4"
+integration_method: "EXPLICIT_MERGE_COMMIT"
+integration_commit: "6dc58db48415d831b37a10b423a9a555aa9fe833"
+implementation_branch: "stage/A13/PRC-013-price-prediction"
+pull_request: 12
+objective: >-
+  Implement a deterministic, time-safe Stage-13 vertical slice that turns immutable price and
+  transfer observations into recurrent rise/fall/no-change probabilities, discrete future market
+  price scenarios, exact manager-specific selling consequences, Stage-12 evaluation, and a full
+  ACT_NOW versus WAIT_FOR_INFORMATION versus DO_NOT_TRANSFER utility comparison.
+model_ladder:
+  P0_NO_CHANGE: "Mandatory null benchmark."
+  P1_REGULARIZED_COMPETING_LOGIT: "Primary deterministic reference model."
+  P2_RECURRENT_LATENT_PRESSURE: "Auditable recurrent hazard/state baseline."
+  P3_GBDT_CHALLENGER: "DEPENDENCY_NOT_APPROVED / DEFERRED."
+  P4_ADVANCED_LATENT_FILTER: "DEFERRED pending prospective identifiability evidence."
+activation:
+  engineering_target: "REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"
+  production_target: "SHADOW_ONLY"
+  blockers:
+    - "TARGET_SEASON_UNCALIBRATED"
+    - "RIGHTS_APPROVAL_REQUIRED_FOR_AUTOMATED_PROVIDER_CAPTURE"
+temporal_boundary: "usable_at <= information_cutoff"
+runtime_dependencies_added: []
+migration:
+  required: false
+  reason: "The accepted Stage-13 engineering slice uses immutable in-memory/file artifacts."
+explicit_exclusions:
+  - "Public predictor scraping or automated provider capture"
+  - "Exact hidden price threshold or exact update-minute claim"
+  - "Production model promotion"
+  - "Stage-14 chip scheduling or Stage-15 rank/effective-ownership strategy"
+  - "Autonomous FPL execution, public service or UI"
+  - "New football/minutes models"
+acceptance:
+  human_acceptance: false
+  independent_review_complete: true
+  full_repository_pytest: >-
+    RESOURCE_LIMIT — both the independently reviewed and post-main-integration bounded attempts
+    reached their 20-minute execution ceilings without a final pytest summary or emitted failure
+    trace; neither is reported as PASS

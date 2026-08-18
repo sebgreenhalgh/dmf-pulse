@@ -1,0 +1,143 @@
+schema_version: "price-config-v1"
+configuration_id: "PRC-013-SYNTHETIC-REFERENCE-V1"
+configuration_role: "POLICY_CONFIGURATION"
+parameter_status: "PROVISIONAL_MODEL_PARAMETER"
+evidence_status: "SYNTHETIC_REFERENCE"
+transfer_features:
+  short_half_life_hours: "3"
+  long_half_life_hours: "12"
+  maximum_interval_hours: "8"
+  low_ownership_percent: "2"
+  high_ownership_percent: "20"
+  denominator_floor: 1
+  unknown_denominator_uncertainty: "1"
+  rounded_ownership_uncertainty: "0.25"
+  low_global_transfer_activity: 100000
+  high_global_transfer_activity: 2000000
+  status_uncertainty:
+    AVAILABLE: "0.10"
+    DOUBTFUL: "0.50"
+    INJURED: "0.40"
+    SUSPENDED: "0.30"
+    UNAVAILABLE: "0.60"
+    LEFT_LEAGUE: "1"
+    UNKNOWN: "1"
+  chip_uncertainty:
+    LOW: "0.10"
+    ELEVATED: "0.40"
+    HIGH: "0.70"
+    UNKNOWN: "1"
+update_cycles:
+  maximum_label_interval_minutes: 480
+competing_logit:
+  model_version: "P1-REGULARIZED-COMPETING-LOGIT-V1"
+  feature_schema_version: "PRICE-FEATURES-V1"
+  feature_names:
+    - "acceleration"
+    - "buy_rate_nonowners"
+    - "buys_per_hour"
+    - "chip_contamination_unknown"
+    - "consecutive_negative_intervals"
+    - "consecutive_positive_intervals"
+    - "fall_pressure"
+    - "global_activity_share"
+    - "hours_since_any_change"
+    - "hours_since_deadline"
+    - "hours_to_next_deadline"
+    - "net_per_hour"
+    - "ownership_percent"
+    - "previous_event_fall"
+    - "previous_event_rise"
+    - "rise_pressure"
+    - "sell_rate_owners"
+    - "sells_per_hour"
+    - "status_uncertainty"
+  feature_scales:
+    acceleration: "1000"
+    buy_rate_nonowners: "0.001"
+    buys_per_hour: "1000"
+    chip_contamination_unknown: "1"
+    consecutive_negative_intervals: "1"
+    consecutive_positive_intervals: "1"
+    fall_pressure: "1"
+    global_activity_share: "0.01"
+    hours_since_any_change: "1"
+    hours_since_deadline: "1"
+    hours_to_next_deadline: "1"
+    net_per_hour: "1000"
+    ownership_percent: "100"
+    previous_event_fall: "1"
+    previous_event_rise: "1"
+    rise_pressure: "1"
+    sell_rate_owners: "0.001"
+    sells_per_hour: "1000"
+    status_uncertainty: "1"
+  regularization_l2: "0.01"
+  learning_rate: "0.05"
+  epochs: 80
+  calibration_version: "IDENTITY-CHRONOLOGICAL-V1"
+  calibration_probability_epsilon: "0.000001"
+  disagreement_threshold: "0.15"
+  score_cap: "50"
+recurrent_pressure:
+  state_version: "RECURRENT-PRESSURE-V1"
+  persistence: "0.85"
+  flow_scale: "0.0001"
+  momentum_scale: "0.001"
+  ownership_rate_scale: "1000"
+  event_reset_retention: "0.20"
+  opposite_direction_retention: "0.90"
+  rise_boundary: "1"
+  fall_boundary: "1"
+  uncertainty_floor: "0.25"
+  uncertainty_missing_chip_increment: "0.50"
+  recurrent_same_direction_bonus: "0.20"
+  opposite_direction_penalty: "0.10"
+  gap_decay: "0.05"
+  default_event_logit: "-3"
+  probability_epsilon: "0.000000000001"
+  score_cap: "50"
+  threshold_interval_z: "1.281551565545"
+price_paths:
+  mechanics_authority: "DMFP-02_RULESET"
+  price_unit_reference: "TENTHS_OF_MILLION_GBP"
+  price_step_units_role: "RULESET_VALIDATION_REFERENCE"
+  price_step_units: 1
+  minimum_price_units: 1
+  maximum_price_units: 200
+  updates_24h: 1
+  updates_72h: 3
+  updates_7d: 7
+  maximum_exact_scenarios: 2187
+  maximum_optimiser_support: 15
+  deterministic_seed: 0
+activation:
+  engineering_status: "ENGINEERING_READY"
+  production_statuses:
+    - "RIGHTS_BLOCKED"
+    - "SHADOW_ONLY"
+    - "TARGET_SEASON_UNCALIBRATED"
+  maximum_confidence: "C"
+  challenger_status: "DEPENDENCY_NOT_APPROVED"
+  automated_capture_allowed: false
+  confidence_c_max_uncertainty: "0.75"
+early_transfer:
+  schema_version: "early-transfer-policy-v1"
+  actionable_dataset_modes:
+    - "COUNTERFACTUAL"
+    - "RECONSTRUCTED"
+  require_all_core_alternatives: true
+  price_probability_is_component_only: true
+  manual_review_when_not_actionable: true
+evaluation:
+  alert_probability: "0.5"
+  probability_epsilon: "0.000001"
+benchmark_ids:
+  - "FANTASY_FOOTBALL_FIX"
+  - "LIVEFPL"
+  - "OFFICIAL_FPL_PREDICTOR"
+  - "OTHER_APPROVED_EXTERNAL"
+  - "P0_NO_CHANGE"
+  - "P1_REGULARIZED_COMPETING_LOGIT"
+  - "P2_RECURRENT_LATENT_PRESSURE"
+rights_profile_required: true

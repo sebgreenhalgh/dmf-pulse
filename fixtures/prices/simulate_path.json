@@ -1,0 +1,25 @@
+{
+  "current_price_units": 75,
+  "pressure_state": {
+    "schema_version": "latent-pressure-state-v1",
+    "state_id": "synthetic-state-1",
+    "player_id": "player-1",
+    "as_of": "2026-08-01T12:00:00Z",
+    "rise_pressure": "0.70",
+    "fall_pressure": "0.15",
+    "uncertainty": "0.35",
+    "previous_event": "NO_CHANGE",
+    "updates_since_rise": 2,
+    "updates_since_fall": 4,
+    "updates_since_any_change": 2,
+    "rises_this_gameweek": 0,
+    "falls_this_gameweek": 0,
+    "state_version": "RECURRENT-PRESSURE-V1"
+  },
+  "baseline": {
+    "probability_fall": "0.10",
+    "probability_no_change": "0.55",
+    "probability_rise": "0.35"
+  },
+  "model_lineage": ["P1-REGULARIZED-COMPETING-LOGIT-V1", "RECURRENT-PRESSURE-V1"]
+}

@@ -1,5 +1,67 @@
 # DMF Pulse execution plans
 
+## PRC-013 Stage-13 price prediction and ACT/WAIT
+
+- Ticket/stage: `PRC-013`, DMFP-19 Stage 13 / playbook B3; immutable parent
+  `ce7fe8f4354d95a477afcf6eed45f63cf0ab772e` on `main`.
+- Branch: `stage/A13/PRC-013-price-prediction`.
+- Scope: immutable cutoff-safe price observations and update cycles; transfer-flow,
+  ownership, status, calendar and recurrent features; deterministic P0 no-change,
+  P1 regularized competing-logit and P2 recurrent latent-pressure baselines; calibrated
+  next-update probabilities; recurrent 24h/72h/7d discrete price paths; exact Stage-11
+  selling-value/scenario integration; Stage-12 chronological evaluation; complete
+  ACT/WAIT utility; offline CLI and immutable artifacts.
+- Safety: synthetic/replay and rights-approved inputs only; `usable_at` is the governing
+  feature boundary; no hidden-threshold, wildcard, flag-lock, exact update-minute or weekly-cap
+  claim; no predictor scraping; no new dependency, migration, Stage 14+ logic, live-history
+  fabrication, PR, merge, accepted tag or production promotion.
+- Model status: engineering implementation may become `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`;
+  target-season use remains `SHADOW_ONLY`, `TARGET_SEASON_UNCALIBRATED` and rights-gated.
+
+### PRC-013 checkpoints
+
+- [x] Verify the immutable Stage-12 parent, advanced `main`, branch ancestry, repository
+  authority and the complete external-research delta.
+- [x] Freeze the ticket contract, model/dependency/rights boundary and focused acceptance plan.
+- [x] Implement public contracts, temporal observations/cycles/features and the P0/P1/P2 ladder.
+- [x] Implement recurrent price PMFs, Stage-11 selling/scenario reuse, Stage-12 evaluation and
+  ACT/WAIT decision integration.
+- [x] Add physical adversarial fixtures plus unit/property/contract/golden/integration/replay/CLI
+  and artifact tests.
+- [x] Run focused acceptance, targeted inherited regressions and >=90% Stage-13 branch coverage.
+- [x] Run final Ruff, mypy, frozen sync, build, installed-wheel and CLI gates.
+- [ ] Finalize truthful evidence, inspect the exact-parent diff, commit, push and verify remote
+  equality; only then build and integrity-check the compact independent-Sol review bundle.
+
+### PRC-013 independent Sol review and remediation
+
+- Corrected pre-review baseline: `a2fdeea7b6514cb8f37b2f687d892998a1422973`; immutable
+  parent remains `ce7fe8f4354d95a477afcf6eed45f63cf0ab772e`.
+- [x] Verify the corrected GitHub lineage, complete Stage-13 tree and absence of recovery material.
+- [x] Review repository authority, every Stage-13 production boundary and the complete baseline
+  diff; classify P0/P1/P2/P3 findings independently.
+- [x] Remediate every valid P0/P1 and material P2 with focused adversarial regressions.
+- [x] Run the final Stage-13 coverage suite, inherited Stage-5/11/12/rules regressions and one
+  complete repository pytest suite.
+- [x] Run frozen sync, Ruff, strict mypy, build, clean installed-wheel CLI and assurance gates;
+  update truthful independent-review evidence.
+- [x] Commit remediation above the preserved implementation SHA, push normally, verify remote
+  equality and create a draft PR to `main`; do not merge, accept or tag.
+
+### PRC-013 final main integration
+
+- [x] Verify reviewed/remote lineage and preserve
+  `backup/stage13-pre-main-integration` at the independently reviewed HEAD.
+- [x] Merge current `main` explicitly, retain both plan histories and reconcile Stage-13 price
+  references with authoritative 2026/27 DMFP-02 mechanics and predictor evidence.
+- [x] Pass the 116-test Stage-13 suite at >=90% coverage, the preserved 17 regressions and the
+  104-test current-main dependency batch.
+- [x] Make one bounded post-integration repository attempt and preserve `RESOURCE_LIMIT` without
+  relabeling or rerunning it.
+- [x] Pass frozen sync, Ruff, mypy, build, clean external-wheel rules/price CLI and assurance gates.
+- [x] Commit the explicit integration, push normally, verify remote equality and update draft PR
+  #12; do not merge, accept or tag.
+
 ## RUL-2026-27 independent full-ruleset review and remediation
 
 - Repository/branch: `sebgreenhalgh/dmf-pulse`,
@@ -31,7 +93,6 @@ Validation note: the exact repository-wide branch-coverage command reached a
 30-minute cap without producing its JSON report. Focused rules/optimisation,
 PostgreSQL, migration, static, package, repository, and secret gates passed; the
 timeout is retained in `evidence/tickets/RUL-2026-27/VALIDATION_RESULTS.json`.
-
 ## OPT-010 - exact bounded one-Gameweek optimiser
 
 - Ticket/stage: `OPT-010`, A10; immutable parent
