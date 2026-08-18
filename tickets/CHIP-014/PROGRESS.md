@@ -13,10 +13,14 @@
 ## Startup verification
 
 - `origin/main` at branch creation: `a8796d4edacea4c87ee6461d381f4df87e1ef39c`.
+- Resumed session verification on `2026-08-18`: current `origin/main` is still exactly `a8796d4edacea4c87ee6461d381f4df87e1ef39c`.
+- The remote Stage-14 branch compares `ahead_by=7`, `behind_by=0` against the immutable parent; merge-base is the immutable parent.
+- Remote progress is authoritative and identifies `14.04 Free Hit` as the first unfinished checkpoint.
 - Branch created directly from the immutable parent.
 - Ordinary container Git transport is unavailable because this execution container cannot resolve `github.com`.
 - Durable publication uses authenticated GitHub Git-data/contents APIs with non-force fast-forward updates.
 - Every publication is verified by comparing the intended commit with the remote branch ref.
+- Temporary `.github/workflows/stage14-workspace-export.yml` remains retained during recovery and must be removed before final delivery.
 
 ## Checkpoints
 
