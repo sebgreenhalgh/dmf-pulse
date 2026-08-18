@@ -1,0 +1,223 @@
+name: gw1-checkpoint-1-3b-publication
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-checkpoint-1-3b-publish.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish-and-validate:
+    name: Publish and validate Checkpoint 1.3B
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: dmf_pulse_test
+          POSTGRES_USER: dmf_test
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
+      UV_NO_PROGRESS: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Extract, validate, and publish durable capability
+        shell: bash
+        run: |
+          set +e
+          report='evidence/readiness/GW1_SESSION1_VALIDATION_1_3B.md'
+          log_dir="${RUNNER_TEMP}/gw1-1-3b"
+          archive="${RUNNER_TEMP}/gw1-1.3b.tar.gz"
+          mkdir -p "$log_dir" evidence/readiness
+          overall=0
+
+          run_check() {
+            name="$1"
+            shift
+            "$@" >"$log_dir/$name.log" 2>&1
+            rc=$?
+            printf '%s=%s\n' "$name" "$rc" >>"$log_dir/status"
+            if [ "$rc" -ne 0 ]; then
+              overall=1
+            fi
+          }
+
+          cat .gw1_staging/gw1-1.3b.part.* | base64 --decode >"$archive"
+          echo '642653eecdb88eb30c2375015db328226c6eac89ccebef5bbbed5b8cb9741292  '"$archive" | sha256sum --check --status
+          archive_rc=$?
+          printf 'archive_integrity=%s\n' "$archive_rc" >>"$log_dir/status"
+          if [ "$archive_rc" -eq 0 ]; then
+            tar -xzf "$archive" -C .
+            extract_rc=$?
+          else
+            extract_rc=1
+          fi
+          printf 'archive_extract=%s\n' "$extract_rc" >>"$log_dir/status"
+          if [ "$archive_rc" -ne 0 ] || [ "$extract_rc" -ne 0 ]; then
+            overall=1
+          fi
+          rm -rf .gw1_staging
+
+          run_check install_uv python -m pip install --disable-pip-version-check uv==0.11.26
+          if grep -q '^install_uv=0$' "$log_dir/status"; then
+            run_check frozen_sync uv sync --all-groups --frozen
+          else
+            printf 'frozen_sync=125\n' >>"$log_dir/status"
+            overall=1
+          fi
+
+          if grep -q '^archive_extract=0$' "$log_dir/status" \
+            && grep -q '^frozen_sync=0$' "$log_dir/status"; then
+            run_check ruff_format_apply uv run ruff format \
+              src/dmf_pulse/ingestion/odds/current.py \
+              src/dmf_pulse/ingestion/odds/live.py \
+              src/dmf_pulse/cli/odds_cmd.py \
+              tests/unit/ingestion/test_live_odds_transport.py \
+              tests/unit/ingestion/test_live_odds_current_input.py \
+              tests/unit/cli/test_live_odds_snapshot.py \
+              tests/integration/ingestion/odds/test_live_provider_current_input.py
+            run_check focused_pytest uv run pytest -q \
+              tests/unit/ingestion/test_gw1_live_odds_transport.py \
+              tests/unit/ingestion/test_live_odds_transport.py \
+              tests/unit/ingestion/test_live_odds_current_input.py \
+              tests/unit/cli/test_live_odds_snapshot.py
+            run_check inherited_odds_pytest uv run pytest -q \
+              tests/unit/ingestion/test_odds_foundation.py \
+              tests/unit/ingestion/test_odds_model_config_boundaries.py \
+              tests/unit/cli/test_odds_market_commands.py
+            run_check postgres_integration bash -lc \
+              'uv run alembic upgrade head && uv run pytest -q tests/integration/ingestion/odds/test_live_provider_current_input.py'
+            run_check ruff_format uv run ruff format --check \
+              src/dmf_pulse/ingestion/odds/current.py \
+              src/dmf_pulse/ingestion/odds/live.py \
+              src/dmf_pulse/cli/odds_cmd.py \
+              tests/unit/ingestion/test_live_odds_transport.py \
+              tests/unit/ingestion/test_live_odds_current_input.py \
+              tests/unit/cli/test_live_odds_snapshot.py \
+              tests/integration/ingestion/odds/test_live_provider_current_input.py
+            run_check ruff_lint uv run ruff check \
+              src/dmf_pulse/ingestion/odds/current.py \
+              src/dmf_pulse/ingestion/odds/live.py \
+              src/dmf_pulse/cli/odds_cmd.py \
+              tests/unit/ingestion/test_live_odds_transport.py \
+              tests/unit/ingestion/test_live_odds_current_input.py \
+              tests/unit/cli/test_live_odds_snapshot.py \
+              tests/integration/ingestion/odds/test_live_provider_current_input.py
+            run_check strict_mypy uv run mypy \
+              src/dmf_pulse/ingestion/odds/current.py \
+              src/dmf_pulse/ingestion/odds/live.py \
+              src/dmf_pulse/cli/odds_cmd.py
+            run_check wheel_build uv build
+            run_check secret_scan uv run python scripts/scan_secrets.py
+          else
+            for name in ruff_format_apply focused_pytest inherited_odds_pytest \
+              postgres_integration ruff_format ruff_lint strict_mypy \
+              wheel_build secret_scan; do
+              printf '%s=125\n' "$name" >>"$log_dir/status"
+            done
+            overall=1
+          fi
+          run_check diff_check git diff --check
+
+          status_label=FAIL
+          if [ "$overall" -eq 0 ]; then
+            status_label=PASS
+          fi
+          python - "$overall" "$GITHUB_RUN_ID" <<'PY'
+          from pathlib import Path
+          import sys
+
+          progress = Path("evidence/readiness/GW1_SESSION1_PROGRESS.md")
+          text = progress.read_text(encoding="utf-8")
+          passed = sys.argv[1] == "0"
+          run_id = sys.argv[2]
+          if passed:
+              text = text.replace(
+                  "| 1.3 Live The Odds API input foundation | IN_PROGRESS | 1.3A is complete; the commit containing this record stages 1.3B provider-native current-input capability and focused validation. |",
+                  "| 1.3 Live The Odds API input foundation | IN_PROGRESS | 1.3A and 1.3B are complete; 1.3C operator acceptance is the exact next action. |",
+              )
+              text = text.replace(
+                  "- 1.3B remains `IN_PROGRESS` until the branch workflow passes, its evidence commit is verified, and an exact-SHA progress attestation is pushed.",
+                  "- Checkpoint 1.3B validation passed and its capability/evidence are published; exact-SHA attestation remains before 1.3C.",
+              )
+              text = text.replace(
+                  "- Exact next action after 1.3B validation and attestation: **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.",
+                  "- Exact next action: **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.",
+              )
+          text += (
+              "\n## Checkpoint 1.3B automated publication\n\n"
+              f"- Workflow run — `{run_id}`.\n"
+              f"- Validation result — `{'PASS' if passed else 'FAIL'}`.\n"
+              "- Machine-written details — `evidence/readiness/GW1_SESSION1_VALIDATION_1_3B.md`.\n"
+              "- Real credentialled provider call — `OPERATOR_CHECKPOINT`.\n"
+          )
+          progress.write_text(text, encoding="utf-8")
+          PY
+
+          {
+            echo '# GW1 Checkpoint 1.3B Focused Validation'
+            echo
+            echo "- Workflow run — \`${GITHUB_RUN_ID}\`"
+            echo "- Staging commit — \`${GITHUB_SHA}\`"
+            echo "- Branch — \`${GITHUB_REF_NAME}\`"
+            echo "- Overall — \`${status_label}\`"
+            echo '- Real credentialled provider call — `OPERATOR_CHECKPOINT`'
+            echo
+            echo '## Exit codes'
+            echo
+            while IFS='=' read -r name rc; do
+              if [ "$rc" -eq 0 ]; then
+                state=PASS
+              elif [ "$rc" -eq 125 ]; then
+                state=NOT_RUN
+              else
+                state=FAIL
+              fi
+              echo "- \`${name}\` — \`${state}\` (exit \`${rc}\`)"
+            done <"$log_dir/status"
+            for name in focused_pytest inherited_odds_pytest postgres_integration \
+              ruff_format ruff_lint strict_mypy wheel_build secret_scan; do
+              echo
+              echo "## ${name} output"
+              echo
+              echo '```text'
+              tail -n 120 "$log_dir/$name.log" 2>/dev/null || true
+              echo '```'
+            done
+          } >"$report"
+
+          git status --short >"$log_dir/git-status.log"
+          git config user.name 'dmf-pulse-gw1-validation-bot'
+          git config user.email 'dmf-pulse-gw1-validation-bot@users.noreply.github.com'
+          git add -A
+          if [ "$overall" -eq 0 ]; then
+            message='feat(gw1): harden current EPL odds retrieval'
+          else
+            message='checkpoint(gw1): preserve live odds validation findings'
+          fi
+          git commit -m "$message"
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+          exit "$overall"
