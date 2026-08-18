@@ -23,56 +23,51 @@
 | Checkpoint | Status | Latest pushed capability commit | Direct tests | Notes |
 |---|---|---|---|---|
 | Bootstrap | COMPLETE | `6b7f1d528a85f474e2affe912b72d6d24881839e` | not applicable | Remote resumable branch and progress record created. |
-| 14.01 generic chip definition/inventory | COMPLETE | `3173c97f5d04b3b0fe65c8e9b17876d257b233be` | 58 passed | 98% branch coverage for Stage-14 compiler/inventory production code. |
-| 14.02 captain/vice/Triple Captain | COMPLETE | `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2` | 41 passed | 99% branch coverage for captaincy/TC production code. |
-| 14.03 Bench Boost | IN_PROGRESS | — | — | Incremental common-scenario BB comparator next. |
-| 14.04 Free Hit | NOT_STARTED | — | — | — |
+| 14.01 generic chip definition/inventory | COMPLETE | `3173c97f5d04b3b0fe65c8e9b17876d257b233be` | 58 passed | 98% branch coverage for compiler/inventory. |
+| 14.02 captain/vice/Triple Captain | COMPLETE | `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2` | 41 passed | 99% branch coverage for captaincy/TC. |
+| 14.03 Bench Boost | COMPLETE | `f1c384972567befbe4713c56bfaaa4a481135687` | 67 passed | 26 new BB tests; 94% combined affected coverage. |
+| 14.04 Free Hit | IN_PROGRESS | — | — | Temporary-policy comparator and exact restoration next. |
 | 14.05 Wildcard | NOT_STARTED | — | — | — |
 | 14.06 scheduler/continuation | NOT_STARTED | — | — | — |
 | 14.07 CLI/evaluation/evidence | NOT_STARTED | — | — | — |
 
 ## Completed capability
 
-### Checkpoint 14.01
+### 14.01 generic definition/inventory
 
-- Generic optimisation-facing chip definitions and closed effect grammar.
-- Rules-view adapter that stores ruleset ID/version/hash without copying target-season constants.
-- Fail-closed unknown-effect and invalid-semantics compilation.
-- Inventory grants/tokens, multiple copies, future acquisition, windows, expiry and exclusions.
-- Pending selection, cancellation, activation, use, minimum gaps, concurrency groups/limits and multi-week occupancy.
-- Deterministic semantic hashes for definitions, bundles and inventory state.
-- Synthetic tests for multi-week, transfer-cost, budget, unknown-effect and conflicting-duration chips.
+- Closed optimisation effect grammar compiled from accepted rules-layer public views.
+- Fail-closed unknown/invalid effects; multiple copies, future acquisition, windows, expiry, selection/cancellation/use, minimum gaps, concurrency and multi-week occupancy.
+- Deterministic definition, bundle and inventory semantic hashes.
 
-### Checkpoint 14.02
+### 14.02 captain/vice/Triple Captain
 
 - Exact ordered captain/vice search on common coherent Stage-9 scenarios.
-- Default delegation to the accepted Stage-10 tactical/autosub evaluator.
-- Conditional vice fallback probability and incremental fallback value.
-- Correlated captain/vice nonappearance and fixture/postponement context retained.
-- Triple Captain multiplier compiled from the rules-bound chip definition.
-- Independently optimised normal and TC captain/vice policies on identical scenarios.
-- Projected generic inventory activation; a zero-extra TC outcome still consumes the token.
-- Immutable ruleset, definition, scenario-set and before/after inventory lineage.
+- Default delegation to accepted Stage-10 tactical/autosub scoring.
+- Conditional vice fallback value and correlated joint nonappearance.
+- Rules-bound TC multiplier, independent normal/TC pair optimisation and projected token consumption even at zero extra score.
+
+### 14.03 Bench Boost
+
+- BB score compared with the best normal tactical policy, not a frozen XI.
+- Four bench players including goalkeeper; ordinary autosub overlap removed scenario by scenario.
+- Natural and engineered routes with explicit hits, budget shift, future-XI, unwind and price-route costs.
+- Gross current gain kept separate from net pre-continuation value.
+- WC-prepared route measures positive or negative WC-BB synergy; no positive synergy assumption.
+- Generic inventory activation and immutable rules/definition/scenario/inventory lineage.
 
 ## Validation
 
-Exact commands and results are retained in:
+Exact commands/results:
 
 - `evidence/tickets/CHIP-014/CHECKPOINT_14_01.md`
 - `evidence/tickets/CHIP-014/CHECKPOINT_14_02.md`
+- `evidence/tickets/CHIP-014/CHECKPOINT_14_03.md`
 
-Checkpoint 14.01:
+Results:
 
-- Focused unit/property tests: `58 passed`.
-- Stage-14 compiler/inventory branch coverage: `98%` (`439` statements, `3` missed; `156` branches, `9` partial).
-- Python compileall: `PASS`.
-
-Checkpoint 14.02:
-
-- Focused captaincy/TC tests: `41 passed`.
-- Captaincy/TC branch coverage: `99%` (`303` statements, `2` missed; `104` branches, `2` partial).
-- Python compileall: `PASS`.
-- Publication whitespace/diff check: `PASS`.
+- 14.01: `58 passed`; `98%` branch coverage; compileall `PASS`.
+- 14.02: `41 passed`; `99%` branch coverage; compileall `PASS`.
+- 14.03: `67 passed` (`41` inherited captaincy/TC + `26` BB); `94%` combined affected branch coverage (`586` statements, `24` missed; `204` branches, `25` partial); compileall/whitespace `PASS`.
 
 Deferred gates remain truthfully unpassed:
 
@@ -83,27 +78,21 @@ Deferred gates remain truthfully unpassed:
 
 ## Push/equality record
 
-Checkpoint 14.01:
-
-- Capability commit: `3173c97f5d04b3b0fe65c8e9b17876d257b233be`.
-- Remote comparison: `identical`, ahead `0`, behind `0`.
-
-Checkpoint 14.02:
-
-- Capability commit: `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2`.
-- Remote comparison immediately after publication: `identical`, ahead `0`, behind `0`.
-- Force push: `false`.
-- Publication tree contained only coherent 14.02 production code, focused tests, exports and evidence.
-- Container-side Git worktree: unavailable; the validated offline scratch was checked for trailing whitespace and syntax before publication.
+- 14.01 capability `3173c97f5d04b3b0fe65c8e9b17876d257b233be`: remote `identical`, ahead `0`, behind `0`.
+- 14.02 capability `8c135cba3efb6d64b9fed7f2bb2e06ebe28ae8f2`: remote `identical`, ahead `0`, behind `0`.
+- 14.03 capability `f1c384972567befbe4713c56bfaaa4a481135687`: remote `identical`, ahead `0`, behind `0`.
+- Force push: `false` for all capability publications.
+- 14.03 publication contained only coherent BB production code, contracts, tests, exports and evidence.
+- Container-side Git worktree unavailable; validated offline scratch passed syntax and whitespace checks before publication.
 
 ## Known limitations
 
-- No target-season policy performance claim is made by checkpoints 14.01–14.02.
-- Gross Triple Captain current gain is intentionally distinct from continuation/opportunity value, which is implemented in checkpoint 14.06.
-- Sophisticated continuation-value selection remains open by specification and is not claimed solved.
+- No target-season chip-policy performance claim is made yet.
+- BB `net_pre_continuation_value` deliberately excludes finite-inventory continuation/opportunity value; checkpoint 14.06 owns that comparison.
+- Sophisticated continuation methods remain open by specification and are not claimed solved.
 - Temporary branch-only workspace-export workflow remains and must be removed before final delivery.
 - Final Ruff, mypy, frozen sync, build, wheel, installed-wheel CLI and targeted inherited regressions remain pending.
 
 ## Exact resume state
 
-Resume from remote branch HEAD, verify it descends from the immutable parent, read this file, then continue checkpoint 14.03. Do not recreate or reset checkpoints 14.01 or 14.02.
+Resume from remote branch HEAD, verify ancestry, read this file, then continue checkpoint 14.04. Do not recreate or reset checkpoints 14.01–14.03.
