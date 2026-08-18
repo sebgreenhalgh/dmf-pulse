@@ -14,6 +14,11 @@ from pydantic import BaseModel
 
 from dmf_pulse.cli.odds_cmd import odds_app
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.ingestion.fpl.current import (
+    CurrentFplInputRequest,
+    CurrentFplInputService,
+    CurrentFplInputSummary,
+)
 from dmf_pulse.ingestion.fpl.parser import (
     CONTRACT_VERSION,
     FplResource,
@@ -31,9 +36,11 @@ from dmf_pulse.ingestion.fpl.service import (
 ingest_app = typer.Typer(help="Run explicitly rights-gated ingestion operations.")
 fpl_app = typer.Typer(help="Validate and ingest frozen FPL reference payloads.")
 bundle_app = typer.Typer(help="Inspect immutable FPL source bundles.")
+current_app = typer.Typer(help="Validate current official-FPL manual captures transiently.")
 ingest_app.add_typer(fpl_app, name="fpl")
 ingest_app.add_typer(odds_app, name="odds")
 fpl_app.add_typer(bundle_app, name="bundle")
+fpl_app.add_typer(current_app, name="current")
 
 
 def _json(value: BaseModel | dict[str, object]) -> str:
@@ -74,6 +81,42 @@ def _safe(operation: Callable[[], object]) -> object:
         error = IngestionError("INTERNAL_INVARIANT", "ingestion command failed safely")
         typer.echo(_json(error.as_error_object()))
         raise typer.Exit(error.exit_code) from exc
+
+
+@current_app.command("validate")
+def current_validate_command(
+    bootstrap: Annotated[Path, typer.Option("--bootstrap")],
+    fixtures: Annotated[Path, typer.Option("--fixtures")],
+    competition_key: Annotated[str, typer.Option("--competition-key")],
+    season_code: Annotated[str, typer.Option("--season-code")],
+    captured_at: Annotated[str, typer.Option("--captured-at")],
+    information_cutoff: Annotated[str, typer.Option("--information-cutoff")],
+    rights_profile: Annotated[str, typer.Option("--rights-profile")],
+    gameweek: Annotated[int, typer.Option("--gameweek", min=1)] = 1,
+    output: Annotated[str, typer.Option("--output")] = "json",
+) -> None:
+    """Compile a DB-free, non-persisting current official-FPL input bundle."""
+
+    def operation() -> CurrentFplInputSummary:
+        _require_json(output)
+        bundle = CurrentFplInputService().compile(
+            CurrentFplInputRequest(
+                bootstrap_path=bootstrap,
+                fixtures_path=fixtures,
+                competition_key=competition_key,
+                season_code=season_code,
+                captured_at=_timestamp(captured_at, option="--captured-at"),
+                information_cutoff=_timestamp(information_cutoff, option="--information-cutoff"),
+                rights_profile_id=rights_profile,
+                gameweek=gameweek,
+            )
+        )
+        return bundle.safe_summary()
+
+    result = _safe(operation)
+    if not isinstance(result, CurrentFplInputSummary):
+        _failure(IngestionError("INTERNAL_INVARIANT", "current FPL result is invalid"))
+    typer.echo(_json(result))
 
 
 @fpl_app.command("validate")
