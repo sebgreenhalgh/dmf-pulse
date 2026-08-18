@@ -1,0 +1,85 @@
+name: stage14-wildcard-apply
+
+on:
+  push:
+    branches:
+      - stage/A14/CHIP-014-chip-optimisation
+    paths:
+      - recovery/stage14-wildcard-ready.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage14-wildcard-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out canonical Stage 14 branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Materialise validated Wildcard checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64
+          import bz2
+          import json
+          from pathlib import Path
+
+          part_paths = sorted(Path("recovery").glob("stage14-wildcard.part-*"))
+          if not part_paths:
+              raise SystemExit("no validated Wildcard payload chunks found")
+          encoded = "".join(path.read_text(encoding="utf-8") for path in part_paths)
+          payload = json.loads(bz2.decompress(base64.b64decode(encoded)))
+          message = payload.get("message")
+          if not isinstance(message, str) or not message.strip():
+              raise SystemExit("checkpoint message must be a non-empty string")
+
+          for raw_path, content in payload.get("files", {}).items():
+              path = Path(raw_path)
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_text(content, encoding="utf-8")
+
+          for raw_path in payload.get("delete_paths", []):
+              path = Path(raw_path)
+              if path.exists():
+                  path.unlink()
+
+          Path("/tmp/stage14-message.txt").write_text(
+              message.strip() + "\n", encoding="utf-8"
+          )
+          for path in part_paths:
+              path.unlink()
+          Path("recovery/stage14-wildcard-ready.txt").unlink()
+          Path(".github/workflows/stage14-wildcard-apply.yml").unlink()
+          PY
+          git add -A
+          git diff --cached --check
+          actual_tree="$(git write-tree)"
+          expected_tree="e60b2e680b8401a7c38c6c8db44b127c951bc6e8"
+          if [[ "$actual_tree" != "$expected_tree" ]]; then
+            echo "tree mismatch: expected $expected_tree, got $actual_tree" >&2
+            exit 1
+          fi
+          git config user.name "Sebastian Greenhalgh"
+          git config user.email "seb.greenhalgh@outlook.com"
+          git commit -F /tmp/stage14-message.txt
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:stage/A14/CHIP-014-chip-optimisation; then
+              exit 0
+            fi
+            if [[ "$attempt" == 5 ]]; then
+              exit 1
+            fi
+            git fetch --no-tags origin \
+              stage/A14/CHIP-014-chip-optimisation:refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+            git rebase refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation
+          done
