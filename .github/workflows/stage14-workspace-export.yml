@@ -1,0 +1,36 @@
+name: stage14-workspace-export
+
+on:
+  push:
+    branches:
+      - stage/A14/CHIP-014-chip-optimisation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stage14-workspace-export-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out Stage 14
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Export exact repository tree
+        run: git archive --format=zip --output=dmf-pulse-source.zip HEAD
+
+      - name: Upload workspace archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage14-workspace-${{ github.sha }}
+          path: dmf-pulse-source.zip
+          if-no-files-found: error
+          retention-days: 1
