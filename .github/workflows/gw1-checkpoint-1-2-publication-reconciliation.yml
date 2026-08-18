@@ -1,0 +1,43 @@
+name: gw1-checkpoint-1-2-publication-reconciliation
+
+on:
+  push:
+    branches:
+      - recovery/GW1-checkpoint-1-2-publish
+    paths:
+      - .github/workflows/gw1-checkpoint-1-2-publication-reconciliation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install frozen development environment
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check uv==0.11.26
+          uv sync --all-groups --frozen
+
+      - name: Validate and publish Checkpoint 1.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .recovery/gw1-checkpoint-1-2-package/part-*.b64 \
+            | base64 --decode > /tmp/gw1-checkpoint-1-2-package.tar.gz
+          echo 'fe83533b55417f3c88bdac04780b383339f7da97137c5fd80562e34533d47ec6  /tmp/gw1-checkpoint-1-2-package.tar.gz' \
+            | sha256sum --check --strict
+          mkdir -p /tmp/gw1-checkpoint-1-2-package
+          tar -xzf /tmp/gw1-checkpoint-1-2-package.tar.gz \
+            -C /tmp/gw1-checkpoint-1-2-package
+          bash /tmp/gw1-checkpoint-1-2-package/publish.sh
