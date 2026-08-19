@@ -11,7 +11,7 @@ from typer.testing import CliRunner
 from dmf_pulse.cli.app import app
 from dmf_pulse.ingestion.odds.credentials import ODDS_API_ENVIRONMENT_VARIABLE
 
-pytestmark = (pytest.mark.unit, pytest.mark.contract)
+pytestmark = [pytest.mark.unit, pytest.mark.contract]
 runner = CliRunner()
 
 DOCUMENT = Path("docs/operations/odds_runtime_credential.md")
