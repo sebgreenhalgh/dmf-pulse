@@ -19,7 +19,7 @@
 | 1.1 Runtime odds credential foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
 | 1.2 Current official FPL input foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
 | 1.3 Live The Odds API input foundation | COMPLETE | 1.3A, 1.3B and 1.3C are COMPLETE; operator contract and acceptance evidence are published. |
-| 1.4 FPL / odds identity integrity | IN_PROGRESS | 1.4A exact team identity resolution COMPLETE; 1.4B not started. |
+| 1.4 FPL / odds identity integrity | COMPLETE | Exact team and target-GW fixture identity bridge accepted. |
 | 1.5 Session-1 artifacts / operator workflow | INCOMPLETE | Not started. |
 
 ## Checkpoint 1.3A — live credential / transport wiring
@@ -217,3 +217,17 @@
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
 - Exact next action — publish the required capability commit, verify remote equality, and
   consume the Linux focused-validation result before bounded Checkpoint 1.4C review.
+
+<!-- GW1-1.4B-START -->
+## Checkpoint 1.4B — automated focused publication
+
+- Validated commit — `291418d233745182f32e23395483aa88c367d1df`.
+- Workflow run — `32312677922`.
+- Validation result — `PASS`.
+- Machine-written evidence — `evidence/readiness/GW1_SESSION1_CHECKPOINT_1_4_ACCEPTANCE.md`.
+- Mapping remains exact, reviewed, cutoff-bound and fail-closed; no fuzzy matching.
+- Combined FPL-derived result remains transient/in-memory; PostgreSQL was not used.
+- Real credentialled provider call — `OPERATOR_CHECKPOINT`.
+- Checkpoint 1.5 — `NOT_STARTED`.
+- Exact next action — **CHECKPOINT 1.5 — SESSION-1 ARTIFACTS / OPERATOR WORKFLOW**.
+<!-- GW1-1.4B-END -->
