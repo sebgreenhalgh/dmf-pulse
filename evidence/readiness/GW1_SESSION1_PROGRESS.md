@@ -221,8 +221,8 @@
 <!-- GW1-1.4B-START -->
 ## Checkpoint 1.4B — automated focused publication
 
-- Validated commit — `291418d233745182f32e23395483aa88c367d1df`.
-- Workflow run — `32312677922`.
+- Validated commit — `16560a1f8e50a7a6b33a6a7430f4ca9a01be30ff`.
+- Workflow run — `32313356458`.
 - Validation result — `PASS`.
 - Machine-written evidence — `evidence/readiness/GW1_SESSION1_CHECKPOINT_1_4_ACCEPTANCE.md`.
 - Mapping remains exact, reviewed, cutoff-bound and fail-closed; no fuzzy matching.
@@ -231,7 +231,6 @@
 - Checkpoint 1.5 — `NOT_STARTED`.
 - Exact next action — **CHECKPOINT 1.5 — SESSION-1 ARTIFACTS / OPERATOR WORKFLOW**.
 <!-- GW1-1.4B-END -->
-
 ## Checkpoint 1.4C — hostile identity acceptance pre-publication
 
 - Starting accepted 1.4B evidence head —

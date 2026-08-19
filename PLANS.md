@@ -9,11 +9,8 @@
   approval/cutoff enforcement and transient rights boundary.
 - [x] 1.4B exact target-GW fixture resolution, orientation, kickoff, one-to-one
   coverage, diagnostics and deterministic mapped output.
-- [ ] 1.4C bounded acceptance evidence and exact Checkpoint 1.5 handoff.
-- Latest focused validation — `1.4B` `PASS`, run `32312677922`, commit `291418d233745182f32e23395483aa88c367d1df`.
-- 1.4C hostile review is in progress; deserialized output must independently
-  revalidate nested identity, approval-time, deadline, and team-map coherence.
-- 1.4C local acceptance — `PASS`; remote publication/validation is pending.
+- [x] 1.4C bounded acceptance evidence and exact Checkpoint 1.5 handoff.
+- Latest focused validation — `1.4B` `PASS`, run `32313356458`, commit `16560a1f8e50a7a6b33a6a7430f4ca9a01be30ff`.
 - Exclusions remain: probabilities, projections, optimisation, initial squad,
   captaincy, prospective logging, UI, Checkpoint 1.5, PR, merge and activation.
 <!-- GW1-1.4-PLAN-END -->
