@@ -69,7 +69,9 @@ def _fpl_input(repository_root: Path, tmp_path: Path) -> CurrentFplInputBundle:
 
 def _odds_value(repository_root: Path) -> list[dict[str, Any]]:
     value = json.loads(
-        (repository_root / "fixtures/odds/ODD-005/happy_path.json").read_text(encoding="utf-8")
+        (repository_root / "fixtures/odds/ODD-005/happy_path.json").read_text(
+            encoding="utf-8"
+        )
     )
     assert isinstance(value, list)
     return value

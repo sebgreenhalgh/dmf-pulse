@@ -201,10 +201,14 @@ class CurrentTeamAliasMapping(_FrozenCurrentMapping):
 class CurrentTeamAliasPlan(_FrozenCurrentMapping):
     """Operator-supplied, reviewed team alias authority for current use."""
 
-    contract_version: Literal["gw1-fpl-odds-team-alias-plan-v1"] = "gw1-fpl-odds-team-alias-plan-v1"
+    contract_version: Literal["gw1-fpl-odds-team-alias-plan-v1"] = (
+        "gw1-fpl-odds-team-alias-plan-v1"
+    )
     plan_id: str = Field(min_length=1, max_length=160)
     plan_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
-    mapping_algorithm_version: Literal["gw1-fpl-odds-exact-v1"] = "gw1-fpl-odds-exact-v1"
+    mapping_algorithm_version: Literal["gw1-fpl-odds-exact-v1"] = (
+        "gw1-fpl-odds-exact-v1"
+    )
     approved_at: datetime
     evidence_class: CurrentMappingEvidenceClass
     reviewer: str = Field(min_length=1, max_length=160)
