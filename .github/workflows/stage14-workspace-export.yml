@@ -28,6 +28,37 @@ jobs:
         with:
           enable-cache: false
 
+      - name: Publish run heartbeat
+        shell: bash
+        env:
+          RUN_ID: ${{ github.run_id }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git config user.name "Sebastian Greenhalgh"
+          git config user.email "seb.greenhalgh@outlook.com"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          Path("recovery/stage14-apply-started.json").write_text(
+              json.dumps(
+                  {
+                      "run_id": int(os.environ["RUN_ID"]),
+                      "source_sha": os.environ["SOURCE_SHA"],
+                  },
+                  indent=2,
+                  sort_keys=True,
+              )
+              + "\n",
+              encoding="utf-8",
+          )
+          PY
+          git add recovery/stage14-apply-started.json
+          git commit -m "checkpoint(chips): record Stage 14 apply run [skip ci]"
+          git push origin HEAD:stage/A14/CHIP-014-chip-optimisation
+
       - name: Verify and materialise payload
         shell: bash
         run: |
