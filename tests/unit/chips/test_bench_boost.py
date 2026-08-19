@@ -74,7 +74,9 @@ def normal_evaluator(scenario, tactic, players, rules):
     effective = (
         tactic.captain
         if tactic.captain in appeared
-        else tactic.vice_captain if tactic.vice_captain in appeared else None
+        else tactic.vice_captain
+        if tactic.vice_captain in appeared
+        else None
     )
     points = sum(scenario.player_points[player] for player in counted)
     if effective is not None:
@@ -215,7 +217,18 @@ def test_four_player_bench_including_goalkeeper_scores_incrementally() -> None:
 
 
 def test_autosub_overlap_is_subtracted_from_bench_sum() -> None:
-    scenario = full_scenario(appeared={"A": True, "B": True, "C": False, "D": True, "E": True, "F": True, "G": True, "H": True})
+    scenario = full_scenario(
+        appeared={
+            "A": True,
+            "B": True,
+            "C": False,
+            "D": True,
+            "E": True,
+            "F": True,
+            "G": True,
+            "H": True,
+        }
+    )
     result = evaluate((scenario,))
     value = result.standalone_route.scenario_values[0]
     assert "E" in value.normal_autosub_overlap_ids
@@ -225,7 +238,16 @@ def test_autosub_overlap_is_subtracted_from_bench_sum() -> None:
 
 
 def test_zero_bench_appearances_have_zero_increment_but_consume_chip() -> None:
-    appearances = {"A": True, "B": True, "C": True, "D": True, "E": False, "F": False, "G": False, "H": False}
+    appearances = {
+        "A": True,
+        "B": True,
+        "C": True,
+        "D": True,
+        "E": False,
+        "F": False,
+        "G": False,
+        "H": False,
+    }
     result = evaluate((full_scenario(appeared=appearances),))
     assert result.standalone_route.gross_current_gain == 0.0
     assert result.chip_consumed is True
@@ -326,6 +348,14 @@ def test_duplicate_scenario_identity_fails() -> None:
     [
         (),
         (SimpleNamespace(starting_xi=("A",)),),
+        (
+            SimpleNamespace(
+                starting_xi=("A",),
+                bench_goalkeeper="G",
+                bench_order=("E", "F"),
+            ),
+        ),
+        (replace(tactic_a(), starting_xi=()),),
         (replace(tactic_a(), bench_order=("E", "E", "H")),),
     ],
 )
@@ -377,14 +407,24 @@ def test_rules_lineage_definition_effect_and_token_fail_closed() -> None:
     inventory = build_chip_inventory(missing, current_gameweek=1)
     with pytest.raises(ChipError) as exc:
         evaluate_bench_boost(
-            scenarios=(scenario,), tactical_candidates=(tactic_a(),), players={}, rules=Rules(),
-            chip_bundle=missing, inventory=inventory, token_id=inventory.tokens[0].token_id,
-            costs=costs(), evaluator=normal_evaluator,
+            scenarios=(scenario,),
+            tactical_candidates=(tactic_a(),),
+            players={},
+            rules=Rules(),
+            chip_bundle=missing,
+            inventory=inventory,
+            token_id=inventory.tokens[0].token_id,
+            costs=costs(),
+            evaluator=normal_evaluator,
         )
     assert exc.value.code == "CHIP_BB_DEFINITION_MISSING"
 
     wrong_effect = bundle_for(
-        bb_definition(effects=(ChipEffect(surface="SCORING", operation="ADD_POINTS", parameters={"points": 1}),))
+        bb_definition(
+            effects=(
+                ChipEffect(surface="SCORING", operation="ADD_POINTS", parameters={"points": 1}),
+            )
+        )
     )
     with pytest.raises(ChipError) as exc:
         evaluate((scenario,), bundle=wrong_effect)
@@ -395,9 +435,15 @@ def test_rules_lineage_definition_effect_and_token_fail_closed() -> None:
     other = next(token for token in inventory.tokens if token.chip_key == "OTHER")
     with pytest.raises(ChipError) as exc:
         evaluate_bench_boost(
-            scenarios=(scenario,), tactical_candidates=(tactic_a(),), players={}, rules=Rules(),
-            chip_bundle=bundle, inventory=inventory, token_id=other.token_id,
-            costs=costs(), evaluator=normal_evaluator,
+            scenarios=(scenario,),
+            tactical_candidates=(tactic_a(),),
+            players={},
+            rules=Rules(),
+            chip_bundle=bundle,
+            inventory=inventory,
+            token_id=other.token_id,
+            costs=costs(),
+            evaluator=normal_evaluator,
         )
     assert exc.value.code == "CHIP_BB_TOKEN_MISMATCH"
 
@@ -414,9 +460,15 @@ def test_blocked_and_expired_token_fail_closed() -> None:
     inventory = build_chip_inventory(bundle, current_gameweek=20)
     with pytest.raises(ChipError) as exc:
         evaluate_bench_boost(
-            scenarios=(full_scenario(),), tactical_candidates=(tactic_a(),), players={}, rules=Rules(),
-            chip_bundle=bundle, inventory=inventory, token_id=inventory.tokens[0].token_id,
-            costs=costs(), evaluator=normal_evaluator,
+            scenarios=(full_scenario(),),
+            tactical_candidates=(tactic_a(),),
+            players={},
+            rules=Rules(),
+            chip_bundle=bundle,
+            inventory=inventory,
+            token_id=inventory.tokens[0].token_id,
+            costs=costs(),
+            evaluator=normal_evaluator,
         )
     assert exc.value.code == "CHIP_BB_TOKEN_UNAVAILABLE"
 
@@ -434,7 +486,10 @@ def test_hashes_are_reproducible_and_tamper_evident() -> None:
     second = evaluate((full_scenario(),))
     assert first == second
     assert first.evaluation_hash == second.evaluation_hash
-    assert semantic_sha256(first.model_dump(mode="json", exclude={"evaluation_hash"})) == first.evaluation_hash
+    assert (
+        semantic_sha256(first.model_dump(mode="json", exclude={"evaluation_hash"}))
+        == first.evaluation_hash
+    )
 
     payload = first.model_dump(mode="python")
     payload["evaluation_hash"] = "f" * 64

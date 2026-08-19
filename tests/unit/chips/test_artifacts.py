@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from dmf_pulse.chips.artifacts import (
     Stage14DecisionArtifact,
@@ -108,3 +110,42 @@ def test_artifact_contract_rejects_lineage_and_hash_relationship_tampering(
     with pytest.raises((ValueError, ChipError)):
         value = Stage14DecisionArtifact.model_validate(raw)
         verify_decision_artifact(value)
+
+
+def test_artifact_envelope_rejects_every_cross_contract_mismatch() -> None:
+    artifact = seal_decision_artifact(service_request())
+    base = artifact.model_dump(mode="python")
+
+    cases: list[tuple[dict[str, object], str]] = []
+    payload = artifact.model_dump(mode="python")
+    payload["issued_at"] = artifact.issued_at.replace(microsecond=1)
+    payload["artifact_hash"] = "0" * 64
+    cases.append((payload, "issue time differs"))
+
+    other = seal_decision_artifact(service_request(current_values={"TRIPLE_CAPTAIN": (2.0, 2.0)}))
+    payload = dict(
+        base,
+        decision_set=other.decision_set,
+        artifact_hash="0" * 64,
+    )
+    cases.append((payload, "decision is not bound"))
+
+    payload = artifact.model_dump(mode="python")
+    lineage = payload["decision_set"]["lineage"]
+    lineage["information_cutoff"] = artifact.service_request.information_cutoff - timedelta(
+        seconds=1
+    )
+    lineage["lineage_hash"] = "0" * 64
+    payload["decision_set"]["decision_set_hash"] = "0" * 64
+    payload["artifact_hash"] = "0" * 64
+    cases.append((payload, "lineage cutoff differs"))
+
+    cases.extend(
+        (
+            (dict(base, artifact_id="forged", artifact_hash="0" * 64), "identity"),
+            (dict(base, artifact_hash="f" * 64), "semantic hash mismatch"),
+        )
+    )
+    for payload, match in cases:
+        with pytest.raises(ValidationError, match=match):
+            Stage14DecisionArtifact.model_validate(payload)

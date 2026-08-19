@@ -194,3 +194,101 @@ def test_tampered_artifact_is_rejected_without_traceback(tmp_path: Path) -> None
     )
 
     _assert_typed_failure(runner.invoke(chips_app, ["validate", "--artifact", str(path)]))
+
+
+def test_rules_inventory_and_value_commands_cover_shared_service_paths(tmp_path: Path) -> None:
+    request = service_request(keys=("TRIPLE_CAPTAIN", "BENCH_BOOST", "FREE_HIT", "WILDCARD"))
+    bundle_path = tmp_path / "bundle.json"
+    bundle_path.write_text(request.chip_bundle.model_dump_json(), encoding="utf-8")
+    rules = runner.invoke(chips_app, ["validate-rules", "--input", str(bundle_path)])
+    assert rules.exit_code == 0
+    assert json.loads(rules.stdout)["status"] == "READY"
+
+    build_path = tmp_path / "inventory-build.json"
+    build_path.write_text(
+        json.dumps(
+            {
+                "chip_bundle": request.chip_bundle.model_dump(mode="json"),
+                "current_gameweek": request.inventory.current_gameweek,
+            }
+        ),
+        encoding="utf-8",
+    )
+    built = runner.invoke(chips_app, ["inventory", "--input", str(build_path)])
+    assert built.exit_code == 0
+
+    validate_path = tmp_path / "inventory-validate.json"
+    validate_path.write_text(
+        json.dumps(
+            {
+                "chip_bundle": request.chip_bundle.model_dump(mode="json"),
+                "inventory": request.inventory.model_dump(mode="json"),
+            }
+        ),
+        encoding="utf-8",
+    )
+    validated = runner.invoke(chips_app, ["inventory", "--input", str(validate_path)])
+    assert validated.exit_code == 0
+    assert json.loads(validated.stdout)["inventory_hash"] == request.inventory.inventory_hash
+
+    request_path = tmp_path / "all-chips.json"
+    write_service_request(request_path, request)
+    for command in (
+        "triple-captain-value",
+        "bench-boost-value",
+        "free-hit-value",
+        "wildcard-now-vs-later",
+        "opportunity",
+        "explain",
+    ):
+        result = runner.invoke(chips_app, [command, "--input", str(request_path)])
+        assert result.exit_code == 0, (command, result.stdout)
+
+    captain = runner.invoke(chips_app, ["captain", "--input", str(request_path)])
+    assert _assert_typed_failure(captain)["error"]["code"] == ("CHIP_CAPTAIN_EVIDENCE_MISSING")
+
+
+def test_validate_accepts_request_and_inline_artifact(tmp_path: Path) -> None:
+    request = service_request()
+    request_path = tmp_path / "request.json"
+    write_service_request(request_path, request)
+
+    validated_request = runner.invoke(
+        chips_app,
+        ["validate", "--input", str(request_path)],
+    )
+    assert validated_request.exit_code == 0
+    assert json.loads(validated_request.stdout)["status"] == "VALID"
+
+    artifact = seal_decision_artifact(request)
+    artifact_path = tmp_path / "inline-artifact.json"
+    artifact_path.write_text(artifact.model_dump_json(), encoding="utf-8")
+    validated_artifact = runner.invoke(
+        chips_app,
+        ["validate", "--input", str(artifact_path)],
+    )
+    assert validated_artifact.exit_code == 0
+    assert json.loads(validated_artifact.stdout)["artifact_hash"] == artifact.artifact_hash
+
+
+@pytest.mark.parametrize(
+    "contents",
+    ("not-json", "[]"),
+)
+def test_malformed_json_shapes_are_typed_failures(tmp_path: Path, contents: str) -> None:
+    path = tmp_path / "bad.json"
+    path.write_text(contents, encoding="utf-8")
+
+    _assert_typed_failure(runner.invoke(chips_app, ["compare", "--input", str(path)]))
+
+
+def test_inventory_requires_bundle_for_detached_state_and_output_is_json_only(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "inventory.json"
+    path.write_text(service_request().inventory.model_dump_json(), encoding="utf-8")
+
+    failure = runner.invoke(chips_app, ["inventory", "--input", str(path)])
+    assert _assert_typed_failure(failure)["error"]["code"] == ("CHIP_INVENTORY_BUNDLE_REQUIRED")
+    non_json = runner.invoke(chips_app, ["validate", "--output", "yaml"])
+    assert non_json.exit_code != 0

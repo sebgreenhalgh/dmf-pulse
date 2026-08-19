@@ -10,6 +10,8 @@ from dmf_pulse.chips.inventory import TokenStatus, advance_inventory
 from dmf_pulse.chips.replay import (
     ChipReplayDeadline,
     ChipReplayRequest,
+    ChipReplayResult,
+    ChipReplayStep,
     replay_chip_policy,
     seal_chip_replay_request,
 )
@@ -148,3 +150,151 @@ def test_executable_request_rejects_future_usable_at_cutoff_leakage() -> None:
 
     with pytest.raises(ValidationError, match="future-artifact leakage"):
         ChipServiceRequest.model_validate(payload)
+
+
+def _reject(model: type, payload: dict[str, object], match: str) -> None:
+    with pytest.raises(ValidationError, match=match):
+        model.model_validate(payload)
+
+
+def test_replay_deadline_rejects_temporal_and_gameweek_mismatches() -> None:
+    deadline = _replay((8.0, 8.0)).deadlines[0]
+    payload = deadline.model_dump(mode="python")
+    payload["gameweek"] = 2
+    _reject(ChipReplayDeadline, payload, "Gameweeks differ")
+
+    payload = deadline.model_dump(mode="python")
+    payload["outcome_revealed_at"] = deadline.request.forecast_origin
+    _reject(ChipReplayDeadline, payload, "reveal must follow")
+
+
+def test_replay_request_rejects_incoherent_trajectory_and_hash() -> None:
+    request = _replay((8.0, 8.0))
+    base = request.model_dump(mode="python")
+
+    payload = dict(base, deadlines=(), replay_request_hash="0" * 64)
+    _reject(ChipReplayRequest, payload, "at least one deadline")
+
+    payload = dict(
+        base,
+        deadlines=tuple(reversed(base["deadlines"])),
+        replay_request_hash="0" * 64,
+    )
+    _reject(ChipReplayRequest, payload, "chronologically ordered")
+
+    deadlines = [item.model_dump(mode="python") for item in request.deadlines]
+    deadlines[1]["deadline_id"] = deadlines[0]["deadline_id"]
+    payload = dict(base, deadlines=deadlines, replay_request_hash="0" * 64)
+    _reject(ChipReplayRequest, payload, "IDs must be unique")
+
+    first = request.deadlines[0].model_dump(mode="python")
+    repeated = dict(first, deadline_id="GW1-B")
+    payload = dict(base, deadlines=(first, repeated), replay_request_hash="0" * 64)
+    _reject(ChipReplayRequest, payload, "Gameweeks must be strictly increasing")
+
+    payload = dict(
+        base,
+        initial_inventory=request.deadlines[1].request.inventory,
+        replay_request_hash="0" * 64,
+    )
+    _reject(ChipReplayRequest, payload, "initial inventory differs")
+
+    deadlines = [item.model_dump(mode="python") for item in request.deadlines]
+    deadlines[0]["outcome_revealed_at"] = request.deadlines[
+        1
+    ].request.information_cutoff + timedelta(seconds=1)
+    payload = dict(base, deadlines=deadlines, replay_request_hash="0" * 64)
+    _reject(ChipReplayRequest, payload, "information was not usable")
+
+    payload = dict(base, replay_request_hash="f" * 64)
+    _reject(ChipReplayRequest, payload, "request hash mismatch")
+
+
+def test_replay_step_rejects_non_root_or_ambiguous_state_changes() -> None:
+    step = replay_chip_policy(_replay((8.0, 8.0))).steps[0]
+    base = step.model_dump(mode="python")
+    cases = (
+        (
+            dict(base, executed_action="USE", step_hash="0" * 64),
+            "USE must identify one executed chip",
+        ),
+        (
+            dict(
+                base,
+                executed_action="USE",
+                executed_chip="TRIPLE_CAPTAIN",
+                step_hash="0" * 64,
+            ),
+            "USE must identify one executed token",
+        ),
+        (
+            dict(base, transitioned_to_gameweek=step.gameweek, step_hash="0" * 64),
+            "must advance beyond",
+        ),
+        (
+            dict(
+                base,
+                inventory_after_transition_hash=step.inventory_after_root_hash,
+                step_hash="0" * 64,
+            ),
+            "must have a new semantic identity",
+        ),
+        (
+            dict(
+                base,
+                advisory_future_opportunity_ids=("z", "a"),
+                step_hash="0" * 64,
+            ),
+            "must be sorted and unique",
+        ),
+        (dict(base, step_hash="f" * 64), "step hash mismatch"),
+    )
+    for payload, match in cases:
+        _reject(ChipReplayStep, payload, match)
+
+
+def test_replay_result_rejects_broken_state_chain_and_hash() -> None:
+    request = _replay((8.0, 8.0))
+    result = replay_chip_policy(request)
+    base = result.model_dump(mode="python")
+
+    cases: list[tuple[dict[str, object], str]] = [
+        (dict(base, steps=(), result_hash="0" * 64), "requires steps"),
+        (
+            dict(base, initial_inventory_hash="f" * 64, result_hash="0" * 64),
+            "initial state hash differs",
+        ),
+    ]
+    steps = [item.model_dump(mode="python") for item in result.steps]
+    steps[1]["inventory_before_hash"] = "f" * 64
+    steps[1]["step_hash"] = "0" * 64
+    cases.append(
+        (
+            dict(base, steps=steps, result_hash="0" * 64),
+            "state chain differs",
+        )
+    )
+    steps = [item.model_dump(mode="python") for item in result.steps]
+    steps[0]["transitioned_to_gameweek"] = 3
+    steps[0]["step_hash"] = "0" * 64
+    cases.append(
+        (
+            dict(base, steps=steps, result_hash="0" * 64),
+            "transition target differs",
+        )
+    )
+    cases.extend(
+        (
+            (
+                dict(
+                    base,
+                    final_inventory=request.initial_inventory,
+                    result_hash="0" * 64,
+                ),
+                "final inventory",
+            ),
+            (dict(base, result_hash="f" * 64), "result hash mismatch"),
+        )
+    )
+    for payload, match in cases:
+        _reject(ChipReplayResult, payload, match)
