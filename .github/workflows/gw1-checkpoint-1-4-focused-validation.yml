@@ -1,0 +1,264 @@
+name: gw1-checkpoint-1-4-focused-validation
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-checkpoint-1-4-focused-validation.yml
+      - src/dmf_pulse/ingestion/odds/mapping.py
+      - src/dmf_pulse/ingestion/odds/identity.py
+      - tests/unit/ingestion/test_fpl_odds_team_identity.py
+      - tests/unit/ingestion/test_fpl_odds_fixture_identity.py
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gw1-checkpoint-1-4-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  focused-validation:
+    name: Python 3.13 / transient identity bridge
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DMF_ENVIRONMENT: TEST
+      UV_NO_PROGRESS: "1"
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned uv
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen dependency sync
+        run: uv sync --all-groups --frozen
+
+      - name: Focused identity and inherited current-input tests
+        shell: bash
+        run: |
+          set -o pipefail
+          tests=(
+            tests/unit/ingestion/test_fpl_odds_team_identity.py
+            tests/unit/ingestion/test_fpl_current_input.py
+            tests/unit/ingestion/test_live_odds_current_input.py
+            tests/unit/ingestion/test_odds_foundation.py
+          )
+          if [[ -f tests/unit/ingestion/test_fpl_odds_fixture_identity.py ]]; then
+            tests+=(tests/unit/ingestion/test_fpl_odds_fixture_identity.py)
+          fi
+          uv run pytest -q "${tests[@]}" | tee "${RUNNER_TEMP}/gw1-1-4-pytest.log"
+
+      - name: Ruff format
+        shell: bash
+        run: |
+          paths=(
+            src/dmf_pulse/ingestion/odds/mapping.py
+            src/dmf_pulse/ingestion/odds/identity.py
+            tests/unit/ingestion/test_fpl_odds_team_identity.py
+          )
+          if [[ -f tests/unit/ingestion/test_fpl_odds_fixture_identity.py ]]; then
+            paths+=(tests/unit/ingestion/test_fpl_odds_fixture_identity.py)
+          fi
+          uv run ruff format --check "${paths[@]}"
+
+      - name: Ruff lint
+        shell: bash
+        run: |
+          paths=(
+            src/dmf_pulse/ingestion/odds/mapping.py
+            src/dmf_pulse/ingestion/odds/identity.py
+            tests/unit/ingestion/test_fpl_odds_team_identity.py
+          )
+          if [[ -f tests/unit/ingestion/test_fpl_odds_fixture_identity.py ]]; then
+            paths+=(tests/unit/ingestion/test_fpl_odds_fixture_identity.py)
+          fi
+          uv run ruff check "${paths[@]}"
+
+      - name: Strict typing on changed production code
+        run: >-
+          uv run mypy
+          src/dmf_pulse/ingestion/odds/mapping.py
+          src/dmf_pulse/ingestion/odds/identity.py
+
+      - name: Build distributions
+        run: uv build
+
+      - name: First-party secret scan
+        run: uv run python scripts/scan_secrets.py
+
+      - name: Commit whitespace validation
+        run: git diff --check "${GITHUB_SHA}^" "${GITHUB_SHA}"
+
+      - name: Publish durable checkpoint evidence
+        shell: bash
+        env:
+          VALIDATED_SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          subject="$(git log -1 --pretty=%s "$VALIDATED_SHA")"
+          case "$subject" in
+            "feat(gw1): add explicit FPL odds team identity resolution")
+              stage="1.4A"
+              report="evidence/readiness/GW1_SESSION1_VALIDATION_1_4A.md"
+              evidence_commit="docs(gw1): record FPL odds team identity validation"
+              ;;
+            "feat(gw1): map current odds events to FPL fixtures")
+              stage="1.4B"
+              report="evidence/readiness/GW1_SESSION1_CHECKPOINT_1_4_ACCEPTANCE.md"
+              evidence_commit="docs(gw1): complete FPL odds identity checkpoint"
+              ;;
+            *)
+              echo "No durable publication required for commit subject: $subject"
+              exit 0
+              ;;
+          esac
+          export STAGE="$stage" REPORT="$report" SUBJECT="$subject"
+          python - <<'PY'
+          from __future__ import annotations
+
+          import os
+          import re
+          from pathlib import Path
+
+          stage = os.environ["STAGE"]
+          report_path = Path(os.environ["REPORT"])
+          subject = os.environ["SUBJECT"]
+          run_id = os.environ["RUN_ID"]
+          validated_sha = os.environ["VALIDATED_SHA"]
+          pytest_log = Path(os.environ["RUNNER_TEMP"]) / "gw1-1-4-pytest.log"
+          pytest_output = pytest_log.read_text(encoding="utf-8").strip()
+
+          report_path.parent.mkdir(parents=True, exist_ok=True)
+          report_path.write_text(
+              f"""# GW1 Checkpoint {stage} Validation
+
+- Validated capability commit — `{validated_sha}`.
+- Workflow run — `{run_id}`.
+- Commit subject — `{subject}`.
+- Focused identity and inherited current-input tests — `PASS`.
+- Ruff format — `PASS`.
+- Ruff lint — `PASS`.
+- Strict mypy on changed production code — `PASS`.
+- Package build — `PASS`.
+- First-party secret scan — `PASS`.
+- Git diff check — `PASS`.
+- PostgreSQL — `NOT_EXECUTED` (the bridge is rights-safe and transient/in-memory).
+- Real credentialled provider call — `OPERATOR_CHECKPOINT`.
+- Checkpoint 1.5 — `NOT_STARTED`.
+
+## Focused pytest output
+
+```text
+{pytest_output}
+```
+""",
+              encoding="utf-8",
+          )
+
+          progress_path = Path("evidence/readiness/GW1_SESSION1_PROGRESS.md")
+          progress = progress_path.read_text(encoding="utf-8")
+          row_pattern = re.compile(r"^\| 1\.4 FPL / odds identity integrity \|.*$", re.MULTILINE)
+          if stage == "1.4A":
+              row = (
+                  "| 1.4 FPL / odds identity integrity | IN_PROGRESS | "
+                  "1.4A exact team identity resolution COMPLETE; 1.4B not started. |"
+              )
+              block = f"""
+## Checkpoint 1.4A — team identity / explicit alias resolution
+
+- Starting remote SHA — `abd7abdc5de16f29d55bc7dcab5421d542fe8dc7`.
+- Capability commit — `{validated_sha}`.
+- Validation workflow — `{run_id}` (`PASS`).
+- Explicit operator-supplied alias plan only; no committed live alias registry.
+- Exact provider-team text equality only; no fuzzy, nearest-neighbour, abbreviation,
+  punctuation, case-folding or heuristic matching.
+- Provider, competition, season, approval time, mapping decision time, source rights,
+  accepted FPL semantic identity, FPL identity view, Odds provenance, Odds identity view,
+  plan version and plan hash are all fail-closed bindings.
+- Current output is transient/in-memory and reports `persistence_performed=false`.
+- PostgreSQL — `NOT_EXECUTED`.
+- `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
+- Exact next action — **CHECKPOINT 1.4B — EXACT FIXTURE RESOLUTION / COVERAGE**.
+"""
+          else:
+              row = (
+                  "| 1.4 FPL / odds identity integrity | COMPLETE | "
+                  "Exact team and target-GW fixture identity bridge accepted. |"
+              )
+              block = f"""
+## Checkpoint 1.4B / 1.4C — exact fixture resolution and acceptance
+
+- Fixture-resolution capability commit — `{validated_sha}`.
+- Acceptance workflow — `{run_id}` (`PASS`).
+- Acceptance evidence — `{report_path.as_posix()}`.
+- Team aliases resolve by exact reviewed equality only.
+- Provider events resolve through mapped home/away official-FPL identities, exact UTC
+  kickoff, target competition, season and Gameweek, plus an explicit reviewed event binding.
+- Home/away orientation, event/fixture uniqueness, target-GW scope, official deadline,
+  complete one-to-one coverage, plan/input hashes and approval cutoffs fail closed.
+- Mapping output — `FPL_ODDS_IDENTITY_MAP`, `USABLE`, deterministic semantic hash,
+  distinct provider-event and official-FPL fixture fields.
+- Full mapped bundle remains transient/in-memory; FPL derived-storage `DENY` is unchanged.
+- No odds probabilities, projections, optimiser, squad, captaincy, logging, UI or
+  Checkpoint 1.5 behavior was implemented.
+- PostgreSQL — `NOT_EXECUTED`.
+- `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
+- Exact next action — **CHECKPOINT 1.5 — SESSION-1 ARTIFACTS / OPERATOR WORKFLOW**.
+"""
+          if not row_pattern.search(progress):
+              raise SystemExit("Checkpoint 1.4 progress row was not found")
+          progress = row_pattern.sub(row, progress, count=1)
+          marker = f"## Checkpoint {stage}"
+          if marker not in progress:
+              progress = progress.rstrip() + "\n\n" + block.strip() + "\n"
+          progress_path.write_text(progress, encoding="utf-8")
+
+          plans_path = Path("PLANS.md")
+          plans = plans_path.read_text(encoding="utf-8")
+          start = "<!-- GW1-1.4-PLAN-START -->"
+          end = "<!-- GW1-1.4-PLAN-END -->"
+          b = "x" if stage == "1.4B" else " "
+          c = "x" if stage == "1.4B" else " "
+          plan_block = f"""{start}
+### Checkpoint 1.4 — FPL / Odds identity integrity
+
+- [x] 1.4A exact explicit team alias resolution, source/plan hash binding,
+  approval/cutoff enforcement and transient rights boundary.
+- [{b}] 1.4B exact target-GW fixture resolution, orientation, kickoff, one-to-one
+  coverage, diagnostics and deterministic mapped output.
+- [{c}] 1.4C bounded acceptance evidence and exact Checkpoint 1.5 handoff.
+- Latest validated capability — `{validated_sha}`; workflow `{run_id}`.
+- Exclusions remain: probabilities, projections, optimisation, initial squad,
+  captaincy, prospective logging, UI, Checkpoint 1.5, PR, merge and activation.
+{end}
+"""
+          if start in plans and end in plans:
+              before, tail = plans.split(start, 1)
+              _, after = tail.split(end, 1)
+              plans = before + plan_block + after.lstrip("\n")
+          else:
+              anchor = (
+                  "- Immutable parent: `9eb57143f6ee92f67c78607cc386678d962e62d4`.\n"
+              )
+              if anchor not in plans:
+                  raise SystemExit("GW1 plan anchor was not found")
+              plans = plans.replace(anchor, anchor + plan_block, 1)
+          plans_path.write_text(plans, encoding="utf-8")
+          PY
+
+          git config user.name "dmf-pulse-gw1-validation-bot"
+          git config user.email "dmf-pulse-gw1-validation-bot@users.noreply.github.com"
+          git add "$report" evidence/readiness/GW1_SESSION1_PROGRESS.md PLANS.md
+          git commit -m "$evidence_commit"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
