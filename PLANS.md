@@ -24,14 +24,15 @@
 - [x] Complete and publish 14.04 Free Hit.
 - [x] Complete and publish 14.05 Wildcard.
 - [x] Complete and publish 14.06 scheduler/continuation.
-- [ ] Define tests/contracts for shared service models, cutoff-safe artifacts, sequential replay,
+- [x] Define tests/contracts for shared service models, cutoff-safe artifacts, sequential replay,
   probability lineage and the `dmf chips` installed-wheel surface.
-- [ ] Implement and publish 14.07 service/CLI/replay/evidence, then verify the remote product tree.
-- [ ] Independently review the complete immutable-parent Stage 14 diff; remediate all P0/P1 and
+- [x] Implement and publish 14.07 service/CLI/replay/evidence, then verify the remote product tree.
+- [x] Independently review the complete immutable-parent Stage 14 diff; remediate all P0/P1 and
   material in-scope P2 findings with adversarial regressions.
-- [ ] Run focused coverage, inherited regressions, one bounded repository suite, static/build/
+- [x] Run focused coverage, inherited regressions, one bounded repository suite, static/build/
   wheel/installed-CLI and final assurance.
-- [ ] Remove all recovery-only workflows/material, verify local/remote equality, and open a draft
+- [x] Remove all recovery-only workflows/material and verify the reviewed branch lineage.
+- [ ] Publish final evidence, verify local/remote equality, and open a draft
   PR to `main` without merging or marking human acceptance.
 
 ## PRC-013 Stage-13 price prediction and ACT/WAIT
