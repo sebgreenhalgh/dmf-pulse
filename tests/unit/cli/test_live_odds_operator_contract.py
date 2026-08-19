@@ -31,7 +31,7 @@ def test_operator_document_freezes_exact_secret_safe_commands(repository_root: P
     assert EXACT_SETTER in text
     assert EXACT_DIAGNOSTIC in text
     assert EXACT_SNAPSHOT in text
-    assert "$env:DMF_TEST_DATABASE_URL = \"<POSTGRESQL_URL>\"" in text
+    assert '$env:DMF_TEST_DATABASE_URL = "<POSTGRESQL_URL>"' in text
     assert "REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT" in text
     assert "canonical_fpl_fixture_mapping_performed = false" in text
     assert "PROVIDER_NATIVE_UNMAPPED" in text

@@ -18,7 +18,7 @@
 | 1.0 Remote state / progress bootstrap | COMPLETE | Immutable-parent ancestry and branch head verified. |
 | 1.1 Runtime odds credential foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
 | 1.2 Current official FPL input foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
-| 1.3 Live The Odds API input foundation | IN_PROGRESS | 1.3A and 1.3B are COMPLETE; 1.3C is NOT_STARTED and is the exact next action. |
+| 1.3 Live The Odds API input foundation | COMPLETE | 1.3A, 1.3B and 1.3C are COMPLETE; operator contract and acceptance evidence are published. |
 | 1.4 FPL / odds identity integrity | INCOMPLETE | Not started. |
 | 1.5 Session-1 artifacts / operator workflow | INCOMPLETE | Not started. |
 
@@ -146,7 +146,7 @@
 | 1.2 | COMPLETE |
 | 1.3A | COMPLETE |
 | 1.3B | COMPLETE |
-| 1.3C | NOT_STARTED / INCOMPLETE |
+| 1.3C | COMPLETE |
 | 1.4 | INCOMPLETE / NOT_STARTED |
 | 1.5 | INCOMPLETE / NOT_STARTED |
 
@@ -157,3 +157,20 @@
 - Workflow run — `32247073642`.
 - Validation result — `PASS`.
 - Validation/evidence commit SHA — `d2ca5c934124c6ac6dab7391b35cf0d3fd3495e4`.
+
+
+## Checkpoint 1.3C — acceptance / operator contract
+
+- Starting remote SHA — `8a678cb3f08ef0894a4468b6d37674f0e5a1b935`.
+- Operator-contract commit — `83e66db98807697819b5bf31228b515756688722`.
+- Acceptance workflow — `32262150075` (`PASS`).
+- Focused acceptance — `PASS`, `73 passed`.
+- Ruff format/lint, wheel build/install, installed CLI credential status/help, controlled missing-credential path, diff check and first-party secret scan — `PASS`.
+- Strict mypy — `NOT_EXECUTED`; no production Python changed.
+- PostgreSQL integration — `NOT_EXECUTED`; accepted Checkpoint 1.3B database evidence remains controlling.
+- Acceptance/evidence commit SHA — pending exact-SHA attestation.
+- Output — `ODDS_PROVIDER_CURRENT_INPUT`, `PROVIDER_NATIVE_UNMAPPED`, no canonical FPL mapping, no raw payload retention.
+- Rights/storage and temporal contracts — unchanged and accepted.
+- `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
+- Checkpoint 1.4 — `NOT_STARTED`.
+- Exact next action — **CHECKPOINT 1.4 — FPL / ODDS IDENTITY INTEGRITY**.
