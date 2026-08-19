@@ -1,4 +1,4 @@
-name: Stage 15 temporary checkpoint transport
+name: Stage 15 temporary source export
 
 on:
   push:
@@ -6,15 +6,19 @@ on:
       - stage/A15/RANK-015-rank-aware-strategy
     paths:
       - .github/workflows/stage15-source-export.yml
-      - .stage15-transport/apply-request.json
+      - .stage15-transport/export-request.json
   workflow_dispatch:
 
 permissions:
   actions: read
   contents: write
+  issues: write
 
 jobs:
-  transport:
+  export:
+    if: >-
+      github.event_name != 'push' ||
+      github.event.head_commit.message != 'chore(stage15): consume export request'
     runs-on: ubuntu-latest
     steps:
       - name: Check out branch
@@ -22,45 +26,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Apply requested checkpoint archive
-        id: apply
+      - name: Consume transport request and legacy metadata
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          if [[ ! -f .stage15-transport/apply-request.json ]]; then
-            echo "applied=false" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-          blob_sha="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["blob_sha"])')"
-          commit_message="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["commit_message"])')"
-          gh api "repos/${GITHUB_REPOSITORY}/git/blobs/${blob_sha}" > /tmp/stage15-blob.json
-          python - <<'PY'
-          import base64
-          import json
-          from pathlib import Path
-
-          payload = json.loads(Path('/tmp/stage15-blob.json').read_text(encoding='utf-8'))
-          Path('/tmp/stage15-checkpoint.tar.xz').write_bytes(
-              base64.b64decode(payload['content'].replace('\n', ''))
-          )
-          PY
-          tar -xJf /tmp/stage15-checkpoint.tar.xz -C .
-          rm -f .stage15-transport/apply-request.json
+          rm -f .stage15-transport/export-request.json
+          rm -f .stage15-transport/source-export.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "${commit_message}"
+          git add -A .stage15-transport
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "chore(stage15): consume export request"
           git push origin HEAD:stage/A15/RANK-015-rank-aware-strategy
-          echo "applied=true" >> "${GITHUB_OUTPUT}"
 
       - name: Build exact repository bundle
         shell: bash
         run: git bundle create dmf-pulse.bundle --all
 
       - name: Upload exact repository bundle
-        id: upload_source
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: stage15-source-bundle-${{ github.run_id }}
@@ -68,23 +54,13 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Publish transport metadata
+      - name: Publish exact transport coordinates
         shell: bash
         env:
-          SOURCE_ARTIFACT_ID: ${{ steps.upload_source.outputs.artifact-id }}
-          APPLIED: ${{ steps.apply.outputs.applied }}
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
         run: |
           set -euo pipefail
           head_sha="$(git rev-parse HEAD)"
-          mkdir -p .stage15-transport
-          printf '{"run_id":%s,"source_artifact_id":%s,"head_sha":"%s","applied":%s}\n' \
-            "${GITHUB_RUN_ID}" "${SOURCE_ARTIFACT_ID}" "${head_sha}" "${APPLIED}" \
-            > .stage15-transport/source-export.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .stage15-transport/source-export.json
-          if git diff --cached --quiet; then
-            exit 0
-          fi
-          git commit -m "chore(stage15): publish temporary source export metadata"
-          git push origin HEAD:stage/A15/RANK-015-rank-aware-strategy
+          gh issue comment 14 --body \
+            "STAGE15_EXPORT run_id=${GITHUB_RUN_ID} artifact_id=${ARTIFACT_ID} head_sha=${head_sha}"
