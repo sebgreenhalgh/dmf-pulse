@@ -35,7 +35,7 @@
 
 | Checkpoint | Status | Capability SHA | Verification |
 |---|---|---|---|
-| 15.01 manager multipliers / EO | COMPLETE / REMOTE | `c885b37982e346a6422681d4c6c18da4392b480d` | `39 passed`; 99% branch coverage; 11 inherited passed |
+| 15.01 manager multipliers / EO | COMPLETE / REMOTE | `77f2cd2c57649a224bc7908128163b498d5b8bd5` | `39 passed`; 99% branch coverage; 11 inherited passed |
 | 15.02 exact named mini-league | NOT_STARTED | — | — |
 | 15.03 baseline opponent model | NOT_STARTED | — | — |
 | 15.04 target / rank utility | NOT_STARTED | — | — |
@@ -61,3 +61,4 @@
 - Inherited accepted-interface regressions: `11 passed` across Stage-10 autosub/oracle and Stage-14 captain/TC/BB/FH semantics.
 - Ruff focused: PASS. Strict mypy for `src/dmf_pulse/rank_strategy`: PASS.
 - Raw projection hash remained identical before and after EO evaluation.
+- Fetch-back verification found six connector-introduced quoted annotations; Ruff caught them and capability SHA `77f2cd2c57649a224bc7908128163b498d5b8bd5` is the corrected checkpoint.
