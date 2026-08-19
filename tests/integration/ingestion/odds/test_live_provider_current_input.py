@@ -112,9 +112,10 @@ def test_live_provider_native_input_persists_governed_evidence_without_mapping(
         assert snapshot["raw_storage_object_id"] is None
         assert snapshot["body_sha256"] is not None
         assert snapshot["body_size"] == len(body)
-        assert snapshot["validation_status"] == "USABLE"
+        assert snapshot["validation_status"] == "RECEIVED"
         assert snapshot["dataset_mode"] == "RAW_OBSERVED"
-        assert snapshot["usable_at"] == RECEIVED + timedelta(seconds=1)
+        assert snapshot["parsed_at"] is None
+        assert snapshot["usable_at"] is None
         assert "apiKey" not in snapshot["sanitized_target"]
         assert DUMMY_RUNTIME_VALUE not in snapshot["sanitized_target"]
 

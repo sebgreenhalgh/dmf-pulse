@@ -10,11 +10,11 @@ from typing import Literal, Protocol, Self
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from sqlalchemy import insert, update
+from sqlalchemy import insert
 
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.data_model.models import require_utc
-from dmf_pulse.data_model.tables import data_quality_issue, source_snapshot
+from dmf_pulse.data_model.tables import data_quality_issue
 from dmf_pulse.database.engine import session_factory
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.service import (
@@ -424,16 +424,6 @@ class DatabaseLiveOddsEvidenceStore:
                             message=("live odds source has bounded nonblocking drift"),
                         )
                     )
-                session.execute(
-                    update(source_snapshot)
-                    .where(source_snapshot.c.source_snapshot_id == handle.source_snapshot_id)
-                    .values(
-                        parsed_at=current_input.temporal.usable_at,
-                        usable_at=current_input.temporal.usable_at,
-                        validation_status="USABLE",
-                        schema_fingerprint=parsed.schema_fingerprint,
-                    )
-                )
         finally:
             engine.dispose()
 

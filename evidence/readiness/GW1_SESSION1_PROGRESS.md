@@ -18,7 +18,7 @@
 | 1.0 Remote state / progress bootstrap | COMPLETE | Immutable-parent ancestry and branch head verified. |
 | 1.1 Runtime odds credential foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
 | 1.2 Current official FPL input foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
-| 1.3 Live The Odds API input foundation | IN_PROGRESS | 1.3A is complete; the commit containing this record stages 1.3B provider-native current-input capability and focused validation. |
+| 1.3 Live The Odds API input foundation | IN_PROGRESS | 1.3A and 1.3B are COMPLETE; 1.3C is NOT_STARTED and is the exact next action. |
 | 1.4 FPL / odds identity integrity | INCOMPLETE | Not started. |
 | 1.5 Session-1 artifacts / operator workflow | INCOMPLETE | Not started. |
 
@@ -115,3 +115,39 @@
 - Workflow run — `32246327083`.
 - Focused validation — `FAIL`.
 - Validation/evidence commit SHA — `4ece4f1054e400720693ab223b4f8ddc0ac4cefc`.
+
+
+## Checkpoint 1.3B immutable-snapshot remediation — run 32247073642
+
+- Exact startup remote SHA — `7df6483a461e4cf2917c70b27aa52d75cac39822`.
+- Prior remediation run — `32246327083` (`FAIL`).
+- Remaining root cause — the live path attempted to update immutable `provenance.source_snapshot` fields after receipt; the append-only lifecycle already carries parsed/validated/mapped/promoted/quality/usable state.
+- Resolution — remove the prohibited snapshot mutation, retain the immutable receipt envelope, and assert final state through the ordered processing-event ledger and `source_snapshot_lifecycle` view.
+- Workflow run — `32247073642`.
+- Validation — `PASS`.
+- Focused provider/CLI tests — `64 passed`.
+- Inherited odds tests — `103 passed`.
+- Affected CLI tests — `29 passed`.
+- PostgreSQL integration tests — `1 passed`.
+- Ruff format/lint, strict mypy, wheel build, diff check and first-party secret scan — `PASS`.
+- Code/remediation commit SHA — pending the next durable commit.
+- `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
+- Raw provider payload retention remains forbidden; canonical FPL fixture/team mapping and fuzzy matching remain unperformed.
+- Public display, redistribution, backup and model training remain denied.
+- Checkpoint 1.3C and Checkpoint 1.4 were not started.
+- Exact next action after a clean durable pass — **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.
+
+### Current checkpoint matrix after the clean 1.3B pass
+
+| Checkpoint | Status |
+|---|---|
+| 1.0 | COMPLETE |
+| 1.1 | COMPLETE |
+| 1.2 | COMPLETE |
+| 1.3A | COMPLETE |
+| 1.3B | COMPLETE |
+| 1.3C | NOT_STARTED / INCOMPLETE |
+| 1.4 | INCOMPLETE / NOT_STARTED |
+| 1.5 | INCOMPLETE / NOT_STARTED |
+
+- Exact next action — **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.
