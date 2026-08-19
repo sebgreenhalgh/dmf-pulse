@@ -1,5 +1,40 @@
 # DMF Pulse execution plans
 
+## CHIP-014 Stage-14 chip optimisation
+
+- Ticket/stage: `CHIP-014`, DMFP-19 Stage 14; immutable original parent
+  `a8796d4edacea4c87ee6461d381f4df87e1ef39c`; implementation branch
+  `stage/A14/CHIP-014-chip-optimisation`.
+- Resume boundary: checkpoints 14.01 through 14.06 are preserved on the canonical remote at
+  `853142c84b909f1f22b6e31b657b21d990c331b1`; 14.07 service/replay/CLI/artifacts is absent and
+  is the first unfinished capability.
+- Scope: best-policy Free Hit comparison with exact permanent-state restoration; immediate,
+  delayed and bridge Wildcard policies; transparent finite-inventory scheduling with an exact
+  tiny-instance oracle and nonanticipativity; shared service/CLI, Stage-12 rolling replay and
+  immutable evidence.
+- Safety: current target-season rules are consumed from the compiled rules view; no duplicated
+  chip constants, RL/MCTS/black-box continuation, open-loop future execution, merge, tag or human
+  acceptance. A draft PR is permitted only after the independent review and all engineering gates.
+
+### CHIP-014 checkpoints
+
+- [x] Verify remote ancestry/progress and recover the exact Git workspace without restarting
+  completed checkpoints.
+- [x] Remediate the discovered generic vice-fallback compiler regression and publish it durably.
+- [x] Complete and publish 14.04 Free Hit.
+- [x] Complete and publish 14.05 Wildcard.
+- [x] Complete and publish 14.06 scheduler/continuation.
+- [x] Define tests/contracts for shared service models, cutoff-safe artifacts, sequential replay,
+  probability lineage and the `dmf chips` installed-wheel surface.
+- [x] Implement and publish 14.07 service/CLI/replay/evidence, then verify the remote product tree.
+- [x] Independently review the complete immutable-parent Stage 14 diff; remediate all P0/P1 and
+  material in-scope P2 findings with adversarial regressions.
+- [x] Run focused coverage, inherited regressions, one bounded repository suite, static/build/
+  wheel/installed-CLI and final assurance.
+- [x] Remove all recovery-only workflows/material and verify the reviewed branch lineage.
+- [x] Publish final evidence, verify local/remote equality, and open a draft
+  PR to `main` without merging or marking human acceptance.
+
 ## PRC-013 Stage-13 price prediction and ACT/WAIT
 
 - Ticket/stage: `PRC-013`, DMFP-19 Stage 13 / playbook B3; immutable parent
