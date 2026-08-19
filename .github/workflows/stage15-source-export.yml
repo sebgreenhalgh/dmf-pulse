@@ -1,4 +1,4 @@
-name: Stage 15 temporary source export
+name: Stage 15 temporary checkpoint transport
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - stage/A15/RANK-015-rank-aware-strategy
     paths:
       - .github/workflows/stage15-source-export.yml
+      - .stage15-transport/apply-request.json
   workflow_dispatch:
 
 permissions:
@@ -13,57 +14,77 @@ permissions:
   contents: write
 
 jobs:
-  export:
+  transport:
     runs-on: ubuntu-latest
     steps:
       - name: Check out branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - name: Install pinned uv
-        run: python -m pip install --disable-pip-version-check uv==0.11.26
-      - name: Build relocatable development environment
+
+      - name: Apply requested checkpoint archive
+        id: apply
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          rm -rf .venv
-          uv venv --relocatable .venv
-          uv sync --all-groups --frozen
-          tar -czf stage15-venv.tar.gz .venv
-      - name: Upload development environment
-        id: upload_venv
-        uses: actions/upload-artifact@v4
-        with:
-          name: stage15-development-environment
-          path: stage15-venv.tar.gz
-          if-no-files-found: error
-          retention-days: 1
-      - name: Build repository bundle
+          set -euo pipefail
+          if [[ ! -f .stage15-transport/apply-request.json ]]; then
+            echo "applied=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          blob_sha="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["blob_sha"])')"
+          commit_message="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["commit_message"])')"
+          gh api "repos/${GITHUB_REPOSITORY}/git/blobs/${blob_sha}" > /tmp/stage15-blob.json
+          python - <<'PY'
+          import base64
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('/tmp/stage15-blob.json').read_text(encoding='utf-8'))
+          Path('/tmp/stage15-checkpoint.tar.xz').write_bytes(
+              base64.b64decode(payload['content'].replace('\n', ''))
+          )
+          PY
+          tar -xJf /tmp/stage15-checkpoint.tar.xz -C .
+          rm -f .stage15-transport/apply-request.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "${commit_message}"
+          git push origin HEAD:stage/A15/RANK-015-rank-aware-strategy
+          echo "applied=true" >> "${GITHUB_OUTPUT}"
+
+      - name: Build exact repository bundle
         shell: bash
         run: git bundle create dmf-pulse.bundle --all
-      - name: Upload repository bundle
+
+      - name: Upload exact repository bundle
         id: upload_source
         uses: actions/upload-artifact@v4
         with:
-          name: stage15-source-bundle
+          name: stage15-source-bundle-${{ github.run_id }}
           path: dmf-pulse.bundle
           if-no-files-found: error
           retention-days: 1
+
       - name: Publish transport metadata
         shell: bash
         env:
           SOURCE_ARTIFACT_ID: ${{ steps.upload_source.outputs.artifact-id }}
-          VENV_ARTIFACT_ID: ${{ steps.upload_venv.outputs.artifact-id }}
+          APPLIED: ${{ steps.apply.outputs.applied }}
         run: |
+          set -euo pipefail
+          head_sha="$(git rev-parse HEAD)"
           mkdir -p .stage15-transport
-          printf '{"run_id":%s,"source_artifact_id":%s,"venv_artifact_id":%s,"head_sha":"%s"}\n' \
-            "${GITHUB_RUN_ID}" "${SOURCE_ARTIFACT_ID}" "${VENV_ARTIFACT_ID}" "${GITHUB_SHA}" \
+          printf '{"run_id":%s,"source_artifact_id":%s,"head_sha":"%s","applied":%s}\n' \
+            "${GITHUB_RUN_ID}" "${SOURCE_ARTIFACT_ID}" "${head_sha}" "${APPLIED}" \
             > .stage15-transport/source-export.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .stage15-transport/source-export.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
           git commit -m "chore(stage15): publish temporary source export metadata"
           git push origin HEAD:stage/A15/RANK-015-rank-aware-strategy
