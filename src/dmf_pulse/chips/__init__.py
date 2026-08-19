@@ -1,5 +1,12 @@
 """Stage-14 finite-inventory chip policy package."""
 
+from dmf_pulse.chips.artifacts import (
+    Stage14DecisionArtifact,
+    load_decision_artifact,
+    persist_decision_artifact,
+    seal_decision_artifact,
+    verify_decision_artifact,
+)
 from dmf_pulse.chips.bench_boost import evaluate_bench_boost
 from dmf_pulse.chips.captaincy import evaluate_triple_captain, optimise_captain_vice
 from dmf_pulse.chips.compiler import (
@@ -57,6 +64,14 @@ from dmf_pulse.chips.policy_models import (
     WildcardRouteRole,
     WildcardScenarioValue,
 )
+from dmf_pulse.chips.replay import (
+    ChipReplayDeadline,
+    ChipReplayRequest,
+    ChipReplayResult,
+    ChipReplayStep,
+    replay_chip_policy,
+    seal_chip_replay_request,
+)
 from dmf_pulse.chips.schedule_models import (
     ChipScheduleCandidate,
     ChipScheduleOpportunity,
@@ -85,7 +100,28 @@ from dmf_pulse.chips.schedule_models import (
 from dmf_pulse.chips.scheduler import (
     estimate_state_space,
     exact_small_schedule_oracle,
+)
+from dmf_pulse.chips.scheduler import (
+    optimise_chip_schedule as optimise_chip_schedule_core,
+)
+from dmf_pulse.chips.service import (
+    evaluate_chip_opportunities,
     optimise_chip_schedule,
+    seal_chip_service_request,
+    validate_compiled_chip_bundle,
+    validate_installed_chip_capability,
+)
+from dmf_pulse.chips.service_models import (
+    ChipCapabilityValidation,
+    ChipDecision,
+    ChipDecisionAction,
+    ChipDecisionLineage,
+    ChipDecisionSet,
+    ChipOpportunityEvaluation,
+    ChipProbabilityDiagnostic,
+    ChipRulesValidation,
+    ChipServiceRequest,
+    ScenarioWeight,
 )
 from dmf_pulse.chips.wildcard import (
     apply_wildcard_reset,
@@ -102,15 +138,28 @@ __all__ = [
     "BenchBoostRouteEvaluation",
     "BenchBoostScenarioValue",
     "CaptainViceDecision",
+    "ChipCapabilityValidation",
+    "ChipDecision",
+    "ChipDecisionAction",
+    "ChipDecisionLineage",
+    "ChipDecisionSet",
     "ChipDefinition",
     "ChipEffect",
     "ChipInventory",
     "ChipInventoryToken",
+    "ChipOpportunityEvaluation",
     "ChipPolicyCandidate",
+    "ChipProbabilityDiagnostic",
+    "ChipReplayDeadline",
+    "ChipReplayRequest",
+    "ChipReplayResult",
+    "ChipReplayStep",
+    "ChipRulesValidation",
     "ChipScheduleCandidate",
     "ChipScheduleOpportunity",
     "ChipSchedulePolicy",
     "ChipScheduleRequest",
+    "ChipServiceRequest",
     "CompiledChipBundle",
     "CompiledChipDefinition",
     "EffectCapability",
@@ -124,6 +173,7 @@ __all__ = [
     "PolicyScenarioScore",
     "ProbabilityNowOptimalDiagnostic",
     "RootScheduleAction",
+    "ScenarioWeight",
     "ScheduleObjectiveConfig",
     "ScheduleObjectiveMode",
     "ScheduleScenarioIdentity",
@@ -132,6 +182,7 @@ __all__ = [
     "ScheduleSearchDiagnostics",
     "ScheduleSearchMethod",
     "ScheduledActivation",
+    "Stage14DecisionArtifact",
     "TerminalTokenValue",
     "TokenDisposition",
     "TokenDispositionKind",
@@ -158,17 +209,28 @@ __all__ = [
     "definition_from_rules_runtime",
     "estimate_state_space",
     "evaluate_bench_boost",
+    "evaluate_chip_opportunities",
     "evaluate_free_hit",
     "evaluate_triple_captain",
     "evaluate_wildcard",
     "exact_small_schedule_oracle",
+    "load_decision_artifact",
     "make_policy_candidate",
     "make_wildcard_route_candidate",
     "optimise_captain_vice",
     "optimise_chip_schedule",
+    "optimise_chip_schedule_core",
+    "persist_decision_artifact",
     "policy_candidate_from_stage11",
+    "replay_chip_policy",
     "scenario_set_hash",
+    "seal_chip_replay_request",
+    "seal_chip_service_request",
+    "seal_decision_artifact",
     "seal_opportunity",
     "seal_schedule_request",
     "select_token",
+    "validate_compiled_chip_bundle",
+    "validate_installed_chip_capability",
+    "verify_decision_artifact",
 ]

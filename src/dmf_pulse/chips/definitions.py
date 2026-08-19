@@ -12,7 +12,16 @@ import json
 from enum import StrEnum
 from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictBool,
+    StrictInt,
+    StrictStr,
+    field_serializer,
+    model_validator,
+)
 
 PositiveInt = Annotated[StrictInt, Field(gt=0)]
 NonNegativeInt = Annotated[StrictInt, Field(ge=0)]
@@ -147,6 +156,12 @@ class CompiledChipDefinition(FrozenModel):
         if EffectCapability.CONFLICT_OCCUPANCY not in self.capabilities:
             raise ValueError("every compiled chip must expose conflict occupancy")
         return self
+
+    @field_serializer("capabilities")
+    def serialize_capabilities(self, capabilities: frozenset[EffectCapability]) -> tuple[str, ...]:
+        """Canonicalise set-valued capabilities for stable semantic hashes."""
+
+        return tuple(sorted(item.value for item in capabilities))
 
     @property
     def chip_key(self) -> str:

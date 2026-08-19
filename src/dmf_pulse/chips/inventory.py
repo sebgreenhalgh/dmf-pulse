@@ -73,9 +73,10 @@ class ChipInventoryToken(FrozenModel):
             raise ValueError("token expiry precedes activation end")
         if self.status == TokenStatus.PENDING_CANCELLABLE and self.selected_at_gameweek is None:
             raise ValueError("pending token requires selection time")
-        if self.status == TokenStatus.ACTIVE:
-            if self.active_from_gameweek is None or self.active_until_gameweek is None:
-                raise ValueError("active token requires an occupied interval")
+        if self.status == TokenStatus.ACTIVE and (
+            self.active_from_gameweek is None or self.active_until_gameweek is None
+        ):
+            raise ValueError("active token requires an occupied interval")
         if self.status == TokenStatus.USED and self.used_at_gameweek is None:
             raise ValueError("used token requires completion time")
         return self
@@ -464,9 +465,7 @@ def advance_inventory(
                     )
             elif (
                 to_gameweek >= token.acquired_gameweek
-                and token.activation_start_gameweek
-                <= to_gameweek
-                <= token.activation_end_gameweek
+                and token.activation_start_gameweek <= to_gameweek <= token.activation_end_gameweek
             ):
                 status = TokenStatus.AVAILABLE
             else:

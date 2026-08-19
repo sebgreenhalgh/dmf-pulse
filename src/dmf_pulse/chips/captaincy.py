@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import replace
 from math import fsum, isfinite
-from typing import Any, Protocol, TypeVar, cast
+from typing import Any, Protocol, cast
 
 from dmf_pulse.chips.definitions import (
     ActivationStatus,
@@ -37,8 +37,9 @@ class ScoreLike(Protocol):
     captain_resolution: Any
 
 
-ScenarioT = TypeVar("ScenarioT", bound=ScenarioLike)
-Evaluator = Callable[[ScenarioT, Any, dict[str, Any], Any], tuple[ScoreLike, Any]]
+type Evaluator[ScenarioT: ScenarioLike] = Callable[
+    [ScenarioT, Any, dict[str, Any], Any], tuple[ScoreLike, Any]
+]
 
 
 def _copy_with(value: Any, **updates: object) -> Any:
@@ -60,7 +61,9 @@ def _resolution_token(value: Any) -> str:
     return str(raw)
 
 
-def _normalised_scenarios(scenarios: Iterable[ScenarioT]) -> tuple[ScenarioT, ...]:
+def _normalised_scenarios[ScenarioT: ScenarioLike](
+    scenarios: Iterable[ScenarioT],
+) -> tuple[ScenarioT, ...]:
     items = tuple(scenarios)
     if not items:
         raise ChipError("CHIP_SCENARIOS_EMPTY", "captain evaluation requires common scenarios")
@@ -131,7 +134,7 @@ def _assert_rules_lineage(rules: Any, bundle: CompiledChipBundle) -> None:
         )
 
 
-def _scenario_hash(common: tuple[ScenarioT, ...]) -> str:
+def _scenario_hash[ScenarioT: ScenarioLike](common: tuple[ScenarioT, ...]) -> str:
     payload: list[dict[str, object]] = []
     for item in common:
         scenario: dict[str, object] = {
@@ -154,7 +157,7 @@ def _scenario_hash(common: tuple[ScenarioT, ...]) -> str:
     return semantic_sha256(payload)
 
 
-def optimise_captain_vice(
+def optimise_captain_vice[ScenarioT: ScenarioLike](
     *,
     scenarios: Iterable[ScenarioT],
     base_tactic: Any,
@@ -205,16 +208,19 @@ def optimise_captain_vice(
     score_scenario = evaluator or _default_evaluator()
 
     best_key: tuple[float, str, str] | None = None
-    best: tuple[
-        str,
-        str,
-        tuple[CaptainScenarioScore, ...],
-        float,
-        float,
-        float,
-        float,
-        float,
-    ] | None = None
+    best: (
+        tuple[
+            str,
+            str,
+            tuple[CaptainScenarioScore, ...],
+            float,
+            float,
+            float,
+            float,
+            float,
+        ]
+        | None
+    ) = None
     evaluated_pairs = 0
     for captain in candidates:
         for vice in candidates:
@@ -293,7 +299,7 @@ def optimise_captain_vice(
     (
         captain,
         vice,
-        scores,
+        selected_scores,
         expected,
         expected_raw,
         vice_probability,
@@ -310,7 +316,7 @@ def optimise_captain_vice(
         "vice_fallback_incremental_points": vice_value,
         "captain_and_vice_failure_probability": neither_probability,
         "evaluated_pairs": evaluated_pairs,
-        "scenario_scores": [item.model_dump(mode="json") for item in scores],
+        "scenario_scores": [item.model_dump(mode="json") for item in selected_scores],
     }
     return CaptainViceDecision(
         captain=captain,
@@ -322,7 +328,7 @@ def optimise_captain_vice(
         vice_fallback_incremental_points=vice_value,
         captain_and_vice_failure_probability=neither_probability,
         evaluated_pairs=evaluated_pairs,
-        scenario_scores=tuple(scores),
+        scenario_scores=selected_scores,
         decision_hash=semantic_sha256(payload),
     )
 
@@ -342,7 +348,7 @@ def _tc_definition(compiled: object) -> CompiledChipDefinition:
     )
 
 
-def evaluate_triple_captain(
+def evaluate_triple_captain[ScenarioT: ScenarioLike](
     *,
     scenarios: Iterable[ScenarioT],
     base_tactic: Any,
@@ -376,8 +382,8 @@ def evaluate_triple_captain(
             "compiled Triple Captain must expose exactly one captain multiplier effect",
         )
     multiplier_value = effects[0].parameters.get("multiplier")
-    if (
-        not isinstance(multiplier_value, int) or isinstance(multiplier_value, bool)
+    if not isinstance(multiplier_value, int) or isinstance(
+        multiplier_value, bool
     ):  # pragma: no cover - known invalid semantics are blocked by the compiler
         raise ChipError(
             "CHIP_TC_MULTIPLIER_INVALID",

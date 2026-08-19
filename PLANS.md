@@ -5,27 +5,34 @@
 - Ticket/stage: `CHIP-014`, DMFP-19 Stage 14; immutable original parent
   `a8796d4edacea4c87ee6461d381f4df87e1ef39c`; implementation branch
   `stage/A14/CHIP-014-chip-optimisation`.
-- Resume boundary: checkpoints 14.01 generic inventory, 14.02 captain/vice/TC and
-  14.03 Bench Boost are preserved; 14.04 Free Hit is locally complete and publication-pending; 14.05 Wildcard is locally complete and publication-pending; 14.06 scheduler/continuation is the first unfinished capability.
+- Resume boundary: checkpoints 14.01 through 14.06 are preserved on the canonical remote at
+  `853142c84b909f1f22b6e31b657b21d990c331b1`; 14.07 service/replay/CLI/artifacts is absent and
+  is the first unfinished capability.
 - Scope: best-policy Free Hit comparison with exact permanent-state restoration; immediate,
   delayed and bridge Wildcard policies; transparent finite-inventory scheduling with an exact
   tiny-instance oracle and nonanticipativity; shared service/CLI, Stage-12 rolling replay and
   immutable evidence.
 - Safety: current target-season rules are consumed from the compiled rules view; no duplicated
-  chip constants, RL/MCTS/black-box continuation, open-loop future execution, PR, merge, tag or
-  human acceptance.
+  chip constants, RL/MCTS/black-box continuation, open-loop future execution, merge, tag or human
+  acceptance. A draft PR is permitted only after the independent review and all engineering gates.
 
 ### CHIP-014 checkpoints
 
 - [x] Verify remote ancestry/progress and recover the exact Git workspace without restarting
   completed checkpoints.
 - [x] Remediate the discovered generic vice-fallback compiler regression and publish it durably.
-- [x] Complete 14.04 Free Hit locally; remote publication remains pending transport recovery.
-- [x] Complete 14.05 Wildcard locally; remote publication remains pending transport recovery.
-- [ ] Complete and publish 14.06 scheduler/continuation.
-- [ ] Complete and publish 14.07 service/CLI/replay/evidence.
-- [ ] Run focused coverage, inherited regressions, static/build/wheel/installed-CLI and final
-  assurance; remove recovery-only workflow/material and verify local/remote equality.
+- [x] Complete and publish 14.04 Free Hit.
+- [x] Complete and publish 14.05 Wildcard.
+- [x] Complete and publish 14.06 scheduler/continuation.
+- [ ] Define tests/contracts for shared service models, cutoff-safe artifacts, sequential replay,
+  probability lineage and the `dmf chips` installed-wheel surface.
+- [ ] Implement and publish 14.07 service/CLI/replay/evidence, then verify the remote product tree.
+- [ ] Independently review the complete immutable-parent Stage 14 diff; remediate all P0/P1 and
+  material in-scope P2 findings with adversarial regressions.
+- [ ] Run focused coverage, inherited regressions, one bounded repository suite, static/build/
+  wheel/installed-CLI and final assurance.
+- [ ] Remove all recovery-only workflows/material, verify local/remote equality, and open a draft
+  PR to `main` without merging or marking human acceptance.
 
 ## PRC-013 Stage-13 price prediction and ACT/WAIT
 

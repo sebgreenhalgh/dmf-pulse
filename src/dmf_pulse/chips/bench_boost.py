@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from math import fsum, isfinite
-from typing import Any, Protocol, TypeVar, cast
+from typing import Any, Protocol, cast
 
 from dmf_pulse.chips.definitions import (
     ActivationStatus,
@@ -36,8 +36,9 @@ class ScoreLike(Protocol):
     counted_player_ids: Sequence[str]
 
 
-ScenarioT = TypeVar("ScenarioT", bound=ScenarioLike)
-Evaluator = Callable[[ScenarioT, Any, dict[str, Any], Any], tuple[ScoreLike, Any]]
+type Evaluator[ScenarioT: ScenarioLike] = Callable[
+    [ScenarioT, Any, dict[str, Any], Any], tuple[ScoreLike, Any]
+]
 
 
 def _default_evaluator() -> Evaluator[Any]:
@@ -46,7 +47,9 @@ def _default_evaluator() -> Evaluator[Any]:
     return cast(Evaluator[Any], evaluate_scenario)
 
 
-def _normalised_scenarios(scenarios: Iterable[ScenarioT]) -> tuple[ScenarioT, ...]:
+def _normalised_scenarios[ScenarioT: ScenarioLike](
+    scenarios: Iterable[ScenarioT],
+) -> tuple[ScenarioT, ...]:
     items = tuple(scenarios)
     if not items:
         raise ChipError("CHIP_SCENARIOS_EMPTY", "Bench Boost evaluation requires scenarios")
@@ -68,7 +71,9 @@ def _normalised_scenarios(scenarios: Iterable[ScenarioT]) -> tuple[ScenarioT, ..
     return tuple(sorted(items, key=lambda item: (item.scenario_id, item.outcome_draw_id)))
 
 
-def _scenario_set_hash(scenarios: tuple[ScenarioT, ...]) -> str:
+def _scenario_set_hash[ScenarioT: ScenarioLike](
+    scenarios: tuple[ScenarioT, ...],
+) -> str:
     payload: list[dict[str, object]] = []
     for scenario in scenarios:
         item: dict[str, object] = {
@@ -96,10 +101,14 @@ def _bench_ids(tactic: Any) -> tuple[str, str, str, str]:
     if not isinstance(goalkeeper, str) or not goalkeeper:
         raise ChipError("CHIP_BB_TACTIC_INVALID", "Bench Boost tactic requires a bench goalkeeper")
     if not isinstance(order, tuple) or len(order) != 3:
-        raise ChipError("CHIP_BB_TACTIC_INVALID", "Bench Boost tactic requires three outfield bench slots")
+        raise ChipError(
+            "CHIP_BB_TACTIC_INVALID", "Bench Boost tactic requires three outfield bench slots"
+        )
     bench = (goalkeeper, *(str(item) for item in order))
     if any(not player_id for player_id in bench) or len(bench) != len(set(bench)):
-        raise ChipError("CHIP_BB_TACTIC_INVALID", "Bench Boost bench IDs must be non-empty and unique")
+        raise ChipError(
+            "CHIP_BB_TACTIC_INVALID", "Bench Boost bench IDs must be non-empty and unique"
+        )
     return cast(tuple[str, str, str, str], bench)
 
 
@@ -162,7 +171,7 @@ def _bb_definition(bundle: CompiledChipBundle) -> CompiledChipDefinition:
     return definition
 
 
-def _evaluate_candidate(
+def _evaluate_candidate[ScenarioT: ScenarioLike](
     *,
     scenarios: tuple[ScenarioT, ...],
     tactic: Any,
@@ -193,14 +202,18 @@ def _evaluate_candidate(
             raise ChipError("CHIP_BB_COUNTED_INVALID", "normal counted-player IDs must be unique")
         appeared = scenario.player_appeared
         bench_appeared = tuple(player_id for player_id in bench if appeared.get(player_id, False))
-        bench_points = float(fsum(float(scenario.player_points[player_id]) for player_id in bench_appeared))
+        bench_points = float(
+            fsum(float(scenario.player_points[player_id]) for player_id in bench_appeared)
+        )
         overlap_players = tuple(player_id for player_id in bench_appeared if player_id in counted)
         overlap_points = float(
             fsum(float(scenario.player_points[player_id]) for player_id in overlap_players)
         )
         incremental = bench_points - overlap_points
         bb_points = normal_points + incremental
-        if not all(isfinite(value) for value in (bench_points, overlap_points, incremental, bb_points)):
+        if not all(
+            isfinite(value) for value in (bench_points, overlap_points, incremental, bb_points)
+        ):
             raise ChipError("CHIP_BB_SCORE_INVALID", "Bench Boost score is not finite")
         weight = float(scenario.weight)
         weighted_normal.append(weight * normal_points)
@@ -222,7 +235,7 @@ def _evaluate_candidate(
     return signature, tuple(values), fsum(weighted_normal), fsum(weighted_bb)
 
 
-def _evaluate_route(
+def _evaluate_route[ScenarioT: ScenarioLike](
     *,
     plan_id: str,
     scenarios: tuple[ScenarioT, ...],
@@ -234,7 +247,9 @@ def _evaluate_route(
 ) -> BenchBoostRouteEvaluation:
     candidates = tuple(tactical_candidates)
     if not candidates:
-        raise ChipError("CHIP_BB_CANDIDATES_EMPTY", "Bench Boost route requires tactical candidates")
+        raise ChipError(
+            "CHIP_BB_CANDIDATES_EMPTY", "Bench Boost route requires tactical candidates"
+        )
     evaluated = tuple(
         _evaluate_candidate(
             scenarios=scenarios,
@@ -247,12 +262,12 @@ def _evaluate_route(
     )
     signatures = tuple(item[0] for item in evaluated)
     if len(signatures) != len(set(signatures)):
-        raise ChipError("CHIP_BB_CANDIDATES_DUPLICATE", "Bench Boost tactic candidates must be unique")
+        raise ChipError(
+            "CHIP_BB_CANDIDATES_DUPLICATE", "Bench Boost tactic candidates must be unique"
+        )
     normal = min(evaluated, key=lambda item: (-item[2], item[0]))
     boosted = min(evaluated, key=lambda item: (-item[3], item[0]))
-    normal_values = {
-        (item.scenario_id, item.outcome_draw_id): item for item in normal[1]
-    }
+    normal_values = {(item.scenario_id, item.outcome_draw_id): item for item in normal[1]}
     comparative: list[BenchBoostScenarioValue] = []
     for item in boosted[1]:
         baseline = normal_values[(item.scenario_id, item.outcome_draw_id)]
@@ -296,7 +311,7 @@ def _evaluate_route(
     )
 
 
-def evaluate_bench_boost(
+def evaluate_bench_boost[ScenarioT: ScenarioLike](
     *,
     scenarios: Iterable[ScenarioT],
     tactical_candidates: Sequence[Any],
