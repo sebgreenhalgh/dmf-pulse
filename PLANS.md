@@ -10,7 +10,7 @@
 - [ ] 1.4B exact target-GW fixture resolution, orientation, kickoff, one-to-one
   coverage, diagnostics and deterministic mapped output.
 - [ ] 1.4C bounded acceptance evidence and exact Checkpoint 1.5 handoff.
-- Latest focused validation — `1.4A` `FAIL`, run `32280118079`, commit `99f3e93ca769ca36639774af88135c734d4312c1`.
+- Latest focused validation — `1.4A` `FAIL`, run `32285050335`, commit `3bf950c67b3c3a6d3da48e18b65718281f643461`.
 - Exclusions remain: probabilities, projections, optimisation, initial squad,
   captaincy, prospective logging, UI, Checkpoint 1.5, PR, merge and activation.
 <!-- GW1-1.4-PLAN-END -->
