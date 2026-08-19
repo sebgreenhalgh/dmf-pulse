@@ -1,4 +1,4 @@
-name: Stage 15 temporary source export
+name: Stage 15 temporary checkpoint transport
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - stage/A15/RANK-015-rank-aware-strategy
     paths:
       - .github/workflows/stage15-source-export.yml
+      - .stage15-transport/apply-request.json
       - .stage15-transport/export-request.json
   workflow_dispatch:
 
@@ -15,10 +16,11 @@ permissions:
   issues: write
 
 jobs:
-  export:
+  transport:
     if: >-
       github.event_name != 'push' ||
-      github.event.head_commit.message != 'chore(stage15): consume export request'
+      (!contains(github.event.head_commit.message, '[stage15-apply]') &&
+       github.event.head_commit.message != 'chore(stage15): consume export request')
     runs-on: ubuntu-latest
     steps:
       - name: Check out branch
@@ -26,7 +28,40 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Consume transport request and legacy metadata
+      - name: Apply requested checkpoint archive
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ ! -f .stage15-transport/apply-request.json ]]; then
+            exit 0
+          fi
+          blob_sha="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["blob_sha"])')"
+          archive_sha256="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["archive_sha256"])')"
+          commit_message="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["commit_message"])')"
+          gh api "repos/${GITHUB_REPOSITORY}/git/blobs/${blob_sha}" > /tmp/stage15-blob.json
+          python - <<'PY'
+          import base64
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('/tmp/stage15-blob.json').read_text(encoding='utf-8'))
+          Path('/tmp/stage15-checkpoint.tar.xz').write_bytes(
+              base64.b64decode(payload['content'].replace('\n', ''))
+          )
+          PY
+          printf '%s  %s\n' "${archive_sha256}" /tmp/stage15-checkpoint.tar.xz | sha256sum -c -
+          tar -xJf /tmp/stage15-checkpoint.tar.xz -C .
+          rm -f .stage15-transport/apply-request.json
+          rm -f .stage15-transport/source-export.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "${commit_message} [stage15-apply]"
+          git push origin HEAD:stage/A15/RANK-015-rank-aware-strategy
+
+      - name: Consume export request and legacy metadata
         shell: bash
         run: |
           set -euo pipefail
