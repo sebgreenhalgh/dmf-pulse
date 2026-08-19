@@ -27,7 +27,10 @@ from dmf_pulse.ingestion.odds.current import (
     build_current_odds_input,
 )
 from dmf_pulse.ingestion.odds.identity import (
+    CurrentFixtureCoverage,
     FplOddsIdentityMap,
+    ResolvedCurrentFixture,
+    _fpl_odds_identity_map_sha256,
     bind_current_fixture_resolution_request,
     bind_current_team_resolution_request,
     current_odds_identity_semantic_sha256,
@@ -129,6 +132,8 @@ def _identity(
     entity_type: str,
     namespace: str,
     external_id: int,
+    *,
+    season_code: str = "2026/27",
 ) -> CurrentFplIdentity:
     material = {
         "entity_type": entity_type,
@@ -136,10 +141,10 @@ def _identity(
         "identifier_namespace": namespace,
         "provider_key": "official_fpl",
         "provider_product": "fantasy_premierleague",
-        "season_code": "2026/27",
+        "season_code": season_code,
     }
     return CurrentFplIdentity(
-        season_code="2026/27",
+        season_code=season_code,
         entity_type=entity_type,
         identifier_namespace=namespace,
         external_id_text=str(external_id),
@@ -308,6 +313,21 @@ def _default_context(
     binding = _fixture_binding(fpl_input, odds_input.events[0])
     fixture_plan = _fixture_plan(team_plan, (binding,))
     return fpl_input, odds_input, team_plan, fixture_plan
+
+
+def _with_rehashed_fixture_mapping(
+    result: FplOddsIdentityMap,
+    fixture: ResolvedCurrentFixture,
+) -> FplOddsIdentityMap:
+    return _rehash_identity_map(result, fixture_mappings=(fixture,))
+
+
+def _rehash_identity_map(
+    result: FplOddsIdentityMap,
+    **updates: object,
+) -> FplOddsIdentityMap:
+    tampered = result.model_copy(update=updates)
+    return tampered.model_copy(update={"semantic_sha256": _fpl_odds_identity_map_sha256(tampered)})
 
 
 def test_complete_exact_fixture_mapping_is_usable_transient_and_distinct(
@@ -811,3 +831,206 @@ def test_stale_explicit_binding_fixture_identity_fails_closed(
     assert raised.value.code == "MAPPING_CONFLICT"
     assert raised.value.details["mapping_outcome"] == "UNKNOWN"
     assert raised.value.details["reason"] == "EXPLICIT_BINDING_STALE_AGAINST_FPL"
+
+
+def test_resolved_fixture_rejects_nested_team_identity_mismatch(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    fpl_input, odds_input, team_plan, fixture_plan = _default_context(repository_root, tmp_path)
+    mapped = _resolve(fpl_input, odds_input, team_plan, fixture_plan).fixture("todapi-event-001")
+    values = mapped.model_dump(mode="python")
+    values["official_home_team_id"] = 999
+
+    with pytest.raises(ValidationError, match="home team identity"):
+        ResolvedCurrentFixture.model_validate(values)
+
+
+def test_resolved_fixture_rejects_wrong_season_gameweek_identity(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    fpl_input, odds_input, team_plan, fixture_plan = _default_context(repository_root, tmp_path)
+    mapped = _resolve(fpl_input, odds_input, team_plan, fixture_plan).fixture("todapi-event-001")
+    values = mapped.model_dump(mode="python")
+    values["official_fpl_gameweek_identity"] = _identity(
+        "GAMEWEEK",
+        "fpl.event.id",
+        1,
+        season_code="2025/26",
+    )
+
+    with pytest.raises(ValidationError, match="gameweek identity"):
+        ResolvedCurrentFixture.model_validate(values)
+
+
+def test_resolved_fixture_rejects_remaining_internal_inconsistencies(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    fpl_input, odds_input, team_plan, fixture_plan = _default_context(repository_root, tmp_path)
+    mapped = _resolve(fpl_input, odds_input, team_plan, fixture_plan).fixture("todapi-event-001")
+    early = mapped.official_deadline_at - timedelta(seconds=1)
+    cases = (
+        ({"official_fpl_fixture_id": 999}, "fixture identity"),
+        ({"official_away_team_id": 999}, "away team identity"),
+        (
+            {
+                "official_away_team_id": mapped.official_home_team_id,
+                "official_away_team_identity": mapped.official_home_team_identity,
+            },
+            "home and away teams",
+        ),
+        ({"provider_away_team": mapped.provider_home_team}, "provider home and away"),
+        (
+            {"official_fpl_kickoff_at": mapped.official_fpl_kickoff_at + timedelta(seconds=1)},
+            "kickoff must match",
+        ),
+        (
+            {"provider_commence_time": early, "official_fpl_kickoff_at": early},
+            "starts before",
+        ),
+    )
+
+    for updates, message in cases:
+        values = mapped.model_dump(mode="python")
+        values.update(updates)
+        with pytest.raises(ValidationError, match=message):
+            ResolvedCurrentFixture.model_validate(values)
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement", "message"),
+    (
+        ("provider_home_team", "Unreviewed Alias", "team mapping"),
+        ("official_home_team_name", "Tampered Name", "team mapping"),
+        (
+            "binding_approved_at",
+            DECIDED + timedelta(seconds=1),
+            "binding approval",
+        ),
+        (
+            "official_deadline_at",
+            CUTOFF - timedelta(seconds=1),
+            "official deadline",
+        ),
+    ),
+)
+def test_rehashed_identity_map_rejects_nested_context_tampering(
+    repository_root: Path,
+    tmp_path: Path,
+    field: str,
+    replacement: object,
+    message: str,
+) -> None:
+    fpl_input, odds_input, team_plan, fixture_plan = _default_context(repository_root, tmp_path)
+    result = _resolve(fpl_input, odds_input, team_plan, fixture_plan)
+    fixture = result.fixture("todapi-event-001").model_copy(update={field: replacement})
+    tampered = _with_rehashed_fixture_mapping(result, fixture)
+
+    with pytest.raises(ValidationError, match=message):
+        FplOddsIdentityMap.model_validate(tampered.model_dump(mode="python"))
+
+
+def test_rehashed_identity_map_rejects_remaining_map_inconsistencies(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    fpl_input, odds_input, team_plan, fixture_plan = _default_context(repository_root, tmp_path)
+    result = _resolve(fpl_input, odds_input, team_plan, fixture_plan)
+    home, away = result.team_mappings
+    wrong_home_identity = _identity(
+        "TEAM",
+        "fpl.team.id",
+        home.official_fpl_team_id,
+        season_code="2025/26",
+    )
+    invalid_team = home.model_copy(update={"official_fpl_team_identity": wrong_home_identity})
+    late_team = home.model_copy(update={"mapping_approved_at": DECIDED + timedelta(seconds=1)})
+    unused_team = home.model_copy(update={"provider_team_text": "Unused Reviewed Alias"})
+    coverage = CurrentFixtureCoverage(
+        provider_event_count=2,
+        target_fpl_fixture_count=2,
+        mapped_event_count=2,
+    )
+    mapped = result.fixture_mappings[0]
+    wrong_season_fixture = mapped.model_copy(
+        update={
+            "official_fpl_fixture_identity": _identity(
+                "FIXTURE",
+                "fpl.fixture.id",
+                mapped.official_fpl_fixture_id,
+                season_code="2025/26",
+            ),
+            "official_fpl_gameweek_identity": _identity(
+                "GAMEWEEK",
+                "fpl.event.id",
+                result.target_gameweek,
+                season_code="2025/26",
+            ),
+            "official_home_team_identity": _identity(
+                "TEAM",
+                "fpl.team.id",
+                mapped.official_home_team_id,
+                season_code="2025/26",
+            ),
+            "official_away_team_identity": _identity(
+                "TEAM",
+                "fpl.team.id",
+                mapped.official_away_team_id,
+                season_code="2025/26",
+            ),
+        }
+    )
+    cases = (
+        (
+            _rehash_identity_map(result, team_mappings=(home, away, home)),
+            "team mapping is duplicated",
+        ),
+        (
+            _rehash_identity_map(
+                result,
+                information_cutoff=result.information_cutoff - timedelta(seconds=1),
+            ),
+            "deadline and information cutoff",
+        ),
+        (
+            _rehash_identity_map(
+                result,
+                mapping_decided_at=result.information_cutoff + timedelta(seconds=1),
+            ),
+            "decision is after",
+        ),
+        (_rehash_identity_map(result, coverage=coverage), "coverage counts"),
+        (
+            _rehash_identity_map(result, team_mappings=(invalid_team, away)),
+            "team identity contradicts",
+        ),
+        (
+            _rehash_identity_map(result, team_mappings=(late_team, away)),
+            "team mapping approval",
+        ),
+        (
+            _with_rehashed_fixture_mapping(result, wrong_season_fixture),
+            "target season or Gameweek",
+        ),
+        (
+            _rehash_identity_map(result, team_mappings=(home, away, unused_team)),
+            "unused or missing",
+        ),
+        (
+            _rehash_identity_map(result, source_lineage_sha256="f" * 64),
+            "source-lineage hash",
+        ),
+    )
+
+    for tampered, message in cases:
+        with pytest.raises(ValidationError, match=message):
+            FplOddsIdentityMap.model_validate(tampered.model_dump(mode="python"))
+
+    invalid_semantic = result.model_copy(update={"semantic_sha256": "f" * 64})
+    with pytest.raises(ValidationError, match="semantic hash"):
+        FplOddsIdentityMap.model_validate(invalid_semantic.model_dump(mode="python"))
+
+    with pytest.raises(IngestionError, match="lacks one resolved"):
+        result.fixture("missing-provider-event")

@@ -531,6 +531,7 @@ class ResolvedCurrentFixture(_FrozenIdentityModel):
         gameweek_identity = self.official_fpl_gameweek_identity
         if (
             fixture_identity.provider_key != "official_fpl"
+            or fixture_identity.provider_product != "fantasy_premierleague"
             or fixture_identity.entity_type != "FIXTURE"
             or fixture_identity.identifier_namespace != "fpl.fixture.id"
             or fixture_identity.external_id_text != str(self.official_fpl_fixture_id)
@@ -538,12 +539,36 @@ class ResolvedCurrentFixture(_FrozenIdentityModel):
             raise ValueError("resolved official FPL fixture identity is inconsistent")
         if (
             gameweek_identity.provider_key != "official_fpl"
+            or gameweek_identity.provider_product != "fantasy_premierleague"
             or gameweek_identity.entity_type != "GAMEWEEK"
             or gameweek_identity.identifier_namespace != "fpl.event.id"
+            or gameweek_identity.season_code != fixture_identity.season_code
         ):
             raise ValueError("resolved official FPL gameweek identity is inconsistent")
+        home_identity = self.official_home_team_identity
+        if (
+            home_identity.provider_key != "official_fpl"
+            or home_identity.provider_product != "fantasy_premierleague"
+            or home_identity.entity_type != "TEAM"
+            or home_identity.identifier_namespace != "fpl.team.id"
+            or home_identity.external_id_text != str(self.official_home_team_id)
+            or home_identity.season_code != fixture_identity.season_code
+        ):
+            raise ValueError("resolved official FPL home team identity is inconsistent")
+        away_identity = self.official_away_team_identity
+        if (
+            away_identity.provider_key != "official_fpl"
+            or away_identity.provider_product != "fantasy_premierleague"
+            or away_identity.entity_type != "TEAM"
+            or away_identity.identifier_namespace != "fpl.team.id"
+            or away_identity.external_id_text != str(self.official_away_team_id)
+            or away_identity.season_code != fixture_identity.season_code
+        ):
+            raise ValueError("resolved official FPL away team identity is inconsistent")
         if self.official_home_team_id == self.official_away_team_id:
             raise ValueError("resolved fixture home and away teams must differ")
+        if self.provider_home_team == self.provider_away_team:
+            raise ValueError("resolved provider home and away teams must differ")
         if self.provider_commence_time != self.official_fpl_kickoff_at:
             raise ValueError("provider commence time and FPL kickoff must match exactly")
         if self.provider_commence_time < self.official_deadline_at:
@@ -628,23 +653,66 @@ class FplOddsIdentityMap(_FrozenIdentityModel):
     def validate_final_identity_map(self) -> FplOddsIdentityMap:
         provider_ids = [mapping.provider_event_id for mapping in self.fixture_mappings]
         fixture_ids = [mapping.official_fpl_fixture_id for mapping in self.fixture_mappings]
+        team_by_provider = {mapping.provider_team_text: mapping for mapping in self.team_mappings}
+        if len(team_by_provider) != len(self.team_mappings):
+            raise ValueError("resolved provider team mapping is duplicated")
         if len(provider_ids) != len(set(provider_ids)):
             raise ValueError("mapped provider event identity is duplicated")
         if len(fixture_ids) != len(set(fixture_ids)):
             raise ValueError("mapped official FPL fixture identity is duplicated")
         if self.official_deadline_at != self.information_cutoff:
             raise ValueError("official deadline and information cutoff must be identical")
+        if self.mapping_decided_at > self.information_cutoff:
+            raise ValueError("mapping decision is after the information cutoff")
         if (
             self.coverage.provider_event_count != len(self.fixture_mappings)
             or self.coverage.target_fpl_fixture_count != len(self.fixture_mappings)
             or self.coverage.mapped_event_count != len(self.fixture_mappings)
         ):
             raise ValueError("fixture coverage counts contradict mapped output")
-        if any(
-            mapping.official_fpl_gameweek_identity.external_id_text != str(self.target_gameweek)
-            for mapping in self.fixture_mappings
-        ):
-            raise ValueError("mapped fixture is outside the target Gameweek")
+        for team_mapping in self.team_mappings:
+            identity = team_mapping.official_fpl_team_identity
+            if (
+                identity.provider_key != "official_fpl"
+                or identity.provider_product != "fantasy_premierleague"
+                or identity.entity_type != "TEAM"
+                or identity.identifier_namespace != "fpl.team.id"
+                or identity.external_id_text != str(team_mapping.official_fpl_team_id)
+                or identity.season_code != self.season_code
+            ):
+                raise ValueError("resolved team identity contradicts map context")
+            if team_mapping.mapping_approved_at > self.mapping_decided_at:
+                raise ValueError("team mapping approval is after mapping decision")
+        used_provider_teams: set[str] = set()
+        for mapping in self.fixture_mappings:
+            fixture_identity = mapping.official_fpl_fixture_identity
+            gameweek_identity = mapping.official_fpl_gameweek_identity
+            if (
+                fixture_identity.season_code != self.season_code
+                or gameweek_identity.season_code != self.season_code
+                or gameweek_identity.external_id_text != str(self.target_gameweek)
+            ):
+                raise ValueError("mapped fixture is outside the target season or Gameweek")
+            if mapping.official_deadline_at != self.official_deadline_at:
+                raise ValueError("mapped fixture official deadline is inconsistent")
+            if mapping.binding_approved_at > self.mapping_decided_at:
+                raise ValueError("fixture binding approval is after mapping decision")
+            home = team_by_provider.get(mapping.provider_home_team)
+            away = team_by_provider.get(mapping.provider_away_team)
+            if (
+                home is None
+                or home.official_fpl_team_id != mapping.official_home_team_id
+                or home.official_fpl_team_identity != mapping.official_home_team_identity
+                or home.official_fpl_team_name != mapping.official_home_team_name
+                or away is None
+                or away.official_fpl_team_id != mapping.official_away_team_id
+                or away.official_fpl_team_identity != mapping.official_away_team_identity
+                or away.official_fpl_team_name != mapping.official_away_team_name
+            ):
+                raise ValueError("resolved fixture team mapping is inconsistent")
+            used_provider_teams.update((mapping.provider_home_team, mapping.provider_away_team))
+        if used_provider_teams != set(team_by_provider):
+            raise ValueError("resolved team map contains unused or missing provider teams")
         if self.source_lineage_sha256 != _identity_source_lineage_sha256(self):
             raise ValueError("identity source-lineage hash is inconsistent")
         if self.semantic_sha256 != _fpl_odds_identity_map_sha256(self):

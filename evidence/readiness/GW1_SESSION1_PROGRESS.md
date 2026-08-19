@@ -231,3 +231,31 @@
 - Checkpoint 1.5 — `NOT_STARTED`.
 - Exact next action — **CHECKPOINT 1.5 — SESSION-1 ARTIFACTS / OPERATOR WORKFLOW**.
 <!-- GW1-1.4B-END -->
+
+## Checkpoint 1.4C — hostile identity acceptance pre-publication
+
+- Starting accepted 1.4B evidence head —
+  `ff57c0c12b8ba9f7730bf5d703c808e2b6f7955a`.
+- P0 findings — none.
+- P1 findings — one: a caller could deserialize a rehashed `FPL_ODDS_IDENTITY_MAP`
+  whose nested team/Gameweek identity, approval time, official deadline, or reviewed
+  team correspondence contradicted the top-level context. The construction service was
+  safe, but the public output model did not independently reject every such mutation.
+- P1 remediation — independently revalidate nested official identity namespaces,
+  products, IDs and season; exact reviewed provider-team correspondence; team and fixture
+  approval cutoffs; decision cutoff; official deadline; target Gameweek; coverage counts;
+  used-team closure; source-lineage hash; and semantic hash during deserialization.
+- P2 findings — none.
+- P3 findings — none recorded for the bounded identity bridge.
+- Identity tests — `59 passed`.
+- Focused Linux-equivalent local suite — `165 passed, 1 deselected`; the deselected
+  symlink test remains enabled for Linux CI and cannot run without Windows symlink privilege.
+- Identity-module branch-aware coverage — `92.08%` (`431` statements, `150` branches).
+- Ruff format/lint, strict mypy, wheel build, first-party secret scan and diff check —
+  `PASS`.
+- PostgreSQL — `NOT_EXECUTED` (transient/DB-free identity architecture).
+- Rights/storage — combined FPL-derived identity remains transient/in-memory;
+  persistence and database access remain false; no raw provider payload is retained.
+- Real credentialled provider call — `OPERATOR_CHECKPOINT`.
+- Exact next action — publish the 1.4C remediation, consume Linux validation, record
+  exact remote SHAs, then begin Checkpoint 1.5.
