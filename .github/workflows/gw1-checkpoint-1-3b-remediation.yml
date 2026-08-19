@@ -1,0 +1,469 @@
+name: gw1-checkpoint-1-3b-remediation
+
+on:
+  push:
+    branches:
+      - tmp/gw1-1-3b-remediation-20260819
+    paths:
+      - .github/workflows/gw1-checkpoint-1-3b-remediation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  remediate:
+    name: Remediate and publish Checkpoint 1.3B
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: dmf_pulse_test
+          POSTGRES_USER: dmf_test
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      TARGET_BRANCH: readiness/GW1-2026-27-live-input-initial-squad
+      STARTUP_SHA: 196224c729e1df25a30f3a0d5ac55bac74f7fcc2
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
+      UV_NO_PROGRESS: "1"
+      UV_CACHE_DIR: ${{ github.workspace }}/../.uv-cache
+    steps:
+      - name: Check out canonical target branch
+        uses: actions/checkout@v4
+        with:
+          ref: readiness/GW1-2026-27-live-input-initial-squad
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verify canonical startup SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$STARTUP_SHA"
+          git fetch origin "$TARGET_BRANCH"
+          test "$(git rev-parse HEAD)" = "$(git rev-parse "origin/$TARGET_BRANCH")"
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned uv and frozen dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check uv==0.11.26
+          uv sync --all-groups --frozen
+
+      - name: Apply bounded 1.3B remediation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              target = Path(path)
+              text = target.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one replacement target, found {count}")
+              target.write_text(text.replace(old, new), encoding="utf-8")
+
+          replace_once(
+              "tests/unit/cli/test_live_odds_snapshot.py",
+              '''    assert json.loads(result.stdout) == {
+                  "error": {
+                      "code": "USAGE_INVALID",
+                      "message": "odds snapshot options are not allowlisted",
+                      "retryable": False,
+                  }
+              }''',
+              '''    assert json.loads(result.stdout) == {
+                  "schema_version": "1.0.0",
+                  "status": "FAILED",
+                  "error": {
+                      "code": "USAGE_INVALID",
+                      "message": "odds snapshot options are not allowlisted",
+                      "retryable": False,
+                  },
+              }''',
+          )
+
+          replace_once(
+              "src/dmf_pulse/ingestion/odds/live.py",
+              '''                append_processing_event_idempotent(
+                              session,
+                              snapshot_id=handle.source_snapshot_id,
+                              stage="QUALITY_PASSED",
+                              event_at=current_input.temporal.usable_at,
+                              input_sha256=(current_input.provenance.effective_config_sha256),
+                              output_sha256=current_input_sha256,
+                              safe_details={
+                                  "provider_native": True,
+                                  "raw_payload_retained": False,
+                                  "canonical_fpl_fixture_mapping_performed": False,
+                              },
+                              stage_version="the-odds-api-v4-reference-v1",
+                              actor="the-odds-api-current-input-v1",
+                          )''',
+              '''                append_processing_event_idempotent(
+                              session,
+                              snapshot_id=handle.source_snapshot_id,
+                              stage="MAPPED",
+                              event_at=current_input.temporal.usable_at,
+                              input_sha256=(current_input.provenance.effective_config_sha256),
+                              output_sha256=current_input_sha256,
+                              safe_details={
+                                  "identity_scope": current_input.identity_scope,
+                                  "mapping_scope": "PROVIDER_NATIVE_ONLY",
+                                  "canonical_fpl_fixture_mapping_performed": False,
+                                  "fuzzy_team_matching_performed": False,
+                              },
+                              stage_version="the-odds-api-v4-reference-v1",
+                              actor="the-odds-api-current-input-v1",
+                          )
+                          append_processing_event_idempotent(
+                              session,
+                              snapshot_id=handle.source_snapshot_id,
+                              stage="PROMOTED",
+                              event_at=current_input.temporal.usable_at,
+                              input_sha256=current_input_sha256,
+                              output_sha256=current_input_sha256,
+                              safe_details={
+                                  "promotion_target": current_input.contract,
+                                  "canonical_rows_created": 0,
+                                  "raw_payload_retained": False,
+                              },
+                              stage_version="the-odds-api-v4-reference-v1",
+                              actor="the-odds-api-current-input-v1",
+                          )
+                          append_processing_event_idempotent(
+                              session,
+                              snapshot_id=handle.source_snapshot_id,
+                              stage="QUALITY_PASSED",
+                              event_at=current_input.temporal.usable_at,
+                              input_sha256=current_input_sha256,
+                              output_sha256=current_input_sha256,
+                              safe_details={
+                                  "provider_native": True,
+                                  "raw_payload_retained": False,
+                                  "canonical_fpl_fixture_mapping_performed": False,
+                              },
+                              stage_version="the-odds-api-v4-reference-v1",
+                              actor="the-odds-api-current-input-v1",
+                          )''',
+          )
+
+          replace_once(
+              "tests/integration/ingestion/odds/test_live_provider_current_input.py",
+              '''        stages = set(
+                      session.scalars(
+                          select(source_processing_event.c.stage).where(
+                              source_processing_event.c.source_snapshot_id == snapshot_id
+                          )
+                      )
+                  )
+                  assert {
+                      "RECEIVED",
+                      "RAW_DISCARDED",
+                      "PARSED",
+                      "VALIDATED",
+                      "QUALITY_PASSED",
+                      "USABLE",
+                  }.issubset(stages)''',
+              '''        stages = list(
+                      session.scalars(
+                          select(source_processing_event.c.stage)
+                          .where(source_processing_event.c.source_snapshot_id == snapshot_id)
+                          .order_by(source_processing_event.c.sequence_number)
+                      )
+                  )
+                  assert stages == [
+                      "RECEIVED",
+                      "RAW_DISCARDED",
+                      "PARSED",
+                      "VALIDATED",
+                      "MAPPED",
+                      "PROMOTED",
+                      "QUALITY_PASSED",
+                      "USABLE",
+                  ]''',
+          )
+
+          replace_once(
+              "tests/unit/ingestion/test_live_odds_current_input.py",
+              "from typing import Any, Callable\n",
+              "from collections.abc import Callable\nfrom typing import Any\n",
+          )
+          PY
+
+          uv run ruff check --fix \
+            src/dmf_pulse/cli/odds_cmd.py \
+            tests/unit/ingestion/test_live_odds_current_input.py
+          uv run ruff format \
+            src/dmf_pulse/ingestion/odds/live.py \
+            src/dmf_pulse/cli/odds_cmd.py \
+            tests/unit/ingestion/test_live_odds_current_input.py \
+            tests/unit/cli/test_live_odds_snapshot.py \
+            tests/integration/ingestion/odds/test_live_provider_current_input.py
+
+      - name: Run exact focused validation surface
+        id: validation
+        shell: bash
+        run: |
+          set +e
+          log_dir="${RUNNER_TEMP}/gw1-1-3b-remediation"
+          mkdir -p "$log_dir"
+          : > "$log_dir/status"
+          overall=0
+
+          run_check() {
+            name="$1"
+            shift
+            "$@" >"$log_dir/$name.log" 2>&1
+            rc=$?
+            printf '%s=%s\n' "$name" "$rc" >>"$log_dir/status"
+            if [ "$rc" -ne 0 ]; then
+              overall=1
+            fi
+          }
+
+          run_check focused_pytest uv run pytest -q \
+            tests/unit/ingestion/test_gw1_live_odds_transport.py \
+            tests/unit/ingestion/test_live_odds_transport.py \
+            tests/unit/ingestion/test_live_odds_current_input.py \
+            tests/unit/cli/test_live_odds_snapshot.py
+          run_check inherited_odds_pytest uv run pytest -q \
+            tests/unit/ingestion/test_odds_foundation.py \
+            tests/unit/ingestion/test_odds_model_config_boundaries.py \
+            tests/unit/cli/test_odds_market_commands.py
+          run_check affected_cli_pytest uv run pytest -q \
+            tests/unit/cli/test_live_odds_snapshot.py \
+            tests/unit/cli/test_odds_market_commands.py
+          run_check postgres_integration bash -lc \
+            'uv run alembic upgrade head && uv run pytest -q tests/integration/ingestion/odds/test_live_provider_current_input.py'
+          run_check ruff_format uv run ruff format --check \
+            src/dmf_pulse/ingestion/odds/current.py \
+            src/dmf_pulse/ingestion/odds/live.py \
+            src/dmf_pulse/cli/odds_cmd.py \
+            tests/unit/ingestion/test_live_odds_transport.py \
+            tests/unit/ingestion/test_live_odds_current_input.py \
+            tests/unit/cli/test_live_odds_snapshot.py \
+            tests/integration/ingestion/odds/test_live_provider_current_input.py
+          run_check ruff_lint uv run ruff check \
+            src/dmf_pulse/ingestion/odds/current.py \
+            src/dmf_pulse/ingestion/odds/live.py \
+            src/dmf_pulse/cli/odds_cmd.py \
+            tests/unit/ingestion/test_live_odds_transport.py \
+            tests/unit/ingestion/test_live_odds_current_input.py \
+            tests/unit/cli/test_live_odds_snapshot.py \
+            tests/integration/ingestion/odds/test_live_provider_current_input.py
+          run_check strict_mypy uv run mypy \
+            src/dmf_pulse/ingestion/odds/current.py \
+            src/dmf_pulse/ingestion/odds/live.py \
+            src/dmf_pulse/cli/odds_cmd.py
+          run_check wheel_build uv build
+          run_check secret_scan uv run python scripts/scan_secrets.py
+          run_check diff_check git diff --check
+
+          cp "$log_dir/status" "${RUNNER_TEMP}/gw1-1-3b-status"
+          tar -czf "${RUNNER_TEMP}/gw1-1-3b-logs.tar.gz" -C "$log_dir" .
+          echo "overall=$overall" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Publish remediation, validation evidence, and exact-SHA attestation
+        shell: bash
+        run: |
+          set -euo pipefail
+          overall='${{ steps.validation.outputs.overall }}'
+          status_file="${RUNNER_TEMP}/gw1-1-3b-status"
+          logs_archive="${RUNNER_TEMP}/gw1-1-3b-logs.tar.gz"
+          log_dir="${RUNNER_TEMP}/gw1-1-3b-report-logs"
+          mkdir -p "$log_dir"
+          tar -xzf "$logs_archive" -C "$log_dir"
+
+          git config user.name 'dmf-pulse-gw1-remediation-bot'
+          git config user.email 'dmf-pulse-gw1-remediation-bot@users.noreply.github.com'
+
+          python - "$overall" "$GITHUB_RUN_ID" <<'PY'
+          from pathlib import Path
+          import sys
+
+          progress_path = Path("evidence/readiness/GW1_SESSION1_PROGRESS.md")
+          text = progress_path.read_text(encoding="utf-8")
+          section = "## Checkpoint 1.3B remediation — 2026-08-19"
+          if section in text:
+              raise SystemExit("remediation section already exists")
+          passed = sys.argv[1] == "0"
+          run_id = sys.argv[2]
+          text += f'''\n\n{section}\n\n- Exact remediation startup remote SHA — `196224c729e1df25a30f3a0d5ac55bac74f7fcc2`.\n- Reproduced published workflow run — `32194395276` (`FAIL`).\n- CLI root cause — the test asserted only `error`; the accepted public envelope also requires `schema_version` and `status`.\n- PostgreSQL root cause — the provider-native path skipped the legal `MAPPED` and `PROMOTED` lifecycle stages before `QUALITY_PASSED`.\n- Ruff root causes — one unsorted import block and one `Callable` import from `typing`.\n- Remediation — preserve the production error envelope, restore the accepted lifecycle vocabulary with explicit provider-native/no-canonical-mapping semantics, strengthen ordered lifecycle coverage, and apply normal Ruff fixes.\n- Remediation validation workflow — `{run_id}`.\n- Validation status before publication — `{'PASS' if passed else 'FAIL'}`.\n- Remediation commit SHA — pending the next durable commit.\n- `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.\n- No Checkpoint 1.3C or 1.4 implementation was started.\n- Exact next action after a clean durable pass — **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.\n'''
+          progress_path.write_text(text, encoding="utf-8")
+          PY
+
+          git status --short
+          git diff --check
+          git add \
+            src/dmf_pulse/ingestion/odds/live.py \
+            src/dmf_pulse/cli/odds_cmd.py \
+            tests/unit/ingestion/test_live_odds_current_input.py \
+            tests/unit/cli/test_live_odds_snapshot.py \
+            tests/integration/ingestion/odds/test_live_provider_current_input.py \
+            evidence/readiness/GW1_SESSION1_PROGRESS.md
+
+          if [ "$overall" -eq 0 ]; then
+            git commit -m 'fix(gw1): remediate live odds provider validation'
+          else
+            git commit -m 'checkpoint(gw1): preserve 1.3B remediation findings'
+          fi
+          remediation_sha="$(git rev-parse HEAD)"
+          git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
+          git fetch origin "$TARGET_BRANCH"
+          test "$remediation_sha" = "$(git rev-parse "origin/$TARGET_BRANCH")"
+
+          python - "$overall" "$GITHUB_RUN_ID" "$remediation_sha" "$status_file" "$log_dir" <<'PY'
+          from pathlib import Path
+          import sys
+
+          overall = int(sys.argv[1])
+          run_id = sys.argv[2]
+          remediation_sha = sys.argv[3]
+          status_path = Path(sys.argv[4])
+          log_dir = Path(sys.argv[5])
+          report = Path("evidence/readiness/GW1_SESSION1_VALIDATION_1_3B.md")
+          statuses: list[tuple[str, int]] = []
+          for line in status_path.read_text(encoding="utf-8").splitlines():
+              name, raw_rc = line.split("=", 1)
+              statuses.append((name, int(raw_rc)))
+
+          result = "PASS" if overall == 0 else "FAIL"
+          lines = [
+              "# GW1 Checkpoint 1.3B Remediation Validation",
+              "",
+              f"- Workflow run — `{run_id}`",
+              "- Reproduced failing workflow — `32194395276`",
+              "- Exact startup remote SHA — `196224c729e1df25a30f3a0d5ac55bac74f7fcc2`",
+              f"- Remediation commit — `{remediation_sha}`",
+              "- Branch — `readiness/GW1-2026-27-live-input-initial-squad`",
+              f"- Overall — `{result}`",
+              "- Real credentialled provider call — `OPERATOR_CHECKPOINT`",
+              "",
+              "## Root causes and remediation",
+              "",
+              "- CLI: retained the accepted `schema_version` / `status` / `error` envelope and corrected the stale test.",
+              "- PostgreSQL: restored `MAPPED` and `PROMOTED` in the accepted lifecycle before `QUALITY_PASSED`, while recording provider-native identity, zero canonical rows, no fuzzy matching and no raw retention.",
+              "- Ruff: fixed import ordering and imported `Callable` from `collections.abc`; no suppressions were added.",
+              "",
+              "## Results",
+              "",
+          ]
+          for name, rc in statuses:
+              state = "PASS" if rc == 0 else "FAIL"
+              lines.append(f"- `{name}` — `{state}` (exit `{rc}`)")
+          for name, _rc in statuses:
+              lines.extend(["", f"## {name} output", "", "```text"])
+              log = log_dir / f"{name}.log"
+              if log.exists():
+                  content = log.read_text(encoding="utf-8", errors="replace").splitlines()
+                  lines.extend(content[-160:])
+              lines.append("```")
+          lines.extend(
+              [
+                  "",
+                  "## Rights and storage",
+                  "",
+                  "- Runtime credential provider wiring remains unchanged; no API-key CLI option exists.",
+                  "- HTTPS, approved-host, redirect, timeout, retry, response-size/content-type and explicit provider-status controls remain covered by the focused suite.",
+                  "- Raw provider payload retention remains forbidden; no raw blob/object or canonical market/odds rows are created by the provider-native path.",
+                  "- Public display, redistribution, backup and model training remain denied by the current Rights Profile.",
+                  "- Canonical FPL fixture mapping and fuzzy team matching remain unperformed.",
+                  "",
+                  "## Scope",
+                  "",
+                  "- Checkpoint 1.3C — `NOT_STARTED`.",
+                  "- Checkpoint 1.4 — `INCOMPLETE` / not started.",
+                  "- Exact next action — **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.",
+                  "",
+              ]
+          )
+          report.write_text("\n".join(lines), encoding="utf-8")
+          PY
+
+          python - "$overall" "$GITHUB_RUN_ID" "$remediation_sha" <<'PY'
+          from pathlib import Path
+          import sys
+
+          overall = int(sys.argv[1])
+          run_id = sys.argv[2]
+          remediation_sha = sys.argv[3]
+          path = Path("evidence/readiness/GW1_SESSION1_PROGRESS.md")
+          text = path.read_text(encoding="utf-8")
+          text = text.replace(
+              "- Remediation commit SHA — pending the next durable commit.",
+              f"- Remediation commit SHA — `{remediation_sha}`.",
+          )
+          text += f'''\n### Remediation validation publication\n\n- Workflow run — `{run_id}`.\n- Focused validation — `{'PASS' if overall == 0 else 'FAIL'}`.\n- Validation/evidence commit SHA — pending the next durable commit.\n'''
+          if overall == 0:
+              text = text.replace(
+                  "| 1.3 Live The Odds API input foundation | IN_PROGRESS | 1.3A is complete; the commit containing this record stages 1.3B provider-native current-input capability and focused validation. |",
+                  "| 1.3 Live The Odds API input foundation | IN_PROGRESS | 1.3A and 1.3B are COMPLETE; 1.3C is NOT_STARTED and is the exact next action. |",
+              )
+              text += '''\n### Current checkpoint matrix\n\n| Checkpoint | Status |\n|---|---|\n| 1.0 | COMPLETE |\n| 1.1 | COMPLETE |\n| 1.2 | COMPLETE |\n| 1.3A | COMPLETE |\n| 1.3B | COMPLETE |\n| 1.3C | NOT_STARTED / INCOMPLETE |\n| 1.4 | INCOMPLETE |\n| 1.5 | INCOMPLETE |\n\n- Exact next action — **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.\n'''
+          path.write_text(text, encoding="utf-8")
+          PY
+
+          git add \
+            evidence/readiness/GW1_SESSION1_PROGRESS.md \
+            evidence/readiness/GW1_SESSION1_VALIDATION_1_3B.md
+          if [ "$overall" -eq 0 ]; then
+            git commit -m 'test(gw1): publish 1.3B remediation evidence'
+          else
+            git commit -m 'test(gw1): publish 1.3B remediation failure evidence'
+          fi
+          evidence_sha="$(git rev-parse HEAD)"
+          git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
+          git fetch origin "$TARGET_BRANCH"
+          test "$evidence_sha" = "$(git rev-parse "origin/$TARGET_BRANCH")"
+
+          python - "$evidence_sha" <<'PY'
+          from pathlib import Path
+          import sys
+
+          evidence_sha = sys.argv[1]
+          path = Path("evidence/readiness/GW1_SESSION1_PROGRESS.md")
+          text = path.read_text(encoding="utf-8")
+          text = text.replace(
+              "- Validation/evidence commit SHA — pending the next durable commit.",
+              f"- Validation/evidence commit SHA — `{evidence_sha}`.",
+          )
+          path.write_text(text, encoding="utf-8")
+          PY
+          git add evidence/readiness/GW1_SESSION1_PROGRESS.md
+          git commit -m 'checkpoint(gw1): attest 1.3B remediation publication'
+          attestation_sha="$(git rev-parse HEAD)"
+          git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
+          git fetch origin "$TARGET_BRANCH"
+          remote_sha="$(git rev-parse "origin/$TARGET_BRANCH")"
+          test "$attestation_sha" = "$remote_sha"
+
+          {
+            echo "remediation_sha=$remediation_sha"
+            echo "evidence_sha=$evidence_sha"
+            echo "attestation_sha=$attestation_sha"
+            echo "remote_sha=$remote_sha"
+            echo "overall=$overall"
+          } | tee "${RUNNER_TEMP}/gw1-1-3b-publication-shas"
+
+          if [ "$overall" -ne 0 ]; then
+            exit 1
+          fi
