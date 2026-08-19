@@ -20,11 +20,32 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install pinned uv
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+      - name: Build relocatable development environment
+        shell: bash
+        run: |
+          rm -rf .venv
+          uv venv --relocatable .venv
+          uv sync --all-groups --frozen
+          tar -czf stage15-venv.tar.gz .venv
+      - name: Upload development environment
+        id: upload_venv
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage15-development-environment
+          path: stage15-venv.tar.gz
+          if-no-files-found: error
+          retention-days: 1
       - name: Build repository bundle
         shell: bash
         run: git bundle create dmf-pulse.bundle --all
       - name: Upload repository bundle
-        id: upload
+        id: upload_source
         uses: actions/upload-artifact@v4
         with:
           name: stage15-source-bundle
@@ -34,11 +55,12 @@ jobs:
       - name: Publish transport metadata
         shell: bash
         env:
-          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          SOURCE_ARTIFACT_ID: ${{ steps.upload_source.outputs.artifact-id }}
+          VENV_ARTIFACT_ID: ${{ steps.upload_venv.outputs.artifact-id }}
         run: |
           mkdir -p .stage15-transport
-          printf '{"run_id":%s,"artifact_id":%s,"head_sha":"%s"}\n' \
-            "${GITHUB_RUN_ID}" "${ARTIFACT_ID}" "${GITHUB_SHA}" \
+          printf '{"run_id":%s,"source_artifact_id":%s,"venv_artifact_id":%s,"head_sha":"%s"}\n' \
+            "${GITHUB_RUN_ID}" "${SOURCE_ARTIFACT_ID}" "${VENV_ARTIFACT_ID}" "${GITHUB_SHA}" \
             > .stage15-transport/source-export.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
