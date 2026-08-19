@@ -1,0 +1,31 @@
+name: Stage 15 temporary source export
+
+on:
+  push:
+    branches:
+      - stage/A15/RANK-015-rank-aware-strategy
+    paths:
+      - .github/workflows/stage15-source-export.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build repository bundle
+        shell: bash
+        run: git bundle create dmf-pulse.bundle --all
+      - name: Upload repository bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage15-source-bundle
+          path: dmf-pulse.bundle
+          if-no-files-found: error
+          retention-days: 1
