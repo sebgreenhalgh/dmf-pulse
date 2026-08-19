@@ -201,14 +201,10 @@ class CurrentTeamAliasMapping(_FrozenCurrentMapping):
 class CurrentTeamAliasPlan(_FrozenCurrentMapping):
     """Operator-supplied, reviewed team alias authority for current use."""
 
-    contract_version: Literal["gw1-fpl-odds-team-alias-plan-v1"] = (
-        "gw1-fpl-odds-team-alias-plan-v1"
-    )
+    contract_version: Literal["gw1-fpl-odds-team-alias-plan-v1"] = "gw1-fpl-odds-team-alias-plan-v1"
     plan_id: str = Field(min_length=1, max_length=160)
     plan_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
-    mapping_algorithm_version: Literal["gw1-fpl-odds-exact-v1"] = (
-        "gw1-fpl-odds-exact-v1"
-    )
+    mapping_algorithm_version: Literal["gw1-fpl-odds-exact-v1"] = "gw1-fpl-odds-exact-v1"
     approved_at: datetime
     evidence_class: CurrentMappingEvidenceClass
     reviewer: str = Field(min_length=1, max_length=160)
@@ -270,6 +266,163 @@ class CurrentTeamAliasPlan(_FrozenCurrentMapping):
         return matches[0]
 
 
+def _validate_fixture_identity(
+    identity: CurrentFplIdentity,
+    *,
+    fixture_id: int,
+    season_code: str,
+) -> None:
+    if (
+        identity.provider_key != "official_fpl"
+        or identity.provider_product != "fantasy_premierleague"
+        or identity.entity_type != "FIXTURE"
+        or identity.identifier_namespace != "fpl.fixture.id"
+        or identity.external_id_text != str(fixture_id)
+        or identity.season_code != season_code
+    ):
+        raise ValueError("official FPL fixture identity is inconsistent")
+
+
+class CurrentFixtureBinding(_FrozenCurrentMapping):
+    """One reviewed provider-event binding to one exact current FPL fixture."""
+
+    provider: Literal["the_odds_api"] = "the_odds_api"
+    provider_event_id: str = Field(min_length=1, max_length=500)
+    competition_key: Literal["PL"] = "PL"
+    season_code: Literal["2026/27"] = "2026/27"
+    target_gameweek: int = Field(gt=0)
+    official_fpl_fixture_id: int = Field(gt=0)
+    canonical_fixture_identity: CurrentFplIdentity
+    expected_home_team_id: int = Field(gt=0)
+    expected_home_team_identity: CurrentFplIdentity
+    expected_away_team_id: int = Field(gt=0)
+    expected_away_team_identity: CurrentFplIdentity
+    expected_commence_time: datetime
+    evidence_class: CurrentMappingEvidenceClass
+    status: Literal["APPROVED"] = "APPROVED"
+    reviewer: str = Field(min_length=1, max_length=160)
+    approved_at: datetime
+    validity_policy: Literal["TARGET_GAMEWEEK_EXACT_KICKOFF"] = "TARGET_GAMEWEEK_EXACT_KICKOFF"
+
+    @field_validator("expected_commence_time", mode="before")
+    @classmethod
+    def parse_expected_commence_time(cls, value: object) -> datetime:
+        return _parse_current_mapping_time(value, label="expected commence time")
+
+    @field_validator("approved_at", mode="before")
+    @classmethod
+    def parse_approved_at(cls, value: object) -> datetime:
+        return _parse_current_mapping_time(value, label="fixture binding approval time")
+
+    @model_validator(mode="after")
+    def validate_identities(self) -> CurrentFixtureBinding:
+        _validate_fixture_identity(
+            self.canonical_fixture_identity,
+            fixture_id=self.official_fpl_fixture_id,
+            season_code=self.season_code,
+        )
+        _validate_team_identity(
+            self.expected_home_team_identity,
+            team_id=self.expected_home_team_id,
+            season_code=self.season_code,
+        )
+        _validate_team_identity(
+            self.expected_away_team_identity,
+            team_id=self.expected_away_team_id,
+            season_code=self.season_code,
+        )
+        if self.expected_home_team_id == self.expected_away_team_id:
+            raise ValueError("fixture binding home and away teams must differ")
+        return self
+
+    @property
+    def sha256(self) -> str:
+        return canonical_sha256(self.model_dump(mode="json"))
+
+
+class CurrentFixtureMappingPlan(_FrozenCurrentMapping):
+    """Operator-supplied reviewed event-to-fixture authority for current use."""
+
+    contract_version: Literal["gw1-fpl-odds-fixture-plan-v1"] = "gw1-fpl-odds-fixture-plan-v1"
+    plan_id: str = Field(min_length=1, max_length=160)
+    plan_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
+    mapping_algorithm_version: Literal["gw1-fpl-odds-exact-v1"] = "gw1-fpl-odds-exact-v1"
+    approved_at: datetime
+    evidence_class: CurrentMappingEvidenceClass
+    reviewer: str = Field(min_length=1, max_length=160)
+    status: Literal["APPROVED"] = "APPROVED"
+    usage_scope: Literal["CURRENT_DECISION"] = "CURRENT_DECISION"
+    provider: Literal["the_odds_api"] = "the_odds_api"
+    competition_key: Literal["PL"] = "PL"
+    season_code: Literal["2026/27"] = "2026/27"
+    target_gameweek: int = Field(gt=0)
+    team_alias_plan_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
+    team_alias_plan_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    fixture_mappings: tuple[CurrentFixtureBinding, ...] = Field(min_length=1)
+
+    @field_validator("approved_at", mode="before")
+    @classmethod
+    def parse_approved_at(cls, value: object) -> datetime:
+        return _parse_current_mapping_time(value, label="fixture mapping plan approval time")
+
+    @model_validator(mode="after")
+    def validate_current_scope(self) -> CurrentFixtureMappingPlan:
+        event_ids = [mapping.provider_event_id for mapping in self.fixture_mappings]
+        fixture_ids = [mapping.official_fpl_fixture_id for mapping in self.fixture_mappings]
+        fixture_hashes = [
+            mapping.canonical_fixture_identity.canonical_lookup_sha256
+            for mapping in self.fixture_mappings
+        ]
+        if len(event_ids) != len(set(event_ids)):
+            raise ValueError("provider event binding is duplicated or ambiguous")
+        if len(fixture_ids) != len(set(fixture_ids)):
+            raise ValueError("official FPL fixture binding is duplicated or ambiguous")
+        if len(fixture_hashes) != len(set(fixture_hashes)):
+            raise ValueError("canonical FPL fixture identity is duplicated")
+        for mapping in self.fixture_mappings:
+            if (
+                mapping.provider != self.provider
+                or mapping.competition_key != self.competition_key
+                or mapping.season_code != self.season_code
+                or mapping.target_gameweek != self.target_gameweek
+                or mapping.evidence_class != self.evidence_class
+                or mapping.status != self.status
+                or mapping.reviewer != self.reviewer
+                or mapping.approved_at > self.approved_at
+            ):
+                raise ValueError("fixture binding provenance contradicts its plan")
+        return self
+
+    @property
+    def sha256(self) -> str:
+        material = self.model_dump(mode="json")
+        material["fixture_mappings"] = sorted(
+            material["fixture_mappings"],
+            key=lambda item: (
+                item["provider_event_id"],
+                item["official_fpl_fixture_id"],
+            ),
+        )
+        return canonical_sha256(material)
+
+    def fixture(self, provider_event_id: str) -> CurrentFixtureBinding:
+        matches = [
+            mapping
+            for mapping in self.fixture_mappings
+            if mapping.provider_event_id == provider_event_id
+        ]
+        if len(matches) != 1:
+            raise IngestionError(
+                "MAPPING_CONFLICT",
+                "provider event lacks one explicit approved fixture binding",
+                details={
+                    "mapping_outcome": "UNKNOWN",
+                    "reason": "EXPLICIT_EVENT_BINDING_MISSING",
+                },
+            )
+        return matches[0]
+
+
 def _strict_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
     result: dict[str, object] = {}
     for key, value in pairs:
@@ -295,3 +448,13 @@ def load_current_team_alias_plan(path: Path) -> CurrentTeamAliasPlan:
         return CurrentTeamAliasPlan.model_validate(value)
     except (OSError, UnicodeError, json.JSONDecodeError, ValidationError, ValueError) as exc:
         raise IngestionError("MAPPING_CONFLICT", "current team alias plan is invalid") from exc
+
+
+def load_current_fixture_mapping_plan(path: Path) -> CurrentFixtureMappingPlan:
+    """Load one strict operator-supplied current fixture mapping plan."""
+
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=_strict_object)
+        return CurrentFixtureMappingPlan.model_validate(value)
+    except (OSError, UnicodeError, json.JSONDecodeError, ValidationError, ValueError) as exc:
+        raise IngestionError("MAPPING_CONFLICT", "current fixture mapping plan is invalid") from exc

@@ -1,25 +1,31 @@
 name: gw1-checkpoint-1-4-focused-validation
 
-# Triggered through a low-level ref update to preserve the accepted 1.4A lineage.
 on:
   push:
     branches:
       - readiness/GW1-2026-27-live-input-initial-squad
     paths:
       - .github/workflows/gw1-checkpoint-1-4-focused-validation.yml
+      - src/dmf_pulse/ingestion/odds/mapping.py
+      - src/dmf_pulse/ingestion/odds/identity.py
+      - tests/unit/ingestion/test_fpl_odds_team_identity.py
+      - tests/unit/ingestion/test_fpl_odds_fixture_identity.py
 
 permissions:
   contents: write
 
 concurrency:
-  group: gw1-checkpoint-1-4-recovery-${{ github.ref }}
+  group: gw1-checkpoint-1-4-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  recover-and-publish:
-    name: Recover accepted 1.4A and publish 1.4B
+  validate:
+    name: Checkpoint 1.4 focused validation
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
+    env:
+      DMF_ENVIRONMENT: TEST
+      UV_NO_PROGRESS: "1"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,38 +35,235 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Restore accepted lineage and publish exact fixture identity
+      - name: Validate and publish durable diagnostics
         shell: bash
         run: |
-          set -euo pipefail
-          accepted="3abd02aa28959b0cfa6f56f3b5e58271ae0c9e61"
-          payload="build/gw1-checkpoint-1-4b-payload.b64"
-          archive="${RUNNER_TEMP}/gw1-checkpoint-1-4b-payload.tar.gz"
-          base64 --decode "$payload" >"$archive"
-          echo "ef8b77ed50a5317eb32ead4b1c219da78321049b8e52dc73d6a24fdbe8530ce7  $archive" \
-            | sha256sum --check --strict
-          tar -xzf "$archive" -C .
-          git show "$accepted:.github/workflows/gw1-checkpoint-1-4-focused-validation.yml" \
-            >.github/workflows/gw1-checkpoint-1-4-focused-validation.yml
-          git show "$accepted:PLANS.md" >PLANS.md
-          git show "$accepted:evidence/readiness/GW1_SESSION1_PROGRESS.md" \
-            >evidence/readiness/GW1_SESSION1_PROGRESS.md
-          git show "$accepted:evidence/readiness/GW1_SESSION1_VALIDATION_1_4A.md" \
-            >evidence/readiness/GW1_SESSION1_VALIDATION_1_4A.md
-          git show "$accepted:tests/unit/ingestion/test_fpl_odds_team_identity.py" \
-            >tests/unit/ingestion/test_fpl_odds_team_identity.py
-          rm -f "$payload" .github/workflows/gw1-checkpoint-1-4-publisher.yml
-          rmdir build 2>/dev/null || true
-          python -m py_compile \
-            src/dmf_pulse/ingestion/odds/mapping.py \
-            src/dmf_pulse/ingestion/odds/identity.py \
-            tests/unit/ingestion/test_fpl_odds_team_identity.py \
-            tests/unit/ingestion/test_fpl_odds_fixture_identity.py
-          git diff --check
-          git status --short
-          git config user.name "dmf-pulse-gw1-publisher-bot"
-          git config user.email "dmf-pulse-gw1-publisher-bot@users.noreply.github.com"
-          git add -A
-          git commit -m "feat(gw1): map current odds events to FPL fixtures"
+          set +e
+          if [[ -f tests/unit/ingestion/test_fpl_odds_fixture_identity.py ]]; then
+            stage="1.4B"
+            report="evidence/readiness/GW1_SESSION1_CHECKPOINT_1_4_ACCEPTANCE.md"
+          else
+            stage="1.4A"
+            report="evidence/readiness/GW1_SESSION1_VALIDATION_1_4A.md"
+          fi
+          subject="$(git log -1 --pretty=%s "$GITHUB_SHA")"
+          log_dir="${RUNNER_TEMP}/gw1-${stage}"
+          mkdir -p "$log_dir" evidence/readiness
+          : >"$log_dir/status"
+          overall=0
+
+          run_check() {
+            name="$1"
+            shift
+            "$@" >"$log_dir/$name.log" 2>&1
+            rc=$?
+            printf '%s=%s\n' "$name" "$rc" >>"$log_dir/status"
+            if [[ "$rc" -ne 0 ]]; then
+              overall=1
+            fi
+          }
+
+          run_check install_uv python -m pip install --disable-pip-version-check uv==0.11.26
+          if grep -q '^install_uv=0$' "$log_dir/status"; then
+            run_check frozen_sync uv sync --all-groups --frozen
+          else
+            printf 'frozen_sync=125\n' >>"$log_dir/status"
+            overall=1
+          fi
+
+          if grep -q '^frozen_sync=0$' "$log_dir/status"; then
+            test_paths=(
+              tests/unit/ingestion/test_fpl_odds_team_identity.py
+              tests/unit/ingestion/test_odds_foundation.py
+              tests/unit/ingestion/test_fpl_current_input.py
+              tests/unit/ingestion/test_live_odds_current_input.py
+            )
+            if [[ -f tests/unit/ingestion/test_fpl_odds_fixture_identity.py ]]; then
+              test_paths+=(tests/unit/ingestion/test_fpl_odds_fixture_identity.py)
+            fi
+            run_check focused_pytest uv run pytest -q "${test_paths[@]}"
+            format_paths=(
+              src/dmf_pulse/ingestion/odds/mapping.py
+              src/dmf_pulse/ingestion/odds/identity.py
+              tests/unit/ingestion/test_fpl_odds_team_identity.py
+            )
+            if [[ -f tests/unit/ingestion/test_fpl_odds_fixture_identity.py ]]; then
+              format_paths+=(tests/unit/ingestion/test_fpl_odds_fixture_identity.py)
+            fi
+            run_check ruff_format uv run ruff format --check "${format_paths[@]}"
+            run_check ruff_format_diff uv run ruff format --diff "${format_paths[@]}"
+            run_check ruff_lint uv run ruff check "${format_paths[@]}"
+            run_check strict_mypy uv run mypy \
+              src/dmf_pulse/ingestion/odds/mapping.py \
+              src/dmf_pulse/ingestion/odds/identity.py
+            run_check build uv build
+            run_check secret_scan uv run python scripts/scan_secrets.py
+          else
+            for name in focused_pytest ruff_format ruff_format_diff ruff_lint strict_mypy build secret_scan; do
+              printf '%s=125\n' "$name" >>"$log_dir/status"
+            done
+            overall=1
+          fi
+          run_check diff_check git diff --check "$GITHUB_SHA^" "$GITHUB_SHA"
+
+          {
+            echo "# GW1 Checkpoint ${stage} Focused Validation"
+            echo
+            echo "- Workflow run — \`${GITHUB_RUN_ID}\`"
+            echo "- Validated commit — \`${GITHUB_SHA}\`"
+            echo "- Branch — \`${GITHUB_REF_NAME}\`"
+            echo "- Commit subject — \`${subject}\`"
+            echo "- Overall — \`$([[ "$overall" -eq 0 ]] && echo PASS || echo FAIL)\`"
+            echo '- PostgreSQL — `NOT_EXECUTED` (transient/DB-free identity architecture).'
+            echo '- Real credentialled provider call — `OPERATOR_CHECKPOINT`.'
+            echo '- Checkpoint 1.5 work — `NOT_EXECUTED`.'
+            echo
+            echo '## Exit codes'
+            echo
+            while IFS='=' read -r name rc; do
+              if [[ "$rc" -eq 0 ]]; then
+                state="PASS"
+              elif [[ "$rc" -eq 125 ]]; then
+                state="NOT_EXECUTED"
+              else
+                state="FAIL"
+              fi
+              echo "- \`${name}\` — \`${state}\` (exit \`${rc}\`)"
+            done <"$log_dir/status"
+            for name in focused_pytest ruff_format ruff_format_diff ruff_lint strict_mypy build secret_scan diff_check; do
+              echo
+              echo "## ${name}"
+              echo
+              echo '```text'
+              tail -n 200 "$log_dir/$name.log" 2>/dev/null || true
+              echo '```'
+            done
+          } >"$report"
+
+          python - "$report" <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          lines = path.read_text(encoding="utf-8").splitlines()
+          path.write_text("\n".join(line.rstrip() for line in lines) + "\n", encoding="utf-8")
+          PY
+
+          export GW1_STAGE="$stage"
+          export GW1_OVERALL="$([[ "$overall" -eq 0 ]] && echo PASS || echo FAIL)"
+          export GW1_REPORT="$report"
+          python - <<'PY'
+          from __future__ import annotations
+
+          import os
+          import re
+          from pathlib import Path
+
+          stage = os.environ["GW1_STAGE"]
+          overall = os.environ["GW1_OVERALL"]
+          report = os.environ["GW1_REPORT"]
+          run_id = os.environ["GITHUB_RUN_ID"]
+          sha = os.environ["GITHUB_SHA"]
+
+          progress_path = Path("evidence/readiness/GW1_SESSION1_PROGRESS.md")
+          progress = progress_path.read_text(encoding="utf-8")
+          row_pattern = re.compile(r"^\| 1\.4 FPL / odds identity integrity \|.*$", re.MULTILINE)
+          if stage == "1.4A":
+              if overall == "PASS":
+                  row = (
+                      "| 1.4 FPL / odds identity integrity | IN_PROGRESS | "
+                      "1.4A exact team identity resolution COMPLETE; 1.4B not started. |"
+                  )
+                  next_action = "**CHECKPOINT 1.4B — EXACT FIXTURE RESOLUTION / COVERAGE**"
+              else:
+                  row = (
+                      "| 1.4 FPL / odds identity integrity | IN_PROGRESS | "
+                      "1.4A published; focused validation failed and requires remediation. |"
+                  )
+                  next_action = "**REMEDIATE CHECKPOINT 1.4A VALIDATION**"
+          elif overall == "PASS":
+              row = (
+                  "| 1.4 FPL / odds identity integrity | COMPLETE | "
+                  "Exact team and target-GW fixture identity bridge accepted. |"
+              )
+              next_action = "**CHECKPOINT 1.5 — SESSION-1 ARTIFACTS / OPERATOR WORKFLOW**"
+          else:
+              row = (
+                  "| 1.4 FPL / odds identity integrity | IN_PROGRESS | "
+                  "1.4B published; focused validation failed and requires remediation. |"
+              )
+              next_action = "**REMEDIATE CHECKPOINT 1.4B VALIDATION**"
+          if not row_pattern.search(progress):
+              raise SystemExit("Checkpoint 1.4 progress row was not found")
+          progress = row_pattern.sub(row, progress, count=1)
+
+          start = f"<!-- GW1-{stage}-START -->"
+          end = f"<!-- GW1-{stage}-END -->"
+          block = f"""{start}
+          ## Checkpoint {stage} — automated focused publication
+
+          - Validated commit — `{sha}`.
+          - Workflow run — `{run_id}`.
+          - Validation result — `{overall}`.
+          - Machine-written evidence — `{report}`.
+          - Mapping remains exact, reviewed, cutoff-bound and fail-closed; no fuzzy matching.
+          - Combined FPL-derived result remains transient/in-memory; PostgreSQL was not used.
+          - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
+          - Checkpoint 1.5 — `NOT_STARTED`.
+          - Exact next action — {next_action}.
+          {end}
+          """
+          if start in progress and end in progress:
+              before, tail = progress.split(start, 1)
+              _, after = tail.split(end, 1)
+              progress = before + block + after.lstrip("\n")
+          else:
+              progress = progress.rstrip() + "\n\n" + block
+          progress_path.write_text(progress, encoding="utf-8")
+
+          plans_path = Path("PLANS.md")
+          plans = plans_path.read_text(encoding="utf-8")
+          plan_start = "<!-- GW1-1.4-PLAN-START -->"
+          plan_end = "<!-- GW1-1.4-PLAN-END -->"
+          a = "x" if stage in {"1.4A", "1.4B"} and overall == "PASS" else " "
+          b = "x" if stage == "1.4B" and overall == "PASS" else " "
+          c = b
+          plan_block = f"""{plan_start}
+          ### Checkpoint 1.4 — FPL / Odds identity integrity
+
+          - [{a}] 1.4A exact explicit team alias resolution, source/plan hash binding,
+            approval/cutoff enforcement and transient rights boundary.
+          - [{b}] 1.4B exact target-GW fixture resolution, orientation, kickoff, one-to-one
+            coverage, diagnostics and deterministic mapped output.
+          - [{c}] 1.4C bounded acceptance evidence and exact Checkpoint 1.5 handoff.
+          - Latest focused validation — `{stage}` `{overall}`, run `{run_id}`, commit `{sha}`.
+          - Exclusions remain: probabilities, projections, optimisation, initial squad,
+            captaincy, prospective logging, UI, Checkpoint 1.5, PR, merge and activation.
+          {plan_end}
+          """
+          if plan_start in plans and plan_end in plans:
+              before, tail = plans.split(plan_start, 1)
+              _, after = tail.split(plan_end, 1)
+              plans = before + plan_block + after.lstrip("\n")
+          else:
+              anchor = "- Immutable parent: `9eb57143f6ee92f67c78607cc386678d962e62d4`.\n"
+              if anchor not in plans:
+                  raise SystemExit("GW1 plan anchor was not found")
+              plans = plans.replace(anchor, anchor + plan_block, 1)
+          plans_path.write_text(plans, encoding="utf-8")
+          PY
+
+          git config user.name "dmf-pulse-gw1-validation-bot"
+          git config user.email "dmf-pulse-gw1-validation-bot@users.noreply.github.com"
+          git add "$report" evidence/readiness/GW1_SESSION1_PROGRESS.md PLANS.md
+          if [[ "$stage" == "1.4B" && "$overall" -eq 0 ]]; then
+            evidence_commit="docs(gw1): complete FPL odds identity checkpoint"
+          elif [[ "$stage" == "1.4A" ]]; then
+            evidence_commit="docs(gw1): record FPL odds team identity validation"
+          else
+            evidence_commit="docs(gw1): record FPL odds fixture validation"
+          fi
+          git commit -m "$evidence_commit"
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+          exit "$overall"

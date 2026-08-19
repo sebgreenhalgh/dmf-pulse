@@ -19,7 +19,7 @@
 | 1.1 Runtime odds credential foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
 | 1.2 Current official FPL input foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
 | 1.3 Live The Odds API input foundation | COMPLETE | 1.3A, 1.3B and 1.3C are COMPLETE; operator contract and acceptance evidence are published. |
-| 1.4 FPL / odds identity integrity | IN_PROGRESS | 1.4A published; focused validation failed and requires remediation. |
+| 1.4 FPL / odds identity integrity | IN_PROGRESS | 1.4A exact team identity resolution COMPLETE; 1.4B not started. |
 | 1.5 Session-1 artifacts / operator workflow | INCOMPLETE | Not started. |
 
 ## Checkpoint 1.3A — live credential / transport wiring
@@ -178,13 +178,42 @@
 <!-- GW1-1.4A-START -->
 ## Checkpoint 1.4A — automated focused publication
 
-- Validated commit — `3bf950c67b3c3a6d3da48e18b65718281f643461`.
-- Workflow run — `32285050335`.
-- Validation result — `FAIL`.
+- Validated commit — `6991e586c77301d6a0cc26246144f71c1cf49cb0`.
+- Workflow run — `32281522483`.
+- Validation result — `PASS`.
 - Machine-written evidence — `evidence/readiness/GW1_SESSION1_VALIDATION_1_4A.md`.
 - Mapping remains exact, reviewed, cutoff-bound and fail-closed; no fuzzy matching.
 - Combined FPL-derived result remains transient/in-memory; PostgreSQL was not used.
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
 - Checkpoint 1.5 — `NOT_STARTED`.
-- Exact next action — **REMEDIATE CHECKPOINT 1.4A VALIDATION**.
+- Exact next action — **CHECKPOINT 1.4B — EXACT FIXTURE RESOLUTION / COVERAGE**.
 <!-- GW1-1.4A-END -->
+
+## Checkpoint 1.4B — verified recovery and local pre-publication validation
+
+- Recovery starting remote SHA — `3e383927a4366e4cf0e26d2f9a6aaee0ccc005ed`.
+- Accepted 1.4A evidence head restored as authority —
+  `3abd02aa28959b0cfa6f56f3b5e58271ae0c9e61`.
+- Decoded recovery archive SHA-256 —
+  `ef8b77ed50a5317eb32ead4b1c219da78321049b8e52dc73d6a24fdbe8530ce7` (verified).
+- Recovered mapping-contract Git blob —
+  `e0a9f00248ac88c1f01893916e88345b14ddc36c` (verified as the archive's exact
+  `src/dmf_pulse/ingestion/odds/mapping.py`).
+- Temporary recovery archive and publisher workflow — removed.
+- Formatted recovered source SHA-256 values — identity
+  `3cc9783c070dee26ba282835e4a8aaeb07070b13104b0f9308d09a4d4928154c`, mapping
+  `492ab91fda30a0c89fb2ce6b7603f26d7f3bada4d7cb74243631ec4c5c151977`, fixture tests
+  `fba6551a8ee77f38a6676c36bab5f81a1f0c27ffca4da9be12edaba0871924d2`.
+- Recovered identity tests — `51 passed`.
+- Focused Linux-equivalent local suite — `157 passed, 1 deselected`; the deselected
+  test requires Windows symlink privilege unavailable on this host and remains enabled
+  for the Linux branch workflow.
+- Ruff format/lint, strict mypy, wheel build, first-party secret scan and diff check —
+  `PASS`.
+- Repository validation — `FAIL` against the pre-existing stale branch-wide current
+  manifest; this is not promoted to a Checkpoint-1.4 pass and must be remediated by final
+  engineering acceptance.
+- PostgreSQL — `NOT_EXECUTED` (transient/DB-free identity architecture).
+- Real credentialled provider call — `OPERATOR_CHECKPOINT`.
+- Exact next action — publish the required capability commit, verify remote equality, and
+  consume the Linux focused-validation result before bounded Checkpoint 1.4C review.
