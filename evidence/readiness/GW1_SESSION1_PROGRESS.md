@@ -130,7 +130,7 @@
 - Affected CLI tests — `29 passed`.
 - PostgreSQL integration tests — `1 passed`.
 - Ruff format/lint, strict mypy, wheel build, diff check and first-party secret scan — `PASS`.
-- Code/remediation commit SHA — pending the next durable commit.
+- Code/remediation commit SHA — `03b76f08bb1648359e1c63a3c1d4ae4ea5d58f79`.
 - `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
 - Raw provider payload retention remains forbidden; canonical FPL fixture/team mapping and fuzzy matching remain unperformed.
 - Public display, redistribution, backup and model training remain denied.
@@ -151,3 +151,9 @@
 | 1.5 | INCOMPLETE / NOT_STARTED |
 
 - Exact next action — **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.
+
+### Final 1.3B validation publication
+
+- Workflow run — `32247073642`.
+- Validation result — `PASS`.
+- Validation/evidence commit SHA — pending the next durable commit.
