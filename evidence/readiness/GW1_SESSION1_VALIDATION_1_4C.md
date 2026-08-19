@@ -50,5 +50,17 @@ fixture identity bridge after accepted capability commit
 - No real provider credential was requested, read, logged, stored or used.
 - No official-FPL-derived persistence was introduced.
 - `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
-- Checkpoint 1.5 remains `NOT_STARTED` until this remediation is pushed and remotely
-  validated.
+- Checkpoint 1.5 was `NOT_STARTED` throughout Checkpoint-1.4C implementation and
+  validation.
+
+## Remote acceptance
+
+- Remediation commit — `16560a1f8e50a7a6b33a6a7430f4ca9a01be30ff`.
+- Focused Linux workflow — `32313356458` (`PASS`).
+- Linux focused tests — `166 passed`.
+- Frozen sync, Ruff format/diff/lint, strict mypy, package build, first-party secret
+  scan and Git diff check — `PASS`.
+- Machine-written validation evidence head —
+  `5d48a1bcabe8e3c4960f5c906b0a1492799abfde`.
+- Checkpoint 1.4 — `COMPLETE`.
+- Exact next action — **CHECKPOINT 1.5 — SESSION-1 ARTIFACTS / OPERATOR WORKFLOW**.

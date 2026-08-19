@@ -231,7 +231,7 @@
 - Checkpoint 1.5 — `NOT_STARTED`.
 - Exact next action — **CHECKPOINT 1.5 — SESSION-1 ARTIFACTS / OPERATOR WORKFLOW**.
 <!-- GW1-1.4B-END -->
-## Checkpoint 1.4C — hostile identity acceptance pre-publication
+## Checkpoint 1.4C — hostile identity acceptance
 
 - Starting accepted 1.4B evidence head —
   `ff57c0c12b8ba9f7730bf5d703c808e2b6f7955a`.
@@ -256,5 +256,8 @@
 - Rights/storage — combined FPL-derived identity remains transient/in-memory;
   persistence and database access remain false; no raw provider payload is retained.
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
-- Exact next action — publish the 1.4C remediation, consume Linux validation, record
-  exact remote SHAs, then begin Checkpoint 1.5.
+- Remediation commit — `16560a1f8e50a7a6b33a6a7430f4ca9a01be30ff`.
+- Linux validation workflow — `32313356458` (`PASS`, `166 passed`).
+- Validation evidence head — `5d48a1bcabe8e3c4960f5c906b0a1492799abfde`.
+- Checkpoint 1.4 — `COMPLETE`.
+- Exact next action — **CHECKPOINT 1.5 — SESSION-1 ARTIFACTS / OPERATOR WORKFLOW**.
