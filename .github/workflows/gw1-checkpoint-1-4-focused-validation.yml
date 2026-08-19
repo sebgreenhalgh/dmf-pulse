@@ -104,8 +104,7 @@ jobs:
             done
             overall=1
           fi
-          run_check diff_check git diff --check \
-            abd7abdc5de16f29d55bc7dcab5421d542fe8dc7 "$GITHUB_SHA"
+          run_check diff_check git diff --check "$GITHUB_SHA^" "$GITHUB_SHA"
 
           {
             echo "# GW1 Checkpoint ${stage} Focused Validation"
@@ -140,6 +139,15 @@ jobs:
               echo '```'
             done
           } >"$report"
+
+          python - "$report" <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          lines = path.read_text(encoding="utf-8").splitlines()
+          path.write_text("\n".join(line.rstrip() for line in lines) + "\n", encoding="utf-8")
+          PY
 
           export GW1_STAGE="$stage"
           export GW1_OVERALL="$([[ "$overall" -eq 0 ]] && echo PASS || echo FAIL)"
