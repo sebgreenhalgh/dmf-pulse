@@ -114,4 +114,4 @@
 
 - Workflow run — `32246327083`.
 - Focused validation — `FAIL`.
-- Validation/evidence commit SHA — pending the next durable commit.
+- Validation/evidence commit SHA — `4ece4f1054e400720693ab223b4f8ddc0ac4cefc`.
