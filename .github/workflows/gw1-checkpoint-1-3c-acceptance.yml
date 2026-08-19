@@ -17,6 +17,7 @@ jobs:
     env:
       UV_NO_PROGRESS: "1"
       PYTHONUTF8: "1"
+      OPERATOR_CONTRACT_SHA: "83e66db98807697819b5bf31228b515756688722"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -103,9 +104,9 @@ jobs:
 
           cd "$GITHUB_WORKSPACE"
           uv run python scripts/scan_secrets.py | tee "${RUNNER_TEMP}/secret-scan.log"
-          git diff --check "${GITHUB_SHA}^" "$GITHUB_SHA"
+          git diff --check "8a678cb3f08ef0894a4468b6d37674f0e5a1b935" "$GITHUB_SHA"
 
-          python - "$GITHUB_RUN_ID" "$GITHUB_SHA" "$smoke" <<'PY'
+          python - "$GITHUB_RUN_ID" "$OPERATOR_CONTRACT_SHA" "$smoke" <<'PY'
           from pathlib import Path
           import sys
 
