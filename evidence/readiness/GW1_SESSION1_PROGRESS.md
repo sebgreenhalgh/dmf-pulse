@@ -168,7 +168,7 @@
 - Ruff format/lint, wheel build/install, installed CLI credential status/help, controlled missing-credential path, diff check and first-party secret scan — `PASS`.
 - Strict mypy — `NOT_EXECUTED`; no production Python changed.
 - PostgreSQL integration — `NOT_EXECUTED`; accepted Checkpoint 1.3B database evidence remains controlling.
-- Acceptance/evidence commit SHA — pending exact-SHA attestation.
+- Acceptance/evidence commit SHA — `a2f823ab53cec944e8bb7065d40b4950f7d11c9b`.
 - Output — `ODDS_PROVIDER_CURRENT_INPUT`, `PROVIDER_NATIVE_UNMAPPED`, no canonical FPL mapping, no raw payload retention.
 - Rights/storage and temporal contracts — unchanged and accepted.
 - `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.

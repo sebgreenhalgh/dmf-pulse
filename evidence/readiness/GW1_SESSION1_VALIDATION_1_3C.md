@@ -7,7 +7,7 @@
 - Engineering path — `VALIDATED`
 - Real provider call — `NOT EXECUTED`
 - `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`
-- Acceptance/evidence commit SHA — pending exact-SHA attestation
+- Acceptance/evidence commit SHA — `a2f823ab53cec944e8bb7065d40b4950f7d11c9b`
 
 ## Results
 
