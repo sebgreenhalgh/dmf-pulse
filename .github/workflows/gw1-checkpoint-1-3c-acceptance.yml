@@ -22,7 +22,7 @@ jobs:
       UV_NO_PROGRESS: "1"
       PYTHONUTF8: "1"
       OPERATOR_CONTRACT_SHA: "83e66db98807697819b5bf31228b515756688722"
-      ACCEPTANCE_ATTEMPT: "2"
+      ACCEPTANCE_ATTEMPT: "3"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -142,7 +142,7 @@ jobs:
               "| 1.3 Live The Odds API input foundation | COMPLETE | "
               "1.3A, 1.3B and 1.3C are COMPLETE; operator contract and acceptance evidence are published. |"
           )
-          if old not in text or "| 1.3C | NOT_STARTED / INCOMPLEQE |" not in text:
+          if old not in text or "| 1.3C | NOT_STARTED / INCOMPLETE |" not in text:
               raise SystemExit("unexpected Checkpoint 1.3 progress handoff state")
           text = text.replace(old, new, 1).replace(
               "| 1.3C | NOT_STARTED / INCOMPLETE |", "| 1.3C | COMPLETE |", 1

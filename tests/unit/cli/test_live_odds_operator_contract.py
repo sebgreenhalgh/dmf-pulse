@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -99,7 +100,7 @@ def test_snapshot_help_matches_documented_option_contract() -> None:
     result = runner.invoke(app, ["ingest", "odds", "snapshot", "--help"])
 
     assert result.exit_code == 0
-    normalized = result.stdout.casefold().replace("_", "-")
+    normalized = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", result.stdout).casefold().replace("_", "-")
     for option in (
         "--provider",
         "--competition-key",
