@@ -5,12 +5,12 @@
 <!-- GW1-1.4-PLAN-START -->
 ### Checkpoint 1.4 — FPL / Odds identity integrity
 
-- [ ] 1.4A exact explicit team alias resolution, source/plan hash binding,
+- [x] 1.4A exact explicit team alias resolution, source/plan hash binding,
   approval/cutoff enforcement and transient rights boundary.
 - [ ] 1.4B exact target-GW fixture resolution, orientation, kickoff, one-to-one
   coverage, diagnostics and deterministic mapped output.
 - [ ] 1.4C bounded acceptance evidence and exact Checkpoint 1.5 handoff.
-- Latest focused validation — `1.4A` `FAIL`, run `32281153327`, commit `a5bdc995080dc984676133c1f70c7a2bc0594801`.
+- Latest focused validation — `1.4A` `PASS`, run `32281522483`, commit `6991e586c77301d6a0cc26246144f71c1cf49cb0`.
 - Exclusions remain: probabilities, projections, optimisation, initial squad,
   captaincy, prospective logging, UI, Checkpoint 1.5, PR, merge and activation.
 <!-- GW1-1.4-PLAN-END -->

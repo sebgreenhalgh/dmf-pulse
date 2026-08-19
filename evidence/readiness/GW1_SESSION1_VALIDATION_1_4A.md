@@ -1,10 +1,10 @@
 # GW1 Checkpoint 1.4A Focused Validation
 
-- Workflow run — `32281153327`
-- Validated commit — `a5bdc995080dc984676133c1f70c7a2bc0594801`
+- Workflow run — `32281522483`
+- Validated commit — `6991e586c77301d6a0cc26246144f71c1cf49cb0`
 - Branch — `readiness/GW1-2026-27-live-input-initial-squad`
-- Commit subject — `fix(gw1): satisfy team identity validation gates`
-- Overall — `FAIL`
+- Commit subject — `ci(gw1): make focused identity evidence self-cleaning`
+- Overall — `PASS`
 - PostgreSQL — `NOT_EXECUTED` (transient/DB-free identity architecture).
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
 - Checkpoint 1.5 work — `NOT_EXECUTED`.
@@ -20,14 +20,14 @@
 - `strict_mypy` — `PASS` (exit `0`)
 - `build` — `PASS` (exit `0`)
 - `secret_scan` — `PASS` (exit `0`)
-- `diff_check` — `FAIL` (exit `2`)
+- `diff_check` — `PASS` (exit `0`)
 
 ## focused_pytest
 
 ```text
 ........................................................................ [ 57%]
 ......................................................                   [100%]
-126 passed in 2.79s
+126 passed in 2.69s
 ```
 
 ## ruff_format
@@ -76,10 +76,4 @@ Successfully built dist/dmf_pulse-0.2.0-py3-none-any.whl
 ## diff_check
 
 ```text
-evidence/readiness/GW1_SESSION1_VALIDATION_1_4A.md:57: trailing whitespace.
-+ 
-evidence/readiness/GW1_SESSION1_VALIDATION_1_4A.md:84: trailing whitespace.
-+ 
-evidence/readiness/GW1_SESSION1_VALIDATION_1_4A.md:102: trailing whitespace.
-+ 
 ```
