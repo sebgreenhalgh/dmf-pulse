@@ -22,7 +22,7 @@ jobs:
       UV_NO_PROGRESS: "1"
       PYTHONUTF8: "1"
       OPERATOR_CONTRACT_SHA: "83e66db98807697819b5bf31228b515756688722"
-      ACCEPTANCE_ATTEMPT: "3"
+      ACCEPTANCE_ATTEMPT: "4"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,6 +65,7 @@ jobs:
             tests/unit/ingestion/test_live_odds_transport.py \
             tests/unit/ingestion/test_live_odds_current_input.py \
             | tee "${RUNNER_TEMP}/focused.log"
+          uv run ruff format tests/unit/cli/test_live_odds_operator_contract.py
           uv run ruff format --check tests/unit/cli/test_live_odds_operator_contract.py
           uv run ruff check tests/unit/cli/test_live_odds_operator_contract.py
           uv build | tee "${RUNNER_TEMP}/build.log"
@@ -211,6 +212,6 @@ jobs:
           rm -f "$marker"
           uv run python scripts/scan_secrets.py > "${RUNNER_TEMP}/final-secret-scan.log"
           git diff --check
-          git add -A -- "$report" evidence/readiness/GW1_SESSION1_PROGRESS.md "$marker"
+          git add -A -- "$report" evidence/readiness/GW1_SESSION1_PROGRESS.md "$marker" tests/unit/cli/test_live_odds_operator_contract.py
           git commit -m 'docs(gw1): complete live odds input acceptance'
           git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
