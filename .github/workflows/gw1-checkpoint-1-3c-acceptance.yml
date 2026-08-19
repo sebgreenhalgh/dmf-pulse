@@ -1,0 +1,195 @@
+name: gw1-checkpoint-1-3c-acceptance
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-checkpoint-1-3c-acceptance.yml
+
+permissions:
+  contents: write
+
+jobs:
+  accept-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      UV_NO_PROGRESS: "1"
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Validate and publish Checkpoint 1.3C
+        shell: bash
+        run: |
+          set -euo pipefail
+          report='evidence/readiness/GW1_SESSION1_VALIDATION_1_3C.md'
+          smoke="${RUNNER_TEMP}/dmf-wheel-smoke"
+          venv="${RUNNER_TEMP}/dmf-wheel-venv"
+          mkdir -p "$smoke" evidence/readiness
+
+          python -m pip install --disable-pip-version-check uv==0.11.26
+          uv sync --all-groups --frozen
+          uv run pytest -q \
+            tests/unit/cli/test_live_odds_operator_contract.py \
+            tests/unit/cli/test_odds_credential_status.py \
+            tests/unit/cli/test_live_odds_snapshot.py \
+            tests/unit/ingestion/test_gw1_live_odds_transport.py \
+            tests/unit/ingestion/test_live_odds_transport.py \
+            tests/unit/ingestion/test_live_odds_current_input.py \
+            | tee "${RUNNER_TEMP}/focused.log"
+          uv run ruff format --check tests/unit/cli/test_live_odds_operator_contract.py
+          uv run ruff check tests/unit/cli/test_live_odds_operator_contract.py
+          uv build | tee "${RUNNER_TEMP}/build.log"
+
+          wheel=$(find dist -maxdepth 1 -type f -name '*.whl' -print -quit)
+          test -n "$wheel"
+          python -m venv "$venv"
+          uv pip install --python "$venv/bin/python" "$wheel"
+
+          cd "$smoke"
+          unset PYTHONPATH DMF_PULSE_ODDS_API_KEY CREDENTIALS_DIRECTORY \
+            DMF_TEST_DATABASE_URL DMF_ENVIRONMENT
+          "$venv/bin/dmf" ingest odds credential-status --output json > credential.json
+          "$venv/bin/python" - <<'PY'
+          import json
+          from pathlib import Path
+
+          value = json.loads(Path("credential.json").read_text(encoding="utf-8"))
+          assert value == {"configured": False}
+          PY
+
+          export NO_COLOR=1 TERM=dumb
+          "$venv/bin/dmf" ingest odds snapshot --help > snapshot-help.txt
+          "$venv/bin/python" - <<'PY'
+          import re
+          from pathlib import Path
+
+          text = Path("snapshot-help.txt").read_text(encoding="utf-8")
+          normalized = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", text).casefold().replace("_", "-")
+          for option in (
+              "--provider", "--competition-key", "--sport-key", "--region",
+              "--market", "--as-of", "--database-url-ref", "--output",
+          ):
+              assert option in normalized
+          assert "--api-key" not in normalized
+          PY
+
+          set +e
+          "$venv/bin/dmf" ingest odds snapshot \
+            --provider the_odds_api --competition-key PL --sport-key soccer_epl \
+            --region uk --market h2h --as-of 2099-01-01T00:00:00Z \
+            --database-url-ref env:DMF_TEST_DATABASE_URL --output json \
+            > missing-credential.json
+          missing_rc=$?
+          set -e
+          test "$missing_rc" -eq 4
+          "$venv/bin/python" - <<'PY'
+          import json
+          from pathlib import Path
+
+          value = json.loads(Path("missing-credential.json").read_text(encoding="utf-8"))
+          assert value["status"] == "BLOCKED"
+          assert value["current_input"] is None
+          assert value["error"]["code"] == "CREDENTIAL_UNAVAILABLE"
+          assert value["error"]["transport_called"] is False
+          assert value["quality"]["blockers"] == ["CREDENTIAL_UNAVAILABLE"]
+          PY
+
+          cd "$GITHUB_WORKSPACE"
+          uv run python scripts/scan_secrets.py | tee "${RUNNER_TEMP}/secret-scan.log"
+          git diff --check "${GITHUB_SHA}^" "$GITHUB_SHA"
+
+          python - "$GITHUB_RUN_ID" "$GITHUB_SHA" "$smoke" <<'PY'
+          from pathlib import Path
+          import sys
+
+          run_id, operator_commit, smoke_dir = sys.argv[1:]
+          progress = Path("evidence/readiness/GW1_SESSION1_PROGRESS.md")
+          text = progress.read_text(encoding="utf-8")
+          old = (
+              "| 1.3 Live The Odds API input foundation | IN_PROGRESS | "
+              "1.3A and 1.3B are COMPLETE; 1.3C is NOT_STARTED and is the exact next action. |"
+          )
+          new = (
+              "| 1.3 Live The Odds API input foundation | COMPLETE | "
+              "1.3A, 1.3B and 1.3C are COMPLETE; operator contract and acceptance evidence are published. |"
+          )
+          if old not in text or "| 1.3C | NOT_STARTED / INCOMPLETE |" not in text:
+              raise SystemExit("unexpected Checkpoint 1.3 progress handoff state")
+          text = text.replace(old, new, 1).replace(
+              "| 1.3C | NOT_STARTED / INCOMPLETE |", "| 1.3C | COMPLETE |", 1
+          )
+          text += f"""
+          
+          ## Checkpoint 1.3C — acceptance / operator contract
+          
+          - Starting remote SHA — `8a678cb3f08ef0894a4468b6d37674f0e5a1b935`.
+          - Operator-contract commit — `{operator_commit}`.
+          - Acceptance workflow — `{run_id}` (`PASS`).
+          - Focused acceptance, Ruff format/lint, wheel build/install, installed CLI credential status/help, controlled missing-credential path, diff check and first-party secret scan — `PASS`.
+          - Strict mypy — `NOT_EXECUTED`; no production Python changed.
+          - PostgreSQL integration — `NOT_EXECUTED`; accepted Checkpoint 1.3B database evidence remains controlling.
+          - Acceptance/evidence commit SHA — pending exact-SHA attestation.
+          - Output — `ODDS_PROVIDER_CURRENT_INPUT`, `PROVIDER_NATIVE_UNMAPPED`, no canonical FPL mapping, no raw payload retention.
+          - Rights/storage and temporal contracts — unchanged and accepted.
+          - `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
+          - Checkpoint 1.4 — `NOT_STARTED`.
+          - Exact next action — **CHECKPOINT 1.4 — FPL / ODDS IDENTITY INTEGRITY**.
+          """
+          progress.write_text(text, encoding="utf-8")
+
+          missing = Path(smoke_dir, "missing-credential.json").read_text(encoding="utf-8")
+          report = Path("evidence/readiness/GW1_SESSION1_VALIDATION_1_3C.md")
+          report.write_text(f"""# GW1 Checkpoint 1.3C Acceptance / Operator Contract
+          
+          - Starting remote SHA — `8a678cb3f08ef0894a4468b6d37674f0e5a1b935`
+          - Operator-contract commit — `{operator_commit}`
+          - Workflow run — `{run_id}`
+          - Overall — `PASS`
+          - Engineering path — `VALIDATED`
+          - Real provider call — `NOT EXECUTED`
+          - `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`
+          - Acceptance/evidence commit SHA — pending exact-SHA attestation
+          
+          ## Results
+          
+          - Focused CLI/current-input acceptance — `PASS`
+          - Ruff format/lint — `PASS`
+          - Strict mypy — `NOT_EXECUTED` (no production Python changed)
+          - PostgreSQL integration — `NOT_EXECUTED` (accepted 1.3B evidence remains controlling)
+          - Wheel build and clean-environment install — `PASS`
+          - Installed `credential-status` and snapshot help — `PASS`
+          - Installed missing-credential path — `PASS`, exit `4`, no transport
+          - First-party secret scan — `PASS`
+          - Git diff check — `PASS`
+          
+          ## Installed missing-credential envelope
+          
+          ```json
+          {missing.strip()}
+          ```
+          
+          ## Contract boundary
+          
+          - Provider configuration: `the_odds_api`, `soccer_epl`, `uk`, `h2h`, decimal, cost `1`, attempts `2`, timeouts `10/20/30` seconds.
+          - Output: `ODDS_PROVIDER_CURRENT_INPUT`, `PROVIDER_NATIVE_UNMAPPED`.
+          - Canonical FPL fixture mapping and fuzzy matching: not performed.
+          - Rights/storage: private automated/transient/derived/internal use allowed; raw retention zero; public display, redistribution, backup and model training effectively denied.
+          - Temporal: fresh nonpast cutoff required; request, receipt, capture, cutoff, provider and usable timestamps preserved; no backdating.
+          - No Checkpoint 1.4 work was started.
+          """, encoding="utf-8")
+          PY
+
+          uv run python scripts/scan_secrets.py > "${RUNNER_TEMP}/final-secret-scan.log"
+          git diff --check
+          git config user.name 'dmf-pulse-gw1-acceptance-bot'
+          git config user.email 'dmf-pulse-gw1-acceptance-bot@users.noreply.github.com'
+          git add "$report" evidence/readiness/GW1_SESSION1_PROGRESS.md
+          git commit -m 'docs(gw1): complete live odds input acceptance'
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
