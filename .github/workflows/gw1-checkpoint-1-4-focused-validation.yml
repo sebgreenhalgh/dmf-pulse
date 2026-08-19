@@ -1,5 +1,6 @@
 name: gw1-checkpoint-1-4-focused-validation
 
+# Triggered through a low-level ref update to preserve the accepted 1.4A lineage.
 on:
   push:
     branches:
