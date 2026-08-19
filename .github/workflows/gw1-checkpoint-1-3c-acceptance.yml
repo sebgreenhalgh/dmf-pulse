@@ -44,9 +44,9 @@ jobs:
           {
             echo '# GW1 Checkpoint 1.3C Acceptance Run Start'
             echo
-            echo "- Workflow run — `${GITHUB_RUN_ID}`"
-            echo "- Trigger commit — `${GITHUB_SHA}`"
-            echo "- Operator-contract commit — `${OPERATOR_CONTRACT_SHA}`"
+            echo "- Workflow run — ${GITHUB_RUN_ID}"
+            echo "- Trigger commit — ${GITHUB_SHA}"
+            echo "- Operator-contract commit — ${OPERATOR_CONTRACT_SHA}"
             echo '- State — `RUNNING`'
             echo '- `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`'
           } > "$marker"
