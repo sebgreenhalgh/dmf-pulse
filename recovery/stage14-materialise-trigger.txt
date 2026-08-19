@@ -1,0 +1,2 @@
+trigger_sha=d4ba48cb1d3858eef0c27fd7a6794c820805e4c7
+purpose=materialise-checkpoint-payload
