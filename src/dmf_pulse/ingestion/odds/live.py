@@ -349,9 +349,40 @@ class DatabaseLiveOddsEvidenceStore:
                 append_processing_event_idempotent(
                     session,
                     snapshot_id=handle.source_snapshot_id,
-                    stage="QUALITY_PASSED",
+                    stage="MAPPED",
                     event_at=current_input.temporal.usable_at,
                     input_sha256=(current_input.provenance.effective_config_sha256),
+                    output_sha256=current_input_sha256,
+                    safe_details={
+                        "identity_scope": current_input.identity_scope,
+                        "mapping_scope": "PROVIDER_NATIVE_ONLY",
+                        "canonical_fpl_fixture_mapping_performed": False,
+                        "fuzzy_team_matching_performed": False,
+                    },
+                    stage_version="the-odds-api-v4-reference-v1",
+                    actor="the-odds-api-current-input-v1",
+                )
+                append_processing_event_idempotent(
+                    session,
+                    snapshot_id=handle.source_snapshot_id,
+                    stage="PROMOTED",
+                    event_at=current_input.temporal.usable_at,
+                    input_sha256=current_input_sha256,
+                    output_sha256=current_input_sha256,
+                    safe_details={
+                        "promotion_target": current_input.contract,
+                        "canonical_rows_created": 0,
+                        "raw_payload_retained": False,
+                    },
+                    stage_version="the-odds-api-v4-reference-v1",
+                    actor="the-odds-api-current-input-v1",
+                )
+                append_processing_event_idempotent(
+                    session,
+                    snapshot_id=handle.source_snapshot_id,
+                    stage="QUALITY_PASSED",
+                    event_at=current_input.temporal.usable_at,
+                    input_sha256=current_input_sha256,
                     output_sha256=current_input_sha256,
                     safe_details={
                         "provider_native": True,

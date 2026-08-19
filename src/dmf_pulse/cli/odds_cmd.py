@@ -22,9 +22,11 @@ from dmf_pulse.ingestion.odds.live import LiveOddsOperationOutcome, LiveOddsSnap
 from dmf_pulse.ingestion.odds.parser import CONTRACT_VERSION
 from dmf_pulse.ingestion.odds.service import (
     OddsImportRequest,
-    OddsIngestionService as ReferenceOddsIngestionService,
     OddsOperationOutcome,
     OddsReplayRequest,
+)
+from dmf_pulse.ingestion.odds.service import (
+    OddsIngestionService as ReferenceOddsIngestionService,
 )
 
 odds_app = typer.Typer(help="Validate and ingest governed The Odds API-shaped observations.")

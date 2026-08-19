@@ -153,9 +153,11 @@ def test_snapshot_usage_failure_is_secret_free(monkeypatch: pytest.MonkeyPatch) 
     assert result.exit_code == 3
     assert DUMMY_RUNTIME_VALUE not in result.stdout
     assert json.loads(result.stdout) == {
+        "schema_version": "1.0.0",
+        "status": "FAILED",
         "error": {
             "code": "USAGE_INVALID",
             "message": "odds snapshot options are not allowlisted",
             "retryable": False,
-        }
+        },
     }

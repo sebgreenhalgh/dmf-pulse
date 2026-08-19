@@ -125,21 +125,23 @@ def test_live_provider_native_input_persists_governed_evidence_without_mapping(
         )
         assert provider_key == "the_odds_api"
 
-        stages = set(
+        stages = list(
             session.scalars(
-                select(source_processing_event.c.stage).where(
-                    source_processing_event.c.source_snapshot_id == snapshot_id
-                )
+                select(source_processing_event.c.stage)
+                .where(source_processing_event.c.source_snapshot_id == snapshot_id)
+                .order_by(source_processing_event.c.sequence_number)
             )
         )
-        assert {
+        assert stages == [
             "RECEIVED",
             "RAW_DISCARDED",
             "PARSED",
             "VALIDATED",
+            "MAPPED",
+            "PROMOTED",
             "QUALITY_PASSED",
             "USABLE",
-        }.issubset(stages)
+        ]
 
         decisions = set(
             session.scalars(

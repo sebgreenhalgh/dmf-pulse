@@ -93,3 +93,19 @@
 - Validation result — `FAIL`.
 - Machine-written details — `evidence/readiness/GW1_SESSION1_VALIDATION_1_3B.md`.
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
+
+
+## Checkpoint 1.3B remediation — 2026-08-19
+
+- Exact remediation startup remote SHA — `196224c729e1df25a30f3a0d5ac55bac74f7fcc2`.
+- Reproduced published workflow run — `32194395276` (`FAIL`).
+- CLI root cause — the test asserted only `error`; the accepted public envelope also requires `schema_version` and `status`.
+- PostgreSQL root cause — the provider-native path skipped the legal `MAPPED` and `PROMOTED` lifecycle stages before `QUALITY_PASSED`.
+- Ruff root causes — one unsorted import block and one `Callable` import from `typing`.
+- Remediation — preserve the production error envelope, restore the accepted lifecycle vocabulary with explicit provider-native/no-canonical-mapping semantics, strengthen ordered lifecycle coverage, and apply normal Ruff fixes.
+- Remediation validation workflow — `32246327083`.
+- Validation status before publication — `FAIL`.
+- Remediation commit SHA — pending the next durable commit.
+- `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
+- No Checkpoint 1.3C or 1.4 implementation was started.
+- Exact next action after a clean durable pass — **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.
