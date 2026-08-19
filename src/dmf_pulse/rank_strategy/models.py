@@ -93,7 +93,7 @@ class ManagerTeamPlan(RankModel):
     transfer_hit_points: NonNegativeInt = 0
 
     @model_validator(mode="after")
-    def team_shape_is_exact(self) -> "ManagerTeamPlan":
+    def team_shape_is_exact(self) -> ManagerTeamPlan:
         for label, squad in (
             ("permanent", self.permanent_squad),
             ("temporary Free Hit", self.temporary_free_hit_squad),
@@ -144,7 +144,7 @@ class CohortSample(RankModel):
     source_reference: StrictStr | None = None
 
     @model_validator(mode="after")
-    def sample_is_valid(self) -> "CohortSample":
+    def sample_is_valid(self) -> CohortSample:
         for label, value in (
             ("observed_at", self.observed_at),
             ("information_cutoff", self.information_cutoff),
@@ -188,7 +188,7 @@ class ScenarioManagerMultiplier(RankModel):
     multiplier_hash: Sha256
 
     @model_validator(mode="after")
-    def multiplier_is_canonical(self) -> "ScenarioManagerMultiplier":
+    def multiplier_is_canonical(self) -> ScenarioManagerMultiplier:
         if tuple(self.player_multipliers) != tuple(sorted(self.player_multipliers)):
             raise ValueError("player multipliers must be sorted by player ID")
         expected_counted = tuple(
@@ -213,7 +213,7 @@ class ManagerMultiplierSet(RankModel):
     multiplier_set_hash: Sha256
 
     @model_validator(mode="after")
-    def scenario_set_is_valid(self) -> "ManagerMultiplierSet":
+    def scenario_set_is_valid(self) -> ManagerMultiplierSet:
         identities = tuple((item.scenario_id, item.outcome_draw_id) for item in self.scenarios)
         if identities != tuple(sorted(identities)) or len(identities) != len(set(identities)):
             raise ValueError("manager multiplier scenarios must be sorted and unique")
@@ -239,7 +239,7 @@ class PlayerOwnership(RankModel):
     expected_leverage: FiniteFloat | None = None
 
     @model_validator(mode="after")
-    def ownership_is_canonical(self) -> "PlayerOwnership":
+    def ownership_is_canonical(self) -> PlayerOwnership:
         percentage_fields = (
             self.raw_ownership,
             self.starting_ownership,
@@ -281,7 +281,7 @@ class EffectiveOwnershipReport(RankModel):
     report_hash: Sha256
 
     @model_validator(mode="after")
-    def report_is_canonical(self) -> "EffectiveOwnershipReport":
+    def report_is_canonical(self) -> EffectiveOwnershipReport:
         ids = tuple(item.player_id for item in self.entries)
         if ids != tuple(sorted(ids)) or len(ids) != len(set(ids)):
             raise ValueError("EO entries must be sorted and unique")
