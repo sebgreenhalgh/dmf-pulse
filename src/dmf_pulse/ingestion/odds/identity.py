@@ -85,9 +85,7 @@ class CurrentTeamIdentityMap(_FrozenIdentityModel):
     odds_identity_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     team_alias_plan_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
     team_alias_plan_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    mapping_algorithm_version: Literal["gw1-fpl-odds-exact-v1"] = (
-        "gw1-fpl-odds-exact-v1"
-    )
+    mapping_algorithm_version: Literal["gw1-fpl-odds-exact-v1"] = "gw1-fpl-odds-exact-v1"
     team_mappings: tuple[ResolvedCurrentTeam, ...] = Field(min_length=2)
     semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -145,37 +143,34 @@ def current_fpl_input_semantic_sha256(fpl_input: CurrentFplInputBundle) -> str:
 def current_fpl_identity_view_sha256(fpl_input: CurrentFplInputBundle) -> str:
     """Bind the exact current team, target-event, and fixture identity view."""
 
-    teams = sorted(
-        (
-            {
-                "identity": team.identity.model_dump(mode="json"),
-                "official_name": team.official_name,
-                "provider_team_id": team.provider_team_id,
-                "source_semantic_sha256": team.source_semantic_sha256,
-            }
-            for team in fpl_input.teams
-        ),
-        key=lambda item: item["provider_team_id"],
-    )
-    fixtures = sorted(
-        (
-            {
-                "away_team_identity": fixture.away_team_identity.model_dump(mode="json"),
-                "event_identity": (
-                    fixture.event_identity.model_dump(mode="json")
-                    if fixture.event_identity is not None
-                    else None
-                ),
-                "fixture_identity": fixture.identity.model_dump(mode="json"),
-                "home_team_identity": fixture.home_team_identity.model_dump(mode="json"),
-                "kickoff_at": fixture.kickoff_at.isoformat() if fixture.kickoff_at else None,
-                "provider_fixture_id": fixture.provider_fixture_id,
-                "source_semantic_sha256": fixture.source_semantic_sha256,
-            }
-            for fixture in fpl_input.fixtures
-        ),
-        key=lambda item: item["provider_fixture_id"],
-    )
+    teams = [
+        {
+            "identity": team.identity.model_dump(mode="json"),
+            "official_name": team.official_name,
+            "provider_team_id": team.provider_team_id,
+            "source_semantic_sha256": team.source_semantic_sha256,
+        }
+        for team in sorted(fpl_input.teams, key=lambda item: item.provider_team_id)
+    ]
+    fixtures = [
+        {
+            "away_team_identity": fixture.away_team_identity.model_dump(mode="json"),
+            "event_identity": (
+                fixture.event_identity.model_dump(mode="json")
+                if fixture.event_identity is not None
+                else None
+            ),
+            "fixture_identity": fixture.identity.model_dump(mode="json"),
+            "home_team_identity": fixture.home_team_identity.model_dump(mode="json"),
+            "kickoff_at": fixture.kickoff_at.isoformat() if fixture.kickoff_at else None,
+            "provider_fixture_id": fixture.provider_fixture_id,
+            "source_semantic_sha256": fixture.source_semantic_sha256,
+        }
+        for fixture in sorted(
+            fpl_input.fixtures,
+            key=lambda item: item.provider_fixture_id,
+        )
+    ]
     return canonical_sha256(
         {
             "competition_key": fpl_input.competition_key,
@@ -317,8 +312,7 @@ def _require_current_context(
     if any(mapping.approved_at > decided_at for mapping in plan.team_mappings):
         raise IngestionError("POST_CUTOFF", "team alias was approved after the mapping decision")
     fpl_rights = {
-        str(decision.capability): decision.decision
-        for decision in fpl_input.rights.decisions
+        str(decision.capability): decision.decision for decision in fpl_input.rights.decisions
     }
     if (
         fpl_rights.get("manual_import") != "ALLOW"
@@ -343,8 +337,7 @@ def _team_by_id(fpl_input: CurrentFplInputBundle) -> dict[int, CurrentFplTeam]:
         if (
             team.provider_team_id in by_id
             or team.identity.canonical_lookup_sha256 in identity_hashes
-            or team.source_semantic_sha256
-            != fpl_input.provenance.bootstrap_semantic_sha256
+            or team.source_semantic_sha256 != fpl_input.provenance.bootstrap_semantic_sha256
         ):
             raise IngestionError("MAPPING_CONFLICT", "official FPL team identity is duplicated")
         by_id[team.provider_team_id] = team
