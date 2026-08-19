@@ -369,6 +369,32 @@ def activate_token(
             "chip token is not available for activation",
             status=token.status,
         )
+    else:
+        if compiled.activation_status != ActivationStatus.READY:
+            raise ChipError(
+                "CHIP_EFFECT_BLOCKED",
+                "chip has unknown or invalid effect semantics",
+                chip_key=token.chip_key,
+                blockers=compiled.blockers,
+            )
+        if not compiled.definition.cancellable_before_lock:
+            raise ChipError(
+                "CHIP_PENDING_STATE_INVALID",
+                "only a cancellable chip can have a pending selection",
+            )
+        if token.selected_at_gameweek != inventory.current_gameweek:
+            raise ChipError(
+                "CHIP_PENDING_STATE_INVALID",
+                "pending chip selection must belong to the current Gameweek",
+            )
+        if not (
+            token.activation_start_gameweek
+            <= inventory.current_gameweek
+            <= token.activation_end_gameweek
+        ):
+            raise ChipError("CHIP_WINDOW_CLOSED", "chip token is outside its activation window")
+        if inventory.current_gameweek in token.excluded_gameweeks:
+            raise ChipError("CHIP_GAMEWEEK_EXCLUDED", "chip is excluded in the current Gameweek")
 
     current = inventory.current_gameweek
     active_until = current + token.duration_gameweeks - 1
@@ -478,6 +504,87 @@ def advance_inventory(
         current_gameweek=to_gameweek,
         tokens=tuple(advanced),
     )
+
+
+def validate_chip_inventory(
+    inventory: ChipInventory,
+    bundle: CompiledChipBundle,
+) -> ChipInventory:
+    """Independently replay a rules-bound inventory and reject forged state.
+
+    A semantic hash proves byte-level integrity, not that tokens were minted by
+    the compiled rules or reached their state through legal transitions.  This
+    verifier reconstructs the inventory from the bundle and replays every
+    user-driven selection, cancellation and activation event before comparing
+    the complete resulting state.
+    """
+
+    checked = ChipInventory.model_validate(inventory.model_dump(mode="python"))
+    expected_hash = semantic_sha256(checked.model_dump(mode="json", exclude={"inventory_hash"}))
+    if checked.inventory_hash != expected_hash:
+        raise ChipError(
+            "CHIP_INVENTORY_HASH_MISMATCH",
+            "chip inventory hash does not match",
+        )
+    if (
+        checked.ruleset_id,
+        checked.ruleset_version,
+        checked.ruleset_hash,
+        checked.bundle_hash,
+        checked.concurrency_limit,
+    ) != (
+        bundle.ruleset_id,
+        bundle.ruleset_version,
+        bundle.ruleset_hash,
+        bundle.bundle_hash,
+        bundle.concurrency_limit,
+    ):
+        raise ChipError(
+            "CHIP_INVENTORY_BUNDLE_MISMATCH",
+            "chip inventory does not match the compiled rules bundle",
+        )
+
+    replayed = build_chip_inventory(bundle, current_gameweek=1)
+    commands = tuple(
+        sorted(
+            (
+                event.gameweek,
+                token.token_id,
+                index,
+                event.event,
+            )
+            for token in checked.tokens
+            for index, event in enumerate(token.history)
+            if event.event
+            in {
+                TokenEventKind.SELECTED,
+                TokenEventKind.CANCELLED,
+                TokenEventKind.ACTIVATED,
+            }
+        )
+    )
+    for gameweek, token_id, _, event in commands:
+        if gameweek > checked.current_gameweek:
+            raise ChipError(
+                "CHIP_INVENTORY_FUTURE_EVENT",
+                "chip inventory history contains a future event",
+                token_id=token_id,
+                gameweek=gameweek,
+            )
+        replayed = advance_inventory(replayed, to_gameweek=gameweek)
+        if event is TokenEventKind.SELECTED:
+            replayed = select_token(replayed, bundle, token_id=token_id)
+        elif event is TokenEventKind.CANCELLED:
+            replayed = cancel_token(replayed, token_id=token_id)
+        else:
+            replayed = activate_token(replayed, bundle, token_id=token_id)
+    replayed = advance_inventory(replayed, to_gameweek=checked.current_gameweek)
+    if replayed != checked:
+        raise ChipError(
+            "CHIP_INVENTORY_STATE_INVALID",
+            "chip inventory was not produced by legal compiled-rules transitions",
+        )
+    return checked
 
 
 def available_token_ids(inventory: ChipInventory) -> tuple[str, ...]:

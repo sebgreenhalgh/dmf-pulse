@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import Field, StrictBool, StrictFloat, StrictInt, StrictStr, model_validator
 
@@ -388,13 +388,76 @@ class ChipServiceRequest(FrozenModel):
                 raise ValueError("chip-specific evaluation has different rules lineage")
             if evaluation.inventory_before_hash != self.inventory.inventory_hash:
                 raise ValueError("chip-specific evaluation has different inventory lineage")
-            if evaluation.scenario_set_hash != self.schedule_request.scenario_set_hash:
-                raise ValueError("chip-specific evaluation has different scenario lineage")
             token = token_map.get(evaluation.token_id)
             if token is None or token.chip_key != evaluation.chip_key:
                 raise ValueError("chip-specific evaluation token is absent or mismatched")
             if definition_map.get(evaluation.chip_key) != evaluation.chip_definition_hash:
                 raise ValueError("chip-specific evaluation definition hash differs")
+
+            domain_scenario_sets: tuple[tuple[Any, ...], ...]
+            if isinstance(evaluation, TripleCaptainEvaluation):
+                domain_scenario_sets = (evaluation.scenario_values,)
+            elif isinstance(evaluation, BenchBoostEvaluation):
+                domain_scenario_sets = (
+                    evaluation.standalone_route.scenario_values,
+                    *(
+                        (evaluation.wildcard_prepared_route.scenario_values,)
+                        if evaluation.wildcard_prepared_route is not None
+                        else ()
+                    ),
+                )
+            else:
+                domain_scenario_sets = (evaluation.scenario_values,)
+            for domain_scenarios in domain_scenario_sets:
+                domain_signature = tuple(
+                    (item.scenario_id, item.outcome_draw_id, item.weight)
+                    for item in domain_scenarios
+                )
+                if domain_signature != scenario_signature:
+                    raise ValueError(
+                        "chip-specific evaluation differs from the scheduler scenario universe"
+                    )
+
+            current_opportunities = tuple(
+                item
+                for item in self.schedule_request.opportunities
+                if item.chip_key == evaluation.chip_key
+                and item.token_id == evaluation.token_id
+                and item.activation_gameweek == self.inventory.current_gameweek
+            )
+            if not current_opportunities:
+                raise ValueError(
+                    "chip-specific evaluation lacks a matching current scheduler opportunity"
+                )
+            domain_gross_vectors = tuple(
+                tuple(
+                    float(
+                        getattr(
+                            item,
+                            "gross_increment",
+                            getattr(item, "gross_current_increment", 0.0),
+                        )
+                    )
+                    for item in domain_scenarios
+                )
+                for domain_scenarios in domain_scenario_sets
+            )
+            for opportunity in current_opportunities:
+                opportunity_vector = tuple(
+                    item.gross_current_gain for item in opportunity.scenario_values
+                )
+                if not any(
+                    all(
+                        abs(observed - expected) <= 1e-9
+                        for observed, expected in zip(
+                            opportunity_vector,
+                            domain_vector,
+                            strict=True,
+                        )
+                    )
+                    for domain_vector in domain_gross_vectors
+                ):
+                    raise ValueError("scheduler gross gain differs from chip-specific evaluation")
 
         payload = self.model_dump(mode="json", exclude={"service_request_hash"})
         if (

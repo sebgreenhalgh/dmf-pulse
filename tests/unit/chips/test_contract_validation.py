@@ -338,6 +338,25 @@ def test_window_check_catches_tampered_available_status(make_definition, make_bu
     assert exc.value.code == "CHIP_WINDOW_CLOSED"
 
 
+def test_forged_pending_state_cannot_bypass_activation_rules(make_definition, make_bundle) -> None:
+    blocked_bundle = make_bundle(
+        make_definition("BLOCKED_PENDING", effect=("UNKNOWN", "TRANSFORM", {}))
+    )
+    inventory = build_chip_inventory(blocked_bundle, current_gameweek=2)
+    token = inventory.tokens[0].model_copy(
+        update={
+            "status": TokenStatus.PENDING_CANCELLABLE,
+            "selected_at_gameweek": 2,
+        }
+    )
+    forged = inventory.model_copy(update={"tokens": (token,)})
+
+    with pytest.raises(ChipError) as exc_info:
+        activate_token(forged, blocked_bundle, token_id=token.token_id)
+
+    assert exc_info.value.code == "CHIP_EFFECT_BLOCKED"
+
+
 def test_selection_conflicts_and_irreversible_selection(make_definition, make_bundle) -> None:
     irreversible = make_bundle(make_definition("NOW", cancellable=False))
     inventory = build_chip_inventory(irreversible, current_gameweek=2)

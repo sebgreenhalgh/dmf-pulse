@@ -16,9 +16,13 @@ from dmf_pulse.chips.artifacts import (
     seal_decision_artifact,
     verify_decision_artifact,
 )
-from dmf_pulse.chips.definitions import CompiledChipBundle, semantic_sha256
+from dmf_pulse.chips.definitions import CompiledChipBundle
 from dmf_pulse.chips.errors import ChipError
-from dmf_pulse.chips.inventory import ChipInventory, build_chip_inventory
+from dmf_pulse.chips.inventory import (
+    ChipInventory,
+    build_chip_inventory,
+    validate_chip_inventory,
+)
 from dmf_pulse.chips.replay import (
     ChipReplayRequest,
     replay_chip_policy,
@@ -44,6 +48,13 @@ class _InventoryBuildInput(BaseModel):
 
     chip_bundle: CompiledChipBundle
     current_gameweek: int = Field(gt=0)
+
+
+class _InventoryValidationInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    chip_bundle: CompiledChipBundle
+    inventory: ChipInventory
 
 
 def _emit(value: BaseModel | tuple[Any, ...] | dict[str, Any] | list[Any]) -> None:
@@ -147,21 +158,26 @@ def inventory(
 
     def operation() -> ChipInventory:
         payload = _load(input_path)
+        if "chip_bundle" in payload and "inventory" in payload:
+            validation_request = _InventoryValidationInput.model_validate(payload)
+            validate_compiled_chip_bundle(validation_request.chip_bundle)
+            return validate_chip_inventory(
+                validation_request.inventory,
+                validation_request.chip_bundle,
+            )
         if "chip_bundle" in payload:
-            request = _InventoryBuildInput.model_validate(payload)
-            validate_compiled_chip_bundle(request.chip_bundle)
-            return build_chip_inventory(
-                request.chip_bundle,
-                current_gameweek=request.current_gameweek,
+            build_request = _InventoryBuildInput.model_validate(payload)
+            validate_compiled_chip_bundle(build_request.chip_bundle)
+            built = build_chip_inventory(
+                build_request.chip_bundle,
+                current_gameweek=build_request.current_gameweek,
             )
-        value = ChipInventory.model_validate(payload)
-        expected = semantic_sha256(value.model_dump(mode="json", exclude={"inventory_hash"}))
-        if value.inventory_hash != expected:
-            raise ChipError(
-                "CHIP_INVENTORY_HASH_MISMATCH",
-                "chip inventory hash does not match",
-            )
-        return value
+            return validate_chip_inventory(built, build_request.chip_bundle)
+        ChipInventory.model_validate(payload)
+        raise ChipError(
+            "CHIP_INVENTORY_BUNDLE_REQUIRED",
+            "validating evolved inventory requires its compiled chip bundle",
+        )
 
     _execute(operation)
 

@@ -1071,13 +1071,153 @@ def optimise_chip_schedule(request: ChipScheduleRequest) -> ChipSchedulePolicy:
     return _build_policy(request, search)
 
 
+def _oracle_subset_is_legal(
+    selected: tuple[ChipScheduleOpportunity, ...],
+    request: ChipScheduleRequest,
+) -> bool:
+    """Check one subset without using the production search legality path."""
+
+    selected_ids = {item.opportunity_id for item in selected}
+    token_ids = tuple(item.token_id for item in selected)
+    if len(token_ids) != len(set(token_ids)):
+        return False
+    if any(
+        not set(item.requires_prior_opportunity_ids) <= selected_ids
+        or bool(set(item.forbids_prior_opportunity_ids) & selected_ids)
+        for item in selected
+    ):
+        return False
+
+    occupancies = [*_existing_occupancies(request)]
+    for item in selected:
+        token = request.inventory.token(item.token_id)
+        occupancies.append(
+            _Occupancy(
+                start=item.activation_gameweek,
+                end=item.activation_gameweek + item.duration_gameweeks - 1,
+                concurrency_group=token.concurrency_group,
+                token_id=token.token_id,
+                chip_key=token.chip_key,
+            )
+        )
+    for left_index, left in enumerate(occupancies):
+        for right in occupancies[left_index + 1 :]:
+            if _overlaps(left, right) and left.concurrency_group == right.concurrency_group:
+                return False
+    if occupancies:
+        for gameweek in range(
+            min(item.start for item in occupancies),
+            max(item.end for item in occupancies) + 1,
+        ):
+            if (
+                sum(item.start <= gameweek <= item.end for item in occupancies)
+                > request.inventory.concurrency_limit
+            ):
+                return False
+
+    selected_by_token = {item.token_id: item for item in selected}
+    for item in selected:
+        token = request.inventory.token(item.token_id)
+        if any(
+            other.opportunity_id != item.opportunity_id
+            and other.chip_key == item.chip_key
+            and other.activation_gameweek == item.activation_gameweek
+            for other in selected_by_token.values()
+        ):
+            return False
+        prior_ends = [
+            existing.used_at_gameweek
+            for existing in request.inventory.tokens
+            if existing.chip_key == item.chip_key
+            and existing.used_at_gameweek is not None
+            and existing.used_at_gameweek < item.activation_gameweek
+        ]
+        prior_ends.extend(
+            other.activation_gameweek + other.duration_gameweeks - 1
+            for other in selected_by_token.values()
+            if other.chip_key == item.chip_key
+            and other.activation_gameweek < item.activation_gameweek
+        )
+        prior_ends.extend(
+            existing.end
+            for existing in _existing_occupancies(request)
+            if existing.chip_key == item.chip_key and existing.end < item.activation_gameweek
+        )
+        if prior_ends and item.activation_gameweek - max(prior_ends) <= token.minimum_gap_gameweeks:
+            return False
+    return True
+
+
+def _oracle_state(
+    selected: tuple[ChipScheduleOpportunity, ...],
+    request: ChipScheduleRequest,
+) -> _SearchState:
+    """Construct an independently enumerated state by direct scenario summation."""
+
+    ordered = tuple(
+        sorted(selected, key=lambda item: (item.activation_gameweek, item.opportunity_id))
+    )
+    existing = _existing_occupancies(request)
+    added = tuple(
+        _Occupancy(
+            start=item.activation_gameweek,
+            end=item.activation_gameweek + item.duration_gameweeks - 1,
+            concurrency_group=request.inventory.token(item.token_id).concurrency_group,
+            token_id=item.token_id,
+            chip_key=item.chip_key,
+        )
+        for item in ordered
+    )
+
+    def scenario_sum(field: str) -> tuple[float, ...]:
+        return tuple(
+            sum(float(getattr(item.scenario_values[index], field)) for item in ordered)
+            for index in range(len(request.scenario_universe))
+        )
+
+    return _SearchState(
+        selected_ids=tuple(item.opportunity_id for item in ordered),
+        used_token_ids=frozenset(item.token_id for item in ordered),
+        occupancies=tuple(
+            sorted((*existing, *added), key=lambda item: (item.start, item.end, item.token_id))
+        ),
+        gross=scenario_sum("gross_current_gain"),
+        continuation=scenario_sum("continuation_value"),
+        policy_cost=scenario_sum("policy_cost"),
+        net=scenario_sum("net_policy_value"),
+        cash=scenario_sum("cash_like_value"),
+        terminal=scenario_sum("terminal_state_value"),
+        robust_penalty=sum(item.robust_penalty for item in ordered),
+    )
+
+
 def exact_small_schedule_oracle(request: ChipScheduleRequest) -> ChipSchedulePolicy:
-    """Independently force exhaustive search for tiny golden/oracle comparisons."""
+    """Enumerate every opportunity subset through an independent legality path."""
 
     _verify_hashes(request)
     estimated = estimate_state_space(request)
-    # The oracle intentionally ignores the configured threshold but remains bounded
-    # by a hard safety ceiling suitable for tests and golden fixtures.
-    if estimated > 2_000_000:
+    subset_count = 1 << len(request.opportunities)
+    if estimated > 2_000_000 or subset_count > 2_000_000:
         raise ValueError("exact small schedule oracle state space exceeds safety ceiling")
-    return _build_policy(request, _exact_search(request, estimated))
+    opportunities = request.opportunities
+    states = tuple(
+        _oracle_state(selected, request)
+        for mask in range(subset_count)
+        if _oracle_subset_is_legal(
+            (
+                selected := tuple(
+                    item for index, item in enumerate(opportunities) if mask & (1 << index)
+                )
+            ),
+            request,
+        )
+    )
+    return _build_policy(
+        request,
+        _SearchResult(
+            states=states,
+            method=ScheduleSearchMethod.EXACT_DYNAMIC_PROGRAMMING,
+            estimated_state_space=subset_count,
+            counters=_Counters(explored=subset_count, pruned=subset_count - len(states)),
+        ),
+    )

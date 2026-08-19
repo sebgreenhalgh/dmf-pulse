@@ -13,6 +13,7 @@ from pydantic import BaseModel, ValidationError
 
 from dmf_pulse.chips.definitions import semantic_sha256
 from dmf_pulse.chips.errors import ChipError
+from dmf_pulse.chips.inventory import validate_chip_inventory
 from dmf_pulse.chips.schedule_models import (
     ChipScheduleOpportunity,
     ChipSchedulePolicy,
@@ -87,6 +88,7 @@ def _verified_service_request(request: ChipServiceRequest) -> ChipServiceRequest
             "CHIP_SERVICE_REQUEST_UNSEALED",
             "chip service requires a correctly sealed semantic request",
         )
+    validate_compiled_chip_bundle(checked.chip_bundle)
     for definition in checked.chip_bundle.definitions:
         if semantic_sha256(definition.definition) != definition.definition_hash:
             raise ChipError(
@@ -113,6 +115,7 @@ def _verified_service_request(request: ChipServiceRequest) -> ChipServiceRequest
             "CHIP_INVENTORY_HASH_MISMATCH",
             "chip inventory hash does not match",
         )
+    validate_chip_inventory(checked.inventory, checked.chip_bundle)
     schedule_payload = checked.schedule_request.model_dump(mode="json", exclude={"request_hash"})
     if semantic_sha256(schedule_payload) != checked.schedule_request.request_hash:
         raise ChipError(
@@ -496,6 +499,7 @@ def evaluate_chip_opportunities(request: ChipServiceRequest) -> ChipDecisionSet:
 def validate_compiled_chip_bundle(bundle: object) -> ChipRulesValidation:
     """Validate compiled rules, semantic hashes and fail-closed activation state."""
 
+    from dmf_pulse.chips.compiler import COMPILER_VERSION, compile_chip_definition
     from dmf_pulse.chips.definitions import ActivationStatus, CompiledChipBundle
 
     try:
@@ -506,6 +510,13 @@ def validate_compiled_chip_bundle(bundle: object) -> ChipRulesValidation:
             "CHIP_RULES_INVALID",
             "compiled chip rules violate the Stage-14 contract",
         ) from exc
+    if checked.compiler_version != COMPILER_VERSION:
+        raise ChipError(
+            "CHIP_COMPILER_VERSION_MISMATCH",
+            "compiled chip bundle uses an unsupported compiler version",
+            expected=COMPILER_VERSION,
+            observed=checked.compiler_version,
+        )
     blocked = tuple(
         item for item in checked.definitions if item.activation_status is not ActivationStatus.READY
     )
@@ -521,6 +532,13 @@ def validate_compiled_chip_bundle(bundle: object) -> ChipRulesValidation:
             raise ChipError(
                 "CHIP_DEFINITION_HASH_MISMATCH",
                 "compiled chip definition hash does not match",
+                chip_key=definition.chip_key,
+            )
+        independently_compiled = compile_chip_definition(definition.definition)
+        if definition != independently_compiled:
+            raise ChipError(
+                "CHIP_DEFINITION_COMPILE_MISMATCH",
+                "compiled chip definition differs from independent recompilation",
                 chip_key=definition.chip_key,
             )
     provisional = {

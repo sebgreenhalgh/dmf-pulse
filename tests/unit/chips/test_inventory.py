@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from dmf_pulse.chips.definitions import semantic_sha256
 from dmf_pulse.chips.errors import ChipError
 from dmf_pulse.chips.inventory import (
     TokenEventKind,
@@ -12,6 +13,7 @@ from dmf_pulse.chips.inventory import (
     build_chip_inventory,
     cancel_token,
     select_token,
+    validate_chip_inventory,
 )
 
 
@@ -57,6 +59,35 @@ def test_cancellation_returns_token_without_consuming_copy(make_definition, make
     assert token.history[-1].event == TokenEventKind.CANCELLED
     activated = activate_token(cancelled, bundle, token_id=token.token_id)
     assert activated.token(token.token_id).status == TokenStatus.ACTIVE
+
+
+def test_inventory_validator_replays_legal_state_history(make_definition, make_bundle) -> None:
+    bundle = make_bundle(make_definition("REPLAY", copies=2))
+    inventory = build_chip_inventory(bundle, current_gameweek=2)
+    selected = select_token(inventory, bundle, token_id="REPLAY:window-1:1")
+    cancelled = cancel_token(selected, token_id="REPLAY:window-1:1")
+    active = activate_token(cancelled, bundle, token_id="REPLAY:window-1:1")
+    used = advance_inventory(active, to_gameweek=3)
+
+    assert validate_chip_inventory(inventory, bundle) == inventory
+    assert validate_chip_inventory(selected, bundle) == selected
+    assert validate_chip_inventory(cancelled, bundle) == cancelled
+    assert validate_chip_inventory(active, bundle) == active
+    assert validate_chip_inventory(used, bundle) == used
+
+
+def test_inventory_validator_rejects_self_hashed_forged_token(make_definition, make_bundle) -> None:
+    bundle = make_bundle(make_definition("FORGED"))
+    inventory = build_chip_inventory(bundle, current_gameweek=2)
+    token = inventory.tokens[0].model_copy(update={"copy_index": 2})
+    payload = inventory.model_dump(mode="python", exclude={"inventory_hash"})
+    payload["tokens"] = [token.model_dump(mode="python")]
+    forged = type(inventory)(**payload, inventory_hash=semantic_sha256(payload))
+
+    with pytest.raises(ChipError) as exc_info:
+        validate_chip_inventory(forged, bundle)
+
+    assert exc_info.value.code == "CHIP_INVENTORY_STATE_INVALID"
 
 
 def test_consumed_chip_cannot_be_reused(make_definition, make_bundle) -> None:

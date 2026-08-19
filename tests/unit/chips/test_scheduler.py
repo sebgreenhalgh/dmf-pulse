@@ -1651,3 +1651,29 @@ def test_exact_oracle_enforces_its_independent_safety_ceiling(
 
     with pytest.raises(ValueError, match="safety ceiling"):
         exact_small_schedule_oracle(request)
+
+
+def test_exact_oracle_does_not_call_production_search(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    inventory = _inventory(_definition("TC"))
+    token = inventory.tokens[0]
+    request = _request(
+        inventory,
+        _opportunity(
+            inventory,
+            token_id=token.token_id,
+            gameweek=1,
+            values=(5.0, 4.0),
+        ),
+    )
+    monkeypatch.setattr(
+        "dmf_pulse.chips.scheduler._exact_search",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("production exact search must not be called")
+        ),
+    )
+
+    policy = exact_small_schedule_oracle(request)
+
+    assert policy.selected_schedule.activations[0].token_id == token.token_id

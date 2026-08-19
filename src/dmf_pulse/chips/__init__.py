@@ -43,6 +43,7 @@ from dmf_pulse.chips.inventory import (
     build_chip_inventory,
     cancel_token,
     select_token,
+    validate_chip_inventory,
 )
 from dmf_pulse.chips.policy_models import (
     BenchBoostCostProfile,
@@ -230,6 +231,7 @@ __all__ = [
     "seal_opportunity",
     "seal_schedule_request",
     "select_token",
+    "validate_chip_inventory",
     "validate_compiled_chip_bundle",
     "validate_installed_chip_capability",
     "verify_decision_artifact",

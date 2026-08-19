@@ -8,16 +8,42 @@ from copy import deepcopy
 import pytest
 from pydantic import ValidationError
 
+from dmf_pulse.chips.captaincy import evaluate_triple_captain
+from dmf_pulse.chips.definitions import semantic_sha256
 from dmf_pulse.chips.errors import ChipError
+from dmf_pulse.chips.inventory import build_chip_inventory
+from dmf_pulse.chips.schedule_models import (
+    ChipScheduleRequest,
+    ScheduleObjectiveConfig,
+    scenario_set_hash,
+    seal_schedule_request,
+)
 from dmf_pulse.chips.service import (
     evaluate_chip_opportunities,
+    seal_chip_service_request,
     validate_compiled_chip_bundle,
     validate_installed_chip_capability,
 )
 from dmf_pulse.chips.service_models import ChipDecisionAction, ChipServiceRequest
+from dmf_pulse.evaluation.leakage import scan_for_leakage
+from dmf_pulse.evaluation.models import DatasetMode
 from dmf_pulse.prices.models import ActivationStatus as PriceActivationStatus
 from dmf_pulse.prices.models import ConfidenceGrade
-from tests.support.stage14_chip_fixtures import service_request
+from tests.support.stage14_chip_fixtures import (
+    MANAGER_HASH,
+    NOW,
+    scenario_universe,
+    schedule_opportunity,
+    service_request,
+    stage12_feature_records,
+)
+from tests.unit.chips.test_captaincy import (
+    Rules,
+    Scenario,
+    bundle_for,
+    evaluator,
+    tactic,
+)
 
 
 def test_shared_service_selects_one_executable_root_action() -> None:
@@ -181,6 +207,130 @@ def test_rules_validation_rejects_definition_tampering() -> None:
         validate_compiled_chip_bundle(payload)
 
     assert exc_info.value.code == "CHIP_DEFINITION_HASH_MISMATCH"
+
+
+def test_rules_validation_independently_recompiles_forged_ready_definition() -> None:
+    request = service_request()
+    payload = deepcopy(request.chip_bundle.model_dump(mode="json"))
+    payload["definitions"][0]["capabilities"] = [
+        *payload["definitions"][0]["capabilities"],
+        "TEMPORARY_SQUAD",
+    ]
+    bundle_payload = {key: value for key, value in payload.items() if key != "bundle_hash"}
+    payload["bundle_hash"] = semantic_sha256(bundle_payload)
+
+    with pytest.raises(ChipError) as exc_info:
+        validate_compiled_chip_bundle(payload)
+
+    assert exc_info.value.code == "CHIP_DEFINITION_COMPILE_MISMATCH"
+
+
+def test_service_rejects_self_sealed_inventory_not_minted_by_bundle() -> None:
+    payload = service_request().model_dump(mode="json")
+    for inventory in (payload["inventory"], payload["schedule_request"]["inventory"]):
+        inventory["concurrency_limit"] = 2
+        inventory["inventory_hash"] = semantic_sha256(
+            {key: value for key, value in inventory.items() if key != "inventory_hash"}
+        )
+    payload["schedule_request"]["request_hash"] = semantic_sha256(
+        {key: value for key, value in payload["schedule_request"].items() if key != "request_hash"}
+    )
+    payload["service_request_hash"] = "0" * 64
+    forged = seal_chip_service_request(ChipServiceRequest.model_validate(payload))
+
+    with pytest.raises(ChipError) as exc_info:
+        evaluate_chip_opportunities(forged)
+
+    assert exc_info.value.code == "CHIP_INVENTORY_BUNDLE_MISMATCH"
+
+
+def test_service_composes_real_domain_evaluation_with_distinct_bundle_hash() -> None:
+    scenarios = (
+        Scenario(
+            "S1",
+            "D1",
+            0.5,
+            {"A": 10, "B": 4, "C": 2},
+            {"A": True, "B": True, "C": True},
+        ),
+        Scenario(
+            "S2",
+            "D2",
+            0.5,
+            {"A": 0, "B": 7, "C": 3},
+            {"A": False, "B": True, "C": True},
+        ),
+    )
+    bundle = bundle_for()
+    inventory = build_chip_inventory(bundle, current_gameweek=1)
+    token_id = inventory.tokens[0].token_id
+    triple_captain = evaluate_triple_captain(
+        scenarios=scenarios,
+        base_tactic=tactic(),
+        players={},
+        rules=Rules(),
+        chip_bundle=bundle,
+        inventory=inventory,
+        token_id=token_id,
+        evaluator=evaluator,
+    )
+    gross = tuple(item.gross_increment for item in triple_captain.scenario_values)
+    opportunity = schedule_opportunity(
+        inventory,
+        token_id=token_id,
+        gameweek=1,
+        values=gross,
+        now=NOW,
+    )
+    scenario_identities = scenario_universe()
+    objective = ScheduleObjectiveConfig(config_version="DOMAIN-COMPOSITION-V1")
+    schedule = seal_schedule_request(
+        ChipScheduleRequest(
+            request_id="domain-composition",
+            inventory=inventory,
+            horizon_start_gameweek=1,
+            horizon_end_gameweek=1,
+            information_cutoff=NOW,
+            scenario_universe=scenario_identities,
+            scenario_set_hash=scenario_set_hash(scenario_identities),
+            opportunities=(opportunity,),
+            objective=objective,
+            request_hash="0" * 64,
+        )
+    )
+    records = stage12_feature_records(now=NOW, include_price=False)
+    request = seal_chip_service_request(
+        ChipServiceRequest(
+            request_id="domain-service",
+            decision_id="domain-decision",
+            manager_state_id="manager-domain",
+            manager_state_hash=MANAGER_HASH,
+            forecast_origin=NOW,
+            information_cutoff=NOW,
+            dataset_mode=DatasetMode.LIVE_OBSERVED,
+            feature_records=records,
+            leakage_report=scan_for_leakage(
+                records,
+                forecast_origin=NOW,
+                dataset_mode=DatasetMode.LIVE_OBSERVED,
+            ),
+            chip_bundle=bundle,
+            inventory=inventory,
+            schedule_request=schedule,
+            captain_vice=triple_captain.ordinary,
+            triple_captain=triple_captain,
+            confidence=ConfidenceGrade.B,
+            continuation_model_version="DOMAIN-COMPOSITION-V1",
+            continuation_configuration_hash=semantic_sha256(objective),
+            code_commit="eea9591282c2147ad674b35e7c8e2c328a20c68a",
+            service_request_hash="0" * 64,
+        )
+    )
+
+    assert triple_captain.scenario_set_hash != schedule.scenario_set_hash
+    result = evaluate_chip_opportunities(request)
+    assert result.triple_captain == triple_captain
+    assert result.opportunities[0].domain_evaluation_hash == triple_captain.evaluation_hash
 
 
 def test_installed_validation_does_not_claim_target_rules_are_active() -> None:
