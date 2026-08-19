@@ -5,7 +5,7 @@
 - Immutable original parent: `a8796d4edacea4c87ee6461d381f4df87e1ef39c`
 - Branch: `stage/A14/CHIP-014-chip-optimisation`
 - Delivery mode: Git-first, resumable checkpoint publication.
-- Current engineering status: `IN_PROGRESS — 14.06 COMPLETE / REMOTE; 14.07 NOT_STARTED`
+- Current engineering status: `IN_PROGRESS — 14.07 COMPLETE / REMOTE; INDEPENDENT REVIEW ACTIVE`
 - Human acceptance: `false`
 - Merged: `false`
 - Accepted tag: none
@@ -38,8 +38,8 @@
 | 14.04 Free Hit | COMPLETE / REMOTE | `ef3f5b2` | 23 focused; 149 then-current chip tests | Best temporary versus best normal policy; exact restoration. |
 | 14.05 Wildcard | COMPLETE / REMOTE | `0449dd7c47ae983a78fb8ef9098ce604ae3022db` | 58 focused; 207 then-current chip tests | Immediate/delayed/FH-bridge/hold routes. |
 | 14.06 scheduler/continuation | COMPLETE / REMOTE | `cc62e21a3a085fc6a5cec959881f075f6dfa13c1` | 75 focused; 282 all chip unit/property | Exact/beam finite-inventory policy, diagnostics, nonanticipativity and oracle. |
-| 14.07 service/replay/CLI/artifacts | NOT_STARTED | — | — | Must not start before 14.06 remote verification. |
-| Final acceptance/evidence/cleanup | NOT_STARTED | — | — | Includes transport cleanup; no PR/merge/tag. |
+| 14.07 service/replay/CLI/artifacts | COMPLETE / REMOTE | `6583a0d8c7a69a07668cbd53db99b9119a7f89d5` | 62 focused; Ruff; mypy; compileall; diff check | Shared service, sealed artifacts, root-only sequential replay, Typer CLI, golden fixtures. |
+| Final independent review/evidence/cleanup | IN PROGRESS | — | — | Includes full Stage-14 adversarial review, validation, transport cleanup and draft PR; no merge/tag. |
 
 ## 14.06 completed capability
 
@@ -79,29 +79,43 @@ Evidence: `evidence/tickets/CHIP-014/CHECKPOINT_14_06.md`.
 These percentages are deliberately distinguished: per-module raw branch
 coverage is not represented as aggregate package coverage.
 
+## 14.07 completed capability
+
+- One shared application service for current opportunity comparison and the
+  accepted finite-inventory scheduler.
+- Sealed semantic request, decision, lineage, probability-diagnostic and
+  content-addressed artifact contracts with independent recomputation.
+- Stage-12 cutoff/leakage lineage and Stage-13 confidence/status propagation.
+- Deadline-safe sequential replay that freezes and executes only the root
+  action, transitions inventory, reveals outcomes, and re-solves.
+- Typer CLI for validation, inventory, captaincy, each chip value, comparison,
+  explanation, scheduling, replay and artifact validation.
+- Deterministic golden fixtures, temporal/tamper/replay/property/contract/
+  integration/performance/CLI coverage.
+
+Evidence: `evidence/tickets/CHIP-014/CHECKPOINT_14_07.md`.
+
 ## Remaining mandatory work
 
-1. Implement checkpoint 14.07 service, sequential replay, CLI and artifacts from
-   published scheduler capability `cc62e21a3a085fc6a5cec959881f075f6dfa13c1`.
-2. Run the bounded Stage-14 test/static/build/installed-wheel matrix and targeted
-   inherited regressions.
-3. Publish checkpoint 14.07.
-4. Produce final evidence, remove all transient Stage-14 recovery/transport
-   workflows and `recovery/`, validate/secret-scan, then publish final cleanup.
-
-`FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_INDEPENDENT_SOL_REVIEW`
-unless a later bounded reason is recorded.
+1. Independently adversarially review the complete immutable-parent-to-branch
+   Stage-14 diff and remediate all release-blocking findings.
+2. Run the complete Stage-14 and inherited validation matrix, including one
+   bounded full-repository pytest attempt and clean installed-wheel checks.
+3. Produce final evidence, remove all transient Stage-14 recovery/transport
+   workflows and `recovery/`, validate/secret-scan, publish final cleanup and
+   open a draft PR for human review.
 
 ## Known limitations
 
 - No target-season chip-policy performance claim is made.
-- Checkpoint 14.06 consumes explicit opportunity/scenario values; checkpoint
-  14.07 owns the public service/replay composition and artifact surface.
-- Final repository-wide static/build/installed-wheel/secret-scan gates remain
-  pending.
+- The service consumes explicit cutoff-safe opportunity/scenario values; it
+  does not claim target-season policy performance or calibrated win probabilities.
+- Final repository-wide static/build/installed-wheel/secret-scan gates and the
+  independent adversarial review remain pending.
 - Temporary Stage-14 publication/recovery material remains only because it is
   still required to publish the remaining checkpoints; it is not product code.
-- No PR, merge, accepted tag or human acceptance has occurred.
+- No PR, merge, accepted tag or human acceptance has occurred; only the
+  requested checkpoint publication has occurred.
 
 ## Exact resume state
 
@@ -112,5 +126,7 @@ unless a later bounded reason is recorded.
 - Reported scheduler commit `3935bc00ff760a6c76bb6115e142aa273affc371`: not recovered.
 - Reported 14.07 stash `stage14-service-cli-replay-wip-after-scheduler`: not recovered.
 - Recovery mode: truthful Case B; only checkpoint 14.06 was reconstructed.
-- Checkpoint 14.07 starts from the published `cc62e21a...` canonical tree.
+- Published 14.07 capability: `6583a0d8c7a69a07668cbd53db99b9119a7f89d5`.
+- A fetch-back verified the local and canonical remote branch at that exact
+  commit, with merge-base `a8796d4edacea4c87ee6461d381f4df87e1ef39c`.
 - Temporary Stage-14 transport/export workflows and `recovery/` remain only until final cleanup.
