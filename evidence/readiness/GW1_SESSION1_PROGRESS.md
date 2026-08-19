@@ -156,4 +156,4 @@
 
 - Workflow run — `32247073642`.
 - Validation result — `PASS`.
-- Validation/evidence commit SHA — pending the next durable commit.
+- Validation/evidence commit SHA — `d2ca5c934124c6ac6dab7391b35cf0d3fd3495e4`.
