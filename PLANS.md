@@ -32,7 +32,7 @@
 - [x] Run focused coverage, inherited regressions, one bounded repository suite, static/build/
   wheel/installed-CLI and final assurance.
 - [x] Remove all recovery-only workflows/material and verify the reviewed branch lineage.
-- [ ] Publish final evidence, verify local/remote equality, and open a draft
+- [x] Publish final evidence, verify local/remote equality, and open a draft
   PR to `main` without merging or marking human acceptance.
 
 ## PRC-013 Stage-13 price prediction and ACT/WAIT

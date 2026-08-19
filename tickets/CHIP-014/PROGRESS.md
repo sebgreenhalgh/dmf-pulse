@@ -3,12 +3,13 @@
 - Ticket: `CHIP-014`
 - Immutable original parent: `a8796d4edacea4c87ee6461d381f4df87e1ef39c`
 - Branch: `stage/A14/CHIP-014-chip-optimisation`
-- Current engineering status: `INDEPENDENT REVIEW COMPLETE; FINAL PUBLICATION ACTIVE`
+- Current engineering status: `INDEPENDENTLY REVIEWED; REVIEW-READY`
 - Installed capability status: `ENGINEERING_READY_PENDING_TARGET_RULES`
 - Production eligible: `false`
 - Human acceptance: `false`
 - Merged: `false`
 - Accepted tag: none
+- Draft PR: `#13` — `https://github.com/sebgreenhalgh/dmf-pulse/pull/13`
 
 ## Verified lineage and recovery
 

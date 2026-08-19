@@ -168,7 +168,7 @@
     {
       "bytes": 75881,
       "path": "PLANS.md",
-      "sha256": "dda9127f64656f606a90824fec09c07f2a2e26ae1e8e11ca3de758fafde962b9"
+      "sha256": "9266af6f34ecf7f6f1b8ceb36528db5af1e06e2cba5d35c6c5ada36b9436241f"
     },
     {
       "bytes": 2761,
@@ -5211,9 +5211,9 @@
       "sha256": "8dd0de3716f472926c597cf4b6d62022ca6af0af2e2f9c729ff0dcb2af58874a"
     },
     {
-      "bytes": 4495,
+      "bytes": 4553,
       "path": "tickets/CHIP-014/PROGRESS.md",
-      "sha256": "f5c29ef55e871a8d5afef698cb448bb43c127e1b90c8485edf3f3e6822aed1d5"
+      "sha256": "2204fa4d8b2bb3e53dd14247077ff7831e2cf6a0043380dea855ee81ccb4581d"
     },
     {
       "bytes": 3923,

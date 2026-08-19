@@ -32,3 +32,5 @@ COMPLETED_NOT_PASS | uv run pytest -q
        Other failure: stale current repository manifest, subsequently refreshed.
 PASS | git fetch origin --prune; rev-parse and merge-base checks
        origin/main=a8796d4edacea4c87ee6461d381f4df87e1ef39c; no main integration required.
+PASS | GitHub draft PR creation
+       PR #13; base=main; head=stage/A14/CHIP-014-chip-optimisation; draft=true; merged=false.
