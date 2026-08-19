@@ -105,7 +105,13 @@
 - Remediation — preserve the production error envelope, restore the accepted lifecycle vocabulary with explicit provider-native/no-canonical-mapping semantics, strengthen ordered lifecycle coverage, and apply normal Ruff fixes.
 - Remediation validation workflow — `32246327083`.
 - Validation status before publication — `FAIL`.
-- Remediation commit SHA — pending the next durable commit.
+- Remediation commit SHA — `e0e1459f203bd4f7e00c7173e18446b5e454cff7`.
 - `REAL_CREDENTIALLED_PROVIDER_CALL = OPERATOR_CHECKPOINT`.
 - No Checkpoint 1.3C or 1.4 implementation was started.
 - Exact next action after a clean durable pass — **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.
+
+### Remediation validation publication
+
+- Workflow run — `32246327083`.
+- Focused validation — `FAIL`.
+- Validation/evidence commit SHA — pending the next durable commit.

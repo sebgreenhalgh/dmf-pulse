@@ -1,23 +1,27 @@
-# GW1 Checkpoint 1.3B Focused Validation
+# GW1 Checkpoint 1.3B Remediation Validation
 
-- Workflow run — `32194395276`
-- Staging commit — `e2b6446faf8f502cbdc969650e2357b44da4c0d4`
+- Workflow run — `32246327083`
+- Reproduced failing workflow — `32194395276`
+- Exact startup remote SHA — `196224c729e1df25a30f3a0d5ac55bac74f7fcc2`
+- Remediation commit — `e0e1459f203bd4f7e00c7173e18446b5e454cff7`
 - Branch — `readiness/GW1-2026-27-live-input-initial-squad`
 - Overall — `FAIL`
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`
 
-## Exit codes
+## Root causes and remediation
 
-- `archive_integrity` — `PASS` (exit `0`)
-- `archive_extract` — `PASS` (exit `0`)
-- `install_uv` — `PASS` (exit `0`)
-- `frozen_sync` — `PASS` (exit `0`)
-- `ruff_format_apply` — `PASS` (exit `0`)
-- `focused_pytest` — `FAIL` (exit `1`)
+- CLI: retained the accepted `schema_version` / `status` / `error` envelope and corrected the stale test.
+- PostgreSQL: restored `MAPPED` and `PROMOTED` in the accepted lifecycle before `QUALITY_PASSED`, while recording provider-native identity, zero canonical rows, no fuzzy matching and no raw retention.
+- Ruff: fixed import ordering and imported `Callable` from `collections.abc`; no suppressions were added.
+
+## Results
+
+- `focused_pytest` — `PASS` (exit `0`)
 - `inherited_odds_pytest` — `PASS` (exit `0`)
+- `affected_cli_pytest` — `PASS` (exit `0`)
 - `postgres_integration` — `FAIL` (exit `1`)
 - `ruff_format` — `PASS` (exit `0`)
-- `ruff_lint` — `FAIL` (exit `1`)
+- `ruff_lint` — `PASS` (exit `0`)
 - `strict_mypy` — `PASS` (exit `0`)
 - `wheel_build` — `PASS` (exit `0`)
 - `secret_scan` — `PASS` (exit `0`)
@@ -26,68 +30,8 @@
 ## focused_pytest output
 
 ```text
-...............................................................F         [100%]
-=================================== FAILURES ===================================
-__________________ test_snapshot_usage_failure_is_secret_free __________________
-
-monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fd202e97e00>
-
-    def test_snapshot_usage_failure_is_secret_free(monkeypatch: pytest.MonkeyPatch) -> None:
-        def invalid(*_args: object, **_kwargs: object) -> object:
-            from dmf_pulse.ingestion.errors import IngestionError
-    
-            raise IngestionError("USAGE_INVALID", "odds snapshot options are not allowlisted")
-    
-        monkeypatch.setattr(odds_cmd.OddsIngestionService, "snapshot", invalid)
-        args = _args()
-        args[args.index("soccer_epl")] = "not-epl"
-        result = runner.invoke(app, args, env=_runtime_env())
-    
-        assert result.exit_code == 3
-        assert DUMMY_RUNTIME_VALUE not in result.stdout
->       assert json.loads(result.stdout) == {
-            "error": {
-                "code": "USAGE_INVALID",
-                "message": "odds snapshot options are not allowlisted",
-                "retryable": False,
-            }
-        }
-E       AssertionError: assert {'error': {'c...us': 'FAILED'} == {'error': {'c...able': False}}
-E         
-E         Omitting 1 identical items, use -vv to show
-E         Left contains 2 more items:
-E         {'schema_version': '1.0.0', 'status': 'FAILED'}
-E         
-E         Full diff:
-E           {
-E               'error': {
-E                   'code': 'USAGE_INVALID',
-E                   'message': 'odds snapshot options are not allowlisted',
-E                   'retryable': False,
-E               },
-E         +     'schema_version': '1.0.0',
-E         +     'status': 'FAILED',
-E           }
-
-tests/unit/cli/test_live_odds_snapshot.py:155: AssertionError
-=========================== short test summary info ============================
-FAILED tests/unit/cli/test_live_odds_snapshot.py::test_snapshot_usage_failure_is_secret_free - AssertionError: assert {'error': {'c...us': 'FAILED'} == {'error': {'c...able': False}}
-  
-  Omitting 1 identical items, use -vv to show
-  Left contains 2 more items:
-  {'schema_version': '1.0.0', 'status': 'FAILED'}
-  
-  Full diff:
-    {
-        'error': {
-            'code': 'USAGE_INVALID',
-            'message': 'odds snapshot options are not allowlisted',
-            'retryable': False,
-        },
-  +     'schema_version': '1.0.0',
-  +     'status': 'FAILED',
-    }
-1 failed, 63 passed in 2.51s
+................................................................         [100%]
+64 passed in 3.09s
 ```
 
 ## inherited_odds_pytest output
@@ -95,132 +39,179 @@ FAILED tests/unit/cli/test_live_odds_snapshot.py::test_snapshot_usage_failure_is
 ```text
 ........................................................................ [ 69%]
 ...............................                                          [100%]
-103 passed in 1.61s
+103 passed in 2.28s
+```
+
+## affected_cli_pytest output
+
+```text
+.............................                                            [100%]
+29 passed in 2.25s
 ```
 
 ## postgres_integration output
 
 ```text
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [BAD] at 0x7ff7870ca5d0>
+query = 'UPDATE provenance.source_snapshot SET parsed_at=%(parsed_at)s::TIMESTAMP WITH TIME ZONE, usable_at=%(usable_at)s::TIM...us=%(validation_status)s::VARCHAR WHERE provenance.source_snapshot.source_snapshot_id = %(source_snapshot_id_1)s::UUID'
+params = {'parsed_at': datetime.datetime(2026, 8, 20, 12, 0, 1, tzinfo=datetime.timezone.utc), 'usable_at': datetime.datetime(2...a_fingerprint': '6f56ce48f1dba69bd322cbc57ab3c5055a27310b1b86332de314751ed018c56b', 'validation_status': 'USABLE', ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.ObjectNotInPrerequisiteState: IMMUTABLE_RECORD
+E           CONTEXT:  PL/pgSQL function provenance.reject_immutable_change() line 3 at RAISE
+
+.venv/lib/python3.13/site-packages/psycopg/cursor.py:117: ObjectNotInPrerequisiteState
+
+The above exception was the direct cause of the following exception:
+
+repository_root = PosixPath('/home/runner/work/dmf-pulse/dmf-pulse')
+postgres_session_factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test), autoflush=False, expire_on_commit=False)
+
+    def test_live_provider_native_input_persists_governed_evidence_without_mapping(
+        repository_root: Path,
+        postgres_session_factory: sessionmaker[Session],
+    ) -> None:
+        body = (repository_root / "fixtures/odds/ODD-005/happy_path.json").read_bytes()
+        transport = _Transport(
+            OddsHttpResponse(
+                status_code=200,
+                content_type="application/json",
+                headers={
+                    "x-requests-remaining": "499",
+                    "x-requests-used": "1",
+                    "x-requests-last": "1",
+                    "x-request-id": "provider-request-913",
+                },
+                body=body,
+            )
+        )
+        service = LiveOddsSnapshotService(
+            credential_provider=StaticCredentialProvider(DUMMY_RUNTIME_VALUE),
+            transport_factory=lambda: transport,
+            clock=lambda: RECEIVED,
+            processing_clock=lambda: RECEIVED + timedelta(seconds=1),
+            sleeper=lambda _seconds: None,
+            monotonic=lambda: 0.0,
+        )
+    
+>       outcome = service.snapshot(
+            provider="the_odds_api",
+            competition_key="PL",
+            sport_key="soccer_epl",
+            region="uk",
+            market="h2h",
+            as_of=CUTOFF,
+            database_url_ref=DATABASE_REF,
+        )
 
 tests/integration/ingestion/odds/test_live_provider_current_input.py:80: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/dmf_pulse/ingestion/odds/live.py:766: in snapshot
+src/dmf_pulse/ingestion/odds/live.py:797: in snapshot
     evidence_store.record_usable(
-src/dmf_pulse/ingestion/odds/live.py:349: in record_usable
-    append_processing_event_idempotent(
-src/dmf_pulse/ingestion/repository.py:457: in append_processing_event_idempotent
-    return SourceObservationRepository(session).append_processing_event(
+src/dmf_pulse/ingestion/odds/live.py:427: in record_usable
+    session.execute(
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py:2373: in execute
+    return self._execute_internal(
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py:2280: in _execute_internal
+    result = conn.execute(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-self = <dmf_pulse.data_model.repositories.SourceObservationRepository object at 0x7fd8d4590d60>
-snapshot_id = UUID('01a01710-6908-756f-a129-a0c38322f55e')
-stage = 'QUALITY_PASSED'
-event_at = datetime.datetime(2026, 8, 20, 12, 0, 1, tzinfo=datetime.timezone.utc)
-stage_version = 'the-odds-api-v4-reference-v1', operation_id = None
-input_sha256 = 'b6782d6e6f657e7b9e7ef68e8327e89c6b1881bb076a0d2602811b2fa5e0ca69'
-output_sha256 = 'a1f71471da1b16e322fb97c84233175f23df03ed9f516d535c55e6027e746303'
-safe_details = {'provider_native': True, 'raw_payload_retained': False, 'canonical_fpl_fixture_mapping_performed': False}
-error_code = None, actor = 'the-odds-api-current-input-v1'
+self = <psycopg.Cursor [closed] [BAD] at 0x7ff7870ca5d0>
+query = 'UPDATE provenance.source_snapshot SET parsed_at=%(parsed_at)s::TIMESTAMP WITH TIME ZONE, usable_at=%(usable_at)s::TIM...us=%(validation_status)s::VARCHAR WHERE provenance.source_snapshot.source_snapshot_id = %(source_snapshot_id_1)s::UUID'
+params = {'parsed_at': datetime.datetime(2026, 8, 20, 12, 0, 1, tzinfo=datetime.timezone.utc), 'usable_at': datetime.datetime(2...a_fingerprint': '6f56ce48f1dba69bd322cbc57ab3c5055a27310b1b86332de314751ed018c56b', 'validation_status': 'USABLE', ...}
+prepare = None, binary = None
 
-    def append_processing_event(
+    def execute(
         self,
+        query: Query,
+        params: Params | None = None,
         *,
-        snapshot_id: UUID,
-        stage: str,
-        event_at: datetime,
-        stage_version: str,
-        operation_id: UUID | None = None,
-        input_sha256: str | None = None,
-        output_sha256: str | None = None,
-        safe_details: Mapping[str, object] | None = None,
-        error_code: str | None = None,
-        actor: str = "dmf-pulse",
-    ) -> UUID:
-        locked_snapshot = self.session.execute(
-            select(source_snapshot.c.source_snapshot_id)
-            .where(source_snapshot.c.source_snapshot_id == snapshot_id)
-            .with_for_update()
-        ).scalar_one_or_none()
-        if locked_snapshot is None:
-            raise DataModelError("PROVENANCE_INTEGRITY", "source snapshot was not found")
-        previous = (
-            self.session.execute(
-                select(
-                    source_processing_event.c.processing_event_id,
-                    source_processing_event.c.sequence_number,
-                )
-                .where(source_processing_event.c.source_snapshot_id == snapshot_id)
-                .order_by(source_processing_event.c.sequence_number.desc())
-                .limit(1)
-                .with_for_update()
-            )
-            .mappings()
-            .one_or_none()
-        )
-        sequence = 1 if previous is None else int(previous["sequence_number"]) + 1
-        previous_id = None if previous is None else _uuid(previous["processing_event_id"])
-        operation = operation_id or snapshot_id
-        occurred_at = require_utc(event_at)
-        event_body = {
-            "actor": actor,
-            "error_code": error_code,
-            "event_at": _utc_text(occurred_at),
-            "input_sha256": input_sha256,
-            "operation_id": str(operation),
-            "output_sha256": output_sha256,
-            "previous_event_id": str(previous_id) if previous_id is not None else None,
-            "safe_details": dict(safe_details or {}),
-            "sequence_number": sequence,
-            "snapshot_id": str(snapshot_id),
-            "stage": stage,
-            "stage_version": stage_version,
-        }
-        event_sha256 = hashlib.sha256(
-            json.dumps(
-                event_body,
-                ensure_ascii=False,
-                allow_nan=False,
-                separators=(",", ":"),
-                sort_keys=True,
-            ).encode("utf-8")
-        ).hexdigest()
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
         try:
-            return _uuid(
-                self.session.execute(
-                    insert(source_processing_event)
-                    .values(
-                        source_snapshot_id=snapshot_id,
-                        operation_id=operation,
-                        previous_event_id=previous_id,
-                        sequence_number=sequence,
-                        stage=stage,
-                        outcome=(
-                            "FAILED_RETRYABLE"
-                            if stage == "FAILED_RETRYABLE"
-                            else "FAILED_PERMANENT"
-                            if stage == "FAILED_PERMANENT"
-                            else "SUCCEEDED"
-                        ),
-                        event_at=occurred_at,
-                        stage_version=stage_version,
-                        input_sha256=input_sha256,
-                        output_sha256=output_sha256,
-                        event_sha256=event_sha256,
-                        safe_details=dict(safe_details or {}),
-                        error_code=error_code,
-                        actor=actor,
-                    )
-                    .returning(source_processing_event.c.processing_event_id)
-                ).scalar_one()
-            )
-        except DBAPIError as exc:
->           raise translate_database_error(exc) from exc
-E           dmf_pulse.data_model.errors.DataModelError: database constraint rejected data
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.OperationalError: (psycopg.errors.ObjectNotInPrerequisiteState) IMMUTABLE_RECORD
+E           CONTEXT:  PL/pgSQL function provenance.reject_immutable_change() line 3 at RAISE
+E           [SQL: UPDATE provenance.source_snapshot SET parsed_at=%(parsed_at)s::TIMESTAMP WITH TIME ZONE, usable_at=%(usable_at)s::TIMESTAMP WITH TIME ZONE, schema_fingerprint=%(schema_fingerprint)s::VARCHAR, validation_status=%(validation_status)s::VARCHAR WHERE provenance.source_snapshot.source_snapshot_id = %(source_snapshot_id_1)s::UUID]
+E           [SQL parameters hidden due to hide_parameters=True]
+E           (Background on this error at: https://sqlalche.me/e/20/e3q8)
 
-src/dmf_pulse/data_model/repositories.py:1281: DataModelError
+.venv/lib/python3.13/site-packages/psycopg/cursor.py:117: OperationalError
 =========================== short test summary info ============================
-FAILED tests/integration/ingestion/odds/test_live_provider_current_input.py::test_live_provider_native_input_persists_governed_evidence_without_mapping - dmf_pulse.data_model.errors.DataModelError: database constraint rejected data
-1 failed in 0.60s
+FAILED tests/integration/ingestion/odds/test_live_provider_current_input.py::test_live_provider_native_input_persists_governed_evidence_without_mapping - sqlalchemy.exc.OperationalError: (psycopg.errors.ObjectNotInPrerequisiteState) IMMUTABLE_RECORD
+CONTEXT:  PL/pgSQL function provenance.reject_immutable_change() line 3 at RAISE
+[SQL: UPDATE provenance.source_snapshot SET parsed_at=%(parsed_at)s::TIMESTAMP WITH TIME ZONE, usable_at=%(usable_at)s::TIMESTAMP WITH TIME ZONE, schema_fingerprint=%(schema_fingerprint)s::VARCHAR, validation_status=%(validation_status)s::VARCHAR WHERE provenance.source_snapshot.source_snapshot_id = %(source_snapshot_id_1)s::UUID]
+[SQL parameters hidden due to hide_parameters=True]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+1 failed in 0.65s
 ```
 
 ## ruff_format output
@@ -232,56 +223,7 @@ FAILED tests/integration/ingestion/odds/test_live_provider_current_input.py::tes
 ## ruff_lint output
 
 ```text
-I001 [*] Import block is un-sorted or un-formatted
-  --> src/dmf_pulse/cli/odds_cmd.py:3:1
-   |
- 1 |   """Typer surface for governed The Odds API validation and current retrieval."""
- 2 |
- 3 | / from __future__ import annotations
- 4 | |
- 5 | | import json
- 6 | | from collections.abc import Callable
- 7 | | from datetime import datetime
- 8 | | from pathlib import Path
- 9 | | from typing import Annotated, NoReturn
-10 | |
-11 | | import typer
-12 | | from pydantic import BaseModel
-13 | |
-14 | | from dmf_pulse.ingestion.errors import IngestionError
-15 | | from dmf_pulse.ingestion.fpl.parser import parse_rfc3339_timestamp
-16 | | from dmf_pulse.ingestion.fpl.service import DATABASE_REF
-17 | | from dmf_pulse.ingestion.odds.credentials import (
-18 | |     RuntimeOddsCredentialProvider,
-19 | |     credential_is_configured,
-20 | | )
-21 | | from dmf_pulse.ingestion.odds.live import LiveOddsOperationOutcome, LiveOddsSnapshotService
-22 | | from dmf_pulse.ingestion.odds.parser import CONTRACT_VERSION
-23 | | from dmf_pulse.ingestion.odds.service import (
-24 | |     OddsImportRequest,
-25 | |     OddsIngestionService as ReferenceOddsIngestionService,
-26 | |     OddsOperationOutcome,
-27 | |     OddsReplayRequest,
-28 | | )
-   | |_^
-29 |
-30 |   odds_app = typer.Typer(help="Validate and ingest governed The Odds API-shaped observations.")
-   |
-help: Organize imports
-
-UP035 [*] Import from `collections.abc` instead: `Callable`
-  --> tests/unit/ingestion/test_live_odds_current_input.py:9:1
-   |
- 7 | from datetime import UTC, datetime, timedelta
- 8 | from pathlib import Path
- 9 | from typing import Any, Callable
-   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-10 | from uuid import UUID
-   |
-help: Import from `collections.abc`
-
-Found 2 errors.
-[*] 2 fixable with the `--fix` option.
+All checks passed!
 ```
 
 ## strict_mypy output
@@ -308,3 +250,22 @@ Successfully built dist/dmf_pulse-0.2.0-py3-none-any.whl
   "status": "PASS"
 }
 ```
+
+## diff_check output
+
+```text
+```
+
+## Rights and storage
+
+- Runtime credential provider wiring remains unchanged; no API-key CLI option exists.
+- HTTPS, approved-host, redirect, timeout, retry, response-size/content-type and explicit provider-status controls remain covered by the focused suite.
+- Raw provider payload retention remains forbidden; no raw blob/object or canonical market/odds rows are created by the provider-native path.
+- Public display, redistribution, backup and model training remain denied by the current Rights Profile.
+- Canonical FPL fixture mapping and fuzzy team matching remain unperformed.
+
+## Scope
+
+- Checkpoint 1.3C — `NOT_STARTED`.
+- Checkpoint 1.4 — `INCOMPLETE` / not started.
+- Exact next action — **CHECKPOINT 1.3C — CHECKPOINT ACCEPTANCE / OPERATOR CONTRACT**.
