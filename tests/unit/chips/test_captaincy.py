@@ -11,7 +11,6 @@ from dmf_pulse.chips.captaincy import evaluate_triple_captain, optimise_captain_
 from dmf_pulse.chips.compiler import compile_synthetic_bundle
 from dmf_pulse.chips.definitions import (
     ActivationRoute,
-    ActivationStatus,
     ChipDefinition,
     ChipEffect,
     CompiledChipBundle,
@@ -72,9 +71,7 @@ def evaluator(scenario, tactic, players, rules):
     del players
     appeared = {key for key, value in scenario.player_appeared.items() if value}
     base = sum(
-        scenario.player_points[player]
-        for player in tactic.starting_xi
-        if player in appeared
+        scenario.player_points[player] for player in tactic.starting_xi if player in appeared
     )
     if tactic.captain in appeared:
         effective = tactic.captain
@@ -297,8 +294,12 @@ def test_pydantic_copy_path_and_default_evaluator(monkeypatch) -> None:
 
 def test_scenario_hash_includes_correlated_appearance_state() -> None:
     points = {"A": 5, "B": 4}
-    played = evaluate((Scenario("s", "d", 1.0, points, {"A": True, "B": True}),), candidate_ids=("A", "B"))
-    absent = evaluate((Scenario("s", "d", 1.0, points, {"A": False, "B": False}),), candidate_ids=("A", "B"))
+    played = evaluate(
+        (Scenario("s", "d", 1.0, points, {"A": True, "B": True}),), candidate_ids=("A", "B")
+    )
+    absent = evaluate(
+        (Scenario("s", "d", 1.0, points, {"A": False, "B": False}),), candidate_ids=("A", "B")
+    )
     assert played.scenario_set_hash != absent.scenario_set_hash
 
 
@@ -306,9 +307,18 @@ def test_scenario_hash_includes_correlated_appearance_state() -> None:
     ("scenarios", "code"),
     [
         ((), "CHIP_SCENARIOS_EMPTY"),
-        ((Scenario("", "d", 1.0, {"A": 1, "B": 1}, {"A": True, "B": True}),), "CHIP_SCENARIO_ID_INVALID"),
-        ((Scenario("s", "d", nan, {"A": 1, "B": 1}, {"A": True, "B": True}),), "CHIP_SCENARIO_WEIGHT_INVALID"),
-        ((Scenario("s", "d", 0.7, {"A": 1, "B": 1}, {"A": True, "B": True}),), "CHIP_SCENARIO_WEIGHT_SUM"),
+        (
+            (Scenario("", "d", 1.0, {"A": 1, "B": 1}, {"A": True, "B": True}),),
+            "CHIP_SCENARIO_ID_INVALID",
+        ),
+        (
+            (Scenario("s", "d", nan, {"A": 1, "B": 1}, {"A": True, "B": True}),),
+            "CHIP_SCENARIO_WEIGHT_INVALID",
+        ),
+        (
+            (Scenario("s", "d", 0.7, {"A": 1, "B": 1}, {"A": True, "B": True}),),
+            "CHIP_SCENARIO_WEIGHT_SUM",
+        ),
     ],
 )
 def test_scenario_contracts_fail_closed(scenarios, code) -> None:
@@ -343,7 +353,11 @@ def test_duplicate_scenarios_fail_closed() -> None:
 def test_invalid_candidate_sets_fail(candidate_ids) -> None:
     with pytest.raises(ChipError) as exc:
         optimise_captain_vice(
-            scenarios=(Scenario("s", "d", 1.0, {"A": 1, "B": 1, "C": 1}, {"A": True, "B": True, "C": True}),),
+            scenarios=(
+                Scenario(
+                    "s", "d", 1.0, {"A": 1, "B": 1, "C": 1}, {"A": True, "B": True, "C": True}
+                ),
+            ),
             base_tactic=tactic(),
             players={},
             rules=Rules(),
@@ -396,7 +410,10 @@ def test_unsupported_copy_adapter_fails_explicitly() -> None:
 
 def test_invalid_multiplier_resolution_effective_id_and_score_fail() -> None:
     scenario = Scenario("s", "d", 1.0, {"A": 1, "B": 1}, {"A": True, "B": True})
-    for rules in (replace(Rules(), captain_multiplier=0), replace(Rules(), captain_multiplier=True)):
+    for rules in (
+        replace(Rules(), captain_multiplier=0),
+        replace(Rules(), captain_multiplier=True),
+    ):
         with pytest.raises(ChipError) as exc:
             optimise_captain_vice(
                 scenarios=(scenario,),
@@ -412,8 +429,11 @@ def test_invalid_multiplier_resolution_effective_id_and_score_fail() -> None:
 
     with pytest.raises(ChipError) as exc:
         optimise_captain_vice(
-            scenarios=(scenario,), base_tactic=replace(tactic(), starting_xi=("A", "B")),
-            players={}, rules=Rules(), evaluator=invalid_resolution,
+            scenarios=(scenario,),
+            base_tactic=replace(tactic(), starting_xi=("A", "B")),
+            players={},
+            rules=Rules(),
+            evaluator=invalid_resolution,
         )
     assert exc.value.code == "CHIP_CAPTAIN_RESOLUTION_INVALID"
 
@@ -422,8 +442,11 @@ def test_invalid_multiplier_resolution_effective_id_and_score_fail() -> None:
 
     with pytest.raises(ChipError) as exc:
         optimise_captain_vice(
-            scenarios=(scenario,), base_tactic=replace(tactic(), starting_xi=("A", "B")),
-            players={}, rules=Rules(), evaluator=invalid_player,
+            scenarios=(scenario,),
+            base_tactic=replace(tactic(), starting_xi=("A", "B")),
+            players={},
+            rules=Rules(),
+            evaluator=invalid_player,
         )
     assert exc.value.code == "CHIP_EFFECTIVE_CAPTAIN_UNKNOWN"
 
@@ -432,8 +455,11 @@ def test_invalid_multiplier_resolution_effective_id_and_score_fail() -> None:
 
     with pytest.raises(ChipError) as exc:
         optimise_captain_vice(
-            scenarios=(scenario,), base_tactic=replace(tactic(), starting_xi=("A", "B")),
-            players={}, rules=Rules(), evaluator=invalid_score,
+            scenarios=(scenario,),
+            base_tactic=replace(tactic(), starting_xi=("A", "B")),
+            players={},
+            rules=Rules(),
+            evaluator=invalid_score,
         )
     assert exc.value.code == "CHIP_CAPTAIN_SCORE_INVALID"
 
@@ -444,18 +470,27 @@ def test_tc_requires_bundle_definition_and_matching_lineage() -> None:
     inventory, token_id = inventory_for(bundle)
     with pytest.raises(ChipError) as exc:
         evaluate_triple_captain(
-            scenarios=(scenario,), base_tactic=replace(tactic(), starting_xi=("A", "B")),
-            players={}, rules=Rules(), chip_bundle=bundle.definition_for("TRIPLE_CAPTAIN"),
-            inventory=inventory, token_id=token_id, evaluator=evaluator,
+            scenarios=(scenario,),
+            base_tactic=replace(tactic(), starting_xi=("A", "B")),
+            players={},
+            rules=Rules(),
+            chip_bundle=bundle.definition_for("TRIPLE_CAPTAIN"),
+            inventory=inventory,
+            token_id=token_id,
+            evaluator=evaluator,
         )
     assert exc.value.code == "CHIP_RULESET_LINEAGE_REQUIRED"
 
     missing = bundle_for(tc_definition(key="OTHER"))
     with pytest.raises(ChipError) as exc:
         evaluate_triple_captain(
-            scenarios=(scenario,), base_tactic=replace(tactic(), starting_xi=("A", "B")),
-            players={}, rules=Rules(), chip_bundle=missing,
-            inventory=build_chip_inventory(missing, current_gameweek=1), token_id="missing",
+            scenarios=(scenario,),
+            base_tactic=replace(tactic(), starting_xi=("A", "B")),
+            players={},
+            rules=Rules(),
+            chip_bundle=missing,
+            inventory=build_chip_inventory(missing, current_gameweek=1),
+            token_id="missing",
             evaluator=evaluator,
         )
     assert exc.value.code == "CHIP_TC_DEFINITION_MISSING"
@@ -475,7 +510,11 @@ def test_tc_definition_semantics_fail_closed() -> None:
     assert exc.value.code == "CHIP_EFFECT_BLOCKED"
 
     missing_effect_bundle = bundle_for(
-        tc_definition(effects=(ChipEffect(surface="SCORING", operation="ADD_POINTS", parameters={"points": 1}),))
+        tc_definition(
+            effects=(
+                ChipEffect(surface="SCORING", operation="ADD_POINTS", parameters={"points": 1}),
+            )
+        )
     )
     with pytest.raises(ChipError) as exc:
         evaluate((scenario,), bundle=missing_effect_bundle)
@@ -497,9 +536,14 @@ def test_tc_token_mismatch_and_unavailable_fail_closed() -> None:
     other = next(item for item in inventory.tokens if item.chip_key == "OTHER")
     with pytest.raises(ChipError) as exc:
         evaluate_triple_captain(
-            scenarios=(scenario,), base_tactic=replace(tactic(), starting_xi=("A", "B")),
-            players={}, rules=Rules(), chip_bundle=bundle, inventory=inventory,
-            token_id=other.token_id, evaluator=evaluator,
+            scenarios=(scenario,),
+            base_tactic=replace(tactic(), starting_xi=("A", "B")),
+            players={},
+            rules=Rules(),
+            chip_bundle=bundle,
+            inventory=inventory,
+            token_id=other.token_id,
+            evaluator=evaluator,
         )
     assert exc.value.code == "CHIP_TC_TOKEN_MISMATCH"
 
@@ -508,15 +552,23 @@ def test_tc_token_mismatch_and_unavailable_fail_closed() -> None:
     assert expired.tokens[0].status is TokenStatus.EXPIRED
     with pytest.raises(ChipError) as exc:
         evaluate_triple_captain(
-            scenarios=(scenario,), base_tactic=replace(tactic(), starting_xi=("A", "B")),
-            players={}, rules=Rules(), chip_bundle=bundle_for(), inventory=expired,
-            token_id=token_id, evaluator=evaluator,
+            scenarios=(scenario,),
+            base_tactic=replace(tactic(), starting_xi=("A", "B")),
+            players={},
+            rules=Rules(),
+            chip_bundle=bundle_for(),
+            inventory=expired,
+            token_id=token_id,
+            evaluator=evaluator,
         )
     assert exc.value.code == "CHIP_TC_TOKEN_UNAVAILABLE"
 
 
 def test_hash_and_arithmetic_models_reject_tampering() -> None:
-    result = evaluate((Scenario("s", "d", 1.0, {"A": 3, "B": 2}, {"A": True, "B": True}),), candidate_ids=("A", "B"))
+    result = evaluate(
+        (Scenario("s", "d", 1.0, {"A": 3, "B": 2}, {"A": True, "B": True}),),
+        candidate_ids=("A", "B"),
+    )
     ordinary_payload = result.ordinary.model_dump(mode="python")
     ordinary_payload["decision_hash"] = "f" * 64
     with pytest.raises(ValidationError, match="decision hash mismatch"):
@@ -600,7 +652,10 @@ def test_empty_candidate_declaration_does_not_fall_back_to_starting_xi() -> None
     ],
 )
 def test_captain_scenario_contract_rejects_resolution_mismatch(update, message) -> None:
-    result = evaluate((Scenario("s", "d", 1.0, {"A": 3, "B": 2}, {"A": True, "B": True}),), candidate_ids=("A", "B"))
+    result = evaluate(
+        (Scenario("s", "d", 1.0, {"A": 3, "B": 2}, {"A": True, "B": True}),),
+        candidate_ids=("A", "B"),
+    )
     payload = result.ordinary.scenario_scores[0].model_dump(mode="python")
     payload.update(update)
     with pytest.raises(ValidationError, match=message):
@@ -614,9 +669,7 @@ def test_captain_scenario_contract_rejects_resolution_mismatch(update, message) 
         (lambda payload: payload.update(scenario_scores=()), "non-empty"),
         (
             lambda payload: payload.update(
-                scenario_scores=(
-                    {**payload["scenario_scores"][0], "weight": 0.5},
-                )
+                scenario_scores=({**payload["scenario_scores"][0], "weight": 0.5},)
             ),
             "sum to one",
         ),
@@ -629,7 +682,10 @@ def test_captain_scenario_contract_rejects_resolution_mismatch(update, message) 
     ],
 )
 def test_captain_decision_contract_rejects_semantic_tampering(mutator, message) -> None:
-    result = evaluate((Scenario("s", "d", 1.0, {"A": 3, "B": 2}, {"A": True, "B": True}),), candidate_ids=("A", "B"))
+    result = evaluate(
+        (Scenario("s", "d", 1.0, {"A": 3, "B": 2}, {"A": True, "B": True}),),
+        candidate_ids=("A", "B"),
+    )
     payload = result.ordinary.model_dump(mode="python")
     mutator(payload)
     with pytest.raises(ValidationError, match=message):
@@ -649,9 +705,7 @@ def test_captain_decision_contract_rejects_semantic_tampering(mutator, message) 
             "same ordered scenario",
         ),
         (
-            lambda payload: payload.update(
-                gross_current_gain=payload["gross_current_gain"] + 1.0
-            ),
+            lambda payload: payload.update(gross_current_gain=payload["gross_current_gain"] + 1.0),
             "gross gain",
         ),
         (lambda payload: payload.update(zero_extra_score=True), "zero-extra"),
@@ -664,7 +718,10 @@ def test_captain_decision_contract_rejects_semantic_tampering(mutator, message) 
     ],
 )
 def test_triple_captain_contract_rejects_semantic_tampering(mutator, message) -> None:
-    result = evaluate((Scenario("s", "d", 1.0, {"A": 3, "B": 2}, {"A": True, "B": True}),), candidate_ids=("A", "B"))
+    result = evaluate(
+        (Scenario("s", "d", 1.0, {"A": 3, "B": 2}, {"A": True, "B": True}),),
+        candidate_ids=("A", "B"),
+    )
     payload = result.model_dump(mode="python")
     mutator(payload)
     with pytest.raises(ValidationError, match=message):

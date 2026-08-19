@@ -143,9 +143,7 @@ def synthetic_bundle(
         ruleset_version="1.0",
         ruleset_hash=RULESET_HASH,
         concurrency_limit=1,
-        definitions=tuple(
-            chip_definition(key, end=activation_end_gameweek) for key in keys
-        ),
+        definitions=tuple(chip_definition(key, end=activation_end_gameweek) for key in keys),
     )
 
 
@@ -180,9 +178,7 @@ def schedule_opportunity(
             gross_current_gain=values[index],
             continuation_value=continuation[index],
             policy_cost=policy_cost[index],
-            net_policy_value=(
-                values[index] + continuation[index] - policy_cost[index]
-            ),
+            net_policy_value=(values[index] + continuation[index] - policy_cost[index]),
         )
         for index, scenario in enumerate(scenarios)
     )
