@@ -1,0 +1,12 @@
+schema_version: rank-strategy-policy-v1
+manager_multipliers:
+  triple_captain_multiplier: 3
+  bench_boost_counts_all_appearing_squad_players: true
+  free_hit_uses_temporary_squad_only: true
+activation:
+  default_objective: PURE_POINTS
+  permitted_sample_rights:
+    - SYNTHETIC_APPROVED
+    - REPOSITORY_APPROVED
+    - NAMED_RIVAL_AUTHORISED
+  fail_closed: true
