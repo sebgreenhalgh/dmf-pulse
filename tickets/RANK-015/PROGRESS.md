@@ -35,7 +35,7 @@
 
 | Checkpoint | Status | Capability SHA | Verification |
 |---|---|---|---|
-| 15.01 manager multipliers / EO | IN_PROGRESS | — | — |
+| 15.01 manager multipliers / EO | COMPLETE / REMOTE | `c885b37982e346a6422681d4c6c18da4392b480d` | `39 passed`; 99% branch coverage; 11 inherited passed |
 | 15.02 exact named mini-league | NOT_STARTED | — | — |
 | 15.03 baseline opponent model | NOT_STARTED | — | — |
 | 15.04 target / rank utility | NOT_STARTED | — | — |
@@ -47,3 +47,17 @@
 `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
 
 `FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_INDEPENDENT_SOL_REVIEW`
+
+## Checkpoint 15.01 evidence
+
+- Implemented exact scenario multipliers using the accepted Stage-10 autosub/captain evaluator.
+- Supported ordinary captain, conditional vice fallback, Triple Captain, Bench Boost and Free Hit.
+- Free Hit uses the temporary squad without mutating the permanent squad; transfer hits are deducted once.
+- EO is the normalised weighted mean scenario multiplier and can exceed 100%; raw ownership remains separate.
+- Exposed saved/scenario EO, action ownership, intervals and Sebastian leverage.
+- Rights-invalid samples fail before numerical use.
+- Focused Stage-15 matrix: `39 passed in 0.63s`.
+- Stage-15 branch coverage at checkpoint: `99%` (`341 statements`, branch-aware).
+- Inherited accepted-interface regressions: `11 passed` across Stage-10 autosub/oracle and Stage-14 captain/TC/BB/FH semantics.
+- Ruff focused: PASS. Strict mypy for `src/dmf_pulse/rank_strategy`: PASS.
+- Raw projection hash remained identical before and after EO evaluation.
