@@ -2,6 +2,18 @@
 
 - Branch: `readiness/GW1-2026-27-live-input-initial-squad`.
 - Immutable parent: `9eb57143f6ee92f67c78607cc386678d962e62d4`.
+<!-- GW1-1.4-PLAN-START -->
+### Checkpoint 1.4 — FPL / Odds identity integrity
+
+- [ ] 1.4A exact explicit team alias resolution, source/plan hash binding,
+  approval/cutoff enforcement and transient rights boundary.
+- [ ] 1.4B exact target-GW fixture resolution, orientation, kickoff, one-to-one
+  coverage, diagnostics and deterministic mapped output.
+- [ ] 1.4C bounded acceptance evidence and exact Checkpoint 1.5 handoff.
+- Latest focused validation — `1.4A` `FAIL`, run `32280118079`, commit `99f3e93ca769ca36639774af88135c734d4312c1`.
+- Exclusions remain: probabilities, projections, optimisation, initial squad,
+  captaincy, prospective logging, UI, Checkpoint 1.5, PR, merge and activation.
+<!-- GW1-1.4-PLAN-END -->
 - Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
 - Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.
 - Exclusions: no live key, provider success claim, FPL current-input changes, identity mapping, projections, optimiser, squad, captaincy, prospective logging, PR, merge, or activation.
