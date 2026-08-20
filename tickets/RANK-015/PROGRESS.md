@@ -3,7 +3,7 @@
 - Ticket: `RANK-015`
 - Immutable parent: `c53a1dfae952f481c1e885200ebf6120e4b63c24`
 - Branch: `stage/A15/RANK-015-rank-aware-strategy`
-- Engineering status: `IN_PROGRESS`
+- Engineering status: `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
 - Production activation: `FAIL_CLOSED_TO_PURE_POINTS`
 - Human acceptance: `false`
 - Pull request: none
@@ -29,7 +29,7 @@
 - Accepted Stage-14 targeted matrix: `399 passed in 10.21s`.
 - No Stage-15 `rank_strategy` package or `dmf rank` CLI existed at the parent.
 - A temporary branch-only source-export workflow was required because the execution container
-  could not resolve GitHub. It will be deleted from the final tree before handoff.
+  could not resolve GitHub. It was removed from the final review tree before handoff.
 
 ## Checkpoints
 
@@ -40,13 +40,13 @@
 | 15.03 baseline opponent model | COMPLETE / REMOTE | `a5b3e2a5f852dbde1f5b3ca4c8a91b1f60694868` | `123 passed`; 95.92% branch coverage; 11 inherited passed |
 | 15.04 target / rank utility | COMPLETE / REMOTE | `bc03b1f7b020835b2b36896cc39d58a84b8808a4` | `127 passed`; 92.13% branch coverage; projection invariance and fail-closed gates PASS |
 | 15.05 synthetic overall cohort | COMPLETE / REMOTE | `62f1828edcfbd0569dbf76fc93e241f2db95094d` | `23 passed` at publication; exact independent synthetic-field oracle PASS |
-| 15.06 service / CLI / evidence | READY FOR REMOTE PUBLICATION | `PENDING` | `243 passed`; raw branch coverage 91.334895%; Ruff/mypy PASS |
+| 15.06 service / CLI / evidence | COMPLETE / REMOTE | `c77b8950a4a150407b51d9bfed69b2314c74380e` | `243 passed`; raw branch coverage `91.334895%`; service/CLI/artifacts PASS |
 
 ## Required final status
 
 `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
 
-`FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_INDEPENDENT_SOL_REVIEW`
+`FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL`
 
 ## Checkpoint 15.01 evidence
 
@@ -118,7 +118,7 @@
 - Published capability SHA: `62f1828edcfbd0569dbf76fc93e241f2db95094d`.
 - Original focused publication matrix: `23 passed`. Hardened current synthetic matrix: `34 passed`; raw branch coverage `98.684211%`.
 
-## Checkpoint 15.06 pre-publication evidence
+## Checkpoint 15.06 sealed evidence
 
 - Implemented shared Stage-15 service over sealed accepted Stage-12/13/14 candidate identities without invoking or duplicating upstream optimisers.
 - Preserves points-optimal, rank-optimal and selected plans, expected-points/target-probability deltas, raw/scenario identities, rank diagnostics, confidence and fail-closed reasons.
@@ -126,7 +126,28 @@
 - Added complete required-gate inventory and pure-points fallback for rules, target, rights, cohort, opponent, confidence, projection/scenario lineage, points floor and early-season policy.
 - Added immutable Stage-15 artifacts using canonical detached hashes and recomputation on load; nested or outer tampering fails closed.
 - Added real `dmf rank` validate/eo/mini-league/opponents/cohort/evaluate/compare commands through the shared service.
-- Current complete Stage-15 matrix: `243 passed in 11.86s`.
+- Current complete Stage-15 matrix: `243 passed in 15.85s`.
 - Raw Stage-15 branch coverage: `91.334895%` (`780/854`); combined line/branch coverage: `95.192007%`.
 - Ruff format/lint: PASS. Strict mypy: PASS. `git diff --check`: PASS.
-- Independent review and final build/wheel/repository/security acceptance remain pending.
+- Product implementation is sealed for independent review; no human acceptance is recorded.
+
+## Final Stage 15 implementation evidence
+
+- Status: `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`.
+- Actual finalisation starting remote SHA: `0a16ebaf6376c2347845ae9bb7804433fe6823e4`.
+- Immutable main: `c53a1dfae952f481c1e885200ebf6120e4b63c24`.
+- Checkpoint 15.05 capability: `62f1828edcfbd0569dbf76fc93e241f2db95094d`.
+- Checkpoint 15.06 capability: `c77b8950a4a150407b51d9bfed69b2314c74380e`.
+- Complete Stage-15 suite: `243 passed`.
+- Raw branch coverage: `91.334895%` (`780/854` branches); combined coverage `95.192007%`.
+- Targeted inherited rules and Stages 9–14 regressions: `37 passed`.
+- Projection invariance and shared-football-scenario invariant: PASS.
+- Exact mini-league oracle and independent exact synthetic-field oracle: PASS.
+- Nonanticipativity, future-action leakage and final-rank-hindsight exclusions: PASS.
+- Rank-aware activation failures preserve and select `PURE_POINTS`: PASS.
+- Service/CLI semantic equivalence and artifact tamper rejection: PASS.
+- Frozen dependency sync at the starting remote SHA: PASS in the successful GitHub validation/export runs; the final local run reused the exact exported environment because this container has no external DNS.
+- Ruff format/lint, strict mypy, repository validation, secret scan, Hatchling sdist/wheel build and clean external-wheel CLI: PASS.
+- Temporary Stage-15 workflows and `recovery/stage1505`, `recovery/stage1506`: REMOVED.
+- `FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL`.
+- PR / merge / tag / human acceptance: none.

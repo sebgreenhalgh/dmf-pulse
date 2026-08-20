@@ -85,7 +85,7 @@ It binds the sealed request and result, including all cutoff, lineage, objective
 target, plan, gate, confidence, rights and version fields. Loading recomputes
 request, nested model, result and artifact hashes; any mismatch fails closed.
 
-## Focused verification before publication
+## Complete verification and seal
 
 ```text
 243 passed in 11.86s
@@ -100,10 +100,18 @@ python diff whitespace gate: PASS
 The matrix covers all Stage-15 unit, property, integration and rank CLI tests.
 Repository-wide pytest was not run by design.
 
-## Status
+## Final seal evidence
 
-`CHECKPOINT_15_06_READY_FOR_REMOTE_PUBLICATION`
-
-Independent review, final inherited regression selection, build/wheel testing,
-repository validation, secret scan and temporary-workflow cleanup remain final
-hardening work and are not claimed here.
+- Capability SHA: `c77b8950a4a150407b51d9bfed69b2314c74380e`.
+- Complete Stage-15 matrix: `243 passed in 15.85s`.
+- Raw branch coverage: `91.334895%` (`780/854` branches).
+- Targeted inherited rules and Stages 9–14 matrix: `37 passed in 4.26s`.
+- Projection invariance, shared-scenario identity and nonanticipativity: PASS.
+- Exact mini-league oracle and independent synthetic-field oracle: PASS.
+- Required fail-closed gates, service/CLI equivalence and artifact tamper rejection: PASS.
+- Ruff format/lint and strict mypy over all production sources: PASS.
+- Repository validation and first-party secret scan after cleanup: PASS.
+- Canonical Hatchling sdist/wheel build and clean external-wheel CLI execution: PASS.
+- All four temporary Stage-15 workflows and both recovery payload sets: REMOVED.
+- Full repository pytest: `NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL`.
+- Status: `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`.

@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 75881,
+      "bytes": 77204,
       "path": "PLANS.md",
-      "sha256": "9266af6f34ecf7f6f1b8ceb36528db5af1e06e2cba5d35c6c5ada36b9436241f"
+      "sha256": "451166ba252c0e979b04554d1616bd5bdcf8c05d199f94f3c4c3afad533f870f"
     },
     {
       "bytes": 2761,
@@ -289,6 +289,11 @@
       "bytes": 809,
       "path": "config/providers/the_odds_api.json",
       "sha256": "8936ddc1e637438c8bc1991146b41a2c3bbe3be15442ce7410ea9ac451e9014c"
+    },
+    {
+      "bytes": 362,
+      "path": "config/rank_strategy/default.yaml",
+      "sha256": "6576a10be9d2c12de2dce7a05e55dcfc14168977ba4f318102f57ad314d3f3e2"
     },
     {
       "bytes": 3074,
@@ -2716,9 +2721,9 @@
       "sha256": "730f905d12f5fcefb162931d287cc6b6faab716c8538da88791c385f9ced8802"
     },
     {
-      "bytes": 3915,
+      "bytes": 3992,
       "path": "src/dmf_pulse/cli/app.py",
-      "sha256": "7301e573e694b601ccfb7b84f90693a9c340105410f1e7e905e3c37d582743c7"
+      "sha256": "31389c53e111ec7af5526f5e79130e7e6fd2dcb9485e28cdfa86fdd2c5d44632"
     },
     {
       "bytes": 17035,
@@ -2789,6 +2794,11 @@
       "bytes": 7428,
       "path": "src/dmf_pulse/cli/prices.py",
       "sha256": "b687669f3341011a8483e1798c340c899cc90406008b79462342bb91a90d32c2"
+    },
+    {
+      "bytes": 11903,
+      "path": "src/dmf_pulse/cli/rank.py",
+      "sha256": "1714d42b0072c15afa63ae1db4f2b898db6f90a0c3b819af8b35b6e476de6bdd"
     },
     {
       "bytes": 1660,
@@ -3621,6 +3631,96 @@
       "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
     },
     {
+      "bytes": 4573,
+      "path": "src/dmf_pulse/rank_strategy/__init__.py",
+      "sha256": "2e858f9d6527ed5f451d187dae61eb4f926c445fde2ecb7e6e44ec21e3bcca39"
+    },
+    {
+      "bytes": 5928,
+      "path": "src/dmf_pulse/rank_strategy/artifacts.py",
+      "sha256": "707384d8b2c4b87b10fdeddc6478bc07b91f5d7d4d73b86a507814feb8c81125"
+    },
+    {
+      "bytes": 1029,
+      "path": "src/dmf_pulse/rank_strategy/cohorts.py",
+      "sha256": "bc888e4149e9f61d3dfc930cb29827a401ca3097c0290015f47fa71697e043ee"
+    },
+    {
+      "bytes": 6628,
+      "path": "src/dmf_pulse/rank_strategy/effective_ownership.py",
+      "sha256": "98b41ab89b190de0e3480cf635c0e9a506daebc44cdfc209216b95965a308943"
+    },
+    {
+      "bytes": 637,
+      "path": "src/dmf_pulse/rank_strategy/errors.py",
+      "sha256": "52a06e46cf9ba5ca24ce6080f6250631da04490f8d67619f0212adc9457f5376"
+    },
+    {
+      "bytes": 6950,
+      "path": "src/dmf_pulse/rank_strategy/manager_multipliers.py",
+      "sha256": "086136981c187762c626d890d434af763789ec4998a5242a94cf5e885ed79ecf"
+    },
+    {
+      "bytes": 8639,
+      "path": "src/dmf_pulse/rank_strategy/mini_league.py",
+      "sha256": "5b93b0972cb6a0348498d4ee83c211cc1d3f4fa969352767e647f470d10f91c7"
+    },
+    {
+      "bytes": 17327,
+      "path": "src/dmf_pulse/rank_strategy/models.py",
+      "sha256": "49aae028af020ba67f1ced19c6119d9e74fb3ce737aae72b0310202424c16db3"
+    },
+    {
+      "bytes": 13784,
+      "path": "src/dmf_pulse/rank_strategy/opponent_actions.py",
+      "sha256": "a671448e6d7675f64fa2e6a9b1c900529b67bb78133a4b65531fcaab3154f722"
+    },
+    {
+      "bytes": 14033,
+      "path": "src/dmf_pulse/rank_strategy/opponent_models.py",
+      "sha256": "363884779781b5a9566cce1564812be496b035826ad4e1b7364b21988312731b"
+    },
+    {
+      "bytes": 1110,
+      "path": "src/dmf_pulse/rank_strategy/ownership.py",
+      "sha256": "580e269b046656ccbc4b01abdcc175131a74c286fb7ba172bcbfc14f9ce46b33"
+    },
+    {
+      "bytes": 1533,
+      "path": "src/dmf_pulse/rank_strategy/rank_simulator.py",
+      "sha256": "e92407419e1e266d09802be2a4481b638d39af9f21a1eea3b3a0ce2a99c68764"
+    },
+    {
+      "bytes": 20463,
+      "path": "src/dmf_pulse/rank_strategy/rank_utility.py",
+      "sha256": "5b0ee8901c5861fb1437db599e0c3ad14f3558c96092d7ce6c316254447b666a"
+    },
+    {
+      "bytes": 22577,
+      "path": "src/dmf_pulse/rank_strategy/service.py",
+      "sha256": "83e1cff6795717bf9c21654bf75708f5885d26c17535b6e4bc0783bba02e7fa0"
+    },
+    {
+      "bytes": 19075,
+      "path": "src/dmf_pulse/rank_strategy/service_models.py",
+      "sha256": "909a05c44f5d5283ceb74dc36cb8475a53009fc4428e1db872bb094d7242f56a"
+    },
+    {
+      "bytes": 16627,
+      "path": "src/dmf_pulse/rank_strategy/synthetic_field.py",
+      "sha256": "8eea3342b30a0065995adfa1a2f92692dd09fa2fb8802355b84d3953191a5f84"
+    },
+    {
+      "bytes": 18619,
+      "path": "src/dmf_pulse/rank_strategy/synthetic_models.py",
+      "sha256": "17633ae5593c12d0cd010ba931b224acc838d51c1957ad171ec75895f11a7002"
+    },
+    {
+      "bytes": 17383,
+      "path": "src/dmf_pulse/rank_strategy/utility_models.py",
+      "sha256": "ff3767bc7e8de7f618aa8cea98aaada1d87416a99f690551abcd37082c14889e"
+    },
+    {
       "bytes": 667,
       "path": "src/dmf_pulse/rules/AGENTS.md",
       "sha256": "738a4299fcb1c818b53c9bf3d881c1f504933b3943b6a68b94cfe12c3de2a0b6"
@@ -4246,6 +4346,26 @@
       "sha256": "8fef56e0d55f620f668c3b285e96e9908374f915dda081467faac21e2e390262"
     },
     {
+      "bytes": 3790,
+      "path": "tests/integration/rank_strategy/test_exact_mini_league.py",
+      "sha256": "0a049d8ab4d4d96359729c188af91c4141c3ac65c50dc47999ccdfc38e5d1326"
+    },
+    {
+      "bytes": 4280,
+      "path": "tests/integration/rank_strategy/test_hidden_opponent_actions.py",
+      "sha256": "6b8543077ce12c3b839d8cc1c3876ddebfa498837bc5481edd1d15581e51b6df"
+    },
+    {
+      "bytes": 2828,
+      "path": "tests/integration/rank_strategy/test_mini_league_rank_utility.py",
+      "sha256": "d22825a2d788f75190311537a08bb331fc5d470afbf37c9ce59fe7fb600433ad"
+    },
+    {
+      "bytes": 7697,
+      "path": "tests/integration/rank_strategy/test_synthetic_overall_field.py",
+      "sha256": "f01e36c04a868494631588df235a8d4d0db7fe5665d8319f59bd702e9e09a32f"
+    },
+    {
       "bytes": 4603,
       "path": "tests/integration/repository/test_authority_stage_map.py",
       "sha256": "eb74931ad20eac1941212281f9ce861c5172747b465a4bdf78655825211dcb19"
@@ -4386,6 +4506,31 @@
       "sha256": "e4abce2b11c32598bcc4a383c2ee2da677f4da04d89f69bdcfa89ef059dbcfc9"
     },
     {
+      "bytes": 2078,
+      "path": "tests/property/rank_strategy/test_multiplier_properties.py",
+      "sha256": "cb2baae12493de3d33715a12962fead620f38db31ecfacaa1c50bbdbfe5768f9"
+    },
+    {
+      "bytes": 4076,
+      "path": "tests/property/rank_strategy/test_opponent_properties.py",
+      "sha256": "cbc2e841815fe6ec857ab56c2c7b7565f33145496c6bf06353d7eaa4fcdaa967"
+    },
+    {
+      "bytes": 2012,
+      "path": "tests/property/rank_strategy/test_rank_properties.py",
+      "sha256": "937633e5384c1194268d334ef45422d989efdd6e5dbebe2a2567119ab977693d"
+    },
+    {
+      "bytes": 2748,
+      "path": "tests/property/rank_strategy/test_rank_utility_properties.py",
+      "sha256": "336bfcfeb4c50c80b4c478c4fc499badcbaac23f03a23054581dcdad27a69973"
+    },
+    {
+      "bytes": 2395,
+      "path": "tests/property/rank_strategy/test_synthetic_properties.py",
+      "sha256": "228b14390f3145a1e0ff1420f4808a9df6c7aac8d57a00c944d1b5602ae6aa82"
+    },
+    {
       "bytes": 2945,
       "path": "tests/property/rules/test_rules_properties.py",
       "sha256": "1eb9fb620de28adfc8fd5663430c1d0704b15c19395d7d4b6938fb9699f8c2f0"
@@ -4456,6 +4601,11 @@
       "sha256": "e4d87362c66ce04f5fef84d40a4a6111d58c40ad4abd5815b6d8b08858533647"
     },
     {
+      "bytes": 6513,
+      "path": "tests/support/opponent_action_fixtures.py",
+      "sha256": "e95ff0b3141e91ad4279441ea9fb30ed99b9bab355b5b42194742f4328aa69d4"
+    },
+    {
       "bytes": 6830,
       "path": "tests/support/optimisation_factories.py",
       "sha256": "58baffda6726d18df07f6d6c97c7ed44877102715386eb01f4d8cc7607e2fda9"
@@ -4464,6 +4614,26 @@
       "bytes": 10144,
       "path": "tests/support/optimisation_oracle.py",
       "sha256": "cc10a43061093ca5ba50fa6f60e40c5aadae9ccacd2e605ce38234c7df41e418"
+    },
+    {
+      "bytes": 5994,
+      "path": "tests/support/rank_service_fixtures.py",
+      "sha256": "49742e9c764e0aebe7fd5ca7176b2d1b86506fe72b29f82390a543466fd1eb2d"
+    },
+    {
+      "bytes": 8375,
+      "path": "tests/support/rank_strategy_fixtures.py",
+      "sha256": "67eb10e7ad409503ce80c646fc15acef1225c7756be28ff0380ca472793da4c2"
+    },
+    {
+      "bytes": 2828,
+      "path": "tests/support/rank_strategy_oracle.py",
+      "sha256": "9aaccd07113e343a7c6f7fb4ee6fcb273d1ca6864192564dbb5354a3dbf5ff08"
+    },
+    {
+      "bytes": 6877,
+      "path": "tests/support/rank_utility_fixtures.py",
+      "sha256": "c47aa6f67135845e27e8e604067e659a69e77b21d9d2366fac3578e7ab5cac5d"
     },
     {
       "bytes": 442,
@@ -4484,6 +4654,16 @@
       "bytes": 12048,
       "path": "tests/support/stage14_chip_fixtures.py",
       "sha256": "0b5e053979d7fbae77d0db38f98a030c0c503176ca6ffbfccaebf7fd29289ab5"
+    },
+    {
+      "bytes": 5399,
+      "path": "tests/support/synthetic_field_fixtures.py",
+      "sha256": "cf71e94c0c26272a6bf968b2fd405f1da057d5509a2f298ea8725ac3313bbd2c"
+    },
+    {
+      "bytes": 5105,
+      "path": "tests/support/synthetic_field_oracle.py",
+      "sha256": "ca3e9a243921bb6b118fe9fbad5ede304c23f79ebe1a2f226c1fdbc2cbf2f12a"
     },
     {
       "bytes": 9952,
@@ -4774,6 +4954,11 @@
       "bytes": 16621,
       "path": "tests/unit/cli/test_odds_market_commands.py",
       "sha256": "08dda00ff7c979dbfb2bbc281c7f58aebd920c3b71fc37926ac44a55dd2e3d76"
+    },
+    {
+      "bytes": 10264,
+      "path": "tests/unit/cli/test_rank_cli.py",
+      "sha256": "1545f56a67da213c444d204af02e1826c200bffd7676132b7ecc90dbf60ce62c"
     },
     {
       "bytes": 9905,
@@ -5131,6 +5316,91 @@
       "sha256": "b75772c6f82ad4416f17de53f0294abbf1f2ee513dbff2dfcd2d3c2b538419df"
     },
     {
+      "bytes": 5694,
+      "path": "tests/unit/rank_strategy/test_artifacts.py",
+      "sha256": "871e3048cb7f0bbabe9be7f938dc854104eda5bf3668608f12ffcb49d47aa71c"
+    },
+    {
+      "bytes": 8445,
+      "path": "tests/unit/rank_strategy/test_contracts.py",
+      "sha256": "1f1117b8b34701467fbe1de73ca65538195cec5d1f07fa25029f4b23092fc582"
+    },
+    {
+      "bytes": 3992,
+      "path": "tests/unit/rank_strategy/test_effective_ownership.py",
+      "sha256": "8be5c8a7589f47cef571e9f592295180d0b90c43c0f7326ae89c87cf15df60dc"
+    },
+    {
+      "bytes": 5157,
+      "path": "tests/unit/rank_strategy/test_joint_opponent_actions.py",
+      "sha256": "f1ada74f4e98c460f187a9559891c3a5ae51c89d9e2c3b28f51ccc271dcd01ae"
+    },
+    {
+      "bytes": 4073,
+      "path": "tests/unit/rank_strategy/test_manager_multipliers.py",
+      "sha256": "b0e7448c2e5d1ef45468e30a809f59ee2a6140d2e205eb4269ed75979b6b4e5f"
+    },
+    {
+      "bytes": 8798,
+      "path": "tests/unit/rank_strategy/test_mini_league.py",
+      "sha256": "291cf8c08a88e2da17fb2d2b88f14cb181cf5a78525ccfbcee44cd91e05d2eab"
+    },
+    {
+      "bytes": 8615,
+      "path": "tests/unit/rank_strategy/test_opponent_actions.py",
+      "sha256": "c8c163fd15526b6cee41a5570d4c11adb6d9668971a8943910c7e7fb2e4e019b"
+    },
+    {
+      "bytes": 11429,
+      "path": "tests/unit/rank_strategy/test_opponent_contracts.py",
+      "sha256": "c705eedac4851b3a69887ec0c7af2ff43e109f332161aadfcb97d5d34fb254d9"
+    },
+    {
+      "bytes": 9193,
+      "path": "tests/unit/rank_strategy/test_rank_utility.py",
+      "sha256": "899f84b52b03e9cb3497f3ef48afff105dc7b8e9905e5a4cf7197663e750fbba"
+    },
+    {
+      "bytes": 5437,
+      "path": "tests/unit/rank_strategy/test_rank_utility_contracts.py",
+      "sha256": "d1707f6b1758762921f2cd22b2d8321381f6ffb2781c582e58defcb96f4eacde"
+    },
+    {
+      "bytes": 9759,
+      "path": "tests/unit/rank_strategy/test_rank_utility_gates.py",
+      "sha256": "7fe46cc5dc245853c9da6a62bfebbd48bdc4931e78b6f431bc16fc2bc1aaf7e8"
+    },
+    {
+      "bytes": 11441,
+      "path": "tests/unit/rank_strategy/test_service.py",
+      "sha256": "63800f5ac3d9c742f2dad2547234ebce33da180868bce47fa29958121cfa698b"
+    },
+    {
+      "bytes": 12783,
+      "path": "tests/unit/rank_strategy/test_service_model_guards.py",
+      "sha256": "4830104a54d015b18d5dc501f05a306057cce681252de29b372eda0e2e5ed5ce"
+    },
+    {
+      "bytes": 7191,
+      "path": "tests/unit/rank_strategy/test_synthetic_contracts.py",
+      "sha256": "68ab9a4828e7aae34d3af1decac813bee7a1ae28be3a32c75a1046769839ffc4"
+    },
+    {
+      "bytes": 13468,
+      "path": "tests/unit/rank_strategy/test_synthetic_field.py",
+      "sha256": "7d0eeb8ad6d36332a8f44382435b038a31ae72397c27519bd04ff3596ab7bb2b"
+    },
+    {
+      "bytes": 14781,
+      "path": "tests/unit/rank_strategy/test_synthetic_model_guards.py",
+      "sha256": "8e92f140a5095fc77e7271cef969a2e024565c2127a49ebdd31aefc25110a940"
+    },
+    {
+      "bytes": 10790,
+      "path": "tests/unit/rank_strategy/test_utility_model_guards.py",
+      "sha256": "5ad733549e4a3859613930cef10fe1f406d97741b4449df0ed207ab61366d78d"
+    },
+    {
       "bytes": 5609,
       "path": "tests/unit/rules/test_2026_27_save_contract.py",
       "sha256": "6f883861a725c8e56a17c091ba9763ba23746a5a0478fef957a31291ee327053"
@@ -5339,6 +5609,11 @@
       "bytes": 2567,
       "path": "tickets/PRC-013/ticket.yaml",
       "sha256": "97d54728b7af2ff329edc05f50b8b8f47f9f4aa0294f2843688913c1107d0172"
+    },
+    {
+      "bytes": 12263,
+      "path": "tickets/RANK-015/PROGRESS.md",
+      "sha256": "4645d6de1104af01311d9133cc272a547266bb0f10c9281ad9b9f2ef7814e934"
     },
     {
       "bytes": 4490,
