@@ -37,15 +37,7 @@ jobs:
           set -euo pipefail
           mkdir -p stage15-dev-tools/bin stage15-dev-tools/site-packages
           cp .venv/bin/ruff stage15-dev-tools/bin/
-          cp -a \
-            .venv/lib/python3.13/site-packages/hypothesis* \
-            .venv/lib/python3.13/site-packages/sortedcontainers* \
-            .venv/lib/python3.13/site-packages/mypy* \
-            .venv/lib/python3.13/site-packages/pathspec* \
-            .venv/lib/python3.13/site-packages/build* \
-            .venv/lib/python3.13/site-packages/pyproject_hooks* \
-            .venv/lib/python3.13/site-packages/psycopg* \
-            stage15-dev-tools/site-packages/
+          cp -a .venv/lib/python3.13/site-packages/. stage15-dev-tools/site-packages/
           tar -czf stage15-dev-tools.tar.gz stage15-dev-tools
 
       - name: Upload exact repository bundle
