@@ -54,7 +54,7 @@ jobs:
         run: |
           set -euo pipefail
           git show "$PAYLOAD_SOURCE_SHA":.github/workflows/stage15-terminal-finalizer.yml \
-            | sed -n 's/^          \(H4sI.*\)$/\1/p' > /tmp/rank015-docs.patch.gz.b64
+            | sed -n 's/^\(H4sI.*\)$/\1/p' > /tmp/rank015-docs.patch.gz.b64
           test "$(sha256sum /tmp/rank015-docs.patch.gz.b64 | cut -d' ' -f1)" = "334f1f049b0558815271c6fb1acf5ec4b1f4b94ae75e49e6b827899b3e5acbc4"
           base64 -d /tmp/rank015-docs.patch.gz.b64 > /tmp/rank015-docs.patch.gz
           gzip -dc /tmp/rank015-docs.patch.gz > /tmp/rank015-docs.patch
