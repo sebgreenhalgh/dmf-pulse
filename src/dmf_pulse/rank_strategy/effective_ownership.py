@@ -154,4 +154,8 @@ def calculate_effective_ownership(
         report_hash="0" * 64,
     )
     payload = report.model_dump(mode="json", exclude={"report_hash"})
-    return report.model_copy(update={"report_hash": semantic_sha256(payload)})
+    return EffectiveOwnershipReport.model_validate(
+        report.model_copy(update={"report_hash": semantic_sha256(payload)}).model_dump(
+            mode="python"
+        )
+    )

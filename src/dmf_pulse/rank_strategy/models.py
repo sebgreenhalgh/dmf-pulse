@@ -114,6 +114,8 @@ class ManagerTeamPlan(RankModel):
         if self.active_chip is ManagerChip.FREE_HIT:
             if self.temporary_free_hit_squad is None:
                 raise ValueError("Free Hit requires a temporary squad")
+            if self.transfer_hit_points != 0:
+                raise ValueError("Free Hit cannot carry ordinary transfer-hit deductions")
         elif self.temporary_free_hit_squad is not None:
             raise ValueError("temporary squad is only valid for Free Hit")
         designations = (
@@ -226,6 +228,8 @@ class ManagerMultiplierSet(RankModel):
 
     @model_validator(mode="after")
     def scenario_set_is_valid(self) -> ManagerMultiplierSet:
+        if self.scenario_set_hash == _ZERO_HASH or self.raw_projection_hash == _ZERO_HASH:
+            raise ValueError("manager multiplier lineage cannot use unsealed hash sentinels")
         identities = tuple((item.scenario_id, item.outcome_draw_id) for item in self.scenarios)
         if identities != tuple(sorted(identities)) or len(identities) != len(set(identities)):
             raise ValueError("manager multiplier scenarios must be sorted and unique")
@@ -310,6 +314,8 @@ class EffectiveOwnershipReport(RankModel):
 
     @model_validator(mode="after")
     def report_is_canonical(self) -> EffectiveOwnershipReport:
+        if self.scenario_set_hash == _ZERO_HASH or self.raw_projection_hash == _ZERO_HASH:
+            raise ValueError("EO projection lineage cannot use unsealed hash sentinels")
         ids = tuple(item.player_id for item in self.entries)
         if ids != tuple(sorted(ids)) or len(ids) != len(set(ids)):
             raise ValueError("EO entries must be sorted and unique")
@@ -415,6 +421,7 @@ class RankDistribution(RankModel):
     scenario_set_hash: Sha256
     raw_projection_hash: Sha256
     tie_policy_id: StrictStr = Field(min_length=1)
+    tie_policy_hash: Sha256
     target_rank: PositiveInt | None = None
     rank_pmf: tuple[RankMass, ...] = Field(min_length=1)
     expected_rank: FiniteFloat
@@ -428,6 +435,15 @@ class RankDistribution(RankModel):
 
     @model_validator(mode="after")
     def distribution_is_canonical(self) -> RankDistribution:
+        if any(
+            value == _ZERO_HASH
+            for value in (
+                self.scenario_set_hash,
+                self.raw_projection_hash,
+                self.tie_policy_hash,
+            )
+        ):
+            raise ValueError("rank distribution lineage cannot use unsealed hash sentinels")
         ranks = tuple(item.rank for item in self.rank_pmf)
         if ranks != tuple(sorted(ranks)) or len(ranks) != len(set(ranks)):
             raise ValueError("rank PMF must be sorted by unique rank")

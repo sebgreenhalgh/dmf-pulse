@@ -195,6 +195,11 @@ class RankServiceRequest(RankModel):
         )
         if len(source_plan_ids) != len(set(source_plan_ids)):
             raise ValueError("accepted rank plans must bind unique upstream plan identities")
+        source_stages = {item.source_stage for item in self.plans}
+        if RankPlanSource.STAGE_13 in source_stages and self.lineage.stage13_prices is None:
+            raise ValueError("accepted Stage-13 plan requires Stage-13 price lineage")
+        if RankPlanSource.STAGE_14 in source_stages and self.lineage.stage14_chips is None:
+            raise ValueError("accepted Stage-14 plan requires Stage-14 chip lineage")
         expected_floor_hash = semantic_sha256(self.policy.model_dump(mode="json"))
         if self.lineage.points_floor_hash != expected_floor_hash:
             raise ValueError("rank points-floor configuration hash mismatch")

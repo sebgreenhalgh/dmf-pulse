@@ -224,6 +224,7 @@ def simulate_mini_league_rank(
         scenario_set_hash=scenario_hash,
         raw_projection_hash=projection_hash,
         tie_policy_id=tie_policy.policy_id,
+        tie_policy_hash=semantic_sha256(tie_policy.model_dump(mode="json")),
         target_rank=target_rank,
         rank_pmf=pmf,
         expected_rank=expected_rank,

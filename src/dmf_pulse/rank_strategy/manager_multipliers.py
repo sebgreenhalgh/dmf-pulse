@@ -121,7 +121,7 @@ def _scenario_multiplier(
         counted_player_ids=tuple(
             player_id for player_id, multiplier in multipliers.items() if multiplier > 0
         ),
-        autosubs=accepted.autosubs,
+        autosubs=() if plan.active_chip is ManagerChip.BENCH_BOOST else accepted.autosubs,
         captain_resolution=accepted.captain_resolution,
         effective_captain_id=accepted.effective_captain_id,
         gross_points=gross_points,
@@ -130,7 +130,11 @@ def _scenario_multiplier(
         multiplier_hash="0" * 64,
     )
     payload = value.model_dump(mode="json", exclude={"multiplier_hash"})
-    return value.model_copy(update={"multiplier_hash": semantic_sha256(payload)})
+    return ScenarioManagerMultiplier.model_validate(
+        value.model_copy(update={"multiplier_hash": semantic_sha256(payload)}).model_dump(
+            mode="python"
+        )
+    )
 
 
 def calculate_manager_multipliers(
@@ -165,4 +169,8 @@ def calculate_manager_multipliers(
         multiplier_set_hash="0" * 64,
     )
     payload = value.model_dump(mode="json", exclude={"multiplier_set_hash"})
-    return value.model_copy(update={"multiplier_set_hash": semantic_sha256(payload)})
+    return ManagerMultiplierSet.model_validate(
+        value.model_copy(update={"multiplier_set_hash": semantic_sha256(payload)}).model_dump(
+            mode="python"
+        )
+    )

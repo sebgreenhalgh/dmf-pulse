@@ -161,6 +161,11 @@ class OpponentActionCandidate(RankModel):
             raise ValueError("a no-transfer action cannot carry a transfer hit")
         if self.chip_action is OpponentChipAction.WILDCARD and self.transfer_count == 0:
             raise ValueError("Wildcard candidate must describe at least one transfer")
+        if (
+            self.chip_action is OpponentChipAction.WILDCARD
+            and self.manager_plan.transfer_hit_points != 0
+        ):
+            raise ValueError("Wildcard action cannot carry ordinary transfer-hit deductions")
         return self
 
 

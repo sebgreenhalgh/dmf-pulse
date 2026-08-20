@@ -255,6 +255,21 @@ def test_invalid_target_rank_fails_with_stable_error() -> None:
     assert exc_info.value.code == "RANK_TARGET_INVALID"
 
 
+def test_exact_distribution_binds_complete_tie_policy_identity() -> None:
+    plans = (manager_plan("sebastian"), manager_plan("rival"))
+    policy = rank_tie_policy()
+    result = simulate_mini_league_rank(
+        exact_named_league(*plans),
+        _sets(plans, scenario_set()),
+        policy,
+        target_manager_id="sebastian",
+    )
+
+    assert result.tie_policy_id == policy.policy_id
+    assert result.tie_policy_hash == semantic_sha256(policy.model_dump(mode="json"))
+    assert result.tie_policy_hash != "0" * 64
+
+
 def test_exact_league_rejects_stale_nested_and_multiplier_set_hashes() -> None:
     plans = (manager_plan("sebastian"), manager_plan("rival"))
     scenarios = scenario_set()

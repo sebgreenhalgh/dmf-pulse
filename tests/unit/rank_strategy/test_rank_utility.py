@@ -14,6 +14,55 @@ from tests.support.rank_utility_fixtures import candidate, context, policy
 pytestmark = pytest.mark.unit
 
 
+@pytest.mark.parametrize(
+    ("objective", "target"),
+    (
+        (RankObjectiveMode.PURE_POINTS, None),
+        (RankObjectiveMode.MEASURED_LEVERAGE, None),
+        (RankObjectiveMode.TARGET_RANK, RankTargetDefinition(target_rank=1)),
+        (RankObjectiveMode.RANK_PROTECTION, RankTargetDefinition(target_rank=1)),
+        (RankObjectiveMode.MINI_LEAGUE_WIN, RankTargetDefinition(target_rank=1)),
+        (
+            RankObjectiveMode.RANK_BAND,
+            RankTargetDefinition(band_best_rank=1, band_worst_rank=1),
+        ),
+        (
+            RankObjectiveMode.PRIZE_BAND,
+            RankTargetDefinition(
+                band_best_rank=1,
+                band_worst_rank=1,
+                prize_band_id="winner",
+            ),
+        ),
+    ),
+)
+def test_every_objective_preserves_identical_raw_projection_and_scenario_scores(
+    objective: RankObjectiveMode,
+    target: RankTargetDefinition | None,
+) -> None:
+    candidates = (
+        candidate("points", 60.0, {1: 0.2, 2: 0.8}, leverage=0.1),
+        candidate("rank", 60.0, {1: 0.8, 2: 0.2}, leverage=0.9),
+    )
+    before = tuple(item.model_dump(mode="json") for item in candidates)
+
+    result = evaluate_rank_strategy(
+        request_id=f"invariance-{objective.value}",
+        objective=objective,
+        candidates=candidates,
+        context=context(),
+        policy=policy(material_threshold=1.0),
+        target=target,
+    )
+
+    assert result.projection_invariance.identical is True
+    assert result.projection_invariance.before_score_hashes == (
+        result.projection_invariance.after_score_hashes
+    )
+    assert result.projection_invariance.raw_projection_hash == candidates[0].raw_projection_hash
+    assert tuple(item.model_dump(mode="json") for item in candidates) == before
+
+
 def test_pure_points_retains_and_selects_exact_points_optimum() -> None:
     candidates = (
         candidate("points", 60.0, {1: 0.2, 2: 0.8}),

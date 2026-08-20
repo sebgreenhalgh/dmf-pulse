@@ -79,7 +79,7 @@ def test_triple_captain_uses_three_not_raw_captain_ownership() -> None:
     assert result.scenarios[0].player_multipliers["p12"] == 3
 
 
-def test_bench_boost_counts_appearing_bench_once_even_when_autosubbed() -> None:
+def test_bench_boost_counts_appearing_bench_once_without_recording_autosubs() -> None:
     appearances = ({"p04": False, "p05": True, "p11": True, "p06": True, "p01": True},)
     scenarios = scenario_set(_points(p05=9, p11=7, p06=5, p01=6), appearances=appearances)
     result = calculate_manager_multipliers(
@@ -96,6 +96,7 @@ def test_bench_boost_counts_appearing_bench_once_even_when_autosubbed() -> None:
     assert multiplier.player_multipliers["p11"] == 1
     assert multiplier.player_multipliers["p06"] == 1
     assert multiplier.player_multipliers["p04"] == 0
+    assert multiplier.autosubs == ()
 
 
 def test_free_hit_scores_temporary_squad_without_mutating_permanent_squad() -> None:

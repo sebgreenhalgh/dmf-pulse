@@ -268,6 +268,15 @@ class SyntheticOverallDistribution(RankModel):
 
     @model_validator(mode="after")
     def distribution_is_canonical(self) -> SyntheticOverallDistribution:
+        protected_hashes = (
+            self.population_hash,
+            self.scenario_set_hash,
+            self.raw_projection_hash,
+            self.tie_policy_hash,
+            *self.manager_multiplier_set_hashes.values(),
+        )
+        if any(value == "0" * 64 for value in protected_hashes):
+            raise ValueError("synthetic distribution lineage cannot use unsealed hash sentinels")
         multiplier_manager_ids = tuple(self.manager_multiplier_set_hashes)
         if (
             not multiplier_manager_ids
@@ -291,6 +300,27 @@ class SyntheticOverallDistribution(RankModel):
             raise ValueError("synthetic expected rank does not reconcile with the PMF")
         if tuple(self.rank_percentiles) != _PERCENTILE_KEYS:
             raise ValueError("synthetic rank percentiles must use the canonical keys")
+
+        def quantile(probability: float) -> int:
+            cumulative = 0.0
+            for item in self.rank_pmf:
+                cumulative += item.probability
+                if cumulative + 1e-15 >= probability:
+                    return item.rank
+            return self.rank_pmf[-1].rank
+
+        expected_percentiles = {
+            label: quantile(probability)
+            for label, probability in zip(
+                _PERCENTILE_KEYS,
+                (0.10, 0.25, 0.50, 0.75, 0.90),
+                strict=True,
+            )
+        }
+        if self.rank_percentiles != expected_percentiles:
+            raise ValueError("synthetic rank percentiles must be derived from the PMF")
+        if self.median_rank != expected_percentiles["p50"]:
+            raise ValueError("synthetic median rank must be derived from the PMF")
         if self.target_rank is not None and self.target_rank > self.population_size:
             raise ValueError("synthetic target rank lies outside the represented population")
         target_probability = (

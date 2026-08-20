@@ -108,6 +108,7 @@ def rank_distribution(
         "scenario_set_hash": scenario_hash,
         "raw_projection_hash": raw_hash,
         "tie_policy_id": "verified-classic",
+        "tie_policy_hash": "c" * 64,
         "target_rank": None,
         "rank_pmf": masses,
         "expected_rank": expected_rank,

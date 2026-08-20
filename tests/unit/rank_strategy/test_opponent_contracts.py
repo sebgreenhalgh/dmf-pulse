@@ -118,6 +118,24 @@ def test_action_candidate_rejects_feature_after_generation() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "chip",
+    [OpponentChipAction.FREE_HIT, OpponentChipAction.WILDCARD],
+)
+def test_free_hit_and_wildcard_actions_cannot_carry_transfer_hits(
+    chip: OpponentChipAction,
+) -> None:
+    action = candidate(f"{chip.value.lower()}-hits", transfer_count=2, chip=chip)
+    payload = action.model_dump(mode="python")
+    payload["manager_plan"] = {
+        **payload["manager_plan"],
+        "transfer_hit_points": 4,
+    }
+
+    with pytest.raises(ValidationError, match="transfer-hit deductions"):
+        type(action).model_validate(payload)
+
+
 def test_distribution_rejects_invalid_probability_vector_and_diagnostics() -> None:
     result = model_opponent_actions(observed_state(), baseline_candidates(), behaviour_profile())
     mutations = (

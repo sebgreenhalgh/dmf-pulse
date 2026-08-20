@@ -150,6 +150,7 @@ def _require_common_projection_surface(
             baseline_distribution.target_manager_id,
             baseline_distribution.population_size,
             baseline_distribution.tie_policy_id,
+            baseline_distribution.tie_policy_hash,
         )
         if any(
             (
@@ -157,6 +158,7 @@ def _require_common_projection_surface(
                 distribution.target_manager_id,
                 distribution.population_size,
                 distribution.tie_policy_id,
+                distribution.tie_policy_hash,
             )
             != baseline_rank_surface
             for distribution in distributions[1:]

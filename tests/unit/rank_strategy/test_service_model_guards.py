@@ -166,6 +166,33 @@ def test_service_request_rejects_temporal_ordering_and_seal_tampering(
 
 
 @pytest.mark.parametrize(
+    ("source_stage", "lineage_field", "match"),
+    (
+        ("STAGE_13", "stage13_prices", "Stage-13 plan requires Stage-13 price lineage"),
+        ("STAGE_14", "stage14_chips", "Stage-14 plan requires Stage-14 chip lineage"),
+    ),
+)
+def test_upstream_plan_source_requires_matching_lineage_component(
+    source_stage: str,
+    lineage_field: str,
+    match: str,
+) -> None:
+    payload = service_request().model_dump(mode="python")
+    rank_plan = next(item for item in payload["plans"] if item["plan_id"] == "rank-plan")
+    rank_plan["source_stage"] = source_stage
+    rank_plan["candidate"]["source_stage"] = source_stage
+    rank_plan["binding_hash"] = _ZERO_HASH
+    payload["lineage"][lineage_field] = None
+    if lineage_field == "stage13_prices":
+        payload["lineage"]["stage13_activation_statuses"] = ()
+    payload["lineage"]["lineage_hash"] = _ZERO_HASH
+    payload["service_request_hash"] = _ZERO_HASH
+
+    with pytest.raises(ValidationError, match=match):
+        RankServiceRequest.model_validate(payload)
+
+
+@pytest.mark.parametrize(
     "payload",
     (
         {

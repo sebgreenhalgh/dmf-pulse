@@ -246,6 +246,10 @@ def test_scenario_outcome_rejects_rank_band_and_count_mismatch() -> None:
 def test_distribution_rejects_lineage_pmf_and_population_mismatch() -> None:
     distribution = _result().distribution
 
+    zero_lineage = distribution.model_copy(update={"tie_policy_hash": "0" * 64})
+    with pytest.raises(ValueError, match="unsealed hash sentinels"):
+        zero_lineage.distribution_is_canonical()
+
     empty_lineage = distribution.model_copy(update={"manager_multiplier_set_hashes": {}})
     with pytest.raises(ValueError, match="sorted non-empty manager IDs"):
         empty_lineage.distribution_is_canonical()
@@ -291,6 +295,23 @@ def test_distribution_rejects_percentile_target_and_rank_one_mismatch() -> None:
     )
     with pytest.raises(ValueError, match="canonical keys"):
         bad_percentiles.distribution_is_canonical()
+
+    wrong_values = dict(distribution.rank_percentiles)
+    wrong_values["p10"] = (
+        distribution.population_size if wrong_values["p10"] != distribution.population_size else 1
+    )
+    bad_percentile_values = distribution.model_copy(update={"rank_percentiles": wrong_values})
+    with pytest.raises(ValueError, match="percentiles must be derived"):
+        bad_percentile_values.distribution_is_canonical()
+
+    wrong_median = (
+        distribution.population_size
+        if distribution.median_rank != distribution.population_size
+        else 1
+    )
+    bad_median = distribution.model_copy(update={"median_rank": wrong_median})
+    with pytest.raises(ValueError, match="median rank must be derived"):
+        bad_median.distribution_is_canonical()
 
     target_outside = distribution.model_copy(
         update={"target_rank": distribution.population_size + 1}
