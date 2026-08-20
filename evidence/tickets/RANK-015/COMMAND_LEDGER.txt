@@ -1,0 +1,115 @@
+RANK-015 COMMAND LEDGER — CHECKPOINTS 15.05/15.06
+
+15.05 focused published-capability matrix:
+PYTHONPATH=<dev-tools>:src python3.13 -m pytest \
+  tests/unit/rank_strategy/test_synthetic_contracts.py \
+  tests/unit/rank_strategy/test_synthetic_field.py \
+  tests/property/rank_strategy/test_synthetic_properties.py \
+  tests/integration/rank_strategy/test_synthetic_overall_field.py -q
+RESULT: 23 passed in 2.02s
+
+15.05 hardened matrix:
+PYTHONPATH=<dev-tools>:src python3.13 -m pytest <synthetic files including model guards> \
+  --cov=dmf_pulse.rank_strategy.synthetic_models \
+  --cov=dmf_pulse.rank_strategy.synthetic_field --cov-branch
+RESULT: 34 passed in 3.36s; raw branches 150/152 = 98.684211%
+
+15.06 pre-publication Stage-15 matrix:
+PYTHONPATH=<dev-tools>:src python3.13 -m pytest \
+  tests/unit/rank_strategy tests/property/rank_strategy \
+  tests/integration/rank_strategy tests/unit/cli/test_rank_cli.py \
+  --cov=dmf_pulse.rank_strategy --cov=dmf_pulse.cli.rank --cov-branch
+RESULT: 243 passed in 11.86s; raw branches 780/854 = 91.334895%; combined 95.192007%
+
+Static gates:
+ruff format --check <Stage-15 production/tests>: PASS
+ruff check <Stage-15 production/tests>: PASS
+python3.13 -m mypy --strict src/dmf_pulse/rank_strategy src/dmf_pulse/cli/rank.py: PASS
+git diff --check: PASS
+
+FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL
+
+FINAL SEAL / CLEANUP ACCEPTANCE
+
+Complete Stage-15 suite:
+PYTHONPATH=<frozen-export-site-packages>:src python -m pytest \
+  tests/unit/rank_strategy tests/property/rank_strategy \
+  tests/integration/rank_strategy tests/unit/cli/test_rank_cli.py \
+  --cov=dmf_pulse.rank_strategy --cov=dmf_pulse.cli.rank --cov-branch \
+  --cov-report=term-missing --cov-report=json:/tmp/stage15-coverage.json \
+  --cov-fail-under=90 -q
+RESULT: 243 passed in 15.85s; raw branches 780/854 = 91.334895%; combined 95.192007%
+
+Targeted inherited node set:
+See evidence/tickets/RANK-015/FINAL_ACCEPTANCE.md for exact nodes and rationale.
+RESULT: 37 passed in 4.26s
+
+Engineering gates:
+- frozen GitHub uv sync at starting remote SHA: PASS
+- ruff format --check .: PASS
+- ruff check .: PASS
+- mypy --strict src/dmf_pulse: PASS (245 source files)
+- git diff --check: PASS
+- scripts/validate_repository.py after manifest refresh: PASS
+- scripts/scan_secrets.py after cleanup: PASS, zero findings
+- uv build --no-build-isolation --offline: PASS, Hatchling sdist + wheel
+- clean external wheel install and rank CLI commands: PASS
+
+Cleanup:
+- all four temporary Stage-15 workflows removed
+- recovery/stage1505 and recovery/stage1506 removed
+- legitimate repository CI retained
+
+INDEPENDENT SOL REVIEW / REMEDIATION
+
+Lineage:
+git fetch origin --prune
+git rev-parse origin/main
+git rev-parse origin/stage/A15/RANK-015-rank-aware-strategy
+git merge-base origin/main origin/stage/A15/RANK-015-rank-aware-strategy
+RESULT: main and merge base c53a1dfae952f481c1e885200ebf6120e4b63c24;
+        exact starting remote 17b6aa576459c652e14015dcfd7b7cf0bffd6f9d
+
+Complete remediated Stage-15 matrix:
+uv run pytest tests/unit/rank_strategy tests/property/rank_strategy \
+  tests/integration/rank_strategy tests/unit/cli/test_rank_cli.py \
+  --cov=dmf_pulse.rank_strategy --cov=dmf_pulse.cli.rank --cov-branch \
+  --cov-report=term-missing --cov-report=json:review_pack/stage15-sol-coverage.json \
+  --cov-fail-under=90 -q
+RESULT: 274 passed in 11.19s; raw branches 861/954 = 90.251572327044%;
+        combined 94.331983805668%
+
+Targeted inherited Rules and Stages 9-14 nodes:
+uv run pytest <the exact 23 nodes and parameter-expanded cases listed in FINAL_ACCEPTANCE.md> -q
+RESULT: 37 passed in 5.41s
+
+Single bounded complete-repository attempt:
+uv run pytest -q
+RESULT: RESOURCE_LIMIT; exit 124 after 1204.026s; no test failure was emitted;
+        remaining child processes stopped; unchanged full suite not rerun
+
+Final engineering gates:
+- uv sync --all-groups --frozen: PASS (Checked 40 packages)
+- ruff format --check .: PASS (635 files already formatted)
+- ruff check .: PASS
+- mypy --strict src/dmf_pulse: PASS (245 source files)
+- git diff --check: PASS
+- uv build --no-build-isolation: PASS, canonical Hatchling sdist + wheel
+- clean external wheel installation with PYTHONPATH cleared: PASS
+- installed dmf --version, rank help/subcommand help, and rank validate: PASS
+- python scripts/generate_repository_manifest.py --ticket PRC-013: PASS (1126 files)
+- python scripts/validate_repository.py: PASS (0 errors)
+- python scripts/scan_secrets.py: PASS (0 findings)
+
+Tree hygiene:
+- forbidden temporary implementation machinery: absent
+- test-created ACL-inaccessible .test-tmp moved outside repository to the named OS temp path
+- final repository tree: clean of temporary implementation machinery
+
+Draft pull request:
+base: main
+head: stage/A15/RANK-015-rank-aware-strategy
+title: Stage 15: rank-aware strategy
+RESULT: https://github.com/sebgreenhalgh/dmf-pulse/pull/15; draft YES; merged NO
+
+FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL

@@ -932,3 +932,35 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Complete final repository/evidence assurance, push the review-ready branch and open the
   unmerged PR to `main`.
 - [ ] Human acceptance, merge and accepted tag.
+
+# RANK-015 Stage-15 rank-aware strategy
+
+- Ticket/stage: `RANK-015`, DMFP-19 Stage 15; immutable parent
+  `c53a1dfae952f481c1e885200ebf6120e4b63c24` on `main`.
+- Branch: `stage/A15/RANK-015-rank-aware-strategy`.
+- Scope: exact manager multipliers/EO; shared-scenario named mini-leagues; cutoff-safe
+  probabilistic rival actions; epsilon/lexicographic rank utility; synthetic overall cohorts;
+  accepted Stage-12/13/14 candidate re-evaluation; shared service and `dmf rank` CLI.
+- Safety: raw projections remain invariant; only synthetic/approved/named-rival samples;
+  early-season and invalid activation states fail closed to `PURE_POINTS`; no scraping, PR,
+  merge, tag or human acceptance.
+
+## RANK-015 checkpoints
+
+- [x] 15.01 implement manager scenario multipliers, EO, leverage and chip/autosub effects.
+- [x] 15.02 implement exact shared-scenario named mini-league ranking and exhaustive oracle.
+- [x] 15.03 implement cutoff-safe probabilistic hidden rival action modelling.
+- [x] 15.04 implement points-floor target/rank utilities and plan diagnostics.
+- [x] 15.05 implement rights-gated synthetic weighted overall-rank cohorts.
+- [x] 15.06 implement Stage-12/13/14 re-evaluation, fail-closed service, CLI and evidence.
+- [x] Complete adversarial self-review, final Stage-15 validation and clean remote equality.
+
+## RANK-015 independent Sol review
+
+- [x] Verify exact pre-review remote lineage and immutable merge base.
+- [x] Reconcile the supplied Stage-15 documents with repository-approved authority hashes.
+- [x] Independently audit all six checkpoints, public contracts, oracles, gates, artifacts and CLI.
+- [x] Remediate every valid P0/P1/material P2 with focused regression coverage.
+- [x] Run the complete Stage-15 branch-coverage matrix and affected inherited regressions.
+- [x] Run one bounded full-repository pytest attempt and all static/build/clean-wheel gates.
+- [x] Publish truthful review evidence, verify final remote equality and open the unmerged draft PR.
