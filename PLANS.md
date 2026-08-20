@@ -63,6 +63,31 @@ Latest accepted capability — implementation `57c5b5f68e0e1a5a2c5a2d6b9c14f4e9e
 hostile-review remediation `2858e6f155c6606fa6bfc1a51d72c3286da33317`,
 Linux validation run `32317678585` (`PASS`).
 <!-- GW1-2.1-PLAN-END -->
+<!-- GW1-2.2-PLAN-START -->
+### Checkpoint 2.2 — current availability and minutes baseline
+
+- [x] Revalidate the Checkpoint 2.1 bundle and generate a deterministic,
+  hash-bound private review template for every current target-team player and
+  every FPL availability alert without persisting official FPL data.
+- [x] Require complete operator approval with typed, cutoff-safe evidence;
+  permit only accepted hard-ineligibility and new-signing overrides while
+  retaining soft evidence without inventing numeric probability adjustments.
+- [x] Run the accepted Stage-7 baseline for every target-fixture team using
+  deterministic transient identity surrogates, explicit empty-history
+  cold-start inputs, and the packaged frozen TEST/REPLAY resources.
+- [x] Return an independently revalidated transient preseason bundle with
+  coherent player minutes projections, complete fixture/team coverage, safe
+  summary, semantic lineage, and an explicit non-production synthetic-contract
+  calibration limitation for Checkpoint 2.3.
+- [ ] Add adversarial tests, bounded evidence and a dedicated Linux gate; then
+  commit, push, verify the remote SHA, inspect hostile-review findings, and
+  attest the exact accepted revision.
+
+Exclusions: production-calibration claims, automated interpretation of FPL
+status/news as a hard override, football-event and player-points projections,
+optimisation, squad/captain decisions, prospective evaluation, PR, merge, and
+activation.
+<!-- GW1-2.2-PLAN-END -->
 - Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
 - Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.
 - Exclusions: no live key, provider success claim, FPL current-input changes, identity mapping, projections, optimiser, squad, captaincy, prospective logging, PR, merge, or activation.

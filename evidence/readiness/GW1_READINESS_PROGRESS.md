@@ -15,7 +15,7 @@
 | 1.4 identity integrity | COMPLETE | Capability `16560a1f…`; Linux run `32313356458` PASS. |
 | 1.5 Session-1 workflow | COMPLETE | Capability `db4ef85f…`; Linux run `32315608960` PASS. |
 | 2.1 current market consensus | COMPLETE | Remediated capability `2858e6f1…`; Linux run `32317678585` PASS. |
-| 2.2 availability/start/minutes | IN_PROGRESS | Contract/authority review started after 2.1 acceptance. |
+| 2.2 availability/start/minutes | LOCAL_PASS | Current adapter, adversarial tests and local gates pass; exact Linux capability validation is pending. |
 | 2.3–4.5 | NOT_STARTED | Must consume accepted preceding checkpoints in order. |
 
 ## Current operational boundary
@@ -28,6 +28,10 @@
   `PRESEASON_DECISION_SUPPORT / NON_PRODUCTION` and binds actual Session-1
   decision time, exact reviewed fixture identities, parsed-market semantics and
   frozen policy identity.
+- Stage-7 current minutes are available only as an explicit empty-history
+  cold-start against the frozen synthetic TEST/REPLAY baseline. The output is
+  non-production, carries confidence grade D for unobserved current players and
+  makes no production-calibration claim.
 - No squad, XI, bench, captain, vice-captain or alternative has yet been produced.
 - The branch-wide stale GCS-008 current manifest remains a known final
   engineering-acceptance blocker; it will be regenerated only at the designated
@@ -35,7 +39,6 @@
 
 ## Exact next action
 
-Implement Checkpoint 2.2 as a structured, reviewed, cutoff-safe current roster
-and availability-evidence adapter around the accepted Stage-7 baseline. Preserve
-hard-versus-soft override semantics, explicit cold-start/model limitations and
-the transient official-FPL rights boundary.
+Commit and push the bounded Checkpoint-2.2 capability, require the dedicated
+Linux workflow to pass on that exact revision, verify remote SHA equality and
+publish the evidence-only acceptance attestation before beginning Checkpoint 2.3.

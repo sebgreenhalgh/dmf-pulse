@@ -1,0 +1,100 @@
+name: gw1-checkpoint-2-2-validation
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-checkpoint-2-2-validation.yml
+      - src/dmf_pulse/availability/current.py
+      - src/dmf_pulse/availability/__init__.py
+      - tests/unit/availability/test_current_availability.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gw1-checkpoint-2-2-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Checkpoint 2.2 focused validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: dmf_pulse_test
+          POSTGRES_USER: dmf_test
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
+      UV_NO_PROGRESS: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen environment sync
+        run: uv sync --all-groups --frozen
+
+      - name: Upgrade disposable PostgreSQL
+        run: uv run alembic upgrade head
+
+      - name: Current availability, Stage-7 and upstream regressions
+        run: >-
+          uv run pytest -q
+          tests/unit/availability
+          tests/property/availability
+          tests/contract/availability
+          tests/unit/markets/test_current_market.py
+          tests/unit/ingestion/test_session1_current_input.py
+
+      - name: New current-availability branch coverage
+        run: >-
+          uv run pytest -q
+          tests/unit/availability/test_current_availability.py
+          --cov=dmf_pulse.availability.current
+          --cov-branch
+          --cov-report=term-missing
+          --cov-fail-under=90
+
+      - name: PostgreSQL Stage-7 regression
+        run: uv run pytest -q tests/integration/availability
+
+      - name: Ruff format
+        run: uv run ruff format --check src/dmf_pulse tests scripts
+
+      - name: Ruff lint
+        run: uv run ruff check src/dmf_pulse tests scripts
+
+      - name: Strict mypy
+        run: uv run mypy
+
+      - name: Build wheel and source distribution
+        run: uv build
+
+      - name: First-party secret scan
+        run: uv run python scripts/scan_secrets.py
+
+      - name: Commit whitespace assurance
+        run: git diff --check ${{ github.event.before }} ${{ github.sha }}
