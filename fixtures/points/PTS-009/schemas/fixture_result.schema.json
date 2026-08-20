@@ -2749,6 +2749,7 @@
     "ProjectionMode": {
       "enum": [
         "PRODUCTION",
+        "PRESEASON_DECISION_SUPPORT",
         "TEST",
         "REPLAY"
       ],

@@ -126,6 +126,34 @@ Linux validation run `32325586142` (`PASS`), job `96296054494`. The operator
 projection remains blocked because no governance-accepted current event-prior
 artifact was supplied.
 <!-- GW1-2.3-PLAN-END -->
+<!-- GW1-2.4-PLAN-START -->
+### Checkpoint 2.4 — current FPL-points distributions
+
+- [x] Add one explicit `PRESEASON_DECISION_SUPPORT` Stage-9 projection mode;
+  preserve every existing `PRODUCTION` ACTIVE/human-activation guard and refresh
+  the frozen Stage-9 public schemas and manifest.
+- [x] Bind one deterministic non-production run configuration to the exact
+  Checkpoint-2.3 semantic hash, common root seed, scenario count, tracked Monte
+  Carlo policy, `fpl-2026-27` VERIFIED ruleset and compiled `PLAYER_POINTS`
+  capability hashes.
+- [x] Execute only the accepted Stage-9 fixture service, preserve a common
+  outcome-draw identity across fixtures, and assemble the accepted Gameweek
+  scenario set and points summaries without handcrafted xP.
+- [x] Build an in-memory private current player table with exact official and
+  transient identity, team, position, current price, Stage-7 start/minutes,
+  Stage-9 distribution/quantiles, numerical uncertainty, scenario identity,
+  cutoff and full source lineage; expose only a non-disclosing safe summary.
+- [ ] Add adversarial governance, identity, rules, seed, lineage, rights and
+  tamper tests; run bounded local gates, commit/push the capability, run the
+  dedicated exact-SHA Linux workflow, verify the remote SHA and commit the
+  durable attestation.
+
+Exclusions: global rules activation, fabricated human approval, production
+projection, persistent official-FPL raw or derived data, independent event or
+points formulas, optimisation, squad/captain decisions, prospective evaluation,
+PR and merge. The real operator projection remains blocked by the unsupplied
+governance-accepted current event-prior artifact.
+<!-- GW1-2.4-PLAN-END -->
 - Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
 - Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.
 - Exclusions: no live key, provider success claim, FPL current-input changes, identity mapping, projections, optimiser, squad, captaincy, prospective logging, PR, merge, or activation.

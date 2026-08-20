@@ -17,7 +17,8 @@
 | 2.1 current market consensus | COMPLETE | Remediated capability `2858e6f1…`; Linux run `32317678585` PASS. |
 | 2.2 availability/start/minutes | COMPLETE | Capability `e7c40a03…`; Linux run `32319850997` PASS. |
 | 2.3 football-event distributions | ENGINEERING_COMPLETE / OPERATOR_BLOCKED | Capability `008ad0d2…`; Linux run `32325586142` PASS. No governance-accepted current event-prior artifact was supplied. |
-| 2.4–4.5 | NOT_STARTED | Must consume accepted preceding checkpoints in order. |
+| 2.4 FPL-points distributions | LOCAL_COMPLETE / REMOTE_PENDING / OPERATOR_BLOCKED | Exact VERIFIED target-rules and accepted Stage-9 integration passes locally; no governance-accepted current event-prior artifact was supplied. |
+| 2.5–4.5 | NOT_STARTED | Must consume accepted preceding checkpoints in order. |
 
 ## Current operational boundary
 
@@ -38,6 +39,11 @@
   current player-allocation artifact. A governed transient artifact ingress is
   implemented, but the real operator run remains fail-closed until that input
   is governance-accepted and supplied.
+- The explicit `PRESEASON_DECISION_SUPPORT` Stage-9 mode now consumes only the
+  exact VERIFIED `fpl-2026-27` PLAYER_POINTS capability and preserves the ACTIVE
+  plus human-activation production gate. The transient private player-table
+  integration passes on synthetic contract fixtures, but no real current table
+  exists while the preceding accepted event-prior input is absent.
 - No squad, XI, bench, captain, vice-captain or alternative has yet been produced.
 - The branch-wide stale GCS-008 current manifest remains a known final
   engineering-acceptance blocker; it will be regenerated only at the designated
@@ -45,7 +51,7 @@
 
 ## Exact next action
 
-Attest the remotely verified Checkpoint-2.3 engineering capability, then begin
-the smallest governed Checkpoint-2.4 Stage-9 decision-support integration on
-the same branch. Keep the real current run fail-closed: no points projection
-may be claimed without the missing governance-accepted event-prior artifact.
+Freeze and push the Checkpoint-2.4 engineering capability, run the dedicated
+Linux gate on that exact SHA, verify remote equality and commit the attestation.
+Keep the real current run fail-closed: no points projection may be claimed
+without the missing governance-accepted event-prior artifact.

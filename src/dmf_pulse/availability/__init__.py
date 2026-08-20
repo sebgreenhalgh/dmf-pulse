@@ -10,6 +10,7 @@ from dmf_pulse.availability.current import (
     CurrentTeamAvailabilityProjection,
     build_current_availability,
     build_current_availability_review,
+    current_player_id,
 )
 from dmf_pulse.availability.dataset import build_training_dataset, semantic_dataset_hash
 from dmf_pulse.availability.models import (
@@ -49,6 +50,7 @@ __all__ = [
     "build_current_availability",
     "build_current_availability_review",
     "build_training_dataset",
+    "current_player_id",
     "evaluate_minutes_baseline",
     "fit_projection_artifact",
     "predict_minutes_baseline",

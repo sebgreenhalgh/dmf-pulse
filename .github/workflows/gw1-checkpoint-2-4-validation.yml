@@ -1,0 +1,128 @@
+name: gw1-checkpoint-2-4-validation
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-checkpoint-2-4-validation.yml
+      - config/models/fpl_points_simulation.yaml
+      - artifacts/rules/fpl-2026-27.json
+      - fixtures/points/PTS-009/manifest.json
+      - fixtures/points/PTS-009/schemas/fixture_request.schema.json
+      - fixtures/points/PTS-009/schemas/fixture_result.schema.json
+      - src/dmf_pulse/availability/current.py
+      - src/dmf_pulse/availability/__init__.py
+      - src/dmf_pulse/fpl_points/current.py
+      - src/dmf_pulse/fpl_points/current_points.py
+      - src/dmf_pulse/fpl_points/models.py
+      - src/dmf_pulse/fpl_points/rules_adapter.py
+      - src/dmf_pulse/fpl_points/__init__.py
+      - tests/unit/fpl_points/test_current_football_events.py
+      - tests/unit/fpl_points/test_current_fpl_points.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gw1-checkpoint-2-4-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Checkpoint 2.4 focused validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: dmf_pulse_test
+          POSTGRES_USER: dmf_test
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
+      UV_NO_PROGRESS: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen environment sync
+        run: uv sync --all-groups --frozen
+
+      - name: Upgrade disposable PostgreSQL
+        run: uv run alembic upgrade head
+
+      - name: Current points, accepted Stage-6 through Stage-9 regressions
+        run: >-
+          uv run pytest -q
+          tests/unit/fpl_points
+          tests/property/fpl_points
+          tests/contract/fpl_points
+          tests/unit/football_events
+          tests/property/football_events
+          tests/contract/football_events
+          tests/unit/availability
+          tests/property/availability
+          tests/contract/availability
+          tests/unit/markets/test_current_market.py
+          tests/unit/ingestion/test_session1_current_input.py
+
+      - name: Current Stage-7 through Stage-9 branch coverage
+        run: >-
+          uv run pytest -q
+          tests/unit/availability/test_current_availability.py
+          tests/unit/fpl_points/test_current_football_events.py
+          tests/unit/fpl_points/test_current_fpl_points.py
+          --cov=dmf_pulse.availability.current
+          --cov=dmf_pulse.fpl_points.current
+          --cov=dmf_pulse.fpl_points.current_points
+          --cov-branch
+          --cov-report=term-missing
+          --cov-fail-under=90
+
+      - name: Frozen Stage-9 resource assurance
+        run: uv run python scripts/assurance/check_stage9_resources.py
+
+      - name: PostgreSQL upstream integration regressions
+        run: >-
+          uv run pytest -q
+          tests/integration/availability
+          tests/integration/football_events
+          tests/integration/fpl_points
+
+      - name: Ruff format
+        run: uv run ruff format --check src/dmf_pulse tests scripts
+
+      - name: Ruff lint
+        run: uv run ruff check src/dmf_pulse tests scripts
+
+      - name: Strict mypy
+        run: uv run mypy
+
+      - name: Build wheel and source distribution
+        run: uv build
+
+      - name: First-party secret scan
+        run: uv run python scripts/scan_secrets.py
+
+      - name: Commit whitespace assurance
+        run: git diff --check ${{ github.event.before }} ${{ github.sha }}

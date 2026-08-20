@@ -284,7 +284,7 @@ class AcceptedRulesAdapter:
         elif identity.status not in {"REFERENCE_ONLY", "VERIFIED", "ACTIVE"}:
             raise FplPointsError(
                 "RULESET_SCORING_BLOCKED",
-                "TEST/REPLAY requires a complete reference, verified, or active ruleset",
+                "non-production scoring requires a complete reference, verified, or active ruleset",
             )
 
     def _player_points_eligible(self) -> bool:

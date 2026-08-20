@@ -13,12 +13,12 @@
       "sha256": "f4fb6a5458b3956cb300b822539772904e61036f7571aba7c04284458680f271"
     },
     "schemas/fixture_request.schema.json": {
-      "bytes": 40236,
-      "sha256": "a05e3e2a5b3f9dcb404583f6c3436efbd13b82bbda709d3b67f22ae5e98bec95"
+      "bytes": 40274,
+      "sha256": "13b0625da219453f2d59e2a5906a059edd0f9854b73c537da0620d904d65a719"
     },
     "schemas/fixture_result.schema.json": {
-      "bytes": 85116,
-      "sha256": "35eb3c6542ac2ce2bffac1ec09593b7ada8dbde832a05eea388121b2ac290c02"
+      "bytes": 85154,
+      "sha256": "b5e27ab29cfe23b9376bbe91a8d386bfe1087380132b3c481beed949fab00652"
     },
     "schemas/gameweek_result.schema.json": {
       "bytes": 18664,

@@ -12,6 +12,17 @@ from dmf_pulse.fpl_points.current import (
     build_current_football_event_review,
     build_current_football_events,
 )
+from dmf_pulse.fpl_points.current_points import (
+    CurrentFixturePointsProjection,
+    CurrentFplPointsBundle,
+    CurrentFplPointsRunConfig,
+    CurrentFplPointsSummary,
+    CurrentPlayerPointsProjection,
+    CurrentPlayerPointsProvenance,
+    CurrentPlayerPointsUncertainty,
+    build_current_fpl_points,
+    build_current_fpl_points_run_config,
+)
 from dmf_pulse.fpl_points.gameweek import assemble_blank_gameweek, assemble_gameweek
 from dmf_pulse.fpl_points.gameweek_summaries import build_gameweek_projection
 from dmf_pulse.fpl_points.models import (
@@ -30,11 +41,18 @@ __all__ = [
     "AcceptedRulesAdapter",
     "CurrentFixtureEventInputs",
     "CurrentFixtureEventPrior",
+    "CurrentFixturePointsProjection",
     "CurrentFootballEventApproval",
     "CurrentFootballEventBundle",
     "CurrentFootballEventPriorArtifact",
     "CurrentFootballEventReviewTemplate",
     "CurrentFootballEventSummary",
+    "CurrentFplPointsBundle",
+    "CurrentFplPointsRunConfig",
+    "CurrentFplPointsSummary",
+    "CurrentPlayerPointsProjection",
+    "CurrentPlayerPointsProvenance",
+    "CurrentPlayerPointsUncertainty",
     "FixtureProjectionResult",
     "FixtureSimulationRequest",
     "FplPointsService",
@@ -49,5 +67,7 @@ __all__ = [
     "assemble_gameweek",
     "build_current_football_event_review",
     "build_current_football_events",
+    "build_current_fpl_points",
+    "build_current_fpl_points_run_config",
     "build_gameweek_projection",
 ]

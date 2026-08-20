@@ -67,6 +67,7 @@ def _parse_utc(value: str, *, label: str) -> datetime:
 
 class ProjectionMode(StrEnum):
     PRODUCTION = "PRODUCTION"
+    PRESEASON_DECISION_SUPPORT = "PRESEASON_DECISION_SUPPORT"
     TEST = "TEST"
     REPLAY = "REPLAY"
 

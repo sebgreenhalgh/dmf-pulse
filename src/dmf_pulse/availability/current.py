@@ -662,7 +662,9 @@ def _load_frozen_resources() -> tuple[MinutesModelArtifact, dict[str, Any]]:
     return artifact, policy
 
 
-def _player_id(player: CurrentFplPlayer) -> UUID:
+def current_player_id(player: CurrentFplPlayer) -> UUID:
+    """Return the governed transient identity used by current Stage-7 outputs."""
+
     return _uuid("player", player.identity.canonical_lookup_sha256)
 
 
@@ -703,7 +705,7 @@ def _team_projection(
     )
     roster = [
         {
-            "player_id": str(_player_id(player)),
+            "player_id": str(current_player_id(player)),
             "player_key": f"official_fpl_player_{player.provider_element_id}",
             "position": player.position.value,
             "team_id": str(team_id),
@@ -730,7 +732,7 @@ def _team_projection(
     overrides: dict[str, dict[str, object]] = {}
     for decision in decisions:
         player = players_by_official_id[decision.official_fpl_player_id]
-        override: dict[str, object] = {"player_id": str(_player_id(player))}
+        override: dict[str, object] = {"player_id": str(current_player_id(player))}
         if decision.adjustment == "HARD_INELIGIBLE":
             override["hard_ineligible"] = True
         elif decision.adjustment == "NEW_SIGNING":
@@ -790,14 +792,16 @@ def _team_projection(
         CurrentAppliedAvailabilityDecision(
             official_fpl_player_id=decision.official_fpl_player_id,
             official_fpl_fixture_id=decision.official_fpl_fixture_id,
-            transient_player_id=_player_id(players_by_official_id[decision.official_fpl_player_id]),
+            transient_player_id=current_player_id(
+                players_by_official_id[decision.official_fpl_player_id]
+            ),
             adjustment=decision.adjustment,
             direct_model_effect=_decision_effect(decision.adjustment),
             prior_player_projection_sha256=prior_players[
-                str(_player_id(players_by_official_id[decision.official_fpl_player_id]))
+                str(current_player_id(players_by_official_id[decision.official_fpl_player_id]))
             ].projection_sha256,
             posterior_player_projection_sha256=posterior_players[
-                str(_player_id(players_by_official_id[decision.official_fpl_player_id]))
+                str(current_player_id(players_by_official_id[decision.official_fpl_player_id]))
             ].projection_sha256,
             decision_sha256=canonical_sha256(decision.model_dump(mode="json")),
         )
@@ -913,4 +917,5 @@ __all__ = [
     "CurrentTeamAvailabilityProjection",
     "build_current_availability",
     "build_current_availability_review",
+    "current_player_id",
 ]
