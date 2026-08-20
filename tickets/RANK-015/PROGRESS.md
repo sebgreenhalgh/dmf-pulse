@@ -37,8 +37,8 @@
 |---|---|---|---|
 | 15.01 manager multipliers / EO | COMPLETE / REMOTE | `77f2cd2c57649a224bc7908128163b498d5b8bd5` | `39 passed`; 99% branch coverage; 11 inherited passed |
 | 15.02 exact named mini-league | COMPLETE / REMOTE | `bf0ebb29e9af4f33f4a9575222da61021c9df748` | `53 passed`; 95% branch coverage; exact 2/3/4-manager oracle PASS |
-| 15.03 baseline opponent model | IN_PROGRESS | — | — |
-| 15.04 target / rank utility | NOT_STARTED | — | — |
+| 15.03 baseline opponent model | COMPLETE / REMOTE | `a5b3e2a5f852dbde1f5b3ca4c8a91b1f60694868` | `123 passed`; 95.92% branch coverage; 11 inherited passed |
+| 15.04 target / rank utility | IN_PROGRESS | — | — |
 | 15.05 synthetic overall cohort | NOT_STARTED | — | — |
 | 15.06 service / CLI / evidence | NOT_STARTED | — | — |
 
@@ -76,3 +76,18 @@
 - Inherited accepted-interface regressions: `11 passed in 1.98s`.
 - Ruff focused: PASS. Strict mypy for `src/dmf_pulse/rank_strategy`: PASS.
 - Exact local/remote checkpoint SHA equality: `bf0ebb29e9af4f33f4a9575222da61021c9df748`.
+
+## Checkpoint 15.03 evidence
+
+- Implemented an explicit random-utility opponent action model over exact legal rival plans.
+- Supports no-transfer, transfers and hits, captain/vice changes, Triple Captain, Bench Boost, Free Hit and Wildcard branches.
+- Probability vectors are positive, normalised, entropy-reconciled and non-degenerate; profiles explicitly prohibit perfect-rationality assumptions.
+- Rights, manager identity, cumulative points, counted-transfer state, squad semantics, feature timing and postdeadline action labels fail closed at the service boundary.
+- Free Hit and Wildcard transfers do not enter counted-transfer tie state; ordinary transfers do exactly.
+- Exact multi-rival joint distributions preserve every marginal and expose the baseline conditional-independence assumption.
+- Hidden rival plans are scored against identical Stage-9 scenario IDs, outcome draw IDs, weights, scenario-set hashes and raw-projection hashes.
+- Focused Stage-15 matrix: `123 passed in 5.78s`.
+- Stage-15 branch coverage: `95.92%` (`1194 statements`, branch-aware).
+- Inherited accepted-interface regressions: `11 passed in 1.59s`.
+- Ruff focused: PASS. Strict mypy for `src/dmf_pulse/rank_strategy`: PASS.
+- Remote source blob hashes for the opponent contracts/service matched the tested local files; stale transport request was removed before checkpoint sealing.
