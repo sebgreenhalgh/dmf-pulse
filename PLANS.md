@@ -29,9 +29,11 @@
 - [x] Expose the shared service through an exact PowerShell-compatible CLI and
   document PostgreSQL, process credential, manual capture, interactive review,
   controlled failures, transient-file deletion, and secret clearing.
-- [ ] Add service, CLI, rights, tamper, completeness, no-auto-approval, and
+- [x] Add service, CLI, rights, tamper, completeness, no-auto-approval, and
   no-persistence regressions; run focused tests, static/package/security gates,
   checkpoint commit/push, Linux workflow validation, and remote-SHA verification.
+- Latest focused validation — `PASS`, run `32315608960`, capability commit
+  `db4ef85f31754f3a5795423d2cbb795378439e50`.
 - Exclusions: probabilities, market consensus, projections, optimisation,
   initial squad, captaincy, prospective logging, PR, merge, and activation.
 <!-- GW1-1.5-PLAN-END -->

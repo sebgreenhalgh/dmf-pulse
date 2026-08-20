@@ -5,8 +5,8 @@
 - Canonical branch — `readiness/GW1-2026-27-live-input-initial-squad`.
 - Immutable parent — `9eb57143f6ee92f67c78607cc386678d962e62d4`.
 - Starting accepted remote SHA — `b557d1c52604817415b414f8414b938eaa3f69ac`.
-- Capability commit — `PENDING_PUBLICATION`.
-- Linux validation workflow — `PENDING_PUBLICATION`.
+- Capability commit — `db4ef85f31754f3a5795423d2cbb795378439e50`.
+- Linux validation workflow — `32315608960` (`PASS`).
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
 
 ## Implemented vertical slice
@@ -106,7 +106,10 @@
 ## Status
 
 - Local engineering result — `PASS`.
-- Checkpoint 1.5 — `IN_PROGRESS` pending capability publication, Linux workflow
-  PASS, evidence attestation, push, fetch, and exact remote-SHA verification.
-- Exact next action — publish Checkpoint 1.5, consume the read-only Linux result,
-  attest the remote SHA, then begin Checkpoint 2.1 market/consensus integration.
+- Linux engineering result — `PASS`; all 15 substantive validation steps and
+  container cleanup completed successfully on the exact capability commit.
+- Capability remote verification — local and canonical remote both resolved to
+  `db4ef85f31754f3a5795423d2cbb795378439e50` after push/fetch.
+- Checkpoint 1.5 — `COMPLETE`.
+- Exact next action — publish this attestation, verify the new remote evidence
+  head, then begin Checkpoint 2.1 market/consensus integration.

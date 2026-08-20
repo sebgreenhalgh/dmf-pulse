@@ -20,7 +20,7 @@
 | 1.2 Current official FPL input foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
 | 1.3 Live The Odds API input foundation | COMPLETE | 1.3A, 1.3B and 1.3C are COMPLETE; operator contract and acceptance evidence are published. |
 | 1.4 FPL / odds identity integrity | COMPLETE | Exact team and target-GW fixture identity bridge accepted. |
-| 1.5 Session-1 artifacts / operator workflow | IN_PROGRESS | Shared transient service, explicit hash-confirmed review, downstream contract, CLI and exact PowerShell runbook pass local validation; Linux publication is pending. |
+| 1.5 Session-1 artifacts / operator workflow | COMPLETE | Capability `db4ef85f31754f3a5795423d2cbb795378439e50`; Linux run `32315608960` PASS; exact remote capability SHA verified. |
 
 ## Checkpoint 1.3A — live credential / transport wiring
 
@@ -290,6 +290,11 @@
 - Detailed evidence —
   `evidence/readiness/GW1_SESSION1_VALIDATION_1_5.md`.
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
-- Checkpoint status — `IN_PROGRESS` pending commit, push, Linux workflow and exact
-  remote attestation.
-- Exact next action — **PUBLISH AND VALIDATE CHECKPOINT 1.5**.
+- Capability commit — `db4ef85f31754f3a5795423d2cbb795378439e50`.
+- Linux validation workflow — `32315608960` (`PASS`); frozen sync, PostgreSQL,
+  focused/inherited tests, Ruff, strict mypy, build, secret scan and whitespace
+  assurance all completed successfully.
+- Capability remote verification — local and canonical remote both resolved to
+  `db4ef85f31754f3a5795423d2cbb795378439e50` after push/fetch.
+- Checkpoint status — `COMPLETE`.
+- Exact next action — **CHECKPOINT 2.1 — MARKET/CONSENSUS CURRENT INTEGRATION**.
