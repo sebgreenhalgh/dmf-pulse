@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   publish:
@@ -19,14 +20,37 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Apply and publish sealed checkpoint 15.05
+      - name: Verify and apply checkpoint 15.05 payload
         shell: bash
         run: |
           set -euo pipefail
-          cat recovery/stage1505/part-*.b64 | base64 -d | gzip -d > /tmp/checkpoint.patch
+          cat recovery/stage1505/part-*.b64 > /tmp/checkpoint.patch.gz.b64
+          test "$(wc -c < /tmp/checkpoint.patch.gz.b64)" -eq 20872
+          echo "cc1617bc8b5bc0845f17c3be32ed4890dd6d0d35f623488b7357fc0dd30668bd  /tmp/checkpoint.patch.gz.b64" | sha256sum --check
+          base64 -d /tmp/checkpoint.patch.gz.b64 > /tmp/checkpoint.patch.gz
+          gzip -t /tmp/checkpoint.patch.gz
+          gzip -dc /tmp/checkpoint.patch.gz > /tmp/checkpoint.patch
+          git apply --check --whitespace=error /tmp/checkpoint.patch
           git apply --index --whitespace=error /tmp/checkpoint.patch
           git diff --cached --check
+
+      - name: Commit and push checkpoint 15.05
+        shell: bash
+        run: |
+          set -euo pipefail
           git config user.name "Sebastian Greenhalgh"
           git config user.email "seb.greenhalgh@outlook.com"
           git commit -m "feat(rank): seal checkpoint 15.05 synthetic cohort"
           git push origin HEAD:stage/A15/RANK-015-rank-aware-strategy
+
+      - name: Report publisher result
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          head_sha="$(git rev-parse HEAD)"
+          gh issue comment 14 --body \
+            "STAGE15_PUBLISH run_id=${GITHUB_RUN_ID} status=${JOB_STATUS} head_sha=${head_sha} trigger_sha=${GITHUB_SHA}"
