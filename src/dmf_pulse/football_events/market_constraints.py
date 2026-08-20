@@ -30,6 +30,7 @@ from dmf_pulse.football_events._decimal import (
     positive_decimal,
     probability,
 )
+from dmf_pulse.markets.totals import FullTimeTotalsConsensus, TotalsOutcome
 
 
 class MarketFamily(StrEnum):
@@ -656,6 +657,107 @@ def constraints_from_market_consensus(
     )
 
 
+def constraints_from_totals_consensus(
+    consensus: FullTimeTotalsConsensus,
+    *,
+    fixture_id: UUID | str,
+    as_of: datetime,
+    uncertainty_floor: Decimal,
+) -> MarketConstraintSet:
+    """Adapt a line-specific Stage-6 O/U consensus into native Stage-8 rows."""
+
+    cutoff = parse_utc(as_of, field_name="as_of")
+    floor = positive_decimal(uncertainty_floor, label="uncertainty_floor")
+    expected_fixture_id = _validated_fixture_id(fixture_id, label="fixture_id")
+    if consensus.fixture_id != expected_fixture_id:
+        raise ValueError("MARKET_FIXTURE_MISMATCH: Stage-6 totals are for another fixture")
+    if (
+        consensus.market_definition != "FULL_TIME_TOTALS"
+        or consensus.period != "FULL_TIME"
+        or consensus.settlement_profile != "FULL_TIME_90"
+        or consensus.mapping_cutoff > consensus.as_of
+        or consensus.as_of > cutoff
+        or consensus.mapping_cutoff > cutoff
+    ):
+        raise ValueError("POST_CUTOFF_MARKET: Stage-6 totals violate the Stage-8 cutoff")
+    if consensus.line % 1 != Decimal("0.5"):
+        raise ValueError("Stage-6 totals line must be a half-goal")
+    confidence_weights = {
+        "A": Decimal("1"),
+        "B": Decimal("0.75"),
+        "C": Decimal("0.50"),
+        "D": Decimal("0.25"),
+    }
+    confidence = consensus.confidence_grade
+    if confidence not in confidence_weights:
+        raise ValueError("Stage-6 totals confidence grade is invalid")
+    outcome_weights = _rounded_weight_vector(
+        (confidence_weights[confidence] / Decimal(2),) * 2,
+        target_total=confidence_weights[confidence],
+    )
+    by_outcome = {row.outcome: row for row in consensus.outcomes}
+    if set(by_outcome) != {TotalsOutcome.OVER, TotalsOutcome.UNDER}:
+        raise ValueError("Stage-6 totals outcomes are incomplete or unordered")
+    event_by_outcome = {
+        TotalsOutcome.OVER: ScoreEvent.TOTAL_OVER,
+        TotalsOutcome.UNDER: ScoreEvent.TOTAL_UNDER,
+    }
+    constraints = tuple(
+        MarketConstraint.model_validate(
+            {
+                "confidence_grade": confidence,
+                "constraint_id": f"stage6-totals-{consensus.line}-{outcome.value.lower()}",
+                "event": event_by_outcome[outcome],
+                "family": MarketFamily.TOTALS,
+                "line": consensus.line,
+                "market_disagreement": consensus.market_disagreement,
+                "maximum_age_seconds": consensus.freshness.maximum_age_seconds,
+                "operator_count": consensus.eligible_operator_count,
+                "provider_count": consensus.provider_count,
+                "source_result_sha256": consensus.result_sha256,
+                "target_probability": by_outcome[outcome].consensus_probability,
+                "uncertainty": max(
+                    (by_outcome[outcome].upper_bound - by_outcome[outcome].lower_bound)
+                    / Decimal(2),
+                    consensus.market_disagreement,
+                    floor,
+                ),
+                "usable_at": consensus.as_of,
+                "weight": outcome_weights[index],
+            }
+        )
+        for index, outcome in enumerate((TotalsOutcome.OVER, TotalsOutcome.UNDER))
+    )
+    return MarketConstraintSet.model_validate(
+        {
+            "as_of": cutoff,
+            "constraints": constraints,
+            "source_result_sha256": consensus.result_sha256,
+        }
+    )
+
+
+def combine_market_constraint_sets(
+    *sets: MarketConstraintSet,
+) -> MarketConstraintSet:
+    """Join independently evidenced Stage-6 families without concealing lineage."""
+
+    if not sets:
+        raise ValueError("at least one market constraint set is required")
+    as_of = sets[0].as_of
+    if any(item.as_of != as_of for item in sets):
+        raise ValueError("market constraint sets must share one as_of cutoff")
+    constraints = tuple(row for item in sets for row in item.constraints)
+    source_hashes = {row.source_result_sha256 for row in constraints if row.source_result_sha256}
+    return MarketConstraintSet.model_validate(
+        {
+            "as_of": as_of,
+            "constraints": constraints,
+            "source_result_sha256": next(iter(source_hashes)) if len(source_hashes) == 1 else None,
+        }
+    )
+
+
 __all__ = [
     "MarketConstraint",
     "MarketConstraintSet",
@@ -663,6 +765,8 @@ __all__ = [
     "ScoreEvent",
     "build_design_matrix",
     "cap_market_family_weights",
+    "combine_market_constraint_sets",
     "constraints_from_market_consensus",
+    "constraints_from_totals_consensus",
     "event_matches",
 ]

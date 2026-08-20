@@ -203,9 +203,9 @@ governance-accepted current event-prior artifact.
 ### Remediation checkpoints
 
 - [x] Reproduce and repair the generic real-FPL Decimal serialization defect.
-- [ ] Add Stage-6 line-specific two-way totals ingestion, normalisation and consensus.
-- [ ] Bind separate H2H/totals Stage-6 evidence into existing Stage-8 constraints.
-- [ ] Produce unaccepted support-prior and player-allocation candidates.
+- [x] Add Stage-6 line-specific two-way totals ingestion, normalisation and consensus.
+- [x] Bind separate H2H/totals Stage-6 evidence into existing Stage-8 constraints.
+- [x] Produce unaccepted support-prior and player-allocation candidate status evidence.
 - [ ] Run hostile validation, commits, push and exact-SHA Linux gates.
 
 ## RUL-2026-27 independent full-ruleset review and remediation

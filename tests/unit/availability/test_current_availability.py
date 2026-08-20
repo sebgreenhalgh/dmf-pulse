@@ -56,8 +56,8 @@ class _FakeOddsService:
     def snapshot(self, **_kwargs: object) -> LiveOddsOperationOutcome:
         quota = QuotaState(
             remaining=499,
-            used=1,
-            last_cost=1,
+            used=2,
+            last_cost=2,
             observed_at=ODDS_RECEIVED,
             source=QuotaSource.RESPONSE_HEADERS,
         )
@@ -125,6 +125,7 @@ def _market_source(
     *,
     expand_rosters: bool = True,
     alert: bool = False,
+    include_totals: bool = False,
 ) -> CurrentMarketConsensusBundle:
     tmp_path.mkdir(parents=True, exist_ok=True)
     source = repository_root / "fixtures/fpl/FPL-004/happy_path"
@@ -139,11 +140,23 @@ def _market_source(
     odds_value = json.loads(
         (repository_root / "fixtures/odds/ODD-005/happy_path.json").read_text(encoding="utf-8")
     )
+    if include_totals:
+        for index, bookmaker in enumerate(odds_value[0]["bookmakers"]):
+            bookmaker["markets"].append(
+                {
+                    "key": "totals",
+                    "last_update": bookmaker["last_update"],
+                    "outcomes": [
+                        {"name": "Over", "price": 1.80 + index / 100, "point": 2.5},
+                        {"name": "Under", "price": 2.10 - index / 100, "point": 2.5},
+                    ],
+                }
+            )
     body = json.dumps(odds_value, allow_nan=False, separators=(",", ":")).encode()
     quota = QuotaState(
         remaining=499,
-        used=1,
-        last_cost=1,
+        used=2,
+        last_cost=2,
         observed_at=ODDS_RECEIVED,
         source=QuotaSource.RESPONSE_HEADERS,
     )
@@ -159,7 +172,7 @@ def _market_source(
         request_fingerprint="1" * 64,
         sanitized_target=(
             "https://api.the-odds-api.com/v4/sports/soccer_epl/odds?"
-            "regions=uk&markets=h2h&oddsFormat=decimal&dateFormat=iso&"
+            "regions=uk&markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&"
             "commenceTimeFrom=2026-08-21T17%3A30%3A00Z"
         ),
         attempt_count=1,

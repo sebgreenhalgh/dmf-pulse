@@ -57,7 +57,7 @@ APPROVED = datetime(2026, 8, 18, 13, tzinfo=UTC)
 SOURCE_SNAPSHOT_ID = UUID("00000000-0000-0000-0000-000000001402")
 SANITIZED_TARGET = (
     "https://api.the-odds-api.com/v4/sports/soccer_epl/odds?"
-    "regions=uk&markets=h2h&oddsFormat=decimal&dateFormat=iso&commenceTimeFrom="
+    "regions=uk&markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&commenceTimeFrom="
     "2026-08-21T17%3A30%3A00Z"
 )
 
@@ -115,8 +115,8 @@ def _odds_input(
         usable_at=ODDS_RECEIVED + timedelta(seconds=1),
         quota=QuotaState(
             remaining=499,
-            used=1,
-            last_cost=1,
+            used=2,
+            last_cost=2,
             observed_at=ODDS_RECEIVED,
             source=QuotaSource.RESPONSE_HEADERS,
         ),

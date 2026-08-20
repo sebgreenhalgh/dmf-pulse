@@ -100,8 +100,8 @@ def _response(
     status: int = 200,
     content_type: str = "application/json",
     remaining: str = "499",
-    used: str = "1",
-    last: str = "1",
+    used: str = "2",
+    last: str = "2",
     body: bytes | None = None,
     redirect_location: str | None = None,
     extra_headers: dict[str, str] | None = None,
@@ -177,6 +177,7 @@ def test_valid_dummy_runtime_credential_reaches_only_transport_boundary(
     assert request.connect_timeout_seconds == 10
     assert request.read_timeout_seconds == 20
     assert request.total_timeout_seconds == 30
+    assert dict(request.safe_parameters)["markets"] == "h2h,totals"
     assert "apiKey" not in request.sanitized_target
     assert DUMMY_RUNTIME_VALUE not in request.sanitized_target
     assert DUMMY_RUNTIME_VALUE not in request.request_fingerprint
@@ -206,7 +207,7 @@ def test_local_quota_exhaustion_blocks_before_transport(repository_root: Path) -
     exhausted = QuotaState(
         remaining=0,
         used=500,
-        last_cost=1,
+        last_cost=2,
         observed_at=RECEIVED,
         source=QuotaSource.RESPONSE_HEADERS,
     )
@@ -372,16 +373,16 @@ def test_transport_timeout_and_tls_classes_are_bounded(
 def test_provider_quota_and_request_cost_are_exposed_without_secret(
     repository_root: Path,
 ) -> None:
-    transport = FakeTransport([_response(repository_root, remaining="417", used="83", last="1")])
+    transport = FakeTransport([_response(repository_root, remaining="417", used="83", last="2")])
     outcome = _snapshot(_service(transport, FakeEvidenceStore()))
 
     assert outcome.result.quota is not None
     assert outcome.result.quota.remaining == 417
     assert outcome.result.quota.used == 83
-    assert outcome.result.quota.last_cost == 1
+    assert outcome.result.quota.last_cost == 2
     assert outcome.result.current_input is not None
-    assert outcome.result.current_input.quota.configured_request_cost == 1
-    assert outcome.result.current_input.quota.provider_last_request_cost == 1
+    assert outcome.result.current_input.quota.configured_request_cost == 2
+    assert outcome.result.current_input.quota.provider_last_request_cost == 2
     assert DUMMY_RUNTIME_VALUE not in outcome.result.model_dump_json()
 
 

@@ -25,11 +25,19 @@ from dmf_pulse.markets.policy import (
     MarketNormalisationPolicy,
     load_market_normalisation_policy,
 )
+from dmf_pulse.markets.totals import (
+    FullTimeTotalsConsensus,
+    FullTimeTotalsQuote,
+    TotalsOutcome,
+    evaluate_full_time_totals_consensus,
+)
 
 __all__ = [
     "ConsensusPolicy",
     "ExclusionReason",
     "ExclusiveOutcomeQuote",
+    "FullTimeTotalsConsensus",
+    "FullTimeTotalsQuote",
     "MarketBook",
     "MarketConsensus",
     "MarketNormalisationPolicy",
@@ -42,7 +50,9 @@ __all__ = [
     "NormalisationStatus",
     "NormalisedOperatorMarket",
     "Probability",
+    "TotalsOutcome",
     "build_market_consensus",
+    "evaluate_full_time_totals_consensus",
     "load_market_normalisation_policy",
     "normalise_complete_market",
     "raw_implied_probability",

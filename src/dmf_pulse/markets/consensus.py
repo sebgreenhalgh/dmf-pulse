@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from itertools import combinations
+from typing import cast
 
 from dmf_pulse.markets.models import (
     ConsensusOutcome,
@@ -268,8 +269,8 @@ def evaluate_market_consensus(
         eligible.append(
             _EligibleMarket(
                 result=result,
-                power_internal=primary,
-                proportional_internal=computed.proportional,
+                power_internal=cast(tuple[Decimal, Decimal, Decimal], primary),
+                proportional_internal=cast(tuple[Decimal, Decimal, Decimal], computed.proportional),
                 age_seconds=int((cutoff - result.observed_at).total_seconds()),
             )
         )

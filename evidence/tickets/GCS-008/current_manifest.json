@@ -121,6 +121,11 @@
       "sha256": "a6a2f3f46a1a4b90335b1046f7f5c49dcd4c5f7fd110bde594f8abe1558f2420"
     },
     {
+      "bytes": 3908,
+      "path": ".github/workflows/gw1-market-primary-remediation.yml",
+      "sha256": "c888a7872ec38bd71a08a8b140e4a666dd75d7281a1635712504dacf901f9da2"
+    },
+    {
       "bytes": 1740,
       "path": ".github/workflows/windows-smoke.yml",
       "sha256": "f04ce4d61d35f007b53e87d0eb26a35d212f0e6e0023288e793cc6066678c6ee"
@@ -216,9 +221,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 81330,
+      "bytes": 82348,
       "path": "PLANS.md",
-      "sha256": "e8dd71d8a7c10f9c5c512dbda66741016d7d7775042f59087c639beb163d9a1a"
+      "sha256": "853a6199c73717d0a5464e0f4c329f793d17098eaf4c900c055dd283103fb4ce"
     },
     {
       "bytes": 2761,
@@ -331,9 +336,9 @@
       "sha256": "9c203f686d4bc5e197cf708c6c5829bf7865b1039615365db42c70401e6b2041"
     },
     {
-      "bytes": 809,
+      "bytes": 819,
       "path": "config/providers/the_odds_api.json",
-      "sha256": "8936ddc1e637438c8bc1991146b41a2c3bbe3be15442ce7410ea9ac451e9014c"
+      "sha256": "b426fc82fe260621598ee2aa5baaacfb513d138f4f2023b5712b97a2ebea9743"
     },
     {
       "bytes": 3074,
@@ -449,6 +454,11 @@
       "bytes": 852,
       "path": "docs/adr/ADR-FND-001-TOOLCHAIN.md",
       "sha256": "7bd7e4b356ca098106f13ef2ec5650cccd35550e10338ae61e9d97368aadeee2"
+    },
+    {
+      "bytes": 1458,
+      "path": "docs/adr/ADR-MKT-007-GW1-FULL-TIME-TOTALS.md",
+      "sha256": "0a5a8dcc10a045786ab6f2dfff180a86a402da23b0a1f62837f04a9f0ae5c1b4"
     },
     {
       "bytes": 791,
@@ -2571,9 +2581,9 @@
       "sha256": "7ee853c54a61becc5e8410d32baf109735bd40179403e3e74e429623ee882c60"
     },
     {
-      "bytes": 1451,
+      "bytes": 2487,
       "path": "src/dmf_pulse/assurance/canonical.py",
-      "sha256": "687d4632f9bf4265a3b7ebfc95f61311e45cffb53b50d31645a48d08491381d2"
+      "sha256": "68f7b945cb26d6ce491451cf6bea0249899ff2f6744bbf2753ac26e1bafd1f5b"
     },
     {
       "bytes": 29860,
@@ -3086,9 +3096,9 @@
       "sha256": "ad687022135c692b01ecdb2daabe4c2556173035fbdc71c29260ed94406364f3"
     },
     {
-      "bytes": 2661,
+      "bytes": 2815,
       "path": "src/dmf_pulse/football_events/__init__.py",
-      "sha256": "ad169408ca15a54a35fea1c8266e747209fe67200cc589e04fdf51f0e2e00cc4"
+      "sha256": "0b8abdb92761e0f1e531955c14942ce17b64bce696ed07502c66d93375e8c2dc"
     },
     {
       "bytes": 7210,
@@ -3106,9 +3116,9 @@
       "sha256": "0265bd3edadfc5ef3e8a6e50098ead04fc73cb252fa08478e531103980024416"
     },
     {
-      "bytes": 26125,
+      "bytes": 30535,
       "path": "src/dmf_pulse/football_events/market_constraints.py",
-      "sha256": "2f5a8f7490a3d5d87d1884d785bd22703e442ce2e817620a7b8d8e6430061a9c"
+      "sha256": "bd20e654610e72061616b9c54c6f76e0ee2778b8e1bc6d325e744f6b8ead878e"
     },
     {
       "bytes": 6291,
@@ -3186,9 +3196,9 @@
       "sha256": "c88f6ef06e5cd3ad5cbf9b713c0eb556be8d4bb67b81322e579e6946be207870"
     },
     {
-      "bytes": 37105,
+      "bytes": 39375,
       "path": "src/dmf_pulse/fpl_points/current.py",
-      "sha256": "3dfd63fd8ec82f885734077ffa69808ea73a04841de7d1bc45d7f07b95b24282"
+      "sha256": "2578795d7ce74ef8d9a7a29ba5f6130d9575d2b9d85ca5fee1b2f3e2e9051f52"
     },
     {
       "bytes": 9551,
@@ -3336,14 +3346,14 @@
       "sha256": "c8a09c820b2cc588daaa54708bbcd3661af0b7d39ed1907e82d99d90afea6924"
     },
     {
-      "bytes": 34169,
+      "bytes": 34195,
       "path": "src/dmf_pulse/ingestion/odds/client.py",
-      "sha256": "d66bad7f9515d16d4169f9ad563a4068c85b45148ca83cd745b29f6de9f40604"
+      "sha256": "7823711e926d1847e93d89ee97512f06e15697c73566577f2b7b1e30b469edd4"
     },
     {
-      "bytes": 6897,
+      "bytes": 7308,
       "path": "src/dmf_pulse/ingestion/odds/config.py",
-      "sha256": "6d960340cc279040ba10995f80f758faa14b44fa748de0ee67bcb8eaffb3aca1"
+      "sha256": "2038ac9d6ace42f71d3582671aedb2fa74472dc25ee31d59c18d73a106952577"
     },
     {
       "bytes": 5286,
@@ -3351,9 +3361,9 @@
       "sha256": "61a5dbf5054824aaa518733b1a33110df5d2769f6b54cc97ece02645fbbdf110"
     },
     {
-      "bytes": 28322,
+      "bytes": 35549,
       "path": "src/dmf_pulse/ingestion/odds/current.py",
-      "sha256": "7ff765f4b13fe25916b69d96f7d833f0c32d7ebc5b6a9c64cdda1f62b9cc1b92"
+      "sha256": "19f7461536f9d66739ef5d992fb8d5ac21f978f9b1d587b877eeabda16016a74"
     },
     {
       "bytes": 59303,
@@ -3376,9 +3386,9 @@
       "sha256": "42ee8f5a6c30e484d3ba2193c83deb1ec9f8d6a0ee43312e64ff8c677e0f91ff"
     },
     {
-      "bytes": 19169,
+      "bytes": 19642,
       "path": "src/dmf_pulse/ingestion/odds/parser.py",
-      "sha256": "a2336905fc3e9d9faecbd276b351ae49694119d8dc03dfa42531438c96b9aa56"
+      "sha256": "d4e433fd7748c096dcc78261b289f26d72205d6952c16eeb9ba404dc29f18188"
     },
     {
       "bytes": 49853,
@@ -3411,19 +3421,19 @@
       "sha256": "71fdc11f06bc5debaeac6d42ffe62086623deacda04700fdb2da9756c02f3f13"
     },
     {
-      "bytes": 1237,
+      "bytes": 1514,
       "path": "src/dmf_pulse/markets/__init__.py",
-      "sha256": "11e5d407590263a719feef57eb4edfd9b4ea87dcb7d26f2e52a547888210479b"
+      "sha256": "7efbf539d53dceedfc93ca28afbdeaec97ce98719ad09d0fb21240138783cdf5"
     },
     {
-      "bytes": 16675,
+      "bytes": 16779,
       "path": "src/dmf_pulse/markets/consensus.py",
-      "sha256": "5b7b5f41d87b0837cfc5e2e2201b87a2f86589cca6b8bd2f604f7eddf7823b3f"
+      "sha256": "68d0001068fd3d255800ee23223ee90bd0c11a262ae89bf3e02db8c26be92232"
     },
     {
-      "bytes": 18320,
+      "bytes": 26476,
       "path": "src/dmf_pulse/markets/current.py",
-      "sha256": "17f4d7999c0097f9c6e75b73dd63053dce8c4115cb2eb46e05e67d7f14471ba8"
+      "sha256": "74faa35f0a58f3f7ee8e0a276da0cbd8fe261320e4e30f2bfa142954024ee5c4"
     },
     {
       "bytes": 14873,
@@ -3431,9 +3441,9 @@
       "sha256": "1f67cb94bb212858ecd34fe0d6cfbf80442e6311fac228b12450e9ca853c1106"
     },
     {
-      "bytes": 15465,
+      "bytes": 15505,
       "path": "src/dmf_pulse/markets/normalisation.py",
-      "sha256": "057b53080cf43b68dd146daa6485aadb8e7c3b6ca825af018420be0492d42c4c"
+      "sha256": "755c2d886e4f524e21d55464032964069c32db72037a198cfe0355e1019e30f2"
     },
     {
       "bytes": 7676,
@@ -3469,6 +3479,11 @@
       "bytes": 9610,
       "path": "src/dmf_pulse/markets/service.py",
       "sha256": "d0ec9acc7cad93246243b1186f44946428bc14727403957a631aea6385f57cec"
+    },
+    {
+      "bytes": 23819,
+      "path": "src/dmf_pulse/markets/totals.py",
+      "sha256": "e5387a9fdac14403041b48d1274260d458aa2a9110a38bfd462071965a93d1ae"
     },
     {
       "bytes": 56,
@@ -4386,9 +4401,9 @@
       "sha256": "4c08ae21aca94b5d073edd92edd1840ba37ec9abc80cb91b0e24cc18f839da17"
     },
     {
-      "bytes": 9764,
+      "bytes": 10159,
       "path": "tests/unit/assurance/test_evidence.py",
-      "sha256": "c26c5dcdf5b945801f336afe54d55146f00367b477e040beb7e57aa938b53bbd"
+      "sha256": "abea715946c9b60c906e5612a4e78a44dc1660d600fe8939d26fae38a994e230"
     },
     {
       "bytes": 6744,
@@ -4526,9 +4541,9 @@
       "sha256": "1b134a0f490c1ff1ed4feb64e2fe4c0b218b03aca5239e634e791d1af319bba4"
     },
     {
-      "bytes": 18796,
+      "bytes": 19351,
       "path": "tests/unit/availability/test_current_availability.py",
-      "sha256": "7febb48a89583aeaf0400a1a84ec3ceca019f45bf662b50728f1be0b0a9e2f8a"
+      "sha256": "7f5744acaba5ef8338eebf29d2bc5b135d0740abf4c9bd00d30471dbfdc279b7"
     },
     {
       "bytes": 5402,
@@ -4601,9 +4616,9 @@
       "sha256": "c4edf4741f7b8a0adff50d39e6f8a77459c81b524095ab902c55c4f08c2da69d"
     },
     {
-      "bytes": 5405,
+      "bytes": 5414,
       "path": "tests/unit/cli/test_live_odds_snapshot.py",
-      "sha256": "6a43e1bfa231aae5d8bb6ef1964550d41f880088fdf3e344245030c2d21caf56"
+      "sha256": "cacca6dd13032fcaf9310a4179c4109e71db7c081f6a43a1b21e2a5b97e3fb19"
     },
     {
       "bytes": 1862,
@@ -4786,9 +4801,9 @@
       "sha256": "6bfd78770b342f9c7fcc6c4d903b8531c7a5abf981a5974234ed407b3fa6ee64"
     },
     {
-      "bytes": 16929,
+      "bytes": 17886,
       "path": "tests/unit/fpl_points/test_current_football_events.py",
-      "sha256": "fa02957834d3a7202367cac8750ec7dfbf7f4164e23deccdb1897862fd8b28d2"
+      "sha256": "c16052629911e9e5b53838c620f47ab2c9cf91a9243546e092ce5ac8304905ba"
     },
     {
       "bytes": 13321,
@@ -4831,19 +4846,19 @@
       "sha256": "4edf772b5f7f2d78692195bda94146382513efff7af6091f2ef2be4f0197bb4e"
     },
     {
-      "bytes": 17296,
+      "bytes": 18181,
       "path": "tests/unit/ingestion/test_fpl_current_input.py",
-      "sha256": "21cfe9d6203abb6208e12092d237d181c7d0217cda8e4b286c3f9fcd93b1ca35"
+      "sha256": "ca9474e6bce6a33a6873da229f9b4980ca9b887887378eb6ed8fdb9f2df26b04"
     },
     {
-      "bytes": 37311,
+      "bytes": 37320,
       "path": "tests/unit/ingestion/test_fpl_odds_fixture_identity.py",
-      "sha256": "3ae65cf3e79e0c6a7f447f3ca15fcc2d2c0efaf751af3350f7ff5060300934f3"
+      "sha256": "6cf9a7a4a007c368148b0ad578185d4256811ddf1051f1d83f64075c71900bb4"
     },
     {
-      "bytes": 13647,
+      "bytes": 13656,
       "path": "tests/unit/ingestion/test_fpl_odds_team_identity.py",
-      "sha256": "764edac1a879e1123386898490bf790373b60584cdce77c3584c144b2a1b0cda"
+      "sha256": "05055933832875e1b6c261eb7a9ec62c1a7278fbeaef5909cbc3b8514590d35e"
     },
     {
       "bytes": 13632,
@@ -4876,19 +4891,19 @@
       "sha256": "d5472197c34471908096fb99715d1eef51184e5f57c0a6d78046200b4111c506"
     },
     {
-      "bytes": 10817,
+      "bytes": 14124,
       "path": "tests/unit/ingestion/test_live_odds_current_input.py",
-      "sha256": "ab03c4311fbc069761f66d2482085b4b0852ee73ac3e15cbd9ff23127d7b0846"
+      "sha256": "958d4f7759825c48f8bd30702147678ebe26681c7e4424d3b6cbc71512a4472a"
     },
     {
-      "bytes": 15099,
+      "bytes": 15167,
       "path": "tests/unit/ingestion/test_live_odds_transport.py",
-      "sha256": "cf022980c6ea4f2f26b6c173a15e3a1c6c72df5b8d332972bb65c7bcfc8efa0f"
+      "sha256": "33d53b28af417e7be53858b811ec8782c4b48ed4d592a5c7ff2d8c9f8e248087"
     },
     {
-      "bytes": 28093,
+      "bytes": 28102,
       "path": "tests/unit/ingestion/test_odds_foundation.py",
-      "sha256": "c47edf0a30e273d5f85441a7d9259b75eb64c9e7915bdb14a3a420c72c051311"
+      "sha256": "bc2c25f17879c183647dc7460eee166ee9b1eceb43aec7fd16b99f0d81c2d33c"
     },
     {
       "bytes": 11904,
@@ -4921,14 +4936,14 @@
       "sha256": "fc61db628850ac44a8549f300a709dc670f25709cfd254fb81a8d225173ff41f"
     },
     {
-      "bytes": 19802,
+      "bytes": 19811,
       "path": "tests/unit/ingestion/test_session1_current_input.py",
-      "sha256": "640dbe659a9d7b5a4eda380f6fe3f64dab169d0b75ef52f39c0276023a777fed"
+      "sha256": "ee6997e575b43871954ca3814ec27bd6ee29d583585dadbdf21d55d621e6d440"
     },
     {
-      "bytes": 12567,
+      "bytes": 20475,
       "path": "tests/unit/markets/test_current_market.py",
-      "sha256": "4f6308df6e121006b526d4d1c6797853a26dd9f5ce57103670e94b8acad4aad7"
+      "sha256": "caec41d498056e175a4a7ec3c061bd2ded5a9f75086bdec7b16d0a302be3edf9"
     },
     {
       "bytes": 28150,
@@ -5159,6 +5174,16 @@
       "bytes": 2721,
       "path": "tickets/GCS-008/ticket.yaml",
       "sha256": "875b727ddeb7581472b8e36a497ebf6cbbfa4303939f2684b0649a2be68389b1"
+    },
+    {
+      "bytes": 2449,
+      "path": "tickets/GW1-MKT-001/ACCEPTANCE.md",
+      "sha256": "5e66fbc08356dbc8eebaa60182bcb6b07669a4ed2696e4e5ecd76ecad1067b7b"
+    },
+    {
+      "bytes": 2411,
+      "path": "tickets/GW1-MKT-001/ticket.yaml",
+      "sha256": "16043963543583606d198b78ade17e58624e349dce570184091d21d0d7bb81fb"
     },
     {
       "bytes": 10572,

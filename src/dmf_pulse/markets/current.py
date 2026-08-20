@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from decimal import Decimal
 from typing import Literal, Self
 from uuid import UUID, uuid5
 
@@ -30,8 +31,14 @@ from dmf_pulse.markets.models import (
     MarketState,
 )
 from dmf_pulse.markets.policy import POLICY_ID, POLICY_SHA256, load_market_normalisation_policy
+from dmf_pulse.markets.totals import (
+    FullTimeTotalsConsensus,
+    FullTimeTotalsQuote,
+    TotalsOutcome,
+    evaluate_full_time_totals_consensus,
+)
 
-CURRENT_MARKET_ADAPTER_VERSION = "gw1-current-market-stage6-v1"
+CURRENT_MARKET_ADAPTER_VERSION = "gw1-current-market-stage6-v2"
 _IDENTITY_NAMESPACE = UUID("5b2469af-1f0f-5ba2-9d2c-1c60683c04e6")
 
 
@@ -84,6 +91,45 @@ def _fixture_result_sha256(value: CurrentFixtureMarketConsensus) -> str:
     return canonical_sha256(value.model_dump(mode="json", exclude={"result_sha256"}))
 
 
+class CurrentFixtureTotalsConsensus(_FrozenModel):
+    """Optional, line-specific Stage-6 totals consensus for one reviewed fixture."""
+
+    official_fpl_fixture_id: int = Field(gt=0)
+    transient_fixture_id: UUID
+    provider_event_id: str = Field(min_length=1, max_length=500)
+    source_book_count: int = Field(ge=0)
+    source_quote_count: int = Field(ge=0)
+    coverage: Literal["COMPLETE", "DEGRADED", "UNAVAILABLE"]
+    excluded_books: tuple[ExcludedBook, ...]
+    warnings: tuple[str, ...]
+    consensus: FullTimeTotalsConsensus | None
+    result_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def validate_fixture_totals(self) -> CurrentFixtureTotalsConsensus:
+        if (
+            self.source_quote_count != self.source_book_count * 2
+            or self.result_sha256 != _totals_result_sha256(self)
+        ):
+            raise ValueError("current fixture totals lineage is inconsistent")
+        if self.consensus is None:
+            if self.coverage != "UNAVAILABLE":
+                raise ValueError("unavailable totals cannot claim usable coverage")
+        elif (
+            self.consensus.fixture_id != self.transient_fixture_id
+            or self.consensus.line != Decimal("2.5")
+            or self.consensus.eligible_operator_count + len(self.excluded_books)
+            > self.source_book_count
+            or self.coverage != ("DEGRADED" if self.excluded_books or self.warnings else "COMPLETE")
+        ):
+            raise ValueError("current fixture totals coverage is inconsistent")
+        return self
+
+
+def _totals_result_sha256(value: CurrentFixtureTotalsConsensus) -> str:
+    return canonical_sha256(value.model_dump(mode="json", exclude={"result_sha256"}))
+
+
 class CurrentMarketConsensusSummary(_FrozenModel):
     schema_version: Literal["1.0.0"] = "1.0.0"
     status: Literal["COMPLETE"] = "COMPLETE"
@@ -101,6 +147,9 @@ class CurrentMarketConsensusSummary(_FrozenModel):
     source_book_count: int = Field(gt=0)
     eligible_operator_count: int = Field(gt=0)
     excluded_book_count: int = Field(ge=0)
+    totals_complete_fixture_count: int = Field(ge=0)
+    totals_degraded_fixture_count: int = Field(ge=0)
+    totals_unavailable_fixture_count: int = Field(ge=0)
     confidence_grades: dict[str, int]
     policy_id: Literal["market-normalisation-v1"] = "market-normalisation-v1"
     policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -126,7 +175,7 @@ class CurrentMarketConsensusBundle(_FrozenModel):
     )
     as_of: datetime
     mapping_cutoff: datetime
-    adapter_version: Literal["gw1-current-market-stage6-v1"] = "gw1-current-market-stage6-v1"
+    adapter_version: Literal["gw1-current-market-stage6-v2"] = "gw1-current-market-stage6-v2"
     policy_id: Literal["market-normalisation-v1"] = "market-normalisation-v1"
     policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_session1_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -136,12 +185,14 @@ class CurrentMarketConsensusBundle(_FrozenModel):
     source_odds_market_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_input: Session1DownstreamInput
     fixture_markets: tuple[CurrentFixtureMarketConsensus, ...] = Field(min_length=1)
+    fixture_totals: tuple[CurrentFixtureTotalsConsensus, ...] = Field(min_length=1)
     semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
     def validate_current_consensus(self) -> CurrentMarketConsensusBundle:
         source = _revalidate_session1(self.source_input)
         expected = _build_fixture_markets(source)
+        expected_totals = _build_fixture_totals(source)
         fixture_ids = [row.official_fpl_fixture_id for row in self.fixture_markets]
         if (
             source != self.source_input
@@ -157,8 +208,11 @@ class CurrentMarketConsensusBundle(_FrozenModel):
             or self.source_odds_market_semantic_sha256
             != current_odds_market_semantic_sha256(source.odds_input)
             or tuple(self.fixture_markets) != expected
+            or tuple(self.fixture_totals) != expected_totals
             or len(fixture_ids) != len(set(fixture_ids))
             or len(self.fixture_markets) != source.identity_map.coverage.target_fpl_fixture_count
+            or tuple(row.official_fpl_fixture_id for row in self.fixture_totals)
+            != tuple(fixture_ids)
             or self.semantic_sha256 != _bundle_sha256(self)
         ):
             raise ValueError("current market-consensus bundle lineage is inconsistent")
@@ -177,6 +231,15 @@ class CurrentMarketConsensusBundle(_FrozenModel):
                 row.consensus.eligible_operator_count for row in self.fixture_markets
             ),
             excluded_book_count=sum(len(row.excluded_books) for row in self.fixture_markets),
+            totals_complete_fixture_count=sum(
+                row.coverage == "COMPLETE" for row in self.fixture_totals
+            ),
+            totals_degraded_fixture_count=sum(
+                row.coverage == "DEGRADED" for row in self.fixture_totals
+            ),
+            totals_unavailable_fixture_count=sum(
+                row.coverage == "UNAVAILABLE" for row in self.fixture_totals
+            ),
             confidence_grades=dict(sorted(grades.items())),
             policy_sha256=self.policy_sha256,
             source_session1_semantic_sha256=self.source_session1_semantic_sha256,
@@ -262,6 +325,122 @@ def _book_quotes(
         )
         for outcome in MarketOutcome
     )  # type: ignore[return-value]
+
+
+def _totals_book_quotes(
+    source: Session1DownstreamInput,
+    event: CurrentOddsEvent,
+    mapping: ResolvedCurrentFixture,
+    bookmaker: CurrentOddsBookmaker,
+) -> tuple[FullTimeTotalsQuote, FullTimeTotalsQuote] | tuple[()]:
+    """Convert one accepted provider-native O/U 2.5 book without rematching."""
+
+    if not bookmaker.totals_markets:
+        return ()
+    market = bookmaker.totals_markets[0]
+    fixture_id = _uuid("fixture", mapping.official_fpl_fixture_identity.canonical_lookup_sha256)
+    provider_id = _uuid("provider", source.odds_input.provider)
+    operator_id = _uuid("operator", source.odds_input.provider, bookmaker.bookmaker_key)
+    market_id = _uuid("market", fixture_id, "FULL_TIME_TOTALS", market.line)
+    observed_at = market.provider_last_update or bookmaker.provider_last_update
+    book_observation_id = _uuid(
+        "totals-book-observation",
+        source.odds_input.provenance.source_snapshot_id,
+        event.provider_event_id,
+        bookmaker.bookmaker_key,
+        market.line,
+        observed_at.isoformat(),
+    )
+    by_outcome = {TotalsOutcome(row.outcome): row for row in market.outcomes}
+    return tuple(
+        FullTimeTotalsQuote(
+            fixture_id=fixture_id,
+            market_id=market_id,
+            selection_id=_uuid("selection", market_id, outcome.value),
+            operator_id=operator_id,
+            operator_key=bookmaker.bookmaker_key,
+            provider_id=provider_id,
+            outcome=outcome,
+            line=market.line,
+            decimal_odds=by_outcome[outcome].decimal_price,
+            observed_at=observed_at,
+            received_at=source.odds_input.temporal.received_at,
+            usable_at=source.odds_input.temporal.usable_at,
+            source_snapshot_id=source.odds_input.provenance.source_snapshot_id,
+            book_observation_id=book_observation_id,
+            odds_observation_id=_uuid(
+                "totals-odds-observation",
+                book_observation_id,
+                outcome.value,
+                by_outcome[outcome].decimal_price,
+            ),
+            contract_version=source.odds_input.provenance.contract_version,
+        )
+        for outcome in TotalsOutcome
+    )  # type: ignore[return-value]
+
+
+def _build_fixture_totals(
+    source: Session1DownstreamInput,
+) -> tuple[CurrentFixtureTotalsConsensus, ...]:
+    policy = load_market_normalisation_policy()
+    results: list[CurrentFixtureTotalsConsensus] = []
+    for event, mapping in _event_and_mapping(source):
+        books = tuple(sorted(event.bookmakers, key=lambda item: item.bookmaker_key))
+        totals_books = tuple(
+            _totals_book_quotes(source, event, mapping, bookmaker) for bookmaker in books
+        )
+        quotes = tuple(quote for book in totals_books for quote in book)
+        warnings = set(source.odds_input.quality.warnings)
+        warnings.update("TOTALS_MISSING" for book in totals_books if not book)
+        warnings.update(
+            "TOTALS_MARKET_TIMESTAMP_NOT_PUBLISHED_USED_BOOKMAKER_TIMESTAMP"
+            for bookmaker in books
+            for market in bookmaker.totals_markets
+            if market.provider_last_update is None
+        )
+        evaluation = evaluate_full_time_totals_consensus(
+            quotes,
+            as_of=source.decision_information_at,
+            mapping_cutoff=source.identity_map.mapping_decided_at,
+            policy=policy,
+            initial_warnings=tuple(sorted(warnings)),
+        )
+        source_book_count = len(tuple(book for book in totals_books if book))
+        coverage: Literal["COMPLETE", "DEGRADED", "UNAVAILABLE"]
+        if evaluation.consensus is None:
+            coverage = "UNAVAILABLE"
+        else:
+            coverage = "DEGRADED" if evaluation.exclusions or evaluation.warnings else "COMPLETE"
+        provisional = CurrentFixtureTotalsConsensus.model_construct(
+            official_fpl_fixture_id=mapping.official_fpl_fixture_id,
+            transient_fixture_id=_uuid(
+                "fixture", mapping.official_fpl_fixture_identity.canonical_lookup_sha256
+            ),
+            provider_event_id=event.provider_event_id,
+            source_book_count=source_book_count,
+            source_quote_count=len(quotes),
+            coverage=coverage,
+            excluded_books=evaluation.exclusions,
+            warnings=evaluation.warnings,
+            consensus=evaluation.consensus,
+            result_sha256="0" * 64,
+        )
+        results.append(
+            CurrentFixtureTotalsConsensus(
+                official_fpl_fixture_id=mapping.official_fpl_fixture_id,
+                transient_fixture_id=provisional.transient_fixture_id,
+                provider_event_id=event.provider_event_id,
+                source_book_count=source_book_count,
+                source_quote_count=len(quotes),
+                coverage=coverage,
+                excluded_books=evaluation.exclusions,
+                warnings=evaluation.warnings,
+                consensus=evaluation.consensus,
+                result_sha256=_totals_result_sha256(provisional),
+            )
+        )
+    return tuple(sorted(results, key=lambda row: row.official_fpl_fixture_id))
 
 
 def _build_fixture_markets(
@@ -350,6 +529,7 @@ def build_current_market_consensus(
 
     validated = _revalidate_session1(source)
     fixture_markets = _build_fixture_markets(validated)
+    fixture_totals = _build_fixture_totals(validated)
     provisional = CurrentMarketConsensusBundle.model_construct(
         schema_version="1.0.0",
         contract="GW1_CURRENT_MARKET_CONSENSUS",
@@ -375,6 +555,7 @@ def build_current_market_consensus(
         ),
         source_input=validated,
         fixture_markets=fixture_markets,
+        fixture_totals=fixture_totals,
         semantic_sha256="0" * 64,
     )
     return CurrentMarketConsensusBundle(
@@ -392,6 +573,7 @@ def build_current_market_consensus(
         ),
         source_input=validated,
         fixture_markets=fixture_markets,
+        fixture_totals=fixture_totals,
         semantic_sha256=_bundle_sha256(provisional),
     )
 
@@ -399,6 +581,7 @@ def build_current_market_consensus(
 __all__ = [
     "CURRENT_MARKET_ADAPTER_VERSION",
     "CurrentFixtureMarketConsensus",
+    "CurrentFixtureTotalsConsensus",
     "CurrentMarketConsensusBundle",
     "CurrentMarketConsensusSummary",
     "build_current_market_consensus",

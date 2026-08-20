@@ -358,6 +358,20 @@ def _outcome_identity(event: OddsEvent, name: str) -> tuple[str, str]:
     return ("CANONICAL", canonical) if canonical != "UNMAPPED" else ("SOURCE", name)
 
 
+def _market_outcome_identity(
+    event: OddsEvent,
+    market: OddsMarket,
+    outcome: OddsOutcome,
+) -> tuple[str, ...]:
+    """Keep distinct totals lines distinct while preserving H2H duplicate rules."""
+
+    identity = _outcome_identity(event, outcome.name)
+    if market.key != "totals":
+        return identity
+    point = "MISSING" if outcome.point is None else canonical_decimal_text(outcome.point)
+    return (*identity, point)
+
+
 def _validate_limits(events: tuple[OddsEvent, ...], config: OddsProviderConfig) -> None:
     if len(events) > config.max_events:
         raise IngestionError("PAYLOAD_TOO_LARGE", "provider event count exceeds the limit")
@@ -384,9 +398,9 @@ def _validate_limits(events: tuple[OddsEvent, ...], config: OddsProviderConfig) 
                 market_keys.add(market.key)
                 if len(market.outcomes) > config.max_outcomes_per_market:
                     raise IngestionError("PAYLOAD_TOO_LARGE", "outcome count exceeds the limit")
-                by_outcome: dict[tuple[str, str], tuple[Decimal, Decimal | None]] = {}
+                by_outcome: dict[tuple[str, ...], tuple[Decimal, Decimal | None]] = {}
                 for outcome in market.outcomes:
-                    identity = _outcome_identity(event, outcome.name)
+                    identity = _market_outcome_identity(event, market, outcome)
                     previous = by_outcome.get(identity)
                     candidate = (outcome.price, outcome.point)
                     if previous is not None and previous != candidate:
@@ -407,10 +421,10 @@ def _deduplicate_equal_outcomes(
             markets: list[OddsMarket] = []
             for market in bookmaker.markets:
                 outcomes: list[OddsOutcome] = []
-                positions: dict[tuple[str, str], int] = {}
-                duplicate_counts: dict[tuple[str, str], int] = {}
+                positions: dict[tuple[str, ...], int] = {}
+                duplicate_counts: dict[tuple[str, ...], int] = {}
                 for outcome in market.outcomes:
-                    identity = _outcome_identity(event, outcome.name)
+                    identity = _market_outcome_identity(event, market, outcome)
                     if identity in positions:
                         duplicate_counts[identity] = duplicate_counts.get(identity, 0) + 1
                         continue
@@ -496,7 +510,7 @@ def parse_odds_payload(body: bytes) -> ParsedOddsPayload:
         for event in events
         for bookmaker in event.bookmakers
         for market in bookmaker.markets
-        if market.key != "h2h"
+        if market.key not in config.markets
     )
     if duplicate_outcomes:
         warnings.append("DUPLICATE_OUTCOME_DEDUPED")

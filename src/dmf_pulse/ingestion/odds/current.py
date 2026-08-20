@@ -20,7 +20,7 @@ from dmf_pulse.ingestion.odds.config import (
     rights_config_sha256,
 )
 from dmf_pulse.ingestion.odds.models import QuotaState
-from dmf_pulse.ingestion.odds.parser import OddsEvent, ParsedOddsPayload
+from dmf_pulse.ingestion.odds.parser import OddsEvent, OddsMarket, ParsedOddsPayload
 from dmf_pulse.ingestion.rights import decide_rights, require_rights
 
 _SECRET_FIELD_FRAGMENTS = (
@@ -91,12 +91,71 @@ class CurrentOddsMarket(_FrozenModel):
         return self
 
 
+class CurrentOddsTotalsOutcome(_FrozenModel):
+    """One source price in the bounded full-time O/U market."""
+
+    provider_name: str = Field(min_length=1, max_length=500)
+    outcome: Literal["OVER", "UNDER"]
+    decimal_price: Decimal
+    point: Decimal
+
+    @field_validator("decimal_price")
+    @classmethod
+    def validate_price(cls, value: Decimal) -> Decimal:
+        if not value.is_finite() or value <= 1:
+            raise ValueError("decimal price must be finite and greater than one")
+        return value
+
+    @field_validator("point")
+    @classmethod
+    def validate_point(cls, value: Decimal) -> Decimal:
+        if not value.is_finite() or value < 0 or value % 1 != Decimal("0.5"):
+            raise ValueError("totals point must be a nonnegative half-goal line")
+        return value
+
+
+class CurrentOddsTotalsMarket(_FrozenModel):
+    """One complete, line-specific, 90-minute totals market."""
+
+    market_key: Literal["totals"] = "totals"
+    line: Decimal
+    provider_last_update: datetime | None
+    provider_last_update_state: Literal["PUBLISHED", "NOT_PUBLISHED"]
+    outcomes: tuple[CurrentOddsTotalsOutcome, CurrentOddsTotalsOutcome]
+
+    @field_validator("line")
+    @classmethod
+    def validate_line(cls, value: Decimal) -> Decimal:
+        if not value.is_finite() or value < 0 or value % 1 != Decimal("0.5"):
+            raise ValueError("totals line must be a nonnegative half-goal line")
+        return value
+
+    @model_validator(mode="after")
+    def validate_market(self) -> CurrentOddsTotalsMarket:
+        expected_state = "PUBLISHED" if self.provider_last_update is not None else "NOT_PUBLISHED"
+        if self.provider_last_update_state != expected_state:
+            raise ValueError("market timestamp state contradicts the timestamp")
+        if {outcome.outcome for outcome in self.outcomes} != {"OVER", "UNDER"}:
+            raise ValueError("totals market must contain OVER and UNDER once")
+        if any(outcome.point != self.line for outcome in self.outcomes):
+            raise ValueError("totals outcomes must bind one exact line")
+        return self
+
+
 class CurrentOddsBookmaker(_FrozenModel):
     bookmaker_key: str = Field(min_length=1, max_length=500)
     bookmaker_title: str = Field(min_length=1, max_length=500)
     provider_last_update: datetime
     age_at_receipt_seconds: int = Field(ge=0)
     markets: tuple[CurrentOddsMarket, ...] = Field(min_length=1, max_length=1)
+    totals_markets: tuple[CurrentOddsTotalsMarket, ...] = ()
+
+    @model_validator(mode="after")
+    def validate_totals_lines(self) -> CurrentOddsBookmaker:
+        lines = [market.line for market in self.totals_markets]
+        if len(lines) != len(set(lines)):
+            raise ValueError("totals line is duplicated within a bookmaker")
+        return self
 
 
 class CurrentOddsEvent(_FrozenModel):
@@ -242,7 +301,7 @@ class CurrentOddsProvenance(_FrozenModel):
             len(query_names) != len(set(query_names))
             or set(query_names) != expected_names
             or parameters.get("regions") != "uk"
-            or parameters.get("markets") != "h2h"
+            or parameters.get("markets") != "h2h,totals"
             or parameters.get("oddsFormat") != "decimal"
             or parameters.get("dateFormat") != "iso"
             or self.attempt_count != self.transport_call_count
@@ -272,7 +331,7 @@ class OddsProviderCurrentInput(_FrozenModel):
     api_version: Literal["v4"] = "v4"
     sport_key: Literal["soccer_epl"] = "soccer_epl"
     region: Literal["uk"] = "uk"
-    market: Literal["h2h"] = "h2h"
+    market: Literal["h2h,totals"] = "h2h,totals"
     odds_format: Literal["decimal"] = "decimal"
     identity_scope: Literal["PROVIDER_NATIVE_UNMAPPED"] = "PROVIDER_NATIVE_UNMAPPED"
     events: tuple[CurrentOddsEvent, ...] = Field(min_length=1)
@@ -337,6 +396,31 @@ def current_odds_market_semantic_sha256(value: OddsProviderCurrentInput) -> str:
                         ),
                     }
                 )
+            for totals_market in bookmaker.totals_markets:
+                markets.append(
+                    {
+                        "line": format(totals_market.line, "f"),
+                        "market_key": totals_market.market_key,
+                        "provider_last_update": (
+                            totals_market.provider_last_update.isoformat()
+                            if totals_market.provider_last_update is not None
+                            else None
+                        ),
+                        "provider_last_update_state": totals_market.provider_last_update_state,
+                        "outcomes": sorted(
+                            (
+                                {
+                                    "decimal_price": format(outcome.decimal_price, "f"),
+                                    "outcome": outcome.outcome,
+                                    "point": format(outcome.point, "f"),
+                                    "provider_name": outcome.provider_name,
+                                }
+                                for outcome in totals_market.outcomes
+                            ),
+                            key=lambda item: str(item["outcome"]),
+                        ),
+                    }
+                )
             bookmakers.append(
                 {
                     "age_at_receipt_seconds": bookmaker.age_at_receipt_seconds,
@@ -380,6 +464,70 @@ def _canonical_outcome(
     if name.casefold() == "draw":
         return "DRAW"
     return None
+
+
+def _canonical_totals_outcome(name: str) -> Literal["OVER", "UNDER"] | None:
+    normalized = name.casefold().strip()
+    if normalized == "over":
+        return "OVER"
+    if normalized == "under":
+        return "UNDER"
+    return None
+
+
+def _totals_market(
+    market: object,
+    *,
+    bookmaker_last_update: datetime,
+    received_at: datetime,
+) -> tuple[CurrentOddsTotalsMarket | None, str | None]:
+    """Parse an optional provider totals book without weakening valid H2H input."""
+
+    if not isinstance(market, OddsMarket):
+        raise IngestionError("INTERNAL_INVARIANT", "provider totals market type is invalid")
+    if market.last_update is not None and (
+        market.last_update > received_at or market.last_update > bookmaker_last_update
+    ):
+        return None, "TOTALS_TIMESTAMP_INVALID"
+    by_line: dict[Decimal, dict[str, CurrentOddsTotalsOutcome]] = {}
+    for outcome in market.outcomes:
+        canonical = _canonical_totals_outcome(outcome.name)
+        if canonical is None or outcome.point is None:
+            return None, "TOTALS_MALFORMED_OUTCOME"
+        try:
+            parsed = CurrentOddsTotalsOutcome(
+                provider_name=outcome.name,
+                outcome=canonical,
+                decimal_price=outcome.price,
+                point=outcome.point,
+            )
+        except ValueError:
+            return None, "TOTALS_NON_HALF_GOAL_LINE"
+        line_outcomes = by_line.setdefault(parsed.point, {})
+        if canonical in line_outcomes:
+            return None, "TOTALS_DUPLICATE_OUTCOME"
+        line_outcomes[canonical] = parsed
+    if len(market.outcomes) == 2 and len(by_line) != 1:
+        return None, "TOTALS_LINE_MISMATCH"
+    selected = by_line.get(Decimal("2.5"))
+    if selected is None:
+        return None, "TOTALS_PREFERRED_LINE_2_5_UNAVAILABLE"
+    if set(selected) != {"OVER", "UNDER"}:
+        return None, "TOTALS_INCOMPLETE"
+    if selected["OVER"].point != selected["UNDER"].point:
+        return None, "TOTALS_LINE_MISMATCH"
+    line = selected["OVER"].point
+    return (
+        CurrentOddsTotalsMarket(
+            line=line,
+            provider_last_update=market.last_update,
+            provider_last_update_state=(
+                "PUBLISHED" if market.last_update is not None else "NOT_PUBLISHED"
+            ),
+            outcomes=(selected["OVER"], selected["UNDER"]),
+        ),
+        None,
+    )
 
 
 def _contains_secret_like_extra(value: object) -> bool:
@@ -465,13 +613,16 @@ def _provider_events(
     *,
     received_at: datetime,
     information_cutoff: datetime,
-) -> tuple[CurrentOddsEvent, ...]:
+) -> tuple[tuple[CurrentOddsEvent, ...], tuple[str, ...]]:
     blockers: set[str] = set()
+    warnings: set[str] = set()
     current_events: list[CurrentOddsEvent] = []
     if not parsed.events:
         blockers.add("EMPTY_PROVIDER_RESPONSE")
-    if parsed.duplicate_outcomes:
+    if any(item.market_key == "h2h" for item in parsed.duplicate_outcomes):
         blockers.add("DUPLICATE_OUTCOME")
+    if any(item.market_key == "totals" for item in parsed.duplicate_outcomes):
+        warnings.add("TOTALS_DUPLICATE_OUTCOME")
     if _contains_secret_like_extra(parsed.events):
         blockers.add("SECRET_LIKE_PROVIDER_FIELD")
 
@@ -498,7 +649,8 @@ def _provider_events(
             if bookmaker.last_update > received_at:
                 blockers.add("PROVIDER_TIMESTAMP_AFTER_RECEIPT")
             requested = [market for market in bookmaker.markets if market.key == "h2h"]
-            if any(market.key != "h2h" for market in bookmaker.markets):
+            totals = [market for market in bookmaker.markets if market.key == "totals"]
+            if any(market.key not in {"h2h", "totals"} for market in bookmaker.markets):
                 blockers.add("UNSUPPORTED_MARKET")
             if len(requested) != 1:
                 blockers.add("REQUESTED_MARKET_MISSING_OR_DUPLICATED")
@@ -538,6 +690,19 @@ def _provider_events(
                     by_outcome["AWAY"],
                 ),
             )
+            current_totals: list[CurrentOddsTotalsMarket] = []
+            if len(totals) != 1:
+                warnings.add("TOTALS_MISSING")
+            else:
+                totals_market, totals_warning = _totals_market(
+                    totals[0],
+                    bookmaker_last_update=bookmaker.last_update,
+                    received_at=received_at,
+                )
+                if totals_warning is not None:
+                    warnings.add(totals_warning)
+                elif totals_market is not None:
+                    current_totals.append(totals_market)
             age_seconds = int((received_at - bookmaker.last_update).total_seconds())
             if age_seconds < 0:
                 blockers.add("PROVIDER_TIMESTAMP_AFTER_RECEIPT")
@@ -549,6 +714,7 @@ def _provider_events(
                     provider_last_update=bookmaker.last_update,
                     age_at_receipt_seconds=age_seconds,
                     markets=(current_market,),
+                    totals_markets=tuple(current_totals),
                 )
             )
         if current_bookmakers:
@@ -568,7 +734,7 @@ def _provider_events(
             "provider-native odds response failed current-input quality gates",
             details={"blockers": sorted(blockers)},
         )
-    return tuple(current_events)
+    return tuple(current_events), tuple(sorted(warnings))
 
 
 def build_current_odds_input(
@@ -635,12 +801,12 @@ def build_current_odds_input(
             details={"blockers": ["QUOTA_SOURCE_INVALID"]},
         )
 
-    events = _provider_events(
+    events, totals_warnings = _provider_events(
         parsed,
         received_at=received,
         information_cutoff=cutoff,
     )
-    warnings = tuple(sorted(set(parsed.warnings)))
+    warnings = tuple(sorted(set((*parsed.warnings, *totals_warnings))))
     temporal = CurrentOddsTemporalState(
         request_started_at=request_started,
         received_at=received,
@@ -681,7 +847,7 @@ def build_current_odds_input(
         api_version="v4",
         sport_key="soccer_epl",
         region="uk",
-        market="h2h",
+        market="h2h,totals",
         odds_format="decimal",
         identity_scope="PROVIDER_NATIVE_UNMAPPED",
         events=events,

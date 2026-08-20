@@ -84,12 +84,12 @@ def code_identity() -> str:
 
 @dataclass(frozen=True, slots=True)
 class _ComputedMarket:
-    raw: tuple[Decimal, Decimal, Decimal]
+    raw: tuple[Decimal, ...]
     booksum: Decimal
-    proportional: tuple[Decimal, Decimal, Decimal]
-    power: tuple[Decimal, Decimal, Decimal] | None
+    proportional: tuple[Decimal, ...]
+    power: tuple[Decimal, ...] | None
     alpha: Decimal | None
-    primary: tuple[Decimal, Decimal, Decimal]
+    primary: tuple[Decimal, ...]
     primary_method: NormalisationMethod
     fallback_used: bool
     fallback_diagnostic: str | None = None
@@ -109,14 +109,14 @@ def _overround12(booksum: Decimal) -> Decimal:
         return (booksum - _ONE).quantize(_PUBLIC_SCALE)
 
 
-def _public_vector(
-    values: tuple[Decimal, Decimal, Decimal],
-) -> tuple[Decimal, Decimal, Decimal]:
+def _public_vector(values: tuple[Decimal, ...]) -> tuple[Decimal, ...]:
+    if len(values) < 2:
+        raise MarketNormalisationError("probability vector requires at least two outcomes")
     rounded = [_q12(value) for value in values]
     residual = _ONE - sum(rounded, start=Decimal(0))
-    winner = max(range(3), key=lambda index: (values[index], -index))
+    winner = max(range(len(values)), key=lambda index: (values[index], -index))
     rounded[winner] += residual
-    return rounded[0], rounded[1], rounded[2]
+    return tuple(rounded)
 
 
 def raw_implied_probability(decimal_odds: Decimal) -> Probability:
@@ -132,9 +132,11 @@ def raw_implied_probability(decimal_odds: Decimal) -> Probability:
         return _ONE / decimal_odds
 
 
-def _power_vector(
-    raw: tuple[Decimal, Decimal, Decimal],
-) -> tuple[tuple[Decimal, Decimal, Decimal], Decimal]:
+def _power_vector(raw: tuple[Decimal, ...]) -> tuple[tuple[Decimal, ...], Decimal]:
+    if len(raw) < 2:
+        raise PowerNormalisationError(
+            "POWER_VECTOR_INVALID", "power vector requires at least two outcomes"
+        )
     try:
         with localcontext() as context:
             context.prec = 60
@@ -169,12 +171,14 @@ def _power_vector(
                     "power vector has invalid total",
                 )
             result = tuple(value / total for value in powered)
-            if len(result) != 3 or any(not value.is_finite() or value <= 0 for value in result):
+            if len(result) != len(raw) or any(
+                not value.is_finite() or value <= 0 for value in result
+            ):
                 raise PowerNormalisationError(
                     "POWER_VECTOR_INVALID",
                     "power vector is not finite and positive",
                 )
-            return (result[0], result[1], result[2]), alpha
+            return result, alpha
     except PowerNormalisationError:
         raise
     except (DecimalException, InvalidOperation, OverflowError) as exc:
@@ -184,9 +188,9 @@ def _power_vector(
         ) from exc
 
 
-def _compute_market(
-    odds: tuple[Decimal, Decimal, Decimal], method: NormalisationMethod
-) -> _ComputedMarket:
+def _compute_market(odds: tuple[Decimal, ...], method: NormalisationMethod) -> _ComputedMarket:
+    if len(odds) < 2:
+        raise MarketNormalisationError("complete market requires at least two odds")
     with localcontext() as context:
         context.prec = 60
         context.rounding = ROUND_HALF_EVEN
@@ -195,38 +199,36 @@ def _compute_market(
         if not booksum.is_finite() or booksum <= 0:
             raise MarketNormalisationError("raw booksum must be finite and positive")
         proportional = tuple(value / booksum for value in raw)
-        raw_triplet = raw[0], raw[1], raw[2]
-        proportional_triplet = proportional[0], proportional[1], proportional[2]
         if method is NormalisationMethod.PROPORTIONAL:
             return _ComputedMarket(
-                raw=raw_triplet,
+                raw=raw,
                 booksum=booksum,
-                proportional=proportional_triplet,
+                proportional=proportional,
                 power=None,
                 alpha=None,
-                primary=proportional_triplet,
+                primary=proportional,
                 primary_method=NormalisationMethod.PROPORTIONAL,
                 fallback_used=False,
                 fallback_diagnostic=None,
             )
         try:
-            power, alpha = _power_vector(raw_triplet)
+            power, alpha = _power_vector(raw)
         except PowerNormalisationError as exc:
             return _ComputedMarket(
-                raw=raw_triplet,
+                raw=raw,
                 booksum=booksum,
-                proportional=proportional_triplet,
+                proportional=proportional,
                 power=None,
                 alpha=None,
-                primary=proportional_triplet,
+                primary=proportional,
                 primary_method=NormalisationMethod.PROPORTIONAL,
                 fallback_used=True,
                 fallback_diagnostic=exc.code,
             )
         return _ComputedMarket(
-            raw=raw_triplet,
+            raw=raw,
             booksum=booksum,
-            proportional=proportional_triplet,
+            proportional=proportional,
             power=power,
             alpha=alpha,
             primary=power,

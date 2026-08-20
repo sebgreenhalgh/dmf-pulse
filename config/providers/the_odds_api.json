@@ -4,7 +4,7 @@
   "contract_version": "the-odds-api-v4-reference-v1",
   "date_format": "iso",
   "host": "api.the-odds-api.com",
-  "markets": ["h2h"],
+  "markets": ["h2h", "totals"],
   "max_bookmakers_per_event": 80,
   "max_events": 1000,
   "max_json_depth": 64,
@@ -16,7 +16,7 @@
   "path": "/v4/sports/soccer_epl/odds",
   "provider_key": "the_odds_api",
   "regions": ["uk"],
-  "request_cost": 1,
+  "request_cost": 2,
   "retry": {
     "default_delay_seconds": 1,
     "max_attempts": 2,

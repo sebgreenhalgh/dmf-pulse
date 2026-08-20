@@ -15,7 +15,9 @@ from dmf_pulse.football_events.market_constraints import (
     MarketFamily,
     ScoreEvent,
     cap_market_family_weights,
+    combine_market_constraint_sets,
     constraints_from_market_consensus,
+    constraints_from_totals_consensus,
 )
 from dmf_pulse.football_events.minutes_context import (
     Stage7MinutesContext,
@@ -86,7 +88,9 @@ __all__ = [
     "assert_score_coherence",
     "build_score_prior",
     "cap_market_family_weights",
+    "combine_market_constraint_sets",
     "constraints_from_market_consensus",
+    "constraints_from_totals_consensus",
     "evaluate_realized_score",
     "load_score_baseline_policy",
     "poisson_pmf",

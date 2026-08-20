@@ -49,8 +49,13 @@ EVENT_APPROVED = datetime(2026, 8, 20, 12, 4, tzinfo=UTC)
 PRIOR_INFORMATION_CUTOFF = datetime(2026, 8, 20, 12, 2, tzinfo=UTC)
 
 
-def _availability(repository_root: Path, tmp_path: Path) -> CurrentAvailabilityBundle:
-    market = _market_source(repository_root, tmp_path)
+def _availability(
+    repository_root: Path,
+    tmp_path: Path,
+    *,
+    include_totals: bool = False,
+) -> CurrentAvailabilityBundle:
+    market = _market_source(repository_root, tmp_path, include_totals=include_totals)
     return build_current_availability(market, availability_approval(market))
 
 
@@ -298,6 +303,28 @@ def test_stage8_is_bound_to_reviewed_market_minutes_and_prior(
         away.posterior_projection.result_sha256
     )
     assert fixture.source_prior_artifact_sha256 == artifact.artifact_sha256
+
+
+def test_current_stage8_uses_one_matrix_for_h2h_and_available_totals(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    source = _availability(repository_root, tmp_path, include_totals=True)
+    totals = source.source_market.fixture_totals[0]
+    h2h = source.source_market.fixture_markets[0]
+    assert totals.consensus is not None
+
+    result = build_current_football_events(source, _event_approval(source))
+    distribution = result.fixtures[0].score_distribution
+    residuals = distribution.market_residuals
+
+    assert distribution.source_market_sha256 is None
+    assert {row.family for row in residuals} == {"1X2", "TOTALS"}
+    assert {row.source_result_sha256 for row in residuals} == {
+        h2h.consensus.result_sha256,
+        totals.consensus.result_sha256,
+    }
+    assert {row.line for row in residuals if row.family == "TOTALS"} == {"2.5"}
 
 
 @pytest.mark.parametrize(

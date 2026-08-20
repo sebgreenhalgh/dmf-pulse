@@ -1,0 +1,46 @@
+ticket_id: "GW1-MKT-001"
+stage: "A6-A8-current-bridge"
+pack_version: "1.0"
+title: "GW1 market-primary remediation: bounded full-time totals current bridge"
+status: "IMPLEMENTED_PENDING_HUMAN_ACCEPTANCE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "codex_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+
+required_branch: "readiness/GW1-2026-27-market-primary-remediation"
+required_base_commit: "ed6fc1a1190fcc924e6fe0c078f18c7ae25e5a94"
+
+objective: >-
+  Make multi-book pre-match full-time H2H plus O/U 2.5 totals the current
+  fixture-strength evidence for the existing Stage-8 score matrix, retaining
+  the existing Stage-9 player simulation and Stage-10 optimiser unchanged.
+
+authority_override:
+  source: "operator directive SHA-256 508447aaba3493e649012f7e6a5659799841301d3bb3571161b9096b7a1a946e"
+  limited_effect: >-
+    Supersedes NRM-006's totals exclusion only for this transient current-GW1
+    adapter; it does not amend frozen NRM-006 persistence/public contracts.
+
+in_scope:
+  - "Decimal-safe transient compilation of current official FPL settings."
+  - "The Odds API UK `h2h,totals` request contract at documented request cost 2."
+  - "FULL_TIME/FULL_TIME_90 complete O/U 2.5 market parsing, de-vig and multi-book consensus."
+  - "Separate H2H/totals lineage joined only as native constraints on one existing Stage-8 matrix."
+  - "Explicit H2H-only fallback when totals are absent, incomplete or stale."
+  - "Focused current Stage-7/8/9 handoff tests and governance evidence."
+
+excluded:
+  - "Live provider calls, real credentials, raw provider or official-FPL persistence."
+  - "Provider configuration activation, database schema migration, public totals contract migration."
+  - "Dixon-Coles/rho estimation, a second score engine, player props, team totals or in-play markets."
+  - "A parallel player simulator, optimiser, external application import, PR, merge or activation."
+
+acceptance:
+  - "A current H2H-only response stays usable with explicit totals-unavailable evidence."
+  - "A valid O/U 2.5 response yields independently hash-bound totals consensus."
+  - "The current Stage-8/9 bridge projects one matrix constrained by both market families."
+  - "Every totals constraint retains its own Stage-6 result hash; the combined outer hash is null."
+  - "No real key, request or persisted raw capture is used."
+
+network_allowed: false
+real_credentials_allowed: false

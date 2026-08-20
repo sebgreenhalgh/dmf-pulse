@@ -6,6 +6,7 @@ import json
 from collections.abc import Callable
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -14,7 +15,7 @@ import pytest
 
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
-from dmf_pulse.ingestion.odds.current import build_current_odds_input
+from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput, build_current_odds_input
 from dmf_pulse.ingestion.odds.models import QuotaSource, QuotaState
 from dmf_pulse.ingestion.odds.parser import parse_odds_payload
 
@@ -25,7 +26,7 @@ CUTOFF = datetime(2026, 8, 21, 17, 30, tzinfo=UTC)
 SOURCE_SNAPSHOT_ID = UUID("00000000-0000-0000-0000-000000000913")
 SANITIZED_TARGET = (
     "https://api.the-odds-api.com/v4/sports/soccer_epl/odds?"
-    "regions=uk&markets=h2h&oddsFormat=decimal&dateFormat=iso&commenceTimeFrom="
+    "regions=uk&markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&commenceTimeFrom="
     "2026-08-21T17%3A30%3A00Z"
 )
 
@@ -44,16 +45,33 @@ def _body(value: object) -> bytes:
     return json.dumps(value, allow_nan=False, separators=(",", ":")).encode()
 
 
+def _append_totals(value: list[dict[str, Any]]) -> None:
+    for index, bookmaker in enumerate(value[0]["bookmakers"]):
+        assert isinstance(bookmaker, dict)
+        markets = bookmaker["markets"]
+        assert isinstance(markets, list)
+        markets.append(
+            {
+                "key": "totals",
+                "last_update": bookmaker["last_update"],
+                "outcomes": [
+                    {"name": "Over", "price": 1.80 + index / 100, "point": 2.5},
+                    {"name": "Under", "price": 2.10 - index / 100, "point": 2.5},
+                ],
+            }
+        )
+
+
 def _build_from_value(
     repository_root: Path,
     value: object,
     *,
     received_at: datetime = RECEIVED,
     usable_at: datetime = RECEIVED + timedelta(seconds=1),
-    last_cost: int = 1,
+    last_cost: int = 2,
     quota_source: QuotaSource = QuotaSource.RESPONSE_HEADERS,
     sanitized_target: str = SANITIZED_TARGET,
-):
+) -> OddsProviderCurrentInput:
     parsed = parse_odds_payload(_body(value))
     profile = load_rights_profiles()["the_odds_api_private_analytics_v1"]
     return build_current_odds_input(
@@ -66,7 +84,7 @@ def _build_from_value(
         usable_at=usable_at,
         quota=QuotaState(
             remaining=499,
-            used=max(last_cost, 1),
+            used=max(last_cost, 2),
             last_cost=last_cost,
             observed_at=received_at,
             source=quota_source,
@@ -89,7 +107,7 @@ def test_valid_epl_h2h_response_builds_provider_native_unmapped_contract(
     assert current.provider == "the_odds_api"
     assert current.sport_key == "soccer_epl"
     assert current.region == "uk"
-    assert current.market == "h2h"
+    assert current.market == "h2h,totals"
     assert current.events[0].provider_event_id == "todapi-event-001"
     assert current.events[0].provider_home_team == "Alpha Athletic"
     assert current.events[0].provider_away_team == "Beta Borough"
@@ -132,6 +150,82 @@ def test_current_rights_preserve_declared_unknowns_and_effective_denials(
     assert rights.raw_payload_retained is False
 
 
+def test_complete_half_goal_totals_are_retained_alongside_h2h(
+    repository_root: Path,
+) -> None:
+    value = _value(repository_root)
+    _append_totals(value)
+
+    current = _build_from_value(repository_root, value)
+
+    first = current.events[0].bookmakers[0]
+    assert current.quality.status == "PASS"
+    assert first.totals_markets[0].line == Decimal("2.5")
+    assert [item.outcome for item in first.totals_markets[0].outcomes] == ["OVER", "UNDER"]
+    assert [item.point for item in first.totals_markets[0].outcomes] == [
+        Decimal("2.5"),
+        Decimal("2.5"),
+    ]
+
+
+def test_complete_preferred_totals_line_is_selected_without_mixing_extra_lines(
+    repository_root: Path,
+) -> None:
+    value = _value(repository_root)
+    _append_totals(value)
+    outcomes = value[0]["bookmakers"][0]["markets"][1]["outcomes"]
+    outcomes.extend(
+        [
+            {"name": "Over", "price": 2.40, "point": 3.5},
+            {"name": "Under", "price": 1.60, "point": 3.5},
+        ]
+    )
+
+    current = _build_from_value(repository_root, value)
+
+    totals = current.events[0].bookmakers[0].totals_markets[0]
+    assert totals.line == Decimal("2.5")
+    assert [row.point for row in totals.outcomes] == [Decimal("2.5"), Decimal("2.5")]
+
+
+@pytest.mark.parametrize(
+    ("mutation", "warning"),
+    (
+        (
+            lambda value: value[0]["bookmakers"][0]["markets"][1]["outcomes"].pop(),
+            "TOTALS_INCOMPLETE",
+        ),
+        (
+            lambda value: value[0]["bookmakers"][0]["markets"][1]["outcomes"][0].__setitem__(
+                "point", 2
+            ),
+            "TOTALS_NON_HALF_GOAL_LINE",
+        ),
+        (
+            lambda value: value[0]["bookmakers"][0]["markets"][1]["outcomes"][1].__setitem__(
+                "point", 3.5
+            ),
+            "TOTALS_LINE_MISMATCH",
+        ),
+    ),
+)
+def test_invalid_totals_are_degraded_without_discarding_valid_h2h(
+    repository_root: Path,
+    mutation: Callable[[list[dict[str, Any]]], object],
+    warning: str,
+) -> None:
+    value = _value(repository_root)
+    _append_totals(value)
+    mutation(value)
+
+    current = _build_from_value(repository_root, value)
+
+    assert current.quality.status == "WARNING"
+    assert warning in current.quality.warnings
+    assert len(current.events[0].bookmakers[0].markets) == 1
+    assert current.events[0].bookmakers[0].totals_markets == ()
+
+
 @pytest.mark.parametrize(
     ("mutation", "blocker"),
     (
@@ -139,7 +233,7 @@ def test_current_rights_preserve_declared_unknowns_and_effective_denials(
         (lambda value: value[0].__setitem__("bookmakers", []), "BOOKMAKER_MISSING"),
         (
             lambda value: value[0]["bookmakers"][0]["markets"][0].__setitem__("key", "totals"),
-            "UNSUPPORTED_MARKET",
+            "REQUESTED_MARKET_MISSING_OR_DUPLICATED",
         ),
         (
             lambda value: value[0]["bookmakers"][0]["markets"][0]["outcomes"].pop(1),
@@ -183,7 +277,9 @@ def test_decision_critical_provider_payload_failures_block(
     with pytest.raises(IngestionError) as raised:
         _build_from_value(repository_root, value)
     assert raised.value.code == "QUALITY_BLOCKED"
-    assert blocker in raised.value.details["blockers"]
+    blockers = raised.value.details["blockers"]
+    assert isinstance(blockers, list)
+    assert blocker in blockers
 
 
 def test_builder_rejects_duplicate_provider_event_identity(repository_root: Path) -> None:
@@ -202,8 +298,8 @@ def test_builder_rejects_duplicate_provider_event_identity(repository_root: Path
             usable_at=RECEIVED + timedelta(seconds=1),
             quota=QuotaState(
                 remaining=499,
-                used=1,
-                last_cost=1,
+                used=2,
+                last_cost=2,
                 observed_at=RECEIVED,
                 source=QuotaSource.RESPONSE_HEADERS,
             ),
@@ -215,7 +311,9 @@ def test_builder_rejects_duplicate_provider_event_identity(repository_root: Path
         )
 
     assert raised.value.code == "QUALITY_BLOCKED"
-    assert "DUPLICATE_PROVIDER_EVENT_ID" in raised.value.details["blockers"]
+    blockers = raised.value.details["blockers"]
+    assert isinstance(blockers, list)
+    assert "DUPLICATE_PROVIDER_EVENT_ID" in blockers
 
 
 def test_equal_duplicate_outcome_is_not_accepted_as_current(repository_root: Path) -> None:
@@ -225,7 +323,9 @@ def test_equal_duplicate_outcome_is_not_accepted_as_current(repository_root: Pat
     with pytest.raises(IngestionError) as raised:
         _build_from_value(repository_root, value)
     assert raised.value.code == "QUALITY_BLOCKED"
-    assert "DUPLICATE_OUTCOME" in raised.value.details["blockers"]
+    blockers = raised.value.details["blockers"]
+    assert isinstance(blockers, list)
+    assert "DUPLICATE_OUTCOME" in blockers
 
 
 def test_post_cutoff_receipt_or_validation_is_rejected(repository_root: Path) -> None:
@@ -252,7 +352,7 @@ def test_non_provider_quota_source_is_quality_blocked(repository_root: Path) -> 
 
 def test_provider_request_cost_mismatch_is_quality_blocked(repository_root: Path) -> None:
     with pytest.raises(IngestionError) as raised:
-        _build_from_value(repository_root, _value(repository_root), last_cost=2)
+        _build_from_value(repository_root, _value(repository_root), last_cost=1)
     assert raised.value.code == "QUALITY_BLOCKED"
     assert raised.value.details["blockers"] == ["QUOTA_REQUEST_COST_MISMATCH"]
 

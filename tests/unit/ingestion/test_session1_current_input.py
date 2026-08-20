@@ -83,8 +83,8 @@ def _complete_odds_outcome(
     ).encode()
     quota = QuotaState(
         remaining=499,
-        used=1,
-        last_cost=1,
+        used=2,
+        last_cost=2,
         observed_at=ODDS_RECEIVED,
         source=QuotaSource.RESPONSE_HEADERS,
     )
@@ -100,7 +100,7 @@ def _complete_odds_outcome(
         request_fingerprint="1" * 64,
         sanitized_target=(
             "https://api.the-odds-api.com/v4/sports/soccer_epl/odds?"
-            "regions=uk&markets=h2h&oddsFormat=decimal&dateFormat=iso&"
+            "regions=uk&markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&"
             "commenceTimeFrom=2026-08-21T17%3A30%3A00Z"
         ),
         attempt_count=1,

@@ -237,7 +237,7 @@ def test_provider_and_rights_configuration_is_strict_and_hash_bound(
     profiles = load_rights_profiles()
     assert config.sport_keys == ("soccer_epl",)
     assert config.regions == ("uk",)
-    assert config.markets == ("h2h",)
+    assert config.markets == ("h2h", "totals")
     assert set(profiles) == {
         "synthetic_the_odds_api_v1",
         "the_odds_api_private_analytics_v1",

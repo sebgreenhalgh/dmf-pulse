@@ -276,7 +276,7 @@ def _safe_parameters(
 ) -> tuple[tuple[str, str], ...]:
     parameters: list[tuple[str, str]] = [
         ("regions", config.regions[0]),
-        ("markets", config.markets[0]),
+        ("markets", ",".join(config.markets)),
         ("oddsFormat", config.odds_format),
         ("dateFormat", config.date_format),
     ]
@@ -331,7 +331,7 @@ def _validate_request(request: OddsHttpRequest, config: OddsProviderConfig) -> N
         raise IngestionError("INTERNAL_INVARIANT", "odds request is not allowlisted")
     if request.safe_parameters[:4] != (
         ("regions", "uk"),
-        ("markets", "h2h"),
+        ("markets", ",".join(config.markets)),
         ("oddsFormat", "decimal"),
         ("dateFormat", "iso"),
     ):

@@ -22,10 +22,14 @@ from dmf_pulse.availability import CurrentAvailabilityBundle
 from dmf_pulse.availability.current import CurrentTeamAvailabilityProjection
 from dmf_pulse.football_events import (
     JointScoreDistribution,
+    MarketConstraint,
     ScoreDistributionRequest,
     ScoreDistributionService,
     Stage7MinutesContext,
     assert_score_coherence,
+    combine_market_constraint_sets,
+    constraints_from_market_consensus,
+    constraints_from_totals_consensus,
     load_score_baseline_policy,
 )
 from dmf_pulse.football_events.service import ScoreDistributionError, ScorePriorRequest
@@ -43,8 +47,10 @@ from dmf_pulse.fpl_points.seed import rng_for, stable_identifier
 from dmf_pulse.fpl_points.upstream import build_participation_scenario
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplFixture
+from dmf_pulse.markets.current import CurrentFixtureMarketConsensus
+from dmf_pulse.markets.models import MarketConsensus
 
-CURRENT_FOOTBALL_EVENT_ADAPTER_VERSION = "gw1-current-football-events-stage8-v1"
+CURRENT_FOOTBALL_EVENT_ADAPTER_VERSION = "gw1-current-football-events-stage8-v2"
 _IDENTITY_NAMESPACE = UUID("891aa5e8-08d5-56ee-aab4-8fc547d10f77")
 _PARTICIPATION_SCENARIO_COUNT = 256
 
@@ -342,8 +348,8 @@ class CurrentFootballEventBundle(_FrozenModel):
     fpl_derived_storage: Literal["DENY"] = "DENY"
     production_calibration_claim: Literal[False] = False
     decision_information_at: datetime
-    adapter_version: Literal["gw1-current-football-events-stage8-v1"] = (
-        "gw1-current-football-events-stage8-v1"
+    adapter_version: Literal["gw1-current-football-events-stage8-v2"] = (
+        "gw1-current-football-events-stage8-v2"
     )
     stage8_policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_availability_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -722,6 +728,51 @@ def _participation_scenarios(
     return tuple(scenarios)
 
 
+def _stage8_market_evidence(
+    source: CurrentAvailabilityBundle,
+    fixture: CurrentFplFixture,
+    *,
+    market: CurrentFixtureMarketConsensus,
+    as_of: datetime,
+) -> tuple[tuple[MarketConstraint, ...], MarketConsensus | None]:
+    """Use optional totals with 1X2 in the one existing Stage-8 request.
+
+    The frozen 1X2 public contract remains the H2H-only fallback.  When a
+    fresh, complete 2.5-goal consensus is present, both independently
+    normalised families become native constraints on the same score matrix.
+    No second score, player, or optimisation path is created.
+    """
+
+    totals_by_fixture = {
+        row.official_fpl_fixture_id: row for row in source.source_market.fixture_totals
+    }
+    totals = totals_by_fixture[fixture.provider_fixture_id]
+    if totals.consensus is None:
+        return (), market.consensus
+    policy = load_score_baseline_policy()
+    try:
+        one_x_two = constraints_from_market_consensus(
+            market.consensus,
+            fixture_id=market.transient_fixture_id,
+            as_of=as_of,
+            uncertainty_floor=policy.projection.market_uncertainty_floor,
+        )
+        totals_constraints = constraints_from_totals_consensus(
+            totals.consensus,
+            fixture_id=market.transient_fixture_id,
+            as_of=as_of,
+            uncertainty_floor=policy.projection.market_uncertainty_floor,
+        )
+        combined = combine_market_constraint_sets(one_x_two, totals_constraints)
+    except ValueError as exc:
+        raise IngestionError(
+            "QUALITY_BLOCKED",
+            "current Stage-6 1X2/totals evidence cannot be adapted for Stage-8",
+            details={"official_fpl_fixture_id": fixture.provider_fixture_id},
+        ) from exc
+    return combined.constraints, None
+
+
 def _build_fixture_inputs(
     source: CurrentAvailabilityBundle,
     approval: CurrentFootballEventApproval,
@@ -739,6 +790,12 @@ def _build_fixture_inputs(
         context = Stage7MinutesContext.from_projections(
             home.posterior_projection, away.posterior_projection
         )
+        constraints, market_consensus = _stage8_market_evidence(
+            source,
+            fixture,
+            market=market,
+            as_of=approval.approved_at,
+        )
         request = ScoreDistributionRequest(
             schema_version="score-distribution-request-v1",
             fixture_id=home.transient_fixture_id,
@@ -748,7 +805,8 @@ def _build_fixture_inputs(
             fixture_status="SCHEDULED",
             minutes_context=context,
             prior=prior.score_prior,
-            market_consensus=market.consensus,
+            constraints=constraints,
+            market_consensus=market_consensus,
         )
         try:
             projected = service.project(request)

@@ -12,6 +12,13 @@ from uuid import UUID
 import pytest
 from pydantic import ValidationError
 
+from dmf_pulse.football_events.market_constraints import (
+    combine_market_constraint_sets,
+    constraints_from_market_consensus,
+    constraints_from_totals_consensus,
+)
+from dmf_pulse.football_events.score_prior import build_score_prior
+from dmf_pulse.football_events.score_projection import constraint_probabilities, project_to_markets
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplInputService
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
@@ -50,8 +57,8 @@ class _FakeOddsService:
     def snapshot(self, **_kwargs: object) -> LiveOddsOperationOutcome:
         quota = QuotaState(
             remaining=499,
-            used=1,
-            last_cost=1,
+            used=2,
+            last_cost=2,
             observed_at=ODDS_RECEIVED,
             source=QuotaSource.RESPONSE_HEADERS,
         )
@@ -80,6 +87,24 @@ def _odds_value(repository_root: Path) -> list[dict[str, Any]]:
     return value
 
 
+def _with_totals(value: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    for index, bookmaker in enumerate(value[0]["bookmakers"]):
+        assert isinstance(bookmaker, dict)
+        markets = bookmaker["markets"]
+        assert isinstance(markets, list)
+        markets.append(
+            {
+                "key": "totals",
+                "last_update": bookmaker["last_update"],
+                "outcomes": [
+                    {"name": "Over", "price": 1.80 + index / 100, "point": 2.5},
+                    {"name": "Under", "price": 2.10 - index / 100, "point": 2.5},
+                ],
+            }
+        )
+    return value
+
+
 def _source(
     repository_root: Path,
     tmp_path: Path,
@@ -99,8 +124,8 @@ def _source(
     ).encode()
     quota = QuotaState(
         remaining=499,
-        used=1,
-        last_cost=1,
+        used=2,
+        last_cost=2,
         observed_at=ODDS_RECEIVED,
         source=QuotaSource.RESPONSE_HEADERS,
     )
@@ -116,7 +141,7 @@ def _source(
         request_fingerprint="1" * 64,
         sanitized_target=(
             "https://api.the-odds-api.com/v4/sports/soccer_epl/odds?"
-            "regions=uk&markets=h2h&oddsFormat=decimal&dateFormat=iso&"
+            "regions=uk&markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&"
             "commenceTimeFrom=2026-08-21T17%3A30%3A00Z"
         ),
         attempt_count=1,
@@ -191,6 +216,194 @@ def test_current_h2h_books_produce_complete_transient_stage6_consensus(
     assert summary.database_accessed is False
     assert summary.eligible_operator_count == 2
     assert summary.confidence_grades == {fixture.consensus.confidence_grade: 1}
+    assert summary.totals_unavailable_fixture_count == 1
+    assert result.fixture_totals[0].coverage == "UNAVAILABLE"
+
+
+def test_current_h2h_and_totals_produce_independent_line_bound_consensus(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    source = _source(
+        repository_root, tmp_path, odds_value=_with_totals(_odds_value(repository_root))
+    )
+
+    result = build_current_market_consensus(source)
+    h2h = result.fixture_markets[0]
+    totals = result.fixture_totals[0]
+
+    assert h2h.consensus.result_sha256 != totals.consensus.result_sha256  # type: ignore[union-attr]
+    assert totals.coverage == "COMPLETE"
+    assert totals.consensus is not None
+    assert totals.consensus.line == Decimal("2.5")
+    assert tuple(row.outcome.value for row in totals.consensus.outcomes) == ("OVER", "UNDER")
+    assert sum(row.consensus_probability for row in totals.consensus.outcomes) == Decimal(1)
+    assert totals.source_book_count == 2
+    assert totals.source_quote_count == 4
+
+
+def test_h2h_and_totals_constrain_one_stage8_matrix_with_separate_lineage(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    source = _source(
+        repository_root, tmp_path, odds_value=_with_totals(_odds_value(repository_root))
+    )
+    result = build_current_market_consensus(source)
+    h2h = result.fixture_markets[0]
+    totals = result.fixture_totals[0]
+    assert totals.consensus is not None
+    h2h_constraints = constraints_from_market_consensus(
+        h2h.consensus,
+        fixture_id=h2h.transient_fixture_id,
+        as_of=result.as_of,
+        uncertainty_floor=Decimal("0.005"),
+    )
+    totals_constraints = constraints_from_totals_consensus(
+        totals.consensus,
+        fixture_id=totals.transient_fixture_id,
+        as_of=result.as_of,
+        uncertainty_floor=Decimal("0.005"),
+    )
+    both = combine_market_constraint_sets(h2h_constraints, totals_constraints)
+    hashes = {row.source_result_sha256 for row in both.constraints}
+    assert both.source_result_sha256 is None
+    assert hashes == {h2h.consensus.result_sha256, totals.consensus.result_sha256}
+
+    prior = build_score_prior(
+        Decimal("1.4"),
+        Decimal("1.1"),
+        minimum_max_goals=6,
+        maximum_max_goals=18,
+        tail_tolerance=Decimal("0.0000000001"),
+        hard_tail_limit=Decimal("0.00000001"),
+    )
+    h2h_projection = project_to_markets(
+        prior,
+        h2h_constraints,
+        max_iterations=80,
+        gradient_tolerance=Decimal("1e-18"),
+        line_search_min_step=Decimal("1e-12"),
+        allow_prior_fallback=False,
+    )
+    both_projection = project_to_markets(
+        prior,
+        both,
+        max_iterations=80,
+        gradient_tolerance=Decimal("1e-18"),
+        line_search_min_step=Decimal("1e-12"),
+        allow_prior_fallback=False,
+    )
+    h2h_over = constraint_probabilities(
+        h2h_projection.probabilities, totals_constraints.constraints
+    )[0]
+    both_over = constraint_probabilities(
+        both_projection.probabilities, totals_constraints.constraints
+    )[0]
+    assert both_projection.status == "PROJECTED"
+    assert both_over > h2h_over + Decimal("0.01")
+    with pytest.raises(ValueError, match="POST_CUTOFF_MARKET"):
+        constraints_from_totals_consensus(
+            totals.consensus,
+            fixture_id=totals.transient_fixture_id,
+            as_of=result.as_of - timedelta(seconds=1),
+            uncertainty_floor=Decimal("0.005"),
+        )
+
+
+def test_current_h2h_and_totals_dominate_reasonable_stage8_prior_variation(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    source = _source(
+        repository_root, tmp_path, odds_value=_with_totals(_odds_value(repository_root))
+    )
+    result = build_current_market_consensus(source)
+    h2h = result.fixture_markets[0]
+    totals = result.fixture_totals[0]
+    assert totals.consensus is not None
+    constraints = combine_market_constraint_sets(
+        constraints_from_market_consensus(
+            h2h.consensus,
+            fixture_id=h2h.transient_fixture_id,
+            as_of=result.as_of,
+            uncertainty_floor=Decimal("0.005"),
+        ),
+        constraints_from_totals_consensus(
+            totals.consensus,
+            fixture_id=totals.transient_fixture_id,
+            as_of=result.as_of,
+            uncertainty_floor=Decimal("0.005"),
+        ),
+    )
+    projected_vectors: list[tuple[Decimal, ...]] = []
+    for home_rate, away_rate in (
+        (Decimal("1.0"), Decimal("1.8")),
+        (Decimal("1.8"), Decimal("1.0")),
+    ):
+        prior = build_score_prior(
+            home_rate,
+            away_rate,
+            minimum_max_goals=6,
+            maximum_max_goals=36,
+            tail_tolerance=Decimal("0.0000000001"),
+            hard_tail_limit=Decimal("0.00000001"),
+        )
+        projection = project_to_markets(
+            prior,
+            constraints,
+            max_iterations=80,
+            gradient_tolerance=Decimal("1e-18"),
+            line_search_min_step=Decimal("1e-12"),
+            allow_prior_fallback=False,
+        )
+        assert projection.status == "PROJECTED"
+        projected_vectors.append(
+            constraint_probabilities(projection.probabilities, constraints.constraints)
+        )
+
+    assert max(abs(left - right) for left, right in zip(*projected_vectors, strict=True)) < Decimal(
+        "0.001"
+    )
+
+
+def test_totals_never_mix_lines_and_degrade_to_complete_preferred_2_5_books(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    value = _with_totals(_odds_value(repository_root))
+    outcomes = value[0]["bookmakers"][1]["markets"][1]["outcomes"]
+    assert isinstance(outcomes, list)
+    for outcome in outcomes:
+        assert isinstance(outcome, dict)
+        outcome["point"] = 3.5
+
+    totals = build_current_market_consensus(
+        _source(repository_root, tmp_path, odds_value=value)
+    ).fixture_totals[0]
+
+    assert totals.coverage == "DEGRADED"
+    assert totals.consensus is not None
+    assert totals.consensus.line == Decimal("2.5")
+    assert totals.source_book_count == 1
+    assert "TOTALS_PREFERRED_LINE_2_5_UNAVAILABLE" in totals.warnings
+
+
+def test_stale_totals_are_excluded_without_discarding_h2h(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    value = _with_totals(_odds_value(repository_root))
+    value[0]["bookmakers"][1]["markets"][1]["last_update"] = "2026-08-20T11:00:00Z"
+
+    result = build_current_market_consensus(_source(repository_root, tmp_path, odds_value=value))
+    totals = result.fixture_totals[0]
+
+    assert result.fixture_markets[0].consensus.eligible_operator_count == 2
+    assert totals.coverage == "DEGRADED"
+    assert totals.consensus is not None
+    assert totals.consensus.eligible_operator_count == 1
+    assert [item.reason.value for item in totals.excluded_books] == ["STALE"]
 
 
 def test_current_consensus_is_deterministic_and_revalidates_from_serialized_contract(
@@ -274,7 +487,9 @@ def test_all_stale_books_fail_closed_without_model_only_imputation(
         build_current_market_consensus(_source(repository_root, tmp_path, odds_value=value))
 
     assert error.value.code == "NO_ELIGIBLE_MARKET"
-    assert len(error.value.details["excluded_books"]) == 2
+    excluded_books = error.value.details["excluded_books"]
+    assert isinstance(excluded_books, list)
+    assert len(excluded_books) == 2
 
 
 def test_independent_revalidation_rejects_tampered_source_market_values(
