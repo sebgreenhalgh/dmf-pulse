@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import pytest
 
-from dmf_pulse.rank_strategy.manager_multipliers import calculate_manager_multipliers
+from dmf_pulse.rank_strategy.manager_multipliers import (
+    calculate_manager_multipliers,
+    raw_projection_hash,
+    shared_scenario_set_hash,
+)
 from dmf_pulse.rank_strategy.models import ManagerChip
 from tests.support.rank_strategy_fixtures import (
     manager_plan,
@@ -19,6 +23,17 @@ def _points(**updates: int) -> dict[str, int]:
     values = {f"p{index:02d}": 2 for index in range(16)}
     values.update(updates)
     return values
+
+
+def test_raw_projection_hash_binds_stage9_and_upstream_event_lineage() -> None:
+    scenarios = scenario_set()
+    changed_model = scenarios.model_copy(update={"model_version_ids": ("different-model",)})
+    changed_stage8 = scenarios.model_copy(update={"upstream_stage8_sha256s": ("9" * 64,)})
+
+    assert raw_projection_hash(changed_model) != raw_projection_hash(scenarios)
+    assert raw_projection_hash(changed_stage8) != raw_projection_hash(scenarios)
+    assert shared_scenario_set_hash(changed_model) == shared_scenario_set_hash(scenarios)
+    assert shared_scenario_set_hash(changed_stage8) == shared_scenario_set_hash(scenarios)
 
 
 def test_normal_captain_and_player_multipliers_reconcile_exactly() -> None:

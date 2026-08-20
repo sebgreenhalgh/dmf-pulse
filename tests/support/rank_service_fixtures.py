@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from dmf_pulse.evaluation.artifacts import canonical_json_bytes, semantic_sha256
+from dmf_pulse.prices.models import ActivationStatus as PriceActivationStatus
 from dmf_pulse.rank_strategy.models import SampleRightsStatus
 from dmf_pulse.rank_strategy.service import bind_accepted_plan, seal_rank_service_request
 from dmf_pulse.rank_strategy.service_models import (
@@ -83,6 +84,9 @@ def service_request(
     rank_expected_points: float = 99.4,
     rank_raw_hash: str = RAW_HASH,
     rank_scenario_hash: str = SCENARIO_HASH,
+    stage13_statuses: tuple[PriceActivationStatus, ...] = (
+        PriceActivationStatus.PRODUCTION_ELIGIBLE,
+    ),
 ) -> RankServiceRequest:
     utility_policy = policy(
         points_epsilon=points_epsilon,
@@ -141,6 +145,7 @@ def service_request(
         stage11_manager_state=component(RankComponentKind.STAGE_11_MANAGER_STATE, "7"),
         stage12_plans=component(RankComponentKind.STAGE_12_PLANS, "8"),
         stage13_prices=component(RankComponentKind.STAGE_13_PRICES, "9"),
+        stage13_activation_statuses=tuple(sorted(stage13_statuses, key=lambda item: item.value)),
         stage14_chips=component(RankComponentKind.STAGE_14_CHIPS, "a"),
         effective_ownership_model=component(RankComponentKind.STAGE_15_EFFECTIVE_OWNERSHIP, "b"),
         cohort_model=(

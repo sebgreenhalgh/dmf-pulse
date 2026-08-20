@@ -171,6 +171,67 @@ def test_minimum_target_gain_gate_blocks_cosmetic_rank_override() -> None:
     assert "TARGET_GAIN_BELOW_MINIMUM" in result.fallback_reasons
 
 
+@pytest.mark.parametrize(
+    ("target_rank", "points_pmf", "alternative_pmf"),
+    [
+        (1, {3: 1.0}, {2: 1.0}),
+        (2, {1: 0.5, 2: 0.5}, {1: 1.0}),
+    ],
+)
+def test_unreachable_or_secure_target_cannot_select_a_lower_points_plan_without_gain(
+    target_rank: int,
+    points_pmf: dict[int, float],
+    alternative_pmf: dict[int, float],
+) -> None:
+    result = evaluate_rank_strategy(
+        request_id="non-sensitive-target",
+        objective=RankObjectiveMode.TARGET_RANK,
+        candidates=(
+            candidate("points", 60.0, points_pmf),
+            candidate("alternative", 59.9, alternative_pmf),
+        ),
+        context=context(),
+        policy=policy(material_threshold=1.0),
+        target=RankTargetDefinition(target_rank=target_rank),
+    )
+
+    assert result.rank_optimal_plan_id == "alternative"
+    assert result.selected_plan_id == "points"
+    assert "TARGET_NOT_DECISION_SENSITIVE" in result.fallback_reasons
+
+
+def test_target_outside_represented_population_fails_closed() -> None:
+    result = evaluate_rank_strategy(
+        request_id="outside-population",
+        objective=RankObjectiveMode.TARGET_RANK,
+        candidates=(candidate("points", 60.0, {1: 0.5, 2: 0.5}, population_size=2),),
+        context=context(),
+        policy=policy(),
+        target=RankTargetDefinition(target_rank=3),
+    )
+
+    assert result.selected_plan_id == "points"
+    assert result.activation_status is not RankActivationStatus.ACTIVE
+    assert "TARGET_OUTSIDE_POPULATION" in result.fallback_reasons
+
+
+def test_candidate_rank_populations_must_be_comparable() -> None:
+    with pytest.raises(RankStrategyError) as exc_info:
+        evaluate_rank_strategy(
+            request_id="population-mismatch",
+            objective=RankObjectiveMode.TARGET_RANK,
+            candidates=(
+                candidate("two-manager", 60.0, {1: 0.5, 2: 0.5}, population_size=2),
+                candidate("three-manager", 59.9, {1: 0.5, 3: 0.5}, population_size=3),
+            ),
+            context=context(),
+            policy=policy(),
+            target=RankTargetDefinition(target_rank=1),
+        )
+
+    assert exc_info.value.code == "RANK_DISTRIBUTION_SURFACE_MISMATCH"
+
+
 def test_missing_rank_distribution_cannot_activate_rank_mode() -> None:
     candidates = (
         candidate("points", 60.0, {1: 0.2, 2: 0.8}),

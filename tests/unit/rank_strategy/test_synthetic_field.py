@@ -6,7 +6,11 @@ import pytest
 
 from dmf_pulse.evaluation.artifacts import semantic_sha256
 from dmf_pulse.rank_strategy.errors import RankStrategyError
-from dmf_pulse.rank_strategy.models import ManagerMultiplierSet, SampleRightsStatus
+from dmf_pulse.rank_strategy.models import (
+    ManagerMultiplierSet,
+    SampleRightsStatus,
+    ScenarioManagerMultiplier,
+)
 from dmf_pulse.rank_strategy.synthetic_field import simulate_synthetic_overall_rank
 from dmf_pulse.rank_strategy.synthetic_models import (
     SyntheticApproximationStatus,
@@ -39,6 +43,15 @@ def _reseal_multiplier_set(value: ManagerMultiplierSet) -> ManagerMultiplierSet:
     return ManagerMultiplierSet(
         **payload,
         multiplier_set_hash=semantic_sha256(semantic_payload),
+    )
+
+
+def _reseal_multiplier(value: ScenarioManagerMultiplier) -> ScenarioManagerMultiplier:
+    payload = value.model_dump(mode="python", exclude={"multiplier_hash"})
+    semantic_payload = value.model_dump(mode="json", exclude={"multiplier_hash"})
+    return ScenarioManagerMultiplier(
+        **payload,
+        multiplier_hash=semantic_sha256(semantic_payload),
     )
 
 
@@ -203,8 +216,20 @@ def test_population_membership_plan_target_and_tie_policy_gates() -> None:
     assert exc_info.value.code == "RANK_SYNTHETIC_MANAGER_SET_MISMATCH"
 
     changed = list(values)
+    wrong_scenarios = tuple(
+        _reseal_multiplier(
+            scenario.model_copy(update={"plan_id": "wrong", "multiplier_hash": "0" * 64})
+        )
+        for scenario in changed[0].scenarios
+    )
     changed[0] = _reseal_multiplier_set(
-        changed[0].model_copy(update={"plan_id": "wrong", "multiplier_set_hash": "0" * 64})
+        changed[0].model_copy(
+            update={
+                "plan_id": "wrong",
+                "scenarios": wrong_scenarios,
+                "multiplier_set_hash": "0" * 64,
+            }
+        )
     )
     with pytest.raises(RankStrategyError) as exc_info:
         simulate_synthetic_overall_rank(population, tuple(changed), rank_tie_policy())

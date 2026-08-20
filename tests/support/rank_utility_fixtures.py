@@ -22,9 +22,10 @@ SCENARIO_WEIGHTS = {"s1|d1": 0.5, "s2|d2": 0.5}
 
 
 def rank_distribution(
-    plan_id: str,
+    _plan_id: str,
     pmf: dict[int, float],
     *,
+    population_size: int = 10,
     confidence: str = "A",
     raw_hash: str = RAW_HASH,
     scenario_hash: str = SCENARIO_HASH,
@@ -33,18 +34,28 @@ def rank_distribution(
         RankMass(rank=rank, probability=probability) for rank, probability in sorted(pmf.items())
     )
     expected_rank = sum(item.rank * item.probability for item in masses)
-    ordered: list[int] = []
-    for item in masses:
-        ordered.extend([item.rank] * max(1, round(item.probability * 100)))
-    median_rank = ordered[len(ordered) // 2]
+
+    def quantile(probability: float) -> int:
+        cumulative = 0.0
+        for mass in masses:
+            cumulative += mass.probability
+            if cumulative + 1e-15 >= probability:
+                return mass.rank
+        return masses[-1].rank
+
+    median_rank = quantile(0.5)
     percentiles = {
-        "p10": masses[0].rank,
-        "p25": masses[0].rank,
-        "p50": median_rank,
-        "p75": masses[-1].rank,
-        "p90": masses[-1].rank,
+        label: quantile(probability)
+        for label, probability in (
+            ("p10", 0.10),
+            ("p25", 0.25),
+            ("p50", 0.50),
+            ("p75", 0.75),
+            ("p90", 0.90),
+        )
     }
-    population_size = max(2, max(item.rank for item in masses))
+    if population_size < max(item.rank for item in masses):
+        raise ValueError("fixture population cannot be smaller than its PMF support")
     outcomes: list[MiniLeagueScenarioOutcome] = []
     for index, mass in enumerate(masses, start=1):
         scenario_id = f"rank-pmf-{index:03d}"
@@ -91,25 +102,31 @@ def rank_distribution(
                 ),
             )
         )
-    return RankDistribution(
-        target_manager_id="sebastian",
-        population_size=population_size,
-        scenario_set_hash=scenario_hash,
-        raw_projection_hash=raw_hash,
-        tie_policy_id="verified-classic",
-        target_rank=None,
-        rank_pmf=masses,
-        expected_rank=expected_rank,
-        median_rank=median_rank,
-        rank_percentiles=percentiles,
-        probability_target_rank=None,
-        mini_league_win_probability=sum(
+    payload = {
+        "target_manager_id": "sebastian",
+        "population_size": population_size,
+        "scenario_set_hash": scenario_hash,
+        "raw_projection_hash": raw_hash,
+        "tie_policy_id": "verified-classic",
+        "target_rank": None,
+        "rank_pmf": masses,
+        "expected_rank": expected_rank,
+        "median_rank": median_rank,
+        "rank_percentiles": percentiles,
+        "probability_target_rank": None,
+        "mini_league_win_probability": sum(
             (item.probability for item in masses if item.rank == 1),
             0.0,
         ),
-        outcomes=tuple(outcomes),
-        confidence=confidence,
-        distribution_hash=semantic_sha256({"plan_id": plan_id, "pmf": pmf}),
+        "outcomes": tuple(outcomes),
+        "confidence": confidence,
+    }
+    unsealed = RankDistribution.model_construct(**payload, distribution_hash="0" * 64)
+    return RankDistribution(
+        **payload,
+        distribution_hash=semantic_sha256(
+            unsealed.model_dump(mode="json", exclude={"distribution_hash"})
+        ),
     )
 
 
@@ -118,6 +135,7 @@ def candidate(
     expected_points: float,
     pmf: dict[int, float] | None = None,
     *,
+    population_size: int = 10,
     confidence: str = "A",
     leverage: float = 0.0,
     template_beta: float = 0.0,
@@ -152,6 +170,7 @@ def candidate(
             else rank_distribution(
                 plan_id,
                 pmf,
+                population_size=population_size,
                 confidence=confidence,
                 raw_hash=raw_hash,
                 scenario_hash=scenario_hash,

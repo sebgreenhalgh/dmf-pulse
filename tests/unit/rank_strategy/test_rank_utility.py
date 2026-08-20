@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from dmf_pulse.rank_strategy.errors import RankStrategyError
 from dmf_pulse.rank_strategy.rank_utility import evaluate_rank_strategy
 from dmf_pulse.rank_strategy.utility_models import (
     RankActivationStatus,
@@ -59,7 +60,7 @@ def test_target_rank_uses_points_floor_then_target_probability_lexicographically
     assert excluded.exclusion_reasons == ("POINTS_FLOOR_VIOLATION",)
 
 
-def test_target_probability_is_rederived_from_rank_pmf_not_cached_distribution_field() -> None:
+def test_tampered_cached_target_probability_fails_closed_before_utility() -> None:
     plan = candidate("target", 60.0, {1: 0.25, 2: 0.25, 5: 0.5})
     assert plan.rank_distribution is not None
     altered = plan.model_copy(
@@ -69,15 +70,16 @@ def test_target_probability_is_rederived_from_rank_pmf_not_cached_distribution_f
             )
         }
     )
-    result = evaluate_rank_strategy(
-        request_id="pmf",
-        objective=RankObjectiveMode.TARGET_RANK,
-        candidates=(altered,),
-        context=context(),
-        policy=policy(),
-        target=RankTargetDefinition(target_rank=2),
-    )
-    assert result.rank_optimal_metrics.probability_target == pytest.approx(0.5)
+    with pytest.raises(RankStrategyError) as exc_info:
+        evaluate_rank_strategy(
+            request_id="pmf",
+            objective=RankObjectiveMode.TARGET_RANK,
+            candidates=(altered,),
+            context=context(),
+            policy=policy(),
+            target=RankTargetDefinition(target_rank=2),
+        )
+    assert exc_info.value.code == "RANK_DISTRIBUTION_HASH_INVALID"
 
 
 def test_impossible_and_secure_targets_produce_zero_and_one_from_pmf() -> None:

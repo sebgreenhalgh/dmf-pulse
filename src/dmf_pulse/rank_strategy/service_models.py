@@ -9,6 +9,7 @@ from typing import Literal
 from pydantic import Field, StrictBool, StrictStr, model_validator
 
 from dmf_pulse.evaluation.artifacts import semantic_sha256
+from dmf_pulse.prices.models import ActivationStatus as PriceActivationStatus
 from dmf_pulse.prices.models import ConfidenceGrade, require_utc
 from dmf_pulse.rank_strategy.models import FiniteFloat, RankModel, SampleRightsStatus, Sha256
 from dmf_pulse.rank_strategy.utility_models import (
@@ -76,6 +77,7 @@ class RankServiceLineage(RankModel):
     stage11_manager_state: RankComponentIdentity
     stage12_plans: RankComponentIdentity
     stage13_prices: RankComponentIdentity | None = None
+    stage13_activation_statuses: tuple[PriceActivationStatus, ...] = ()
     stage14_chips: RankComponentIdentity | None = None
     effective_ownership_model: RankComponentIdentity
     cohort_model: RankComponentIdentity | None = None
@@ -107,6 +109,15 @@ class RankServiceLineage(RankModel):
         for component, value in expected_components.items():
             if value is not None and value.component is not component:
                 raise ValueError(f"rank lineage component identity mismatch: {component.value}")
+        expected_statuses = tuple(
+            sorted(set(self.stage13_activation_statuses), key=lambda item: item.value)
+        )
+        if self.stage13_activation_statuses != expected_statuses:
+            raise ValueError("Stage-13 activation statuses must be sorted and unique")
+        if self.stage13_prices is None and self.stage13_activation_statuses:
+            raise ValueError("Stage-13 statuses require a Stage-13 price component")
+        if self.stage13_prices is not None and not self.stage13_activation_statuses:
+            raise ValueError("Stage-13 price lineage requires its activation-status inventory")
         protected_hashes = {
             "raw_projection_hash": self.raw_projection_hash,
             "scenario_set_hash": self.scenario_set_hash,
@@ -270,6 +281,7 @@ class RankServiceResult(RankModel):
     rank_decision: RankStrategyDecision | None
     gate_report: RankGateReport
     confidence: ConfidenceGrade
+    stage13_activation_statuses: tuple[PriceActivationStatus, ...]
     diagnostic_output_available: StrictBool
     fail_closed_reasons: tuple[StrictStr, ...]
     raw_projection_hash: Sha256
@@ -281,6 +293,11 @@ class RankServiceResult(RankModel):
     def result_reconciles(self) -> RankServiceResult:
         if self.fail_closed_reasons != tuple(sorted(set(self.fail_closed_reasons))):
             raise ValueError("rank service fail-closed reasons must be sorted and unique")
+        expected_statuses = tuple(
+            sorted(set(self.stage13_activation_statuses), key=lambda item: item.value)
+        )
+        if self.stage13_activation_statuses != expected_statuses:
+            raise ValueError("rank result Stage-13 statuses must be sorted and unique")
         expected_difference = (
             self.rank_optimal_plan.candidate.expected_points
             - self.points_optimal_plan.candidate.expected_points

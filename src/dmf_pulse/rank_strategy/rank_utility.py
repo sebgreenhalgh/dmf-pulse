@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pydantic import ValidationError
+
 from dmf_pulse.evaluation.artifacts import semantic_sha256
 from dmf_pulse.prices.models import ConfidenceGrade
 from dmf_pulse.rank_strategy.errors import RankStrategyError
@@ -47,6 +49,23 @@ def _validate_rank_distribution_surface(candidate: RankPlanCandidate) -> None:
     distribution = candidate.rank_distribution
     if distribution is None:
         return
+    payload = distribution.model_dump(mode="json", exclude={"distribution_hash"})
+    if distribution.distribution_hash == "0" * 64 or (
+        distribution.distribution_hash != semantic_sha256(payload)
+    ):
+        raise RankStrategyError(
+            "RANK_DISTRIBUTION_HASH_INVALID",
+            "rank utility received an unsealed or mutated rank distribution",
+            plan_id=candidate.plan_id,
+        )
+    try:
+        type(distribution).model_validate(distribution.model_dump(mode="python"))
+    except ValidationError as exc:
+        raise RankStrategyError(
+            "RANK_DISTRIBUTION_INVALID",
+            "rank utility received a semantically invalid rank distribution",
+            plan_id=candidate.plan_id,
+        ) from exc
     ranks = tuple(item.rank for item in distribution.rank_pmf)
     if ranks != tuple(sorted(ranks)) or len(ranks) != len(set(ranks)):
         raise RankStrategyError(
@@ -120,6 +139,31 @@ def _require_common_projection_surface(
                 "RANK_SCENARIO_WEIGHT_INVARIANCE_VIOLATION",
                 "accepted utility candidates use different scenario weights",
                 plan_id=candidate.plan_id,
+            )
+    distributions = tuple(
+        item.rank_distribution for item in candidates if item.rank_distribution is not None
+    )
+    if distributions:
+        baseline_distribution = distributions[0]
+        baseline_rank_surface = (
+            type(baseline_distribution),
+            baseline_distribution.target_manager_id,
+            baseline_distribution.population_size,
+            baseline_distribution.tie_policy_id,
+        )
+        if any(
+            (
+                type(distribution),
+                distribution.target_manager_id,
+                distribution.population_size,
+                distribution.tie_policy_id,
+            )
+            != baseline_rank_surface
+            for distribution in distributions[1:]
+        ):
+            raise RankStrategyError(
+                "RANK_DISTRIBUTION_SURFACE_MISMATCH",
+                "accepted candidates use incomparable rank populations or tie policies",
             )
     return (
         baseline.raw_projection_hash,
@@ -306,6 +350,19 @@ def evaluate_rank_strategy(
                 reasons.append("EXACT_MINI_LEAGUE_DISTRIBUTION_REQUIRED")
             if probability is None:
                 reasons.append("TARGET_PROBABILITY_UNAVAILABLE")
+            target_boundary = (
+                None
+                if target is None
+                else (
+                    target.target_rank if target.target_rank is not None else target.band_worst_rank
+                )
+            )
+            if (
+                distribution is not None
+                and target_boundary is not None
+                and target_boundary > distribution.population_size
+            ):
+                reasons.append("TARGET_OUTSIDE_POPULATION")
         metrics = RankPlanMetrics(
             plan_id=candidate.plan_id,
             expected_points=candidate.expected_points,
@@ -397,6 +454,13 @@ def evaluate_rank_strategy(
         and rank_metrics.target_probability_gain + 1e-12 < policy.minimum_target_probability_gain
     ):
         activation_reasons.append("TARGET_GAIN_BELOW_MINIMUM")
+    if (
+        objective not in {RankObjectiveMode.PURE_POINTS, RankObjectiveMode.MEASURED_LEVERAGE}
+        and rank_optimal_evaluation.plan_id != points_optimal.plan_id
+        and rank_metrics.target_probability_gain is not None
+        and rank_metrics.target_probability_gain <= 1e-12
+    ):
+        activation_reasons.append("TARGET_NOT_DECISION_SENSITIVE")
 
     low_confidence = "RANK_CONFIDENCE_TOO_LOW" in activation_reasons
     human_review_required = bool(

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pytest
 
+from dmf_pulse.prices.models import ActivationStatus as PriceActivationStatus
+from dmf_pulse.prices.models import ConfidenceGrade
 from dmf_pulse.rank_strategy.errors import RankStrategyError
 from dmf_pulse.rank_strategy.service import (
     evaluate_opponent_actions,
@@ -33,10 +35,45 @@ def test_service_preserves_points_and_rank_optimal_plans_and_selects_rank() -> N
     assert result.raw_projection_hash == request.lineage.raw_projection_hash
     assert result.scenario_set_hash == request.lineage.scenario_set_hash
     assert result.projection_invariance.unchanged is True
+    assert result.fail_closed_reasons == ()
+
+
+@pytest.mark.parametrize(
+    "status",
+    [
+        PriceActivationStatus.SHADOW_ONLY,
+        PriceActivationStatus.TARGET_SEASON_UNCALIBRATED,
+        PriceActivationStatus.RIGHTS_BLOCKED,
+    ],
+)
+def test_stage13_limited_statuses_are_propagated_and_fail_closed(
+    status: PriceActivationStatus,
+) -> None:
+    result = evaluate_rank_plans(service_request(stage13_statuses=(status,)))
+
+    assert result.stage13_activation_statuses == (status,)
+    assert result.confidence is ConfidenceGrade.D
+    assert result.selected_plan.plan_id == result.points_optimal_plan.plan_id
+    if status is PriceActivationStatus.RIGHTS_BLOCKED:
+        assert "STAGE13_RIGHTS_BLOCKED_PROPAGATED" in result.fail_closed_reasons
+    else:
+        assert "RANK_CONFIDENCE_TOO_LOW" in result.fail_closed_reasons
     assert result.projection_invariance.before_score_hashes == (
         result.projection_invariance.after_score_hashes
     )
-    assert result.fail_closed_reasons == ()
+
+
+def test_stage13_component_requires_complete_activation_status_inventory() -> None:
+    request = service_request()
+    incomplete = request.model_copy(
+        update={
+            "lineage": request.lineage.model_copy(update={"stage13_activation_statuses": ()}),
+            "service_request_hash": "0" * 64,
+        }
+    )
+
+    with pytest.raises(ValueError, match="activation-status inventory"):
+        seal_rank_service_request(incomplete)
 
 
 def test_service_keeps_stage12_and_stage14_plan_bindings() -> None:

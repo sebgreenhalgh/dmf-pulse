@@ -125,3 +125,15 @@ def test_single_opponent_joint_distribution_is_valid_and_identical_to_source_vec
     actual = {scenario.action_ids["rival-a"]: scenario.probability for scenario in result.scenarios}
     expected = {item.action_id: item.probability for item in source.actions}
     assert actual == pytest.approx(expected)
+
+
+def test_joint_distribution_rejects_stale_source_distribution_hash() -> None:
+    source = _distribution("rival-a")
+    changed_action = source.actions[0].model_copy(
+        update={"probability": source.actions[0].probability + 0.01}
+    )
+    forged = source.model_copy(update={"actions": (changed_action, *source.actions[1:])})
+
+    with pytest.raises(RankStrategyError) as exc_info:
+        combine_opponent_action_distributions((forged,))
+    assert exc_info.value.code == "RANK_OPPONENT_DISTRIBUTION_HASH_INVALID"

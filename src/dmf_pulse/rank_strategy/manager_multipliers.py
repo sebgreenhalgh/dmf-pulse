@@ -17,27 +17,9 @@ from dmf_pulse.rank_strategy.models import (
 
 
 def raw_projection_hash(scenario_set: GameweekScenarioSet) -> str:
-    """Hash only unchanged Stage-9 football/FPL scenario truth."""
+    """Bind the complete unchanged Stage-9 projection and upstream event lineage."""
 
-    return semantic_sha256(
-        {
-            "gameweek_id": scenario_set.gameweek_id,
-            "ruleset_hash": scenario_set.ruleset_hash,
-            "player_ids": list(scenario_set.player_ids),
-            "scenarios": [
-                {
-                    "scenario_id": item.scenario_id,
-                    "outcome_draw_id": item.outcome_draw_id,
-                    "weight": item.weight,
-                    "fixture_ids": list(item.fixture_ids),
-                    "player_points": item.player_points,
-                    "player_minutes": item.player_minutes,
-                    "player_appeared": item.player_appeared,
-                }
-                for item in scenario_set.scenarios
-            ],
-        }
-    )
+    return semantic_sha256(scenario_set.model_dump(mode="json"))
 
 
 def shared_scenario_set_hash(scenario_set: GameweekScenarioSet) -> str:

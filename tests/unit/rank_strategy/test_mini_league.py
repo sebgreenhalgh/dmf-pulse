@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
+from dmf_pulse.evaluation.artifacts import semantic_sha256
 from dmf_pulse.rank_strategy.errors import RankStrategyError
 from dmf_pulse.rank_strategy.manager_multipliers import calculate_manager_multipliers
 from dmf_pulse.rank_strategy.mini_league import simulate_mini_league_rank
@@ -242,3 +243,71 @@ def test_invalid_target_rank_fails_with_stable_error() -> None:
             target_rank=0,
         )
     assert exc_info.value.code == "RANK_TARGET_INVALID"
+
+    with pytest.raises(RankStrategyError) as exc_info:
+        simulate_mini_league_rank(
+            exact_named_league(*plans),
+            _sets(plans, scenarios),
+            rank_tie_policy(),
+            target_manager_id="sebastian",
+            target_rank=3,
+        )
+    assert exc_info.value.code == "RANK_TARGET_INVALID"
+
+
+def test_exact_league_rejects_stale_nested_and_multiplier_set_hashes() -> None:
+    plans = (manager_plan("sebastian"), manager_plan("rival"))
+    scenarios = scenario_set()
+    values = list(_sets(plans, scenarios))
+
+    first = values[1].scenarios[0]
+    changed = first.model_copy(
+        update={
+            "gross_points": first.gross_points + 1,
+            "net_points": first.net_points + 1,
+        }
+    )
+    values[1] = values[1].model_copy(update={"scenarios": (changed,)})
+    with pytest.raises(RankStrategyError) as exc_info:
+        simulate_mini_league_rank(
+            exact_named_league(*plans),
+            tuple(values),
+            rank_tie_policy(),
+            target_manager_id="sebastian",
+        )
+    assert exc_info.value.code == "RANK_MINI_LEAGUE_SCENARIO_MULTIPLIER_HASH_INVALID"
+
+    values = list(_sets(plans, scenarios))
+    values[1] = values[1].model_copy(update={"expected_net_points": 999.0})
+    with pytest.raises(RankStrategyError) as exc_info:
+        simulate_mini_league_rank(
+            exact_named_league(*plans),
+            tuple(values),
+            rank_tie_policy(),
+            target_manager_id="sebastian",
+        )
+    assert exc_info.value.code == "RANK_MINI_LEAGUE_MULTIPLIER_SET_HASH_INVALID"
+
+
+def test_rank_distribution_rejects_resealed_pmf_not_derived_from_outcomes() -> None:
+    result = _simulate((manager_plan("sebastian"), manager_plan("rival")))
+    payload = result.model_dump(mode="python")
+    payload["rank_pmf"] = ({"rank": 2, "probability": 1.0},)
+    payload["expected_rank"] = 2.0
+    payload["median_rank"] = 2
+    payload["rank_percentiles"] = {
+        "p10": 2,
+        "p25": 2,
+        "p50": 2,
+        "p75": 2,
+        "p90": 2,
+    }
+    payload["probability_target_rank"] = 0.0
+    payload["mini_league_win_probability"] = 0.0
+    payload["distribution_hash"] = "0" * 64
+    unsealed = RankDistribution.model_construct(**payload)
+    payload["distribution_hash"] = semantic_sha256(
+        unsealed.model_dump(mode="json", exclude={"distribution_hash"})
+    )
+    with pytest.raises(ValidationError, match="derived from scenario outcomes"):
+        RankDistribution.model_validate(payload)

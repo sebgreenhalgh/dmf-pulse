@@ -5,6 +5,8 @@ from __future__ import annotations
 from itertools import product
 from math import exp, log, prod
 
+from pydantic import ValidationError
+
 from dmf_pulse.evaluation.artifacts import semantic_sha256
 from dmf_pulse.prices.models import ConfidenceGrade
 from dmf_pulse.rank_strategy.errors import RankStrategyError
@@ -247,7 +249,11 @@ def model_opponent_actions(
         distribution_hash="0" * 64,
     )
     payload = value.model_dump(mode="json", exclude={"distribution_hash"})
-    return value.model_copy(update={"distribution_hash": semantic_sha256(payload)})
+    return OpponentActionDistribution.model_validate(
+        value.model_copy(update={"distribution_hash": semantic_sha256(payload)}).model_dump(
+            mode="python"
+        )
+    )
 
 
 def combine_opponent_action_distributions(
@@ -281,6 +287,30 @@ def combine_opponent_action_distributions(
             "RANK_OPPONENT_JOINT_TEMPORAL_MISMATCH",
             "joint opponent distributions must share cutoff and deadline",
         )
+    verified: list[OpponentActionDistribution] = []
+    for distribution in ordered:
+        expected_hash = semantic_sha256(
+            distribution.model_dump(mode="json", exclude={"distribution_hash"})
+        )
+        if distribution.distribution_hash == "0" * 64 or (
+            distribution.distribution_hash != expected_hash
+        ):
+            raise RankStrategyError(
+                "RANK_OPPONENT_DISTRIBUTION_HASH_INVALID",
+                "joint opponent model received an unsealed or mutated source distribution",
+                manager_id=distribution.manager_id,
+            )
+        try:
+            verified.append(
+                OpponentActionDistribution.model_validate(distribution.model_dump(mode="python"))
+            )
+        except ValidationError as exc:
+            raise RankStrategyError(
+                "RANK_OPPONENT_DISTRIBUTION_HASH_INVALID",
+                "joint opponent model received an invalid source distribution",
+                manager_id=distribution.manager_id,
+            ) from exc
+    ordered = tuple(verified)
     scenario_count = 1
     for item in ordered:
         scenario_count *= len(item.actions)
@@ -320,4 +350,6 @@ def combine_opponent_action_distributions(
         joint_hash="0" * 64,
     )
     payload = value.model_dump(mode="json", exclude={"joint_hash"})
-    return value.model_copy(update={"joint_hash": semantic_sha256(payload)})
+    return JointOpponentActionDistribution.model_validate(
+        value.model_copy(update={"joint_hash": semantic_sha256(payload)}).model_dump(mode="python")
+    )

@@ -22,6 +22,7 @@ from pydantic import (
     model_validator,
 )
 
+from dmf_pulse.evaluation.artifacts import semantic_sha256
 from dmf_pulse.optimisation.models import AutosubEvent, CaptainResolution, TacticalConfiguration
 from dmf_pulse.prices.models import ConfidenceGrade
 
@@ -32,6 +33,14 @@ NonNegativeFloat = Annotated[StrictFloat, Field(ge=0.0, allow_inf_nan=False)]
 PositiveFloat = Annotated[StrictFloat, Field(gt=0.0, allow_inf_nan=False)]
 NonNegativeInt = Annotated[StrictInt, Field(ge=0)]
 PositiveInt = Annotated[StrictInt, Field(gt=0)]
+_ZERO_HASH = "0" * 64
+_PERCENTILES = (
+    ("p10", 0.10),
+    ("p25", 0.25),
+    ("p50", 0.50),
+    ("p75", 0.75),
+    ("p90", 0.90),
+)
 
 
 class RankModel(BaseModel):
@@ -198,6 +207,9 @@ class ScenarioManagerMultiplier(RankModel):
             raise ValueError("counted player IDs must match positive multipliers")
         if self.net_points != self.gross_points - self.transfer_hit_points:
             raise ValueError("net manager score must deduct transfer hits exactly once")
+        payload = self.model_dump(mode="json", exclude={"multiplier_hash"})
+        if self.multiplier_hash != _ZERO_HASH and self.multiplier_hash != semantic_sha256(payload):
+            raise ValueError("scenario manager multiplier hash does not reconcile")
         return self
 
 
@@ -219,6 +231,22 @@ class ManagerMultiplierSet(RankModel):
             raise ValueError("manager multiplier scenarios must be sorted and unique")
         if abs(sum(item.weight for item in self.scenarios) - 1.0) > 1e-10:
             raise ValueError("manager multiplier scenario weights must sum to one")
+        if any(
+            item.manager_id != self.manager_id or item.plan_id != self.plan_id
+            for item in self.scenarios
+        ):
+            raise ValueError("manager multiplier scenarios must match their manager and plan")
+        expected_gross = sum(item.weight * item.gross_points for item in self.scenarios)
+        expected_net = sum(item.weight * item.net_points for item in self.scenarios)
+        if abs(self.expected_gross_points - expected_gross) > 1e-10:
+            raise ValueError("expected gross points do not reconcile with multiplier scenarios")
+        if abs(self.expected_net_points - expected_net) > 1e-10:
+            raise ValueError("expected net points do not reconcile with multiplier scenarios")
+        payload = self.model_dump(mode="json", exclude={"multiplier_set_hash"})
+        if self.multiplier_set_hash != _ZERO_HASH and self.multiplier_set_hash != semantic_sha256(
+            payload
+        ):
+            raise ValueError("manager multiplier set hash does not reconcile")
         return self
 
 
@@ -285,6 +313,9 @@ class EffectiveOwnershipReport(RankModel):
         ids = tuple(item.player_id for item in self.entries)
         if ids != tuple(sorted(ids)) or len(ids) != len(set(ids)):
             raise ValueError("EO entries must be sorted and unique")
+        payload = self.model_dump(mode="json", exclude={"report_hash"})
+        if self.report_hash != _ZERO_HASH and self.report_hash != semantic_sha256(payload):
+            raise ValueError("effective ownership report hash does not reconcile")
         return self
 
 
@@ -352,6 +383,26 @@ class MiniLeagueScenarioOutcome(RankModel):
         expected_winners = tuple(item.manager_id for item in self.standings if item.rank == 1)
         if self.winner_manager_ids != expected_winners:
             raise ValueError("winner IDs must exactly match all managers sharing rank one")
+        final_state = {
+            item.manager_id: (item.final_points, item.counted_transfers) for item in self.standings
+        }
+        expected_ranks = {
+            manager_id: 1
+            + sum(
+                other_points > points or (other_points == points and other_transfers < transfers)
+                for other_id, (other_points, other_transfers) in final_state.items()
+                if other_id != manager_id
+            )
+            for manager_id, (points, transfers) in final_state.items()
+        }
+        rank_counts = {
+            rank: sum(value == rank for value in expected_ranks.values())
+            for rank in set(expected_ranks.values())
+        }
+        if any(item.rank != expected_ranks[item.manager_id] for item in self.standings):
+            raise ValueError("mini-league standing ranks do not reconcile with points and ties")
+        if any(item.shared_rank != (rank_counts[item.rank] > 1) for item in self.standings):
+            raise ValueError("mini-league shared-rank flags do not reconcile")
         return self
 
 
@@ -387,8 +438,24 @@ class RankDistribution(RankModel):
         expected = sum(item.rank * item.probability for item in self.rank_pmf)
         if abs(self.expected_rank - expected) > 1e-10:
             raise ValueError("expected rank does not reconcile with rank PMF")
-        if tuple(self.rank_percentiles) != tuple(sorted(self.rank_percentiles)):
-            raise ValueError("rank percentile keys must be sorted")
+        if tuple(self.rank_percentiles) != tuple(label for label, _ in _PERCENTILES):
+            raise ValueError("rank percentiles must use the canonical keys")
+
+        def quantile(probability: float) -> int:
+            cumulative = 0.0
+            for item in self.rank_pmf:
+                cumulative += item.probability
+                if cumulative + 1e-15 >= probability:
+                    return item.rank
+            return self.rank_pmf[-1].rank
+
+        expected_percentiles = {label: quantile(probability) for label, probability in _PERCENTILES}
+        if self.rank_percentiles != expected_percentiles:
+            raise ValueError("rank percentiles must be derived from the rank PMF")
+        if self.median_rank != expected_percentiles["p50"]:
+            raise ValueError("median rank must be derived from the rank PMF")
+        if self.target_rank is not None and self.target_rank > self.population_size:
+            raise ValueError("target rank lies outside the represented population")
         target_probability = (
             None
             if self.target_rank is None
@@ -404,4 +471,28 @@ class RankDistribution(RankModel):
             raise ValueError("rank outcomes must be sorted by unique shared scenario identity")
         if abs(sum(item.weight for item in self.outcomes) - 1.0) > 1e-10:
             raise ValueError("rank outcome weights must sum to one")
+        outcome_pmf: dict[int, float] = {}
+        for outcome in self.outcomes:
+            if len(outcome.standings) != self.population_size:
+                raise ValueError("rank outcome standings must cover the represented population")
+            targets = tuple(
+                item for item in outcome.standings if item.manager_id == self.target_manager_id
+            )
+            if len(targets) != 1:
+                raise ValueError("rank outcome must contain the target manager exactly once")
+            target_outcome_rank = targets[0].rank
+            outcome_pmf[target_outcome_rank] = (
+                outcome_pmf.get(target_outcome_rank, 0.0) + outcome.weight
+            )
+        expected_pmf = tuple(
+            RankMass(rank=rank, probability=probability)
+            for rank, probability in sorted(outcome_pmf.items())
+        )
+        if self.rank_pmf != expected_pmf:
+            raise ValueError("rank PMF must be derived from scenario outcomes")
+        payload = self.model_dump(mode="json", exclude={"distribution_hash"})
+        if self.distribution_hash != _ZERO_HASH and self.distribution_hash != semantic_sha256(
+            payload
+        ):
+            raise ValueError("rank distribution hash does not reconcile")
         return self

@@ -9,6 +9,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field, StrictBool, StrictFloat, StrictStr, model_validator
 
+from dmf_pulse.evaluation.artifacts import semantic_sha256
 from dmf_pulse.prices.models import ConfidenceGrade
 from dmf_pulse.rank_strategy.models import (
     FiniteFloat,
@@ -22,6 +23,8 @@ from dmf_pulse.rank_strategy.models import (
     SampleRightsStatus,
     Sha256,
 )
+
+_ZERO_HASH = "0" * 64
 
 
 class OpponentChipAction(StrEnum):
@@ -228,6 +231,11 @@ class OpponentActionDistribution(RankModel):
         expected_normalised_entropy = expected_entropy / log(len(self.actions))
         if abs(self.normalised_entropy - expected_normalised_entropy) > 1e-10:
             raise ValueError("normalised entropy must reconcile with the action probability vector")
+        payload = self.model_dump(mode="json", exclude={"distribution_hash"})
+        if self.distribution_hash != _ZERO_HASH and self.distribution_hash != semantic_sha256(
+            payload
+        ):
+            raise ValueError("opponent action distribution hash does not reconcile")
         return self
 
 
@@ -288,4 +296,9 @@ class JointOpponentActionDistribution(RankModel):
             raise ValueError("joint opponent scenario probabilities must sum to one")
         if any(tuple(item.action_ids) != self.manager_ids for item in self.scenarios):
             raise ValueError("every joint scenario must contain every represented manager")
+        if any(value == _ZERO_HASH for value in self.source_distribution_hashes.values()):
+            raise ValueError("joint opponent sources cannot use unsealed hash sentinels")
+        payload = self.model_dump(mode="json", exclude={"joint_hash"})
+        if self.joint_hash != _ZERO_HASH and self.joint_hash != semantic_sha256(payload):
+            raise ValueError("joint opponent distribution hash does not reconcile")
         return self

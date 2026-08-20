@@ -97,6 +97,24 @@ def _validate_exact_league(
                 "manager scenario identities and weights must be identical",
                 manager_id=item.manager_id,
             )
+    for multiplier_set in multiplier_sets:
+        for scenario in multiplier_set.scenarios:
+            payload = scenario.model_dump(mode="json", exclude={"multiplier_hash"})
+            if scenario.multiplier_hash != semantic_sha256(payload):
+                raise RankStrategyError(
+                    "RANK_MINI_LEAGUE_SCENARIO_MULTIPLIER_HASH_INVALID",
+                    "exact mini-league received a mutated scenario multiplier",
+                    manager_id=multiplier_set.manager_id,
+                    scenario_id=scenario.scenario_id,
+                    outcome_draw_id=scenario.outcome_draw_id,
+                )
+        payload = multiplier_set.model_dump(mode="json", exclude={"multiplier_set_hash"})
+        if multiplier_set.multiplier_set_hash != semantic_sha256(payload):
+            raise RankStrategyError(
+                "RANK_MINI_LEAGUE_MULTIPLIER_SET_HASH_INVALID",
+                "exact mini-league received a mutated manager multiplier set",
+                manager_id=multiplier_set.manager_id,
+            )
     return set_by_manager, baseline.scenario_set_hash, baseline.raw_projection_hash
 
 
@@ -127,6 +145,13 @@ def simulate_mini_league_rank(
         tie_policy,
         target_manager_id,
     )
+    if target_rank is not None and target_rank > len(set_by_manager):
+        raise RankStrategyError(
+            "RANK_TARGET_INVALID",
+            "target rank must lie inside the exact mini-league population",
+            target_rank=target_rank,
+            population_size=len(set_by_manager),
+        )
     plans = {member.manager_plan.manager_id: member.manager_plan for member in sample.members}
     scenario_maps = {
         manager_id: {
@@ -211,4 +236,8 @@ def simulate_mini_league_rank(
         distribution_hash="0" * 64,
     )
     payload = result.model_dump(mode="json", exclude={"distribution_hash"})
-    return result.model_copy(update={"distribution_hash": semantic_sha256(payload)})
+    return RankDistribution.model_validate(
+        result.model_copy(update={"distribution_hash": semantic_sha256(payload)}).model_dump(
+            mode="python"
+        )
+    )

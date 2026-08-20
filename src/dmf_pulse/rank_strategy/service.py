@@ -14,6 +14,7 @@ from pydantic import ValidationError
 from dmf_pulse.evaluation.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.models import GameweekScenarioSet
 from dmf_pulse.optimisation.models import CandidatePlayer, OneGameweekRulesView
+from dmf_pulse.prices.models import ActivationStatus as PriceActivationStatus
 from dmf_pulse.prices.models import ConfidenceGrade
 from dmf_pulse.rank_strategy.effective_ownership import calculate_effective_ownership
 from dmf_pulse.rank_strategy.errors import RankStrategyError
@@ -69,6 +70,13 @@ _CONFIDENCE_ORDER = {
     ConfidenceGrade.C: 2,
     ConfidenceGrade.D: 3,
     ConfidenceGrade.E: 4,
+}
+_LIMITED_PRICE_STATUSES = {
+    PriceActivationStatus.SHADOW_ONLY,
+    PriceActivationStatus.TARGET_SEASON_UNCALIBRATED,
+    PriceActivationStatus.RIGHTS_BLOCKED,
+    PriceActivationStatus.INSUFFICIENT_EVENTS,
+    PriceActivationStatus.CALIBRATION_BLOCKED,
 }
 
 
@@ -281,6 +289,8 @@ def _worst_confidence(
     values = [request.context.rank_model_confidence]
     if decision is not None and decision.rank_optimal_metrics.confidence is not None:
         values.append(decision.rank_optimal_metrics.confidence)
+    if _LIMITED_PRICE_STATUSES.intersection(request.lineage.stage13_activation_statuses):
+        values.append(ConfidenceGrade.D)
     return max(values, key=_CONFIDENCE_ORDER.__getitem__)
 
 
@@ -299,6 +309,9 @@ def _build_gate_report(
     target_passed, target_reason = _target_gate_passes(request)
     confidence = _worst_confidence(request, decision)
     fallback = set(() if decision is None else decision.fallback_reasons)
+    price_rights_valid = (
+        PriceActivationStatus.RIGHTS_BLOCKED not in request.lineage.stage13_activation_statuses
+    )
     checks = (
         _gate(
             RankGateName.RULES,
@@ -315,8 +328,16 @@ def _build_gate_report(
         _gate(
             RankGateName.RIGHTS,
             required=rank_required,
-            passed=request.context.rights_valid and request.lineage.rights_status.permitted,
-            reason="RANK_SAMPLE_RIGHTS_INVALID",
+            passed=(
+                request.context.rights_valid
+                and request.lineage.rights_status.permitted
+                and price_rights_valid
+            ),
+            reason=(
+                "RANK_SAMPLE_RIGHTS_INVALID"
+                if price_rights_valid
+                else "STAGE13_RIGHTS_BLOCKED_PROPAGATED"
+            ),
         ),
         _gate(
             RankGateName.COHORT,
@@ -492,6 +513,7 @@ def evaluate_rank_plans(request: RankServiceRequest) -> RankServiceResult:
         rank_decision=decision,
         gate_report=gate_report,
         confidence=_worst_confidence(checked, decision),
+        stage13_activation_statuses=checked.lineage.stage13_activation_statuses,
         diagnostic_output_available=diagnostic_available,
         fail_closed_reasons=tuple(sorted(reasons)),
         raw_projection_hash=checked.lineage.raw_projection_hash,
