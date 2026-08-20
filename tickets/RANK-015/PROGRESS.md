@@ -6,7 +6,7 @@
 - Engineering status: `REVIEW_READY_PENDING_HUMAN_ACCEPTANCE`
 - Production activation: `FAIL_CLOSED_TO_PURE_POINTS`
 - Human acceptance: `false`
-- Pull request: draft pending final publication
+- Pull request: draft [#15](https://github.com/sebgreenhalgh/dmf-pulse/pull/15)
 - Merge: none
 - Accepted tag: none
 
@@ -173,4 +173,5 @@
 - Ruff format/lint, strict mypy, repository validation, secret scan, Hatchling sdist/wheel build and clean external-wheel CLI: PASS.
 - Temporary Stage-15 workflows and `recovery/stage1505`, `recovery/stage1506`: REMOVED.
 - `FULL_REPOSITORY_PYTEST = RESOURCE_LIMIT` after the single bounded independent attempt.
-- PR / merge / tag / human acceptance: none.
+- Draft PR: [#15](https://github.com/sebgreenhalgh/dmf-pulse/pull/15); merge, tag and human
+  acceptance: none.

@@ -106,4 +106,10 @@ Tree hygiene:
 - test-created ACL-inaccessible .test-tmp moved outside repository to the named OS temp path
 - final repository tree: clean of temporary implementation machinery
 
+Draft pull request:
+base: main
+head: stage/A15/RANK-015-rank-aware-strategy
+title: Stage 15: rank-aware strategy
+RESULT: https://github.com/sebgreenhalgh/dmf-pulse/pull/15; draft YES; merged NO
+
 FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL

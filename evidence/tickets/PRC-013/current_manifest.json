@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 77204,
+      "bytes": 77868,
       "path": "PLANS.md",
-      "sha256": "451166ba252c0e979b04554d1616bd5bdcf8c05d199f94f3c4c3afad533f870f"
+      "sha256": "67b172c406b1b6bc9335fbe4442a0caca307ace52c3118a2aa7b0ac1eb7bc924"
     },
     {
       "bytes": 2761,
@@ -3646,9 +3646,9 @@
       "sha256": "bc888e4149e9f61d3dfc930cb29827a401ca3097c0290015f47fa71697e043ee"
     },
     {
-      "bytes": 6628,
+      "bytes": 6731,
       "path": "src/dmf_pulse/rank_strategy/effective_ownership.py",
-      "sha256": "98b41ab89b190de0e3480cf635c0e9a506daebc44cdfc209216b95965a308943"
+      "sha256": "0e77d70370f89b36b72d9122a6beb7ccd3c9330a00c5b0d5251be6c253cb7137"
     },
     {
       "bytes": 637,
@@ -3656,29 +3656,29 @@
       "sha256": "52a06e46cf9ba5ca24ce6080f6250631da04490f8d67619f0212adc9457f5376"
     },
     {
-      "bytes": 6950,
+      "bytes": 6550,
       "path": "src/dmf_pulse/rank_strategy/manager_multipliers.py",
-      "sha256": "086136981c187762c626d890d434af763789ec4998a5242a94cf5e885ed79ecf"
+      "sha256": "a73729d2cd284946f5e6bad8cba7cdcfbb027f1427f083c255401f621a9394d3"
     },
     {
-      "bytes": 8639,
+      "bytes": 10166,
       "path": "src/dmf_pulse/rank_strategy/mini_league.py",
-      "sha256": "5b93b0972cb6a0348498d4ee83c211cc1d3f4fa969352767e647f470d10f91c7"
+      "sha256": "c90b460cdb80a7edfff2b4a7740d273c7e222c461c9693782a1a3294ff0ef5f4"
     },
     {
-      "bytes": 17327,
+      "bytes": 23066,
       "path": "src/dmf_pulse/rank_strategy/models.py",
-      "sha256": "49aae028af020ba67f1ced19c6119d9e74fb3ce737aae72b0310202424c16db3"
+      "sha256": "d984f55bf3d247783a39e8b69b0edf8591c10e6082e7d5f8570b69856de604c3"
     },
     {
-      "bytes": 13784,
+      "bytes": 15089,
       "path": "src/dmf_pulse/rank_strategy/opponent_actions.py",
-      "sha256": "a671448e6d7675f64fa2e6a9b1c900529b67bb78133a4b65531fcaab3154f722"
+      "sha256": "416eee9c8b673a94e2cc630af463d0e4b289af4ecd367091217056fd0cfb78d3"
     },
     {
-      "bytes": 14033,
+      "bytes": 15067,
       "path": "src/dmf_pulse/rank_strategy/opponent_models.py",
-      "sha256": "363884779781b5a9566cce1564812be496b035826ad4e1b7364b21988312731b"
+      "sha256": "d6e55aee7e39a523be1a6bc907878a1a0bc9f78b1b8a22c093254f9e52da3b00"
     },
     {
       "bytes": 1110,
@@ -3691,19 +3691,19 @@
       "sha256": "e92407419e1e266d09802be2a4481b638d39af9f21a1eea3b3a0ce2a99c68764"
     },
     {
-      "bytes": 20463,
+      "bytes": 23152,
       "path": "src/dmf_pulse/rank_strategy/rank_utility.py",
-      "sha256": "5b0ee8901c5861fb1437db599e0c3ad14f3558c96092d7ce6c316254447b666a"
+      "sha256": "972f2ecb0cea6fad7b60c2be215fc2bcbb8c75b18f573155fbf99132d2996e95"
     },
     {
-      "bytes": 22577,
+      "bytes": 23468,
       "path": "src/dmf_pulse/rank_strategy/service.py",
-      "sha256": "83e1cff6795717bf9c21654bf75708f5885d26c17535b6e4bc0783bba02e7fa0"
+      "sha256": "c62db21fd2d6339c0812db6375f6f463428e37cb3837a818a549d7d3e845452b"
     },
     {
-      "bytes": 19075,
+      "bytes": 20629,
       "path": "src/dmf_pulse/rank_strategy/service_models.py",
-      "sha256": "909a05c44f5d5283ceb74dc36cb8475a53009fc4428e1db872bb094d7242f56a"
+      "sha256": "913d1d613b1958f52215bf3fc70aa27c5a7dc8b50aba7f2d0d7aeffd2becc3ee"
     },
     {
       "bytes": 16627,
@@ -3711,9 +3711,9 @@
       "sha256": "8eea3342b30a0065995adfa1a2f92692dd09fa2fb8802355b84d3953191a5f84"
     },
     {
-      "bytes": 18619,
+      "bytes": 19861,
       "path": "src/dmf_pulse/rank_strategy/synthetic_models.py",
-      "sha256": "17633ae5593c12d0cd010ba931b224acc838d51c1957ad171ec75895f11a7002"
+      "sha256": "1dff909f568026a3ce39a0274050fa2eb6eca215c4da89a8b1762090ff00e0e7"
     },
     {
       "bytes": 17383,
@@ -4616,9 +4616,9 @@
       "sha256": "cc10a43061093ca5ba50fa6f60e40c5aadae9ccacd2e605ce38234c7df41e418"
     },
     {
-      "bytes": 5994,
+      "bytes": 6288,
       "path": "tests/support/rank_service_fixtures.py",
-      "sha256": "49742e9c764e0aebe7fd5ca7176b2d1b86506fe72b29f82390a543466fd1eb2d"
+      "sha256": "d393a57493b6c353bd8ece913096ee36fac4732854061e8de96a19abbbec7bbc"
     },
     {
       "bytes": 8375,
@@ -4631,9 +4631,9 @@
       "sha256": "9aaccd07113e343a7c6f7fb4ee6fcb273d1ca6864192564dbb5354a3dbf5ff08"
     },
     {
-      "bytes": 6877,
+      "bytes": 7511,
       "path": "tests/support/rank_utility_fixtures.py",
-      "sha256": "c47aa6f67135845e27e8e604067e659a69e77b21d9d2366fac3578e7ab5cac5d"
+      "sha256": "367babd241ad8b5fd85a70a3ef3582c103a4fb6da8467c9ebf0e0070f6ac909f"
     },
     {
       "bytes": 442,
@@ -4956,9 +4956,9 @@
       "sha256": "08dda00ff7c979dbfb2bbc281c7f58aebd920c3b71fc37926ac44a55dd2e3d76"
     },
     {
-      "bytes": 10264,
+      "bytes": 11044,
       "path": "tests/unit/cli/test_rank_cli.py",
-      "sha256": "1545f56a67da213c444d204af02e1826c200bffd7676132b7ecc90dbf60ce62c"
+      "sha256": "60cfbabb26971459f9f48cb17651f3dfd54038c4db56533775ade941d1205a9c"
     },
     {
       "bytes": 9905,
@@ -5331,19 +5331,19 @@
       "sha256": "8be5c8a7589f47cef571e9f592295180d0b90c43c0f7326ae89c87cf15df60dc"
     },
     {
-      "bytes": 5157,
+      "bytes": 5680,
       "path": "tests/unit/rank_strategy/test_joint_opponent_actions.py",
-      "sha256": "f1ada74f4e98c460f187a9559891c3a5ae51c89d9e2c3b28f51ccc271dcd01ae"
+      "sha256": "81c87aa4d07ddccafa43b8853af2edfc58ef12652c8dec990a382001db22122a"
     },
     {
-      "bytes": 4073,
+      "bytes": 4820,
       "path": "tests/unit/rank_strategy/test_manager_multipliers.py",
-      "sha256": "b0e7448c2e5d1ef45468e30a809f59ee2a6140d2e205eb4269ed75979b6b4e5f"
+      "sha256": "0f821da79b274cb7a5d88284afbd28e758bab62d5616485c0343983ef99bc025"
     },
     {
-      "bytes": 8798,
+      "bytes": 11906,
       "path": "tests/unit/rank_strategy/test_mini_league.py",
-      "sha256": "291cf8c08a88e2da17fb2d2b88f14cb181cf5a78525ccfbcee44cd91e05d2eab"
+      "sha256": "569e4845243568bd22d49458810df70eba1b08bcc7bd669974d050bad48aaecc"
     },
     {
       "bytes": 8615,
@@ -5351,14 +5351,14 @@
       "sha256": "c8c163fd15526b6cee41a5570d4c11adb6d9668971a8943910c7e7fb2e4e019b"
     },
     {
-      "bytes": 11429,
+      "bytes": 11999,
       "path": "tests/unit/rank_strategy/test_opponent_contracts.py",
-      "sha256": "c705eedac4851b3a69887ec0c7af2ff43e109f332161aadfcb97d5d34fb254d9"
+      "sha256": "0d56829664a02e3e98fa153f66260d9eac87273e243143299dc74ec3d4280515"
     },
     {
-      "bytes": 9193,
+      "bytes": 11086,
       "path": "tests/unit/rank_strategy/test_rank_utility.py",
-      "sha256": "899f84b52b03e9cb3497f3ef48afff105dc7b8e9905e5a4cf7197663e750fbba"
+      "sha256": "25ef702a1a8447f16c169112369a549aa29227ad6c6f7b14c174c1076161f62b"
     },
     {
       "bytes": 5437,
@@ -5366,19 +5366,19 @@
       "sha256": "d1707f6b1758762921f2cd22b2d8321381f6ffb2781c582e58defcb96f4eacde"
     },
     {
-      "bytes": 9759,
+      "bytes": 11956,
       "path": "tests/unit/rank_strategy/test_rank_utility_gates.py",
-      "sha256": "7fe46cc5dc245853c9da6a62bfebbd48bdc4931e78b6f431bc16fc2bc1aaf7e8"
+      "sha256": "5ab257b08c3d6d677f77514c867ed08cb9279ba9fe315a912936ca6bba36873f"
     },
     {
-      "bytes": 11441,
+      "bytes": 12818,
       "path": "tests/unit/rank_strategy/test_service.py",
-      "sha256": "63800f5ac3d9c742f2dad2547234ebce33da180868bce47fa29958121cfa698b"
+      "sha256": "534239b23cab0624550ecfb81903ba8f96d8810bb5c77536d1f5aa4d663ee2b2"
     },
     {
-      "bytes": 12783,
+      "bytes": 13842,
       "path": "tests/unit/rank_strategy/test_service_model_guards.py",
-      "sha256": "4830104a54d015b18d5dc501f05a306057cce681252de29b372eda0e2e5ed5ce"
+      "sha256": "6904192e8122f5890c0806d46c5df1a165495534c751aa03be5d922ffb429015"
     },
     {
       "bytes": 7191,
@@ -5386,14 +5386,14 @@
       "sha256": "68ab9a4828e7aae34d3af1decac813bee7a1ae28be3a32c75a1046769839ffc4"
     },
     {
-      "bytes": 13468,
+      "bytes": 14203,
       "path": "tests/unit/rank_strategy/test_synthetic_field.py",
-      "sha256": "7d0eeb8ad6d36332a8f44382435b038a31ae72397c27519bd04ff3596ab7bb2b"
+      "sha256": "42f55a37b0531a9d451a47ff0fea726bd6f2ec41894f95fa37be8ab9130edaf0"
     },
     {
-      "bytes": 14781,
+      "bytes": 15743,
       "path": "tests/unit/rank_strategy/test_synthetic_model_guards.py",
-      "sha256": "8e92f140a5095fc77e7271cef969a2e024565c2127a49ebdd31aefc25110a940"
+      "sha256": "0649e4be058d07db1c874e8daede3fb93ea01f988851b2ed42e66a5f5786665f"
     },
     {
       "bytes": 10790,
@@ -5611,9 +5611,9 @@
       "sha256": "97d54728b7af2ff329edc05f50b8b8f47f9f4aa0294f2843688913c1107d0172"
     },
     {
-      "bytes": 12263,
+      "bytes": 13808,
       "path": "tickets/RANK-015/PROGRESS.md",
-      "sha256": "4645d6de1104af01311d9133cc272a547266bb0f10c9281ad9b9f2ef7814e934"
+      "sha256": "93d22de0539e9b22681dde095b1d18650b158307f7e4db490fe8d5285ef3cbbb"
     },
     {
       "bytes": 4490,

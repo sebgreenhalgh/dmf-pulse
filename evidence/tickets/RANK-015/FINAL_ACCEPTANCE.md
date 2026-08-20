@@ -84,8 +84,8 @@ Legitimate repository CI was retained.
 
 - `FULL_REPOSITORY_PYTEST = RESOURCE_LIMIT` after the single bounded independent attempt.
 - Target-season rank activation remains conditional on verified rules, lawful data, valid cohort/opponent models and confidence gates.
-- Draft PR creation is pending final review publication; merge, tag and human acceptance remain
-  absent.
+- Draft PR [#15](https://github.com/sebgreenhalgh/dmf-pulse/pull/15) is open; merge, tag and
+  human acceptance remain absent.
 
 ## Independent Sol review addendum
 
@@ -112,3 +112,5 @@ Legitimate repository CI was retained.
 - Verdict: `PASS_WITH_NONBLOCKING_LIMITATIONS`.
 - Detailed findings, regressions and limitations are in `INDEPENDENT_SOL_REVIEW.md`.
 - Human acceptance, merge and accepted tag remain pending.
+- Draft PR: [#15](https://github.com/sebgreenhalgh/dmf-pulse/pull/15); `draft = YES`,
+  `merged = NO`.

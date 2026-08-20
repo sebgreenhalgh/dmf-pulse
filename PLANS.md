@@ -953,14 +953,14 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] 15.04 implement points-floor target/rank utilities and plan diagnostics.
 - [x] 15.05 implement rights-gated synthetic weighted overall-rank cohorts.
 - [x] 15.06 implement Stage-12/13/14 re-evaluation, fail-closed service, CLI and evidence.
-- [ ] Complete adversarial self-review, final Stage-15 validation and clean remote equality.
+- [x] Complete adversarial self-review, final Stage-15 validation and clean remote equality.
 
 ## RANK-015 independent Sol review
 
 - [x] Verify exact pre-review remote lineage and immutable merge base.
 - [x] Reconcile the supplied Stage-15 documents with repository-approved authority hashes.
-- [ ] Independently audit all six checkpoints, public contracts, oracles, gates, artifacts and CLI.
-- [ ] Remediate every valid P0/P1/material P2 with focused regression coverage.
-- [ ] Run the complete Stage-15 branch-coverage matrix and affected inherited regressions.
-- [ ] Run one bounded full-repository pytest attempt and all static/build/clean-wheel gates.
-- [ ] Publish truthful review evidence, verify final remote equality and open the unmerged draft PR.
+- [x] Independently audit all six checkpoints, public contracts, oracles, gates, artifacts and CLI.
+- [x] Remediate every valid P0/P1/material P2 with focused regression coverage.
+- [x] Run the complete Stage-15 branch-coverage matrix and affected inherited regressions.
+- [x] Run one bounded full-repository pytest attempt and all static/build/clean-wheel gates.
+- [x] Publish truthful review evidence, verify final remote equality and open the unmerged draft PR.

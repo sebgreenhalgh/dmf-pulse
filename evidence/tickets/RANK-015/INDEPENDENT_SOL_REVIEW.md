@@ -87,8 +87,10 @@ existing chip, synthetic and artifact tests. P3 findings: none.
 - Repository validation: PASS (`error_count: 0`).
 - First-party secret scan: PASS (`finding_count: 0`).
 
-Draft PR identity is recorded after remote publication. Human acceptance and merge remain separate
-and pending.
+- Draft PR: [#15](https://github.com/sebgreenhalgh/dmf-pulse/pull/15).
+- Draft: `YES`; merged: `NO`.
+
+Human acceptance and merge remain separate and pending.
 
 ## Verdict
 
