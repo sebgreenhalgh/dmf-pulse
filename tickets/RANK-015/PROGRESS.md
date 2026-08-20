@@ -38,7 +38,7 @@
 | 15.01 manager multipliers / EO | COMPLETE / REMOTE | `77f2cd2c57649a224bc7908128163b498d5b8bd5` | `39 passed`; 99% branch coverage; 11 inherited passed |
 | 15.02 exact named mini-league | COMPLETE / REMOTE | `bf0ebb29e9af4f33f4a9575222da61021c9df748` | `53 passed`; 95% branch coverage; exact 2/3/4-manager oracle PASS |
 | 15.03 baseline opponent model | COMPLETE / REMOTE | `a5b3e2a5f852dbde1f5b3ca4c8a91b1f60694868` | `123 passed`; 95.92% branch coverage; 11 inherited passed |
-| 15.04 target / rank utility | IN_PROGRESS | — | — |
+| 15.04 target / rank utility | COMPLETE / REMOTE | `bc03b1f7b020835b2b36896cc39d58a84b8808a4` | `127 passed`; 92.13% branch coverage; projection invariance and fail-closed gates PASS |
 | 15.05 synthetic overall cohort | NOT_STARTED | — | — |
 | 15.06 service / CLI / evidence | NOT_STARTED | — | — |
 
@@ -91,3 +91,18 @@
 - Inherited accepted-interface regressions: `11 passed in 1.59s`.
 - Ruff focused: PASS. Strict mypy for `src/dmf_pulse/rank_strategy`: PASS.
 - Remote source blob hashes for the opponent contracts/service matched the tested local files; stale transport request was removed before checkpoint sealing.
+
+## Checkpoint 15.04 evidence
+
+- Preserved both the points-optimal and rank-optimal plans and selected rank utility only through explicit lexicographic/epsilon policy; no weighted points/rank sum was introduced.
+- Implemented PURE_POINTS, MEASURED_LEVERAGE, TARGET_RANK, RANK_PROTECTION, MINI_LEAGUE_WIN, RANK_BAND and PRIZE_BAND evaluation surfaces.
+- Re-derived expected rank, P(target) and mini-league win probability from the sealed rank PMF and rejected noncanonical, unnormalised or out-of-population PMFs.
+- Enforced the configured expected-points floor, measured expected-points sacrifice and target-probability gain, and retained template beta, tracking error and confidence diagnostics.
+- Added explicit selected-target activation, candidate-level confidence and semantic scenario-score hash gates; post-validation mutation and invalid target surfaces fail closed to PURE_POINTS.
+- Early season defaults to PURE_POINTS; being behind does not force variance, being ahead does not force template matching, and ownership alone has no positive or negative utility.
+- Projection-invariance evidence proves the common raw-projection hash and scenario-set hash are unchanged across points and rank modes.
+- Corrected two genuine inherited defects exposed by the resumed work: future-feature leakage was masked by future-action validation order, and several tests mutated serialised dictionaries as if they were Pydantic models. Regression tests now preserve distinct temporal diagnostics.
+- Focused Stage-15 matrix: `127 passed in 2.18s`.
+- Checkpoint-scoped Stage-15 branch coverage: `92.13%`; the deliberately unfinished 15.05 synthetic module was excluded from this checkpoint-only denominator.
+- Ruff focused: PASS. Strict mypy for `src/dmf_pulse/rank_strategy`: PASS. `git diff --check`: PASS.
+- Exact local/remote sealed capability SHA equality: `bc03b1f7b020835b2b36896cc39d58a84b8808a4`.
