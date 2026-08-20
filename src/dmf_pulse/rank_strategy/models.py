@@ -293,3 +293,115 @@ class ProjectionInvarianceResult(RankModel):
     points_mode_hash: Sha256
     rank_mode_hash: Sha256
     code: Literal["RAW_PROJECTIONS_IDENTICAL", "RAW_PROJECTIONS_DIFFER"]
+
+
+class RankTiePolicy(RankModel):
+    """Versioned classic-rank tie mechanics required by exact simulation."""
+
+    schema_version: Literal["rank-tie-policy-v1"] = "rank-tie-policy-v1"
+    policy_id: StrictStr = Field(min_length=1, max_length=200)
+    target_season: StrictStr = Field(min_length=1, max_length=20)
+    rules_verified: StrictBool
+    points_primary: Literal[True] = True
+    fewer_counted_transfers_breaks_points_ties: Literal[True] = True
+    equal_points_and_counted_transfers_share_rank: Literal[True] = True
+    wildcard_transfers_excluded: Literal[True] = True
+    free_hit_transfers_excluded: Literal[True] = True
+
+
+class RankMass(RankModel):
+    rank: PositiveInt
+    probability: Probability
+
+
+class ManagerScenarioStanding(RankModel):
+    manager_id: StrictStr = Field(min_length=1, max_length=200)
+    scenario_id: StrictStr = Field(min_length=1)
+    outcome_draw_id: StrictStr = Field(min_length=1)
+    cumulative_points: StrictInt
+    gameweek_net_points: StrictInt
+    final_points: StrictInt
+    counted_transfers: NonNegativeInt
+    rank: PositiveInt
+    shared_rank: StrictBool
+
+    @model_validator(mode="after")
+    def points_reconcile(self) -> ManagerScenarioStanding:
+        if self.final_points != self.cumulative_points + self.gameweek_net_points:
+            raise ValueError("final points must equal cumulative plus scenario net points")
+        return self
+
+
+class MiniLeagueScenarioOutcome(RankModel):
+    scenario_id: StrictStr = Field(min_length=1)
+    outcome_draw_id: StrictStr = Field(min_length=1)
+    weight: Probability
+    standings: tuple[ManagerScenarioStanding, ...] = Field(min_length=2)
+    winner_manager_ids: tuple[StrictStr, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def outcome_is_canonical(self) -> MiniLeagueScenarioOutcome:
+        manager_ids = tuple(item.manager_id for item in self.standings)
+        if manager_ids != tuple(sorted(manager_ids)) or len(manager_ids) != len(set(manager_ids)):
+            raise ValueError("mini-league standings must be sorted by unique manager ID")
+        if any(
+            (item.scenario_id, item.outcome_draw_id) != (self.scenario_id, self.outcome_draw_id)
+            for item in self.standings
+        ):
+            raise ValueError("every manager standing must use the shared scenario identity")
+        expected_winners = tuple(item.manager_id for item in self.standings if item.rank == 1)
+        if self.winner_manager_ids != expected_winners:
+            raise ValueError("winner IDs must exactly match all managers sharing rank one")
+        return self
+
+
+class RankDistribution(RankModel):
+    """Exact probability distribution over one manager's classic rank."""
+
+    schema_version: Literal["rank-distribution-v1"] = "rank-distribution-v1"
+    target_manager_id: StrictStr = Field(min_length=1, max_length=200)
+    population_size: PositiveInt
+    scenario_set_hash: Sha256
+    raw_projection_hash: Sha256
+    tie_policy_id: StrictStr = Field(min_length=1)
+    target_rank: PositiveInt | None = None
+    rank_pmf: tuple[RankMass, ...] = Field(min_length=1)
+    expected_rank: FiniteFloat
+    median_rank: PositiveInt
+    rank_percentiles: dict[StrictStr, PositiveInt]
+    probability_target_rank: Probability | None = None
+    mini_league_win_probability: Probability
+    outcomes: tuple[MiniLeagueScenarioOutcome, ...] = Field(min_length=1)
+    confidence: ConfidenceGrade
+    distribution_hash: Sha256
+
+    @model_validator(mode="after")
+    def distribution_is_canonical(self) -> RankDistribution:
+        ranks = tuple(item.rank for item in self.rank_pmf)
+        if ranks != tuple(sorted(ranks)) or len(ranks) != len(set(ranks)):
+            raise ValueError("rank PMF must be sorted by unique rank")
+        if any(rank > self.population_size for rank in ranks):
+            raise ValueError("rank PMF contains rank outside the population")
+        if abs(sum(item.probability for item in self.rank_pmf) - 1.0) > 1e-10:
+            raise ValueError("rank probabilities must sum to one")
+        expected = sum(item.rank * item.probability for item in self.rank_pmf)
+        if abs(self.expected_rank - expected) > 1e-10:
+            raise ValueError("expected rank does not reconcile with rank PMF")
+        if tuple(self.rank_percentiles) != tuple(sorted(self.rank_percentiles)):
+            raise ValueError("rank percentile keys must be sorted")
+        target_probability = (
+            None
+            if self.target_rank is None
+            else sum(item.probability for item in self.rank_pmf if item.rank <= self.target_rank)
+        )
+        if self.probability_target_rank != target_probability:
+            raise ValueError("target probability must be derived from the rank PMF")
+        win_probability = sum(item.probability for item in self.rank_pmf if item.rank == 1)
+        if abs(self.mini_league_win_probability - win_probability) > 1e-10:
+            raise ValueError("mini-league win probability must equal rank-one mass")
+        identities = tuple((item.scenario_id, item.outcome_draw_id) for item in self.outcomes)
+        if identities != tuple(sorted(identities)) or len(identities) != len(set(identities)):
+            raise ValueError("rank outcomes must be sorted by unique shared scenario identity")
+        if abs(sum(item.weight for item in self.outcomes) - 1.0) > 1e-10:
+            raise ValueError("rank outcome weights must sum to one")
+        return self

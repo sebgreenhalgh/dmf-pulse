@@ -113,8 +113,10 @@ def multiplier_policy() -> ManagerMultiplierPolicy:
 
 
 def tactic(
-    *, free_hit: bool = False, captain: str = "p12", vice: str = "p13"
+    *, free_hit: bool = False, captain: str = "p12", vice: str | None = None
 ) -> TacticalConfiguration:
+    if vice is None:
+        vice = "p13" if captain != "p13" else "p12"
     starting_mid = "p15" if free_hit else "p10"
     bench_mid = "p10" if free_hit else "p11"
     return TacticalConfiguration(
@@ -144,7 +146,7 @@ def manager_plan(
     chip: ManagerChip = ManagerChip.NONE,
     free_hit: bool = False,
     captain: str = "p12",
-    vice: str = "p13",
+    vice: str | None = None,
     hit_points: int = 0,
     cumulative_points: int = 100,
     counted_transfers: int = 5,
@@ -246,4 +248,22 @@ def cohort(
             for index, plan in enumerate(plans)
         ),
         confidence="A",
+    )
+
+
+def rank_tie_policy(*, verified: bool = True):
+    from dmf_pulse.rank_strategy.models import RankTiePolicy
+
+    return RankTiePolicy(
+        policy_id="fpl-2026-27-classic-reference",
+        target_season="2026/27",
+        rules_verified=verified,
+    )
+
+
+def exact_named_league(*plans: ManagerTeamPlan) -> CohortSample:
+    return cohort(
+        *plans,
+        rights=SampleRightsStatus.NAMED_RIVAL_AUTHORISED,
+        kind=CohortKind.NAMED_MINI_LEAGUE,
     )

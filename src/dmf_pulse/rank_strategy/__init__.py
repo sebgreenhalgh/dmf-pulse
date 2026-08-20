@@ -6,6 +6,7 @@ from dmf_pulse.rank_strategy.manager_multipliers import (
     raw_projection_hash,
     shared_scenario_set_hash,
 )
+from dmf_pulse.rank_strategy.mini_league import simulate_mini_league_rank
 from dmf_pulse.rank_strategy.models import (
     CohortKind,
     CohortMember,
@@ -14,8 +15,13 @@ from dmf_pulse.rank_strategy.models import (
     ManagerChip,
     ManagerMultiplierPolicy,
     ManagerMultiplierSet,
+    ManagerScenarioStanding,
     ManagerTeamPlan,
+    MiniLeagueScenarioOutcome,
     PlayerOwnership,
+    RankDistribution,
+    RankMass,
+    RankTiePolicy,
     SampleRightsStatus,
     ScenarioManagerMultiplier,
 )
@@ -28,12 +34,18 @@ __all__ = [
     "ManagerChip",
     "ManagerMultiplierPolicy",
     "ManagerMultiplierSet",
+    "ManagerScenarioStanding",
     "ManagerTeamPlan",
+    "MiniLeagueScenarioOutcome",
     "PlayerOwnership",
+    "RankDistribution",
+    "RankMass",
+    "RankTiePolicy",
     "SampleRightsStatus",
     "ScenarioManagerMultiplier",
     "calculate_effective_ownership",
     "calculate_manager_multipliers",
     "raw_projection_hash",
     "shared_scenario_set_hash",
+    "simulate_mini_league_rank",
 ]
