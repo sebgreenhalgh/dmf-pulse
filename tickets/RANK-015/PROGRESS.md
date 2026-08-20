@@ -39,8 +39,8 @@
 | 15.02 exact named mini-league | COMPLETE / REMOTE | `bf0ebb29e9af4f33f4a9575222da61021c9df748` | `53 passed`; 95% branch coverage; exact 2/3/4-manager oracle PASS |
 | 15.03 baseline opponent model | COMPLETE / REMOTE | `a5b3e2a5f852dbde1f5b3ca4c8a91b1f60694868` | `123 passed`; 95.92% branch coverage; 11 inherited passed |
 | 15.04 target / rank utility | COMPLETE / REMOTE | `bc03b1f7b020835b2b36896cc39d58a84b8808a4` | `127 passed`; 92.13% branch coverage; projection invariance and fail-closed gates PASS |
-| 15.05 synthetic overall cohort | NOT_STARTED | — | — |
-| 15.06 service / CLI / evidence | NOT_STARTED | — | — |
+| 15.05 synthetic overall cohort | COMPLETE / REMOTE | `62f1828edcfbd0569dbf76fc93e241f2db95094d` | `23 passed` at publication; exact independent synthetic-field oracle PASS |
+| 15.06 service / CLI / evidence | READY FOR REMOTE PUBLICATION | `PENDING` | `243 passed`; raw branch coverage 91.334895%; Ruff/mypy PASS |
 
 ## Required final status
 
@@ -106,3 +106,27 @@
 - Checkpoint-scoped Stage-15 branch coverage: `92.13%`; the deliberately unfinished 15.05 synthetic module was excluded from this checkpoint-only denominator.
 - Ruff focused: PASS. Strict mypy for `src/dmf_pulse/rank_strategy`: PASS. `git diff --check`: PASS.
 - Exact local/remote sealed capability SHA equality: `bc03b1f7b020835b2b36896cc39d58a84b8808a4`.
+
+
+## Checkpoint 15.05 evidence
+
+- Implemented the real weighted synthetic overall-field simulator with explicit integer populations and rank bands.
+- Reconciles cumulative points, Gameweek net points, counted-transfer tie state, weighted rank PMF, expected/percentile rank and P(target).
+- Exposes concentration, entropy, maximum-share and effective-representative diagnostics with explicit known-truth/approximation status.
+- Carries rights, provenance, source-bundle and upstream hash lineage; mass scraping, final-rank hindsight and definitive overall-win claims are prohibited by literal contracts.
+- Independent exhaustive oracle imports no production synthetic simulator and matches the known-truth field exactly.
+- Published capability SHA: `62f1828edcfbd0569dbf76fc93e241f2db95094d`.
+- Original focused publication matrix: `23 passed`. Hardened current synthetic matrix: `34 passed`; raw branch coverage `98.684211%`.
+
+## Checkpoint 15.06 pre-publication evidence
+
+- Implemented shared Stage-15 service over sealed accepted Stage-12/13/14 candidate identities without invoking or duplicating upstream optimisers.
+- Preserves points-optimal, rank-optimal and selected plans, expected-points/target-probability deltas, raw/scenario identities, rank diagnostics, confidence and fail-closed reasons.
+- Binds Stage-9 through Stage-15 component lineage, cutoff, rules, rights, points-floor, code and config versions.
+- Added complete required-gate inventory and pure-points fallback for rules, target, rights, cohort, opponent, confidence, projection/scenario lineage, points floor and early-season policy.
+- Added immutable Stage-15 artifacts using canonical detached hashes and recomputation on load; nested or outer tampering fails closed.
+- Added real `dmf rank` validate/eo/mini-league/opponents/cohort/evaluate/compare commands through the shared service.
+- Current complete Stage-15 matrix: `243 passed in 11.86s`.
+- Raw Stage-15 branch coverage: `91.334895%` (`780/854`); combined line/branch coverage: `95.192007%`.
+- Ruff format/lint: PASS. Strict mypy: PASS. `git diff --check`: PASS.
+- Independent review and final build/wheel/repository/security acceptance remain pending.

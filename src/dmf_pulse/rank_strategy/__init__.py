@@ -1,5 +1,12 @@
 """Stage-15 rank, effective-ownership and competition-utility package."""
 
+from dmf_pulse.rank_strategy.artifacts import (
+    Stage15DecisionArtifact,
+    load_decision_artifact,
+    persist_decision_artifact,
+    seal_decision_artifact,
+    verify_decision_artifact,
+)
 from dmf_pulse.rank_strategy.effective_ownership import calculate_effective_ownership
 from dmf_pulse.rank_strategy.manager_multipliers import (
     calculate_manager_multipliers,
@@ -40,6 +47,29 @@ from dmf_pulse.rank_strategy.opponent_models import (
     OpponentChipAction,
     OpponentObservedState,
 )
+from dmf_pulse.rank_strategy.service import (
+    bind_accepted_plan,
+    evaluate_effective_ownership,
+    evaluate_exact_mini_league,
+    evaluate_opponent_actions,
+    evaluate_rank_plans,
+    evaluate_synthetic_cohort,
+    seal_rank_service_request,
+    validate_installed_rank_capability,
+)
+from dmf_pulse.rank_strategy.service_models import (
+    AcceptedRankPlan,
+    RankCapabilityValidation,
+    RankComponentIdentity,
+    RankComponentKind,
+    RankGateCheck,
+    RankGateName,
+    RankGateReport,
+    RankServiceLineage,
+    RankServiceProjectionEvidence,
+    RankServiceRequest,
+    RankServiceResult,
+)
 from dmf_pulse.rank_strategy.synthetic_field import simulate_synthetic_overall_rank
 from dmf_pulse.rank_strategy.synthetic_models import (
     SyntheticApproximationStatus,
@@ -55,6 +85,7 @@ from dmf_pulse.rank_strategy.synthetic_models import (
 )
 
 __all__ = [
+    "AcceptedRankPlan",
     "CohortKind",
     "CohortMember",
     "CohortSample",
@@ -75,11 +106,22 @@ __all__ = [
     "OpponentChipAction",
     "OpponentObservedState",
     "PlayerOwnership",
+    "RankCapabilityValidation",
+    "RankComponentIdentity",
+    "RankComponentKind",
     "RankDistribution",
+    "RankGateCheck",
+    "RankGateName",
+    "RankGateReport",
     "RankMass",
+    "RankServiceLineage",
+    "RankServiceProjectionEvidence",
+    "RankServiceRequest",
+    "RankServiceResult",
     "RankTiePolicy",
     "SampleRightsStatus",
     "ScenarioManagerMultiplier",
+    "Stage15DecisionArtifact",
     "SyntheticApproximationStatus",
     "SyntheticBandScenarioCount",
     "SyntheticBandSelectionBasis",
@@ -90,12 +132,24 @@ __all__ = [
     "SyntheticOverallScenarioOutcome",
     "SyntheticPopulationDiagnostics",
     "SyntheticRankBand",
+    "bind_accepted_plan",
     "calculate_effective_ownership",
     "calculate_manager_multipliers",
     "combine_opponent_action_distributions",
+    "evaluate_effective_ownership",
+    "evaluate_exact_mini_league",
+    "evaluate_opponent_actions",
+    "evaluate_rank_plans",
+    "evaluate_synthetic_cohort",
+    "load_decision_artifact",
     "model_opponent_actions",
+    "persist_decision_artifact",
     "raw_projection_hash",
+    "seal_decision_artifact",
+    "seal_rank_service_request",
     "shared_scenario_set_hash",
     "simulate_mini_league_rank",
     "simulate_synthetic_overall_rank",
+    "validate_installed_rank_capability",
+    "verify_decision_artifact",
 ]

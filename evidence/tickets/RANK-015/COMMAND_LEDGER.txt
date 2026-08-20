@@ -1,0 +1,30 @@
+RANK-015 COMMAND LEDGER — CHECKPOINTS 15.05/15.06
+
+15.05 focused published-capability matrix:
+PYTHONPATH=<dev-tools>:src python3.13 -m pytest \
+  tests/unit/rank_strategy/test_synthetic_contracts.py \
+  tests/unit/rank_strategy/test_synthetic_field.py \
+  tests/property/rank_strategy/test_synthetic_properties.py \
+  tests/integration/rank_strategy/test_synthetic_overall_field.py -q
+RESULT: 23 passed in 2.02s
+
+15.05 hardened matrix:
+PYTHONPATH=<dev-tools>:src python3.13 -m pytest <synthetic files including model guards> \
+  --cov=dmf_pulse.rank_strategy.synthetic_models \
+  --cov=dmf_pulse.rank_strategy.synthetic_field --cov-branch
+RESULT: 34 passed in 3.36s; raw branches 150/152 = 98.684211%
+
+15.06 pre-publication Stage-15 matrix:
+PYTHONPATH=<dev-tools>:src python3.13 -m pytest \
+  tests/unit/rank_strategy tests/property/rank_strategy \
+  tests/integration/rank_strategy tests/unit/cli/test_rank_cli.py \
+  --cov=dmf_pulse.rank_strategy --cov=dmf_pulse.cli.rank --cov-branch
+RESULT: 243 passed in 11.86s; raw branches 780/854 = 91.334895%; combined 95.192007%
+
+Static gates:
+ruff format --check <Stage-15 production/tests>: PASS
+ruff check <Stage-15 production/tests>: PASS
+python3.13 -m mypy --strict src/dmf_pulse/rank_strategy src/dmf_pulse/cli/rank.py: PASS
+git diff --check: PASS
+
+FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL

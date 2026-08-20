@@ -949,8 +949,8 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 
 - [x] 15.01 implement manager scenario multipliers, EO, leverage and chip/autosub effects.
 - [x] 15.02 implement exact shared-scenario named mini-league ranking and exhaustive oracle.
-- [ ] 15.03 implement cutoff-safe probabilistic hidden rival action modelling.
-- [ ] 15.04 implement points-floor target/rank utilities and plan diagnostics.
-- [ ] 15.05 implement rights-gated synthetic weighted overall-rank cohorts.
-- [ ] 15.06 implement Stage-12/13/14 re-evaluation, fail-closed service, CLI and evidence.
+- [x] 15.03 implement cutoff-safe probabilistic hidden rival action modelling.
+- [x] 15.04 implement points-floor target/rank utilities and plan diagnostics.
+- [x] 15.05 implement rights-gated synthetic weighted overall-rank cohorts.
+- [x] 15.06 implement Stage-12/13/14 re-evaluation, fail-closed service, CLI and evidence.
 - [ ] Complete adversarial self-review, final Stage-15 validation and clean remote equality.
