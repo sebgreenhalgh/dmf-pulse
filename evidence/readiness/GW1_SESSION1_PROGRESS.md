@@ -221,8 +221,8 @@
 <!-- GW1-1.4B-START -->
 ## Checkpoint 1.4B — automated focused publication
 
-- Validated commit — `16560a1f8e50a7a6b33a6a7430f4ca9a01be30ff`.
-- Workflow run — `32313356458`.
+- Validated commit — `3ef25343725aeef1ebb3546a78e63a2ff72ea2e8`.
+- Workflow run — `32399774975`.
 - Validation result — `PASS`.
 - Machine-written evidence — `evidence/readiness/GW1_SESSION1_CHECKPOINT_1_4_ACCEPTANCE.md`.
 - Mapping remains exact, reviewed, cutoff-bound and fail-closed; no fuzzy matching.

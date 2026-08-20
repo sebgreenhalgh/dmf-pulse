@@ -1,9 +1,9 @@
 # GW1 Checkpoint 1.4B Focused Validation
 
-- Workflow run — `32313356458`
-- Validated commit — `16560a1f8e50a7a6b33a6a7430f4ca9a01be30ff`
+- Workflow run — `32399774975`
+- Validated commit — `3ef25343725aeef1ebb3546a78e63a2ff72ea2e8`
 - Branch — `readiness/GW1-2026-27-live-input-initial-squad`
-- Commit subject — `fix(gw1): harden FPL odds identity acceptance`
+- Commit subject — `docs: record market-primary Linux validation`
 - Overall — `PASS`
 - PostgreSQL — `NOT_EXECUTED` (transient/DB-free identity architecture).
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
@@ -25,10 +25,10 @@
 ## focused_pytest
 
 ```text
-........................................................................ [ 43%]
-........................................................................ [ 86%]
-......................                                                   [100%]
-166 passed in 3.20s
+........................................................................ [ 41%]
+........................................................................ [ 83%]
+............................                                             [100%]
+172 passed in 3.34s
 ```
 
 ## ruff_format
