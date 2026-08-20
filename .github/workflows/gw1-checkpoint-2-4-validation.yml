@@ -8,6 +8,7 @@ on:
       - .github/workflows/gw1-checkpoint-2-4-validation.yml
       - config/models/fpl_points_simulation.yaml
       - config/rules/fpl-2026-27/**
+      - evidence/readiness/**
       - fixtures/points/PTS-009/manifest.json
       - fixtures/points/PTS-009/schemas/fixture_request.schema.json
       - fixtures/points/PTS-009/schemas/fixture_result.schema.json

@@ -134,7 +134,11 @@ def test_integrity_failure_emits_machine_readable_fail_closed_payload(
     ),
 )
 def test_all_optimise_commands_reject_non_json_output(command: str, args: list[str]) -> None:
-    invoked = RUNNER.invoke(optimise_app, [command, *args, "--output", "yaml"])
+    invoked = RUNNER.invoke(
+        optimise_app,
+        [command, *args, "--output", "yaml"],
+        terminal_width=240,
+    )
     assert invoked.exit_code == 2
     assert "--output must be json" in invoked.output
 

@@ -43,6 +43,13 @@ None found.
 - The final Linux workflow initially selected database-backed security tests
   without PostgreSQL. It now provisions the exact pinned 18.4 image, migrates to
   head, and supplies only the test database reference/fake password.
+- The first final Linux publication (run `32355035128`; `411 passed, 6 failed`)
+  exposed five terminal-width-dependent CLI assertions and one assurance
+  fixture whose purportedly invalid one-player reduced candidate was valid by
+  contract. CLI tests now use a fixed render width and the artifact test uses
+  duplicate IDs, preserving reduced exact oracle cases. The six original
+  failures plus both affected reduced-oracle regressions pass locally
+  (`8 passed`).
 
 ### P3 / retained limitations
 

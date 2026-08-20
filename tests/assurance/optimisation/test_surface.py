@@ -83,7 +83,7 @@ def test_artifacts_policy_and_candidate_snapshot(tmp_path: Path) -> None:
     path.write_bytes(b"not-json\n")
     with pytest.raises(OptimisationError):
         load_canonical_json(path, CandidateSquad)
-    path.write_text('{"player_ids":["p00"]}\n', encoding="utf-8")
+    path.write_text('{"player_ids":["p00","p00"]}\n', encoding="utf-8")
     with pytest.raises(OptimisationError):
         load_canonical_json(path, CandidateSquad)
 

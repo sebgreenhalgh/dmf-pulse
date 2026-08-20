@@ -111,9 +111,9 @@
       "sha256": "af2fff322935892fc21d83a1da6579edc2a9e1d848a1661e5c24697cc7c0afd5"
     },
     {
-      "bytes": 4209,
+      "bytes": 4239,
       "path": ".github/workflows/gw1-checkpoint-2-4-validation.yml",
-      "sha256": "376c41fae59e44e14e30935f7e561338f873e6aacbdbc4f78feac85344480597"
+      "sha256": "ed644509e24d3d43ed66dd291cce6054b46af890994e26f2220838f4375f4c2e"
     },
     {
       "bytes": 4503,
@@ -566,9 +566,9 @@
       "sha256": "fa5a6210be3d51590bfc67ac61f11d551acfa48d4a9f07143942f9d8764b9722"
     },
     {
-      "bytes": 4618,
+      "bytes": 5086,
       "path": "evidence/readiness/GW1_FINAL_ENGINEERING_ACCEPTANCE.md",
-      "sha256": "7bd0f6c45f948b0aa418cda67c15a2368407b406857956807d0f263e5ec5c61a"
+      "sha256": "456addf5fad2b44d9f38a721b9d4b80aaa3e3480b0e59657e070af708e3ef8a3"
     },
     {
       "bytes": 8607,
@@ -3756,9 +3756,9 @@
       "sha256": "5ac7bc744b06000bedce03c54be7cf8018cab9d26acf4d8b2c4c6097187d5422"
     },
     {
-      "bytes": 27496,
+      "bytes": 27502,
       "path": "tests/assurance/optimisation/test_surface.py",
-      "sha256": "005e695e490b87ead5517e9f78d020d5def1df66c3207813c9a6da5461ddb116"
+      "sha256": "3731693b685f403505c89452d0deb0adf63162cb6e220f1c3980df693ffaf98f"
     },
     {
       "bytes": 2814,
@@ -4581,9 +4581,9 @@
       "sha256": "2d8a63f8831f4de349885247f3cf92766bb3089d9d9472b9987d1d6347d8941c"
     },
     {
-      "bytes": 9290,
+      "bytes": 9310,
       "path": "tests/unit/cli/test_commands.py",
-      "sha256": "c4f29f166d57f2092ea4added521c584198bea04733d15cb86b3b64f240e4129"
+      "sha256": "62a5985e569b1499d523dd8a22cef26f2f7d592499f666f14e034a71078fd63b"
     },
     {
       "bytes": 3424,
@@ -4961,9 +4961,9 @@
       "sha256": "be180b034e627df5bb023f5fab9361285d579d51131fa68f2db199c9d147ad9b"
     },
     {
-      "bytes": 6814,
+      "bytes": 6865,
       "path": "tests/unit/optimisation/test_multi_gameweek_cli_hardening.py",
-      "sha256": "08a5d9a4d8734506b6916cafdf6409e2d1e58f5745743c88a236182a77510f6d"
+      "sha256": "9cf02cbe4c521e85a641c008eb7d7a38a8e8b59eed29bfae0887635081906dbc"
     },
     {
       "bytes": 26712,
