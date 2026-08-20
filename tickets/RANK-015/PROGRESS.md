@@ -36,8 +36,8 @@
 | Checkpoint | Status | Capability SHA | Verification |
 |---|---|---|---|
 | 15.01 manager multipliers / EO | COMPLETE / REMOTE | `77f2cd2c57649a224bc7908128163b498d5b8bd5` | `39 passed`; 99% branch coverage; 11 inherited passed |
-| 15.02 exact named mini-league | NOT_STARTED | — | — |
-| 15.03 baseline opponent model | NOT_STARTED | — | — |
+| 15.02 exact named mini-league | COMPLETE / REMOTE | `bf0ebb29e9af4f33f4a9575222da61021c9df748` | `53 passed`; 95% branch coverage; exact 2/3/4-manager oracle PASS |
+| 15.03 baseline opponent model | IN_PROGRESS | — | — |
 | 15.04 target / rank utility | NOT_STARTED | — | — |
 | 15.05 synthetic overall cohort | NOT_STARTED | — | — |
 | 15.06 service / CLI / evidence | NOT_STARTED | — | — |
@@ -62,3 +62,17 @@
 - Ruff focused: PASS. Strict mypy for `src/dmf_pulse/rank_strategy`: PASS.
 - Raw projection hash remained identical before and after EO evaluation.
 - Fetch-back verification found six connector-introduced quoted annotations; Ruff caught them and capability SHA `77f2cd2c57649a224bc7908128163b498d5b8bd5` is the corrected checkpoint.
+
+## Checkpoint 15.02 evidence
+
+- Implemented exact classic mini-league rank simulation for two, three and arbitrary multi-manager leagues.
+- Every manager is evaluated on identical Stage-9 scenario and outcome-draw identities; mismatched raw projections, weights or scenario hashes fail closed.
+- Final score reconciles cumulative points, shared-scenario Gameweek net points and one hit deduction.
+- Verified active tie policy: points primary, then fewer counted transfers; exact equals share competition rank; Wildcard and Free Hit transfers are excluded by the supplied counted-transfer state.
+- Exposed exact outcome standings, shared-rank flags, winners, rank PMF, expected/median/percentile rank, P(target) and mini-league win probability.
+- Independent exhaustive oracle imports no production mini-league/rank implementation and matches exact two-, three- and four-manager fixtures.
+- Focused Stage-15 matrix after exact GitHub fetch-back: `53 passed in 1.22s`.
+- Stage-15 branch coverage at checkpoint: `95.24%` (`507 statements`, branch-aware).
+- Inherited accepted-interface regressions: `11 passed in 1.98s`.
+- Ruff focused: PASS. Strict mypy for `src/dmf_pulse/rank_strategy`: PASS.
+- Exact local/remote checkpoint SHA equality: `bf0ebb29e9af4f33f4a9575222da61021c9df748`.
