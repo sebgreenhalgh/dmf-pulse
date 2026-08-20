@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Verify corrected checkpoint 15.05 payload
+      - name: Verify final corrected checkpoint 15.05 payload
         shell: bash
         run: |
           set -euo pipefail
