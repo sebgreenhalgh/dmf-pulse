@@ -206,7 +206,11 @@ governance-accepted current event-prior artifact.
 - [x] Add Stage-6 line-specific two-way totals ingestion, normalisation and consensus.
 - [x] Bind separate H2H/totals Stage-6 evidence into existing Stage-8 constraints.
 - [x] Produce unaccepted support-prior and player-allocation candidate status evidence.
-- [ ] Run hostile validation, commits, push and exact-SHA Linux gates.
+- [x] Run hostile validation, commits, push and exact-SHA Linux gates.
+
+Latest bounded implementation validation: `80297e4934e23a0c1176a078f78b2b3b6debef91`,
+dedicated Ubuntu run `32389420928` (`PASS`). No PR, merge, activation, real
+provider request, or credential use occurred.
 
 ## RUL-2026-27 independent full-ruleset review and remediation
 
