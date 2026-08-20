@@ -40,6 +40,19 @@ from dmf_pulse.rank_strategy.opponent_models import (
     OpponentChipAction,
     OpponentObservedState,
 )
+from dmf_pulse.rank_strategy.synthetic_field import simulate_synthetic_overall_rank
+from dmf_pulse.rank_strategy.synthetic_models import (
+    SyntheticApproximationStatus,
+    SyntheticBandScenarioCount,
+    SyntheticBandSelectionBasis,
+    SyntheticManagerRepresentative,
+    SyntheticOverallDistribution,
+    SyntheticOverallPopulation,
+    SyntheticOverallRankResult,
+    SyntheticOverallScenarioOutcome,
+    SyntheticPopulationDiagnostics,
+    SyntheticRankBand,
+)
 
 __all__ = [
     "CohortKind",
@@ -67,6 +80,16 @@ __all__ = [
     "RankTiePolicy",
     "SampleRightsStatus",
     "ScenarioManagerMultiplier",
+    "SyntheticApproximationStatus",
+    "SyntheticBandScenarioCount",
+    "SyntheticBandSelectionBasis",
+    "SyntheticManagerRepresentative",
+    "SyntheticOverallDistribution",
+    "SyntheticOverallPopulation",
+    "SyntheticOverallRankResult",
+    "SyntheticOverallScenarioOutcome",
+    "SyntheticPopulationDiagnostics",
+    "SyntheticRankBand",
     "calculate_effective_ownership",
     "calculate_manager_multipliers",
     "combine_opponent_action_distributions",
@@ -74,4 +97,5 @@ __all__ = [
     "raw_projection_hash",
     "shared_scenario_set_hash",
     "simulate_mini_league_rank",
+    "simulate_synthetic_overall_rank",
 ]

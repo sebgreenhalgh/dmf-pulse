@@ -5,10 +5,12 @@ from __future__ import annotations
 from dmf_pulse.evaluation.artifacts import semantic_sha256
 from dmf_pulse.prices.models import ConfidenceGrade
 from dmf_pulse.rank_strategy.errors import RankStrategyError
+from dmf_pulse.rank_strategy.synthetic_models import SyntheticOverallDistribution
 from dmf_pulse.rank_strategy.utility_models import (
     ProjectionInvarianceEvidence,
     RankActivationContext,
     RankActivationStatus,
+    RankDistributionScope,
     RankObjectiveMode,
     RankPlanCandidate,
     RankPlanEvaluation,
@@ -144,6 +146,8 @@ def _target_probability(
             0.0,
         )
     if objective is RankObjectiveMode.MINI_LEAGUE_WIN:
+        if isinstance(distribution, SyntheticOverallDistribution):
+            return None
         return sum(
             (item.probability for item in distribution.rank_pmf if item.rank == 1),
             0.0,
@@ -281,6 +285,15 @@ def evaluate_rank_strategy(
     for candidate in ordered_candidates:
         probability = _target_probability(candidate, objective, target)
         distribution = candidate.rank_distribution
+        synthetic_overall = isinstance(distribution, SyntheticOverallDistribution)
+        rank_one_probability = (
+            None
+            if distribution is None
+            else sum(
+                (item.probability for item in distribution.rank_pmf if item.rank == 1),
+                0.0,
+            )
+        )
         sacrifice = max(0.0, points_optimal.expected_points - candidate.expected_points)
         points_floor_satisfied = candidate.expected_points + 1e-12 >= points_floor
         reasons: list[str] = []
@@ -289,6 +302,8 @@ def evaluate_rank_strategy(
         if objective not in {RankObjectiveMode.PURE_POINTS, RankObjectiveMode.MEASURED_LEVERAGE}:
             if distribution is None:
                 reasons.append("RANK_DISTRIBUTION_MISSING")
+            if objective is RankObjectiveMode.MINI_LEAGUE_WIN and synthetic_overall:
+                reasons.append("EXACT_MINI_LEAGUE_DISTRIBUTION_REQUIRED")
             if probability is None:
                 reasons.append("TARGET_PROBABILITY_UNAVAILABLE")
         metrics = RankPlanMetrics(
@@ -300,15 +315,22 @@ def evaluate_rank_strategy(
                 else sum(item.rank * item.probability for item in distribution.rank_pmf)
             ),
             rank_pmf=() if distribution is None else distribution.rank_pmf,
-            probability_target=probability,
-            mini_league_win_probability=(
+            distribution_scope=(
                 None
                 if distribution is None
-                else sum(
-                    (item.probability for item in distribution.rank_pmf if item.rank == 1),
-                    0.0,
+                else (
+                    RankDistributionScope.SYNTHETIC_OVERALL_APPROXIMATION
+                    if synthetic_overall
+                    else RankDistributionScope.EXACT_MINI_LEAGUE
                 )
             ),
+            probability_target=probability,
+            rank_one_probability=rank_one_probability,
+            mini_league_win_probability=(
+                None if distribution is None or synthetic_overall else rank_one_probability
+            ),
+            overall_rank_one_probability=(rank_one_probability if synthetic_overall else None),
+            approximation_only=synthetic_overall,
             expected_points_sacrifice=sacrifice,
             target_probability_gain=(
                 None
@@ -351,6 +373,9 @@ def evaluate_rank_strategy(
     activation_reasons = list(_activation_reasons(objective, context, target, policy))
     if not eligible and objective is not RankObjectiveMode.PURE_POINTS:
         activation_reasons.append("NO_ELIGIBLE_RANK_PLAN")
+        activation_reasons.extend(
+            reason for evaluation in evaluations for reason in evaluation.exclusion_reasons
+        )
 
     rank_metrics = rank_optimal_evaluation.metrics
     if (

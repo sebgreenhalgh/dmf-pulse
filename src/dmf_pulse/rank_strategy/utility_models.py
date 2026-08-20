@@ -19,6 +19,7 @@ from dmf_pulse.rank_strategy.models import (
     RankModel,
     Sha256,
 )
+from dmf_pulse.rank_strategy.synthetic_models import SyntheticOverallDistribution
 
 
 class RankObjectiveMode(StrEnum):
@@ -42,6 +43,11 @@ class RankPlanSource(StrEnum):
     STAGE_13 = "STAGE_13"
     STAGE_14 = "STAGE_14"
     SYNTHETIC_TEST = "SYNTHETIC_TEST"
+
+
+class RankDistributionScope(StrEnum):
+    EXACT_MINI_LEAGUE = "EXACT_MINI_LEAGUE"
+    SYNTHETIC_OVERALL_APPROXIMATION = "SYNTHETIC_OVERALL_APPROXIMATION"
 
 
 class RankTargetDefinition(RankModel):
@@ -118,7 +124,7 @@ class RankPlanCandidate(RankModel):
     scenario_points: dict[StrictStr, FiniteFloat]
     scenario_weights: dict[StrictStr, Probability]
     expected_points: FiniteFloat
-    rank_distribution: RankDistribution | None = None
+    rank_distribution: RankDistribution | SyntheticOverallDistribution | None = None
     measured_leverage_score: FiniteFloat = 0.0
     template_beta: FiniteFloat = 0.0
     tracking_error: NonNegativeFloat = 0.0
@@ -164,8 +170,12 @@ class RankPlanMetrics(RankModel):
     expected_points: FiniteFloat
     expected_rank: FiniteFloat | None
     rank_pmf: tuple[RankMass, ...]
+    distribution_scope: RankDistributionScope | None
     probability_target: Probability | None
+    rank_one_probability: Probability | None
     mini_league_win_probability: Probability | None
+    overall_rank_one_probability: Probability | None
+    approximation_only: StrictBool
     expected_points_sacrifice: NonNegativeFloat
     target_probability_gain: FiniteFloat | None
     measured_leverage_score: FiniteFloat
@@ -187,11 +197,16 @@ class RankPlanMetrics(RankModel):
                 for value in (
                     self.expected_rank,
                     self.probability_target,
+                    self.rank_one_probability,
                     self.mini_league_win_probability,
+                    self.overall_rank_one_probability,
                     self.confidence,
+                    self.distribution_scope,
                 )
             ):
                 raise ValueError("rank metrics without a PMF cannot contain rank diagnostics")
+            if self.approximation_only:
+                raise ValueError("rank metrics without a PMF cannot be approximation-labelled")
             return self
         if abs(sum(item.probability for item in self.rank_pmf) - 1.0) > 1e-10:
             raise ValueError("rank metrics probabilities must sum to one")
@@ -200,10 +215,28 @@ class RankPlanMetrics(RankModel):
             raise ValueError("rank metrics expected rank must be derived from the PMF")
         win_probability = sum(item.probability for item in self.rank_pmf if item.rank == 1)
         if (
-            self.mini_league_win_probability is None
-            or abs(self.mini_league_win_probability - win_probability) > 1e-10
+            self.rank_one_probability is None
+            or abs(self.rank_one_probability - win_probability) > 1e-10
         ):
-            raise ValueError("rank metrics win probability must equal rank-one mass")
+            raise ValueError("rank metrics rank-one probability must equal PMF mass")
+        if self.distribution_scope is RankDistributionScope.EXACT_MINI_LEAGUE:
+            if (
+                self.mini_league_win_probability is None
+                or abs(self.mini_league_win_probability - win_probability) > 1e-10
+                or self.overall_rank_one_probability is not None
+                or self.approximation_only
+            ):
+                raise ValueError("exact mini-league rank-one diagnostics do not reconcile")
+        elif self.distribution_scope is RankDistributionScope.SYNTHETIC_OVERALL_APPROXIMATION:
+            if (
+                self.overall_rank_one_probability is None
+                or abs(self.overall_rank_one_probability - win_probability) > 1e-10
+                or self.mini_league_win_probability is not None
+                or not self.approximation_only
+            ):
+                raise ValueError("synthetic overall rank-one diagnostics do not reconcile")
+        else:
+            raise ValueError("rank metrics with a PMF require a distribution scope")
         if self.confidence is None:
             raise ValueError("rank metrics with a PMF require confidence")
         return self
