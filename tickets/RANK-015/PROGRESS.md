@@ -3,10 +3,10 @@
 - Ticket: `RANK-015`
 - Immutable parent: `c53a1dfae952f481c1e885200ebf6120e4b63c24`
 - Branch: `stage/A15/RANK-015-rank-aware-strategy`
-- Engineering status: `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
+- Engineering status: `REVIEW_READY_PENDING_HUMAN_ACCEPTANCE`
 - Production activation: `FAIL_CLOSED_TO_PURE_POINTS`
 - Human acceptance: `false`
-- Pull request: none
+- Pull request: draft pending final publication
 - Merge: none
 - Accepted tag: none
 
@@ -44,9 +44,32 @@
 
 ## Required final status
 
-`IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
+`REVIEW_READY_PENDING_HUMAN_ACCEPTANCE`
 
-`FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL`
+`FULL_REPOSITORY_PYTEST = RESOURCE_LIMIT`
+
+## Independent Sol review
+
+- Exact pre-review and actual starting remote SHA:
+  `17b6aa576459c652e14015dcfd7b7cf0bffd6f9d`.
+- Immutable parent and merge base: `c53a1dfae952f481c1e885200ebf6120e4b63c24`.
+- Remediation commits published during review: `bb9443c`, `f457342`, and `af7c467`.
+- Findings: zero P0; seven P1 fixed; three material P2 fixed; zero P3.
+- Regression expansion: 31 parameter-expanded test cases, with additional strengthened assertions.
+- Final Stage-15 matrix: `274 passed in 11.19s`.
+- Raw branch coverage: `861/954 = 90.251572327044%`.
+- Targeted inherited Rules and Stages 9-14 matrix: `37 passed in 5.41s`.
+- Projection invariance, common football worlds, EO, independent mini-league oracle,
+  independent synthetic-field oracle, nonanticipativity, rank-PMF reconciliation,
+  service fallback and artifact tamper rejection: PASS.
+- One bounded full-repository pytest attempt: `RESOURCE_LIMIT`; exit `124` after
+  `1204.026s`, with no emitted failure and no unchanged-suite rerun.
+- Frozen sync, Ruff, strict mypy, build and clean installed-wheel CLI: PASS.
+- Governed manifest refresh, repository validation and first-party secret scan: PASS with zero
+  errors/findings.
+- Current main remained the immutable parent: `NO_MAIN_INTEGRATION_REQUIRED`.
+- Independent verdict: `PASS_WITH_NONBLOCKING_LIMITATIONS`.
+- Human acceptance, merge and accepted tag remain pending.
 
 ## Checkpoint 15.01 evidence
 
@@ -133,7 +156,7 @@
 
 ## Final Stage 15 implementation evidence
 
-- Status: `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`.
+- Status after independent Sol review: `REVIEW_READY_PENDING_HUMAN_ACCEPTANCE`.
 - Actual finalisation starting remote SHA: `0a16ebaf6376c2347845ae9bb7804433fe6823e4`.
 - Immutable main: `c53a1dfae952f481c1e885200ebf6120e4b63c24`.
 - Checkpoint 15.05 capability: `62f1828edcfbd0569dbf76fc93e241f2db95094d`.
@@ -149,5 +172,5 @@
 - Frozen dependency sync at the starting remote SHA: PASS in the successful GitHub validation/export runs; the final local run reused the exact exported environment because this container has no external DNS.
 - Ruff format/lint, strict mypy, repository validation, secret scan, Hatchling sdist/wheel build and clean external-wheel CLI: PASS.
 - Temporary Stage-15 workflows and `recovery/stage1505`, `recovery/stage1506`: REMOVED.
-- `FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL`.
+- `FULL_REPOSITORY_PYTEST = RESOURCE_LIMIT` after the single bounded independent attempt.
 - PR / merge / tag / human acceptance: none.

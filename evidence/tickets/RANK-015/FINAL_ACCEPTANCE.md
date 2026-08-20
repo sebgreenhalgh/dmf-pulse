@@ -6,7 +6,7 @@
 - Immutable main SHA: `c53a1dfae952f481c1e885200ebf6120e4b63c24`.
 - Checkpoint 15.05 capability SHA: `62f1828edcfbd0569dbf76fc93e241f2db95094d`.
 - Checkpoint 15.06 capability SHA: `c77b8950a4a150407b51d9bfed69b2314c74380e`.
-- Engineering status: `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`.
+- Engineering status after independent Sol review: `REVIEW_READY_PENDING_HUMAN_ACCEPTANCE`.
 - Production activation remains fail-closed to `PURE_POINTS`.
 
 ## Stage-15 acceptance
@@ -82,6 +82,33 @@ Legitimate repository CI was retained.
 
 ## Limitations
 
-- `FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL`.
+- `FULL_REPOSITORY_PYTEST = RESOURCE_LIMIT` after the single bounded independent attempt.
 - Target-season rank activation remains conditional on verified rules, lawful data, valid cohort/opponent models and confidence gates.
-- No PR, merge, tag or human acceptance is created by this finalisation.
+- Draft PR creation is pending final review publication; merge, tag and human acceptance remain
+  absent.
+
+## Independent Sol review addendum
+
+- Exact pre-review and actual starting remote SHA:
+  `17b6aa576459c652e14015dcfd7b7cf0bffd6f9d`.
+- Remediation commits published during independent review: `bb9443c`, `f457342`, and
+  `af7c467`.
+- Findings: zero P0; seven P1 fixed; three material P2 fixed; zero P3; no material finding
+  remains unresolved.
+- Complete remediated Stage-15 matrix: `274 passed in 11.19s`.
+- Raw branch coverage: `861/954 = 90.251572327044%`; combined line/branch coverage:
+  `94.331983805668%`.
+- Targeted inherited Rules and Stages 9-14 matrix: `37 passed in 5.41s` using the exact nodes
+  and rationales above.
+- One bounded full-repository pytest attempt: `RESOURCE_LIMIT`; exit `124` after
+  `1204.026s`, with no emitted failure and no unchanged-suite rerun.
+- Frozen sync, Ruff format/lint, strict mypy, `git diff --check`, Hatchling build and clean
+  external-wheel rank CLI: PASS.
+- Governed manifest refresh recorded `1126` tracked files; repository validation passed with zero
+  errors and the first-party secret scan passed with zero findings.
+- Main remained `c53a1dfae952f481c1e885200ebf6120e4b63c24`:
+  `NO_MAIN_INTEGRATION_REQUIRED`.
+- Engineering status: `REVIEW_READY_PENDING_HUMAN_ACCEPTANCE`.
+- Verdict: `PASS_WITH_NONBLOCKING_LIMITATIONS`.
+- Detailed findings, regressions and limitations are in `INDEPENDENT_SOL_REVIEW.md`.
+- Human acceptance, merge and accepted tag remain pending.

@@ -60,4 +60,50 @@ Cleanup:
 - recovery/stage1505 and recovery/stage1506 removed
 - legitimate repository CI retained
 
+INDEPENDENT SOL REVIEW / REMEDIATION
+
+Lineage:
+git fetch origin --prune
+git rev-parse origin/main
+git rev-parse origin/stage/A15/RANK-015-rank-aware-strategy
+git merge-base origin/main origin/stage/A15/RANK-015-rank-aware-strategy
+RESULT: main and merge base c53a1dfae952f481c1e885200ebf6120e4b63c24;
+        exact starting remote 17b6aa576459c652e14015dcfd7b7cf0bffd6f9d
+
+Complete remediated Stage-15 matrix:
+uv run pytest tests/unit/rank_strategy tests/property/rank_strategy \
+  tests/integration/rank_strategy tests/unit/cli/test_rank_cli.py \
+  --cov=dmf_pulse.rank_strategy --cov=dmf_pulse.cli.rank --cov-branch \
+  --cov-report=term-missing --cov-report=json:review_pack/stage15-sol-coverage.json \
+  --cov-fail-under=90 -q
+RESULT: 274 passed in 11.19s; raw branches 861/954 = 90.251572327044%;
+        combined 94.331983805668%
+
+Targeted inherited Rules and Stages 9-14 nodes:
+uv run pytest <the exact 23 nodes and parameter-expanded cases listed in FINAL_ACCEPTANCE.md> -q
+RESULT: 37 passed in 5.41s
+
+Single bounded complete-repository attempt:
+uv run pytest -q
+RESULT: RESOURCE_LIMIT; exit 124 after 1204.026s; no test failure was emitted;
+        remaining child processes stopped; unchanged full suite not rerun
+
+Final engineering gates:
+- uv sync --all-groups --frozen: PASS (Checked 40 packages)
+- ruff format --check .: PASS (635 files already formatted)
+- ruff check .: PASS
+- mypy --strict src/dmf_pulse: PASS (245 source files)
+- git diff --check: PASS
+- uv build --no-build-isolation: PASS, canonical Hatchling sdist + wheel
+- clean external wheel installation with PYTHONPATH cleared: PASS
+- installed dmf --version, rank help/subcommand help, and rank validate: PASS
+- python scripts/generate_repository_manifest.py --ticket PRC-013: PASS (1126 files)
+- python scripts/validate_repository.py: PASS (0 errors)
+- python scripts/scan_secrets.py: PASS (0 findings)
+
+Tree hygiene:
+- forbidden temporary implementation machinery: absent
+- test-created ACL-inaccessible .test-tmp moved outside repository to the named OS temp path
+- final repository tree: clean of temporary implementation machinery
+
 FULL_REPOSITORY_PYTEST = NOT_RUN_BY_DESIGN — DEFERRED_TO_SOL
