@@ -58,7 +58,7 @@ class CurrentFixtureMarketConsensus(_FrozenModel):
     """One exact reviewed target fixture normalised by the accepted Stage-6 policy."""
 
     official_fpl_fixture_id: int = Field(gt=0)
-    canonical_fixture_id: UUID
+    transient_fixture_id: UUID
     provider_event_id: str = Field(min_length=1, max_length=500)
     source_book_count: int = Field(gt=0)
     source_quote_count: int = Field(gt=0)
@@ -70,7 +70,7 @@ class CurrentFixtureMarketConsensus(_FrozenModel):
     @model_validator(mode="after")
     def validate_fixture_result(self) -> CurrentFixtureMarketConsensus:
         if (
-            self.consensus.fixture_id != self.canonical_fixture_id
+            self.consensus.fixture_id != self.transient_fixture_id
             or self.source_quote_count != self.source_book_count * 3
             or self.consensus.eligible_operator_count + len(self.excluded_books)
             != self.source_book_count
@@ -93,6 +93,9 @@ class CurrentMarketConsensusSummary(_FrozenModel):
     storage_mode: Literal["TRANSIENT_IN_MEMORY"] = "TRANSIENT_IN_MEMORY"
     persistence_performed: Literal[False] = False
     database_accessed: Literal[False] = False
+    fixture_identity_mode: Literal["DETERMINISTIC_TRANSIENT_SURROGATE_NO_DATABASE_RESOLUTION"] = (
+        "DETERMINISTIC_TRANSIENT_SURROGATE_NO_DATABASE_RESOLUTION"
+    )
     as_of: datetime
     fixture_count: int = Field(gt=0)
     source_book_count: int = Field(gt=0)
@@ -118,6 +121,9 @@ class CurrentMarketConsensusBundle(_FrozenModel):
     storage_mode: Literal["TRANSIENT_IN_MEMORY"] = "TRANSIENT_IN_MEMORY"
     persistence_performed: Literal[False] = False
     database_accessed: Literal[False] = False
+    fixture_identity_mode: Literal["DETERMINISTIC_TRANSIENT_SURROGATE_NO_DATABASE_RESOLUTION"] = (
+        "DETERMINISTIC_TRANSIENT_SURROGATE_NO_DATABASE_RESOLUTION"
+    )
     as_of: datetime
     mapping_cutoff: datetime
     adapter_version: Literal["gw1-current-market-stage6-v1"] = "gw1-current-market-stage6-v1"
@@ -308,7 +314,7 @@ def _build_fixture_markets(
             )
         provisional = CurrentFixtureMarketConsensus.model_construct(
             official_fpl_fixture_id=mapping.official_fpl_fixture_id,
-            canonical_fixture_id=evaluation.consensus.fixture_id,
+            transient_fixture_id=evaluation.consensus.fixture_id,
             provider_event_id=event.provider_event_id,
             source_book_count=len(books),
             source_quote_count=len(quotes),
@@ -320,7 +326,7 @@ def _build_fixture_markets(
         results.append(
             CurrentFixtureMarketConsensus(
                 official_fpl_fixture_id=mapping.official_fpl_fixture_id,
-                canonical_fixture_id=evaluation.consensus.fixture_id,
+                transient_fixture_id=evaluation.consensus.fixture_id,
                 provider_event_id=event.provider_event_id,
                 source_book_count=len(books),
                 source_quote_count=len(quotes),
@@ -352,6 +358,7 @@ def build_current_market_consensus(
         storage_mode="TRANSIENT_IN_MEMORY",
         persistence_performed=False,
         database_accessed=False,
+        fixture_identity_mode="DETERMINISTIC_TRANSIENT_SURROGATE_NO_DATABASE_RESOLUTION",
         as_of=validated.decision_information_at,
         mapping_cutoff=validated.identity_map.mapping_decided_at,
         adapter_version=CURRENT_MARKET_ADAPTER_VERSION,

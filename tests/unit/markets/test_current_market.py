@@ -173,6 +173,9 @@ def test_current_h2h_books_produce_complete_transient_stage6_consensus(
     assert result.contract == "GW1_CURRENT_MARKET_CONSENSUS"
     assert result.as_of == APPROVED
     assert result.mapping_cutoff == APPROVED
+    assert (
+        result.fixture_identity_mode == "DETERMINISTIC_TRANSIENT_SURROGATE_NO_DATABASE_RESOLUTION"
+    )
     assert result.policy_sha256 == POLICY_SHA256
     assert result.source_odds_market_semantic_sha256 == source.odds_input.market_semantic_sha256
     assert fixture.official_fpl_fixture_id == 101
@@ -217,8 +220,8 @@ def test_price_change_changes_market_lineage_but_not_canonical_fixture_identity(
     assert first.source_odds_market_semantic_sha256 != second.source_odds_market_semantic_sha256
     assert first.semantic_sha256 != second.semantic_sha256
     assert (
-        first.fixture_markets[0].canonical_fixture_id
-        == second.fixture_markets[0].canonical_fixture_id
+        first.fixture_markets[0].transient_fixture_id
+        == second.fixture_markets[0].transient_fixture_id
     )
 
 
