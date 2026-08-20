@@ -22,6 +22,10 @@ def test_target_definition_rejects_partial_or_inverted_band() -> None:
         RankTargetDefinition(band_best_rank=1)
     with pytest.raises(ValidationError):
         RankTargetDefinition(band_best_rank=10, band_worst_rank=2)
+    with pytest.raises(ValidationError):
+        RankTargetDefinition(target_rank=10, band_best_rank=1, band_worst_rank=5)
+    with pytest.raises(ValidationError):
+        RankTargetDefinition(prize_band_id="winner")
 
 
 def test_activation_context_rejects_gameweek_after_season() -> None:
@@ -37,21 +41,13 @@ def test_candidate_rejects_points_weights_hash_and_rank_surface_mismatch() -> No
     mutations = (
         lambda payload: payload.update(expected_points=61.0),
         lambda payload: payload.update(scenario_score_hash="0" * 64),
+        lambda payload: payload.update(scenario_weights={"s1|d1": 0.2, "s2|d2": 0.2}),
+        lambda payload: payload.update(scenario_points={"s2|d2": 62.0, "s1|d1": 58.0}),
         lambda payload: payload.update(
-            scenario_weights={"s1|d1": 0.2, "s2|d2": 0.2}
+            rank_distribution={**payload["rank_distribution"], "raw_projection_hash": "c" * 64}
         ),
         lambda payload: payload.update(
-            scenario_points={"s2|d2": 62.0, "s1|d1": 58.0}
-        ),
-        lambda payload: payload.update(
-            rank_distribution=payload["rank_distribution"].model_copy(
-                update={"raw_projection_hash": "c" * 64}
-            )
-        ),
-        lambda payload: payload.update(
-            rank_distribution=payload["rank_distribution"].model_copy(
-                update={"scenario_set_hash": "c" * 64}
-            )
+            rank_distribution={**payload["rank_distribution"], "scenario_set_hash": "c" * 64}
         ),
     )
     for mutation in mutations:
@@ -71,6 +67,15 @@ def test_projection_invariance_contract_rejects_changed_scenario_scores() -> Non
             after_score_hashes={"a": "d" * 64},
             code="RAW_PROJECTIONS_AND_SCENARIO_SCORES_IDENTICAL",
         )
+    with pytest.raises(ValidationError):
+        ProjectionInvarianceEvidence(
+            identical=False,
+            raw_projection_hash="a" * 64,
+            scenario_set_hash="b" * 64,
+            before_score_hashes={"a": "c" * 64},
+            after_score_hashes={"a": "c" * 64},
+            code="RAW_PROJECTIONS_AND_SCENARIO_SCORES_IDENTICAL",
+        )
 
 
 def test_decision_contract_rejects_plan_and_delta_mismatch() -> None:
@@ -88,11 +93,12 @@ def test_decision_contract_rejects_plan_and_delta_mismatch() -> None:
     mutations = (
         lambda payload: payload.update(points_optimal_plan_id="other"),
         lambda payload: payload.update(rank_optimal_plan_id="other"),
+        lambda payload: payload.update(selected_plan_id="other"),
         lambda payload: payload.update(expected_points_difference=99.0),
         lambda payload: payload.update(target_probability_difference=99.0),
-        lambda payload: payload.update(
-            evaluations=tuple(reversed(payload["evaluations"]))
-        ),
+        lambda payload: payload.update(evaluations=tuple(reversed(payload["evaluations"]))),
+        lambda payload: payload.update(effective_objective=RankObjectiveMode.PURE_POINTS),
+        lambda payload: payload.update(decision_hash="0" * 64),
     )
     for mutation in mutations:
         payload = result.model_dump(mode="python")

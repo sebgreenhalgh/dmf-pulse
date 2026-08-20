@@ -3,7 +3,12 @@
 from __future__ import annotations
 
 from dmf_pulse.evaluation.artifacts import semantic_sha256
-from dmf_pulse.rank_strategy.models import RankDistribution, RankMass
+from dmf_pulse.rank_strategy.models import (
+    ManagerScenarioStanding,
+    MiniLeagueScenarioOutcome,
+    RankDistribution,
+    RankMass,
+)
 from dmf_pulse.rank_strategy.utility_models import (
     RankActivationContext,
     RankPlanCandidate,
@@ -25,8 +30,7 @@ def rank_distribution(
     scenario_hash: str = SCENARIO_HASH,
 ) -> RankDistribution:
     masses = tuple(
-        RankMass(rank=rank, probability=probability)
-        for rank, probability in sorted(pmf.items())
+        RankMass(rank=rank, probability=probability) for rank, probability in sorted(pmf.items())
     )
     expected_rank = sum(item.rank * item.probability for item in masses)
     ordered: list[int] = []
@@ -40,9 +44,56 @@ def rank_distribution(
         "p75": masses[-1].rank,
         "p90": masses[-1].rank,
     }
+    population_size = max(2, max(item.rank for item in masses))
+    outcomes: list[MiniLeagueScenarioOutcome] = []
+    for index, mass in enumerate(masses, start=1):
+        scenario_id = f"rank-pmf-{index:03d}"
+        outcome_draw_id = f"rank-draw-{index:03d}"
+        rivals = [f"rival-{rival_index:03d}" for rival_index in range(1, population_size)]
+        standings: list[ManagerScenarioStanding] = []
+        for rival_index, manager_id in enumerate(rivals, start=1):
+            rival_rank = rival_index if rival_index < mass.rank else rival_index + 1
+            standings.append(
+                ManagerScenarioStanding(
+                    manager_id=manager_id,
+                    scenario_id=scenario_id,
+                    outcome_draw_id=outcome_draw_id,
+                    cumulative_points=1_000,
+                    gameweek_net_points=1_000 - rival_rank,
+                    final_points=2_000 - rival_rank,
+                    counted_transfers=rival_rank,
+                    rank=rival_rank,
+                    shared_rank=False,
+                )
+            )
+        standings.append(
+            ManagerScenarioStanding(
+                manager_id="sebastian",
+                scenario_id=scenario_id,
+                outcome_draw_id=outcome_draw_id,
+                cumulative_points=1_000,
+                gameweek_net_points=1_000 - mass.rank,
+                final_points=2_000 - mass.rank,
+                counted_transfers=mass.rank,
+                rank=mass.rank,
+                shared_rank=False,
+            )
+        )
+        canonical_standings = tuple(sorted(standings, key=lambda item: item.manager_id))
+        outcomes.append(
+            MiniLeagueScenarioOutcome(
+                scenario_id=scenario_id,
+                outcome_draw_id=outcome_draw_id,
+                weight=mass.probability,
+                standings=canonical_standings,
+                winner_manager_ids=tuple(
+                    item.manager_id for item in canonical_standings if item.rank == 1
+                ),
+            )
+        )
     return RankDistribution(
         target_manager_id="sebastian",
-        population_size=max(item.rank for item in masses),
+        population_size=population_size,
         scenario_set_hash=scenario_hash,
         raw_projection_hash=raw_hash,
         tie_policy_id="verified-classic",
@@ -56,7 +107,7 @@ def rank_distribution(
             (item.probability for item in masses if item.rank == 1),
             0.0,
         ),
-        outcomes=(),
+        outcomes=tuple(outcomes),
         confidence=confidence,
         distribution_hash=semantic_sha256({"plan_id": plan_id, "pmf": pmf}),
     )

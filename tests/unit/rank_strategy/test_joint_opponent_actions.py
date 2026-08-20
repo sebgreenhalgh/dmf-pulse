@@ -107,7 +107,7 @@ def test_joint_contract_rejects_invalid_manager_and_probability_state() -> None:
         lambda payload: payload.update(manager_ids=tuple(reversed(payload["manager_ids"]))),
         lambda payload: payload.update(source_distribution_hashes={"rival-a": "0" * 64}),
         lambda payload: payload.update(
-            scenarios=tuple(item.model_copy(update={"probability": 0.01}) for item in payload["scenarios"])
+            scenarios=tuple({**item, "probability": 0.01} for item in payload["scenarios"])
         ),
         lambda payload: payload.update(scenarios=tuple(reversed(payload["scenarios"]))),
     )
@@ -122,8 +122,6 @@ def test_single_opponent_joint_distribution_is_valid_and_identical_to_source_vec
     source = _distribution("rival-a")
     result = combine_opponent_action_distributions((source,))
     assert len(result.scenarios) == len(source.actions)
-    actual = {
-        scenario.action_ids["rival-a"]: scenario.probability for scenario in result.scenarios
-    }
+    actual = {scenario.action_ids["rival-a"]: scenario.probability for scenario in result.scenarios}
     expected = {item.action_id: item.probability for item in source.actions}
     assert actual == pytest.approx(expected)

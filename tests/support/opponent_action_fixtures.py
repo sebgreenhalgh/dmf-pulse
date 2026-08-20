@@ -84,7 +84,9 @@ def action_features(
 
 def _ordinary_transfer_plan(manager_id: str, *, hit_points: int = 0):
     source = manager_plan(manager_id, cumulative_points=100, counted_transfers=6)
-    replacement = tuple(sorted((*[item for item in source.permanent_squad if item != "p11"], "p15")))
+    replacement = tuple(
+        sorted((*[item for item in source.permanent_squad if item != "p11"], "p15"))
+    )
     return source.model_copy(
         update={
             "plan_id": f"plan-{manager_id}-ordinary-transfer-{hit_points}",
@@ -160,7 +162,9 @@ def candidate(
         manager_plan=plan,
         transfer_count=transfer_count,
         counted_transfer_delta=(
-            0 if chip in {OpponentChipAction.FREE_HIT, OpponentChipAction.WILDCARD} else transfer_count
+            0
+            if chip in {OpponentChipAction.FREE_HIT, OpponentChipAction.WILDCARD}
+            else transfer_count
         ),
         chip_action=chip,
         generated_at=generated_at,

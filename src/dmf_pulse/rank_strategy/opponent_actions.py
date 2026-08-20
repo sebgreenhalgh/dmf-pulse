@@ -128,16 +128,16 @@ def _validate_model_inputs(
                 expected=expected_counted,
                 actual=plan.counted_transfers,
             )
-        if candidate.generated_at > state.information_cutoff:
-            raise RankStrategyError(
-                "RANK_OPPONENT_FUTURE_ACTION_LEAKAGE",
-                "opponent action candidate was generated after the information cutoff",
-                action_id=candidate.action_id,
-            )
         if candidate.features.observed_at > state.information_cutoff:
             raise RankStrategyError(
                 "RANK_OPPONENT_FUTURE_FEATURE_LEAKAGE",
                 "opponent action feature was unavailable at the information cutoff",
+                action_id=candidate.action_id,
+            )
+        if candidate.generated_at > state.information_cutoff:
+            raise RankStrategyError(
+                "RANK_OPPONENT_FUTURE_ACTION_LEAKAGE",
+                "opponent action candidate was generated after the information cutoff",
                 action_id=candidate.action_id,
             )
         if candidate.features.observed_at > candidate.generated_at:

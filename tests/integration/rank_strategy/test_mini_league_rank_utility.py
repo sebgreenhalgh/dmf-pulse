@@ -12,8 +12,8 @@ from tests.support.rank_strategy_fixtures import (
     multiplier_policy,
     rank_players,
     rank_rules,
+    rank_tie_policy,
     scenario_set,
-    tie_policy,
 )
 from tests.support.rank_utility_fixtures import candidate, context, policy
 
@@ -46,13 +46,15 @@ def _distribution_for_sebastian(captain: str):
     return simulate_mini_league_rank(
         sample,
         sets,
-        tie_policy(),
+        rank_tie_policy(),
         target_manager_id="sebastian",
         target_rank=1,
     )
 
 
-def test_exact_mini_league_rank_distributions_feed_lexicographic_utility_without_projection_mutation() -> None:
+def test_exact_mini_league_rank_distributions_feed_lexicographic_utility_without_projection_mutation() -> (
+    None
+):
     points_distribution = _distribution_for_sebastian("p12")
     alternative_distribution = _distribution_for_sebastian("p13")
     points = candidate(

@@ -37,7 +37,7 @@ def test_observed_state_rejects_temporal_and_manager_mismatch() -> None:
         OpponentObservedState.model_validate(payload)
 
     payload = observed_state().model_dump(mode="python")
-    payload["observed_plan"] = payload["observed_plan"].model_copy(update={"manager_id": "other"})
+    payload["observed_plan"] = {**payload["observed_plan"], "manager_id": "other"}
     with pytest.raises(ValidationError):
         OpponentObservedState.model_validate(payload)
 
@@ -67,9 +67,11 @@ def test_profile_rejects_future_estimate_and_non_utc_timestamp() -> None:
                 transfer_count=3,
                 counted_transfer_delta=3,
                 chip_action=OpponentChipAction.FREE_HIT,
-                manager_plan=payload["manager_plan"].model_copy(
-                    update={"active_chip": "FREE_HIT"}
-                ),
+                manager_plan=candidate(
+                    "free-hit-contract",
+                    transfer_count=3,
+                    chip=OpponentChipAction.FREE_HIT,
+                ).manager_plan.model_dump(mode="python"),
             ),
             "Free Hit and Wildcard",
         ),
@@ -77,9 +79,7 @@ def test_profile_rejects_future_estimate_and_non_utc_timestamp() -> None:
             lambda payload: payload.update(
                 transfer_count=0,
                 counted_transfer_delta=0,
-                manager_plan=payload["manager_plan"].model_copy(
-                    update={"transfer_hit_points": 4}
-                ),
+                manager_plan={**payload["manager_plan"], "transfer_hit_points": 4},
             ),
             "no-transfer",
         ),
@@ -108,9 +108,10 @@ def test_action_candidate_rejects_feature_after_generation() -> None:
     payload = candidate("transfer", expected_points=52.0, transfer_count=1).model_dump(
         mode="python"
     )
-    payload["features"] = payload["features"].model_copy(
-        update={"observed_at": payload["generated_at"] + timedelta(seconds=1)}
-    )
+    payload["features"] = {
+        **payload["features"],
+        "observed_at": payload["generated_at"] + timedelta(seconds=1),
+    }
     with pytest.raises(ValidationError, match="features cannot postdate"):
         candidate("transfer", expected_points=52.0, transfer_count=1).__class__.model_validate(
             payload
@@ -122,7 +123,7 @@ def test_distribution_rejects_invalid_probability_vector_and_diagnostics() -> No
     mutations = (
         lambda payload: payload.update(actions=tuple(reversed(payload["actions"]))),
         lambda payload: payload.update(
-            actions=tuple(item.model_copy(update={"probability": 0.2}) for item in payload["actions"])
+            actions=tuple({**item, "probability": 0.2} for item in payload["actions"])
         ),
         lambda payload: payload.update(no_transfer_probability=0.0),
         lambda payload: payload.update(expected_transfer_count=99.0),
@@ -244,7 +245,9 @@ def test_model_boundary_rejects_squad_mutation_inconsistent_with_action() -> Non
     mutated_no_transfer = no_transfer.model_copy(
         update={
             "manager_plan": no_transfer.manager_plan.model_copy(
-                update={"permanent_squad": tuple(reversed(no_transfer.manager_plan.permanent_squad))}
+                update={
+                    "permanent_squad": tuple(reversed(no_transfer.manager_plan.permanent_squad))
+                }
             )
         }
     )

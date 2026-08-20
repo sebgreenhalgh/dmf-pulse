@@ -62,6 +62,10 @@ class RankTargetDefinition(RankModel):
             and self.band_best_rank > self.band_worst_rank
         ):
             raise ValueError("rank band best rank cannot exceed worst rank")
+        if self.target_rank is not None and self.band_best_rank is not None:
+            raise ValueError("rank target cannot mix a single target rank with a rank band")
+        if self.prize_band_id is not None and self.band_best_rank is None:
+            raise ValueError("prize band ID requires a complete rank band")
         return self
 
 
@@ -93,7 +97,9 @@ class RankUtilityPolicy(RankModel):
     early_season_through_gameweek: Annotated[StrictInt, Field(ge=0)]
     minimum_rank_confidence: ConfidenceGrade
     minimum_target_probability_gain: NonNegativeFloat = 0.0
-    early_season_default_mode: Literal[RankObjectiveMode.PURE_POINTS] = RankObjectiveMode.PURE_POINTS
+    early_season_default_mode: Literal[RankObjectiveMode.PURE_POINTS] = (
+        RankObjectiveMode.PURE_POINTS
+    )
     fail_closed: Literal[True] = True
 
 
@@ -170,6 +176,38 @@ class RankPlanMetrics(RankModel):
     confidence: ConfidenceGrade | None
     points_floor_satisfied: StrictBool
 
+    @model_validator(mode="after")
+    def distribution_diagnostics_reconcile(self) -> RankPlanMetrics:
+        ranks = tuple(item.rank for item in self.rank_pmf)
+        if ranks != tuple(sorted(ranks)) or len(ranks) != len(set(ranks)):
+            raise ValueError("rank metrics PMF must be sorted by unique rank")
+        if not self.rank_pmf:
+            if any(
+                value is not None
+                for value in (
+                    self.expected_rank,
+                    self.probability_target,
+                    self.mini_league_win_probability,
+                    self.confidence,
+                )
+            ):
+                raise ValueError("rank metrics without a PMF cannot contain rank diagnostics")
+            return self
+        if abs(sum(item.probability for item in self.rank_pmf) - 1.0) > 1e-10:
+            raise ValueError("rank metrics probabilities must sum to one")
+        expected_rank = sum(item.rank * item.probability for item in self.rank_pmf)
+        if self.expected_rank is None or abs(self.expected_rank - expected_rank) > 1e-10:
+            raise ValueError("rank metrics expected rank must be derived from the PMF")
+        win_probability = sum(item.probability for item in self.rank_pmf if item.rank == 1)
+        if (
+            self.mini_league_win_probability is None
+            or abs(self.mini_league_win_probability - win_probability) > 1e-10
+        ):
+            raise ValueError("rank metrics win probability must equal rank-one mass")
+        if self.confidence is None:
+            raise ValueError("rank metrics with a PMF require confidence")
+        return self
+
 
 class RankPlanEvaluation(RankModel):
     plan_id: StrictStr = Field(min_length=1, max_length=200)
@@ -177,9 +215,19 @@ class RankPlanEvaluation(RankModel):
     eligible_for_counterfactual_rank_selection: StrictBool
     exclusion_reasons: tuple[StrictStr, ...]
 
+    @model_validator(mode="after")
+    def evaluation_is_canonical(self) -> RankPlanEvaluation:
+        if self.metrics.plan_id != self.plan_id:
+            raise ValueError("rank evaluation metrics plan mismatch")
+        if self.exclusion_reasons != tuple(sorted(set(self.exclusion_reasons))):
+            raise ValueError("rank evaluation exclusion reasons must be sorted and unique")
+        if self.eligible_for_counterfactual_rank_selection == bool(self.exclusion_reasons):
+            raise ValueError("rank evaluation eligibility must reconcile with exclusion reasons")
+        return self
+
 
 class ProjectionInvarianceEvidence(RankModel):
-    identical: StrictBool
+    identical: Literal[True]
     raw_projection_hash: Sha256
     scenario_set_hash: Sha256
     before_score_hashes: dict[StrictStr, Sha256]
@@ -210,7 +258,7 @@ class RankStrategyDecision(RankModel):
     rank_optimal_metrics: RankPlanMetrics
     expected_points_difference: FiniteFloat
     target_probability_difference: FiniteFloat | None
-    evaluations: tuple[RankPlanEvaluation, ...]
+    evaluations: tuple[RankPlanEvaluation, ...] = Field(min_length=1)
     fallback_reasons: tuple[StrictStr, ...]
     human_review_required: StrictBool
     projection_invariance: ProjectionInvarianceEvidence
@@ -225,18 +273,56 @@ class RankStrategyDecision(RankModel):
             raise ValueError("points-optimal metrics plan mismatch")
         if self.rank_optimal_metrics.plan_id != self.rank_optimal_plan_id:
             raise ValueError("rank-optimal metrics plan mismatch")
+        if self.selected_plan_id not in ids:
+            raise ValueError("selected rank plan must exist in evaluations")
+        evaluation_by_id = {item.plan_id: item for item in self.evaluations}
+        if evaluation_by_id[self.points_optimal_plan_id].metrics != self.points_optimal_metrics:
+            raise ValueError("points-optimal metrics must match the retained evaluation")
+        if evaluation_by_id[self.rank_optimal_plan_id].metrics != self.rank_optimal_metrics:
+            raise ValueError("rank-optimal metrics must match the retained evaluation")
+        if not self.rank_optimal_metrics.points_floor_satisfied:
+            raise ValueError("rank-optimal plan must satisfy the expected-points floor")
         expected_difference = (
             self.rank_optimal_metrics.expected_points - self.points_optimal_metrics.expected_points
         )
         if abs(self.expected_points_difference - expected_difference) > 1e-10:
             raise ValueError("expected-points difference does not reconcile")
+        probabilities_available = (
+            self.rank_optimal_metrics.probability_target is not None
+            and self.points_optimal_metrics.probability_target is not None
+        )
+        if probabilities_available != (self.target_probability_difference is not None):
+            raise ValueError("target-probability difference availability does not reconcile")
         if self.target_probability_difference is not None:
-            assert self.rank_optimal_metrics.probability_target is not None
-            assert self.points_optimal_metrics.probability_target is not None
-            expected_target_difference = (
-                self.rank_optimal_metrics.probability_target
-                - self.points_optimal_metrics.probability_target
-            )
+            rank_probability = self.rank_optimal_metrics.probability_target
+            points_probability = self.points_optimal_metrics.probability_target
+            if rank_probability is None or points_probability is None:
+                raise ValueError("target-probability difference requires both plan probabilities")
+            expected_target_difference = rank_probability - points_probability
             if abs(self.target_probability_difference - expected_target_difference) > 1e-10:
                 raise ValueError("target-probability difference does not reconcile")
+        if self.fallback_reasons != tuple(sorted(set(self.fallback_reasons))):
+            raise ValueError("rank fallback reasons must be sorted and unique")
+        if self.activation_status is RankActivationStatus.ACTIVE:
+            if self.fallback_reasons:
+                raise ValueError("active rank decision cannot contain fallback reasons")
+            if self.effective_objective is not self.requested_objective:
+                raise ValueError("active rank decision must retain the requested objective")
+            expected_selected = (
+                self.points_optimal_plan_id
+                if self.requested_objective is RankObjectiveMode.PURE_POINTS
+                else self.rank_optimal_plan_id
+            )
+            if self.selected_plan_id != expected_selected:
+                raise ValueError("active rank decision selected plan is inconsistent")
+        else:
+            if not self.fallback_reasons:
+                raise ValueError("inactive rank decision requires a fallback reason")
+            if self.effective_objective is not RankObjectiveMode.PURE_POINTS:
+                raise ValueError("inactive rank decision must fail closed to pure points")
+            if self.selected_plan_id != self.points_optimal_plan_id:
+                raise ValueError("inactive rank decision must select the points-optimal plan")
+        payload = self.model_dump(mode="json", exclude={"decision_hash"})
+        if self.decision_hash != semantic_sha256(payload):
+            raise ValueError("rank decision hash does not reconcile")
         return self

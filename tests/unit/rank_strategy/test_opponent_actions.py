@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import replace
 from datetime import timedelta
 
 import pytest
@@ -34,7 +33,9 @@ def test_baseline_distribution_is_non_degenerate_transparent_and_reconciled() ->
     assert sum(probabilities.values()) == pytest.approx(1.0)
     assert all(0.0 < value < 1.0 for value in probabilities.values())
     assert probabilities["one-transfer"] > probabilities["no-transfer"]
-    assert result.no_transfer_probability == probabilities["no-transfer"]
+    assert result.no_transfer_probability == pytest.approx(
+        probabilities["no-transfer"] + probabilities["triple-captain"]
+    )
     assert result.expected_transfer_count == pytest.approx(probabilities["one-transfer"])
     assert result.expected_hit_points == 0.0
     assert 0.0 < result.normalised_entropy <= 1.0
@@ -130,7 +131,11 @@ def test_future_action_feature_and_postdeadline_label_leakage_have_distinct_code
             "RANK_OPPONENT_FUTURE_ACTION_LEAKAGE",
         ),
         (
-            candidate("future-feature", feature_observed_at=CUTOFF + timedelta(seconds=1)),
+            candidate(
+                "future-feature",
+                generated_at=CUTOFF + timedelta(seconds=2),
+                feature_observed_at=CUTOFF + timedelta(seconds=1),
+            ),
             "RANK_OPPONENT_FUTURE_FEATURE_LEAKAGE",
         ),
         (
@@ -139,7 +144,11 @@ def test_future_action_feature_and_postdeadline_label_leakage_have_distinct_code
         ),
     )
     for invalid, expected_code in cases:
-        candidates = (candidate("no-transfer"), invalid)
+        candidates = (
+            candidate("no-transfer"),
+            candidate("valid-transfer", transfer_count=1),
+            invalid,
+        )
         with pytest.raises(RankStrategyError) as exc_info:
             model_opponent_actions(observed_state(), candidates, behaviour_profile())
         assert exc_info.value.code == expected_code

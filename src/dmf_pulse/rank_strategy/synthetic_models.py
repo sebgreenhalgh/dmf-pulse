@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from enum import StrEnum
+from itertools import pairwise
 from math import isfinite
 from typing import Literal
 
@@ -98,14 +99,16 @@ class SyntheticOverallPopulation(RankModel):
             if value.tzinfo is None or value.utcoffset() != timedelta(0):
                 raise ValueError(f"{label} must be timezone-aware UTC")
         if self.generated_at > self.information_cutoff:
-            raise ValueError("synthetic population cannot be generated after the information cutoff")
+            raise ValueError(
+                "synthetic population cannot be generated after the information cutoff"
+            )
         band_ids = tuple(item.band_id for item in self.bands)
         if band_ids != tuple(sorted(band_ids)) or len(band_ids) != len(set(band_ids)):
             raise ValueError("synthetic rank bands must be sorted and unique")
         ordered_by_rank = tuple(
             sorted(self.bands, key=lambda item: (item.best_rank, item.worst_rank))
         )
-        for previous, current in zip(ordered_by_rank, ordered_by_rank[1:], strict=False):
+        for previous, current in pairwise(ordered_by_rank):
             if previous.worst_rank >= current.best_rank:
                 raise ValueError("synthetic rank bands cannot overlap")
         representatives = tuple(
@@ -163,9 +166,7 @@ class SyntheticOverallScenarioOutcome(RankModel):
 
 
 class SyntheticOverallRankResult(RankModel):
-    schema_version: Literal["rank-synthetic-overall-result-v1"] = (
-        "rank-synthetic-overall-result-v1"
-    )
+    schema_version: Literal["rank-synthetic-overall-result-v1"] = "rank-synthetic-overall-result-v1"
     population_id: StrictStr = Field(min_length=1, max_length=200)
     distribution: RankDistribution
     scenario_outcomes: tuple[SyntheticOverallScenarioOutcome, ...] = Field(min_length=1)

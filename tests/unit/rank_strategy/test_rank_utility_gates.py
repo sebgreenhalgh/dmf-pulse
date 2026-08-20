@@ -74,6 +74,39 @@ def test_low_confidence_explicit_target_is_evaluated_but_cannot_override_points(
     assert result.human_review_required is True
 
 
+def test_rank_mode_requires_explicit_user_selected_target() -> None:
+    result = evaluate_rank_strategy(
+        request_id="implicit-target",
+        objective=RankObjectiveMode.TARGET_RANK,
+        candidates=_two_plans(),
+        context=context(explicit=False),
+        policy=policy(material_threshold=1.0),
+        target=RankTargetDefinition(target_rank=1),
+    )
+    assert result.rank_optimal_plan_id == "target"
+    assert result.selected_plan_id == "points"
+    assert result.activation_status is RankActivationStatus.FALLBACK_PURE_POINTS
+    assert "RANK_TARGET_NOT_USER_SELECTED" in result.fallback_reasons
+
+
+def test_candidate_level_rank_confidence_cannot_be_hidden_by_context() -> None:
+    candidates = (
+        candidate("points", 60.0, {1: 0.2, 3: 0.8}, confidence="A"),
+        candidate("target", 59.2, {1: 0.8, 3: 0.2}, confidence="D"),
+    )
+    result = evaluate_rank_strategy(
+        request_id="candidate-confidence",
+        objective=RankObjectiveMode.TARGET_RANK,
+        candidates=candidates,
+        context=context(confidence="A", explicit=True),
+        policy=policy(material_threshold=1.0, minimum_confidence="C"),
+        target=RankTargetDefinition(target_rank=1),
+    )
+    assert result.rank_optimal_plan_id == "target"
+    assert result.selected_plan_id == "points"
+    assert "RANK_PLAN_CONFIDENCE_TOO_LOW" in result.fallback_reasons
+
+
 def test_early_season_material_sacrifice_is_diagnostic_only_even_for_explicit_target() -> None:
     result = evaluate_rank_strategy(
         request_id="early",
@@ -181,6 +214,20 @@ def test_raw_projection_and_scenario_set_mismatches_are_p0_failures() -> None:
                 policy=policy(),
             )
         assert exc_info.value.code == expected_code
+
+
+def test_post_validation_scenario_mutation_is_detected_from_semantic_content() -> None:
+    plan = candidate("mutated", 60.0, {1: 0.5, 2: 0.5})
+    plan.scenario_points["s1|d1"] = 999.0
+    with pytest.raises(RankStrategyError) as exc_info:
+        evaluate_rank_strategy(
+            request_id="mutated-scores",
+            objective=RankObjectiveMode.PURE_POINTS,
+            candidates=(plan,),
+            context=context(),
+            policy=policy(),
+        )
+    assert exc_info.value.code == "RANK_SCENARIO_SCORE_HASH_INVALID"
 
 
 def test_empty_and_duplicate_candidate_sets_fail_closed() -> None:

@@ -95,12 +95,8 @@ def test_increasing_only_one_action_points_increases_its_probability(
         candidate("no-transfer", expected_points=base),
         candidate("transfer", expected_points=base + improvement, transfer_count=1),
     )
-    baseline = model_opponent_actions(
-        observed_state(), baseline_candidates, behaviour_profile()
-    )
-    improved = model_opponent_actions(
-        observed_state(), improved_candidates, behaviour_profile()
-    )
+    baseline = model_opponent_actions(observed_state(), baseline_candidates, behaviour_profile())
+    improved = model_opponent_actions(observed_state(), improved_candidates, behaviour_profile())
     base_probability = next(
         item.probability for item in baseline.actions if item.action_id == "transfer"
     )

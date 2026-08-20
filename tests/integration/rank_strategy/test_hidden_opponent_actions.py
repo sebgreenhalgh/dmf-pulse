@@ -64,7 +64,10 @@ def test_every_hidden_rival_action_reuses_identical_raw_football_scenarios() -> 
     expected_projection_hashes = {item.raw_projection_hash for item in scored.values()}
     expected_scenario_hashes = {item.scenario_set_hash for item in scored.values()}
     expected_identities = {
-        tuple((scenario.scenario_id, scenario.outcome_draw_id, scenario.weight) for scenario in item.scenarios)
+        tuple(
+            (scenario.scenario_id, scenario.outcome_draw_id, scenario.weight)
+            for scenario in item.scenarios
+        )
         for item in scored.values()
     }
     assert len(expected_projection_hashes) == 1
@@ -106,7 +109,6 @@ def test_hidden_captain_chip_and_transfer_actions_change_only_manager_decisions(
     assert len(set(expected_points.values())) > 1
     assert all(item.raw_projection_hash == raw_hash for item in scored.values())
     assert any(
-        action.chip_action is OpponentChipAction.TRIPLE_CAPTAIN
-        for action in distribution.actions
+        action.chip_action is OpponentChipAction.TRIPLE_CAPTAIN for action in distribution.actions
     )
     assert any(action.transfer_count > 0 for action in distribution.actions)
