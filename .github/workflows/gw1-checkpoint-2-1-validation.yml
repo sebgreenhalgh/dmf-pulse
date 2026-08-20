@@ -1,0 +1,106 @@
+name: gw1-checkpoint-2-1-validation
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-live-input-initial-squad
+    paths:
+      - .github/workflows/gw1-checkpoint-2-1-validation.yml
+      - src/dmf_pulse/ingestion/odds/credentials.py
+      - src/dmf_pulse/ingestion/odds/current.py
+      - src/dmf_pulse/ingestion/odds/live.py
+      - src/dmf_pulse/ingestion/odds/service.py
+      - src/dmf_pulse/ingestion/session1.py
+      - src/dmf_pulse/markets/current.py
+      - tests/unit/markets/test_current_market.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gw1-checkpoint-2-1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Checkpoint 2.1 focused validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: dmf_pulse_test
+          POSTGRES_USER: dmf_test
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
+      UV_NO_PROGRESS: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen environment sync
+        run: uv sync --all-groups --frozen
+
+      - name: Upgrade disposable PostgreSQL
+        run: uv run alembic upgrade head
+
+      - name: Current market, Stage-6 and ingestion regressions
+        run: >-
+          uv run pytest -q
+          tests/unit/markets
+          tests/property/markets
+          tests/unit/ingestion
+          tests/unit/cli/test_session1_operator_workflow.py
+
+      - name: New current-market branch coverage
+        run: >-
+          uv run pytest -q
+          tests/unit/markets/test_current_market.py
+          --cov=dmf_pulse.markets.current
+          --cov-branch
+          --cov-report=term-missing
+          --cov-fail-under=90
+
+      - name: PostgreSQL odds evidence regression
+        run: >-
+          uv run pytest -q
+          tests/integration/ingestion/odds/test_live_provider_current_input.py
+          tests/integration/markets
+
+      - name: Ruff format
+        run: uv run ruff format --check src/dmf_pulse tests scripts
+
+      - name: Ruff lint
+        run: uv run ruff check src/dmf_pulse tests scripts
+
+      - name: Strict mypy
+        run: uv run mypy
+
+      - name: Build wheel and source distribution
+        run: uv build
+
+      - name: First-party secret scan
+        run: uv run python scripts/scan_secrets.py
+
+      - name: Commit whitespace assurance
+        run: git diff --check ${{ github.event.before }} ${{ github.sha }}

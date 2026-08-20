@@ -131,3 +131,23 @@ def credential_is_configured(provider: CredentialProvider) -> bool:
     except Exception:
         return False
     return True
+
+
+def credential_configuration_hint(provider: CredentialProvider) -> bool | None:
+    """Report known configuration presence without resolving secret material.
+
+    ``None`` is deliberate for arbitrary providers: error handlers must not call
+    an unknown secret-bearing boundary merely to choose an error precedence.
+    """
+
+    if isinstance(provider, UnavailableCredentialProvider):
+        return False
+    if isinstance(provider, StaticCredentialProvider):
+        return True
+    if isinstance(provider, RuntimeOddsCredentialProvider):
+        environment = provider._runtime_environment()
+        return bool(
+            environment.get(SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE)
+            or ODDS_API_ENVIRONMENT_VARIABLE in environment
+        )
+    return None

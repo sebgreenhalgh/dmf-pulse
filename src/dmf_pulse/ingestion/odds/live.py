@@ -36,7 +36,7 @@ from dmf_pulse.ingestion.odds.config import (
 )
 from dmf_pulse.ingestion.odds.credentials import (
     RuntimeOddsCredentialProvider,
-    credential_is_configured,
+    credential_configuration_hint,
 )
 from dmf_pulse.ingestion.odds.current import (
     OddsProviderCurrentInput,
@@ -609,7 +609,7 @@ class LiveOddsSnapshotService:
                 quota if quota is not None else evidence_store.latest_quota(selected_database_ref)
             )
         except Exception:
-            if not credential_is_configured(self.credential_provider):
+            if credential_configuration_hint(self.credential_provider) is False:
                 code = ProviderFailureCode.CREDENTIAL_UNAVAILABLE
                 return LiveOddsOperationOutcome(
                     LiveOddsSnapshotResult(

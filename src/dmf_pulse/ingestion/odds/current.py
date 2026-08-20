@@ -10,6 +10,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.models import RightsCapability, RightsProfile
 from dmf_pulse.ingestion.odds.config import (
@@ -280,6 +281,7 @@ class OddsProviderCurrentInput(_FrozenModel):
     rights: CurrentOddsRightsState
     provenance: CurrentOddsProvenance
     quality: CurrentOddsQualityState
+    market_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
     def validate_cutoff_request_alignment(self) -> OddsProviderCurrentInput:
@@ -295,7 +297,76 @@ class OddsProviderCurrentInput(_FrozenModel):
             raise ValueError("provider request cutoff must be timezone-aware")
         if requested_cutoff.astimezone(UTC) != self.temporal.information_cutoff:
             raise ValueError("provider request cutoff contradicts input cutoff")
+        if self.market_semantic_sha256 != current_odds_market_semantic_sha256(self):
+            raise ValueError("provider current-market semantic hash is inconsistent")
         return self
+
+
+def _semantic_event_key(item: dict[str, object]) -> str:
+    return str(item["provider_event_id"])
+
+
+def current_odds_market_semantic_sha256(value: OddsProviderCurrentInput) -> str:
+    """Hash the actual parsed current-market material independently of raw retention."""
+
+    events: list[dict[str, object]] = []
+    for event in value.events:
+        bookmakers: list[dict[str, object]] = []
+        for bookmaker in event.bookmakers:
+            markets: list[dict[str, object]] = []
+            for market in bookmaker.markets:
+                markets.append(
+                    {
+                        "market_key": market.market_key,
+                        "provider_last_update": (
+                            market.provider_last_update.isoformat()
+                            if market.provider_last_update is not None
+                            else None
+                        ),
+                        "provider_last_update_state": market.provider_last_update_state,
+                        "outcomes": sorted(
+                            (
+                                {
+                                    "decimal_price": format(outcome.decimal_price, "f"),
+                                    "outcome": outcome.outcome,
+                                    "provider_name": outcome.provider_name,
+                                }
+                                for outcome in market.outcomes
+                            ),
+                            key=lambda item: str(item["outcome"]),
+                        ),
+                    }
+                )
+            bookmakers.append(
+                {
+                    "age_at_receipt_seconds": bookmaker.age_at_receipt_seconds,
+                    "bookmaker_key": bookmaker.bookmaker_key,
+                    "bookmaker_title": bookmaker.bookmaker_title,
+                    "markets": markets,
+                    "provider_last_update": bookmaker.provider_last_update.isoformat(),
+                }
+            )
+        events.append(
+            {
+                "bookmakers": sorted(bookmakers, key=lambda item: str(item["bookmaker_key"])),
+                "commence_time": event.commence_time.isoformat(),
+                "provider_away_team": event.provider_away_team,
+                "provider_event_id": event.provider_event_id,
+                "provider_home_team": event.provider_home_team,
+                "sport_key": event.sport_key,
+            }
+        )
+    events.sort(key=_semantic_event_key)
+    return canonical_sha256(
+        {
+            "contract": value.contract,
+            "events": events,
+            "provider": value.provider,
+            "received_at": value.temporal.received_at.isoformat(),
+            "source_snapshot_id": str(value.provenance.source_snapshot_id),
+            "usable_at": value.temporal.usable_at.isoformat(),
+        }
+    )
 
 
 def _canonical_outcome(
@@ -570,39 +641,63 @@ def build_current_odds_input(
         information_cutoff=cutoff,
     )
     warnings = tuple(sorted(set(parsed.warnings)))
+    temporal = CurrentOddsTemporalState(
+        request_started_at=request_started,
+        received_at=received,
+        captured_at=received,
+        information_cutoff=cutoff,
+        usable_at=usable,
+    )
+    current_quota = CurrentOddsQuotaState(
+        remaining=quota.remaining,
+        used=quota.used,
+        configured_request_cost=config.request_cost,
+        provider_last_request_cost=quota.last_cost,
+        observed_at=quota.observed_at,
+    )
+    rights = _rights_state(profile, received)
+    provenance = CurrentOddsProvenance(
+        source_snapshot_id=source_snapshot_id,
+        sanitized_target=sanitized_target,
+        attempt_count=attempt_count,
+        transport_call_count=transport_call_count,
+        provider_config_sha256=provider_config_sha256(),
+        rights_config_sha256=rights_config_sha256(),
+        effective_config_sha256=effective_config_sha256(),
+        request_fingerprint=request_fingerprint,
+        provider_request_id_sha256=provider_request_id_sha256,
+        response_body_sha256=parsed.body_sha256,
+        adapter_version=config.adapter_version,
+        contract_version=config.contract_version,
+    )
+    quality = CurrentOddsQualityState(
+        status="WARNING" if warnings else "PASS",
+        warnings=warnings,
+    )
+    provisional = OddsProviderCurrentInput.model_construct(
+        schema_version="1.0.0",
+        contract="ODDS_PROVIDER_CURRENT_INPUT",
+        provider="the_odds_api",
+        api_version="v4",
+        sport_key="soccer_epl",
+        region="uk",
+        market="h2h",
+        odds_format="decimal",
+        identity_scope="PROVIDER_NATIVE_UNMAPPED",
+        events=events,
+        temporal=temporal,
+        quota=current_quota,
+        rights=rights,
+        provenance=provenance,
+        quality=quality,
+        market_semantic_sha256="0" * 64,
+    )
     return OddsProviderCurrentInput(
         events=events,
-        temporal=CurrentOddsTemporalState(
-            request_started_at=request_started,
-            received_at=received,
-            captured_at=received,
-            information_cutoff=cutoff,
-            usable_at=usable,
-        ),
-        quota=CurrentOddsQuotaState(
-            remaining=quota.remaining,
-            used=quota.used,
-            configured_request_cost=config.request_cost,
-            provider_last_request_cost=quota.last_cost,
-            observed_at=quota.observed_at,
-        ),
-        rights=_rights_state(profile, received),
-        provenance=CurrentOddsProvenance(
-            source_snapshot_id=source_snapshot_id,
-            sanitized_target=sanitized_target,
-            attempt_count=attempt_count,
-            transport_call_count=transport_call_count,
-            provider_config_sha256=provider_config_sha256(),
-            rights_config_sha256=rights_config_sha256(),
-            effective_config_sha256=effective_config_sha256(),
-            request_fingerprint=request_fingerprint,
-            provider_request_id_sha256=provider_request_id_sha256,
-            response_body_sha256=parsed.body_sha256,
-            adapter_version=config.adapter_version,
-            contract_version=config.contract_version,
-        ),
-        quality=CurrentOddsQualityState(
-            status="WARNING" if warnings else "PASS",
-            warnings=warnings,
-        ),
+        temporal=temporal,
+        quota=current_quota,
+        rights=rights,
+        provenance=provenance,
+        quality=quality,
+        market_semantic_sha256=current_odds_market_semantic_sha256(provisional),
     )

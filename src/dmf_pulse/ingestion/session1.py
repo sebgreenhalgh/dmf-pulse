@@ -17,7 +17,10 @@ from dmf_pulse.ingestion.fpl.current import (
     CurrentFplInputService,
 )
 from dmf_pulse.ingestion.fpl.service import DATABASE_REF
-from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput
+from dmf_pulse.ingestion.odds.current import (
+    OddsProviderCurrentInput,
+    current_odds_market_semantic_sha256,
+)
 from dmf_pulse.ingestion.odds.identity import (
     FplOddsIdentityMap,
     bind_current_fixture_resolution_request,
@@ -224,6 +227,7 @@ def _downstream_semantic_sha256(value: Session1DownstreamInput) -> str:
             "odds_identity_semantic_sha256": current_odds_identity_semantic_sha256(
                 value.odds_input
             ),
+            "odds_market_semantic_sha256": current_odds_market_semantic_sha256(value.odds_input),
             "odds_provider_provenance_sha256": current_odds_provider_provenance_sha256(
                 value.odds_input
             ),
@@ -480,8 +484,12 @@ def _scope_odds_to_target_gameweek(
             "QUALITY_BLOCKED",
             "live odds input has no event in the official target-Gameweek kickoff window",
         )
-    payload = odds_input.model_dump(mode="python")
-    payload["events"] = selected
+    values = {name: getattr(odds_input, name) for name in OddsProviderCurrentInput.model_fields}
+    values["events"] = selected
+    values["market_semantic_sha256"] = "0" * 64
+    provisional = OddsProviderCurrentInput.model_construct(**values)
+    payload = provisional.model_dump(mode="python")
+    payload["market_semantic_sha256"] = current_odds_market_semantic_sha256(provisional)
     return OddsProviderCurrentInput.model_validate(payload)
 
 
