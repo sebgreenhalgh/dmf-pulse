@@ -5,8 +5,9 @@
 - Canonical branch - `readiness/GW1-2026-27-live-input-initial-squad`.
 - Immutable programme parent - `9eb57143f6ee92f67c78607cc386678d962e62d4`.
 - Starting accepted remote SHA - `4899a1a9b31532600676f280a62599078eab5763`.
-- Capability commit - `PENDING_CAPABILITY_COMMIT`.
-- Dedicated Linux workflow - `PENDING_CAPABILITY_COMMIT`.
+- Capability commit - `008ad0d2369d89da0beff120920253eb315e9251`.
+- Dedicated Linux workflow - run `32325586142` (`PASS`), job `96296054494`,
+  exact head `008ad0d2369d89da0beff120920253eb315e9251`.
 - Real credentialled provider call - `OPERATOR_CHECKPOINT`.
 - Accepted current score/player prior artifact - `NOT_SUPPLIED / OPERATOR_BLOCKER`.
 
@@ -118,10 +119,28 @@
 ## Status
 
 - Local bounded engineering result - `PASS`.
-- Linux engineering result - `PENDING_CAPABILITY_COMMIT`.
-- Checkpoint 2.3 engineering capability - `PENDING_CAPABILITY_COMMIT`.
+- Linux engineering result - `PASS`.
+- Checkpoint 2.3 engineering capability - `COMPLETE`.
 - Current operator projection - `BLOCKED_CURRENT_EVENT_PRIOR_ARTIFACT`.
 - PR, merge and production activation - `NOT_AUTHORIZED / NOT_PERFORMED`.
+
+## Linux and remote validation
+
+- Dedicated run `32325586142` passed on exact capability commit
+  `008ad0d2369d89da0beff120920253eb315e9251`; job `96296054494` passed every
+  step and stopped its PostgreSQL service cleanly.
+- Frozen sync and PostgreSQL migration passed.
+- The accepted Stage-6 through Stage-9 regression command passed `493` tests.
+- Current-adapter branch coverage passed `25` tests and the configured `90%`
+  gate at `91.77%` (`741` statements, `146` branches).
+- PostgreSQL Stage-7/8/9 integration passed `46` tests.
+- Ruff reported `514` files formatted and no lint findings; strict mypy passed
+  `196` source files; wheel/sdist build, secret scan (`finding_count=0`) and
+  commit whitespace assurance passed.
+- After the successful run, the canonical branch was fetched. Local HEAD and
+  `origin/readiness/GW1-2026-27-live-input-initial-squad` were exactly equal at
+  `008ad0d2369d89da0beff120920253eb315e9251` before this evidence-only
+  attestation.
 
 ## Capability file hashes before commit
 

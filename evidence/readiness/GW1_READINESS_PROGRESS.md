@@ -16,7 +16,7 @@
 | 1.5 Session-1 workflow | COMPLETE | Capability `db4ef85f…`; Linux run `32315608960` PASS. |
 | 2.1 current market consensus | COMPLETE | Remediated capability `2858e6f1…`; Linux run `32317678585` PASS. |
 | 2.2 availability/start/minutes | COMPLETE | Capability `e7c40a03…`; Linux run `32319850997` PASS. |
-| 2.3 football-event distributions | IN_PROGRESS / OPERATOR_BLOCKED | Guarded Stage-8/Stage-9 handoff implemented locally; broad/Linux acceptance pending and no accepted current event-prior artifact has been supplied. |
+| 2.3 football-event distributions | ENGINEERING_COMPLETE / OPERATOR_BLOCKED | Capability `008ad0d2…`; Linux run `32325586142` PASS. No governance-accepted current event-prior artifact was supplied. |
 | 2.4–4.5 | NOT_STARTED | Must consume accepted preceding checkpoints in order. |
 
 ## Current operational boundary
@@ -45,8 +45,7 @@
 
 ## Exact next action
 
-Complete local broad/PostgreSQL/static/build/security validation for the
-Checkpoint-2.3 guarded current-fixture adapter, commit and push the coherent
-capability, run its exact dedicated Linux workflow, and attest the remotely
-verified revision. Do not claim a live current projection without the missing
-accepted event-prior artifact.
+Attest the remotely verified Checkpoint-2.3 engineering capability, then begin
+the smallest governed Checkpoint-2.4 Stage-9 decision-support integration on
+the same branch. Keep the real current run fail-closed: no points projection
+may be claimed without the missing governance-accepted event-prior artifact.

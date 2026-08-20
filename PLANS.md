@@ -110,7 +110,7 @@ Linux validation run `32319850997` (`PASS`), job `96279685296`.
   score matrix, paired coherent Stage-7 lineup/minute paths and accepted
   allocation inputs. Do not add rules identity, allocate or score events before
   Checkpoint 2.4, and do not create a parallel simulator.
-- [ ] Return a hash-bound transient preseason bundle and safe summary; add
+- [x] Return a hash-bound transient preseason bundle and safe summary; add
   adversarial lineage/cutoff/coverage/coherence/rights tests, bounded evidence,
   a dedicated Linux gate, capability commit/push/run verification and exact
   attestation commit.
@@ -120,6 +120,11 @@ derived data, actual Stage-9 scoring, production-calibration claims,
 optimisation, squad/captain decisions, prospective evaluation, PR, merge and
 activation. The current operator run remains fail-closed until a
 governance-accepted current event-prior artifact is supplied.
+
+Latest engineering capability - `008ad0d2369d89da0beff120920253eb315e9251`,
+Linux validation run `32325586142` (`PASS`), job `96296054494`. The operator
+projection remains blocked because no governance-accepted current event-prior
+artifact was supplied.
 <!-- GW1-2.3-PLAN-END -->
 - Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
 - Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.
