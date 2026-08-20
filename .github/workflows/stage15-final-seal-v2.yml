@@ -60,7 +60,7 @@ jobs:
           gzip -dc /tmp/rank015-docs.patch.gz > /tmp/rank015-docs.patch
           git read-tree --reset -u "$BASE_SHA"
           git apply --index --whitespace=error /tmp/rank015-docs.patch
-          git rm -r --ignore-unmatch -- \
+          git rm -rf --ignore-unmatch -- \
             .github/workflows/stage15-publish.yml \
             .github/workflows/stage15-source-export.yml \
             .github/workflows/stage15-terminal-finalizer.yml \
