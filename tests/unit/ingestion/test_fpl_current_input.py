@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -161,6 +162,26 @@ def test_valid_pair_exposes_complete_transient_current_input_contract(
     assert "Minor doubt" not in rendered
     assert str(bootstrap_path) not in rendered
     assert str(fixtures_path) not in rendered
+
+
+def test_compile_handles_decimal_game_setting_from_official_payload(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    bootstrap = _source(repository_root, "bootstrap.json")
+    fixtures = _source(repository_root, "fixtures.json")
+    assert isinstance(bootstrap, dict)
+    game_settings = bootstrap["game_settings"]
+    assert isinstance(game_settings, dict)
+    # The official current payload carries this as a JSON number.  Its strict
+    # parser intentionally reads JSON floats as Decimal to avoid float drift.
+    game_settings["transfers_sell_on_fee"] = 0.5
+    bootstrap_path, fixtures_path = _write_pair(tmp_path, bootstrap, fixtures)
+
+    bundle = _compile(_request(bootstrap_path, fixtures_path))
+
+    assert bundle.game_settings["transfers_sell_on_fee"] == Decimal("0.5")
+    assert len(bundle.game_settings_semantic_sha256) == 64
 
 
 def test_position_mapping_uses_target_payload_labels_not_historical_numeric_ids(

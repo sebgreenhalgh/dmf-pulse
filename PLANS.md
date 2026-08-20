@@ -190,6 +190,24 @@ governance-accepted current event-prior artifact.
 
 # DMF Pulse execution plans
 
+## GW1 market-primary remediation
+
+- Branch: `readiness/GW1-2026-27-market-primary-remediation` from accepted
+  readiness SHA `ed6fc1a1190fcc924e6fe0c078f18c7ae25e5a94`.
+- Scope: generic current-FPL Decimal canonicalisation repair; pre-match full-time
+  half-goal `h2h,totals` Stage-6 extension; native Stage-8 totals adapter; candidate
+  generic support prior; then a bounded DMF-native player-allocation candidate.
+- Safety: no live Odds API call/key, no external model/package, no raw FPL payload
+  persistence, no production activation/PR/merge, and no separate score engine.
+
+### Remediation checkpoints
+
+- [x] Reproduce and repair the generic real-FPL Decimal serialization defect.
+- [ ] Add Stage-6 line-specific two-way totals ingestion, normalisation and consensus.
+- [ ] Bind separate H2H/totals Stage-6 evidence into existing Stage-8 constraints.
+- [ ] Produce unaccepted support-prior and player-allocation candidates.
+- [ ] Run hostile validation, commits, push and exact-SHA Linux gates.
+
 ## RUL-2026-27 independent full-ruleset review and remediation
 
 - Repository/branch: `sebgreenhalgh/dmf-pulse`,

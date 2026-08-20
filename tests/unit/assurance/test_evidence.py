@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -61,6 +62,15 @@ def test_canonical_json_has_independent_exact_bytes_and_hash() -> None:
 def test_canonical_json_rejects_nan() -> None:
     with pytest.raises(ValueError):
         canonical_json_bytes({"value": float("nan")})
+
+
+@pytest.mark.unit
+def test_canonical_json_serializes_finite_decimal_without_float_rounding() -> None:
+    value = {"fee": Decimal("0.50"), "nested": [Decimal("1.25")]}
+
+    assert canonical_json_bytes(value) == b'{"fee":"0.50","nested":["1.25"]}'
+    with pytest.raises(ValueError, match="non-finite Decimal"):
+        canonical_json_bytes({"fee": Decimal("NaN")})
 
 
 @pytest.mark.unit

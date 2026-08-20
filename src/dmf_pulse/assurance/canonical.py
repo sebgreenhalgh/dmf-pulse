@@ -4,14 +4,35 @@ from __future__ import annotations
 
 import hashlib
 import json
+from decimal import Decimal
 from pathlib import Path
 
 from pydantic import BaseModel
 
 
 def _json_compatible(value: object) -> object:
+    """Return a JSON-safe representation without introducing float rounding.
+
+    ``json.loads(..., parse_float=Decimal)`` is intentionally used by several
+    ingestion boundaries.  Decimal-bearing provider settings are therefore a
+    normal input shape, not an exceptional one.  Render finite decimals as
+    fixed-point strings: this preserves their exact value and scale without a
+    binary-float round trip.  Existing JSON-native values retain their prior
+    serialisation byte-for-byte.
+    """
+
+    if isinstance(value, Decimal):
+        if not value.is_finite():
+            raise ValueError("canonical JSON does not allow non-finite Decimal values")
+        return format(value, "f")
     if isinstance(value, BaseModel):
-        return value.model_dump(mode="json")
+        return _json_compatible(value.model_dump(mode="json"))
+    if isinstance(value, dict):
+        return {key: _json_compatible(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_compatible(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_json_compatible(item) for item in value)
     return value
 
 
