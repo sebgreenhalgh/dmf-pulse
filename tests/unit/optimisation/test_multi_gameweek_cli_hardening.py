@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
 import typer
+import typer.rich_utils
 from typer.testing import CliRunner
 
 from dmf_pulse.cli.optimise import (
@@ -133,14 +135,14 @@ def test_integrity_failure_emits_machine_readable_fail_closed_payload(
         ),
     ),
 )
-def test_all_optimise_commands_reject_non_json_output(command: str, args: list[str]) -> None:
-    invoked = RUNNER.invoke(
-        optimise_app,
-        [command, *args, "--output", "yaml"],
-        env={"COLUMNS": "240"},
-    )
+def test_all_optimise_commands_reject_non_json_output(
+    command: str, args: list[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(typer.rich_utils, "MAX_WIDTH", 240)
+    invoked = RUNNER.invoke(optimise_app, [command, *args, "--output", "yaml"])
     assert invoked.exit_code == 2
-    assert "--output must be json" in invoked.output
+    plain = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", invoked.output)
+    assert "--output must be json" in plain
 
 
 def test_multi_gameweek_cli_blocks_missing_or_rules_mismatched_input(

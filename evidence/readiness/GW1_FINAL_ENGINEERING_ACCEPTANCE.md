@@ -49,9 +49,13 @@ None found.
   contract. The artifact test now uses duplicate IDs, preserving reduced exact
   oracle cases. Replacement run `32358512801` confirmed that correction
   (`412 passed, 5 failed`) and proved Click's `terminal_width` did not control
-  Rich's table width on Ubuntu. CLI invocations now set Rich's `COLUMNS` input
-  directly. All eight affected CLI/artifact/reduced-oracle cases pass locally,
-  including all five under a forced narrow outer terminal (`8 passed`).
+  Rich's table width on Ubuntu. Run `32360301030` (`412 passed, 5 failed`)
+  further proved invocation-scoped `COLUMNS` was too late because Typer caches
+  width at import and GitHub forces ANSI rendering. Error tests now patch the
+  pinned Typer width before rendering and strip ANSI; the GW1 option-surface
+  test inspects registered command metadata instead of visual help layout. All
+  31 affected-file cases pass with `GITHUB_ACTIONS=true` and a forced 20-column
+  outer terminal.
 
 ### P3 / retained limitations
 

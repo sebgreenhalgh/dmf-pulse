@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+from typer.main import get_command
 from typer.testing import CliRunner
 
 from dmf_pulse.assurance.review_pack import ReviewPackError, ReviewPackSummary
@@ -32,15 +33,17 @@ def test_version_contract() -> None:
 
 @pytest.mark.unit
 def test_gw1_operator_command_exposes_only_process_safe_inputs() -> None:
-    result = runner.invoke(app, ["gw1", "run", "--help"], env={"COLUMNS": "240"})
+    root_command = get_command(app)
+    gw1_group = root_command.commands["gw1"]
+    run_command = gw1_group.commands["run"]
+    options = {
+        option.lower()
+        for parameter in run_command.params
+        for option in getattr(parameter, "opts", ())
+    }
 
-    assert result.exit_code == 0
-    assert "--bootstrap" in result.stdout
-    assert "--event-prior" in result.stdout
-    assert "--code-commit" in result.stdout
-    assert "--prospective-root" in result.stdout
-    assert "api-key" not in result.stdout.lower()
-    assert "password" not in result.stdout.lower()
+    assert {"--bootstrap", "--event-prior", "--code-commit", "--prospective-root"} <= options
+    assert not any("api-key" in option or "password" in option for option in options)
 
 
 @pytest.mark.unit

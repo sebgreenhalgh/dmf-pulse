@@ -566,9 +566,9 @@
       "sha256": "fa5a6210be3d51590bfc67ac61f11d551acfa48d4a9f07143942f9d8764b9722"
     },
     {
-      "bytes": 5309,
+      "bytes": 5565,
       "path": "evidence/readiness/GW1_FINAL_ENGINEERING_ACCEPTANCE.md",
-      "sha256": "b2400382626fb3c3e56c4c5e9778f0c379b26eaf39cf3165e61c759ffe69019c"
+      "sha256": "81aa9d1086b364401cdb670d0450786cc96e74cce1cd7c3001afe8b768c3ec0f"
     },
     {
       "bytes": 8607,
@@ -4581,9 +4581,9 @@
       "sha256": "2d8a63f8831f4de349885247f3cf92766bb3089d9d9472b9987d1d6347d8941c"
     },
     {
-      "bytes": 9314,
+      "bytes": 9401,
       "path": "tests/unit/cli/test_commands.py",
-      "sha256": "331ed068bee345354385436dd7a56ea9a25d7857b0ed31069f5dee635577a5e6"
+      "sha256": "b9cfaaf99b8c890bb1384357a7389a91f7a939ec711afb28ccdf9dc09033fc80"
     },
     {
       "bytes": 3424,
@@ -4961,9 +4961,9 @@
       "sha256": "be180b034e627df5bb023f5fab9361285d579d51131fa68f2db199c9d147ad9b"
     },
     {
-      "bytes": 6869,
+      "bytes": 7005,
       "path": "tests/unit/optimisation/test_multi_gameweek_cli_hardening.py",
-      "sha256": "04fa564c541ed5063b50c1902162114f6b54a8e63ab30e63dfce9e1d80f1b60f"
+      "sha256": "c6bfe1d6630f03da53827fc6c310c35bdddad8d5f87225533d2f25244802dd9c"
     },
     {
       "bytes": 26712,
