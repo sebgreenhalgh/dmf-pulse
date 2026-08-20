@@ -1,39 +1,42 @@
-name: gw1-checkpoint-2-4-validation
+name: gw1-final-readiness-validation
 
 on:
   push:
     branches:
       - readiness/GW1-2026-27-live-input-initial-squad
     paths:
-      - .github/workflows/gw1-checkpoint-2-4-validation.yml
+      - .github/workflows/gw1-final-readiness-validation.yml
       - config/models/fpl_points_simulation.yaml
       - config/rules/fpl-2026-27/**
-      - fixtures/points/PTS-009/manifest.json
-      - fixtures/points/PTS-009/schemas/fixture_request.schema.json
-      - fixtures/points/PTS-009/schemas/fixture_result.schema.json
+      - docs/operations/gw1_full_decision_run.md
+      - evidence/readiness/**
       - src/dmf_pulse/availability/current.py
-      - src/dmf_pulse/availability/__init__.py
-      - src/dmf_pulse/fpl_points/current.py
-      - src/dmf_pulse/fpl_points/current_points.py
-      - src/dmf_pulse/fpl_points/models.py
-      - src/dmf_pulse/fpl_points/rules_adapter.py
-      - src/dmf_pulse/fpl_points/__init__.py
+      - src/dmf_pulse/cli/app.py
+      - src/dmf_pulse/cli/gw1_cmd.py
+      - src/dmf_pulse/cli/ingest_cmd.py
+      - src/dmf_pulse/evaluation/**
+      - src/dmf_pulse/fpl_points/**
+      - src/dmf_pulse/optimisation/**
+      - src/dmf_pulse/orchestration/**
       - src/dmf_pulse/rules/**
-      - tests/unit/fpl_points/test_current_football_events.py
+      - tests/unit/cli/test_commands.py
+      - tests/unit/evaluation/test_prospective_gw1.py
       - tests/unit/fpl_points/test_current_fpl_points.py
+      - tests/unit/optimisation/test_preseason_current.py
+      - tests/unit/orchestration/**
 
 permissions:
   contents: read
 
 concurrency:
-  group: gw1-checkpoint-2-4-${{ github.ref }}
+  group: gw1-final-readiness-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   validate:
-    name: Checkpoint 2.4 focused validation
+    name: Final GW1 engineering readiness
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 75
     services:
       postgres:
         image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
@@ -72,43 +75,33 @@ jobs:
       - name: Upgrade disposable PostgreSQL
         run: uv run alembic upgrade head
 
-      - name: Current points, accepted Stage-6 through Stage-9 regressions
+      - name: Current decision and inherited Stage-6 through Stage-12 regressions
         run: >-
           uv run pytest -q
-          tests/unit/fpl_points
-          tests/property/fpl_points
-          tests/contract/fpl_points
-          tests/unit/football_events
-          tests/property/football_events
-          tests/contract/football_events
-          tests/unit/availability
-          tests/property/availability
-          tests/contract/availability
-          tests/unit/markets/test_current_market.py
           tests/unit/ingestion/test_session1_current_input.py
-
-      - name: Current Stage-7 through Stage-9 branch coverage
-        run: >-
-          uv run pytest -q
+          tests/unit/markets/test_current_market.py
           tests/unit/availability/test_current_availability.py
           tests/unit/fpl_points/test_current_football_events.py
           tests/unit/fpl_points/test_current_fpl_points.py
-          --cov=dmf_pulse.availability.current
-          --cov=dmf_pulse.fpl_points.current
-          --cov=dmf_pulse.fpl_points.current_points
-          --cov-branch
-          --cov-report=term-missing
-          --cov-fail-under=90
+          tests/unit/optimisation
+          tests/property/optimisation
+          tests/performance/optimisation
+          tests/assurance/optimisation
+          tests/unit/evaluation
+          tests/property/evaluation
+          tests/replay/evaluation
+          tests/golden/evaluation
+          tests/unit/orchestration
+          tests/unit/cli/test_commands.py
 
-      - name: Frozen Stage-9 resource assurance
-        run: uv run python scripts/assurance/check_stage9_resources.py
-
-      - name: PostgreSQL upstream integration regressions
+      - name: Rules, rights, and security regressions
         run: >-
           uv run pytest -q
-          tests/integration/availability
-          tests/integration/football_events
-          tests/integration/fpl_points
+          tests/unit/rules
+          tests/property/rules
+          tests/golden/rules
+          tests/security
+          tests/unit/ingestion/test_rights_and_fixtures.py
 
       - name: Ruff format
         run: uv run ruff format --check src/dmf_pulse tests scripts
@@ -121,6 +114,24 @@ jobs:
 
       - name: Build wheel and source distribution
         run: uv build
+
+      - name: Installed-wheel GW1 command smoke outside source tree
+        shell: bash
+        run: |
+          wheel=$(find dist -maxdepth 1 -type f -name '*.whl' -print -quit)
+          test -n "$wheel"
+          wheel=$(readlink -f "$wheel")
+          venv="${RUNNER_TEMP}/gw1-wheel-venv"
+          smoke="${RUNNER_TEMP}/gw1-wheel-smoke"
+          uv venv --python 3.13 "$venv"
+          uv pip install --python "$venv/bin/python" "$wheel"
+          mkdir -p "$smoke"
+          cd "$smoke"
+          "$venv/bin/dmf" --version
+          "$venv/bin/dmf" gw1 run --help
+
+      - name: Repository validation
+        run: uv run python scripts/validate_repository.py
 
       - name: First-party secret scan
         run: uv run python scripts/scan_secrets.py

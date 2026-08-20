@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from dataclasses import dataclass
 from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from fractions import Fraction
 from itertools import combinations, permutations, product
@@ -31,6 +32,13 @@ from dmf_pulse.optimisation.models import (
 )
 
 CANONICAL_DECIMAL_CONTEXT = Context(prec=50, rounding=ROUND_HALF_EVEN)
+
+
+@dataclass(frozen=True)
+class TacticalShape:
+    starting_xi: tuple[str, ...]
+    bench_goalkeeper: str
+    bench_order: tuple[str, str, str]
 
 
 def _quantile(masses: dict[int, Fraction], probability: Fraction) -> int:
@@ -87,6 +95,57 @@ def tactical_configuration_upper_bound(
     return formations * bench_orders * captain_pairs
 
 
+def tactical_shape_upper_bound(
+    squad: CandidateSquad, players: dict[str, CandidatePlayer], rules: OneGameweekRulesView
+) -> int:
+    captain_pairs = rules.starting_size * (rules.starting_size - 1)
+    return tactical_configuration_upper_bound(squad, players, rules) // captain_pairs
+
+
+def enumerate_tactical_shapes(
+    squad: CandidateSquad,
+    players: dict[str, CandidatePlayer],
+    rules: OneGameweekRulesView,
+) -> Iterator[TacticalShape]:
+    """Enumerate every legal XI and ordered bench once, without captain duplication."""
+
+    grouped = _players_by_position(squad, players)
+    gk = grouped[PlayerPosition.GK]
+    outfield = {
+        position: grouped[position]
+        for position in (PlayerPosition.DEF, PlayerPosition.MID, PlayerPosition.FWD)
+    }
+    for bench_gk in gk:
+        starting_gk = next(player for player in gk if player != bench_gk)
+        for d_count in range(
+            rules.lineup_min[PlayerPosition.DEF], rules.lineup_max[PlayerPosition.DEF] + 1
+        ):
+            for m_count in range(
+                rules.lineup_min[PlayerPosition.MID], rules.lineup_max[PlayerPosition.MID] + 1
+            ):
+                f_count = rules.starting_size - 1 - d_count - m_count
+                if (
+                    f_count < rules.lineup_min[PlayerPosition.FWD]
+                    or f_count > rules.lineup_max[PlayerPosition.FWD]
+                ):
+                    continue
+                for defenders, mids, fwds in product(
+                    combinations(outfield[PlayerPosition.DEF], d_count),
+                    combinations(outfield[PlayerPosition.MID], m_count),
+                    combinations(outfield[PlayerPosition.FWD], f_count),
+                ):
+                    selected = (starting_gk, *defenders, *mids, *fwds)
+                    bench_outfield = tuple(
+                        sorted(set(squad.player_ids) - set(selected) - {bench_gk})
+                    )
+                    for bench_order in permutations(bench_outfield):
+                        yield TacticalShape(
+                            starting_xi=selected,
+                            bench_goalkeeper=bench_gk,
+                            bench_order=cast(tuple[str, str, str], bench_order),
+                        )
+
+
 def enumerate_tactical_configurations(
     squad: CandidateSquad,
     players: dict[str, CandidatePlayer],
@@ -96,50 +155,19 @@ def enumerate_tactical_configurations(
     upper = tactical_configuration_upper_bound(squad, players, rules)
     if upper > policy.max_tactical_configurations:
         raise ResourceLimitError(f"conservative tactical upper bound {upper} exceeds cap")
-    grouped = _players_by_position(squad, players)
-    gk = grouped[PlayerPosition.GK]
-    outfield = {
-        position: grouped[position]
-        for position in (PlayerPosition.DEF, PlayerPosition.MID, PlayerPosition.FWD)
-    }
 
     def generator() -> Iterator[TacticalConfiguration]:
-        for bench_gk in gk:
-            starting_gk = next(player for player in gk if player != bench_gk)
-            for d_count in range(
-                rules.lineup_min[PlayerPosition.DEF], rules.lineup_max[PlayerPosition.DEF] + 1
-            ):
-                for m_count in range(
-                    rules.lineup_min[PlayerPosition.MID], rules.lineup_max[PlayerPosition.MID] + 1
-                ):
-                    f_count = rules.starting_size - 1 - d_count - m_count
-                    if (
-                        f_count < rules.lineup_min[PlayerPosition.FWD]
-                        or f_count > rules.lineup_max[PlayerPosition.FWD]
-                    ):
-                        continue
-                    for defenders, mids, fwds in product(
-                        combinations(outfield[PlayerPosition.DEF], d_count),
-                        combinations(outfield[PlayerPosition.MID], m_count),
-                        combinations(outfield[PlayerPosition.FWD], f_count),
-                    ):
-                        selected = (starting_gk, *defenders, *mids, *fwds)
-                        bench_outfield = tuple(
-                            sorted(set(squad.player_ids) - set(selected) - {bench_gk})
-                        )
-                        for bench_order in permutations(bench_outfield):
-                            for captain, vice in permutations(selected, 2):
-                                tactic = TacticalConfiguration(
-                                    starting_xi=selected,
-                                    bench_goalkeeper=bench_gk,
-                                    bench_order=cast(tuple[str, str, str], bench_order),
-                                    captain=captain,
-                                    vice_captain=vice,
-                                )
-                                if validate_tactical_configuration(
-                                    squad, tactic, players, rules
-                                ).legal:
-                                    yield tactic
+        for shape in enumerate_tactical_shapes(squad, players, rules):
+            for captain, vice in permutations(shape.starting_xi, 2):
+                tactic = TacticalConfiguration(
+                    starting_xi=shape.starting_xi,
+                    bench_goalkeeper=shape.bench_goalkeeper,
+                    bench_order=shape.bench_order,
+                    captain=captain,
+                    vice_captain=vice,
+                )
+                if validate_tactical_configuration(squad, tactic, players, rules).legal:
+                    yield tactic
 
     return generator(), upper
 

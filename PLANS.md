@@ -143,10 +143,13 @@ artifact was supplied.
   transient identity, team, position, current price, Stage-7 start/minutes,
   Stage-9 distribution/quantiles, numerical uncertainty, scenario identity,
   cutoff and full source lineage; expose only a non-disclosing safe summary.
-- [ ] Add adversarial governance, identity, rules, seed, lineage, rights and
+- [x] Add adversarial governance, identity, rules, seed, lineage, rights and
   tamper tests; run bounded local gates, commit/push the capability, run the
   dedicated exact-SHA Linux workflow, verify the remote SHA and commit the
   durable attestation.
+- [x] Remediate failed Linux run `32329591311`: compile the tracked canonical
+  target rules into a disposable test artifact, verify its accepted hashes and
+  capability, and remove the ignored local artifact from workflow triggers.
 
 Exclusions: global rules activation, fabricated human approval, production
 projection, persistent official-FPL raw or derived data, independent event or
@@ -154,6 +157,33 @@ points formulas, optimisation, squad/captain decisions, prospective evaluation,
 PR and merge. The real operator projection remains blocked by the unsupplied
 governance-accepted current event-prior artifact.
 <!-- GW1-2.4-PLAN-END -->
+<!-- GW1-FINAL-PLAN-START -->
+### Checkpoint 2.5 and Sessions 3-4 — final GW1 engineering readiness
+
+- [x] Reconcile every official current player against the hash-bound Stage-9
+  table, add P(appearance), and fail closed on missing/colliding identities,
+  price/position/minutes drift, or a non-PASS Monte Carlo stopping result.
+- [x] Retest the historical manager-tactics blocker. Keep production bound to
+  ACTIVE `FULL_SEASON`, while permitting only the exact VERIFIED,
+  source-backed, blocker-free `GW1_INITIAL_SQUAD` capability in explicit
+  preseason decision-support mode.
+- [x] Add exact captain/scenario factorisation for that preseason mode, retain
+  exhaustive tactical semantics, and validate 1,000 scenarios inside the
+  accepted resource policy without changing TEST/REPLAY/PRODUCTION behavior.
+- [x] Build three distinct legal bounded initial-squad portfolios from accepted
+  Stage-9 distributions, then use Stage 10 for exact XI, bench, captain, vice,
+  distribution, spend and bank within each declared 15-player pool.
+- [x] Compose Session 1 and Stages 6-10 through one shared in-memory service and
+  operator command; add a hash-only Stage-12 prospective receipt and an exact
+  PowerShell runbook without FPL-derived persistence or account action.
+- [x] Complete local hostile review and bounded functional, branch-coverage,
+  PostgreSQL, rules/rights/security, static, build, installed-wheel, secret and
+  whitespace gates. Record the complete repository pytest attempt honestly as
+  `RESOURCE_LIMIT` after the explicit ceiling.
+- [ ] Publish the final coherent branch once, wait for the exact-SHA Linux
+  Checkpoint-2.4 and final-readiness workflows, fetch once, and verify remote
+  equality. No PR, merge, activation, or real provider call.
+<!-- GW1-FINAL-PLAN-END -->
 - Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
 - Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.
 - Exclusions: no live key, provider success claim, FPL current-input changes, identity mapping, projections, optimiser, squad, captaincy, prospective logging, PR, merge, or activation.

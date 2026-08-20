@@ -31,6 +31,49 @@ def test_version_contract() -> None:
 
 
 @pytest.mark.unit
+def test_gw1_operator_command_exposes_only_process_safe_inputs() -> None:
+    result = runner.invoke(app, ["gw1", "run", "--help"])
+
+    assert result.exit_code == 0
+    assert "--bootstrap" in result.stdout
+    assert "--event-prior" in result.stdout
+    assert "--code-commit" in result.stdout
+    assert "--prospective-root" in result.stdout
+    assert "api-key" not in result.stdout.lower()
+    assert "password" not in result.stdout.lower()
+
+
+@pytest.mark.unit
+def test_gw1_operator_command_rejects_bad_commit_before_reading_inputs() -> None:
+    result = runner.invoke(
+        app,
+        [
+            "gw1",
+            "run",
+            "--bootstrap",
+            "missing-bootstrap.json",
+            "--fixtures",
+            "missing-fixtures.json",
+            "--captured-at",
+            "2026-08-20T12:00:00Z",
+            "--information-cutoff",
+            "2026-08-21T17:30:00Z",
+            "--reviewer",
+            "Operator",
+            "--event-prior",
+            "missing-prior.json",
+            "--code-commit",
+            "not-a-commit",
+        ],
+    )
+
+    assert result.exit_code == 3
+    payload = json.loads(result.stdout)
+    assert payload["error"]["code"] == "USAGE_INVALID"
+    assert "missing" not in payload["error"]["message"]
+
+
+@pytest.mark.unit
 def test_config_validate_and_show_json(repository_root: Path) -> None:
     config_root = str(repository_root / "config")
     valid = runner.invoke(

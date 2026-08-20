@@ -7,9 +7,10 @@ from decimal import Decimal
 from fractions import Fraction
 
 from dmf_pulse.fpl_points.artifacts import semantic_sha256
-from dmf_pulse.fpl_points.models import GameweekPointScenario
+from dmf_pulse.fpl_points.models import GameweekPointScenario, ProjectionMode
 from dmf_pulse.optimisation.candidate_pool import enumerate_squads
 from dmf_pulse.optimisation.errors import InfeasibleError, ResourceLimitError
+from dmf_pulse.optimisation.factorized_solver import solve_factorized_preseason
 from dmf_pulse.optimisation.models import (
     OneGameweekOptimisationRequest,
     OneGameweekOptimiserPolicy,
@@ -47,6 +48,9 @@ def solve(
     rules: OneGameweekRulesView,
     policy: OneGameweekOptimiserPolicy,
 ) -> SearchOutput:
+    if request.projection_mode is ProjectionMode.PRESEASON_DECISION_SUPPORT:
+        plans, objective, status = solve_factorized_preseason(request, scenarios, rules, policy)
+        return SearchOutput(plans=plans, objective=objective, status=status)
     players = {candidate.player_id: candidate for candidate in request.candidate_pool.candidates}
     squads, squad_upper = enumerate_squads(request, rules, policy)
     tactical_upper = 0

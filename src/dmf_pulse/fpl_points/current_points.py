@@ -361,6 +361,7 @@ class CurrentPlayerPointsProjection(_FrozenModel):
     team_name: str = Field(min_length=1, max_length=200)
     position: PlayerPosition
     current_price_tenths: int = Field(gt=0)
+    probability_appearance: str = Field(pattern=r"^(?:0\.\d{12}|1\.000000000000)$")
     probability_start: str = Field(pattern=r"^(?:0\.\d{12}|1\.000000000000)$")
     expected_minutes: str = Field(pattern=r"^\d{1,3}\.\d{6}$")
     mean_expected_fpl_points: float
@@ -554,6 +555,7 @@ def _build_player_rows(
             "team_name": official_team.official_name,
             "position": PlayerPosition(player.position.value),
             "current_price_tenths": player.current_price_tenths,
+            "probability_appearance": stage7.p_appearance,
             "probability_start": stage7.p_start,
             "expected_minutes": stage7.expected_minutes,
             "mean_expected_fpl_points": summary.expected_points,
@@ -737,6 +739,7 @@ class CurrentFplPointsBundle(_FrozenModel):
             or row.transient_fixture_ids != (UUID(fixture_id),)
             or str(row.transient_team_id) != team_id
             or row.position.value != stage7.position
+            or row.probability_appearance != stage7.p_appearance
             or row.probability_start != stage7.p_start
             or row.expected_minutes != stage7.expected_minutes
             or row.gameweek_result_sha256 != self.gameweek_projection.result_sha256

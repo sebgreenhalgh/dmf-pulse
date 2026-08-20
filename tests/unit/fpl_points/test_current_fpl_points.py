@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import shutil
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
 from dmf_pulse.fpl_points.current import build_current_football_events
+from dmf_pulse.fpl_points.current_acceptance import assess_current_projection
 from dmf_pulse.fpl_points.current_points import (
     TARGET_MC_POLICY_SHA256,
     TARGET_PLAYER_POINTS_CAPABILITY_HASH,
+    TARGET_RULESET_FILE_SHA256,
     TARGET_RULESET_HASH,
     CurrentFplPointsBundle,
     CurrentFplPointsRunConfig,
@@ -22,6 +26,10 @@ from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import ProjectionMode, SimulationStatus
 from dmf_pulse.fpl_points.rules_adapter import AcceptedRulesAdapter
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.optimisation.current_initial_squad import optimise_current_initial_squad
+from dmf_pulse.rules.capabilities import compile_capability_artifact
+from dmf_pulse.rules.compiler import compile_ruleset, load_compiled_ruleset, write_compiled_ruleset
+from dmf_pulse.rules.models import RuleCapability, RulesetStatus
 from tests.unit.fpl_points.test_current_football_events import (
     _availability,
     _event_approval,
@@ -34,8 +42,31 @@ SCENARIO_COUNT = 32
 
 
 @pytest.fixture(scope="module")
-def ruleset_path(repository_root: Path) -> Path:
-    return repository_root / "artifacts/rules/fpl-2026-27.json"
+def ruleset_path(repository_root: Path, tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Compile the tracked target authority into a disposable canonical artifact."""
+
+    source = repository_root / "config/rules/fpl-2026-27"
+    output = tmp_path_factory.mktemp("gw1-target-rules") / "fpl-2026-27.json"
+    compiled = compile_ruleset(source)
+    capability = compile_capability_artifact(compiled, RuleCapability.PLAYER_POINTS)
+
+    assert compiled.schema_version == "1.1"
+    assert compiled.ruleset_id == "fpl-2026-27"
+    assert compiled.season_code == "2026/2027"
+    assert compiled.ruleset_version == "1.0.0"
+    assert compiled.status is RulesetStatus.VERIFIED
+    assert compiled.ruleset_hash == TARGET_RULESET_HASH
+    assert capability.capability is RuleCapability.PLAYER_POINTS
+    assert capability.capability_hash == TARGET_PLAYER_POINTS_CAPABILITY_HASH
+    assert capability.source_backed
+    assert capability.production_eligible
+    assert not capability.blockers
+
+    write_compiled_ruleset(compiled, output)
+    reloaded = load_compiled_ruleset(output)
+    assert reloaded == compiled
+    assert hashlib.sha256(output.read_bytes()).hexdigest() == TARGET_RULESET_FILE_SHA256
+    return output
 
 
 @pytest.fixture(scope="module")
@@ -115,6 +146,7 @@ def test_current_stage9_builds_private_player_distribution_table_without_xp_form
         row.player_name.startswith("P")
         and row.team_name
         and row.current_price_tenths > 0
+        and row.probability_appearance.count(".") == 1
         and row.probability_start.count(".") == 1
         and row.expected_minutes.count(".") == 1
         and set(row.selected_percentiles)
@@ -153,6 +185,34 @@ def test_shared_root_seed_and_outcome_draw_identity_are_preserved(
     )
 
 
+def test_projection_acceptance_reconciles_official_rows_and_retains_mc_blocker(
+    current_event_source,
+    projected: CurrentFplPointsBundle,
+    ruleset_path: Path,
+) -> None:
+    report = assess_current_projection(current_event_source, projected)
+    rendered = report.model_dump_json()
+
+    assert report.status == "BLOCKED"
+    assert report.accepted_for_initial_squad is False
+    assert report.blocker_codes == ("UPSTREAM_MONTE_CARLO_CONTINUE",)
+    assert report.player_count == 44
+    assert report.fixture_count == 1
+    assert "STAGE7_CURRENT_ROSTER_COLD_START" in report.warnings
+    assert report.handcrafted_xp is False
+    assert "P1001" not in rendered
+    assert "current_price" not in rendered
+
+    compiled = load_compiled_ruleset(ruleset_path)
+    capability = compile_capability_artifact(compiled, RuleCapability.GW1_INITIAL_SQUAD)
+    decision = optimise_current_initial_squad(current_event_source, projected, compiled, capability)
+    assert decision.status == "BLOCKED"
+    assert decision.blocker_codes == ("UPSTREAM_MONTE_CARLO_CONTINUE",)
+    assert not decision.portfolios
+    assert decision.persistence_performed is False
+    assert decision.automated_fpl_account_action is False
+
+
 def test_run_configuration_is_deterministic_and_exactly_source_bound(
     current_event_source,
     run_config: CurrentFplPointsRunConfig,
@@ -180,6 +240,7 @@ def test_run_configuration_is_deterministic_and_exactly_source_bound(
 
 def test_rules_and_mc_policy_drift_fail_closed(
     current_event_source,
+    repository_root: Path,
     tmp_path: Path,
     ruleset_path: Path,
     mc_policy_path: Path,
@@ -194,7 +255,16 @@ def test_rules_and_mc_policy_drift_fail_closed(
             scenario_count=SCENARIO_COUNT,
         )
 
-    older_rules = ruleset_path.with_name("fpl-2026-27-0.1.0-prelaunch.1.schema-v1.1.json")
+    drifted_source = tmp_path / "drifted-source"
+    shutil.copytree(repository_root / "config/rules/fpl-2026-27", drifted_source)
+    for filename in ("season_manifest.yaml", "target_2026_27_claims.yaml"):
+        path = drifted_source / filename
+        path.write_text(
+            path.read_text(encoding="utf-8").replace('"1.0.0"', '"1.0.1"'),
+            encoding="utf-8",
+        )
+    older_rules = tmp_path / "drifted-rules.json"
+    write_compiled_ruleset(compile_ruleset(drifted_source), older_rules)
     with pytest.raises(IngestionError, match="differs from the accepted revision"):
         build_current_fpl_points_run_config(
             current_event_source,

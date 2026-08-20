@@ -94,7 +94,7 @@ def _safe(operation: Callable[[], object]) -> object:
         raise typer.Exit(error.exit_code) from exc
 
 
-def _collect_session1_approval(
+def collect_session1_approval(
     prepared: Session1PreparedInputs,
     *,
     reviewer: str,
@@ -204,7 +204,7 @@ def session1_run_command(
     if not isinstance(prepared, Session1PreparedInputs):
         _failure(IngestionError("INTERNAL_INVARIANT", "Session-1 preparation is invalid"))
     try:
-        approval = _collect_session1_approval(
+        approval = collect_session1_approval(
             prepared,
             reviewer=reviewer,
         )

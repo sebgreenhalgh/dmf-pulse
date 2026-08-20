@@ -17,6 +17,7 @@ from dmf_pulse.cli.evaluate import evaluate_app
 from dmf_pulse.cli.events import events_app
 from dmf_pulse.cli.evidence_cmd import evidence_app
 from dmf_pulse.cli.fpl_points import fpl_points_app
+from dmf_pulse.cli.gw1_cmd import gw1_app
 from dmf_pulse.cli.ingest_cmd import ingest_app
 from dmf_pulse.cli.market_cmd import market_app
 from dmf_pulse.cli.optimise import optimise_app
@@ -39,6 +40,7 @@ app.add_typer(evidence_app, name="evidence")
 app.add_typer(evaluate_app, name="evaluate")
 app.add_typer(events_app, name="events")
 app.add_typer(fpl_points_app, name="fpl-points")
+app.add_typer(gw1_app, name="gw1")
 app.add_typer(ingest_app, name="ingest")
 app.add_typer(market_app, name="market")
 app.add_typer(review_pack_app, name="review-pack")

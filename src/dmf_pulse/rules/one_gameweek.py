@@ -110,6 +110,32 @@ def _capability_allows_production(
         )
 
 
+def _capability_allows_preseason_initial_squad(
+    compiled: CompiledRuleset, capability: CapabilityArtifact | None
+) -> None:
+    if (
+        compiled.status not in {RulesetStatus.VERIFIED, RulesetStatus.ACTIVE}
+        or not compiled.production_eligible
+        or capability is None
+        or capability.capability is not RuleCapability.GW1_INITIAL_SQUAD
+    ):
+        raise RulesValidationError(
+            "MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
+            "GW1_INITIAL_SQUAD capability is unavailable for preseason decision support",
+        )
+    expected = compile_capability_artifact(compiled, RuleCapability.GW1_INITIAL_SQUAD)
+    if (
+        capability.model_dump(mode="json") != expected.model_dump(mode="json")
+        or not expected.source_backed
+        or not expected.production_eligible
+        or expected.blockers
+    ):
+        raise RulesValidationError(
+            "MANAGER_TACTICS_CAPABILITY_UNAVAILABLE",
+            "GW1_INITIAL_SQUAD capability does not match the compiled ruleset",
+        )
+
+
 def build_one_gameweek_rules_view(
     compiled: CompiledRuleset,
     *,
@@ -120,6 +146,8 @@ def build_one_gameweek_rules_view(
 
     if projection_mode is ProjectionMode.PRODUCTION:
         _capability_allows_production(compiled, capability)
+    elif projection_mode is ProjectionMode.PRESEASON_DECISION_SUPPORT:
+        _capability_allows_preseason_initial_squad(compiled, capability)
     elif compiled.status not in {
         RulesetStatus.REFERENCE_ONLY,
         RulesetStatus.ACTIVE,
@@ -211,11 +239,17 @@ def build_one_gameweek_rules_view(
         manager_capability=(
             RuleCapability.FULL_SEASON.value
             if projection_mode is ProjectionMode.PRODUCTION
-            else "REFERENCE_ONLY"
+            else (
+                RuleCapability.GW1_INITIAL_SQUAD.value
+                if projection_mode is ProjectionMode.PRESEASON_DECISION_SUPPORT
+                else "REFERENCE_ONLY"
+            )
         ),
         manager_capability_hash=(
             capability.capability_hash
-            if projection_mode is ProjectionMode.PRODUCTION and capability is not None
+            if projection_mode
+            in {ProjectionMode.PRODUCTION, ProjectionMode.PRESEASON_DECISION_SUPPORT}
+            and capability is not None
             else None
         ),
     )

@@ -4,9 +4,10 @@
 
 - Canonical branch - `readiness/GW1-2026-27-live-input-initial-squad`.
 - Immutable programme parent - `9eb57143f6ee92f67c78607cc386678d962e62d4`.
-- Starting accepted remote SHA - `13fe8a49faf8f6715c7509f3e2b8a0a033730331`.
-- Capability commit - `PENDING_CAPABILITY_FREEZE`.
-- Dedicated Linux workflow - `PENDING_CAPABILITY_FREEZE`.
+- Resumed canonical SHA - `5838bc6b1a44070261035c2d3d53b9a77d9d4a3c`.
+- Failed Linux workflow/job - `32329591311` / `96307553750`.
+- Final capability commit - `PENDING_FINAL_PUBLICATION`.
+- Final dedicated Linux workflow - `PENDING_FINAL_PUBLICATION`.
 - Real credentialled provider call - `OPERATOR_CHECKPOINT`.
 - Accepted current score/player prior artifact - `NOT_SUPPLIED / OPERATOR_BLOCKER`.
 
@@ -42,10 +43,25 @@
   provider call, database access or filesystem write and returns the private
   table in memory only.
 
+## Clean-checkout CI remediation
+
+- The failed Linux run completed `493` tests before two failures and six setup
+  errors all traced to one reproducibility defect: the new test fixture expected
+  the gitignored developer artifact `artifacts/rules/fpl-2026-27.json`.
+- The test now compiles tracked `config/rules/fpl-2026-27` with the existing
+  compiler into a pytest temporary directory, reloads canonical bytes, and
+  independently pins schema, ID, season, version, VERIFIED state, rules hash,
+  file hash, and the source-backed blocker-free PLAYER_POINTS capability.
+- The rules-drift test now copies and mutates tracked source, then compiles the
+  drifted temporary artifact. No generated rules file became source authority.
+- The workflow path filters now watch the tracked target rules directory and
+  `src/dmf_pulse/rules/**`; the ignored artifact path was removed. Scoring
+  semantics, lifecycle state, activation and accepted hashes were not changed.
+
 ## Rules governance finding
 
-- `artifacts/rules/fpl-2026-27.json` remains schema `1.1`, ruleset version
-  `1.0.0`, status `VERIFIED`, ruleset hash
+- The disposable artifact compiled from tracked authority is schema `1.1`,
+  ruleset version `1.0.0`, status `VERIFIED`, ruleset hash
   `c2883ad9bf1497dad9c2eba69422e14937ddc072f9b3a95c5005a312c38f7d56`.
 - Its freshly compiled `PLAYER_POINTS` capability is source-backed,
   production-eligible and blocker-free at capability hash
@@ -90,9 +106,9 @@
 
 ## Local validation
 
-- New current-points tests - `8 passed`.
-- Combined current Stage-7 through Stage-9 branch coverage - `33 passed`,
-  `92.27%` total across `1,106` statements and `200` branches; current
+- Current-points tests - `9 passed` inside the final current group.
+- Combined current Stage-7 through Stage-9 branch coverage - `34 passed`,
+  `92.27%` total across `1,107` statements and `200` branches; current
   availability measured `93%`, current event handoff `90%`, and current points
   adapter `93%`.
 - Final-tree accepted Stage-6 through Stage-9 unit/property/contract regression
@@ -101,8 +117,8 @@
   `46 passed`; named container `dmf-pulse-gw1-24-postgres` was stopped and
   auto-removed.
 - Frozen Stage-9 resource assurance - `PASS`.
-- Ruff format - `PASS`, `516 files`; Ruff lint - `PASS`.
-- Strict mypy - `PASS`, `197 source files`.
+- Ruff format - `PASS`, `527 files`; Ruff lint - `PASS`.
+- Strict mypy - `PASS`, `204 source files`.
 - Source/wheel build - `PASS`, `dmf-pulse 0.2.0`.
 - Installed-wheel public current-points import outside the source tree -
   `PASS`; installed `dmf --help` - `PASS`. The first disposable CLI attempt
@@ -112,19 +128,23 @@
 - First-party secret scan - `PASS`, `finding_count=0`.
 - Workflow YAML, schema reproduction and `git diff --check` - `PASS` before
   capability freeze.
-- Repository validation - `NOT_EXECUTED` at this bounded checkpoint. The known
-  stale GCS-008 current-manifest debt remains reserved for final engineering
-  acceptance and is not promoted to PASS.
+- Repository validation was deferred at the bounded checkpoint; the final GW1
+  gate regenerated GCS-008 and the active EVAL-012 current manifest and passed
+  with zero errors.
 
-## Status before remote attestation
+## Status before final remote attestation
 
 - Local bounded engineering result - `PASS`.
-- Linux engineering result - `PENDING_CAPABILITY_FREEZE`.
-- Checkpoint 2.4 engineering capability - `LOCAL_COMPLETE / REMOTE_PENDING`.
+- Linux engineering result - `PENDING_FINAL_PUBLICATION`.
+- Checkpoint 2.4 engineering capability - `LOCAL_COMPLETE / FINAL_REMOTE_PENDING`.
 - Current operator projection - `BLOCKED_CURRENT_EVENT_PRIOR_ARTIFACT`.
 - PR, merge and production activation - `NOT_AUTHORIZED / NOT_PERFORMED`.
 
-## Capability file hashes before commit
+## Historical pre-remediation capability hashes (superseded)
+
+The following hashes describe the earlier local capability before the
+clean-checkout remediation and final programme delta. They are retained only as
+historical evidence and are not final-tree identities.
 
 - `src/dmf_pulse/fpl_points/current_points.py` -
   `c8c713071fb00ffb117eab6ee9343bb689fb69511337304c04f666bc05478853`.

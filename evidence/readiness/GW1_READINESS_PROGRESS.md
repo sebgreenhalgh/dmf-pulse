@@ -17,8 +17,10 @@
 | 2.1 current market consensus | COMPLETE | Remediated capability `2858e6f1…`; Linux run `32317678585` PASS. |
 | 2.2 availability/start/minutes | COMPLETE | Capability `e7c40a03…`; Linux run `32319850997` PASS. |
 | 2.3 football-event distributions | ENGINEERING_COMPLETE / OPERATOR_BLOCKED | Capability `008ad0d2…`; Linux run `32325586142` PASS. No governance-accepted current event-prior artifact was supplied. |
-| 2.4 FPL-points distributions | LOCAL_COMPLETE / REMOTE_PENDING / OPERATOR_BLOCKED | Exact VERIFIED target-rules and accepted Stage-9 integration passes locally; no governance-accepted current event-prior artifact was supplied. |
-| 2.5–4.5 | NOT_STARTED | Must consume accepted preceding checkpoints in order. |
+| 2.4 FPL-points distributions | LOCAL_COMPLETE / FINAL_REMOTE_PENDING / OPERATOR_BLOCKED | Clean-checkout rules compilation remediation and exact Stage-9 gates pass locally; final exact-SHA Linux rerun is pending publication. |
+| 2.5 projection acceptance | ENGINEERING_COMPLETE / OPERATOR_BLOCKED | Full player reconciliation and Monte Carlo fail-closed acceptance are implemented; no real current event prior or projection exists. |
+| Session 3 initial squad | ENGINEERING_COMPLETE / OPERATOR_BLOCKED | Three-portfolio engine and exact bounded-pool Stage-10 tactics pass 1,000-scenario synthetic acceptance; no real squad has been produced. |
+| Session 4 orchestration / Stage 12 | ENGINEERING_COMPLETE / FINAL_REMOTE_PENDING | Shared one-process command, hash-only prospective receipt and PowerShell runbook pass locally; real inputs remain operator checkpoints. |
 
 ## Current operational boundary
 
@@ -44,14 +46,33 @@
   plus human-activation production gate. The transient private player-table
   integration passes on synthetic contract fixtures, but no real current table
   exists while the preceding accepted event-prior input is absent.
-- No squad, XI, bench, captain, vice-captain or alternative has yet been produced.
-- The branch-wide stale GCS-008 current manifest remains a known final
-  engineering-acceptance blocker; it will be regenerated only at the designated
-  final acceptance checkpoint.
+- Projection acceptance now reconciles every official player, identity, team,
+  position, price, P(appearance), P(start), minutes, distribution and lineage.
+  Missing or colliding official players and non-PASS Monte Carlo diagnostics
+  block the optimiser without partial output.
+- Stage 10 now accepts only the exact target `GW1_INITIAL_SQUAD` capability for
+  explicit preseason decision support. Production still fails with
+  `MANAGER_TACTICS_CAPABILITY_UNAVAILABLE` until its existing ACTIVE
+  `FULL_SEASON` authority exists. Exact captain/scenario factorisation brings a
+  declared 1,000-scenario 15-player pool within the accepted resource cap.
+- The current initial-squad adapter selects three distinct heuristic portfolios
+  from accepted Stage-9 distributions, then delegates all squad legality, XI,
+  autosub/bench, captain and vice semantics to exact Stage 10 within each pool.
+  It makes no global-optimum claim outside those three declared pools.
+- The shared `dmf gw1 run` process performs Session 1 and Stages 6-10 without a
+  serialized FPL handoff. Only a successful, predeadline, content-addressed
+  Stage-12 hash receipt may persist; detailed projections and decisions remain
+  transient and no account/chip action exists.
+- No real squad, XI, bench, captain, vice-captain or alternative has been
+  produced because the current accepted event-prior input and real provider run
+  remain operator checkpoints.
+- The stale GCS-008 snapshot and the validator-selected active EVAL-012 current
+  manifest were regenerated at this final engineering-acceptance checkpoint.
 
 ## Exact next action
 
-Freeze and push the Checkpoint-2.4 engineering capability, run the dedicated
-Linux gate on that exact SHA, verify remote equality and commit the attestation.
-Keep the real current run fail-closed: no points projection may be claimed
-without the missing governance-accepted event-prior artifact.
+Publish the final coherent branch once; require both the Checkpoint-2.4 and
+final-readiness Linux workflows on that exact SHA, then fetch once and verify
+local/remote equality. Keep the real current run fail-closed until the operator
+supplies a current accepted event prior, manual FPL captures, explicit reviews,
+and the process-scoped Odds credential.
