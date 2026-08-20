@@ -37,20 +37,29 @@ jobs:
           if [[ ! -f .stage15-transport/apply-request.json ]]; then
             exit 0
           fi
-          blob_sha="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["blob_sha"])')"
           archive_sha256="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["archive_sha256"])')"
           commit_message="$(python -c 'import json; print(json.load(open(".stage15-transport/apply-request.json"))["commit_message"])')"
-          gh api "repos/${GITHUB_REPOSITORY}/git/blobs/${blob_sha}" > /tmp/stage15-blob.json
-          python - <<'PY'
+          mapfile -t blob_shas < <(python - <<'PY'
+          import json
+          request = json.load(open('.stage15-transport/apply-request.json'))
+          for sha in request.get('blob_shas', [request.get('blob_sha')]):
+              if sha:
+                  print(sha)
+          PY
+          )
+          : > /tmp/stage15-checkpoint.tar.xz
+          for blob_sha in "${blob_shas[@]}"; do
+            gh api "repos/${GITHUB_REPOSITORY}/git/blobs/${blob_sha}" > /tmp/stage15-blob.json
+            python - <<'PY'
           import base64
           import json
           from pathlib import Path
 
           payload = json.loads(Path('/tmp/stage15-blob.json').read_text(encoding='utf-8'))
-          Path('/tmp/stage15-checkpoint.tar.xz').write_bytes(
-              base64.b64decode(payload['content'].replace('\n', ''))
-          )
+          with Path('/tmp/stage15-checkpoint.tar.xz').open('ab') as target:
+              target.write(base64.b64decode(payload['content'].replace('\n', '')))
           PY
+          done
           printf '%s  %s\n' "${archive_sha256}" /tmp/stage15-checkpoint.tar.xz | sha256sum -c -
           tar -xJf /tmp/stage15-checkpoint.tar.xz -C .
           rm -f .stage15-transport/apply-request.json
