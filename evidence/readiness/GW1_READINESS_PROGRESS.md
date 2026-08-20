@@ -16,7 +16,7 @@
 | 1.5 Session-1 workflow | COMPLETE | Capability `db4ef85f…`; Linux run `32315608960` PASS. |
 | 2.1 current market consensus | COMPLETE | Remediated capability `2858e6f1…`; Linux run `32317678585` PASS. |
 | 2.2 availability/start/minutes | COMPLETE | Capability `e7c40a03…`; Linux run `32319850997` PASS. |
-| 2.3 football-event distributions | IN_PROGRESS | Authority and accepted Stage-8 contract review started after 2.2 acceptance. |
+| 2.3 football-event distributions | IN_PROGRESS / OPERATOR_BLOCKED | Guarded Stage-8/Stage-9 handoff implemented locally; broad/Linux acceptance pending and no accepted current event-prior artifact has been supplied. |
 | 2.4–4.5 | NOT_STARTED | Must consume accepted preceding checkpoints in order. |
 
 ## Current operational boundary
@@ -33,6 +33,11 @@
   cold-start against the frozen synthetic TEST/REPLAY baseline. The output is
   non-production, carries confidence grade D for unobserved current players and
   makes no production-calibration claim.
+- Stage-8 cannot legitimately derive its required Poisson/team-strength rates
+  from the available H2H market alone. The repository also has no accepted
+  current player-allocation artifact. A governed transient artifact ingress is
+  implemented, but the real operator run remains fail-closed until that input
+  is governance-accepted and supplied.
 - No squad, XI, bench, captain, vice-captain or alternative has yet been produced.
 - The branch-wide stale GCS-008 current manifest remains a known final
   engineering-acceptance blocker; it will be regenerated only at the designated
@@ -40,7 +45,8 @@
 
 ## Exact next action
 
-Implement Checkpoint 2.3 as a transient current-fixture adapter around the
-accepted Stage-8 market-constrained score-distribution baseline. Bind the exact
-Stage-6 consensus and Stage-7 minutes identities, preserve all cold-start and
-market-coverage limitations, and make no player-allocation or Stage-9 claim.
+Complete local broad/PostgreSQL/static/build/security validation for the
+Checkpoint-2.3 guarded current-fixture adapter, commit and push the coherent
+capability, run its exact dedicated Linux workflow, and attest the remotely
+verified revision. Do not claim a live current projection without the missing
+accepted event-prior artifact.

@@ -91,6 +91,36 @@ activation.
 Latest accepted capability — `e7c40a03ac664e5f736d019b375d3478a654176b`,
 Linux validation run `32319850997` (`PASS`), job `96279685296`.
 <!-- GW1-2.2-PLAN-END -->
+<!-- GW1-2.3-PLAN-START -->
+### Checkpoint 2.3 — current football-event distributions
+
+- [x] Extend the transient Checkpoint-2.2 handoff with the already-generated,
+  hash-bound Stage-7 coherent lineup paths and conditional minute PMFs; retain
+  them in memory only and independently revalidate their exact public lineage.
+- [x] Generate a deterministic private operator-review template for every
+  target fixture and require one immutable accepted-model artifact containing
+  fixture score priors plus complete TEMP-EVT-002/TEMP-PTS-001 player-allocation
+  inputs. Reject operator-invented, synthetic, post-cutoff, partial, stale or
+  unaccepted live inputs.
+- [x] Run each exact Stage-6 consensus and Stage-7 minutes context through the
+  accepted Stage-8 service, preserving fixture orientation, market residuals,
+  clean-sheet/team-score correlations, cold-start limitations and fail-closed
+  current-fixture eligibility.
+- [x] Compose the exact accepted Stage-9 input primitives from the Stage-8
+  score matrix, paired coherent Stage-7 lineup/minute paths and accepted
+  allocation inputs. Do not add rules identity, allocate or score events before
+  Checkpoint 2.4, and do not create a parallel simulator.
+- [ ] Return a hash-bound transient preseason bundle and safe summary; add
+  adversarial lineage/cutoff/coverage/coherence/rights tests, bounded evidence,
+  a dedicated Linux gate, capability commit/push/run verification and exact
+  attestation commit.
+
+Exclusions: synthetic or handcrafted live priors, persisted official-FPL raw or
+derived data, actual Stage-9 scoring, production-calibration claims,
+optimisation, squad/captain decisions, prospective evaluation, PR, merge and
+activation. The current operator run remains fail-closed until a
+governance-accepted current event-prior artifact is supplied.
+<!-- GW1-2.3-PLAN-END -->
 - Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
 - Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.
 - Exclusions: no live key, provider success claim, FPL current-input changes, identity mapping, projections, optimiser, squad, captaincy, prospective logging, PR, merge, or activation.

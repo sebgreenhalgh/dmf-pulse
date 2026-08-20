@@ -1,6 +1,17 @@
 """DMFP-09 bounded scenario-level FPL points distribution engine."""
 
 from dmf_pulse.fpl_points.allocation import allocate_fixture_events
+from dmf_pulse.fpl_points.current import (
+    CurrentFixtureEventInputs,
+    CurrentFixtureEventPrior,
+    CurrentFootballEventApproval,
+    CurrentFootballEventBundle,
+    CurrentFootballEventPriorArtifact,
+    CurrentFootballEventReviewTemplate,
+    CurrentFootballEventSummary,
+    build_current_football_event_review,
+    build_current_football_events,
+)
 from dmf_pulse.fpl_points.gameweek import assemble_blank_gameweek, assemble_gameweek
 from dmf_pulse.fpl_points.gameweek_summaries import build_gameweek_projection
 from dmf_pulse.fpl_points.models import (
@@ -17,6 +28,13 @@ from dmf_pulse.fpl_points.service import FplPointsService
 
 __all__ = [
     "AcceptedRulesAdapter",
+    "CurrentFixtureEventInputs",
+    "CurrentFixtureEventPrior",
+    "CurrentFootballEventApproval",
+    "CurrentFootballEventBundle",
+    "CurrentFootballEventPriorArtifact",
+    "CurrentFootballEventReviewTemplate",
+    "CurrentFootballEventSummary",
     "FixtureProjectionResult",
     "FixtureSimulationRequest",
     "FplPointsService",
@@ -29,5 +47,7 @@ __all__ = [
     "allocate_fixture_events",
     "assemble_blank_gameweek",
     "assemble_gameweek",
+    "build_current_football_event_review",
+    "build_current_football_events",
     "build_gameweek_projection",
 ]

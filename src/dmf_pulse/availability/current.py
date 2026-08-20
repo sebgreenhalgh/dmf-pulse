@@ -8,6 +8,8 @@ cold starts against the frozen synthetic TEST/REPLAY baseline.
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections import Counter
 from collections.abc import Mapping
 from datetime import UTC, datetime
@@ -18,6 +20,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.availability.dataset import semantic_dataset_hash
+from dmf_pulse.availability.lineup import LineupScenario
+from dmf_pulse.availability.minutes import MinuteConditionalPrediction
 from dmf_pulse.availability.pipeline import (
     ARTIFACT_SHA256,
     DATASET_SHA256,
@@ -206,6 +210,10 @@ class CurrentTeamAvailabilityProjection(_FrozenModel):
     transient_team_id: UUID
     prior_projection: TeamMinutesProjection
     posterior_projection: TeamMinutesProjection
+    posterior_lineup_scenarios: tuple[LineupScenario, ...] = Field(min_length=256, max_length=256)
+    posterior_conditional_minute_pmfs: tuple[MinuteConditionalPrediction, ...] = Field(
+        min_length=22
+    )
     applied_decisions: tuple[CurrentAppliedAvailabilityDecision, ...]
     limitations: tuple[
         Literal[
@@ -220,11 +228,35 @@ class CurrentTeamAvailabilityProjection(_FrozenModel):
 
     @model_validator(mode="after")
     def validate_team_result(self) -> CurrentTeamAvailabilityProjection:
+        player_ids = {row.player_id for row in self.posterior_projection.players}
+        scenario_hash = hashlib.sha256(
+            "".join(row.scenario_sha256 for row in self.posterior_lineup_scenarios).encode("utf-8")
+        ).hexdigest()
+        minute_keys = [(row.player_id, row.role) for row in self.posterior_conditional_minute_pmfs]
+        expected_minute_keys = {
+            (player_id, role) for player_id in player_ids for role in ("START", "BENCH")
+        }
+        scenario_indices = [row.scenario_index for row in self.posterior_lineup_scenarios]
         if (
             self.prior_projection.fixture_id != str(self.transient_fixture_id)
             or self.posterior_projection.fixture_id != str(self.transient_fixture_id)
             or self.prior_projection.team_id != str(self.transient_team_id)
             or self.posterior_projection.team_id != str(self.transient_team_id)
+            or scenario_indices != list(range(256))
+            or scenario_hash != self.posterior_projection.scenario_set_sha256
+            or len(minute_keys) != len(set(minute_keys))
+            or set(minute_keys) != expected_minute_keys
+            or any(
+                {member.player_id for member in scenario.members} != player_ids
+                for scenario in self.posterior_lineup_scenarios
+            )
+            or any(
+                scenario.starters
+                != tuple(member.player_id for member in scenario.members if member.role == "START")
+                or scenario.bench
+                != tuple(member.player_id for member in scenario.members if member.role == "BENCH")
+                for scenario in self.posterior_lineup_scenarios
+            )
             or self.result_sha256 != _team_result_sha256(self)
         ):
             raise ValueError("current team availability projection lineage is inconsistent")
@@ -742,6 +774,18 @@ def _team_projection(
         )
     prior_players = {row.player_id: row for row in prior.projection.players}
     posterior_players = {row.player_id: row for row in posterior.projection.players}
+    posterior_lineup_scenarios = tuple(
+        LineupScenario.model_validate_json(
+            json.dumps(row, allow_nan=False, separators=(",", ":"), sort_keys=True)
+        )
+        for row in posterior.core_scenarios
+    )
+    posterior_conditional_minute_pmfs = tuple(
+        MinuteConditionalPrediction.model_validate_json(
+            json.dumps(row, allow_nan=False, separators=(",", ":"), sort_keys=True)
+        )
+        for row in posterior.core_minute_pmfs
+    )
     applications = tuple(
         CurrentAppliedAvailabilityDecision(
             official_fpl_player_id=decision.official_fpl_player_id,
@@ -766,6 +810,8 @@ def _team_projection(
         transient_team_id=team_id,
         prior_projection=prior.projection,
         posterior_projection=posterior.projection,
+        posterior_lineup_scenarios=posterior_lineup_scenarios,
+        posterior_conditional_minute_pmfs=posterior_conditional_minute_pmfs,
         applied_decisions=applications,
         limitations=(
             "NO_CURRENT_TEAM_COMPETITIVE_HISTORY_COLD_START",
@@ -782,6 +828,8 @@ def _team_projection(
         transient_team_id=team_id,
         prior_projection=prior.projection,
         posterior_projection=posterior.projection,
+        posterior_lineup_scenarios=posterior_lineup_scenarios,
+        posterior_conditional_minute_pmfs=posterior_conditional_minute_pmfs,
         applied_decisions=applications,
         limitations=provisional.limitations,
         result_sha256=_team_result_sha256(provisional),
