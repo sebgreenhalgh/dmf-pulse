@@ -137,7 +137,7 @@ def test_all_optimise_commands_reject_non_json_output(command: str, args: list[s
     invoked = RUNNER.invoke(
         optimise_app,
         [command, *args, "--output", "yaml"],
-        terminal_width=240,
+        env={"COLUMNS": "240"},
     )
     assert invoked.exit_code == 2
     assert "--output must be json" in invoked.output

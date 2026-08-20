@@ -46,10 +46,12 @@ None found.
 - The first final Linux publication (run `32355035128`; `411 passed, 6 failed`)
   exposed five terminal-width-dependent CLI assertions and one assurance
   fixture whose purportedly invalid one-player reduced candidate was valid by
-  contract. CLI tests now use a fixed render width and the artifact test uses
-  duplicate IDs, preserving reduced exact oracle cases. The six original
-  failures plus both affected reduced-oracle regressions pass locally
-  (`8 passed`).
+  contract. The artifact test now uses duplicate IDs, preserving reduced exact
+  oracle cases. Replacement run `32358512801` confirmed that correction
+  (`412 passed, 5 failed`) and proved Click's `terminal_width` did not control
+  Rich's table width on Ubuntu. CLI invocations now set Rich's `COLUMNS` input
+  directly. All eight affected CLI/artifact/reduced-oracle cases pass locally,
+  including all five under a forced narrow outer terminal (`8 passed`).
 
 ### P3 / retained limitations
 

@@ -32,7 +32,7 @@ def test_version_contract() -> None:
 
 @pytest.mark.unit
 def test_gw1_operator_command_exposes_only_process_safe_inputs() -> None:
-    result = runner.invoke(app, ["gw1", "run", "--help"], terminal_width=240)
+    result = runner.invoke(app, ["gw1", "run", "--help"], env={"COLUMNS": "240"})
 
     assert result.exit_code == 0
     assert "--bootstrap" in result.stdout
