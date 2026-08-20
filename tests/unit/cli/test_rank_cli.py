@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from dmf_pulse.cli.app import app
@@ -64,12 +65,33 @@ def test_top_level_rank_help_exposes_complete_vertical_slice() -> None:
         assert command in result.stdout
 
 
+@pytest.mark.parametrize(
+    "arguments",
+    (
+        ("eo", "--input", "unused.json", "--output", "yaml"),
+        ("mini-league", "--input", "unused.json", "--output", "yaml"),
+        ("opponents", "--input", "unused.json", "--output", "yaml"),
+        ("cohort", "--input", "unused.json", "--output", "yaml"),
+        ("evaluate", "--input", "unused.json", "--output", "yaml"),
+        ("compare", "--input", "unused.json", "--output", "yaml"),
+        ("validate", "--output", "yaml"),
+    ),
+)
+def test_every_rank_command_rejects_unsupported_output_format(
+    arguments: tuple[str, ...],
+) -> None:
+    result = runner.invoke(rank_app, list(arguments))
+
+    assert result.exit_code != 0
+    assert "--output must be json" in result.stdout + result.stderr
+
+
 def test_validate_reports_installed_fail_closed_capability() -> None:
     result = runner.invoke(rank_app, ["validate"])
 
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
-    assert payload["status"] == "IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"
+    assert payload["status"] == "REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"
     assert payload["fail_closed_to_pure_points"] is True
     assert payload["raw_projection_mutation_permitted"] is False
 

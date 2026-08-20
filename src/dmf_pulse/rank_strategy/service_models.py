@@ -393,8 +393,8 @@ class RankServiceResult(RankModel):
 
 class RankCapabilityValidation(RankModel):
     schema_version: Literal["rank-capability-validation-v1"] = "rank-capability-validation-v1"
-    status: Literal["IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"] = (
-        "IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"
+    status: Literal["REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"] = (
+        "REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"
     )
     shared_service_available: Literal[True] = True
     cli_commands: tuple[StrictStr, ...]

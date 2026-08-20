@@ -229,7 +229,7 @@ def test_sealing_is_deterministic_and_batch_validation_returns_result_hashes() -
 def test_installed_capability_is_explicitly_fail_closed() -> None:
     report = validate_installed_rank_capability()
 
-    assert report.status == "IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"
+    assert report.status == "REVIEW_READY_PENDING_HUMAN_ACCEPTANCE"
     assert report.fail_closed_to_pure_points is True
     assert report.raw_projection_mutation_permitted is False
     assert report.mass_manager_scraping_permitted is False

@@ -621,7 +621,7 @@ def validate_installed_rank_capability() -> RankCapabilityValidation:
         sorted(("cohort", "compare", "eo", "evaluate", "mini-league", "opponents", "validate"))
     )
     unsealed = RankCapabilityValidation.model_construct(
-        status="IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+        status="REVIEW_READY_PENDING_HUMAN_ACCEPTANCE",
         shared_service_available=True,
         cli_commands=commands,
         fail_closed_to_pure_points=True,
