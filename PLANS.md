@@ -79,7 +79,7 @@ Linux validation run `32317678585` (`PASS`).
   coherent player minutes projections, complete fixture/team coverage, safe
   summary, semantic lineage, and an explicit non-production synthetic-contract
   calibration limitation for Checkpoint 2.3.
-- [ ] Add adversarial tests, bounded evidence and a dedicated Linux gate; then
+- [x] Add adversarial tests, bounded evidence and a dedicated Linux gate; then
   commit, push, verify the remote SHA, inspect hostile-review findings, and
   attest the exact accepted revision.
 
@@ -87,6 +87,9 @@ Exclusions: production-calibration claims, automated interpretation of FPL
 status/news as a hard override, football-event and player-points projections,
 optimisation, squad/captain decisions, prospective evaluation, PR, merge, and
 activation.
+
+Latest accepted capability — `e7c40a03ac664e5f736d019b375d3478a654176b`,
+Linux validation run `32319850997` (`PASS`), job `96279685296`.
 <!-- GW1-2.2-PLAN-END -->
 - Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
 - Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.

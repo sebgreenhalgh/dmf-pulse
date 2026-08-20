@@ -15,8 +15,9 @@
 | 1.4 identity integrity | COMPLETE | Capability `16560a1f…`; Linux run `32313356458` PASS. |
 | 1.5 Session-1 workflow | COMPLETE | Capability `db4ef85f…`; Linux run `32315608960` PASS. |
 | 2.1 current market consensus | COMPLETE | Remediated capability `2858e6f1…`; Linux run `32317678585` PASS. |
-| 2.2 availability/start/minutes | LOCAL_PASS | Current adapter, adversarial tests and local gates pass; exact Linux capability validation is pending. |
-| 2.3–4.5 | NOT_STARTED | Must consume accepted preceding checkpoints in order. |
+| 2.2 availability/start/minutes | COMPLETE | Capability `e7c40a03…`; Linux run `32319850997` PASS. |
+| 2.3 football-event distributions | IN_PROGRESS | Authority and accepted Stage-8 contract review started after 2.2 acceptance. |
+| 2.4–4.5 | NOT_STARTED | Must consume accepted preceding checkpoints in order. |
 
 ## Current operational boundary
 
@@ -39,6 +40,7 @@
 
 ## Exact next action
 
-Commit and push the bounded Checkpoint-2.2 capability, require the dedicated
-Linux workflow to pass on that exact revision, verify remote SHA equality and
-publish the evidence-only acceptance attestation before beginning Checkpoint 2.3.
+Implement Checkpoint 2.3 as a transient current-fixture adapter around the
+accepted Stage-8 market-constrained score-distribution baseline. Bind the exact
+Stage-6 consensus and Stage-7 minutes identities, preserve all cold-start and
+market-coverage limitations, and make no player-allocation or Stage-9 claim.

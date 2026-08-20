@@ -5,10 +5,9 @@
 - Canonical branch — `readiness/GW1-2026-27-live-input-initial-squad`.
 - Immutable programme parent — `9eb57143f6ee92f67c78607cc386678d962e62d4`.
 - Starting accepted remote SHA — `923d0761ce1f4bf327623948cdc82ad7306d9aeb`.
-- Capability commit — recorded by the Git checkpoint following this local
-  evidence capture.
-- Linux validation workflow — required after the capability push; no result is
-  claimed in this pre-push record.
+- Capability commit — `e7c40a03ac664e5f736d019b375d3478a654176b`.
+- Linux validation workflow — run `32319850997` (`PASS`), job `96279685296`,
+  exact head `e7c40a03ac664e5f736d019b375d3478a654176b`.
 - Real credentialled provider call — `OPERATOR_CHECKPOINT`.
 
 ## Implemented vertical slice
@@ -104,9 +103,19 @@
 
 ## Linux and remote validation
 
-- Awaiting the exact capability commit, push, Linux workflow result and remote
-  SHA equality check. This section must be replaced with exact identifiers
-  before Checkpoint 2.2 is marked complete.
+- Dedicated Linux run `32319850997` passed on exact capability commit
+  `e7c40a03ac664e5f736d019b375d3478a654176b`; job `96279685296` passed every
+  step.
+- Frozen sync and disposable PostgreSQL migration passed.
+- The final current-availability, complete Stage-7 unit/property/contract,
+  Checkpoint-2.1 and Session-1 regression command passed `202` tests.
+- New current-availability branch coverage passed the configured `90%` gate.
+- The complete PostgreSQL Stage-7 integration command passed `28` tests.
+- Ruff format, Ruff lint, strict mypy, wheel/sdist build, first-party secret
+  scan, commit whitespace assurance and container cleanup all passed.
+- The canonical branch was fetched after completion. Local HEAD and
+  `origin/readiness/GW1-2026-27-live-input-initial-squad` were exactly equal at
+  `e7c40a03ac664e5f736d019b375d3478a654176b` before this attestation.
 
 ## Capability file hashes
 
@@ -122,5 +131,8 @@
 ## Status
 
 - Local engineering result — `PASS`.
-- Linux engineering result — `PENDING`.
-- Checkpoint 2.2 — `IN_PROGRESS` pending exact remote Linux acceptance.
+- Linux engineering result — `PASS`.
+- Checkpoint 2.2 — `COMPLETE`.
+- Exact next action — publish this evidence-only attestation, verify its remote
+  SHA, then begin Checkpoint 2.3 current football-event distributions without
+  widening the accepted Stage-8 baseline or hiding the Stage-7 cold-start debt.
