@@ -10,7 +10,7 @@ from typing import Annotated, NoReturn
 from uuid import UUID
 
 import typer
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from dmf_pulse.cli.odds_cmd import odds_app
 from dmf_pulse.ingestion.errors import IngestionError
@@ -32,13 +32,24 @@ from dmf_pulse.ingestion.fpl.service import (
     FplOperationOutcome,
     FplReplayRequest,
 )
+from dmf_pulse.ingestion.session1 import (
+    Session1CurrentInputRequest,
+    Session1CurrentInputService,
+    Session1DownstreamSummary,
+    Session1FixtureApproval,
+    Session1OperatorApproval,
+    Session1PreparedInputs,
+    Session1TeamApproval,
+)
 
 ingest_app = typer.Typer(help="Run explicitly rights-gated ingestion operations.")
 fpl_app = typer.Typer(help="Validate and ingest frozen FPL reference payloads.")
 bundle_app = typer.Typer(help="Inspect immutable FPL source bundles.")
 current_app = typer.Typer(help="Validate current official-FPL manual captures transiently.")
+session1_app = typer.Typer(help="Prepare one transient, explicitly reviewed GW1 current input.")
 ingest_app.add_typer(fpl_app, name="fpl")
 ingest_app.add_typer(odds_app, name="odds")
+ingest_app.add_typer(session1_app, name="session1")
 fpl_app.add_typer(bundle_app, name="bundle")
 fpl_app.add_typer(current_app, name="current")
 
@@ -81,6 +92,136 @@ def _safe(operation: Callable[[], object]) -> object:
         error = IngestionError("INTERNAL_INVARIANT", "ingestion command failed safely")
         typer.echo(_json(error.as_error_object()))
         raise typer.Exit(error.exit_code) from exc
+
+
+def _collect_session1_approval(
+    prepared: Session1PreparedInputs,
+    *,
+    reviewer: str,
+    clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+) -> Session1OperatorApproval:
+    template = prepared.review_template
+    typer.echo(
+        "PRIVATE TRANSIENT REVIEW — do not redirect, record, or persist this FPL-derived view.",
+        err=True,
+    )
+    typer.echo(_json(template), err=True)
+
+    teams = tuple(
+        Session1TeamApproval(
+            provider_team_text=row.provider_team_text,
+            official_fpl_team_id=typer.prompt(
+                f"Official FPL team ID for {json.dumps(row.provider_team_text)}",
+                type=int,
+                err=True,
+            ),
+        )
+        for row in template.provider_teams
+    )
+    fixtures = tuple(
+        Session1FixtureApproval(
+            provider_event_id=row.provider_event_id,
+            official_fpl_fixture_id=typer.prompt(
+                f"Official FPL fixture ID for event {json.dumps(row.provider_event_id)}",
+                type=int,
+                err=True,
+            ),
+        )
+        for row in template.provider_events
+    )
+    confirmed = typer.prompt(
+        "Type the complete review template SHA-256 to approve these exact choices",
+        type=str,
+        err=True,
+    )
+    return Session1OperatorApproval(
+        reviewer=reviewer,
+        approved_at=clock(),
+        template_sha256=template.template_sha256,
+        confirmed_template_sha256=confirmed,
+        team_approvals=teams,
+        fixture_approvals=fixtures,
+    )
+
+
+@session1_app.command("run")
+def session1_run_command(
+    bootstrap: Annotated[Path, typer.Option("--bootstrap")],
+    fixtures: Annotated[Path, typer.Option("--fixtures")],
+    captured_at: Annotated[str, typer.Option("--captured-at")],
+    information_cutoff: Annotated[str, typer.Option("--information-cutoff")],
+    reviewer: Annotated[str, typer.Option("--reviewer")],
+    database_url_ref: Annotated[str, typer.Option("--database-url-ref")] = DATABASE_REF,
+    competition_key: Annotated[str, typer.Option("--competition-key")] = "PL",
+    season_code: Annotated[str, typer.Option("--season-code")] = "2026/27",
+    gameweek: Annotated[int, typer.Option("--gameweek", min=1)] = 1,
+    fpl_rights_profile: Annotated[str, typer.Option("--fpl-rights-profile")] = (
+        "fpl_official_private_manual_v1"
+    ),
+    odds_provider: Annotated[str, typer.Option("--odds-provider")] = "the_odds_api",
+    odds_sport_key: Annotated[str, typer.Option("--odds-sport-key")] = "soccer_epl",
+    odds_region: Annotated[str, typer.Option("--odds-region")] = "uk",
+    odds_market: Annotated[str, typer.Option("--odds-market")] = "h2h",
+    output: Annotated[str, typer.Option("--output")] = "json",
+) -> None:
+    """Run FPL compilation, live odds retrieval, and explicit identity review in one process."""
+
+    def prepare() -> Session1PreparedInputs:
+        _require_json(output)
+        if (
+            not reviewer.strip()
+            or competition_key != "PL"
+            or season_code != "2026/27"
+            or gameweek != 1
+            or fpl_rights_profile != "fpl_official_private_manual_v1"
+            or odds_provider != "the_odds_api"
+            or odds_sport_key != "soccer_epl"
+            or odds_region != "uk"
+            or odds_market != "h2h"
+        ):
+            raise IngestionError("USAGE_INVALID", "Session-1 options are invalid")
+        try:
+            request = Session1CurrentInputRequest(
+                bootstrap_path=bootstrap,
+                fixtures_path=fixtures,
+                captured_at=_timestamp(captured_at, option="--captured-at"),
+                information_cutoff=_timestamp(information_cutoff, option="--information-cutoff"),
+                database_url_ref=database_url_ref,
+                competition_key="PL",
+                season_code="2026/27",
+                target_gameweek=1,
+                fpl_rights_profile_id="fpl_official_private_manual_v1",
+                odds_provider="the_odds_api",
+                odds_sport_key="soccer_epl",
+                odds_region="uk",
+                odds_market="h2h",
+            )
+        except ValueError as exc:
+            raise IngestionError("USAGE_INVALID", "Session-1 options are invalid") from exc
+        return Session1CurrentInputService().prepare(request)
+
+    prepared = _safe(prepare)
+    if not isinstance(prepared, Session1PreparedInputs):
+        _failure(IngestionError("INTERNAL_INVARIANT", "Session-1 preparation is invalid"))
+    try:
+        approval = _collect_session1_approval(
+            prepared,
+            reviewer=reviewer,
+        )
+    except ValidationError:
+        _failure(
+            IngestionError(
+                "MAPPING_CONFLICT", "Session-1 operator approval is invalid or incomplete"
+            )
+        )
+
+    def complete() -> Session1DownstreamSummary:
+        return Session1CurrentInputService().complete(prepared, approval).safe_summary()
+
+    result = _safe(complete)
+    if not isinstance(result, Session1DownstreamSummary):
+        _failure(IngestionError("INTERNAL_INVARIANT", "Session-1 result is invalid"))
+    typer.echo(_json(result))
 
 
 @current_app.command("validate")

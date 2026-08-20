@@ -14,6 +14,27 @@
 - Exclusions remain: probabilities, projections, optimisation, initial squad,
   captaincy, prospective logging, UI, Checkpoint 1.5, PR, merge and activation.
 <!-- GW1-1.4-PLAN-END -->
+<!-- GW1-1.5-PLAN-START -->
+### Checkpoint 1.5 — Session-1 transient operator workflow
+
+- [x] Add one shared application service that compiles the operator-captured
+  official-FPL pair, retrieves one governed provider-native EPL odds input, and
+  keeps both current inputs in the same process.
+- [x] Generate a deterministic, hash-bound private review template containing
+  only exact provider/FPL identity choices; require an operator selection for
+  every team and fixture plus exact template-hash confirmation.
+- [x] Build the accepted team and fixture plans in memory, run the Checkpoint
+  1.4 resolvers, and return a validated `SESSION1_DOWNSTREAM_INPUT` without FPL
+  raw or derived persistence.
+- [x] Expose the shared service through an exact PowerShell-compatible CLI and
+  document PostgreSQL, process credential, manual capture, interactive review,
+  controlled failures, transient-file deletion, and secret clearing.
+- [ ] Add service, CLI, rights, tamper, completeness, no-auto-approval, and
+  no-persistence regressions; run focused tests, static/package/security gates,
+  checkpoint commit/push, Linux workflow validation, and remote-SHA verification.
+- Exclusions: probabilities, market consensus, projections, optimisation,
+  initial squad, captaincy, prospective logging, PR, merge, and activation.
+<!-- GW1-1.5-PLAN-END -->
 - Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
 - Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.
 - Exclusions: no live key, provider success claim, FPL current-input changes, identity mapping, projections, optimiser, squad, captaincy, prospective logging, PR, merge, or activation.

@@ -20,7 +20,7 @@
 | 1.2 Current official FPL input foundation | COMPLETE | Existing accepted implementation preserved unchanged. |
 | 1.3 Live The Odds API input foundation | COMPLETE | 1.3A, 1.3B and 1.3C are COMPLETE; operator contract and acceptance evidence are published. |
 | 1.4 FPL / odds identity integrity | COMPLETE | Exact team and target-GW fixture identity bridge accepted. |
-| 1.5 Session-1 artifacts / operator workflow | INCOMPLETE | Not started. |
+| 1.5 Session-1 artifacts / operator workflow | IN_PROGRESS | Shared transient service, explicit hash-confirmed review, downstream contract, CLI and exact PowerShell runbook pass local validation; Linux publication is pending. |
 
 ## Checkpoint 1.3A — live credential / transport wiring
 
@@ -261,3 +261,35 @@
 - Validation evidence head — `5d48a1bcabe8e3c4960f5c906b0a1492799abfde`.
 - Checkpoint 1.4 — `COMPLETE`.
 - Exact next action — **CHECKPOINT 1.5 — SESSION-1 ARTIFACTS / OPERATOR WORKFLOW**.
+
+## Checkpoint 1.5 — local pre-publication acceptance
+
+- Starting accepted remote SHA —
+  `b557d1c52604817415b414f8414b938eaa3f69ac`.
+- Shared application path — manual transient official-FPL compilation, governed
+  live EPL odds retrieval, official target-GW time-window scoping, deterministic
+  private review, explicit complete team/fixture choices, exact template-hash
+  confirmation, Checkpoint-1.4 identity resolution and one transient
+  `SESSION1_DOWNSTREAM_INPUT`.
+- No-lookahead boundary — actual operator approval is recorded separately as
+  `decision_information_at`; official deadline remains the maximum ceiling.
+- Rights/storage — official-FPL raw and derived persistence remain denied; no FPL
+  database access, mapping-plan file, identity-map file, or downstream artifact is
+  created. Odds raw retention remains false.
+- Hostile review — three P1 findings were fixed: later provider-event scope,
+  deadline-versus-observation ambiguity, and independent downstream source-hash
+  revalidation. P0/P2/P3 — none unresolved.
+- New tests — `14 passed`; focused/inherited — `135 passed, 1 deselected`.
+- New service/affected CLI branch-aware coverage — `96%` total (`98%` / `93%`).
+- Disposable PostgreSQL 18.4 migration and live/rights regressions — `18 passed`;
+  container removed.
+- Ruff format/lint, strict mypy, build, clean installed-wheel CLI help, workflow
+  YAML, secret scan and diff check — `PASS`.
+- Repository validation — `FAIL` against the known stale branch-wide GCS-008
+  current manifest (`105` errors); retained as final acceptance debt.
+- Detailed evidence —
+  `evidence/readiness/GW1_SESSION1_VALIDATION_1_5.md`.
+- Real credentialled provider call — `OPERATOR_CHECKPOINT`.
+- Checkpoint status — `IN_PROGRESS` pending commit, push, Linux workflow and exact
+  remote attestation.
+- Exact next action — **PUBLISH AND VALIDATE CHECKPOINT 1.5**.
