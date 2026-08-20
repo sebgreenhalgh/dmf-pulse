@@ -40,24 +40,28 @@
 <!-- GW1-2.1-PLAN-START -->
 ### Checkpoint 2.1 — current market consensus integration
 
-- [ ] Revalidate the Session-1 downstream hashes, reviewed identity coverage,
+- [x] Revalidate the Session-1 downstream hashes, reviewed identity coverage,
   rights boundary, and decision-time information set before adaptation.
-- [ ] Deterministically translate every complete provider-native target-fixture
+- [x] Deterministically translate every complete provider-native target-fixture
   H2H book into the accepted Stage-6 observation contract without database or
   FPL persistence.
-- [ ] Run the authenticated frozen Stage-6 normalisation/consensus policy per
+- [x] Run the authenticated frozen Stage-6 normalisation/consensus policy per
   exact mapped fixture and fail closed on missing, stale, future, ambiguous, or
   unusable coverage.
-- [ ] Return a hash-bound transient preseason market-consensus bundle with safe
+- [x] Return a hash-bound transient preseason market-consensus bundle with safe
   summary, source lineage, confidence/degradation evidence, and complete fixture
   coverage for Checkpoint 2.2.
-- [ ] Add adversarial tests, record bounded acceptance evidence, commit and push
+- [x] Add adversarial tests, record bounded acceptance evidence, commit and push
   the coherent capability, run the dedicated Linux gate, and attest the exact
   remotely verified revision.
 
 Exclusions: availability/minutes, football-event and player-points projections,
 optimisation, squad/captain decisions, prospective evaluation, PR, merge, and
 activation.
+
+Latest accepted capability — implementation `57c5b5f68e0e1a5a2c5a2d6b9c14f4e9e43d0924`,
+hostile-review remediation `2858e6f155c6606fa6bfc1a51d72c3286da33317`,
+Linux validation run `32317678585` (`PASS`).
 <!-- GW1-2.1-PLAN-END -->
 - Checkpoint 1.0: complete at remote SHA `743e8167ec77f1d4b1795e4278b7047b8859b0d7`.
 - Checkpoint 1.1 scope: add a runtime-only Odds API credential provider, systemd-credential preference, process-scoped PowerShell fallback, non-disclosing diagnostic, and focused security tests.
