@@ -20,27 +20,28 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Verify final corrected checkpoint 15.05 payload
+      - name: Verify checkpoint 15.06 payload
         shell: bash
         run: |
           set -euo pipefail
-          cat recovery/stage1505/part-*.b64 > /tmp/checkpoint.patch.gz.b64
-          test "$(wc -c < /tmp/checkpoint.patch.gz.b64)" -eq 20872
-          echo "cc1617bc8b5bc0845f17c3be32ed4890dd6d0d35f623488b7357fc0dd30668bd  /tmp/checkpoint.patch.gz.b64" | sha256sum --check
-          base64 -d /tmp/checkpoint.patch.gz.b64 > /tmp/checkpoint.patch.gz
-          gzip -t /tmp/checkpoint.patch.gz
-          gzip -dc /tmp/checkpoint.patch.gz > /tmp/checkpoint.patch
-          git apply --check --whitespace=error /tmp/checkpoint.patch
-          git apply --index --whitespace=error /tmp/checkpoint.patch
+          cat recovery/stage1506/part-*.b64 > /tmp/stage1506.patch.gz.b64
+          test "$(wc -c < /tmp/stage1506.patch.gz.b64)" -eq 40164
+          echo "c3b4529597c078520fa365a94fd97e6800d35820814c4e2152e9bae04e51bd0a  /tmp/stage1506.patch.gz.b64" | sha256sum --check
+          base64 -d /tmp/stage1506.patch.gz.b64 > /tmp/stage1506.patch.gz
+          gzip -t /tmp/stage1506.patch.gz
+          gzip -dc /tmp/stage1506.patch.gz > /tmp/stage1506.patch
+          echo "b0544d83473fb4b94b3eff73c5faf20466363200b4623a5294cae08a779dd43a  /tmp/stage1506.patch" | sha256sum --check
+          git apply --check --whitespace=error /tmp/stage1506.patch
+          git apply --index --whitespace=error /tmp/stage1506.patch
           git diff --cached --check
 
-      - name: Commit and push checkpoint 15.05
+      - name: Commit and push checkpoint 15.06
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "Sebastian Greenhalgh"
           git config user.email "seb.greenhalgh@outlook.com"
-          git commit -m "feat(rank): seal checkpoint 15.05 synthetic cohort"
+          git commit -m "feat(rank): seal checkpoint 15.06 shared service and CLI"
           git push origin HEAD:stage/A15/RANK-015-rank-aware-strategy
 
       - name: Report publisher result
@@ -53,4 +54,4 @@ jobs:
           set -euo pipefail
           head_sha="$(git rev-parse HEAD)"
           gh issue comment 14 --body \
-            "STAGE15_PUBLISH run_id=${GITHUB_RUN_ID} status=${JOB_STATUS} head_sha=${head_sha} trigger_sha=${GITHUB_SHA}"
+            "STAGE15_1506_PUBLISH run_id=${GITHUB_RUN_ID} status=${JOB_STATUS} head_sha=${head_sha} trigger_sha=${GITHUB_SHA}"
