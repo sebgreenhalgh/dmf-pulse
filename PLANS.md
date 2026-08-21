@@ -235,6 +235,16 @@ provider request, or credential use occurred.
 - [x] Run focused, inherited and repository assurance; publish only the
   candidate branch and await dedicated Ubuntu validation.
 
+### Human-acceptance checkpoint
+
+- [x] Record the direct human acceptance as a separate immutable attestation
+  bound to candidate artifact `e6a6bd6f5053c8c2db71e982a5eb0b86066232e600ef18296f7f4751ba5bb3d2`,
+  reviewed branch `4e8d6ebe58297a66ff02e2b2d5c09981b9c52aba`, and transformation
+  commit `a6b557cd3c0f2a7729c95a34546dd4d9c3aa33a9`.
+- [x] Preserve the candidate artifact's `CANDIDATE_NOT_ACCEPTED` status and all
+  non-activation boundaries while marking the ticket as privately accepted for
+  2026/27 GW1 decision support only.
+
 ## RUL-2026-27 independent full-ruleset review and remediation
 
 - Repository/branch: `sebgreenhalgh/dmf-pulse`,

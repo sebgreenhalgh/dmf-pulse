@@ -1,19 +1,31 @@
 # GW1-INPUT-001 acceptance record
 
-Implementation status: **READY FOR INDEPENDENT REVIEW; NOT HUMAN-ACCEPTED**.
+Implementation status: **HUMAN-ACCEPTED FOR BOUNDED PRIVATE 2026/27 GW1
+DECISION SUPPORT; NOT ACTIVATED**.
 
-This ticket publishes an offline candidate only. It must not be used as an
-ACTIVE current-event prior until a human reviews the source-rights record,
-historical calibration and downstream readiness decision.
+The human-acceptance attestation is
+[`HUMAN_ACCEPTANCE.json`](../../evidence/tickets/GW1-INPUT-001/HUMAN_ACCEPTANCE.json).
+It binds the reviewed branch `4e8d6ebe58297a66ff02e2b2d5c09981b9c52aba`,
+transformation commit `a6b557cd3c0f2a7729c95a34546dd4d9c3aa33a9`, and
+candidate artifact SHA-256
+`e6a6bd6f5053c8c2db71e982a5eb0b86066232e600ef18296f7f4751ba5bb3d2`.
 
-The candidate is accepted for review only if it proves all of the following:
+The candidate artifact deliberately remains `CANDIDATE_NOT_ACCEPTED`: human
+acceptance is recorded separately so the reviewed numerical artifact and its
+original non-activation provenance are immutable. The acceptance permits only
+a league-wide weak Stage-8 regulariser, finite-support prior, and controlled
+fallback for private 2026/27 GW1 decision support.
+
+The bounded private acceptance rests on all of the following:
 
 - the exact five pinned OpenFootball EPL files produce 380 completed fixtures
   each, with duplicate fixtures and malformed/negative scores rejected;
 - exact-Decimal half-life weighting reproduces the declared league-wide
   10-decimal central rates without hard-coding them as source truth;
 - the candidate artifact is hash-bound, records source provenance, and remains
-  `CANDIDATE_NOT_ACCEPTED` with all human-acceptance fields empty;
+  `CANDIDATE_NOT_ACCEPTED`; the separate attestation has the exact reviewed
+  branch, transformation commit, source commit, calibration, model family and
+  artifact SHA-256;
 - the existing Stage-8 `ScorePriorRequest`, adaptive grid and soft-KL
   projection are reused; no alternative score engine or confidence grade is
   introduced;
@@ -22,16 +34,17 @@ The candidate is accepted for review only if it proves all of the following:
 - no provider key/request, raw external-data commit, activation, PR, merge or
   player-allocation change occurs.
 
-## Manual review still required
+## Boundaries that remain in force
 
-1. Confirm that OpenFootball's CC0/public-domain statement is sufficient for
-   the intended DMF retention and derived-model use, including any upstream
-   data-origin consideration outside the repository's own assertion.
-2. Review the five file hashes, 1,900-match totals, date/cutoff, rounding and
-   source-quality limitations independently.
-3. Review the synthetic diagnostic report without treating its output spread as
-   a prospective production threshold.
-4. Supply separately approved current-player evidence before any player goal or
-   assist allocation work begins.
-5. Make a separate human acceptance decision before a candidate can become an
-   accepted current-event artifact.
+1. OpenFootball's CC0/public-domain source-owner assertion and its documented
+   quality/provenance limitation are accepted only for this bounded private
+   use; no wider retention or production-rights conclusion follows.
+2. H2H plus totals remain market-primary. H2H-only output remains explicitly
+   degraded and materially prior-sensitive; prior-only or numerical fallback
+   remains explicitly surfaced.
+3. This is not current team-strength evidence, player evidence, or a
+   replacement for available market H2H or totals.
+4. Separately approved current-player evidence is still required before any
+   player goal, assist, minutes, or allocation artifact is considered.
+5. A real provider call, production activation, main-branch merge, or any
+   wider use needs a separate approval.

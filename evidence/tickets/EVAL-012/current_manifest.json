@@ -226,9 +226,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 83733,
+      "bytes": 84272,
       "path": "PLANS.md",
-      "sha256": "dd9f9028d9afce3de57927039f7d92d5d0e09b06c07aa126f84b2496e6dd3aaa"
+      "sha256": "c3ade05afc3ceec5644f3d6efef06668115b693aa361941ff0a805308cf3007e"
     },
     {
       "bytes": 2761,
@@ -5201,14 +5201,14 @@
       "sha256": "875b727ddeb7581472b8e36a497ebf6cbbfa4303939f2684b0649a2be68389b1"
     },
     {
-      "bytes": 1958,
+      "bytes": 2693,
       "path": "tickets/GW1-INPUT-001/ACCEPTANCE.md",
-      "sha256": "1e6ef25f9bf2717399cee362068814885b01941b5513150ab9f3776c7dc92c74"
+      "sha256": "fbfc25e198e9eb316bb52b243b03cc0b4e60b1ea57ec85d3f41c68ba08d91feb"
     },
     {
-      "bytes": 2604,
+      "bytes": 2906,
       "path": "tickets/GW1-INPUT-001/ticket.yaml",
-      "sha256": "108ddcc0b05a747b95f6b5aa5c71b72e1c8b26b1954ae9e487432438f8160c61"
+      "sha256": "c8c9f0927cfb54340e09ce5653fbfbca62f9b2510b0c94675dafa20b3c52b0ff"
     },
     {
       "bytes": 2449,

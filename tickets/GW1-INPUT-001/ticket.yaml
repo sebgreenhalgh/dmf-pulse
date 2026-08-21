@@ -2,7 +2,7 @@ ticket_id: "GW1-INPUT-001"
 stage: "A8-support-prior-candidate"
 pack_version: "1.0"
 title: "GW1 league-wide weak Stage-8 support-prior candidate"
-status: "IMPLEMENTED_PENDING_HUMAN_ACCEPTANCE"
+status: "HUMAN_ACCEPTED_PRIVATE_GW1_DECISION_SUPPORT_NOT_ACTIVATED"
 owner: "Sebastian Greenhalgh"
 implementer_role: "codex_implementation"
 reviewer_role: "fresh_independent_review_and_human"
@@ -18,14 +18,16 @@ objective: >-
 authority_override:
   source: "operator directive GW1-INPUT-001"
   limited_effect: >-
-    Authorizes an unaccepted, offline Stage-8 support-prior candidate only. It
-    does not activate a model, amend accepted public contracts, or authorize a
-    player-allocation model or provider call.
+    Records a separate human acceptance of the immutable offline candidate for
+    private 2026/27 GW1 decision support only. The candidate artifact remains
+    CANDIDATE_NOT_ACCEPTED; this does not activate a model, amend accepted
+    public contracts, or authorize a player-allocation model or provider call.
 
 in_scope:
   - "Pinned OpenFootball England source verification and derived aggregate provenance."
   - "Deterministic five-season parser, coverage/duplicate/score validation and Decimal half-life calibration."
   - "Candidate-only artifact, explicit sensitivity worlds, and synthetic Stage-8 diagnostics."
+  - "Separate immutable human-acceptance attestation for private 2026/27 GW1 decision support only."
   - "Reuse of existing ScorePriorRequest, adaptive score grid and soft-KL projection."
   - "Deterministic refresh of the validator-selected EVAL-012 current repository manifest only."
   - "Dedicated offline Ubuntu validation workflow."
@@ -39,7 +41,7 @@ excluded:
 acceptance:
   - "Exactly five source files produce 380 completed fixtures each and 1,900 fixtures in total."
   - "The derived central rates reproduce 1.5840940818 and 1.3253421983 after declared rounding."
-  - "The artifact remains CANDIDATE_NOT_ACCEPTED and contains no reviewer or activation claim."
+  - "The immutable candidate artifact remains CANDIDATE_NOT_ACCEPTED, while a separate hash-bound human acceptance records the private GW1 decision-support scope only."
   - "The existing Stage-8 prior/request/grid path proves strictly positive finite support and tail compliance."
   - "Synthetic complete-market, H2H-only, no-market and numerical-fallback diagnostics are explicit."
   - "No provider credential, provider call, raw source retention, PR, merge or activation occurs."

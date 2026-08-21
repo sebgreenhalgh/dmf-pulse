@@ -1,0 +1,46 @@
+{
+  "acceptance_sha256": "f8ff9600eab5b6146cdf4988def12771a99de21d0a3294dfd7bfa455b0d4ac74",
+  "acceptance_source": "USER_DIRECTIVE",
+  "accepted_artifact_sha256": "e6a6bd6f5053c8c2db71e982a5eb0b86066232e600ef18296f7f4751ba5bb3d2",
+  "accepted_calibration": {
+    "away_goal_rate": "1.3253421983",
+    "completed_fixture_count": 1900,
+    "half_life_seasons": "2",
+    "home_goal_rate": "1.5840940818",
+    "seasons": [
+      "2021/22",
+      "2022/23",
+      "2023/24",
+      "2024/25",
+      "2025/26"
+    ]
+  },
+  "accepted_model_family": "INDEPENDENT_POISSON_V1",
+  "accepted_scope": {
+    "decision_support": "PRIVATE_2026_27_GW1_ONLY",
+    "prior_role": "LEAGUE_WIDE_WEAK_REGULARISER_FINITE_SUPPORT_CONTROLLED_FALLBACK_ONLY",
+    "stage8_status": "H2H_AND_TOTALS_MARKET_PRIMARY; H2H_ONLY_DEGRADED_AND_MATERIALLY_PRIOR_SENSITIVE; PRIOR_OR_NUMERICAL_FALLBACK_EXPLICITLY_SURFACED"
+  },
+  "artifact_status_preserved": "CANDIDATE_NOT_ACCEPTED",
+  "authorised": {
+    "main_branch_merge": false,
+    "player_allocation_artifact": false,
+    "production_activation": false,
+    "provider_call": false,
+    "replacement_of_available_market_h2h_or_totals": false,
+    "team_strength_or_player_evidence": false
+  },
+  "human_identity": null,
+  "limitations_acknowledged": "OPENFOOTBALL_SOURCE_QUALITY_AND_PROVENANCE_LIMITATION_ACCEPTED_FOR_BOUNDED_PRIVATE_GW1_USE",
+  "recorded_at": "2026-08-21T00:31:46Z",
+  "reviewed_branch_sha": "4e8d6ebe58297a66ff02e2b2d5c09981b9c52aba",
+  "schema_version": "gw1-support-prior-human-acceptance-v1",
+  "source": {
+    "commit": "10fa650c5d0f137f0d71d6b9fc723076060fe80e",
+    "licence": "CC0-1.0",
+    "rights_basis": "SOURCE_OWNER_PUBLIC_DOMAIN_DEDICATION",
+    "source": "OpenFootball England"
+  },
+  "status": "HUMAN_ACCEPTED_PRIVATE_GW1_DECISION_SUPPORT_NOT_ACTIVATED",
+  "transformation_code_commit": "a6b557cd3c0f2a7729c95a34546dd4d9c3aa33a9"
+}
