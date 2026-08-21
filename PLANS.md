@@ -1216,6 +1216,8 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Publish only the three permitted allocations, safe aggregate penalty/role
   receipt, and safe sensitivity summary; keep the named review and transient
   catalogue outside Git.
+- [x] Record the operator's exact bounded private-GW1 player-allocation human
+  acceptance with sensitivity and defensive limitations still explicit.
 - [ ] Run focused/full assurance, publish the exact final SHA, and require the
   dedicated Ubuntu workflow to pass before recommending bounded human review.
 

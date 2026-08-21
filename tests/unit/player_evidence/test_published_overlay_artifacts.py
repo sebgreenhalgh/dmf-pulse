@@ -7,9 +7,11 @@ import math
 from collections import defaultdict
 from pathlib import Path
 
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.player_evidence.models import (
     HistorySensitivityWorld,
     PlayerAllocationCandidateArtifact,
+    PlayerPosteriorArtifact,
     PriceWorld,
 )
 from dmf_pulse.player_evidence.overlays import (
@@ -151,3 +153,83 @@ def test_published_overlay_artifacts_are_bound_complete_and_derived_only() -> No
     }
     for path in (*ALLOCATION_PATHS.values(), *ROOT.glob("*.json")):
         assert _all_keys(json.loads(path.read_text(encoding="utf-8"))).isdisjoint(forbidden)
+
+
+def test_player_allocation_human_acceptance_is_exact_bounded_and_hash_bound() -> None:
+    path = ROOT / "GW1_PLAYER_ALLOCATION_HUMAN_ACCEPTANCE.json"
+    acceptance = json.loads(path.read_text(encoding="utf-8"))
+    assert set(acceptance) == {
+        "acceptance_sha256",
+        "acceptance_source",
+        "accepted_artifacts",
+        "accepted_at",
+        "accepted_scope",
+        "classification_counts",
+        "identity_coverage",
+        "implementation_sha",
+        "invariants",
+        "limitations_accepted",
+        "production_activation",
+        "schema_version",
+        "status",
+        "validation",
+    }
+    assert acceptance["acceptance_sha256"] == canonical_sha256(
+        {key: value for key, value in acceptance.items() if key != "acceptance_sha256"}
+    )
+    assert acceptance["acceptance_source"] == "USER_DIRECTIVE"
+    assert acceptance["accepted_scope"] == "PRIVATE_2026_27_GW1_ONLY"
+    assert acceptance["status"] == "HUMAN_ACCEPTED_PRIVATE_GW1_ONLY"
+    assert acceptance["implementation_sha"] == (
+        "b4353dbdcebd31f2a807bee90ec04b3ee8b07389"
+    )
+    assert acceptance["production_activation"] is False
+    assert acceptance["identity_coverage"] == {
+        "expected_player_count": 599,
+        "expected_team_count": 20,
+        "player_count": 599,
+        "team_count": 20,
+        "unresolved_mapping_count": 0,
+    }
+    assert acceptance["invariants"]["stage7_expected_minutes_separate"] is True
+    assert acceptance["limitations_accepted"][
+        "defensive_contribution_model_completeness"
+    ] == "PARTIAL"
+    assert acceptance["validation"] == {
+        "conclusion": "SUCCESS",
+        "head_sha": "b4353dbdcebd31f2a807bee90ec04b3ee8b07389",
+        "run_id": 32502314049,
+        "run_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/32502314049",
+    }
+
+    accepted = acceptance["accepted_artifacts"]
+    allocations = {world: _load_allocation(path) for world, path in ALLOCATION_PATHS.items()}
+    assert accepted["central_allocation_sha256"] == allocations[
+        HistorySensitivityWorld.CENTRAL_TEMPORARY
+    ].artifact_sha256
+    assert accepted["low_allocation_sha256"] == allocations[
+        HistorySensitivityWorld.LOW_SHRINKAGE
+    ].artifact_sha256
+    assert accepted["high_allocation_sha256"] == allocations[
+        HistorySensitivityWorld.HIGH_SHRINKAGE
+    ].artifact_sha256
+    posterior = PlayerPosteriorArtifact.model_validate_json(
+        Path(
+            "evidence/tickets/GW1-PLY-003/GW1_CURRENT_PLAYER_POSTERIOR_CENTRAL.json"
+        ).read_text(encoding="utf-8")
+    )
+    receipt = PenaltyOverlayReceipt.model_validate_json(
+        (ROOT / "GW1_CURRENT_PENALTY_ROLE_OVERLAY_RECEIPT.json").read_text(encoding="utf-8")
+    )
+    sensitivity = AllocationSensitivitySummary.model_validate_json(
+        (ROOT / "GW1_PLAYER_ALLOCATION_SENSITIVITY_SUMMARY.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert accepted["central_posterior_sha256"] == posterior.artifact_sha256
+    assert accepted["penalty_assignment_artifact_sha256"] == (
+        receipt.penalty_assignment_artifact_sha256
+    )
+    assert accepted["penalty_role_receipt_sha256"] == receipt.receipt_sha256
+    assert accepted["sensitivity_artifact_sha256"] == sensitivity.artifact_sha256
+    assert accepted["catalogue_semantic_sha256"] == receipt.catalogue_semantic_sha256

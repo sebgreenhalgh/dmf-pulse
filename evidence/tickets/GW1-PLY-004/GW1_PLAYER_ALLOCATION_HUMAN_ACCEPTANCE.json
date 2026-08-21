@@ -1,0 +1,53 @@
+{
+  "acceptance_sha256": "39737c6b96e2664f63f19b4ea0c34038d7c0ec5d9afc9f60cc1c6b89749a3352",
+  "acceptance_source": "USER_DIRECTIVE",
+  "accepted_artifacts": {
+    "catalogue_semantic_sha256": "9d655a2dc8e60eca0898f4bc04e8caf7b264887af1d62bfe61c5288cbdd75f11",
+    "central_allocation_sha256": "629d6c288f9faa7aa7763f5c578e662511c03d514169f683cbeb6ee81af695be",
+    "central_posterior_sha256": "537b2ab3c19aba381e6020972cd037b3f62665309c423037049020f0d4f0239f",
+    "high_allocation_sha256": "be28135f96276ccd59a57c38369ee4fe423d7b504400faca34a33a847482c0db",
+    "low_allocation_sha256": "6a3184e809d4cc11c4d34327c6b5b7fec320201784614f3601f1285e92ea5bb8",
+    "penalty_assignment_artifact_sha256": "0f5aa416babdb0db6166b2126448dd2c2ce3c58732e6d69837cf182ee9b60efb",
+    "penalty_role_receipt_sha256": "cb325409752286beb4dff2366c34bca0fafb33bff2426951e9e760e928c5c9bb",
+    "sensitivity_artifact_sha256": "854772e6d46b0b5e890039f94cd5a203481ec3794d1b8374913d75c72f091776"
+  },
+  "accepted_at": "2026-08-21T16:30:21.3363973Z",
+  "accepted_scope": "PRIVATE_2026_27_GW1_ONLY",
+  "classification_counts": {
+    "CLEAR_PRIMARY": 3,
+    "MULTIPLE_CANDIDATES": 8,
+    "PRIMARY_WITH_BACKUP": 9,
+    "UNKNOWN": 0
+  },
+  "identity_coverage": {
+    "expected_player_count": 599,
+    "expected_team_count": 20,
+    "player_count": 599,
+    "team_count": 20,
+    "unresolved_mapping_count": 0
+  },
+  "implementation_sha": "b4353dbdcebd31f2a807bee90ec04b3ee8b07389",
+  "invariants": {
+    "penalty_responsibility_affects_penalty_taker_share_only": true,
+    "raw_official_fpl_history_persisted": false,
+    "role_override_count": 0,
+    "stage7_expected_minutes_separate": true,
+    "zero_exposure_discipline_lineage_preserved": true
+  },
+  "limitations_accepted": {
+    "blocks_and_ball_recoveries_incompletely_calibrated": true,
+    "defensive_contribution_model_completeness": "PARTIAL",
+    "maximum_goal_or_assist_share_movement": 0.04178171187529492,
+    "players_at_or_above_0_02_goal_or_assist_threshold": 21,
+    "sensitivity_disclosed": true
+  },
+  "production_activation": false,
+  "schema_version": "gw1-player-allocation-human-acceptance-v1",
+  "status": "HUMAN_ACCEPTED_PRIVATE_GW1_ONLY",
+  "validation": {
+    "conclusion": "SUCCESS",
+    "head_sha": "b4353dbdcebd31f2a807bee90ec04b3ee8b07389",
+    "run_id": 32502314049,
+    "run_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/32502314049"
+  }
+}

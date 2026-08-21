@@ -236,9 +236,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 93584,
+      "bytes": 93734,
       "path": "PLANS.md",
-      "sha256": "f052bedf9e8a43facf79864c2044ecb4fd421f41a5547986e0d01a3bf77855dc"
+      "sha256": "a7021aebf092c2f08a19d9c391d4ae1a3b8603b7ef1db8e4777c8b3317dc6ca3"
     },
     {
       "bytes": 2761,
@@ -5166,9 +5166,9 @@
       "sha256": "b67599427ece2de08c180ff2cbc185d9671507840e6ca17189103daa90c8a7f2"
     },
     {
-      "bytes": 6782,
+      "bytes": 10243,
       "path": "tests/unit/player_evidence/test_published_overlay_artifacts.py",
-      "sha256": "aac75c0ad22eddb342f1b983b2b94b86344333b38ef19dc5c1adbe09b0b0bc13"
+      "sha256": "621246a9d0470c0fbaca5c4e5ae2b2b644f5b5cfd8653b7f436020c8050d0cdc"
     },
     {
       "bytes": 12836,
