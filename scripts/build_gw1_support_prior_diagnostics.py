@@ -127,16 +127,34 @@ def main(argv: list[str] | None = None) -> int:
         if calibration.dataset_sha256 != artifact["dataset_sha256"]:
             raise ValueError("candidate artifact dataset hash does not match local pinned source")
         complete, h2h_only, no_market = _synthetic_constraints()
+        dominance = diagnose_market_dominance(
+            calibration,
+            complete_constraints=complete,
+            h2h_only_constraints=h2h_only,
+            no_market_constraints=no_market,
+            policy=load_score_baseline_policy(),
+        )
+        fallback = diagnose_market_dominance(
+            calibration,
+            complete_constraints=complete,
+            h2h_only_constraints=h2h_only,
+            no_market_constraints=no_market,
+            policy=load_score_baseline_policy(),
+            max_iterations=1,
+        )
+        fallback_rows = [*fallback["complete_h2h_totals"], *fallback["h2h_only"]]
         report: dict[str, Any] = {
             "candidate_artifact_sha256": artifact["artifact_sha256"],
             "diagnostic_input": "SYNTHETIC_STAGE8_H2H_AND_TOTALS_V1",
-            "report": diagnose_market_dominance(
-                calibration,
-                complete_constraints=complete,
-                h2h_only_constraints=h2h_only,
-                no_market_constraints=no_market,
-                policy=load_score_baseline_policy(),
-            ),
+            "numerical_fallback_probe": {
+                "confidence_grade_added": False,
+                "max_iterations": 1,
+                "projection_statuses": sorted({row["projection_status"] for row in fallback_rows}),
+                "solver_error_codes": sorted(
+                    {row["solver_error_code"] for row in fallback_rows if row["solver_error_code"]}
+                ),
+            },
+            "report": dominance,
             "schema_version": "gw1-support-prior-market-diagnostics-v1",
         }
         report["result_sha256"] = canonical_json_sha256(report)

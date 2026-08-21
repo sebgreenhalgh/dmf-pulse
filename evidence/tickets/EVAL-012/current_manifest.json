@@ -2251,9 +2251,9 @@
       "sha256": "a731bc07ed562b822bd80c821b07b6c81628180f56d21523cb7c0be8cce77d01"
     },
     {
-      "bytes": 5350,
+      "bytes": 6137,
       "path": "scripts/build_gw1_support_prior_diagnostics.py",
-      "sha256": "e993fe717818eeeee9c4447c1c7e89ce08ec940539ecf12447ae5434e7ece67f"
+      "sha256": "106e5ce376293f3a0cb997969bfb130030cbf4334f066271da473316622c2fa9"
     },
     {
       "bytes": 1669,

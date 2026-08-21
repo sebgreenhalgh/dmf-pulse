@@ -1,6 +1,16 @@
 {
   "candidate_artifact_sha256": "e6a6bd6f5053c8c2db71e982a5eb0b86066232e600ef18296f7f4751ba5bb3d2",
   "diagnostic_input": "SYNTHETIC_STAGE8_H2H_AND_TOTALS_V1",
+  "numerical_fallback_probe": {
+    "confidence_grade_added": false,
+    "max_iterations": 1,
+    "projection_statuses": [
+      "DEGRADED"
+    ],
+    "solver_error_codes": [
+      "PROJECTION_DID_NOT_CONVERGE"
+    ]
+  },
   "report": {
     "candidate_model_sha256": "affa122cb5f93eb927e418f290e961c2cd227f4d6b8cba699a0ae6d5e8a5b85b",
     "complete_h2h_totals": [
@@ -1108,6 +1118,6 @@
     },
     "thresholds": "CANDIDATE_DIAGNOSTIC_ONLY_NO_PRODUCTION_THRESHOLD"
   },
-  "result_sha256": "04019a430dd7d1fabd440dc35719fa8ed8c1d0cc89569b294d434db3606cc3ab",
+  "result_sha256": "6e2621ea440db17157883a102d26ce191014dbbaec54a5b74e95b8df956c8eb7",
   "schema_version": "gw1-support-prior-market-diagnostics-v1"
 }
