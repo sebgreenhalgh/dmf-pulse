@@ -1,0 +1,1113 @@
+{
+  "candidate_artifact_sha256": "e6a6bd6f5053c8c2db71e982a5eb0b86066232e600ef18296f7f4751ba5bb3d2",
+  "diagnostic_input": "SYNTHETIC_STAGE8_H2H_AND_TOTALS_V1",
+  "report": {
+    "candidate_model_sha256": "affa122cb5f93eb927e418f290e961c2cd227f4d6b8cba699a0ae6d5e8a5b85b",
+    "complete_h2h_totals": [
+      {
+        "kl_movement": "0.057807682419",
+        "metrics": {
+          "btts_yes": "0.608198433365",
+          "clean_sheet_probabilities": {
+            "away": "0.184229864822",
+            "home": "0.279936450418"
+          },
+          "expected_away_goals": "1.235823",
+          "expected_home_goals": "1.631005",
+          "hda": {
+            "away": "0.260782206845",
+            "draw": "0.279317388480",
+            "home": "0.459900404674"
+          },
+          "over_2_5": "0.598870481354",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.122182729336"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.109767533726"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.081976050930"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.081802530806"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.078463618345"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.149622607281",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_TOTALS",
+          "away_goal_rate": "1.1265408686",
+          "away_multiplier": "0.85",
+          "home_goal_rate": "1.3464799695",
+          "home_multiplier": "0.85",
+          "world_sha256": "2826dedde199600e51cc18471d355feb3a32c0eb2d051dbe0a460b8464c0ea04"
+        }
+      },
+      {
+        "kl_movement": "0.050821592912",
+        "metrics": {
+          "btts_yes": "0.621851378473",
+          "clean_sheet_probabilities": {
+            "away": "0.177764276211",
+            "home": "0.264693891701"
+          },
+          "expected_away_goals": "1.297701",
+          "expected_home_goals": "1.644074",
+          "hda": {
+            "away": "0.261223719722",
+            "draw": "0.279343817447",
+            "home": "0.459432462830"
+          },
+          "over_2_5": "0.599214006170",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.120568950482"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.114763390242"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.084319084632"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.082050828562"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.069339980339"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.132078578842",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 6,
+        "world": {
+          "availability": "H2H_TOTALS",
+          "away_goal_rate": "1.3253421983",
+          "away_multiplier": "1",
+          "home_goal_rate": "1.3464799695",
+          "home_multiplier": "0.85",
+          "world_sha256": "3420548592986b107dc721cf385059384ae798135175658f444d4fd35f1b05bb"
+        }
+      },
+      {
+        "kl_movement": "0.064151993686",
+        "metrics": {
+          "btts_yes": "0.632413319754",
+          "clean_sheet_probabilities": {
+            "away": "0.172574281944",
+            "home": "0.252969228563"
+          },
+          "expected_away_goals": "1.355075",
+          "expected_home_goals": "1.658056",
+          "hda": {
+            "away": "0.261617417082",
+            "draw": "0.279360188686",
+            "home": "0.459022394232"
+          },
+          "over_2_5": "0.599521207205",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.118940672226"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.118106340107"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.086360510871"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.081331428825"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.061375910741"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.154122066689",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 6,
+        "world": {
+          "availability": "H2H_TOTALS",
+          "away_goal_rate": "1.524143528",
+          "away_multiplier": "1.15",
+          "home_goal_rate": "1.3464799695",
+          "home_multiplier": "0.85",
+          "world_sha256": "35428a069042a1e83ae26aff2f1112fd235ab59d0dc731229061849a24555e68"
+        }
+      },
+      {
+        "kl_movement": "0.024522763955",
+        "metrics": {
+          "btts_yes": "0.613290104516",
+          "clean_sheet_probabilities": {
+            "away": "0.174614636243",
+            "home": "0.276935692134"
+          },
+          "expected_away_goals": "1.248287",
+          "expected_home_goals": "1.707604",
+          "hda": {
+            "away": "0.260305228710",
+            "draw": "0.279330244235",
+            "home": "0.460364527055"
+          },
+          "over_2_5": "0.599252691654",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.115710782027"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.105220640903"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.080830058872"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.076171552289"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.075313335251"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.090275603392",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_TOTALS",
+          "away_goal_rate": "1.1265408686",
+          "away_multiplier": "0.85",
+          "home_goal_rate": "1.5840940818",
+          "home_multiplier": "1",
+          "world_sha256": "0160550e131e1f7170104acf064b685daf21acac910e94db0e5aa0ded29fb2ad"
+        }
+      },
+      {
+        "kl_movement": "0.015282181988",
+        "metrics": {
+          "btts_yes": "0.628235568749",
+          "clean_sheet_probabilities": {
+            "away": "0.167991147429",
+            "home": "0.261074644353"
+          },
+          "expected_away_goals": "1.313712",
+          "expected_home_goals": "1.722980",
+          "hda": {
+            "away": "0.260741628561",
+            "draw": "0.279368947250",
+            "home": "0.459889424189"
+          },
+          "over_2_5": "0.599598453730",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.120302300173"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.103716159202"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.080344570730"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.077648635145"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.067198748257"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.074797235105",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_TOTALS",
+          "away_goal_rate": "1.3253421983",
+          "away_multiplier": "1",
+          "home_goal_rate": "1.5840940818",
+          "home_multiplier": "1",
+          "world_sha256": "3fb7e7dfa635b9f9cf5267d40b79cc7e5b1d0333585922738f37142499a4157f"
+        }
+      },
+      {
+        "kl_movement": "0.026184463265",
+        "metrics": {
+          "btts_yes": "0.639881795740",
+          "clean_sheet_probabilities": {
+            "away": "0.162670903852",
+            "home": "0.248854812645"
+          },
+          "expected_away_goals": "1.374518",
+          "expected_home_goals": "1.739486",
+          "hda": {
+            "away": "0.261130116976",
+            "draw": "0.279395455241",
+            "home": "0.459474427783"
+          },
+          "over_2_5": "0.599909165960",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.124117616011"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.101382835295"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.079527688042"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.079113300859"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 2,
+              "probability": "0.062989669983"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.106874955119",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 6,
+        "world": {
+          "availability": "H2H_TOTALS",
+          "away_goal_rate": "1.524143528",
+          "away_multiplier": "1.15",
+          "home_goal_rate": "1.5840940818",
+          "home_multiplier": "1",
+          "world_sha256": "ee69c30daa3d3df912f2f8336834ab1da2ccd4465b12b52e25700d5f48c4557b"
+        }
+      },
+      {
+        "kl_movement": "0.018483596370",
+        "metrics": {
+          "btts_yes": "0.617151110665",
+          "clean_sheet_probabilities": {
+            "away": "0.167415207625",
+            "home": "0.274326677771"
+          },
+          "expected_away_goals": "1.260694",
+          "expected_home_goals": "1.781293",
+          "hda": {
+            "away": "0.259884363819",
+            "draw": "0.279333348817",
+            "home": "0.460782287364"
+          },
+          "over_2_5": "0.599595501574",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.120861898589"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.090857604895"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.079042022592"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.073556049477"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.069464458707"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.080022265924",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_TOTALS",
+          "away_goal_rate": "1.1265408686",
+          "away_multiplier": "0.85",
+          "home_goal_rate": "1.8217081941",
+          "home_multiplier": "1.15",
+          "world_sha256": "6920cdf587afe8528acef622617727a41385975957800542444e0e5095e80d68"
+        }
+      },
+      {
+        "kl_movement": "0.006989218789",
+        "metrics": {
+          "btts_yes": "0.633192662463",
+          "clean_sheet_probabilities": {
+            "away": "0.160685925305",
+            "home": "0.257930910634"
+          },
+          "expected_away_goals": "1.329696",
+          "expected_home_goals": "1.798865",
+          "hda": {
+            "away": "0.260317704743",
+            "draw": "0.279382103542",
+            "home": "0.460300191716"
+          },
+          "over_2_5": "0.599944535089",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.125088166086"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.089433806555"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.078057733087"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.071659209188"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 2,
+              "probability": "0.065271084281"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.050402610827",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_TOTALS",
+          "away_goal_rate": "1.3253421983",
+          "away_multiplier": "1",
+          "home_goal_rate": "1.8217081941",
+          "home_multiplier": "1.15",
+          "world_sha256": "8c9e8f7f5074ccfdddb10181bbfdfdfe89f2ceb68579d5a19b1d323ec1853636"
+        }
+      },
+      {
+        "kl_movement": "0.015455417114",
+        "metrics": {
+          "btts_yes": "0.645765269271",
+          "clean_sheet_probabilities": {
+            "away": "0.155271686624",
+            "home": "0.245273327472"
+          },
+          "expected_away_goals": "1.393994",
+          "expected_home_goals": "1.817789",
+          "hda": {
+            "away": "0.260702907959",
+            "draw": "0.279416872858",
+            "home": "0.459880219182"
+          },
+          "over_2_5": "0.600259604330",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.128582574338"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.087219877070"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.076380054928"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.073415476970"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 2,
+              "probability": "0.066870787985"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.071099611815",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_TOTALS",
+          "away_goal_rate": "1.524143528",
+          "away_multiplier": "1.15",
+          "home_goal_rate": "1.8217081941",
+          "home_multiplier": "1.15",
+          "world_sha256": "9a9125c0d8474f7ac24e618304be49baffa12f68b2d842f9340ce9a6ceddd903"
+        }
+      }
+    ],
+    "complete_h2h_totals_prior_world_output_spread": {
+      "away_win": "0.001733053263",
+      "draw": "0.000099484378",
+      "expected_away_goals": "0.158171",
+      "expected_home_goals": "0.186784",
+      "home_win": "0.001759893132",
+      "over_2_5": "0.001389122976"
+    },
+    "h2h_only": [
+      {
+        "kl_movement": "0.007439935996",
+        "metrics": {
+          "btts_yes": "0.434765800404",
+          "clean_sheet_probabilities": {
+            "away": "0.272226248852",
+            "home": "0.401601205043"
+          },
+          "expected_away_goals": "0.921734",
+          "expected_home_goals": "1.274252",
+          "hda": {
+            "away": "0.260457453881",
+            "draw": "0.280051420169",
+            "home": "0.459491125950"
+          },
+          "over_2_5": "0.376804714483",
+          "top_exact_scores": [
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.152631751997"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.128243207700"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 0,
+              "probability": "0.108593254299"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 0,
+              "probability": "0.095563198526"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 2,
+              "probability": "0.090668645641"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.056021930331",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_ONLY",
+          "away_goal_rate": "0.9940066487",
+          "away_multiplier": "0.75",
+          "home_goal_rate": "1.1880705614",
+          "home_multiplier": "0.75",
+          "world_sha256": "f0dce2b0711939a982fea47a35198e5a81ef9521dcf0d79a3cbe2e015095707e"
+        }
+      },
+      {
+        "kl_movement": "0.000000000000",
+        "metrics": {
+          "btts_yes": "0.510470538704",
+          "clean_sheet_probabilities": {
+            "away": "0.304808806961",
+            "home": "0.265712017333"
+          },
+          "expected_away_goals": "1.325342",
+          "expected_home_goals": "1.188071",
+          "hda": {
+            "away": "0.398398200210",
+            "draw": "0.268426510325",
+            "home": "0.333175289464"
+          },
+          "over_2_5": "0.459622822962",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.127529004193"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 0,
+              "probability": "0.107341271080"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.096223454106"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.084509785382"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 0,
+              "probability": "0.080991362999"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.000000000000",
+        "projection_status": "DEGRADED",
+        "solver_error_code": "PROJECTION_DID_NOT_CONVERGE",
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_ONLY",
+          "away_goal_rate": "1.3253421983",
+          "away_multiplier": "1",
+          "home_goal_rate": "1.1880705614",
+          "home_multiplier": "0.75",
+          "world_sha256": "2e848b47696ffaad29e4a0ce78c5571ae1b1b12824e9c3bb90c4b5b76b7f3496"
+        }
+      },
+      {
+        "kl_movement": "0.114889417660",
+        "metrics": {
+          "btts_yes": "0.577392867515",
+          "clean_sheet_probabilities": {
+            "away": "0.200736817779",
+            "home": "0.288806869887"
+          },
+          "expected_away_goals": "1.270494",
+          "expected_home_goals": "1.503431",
+          "hda": {
+            "away": "0.262087385456",
+            "draw": "0.279579383309",
+            "home": "0.458333231235"
+          },
+          "over_2_5": "0.521542537721",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.131747878885"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.115575207989"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.113740455146"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 2,
+              "probability": "0.068655751120"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 0,
+              "probability": "0.066936555181"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.221068990635",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 6,
+        "world": {
+          "availability": "H2H_ONLY",
+          "away_goal_rate": "1.6566777479",
+          "away_multiplier": "1.25",
+          "home_goal_rate": "1.1880705614",
+          "home_multiplier": "0.75",
+          "world_sha256": "40a19c5c5a695d26337736302b13a7c9a1a24a7604436e3e018af965e653418f"
+        }
+      },
+      {
+        "kl_movement": "0.005112984362",
+        "metrics": {
+          "btts_yes": "0.509111869570",
+          "clean_sheet_probabilities": {
+            "away": "0.225767633687",
+            "home": "0.349528066795"
+          },
+          "expected_away_goals": "1.040478",
+          "expected_home_goals": "1.504474",
+          "hda": {
+            "away": "0.259802624275",
+            "draw": "0.279748711884",
+            "home": "0.460448663842"
+          },
+          "over_2_5": "0.464868312705",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.132908163980"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.108384402419"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 2,
+              "probability": "0.085845545216"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.085331042706"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 0,
+              "probability": "0.084407570052"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.050456720892",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_ONLY",
+          "away_goal_rate": "0.9940066487",
+          "away_multiplier": "0.75",
+          "home_goal_rate": "1.5840940818",
+          "home_multiplier": "1",
+          "world_sha256": "8df69ed0b22ef3b66c5a7bd3d7cf5b790e86d02f772cfa59022d784bae1e6c00"
+        }
+      },
+      {
+        "kl_movement": "0.008886616493",
+        "metrics": {
+          "btts_yes": "0.591868693813",
+          "clean_sheet_probabilities": {
+            "away": "0.184899676938",
+            "home": "0.285418211834"
+          },
+          "expected_away_goals": "1.243318",
+          "expected_home_goals": "1.644406",
+          "hda": {
+            "away": "0.260663460637",
+            "draw": "0.279540865918",
+            "home": "0.459795673445"
+          },
+          "over_2_5": "0.545860935869",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.130558661356"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.095798390660"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.091259736741"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 2,
+              "probability": "0.072282004439"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.068525891545"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.059294081071",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_ONLY",
+          "away_goal_rate": "1.3253421983",
+          "away_multiplier": "1",
+          "home_goal_rate": "1.5840940818",
+          "home_multiplier": "1",
+          "world_sha256": "84ab81fa188747c9358c13e605897ebd3d6a8d26ce751c706a89a69d8862b7f0"
+        }
+      },
+      {
+        "kl_movement": "0.000000000000",
+        "metrics": {
+          "btts_yes": "0.643228415513",
+          "clean_sheet_probabilities": {
+            "away": "0.205133543181",
+            "home": "0.190771720213"
+          },
+          "expected_away_goals": "1.656678",
+          "expected_home_goals": "1.584094",
+          "hda": {
+            "away": "0.399190362828",
+            "draw": "0.232447455175",
+            "home": "0.368362181998"
+          },
+          "over_2_5": "0.628540268710",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.102699821240"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.085070254281"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.081343089514"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.067379643172"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 0,
+              "probability": "0.064831895037"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.000000000000",
+        "projection_status": "DEGRADED",
+        "solver_error_code": "PROJECTION_DID_NOT_CONVERGE",
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_ONLY",
+          "away_goal_rate": "1.6566777479",
+          "away_multiplier": "1.25",
+          "home_goal_rate": "1.5840940818",
+          "home_multiplier": "1",
+          "world_sha256": "5905df2d245ca43d0fd984147797e74ef86297abb96ac5ee5a01b7660ee17aba"
+        }
+      },
+      {
+        "kl_movement": "0.041189383612",
+        "metrics": {
+          "btts_yes": "0.566298949011",
+          "clean_sheet_probabilities": {
+            "away": "0.189639328874",
+            "home": "0.310975857161"
+          },
+          "expected_away_goals": "1.145103",
+          "expected_home_goals": "1.725830",
+          "hda": {
+            "away": "0.259236704189",
+            "draw": "0.279485739266",
+            "home": "0.461277556546"
+          },
+          "over_2_5": "0.540052037489",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.131703750439"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.077402670683"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 2,
+              "probability": "0.076633195339"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.076173905678"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 0,
+              "probability": "0.071672660480"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.141631229242",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 6,
+        "world": {
+          "availability": "H2H_ONLY",
+          "away_goal_rate": "0.9940066487",
+          "away_multiplier": "0.75",
+          "home_goal_rate": "1.9801176022",
+          "home_multiplier": "1.25",
+          "world_sha256": "23dbee31f10583c11d2202ffcba438c9390885e316dd472b54d0b2deed77b69e"
+        }
+      },
+      {
+        "kl_movement": "0.000000000000",
+        "metrics": {
+          "btts_yes": "0.632917323042",
+          "clean_sheet_probabilities": {
+            "away": "0.138053001026",
+            "home": "0.265712017333"
+          },
+          "expected_away_goals": "1.325342",
+          "expected_home_goals": "1.980118",
+          "hda": {
+            "away": "0.255358003122",
+            "draw": "0.217886923657",
+            "home": "0.526755073221"
+          },
+          "over_2_5": "0.641668839759",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.096266694310"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.095309687954"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 1,
+              "probability": "0.072635349899"
+            },
+            {
+              "away_goals": 0,
+              "home_goals": 2,
+              "probability": "0.071913267439"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.063793156130"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.000000000000",
+        "projection_status": "DEGRADED",
+        "solver_error_code": "PROJECTION_DID_NOT_CONVERGE",
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_ONLY",
+          "away_goal_rate": "1.3253421983",
+          "away_multiplier": "1",
+          "home_goal_rate": "1.9801176022",
+          "home_multiplier": "1.25",
+          "world_sha256": "0c2efa4e196a19138fa801ebc12aaf0907bc74fed699068c9a45bfe22adf68f4"
+        }
+      },
+      {
+        "kl_movement": "0.015886062180",
+        "metrics": {
+          "btts_yes": "0.711418401656",
+          "clean_sheet_probabilities": {
+            "away": "0.123137699800",
+            "home": "0.199567976026"
+          },
+          "expected_away_goals": "1.574327",
+          "expected_home_goals": "2.021538",
+          "hda": {
+            "away": "0.260799452752",
+            "draw": "0.279178728341",
+            "home": "0.460021818907"
+          },
+          "over_2_5": "0.685955809250",
+          "top_exact_scores": [
+            {
+              "away_goals": 1,
+              "home_goals": 1,
+              "probability": "0.111941196026"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 2,
+              "probability": "0.091803444168"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 2,
+              "probability": "0.086060934463"
+            },
+            {
+              "away_goals": 2,
+              "home_goals": 1,
+              "probability": "0.057021217441"
+            },
+            {
+              "away_goals": 1,
+              "home_goals": 3,
+              "probability": "0.056803590397"
+            }
+          ]
+        },
+        "prior_to_posterior_total_variation": "0.066516448782",
+        "projection_status": "PROJECTED",
+        "solver_error_code": null,
+        "solver_iterations": 5,
+        "world": {
+          "availability": "H2H_ONLY",
+          "away_goal_rate": "1.6566777479",
+          "away_multiplier": "1.25",
+          "home_goal_rate": "1.9801176022",
+          "home_multiplier": "1.25",
+          "world_sha256": "1bffa0fbd607af62af1e0bbadec2e31d06e7f8ebe02608efd82cd6099f05348c"
+        }
+      }
+    ],
+    "h2h_only_prior_world_output_spread": {
+      "away_win": "0.143832359706",
+      "draw": "0.062164496512",
+      "expected_away_goals": "0.734944",
+      "expected_home_goals": "0.833467",
+      "home_win": "0.193579783757",
+      "over_2_5": "0.309151094767"
+    },
+    "no_market": {
+      "kl_movement": "0.000000000000",
+      "metrics": {
+        "btts_yes": "0.583660887067",
+        "clean_sheet_probabilities": {
+          "away": "0.205133543181",
+          "home": "0.265712017333"
+        },
+        "expected_away_goals": "1.325342",
+        "expected_home_goals": "1.584094",
+        "hda": {
+          "away": "0.319957541709",
+          "draw": "0.245017155174",
+          "home": "0.435025303117"
+        },
+        "over_2_5": "0.556216897019",
+        "top_exact_scores": [
+          {
+            "away_goals": 1,
+            "home_goals": 1,
+            "probability": "0.114434473414"
+          },
+          {
+            "away_goals": 1,
+            "home_goals": 2,
+            "probability": "0.090637486044"
+          },
+          {
+            "away_goals": 0,
+            "home_goals": 1,
+            "probability": "0.086343341033"
+          },
+          {
+            "away_goals": 2,
+            "home_goals": 1,
+            "probability": "0.075832418278"
+          },
+          {
+            "away_goals": 1,
+            "home_goals": 0,
+            "probability": "0.072239695059"
+          }
+        ]
+      },
+      "prior_to_posterior_total_variation": "0.000000000000",
+      "projection_status": "PRIOR_ONLY",
+      "solver_error_code": null,
+      "solver_iterations": 0,
+      "world": {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.3253421983",
+        "away_multiplier": "1",
+        "home_goal_rate": "1.5840940818",
+        "home_multiplier": "1",
+        "world_sha256": "3fb7e7dfa635b9f9cf5267d40b79cc7e5b1d0333585922738f37142499a4157f"
+      }
+    },
+    "thresholds": "CANDIDATE_DIAGNOSTIC_ONLY_NO_PRODUCTION_THRESHOLD"
+  },
+  "result_sha256": "04019a430dd7d1fabd440dc35719fa8ed8c1d0cc89569b294d434db3606cc3ab",
+  "schema_version": "gw1-support-prior-market-diagnostics-v1"
+}

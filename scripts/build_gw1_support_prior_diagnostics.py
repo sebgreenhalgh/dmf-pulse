@@ -41,7 +41,7 @@ def _constraint(
         "event": event,
         "family": family,
         "target_probability": Decimal(target),
-        "uncertainty": Decimal("0.010000000000"),
+        "uncertainty": Decimal("0.050000000000"),
         "usable_at": AS_OF,
         "weight": Decimal("0.750000000000"),
     }

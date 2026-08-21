@@ -1,0 +1,318 @@
+{
+  "artifact_sha256": "e6a6bd6f5053c8c2db71e982a5eb0b86066232e600ef18296f7f4751ba5bb3d2",
+  "calibration_seasons": [
+    "2021/22",
+    "2022/23",
+    "2023/24",
+    "2024/25",
+    "2025/26"
+  ],
+  "code_commit": "a6b557cd3c0f2a7729c95a34546dd4d9c3aa33a9",
+  "competition": "EPL",
+  "dataset_sha256": "2b42ff592c5e54e710bd5f632ecb0447da59cf03070c80886b1b739f52ed2a00",
+  "derived_away_goal_rate": "1.3253421983",
+  "derived_home_goal_rate": "1.5840940818",
+  "half_life_seasons": "2",
+  "human_acceptance": {
+    "accepted": false,
+    "accepted_at": null,
+    "decision_reference": null,
+    "reviewer": null
+  },
+  "information_cutoff": "2026-08-19T14:41:04Z",
+  "limitations": [
+    "League-wide regulariser only; no fixture-specific team strength is estimated.",
+    "No promoted-team, manager, lineup, player, xG, or bookmaker information enters calibration.",
+    "Candidate is not activated and does not replace market evidence when H2H or totals exist.",
+    "OpenFootball's public-domain assertion does not provide an independent accuracy warranty; human rights and data-quality review remains required."
+  ],
+  "match_count": 1900,
+  "model_family": "INDEPENDENT_POISSON_V1",
+  "model_sha256": "affa122cb5f93eb927e418f290e961c2cd227f4d6b8cba699a0ae6d5e8a5b85b",
+  "per_season_summaries": [
+    {
+      "age_seasons": 4,
+      "away_goal_rate": "1.30526315789473684210526315789473684210526315789473684210526",
+      "away_goal_total": 496,
+      "home_goal_rate": "1.51315789473684210526315789473684210526315789473684210526316",
+      "home_goal_total": 575,
+      "match_count": 380,
+      "path": "2021-22/1-premierleague.txt",
+      "season": "2021/22",
+      "sha256": "592df232fbc7c2f36ec3e643eef608f77fcbf7d8da0706c94c99248d60b932b3",
+      "weight": "0.25"
+    },
+    {
+      "age_seasons": 3,
+      "away_goal_rate": "1.21842105263157894736842105263157894736842105263157894736842",
+      "away_goal_total": 463,
+      "home_goal_rate": "1.63421052631578947368421052631578947368421052631578947368421",
+      "home_goal_total": 621,
+      "match_count": 380,
+      "path": "2022-23/1-premierleague.txt",
+      "season": "2022/23",
+      "sha256": "c85a2f8ac64975435b8359eb923eaa09e48f33d47672c8b32d2c6e99a8cec5f0",
+      "weight": "0.35355339059327376220042218105242451964241796884423701829417"
+    },
+    {
+      "age_seasons": 2,
+      "away_goal_rate": "1.47894736842105263157894736842105263157894736842105263157895",
+      "away_goal_total": 562,
+      "home_goal_rate": "1.8",
+      "home_goal_total": 684,
+      "match_count": 380,
+      "path": "2023-24/1-premierleague.txt",
+      "season": "2023/24",
+      "sha256": "0bfb4a7fffe0b1bf7318955686eafeb28fc9676346ae433259e7409d69551450",
+      "weight": "0.5"
+    },
+    {
+      "age_seasons": 1,
+      "away_goal_rate": "1.42105263157894736842105263157894736842105263157894736842105",
+      "away_goal_total": 540,
+      "home_goal_rate": "1.51315789473684210526315789473684210526315789473684210526316",
+      "home_goal_total": 575,
+      "match_count": 380,
+      "path": "2024-25/1-premierleague.txt",
+      "season": "2024/25",
+      "sha256": "e39716b01af0c8654a9fae7b5555e6b02f506ea05239e0d0eef41936ba80e1e3",
+      "weight": "0.70710678118654752440084436210484903928483593768847403658834"
+    },
+    {
+      "age_seasons": 0,
+      "away_goal_rate": "1.22368421052631578947368421052631578947368421052631578947368",
+      "away_goal_total": 465,
+      "home_goal_rate": "1.52631578947368421052631578947368421052631578947368421052632",
+      "home_goal_total": 580,
+      "match_count": 380,
+      "path": "2025-26/1-premierleague.txt",
+      "season": "2025/26",
+      "sha256": "9bb2f7728e8a371888de2734f59e7400670ed14b2f272c4a47858ac5f257cc38",
+      "weight": "1"
+    }
+  ],
+  "policy_sha256": "56c21c9fc6cdd00d5e7cfd79d491e0c1fcc14a16b67adf5d455612c1a8be3431",
+  "produced_at": "2026-08-21T00:02:19Z",
+  "sampling_structural_diagnostics": {
+    "completed_match_counts_verified": true,
+    "duplicate_fixture_rejection": "HOME_AWAY_PAIR_PER_SEASON",
+    "fixture_specific_team_parameters": false,
+    "market_evidence_used_in_calibration": false,
+    "parser_version": "OPENFOOTBALL_TEXT_RESULTS_V1",
+    "player_parameters": false
+  },
+  "schema_version": "gw1-support-prior-candidate-v1",
+  "sensitivity_world_specification": {
+    "complete_h2h_totals": [
+      {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.1265408686",
+        "away_multiplier": "0.85",
+        "home_goal_rate": "1.3464799695",
+        "home_multiplier": "0.85",
+        "world_sha256": "2826dedde199600e51cc18471d355feb3a32c0eb2d051dbe0a460b8464c0ea04"
+      },
+      {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.3253421983",
+        "away_multiplier": "1",
+        "home_goal_rate": "1.3464799695",
+        "home_multiplier": "0.85",
+        "world_sha256": "3420548592986b107dc721cf385059384ae798135175658f444d4fd35f1b05bb"
+      },
+      {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.524143528",
+        "away_multiplier": "1.15",
+        "home_goal_rate": "1.3464799695",
+        "home_multiplier": "0.85",
+        "world_sha256": "35428a069042a1e83ae26aff2f1112fd235ab59d0dc731229061849a24555e68"
+      },
+      {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.1265408686",
+        "away_multiplier": "0.85",
+        "home_goal_rate": "1.5840940818",
+        "home_multiplier": "1",
+        "world_sha256": "0160550e131e1f7170104acf064b685daf21acac910e94db0e5aa0ded29fb2ad"
+      },
+      {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.3253421983",
+        "away_multiplier": "1",
+        "home_goal_rate": "1.5840940818",
+        "home_multiplier": "1",
+        "world_sha256": "3fb7e7dfa635b9f9cf5267d40b79cc7e5b1d0333585922738f37142499a4157f"
+      },
+      {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.524143528",
+        "away_multiplier": "1.15",
+        "home_goal_rate": "1.5840940818",
+        "home_multiplier": "1",
+        "world_sha256": "ee69c30daa3d3df912f2f8336834ab1da2ccd4465b12b52e25700d5f48c4557b"
+      },
+      {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.1265408686",
+        "away_multiplier": "0.85",
+        "home_goal_rate": "1.8217081941",
+        "home_multiplier": "1.15",
+        "world_sha256": "6920cdf587afe8528acef622617727a41385975957800542444e0e5095e80d68"
+      },
+      {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.3253421983",
+        "away_multiplier": "1",
+        "home_goal_rate": "1.8217081941",
+        "home_multiplier": "1.15",
+        "world_sha256": "8c9e8f7f5074ccfdddb10181bbfdfdfe89f2ceb68579d5a19b1d323ec1853636"
+      },
+      {
+        "availability": "H2H_TOTALS",
+        "away_goal_rate": "1.524143528",
+        "away_multiplier": "1.15",
+        "home_goal_rate": "1.8217081941",
+        "home_multiplier": "1.15",
+        "world_sha256": "9a9125c0d8474f7ac24e618304be49baffa12f68b2d842f9340ce9a6ceddd903"
+      }
+    ],
+    "h2h_only": [
+      {
+        "availability": "H2H_ONLY",
+        "away_goal_rate": "0.9940066487",
+        "away_multiplier": "0.75",
+        "home_goal_rate": "1.1880705614",
+        "home_multiplier": "0.75",
+        "world_sha256": "f0dce2b0711939a982fea47a35198e5a81ef9521dcf0d79a3cbe2e015095707e"
+      },
+      {
+        "availability": "H2H_ONLY",
+        "away_goal_rate": "1.3253421983",
+        "away_multiplier": "1",
+        "home_goal_rate": "1.1880705614",
+        "home_multiplier": "0.75",
+        "world_sha256": "2e848b47696ffaad29e4a0ce78c5571ae1b1b12824e9c3bb90c4b5b76b7f3496"
+      },
+      {
+        "availability": "H2H_ONLY",
+        "away_goal_rate": "1.6566777479",
+        "away_multiplier": "1.25",
+        "home_goal_rate": "1.1880705614",
+        "home_multiplier": "0.75",
+        "world_sha256": "40a19c5c5a695d26337736302b13a7c9a1a24a7604436e3e018af965e653418f"
+      },
+      {
+        "availability": "H2H_ONLY",
+        "away_goal_rate": "0.9940066487",
+        "away_multiplier": "0.75",
+        "home_goal_rate": "1.5840940818",
+        "home_multiplier": "1",
+        "world_sha256": "8df69ed0b22ef3b66c5a7bd3d7cf5b790e86d02f772cfa59022d784bae1e6c00"
+      },
+      {
+        "availability": "H2H_ONLY",
+        "away_goal_rate": "1.3253421983",
+        "away_multiplier": "1",
+        "home_goal_rate": "1.5840940818",
+        "home_multiplier": "1",
+        "world_sha256": "84ab81fa188747c9358c13e605897ebd3d6a8d26ce751c706a89a69d8862b7f0"
+      },
+      {
+        "availability": "H2H_ONLY",
+        "away_goal_rate": "1.6566777479",
+        "away_multiplier": "1.25",
+        "home_goal_rate": "1.5840940818",
+        "home_multiplier": "1",
+        "world_sha256": "5905df2d245ca43d0fd984147797e74ef86297abb96ac5ee5a01b7660ee17aba"
+      },
+      {
+        "availability": "H2H_ONLY",
+        "away_goal_rate": "0.9940066487",
+        "away_multiplier": "0.75",
+        "home_goal_rate": "1.9801176022",
+        "home_multiplier": "1.25",
+        "world_sha256": "23dbee31f10583c11d2202ffcba438c9390885e316dd472b54d0b2deed77b69e"
+      },
+      {
+        "availability": "H2H_ONLY",
+        "away_goal_rate": "1.3253421983",
+        "away_multiplier": "1",
+        "home_goal_rate": "1.9801176022",
+        "home_multiplier": "1.25",
+        "world_sha256": "0c2efa4e196a19138fa801ebc12aaf0907bc74fed699068c9a45bfe22adf68f4"
+      },
+      {
+        "availability": "H2H_ONLY",
+        "away_goal_rate": "1.6566777479",
+        "away_multiplier": "1.25",
+        "home_goal_rate": "1.9801176022",
+        "home_multiplier": "1.25",
+        "world_sha256": "1bffa0fbd607af62af1e0bbadec2e31d06e7f8ebe02608efd82cd6099f05348c"
+      }
+    ]
+  },
+  "source": {
+    "attribution_note": "OpenFootball England / football.db; source and derived candidate recorded for review.",
+    "commit": "10fa650c5d0f137f0d71d6b9fc723076060fe80e",
+    "licence": "CC0-1.0",
+    "owner": "openfootball",
+    "repository_url": "https://github.com/openfootball/england",
+    "retention_permission": "CC0 permits retention and reuse; DMF retains only file hashes and derived aggregates.",
+    "retrieved_at": "2026-08-21T00:02:19Z",
+    "underlying_data_statement": "Repository README states that football.db schema, data and scripts are dedicated to the public domain."
+  },
+  "source_file_hashes": [
+    {
+      "path": "2021-22/1-premierleague.txt",
+      "season": "2021/22",
+      "sha256": "592df232fbc7c2f36ec3e643eef608f77fcbf7d8da0706c94c99248d60b932b3"
+    },
+    {
+      "path": "2022-23/1-premierleague.txt",
+      "season": "2022/23",
+      "sha256": "c85a2f8ac64975435b8359eb923eaa09e48f33d47672c8b32d2c6e99a8cec5f0"
+    },
+    {
+      "path": "2023-24/1-premierleague.txt",
+      "season": "2023/24",
+      "sha256": "0bfb4a7fffe0b1bf7318955686eafeb28fc9676346ae433259e7409d69551450"
+    },
+    {
+      "path": "2024-25/1-premierleague.txt",
+      "season": "2024/25",
+      "sha256": "e39716b01af0c8654a9fae7b5555e6b02f506ea05239e0d0eef41936ba80e1e3"
+    },
+    {
+      "path": "2025-26/1-premierleague.txt",
+      "season": "2025/26",
+      "sha256": "9bb2f7728e8a371888de2734f59e7400670ed14b2f272c4a47858ac5f257cc38"
+    }
+  ],
+  "stage8_compatibility": {
+    "away_marginal_tail": "0.000000000015",
+    "away_max": 14,
+    "central_score_prior_request": {
+      "away_goal_rate": "1.325342",
+      "home_goal_rate": "1.584094",
+      "model_family": "INDEPENDENT_POISSON_V1"
+    },
+    "finite_strictly_positive_support": true,
+    "home_marginal_tail": "0.000000000017",
+    "home_max": 15,
+    "omitted_tail_mass": "0.000000000032",
+    "score_prior_sha256": "40d02a104a22b3ba6da48777b2d5424394684193c6d3f27593259f7172e82b3d",
+    "tail_tolerance": "0.000000000100"
+  },
+  "status": "CANDIDATE_NOT_ACCEPTED",
+  "validation_result": {
+    "checks": [
+      "FIVE_SEASONS_380_COMPLETED_MATCHES_EACH",
+      "NO_DUPLICATE_HOME_AWAY_FIXTURES",
+      "STRICTLY_POSITIVE_LEAGUE_WIDE_RATES",
+      "EXISTING_STAGE8_ADAPTIVE_TAIL_COMPLIANT"
+    ],
+    "status": "PASS"
+  },
+  "weight_method": "EXPONENTIAL_HALF_LIFE_SEASONS_V1"
+}
