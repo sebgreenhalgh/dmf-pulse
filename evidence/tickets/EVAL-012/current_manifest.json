@@ -131,9 +131,9 @@
       "sha256": "eadb5f9a15679ce6539dd5db8f97bb66098e04ec1a7a9511bb3ae6a87dfc67d2"
     },
     {
-      "bytes": 3549,
+      "bytes": 3793,
       "path": ".github/workflows/gw1-player-role-prior-candidate.yml",
-      "sha256": "830850952b4abf831b51961c9cbf39cca453e18e91fe3de300faf893ae91dc69"
+      "sha256": "1785ad6c049cdb8b40beb04e2be92f1e2f33ae4480fc72f49b381d6447c50835"
     },
     {
       "bytes": 2554,
@@ -236,9 +236,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 90097,
+      "bytes": 91314,
       "path": "PLANS.md",
-      "sha256": "220a8cdec34fea06c9a29acb6de15e70124e1f9b75ca268a33efe972365a6b10"
+      "sha256": "744a7fbf212ab60eaf445d585f69b81351d2543fa63ccd25f7e5702049dd6ffe"
     },
     {
       "bytes": 2761,
@@ -2856,9 +2856,9 @@
       "sha256": "9c77ca0e9d895f3cb2b90fcf0979c6b52c75e51da473c11a8a578c14b9e5ff4a"
     },
     {
-      "bytes": 26664,
+      "bytes": 32295,
       "path": "src/dmf_pulse/cli/player_evidence.py",
-      "sha256": "8b72a4af01489b1709bb77d59f0885afe6dc405edf4fbea64c9bdc0c24bfce74"
+      "sha256": "3407d5af61983600e564e3752e58af76ea7a7028cd35b8e2434fd1f0fe409d46"
     },
     {
       "bytes": 1660,
@@ -3676,6 +3676,11 @@
       "sha256": "eb78aebf8cca5f71714dba8559abc70d026d9b10ea5ed0d18a0c1adef328d71b"
     },
     {
+      "bytes": 6983,
+      "path": "src/dmf_pulse/player_evidence/diagnostic_approval.py",
+      "sha256": "b7238db92714d073e3067895ee60aa00b1e4153dfce6e3eda0bd5eb68a6a9ddb"
+    },
+    {
       "bytes": 11121,
       "path": "src/dmf_pulse/player_evidence/empirical_bayes.py",
       "sha256": "3fd518549544f9dfe640a526979fe18a53b751bbe04fb9311d351dcba283d3ac"
@@ -3699,6 +3704,11 @@
       "bytes": 58111,
       "path": "src/dmf_pulse/player_evidence/role_priors.py",
       "sha256": "528479ff60cc7a8263557769c06d4bb5113adc8bb16b0f250a5b45066d442833"
+    },
+    {
+      "bytes": 14322,
+      "path": "src/dmf_pulse/player_evidence/zero_minute_diagnostic.py",
+      "sha256": "b2890aae5284d52ff333f39fc765482169fc52e86348c5918e2d8808c345d3f5"
     },
     {
       "bytes": 1,
@@ -5116,9 +5126,9 @@
       "sha256": "cd60e5433898eecb5a113f835c191cb3d3b24a771dd7f6f49a7ababc57ca82a6"
     },
     {
-      "bytes": 10412,
+      "bytes": 12245,
       "path": "tests/unit/player_evidence/test_cli.py",
-      "sha256": "cb6d5a6f5356b7392c17e1aac58e22d13b178aa0ee37c11fefed40ef015b2b1d"
+      "sha256": "f09d466e2ca7df7740cd8bb0a48841bee9288ecc307443d02bd1c500abd901c5"
     },
     {
       "bytes": 16084,
@@ -5139,6 +5149,11 @@
       "bytes": 12836,
       "path": "tests/unit/player_evidence/test_role_priors.py",
       "sha256": "55e0dcccc04039b6710d269819cb621e0c43bafff44e7822f337929a28f8fcd9"
+    },
+    {
+      "bytes": 9952,
+      "path": "tests/unit/player_evidence/test_zero_minute_diagnostic.py",
+      "sha256": "2b5971b06df94ac05c39b56ff62d209ce9929b5010d26524a6f92f92aa6b2bcc"
     },
     {
       "bytes": 5609,

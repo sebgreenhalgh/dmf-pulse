@@ -159,6 +159,60 @@ def test_current_capture_command_requires_governed_manual_inputs_before_transpor
     assert called is False
 
 
+def test_zero_minute_diagnostic_requires_its_separate_inputs_before_transport(
+    monkeypatch,
+) -> None:
+    import dmf_pulse.cli.player_evidence as command_module
+
+    called = False
+
+    class _ForbiddenTransport:
+        def __init__(self) -> None:
+            nonlocal called
+            called = True
+
+    monkeypatch.setattr(command_module, "OneShotUrllibDiagnosticTransport", _ForbiddenTransport)
+    result = RUNNER.invoke(app, ["player-evidence", "diagnose-zero-minute-history"])
+    assert result.exit_code == 2
+    payload = json.loads(result.output)
+    assert payload["error"]["code"] == "DIAGNOSTIC_APPROVAL_REQUIRED"
+    assert called is False
+
+
+def test_diagnostic_approval_cannot_authorize_current_bulk_capture(
+    repository_root: Path, tmp_path: Path, monkeypatch
+) -> None:
+    import dmf_pulse.cli.player_evidence as command_module
+
+    constructed = False
+
+    class _ForbiddenTransport:
+        def __init__(self) -> None:
+            nonlocal constructed
+            constructed = True
+
+    diagnostic_approval = (
+        repository_root
+        / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_ZERO_MINUTE_DIAGNOSTIC_APPROVAL.json"
+    )
+    monkeypatch.setattr(command_module, "UrllibHistoryTransport", _ForbiddenTransport)
+    args, outputs = _current_capture_args(
+        repository_root,
+        tmp_path,
+        approval=diagnostic_approval,
+        expected_approval_sha256=(
+            "7e299bb4d88a0260d8f67bda9e81b09649452fddbe027f52270634945597cb20"
+        ),
+    )
+    args.append("--execute-network")
+    result = RUNNER.invoke(app, args)
+    assert result.exit_code == 2, result.output
+    payload = json.loads(result.output)
+    assert payload["error"]["code"] == "RIGHTS_APPROVAL_HASH_MISMATCH"
+    assert constructed is False
+    assert not any(path.exists() for path in outputs)
+
+
 def test_current_capture_builds_only_an_in_memory_catalogue_before_execute_network(
     repository_root: Path, tmp_path: Path, monkeypatch
 ) -> None:

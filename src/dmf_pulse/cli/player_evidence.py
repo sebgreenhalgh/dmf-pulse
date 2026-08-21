@@ -19,6 +19,10 @@ from dmf_pulse.player_evidence.approvals import (
     validate_second_retry_capture_authorization,
 )
 from dmf_pulse.player_evidence.catalogue import build_current_player_history_catalogue
+from dmf_pulse.player_evidence.diagnostic_approval import (
+    DIAGNOSTIC_APPROVAL_SHA256,
+    load_zero_minute_diagnostic_approval,
+)
 from dmf_pulse.player_evidence.empirical_bayes import compile_posterior_artifact
 from dmf_pulse.player_evidence.history import (
     ApprovedCaptureRequest,
@@ -43,6 +47,13 @@ from dmf_pulse.player_evidence.role_priors import (
     candidate_eb_parameters_from_role_prior,
     load_role_prior_candidate,
     role_priors_from_candidate,
+)
+from dmf_pulse.player_evidence.zero_minute_diagnostic import (
+    ApprovedZeroMinuteDiagnosticRequest,
+    OneShotUrllibDiagnosticTransport,
+    execute_zero_minute_diagnostic,
+    resolve_zero_minute_diagnostic_target,
+    validate_zero_minute_diagnostic_request,
 )
 
 player_evidence_app = typer.Typer(help="Build offline-first GW1 player-evidence candidates.")
@@ -613,6 +624,130 @@ def capture_current_history_command(
                 else IngestionError(
                     "CAPTURE_INPUT_INVALID", "current history capture input is invalid"
                 )
+            )
+        )
+        _emit(error.as_error_object())
+        raise typer.Exit(2) from None
+
+
+@player_evidence_app.command("diagnose-zero-minute-history")
+def diagnose_zero_minute_history_command(
+    approval: Annotated[
+        Path | None, typer.Option("--approval", exists=True, dir_okay=False, readable=True)
+    ] = None,
+    expected_approval_sha256: Annotated[
+        str | None, typer.Option("--expected-approval-sha256")
+    ] = None,
+    bootstrap: Annotated[
+        Path | None, typer.Option("--bootstrap", exists=True, dir_okay=False, readable=True)
+    ] = None,
+    fixtures: Annotated[
+        Path | None, typer.Option("--fixtures", exists=True, dir_okay=False, readable=True)
+    ] = None,
+    captured_at: Annotated[str | None, typer.Option("--captured-at")] = None,
+    information_cutoff: Annotated[str | None, typer.Option("--information-cutoff")] = None,
+    terms_fingerprint: Annotated[str | None, typer.Option("--terms-fingerprint")] = None,
+    execute_network: Annotated[bool, typer.Option("--execute-network")] = False,
+) -> None:
+    """Diagnose one hash-bound history row without invoking the bulk capture path."""
+
+    try:
+        required = (
+            approval,
+            expected_approval_sha256,
+            bootstrap,
+            fixtures,
+            captured_at,
+            information_cutoff,
+            terms_fingerprint,
+        )
+        if any(value is None for value in required):
+            raise IngestionError(
+                "DIAGNOSTIC_APPROVAL_REQUIRED",
+                "the exact single-row diagnostic approval and manual inputs are required",
+            )
+        assert approval is not None
+        assert expected_approval_sha256 is not None
+        assert bootstrap is not None
+        assert fixtures is not None
+        assert captured_at is not None
+        assert information_cutoff is not None
+        assert terms_fingerprint is not None
+        if expected_approval_sha256 != DIAGNOSTIC_APPROVAL_SHA256:
+            raise IngestionError(
+                "DIAGNOSTIC_APPROVAL_HASH_MISMATCH",
+                "the single-row diagnostic requires its exact approval hash",
+            )
+        diagnostic_approval = load_zero_minute_diagnostic_approval(
+            approval, expected_approval_sha256=expected_approval_sha256
+        )
+        cutoff = _parse_utc(information_cutoff, label="information cutoff")
+        bundle = CurrentFplInputService().compile(
+            CurrentFplInputRequest(
+                bootstrap_path=bootstrap,
+                fixtures_path=fixtures,
+                competition_key="PL",
+                season_code="2026/27",
+                captured_at=_parse_utc(captured_at, label="captured_at"),
+                information_cutoff=cutoff,
+                rights_profile_id="fpl_official_private_manual_v1",
+                gameweek=1,
+            )
+        )
+        if bundle.target_event.deadline_at != cutoff:
+            raise IngestionError(
+                "DEADLINE_MISMATCH", "current GW1 deadline does not match the cutoff"
+            )
+        catalogue = build_current_player_history_catalogue(bundle)
+        target = resolve_zero_minute_diagnostic_target(catalogue)
+        request = ApprovedZeroMinuteDiagnosticRequest(
+            approval=diagnostic_approval,
+            target=target,
+            catalogue=catalogue,
+            information_cutoff=cutoff,
+            terms_fingerprint=terms_fingerprint,
+        )
+        validate_zero_minute_diagnostic_request(request)
+        if not execute_network:
+            raise IngestionError(
+                "NETWORK_EXECUTION_DISABLED",
+                "add --execute-network only after exact-SHA Ubuntu validation",
+                details={
+                    "catalogue_semantic_sha256": catalogue.semantic_sha256,
+                    "current_fpl_catalogue_persisted": False,
+                    "diagnostic_request_count": 0,
+                    "raw_fpl_history_persisted": False,
+                    "target_identity_sha256": target.identity_sha256,
+                    "target_ordinal": target.ordinal,
+                    "target_position": target.position,
+                },
+            )
+        result = execute_zero_minute_diagnostic(
+            request,
+            transport=OneShotUrllibDiagnosticTransport(),
+            clock=lambda: datetime.now(UTC),
+        )
+        safe = result.safe_dict()
+        safe.update(
+            {
+                "catalogue_semantic_sha256": catalogue.semantic_sha256 or "",
+                "diagnostic_approval_sha256": diagnostic_approval.approval_sha256,
+                "schema_version": "gw1-zero-minute-history-diagnostic-result-v1",
+                "target_identity_sha256": target.identity_sha256,
+                "target_ordinal": target.ordinal,
+                "target_position": target.position,
+            }
+        )
+        del bundle
+        del catalogue
+        del target
+        _emit(safe)
+    except (IngestionError, ValidationError, OSError, ValueError) as exc:
+        error = (
+            exc
+            if isinstance(exc, IngestionError)
+            else IngestionError(
+                "DIAGNOSTIC_INPUT_INVALID", "zero-minute diagnostic input is invalid"
             )
         )
         _emit(error.as_error_object())

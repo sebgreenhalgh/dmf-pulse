@@ -1,0 +1,63 @@
+{
+  "access_mode": "HUMAN_INITIATED_BOUNDED_UNAUTHENTICATED_TRANSIENT",
+  "allowed_history_fields": [
+    "season_name",
+    "minutes",
+    "goals_scored",
+    "assists",
+    "yellow_cards",
+    "red_cards",
+    "saves"
+  ],
+  "allowed_node": "history_past",
+  "approval_sha256": "7e299bb4d88a0260d8f67bda9e81b09649452fddbe027f52270634945597cb20",
+  "approval_source": "USER_DIRECTIVE",
+  "approved_at": "2026-08-21T13:11:56.3841308Z",
+  "bulk_capture_authority": "NONE",
+  "capture_constraints": {
+    "information_cutoff": "2026-08-21T17:30:00Z",
+    "maximum_official_history_requests": 1,
+    "no_browser_automation": true,
+    "no_bulk_capture": true,
+    "no_cookie_or_session": true,
+    "no_credential": true,
+    "no_historical_catalogue_discovery": true,
+    "no_login": true,
+    "no_other_player": true,
+    "no_retry": true,
+    "stop_on_any_request_failure": true,
+    "stop_on_post_cutoff_response": true
+  },
+  "consumed_bulk_approval_sha256s": [
+    "d946552f2a55df7ed400bb43cff6bf85b4bdf8cbfe804044d08d9c9a96f8e2fd",
+    "6d094bd94217d227f946bdee769a46227312d78bae455464a4fd41d191e8c935"
+  ],
+  "current_catalogue_retention": "FORBIDDEN",
+  "diagnostic_binding": {
+    "expected_catalogue_semantic_sha256": "9d655a2dc8e60eca0898f4bc04e8caf7b264887af1d62bfe61c5288cbdd75f11",
+    "failed_request_ordinal": 348,
+    "observed_failure_code": "HISTORY_MODEL_VALIDATION_FAILED",
+    "observed_failure_stage": "MODEL",
+    "observed_model_validation_reason": "ZERO_MINUTE_POSITIVE_EVENT",
+    "player_position": "GK",
+    "transient_player_identity_sha256": "32cbe879f9c063a8a8467c7bf3241a370901dc463072eb15e93ecaa0ed683269"
+  },
+  "diagnostic_parser_mode": "PERMITTED_FIELDS_BEFORE_HISTORY_PAST_SEASON_MODEL",
+  "diagnostic_remediation_parent_sha": "bb003141f2ba197453a8f88e2565a98ca7dca712",
+  "raw_retention": "FORBIDDEN",
+  "redistribution": "NONE",
+  "repeat_diagnostic": "REQUIRES_NEW_HUMAN_APPROVAL",
+  "required_branch_start_sha": "cde6ad7031089dabaccf2d94e18a26eff7b414ee",
+  "schema_version": "gw1-player-history-zero-minute-diagnostic-approval-v1",
+  "scope": "PRIVATE_2026_27_GW1_ZERO_MINUTE_DIAGNOSTIC_ONLY",
+  "source": {
+    "current_element_id_binding": "EXACT_TARGET_RESOLVED_FROM_APPROVED_TRANSIENT_CURRENT_CATALOGUE",
+    "url_template": "https://fantasy.premierleague.com/api/element-summary/{current_element_id}/"
+  },
+  "source_body_sha256_retention": "PERMITTED_NONREVERSIBLE_PROVENANCE_ONLY",
+  "status": "HUMAN_ACCEPTED_SINGLE_ROW_DIAGNOSTIC_ONLY",
+  "terms_review": {
+    "snapshot_sha256": "ad62cb745459df3282f8900117b85352a01d75754e080d06aa3836dcd2b2b246",
+    "source_url": "https://www.premierleague.com/en/terms-and-conditions"
+  }
+}

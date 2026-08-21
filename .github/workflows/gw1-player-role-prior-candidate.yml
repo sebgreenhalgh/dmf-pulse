@@ -8,6 +8,7 @@ on:
       - .github/workflows/gw1-player-role-prior-candidate.yml
       - PLANS.md
       - evidence/tickets/GW1-PLY-002/**
+      - evidence/tickets/GW1-PLY-003/**
       - tickets/GW1-PLY-002/**
       - src/dmf_pulse/player_evidence/**
       - src/dmf_pulse/availability/current.py
@@ -89,6 +90,10 @@ jobs:
           fi
           if "$venv/bin/dmf" player-evidence capture-current-history; then
             echo "capture-current-history unexpectedly bypassed current-input and rights guards" >&2
+            exit 1
+          fi
+          if "$venv/bin/dmf" player-evidence diagnose-zero-minute-history; then
+            echo "diagnose-zero-minute-history unexpectedly bypassed diagnostic guards" >&2
             exit 1
           fi
 

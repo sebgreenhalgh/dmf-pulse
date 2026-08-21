@@ -1161,6 +1161,27 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   passed Ubuntu validation; stop permanently on its first typed failure or
   publish only permitted posterior/allocation outputs on full success.
 
+## GW1-PLY-003R3-DIAG — single-row zero-minute diagnostic
+
+- [x] Verify the exact post-retry branch state, consumed approval lineage,
+  remote equality, and clean worktree; preserve the prohibition on a third
+  full capture.
+- [x] Record an immutable single-row diagnostic approval and implement a
+  separate fail-closed loader, offline target resolver, safe parser, and
+  one-request-only command that cannot authorize bulk capture.
+- [x] Prove the diagnostic governance, identity/ordinal binding, safe-output
+  contract, one-request bound, and no-retry behavior with synthetic tests;
+  run all required offline validation before any provider request.
+- [ ] Publish the pre-request code SHA and require a successful dedicated
+  Ubuntu run on that exact revision before exercising the one approved
+  diagnostic request.
+- [ ] Execute exactly one diagnostic request, persist no raw source or current
+  catalogue, and conditionally implement the narrow discipline-only exclusion
+  policy only if the safe boolean signature authorizes it.
+- [ ] Run the complete conditional regression/static/build/security suite,
+  publish the final code SHA for dedicated Ubuntu validation, and stop without
+  a third full capture.
+
 - Ticket/stage: `EVAL-012`, DMFP-19 Stage 12 / playbook B1; immutable parent
   `4f1274ccef419a7c0bde335c48bd4070e248b2e6` on `main`.
 - Branch: `stage/A12/EVAL-012-backtesting-framework`.
