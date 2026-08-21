@@ -275,6 +275,49 @@ def test_accepted_prior_builds_coherent_stage8_and_exact_stage9_handoff(
     assert CurrentFootballEventBundle.model_validate_json(result.model_dump_json()) == result
 
 
+def test_score_prior_exact_decimal_json_roundtrip_and_current_artifact_loader(
+    current_source: CurrentAvailabilityBundle,
+) -> None:
+    prior = ScorePriorRequest(
+        home_goal_rate=Decimal("1.5840940818"),
+        away_goal_rate=Decimal("1.3253421983"),
+    )
+
+    reloaded_prior = ScorePriorRequest.model_validate_json(prior.model_dump_json())
+    assert reloaded_prior.home_goal_rate == Decimal("1.5840940818")
+    assert reloaded_prior.away_goal_rate == Decimal("1.3253421983")
+
+    artifact = _artifact(
+        current_source,
+        home_rate=Decimal("1.5840940818"),
+        away_rate=Decimal("1.3253421983"),
+    )
+    reloaded_artifact = CurrentFootballEventPriorArtifact.model_validate_json(
+        artifact.model_dump_json()
+    )
+    assert reloaded_artifact.artifact_sha256 == artifact.artifact_sha256
+    assert all(
+        fixture.score_prior.home_goal_rate == Decimal("1.5840940818")
+        and fixture.score_prior.away_goal_rate == Decimal("1.3253421983")
+        for fixture in reloaded_artifact.fixtures
+    )
+
+    assert ScorePriorRequest.model_validate_json(
+        '{"home_goal_rate":"1.400000","away_goal_rate":"1.100000"}'
+    ) == ScorePriorRequest(
+        home_goal_rate=Decimal("1.400000"),
+        away_goal_rate=Decimal("1.100000"),
+    )
+    with pytest.raises(ValidationError):
+        ScorePriorRequest.model_validate_json(
+            '{"home_goal_rate":1.5840940818,"away_goal_rate":"1.3253421983"}'
+        )
+    with pytest.raises(ValidationError):
+        ScorePriorRequest.model_validate_json(
+            '{"home_goal_rate":"1.58409408180","away_goal_rate":"1.3253421983"}'
+        )
+
+
 def test_stage8_is_bound_to_reviewed_market_minutes_and_prior(
     current_source: CurrentAvailabilityBundle,
     accepted_event_result: CurrentFootballEventBundle,

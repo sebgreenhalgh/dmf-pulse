@@ -80,10 +80,15 @@ class _FrozenModel(BaseModel):
 
 
 CANONICAL_NONNEGATIVE_MEASURE_PATTERN = r"^\d+\.\d{6}$"
+CANONICAL_SCORE_PRIOR_MEASURE_PATTERN = r"^\d+\.(?:\d{6}|\d{6,}[1-9])$"
 CANONICAL_DECIMAL_12_PATTERN = r"^-?\d+\.\d{12}$"
 NonnegativeMeasureJsonInput = Annotated[
     str,
     Field(pattern=CANONICAL_NONNEGATIVE_MEASURE_PATTERN),
+]
+ScorePriorMeasureJsonInput = Annotated[
+    str,
+    Field(pattern=CANONICAL_SCORE_PRIOR_MEASURE_PATTERN),
 ]
 
 
@@ -285,13 +290,13 @@ class ScorePriorRequest(_FrozenModel):
         "home_goal_rate",
         "away_goal_rate",
         mode="before",
-        json_schema_input_type=NonnegativeMeasureJsonInput,
+        json_schema_input_type=ScorePriorMeasureJsonInput,
     )
     @classmethod
     def validate_rate(cls, value: object, info: ValidationInfo) -> Decimal:
         if info.mode == "json" and (
             not isinstance(value, str)
-            or re.fullmatch(CANONICAL_NONNEGATIVE_MEASURE_PATTERN, value) is None
+            or re.fullmatch(CANONICAL_SCORE_PRIOR_MEASURE_PATTERN, value) is None
         ):
             raise ValueError(f"{info.field_name} must use its canonical public decimal string")
         return nonnegative_decimal(value, label=str(info.field_name))
