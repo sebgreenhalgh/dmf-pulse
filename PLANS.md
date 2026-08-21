@@ -270,7 +270,7 @@ provider request, or credential use occurred.
   populated degraded no-history profile without embedding Stage-7 exposure.
 - [x] Add safe CLI/operator review commands, synthetic fixtures, unit/property/
   integration regressions, and a dedicated offline Linux validation workflow.
-- [ ] Run focused and inherited assurance, hostile self-review, record measured
+- [x] Run focused and inherited assurance, hostile self-review, record measured
   evidence, publish only the candidate branch, and stop pending player-history
   rights approval and capture.
 
