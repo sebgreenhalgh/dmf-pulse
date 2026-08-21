@@ -1199,6 +1199,26 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   allocation, safe receipt, and deletion/transience artifacts; run final
   deterministic assurance without replaying network capture.
 
+## GW1-PLY-004 — current penalty overlay and allocation sensitivity
+
+- [x] Verify the immutable player-history parent, dedicated Ubuntu validation,
+  published posterior/allocation hashes, current manual-input bridge, and
+  information cutoff without making a history-provider request.
+- [x] Review current pre-cutoff penalty evidence across all 20 clubs; preserve
+  uncertainty through clear-primary, primary-with-backup, multiple-candidate,
+  and explicit-unknown classifications bound only to exact Stage-7 identities.
+- [x] Reject tactical-role overrides that do not clear the materiality and
+  calibration threshold; keep penalty responsibility separate from open-play
+  goal and assist propensities.
+- [x] Compile PRICE_OFF central, low-shrinkage, and high-shrinkage allocations;
+  prove 599-player identity equality, per-team simplexes, no Stage-7 minutes
+  embedding, penalty-only effects, and derived-only retention.
+- [x] Publish only the three permitted allocations, safe aggregate penalty/role
+  receipt, and safe sensitivity summary; keep the named review and transient
+  catalogue outside Git.
+- [ ] Run focused/full assurance, publish the exact final SHA, and require the
+  dedicated Ubuntu workflow to pass before recommending bounded human review.
+
 - Ticket/stage: `EVAL-012`, DMFP-19 Stage 12 / playbook B1; immutable parent
   `4f1274ccef419a7c0bde335c48bd4070e248b2e6` on `main`.
 - Branch: `stage/A12/EVAL-012-backtesting-framework`.

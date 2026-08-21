@@ -368,7 +368,7 @@ class PenaltyAssignment(_Model):
     usable_at: datetime
     expires_at: datetime
     reviewer: str = Field(min_length=1, max_length=200)
-    status: Literal["HUMAN_REVIEWED"]
+    status: Literal["HUMAN_REVIEWED", "REVIEWED_CANDIDATE_NOT_HUMAN_ACCEPTED"]
     assignment_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @field_validator("observed_at", "usable_at", "expires_at")

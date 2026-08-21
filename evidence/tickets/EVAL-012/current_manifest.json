@@ -131,9 +131,9 @@
       "sha256": "eadb5f9a15679ce6539dd5db8f97bb66098e04ec1a7a9511bb3ae6a87dfc67d2"
     },
     {
-      "bytes": 3793,
+      "bytes": 3888,
       "path": ".github/workflows/gw1-player-role-prior-candidate.yml",
-      "sha256": "1785ad6c049cdb8b40beb04e2be92f1e2f33ae4480fc72f49b381d6447c50835"
+      "sha256": "4de5b0737b15eee31a4037b56147d29ca5ff2ba036647133ba0d88ab0dc3e551"
     },
     {
       "bytes": 2554,
@@ -236,9 +236,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 92316,
+      "bytes": 93584,
       "path": "PLANS.md",
-      "sha256": "8706517900efa48d4603a894ae0d79722f9ee4d1038259a7656d0e380824556b"
+      "sha256": "f052bedf9e8a43facf79864c2044ecb4fd421f41a5547986e0d01a3bf77855dc"
     },
     {
       "bytes": 2761,
@@ -2256,6 +2256,11 @@
       "sha256": "5f156add4cd78a80706e831613ae4df4b8e3e7ec733b9c382ed5f9193f3f4c97"
     },
     {
+      "bytes": 10093,
+      "path": "scripts/build_gw1_player_allocation_overlay.py",
+      "sha256": "b8eda97e17c1e5de2913bf650f77e49e4adc7c71fd3a29705a8ecc743cc35cab"
+    },
+    {
       "bytes": 5240,
       "path": "scripts/build_gw1_player_role_prior_candidate.py",
       "sha256": "e4ad3b8ef3787c4ed2a0f95d24f0fa04a4a800aac160c1e27262b05676fa2f07"
@@ -3691,9 +3696,14 @@
       "sha256": "df4436be121b54e7cc2fe5f63e064412cd3ef2a981cf61feef67d19145848b60"
     },
     {
-      "bytes": 24886,
+      "bytes": 24927,
       "path": "src/dmf_pulse/player_evidence/models.py",
-      "sha256": "858ac56409dc9dfb10b7f37c926c5cd1af3796c24dd653ec30baf35ce9d34c2b"
+      "sha256": "eb6da4ac736edbc2a0fd316bc9dea68b98bfddc8ab2ccc788b6f0af724e7b859"
+    },
+    {
+      "bytes": 38172,
+      "path": "src/dmf_pulse/player_evidence/overlays.py",
+      "sha256": "480a3c46f3bee5296cf0fe0906177382c0e49018e13318c7c607dbd3c46542f2"
     },
     {
       "bytes": 13250,
@@ -5146,9 +5156,19 @@
       "sha256": "62881bb39a1b6861a52adf6b8fac2f263fe68652405a6610f8db71344fc71cb4"
     },
     {
+      "bytes": 12078,
+      "path": "tests/unit/player_evidence/test_overlays.py",
+      "sha256": "011f746deee7e014474e3480aed15e18645e7e877a0af542ce836468bf327dab"
+    },
+    {
       "bytes": 8834,
       "path": "tests/unit/player_evidence/test_published_capture_artifacts.py",
       "sha256": "b67599427ece2de08c180ff2cbc185d9671507840e6ca17189103daa90c8a7f2"
+    },
+    {
+      "bytes": 6782,
+      "path": "tests/unit/player_evidence/test_published_overlay_artifacts.py",
+      "sha256": "aac75c0ad22eddb342f1b983b2b94b86344333b38ef19dc5c1adbe09b0b0bc13"
     },
     {
       "bytes": 12836,

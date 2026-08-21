@@ -1,0 +1,55 @@
+{
+  "allocation_bindings": [
+    {
+      "allocation_artifact_sha256": "629d6c288f9faa7aa7763f5c578e662511c03d514169f683cbeb6ee81af695be",
+      "posterior_artifact_sha256": "537b2ab3c19aba381e6020972cd037b3f62665309c423037049020f0d4f0239f",
+      "profile_count": 599,
+      "world": "CENTRAL_TEMPORARY"
+    },
+    {
+      "allocation_artifact_sha256": "6a3184e809d4cc11c4d34327c6b5b7fec320201784614f3601f1285e92ea5bb8",
+      "posterior_artifact_sha256": "2bba62e765c83ba0ed114e78d168311e1f33aa144143b121703af2e5acfedbec",
+      "profile_count": 599,
+      "world": "LOW_SHRINKAGE"
+    },
+    {
+      "allocation_artifact_sha256": "be28135f96276ccd59a57c38369ee4fe423d7b504400faca34a33a847482c0db",
+      "posterior_artifact_sha256": "b876b34d8669cf0acbaaa1a8136e90058573b4292c6dc016b7bf59e52992595e",
+      "profile_count": 599,
+      "world": "HIGH_SHRINKAGE"
+    }
+  ],
+  "artifact_sha256": "854772e6d46b0b5e890039f94cd5a203481ec3794d1b8374913d75c72f091776",
+  "assist_share": {
+    "material_threshold": 0.02,
+    "maximum_absolute_movement": 0.040261622788183654,
+    "median_absolute_movement": 0.0021485053795938375,
+    "p90_absolute_movement": 0.009178055353779059,
+    "players_at_or_above_material_threshold": 14
+  },
+  "current_fpl_catalogue_persisted": false,
+  "goal_share": {
+    "material_threshold": 0.02,
+    "maximum_absolute_movement": 0.04178171187529492,
+    "median_absolute_movement": 0.0014541673733003187,
+    "p90_absolute_movement": 0.00896768292426477,
+    "players_at_or_above_material_threshold": 7
+  },
+  "information_cutoff": "2026-08-21T17:30:00Z",
+  "largest_team_assist_instability": {
+    "maximum_pairwise_total_variation": 0.0923719002074303,
+    "team_identity_sha256": "f4b7fb90c5cc700e1c87bf9693a49bac6d9cf7d577ebea9269f69c2e4fdd3799"
+  },
+  "largest_team_goal_instability": {
+    "maximum_pairwise_total_variation": 0.08435628972620685,
+    "team_identity_sha256": "73d37c7369f6f902ba94cb565d0034ac3aa2dc4427707282b22df78a13f9896b"
+  },
+  "penalty_clubs_invariant_across_worlds": 20,
+  "penalty_profiles_invariant_across_worlds": 599,
+  "player_count": 599,
+  "players_materially_unstable_on_either_metric": 21,
+  "raw_fpl_history_persisted": false,
+  "schema_version": "gw1-player-allocation-sensitivity-summary-v1",
+  "status": "CANDIDATE_NOT_HUMAN_ACCEPTED",
+  "team_count": 20
+}

@@ -1,0 +1,64 @@
+{
+  "allocation_bindings": [
+    {
+      "allocation_artifact_sha256": "629d6c288f9faa7aa7763f5c578e662511c03d514169f683cbeb6ee81af695be",
+      "posterior_artifact_sha256": "537b2ab3c19aba381e6020972cd037b3f62665309c423037049020f0d4f0239f",
+      "profile_count": 599,
+      "world": "CENTRAL_TEMPORARY"
+    },
+    {
+      "allocation_artifact_sha256": "6a3184e809d4cc11c4d34327c6b5b7fec320201784614f3601f1285e92ea5bb8",
+      "posterior_artifact_sha256": "2bba62e765c83ba0ed114e78d168311e1f33aa144143b121703af2e5acfedbec",
+      "profile_count": 599,
+      "world": "LOW_SHRINKAGE"
+    },
+    {
+      "allocation_artifact_sha256": "be28135f96276ccd59a57c38369ee4fe423d7b504400faca34a33a847482c0db",
+      "posterior_artifact_sha256": "b876b34d8669cf0acbaaa1a8136e90058573b4292c6dc016b7bf59e52992595e",
+      "profile_count": 599,
+      "world": "HIGH_SHRINKAGE"
+    }
+  ],
+  "catalogue_semantic_sha256": "9d655a2dc8e60eca0898f4bc04e8caf7b264887af1d62bfe61c5288cbdd75f11",
+  "classification_counts": {
+    "CLEAR_PRIMARY": 3,
+    "MULTIPLE_CANDIDATES": 8,
+    "PRIMARY_WITH_BACKUP": 9,
+    "UNKNOWN": 0
+  },
+  "current_fpl_catalogue_persisted": false,
+  "defensive_contribution_model_completeness": "PARTIAL",
+  "exact_stage7_player_identity_equality": true,
+  "exact_stage7_team_identity_equality": true,
+  "history_network_request_count": 0,
+  "information_cutoff": "2026-08-21T17:30:00Z",
+  "penalty_assignment_artifact_sha256": "0f5aa416babdb0db6166b2126448dd2c2ce3c58732e6d69837cf182ee9b60efb",
+  "penalty_assignment_count": 50,
+  "penalty_assignment_status": "REVIEWED_CANDIDATE_NOT_HUMAN_ACCEPTED",
+  "penalty_assignments_affect_penalty_share_only": true,
+  "player_allocation_human_accepted": false,
+  "player_count": 599,
+  "private_review_sha256": "030d4b859aae2944c8d8ff96f5e3c8650bb41520a2c171a1c768c787898ae1c3",
+  "produced_at": "2026-08-21T16:11:57.552402Z",
+  "raw_fpl_history_persisted": false,
+  "receipt_sha256": "cb325409752286beb4dff2366c34bca0fafb33bff2426951e9e760e928c5c9bb",
+  "reviewed_source_domains": [
+    "allaboutfpl.com",
+    "www.fantasyfootballfix.com",
+    "www.fantasyfootballscout.co.uk",
+    "www.premierleague.com",
+    "www.squawka.com"
+  ],
+  "reviewed_source_references_sha256": "3f42eb5a598a147baa40c45649b1c512f38db55f638207228cda3d406fe863f3",
+  "role_override_artifact_sha256": "7faabc204eb4eda070a4e937d5c8863fc693ba1d76eb42eb7485992696d2f25c",
+  "role_override_count": 0,
+  "role_review_rationale": "No material current tactical-role override was accepted. Individual attacking evidence already exists for 482 players, while the accepted historical calibration distinguishes only broad FPL positions and goalkeeper status; the current sources reviewed do not justify a radical, calibrated role reclassification without false precision. Penalty responsibility is represented only through the separate penalty_taker_share channel.",
+  "schema_version": "gw1-current-penalty-role-overlay-receipt-v1",
+  "sensitivity_artifact_sha256": "854772e6d46b0b5e890039f94cd5a203481ec3794d1b8374913d75c72f091776",
+  "stage7_expected_minutes_separate": true,
+  "status": "CANDIDATE_NOT_HUMAN_ACCEPTED",
+  "team_count": 20,
+  "unknown_team_identity_sha256s": [],
+  "whole_roster_uniform_fallback_only_when_explicit_unknown": true,
+  "zero_exposure_discipline_lineage_preserved": true
+}
