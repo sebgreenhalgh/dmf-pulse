@@ -274,6 +274,30 @@ provider request, or credential use occurred.
   evidence, publish only the candidate branch, and stop pending player-history
   rights approval and capture.
 
+## GW1-PLY-002 — rights-clear Wyscout role-prior calibration
+
+- Branch: `readiness/GW1-2026-27-player-role-prior-candidate` from immutable
+  player-evidence candidate `1a3c63c38a302f9fd4088fdb9f3fa049352652f0`.
+- Scope: CC-BY Figshare-derived, EPL-2017/18 role/FPL-position pooled rates and
+  a hash-bound candidate artifact consumed by the existing GW1-PLY-001
+  compiler. No current player identity, official-FPL history, Stage-7 minutes,
+  Odds request, acceptance, PR, merge, or canonical-readiness change.
+
+### Candidate checkpoints
+
+- [x] Verify the exact parent and independently verify the three required
+  Figshare item licences, versions, downloads, hashes, attribution, and source
+  entity definitions before calibration.
+- [ ] Implement an offline schema/integrity gate, regulation-minute
+  reconstruction, source-role-to-FPL-position fallback, direct/derived field
+  classification, and aggregate-only candidate builder.
+- [ ] Produce the non-vendored-data candidate artifact and wire its prior rows
+  and temporary kappa worlds into the existing compiler without changing
+  Stage-7 or Stage-9 ownership.
+- [ ] Add deterministic synthetic tests, diagnostics, ticket/evidence, and an
+  offline Ubuntu workflow; run full bounded assurance, hostile review, then
+  publish only this dedicated branch.
+
 ## RUL-2026-27 independent full-ruleset review and remediation
 
 - Repository/branch: `sebgreenhalgh/dmf-pulse`,

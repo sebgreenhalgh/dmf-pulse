@@ -1,0 +1,90 @@
+name: gw1-player-role-prior-candidate
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-player-role-prior-candidate
+    paths:
+      - .github/workflows/gw1-player-role-prior-candidate.yml
+      - PLANS.md
+      - evidence/tickets/GW1-PLY-002/**
+      - tickets/GW1-PLY-002/**
+      - src/dmf_pulse/player_evidence/**
+      - scripts/build_gw1_player_role_prior_candidate.py
+      - tests/unit/player_evidence/**
+      - tests/unit/fpl_points/test_allocation.py
+      - tests/unit/fpl_points/test_current_football_events.py
+      - evidence/tickets/EVAL-012/current_manifest.json
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Player role-prior candidate / Ubuntu
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      UV_NO_PROGRESS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned uv frontend
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen dependency sync
+        run: uv sync --all-groups --frozen
+
+      - name: Offline role-prior, player-evidence and Stage-9 allocation regressions
+        run: >-
+          uv run pytest -q
+          tests/unit/player_evidence
+          tests/unit/fpl_points/test_allocation.py
+          tests/unit/fpl_points/test_current_football_events.py
+
+      - name: Candidate artifact hash verification without Figshare network
+        run: >-
+          uv run python -c
+          "from pathlib import Path; from dmf_pulse.player_evidence.role_priors import load_role_prior_candidate;
+          load_role_prior_candidate(Path('evidence/tickets/GW1-PLY-002/GW1_PLAYER_ROLE_PRIOR_CANDIDATE.json'))"
+
+      - name: Formatting and lint
+        run: |
+          uv run ruff format --check src/dmf_pulse tests scripts
+          uv run ruff check src/dmf_pulse tests scripts
+
+      - name: Strict typing
+        run: uv run mypy src/dmf_pulse
+
+      - name: Build and installed-wheel safe-command smoke outside source tree
+        shell: bash
+        run: |
+          uv build
+          wheel=$(find dist -maxdepth 1 -type f -name '*.whl' -print -quit)
+          test -n "$wheel"
+          wheel=$(readlink -f "$wheel")
+          venv="${RUNNER_TEMP}/player-role-prior-wheel-venv"
+          smoke="${RUNNER_TEMP}/player-role-prior-wheel-smoke"
+          uv venv --python 3.13 "$venv"
+          uv pip install --python "$venv/bin/python" "$wheel"
+          mkdir -p "$smoke"
+          cd "$smoke"
+          "$venv/bin/dmf" --version
+          "$venv/bin/dmf" player-evidence rights-status
+          if "$venv/bin/dmf" player-evidence capture-history; then
+            echo "capture-history unexpectedly bypassed human-rights guard" >&2
+            exit 1
+          fi
+
+      - name: Repository and secret validation
+        run: |
+          uv run python scripts/validate_repository.py
+          uv run python scripts/scan_secrets.py
+          git diff --check HEAD^ HEAD

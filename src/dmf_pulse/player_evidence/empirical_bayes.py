@@ -22,6 +22,10 @@ from dmf_pulse.player_evidence.models import (
     RolePooledPrior,
     TacticalRole,
 )
+from dmf_pulse.player_evidence.role_priors import (
+    RolePriorCandidateArtifact,
+    role_priors_from_candidate,
+)
 
 
 def resolve_role_prior(
@@ -146,7 +150,7 @@ def compile_posterior_artifact(
     *,
     catalogue: CurrentPlayerCatalogue,
     histories: Sequence[PlayerHistoryEvidence],
-    role_priors: Sequence[RolePooledPrior],
+    role_priors: Sequence[RolePooledPrior] | RolePriorCandidateArtifact,
     tactical_roles: Mapping[UUID, TacticalRole],
     parameters: EmpiricalBayesParameters,
     information_cutoff: datetime,
@@ -166,6 +170,11 @@ def compile_posterior_artifact(
     argument.  Callers cannot use it to retain raw FPL history rows.
     """
 
+    resolved_role_priors = (
+        role_priors_from_candidate(role_priors)
+        if isinstance(role_priors, RolePriorCandidateArtifact)
+        else role_priors
+    )
     for label, value in (
         ("information_cutoff", information_cutoff),
         ("source_observed_at", source_observed_at),
@@ -229,7 +238,7 @@ def compile_posterior_artifact(
         prior = resolve_role_prior(
             player,
             tactical_roles.get(player.player_id, TacticalRole.UNKNOWN),
-            role_priors,
+            resolved_role_priors,
         )
         players.append(
             _posterior_player(

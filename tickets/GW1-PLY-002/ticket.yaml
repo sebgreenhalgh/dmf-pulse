@@ -1,0 +1,54 @@
+ticket_id: "GW1-PLY-002"
+stage: "A9-role-prior-calibration-candidate"
+pack_version: "1.0"
+title: "Rights-clear historical role/FPL-position prior calibration"
+status: "IMPLEMENTED_CANDIDATE_NOT_HUMAN_ACCEPTED"
+owner: "Sebastian Greenhalgh"
+implementer_role: "codex_implementation"
+reviewer_role: "human_role_prior_and_data_rights_review"
+
+required_branch: "readiness/GW1-2026-27-player-role-prior-candidate"
+required_base_commit: "1a3c63c38a302f9fd4088fdb9f3fa049352652f0"
+
+objective: >-
+  Derive reproducible, aggregate-only EPL-2017/18 pooled rates from the
+  item-level CC-BY Pappalardo/Wyscout Figshare release, then adapt only those
+  role/FPL-position priors into the existing GW1-PLY-001 compiler. The result
+  is a candidate for private GW1 review, not current-player evidence or model
+  activation.
+
+authority_override:
+  source: "operator directive GW1-PLY-002"
+  limited_effect: >-
+    Permits one independently licence-verified public Figshare calibration
+    download and retention of only provenance plus derived aggregates. It does
+    not authorize any FPL/Odds call, credential, current-player identity join,
+    Stage-7 or Stage-9 redesign, acceptance, PR, merge, or canonical update.
+
+in_scope:
+  - "Hash-verified local parsing of Players v3, Events v1 and Matches v1 only."
+  - "Actual regulation-minute reconstruction from starting XIs, substitutions and dismissals."
+  - "Broad Wyscout role to FPL-position fallback calibration, with GK as the only supported fine tactical role."
+  - "Explicit per-field direct, derived, proxy, fallback or unsupported coverage."
+  - "Aggregate-only immutable candidate artifact and existing compiler adapter."
+  - "Temporary GW1-PLY-001 kappa worlds with transparent non-adopted moment diagnostics."
+  - "Deterministic synthetic tests and offline Ubuntu validation."
+
+excluded:
+  - "Official FPL history/API request, capture-history execution, credential, cookie, browser, or raw FPL retention."
+  - "Odds API request, provider request, current player identity join, player name mapping, or Wyscout identity retention."
+  - "Stage-7 participation/minutes change, Stage-9 simulator redesign, FPL rule activation, optimiser change, or price-model change."
+  - "Raw Wyscout dataset vendoring, human acceptance, PR, merge, main change, or canonical-readiness fast-forward."
+
+acceptance:
+  - "The candidate begins exactly at immutable parent 1a3c63c38a302f9fd4088fdb9f3fa049352652f0."
+  - "Every used Figshare item/file has item-level CC-BY 4.0 provenance, source and member hashes, version, URL, timestamp and attribution."
+  - "No appearance is treated as 90 minutes; nonregular matches are excluded and regular exposure is reconstructed."
+  - "The output has no source-player identities and cannot join historical Wyscout identities to a current DMF catalogue."
+  - "Nonpenalty goals exclude own goals and penalty goals; assists remain broad source propensity only."
+  - "Unsupported/Opta-specific fields remain explicit and never become unlabelled calibrated rates."
+  - "Current role, position and generic compiler fallback remains deterministic; Stage-7 minutes stay external."
+  - "No live official-FPL or Odds call, acceptance, PR, merge, or canonical update occurs."
+
+network_allowed: "FIGSHARE_PUBLIC_CC_BY_SOURCE_ONLY_DURING_MANUAL_CALIBRATION"
+real_credentials_allowed: false
