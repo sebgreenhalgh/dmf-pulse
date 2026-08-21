@@ -212,6 +212,29 @@ Latest bounded implementation validation: `80297e4934e23a0c1176a078f78b2b3b6debe
 dedicated Ubuntu run `32389420928` (`PASS`). No PR, merge, activation, real
 provider request, or credential use occurred.
 
+## GW1-INPUT-001 — weak Stage-8 support-prior candidate
+
+- Branch: `readiness/GW1-2026-27-support-prior-candidate` from canonical
+  readiness SHA `57aaba6a296ff314595a2ad6edabb5a2657a1a74`.
+- Scope: independently reproduce a five-season, league-wide EPL goal-rate
+  calibration from the pinned OpenFootball CC0 source; publish only an
+  unaccepted, hash-bound support-prior candidate that reuses the existing
+  Stage-8 score grid and soft-KL projection.
+- Safety: no player-allocation model, team-strength ratings, provider call or
+  credential, raw external dataset retention, activation, PR, merge, or
+  separate score engine.
+
+### Candidate checkpoints
+
+- [x] Verify source rights, pinned commit, season paths, hashes and exact
+  reproduction before implementing any model artifact.
+- [x] Add deterministic parser/calibration and candidate-artifact contracts
+  with offline pinned/synthetic test fixtures.
+- [x] Exercise the existing Stage-8 path for tail, sensitivity and
+  market-dominance diagnostics without changing confidence grades.
+- [ ] Run focused, inherited and repository assurance; publish only the
+  candidate branch and await dedicated Ubuntu validation.
+
 ## RUL-2026-27 independent full-ruleset review and remediation
 
 - Repository/branch: `sebgreenhalgh/dmf-pulse`,

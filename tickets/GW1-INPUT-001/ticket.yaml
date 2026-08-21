@@ -1,0 +1,47 @@
+ticket_id: "GW1-INPUT-001"
+stage: "A8-support-prior-candidate"
+pack_version: "1.0"
+title: "GW1 league-wide weak Stage-8 support-prior candidate"
+status: "IMPLEMENTED_PENDING_HUMAN_ACCEPTANCE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "codex_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+
+required_branch: "readiness/GW1-2026-27-support-prior-candidate"
+required_base_commit: "57aaba6a296ff314595a2ad6edabb5a2657a1a74"
+
+objective: >-
+  Reproduce one league-wide, five-season independent-Poisson support-prior
+  candidate from a pinned public source, retaining the existing Stage-8 score
+  grid and soft-KL market projection as the only score-distribution path.
+
+authority_override:
+  source: "operator directive GW1-INPUT-001"
+  limited_effect: >-
+    Authorizes an unaccepted, offline Stage-8 support-prior candidate only. It
+    does not activate a model, amend accepted public contracts, or authorize a
+    player-allocation model or provider call.
+
+in_scope:
+  - "Pinned OpenFootball England source verification and derived aggregate provenance."
+  - "Deterministic five-season parser, coverage/duplicate/score validation and Decimal half-life calibration."
+  - "Candidate-only artifact, explicit sensitivity worlds, and synthetic Stage-8 diagnostics."
+  - "Reuse of existing ScorePriorRequest, adaptive score grid and soft-KL projection."
+  - "Dedicated offline Ubuntu validation workflow."
+
+excluded:
+  - "Any player goal, assist, minutes or allocation implementation."
+  - "Team strength, Dixon-Coles, xG, promoted-team, manager or bookmaker prior inputs."
+  - "Real Odds API request, provider credential, raw external dataset retention or runtime source retrieval."
+  - "New score engine, confidence grade, rules activation, PR, merge or main change."
+
+acceptance:
+  - "Exactly five source files produce 380 completed fixtures each and 1,900 fixtures in total."
+  - "The derived central rates reproduce 1.5840940818 and 1.3253421983 after declared rounding."
+  - "The artifact remains CANDIDATE_NOT_ACCEPTED and contains no reviewer or activation claim."
+  - "The existing Stage-8 prior/request/grid path proves strictly positive finite support and tail compliance."
+  - "Synthetic complete-market, H2H-only, no-market and numerical-fallback diagnostics are explicit."
+  - "No provider credential, provider call, raw source retention, PR, merge or activation occurs."
+
+network_allowed: "PUBLIC_PINNED_SOURCE_RETRIEVAL_ONLY_OUTSIDE_RUNTIME"
+real_credentials_allowed: false

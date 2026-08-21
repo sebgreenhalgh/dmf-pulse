@@ -1,0 +1,80 @@
+name: gw1-support-prior-candidate
+
+on:
+  push:
+    branches:
+      - readiness/GW1-2026-27-support-prior-candidate
+    paths:
+      - .github/workflows/gw1-support-prior-candidate.yml
+      - PLANS.md
+      - evidence/tickets/GW1-INPUT-001/**
+      - scripts/build_gw1_support_prior_candidate.py
+      - scripts/build_gw1_support_prior_diagnostics.py
+      - src/dmf_pulse/football_events/support_prior.py
+      - tests/unit/football_events/test_support_prior.py
+      - tickets/GW1-INPUT-001/**
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Support-prior candidate / Ubuntu
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      UV_NO_PROGRESS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned uv frontend
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen dependency sync
+        run: uv sync --all-groups --frozen
+
+      - name: Offline support-prior and inherited Stage-8 regressions
+        run: >-
+          uv run pytest -q
+          tests/unit/football_events/test_support_prior.py
+          tests/unit/football_events/test_score_projection.py
+          tests/unit/football_events/test_service_and_artifacts.py
+          tests/unit/football_events/test_public_model_boundaries.py
+          tests/unit/markets/test_current_market.py
+
+      - name: Formatting and lint
+        run: |
+          uv run ruff format --check src/dmf_pulse tests scripts
+          uv run ruff check src/dmf_pulse tests scripts
+
+      - name: Strict typing
+        run: uv run mypy src/dmf_pulse
+
+      - name: Build and installed-wheel smoke outside source tree
+        shell: bash
+        run: |
+          uv build
+          wheel=$(find dist -maxdepth 1 -type f -name '*.whl' -print -quit)
+          test -n "$wheel"
+          wheel=$(readlink -f "$wheel")
+          venv="${RUNNER_TEMP}/support-prior-wheel-venv"
+          smoke="${RUNNER_TEMP}/support-prior-wheel-smoke"
+          uv venv --python 3.13 "$venv"
+          uv pip install --python "$venv/bin/python" "$wheel"
+          mkdir -p "$smoke"
+          cd "$smoke"
+          "$venv/bin/dmf" --version
+          "$venv/bin/dmf" doctor --json
+
+      - name: Repository and secret validation
+        run: |
+          uv run python scripts/validate_repository.py
+          uv run python scripts/scan_secrets.py
+          git diff --check HEAD^ HEAD
