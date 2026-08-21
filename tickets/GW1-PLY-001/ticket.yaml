@@ -1,0 +1,51 @@
+ticket_id: "GW1-PLY-001"
+stage: "A9-current-player-evidence-and-stage9-allocation-candidate"
+pack_version: "1.0"
+title: "Offline-first current-player historical evidence and Stage-9 allocation candidate"
+status: "IMPLEMENTED_CANDIDATE_NOT_HUMAN_ACCEPTED"
+owner: "Sebastian Greenhalgh"
+implementer_role: "codex_implementation"
+reviewer_role: "human_rights_and_player_allocation_review"
+
+required_branch: "readiness/GW1-2026-27-player-evidence-candidate"
+required_base_commit: "2ca0e32b32503684d15b70d5c9fce506845939c0"
+
+objective: >-
+  Build an offline-tested, posterior-only current-player historical-evidence
+  path that adapts data into the existing Stage-9 PlayerAllocationProfile
+  interface. The future official-FPL history capability is fail-closed until a
+  separately supplied, hash-bound human rights approval is validated.
+
+authority_override:
+  source: "operator directive GW1-PLY-001"
+  limited_effect: >-
+    Permits a candidate-only private GW1 implementation and synthetic/replay
+    validation. It does not record the required source-rights approval, accept
+    player allocation, activate a model, or authorize a live provider call.
+
+in_scope:
+  - "Synthetic-only parser for the future official FPL history_past node."
+  - "Fail-closed bounded serial capture design with no credential, cookie, browser, retry, or raw-retention surface."
+  - "Posterior-only Gamma-Poisson evidence artifact with declared temporary sensitivity parameters."
+  - "Tactical-role/position/generic pooled-prior hierarchy and complete Stage-9 profile adapter."
+  - "Sparse-evidence price sensitivity and separate penalty allocation."
+  - "Explicit no-history degraded profile path and dedicated offline Linux validation."
+  - "Deterministic EVAL-012 repository-manifest refresh only."
+
+excluded:
+  - "Real official-FPL history request, provider call, credential, cookie, login, browser automation, or source discovery."
+  - "Raw FPL history JSON, CSV, Parquet, HTML, screenshots, logs, test snapshots, artifacts, caches, or backups."
+  - "Wyscout real-data ingestion or calibration; that is a separate checkpoint."
+  - "New event simulation, minutes model, optimiser, FPL rules activation, PR, merge, canonical-readiness fast-forward, or main change."
+
+acceptance:
+  - "The candidate begins exactly at immutable parent 2ca0e32b32503684d15b70d5c9fce506845939c0."
+  - "Future capture rejects missing or mismatched approval, terms drift, schema drift, invalid bounds, unauthenticated refusal, HTTP 403, HTTP 429, and post-cutoff successful receipt."
+  - "Only synthetic schema-equivalent evidence is used in validation and the durable artifact retains posterior fields only."
+  - "Persistent player goal and assist shares do not include Stage-7 starts, appearance probabilities, expected minutes, or exposure."
+  - "Existing Stage-9 allocation dynamically limits credit to players actually on pitch."
+  - "A fully populated degraded no-history profile path remains available."
+  - "No live capture, human acceptance, production activation, PR, merge, or main change occurs."
+
+network_allowed: "NONE_FOR_IMPLEMENTATION_AND_CI"
+real_credentials_allowed: false

@@ -126,6 +126,11 @@
       "sha256": "c888a7872ec38bd71a08a8b140e4a666dd75d7281a1635712504dacf901f9da2"
     },
     {
+      "bytes": 2693,
+      "path": ".github/workflows/gw1-player-evidence-candidate.yml",
+      "sha256": "eadb5f9a15679ce6539dd5db8f97bb66098e04ec1a7a9511bb3ae6a87dfc67d2"
+    },
+    {
       "bytes": 2554,
       "path": ".github/workflows/gw1-support-prior-candidate.yml",
       "sha256": "68a6167099c56f4279b8b3c905b541ad7bac366c5a77d2ca48ba07b07ebaa44c"
@@ -226,9 +231,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 84272,
+      "bytes": 85996,
       "path": "PLANS.md",
-      "sha256": "c3ade05afc3ceec5644f3d6efef06668115b693aa361941ff0a805308cf3007e"
+      "sha256": "3ccccbe9b2cb27a88dd31e09d8b703a730d9ecba79767662822834cbd76ecb8f"
     },
     {
       "bytes": 2761,
@@ -2771,9 +2776,9 @@
       "sha256": "730f905d12f5fcefb162931d287cc6b6faab716c8538da88791c385f9ced8802"
     },
     {
-      "bytes": 3826,
+      "bytes": 3947,
       "path": "src/dmf_pulse/cli/app.py",
-      "sha256": "9b62b5974251ddcea193b8eb9e83176a188c8f4f9b1fc74cb94228b458ac6c2c"
+      "sha256": "423d9f7fb8e6d79c7bd683ca451ee57bc56fbc7f35dffe7f630d4c2215ff64aa"
     },
     {
       "bytes": 17035,
@@ -2839,6 +2844,11 @@
       "bytes": 8909,
       "path": "src/dmf_pulse/cli/optimise.py",
       "sha256": "9c77ca0e9d895f3cb2b90fcf0979c6b52c75e51da473c11a8a578c14b9e5ff4a"
+    },
+    {
+      "bytes": 9591,
+      "path": "src/dmf_pulse/cli/player_evidence.py",
+      "sha256": "98d9275ea3bbdc9a5af5345025188a0ac5db7230b0ea0f2a4452264eed752adf"
     },
     {
       "bytes": 1660,
@@ -3639,6 +3649,31 @@
       "bytes": 9062,
       "path": "src/dmf_pulse/orchestration/gw1.py",
       "sha256": "0b7ac8ece390efb90cbf5ad79109b89250992bf3cd0cfa7d8d35e7231b6b3b70"
+    },
+    {
+      "bytes": 393,
+      "path": "src/dmf_pulse/player_evidence/__init__.py",
+      "sha256": "e6683e724dabc23c3802e5bf97ea827a6de5a2d69b1aa7cda965ae861e3417a4"
+    },
+    {
+      "bytes": 10794,
+      "path": "src/dmf_pulse/player_evidence/empirical_bayes.py",
+      "sha256": "b447e7cae23016f7cbf505fffb53280d09a36333fd26a8e1bc577dfc57b3eb06"
+    },
+    {
+      "bytes": 13405,
+      "path": "src/dmf_pulse/player_evidence/history.py",
+      "sha256": "0bc1218eb2b807f39ed7fae4b2c692f2c873123e086c588848319ada5d10a79f"
+    },
+    {
+      "bytes": 20998,
+      "path": "src/dmf_pulse/player_evidence/models.py",
+      "sha256": "957caa5663fa50ee04fba26b697a2ffd36e3a6c430ba89adfe32ea4c401f4a7c"
+    },
+    {
+      "bytes": 12916,
+      "path": "src/dmf_pulse/player_evidence/profiles.py",
+      "sha256": "5c5c6b7e40d535e02906226ccf648c7ce2a97958f8a14ac1ce5fd817f986d903"
     },
     {
       "bytes": 1,
@@ -5051,6 +5086,26 @@
       "sha256": "6cfb287254d2cb88fbdd6ef49568ed41e7692433f7a0bcb7ef8a7985ef343537"
     },
     {
+      "bytes": 4110,
+      "path": "tests/unit/player_evidence/support.py",
+      "sha256": "cd60e5433898eecb5a113f835c191cb3d3b24a771dd7f6f49a7ababc57ca82a6"
+    },
+    {
+      "bytes": 2826,
+      "path": "tests/unit/player_evidence/test_cli.py",
+      "sha256": "c09c570cf7a9cd786b7536afa061b468e5314216bb743f47a25051f4bf658405"
+    },
+    {
+      "bytes": 18028,
+      "path": "tests/unit/player_evidence/test_empirical_bayes_profiles.py",
+      "sha256": "c121c5ab3333142c9190cfa6e6f3d21856d10d92070ac3c372afa19f918e7d2a"
+    },
+    {
+      "bytes": 7084,
+      "path": "tests/unit/player_evidence/test_history.py",
+      "sha256": "d1059d040d612c73882f5a2e4061b8be1c961a241b7ada603168cb9f716986ee"
+    },
+    {
       "bytes": 5609,
       "path": "tests/unit/rules/test_2026_27_save_contract.py",
       "sha256": "6f883861a725c8e56a17c091ba9763ba23746a5a0478fef957a31291ee327053"
@@ -5219,6 +5274,16 @@
       "bytes": 2411,
       "path": "tickets/GW1-MKT-001/ticket.yaml",
       "sha256": "16043963543583606d198b78ade17e58624e349dce570184091d21d0d7bb81fb"
+    },
+    {
+      "bytes": 1033,
+      "path": "tickets/GW1-PLY-001/ACCEPTANCE.md",
+      "sha256": "16792327b3849e39eda0f8c1c85e93f33a150ff6d6270445cd714b9569227ce0"
+    },
+    {
+      "bytes": 3147,
+      "path": "tickets/GW1-PLY-001/ticket.yaml",
+      "sha256": "a7d4dceb81960040142fbccaa8cfca84712830708bcb44ee9aa4ac32dded30db"
     },
     {
       "bytes": 10572,

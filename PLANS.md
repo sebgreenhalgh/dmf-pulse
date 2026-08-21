@@ -245,6 +245,35 @@ provider request, or credential use occurred.
   non-activation boundaries while marking the ticket as privately accepted for
   2026/27 GW1 decision support only.
 
+## GW1-PLY-001 — player evidence and allocation candidate
+
+- Branch: `readiness/GW1-2026-27-player-evidence-candidate` from immutable
+  canonical readiness parent `2ca0e32b32503684d15b70d5c9fce506845939c0`.
+- Scope: offline-only synthetic/replay evidence, posterior-only player-event
+  rates, governed allocation profiles, an executable degraded fallback, and a
+  future-capture command that fails closed without explicit rights approval.
+- Safety: no real official-FPL history request, raw-history retention,
+  credential, Odds request, player-allocation activation, main merge, PR, or
+  canonical-readiness update.
+
+### Candidate checkpoints
+
+- [x] Reconcile governing authority with the existing Stage-7 participation,
+  Stage-9 allocation, identifier, provider-rights, and target-season rules
+  contracts; record the inherited general-CI baseline failure unchanged.
+- [x] Add typed, posterior-only synthetic-history and rights-approval contracts
+  with raw-retention/network guards and a fail-closed future capture boundary.
+- [x] Implement deterministic Gamma-Poisson empirical-Bayes rates, role/position
+  fallback hierarchy, bounded price worlds, governed overrides, and complete
+  role-pooled auxiliary priors.
+- [x] Construct Stage-9-compatible persistent allocation profiles and a fully
+  populated degraded no-history profile without embedding Stage-7 exposure.
+- [x] Add safe CLI/operator review commands, synthetic fixtures, unit/property/
+  integration regressions, and a dedicated offline Linux validation workflow.
+- [ ] Run focused and inherited assurance, hostile self-review, record measured
+  evidence, publish only the candidate branch, and stop pending player-history
+  rights approval and capture.
+
 ## RUL-2026-27 independent full-ruleset review and remediation
 
 - Repository/branch: `sebgreenhalgh/dmf-pulse`,

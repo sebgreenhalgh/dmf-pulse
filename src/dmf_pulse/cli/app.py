@@ -21,6 +21,7 @@ from dmf_pulse.cli.gw1_cmd import gw1_app
 from dmf_pulse.cli.ingest_cmd import ingest_app
 from dmf_pulse.cli.market_cmd import market_app
 from dmf_pulse.cli.optimise import optimise_app
+from dmf_pulse.cli.player_evidence import player_evidence_app
 from dmf_pulse.cli.review_pack_cmd import review_pack_app
 from dmf_pulse.cli.rules_cmd import rules_app
 from dmf_pulse.cli.specs_cmd import specs_app
@@ -43,6 +44,7 @@ app.add_typer(fpl_points_app, name="fpl-points")
 app.add_typer(gw1_app, name="gw1")
 app.add_typer(ingest_app, name="ingest")
 app.add_typer(market_app, name="market")
+app.add_typer(player_evidence_app, name="player-evidence")
 app.add_typer(review_pack_app, name="review-pack")
 app.add_typer(rules_app, name="rules")
 app.add_typer(optimise_app, name="optimise")
