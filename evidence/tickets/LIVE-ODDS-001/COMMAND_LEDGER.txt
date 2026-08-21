@@ -77,7 +77,7 @@ PASS  focused client/credential/current branch-aware coverage command
       114 passed in 5.58s; combined coverage 90.39%; JSON retained as coverage.json
 PASS  uv build
       dmf_pulse-0.2.0-py3-none-any.whl (838107 bytes, sha256 d1f3877112cd755355ae9a988f9cf3070c15994fc21a5b5316b907a0a5b47ae8)
-      dmf_pulse-0.2.0.tar.gz (4120014 bytes, sha256 2a70b7376baee98214f50f4511494360bb3c499a9b992e51154d8a8ec0ee67af)
+      dmf_pulse-0.2.0.tar.gz built successfully. Its digest is deliberately not embedded here because ticket evidence is an sdist input and would make an in-artifact final digest self-referential.
 ENVIRONMENT_BLOCKED  uv run python scripts/verify_wheel.py
       DMF_TEST_DATABASE_URL is required for the canonical database-backed wheel verification.
 PASS  clean installed-wheel smoke outside the source tree with offline dependency resolution
@@ -90,4 +90,6 @@ PASS  mechanical active-manifest refresh required by repository assurance toolin
       evidence/tickets/PRC-013/current_manifest.json refreshed over the same 1134 deliverables; no historical narrative/result evidence changed.
 PASS  uv run python scripts/validate_repository.py after manifest refresh
       0 errors
+PASS  uv build from pushed checkpoint-04 tree 5e34434edfc89791138aa2876c315709c48631a4
+      wheel remained byte-identical at 838107 bytes / d1f3877112cd755355ae9a988f9cf3070c15994fc21a5b5316b907a0a5b47ae8; sdist built successfully with final ticket evidence included.
 NETWORK/CREDENTIAL  No provider call and no real credential or developer-secret inspection occurred during acceptance.
