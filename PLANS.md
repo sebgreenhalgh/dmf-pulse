@@ -1189,13 +1189,13 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Record the immutable v4 full-capture approval and extend the strict
   loader/live command only for that exact approval; preserve every consumed
   approval and reject arbitrary future records.
-- [ ] Prove all governance negative controls and reproduce the exact 599-player
+- [x] Prove all governance negative controls and reproduce the exact 599-player
   catalogue offline; publish the pre-capture SHA and require dedicated Ubuntu
   success before transport.
-- [ ] Execute exactly one serial 599-player capture with no retry and initially
+- [x] Execute exactly one serial 599-player capture with no retry and initially
   empty operator-controlled output paths outside the repository; stop the
   session on the first typed failure.
-- [ ] On complete success only, validate and publish permitted posterior,
+- [x] On complete success only, validate and publish permitted posterior,
   allocation, safe receipt, and deletion/transience artifacts; run final
   deterministic assurance without replaying network capture.
 

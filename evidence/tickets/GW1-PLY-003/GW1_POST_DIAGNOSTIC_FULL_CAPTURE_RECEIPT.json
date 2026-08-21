@@ -1,0 +1,117 @@
+{
+  "schema_version": "gw1-post-diagnostic-full-capture-receipt-v1",
+  "status": "CAPTURED_POSTERIOR_ONLY_NOT_HUMAN_ACCEPTED",
+  "approval": {
+    "approval_sha256": "2a4561b3ad7fa24cbe3b40f5a56e8b58251b3d6e8ec68881ed4d78c0d8579b4b",
+    "consumed": true,
+    "another_capture_requires_new_human_approval": true
+  },
+  "pre_capture_gate": {
+    "starting_sha": "afe02852ef4456c632835e85dd4cfe8333812d5f",
+    "governance_loader_sha": "f1647d2e5c957a201cc9f2a935f7330515a08f8e",
+    "dedicated_workflow_run_id": 32491759140,
+    "dedicated_workflow_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/32491759140",
+    "dedicated_workflow_head_sha": "f1647d2e5c957a201cc9f2a935f7330515a08f8e",
+    "dedicated_workflow_conclusion": "SUCCESS"
+  },
+  "source_governance": {
+    "scope": "PRIVATE_2026_27_GW1_ONLY",
+    "access_mode": "HUMAN_INITIATED_BOUNDED_UNAUTHENTICATED_TRANSIENT",
+    "retention": "POSTERIOR_ONLY",
+    "redistribution": "NONE",
+    "terms_fingerprint": "ad62cb745459df3282f8900117b85352a01d75754e080d06aa3836dcd2b2b246",
+    "manual_capture_timestamp": "2026-08-21T11:24:34Z",
+    "information_cutoff": "2026-08-21T17:30:00Z",
+    "bootstrap_file_sha256": "bafa4905cec85b9d4080d1e8fa16c390b5d05d2fff2069356b76ad75ad12cfce",
+    "fixtures_file_sha256": "18745575078b4bbf1c3a1c85862945e8d5ff15825130c68b4d11124e2c7bbc54",
+    "source_bootstrap_semantic_sha256": "4852cf5ac90b0da14874fb3bd3a34220eccf0ec040910c0ec204458090506a39",
+    "source_bundle_semantic_sha256": "dec4bca6d7351afee0219ae0dfcd98c802d75edbcccc352ecf91c0cdfaf16038",
+    "history_source_hash_commitment_sha256": "dbaae55e4c449b3dbb7c8e6a649adac3c755e21baae402a88cfba516fc533189"
+  },
+  "capture": {
+    "attempt_ordinal": 1,
+    "actual_request_count": 599,
+    "successful_response_count": 599,
+    "players_with_historical_seasons": 506,
+    "no_history_player_count": 93,
+    "capture_failure_count": 0,
+    "schema_failure_count": 0,
+    "post_cutoff_failure_count": 0,
+    "retry_occurred": false,
+    "serial_minimum_interval_seconds": 1.0,
+    "successful_observed_at_min": "2026-08-21T14:30:57.671833Z",
+    "successful_observed_at_max": "2026-08-21T14:41:25.812195Z"
+  },
+  "catalogue": {
+    "identity_mode": "GW1_STAGE7_TRANSIENT_SURROGATE",
+    "semantic_sha256": "9d655a2dc8e60eca0898f4bc04e8caf7b264887af1d62bfe61c5288cbdd75f11",
+    "player_count": 599,
+    "team_count": 20,
+    "position_counts": {
+      "GK": 67,
+      "DEF": 198,
+      "MID": 262,
+      "FWD": 72
+    },
+    "unresolved_current_player_mappings": 0,
+    "player_ids_match_stage7": true,
+    "team_ids_match_stage7": true
+  },
+  "coverage": {
+    "individual_goal_posterior_count": 482,
+    "individual_assist_posterior_count": 482,
+    "goalkeepers_with_individual_save_posterior_count": 56,
+    "role_or_position_fallback_count": 117,
+    "generic_fallback_count": 0,
+    "zero_exposure_discipline_rows_excluded_count": 1,
+    "players_affected_by_zero_exposure_discipline_exclusion": 1
+  },
+  "artifacts": {
+    "central_posterior": {
+      "path": "evidence/tickets/GW1-PLY-003/GW1_CURRENT_PLAYER_POSTERIOR_CENTRAL.json",
+      "artifact_sha256": "537b2ab3c19aba381e6020972cd037b3f62665309c423037049020f0d4f0239f",
+      "file_sha256": "25a094253ef854126ceb9183aa9d327201998f4ba4711d2afdc6ff779751f0f4"
+    },
+    "low_posterior": {
+      "path": "evidence/tickets/GW1-PLY-003/GW1_CURRENT_PLAYER_POSTERIOR_LOW.json",
+      "artifact_sha256": "2bba62e765c83ba0ed114e78d168311e1f33aa144143b121703af2e5acfedbec",
+      "file_sha256": "3ecd4187a845e1a1440f34c57b8b1fb90192df6ce8a8739e014e2f1e848ec920"
+    },
+    "high_posterior": {
+      "path": "evidence/tickets/GW1-PLY-003/GW1_CURRENT_PLAYER_POSTERIOR_HIGH.json",
+      "artifact_sha256": "b876b34d8669cf0acbaaa1a8136e90058573b4292c6dc016b7bf59e52992595e",
+      "file_sha256": "d3486942fc055c69b0f4a43bcadf6b5ae1d3722bc3cee0fd228be9bf2f5b01f4"
+    },
+    "allocation_candidate": {
+      "path": "evidence/tickets/GW1-PLY-003/GW1_CURRENT_PLAYER_ALLOCATION_CANDIDATE.json",
+      "artifact_sha256": "6902afe2a6a77524c1cdc9a36fadc7df43b5eb1817f216d44de551e666696c39",
+      "file_sha256": "53be9ada1e098eeeeb792ca2c16e3d462cb22ef6511f6ed79ac70a65cf7d6684"
+    },
+    "deletion_manifest": {
+      "path": "evidence/tickets/GW1-PLY-003/GW1_CURRENT_PLAYER_HISTORY_DELETION_MANIFEST.json",
+      "artifact_sha256": "095ac493c106427d0ec559aac4646ab8fffb46b1e3079d7c3ba0f8eb246b92f3",
+      "file_sha256": "a61f4a8e1bbd21d6a89d98b50d1e44e70737f1738300f66e94cd36c9cb8097e8"
+    }
+  },
+  "validation": {
+    "sensitivity_worlds_distinct": true,
+    "role_prior_lineage_valid": true,
+    "rights_approval_lineage_valid": true,
+    "no_history_fallback_valid": true,
+    "zero_exposure_discipline_lineage_valid": true,
+    "zero_minute_rate_events_fail_closed": true,
+    "stage7_expected_minutes_separate": true,
+    "raw_retention_scan_passed": true,
+    "current_catalogue_transience_scan_passed": true,
+    "defensive_contribution_model_completeness": "PARTIAL"
+  },
+  "state": {
+    "raw_fpl_history_persisted": false,
+    "current_fpl_catalogue_persisted": false,
+    "player_allocation_human_accepted": false,
+    "ready_for_current_player_allocation_human_review": true,
+    "real_odds_provider_call": "NOT_PERFORMED",
+    "production_activation": false
+  },
+  "receipt_sha256": "a97a1a0b903a8ae1fa1f72392f3fce4e9bb2c7126aad74202d0ac93edd3800fc"
+}

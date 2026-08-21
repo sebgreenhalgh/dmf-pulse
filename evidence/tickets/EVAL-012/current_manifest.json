@@ -238,7 +238,7 @@
     {
       "bytes": 92316,
       "path": "PLANS.md",
-      "sha256": "9ed762a6ed361be4fb6e32cea33c5d6fdb24997e18f956ee1875bcadfd5347d3"
+      "sha256": "8706517900efa48d4603a894ae0d79722f9ee4d1038259a7656d0e380824556b"
     },
     {
       "bytes": 2761,
@@ -5144,6 +5144,11 @@
       "bytes": 17699,
       "path": "tests/unit/player_evidence/test_history.py",
       "sha256": "62881bb39a1b6861a52adf6b8fac2f263fe68652405a6610f8db71344fc71cb4"
+    },
+    {
+      "bytes": 8834,
+      "path": "tests/unit/player_evidence/test_published_capture_artifacts.py",
+      "sha256": "b67599427ece2de08c180ff2cbc185d9671507840e6ca17189103daa90c8a7f2"
     },
     {
       "bytes": 12836,
