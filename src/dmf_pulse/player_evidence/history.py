@@ -142,6 +142,7 @@ class ParsedHistoryPast:
     seasons: tuple[HistoryPastSeason, ...]
     schema_fingerprint: str
     unknown_fields: tuple[str, ...]
+    zero_exposure_discipline_rows_excluded_count: int = 0
 
 
 @dataclass(frozen=True)
@@ -232,6 +233,7 @@ def parse_history_past(
     assert isinstance(raw_rows, list)
     seasons: list[HistoryPastSeason] = []
     unknown: set[str] = set()
+    zero_exposure_discipline_rows_excluded_count = 0
     for row in raw_rows:
         assert isinstance(row, Mapping)
         missing = _REQUIRED_FIELDS - set(row)
@@ -252,6 +254,14 @@ def parse_history_past(
         yellow_cards = _int(row["yellow_cards"], field="yellow_cards")
         red_cards = _int(row["red_cards"], field="red_cards")
         saves = _int(row.get("saves", 0), field="saves")
+        if minutes == 0 and any(value > 0 for value in (goals, assists, saves)):
+            raise _history_error(
+                "HISTORY_MODEL_VALIDATION_FAILED",
+                model_validation_reason="ZERO_MINUTE_RATE_EVENT",
+            )
+        if minutes == 0 and (yellow_cards > 0 or red_cards > 0):
+            zero_exposure_discipline_rows_excluded_count += 1
+            continue
         history_season: HistoryPastSeason | None = None
         model_failure = False
         try:
@@ -267,13 +277,10 @@ def parse_history_past(
         except ValidationError:
             model_failure = True
         if model_failure:
-            reason = (
-                "ZERO_MINUTE_POSITIVE_EVENT"
-                if minutes == 0
-                and any(value > 0 for value in (goals, assists, yellow_cards, red_cards, saves))
-                else "HISTORY_PAST_SEASON"
+            raise _history_error(
+                "HISTORY_MODEL_VALIDATION_FAILED",
+                model_validation_reason="HISTORY_PAST_SEASON",
             )
-            raise _history_error("HISTORY_MODEL_VALIDATION_FAILED", model_validation_reason=reason)
         assert history_season is not None
         seasons.append(history_season)
     ordered = tuple(sorted(seasons, key=lambda item: item.season))
@@ -283,6 +290,7 @@ def parse_history_past(
         seasons=ordered,
         schema_fingerprint=fingerprint,
         unknown_fields=tuple(sorted(unknown)),
+        zero_exposure_discipline_rows_excluded_count=(zero_exposure_discipline_rows_excluded_count),
     )
 
 
@@ -397,7 +405,7 @@ def _capture_failure(
     }
     reason = error.details.get("model_validation_reason")
     if reason in {
-        "ZERO_MINUTE_POSITIVE_EVENT",
+        "ZERO_MINUTE_RATE_EVENT",
         "HISTORY_PAST_SEASON",
         "PLAYER_HISTORY_EVIDENCE",
         "UNEXPECTED_CAPTURE_VALUE_ERROR",
@@ -487,6 +495,9 @@ def capture_approved_history(
                     player_id=player.player_id,
                     source_player_id=player.source_player_id,
                     seasons=parsed.seasons,
+                    zero_exposure_discipline_rows_excluded_count=(
+                        parsed.zero_exposure_discipline_rows_excluded_count
+                    ),
                 )
             except ValidationError:
                 evidence_model_failure = True

@@ -98,11 +98,20 @@ def _posterior_player(
     rights_profile_id: str,
 ) -> PlayerPosterior:
     seasons = history.seasons if history is not None else ()
+    excluded_count = (
+        history.zero_exposure_discipline_rows_excluded_count if history is not None else 0
+    )
     exposure, totals = _weighted_history(seasons, parameters=parameters)
     return PlayerPosterior(
         player_id=player.player_id,
         source_player_id=player.source_player_id,
         history_seasons_included=tuple(season.season for season in seasons),
+        zero_exposure_discipline_rows_excluded_count=excluded_count,
+        history_limitations=(
+            ("ZERO_EXPOSURE_DISCIPLINE_ONLY_EXCLUDED_FROM_RATE_MODEL",)
+            if excluded_count > 0
+            else ()
+        ),
         goal_rate=gamma_poisson_posterior(
             prior_mean_per90=prior.goal_rate_per90,
             kappa=parameters.goal_kappa_full_match_equivalents,
@@ -263,11 +272,13 @@ def compile_posterior_artifact(
             )
         )
     ordered = tuple(sorted(players, key=lambda item: str(item.player_id)))
+    exclusion_count = sum(player.zero_exposure_discipline_rows_excluded_count for player in ordered)
     provisional = PlayerPosteriorArtifact.model_construct(
         information_cutoff=cutoff,
         produced_at=produced_at.astimezone(UTC),
         parameters=parameters,
         players=ordered,
+        zero_exposure_discipline_rows_excluded_count=exclusion_count,
         artifact_sha256="0" * 64,
     )
     return PlayerPosteriorArtifact(
@@ -275,6 +286,7 @@ def compile_posterior_artifact(
         produced_at=produced_at.astimezone(UTC),
         parameters=parameters,
         players=ordered,
+        zero_exposure_discipline_rows_excluded_count=exclusion_count,
         artifact_sha256=canonical_sha256(
             provisional.model_dump(mode="json", exclude={"artifact_sha256"})
         ),

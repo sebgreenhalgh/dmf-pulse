@@ -220,10 +220,15 @@ def _build_profiles(
                 auxiliary_source_level=prior.source_level,
                 fallback_reason=prior.fallback_reason,
                 prior_version=prior.prior_version,
-                limitations=(
-                    "ROLE_PRIOR_REAL_CALIBRATION_SEPARATE_CHECKPOINT",
-                    "BPS_AUXILIARY_ROLE_POOLED_NOT_INDIVIDUAL_RECONSTRUCTION",
-                    "STAGE7_PARTICIPATION_OWNS_MINUTES_AND_ON_PITCH_ELIGIBILITY",
+                limitations=tuple(
+                    sorted(
+                        {
+                            "ROLE_PRIOR_REAL_CALIBRATION_SEPARATE_CHECKPOINT",
+                            "BPS_AUXILIARY_ROLE_POOLED_NOT_INDIVIDUAL_RECONSTRUCTION",
+                            "STAGE7_PARTICIPATION_OWNS_MINUTES_AND_ON_PITCH_ELIGIBILITY",
+                            *row.history_limitations,
+                        }
+                    )
                 ),
             )
         )
@@ -277,6 +282,8 @@ def build_allocation_candidate(
     }
     if degraded_player_allocation:
         limitations.add("DEGRADED_PLAYER_ALLOCATION_TRUE_INDIVIDUAL_HISTORY_INACTIVE")
+    if posterior.zero_exposure_discipline_rows_excluded_count > 0:
+        limitations.add("ZERO_EXPOSURE_DISCIPLINE_ONLY_EXCLUDED_FROM_RATE_MODEL")
     if any(
         override.override_kind is OverrideKind.PRIMARY_MATERIAL_SET_PIECE
         and override.usable_at <= cutoff < override.expires_at

@@ -117,12 +117,12 @@ def test_parser_rejects_duplicate_season_and_goalkeeper_without_saves() -> None:
     assert goalkeeper.value.code == "HISTORY_GOALKEEPER_SAVES_MISSING"
 
 
-@pytest.mark.parametrize(
-    "event_field", ("goals_scored", "assists", "yellow_cards", "red_cards", "saves")
-)
-def test_zero_minute_positive_event_remains_a_distinct_model_failure(event_field: str) -> None:
+@pytest.mark.parametrize("event_field", ("goals_scored", "assists", "saves"))
+def test_zero_minute_rate_event_remains_a_distinct_model_failure(event_field: str) -> None:
     row = dict(_payload()["history_past"][0])
     row["minutes"] = 0
+    for field in ("goals_scored", "assists", "yellow_cards", "red_cards", "saves"):
+        row[field] = 0
     row[event_field] = 1
     with pytest.raises(IngestionError) as raised:
         parse_history_past(
@@ -131,7 +131,60 @@ def test_zero_minute_positive_event_remains_a_distinct_model_failure(event_field
             is_goalkeeper=event_field == "saves",
         )
     assert raised.value.code == "HISTORY_MODEL_VALIDATION_FAILED"
-    assert raised.value.details == {"model_validation_reason": "ZERO_MINUTE_POSITIVE_EVENT"}
+    assert raised.value.details == {"model_validation_reason": "ZERO_MINUTE_RATE_EVENT"}
+
+
+@pytest.mark.parametrize(
+    "discipline",
+    (
+        {"yellow_cards": 1},
+        {"red_cards": 1},
+        {"yellow_cards": 1, "red_cards": 1},
+    ),
+)
+def test_zero_exposure_discipline_row_is_accepted_but_excluded_from_rate_model(
+    discipline: dict[str, int],
+) -> None:
+    excluded = dict(_payload()["history_past"][0])
+    excluded.update(
+        {
+            "season_name": "2024/25",
+            "minutes": 0,
+            "goals_scored": 0,
+            "assists": 0,
+            "yellow_cards": 0,
+            "red_cards": 0,
+            "saves": 0,
+            **discipline,
+        }
+    )
+    valid = dict(_payload()["history_past"][0])
+    parsed = parse_history_past(
+        {"history_past": [excluded, valid]},
+        current_season="2026/27",
+        is_goalkeeper=True,
+    )
+    assert parsed.zero_exposure_discipline_rows_excluded_count == 1
+    assert tuple(row.season for row in parsed.seasons) == ("2025/26",)
+    assert parsed.seasons[0].minutes == 900
+    assert parsed.seasons[0].yellow_cards == 3
+
+
+def test_zero_minute_mixed_discipline_and_rate_event_still_fails_closed() -> None:
+    row = dict(_payload()["history_past"][0])
+    row.update(
+        {
+            "minutes": 0,
+            "goals_scored": 1,
+            "assists": 0,
+            "yellow_cards": 1,
+            "red_cards": 0,
+            "saves": 0,
+        }
+    )
+    with pytest.raises(IngestionError) as raised:
+        parse_history_past({"history_past": [row]}, current_season="2026/27", is_goalkeeper=True)
+    assert raised.value.details == {"model_validation_reason": "ZERO_MINUTE_RATE_EVENT"}
 
 
 class _NeverTransport:
@@ -436,5 +489,5 @@ def test_serial_model_failure_stops_once_and_retains_only_safe_progress() -> Non
         successes=2,
         stage="MODEL",
     )
-    assert raised.value.details["model_validation_reason"] == "ZERO_MINUTE_POSITIVE_EVENT"
+    assert raised.value.details["model_validation_reason"] == "ZERO_MINUTE_RATE_EVENT"
     assert transport.calls == 3

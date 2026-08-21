@@ -1172,10 +1172,10 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Prove the diagnostic governance, identity/ordinal binding, safe-output
   contract, one-request bound, and no-retry behavior with synthetic tests;
   run all required offline validation before any provider request.
-- [ ] Publish the pre-request code SHA and require a successful dedicated
+- [x] Publish the pre-request code SHA and require a successful dedicated
   Ubuntu run on that exact revision before exercising the one approved
   diagnostic request.
-- [ ] Execute exactly one diagnostic request, persist no raw source or current
+- [x] Execute exactly one diagnostic request, persist no raw source or current
   catalogue, and conditionally implement the narrow discipline-only exclusion
   policy only if the safe boolean signature authorizes it.
 - [ ] Run the complete conditional regression/static/build/security suite,

@@ -154,6 +154,58 @@ def test_no_history_returns_pooled_prior_and_rare_events_shrink() -> None:
     assert prior.red_rate_per90 < red.mean_per90 < 1.0
 
 
+def test_zero_exposure_discipline_exclusion_has_explicit_zero_rate_evidence_lineage() -> None:
+    excluded_only_player = _catalogue_player(H_MID)
+    valid_player = _catalogue_player(H_FWD)
+    excluded_only = PlayerHistoryEvidence(
+        player_id=excluded_only_player.player_id,
+        source_player_id=excluded_only_player.source_player_id,
+        seasons=(),
+        zero_exposure_discipline_rows_excluded_count=3,
+    )
+    valid_with_exclusion = _history(
+        H_FWD,
+        valid_player.source_player_id,
+        minutes=900,
+        goals=4,
+        assists=2,
+        yellow_cards=2,
+        red_cards=1,
+    ).model_copy(update={"zero_exposure_discipline_rows_excluded_count": 1})
+    valid_without_exclusion = valid_with_exclusion.model_copy(
+        update={"zero_exposure_discipline_rows_excluded_count": 0}
+    )
+
+    posterior = _posterior((excluded_only, valid_with_exclusion))
+    repeated = _posterior((excluded_only, valid_with_exclusion))
+    control = _posterior((valid_without_exclusion,))
+    rows = {str(row.player_id): row for row in posterior.players}
+    control_rows = {str(row.player_id): row for row in control.players}
+    prior = generic_prior()
+
+    assert posterior.artifact_sha256 == repeated.artifact_sha256
+    assert posterior.zero_exposure_discipline_rows_excluded_count == 4
+    assert rows[H_MID].posterior_effective_minutes == 0.0
+    assert rows[H_MID].yellow_rate.mean_per90 == prior.yellow_rate_per90
+    assert rows[H_MID].red_rate.mean_per90 == prior.red_rate_per90
+    assert rows[H_MID].history_seasons_included == ()
+    assert rows[H_MID].zero_exposure_discipline_rows_excluded_count == 3
+    assert rows[H_FWD].history_seasons_included == ("2025/26",)
+    assert (
+        rows[H_FWD].posterior_effective_minutes == control_rows[H_FWD].posterior_effective_minutes
+    )
+    assert rows[H_FWD].yellow_rate == control_rows[H_FWD].yellow_rate
+    assert rows[H_FWD].red_rate == control_rows[H_FWD].red_rate
+    assert rows[H_FWD].history_limitations == (
+        "ZERO_EXPOSURE_DISCIPLINE_ONLY_EXCLUDED_FROM_RATE_MODEL",
+    )
+
+    allocation = _allocation(posterior)
+    assert "ZERO_EXPOSURE_DISCIPLINE_ONLY_EXCLUDED_FROM_RATE_MODEL" in allocation.limitations
+    lineage = {str(row.player_id): row for row in allocation.lineage}
+    assert "ZERO_EXPOSURE_DISCIPLINE_ONLY_EXCLUDED_FROM_RATE_MODEL" in lineage[H_MID].limitations
+
+
 def test_recency_and_sensitivity_worlds_are_deterministic_and_declared() -> None:
     player = _catalogue_player(H_MID)
     history = _history(

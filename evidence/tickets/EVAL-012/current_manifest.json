@@ -238,7 +238,7 @@
     {
       "bytes": 91314,
       "path": "PLANS.md",
-      "sha256": "744a7fbf212ab60eaf445d585f69b81351d2543fa63ccd25f7e5702049dd6ffe"
+      "sha256": "aaa9af918c8870bc8931990277a2efdf8dce8ad99c93d05c3e55b74a5528a75f"
     },
     {
       "bytes": 2761,
@@ -2856,9 +2856,9 @@
       "sha256": "9c77ca0e9d895f3cb2b90fcf0979c6b52c75e51da473c11a8a578c14b9e5ff4a"
     },
     {
-      "bytes": 32295,
+      "bytes": 32441,
       "path": "src/dmf_pulse/cli/player_evidence.py",
-      "sha256": "3407d5af61983600e564e3752e58af76ea7a7028cd35b8e2434fd1f0fe409d46"
+      "sha256": "3356a7530180b0515b439ba1a69dd37fedac482d903aa4038faddd630b8fcd18"
     },
     {
       "bytes": 1660,
@@ -3681,24 +3681,24 @@
       "sha256": "b7238db92714d073e3067895ee60aa00b1e4153dfce6e3eda0bd5eb68a6a9ddb"
     },
     {
-      "bytes": 11121,
+      "bytes": 11718,
       "path": "src/dmf_pulse/player_evidence/empirical_bayes.py",
-      "sha256": "3fd518549544f9dfe640a526979fe18a53b751bbe04fb9311d351dcba283d3ac"
+      "sha256": "ee7f3e147ac8293345fc9682c83a5ea20ce11105ec3d2c5f760fa5faad30a7fd"
     },
     {
-      "bytes": 21315,
+      "bytes": 21891,
       "path": "src/dmf_pulse/player_evidence/history.py",
-      "sha256": "2f336d616d79292792a3f02efdbe75fac65c8709267ed0bad08c5f80719dcb68"
+      "sha256": "df4436be121b54e7cc2fe5f63e064412cd3ef2a981cf61feef67d19145848b60"
     },
     {
-      "bytes": 23819,
+      "bytes": 24886,
       "path": "src/dmf_pulse/player_evidence/models.py",
-      "sha256": "e98936537431c847ba66ccf15ca99bac6f7df219cafaf73fa5adcb87513c70da"
+      "sha256": "858ac56409dc9dfb10b7f37c926c5cd1af3796c24dd653ec30baf35ce9d34c2b"
     },
     {
-      "bytes": 12916,
+      "bytes": 13250,
       "path": "src/dmf_pulse/player_evidence/profiles.py",
-      "sha256": "5c5c6b7e40d535e02906226ccf648c7ce2a97958f8a14ac1ce5fd817f986d903"
+      "sha256": "22aeee58be00f976447df5e07a717b4e55f8405edd1e564b4c15049c5c84280d"
     },
     {
       "bytes": 58111,
@@ -5136,14 +5136,14 @@
       "sha256": "f0a2ac17e74dc0b7ee3d6e02a1e217e964a20188d83757ffd817f32ed984ecb1"
     },
     {
-      "bytes": 18028,
+      "bytes": 20418,
       "path": "tests/unit/player_evidence/test_empirical_bayes_profiles.py",
-      "sha256": "c121c5ab3333142c9190cfa6e6f3d21856d10d92070ac3c372afa19f918e7d2a"
+      "sha256": "5fc88a312e963ecf272c243fa06e4507f40c63c58c526bebe35be4e890eaebf2"
     },
     {
-      "bytes": 16027,
+      "bytes": 17699,
       "path": "tests/unit/player_evidence/test_history.py",
-      "sha256": "dfbcd71415489356b238beba741a5d624921b32c99bc28f417a510c7e1272aec"
+      "sha256": "62881bb39a1b6861a52adf6b8fac2f263fe68652405a6610f8db71344fc71cb4"
     },
     {
       "bytes": 12836,
@@ -5151,9 +5151,9 @@
       "sha256": "55e0dcccc04039b6710d269819cb621e0c43bafff44e7822f337929a28f8fcd9"
     },
     {
-      "bytes": 9952,
+      "bytes": 10864,
       "path": "tests/unit/player_evidence/test_zero_minute_diagnostic.py",
-      "sha256": "2b5971b06df94ac05c39b56ff62d209ce9929b5010d26524a6f92f92aa6b2bcc"
+      "sha256": "3af2258399ce3b924679709a32915bb6d388d0611ce0c830a7e9a66c7dc8ac5a"
     },
     {
       "bytes": 5609,

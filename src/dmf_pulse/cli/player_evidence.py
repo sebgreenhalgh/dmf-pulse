@@ -609,6 +609,9 @@ def capture_current_history_command(
             "successful_history_count": len(capture.evidence),
             "team_ids_match_stage7": True,
             "unresolved_current_player_mappings": 0,
+            "zero_exposure_discipline_rows_excluded_count": (
+                central.zero_exposure_discipline_rows_excluded_count
+            ),
         }
         del bundle
         del catalogue

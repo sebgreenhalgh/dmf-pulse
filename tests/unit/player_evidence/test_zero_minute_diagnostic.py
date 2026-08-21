@@ -11,6 +11,7 @@ from urllib.request import Request
 
 import pytest
 
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.player_evidence import zero_minute_diagnostic as diagnostic_module
 from dmf_pulse.player_evidence.approvals import load_player_history_rights_approval
@@ -252,3 +253,24 @@ def test_diagnostic_loader_is_exact_and_cannot_authorize_bulk_capture(
             source, expected_approval_sha256=DIAGNOSTIC_APPROVAL_SHA256
         )
     assert bulk_error.value.code == "RIGHTS_APPROVAL_HASH_MISMATCH"
+
+
+def test_safe_live_diagnostic_receipt_is_hash_bound_and_contains_no_raw_rows(
+    repository_root: Path,
+) -> None:
+    path = (
+        repository_root
+        / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_ZERO_MINUTE_DIAGNOSTIC_RESULT.json"
+    )
+    value = json.loads(path.read_text(encoding="utf-8"))
+    expected = value.pop("diagnostic_result_sha256")
+    assert canonical_sha256(value) == expected
+    assert value["diagnostic_request_count"] == 1
+    assert value["live_requests_after_diagnostic"] == 0
+    assert value["raw_fpl_history_persisted"] is False
+    assert value["current_fpl_catalogue_persisted"] is False
+    rendered = path.read_text(encoding="utf-8")
+    assert '"history_past"' not in rendered
+    assert '"season_name"' not in rendered
+    assert '"minutes"' not in rendered
+    assert '"yellow_cards"' not in rendered

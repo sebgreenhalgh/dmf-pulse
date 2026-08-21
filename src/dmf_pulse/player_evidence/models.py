@@ -170,11 +170,10 @@ class HistoryPastSeason(_Model):
         start = int(self.season[:4])
         if int(self.season[-2:]) != (start + 1) % 100:
             raise ValueError("history season is malformed")
-        if self.minutes == 0 and any(
-            value > 0
-            for value in (self.goals, self.assists, self.yellow_cards, self.red_cards, self.saves)
-        ):
-            raise ValueError("zero-minute history cannot contain events")
+        if self.minutes == 0 and any(value > 0 for value in (self.goals, self.assists, self.saves)):
+            raise ValueError("zero-minute rate events are invalid")
+        if self.minutes == 0 and any(value > 0 for value in (self.yellow_cards, self.red_cards)):
+            raise ValueError("zero-exposure discipline must be excluded before the rate model")
         return self
 
 
@@ -182,6 +181,7 @@ class PlayerHistoryEvidence(_Model):
     player_id: UUID
     source_player_id: int = Field(gt=0)
     seasons: tuple[HistoryPastSeason, ...]
+    zero_exposure_discipline_rows_excluded_count: int = Field(default=0, ge=0)
 
     @model_validator(mode="after")
     def seasons_are_unique_and_sorted(self) -> Self:
@@ -397,6 +397,10 @@ class PlayerPosterior(_Model):
     player_id: UUID
     source_player_id: int = Field(gt=0)
     history_seasons_included: tuple[str, ...]
+    zero_exposure_discipline_rows_excluded_count: int = Field(default=0, ge=0)
+    history_limitations: tuple[
+        Literal["ZERO_EXPOSURE_DISCIPLINE_ONLY_EXCLUDED_FROM_RATE_MODEL"], ...
+    ] = ()
     goal_rate: PosteriorRate
     assist_rate: PosteriorRate
     yellow_rate: PosteriorRate
@@ -426,6 +430,13 @@ class PlayerPosterior(_Model):
     def temporal_order_is_valid(self) -> Self:
         if self.usable_at < self.source_observed_at:
             raise ValueError("posterior usable_at precedes source observation")
+        expected_limitation = (
+            ("ZERO_EXPOSURE_DISCIPLINE_ONLY_EXCLUDED_FROM_RATE_MODEL",)
+            if self.zero_exposure_discipline_rows_excluded_count > 0
+            else ()
+        )
+        if self.history_limitations != expected_limitation:
+            raise ValueError("posterior history exclusion lineage is inconsistent")
         return self
 
 
@@ -440,6 +451,7 @@ class PlayerPosteriorArtifact(_Model):
     produced_at: datetime
     parameters: EmpiricalBayesParameters
     players: tuple[PlayerPosterior, ...] = Field(min_length=1)
+    zero_exposure_discipline_rows_excluded_count: int = Field(ge=0)
     raw_history_persisted: Literal[False] = False
     artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -457,6 +469,10 @@ class PlayerPosteriorArtifact(_Model):
             raise ValueError("posterior players must be unique and sorted")
         if any(player.usable_at > self.information_cutoff for player in self.players):
             raise ValueError("posterior is post-cutoff")
+        if self.zero_exposure_discipline_rows_excluded_count != sum(
+            player.zero_exposure_discipline_rows_excluded_count for player in self.players
+        ):
+            raise ValueError("posterior history exclusion count is inconsistent")
         expected = canonical_sha256(self.model_dump(mode="json", exclude={"artifact_sha256"}))
         if self.artifact_sha256 != expected:
             raise ValueError("posterior artifact hash is invalid")
