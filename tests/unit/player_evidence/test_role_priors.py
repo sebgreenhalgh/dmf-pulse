@@ -283,6 +283,14 @@ def test_goal_penalty_assist_gk_and_unsupported_field_handling(tmp_path: Path) -
     )
     assert generic["blocks_per90"].prior_mean == 0.0
     assert candidate.calibration.excluded_non_goalkeeper_save_events == 0
+    fwd_save = next(
+        cell
+        for cell in candidate.cells
+        if cell.shrinkage_group_id == "wyscout-epl-2017-18-fpl-fwd"
+        and cell.field == "save_rate_per90"
+    )
+    assert fwd_save.prior_mean == 0.0
+    assert fwd_save.mapping_quality is MappingQuality.UNSUPPORTED_BY_SOURCE
 
 
 @pytest.mark.unit

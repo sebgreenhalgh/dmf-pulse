@@ -874,6 +874,36 @@ def _fallback_cell(
     )
 
 
+def _non_goalkeeper_save_cell(
+    *, group: _Group, player_ids: set[int], minutes: Mapping[int, float]
+) -> RolePriorCell:
+    """Keep a goalkeeper-only profile field exactly zero for non-goalkeeper pools."""
+
+    return RolePriorCell(
+        field="save_rate_per90",
+        shrinkage_group_id=group.shrinkage_group_id,
+        position=group.position,
+        tactical_role=group.tactical_role,
+        estimator="POSITION_NOT_APPLICABLE_ZERO_V1",
+        player_count=len(player_ids),
+        exposure_minutes=sum(minutes[player_id] for player_id in player_ids),
+        event_count=None,
+        raw_pooled_rate=None,
+        prior_mean=0.0,
+        prior_variance=None,
+        interval_low=None,
+        interval_high=None,
+        support_level=SupportLevel.UNSUPPORTED,
+        minimum_support_met=False,
+        mapping_quality=MappingQuality.UNSUPPORTED_BY_SOURCE,
+        source_definition_reference=(
+            "Goalkeeper saves are position-specific. Non-goalkeeper pools receive no smoothed "
+            "save rate and are not treated as a source measurement."
+        ),
+        fallback_level="POSITION_NOT_APPLICABLE_ZERO",
+    )
+
+
 def _moment_kappa(
     *, event_key: str, minutes: Mapping[int, float], counts: Mapping[int, Counter[str]]
 ) -> KappaAttempt:
@@ -1148,7 +1178,6 @@ def build_role_prior_candidate(
             ("assist_rate_per90", "assists"),
             ("yellow_rate_per90", "yellow_cards"),
             ("red_rate_per90", "red_cards"),
-            ("save_rate_per90", "saves"),
             ("own_goal_weight", "own_goals"),
             ("clearances_per90", "clearances"),
             ("interceptions_per90", "interceptions"),
@@ -1171,6 +1200,19 @@ def build_role_prior_candidate(
                 event_key=event_key,
                 fallback=generic_cells[field],
             )
+        group_cells["save_rate_per90"] = (
+            _count_cell(
+                field="save_rate_per90",
+                group=group,
+                player_ids=player_ids,
+                minutes=minutes,
+                counts=counts,
+                event_key="saves",
+                fallback=generic_cells["save_rate_per90"],
+            )
+            if group.position is PlayerPosition.GK
+            else _non_goalkeeper_save_cell(group=group, player_ids=player_ids, minutes=minutes)
+        )
         group_cells["pass_completion_probability"] = _pass_completion_cell(
             group=group,
             player_ids=player_ids,
