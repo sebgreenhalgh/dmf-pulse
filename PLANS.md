@@ -25,7 +25,7 @@
 - [x] 03 port the provider-native current-input boundary and remediate additive market drift while
   preserving mandatory H2H, totals degradation, rights, cutoff, and provenance invariants; commit
   and push.
-- [ ] 04 run adversarial self-review, focused branch coverage, inherited regressions, repository
+- [x] 04 run adversarial self-review, focused branch coverage, inherited regressions, repository
   validation, secret scan, Ruff, strict mypy, build, installed-wheel smoke, final evidence, commit,
   push, and remote-equality verification.
 

@@ -1,0 +1,25 @@
+{
+  "branch": "integration/post-gw1/LIVE-ODDS-001-production-live-odds",
+  "checkpoint_commits": [
+    "91e5a92",
+    "12ba082",
+    "fbcd185"
+  ],
+  "coverage": {
+    "combined_branch_aware_percent": 90.3899721448468,
+    "focused_tests_passed": 114,
+    "report": "evidence/tickets/LIVE-ODDS-001/coverage.json"
+  },
+  "evidence_binding": {
+    "kind": "repository-deliverables-manifest",
+    "path": "evidence/tickets/LIVE-ODDS-001/current_manifest.json"
+  },
+  "historical_merge_base": "9eb57143f6ee92f67c78607cc386678d962e62d4",
+  "immutable_parent": "baed47bce7a158d91afe38351a2c65be60444adf",
+  "independent_review": "PENDING",
+  "provider_network_called": false,
+  "readiness_donor": "d4cc759d4600489c21ba738cfc9b357cc380554e",
+  "real_credential_read": false,
+  "status": "ENGINEERING_COMPLETE_PENDING_INDEPENDENT_REVIEW",
+  "ticket_id": "LIVE-ODDS-001"
+}

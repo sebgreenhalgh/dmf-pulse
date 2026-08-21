@@ -28,6 +28,21 @@ from dmf_pulse.markets.models import canonical_decimal_text
 
 CONTRACT_VERSION = "the-odds-api-v4-reference-v1"
 SOURCE_PRICE_PATTERN = re.compile(r"^(?:1\.\d*[1-9]\d*|(?:[2-9]\d*|1\d+)\.\d+)$")
+_SECRET_FIELD_FRAGMENTS = (
+    "api_key",
+    "apikey",
+    "authorization",
+    "client_secret",
+    "cookie",
+    "credential",
+    "password",
+    "passwd",
+    "private_key",
+    "secret",
+    "session",
+    "token",
+)
+_REDACTED_PROVIDER_VALUE = "<redacted>"
 
 
 class _SourceDecimal(Decimal):
@@ -179,6 +194,24 @@ def _strict_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
 
 def _reject_constant(value: str) -> object:
     raise ValueError(f"invalid numeric constant {value}")
+
+
+def _redact_secret_like_provider_fields(value: object) -> object:
+    """Remove unexpected secret values while retaining field names for quality blocking."""
+
+    if isinstance(value, dict):
+        redacted: dict[str, object] = {}
+        for key, child in value.items():
+            normalized = key.casefold().replace("-", "_")
+            redacted[key] = (
+                _REDACTED_PROVIDER_VALUE
+                if any(fragment in normalized for fragment in _SECRET_FIELD_FRAGMENTS)
+                else _redact_secret_like_provider_fields(child)
+            )
+        return redacted
+    if isinstance(value, list):
+        return [_redact_secret_like_provider_fields(item) for item in value]
+    return value
 
 
 def _decode_utf8(body: bytes) -> str | None:
@@ -495,7 +528,10 @@ def parse_odds_payload(body: bytes) -> ParsedOddsPayload:
     _check_numeric_limits(raw, config.max_text_length)
     # JSON arrays are decoded as lists. Permit that representation at the
     # model boundary while strict field validators reject provider coercions.
-    events, invalid_paths = _parse_events(raw, config)
+    safe_raw = _redact_secret_like_provider_fields(raw)
+    if not isinstance(safe_raw, list):  # pragma: no cover - top-level list invariant
+        raise IngestionError("INTERNAL_INVARIANT", "provider response redaction failed")
+    events, invalid_paths = _parse_events(safe_raw, config)
     if events is None:
         raise IngestionError(
             "VALIDATION_FAILED",

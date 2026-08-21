@@ -275,6 +275,8 @@ def test_tr04_valid_json_response_envelope_keeps_only_safe_headers() -> None:
         "x-request-id",
     }
     assert SENTINEL not in repr(result)
+    with pytest.raises(TypeError):
+        result.headers["x-request-id"] = SENTINEL  # type: ignore[index]
 
 
 @pytest.mark.parametrize(

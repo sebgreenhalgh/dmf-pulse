@@ -225,8 +225,12 @@ def test_pd08_secret_like_unexpected_material_remains_blocking(repository_root: 
     _append_additive_market(value, "future_market")
     value[0]["bookmakers"][0]["markets"][-1]["apiKey"] = sentinel
 
+    parsed = parse_odds_payload(_body(value))
+    assert sentinel not in repr(parsed)
+    assert sentinel not in parsed.events[0].model_dump_json()
+
     with pytest.raises(IngestionError) as raised:
-        _build(parse_odds_payload(_body(value)))
+        _build(parsed)
 
     assert raised.value.code == "QUALITY_BLOCKED"
     assert "SECRET_LIKE_PROVIDER_FIELD" in raised.value.details["blockers"]

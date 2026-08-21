@@ -47,3 +47,47 @@ PASS  uv run mypy src/dmf_pulse/ingestion/odds
       Success: no issues found in 10 source files
 PASS  uv run ruff check (odds package, ticket tests, affected inherited/integration tests)
 NETWORK/CREDENTIAL  Offline fixtures and fakes only; no provider request or runtime credential read.
+
+CHECKPOINT 04 FINAL HARDENING AND ACCEPTANCE
+PASS  uv sync --all-groups --frozen
+      Checked 40 packages
+PASS  uv run ruff format --check .
+      641 files already formatted
+PASS  uv run ruff check .
+      All checks passed
+PASS  uv run mypy src/dmf_pulse
+      Success: no issues found in 247 source files
+EXPECTED_MANIFEST_DRIFT  uv run python scripts/validate_repository.py
+      28 errors, all intentional changed/unrecorded deliverable hashes before the permitted final manifest refresh; the command-generated GCS-008 report is revalidated later.
+PASS  uv run python scripts/scan_secrets.py
+      0 findings
+ENVIRONMENT_BLOCKED  broader Odds/security suite including PostgreSQL retention tests
+      313 passed, 4 setup errors in 28.52s; every error was absent DMF_TEST_DATABASE_URL and no behavioral test failed.
+PASS  focused non-database Odds/markets suite
+      309 passed in 31.15s on final hardened source
+PASS  uv run pytest -q -m unit tests/unit
+      1998 passed, 452 deselected, 77 inherited Pydantic adversarial-test warnings in 88.22s
+PASS  uv run pytest -q -m property tests/property
+      88 passed, 23 deselected, 3 inherited warnings in 44.66s
+PASS  uv run pytest -q -m contract tests/contract
+      72 passed, 68 deselected in 5.88s
+PASS  uv run pytest -q -m security tests/security --ignore=tests/security/test_odds_credentials_quota_retention.py
+      27 passed, 6 deselected in 1.96s; the excluded file's non-database coverage is included in the focused attempts and its four database cases are environment-blocked above.
+PASS  focused client/credential/current branch-aware coverage command
+      114 passed in 5.58s; combined coverage 90.39%; JSON retained as coverage.json
+PASS  uv build
+      dmf_pulse-0.2.0-py3-none-any.whl (838107 bytes, sha256 d1f3877112cd755355ae9a988f9cf3070c15994fc21a5b5316b907a0a5b47ae8)
+      dmf_pulse-0.2.0.tar.gz (4120014 bytes, sha256 2a70b7376baee98214f50f4511494360bb3c499a9b992e51154d8a8ec0ee67af)
+ENVIRONMENT_BLOCKED  uv run python scripts/verify_wheel.py
+      DMF_TEST_DATABASE_URL is required for the canonical database-backed wheel verification.
+PASS  clean installed-wheel smoke outside the source tree with offline dependency resolution
+      imported from isolated site-packages; dmf 0.2.0; packaged markets h2h,totals; cost 2; ODDS_PROVIDER_CURRENT_INPUT present; default transport stdlib_http_client; temporary environment removed.
+PASS  same-agent hostile review
+      P0 0; P1 1 found/closed; material P2 1 found/closed. See FINAL_SELF_REVIEW.md.
+PASS  uv run python scripts/generate_repository_manifest.py --ticket LIVE-ODDS-001
+      1134 deliverable files; manifest sha256 5814ec11369ee50597e4c45501da8462b6be11694d7589d809d7479b0fe9f454
+PASS  mechanical active-manifest refresh required by repository assurance tooling
+      evidence/tickets/PRC-013/current_manifest.json refreshed over the same 1134 deliverables; no historical narrative/result evidence changed.
+PASS  uv run python scripts/validate_repository.py after manifest refresh
+      0 errors
+NETWORK/CREDENTIAL  No provider call and no real credential or developer-secret inspection occurred during acceptance.

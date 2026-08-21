@@ -12,6 +12,7 @@ import urllib.request
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
+from types import MappingProxyType
 from typing import Literal, Protocol, cast
 
 from dmf_pulse.assurance.canonical import canonical_sha256
@@ -132,7 +133,7 @@ class OddsHttpResponse:
 
     status_code: int
     content_type: str
-    _headers: dict[str, str]
+    _headers: Mapping[str, str]
     _body: bytes
     _redirect_location: str | None
 
@@ -148,7 +149,7 @@ class OddsHttpResponse:
     ) -> None:
         object.__setattr__(self, "status_code", status_code)
         object.__setattr__(self, "content_type", content_type)
-        object.__setattr__(self, "_headers", dict(headers))
+        object.__setattr__(self, "_headers", MappingProxyType(dict(headers)))
         object.__setattr__(self, "_body", body)
         object.__setattr__(self, "_redirect_location", redirect_location)
 
