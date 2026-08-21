@@ -20,6 +20,7 @@ from dmf_pulse.player_evidence.role_priors import (
     WyscoutSourceGovernance,
     build_role_prior_candidate,
     candidate_eb_parameters_from_role_prior,
+    load_role_prior_candidate,
     load_verified_wyscout_source,
     map_wyscout_broad_role,
     reconstruct_regulation_minutes,
@@ -329,3 +330,11 @@ def test_candidate_hash_tamper_is_rejected(tmp_path: Path) -> None:
     with pytest.raises(IngestionError) as error:
         verify_role_prior_candidate(tampered)
     assert error.value.code == "ARTIFACT_HASH_MISMATCH"
+
+
+@pytest.mark.unit
+def test_serialized_candidate_loads_with_strict_json_contract(tmp_path: Path) -> None:
+    candidate = _candidate(tmp_path)
+    path = tmp_path / "candidate.json"
+    path.write_text(candidate.model_dump_json(), encoding="utf-8")
+    assert load_role_prior_candidate(path) == candidate

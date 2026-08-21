@@ -1344,10 +1344,16 @@ def load_role_prior_candidate(path: Path) -> RolePriorCandidateArtifact:
     """Explicit offline file load for an operator-selected immutable artifact."""
 
     try:
-        payload = loads(path.read_text(encoding="utf-8"))
+        payload = path.read_text(encoding="utf-8")
     except (OSError, ValueError) as exc:
         raise IngestionError("ARTIFACT_READ_FAILED", "role-prior candidate cannot be read") from exc
-    return verify_role_prior_candidate(RolePriorCandidateArtifact.model_validate(payload))
+    try:
+        candidate = RolePriorCandidateArtifact.model_validate_json(payload)
+    except ValueError as exc:
+        raise IngestionError(
+            "ARTIFACT_READ_FAILED", "role-prior candidate schema is invalid"
+        ) from exc
+    return verify_role_prior_candidate(candidate)
 
 
 __all__ = [
