@@ -244,7 +244,8 @@ def test_unknown_market_is_warning_only_and_cannot_pollute_1x2(
     assert outcome.exit_code == 0
     assert outcome.result.status == "COMPLETE"
     assert any(
-        warning.startswith("UNSUPPORTED_MARKET") for warning in outcome.result.quality.warnings
+        warning.startswith("ADDITIVE_UNSUPPORTED_MARKET")
+        for warning in outcome.result.quality.warnings
     )
     with postgres_session_factory() as session:
         assert set(session.scalars(select(market_definition.c.definition_key))) == {

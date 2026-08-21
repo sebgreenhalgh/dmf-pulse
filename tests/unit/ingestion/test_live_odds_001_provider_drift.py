@@ -10,10 +10,10 @@ from typing import Any
 from uuid import UUID
 
 import pytest
-from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput, build_current_odds_input
 
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
+from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput, build_current_odds_input
 from dmf_pulse.ingestion.odds.models import QuotaSource, QuotaState
 from dmf_pulse.ingestion.odds.parser import ParsedOddsPayload, parse_odds_payload
 

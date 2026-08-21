@@ -87,7 +87,7 @@ def test_supplied_payload_scenarios_have_frozen_semantics(repository_root: Path)
     assert happy.warnings == ()
     assert changed.semantic_sha256 != happy.semantic_sha256
     assert incomplete.operator_books_seen == 1
-    assert unknown.warnings == ("UNSUPPORTED_MARKET:synthetic_unknown_market",)
+    assert unknown.warnings == ("ADDITIVE_UNSUPPORTED_MARKET:synthetic_unknown_market",)
     assert len({happy.schema_fingerprint, changed.schema_fingerprint}) == 1
 
 

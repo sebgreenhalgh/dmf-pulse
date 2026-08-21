@@ -20,9 +20,9 @@
   terms compatibility, and clean isolated worktree.
 - [x] 01 freeze the reconciliation contract, RED provider-drift/transport/security regressions,
   donor ledger, quality matrix, and preflight evidence; commit and push.
-- [ ] 02 productionise credential isolation and the explicit `http.client` transport; run focused
+- [x] 02 productionise credential isolation and the explicit `http.client` transport; run focused
   transport/security gates; commit and push.
-- [ ] 03 port the provider-native current-input boundary and remediate additive market drift while
+- [x] 03 port the provider-native current-input boundary and remediate additive market drift while
   preserving mandatory H2H, totals degradation, rights, cutoff, and provenance invariants; commit
   and push.
 - [ ] 04 run adversarial self-review, focused branch coverage, inherited regressions, repository

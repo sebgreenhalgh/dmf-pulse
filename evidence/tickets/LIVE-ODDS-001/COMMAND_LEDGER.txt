@@ -35,3 +35,15 @@ PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_transport.py test
       137 passed in 3.98s
 NOTE  One combined verifier process launch returned Windows "Access is denied" before any command executed. Each command was rerun separately and passed as recorded above.
 NETWORK/CREDENTIAL  Offline fakes only; no provider request, environment secret read, or credential value inspection.
+
+CHECKPOINT 03 PROVIDER DRIFT
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py
+      54 passed in 0.60s
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py --cov=dmf_pulse.ingestion.odds.current --cov-branch --cov-report=term-missing
+      54 passed; 95.08% branch-aware coverage
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py tests/unit/ingestion/test_live_odds_001_transport.py tests/unit/ingestion/test_live_odds_001_credentials.py tests/unit/ingestion/test_odds_foundation.py tests/unit/ingestion/test_odds_model_config_boundaries.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py
+      191 passed in 4.26s
+PASS  uv run mypy src/dmf_pulse/ingestion/odds
+      Success: no issues found in 10 source files
+PASS  uv run ruff check (odds package, ticket tests, affected inherited/integration tests)
+NETWORK/CREDENTIAL  Offline fixtures and fakes only; no provider request or runtime credential read.
