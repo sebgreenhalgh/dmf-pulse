@@ -282,11 +282,15 @@ def capture_history_command(
                 "success_count": len(result.evidence),
             }
         )
-    except (IngestionError, ValueError) as exc:
+    except (IngestionError, ValidationError, ValueError) as exc:
         error = (
             exc
             if isinstance(exc, IngestionError)
-            else IngestionError("TEMPORAL_INVALID", "information cutoff is invalid")
+            else (
+                IngestionError("HISTORY_MODEL_VALIDATION_FAILED", "history model validation failed")
+                if isinstance(exc, ValidationError)
+                else IngestionError("TEMPORAL_INVALID", "information cutoff is invalid")
+            )
         )
         _emit(error.as_error_object())
         raise typer.Exit(2) from None
@@ -583,11 +587,17 @@ def capture_current_history_command(
         del catalogue
         del capture
         _emit(summary)
-    except (IngestionError, OSError, ValueError) as exc:
+    except (IngestionError, ValidationError, OSError, ValueError) as exc:
         error = (
             exc
             if isinstance(exc, IngestionError)
-            else IngestionError("CAPTURE_INPUT_INVALID", "current history capture input is invalid")
+            else (
+                IngestionError("HISTORY_MODEL_VALIDATION_FAILED", "history model validation failed")
+                if isinstance(exc, ValidationError)
+                else IngestionError(
+                    "CAPTURE_INPUT_INVALID", "current history capture input is invalid"
+                )
+            )
         )
         _emit(error.as_error_object())
         raise typer.Exit(2) from None

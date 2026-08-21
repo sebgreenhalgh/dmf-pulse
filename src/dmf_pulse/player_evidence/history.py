@@ -17,6 +17,8 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from uuid import UUID, uuid4
 
+from pydantic import ValidationError
+
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.player_evidence.models import (
@@ -36,6 +38,80 @@ _REQUIRED_FIELDS = {
     "yellow_cards",
     "red_cards",
 }
+
+_SAFE_CAPTURE_CODES = frozenset(
+    {
+        "HISTORY_JSON_INVALID",
+        "HISTORY_ROOT_INVALID",
+        "HISTORY_NODE_INVALID",
+        "HISTORY_REQUIRED_FIELD_MISSING",
+        "HISTORY_FIELD_TYPE_INVALID",
+        "HISTORY_SEASON_INVALID",
+        "HISTORY_FUTURE_SEASON",
+        "HISTORY_DUPLICATE_SEASON",
+        "HISTORY_GOALKEEPER_SAVES_MISSING",
+        "HISTORY_MODEL_VALIDATION_FAILED",
+        "HISTORY_SCHEMA_DRIFT",
+        "HISTORY_HTTP_BLOCKED",
+        "HISTORY_AUTHENTICATION_BLOCKED",
+        "HISTORY_RATE_LIMITED",
+        "POST_CUTOFF",
+        "NETWORK_UNAVAILABLE",
+    }
+)
+
+_SAFE_CAPTURE_MESSAGES = {
+    "HISTORY_JSON_INVALID": "history response is not valid JSON",
+    "HISTORY_ROOT_INVALID": "history response root is invalid",
+    "HISTORY_NODE_INVALID": "history_past node is invalid",
+    "HISTORY_REQUIRED_FIELD_MISSING": "history required field is missing",
+    "HISTORY_FIELD_TYPE_INVALID": "history field type is invalid",
+    "HISTORY_SEASON_INVALID": "history season is invalid",
+    "HISTORY_FUTURE_SEASON": "history contains a future season",
+    "HISTORY_DUPLICATE_SEASON": "history contains duplicate seasons",
+    "HISTORY_GOALKEEPER_SAVES_MISSING": "goalkeeper history lacks saves",
+    "HISTORY_MODEL_VALIDATION_FAILED": "history model validation failed",
+    "HISTORY_SCHEMA_DRIFT": "history schema fingerprint has changed",
+    "HISTORY_HTTP_BLOCKED": "history capture received a non-success response",
+    "HISTORY_AUTHENTICATION_BLOCKED": "history capture requires authentication",
+    "HISTORY_RATE_LIMITED": "history capture received HTTP 429",
+    "POST_CUTOFF": "successful history receipt is after the information cutoff",
+    "NETWORK_UNAVAILABLE": "official FPL history request failed",
+}
+
+
+def _history_error(
+    code: str,
+    *,
+    model_validation_reason: str | None = None,
+) -> IngestionError:
+    """Create a source-body-free parser/model failure."""
+
+    details: dict[str, object] | None = (
+        {"model_validation_reason": model_validation_reason}
+        if model_validation_reason is not None
+        else None
+    )
+    return IngestionError(code, _SAFE_CAPTURE_MESSAGES[code], details=details)
+
+
+def _failure_stage(code: str) -> str:
+    if code in {"HISTORY_JSON_INVALID", "HISTORY_ROOT_INVALID"}:
+        return "JSON"
+    if code == "HISTORY_MODEL_VALIDATION_FAILED":
+        return "MODEL"
+    if code in {
+        "HISTORY_NODE_INVALID",
+        "HISTORY_REQUIRED_FIELD_MISSING",
+        "HISTORY_FIELD_TYPE_INVALID",
+        "HISTORY_SEASON_INVALID",
+        "HISTORY_FUTURE_SEASON",
+        "HISTORY_DUPLICATE_SEASON",
+        "HISTORY_GOALKEEPER_SAVES_MISSING",
+        "HISTORY_SCHEMA_DRIFT",
+    }:
+        return "SCHEMA"
+    return "HTTP"
 
 
 def approved_history_schema_fingerprint() -> str:
@@ -92,30 +168,33 @@ class UrllibHistoryTransport:
                 return HistoryHttpResponse(status_code=int(response.status), body=response.read())
         except HTTPError as exc:
             return HistoryHttpResponse(status_code=exc.code, body=b"")
-        except URLError as exc:
-            raise IngestionError(
-                "NETWORK_UNAVAILABLE", "official FPL history request failed"
-            ) from exc
+        except URLError:
+            pass
+        raise _history_error("NETWORK_UNAVAILABLE")
 
 
 def _int(value: object, *, field: str) -> int:
+    del field
     if not isinstance(value, int) or isinstance(value, bool) or value < 0:
-        raise IngestionError(
-            "HISTORY_SCHEMA_INVALID", f"history field {field} must be a non-negative integer"
-        )
+        raise _history_error("HISTORY_FIELD_TYPE_INVALID")
     return value
 
 
 def _season(value: object) -> str:
     if not isinstance(value, str) or len(value) != 7 or value[4] != "/":
-        raise IngestionError("HISTORY_SCHEMA_INVALID", "history season is invalid")
+        raise _history_error("HISTORY_SEASON_INVALID")
+    conversion_failed = False
     try:
         start = int(value[:4])
         end = int(value[-2:])
-    except ValueError as exc:
-        raise IngestionError("HISTORY_SCHEMA_INVALID", "history season is invalid") from exc
+    except ValueError:
+        conversion_failed = True
+        start = 0
+        end = 0
+    if conversion_failed:
+        raise _history_error("HISTORY_SEASON_INVALID")
     if start < 2000 or end != (start + 1) % 100:
-        raise IngestionError("HISTORY_SCHEMA_INVALID", "history season is invalid")
+        raise _history_error("HISTORY_SEASON_INVALID")
     return value
 
 
@@ -123,17 +202,15 @@ def history_past_schema_fingerprint(rows: object) -> str:
     """Validate and fingerprint permitted field types; no source values survive."""
 
     if not isinstance(rows, list):
-        raise IngestionError("HISTORY_SCHEMA_INVALID", "history_past must be an array")
+        raise _history_error("HISTORY_NODE_INVALID")
     for row in rows:
         if not isinstance(row, Mapping):
-            raise IngestionError("HISTORY_SCHEMA_INVALID", "history_past row must be an object")
+            raise _history_error("HISTORY_NODE_INVALID")
         missing = _REQUIRED_FIELDS - set(row)
         if missing:
-            raise IngestionError("HISTORY_SCHEMA_INVALID", "history_past required field is missing")
+            raise _history_error("HISTORY_REQUIRED_FIELD_MISSING")
         if not isinstance(row["season_name"], str):
-            raise IngestionError(
-                "HISTORY_SCHEMA_INVALID", "history field season_name must be a string"
-            )
+            raise _history_error("HISTORY_FIELD_TYPE_INVALID")
         for field in _REQUIRED_FIELDS - {"season_name"}:
             _int(row[field], field=field)
         if "saves" in row:
@@ -159,30 +236,49 @@ def parse_history_past(
         assert isinstance(row, Mapping)
         missing = _REQUIRED_FIELDS - set(row)
         if missing:
-            raise IngestionError("HISTORY_SCHEMA_INVALID", "history_past required field is missing")
+            raise _history_error("HISTORY_REQUIRED_FIELD_MISSING")
         if is_goalkeeper and "saves" not in row:
-            raise IngestionError("HISTORY_SCHEMA_INVALID", "goalkeeper history lacks saves")
+            raise _history_error("HISTORY_GOALKEEPER_SAVES_MISSING")
         season = _season(row["season_name"])
         if season == current_season:
             continue
         if season > current_season:
-            raise IngestionError("HISTORY_SCHEMA_INVALID", "history contains a future season")
+            raise _history_error("HISTORY_FUTURE_SEASON")
         allowed = set(_REQUIRED_FIELDS) | {"saves"}
         unknown.update(str(key) for key in row if key not in allowed)
-        seasons.append(
-            HistoryPastSeason(
+        minutes = _int(row["minutes"], field="minutes")
+        goals = _int(row["goals_scored"], field="goals_scored")
+        assists = _int(row["assists"], field="assists")
+        yellow_cards = _int(row["yellow_cards"], field="yellow_cards")
+        red_cards = _int(row["red_cards"], field="red_cards")
+        saves = _int(row.get("saves", 0), field="saves")
+        history_season: HistoryPastSeason | None = None
+        model_failure = False
+        try:
+            history_season = HistoryPastSeason(
                 season=season,
-                minutes=_int(row["minutes"], field="minutes"),
-                goals=_int(row["goals_scored"], field="goals_scored"),
-                assists=_int(row["assists"], field="assists"),
-                yellow_cards=_int(row["yellow_cards"], field="yellow_cards"),
-                red_cards=_int(row["red_cards"], field="red_cards"),
-                saves=_int(row.get("saves", 0), field="saves"),
+                minutes=minutes,
+                goals=goals,
+                assists=assists,
+                yellow_cards=yellow_cards,
+                red_cards=red_cards,
+                saves=saves,
             )
-        )
+        except ValidationError:
+            model_failure = True
+        if model_failure:
+            reason = (
+                "ZERO_MINUTE_POSITIVE_EVENT"
+                if minutes == 0
+                and any(value > 0 for value in (goals, assists, yellow_cards, red_cards, saves))
+                else "HISTORY_PAST_SEASON"
+            )
+            raise _history_error("HISTORY_MODEL_VALIDATION_FAILED", model_validation_reason=reason)
+        assert history_season is not None
+        seasons.append(history_season)
     ordered = tuple(sorted(seasons, key=lambda item: item.season))
     if len({item.season for item in ordered}) != len(ordered):
-        raise IngestionError("HISTORY_SCHEMA_INVALID", "history has duplicate seasons")
+        raise _history_error("HISTORY_DUPLICATE_SEASON")
     return ParsedHistoryPast(
         seasons=ordered,
         schema_fingerprint=fingerprint,
@@ -195,14 +291,16 @@ def parse_history_bytes(
 ) -> ParsedHistoryPast:
     """Decode one transient body without returning it or writing it anywhere."""
 
+    value: object | None = None
+    json_invalid = False
     try:
         value = json.loads(body.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise IngestionError(
-            "HISTORY_SCHEMA_INVALID", "history response is not valid JSON"
-        ) from exc
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        json_invalid = True
+    if json_invalid:
+        raise _history_error("HISTORY_JSON_INVALID")
     if not isinstance(value, Mapping):
-        raise IngestionError("HISTORY_SCHEMA_INVALID", "history response root must be an object")
+        raise _history_error("HISTORY_ROOT_INVALID")
     return parse_history_past(value, current_season=current_season, is_goalkeeper=is_goalkeeper)
 
 
@@ -273,6 +371,61 @@ def validate_capture_request(request: ApprovedCaptureRequest) -> None:
         )
 
 
+def _capture_failure(
+    error: IngestionError,
+    *,
+    player_id: UUID,
+    position: str,
+    request_ordinal: int,
+    total_requested_bound: int,
+    successful_responses: int,
+) -> IngestionError:
+    """Bind a typed history error to safe, per-request progress only."""
+
+    code = error.code if error.code in _SAFE_CAPTURE_CODES else "HISTORY_MODEL_VALIDATION_FAILED"
+    details: dict[str, object] = {
+        "current_player_position": position,
+        "failed_request_ordinal": request_ordinal,
+        "failure_code": code,
+        "failure_stage": _failure_stage(code),
+        "raw_persistence": False,
+        "request_ordinal": request_ordinal,
+        "requests_attempted_before_stop": request_ordinal,
+        "successful_responses_before_stop": successful_responses,
+        "total_requested_bound": total_requested_bound,
+        "transient_player_identity_sha256": sha256(player_id.bytes).hexdigest(),
+    }
+    reason = error.details.get("model_validation_reason")
+    if reason in {
+        "ZERO_MINUTE_POSITIVE_EVENT",
+        "HISTORY_PAST_SEASON",
+        "PLAYER_HISTORY_EVIDENCE",
+        "UNEXPECTED_CAPTURE_VALUE_ERROR",
+    }:
+        details["model_validation_reason"] = reason
+    return IngestionError(code, _SAFE_CAPTURE_MESSAGES[code], details=details)
+
+
+def _failure_with_deletion(
+    error: IngestionError,
+    *,
+    run_id: UUID,
+    deletion_manifest: DeletionManifest,
+) -> IngestionError:
+    """Emit only the safe deletion confirmation when a capture stops."""
+
+    return IngestionError(
+        error.code,
+        error.message,
+        details={
+            **error.details,
+            "current_catalogue_persisted": False,
+            "deletion_outcome": deletion_manifest.deletion_outcome,
+            "deletion_run_id": str(run_id),
+        },
+    )
+
+
 def capture_approved_history(
     request: ApprovedCaptureRequest,
     *,
@@ -293,41 +446,33 @@ def capture_approved_history(
     source_observed_at: dict[UUID, datetime] = {}
     fingerprints: set[str] = set()
     players = request.catalogue.players[: request.maximum_player_count]
-    try:
-        for index, player in enumerate(players):
+    failure: IngestionError | None = None
+    for index, player in enumerate(players):
+        ordinal = index + 1
+        try:
             url = request.approval.source_url_template.format(
                 current_element_id=player.source_player_id
             )
             response = transport.get(url)
             if response.authentication_required or response.status_code in {401, 403}:
-                raise IngestionError(
-                    "HISTORY_AUTHENTICATION_BLOCKED", "history capture requires authentication"
-                )
+                raise _history_error("HISTORY_AUTHENTICATION_BLOCKED")
             if response.status_code == 429:
-                raise IngestionError("HISTORY_RATE_LIMITED", "history capture received HTTP 429")
+                raise _history_error("HISTORY_RATE_LIMITED")
             if response.status_code != 200:
-                raise IngestionError(
-                    "HISTORY_HTTP_BLOCKED", "history capture received a non-success response"
-                )
+                raise _history_error("HISTORY_HTTP_BLOCKED")
             observed_at = clock()
             if observed_at.tzinfo is None or observed_at.utcoffset() is None:
-                raise IngestionError(
-                    "TEMPORAL_INVALID", "successful receipt time must be timezone-aware"
-                )
+                raise _history_error("HISTORY_MODEL_VALIDATION_FAILED")
             observed_at = observed_at.astimezone(UTC)
             if observed_at > request.information_cutoff.astimezone(UTC):
-                raise IngestionError(
-                    "POST_CUTOFF", "successful history receipt is after the information cutoff"
-                )
+                raise _history_error("POST_CUTOFF")
             parsed = parse_history_bytes(
                 response.body,
                 current_season=request.catalogue.season_code,
                 is_goalkeeper=player.position.value == "GK",
             )
             if parsed.schema_fingerprint != request.approval.history_past_schema_fingerprint:
-                raise IngestionError(
-                    "HISTORY_SCHEMA_DRIFT", "history_past schema fingerprint has changed"
-                )
+                raise _history_error("HISTORY_SCHEMA_DRIFT")
             fingerprints.add(parsed.schema_fingerprint)
             source_hashes[player.player_id] = (
                 sha256(response.body).hexdigest()
@@ -335,31 +480,75 @@ def capture_approved_history(
                 else None
             )
             source_observed_at[player.player_id] = observed_at
-            evidence.append(
-                PlayerHistoryEvidence(
+            player_evidence: PlayerHistoryEvidence | None = None
+            evidence_model_failure = False
+            try:
+                player_evidence = PlayerHistoryEvidence(
                     player_id=player.player_id,
                     source_player_id=player.source_player_id,
                     seasons=parsed.seasons,
                 )
-            )
-            if index + 1 < len(players):
-                sleeper(request.minimum_interval_seconds)
-    finally:
-        # Bodies have no path, cache, log, artifact, or return-value reference.
-        deleted_at = clock()
-        if deleted_at.tzinfo is None or deleted_at.utcoffset() is None:
-            raise IngestionError("TEMPORAL_INVALID", "deletion timestamp must be timezone-aware")
-        deletion = DeletionManifest(
-            run_id=run_id,
-            temporary_object_identifiers=tuple(
-                (
-                    "transient-current-catalogue",
-                    *(f"transient-history-{index}" for index in range(len(evidence))),
+            except ValidationError:
+                evidence_model_failure = True
+            if evidence_model_failure:
+                raise _history_error(
+                    "HISTORY_MODEL_VALIDATION_FAILED",
+                    model_validation_reason="PLAYER_HISTORY_EVIDENCE",
                 )
-            ),
-            deletion_timestamp=deleted_at.astimezone(UTC),
-            deletion_outcome="SUCCESS",
-        )
+            assert player_evidence is not None
+            evidence.append(player_evidence)
+            if ordinal < len(players):
+                sleeper(request.minimum_interval_seconds)
+        except OSError:
+            failure = _capture_failure(
+                _history_error("NETWORK_UNAVAILABLE"),
+                player_id=player.player_id,
+                position=player.position.value,
+                request_ordinal=ordinal,
+                total_requested_bound=len(players),
+                successful_responses=len(evidence),
+            )
+            break
+        except IngestionError as error:
+            failure = _capture_failure(
+                error,
+                player_id=player.player_id,
+                position=player.position.value,
+                request_ordinal=ordinal,
+                total_requested_bound=len(players),
+                successful_responses=len(evidence),
+            )
+            break
+        except (ValidationError, ValueError):
+            failure = _capture_failure(
+                _history_error(
+                    "HISTORY_MODEL_VALIDATION_FAILED",
+                    model_validation_reason="UNEXPECTED_CAPTURE_VALUE_ERROR",
+                ),
+                player_id=player.player_id,
+                position=player.position.value,
+                request_ordinal=ordinal,
+                total_requested_bound=len(players),
+                successful_responses=len(evidence),
+            )
+            break
+    # Bodies have no path, cache, log, artifact, or return-value reference.
+    deleted_at = clock()
+    if deleted_at.tzinfo is None or deleted_at.utcoffset() is None:
+        raise IngestionError("TEMPORAL_INVALID", "deletion timestamp must be timezone-aware")
+    deletion = DeletionManifest(
+        run_id=run_id,
+        temporary_object_identifiers=tuple(
+            (
+                "transient-current-catalogue",
+                *(f"transient-history-{index}" for index in range(len(evidence))),
+            )
+        ),
+        deletion_timestamp=deleted_at.astimezone(UTC),
+        deletion_outcome="SUCCESS",
+    )
+    if failure is not None:
+        raise _failure_with_deletion(failure, run_id=run_id, deletion_manifest=deletion) from None
     if len(fingerprints) > 1:
         raise IngestionError(
             "HISTORY_SCHEMA_DRIFT", "history responses disagree on schema fingerprint"

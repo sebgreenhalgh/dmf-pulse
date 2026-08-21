@@ -1133,6 +1133,20 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   fixtures pair, then run the governed capture command only after the exact
   implementation SHA has passed dedicated Ubuntu validation.
 
+## GW1-PLY-003R — offline history-capture diagnostic remediation
+
+- [x] Verify the consumed-capture branch state at
+  `98d1bbd6da46da73243fb8daced56a9580e30dae`; perform no history-provider
+  request and create no new approval.
+- [x] Replace the generic parser/model failure collapse with a stable,
+  body-free history taxonomy and bounded per-player failure progress context.
+- [x] Preserve the zero-minute positive-event invariant, add synthetic
+  parser/model/serial-failure coverage, and prove derived output remains atomic
+  on capture failure.
+- [ ] Run offline focused and repository assurance, publish the diagnostic-only
+  continuation for dedicated Ubuntu validation, and stop pending a separate
+  newly approved one-off history capture.
+
 - Ticket/stage: `EVAL-012`, DMFP-19 Stage 12 / playbook B1; immutable parent
   `4f1274ccef419a7c0bde335c48bd4070e248b2e6` on `main`.
 - Branch: `stage/A12/EVAL-012-backtesting-framework`.
