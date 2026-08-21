@@ -1178,9 +1178,26 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Execute exactly one diagnostic request, persist no raw source or current
   catalogue, and conditionally implement the narrow discipline-only exclusion
   policy only if the safe boolean signature authorizes it.
-- [ ] Run the complete conditional regression/static/build/security suite,
+- [x] Run the complete conditional regression/static/build/security suite,
   publish the final code SHA for dedicated Ubuntu validation, and stop without
   a third full capture.
+
+## GW1-PLY-003R4 — post-diagnostic full current-player history capture
+
+- [x] Verify the exact remediated branch/run, clean remote equality, cutoff,
+  operator-file types, and committed diagnostic-result authority.
+- [x] Record the immutable v4 full-capture approval and extend the strict
+  loader/live command only for that exact approval; preserve every consumed
+  approval and reject arbitrary future records.
+- [ ] Prove all governance negative controls and reproduce the exact 599-player
+  catalogue offline; publish the pre-capture SHA and require dedicated Ubuntu
+  success before transport.
+- [ ] Execute exactly one serial 599-player capture with no retry and initially
+  empty operator-controlled output paths outside the repository; stop the
+  session on the first typed failure.
+- [ ] On complete success only, validate and publish permitted posterior,
+  allocation, safe receipt, and deletion/transience artifacts; run final
+  deterministic assurance without replaying network capture.
 
 - Ticket/stage: `EVAL-012`, DMFP-19 Stage 12 / playbook B1; immutable parent
   `4f1274ccef419a7c0bde335c48bd4070e248b2e6` on `main`.

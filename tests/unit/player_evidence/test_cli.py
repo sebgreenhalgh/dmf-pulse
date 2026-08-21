@@ -6,15 +6,25 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
-from dmf_pulse.assurance.canonical import pretty_json
+from dmf_pulse.assurance.canonical import canonical_sha256, pretty_json
 from dmf_pulse.cli.app import app
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplInputService
 from tests.unit.player_evidence.support import replay
 
 RUNNER = CliRunner()
+V4_APPROVAL_SHA256 = "2a4561b3ad7fa24cbe3b40f5a56e8b58251b3d6e8ec68881ed4d78c0d8579b4b"
+SECOND_APPROVAL_SHA256 = "6d094bd94217d227f946bdee769a46227312d78bae455464a4fd41d191e8c935"
+
+
+def _make_self_consistent_v5(record: dict[str, object]) -> None:
+    record["schema_version"] = "gw1-player-history-rights-approval-v5"
+    without_hash = dict(record)
+    without_hash.pop("approval_sha256")
+    record["approval_sha256"] = canonical_sha256(without_hash)
 
 
 def _write_replay(tmp_path):
@@ -233,10 +243,19 @@ def test_current_capture_builds_only_an_in_memory_catalogue_before_execute_netwo
     )
     monkeypatch.setattr(
         command_module,
-        "validate_second_retry_capture_authorization",
+        "validate_post_diagnostic_capture_authorization",
         lambda *_args, **_kwargs: None,
     )
-    args, outputs = _current_capture_args(repository_root, tmp_path)
+    v4_approval = (
+        repository_root / "evidence/tickets/GW1-PLY-003/"
+        "GW1_PLAYER_HISTORY_POST_DIAGNOSTIC_FULL_CAPTURE_APPROVAL.json"
+    )
+    args, outputs = _current_capture_args(
+        repository_root,
+        tmp_path,
+        approval=v4_approval,
+        expected_approval_sha256=V4_APPROVAL_SHA256,
+    )
     result = RUNNER.invoke(app, args)
     assert result.exit_code == 2, result.output
     payload = json.loads(result.output)
@@ -272,10 +291,19 @@ def test_current_capture_preserves_typed_history_failure_and_writes_nothing(
     )
     monkeypatch.setattr(
         command_module,
-        "validate_second_retry_capture_authorization",
+        "validate_post_diagnostic_capture_authorization",
         lambda *_args, **_kwargs: None,
     )
-    args, outputs = _current_capture_args(repository_root, tmp_path)
+    v4_approval = (
+        repository_root / "evidence/tickets/GW1-PLY-003/"
+        "GW1_PLAYER_HISTORY_POST_DIAGNOSTIC_FULL_CAPTURE_APPROVAL.json"
+    )
+    args, outputs = _current_capture_args(
+        repository_root,
+        tmp_path,
+        approval=v4_approval,
+        expected_approval_sha256=V4_APPROVAL_SHA256,
+    )
     args.append("--execute-network")
     result = RUNNER.invoke(app, args)
     assert result.exit_code == 2, result.output
@@ -314,7 +342,7 @@ def test_current_capture_rejects_consumed_first_approval_before_transport(
     assert not any(path.exists() for path in outputs)
 
 
-def test_current_capture_rejects_wrong_second_retry_hash_before_transport(
+def test_current_capture_rejects_consumed_second_approval_before_transport(
     repository_root: Path, tmp_path: Path, monkeypatch
 ) -> None:
     import dmf_pulse.cli.player_evidence as command_module
@@ -335,12 +363,64 @@ def test_current_capture_rejects_wrong_second_retry_hash_before_transport(
         repository_root,
         tmp_path,
         approval=second_approval,
-        expected_approval_sha256="0" * 64,
+        expected_approval_sha256=SECOND_APPROVAL_SHA256,
     )
     args.append("--execute-network")
     result = RUNNER.invoke(app, args)
     assert result.exit_code == 2, result.output
     payload = json.loads(result.output)
     assert payload["error"]["code"] == "RIGHTS_APPROVAL_HASH_MISMATCH"
+    assert constructed is False
+    assert not any(path.exists() for path in outputs)
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    (
+        lambda record: record.__setitem__("diagnostic_result_sha256", "0" * 64),
+        lambda record: record.__setitem__("required_remediation_sha", "1" * 40),
+        lambda record: record.__setitem__("expected_catalogue_semantic_sha256", "2" * 64),
+        lambda record: record["capture_constraints"].__setitem__(  # type: ignore[index,union-attr]
+            "maximum_player_requests", 600
+        ),
+        lambda record: record["terms_review"].__setitem__(  # type: ignore[index,union-attr]
+            "snapshot_sha256", "3" * 64
+        ),
+        lambda record: record.__setitem__("raw_retention", "PERMITTED"),
+        _make_self_consistent_v5,
+    ),
+)
+def test_current_capture_rejects_altered_v4_before_transport(
+    repository_root: Path, tmp_path: Path, monkeypatch, mutate
+) -> None:
+    import dmf_pulse.cli.player_evidence as command_module
+
+    constructed = False
+
+    class _ForbiddenTransport:
+        def __init__(self) -> None:
+            nonlocal constructed
+            constructed = True
+
+    source = (
+        repository_root / "evidence/tickets/GW1-PLY-003/"
+        "GW1_PLAYER_HISTORY_POST_DIAGNOSTIC_FULL_CAPTURE_APPROVAL.json"
+    )
+    altered = json.loads(source.read_text(encoding="utf-8"))
+    mutate(altered)
+    altered_path = tmp_path / "altered-v4.json"
+    altered_path.write_text(json.dumps(altered), encoding="utf-8")
+    monkeypatch.setattr(command_module, "UrllibHistoryTransport", _ForbiddenTransport)
+    args, outputs = _current_capture_args(
+        repository_root,
+        tmp_path,
+        approval=altered_path,
+        expected_approval_sha256=V4_APPROVAL_SHA256,
+    )
+    args.append("--execute-network")
+    result = RUNNER.invoke(app, args)
+    assert result.exit_code == 2, result.output
+    payload = json.loads(result.output)
+    assert payload["error"]["code"] == "RIGHTS_APPROVAL_INVALID"
     assert constructed is False
     assert not any(path.exists() for path in outputs)

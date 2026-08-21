@@ -1,4 +1,4 @@
-"""Strict adapters for the consumed and exact second GW1 history approvals."""
+"""Strict adapters for consumed and exact approved GW1 history records."""
 
 from __future__ import annotations
 
@@ -20,6 +20,9 @@ from dmf_pulse.player_evidence.models import (
 
 _ACCEPTED_APPROVAL_SHA256 = "d946552f2a55df7ed400bb43cff6bf85b4bdf8cbfe804044d08d9c9a96f8e2fd"
 SECOND_RETRY_APPROVAL_SHA256 = "6d094bd94217d227f946bdee769a46227312d78bae455464a4fd41d191e8c935"
+POST_DIAGNOSTIC_FULL_APPROVAL_SHA256 = (
+    "2a4561b3ad7fa24cbe3b40f5a56e8b58251b3d6e8ec68881ed4d78c0d8579b4b"
+)
 _ACCEPTED_TERMS_FINGERPRINT = "ad62cb745459df3282f8900117b85352a01d75754e080d06aa3836dcd2b2b246"
 _SECOND_RETRY_CATALOGUE_SHA256 = "9d655a2dc8e60eca0898f4bc04e8caf7b264887af1d62bfe61c5288cbdd75f11"
 _ALLOWED_HISTORY_FIELDS = (
@@ -75,10 +78,36 @@ class _SecondRetryCaptureConstraints(_RecordModel):
     stop_on_typed_parser_or_model_failure: Literal[True]
 
 
+class _PostDiagnosticCaptureConstraints(_RecordModel):
+    actual_requested_count_must_equal_exact_mapped_catalogue_count: Literal[True]
+    information_cutoff: Literal["2026-08-21T17:30:00Z"]
+    maximum_player_requests: Literal[599]
+    minimum_serial_interval_seconds: float = Field(ge=1.0, le=1.0)
+    no_browser_automation: Literal[True]
+    session_free: Literal[True] = Field(validation_alias="no_cookie_or_session")
+    login_free: Literal[True] = Field(validation_alias="no_credential")
+    no_historical_player_discovery: Literal[True]
+    no_parallel_requests: Literal[True]
+    no_retry_loop: Literal[True]
+    stop_immediately_on_http: tuple[Literal[401], Literal[403], Literal[429]]
+    stop_on_material_schema_drift: Literal[True]
+    stop_on_network_failure: Literal[True]
+    stop_on_other_non_success_response: Literal[True]
+    stop_on_post_cutoff_response: Literal[True]
+    stop_on_typed_parser_or_model_failure: Literal[True]
+
+
 class _ApprovedSource(_RecordModel):
     current_element_id_binding: Literal[
         "ONLY_ALREADY_GOVERNED_CURRENT_2026_27_MAPPED_FPL_CATALOGUE"
     ]
+    url_template: Literal[
+        "https://fantasy.premierleague.com/api/element-summary/{current_element_id}/"
+    ]
+
+
+class _ApprovedPostDiagnosticSource(_RecordModel):
+    current_element_id_binding: Literal["ONLY_EXACT_APPROVED_599_PLAYER_2026_27_GW1_CATALOGUE"]
     url_template: Literal[
         "https://fantasy.premierleague.com/api/element-summary/{current_element_id}/"
     ]
@@ -204,14 +233,91 @@ class _AcceptedV3SecondRetryRightsRecord(_RecordModel):
         return self
 
 
+class _ZeroExposureDisciplinePolicy(_RecordModel):
+    classification: Literal["ZERO_EXPOSURE_DISCIPLINE_ONLY"]
+    exclude_entire_row_from_rate_evidence: Literal[True]
+    excluded_row_contributes_event_numerator: Literal[False]
+    excluded_row_contributes_exposure: Literal[False]
+    excluded_row_imputes_minutes: Literal[False]
+    lineage: Literal["ZERO_EXPOSURE_DISCIPLINE_ONLY_EXCLUDED_FROM_RATE_MODEL"]
+    zero_minute_assist_fails_closed: Literal[True]
+    zero_minute_goal_fails_closed: Literal[True]
+    zero_minute_save_fails_closed: Literal[True]
+
+
+class _AcceptedV4PostDiagnosticRightsRecord(_RecordModel):
+    schema_version: Literal["gw1-player-history-rights-approval-v4"]
+    status: Literal["HUMAN_ACCEPTED_POST_DIAGNOSTIC_FULL_CAPTURE_ONLY"]
+    scope: Literal["PRIVATE_2026_27_GW1_ONLY"]
+    purpose: Literal["PRIVATE_2026_27_GW1_DECISION_SUPPORT_ONLY"]
+    access_mode: Literal[CaptureAccessMode.HUMAN_INITIATED_BOUNDED_UNAUTHENTICATED_TRANSIENT]
+    allowed_history_fields: tuple[
+        Literal["season_name"],
+        Literal["minutes"],
+        Literal["goals_scored"],
+        Literal["assists"],
+        Literal["yellow_cards"],
+        Literal["red_cards"],
+        Literal["saves_FOR_GOALKEEPERS_ONLY"],
+    ]
+    allowed_node: Literal["history_past"]
+    capture_constraints: _PostDiagnosticCaptureConstraints
+    current_catalogue_retention: Literal["FORBIDDEN"]
+    derived_retention: Literal[RetentionMode.POSTERIOR_ONLY]
+    raw_retention: Literal["FORBIDDEN"]
+    redistribution: Literal["NONE"]
+    repeat_collection: Literal["REQUIRES_ANOTHER_NEW_HUMAN_APPROVAL"]
+    source: _ApprovedPostDiagnosticSource
+    source_body_sha256_retention: Literal["PERMITTED_NONREVERSIBLE_PROVENANCE_ONLY"]
+    terms_review: _TermsReview
+    approval_source: Literal["USER_DIRECTIVE"]
+    approved_at: datetime
+    consumed_prior_approval_sha256s: tuple[
+        Literal["d946552f2a55df7ed400bb43cff6bf85b4bdf8cbfe804044d08d9c9a96f8e2fd"],
+        Literal["6d094bd94217d227f946bdee769a46227312d78bae455464a4fd41d191e8c935"],
+        Literal["7e299bb4d88a0260d8f67bda9e81b09649452fddbe027f52270634945597cb20"],
+    ]
+    diagnostic_result_sha256: Literal[
+        "9711ad20221f66c0fd761f52ccf751f73358066d69869a28e908586bfc8acae5"
+    ]
+    diagnostic_source_body_sha256: Literal[
+        "81aff2cbb2b44b9baa516e84a017f25fbc17c986057c9be8714080bff921422d"
+    ]
+    expected_catalogue_semantic_sha256: Literal[
+        "9d655a2dc8e60eca0898f4bc04e8caf7b264887af1d62bfe61c5288cbdd75f11"
+    ]
+    required_remediation_sha: Literal["afe02852ef4456c632835e85dd4cfe8333812d5f"]
+    zero_exposure_discipline_policy: _ZeroExposureDisciplinePolicy
+    approval_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("approved_at")
+    @classmethod
+    def approved_at_is_utc(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("approved_at must be timezone-aware")
+        return value.astimezone(UTC)
+
+    @model_validator(mode="after")
+    def record_is_exact(self) -> Self:
+        if self.allowed_history_fields != _ALLOWED_HISTORY_FIELDS:
+            raise ValueError("allowed history fields are not the accepted set")
+        return self
+
+
 def _as_capture_approval(
-    record: _AcceptedV2RightsRecord | _AcceptedV3SecondRetryRightsRecord,
+    record: (
+        _AcceptedV2RightsRecord
+        | _AcceptedV3SecondRetryRightsRecord
+        | _AcceptedV4PostDiagnosticRightsRecord
+    ),
 ) -> PlayerHistoryRightsApproval:
-    rights_profile_id = (
-        "GW1_PLY003_SECOND_ONE_OFF_HISTORY_POSTERIOR_ONLY_V1"
-        if isinstance(record, _AcceptedV3SecondRetryRightsRecord)
-        else "GW1_PLY003_ONE_OFF_HISTORY_POSTERIOR_ONLY_V1"
-    )
+    rights_profile_id = {
+        _AcceptedV2RightsRecord: "GW1_PLY003_ONE_OFF_HISTORY_POSTERIOR_ONLY_V1",
+        _AcceptedV3SecondRetryRightsRecord: "GW1_PLY003_SECOND_ONE_OFF_HISTORY_POSTERIOR_ONLY_V1",
+        _AcceptedV4PostDiagnosticRightsRecord: (
+            "GW1_PLY003_POST_DIAGNOSTIC_FULL_HISTORY_POSTERIOR_ONLY_V1"
+        ),
+    }[type(record)]
 
     def build(approval_sha256: str) -> PlayerHistoryRightsApproval:
         return PlayerHistoryRightsApproval(
@@ -261,7 +367,7 @@ def _as_capture_approval(
 def load_player_history_rights_approval(
     path: Path, *, expected_approval_sha256: str
 ) -> PlayerHistoryRightsApproval:
-    """Load only the consumed historical or exact second-retry record.
+    """Load only the known consumed records or exact post-diagnostic approval.
 
     Both returned v1 capture contracts remain hash-bound to their immutable
     governance record.  This deliberately accepts no arbitrary self-consistent
@@ -271,6 +377,7 @@ def load_player_history_rights_approval(
     if expected_approval_sha256 not in {
         _ACCEPTED_APPROVAL_SHA256,
         SECOND_RETRY_APPROVAL_SHA256,
+        POST_DIAGNOSTIC_FULL_APPROVAL_SHA256,
     }:
         raise IngestionError("RIGHTS_APPROVAL_HASH_MISMATCH", "unexpected rights approval hash")
     try:
@@ -282,12 +389,18 @@ def load_player_history_rights_approval(
         ) from exc
     if not isinstance(raw_record, dict):
         raise IngestionError("RIGHTS_APPROVAL_INVALID", "rights approval record is invalid")
+    record: (
+        _AcceptedV2RightsRecord
+        | _AcceptedV3SecondRetryRightsRecord
+        | _AcceptedV4PostDiagnosticRightsRecord
+    )
     try:
-        record = (
-            _AcceptedV2RightsRecord.model_validate_json(raw_text)
-            if expected_approval_sha256 == _ACCEPTED_APPROVAL_SHA256
-            else _AcceptedV3SecondRetryRightsRecord.model_validate_json(raw_text)
-        )
+        if expected_approval_sha256 == _ACCEPTED_APPROVAL_SHA256:
+            record = _AcceptedV2RightsRecord.model_validate_json(raw_text)
+        elif expected_approval_sha256 == SECOND_RETRY_APPROVAL_SHA256:
+            record = _AcceptedV3SecondRetryRightsRecord.model_validate_json(raw_text)
+        else:
+            record = _AcceptedV4PostDiagnosticRightsRecord.model_validate_json(raw_text)
     except (ValidationError, ValueError) as exc:
         raise IngestionError(
             "RIGHTS_APPROVAL_INVALID", "rights approval record is invalid"
@@ -326,8 +439,39 @@ def validate_second_retry_capture_authorization(
         )
 
 
+def validate_post_diagnostic_capture_authorization(
+    approval: PlayerHistoryRightsApproval,
+    *,
+    expected_approval_sha256: str,
+    catalogue_semantic_sha256: str,
+    maximum_player_count: int,
+) -> None:
+    """Require the exact v4 directive and its full 599-player universe."""
+
+    if expected_approval_sha256 != POST_DIAGNOSTIC_FULL_APPROVAL_SHA256:
+        raise IngestionError(
+            "RIGHTS_APPROVAL_HASH_MISMATCH",
+            "post-diagnostic capture requires its new approval hash",
+        )
+    if approval.governance_approval_sha256 != POST_DIAGNOSTIC_FULL_APPROVAL_SHA256:
+        raise IngestionError(
+            "RIGHTS_APPROVAL_HASH_MISMATCH", "post-diagnostic approval lineage is invalid"
+        )
+    if approval.maximum_player_requests != 599 or maximum_player_count != 599:
+        raise IngestionError(
+            "REQUEST_BOUND_INVALID", "post-diagnostic request bound must equal 599"
+        )
+    if catalogue_semantic_sha256 != _SECOND_RETRY_CATALOGUE_SHA256:
+        raise IngestionError(
+            "CATALOGUE_HASH_MISMATCH",
+            "current catalogue does not match the approved post-diagnostic universe",
+        )
+
+
 __all__ = [
+    "POST_DIAGNOSTIC_FULL_APPROVAL_SHA256",
     "SECOND_RETRY_APPROVAL_SHA256",
     "load_player_history_rights_approval",
+    "validate_post_diagnostic_capture_authorization",
     "validate_second_retry_capture_authorization",
 ]

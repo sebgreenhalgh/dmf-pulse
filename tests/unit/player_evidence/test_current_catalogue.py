@@ -14,8 +14,10 @@ from dmf_pulse.availability.current import current_player_id, current_team_id
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplInputRequest, CurrentFplInputService
 from dmf_pulse.player_evidence.approvals import (
+    POST_DIAGNOSTIC_FULL_APPROVAL_SHA256,
     SECOND_RETRY_APPROVAL_SHA256,
     load_player_history_rights_approval,
+    validate_post_diagnostic_capture_authorization,
     validate_second_retry_capture_authorization,
 )
 from dmf_pulse.player_evidence.catalogue import build_current_player_history_catalogue
@@ -30,6 +32,9 @@ RECEIVED = datetime(2026, 8, 18, 12, 5, tzinfo=UTC)
 CUTOFF = datetime(2026, 8, 21, 17, 30, tzinfo=UTC)
 RIGHTS_APPROVAL_SHA256 = "d946552f2a55df7ed400bb43cff6bf85b4bdf8cbfe804044d08d9c9a96f8e2fd"
 SECOND_RETRY_CATALOGUE_SHA256 = "9d655a2dc8e60eca0898f4bc04e8caf7b264887af1d62bfe61c5288cbdd75f11"
+POST_DIAGNOSTIC_APPROVAL_PATH = (
+    "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_POST_DIAGNOSTIC_FULL_CAPTURE_APPROVAL.json"
+)
 
 
 def _source(repository_root: Path, name: str) -> object:
@@ -363,3 +368,138 @@ def test_second_retry_terms_mismatch_blocks_before_transport(
             )
         )
     assert raised.value.code == "TERMS_FINGERPRINT_DRIFT"
+
+
+def test_v4_loader_and_full_universe_guard_accept_only_the_new_directive(
+    repository_root: Path,
+) -> None:
+    v4 = load_player_history_rights_approval(
+        repository_root / POST_DIAGNOSTIC_APPROVAL_PATH,
+        expected_approval_sha256=POST_DIAGNOSTIC_FULL_APPROVAL_SHA256,
+    )
+    assert v4.governance_approval_sha256 == POST_DIAGNOSTIC_FULL_APPROVAL_SHA256
+    assert v4.maximum_player_requests == 599
+    assert v4.raw_retention == "FORBIDDEN"
+    assert v4.derived_retention is RetentionMode.POSTERIOR_ONLY
+    validate_post_diagnostic_capture_authorization(
+        v4,
+        expected_approval_sha256=POST_DIAGNOSTIC_FULL_APPROVAL_SHA256,
+        catalogue_semantic_sha256=SECOND_RETRY_CATALOGUE_SHA256,
+        maximum_player_count=599,
+    )
+
+    for path, approval_sha256 in (
+        (
+            repository_root
+            / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_RIGHTS_APPROVAL.json",
+            RIGHTS_APPROVAL_SHA256,
+        ),
+        (
+            repository_root / "evidence/tickets/GW1-PLY-003/"
+            "GW1_PLAYER_HISTORY_SECOND_RETRY_RIGHTS_APPROVAL.json",
+            SECOND_RETRY_APPROVAL_SHA256,
+        ),
+    ):
+        consumed = load_player_history_rights_approval(
+            path, expected_approval_sha256=approval_sha256
+        )
+        with pytest.raises(IngestionError) as raised:
+            validate_post_diagnostic_capture_authorization(
+                consumed,
+                expected_approval_sha256=approval_sha256,
+                catalogue_semantic_sha256=SECOND_RETRY_CATALOGUE_SHA256,
+                maximum_player_count=599,
+            )
+        assert raised.value.code == "RIGHTS_APPROVAL_HASH_MISMATCH"
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    (
+        lambda record: record.__setitem__("diagnostic_result_sha256", "0" * 64),
+        lambda record: record.__setitem__("required_remediation_sha", "1" * 40),
+        lambda record: record.__setitem__("expected_catalogue_semantic_sha256", "2" * 64),
+        lambda record: record["capture_constraints"].__setitem__("maximum_player_requests", 600),
+        lambda record: record["terms_review"].__setitem__("snapshot_sha256", "3" * 64),
+        lambda record: record.__setitem__("raw_retention", "PERMITTED"),
+        lambda record: record.__setitem__("derived_retention", "RAW"),
+    ),
+)
+def test_v4_loader_rejects_every_altered_governance_field(
+    repository_root: Path, tmp_path: Path, mutate
+) -> None:
+    source = repository_root / POST_DIAGNOSTIC_APPROVAL_PATH
+    altered = json.loads(source.read_text(encoding="utf-8"))
+    mutate(altered)
+    altered_path = tmp_path / "altered-v4.json"
+    altered_path.write_text(json.dumps(altered), encoding="utf-8")
+    with pytest.raises(IngestionError) as raised:
+        load_player_history_rights_approval(
+            altered_path, expected_approval_sha256=POST_DIAGNOSTIC_FULL_APPROVAL_SHA256
+        )
+    assert raised.value.code == "RIGHTS_APPROVAL_INVALID"
+
+
+def test_v4_rejects_self_consistent_fifth_record_and_runtime_universe_drift(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    source = repository_root / POST_DIAGNOSTIC_APPROVAL_PATH
+    fifth = json.loads(source.read_text(encoding="utf-8"))
+    fifth["schema_version"] = "gw1-player-history-rights-approval-v5"
+    without_hash = dict(fifth)
+    without_hash.pop("approval_sha256")
+    fifth["approval_sha256"] = canonical_sha256(without_hash)
+    fifth_path = tmp_path / "self-consistent-v5.json"
+    fifth_path.write_text(json.dumps(fifth), encoding="utf-8")
+    with pytest.raises(IngestionError) as future:
+        load_player_history_rights_approval(
+            fifth_path, expected_approval_sha256=POST_DIAGNOSTIC_FULL_APPROVAL_SHA256
+        )
+    assert future.value.code == "RIGHTS_APPROVAL_INVALID"
+
+    v4 = load_player_history_rights_approval(
+        source, expected_approval_sha256=POST_DIAGNOSTIC_FULL_APPROVAL_SHA256
+    )
+    with pytest.raises(IngestionError) as catalogue_drift:
+        validate_post_diagnostic_capture_authorization(
+            v4,
+            expected_approval_sha256=POST_DIAGNOSTIC_FULL_APPROVAL_SHA256,
+            catalogue_semantic_sha256="4" * 64,
+            maximum_player_count=599,
+        )
+    assert catalogue_drift.value.code == "CATALOGUE_HASH_MISMATCH"
+    with pytest.raises(IngestionError) as count_drift:
+        validate_post_diagnostic_capture_authorization(
+            v4,
+            expected_approval_sha256=POST_DIAGNOSTIC_FULL_APPROVAL_SHA256,
+            catalogue_semantic_sha256=SECOND_RETRY_CATALOGUE_SHA256,
+            maximum_player_count=600,
+        )
+    assert count_drift.value.code == "REQUEST_BOUND_INVALID"
+
+
+def test_v4_terms_and_retention_drift_fail_capture_request(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    v4 = load_player_history_rights_approval(
+        repository_root / POST_DIAGNOSTIC_APPROVAL_PATH,
+        expected_approval_sha256=POST_DIAGNOSTIC_FULL_APPROVAL_SHA256,
+    )
+    catalogue = build_current_player_history_catalogue(_bundle(repository_root, tmp_path))
+    for terms, retention, expected_code in (
+        ("0" * 64, RetentionMode.POSTERIOR_ONLY, "TERMS_FINGERPRINT_DRIFT"),
+        (v4.terms_fingerprint, "RAW", "RAW_RETENTION_FORBIDDEN"),
+    ):
+        with pytest.raises(IngestionError) as raised:
+            validate_capture_request(
+                ApprovedCaptureRequest(
+                    approval=v4,
+                    expected_approval_sha256=POST_DIAGNOSTIC_FULL_APPROVAL_SHA256,
+                    catalogue=catalogue,
+                    information_cutoff=CUTOFF,
+                    maximum_player_count=len(catalogue.players),
+                    terms_fingerprint=terms,
+                    retention_mode=retention,  # type: ignore[arg-type]
+                )
+            )
+        assert raised.value.code == expected_code
