@@ -10,8 +10,12 @@ on:
       - evidence/tickets/GW1-PLY-002/**
       - tickets/GW1-PLY-002/**
       - src/dmf_pulse/player_evidence/**
+      - src/dmf_pulse/availability/current.py
+      - src/dmf_pulse/ingestion/fpl/current.py
       - scripts/build_gw1_player_role_prior_candidate.py
       - tests/unit/player_evidence/**
+      - tests/unit/availability/test_current_availability.py
+      - tests/unit/ingestion/test_fpl_current_input.py
       - tests/unit/fpl_points/test_allocation.py
       - tests/unit/fpl_points/test_current_football_events.py
       - evidence/tickets/EVAL-012/current_manifest.json
@@ -42,10 +46,11 @@ jobs:
       - name: Frozen dependency sync
         run: uv sync --all-groups --frozen
 
-      - name: Offline role-prior, player-evidence and Stage-9 allocation regressions
+      - name: Offline role-prior, current-catalogue, Stage-7 and Stage-9 regressions
         run: >-
           uv run pytest -q
           tests/unit/player_evidence
+          tests/unit/availability/test_current_availability.py
           tests/unit/fpl_points/test_allocation.py
           tests/unit/fpl_points/test_current_football_events.py
 
@@ -80,6 +85,10 @@ jobs:
           "$venv/bin/dmf" player-evidence rights-status
           if "$venv/bin/dmf" player-evidence capture-history; then
             echo "capture-history unexpectedly bypassed human-rights guard" >&2
+            exit 1
+          fi
+          if "$venv/bin/dmf" player-evidence capture-current-history; then
+            echo "capture-current-history unexpectedly bypassed current-input and rights guards" >&2
             exit 1
           fi
 

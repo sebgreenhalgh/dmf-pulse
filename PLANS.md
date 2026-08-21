@@ -1118,16 +1118,20 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Review the current official Premier League terms against the bounded
   private, transient, posterior-only governance basis; retain only a
   deterministic snapshot fingerprint.
-- [ ] Record the separate role-prior acceptance and one-off history-rights
+- [x] Record the separate role-prior acceptance and one-off history-rights
   approval, then validate the governance-only revision in the dedicated
   offline workflow.
-- [ ] Resolve an already governed, current mapped 2026/27 player catalogue;
-  stop without transport if none is available.
+- [x] Add and validate the in-memory Stage-7 transient current-player
+  catalogue bridge and strict accepted-v2 history-rights adapter; stop without
+  transport until a fresh manual bootstrap/fixtures pair is supplied.
 - [ ] Perform the authorised serial history capture only after every gate;
   compile posterior-only central/low/high sensitivity artifacts and prove
   transience.
-- [ ] Run focused offline validation and record the unresolved
+- [x] Run focused offline validation and retain the unresolved
   defensive-contribution limitation for human model review.
+- [ ] Obtain a fresh operator-supplied manual 2026/27 GW1 bootstrap-static and
+  fixtures pair, then run the governed capture command only after the exact
+  implementation SHA has passed dedicated Ubuntu validation.
 
 - Ticket/stage: `EVAL-012`, DMFP-19 Stage 12 / playbook B1; immutable parent
   `4f1274ccef419a7c0bde335c48bd4070e248b2e6` on `main`.

@@ -57,6 +57,18 @@ class RetentionMode(StrEnum):
     POSTERIOR_ONLY = "POSTERIOR_ONLY"
 
 
+class CurrentPlayerIdentityMode(StrEnum):
+    """Identity authority for a current-player catalogue.
+
+    ``GW1_STAGE7_TRANSIENT_SURROGATE`` is deliberately not a canonical database
+    identity.  It is the exact short-lived UUID convention consumed by the
+    current Stage-7 and Stage-9 paths.
+    """
+
+    EXTERNALLY_MAPPED = "EXTERNALLY_MAPPED"
+    GW1_STAGE7_TRANSIENT_SURROGATE = "GW1_STAGE7_TRANSIENT_SURROGATE"
+
+
 class HistorySensitivityWorld(StrEnum):
     CENTRAL_TEMPORARY = "CENTRAL_TEMPORARY"
     LOW_SHRINKAGE = "LOW_SHRINKAGE"
@@ -77,23 +89,31 @@ class OverrideKind(StrEnum):
 
 
 class CurrentPlayer(_Model):
-    """A mapped, current-season player; names are intentionally not identifiers."""
+    """A current-stage player row; names are intentionally not identifiers."""
 
     player_id: UUID
     source_player_id: int = Field(gt=0)
     team_id: UUID
     position: PlayerPosition
     current_price_tenths: int = Field(gt=0)
+    source_player_identity_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    source_team_identity_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
 
 
 class CurrentPlayerCatalogue(_Model):
-    schema_version: Literal["gw1-player-history-catalogue-v1"] = "gw1-player-history-catalogue-v1"
+    schema_version: Literal[
+        "gw1-player-history-catalogue-v1", "gw1-player-history-catalogue-v2"
+    ] = "gw1-player-history-catalogue-v1"
     season_code: Literal["2026/27"] = "2026/27"
+    identity_mode: CurrentPlayerIdentityMode = CurrentPlayerIdentityMode.EXTERNALLY_MAPPED
     source_catalogue_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_bundle_semantic_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    source_bootstrap_semantic_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     players: tuple[CurrentPlayer, ...] = Field(min_length=1)
+    semantic_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
-    def mapped_identities_are_unique(self) -> Self:
+    def identities_are_unique_and_mode_is_explicit(self) -> Self:
         player_ids = [player.player_id for player in self.players]
         source_ids = [player.source_player_id for player in self.players]
         if (
@@ -102,6 +122,35 @@ class CurrentPlayerCatalogue(_Model):
             or len(source_ids) != len(set(source_ids))
         ):
             raise ValueError("current catalogue identities must be unique and sorted")
+        if self.identity_mode is CurrentPlayerIdentityMode.GW1_STAGE7_TRANSIENT_SURROGATE:
+            if (
+                self.schema_version != "gw1-player-history-catalogue-v2"
+                or self.source_bundle_semantic_sha256 is None
+                or self.source_bootstrap_semantic_sha256 is None
+                or self.semantic_sha256 is None
+                or self.source_catalogue_semantic_sha256 != self.source_bundle_semantic_sha256
+                or any(
+                    player.source_player_identity_sha256 is None
+                    or player.source_team_identity_sha256 is None
+                    for player in self.players
+                )
+            ):
+                raise ValueError("GW1 transient catalogue lineage is incomplete")
+            expected = canonical_sha256(self.model_dump(mode="json", exclude={"semantic_sha256"}))
+            if self.semantic_sha256 != expected:
+                raise ValueError("GW1 transient catalogue hash is invalid")
+        elif (
+            self.schema_version != "gw1-player-history-catalogue-v1"
+            or self.source_bundle_semantic_sha256 is not None
+            or self.source_bootstrap_semantic_sha256 is not None
+            or self.semantic_sha256 is not None
+            or any(
+                player.source_player_identity_sha256 is not None
+                or player.source_team_identity_sha256 is not None
+                for player in self.players
+            )
+        ):
+            raise ValueError("legacy mapped catalogue must not claim transient source lineage")
         return self
 
 
@@ -485,6 +534,8 @@ class PlayerHistoryRightsApproval(_Model):
     history_past_schema_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     approved_by: str = Field(min_length=1, max_length=200)
     approved_at: datetime
+    governance_approval_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    maximum_player_requests: int | None = Field(default=None, gt=0, le=650)
     approval_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @field_validator("approved_at")
@@ -509,6 +560,7 @@ class DeletionManifest(_Model):
     deletion_outcome: Literal["NOT_RUN", "SUCCESS", "FAILED"]
     posterior_artifact_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     raw_history_persisted: Literal[False] = False
+    current_catalogue_persisted: Literal[False] = False
 
     @field_validator("deletion_timestamp")
     @classmethod

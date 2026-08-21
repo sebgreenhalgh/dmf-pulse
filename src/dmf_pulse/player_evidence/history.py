@@ -38,6 +38,29 @@ _REQUIRED_FIELDS = {
 }
 
 
+def approved_history_schema_fingerprint() -> str:
+    """Return the accepted material schema for the permitted history projection.
+
+    Unknown provider fields are neither retained nor material to this bounded
+    transformation.  Missing or retyped allowed fields still fail parsing.
+    """
+
+    return canonical_sha256(
+        {
+            "node": "history_past",
+            "required_fields": {
+                "assists": "int",
+                "goals_scored": "int",
+                "minutes": "int",
+                "red_cards": "int",
+                "season_name": "str",
+                "yellow_cards": "int",
+            },
+            "optional_goalkeeper_field": {"saves": "int"},
+        }
+    )
+
+
 @dataclass(frozen=True)
 class ParsedHistoryPast:
     seasons: tuple[HistoryPastSeason, ...]
@@ -97,16 +120,25 @@ def _season(value: object) -> str:
 
 
 def history_past_schema_fingerprint(rows: object) -> str:
-    """Fingerprint node shape only; no source values survive the calculation."""
+    """Validate and fingerprint permitted field types; no source values survive."""
 
     if not isinstance(rows, list):
         raise IngestionError("HISTORY_SCHEMA_INVALID", "history_past must be an array")
-    shapes: list[dict[str, str]] = []
     for row in rows:
         if not isinstance(row, Mapping):
             raise IngestionError("HISTORY_SCHEMA_INVALID", "history_past row must be an object")
-        shapes.append({str(key): type(value).__name__ for key, value in sorted(row.items())})
-    return canonical_sha256({"node": "history_past", "row_shapes": shapes})
+        missing = _REQUIRED_FIELDS - set(row)
+        if missing:
+            raise IngestionError("HISTORY_SCHEMA_INVALID", "history_past required field is missing")
+        if not isinstance(row["season_name"], str):
+            raise IngestionError(
+                "HISTORY_SCHEMA_INVALID", "history field season_name must be a string"
+            )
+        for field in _REQUIRED_FIELDS - {"season_name"}:
+            _int(row[field], field=field)
+        if "saves" in row:
+            _int(row["saves"], field="saves")
+    return approved_history_schema_fingerprint()
 
 
 def parse_history_past(
@@ -213,7 +245,8 @@ def validate_capture_request(request: ApprovedCaptureRequest) -> None:
     """Fail before a transport exists unless every human-controlled guard agrees."""
 
     approval = request.approval
-    if request.expected_approval_sha256 != approval.approval_sha256:
+    effective_approval_sha256 = approval.governance_approval_sha256 or approval.approval_sha256
+    if request.expected_approval_sha256 != effective_approval_sha256:
         raise IngestionError("RIGHTS_APPROVAL_HASH_MISMATCH", "rights approval hash does not match")
     if request.retention_mode is not RetentionMode.POSTERIOR_ONLY:
         raise IngestionError("RAW_RETENTION_FORBIDDEN", "only POSTERIOR_ONLY retention is allowed")
@@ -224,6 +257,13 @@ def validate_capture_request(request: ApprovedCaptureRequest) -> None:
     ):
         raise IngestionError(
             "REQUEST_BOUND_INVALID", "maximum player count is outside catalogue bounds"
+        )
+    if (
+        approval.maximum_player_requests is not None
+        and request.maximum_player_count > approval.maximum_player_requests
+    ):
+        raise IngestionError(
+            "REQUEST_BOUND_INVALID", "maximum player count exceeds rights approval"
         )
     if request.information_cutoff.tzinfo is None or request.information_cutoff.utcoffset() is None:
         raise IngestionError("TEMPORAL_INVALID", "information cutoff must be timezone-aware")
@@ -312,7 +352,10 @@ def capture_approved_history(
         deletion = DeletionManifest(
             run_id=run_id,
             temporary_object_identifiers=tuple(
-                f"transient-history-{index}" for index in range(len(evidence))
+                (
+                    "transient-current-catalogue",
+                    *(f"transient-history-{index}" for index in range(len(evidence))),
+                )
             ),
             deletion_timestamp=deleted_at.astimezone(UTC),
             deletion_outcome="SUCCESS",

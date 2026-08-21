@@ -34,7 +34,7 @@ from dmf_pulse.availability.pipeline import (
 from dmf_pulse.availability.projection import TeamMinutesProjection
 from dmf_pulse.availability.resources import availability_resource_json
 from dmf_pulse.ingestion.errors import IngestionError
-from dmf_pulse.ingestion.fpl.current import CurrentFplFixture, CurrentFplPlayer
+from dmf_pulse.ingestion.fpl.current import CurrentFplFixture, CurrentFplPlayer, CurrentFplTeam
 from dmf_pulse.markets.current import CurrentMarketConsensusBundle
 
 CURRENT_AVAILABILITY_ADAPTER_VERSION = "gw1-current-availability-stage7-v1"
@@ -668,6 +668,12 @@ def current_player_id(player: CurrentFplPlayer) -> UUID:
     return _uuid("player", player.identity.canonical_lookup_sha256)
 
 
+def current_team_id(team: CurrentFplTeam) -> UUID:
+    """Return the governed transient team UUID used by current Stage-7 outputs."""
+
+    return _uuid("team", team.identity.canonical_lookup_sha256)
+
+
 def _decision_effect(adjustment: AdjustmentType) -> Literal["HARD_ZERO", "CONFIDENCE_ONLY", "NONE"]:
     if adjustment == "HARD_INELIGIBLE":
         return "HARD_ZERO"
@@ -680,8 +686,7 @@ def _team_projection(
     *,
     source: CurrentMarketConsensusBundle,
     fixture: CurrentFplFixture,
-    official_team_id: int,
-    team_identity_sha256: str,
+    team: CurrentFplTeam,
     approval: CurrentAvailabilityApproval,
     artifact: MinutesModelArtifact,
     policy: Mapping[str, Any],
@@ -691,7 +696,9 @@ def _team_projection(
         for row in source.fixture_markets
         if row.official_fpl_fixture_id == fixture.provider_fixture_id
     )
-    team_id = _uuid("team", team_identity_sha256)
+    official_team_id = team.provider_team_id
+    team_identity_sha256 = team.identity.canonical_lookup_sha256
+    team_id = current_team_id(team)
     team_key = f"official_fpl_team_{official_team_id}"
     players = tuple(
         sorted(
@@ -847,8 +854,7 @@ def _build_team_projections(
     policy: Mapping[str, Any],
 ) -> tuple[CurrentTeamAvailabilityProjection, ...]:
     teams = {
-        team.identity.canonical_lookup_sha256: team.provider_team_id
-        for team in source.source_input.fpl_input.teams
+        team.identity.canonical_lookup_sha256: team for team in source.source_input.fpl_input.teams
     }
     results: list[CurrentTeamAvailabilityProjection] = []
     for fixture in _target_fixtures(source):
@@ -858,8 +864,7 @@ def _build_team_projections(
                 _team_projection(
                     source=source,
                     fixture=fixture,
-                    official_team_id=teams[identity_hash],
-                    team_identity_sha256=identity_hash,
+                    team=teams[identity_hash],
                     approval=approval,
                     artifact=artifact,
                     policy=policy,
@@ -918,4 +923,5 @@ __all__ = [
     "build_current_availability",
     "build_current_availability_review",
     "current_player_id",
+    "current_team_id",
 ]

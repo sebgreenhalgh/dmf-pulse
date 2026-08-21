@@ -19,6 +19,8 @@ from dmf_pulse.availability.current import (
     CurrentPlayerAvailabilityDecision,
     build_current_availability,
     build_current_availability_review,
+    current_player_id,
+    current_team_id,
 )
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplInputService
@@ -298,6 +300,28 @@ def test_current_rosters_produce_complete_cold_start_minutes_bundle(
     assert summary.confidence_grades == {"D": 44}
     assert summary.persistence_performed is False
     assert CurrentAvailabilityBundle.model_validate_json(result.model_dump_json()) == result
+
+
+def test_stage7_projection_uses_the_public_transient_identity_convention(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    source = _market_source(repository_root, tmp_path)
+    result = build_current_availability(source, _approval(source))
+    bundle = source.source_input.fpl_input
+    team_by_id = {team.provider_team_id: team for team in bundle.teams}
+
+    for projection in result.team_projections:
+        team = team_by_id[projection.official_fpl_team_id]
+        assert projection.transient_team_id == current_team_id(team)
+        expected_player_ids = {
+            str(current_player_id(player))
+            for player in bundle.players
+            if player.team_identity == team.identity
+        }
+        assert {
+            row.player_id for row in projection.posterior_projection.players
+        } == expected_player_ids
 
 
 def test_hard_new_signing_and_soft_evidence_obey_distinct_boundaries(
