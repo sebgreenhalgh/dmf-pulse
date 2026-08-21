@@ -1147,6 +1147,20 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   continuation for dedicated Ubuntu validation, and stop pending a separate
   newly approved one-off history capture.
 
+## GW1-PLY-003R2 — second one-off current-player history retry
+
+- [x] Verify the exact diagnostic-remediation branch and dedicated Ubuntu run;
+  reconfirm the existing private/transient terms basis without changing its
+  fingerprint.
+- [x] Record the second, single-use retry approval and extend the loader only
+  for the consumed historical record and this exact retry record.
+- [x] Prove all altered-governance negative controls offline; recompile the
+  operator-controlled manual input and require the accepted 599-player
+  catalogue hash before a dedicated pre-retry validation run.
+- [ ] Execute exactly one serial retry only after the exact pre-retry SHA has
+  passed Ubuntu validation; stop permanently on its first typed failure or
+  publish only permitted posterior/allocation outputs on full success.
+
 - Ticket/stage: `EVAL-012`, DMFP-19 Stage 12 / playbook B1; immutable parent
   `4f1274ccef419a7c0bde335c48bd4070e248b2e6` on `main`.
 - Branch: `stage/A12/EVAL-012-backtesting-framework`.

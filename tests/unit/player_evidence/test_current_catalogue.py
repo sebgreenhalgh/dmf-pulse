@@ -9,10 +9,15 @@ from pathlib import Path
 
 import pytest
 
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.availability.current import current_player_id, current_team_id
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplInputRequest, CurrentFplInputService
-from dmf_pulse.player_evidence.approvals import load_player_history_rights_approval
+from dmf_pulse.player_evidence.approvals import (
+    SECOND_RETRY_APPROVAL_SHA256,
+    load_player_history_rights_approval,
+    validate_second_retry_capture_authorization,
+)
 from dmf_pulse.player_evidence.catalogue import build_current_player_history_catalogue
 from dmf_pulse.player_evidence.empirical_bayes import compile_posterior_artifact
 from dmf_pulse.player_evidence.history import ApprovedCaptureRequest, validate_capture_request
@@ -24,6 +29,7 @@ CAPTURED = datetime(2026, 8, 18, 12, tzinfo=UTC)
 RECEIVED = datetime(2026, 8, 18, 12, 5, tzinfo=UTC)
 CUTOFF = datetime(2026, 8, 21, 17, 30, tzinfo=UTC)
 RIGHTS_APPROVAL_SHA256 = "d946552f2a55df7ed400bb43cff6bf85b4bdf8cbfe804044d08d9c9a96f8e2fd"
+SECOND_RETRY_CATALOGUE_SHA256 = "9d655a2dc8e60eca0898f4bc04e8caf7b264887af1d62bfe61c5288cbdd75f11"
 
 
 def _source(repository_root: Path, name: str) -> object:
@@ -225,3 +231,135 @@ def test_accepted_v2_rights_loader_binds_the_existing_capture_guard(
             )
         )
     assert raised.value.code == "RIGHTS_APPROVAL_HASH_MISMATCH"
+
+
+def test_second_retry_loader_accepts_only_the_exact_new_human_directive(
+    repository_root: Path,
+) -> None:
+    first_path = (
+        repository_root / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_RIGHTS_APPROVAL.json"
+    )
+    second_path = (
+        repository_root
+        / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_SECOND_RETRY_RIGHTS_APPROVAL.json"
+    )
+    historical = load_player_history_rights_approval(
+        first_path, expected_approval_sha256=RIGHTS_APPROVAL_SHA256
+    )
+    retry = load_player_history_rights_approval(
+        second_path, expected_approval_sha256=SECOND_RETRY_APPROVAL_SHA256
+    )
+    assert historical.governance_approval_sha256 == RIGHTS_APPROVAL_SHA256
+    assert retry.governance_approval_sha256 == SECOND_RETRY_APPROVAL_SHA256
+    assert retry.maximum_player_requests == 599
+
+    with pytest.raises(IngestionError) as raised:
+        validate_second_retry_capture_authorization(
+            historical,
+            expected_approval_sha256=RIGHTS_APPROVAL_SHA256,
+            catalogue_semantic_sha256=SECOND_RETRY_CATALOGUE_SHA256,
+        )
+    assert raised.value.code == "RIGHTS_APPROVAL_HASH_MISMATCH"
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    (
+        lambda record: record.__setitem__("required_capture_code_sha", "0" * 40),
+        lambda record: record.__setitem__("previous_consumed_approval_sha256", "1" * 64),
+        lambda record: record.__setitem__("expected_catalogue_semantic_sha256", "2" * 64),
+        lambda record: record["capture_constraints"].__setitem__("maximum_player_requests", 600),
+        lambda record: record["terms_review"].__setitem__("snapshot_sha256", "3" * 64),
+    ),
+)
+def test_second_retry_loader_rejects_any_altered_governance_field(
+    repository_root: Path, tmp_path: Path, mutate
+) -> None:
+    source = (
+        repository_root
+        / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_SECOND_RETRY_RIGHTS_APPROVAL.json"
+    )
+    altered = json.loads(source.read_text(encoding="utf-8"))
+    mutate(altered)
+    altered_path = tmp_path / "altered-second-retry.json"
+    altered_path.write_text(json.dumps(altered), encoding="utf-8")
+    with pytest.raises(IngestionError) as raised:
+        load_player_history_rights_approval(
+            altered_path, expected_approval_sha256=SECOND_RETRY_APPROVAL_SHA256
+        )
+    assert raised.value.code == "RIGHTS_APPROVAL_INVALID"
+
+
+def test_second_retry_loader_rejects_wrong_hash_and_self_consistent_third_record(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    source = (
+        repository_root
+        / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_SECOND_RETRY_RIGHTS_APPROVAL.json"
+    )
+    with pytest.raises(IngestionError) as wrong_hash:
+        load_player_history_rights_approval(source, expected_approval_sha256="0" * 64)
+    assert wrong_hash.value.code == "RIGHTS_APPROVAL_HASH_MISMATCH"
+
+    third = json.loads(source.read_text(encoding="utf-8"))
+    third["retry_ordinal"] = 3
+    third_without_hash = dict(third)
+    third_without_hash.pop("approval_sha256")
+    third["approval_sha256"] = canonical_sha256(third_without_hash)
+    third_path = tmp_path / "self-consistent-third.json"
+    third_path.write_text(json.dumps(third), encoding="utf-8")
+    with pytest.raises(IngestionError) as raised:
+        load_player_history_rights_approval(
+            third_path, expected_approval_sha256=SECOND_RETRY_APPROVAL_SHA256
+        )
+    assert raised.value.code == "RIGHTS_APPROVAL_INVALID"
+
+
+def test_second_retry_catalogue_guard_rejects_drift_and_request_bound() -> None:
+    approval_path = Path(
+        "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_SECOND_RETRY_RIGHTS_APPROVAL.json"
+    )
+    approval = load_player_history_rights_approval(
+        approval_path, expected_approval_sha256=SECOND_RETRY_APPROVAL_SHA256
+    )
+    with pytest.raises(IngestionError) as wrong_catalogue:
+        validate_second_retry_capture_authorization(
+            approval,
+            expected_approval_sha256=SECOND_RETRY_APPROVAL_SHA256,
+            catalogue_semantic_sha256="0" * 64,
+        )
+    assert wrong_catalogue.value.code == "CATALOGUE_HASH_MISMATCH"
+    altered = approval.model_copy(update={"maximum_player_requests": 600})
+    with pytest.raises(IngestionError) as invalid_bound:
+        validate_second_retry_capture_authorization(
+            altered,
+            expected_approval_sha256=SECOND_RETRY_APPROVAL_SHA256,
+            catalogue_semantic_sha256=SECOND_RETRY_CATALOGUE_SHA256,
+        )
+    assert invalid_bound.value.code == "REQUEST_BOUND_INVALID"
+
+
+def test_second_retry_terms_mismatch_blocks_before_transport(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    approval_path = (
+        repository_root
+        / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_SECOND_RETRY_RIGHTS_APPROVAL.json"
+    )
+    approval = load_player_history_rights_approval(
+        approval_path, expected_approval_sha256=SECOND_RETRY_APPROVAL_SHA256
+    )
+    catalogue = build_current_player_history_catalogue(_bundle(repository_root, tmp_path))
+    with pytest.raises(IngestionError) as raised:
+        validate_capture_request(
+            ApprovedCaptureRequest(
+                approval=approval,
+                expected_approval_sha256=SECOND_RETRY_APPROVAL_SHA256,
+                catalogue=catalogue,
+                information_cutoff=CUTOFF,
+                maximum_player_count=len(catalogue.players),
+                terms_fingerprint="0" * 64,
+                retention_mode=RetentionMode.POSTERIOR_ONLY,
+            )
+        )
+    assert raised.value.code == "TERMS_FINGERPRINT_DRIFT"

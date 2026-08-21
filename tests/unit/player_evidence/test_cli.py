@@ -23,9 +23,15 @@ def _write_replay(tmp_path):
     return path
 
 
-def _current_capture_args(repository_root: Path, tmp_path: Path) -> tuple[list[str], list[Path]]:
+def _current_capture_args(
+    repository_root: Path,
+    tmp_path: Path,
+    *,
+    approval: Path | None = None,
+    expected_approval_sha256: str = "d946552f2a55df7ed400bb43cff6bf85b4bdf8cbfe804044d08d9c9a96f8e2fd",
+) -> tuple[list[str], list[Path]]:
     current_input = repository_root / "fixtures/fpl/FPL-004/happy_path"
-    rights = (
+    rights = approval or (
         repository_root / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_RIGHTS_APPROVAL.json"
     )
     role_prior = (
@@ -45,7 +51,7 @@ def _current_capture_args(repository_root: Path, tmp_path: Path) -> tuple[list[s
             "--approval",
             str(rights),
             "--expected-approval-sha256",
-            "d946552f2a55df7ed400bb43cff6bf85b4bdf8cbfe804044d08d9c9a96f8e2fd",
+            expected_approval_sha256,
             "--bootstrap",
             str(current_input / "bootstrap.json"),
             "--fixtures",
@@ -171,6 +177,11 @@ def test_current_capture_builds_only_an_in_memory_catalogue_before_execute_netwo
         "CurrentFplInputService",
         lambda: CurrentFplInputService(clock=lambda: datetime(2026, 8, 18, 12, 5, tzinfo=UTC)),
     )
+    monkeypatch.setattr(
+        command_module,
+        "validate_second_retry_capture_authorization",
+        lambda *_args, **_kwargs: None,
+    )
     args, outputs = _current_capture_args(repository_root, tmp_path)
     result = RUNNER.invoke(app, args)
     assert result.exit_code == 2, result.output
@@ -205,6 +216,11 @@ def test_current_capture_preserves_typed_history_failure_and_writes_nothing(
         "CurrentFplInputService",
         lambda: CurrentFplInputService(clock=lambda: datetime(2026, 8, 18, 12, 5, tzinfo=UTC)),
     )
+    monkeypatch.setattr(
+        command_module,
+        "validate_second_retry_capture_authorization",
+        lambda *_args, **_kwargs: None,
+    )
     args, outputs = _current_capture_args(repository_root, tmp_path)
     args.append("--execute-network")
     result = RUNNER.invoke(app, args)
@@ -213,4 +229,64 @@ def test_current_capture_preserves_typed_history_failure_and_writes_nothing(
     assert payload["error"]["code"] == "HISTORY_MODEL_VALIDATION_FAILED"
     assert "CAPTURE_INPUT_INVALID" not in result.output
     assert payload["error"]["details"]["raw_persistence"] is False
+    assert not any(path.exists() for path in outputs)
+
+
+def test_current_capture_rejects_consumed_first_approval_before_transport(
+    repository_root: Path, tmp_path: Path, monkeypatch
+) -> None:
+    import dmf_pulse.cli.player_evidence as command_module
+
+    constructed = False
+
+    class _ForbiddenTransport:
+        def __init__(self) -> None:
+            nonlocal constructed
+            constructed = True
+
+    monkeypatch.setattr(command_module, "UrllibHistoryTransport", _ForbiddenTransport)
+    monkeypatch.setattr(
+        command_module,
+        "CurrentFplInputService",
+        lambda: CurrentFplInputService(clock=lambda: datetime(2026, 8, 18, 12, 5, tzinfo=UTC)),
+    )
+    args, outputs = _current_capture_args(repository_root, tmp_path)
+    args.append("--execute-network")
+    result = RUNNER.invoke(app, args)
+    assert result.exit_code == 2, result.output
+    payload = json.loads(result.output)
+    assert payload["error"]["code"] == "RIGHTS_APPROVAL_HASH_MISMATCH"
+    assert constructed is False
+    assert not any(path.exists() for path in outputs)
+
+
+def test_current_capture_rejects_wrong_second_retry_hash_before_transport(
+    repository_root: Path, tmp_path: Path, monkeypatch
+) -> None:
+    import dmf_pulse.cli.player_evidence as command_module
+
+    constructed = False
+
+    class _ForbiddenTransport:
+        def __init__(self) -> None:
+            nonlocal constructed
+            constructed = True
+
+    second_approval = (
+        repository_root
+        / "evidence/tickets/GW1-PLY-003/GW1_PLAYER_HISTORY_SECOND_RETRY_RIGHTS_APPROVAL.json"
+    )
+    monkeypatch.setattr(command_module, "UrllibHistoryTransport", _ForbiddenTransport)
+    args, outputs = _current_capture_args(
+        repository_root,
+        tmp_path,
+        approval=second_approval,
+        expected_approval_sha256="0" * 64,
+    )
+    args.append("--execute-network")
+    result = RUNNER.invoke(app, args)
+    assert result.exit_code == 2, result.output
+    payload = json.loads(result.output)
+    assert payload["error"]["code"] == "RIGHTS_APPROVAL_HASH_MISMATCH"
+    assert constructed is False
     assert not any(path.exists() for path in outputs)

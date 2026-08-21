@@ -1,0 +1,67 @@
+{
+  "access_mode": "HUMAN_INITIATED_BOUNDED_UNAUTHENTICATED_TRANSIENT",
+  "allowed_history_fields": [
+    "season_name",
+    "minutes",
+    "goals_scored",
+    "assists",
+    "yellow_cards",
+    "red_cards",
+    "saves_FOR_GOALKEEPERS_ONLY"
+  ],
+  "allowed_node": "history_past",
+  "approval_sha256": "6d094bd94217d227f946bdee769a46227312d78bae455464a4fd41d191e8c935",
+  "approval_source": "USER_DIRECTIVE",
+  "approved_at": "2026-08-21T12:37:08.3877731Z",
+  "capture_constraints": {
+    "actual_requested_count_must_not_exceed_exact_mapped_catalogue_count": true,
+    "information_cutoff": "2026-08-21T17:30:00Z",
+    "maximum_player_requests": 599,
+    "minimum_serial_interval_seconds": 1.0,
+    "no_browser_automation": true,
+    "no_cookie_or_session": true,
+    "no_credential": true,
+    "no_historical_player_discovery": true,
+    "no_parallel_requests": true,
+    "no_retry_loop": true,
+    "stop_immediately_on_http": [
+      401,
+      403,
+      429
+    ],
+    "stop_on_material_schema_drift": true,
+    "stop_on_network_failure": true,
+    "stop_on_other_non_success_response": true,
+    "stop_on_post_cutoff_response": true,
+    "stop_on_typed_parser_or_model_failure": true
+  },
+  "derived_retention": "POSTERIOR_ONLY",
+  "expected_catalogue_semantic_sha256": "9d655a2dc8e60eca0898f4bc04e8caf7b264887af1d62bfe61c5288cbdd75f11",
+  "previous_consumed_approval_sha256": "d946552f2a55df7ed400bb43cff6bf85b4bdf8cbfe804044d08d9c9a96f8e2fd",
+  "purpose": "PRIVATE_2026_27_GW1_DECISION_SUPPORT_ONLY",
+  "raw_retention": "FORBIDDEN",
+  "redistribution": "NONE",
+  "repeat_collection": "REQUIRES_ANOTHER_NEW_HUMAN_APPROVAL",
+  "required_capture_code_sha": "bb003141f2ba197453a8f88e2565a98ca7dca712",
+  "retry_ordinal": 2,
+  "retry_reason": "FIRST_ATTEMPT_FAILED_ATOMICALLY_WITH_DIAGNOSTICS_PREVIOUSLY_MASKED",
+  "schema_version": "gw1-player-history-rights-approval-v3",
+  "scope": "PRIVATE_2026_27_GW1_ONLY",
+  "source": {
+    "current_element_id_binding": "ONLY_ALREADY_GOVERNED_CURRENT_2026_27_MAPPED_FPL_CATALOGUE",
+    "url_template": "https://fantasy.premierleague.com/api/element-summary/{current_element_id}/"
+  },
+  "source_body_sha256_retention": "PERMITTED_NONREVERSIBLE_PROVENANCE_ONLY",
+  "status": "HUMAN_ACCEPTED_SECOND_ONE_OFF_RETRY_ONLY",
+  "terms_review": {
+    "current_terms_materially_consistent_with_reviewed_basis": true,
+    "reviewed_at": "2026-08-21T12:37:08.3877731Z",
+    "snapshot_sha256": "ad62cb745459df3282f8900117b85352a01d75754e080d06aa3836dcd2b2b246",
+    "source_url": "https://www.premierleague.com/en/terms-and-conditions",
+    "verified_propositions": [
+      "REASONABLE_PRIVATE_PERSONAL_DOWNLOADING_PERMITTED",
+      "BROADER_REPRODUCTION_REUTILISATION_REDISTRIBUTION_AND_DATABASE_CREATION_RESTRICTED",
+      "NO_EXPRESS_RESOLUTION_OF_THIS_BOUNDED_TRANSIENT_POSTERIOR_ONLY_TRANSFORMATION"
+    ]
+  }
+}

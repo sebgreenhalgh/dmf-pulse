@@ -13,7 +13,11 @@ from pydantic import ValidationError
 from dmf_pulse.assurance.canonical import canonical_sha256, pretty_json
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplInputRequest, CurrentFplInputService
-from dmf_pulse.player_evidence.approvals import load_player_history_rights_approval
+from dmf_pulse.player_evidence.approvals import (
+    SECOND_RETRY_APPROVAL_SHA256,
+    load_player_history_rights_approval,
+    validate_second_retry_capture_authorization,
+)
 from dmf_pulse.player_evidence.catalogue import build_current_player_history_catalogue
 from dmf_pulse.player_evidence.empirical_bayes import compile_posterior_artifact
 from dmf_pulse.player_evidence.history import (
@@ -246,7 +250,14 @@ def capture_history_command(
             raise IngestionError(
                 "RIGHTS_APPROVAL_REQUIRED", "explicit human rights approval is required"
             )
-        approval_value = _load(approval, PlayerHistoryRightsApproval)
+        if expected_approval_sha256 != SECOND_RETRY_APPROVAL_SHA256:
+            raise IngestionError(
+                "RIGHTS_APPROVAL_HASH_MISMATCH",
+                "live history capture requires the second retry approval hash",
+            )
+        approval_value = load_player_history_rights_approval(
+            approval, expected_approval_sha256=expected_approval_sha256
+        )
         catalogue_value = _load(catalogue, CurrentPlayerCatalogue)
         cutoff = datetime.fromisoformat(information_cutoff.replace("Z", "+00:00"))
         request = ApprovedCaptureRequest(
@@ -421,6 +432,11 @@ def capture_current_history_command(
                 "DEADLINE_MISMATCH", "current GW1 deadline does not match the cutoff"
             )
         catalogue = build_current_player_history_catalogue(bundle)
+        validate_second_retry_capture_authorization(
+            rights_approval,
+            expected_approval_sha256=expected_approval_sha256,
+            catalogue_semantic_sha256=catalogue.semantic_sha256 or "",
+        )
         request = ApprovedCaptureRequest(
             approval=rights_approval,
             expected_approval_sha256=expected_approval_sha256,
