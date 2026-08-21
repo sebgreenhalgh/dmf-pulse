@@ -1,0 +1,57 @@
+{
+  "access_mode": "HUMAN_INITIATED_BOUNDED_UNAUTHENTICATED_TRANSIENT",
+  "allowed_history_fields": [
+    "season_name",
+    "minutes",
+    "goals_scored",
+    "assists",
+    "yellow_cards",
+    "red_cards",
+    "saves_FOR_GOALKEEPERS_ONLY"
+  ],
+  "allowed_node": "history_past",
+  "approval_sha256": "d946552f2a55df7ed400bb43cff6bf85b4bdf8cbfe804044d08d9c9a96f8e2fd",
+  "approval_source": "USER_DIRECTIVE",
+  "approved_at": "2026-08-21T10:12:39.7814700Z",
+  "capture_constraints": {
+    "actual_requested_count_must_not_exceed_exact_mapped_catalogue_count": true,
+    "information_cutoff": "2026-08-21T17:30:00Z",
+    "maximum_player_requests": 650,
+    "minimum_serial_interval_seconds": 1.0,
+    "no_browser_automation": true,
+    "no_cookie_or_session": true,
+    "no_credential": true,
+    "no_historical_player_discovery": true,
+    "stop_immediately_on_http": [
+      401,
+      403,
+      429
+    ],
+    "stop_on_material_schema_drift": true,
+    "stop_on_post_cutoff_response": true
+  },
+  "derived_retention": "POSTERIOR_ONLY",
+  "purpose": "PRIVATE_2026_27_GW1_DECISION_SUPPORT_ONLY",
+  "raw_retention": "FORBIDDEN",
+  "redistribution": "NONE",
+  "repeat_collection": "REQUIRES_NEW_HUMAN_APPROVAL",
+  "schema_version": "gw1-player-history-rights-approval-v2",
+  "scope": "PRIVATE_2026_27_GW1_ONLY",
+  "source": {
+    "current_element_id_binding": "ONLY_ALREADY_GOVERNED_CURRENT_2026_27_MAPPED_FPL_CATALOGUE",
+    "url_template": "https://fantasy.premierleague.com/api/element-summary/{current_element_id}/"
+  },
+  "source_body_sha256_retention": "PERMITTED_NONREVERSIBLE_PROVENANCE_ONLY",
+  "status": "HUMAN_ACCEPTED_ONE_OFF_ONLY",
+  "terms_review": {
+    "current_terms_materially_consistent_with_reviewed_basis": true,
+    "reviewed_at": "2026-08-21T10:12:39.7814700Z",
+    "snapshot_sha256": "ad62cb745459df3282f8900117b85352a01d75754e080d06aa3836dcd2b2b246",
+    "source_url": "https://www.premierleague.com/en/terms-and-conditions",
+    "verified_propositions": [
+      "REASONABLE_PRIVATE_PERSONAL_DOWNLOADING_PERMITTED",
+      "BROADER_REPRODUCTION_REUTILISATION_REDISTRIBUTION_AND_DATABASE_CREATION_RESTRICTED",
+      "NO_EXPRESS_RESOLUTION_OF_THIS_BOUNDED_TRANSIENT_POSTERIOR_ONLY_TRANSFORMATION"
+    ]
+  }
+}

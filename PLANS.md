@@ -1111,6 +1111,24 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 
 # EVAL-012 Stage-12 backtesting framework
 
+# GW1-PLY-003 bounded current-player history capture
+
+- [x] Verify the approved role-prior branch identity and the prior dedicated
+  Ubuntu validation.
+- [x] Review the current official Premier League terms against the bounded
+  private, transient, posterior-only governance basis; retain only a
+  deterministic snapshot fingerprint.
+- [ ] Record the separate role-prior acceptance and one-off history-rights
+  approval, then validate the governance-only revision in the dedicated
+  offline workflow.
+- [ ] Resolve an already governed, current mapped 2026/27 player catalogue;
+  stop without transport if none is available.
+- [ ] Perform the authorised serial history capture only after every gate;
+  compile posterior-only central/low/high sensitivity artifacts and prove
+  transience.
+- [ ] Run focused offline validation and record the unresolved
+  defensive-contribution limitation for human model review.
+
 - Ticket/stage: `EVAL-012`, DMFP-19 Stage 12 / playbook B1; immutable parent
   `4f1274ccef419a7c0bde335c48bd4070e248b2e6` on `main`.
 - Branch: `stage/A12/EVAL-012-backtesting-framework`.

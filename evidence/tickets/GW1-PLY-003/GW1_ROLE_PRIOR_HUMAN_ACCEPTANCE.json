@@ -1,0 +1,74 @@
+{
+  "acceptance_scope": "PRIVATE_2026_27_GW1_DECISION_SUPPORT_ONLY",
+  "acceptance_source": "USER_DIRECTIVE",
+  "accepted_at": "2026-08-21T10:12:39.7814700Z",
+  "accepted_model_scope": [
+    "EMPIRICALLY_CALIBRATED_BROAD_ROLE_FPL_POSITION_MEANS",
+    "GK_SPECIFIC_SAVE_PRIOR",
+    "DETERMINISTIC_COARSE_ROLE_TO_FPL_POSITION_FALLBACK",
+    "DOCUMENTED_GENERIC_FALLBACK",
+    "BROAD_WYSCOUT_ASSIST_PROPENSITY_PRIOR_ONLY"
+  ],
+  "attestation_sha256": "62f7a50ae3d047d27b78be33ead17c8c66880e9b444fe7a0fa09815d25267006",
+  "candidate_kappa_policy": {
+    "central": {
+      "assists": 10.0,
+      "goals": 10.0,
+      "red_cards": 30.0,
+      "saves": 7.0,
+      "yellow_cards": 7.0
+    },
+    "low_high_sensitivity_required": true,
+    "status": "TEMPORARY_GW1_POLICY_NOT_CALIBRATED"
+  },
+  "limitations": [
+    "SOURCE_SEASON_EPL_2017_18_ONLY",
+    "SOURCE_ROLES_COARSE_FINE_TACTICAL_ROLES_NOT_EMPIRICALLY_CALIBRATED",
+    "NO_CURRENT_PLAYER_IDENTITY_INFERENCE",
+    "NO_OPTA_EQUIVALENCE_CLAIM",
+    "UNSUPPORTED_FIELDS_ARE_NOT_EMPIRICAL_ZERO_RATE_ESTIMATES",
+    "DEFENSIVE_CONTRIBUTION_MODEL_COMPLETENESS_PARTIAL",
+    "BLOCKS_UNSUPPORTED",
+    "BALL_RECOVERIES_UNSUPPORTED",
+    "BPS_AUXILIARIES_PARTIAL"
+  ],
+  "role_prior_artifact_sha256": "007e4d400d8f72eccc50541a9e9b385042bd3eb5d724b0b1d76e7cc69f42afb8",
+  "reviewed_final_branch_sha": "85f49727990197f6e5609c028a52c2f4f59f427c",
+  "schema_version": "gw1-role-prior-human-acceptance-v1",
+  "source": {
+    "attribution": "Pappalardo, Luca; Massucco, Emanuele (2019). Soccer match event dataset, figshare collection 10.6084/m9.figshare.c.4415000; cite Pappalardo et al. (2019).",
+    "collection_url": "https://figshare.com/collections/Soccer_match_event_dataset/4415000/2",
+    "collection_version": 5,
+    "dataset": "Pappalardo / Wyscout Soccer Match Event Dataset",
+    "files": [
+      {
+        "download_sha256": "877e015b716ffdeea18f04418e3f24fed307ed03c37ff305cabe1f47c4822a45",
+        "file_id": 14464685,
+        "item_id": 7770599,
+        "item_version": 1,
+        "member_sha256": "301599543aa1a7fa457bb8ef33c9fe860bf81dca65d418d618d68abcda3defad",
+        "used_member": "events_England.json"
+      },
+      {
+        "download_sha256": "c8f92bb7533e5c127e043cee764c991b5c25b4f5e70a65be931baae0b1765ce9",
+        "file_id": 14464622,
+        "item_id": 7770422,
+        "item_version": 1,
+        "member_sha256": "620725c2e6a58b4db3e574ed6c559136477451d81af543f8a06bd85c3da3fe29",
+        "used_member": "matches_England.json"
+      },
+      {
+        "download_sha256": "877a111cb1005b73df5645e9338bd74fb4b496bace2fbc545a72abb3b73efa2e",
+        "file_id": 15073721,
+        "item_id": 7765196,
+        "item_version": 3,
+        "member_sha256": "877a111cb1005b73df5645e9338bd74fb4b496bace2fbc545a72abb3b73efa2e",
+        "used_member": "players.json"
+      }
+    ],
+    "licence": "CC-BY-4.0",
+    "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "status": "HUMAN_ACCEPTED_PRIVATE_GW1_ONLY",
+  "transformation_code_sha": "92a2995143a67e78e98e2bd1b203d2c9f231fc6f"
+}
