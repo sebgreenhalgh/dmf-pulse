@@ -288,13 +288,13 @@ provider request, or credential use occurred.
 - [x] Verify the exact parent and independently verify the three required
   Figshare item licences, versions, downloads, hashes, attribution, and source
   entity definitions before calibration.
-- [ ] Implement an offline schema/integrity gate, regulation-minute
+- [x] Implement an offline schema/integrity gate, regulation-minute
   reconstruction, source-role-to-FPL-position fallback, direct/derived field
   classification, and aggregate-only candidate builder.
-- [ ] Produce the non-vendored-data candidate artifact and wire its prior rows
+- [x] Produce the non-vendored-data candidate artifact and wire its prior rows
   and temporary kappa worlds into the existing compiler without changing
   Stage-7 or Stage-9 ownership.
-- [ ] Add deterministic synthetic tests, diagnostics, ticket/evidence, and an
+- [x] Add deterministic synthetic tests, diagnostics, ticket/evidence, and an
   offline Ubuntu workflow; run full bounded assurance, hostile review, then
   publish only this dedicated branch.
 

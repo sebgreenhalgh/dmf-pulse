@@ -131,6 +131,11 @@
       "sha256": "eadb5f9a15679ce6539dd5db8f97bb66098e04ec1a7a9511bb3ae6a87dfc67d2"
     },
     {
+      "bytes": 3069,
+      "path": ".github/workflows/gw1-player-role-prior-candidate.yml",
+      "sha256": "01cead47ec80ca587021d82763b2bc3bc99103a67d1eab2206ff2e3ae8bb8e8a"
+    },
+    {
       "bytes": 2554,
       "path": ".github/workflows/gw1-support-prior-candidate.yml",
       "sha256": "68a6167099c56f4279b8b3c905b541ad7bac366c5a77d2ca48ba07b07ebaa44c"
@@ -231,9 +236,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 85996,
+      "bytes": 87309,
       "path": "PLANS.md",
-      "sha256": "b5619e22d19bea848c0955b65742f29e4cc1eed0e5998bb3e3d5609053eb2aab"
+      "sha256": "2d5bc86be27f37dc7795e31240b3929d15c382119e3bc1f3652957e360728a33"
     },
     {
       "bytes": 2761,
@@ -2251,6 +2256,11 @@
       "sha256": "5f156add4cd78a80706e831613ae4df4b8e3e7ec733b9c382ed5f9193f3f4c97"
     },
     {
+      "bytes": 5240,
+      "path": "scripts/build_gw1_player_role_prior_candidate.py",
+      "sha256": "e4ad3b8ef3787c4ed2a0f95d24f0fa04a4a800aac160c1e27262b05676fa2f07"
+    },
+    {
       "bytes": 3238,
       "path": "scripts/build_gw1_support_prior_candidate.py",
       "sha256": "a731bc07ed562b822bd80c821b07b6c81628180f56d21523cb7c0be8cce77d01"
@@ -3651,14 +3661,14 @@
       "sha256": "0b7ac8ece390efb90cbf5ad79109b89250992bf3cd0cfa7d8d35e7231b6b3b70"
     },
     {
-      "bytes": 393,
+      "bytes": 750,
       "path": "src/dmf_pulse/player_evidence/__init__.py",
-      "sha256": "e6683e724dabc23c3802e5bf97ea827a6de5a2d69b1aa7cda965ae861e3417a4"
+      "sha256": "9aef8d87ff511f2928565612798623f42d0aba764049627c22bc6358b72086d8"
     },
     {
-      "bytes": 10794,
+      "bytes": 11121,
       "path": "src/dmf_pulse/player_evidence/empirical_bayes.py",
-      "sha256": "b447e7cae23016f7cbf505fffb53280d09a36333fd26a8e1bc577dfc57b3eb06"
+      "sha256": "3fd518549544f9dfe640a526979fe18a53b751bbe04fb9311d351dcba283d3ac"
     },
     {
       "bytes": 13405,
@@ -3674,6 +3684,11 @@
       "bytes": 12916,
       "path": "src/dmf_pulse/player_evidence/profiles.py",
       "sha256": "5c5c6b7e40d535e02906226ccf648c7ce2a97958f8a14ac1ce5fd817f986d903"
+    },
+    {
+      "bytes": 58111,
+      "path": "src/dmf_pulse/player_evidence/role_priors.py",
+      "sha256": "528479ff60cc7a8263557769c06d4bb5113adc8bb16b0f250a5b45066d442833"
     },
     {
       "bytes": 1,
@@ -5106,6 +5121,11 @@
       "sha256": "d1059d040d612c73882f5a2e4061b8be1c961a241b7ada603168cb9f716986ee"
     },
     {
+      "bytes": 12836,
+      "path": "tests/unit/player_evidence/test_role_priors.py",
+      "sha256": "55e0dcccc04039b6710d269819cb621e0c43bafff44e7822f337929a28f8fcd9"
+    },
+    {
       "bytes": 5609,
       "path": "tests/unit/rules/test_2026_27_save_contract.py",
       "sha256": "6f883861a725c8e56a17c091ba9763ba23746a5a0478fef957a31291ee327053"
@@ -5284,6 +5304,16 @@
       "bytes": 3147,
       "path": "tickets/GW1-PLY-001/ticket.yaml",
       "sha256": "a7d4dceb81960040142fbccaa8cfca84712830708bcb44ee9aa4ac32dded30db"
+    },
+    {
+      "bytes": 1013,
+      "path": "tickets/GW1-PLY-002/ACCEPTANCE.md",
+      "sha256": "8fa987cc25f0fca32cd7e97c44d16cdb77f2d0dc7b3d6be8ca25b2282537427e"
+    },
+    {
+      "bytes": 3339,
+      "path": "tickets/GW1-PLY-002/ticket.yaml",
+      "sha256": "c9f7c8ef23defffa88443f418d350463cbd198127678fd04a8d01753b1b9191f"
     },
     {
       "bytes": 10572,
