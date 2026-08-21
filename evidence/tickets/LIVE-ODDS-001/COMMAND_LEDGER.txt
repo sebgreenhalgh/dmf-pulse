@@ -24,3 +24,14 @@ uv run pytest tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/un
 0 collected; 2 collection errors in 0.28s.
 - current provider-native module absent at the pinned parent.
 - HttpClientOddsTransport absent at the pinned parent.
+
+CHECKPOINT 02 TRANSPORT AND CREDENTIALS
+PASS  uv run ruff check (odds package and focused transport/credential/regression tests)
+PASS  uv run mypy src/dmf_pulse/ingestion/odds/client.py src/dmf_pulse/ingestion/odds/config.py src/dmf_pulse/ingestion/odds/credentials.py src/dmf_pulse/ingestion/odds/service.py
+      Success: no issues found in 4 source files
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_transport.py tests/unit/ingestion/test_live_odds_001_credentials.py
+      34 passed in 3.44s
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_transport.py tests/unit/ingestion/test_live_odds_001_credentials.py tests/unit/ingestion/test_odds_foundation.py tests/unit/ingestion/test_odds_model_config_boundaries.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py
+      137 passed in 3.98s
+NOTE  One combined verifier process launch returned Windows "Access is denied" before any command executed. Each command was rerun separately and passed as recorded above.
+NETWORK/CREDENTIAL  Offline fakes only; no provider request, environment secret read, or credential value inspection.

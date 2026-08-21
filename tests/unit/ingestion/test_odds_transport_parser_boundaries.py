@@ -5,7 +5,6 @@ from __future__ import annotations
 import ssl
 import urllib.error
 import urllib.request
-from dataclasses import replace
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -202,9 +201,16 @@ def test_request_builder_rejects_unavailable_credential_shapes(credential: str) 
 
 def test_request_validator_rejects_parameter_order_drift() -> None:
     request = _request()
-    drifted = replace(
-        request,
+    drifted = client_module.OddsHttpRequest(
+        method=request.method,
+        scheme=request.scheme,
+        host=request.host,
+        path=request.path,
         safe_parameters=tuple(reversed(request.safe_parameters)),
+        credential=request.credential,
+        connect_timeout_seconds=request.connect_timeout_seconds,
+        read_timeout_seconds=request.read_timeout_seconds,
+        total_timeout_seconds=request.total_timeout_seconds,
     )
     with pytest.raises(IngestionError, match="parameters drifted"):
         _validate_request(drifted, load_provider_config())

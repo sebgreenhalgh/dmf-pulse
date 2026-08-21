@@ -10,57 +10,103 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
-from typing import Literal, Protocol
+from typing import Literal, Protocol, cast
 
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.models import RightsCapability, RightsProfile
 from dmf_pulse.ingestion.odds.config import OddsProviderConfig, load_provider_config
+from dmf_pulse.ingestion.odds.credentials import (
+    CredentialProvider,
+    StaticCredentialProvider,
+    UnavailableCredentialProvider,
+    validate_runtime_credential,
+)
 from dmf_pulse.ingestion.odds.models import ProviderFailureCode, QuotaSource, QuotaState
 from dmf_pulse.ingestion.rights import require_rights
 
-
-class CredentialProvider(Protocol):
-    """Resolve a credential at the final pre-transport boundary."""
-
-    def get_credential(self) -> str | None: ...
-
-
-class UnavailableCredentialProvider:
-    """Safe default: no ambient environment or filesystem credential lookup."""
-
-    def get_credential(self) -> None:
-        return None
-
-
-class StaticCredentialProvider:
-    """Explicit test-only/runtime injection without a revealing repr."""
-
-    __slots__ = ("_credential",)
-
-    def __init__(self, credential: str) -> None:
-        self._credential = credential
-
-    def __repr__(self) -> str:
-        return "StaticCredentialProvider(<redacted>)"
-
-    def get_credential(self) -> str:
-        return self._credential
+__all__ = [
+    "CredentialProvider",
+    "HttpClientOddsTransport",
+    "OddsClient",
+    "OddsFetchFailure",
+    "OddsFetchResult",
+    "OddsHttpRequest",
+    "OddsHttpResponse",
+    "OddsRetrievalAttempt",
+    "OddsTransport",
+    "StaticCredentialProvider",
+    "UnavailableCredentialProvider",
+    "UrllibOddsTransport",
+    "build_request",
+]
 
 
-@dataclass(frozen=True, slots=True)
 class OddsHttpRequest:
+    """Non-serializable outbound request with private credential storage."""
+
     method: str
     scheme: str
     host: str
     path: str
     safe_parameters: tuple[tuple[str, str], ...]
-    credential: str = field(repr=False, compare=False)
-    connect_timeout_seconds: float = 10
-    read_timeout_seconds: float = 20
-    total_timeout_seconds: float = 30
+    _credential: str
+    connect_timeout_seconds: float
+    read_timeout_seconds: float
+    total_timeout_seconds: float
+
+    __slots__ = (
+        "_credential",
+        "connect_timeout_seconds",
+        "host",
+        "method",
+        "path",
+        "read_timeout_seconds",
+        "safe_parameters",
+        "scheme",
+        "total_timeout_seconds",
+    )
+
+    def __init__(
+        self,
+        method: str,
+        scheme: str,
+        host: str,
+        path: str,
+        safe_parameters: tuple[tuple[str, str], ...],
+        credential: str,
+        connect_timeout_seconds: float = 10,
+        read_timeout_seconds: float = 20,
+        total_timeout_seconds: float = 30,
+    ) -> None:
+        object.__setattr__(self, "method", method)
+        object.__setattr__(self, "scheme", scheme)
+        object.__setattr__(self, "host", host)
+        object.__setattr__(self, "path", path)
+        object.__setattr__(self, "safe_parameters", safe_parameters)
+        object.__setattr__(self, "_credential", credential)
+        object.__setattr__(self, "connect_timeout_seconds", connect_timeout_seconds)
+        object.__setattr__(self, "read_timeout_seconds", read_timeout_seconds)
+        object.__setattr__(self, "total_timeout_seconds", total_timeout_seconds)
+
+    def __setattr__(self, name: str, value: object) -> None:
+        del name, value
+        raise AttributeError("OddsHttpRequest is immutable")
+
+    def __repr__(self) -> str:
+        return (
+            "OddsHttpRequest("
+            f"method={self.method!r}, sanitized_target={self.sanitized_target!r}, "
+            f"connect_timeout_seconds={self.connect_timeout_seconds!r}, "
+            f"read_timeout_seconds={self.read_timeout_seconds!r}, "
+            f"total_timeout_seconds={self.total_timeout_seconds!r}, credential=<redacted>)"
+        )
+
+    @property
+    def credential(self) -> str:
+        return self._credential
 
     @property
     def sanitized_target(self) -> str:
@@ -81,24 +127,118 @@ class OddsHttpRequest:
         )
 
 
-@dataclass(frozen=True, slots=True)
 class OddsHttpResponse:
+    """Ephemeral response whose body and headers cannot leak through serialization."""
+
     status_code: int
     content_type: str
-    headers: Mapping[str, str]
-    body: bytes
-    redirect_location: str | None = None
+    _headers: dict[str, str]
+    _body: bytes
+    _redirect_location: str | None
+
+    __slots__ = ("_body", "_headers", "_redirect_location", "content_type", "status_code")
+
+    def __init__(
+        self,
+        status_code: int,
+        content_type: str,
+        headers: Mapping[str, str],
+        body: bytes,
+        redirect_location: str | None = None,
+    ) -> None:
+        object.__setattr__(self, "status_code", status_code)
+        object.__setattr__(self, "content_type", content_type)
+        object.__setattr__(self, "_headers", dict(headers))
+        object.__setattr__(self, "_body", body)
+        object.__setattr__(self, "_redirect_location", redirect_location)
+
+    def __setattr__(self, name: str, value: object) -> None:
+        del name, value
+        raise AttributeError("OddsHttpResponse is immutable")
+
+    def __repr__(self) -> str:
+        return (
+            "OddsHttpResponse("
+            f"status_code={self.status_code!r}, content_type={self.content_type!r}, "
+            f"body_size={len(self._body)}, redirect_present={self._redirect_location is not None})"
+        )
+
+    @property
+    def headers(self) -> Mapping[str, str]:
+        return self._headers
+
+    @property
+    def body(self) -> bytes:
+        return self._body
+
+    @property
+    def redirect_location(self) -> str | None:
+        return self._redirect_location
 
 
-@dataclass(frozen=True, slots=True)
 class OddsFetchResult:
-    body: bytes
+    """Successful fetch metadata with an opaque, non-serializable response body."""
+
+    _body: bytes
     quota: QuotaState
     request_fingerprint: str
     sanitized_target: str
     transport_call_count: int
+    transport_id: str
     provider_request_id_sha256: str | None
     attempts: tuple[OddsRetrievalAttempt, ...]
+
+    __slots__ = (
+        "_body",
+        "attempts",
+        "provider_request_id_sha256",
+        "quota",
+        "request_fingerprint",
+        "sanitized_target",
+        "transport_call_count",
+        "transport_id",
+    )
+
+    def __init__(
+        self,
+        *,
+        body: bytes,
+        quota: QuotaState,
+        request_fingerprint: str,
+        sanitized_target: str,
+        transport_call_count: int,
+        transport_id: str,
+        provider_request_id_sha256: str | None,
+        attempts: tuple[OddsRetrievalAttempt, ...],
+    ) -> None:
+        object.__setattr__(self, "_body", body)
+        object.__setattr__(self, "quota", quota)
+        object.__setattr__(self, "request_fingerprint", request_fingerprint)
+        object.__setattr__(self, "sanitized_target", sanitized_target)
+        object.__setattr__(self, "transport_call_count", transport_call_count)
+        object.__setattr__(self, "transport_id", transport_id)
+        object.__setattr__(self, "provider_request_id_sha256", provider_request_id_sha256)
+        object.__setattr__(self, "attempts", attempts)
+
+    def __setattr__(self, name: str, value: object) -> None:
+        del name, value
+        raise AttributeError("OddsFetchResult is immutable")
+
+    def __repr__(self) -> str:
+        return (
+            "OddsFetchResult("
+            f"body_size={len(self._body)}, quota={self.quota!r}, "
+            f"request_fingerprint={self.request_fingerprint!r}, "
+            f"sanitized_target={self.sanitized_target!r}, "
+            f"transport_call_count={self.transport_call_count!r}, "
+            f"transport_id={self.transport_id!r}, "
+            f"provider_request_id_sha256={self.provider_request_id_sha256!r}, "
+            f"attempts={self.attempts!r})"
+        )
+
+    @property
+    def body(self) -> bytes:
+        return self._body
 
 
 @dataclass(frozen=True, slots=True)
@@ -110,6 +250,7 @@ class OddsRetrievalAttempt:
     received_at: datetime
     request_fingerprint: str
     sanitized_target: str
+    transport_id: str
     http_status: int | None
     content_type: str | None
     body_sha256: str | None
@@ -143,6 +284,231 @@ class OddsTransport(Protocol):
     def send(self, request: OddsHttpRequest) -> OddsHttpResponse: ...
 
 
+class _HttpClientResponse(Protocol):
+    status: int
+
+    def getheaders(self) -> list[tuple[str, str]]: ...
+
+    def read(self, size: int) -> bytes: ...
+
+
+class _HttpClientConnection(Protocol):
+    sock: object | None
+
+    def connect(self) -> None: ...
+
+    def request(
+        self,
+        method: str,
+        url: str,
+        body: object = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> None: ...
+
+    def getresponse(self) -> _HttpClientResponse: ...
+
+    def close(self) -> None: ...
+
+
+_SAFE_RESPONSE_HEADERS = frozenset(
+    {
+        "content-type",
+        "retry-after",
+        "x-request-id",
+        "x-requests-last",
+        "x-requests-remaining",
+        "x-requests-used",
+    }
+)
+
+
+def _safe_header_value(value: object) -> str | None:
+    rendered = str(value)
+    if len(rendered) > 1024 or any(
+        ord(character) < 32 and character != "\t" for character in rendered
+    ):
+        return None
+    return rendered
+
+
+def _safe_header_pairs(pairs: list[tuple[str, object]]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    duplicated: set[str] = set()
+    for raw_name, raw_value in pairs:
+        name = str(raw_name).casefold()
+        if name not in _SAFE_RESPONSE_HEADERS or name in duplicated:
+            continue
+        if name in result:
+            result.pop(name, None)
+            duplicated.add(name)
+            continue
+        value = _safe_header_value(raw_value)
+        if value is not None:
+            result[name] = value
+    return result
+
+
+def _default_http_client_connection(
+    host: str,
+    timeout: float,
+    context: ssl.SSLContext,
+) -> _HttpClientConnection:
+    return cast(
+        _HttpClientConnection,
+        http.client.HTTPSConnection(host, timeout=timeout, context=context),
+    )
+
+
+class HttpClientOddsTransport:
+    """Explicit TLS-validating stdlib transport with no redirect or fallback."""
+
+    transport_id = "stdlib_http_client"
+
+    def __init__(
+        self,
+        *,
+        connection_factory: Callable[
+            [str, float, ssl.SSLContext], _HttpClientConnection
+        ] = _default_http_client_connection,
+        ssl_context_factory: Callable[[], ssl.SSLContext] = ssl.create_default_context,
+        monotonic: Callable[[], float] = time.monotonic,
+    ) -> None:
+        self._connection_factory = connection_factory
+        self._ssl_context_factory = ssl_context_factory
+        self._monotonic = monotonic
+
+    def _remaining(self, request: OddsHttpRequest, *, started_at: float) -> float:
+        observed = self._monotonic()
+        if observed < started_at:
+            raise IngestionError("INTERNAL_INVARIANT", "odds transport clock regressed")
+        remaining = request.total_timeout_seconds - (observed - started_at)
+        if remaining <= 0:
+            raise IngestionError(
+                "TOTAL_TIMEOUT", "odds provider total deadline expired", retryable=True
+            )
+        return remaining
+
+    def _read_body(
+        self,
+        response: _HttpClientResponse,
+        request: OddsHttpRequest,
+        *,
+        started_at: float,
+        connection: _HttpClientConnection,
+    ) -> bytes:
+        limit = load_provider_config().max_response_bytes
+        chunks: list[bytes] = []
+        size = 0
+        while size <= limit:
+            remaining = self._remaining(request, started_at=started_at)
+            raw_socket = connection.sock
+            set_timeout = getattr(raw_socket, "settimeout", None)
+            if callable(set_timeout):
+                set_timeout(min(request.read_timeout_seconds, remaining))
+            chunk = response.read(min(64 * 1024, limit + 1 - size))
+            if not isinstance(chunk, bytes):
+                raise IngestionError("SOURCE_UNAVAILABLE", "odds response is invalid")
+            if not chunk:
+                break
+            chunks.append(chunk)
+            size += len(chunk)
+        return b"".join(chunks)
+
+    def send(self, request: OddsHttpRequest) -> OddsHttpResponse:
+        config = load_provider_config()
+        _validate_request(request, config)
+        full_parameters = (("apiKey", request.credential), *request.safe_parameters)
+        target = f"{request.path}?{urllib.parse.urlencode(full_parameters)}"
+        started_at = self._monotonic()
+        connection: _HttpClientConnection | None = None
+        result: OddsHttpResponse | None = None
+        failure: IngestionError | None = None
+        phase: Literal["CONNECT", "READ"] = "CONNECT"
+        try:
+            context = self._ssl_context_factory()
+            if not context.check_hostname or context.verify_mode != ssl.CERT_REQUIRED:
+                raise IngestionError("TLS_ERROR", "odds provider TLS validation is unavailable")
+            connect_timeout = min(
+                request.connect_timeout_seconds,
+                self._remaining(request, started_at=started_at),
+            )
+            connection = self._connection_factory(request.host, connect_timeout, context)
+            connection.connect()
+            phase = "READ"
+            remaining = self._remaining(request, started_at=started_at)
+            raw_socket = connection.sock
+            set_timeout = getattr(raw_socket, "settimeout", None)
+            if callable(set_timeout):
+                set_timeout(min(request.read_timeout_seconds, remaining))
+            connection.request(
+                "GET",
+                target,
+                body=None,
+                headers={
+                    "Accept": "application/json",
+                    "User-Agent": "dmf-pulse-private/0.2.0",
+                },
+            )
+            self._remaining(request, started_at=started_at)
+            response = connection.getresponse()
+            self._remaining(request, started_at=started_at)
+            raw_headers = response.getheaders()
+            headers = _safe_header_pairs([(name, value) for name, value in raw_headers])
+            redirect_present = any(str(name).casefold() == "location" for name, _ in raw_headers)
+            body = self._read_body(
+                response,
+                request,
+                started_at=started_at,
+                connection=connection,
+            )
+            result = OddsHttpResponse(
+                status_code=response.status,
+                content_type=headers.get("content-type", ""),
+                headers=headers,
+                body=body,
+                redirect_location="PRESENT" if redirect_present else None,
+            )
+        except IngestionError as exc:
+            failure = exc
+        except (ssl.SSLError, ssl.CertificateError):
+            failure = IngestionError("TLS_ERROR", "odds provider TLS validation failed")
+        except TimeoutError:
+            failure = IngestionError(
+                "CONNECT_TIMEOUT" if phase == "CONNECT" else "READ_TIMEOUT",
+                (
+                    "odds provider connection timed out"
+                    if phase == "CONNECT"
+                    else "odds provider read timed out"
+                ),
+                retryable=True,
+            )
+        except (OSError, http.client.HTTPException):
+            failure = IngestionError(
+                "SOURCE_UNAVAILABLE", "odds provider is unavailable", retryable=True
+            )
+        except Exception:
+            failure = IngestionError(
+                "SOURCE_UNAVAILABLE", "odds provider is unavailable", retryable=True
+            )
+        finally:
+            if connection is not None:
+                try:
+                    connection.close()
+                except Exception:
+                    if result is not None:
+                        result = None
+                        failure = IngestionError(
+                            "SOURCE_UNAVAILABLE",
+                            "odds provider connection could not be closed safely",
+                            retryable=True,
+                        )
+        if failure is not None:
+            raise failure from None
+        if result is None:  # pragma: no cover - result/failure invariant
+            raise IngestionError("INTERNAL_INVARIANT", "odds transport result is unavailable")
+        return result
+
+
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(
         self,
@@ -158,6 +524,8 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 
 class UrllibOddsTransport:
     """Minimal TLS-validating transport; redirects are disabled."""
+
+    transport_id = "stdlib_urllib"
 
     def __init__(self, monotonic: Callable[[], float] = time.monotonic) -> None:
         self._monotonic = monotonic
@@ -205,15 +573,13 @@ class UrllibOddsTransport:
         getter = getattr(headers, "get", None)
         if not callable(getter):
             return {}
-        allowed = (
-            "content-type",
-            "x-requests-remaining",
-            "x-requests-used",
-            "x-requests-last",
-            "x-request-id",
-            "retry-after",
+        return _safe_header_pairs(
+            [
+                (name, value)
+                for name in sorted(_SAFE_RESPONSE_HEADERS)
+                if (value := getter(name)) is not None
+            ]
         )
-        return {name: str(value) for name in allowed if (value := getter(name)) is not None}
 
     def send(self, request: OddsHttpRequest) -> OddsHttpResponse:
         config = load_provider_config()
@@ -241,6 +607,8 @@ class UrllibOddsTransport:
                 )
         except urllib.error.HTTPError as exc:
             headers = self._safe_headers(exc.headers)
+            getter = getattr(exc.headers, "get", None)
+            redirect_present = callable(getter) and getter("location") is not None
             return OddsHttpResponse(
                 status_code=exc.code,
                 content_type=str(headers.get("content-type", "")),
@@ -250,7 +618,7 @@ class UrllibOddsTransport:
                     if exc.fp is not None
                     else b""
                 ),
-                redirect_location=str(headers.get("location")) if "location" in headers else None,
+                redirect_location="PRESENT" if redirect_present else None,
             )
         except TimeoutError:
             raise IngestionError(
@@ -282,7 +650,7 @@ def _safe_parameters(
 ) -> tuple[tuple[str, str], ...]:
     parameters: list[tuple[str, str]] = [
         ("regions", config.regions[0]),
-        ("markets", config.markets[0]),
+        ("markets", ",".join(config.markets)),
         ("oddsFormat", config.odds_format),
         ("dateFormat", config.date_format),
     ]
@@ -303,12 +671,7 @@ def build_request(
     commence_to: datetime | None = None,
 ) -> OddsHttpRequest:
     config = load_provider_config()
-    if (
-        not credential
-        or len(credential) > 512
-        or any(character.isspace() for character in credential)
-    ):
-        raise IngestionError("CREDENTIAL_UNAVAILABLE", "approved runtime credential is unavailable")
+    credential = validate_runtime_credential(credential)
     return OddsHttpRequest(
         method="GET",
         scheme=config.scheme,
@@ -342,7 +705,7 @@ def _validate_request(request: OddsHttpRequest, config: OddsProviderConfig) -> N
         raise IngestionError("INTERNAL_INVARIANT", "odds request is not allowlisted")
     if request.safe_parameters[:4] != (
         ("regions", "uk"),
-        ("markets", "h2h"),
+        ("markets", ",".join(config.markets)),
         ("oddsFormat", "decimal"),
         ("dateFormat", "iso"),
     ):
@@ -414,6 +777,13 @@ def _construct_transport(factory: Callable[[], OddsTransport]) -> tuple[OddsTran
         return factory(), False
     except Exception:
         return None, True
+
+
+def _transport_identifier(transport: OddsTransport) -> str:
+    value = getattr(transport, "transport_id", None)
+    if value in {"stdlib_http_client", "stdlib_urllib"}:
+        return str(value)
+    return "injected"
 
 
 def _send_transport(
@@ -517,8 +887,13 @@ def _bounded_retry_request(
     if remaining <= 0:
         return None, next_elapsed
     return (
-        replace(
-            request,
+        OddsHttpRequest(
+            method=request.method,
+            scheme=request.scheme,
+            host=request.host,
+            path=request.path,
+            safe_parameters=request.safe_parameters,
+            credential=request.credential,
             connect_timeout_seconds=min(request.connect_timeout_seconds, remaining),
             read_timeout_seconds=min(request.read_timeout_seconds, remaining),
             total_timeout_seconds=remaining,
@@ -535,7 +910,7 @@ class OddsClient:
         profile: RightsProfile,
         *,
         credential_provider: CredentialProvider | None = None,
-        transport_factory: Callable[[], OddsTransport] = UrllibOddsTransport,
+        transport_factory: Callable[[], OddsTransport] = HttpClientOddsTransport,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         sleeper: Callable[[float], None] = time.sleep,
         monotonic: Callable[[], float] = time.monotonic,
@@ -579,6 +954,7 @@ class OddsClient:
                 retryable=True,
                 details={"transport_call_count": self.transport_call_count},
             )
+        transport_id = _transport_identifier(transport)
         last_error: IngestionError | None = None
         attempts: list[OddsRetrievalAttempt] = []
         deadline_started = self._monotonic()
@@ -665,6 +1041,7 @@ class OddsClient:
                         received_at=finished_at.astimezone(UTC),
                         request_fingerprint=attempt_request.request_fingerprint,
                         sanitized_target=attempt_request.sanitized_target,
+                        transport_id=transport_id,
                         http_status=None,
                         content_type=None,
                         body_sha256=None,
@@ -773,6 +1150,7 @@ class OddsClient:
                 received_at=finished_at.astimezone(UTC),
                 request_fingerprint=attempt_request.request_fingerprint,
                 sanitized_target=attempt_request.sanitized_target,
+                transport_id=transport_id,
                 http_status=response.status_code,
                 content_type=media_type,
                 body_sha256=(None if truncated else hashlib.sha256(response.body).hexdigest()),
@@ -820,6 +1198,7 @@ class OddsClient:
                 request_fingerprint=request.request_fingerprint,
                 sanitized_target=request.sanitized_target,
                 transport_call_count=self.transport_call_count,
+                transport_id=transport_id,
                 provider_request_id_sha256=provider_request_id_sha256,
                 attempts=tuple(attempts),
             )
