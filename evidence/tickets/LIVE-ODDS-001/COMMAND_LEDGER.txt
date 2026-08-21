@@ -93,3 +93,34 @@ PASS  uv run python scripts/validate_repository.py after manifest refresh
 PASS  uv build from pushed checkpoint-04 tree 5e34434edfc89791138aa2876c315709c48631a4
       wheel remained byte-identical at 838107 bytes / d1f3877112cd755355ae9a988f9cf3070c15994fc21a5b5316b907a0a5b47ae8; sdist built successfully with final ticket evidence included.
 NETWORK/CREDENTIAL  No provider call and no real credential or developer-secret inspection occurred during acceptance.
+
+2026-08-21 INDEPENDENT-REVIEW REMEDIATION STARTUP
+PASS  git fetch --prune origin and pinned-ref/lineage/worktree verification
+      origin/main baed47bce7a158d91afe38351a2c65be60444adf
+      origin implementation branch 6c36e73adef21b52ed54d23733e5a34c71547a6d
+PASS  uv sync --all-groups --frozen
+      Checked 40 packages
+REPRODUCED  REV-001
+      getresponse socket timeout 20.0 seconds with only 11.0 seconds total budget remaining;
+      deterministic outer body read returned after the total deadline before TOTAL_TIMEOUT.
+REPRODUCED  REV-002
+      escaping fetch traceback retained credential/request/response locals; early parser failure
+      retained the provider canary in production frames while rendered errors stayed redacted.
+REPRODUCED  REV-003
+      raw DMF_PULSE_ODDS_API_KEY environment value resolved and health reported configured.
+REPRODUCED  REV-004
+      same body/accepted events with distinct snapshot identity changed market semantic hash;
+      local receipt/usable-only changes also changed it.
+INVALID_ZERO  uv run python scripts/scan_secrets.py from the dedicated review_pack worktree
+      scanner excluded the entire repository because absolute candidate paths include review_pack.
+REPRODUCED_FAIL  uv run python scripts/scan_secrets.py from clean temporary clone outside review_pack
+      8 findings; exact safe fingerprints and categories recorded in EVIDENCE_CORRECTION.md.
+EXPECTED_RED  uv run pytest -q tests/unit/ingestion/test_live_odds_001_transport.py::test_td01_remaining_total_is_reapplied_before_response_headers tests/unit/ingestion/test_live_odds_001_credentials.py::test_cred02_cred03_raw_environment_secret_is_not_a_production_source tests/unit/ingestion/test_live_odds_001_provider_drift.py::test_hash01_distinct_source_snapshots_preserve_market_semantics tests/unit/ingestion/test_live_odds_001_provider_drift.py::test_hash02_local_acquisition_time_does_not_change_market_semantics tests/security/test_live_odds_001_traceback_security.py tests/unit/assurance/test_secret_scan.py::test_repository_scan_exclusions_are_relative_to_scanned_root
+      7 failed in 2.29s, one direct property failure for each frozen regression node;
+      failure values matched the reproduced timeout, environment, hash, traceback, and scanner defects.
+PASS  uv run ruff format --check <five changed test files>
+      5 files already formatted
+PASS  uv run ruff check <five changed test files>
+      All checks passed
+PASS  git diff --check
+NETWORK/CREDENTIAL  Offline deterministic fakes only; no provider call or real credential read.

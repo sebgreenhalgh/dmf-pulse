@@ -83,13 +83,14 @@ def _append_additive_market(
 def _build(
     parsed: ParsedOddsPayload,
     *,
+    source_snapshot_id: UUID = SOURCE_SNAPSHOT_ID,
     received_at: datetime = RECEIVED,
     usable_at: datetime = RECEIVED + timedelta(seconds=1),
 ) -> OddsProviderCurrentInput:
     return build_current_odds_input(
         parsed,
         profile=load_rights_profiles()["the_odds_api_private_analytics_v1"],
-        source_snapshot_id=SOURCE_SNAPSHOT_ID,
+        source_snapshot_id=source_snapshot_id,
         request_started_at=received_at - timedelta(seconds=1),
         received_at=received_at,
         information_cutoff=CUTOFF,
@@ -342,6 +343,40 @@ def test_pd20_repeated_identical_payload_is_deterministic(repository_root: Path)
     second = _build(parse_odds_payload(body))
 
     assert first == second
+    assert first.market_semantic_sha256 == second.market_semantic_sha256
+
+
+def test_hash01_distinct_source_snapshots_preserve_market_semantics(
+    repository_root: Path,
+) -> None:
+    parsed = parse_odds_payload(_body(_value(repository_root)))
+    first = _build(parsed)
+    second = _build(
+        parsed,
+        source_snapshot_id=UUID("00000000-0000-0000-0000-000000000914"),
+    )
+
+    assert first.provenance.source_snapshot_id != second.provenance.source_snapshot_id
+    assert first.provenance.response_body_sha256 == second.provenance.response_body_sha256
+    assert first.events == second.events
+    assert first.market_semantic_sha256 == second.market_semantic_sha256
+
+
+def test_hash02_local_acquisition_time_does_not_change_market_semantics(
+    repository_root: Path,
+) -> None:
+    parsed = parse_odds_payload(_body(_value(repository_root)))
+    later_received = RECEIVED + timedelta(minutes=10)
+    first = _build(parsed)
+    second = _build(
+        parsed,
+        received_at=later_received,
+        usable_at=later_received + timedelta(seconds=1),
+    )
+
+    assert first.temporal.received_at != second.temporal.received_at
+    assert first.temporal.usable_at != second.temporal.usable_at
+    assert first.provenance.response_body_sha256 == second.provenance.response_body_sha256
     assert first.market_semantic_sha256 == second.market_semantic_sha256
 
 

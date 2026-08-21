@@ -993,3 +993,29 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Run the complete Stage-15 branch-coverage matrix and affected inherited regressions.
 - [x] Run one bounded full-repository pytest attempt and all static/build/clean-wheel gates.
 - [x] Publish truthful review evidence, verify final remote equality and open the unmerged draft PR.
+
+# LIVE-ODDS-001 independent-review remediation
+
+- Ticket: `LIVE-ODDS-001`; reviewed checkpoint
+  `6c36e73adef21b52ed54d23733e5a34c71547a6d`; immutable parent
+  `baed47bce7a158d91afe38351a2c65be60444adf`.
+- Branch: `integration/post-gw1/LIVE-ODDS-001-production-live-odds`.
+- Scope: close only REV-001 through REV-005: hard transport deadline,
+  traceback-safe credential/raw boundary, removal of environment-secret
+  fallback, semantic/provenance hash separation, and truthful secret-scan
+  evidence.
+- Safety: no provider call, real credential, dependency, migration, identity
+  reconciliation, Stage-6 algorithm change, orchestration, PR, merge, tag, or
+  acceptance claim.
+
+## Remediation checkpoints
+
+- [x] R1 reproduce all five findings, freeze disposition/evidence, and commit
+  property-level RED tests.
+- [ ] R2 harden the credential/parser/traceback boundary and remove the raw
+  environment-value fallback.
+- [ ] R3 enforce the total deadline at each controlled blocking primitive.
+- [ ] R4 separate supported-market semantics from acquisition provenance and
+  execute a real downstream contamination regression.
+- [ ] R5 close the scanner/evidence defect, run complete acceptance and hostile
+  self-review, seal a new head, and push for independent re-review.

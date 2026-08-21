@@ -344,6 +344,25 @@ def test_tr10_total_timeout_is_enforced_across_transport_phases() -> None:
     assert connection.closed == 1
 
 
+def test_td01_remaining_total_is_reapplied_before_response_headers() -> None:
+    class HeaderTimeoutConnection(_Connection):
+        timeout_at_getresponse: float | None = None
+
+        def getresponse(self) -> _Response:
+            self.timeout_at_getresponse = self.sock.timeouts[-1]
+            return super().getresponse()
+
+    connection = HeaderTimeoutConnection(_Response())
+    transport, _factory = _transport(
+        connection,
+        monotonic=_Monotonic([0.0, 0.0, 0.0, 19.0, 19.0, 19.0, 19.0]),
+    )
+
+    transport.send(_request())
+
+    assert connection.timeout_at_getresponse == 11.0
+
+
 def test_tr13_response_read_is_bounded_to_maximum_plus_one() -> None:
     limit = load_provider_config().max_response_bytes
     response = _Response(body=b"x" * (limit + 100_000))

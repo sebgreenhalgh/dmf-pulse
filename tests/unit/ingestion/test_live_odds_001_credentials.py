@@ -24,15 +24,12 @@ pytestmark = pytest.mark.unit
 SENTINEL = "runtime-secret-sentinel-913579"
 
 
-def test_runtime_provider_is_lazy_and_uses_only_the_injected_environment() -> None:
-    environment: dict[str, str] = {}
-    provider = RuntimeOddsCredentialProvider(environment=environment)
+def test_cred02_cred03_raw_environment_secret_is_not_a_production_source() -> None:
+    provider = RuntimeOddsCredentialProvider(environment={ODDS_API_ENVIRONMENT_VARIABLE: SENTINEL})
 
     assert credential_configuration_hint(provider) is False
-    environment[ODDS_API_ENVIRONMENT_VARIABLE] = SENTINEL
-
-    assert credential_configuration_hint(provider) is True
-    assert provider.get_credential() == SENTINEL
+    assert provider.get_credential() is None
+    assert credential_is_configured(provider) is False
     assert SENTINEL not in repr(provider)
 
 
