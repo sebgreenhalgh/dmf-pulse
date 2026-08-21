@@ -27,6 +27,7 @@ in_scope:
   - "Deterministic five-season parser, coverage/duplicate/score validation and Decimal half-life calibration."
   - "Candidate-only artifact, explicit sensitivity worlds, and synthetic Stage-8 diagnostics."
   - "Reuse of existing ScorePriorRequest, adaptive score grid and soft-KL projection."
+  - "Deterministic refresh of the validator-selected EVAL-012 current repository manifest only."
   - "Dedicated offline Ubuntu validation workflow."
 
 excluded:

@@ -126,6 +126,11 @@
       "sha256": "c888a7872ec38bd71a08a8b140e4a666dd75d7281a1635712504dacf901f9da2"
     },
     {
+      "bytes": 2554,
+      "path": ".github/workflows/gw1-support-prior-candidate.yml",
+      "sha256": "68a6167099c56f4279b8b3c905b541ad7bac366c5a77d2ca48ba07b07ebaa44c"
+    },
+    {
       "bytes": 1740,
       "path": ".github/workflows/windows-smoke.yml",
       "sha256": "f04ce4d61d35f007b53e87d0eb26a35d212f0e6e0023288e793cc6066678c6ee"
@@ -221,9 +226,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 82557,
+      "bytes": 83733,
       "path": "PLANS.md",
-      "sha256": "c2fd60c0c0bb573c0978e66de56c7c12394be554ba21b2e49651777345699568"
+      "sha256": "dd9f9028d9afce3de57927039f7d92d5d0e09b06c07aa126f84b2496e6dd3aaa"
     },
     {
       "bytes": 2761,
@@ -616,14 +621,14 @@
       "sha256": "011bca0ca82381592dfb5c1187ba12584968e0155aeda7b7d8662df6a14971cc"
     },
     {
-      "bytes": 1713,
+      "bytes": 1712,
       "path": "evidence/readiness/GW1_SESSION1_CHECKPOINT_1_4_ACCEPTANCE.md",
-      "sha256": "4827ee06350f64b33473f2a5a3ba21ef917c2a4350300b8838afbe133cf5dfbb"
+      "sha256": "a8dd5ce1e7057dd4d03b2833d251dbb74edf4ec21cbea5f58a667dd6b555fbb2"
     },
     {
       "bytes": 18850,
       "path": "evidence/readiness/GW1_SESSION1_PROGRESS.md",
-      "sha256": "c1ac49379fb915f63db7b3f64c36c46b9faeffcb8d485075ebaa504e0e430b83"
+      "sha256": "7ae986126b7dfc829310f88797394824cc3288cd518036d4b9a8546a92327d6d"
     },
     {
       "bytes": 841,
@@ -2241,6 +2246,16 @@
       "sha256": "5f156add4cd78a80706e831613ae4df4b8e3e7ec733b9c382ed5f9193f3f4c97"
     },
     {
+      "bytes": 3238,
+      "path": "scripts/build_gw1_support_prior_candidate.py",
+      "sha256": "a731bc07ed562b822bd80c821b07b6c81628180f56d21523cb7c0be8cce77d01"
+    },
+    {
+      "bytes": 5350,
+      "path": "scripts/build_gw1_support_prior_diagnostics.py",
+      "sha256": "e993fe717818eeeee9c4447c1c7e89ce08ec940539ecf12447ae5434e7ece67f"
+    },
+    {
       "bytes": 1669,
       "path": "scripts/build_review_pack.py",
       "sha256": "7e55515447b450345ec637d115711ff79ae3ff5c02642b8cf5f12da35f679379"
@@ -3179,6 +3194,11 @@
       "bytes": 28109,
       "path": "src/dmf_pulse/football_events/service.py",
       "sha256": "213e91b8e20fe8871ead161e3c3de95d4b81d52b6df2a87610758792bd6faf12"
+    },
+    {
+      "bytes": 40754,
+      "path": "src/dmf_pulse/football_events/support_prior.py",
+      "sha256": "ebe9817a2363113fa627292dca345a71c874d5c15d39320cf6fa9fd74379c712"
     },
     {
       "bytes": 2659,
@@ -4791,6 +4811,11 @@
       "sha256": "654570b7dabaebbdb76e039c72672de05c0cbc328f70e06969e7cf38a863bd3f"
     },
     {
+      "bytes": 11440,
+      "path": "tests/unit/football_events/test_support_prior.py",
+      "sha256": "1fe92b5b146b5c5670f90a46bd6c3359c0daa8f2015ba49a3bc915b32ab820a9"
+    },
+    {
       "bytes": 10410,
       "path": "tests/unit/fpl_points/test_accepted_rules_adapter.py",
       "sha256": "ea25097d6cf317309b6fb3a2aedd09d1b5e5ddb7fb6c5be1b5005a3c7777e898"
@@ -5174,6 +5199,16 @@
       "bytes": 2721,
       "path": "tickets/GCS-008/ticket.yaml",
       "sha256": "875b727ddeb7581472b8e36a497ebf6cbbfa4303939f2684b0649a2be68389b1"
+    },
+    {
+      "bytes": 1958,
+      "path": "tickets/GW1-INPUT-001/ACCEPTANCE.md",
+      "sha256": "1e6ef25f9bf2717399cee362068814885b01941b5513150ab9f3776c7dc92c74"
+    },
+    {
+      "bytes": 2604,
+      "path": "tickets/GW1-INPUT-001/ticket.yaml",
+      "sha256": "108ddcc0b05a747b95f6b5aa5c71b72e1c8b26b1954ae9e487432438f8160c61"
     },
     {
       "bytes": 2449,

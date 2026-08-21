@@ -232,7 +232,7 @@ provider request, or credential use occurred.
   with offline pinned/synthetic test fixtures.
 - [x] Exercise the existing Stage-8 path for tail, sensitivity and
   market-dominance diagnostics without changing confidence grades.
-- [ ] Run focused, inherited and repository assurance; publish only the
+- [x] Run focused, inherited and repository assurance; publish only the
   candidate branch and await dedicated Ubuntu validation.
 
 ## RUL-2026-27 independent full-ruleset review and remediation
