@@ -1,0 +1,26 @@
+LIVE-ODDS-001 command ledger (append-only during implementation)
+
+2026-08-21 PRE-FLIGHT
+PASS  git fetch origin
+PASS  git rev-parse origin/main
+      baed47bce7a158d91afe38351a2c65be60444adf
+PASS  git cat-file -t d4cc759d4600489c21ba738cfc9b357cc380554e
+      commit
+PASS  git merge-base baed47bce7a158d91afe38351a2c65be60444adf d4cc759d4600489c21ba738cfc9b357cc380554e
+      9eb57143f6ee92f67c78607cc386678d962e62d4
+PASS  uv sync --all-groups --frozen
+
+BASELINE FOCUSED ODDS REGRESSION
+ENVIRONMENT_BLOCKED (4 PostgreSQL setup errors; DMF_TEST_DATABASE_URL absent)
+uv run pytest tests/unit/ingestion/test_odds_foundation.py tests/unit/ingestion/test_odds_model_config_boundaries.py tests/unit/ingestion/test_odds_persistence_boundaries.py tests/unit/ingestion/test_odds_publication_attestation_boundaries.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py tests/security/test_odds_429_retry_policy.py tests/security/test_odds_credentials_quota_retention.py tests/property/ingestion/test_odds_properties.py tests/contract/odds tests/unit/markets tests/property/markets
+225 passed, 4 errors in 29.66s; every error was the explicit missing PostgreSQL URL gate.
+
+NETWORK/CREDENTIAL
+No real provider request was made. No credential source or value was inspected.
+
+CHECKPOINT 01 RED CONTRACT
+EXPECTED_RED
+uv run pytest tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_transport.py
+0 collected; 2 collection errors in 0.28s.
+- current provider-native module absent at the pinned parent.
+- HttpClientOddsTransport absent at the pinned parent.

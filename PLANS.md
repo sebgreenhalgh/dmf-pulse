@@ -1,5 +1,34 @@
 # DMF Pulse execution plans
 
+## LIVE-ODDS-001 production live odds reconciliation
+
+- Ticket: `LIVE-ODDS-001`; immutable main parent
+  `baed47bce7a158d91afe38351a2c65be60444adf`; readiness donor
+  `d4cc759d4600489c21ba738cfc9b357cc380554e`; historical merge base
+  `9eb57143f6ee92f67c78607cc386678d962e62d4`.
+- Branch: `integration/post-gw1/LIVE-ODDS-001-production-live-odds`.
+- Scope: explicit stdlib `http.client` HTTPS transport, runtime credential isolation,
+  governed provider-native `h2h,totals` current input, and warning-only exclusion of safely
+  isolatable additive market families.
+- Safety: offline deterministic acceptance only; no real credential or provider call, migration,
+  new dependency, identity reconciliation, Stage-6 algorithm change, orchestration, PR, merge,
+  tag, or human-acceptance claim.
+
+### LIVE-ODDS-001 checkpoints
+
+- [x] Verify pinned origin/main, donor, merge base, worktrees, authority, provider documentation,
+  terms compatibility, and clean isolated worktree.
+- [x] 01 freeze the reconciliation contract, RED provider-drift/transport/security regressions,
+  donor ledger, quality matrix, and preflight evidence; commit and push.
+- [ ] 02 productionise credential isolation and the explicit `http.client` transport; run focused
+  transport/security gates; commit and push.
+- [ ] 03 port the provider-native current-input boundary and remediate additive market drift while
+  preserving mandatory H2H, totals degradation, rights, cutoff, and provenance invariants; commit
+  and push.
+- [ ] 04 run adversarial self-review, focused branch coverage, inherited regressions, repository
+  validation, secret scan, Ruff, strict mypy, build, installed-wheel smoke, final evidence, commit,
+  push, and remote-equality verification.
+
 ## CHIP-014 Stage-14 chip optimisation
 
 - Ticket/stage: `CHIP-014`, DMFP-19 Stage 14; immutable original parent
