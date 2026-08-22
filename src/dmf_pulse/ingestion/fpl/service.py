@@ -90,6 +90,26 @@ DATABASE_REF = "env:DMF_TEST_DATABASE_URL"
 TARGET_REVISION = "20260807_0006"
 DEFAULT_CAPTURED_AT = datetime(2026, 8, 21, 17, 0, tzinfo=UTC)
 DEFAULT_INFORMATION_CUTOFF = datetime(2026, 8, 21, 17, 30, tzinfo=UTC)
+_PROCESSING_TIME_POLICY = "PROCESSING_TIME_V1"
+_FROZEN_REPLAY_TIME_POLICY = "FROZEN_REPLAY_CAPTURED_AT_V1"
+_REPLAY_SCENARIO_CAPTURED_AT = {
+    "changed_snapshot": datetime(2026, 8, 21, 17, 10, tzinfo=UTC),
+    "happy_path": DEFAULT_CAPTURED_AT,
+    "malformed": DEFAULT_CAPTURED_AT,
+    "missing_required": DEFAULT_CAPTURED_AT,
+    "post_cutoff": datetime(2026, 8, 21, 17, 31, tzinfo=UTC),
+    "unknown_additive": DEFAULT_CAPTURED_AT,
+    "wrong_type": DEFAULT_CAPTURED_AT,
+}
+_REPLAY_RESUME_STAGES = {
+    "resume-mapped": "MAPPED",
+    "resume-parsed": "PARSED",
+    "resume-promoted": "PROMOTED",
+    "resume-raw_discarded": "STORED_OR_RAW_DISCARDED",
+    "resume-stored": "STORED",
+    "resume-stored_or_raw_discarded": "STORED_OR_RAW_DISCARDED",
+    "resume-validated": "VALIDATED",
+}
 VOLATILE_ROOT_NAME = "dmf-fpl004-volatile"
 VOLATILE_OPERATION_PATTERN = re.compile(
     r"^(?:preparing|active)-(?P<pid>[1-9][0-9]*)-(?P<token>[0-9a-f]{32})$"
@@ -574,6 +594,8 @@ def _pair_context(
     bootstrap: ApprovedFixture,
     fixtures: ApprovedFixture,
     profile: RightsProfile,
+    *,
+    operation_time_policy: str,
 ) -> tuple[str, dict[str, object]]:
     captured = require_utc(request.captured_at)
     cutoff = require_utc(request.information_cutoff)
@@ -583,6 +605,7 @@ def _pair_context(
         "competition_key": request.competition_key,
         "fixtures_path": _relative_fixture_path(fixtures),
         "information_cutoff": cutoff.isoformat().replace("+00:00", "Z"),
+        "operation_time_policy": operation_time_policy,
         "profile_id": request.rights_profile_id,
         "profile_version": profile.profile_version,
         "retrieval_pair_id": str(uuid4()),
@@ -648,8 +671,12 @@ class FplIngestionService:
             raise IngestionError("CONFIGURATION_INVALID", "code commit identity is invalid")
         self.code_commit = code_commit
 
-    def _operation_time(self, captured_at: datetime) -> datetime:
+    def _operation_time(self, captured_at: datetime, *, policy: str) -> datetime:
         captured = require_utc(captured_at)
+        if policy == _FROZEN_REPLAY_TIME_POLICY:
+            return captured
+        if policy != _PROCESSING_TIME_POLICY:
+            raise IngestionError("LIFECYCLE_INVARIANT", "operation time policy is unavailable")
         current = require_utc(self.clock())
         return max(captured, current)
 
@@ -716,10 +743,29 @@ class FplIngestionService:
         )
 
     def import_pair(self, request: FplImportRequest) -> FplOperationOutcome:
+        return self._import_pair(request, operation_time_policy=_PROCESSING_TIME_POLICY)
+
+    def _import_pair(
+        self,
+        request: FplImportRequest,
+        *,
+        operation_time_policy: str,
+    ) -> FplOperationOutcome:
         _validate_database_reference(request.database_url_ref)
         profile = _profile(request.rights_profile_id)
         _validate_synthetic_context(request, profile)
-        operation_at = self._operation_time(request.captured_at)
+        if (
+            operation_time_policy == _FROZEN_REPLAY_TIME_POLICY
+            and profile.rights_profile_id != "synthetic_test_v1"
+        ):
+            raise IngestionError(
+                "RIGHTS_BLOCKED",
+                "frozen replay time requires the approved synthetic profile",
+            )
+        operation_at = self._operation_time(
+            request.captured_at,
+            policy=operation_time_policy,
+        )
         manual = require_rights(
             profile,
             RightsCapability.MANUAL_IMPORT,
@@ -824,7 +870,13 @@ class FplIngestionService:
         fixtures_fixture = approve_synthetic_fixture(
             request.fixtures_path, profile_id=profile.rights_profile_id
         )
-        pair_key, context = _pair_context(request, bootstrap_fixture, fixtures_fixture, profile)
+        pair_key, context = _pair_context(
+            request,
+            bootstrap_fixture,
+            fixtures_fixture,
+            profile,
+            operation_time_policy=operation_time_policy,
+        )
         bodies = (
             _read_bounded(bootstrap_fixture.path),
             _read_bounded(fixtures_fixture.path),
@@ -892,15 +944,27 @@ class FplIngestionService:
         scenario = scenario_aliases.get(request.scenario, request.scenario)
         halt_after = request.halt_after_stage
         if scenario.startswith("resume-"):
-            halt_after = scenario.removeprefix("resume-").replace("_", "-").upper()
+            try:
+                halt_after = _REPLAY_RESUME_STAGES[scenario]
+            except KeyError:
+                raise IngestionError(
+                    "USAGE_INVALID", "replay resume scenario is not approved"
+                ) from None
             scenario = "happy_path"
-        scenario_root = request.fixture_set / scenario
-        captured = DEFAULT_CAPTURED_AT
-        if scenario == "changed_snapshot":
-            captured = datetime(2026, 8, 21, 17, 10, tzinfo=UTC)
-        elif scenario == "post_cutoff":
-            captured = datetime(2026, 8, 21, 17, 31, tzinfo=UTC)
-        return self.import_pair(
+        try:
+            captured = _REPLAY_SCENARIO_CAPTURED_AT[scenario]
+        except KeyError:
+            raise IngestionError("USAGE_INVALID", "replay scenario is not approved") from None
+        try:
+            fixture_set_root = request.fixture_set.resolve()
+            scenario_root = (request.fixture_set / scenario).resolve()
+        except OSError:
+            raise IngestionError(
+                "FIXTURE_NOT_APPROVED", "replay scenario path is unavailable"
+            ) from None
+        if scenario_root.parent != fixture_set_root or scenario_root.name != scenario:
+            raise IngestionError("FIXTURE_NOT_APPROVED", "replay scenario path is not approved")
+        return self._import_pair(
             FplImportRequest(
                 bootstrap_path=scenario_root / "bootstrap.json",
                 fixtures_path=scenario_root / "fixtures.json",
@@ -911,7 +975,8 @@ class FplIngestionService:
                 rights_profile_id=request.rights_profile_id,
                 database_url_ref=request.database_url_ref,
                 halt_after_stage=halt_after,
-            )
+            ),
+            operation_time_policy=_FROZEN_REPLAY_TIME_POLICY,
         )
 
     def resume(self, snapshot_id: UUID, *, database_url_ref: str) -> FplOperationOutcome:
@@ -969,7 +1034,6 @@ class FplIngestionService:
                     raise IngestionError("LIFECYCLE_INVARIANT", "rights context is unavailable")
                 profile = _profile(profile_id)
                 captured_at = self._context_time(context, "captured_at")
-                operation_at = self._operation_time(captured_at)
                 if (
                     context.get("profile_version") != profile.profile_version
                     or context.get("rights_config_sha256") != rights_config_sha256()
@@ -989,6 +1053,11 @@ class FplIngestionService:
                     raise IngestionError(
                         "LIFECYCLE_INVARIANT", "snapshot pair context hash is invalid"
                     )
+                operation_time_policy = self._resume_operation_time_policy(context, profile)
+                operation_at = self._operation_time(
+                    captured_at,
+                    policy=operation_time_policy,
+                )
                 profile_record_id = register_rights_profile(session, profile)
                 require_rights(
                     profile,
@@ -2354,6 +2423,23 @@ class FplIngestionService:
         except ValueError as exc:
             raise IngestionError("LIFECYCLE_INVARIANT", "resume time is invalid") from exc
         return require_utc(parsed)
+
+    @staticmethod
+    def _resume_operation_time_policy(context: dict[str, object], profile: RightsProfile) -> str:
+        value = context.get("operation_time_policy", _PROCESSING_TIME_POLICY)
+        if not isinstance(value, str) or value not in {
+            _PROCESSING_TIME_POLICY,
+            _FROZEN_REPLAY_TIME_POLICY,
+        }:
+            raise IngestionError(
+                "LIFECYCLE_INVARIANT", "resume operation time policy is unavailable"
+            )
+        if value == _FROZEN_REPLAY_TIME_POLICY and profile.rights_profile_id != "synthetic_test_v1":
+            raise IngestionError(
+                "RIGHTS_BLOCKED",
+                "frozen replay time requires the approved synthetic profile",
+            )
+        return value
 
     @staticmethod
     def _maybe_interrupt(

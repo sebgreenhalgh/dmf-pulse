@@ -151,13 +151,17 @@ def test_reverted_values_append_history_and_become_current_with_new_exact_bundle
     service = FplIngestionService(repository_root=repository_root)
     original = _replay(service, fixture_root, "happy_path")
     changed = _replay(service, fixture_root, "changed_snapshot")
-    reverted = service.import_pair(
+    reverted_at = datetime(2026, 8, 21, 17, 20, tzinfo=UTC)
+    reverted = FplIngestionService(
+        repository_root=repository_root,
+        clock=lambda: reverted_at,
+    ).import_pair(
         FplImportRequest(
             bootstrap_path=fixture_root / "happy_path/bootstrap.json",
             fixtures_path=fixture_root / "happy_path/fixtures.json",
             competition_key="SYNTHETIC_PL",
             season_code="2026/27",
-            captured_at=datetime(2026, 8, 21, 17, 20, tzinfo=UTC),
+            captured_at=reverted_at,
             information_cutoff=DEFAULT_INFORMATION_CUTOFF,
             rights_profile_id="synthetic_test_v1",
             database_url_ref=DATABASE_REF,

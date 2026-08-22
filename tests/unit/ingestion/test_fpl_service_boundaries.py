@@ -559,12 +559,32 @@ def test_bundle_lookup_handles_absent_and_present_snapshot_without_hidden_resolu
         ("happy", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), None),
         ("changed", "changed_snapshot", datetime(2026, 8, 21, 17, 10, tzinfo=UTC), None),
         ("post_cutoff", "post_cutoff", datetime(2026, 8, 21, 17, 31, tzinfo=UTC), None),
-        ("resume-stored", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), "STORED"),
+        ("resume-mapped", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), "MAPPED"),
+        ("resume-parsed", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), "PARSED"),
+        (
+            "resume-promoted",
+            "happy_path",
+            datetime(2026, 8, 21, 17, tzinfo=UTC),
+            "PROMOTED",
+        ),
         (
             "resume-raw_discarded",
             "happy_path",
             datetime(2026, 8, 21, 17, tzinfo=UTC),
-            "RAW-DISCARDED",
+            "STORED_OR_RAW_DISCARDED",
+        ),
+        ("resume-stored", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), "STORED"),
+        (
+            "resume-stored_or_raw_discarded",
+            "happy_path",
+            datetime(2026, 8, 21, 17, tzinfo=UTC),
+            "STORED_OR_RAW_DISCARDED",
+        ),
+        (
+            "resume-validated",
+            "happy_path",
+            datetime(2026, 8, 21, 17, tzinfo=UTC),
+            "VALIDATED",
         ),
     ],
 )
@@ -598,6 +618,29 @@ def test_replay_aliases_are_explicit_and_deterministic(
     assert request.captured_at == captured
     assert request.halt_after_stage == halt
     assert observed["operation_time_policy"] == "FROZEN_REPLAY_CAPTURED_AT_V1"
+
+
+@pytest.mark.parametrize("scenario", ("resume-post_cutoff", "resume-typo"))
+def test_replay_rejects_arbitrary_resume_aliases_before_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    scenario: str,
+) -> None:
+    def unexpected_import(*_args: object, **_kwargs: object) -> Any:
+        pytest.fail("an unapproved resume alias must fail before fixture import")
+
+    monkeypatch.setattr(FplIngestionService, "import_pair", unexpected_import)
+    monkeypatch.setattr(
+        FplIngestionService,
+        "_import_pair",
+        unexpected_import,
+        raising=False,
+    )
+    with pytest.raises(IngestionError, match="resume scenario is not approved") as caught:
+        FplIngestionService(repository_root=tmp_path).replay(
+            FplReplayRequest(fixture_set=tmp_path / "fixtures", scenario=scenario)
+        )
+    assert caught.value.code == "USAGE_INVALID"
 
 
 @pytest.mark.parametrize(
@@ -672,6 +715,36 @@ def test_replay_rejects_approved_name_resolving_to_another_scenario(
     assert caught.value.code == "FIXTURE_NOT_APPROVED"
 
 
+def test_replay_translates_scenario_resolution_oserror_before_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fixture_set = tmp_path / "fixtures"
+    service = FplIngestionService(repository_root=tmp_path)
+    original_resolve = Path.resolve
+
+    def unavailable_resolve(path: Path, strict: bool = False) -> Path:
+        if path == fixture_set:
+            raise OSError("sensitive host path failure")
+        return original_resolve(path, strict=strict)
+
+    def unexpected_import(*_args: object, **_kwargs: object) -> Any:
+        pytest.fail("an unavailable scenario path must fail before fixture import")
+
+    monkeypatch.setattr(Path, "resolve", unavailable_resolve)
+    monkeypatch.setattr(FplIngestionService, "import_pair", unexpected_import)
+    monkeypatch.setattr(
+        FplIngestionService,
+        "_import_pair",
+        unexpected_import,
+        raising=False,
+    )
+    with pytest.raises(IngestionError, match="scenario path is unavailable") as caught:
+        service.replay(FplReplayRequest(fixture_set=fixture_set, scenario="happy_path"))
+    assert caught.value.code == "FIXTURE_NOT_APPROVED"
+    assert "sensitive host path failure" not in caught.value.message
+
+
 def test_operation_time_policy_separates_frozen_replay_from_processing_time() -> None:
     captured = datetime(2026, 8, 21, 17, tzinfo=UTC)
     future = datetime(2027, 8, 22, 18, tzinfo=UTC)
@@ -738,6 +811,29 @@ def test_resume_operation_time_policy_is_strict_and_fail_closed() -> None:
             official,
         )
     assert unauthorized.value.code == "RIGHTS_BLOCKED"
+
+
+def test_replay_rejects_frozen_time_for_non_synthetic_profile_before_clock(
+    tmp_path: Path,
+) -> None:
+    clock_calls = 0
+
+    def unexpected_clock() -> datetime:
+        nonlocal clock_calls
+        clock_calls += 1
+        return datetime(2026, 8, 21, 17, tzinfo=UTC)
+
+    service = FplIngestionService(repository_root=tmp_path, clock=unexpected_clock)
+    with pytest.raises(IngestionError, match="approved synthetic profile") as blocked:
+        service.replay(
+            FplReplayRequest(
+                fixture_set=tmp_path / "fixtures",
+                scenario="happy_path",
+                rights_profile_id="fpl_official_private_manual_v1",
+            )
+        )
+    assert blocked.value.code == "RIGHTS_BLOCKED"
+    assert clock_calls == 0
 
 
 def test_resume_context_and_interruption_guards_are_typed(tmp_path: Path) -> None:
