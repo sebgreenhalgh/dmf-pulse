@@ -17,11 +17,17 @@ provenance, and secret-handling contracts.
   provider quota state remain operational deployment checks.
 - Four PostgreSQL security tests and the canonical database-backed wheel verifier could not run
   because `DMF_TEST_DATABASE_URL` was not supplied. They are recorded as
-  `ENVIRONMENT_BLOCKED`, not passed. All 309 non-database focused Odds/markets tests passed.
+  `ENVIRONMENT_BLOCKED`, not passed. The final dependency-relevant non-database
+  Odds/markets matrix passed 430 tests with those four cases deselected.
 - The available execution platform was Windows. The transport and credential tests assert no
   platform branches or filesystem assumptions in the transport, and systemd/process credential
   behavior is covered with portable filesystem fakes, but a native POSIX run remains for CI or the
   independent reviewer.
+- Windows application control blocked direct execution of the generated isolated
+  `dmf.exe` console shim. The exact installed entry point invoked through that
+  environment's Python interpreter passed with exit 0 and printed `dmf 0.2.0`;
+  direct shim execution remains an environment-policy check rather than a
+  claimed PASS.
 - Python's synchronous OS resolver has no portable stdlib cancellation primitive. Resolution runs
   before the application-controlled TCP primitive; after resolution, the transport recalculates
   and enforces the connect/total bound separately for each TCP address and TLS handshake, then the

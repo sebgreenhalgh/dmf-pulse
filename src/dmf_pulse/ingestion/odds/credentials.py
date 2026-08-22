@@ -10,7 +10,6 @@ from typing import Protocol
 
 from dmf_pulse.ingestion.errors import IngestionError
 
-ODDS_API_ENVIRONMENT_VARIABLE = "DMF_PULSE_ODDS_API_KEY"
 SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE = "CREDENTIALS_DIRECTORY"
 SYSTEMD_CREDENTIAL_FILE = "the_odds_api_key"
 _MIN_CREDENTIAL_LENGTH = 16

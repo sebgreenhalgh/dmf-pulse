@@ -12,7 +12,6 @@ import pytest
 
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.odds.credentials import (
-    ODDS_API_ENVIRONMENT_VARIABLE,
     SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE,
     RuntimeOddsCredentialProvider,
     StaticCredentialProvider,
@@ -25,10 +24,11 @@ from dmf_pulse.ingestion.odds.credentials import (
 pytestmark = pytest.mark.unit
 
 SENTINEL = "runtime-secret-sentinel-913579"
+RAW_ENVIRONMENT_VARIABLE = "DMF_PULSE_ODDS_API_KEY"
 
 
 def test_cred02_cred03_raw_environment_secret_is_not_a_production_source() -> None:
-    provider = RuntimeOddsCredentialProvider(environment={ODDS_API_ENVIRONMENT_VARIABLE: SENTINEL})
+    provider = RuntimeOddsCredentialProvider(environment={RAW_ENVIRONMENT_VARIABLE: SENTINEL})
 
     assert credential_configuration_hint(provider) is False
     assert provider.get_credential() is None
@@ -44,7 +44,7 @@ def test_cred01_systemd_credential_ignores_raw_environment_value_and_trims_newli
     provider = RuntimeOddsCredentialProvider(
         environment={
             SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE: os.fspath(tmp_path),
-            ODDS_API_ENVIRONMENT_VARIABLE: "different-valid-secret-24680",
+            RAW_ENVIRONMENT_VARIABLE: "different-valid-secret-24680",
         }
     )
 
@@ -156,7 +156,7 @@ def test_credential_probe_returns_only_a_boolean() -> None:
 def test_cred06_through_cred08_only_file_or_explicit_test_injection_is_supported() -> None:
     assert StaticCredentialProvider(SENTINEL).get_credential() == SENTINEL
     source = inspect.getsource(RuntimeOddsCredentialProvider.get_credential)
-    assert ODDS_API_ENVIRONMENT_VARIABLE not in source
+    assert RAW_ENVIRONMENT_VARIABLE not in source
     assert "DMF_PULSE_ODDS_API_KEY" not in source
     assert ".env" not in source
     assert "argv" not in source

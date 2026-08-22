@@ -1017,5 +1017,5 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] R3 enforce the total deadline at each controlled blocking primitive.
 - [x] R4 separate supported-market semantics from acquisition provenance and
   execute a real downstream contamination regression.
-- [ ] R5 close the scanner/evidence defect, run complete acceptance and hostile
+- [x] R5 close the scanner/evidence defect, run complete acceptance and hostile
   self-review, seal a new head, and push for independent re-review.

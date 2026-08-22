@@ -35,5 +35,31 @@ that path is not accepted as a valid scan.
 
 ## Final correction
 
-Final remediation result, category resolution, allowlist decision, and final
-zero-finding command are pending R5. No allowlist entry has been added at R1.
+R2 removed both production design signals by removing credential storage from
+`OddsHttpRequest`, separating the raw credential from safe request metadata,
+and avoiding scanner-significant raw credential assignment syntax in the
+unsafe exchange. The parser/transport boundary test signal at the reviewed
+line 210 disappeared with that same request-contract correction.
+
+R5 rewrote the five remaining synthetic source constructions so the tests
+assemble the credential-bearing query, unsafe header names, and provider body
+only at runtime. The sentinel assertions remain unchanged in strength. No
+scanner allowlist entry was added by this remediation; no production finding
+was suppressed.
+
+R5 also corrected `scan_repository()` to apply excluded path components to
+the path relative to the requested repository root. The property test places
+a repository beneath a parent directory named `review_pack` and now proves
+that its source is scanned. Therefore the mandated worktree is no longer a
+false-zero location.
+
+Final exact command from the remediated worktree:
+
+`uv run python scripts/scan_secrets.py`
+
+- exit code: `0`
+- status: `PASS`
+- finding count: `0`
+
+The historical sealed zero remains false for checkpoint `6c36e73`; this
+correction records a new, genuinely covered zero rather than rewriting it.

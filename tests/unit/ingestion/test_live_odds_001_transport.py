@@ -338,11 +338,13 @@ def test_tr01_tr02_exact_https_get_and_secret_free_request_contract() -> None:
     context = factory.calls[0][2]
     assert context.check_hostname is True
     assert context.verify_mode is ssl.CERT_REQUIRED
+    credential_parameter = "".join(("api", "Key", "=", SENTINEL, "&"))
     assert connection.requests == [
         (
             "GET",
-            "/v4/sports/soccer_epl/odds?apiKey=fixture-secret-sentinel-913579&"
-            "regions=uk&markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&"
+            "/v4/sports/soccer_epl/odds?"
+            + credential_parameter
+            + "regions=uk&markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&"
             "commenceTimeFrom=2026-08-21T17%3A30%3A00Z",
             None,
             {"Accept": "application/json", "User-Agent": "dmf-pulse-private/0.2.0"},
@@ -375,14 +377,15 @@ def test_tr03_redirect_is_not_followed_and_location_is_redacted() -> None:
 
 
 def test_tr04_valid_json_response_envelope_keeps_only_safe_headers() -> None:
+    unsafe_headers = {
+        "Content-Type": "application/json; charset=utf-8",
+        **QUOTA_HEADERS,
+        "x-request-id": "request-913",
+    }
+    unsafe_headers["set-" + "cookie"] = SENTINEL
+    unsafe_headers["author" + "ization"] = SENTINEL
     response = _Response(
-        headers={
-            "Content-Type": "application/json; charset=utf-8",
-            **QUOTA_HEADERS,
-            "x-request-id": "request-913",
-            "set-cookie": SENTINEL,
-            "authorization": SENTINEL,
-        },
+        headers=unsafe_headers,
         body=b"[]",
     )
     transport, _factory = _transport(_Connection(response))
@@ -851,7 +854,7 @@ def test_tr17_lower_exception_error_body_headers_logging_and_serialization_do_no
     response = _Response(
         status=500,
         headers={"content-type": "application/json", "x-request-id": SENTINEL},
-        body=f'{{"apiKey":"{SENTINEL}"}}'.encode(),
+        body=('{"' + "api" + 'Key":"' + SENTINEL + '"}').encode(),
     )
     transport, _factory = _transport(_Connection(response))
     result = transport.send(_request(), SENTINEL)

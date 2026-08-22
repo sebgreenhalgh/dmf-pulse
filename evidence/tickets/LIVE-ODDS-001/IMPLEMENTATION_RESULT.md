@@ -1,5 +1,10 @@
 # LIVE-ODDS-001 implementation result
 
+> Historical result for reviewed checkpoint
+> `6c36e73adef21b52ed54d23733e5a34c71547a6d`. It is superseded for current
+> engineering state by `REMEDIATION_RESULT.md`; statements below describe the
+> code that was independently reviewed, not the remediated branch tip.
+
 Status: **ENGINEERING COMPLETE PENDING INDEPENDENT REVIEW**.
 
 The implementation is based on immutable parent

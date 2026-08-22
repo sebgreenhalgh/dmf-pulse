@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 79602,
+      "bytes": 80874,
       "path": "PLANS.md",
-      "sha256": "23d1b6b50540fd28aae4fd6e640351c42d5dceb8ff8aceb0acf97bae6fac732a"
+      "sha256": "dd2d72f4f0c7f2aff8c5ddff96b96f4b21b46fc5d67d260b0b093f975ca683f0"
     },
     {
       "bytes": 2761,
@@ -2491,9 +2491,9 @@
       "sha256": "f9812e093908bc2cb41765235cdf8452bb42cadf75e322235992f5253783f776"
     },
     {
-      "bytes": 14122,
+      "bytes": 14164,
       "path": "src/dmf_pulse/assurance/secret_scan.py",
-      "sha256": "56ee03653ac985a31db3014b558a411ebd9a23bf360b56c74f6eb7263e0e291f"
+      "sha256": "83a1023bcdb965d17f5b2b3891fe1a1278fff5f720cfae9268be35e332d75c9a"
     },
     {
       "bytes": 29028,
@@ -3296,9 +3296,9 @@
       "sha256": "c8a09c820b2cc588daaa54708bbcd3661af0b7d39ed1907e82d99d90afea6924"
     },
     {
-      "bytes": 48152,
+      "bytes": 63218,
       "path": "src/dmf_pulse/ingestion/odds/client.py",
-      "sha256": "462a83d4587cdbf4aa9d4ed5a383bdc40b739027e606c59a89ccdc52f1d4a818"
+      "sha256": "6467f429fee3582d85667f6c563326c1a78dd385c237ca72154842a5b3b64871"
     },
     {
       "bytes": 7070,
@@ -3306,14 +3306,14 @@
       "sha256": "3c3c21225aa103e088d11ef61b0a0bb5e936a2ef6c5087493035ef93d6369c7b"
     },
     {
-      "bytes": 5268,
+      "bytes": 5253,
       "path": "src/dmf_pulse/ingestion/odds/credentials.py",
-      "sha256": "6dd0d9f790375d7d0f65ccd5a3a1e264fb37dc2f2f4f8d81e5cd99b0ef15eee4"
+      "sha256": "5e145c7a32df7054ef7d051cf2cdf0de5a7a8915d8f4b69339ee71f5850bd29a"
     },
     {
-      "bytes": 36268,
+      "bytes": 36464,
       "path": "src/dmf_pulse/ingestion/odds/current.py",
-      "sha256": "0e46276bbe1a22fd6ed075b0aa4a1f5546aec098cc7d7cf76ace3fe9309d4696"
+      "sha256": "e6e01453a8bd3308d412600c87448413a477348c3ecebacdf7de9ec227574fdf"
     },
     {
       "bytes": 5513,
@@ -3326,9 +3326,9 @@
       "sha256": "42ee8f5a6c30e484d3ba2193c83deb1ec9f8d6a0ee43312e64ff8c677e0f91ff"
     },
     {
-      "bytes": 20870,
+      "bytes": 23732,
       "path": "src/dmf_pulse/ingestion/odds/parser.py",
-      "sha256": "f09d08899867628e50213cb24e6e9af1957afd76b173f2a5de168087237f716e"
+      "sha256": "d92f7dd0fd2bed1ebc031cdad70d8398de19180de57ddc6a446219521621feb0"
     },
     {
       "bytes": 49853,
@@ -4576,14 +4576,19 @@
       "sha256": "eb6dfe78ffc1043fcfe7d97eb64775c24bb4de9f402876dfe22f770253a64110"
     },
     {
-      "bytes": 13639,
-      "path": "tests/security/test_odds_429_retry_policy.py",
-      "sha256": "f228d6df6d8bd90c3fdb5098350aa58af8e06a5b78f9538752a72717e3033581"
+      "bytes": 11929,
+      "path": "tests/security/test_live_odds_001_traceback_security.py",
+      "sha256": "4250f0f15e1d9c7833e20ebc63053afd13cb50970498d0a656874c8e3b7b58cc"
     },
     {
-      "bytes": 17832,
+      "bytes": 13657,
+      "path": "tests/security/test_odds_429_retry_policy.py",
+      "sha256": "2b36b60c5833da6ed9e21e1729c5519d3f17de80cd0c86201d2a643477a40145"
+    },
+    {
+      "bytes": 17868,
       "path": "tests/security/test_odds_credentials_quota_retention.py",
-      "sha256": "1a0d98f99bf89b1c2a265c9a29cc706dab08985b906a1763c0d7d919bcaefac6"
+      "sha256": "f569ef1d41b79d79befd86f32e06eeec9ec7c2d2916caea0a1e1f2a05198fab6"
     },
     {
       "bytes": 60,
@@ -4756,9 +4761,9 @@
       "sha256": "712848cb39af593f03bd02918b6f0311e3bcd960f123b2eb66bfc7089950a606"
     },
     {
-      "bytes": 10334,
+      "bytes": 10867,
       "path": "tests/unit/assurance/test_secret_scan.py",
-      "sha256": "03b71870c3bb16944046eddb3d7bda4f947a0a32e930f2d05ce6e471660c7751"
+      "sha256": "f19b3f052f5f51f138fce9c9dfed863a89f4c882947a6fef0fb6fc63091c16a0"
     },
     {
       "bytes": 20367,
@@ -5191,9 +5196,9 @@
       "sha256": "d5472197c34471908096fb99715d1eef51184e5f57c0a6d78046200b4111c506"
     },
     {
-      "bytes": 3344,
+      "bytes": 5263,
       "path": "tests/unit/ingestion/test_live_odds_001_credentials.py",
-      "sha256": "f360e1788a6dd9de21340d548ce7ab86b146c9e6911a6cd6997a4ae69fdcd86d"
+      "sha256": "30b9cae41f942dd77b6accdd7993f5bb0109dcb3123b833807b54810020fcc7b"
     },
     {
       "bytes": 19195,
@@ -5201,19 +5206,19 @@
       "sha256": "9beda9081dcaa1c89022828ffacae4532a173ffbb343c45b71b4790d2c389f13"
     },
     {
-      "bytes": 14079,
+      "bytes": 25616,
       "path": "tests/unit/ingestion/test_live_odds_001_provider_drift.py",
-      "sha256": "8aa02a7344fdd04a9e9dfd0d6619a65030699fd24144b8fe5500d76d32f354d8"
+      "sha256": "8c86527c9df836f54c7d300f85b4fee33050d1bbfa8ce8ffe6283a5f982323d7"
     },
     {
-      "bytes": 15467,
+      "bytes": 29878,
       "path": "tests/unit/ingestion/test_live_odds_001_transport.py",
-      "sha256": "1e8f078ffb4188bc8231d80ba1d8162ecf87c884f71feb5046cb87532dda51c6"
+      "sha256": "63c4fec5654863d67613a27be8fc16561a79476a1e5d2380c12fb634995d2c77"
     },
     {
-      "bytes": 28147,
+      "bytes": 28103,
       "path": "tests/unit/ingestion/test_odds_foundation.py",
-      "sha256": "d149d680ce11f76c8dc32b93216e9b02019f815dfb765d91c17381588ee545cc"
+      "sha256": "20e231a76abd81064d9c9cde547ebf313d9bc9773dc05fdd9b63fef0c7c0214d"
     },
     {
       "bytes": 11904,
@@ -5231,9 +5236,9 @@
       "sha256": "0af27f4751ce782b781ceee15addd6d6093ab593f8a1351b77db538ee9f4e653"
     },
     {
-      "bytes": 11609,
+      "bytes": 11628,
       "path": "tests/unit/ingestion/test_odds_transport_parser_boundaries.py",
-      "sha256": "1efae5a47a83e77f9d6bdf638a0264e42ed8dc5110e9b532f229a4fbcd56c115"
+      "sha256": "b0366078dae3488cbc435e2f4ea4142c903b3e315aaf72f1c67695322a99ec11"
     },
     {
       "bytes": 15562,

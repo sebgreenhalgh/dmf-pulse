@@ -1,6 +1,7 @@
 # LIVE-ODDS-001 independent-review remediation plan
 
-Status: `IN_PROGRESS` / remediation engineering only.
+Status: `ENGINEERING_REMEDIATED_PENDING_INDEPENDENT_RE_REVIEW` / remediation
+engineering complete; independent re-review and human acceptance remain separate.
 
 ## Immutable boundary
 
@@ -43,5 +44,8 @@ timestamps but exclude local acquisition identity and timing.
    historical false evidence without deleting it, run focused/broad/static/
    build/wheel gates, record unavailable database/POSIX checks truthfully,
    perform hostile self-review, commit, push, and verify remote equality.
+
+All five engineering checkpoints are complete. The exact R5 sealing commit is
+reported in the handoff because a commit cannot contain its own object ID.
 
 No independent or human acceptance is asserted by this plan.

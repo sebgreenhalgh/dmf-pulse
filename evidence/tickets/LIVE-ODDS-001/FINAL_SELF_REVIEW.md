@@ -3,7 +3,54 @@
 This is an adversarial same-agent review of the complete immutable-parent ticket diff. It is not an
 independent review or human acceptance.
 
-## Findings and closure
+## Independent-review remediation self-review
+
+The complete diffs from both `baed47bce` and reviewed checkpoint `6c36e73`
+were inspected after focused and broad acceptance.
+
+| Severity | Found in final pass | Closed | Remaining |
+|---|---:|---:|---:|
+| P0 | 0 | 0 | 0 |
+| P1 | 0 | 0 | 0 |
+| Material P2 | 1 | 1 | 0 |
+
+The material P2 was an obsolete production constant naming the removed raw
+environment source. It had no lookup behavior, but retaining it made the
+credential-source boundary needlessly ambiguous. R5 removed it; the negative
+source assertion, credential matrix, strict typing, and exact secret scan pass.
+
+Hostile remediation checks found:
+
+- No credential or provider canary reachable through escaping production
+  traceback/cause/context locals, including nested dictionaries and slots.
+- `OddsHttpRequest` contains no credential; both stdlib transport failures and
+  the client/parser boundary raise only after unsafe frames return normally.
+- Only the non-secret systemd credential directory identifier may come from
+  the environment. No raw API-key environment fallback, CLI source, or `.env`
+  source remains.
+- TLS hostname/certificate verification, approved host/path, redirect block,
+  bounded body, quota, rights, cutoff, and no-fallback transport selection are
+  unchanged.
+- Deadline tests prove enforcement at TCP, TLS, write, headers, every raw body
+  receive, retry delay, and the second attempt. The synchronous OS resolver
+  limitation is disclosed rather than hidden behind a worker or fallback.
+- The semantic hash payload contains no acquisition/provenance-only key;
+  provider timestamps remain semantic under the recorded authority decision.
+- Additive market data reaches neither production persistence preparation nor
+  the actual consensus/fair-price input. Mandatory H2H remains fail closed.
+- Root-relative scanner coverage works beneath `review_pack`; zero findings is
+  genuine and no remediation allowlist entry was added.
+- No dependency, migration, identity, Stage-6 algorithm, orchestration, PR,
+  merge, tag, main mutation, provider call, real credential read, or database
+  write was introduced.
+
+The four PostgreSQL cases, canonical database-backed wheel verifier, native
+POSIX run, and direct Windows console shim are truthfully environment-blocked
+or unavailable as recorded in `KNOWN_LIMITATIONS.md`. The isolated installed
+wheel import and exact Python console entry point passed. No unsupported gate
+is represented as PASS.
+
+## Historical implementation findings and closure
 
 | Severity | Found | Closed | Result |
 |---|---:|---:|---|

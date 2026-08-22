@@ -170,3 +170,54 @@ PASS  uv run ruff check src/dmf_pulse/ingestion/odds/current.py tests/unit/inges
 PASS  uv run mypy src/dmf_pulse/ingestion/odds/current.py
       Success: no issues found in 1 source file.
 NETWORK/CREDENTIAL  Repository fixture data and in-memory mapping/persistence fakes only; no provider call, database write, or credential read.
+
+2026-08-22 REMEDIATION CHECKPOINT R5 SCANNER / FINAL HARDENING
+PASS  uv run pytest -q tests/unit/assurance/test_secret_scan.py tests/unit/ingestion/test_live_odds_001_transport.py
+      62 passed in 6.69s; root-relative scanner exclusion and unchanged transport sentinel properties passed.
+PASS  uv run python scripts/scan_secrets.py after scanner/source correction
+      exit 0; status PASS; finding_count 0 from the mandated review_pack worktree; no remediation allowlist entry added.
+PASS  uv sync --all-groups --frozen
+      Checked 40 packages.
+PASS  uv run ruff format --check .
+      642 files already formatted.
+PASS  uv run ruff check .
+      All checks passed.
+PASS  uv run mypy src/dmf_pulse
+      Success: no issues found in 247 source files.
+PASS  uv run pytest -q -m unit tests/unit
+      2031 passed, 452 deselected, 77 inherited Pydantic adversarial-test warnings in 85.48s.
+PASS  uv run pytest -q -m property tests/property
+      88 passed, 23 deselected, 3 inherited warnings in 40.47s.
+PASS  uv run pytest -q -m contract tests/contract
+      72 passed, 68 deselected in 3.58s.
+PASS  uv run pytest -q -m "security and not postgres" tests/security
+      51 passed, 10 deselected in 3.23s.
+PASS  24-file dependency-relevant Odds/markets command selected by repository import references, -m "not postgres"
+      430 passed, 4 PostgreSQL cases deselected in 34.68s.
+PASS  focused remediation branch-coverage matrix over scanner/client/credentials/current/parser
+      291 passed, 4 PostgreSQL cases deselected; aggregate 94.53%; scanner 97%, client 90%, credentials 95%, current 95%, parser 99%; coverage.json refreshed.
+EXPECTED_MANIFEST_DRIFT  uv run python scripts/validate_repository.py before final manifest refresh
+      29 errors, exactly changed/unrecorded remediation deliverables; command-generated GCS-008 report captured the expected interim failure and is rerun after refresh.
+PASS  final uv build
+      wheel dmf_pulse-0.2.0-py3-none-any.whl; 841021 bytes; sha256 16eba3453b937118be5ebbaa944228f03210b097d071433627c8223f6cc1b44e; sdist built successfully.
+ENVIRONMENT_BLOCKED  uv run python scripts/verify_wheel.py
+      DMF_TEST_DATABASE_URL is required; variable was confirmed absent without reading a value and no database was provisioned.
+PASS  isolated offline final-wheel import and Python console entry point outside source tree
+      installed 23 cached packages into a temporary environment; imported only from site-packages; dmf 0.2.0; h2h,totals; request cost 2; no request credential storage; raw environment secret ignored; default stdlib_http_client; exit 0; temporary environment removed.
+ENVIRONMENT_BLOCKED  direct isolated dmf.exe shim
+      Windows application control blocked the generated executable; the exact Python entry point passed and direct shim execution is not claimed PASS.
+ENVIRONMENT_BLOCKED  four PostgreSQL retention/quota tests
+      DMF_TEST_DATABASE_URL absent; not executed and not conflated with the 430-test non-database pass.
+POSIX_UNAVAILABLE  native POSIX acceptance
+      Current platform is Windows; no POSIX evidence fabricated.
+PASS  same-agent adversarial review of baed47bc..worktree and 6c36e73..worktree
+      P0 0; P1 0; material P2 1 found/closed; unresolved P0/P1/material P2 0. See FINAL_SELF_REVIEW.md.
+NETWORK/CREDENTIAL  No provider call, real credential read, database write, environment mutation, dependency change, migration, PR, merge, force push, tag, or acceptance action occurred.
+PASS  final focused remediation matrix after source/test sealing
+      163 passed in 9.35s; scanner, credentials, transport, provider drift, current boundaries, and traceback security all passed without PostgreSQL selection.
+PASS  final repository manifest refresh
+      LIVE-ODDS-001 and active PRC-013 manifests each contain 1135 files; LIVE-ODDS-001 manifest sha256 48b830ba9c2c9aff27f663e6b0567a4fb6f560ac8b7b6c62b6dea3e87bf80045.
+PASS  final uv run python scripts/validate_repository.py
+      exit 0; status PASS; error_count 0.
+PASS  final uv run python scripts/scan_secrets.py after evidence and manifest sealing
+      exit 0; status PASS; finding_count 0.

@@ -26,8 +26,8 @@ with the checkpoint that contains the corresponding remediation.
 - Tests: TD-01..12 plus direct request-write and TCP/TLS split-operation
   regressions pass. The R3 focused matrix passed 161 tests with 4 PostgreSQL
   cases deselected; `client.py` branch-aware coverage was 90.28%.
-- Final status: **CLOSED AT R3**, subject to final R5 acceptance rerun.
-- Remediation commit: R3 checkpoint (resolved to the exact commit in R5).
+- Final status: **CLOSED**; final R5 focused and broader acceptance passed.
+- Remediation commit: `a9f325763ae17d08f03c47cbd9bde3d5a2228182`.
 
 ## REV-002 — traceback-local secret/raw retention
 
@@ -52,8 +52,8 @@ with the checkpoint that contains the corresponding remediation.
   credential resolution, construction, transport, response, retry, parser,
   direct-transport, and request-retention cases. The R2 focused matrix passed
   162 tests with 5 PostgreSQL cases deselected.
-- Final status: **CLOSED AT R2**, subject to final R5 acceptance rerun.
-- Remediation commit: R2 checkpoint (resolved to the exact commit in R5).
+- Final status: **CLOSED**; final R5 traceback/security acceptance passed.
+- Remediation commit: `ac638e3ee6bbce8064a06e96102c2cfaa00be0d5`.
 
 ## REV-003 — production environment secret
 
@@ -71,8 +71,8 @@ with the checkpoint that contains the corresponding remediation.
   success, invalid/bounded content, symlink, static test injection, and
   forbidden CLI/`.env` source coverage. The R2 focused matrix passed 162 tests
   with 5 PostgreSQL cases deselected.
-- Final status: **CLOSED AT R2**, subject to final R5 acceptance rerun.
-- Remediation commit: R2 checkpoint (resolved to the exact commit in R5).
+- Final status: **CLOSED**; final R5 credential/security acceptance passed.
+- Remediation commit: `ac638e3ee6bbce8064a06e96102c2cfaa00be0d5`.
 
 ## REV-004 — semantic hash polluted by acquisition state
 
@@ -98,8 +98,8 @@ with the checkpoint that contains the corresponding remediation.
   prepared books/six H2H observations and no unsupported fair-price material.
   The R4 downstream matrix passed 124 tests; `current.py` branch-aware coverage
   was 95.09%.
-- Final status: **CLOSED AT R4**, subject to final R5 acceptance rerun.
-- Remediation commit: R4 checkpoint (resolved to the exact commit in R5).
+- Final status: **CLOSED**; final R5 Odds/markets acceptance passed.
+- Remediation commit: `5475348b77b0be3fbd8766f4565721b98819d652`.
 
 ## REV-005 — false secret-scan evidence
 
@@ -112,10 +112,13 @@ with the checkpoint that contains the corresponding remediation.
   eight findings with the independently reported safe fingerprints.
 - Root cause: two production/test-source finding classes plus a repository-root
   path exclusion defect that created the original false zero.
-- Code fix: R2 removed both production-source findings. The five remaining
-  current-tree findings are synthetic test construction and the scanner's
-  repository-root exclusion defect remains for R5; no production line is
-  allowlisted.
-- Tests: scanner-root regression RED in R1.
-- Final status: **OPEN**.
-- Remediation commit: pending.
+- Code fix: R2 removed both production-source findings and the request-contract
+  test signal. R5 constructs the remaining five synthetic values at runtime,
+  with no allowlist addition, and makes scanner exclusions relative to the
+  scanned root so a parent directory named `review_pack` cannot skip the tree.
+- Tests: the scanner-root regression and 62-test scanner/transport matrix
+  pass. The exact final scanner command genuinely covered this worktree and
+  returned exit 0, `PASS`, finding count 0.
+- Final status: **CLOSED**.
+- Remediation commit: R5 sealing commit containing this disposition and the
+  scanner fix; exact pushed HEAD is recorded in `REMEDIATION_RESULT.md` handoff.
