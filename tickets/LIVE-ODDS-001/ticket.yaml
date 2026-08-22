@@ -20,6 +20,7 @@ permissions:
   new_runtime_dependency: forbidden
 allowed_areas:
   - src/dmf_pulse/ingestion/odds/**
+  - src/dmf_pulse/assurance/secret_scan.py
   - config/providers/the_odds_api.json
   - tests/**
   - tickets/LIVE-ODDS-001/**

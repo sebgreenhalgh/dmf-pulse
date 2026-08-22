@@ -17,6 +17,10 @@
   `evidence/tickets/PRC-013/current_manifest.json` as the mutable active repository snapshot
   required by canonical repository assurance. No PRC-013 narrative/result evidence,
   implementation, other manifest, or additional scope expansion is authorized.
+- Owner Scope Amendment 2 additionally permits only
+  `src/dmf_pulse/assurance/secret_scan.py` for the already independently reviewed REV-005
+  scanner-root correction. No other assurance source, scanner redesign, test change,
+  configuration change, or broader product-scope expansion is authorized.
 
 ### LIVE-ODDS-001 checkpoints
 
@@ -34,6 +38,8 @@
   push, and remote-equality verification.
 - [x] G1 record Owner Scope Amendment 1, preserve NEW-001 history, canonically reseal the ticket
   and active manifests, and return the governance-only commit for independent confirmation.
+- [x] G2 record Owner Scope Amendment 2 for the existing reviewed scanner delta, reseal both
+  manifests, and publish both linear governance commits for independent confirmation.
 
 ## CHIP-014 Stage-14 chip optimisation
 

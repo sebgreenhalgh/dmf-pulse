@@ -17,9 +17,9 @@
     "file_count": 1135,
     "kind": "repository-deliverables-manifest",
     "path": "evidence/tickets/LIVE-ODDS-001/current_manifest.json",
-    "sha256": "b32a50a830a3c4a44a105cc49be89abfb2a8b1c16835d42f49fc1e3c0f580ce5"
+    "sha256": "7737e7a0e85a587b8d21a37c4677e4bf3a48e5ba91cc0805ac561a791b21cf2d"
   },
-  "final_checkpoint": "G1_GOVERNANCE_SEALING_COMMIT_CONTAINING_THIS_RESULT",
+  "final_checkpoint": "G2_GOVERNANCE_SEALING_COMMIT_CONTAINING_THIS_RESULT",
   "historical_merge_base": "9eb57143f6ee92f67c78607cc386678d962e62d4",
   "immutable_parent": "baed47bce7a158d91afe38351a2c65be60444adf",
   "independent_re_review": "REV_001_THROUGH_REV_005_CLOSED_NEW_001_IDENTIFIED",
@@ -35,7 +35,8 @@
     "a9f325763ae17d08f03c47cbd9bde3d5a2228182",
     "5475348b77b0be3fbd8766f4565721b98819d652",
     "b7b7022d99a2b56ac485c9f810c11926b64b25cd",
-    "G1_GOVERNANCE_SEALING_COMMIT_CONTAINING_THIS_RESULT"
+    "bd99bb56acf84def5200715c346d9598753a6f2a",
+    "G2_GOVERNANCE_SEALING_COMMIT_CONTAINING_THIS_RESULT"
   ],
   "reviewed_checkpoint": "6c36e73adef21b52ed54d23733e5a34c71547a6d",
   "secret_scan_finding_count": 0,
