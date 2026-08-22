@@ -1,0 +1,89 @@
+ticket_id: CI-GOV-001
+stage: repository-governance
+title: Required CI runtime budget for complete repository acceptance
+status: READY
+owner: Sebastian Greenhalgh
+implementer_role: codex_implementation
+reviewer_role: independent_governance_review_and_human
+classification: CI_EXECUTION_BUDGET_EXHAUSTED
+
+architectural_main_parent: baed47bce7a158d91afe38351a2c65be60444adf
+stacked_technical_parent: 652bae84fba9bdfbf435367d6140270fa8378d57
+forbidden_local_dependency: 244feb0709294c3a544e399c7890177120dd1020
+expected_branch: governance/CI-GOV-001-ci-runtime-budget
+
+objective: >-
+  Allow the repository's complete existing GitHub Actions quality job to finish under an explicit
+  bounded runtime budget without changing any command, test, threshold, product, dependency,
+  migration, or acceptance semantic.
+
+owner_authorization:
+  workflow: .github/workflows/ci.yml
+  field: jobs.quality.timeout-minutes
+  before: 35
+  after: 60
+  maximum_authorized_minutes: 60
+  further_increase: forbidden_without_new_owner_authority
+
+prechange_evidence:
+  workflow: dmf-pulse-ci
+  run_id: "32598102993"
+  job_id: "97092109564"
+  head: 652bae84fba9bdfbf435367d6140270fa8378d57
+  total_runtime: 35m17s
+  postgresql_step: SUCCESS
+  postgresql_result: 118 passed, 140 deselected in 186.59s
+  termination: coverage_running_when_job_budget_expired
+  real_test_failure_before_timeout: false
+
+protected_integration:
+  pull_request: 16
+  required_state: OPEN
+  required_base: main
+  accepted_live_odds_head: 5e55cf3361a1abff4b2e32dcc30fe42900ea2e16
+  preservation_rule: immutable_and_not_modified_by_this_ticket
+
+allowed_areas:
+  - .github/workflows/ci.yml
+  - tickets/CI-GOV-001/**
+  - evidence/tickets/CI-GOV-001/**
+  - PLANS.md
+  - evidence/tickets/PRC-013/current_manifest.json
+
+conditional_area_rules:
+  evidence/tickets/PRC-013/current_manifest.json: >-
+    May change only if canonical repository assurance requires refreshing the mutable active
+    repository snapshot. No other PRC-013 file is authorized.
+
+strict_exclusions:
+  - src/**
+  - tests/**
+  - config/**
+  - alembic/**
+  - pyproject.toml
+  - uv.lock
+  - every other workflow semantic
+  - command removal, reordering, shortening, retry, parallelism, or continue-on-error
+  - marker, skip, xfail, selection, coverage-threshold, or condition changes
+  - CI-FPL product code or local-only evidence commit dependency
+  - LIVE-ODDS branch, code, ticket, evidence, or PR metadata
+  - merge, tag, rebase, force push, or main mutation
+
+acceptance_contract: tickets/CI-GOV-001/ACCEPTANCE.md
+
+stop_conditions:
+  - origin/main differs from baed47bce7a158d91afe38351a2c65be60444adf before branch creation
+  - remote CI-FPL technical head differs from 652bae84fba9bdfbf435367d6140270fa8378d57
+  - PR 16 is merged, closed, retargeted, or moved from the accepted LIVE-ODDS head
+  - run 32598102993 contains a real material failure before timeout
+  - any workflow semantic other than timeout 35 to 60 must change
+  - any source, test, config, migration, or dependency path must change
+  - canonical assurance requires an unauthorized cross-ticket mutable path
+  - the complete job exceeds the authorized 60-minute budget
+  - a newly exposed required gate fails
+
+completion_evidence:
+  path: evidence/tickets/CI-GOV-001/
+  engineering_status: ENGINEERING_READY_PENDING_INDEPENDENT_GOVERNANCE_REVIEW
+  human_acceptance: separate_and_not_claimed
+  merge: forbidden

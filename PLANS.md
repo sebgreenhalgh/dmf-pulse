@@ -1,5 +1,30 @@
 # DMF Pulse execution plans
 
+## CI-GOV-001 required CI runtime budget
+
+- Architectural main parent: immutable `baed47bce7a158d91afe38351a2c65be60444adf`.
+- Stacked technical parent: remote CI-FPL engineering head
+  `652bae84fba9bdfbf435367d6140270fa8378d57`.
+- Branch: `governance/CI-GOV-001-ci-runtime-budget` in a new isolated worktree.
+- Classification: the corrected required suite exhausted the repository quality job's 35-minute
+  execution budget during branch coverage; no test failure preceded termination.
+- Owner-authorized change: only `.github/workflows/ci.yml` `timeout-minutes: 35` to `60`.
+- Safety: retain every command, order, condition, PostgreSQL 18.4 image, test selection, coverage
+  threshold, build/wheel gate, repository validator, and secret scan unchanged.
+
+### CI-GOV-001 checkpoints
+
+- [x] Verify immutable refs, PR #16, protected worktrees, and run `32598102993` timeout evidence.
+- [x] Create the isolated stacked worktree from exact remote technical head `652bae84...`.
+- [x] Freeze the ticket, acceptance boundary, plan, and bounded 60-minute owner authorization.
+- [x] Prove the governance delta has zero product/test/config/migration/dependency change and only
+  the intended timeout semantic change.
+- [x] Pass local YAML/static/repository/security validation and refresh only the authorized current
+  manifests required by canonical assurance.
+- [ ] Push normally, wait for the complete 60-minute GitHub Actions result, and record every
+  required step duration without rerunning or weakening a gate.
+- [ ] Seal evidence and hand off for independent governance review; do not merge or modify PR #16.
+
 ## CI-FPL-REPLAY-001 deterministic synthetic FPL replay time
 
 - Parent/branch: immutable `baed47bce7a158d91afe38351a2c65be60444adf` on

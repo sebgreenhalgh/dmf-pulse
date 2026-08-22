@@ -1,0 +1,39 @@
+CI-GOV-001 COMMAND LEDGER
+Recorded: 2026-08-22 Europe/London
+Architectural main parent: baed47bce7a158d91afe38351a2c65be60444adf
+Stacked technical parent: 652bae84fba9bdfbf435367d6140270fa8378d57
+
+PASS | git fetch origin --prune | immutable refs refreshed.
+PASS | origin/main | baed47bce7a158d91afe38351a2c65be60444adf.
+PASS | origin/remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time |
+652bae84fba9bdfbf435367d6140270fa8378d57.
+PASS | protected CI-FPL worktree | clean at local-only 244feb0709294c3a544e399c7890177120dd1020;
+not modified and not used as the stacked parent.
+PASS | PR #16 | OPEN, unmerged, base main, head
+5e55cf3361a1abff4b2e32dcc30fe42900ea2e16.
+PASS | gh run view 32598102993 | dmf-pulse-ci job 97092109564 canceled at 35m17s;
+PostgreSQL step SUCCESS; 118 passed, 140 deselected in 186.59s; coverage ran 31m10s before
+cancellation; no real test failure preceded termination; later mandatory steps skipped.
+PASS | workflow inspection at stacked parent | timeout exactly 35; all required commands and order
+recorded before modification.
+
+PASS | uv sync --all-groups --frozen | 40 packages installed; uv.lock unchanged.
+PASS | exact workflow byte comparison | current workflow equals technical parent after the single
+35-to-60 timeout replacement; workflow and ticket YAML parse successfully.
+PASS | git diff --check | no whitespace errors.
+PASS | uv run ruff format --check . | 636 files already formatted.
+PASS | uv run ruff check . | all checks passed.
+PASS | uv run mypy src/dmf_pulse | no issues in 245 source files.
+PASS | generate_repository_manifest.py --ticket CI-GOV-001 | 1131 files recorded.
+PASS | generate_repository_manifest.py --ticket PRC-013 | 1131 files recorded; this is the only
+authorized cross-ticket mutable path.
+PASS | validate_repository(Path.cwd()) via scripts/validate_repository.py | zero errors. The
+read-only function is identical to the CLI validation logic; local CLI main was not invoked because
+it hard-codes a forbidden GCS-008 report write. GitHub retains the literal unchanged CLI command.
+PASS | test_current_repository_manifests_are_valid | 1 passed in 1.43s.
+PASS | uv run python scripts/scan_secrets.py | zero findings.
+PASS | protected product scope | no diff under src, tests, config, alembic, pyproject.toml, or
+uv.lock; FPL service blob remains bb70b31b4309eeba11aa2b1140acb344c5ff5e41.
+
+LOCAL VALIDATION: PASS
+PUSHED 60-MINUTE CI: PENDING
