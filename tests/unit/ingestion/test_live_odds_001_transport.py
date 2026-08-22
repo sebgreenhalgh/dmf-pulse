@@ -139,7 +139,7 @@ class _ProtocolTransport:
         self.responses = responses
         self.requests: list[OddsHttpRequest] = []
 
-    def send(self, request: OddsHttpRequest) -> OddsHttpResponse:
+    def send(self, request: OddsHttpRequest, _credential: str) -> OddsHttpResponse:
         self.requests.append(request)
         response = self.responses.pop(0)
         if isinstance(response, IngestionError):
@@ -207,7 +207,7 @@ def test_tr01_tr02_exact_https_get_and_secret_free_request_contract() -> None:
     transport, factory = _transport(connection)
     request = _request()
 
-    result = transport.send(request)
+    result = transport.send(request, SENTINEL)
 
     assert result.status_code == 200
     assert factory.calls[0][0:2] == ("api.the-odds-api.com", 10.0)
@@ -241,7 +241,7 @@ def test_tr03_redirect_is_not_followed_and_location_is_redacted() -> None:
     connection = _Connection(response)
     transport, factory = _transport(connection)
 
-    result = transport.send(_request())
+    result = transport.send(_request(), SENTINEL)
 
     assert len(factory.calls) == 1
     assert len(connection.requests) == 1
@@ -263,7 +263,7 @@ def test_tr04_valid_json_response_envelope_keeps_only_safe_headers() -> None:
     )
     transport, _factory = _transport(_Connection(response))
 
-    result = transport.send(_request())
+    result = transport.send(_request(), SENTINEL)
 
     assert result.content_type == "application/json; charset=utf-8"
     assert result.body == b"[]"
@@ -323,7 +323,7 @@ def test_tr08_tr09_tr11_tr12_transport_failures_are_typed_and_secret_free(
     transport, _factory = _transport(connection)
 
     with pytest.raises(IngestionError) as raised:
-        transport.send(_request())
+        transport.send(_request(), SENTINEL)
 
     assert raised.value.code == code
     assert SENTINEL not in str(raised.value)
@@ -338,7 +338,7 @@ def test_tr10_total_timeout_is_enforced_across_transport_phases() -> None:
     transport, _factory = _transport(connection, monotonic=_Monotonic([0.0, 0.0, 31.0]))
 
     with pytest.raises(IngestionError) as raised:
-        transport.send(_request())
+        transport.send(_request(), SENTINEL)
 
     assert raised.value.code == "TOTAL_TIMEOUT"
     assert connection.closed == 1
@@ -358,7 +358,7 @@ def test_td01_remaining_total_is_reapplied_before_response_headers() -> None:
         monotonic=_Monotonic([0.0, 0.0, 0.0, 19.0, 19.0, 19.0, 19.0]),
     )
 
-    transport.send(_request())
+    transport.send(_request(), SENTINEL)
 
     assert connection.timeout_at_getresponse == 11.0
 
@@ -368,7 +368,7 @@ def test_tr13_response_read_is_bounded_to_maximum_plus_one() -> None:
     response = _Response(body=b"x" * (limit + 100_000))
     transport, _factory = _transport(_Connection(response))
 
-    result = transport.send(_request())
+    result = transport.send(_request(), SENTINEL)
 
     assert len(result.body) == limit + 1
     assert sum(response.read_sizes) <= limit + 1 + 64 * 1024
@@ -376,7 +376,7 @@ def test_tr13_response_read_is_bounded_to_maximum_plus_one() -> None:
 
 def test_tr14_malformed_json_reaches_parser_as_typed_failure() -> None:
     transport, _factory = _transport(_Connection(_Response(body=b"{not-json")))
-    result = transport.send(_request())
+    result = transport.send(_request(), SENTINEL)
 
     with pytest.raises(IngestionError) as raised:
         parse_odds_payload(result.body)
@@ -423,7 +423,7 @@ def test_tr17_lower_exception_error_body_headers_logging_and_serialization_do_no
         body=f'{{"apiKey":"{SENTINEL}"}}'.encode(),
     )
     transport, _factory = _transport(_Connection(response))
-    result = transport.send(_request())
+    result = transport.send(_request(), SENTINEL)
 
     assert SENTINEL not in repr(result)
     with pytest.raises(TypeError):
@@ -466,7 +466,7 @@ def test_tr20_http_client_transport_satisfies_approved_protocol() -> None:
     response = _Response()
     transport, _factory = _transport(_Connection(response))
 
-    result = transport.send(_request())
+    result = transport.send(_request(), SENTINEL)
 
     assert isinstance(result, OddsHttpResponse)
     assert result.status_code == 200

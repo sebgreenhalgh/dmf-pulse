@@ -1012,7 +1012,7 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 
 - [x] R1 reproduce all five findings, freeze disposition/evidence, and commit
   property-level RED tests.
-- [ ] R2 harden the credential/parser/traceback boundary and remove the raw
+- [x] R2 harden the credential/parser/traceback boundary and remove the raw
   environment-value fallback.
 - [ ] R3 enforce the total deadline at each controlled blocking primitive.
 - [ ] R4 separate supported-market semantics from acquisition provenance and

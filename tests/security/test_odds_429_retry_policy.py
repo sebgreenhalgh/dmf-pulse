@@ -60,7 +60,7 @@ class _SequenceTransport:
         self.calls = 0
         self.requests: list[OddsHttpRequest] = []
 
-    def send(self, request: OddsHttpRequest) -> OddsHttpResponse:
+    def send(self, request: OddsHttpRequest, _credential: str) -> OddsHttpResponse:
         self.calls += 1
         self.requests.append(request)
         if self.order is not None:

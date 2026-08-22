@@ -436,7 +436,7 @@ class _Transport:
         self.responses = responses
         self.requests: list[OddsHttpRequest] = []
 
-    def send(self, request: OddsHttpRequest) -> OddsHttpResponse:
+    def send(self, request: OddsHttpRequest, _credential: str) -> OddsHttpResponse:
         self.requests.append(request)
         response = self.responses.pop(0)
         if isinstance(response, IngestionError):
@@ -629,7 +629,6 @@ def test_quota_and_request_validation_reject_naive_or_inconsistent_values(
                 host="api.the-odds-api.com",
                 path="/v4/sports/soccer_epl/odds",
                 safe_parameters=(),
-                credential=_fake_credential(repository_root),
             ),
             load_provider_config(),
         )

@@ -46,20 +46,18 @@ __all__ = [
 
 
 class OddsHttpRequest:
-    """Non-serializable outbound request with private credential storage."""
+    """Immutable request metadata that never stores the raw credential."""
 
     method: str
     scheme: str
     host: str
     path: str
     safe_parameters: tuple[tuple[str, str], ...]
-    _credential: str
     connect_timeout_seconds: float
     read_timeout_seconds: float
     total_timeout_seconds: float
 
     __slots__ = (
-        "_credential",
         "connect_timeout_seconds",
         "host",
         "method",
@@ -77,7 +75,6 @@ class OddsHttpRequest:
         host: str,
         path: str,
         safe_parameters: tuple[tuple[str, str], ...],
-        credential: str,
         connect_timeout_seconds: float = 10,
         read_timeout_seconds: float = 20,
         total_timeout_seconds: float = 30,
@@ -87,7 +84,6 @@ class OddsHttpRequest:
         object.__setattr__(self, "host", host)
         object.__setattr__(self, "path", path)
         object.__setattr__(self, "safe_parameters", safe_parameters)
-        object.__setattr__(self, "_credential", credential)
         object.__setattr__(self, "connect_timeout_seconds", connect_timeout_seconds)
         object.__setattr__(self, "read_timeout_seconds", read_timeout_seconds)
         object.__setattr__(self, "total_timeout_seconds", total_timeout_seconds)
@@ -102,12 +98,8 @@ class OddsHttpRequest:
             f"method={self.method!r}, sanitized_target={self.sanitized_target!r}, "
             f"connect_timeout_seconds={self.connect_timeout_seconds!r}, "
             f"read_timeout_seconds={self.read_timeout_seconds!r}, "
-            f"total_timeout_seconds={self.total_timeout_seconds!r}, credential=<redacted>)"
+            f"total_timeout_seconds={self.total_timeout_seconds!r})"
         )
-
-    @property
-    def credential(self) -> str:
-        return self._credential
 
     @property
     def sanitized_target(self) -> str:
@@ -281,8 +273,29 @@ class OddsFetchFailure(IngestionError):
         self.attempts = attempts
 
 
+@dataclass(frozen=True, slots=True)
+class _FailureState:
+    code: str
+    message: str
+    retryable: bool
+    details: dict[str, object]
+    attempts: tuple[OddsRetrievalAttempt, ...] | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class _TransportOutcome:
+    response: OddsHttpResponse | None
+    failure: _FailureState | None
+
+
+@dataclass(frozen=True, slots=True)
+class _FetchOutcome:
+    result: OddsFetchResult | None
+    failure: _FailureState | None
+
+
 class OddsTransport(Protocol):
-    def send(self, request: OddsHttpRequest) -> OddsHttpResponse: ...
+    def send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse: ...
 
 
 class _HttpClientResponse(Protocol):
@@ -415,10 +428,11 @@ class HttpClientOddsTransport:
             size += len(chunk)
         return b"".join(chunks)
 
-    def send(self, request: OddsHttpRequest) -> OddsHttpResponse:
+    def _unsafe_send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
         config = load_provider_config()
         _validate_request(request, config)
-        full_parameters = (("apiKey", request.credential), *request.safe_parameters)
+        credential = validate_runtime_credential(credential)
+        full_parameters = (("apiKey", credential), *request.safe_parameters)
         target = f"{request.path}?{urllib.parse.urlencode(full_parameters)}"
         started_at = self._monotonic()
         connection: _HttpClientConnection | None = None
@@ -509,6 +523,50 @@ class HttpClientOddsTransport:
             raise IngestionError("INTERNAL_INVARIANT", "odds transport result is unavailable")
         return result
 
+    def _send_without_traceback_escape(
+        self,
+        request: OddsHttpRequest,
+        credential: str,
+    ) -> _TransportOutcome:
+        """Run the credential/raw exchange without exporting its traceback."""
+
+        try:
+            return _TransportOutcome(
+                response=self._unsafe_send(request, credential),
+                failure=None,
+            )
+        except IngestionError as exc:
+            failure = _FailureState(
+                code=exc.code,
+                message=exc.message,
+                retryable=exc.retryable,
+                details={},
+            )
+        except Exception:
+            failure = _FailureState(
+                code="SOURCE_UNAVAILABLE",
+                message="odds provider is unavailable",
+                retryable=True,
+                details={},
+            )
+        return _TransportOutcome(response=None, failure=failure)
+
+    def send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
+        """Raise typed failures only after the raw credential is released."""
+
+        outcome = self._send_without_traceback_escape(request, credential)
+        del credential, request
+        if outcome.failure is not None:
+            raise IngestionError(
+                outcome.failure.code,
+                outcome.failure.message,
+                retryable=outcome.failure.retryable,
+                details=outcome.failure.details,
+            ) from None
+        if outcome.response is None:  # pragma: no cover - outcome invariant
+            raise IngestionError("INTERNAL_INVARIANT", "odds transport result is unavailable")
+        return outcome.response
+
 
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(
@@ -582,10 +640,11 @@ class UrllibOddsTransport:
             ]
         )
 
-    def send(self, request: OddsHttpRequest) -> OddsHttpResponse:
+    def _unsafe_send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
         config = load_provider_config()
         _validate_request(request, config)
-        full_parameters = (("apiKey", request.credential), *request.safe_parameters)
+        credential = validate_runtime_credential(credential)
+        full_parameters = (("apiKey", credential), *request.safe_parameters)
         url = f"https://{request.host}{request.path}?{urllib.parse.urlencode(full_parameters)}"
         opener = urllib.request.build_opener(_NoRedirect())
         outbound = urllib.request.Request(
@@ -643,6 +702,50 @@ class UrllibOddsTransport:
                 "SOURCE_UNAVAILABLE", "odds provider is unavailable", retryable=True
             ) from None
 
+    def _send_without_traceback_escape(
+        self,
+        request: OddsHttpRequest,
+        credential: str,
+    ) -> _TransportOutcome:
+        """Run the legacy exchange without exporting credential/raw-response frames."""
+
+        try:
+            return _TransportOutcome(
+                response=self._unsafe_send(request, credential),
+                failure=None,
+            )
+        except IngestionError as exc:
+            failure = _FailureState(
+                code=exc.code,
+                message=exc.message,
+                retryable=exc.retryable,
+                details={},
+            )
+        except Exception:
+            failure = _FailureState(
+                code="SOURCE_UNAVAILABLE",
+                message="odds provider is unavailable",
+                retryable=True,
+                details={},
+            )
+        return _TransportOutcome(response=None, failure=failure)
+
+    def send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
+        """Raise typed failures only after the raw credential is released."""
+
+        outcome = self._send_without_traceback_escape(request, credential)
+        del credential, request
+        if outcome.failure is not None:
+            raise IngestionError(
+                outcome.failure.code,
+                outcome.failure.message,
+                retryable=outcome.failure.retryable,
+                details=outcome.failure.details,
+            ) from None
+        if outcome.response is None:  # pragma: no cover - outcome invariant
+            raise IngestionError("INTERNAL_INVARIANT", "odds transport result is unavailable")
+        return outcome.response
+
 
 def _safe_parameters(
     config: OddsProviderConfig,
@@ -672,14 +775,13 @@ def build_request(
     commence_to: datetime | None = None,
 ) -> OddsHttpRequest:
     config = load_provider_config()
-    credential = validate_runtime_credential(credential)
+    validate_runtime_credential(credential)
     return OddsHttpRequest(
         method="GET",
         scheme=config.scheme,
         host=config.host,
         path=config.path,
         safe_parameters=_safe_parameters(config, commence_from, commence_to),
-        credential=credential,
         connect_timeout_seconds=float(config.timeouts_seconds.connect),
         read_timeout_seconds=float(config.timeouts_seconds.read),
         total_timeout_seconds=float(config.timeouts_seconds.total),
@@ -788,12 +890,14 @@ def _transport_identifier(transport: OddsTransport) -> str:
 
 
 def _send_transport(
-    transport: OddsTransport, request: OddsHttpRequest
+    transport: OddsTransport,
+    request: OddsHttpRequest,
+    credential: str,
 ) -> tuple[OddsHttpResponse | None, IngestionError | None]:
     """Translate every transport exception without preserving its causal object."""
 
     try:
-        return transport.send(request), None
+        return transport.send(request, credential), None
     except IngestionError as exc:
         return None, _sanitized_transport_error(exc)
     except Exception:
@@ -889,12 +993,11 @@ def _bounded_retry_request(
         return None, next_elapsed
     return (
         OddsHttpRequest(
-            method=request.method,
-            scheme=request.scheme,
-            host=request.host,
-            path=request.path,
-            safe_parameters=request.safe_parameters,
-            credential=request.credential,
+            request.method,
+            request.scheme,
+            request.host,
+            request.path,
+            request.safe_parameters,
             connect_timeout_seconds=min(request.connect_timeout_seconds, remaining),
             read_timeout_seconds=min(request.read_timeout_seconds, remaining),
             total_timeout_seconds=remaining,
@@ -925,6 +1028,36 @@ class OddsClient:
         self.transport_call_count = 0
 
     def fetch(
+        self,
+        *,
+        quota: QuotaState | None = None,
+        commence_from: datetime | None = None,
+        commence_to: datetime | None = None,
+    ) -> OddsFetchResult:
+        """Raise only from a frame that has never bound raw provider material."""
+
+        outcome = _fetch_without_traceback_escape(
+            self,
+            quota=quota,
+            commence_from=commence_from,
+            commence_to=commence_to,
+        )
+        del self
+        if outcome.failure is not None:
+            error = IngestionError(
+                outcome.failure.code,
+                outcome.failure.message,
+                retryable=outcome.failure.retryable,
+                details=outcome.failure.details,
+            )
+            if outcome.failure.attempts is not None:
+                raise OddsFetchFailure(error, outcome.failure.attempts) from None
+            raise error from None
+        if outcome.result is None:  # pragma: no cover - outcome invariant
+            raise IngestionError("INTERNAL_INVARIANT", "odds fetch result is unavailable")
+        return outcome.result
+
+    def _unsafe_fetch(
         self,
         *,
         quota: QuotaState | None = None,
@@ -993,7 +1126,7 @@ class OddsClient:
                     "INTERNAL_INVARIANT", "odds client clock must be timezone-aware"
                 )
             self.transport_call_count += 1
-            response, safe_error = _send_transport(transport, attempt_request)
+            response, safe_error = _send_transport(transport, attempt_request, credential)
             transport_finished_monotonic = self._monotonic()
             if transport_finished_monotonic < deadline_started:
                 raise IngestionError("INTERNAL_INVARIANT", "odds client monotonic clock regressed")
@@ -1206,3 +1339,46 @@ class OddsClient:
         if last_error is not None:  # pragma: no cover - loop invariant
             raise OddsFetchFailure(last_error, tuple(attempts))
         raise IngestionError("INTERNAL_INVARIANT", "odds transport loop did not execute")
+
+
+def _fetch_without_traceback_escape(
+    client: OddsClient,
+    *,
+    quota: QuotaState | None,
+    commence_from: datetime | None,
+    commence_to: datetime | None,
+) -> _FetchOutcome:
+    """Detach all unsafe client frames and exception graphs before public raise."""
+
+    try:
+        return _FetchOutcome(
+            result=client._unsafe_fetch(
+                quota=quota,
+                commence_from=commence_from,
+                commence_to=commence_to,
+            ),
+            failure=None,
+        )
+    except OddsFetchFailure as exc:
+        failure = _FailureState(
+            code=exc.code,
+            message=exc.message,
+            retryable=exc.retryable,
+            details=dict(exc.details),
+            attempts=tuple(exc.attempts),
+        )
+    except IngestionError as exc:
+        failure = _FailureState(
+            code=exc.code,
+            message=exc.message,
+            retryable=exc.retryable,
+            details=dict(exc.details),
+        )
+    except Exception:
+        failure = _FailureState(
+            code="SOURCE_UNAVAILABLE",
+            message="odds provider is unavailable",
+            retryable=True,
+            details={"transport_call_count": client.transport_call_count},
+        )
+    return _FetchOutcome(result=None, failure=failure)

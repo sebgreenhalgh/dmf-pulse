@@ -93,32 +93,35 @@ def _read_systemd_credential(path: Path) -> str:
 
 
 class RuntimeOddsCredentialProvider:
-    """Resolve a systemd credential or a process-scoped platform fallback.
+    """Resolve only a systemd-delivered runtime credential file.
 
-    Only source identifiers are retained. Secret material is read lazily for the
-    immediate request and is never included in the provider representation.
+    ``CREDENTIALS_DIRECTORY`` is a non-secret location identifier. Raw API-key
+    values in the process environment are deliberately ignored. For injected
+    test environments, retain only the directory identifier rather than the
+    caller's potentially secret-bearing mapping.
     """
 
-    __slots__ = ("_environment",)
+    __slots__ = ("_credential_directory_override", "_use_process_environment")
 
     def __init__(self, *, environment: Mapping[str, str] | None = None) -> None:
-        self._environment = environment
+        self._use_process_environment = environment is None
+        self._credential_directory_override = (
+            None if environment is None else environment.get(SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE)
+        )
 
     def __repr__(self) -> str:
         return "RuntimeOddsCredentialProvider(<runtime-secret>)"
 
-    def _runtime_environment(self) -> Mapping[str, str]:
-        return os.environ if self._environment is None else self._environment
+    def _credential_directory(self) -> str | None:
+        if self._use_process_environment:
+            return os.environ.get(SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE)
+        return self._credential_directory_override
 
     def get_credential(self) -> str | None:
-        environment = self._runtime_environment()
-        credential_directory = environment.get(SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE)
+        credential_directory = self._credential_directory()
         if credential_directory:
             return _read_systemd_credential(Path(credential_directory) / SYSTEMD_CREDENTIAL_FILE)
-        value = environment.get(ODDS_API_ENVIRONMENT_VARIABLE)
-        if value is None:
-            return None
-        return validate_runtime_credential(value)
+        return None
 
 
 def credential_is_configured(provider: CredentialProvider) -> bool:
@@ -144,9 +147,5 @@ def credential_configuration_hint(provider: CredentialProvider) -> bool | None:
     if isinstance(provider, StaticCredentialProvider):
         return True
     if isinstance(provider, RuntimeOddsCredentialProvider):
-        environment = provider._runtime_environment()
-        return bool(
-            environment.get(SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE)
-            or ODDS_API_ENVIRONMENT_VARIABLE in environment
-        )
+        return bool(provider._credential_directory())
     return None

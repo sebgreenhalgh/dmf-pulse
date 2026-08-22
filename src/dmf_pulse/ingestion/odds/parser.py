@@ -183,6 +183,20 @@ class ParsedOddsPayload:
         return sum(len(event.bookmakers) for event in self.events)
 
 
+@dataclass(frozen=True, slots=True)
+class _ParserFailureState:
+    code: str
+    message: str
+    retryable: bool
+    details: dict[str, object]
+
+
+@dataclass(frozen=True, slots=True)
+class _ParserOutcome:
+    result: ParsedOddsPayload | None
+    failure: _ParserFailureState | None
+
+
 def _strict_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for key, value in pairs:
@@ -196,22 +210,45 @@ def _reject_constant(value: str) -> object:
     raise ValueError(f"invalid numeric constant {value}")
 
 
-def _redact_secret_like_provider_fields(value: object) -> object:
-    """Remove unexpected secret values while retaining field names for quality blocking."""
+def _secret_value_limit_failure(value: object, maximum: int) -> tuple[str, str] | None:
+    """Return only a safe limit failure, never an exception retaining the value."""
+
+    try:
+        _check_text_limits(value, maximum)
+        _check_numeric_limits(value, maximum)
+    except IngestionError as exc:
+        return exc.code, exc.message
+    return None
+
+
+def _redact_secret_like_provider_fields(
+    value: object,
+    maximum: int,
+) -> tuple[object, tuple[str, str] | None]:
+    """Destroy secret-like values before structured validation can raise."""
 
     if isinstance(value, dict):
         redacted: dict[str, object] = {}
+        first_failure: tuple[str, str] | None = None
         for key, child in value.items():
             normalized = key.casefold().replace("-", "_")
-            redacted[key] = (
-                _REDACTED_PROVIDER_VALUE
-                if any(fragment in normalized for fragment in _SECRET_FIELD_FRAGMENTS)
-                else _redact_secret_like_provider_fields(child)
-            )
-        return redacted
+            if any(fragment in normalized for fragment in _SECRET_FIELD_FRAGMENTS):
+                first_failure = first_failure or _secret_value_limit_failure(child, maximum)
+                redacted[key] = _REDACTED_PROVIDER_VALUE
+                continue
+            safe_child, child_failure = _redact_secret_like_provider_fields(child, maximum)
+            first_failure = first_failure or child_failure
+            redacted[key] = safe_child
+        return redacted, first_failure
     if isinstance(value, list):
-        return [_redact_secret_like_provider_fields(item) for item in value]
-    return value
+        redacted_items: list[object] = []
+        first_failure = None
+        for item in value:
+            safe_item, item_failure = _redact_secret_like_provider_fields(item, maximum)
+            first_failure = first_failure or item_failure
+            redacted_items.append(safe_item)
+        return redacted_items, first_failure
+    return value, None
 
 
 def _decode_utf8(body: bytes) -> str | None:
@@ -507,12 +544,13 @@ def _parse_events(
     return events, ()
 
 
-def parse_odds_payload(body: bytes) -> ParsedOddsPayload:
-    """Parse one bounded body without performing transport or persistence."""
+def _parse_odds_payload_unsafe(body: bytes) -> ParsedOddsPayload:
+    """Parse inside a caught raw scope whose traceback never escapes."""
 
     config = load_provider_config()
     if len(body) > config.max_response_bytes:
         raise IngestionError("PAYLOAD_TOO_LARGE", "provider response exceeds the byte limit")
+    body_sha256 = hashlib.sha256(body).hexdigest()
     text = _decode_utf8(body)
     if text is None:
         raise IngestionError("MALFORMED_JSON", "provider JSON is not UTF-8")
@@ -524,11 +562,18 @@ def parse_odds_payload(body: bytes) -> ParsedOddsPayload:
         raise IngestionError("MALFORMED_JSON", "provider JSON is malformed")
     if not isinstance(raw, list):
         raise IngestionError("VALIDATION_FAILED", "provider response must be a top-level array")
-    _check_text_limits(raw, config.max_text_length)
-    _check_numeric_limits(raw, config.max_text_length)
+    safe_raw, secret_limit_failure = _redact_secret_like_provider_fields(
+        raw, config.max_text_length
+    )
+    body = b""
+    text = ""
+    raw = None
+    if secret_limit_failure is not None:
+        raise IngestionError(*secret_limit_failure)
+    _check_text_limits(safe_raw, config.max_text_length)
+    _check_numeric_limits(safe_raw, config.max_text_length)
     # JSON arrays are decoded as lists. Permit that representation at the
     # model boundary while strict field validators reject provider coercions.
-    safe_raw = _redact_secret_like_provider_fields(raw)
     if not isinstance(safe_raw, list):  # pragma: no cover - top-level list invariant
         raise IngestionError("INTERNAL_INVARIANT", "provider response redaction failed")
     events, invalid_paths = _parse_events(safe_raw, config)
@@ -552,9 +597,48 @@ def parse_odds_payload(body: bytes) -> ParsedOddsPayload:
         warnings.append("DUPLICATE_OUTCOME_DEDUPED")
     return ParsedOddsPayload(
         events=events,
-        body_sha256=hashlib.sha256(body).hexdigest(),
+        body_sha256=body_sha256,
         semantic_sha256=canonical_sha256(_semantic(events)),
-        schema_fingerprint=canonical_sha256(_type_paths(raw)),
+        schema_fingerprint=canonical_sha256(_type_paths(safe_raw)),
         warnings=tuple(sorted(set(warnings))),
         duplicate_outcomes=duplicate_outcomes,
     )
+
+
+def _parse_without_traceback_escape(body: bytes) -> _ParserOutcome:
+    """Convert every raw-scope exception to detached, bounded failure state."""
+
+    try:
+        return _ParserOutcome(result=_parse_odds_payload_unsafe(body), failure=None)
+    except IngestionError as exc:
+        failure = _ParserFailureState(
+            code=exc.code,
+            message=exc.message,
+            retryable=exc.retryable,
+            details=dict(exc.details),
+        )
+    except Exception:
+        failure = _ParserFailureState(
+            code="VALIDATION_FAILED",
+            message="provider payload violates the reference contract",
+            retryable=False,
+            details={},
+        )
+    return _ParserOutcome(result=None, failure=failure)
+
+
+def parse_odds_payload(body: bytes) -> ParsedOddsPayload:
+    """Parse one body; only detached safe failure state may escape."""
+
+    outcome = _parse_without_traceback_escape(body)
+    del body
+    if outcome.failure is not None:
+        raise IngestionError(
+            outcome.failure.code,
+            outcome.failure.message,
+            retryable=outcome.failure.retryable,
+            details=outcome.failure.details,
+        ) from None
+    if outcome.result is None:  # pragma: no cover - outcome invariant
+        raise IngestionError("INTERNAL_INVARIANT", "odds parser result is unavailable")
+    return outcome.result

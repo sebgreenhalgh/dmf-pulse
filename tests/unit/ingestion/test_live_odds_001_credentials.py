@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import inspect
 import os
+import stat
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -33,7 +36,7 @@ def test_cred02_cred03_raw_environment_secret_is_not_a_production_source() -> No
     assert SENTINEL not in repr(provider)
 
 
-def test_systemd_credential_precedes_process_fallback_and_trims_one_newline(
+def test_cred01_systemd_credential_ignores_raw_environment_value_and_trims_newline(
     tmp_path: Path,
 ) -> None:
     credential_file = tmp_path / "the_odds_api_key"
@@ -81,6 +84,58 @@ def test_systemd_credential_must_be_a_bounded_regular_file(tmp_path: Path) -> No
     assert os.fspath(tmp_path) not in str(raised.value)
 
 
+@pytest.mark.parametrize(
+    "content",
+    (
+        b"short",
+        b"x" * 515,
+        b"non-ascii-\xff-credential",
+        b"contains whitespace 913579",
+    ),
+    ids=("short", "oversized", "non-ascii", "whitespace"),
+)
+def test_cred05_systemd_credential_file_content_remains_bounded(
+    tmp_path: Path,
+    content: bytes,
+) -> None:
+    (tmp_path / "the_odds_api_key").write_bytes(content)
+    provider = RuntimeOddsCredentialProvider(
+        environment={SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE: os.fspath(tmp_path)}
+    )
+
+    with pytest.raises(IngestionError) as raised:
+        provider.get_credential()
+
+    assert raised.value.code == "CREDENTIAL_UNAVAILABLE"
+    assert content.decode("ascii", errors="ignore") not in str(raised.value)
+
+
+def test_cred05_systemd_credential_symlink_is_rejected(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    link = tmp_path / "the_odds_api_key"
+    link.write_text(SENTINEL, encoding="ascii")
+    original_lstat = Path.lstat
+    monkeypatch.setattr(
+        Path,
+        "lstat",
+        lambda candidate: (
+            SimpleNamespace(st_mode=stat.S_IFLNK)
+            if candidate == link
+            else original_lstat(candidate)
+        ),
+    )
+    provider = RuntimeOddsCredentialProvider(
+        environment={SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE: os.fspath(tmp_path)}
+    )
+
+    with pytest.raises(IngestionError) as raised:
+        provider.get_credential()
+
+    assert raised.value.code == "CREDENTIAL_UNAVAILABLE"
+
+
 def test_known_configuration_hints_never_resolve_secret_material() -> None:
     class ExplodingProvider:
         def get_credential(self) -> str:
@@ -96,3 +151,12 @@ def test_credential_probe_returns_only_a_boolean() -> None:
     assert credential_is_configured(StaticCredentialProvider("invalid")) is False
     assert credential_is_configured(UnavailableCredentialProvider()) is False
     assert SENTINEL not in repr(StaticCredentialProvider(SENTINEL))
+
+
+def test_cred06_through_cred08_only_file_or_explicit_test_injection_is_supported() -> None:
+    assert StaticCredentialProvider(SENTINEL).get_credential() == SENTINEL
+    source = inspect.getsource(RuntimeOddsCredentialProvider.get_credential)
+    assert ODDS_API_ENVIRONMENT_VARIABLE not in source
+    assert "DMF_PULSE_ODDS_API_KEY" not in source
+    assert ".env" not in source
+    assert "argv" not in source

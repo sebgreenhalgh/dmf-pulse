@@ -124,3 +124,21 @@ PASS  uv run ruff check <five changed test files>
       All checks passed
 PASS  git diff --check
 NETWORK/CREDENTIAL  Offline deterministic fakes only; no provider call or real credential read.
+
+2026-08-22 REMEDIATION CHECKPOINT R2 SECURITY / CREDENTIAL BOUNDARY
+PASS  uv run pytest -q tests/security/test_live_odds_001_traceback_security.py tests/unit/ingestion/test_live_odds_001_credentials.py tests/unit/ingestion/test_live_odds_001_transport.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py tests/unit/ingestion/test_odds_foundation.py tests/security/test_odds_credentials_quota_retention.py tests/security/test_odds_429_retry_policy.py -m "not postgres" -k "not td01"
+      162 passed, 5 deselected in 4.50s; TD-01 remains the intentionally RED R3 property.
+PASS  adversarial production traceback walker SEC-TB-01..19
+      no sentinel reachable through traceback/cause/context production locals, including nested mappings, sequences, object dictionaries and slots.
+PASS  request credential-retention contract
+      OddsHttpRequest stores no credential; both stdlib transports and OddsClient isolate unsafe values behind non-escaping helpers.
+PASS  credential source matrix
+      systemd credential file supported; raw DMF_PULSE_ODDS_API_KEY process value ignored for resolution and health.
+PASS  uv run ruff check <R2 source and focused tests>
+      All checks passed.
+PASS  uv run mypy src/dmf_pulse/ingestion/odds/client.py src/dmf_pulse/ingestion/odds/credentials.py src/dmf_pulse/ingestion/odds/parser.py
+      Success: no issues found in 3 source files.
+PASS  direct secret-scan classification over R2 production files
+      0 findings in client.py, credentials.py, and parser.py; remaining current-tree scanner signals are synthetic tests reserved for R5.
+PASS  git diff --check
+NETWORK/CREDENTIAL  Offline fakes and synthetic split-string sentinels only; no provider call or real credential read.
