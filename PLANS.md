@@ -16,9 +16,10 @@
 - [x] Verify Git/PR identities, inherited A4 authority, remote migration-matrix pass, exact parent
   PostgreSQL failure, and controlled PRE/POST/`post_cutoff` reproduction.
 - [x] Freeze the narrow ticket, acceptance matrix, root-cause record, and evidence plan.
-- [ ] Add TIME-01 through TIME-18 RED regressions and implement deterministic replay/resume time.
-- [ ] Pass PostgreSQL 18.4 integration, migration matrix, remaining CI vertical slice, full/static/
-  build/wheel/repository/security gates, and branch GitHub Actions.
+- [x] Add TIME-01 through TIME-18 RED regressions and implement deterministic replay/resume time.
+- [x] Pass the focused PostgreSQL 18.4 integration matrix, migration matrix, remaining blocked CI
+  vertical slice, static analysis, and measured coverage thresholds.
+- [ ] Pass final full/static/build/wheel/repository/security gates and branch GitHub Actions.
 - [ ] Seal final evidence, commit/push the remediation branch, and hand off for independent review;
   do not merge or modify PR #16.
 

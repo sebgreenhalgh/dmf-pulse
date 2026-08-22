@@ -1,8 +1,8 @@
 # CI-FPL-REPLAY-001 root cause
 
-Status: `REPRODUCED_ON_IMMUTABLE_MAIN_PARENT`
+Status: `CONFIRMED_AND_REMEDIATED_LOCALLY`
 
-Evidence phase: initial, before remediation
+Evidence phase: post-implementation, before branch CI
 
 ## Classification
 
@@ -72,3 +72,13 @@ forbidden.
 The existing cutoff predicate and typed `POST_CUTOFF` handling remain correct. The defect is which
 clock feeds synthetic replay lifecycle time, not the database schema, migration history, rights
 gate, cutoff instant, fixture date, or bundle eligibility rule.
+
+## Implemented boundary
+
+Public ordinary import remains hard-bound to `PROCESSING_TIME_V1`. Only the canonical,
+manifest-authorized synthetic replay entry point selects `FROZEN_REPLAY_CAPTURED_AT_V1`, and the
+versioned policy is included in the hash-protected pair context used by resume. Legacy contexts
+without the field default to processing time; unknown or synthetic-incompatible frozen policies
+fail closed. Scenario names and resolved fixture directories are bound to an explicit allowlist so
+traversal, case variants, absolute paths, and link redirection cannot substitute fixture content or
+its frozen timestamp.

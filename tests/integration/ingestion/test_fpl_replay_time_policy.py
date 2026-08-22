@@ -68,6 +68,30 @@ def _usable_projection(outcome: FplOperationOutcome) -> tuple[datetime, ...]:
     return tuple(value for value in values if value is not None)
 
 
+def _event_projection(
+    outcome: FplOperationOutcome,
+    factory: sessionmaker[Session],
+) -> tuple[tuple[tuple[int, str, datetime], ...], ...]:
+    with factory() as session:
+        return tuple(
+            tuple(
+                (row.sequence_number, row.stage, row.event_at)
+                for row in session.execute(
+                    select(
+                        source_processing_event.c.sequence_number,
+                        source_processing_event.c.stage,
+                        source_processing_event.c.event_at,
+                    )
+                    .where(
+                        source_processing_event.c.source_snapshot_id == resource.source_snapshot_id
+                    )
+                    .order_by(source_processing_event.c.sequence_number)
+                )
+            )
+            for resource in outcome.result.resources
+        )
+
+
 @pytest.mark.parametrize(
     "future_host",
     (ONE_DAY_LATER_HOST, ONE_YEAR_LATER_HOST),
@@ -107,7 +131,16 @@ def test_time_01_02_03_07_16_18_happy_replay_ignores_host_wall_clock(
     )
     assert _usable_projection(before) == _usable_projection(after)
     assert all(value <= DEFAULT_INFORMATION_CUTOFF for value in _usable_projection(after))
-    assert _quality_projection(before) == _quality_projection(after)
+    before_quality = _quality_projection(before)
+    after_quality = _quality_projection(after)
+    assert len({(issue["code"], issue["subject_scope"]) for issue in before_quality}) >= 2
+    assert before_quality == after_quality
+    before_events = _event_projection(before, postgres_session_factory)
+    after_events = _event_projection(after, postgres_session_factory)
+    assert before_events == after_events
+    for events in after_events:
+        assert tuple(event[0] for event in events) == tuple(range(1, len(events) + 1))
+        assert tuple(event[2] for event in events) == tuple(sorted(event[2] for event in events))
     assert after.result.canonical_effects["changed"] == {}
 
     before_snapshot_ids = {resource.source_snapshot_id for resource in before.result.resources}

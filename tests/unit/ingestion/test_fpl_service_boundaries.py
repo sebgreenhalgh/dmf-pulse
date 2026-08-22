@@ -776,6 +776,18 @@ def test_operation_time_policy_preserves_utc_and_naive_datetime_rejection(
     with pytest.raises(ValueError, match="timezone-aware UTC"):
         service._operation_time(aware, policy="PROCESSING_TIME_V1")
     with pytest.raises(ValueError, match="timezone-aware UTC"):
+        FplIngestionService(repository_root=tmp_path, clock=lambda: aware).import_pair(
+            FplImportRequest(
+                bootstrap_path=tmp_path / "fixtures/bootstrap.json",
+                fixtures_path=tmp_path / "fixtures/fixtures.json",
+                competition_key="SYNTHETIC_PL",
+                season_code="2026/27",
+                captured_at=naive,
+                information_cutoff=aware,
+                rights_profile_id="synthetic_test_v1",
+            )
+        )
+    with pytest.raises(ValueError, match="timezone-aware UTC"):
         service.replay(
             FplReplayRequest(
                 fixture_set=tmp_path / "fixtures",
@@ -783,6 +795,8 @@ def test_operation_time_policy_preserves_utc_and_naive_datetime_rejection(
                 information_cutoff=naive,
             )
         )
+    with pytest.raises(ValueError, match="timezone-aware UTC"):
+        service._context_time({"captured_at": "2026-08-21T17:00:00"}, "captured_at")
 
 
 def test_resume_operation_time_policy_is_strict_and_fail_closed() -> None:

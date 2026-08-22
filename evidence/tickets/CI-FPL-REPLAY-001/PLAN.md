@@ -1,6 +1,6 @@
 # CI-FPL-REPLAY-001 implementation plan
 
-Status: `IN_PROGRESS`
+Status: `LOCAL_ACCEPTANCE_IN_PROGRESS`
 
 Updated: `2026-08-22`
 
@@ -38,14 +38,16 @@ availability/processing time and fail closed after cutoff.
   cases.
 - [x] Freeze the narrow ticket, acceptance contract, TIME-01 through TIME-18 matrix, and evidence
   plan.
-- [ ] Add RED regression coverage for replay across host dates, changed/post-cutoff scenarios,
+- [x] Add RED regression coverage for replay across host dates, changed/post-cutoff scenarios,
   resume stages, concurrency, ordinary import safety, UTC handling, quality ordering, and hashes.
-- [ ] Implement the smallest explicit replay-time policy in `service.py`, retaining it through the
+- [x] Implement the smallest explicit replay-time policy in `service.py`, retaining it through the
   existing safe operation context so resume does not require a migration.
-- [ ] Run focused tests, then the exact PostgreSQL integration suite and migration matrix on
+- [x] Run focused tests, then the exact PostgreSQL integration suite and migration matrix on
   PostgreSQL 18.4.
-- [ ] Run the remaining blocked workflow vertical slice, FPL CLI replay, static/full/package/wheel/
-  repository/security gates, and inspect the exact parent diff.
+- [x] Run the remaining blocked workflow vertical slice, FPL CLI replay, static analysis, and
+  measured coverage gates.
+- [ ] Complete the final full-suite rerun after manifest refresh, package/wheel/repository/security
+  gates, and inspect the exact parent diff.
 - [ ] Seal truthful final evidence and manifests only after results and final identities exist;
   commit/push resumably, inspect the remediation branch CI, and stop before independent review.
 
@@ -58,6 +60,5 @@ written; the substitution is recorded rather than hidden.
 
 ## Evidence lifecycle
 
-This is initial evidence only. `current_manifest.json`, `result.json`, coverage, command ledger,
-implementation result, final self-review, and any final manifest are intentionally deferred until
-their inputs and final Git/CI identities exist.
+Coverage is measured locally. Final manifests, package/repository/security results, remote Git/CI
+identities, and independent review remain pending and will not be claimed early.
