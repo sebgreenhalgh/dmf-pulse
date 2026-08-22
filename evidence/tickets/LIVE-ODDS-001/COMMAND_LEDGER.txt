@@ -142,3 +142,16 @@ PASS  direct secret-scan classification over R2 production files
       0 findings in client.py, credentials.py, and parser.py; remaining current-tree scanner signals are synthetic tests reserved for R5.
 PASS  git diff --check
 NETWORK/CREDENTIAL  Offline fakes and synthetic split-string sentinels only; no provider call or real credential read.
+
+2026-08-22 REMEDIATION CHECKPOINT R3 HARD TRANSPORT DEADLINE
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_transport.py tests/security/test_live_odds_001_traceback_security.py tests/security/test_odds_429_retry_policy.py tests/security/test_odds_credentials_quota_retention.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py tests/unit/ingestion/test_odds_foundation.py -m "not postgres"
+      161 passed, 4 deselected in 7.32s.
+PASS  TD-01..TD-12 and added request-write/TCP-to-TLS regressions
+      stale header timeout corrected to 11 seconds; delayed header and one outer multi-wait body read stopped at the total boundary; read/connect phase classification and retry-budget carry-over remained exact.
+PASS  same R3 matrix with --cov=dmf_pulse.ingestion.odds.client --cov-branch --cov-report=term-missing
+      161 passed, 4 deselected; client.py 90.28% branch-aware coverage (729 statements, 166 branches).
+PASS  uv run ruff check src/dmf_pulse/ingestion/odds/client.py tests/unit/ingestion/test_live_odds_001_transport.py
+      All checks passed.
+PASS  uv run mypy src/dmf_pulse/ingestion/odds/client.py
+      Success: no issues found in 1 source file.
+NETWORK/CREDENTIAL  Deterministic connection/socket fakes only; no external or loopback provider request and no real credential read.

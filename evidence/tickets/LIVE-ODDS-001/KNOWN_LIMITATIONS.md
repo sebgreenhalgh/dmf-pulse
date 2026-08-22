@@ -22,10 +22,12 @@ provenance, and secret-handling contracts.
   platform branches or filesystem assumptions in the transport, and systemd/process credential
   behavior is covered with portable filesystem fakes, but a native POSIX run remains for CI or the
   independent reviewer.
-- Python's stdlib/OS resolver governs scheduling inside `HTTPSConnection.connect`; the configured
-  connect socket timeout and client total deadline govern the controlled connection/read/retry
-  phases. No background worker, subprocess, alternate transport, or silent timeout fallback was
-  introduced.
+- Python's synchronous OS resolver has no portable stdlib cancellation primitive. Resolution runs
+  before the application-controlled TCP primitive; after resolution, the transport recalculates
+  and enforces the connect/total bound separately for each TCP address and TLS handshake, then the
+  read/total bound for every write/header/receive primitive. No background worker, subprocess,
+  alternate transport, or silent timeout fallback was introduced to disguise that platform
+  resolver boundary.
 - This unit stops at provider-native unmapped current Odds input. FPL/team/fixture identity
   reconciliation, live snapshot composition, orchestration, and Stage-6 algorithm changes remain
   deliberately excluded.

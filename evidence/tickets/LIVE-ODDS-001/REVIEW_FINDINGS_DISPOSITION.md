@@ -16,10 +16,18 @@ with the checkpoint that contains the corresponding remediation.
   `TOTAL_TIMEOUT`.
 - Root cause: remaining time was checked but not reapplied before response
   headers; `HTTPResponse.read()` may perform multiple underlying waits.
-- Code fix: pending R3.
-- Tests: TD-01 RED in R1; complete TD matrix pending R3.
-- Final status: **OPEN**.
-- Remediation commit: pending.
+- Code fix: R3 uses one monotonic attempt boundary and recalculates the
+  applicable `min(phase remaining, total remaining)` bound before each TCP
+  address connect, TLS handshake, request write, response-header wait, and
+  raw buffered receive. A deadline socket facade is installed before request
+  writing; its raw reader reapplies the current total/read bound inside one
+  outer `HTTPResponse.read()`. Retry request timeouts are derived from the
+  original client deadline after elapsed transport time and retry delay.
+- Tests: TD-01..12 plus direct request-write and TCP/TLS split-operation
+  regressions pass. The R3 focused matrix passed 161 tests with 4 PostgreSQL
+  cases deselected; `client.py` branch-aware coverage was 90.28%.
+- Final status: **CLOSED AT R3**, subject to final R5 acceptance rerun.
+- Remediation commit: R3 checkpoint (resolved to the exact commit in R5).
 
 ## REV-002 — traceback-local secret/raw retention
 

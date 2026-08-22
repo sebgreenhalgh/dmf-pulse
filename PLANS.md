@@ -1014,7 +1014,7 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   property-level RED tests.
 - [x] R2 harden the credential/parser/traceback boundary and remove the raw
   environment-value fallback.
-- [ ] R3 enforce the total deadline at each controlled blocking primitive.
+- [x] R3 enforce the total deadline at each controlled blocking primitive.
 - [ ] R4 separate supported-market semantics from acquisition provenance and
   execute a real downstream contamination regression.
 - [ ] R5 close the scanner/evidence defect, run complete acceptance and hostile

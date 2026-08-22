@@ -14,6 +14,7 @@ import pytest
 
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.ingestion.odds import client as odds_client_module
 from dmf_pulse.ingestion.odds.client import (
     HttpClientOddsTransport,
     OddsClient,
@@ -158,8 +159,131 @@ class _Monotonic:
         return self.last
 
 
+class _Clock:
+    def __init__(self, value: float = 0.0) -> None:
+        self.value = value
+
+    def __call__(self) -> float:
+        return self.value
+
+
+class _PrimitiveSocket:
+    """Model one blocking primitive per recv/send with an applied timeout."""
+
+    def __init__(self, clock: _Clock, *, delays: list[float] | None = None) -> None:
+        self.clock = clock
+        self.delays = list(delays or [])
+        self.timeout: float | None = None
+        self.timeouts: list[float] = []
+        self.recv_calls = 0
+        self.closed = 0
+
+    def settimeout(self, value: float) -> None:
+        self.timeout = value
+        self.timeouts.append(value)
+
+    def _block(self) -> None:
+        delay = self.delays.pop(0) if self.delays else 0.0
+        assert self.timeout is not None
+        if delay > self.timeout:
+            self.clock.value += self.timeout
+            raise TimeoutError("bounded primitive timeout")
+        self.clock.value += delay
+
+    def recv_into(self, buffer: object) -> int:
+        self.recv_calls += 1
+        self._block()
+        memoryview(buffer)[:1] = b"x"  # type: ignore[arg-type]
+        return 1
+
+    def sendall(self, _data: object, _flags: int = 0) -> None:
+        self._block()
+
+    def makefile(self, *_args: object, **_kwargs: object) -> object:
+        raise AssertionError("test response owns its controlled raw reads")
+
+    def close(self) -> None:
+        self.closed += 1
+
+
+class _PrimitiveResponse(_Response):
+    def __init__(self, connection: _Connection, *, body_waits: int = 0) -> None:
+        super().__init__(body=b"")
+        self.connection = connection
+        self.body_waits = body_waits
+        self.reader: object | None = None
+
+    def read(self, size: int) -> bytes:
+        self.read_sizes.append(size)
+        if self.body_waits == 0:
+            return b""
+        waits = self.body_waits
+        self.body_waits = 0
+        if self.reader is None:
+            self.reader = self.connection.sock.makefile("rb")  # type: ignore[attr-defined]
+        for _ in range(waits):
+            self.reader.read(1)  # type: ignore[attr-defined]
+        return b"x" * waits
+
+
+class _PrimitiveConnection(_Connection):
+    def __init__(
+        self,
+        clock: _Clock,
+        *,
+        header_wait: bool = False,
+        body_waits: int = 0,
+        delays: list[float] | None = None,
+        connect_error: BaseException | None = None,
+        before_headers_elapsed: float = 0.0,
+        request_wait: bool = False,
+        before_request_elapsed: float = 0.0,
+    ) -> None:
+        super().__init__(_Response(), connect_error=connect_error)
+        self.sock = _PrimitiveSocket(clock, delays=delays)
+        self.response = _PrimitiveResponse(self, body_waits=body_waits)
+        self.header_wait = header_wait
+        self.before_headers_elapsed = before_headers_elapsed
+        self.request_wait = request_wait
+        self.before_request_elapsed = before_request_elapsed
+
+    def request(
+        self,
+        method: str,
+        url: str,
+        body: object = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> None:
+        super().request(method, url, body, headers)
+        self.sock.clock.value += self.before_request_elapsed  # type: ignore[attr-defined]
+        if self.request_wait:
+            self.sock.sendall(b"bounded request")  # type: ignore[attr-defined]
+
+    def getresponse(self) -> _Response:
+        self.sock.clock.value += self.before_headers_elapsed  # type: ignore[attr-defined]
+        if self.header_wait:
+            reader = self.sock.makefile("rb")  # type: ignore[attr-defined]
+            reader.read(1)
+            reader.close()
+        return super().getresponse()
+
+
 def _request() -> OddsHttpRequest:
     return build_request(SENTINEL, commence_from=CUTOFF)
+
+
+def _request_with_timeouts(*, connect: float, read: float, total: float) -> OddsHttpRequest:
+    request = _request()
+    return OddsHttpRequest(
+        request.method,
+        request.scheme,
+        request.host,
+        request.path,
+        request.safe_parameters,
+        connect_timeout_seconds=connect,
+        read_timeout_seconds=read,
+        total_timeout_seconds=total,
+    )
 
 
 def _transport(
@@ -361,6 +485,313 @@ def test_td01_remaining_total_is_reapplied_before_response_headers() -> None:
     transport.send(_request(), SENTINEL)
 
     assert connection.timeout_at_getresponse == 11.0
+
+
+def test_td02_delayed_headers_are_stopped_at_the_total_deadline() -> None:
+    clock = _Clock()
+    connection = _PrimitiveConnection(
+        clock,
+        header_wait=True,
+        delays=[12.0],
+        before_headers_elapsed=19.0,
+    )
+    transport, _factory = _transport(connection, monotonic=clock)
+
+    with pytest.raises(IngestionError) as raised:
+        transport.send(_request(), SENTINEL)
+
+    assert raised.value.code == "TOTAL_TIMEOUT"
+    assert clock.value == 30.0
+    assert connection.sock.recv_calls == 1
+
+
+def test_td03_trickled_body_cannot_reset_the_total_deadline() -> None:
+    clock = _Clock()
+    connection = _PrimitiveConnection(
+        clock,
+        body_waits=4,
+        delays=[1.0, 1.0, 1.0, 1.0],
+    )
+    transport, _factory = _transport(connection, monotonic=clock)
+
+    with pytest.raises(IngestionError) as raised:
+        transport.send(
+            _request_with_timeouts(connect=2.0, read=2.0, total=3.0),
+            SENTINEL,
+        )
+
+    assert raised.value.code == "TOTAL_TIMEOUT"
+    assert clock.value == 3.0
+    assert connection.sock.recv_calls == 3
+
+
+def test_td04_progressing_body_is_allowed_while_total_time_remains() -> None:
+    clock = _Clock()
+    connection = _PrimitiveConnection(clock, body_waits=2, delays=[1.0, 1.0])
+    transport, _factory = _transport(connection, monotonic=clock)
+
+    result = transport.send(
+        _request_with_timeouts(connect=2.0, read=2.0, total=3.0),
+        SENTINEL,
+    )
+
+    assert result.body == b"xx"
+    assert clock.value == 2.0
+    assert connection.sock.recv_calls == 2
+
+
+def test_td05_per_read_timeout_shorter_than_total_is_respected() -> None:
+    clock = _Clock()
+    connection = _PrimitiveConnection(clock, header_wait=True, delays=[3.0])
+    transport, _factory = _transport(connection, monotonic=clock)
+
+    with pytest.raises(IngestionError) as raised:
+        transport.send(
+            _request_with_timeouts(connect=2.0, read=2.0, total=10.0),
+            SENTINEL,
+        )
+
+    assert raised.value.code == "READ_TIMEOUT"
+    assert clock.value == 2.0
+
+
+def test_td06_total_timeout_shorter_than_read_timeout_wins() -> None:
+    clock = _Clock()
+    connection = _PrimitiveConnection(clock, header_wait=True, delays=[3.0])
+    transport, _factory = _transport(connection, monotonic=clock)
+
+    with pytest.raises(IngestionError) as raised:
+        transport.send(
+            _request_with_timeouts(connect=1.0, read=10.0, total=2.0),
+            SENTINEL,
+        )
+
+    assert raised.value.code == "TOTAL_TIMEOUT"
+    assert clock.value == 2.0
+
+
+@pytest.mark.parametrize(
+    ("connect_timeout", "total_timeout", "expected_code", "expected_bound"),
+    (
+        (2.0, 10.0, "CONNECT_TIMEOUT", 2.0),
+        (10.0, 2.0, "TOTAL_TIMEOUT", 2.0),
+    ),
+    ids=("td07-connect-wins", "td08-total-wins"),
+)
+def test_td07_td08_connect_uses_the_shorter_current_bound(
+    connect_timeout: float,
+    total_timeout: float,
+    expected_code: str,
+    expected_bound: float,
+) -> None:
+    connection = _Connection(_Response(), connect_error=TimeoutError("bounded connect"))
+    transport, factory = _transport(connection)
+
+    with pytest.raises(IngestionError) as raised:
+        transport.send(
+            _request_with_timeouts(
+                connect=connect_timeout,
+                read=20.0,
+                total=total_timeout,
+            ),
+            SENTINEL,
+        )
+
+    assert raised.value.code == expected_code
+    assert factory.calls[0][1] == expected_bound
+
+
+def test_td09_retry_delay_consumes_the_same_overall_deadline() -> None:
+    clock = _Clock()
+    sleeps: list[float] = []
+
+    def sleep(seconds: float) -> None:
+        sleeps.append(seconds)
+        clock.value += seconds
+
+    class TimedRetryTransport(_ProtocolTransport):
+        def send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
+            if not self.requests:
+                clock.value += 7.0
+            return super().send(request, credential)
+
+    transport = TimedRetryTransport(
+        [
+            _http_response(429, headers={**QUOTA_HEADERS, "retry-after": "5"}),
+            _http_response(),
+        ]
+    )
+    client = OddsClient(
+        load_rights_profiles()["the_odds_api_private_analytics_v1"],
+        credential_provider=StaticCredentialProvider(SENTINEL),
+        transport_factory=lambda: transport,
+        clock=lambda: NOW,
+        sleeper=sleep,
+        monotonic=clock,
+    )
+
+    result = client.fetch()
+
+    assert result.transport_call_count == 2
+    assert sleeps == [5.0]
+    assert transport.requests[1].total_timeout_seconds == 18.0
+    assert transport.requests[1].read_timeout_seconds == 18.0
+
+
+def test_td10_second_attempt_cannot_regain_the_original_budget() -> None:
+    clock = _Clock()
+
+    class TimedFailureTransport(_ProtocolTransport):
+        def send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
+            if not self.requests:
+                clock.value += 15.0
+            return super().send(request, credential)
+
+    transport = TimedFailureTransport(
+        [
+            IngestionError("READ_TIMEOUT", "bounded read", retryable=True),
+            _http_response(),
+        ]
+    )
+    client = OddsClient(
+        load_rights_profiles()["the_odds_api_private_analytics_v1"],
+        credential_provider=StaticCredentialProvider(SENTINEL),
+        transport_factory=lambda: transport,
+        clock=lambda: NOW,
+        sleeper=lambda _seconds: None,
+        monotonic=clock,
+    )
+
+    result = client.fetch()
+
+    assert result.transport_call_count == 2
+    assert transport.requests[1].total_timeout_seconds == 15.0
+    assert transport.requests[1].read_timeout_seconds == 15.0
+
+
+def test_td11_clock_regression_remains_fail_closed() -> None:
+    connection = _Connection(_Response())
+    transport, _factory = _transport(connection, monotonic=_Monotonic([1.0, 0.0]))
+
+    with pytest.raises(IngestionError) as raised:
+        transport.send(_request(), SENTINEL)
+
+    assert raised.value.code == "INTERNAL_INVARIANT"
+
+
+@pytest.mark.parametrize(
+    ("connect", "read", "total", "phase", "expected"),
+    (
+        (2.0, 5.0, 10.0, "connect", "CONNECT_TIMEOUT"),
+        (2.0, 2.0, 10.0, "headers", "READ_TIMEOUT"),
+        (2.0, 10.0, 2.0, "headers", "TOTAL_TIMEOUT"),
+    ),
+)
+def test_td12_timeout_classification_tracks_the_active_bound(
+    connect: float,
+    read: float,
+    total: float,
+    phase: str,
+    expected: str,
+) -> None:
+    clock = _Clock()
+    connection = _PrimitiveConnection(
+        clock,
+        header_wait=phase == "headers",
+        delays=[20.0],
+        connect_error=TimeoutError("bounded connect") if phase == "connect" else None,
+    )
+    transport, _factory = _transport(connection, monotonic=clock)
+
+    with pytest.raises(IngestionError) as raised:
+        transport.send(
+            _request_with_timeouts(connect=connect, read=read, total=total),
+            SENTINEL,
+        )
+
+    assert raised.value.code == expected
+
+
+def test_request_write_uses_the_current_remaining_total_bound() -> None:
+    clock = _Clock()
+    connection = _PrimitiveConnection(
+        clock,
+        delays=[12.0],
+        request_wait=True,
+        before_request_elapsed=19.0,
+    )
+    transport, _factory = _transport(connection, monotonic=clock)
+
+    with pytest.raises(IngestionError) as raised:
+        transport.send(_request(), SENTINEL)
+
+    assert raised.value.code == "TOTAL_TIMEOUT"
+    assert clock.value == 30.0
+
+
+def test_default_connection_recalculates_between_tcp_and_tls_handshake(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    clock = _Clock()
+
+    class FakeTcpSocket:
+        def __init__(self) -> None:
+            self.timeouts: list[float] = []
+            self.closed = 0
+
+        def settimeout(self, value: float) -> None:
+            self.timeouts.append(value)
+
+        def connect(self, _address: object) -> None:
+            clock.value += 4.0
+
+        def close(self) -> None:
+            self.closed += 1
+
+    class FakeTlsSocket:
+        def __init__(self) -> None:
+            self.timeouts: list[float] = []
+            self.handshakes = 0
+
+        def settimeout(self, value: float) -> None:
+            self.timeouts.append(value)
+
+        def do_handshake(self) -> None:
+            self.handshakes += 1
+
+        def close(self) -> None:
+            return None
+
+    class FakeContext:
+        def __init__(self, wrapped: FakeTlsSocket) -> None:
+            self.wrapped = wrapped
+
+        def wrap_socket(self, *_args: object, **kwargs: object) -> FakeTlsSocket:
+            assert kwargs["do_handshake_on_connect"] is False
+            return self.wrapped
+
+    tcp = FakeTcpSocket()
+    tls = FakeTlsSocket()
+    monkeypatch.setattr(
+        odds_client_module.socket,
+        "getaddrinfo",
+        lambda *_args, **_kwargs: [
+            (2, 1, 6, "", ("127.0.0.1", 443)),
+        ],
+    )
+    monkeypatch.setattr(odds_client_module.socket, "socket", lambda *_args: tcp)
+    connection = odds_client_module._DeadlineHTTPSConnection(  # type: ignore[attr-defined]
+        "api.the-odds-api.com",
+        timeout=10.0,
+        context=FakeContext(tls),  # type: ignore[arg-type]
+    )
+    connection.configure_connect_deadline(lambda: min(10.0 - clock.value, 30.0 - clock.value))
+
+    connection.connect()
+
+    assert tcp.timeouts == [10.0, 6.0]
+    assert tls.timeouts == [6.0]
+    assert tls.handshakes == 1
 
 
 def test_tr13_response_read_is_bounded_to_maximum_plus_one() -> None:

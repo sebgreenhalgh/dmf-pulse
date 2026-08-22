@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import hashlib
 import http.client
+import io
+import socket
 import ssl
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from collections.abc import Callable, Mapping
+from collections.abc import Buffer, Callable, Mapping
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from types import MappingProxyType
@@ -324,6 +326,162 @@ class _HttpClientConnection(Protocol):
     def close(self) -> None: ...
 
 
+class _DeadlineRawSocket(Protocol):
+    def close(self) -> None: ...
+
+    def recv_into(self, buffer: Buffer) -> int: ...
+
+    def sendall(self, data: object, flags: int = 0) -> None: ...
+
+    def settimeout(self, value: float) -> None: ...
+
+
+class _DeadlineSocketReader(io.RawIOBase):
+    """Reapply the current total/read bound before every raw receive."""
+
+    def __init__(
+        self,
+        raw_socket: _DeadlineRawSocket,
+        timeout: Callable[[], tuple[float, bool]],
+    ) -> None:
+        super().__init__()
+        self._raw_socket = raw_socket
+        self._timeout = timeout
+
+    def readable(self) -> bool:
+        return True
+
+    def readinto(self, buffer: Buffer) -> int | None:
+        timeout, total_limited = self._timeout()
+        self._raw_socket.settimeout(timeout)
+        try:
+            return self._raw_socket.recv_into(buffer)
+        except TimeoutError:
+            if total_limited:
+                raise IngestionError(
+                    "TOTAL_TIMEOUT",
+                    "odds provider total deadline expired",
+                    retryable=True,
+                ) from None
+            raise IngestionError(
+                "READ_TIMEOUT",
+                "odds provider read timed out",
+                retryable=True,
+            ) from None
+
+
+class _DeadlineSocket:
+    """Socket facade that bounds writes and each buffered-reader receive."""
+
+    def __init__(
+        self,
+        raw_socket: _DeadlineRawSocket,
+        timeout: Callable[[], tuple[float, bool]],
+    ) -> None:
+        self._raw_socket = raw_socket
+        self._timeout = timeout
+
+    def sendall(self, data: object, flags: int = 0) -> None:
+        timeout, total_limited = self._timeout()
+        self._raw_socket.settimeout(timeout)
+        try:
+            self._raw_socket.sendall(data, flags)
+        except TimeoutError:
+            if total_limited:
+                raise IngestionError(
+                    "TOTAL_TIMEOUT",
+                    "odds provider total deadline expired",
+                    retryable=True,
+                ) from None
+            raise IngestionError(
+                "READ_TIMEOUT",
+                "odds provider request write timed out",
+                retryable=True,
+            ) from None
+
+    def makefile(
+        self,
+        mode: str = "r",
+        buffering: int | None = None,
+        **_options: object,
+    ) -> io.BufferedReader:
+        if mode != "rb":
+            raise ValueError("deadline socket supports only binary reads")
+        buffer_size = io.DEFAULT_BUFFER_SIZE if buffering in (None, -1) else buffering
+        if not isinstance(buffer_size, int) or buffer_size <= 0:
+            raise ValueError("deadline socket requires buffered reads")
+        return io.BufferedReader(
+            _DeadlineSocketReader(self._raw_socket, self._timeout),
+            buffer_size=buffer_size,
+        )
+
+    def settimeout(self, value: float) -> None:
+        self._raw_socket.settimeout(value)
+
+    def close(self) -> None:
+        self._raw_socket.close()
+
+    def __getattr__(self, name: str) -> object:
+        return getattr(self._raw_socket, name)
+
+
+class _DeadlineHTTPSConnection(http.client.HTTPSConnection):
+    """Recompute one connect budget before TCP and TLS handshake operations."""
+
+    def __init__(self, host: str, *, timeout: float, context: ssl.SSLContext) -> None:
+        super().__init__(host, timeout=timeout, context=context)
+        self._connect_timeout: Callable[[], float] | None = None
+
+    def configure_connect_deadline(self, timeout: Callable[[], float]) -> None:
+        self._connect_timeout = timeout
+
+    def _current_connect_timeout(self) -> float:
+        if self._connect_timeout is None:
+            if not isinstance(self.timeout, int | float):
+                raise IngestionError("INTERNAL_INVARIANT", "connect timeout is unavailable")
+            return float(self.timeout)
+        return self._connect_timeout()
+
+    def _connect_tcp(self) -> socket.socket:
+        last_error: OSError | None = None
+        for family, socket_type, protocol, _canonical_name, address in socket.getaddrinfo(
+            self.host,
+            self.port,
+            type=socket.SOCK_STREAM,
+        ):
+            raw_socket = socket.socket(family, socket_type, protocol)
+            try:
+                raw_socket.settimeout(self._current_connect_timeout())
+                raw_socket.connect(address)
+            except OSError as exc:
+                last_error = exc
+                raw_socket.close()
+                continue
+            return raw_socket
+        if last_error is not None:
+            raise last_error
+        raise OSError("approved odds provider host has no usable address")
+
+    def connect(self) -> None:
+        if self._tunnel_host is not None:  # type: ignore[attr-defined]
+            raise OSError("proxy tunnelling is not permitted for the odds provider")
+        raw_socket = self._connect_tcp()
+        wrapped: ssl.SSLSocket | None = None
+        try:
+            raw_socket.settimeout(self._current_connect_timeout())
+            wrapped = self._context.wrap_socket(  # type: ignore[attr-defined]
+                raw_socket,
+                server_hostname=self.host,
+                do_handshake_on_connect=False,
+            )
+            wrapped.settimeout(self._current_connect_timeout())
+            wrapped.do_handshake()
+        except BaseException:
+            (wrapped or raw_socket).close()
+            raise
+        self.sock = wrapped
+
+
 _SAFE_RESPONSE_HEADERS = frozenset(
     {
         "content-type",
@@ -369,7 +527,7 @@ def _default_http_client_connection(
 ) -> _HttpClientConnection:
     return cast(
         _HttpClientConnection,
-        http.client.HTTPSConnection(host, timeout=timeout, context=context),
+        _DeadlineHTTPSConnection(host, timeout=timeout, context=context),
     )
 
 
@@ -402,6 +560,75 @@ class HttpClientOddsTransport:
             )
         return remaining
 
+    def _read_bound(
+        self,
+        request: OddsHttpRequest,
+        *,
+        started_at: float,
+    ) -> tuple[float, bool]:
+        remaining = self._remaining(request, started_at=started_at)
+        return min(request.read_timeout_seconds, remaining), (
+            remaining <= request.read_timeout_seconds
+        )
+
+    def _connect_bound(
+        self,
+        request: OddsHttpRequest,
+        *,
+        started_at: float,
+    ) -> tuple[float, bool]:
+        observed = self._monotonic()
+        if observed < started_at:
+            raise IngestionError("INTERNAL_INVARIANT", "odds transport clock regressed")
+        elapsed = observed - started_at
+        total_remaining = request.total_timeout_seconds - elapsed
+        if total_remaining <= 0:
+            raise IngestionError(
+                "TOTAL_TIMEOUT",
+                "odds provider total deadline expired",
+                retryable=True,
+            )
+        connect_remaining = request.connect_timeout_seconds - elapsed
+        if connect_remaining <= 0:
+            raise IngestionError(
+                "CONNECT_TIMEOUT",
+                "odds provider connection timed out",
+                retryable=True,
+            )
+        return min(connect_remaining, total_remaining), total_remaining <= connect_remaining
+
+    def _apply_read_bound(
+        self,
+        connection: _HttpClientConnection,
+        request: OddsHttpRequest,
+        *,
+        started_at: float,
+    ) -> bool:
+        timeout, total_limited = self._read_bound(request, started_at=started_at)
+        raw_socket = connection.sock
+        set_timeout = getattr(raw_socket, "settimeout", None)
+        if callable(set_timeout):
+            set_timeout(timeout)
+        return total_limited
+
+    def _install_deadline_socket(
+        self,
+        connection: _HttpClientConnection,
+        request: OddsHttpRequest,
+        *,
+        started_at: float,
+    ) -> None:
+        raw_socket = connection.sock
+        if raw_socket is None or isinstance(raw_socket, _DeadlineSocket):
+            return
+        required = ("close", "makefile", "recv_into", "sendall", "settimeout")
+        if not all(callable(getattr(raw_socket, name, None)) for name in required):
+            return
+        connection.sock = _DeadlineSocket(
+            cast(_DeadlineRawSocket, raw_socket),
+            lambda: self._read_bound(request, started_at=started_at),
+        )
+
     def _read_body(
         self,
         response: _HttpClientResponse,
@@ -414,12 +641,25 @@ class HttpClientOddsTransport:
         chunks: list[bytes] = []
         size = 0
         while size <= limit:
-            remaining = self._remaining(request, started_at=started_at)
-            raw_socket = connection.sock
-            set_timeout = getattr(raw_socket, "settimeout", None)
-            if callable(set_timeout):
-                set_timeout(min(request.read_timeout_seconds, remaining))
-            chunk = response.read(min(64 * 1024, limit + 1 - size))
+            total_limited = self._apply_read_bound(
+                connection,
+                request,
+                started_at=started_at,
+            )
+            try:
+                chunk = response.read(min(64 * 1024, limit + 1 - size))
+            except TimeoutError:
+                if total_limited:
+                    raise IngestionError(
+                        "TOTAL_TIMEOUT",
+                        "odds provider total deadline expired",
+                        retryable=True,
+                    ) from None
+                raise IngestionError(
+                    "READ_TIMEOUT",
+                    "odds provider read timed out",
+                    retryable=True,
+                ) from None
             if not isinstance(chunk, bytes):
                 raise IngestionError("SOURCE_UNAVAILABLE", "odds response is invalid")
             if not chunk:
@@ -439,22 +679,31 @@ class HttpClientOddsTransport:
         result: OddsHttpResponse | None = None
         failure: IngestionError | None = None
         phase: Literal["CONNECT", "READ"] = "CONNECT"
+        phase_total_limited = False
         try:
             context = self._ssl_context_factory()
             if not context.check_hostname or context.verify_mode != ssl.CERT_REQUIRED:
                 raise IngestionError("TLS_ERROR", "odds provider TLS validation is unavailable")
-            connect_timeout = min(
-                request.connect_timeout_seconds,
-                self._remaining(request, started_at=started_at),
+            connect_timeout, phase_total_limited = self._connect_bound(
+                request,
+                started_at=started_at,
             )
             connection = self._connection_factory(request.host, connect_timeout, context)
+            configure_deadline = getattr(connection, "configure_connect_deadline", None)
+            if callable(configure_deadline):
+                configure_deadline(lambda: self._connect_bound(request, started_at=started_at)[0])
             connection.connect()
             phase = "READ"
-            remaining = self._remaining(request, started_at=started_at)
-            raw_socket = connection.sock
-            set_timeout = getattr(raw_socket, "settimeout", None)
-            if callable(set_timeout):
-                set_timeout(min(request.read_timeout_seconds, remaining))
+            self._install_deadline_socket(
+                connection,
+                request,
+                started_at=started_at,
+            )
+            phase_total_limited = self._apply_read_bound(
+                connection,
+                request,
+                started_at=started_at,
+            )
             connection.request(
                 "GET",
                 target,
@@ -464,7 +713,11 @@ class HttpClientOddsTransport:
                     "User-Agent": "dmf-pulse-private/0.2.0",
                 },
             )
-            self._remaining(request, started_at=started_at)
+            phase_total_limited = self._apply_read_bound(
+                connection,
+                request,
+                started_at=started_at,
+            )
             response = connection.getresponse()
             self._remaining(request, started_at=started_at)
             raw_headers = response.getheaders()
@@ -488,15 +741,22 @@ class HttpClientOddsTransport:
         except (ssl.SSLError, ssl.CertificateError):
             failure = IngestionError("TLS_ERROR", "odds provider TLS validation failed")
         except TimeoutError:
-            failure = IngestionError(
-                "CONNECT_TIMEOUT" if phase == "CONNECT" else "READ_TIMEOUT",
-                (
-                    "odds provider connection timed out"
-                    if phase == "CONNECT"
-                    else "odds provider read timed out"
-                ),
-                retryable=True,
-            )
+            if phase_total_limited:
+                failure = IngestionError(
+                    "TOTAL_TIMEOUT",
+                    "odds provider total deadline expired",
+                    retryable=True,
+                )
+            else:
+                failure = IngestionError(
+                    "CONNECT_TIMEOUT" if phase == "CONNECT" else "READ_TIMEOUT",
+                    (
+                        "odds provider connection timed out"
+                        if phase == "CONNECT"
+                        else "odds provider read timed out"
+                    ),
+                    retryable=True,
+                )
         except (OSError, http.client.HTTPException):
             failure = IngestionError(
                 "SOURCE_UNAVAILABLE", "odds provider is unavailable", retryable=True
