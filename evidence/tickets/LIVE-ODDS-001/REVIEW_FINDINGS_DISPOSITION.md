@@ -83,11 +83,23 @@ with the checkpoint that contains the corresponding remediation.
   receipt/usable timing also changed it.
 - Root cause: one hash payload mixed supported quote semantics with acquisition
   provenance.
-- Code fix: pending R4. Provider-published quote/event timestamps remain
-  semantic under DMFP-03/05/06; local acquisition fields do not.
-- Tests: HASH-01/HASH-02 RED in R1; full HASH-01..12 matrix pending R4.
-- Final status: **OPEN**.
-- Remediation commit: pending.
+- Code fix: R4 projects only supported provider-published market meaning:
+  provider/contract/domain identity, provider event/participant/commence
+  material, bookmaker identity, H2H/totals lines and prices, and provider
+  update timestamps. It excludes source snapshot, response/body identity,
+  request/receipt/capture/cutoff/usable times, age at receipt, quota, rights,
+  quality warnings, and all other acquisition provenance. Provider timestamps
+  remain semantic under the explicit DMFP-03/05/06 authority decision in the
+  remediation plan.
+- Tests: HASH-01..12 pass, including distinct-acquisition equality and an
+  exact recursive payload-field audit. The former shallow PD-18 assertion now
+  executes production `OddsPersistence.prepare()` and the actual consensus
+  evaluator: totals plus an unsupported additive market yield exactly two H2H
+  prepared books/six H2H observations and no unsupported fair-price material.
+  The R4 downstream matrix passed 124 tests; `current.py` branch-aware coverage
+  was 95.09%.
+- Final status: **CLOSED AT R4**, subject to final R5 acceptance rerun.
+- Remediation commit: R4 checkpoint (resolved to the exact commit in R5).
 
 ## REV-005 — false secret-scan evidence
 

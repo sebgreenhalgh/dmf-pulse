@@ -365,8 +365,10 @@ class OddsProviderCurrentInput(_FrozenModel):
         return self
 
 
-def current_odds_market_semantic_sha256(value: OddsProviderCurrentInput) -> str:
-    """Hash only supported current-market material, never additive provider drift."""
+def _current_odds_market_semantic_payload(
+    value: OddsProviderCurrentInput,
+) -> dict[str, object]:
+    """Project only provider-published supported-market meaning."""
 
     events: list[dict[str, object]] = []
     for event in value.events:
@@ -423,7 +425,6 @@ def current_odds_market_semantic_sha256(value: OddsProviderCurrentInput) -> str:
                 )
             bookmakers.append(
                 {
-                    "age_at_receipt_seconds": bookmaker.age_at_receipt_seconds,
                     "bookmaker_key": bookmaker.bookmaker_key,
                     "bookmaker_title": bookmaker.bookmaker_title,
                     "markets": markets,
@@ -441,16 +442,24 @@ def current_odds_market_semantic_sha256(value: OddsProviderCurrentInput) -> str:
             }
         )
     events.sort(key=lambda item: str(item["provider_event_id"]))
-    return canonical_sha256(
-        {
-            "contract": value.contract,
-            "events": events,
-            "provider": value.provider,
-            "received_at": value.temporal.received_at.isoformat(),
-            "source_snapshot_id": str(value.provenance.source_snapshot_id),
-            "usable_at": value.temporal.usable_at.isoformat(),
-        }
-    )
+    return {
+        "api_version": value.api_version,
+        "contract": value.contract,
+        "events": events,
+        "identity_scope": value.identity_scope,
+        "market": value.market,
+        "odds_format": value.odds_format,
+        "provider": value.provider,
+        "region": value.region,
+        "schema_version": value.schema_version,
+        "sport_key": value.sport_key,
+    }
+
+
+def current_odds_market_semantic_sha256(value: OddsProviderCurrentInput) -> str:
+    """Hash supported provider market meaning, excluding local acquisition state."""
+
+    return canonical_sha256(_current_odds_market_semantic_payload(value))
 
 
 def _canonical_outcome(

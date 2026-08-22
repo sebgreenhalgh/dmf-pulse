@@ -13,9 +13,23 @@ import pytest
 
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
-from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput, build_current_odds_input
+from dmf_pulse.ingestion.odds.current import (
+    OddsProviderCurrentInput,
+    _current_odds_market_semantic_payload,
+    build_current_odds_input,
+    current_odds_market_semantic_sha256,
+)
+from dmf_pulse.ingestion.odds.mapping import load_mapping_plan
 from dmf_pulse.ingestion.odds.models import QuotaSource, QuotaState
 from dmf_pulse.ingestion.odds.parser import ParsedOddsPayload, parse_odds_payload
+from dmf_pulse.ingestion.odds.persistence import (
+    OddsPersistence,
+    ResolvedFixture,
+    ResolvedOperator,
+)
+from dmf_pulse.markets.consensus import evaluate_market_consensus
+from dmf_pulse.markets.models import ExclusiveOutcomeQuote, MarketOutcome
+from dmf_pulse.markets.policy import load_market_normalisation_policy
 
 pytestmark = pytest.mark.unit
 
@@ -183,7 +197,9 @@ def test_pd05_multiple_additive_markets_are_unique_and_sorted(repository_root: P
     )
 
 
-def test_pd06_source_hash_changes_but_supported_semantics_do_not(repository_root: Path) -> None:
+def test_pd06_hash04_source_hash_changes_but_supported_semantics_do_not(
+    repository_root: Path,
+) -> None:
     supported = _value(repository_root)
     _append_totals(supported)
     additive = deepcopy(supported)
@@ -299,11 +315,15 @@ def test_pd16_pd17_totals_absence_and_malformedness_remain_degraded(
     assert malformed.events[0].bookmakers[1].totals_markets
 
 
-def test_pd18_additive_market_cannot_become_consensus_input(repository_root: Path) -> None:
+def test_pd18_additive_market_cannot_become_persistence_or_consensus_input(
+    repository_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     value = _value(repository_root)
     _append_totals(value)
     _append_additive_market(value, "future_market")
-    current = _build(parse_odds_payload(_body(value)))
+    parsed = parse_odds_payload(_body(value))
+    current = _build(parsed)
 
     accepted = [
         market.market_key
@@ -314,8 +334,117 @@ def test_pd18_additive_market_cannot_become_consensus_input(repository_root: Pat
     assert "future_market" not in accepted
     assert set(accepted) == {"h2h", "totals"}
 
+    plan = load_mapping_plan(repository_root / "fixtures/odds/ODD-005/mapping_plan.json")
+    persistence = object.__new__(OddsPersistence)
+    persistence.mapping_plan = plan
+    persistence.captured_at = RECEIVED
+    fixture_id = UUID(int=100)
+    resolved_fixture = ResolvedFixture(
+        fixture_id=fixture_id,
+        season_id=UUID(int=101),
+        home_team_id=UUID(int=102),
+        away_team_id=UUID(int=103),
+        fixture_mapping_id=UUID(int=104),
+        home_team_mapping_id=UUID(int=105),
+        away_team_mapping_id=UUID(int=106),
+        fixture_observation_id=UUID(int=107),
+        event_mapping_id=UUID(int=108),
+        kickoff_at=parsed.events[0].commence_time,
+    )
+    operator_numbers = {
+        bookmaker.key: index for index, bookmaker in enumerate(parsed.events[0].bookmakers, start=1)
+    }
+    operator_keys = {
+        UUID(int=200 + index): bookmaker_key for bookmaker_key, index in operator_numbers.items()
+    }
+    prepared_market_calls: list[UUID] = []
 
-def test_pd19_warning_and_hash_order_is_canonical(repository_root: Path) -> None:
+    monkeypatch.setattr(persistence, "resolve_fixture", lambda _event: resolved_fixture)
+    monkeypatch.setattr(
+        persistence,
+        "resolve_operator",
+        lambda bookmaker: ResolvedOperator(
+            operator_id=UUID(int=200 + operator_numbers[bookmaker.key]),
+            operator_mapping_id=UUID(int=300 + operator_numbers[bookmaker.key]),
+        ),
+    )
+
+    def market_and_selections(
+        _fixture_id: UUID,
+        operator_id: UUID,
+    ) -> tuple[UUID, dict[MarketOutcome, UUID]]:
+        prepared_market_calls.append(operator_id)
+        market_id = UUID(int=400 + operator_id.int)
+        return market_id, {
+            outcome: UUID(int=1000 + operator_id.int * 10 + index)
+            for index, outcome in enumerate(MarketOutcome, start=1)
+        }
+
+    monkeypatch.setattr(persistence, "_market_and_selections", market_and_selections)
+    monkeypatch.setattr(
+        persistence,
+        "_representation",
+        lambda **kwargs: kwargs["market_id"],
+    )
+
+    prepared = persistence.prepare(parsed)
+
+    assert len(prepared.books) == len(parsed.events[0].bookmakers) == 2
+    assert len(prepared_market_calls) == 2
+    assert all(book.state.value == "COMPLETE" and not book.missing for book in prepared.books)
+    assert all(
+        {outcome for outcome, _price in book.prices} == set(MarketOutcome)
+        for book in prepared.books
+    )
+
+    quotes: list[ExclusiveOutcomeQuote] = []
+    source_snapshot_id = current.provenance.source_snapshot_id
+    for book_index, book in enumerate(prepared.books, start=1):
+        prices = dict(book.prices)
+        for quote_index, (outcome, selection_id) in enumerate(book.selections, start=1):
+            quotes.append(
+                ExclusiveOutcomeQuote(
+                    fixture_id=book.fixture_id,
+                    market_id=book.market_id,
+                    selection_id=selection_id,
+                    operator_id=book.operator_id,
+                    outcome=outcome,
+                    decimal_odds=prices[outcome],
+                    observed_at=book.observed_at,
+                    received_at=RECEIVED,
+                    usable_at=RECEIVED + timedelta(seconds=1),
+                    source_snapshot_id=source_snapshot_id,
+                    market_state=book.state,
+                    contract_version="the-odds-api-v4-reference-v1",
+                    book_observation_id=UUID(int=2000 + book_index),
+                    odds_observation_id=UUID(int=3000 + book_index * 10 + quote_index),
+                    provider_id=UUID(int=4000),
+                    operator_key=operator_keys[book.operator_id],
+                )
+            )
+    as_of = RECEIVED + timedelta(seconds=2)
+    evaluation = evaluate_market_consensus(
+        quotes,
+        as_of=as_of,
+        mapping_cutoff=as_of,
+        policy=load_market_normalisation_policy(),
+        initial_warnings=current.quality.warnings,
+    )
+
+    assert evaluation.consensus is not None
+    assert evaluation.consensus.operator_count == 2
+    assert {row.outcome for row in evaluation.consensus.outcomes} == set(MarketOutcome)
+    assert "ADDITIVE_UNSUPPORTED_MARKET:future_market" in evaluation.warnings
+    assert {
+        observation_id
+        for market in evaluation.consensus.operator_markets
+        for observation_id in market.source_observation_ids
+    } == {quote.odds_observation_id for quote in quotes}
+
+
+def test_pd19_hash09_hash10_warning_and_json_order_are_canonical(
+    repository_root: Path,
+) -> None:
     value = _value(repository_root)
     _append_totals(value)
     _append_additive_market(value, "zeta_future")
@@ -378,6 +507,151 @@ def test_hash02_local_acquisition_time_does_not_change_market_semantics(
     assert first.temporal.usable_at != second.temporal.usable_at
     assert first.provenance.response_body_sha256 == second.provenance.response_body_sha256
     assert first.market_semantic_sha256 == second.market_semantic_sha256
+
+
+def test_hash03_same_body_has_distinct_provenance_but_equal_semantics(
+    repository_root: Path,
+) -> None:
+    parsed = parse_odds_payload(_body(_value(repository_root)))
+    first = _build(parsed)
+    second = _build(
+        parsed,
+        source_snapshot_id=UUID("00000000-0000-0000-0000-000000000915"),
+        received_at=RECEIVED + timedelta(minutes=5),
+        usable_at=RECEIVED + timedelta(minutes=5, seconds=1),
+    )
+
+    assert first.provenance.response_body_sha256 == second.provenance.response_body_sha256
+    assert first.provenance.source_snapshot_id != second.provenance.source_snapshot_id
+    assert first.temporal.received_at != second.temporal.received_at
+    assert first.market_semantic_sha256 == second.market_semantic_sha256
+
+
+def test_hash05_supported_h2h_price_change_changes_semantics(repository_root: Path) -> None:
+    original = _value(repository_root)
+    changed = deepcopy(original)
+    changed[0]["bookmakers"][0]["markets"][0]["outcomes"][0]["price"] = 1.81
+
+    first = _build(parse_odds_payload(_body(original)))
+    second = _build(parse_odds_payload(_body(changed)))
+
+    assert first.market_semantic_sha256 != second.market_semantic_sha256
+
+
+def test_hash06_supported_totals_line_and_price_changes_change_semantics(
+    repository_root: Path,
+) -> None:
+    original = _value(repository_root)
+    _append_totals(original)
+    changed_line = deepcopy(original)
+    changed_price = deepcopy(original)
+    for outcome in changed_line[0]["bookmakers"][0]["markets"][1]["outcomes"]:
+        outcome["point"] = 3.5
+    changed_price[0]["bookmakers"][0]["markets"][1]["outcomes"][0]["price"] = 1.81
+
+    baseline = _build(parse_odds_payload(_body(original))).market_semantic_sha256
+    line_hash = _build(parse_odds_payload(_body(changed_line))).market_semantic_sha256
+    price_hash = _build(parse_odds_payload(_body(changed_price))).market_semantic_sha256
+
+    assert line_hash != baseline
+    assert price_hash != baseline
+
+
+def test_hash07_supported_bookmaker_identity_change_changes_semantics(
+    repository_root: Path,
+) -> None:
+    original = _value(repository_root)
+    changed = deepcopy(original)
+    changed[0]["bookmakers"][0]["key"] = "book_alpha_variant"
+
+    first = _build(parse_odds_payload(_body(original)))
+    second = _build(parse_odds_payload(_body(changed)))
+
+    assert first.market_semantic_sha256 != second.market_semantic_sha256
+
+
+def test_hash08_provider_event_identity_change_changes_semantics(repository_root: Path) -> None:
+    original = _value(repository_root)
+    changed = deepcopy(original)
+    changed[0]["id"] = "todapi-event-001-reissued"
+
+    first = _build(parse_odds_payload(_body(original)))
+    second = _build(parse_odds_payload(_body(changed)))
+
+    assert first.market_semantic_sha256 != second.market_semantic_sha256
+
+
+def test_hash08_provider_participant_change_changes_semantics(repository_root: Path) -> None:
+    original = _value(repository_root)
+    changed = deepcopy(original)
+    changed[0]["home_team"] = "Alpha Athletic Renamed"
+    for bookmaker in changed[0]["bookmakers"]:
+        for outcome in bookmaker["markets"][0]["outcomes"]:
+            if outcome["name"] == "Alpha Athletic":
+                outcome["name"] = "Alpha Athletic Renamed"
+
+    first = _build(parse_odds_payload(_body(original)))
+    second = _build(parse_odds_payload(_body(changed)))
+
+    assert first.market_semantic_sha256 != second.market_semantic_sha256
+
+
+def test_hash11_provider_published_timestamp_change_is_semantic(repository_root: Path) -> None:
+    original = _value(repository_root)
+    changed = deepcopy(original)
+    changed[0]["bookmakers"][0]["last_update"] = "2026-08-20T11:59:30Z"
+    changed[0]["bookmakers"][0]["markets"][0]["last_update"] = "2026-08-20T11:59:30Z"
+
+    first = _build(parse_odds_payload(_body(original)))
+    second = _build(parse_odds_payload(_body(changed)))
+
+    assert first.market_semantic_sha256 != second.market_semantic_sha256
+
+
+def test_hash12_payload_contains_no_acquisition_or_provenance_field(
+    repository_root: Path,
+) -> None:
+    current = _build(parse_odds_payload(_body(_value(repository_root))))
+    payload = _current_odds_market_semantic_payload(current)
+
+    assert set(payload) == {
+        "api_version",
+        "contract",
+        "events",
+        "identity_scope",
+        "market",
+        "odds_format",
+        "provider",
+        "region",
+        "schema_version",
+        "sport_key",
+    }
+    keys: set[str] = set()
+
+    def collect(value: object) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                keys.add(key)
+                collect(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect(child)
+
+    collect(payload)
+    assert keys.isdisjoint(
+        {
+            "age_at_receipt_seconds",
+            "captured_at",
+            "information_cutoff",
+            "provenance",
+            "received_at",
+            "request_started_at",
+            "source_snapshot_id",
+            "temporal",
+            "usable_at",
+        }
+    )
+    assert current_odds_market_semantic_sha256(current) == current.market_semantic_sha256
 
 
 def test_required_rights_allow_and_unknown_secondary_rights_deny(repository_root: Path) -> None:

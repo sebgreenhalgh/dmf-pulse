@@ -155,3 +155,18 @@ PASS  uv run ruff check src/dmf_pulse/ingestion/odds/client.py tests/unit/ingest
 PASS  uv run mypy src/dmf_pulse/ingestion/odds/client.py
       Success: no issues found in 1 source file.
 NETWORK/CREDENTIAL  Deterministic connection/socket fakes only; no external or loopback provider request and no real credential read.
+
+2026-08-22 REMEDIATION CHECKPOINT R4 SEMANTIC HASH CONTRACT
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py
+      31 passed; HASH-01..12 and provider-drift/fail-closed properties all green.
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py --cov=dmf_pulse.ingestion.odds.current --cov-branch --cov-report=term-missing
+      64 passed; current.py 95.09% branch-aware coverage (464 statements, 188 branches).
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py tests/unit/ingestion/test_odds_persistence_boundaries.py tests/unit/markets/test_normalisation.py tests/unit/markets/test_service_boundaries.py tests/unit/markets/test_repository_persistence_boundaries.py -m "not postgres"
+      124 passed in 6.06s.
+PASS  genuine downstream contamination regression PD-18
+      production OddsPersistence.prepare plus actual consensus evaluation created exactly two canonical H2H books/six observations; unsupported additive and totals material created no Stage-6 fair-price input.
+PASS  uv run ruff check src/dmf_pulse/ingestion/odds/current.py tests/unit/ingestion/test_live_odds_001_provider_drift.py
+      All checks passed.
+PASS  uv run mypy src/dmf_pulse/ingestion/odds/current.py
+      Success: no issues found in 1 source file.
+NETWORK/CREDENTIAL  Repository fixture data and in-memory mapping/persistence fakes only; no provider call, database write, or credential read.
