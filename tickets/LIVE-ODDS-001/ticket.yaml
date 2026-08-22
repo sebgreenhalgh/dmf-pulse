@@ -24,6 +24,7 @@ allowed_areas:
   - tests/**
   - tickets/LIVE-ODDS-001/**
   - evidence/tickets/LIVE-ODDS-001/**
+  - evidence/tickets/PRC-013/current_manifest.json
   - PLANS.md
 exclusions:
   - readiness bulk merge

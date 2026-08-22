@@ -13,6 +13,10 @@
 - Safety: offline deterministic acceptance only; no real credential or provider call, migration,
   new dependency, identity reconciliation, Stage-6 algorithm change, orchestration, PR, merge,
   tag, or human-acceptance claim.
+- Owner Scope Amendment 1 additionally permits only
+  `evidence/tickets/PRC-013/current_manifest.json` as the mutable active repository snapshot
+  required by canonical repository assurance. No PRC-013 narrative/result evidence,
+  implementation, other manifest, or additional scope expansion is authorized.
 
 ### LIVE-ODDS-001 checkpoints
 
@@ -28,6 +32,8 @@
 - [x] 04 run adversarial self-review, focused branch coverage, inherited regressions, repository
   validation, secret scan, Ruff, strict mypy, build, installed-wheel smoke, final evidence, commit,
   push, and remote-equality verification.
+- [x] G1 record Owner Scope Amendment 1, preserve NEW-001 history, canonically reseal the ticket
+  and active manifests, and return the governance-only commit for independent confirmation.
 
 ## CHIP-014 Stage-14 chip optimisation
 
