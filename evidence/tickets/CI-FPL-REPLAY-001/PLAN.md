@@ -1,6 +1,6 @@
 # CI-FPL-REPLAY-001 implementation plan
 
-Status: `LOCAL_ACCEPTANCE_IN_PROGRESS`
+Status: `BLOCKED_BY_UNRELATED_CI_TIMEOUT`
 
 Updated: `2026-08-22`
 
@@ -62,3 +62,8 @@ written; the substitution is recorded rather than hidden.
 
 Coverage is measured locally. Final manifests, package/repository/security results, remote Git/CI
 identities, and independent review remain pending and will not be claimed early.
+
+The pushed engineering checkpoint repaired the PostgreSQL failure, but branch run `32598102993`
+was canceled by the workflow's pre-existing 35-minute job limit while the next full-coverage step
+was still running. Changing `.github/workflows/ci.yml` is explicitly excluded. The brief requires
+reporting this unrelated remaining failure rather than broadening scope or rerunning blindly.

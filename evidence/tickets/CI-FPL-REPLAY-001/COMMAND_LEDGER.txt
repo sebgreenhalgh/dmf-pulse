@@ -1,0 +1,95 @@
+CI-FPL-REPLAY-001 COMMAND LEDGER
+Recorded: 2026-08-22 Europe/London
+Repository: sebgreenhalgh/dmf-pulse
+Immutable parent: baed47bce7a158d91afe38351a2c65be60444adf
+Engineering checkpoint: 652bae84fba9bdfbf435367d6140270fa8378d57
+
+RESULT CONVENTION
+PASS = exit 0. EXPECTED_RED = intentionally failing pre-fix regression. HARNESS_TIMEOUT = local
+wrapper ended before pytest; never counted as a product result. Windows pytest commands use
+`uv run python -m pytest` because App Control rejected the `uv run pytest` launcher shim with OS
+error 4551. GitHub Ubuntu acceptance uses the literal repository commands.
+
+PRE-FLIGHT AND ROOT CAUSE
+PASS | git/gh preflight | origin/main=baed47bce7a158d91afe38351a2c65be60444adf;
+LIVE-ODDS local+remote=5e55cf3361a1abff4b2e32dcc30fe42900ea2e16; PR #16 OPEN and
+unchanged; FPL diff parent..LIVE-ODDS empty.
+PASS | gh run view 32588502517 | run 426 confirmed the migration matrix passed before the
+PostgreSQL integration command failed at 31 failed, 79 passed, 140 deselected.
+PASS | controlled immutable-parent PRE/POST/post_cutoff reproduction | PRE bundle created;
+identical happy fixture under future host clock exited 2 with POST_CUTOFF and no bundle; frozen
+post_cutoff remained ineligible.
+EXPECTED_RED | focused pre-fix policy regression | 1 failed, 42 deselected; public helper did not
+yet accept an explicit policy.
+
+IMPLEMENTATION AND TEMPORAL TESTS
+PASS | uv run python -m pytest -q tests/unit/ingestion/test_fpl_service_boundaries.py |
+52 passed in 0.86s.
+PASS | focused final temporal slice (time policy + resume suffix + ordinary resume + unit boundary)
+| 66 passed in 16.37s.
+PASS | uv run python -m pytest -m "postgres and integration" tests/integration |
+118 passed, 140 deselected in 225.29s.
+PASS | post-suite five-stage replay resume suffix matrix | 5 passed in 9.40s.
+
+POSTGRESQL 18.4 AND MIGRATIONS
+PASS | docker compose -f compose.test.yaml up -d --wait | pinned postgres:18.4-bookworm healthy.
+PASS | uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target
+head --report artifacts/ci-fpl-replay-001/migration_report.json --offline-sql
+artifacts/ci-fpl-replay-001/offline_upgrade.sql --schema-manifest
+artifacts/ci-fpl-replay-001/schema_manifest.json | all five legs, metadata drift, and data
+preservation passed; no new upgrade operations; head=20260807_0006;
+schema_sha256=7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc.
+PASS | uv run alembic upgrade head --sql > artifacts/ci-fpl-replay-001/offline_head.sql.
+PASS | uv run dmf data-model doctor --json | HEALTHY, PostgreSQL 18.4, at head.
+PASS | uv run dmf data-model schema-manifest --json | schema hash matched migration matrix.
+PASS | uv run dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json |
+8/8 assertions.
+PASS | uv run dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json
+| 8/8 assertions.
+
+PUBLIC VERTICAL SLICES
+PASS | uv run dmf specs validate | 22 documents, 19 scopes, 94 decisions.
+PASS | uv run dmf ingest fpl validate --resource bootstrap --input
+fixtures/fpl/FPL-004/happy_path/bootstrap.json --contract-version fpl-reference-v1 --output json.
+PASS | uv run dmf ingest fpl replay --fixture-set fixtures/fpl/FPL-004 --scenario happy_path
+--information-cutoff 2026-08-21T17:30:00Z --rights-profile synthetic_test_v1 --output json |
+BUNDLE_CREATED; usable_at=2026-08-21T17:00:00.000011Z/.000012Z.
+PASS | inherited Odds replay, market observations, and credential-negative transport check |
+2 complete books, 6 observations, CREDENTIAL_UNAVAILABLE, transport_called=false.
+PASS | inherited GCS-008 focused tests and CLI slice | 209 passed in 13.99s; projection/explanation
+commands succeeded.
+PASS | inherited rules validate/compile/score-fixture/score-gameweek slice.
+
+STATIC, COVERAGE, PACKAGE, AND ASSURANCE
+PASS | uv sync --all-groups --frozen | 40 packages checked, no lock mutation.
+PASS | uv run ruff format --check . | 636 files already formatted.
+PASS | uv run ruff check . | all checks passed.
+PASS | uv run mypy src/dmf_pulse | no issues in 245 source files.
+HARNESS_TIMEOUT | first local coverage wrappers at 15m and 40m | no pytest conclusion or coverage
+artifact; excluded from acceptance.
+MEASURED_WITH_STALE_MANIFEST | completed Windows coverage session | 3,083 tests selected;
+93.592677% statements, 86.347551% branches, 91.786610% combined; only reproducible failure was the
+intentionally stale repository current manifest before its required refresh.
+PASS | uv run python scripts/check_gcs008_coverage_gates.py
+evidence/tickets/CI-FPL-REPLAY-001/coverage.json | aggregate 93.066348% statements / 85.818182%
+branches; every critical module exceeded 90% statements / 80% branches.
+PASS | post-refresh current-manifest test | 1 passed in 1.51s.
+PASS | uv run python -m pytest -q -m "not performance" | 3,083 passed, 3 deselected in
+1,276.44s (21m16s) after the final manifest refresh.
+PASS | uv run python -m pytest -m performance tests/performance | 3 passed, 1 deselected in 7.95s.
+PASS | uv build | dmf_pulse-0.2.0 sdist and wheel built.
+PASS | uv run python scripts/verify_odd005_wheel.py | clean external environment, 286 wheel members,
+FPL USABLE, Odds COMPLETE, zero network requests.
+PASS | uv run python scripts/verify_gcs008_wheel.py | 286 RECORD members verified.
+PASS | read-only repository validator function | error_count=0. The CLI main was not run locally
+because it hardcodes a forbidden GCS-008 report write; GitHub runs the literal CLI ephemerally.
+PASS | uv run python scripts/scan_secrets.py | finding_count=0.
+
+REMOTE CI
+PASS | dmf-pulse-ci run 32598102993 PostgreSQL inherited Stage-7 migration matrix and vertical
+slice | PostgreSQL 18.4; migration matrix PASS; 118 passed, 140 deselected in 186.59s.
+BLOCKED | dmf-pulse-ci run 32598102993 overall | head
+652bae84fba9bdfbf435367d6140270fa8378d57; GitHub canceled the job after 35m17s because
+`.github/workflows/ci.yml` fixes `timeout-minutes: 35`. The full coverage step was still running,
+emitted no test failure, and all following steps were skipped. No blind rerun or workflow change
+was performed because both are prohibited by the ticket.

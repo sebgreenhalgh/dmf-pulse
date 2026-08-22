@@ -1,0 +1,111 @@
+{
+  "schema_version": "ci-fpl-replay-001-result-v1",
+  "ticket_id": "CI-FPL-REPLAY-001",
+  "engineering_status": "BLOCKED_BY_UNRELATED_CI_TIMEOUT",
+  "human_acceptance": "PENDING",
+  "merge_performed": false,
+  "git": {
+    "branch": "remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time",
+    "immutable_parent": "baed47bce7a158d91afe38351a2c65be60444adf",
+    "engineering_checkpoint": "652bae84fba9bdfbf435367d6140270fa8378d57",
+    "push_mode": "normal"
+  },
+  "pr_16_preservation": {
+    "pull_request": 16,
+    "preflight_state": "OPEN",
+    "accepted_head": "5e55cf3361a1abff4b2e32dcc30fe42900ea2e16",
+    "modified_by_ticket": false
+  },
+  "root_cause": {
+    "classification": "INHERITED_MAIN_DEFECT",
+    "parent_postgresql_result": "31 failed, 79 passed, 140 deselected",
+    "mechanism": "synthetic replay and resume used max(captured_at, host clock), moving lifecycle completion and usable_at past a fixed historical cutoff"
+  },
+  "fix": {
+    "ordinary_policy": "PROCESSING_TIME_V1",
+    "synthetic_replay_policy": "FROZEN_REPLAY_CAPTURED_AT_V1",
+    "policy_hash_protected_on_resume": true,
+    "migration_required": false,
+    "other_production_path_required": false
+  },
+  "temporal_regressions": [
+    "TIME-01",
+    "TIME-02",
+    "TIME-03",
+    "TIME-04",
+    "TIME-05",
+    "TIME-06",
+    "TIME-07",
+    "TIME-08",
+    "TIME-09",
+    "TIME-10",
+    "TIME-11",
+    "TIME-12",
+    "TIME-13",
+    "TIME-14",
+    "TIME-15",
+    "TIME-16",
+    "TIME-17",
+    "TIME-18"
+  ],
+  "postgresql": {
+    "version": "18.4",
+    "post_fix_integration_result": "118 passed, 140 deselected",
+    "focused_final_temporal_result": "66 passed"
+  },
+  "migration_matrix": {
+    "status": "PASS",
+    "baseline": "20260803_0005",
+    "target": "20260807_0006",
+    "new_upgrade_operations": 0,
+    "schema_sha256": "7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc"
+  },
+  "coverage": {
+    "statements_percent": 93.59267734553775,
+    "branches_percent": 86.34755075433041,
+    "combined_percent": 91.78660971306527,
+    "inherited_gate": "PASS"
+  },
+  "github_actions": {
+    "workflow": "dmf-pulse-ci",
+    "run_id": 32598102993,
+    "head_sha": "652bae84fba9bdfbf435367d6140270fa8378d57",
+    "status": "COMPLETED",
+    "conclusion": "FAILURE",
+    "failure_kind": "JOB_TIMEOUT",
+    "timeout_minutes": 35,
+    "postgresql_step": "PASS",
+    "coverage_step": "CANCELED_WITHOUT_TEST_FAILURE"
+  },
+  "gates": [
+    "POSTGRESQL_INTEGRATION_PASS",
+    "MIGRATION_MATRIX_PASS",
+    "TEMPORAL_MATRIX_PASS",
+    "STATIC_ANALYSIS_PASS",
+    "COVERAGE_THRESHOLDS_PASS",
+    "PERFORMANCE_PASS",
+    "FPL_ODDS_VERTICAL_PASS",
+    "BUILD_PASS",
+    "INSTALLED_WHEEL_PASS",
+    "REPOSITORY_VALIDATION_PASS",
+    "SECRET_SCAN_PASS"
+  ],
+  "scope": {
+    "production_files": [
+      "src/dmf_pulse/ingestion/fpl/service.py"
+    ],
+    "excluded_diff_empty": true,
+    "authorized_cross_ticket_file": "evidence/tickets/PRC-013/current_manifest.json"
+  },
+  "self_review": {
+    "p0": [],
+    "p1": [],
+    "material_p2": []
+  },
+  "known_limitations": [
+    "Canonical remediation-ticket review-pack generation is unsupported without unauthorized assurance-code expansion.",
+    "Independent review and human acceptance remain pending.",
+    "Branch CI cannot finish within the pre-existing 35-minute job limit; changing the workflow is outside this ticket."
+  ],
+  "next_step": "Open an independently authorized CI-governance follow-up to raise or restructure the job timeout without weakening tests; do not merge or modify PR #16."
+}

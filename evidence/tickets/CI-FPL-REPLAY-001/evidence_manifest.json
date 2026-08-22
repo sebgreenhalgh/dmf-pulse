@@ -1,0 +1,81 @@
+{
+  "ticket_id": "CI-FPL-REPLAY-001",
+  "status": "BLOCKED",
+  "created_at": "2026-08-22T21:35:20Z",
+  "code_commit": "652bae84fba9bdfbf435367d6140270fa8378d57",
+  "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+  "commands": [
+    {
+      "command": "uv run python -m pytest -m \"postgres and integration\" tests/integration",
+      "result": "PASS",
+      "summary": "118 passed, 140 deselected on PostgreSQL 18.4"
+    },
+    {
+      "command": "uv run python -m pytest -q -m \"not performance\"",
+      "result": "PASS",
+      "summary": "3083 passed, 3 deselected after final repository manifest refresh"
+    },
+    {
+      "command": "uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/CI-FPL-REPLAY-001/coverage.json",
+      "result": "PASS",
+      "summary": "93.066348% aggregate statements and 85.818182% aggregate branches"
+    },
+    {
+      "command": "gh run view 32598102993 --log --job 97092109564",
+      "result": "BLOCKED",
+      "summary": "PostgreSQL step passed; overall job canceled at immutable 35-minute workflow limit during coverage without a test failure"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/COMMAND_LEDGER.txt",
+      "sha256": "b5398f1c6284a68b7b0ccc63ef09d80c72d78e2ceb0d3a3b7e3941904f7cce3e",
+      "bytes": 6165
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/FINAL_SELF_REVIEW.md",
+      "sha256": "265952b68ede37ffe9cb8368d64b5dce25dd9c050aef9cabf7ff370fcc515120",
+      "bytes": 3298
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/IMPLEMENTATION_RESULT.md",
+      "sha256": "e5c6ba5b46a9dcfdddcd4ff35c466f6889b335b34c8b5671eb442d012f809be4",
+      "bytes": 3752
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/KNOWN_LIMITATIONS.md",
+      "sha256": "68d6177f949c798b5c6fd5de3057fb4a8d98705901f299ebc28fd4abbf0e68f0",
+      "bytes": 1942
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/PLAN.md",
+      "sha256": "4dae2c21ad710b9232d8f5410e35da3e8eee418da52652a5b19dee5a3f4c5ed2",
+      "bytes": 3814
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/ROOT_CAUSE.md",
+      "sha256": "75a33e434e21618574b50b010e2c5d146fbdf38b887f010cbab324b41f0b49fb",
+      "bytes": 4220
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/coverage.json",
+      "sha256": "ff187906a917ab3ee62b94f5597c57fad746c9299e61cde3ae49bb22167752c6",
+      "bytes": 2923216
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/current_manifest.json",
+      "sha256": "04a91477ba1ff1460f7a2c4618a6d5a5f9cb7c162f08bbdc3a28971ecc5105ff",
+      "bytes": 205147
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/result.json",
+      "sha256": "9353c399be6aa0afda533f338698ade7cf81e84669c95d509590f8b272fce8c5",
+      "bytes": 3546
+    }
+  ],
+  "known_limitations": [
+    "Branch CI cannot finish within the pre-existing 35-minute job limit; changing or splitting the workflow is outside this ticket.",
+    "The canonical review-pack builder does not support remediation ticket identifiers without an unauthorized assurance-code change.",
+    "Independent review and human acceptance remain pending."
+  ]
+}
