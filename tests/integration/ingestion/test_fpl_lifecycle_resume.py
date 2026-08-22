@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Iterator
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -39,6 +39,7 @@ from dmf_pulse.ingestion.fpl.service import (
     DATABASE_REF,
     DEFAULT_CAPTURED_AT,
     DEFAULT_INFORMATION_CUTOFF,
+    FplImportRequest,
     FplIngestionService,
     FplReplayRequest,
     IngestionInterrupted,
@@ -113,11 +114,11 @@ def _interruption_cases(repository_root: Path) -> Iterator[str]:
 @pytest.mark.parametrize(
     "interruption_stage",
     (
-        "STORED_OR_RAW_DISCARDED",
-        "PARSED",
-        "VALIDATED",
-        "MAPPED",
-        "PROMOTED",
+        pytest.param("STORED_OR_RAW_DISCARDED", id="TIME-08-STORED"),
+        pytest.param("PARSED", id="TIME-09-PARSED"),
+        pytest.param("VALIDATED", id="TIME-10-VALIDATED"),
+        pytest.param("MAPPED", id="TIME-11-MAPPED"),
+        pytest.param("PROMOTED", id="TIME-12-PROMOTED"),
     ),
 )
 def test_resume_executes_only_incomplete_suffix_without_duplicate_effects(
@@ -128,7 +129,11 @@ def test_resume_executes_only_incomplete_suffix_without_duplicate_effects(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     assert interruption_stage in set(_interruption_cases(repository_root))
-    service = FplIngestionService(repository_root=repository_root)
+    current = [DEFAULT_CAPTURED_AT + timedelta(minutes=5)]
+    service = FplIngestionService(
+        repository_root=repository_root,
+        clock=lambda: current[0],
+    )
     interrupted_request = FplReplayRequest(
         fixture_set=replay_request.fixture_set,
         scenario=replay_request.scenario,
@@ -152,6 +157,9 @@ def test_resume_executes_only_incomplete_suffix_without_duplicate_effects(
     with postgres_session_factory() as session:
         for snapshot_id in caught.value.snapshot_ids:
             assert _stages(session, snapshot_id) == SUCCESSFUL_STAGES[:prefix_length]
+            assert received_context(session, snapshot_id)["operation_time_policy"] == (
+                "FROZEN_REPLAY_CAPTURED_AT_V1"
+            )
         if completed_stage == "STORED":
             stored = session.execute(
                 select(
@@ -219,6 +227,7 @@ def test_resume_executes_only_incomplete_suffix_without_duplicate_effects(
             lambda *_args, **_kwargs: pytest.fail("resume must not reread a parsed source"),
         )
 
+    current[0] = datetime(2027, 8, 22, 18, tzinfo=UTC)
     resumed = service.resume(caught.value.snapshot_ids[0], database_url_ref=DATABASE_REF)
 
     assert parse_calls == (2 if completed_stage == "STORED" else 0)
@@ -419,7 +428,7 @@ def test_repeated_retryable_failures_resume_with_actual_usable_timestamps(
             assert resource.usable_at == events[-1].event_at
 
 
-def test_resume_after_cutoff_uses_resume_clock_and_cannot_backdate_bundle_eligibility(
+def test_ordinary_import_resume_after_cutoff_cannot_backdate_bundle_eligibility(
     repository_root: Path,
     postgres_session_factory: sessionmaker[Session],
 ) -> None:
@@ -428,15 +437,26 @@ def test_resume_after_cutoff_uses_resume_clock_and_cannot_backdate_bundle_eligib
         repository_root=repository_root,
         clock=lambda: current[0],
     )
-    request = FplReplayRequest(
-        fixture_set=repository_root / "fixtures/fpl/FPL-004",
-        scenario="happy_path",
+    fixture_root = repository_root / "fixtures/fpl/FPL-004/happy_path"
+    request = FplImportRequest(
+        bootstrap_path=fixture_root / "bootstrap.json",
+        fixtures_path=fixture_root / "fixtures.json",
+        competition_key="SYNTHETIC_PL",
+        season_code="2026/27",
+        captured_at=DEFAULT_CAPTURED_AT,
         information_cutoff=DEFAULT_INFORMATION_CUTOFF,
+        rights_profile_id="synthetic_test_v1",
         database_url_ref=DATABASE_REF,
         halt_after_stage="PARSED",
     )
     with pytest.raises(IngestionInterrupted) as caught:
-        service.replay(request)
+        service.import_pair(request)
+
+    with postgres_session_factory() as session:
+        for snapshot_id in caught.value.snapshot_ids:
+            assert received_context(session, snapshot_id)["operation_time_policy"] == (
+                "PROCESSING_TIME_V1"
+            )
 
     current[0] = DEFAULT_INFORMATION_CUTOFF + timedelta(minutes=1)
     resumed = service.resume(caught.value.snapshot_ids[0], database_url_ref=DATABASE_REF)

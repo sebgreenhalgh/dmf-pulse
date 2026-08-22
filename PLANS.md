@@ -1,5 +1,27 @@
 # DMF Pulse execution plans
 
+## CI-FPL-REPLAY-001 deterministic synthetic FPL replay time
+
+- Parent/branch: immutable `baed47bce7a158d91afe38351a2c65be60444adf` on
+  `remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time`.
+- Classification: inherited main FPL replay-clock defect exposed by PR #16; the accepted
+  LIVE-ODDS head `5e55cf3361a1abff4b2e32dcc30fe42900ea2e16` and PR remain immutable.
+- Scope: one explicit frozen synthetic replay/resume time policy in FPL `service.py`, directly
+  relevant TIME-01 through TIME-18 tests, ticket/evidence, and conditional active-manifest refresh.
+- Safety: ordinary/manual/live processing stays bound to actual availability; no Odds, workflow,
+  migration, dependency, rule, fixture-date, cutoff, rights, LIVE-ODDS, or PR #16 change.
+
+### CI-FPL-REPLAY-001 checkpoints
+
+- [x] Verify Git/PR identities, inherited A4 authority, remote migration-matrix pass, exact parent
+  PostgreSQL failure, and controlled PRE/POST/`post_cutoff` reproduction.
+- [x] Freeze the narrow ticket, acceptance matrix, root-cause record, and evidence plan.
+- [ ] Add TIME-01 through TIME-18 RED regressions and implement deterministic replay/resume time.
+- [ ] Pass PostgreSQL 18.4 integration, migration matrix, remaining CI vertical slice, full/static/
+  build/wheel/repository/security gates, and branch GitHub Actions.
+- [ ] Seal final evidence, commit/push the remediation branch, and hand off for independent review;
+  do not merge or modify PR #16.
+
 ## CHIP-014 Stage-14 chip optimisation
 
 - Ticket/stage: `CHIP-014`, DMFP-19 Stage 14; immutable original parent
