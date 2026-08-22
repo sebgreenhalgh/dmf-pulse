@@ -287,3 +287,17 @@ def test_scanner_covers_safe_placeholders_refs_scalars_and_excluded_state(
     (tmp_path / ".coverage").write_text("token=" + _fake_token(), encoding="utf-8")
     allowlist.unlink()
     assert scan_repository(tmp_path) == []
+
+
+@pytest.mark.unit
+def test_repository_scan_exclusions_are_relative_to_scanned_root(tmp_path: Path) -> None:
+    repository_root = tmp_path / "review_pack" / "repository"
+    source = repository_root / "src" / "sample.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("api_" + 'key="synthetic-scan-canary-913579"', encoding="utf-8")
+
+    findings = scan_repository(repository_root)
+
+    assert len(findings) == 1
+    assert findings[0].path == "src/sample.py"
+    assert findings[0].rule_id == "CREDENTIAL_ASSIGNMENT"

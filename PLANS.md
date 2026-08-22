@@ -1,5 +1,46 @@
 # DMF Pulse execution plans
 
+## LIVE-ODDS-001 production live odds reconciliation
+
+- Ticket: `LIVE-ODDS-001`; immutable main parent
+  `baed47bce7a158d91afe38351a2c65be60444adf`; readiness donor
+  `d4cc759d4600489c21ba738cfc9b357cc380554e`; historical merge base
+  `9eb57143f6ee92f67c78607cc386678d962e62d4`.
+- Branch: `integration/post-gw1/LIVE-ODDS-001-production-live-odds`.
+- Scope: explicit stdlib `http.client` HTTPS transport, runtime credential isolation,
+  governed provider-native `h2h,totals` current input, and warning-only exclusion of safely
+  isolatable additive market families.
+- Safety: offline deterministic acceptance only; no real credential or provider call, migration,
+  new dependency, identity reconciliation, Stage-6 algorithm change, orchestration, PR, merge,
+  tag, or human-acceptance claim.
+- Owner Scope Amendment 1 additionally permits only
+  `evidence/tickets/PRC-013/current_manifest.json` as the mutable active repository snapshot
+  required by canonical repository assurance. No PRC-013 narrative/result evidence,
+  implementation, other manifest, or additional scope expansion is authorized.
+- Owner Scope Amendment 2 additionally permits only
+  `src/dmf_pulse/assurance/secret_scan.py` for the already independently reviewed REV-005
+  scanner-root correction. No other assurance source, scanner redesign, test change,
+  configuration change, or broader product-scope expansion is authorized.
+
+### LIVE-ODDS-001 checkpoints
+
+- [x] Verify pinned origin/main, donor, merge base, worktrees, authority, provider documentation,
+  terms compatibility, and clean isolated worktree.
+- [x] 01 freeze the reconciliation contract, RED provider-drift/transport/security regressions,
+  donor ledger, quality matrix, and preflight evidence; commit and push.
+- [x] 02 productionise credential isolation and the explicit `http.client` transport; run focused
+  transport/security gates; commit and push.
+- [x] 03 port the provider-native current-input boundary and remediate additive market drift while
+  preserving mandatory H2H, totals degradation, rights, cutoff, and provenance invariants; commit
+  and push.
+- [x] 04 run adversarial self-review, focused branch coverage, inherited regressions, repository
+  validation, secret scan, Ruff, strict mypy, build, installed-wheel smoke, final evidence, commit,
+  push, and remote-equality verification.
+- [x] G1 record Owner Scope Amendment 1, preserve NEW-001 history, canonically reseal the ticket
+  and active manifests, and return the governance-only commit for independent confirmation.
+- [x] G2 record Owner Scope Amendment 2 for the existing reviewed scanner delta, reseal both
+  manifests, and publish both linear governance commits for independent confirmation.
+
 ## CHIP-014 Stage-14 chip optimisation
 
 - Ticket/stage: `CHIP-014`, DMFP-19 Stage 14; immutable original parent
@@ -964,3 +1005,29 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Run the complete Stage-15 branch-coverage matrix and affected inherited regressions.
 - [x] Run one bounded full-repository pytest attempt and all static/build/clean-wheel gates.
 - [x] Publish truthful review evidence, verify final remote equality and open the unmerged draft PR.
+
+# LIVE-ODDS-001 independent-review remediation
+
+- Ticket: `LIVE-ODDS-001`; reviewed checkpoint
+  `6c36e73adef21b52ed54d23733e5a34c71547a6d`; immutable parent
+  `baed47bce7a158d91afe38351a2c65be60444adf`.
+- Branch: `integration/post-gw1/LIVE-ODDS-001-production-live-odds`.
+- Scope: close only REV-001 through REV-005: hard transport deadline,
+  traceback-safe credential/raw boundary, removal of environment-secret
+  fallback, semantic/provenance hash separation, and truthful secret-scan
+  evidence.
+- Safety: no provider call, real credential, dependency, migration, identity
+  reconciliation, Stage-6 algorithm change, orchestration, PR, merge, tag, or
+  acceptance claim.
+
+## Remediation checkpoints
+
+- [x] R1 reproduce all five findings, freeze disposition/evidence, and commit
+  property-level RED tests.
+- [x] R2 harden the credential/parser/traceback boundary and remove the raw
+  environment-value fallback.
+- [x] R3 enforce the total deadline at each controlled blocking primitive.
+- [x] R4 separate supported-market semantics from acquisition provenance and
+  execute a real downstream contamination regression.
+- [x] R5 close the scanner/evidence defect, run complete acceptance and hostile
+  self-review, seal a new head, and push for independent re-review.

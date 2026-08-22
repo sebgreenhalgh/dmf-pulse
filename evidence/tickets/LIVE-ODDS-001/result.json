@@ -1,0 +1,45 @@
+{
+  "branch": "integration/post-gw1/LIVE-ODDS-001-production-live-odds",
+  "coverage": {
+    "aggregate_branch_aware_percent": 94.53,
+    "focused_tests_passed": 291,
+    "modules": {
+      "client": 90,
+      "credentials": 95,
+      "current": 95,
+      "parser": 99,
+      "secret_scan": 97
+    },
+    "report": "evidence/tickets/LIVE-ODDS-001/coverage.json"
+  },
+  "database_checks": "ENVIRONMENT_BLOCKED",
+  "evidence_binding": {
+    "file_count": 1135,
+    "kind": "repository-deliverables-manifest",
+    "path": "evidence/tickets/LIVE-ODDS-001/current_manifest.json",
+    "sha256": "7737e7a0e85a587b8d21a37c4677e4bf3a48e5ba91cc0805ac561a791b21cf2d"
+  },
+  "final_checkpoint": "G2_GOVERNANCE_SEALING_COMMIT_CONTAINING_THIS_RESULT",
+  "historical_merge_base": "9eb57143f6ee92f67c78607cc386678d962e62d4",
+  "immutable_parent": "baed47bce7a158d91afe38351a2c65be60444adf",
+  "independent_re_review": "REV_001_THROUGH_REV_005_CLOSED_NEW_001_IDENTIFIED",
+  "provider_network_called": false,
+  "real_credential_read": false,
+  "repository_validation": {
+    "error_count": 0,
+    "status": "PASS"
+  },
+  "remediation_commits": [
+    "7e660ca44f4844d88d74db6e4334fad2b14a82f2",
+    "ac638e3ee6bbce8064a06e96102c2cfaa00be0d5",
+    "a9f325763ae17d08f03c47cbd9bde3d5a2228182",
+    "5475348b77b0be3fbd8766f4565721b98819d652",
+    "b7b7022d99a2b56ac485c9f810c11926b64b25cd",
+    "bd99bb56acf84def5200715c346d9598753a6f2a",
+    "G2_GOVERNANCE_SEALING_COMMIT_CONTAINING_THIS_RESULT"
+  ],
+  "reviewed_checkpoint": "6c36e73adef21b52ed54d23733e5a34c71547a6d",
+  "secret_scan_finding_count": 0,
+  "status": "ENGINEERING_REMEDIATED_PENDING_INDEPENDENT_GOVERNANCE_CONFIRMATION",
+  "ticket_id": "LIVE-ODDS-001"
+}
