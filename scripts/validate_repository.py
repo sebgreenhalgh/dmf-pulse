@@ -829,6 +829,101 @@ def _validate_dat_repository_contract(root: Path, errors: list[str]) -> None:
             errors.append(f"prohibited SQLite dependency/driver/test marker: {relative.as_posix()}")
 
 
+def _workflow_job_block(workflow: str, job_id: str) -> str:
+    """Return one top-level workflow job block for narrow structural validation."""
+
+    lines = workflow.splitlines()
+    marker = f"  {job_id}:"
+    try:
+        start = lines.index(marker)
+    except ValueError:
+        return ""
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if re.fullmatch(r"  [A-Za-z0-9_-]+:\s*", lines[index]):
+            end = index
+            break
+    return "\n".join(lines[start:end])
+
+
+def _validate_sharded_coverage_ci_contract(ci: str, errors: list[str]) -> None:
+    obsolete_monolith = (
+        "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing "
+        '--cov-report=json:evidence/tickets/GCS-008/coverage.json -m "not performance"'
+    )
+    required_fragments = (
+        "pre_flight:",
+        "coverage_shards:",
+        "combined_coverage:",
+        "post_coverage:",
+        "fail-fast: false",
+        "scripts/ci_coverage_shards.py plan",
+        "--shard-count 8",
+        "scripts/ci_coverage_shards.py materialize",
+        "scripts/ci_coverage_shards.py verify-artifacts",
+        "scripts/ci_coverage_shards.py verify-branch-report",
+        '-m "not performance"',
+        "--cov=dmf_pulse",
+        "--cov-branch",
+        "--cov-report=",
+        "--cov-fail-under=0",
+        "uv run python -m coverage combine",
+        "uv run python -m coverage report --show-missing --fail-under=90",
+        "uv run python -m coverage json --fail-under=90 -o evidence/tickets/GCS-008/coverage.json",
+        "scripts/check_gcs008_coverage_gates.py",
+    )
+    for fragment in required_fragments:
+        if fragment not in ci:
+            errors.append(f"ci.yml missing required sharded-coverage fragment: {fragment}")
+    if obsolete_monolith in ci:
+        errors.append("ci.yml sharded architecture retains the obsolete monolithic coverage run")
+
+    for match in re.finditer(r"(?m)^\s*timeout-minutes:\s*(\d+)\s*$", ci):
+        if int(match.group(1)) > 35:
+            errors.append("ci.yml sharded architecture must not increase a job timeout above 35")
+
+    for fragment in ("continue-on-error:", "pytest-rerunfailures", "--reruns"):
+        if fragment in ci:
+            errors.append(f"ci.yml sharded architecture contains prohibited masking: {fragment}")
+
+    sentinel = _workflow_job_block(ci, "quality")
+    prerequisites = ("pre_flight", "coverage_shards", "combined_coverage", "post_coverage")
+    if not sentinel:
+        errors.append("ci.yml sharded architecture is missing the quality sentinel job")
+        return
+    if "name: Python 3.13 / Ubuntu" not in sentinel:
+        errors.append("ci.yml quality sentinel must retain the exact stable job name")
+    if "if: ${{ always() }}" not in sentinel:
+        errors.append("ci.yml quality sentinel must run with if: always()")
+    needs_lines = sentinel.splitlines()
+    try:
+        needs_start = next(
+            index for index, line in enumerate(needs_lines) if line.startswith("    needs:")
+        )
+    except StopIteration:
+        declared_needs = ""
+    else:
+        needs_end = len(needs_lines)
+        for index in range(needs_start + 1, len(needs_lines)):
+            if re.fullmatch(r"    [A-Za-z0-9_-]+:.*", needs_lines[index]):
+                needs_end = index
+                break
+        declared_needs = "\n".join(needs_lines[needs_start:needs_end])
+    for prerequisite in prerequisites:
+        if re.search(rf"\b{re.escape(prerequisite)}\b", declared_needs) is None:
+            errors.append("ci.yml quality sentinel does not depend on job: " + prerequisite)
+        if f"needs.{prerequisite}.result" not in sentinel:
+            errors.append(
+                "ci.yml quality sentinel does not inspect prerequisite result: " + prerequisite
+            )
+    if sentinel.count("success") < len(prerequisites) or "exit 1" not in sentinel:
+        errors.append(
+            "ci.yml quality sentinel must explicitly fail unless every prerequisite succeeds"
+        )
+    if ci.count("name: Python 3.13 / Ubuntu") != 1:
+        errors.append("ci.yml must expose exactly one stable Python 3.13 / Ubuntu job name")
+
+
 def _validate_ci_contract(root: Path, errors: list[str]) -> None:
     ci_path = root / ".github/workflows/ci.yml"
     windows_path = root / ".github/workflows/windows-smoke.yml"
@@ -855,12 +950,27 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
         "uv run python scripts/validate_repository.py",
         "uv run python scripts/scan_secrets.py",
     )
+    sharded_coverage = (root / "tickets/CI-COVERAGE-SHARD-001/ticket.yaml").is_file()
+    gcs_coverage_fragments = (
+        ()
+        if sharded_coverage
+        else (
+            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/GCS-008/coverage.json",
+        )
+    )
+    gcs_gate_fragments = (
+        ("scripts/check_gcs008_coverage_gates.py",)
+        if sharded_coverage
+        else (
+            "uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/GCS-008/coverage.json",
+        )
+    )
     stage_ci_fragments = (
         (
             "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
             'uv run pytest -m "postgres and integration" tests/integration',
-            "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/GCS-008/coverage.json",
-            "uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/GCS-008/coverage.json",
+            *gcs_coverage_fragments,
+            *gcs_gate_fragments,
             "uv run dmf specs validate",
             "uv run dmf ingest odds replay",
             "uv run dmf market observations",
@@ -912,6 +1022,8 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
     for fragment in required_ci_fragments:
         if fragment not in ci:
             errors.append(f"ci.yml missing required contract fragment: {fragment}")
+    if sharded_coverage:
+        _validate_sharded_coverage_ci_contract(ci, errors)
     if "UV_CACHE_DIR:" not in ci or "UV_CACHE_DIR:" not in windows:
         errors.append("workflows must preserve one explicit uv cache across frozen/offline phases")
     prohibited = ("pull_request_target:", "contents: write", "${{ secrets.")
