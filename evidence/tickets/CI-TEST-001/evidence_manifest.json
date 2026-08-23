@@ -1,0 +1,73 @@
+{
+  "ticket_id": "CI-TEST-001",
+  "status": "DRAFT",
+  "created_at": "2026-08-23T20:36:15Z",
+  "code_commit": null,
+  "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+  "commands": [
+    {
+      "command": "Mechanical executable blob and stable patch identity comparison",
+      "result": "PASS"
+    },
+    {
+      "command": "Windows CPython 3.13.9 complete CI-TEST-001 module",
+      "result": "PASS"
+    },
+    {
+      "command": "Corrected-base confinement and rebuilt repository manifests",
+      "result": "PASS"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/tickets/CI-TEST-001/COMMAND_LEDGER.txt",
+      "sha256": "14327a25d5e03a9025b69b4220648f0b132e3701c50913093483b002ce833a86",
+      "bytes": 1647
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/FINAL_SELF_REVIEW.md",
+      "sha256": "61b1a523e481f6d11902125b366679d7f710fe83f067f2c1e4d486e0adcbe06b",
+      "bytes": 1319
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/IMPLEMENTATION_RESULT.md",
+      "sha256": "1eacdaf9c437e2a295576b157bc2af8ee0b0ef3f5bbe378dd3f31c1a3134c1a2",
+      "bytes": 1892
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/KNOWN_LIMITATIONS.md",
+      "sha256": "4dc1f0dc458657d5e4778024a3c2b20179309daf7c28bea87d5786e472079ea3",
+      "bytes": 973
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/LINEAGE_RESEAL.md",
+      "sha256": "6c1b79d640d9180e2d1dab795aca3fe44cabcb9745ca44dd808a347d9fa6fb19",
+      "bytes": 1414
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/PLAN.md",
+      "sha256": "e6afbc39fbd6ecc32cbfa0ab5d4d6f8e1e4ebe94d8840dc495f8102aa5a4b0d4",
+      "bytes": 1842
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/ROOT_CAUSE.md",
+      "sha256": "06737e78788dbc67dc649fe098e5dd8d8a3f49cfa8addf70f564ac8555f90190",
+      "bytes": 1439
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/current_manifest.json",
+      "sha256": "bb161c0dfb0414f0d9203fc9f1a4460303eaca488de24cefb9975fe37f094332",
+      "bytes": 205674
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/result.json",
+      "sha256": "af840d8c64fd5ce93b179dcd4a575c871203a10ca8f44ddfd641317c536adc04",
+      "bytes": 1282
+    }
+  ],
+  "known_limitations": [
+    "The old clean review covered the historical parent; rebuilt ancestry needs independent confirmation.",
+    "The inherited 35-minute monolithic coverage runtime architecture remains unresolved and unchanged.",
+    "Automatic branch CI and independent lineage confirmation occur after the final stack push."
+  ]
+}

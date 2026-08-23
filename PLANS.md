@@ -1,5 +1,30 @@
 # DMF Pulse execution plans
 
+## Downstream correctness stack lineage rebuild
+
+- Corrected Layer-A parent: `d41be2df28e7a74b67563056adea4ccc963ac04c` on the immutable
+  reviewed CI-FPL remediation branch.
+- Rebuild branch: `rebuild/post-A-FPL-001-correctness-stack`.
+- Historical Layer B: parent `652bae84fba9bdfbf435367d6140270fa8378d57`, reviewed head
+  `d550250836c9c39e6caebaa5f12ad94fec7e2b02`.
+- Historical Layer C: parent `d550250836c9c39e6caebaa5f12ad94fec7e2b02`, reviewed head
+  `840b6b7150808f19a3c32171aea6846e55fa8554`.
+- Scope: reconstruct only the exact reviewed test blobs/patches and reseal truthful
+  lineage-dependent ticket evidence/manifests. Production, workflow, dependency, migration,
+  runtime configuration, CI-GOV, DIAG, and LIVE-ODDS changes are forbidden.
+
+### Rebuild checkpoints
+
+- [x] Verify pinned Git/PR identities, expected divergence, clean worktrees, unchanged executable
+  bases, and immutable reviewed blob/patch IDs.
+- [x] Reconstruct the exact CI-TEST-001 executable patch on corrected Layer A.
+- [ ] Seal direct-child Layer B and record its exact commit.
+- [ ] Reconstruct and seal exact CI-TEST-002 as direct-child Layer C.
+- [ ] Pass targeted/FPL/PostgreSQL/static/security/manifest gates and optional non-performance
+  suite without changing product or CI architecture.
+- [ ] Push the final stack once, inspect the automatic CI run once, and stop for independent
+  lineage confirmation.
+
 ## CI-FPL-REPLAY-001 deterministic synthetic FPL replay time
 
 - Parent/branch: immutable `baed47bce7a158d91afe38351a2c65be60444adf` on

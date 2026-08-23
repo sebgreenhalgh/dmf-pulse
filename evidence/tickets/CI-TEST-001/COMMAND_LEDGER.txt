@@ -1,0 +1,36 @@
+CI-TEST-001 COMMAND LEDGER
+Date: 2026-08-23
+
+HISTORICAL REVIEWED SEAL
+PASS | old parent == 652bae84fba9bdfbf435367d6140270fa8378d57
+PASS | old reviewed head == d550250836c9c39e6caebaa5f12ad94fec7e2b02
+PASS | independent verdict == REVIEW_CLEAN_PENDING_EXTERNAL_CI_GATE
+PASS | historical Windows module
+       11 passed in 85.00s
+PASS | historical Debian Linux module
+       11 passed in 95.68s
+
+LINEAGE RESEAL PREFLIGHT
+PASS | origin/main == baed47bce7a158d91afe38351a2c65be60444adf
+PASS | corrected Layer A == d41be2df28e7a74b67563056adea4ccc963ac04c
+PASS | corrected Layer A is 6 ahead and 0 behind architectural main
+PASS | old Layer B and corrected Layer A merge base == 652bae84fba9bdfbf435367d6140270fa8378d57
+PASS | old branch head remains d550250836c9c39e6caebaa5f12ad94fec7e2b02
+PASS | LIVE-ODDS head remains 5e55cf3361a1abff4b2e32dcc30fe42900ea2e16
+PASS | PR #16 remains OPEN and unmerged
+
+EXECUTABLE IDENTITY
+PASS | old executable blob == ed97b7944a24eb1c7440f5a3f31cf524f38a7157
+PASS | rebuilt executable blob == ed97b7944a24eb1c7440f5a3f31cf524f38a7157
+PASS | old stable patch ID == 2e77cb8598a54ffaf138ab2bc669227f35e81398
+PASS | rebuilt stable patch ID == 2e77cb8598a54ffaf138ab2bc669227f35e81398
+PASS | original pre-B file versus corrected Layer-A file == EMPTY
+
+REBUILT TARGET VALIDATION
+PASS | uv sync --all-groups --frozen
+       Windows CPython 3.13.9; 40 packages installed from frozen lock
+PASS | uv run python -m pytest tests/assurance/optimisation/test_surface.py -vv --tb=long
+       11 passed in 83.09s
+
+PENDING AT THIS LAYER-B EVIDENCE SNAPSHOT
+- manifest refresh, direct-child commit, and final-stack lineage recording
