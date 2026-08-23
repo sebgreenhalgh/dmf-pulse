@@ -1,0 +1,37 @@
+{
+  "ticket_id": "CI-TEST-001",
+  "status": "TEST_FIX_READY_PENDING_INDEPENDENT_REVIEW_WITH_KNOWN_EXTERNAL_CI_ARCHITECTURE_BLOCKER",
+  "classification": "PRE_EXISTING_MAIN_DEFECT",
+  "architectural_main": "baed47bce7a158d91afe38351a2c65be60444adf",
+  "stacked_parent": "652bae84fba9bdfbf435367d6140270fa8378d57",
+  "branch": "remediation/CI-TEST-001-cross-platform-canonical-fixture",
+  "production_loader_changed": false,
+  "workflow_changed": false,
+  "dependencies_changed": false,
+  "scope_validation": "PASS",
+  "repository_validation": "PASS_0_ERRORS",
+  "secret_scan": "PASS_0_FINDINGS",
+  "cross_platform_acceptance": {
+    "windows_python": "3.13.9",
+    "windows_target": "PASS",
+    "windows_module": "PASS",
+    "windows_coverage_module": "PASS",
+    "linux_distribution": "Debian GNU/Linux",
+    "linux_python": "3.13.15",
+    "linux_target": "PASS",
+    "linux_module": "PASS"
+  },
+  "controls": {
+    "canonical_valid": "PASS",
+    "valid_noncanonical": "PASS",
+    "malformed_json": "PASS",
+    "invalid_model": "PASS",
+    "detached_hash_and_collision": "PASS"
+  },
+  "automatic_ci": "PENDING_PUSH_AT_LOCAL_EVIDENCE_SEAL",
+  "diag_02": "UNRESOLVED_AND_UNCHANGED",
+  "ci_runtime_architecture": "UNRESOLVED_AND_UNCHANGED",
+  "independent_review": "PENDING",
+  "human_acceptance": "NOT_CLAIMED",
+  "merged": false
+}

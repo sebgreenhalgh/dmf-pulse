@@ -1,0 +1,68 @@
+{
+  "ticket_id": "CI-TEST-001",
+  "status": "DRAFT",
+  "created_at": "2026-08-23T14:19:13Z",
+  "code_commit": null,
+  "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+  "commands": [
+    {
+      "command": "Windows target and module, with and without targeted coverage instrumentation",
+      "result": "PASS"
+    },
+    {
+      "command": "Debian Linux CPython 3.13.15 target and module against read-only worktree",
+      "result": "PASS"
+    },
+    {
+      "command": "diff, format, lint, repository, secret, manifest, and scope validation",
+      "result": "PASS"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/tickets/CI-TEST-001/COMMAND_LEDGER.txt",
+      "sha256": "f5ec52e4f99f3370faa73b8beca1ca037802f6e7571c4747935ca9a9da953e42",
+      "bytes": 3028
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/FINAL_SELF_REVIEW.md",
+      "sha256": "893ff70631870c8752f988923641ff2ec254a76bf7519c5f32eb8565a22dff87",
+      "bytes": 1026
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/IMPLEMENTATION_RESULT.md",
+      "sha256": "8d1df32ecbba6aee3ed66e669b986a49b3b55f0acf1e824f4248d6a7a60579c7",
+      "bytes": 1709
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/KNOWN_LIMITATIONS.md",
+      "sha256": "e6aef7b2c44fce17f0a581d9b589546ae29249f170b3131c348bd5a91fd45e95",
+      "bytes": 963
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/PLAN.md",
+      "sha256": "2d7ff86f5c2de7f34e905b90c010ce71a77500017120d91ed48dc28f6fbf2a8f",
+      "bytes": 1484
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/ROOT_CAUSE.md",
+      "sha256": "06737e78788dbc67dc649fe098e5dd8d8a3f49cfa8addf70f564ac8555f90190",
+      "bytes": 1439
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/current_manifest.json",
+      "sha256": "a5d694e6c5dc0ca09fa6eae92fada98460ad84c9c6477f9dd907cac5b6f04c3a",
+      "bytes": 205475
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-001/result.json",
+      "sha256": "b7e1a1b1214f1e47d8b920f535794d5e7e217bc47a75911583914244e73e5e04",
+      "bytes": 1330
+    }
+  ],
+  "known_limitations": [
+    "DIAG-02 remains unresolved and unchanged.",
+    "The monolithic full coverage runtime architecture remains unresolved and unchanged.",
+    "Automatic branch CI and independent review occur after this local evidence snapshot."
+  ]
+}

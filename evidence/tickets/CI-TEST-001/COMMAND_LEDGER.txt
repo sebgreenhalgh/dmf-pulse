@@ -1,0 +1,53 @@
+CI-TEST-001 COMMAND LEDGER
+Date: 2026-08-23
+
+PREFLIGHT
+PASS | git fetch origin --prune
+PASS | origin/main == baed47bce7a158d91afe38351a2c65be60444adf
+PASS | origin/remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time == 652bae84fba9bdfbf435367d6140270fa8378d57
+PASS | origin/governance/CI-GOV-001-ci-runtime-budget == 6723f121b2b3d2bc477d929e03eb4597eb86df7e
+PASS | origin/integration/post-gw1/LIVE-ODDS-001-production-live-odds == 5e55cf3361a1abff4b2e32dcc30fe42900ea2e16
+PASS | gh pr view 16 --repo sebgreenhalgh/dmf-pulse --json number,state,isDraft,mergedAt,headRefOid,baseRefName,url
+       state OPEN; mergedAt null; head exact
+
+ENVIRONMENT
+PASS | uv sync --all-groups --frozen
+       Windows CPython 3.13.9; 40 packages installed from frozen lock
+PASS | docker Linux environment
+       python:3.13.15-slim-bookworm; uv 0.11.26; frozen project environment
+
+TARGETED TESTS
+PASS | uv run python -m pytest tests/assurance/optimisation/test_surface.py::test_artifacts_policy_and_candidate_snapshot -vv --tb=long
+       Windows CPython 3.13.9; final test change; 1 passed in 0.61s
+PASS | uv run python -m pytest tests/assurance/optimisation/test_surface.py -vv --tb=long
+       Windows CPython 3.13.9; final test change; 11 passed in 85.00s
+PASS | uv run python -m pytest tests/assurance/optimisation/test_surface.py --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-fail-under=0 -vv --tb=long
+       Windows CPython 3.13.9; final test change; 11 passed in 205.61s; targeted invocation only
+PASS | Linux equivalent target with read-only repository mount and isolated temporary environment
+       Debian Linux CPython 3.13.15; final test change; 1 passed in 2.51s
+PASS | Linux equivalent complete module with read-only repository mount and isolated temporary environment
+       Debian Linux CPython 3.13.15; final test change; 11 passed in 95.68s
+
+STATIC AND SECURITY
+PASS | git diff --check
+PASS | uv run ruff format --check .
+       636 files already formatted
+PASS | uv run ruff check .
+       All checks passed
+PASS | uv run python scripts/scan_secrets.py
+       PASS; 0 findings
+PASS | uv run python scripts/generate_repository_manifest.py --ticket CI-TEST-001
+       wrote 1131 files to evidence/tickets/CI-TEST-001/current_manifest.json
+PASS | uv run python scripts/generate_repository_manifest.py --ticket PRC-013
+       wrote 1131 files to evidence/tickets/PRC-013/current_manifest.json
+PASS | read-only validate_repository(Path.cwd()) from scripts/validate_repository.py
+       PASS; 0 errors; literal main was not invoked because it writes unauthorized GCS-008 evidence
+PASS | exact parent delta confinement
+       src, .github/workflows, config, alembic, pyproject.toml, uv.lock, and DIAG-02 diff empty
+PASS | CI-GOV-001 worktree status
+       clean and untouched
+PASS | uv run dmf evidence validate --ticket CI-TEST-001
+       artifact_count 8; status DRAFT; ticket evidence directory valid
+
+PENDING AT THIS LEDGER SNAPSHOT
+- commit, normal push, remote-head equality, and automatic CI observation

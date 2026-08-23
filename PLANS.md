@@ -1,5 +1,28 @@
 # DMF Pulse execution plans
 
+## CI-TEST-001 cross-platform canonical artifact negative fixture
+
+- Parent/branch: immutable FPL technical parent
+  `652bae84fba9bdfbf435367d6140270fa8378d57` on
+  `remediation/CI-TEST-001-cross-platform-canonical-fixture`.
+- Classification: `PRE_EXISTING_MAIN_DEFECT`; the optimisation artifact negative fixture relied on
+  Windows text newline translation even though its LF payload was canonical on POSIX.
+- Scope: one assurance-test fixture, this ticket/evidence, and the conditionally authorized active
+  PRC-013 repository manifest refresh. Production, workflow, config, migration, dependency,
+  CI-GOV, LIVE-ODDS, PR #16, and unresolved DIAG-02 behavior remain unchanged.
+
+### CI-TEST-001 checkpoints
+
+- [x] Verify immutable refs, open/unmerged PR #16, exact stacked parent, loader behavior, model
+  validity, and the inherited platform-dependent fixture.
+- [x] Freeze the narrow test-only ticket and acceptance contract.
+- [x] Replace newline-dependent text output with explicit valid-but-noncanonical bytes while
+  retaining canonical-valid, malformed-JSON, and invalid-model controls.
+- [x] Pass targeted Windows, Linux Python 3.13, coverage-instrumented, static, repository, secret,
+  evidence, manifest, and scope gates.
+- [ ] Seal one linear commit, push normally, inspect the automatic branch CI once, and stop before
+  independent review without modifying PR #16.
+
 ## CI-FPL-REPLAY-001 deterministic synthetic FPL replay time
 
 - Parent/branch: immutable `baed47bce7a158d91afe38351a2c65be60444adf` on
