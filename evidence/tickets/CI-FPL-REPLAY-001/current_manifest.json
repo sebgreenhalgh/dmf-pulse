@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 79414,
+      "bytes": 80483,
       "path": "PLANS.md",
-      "sha256": "335738dfa4f2d842fde5fca8584cf8126c6b100436e43ced9fe00f2d164edb77"
+      "sha256": "130fe750fa57ffa7619b5c2424c76e75b70235516f349d8e73f4a67427ceb26e"
     },
     {
       "bytes": 2761,
@@ -3281,9 +3281,9 @@
       "sha256": "20b38fcbc6fb93c0930119ce04cc42ca7a1089a6832dfd16cc1315f3649427c2"
     },
     {
-      "bytes": 103522,
+      "bytes": 106478,
       "path": "src/dmf_pulse/ingestion/fpl/service.py",
-      "sha256": "bd6f236dad7ae1ceca330c2f3b0e8266a300e6e8a14b39f29ed78004075e8ed4"
+      "sha256": "a3278442eb0788239a5f000852f850adf184160039dbfcfbf25000cfc55d0d31"
     },
     {
       "bytes": 10204,
@@ -4291,6 +4291,11 @@
       "sha256": "ebf275541af3fe01094bd9be4eab0e12b2b3ab98dbbdcebcb904f02c09ba5869"
     },
     {
+      "bytes": 10168,
+      "path": "tests/integration/ingestion/test_fpl_pair_context_integrity.py",
+      "sha256": "5584bcc26a2874305d94fa801cd63ac453cb6e3ca6a6d407d5a6b265c451df0a"
+    },
+    {
       "bytes": 12342,
       "path": "tests/integration/ingestion/test_fpl_replay_time_policy.py",
       "sha256": "8b5f9a9212414f84ea88a55091dd60b634f78dc2d846027a48ec30ec820cae94"
@@ -5171,9 +5176,9 @@
       "sha256": "de0c4c261f276baa02d0371a40b48daef4087b524f699ee68c8336e57057b8ea"
     },
     {
-      "bytes": 33822,
+      "bytes": 34616,
       "path": "tests/unit/ingestion/test_fpl_service_boundaries.py",
-      "sha256": "9e158691a3e38322c894b576699566cc4576eb6fa135a236113b009e3c8f53be"
+      "sha256": "813f70322008d6460965c0e71b870f4c0a976d141c25db0207f9dc5af39e37eb"
     },
     {
       "bytes": 11194,
@@ -5491,14 +5496,14 @@
       "sha256": "2204fa4d8b2bb3e53dd14247077ff7831e2cf6a0043380dea855ee81ccb4581d"
     },
     {
-      "bytes": 9383,
+      "bytes": 12178,
       "path": "tickets/CI-FPL-REPLAY-001/ACCEPTANCE.md",
-      "sha256": "07e9f0c462fe96aecbb6d1eaeffa343b471133ef40701cb29e27d77d6b4364ce"
+      "sha256": "a089931911eeaba909545f11c2d57c0c54edcd646a8481287f060ceeba41d7e7"
     },
     {
-      "bytes": 5921,
+      "bytes": 6137,
       "path": "tickets/CI-FPL-REPLAY-001/ticket.yaml",
-      "sha256": "97c44a4e8e558764d3a1a70a85f04a79aaf4f6e5d13e8eec66fecd7b2a2c5a08"
+      "sha256": "340cda1ea2481f538e34f39bb51c78ec475bc719d026becf665e2d2416902a84"
     },
     {
       "bytes": 3923,

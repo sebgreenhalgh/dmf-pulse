@@ -1,6 +1,6 @@
 # CI-FPL-REPLAY-001 root cause
 
-Status: `CONFIRMED_AND_REMEDIATED_LOCALLY`
+Status: `TEMPORAL_DEFECT_REMEDIATED; A-FPL-001_REMEDIATED_PENDING_REREVIEW`
 
 Evidence phase: post-implementation, before branch CI
 
@@ -82,3 +82,24 @@ without the field default to processing time; unknown or synthetic-incompatible 
 fail closed. Scenario names and resolved fixture directories are bound to an explicit allowlist so
 traversal, case variants, absolute paths, and link redirection cannot substitute fixture content or
 its frozen timestamp.
+
+## Independent-review correction — A-FPL-001
+
+The preceding implemented-boundary statement describes the intent at technical head `652bae84`,
+not the complete behavior later established by independent review. Resume loaded and hashed only
+the context belonging to the caller-supplied snapshot. It found the second member by the initiating
+context's `pair_key` but never loaded or verified that member's `RECEIVED.safe_details`.
+
+Consequently, privileged/restored corruption confined to the counterpart policy was ignored when
+resume was initiated through the clean member. The controlled RED reproduction changed only the
+counterpart `operation_time_policy` to `UNKNOWN_POLICY`; normal mutation was first rejected by
+`IMMUTABLE_RECORD`, the guard was restored before resume, and production returned exit zero with a
+bundle. The original claim of pair-wide hash protection was therefore incomplete.
+
+Checkpoint `6c5d73c56d8dcb39410da298d3068af38a9f50b8` closes the implementation gap. The initiating
+snapshot resolves `source_snapshot.ingestion_run_id` to the pre-existing
+`ingestion_run.logical_run_key` identity `fpl004:<pair_key>`. Under the existing pair lock, resume
+requires exactly bootstrap and fixtures members, loads both contexts, verifies both roles, checks
+all required fields, independently hashes complete common material from each context to the
+anchored key, and requires exact common-material equality before interpreting policy or any other
+semantic input. Missing and unknown policy now fail `LIFECYCLE_INVARIANT`.

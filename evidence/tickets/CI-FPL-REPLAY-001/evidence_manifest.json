@@ -1,61 +1,71 @@
 {
   "ticket_id": "CI-FPL-REPLAY-001",
   "status": "BLOCKED",
-  "created_at": "2026-08-22T21:35:20Z",
-  "code_commit": "652bae84fba9bdfbf435367d6140270fa8378d57",
+  "created_at": "2026-08-23T18:48:17Z",
+  "code_commit": "6c5d73c56d8dcb39410da298d3068af38a9f50b8",
   "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
   "commands": [
     {
+      "command": "uv run python -m pytest tests/integration/ingestion/test_fpl_pair_context_integrity.py -q",
+      "result": "PASS",
+      "summary": "8 passed in 2.28s; PAIR-01..07 and PAIR-10 fail closed with immutable-trigger restoration"
+    },
+    {
+      "command": "uv run python -m pytest -q tests/integration/ingestion/test_fpl_pair_context_integrity.py tests/integration/ingestion/test_fpl_replay_time_policy.py tests/integration/ingestion/test_fpl_lifecycle_resume.py tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py tests/integration/ingestion/test_fpl_temporal_identity.py tests/integration/ingestion/test_fpl_concurrency.py tests/unit/ingestion/test_fpl_service_boundaries.py",
+      "result": "PASS",
+      "summary": "104 passed in 66.35s; PAIR-01..18 and TIME-01..18 covered"
+    },
+    {
       "command": "uv run python -m pytest -m \"postgres and integration\" tests/integration",
       "result": "PASS",
-      "summary": "118 passed, 140 deselected on PostgreSQL 18.4"
+      "summary": "126 passed, 140 deselected in 283.03s on PostgreSQL 18.4"
     },
     {
-      "command": "uv run python -m pytest -q -m \"not performance\"",
+      "command": "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head --report <artifact> --offline-sql <artifact> --schema-manifest <artifact>",
       "result": "PASS",
-      "summary": "3083 passed, 3 deselected after final repository manifest refresh"
+      "summary": "five migration legs passed; no new upgrade operations; schema hash unchanged"
     },
     {
-      "command": "uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/CI-FPL-REPLAY-001/coverage.json",
+      "command": "uv sync --all-groups --frozen; git diff --check; Ruff format/lint; mypy; secret scan",
       "result": "PASS",
-      "summary": "93.066348% aggregate statements and 85.818182% aggregate branches"
-    },
-    {
-      "command": "gh run view 32598102993 --log --job 97092109564",
-      "result": "BLOCKED",
-      "summary": "PostgreSQL step passed; overall job canceled at immutable 35-minute workflow limit during coverage without a test failure"
+      "summary": "40 packages unchanged; 637 files formatted; lint clean; 245 source files typed; zero secret findings"
     }
   ],
   "artifacts": [
     {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/A-FPL-001_REMEDIATION.md",
+      "sha256": "267640e27269e8a8d5d613492419695f6c9bab71d299ffa4bae425c54a4b0999",
+      "bytes": 4855
+    },
+    {
       "path": "evidence/tickets/CI-FPL-REPLAY-001/COMMAND_LEDGER.txt",
-      "sha256": "b5398f1c6284a68b7b0ccc63ef09d80c72d78e2ceb0d3a3b7e3941904f7cce3e",
-      "bytes": 6165
+      "sha256": "9092a19b5f573fdd1a9f36bea36a632a01335dac9f8128c52eefffc2118b2dab",
+      "bytes": 9009
     },
     {
       "path": "evidence/tickets/CI-FPL-REPLAY-001/FINAL_SELF_REVIEW.md",
-      "sha256": "265952b68ede37ffe9cb8368d64b5dce25dd9c050aef9cabf7ff370fcc515120",
-      "bytes": 3298
+      "sha256": "49e40f83034438c9469a0c849c6a58cc9ce17069a679b410478e5c8d56136e6b",
+      "bytes": 5169
     },
     {
       "path": "evidence/tickets/CI-FPL-REPLAY-001/IMPLEMENTATION_RESULT.md",
-      "sha256": "e5c6ba5b46a9dcfdddcd4ff35c466f6889b335b34c8b5671eb442d012f809be4",
-      "bytes": 3752
+      "sha256": "d239d2abbe0f64680db38548efb6e15ea311ab7cc38180379ece416ff511cfdd",
+      "bytes": 5761
     },
     {
       "path": "evidence/tickets/CI-FPL-REPLAY-001/KNOWN_LIMITATIONS.md",
-      "sha256": "68d6177f949c798b5c6fd5de3057fb4a8d98705901f299ebc28fd4abbf0e68f0",
-      "bytes": 1942
+      "sha256": "ca41f7cbc5c1088ac6b6b84b2faa710ebf76c701d928e06ec26130fd78c7bb39",
+      "bytes": 3102
     },
     {
       "path": "evidence/tickets/CI-FPL-REPLAY-001/PLAN.md",
-      "sha256": "4dae2c21ad710b9232d8f5410e35da3e8eee418da52652a5b19dee5a3f4c5ed2",
-      "bytes": 3814
+      "sha256": "e4896d7a4df5eabe2b59dadcc3ce9a1be3d7748c9eb5ca2c80f551130e637b85",
+      "bytes": 5134
     },
     {
       "path": "evidence/tickets/CI-FPL-REPLAY-001/ROOT_CAUSE.md",
-      "sha256": "75a33e434e21618574b50b010e2c5d146fbdf38b887f010cbab324b41f0b49fb",
-      "bytes": 4220
+      "sha256": "5eb945698f4e65e5d42cb88cb6152cb9606a71c2f9e76fbcb6ec173f4228926d",
+      "bytes": 5790
     },
     {
       "path": "evidence/tickets/CI-FPL-REPLAY-001/coverage.json",
@@ -64,18 +74,18 @@
     },
     {
       "path": "evidence/tickets/CI-FPL-REPLAY-001/current_manifest.json",
-      "sha256": "04a91477ba1ff1460f7a2c4618a6d5a5f9cb7c162f08bbdc3a28971ecc5105ff",
-      "bytes": 205147
+      "sha256": "81bc300367d569fb1e41bd6289aae4d2b4708205def113ba4396c97bd714f520",
+      "bytes": 205346
     },
     {
       "path": "evidence/tickets/CI-FPL-REPLAY-001/result.json",
-      "sha256": "9353c399be6aa0afda533f338698ade7cf81e84669c95d509590f8b272fce8c5",
-      "bytes": 3546
+      "sha256": "09d6e49a8485d0bbfae790ce6a8a04f6db3e4c6e3bdbba6d5d93416d726fa8fc",
+      "bytes": 4819
     }
   ],
   "known_limitations": [
     "Branch CI cannot finish within the pre-existing 35-minute job limit; changing or splitting the workflow is outside this ticket.",
-    "The canonical review-pack builder does not support remediation ticket identifiers without an unauthorized assurance-code change.",
-    "Independent review and human acceptance remain pending."
+    "The ingestion-run logical key is independent of both context documents but not protected against simultaneous privileged corruption of the run row and both documents.",
+    "Independent re-review of A-FPL-001 and human acceptance remain pending."
   ]
 }

@@ -1,6 +1,6 @@
 # CI-FPL-REPLAY-001 final self-review
 
-Status: `BLOCKED_BY_UNRELATED_CI_TIMEOUT`
+Status: `REMEDIATION_READY_PENDING_INDEPENDENT_REREVIEW_WITH_KNOWN_EXTERNAL_CI_ARCHITECTURE_BLOCKER`
 
 ## Correctness and authority
 
@@ -14,6 +14,11 @@ Status: `BLOCKED_BY_UNRELATED_CI_TIMEOUT`
   traversal, case-folding, absolute-path, symlink, and junction substitution paths.
 - Resume authenticates the existing pair context before policy use; legacy absence defaults to the
   safer processing-time policy and unknown/tampered values reject.
+
+The preceding bullet records the original `652bae84` self-review and is superseded. Current resume
+does not default a missing policy: it anchors pair identity outside both safe-details documents,
+loads both members under the pair lock, verifies both hashes and roles, compares their complete
+common material, and only then selects policy.
 
 ## Determinism and lifecycle
 
@@ -43,6 +48,28 @@ Status: `BLOCKED_BY_UNRELATED_CI_TIMEOUT`
 - Closed findings included unsafe profile-only policy selection, scenario traversal/case/link
   substitution, arbitrary resume aliases, untyped path-resolution errors, a vacuous TIME-16
   comparison, and incomplete direct TIME-17 boundary coverage.
+
+The preceding adversarial assessment was disproved by independent review and is preserved only as
+history. Independent finding `A-FPL-001` was material P2 and returned `REMEDIATION_REQUIRED`.
+
+## A-FPL-001 remediation self-review
+
+- Both contexts are loaded in one transaction after resolving the existing logical-run anchor and
+  acquiring the pair lock.
+- Each context is independently checked for anchored key, expected role, complete required common
+  fields, and canonical hash. The full common dictionaries must be identical.
+- Pair membership comes from `source_snapshot.ingestion_run_id`, not a JSON key. Exactly two
+  members and both expected stored resources are mandatory.
+- Missing/unknown policy cannot reach `_continue_pair`; wrong-profile frozen policy remains
+  `RIGHTS_BLOCKED`; current authority checks remain intact.
+- PAIR-01..18 and TIME-01..18 are green. Both initiating members are exercised by existing
+  idempotent resume coverage. Normal immutable mutation is proved blocked in every direct
+  corruption case, and cleanup unconditionally re-enables and verifies the trigger.
+- Production change remains only `src/dmf_pulse/ingestion/fpl/service.py`. No database guard,
+  migration, rights, cutoff, fixture, semantic-hash, Odds, workflow, dependency, CI-TEST branch,
+  LIVE-ODDS, or PR #16 change was made.
+- P0: none. P1: none. Material in-scope P2: none identified after remediation; independent
+  re-review is still required and not claimed.
 
 ## Honest limitations
 

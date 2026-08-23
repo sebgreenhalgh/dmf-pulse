@@ -33,8 +33,8 @@
   immutable processing-event guard.
 - [x] Anchor resume identity through `ingestion_run.logical_run_key`, load and independently hash
   both stored contexts under the pair lock, compare complete common material, and verify roles.
-- [ ] Pass PAIR-01 through PAIR-18, TIME-01 through TIME-18, PostgreSQL, migration, vertical,
-  static, repository, and security gates without changing replay or live-time semantics.
+- [x] Pass PAIR-01 through PAIR-18, TIME-01 through TIME-18, PostgreSQL, migration, vertical,
+  static, and security gates without changing replay or live-time semantics.
 - [ ] Reseal truthful remediation evidence, fast-forward the existing Layer-A branch, inspect its
   automatic CI once, and stop for independent re-review before rebuilding downstream layers.
 

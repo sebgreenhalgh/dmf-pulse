@@ -1,6 +1,6 @@
 # CI-FPL-REPLAY-001 known limitations
 
-Status: local implementation verified; remote CI and independent review are pending.
+Status: A-FPL-001 locally remediated; independent re-review and complete remote CI are pending.
 
 - The exact PostgreSQL 18.4 parent result was `31 failed, 79 passed, 140 deselected`; the same
   post-remediation slice is green at `118 passed, 140 deselected`.
@@ -24,3 +24,20 @@ Status: local implementation verified; remote CI and independent review are pend
   unchanged timeout.
 - Independent review and human acceptance have not occurred. Nothing in this ticket authorizes a
   merge or a modification to PR #16.
+
+## A-FPL-001 successor note
+
+- Independent review did occur for technical head `652bae84` and returned
+  `REMEDIATION_REQUIRED` for material P2 `A-FPL-001`; only the new remediation remains pending
+  independent re-review.
+- The independent persisted pair anchor is `ingestion_run.logical_run_key`. The ingestion-run row
+  is relationally separate from both `RECEIVED.safe_details` documents and closes one- or
+  two-document context forgery. It is not an integrity guarantee against simultaneous privileged
+  corruption of both contexts and the ingestion-run row; closing that broader database threat
+  would require forbidden migration/schema scope.
+- GitHub reports historical run `32598102993` as `cancelled`, not `failure`. The old result field is
+  corrected in the successor `result.json`; the underlying documented cause remains the inherited
+  35-minute job timeout with no emitted test failure.
+- Local remediation gates are green at implementation checkpoint
+  `6c5d73c56d8dcb39410da298d3068af38a9f50b8`. Automatic CI for the final evidence-sealed head is
+  pending at seal time and is inspected once after the normal fast-forward push.

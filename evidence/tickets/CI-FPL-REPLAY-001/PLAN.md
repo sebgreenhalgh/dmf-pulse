@@ -1,10 +1,25 @@
 # CI-FPL-REPLAY-001 implementation plan
 
-Status: `BLOCKED_BY_UNRELATED_CI_TIMEOUT`
+Status: `REMEDIATION_READY_PENDING_INDEPENDENT_REREVIEW_WITH_KNOWN_EXTERNAL_CI_ARCHITECTURE_BLOCKER`
 
-Updated: `2026-08-22`
+Updated: `2026-08-23`
 
 Engineering target: `ENGINEERING_READY_PENDING_INDEPENDENT_REVIEW`
+
+## Independent-review remediation checkpoint
+
+- Independent review of `652bae84fba9bdfbf435367d6140270fa8378d57` returned
+  `REMEDIATION_REQUIRED` for material P2 `A-FPL-001`.
+- The finding was reproduced from preserved continuation `244feb0709294c3a544e399c7890177120dd1020`:
+  normal processing-event mutation raised `IMMUTABLE_RECORD`; with only the counterpart policy
+  changed to `UNKNOWN_POLICY` under a temporarily disabled and restored guard, resume through the
+  clean member incorrectly returned exit zero with a bundle.
+- Implementation checkpoint `6c5d73c56d8dcb39410da298d3068af38a9f50b8` anchors pair identity
+  through the existing ingestion run, verifies both stored contexts and roles independently under
+  the pair lock, compares complete common material, and makes missing policy fail closed.
+- Local PAIR-01..18, TIME-01..18, PostgreSQL 18.4, migration, vertical, static, and security gates
+  are green. Repository manifests/evidence are resealed in the successor commit; independent
+  re-review, human acceptance, merge, and complete branch CI remain pending.
 
 ## Frozen context
 
@@ -67,3 +82,6 @@ The pushed engineering checkpoint repaired the PostgreSQL failure, but branch ru
 was canceled by the workflow's pre-existing 35-minute job limit while the next full-coverage step
 was still running. Changing `.github/workflows/ci.yml` is explicitly excluded. The brief requires
 reporting this unrelated remaining failure rather than broadening scope or rerunning blindly.
+
+The 2026-08-22 checklist above is retained as the original temporal-remediation history. Its
+pre-independent-review clean assessment is superseded by `A-FPL-001_REMEDIATION.md`.

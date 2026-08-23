@@ -1,14 +1,17 @@
 {
-  "schema_version": "ci-fpl-replay-001-result-v1",
+  "schema_version": "ci-fpl-replay-001-result-v2",
   "ticket_id": "CI-FPL-REPLAY-001",
-  "engineering_status": "BLOCKED_BY_UNRELATED_CI_TIMEOUT",
+  "engineering_status": "REMEDIATION_READY_PENDING_INDEPENDENT_REREVIEW_WITH_KNOWN_EXTERNAL_CI_ARCHITECTURE_BLOCKER",
   "human_acceptance": "PENDING",
   "merge_performed": false,
   "git": {
     "branch": "remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time",
     "immutable_parent": "baed47bce7a158d91afe38351a2c65be60444adf",
-    "engineering_checkpoint": "652bae84fba9bdfbf435367d6140270fa8378d57",
-    "push_mode": "normal"
+    "engineering_checkpoint": "6c5d73c56d8dcb39410da298d3068af38a9f50b8",
+    "previous_reviewed_remote_head": "652bae84fba9bdfbf435367d6140270fa8378d57",
+    "evidence_only_continuation": "244feb0709294c3a544e399c7890177120dd1020",
+    "push_mode": "normal_fast_forward",
+    "push_pending_at_evidence_seal": true
   },
   "pr_16_preservation": {
     "pull_request": 16,
@@ -24,7 +27,14 @@
   "fix": {
     "ordinary_policy": "PROCESSING_TIME_V1",
     "synthetic_replay_policy": "FROZEN_REPLAY_CAPTURED_AT_V1",
-    "policy_hash_protected_on_resume": true,
+    "policy_hash_protected_on_both_members": true,
+    "pair_membership_source": "source_snapshot.ingestion_run_id",
+    "independent_pair_anchor": "ingestion_run.logical_run_key",
+    "both_contexts_loaded": true,
+    "both_context_hashes_verified": true,
+    "resource_roles_verified": true,
+    "complete_common_material_equal": true,
+    "missing_policy_fails_closed": true,
     "migration_required": false,
     "other_production_path_required": false
   },
@@ -48,10 +58,31 @@
     "TIME-17",
     "TIME-18"
   ],
+  "pair_regressions": [
+    "PAIR-01",
+    "PAIR-02",
+    "PAIR-03",
+    "PAIR-04",
+    "PAIR-05",
+    "PAIR-06",
+    "PAIR-07",
+    "PAIR-08",
+    "PAIR-09",
+    "PAIR-10",
+    "PAIR-11",
+    "PAIR-12",
+    "PAIR-13",
+    "PAIR-14",
+    "PAIR-15",
+    "PAIR-16",
+    "PAIR-17",
+    "PAIR-18"
+  ],
   "postgresql": {
     "version": "18.4",
-    "post_fix_integration_result": "118 passed, 140 deselected",
-    "focused_final_temporal_result": "66 passed"
+    "post_fix_integration_result": "126 passed, 140 deselected in 283.03s",
+    "focused_pair_temporal_result": "104 passed in 66.35s",
+    "direct_pair_corruption_result": "8 passed in 2.28s"
   },
   "migration_matrix": {
     "status": "PASS",
@@ -60,33 +91,39 @@
     "new_upgrade_operations": 0,
     "schema_sha256": "7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc"
   },
-  "coverage": {
+  "historical_coverage_at_652bae84": {
+    "head_sha": "652bae84fba9bdfbf435367d6140270fa8378d57",
     "statements_percent": 93.59267734553775,
     "branches_percent": 86.34755075433041,
     "combined_percent": 91.78660971306527,
-    "inherited_gate": "PASS"
+    "current_remediation_head_rerun": false
   },
   "github_actions": {
     "workflow": "dmf-pulse-ci",
     "run_id": 32598102993,
     "head_sha": "652bae84fba9bdfbf435367d6140270fa8378d57",
     "status": "COMPLETED",
-    "conclusion": "FAILURE",
+    "conclusion": "CANCELLED",
     "failure_kind": "JOB_TIMEOUT",
     "timeout_minutes": 35,
     "postgresql_step": "PASS",
     "coverage_step": "CANCELED_WITHOUT_TEST_FAILURE"
   },
+  "historical_record_correction": {
+    "commit": "244feb0709294c3a544e399c7890177120dd1020",
+    "field": "github_actions.conclusion",
+    "old_value": "FAILURE",
+    "correct_value": "CANCELLED",
+    "source": "GitHub run 32598102993",
+    "history_rewritten": false
+  },
   "gates": [
     "POSTGRESQL_INTEGRATION_PASS",
+    "PAIR_CONTEXT_INTEGRITY_PASS",
     "MIGRATION_MATRIX_PASS",
     "TEMPORAL_MATRIX_PASS",
     "STATIC_ANALYSIS_PASS",
-    "COVERAGE_THRESHOLDS_PASS",
-    "PERFORMANCE_PASS",
-    "FPL_ODDS_VERTICAL_PASS",
-    "BUILD_PASS",
-    "INSTALLED_WHEEL_PASS",
+    "FPL_VERTICAL_PASS",
     "REPOSITORY_VALIDATION_PASS",
     "SECRET_SCAN_PASS"
   ],
@@ -100,12 +137,16 @@
   "self_review": {
     "p0": [],
     "p1": [],
-    "material_p2": []
+    "material_p2": [],
+    "closed_material_p2": [
+      "A-FPL-001"
+    ],
+    "independent_rereview": "PENDING"
   },
   "known_limitations": [
     "Canonical remediation-ticket review-pack generation is unsupported without unauthorized assurance-code expansion.",
-    "Independent review and human acceptance remain pending.",
+    "Independent re-review of A-FPL-001 and human acceptance remain pending.",
     "Branch CI cannot finish within the pre-existing 35-minute job limit; changing the workflow is outside this ticket."
   ],
-  "next_step": "Open an independently authorized CI-governance follow-up to raise or restructure the job timeout without weakening tests; do not merge or modify PR #16."
+  "next_step": "INDEPENDENT_REREVIEW_A-FPL-001"
 }

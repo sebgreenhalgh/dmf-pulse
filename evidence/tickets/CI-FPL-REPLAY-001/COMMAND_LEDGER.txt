@@ -93,3 +93,36 @@ BLOCKED | dmf-pulse-ci run 32598102993 overall | head
 `.github/workflows/ci.yml` fixes `timeout-minutes: 35`. The full coverage step was still running,
 emitted no test failure, and all following steps were skipped. No blind rerun or workflow change
 was performed because both are prohibited by the ticket.
+
+A-FPL-001 INDEPENDENT-REVIEW REMEDIATION — 2026-08-23
+PASS | git/gh preflight | all pinned main/Layer-A/CI-TEST/LIVE-ODDS refs exact; PR #16 OPEN and
+unchanged; local continuation 244feb0 is a direct evidence-only child of 652bae84 with no
+executable/config/workflow/migration/dependency delta.
+EXPECTED_RED | uv run python -m pytest
+tests/integration/ingestion/test_fpl_pair_context_integrity.py -k PAIR-02 -vv | normal mutation
+raised IMMUTABLE_RECORD; after isolated counterpart operation_time_policy=UNKNOWN_POLICY and guard
+restoration, production incorrectly returned exit_code=0, bundle_present=True; 1 failed,
+7 deselected in 1.26s.
+PASS | direct PAIR-01..07 and PAIR-10 corruption suite | 8 passed in 2.28s; normal immutable update
+blocked per case; minimum guard disabled only for isolated mutation; unconditional cleanup verified
+tgenabled=O before production resume.
+PASS | uv run python -m pytest -q tests/integration/ingestion/test_fpl_pair_context_integrity.py tests/integration/ingestion/test_fpl_replay_time_policy.py tests/integration/ingestion/test_fpl_lifecycle_resume.py tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py tests/integration/ingestion/test_fpl_temporal_identity.py tests/integration/ingestion/test_fpl_concurrency.py tests/unit/ingestion/test_fpl_service_boundaries.py | 104 passed in 66.35s.
+PASS | uv run python -m pytest -m "postgres and integration" tests/integration | PostgreSQL 18.4;
+126 passed, 140 deselected in 283.03s.
+PASS | inherited migration matrix | all five legs and metadata/data-preservation checks passed;
+no new upgrade operations; target=20260807_0006; schema SHA-256 unchanged at
+7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc.
+PASS | exact FPL happy replay CLI | exit 0, status USABLE, BUNDLE_CREATED, source bundle present;
+synthetic fixture path performs no provider transport.
+PASS | uv sync --all-groups --frozen; git diff --check; Ruff format/lint; mypy; secret scan |
+40 packages unchanged; 637 files formatted; lint clean; 245 source files typed; 0 secret findings.
+PASS | implementation checkpoint | 6c5d73c56d8dcb39410da298d3068af38a9f50b8; production delta remains
+only src/dmf_pulse/ingestion/fpl/service.py; no Odds/workflow/dependency/migration/downstream/LIVE-ODDS
+delta.
+CORRECTION | historical run 32598102993 | GitHub conclusion is cancelled, not FAILURE; the prior
+result.json field is corrected without rewriting commit 244feb0. The documented 35-minute timeout
+and absence of emitted test failure are unchanged.
+PASS | uv run dmf evidence validate --ticket CI-FPL-REPLAY-001 | status BLOCKED accepted;
+10 authenticated artifacts; all hashes and sizes valid.
+PASS | read-only repository validator function | error_count=0 after CI-FPL and exact active
+PRC-013 current-manifest refresh; no historical evidence report was written.
