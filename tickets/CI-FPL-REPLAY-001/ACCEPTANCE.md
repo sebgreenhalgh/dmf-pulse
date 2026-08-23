@@ -96,6 +96,49 @@ acceptance, authorize a merge, or authorize any change to PR #16.
 Every TIME item must have a direct, non-skipped automated test and recorded result. Bulk-changing
 assertions to accept the broken no-bundle output is forbidden.
 
+## D.1 A-FPL-001 pair-context integrity addendum
+
+Resume treats the two source snapshots as one integrity domain before interpreting any stored
+semantic input:
+
+1. The initiating snapshot resolves an existing `ingestion_run.logical_run_key` matching exactly
+   `fpl004:<64-lowercase-hex-pair-key>`; that relational run identity is the authoritative pair-key
+   anchor and the existing pair lock is acquired from it.
+2. Exactly two snapshots belong to that ingestion run, including the initiating snapshot: one
+   stored resource is `bootstrap` and one is `fixtures`.
+3. Both `RECEIVED.safe_details` contexts are loaded inside the same locked transaction. Each
+   context names the anchored pair key, and `resource_role` exactly matches the stored resource.
+4. For each context independently, complete common material is formed by removing only `pair_key`
+   and `resource_role`; every required field is present and its canonical SHA-256 equals the
+   anchored pair key.
+5. Bootstrap and fixtures common material is exactly equal. Paths, cutoff, competition, season,
+   profile, configuration hashes, contract, and operation-time policy are interpreted only after
+   both contexts pass.
+6. Missing or unknown operation-time policy fails `LIFECYCLE_INVARIANT`. Frozen replay with a
+   non-synthetic profile remains `RIGHTS_BLOCKED`; current authority checks remain a separate gate.
+
+The mandatory additive regression matrix is:
+
+- **PAIR-01:** initiating-context corruption fails closed.
+- **PAIR-02:** counterpart unknown operation-time policy fails closed through the clean member.
+- **PAIR-03:** counterpart missing operation-time policy fails closed.
+- **PAIR-04:** counterpart `RECEIVED` context missing or unavailable fails closed.
+- **PAIR-05:** counterpart resource-role mismatch fails closed.
+- **PAIR-06:** counterpart common semantic-field change fails closed.
+- **PAIR-07:** counterpart context hash mismatch fails closed.
+- **PAIR-08:** two valid identical contexts resume successfully.
+- **PAIR-09:** bootstrap- and fixtures-initiated resume are equivalent and idempotent.
+- **PAIR-10:** self-consistent two-context forgery conflicting with logical-run identity fails
+  closed.
+- **PAIR-11/12/13/14/15:** STORED, PARSED, VALIDATED, MAPPED, and PROMOTED resume remain valid.
+- **PAIR-16:** frozen post-cutoff replay remains ineligible.
+- **PAIR-17:** ordinary/manual/live processing-time safety remains unchanged.
+- **PAIR-18:** cross-clock synthetic replay determinism remains unchanged.
+
+Corruption tests must first prove the normal immutable-event guard rejects mutation, disable only
+that guard for the isolated record, restore it before production resume, and verify it is enabled
+in unconditional cleanup. They must not change migration or production immutability definitions.
+
 ## E. PostgreSQL and migration acceptance
 
 1. PostgreSQL is exactly 18.4; no SQLite substitute is accepted.

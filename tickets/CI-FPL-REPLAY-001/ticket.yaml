@@ -150,6 +150,24 @@ required_regressions:
   - TIME-16
   - TIME-17
   - TIME-18
+  - PAIR-01
+  - PAIR-02
+  - PAIR-03
+  - PAIR-04
+  - PAIR-05
+  - PAIR-06
+  - PAIR-07
+  - PAIR-08
+  - PAIR-09
+  - PAIR-10
+  - PAIR-11
+  - PAIR-12
+  - PAIR-13
+  - PAIR-14
+  - PAIR-15
+  - PAIR-16
+  - PAIR-17
+  - PAIR-18
 acceptance_contract: tickets/CI-FPL-REPLAY-001/ACCEPTANCE.md
 
 stop_conditions:

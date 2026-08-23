@@ -427,9 +427,23 @@ def _resume_boundary(
     rows: list[dict[str, object]],
 ) -> _Disposable:
     engine = _Disposable()
+
+    def verified_pair(
+        _self: FplIngestionService,
+        _session: object,
+        _snapshot_id: UUID,
+    ) -> tuple[str, dict[str, object], dict[str, dict[str, object]]]:
+        pair_key = context.get("pair_key")
+        if not isinstance(pair_key, str):
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair context is unavailable")
+        by_resource = {str(row["resource"]): row for row in rows}
+        if len(rows) != 2 or set(by_resource) != {"bootstrap", "fixtures"}:
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair is incomplete")
+        return pair_key, dict(context), by_resource
+
     monkeypatch.setattr(service_module, "_engine", lambda _reference: engine)
     monkeypatch.setattr(service_module, "session_factory", lambda _engine: _ResumeFactory(rows))
-    monkeypatch.setattr(service_module, "received_context", lambda _session, _snapshot: context)
+    monkeypatch.setattr(FplIngestionService, "_verified_resume_pair", verified_pair)
     return engine
 
 
@@ -486,6 +500,7 @@ def test_resume_rejects_fixture_bytes_that_changed_after_receive(
         "bootstrap_path": "fixtures/fpl/FPL-004/happy_path/bootstrap.json",
         "captured_at": "2026-08-21T17:00:00Z",
         "fixtures_path": "fixtures/fpl/FPL-004/happy_path/fixtures.json",
+        "operation_time_policy": "FROZEN_REPLAY_CAPTURED_AT_V1",
         "profile_id": "synthetic_test_v1",
         "profile_version": "1.0.0",
         "rights_config_sha256": service_module.rights_config_sha256(),
@@ -803,9 +818,9 @@ def test_resume_operation_time_policy_is_strict_and_fail_closed() -> None:
     synthetic = service_module._profile("synthetic_test_v1")
     official = service_module._profile("fpl_official_private_manual_v1")
 
-    assert FplIngestionService._resume_operation_time_policy({}, synthetic) == (
-        "PROCESSING_TIME_V1"
-    )
+    with pytest.raises(IngestionError, match="policy is unavailable") as missing:
+        FplIngestionService._resume_operation_time_policy({}, synthetic)
+    assert missing.value.code == "LIFECYCLE_INVARIANT"
     assert (
         FplIngestionService._resume_operation_time_policy(
             {"operation_time_policy": "FROZEN_REPLAY_CAPTURED_AT_V1"},

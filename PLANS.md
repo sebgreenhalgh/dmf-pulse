@@ -23,6 +23,21 @@
 - [ ] Seal final evidence, commit/push the remediation branch, and hand off for independent review;
   do not merge or modify PR #16.
 
+### A-FPL-001 pair-context integrity remediation
+
+- Independent review classified counterpart-context verification on resume as material P2
+  `A-FPL-001`: the initiating context was hash-checked, but its paired context was not.
+- Preserve evidence-only continuation `244feb0709294c3a544e399c7890177120dd1020`; supersede its
+  pre-review clean self-assessment without rewriting history.
+- [x] Reproduce counterpart corruption on PostgreSQL 18.4 while proving and restoring the
+  immutable processing-event guard.
+- [x] Anchor resume identity through `ingestion_run.logical_run_key`, load and independently hash
+  both stored contexts under the pair lock, compare complete common material, and verify roles.
+- [ ] Pass PAIR-01 through PAIR-18, TIME-01 through TIME-18, PostgreSQL, migration, vertical,
+  static, repository, and security gates without changing replay or live-time semantics.
+- [ ] Reseal truthful remediation evidence, fast-forward the existing Layer-A branch, inspect its
+  automatic CI once, and stop for independent re-review before rebuilding downstream layers.
+
 ## CHIP-014 Stage-14 chip optimisation
 
 - Ticket/stage: `CHIP-014`, DMFP-19 Stage 14; immutable original parent
