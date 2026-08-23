@@ -15,8 +15,7 @@ Status: `RESEALED_PENDING_INDEPENDENT_LINEAGE_CONFIRMATION`.
 
 - Corrected parent: `d41be2df28e7a74b67563056adea4ccc963ac04c`.
 - Rebuild branch: `rebuild/post-A-FPL-001-correctness-stack`.
-- Rebuilt head: the direct-child commit containing this record; its exact SHA is recorded in the
-  Layer-C/final stack evidence because a commit cannot contain its own object ID.
+- Rebuilt head: `af78cedc65bd043343825facae947b8aed5340a4`.
 - Rebuilt executable blob: `ed97b7944a24eb1c7440f5a3f31cf524f38a7157`.
 - Rebuilt stable patch ID: `2e77cb8598a54ffaf138ab2bc669227f35e81398`.
 - Blob identity: `IDENTICAL`.

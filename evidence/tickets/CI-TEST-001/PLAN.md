@@ -32,7 +32,7 @@ Engineering target:
 
 - [x] Verify corrected Layer A does not change the executable base file.
 - [x] Reapply the reviewed patch with exact blob and stable patch identity.
-- [ ] Seal the direct-child Layer-B commit and record its exact SHA in the final stack evidence.
+- [x] Seal direct-child Layer B as `af78cedc65bd043343825facae947b8aed5340a4`.
 - [ ] Independent lineage confirmation remains separate.
 
 No product, workflow, configuration, migration, dependency, CI-GOV, CI-FPL, LIVE-ODDS, PR #16,

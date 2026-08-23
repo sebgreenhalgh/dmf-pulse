@@ -21,8 +21,8 @@
   "artifacts": [
     {
       "path": "evidence/tickets/CI-TEST-001/COMMAND_LEDGER.txt",
-      "sha256": "14327a25d5e03a9025b69b4220648f0b132e3701c50913093483b002ce833a86",
-      "bytes": 1647
+      "sha256": "899968458193a47f4a1ffde1790707f6d2525c2afd14ceac7b6176a6b1a4e881",
+      "bytes": 2076
     },
     {
       "path": "evidence/tickets/CI-TEST-001/FINAL_SELF_REVIEW.md",
@@ -41,13 +41,13 @@
     },
     {
       "path": "evidence/tickets/CI-TEST-001/LINEAGE_RESEAL.md",
-      "sha256": "6c1b79d640d9180e2d1dab795aca3fe44cabcb9745ca44dd808a347d9fa6fb19",
-      "bytes": 1414
+      "sha256": "66fef88de969141dc36ed3b38218be4e3d90e6a343d90a8fd9157eaefd7c90a6",
+      "bytes": 1295
     },
     {
       "path": "evidence/tickets/CI-TEST-001/PLAN.md",
-      "sha256": "e6afbc39fbd6ecc32cbfa0ab5d4d6f8e1e4ebe94d8840dc495f8102aa5a4b0d4",
-      "bytes": 1842
+      "sha256": "3543ee0785e6b58d60b38e3083f64b901f259bb55f5c804a7752913f92019cd1",
+      "bytes": 1824
     },
     {
       "path": "evidence/tickets/CI-TEST-001/ROOT_CAUSE.md",
@@ -61,8 +61,8 @@
     },
     {
       "path": "evidence/tickets/CI-TEST-001/result.json",
-      "sha256": "af840d8c64fd5ce93b179dcd4a575c871203a10ca8f44ddfd641317c536adc04",
-      "bytes": 1282
+      "sha256": "d50d56f3a15878da05cdfb2a2aeada6b4780d0602883dd6c480e3897660ae0f5",
+      "bytes": 1285
     }
   ],
   "known_limitations": [

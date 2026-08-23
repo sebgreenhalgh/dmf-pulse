@@ -18,10 +18,11 @@
 - [x] Verify pinned Git/PR identities, expected divergence, clean worktrees, unchanged executable
   bases, and immutable reviewed blob/patch IDs.
 - [x] Reconstruct the exact CI-TEST-001 executable patch on corrected Layer A.
-- [ ] Seal direct-child Layer B and record its exact commit.
-- [ ] Reconstruct and seal exact CI-TEST-002 as direct-child Layer C.
-- [ ] Pass targeted/FPL/PostgreSQL/static/security/manifest gates and optional non-performance
-  suite without changing product or CI architecture.
+- [x] Seal direct-child Layer B as `af78cedc65bd043343825facae947b8aed5340a4`.
+- [x] Reconstruct the exact CI-TEST-002 executable patch as the pending direct-child Layer C.
+- [x] Pass targeted/FPL/PostgreSQL/static/security/manifest gates; the optional non-performance
+  suite passed 3090 executable/other tests, exposed only expected pre-seal manifest drift, and its
+  exact manifest test passed after canonical refresh.
 - [ ] Push the final stack once, inspect the automatic CI run once, and stop for independent
   lineage confirmation.
 
