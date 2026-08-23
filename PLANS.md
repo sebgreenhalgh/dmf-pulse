@@ -1,5 +1,33 @@
 # DMF Pulse execution plans
 
+## CI-COVERAGE-SHARD-001 reliable sharded branch coverage
+
+- Parent/branch: independently confirmed correctness-stack head
+  `740e70f0ee836a8fab162c56e8345033a06d926b` on
+  `remediation/CI-COVERAGE-SHARD-001-sharded-coverage`.
+- Classification: CI execution-architecture remediation for the inherited 35-minute monolithic
+  coverage blocker; the complete product/test semantics and every downstream gate remain
+  mandatory.
+- Scope: deterministic pytest-derived shard planning, eight isolated PostgreSQL-backed coverage
+  jobs, fail-closed artifact verification and coverage combination, post-coverage acceptance,
+  stable final status sentinel, focused CI-contract tests, and truthful ticket evidence.
+- Safety: no product, migration, runtime configuration, fixture, dependency, target-season rule,
+  LIVE-ODDS, PR #16, timeout-increase, retry, coverage-threshold, or test-selection change.
+
+### CI-COVERAGE-SHARD-001 checkpoints
+
+- [x] Verify the exact parent, lineage, remote invariants, clean worktree, controlling authority,
+  and 3,091-test parent non-performance collection.
+- [ ] Add the ticket contracts and RED planner/workflow-contract tests.
+- [ ] Implement a deterministic module-grouped weighted partition, canonical plan manifest,
+  shard metadata, strict artifact verification, and branch-data proof.
+- [ ] Refactor CI into pre-flight, eight mandatory shards, combined coverage, post-coverage
+  acceptance, and the fail-closed `Python 3.13 / Ubuntu` sentinel.
+- [ ] Pass partition, focused interaction, static, build, repository, secret, scope, and available
+  combined-coverage acceptance; seal truthful pre-push evidence and manifests.
+- [ ] Commit a small linear history, push the final branch once, inspect the automatic final-SHA
+  Actions run, and stop for independent review without merging or modifying LIVE-ODDS.
+
 ## Downstream correctness stack lineage rebuild
 
 - Corrected Layer-A parent: `d41be2df28e7a74b67563056adea4ccc963ac04c` on the immutable
