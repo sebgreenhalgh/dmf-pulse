@@ -1,0 +1,46 @@
+{
+  "ticket_id": "CI-TEST-002",
+  "status": "TEST_FIX_READY_PENDING_INDEPENDENT_REVIEW_WITH_KNOWN_EXTERNAL_CI_ARCHITECTURE_BLOCKER",
+  "classification": "TEST_OBSERVATION_DEFECT",
+  "architectural_main": "baed47bce7a158d91afe38351a2c65be60444adf",
+  "stacked_parent": "d550250836c9c39e6caebaa5f12ad94fec7e2b02",
+  "diagnostic_commit_excluded": "6fdcad8153897e7485ac48fcc6409008a24e8274",
+  "branch": "remediation/CI-TEST-002-evaluation-cli-ansi-contract",
+  "ansi_normalizer": "rich.text.Text.from_ansi(result.output).plain",
+  "click_available_in_frozen_environment": false,
+  "product_source_changed": false,
+  "cli_behavior_changed": false,
+  "rich_rendering_changed": false,
+  "workflow_changed": false,
+  "dependencies_changed": false,
+  "scope_validation": "PASS",
+  "repository_validation": "PASS_0_ERRORS_READ_ONLY_ENTRYPOINT",
+  "secret_scan": "PASS_0_FINDINGS",
+  "environment_matrix": {
+    "baseline": "PASS",
+    "ci_only": "PASS",
+    "github_actions_only": "PASS",
+    "ci_and_github_actions": "PASS"
+  },
+  "semantic_contract": {
+    "exit_code": 2,
+    "normalized_message": "--output must be json",
+    "all_six_commands": "PASS",
+    "raw_ansi_retained": true
+  },
+  "cross_platform_acceptance": {
+    "windows_python": "3.13.9",
+    "windows_target": "PASS",
+    "windows_module": "PASS",
+    "windows_coverage_module": "PASS",
+    "linux_distribution": "Debian GNU/Linux bookworm",
+    "linux_python": "3.13.15",
+    "linux_target": "PASS",
+    "linux_module": "PASS"
+  },
+  "automatic_ci": "PENDING_PUSH_AT_LOCAL_EVIDENCE_SEAL",
+  "ci_runtime_architecture": "UNRESOLVED_AND_UNCHANGED",
+  "independent_review": "PENDING",
+  "human_acceptance": "NOT_CLAIMED",
+  "merged": false
+}

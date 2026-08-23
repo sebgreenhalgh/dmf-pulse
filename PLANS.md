@@ -979,6 +979,26 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   unmerged PR to `main`.
 - [ ] Human acceptance, merge and accepted tag.
 
+# CI-TEST-002 ANSI-normalized evaluation CLI contract
+
+- Ticket: `CI-TEST-002`; exact engineering parent
+  `d550250836c9c39e6caebaa5f12ad94fec7e2b02` from CI-TEST-001.
+- Branch: `remediation/CI-TEST-002-evaluation-cli-ansi-contract`.
+- Scope: normalize ANSI terminal styling only at the evaluation CLI test assertion boundary;
+  preserve Rich rendering, CLI behavior, all six commands, workflow, timeout and dependencies.
+- Known external blocker: the monolithic coverage workflow remains runtime constrained.
+
+## CI-TEST-002 checkpoints
+
+- [x] Verify immutable refs, PR #16, exact parent, separate diagnostic branch and clean baseline.
+- [x] Reproduce the `GITHUB_ACTIONS=true` ANSI segmentation and confirm exit code 2.
+- [x] Add the minimal public Rich ANSI normalization at the existing semantic assertion.
+- [x] Pass the four-state Windows matrix and targeted module coverage.
+- [x] Pass target and module on Linux CPython 3.13 with `GITHUB_ACTIONS=true`.
+- [x] Pass static/security, repository, manifest and exact-scope gates.
+- [ ] Seal manifests/evidence, commit, push normally and observe the automatic Ubuntu run.
+- [ ] Independent review, human acceptance and merge remain separate.
+
 # RANK-015 Stage-15 rank-aware strategy
 
 - Ticket/stage: `RANK-015`, DMFP-19 Stage 15; immutable parent

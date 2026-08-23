@@ -1,0 +1,68 @@
+{
+  "ticket_id": "CI-TEST-002",
+  "status": "DRAFT",
+  "created_at": "2026-08-23T16:50:33Z",
+  "code_commit": null,
+  "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+  "commands": [
+    {
+      "command": "Windows four-state target matrix, whole module, and targeted coverage",
+      "result": "PASS"
+    },
+    {
+      "command": "Debian Linux CPython 3.13.15 target and module with GITHUB_ACTIONS=true",
+      "result": "PASS"
+    },
+    {
+      "command": "diff, format, lint, typing, repository, secret, manifest, and scope validation",
+      "result": "PASS"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/tickets/CI-TEST-002/COMMAND_LEDGER.txt",
+      "sha256": "cbaf5cef26da03bc3f80fd009505f777e46a8d361524837e329378fad9c2d122",
+      "bytes": 2837
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/FINAL_SELF_REVIEW.md",
+      "sha256": "433a31da179ebdd38530428c367100b9a0624ee5b08e76cf119095f29c8f9f81",
+      "bytes": 1319
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/IMPLEMENTATION_RESULT.md",
+      "sha256": "2751f7edd8149b581e835198901e5ebe2bbae4bcdabe074d476cfcddb2af1a81",
+      "bytes": 2365
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/KNOWN_LIMITATIONS.md",
+      "sha256": "04819193c5a1aa3c39673dd84740daeef3b503e85ace35ec8850f45e5d2b356a",
+      "bytes": 837
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/PLAN.md",
+      "sha256": "ad7075f6798301f27691937c22305945103e1e63ec8fa4d1aaa92918179c9c96",
+      "bytes": 1185
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/ROOT_CAUSE.md",
+      "sha256": "0d038699b7c741332eaab92f847ae4577efa2212d7c8634477c56b8bd50b6633",
+      "bytes": 1407
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/current_manifest.json",
+      "sha256": "533796079408bb552b4ab023b2ec89dfdd8e3914ae824fd65bda538cb71a9c7a",
+      "bytes": 205809
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/result.json",
+      "sha256": "848faaf170f8a5d6079705da41473c0584c982474d807ba1ed11c7711087c737",
+      "bytes": 1700
+    }
+  ],
+  "known_limitations": [
+    "The monolithic full coverage runtime architecture remains unresolved and unchanged.",
+    "Click is absent from the frozen environment; existing Rich 15 provides the public ANSI normalizer.",
+    "Automatic branch CI and independent review occur after this local evidence snapshot."
+  ]
+}

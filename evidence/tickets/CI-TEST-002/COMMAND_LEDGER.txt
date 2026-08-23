@@ -1,0 +1,58 @@
+CI-TEST-002 COMMAND LEDGER
+Date: 2026-08-23
+
+PREFLIGHT
+PASS | git fetch origin
+PASS | origin/main == baed47bce7a158d91afe38351a2c65be60444adf
+PASS | origin/remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time == 652bae84fba9bdfbf435367d6140270fa8378d57
+PASS | origin/remediation/CI-TEST-001-cross-platform-canonical-fixture == d550250836c9c39e6caebaa5f12ad94fec7e2b02
+PASS | origin/diagnostic/CI-DIAG-02-ubuntu-evaluation-cli == 6fdcad8153897e7485ac48fcc6409008a24e8274
+PASS | PR #16 OPEN, unmerged, head == 5e55cf3361a1abff4b2e32dcc30fe42900ea2e16
+PASS | engineering branch created from exact d550250 parent; no diagnostic cherry-pick
+
+ENVIRONMENT AND API
+PASS | uv sync --all-groups --frozen
+       Windows CPython 3.13.9; 40 frozen packages
+PASS | from click import unstyle availability check
+       expected discovery: Click is absent; no dependency was added
+PASS | rich.text.Text.from_ansi public API probe
+       styled option normalizes to --output must be json
+
+WINDOWS TARGET MATRIX
+PASS | baseline target; 1 passed in 3.75s
+PASS | CI=true target; 1 passed in 3.70s
+PASS | GITHUB_ACTIONS=true target; 1 passed in 3.65s
+PASS | CI=true + GITHUB_ACTIONS=true target; 1 passed in 3.75s
+PASS | bounded build-folds styled probe
+       exit_code=2; raw literal=false; normalized literal=true; ANSI retained
+
+WINDOWS MODULE AND COVERAGE
+PASS | baseline module; 6 passed in 5.29s
+PASS | GITHUB_ACTIONS=true module; 6 passed in 5.28s
+PASS | GITHUB_ACTIONS=true targeted coverage module; 6 passed in 19.84s
+       --cov-fail-under=0 applied only to this targeted invocation
+
+LINUX CROSS-PLATFORM
+PASS | disposable Debian bookworm CPython 3.13.15; frozen sync; read-only worktree
+PASS | GITHUB_ACTIONS=true target; 1 passed in 8.13s
+PASS | GITHUB_ACTIONS=true module; 6 passed in 7.48s
+
+STATIC CHECKPOINT
+PASS | git diff --check
+PASS | uv run ruff format --check .; 636 files already formatted
+PASS | uv run ruff check .; all checks passed
+PASS | uv run mypy src/dmf_pulse; 245 files clean
+PASS | uv run python scripts/generate_repository_manifest.py --ticket CI-TEST-002
+       wrote 1133 files to evidence/tickets/CI-TEST-002/current_manifest.json
+PASS | uv run python scripts/generate_repository_manifest.py --ticket PRC-013
+       wrote 1133 files to the sole authorized cross-ticket path
+PASS | read-only validate_repository(Path.cwd()); 0 errors
+       literal wrapper omitted because it writes unauthorized GCS-008 evidence
+PASS | uv run python scripts/scan_secrets.py; 0 findings
+PASS | uv run dmf evidence validate --ticket CI-TEST-002; DRAFT; 8 artifacts
+PASS | exact parent delta confinement
+       src, workflows, config, migrations, pyproject.toml and uv.lock are empty
+PASS | diagnostic observer markers absent
+
+PENDING AT THIS LEDGER SNAPSHOT
+- commit, normal push, remote equality and automatic GitHub CI observation
