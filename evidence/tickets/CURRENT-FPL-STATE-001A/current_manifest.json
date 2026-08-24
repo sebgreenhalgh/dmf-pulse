@@ -5201,9 +5201,9 @@
       "sha256": "4edf772b5f7f2d78692195bda94146382513efff7af6091f2ef2be4f0197bb4e"
     },
     {
-      "bytes": 32939,
+      "bytes": 33036,
       "path": "tests/unit/ingestion/test_fpl_current_input.py",
-      "sha256": "17591a792c084045ab5450b6a6742f43da1c51151ea78194aaf44899cf8ed272"
+      "sha256": "36f864a1dadb28923273ad18b38aec7dfe9642cd23ace5b37db6b941daab3ca2"
     },
     {
       "bytes": 13632,

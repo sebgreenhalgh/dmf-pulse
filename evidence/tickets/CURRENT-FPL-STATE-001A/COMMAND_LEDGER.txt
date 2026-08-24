@@ -105,3 +105,10 @@ Findings: CFSA-REV-001 (material P2), CFSA-REV-002 (material P2)
     terminal status, so the identical command was rerun directly and completed successfully.
 34. Exact-final-SHA automatic CI
     PENDING_EXTERNAL_AFTER_FINAL_PUSH; no post-CI evidence commit is permitted.
+35. First remediation push CI
+    FAIL/CORRECTED BEFORE FINAL SHA: commit e8db7416e92d213d1f2d034e49e3e91b642898ac triggered
+    run 32769116096. Pre-flight passed, but shard 7 reported 1 failed and 724 passed because the new
+    post-open regression monkeypatched Python's shared `os.lstat` and asserted exactly two total
+    process calls; Linux coverage/pytest made 47 unrelated calls. The security rejection itself
+    succeeded. The interposition was narrowed to count/substitute only the target bootstrap path;
+    product code was unchanged. A new exact-final-SHA automatic run is mandatory.

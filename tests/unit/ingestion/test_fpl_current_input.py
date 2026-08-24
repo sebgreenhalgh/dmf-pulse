@@ -849,8 +849,10 @@ def test_post_open_path_identity_mismatch_is_rejected(
 
     def substituted_lstat(path: str | bytes | os.PathLike[str]) -> os.stat_result:
         nonlocal calls
-        calls += 1
-        return real_lstat(path if calls == 1 else attacker)
+        if os.fspath(path) == os.fspath(bootstrap):
+            calls += 1
+            return real_lstat(bootstrap if calls == 1 else attacker)
+        return real_lstat(path)
 
     monkeypatch.setattr(current_module.os, "lstat", substituted_lstat)
 
