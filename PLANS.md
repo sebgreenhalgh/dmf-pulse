@@ -25,8 +25,13 @@
   acceptance, and the fail-closed `Python 3.13 / Ubuntu` sentinel.
 - [x] Pass partition, focused interaction, static, build, repository, secret, scope, and available
   combined-coverage acceptance; seal truthful pre-push evidence and manifests.
-- [ ] Commit a small linear history, push the final branch once, inspect the automatic final-SHA
-  Actions run, and stop for independent review without merging or modifying LIVE-ODDS.
+- [x] Classify automatic run `32676529440`: six shards passed; two exposed eleven inherited
+  ANSI-sensitive CLI assertions; combined/post skipped and the stable sentinel failed closed.
+- [ ] Apply the accepted CI-TEST-002 ANSI-normalization pattern only to those two assertion sites,
+  reseal the active manifests/evidence, and validate the corrected final SHA without masking color.
+- [ ] Commit the corrective scope, reseal evidence, publish the corrected SHA without force-push,
+  inspect its automatic Actions run, and stop for independent review without merging or modifying
+  LIVE-ODDS.
 
 ## Downstream correctness stack lineage rebuild
 

@@ -15,6 +15,10 @@ increase, LIVE-ODDS modification, PR #16 modification, merge, or human acceptanc
    `uv.lock` remain byte-identical to the parent.
 4. LIVE-ODDS head `5e55cf3361a1abff4b2e32dcc30fe42900ea2e16` and PR #16 remain open,
    unmerged, and unchanged.
+5. The only permitted incidental correctness changes are ANSI normalization in the two existing
+   unsupported-output CLI assertions exposed by automatic run `32676529440`. The same commands,
+   exit-code expectations, and semantic message remain mandatory; disabling color in CI is not an
+   acceptable substitute.
 
 ## B. Exact deterministic partition
 
@@ -61,10 +65,14 @@ Before publication, helper/workflow tests, real collection partition audit, avai
 combination checks, focused CI/FPL regressions, diff, Ruff, mypy, build, wheel, read-only repository
 validation, secret scan, evidence validation, manifest validation, and scope confinement pass.
 
-The single push-triggered final-SHA run is decisive: pre-flight, every shard, combined coverage,
+If an automatic run exposes a genuine pre-existing test-observation defect, it is classified from
+raw logs before correction. A correction may normalize presentation only when it preserves the
+tested command, exit code, and semantic text and is recorded in the exact ticket allowlist.
+
+The corrected push-triggered final-SHA run is decisive: pre-flight, every shard, combined coverage,
 post-coverage acceptance, and the stable sentinel must succeed without timeout or cancellation.
 Shard runtimes and combined statement/branch metrics are reported externally; the branch is not
-modified after that run merely to record its ID.
+modified after a successful run merely to record its ID.
 
 ## F. Truthful completion
 

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+from rich.text import Text
 from typer.testing import CliRunner
 
 from dmf_pulse.cli.app import app
@@ -82,8 +83,9 @@ def test_every_rank_command_rejects_unsupported_output_format(
 ) -> None:
     result = runner.invoke(rank_app, list(arguments))
 
+    plain_output = Text.from_ansi(result.stdout + result.stderr).plain
     assert result.exit_code != 0
-    assert "--output must be json" in result.stdout + result.stderr
+    assert "--output must be json" in plain_output
 
 
 def test_validate_reports_installed_fail_closed_capability() -> None:

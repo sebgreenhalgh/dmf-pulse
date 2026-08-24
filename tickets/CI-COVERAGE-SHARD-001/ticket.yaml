@@ -22,6 +22,9 @@ root_cause_evidence:
   inherited_timeout_minutes: 35
   prior_excluded_timeout_experiment: 6723f121b2b3d2bc477d929e03eb4597eb86df7e
   classification: KNOWN_EXTERNAL_CI_ARCHITECTURE_BLOCKER
+  first_architecture_run: "32676529440"
+  first_architecture_run_result: FAIL_CLOSED_ON_11_PRE_EXISTING_ANSI_ASSERTIONS
+  incidental_failure_classification: TEST_OBSERVATION_DEFECT
 
 authority:
   scope: FND-001
@@ -43,6 +46,8 @@ allowed_areas:
   - scripts/validate_repository.py
   - tests/unit/scripts/test_ci_coverage_shards.py
   - tests/unit/scripts/test_ci_workflow_contract.py
+  - tests/unit/cli/test_rank_cli.py
+  - tests/unit/optimisation/test_multi_gameweek_cli_hardening.py
   - tickets/CI-COVERAGE-SHARD-001/**
   - evidence/tickets/CI-COVERAGE-SHARD-001/**
   - PLANS.md
@@ -55,6 +60,12 @@ conditional_area_rules:
   evidence/tickets/PRC-013/current_manifest.json: >-
     May change only when canonical repository validation requires the mutable active repository
     snapshot to be refreshed. No other PRC-013 file is authorized.
+  tests/unit/cli/test_rank_cli.py: >-
+    May change only to ANSI-normalize the existing unsupported-output semantic assertion exposed
+    by automatic run 32676529440; command coverage, exit-code checks, and wording remain unchanged.
+  tests/unit/optimisation/test_multi_gameweek_cli_hardening.py: >-
+    May change only to ANSI-normalize the existing unsupported-output semantic assertion exposed
+    by automatic run 32676529440; command coverage, exit-code checks, and wording remain unchanged.
 
 strict_exclusions:
   - src/**
@@ -88,12 +99,13 @@ required_controls:
   - unchanged_downstream_acceptance_commands
   - fail_closed_stable_python_3_13_ubuntu_sentinel
   - no_timeout_increase_retry_or_continue_on_error
+  - ansi_normalized_cli_assertions_preserve_semantic_text
 
 acceptance_contract: tickets/CI-COVERAGE-SHARD-001/ACCEPTANCE.md
 
 completion_evidence:
   path: evidence/tickets/CI-COVERAGE-SHARD-001/
   engineering_status: CI_ARCHITECTURE_REMEDIATED_PENDING_INDEPENDENT_REVIEW
-  automatic_final_sha_ci: externally_observable_after_single_push
+  automatic_final_sha_ci: externally_observable_after_corrective_push
   human_acceptance: separate_and_not_claimed
   merge: forbidden
