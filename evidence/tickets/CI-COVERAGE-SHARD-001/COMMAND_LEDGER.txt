@@ -1,0 +1,95 @@
+CI-COVERAGE-SHARD-001 COMMAND LEDGER
+Date: 2026-08-24
+
+BASELINE / IDENTITY
+PASS | git status --short at required parent
+       empty
+PASS | required parent
+       740e70f0ee836a8fab162c56e8345033a06d926b
+PASS | required branch
+       remediation/CI-COVERAGE-SHARD-001-sharded-coverage
+PASS | direct lineage
+       d41be2df28e7a74b67563056adea4ccc963ac04c ->
+       af78cedc65bd043343825facae947b8aed5340a4 ->
+       740e70f0ee836a8fab162c56e8345033a06d926b
+PASS | excluded timeout-only commit 6723f121b2b3d2bc477d929e03eb4597eb86df7e
+       not an ancestor
+PASS | parent collection: pytest -m "not performance" --collect-only
+       3,091 selected, 3 deselected
+
+PLANNER / WORKFLOW CONTRACT
+PASS | .venv/Scripts/python.exe -m pytest tests/unit/scripts/test_ci_coverage_shards.py
+       tests/unit/scripts/test_ci_workflow_contract.py -vv --tb=long
+       42 passed
+PASS | broader focused GCS/helper/workflow suite
+       80 passed
+PASS | read-only scripts.validate_repository._validate_ci_contract(Path.cwd(), errors)
+       0 errors
+PASS | independent adversarial review
+       0 remaining P0; 0 P1; 0 material P2; 0 P3
+
+REAL FINAL-TREE PARTITION AUDIT AT IMPLEMENTATION CHECKPOINT d70264d
+PASS | ci_coverage_shards.py plan --shard-count 8 --git-sha d70264d...
+       eligible nodeids: 3,133
+       parent eligible nodeids preserved: 3,091
+       additive ticket nodeids: 42
+       eligible/partition SHA-256:
+       e6bce2db465dd0ea34560336d3127d8fd2ce180c6250db3067cdaba4fa89199f
+       shard node counts: 4, 159, 373, 490, 486, 477, 451, 693
+       estimated weights: 1050, 961, 961, 961, 961, 961, 961, 961
+       duplicates: 0; omissions: 0; unexpected: 0; empty shards: 0
+PASS | eight independent pytest @argfile collection checks
+       every argfile recollected exactly its planned nodeids
+PASS | heaviest estimated shard 0 with real branch coverage
+       4 passed in 606.98s; 10m06.98s; below 25-minute target and 35-minute hard limit
+PASS | shard 0 materialization
+       coverage bytes: 335872; branch/arcs: true; measured files: 245
+       coverage SHA-256: 41ca0b00bc78d9a3d4e6335122e443585ca75a48dd285cfcca0c2b8452d39d96
+PASS | actual coverage.py synthetic artifact combination exercised by focused test
+       visible transport, exact artifact restoration, combine, and populated branch data passed
+
+FOCUSED REGRESSION / STATIC
+PASS | optimisation assurance + evaluation CLI + FPL service boundaries
+       69 passed in 62.71s
+PASS | git diff --check
+PASS | uv run ruff format --check .
+       640 files already formatted
+PASS | uv run ruff check .
+       all checks passed
+PASS | uv run mypy src/dmf_pulse
+       success: no issues found in 245 source files
+PASS | uv sync --all-groups --frozen
+       checked 40 packages
+
+BUILD / WHEEL / REPOSITORY / SECURITY
+PASS | installed uv executable build
+       built dist/dmf_pulse-0.2.0.tar.gz and dist/dmf_pulse-0.2.0-py3-none-any.whl
+PASS | scripts/verify_gcs008_wheel.py outside source tree
+       286 RECORD members verified; required resources present; golden result SHA-256 exact
+ENVIRONMENT_PREREQUISITE | scripts/verify_odd005_wheel.py
+       local host has no DMF_TEST_DATABASE_URL and Docker Desktop Linux engine is not running;
+       the verifier correctly refused to run without PostgreSQL. The unchanged automatic workflow
+       supplies PostgreSQL 18.4 and remains decisive for this inherited wheel gate.
+PASS | read-only validate_repository(Path.cwd())
+       0 errors; the mutating CLI wrapper was intentionally not used in the live worktree
+PASS | scripts/scan_secrets.py
+       0 findings
+PASS | dmf evidence validate --ticket CI-COVERAGE-SHARD-001
+PASS | canonical CI-COVERAGE-SHARD-001 and PRC-013 current manifests
+       zero missing, unrecorded, byte-mismatched, or hash-mismatched deliverables
+
+SCOPE
+PASS | git diff parent..ticket -- src alembic config fixtures pyproject.toml uv.lock
+       empty
+PASS | historical CI-FPL-REPLAY-001, CI-TEST-001, CI-TEST-002, and LIVE-ODDS ticket/evidence diffs
+       empty
+PASS | workflow timeout ceiling
+       no job exceeds 35 minutes
+PASS | retry, continue-on-error, allow-failure, and artifact overwrite scan
+       absent
+
+PUBLICATION BOUNDARY
+PENDING | automatic final-SHA GitHub Actions
+          Runtime proof for every PostgreSQL-backed shard, aggregate coverage, GCS gates,
+          downstream acceptance, and the stable sentinel is recorded externally after one push.
+NOT CLAIMED | independent acceptance, human acceptance, merge, production activation

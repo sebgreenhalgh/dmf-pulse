@@ -1,0 +1,67 @@
+{
+  "ticket_id": "CI-COVERAGE-SHARD-001",
+  "status": "IMPLEMENTED_PENDING_AUTOMATIC_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW",
+  "classification": "CI_COVERAGE_EXECUTION_ARCHITECTURE",
+  "required_parent": "740e70f0ee836a8fab162c56e8345033a06d926b",
+  "branch": "remediation/CI-COVERAGE-SHARD-001-sharded-coverage",
+  "implementation_checkpoint": "d70264db56e40ecdd2e45c6ac9204ace12d14336",
+  "architecture": {
+    "shard_count": 8,
+    "marker_expression": "not performance",
+    "source": "dmf_pulse",
+    "branch_coverage": true,
+    "per_shard_fail_under": 0,
+    "combined_fail_under": 90,
+    "stable_check_name": "Python 3.13 / Ubuntu",
+    "fail_closed_sentinel": true,
+    "maximum_timeout_minutes": 35
+  },
+  "partition_audit": {
+    "eligible_nodeids": 3133,
+    "parent_eligible_nodeids_preserved": 3091,
+    "additive_ticket_nodeids": 42,
+    "eligible_nodeid_sha256": "e6bce2db465dd0ea34560336d3127d8fd2ce180c6250db3067cdaba4fa89199f",
+    "shard_node_counts": [4, 159, 373, 490, 486, 477, 451, 693],
+    "estimated_weights": [1050, 961, 961, 961, 961, 961, 961, 961],
+    "duplicates": 0,
+    "omissions": 0,
+    "unexpected": 0,
+    "empty_shards": 0
+  },
+  "local_validation": {
+    "helper_and_workflow_tests": "PASS_42",
+    "broader_focused_matrix": "PASS_80",
+    "focused_inherited_regressions": "PASS_69",
+    "heaviest_estimated_shard": "PASS_4_IN_606.98_SECONDS",
+    "synthetic_coverage_transport_and_combine": "PASS",
+    "frozen_sync": "PASS",
+    "format": "PASS",
+    "lint": "PASS",
+    "mypy": "PASS_245_FILES",
+    "build": "PASS",
+    "gcs_installed_wheel": "PASS_286_RECORD_MEMBERS",
+    "odd_installed_wheel": "LOCAL_POSTGRESQL_PREREQUISITE_UNAVAILABLE_FINAL_CI_REQUIRED",
+    "repository_validation": "PASS_0_ERRORS",
+    "secret_scan": "PASS_0_FINDINGS",
+    "evidence_validation": "PASS",
+    "manifest_validation": "PASS"
+  },
+  "scope": {
+    "product_source_changed": false,
+    "migrations_changed": false,
+    "config_changed": false,
+    "fixtures_changed": false,
+    "dependencies_changed": false,
+    "live_odds_changed": false
+  },
+  "findings": {
+    "p0": 0,
+    "p1": 0,
+    "material_p2": 0,
+    "p3": 0
+  },
+  "automatic_final_sha_ci": "PENDING_EXTERNAL_AFTER_SINGLE_PUSH",
+  "independent_review": "PENDING",
+  "human_acceptance": "NOT_CLAIMED",
+  "merged": false
+}

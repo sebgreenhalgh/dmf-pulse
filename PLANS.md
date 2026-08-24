@@ -18,12 +18,12 @@
 
 - [x] Verify the exact parent, lineage, remote invariants, clean worktree, controlling authority,
   and 3,091-test parent non-performance collection.
-- [ ] Add the ticket contracts and RED planner/workflow-contract tests.
-- [ ] Implement a deterministic module-grouped weighted partition, canonical plan manifest,
+- [x] Add the ticket contracts and RED planner/workflow-contract tests.
+- [x] Implement a deterministic module-grouped weighted partition, canonical plan manifest,
   shard metadata, strict artifact verification, and branch-data proof.
-- [ ] Refactor CI into pre-flight, eight mandatory shards, combined coverage, post-coverage
+- [x] Refactor CI into pre-flight, eight mandatory shards, combined coverage, post-coverage
   acceptance, and the fail-closed `Python 3.13 / Ubuntu` sentinel.
-- [ ] Pass partition, focused interaction, static, build, repository, secret, scope, and available
+- [x] Pass partition, focused interaction, static, build, repository, secret, scope, and available
   combined-coverage acceptance; seal truthful pre-push evidence and manifests.
 - [ ] Commit a small linear history, push the final branch once, inspect the automatic final-SHA
   Actions run, and stop for independent review without merging or modifying LIVE-ODDS.

@@ -1,0 +1,72 @@
+{
+  "ticket_id": "CI-COVERAGE-SHARD-001",
+  "status": "DRAFT",
+  "created_at": "2026-08-24T00:13:08Z",
+  "code_commit": null,
+  "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+  "commands": [
+    {
+      "command": "Deterministic real-collection partition and focused helper/workflow contract tests",
+      "result": "PASS"
+    },
+    {
+      "command": "Available shard, branch-data transport/combine, inherited regression, static, build, and wheel checks",
+      "result": "PASS_WITH_LOCAL_POSTGRESQL_PREREQUISITE_DEFERRED_TO_FINAL_CI"
+    },
+    {
+      "command": "Read-only repository, secret, evidence, manifest, lineage, and scope validation",
+      "result": "PASS"
+    },
+    {
+      "command": "Automatic final-SHA GitHub Actions and independent review",
+      "result": "PENDING_EXTERNAL_AFTER_SINGLE_PUSH"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/COMMAND_LEDGER.txt",
+      "sha256": "7a753ce35d0e135277ad5fb9a69723e668c20fb21f79a66abd86acf549c2aaf9",
+      "bytes": 4493
+    },
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/FINAL_SELF_REVIEW.md",
+      "sha256": "65d354e39f2d5298994ce10b5dd373c676c5259da3aa17b1853b8dec87c81784",
+      "bytes": 2657
+    },
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/IMPLEMENTATION_RESULT.md",
+      "sha256": "3a03d867b0113601bdfd2a2c3cd7e0d8029d59b427e7c60e7c8991d2f47a100a",
+      "bytes": 3500
+    },
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/KNOWN_LIMITATIONS.md",
+      "sha256": "40ecd9e238803ee52194210bfff075fc7f49155a8d0807120485f0f529280bea",
+      "bytes": 1208
+    },
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/PLAN.md",
+      "sha256": "86e21ae824df1e9836a8f84c5f20bf7848f2227d4addaaaf98e384f91bed0385",
+      "bytes": 1903
+    },
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/ROOT_CAUSE.md",
+      "sha256": "36c45e361839a66493ac2f6c63f0a2a89bc95787f340283c533ac9eb3486fdf9",
+      "bytes": 1815
+    },
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/current_manifest.json",
+      "sha256": "8c14ca00182016ae7f0649c38b9ba9ec1c4d81f53defe6cf022b4a14eed6fea6",
+      "bytes": 206902
+    },
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/result.json",
+      "sha256": "61c66c38fc5b6fa660f4a3dcd0cfc3dd00888a283fa88a648fa007850b5fadc1",
+      "bytes": 2316
+    }
+  ],
+  "known_limitations": [
+    "Automatic final-SHA Actions identity, all eight GitHub-hosted Ubuntu shard runtimes, combined coverage metrics, PostgreSQL 18.4 acceptance, downstream state, and sentinel state remain externally observable after the single final push.",
+    "The local host lacks a running PostgreSQL service, so the PostgreSQL-dependent ODD installed-wheel verification remains for the unchanged final CI command.",
+    "Independent review, human acceptance, merge, production activation, and LIVE-ODDS integration remain separate and unclaimed."
+  ]
+}
