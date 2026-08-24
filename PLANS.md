@@ -1,5 +1,34 @@
 # DMF Pulse execution plans
 
+## CURRENT-FPL-STATE-001A manual transient current FPL state
+
+- Parent/branch: authoritative merged main `2bc2783adc37d0956962d7574f73cbb6af711e28`
+  on `integration/current-fpl/CURRENT-FPL-STATE-001A-manual-transient`.
+- Donor reference: `readiness/GW1-2026-27-live-input-initial-squad` file
+  `src/dmf_pulse/ingestion/fpl/current.py`; reconcile only this bounded capability.
+- Scope: operator-supplied bootstrap/fixtures files, strict existing parser reuse, immutable
+  transient current catalogue/fixture contracts, arbitrary positive current/next Gameweek,
+  safe-summary CLI, runbook, tests, and review evidence.
+- Safety: manual/private/transient only; no FPL network access, database, raw/derived storage,
+  cache, backup, manager state, FPL-to-Odds identity, downstream model port, PR, merge, or
+  human-acceptance claim.
+
+### CURRENT-FPL-STATE-001A checkpoints
+
+- [x] Fetch and verify exact pinned main, clean worktree, merge/tree lineage, current rights,
+  A4 authority, donor ref/blob, and current FPL parser/config/CLI conventions.
+- [x] Add the generalized immutable current-FPL request/bundle/summary contracts and compile
+  service with strict file, rights, identity, cross-resource, temporal, quality, and disclosure
+  gates.
+- [x] Add `dmf ingest fpl current validate`, the manual operator runbook, donor reconciliation,
+  ticket/evidence contracts, and comprehensive positive/fail-closed/security tests.
+- [x] Pass focused branch coverage and inherited FPL regressions; adversarially close all P0,
+  P1, and material P2 findings.
+- [x] Pass frozen sync, diff, Ruff, mypy, build, wheel, repository, secret, and required canonical
+  validation; refresh only the mutable PRC-013 active manifest if canonical tooling requires it.
+- [ ] Commit and push the final branch SHA, inspect the complete automatic GitHub Actions run,
+  and stop for independent review without a post-CI evidence commit.
+
 ## CI-COVERAGE-SHARD-001 independent-review remediation
 
 - Reviewed head/branch: `b8ce5de612d835bee6721898cd57e46c133f90dd` on

@@ -1,0 +1,51 @@
+ticket_id: CURRENT-FPL-STATE-001A
+title: Manual transient current official-FPL catalogue and fixture state
+status: ACTIVE
+required_base_commit: 2bc2783adc37d0956962d7574f73cbb6af711e28
+expected_branch: integration/current-fpl/CURRENT-FPL-STATE-001A-manual-transient
+donor_ref: readiness/GW1-2026-27-live-input-initial-squad
+donor_file: src/dmf_pulse/ingestion/fpl/current.py
+donor_blob_sha: 59bb878ef30158c02a8b9e9ab700e4b57fc003fc
+objective: >-
+  Reconcile the reviewed historical current-FPL compiler onto authoritative current main as a
+  governed, typed, network-free, database-free, storage-free transient compiler for manually
+  supplied official bootstrap and fixtures payloads, generalized beyond Gameweek 1.
+authority_scopes:
+  - A4-FPL-ingestion
+permissions:
+  official_fpl_network: forbidden
+  database_access: forbidden
+  raw_or_derived_storage: forbidden
+  cache_or_backup: forbidden
+  new_runtime_dependency: forbidden
+  migration: forbidden
+allowed_areas:
+  - src/dmf_pulse/ingestion/fpl/current.py
+  - src/dmf_pulse/ingestion/fpl/__init__.py
+  - src/dmf_pulse/cli/ingest_cmd.py
+  - tests/unit/ingestion/test_fpl_current_input.py
+  - tests/unit/cli/test_fpl_current_input.py
+  - docs/operations/fpl_current_input.md
+  - tickets/CURRENT-FPL-STATE-001A/**
+  - evidence/tickets/CURRENT-FPL-STATE-001A/**
+  - evidence/tickets/PRC-013/current_manifest.json
+  - PLANS.md
+exclusions:
+  - automated or authenticated FPL retrieval
+  - existing FPL client, parser, persistence, or service redesign
+  - database or filesystem persistence of source or derived current state
+  - manager-owned state
+  - FPL-to-Odds identity
+  - availability, market, event, points, optimisation, or orchestration ports
+  - pull request, merge, tag, activation, or human acceptance
+required_public_behavior:
+  - manually supplied distinct bounded regular files with symlinks rejected
+  - existing parse_fpl_payload contract reused for bootstrap and fixtures
+  - explicit PL and 2026/27 target-season declaration
+  - any positive target Gameweek allowed only when exactly current or next in official data
+  - immutable season-scoped player, team, event, and fixture identities
+  - fail-closed rights, cross-resource, temporal, cutoff, and schema validation
+  - safe-summary-only CLI with no player names, news, paths, or payload fragments
+  - no transport, database, raw storage, derived storage, cache, or backup
+  - truthful operator deletion requirement on success and failure
+acceptance_status: CURRENT_FPL_STATE_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW
