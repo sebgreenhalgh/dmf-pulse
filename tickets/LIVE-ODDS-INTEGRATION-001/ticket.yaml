@@ -1,0 +1,109 @@
+ticket_id: LIVE-ODDS-INTEGRATION-001
+stage: repository-governance
+title: Integrate human-accepted live odds on repaired main
+status: INTEGRATION_CANDIDATE_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW
+owner: Sebastian Greenhalgh
+implementer_role: codex_implementation
+reviewer_role: independent_integration_review_and_human
+classification: EXACT_TWO_PARENT_GOVERNANCE_RECONCILIATION
+
+first_parent: fceca02d21ec7031e36518c46724c6a6d3d6c72e
+second_parent: 5e55cf3361a1abff4b2e32dcc30fe42900ea2e16
+common_merge_base: baed47bce7a158d91afe38351a2c65be60444adf
+expected_branch: integration/post-ci/LIVE-ODDS-001-on-repaired-main
+
+objective: >-
+  Preserve the exact human-accepted LIVE-ODDS capability as the explicit second parent of one
+  merge commit on repaired main, reconcile only the two reviewed governance conflicts, and prove
+  that every protected executable blob from both parents remains exact.
+
+authority:
+  scope: integration-reconciliation
+  manifest: specs/manifests/authority_manifest.json
+  context_sha256: b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac
+  reconciliation_review_verdict: LIVE_ODDS_RECONCILIABLE_WITH_REPAIRED_MAIN
+  reconciliation_review_findings:
+    p0: 0
+    p1: 0
+    material_p2: 0
+    p3: 0
+
+capability_acceptance:
+  ticket: LIVE-ODDS-001
+  accepted_commit: 5e55cf3361a1abff4b2e32dcc30fe42900ea2e16
+  status: HUMAN_ACCEPTED_AT_PINNED_SOURCE_ONLY
+  preservation_rule: immutable_source_and_evidence
+
+integration_acceptance:
+  engineering: pending_final_sha_ci
+  independent_review: pending
+  human_acceptance: pending
+  merged_to_main: false
+  production_active: false
+
+reviewed_conflicts:
+  - PLANS.md
+  - evidence/tickets/PRC-013/current_manifest.json
+executable_conflicts: 0
+
+allowed_areas:
+  - PLANS.md
+  - tickets/LIVE-ODDS-INTEGRATION-001/**
+  - evidence/tickets/LIVE-ODDS-INTEGRATION-001/**
+  - evidence/tickets/PRC-013/current_manifest.json
+
+conditional_area_rules:
+  PLANS.md: >-
+    Preserve the repaired-main programme block first, the accepted LIVE-ODDS production block
+    second, the shared history, and the accepted LIVE-ODDS independent-review tail without
+    rewriting status or prose.
+  evidence/tickets/PRC-013/current_manifest.json: >-
+    Regenerate only through scripts/generate_repository_manifest.py after the complete combined
+    tree and integration ticket exist; manual hash splicing and historical resealing are forbidden.
+
+strict_exclusions:
+  - src/**
+  - config/**
+  - existing tests/**
+  - scripts/**
+  - .github/**
+  - tickets/LIVE-ODDS-001/**
+  - evidence/tickets/LIVE-ODDS-001/**
+  - tickets/CI-FPL-REPLAY-001/**
+  - evidence/tickets/CI-FPL-REPLAY-001/**
+  - tickets/CI-TEST-001/**
+  - evidence/tickets/CI-TEST-001/**
+  - tickets/CI-TEST-002/**
+  - evidence/tickets/CI-TEST-002/**
+  - tickets/CI-COVERAGE-SHARD-001/**
+  - evidence/tickets/CI-COVERAGE-SHARD-001/**
+  - accepted LIVE-ODDS branch mutation
+  - PR 16 mutation
+  - replacement pull request creation
+  - merge to main
+  - human acceptance
+  - production activation
+
+required_controls:
+  - exact_first_parent
+  - exact_accepted_second_parent
+  - exactly_two_merge_parents
+  - exact_reviewed_two_path_conflict_set
+  - zero_executable_conflicts
+  - twenty_of_twenty_live_odds_blob_identity
+  - sixteen_of_sixteen_repaired_main_blob_identity
+  - canonical_prc013_active_manifest_regeneration
+  - historical_evidence_immutability
+  - postgresql_18_4_focused_validation
+  - deterministic_eight_shard_final_sha_ci
+  - separate_independent_and_human_integration_acceptance
+
+acceptance_contract: tickets/LIVE-ODDS-INTEGRATION-001/ACCEPTANCE.md
+
+completion_evidence:
+  path: evidence/tickets/LIVE-ODDS-INTEGRATION-001/
+  integration_merge_commit: produced_by_this_ticket
+  automatic_final_sha_ci: externally_observable_after_single_commit_push
+  independent_review: pending
+  human_acceptance: pending
+  merge_to_main: forbidden

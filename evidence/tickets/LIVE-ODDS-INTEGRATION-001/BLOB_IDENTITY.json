@@ -1,0 +1,53 @@
+{
+  "ticket_id": "LIVE-ODDS-INTEGRATION-001",
+  "first_parent": "fceca02d21ec7031e36518c46724c6a6d3d6c72e",
+  "second_parent": "5e55cf3361a1abff4b2e32dcc30fe42900ea2e16",
+  "live_odds": {
+    "expected": 20,
+    "mismatches": 0,
+    "blobs": {
+      "config/providers/the_odds_api.json": "d68ec067676ef1448d842d248670389f2b6ffe4a",
+      "src/dmf_pulse/assurance/secret_scan.py": "72cd4f90df88788982afb3c91711c4fe9ed89906",
+      "src/dmf_pulse/ingestion/odds/__init__.py": "d88242ffa0d81f46ccb69321b62ec91daf00be87",
+      "src/dmf_pulse/ingestion/odds/client.py": "cd895eb2194f3160a991a21e56bfdda774123670",
+      "src/dmf_pulse/ingestion/odds/config.py": "7ae24788ba37b71d7947745fba40de633304ddf0",
+      "src/dmf_pulse/ingestion/odds/credentials.py": "47a36d6ff497a51bdc0ef49a987fb3e5567bbefc",
+      "src/dmf_pulse/ingestion/odds/current.py": "92fa84f022b1e6663a7adc28837e6c88fdf49b41",
+      "src/dmf_pulse/ingestion/odds/parser.py": "ec01cbc8ad0ca590b8af1d1c575050a4ed43e612",
+      "src/dmf_pulse/ingestion/odds/service.py": "8296ca96a376c3ad5cb9000e534b68bab5c86ec3",
+      "tests/integration/ingestion/odds/test_the_odds_api_recorded_ingestion.py": "94af7b6549e43c1759ff83b1aa9a7b00b55014a8",
+      "tests/security/test_live_odds_001_traceback_security.py": "08e2a80202c69c4b35f4d7147a531e242de8bee7",
+      "tests/security/test_odds_429_retry_policy.py": "89a4cb0bcbc2c23895f71082a532ec82318df870",
+      "tests/security/test_odds_credentials_quota_retention.py": "2ff9c4a25962f206ece0b08004b07dc286b2f3d2",
+      "tests/unit/assurance/test_secret_scan.py": "e3b65d0d038469b9c15edea8d5b0a2b789336dc5",
+      "tests/unit/ingestion/test_live_odds_001_credentials.py": "dc3568594e1abfd9dab58c667dbd0eb3803e99ac",
+      "tests/unit/ingestion/test_live_odds_001_current_boundaries.py": "23a6d91416e5a9d81a627bd1bec71e9f115982f7",
+      "tests/unit/ingestion/test_live_odds_001_provider_drift.py": "e9a87bb2832a933fc7d3b079ddc999cae906c748",
+      "tests/unit/ingestion/test_live_odds_001_transport.py": "47f515480077cc6bbde9ce1b8184c10818943214",
+      "tests/unit/ingestion/test_odds_foundation.py": "9e954a927d54f506c0e186bedf25d996e5716516",
+      "tests/unit/ingestion/test_odds_transport_parser_boundaries.py": "258a1e29ea3bd3825c5bb57d8ce8b5f4cf3534a5"
+    }
+  },
+  "repaired_main": {
+    "expected": 16,
+    "mismatches": 0,
+    "blobs": {
+      ".github/workflows/ci.yml": "f33b4eb7edd9c3aea69b5e83dd2fe53743beb549",
+      "scripts/ci_coverage_shards.py": "7d2f78e494fdb609a2136b43dab9d529225c0124",
+      "scripts/validate_repository.py": "b4f1c59a24baa91b136379e037d16b156d14e3f9",
+      "src/dmf_pulse/ingestion/fpl/service.py": "d638a14dd155287664d6a6c9c62b736cf7f52de1",
+      "tests/assurance/optimisation/test_surface.py": "ed97b7944a24eb1c7440f5a3f31cf524f38a7157",
+      "tests/contract/evaluation/test_cli_contract.py": "1141bfb59b94901973241bede6f8cb601c63e0d9",
+      "tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py": "bb434215ab65e7bf45c5cafa45d502767f1a346e",
+      "tests/integration/ingestion/test_fpl_lifecycle_resume.py": "681723caf2b07d56641bea2f5197f9ec5cea98da",
+      "tests/integration/ingestion/test_fpl_pair_context_integrity.py": "7f675935f064f4d86ad783d8c9aefeac6994948c",
+      "tests/integration/ingestion/test_fpl_replay_time_policy.py": "968b1fcb4dfe38e777b90061055a102a7f304402",
+      "tests/integration/ingestion/test_fpl_temporal_identity.py": "8c5410430b02a95dfa4ff38ec3e47e59e472b4cf",
+      "tests/unit/cli/test_rank_cli.py": "a709280b69455de277a26d72eea4c49afa10b1a8",
+      "tests/unit/ingestion/test_fpl_service_boundaries.py": "ca9d421459679f35e0a25ea261fda422f43e5a8a",
+      "tests/unit/optimisation/test_multi_gameweek_cli_hardening.py": "5c34812db78692346b3a989d56d4247590838fb6",
+      "tests/unit/scripts/test_ci_coverage_shards.py": "549b7f7b427c4129973631ced7cb5f8b42f976a8",
+      "tests/unit/scripts/test_ci_workflow_contract.py": "7f196305e069a7f00d98b8776f68f2d729e25445"
+    }
+  }
+}

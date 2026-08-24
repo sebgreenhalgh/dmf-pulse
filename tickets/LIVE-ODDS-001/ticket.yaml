@@ -1,0 +1,47 @@
+ticket_id: LIVE-ODDS-001
+title: Production live odds transport and provider-drift contract
+status: ACTIVE
+required_base_commit: baed47bce7a158d91afe38351a2c65be60444adf
+readiness_donor_commit: d4cc759d4600489c21ba738cfc9b357cc380554e
+historical_merge_base: 9eb57143f6ee92f67c78607cc386678d962e62d4
+expected_branch: integration/post-gw1/LIVE-ODDS-001-production-live-odds
+objective: >-
+  Reconcile the bounded readiness live-odds capability onto current main, replace the operational
+  urllib boundary with an explicit production-quality stdlib http.client transport, and ensure
+  additive unsupported provider market families degrade with explicit drift metadata without
+  contaminating supported h2h/totals semantics or bypassing fail-closed validation.
+authority_scopes:
+  - A5-odds-manual-import
+  - A6-normalisation
+permissions:
+  network: disabled_for_implementation_and_acceptance
+  credential_access: forbidden
+  migration: forbidden
+  new_runtime_dependency: forbidden
+allowed_areas:
+  - src/dmf_pulse/ingestion/odds/**
+  - src/dmf_pulse/assurance/secret_scan.py
+  - config/providers/the_odds_api.json
+  - tests/**
+  - tickets/LIVE-ODDS-001/**
+  - evidence/tickets/LIVE-ODDS-001/**
+  - evidence/tickets/PRC-013/current_manifest.json
+  - PLANS.md
+exclusions:
+  - readiness bulk merge
+  - FPL or fixture identity reconciliation
+  - market consensus algorithm changes
+  - orchestration or decision bundles
+  - real provider requests or credentials
+  - database migrations
+  - pull request, merge, accepted tag, or human acceptance
+required_public_behavior:
+  - explicit deterministic transport selection with no fallback
+  - verified HTTPS, approved host/path, bounded body and timeout handling
+  - secret-free requests, errors, representations, attempts, and evidence
+  - h2h and totals requested for soccer_epl in region uk
+  - additive unsupported markets excluded with deterministic warning metadata
+  - mandatory h2h corruption remains blocking
+  - totals missingness and malformedness remain explicit degradations
+  - source-body provenance differs while accepted-market semantics remain invariant
+  - rights and usable_at cutoff gates remain fail closed

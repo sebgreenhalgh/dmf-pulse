@@ -1,0 +1,51 @@
+LIVE-ODDS-INTEGRATION-001 command ledger
+Date: 2026-08-24
+
+1. git fetch --prune origin
+   PASS: pinned origin/main and accepted LIVE-ODDS refs fetched without movement.
+2. gh pr view 16 --repo sebgreenhalgh/dmf-pulse ...
+   PASS: OPEN, unmerged, head 5e55cf3361a1abff4b2e32dcc30fe42900ea2e16.
+3. git switch -c integration/post-ci/LIVE-ODDS-001-on-repaired-main fceca02...
+   PASS: branch created from exact first parent.
+4. git merge --no-ff --no-commit 5e55cf...
+   EXPECTED_CONFLICT: PLANS.md and evidence/tickets/PRC-013/current_manifest.json only.
+5. Candidate index blob audit
+   PASS: LIVE-ODDS 20 checked / 0 mismatches; repaired main 16 checked / 0 mismatches.
+6. uv sync --all-groups --frozen
+   PASS: 40 packages checked.
+7. Initial focused LIVE-ODDS command without a database reference
+   EXPECTED_ENVIRONMENT_SETUP: 265 passed; 10 PostgreSQL fixtures refused to start.
+8. docker compose -f compose.test.yaml up -d postgres
+   PASS: pinned PostgreSQL 18.4 service healthy on the local test boundary.
+9. uv run alembic upgrade head
+   PASS: schema upgraded through 20260807_0006.
+10. Focused LIVE-ODDS command with database reference but without the TEST environment gate
+    EXPECTED_FAIL_CLOSED: 265 passed; 10 operations rejected the non-TEST environment.
+11. Focused LIVE-ODDS command with sanctioned TEST environment and local database reference
+    PASS: 275 passed in 14.30 seconds.
+12. Focused repaired-main/FPL regression matrix with PostgreSQL 18.4
+    PASS: 140 passed, 4 warnings, in 128.62 seconds.
+13. uv run ruff format --check .
+    PASS: 647 files already formatted before governance sealing.
+14. uv run ruff check .
+    PASS: all checks passed.
+15. uv run mypy src/dmf_pulse
+    PASS: 247 source files.
+16. uv build
+    PASS: wheel and source distribution built.
+17. uv run python scripts/verify_wheel.py
+    PASS: clean environment outside repository; no network fetch; healthy database.
+18. scripts/verify_odd005_wheel.py using the frozen project interpreter
+    PASS: clean installed wheel, zero network requests, isolated database cleaned up.
+19. scripts/verify_gcs008_wheel.py using the frozen project interpreter
+    PASS: 288 record members verified.
+20. uv run python scripts/generate_repository_manifest.py --ticket PRC-013
+    PASS: exactly 1,150 deliverable files written to the mutable active manifest.
+21. uv run python scripts/validate_repository.py
+    PASS: zero errors.
+22. uv run python scripts/scan_secrets.py
+    PASS: zero findings.
+
+No real provider request or production credential was used. Final scope, commit, shard-plan,
+publication, and CI commands follow before the one merge commit or are externally observable
+afterward.

@@ -325,9 +325,10 @@ def scan_repository(root: Path, *, allowlist_path: Path | None = None) -> list[S
     allowed = {(item.path, item.rule_id, item.fingerprint) for item in allowlist}
     findings = []
     for candidate in sorted(root.rglob("*"), key=lambda item: item.as_posix()):
-        if any(part in EXCLUDED_PARTS for part in candidate.parts):
+        relative_path = candidate.relative_to(root)
+        if any(part in EXCLUDED_PARTS for part in relative_path.parts):
             continue
-        relative = candidate.relative_to(root).as_posix()
+        relative = relative_path.as_posix()
         if candidate.is_symlink():
             findings.append(
                 _finding(

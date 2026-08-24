@@ -1,0 +1,223 @@
+LIVE-ODDS-001 command ledger (append-only during implementation)
+
+2026-08-21 PRE-FLIGHT
+PASS  git fetch origin
+PASS  git rev-parse origin/main
+      baed47bce7a158d91afe38351a2c65be60444adf
+PASS  git cat-file -t d4cc759d4600489c21ba738cfc9b357cc380554e
+      commit
+PASS  git merge-base baed47bce7a158d91afe38351a2c65be60444adf d4cc759d4600489c21ba738cfc9b357cc380554e
+      9eb57143f6ee92f67c78607cc386678d962e62d4
+PASS  uv sync --all-groups --frozen
+
+BASELINE FOCUSED ODDS REGRESSION
+ENVIRONMENT_BLOCKED (4 PostgreSQL setup errors; DMF_TEST_DATABASE_URL absent)
+uv run pytest tests/unit/ingestion/test_odds_foundation.py tests/unit/ingestion/test_odds_model_config_boundaries.py tests/unit/ingestion/test_odds_persistence_boundaries.py tests/unit/ingestion/test_odds_publication_attestation_boundaries.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py tests/security/test_odds_429_retry_policy.py tests/security/test_odds_credentials_quota_retention.py tests/property/ingestion/test_odds_properties.py tests/contract/odds tests/unit/markets tests/property/markets
+225 passed, 4 errors in 29.66s; every error was the explicit missing PostgreSQL URL gate.
+
+NETWORK/CREDENTIAL
+No real provider request was made. No credential source or value was inspected.
+
+CHECKPOINT 01 RED CONTRACT
+EXPECTED_RED
+uv run pytest tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_transport.py
+0 collected; 2 collection errors in 0.28s.
+- current provider-native module absent at the pinned parent.
+- HttpClientOddsTransport absent at the pinned parent.
+
+CHECKPOINT 02 TRANSPORT AND CREDENTIALS
+PASS  uv run ruff check (odds package and focused transport/credential/regression tests)
+PASS  uv run mypy src/dmf_pulse/ingestion/odds/client.py src/dmf_pulse/ingestion/odds/config.py src/dmf_pulse/ingestion/odds/credentials.py src/dmf_pulse/ingestion/odds/service.py
+      Success: no issues found in 4 source files
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_transport.py tests/unit/ingestion/test_live_odds_001_credentials.py
+      34 passed in 3.44s
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_transport.py tests/unit/ingestion/test_live_odds_001_credentials.py tests/unit/ingestion/test_odds_foundation.py tests/unit/ingestion/test_odds_model_config_boundaries.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py
+      137 passed in 3.98s
+NOTE  One combined verifier process launch returned Windows "Access is denied" before any command executed. Each command was rerun separately and passed as recorded above.
+NETWORK/CREDENTIAL  Offline fakes only; no provider request, environment secret read, or credential value inspection.
+
+CHECKPOINT 03 PROVIDER DRIFT
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py
+      54 passed in 0.60s
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py --cov=dmf_pulse.ingestion.odds.current --cov-branch --cov-report=term-missing
+      54 passed; 95.08% branch-aware coverage
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py tests/unit/ingestion/test_live_odds_001_transport.py tests/unit/ingestion/test_live_odds_001_credentials.py tests/unit/ingestion/test_odds_foundation.py tests/unit/ingestion/test_odds_model_config_boundaries.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py
+      191 passed in 4.26s
+PASS  uv run mypy src/dmf_pulse/ingestion/odds
+      Success: no issues found in 10 source files
+PASS  uv run ruff check (odds package, ticket tests, affected inherited/integration tests)
+NETWORK/CREDENTIAL  Offline fixtures and fakes only; no provider request or runtime credential read.
+
+CHECKPOINT 04 FINAL HARDENING AND ACCEPTANCE
+PASS  uv sync --all-groups --frozen
+      Checked 40 packages
+PASS  uv run ruff format --check .
+      641 files already formatted
+PASS  uv run ruff check .
+      All checks passed
+PASS  uv run mypy src/dmf_pulse
+      Success: no issues found in 247 source files
+EXPECTED_MANIFEST_DRIFT  uv run python scripts/validate_repository.py
+      28 errors, all intentional changed/unrecorded deliverable hashes before the permitted final manifest refresh; the command-generated GCS-008 report is revalidated later.
+PASS  uv run python scripts/scan_secrets.py
+      0 findings
+ENVIRONMENT_BLOCKED  broader Odds/security suite including PostgreSQL retention tests
+      313 passed, 4 setup errors in 28.52s; every error was absent DMF_TEST_DATABASE_URL and no behavioral test failed.
+PASS  focused non-database Odds/markets suite
+      309 passed in 31.15s on final hardened source
+PASS  uv run pytest -q -m unit tests/unit
+      1998 passed, 452 deselected, 77 inherited Pydantic adversarial-test warnings in 88.22s
+PASS  uv run pytest -q -m property tests/property
+      88 passed, 23 deselected, 3 inherited warnings in 44.66s
+PASS  uv run pytest -q -m contract tests/contract
+      72 passed, 68 deselected in 5.88s
+PASS  uv run pytest -q -m security tests/security --ignore=tests/security/test_odds_credentials_quota_retention.py
+      27 passed, 6 deselected in 1.96s; the excluded file's non-database coverage is included in the focused attempts and its four database cases are environment-blocked above.
+PASS  focused client/credential/current branch-aware coverage command
+      114 passed in 5.58s; combined coverage 90.39%; JSON retained as coverage.json
+PASS  uv build
+      dmf_pulse-0.2.0-py3-none-any.whl (838107 bytes, sha256 d1f3877112cd755355ae9a988f9cf3070c15994fc21a5b5316b907a0a5b47ae8)
+      dmf_pulse-0.2.0.tar.gz built successfully. Its digest is deliberately not embedded here because ticket evidence is an sdist input and would make an in-artifact final digest self-referential.
+ENVIRONMENT_BLOCKED  uv run python scripts/verify_wheel.py
+      DMF_TEST_DATABASE_URL is required for the canonical database-backed wheel verification.
+PASS  clean installed-wheel smoke outside the source tree with offline dependency resolution
+      imported from isolated site-packages; dmf 0.2.0; packaged markets h2h,totals; cost 2; ODDS_PROVIDER_CURRENT_INPUT present; default transport stdlib_http_client; temporary environment removed.
+PASS  same-agent hostile review
+      P0 0; P1 1 found/closed; material P2 1 found/closed. See FINAL_SELF_REVIEW.md.
+PASS  uv run python scripts/generate_repository_manifest.py --ticket LIVE-ODDS-001
+      1134 deliverable files; manifest sha256 5814ec11369ee50597e4c45501da8462b6be11694d7589d809d7479b0fe9f454
+PASS  mechanical active-manifest refresh required by repository assurance tooling
+      evidence/tickets/PRC-013/current_manifest.json refreshed over the same 1134 deliverables; no historical narrative/result evidence changed.
+PASS  uv run python scripts/validate_repository.py after manifest refresh
+      0 errors
+PASS  uv build from pushed checkpoint-04 tree 5e34434edfc89791138aa2876c315709c48631a4
+      wheel remained byte-identical at 838107 bytes / d1f3877112cd755355ae9a988f9cf3070c15994fc21a5b5316b907a0a5b47ae8; sdist built successfully with final ticket evidence included.
+NETWORK/CREDENTIAL  No provider call and no real credential or developer-secret inspection occurred during acceptance.
+
+2026-08-21 INDEPENDENT-REVIEW REMEDIATION STARTUP
+PASS  git fetch --prune origin and pinned-ref/lineage/worktree verification
+      origin/main baed47bce7a158d91afe38351a2c65be60444adf
+      origin implementation branch 6c36e73adef21b52ed54d23733e5a34c71547a6d
+PASS  uv sync --all-groups --frozen
+      Checked 40 packages
+REPRODUCED  REV-001
+      getresponse socket timeout 20.0 seconds with only 11.0 seconds total budget remaining;
+      deterministic outer body read returned after the total deadline before TOTAL_TIMEOUT.
+REPRODUCED  REV-002
+      escaping fetch traceback retained credential/request/response locals; early parser failure
+      retained the provider canary in production frames while rendered errors stayed redacted.
+REPRODUCED  REV-003
+      raw DMF_PULSE_ODDS_API_KEY environment value resolved and health reported configured.
+REPRODUCED  REV-004
+      same body/accepted events with distinct snapshot identity changed market semantic hash;
+      local receipt/usable-only changes also changed it.
+INVALID_ZERO  uv run python scripts/scan_secrets.py from the dedicated review_pack worktree
+      scanner excluded the entire repository because absolute candidate paths include review_pack.
+REPRODUCED_FAIL  uv run python scripts/scan_secrets.py from clean temporary clone outside review_pack
+      8 findings; exact safe fingerprints and categories recorded in EVIDENCE_CORRECTION.md.
+EXPECTED_RED  uv run pytest -q tests/unit/ingestion/test_live_odds_001_transport.py::test_td01_remaining_total_is_reapplied_before_response_headers tests/unit/ingestion/test_live_odds_001_credentials.py::test_cred02_cred03_raw_environment_secret_is_not_a_production_source tests/unit/ingestion/test_live_odds_001_provider_drift.py::test_hash01_distinct_source_snapshots_preserve_market_semantics tests/unit/ingestion/test_live_odds_001_provider_drift.py::test_hash02_local_acquisition_time_does_not_change_market_semantics tests/security/test_live_odds_001_traceback_security.py tests/unit/assurance/test_secret_scan.py::test_repository_scan_exclusions_are_relative_to_scanned_root
+      7 failed in 2.29s, one direct property failure for each frozen regression node;
+      failure values matched the reproduced timeout, environment, hash, traceback, and scanner defects.
+PASS  uv run ruff format --check <five changed test files>
+      5 files already formatted
+PASS  uv run ruff check <five changed test files>
+      All checks passed
+PASS  git diff --check
+NETWORK/CREDENTIAL  Offline deterministic fakes only; no provider call or real credential read.
+
+2026-08-22 REMEDIATION CHECKPOINT R2 SECURITY / CREDENTIAL BOUNDARY
+PASS  uv run pytest -q tests/security/test_live_odds_001_traceback_security.py tests/unit/ingestion/test_live_odds_001_credentials.py tests/unit/ingestion/test_live_odds_001_transport.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py tests/unit/ingestion/test_odds_foundation.py tests/security/test_odds_credentials_quota_retention.py tests/security/test_odds_429_retry_policy.py -m "not postgres" -k "not td01"
+      162 passed, 5 deselected in 4.50s; TD-01 remains the intentionally RED R3 property.
+PASS  adversarial production traceback walker SEC-TB-01..19
+      no sentinel reachable through traceback/cause/context production locals, including nested mappings, sequences, object dictionaries and slots.
+PASS  request credential-retention contract
+      OddsHttpRequest stores no credential; both stdlib transports and OddsClient isolate unsafe values behind non-escaping helpers.
+PASS  credential source matrix
+      systemd credential file supported; raw DMF_PULSE_ODDS_API_KEY process value ignored for resolution and health.
+PASS  uv run ruff check <R2 source and focused tests>
+      All checks passed.
+PASS  uv run mypy src/dmf_pulse/ingestion/odds/client.py src/dmf_pulse/ingestion/odds/credentials.py src/dmf_pulse/ingestion/odds/parser.py
+      Success: no issues found in 3 source files.
+PASS  direct secret-scan classification over R2 production files
+      0 findings in client.py, credentials.py, and parser.py; remaining current-tree scanner signals are synthetic tests reserved for R5.
+PASS  git diff --check
+NETWORK/CREDENTIAL  Offline fakes and synthetic split-string sentinels only; no provider call or real credential read.
+
+2026-08-22 REMEDIATION CHECKPOINT R3 HARD TRANSPORT DEADLINE
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_transport.py tests/security/test_live_odds_001_traceback_security.py tests/security/test_odds_429_retry_policy.py tests/security/test_odds_credentials_quota_retention.py tests/unit/ingestion/test_odds_transport_parser_boundaries.py tests/unit/ingestion/test_odds_foundation.py -m "not postgres"
+      161 passed, 4 deselected in 7.32s.
+PASS  TD-01..TD-12 and added request-write/TCP-to-TLS regressions
+      stale header timeout corrected to 11 seconds; delayed header and one outer multi-wait body read stopped at the total boundary; read/connect phase classification and retry-budget carry-over remained exact.
+PASS  same R3 matrix with --cov=dmf_pulse.ingestion.odds.client --cov-branch --cov-report=term-missing
+      161 passed, 4 deselected; client.py 90.28% branch-aware coverage (729 statements, 166 branches).
+PASS  uv run ruff check src/dmf_pulse/ingestion/odds/client.py tests/unit/ingestion/test_live_odds_001_transport.py
+      All checks passed.
+PASS  uv run mypy src/dmf_pulse/ingestion/odds/client.py
+      Success: no issues found in 1 source file.
+NETWORK/CREDENTIAL  Deterministic connection/socket fakes only; no external or loopback provider request and no real credential read.
+
+2026-08-22 REMEDIATION CHECKPOINT R4 SEMANTIC HASH CONTRACT
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py
+      31 passed; HASH-01..12 and provider-drift/fail-closed properties all green.
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py --cov=dmf_pulse.ingestion.odds.current --cov-branch --cov-report=term-missing
+      64 passed; current.py 95.09% branch-aware coverage (464 statements, 188 branches).
+PASS  uv run pytest -q tests/unit/ingestion/test_live_odds_001_provider_drift.py tests/unit/ingestion/test_live_odds_001_current_boundaries.py tests/unit/ingestion/test_odds_persistence_boundaries.py tests/unit/markets/test_normalisation.py tests/unit/markets/test_service_boundaries.py tests/unit/markets/test_repository_persistence_boundaries.py -m "not postgres"
+      124 passed in 6.06s.
+PASS  genuine downstream contamination regression PD-18
+      production OddsPersistence.prepare plus actual consensus evaluation created exactly two canonical H2H books/six observations; unsupported additive and totals material created no Stage-6 fair-price input.
+PASS  uv run ruff check src/dmf_pulse/ingestion/odds/current.py tests/unit/ingestion/test_live_odds_001_provider_drift.py
+      All checks passed.
+PASS  uv run mypy src/dmf_pulse/ingestion/odds/current.py
+      Success: no issues found in 1 source file.
+NETWORK/CREDENTIAL  Repository fixture data and in-memory mapping/persistence fakes only; no provider call, database write, or credential read.
+
+2026-08-22 REMEDIATION CHECKPOINT R5 SCANNER / FINAL HARDENING
+PASS  uv run pytest -q tests/unit/assurance/test_secret_scan.py tests/unit/ingestion/test_live_odds_001_transport.py
+      62 passed in 6.69s; root-relative scanner exclusion and unchanged transport sentinel properties passed.
+PASS  uv run python scripts/scan_secrets.py after scanner/source correction
+      exit 0; status PASS; finding_count 0 from the mandated review_pack worktree; no remediation allowlist entry added.
+PASS  uv sync --all-groups --frozen
+      Checked 40 packages.
+PASS  uv run ruff format --check .
+      642 files already formatted.
+PASS  uv run ruff check .
+      All checks passed.
+PASS  uv run mypy src/dmf_pulse
+      Success: no issues found in 247 source files.
+PASS  uv run pytest -q -m unit tests/unit
+      2031 passed, 452 deselected, 77 inherited Pydantic adversarial-test warnings in 85.48s.
+PASS  uv run pytest -q -m property tests/property
+      88 passed, 23 deselected, 3 inherited warnings in 40.47s.
+PASS  uv run pytest -q -m contract tests/contract
+      72 passed, 68 deselected in 3.58s.
+PASS  uv run pytest -q -m "security and not postgres" tests/security
+      51 passed, 10 deselected in 3.23s.
+PASS  24-file dependency-relevant Odds/markets command selected by repository import references, -m "not postgres"
+      430 passed, 4 PostgreSQL cases deselected in 34.68s.
+PASS  focused remediation branch-coverage matrix over scanner/client/credentials/current/parser
+      291 passed, 4 PostgreSQL cases deselected; aggregate 94.53%; scanner 97%, client 90%, credentials 95%, current 95%, parser 99%; coverage.json refreshed.
+EXPECTED_MANIFEST_DRIFT  uv run python scripts/validate_repository.py before final manifest refresh
+      29 errors, exactly changed/unrecorded remediation deliverables; command-generated GCS-008 report captured the expected interim failure and is rerun after refresh.
+PASS  final uv build
+      wheel dmf_pulse-0.2.0-py3-none-any.whl; 841021 bytes; sha256 16eba3453b937118be5ebbaa944228f03210b097d071433627c8223f6cc1b44e; sdist built successfully.
+ENVIRONMENT_BLOCKED  uv run python scripts/verify_wheel.py
+      DMF_TEST_DATABASE_URL is required; variable was confirmed absent without reading a value and no database was provisioned.
+PASS  isolated offline final-wheel import and Python console entry point outside source tree
+      installed 23 cached packages into a temporary environment; imported only from site-packages; dmf 0.2.0; h2h,totals; request cost 2; no request credential storage; raw environment secret ignored; default stdlib_http_client; exit 0; temporary environment removed.
+ENVIRONMENT_BLOCKED  direct isolated dmf.exe shim
+      Windows application control blocked the generated executable; the exact Python entry point passed and direct shim execution is not claimed PASS.
+ENVIRONMENT_BLOCKED  four PostgreSQL retention/quota tests
+      DMF_TEST_DATABASE_URL absent; not executed and not conflated with the 430-test non-database pass.
+POSIX_UNAVAILABLE  native POSIX acceptance
+      Current platform is Windows; no POSIX evidence fabricated.
+PASS  same-agent adversarial review of baed47bc..worktree and 6c36e73..worktree
+      P0 0; P1 0; material P2 1 found/closed; unresolved P0/P1/material P2 0. See FINAL_SELF_REVIEW.md.
+NETWORK/CREDENTIAL  No provider call, real credential read, database write, environment mutation, dependency change, migration, PR, merge, force push, tag, or acceptance action occurred.
+PASS  final focused remediation matrix after source/test sealing
+      163 passed in 9.35s; scanner, credentials, transport, provider drift, current boundaries, and traceback security all passed without PostgreSQL selection.
+PASS  final repository manifest refresh
+      LIVE-ODDS-001 and active PRC-013 manifests each contain 1135 files; LIVE-ODDS-001 manifest sha256 48b830ba9c2c9aff27f663e6b0567a4fb6f560ac8b7b6c62b6dea3e87bf80045.
+PASS  final uv run python scripts/validate_repository.py
+      exit 0; status PASS; error_count 0.
+PASS  final uv run python scripts/scan_secrets.py after evidence and manifest sealing
+      exit 0; status PASS; finding_count 0.

@@ -5,7 +5,6 @@ from __future__ import annotations
 import ssl
 import urllib.error
 import urllib.request
-from dataclasses import replace
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -87,7 +86,7 @@ class _StaticTransport:
     def __init__(self, value: OddsHttpResponse | BaseException) -> None:
         self.value = value
 
-    def send(self, _request: object) -> OddsHttpResponse:
+    def send(self, _request: object, _credential: str) -> OddsHttpResponse:
         if isinstance(self.value, BaseException):
             raise self.value
         return self.value
@@ -167,7 +166,7 @@ def test_urllib_transport_classifies_connect_failures_without_network(
     opener = _FailingOpener(failure)
     monkeypatch.setattr(urllib.request, "build_opener", lambda *_handlers: opener)
     with pytest.raises(IngestionError) as raised:
-        UrllibOddsTransport().send(_request())
+        UrllibOddsTransport().send(_request(), _fake_credential())
     assert raised.value.code == code
     assert opener.calls == 1
 
@@ -184,7 +183,7 @@ def test_urllib_transport_converts_http_error_without_reading_absent_body(
     )
     opener = _FailingOpener(error)
     monkeypatch.setattr(urllib.request, "build_opener", lambda *_handlers: opener)
-    response = UrllibOddsTransport().send(_request())
+    response = UrllibOddsTransport().send(_request(), _fake_credential())
     assert response.status_code == 429
     assert response.body == b""
     assert response.content_type == "application/json"
@@ -202,9 +201,15 @@ def test_request_builder_rejects_unavailable_credential_shapes(credential: str) 
 
 def test_request_validator_rejects_parameter_order_drift() -> None:
     request = _request()
-    drifted = replace(
-        request,
+    drifted = client_module.OddsHttpRequest(
+        method=request.method,
+        scheme=request.scheme,
+        host=request.host,
+        path=request.path,
         safe_parameters=tuple(reversed(request.safe_parameters)),
+        connect_timeout_seconds=request.connect_timeout_seconds,
+        read_timeout_seconds=request.read_timeout_seconds,
+        total_timeout_seconds=request.total_timeout_seconds,
     )
     with pytest.raises(IngestionError, match="parameters drifted"):
         _validate_request(drifted, load_provider_config())
