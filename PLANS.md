@@ -1,5 +1,29 @@
 # DMF Pulse execution plans
 
+## CI-COVERAGE-SHARD-001 independent-review remediation
+
+- Reviewed head/branch: `b8ce5de612d835bee6721898cd57e46c133f90dd` on
+  `remediation/CI-COVERAGE-SHARD-001-sharded-coverage`.
+- Authority: the repository owner explicitly ratified the exact existing ANSI-only observation
+  deltas in commit `4da506d8fa4c00a61c5387f66b94e8c2d15a4c7b` after independent review found
+  GOV-001; no broader test or product change is authorized.
+- Scope: close CI-REV-001 by making repository/workflow contract guards structurally require the
+  four mandatory result comparisons to be OR-connected, then reseal truthful ticket evidence.
+- Safety: the workflow, shard helper, ratified ANSI tests, product, migrations, configuration,
+  fixtures, dependencies, LIVE-ODDS, and PR #16 remain byte-identical.
+
+### Review-remediation checkpoints
+
+- [x] Verify exact remote refs, clean branch, open/unmerged LIVE-ODDS PR, and protected blobs.
+- [x] Reproduce the all-AND escape against both prior guards.
+- [x] Add a narrow semantic predicate validator and independent workflow-contract mutation tests.
+- [x] Record the owner amendment as post-review authority without rewriting original scope history.
+- [ ] Prove the existing 3,133 nodeids remain and remediation tests are strictly additive; refresh
+  the final deterministic plan, manifests, and DRAFT evidence.
+- [ ] Pass focused, adversarial, static, repository, security, and evidence gates; publish a normal
+  fast-forward and use the new final-SHA Actions run as the decisive execution proof.
+- [ ] Stop for independent re-review without merge, human acceptance, or LIVE-ODDS modification.
+
 ## CI-COVERAGE-SHARD-001 reliable sharded branch coverage
 
 - Parent/branch: independently confirmed correctness-stack head

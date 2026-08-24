@@ -79,3 +79,23 @@ modified after a successful run merely to record its ID.
 The maximum bounded engineering status is
 `CI_ARCHITECTURE_REMEDIATED_PENDING_INDEPENDENT_REVIEW`. Independent review, human acceptance,
 merge, production activation, and LIVE-ODDS integration remain separate and unclaimed.
+
+## G. Post-review authority and sentinel guard remediation
+
+1. The repository owner's 2026-08-24 post-review amendment ratifies only the exact ANSI
+   observation-boundary deltas in commit `4da506d8fa4c00a61c5387f66b94e8c2d15a4c7b`, retained at
+   reviewed state `b8ce5de612d835bee6721898cd57e46c133f90dd`, in
+   `tests/unit/cli/test_rank_cli.py` and
+   `tests/unit/optimisation/test_multi_gameweek_cli_hardening.py`.
+2. The amendment does not retroactively change the original narrower instruction and does not
+   authorize any further change to those files, product behavior, commands, exit codes, semantic
+   wording, color behavior, environment behavior, markers, skips, retries, or dependencies.
+3. Repository and workflow-contract guards must require exactly the four mandatory result
+   variables, each exactly once, compared with `!= "success"`, joined only by logical OR, with
+   `exit 1` in the failure branch.
+4. All-AND, mixed AND/OR, missing, duplicate, inverted, missing-exit, missing-`always()`, and
+   missing-need mutations fail closed in focused tests.
+5. The workflow and both owner-ratified ANSI test blobs remain identical to the reviewed state.
+6. The maximum remediation status is
+   `CI_COVERAGE_SHARD_001_REMEDIATED_PENDING_INDEPENDENT_REREVIEW` after a successful new
+   final-SHA Actions run. Human acceptance and merge remain separate.

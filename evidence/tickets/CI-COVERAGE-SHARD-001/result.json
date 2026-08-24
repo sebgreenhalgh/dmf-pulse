@@ -1,10 +1,11 @@
 {
   "ticket_id": "CI-COVERAGE-SHARD-001",
-  "status": "CORRECTED_AFTER_FAIL_CLOSED_TEST_OBSERVATION_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW",
+  "status": "REVIEW_REMEDIATION_READY_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REREVIEW",
   "classification": "CI_COVERAGE_EXECUTION_ARCHITECTURE",
   "required_parent": "740e70f0ee836a8fab162c56e8345033a06d926b",
   "branch": "remediation/CI-COVERAGE-SHARD-001-sharded-coverage",
   "implementation_checkpoint": "4da506d8fa4c00a61c5387f66b94e8c2d15a4c7b",
+  "independent_reviewed_head": "b8ce5de612d835bee6721898cd57e46c133f90dd",
   "architecture": {
     "shard_count": 8,
     "marker_expression": "not performance",
@@ -17,19 +18,24 @@
     "maximum_timeout_minutes": 35
   },
   "partition_audit": {
-    "eligible_nodeids": 3133,
+    "eligible_nodeids": 3147,
     "parent_eligible_nodeids_preserved": 3091,
-    "additive_ticket_nodeids": 42,
-    "eligible_nodeid_sha256": "e6bce2db465dd0ea34560336d3127d8fd2ce180c6250db3067cdaba4fa89199f",
-    "shard_node_counts": [4, 159, 373, 490, 486, 477, 451, 693],
-    "estimated_weights": [1050, 961, 961, 961, 961, 961, 961, 961],
+    "reviewed_head_nodeids_preserved": 3133,
+    "additive_ticket_nodeids": 56,
+    "additive_review_remediation_nodeids": 14,
+    "eligible_nodeid_sha256": "05222e70da23f1aa432ba1f4a83d8ab77c82f09d2e3473855d94442acb645a67",
+    "shard_node_counts": [4, 161, 375, 492, 488, 479, 453, 695],
+    "estimated_weights": [1050, 963, 963, 963, 963, 963, 963, 963],
     "duplicates": 0,
     "omissions": 0,
     "unexpected": 0,
     "empty_shards": 0
   },
   "local_validation": {
-    "helper_and_workflow_tests": "PASS_42",
+    "helper_and_workflow_tests": "PASS_56",
+    "workflow_contract_tests": "PASS_22",
+    "repository_validator_tests": "PASS_8",
+    "sentinel_mutation_matrix": "PASS_14_REJECTIONS",
     "broader_focused_matrix": "PASS_80",
     "focused_inherited_regressions": "PASS_69",
     "heaviest_estimated_shard": "PASS_4_IN_606.98_SECONDS",
@@ -68,7 +74,22 @@
     "complete_affected_modules": "PASS_35",
     "commands_exit_codes_and_wording_preserved": true,
     "workflow_color_masking_added": false,
-    "independent_findings": "P0_0_P1_0_MATERIAL_P2_0_P3_0"
+    "full_independent_review_at_b8ce5de": "P0_0_P1_0_MATERIAL_P2_2_P3_0"
+  },
+  "review_remediation": {
+    "gov_001": "OWNER_SCOPE_AMENDMENT_SUPPLIED_PENDING_INDEPENDENT_CONFIRMATION",
+    "ratified_commit": "4da506d8fa4c00a61c5387f66b94e8c2d15a4c7b",
+    "ci_rev_001": "SEMANTIC_OR_GUARD_IMPLEMENTED_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REREVIEW",
+    "all_or_to_and_rejected": true,
+    "one_or_to_and_rejected": true,
+    "missing_result_rejected": true,
+    "duplicate_result_rejected": true,
+    "inverted_comparison_rejected": true,
+    "missing_exit_rejected": true,
+    "missing_always_rejected": true,
+    "missing_need_rejected": true,
+    "workflow_changed_from_reviewed_head": false,
+    "ratified_ansi_tests_changed_from_reviewed_head": false
   },
   "scope": {
     "product_source_changed": false,
@@ -84,8 +105,9 @@
     "material_p2": 0,
     "p3": 0
   },
-  "automatic_final_sha_ci": "PENDING_EXTERNAL_AFTER_CORRECTIVE_PUSH",
-  "independent_review": "PENDING",
+  "automatic_final_sha_ci": "PENDING_EXTERNAL_AFTER_REVIEW_REMEDIATION_PUSH",
+  "independent_review": "REMEDIATION_REQUIRED_AT_B8CE5DE",
+  "independent_rereview": "PENDING",
   "human_acceptance": "NOT_CLAIMED",
   "merged": false
 }

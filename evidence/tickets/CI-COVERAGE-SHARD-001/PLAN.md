@@ -1,6 +1,6 @@
 # CI-COVERAGE-SHARD-001 implementation plan
 
-Status: `CORRECTED_AFTER_FAIL_CLOSED_TEST_OBSERVATION_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW`
+Status: `REVIEW_REMEDIATION_READY_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REREVIEW`
 
 Date: `2026-08-24`
 
@@ -33,6 +33,21 @@ Maximum engineering status:
   the two affected assertion sites; preserve every command, exit check, message, and color path.
 - [ ] Reseal truthful corrective evidence, publish without force-push, and use the corrected
   automatic final-SHA Actions run as decisive acceptance.
+
+## Independent-review remediation
+
+- [x] Preserve the full independent review result: GOV-001 and CI-REV-001 were material findings
+  at reviewed state `b8ce5de612d835bee6721898cd57e46c133f90dd`.
+- [x] Record the repository owner's post-review ratification of only the exact two existing ANSI
+  observation deltas without rewriting the original narrower authority history.
+- [x] Replace weak sentinel token counting with narrow structural validation of four unique,
+  OR-connected `!= "success"` clauses and in-branch `exit 1`.
+- [x] Add independent workflow and repository-validator mutation tests for all-AND, mixed AND/OR,
+  missing, duplicate, inverted, missing-exit, missing-`always()`, and missing-need cases.
+- [x] Prove the previous 3,133 eligible nodeids remain with additive remediation tests, regenerate
+  exact population/partition digests, and pass every local acceptance gate.
+- [ ] Seal DRAFT evidence and both active manifests, publish normally, and require the new
+  final-SHA Actions run to pass before independent re-review.
 
 ## Publication boundary
 

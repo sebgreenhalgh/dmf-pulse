@@ -126,3 +126,67 @@ PENDING | corrected automatic final-SHA GitHub Actions
           Runtime proof for every PostgreSQL-backed shard, aggregate coverage, GCS gates,
           downstream acceptance, and the stable sentinel is recorded externally after correction.
 NOT CLAIMED | independent acceptance, human acceptance, merge, production activation
+
+INDEPENDENT REVIEW AT b8ce5de
+MATERIAL_P2 | GOV-001
+              original owner scope did not explicitly authorize the two inherited ANSI test paths
+MATERIAL_P2 | CI-REV-001
+              all sentinel OR connectors could become AND while both prior guards still passed
+PASS | committed workflow behavior
+       exact OR predicate was correct and remained unchanged; historical run 32676529440 proved
+       the sentinel failed on matrix failure while run 32678074317 proved green-on-success
+
+OWNER SCOPE AMENDMENT 2026-08-24
+PASS | explicit post-review owner amendment
+       exact existing commit 4da506d8fa4c00a61c5387f66b94e8c2d15a4c7b deltas ratified only in
+       tests/unit/cli/test_rank_cli.py and
+       tests/unit/optimisation/test_multi_gameweek_cli_hardening.py
+PASS | owner-ratified blobs preserved from b8ce5de
+       rank a709280b69455de277a26d72eea4c49afa10b1a8
+       optimisation 5c34812db78692346b3a989d56d4247590838fb6
+
+CI-REV-001 REVIEW REMEDIATION
+PASS | uv run python -m pytest tests/unit/scripts/test_ci_workflow_contract.py -vv --tb=long
+       22 passed; independent predicate parsing and bounded mutation cases
+PASS | uv run python -m pytest tests/unit/scripts/test_gcs008_acceptance.py -vv --tb=long
+       8 passed; current repository CI contract validates
+PASS | all-OR to all-AND direct repository-validator mutation
+       rejected with invalid fail-closed OR predicate
+PASS | one OR to AND direct repository-validator mutation
+       rejected with invalid fail-closed OR predicate
+PASS | missing result, duplicate result, inverted comparison, missing exit 1,
+       missing always(), and missing mandatory need mutations
+       all rejected
+DISCOVERY | canonical planner collection after initial direct scripts namespace import
+            failed closed because file-path execution did not expose the repository namespace
+PASS | test-only import correction
+       validator is loaded by file location, matching existing script-test convention; no helper
+       or workflow change was made
+PASS | uv run python -m pytest tests/unit/scripts/test_ci_coverage_shards.py
+       tests/unit/scripts/test_ci_workflow_contract.py -vv --tb=long
+       56 passed
+PASS | GITHUB_ACTIONS=true uv run python -m pytest tests/unit/cli/test_rank_cli.py
+       tests/unit/optimisation/test_multi_gameweek_cli_hardening.py -vv --tb=long
+       35 passed; 4 pre-existing Pydantic serializer warnings
+
+REVIEW-REMEDIATION POPULATION
+PASS | canonical planner at settled worktree, reviewed-SHA binding for pre-commit audit
+       eligible nodeids: 3,147
+       all reviewed b8ce5de nodeids preserved: 3,133
+       additive remediation nodeids: 14
+       missing: 0; duplicates: 0; unexpected prior loss: 0
+       eligible/partition SHA-256:
+       05222e70da23f1aa432ba1f4a83d8ab77c82f09d2e3473855d94442acb645a67
+       shard node counts: 4, 161, 375, 492, 488, 479, 453, 695
+       estimated weights: 1050, 963, 963, 963, 963, 963, 963, 963
+PASS | uv run ruff format --check .
+       640 files already formatted
+PASS | uv run ruff check .
+       all checks passed
+PASS | uv run mypy src/dmf_pulse
+       success: no issues found in 245 source files
+
+REVIEW-REMEDIATION PUBLICATION BOUNDARY
+PENDING | active manifests, DRAFT evidence sealing, read-only repository/security validation,
+          final linear commit, fast-forward push, and new final-SHA Actions run
+NOT CLAIMED | independent re-review, human acceptance, merge, production activation

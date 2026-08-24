@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 84278,
+      "bytes": 85904,
       "path": "PLANS.md",
-      "sha256": "2d7cacab8979bfa63dafe4f0a9689efc92522e152bbbf11673b74485fb8e9f5a"
+      "sha256": "8c9ebf97455dc38bb2ce49f563d3cd10add83188db1691662a3bfe3ff94f9ef4"
     },
     {
       "bytes": 2761,
@@ -2251,9 +2251,9 @@
       "sha256": "dd362da8a9a81be532f0e6901045b6dfca7998d113b5c070a9448e01070d8998"
     },
     {
-      "bytes": 72585,
+      "bytes": 74218,
       "path": "scripts/validate_repository.py",
-      "sha256": "cd6aea5d9f875bc08dafceb7524f30a6117e6b88eb8bdc598803844b84656b72"
+      "sha256": "3ef0395335ae65f1e5c90da84ec7c7d400c9ba1f74df597dff4775748613c692"
     },
     {
       "bytes": 8785,
@@ -5471,9 +5471,9 @@
       "sha256": "b97e862dfad83fdbad7136e9bf40ba15afc49b1c3029174a63e35b38d38c03be"
     },
     {
-      "bytes": 12298,
+      "bytes": 16627,
       "path": "tests/unit/scripts/test_ci_workflow_contract.py",
-      "sha256": "aeeaf22aa1b3b294cd844f6678ba70cd37057bad1851c144a316b8d0742e8949"
+      "sha256": "ef1bbd33d0a4ffb95439010085e5bfb0d9cde06bc08c539208b6d62a597784bb"
     },
     {
       "bytes": 4064,
@@ -5511,14 +5511,14 @@
       "sha256": "2204fa4d8b2bb3e53dd14247077ff7831e2cf6a0043380dea855ee81ccb4581d"
     },
     {
-      "bytes": 5052,
+      "bytes": 6417,
       "path": "tickets/CI-COVERAGE-SHARD-001/ACCEPTANCE.md",
-      "sha256": "0a8e5a31b99c25439f8b8cb160cba0165ef75df610f816a095349702c86dfd4d"
+      "sha256": "300cbbfbd5fed6cbd9dbca71f93d3e14ff1b14cc04a8105fdc95d3124cc275f7"
     },
     {
-      "bytes": 4551,
+      "bytes": 5390,
       "path": "tickets/CI-COVERAGE-SHARD-001/ticket.yaml",
-      "sha256": "24526cfaceef3f8de303db27b455062306055dfb0a4ddef822660c4a8a04100e"
+      "sha256": "bf6119bd6837bc02b57517967faf43fcfce9a53b36afbd2633a1cff0563ceaca"
     },
     {
       "bytes": 12178,

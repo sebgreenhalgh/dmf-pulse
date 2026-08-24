@@ -38,3 +38,16 @@ This is a separate `TEST_OBSERVATION_DEFECT`, not an architecture, product, data
 coverage-transport defect. The parent monolith had never reached these tests on Linux. The accepted
 CI-TEST-002 correction establishes the narrow remedy: normalize ANSI only at assertion time. The
 two sibling assertions now use that exact pattern; disabling color in CI was rejected as masking.
+
+## Independent-review guard defect
+
+The subsequent full independent review confirmed that the committed sentinel itself was correct
+and had failed closed in the first architecture run. It separately reproduced CI-REV-001: both the
+repository validator and workflow-contract test accepted an in-memory mutation that replaced all
+three logical OR connectors in the sentinel condition with logical AND. Token-presence checks for
+four comparisons and `exit 1` did not prove the Boolean relationship.
+
+The review remediation therefore changes only the guards around the unchanged workflow. The
+validator narrowly parses the sentinel failure condition and requires exactly four unique
+mandatory `!= "success"` clauses joined only by OR, with `exit 1` inside the branch. Independent
+workflow tests and direct validator mutations prove all-AND and mixed predicates fail closed.

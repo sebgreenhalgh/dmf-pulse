@@ -1,5 +1,28 @@
 # CI-COVERAGE-SHARD-001 final self-review
 
+Current engineering status:
+`REVIEW_REMEDIATION_READY_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REREVIEW`.
+
+The full independent review at `b8ce5de` found GOV-001 and CI-REV-001 after the earlier engineering
+review recorded below. This section preserves that chronology rather than treating the earlier
+zero-finding snapshot as the final independent verdict.
+
+## Review-remediation controls
+
+- GOV-001: the owner supplied a post-review amendment ratifying only the exact unchanged ANSI
+  observation deltas in `4da506d8`; independent confirmation remains pending.
+- CI-REV-001: the validator now requires exactly four unique mandatory result clauses joined only
+  by OR and rejects AND, missing, duplicate, or inverted clauses and missing in-branch `exit 1`.
+- Workflow-contract tests independently parse the predicate instead of checking token presence.
+- All-AND, one-AND, missing-result, duplicate-result, inverted-comparison, missing-exit,
+  missing-`always()`, and missing-need mutations are required to fail.
+- `.github/workflows/ci.yml`, both owner-ratified test blobs, product source, migrations, config,
+  fixtures, and dependencies remain unchanged from `b8ce5de`.
+- Final-SHA CI and independent re-review remain pending; no human acceptance or merge is claimed.
+
+Current engineering self-assessment after focused remediation validation: P0 0; P1 0; unresolved
+material P2 0; P3 0. This is not an independent closure claim.
+
 ## P0 controls
 
 - Test omission: exact fresh pytest collection, canonical plan reconstruction, and union equality

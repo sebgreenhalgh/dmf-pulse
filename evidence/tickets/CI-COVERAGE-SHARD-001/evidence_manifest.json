@@ -6,7 +6,7 @@
   "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
   "commands": [
     {
-      "command": "Deterministic real-collection partition and focused helper/workflow contract tests",
+      "command": "Deterministic original real-collection partition and focused helper/workflow contract tests",
       "result": "PASS"
     },
     {
@@ -14,63 +14,90 @@
       "result": "FAIL_CLOSED_ON_11_PRE_EXISTING_ANSI_TEST_OBSERVATION_ASSERTIONS"
     },
     {
-      "command": "Accepted ANSI normalization at two assertion sites and independent correction review",
+      "command": "Owner-ratified ANSI normalization at the two existing assertion observation boundaries",
+      "result": "PASS_PENDING_INDEPENDENT_CONFIRMATION_OF_OWNER_AMENDMENT"
+    },
+    {
+      "command": "Corrected automatic run 32678074317 at reviewed head b8ce5de",
+      "result": "PASS_HISTORICAL_FINAL_SHA_AT_REVIEWED_STATE"
+    },
+    {
+      "command": "Full independent technical and governance review at b8ce5de",
+      "result": "GOV_001_AND_CI_REV_001_MATERIAL_P2_REMEDIATION_REQUIRED"
+    },
+    {
+      "command": "Post-review owner scope amendment for exact 4da506d8 ANSI observation deltas",
+      "result": "OWNER_SCOPE_AMENDMENT_SUPPLIED_PENDING_INDEPENDENT_CONFIRMATION"
+    },
+    {
+      "command": "Semantic sentinel OR validation and all bounded workflow/validator mutation tests",
       "result": "PASS"
     },
     {
-      "command": "Available shard, branch-data transport/combine, inherited regression, static, build, wheel, repository, security, evidence, manifest, lineage, and scope checks",
-      "result": "PASS_WITH_LOCAL_POSTGRESQL_PREREQUISITE_DEFERRED_TO_CORRECTED_FINAL_CI"
+      "command": "Final worktree population preservation, focused tests, formatting, lint, and strict typing",
+      "result": "PASS_3147_ELIGIBLE_3133_PRESERVED_14_ADDITIVE"
     },
     {
-      "command": "Corrected automatic final-SHA GitHub Actions and independent acceptance",
-      "result": "PENDING_EXTERNAL_AFTER_CORRECTIVE_PUSH"
+      "command": "Review-remediation final-SHA GitHub Actions and independent re-review",
+      "result": "PENDING_EXTERNAL_AFTER_REVIEW_REMEDIATION_PUSH"
     }
   ],
   "artifacts": [
     {
       "path": "evidence/tickets/CI-COVERAGE-SHARD-001/COMMAND_LEDGER.txt",
-      "sha256": "4da2270a26555dc2ec7f89d090bc99ce748193b1dc655054437628f25bfed572",
-      "bytes": 6419
+      "sha256": "71dcde284fcf3556281a2804eba98de7b23b2e7f5162b6703c09565bef3b3717",
+      "bytes": 9878
     },
     {
       "path": "evidence/tickets/CI-COVERAGE-SHARD-001/FINAL_SELF_REVIEW.md",
-      "sha256": "fb71594997f421815f82dfaa13638707f079765e92503c842ed6f0eee0e87f1d",
-      "bytes": 3538
+      "sha256": "be2aa9c7ac4a0539cdec21521be04dc4b1ac4f98afec5fcac430607b4956b831",
+      "bytes": 4968
     },
     {
       "path": "evidence/tickets/CI-COVERAGE-SHARD-001/IMPLEMENTATION_RESULT.md",
-      "sha256": "8af3a56697b07fe15ca67c00ac6bf55be14c1b2da4fbe7aa958107db6bb30dd2",
-      "bytes": 4831
+      "sha256": "b33a65302ca6f37556c53034a19b778dee622a69916cbce4cb1f26a10dde415c",
+      "bytes": 6556
     },
     {
       "path": "evidence/tickets/CI-COVERAGE-SHARD-001/KNOWN_LIMITATIONS.md",
-      "sha256": "03990b2d26ad0145e7b65afa94b580fcfaec271ae0fc3e312b59081a5ba946d8",
-      "bytes": 1517
+      "sha256": "dace4986d288a5eed8199ddd39932d6c2980c55255c3ce53dc5a4c612bc86253",
+      "bytes": 1609
+    },
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/OWNER_SCOPE_AMENDMENT.md",
+      "sha256": "8823a166dca3ae95e2b6202d9812f8ce790364af612234aad0df617edb92eb3d",
+      "bytes": 2072
     },
     {
       "path": "evidence/tickets/CI-COVERAGE-SHARD-001/PLAN.md",
-      "sha256": "28cc65412b49f3ea5b754d52e8900615c8f613ffe21a4ca9ec271e3132f2a0df",
-      "bytes": 2331
+      "sha256": "20bbb2f0a723f89d94aa393b73e410feffe0012863c5740db24b05591d236776",
+      "bytes": 3358
+    },
+    {
+      "path": "evidence/tickets/CI-COVERAGE-SHARD-001/REVIEW_REMEDIATION.md",
+      "sha256": "62a0acf9198bf505cbb66588291b7537e4f30d8d18c4fb9773150d8a9e46b2c3",
+      "bytes": 3291
     },
     {
       "path": "evidence/tickets/CI-COVERAGE-SHARD-001/ROOT_CAUSE.md",
-      "sha256": "d26e08fcf41d2b8fad112e8bd82410dcb86cac3ccefc59e8557c176fa2cc0604",
-      "bytes": 2787
+      "sha256": "3e5bcf7c5c00a61bb85209f464e7b9691d59f4c7afa1de55e499d4e16f91c801",
+      "bytes": 3658
     },
     {
       "path": "evidence/tickets/CI-COVERAGE-SHARD-001/current_manifest.json",
-      "sha256": "b4fa51bd0c0ecbb2d9de95019f6b836b5e507ad546cb809dddeacd36a3d5a6fe",
+      "sha256": "197daae07b608a224e77618a7f8aa90138dd91e09679e81a1c51f450890c2771",
       "bytes": 206902
     },
     {
       "path": "evidence/tickets/CI-COVERAGE-SHARD-001/result.json",
-      "sha256": "b3b5a980175a7f154fe25bf8f9cdb1011c90d65405a64b6f48c6fdc2a8ae88cd",
-      "bytes": 3287
+      "sha256": "dcdfd95acdfd6f1be3ffba8d081bb72c3c59023d80df07442c07d0082e4bcb90",
+      "bytes": 4343
     }
   ],
   "known_limitations": [
-    "Initial run 32676529440 is recorded because its fail-closed result caused the narrow test-observation correction; corrected final-SHA Actions identity, combined coverage metrics, downstream state, and sentinel state remain externally observable after the corrective push.",
-    "The local host lacks a running PostgreSQL service, so the PostgreSQL-dependent ODD installed-wheel verification remains for the unchanged final CI command.",
-    "Independent review, human acceptance, merge, production activation, and LIVE-ODDS integration remain separate and unclaimed."
+    "Run 32678074317 remains historical success evidence for reviewed state b8ce5de; the changed review-remediation SHA requires a new automatic run whose ID and metrics remain external to this pre-push evidence snapshot.",
+    "The owner scope amendment is supplied after independent review and remains pending independent confirmation; this evidence does not self-close GOV-001.",
+    "The local host lacks a running PostgreSQL service, so final PostgreSQL-backed shard, coverage, and downstream execution remains for the automatic workflow.",
+    "Independent re-review, human acceptance, merge, production activation, and LIVE-ODDS integration remain separate and unclaimed."
   ]
 }

@@ -1,6 +1,6 @@
 # CI-COVERAGE-SHARD-001 implementation result
 
-Status: `CORRECTED_AFTER_FAIL_CLOSED_TEST_OBSERVATION_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW`
+Status: `REVIEW_REMEDIATION_READY_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REREVIEW`
 
 ## Architecture
 
@@ -72,3 +72,28 @@ There are no changes under `src/`, `alembic/`, `config/`, `fixtures/`, `pyprojec
 The only incidental correctness changes are the two allowlisted test assertions. Historical
 CI-FPL/CI-TEST/LIVE-ODDS ticket evidence is unchanged. PR #16, independent acceptance, human
 acceptance, merge, and production activation are not claimed or performed.
+
+## Full independent review and bounded remediation
+
+The later full independent review at `b8ce5de612d835bee6721898cd57e46c133f90dd` superseded the
+earlier clean engineering self-assessment with two material findings. GOV-001 required owner
+authority for the two test-observation paths; the owner has now supplied a post-review amendment
+ratifying only their exact existing `4da506d8` deltas. CI-REV-001 demonstrated that changing every
+sentinel OR connector to AND passed both prior regression guards.
+
+The remediation leaves the already-correct workflow and both ratified ANSI tests unchanged. The
+repository validator now structurally validates the one sentinel condition: four unique mandatory
+result variables, each compared with `!= "success"`, connected only by OR, with `exit 1` inside the
+failure branch. Independent workflow-contract and direct validator tests reject the demonstrated
+all-AND escape and bounded related mutations.
+
+Final additive population/digest values, complete local gates, and manifest sealing are recorded
+before publication. A new final-SHA automatic run is mandatory because the branch changes. Its run
+identity and runtime/coverage results will be reported externally without a self-referential
+post-success commit. Independent re-review remains pending.
+
+The settled pre-publication collection contains 3,147 eligible nodeids: all 3,133 reviewed nodeids
+plus exactly 14 additive mutation cases. The exact population digest is
+`05222e70da23f1aa432ba1f4a83d8ab77c82f09d2e3473855d94442acb645a67`; there are no missing or
+duplicate assignments. Focused helper/workflow tests pass 56/56, existing validator/GCS tests pass
+8/8, and the unchanged owner-ratified CLI modules pass 35/35 with `GITHUB_ACTIONS=true`.

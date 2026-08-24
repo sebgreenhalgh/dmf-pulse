@@ -1,7 +1,7 @@
 ticket_id: CI-COVERAGE-SHARD-001
 stage: repository-governance
 title: Reliable deterministic sharded branch-coverage CI
-status: READY
+status: REVIEW_REMEDIATION_READY_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REREVIEW
 owner: Sebastian Greenhalgh
 implementer_role: codex_implementation
 reviewer_role: independent_governance_review_and_human
@@ -25,6 +25,21 @@ root_cause_evidence:
   first_architecture_run: "32676529440"
   first_architecture_run_result: FAIL_CLOSED_ON_11_PRE_EXISTING_ANSI_ASSERTIONS
   incidental_failure_classification: TEST_OBSERVATION_DEFECT
+  independent_reviewed_head: b8ce5de612d835bee6721898cd57e46c133f90dd
+  independent_review_findings:
+    - GOV-001_OWNER_SCOPE_AMENDMENT_REQUIRED
+    - CI-REV-001_SENTINEL_BOOLEAN_GUARD_REQUIRED
+
+owner_scope_amendment:
+  supplied_at: "2026-08-24"
+  supplied_after_independent_review: true
+  ratified_commit: 4da506d8fa4c00a61c5387f66b94e8c2d15a4c7b
+  ratified_reviewed_state: b8ce5de612d835bee6721898cd57e46c133f90dd
+  exact_paths:
+    - tests/unit/cli/test_rank_cli.py
+    - tests/unit/optimisation/test_multi_gameweek_cli_hardening.py
+  semantic_scope: ANSI_NORMALIZATION_AT_EXISTING_TEST_OBSERVATION_BOUNDARY_ONLY
+  status: OWNER_SCOPE_AMENDMENT_SUPPLIED_PENDING_INDEPENDENT_CONFIRMATION
 
 authority:
   scope: FND-001
@@ -98,6 +113,7 @@ required_controls:
   - unchanged_gcs_008_combined_coverage_gate
   - unchanged_downstream_acceptance_commands
   - fail_closed_stable_python_3_13_ubuntu_sentinel
+  - semantic_or_guard_for_every_mandatory_sentinel_result
   - no_timeout_increase_retry_or_continue_on_error
   - ansi_normalized_cli_assertions_preserve_semantic_text
 
@@ -105,7 +121,7 @@ acceptance_contract: tickets/CI-COVERAGE-SHARD-001/ACCEPTANCE.md
 
 completion_evidence:
   path: evidence/tickets/CI-COVERAGE-SHARD-001/
-  engineering_status: CI_ARCHITECTURE_REMEDIATED_PENDING_INDEPENDENT_REVIEW
-  automatic_final_sha_ci: externally_observable_after_corrective_push
+  engineering_status: REVIEW_REMEDIATION_READY_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REREVIEW
+  automatic_final_sha_ci: externally_observable_after_review_remediation_push
   human_acceptance: separate_and_not_claimed
   merge: forbidden
