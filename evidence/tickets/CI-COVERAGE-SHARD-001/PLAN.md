@@ -1,6 +1,6 @@
 # CI-COVERAGE-SHARD-001 implementation plan
 
-Status: `IMPLEMENTED_PENDING_AUTOMATIC_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW`
+Status: `CORRECTED_AFTER_FAIL_CLOSED_TEST_OBSERVATION_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW`
 
 Date: `2026-08-24`
 
@@ -26,10 +26,13 @@ Maximum engineering status:
 - [x] Contract-test completeness, determinism, transport integrity, aggregate thresholds,
   PostgreSQL preservation, downstream commands, and final status semantics.
 - [x] Pass the real implementation-tree partition audit and all locally available focused, static,
-  build,
-  repository, security, manifest, and scope checks.
-- [ ] Seal truthful pre-push evidence, publish once, and use only the automatic final-SHA Actions
-  run as decisive runtime acceptance.
+  build, repository, security, manifest, and scope checks.
+- [x] Classify automatic run `32676529440`: the DAG bounded all shards and failed closed on eleven
+  inherited ANSI-sensitive assertions, with no timeout, cancellation, omission, or transport loss.
+- [x] Apply and independently review the accepted CI-TEST-002 ANSI-normalization pattern at only
+  the two affected assertion sites; preserve every command, exit check, message, and color path.
+- [ ] Reseal truthful corrective evidence, publish without force-push, and use the corrected
+  automatic final-SHA Actions run as decisive acceptance.
 
 ## Publication boundary
 

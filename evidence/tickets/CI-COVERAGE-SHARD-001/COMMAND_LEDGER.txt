@@ -28,7 +28,7 @@ PASS | read-only scripts.validate_repository._validate_ci_contract(Path.cwd(), e
 PASS | independent adversarial review
        0 remaining P0; 0 P1; 0 material P2; 0 P3
 
-REAL FINAL-TREE PARTITION AUDIT AT IMPLEMENTATION CHECKPOINT d70264d
+REAL IMPLEMENTATION-TREE PARTITION AUDIT AT CHECKPOINT d70264d
 PASS | ci_coverage_shards.py plan --shard-count 8 --git-sha d70264d...
        eligible nodeids: 3,133
        parent eligible nodeids preserved: 3,091
@@ -88,8 +88,41 @@ PASS | workflow timeout ceiling
 PASS | retry, continue-on-error, allow-failure, and artifact overwrite scan
        absent
 
+FIRST AUTOMATIC ARCHITECTURE RUN
+FAIL_CLOSED | run 32676529440 at 9805e212daf844ff5335c9e5752db8767375f31b
+              17m28s wall time; no timeout or cancellation
+PASS | pre-flight in 4m00s
+       PostgreSQL 18.4; migration head 20260807_0006; 126 passed, 140 deselected in 177.59s
+PASS | final-SHA plan
+       3,133 exact nodeids; digest e6bce2db465dd0ea34560336d3127d8fd2ce180c6250db3067cdaba4fa89199f;
+       zero duplicate, omitted, or unexpected nodeids
+PASS | shards 0, 1, 3, 4, 6, and 7
+       pytest: 4, 159, 490, 486, 451, and 693 passed; verified branch-data artifacts uploaded
+TEST_OBSERVATION_DEFECT | shard 2: 366 passed, 7 ANSI-sensitive rank CLI assertions failed
+TEST_OBSERVATION_DEFECT | shard 5: 473 passed, 4 ANSI-sensitive optimisation assertions failed
+PASS | all assignments executed exactly once
+       3,122 passed; 11 failed; maximum job 13m16s; maximum pytest 765.16s
+PASS | fail-closed DAG
+       combined coverage and post-coverage skipped; Python 3.13 / Ubuntu sentinel ran and failed
+       on coverage_shards=failure, combined_coverage=skipped, post_coverage=skipped
+
+CORRECTIVE TEST-OBSERVATION CHECKPOINT 4da506d
+PASS | raw logs classified before editing
+       semantic message and required exit codes present; ANSI controls split the raw literal
+PASS | exact CI-TEST-002 Text.from_ansi(...).plain pattern applied at two assertion sites
+PASS | affected GitHub Actions semantic targets
+       4 optimisation + 7 rank cases passed
+PASS | complete affected modules with GitHub Actions semantics
+       17 optimisation + 18 rank = 35 passed
+PASS | independent correction review
+       0 P0; 0 P1; 0 material P2; 0 P3
+PASS | corrected real-tree partition
+       3,133 nodeids; unchanged digest; zero duplicate, omitted, unexpected, or empty assignments
+PASS | no masking or semantic change
+       commands, exit checks, wording, ANSI rendering, workflow, product, dependencies unchanged
+
 PUBLICATION BOUNDARY
-PENDING | automatic final-SHA GitHub Actions
+PENDING | corrected automatic final-SHA GitHub Actions
           Runtime proof for every PostgreSQL-backed shard, aggregate coverage, GCS gates,
-          downstream acceptance, and the stable sentinel is recorded externally after one push.
+          downstream acceptance, and the stable sentinel is recorded externally after correction.
 NOT CLAIMED | independent acceptance, human acceptance, merge, production activation

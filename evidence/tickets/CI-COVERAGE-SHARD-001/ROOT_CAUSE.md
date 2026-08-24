@@ -24,3 +24,17 @@ files by deterministic weighted longest-processing-time scheduling, executes eig
 isolated coverage shards, verifies every artifact and the complete partition, combines branch data,
 applies the unchanged 90 percent repository floor and GCS-008 gates, then runs every inherited
 downstream command. An exact-name sentinel fails unless every mandatory DAG stage succeeded.
+
+## First architecture-run discovery
+
+Automatic run `32676529440` on implementation SHA
+`9805e212daf844ff5335c9e5752db8767375f31b` validated the bounded execution architecture. Pre-flight
+passed, all eight PostgreSQL-backed shards ran, six passed, and the maximum shard job runtime was
+13m16s. Two shards failed only after correctly executing their assigned tests: seven rank and four
+optimisation CLI assertions compared raw ANSI-styled Typer output to an unstyled substring. The
+semantic message and required exit codes were present; ANSI control sequences split the literal.
+
+This is a separate `TEST_OBSERVATION_DEFECT`, not an architecture, product, database, timeout, or
+coverage-transport defect. The parent monolith had never reached these tests on Linux. The accepted
+CI-TEST-002 correction establishes the narrow remedy: normalize ANSI only at assertion time. The
+two sibling assertions now use that exact pattern; disabling color in CI was rejected as masking.

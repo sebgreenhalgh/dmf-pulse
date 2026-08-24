@@ -1,10 +1,10 @@
 {
   "ticket_id": "CI-COVERAGE-SHARD-001",
-  "status": "IMPLEMENTED_PENDING_AUTOMATIC_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW",
+  "status": "CORRECTED_AFTER_FAIL_CLOSED_TEST_OBSERVATION_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW",
   "classification": "CI_COVERAGE_EXECUTION_ARCHITECTURE",
   "required_parent": "740e70f0ee836a8fab162c56e8345033a06d926b",
   "branch": "remediation/CI-COVERAGE-SHARD-001-sharded-coverage",
-  "implementation_checkpoint": "d70264db56e40ecdd2e45c6ac9204ace12d14336",
+  "implementation_checkpoint": "4da506d8fa4c00a61c5387f66b94e8c2d15a4c7b",
   "architecture": {
     "shard_count": 8,
     "marker_expression": "not performance",
@@ -46,6 +46,30 @@
     "evidence_validation": "PASS",
     "manifest_validation": "PASS"
   },
+  "first_automatic_run": {
+    "run_id": 32676529440,
+    "head_sha": "9805e212daf844ff5335c9e5752db8767375f31b",
+    "conclusion": "FAILURE_FAIL_CLOSED",
+    "pre_flight": "PASS_POSTGRESQL_18_4_126_PASSED_140_DESELECTED",
+    "successful_shards": [0, 1, 3, 4, 6, 7],
+    "failed_shards": [2, 5],
+    "tests_passed": 3122,
+    "tests_failed": 11,
+    "maximum_shard_job_seconds": 796,
+    "maximum_pytest_seconds": 765.16,
+    "combined_coverage": "SKIPPED_FAIL_CLOSED",
+    "post_coverage": "SKIPPED_FAIL_CLOSED",
+    "stable_sentinel": "FAILURE_FAIL_CLOSED",
+    "timeout_or_cancellation": false,
+    "failure_classification": "PRE_EXISTING_ANSI_TEST_OBSERVATION_DEFECT"
+  },
+  "corrective_validation": {
+    "affected_assertions": 11,
+    "complete_affected_modules": "PASS_35",
+    "commands_exit_codes_and_wording_preserved": true,
+    "workflow_color_masking_added": false,
+    "independent_findings": "P0_0_P1_0_MATERIAL_P2_0_P3_0"
+  },
   "scope": {
     "product_source_changed": false,
     "migrations_changed": false,
@@ -60,7 +84,7 @@
     "material_p2": 0,
     "p3": 0
   },
-  "automatic_final_sha_ci": "PENDING_EXTERNAL_AFTER_SINGLE_PUSH",
+  "automatic_final_sha_ci": "PENDING_EXTERNAL_AFTER_CORRECTIVE_PUSH",
   "independent_review": "PENDING",
   "human_acceptance": "NOT_CLAIMED",
   "merged": false

@@ -45,5 +45,20 @@ removed and regression-guarded so duplicate/colliding producers fail. The final 
 - Material P2: 0
 - P3: 0
 
-Automatic final-SHA CI and independent acceptance remain pending. This self-review does not claim
-human acceptance, authorize merge, or alter LIVE-ODDS.
+## First-run classification and correction review
+
+- Run `32676529440` executed all 3,133 assignments exactly once: yes.
+- Six shard transports passed and two failed only on 11 ANSI-sensitive assertions: yes.
+- Maximum job runtime stayed below 25 and 35 minutes: yes; 13m16s.
+- Missing/duplicate tests, timeout, cancellation, database, or artifact collision caused failure:
+  no.
+- Combined/post gates skipped and the sentinel failed instead of reporting green: yes.
+- Raw output contained the required message and every expected exit code: yes.
+- Correction follows the accepted CI-TEST-002 `Text.from_ansi(...).plain` pattern: yes.
+- Commands, inputs, exit checks, wording, color behavior, product, workflow, and dependencies changed:
+  no.
+- Complete affected modules passed: yes; 35 passed.
+- Independent correction review findings: P0 0; P1 0; material P2 0; P3 0.
+
+Corrected automatic final-SHA CI and independent acceptance remain pending. This self-review does
+not claim human acceptance, authorize merge, or alter LIVE-ODDS.

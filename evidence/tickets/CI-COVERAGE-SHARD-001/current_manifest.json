@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 83868,
+      "bytes": 84278,
       "path": "PLANS.md",
-      "sha256": "93d8ba09b1c371214a0767c4c4de557662278fa8a971022e12b8347eeb392164"
+      "sha256": "2d7cacab8979bfa63dafe4f0a9689efc92522e152bbbf11673b74485fb8e9f5a"
     },
     {
       "bytes": 2761,
@@ -4971,9 +4971,9 @@
       "sha256": "08dda00ff7c979dbfb2bbc281c7f58aebd920c3b71fc37926ac44a55dd2e3d76"
     },
     {
-      "bytes": 11044,
+      "bytes": 11125,
       "path": "tests/unit/cli/test_rank_cli.py",
-      "sha256": "60cfbabb26971459f9f48cb17651f3dfd54038c4db56533775ade941d1205a9c"
+      "sha256": "09b89b6912a433404e0a3708977dd7ca44b0338a346f18084e8f7fc099642fee"
     },
     {
       "bytes": 9905,
@@ -5256,9 +5256,9 @@
       "sha256": "be180b034e627df5bb023f5fab9361285d579d51131fa68f2db199c9d147ad9b"
     },
     {
-      "bytes": 6814,
+      "bytes": 6895,
       "path": "tests/unit/optimisation/test_multi_gameweek_cli_hardening.py",
-      "sha256": "08a5d9a4d8734506b6916cafdf6409e2d1e58f5745743c88a236182a77510f6d"
+      "sha256": "55394d9baf46de78bc493d297f391204898a207212df1357198890f33b3bcce9"
     },
     {
       "bytes": 26712,
@@ -5511,14 +5511,14 @@
       "sha256": "2204fa4d8b2bb3e53dd14247077ff7831e2cf6a0043380dea855ee81ccb4581d"
     },
     {
-      "bytes": 4439,
+      "bytes": 5052,
       "path": "tickets/CI-COVERAGE-SHARD-001/ACCEPTANCE.md",
-      "sha256": "4006b7305382715265061e16767f5a2201b946d46c27048be568d2a27395f18f"
+      "sha256": "0a8e5a31b99c25439f8b8cb160cba0165ef75df610f816a095349702c86dfd4d"
     },
     {
-      "bytes": 3708,
+      "bytes": 4551,
       "path": "tickets/CI-COVERAGE-SHARD-001/ticket.yaml",
-      "sha256": "46f60583fefecabb4497cb53da57a66d2a60afeedfc4bf03d1411f2c3ab1f50f"
+      "sha256": "24526cfaceef3f8de303db27b455062306055dfb0a4ddef822660c4a8a04100e"
     },
     {
       "bytes": 12178,
