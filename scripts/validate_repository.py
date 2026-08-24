@@ -846,6 +846,48 @@ def _workflow_job_block(workflow: str, job_id: str) -> str:
     return "\n".join(lines[start:end])
 
 
+def _quality_sentinel_predicate_error(sentinel: str) -> str | None:
+    """Return the narrow fail-closed predicate defect, if any."""
+
+    condition_pattern = re.compile(
+        r"(?ms)^\s*if\s+\[\[\s*(?P<predicate>.*?)\s*\]\];\s*then\s*$"
+        r"(?P<body>.*?)^\s*fi\s*$"
+    )
+    conditions = list(condition_pattern.finditer(sentinel))
+    if len(conditions) != 1:
+        return "must contain exactly one shell failure condition"
+
+    condition = conditions[0]
+    predicate = condition.group("predicate")
+    if "&&" in predicate:
+        return "must OR every mandatory result clause and must not contain AND"
+
+    clauses = re.split(r"\s*\|\|\s*", predicate)
+    if len(clauses) != 4:
+        return "must contain exactly four OR-connected mandatory result clauses"
+
+    clause_pattern = re.compile(r'^\s*"\$(?P<variable>[A-Z][A-Z0-9_]*)"\s*!=\s*"success"\s*$')
+    variables: list[str] = []
+    for clause in clauses:
+        match = clause_pattern.fullmatch(clause)
+        if match is None:
+            return 'each clause must have the form "$EXPECTED_RESULT" != "success"'
+        variables.append(match.group("variable"))
+
+    expected_variables = {
+        "PRE_FLIGHT_RESULT",
+        "COVERAGE_SHARDS_RESULT",
+        "COMBINED_COVERAGE_RESULT",
+        "POST_COVERAGE_RESULT",
+    }
+    if len(set(variables)) != len(variables) or set(variables) != expected_variables:
+        return "must compare each mandatory result variable exactly once"
+
+    if re.search(r"(?m)^\s*exit\s+1\s*$", condition.group("body")) is None:
+        return "failure branch must contain exit 1"
+    return None
+
+
 def _validate_sharded_coverage_ci_contract(ci: str, errors: list[str]) -> None:
     obsolete_monolith = (
         "uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing "
@@ -916,9 +958,10 @@ def _validate_sharded_coverage_ci_contract(ci: str, errors: list[str]) -> None:
             errors.append(
                 "ci.yml quality sentinel does not inspect prerequisite result: " + prerequisite
             )
-    if sentinel.count("success") < len(prerequisites) or "exit 1" not in sentinel:
+    predicate_error = _quality_sentinel_predicate_error(sentinel)
+    if predicate_error is not None:
         errors.append(
-            "ci.yml quality sentinel must explicitly fail unless every prerequisite succeeds"
+            "ci.yml quality sentinel has an invalid fail-closed OR predicate: " + predicate_error
         )
     if ci.count("name: Python 3.13 / Ubuntu") != 1:
         errors.append("ci.yml must expose exactly one stable Python 3.13 / Ubuntu job name")

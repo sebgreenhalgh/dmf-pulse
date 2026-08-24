@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import importlib.util
+import re
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
+import pytest
 import yaml
 
 WORKFLOW_PATH = Path(".github/workflows/ci.yml")
+VALIDATOR_PATH = Path("scripts/validate_repository.py")
 POSTGRES_IMAGE = (
     "postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296"
 )
@@ -15,12 +20,26 @@ GCS_BRANCH_CONDITION = (
     "github.ref_name == 'stage/A8/GCS-008-goal-clean-sheet-distributions' || "
     "github.head_ref == 'stage/A8/GCS-008-goal-clean-sheet-distributions'"
 )
+MANDATORY_RESULT_VARIABLES = {
+    "PRE_FLIGHT_RESULT",
+    "COVERAGE_SHARDS_RESULT",
+    "COMBINED_COVERAGE_RESULT",
+    "POST_COVERAGE_RESULT",
+}
 
 
 def _workflow() -> dict[str, Any]:
     value = yaml.safe_load(WORKFLOW_PATH.read_text(encoding="utf-8"))
     assert isinstance(value, dict)
     return value
+
+
+def _validator_module() -> ModuleType:
+    spec = importlib.util.spec_from_file_location("ci_repository_validator", VALIDATOR_PATH)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _jobs() -> dict[str, dict[str, Any]]:
@@ -49,6 +68,69 @@ def _assert_fragments_in_order(value: str, fragments: list[str]) -> None:
         next_position = value.find(fragment, position + 1)
         assert next_position >= 0, fragment
         position = next_position
+
+
+def _assert_fail_closed_sentinel_command(command: str) -> None:
+    condition_pattern = re.compile(
+        r"(?ms)^\s*if\s+\[\[\s*(?P<predicate>.*?)\s*\]\];\s*then\s*$"
+        r"(?P<body>.*?)^\s*fi\s*$"
+    )
+    conditions = list(condition_pattern.finditer(command))
+    assert len(conditions) == 1
+    condition = conditions[0]
+    predicate = condition.group("predicate")
+    assert "&&" not in predicate
+    clauses = re.split(r"\s*\|\|\s*", predicate)
+    assert len(clauses) == 4
+    clause_pattern = re.compile(r'^\s*"\$(?P<variable>[A-Z][A-Z0-9_]*)"\s*!=\s*"success"\s*$')
+    matches = [clause_pattern.fullmatch(clause) for clause in clauses]
+    assert all(match is not None for match in matches)
+    variables = [match.group("variable") for match in matches if match is not None]
+    assert len(set(variables)) == len(variables)
+    assert set(variables) == MANDATORY_RESULT_VARIABLES
+    assert re.search(r"(?m)^\s*exit\s+1\s*$", condition.group("body")) is not None
+
+
+def _mutate_sentinel_command(command: str, mutation: str) -> str:
+    if mutation == "all_or_to_and":
+        mutated = command.replace(" || ", " && ")
+    elif mutation == "one_or_to_and":
+        mutated = command.replace(" || ", " && ", 1)
+    elif mutation == "missing_result":
+        mutated = command.replace(' || "$POST_COVERAGE_RESULT" != "success"', "")
+    elif mutation == "duplicate_result":
+        mutated = command.replace(
+            '"$POST_COVERAGE_RESULT" != "success"',
+            '"$PRE_FLIGHT_RESULT" != "success"',
+        )
+    elif mutation == "inverted_comparison":
+        mutated = command.replace(
+            '"$PRE_FLIGHT_RESULT" != "success"',
+            '"$PRE_FLIGHT_RESULT" == "success"',
+        )
+    elif mutation == "missing_exit":
+        mutated = command.replace("exit 1", "true")
+    else:
+        raise AssertionError(f"unsupported mutation: {mutation}")
+    assert mutated != command
+    return mutated
+
+
+def _mutate_quality_workflow(workflow: str, mutation: str) -> str:
+    prefix, marker, quality = workflow.partition("\n  quality:\n")
+    assert marker
+    if mutation == "missing_always":
+        mutated_quality = quality.replace("if: ${{ always() }}", "if: ${{ success() }}", 1)
+    elif mutation == "missing_need":
+        mutated_quality = quality.replace(
+            "needs: [pre_flight, coverage_shards, combined_coverage, post_coverage]",
+            "needs: [pre_flight, combined_coverage, post_coverage]",
+            1,
+        )
+    else:
+        mutated_quality = _mutate_sentinel_command(quality, mutation)
+    assert mutated_quality != quality
+    return prefix + marker + mutated_quality
 
 
 def _assert_postgres_contract(job: dict[str, Any]) -> None:
@@ -271,10 +353,47 @@ def test_public_quality_check_is_an_explicit_fail_closed_sentinel() -> None:
         "COMBINED_COVERAGE_RESULT": "${{ needs.combined_coverage.result }}",
         "POST_COVERAGE_RESULT": "${{ needs.post_coverage.result }}",
     }
-    command = _normalise(sentinel["run"])
-    for name in sentinel["env"]:
-        assert f'"${name}" != "success"' in command
-    assert "exit 1" in command
+    _assert_fail_closed_sentinel_command(sentinel["run"])
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "all_or_to_and",
+        "one_or_to_and",
+        "missing_result",
+        "duplicate_result",
+        "inverted_comparison",
+        "missing_exit",
+    ],
+)
+def test_workflow_contract_rejects_unsafe_sentinel_mutations(mutation: str) -> None:
+    sentinel = _step(_jobs()["quality"], "Require every mandatory CI stage to succeed")
+    mutated = _mutate_sentinel_command(sentinel["run"], mutation)
+    with pytest.raises(AssertionError):
+        _assert_fail_closed_sentinel_command(mutated)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "all_or_to_and",
+        "one_or_to_and",
+        "missing_result",
+        "duplicate_result",
+        "inverted_comparison",
+        "missing_exit",
+        "missing_always",
+        "missing_need",
+    ],
+)
+def test_repository_validator_rejects_unsafe_sentinel_mutations(mutation: str) -> None:
+    workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
+    mutated = _mutate_quality_workflow(workflow, mutation)
+    errors: list[str] = []
+    _validator_module()._validate_sharded_coverage_ci_contract(mutated, errors)
+    assert errors
+    assert any("quality sentinel" in error for error in errors)
 
 
 def test_artifact_transport_and_failure_policy_have_no_soft_paths() -> None:
