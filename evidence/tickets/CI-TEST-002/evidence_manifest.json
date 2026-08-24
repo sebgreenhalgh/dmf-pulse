@@ -1,0 +1,78 @@
+{
+  "ticket_id": "CI-TEST-002",
+  "status": "DRAFT",
+  "created_at": "2026-08-23T21:19:25Z",
+  "code_commit": null,
+  "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+  "commands": [
+    {
+      "command": "Mechanical Layer-B and Layer-C executable blob and stable patch identity",
+      "result": "PASS"
+    },
+    {
+      "command": "Targeted, GITHUB_ACTIONS, FPL pair, temporal/lifecycle, and PostgreSQL 18.4 matrices",
+      "result": "PASS"
+    },
+    {
+      "command": "Diff, format, lint, typing, repository, secret, manifest, and scope validation",
+      "result": "PASS"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/tickets/CI-TEST-002/COMMAND_LEDGER.txt",
+      "sha256": "aa9ece795f7bbd9300bddf6a3d8ce3fd25b6928a1054c2e3a0427097b3924533",
+      "bytes": 3451
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/FINAL_SELF_REVIEW.md",
+      "sha256": "34133395337f6489aa133da6eb2c4f62fad8a083fed143a3ecb300f6bbc6074f",
+      "bytes": 1791
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/IMPLEMENTATION_RESULT.md",
+      "sha256": "531ef42497aac381fdc4027bb869817e09be577a329693e415c1135a7346f4cf",
+      "bytes": 1846
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/KNOWN_LIMITATIONS.md",
+      "sha256": "9665961a6c953efcf4a91590983ebc3400700dcbcdf6f9394d77158e0c8a7eb1",
+      "bytes": 808
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/LINEAGE_RESEAL.md",
+      "sha256": "4910f18e64137c26c7ebbdf151ed7aed32f0a57eafb963e13bdcc26e75b93913",
+      "bytes": 1291
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/PLAN.md",
+      "sha256": "a498c2c980aaced992fbf6aca84239794b21ed519adb23862ea667c43731d13b",
+      "bytes": 1549
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/ROOT_CAUSE.md",
+      "sha256": "0d038699b7c741332eaab92f847ae4577efa2212d7c8634477c56b8bd50b6633",
+      "bytes": 1407
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/STACK_REBUILD_RESULT.md",
+      "sha256": "4a2b2e091ead9f16e8e4ded2890c8aade3e8edcda48e26625d0333383264c133",
+      "bytes": 1986
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/current_manifest.json",
+      "sha256": "c97c6cd4470ea722aefb48bd8eac21dc5346e986aa1f38f5ded61bb63dd9693d",
+      "bytes": 206008
+    },
+    {
+      "path": "evidence/tickets/CI-TEST-002/result.json",
+      "sha256": "dfd2be0c40073df772a066c27c909c1ebf3d6a01d1ff1b03634b0f8ac71511d0",
+      "bytes": 1900
+    }
+  ],
+  "known_limitations": [
+    "The old clean reviews covered historical parents; rebuilt ancestry needs independent confirmation.",
+    "The inherited 35-minute monolithic coverage runtime architecture remains unresolved and unchanged.",
+    "Automatic branch CI and independent lineage confirmation occur after the single final push."
+  ]
+}

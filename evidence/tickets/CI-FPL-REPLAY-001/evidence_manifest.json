@@ -1,0 +1,91 @@
+{
+  "ticket_id": "CI-FPL-REPLAY-001",
+  "status": "BLOCKED",
+  "created_at": "2026-08-23T18:48:17Z",
+  "code_commit": "6c5d73c56d8dcb39410da298d3068af38a9f50b8",
+  "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+  "commands": [
+    {
+      "command": "uv run python -m pytest tests/integration/ingestion/test_fpl_pair_context_integrity.py -q",
+      "result": "PASS",
+      "summary": "8 passed in 2.28s; PAIR-01..07 and PAIR-10 fail closed with immutable-trigger restoration"
+    },
+    {
+      "command": "uv run python -m pytest -q tests/integration/ingestion/test_fpl_pair_context_integrity.py tests/integration/ingestion/test_fpl_replay_time_policy.py tests/integration/ingestion/test_fpl_lifecycle_resume.py tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py tests/integration/ingestion/test_fpl_temporal_identity.py tests/integration/ingestion/test_fpl_concurrency.py tests/unit/ingestion/test_fpl_service_boundaries.py",
+      "result": "PASS",
+      "summary": "104 passed in 66.35s; PAIR-01..18 and TIME-01..18 covered"
+    },
+    {
+      "command": "uv run python -m pytest -m \"postgres and integration\" tests/integration",
+      "result": "PASS",
+      "summary": "126 passed, 140 deselected in 283.03s on PostgreSQL 18.4"
+    },
+    {
+      "command": "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head --report <artifact> --offline-sql <artifact> --schema-manifest <artifact>",
+      "result": "PASS",
+      "summary": "five migration legs passed; no new upgrade operations; schema hash unchanged"
+    },
+    {
+      "command": "uv sync --all-groups --frozen; git diff --check; Ruff format/lint; mypy; secret scan",
+      "result": "PASS",
+      "summary": "40 packages unchanged; 637 files formatted; lint clean; 245 source files typed; zero secret findings"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/A-FPL-001_REMEDIATION.md",
+      "sha256": "267640e27269e8a8d5d613492419695f6c9bab71d299ffa4bae425c54a4b0999",
+      "bytes": 4855
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/COMMAND_LEDGER.txt",
+      "sha256": "9092a19b5f573fdd1a9f36bea36a632a01335dac9f8128c52eefffc2118b2dab",
+      "bytes": 9009
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/FINAL_SELF_REVIEW.md",
+      "sha256": "49e40f83034438c9469a0c849c6a58cc9ce17069a679b410478e5c8d56136e6b",
+      "bytes": 5169
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/IMPLEMENTATION_RESULT.md",
+      "sha256": "d239d2abbe0f64680db38548efb6e15ea311ab7cc38180379ece416ff511cfdd",
+      "bytes": 5761
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/KNOWN_LIMITATIONS.md",
+      "sha256": "ca41f7cbc5c1088ac6b6b84b2faa710ebf76c701d928e06ec26130fd78c7bb39",
+      "bytes": 3102
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/PLAN.md",
+      "sha256": "e4896d7a4df5eabe2b59dadcc3ce9a1be3d7748c9eb5ca2c80f551130e637b85",
+      "bytes": 5134
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/ROOT_CAUSE.md",
+      "sha256": "5eb945698f4e65e5d42cb88cb6152cb9606a71c2f9e76fbcb6ec173f4228926d",
+      "bytes": 5790
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/coverage.json",
+      "sha256": "ff187906a917ab3ee62b94f5597c57fad746c9299e61cde3ae49bb22167752c6",
+      "bytes": 2923216
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/current_manifest.json",
+      "sha256": "81bc300367d569fb1e41bd6289aae4d2b4708205def113ba4396c97bd714f520",
+      "bytes": 205346
+    },
+    {
+      "path": "evidence/tickets/CI-FPL-REPLAY-001/result.json",
+      "sha256": "09d6e49a8485d0bbfae790ce6a8a04f6db3e4c6e3bdbba6d5d93416d726fa8fc",
+      "bytes": 4819
+    }
+  ],
+  "known_limitations": [
+    "Branch CI cannot finish within the pre-existing 35-minute job limit; changing or splitting the workflow is outside this ticket.",
+    "The ingestion-run logical key is independent of both context documents but not protected against simultaneous privileged corruption of the run row and both documents.",
+    "Independent re-review of A-FPL-001 and human acceptance remain pending."
+  ]
+}

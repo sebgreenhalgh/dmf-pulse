@@ -427,9 +427,23 @@ def _resume_boundary(
     rows: list[dict[str, object]],
 ) -> _Disposable:
     engine = _Disposable()
+
+    def verified_pair(
+        _self: FplIngestionService,
+        _session: object,
+        _snapshot_id: UUID,
+    ) -> tuple[str, dict[str, object], dict[str, dict[str, object]]]:
+        pair_key = context.get("pair_key")
+        if not isinstance(pair_key, str):
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair context is unavailable")
+        by_resource = {str(row["resource"]): row for row in rows}
+        if len(rows) != 2 or set(by_resource) != {"bootstrap", "fixtures"}:
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair is incomplete")
+        return pair_key, dict(context), by_resource
+
     monkeypatch.setattr(service_module, "_engine", lambda _reference: engine)
     monkeypatch.setattr(service_module, "session_factory", lambda _engine: _ResumeFactory(rows))
-    monkeypatch.setattr(service_module, "received_context", lambda _session, _snapshot: context)
+    monkeypatch.setattr(FplIngestionService, "_verified_resume_pair", verified_pair)
     return engine
 
 
@@ -486,6 +500,7 @@ def test_resume_rejects_fixture_bytes_that_changed_after_receive(
         "bootstrap_path": "fixtures/fpl/FPL-004/happy_path/bootstrap.json",
         "captured_at": "2026-08-21T17:00:00Z",
         "fixtures_path": "fixtures/fpl/FPL-004/happy_path/fixtures.json",
+        "operation_time_policy": "FROZEN_REPLAY_CAPTURED_AT_V1",
         "profile_id": "synthetic_test_v1",
         "profile_version": "1.0.0",
         "rights_config_sha256": service_module.rights_config_sha256(),
@@ -559,12 +574,32 @@ def test_bundle_lookup_handles_absent_and_present_snapshot_without_hidden_resolu
         ("happy", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), None),
         ("changed", "changed_snapshot", datetime(2026, 8, 21, 17, 10, tzinfo=UTC), None),
         ("post_cutoff", "post_cutoff", datetime(2026, 8, 21, 17, 31, tzinfo=UTC), None),
-        ("resume-stored", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), "STORED"),
+        ("resume-mapped", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), "MAPPED"),
+        ("resume-parsed", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), "PARSED"),
+        (
+            "resume-promoted",
+            "happy_path",
+            datetime(2026, 8, 21, 17, tzinfo=UTC),
+            "PROMOTED",
+        ),
         (
             "resume-raw_discarded",
             "happy_path",
             datetime(2026, 8, 21, 17, tzinfo=UTC),
-            "RAW-DISCARDED",
+            "STORED_OR_RAW_DISCARDED",
+        ),
+        ("resume-stored", "happy_path", datetime(2026, 8, 21, 17, tzinfo=UTC), "STORED"),
+        (
+            "resume-stored_or_raw_discarded",
+            "happy_path",
+            datetime(2026, 8, 21, 17, tzinfo=UTC),
+            "STORED_OR_RAW_DISCARDED",
+        ),
+        (
+            "resume-validated",
+            "happy_path",
+            datetime(2026, 8, 21, 17, tzinfo=UTC),
+            "VALIDATED",
         ),
     ],
 )
@@ -579,11 +614,17 @@ def test_replay_aliases_are_explicit_and_deterministic(
     observed: dict[str, Any] = {}
     sentinel = object()
 
-    def capture(_self: FplIngestionService, request: FplImportRequest) -> Any:
+    def capture(
+        _self: FplIngestionService,
+        request: FplImportRequest,
+        *,
+        operation_time_policy: str,
+    ) -> Any:
         observed["request"] = request
+        observed["operation_time_policy"] = operation_time_policy
         return sentinel
 
-    monkeypatch.setattr(FplIngestionService, "import_pair", capture)
+    monkeypatch.setattr(FplIngestionService, "_import_pair", capture)
     service = FplIngestionService(repository_root=tmp_path)
     result = service.replay(FplReplayRequest(fixture_set=tmp_path / "fixtures", scenario=scenario))
     request = observed["request"]
@@ -591,6 +632,237 @@ def test_replay_aliases_are_explicit_and_deterministic(
     assert request.bootstrap_path == tmp_path / "fixtures" / expected_scenario / "bootstrap.json"
     assert request.captured_at == captured
     assert request.halt_after_stage == halt
+    assert observed["operation_time_policy"] == "FROZEN_REPLAY_CAPTURED_AT_V1"
+
+
+@pytest.mark.parametrize("scenario", ("resume-post_cutoff", "resume-typo"))
+def test_replay_rejects_arbitrary_resume_aliases_before_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    scenario: str,
+) -> None:
+    def unexpected_import(*_args: object, **_kwargs: object) -> Any:
+        pytest.fail("an unapproved resume alias must fail before fixture import")
+
+    monkeypatch.setattr(FplIngestionService, "import_pair", unexpected_import)
+    monkeypatch.setattr(
+        FplIngestionService,
+        "_import_pair",
+        unexpected_import,
+        raising=False,
+    )
+    with pytest.raises(IngestionError, match="resume scenario is not approved") as caught:
+        FplIngestionService(repository_root=tmp_path).replay(
+            FplReplayRequest(fixture_set=tmp_path / "fixtures", scenario=scenario)
+        )
+    assert caught.value.code == "USAGE_INVALID"
+
+
+@pytest.mark.parametrize(
+    "scenario",
+    [
+        pytest.param("happy_path/../post_cutoff", id="path-traversal"),
+        pytest.param("HAPPY_PATH", id="case-variant"),
+        pytest.param("happy_path/.", id="noncanonical-path"),
+        pytest.param(None, id="absolute-path"),
+    ],
+)
+def test_replay_rejects_noncanonical_scenario_identity_before_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    scenario: str | None,
+) -> None:
+    fixture_set = tmp_path / "fixtures"
+    scenario = scenario or str((tmp_path / "outside" / "post_cutoff").resolve())
+
+    def unexpected_import(*_args: object, **_kwargs: object) -> Any:
+        pytest.fail("an unapproved scenario must fail before fixture import")
+
+    # Patch both boundaries so the regression stays red against the pre-policy
+    # implementation as well as guarding the policy-aware private boundary.
+    monkeypatch.setattr(FplIngestionService, "import_pair", unexpected_import)
+    monkeypatch.setattr(
+        FplIngestionService,
+        "_import_pair",
+        unexpected_import,
+        raising=False,
+    )
+    with pytest.raises(IngestionError, match="scenario is not approved") as caught:
+        FplIngestionService(repository_root=tmp_path).replay(
+            FplReplayRequest(fixture_set=fixture_set, scenario=scenario)
+        )
+    assert caught.value.code == "USAGE_INVALID"
+
+
+def test_replay_rejects_approved_name_resolving_to_another_scenario(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fixture_set = tmp_path / "fixtures"
+    target = fixture_set / "post_cutoff"
+    target.mkdir(parents=True)
+    scenario_path = fixture_set / "happy_path"
+    original_resolve = Path.resolve
+    redirected_target = original_resolve(target)
+
+    def redirected_resolve(path: Path, strict: bool = False) -> Path:
+        if path == scenario_path:
+            return redirected_target
+        return original_resolve(path, strict=strict)
+
+    # Model the portable observable effect of a directory symlink/junction. This
+    # executes on Windows hosts that do not grant the symlink creation privilege.
+    monkeypatch.setattr(Path, "resolve", redirected_resolve)
+
+    def unexpected_import(*_args: object, **_kwargs: object) -> Any:
+        pytest.fail("a redirected scenario must fail before fixture import")
+
+    monkeypatch.setattr(
+        FplIngestionService,
+        "_import_pair",
+        unexpected_import,
+        raising=False,
+    )
+    with pytest.raises(IngestionError, match="scenario path is not approved") as caught:
+        FplIngestionService(repository_root=tmp_path).replay(
+            FplReplayRequest(fixture_set=fixture_set, scenario="happy_path")
+        )
+    assert caught.value.code == "FIXTURE_NOT_APPROVED"
+
+
+def test_replay_translates_scenario_resolution_oserror_before_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fixture_set = tmp_path / "fixtures"
+    service = FplIngestionService(repository_root=tmp_path)
+    original_resolve = Path.resolve
+
+    def unavailable_resolve(path: Path, strict: bool = False) -> Path:
+        if path == fixture_set:
+            raise OSError("sensitive host path failure")
+        return original_resolve(path, strict=strict)
+
+    def unexpected_import(*_args: object, **_kwargs: object) -> Any:
+        pytest.fail("an unavailable scenario path must fail before fixture import")
+
+    monkeypatch.setattr(Path, "resolve", unavailable_resolve)
+    monkeypatch.setattr(FplIngestionService, "import_pair", unexpected_import)
+    monkeypatch.setattr(
+        FplIngestionService,
+        "_import_pair",
+        unexpected_import,
+        raising=False,
+    )
+    with pytest.raises(IngestionError, match="scenario path is unavailable") as caught:
+        service.replay(FplReplayRequest(fixture_set=fixture_set, scenario="happy_path"))
+    assert caught.value.code == "FIXTURE_NOT_APPROVED"
+    assert "sensitive host path failure" not in caught.value.message
+
+
+def test_operation_time_policy_separates_frozen_replay_from_processing_time() -> None:
+    captured = datetime(2026, 8, 21, 17, tzinfo=UTC)
+    future = datetime(2027, 8, 22, 18, tzinfo=UTC)
+    service = FplIngestionService(clock=lambda: future)
+
+    assert (
+        service._operation_time(
+            captured,
+            policy="FROZEN_REPLAY_CAPTURED_AT_V1",
+        )
+        == captured
+    )
+    assert service._operation_time(captured, policy="PROCESSING_TIME_V1") == future
+    with pytest.raises(IngestionError, match="policy is unavailable") as unknown:
+        service._operation_time(captured, policy="UNKNOWN")
+    assert unknown.value.code == "LIFECYCLE_INVARIANT"
+
+
+def test_operation_time_policy_preserves_utc_and_naive_datetime_rejection(
+    tmp_path: Path,
+) -> None:
+    aware = datetime(2026, 8, 21, 17, tzinfo=UTC)
+    naive = datetime(2026, 8, 21, 17)
+    service = FplIngestionService(clock=lambda: naive)
+
+    for policy in ("FROZEN_REPLAY_CAPTURED_AT_V1", "PROCESSING_TIME_V1"):
+        with pytest.raises(ValueError, match="timezone-aware UTC"):
+            service._operation_time(naive, policy=policy)
+    with pytest.raises(ValueError, match="timezone-aware UTC"):
+        service._operation_time(aware, policy="PROCESSING_TIME_V1")
+    with pytest.raises(ValueError, match="timezone-aware UTC"):
+        FplIngestionService(repository_root=tmp_path, clock=lambda: aware).import_pair(
+            FplImportRequest(
+                bootstrap_path=tmp_path / "fixtures/bootstrap.json",
+                fixtures_path=tmp_path / "fixtures/fixtures.json",
+                competition_key="SYNTHETIC_PL",
+                season_code="2026/27",
+                captured_at=naive,
+                information_cutoff=aware,
+                rights_profile_id="synthetic_test_v1",
+            )
+        )
+    with pytest.raises(ValueError, match="timezone-aware UTC"):
+        service.replay(
+            FplReplayRequest(
+                fixture_set=tmp_path / "fixtures",
+                scenario="happy_path",
+                information_cutoff=naive,
+            )
+        )
+    with pytest.raises(ValueError, match="timezone-aware UTC"):
+        service._context_time({"captured_at": "2026-08-21T17:00:00"}, "captured_at")
+
+
+def test_resume_operation_time_policy_is_strict_and_fail_closed() -> None:
+    synthetic = service_module._profile("synthetic_test_v1")
+    official = service_module._profile("fpl_official_private_manual_v1")
+
+    with pytest.raises(IngestionError, match="policy is unavailable") as missing:
+        FplIngestionService._resume_operation_time_policy({}, synthetic)
+    assert missing.value.code == "LIFECYCLE_INVARIANT"
+    assert (
+        FplIngestionService._resume_operation_time_policy(
+            {"operation_time_policy": "FROZEN_REPLAY_CAPTURED_AT_V1"},
+            synthetic,
+        )
+        == "FROZEN_REPLAY_CAPTURED_AT_V1"
+    )
+    with pytest.raises(IngestionError, match="policy is unavailable") as unknown:
+        FplIngestionService._resume_operation_time_policy(
+            {"operation_time_policy": "UNKNOWN"},
+            synthetic,
+        )
+    assert unknown.value.code == "LIFECYCLE_INVARIANT"
+    with pytest.raises(IngestionError, match="approved synthetic profile") as unauthorized:
+        FplIngestionService._resume_operation_time_policy(
+            {"operation_time_policy": "FROZEN_REPLAY_CAPTURED_AT_V1"},
+            official,
+        )
+    assert unauthorized.value.code == "RIGHTS_BLOCKED"
+
+
+def test_replay_rejects_frozen_time_for_non_synthetic_profile_before_clock(
+    tmp_path: Path,
+) -> None:
+    clock_calls = 0
+
+    def unexpected_clock() -> datetime:
+        nonlocal clock_calls
+        clock_calls += 1
+        return datetime(2026, 8, 21, 17, tzinfo=UTC)
+
+    service = FplIngestionService(repository_root=tmp_path, clock=unexpected_clock)
+    with pytest.raises(IngestionError, match="approved synthetic profile") as blocked:
+        service.replay(
+            FplReplayRequest(
+                fixture_set=tmp_path / "fixtures",
+                scenario="happy_path",
+                rights_profile_id="fpl_official_private_manual_v1",
+            )
+        )
+    assert blocked.value.code == "RIGHTS_BLOCKED"
+    assert clock_calls == 0
 
 
 def test_resume_context_and_interruption_guards_are_typed(tmp_path: Path) -> None:

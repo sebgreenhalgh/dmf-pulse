@@ -88,7 +88,10 @@ def _modified_import(
         )
 
     monkeypatch.setattr(service_module, "approve_synthetic_fixture", approve)
-    return FplIngestionService(repository_root=repository_root).import_pair(
+    return FplIngestionService(
+        repository_root=repository_root,
+        clock=lambda: captured_at,
+    ).import_pair(
         FplImportRequest(
             bootstrap_path=bootstrap_path,
             fixtures_path=fixtures_path,

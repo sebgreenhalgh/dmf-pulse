@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
-    name: Python 3.13 / Ubuntu
+  pre_flight:
+    name: Pre-flight
     runs-on: ubuntu-latest
     timeout-minutes: 35
     services:
@@ -79,10 +79,227 @@ jobs:
           uv run dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json
           uv run dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json
 
-      - name: Tests and branch coverage
+      - name: Generate deterministic coverage shard plan
+        run: >-
+          uv run python scripts/ci_coverage_shards.py plan
+          --shard-count 8
+          --git-sha "${GITHUB_SHA}"
+          --output-dir "${RUNNER_TEMP}/coverage-plan"
+
+      - name: Upload coverage shard plan
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-plan-${{ github.sha }}
+          path: ${{ runner.temp }}/coverage-plan
+          if-no-files-found: error
+
+  coverage_shards:
+    name: Coverage shard ${{ matrix.shard }} of 8
+    needs: pre_flight
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    services:
+      postgres:
+        image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: dmf_pulse_test
+          POSTGRES_USER: dmf_test
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
+      UV_NO_PROGRESS: "1"
+      UV_CACHE_DIR: ${{ github.workspace }}/../.uv-cache
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install the pinned uv frontend
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen dependency sync
+        run: uv sync --all-groups --frozen
+
+      - name: Download coverage shard plan
+        uses: actions/download-artifact@v8
+        with:
+          name: coverage-plan-${{ github.sha }}
+          path: ${{ runner.temp }}/coverage-plan
+          digest-mismatch: error
+
+      - name: Initialize the fresh shard database
+        run: uv run alembic upgrade head
+
+      - name: Execute assigned branch-coverage shard
+        shell: bash
         run: |
-          uv run pytest --cov=dmf_pulse --cov-branch --cov-report=term-missing --cov-report=json:evidence/tickets/GCS-008/coverage.json -m "not performance"
-          uv run python scripts/check_gcs008_coverage_gates.py evidence/tickets/GCS-008/coverage.json
+          printf -v shard_label '%02d' "${{ matrix.shard }}"
+          mkdir -p "${RUNNER_TEMP}/coverage-raw"
+          COVERAGE_FILE="${RUNNER_TEMP}/coverage-raw/.coverage" uv run pytest "@${RUNNER_TEMP}/coverage-plan/shard-${shard_label}.args" --cov=dmf_pulse --cov-branch --cov-report= --cov-fail-under=0 -m "not performance"
+
+      - name: Materialize shard transport
+        run: >-
+          uv run python scripts/ci_coverage_shards.py materialize
+          --plan "${RUNNER_TEMP}/coverage-plan/plan.json"
+          --shard-index "${{ matrix.shard }}"
+          --coverage-data "${RUNNER_TEMP}/coverage-raw/.coverage"
+          --output-dir "${RUNNER_TEMP}/coverage-shard"
+
+      - name: Upload shard coverage data
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-shard-${{ github.sha }}-${{ matrix.shard }}
+          path: ${{ runner.temp }}/coverage-shard
+          if-no-files-found: error
+
+  combined_coverage:
+    name: Combined coverage gate
+    needs: [pre_flight, coverage_shards]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
+      UV_NO_PROGRESS: "1"
+      UV_CACHE_DIR: ${{ github.workspace }}/../.uv-cache
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install the pinned uv frontend
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen dependency sync
+        run: uv sync --all-groups --frozen
+
+      - name: Download coverage shard plan
+        uses: actions/download-artifact@v8
+        with:
+          name: coverage-plan-${{ github.sha }}
+          path: ${{ runner.temp }}/coverage-plan
+          digest-mismatch: error
+
+      - name: Download every shard artifact without merging boundaries
+        uses: actions/download-artifact@v8
+        with:
+          pattern: coverage-shard-${{ github.sha }}-*
+          path: ${{ runner.temp }}/downloaded-coverage
+          merge-multiple: false
+          digest-mismatch: error
+
+      - name: Verify complete shard artifacts and exact current collection
+        run: >-
+          uv run python scripts/ci_coverage_shards.py verify-artifacts
+          --plan "${RUNNER_TEMP}/coverage-plan/plan.json"
+          --artifact-root "${RUNNER_TEMP}/downloaded-coverage"
+          --combine-dir "${RUNNER_TEMP}/coverage-combine"
+          --git-sha "${GITHUB_SHA}"
+
+      - name: Combine coverage and enforce repository floor
+        run: |
+          uv run python -m coverage erase
+          uv run python -m coverage combine --keep "${RUNNER_TEMP}/coverage-combine"
+          uv run python -m coverage report --show-missing --fail-under=90
+          uv run python -m coverage json --fail-under=90 -o evidence/tickets/GCS-008/coverage.json
+
+      - name: Verify combined branch data
+        run: >-
+          uv run python scripts/ci_coverage_shards.py verify-branch-report
+          evidence/tickets/GCS-008/coverage.json
+
+      - name: Enforce GCS-008 combined coverage gates
+        run: >-
+          uv run python scripts/check_gcs008_coverage_gates.py
+          evidence/tickets/GCS-008/coverage.json
+
+      - name: Upload combined coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: combined-coverage-${{ github.sha }}
+          path: evidence/tickets/GCS-008/coverage.json
+          if-no-files-found: error
+
+  post_coverage:
+    name: Post-coverage acceptance
+    needs: [pre_flight, combined_coverage]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: dmf_pulse_test
+          POSTGRES_USER: dmf_test
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DMF_ENVIRONMENT: TEST
+      DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+      PGPASSWORD: changeme
+      UV_NO_PROGRESS: "1"
+      UV_CACHE_DIR: ${{ github.workspace }}/../.uv-cache
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install the pinned uv frontend
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+
+      - name: Frozen dependency sync
+        run: uv sync --all-groups --frozen
+
+      - name: Initialize the fresh acceptance database
+        run: uv run alembic upgrade head
+
+      - name: Download verified combined coverage report
+        uses: actions/download-artifact@v8
+        with:
+          name: combined-coverage-${{ github.sha }}
+          path: evidence/tickets/GCS-008
+          digest-mismatch: error
 
       - name: Performance smoke (without coverage)
         run: uv run pytest -m performance tests/performance
@@ -101,6 +318,7 @@ jobs:
           uv run pytest tests/unit/football_events tests/unit/scripts/test_gcs008_acceptance.py tests/unit/scripts/test_gcs008_coverage_gate.py tests/unit/scripts/test_gcs008_scope.py tests/unit/scripts/test_gcs008_wheel.py tests/property/football_events tests/contract/football_events tests/golden/football_events tests/integration/football_events
           uv run dmf events score-distribution --fixture fixtures/events/score/GCS-008/balanced_fixture.json --artifact-root artifacts/gcs008-ci --output json
           uv run dmf events explain-market-fit --fixture fixtures/events/score/GCS-008/inconsistent_markets.json --output json
+
       - name: Validate GCS-008 acceptance
         if: >-
           github.ref_name == 'stage/A8/GCS-008-goal-clean-sheet-distributions' ||
@@ -127,3 +345,23 @@ jobs:
 
       - name: First-party secret scan
         run: uv run python scripts/scan_secrets.py
+
+  quality:
+    name: Python 3.13 / Ubuntu
+    needs: [pre_flight, coverage_shards, combined_coverage, post_coverage]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every mandatory CI stage to succeed
+        shell: bash
+        env:
+          PRE_FLIGHT_RESULT: ${{ needs.pre_flight.result }}
+          COVERAGE_SHARDS_RESULT: ${{ needs.coverage_shards.result }}
+          COMBINED_COVERAGE_RESULT: ${{ needs.combined_coverage.result }}
+          POST_COVERAGE_RESULT: ${{ needs.post_coverage.result }}
+        run: |
+          printf 'pre_flight=%s\ncoverage_shards=%s\ncombined_coverage=%s\npost_coverage=%s\n' "$PRE_FLIGHT_RESULT" "$COVERAGE_SHARDS_RESULT" "$COMBINED_COVERAGE_RESULT" "$POST_COVERAGE_RESULT"
+          if [[ "$PRE_FLIGHT_RESULT" != "success" || "$COVERAGE_SHARDS_RESULT" != "success" || "$COMBINED_COVERAGE_RESULT" != "success" || "$POST_COVERAGE_RESULT" != "success" ]]; then
+            exit 1
+          fi

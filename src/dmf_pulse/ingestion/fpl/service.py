@@ -23,7 +23,12 @@ from sqlalchemy.orm import Session, sessionmaker
 from dmf_pulse import __version__
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.data_model.models import require_utc
-from dmf_pulse.data_model.tables import data_quality_issue, source_processing_event, source_snapshot
+from dmf_pulse.data_model.tables import (
+    data_quality_issue,
+    ingestion_run,
+    source_processing_event,
+    source_snapshot,
+)
 from dmf_pulse.database.engine import (
     create_database_engine,
     resolve_test_database_url,
@@ -90,6 +95,45 @@ DATABASE_REF = "env:DMF_TEST_DATABASE_URL"
 TARGET_REVISION = "20260807_0006"
 DEFAULT_CAPTURED_AT = datetime(2026, 8, 21, 17, 0, tzinfo=UTC)
 DEFAULT_INFORMATION_CUTOFF = datetime(2026, 8, 21, 17, 30, tzinfo=UTC)
+_PROCESSING_TIME_POLICY = "PROCESSING_TIME_V1"
+_FROZEN_REPLAY_TIME_POLICY = "FROZEN_REPLAY_CAPTURED_AT_V1"
+_FPL_LOGICAL_RUN_PATTERN = re.compile(r"^fpl004:(?P<pair_key>[0-9a-f]{64})$")
+_RESUME_PAIR_REQUIRED_COMMON_FIELDS = frozenset(
+    {
+        "bootstrap_path",
+        "captured_at",
+        "competition_key",
+        "contract_version",
+        "effective_config_sha256",
+        "fixtures_path",
+        "information_cutoff",
+        "operation_time_policy",
+        "profile_id",
+        "profile_version",
+        "provider_config_sha256",
+        "retrieval_pair_id",
+        "rights_config_sha256",
+        "season_code",
+    }
+)
+_REPLAY_SCENARIO_CAPTURED_AT = {
+    "changed_snapshot": datetime(2026, 8, 21, 17, 10, tzinfo=UTC),
+    "happy_path": DEFAULT_CAPTURED_AT,
+    "malformed": DEFAULT_CAPTURED_AT,
+    "missing_required": DEFAULT_CAPTURED_AT,
+    "post_cutoff": datetime(2026, 8, 21, 17, 31, tzinfo=UTC),
+    "unknown_additive": DEFAULT_CAPTURED_AT,
+    "wrong_type": DEFAULT_CAPTURED_AT,
+}
+_REPLAY_RESUME_STAGES = {
+    "resume-mapped": "MAPPED",
+    "resume-parsed": "PARSED",
+    "resume-promoted": "PROMOTED",
+    "resume-raw_discarded": "STORED_OR_RAW_DISCARDED",
+    "resume-stored": "STORED",
+    "resume-stored_or_raw_discarded": "STORED_OR_RAW_DISCARDED",
+    "resume-validated": "VALIDATED",
+}
 VOLATILE_ROOT_NAME = "dmf-fpl004-volatile"
 VOLATILE_OPERATION_PATTERN = re.compile(
     r"^(?:preparing|active)-(?P<pid>[1-9][0-9]*)-(?P<token>[0-9a-f]{32})$"
@@ -574,6 +618,8 @@ def _pair_context(
     bootstrap: ApprovedFixture,
     fixtures: ApprovedFixture,
     profile: RightsProfile,
+    *,
+    operation_time_policy: str,
 ) -> tuple[str, dict[str, object]]:
     captured = require_utc(request.captured_at)
     cutoff = require_utc(request.information_cutoff)
@@ -583,6 +629,7 @@ def _pair_context(
         "competition_key": request.competition_key,
         "fixtures_path": _relative_fixture_path(fixtures),
         "information_cutoff": cutoff.isoformat().replace("+00:00", "Z"),
+        "operation_time_policy": operation_time_policy,
         "profile_id": request.rights_profile_id,
         "profile_version": profile.profile_version,
         "retrieval_pair_id": str(uuid4()),
@@ -648,8 +695,12 @@ class FplIngestionService:
             raise IngestionError("CONFIGURATION_INVALID", "code commit identity is invalid")
         self.code_commit = code_commit
 
-    def _operation_time(self, captured_at: datetime) -> datetime:
+    def _operation_time(self, captured_at: datetime, *, policy: str) -> datetime:
         captured = require_utc(captured_at)
+        if policy == _FROZEN_REPLAY_TIME_POLICY:
+            return captured
+        if policy != _PROCESSING_TIME_POLICY:
+            raise IngestionError("LIFECYCLE_INVARIANT", "operation time policy is unavailable")
         current = require_utc(self.clock())
         return max(captured, current)
 
@@ -716,10 +767,29 @@ class FplIngestionService:
         )
 
     def import_pair(self, request: FplImportRequest) -> FplOperationOutcome:
+        return self._import_pair(request, operation_time_policy=_PROCESSING_TIME_POLICY)
+
+    def _import_pair(
+        self,
+        request: FplImportRequest,
+        *,
+        operation_time_policy: str,
+    ) -> FplOperationOutcome:
         _validate_database_reference(request.database_url_ref)
         profile = _profile(request.rights_profile_id)
         _validate_synthetic_context(request, profile)
-        operation_at = self._operation_time(request.captured_at)
+        if (
+            operation_time_policy == _FROZEN_REPLAY_TIME_POLICY
+            and profile.rights_profile_id != "synthetic_test_v1"
+        ):
+            raise IngestionError(
+                "RIGHTS_BLOCKED",
+                "frozen replay time requires the approved synthetic profile",
+            )
+        operation_at = self._operation_time(
+            request.captured_at,
+            policy=operation_time_policy,
+        )
         manual = require_rights(
             profile,
             RightsCapability.MANUAL_IMPORT,
@@ -824,7 +894,13 @@ class FplIngestionService:
         fixtures_fixture = approve_synthetic_fixture(
             request.fixtures_path, profile_id=profile.rights_profile_id
         )
-        pair_key, context = _pair_context(request, bootstrap_fixture, fixtures_fixture, profile)
+        pair_key, context = _pair_context(
+            request,
+            bootstrap_fixture,
+            fixtures_fixture,
+            profile,
+            operation_time_policy=operation_time_policy,
+        )
         bodies = (
             _read_bounded(bootstrap_fixture.path),
             _read_bounded(fixtures_fixture.path),
@@ -892,15 +968,27 @@ class FplIngestionService:
         scenario = scenario_aliases.get(request.scenario, request.scenario)
         halt_after = request.halt_after_stage
         if scenario.startswith("resume-"):
-            halt_after = scenario.removeprefix("resume-").replace("_", "-").upper()
+            try:
+                halt_after = _REPLAY_RESUME_STAGES[scenario]
+            except KeyError:
+                raise IngestionError(
+                    "USAGE_INVALID", "replay resume scenario is not approved"
+                ) from None
             scenario = "happy_path"
-        scenario_root = request.fixture_set / scenario
-        captured = DEFAULT_CAPTURED_AT
-        if scenario == "changed_snapshot":
-            captured = datetime(2026, 8, 21, 17, 10, tzinfo=UTC)
-        elif scenario == "post_cutoff":
-            captured = datetime(2026, 8, 21, 17, 31, tzinfo=UTC)
-        return self.import_pair(
+        try:
+            captured = _REPLAY_SCENARIO_CAPTURED_AT[scenario]
+        except KeyError:
+            raise IngestionError("USAGE_INVALID", "replay scenario is not approved") from None
+        try:
+            fixture_set_root = request.fixture_set.resolve()
+            scenario_root = (request.fixture_set / scenario).resolve()
+        except OSError:
+            raise IngestionError(
+                "FIXTURE_NOT_APPROVED", "replay scenario path is unavailable"
+            ) from None
+        if scenario_root.parent != fixture_set_root or scenario_root.name != scenario:
+            raise IngestionError("FIXTURE_NOT_APPROVED", "replay scenario path is not approved")
+        return self._import_pair(
             FplImportRequest(
                 bootstrap_path=scenario_root / "bootstrap.json",
                 fixtures_path=scenario_root / "fixtures.json",
@@ -911,8 +999,107 @@ class FplIngestionService:
                 rights_profile_id=request.rights_profile_id,
                 database_url_ref=request.database_url_ref,
                 halt_after_stage=halt_after,
-            )
+            ),
+            operation_time_policy=_FROZEN_REPLAY_TIME_POLICY,
         )
+
+    def _verified_resume_pair(
+        self,
+        session: Session,
+        snapshot_id: UUID,
+    ) -> tuple[str, dict[str, object], dict[str, dict[str, object]]]:
+        anchor_statement = (
+            select(
+                source_snapshot.c.ingestion_run_id,
+                ingestion_run.c.logical_run_key,
+            )
+            .join(
+                ingestion_run,
+                ingestion_run.c.ingestion_run_id == source_snapshot.c.ingestion_run_id,
+            )
+            .where(source_snapshot.c.source_snapshot_id == snapshot_id)
+        )
+        anchor = session.execute(anchor_statement).mappings().one_or_none()
+        if anchor is None:
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair anchor is unavailable")
+        raw_run_id = anchor["ingestion_run_id"]
+        raw_logical_key = anchor["logical_run_key"]
+        logical_match = (
+            _FPL_LOGICAL_RUN_PATTERN.fullmatch(raw_logical_key)
+            if isinstance(raw_logical_key, str)
+            else None
+        )
+        if not isinstance(raw_run_id, UUID) or logical_match is None:
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair anchor is invalid")
+        run_id = raw_run_id
+        pair_key = logical_match.group("pair_key")
+        self._lock_pair(session, pair_key)
+
+        locked_anchor = (
+            session.execute(anchor_statement.with_for_update(of=ingestion_run))
+            .mappings()
+            .one_or_none()
+        )
+        if (
+            locked_anchor is None
+            or locked_anchor["ingestion_run_id"] != run_id
+            or locked_anchor["logical_run_key"] != raw_logical_key
+        ):
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair anchor changed")
+
+        raw_rows = (
+            session.execute(
+                select(
+                    source_snapshot.c.source_snapshot_id,
+                    source_snapshot.c.resource,
+                    source_snapshot.c.body_sha256,
+                    source_snapshot.c.rights_profile_key,
+                    source_snapshot.c.rights_profile_version,
+                    source_snapshot.c.rights_profile_record_id,
+                    source_snapshot.c.adapter_version,
+                    source_snapshot.c.contract_version,
+                ).where(source_snapshot.c.ingestion_run_id == run_id)
+            )
+            .mappings()
+            .all()
+        )
+        rows = [dict(row) for row in raw_rows]
+        by_resource: dict[str, dict[str, object]] = {}
+        for row in rows:
+            resource = row.get("resource")
+            if not isinstance(resource, str) or resource in by_resource:
+                raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair membership is invalid")
+            by_resource[resource] = row
+        if len(rows) != 2 or set(by_resource) != {"bootstrap", "fixtures"}:
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair is incomplete")
+        member_ids = {UUID(str(row["source_snapshot_id"])) for row in by_resource.values()}
+        if snapshot_id not in member_ids:
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair membership is invalid")
+
+        common_by_resource: dict[str, dict[str, object]] = {}
+        for resource in ("bootstrap", "fixtures"):
+            member_id = UUID(str(by_resource[resource]["source_snapshot_id"]))
+            context = received_context(session, member_id)
+            if context.get("pair_key") != pair_key:
+                raise IngestionError(
+                    "LIFECYCLE_INVARIANT", "snapshot pair context anchor is invalid"
+                )
+            if context.get("resource_role") != resource.upper():
+                raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair context role is invalid")
+            pair_material = {
+                key: value
+                for key, value in context.items()
+                if key not in {"pair_key", "resource_role"}
+            }
+            if not _RESUME_PAIR_REQUIRED_COMMON_FIELDS.issubset(pair_material):
+                raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair context is incomplete")
+            if canonical_sha256(pair_material) != pair_key:
+                raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair context hash is invalid")
+            common_by_resource[resource] = pair_material
+        context = common_by_resource["bootstrap"]
+        if context != common_by_resource["fixtures"]:
+            raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair contexts conflict")
+        return pair_key, dict(context), by_resource
 
     def resume(self, snapshot_id: UUID, *, database_url_ref: str) -> FplOperationOutcome:
         engine = _engine(database_url_ref)
@@ -925,43 +1112,7 @@ class FplIngestionService:
             parsed: tuple[ParsedFplResource, ParsedFplResource] | None = None
             bodies: tuple[bytes, bytes] | None = None
             with factory.begin() as session:
-                context = received_context(session, snapshot_id)
-                raw_pair_key = context.get("pair_key")
-                if not isinstance(raw_pair_key, str):
-                    raise IngestionError(
-                        "LIFECYCLE_INVARIANT", "snapshot pair context is unavailable"
-                    )
-                pair_key = raw_pair_key
-                self._lock_pair(session, pair_key)
-                rows = (
-                    session.execute(
-                        select(
-                            source_snapshot.c.source_snapshot_id,
-                            source_snapshot.c.resource,
-                            source_snapshot.c.body_sha256,
-                            source_snapshot.c.rights_profile_key,
-                            source_snapshot.c.rights_profile_version,
-                            source_snapshot.c.rights_profile_record_id,
-                            source_snapshot.c.adapter_version,
-                            source_snapshot.c.contract_version,
-                        )
-                        .join(
-                            source_processing_event,
-                            source_processing_event.c.source_snapshot_id
-                            == source_snapshot.c.source_snapshot_id,
-                        )
-                        .where(
-                            source_processing_event.c.stage == "RECEIVED",
-                            source_processing_event.c.safe_details["pair_key"].as_string()
-                            == pair_key,
-                        )
-                    )
-                    .mappings()
-                    .all()
-                )
-                by_resource = {str(row["resource"]): row for row in rows}
-                if len(rows) != 2 or set(by_resource) != {"bootstrap", "fixtures"}:
-                    raise IngestionError("LIFECYCLE_INVARIANT", "snapshot pair is incomplete")
+                pair_key, context, by_resource = self._verified_resume_pair(session, snapshot_id)
                 bootstrap_path = self._safe_resume_path(context.get("bootstrap_path"))
                 fixtures_path = self._safe_resume_path(context.get("fixtures_path"))
                 profile_id = context.get("profile_id")
@@ -969,7 +1120,6 @@ class FplIngestionService:
                     raise IngestionError("LIFECYCLE_INVARIANT", "rights context is unavailable")
                 profile = _profile(profile_id)
                 captured_at = self._context_time(context, "captured_at")
-                operation_at = self._operation_time(captured_at)
                 if (
                     context.get("profile_version") != profile.profile_version
                     or context.get("rights_config_sha256") != rights_config_sha256()
@@ -980,15 +1130,11 @@ class FplIngestionService:
                     raise IngestionError(
                         "RIGHTS_BLOCKED", "resume rights authority differs from the envelope"
                     )
-                pair_material = {
-                    key: value
-                    for key, value in context.items()
-                    if key not in {"pair_key", "resource_role"}
-                }
-                if canonical_sha256(pair_material) != pair_key:
-                    raise IngestionError(
-                        "LIFECYCLE_INVARIANT", "snapshot pair context hash is invalid"
-                    )
+                operation_time_policy = self._resume_operation_time_policy(context, profile)
+                operation_at = self._operation_time(
+                    captured_at,
+                    policy=operation_time_policy,
+                )
                 profile_record_id = register_rights_profile(session, profile)
                 require_rights(
                     profile,
@@ -1001,7 +1147,7 @@ class FplIngestionService:
                     or row["rights_profile_record_id"] != profile_record_id
                     or row["adapter_version"] != CONTRACT_VERSION
                     or row["contract_version"] != CONTRACT_VERSION
-                    for row in rows
+                    for row in by_resource.values()
                 ):
                     raise IngestionError(
                         "RIGHTS_BLOCKED", "resume envelope authority could not be verified"
@@ -2354,6 +2500,23 @@ class FplIngestionService:
         except ValueError as exc:
             raise IngestionError("LIFECYCLE_INVARIANT", "resume time is invalid") from exc
         return require_utc(parsed)
+
+    @staticmethod
+    def _resume_operation_time_policy(context: dict[str, object], profile: RightsProfile) -> str:
+        value = context.get("operation_time_policy")
+        if not isinstance(value, str) or value not in {
+            _PROCESSING_TIME_POLICY,
+            _FROZEN_REPLAY_TIME_POLICY,
+        }:
+            raise IngestionError(
+                "LIFECYCLE_INVARIANT", "resume operation time policy is unavailable"
+            )
+        if value == _FROZEN_REPLAY_TIME_POLICY and profile.rights_profile_id != "synthetic_test_v1":
+            raise IngestionError(
+                "RIGHTS_BLOCKED",
+                "frozen replay time requires the approved synthetic profile",
+            )
+        return value
 
     @staticmethod
     def _maybe_interrupt(

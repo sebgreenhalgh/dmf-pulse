@@ -1,0 +1,28 @@
+{
+  "ticket_id": "CI-TEST-001",
+  "status": "REVIEWED_FIX_RESEALED_PENDING_INDEPENDENT_LINEAGE_CONFIRMATION_WITH_KNOWN_EXTERNAL_CI_ARCHITECTURE_BLOCKER",
+  "classification": "PRE_EXISTING_MAIN_DEFECT",
+  "architectural_main": "baed47bce7a158d91afe38351a2c65be60444adf",
+  "historical_review": {
+    "parent": "652bae84fba9bdfbf435367d6140270fa8378d57",
+    "reviewed_head": "d550250836c9c39e6caebaa5f12ad94fec7e2b02",
+    "branch": "remediation/CI-TEST-001-cross-platform-canonical-fixture",
+    "verdict": "REVIEW_CLEAN_PENDING_EXTERNAL_CI_GATE"
+  },
+  "lineage_reseal": {
+    "rebuilt_parent": "d41be2df28e7a74b67563056adea4ccc963ac04c",
+    "rebuilt_branch": "rebuild/post-A-FPL-001-correctness-stack",
+    "rebuilt_head": "af78cedc65bd043343825facae947b8aed5340a4",
+    "old_test_blob": "ed97b7944a24eb1c7440f5a3f31cf524f38a7157",
+    "new_test_blob": "ed97b7944a24eb1c7440f5a3f31cf524f38a7157",
+    "old_patch_id": "2e77cb8598a54ffaf138ab2bc669227f35e81398",
+    "new_patch_id": "2e77cb8598a54ffaf138ab2bc669227f35e81398",
+    "substantive_patch_identity": "IDENTICAL"
+  },
+  "production_source_changed": false,
+  "workflow_changed": false,
+  "dependencies_changed": false,
+  "independent_lineage_confirmation": "PENDING",
+  "human_acceptance": "NOT_CLAIMED",
+  "merged": false
+}

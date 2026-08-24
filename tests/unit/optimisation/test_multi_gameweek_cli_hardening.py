@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 import typer
+from rich.text import Text
 from typer.testing import CliRunner
 
 from dmf_pulse.cli.optimise import (
@@ -135,8 +136,9 @@ def test_integrity_failure_emits_machine_readable_fail_closed_payload(
 )
 def test_all_optimise_commands_reject_non_json_output(command: str, args: list[str]) -> None:
     invoked = RUNNER.invoke(optimise_app, [command, *args, "--output", "yaml"])
+    plain_output = Text.from_ansi(invoked.output).plain
     assert invoked.exit_code == 2
-    assert "--output must be json" in invoked.output
+    assert "--output must be json" in plain_output
 
 
 def test_multi_gameweek_cli_blocks_missing_or_rules_mismatched_input(

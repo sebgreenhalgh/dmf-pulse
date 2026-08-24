@@ -1,5 +1,126 @@
 # DMF Pulse execution plans
 
+## CI-COVERAGE-SHARD-001 independent-review remediation
+
+- Reviewed head/branch: `b8ce5de612d835bee6721898cd57e46c133f90dd` on
+  `remediation/CI-COVERAGE-SHARD-001-sharded-coverage`.
+- Authority: the repository owner explicitly ratified the exact existing ANSI-only observation
+  deltas in commit `4da506d8fa4c00a61c5387f66b94e8c2d15a4c7b` after independent review found
+  GOV-001; no broader test or product change is authorized.
+- Scope: close CI-REV-001 by making repository/workflow contract guards structurally require the
+  four mandatory result comparisons to be OR-connected, then reseal truthful ticket evidence.
+- Safety: the workflow, shard helper, ratified ANSI tests, product, migrations, configuration,
+  fixtures, dependencies, LIVE-ODDS, and PR #16 remain byte-identical.
+
+### Review-remediation checkpoints
+
+- [x] Verify exact remote refs, clean branch, open/unmerged LIVE-ODDS PR, and protected blobs.
+- [x] Reproduce the all-AND escape against both prior guards.
+- [x] Add a narrow semantic predicate validator and independent workflow-contract mutation tests.
+- [x] Record the owner amendment as post-review authority without rewriting original scope history.
+- [ ] Prove the existing 3,133 nodeids remain and remediation tests are strictly additive; refresh
+  the final deterministic plan, manifests, and DRAFT evidence.
+- [ ] Pass focused, adversarial, static, repository, security, and evidence gates; publish a normal
+  fast-forward and use the new final-SHA Actions run as the decisive execution proof.
+- [ ] Stop for independent re-review without merge, human acceptance, or LIVE-ODDS modification.
+
+## CI-COVERAGE-SHARD-001 reliable sharded branch coverage
+
+- Parent/branch: independently confirmed correctness-stack head
+  `740e70f0ee836a8fab162c56e8345033a06d926b` on
+  `remediation/CI-COVERAGE-SHARD-001-sharded-coverage`.
+- Classification: CI execution-architecture remediation for the inherited 35-minute monolithic
+  coverage blocker; the complete product/test semantics and every downstream gate remain
+  mandatory.
+- Scope: deterministic pytest-derived shard planning, eight isolated PostgreSQL-backed coverage
+  jobs, fail-closed artifact verification and coverage combination, post-coverage acceptance,
+  stable final status sentinel, focused CI-contract tests, and truthful ticket evidence.
+- Safety: no product, migration, runtime configuration, fixture, dependency, target-season rule,
+  LIVE-ODDS, PR #16, timeout-increase, retry, coverage-threshold, or test-selection change.
+
+### CI-COVERAGE-SHARD-001 checkpoints
+
+- [x] Verify the exact parent, lineage, remote invariants, clean worktree, controlling authority,
+  and 3,091-test parent non-performance collection.
+- [x] Add the ticket contracts and RED planner/workflow-contract tests.
+- [x] Implement a deterministic module-grouped weighted partition, canonical plan manifest,
+  shard metadata, strict artifact verification, and branch-data proof.
+- [x] Refactor CI into pre-flight, eight mandatory shards, combined coverage, post-coverage
+  acceptance, and the fail-closed `Python 3.13 / Ubuntu` sentinel.
+- [x] Pass partition, focused interaction, static, build, repository, secret, scope, and available
+  combined-coverage acceptance; seal truthful pre-push evidence and manifests.
+- [x] Classify automatic run `32676529440`: six shards passed; two exposed eleven inherited
+  ANSI-sensitive CLI assertions; combined/post skipped and the stable sentinel failed closed.
+- [ ] Apply the accepted CI-TEST-002 ANSI-normalization pattern only to those two assertion sites,
+  reseal the active manifests/evidence, and validate the corrected final SHA without masking color.
+- [ ] Commit the corrective scope, reseal evidence, publish the corrected SHA without force-push,
+  inspect its automatic Actions run, and stop for independent review without merging or modifying
+  LIVE-ODDS.
+
+## Downstream correctness stack lineage rebuild
+
+- Corrected Layer-A parent: `d41be2df28e7a74b67563056adea4ccc963ac04c` on the immutable
+  reviewed CI-FPL remediation branch.
+- Rebuild branch: `rebuild/post-A-FPL-001-correctness-stack`.
+- Historical Layer B: parent `652bae84fba9bdfbf435367d6140270fa8378d57`, reviewed head
+  `d550250836c9c39e6caebaa5f12ad94fec7e2b02`.
+- Historical Layer C: parent `d550250836c9c39e6caebaa5f12ad94fec7e2b02`, reviewed head
+  `840b6b7150808f19a3c32171aea6846e55fa8554`.
+- Scope: reconstruct only the exact reviewed test blobs/patches and reseal truthful
+  lineage-dependent ticket evidence/manifests. Production, workflow, dependency, migration,
+  runtime configuration, CI-GOV, DIAG, and LIVE-ODDS changes are forbidden.
+
+### Rebuild checkpoints
+
+- [x] Verify pinned Git/PR identities, expected divergence, clean worktrees, unchanged executable
+  bases, and immutable reviewed blob/patch IDs.
+- [x] Reconstruct the exact CI-TEST-001 executable patch on corrected Layer A.
+- [x] Seal direct-child Layer B as `af78cedc65bd043343825facae947b8aed5340a4`.
+- [x] Reconstruct the exact CI-TEST-002 executable patch as the pending direct-child Layer C.
+- [x] Pass targeted/FPL/PostgreSQL/static/security/manifest gates; the optional non-performance
+  suite passed 3090 executable/other tests, exposed only expected pre-seal manifest drift, and its
+  exact manifest test passed after canonical refresh.
+- [ ] Push the final stack once, inspect the automatic CI run once, and stop for independent
+  lineage confirmation.
+
+## CI-FPL-REPLAY-001 deterministic synthetic FPL replay time
+
+- Parent/branch: immutable `baed47bce7a158d91afe38351a2c65be60444adf` on
+  `remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time`.
+- Classification: inherited main FPL replay-clock defect exposed by PR #16; the accepted
+  LIVE-ODDS head `5e55cf3361a1abff4b2e32dcc30fe42900ea2e16` and PR remain immutable.
+- Scope: one explicit frozen synthetic replay/resume time policy in FPL `service.py`, directly
+  relevant TIME-01 through TIME-18 tests, ticket/evidence, and conditional active-manifest refresh.
+- Safety: ordinary/manual/live processing stays bound to actual availability; no Odds, workflow,
+  migration, dependency, rule, fixture-date, cutoff, rights, LIVE-ODDS, or PR #16 change.
+
+### CI-FPL-REPLAY-001 checkpoints
+
+- [x] Verify Git/PR identities, inherited A4 authority, remote migration-matrix pass, exact parent
+  PostgreSQL failure, and controlled PRE/POST/`post_cutoff` reproduction.
+- [x] Freeze the narrow ticket, acceptance matrix, root-cause record, and evidence plan.
+- [x] Add TIME-01 through TIME-18 RED regressions and implement deterministic replay/resume time.
+- [x] Pass the focused PostgreSQL 18.4 integration matrix, migration matrix, remaining blocked CI
+  vertical slice, static analysis, and measured coverage thresholds.
+- [ ] Pass final full/static/build/wheel/repository/security gates and branch GitHub Actions.
+- [ ] Seal final evidence, commit/push the remediation branch, and hand off for independent review;
+  do not merge or modify PR #16.
+
+### A-FPL-001 pair-context integrity remediation
+
+- Independent review classified counterpart-context verification on resume as material P2
+  `A-FPL-001`: the initiating context was hash-checked, but its paired context was not.
+- Preserve evidence-only continuation `244feb0709294c3a544e399c7890177120dd1020`; supersede its
+  pre-review clean self-assessment without rewriting history.
+- [x] Reproduce counterpart corruption on PostgreSQL 18.4 while proving and restoring the
+  immutable processing-event guard.
+- [x] Anchor resume identity through `ingestion_run.logical_run_key`, load and independently hash
+  both stored contexts under the pair lock, compare complete common material, and verify roles.
+- [x] Pass PAIR-01 through PAIR-18, TIME-01 through TIME-18, PostgreSQL, migration, vertical,
+  static, and security gates without changing replay or live-time semantics.
+- [ ] Reseal truthful remediation evidence, fast-forward the existing Layer-A branch, inspect its
+  automatic CI once, and stop for independent re-review before rebuilding downstream layers.
+
 ## CHIP-014 Stage-14 chip optimisation
 
 - Ticket/stage: `CHIP-014`, DMFP-19 Stage 14; immutable original parent

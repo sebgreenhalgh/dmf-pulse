@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+from rich.text import Text
 from typer.testing import CliRunner
 
 from dmf_pulse.cli.app import app
@@ -144,8 +145,9 @@ def test_cli_rejects_non_json_output_for_every_public_command(tmp_path: Path) ->
     )
     for command in commands:
         result = runner.invoke(app, [*command, "--output", "yaml"])
+        plain_output = Text.from_ansi(result.output).plain
         assert result.exit_code == 2
-        assert "--output must be json" in result.output
+        assert "--output must be json" in plain_output
 
 
 def test_cli_maps_validation_and_evaluation_errors(monkeypatch: pytest.MonkeyPatch) -> None:

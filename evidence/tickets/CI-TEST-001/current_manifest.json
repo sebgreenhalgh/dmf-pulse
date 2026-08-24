@@ -66,9 +66,9 @@
       "sha256": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2"
     },
     {
-      "bytes": 14896,
+      "bytes": 6493,
       "path": ".github/workflows/ci.yml",
-      "sha256": "2eed6410224fbbc5b7f8fdf35c08fdf566bef4fb8c685d8671cafd531c250c02"
+      "sha256": "fe09721425c53b0bdf973370d4d8a5107ed646c09ecf31e0f5fe54241ca65ac1"
     },
     {
       "bytes": 1740,
@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 85904,
+      "bytes": 81886,
       "path": "PLANS.md",
-      "sha256": "8c9ebf97455dc38bb2ce49f563d3cd10add83188db1691662a3bfe3ff94f9ef4"
+      "sha256": "e1e97e8e7a40e28d886e5f67fea6315655e25564381b042e73e233f047c4a29a"
     },
     {
       "bytes": 2761,
@@ -2161,11 +2161,6 @@
       "sha256": "683d62aff383d66ff66cfdfe278f1744189473155252d0e0b632cc98b291febb"
     },
     {
-      "bytes": 37833,
-      "path": "scripts/ci_coverage_shards.py",
-      "sha256": "b77b3f996cede2bd981f565bdc361a15bb0e0c36753d8df49886ed578a8ca7e9"
-    },
-    {
       "bytes": 5898,
       "path": "scripts/generate_authority_manifests.py",
       "sha256": "fcd0c96d8ed9029a7992bce29a46bdef7ac39743d42382e23cb51fe0f2eeb559"
@@ -2251,9 +2246,9 @@
       "sha256": "dd362da8a9a81be532f0e6901045b6dfca7998d113b5c070a9448e01070d8998"
     },
     {
-      "bytes": 74218,
+      "bytes": 67944,
       "path": "scripts/validate_repository.py",
-      "sha256": "3ef0395335ae65f1e5c90da84ec7c7d400c9ba1f74df597dff4775748613c692"
+      "sha256": "8604cb1035a773639aceac7040e6edd58e2470e51d269738567e73d6e5503309"
     },
     {
       "bytes": 8785,
@@ -3901,9 +3896,9 @@
       "sha256": "7aa4e23a16429669d2a385958ab0b3aa10a7aa67ac3bff119409d38dccaa0cab"
     },
     {
-      "bytes": 6447,
+      "bytes": 6362,
       "path": "tests/contract/evaluation/test_cli_contract.py",
-      "sha256": "8773774cdb10183ea6b3d636e34d9627b96f447da1469fd3e532405fab444759"
+      "sha256": "ab427ab5f0b3c92179e8474ee7d50dc3b90652d8c42ce61af1ee799c66d4aa8a"
     },
     {
       "bytes": 1777,
@@ -4971,9 +4966,9 @@
       "sha256": "08dda00ff7c979dbfb2bbc281c7f58aebd920c3b71fc37926ac44a55dd2e3d76"
     },
     {
-      "bytes": 11125,
+      "bytes": 11044,
       "path": "tests/unit/cli/test_rank_cli.py",
-      "sha256": "09b89b6912a433404e0a3708977dd7ca44b0338a346f18084e8f7fc099642fee"
+      "sha256": "60cfbabb26971459f9f48cb17651f3dfd54038c4db56533775ade941d1205a9c"
     },
     {
       "bytes": 9905,
@@ -5256,9 +5251,9 @@
       "sha256": "be180b034e627df5bb023f5fab9361285d579d51131fa68f2db199c9d147ad9b"
     },
     {
-      "bytes": 6895,
+      "bytes": 6814,
       "path": "tests/unit/optimisation/test_multi_gameweek_cli_hardening.py",
-      "sha256": "55394d9baf46de78bc493d297f391204898a207212df1357198890f33b3bcce9"
+      "sha256": "08a5d9a4d8734506b6916cafdf6409e2d1e58f5745743c88a236182a77510f6d"
     },
     {
       "bytes": 26712,
@@ -5466,16 +5461,6 @@
       "sha256": "0a12b45a45e943bf148e484fbe3138cce9c151d843184a9dc55a8748a2f3d10f"
     },
     {
-      "bytes": 17196,
-      "path": "tests/unit/scripts/test_ci_coverage_shards.py",
-      "sha256": "b97e862dfad83fdbad7136e9bf40ba15afc49b1c3029174a63e35b38d38c03be"
-    },
-    {
-      "bytes": 16627,
-      "path": "tests/unit/scripts/test_ci_workflow_contract.py",
-      "sha256": "ef1bbd33d0a4ffb95439010085e5bfb0d9cde06bc08c539208b6d62a597784bb"
-    },
-    {
       "bytes": 4064,
       "path": "tests/unit/scripts/test_gcs008_acceptance.py",
       "sha256": "d8e8645751a845b2df9b40f1052c2162a471422bcac819ed46e68d79e81cc588"
@@ -5511,16 +5496,6 @@
       "sha256": "2204fa4d8b2bb3e53dd14247077ff7831e2cf6a0043380dea855ee81ccb4581d"
     },
     {
-      "bytes": 6417,
-      "path": "tickets/CI-COVERAGE-SHARD-001/ACCEPTANCE.md",
-      "sha256": "300cbbfbd5fed6cbd9dbca71f93d3e14ff1b14cc04a8105fdc95d3124cc275f7"
-    },
-    {
-      "bytes": 5390,
-      "path": "tickets/CI-COVERAGE-SHARD-001/ticket.yaml",
-      "sha256": "bf6119bd6837bc02b57517967faf43fcfce9a53b36afbd2633a1cff0563ceaca"
-    },
-    {
       "bytes": 12178,
       "path": "tickets/CI-FPL-REPLAY-001/ACCEPTANCE.md",
       "sha256": "a089931911eeaba909545f11c2d57c0c54edcd646a8481287f060ceeba41d7e7"
@@ -5539,16 +5514,6 @@
       "bytes": 2581,
       "path": "tickets/CI-TEST-001/ticket.yaml",
       "sha256": "849f1b21f592587d16c6a9f01ceb1005e5b7da4ea0ae4d051384690894e31372"
-    },
-    {
-      "bytes": 2215,
-      "path": "tickets/CI-TEST-002/ACCEPTANCE.md",
-      "sha256": "bb75d4e64e5cacda7da1f3208f32fd8f4136afe94257f0e360d735cc3edf000c"
-    },
-    {
-      "bytes": 2521,
-      "path": "tickets/CI-TEST-002/ticket.yaml",
-      "sha256": "d697fa36f92b0167dfb1c1a32096037550b9840017b8a5f0549c310d6e726d59"
     },
     {
       "bytes": 3923,
@@ -5703,5 +5668,5 @@
   ],
   "schema_version": "1.0",
   "scope": "repository-deliverables-excluding-generated-evidence",
-  "ticket_id": "PRC-013"
+  "ticket_id": "CI-TEST-001"
 }
