@@ -66,9 +66,9 @@
       "sha256": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2"
     },
     {
-      "bytes": 14896,
+      "bytes": 6493,
       "path": ".github/workflows/ci.yml",
-      "sha256": "2eed6410224fbbc5b7f8fdf35c08fdf566bef4fb8c685d8671cafd531c250c02"
+      "sha256": "fe09721425c53b0bdf973370d4d8a5107ed646c09ecf31e0f5fe54241ca65ac1"
     },
     {
       "bytes": 1740,
@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 89887,
+      "bytes": 81851,
       "path": "PLANS.md",
-      "sha256": "11bf62419c79c900c03d1c93290466556588349c19dd5e29fa43fbd863c67d2b"
+      "sha256": "8985a83966c73f1a15105fc0e5ebe2f753b9ac42b04b2e7e6bd31f653656d1d5"
     },
     {
       "bytes": 2761,
@@ -2161,11 +2161,6 @@
       "sha256": "683d62aff383d66ff66cfdfe278f1744189473155252d0e0b632cc98b291febb"
     },
     {
-      "bytes": 37833,
-      "path": "scripts/ci_coverage_shards.py",
-      "sha256": "b77b3f996cede2bd981f565bdc361a15bb0e0c36753d8df49886ed578a8ca7e9"
-    },
-    {
       "bytes": 5898,
       "path": "scripts/generate_authority_manifests.py",
       "sha256": "fcd0c96d8ed9029a7992bce29a46bdef7ac39743d42382e23cb51fe0f2eeb559"
@@ -2251,9 +2246,9 @@
       "sha256": "dd362da8a9a81be532f0e6901045b6dfca7998d113b5c070a9448e01070d8998"
     },
     {
-      "bytes": 74218,
+      "bytes": 67944,
       "path": "scripts/validate_repository.py",
-      "sha256": "3ef0395335ae65f1e5c90da84ec7c7d400c9ba1f74df597dff4775748613c692"
+      "sha256": "8604cb1035a773639aceac7040e6edd58e2470e51d269738567e73d6e5503309"
     },
     {
       "bytes": 8785,
@@ -3286,9 +3281,9 @@
       "sha256": "20b38fcbc6fb93c0930119ce04cc42ca7a1089a6832dfd16cc1315f3649427c2"
     },
     {
-      "bytes": 106478,
+      "bytes": 100126,
       "path": "src/dmf_pulse/ingestion/fpl/service.py",
-      "sha256": "a3278442eb0788239a5f000852f850adf184160039dbfcfbf25000cfc55d0d31"
+      "sha256": "ea393bb41c7253023c4edadf00eee9a79ff695fc71c000565d2cbaf2d945dd1b"
     },
     {
       "bytes": 10204,
@@ -3881,9 +3876,9 @@
       "sha256": "5ac7bc744b06000bedce03c54be7cf8018cab9d26acf4d8b2c4c6097187d5422"
     },
     {
-      "bytes": 28095,
+      "bytes": 27496,
       "path": "tests/assurance/optimisation/test_surface.py",
-      "sha256": "f024e178b4552c61208f534fc5523b0fe7cacdd6bebf2a7c6c735dba6dea2334"
+      "sha256": "005e695e490b87ead5517e9f78d020d5def1df66c3207813c9a6da5461ddb116"
     },
     {
       "bytes": 2814,
@@ -3911,9 +3906,9 @@
       "sha256": "7aa4e23a16429669d2a385958ab0b3aa10a7aa67ac3bff119409d38dccaa0cab"
     },
     {
-      "bytes": 6447,
+      "bytes": 6362,
       "path": "tests/contract/evaluation/test_cli_contract.py",
-      "sha256": "8773774cdb10183ea6b3d636e34d9627b96f447da1469fd3e532405fab444759"
+      "sha256": "ab427ab5f0b3c92179e8474ee7d50dc3b90652d8c42ce61af1ee799c66d4aa8a"
     },
     {
       "bytes": 1777,
@@ -4296,29 +4291,19 @@
       "sha256": "991876b5876f76e09d8f57f34c4065c07038fbb2e5b1af69c365e914e414593e"
     },
     {
-      "bytes": 16206,
+      "bytes": 16081,
       "path": "tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py",
-      "sha256": "acfdc922ec86a2052e351033e3763428d1c533d438d74ae2a73a39b46c980a47"
+      "sha256": "ccc598a929e926f8d31815048d44fa966c6cc7e45879a3a63036535acfa84f41"
     },
     {
-      "bytes": 19632,
+      "bytes": 18615,
       "path": "tests/integration/ingestion/test_fpl_lifecycle_resume.py",
-      "sha256": "ebf275541af3fe01094bd9be4eab0e12b2b3ab98dbbdcebcb904f02c09ba5869"
+      "sha256": "984994424a039876739077852d9047f078306e079af05f925963122d67b107b7"
     },
     {
-      "bytes": 10168,
-      "path": "tests/integration/ingestion/test_fpl_pair_context_integrity.py",
-      "sha256": "5584bcc26a2874305d94fa801cd63ac453cb6e3ca6a6d407d5a6b265c451df0a"
-    },
-    {
-      "bytes": 12342,
-      "path": "tests/integration/ingestion/test_fpl_replay_time_policy.py",
-      "sha256": "8b5f9a9212414f84ea88a55091dd60b634f78dc2d846027a48ec30ec820cae94"
-    },
-    {
-      "bytes": 16053,
+      "bytes": 16003,
       "path": "tests/integration/ingestion/test_fpl_temporal_identity.py",
-      "sha256": "8013f6bbdd81a7f45b6a48a78c29b18dc984682705072254857e0a304171d2b4"
+      "sha256": "626c08cda578ff1911b69d4979cd1b3d7367d8ce841e74be5718a468a950402d"
     },
     {
       "bytes": 8387,
@@ -4986,9 +4971,9 @@
       "sha256": "08dda00ff7c979dbfb2bbc281c7f58aebd920c3b71fc37926ac44a55dd2e3d76"
     },
     {
-      "bytes": 11125,
+      "bytes": 11044,
       "path": "tests/unit/cli/test_rank_cli.py",
-      "sha256": "09b89b6912a433404e0a3708977dd7ca44b0338a346f18084e8f7fc099642fee"
+      "sha256": "60cfbabb26971459f9f48cb17651f3dfd54038c4db56533775ade941d1205a9c"
     },
     {
       "bytes": 9905,
@@ -5196,9 +5181,9 @@
       "sha256": "de0c4c261f276baa02d0371a40b48daef4087b524f699ee68c8336e57057b8ea"
     },
     {
-      "bytes": 34616,
+      "bytes": 23906,
       "path": "tests/unit/ingestion/test_fpl_service_boundaries.py",
-      "sha256": "813f70322008d6460965c0e71b870f4c0a976d141c25db0207f9dc5af39e37eb"
+      "sha256": "31f4999f0c79264e77de573d4aa7b68d15b656a203c58def2d1f26fdd9451b71"
     },
     {
       "bytes": 11194,
@@ -5291,9 +5276,9 @@
       "sha256": "be180b034e627df5bb023f5fab9361285d579d51131fa68f2db199c9d147ad9b"
     },
     {
-      "bytes": 6895,
+      "bytes": 6814,
       "path": "tests/unit/optimisation/test_multi_gameweek_cli_hardening.py",
-      "sha256": "55394d9baf46de78bc493d297f391204898a207212df1357198890f33b3bcce9"
+      "sha256": "08a5d9a4d8734506b6916cafdf6409e2d1e58f5745743c88a236182a77510f6d"
     },
     {
       "bytes": 26712,
@@ -5501,16 +5486,6 @@
       "sha256": "0a12b45a45e943bf148e484fbe3138cce9c151d843184a9dc55a8748a2f3d10f"
     },
     {
-      "bytes": 17196,
-      "path": "tests/unit/scripts/test_ci_coverage_shards.py",
-      "sha256": "b97e862dfad83fdbad7136e9bf40ba15afc49b1c3029174a63e35b38d38c03be"
-    },
-    {
-      "bytes": 16627,
-      "path": "tests/unit/scripts/test_ci_workflow_contract.py",
-      "sha256": "ef1bbd33d0a4ffb95439010085e5bfb0d9cde06bc08c539208b6d62a597784bb"
-    },
-    {
       "bytes": 4064,
       "path": "tests/unit/scripts/test_gcs008_acceptance.py",
       "sha256": "d8e8645751a845b2df9b40f1052c2162a471422bcac819ed46e68d79e81cc588"
@@ -5544,46 +5519,6 @@
       "bytes": 4553,
       "path": "tickets/CHIP-014/PROGRESS.md",
       "sha256": "2204fa4d8b2bb3e53dd14247077ff7831e2cf6a0043380dea855ee81ccb4581d"
-    },
-    {
-      "bytes": 6417,
-      "path": "tickets/CI-COVERAGE-SHARD-001/ACCEPTANCE.md",
-      "sha256": "300cbbfbd5fed6cbd9dbca71f93d3e14ff1b14cc04a8105fdc95d3124cc275f7"
-    },
-    {
-      "bytes": 5390,
-      "path": "tickets/CI-COVERAGE-SHARD-001/ticket.yaml",
-      "sha256": "bf6119bd6837bc02b57517967faf43fcfce9a53b36afbd2633a1cff0563ceaca"
-    },
-    {
-      "bytes": 12178,
-      "path": "tickets/CI-FPL-REPLAY-001/ACCEPTANCE.md",
-      "sha256": "a089931911eeaba909545f11c2d57c0c54edcd646a8481287f060ceeba41d7e7"
-    },
-    {
-      "bytes": 6137,
-      "path": "tickets/CI-FPL-REPLAY-001/ticket.yaml",
-      "sha256": "340cda1ea2481f538e34f39bb51c78ec475bc719d026becf665e2d2416902a84"
-    },
-    {
-      "bytes": 2465,
-      "path": "tickets/CI-TEST-001/ACCEPTANCE.md",
-      "sha256": "a75d8acf5ec0c6eff94a0191af0034fc4f779ffc61628903f2adf924c2836c57"
-    },
-    {
-      "bytes": 2581,
-      "path": "tickets/CI-TEST-001/ticket.yaml",
-      "sha256": "849f1b21f592587d16c6a9f01ceb1005e5b7da4ea0ae4d051384690894e31372"
-    },
-    {
-      "bytes": 2215,
-      "path": "tickets/CI-TEST-002/ACCEPTANCE.md",
-      "sha256": "bb75d4e64e5cacda7da1f3208f32fd8f4136afe94257f0e360d735cc3edf000c"
-    },
-    {
-      "bytes": 2521,
-      "path": "tickets/CI-TEST-002/ticket.yaml",
-      "sha256": "d697fa36f92b0167dfb1c1a32096037550b9840017b8a5f0549c310d6e726d59"
     },
     {
       "bytes": 3923,
@@ -5664,16 +5599,6 @@
       "bytes": 2166,
       "path": "tickets/LIVE-ODDS-001/ticket.yaml",
       "sha256": "89f5836d10713eb19977f764bcdff10eb7db869a935e414b71ea2b5c235421fb"
-    },
-    {
-      "bytes": 2823,
-      "path": "tickets/LIVE-ODDS-INTEGRATION-001/ACCEPTANCE.md",
-      "sha256": "f82a02c00fc7f2d6047acddafcdb3924eac1f6bb3265164eda51b2243113c29f"
-    },
-    {
-      "bytes": 3865,
-      "path": "tickets/LIVE-ODDS-INTEGRATION-001/ticket.yaml",
-      "sha256": "024df7be3f47be8ed053e391e17b5b54744a125f55f4ccc56b4f1cac0e31d115"
     },
     {
       "bytes": 10572,
@@ -5758,5 +5683,5 @@
   ],
   "schema_version": "1.0",
   "scope": "repository-deliverables-excluding-generated-evidence",
-  "ticket_id": "PRC-013"
+  "ticket_id": "LIVE-ODDS-001"
 }

@@ -88,7 +88,7 @@ class _SequenceTransport:
         self.calls = 0
         self.requests: list[OddsHttpRequest] = []
 
-    def send(self, request: OddsHttpRequest) -> OddsHttpResponse:
+    def send(self, request: OddsHttpRequest, _credential: str) -> OddsHttpResponse:
         self.calls += 1
         self.requests.append(request)
         return self.responses.pop(0)
@@ -239,7 +239,7 @@ def test_credential_transport_and_parser_failures_drop_sensitive_exception_chain
     assert credential_value not in _exception_rendering(credential_failure.value)
 
     class FailingTransport:
-        def send(self, _request: OddsHttpRequest) -> OddsHttpResponse:
+        def send(self, _request: OddsHttpRequest, _credential: str) -> OddsHttpResponse:
             raise IngestionError(
                 "READ_TIMEOUT",
                 credential_value,

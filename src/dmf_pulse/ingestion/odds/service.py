@@ -43,15 +43,18 @@ from dmf_pulse.ingestion.fpl.service import (
 )
 from dmf_pulse.ingestion.models import RightsCapability, RightsProfile
 from dmf_pulse.ingestion.odds.client import (
-    CredentialProvider,
+    HttpClientOddsTransport,
     OddsClient,
     OddsFetchFailure,
     OddsRetrievalAttempt,
     OddsTransport,
-    UnavailableCredentialProvider,
-    UrllibOddsTransport,
 )
 from dmf_pulse.ingestion.odds.config import load_provider_config, load_rights_profiles
+from dmf_pulse.ingestion.odds.credentials import (
+    CredentialProvider,
+    RuntimeOddsCredentialProvider,
+    credential_configuration_hint,
+)
 from dmf_pulse.ingestion.odds.mapping import OddsMappingPlan, load_mapping_plan
 from dmf_pulse.ingestion.odds.models import (
     OddsIngestionResult,
@@ -180,14 +183,14 @@ class OddsIngestionService:
         *,
         repository_root: Path | None = None,
         credential_provider: CredentialProvider | None = None,
-        transport_factory: Callable[[], OddsTransport] = UrllibOddsTransport,
+        transport_factory: Callable[[], OddsTransport] = HttpClientOddsTransport,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         processing_clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         sleeper: Callable[[float], None] = time.sleep,
         monotonic: Callable[[], float] = time.monotonic,
     ) -> None:
         self.repository_root = (repository_root or Path.cwd()).resolve()
-        self.credential_provider = credential_provider or UnavailableCredentialProvider()
+        self.credential_provider = credential_provider or RuntimeOddsCredentialProvider()
         self.transport_factory = transport_factory
         self.clock = clock
         self.processing_clock = processing_clock
@@ -431,6 +434,7 @@ class OddsIngestionService:
         requested_delay_seconds: int | None = None,
         applied_delay_seconds: int | None = None,
         attempt_outcome: str | None = None,
+        transport_id: str | None = None,
     ) -> _Envelope:
         source_provider_id = ensure_synthetic_odds_provider(session)
         if profile.provider_key != "synthetic_the_odds_api":
@@ -467,7 +471,7 @@ class OddsIngestionService:
                 pair_key=operation_id,
                 started_at=request_started_at or captured_at,
                 logical_prefix="odd005",
-                resource="soccer_epl/h2h",
+                resource="soccer_epl/h2h,totals",
                 adapter_version=CONTRACT_VERSION,
             )
         else:
@@ -487,13 +491,14 @@ class OddsIngestionService:
             "requested_delay_seconds": requested_delay_seconds,
             "applied_delay_seconds": applied_delay_seconds,
             "attempt_outcome": attempt_outcome,
+            "transport_id": transport_id,
         }
         snapshot_id = record_received_snapshot(
             session,
             provider_id=source_provider_id,
             ingestion_run_id=run_id,
             attempt_number=attempt_number,
-            resource="soccer_epl/h2h",
+            resource="soccer_epl/h2h,totals",
             captured_at=captured_at,
             body=body,
             raw_blob_id=raw_blob_id,
@@ -561,7 +566,7 @@ class OddsIngestionService:
                         transport_request_fingerprint
                         or canonical_sha256(
                             {
-                                "markets": "h2h",
+                                "markets": "h2h,totals",
                                 "provider": "the_odds_api",
                                 "regions": "uk",
                                 "sport": "soccer_epl",
@@ -591,7 +596,7 @@ class OddsIngestionService:
                 pair_key=str(uuid4()),
                 started_at=attempts[0].request_started_at,
                 logical_prefix="odd005",
-                resource="soccer_epl/h2h",
+                resource="soccer_epl/h2h,totals",
                 adapter_version=CONTRACT_VERSION,
             )
             for attempt in attempts:
@@ -622,6 +627,7 @@ class OddsIngestionService:
                     requested_delay_seconds=attempt.requested_delay_seconds,
                     applied_delay_seconds=attempt.applied_delay_seconds,
                     attempt_outcome=attempt.attempt_outcome,
+                    transport_id=attempt.transport_id,
                 )
                 final_envelope = envelope
                 if attempt.failure_code is None:
@@ -642,6 +648,7 @@ class OddsIngestionService:
                             "requested_delay_seconds": attempt.requested_delay_seconds,
                             "applied_delay_seconds": attempt.applied_delay_seconds,
                             "attempt_outcome": attempt.attempt_outcome,
+                            "transport_id": attempt.transport_id,
                         },
                         subject_scope="SOURCE_SNAPSHOT",
                         stage="RETRIEVAL",
@@ -663,6 +670,7 @@ class OddsIngestionService:
                         "requested_delay_seconds": attempt.requested_delay_seconds,
                         "applied_delay_seconds": attempt.applied_delay_seconds,
                         "attempt_outcome": attempt.attempt_outcome,
+                        "transport_id": attempt.transport_id,
                     },
                     stage_version=CONTRACT_VERSION,
                     actor="the-odds-api-reference-adapter",
@@ -1128,7 +1136,7 @@ class OddsIngestionService:
         if quota_lookup_failed:
             # The default credential-free command remains a deterministic,
             # offline refusal when its referenced database is unavailable.
-            if isinstance(self.credential_provider, UnavailableCredentialProvider):
+            if credential_configuration_hint(self.credential_provider) is False:
                 code = ProviderFailureCode.CREDENTIAL_UNAVAILABLE
                 return OddsOperationOutcome(
                     _empty_result(

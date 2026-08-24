@@ -55,7 +55,7 @@ class OddsProviderConfig(_FrozenConfig):
     path: Literal["/v4/sports/soccer_epl/odds"]
     sport_keys: tuple[Literal["soccer_epl"], ...]
     regions: tuple[Literal["uk"], ...]
-    markets: tuple[Literal["h2h"], ...]
+    markets: tuple[Literal["h2h", "totals"], ...]
     odds_format: Literal["decimal"]
     date_format: Literal["iso"]
     request_cost: int = Field(gt=0, le=10)
@@ -73,8 +73,10 @@ class OddsProviderConfig(_FrozenConfig):
     def validate_allowlists(self) -> OddsProviderConfig:
         if self.sport_keys != ("soccer_epl",):
             raise ValueError("sport allowlist drifted")
-        if self.regions != ("uk",) or self.markets != ("h2h",):
+        if self.regions != ("uk",) or self.markets != ("h2h", "totals"):
             raise ValueError("market allowlist drifted")
+        if self.request_cost != len(self.markets) * len(self.regions):
+            raise ValueError("request cost does not match market-region coverage")
         return self
 
 

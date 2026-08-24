@@ -1,0 +1,50 @@
+{
+  "ticket_id": "LIVE-ODDS-INTEGRATION-001",
+  "status": "INTEGRATION_CANDIDATE_PENDING_FINAL_SHA_CI_AND_INDEPENDENT_REVIEW",
+  "classification": "EXACT_TWO_PARENT_GOVERNANCE_RECONCILIATION",
+  "first_parent": "fceca02d21ec7031e36518c46724c6a6d3d6c72e",
+  "second_parent": "5e55cf3361a1abff4b2e32dcc30fe42900ea2e16",
+  "common_merge_base": "baed47bce7a158d91afe38351a2c65be60444adf",
+  "branch": "integration/post-ci/LIVE-ODDS-001-on-repaired-main",
+  "conflicts": [
+    "PLANS.md",
+    "evidence/tickets/PRC-013/current_manifest.json"
+  ],
+  "executable_conflicts": 0,
+  "blob_identity": {
+    "live_odds": {"matched": 20, "expected": 20, "mismatches": 0},
+    "repaired_main": {"matched": 16, "expected": 16, "mismatches": 0}
+  },
+  "plans": {
+    "main_programme_exact": true,
+    "live_odds_programme_exact": true,
+    "live_odds_review_tail_exact": true,
+    "unexpected_history_rewrite": false
+  },
+  "local_validation": {
+    "frozen_sync": "PASS",
+    "live_odds_focused": "PASS_275",
+    "fpl_regression": "PASS_140",
+    "postgresql": "PASS_18_4",
+    "format": "PASS_647_FILES",
+    "lint": "PASS",
+    "mypy": "PASS_247_SOURCE_FILES",
+    "build": "PASS",
+    "wheel": "PASS",
+    "odd005_wheel": "PASS_ZERO_NETWORK",
+    "gcs008_wheel": "PASS_288_RECORD_MEMBERS",
+    "repository_validation": "PASS_0_ERRORS",
+    "secret_scan": "PASS_0_FINDINGS"
+  },
+  "prc013_active_manifest": {"status": "PASS", "deliverable_files": 1150, "manual_splice": false},
+  "historical_evidence_rewritten": false,
+  "accepted_source_modified": false,
+  "pr_16_modified": false,
+  "automatic_final_sha_ci": "PENDING_EXTERNAL_AFTER_SINGLE_MERGE_COMMIT_PUSH",
+  "independent_integration_review": "PENDING",
+  "human_integration_acceptance": "PENDING",
+  "replacement_pr_created": false,
+  "merged_to_main": false,
+  "production_active": false,
+  "findings": {"p0": 0, "p1": 0, "material_p2": 0, "p3": 0}
+}

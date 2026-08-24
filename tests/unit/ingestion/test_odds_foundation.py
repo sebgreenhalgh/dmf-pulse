@@ -87,7 +87,7 @@ def test_supplied_payload_scenarios_have_frozen_semantics(repository_root: Path)
     assert happy.warnings == ()
     assert changed.semantic_sha256 != happy.semantic_sha256
     assert incomplete.operator_books_seen == 1
-    assert unknown.warnings == ("UNSUPPORTED_MARKET:synthetic_unknown_market",)
+    assert unknown.warnings == ("ADDITIVE_UNSUPPORTED_MARKET:synthetic_unknown_market",)
     assert len({happy.schema_fingerprint, changed.schema_fingerprint}) == 1
 
 
@@ -237,7 +237,8 @@ def test_provider_and_rights_configuration_is_strict_and_hash_bound(
     profiles = load_rights_profiles()
     assert config.sport_keys == ("soccer_epl",)
     assert config.regions == ("uk",)
-    assert config.markets == ("h2h",)
+    assert config.markets == ("h2h", "totals")
+    assert config.request_cost == 2
     assert set(profiles) == {
         "synthetic_the_odds_api_v1",
         "the_odds_api_private_analytics_v1",
@@ -435,7 +436,7 @@ class _Transport:
         self.responses = responses
         self.requests: list[OddsHttpRequest] = []
 
-    def send(self, request: OddsHttpRequest) -> OddsHttpResponse:
+    def send(self, request: OddsHttpRequest, _credential: str) -> OddsHttpResponse:
         self.requests.append(request)
         response = self.responses.pop(0)
         if isinstance(response, IngestionError):
@@ -628,7 +629,6 @@ def test_quota_and_request_validation_reject_naive_or_inconsistent_values(
                 host="api.the-odds-api.com",
                 path="/v4/sports/soccer_epl/odds",
                 safe_parameters=(),
-                credential=_fake_credential(repository_root),
             ),
             load_provider_config(),
         )
