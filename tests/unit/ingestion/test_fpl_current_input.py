@@ -264,6 +264,141 @@ def test_target_gameweek_is_generalized_for_current_and_next_events(
     assert current_bundle.target_event.is_current is True
 
 
+@pytest.mark.parametrize(
+    ("state", "case"),
+    [
+        (
+            {
+                "finished": True,
+                "is_previous": False,
+                "is_current": True,
+                "is_next": False,
+            },
+            "finished_true",
+        ),
+        (
+            {
+                "finished": None,
+                "is_previous": False,
+                "is_current": True,
+                "is_next": False,
+            },
+            "finished_null",
+        ),
+        (
+            {
+                "finished": False,
+                "is_previous": True,
+                "is_current": True,
+                "is_next": False,
+            },
+            "previous_current",
+        ),
+        (
+            {
+                "finished": False,
+                "is_previous": True,
+                "is_current": False,
+                "is_next": True,
+            },
+            "previous_next",
+        ),
+        (
+            {
+                "finished": False,
+                "is_previous": False,
+                "is_current": True,
+                "is_next": True,
+            },
+            "current_next",
+        ),
+        (
+            {
+                "finished": False,
+                "is_previous": None,
+                "is_current": True,
+                "is_next": False,
+            },
+            "previous_null",
+        ),
+        (
+            {
+                "finished": False,
+                "is_previous": False,
+                "is_current": None,
+                "is_next": True,
+            },
+            "current_null",
+        ),
+        (
+            {
+                "finished": False,
+                "is_previous": False,
+                "is_current": True,
+                "is_next": None,
+            },
+            "next_null",
+        ),
+        (
+            {
+                "finished": False,
+                "is_previous": False,
+                "is_current": False,
+                "is_next": False,
+            },
+            "neither_current_nor_next",
+        ),
+    ],
+)
+def test_target_event_state_must_be_explicit_and_consistent(
+    repository_root: Path,
+    tmp_path: Path,
+    state: dict[str, bool | None],
+    case: str,
+) -> None:
+    bootstrap = _source(repository_root, "bootstrap.json")
+    fixtures = _source(repository_root, "fixtures.json")
+    assert isinstance(bootstrap, dict)
+    events = bootstrap["events"]
+    assert isinstance(events, list)
+    target = events[0]
+    assert isinstance(target, dict)
+    target.update(state)
+    paths = _write_pair(tmp_path / case, bootstrap, fixtures)
+
+    _assert_error(_request(*paths), "VALIDATION_FAILED")
+
+
+@pytest.mark.parametrize("case", ["two_current", "two_next", "previous_current", "current_next"])
+def test_global_event_state_contradictions_fail_closed(
+    repository_root: Path,
+    tmp_path: Path,
+    case: str,
+) -> None:
+    bootstrap = _source(repository_root, "bootstrap.json")
+    fixtures = _source(repository_root, "fixtures.json")
+    assert isinstance(bootstrap, dict)
+    events = bootstrap["events"]
+    assert isinstance(events, list)
+    first = events[0]
+    second = events[1]
+    assert isinstance(first, dict)
+    assert isinstance(second, dict)
+    if case == "two_current":
+        second["is_current"] = True
+    elif case == "two_next":
+        first["is_next"] = True
+    elif case == "previous_current":
+        first.update({"is_previous": True, "is_current": True, "is_next": False})
+    elif case == "current_next":
+        second.update({"is_previous": False, "is_current": True, "is_next": True})
+    else:  # pragma: no cover - parameter contract
+        raise AssertionError(case)
+    paths = _write_pair(tmp_path / case, bootstrap, fixtures)
+
+    _assert_error(_request(*paths), "VALIDATION_FAILED")
+
+
 def test_position_mapping_uses_payload_labels_not_historical_numeric_ids(
     repository_root: Path,
     tmp_path: Path,
@@ -626,14 +761,143 @@ def test_duplicate_unavailable_directory_and_symlink_inputs_fail_safely(
     assert str(bootstrap) not in error.message
 
 
-def test_oversized_file_is_rejected_without_reading_beyond_bound(
+def test_resolved_and_hard_link_aliases_are_rejected_by_opened_identity(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    bootstrap = repository_root / "fixtures/fpl/FPL-004/happy_path/bootstrap.json"
+    resolved_alias = bootstrap.parent / ".." / "happy_path" / "bootstrap.json"
+    _assert_error(_request(bootstrap, resolved_alias), "USAGE_INVALID")
+
+    hard_link = tmp_path / "bootstrap-hard-link.json"
+    try:
+        os.link(bootstrap, hard_link)
+    except OSError as exc:
+        pytest.skip(f"hard links are unavailable on this test host: {exc}")
+    _assert_error(_request(bootstrap, hard_link), "USAGE_INVALID")
+
+
+def test_descriptor_substitution_is_rejected_and_descriptor_is_closed(
     repository_root: Path,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    bootstrap = tmp_path / "bootstrap.json"
-    bootstrap.write_bytes(b"x" * 17)
+    bootstrap = repository_root / "fixtures/fpl/FPL-004/happy_path/bootstrap.json"
+    attacker = tmp_path / "attacker.json"
+    attacker.write_bytes(b'"PRIVATE-ATTACKER-BYTES"')
+    real_open = os.open
+    real_fstat = os.fstat
+    substituted_descriptors: list[int] = []
+
+    def substituted_open(
+        path: str | bytes | os.PathLike[str], flags: int, mode: int = 0o777
+    ) -> int:
+        del path
+        descriptor = real_open(attacker, flags, mode)
+        substituted_descriptors.append(descriptor)
+        return descriptor
+
+    monkeypatch.setattr(current_module.os, "open", substituted_open)
+
+    with pytest.raises(IngestionError) as exc_info:
+        current_module._safe_read(bootstrap)
+
+    assert exc_info.value.code == "SOURCE_UNAVAILABLE"
+    assert "PRIVATE-ATTACKER-BYTES" not in exc_info.value.message
+    assert substituted_descriptors
+    with pytest.raises(OSError):
+        real_fstat(substituted_descriptors[0])
+
+
+def test_opened_descriptor_must_be_regular_and_is_closed_on_failure(
+    repository_root: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bootstrap = repository_root / "fixtures/fpl/FPL-004/happy_path/bootstrap.json"
+    real_open = os.open
+    real_fstat = os.fstat
+    opened_descriptors: list[int] = []
+
+    def observing_open(path: str | bytes | os.PathLike[str], flags: int, mode: int = 0o777) -> int:
+        descriptor = real_open(path, flags, mode)
+        opened_descriptors.append(descriptor)
+        return descriptor
+
+    monkeypatch.setattr(current_module.os, "open", observing_open)
+    monkeypatch.setattr(current_module.os, "fstat", lambda _descriptor: tmp_path.stat())
+
+    with pytest.raises(IngestionError) as exc_info:
+        current_module._safe_read(bootstrap)
+
+    assert exc_info.value.code == "SOURCE_UNAVAILABLE"
+    assert opened_descriptors
+    with pytest.raises(OSError):
+        real_fstat(opened_descriptors[0])
+
+
+def test_post_open_path_identity_mismatch_is_rejected(
+    repository_root: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bootstrap = repository_root / "fixtures/fpl/FPL-004/happy_path/bootstrap.json"
+    attacker = tmp_path / "replacement.json"
+    attacker.write_bytes(b'"PRIVATE-REPLACEMENT-BYTES"')
+    real_lstat = os.lstat
+    calls = 0
+
+    def substituted_lstat(path: str | bytes | os.PathLike[str]) -> os.stat_result:
+        nonlocal calls
+        calls += 1
+        return real_lstat(path if calls == 1 else attacker)
+
+    monkeypatch.setattr(current_module.os, "lstat", substituted_lstat)
+
+    with pytest.raises(IngestionError) as exc_info:
+        current_module._safe_read(bootstrap)
+
+    assert calls == 2
+    assert exc_info.value.code == "SOURCE_UNAVAILABLE"
+    assert "PRIVATE-REPLACEMENT-BYTES" not in exc_info.value.message
+
+
+def test_secure_open_uses_nofollow_when_available(
+    repository_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bootstrap = repository_root / "fixtures/fpl/FPL-004/happy_path/bootstrap.json"
+    real_open = os.open
+    observed_flags: list[int] = []
+
+    def observing_open(path: str | bytes | os.PathLike[str], flags: int, mode: int = 0o777) -> int:
+        observed_flags.append(flags)
+        return real_open(path, flags, mode)
+
+    monkeypatch.setattr(current_module.os, "open", observing_open)
+
+    assert current_module._safe_read(bootstrap)
+    assert observed_flags
+    nofollow = getattr(os, "O_NOFOLLOW", 0)
+    if nofollow:
+        assert observed_flags[0] & nofollow
+
+
+@pytest.mark.parametrize("oversized_resource", ["bootstrap", "fixtures"])
+def test_oversized_file_is_rejected_without_reading_beyond_bound(
+    repository_root: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    oversized_resource: str,
+) -> None:
+    bootstrap = repository_root / "fixtures/fpl/FPL-004/happy_path/bootstrap.json"
     fixtures = repository_root / "fixtures/fpl/FPL-004/happy_path/fixtures.json"
+    oversized = tmp_path / f"{oversized_resource}.json"
+    oversized.write_bytes(b"x" * 17)
+    if oversized_resource == "bootstrap":
+        bootstrap = oversized
+    else:
+        fixtures = oversized
     config = current_module.load_provider_config()
     monkeypatch.setattr(
         current_module,

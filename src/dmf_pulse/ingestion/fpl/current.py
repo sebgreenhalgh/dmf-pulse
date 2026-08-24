@@ -9,9 +9,12 @@ for public or CLI disclosure.
 from __future__ import annotations
 
 import json
+import os
 import stat
 from collections import Counter
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from contextlib import ExitStack, contextmanager, suppress
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal, Self
@@ -520,41 +523,90 @@ def _identity(
     )
 
 
-def _safe_read(path: Path) -> bytes:
-    """Read one bounded regular operator-owned file without following a file symlink."""
+@dataclass(frozen=True)
+class _OpenedManualInput:
+    descriptor: int
+    metadata: os.stat_result
 
+
+def _manual_input_open_flags() -> int:
+    flags = os.O_RDONLY
+    for name in ("O_BINARY", "O_CLOEXEC", "O_NOINHERIT", "O_NOFOLLOW"):
+        flags |= int(getattr(os, name, 0))
+    return flags
+
+
+def _regular_file(metadata: os.stat_result) -> bool:
+    return not stat.S_ISLNK(metadata.st_mode) and stat.S_ISREG(metadata.st_mode)
+
+
+@contextmanager
+def _open_verified_input(path: Path) -> Iterator[_OpenedManualInput]:
+    """Open once and bind all validation and reads to the resulting descriptor."""
+
+    descriptor: int | None = None
     try:
-        metadata = path.lstat()
-        if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISREG(metadata.st_mode):
+        before = os.lstat(path)
+        if not _regular_file(before):
             raise OSError("input is not a regular file")
-        maximum = load_provider_config().max_response_bytes
-        with path.open("rb") as handle:
-            body = handle.read(maximum + 1)
+        descriptor = os.open(path, _manual_input_open_flags())
+        opened = os.fstat(descriptor)
+        if not stat.S_ISREG(opened.st_mode) or not os.path.samestat(before, opened):
+            raise OSError("opened input differs from validated path")
+        after = os.lstat(path)
+        if not _regular_file(after) or not os.path.samestat(after, opened):
+            raise OSError("input path changed while opening")
+        yield _OpenedManualInput(descriptor=descriptor, metadata=opened)
     except OSError:
         raise IngestionError("SOURCE_UNAVAILABLE", "manual FPL input is unavailable") from None
+    finally:
+        if descriptor is not None:
+            with suppress(OSError):
+                os.close(descriptor)
+
+
+def _bounded_descriptor_read(source: _OpenedManualInput, maximum: int) -> bytes:
+    chunks: list[bytes] = []
+    remaining = maximum + 1
+    while remaining:
+        chunk = os.read(source.descriptor, remaining)
+        if not chunk:
+            break
+        chunks.append(chunk)
+        remaining -= len(chunk)
+    body = b"".join(chunks)
     if len(body) > maximum:
         raise IngestionError("PAYLOAD_TOO_LARGE", "manual FPL input exceeds the byte limit")
     return body
 
 
+def _safe_read(path: Path) -> bytes:
+    """Read one bounded operator-owned file from its verified descriptor."""
+
+    maximum = load_provider_config().max_response_bytes
+    with _open_verified_input(path) as source:
+        return _bounded_descriptor_read(source, maximum)
+
+
 def _parsed_payloads(
     request: CurrentFplInputRequest,
 ) -> tuple[ParsedFplResource, ParsedFplResource]:
-    try:
-        bootstrap_resolved = request.bootstrap_path.resolve(strict=True)
-        fixtures_resolved = request.fixtures_path.resolve(strict=True)
-    except OSError:
-        raise IngestionError("SOURCE_UNAVAILABLE", "manual FPL input is unavailable") from None
-    if bootstrap_resolved == fixtures_resolved:
-        raise IngestionError("USAGE_INVALID", "bootstrap and fixtures must be distinct files")
+    maximum = load_provider_config().max_response_bytes
+    with ExitStack() as stack:
+        bootstrap_source = stack.enter_context(_open_verified_input(request.bootstrap_path))
+        fixtures_source = stack.enter_context(_open_verified_input(request.fixtures_path))
+        if os.path.samestat(bootstrap_source.metadata, fixtures_source.metadata):
+            raise IngestionError("USAGE_INVALID", "bootstrap and fixtures must be distinct files")
+        bootstrap_body = _bounded_descriptor_read(bootstrap_source, maximum)
+        fixtures_body = _bounded_descriptor_read(fixtures_source, maximum)
     bootstrap = parse_fpl_payload(
         FplResource.BOOTSTRAP,
-        _safe_read(request.bootstrap_path),
+        bootstrap_body,
         contract_version=CONTRACT_VERSION,
     )
     fixtures = parse_fpl_payload(
         FplResource.FIXTURES,
-        _safe_read(request.fixtures_path),
+        fixtures_body,
         contract_version=CONTRACT_VERSION,
     )
     return bootstrap, fixtures
@@ -617,6 +669,11 @@ def _position_map(
 
 
 def _target_event(events: list[Event], target_gameweek: int) -> Event:
+    if any(
+        sum(flag is True for flag in (event.is_previous, event.is_current, event.is_next)) > 1
+        for event in events
+    ):
+        raise IngestionError("VALIDATION_FAILED", "Gameweek state flags are inconsistent")
     current = tuple(event for event in events if event.is_current is True)
     following = tuple(event for event in events if event.is_next is True)
     if len(current) > 1 or len(following) > 1:
@@ -627,10 +684,13 @@ def _target_event(events: list[Event], target_gameweek: int) -> Event:
     if len(matches) != 1:
         raise IngestionError("VALIDATION_FAILED", "target Gameweek is missing or ambiguous")
     target = matches[0]
-    if target.finished is True:
-        raise IngestionError("VALIDATION_FAILED", "target Gameweek is already finished")
-    if target.is_current is not True and target.is_next is not True:
-        raise IngestionError("VALIDATION_FAILED", "target Gameweek is not marked current or next")
+    if target.finished is not False:
+        raise IngestionError("VALIDATION_FAILED", "target Gameweek is not explicitly unfinished")
+    if (target.is_previous, target.is_current, target.is_next) not in (
+        (False, True, False),
+        (False, False, True),
+    ):
+        raise IngestionError("VALIDATION_FAILED", "target Gameweek state is inconsistent")
     return target
 
 

@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 91796,
+      "bytes": 92930,
       "path": "PLANS.md",
-      "sha256": "dcae1cd07f0deded48e8d52a7639abd58eb0c70e5648db311481eb30253080b8"
+      "sha256": "f402e10cfe3a63f975ae10d84bd4d01f5124829f2d69b53f6b0eba35c3b256b5"
     },
     {
       "bytes": 2761,
@@ -3281,9 +3281,9 @@
       "sha256": "179829a5da85423f363b7630c570f03266d40301fbd7452f3312c209266c8779"
     },
     {
-      "bytes": 44669,
+      "bytes": 46807,
       "path": "src/dmf_pulse/ingestion/fpl/current.py",
-      "sha256": "02d52237304e33ef770f28fad32b8d910587597855119850cdbaeccee47001c2"
+      "sha256": "3d57f2fb7b367c85278f3a64b810f9379e830be5cc5144ca851c0e8bb2dec41b"
     },
     {
       "bytes": 23102,
@@ -5201,9 +5201,9 @@
       "sha256": "4edf772b5f7f2d78692195bda94146382513efff7af6091f2ef2be4f0197bb4e"
     },
     {
-      "bytes": 24524,
+      "bytes": 32939,
       "path": "tests/unit/ingestion/test_fpl_current_input.py",
-      "sha256": "c92bcd5b48c46087a803befdc3349f953368fd2e31bcf8206c0e1f69643e4d29"
+      "sha256": "17591a792c084045ab5450b6a6742f43da1c51151ea78194aaf44899cf8ed272"
     },
     {
       "bytes": 13632,
@@ -5606,14 +5606,14 @@
       "sha256": "d697fa36f92b0167dfb1c1a32096037550b9840017b8a5f0549c310d6e726d59"
     },
     {
-      "bytes": 641,
+      "bytes": 765,
       "path": "tickets/CURRENT-FPL-STATE-001A/ACCEPTANCE.md",
-      "sha256": "e734083bacea41ca68f53b425d74de2a054de977b2d618c8a8813fb947bf7f03"
+      "sha256": "a30f75a9a64c48913213003b62d57f2b7d759e2336912540bb9ab039ca90b248"
     },
     {
-      "bytes": 2544,
+      "bytes": 2545,
       "path": "tickets/CURRENT-FPL-STATE-001A/ticket.yaml",
-      "sha256": "eafd1ea4981587cf683ee20e0d861e60529e08f98d0ecd3166c9f04d9b2778f2"
+      "sha256": "f2119b9f1951016dea3538ddf657a47075f0734875f3007c1fc2aa4a748383c3"
     },
     {
       "bytes": 3923,

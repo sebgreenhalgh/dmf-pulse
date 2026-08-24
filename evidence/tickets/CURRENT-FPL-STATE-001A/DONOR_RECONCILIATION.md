@@ -13,7 +13,8 @@ The donor was inspected as a reference. It was not merged, rebased, or bulk cher
 ## Ported semantically
 
 - operator-supplied bootstrap and fixtures files;
-- bounded regular-file reads, distinct resolved paths, and symlink rejection;
+- bounded regular-file reads and symlink rejection; independent review later identified that the
+  initial resolved-path distinctness and `lstat`/pathname-open sequence needed CFSA-REV-002;
 - reuse of the accepted `parse_fpl_payload` bootstrap/fixtures contracts;
 - immutable in-memory teams, players, positions, events, fixtures, provenance, rights, and quality;
 - season-scoped official-FPL identities and provider-native price/status/news fields;
@@ -38,8 +39,9 @@ The donor was inspected as a reference. It was not merged, rebased, or bulk cher
 ## Generalised from the GW1 donor
 
 - There is no default target Gameweek and no `gameweek == 1` semantic gate.
-- Any positive operator-declared Gameweek may compile only when exactly present, unfinished,
-  marked current or next by the supplied bootstrap, and backed by valid post-deadline fixtures.
+- Any positive operator-declared Gameweek may compile only when exactly present, explicitly
+  `finished=False`, explicitly not previous, marked by an exact current-or-next tuple, and backed
+  by valid post-deadline fixtures. Multiple true state flags on any event fail closed.
 - Tests cover Gameweek 2 as both next and current; no wall-clock inference or maximum-event
   fallback exists.
 - GW1-specific downstream checkpoint text was removed from the summary and runbook.
@@ -59,3 +61,7 @@ The donor was inspected as a reference. It was not merged, rebased, or bulk cher
 The donor's GW1 default, GW1-only operational framing, mutable game-settings mapping, single
 receipt/usable timestamp, and stale next-checkpoint status are superseded by the generalized,
 self-validating current-main contracts in this ticket.
+
+Independent review subsequently identified CFSA-REV-001/002 in the reviewed implementation head;
+the descriptor-bound file gate and exact target/global event-state checks are remediation work, not
+claims that were established by the original donor reconciliation. See `REVIEW_REMEDIATION.md`.

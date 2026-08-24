@@ -1,6 +1,7 @@
 # CURRENT-FPL-STATE-001A same-agent final self-review
 
-This is an adversarial same-agent review, not independent review or human acceptance.
+This records the original adversarial same-agent review and its later remediation-author update. It
+is not independent review or human acceptance.
 
 | Severity | Found | Closed | Remaining |
 |---|---:|---:|---:|
@@ -9,11 +10,17 @@ This is an adversarial same-agent review, not independent review or human accept
 | Material P2 | 2 | 2 | 0 |
 | P3 | 0 | 0 | 0 |
 
-The first material P2 was non-JSON-native datetime material in the new bundle semantic digest;
+The table above is the chronology of the original same-agent review. The first material P2 was
+non-JSON-native datetime material in the new bundle semantic digest;
 timestamps now have one UTC RFC3339 representation and deterministic semantic tests cover it. The
 second was whole-bootstrap Pydantic serialization for game settings, which could encounter Decimal
 values elsewhere in the accepted parser model under tracing. The implementation now canonicalizes
 only the accepted game-settings mapping and does not change the inherited parser.
+
+Independent review of head `140100fa49bea1d3d0493cb68f186af564fa1380` subsequently identified
+two additional material P2 findings that this original same-agent review did not find:
+CFSA-REV-001 and CFSA-REV-002. Their reproduction, remediation, tests, and disposition are preserved
+in `REVIEW_REMEDIATION.md`; this chronology is not rewritten to imply otherwise.
 
 ## P0/P1 hostile checks
 
@@ -25,10 +32,14 @@ only the accepted game-settings mapping and does not change the inherited parser
 - Capture, receipt, usable, cutoff, target deadline, target kickoffs, and player news timestamps
   are UTC-aware and ordered. Post-cutoff material is rejected.
 - Missing/duplicate/invalid player, team, event, fixture, position, game-setting, target-event, or
-  target-fixture state fails closed. No wall-clock or highest-event fallback exists.
-- Input files are distinct, bounded, regular, non-symlink files. Errors exclude bodies and absolute
-  paths; CLI adversarial cases exclude player names, news, tracebacks, credentials, and database
-  references.
+  target-fixture state fails closed. The remediated target must be explicitly unfinished with the
+  exact previous/current/next tuple for current or next, and contradictory true flags on any event
+  fail closed. No wall-clock or highest-event fallback exists.
+- The remediated file boundary validates pre-open path metadata, opens once with available safe
+  flags, validates the descriptor with `fstat`, checks pre/open/post identity, and reads bounded
+  bytes from that descriptor. Opened bootstrap/fixtures object identity must differ. Errors exclude
+  bodies and absolute paths; CLI adversarial cases exclude player names, news, tracebacks,
+  credentials, and database references.
 - The complete bundle retains private fields only in memory. Default output exposes counts,
   categories, timestamps, digests, quality counts, and conservative rights outcomes.
 - Temporary tests use repository synthetic fixtures only. No official provider endpoint, real
@@ -36,5 +47,6 @@ only the accepted game-settings mapping and does not change the inherited parser
 - Existing FPL client/parser/config/service/persistence code is unchanged, and 273 inherited FPL
   tests pass across non-database and disposable PostgreSQL matrices.
 
-No unresolved P0, P1, or material in-scope P2 remains. Scope and operational limitations are
+Remediation-author self-review finds no unresolved P0, P1, or material in-scope P2 after closing
+CFSA-REV-001/002. Independent re-review remains required. Scope and operational limitations are
 recorded in `KNOWN_LIMITATIONS.md`.

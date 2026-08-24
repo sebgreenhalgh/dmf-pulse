@@ -29,6 +29,23 @@
 - [ ] Commit and push the final branch SHA, inspect the complete automatic GitHub Actions run,
   and stop for independent review without a post-CI evidence commit.
 
+### CURRENT-FPL-STATE-001A independent-review remediation
+
+- Reviewed deficient head: `140100fa49bea1d3d0493cb68f186af564fa1380`; preserve the existing branch,
+  architectural parent, manual/private/transient boundary, and independent-review chronology.
+- [x] Reconfirm the exact remote main/branch pins, direct-child lineage, and clean worktree before
+  remediation.
+- [x] Reproduce and close CFSA-REV-001 with explicit target-state and contradictory global-event
+  regressions.
+- [x] Reproduce and close CFSA-REV-002 with descriptor-bound pre/open/post identity validation,
+  opened-object pair distinctness, bounded reads, and deterministic substitution/cleanup tests.
+- [x] Correct overstated final-state evidence, add the independent-review remediation record, and
+  regenerate only the canonical ticket and mutable PRC-013 manifests.
+- [x] Pass focused/hostile coverage, all 273 inherited FPL regressions, static/build/wheel/security,
+  and an isolated installed-wheel smoke.
+- [ ] Commit and push one remediation commit, inspect exact-final-SHA CI, and stop for independent
+  re-review without making a post-CI status commit.
+
 ## CI-COVERAGE-SHARD-001 independent-review remediation
 
 - Reviewed head/branch: `b8ce5de612d835bee6721898cd57e46c133f90dd` on

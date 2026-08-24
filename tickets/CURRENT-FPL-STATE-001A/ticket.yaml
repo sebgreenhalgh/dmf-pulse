@@ -48,4 +48,4 @@ required_public_behavior:
   - safe-summary-only CLI with no player names, news, paths, or payload fragments
   - no transport, database, raw storage, derived storage, cache, or backup
   - truthful operator deletion requirement on success and failure
-acceptance_status: CURRENT_FPL_STATE_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW
+acceptance_status: CURRENT_FPL_STATE_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW

@@ -8,6 +8,8 @@ parser. It must not perform official-FPL network access, use a database, retain 
 official data, or introduce manager state, FPL-to-Odds identity, downstream models, activation,
 merge, or human acceptance.
 
-The only clean engineering status is:
+After CFSA-REV-001/002 remediation, the only clean engineering status is:
 
-`CURRENT_FPL_STATE_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
+`CURRENT_FPL_STATE_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`
+
+This status requires a new independent re-review and does not claim human acceptance.
