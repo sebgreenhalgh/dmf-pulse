@@ -1,0 +1,49 @@
+{
+  "automatic_final_sha_ci": "PENDING_EXTERNAL_AFTER_FINAL_PUSH",
+  "automated_fpl": "BLOCKED_NOT_IMPLEMENTED",
+  "branch": "integration/current-fpl/CURRENT-FPL-STATE-001A-manual-transient",
+  "coverage": {
+    "branch_aware_percent": 91.35446685878962,
+    "covered_branches": 115,
+    "covered_lines": 519,
+    "focused_tests_passed": 76,
+    "module": "src/dmf_pulse/ingestion/fpl/current.py",
+    "report": "evidence/tickets/CURRENT-FPL-STATE-001A/coverage.json"
+  },
+  "database_called_by_current_compiler": false,
+  "evidence_binding": {
+    "deliverable_file_count": 1156,
+    "kind": "repository-deliverables-manifest",
+    "path": "evidence/tickets/CURRENT-FPL-STATE-001A/current_manifest.json"
+  },
+  "findings": {
+    "CFSA-REV-001": "CLOSED_PENDING_INDEPENDENT_REREVIEW",
+    "CFSA-REV-002": "CLOSED_PENDING_INDEPENDENT_REREVIEW"
+  },
+  "final_commit": "FINAL_REMEDIATION_COMMIT_CONTAINING_THIS_RESULT",
+  "fpl_odds_identity": "OUT_OF_SCOPE",
+  "inherited_fpl_regressions": {
+    "database_backed_passed": 68,
+    "non_database_passed": 205,
+    "status": "PASS"
+  },
+  "manager_state": "OUT_OF_SCOPE",
+  "network_called": false,
+  "parent": "2bc2783adc37d0956962d7574f73cbb6af711e28",
+  "persistent_official_state": "BLOCKED_NOT_IMPLEMENTED",
+  "production_activation": "NOT_CLAIMED",
+  "repository_validation": "PASS_ZERO_ERRORS",
+  "secret_scan": "PASS_ZERO_FINDINGS",
+  "static_and_build": {
+    "build": "PASS",
+    "frozen_sync": "PASS",
+    "gcs008_wheel": "PASS_289_RECORD_MEMBERS",
+    "installed_current_cli": "PASS_OFFLINE_TEMPORARY_SYNTHETIC_GW2",
+    "mypy": "PASS_248_SOURCE_FILES_VIA_MODULE_WINDOWS_LAUNCHER_BLOCKED",
+    "odd005_wheel": "PASS_ZERO_NETWORK_REQUESTS",
+    "ruff": "PASS_650_FILES",
+    "wheel": "PASS"
+  },
+  "status": "CURRENT_FPL_STATE_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW",
+  "ticket_id": "CURRENT-FPL-STATE-001A"
+}

@@ -1,0 +1,114 @@
+CURRENT-FPL-STATE-001A command ledger
+Date: 2026-08-24
+
+1. git fetch --prune origin
+   PASS: origin/main remained 2bc2783adc37d0956962d7574f73cbb6af711e28.
+2. git switch -c integration/current-fpl/CURRENT-FPL-STATE-001A-manual-transient 2bc2783...
+   PASS: exact authorized branch and parent established from a clean worktree.
+3. git show/read-tree/donor blob inspection
+   PASS: current main tree and parents verified; donor current.py blob was
+   59bb878ef30158c02a8b9e9ab700e4b57fc003fc; no donor history was merged.
+4. Focused CURRENT-FPL-STATE-001A tests during implementation
+   EXPECTED_RED_TO_GREEN: initial contract defects were localized and corrected without changing
+   the inherited parser; final focused result is 57 passed.
+5. uv run python -m coverage run --branch -m pytest -q <focused current-FPL tests>
+   PASS: 57 passed; new current.py branch-aware aggregate 90.29733959311424%.
+   The literal `uv run pytest` launcher was also attempted inside and outside the sandbox and was
+   blocked before collection by Windows Application Control (os error 4551); the frozen
+   interpreter module invocation above is the local equivalent, and final Linux CI remains
+   mandatory.
+6. uv run python -m pytest -q <inherited non-database FPL matrix>
+   PASS: 205 passed; six PostgreSQL fixtures initially reported the missing database prerequisite.
+7. docker compose -f compose.test.yaml up -d --wait
+   PASS: digest-pinned PostgreSQL 18.4 disposable service healthy.
+8. uv run alembic upgrade head
+   PASS: canonical schema upgraded through 20260807_0006.
+9. uv run python -m pytest -q <inherited database-backed FPL matrix>
+   PASS: 68 passed in 78.82 seconds.
+10. uv sync --all-groups --frozen; git diff --check; repository-wide Ruff and mypy
+    PASS: 40 packages checked, 650 files formatted, lint clean, 248 source files strictly typed.
+11. uv build
+    PASS: dmf_pulse-0.2.0 source distribution and wheel built.
+12. uv run python scripts/verify_wheel.py
+    PASS: clean installed environment outside the repository, healthy database, no network fetch.
+13. uv run python scripts/verify_odd005_wheel.py
+    PASS: clean installed wheel, isolated database, zero network requests.
+14. uv run python scripts/verify_gcs008_wheel.py
+    PASS: clean installed wheel; 289 record members and required resources verified.
+15. Offline isolated installed-wheel current-FPL CLI smoke outside the source tree
+    PASS: full `dmf ingest fpl current validate` route returned a safe valid GW2 summary from
+    temporary synthetic inputs; temporary input directory was automatically deleted.
+16. uv run python scripts/generate_repository_manifest.py --ticket CURRENT-FPL-STATE-001A
+    PASS: 1,156 deliverable files written by canonical tooling.
+17. uv run python scripts/generate_repository_manifest.py --ticket PRC-013
+    PASS: 1,156 deliverable files written to the authorized mutable active manifest.
+18. uv run python scripts/validate_repository.py
+    PASS: zero errors.
+19. uv run python scripts/scan_secrets.py
+    PASS: zero findings.
+
+No real provider request, production credential, operator capture, persistent current-state write,
+PR, merge, tag, human acceptance, or activation occurred. Exact-final-SHA CI is externally
+observable after the single final push; no post-CI evidence commit is made.
+
+INDEPENDENT-REVIEW REMEDIATION
+Reviewed deficient head: 140100fa49bea1d3d0493cb68f186af564fa1380
+Findings: CFSA-REV-001 (material P2), CFSA-REV-002 (material P2)
+
+20. Pinned startup verification
+    PASS: fetched origin; origin/main remained 2bc2783adc37d0956962d7574f73cbb6af711e28;
+    branch/local HEAD remained 140100fa49bea1d3d0493cb68f186af564fa1380; reviewed head was
+    the clean single direct child of the architectural parent.
+21. RED focused review regressions
+    EXPECTED RED: 8 failed, 10 passed, 46 deselected. Accepted target null/contradiction states,
+    contradictory non-target state, hard-link aliasing, and the absent descriptor boundary were
+    reproduced before implementation.
+22. GREEN focused CURRENT-FPL compiler and CLI
+    PASS: 76 passed. Branch-aware coverage aggregate 91.35446685878962%; 519/550 statements and
+    115/144 branches covered. New descriptor-validation failure branches were not excluded.
+23. Hostile remediation matrix
+    PASS: 30 passed, 47 deselected. Rights drift, disclosure, event ambiguity/nulls, symlink,
+    descriptor substitution/regularity/post-open identity, opened-object aliasing, both oversize
+    inputs, post-cutoff news, and path/body non-disclosure were exercised.
+24. Exact inherited non-database population
+    PASS: 205 passed. A preliminary unsplit selection produced 199 passes plus six setup errors
+    because those six tests explicitly require DMF_TEST_DATABASE_URL; no assertion failed. The
+    corrected accepted non-database split then passed with zero failures.
+25. PostgreSQL 18.4 inherited population
+    PASS: disposable digest-pinned PostgreSQL 18.4 became healthy, canonical migrations completed
+    through 20260807_0006, and the exact 68-test slice passed in 73.68 seconds. Total inherited:
+    273 passed. The named disposable containers, network, and volume were removed after validation.
+26. uv sync --all-groups --frozen; git diff --check; repository-wide Ruff
+    PASS: 40 packages checked, 650 files formatted, and lint clean.
+27. uv run mypy src/dmf_pulse; uv run python -m mypy src/dmf_pulse
+    HOST_BOUNDARY/PASS: the literal Windows launcher was blocked before execution by Application
+    Control (os error 4551); the same frozen interpreter module entry passed 248 source files.
+    Exact direct Linux final-SHA CI remains mandatory.
+28. uv build
+    PASS: source distribution and wheel built after the sandboxed launcher was denied and the
+    identical required command was rerun with approved host execution.
+29. uv run python scripts/verify_wheel.py
+    PASS: clean environment outside the repository, 289 wheel members, network disabled.
+30. uv run python scripts/verify_odd005_wheel.py
+    PASS: fresh disposable database, isolated replay, zero network requests, database removed.
+31. uv run python scripts/verify_gcs008_wheel.py
+    PASS: 289 RECORD members and all required resources verified.
+32. Isolated installed-wheel current-FPL CLI smoke
+    PASS: source-tree PYTHONPATH cleared; synthetic GW2 returned VALID_WITH_WARNINGS; player/news/
+    path sentinels and traceback were absent; temporary environment removed. Two earlier harness
+    attempts stopped before a valid assertion due Windows PowerShell JSON/encoding handling; a
+    third valid command result exposed an overbroad harness word match, not application disclosure.
+33. Canonical manifests, repository validator, and secret scan
+    PASS: canonical tooling wrote 1,156 deliverables to the CURRENT-FPL-STATE-001A ticket manifest
+    and authorized mutable PRC-013 active manifest; repository validator reported zero errors;
+    secret scan reported zero findings. The first secret-scan orchestration cell did not return a
+    terminal status, so the identical command was rerun directly and completed successfully.
+34. Exact-final-SHA automatic CI
+    PENDING_EXTERNAL_AFTER_FINAL_PUSH; no post-CI evidence commit is permitted.
+35. First remediation push CI
+    FAIL/CORRECTED BEFORE FINAL SHA: commit e8db7416e92d213d1f2d034e49e3e91b642898ac triggered
+    run 32769116096. Pre-flight passed, but shard 7 reported 1 failed and 724 passed because the new
+    post-open regression monkeypatched Python's shared `os.lstat` and asserted exactly two total
+    process calls; Linux coverage/pytest made 47 unrelated calls. The security rejection itself
+    succeeded. The interposition was narrowed to count/substitute only the target bootstrap path;
+    product code was unchanged. A new exact-final-SHA automatic run is mandatory.
