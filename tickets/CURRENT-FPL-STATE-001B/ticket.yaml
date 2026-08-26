@@ -1,0 +1,54 @@
+ticket_id: CURRENT-FPL-STATE-001B
+title: Transient current official-FPL to LIVE-ODDS team and fixture identity
+status: ACTIVE
+required_base_commit: ee16489054ff78c59eb67897e5e9e52f785ccd6e
+expected_branch: integration/current-fpl/CURRENT-FPL-STATE-001B-fpl-odds-identity
+donor_ref: readiness/GW1-2026-27-live-input-initial-squad
+donor_identity_blob_sha: 4f9a515a3dd3024523f3e9393eb1de452a07fbc8
+donor_mapping_blob_sha: a9a176274f715fe25da83ce1d1cd794c3a38b4e3
+objective: >-
+  Join the accepted transient current official-FPL bundle to the accepted provider-native
+  LIVE-ODDS input through explicit reviewed team aliases and exact target-Gameweek fixture
+  bindings, producing a private non-persistent identity bridge with deterministic semantic and
+  acquisition lineage.
+authority_scopes:
+  - A3-data-foundation
+  - A4-FPL-ingestion
+  - A5-odds-manual-import
+permissions:
+  official_fpl_network: forbidden
+  odds_network_for_acceptance: forbidden
+  database_access: forbidden
+  raw_or_derived_fpl_storage: forbidden
+  current_mapping_storage: forbidden
+  real_current_mapping_data: forbidden
+  new_runtime_dependency: forbidden
+  migration: forbidden
+allowed_areas:
+  - src/dmf_pulse/ingestion/odds/identity.py
+  - src/dmf_pulse/ingestion/odds/mapping.py
+  - src/dmf_pulse/ingestion/odds/__init__.py
+  - tests/unit/ingestion/test_fpl_odds_team_identity.py
+  - tests/unit/ingestion/test_fpl_odds_fixture_identity.py
+  - tests/unit/ingestion/current_identity_test_support.py
+  - tickets/CURRENT-FPL-STATE-001B/**
+  - evidence/tickets/CURRENT-FPL-STATE-001B/**
+  - evidence/tickets/PRC-013/current_manifest.json
+  - PLANS.md
+exclusions:
+  - FPL or Odds acquisition changes
+  - fuzzy or inferred entity resolution
+  - durable current mapping plans or identity maps
+  - real current team aliases or provider event bindings in repository artifacts
+  - manager state, availability, projections, consensus, optimisation, or orchestration
+  - public mapping-management CLI
+  - pull request, merge, activation, or human acceptance
+required_public_behavior:
+  - exact explicit approved team aliases only
+  - exact home and away orientation and exact UTC kickoff equality
+  - complete one-to-one target-Gameweek fixture coverage
+  - unrelated provider events allowed only when they create no target identity collision
+  - common source cutoff and cutoff-safe mapping and approval times
+  - source, plan, identity-view, semantic, and acquisition hashes fail closed on substitution
+  - output remains private, transient, database-free, and non-persistent
+acceptance_status: CURRENT_FPL_STATE_001B_REMEDIATED_PENDING_INDEPENDENT_REREVIEW

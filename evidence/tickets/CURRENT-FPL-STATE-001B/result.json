@@ -1,0 +1,61 @@
+{
+  "automatic_final_sha_ci": "PENDING_EXTERNAL_AFTER_FINAL_PUSH",
+  "branch": "integration/current-fpl/CURRENT-FPL-STATE-001B-fpl-odds-identity",
+  "coverage": {
+    "branch_aware_percent": 90.4040404040404,
+    "covered_branches": 179,
+    "covered_lines": 716,
+    "focused_coverage_tests_passed": 122,
+    "modules": [
+      "src/dmf_pulse/ingestion/odds/identity.py",
+      "src/dmf_pulse/ingestion/odds/mapping.py"
+    ],
+    "report": "evidence/tickets/CURRENT-FPL-STATE-001B/coverage.json"
+  },
+  "database_called_by_identity_bridge": false,
+  "evidence_binding": {
+    "kind": "repository-deliverables-manifest",
+    "path": "evidence/tickets/CURRENT-FPL-STATE-001B/current_manifest.json"
+  },
+  "final_commit": "FINAL_COMMIT_CONTAINING_THIS_RESULT",
+  "findings": {
+    "material_p2": 0,
+    "material_p2_closed": 1,
+    "material_p2_found": 1,
+    "p0": 0,
+    "p1": 0,
+    "p3": 0
+  },
+  "focused_tests_passed": 68,
+  "fpl_derived_storage": "DENY",
+  "identity_policy": "EXACT_OBSERVED_EXPLICIT_ONLY",
+  "inherited_regressions": {
+    "database_backed_passed": 92,
+    "non_database_passed": 530,
+    "status": "PASS"
+  },
+  "network_called": false,
+  "parent": "ee16489054ff78c59eb67897e5e9e52f785ccd6e",
+  "persistence_performed": false,
+  "production_activation": "NOT_CLAIMED",
+  "real_current_mapping_data": "NOT_INCLUDED",
+  "repository_validation": "PASS_ZERO_ERRORS",
+  "review_remediation": {
+    "deficient_reviewed_sha": "d59a105669f271dfe0cfcb9b31b28becc922a11a",
+    "disposition": "CLOSED_PENDING_INDEPENDENT_REREVIEW",
+    "finding_id": "CFSB-REV-001",
+    "severity": "material P2"
+  },
+  "secret_scan": "PASS_ZERO_FINDINGS",
+  "static_and_build": {
+    "build": "PASS",
+    "frozen_sync": "PASS",
+    "gcs008_wheel": "PASS_290_RECORD_MEMBERS",
+    "mypy": "PASS_249_SOURCE_FILES",
+    "odd005_wheel": "PASS_ZERO_NETWORK_REQUESTS",
+    "ruff": "PASS_654_FILES",
+    "wheel": "PASS"
+  },
+  "status": "CURRENT_FPL_STATE_001B_REMEDIATED_PENDING_INDEPENDENT_REREVIEW",
+  "ticket_id": "CURRENT-FPL-STATE-001B"
+}
