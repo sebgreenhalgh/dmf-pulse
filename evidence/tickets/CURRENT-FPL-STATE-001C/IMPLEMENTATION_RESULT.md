@@ -5,7 +5,7 @@
 - Parent: `e53ec45badcf00acfdad37dc51fd5d8572d7a505`.
 - Branch: `integration/current-fpl/CURRENT-FPL-STATE-001C-operator-manager-state`.
 - Final HEAD: `FINAL_COMMIT_CONTAINING_THIS_RESULT`.
-- Remote HEAD and exact-SHA CI: pending the single final push.
+- Remote HEAD and exact-SHA CI: pending the final remediation push.
 
 ## 2. Source authority
 
@@ -88,9 +88,9 @@ and outer-hash tampering all block, including after recomputing the outer hash.
 
 ## 13. Inherited
 
-- 001A / 001B / Stage-11 / Stage-14 / price / current-rules matrix: **409 passed**.
+- Expanded 001A / 001B / Stage-11 / Stage-14 / price / current-rules matrix: **664 passed**.
 - PostgreSQL 18.4 inherited integration matrix: migrations through `20260807_0006`, **126 passed,
-  140 deselected**.
+  140 deselected** in 266.26 seconds.
 - 001C itself remained database-free.
 
 ## 14. Static/build/security
@@ -106,14 +106,18 @@ and outer-hash tampering all block, including after recomputing the outer hash.
 
 ## 15. Final actions
 
-Automatic push CI is intentionally pending until the final evidence/manifests are sealed and one
-final commit is pushed. The CI run ID is not committed, so its tested SHA remains the independent
-review target.
+Initial exact-SHA CI run `33020729496` exposed a clean-checkout test-support dependency on an
+ignored local compiled-rules artifact. The defect was closed by compiling the tracked canonical
+target-rules source in test support. Focused, coverage, expanded inherited, PostgreSQL, static,
+build, all installed-wheel, manifest, repository-validation, and security gates pass after
+remediation; only a fresh exact-SHA automatic run remains. No post-green-CI evidence commit will be
+made, so that tested SHA will remain the independent-review target.
 
 ## 16. Findings
 
 Same-agent adversarial self-review has unresolved P0 = 0, P1 = 0, material P2 = 0, and P3 = 0.
-Independent review has not been performed or claimed.
+One material P2 clean-checkout portability finding was discovered by the initial CI run and closed
+before the final remediation push. Independent review has not been performed or claimed.
 
 ## 17. Status
 

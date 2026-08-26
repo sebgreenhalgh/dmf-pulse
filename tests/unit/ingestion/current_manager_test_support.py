@@ -26,7 +26,7 @@ from dmf_pulse.optimisation.manager_state import selling_price_tenths
 from dmf_pulse.rules.canonical import self_hash
 from dmf_pulse.rules.capabilities import compile_capability_artifact
 from dmf_pulse.rules.chips import build_chip_rules_view
-from dmf_pulse.rules.compiler import load_compiled_ruleset
+from dmf_pulse.rules.compiler import compile_ruleset
 from dmf_pulse.rules.models import (
     CapabilityArtifact,
     CompiledRuleset,
@@ -57,7 +57,7 @@ class CurrentManagerTestContext:
 def active_target_rules(repository_root: Path) -> tuple[CompiledRuleset, CapabilityArtifact]:
     """Build an integrity-valid ACTIVE test input without publishing an active registry entry."""
 
-    verified = load_compiled_ruleset(repository_root / "artifacts/rules/fpl-2026-27.json")
+    verified = compile_ruleset(repository_root / "config/rules/fpl-2026-27")
     payload = verified.model_dump(mode="json")
     payload["status"] = "ACTIVE"
     payload["production_eligible"] = True

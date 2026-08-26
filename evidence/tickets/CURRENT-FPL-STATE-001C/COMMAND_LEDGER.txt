@@ -1,5 +1,6 @@
 CURRENT-FPL-STATE-001C command ledger
 Date: 2026-08-26
+Remediation rerun: 2026-08-27
 
 1. git fetch --prune origin; exact ref/history/worktree inspection
    PASS: origin/main was e53ec45badcf00acfdad37dc51fd5d8572d7a505; LIVE-ODDS-001, accepted
@@ -50,8 +51,36 @@ Date: 2026-08-26
     PASS: repository validation returned zero errors; the scanner's first run identified two
     non-secret chip-inventory locals whose names ended in `token`, and the names were clarified;
     the required rerun returned zero findings.
-18. one final commit/push and exact-SHA automatic CI
-    PENDING; no post-CI evidence commit is permitted.
+18. Initial implementation commit/push and exact-SHA automatic CI
+    FAIL: commit 6b4bc3183a52a1266087e1a1dad3b70bce4c76ee, run 33020729496. Pre-flight and
+    shards 1/7 and 7/7 passed, while shards containing 001C tests failed before assertions because
+    test support loaded ignored local artifact artifacts/rules/fpl-2026-27.json. A clean checkout
+    therefore lacked a required test input. This material-P2 portability defect was not waived.
+19. Clean-checkout test-support remediation
+    PASS: active test rules are now derived from the tracked canonical source directory
+    config/rules/fpl-2026-27; the focused matrix passes 84/84 without the ignored artifact.
+20. Complete remediation acceptance rerun
+    PASS: focused 84 passed; branch-aware surface coverage remained 91.67733674775928%; expanded
+    inherited non-database selection passed 664 tests; PostgreSQL 18.4 migrated through
+    20260807_0006 and passed 126 tests with 140 deselected in 266.26 seconds; disposable database,
+    network, container, and volume were removed.
+    INVOCATION NOTE: one preliminary database command omitted the required DMF_ENVIRONMENT=test
+    guard, so 94 tests correctly rejected database access before product assertions (32 passed,
+    140 deselected). The service was rebuilt from a fresh volume and the corrected command passed.
+21. Frozen/static/build/installed-wheel remediation rerun
+    PASS: frozen sync checked 40 packages; diff, Ruff format/lint, and mypy (250 source files) were
+    clean; approved host build produced sdist/wheel after the sandbox launcher was denied; generic
+    wheel was HEALTHY with 291 files and network fetch disabled; ODD-005 passed with zero network
+    requests and isolated database cleanup; GCS-008 passed all 291 records.
+    INVOCATION NOTE: the first generic-wheel call occurred after test-database teardown and failed
+    closed for its required test URL. The service was recreated/migrated, both database-dependent
+    wheel gates passed, and the disposable volume was removed again.
+22. Canonical manifest refresh, repository validation, and secret scan
+    PASS: canonical tooling wrote 1,171 deliverables to the CURRENT-FPL-STATE-001C manifest and
+    authorized mutable PRC-013 manifest; repository validation reported zero errors and the secret
+    scan reported zero findings.
+23. Remediation commit/push and exact-SHA automatic CI
+    PENDING; no post-green-CI evidence commit is permitted.
 
 No provider call, authentication, real credential, account identifier, real manager state,
 manager-state persistence, product database access, optimiser run, PR, merge, human acceptance,

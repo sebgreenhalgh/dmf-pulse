@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 97775,
+      "bytes": 98066,
       "path": "PLANS.md",
-      "sha256": "adee6a44c4f98a03482ad17eff579887693c71a9a8ebc838f3ac384d77e06e18"
+      "sha256": "5f0df1521ea887657d44a16f00c8d1e28ab3b617e0208ddc44349100edf6e56e"
     },
     {
       "bytes": 2761,
@@ -5211,9 +5211,9 @@
       "sha256": "6ba647ec9e44bf427dc9e7c52ac829662ea1eaae40da5b3d2372c516f3087c05"
     },
     {
-      "bytes": 10809,
+      "bytes": 10789,
       "path": "tests/unit/ingestion/current_manager_test_support.py",
-      "sha256": "29d7c27c6b3681e2194c92b9d1eb50eabf12a13cd52945416ffabc4da5a6fe9f"
+      "sha256": "9b0feb8da8ee1fb852ca12f889040f6f0e5c50232f913d41632354fa9ab1ff6c"
     },
     {
       "bytes": 16492,

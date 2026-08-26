@@ -6,7 +6,7 @@ This is an implementation-agent adversarial review, not independent review or hu
 |---|---:|---:|---:|
 | P0 | 0 | 0 | 0 |
 | P1 | 0 | 0 | 0 |
-| Material P2 | 0 | 0 | 0 |
+| Material P2 | 1 | 1 | 0 |
 | P3 | 0 | 0 | 0 |
 
 ## P0 audit
@@ -31,6 +31,10 @@ This is an implementation-agent adversarial review, not independent review or hu
 
 ## Material-P2 audit
 
+- `CFSC-CI-001` (closed): the initial pushed test support depended on ignored local artifact
+  `artifacts/rules/fpl-2026-27.json`, so clean-checkout CI could not construct ACTIVE test rules.
+  It now compiles the tracked canonical `config/rules/fpl-2026-27` source before applying the
+  test-only ACTIVE binding; the 84-test focused matrix passes without the ignored artifact.
 - No Stage-11 history is invented and no current declaration is coerced into `ManagerState`.
 - Ruleset, FULL_SEASON capability, tactical, transfer, selling-rule, chip bundle, chip inventory,
   target event, FPL bundle, and consumed catalogue all have exact lineage.
@@ -40,6 +44,7 @@ This is an implementation-agent adversarial review, not independent review or hu
   bench order is retained as semantic.
 - Rehashed nested tamper cases fail independently of the outer digest.
 
-The focused 84-test matrix, 92% displayed branch-aware coverage gate, 409 inherited tests, 126
-PostgreSQL integration tests, and static/build/installed-wheel gates are green. Independent review
-is still required.
+The focused 84-test matrix, 92% displayed branch-aware coverage gate, expanded 664-test inherited
+selection, 126-test PostgreSQL population, static/build/installed-wheel gates, repository
+validation, and secret scanning are green after remediation. Independent review is still
+required.

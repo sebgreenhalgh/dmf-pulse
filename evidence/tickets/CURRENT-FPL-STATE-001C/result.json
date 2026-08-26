@@ -1,5 +1,5 @@
 {
-  "automatic_final_sha_ci": "PENDING_EXTERNAL_AFTER_FINAL_PUSH",
+  "automatic_final_sha_ci": "PENDING_REMEDIATION_PUSH",
   "branch": "integration/current-fpl/CURRENT-FPL-STATE-001C-operator-manager-state",
   "coverage": {
     "branch_aware_percent": 91.67733674775928,
@@ -17,13 +17,20 @@
   },
   "final_commit": "FINAL_COMMIT_CONTAINING_THIS_RESULT",
   "findings": {
-    "material_p2": 0,
+    "material_p2_closed": 1,
+    "material_p2_remaining": 0,
     "p0": 0,
     "p1": 0,
     "p3": 0
   },
+  "initial_failed_ci": {
+    "commit": "6b4bc3183a52a1266087e1a1dad3b70bce4c76ee",
+    "finding": "CFSC-CI-001",
+    "run_id": 33020729496,
+    "status": "CLOSED_BY_REMEDIATION"
+  },
   "inherited": {
-    "non_database_passed": 409,
+    "non_database_passed": 664,
     "postgres_passed": 126,
     "status": "PASS"
   },

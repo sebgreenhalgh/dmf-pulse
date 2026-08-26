@@ -1269,4 +1269,8 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Validate source hashes, ACTIVE rules lineage, squad/prices/FT/lineup/chips/rights/time.
 - [x] Add positive, hostile, tamper, order, disclosure, and file-security branch coverage.
 - [x] Complete governance evidence/manifests and all focused/inherited/static/build/security gates.
-- [ ] Commit and push one exact final SHA, observe automatic CI, and hand off for independent review.
+- [x] Push the initial exact implementation SHA and diagnose clean-checkout CI finding CFSC-CI-001.
+- [x] Replace the ignored-artifact test dependency with the tracked canonical rules source.
+- [x] Rerun all gates and seal canonical manifests, repository validation, and secret scanning.
+- [ ] Push the exact remediation SHA, observe green automatic CI, and hand off for independent
+  review.
