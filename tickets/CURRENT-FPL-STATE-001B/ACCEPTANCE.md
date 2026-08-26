@@ -12,6 +12,11 @@ No network, database, persistence, real mapping data, fuzzy resolution, manager 
 or public operator surface is authorized. Engineering completion does not claim independent
 review, human acceptance, merge, or production activation.
 
-The only clean engineering status is:
+Independent review of deficient SHA `d59a105669f271dfe0cfcb9b31b28becc922a11a` identified
+material-P2 `CFSB-REV-001`. Remediation requires plan and resolved authority to equal the exact
+participant set observed across all supplied current Odds events, including outside-target events
+used for collision analysis.
 
-`CURRENT_FPL_STATE_001B_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
+The only clean post-remediation engineering status is:
+
+`CURRENT_FPL_STATE_001B_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`

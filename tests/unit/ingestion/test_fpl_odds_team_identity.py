@@ -11,6 +11,8 @@ from pydantic import ValidationError
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.odds import mapping as mapping_module
 from dmf_pulse.ingestion.odds.identity import (
+    CurrentTeamIdentityMap,
+    _team_identity_map_sha256,
     bind_current_team_resolution_request,
     resolve_current_team_identities,
 )
@@ -73,7 +75,121 @@ def test_team_plan_and_resolution_are_order_independent(
 
     assert first_plan.sha256 == second_plan.sha256
     assert first.semantic_sha256 == second.semantic_sha256
+    assert first.observed_provider_team_texts == ("Alpha Athletic", "Beta Borough")
     assert first.team_mappings == second.team_mappings
+
+
+def test_unobserved_approved_alias_is_rejected(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    fpl_input = build_fpl_input(
+        repository_root,
+        tmp_path,
+        additional_teams=(("Gamma City", "GAM"),),
+    )
+    by_id = {team.provider_team_id: team for team in fpl_input.teams}
+    base = team_plan(fpl_input)
+    plan = team_plan(
+        fpl_input,
+        mappings=(*base.team_mappings, team_mapping("Gamma City", by_id[3])),
+    )
+
+    with pytest.raises(IngestionError, match="exact observed provider participants") as raised:
+        resolve_team_map(fpl_input, build_odds_input(repository_root), plan)
+
+    assert raised.value.code == "MAPPING_CONFLICT"
+
+
+def test_all_observed_outside_target_aliases_resolve_deterministically(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    fpl_input = build_fpl_input(
+        repository_root,
+        tmp_path,
+        additional_teams=(("Gamma City", "GAM"), ("Delta United", "DEL")),
+    )
+    odds_input = build_odds_input(
+        repository_root,
+        extra_event_participants=("Gamma City", "Delta United"),
+    )
+    by_id = {team.provider_team_id: team for team in fpl_input.teams}
+    base = team_plan(fpl_input)
+    mappings = (
+        *base.team_mappings,
+        team_mapping("Gamma City", by_id[3]),
+        team_mapping("Delta United", by_id[4]),
+    )
+    first = resolve_team_map(fpl_input, odds_input, team_plan(fpl_input, mappings=mappings))
+    second = resolve_team_map(
+        fpl_input,
+        odds_input,
+        team_plan(fpl_input, mappings=tuple(reversed(mappings))),
+    )
+
+    assert first.observed_provider_team_texts == (
+        "Alpha Athletic",
+        "Beta Borough",
+        "Delta United",
+        "Gamma City",
+    )
+    assert first.team("Gamma City").official_fpl_team_id == 3
+    assert first.team("Delta United").official_fpl_team_id == 4
+    assert first.semantic_sha256 == second.semantic_sha256
+    assert first.team_mappings == second.team_mappings
+
+
+def test_missing_observed_outside_target_alias_is_rejected(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    fpl_input = build_fpl_input(
+        repository_root,
+        tmp_path,
+        additional_teams=(("Gamma City", "GAM"), ("Delta United", "DEL")),
+    )
+    odds_input = build_odds_input(
+        repository_root,
+        extra_event_participants=("Gamma City", "Delta United"),
+    )
+    by_id = {team.provider_team_id: team for team in fpl_input.teams}
+    base = team_plan(fpl_input)
+    missing_delta = team_plan(
+        fpl_input,
+        mappings=(*base.team_mappings, team_mapping("Gamma City", by_id[3])),
+    )
+
+    with pytest.raises(IngestionError, match="exact observed provider participants") as raised:
+        resolve_team_map(fpl_input, odds_input, missing_delta)
+
+    assert raised.value.code == "MAPPING_CONFLICT"
+
+
+@pytest.mark.parametrize(
+    ("observed", "message"),
+    (
+        (("Beta Borough", "Alpha Athletic"), "not canonical"),
+        (("Alpha Athletic", "Beta Borough", "Gamma City"), "exact observed"),
+    ),
+)
+def test_team_map_rejects_rehashed_observed_participant_tampering(
+    repository_root: Path,
+    tmp_path: Path,
+    observed: tuple[str, ...],
+    message: str,
+) -> None:
+    fpl_input = build_fpl_input(repository_root, tmp_path)
+    result = resolve_team_map(
+        fpl_input,
+        build_odds_input(repository_root),
+        team_plan(fpl_input),
+    )
+    tampered = result.model_copy(update={"observed_provider_team_texts": observed})
+    tampered = tampered.model_copy(update={"semantic_sha256": _team_identity_map_sha256(tampered)})
+
+    with pytest.raises(ValidationError, match=message):
+        CurrentTeamIdentityMap.model_validate(tampered.model_dump(mode="python"))
 
 
 @pytest.mark.parametrize(

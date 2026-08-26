@@ -51,4 +51,4 @@ required_public_behavior:
   - common source cutoff and cutoff-safe mapping and approval times
   - source, plan, identity-view, semantic, and acquisition hashes fail closed on substitution
   - output remains private, transient, database-free, and non-persistent
-acceptance_status: CURRENT_FPL_STATE_001B_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW
+acceptance_status: CURRENT_FPL_STATE_001B_REMEDIATED_PENDING_INDEPENDENT_REREVIEW

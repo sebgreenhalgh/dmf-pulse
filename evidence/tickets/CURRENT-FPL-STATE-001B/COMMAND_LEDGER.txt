@@ -62,3 +62,33 @@ Date: 2026-08-26
 
 No provider request, credential, real current mapping, current mapping persistence, production
 database, PR, merge, tag, independent review, human acceptance, or activation was used or claimed.
+
+Independent-review remediation chronology
+
+18. Fresh independent review of `d59a105669f271dfe0cfcb9b31b28becc922a11a`
+    REMEDIATION_REQUIRED: original push run 32991867645 was fully green, but material-P2
+    CFSB-REV-001 showed that a plan-only alias became active resolved authority.
+19. Inline hostile RED reproduction before remediation
+    RED CONFIRMED: Odds participants were Alpha/Beta; plan and both resolved maps also contained
+    unobserved Gamma; `team("Gamma City")` returned FPL team 3.
+20. Exact observed-participant remediation and hostile regressions
+    PASS: the plan must now equal exact home/away strings across every supplied provider event;
+    observed outside-target aliases remain supported; unused/missing aliases and rehashed dormant
+    final-map authority block.
+21. Focused team/fixture and branch-aware identity/mapping suites
+    PASS: 68 team/fixture tests; 122 coverage tests; 90.4040404040404% aggregate, 716/766
+    statements and 179/224 branches.
+22. Relevant inherited non-database and PostgreSQL populations
+    PASS: 206 current-FPL, 140 LIVE-ODDS, 184 Odds/property/contract, and 92 PostgreSQL tests;
+    migrations reached 20260807_0006.
+23. Frozen sync, Ruff, mypy, build, and installed-wheel gates
+    PASS: 40 locked packages, 654 formatted files, lint clean, 249 typed source files, built sdist
+    and wheel, generic wheel HEALTHY, ODD-005 zero network requests, and GCS-008 290 members.
+24. Canonical manifest refresh, repository validation, and secret scan
+    PASS: canonical tooling refreshed only the ticket and authorized PRC-013 manifests;
+    repository validation reported zero errors and secret scan zero findings.
+25. Exact-final-SHA remediation CI
+    PENDING_EXTERNAL_AFTER_SINGLE_FINAL_PUSH; no post-CI evidence commit is permitted.
+
+The remediation did not use provider access, real credentials/mappings, runtime persistence,
+production database, PR, merge, tag, human acceptance, or CURRENT-FPL-STATE-001C.

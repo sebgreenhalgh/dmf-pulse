@@ -54,5 +54,17 @@ The historical donor was inspected, not merged, rebased, or cherry-picked.
   database use, cache, backup, public mapping CLI, or disclosure-bearing summary.
 - Manager state, availability/minutes, projections, consensus, optimization, and activation.
 
+## Independent-review remediation
+
+Independent review of deficient SHA `d59a105669f271dfe0cfcb9b31b28becc922a11a` found that one
+useful donor invariant had been lost. The donor resolved only provider strings observed in its
+input and rejected a final map with unused resolved team authority. Generalized 001B support for
+outside-target events inadvertently weakened this to a subset check, allowing plan-only aliases to
+become current authority.
+
+`CFSB-REV-001` restores exact current-source authority without reverting the generalization:
+participants are collected across all supplied provider events, including outside-target events,
+and that observed set must exactly equal both the current plan and resolved maps.
+
 No current mapping persistence was added. Repository tests and evidence contain synthetic names,
 identifiers, fixtures, and prices only.

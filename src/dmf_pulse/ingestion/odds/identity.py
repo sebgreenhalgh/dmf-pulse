@@ -138,6 +138,7 @@ class CurrentTeamIdentityMap(_FrozenIdentityModel):
     mapping_algorithm_version: Literal["current-fpl-odds-exact-v1"] = (
         CURRENT_MAPPING_ALGORITHM_VERSION
     )
+    observed_provider_team_texts: tuple[str, ...] = Field(min_length=2)
     team_mappings: tuple[ResolvedCurrentTeam, ...] = Field(min_length=2)
     semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -165,8 +166,13 @@ class CurrentTeamIdentityMap(_FrozenIdentityModel):
         aliases = {
             mapping.provider_team_text: mapping for mapping in self.team_alias_plan.team_mappings
         }
-        if set(aliases) != set(by_provider):
-            raise ValueError("resolved team identities differ from the approved alias plan")
+        canonical_observed = tuple(sorted(set(self.observed_provider_team_texts)))
+        if self.observed_provider_team_texts != canonical_observed:
+            raise ValueError("observed provider team participants are not canonical")
+        if set(canonical_observed) != set(aliases) or set(canonical_observed) != set(by_provider):
+            raise ValueError(
+                "resolved team identities differ from exact observed provider participants"
+            )
         for provider_text, resolved in by_provider.items():
             alias = aliases[provider_text]
             if (
@@ -534,6 +540,7 @@ def _team_identity_map_sha256(value: CurrentTeamIdentityMap) -> str:
             "odds_provider_provenance_sha256": value.odds_provider_provenance_sha256,
             "odds_raw_payload_retained": value.odds_raw_payload_retained,
             "odds_usable_at": value.odds_usable_at.isoformat(),
+            "observed_provider_team_texts": list(value.observed_provider_team_texts),
             "persistence_performed": value.persistence_performed,
             "provider": value.provider,
             "schema_version": value.schema_version,
@@ -566,6 +573,22 @@ def resolve_current_team_identities(
     cutoff = _require_current_context(fpl_input, odds_input, plan, request)
     fpl_teams = _team_by_id(fpl_input)
 
+    observed_provider_team_texts = tuple(
+        sorted(
+            {
+                text
+                for event in odds_input.events
+                for text in (event.provider_home_team, event.provider_away_team)
+            }
+        )
+    )
+    approved_texts = {mapping.provider_team_text for mapping in plan.team_mappings}
+    if set(observed_provider_team_texts) != approved_texts:
+        raise IngestionError(
+            "MAPPING_CONFLICT",
+            "team alias plan differs from exact observed provider participants",
+        )
+
     resolved: list[ResolvedCurrentTeam] = []
     for alias in sorted(plan.team_mappings, key=lambda item: item.provider_team_text):
         fpl_team = fpl_teams.get(alias.official_fpl_team_id)
@@ -574,16 +597,6 @@ def resolve_current_team_identities(
                 "MAPPING_CONFLICT", "team alias references no current official FPL team"
             )
         resolved.append(_resolved_team(alias, fpl_team=fpl_team))
-    provider_texts = {
-        text
-        for event in odds_input.events
-        for text in (event.provider_home_team, event.provider_away_team)
-    }
-    approved_texts = {mapping.provider_team_text for mapping in resolved}
-    if not provider_texts.issubset(approved_texts):
-        raise IngestionError(
-            "MAPPING_CONFLICT", "provider team text lacks one explicit approved mapping"
-        )
     by_provider = {mapping.provider_team_text: mapping for mapping in resolved}
     for event in odds_input.events:
         if (
@@ -619,6 +632,7 @@ def resolve_current_team_identities(
         team_alias_plan=plan,
         team_alias_plan_version=plan.plan_version,
         team_alias_plan_sha256=plan.sha256,
+        observed_provider_team_texts=observed_provider_team_texts,
         team_mappings=team_mappings,
     )
     return CurrentTeamIdentityMap(
@@ -635,6 +649,7 @@ def resolve_current_team_identities(
         team_alias_plan=plan,
         team_alias_plan_version=plan.plan_version,
         team_alias_plan_sha256=plan.sha256,
+        observed_provider_team_texts=observed_provider_team_texts,
         team_mappings=team_mappings,
     )
 
@@ -809,6 +824,7 @@ class FplOddsIdentityMap(_FrozenIdentityModel):
         "TARGET_GW_HOME_AWAY_EXACT_UTC_PLUS_EXPLICIT_BINDING"
     )
     kickoff_policy: Literal["EXACT_UTC_EQUALITY"] = "EXACT_UTC_EQUALITY"
+    observed_provider_team_texts: tuple[str, ...] = Field(min_length=2)
     team_mappings: tuple[ResolvedCurrentTeam, ...] = Field(min_length=2)
     fixture_mappings: tuple[ResolvedCurrentFixture, ...] = Field(min_length=1)
     coverage: CurrentFixtureCoverage
@@ -833,6 +849,17 @@ class FplOddsIdentityMap(_FrozenIdentityModel):
             raise ValueError("fixture mapping-plan approval time is inconsistent")
         if self.limitations != _LIMITATIONS:
             raise ValueError("identity-map limitations are inconsistent")
+        canonical_observed = tuple(sorted(set(self.observed_provider_team_texts)))
+        plan_provider_texts = {
+            mapping.provider_team_text for mapping in self.team_alias_plan.team_mappings
+        }
+        resolved_provider_texts = {mapping.provider_team_text for mapping in self.team_mappings}
+        if (
+            self.observed_provider_team_texts != canonical_observed
+            or set(canonical_observed) != plan_provider_texts
+            or set(canonical_observed) != resolved_provider_texts
+        ):
+            raise ValueError("final identity map contains dormant or missing team authority")
         if (
             self.team_alias_plan_version != self.team_alias_plan.plan_version
             or self.team_alias_plan_sha256 != self.team_alias_plan.sha256
@@ -861,6 +888,7 @@ class FplOddsIdentityMap(_FrozenIdentityModel):
             team_alias_plan=self.team_alias_plan,
             team_alias_plan_version=self.team_alias_plan_version,
             team_alias_plan_sha256=self.team_alias_plan_sha256,
+            observed_provider_team_texts=self.observed_provider_team_texts,
             team_mappings=self.team_mappings,
             semantic_sha256=self.team_identity_map_semantic_sha256,
         )
@@ -1325,6 +1353,7 @@ def _fpl_odds_identity_map_sha256(value: FplOddsIdentityMap) -> str:
             "mapping_decided_at": value.mapping_decided_at.isoformat(),
             "mapping_outcome": value.mapping_outcome,
             "odds_identity_semantic_sha256": value.odds_identity_semantic_sha256,
+            "observed_provider_team_texts": list(value.observed_provider_team_texts),
             "official_deadline_at": value.official_deadline_at.isoformat(),
             "persistence_performed": value.persistence_performed,
             "provider": value.provider,
@@ -1523,6 +1552,7 @@ def resolve_current_fixture_identities(
         fixture_mapping_plan=fixture_plan,
         fixture_mapping_plan_version=fixture_plan.plan_version,
         fixture_mapping_plan_sha256=fixture_plan.sha256,
+        observed_provider_team_texts=team_map.observed_provider_team_texts,
         team_mappings=team_map.team_mappings,
         fixture_mappings=fixture_mappings,
         coverage=coverage,

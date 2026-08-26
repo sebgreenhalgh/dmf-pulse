@@ -85,12 +85,26 @@ def build_fpl_input(
     tmp_path: Path,
     *,
     cutoff: datetime = CUTOFF,
+    additional_teams: tuple[tuple[str, str], ...] = (),
 ) -> CurrentFplInputBundle:
     source = repository_root / "fixtures/fpl/FPL-004/happy_path"
     bootstrap = json.loads((source / "bootstrap.json").read_text(encoding="utf-8"))
     fixtures = json.loads((source / "fixtures.json").read_text(encoding="utf-8"))
     assert isinstance(bootstrap, dict)
     assert isinstance(fixtures, list)
+    teams = bootstrap.get("teams")
+    assert isinstance(teams, list)
+    for team_id, (name, short_name) in enumerate(additional_teams, start=3):
+        team = deepcopy(teams[0])
+        team.update(
+            {
+                "id": team_id,
+                "code": 1000 + team_id,
+                "name": name,
+                "short_name": short_name,
+            }
+        )
+        teams.append(team)
     gw2 = deepcopy(fixtures[0])
     gw2.update(
         {
@@ -152,6 +166,7 @@ def build_odds_input(
     cutoff: datetime = CUTOFF,
     extra_event: bool = False,
     colliding_extra: bool = False,
+    extra_event_participants: tuple[str, str] | None = None,
     price_delta: float = 0.0,
     reverse_events: bool = False,
     reverse_bookmakers: bool = False,
@@ -173,12 +188,15 @@ def build_odds_input(
             for market in bookmaker["markets"]:
                 for outcome in market["outcomes"]:
                     outcome["price"] = float(outcome["price"]) + price_delta
-    if extra_event or colliding_extra:
+    if extra_event or colliding_extra or extra_event_participants is not None:
         extra = deepcopy(event)
         extra["id"] = OUTSIDE_PROVIDER_EVENT_ID
         if not colliding_extra:
             extra["commence_time"] = "2026-09-05T14:00:00Z"
-            _set_participants(extra, "Alpha Athletic", "Beta Borough")
+            _set_participants(
+                extra,
+                *(extra_event_participants or ("Alpha Athletic", "Beta Borough")),
+            )
         value.append(extra)
     if reverse_events:
         value.reverse()

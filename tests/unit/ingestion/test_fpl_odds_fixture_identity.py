@@ -14,7 +14,9 @@ from dmf_pulse.ingestion.odds.identity import (
     CurrentFixtureCoverage,
     FplOddsIdentityMap,
     ResolvedCurrentFixture,
+    ResolvedCurrentTeam,
     _fpl_odds_identity_map_sha256,
+    _team_identity_map_sha256,
     bind_current_fixture_resolution_request,
     current_odds_identity_semantic_sha256,
     resolve_current_fixture_identities,
@@ -40,6 +42,7 @@ from tests.unit.ingestion.current_identity_test_support import (
     resolve_bridge,
     resolve_team_map,
     target_fixture,
+    team_mapping,
     team_plan,
 )
 
@@ -104,6 +107,49 @@ def test_complete_gw2_mapping_with_earlier_cutoff_and_extra_provider_event(
     assert result.fpl_derived_storage == "DENY"
     assert result.odds_raw_payload_retained is False
     assert result.kickoff_policy == "EXACT_UTC_EQUALITY"
+
+
+def test_unrelated_outside_target_participants_remain_supported(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    fpl_input = build_fpl_input(
+        repository_root,
+        tmp_path,
+        additional_teams=(("Gamma City", "GAM"), ("Delta United", "DEL")),
+    )
+    odds_input = build_odds_input(
+        repository_root,
+        extra_event_participants=("Gamma City", "Delta United"),
+    )
+    by_id = {team.provider_team_id: team for team in fpl_input.teams}
+    base = team_plan(fpl_input)
+    aliases = team_plan(
+        fpl_input,
+        mappings=(
+            *base.team_mappings,
+            team_mapping("Gamma City", by_id[3]),
+            team_mapping("Delta United", by_id[4]),
+        ),
+    )
+
+    result = resolve_bridge(
+        fpl_input,
+        odds_input,
+        aliases,
+        fixture_plan(fpl_input, odds_input, aliases),
+    )
+
+    assert result.observed_provider_team_texts == (
+        "Alpha Athletic",
+        "Beta Borough",
+        "Delta United",
+        "Gamma City",
+    )
+    assert {mapping.provider_team_text for mapping in result.team_mappings} == set(
+        result.observed_provider_team_texts
+    )
+    assert result.coverage.outside_target_provider_event_ids == (OUTSIDE_PROVIDER_EVENT_ID,)
 
 
 def test_provider_event_order_is_deterministic_and_price_order_is_identity_invariant(
@@ -562,6 +608,63 @@ def test_rehashed_final_map_rejects_nested_context_plan_and_hash_tampering(
         FplOddsIdentityMap.model_validate(bad_semantic.model_dump(mode="python"))
     with pytest.raises(IngestionError, match="lacks one resolved"):
         result.fixture("synthetic-missing-event")
+
+
+def test_rehashed_final_map_rejects_dormant_resolved_team_authority(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    fpl_input = build_fpl_input(
+        repository_root,
+        tmp_path,
+        additional_teams=(("Unused Town", "UNU"),),
+    )
+    odds_input = build_odds_input(repository_root)
+    aliases = team_plan(fpl_input)
+    mapping_plan = fixture_plan(fpl_input, odds_input, aliases)
+    team_map = resolve_team_map(fpl_input, odds_input, aliases)
+    result = resolve_bridge(fpl_input, odds_input, aliases, mapping_plan)
+    unused_team = next(team for team in fpl_input.teams if team.provider_team_id == 3)
+    unused_alias = team_mapping("Unused Town", unused_team)
+    expanded_aliases = team_plan(
+        fpl_input,
+        mappings=(*aliases.team_mappings, unused_alias),
+    )
+    dormant = ResolvedCurrentTeam(
+        provider_team_text=unused_alias.provider_team_text,
+        official_fpl_team_id=unused_alias.official_fpl_team_id,
+        official_fpl_team_identity=unused_alias.canonical_team_identity,
+        official_fpl_team_name=unused_alias.official_fpl_team_name,
+        mapping_evidence_class=unused_alias.evidence_class,
+        mapping_reviewer=unused_alias.reviewer,
+        mapping_approved_at=unused_alias.approved_at,
+        team_alias_mapping_sha256=unused_alias.sha256,
+    )
+    dormant_team_map = team_map.model_copy(
+        update={
+            "team_alias_plan": expanded_aliases,
+            "team_alias_plan_sha256": expanded_aliases.sha256,
+            "team_mappings": (*team_map.team_mappings, dormant),
+        }
+    )
+    dormant_team_map = dormant_team_map.model_copy(
+        update={"semantic_sha256": _team_identity_map_sha256(dormant_team_map)}
+    )
+    expanded_fixture_plan = mapping_plan.model_copy(
+        update={"team_alias_plan_sha256": expanded_aliases.sha256}
+    )
+    tampered = _rehash_result(
+        result,
+        team_alias_plan=expanded_aliases,
+        team_alias_plan_sha256=expanded_aliases.sha256,
+        team_identity_map_semantic_sha256=dormant_team_map.semantic_sha256,
+        fixture_mapping_plan=expanded_fixture_plan,
+        fixture_mapping_plan_sha256=expanded_fixture_plan.sha256,
+        team_mappings=dormant_team_map.team_mappings,
+    )
+
+    with pytest.raises(ValidationError, match="dormant or missing team authority"):
+        FplOddsIdentityMap.model_validate(tampered.model_dump(mode="python"))
 
 
 def test_coverage_model_cannot_mark_incomplete_state_complete() -> None:

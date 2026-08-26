@@ -16,3 +16,13 @@
 
 No real current mapping data, provider request, official-FPL request, persistence, PR, merge,
 activation, independent review, or human acceptance is part of this plan.
+
+## Independent-review remediation
+
+- Deficient reviewed SHA: `d59a105669f271dfe0cfcb9b31b28becc922a11a`.
+- Finding: material-P2 `CFSB-REV-001`.
+- Policy: the exact plan and resolved authority must equal participant strings observed across all
+  supplied Odds events, including outside-target events used for collision checks.
+- Validation: focused RED-to-GREEN, branch-aware coverage, inherited FPL/Odds/PostgreSQL gates,
+  static/build/wheel/security gates, canonical manifests, and one automatic exact-SHA push CI.
+- Final boundary: remediated pending independent re-review; no PR, merge, acceptance, or 001C.

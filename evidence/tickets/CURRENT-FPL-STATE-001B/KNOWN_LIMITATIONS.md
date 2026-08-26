@@ -3,6 +3,11 @@
 - Identity mappings remain explicit manual authority supplied at runtime. There is no fuzzy,
   automatic, case-normalized, punctuation-normalized, edit-distance, code-based, or inferred
   resolution.
+- The current-decision plan must exactly cover participant strings observed across every bound
+  provider event. Approval alone does not activate an alias absent from the provider population;
+  adding or removing an event participant requires a correspondingly exact reviewed plan.
+- Outside-target provider participants are included because they are consumed by exact collision
+  analysis. They do not become target fixture bindings unless separately and explicitly bound.
 - Exact kickoff equality is intentional. A reschedule or postponement invalidates the binding and
   blocks resolution until an authorized operator supplies a freshly approved plan.
 - Current aliases, fixture bindings, and identity maps remain private and transient because the
@@ -21,5 +26,5 @@
   frozen interpreter module entry passed strict mypy and pytest checks; canonical Ubuntu/Python
   3.13 final-SHA CI remains mandatory for the literal acceptance commands.
 
-Independent review, human acceptance, PR creation, merge, and production activation remain
+Independent re-review, human acceptance, PR creation, merge, and production activation remain
 pending and are not claimed.

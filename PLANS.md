@@ -1227,3 +1227,23 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   execute a real downstream contamination regression.
 - [x] R5 close the scanner/evidence defect, run complete acceptance and hostile
   self-review, seal a new head, and push for independent re-review.
+
+# CURRENT-FPL-STATE-001B independent-review remediation
+
+- Ticket: `CURRENT-FPL-STATE-001B`; deficient reviewed checkpoint
+  `d59a105669f271dfe0cfcb9b31b28becc922a11a`; immutable parent
+  `ee16489054ff78c59eb67897e5e9e52f785ccd6e`.
+- Branch: `integration/current-fpl/CURRENT-FPL-STATE-001B-fpl-odds-identity`.
+- Scope: close only material-P2 finding `CFSB-REV-001` by making current resolved team
+  authority exactly equal to participant strings observed across every bound Odds event, including
+  outside-target events used for collision analysis.
+- Safety: preserve exact matching, extra-event ambiguity checks, FPL derived-storage denial, and
+  transient/no-database behavior; no acquisition, real mappings, 001C, PR, merge, or acceptance.
+
+## Remediation checkpoints
+
+- [x] Reproduce dormant unobserved team authority at deficient SHA and preserve RED chronology.
+- [x] Enforce and self-validate the canonical observed-participant set in team and final maps.
+- [x] Add unused/missing/outside-target and rehashed dormant-map regression coverage.
+- [x] Correct evidence, refresh only authorized manifests, and pass complete validation.
+- [ ] Commit and push one exact remediation SHA, observe automatic CI, and hand off for re-review.
