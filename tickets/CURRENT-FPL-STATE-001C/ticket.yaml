@@ -1,0 +1,57 @@
+ticket_id: CURRENT-FPL-STATE-001C
+title: Transient operator-declared current manager state
+status: ACTIVE
+required_base_commit: e53ec45badcf00acfdad37dc51fd5d8572d7a505
+expected_branch: integration/current-fpl/CURRENT-FPL-STATE-001C-operator-manager-state
+donor_ref: NO_DIRECT_DONOR
+objective: >-
+  Compile one immutable private transient human-attested current manager-state bundle from a
+  strict operator-owned local declaration, the accepted CURRENT-FPL-STATE-001A catalogue, and
+  exact ACTIVE target rules, without official-FPL access, persistence, or fabricated history.
+authority_scopes:
+  - A2-rules
+  - A4-FPL-ingestion
+  - A10-one-GW-optimiser
+  - B2-multi-GW
+  - B4-chips
+permissions:
+  official_fpl_network: forbidden
+  authentication_or_credentials: forbidden
+  database_access: forbidden
+  raw_or_derived_fpl_storage: forbidden
+  manager_state_storage: forbidden
+  real_manager_data: forbidden
+  new_runtime_dependency: forbidden
+  migration: forbidden
+allowed_areas:
+  - src/dmf_pulse/ingestion/fpl/manager_current.py
+  - src/dmf_pulse/ingestion/fpl/__init__.py
+  - tests/unit/ingestion/test_fpl_current_manager_state.py
+  - tests/unit/ingestion/test_fpl_current_manager_validation.py
+  - tests/unit/ingestion/test_fpl_current_manager_chips.py
+  - tests/unit/ingestion/test_fpl_current_manager_boundaries.py
+  - tests/unit/ingestion/test_fpl_current_manager_tamper.py
+  - tests/unit/ingestion/current_manager_test_support.py
+  - tickets/CURRENT-FPL-STATE-001C/**
+  - evidence/tickets/CURRENT-FPL-STATE-001C/**
+  - evidence/tickets/PRC-013/current_manifest.json
+  - PLANS.md
+exclusions:
+  - automated or authenticated official-FPL retrieval
+  - account identifiers, passwords, cookies, sessions, or browser automation
+  - persistent current manager state or FPL-derived identity
+  - Stage-11 ownership-history fabrication or optimiser execution
+  - active Free Hit without restoration-relevant permanent state
+  - availability, projections, optimisation, orchestration, or CURRENT-FPL-STATE-001D
+  - pull request, merge, human acceptance, or production activation
+required_public_behavior:
+  - strict bounded descriptor-bound local JSON declaration with duplicate-key rejection
+  - explicit OPERATOR_DECLARED, HUMAN_ATTESTED, NOT_PROVIDER_VERIFIED provenance
+  - exact accepted 001A catalogue and target-Gameweek binding
+  - ACTIVE FULL_SEASON rules and compiled chip-bundle lineage
+  - rule-derived selling prices with optional exact operator cross-check
+  - exact legal squad, bank, FT, XI, bench, captain, vice, and chip-token reconciliation
+  - active or pending Free Hit blocks when restoration state is unavailable
+  - deterministic semantic hashes and source-bound tamper validation
+  - safe summary only; private output remains transient, database-free, and non-persistent
+acceptance_status: CURRENT_FPL_STATE_001C_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW

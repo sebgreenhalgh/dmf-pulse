@@ -1,0 +1,58 @@
+CURRENT-FPL-STATE-001C command ledger
+Date: 2026-08-26
+
+1. git fetch --prune origin; exact ref/history/worktree inspection
+   PASS: origin/main was e53ec45badcf00acfdad37dc51fd5d8572d7a505; LIVE-ODDS-001, accepted
+   CURRENT-FPL-STATE-001A, and accepted CURRENT-FPL-STATE-001B were present; startup was clean.
+2. git switch -c integration/current-fpl/CURRENT-FPL-STATE-001C-operator-manager-state <parent>
+   PASS: authorized branch created from the exact immutable parent.
+3. Authority, decision, 001A, Stage-10/11, Stage-14, selling-price, and Free Hit inspection
+   PASS: A2/A4/A10/B2/B4 resolved; NO_DIRECT_DONOR recorded; accepted components reused without
+   altering inherited compiler, optimiser, chip, transport, or persistence semantics.
+4. Focused CURRENT-FPL-STATE-001C tests
+   PASS: 84 passed across positive, squad, price, FT/bank, lineup, chips, temporal, rights,
+   strict-JSON/file-security, order, disclosure, source binding, and nested tamper behavior.
+5. Branch-aware focused coverage
+   PASS: canonical broad-measure/filter-at-report invocation produced 91.67733674775928% overall,
+   566/599 statements and 150/182 branches (92% displayed), above the 90% gate.
+   ENVIRONMENT NOTE: initial Windows sandbox attempts failed before product assertions because a
+   coverage --source pre-import hit an unrelated Pydantic/Decimal loader issue, then pytest temp
+   and committed-fixture reads received false ACL denials. The same tests passed outside that
+   boundary using a fresh ignored review-pack temp root. No failure was hidden or waived.
+6. Inherited 001A/001B/Stage-11/Stage-14/price/rules population
+   PASS: 409 passed.
+7. docker compose -f compose.test.yaml up -d --wait; alembic upgrade head
+   PASS: digest-pinned PostgreSQL 18.4 healthy; migrations reached 20260807_0006.
+8. PostgreSQL inherited integration population
+   PASS: 126 passed, 140 deselected in 264.16 seconds. 001C product code remained DB-free.
+9. uv sync --all-groups --frozen
+   PASS: 40 packages checked.
+10. git diff --check; uv run ruff format --check .; uv run ruff check .
+    PASS: diff clean, 661 files formatted, lint clean.
+    ENVIRONMENT NOTE: one sandbox-owned test-temp ACL initially blocked the literal dot traversal;
+    the exact workspace-local temporary parent was moved recoverably under ignored review_pack,
+    after which the literal command passed unchanged.
+11. uv run mypy src/dmf_pulse
+    PASS: 250 source files.
+12. uv build
+    HOST_BOUNDARY/PASS: the sandboxed Windows launcher was denied by Application Control before
+    execution; the identical approved host command built the sdist and wheel successfully.
+13. uv run python scripts/verify_wheel.py
+    PASS: clean environment outside the repository, HEALTHY, 291 wheel files, network disabled.
+14. uv run python scripts/verify_odd005_wheel.py
+    PASS: isolated replay/validation, zero network requests, temporary database removed.
+15. uv run python scripts/verify_gcs008_wheel.py
+    PASS: 291 record members and every required resource verified.
+16. canonical ticket and PRC-013 manifest generation
+    PASS: canonical tooling wrote 1,171 deliverables to each authorized current manifest before
+    the final content refresh.
+17. uv run python scripts/validate_repository.py; uv run python scripts/scan_secrets.py
+    PASS: repository validation returned zero errors; the scanner's first run identified two
+    non-secret chip-inventory locals whose names ended in `token`, and the names were clarified;
+    the required rerun returned zero findings.
+18. one final commit/push and exact-SHA automatic CI
+    PENDING; no post-CI evidence commit is permitted.
+
+No provider call, authentication, real credential, account identifier, real manager state,
+manager-state persistence, product database access, optimiser run, PR, merge, human acceptance,
+production activation, or CURRENT-FPL-STATE-001D was performed or claimed.
