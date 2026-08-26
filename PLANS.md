@@ -1,5 +1,34 @@
 # DMF Pulse execution plans
 
+## CURRENT-FPL-STATE-001B transient FPL/Odds identity bridge
+
+- Parent/branch: human-accepted merged main `ee16489054ff78c59eb67897e5e9e52f785ccd6e`
+  on `integration/current-fpl/CURRENT-FPL-STATE-001B-fpl-odds-identity`.
+- Donor reference: `readiness/GW1-2026-27-live-input-initial-squad`; reconcile only the explicit
+  current team/fixture identity concepts from the pinned donor blobs without merging donor history.
+- Scope: exact reviewed provider-team aliases, exact provider-event to target-Gameweek fixture
+  bindings, common-cutoff and usable-time gates, complete target coverage with safe handling of
+  unrelated provider events, deterministic semantic/source-lineage hashes, and transient private
+  output for downstream CURRENT-FPL-STATE-001D.
+- Safety: no fuzzy matching, network, database, persistence, real current mapping data, manager
+  state, modelling, optimisation, orchestration, CLI, PR, merge, activation, or human-acceptance
+  claim.
+
+### CURRENT-FPL-STATE-001B checkpoints
+
+- [x] Fetch and verify exact pinned main, accepted 001A/LIVE-ODDS merge ancestry, clean worktree,
+  donor ref/blobs, authority scopes, current rights profiles, and merged input contracts.
+- [x] Add generalized in-memory mapping and identity contracts without changing the historical
+  `OddsMappingPlan`, accepted FPL compiler, or provider-native LIVE-ODDS object.
+- [x] Add GW > 1, cutoff-before-deadline, extra-provider-event, ambiguity, rights, temporal,
+  substitution, deterministic hashing, and nested-tamper regressions using synthetic inputs only.
+- [x] Pass focused branch coverage, inherited 001A/LIVE-ODDS/Odds/FPL/PostgreSQL regressions, and
+  every static/build/wheel/repository/security acceptance command.
+- [x] Complete donor/evidence ledgers and adversarial self-review with no unresolved P0, P1, or
+  material P2 finding; refresh only canonically authorized active manifests if required.
+- [ ] Commit and push the final branch SHA, inspect its complete automatic GitHub Actions run, and
+  stop for independent review without a post-CI commit.
+
 ## CURRENT-FPL-STATE-001A manual transient current FPL state
 
 - Parent/branch: authoritative merged main `2bc2783adc37d0956962d7574f73cbb6af711e28`

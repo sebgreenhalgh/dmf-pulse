@@ -1,0 +1,64 @@
+CURRENT-FPL-STATE-001B command ledger
+Date: 2026-08-26
+
+1. git fetch --prune origin; git rev-parse/merge-parent/worktree inspection
+   PASS: origin/main was ee16489054ff78c59eb67897e5e9e52f785ccd6e; its merge structure
+   contained LIVE-ODDS-001 then accepted CURRENT-FPL-STATE-001A; startup worktree was clean.
+2. git switch -c integration/current-fpl/CURRENT-FPL-STATE-001B-fpl-odds-identity ee164890...
+   PASS: exact authorized branch and immutable parent established.
+3. git show donor object/blob inspection
+   PASS: donor commit d4cc759d4600489c21ba738cfc9b357cc380554e; identity, mapping, team-test,
+   and fixture-test blobs recorded in DONOR_RECONCILIATION.md. No donor history was merged.
+4. Authority manifest, accepted DMFP-20 decisions, 001A contract, LIVE-ODDS contract, and rights
+   profile inspection
+   PASS: A3/A4/A5 authority resolved; the strict FPL-derived non-persistence boundary governs.
+5. uv run python -m pytest -q <ticket-owned team and fixture tests>
+   PASS: 61 passed; all inputs and mappings synthetic; no network or database access.
+6. uv run python -m coverage run --branch --source=<identity,mapping> -m pytest <ticket tests plus
+   inherited odds-foundation tests>; uv run python -m coverage report/json
+   PASS: 115 passed; 90.06147540983606% aggregate, 705/756 statements and 174/220 branches.
+   The 43 emitted warnings are inherited Pydantic Decimal serializer warnings from synthetic Odds
+   model-copy fixtures; they are absent from the focused ticket-only run and conceal no failure.
+7. uv run python -m pytest -q <inherited FPL/current/LIVE-ODDS/Odds non-database population>
+   PASS_WITH_PREREQUISITE_SPLIT: 427 passed; four setup errors were solely missing
+   DMF_TEST_DATABASE_URL for explicitly database-backed tests. No assertion failed.
+8. docker compose -f compose.test.yaml up -d --wait; uv run alembic upgrade head
+   PASS: repository digest-pinned PostgreSQL 18.4 became healthy; canonical migrations completed
+   through 20260807_0006.
+9. uv run python -m pytest -q <integration ingestion plus FPL rights/Odds quota retention> with
+   DMF_ENVIRONMENT=TEST and DMF_TEST_DATABASE_URL set to the disposable service
+   PASS: 92 passed in 119.47 seconds. A prior harness attempt set only the URL, so 80 tests correctly
+   stopped at the TEST-environment configuration gate and 12 passed; no product operation ran under
+   the refused configuration.
+10. uv sync --all-groups --frozen; git diff --check; repository-wide Ruff
+    PASS: 40 packages checked, 654 files formatted, and lint clean at checkpoint.
+11. uv run mypy src/dmf_pulse; uv run python -m mypy src/dmf_pulse
+    HOST_BOUNDARY/PASS: the literal Windows launcher was blocked before mypy execution by
+    Application Control (os error 4551); the same frozen interpreter module entry passed all 249
+    source files. Exact literal Ubuntu final-SHA CI remains mandatory.
+12. uv build
+    PASS: dmf_pulse-0.2.0 source distribution and wheel built. The sandboxed Windows build attempt
+    was denied filesystem access; the identical approved host command passed.
+13. uv run python scripts/verify_wheel.py
+    PASS: clean installed environment outside the source tree, network disabled, database healthy,
+    290 wheel files, and overall HEALTHY. Optional NVIDIA discovery timed out without degrading the
+    required result. A final-tree invocation without DMF_TEST_DATABASE_URL first refused its missing
+    test prerequisite; the configured rerun passed without entering product verification on the
+    refused attempt.
+14. uv run python scripts/verify_odd005_wheel.py
+    PASS: clean installed wheel, isolated database, COMPLETE replay, VALID validation, zero network
+    requests, and safe raw-credential refusal.
+15. uv run python scripts/verify_gcs008_wheel.py
+    PASS: 290 record members and all required packaged resources verified. The first successful
+    invocation's output was truncated by the tool boundary; an explicit rerun also returned PASS.
+    Final-tree sandbox retries were blocked when Windows policy denied the temporary installed
+    `dmf.exe`; the approved host rerun of the identical verifier passed against the same wheel hash.
+16. Canonical manifests, repository validator, and secret scan
+    PASS: canonical tooling wrote 1,162 deliverables to the ticket manifest and authorized mutable
+    PRC-013 manifest; final-tree repository validation reported zero errors and secret scan zero
+    findings.
+17. Exact-final-SHA automatic CI
+    PENDING_EXTERNAL_AFTER_SINGLE_FINAL_PUSH; no post-CI evidence commit is permitted.
+
+No provider request, credential, real current mapping, current mapping persistence, production
+database, PR, merge, tag, independent review, human acceptance, or activation was used or claimed.
