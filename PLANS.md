@@ -1274,3 +1274,28 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Rerun all gates and seal canonical manifests, repository validation, and secret scanning.
 - [ ] Push the exact remediation SHA, observe green automatic CI, and hand off for independent
   review.
+
+# CURRENT-FPL-STATE-001D unified transient current source state
+
+- Ticket: `CURRENT-FPL-STATE-001D`; immutable merged parent
+  `716ea3a90c8893081bfebce400020b07ce95a463` on `main`.
+- Branch: `integration/current-fpl/CURRENT-FPL-STATE-001D-unified-current-state`.
+- Scope: compose accepted 001A FPL, LIVE-ODDS market, 001B identity, and 001C manager objects;
+  exact source/rules bindings; independent bridge and manager reconstruction; common cutoff and
+  readiness time; conservative whole-bundle rights; safe summary; transient private output.
+- Safety: no acquisition, network, database, persistence, real current data, fuzzy mapping,
+  market normalisation, modelling, optimisation, Decision Bundle, production activation, PR,
+  merge, or human acceptance.
+
+## CURRENT-FPL-STATE-001D checkpoints
+
+- [x] Verify the exact merged parent, clean branch, canonical authorities, accepted predecessor
+  contracts, and pinned historical donor.
+- [x] Implement path-free request, lineage, rights/runtime, bundle, summary, composition, and
+  independent source-family verification.
+- [x] Add coherent GW2+ positive, extra-event, temporal, rights, disclosure, substitution, and
+  rehashed nested-tamper tests with at least 90% focused branch coverage.
+- [x] Run inherited FPL/Odds/identity/manager/rules/chip and PostgreSQL acceptance suites.
+- [x] Complete frozen sync, static, build, clean-wheel, repository, manifest, and secret gates.
+- [ ] Commit and push one exact final SHA, observe its automatic CI fully green, and hand off for
+  independent review without a post-CI commit.

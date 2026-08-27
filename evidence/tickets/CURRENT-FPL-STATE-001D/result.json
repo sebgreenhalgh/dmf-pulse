@@ -1,0 +1,50 @@
+{
+  "automatic_final_sha_ci": "PENDING_FINAL_PUSH",
+  "branch": "integration/current-fpl/CURRENT-FPL-STATE-001D-unified-current-state",
+  "coverage": {
+    "branch_aware_percent": 94.09282700421942,
+    "covered_branches": 19,
+    "covered_lines": 204,
+    "focused_tests_passed": 77,
+    "module": "src/dmf_pulse/ingestion/current_state.py",
+    "report": "evidence/tickets/CURRENT-FPL-STATE-001D/coverage.json"
+  },
+  "database_called_by_001d": false,
+  "evidence_binding": {
+    "deliverable_file_count": 1178,
+    "kind": "repository-deliverables-manifest",
+    "path": "evidence/tickets/CURRENT-FPL-STATE-001D/current_manifest.json",
+    "status": "PASS"
+  },
+  "final_commit": "FINAL_COMMIT_CONTAINING_THIS_RESULT",
+  "findings": {
+    "material_p2": 0,
+    "p0": 0,
+    "p1": 0,
+    "p3": 0
+  },
+  "inherited": {
+    "non_database_passed": 1050,
+    "postgres_passed": 126,
+    "status": "PASS"
+  },
+  "manager_source": "OPERATOR_DECLARED",
+  "network_called": false,
+  "parent": "716ea3a90c8893081bfebce400020b07ce95a463",
+  "persistence_performed": false,
+  "provider_verification": "NOT_PROVIDER_VERIFIED",
+  "repository_validation": "PASS_ZERO_ERRORS",
+  "secret_scan": "PASS_ZERO_FINDINGS",
+  "static_and_build": {
+    "build": "PASS",
+    "frozen_sync": "PASS_40_PACKAGES",
+    "gcs008_wheel": "PASS_292_RECORD_MEMBERS",
+    "mypy": "PASS_251_SOURCE_FILES",
+    "odd005_wheel": "PASS_ZERO_NETWORK_REQUESTS",
+    "ruff": "PASS_666_FILES",
+    "wheel": "PASS_292_FILES",
+    "wheel_001d_import": "PASS_FROM_SITE_PACKAGES"
+  },
+  "status": "CURRENT_FPL_STATE_001D_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "ticket_id": "CURRENT-FPL-STATE-001D"
+}
