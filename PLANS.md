@@ -1247,3 +1247,30 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Add unused/missing/outside-target and rehashed dormant-map regression coverage.
 - [x] Correct evidence, refresh only authorized manifests, and pass complete validation.
 - [ ] Commit and push one exact remediation SHA, observe automatic CI, and hand off for re-review.
+
+# CURRENT-FPL-STATE-001C transient operator-declared manager state
+
+- Ticket: `CURRENT-FPL-STATE-001C`; immutable parent
+  `e53ec45badcf00acfdad37dc51fd5d8572d7a505` on `main`.
+- Branch: `integration/current-fpl/CURRENT-FPL-STATE-001C-operator-manager-state`.
+- Scope: strict local operator declaration; accepted 001A catalogue resolution; ACTIVE
+  target-rules binding; rule-derived selling prices; legal squad/XI/bench/captaincy; exact
+  Stage-14 chip-token reconciliation; safe summary; transient private in-memory result.
+- Safety: no official-FPL network/authentication, account identifier, credential, persistence,
+  database, real manager data, Stage-11 history fabrication, optimiser execution, 001D, PR,
+  merge, human acceptance, or production activation.
+
+## CURRENT-FPL-STATE-001C checkpoints
+
+- [x] Verify exact merged parent, required predecessor capabilities, clean worktree, and authority.
+- [x] Inspect accepted 001A, Stage-10/11 rules, selling-price, Stage-14 inventory, and Free Hit
+  restoration contracts; record no-direct-donor disposition.
+- [x] Implement strict declaration/request/bundle/summary contracts and descriptor-bound loader.
+- [x] Validate source hashes, ACTIVE rules lineage, squad/prices/FT/lineup/chips/rights/time.
+- [x] Add positive, hostile, tamper, order, disclosure, and file-security branch coverage.
+- [x] Complete governance evidence/manifests and all focused/inherited/static/build/security gates.
+- [x] Push the initial exact implementation SHA and diagnose clean-checkout CI finding CFSC-CI-001.
+- [x] Replace the ignored-artifact test dependency with the tracked canonical rules source.
+- [x] Rerun all gates and seal canonical manifests, repository validation, and secret scanning.
+- [ ] Push the exact remediation SHA, observe green automatic CI, and hand off for independent
+  review.
