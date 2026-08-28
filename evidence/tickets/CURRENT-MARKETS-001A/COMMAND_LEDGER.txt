@@ -1,0 +1,56 @@
+CURRENT-MARKETS-001A command ledger
+Date: 2026-08-28
+
+1. Exact ref/worktree/history inspection; git fetch origin --prune
+   PASS: authoritative origin/main and required parent were exactly
+   4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb. The unrelated dirty CURRENT-AVAILABILITY worktree
+   was preserved, and this branch was created in a separate clean worktree.
+2. Authority and accepted-contract inspection
+   PASS: A3/A5/A6/A8, DAT-003, LIVE-ODDS, 001B/001D, Stage-6 and GCS-008 contracts reconciled.
+   No accepted current score prior was found; blocker recorded as NO_ACCEPTED_CURRENT_SCORE_PRIOR.
+3. Preliminary focused tests
+   EXPECTED DEVELOPMENT FAILURES/CLOSED: the first synthetic source refreshed Odds after its
+   accepted fixture-approval window and eager package export created a circular import. The
+   coherent family and lazy export boundary were corrected before final acceptance.
+4. Ticket-owned focused suite and branch-aware coverage
+   PASS: 32 tests; 92.3154701718908% branch-aware product coverage; 724/767 statements and
+   189/222 branches covered. Material uncovered defensive branches were manually inspected.
+5. Inherited LIVE-ODDS/001B/001D/Stage-6/GCS-008/DAT-003 unit matrix
+   PASS: 522 tests.
+6. Disposable PostgreSQL 18.4 canonical identity proof
+   PASS: migrations through 20260807_0006; exact dual-namespace fixture/operator resolution;
+   database-read evidence true; before/after table counts identical; 1 integration test passed.
+7. Inherited DAT-003 PostgreSQL and migration matrix
+   PASS: 90 tests.
+8. uv sync --all-groups --frozen
+   PASS: 40 packages checked.
+9. git diff --check; uv run ruff format --check .; uv run ruff check .
+   PASS: diff clean; 674 files formatted; lint clean.
+10. uv run mypy src/dmf_pulse
+    PASS: 252 source files.
+11. uv build
+    HOST BOUNDARY/PASS: Windows application control denied the sandboxed uv launcher before
+    execution; the identical approved host command built the 0.2.0 sdist and wheel.
+12. uv run python scripts/verify_wheel.py
+    PASS: clean environment outside repository; HEALTHY; 293 wheel files; network fetch disabled.
+    NOTE: after the disposable volume was deliberately recreated for final rebuilt-wheel checks,
+    the first doctor invocation correctly found an unmigrated empty database. The canonical
+    migration command was run and the exact wheel command then passed.
+13. uv run python scripts/verify_odd005_wheel.py
+    PASS: clean isolated database and installed wheel; exact prices; zero network requests.
+    NOTE: the first invocation immediately following another database verifier reported an
+    installed FPL replay startup failure; the exact isolated rerun passed and cleaned its database.
+14. uv run python scripts/verify_gcs008_wheel.py
+    PASS: 293 RECORD members and all required GCS-008 resources verified.
+15. uv run python scripts/verify_current_markets_wheel.py
+    PASS: installed from site-packages outside repository; request binding, two H2H consensuses,
+    four totals consensuses, constraint construction, verify, safe summary and zero network calls.
+16. Canonical manifests, repository validation and secret scan
+    PASS: ticket and authorized mutable PRC-013 manifests contain 1,188 deliverables; repository
+    validation returned zero errors and secret scanning returned zero findings.
+17. Final commit/push and exact-SHA automatic CI
+    PENDING. No PR or post-CI evidence commit is authorized.
+
+No real provider call, credential, current private input, current-market persistence, canonical
+identity creation, score projection, player model, optimisation, PR, merge, human acceptance or
+production activation was performed or claimed.

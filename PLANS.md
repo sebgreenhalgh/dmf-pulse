@@ -1,5 +1,31 @@
 # DMF Pulse execution plans
 
+## CURRENT-MARKETS-001A transient current market constraints
+
+- Parent/branch: authoritative merged main `4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb`
+  on `integration/current-markets/CURRENT-MARKETS-001A-transient-market-constraints`.
+- Scope: verify one accepted `CurrentUnifiedStateBundle`, resolve exact fixture/provider/operator
+  UUIDs through a hash-bound DAT-003 read-only identity view, reuse the accepted Stage-6 H2H
+  consensus and Stage-8 1X2 adapter, add a narrow exact-Decimal binary totals consensus, and emit
+  one private transient `MarketConstraintSet` per target fixture.
+- Safety: preserve the dirty CURRENT-AVAILABILITY worktree; no source acquisition, network, DB
+  write, persistence, score prior/rates, Stage-7 substitution, full GCS-008 execution, player
+  allocation, Stage 9, optimisation, PR, merge, production activation, or human-acceptance claim.
+
+### CURRENT-MARKETS-001A checkpoints
+
+- [x] Fetch and verify exact pinned origin/main, preserve the local availability work, create a
+  clean isolated worktree, and reconcile A3/A5/A6/A8 authority plus 001D, DAT-003, Stage-6, and
+  GCS-008 contracts.
+- [x] Freeze ticket contracts and tests for exact source binding, canonical identity, H2H, totals,
+  constraints, cutoffs, rights/runtime, disclosure, mutation, substitution, and determinism.
+- [x] Implement the smallest complete transient market slice without changing accepted Stage-6
+  H2H mathematics or GCS-008 Stage-7 requirements.
+- [x] Pass focused branch coverage and inherited LIVE-ODDS, 001B, 001D, markets, GCS-008, and
+  DAT-003 regressions plus every static/build/wheel/repository/security gate.
+- [ ] Complete governance evidence and adversarial self-review with no unresolved P0, P1, or
+  material P2 finding; commit, push, inspect exact-SHA CI, and stop for independent review.
+
 ## CURRENT-FPL-STATE-001B transient FPL/Odds identity bridge
 
 - Parent/branch: human-accepted merged main `ee16489054ff78c59eb67897e5e9e52f785ccd6e`
