@@ -1,0 +1,54 @@
+ticket_id: CURRENT-FPL-STATE-001D
+title: Unified transient current decision source state
+status: ACTIVE
+required_base_commit: 716ea3a90c8893081bfebce400020b07ce95a463
+expected_branch: integration/current-fpl/CURRENT-FPL-STATE-001D-unified-current-state
+donor_ref: d4cc759d4600489c21ba738cfc9b357cc380554e
+objective: >-
+  Compose exact accepted current FPL, current Odds, FPL/Odds identity, and operator-declared
+  manager bundles into one immutable private transient source bundle, independently verified
+  against ACTIVE FULL_SEASON rules and exact cross-source lineage.
+authority_scopes:
+  - A2-rules
+  - A4-FPL-ingestion
+  - A5-odds-manual-import
+  - A10-one-GW-optimiser
+  - B2-multi-GW
+  - B4-chips
+permissions:
+  source_acquisition: forbidden
+  official_fpl_network: forbidden
+  database_access: forbidden
+  persistence: forbidden
+  real_current_data: forbidden
+  market_normalisation: forbidden
+  modelling_or_optimisation: forbidden
+  new_runtime_dependency: forbidden
+allowed_areas:
+  - src/dmf_pulse/ingestion/current_state.py
+  - src/dmf_pulse/ingestion/__init__.py
+  - tests/unit/ingestion/test_current_unified_state.py
+  - tests/unit/ingestion/test_current_unified_state_tamper.py
+  - tests/unit/ingestion/test_current_unified_state_boundaries.py
+  - tests/unit/ingestion/current_unified_state_test_support.py
+  - tickets/CURRENT-FPL-STATE-001D/**
+  - evidence/tickets/CURRENT-FPL-STATE-001D/**
+  - evidence/tickets/PRC-013/current_manifest.json
+  - PLANS.md
+exclusions:
+  - file or provider ingestion
+  - network, database, cache, backup, or persistence
+  - real FPL, manager, mapping, event, or Odds data
+  - fuzzy identity resolution or mapping acquisition
+  - availability, football-event, points, market-consensus, or optimisation execution
+  - Stage-11 manager history fabrication
+  - Decision Bundle, orchestration, production activation, PR, merge, or human acceptance
+required_public_behavior:
+  - path-free exact request bindings for every source semantic and provenance identity
+  - accepted 001B bridge reconstruction against the exact FPL and Odds inputs
+  - accepted 001C manager verification against exact FPL, ACTIVE rules, and capability inputs
+  - exact common cutoff, derived readiness time, and FPL-authoritative deadline
+  - complete target fixture coverage while allowing unrelated outside-target Odds events
+  - conservative composite rights with distinct FPL and Odds automated-access authority
+  - deterministic composition hash, nested tamper verification, and disclosure-safe summary
+acceptance_status: CURRENT_FPL_STATE_001D_REMEDIATED_PENDING_INDEPENDENT_REREVIEW
