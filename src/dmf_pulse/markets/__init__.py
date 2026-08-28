@@ -39,6 +39,8 @@ if TYPE_CHECKING:
         CurrentMarketConstraintRequest,
         CurrentMarketConstraintService,
         CurrentMarketReadiness,
+        current_odds_rights_sha256,
+        current_odds_temporal_sha256,
     )
 
 _CURRENT_EXPORTS = frozenset(
@@ -51,6 +53,8 @@ _CURRENT_EXPORTS = frozenset(
         "CurrentMarketConstraintService",
         "CurrentMarketReadiness",
         "bind_current_market_constraint_request",
+        "current_odds_rights_sha256",
+        "current_odds_temporal_sha256",
     }
 )
 
@@ -92,6 +96,8 @@ __all__ = [
     "Probability",
     "bind_current_market_constraint_request",
     "build_market_consensus",
+    "current_odds_rights_sha256",
+    "current_odds_temporal_sha256",
     "load_market_normalisation_policy",
     "normalise_complete_market",
     "raw_implied_probability",

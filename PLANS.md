@@ -11,6 +11,8 @@
 - Safety: preserve the dirty CURRENT-AVAILABILITY worktree; no source acquisition, network, DB
   write, persistence, score prior/rates, Stage-7 substitution, full GCS-008 execution, player
   allocation, Stage 9, optimisation, PR, merge, production activation, or human-acceptance claim.
+- Remediation basis: preserve deficient commit `92f368597c22edbf77b236a8c96ddf959e545f59`
+  and close independent-review findings CMR-IR-001 through CMR-IR-007 in a visible descendant.
 
 ### CURRENT-MARKETS-001A checkpoints
 
@@ -23,8 +25,14 @@
   H2H mathematics or GCS-008 Stage-7 requirements.
 - [x] Pass focused branch coverage and inherited LIVE-ODDS, 001B, 001D, markets, GCS-008, and
   DAT-003 regressions plus every static/build/wheel/repository/security gate.
-- [ ] Complete governance evidence and adversarial self-review with no unresolved P0, P1, or
-  material P2 finding; commit, push, inspect exact-SHA CI, and stop for independent review.
+- [x] Add boundary-local exact temporal/rights identities, provider-name orientation validation,
+  pre-ranking totals receipt coherence, HUMAN_VERIFIED-only mappings, and exact official-FPL
+  provider/product/PL-season authority.
+- [x] Add direct unit and PostgreSQL regressions for every historical independent-review finding
+  and raise ticket-owned raw branch coverage above 90%.
+- [ ] Correct remediation chronology/evidence and manifests; pass full inherited/static/wheel
+  acceptance; commit and push without amending the deficient SHA; inspect exact-SHA CI; stop for
+  independent re-review.
 
 ## CURRENT-FPL-STATE-001B transient FPL/Odds identity bridge
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
@@ -21,6 +21,7 @@ from dmf_pulse.data_model.tables import (
 )
 from dmf_pulse.markets.current import (
     CurrentMarketCanonicalIdentityRepository,
+    CurrentMarketConstraintError,
     CurrentMarketConstraintService,
     bind_current_market_constraint_request,
 )
@@ -37,7 +38,23 @@ def _uuid(number: int) -> UUID:
     return UUID(f"00000000-0000-0000-0000-{number:012d}")
 
 
-def _seed_current_identities(session: Session, context) -> None:
+def _seed_current_identities(
+    session: Session,
+    context,
+    *,
+    mapping_status: str = "HUMAN_VERIFIED",
+    mapping_method: str = "MANUAL",
+    match_probability: Decimal | None = Decimal(1),
+    official_product: str = "fantasy_premierleague",
+    official_active: bool = True,
+    competition_key: str = "PL",
+    season_code: str = "2026/27",
+    official_namespace: str = "fpl.fixture.id",
+    official_entity_type: str = "FIXTURE",
+    official_valid_range: Range | None = None,
+    official_system_range: Range | None = None,
+    add_parallel_pl_season: bool = False,
+) -> None:
     competition_id = _uuid(3901)
     season_id = _uuid(3902)
     official_provider_id = _uuid(3903)
@@ -54,7 +71,7 @@ def _seed_current_identities(session: Session, context) -> None:
     session.execute(
         insert(competition).values(
             competition_id=competition_id,
-            competition_key="PL",
+            competition_key=competition_key,
             canonical_name="Synthetic Premier League",
             country_code="GB",
         )
@@ -63,7 +80,7 @@ def _seed_current_identities(session: Session, context) -> None:
         insert(season).values(
             season_id=season_id,
             competition_id=competition_id,
-            season_code="2026/27",
+            season_code=season_code,
             starts_on=date(2026, 8, 1),
             ends_on=date(2027, 5, 31),
         )
@@ -77,6 +94,7 @@ def _seed_current_identities(session: Session, context) -> None:
                 "display_name": "Synthetic official FPL",
                 "provider_type": "OFFICIAL",
                 "rights_profile_key": "fpl_official_private_manual_v1",
+                "active": official_active,
             },
             {
                 "provider_id": odds_provider_id,
@@ -84,6 +102,7 @@ def _seed_current_identities(session: Session, context) -> None:
                 "display_name": "Synthetic The Odds API",
                 "provider_type": "ODDS_API",
                 "rights_profile_key": "the_odds_api_private_analytics_v1",
+                "active": True,
             },
         ],
     )
@@ -94,6 +113,36 @@ def _seed_current_identities(session: Session, context) -> None:
         bounds="[)",
     )
     observed_at = datetime(2026, 8, 24, 10, tzinfo=UTC)
+    if add_parallel_pl_season:
+        replacement_competition_id = _uuid(3981)
+        replacement_season_id = _uuid(3982)
+        session.execute(
+            insert(canonical_entity),
+            [
+                {
+                    "entity_id": replacement_competition_id,
+                    "entity_type": "COMPETITION",
+                },
+                {"entity_id": replacement_season_id, "entity_type": "SEASON"},
+            ],
+        )
+        session.execute(
+            insert(competition).values(
+                competition_id=replacement_competition_id,
+                competition_key="PL",
+                canonical_name="Replacement synthetic PL",
+                country_code="GB",
+            )
+        )
+        session.execute(
+            insert(season).values(
+                season_id=replacement_season_id,
+                competition_id=replacement_competition_id,
+                season_code="2026/27",
+                starts_on=date(2026, 8, 1),
+                ends_on=date(2027, 5, 31),
+            )
+        )
     event_by_id = {event.provider_event_id: event for event in context.odds_input.events}
     identifier_rows: list[dict[str, object]] = []
     for index, mapping in enumerate(context.identity_map.fixture_mappings, start=1):
@@ -101,21 +150,34 @@ def _seed_current_identities(session: Session, context) -> None:
         session.execute(
             insert(canonical_entity).values(entity_id=fixture_id, entity_type="FIXTURE")
         )
+        official_canonical_id = fixture_id
+        if official_entity_type != "FIXTURE":
+            official_canonical_id = _uuid(3970 + index)
+            session.execute(
+                insert(canonical_entity).values(
+                    entity_id=official_canonical_id,
+                    entity_type=official_entity_type,
+                )
+            )
         identifier_rows.extend(
             (
                 {
                     "external_identifier_id": _uuid(3920 + index),
-                    "canonical_entity_id": fixture_id,
+                    "canonical_entity_id": official_canonical_id,
                     "provider_id": official_provider_id,
-                    "provider_product": "fantasy_premierleague",
-                    "identifier_namespace": "fpl.fixture.id",
-                    "entity_type": "FIXTURE",
+                    "provider_product": official_product,
+                    "identifier_namespace": official_namespace,
+                    "entity_type": official_entity_type,
                     "external_id_text": str(mapping.official_fpl_fixture_id),
-                    "valid_during": valid_range,
-                    "system_during": system_range,
-                    "mapping_status": "HUMAN_VERIFIED",
-                    "mapping_method": "MANUAL",
-                    "match_probability": Decimal(1),
+                    "valid_during": (
+                        official_valid_range if official_valid_range is not None else valid_range
+                    ),
+                    "system_during": (
+                        official_system_range if official_system_range is not None else system_range
+                    ),
+                    "mapping_status": mapping_status,
+                    "mapping_method": mapping_method,
+                    "match_probability": match_probability,
                     "reviewed_by": "CURRENT-MARKETS-001A synthetic integration",
                     "reviewed_at": observed_at,
                     "first_seen_at": observed_at,
@@ -133,9 +195,9 @@ def _seed_current_identities(session: Session, context) -> None:
                     "external_id_text": mapping.provider_event_id,
                     "valid_during": valid_range,
                     "system_during": system_range,
-                    "mapping_status": "HUMAN_VERIFIED",
-                    "mapping_method": "MANUAL",
-                    "match_probability": Decimal(1),
+                    "mapping_status": mapping_status,
+                    "mapping_method": mapping_method,
+                    "match_probability": match_probability,
                     "reviewed_by": "CURRENT-MARKETS-001A synthetic integration",
                     "reviewed_at": observed_at,
                     "first_seen_at": observed_at,
@@ -179,9 +241,9 @@ def _seed_current_identities(session: Session, context) -> None:
                 "external_id_text": key,
                 "valid_during": valid_range,
                 "system_during": system_range,
-                "mapping_status": "HUMAN_VERIFIED",
-                "mapping_method": "MANUAL",
-                "match_probability": Decimal(1),
+                "mapping_status": mapping_status,
+                "mapping_method": mapping_method,
+                "match_probability": match_probability,
                 "reviewed_by": "CURRENT-MARKETS-001A synthetic integration",
                 "reviewed_at": observed_at,
                 "first_seen_at": observed_at,
@@ -231,3 +293,113 @@ def test_real_postgres_resolution_and_market_build_make_no_database_writes(
     assert result.runtime.persistence_performed is False
     assert result.runtime.network_called is False
     assert all(item.readiness == "MARKET_READY" for item in result.fixtures)
+
+
+@pytest.mark.parametrize(
+    ("status", "method", "probability"),
+    (
+        ("AUTO_MATCHED", "PROBABILISTIC", Decimal("0.999999")),
+        ("AUTO_MATCHED", "PROBABILISTIC", Decimal("0.010000")),
+        ("AUTO_MATCHED", "PROBABILISTIC", Decimal(0)),
+        ("AUTO_MATCHED", "PROBABILISTIC", None),
+        ("CANDIDATE", "MANUAL", None),
+        ("UNRESOLVED", "MANUAL", None),
+        ("CONFLICTED", "MANUAL", None),
+        ("REJECTED", "MANUAL", None),
+        ("EXPIRED", "MANUAL", None),
+    ),
+)
+def test_cmr_ir_004_only_human_verified_blocking_mappings_are_accepted(
+    repository_root,
+    tmp_path,
+    postgres_session_factory: sessionmaker[Session],
+    status: str,
+    method: str,
+    probability: Decimal | None,
+) -> None:
+    context = build_source_context(repository_root, tmp_path)
+    with postgres_session_factory.begin() as session:
+        _seed_current_identities(
+            session,
+            context,
+            mapping_status=status,
+            mapping_method=method,
+            match_probability=probability,
+        )
+
+    with (
+        postgres_session_factory() as session,
+        pytest.raises(CurrentMarketConstraintError) as caught,
+    ):
+        CurrentMarketCanonicalIdentityRepository(session).resolve(
+            context.bundle,
+            resolved_at=context.bundle.decision_information_at,
+        )
+
+    assert caught.value.code == "CANONICAL_IDENTITY_UNAVAILABLE"
+
+
+@pytest.mark.parametrize(
+    "scope_defect",
+    (
+        "WRONG_PRODUCT",
+        "INACTIVE_PROVIDER",
+        "WRONG_COMPETITION",
+        "CROSS_COMPETITION",
+        "WRONG_SEASON",
+        "WRONG_NAMESPACE",
+        "WRONG_ENTITY_TYPE",
+        "EXPIRED_VALID_RANGE",
+        "FUTURE_SYSTEM_RANGE",
+    ),
+)
+def test_cmr_ir_005_official_fpl_scope_defects_fail_closed(
+    repository_root,
+    tmp_path,
+    postgres_session_factory: sessionmaker[Session],
+    scope_defect: str,
+) -> None:
+    context = build_source_context(repository_root, tmp_path)
+    seed_options: dict[str, object] = {}
+    if scope_defect == "WRONG_PRODUCT":
+        seed_options["official_product"] = "synthetic_wrong_product"
+    elif scope_defect == "INACTIVE_PROVIDER":
+        seed_options["official_active"] = False
+    elif scope_defect == "WRONG_COMPETITION":
+        seed_options["competition_key"] = "SYNTHETIC_OTHER"
+    elif scope_defect == "CROSS_COMPETITION":
+        seed_options.update(
+            competition_key="SYNTHETIC_OTHER",
+            add_parallel_pl_season=True,
+        )
+    elif scope_defect == "WRONG_SEASON":
+        seed_options["season_code"] = "2025/26"
+    elif scope_defect == "WRONG_NAMESPACE":
+        seed_options["official_namespace"] = "synthetic.fixture.id"
+    elif scope_defect == "WRONG_ENTITY_TYPE":
+        seed_options["official_entity_type"] = "TEAM"
+    elif scope_defect == "EXPIRED_VALID_RANGE":
+        seed_options["official_valid_range"] = Range(
+            datetime(2025, 8, 1, tzinfo=UTC),
+            datetime(2026, 1, 1, tzinfo=UTC),
+            bounds="[)",
+        )
+    else:
+        seed_options["official_system_range"] = Range(
+            context.identity_map.mapping_decided_at + timedelta(seconds=1),
+            None,
+            bounds="[)",
+        )
+    with postgres_session_factory.begin() as session:
+        _seed_current_identities(session, context, **seed_options)
+
+    with (
+        postgres_session_factory() as session,
+        pytest.raises(CurrentMarketConstraintError) as caught,
+    ):
+        CurrentMarketCanonicalIdentityRepository(session).resolve(
+            context.bundle,
+            resolved_at=context.bundle.decision_information_at,
+        )
+
+    assert caught.value.code == "CANONICAL_IDENTITY_UNAVAILABLE"

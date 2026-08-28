@@ -33,6 +33,7 @@ from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.data_model.models import require_utc
 from dmf_pulse.data_model.tables import (
     betting_operator,
+    competition,
     data_provider,
     external_identifier,
     season,
@@ -56,6 +57,8 @@ from dmf_pulse.ingestion.current_state import (
     current_unified_state_semantic_sha256,
 )
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.ingestion.models import RightsProfile, RightsProfileStatus
+from dmf_pulse.ingestion.odds.config import load_rights_profiles, rights_config_sha256
 from dmf_pulse.ingestion.odds.current import (
     CurrentOddsBookmaker,
     CurrentOddsEvent,
@@ -91,6 +94,9 @@ CURRENT_MARKET_IDENTITY_VIEW_VERSION: Literal["current-market-identity-view-v1"]
     "current-market-identity-view-v1"
 )
 _TRANSIENT_NAMESPACE = UUID("58c3d432-1488-5c53-a4aa-da5753f7a08c")
+_ACCEPTED_ODDS_RIGHTS_PROFILE_ID = "the_odds_api_private_analytics_v1"
+_ACCEPTED_ODDS_RIGHTS_PROFILE_VERSION = "1.0.0"
+_ACCEPTED_ODDS_PROVIDER_KEY = "the_odds_api"
 _ONE = Decimal(1)
 _TWO = Decimal(2)
 _ERROR_MESSAGES = {
@@ -269,6 +275,8 @@ class CurrentMarketConstraintRequest(_FrozenModel):
     odds_identity_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     odds_provider_provenance_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     odds_quality_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    odds_temporal_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    odds_rights_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     canonical_identity_view_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     market_policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     confidence_gate_policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -285,6 +293,8 @@ class CurrentMarketConstraintLineage(_FrozenModel):
     odds_identity_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     odds_provider_provenance_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     odds_quality_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    odds_temporal_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    odds_rights_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     canonical_identity_view_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     market_policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     confidence_gate_policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -690,6 +700,8 @@ def bind_current_market_constraint_request(
         odds_identity_semantic_sha256=source.lineage.odds_identity_semantic_sha256,
         odds_provider_provenance_sha256=source.lineage.odds_provider_provenance_sha256,
         odds_quality_sha256=current_odds_quality_sha256(source),
+        odds_temporal_sha256=current_odds_temporal_sha256(source),
+        odds_rights_sha256=current_odds_rights_sha256(source),
         canonical_identity_view_sha256=identity_view.semantic_sha256,
         market_policy_sha256=policy.sha256,
         confidence_gate_policy_sha256=CONFIDENCE_GATE_POLICY_SHA256,
@@ -708,6 +720,57 @@ def current_odds_quality_sha256(value: CurrentUnifiedStateBundle) -> str:
     """Bind accepted upstream exclusions absent from the 001D market-only digest."""
 
     return canonical_sha256(value.odds_input.quality.model_dump(mode="json"))
+
+
+def current_odds_temporal_sha256(value: CurrentUnifiedStateBundle) -> str:
+    """Bind the complete local acquisition-time state used by current markets."""
+
+    return canonical_sha256(value.odds_input.temporal.model_dump(mode="json"))
+
+
+def _accepted_odds_rights_authority() -> tuple[RightsProfile, str]:
+    profiles = load_rights_profiles()
+    profile = profiles.get(_ACCEPTED_ODDS_RIGHTS_PROFILE_ID)
+    if (
+        profile is None
+        or profile.rights_profile_id != _ACCEPTED_ODDS_RIGHTS_PROFILE_ID
+        or profile.profile_version != _ACCEPTED_ODDS_RIGHTS_PROFILE_VERSION
+        or profile.provider_key != _ACCEPTED_ODDS_PROVIDER_KEY
+        or profile.status is not RightsProfileStatus.HUMAN_APPROVED
+    ):
+        raise IngestionError("RIGHTS_BLOCKED", "accepted odds rights profile is unavailable")
+    return profile, rights_config_sha256()
+
+
+def current_odds_rights_sha256(value: CurrentUnifiedStateBundle) -> str:
+    """Bind the complete supplied rights state to the packaged approved authority."""
+
+    profile, accepted_config_sha256 = _accepted_odds_rights_authority()
+    return canonical_sha256(
+        {
+            "accepted_profile": {
+                "profile_version": profile.profile_version,
+                "provider_key": profile.provider_key,
+                "rights_profile_id": profile.rights_profile_id,
+                "status": profile.status.value,
+            },
+            "accepted_rights_config_sha256": accepted_config_sha256,
+            "source_provenance_rights_config_sha256": (
+                value.odds_input.provenance.rights_config_sha256
+            ),
+            "source_rights": value.odds_input.rights.model_dump(mode="json"),
+        }
+    )
+
+
+def _require_accepted_odds_rights(value: CurrentUnifiedStateBundle) -> None:
+    profile, accepted_config_sha256 = _accepted_odds_rights_authority()
+    if (
+        value.odds_input.provenance.rights_config_sha256 != accepted_config_sha256
+        or value.odds_input.rights.rights_profile_id != profile.rights_profile_id
+        or value.odds_input.rights.rights_profile_version != profile.profile_version
+    ):
+        raise CurrentMarketConstraintError("RIGHTS_BLOCKED")
 
 
 def _public_pair(values: tuple[Decimal, Decimal]) -> tuple[Decimal, Decimal]:
@@ -805,6 +868,14 @@ def _h2h_quotes(
     exclusions: list[ExcludedBook] = []
     candidates: dict[UUID, list[CurrentOddsBookmaker]] = {}
     for bookmaker in event.bookmakers:
+        market = bookmaker.markets[0]
+        for outcome in market.outcomes:
+            if (
+                (outcome.outcome == "HOME" and outcome.provider_name != event.provider_home_team)
+                or (outcome.outcome == "AWAY" and outcome.provider_name != event.provider_away_team)
+                or (outcome.outcome == "DRAW" and outcome.provider_name.casefold() != "draw")
+            ):
+                raise CurrentMarketConstraintError("SOURCE_INVALID")
         canonical_operator = identity_view.operator(bookmaker.bookmaker_key)
         candidates.setdefault(canonical_operator.canonical_operator_id, []).append(bookmaker)
     selected_books: list[CurrentOddsBookmaker] = []
@@ -1047,15 +1118,20 @@ def _totals_consensus(
     as_of: datetime,
 ) -> CurrentTotalsConsensus | None:
     candidates: dict[UUID, list[tuple[CurrentOddsBookmaker, CurrentOddsTotalsMarket]]] = {}
+    has_warning = False
     for bookmaker in event.bookmakers:
         canonical_operator = identity_view.operator(bookmaker.bookmaker_key)
         for market in bookmaker.totals_markets:
             if market.line == line:
+                observed_at, _timestamp_source = _observation_time(bookmaker, market)
+                if observed_at > source.odds_input.temporal.received_at:
+                    exclusions[ExclusionReason.FUTURE_OBSERVATION.value] += 1
+                    has_warning = True
+                    continue
                 candidates.setdefault(canonical_operator.canonical_operator_id, []).append(
                     (bookmaker, market)
                 )
     selected: list[CurrentTotalsOperatorMarket] = []
-    has_warning = False
     for _operator_id, aliases in sorted(candidates.items(), key=lambda item: str(item[0])):
         ranked = sorted(
             aliases,
@@ -1261,6 +1337,8 @@ def _lineage(
         odds_identity_semantic_sha256=source.lineage.odds_identity_semantic_sha256,
         odds_provider_provenance_sha256=source.lineage.odds_provider_provenance_sha256,
         odds_quality_sha256=current_odds_quality_sha256(source),
+        odds_temporal_sha256=current_odds_temporal_sha256(source),
+        odds_rights_sha256=current_odds_rights_sha256(source),
         canonical_identity_view_sha256=identity_view.semantic_sha256,
         market_policy_sha256=policy.sha256,
         confidence_gate_policy_sha256=CONFIDENCE_GATE_POLICY_SHA256,
@@ -1391,6 +1469,10 @@ class CurrentMarketConstraintService:
             raise CurrentMarketConstraintError("SOURCE_MISMATCH")
         if not _identity_sets_are_exact(checked_source, checked_view):
             raise CurrentMarketConstraintError("CANONICAL_IDENTITY_UNAVAILABLE")
+        try:
+            _require_accepted_odds_rights(checked_source)
+        except IngestionError:
+            raise CurrentMarketConstraintError("RIGHTS_BLOCKED") from None
         if (
             checked_source.rights.private_internal_use != "ALLOW"
             or checked_source.rights.transient_processing != "ALLOW"
@@ -1644,16 +1726,21 @@ class CurrentMarketCanonicalIdentityRepository:
                             data_provider.c.provider_id == external_identifier.c.provider_id,
                         )
                         .join(season, season.c.season_id == external_identifier.c.season_id)
+                        .join(
+                            competition,
+                            competition.c.competition_id == season.c.competition_id,
+                        )
                         .where(
                             data_provider.c.provider_key == "official_fpl",
+                            data_provider.c.active.is_(True),
+                            external_identifier.c.provider_product == "fantasy_premierleague",
+                            competition.c.competition_key == "PL",
                             season.c.season_code == source.season_code,
                             external_identifier.c.identifier_namespace == "fpl.fixture.id",
                             external_identifier.c.entity_type == "FIXTURE",
                             external_identifier.c.external_id_text
                             == str(mapping.official_fpl_fixture_id),
-                            external_identifier.c.mapping_status.in_(
-                                ("AUTO_MATCHED", "HUMAN_VERIFIED")
-                            ),
+                            external_identifier.c.mapping_status == "HUMAN_VERIFIED",
                             external_identifier.c.valid_during.op("@>")(
                                 mapping.official_fpl_kickoff_at
                             ),
@@ -1682,9 +1769,7 @@ class CurrentMarketCanonicalIdentityRepository:
                             external_identifier.c.identifier_namespace == "the_odds_api.event.id",
                             external_identifier.c.entity_type == "FIXTURE",
                             external_identifier.c.external_id_text == mapping.provider_event_id,
-                            external_identifier.c.mapping_status.in_(
-                                ("AUTO_MATCHED", "HUMAN_VERIFIED")
-                            ),
+                            external_identifier.c.mapping_status == "HUMAN_VERIFIED",
                             external_identifier.c.valid_during.op("@>")(event.commence_time),
                             external_identifier.c.system_during.op("@>")(
                                 source.identity_map.mapping_decided_at
@@ -1759,9 +1844,7 @@ class CurrentMarketCanonicalIdentityRepository:
                             == "the_odds_api.bookmaker.key",
                             external_identifier.c.entity_type == "BETTING_OPERATOR",
                             external_identifier.c.external_id_text == bookmaker_key,
-                            external_identifier.c.mapping_status.in_(
-                                ("AUTO_MATCHED", "HUMAN_VERIFIED")
-                            ),
+                            external_identifier.c.mapping_status == "HUMAN_VERIFIED",
                             external_identifier.c.valid_during.op("@>")(
                                 event_time_by_key[bookmaker_key]
                             ),
@@ -1830,5 +1913,7 @@ __all__ = [
     "current_market_constraint_bundle_sha256",
     "current_market_identity_view_sha256",
     "current_odds_quality_sha256",
+    "current_odds_rights_sha256",
+    "current_odds_temporal_sha256",
     "current_totals_consensus_sha256",
 ]

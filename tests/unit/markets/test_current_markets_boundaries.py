@@ -11,7 +11,10 @@ from uuid import UUID
 
 import pytest
 
+import dmf_pulse.markets.current as current_market_module
 from dmf_pulse.ingestion.current_state import current_unified_state_semantic_sha256
+from dmf_pulse.ingestion.models import RightsProfileStatus
+from dmf_pulse.ingestion.odds.config import load_rights_profiles
 from dmf_pulse.ingestion.odds.current import (
     CurrentOddsBookmaker,
     CurrentOddsEvent,
@@ -22,11 +25,14 @@ from dmf_pulse.markets.current import (
     CurrentMarketConstraintService,
     CurrentMarketReadiness,
     bind_current_market_constraint_request,
+    current_odds_rights_sha256,
+    current_odds_temporal_sha256,
 )
 
 from .current_market_test_support import (
     build_from_context,
     build_market_context,
+    identity_view,
     recompose,
     rehash_identity_view,
     rehash_odds,
@@ -109,6 +115,128 @@ def test_h2h_price_mutation_changes_every_bound_result_and_stale_request_fails(
     assert caught.value.code == "VERIFICATION_FAILED"
 
 
+@pytest.mark.parametrize(
+    "corruption",
+    (
+        "ONE_BOOK_SWAP",
+        "ALL_BOOKS_SWAP",
+        "HOME_NAME",
+        "AWAY_NAME",
+        "DRAW_NAME",
+    ),
+)
+def test_cmr_ir_001_h2h_orientation_corruption_fails_closed(
+    repository_root, tmp_path, corruption: str
+) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = list(event.bookmakers)
+    selected = range(len(books)) if corruption == "ALL_BOOKS_SWAP" else range(1)
+    for index in selected:
+        market = books[index].markets[0]
+        outcomes = []
+        for outcome in market.outcomes:
+            updates: dict[str, object] = {}
+            if corruption in {"ONE_BOOK_SWAP", "ALL_BOOKS_SWAP"}:
+                if outcome.outcome == "HOME":
+                    updates["outcome"] = "AWAY"
+                elif outcome.outcome == "AWAY":
+                    updates["outcome"] = "HOME"
+            elif corruption == "HOME_NAME" and outcome.outcome == "HOME":
+                updates["provider_name"] = "synthetic wrong home"
+            elif corruption == "AWAY_NAME" and outcome.outcome == "AWAY":
+                updates["provider_name"] = "synthetic wrong away"
+            elif corruption == "DRAW_NAME" and outcome.outcome == "DRAW":
+                updates["provider_name"] = "synthetic not draw"
+            outcomes.append(outcome.model_copy(update=updates))
+        books[index] = books[index].model_copy(
+            update={"markets": (market.model_copy(update={"outcomes": tuple(outcomes)}),)}
+        )
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    changed_view = identity_view(changed)
+    changed_request = bind_current_market_constraint_request(changed.bundle, changed_view)
+
+    with pytest.raises(CurrentMarketConstraintError) as caught:
+        CurrentMarketConstraintService().build(
+            changed_request,
+            source=changed.bundle,
+            identity_view=changed_view,
+        )
+
+    assert caught.value.code == "SOURCE_INVALID"
+    serialized = json.dumps(caught.value.as_error_object(), sort_keys=True)
+    assert event.provider_home_team not in serialized
+    assert event.provider_away_team not in serialized
+
+
+@pytest.mark.parametrize("mutation", ("REQUEST_STARTED", "RECEIPT", "USABLE"))
+def test_cmr_ir_002_temporal_mutation_invalidates_stale_request_and_result_identity(
+    repository_root, tmp_path, mutation: str
+) -> None:
+    context, _view, request, result = build_market_context(repository_root, tmp_path)
+    temporal = context.odds_input.temporal
+    if mutation == "REQUEST_STARTED":
+        changed_temporal = temporal.model_copy(
+            update={"request_started_at": temporal.request_started_at - timedelta(seconds=1)}
+        )
+    elif mutation == "RECEIPT":
+        changed_temporal = temporal.model_copy(
+            update={
+                "received_at": temporal.received_at - timedelta(seconds=1),
+                "captured_at": temporal.captured_at - timedelta(seconds=1),
+            }
+        )
+    else:
+        changed_temporal = temporal.model_copy(
+            update={"usable_at": temporal.usable_at + timedelta(seconds=1)}
+        )
+    changed = recompose(
+        context,
+        context.odds_input.model_copy(update={"temporal": changed_temporal}),
+    )
+    changed_view = identity_view(changed)
+
+    with pytest.raises(CurrentMarketConstraintError) as caught:
+        CurrentMarketConstraintService().build(
+            request,
+            source=changed.bundle,
+            identity_view=changed_view,
+        )
+    assert caught.value.code == "SOURCE_MISMATCH"
+
+    changed_request = bind_current_market_constraint_request(changed.bundle, changed_view)
+    changed_result = CurrentMarketConstraintService().build(
+        changed_request,
+        source=changed.bundle,
+        identity_view=changed_view,
+    )
+    assert changed_request.odds_temporal_sha256 != request.odds_temporal_sha256
+    assert changed_result.lineage.odds_temporal_sha256 == (
+        current_odds_temporal_sha256(changed.bundle)
+    )
+    assert changed_result.semantic_sha256 != result.semantic_sha256
+
+
+def test_cmr_ir_002_temporal_digest_binds_complete_temporal_state(
+    repository_root, tmp_path
+) -> None:
+    context, _view, request, result = build_market_context(repository_root, tmp_path)
+    expected_fields = {
+        "request_started_at",
+        "received_at",
+        "captured_at",
+        "information_cutoff",
+        "usable_at",
+        "provider_response_generated_at",
+        "provider_response_generated_at_state",
+    }
+    assert set(context.odds_input.temporal.model_dump(mode="json")) == expected_fields
+    assert request.odds_temporal_sha256 == current_odds_temporal_sha256(context.bundle)
+    assert result.lineage.odds_temporal_sha256 == request.odds_temporal_sha256
+
+
 def test_totals_price_and_line_mutations_change_constraints(repository_root, tmp_path) -> None:
     context, _view, _request, result = build_market_context(repository_root, tmp_path)
     original = context.odds_input.events[0].bookmakers[0].totals_markets[1]
@@ -187,6 +315,9 @@ def test_upstream_quality_exclusions_are_propagated_and_safely_summarized(
         status="WARNING",
         warnings=(
             "ADDITIVE_UNSUPPORTED_MARKET:btts",
+            "PROVIDER_UNAVAILABLE",
+            "SYNTHETIC_OTHER_WARNING",
+            "TIMESTAMP_INCOHERENT",
             "TOTALS_INCOMPLETE",
         ),
         additive_unsupported_markets=("btts",),
@@ -202,12 +333,18 @@ def test_upstream_quality_exclusions_are_propagated_and_safely_summarized(
     assert result.source_quality_warnings == quality.warnings
     assert changed_request.odds_quality_sha256 != original_request.odds_quality_sha256
     assert {item.reason: item.count for item in result.source_exclusion_counts} == {
+        "FUTURE_OBSERVATION": 1,
         "INCOMPLETE": 1,
+        "QUALITY_BLOCKED": 1,
         "UNSUPPORTED": 1,
+        "UNAVAILABLE": 1,
     }
     assert {item.reason: item.count for item in summary.exclusion_counts} == {
+        "FUTURE_OBSERVATION": 1,
         "INCOMPLETE": 1,
+        "QUALITY_BLOCKED": 1,
         "UNSUPPORTED": 1,
+        "UNAVAILABLE": 1,
     }
     assert "btts" not in serialized
     assert "TOTALS_INCOMPLETE" not in serialized
@@ -281,6 +418,215 @@ def test_post_decision_market_evidence_is_excluded(repository_root, tmp_path) ->
         dict((item.reason, item.count) for item in affected.exclusion_counts)["FUTURE_OBSERVATION"]
         >= 2
     )
+
+
+@pytest.mark.parametrize("fallback", (False, True), ids=("market", "bookmaker-fallback"))
+@pytest.mark.parametrize(
+    ("offset_seconds", "expected_operators"),
+    ((-1, 2), (0, 2), (1, 1)),
+    ids=("before-receipt", "at-receipt", "after-receipt"),
+)
+def test_cmr_ir_003_totals_timestamp_is_bounded_by_receipt(
+    repository_root,
+    tmp_path,
+    fallback: bool,
+    offset_seconds: int,
+    expected_operators: int,
+) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = list(event.bookmakers)
+    book = books[0]
+    totals = list(book.totals_markets)
+    observed_at = context.odds_input.temporal.received_at + timedelta(seconds=offset_seconds)
+    book_updates: dict[str, object] = {}
+    if fallback:
+        totals[1] = totals[1].model_copy(
+            update={
+                "provider_last_update": None,
+                "provider_last_update_state": "NOT_PUBLISHED",
+            }
+        )
+        book_updates.update(
+            {
+                "provider_last_update": observed_at,
+                "age_at_receipt_seconds": max(0, -offset_seconds),
+            }
+        )
+    else:
+        totals[1] = totals[1].model_copy(update={"provider_last_update": observed_at})
+    book_updates["totals_markets"] = tuple(totals)
+    books[0] = book.model_copy(update=book_updates)
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    view, _request, result = build_from_context(changed)
+    affected = _fixture_for_event(result, view, changed, 0)
+    consensus = next(item for item in affected.totals_consensuses if item.line == Decimal("2.5"))
+
+    assert consensus.eligible_operator_count == expected_operators
+    exclusions = {item.reason: item.count for item in affected.exclusion_counts}
+    if offset_seconds > 0:
+        assert exclusions["FUTURE_OBSERVATION"] >= 1
+
+
+def test_cmr_ir_003_future_alias_cannot_displace_valid_older_alias(
+    repository_root, tmp_path
+) -> None:
+    context, view, _request, _result = build_market_context(repository_root, tmp_path)
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = list(event.bookmakers)
+    totals = list(books[0].totals_markets)
+    totals[1] = totals[1].model_copy(
+        update={
+            "provider_last_update": context.odds_input.temporal.received_at + timedelta(seconds=1)
+        }
+    )
+    books[0] = books[0].model_copy(update={"totals_markets": tuple(totals)})
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    first, second = view.operators
+    alias_view = rehash_identity_view(
+        view,
+        operators=(
+            first,
+            second.model_copy(
+                update={
+                    "canonical_operator_id": first.canonical_operator_id,
+                    "canonical_operator_key": first.canonical_operator_key,
+                }
+            ),
+        ),
+    )
+    _view, _request, result = build_from_context(changed, alias_view)
+    affected = _fixture_for_event(result, alias_view, changed, 0)
+    consensus = next(item for item in affected.totals_consensuses if item.line == Decimal("2.5"))
+
+    assert consensus.eligible_operator_count == 1
+    assert consensus.operator_markets[0].observed_at == (
+        books[1].totals_markets[1].provider_last_update
+    )
+    assert {item.reason: item.count for item in affected.exclusion_counts}[
+        "FUTURE_OBSERVATION"
+    ] >= 1
+
+
+def test_cmr_ir_003_all_future_aliases_contribute_nothing(repository_root, tmp_path) -> None:
+    context, view, _request, _result = build_market_context(repository_root, tmp_path)
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = []
+    future_at = context.odds_input.temporal.received_at + timedelta(seconds=1)
+    for book in event.bookmakers:
+        totals = list(book.totals_markets)
+        totals[1] = totals[1].model_copy(update={"provider_last_update": future_at})
+        books.append(book.model_copy(update={"totals_markets": tuple(totals)}))
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    first, second = view.operators
+    alias_view = rehash_identity_view(
+        view,
+        operators=(
+            first,
+            second.model_copy(
+                update={
+                    "canonical_operator_id": first.canonical_operator_id,
+                    "canonical_operator_key": first.canonical_operator_key,
+                }
+            ),
+        ),
+    )
+    _view, _request, result = build_from_context(changed, alias_view)
+    affected = _fixture_for_event(result, alias_view, changed, 0)
+
+    assert Decimal("2.5") not in {item.line for item in affected.totals_consensuses}
+    assert {item.reason: item.count for item in affected.exclusion_counts}[
+        "FUTURE_OBSERVATION"
+    ] == 2
+
+
+def test_totals_tied_alias_conflict_excludes_operator_line(repository_root, tmp_path) -> None:
+    context, view, _request, _result = build_market_context(repository_root, tmp_path)
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = list(event.bookmakers)
+    totals = list(books[1].totals_markets)
+    tied_at = books[0].totals_markets[1].provider_last_update
+    totals[1] = totals[1].model_copy(update={"provider_last_update": tied_at})
+    books[1] = books[1].model_copy(update={"totals_markets": tuple(totals)})
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    first, second = view.operators
+    alias_view = rehash_identity_view(
+        view,
+        operators=(
+            first,
+            second.model_copy(
+                update={
+                    "canonical_operator_id": first.canonical_operator_id,
+                    "canonical_operator_key": first.canonical_operator_key,
+                }
+            ),
+        ),
+    )
+    _view, _request, result = build_from_context(changed, alias_view)
+    affected = _fixture_for_event(result, alias_view, changed, 0)
+
+    assert Decimal("2.5") not in {item.line for item in affected.totals_consensuses}
+    assert {item.reason: item.count for item in affected.exclusion_counts}["QUALITY_BLOCKED"] >= 2
+
+
+@pytest.mark.parametrize(
+    ("prices", "fallback", "exponent_relation"),
+    (
+        ((Decimal("2.20"), Decimal("2.30")), False, "LT_ONE"),
+        ((Decimal("2"), Decimal("2")), False, "ONE"),
+        ((Decimal("1.000001"), Decimal("1.000002")), True, "NONE"),
+        ((Decimal("1.000000000001"), Decimal("1000000000000")), False, "POSITIVE"),
+    ),
+    ids=("underround", "fair", "fallback", "extreme"),
+)
+def test_binary_totals_critical_power_and_fallback_paths(
+    repository_root,
+    tmp_path,
+    prices: tuple[Decimal, Decimal],
+    fallback: bool,
+    exponent_relation: str,
+) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+
+    def change(bookmaker: CurrentOddsBookmaker) -> CurrentOddsBookmaker:
+        totals = list(bookmaker.totals_markets)
+        market = totals[1]
+        outcomes = tuple(
+            outcome.model_copy(
+                update={"decimal_price": prices[0] if outcome.outcome == "OVER" else prices[1]}
+            )
+            for outcome in market.outcomes
+        )
+        totals[1] = market.model_copy(update={"outcomes": outcomes})
+        return bookmaker.model_copy(update={"totals_markets": tuple(totals)})
+
+    changed = _transform_event(context, 0, change)
+    view, _request, result = build_from_context(changed)
+    consensus = next(
+        item
+        for item in _fixture_for_event(result, view, changed, 0).totals_consensuses
+        if item.line == Decimal("2.5")
+    )
+    assert sum((item.consensus_probability for item in consensus.outcomes), Decimal(0)) == 1
+    for operator in consensus.operator_markets:
+        assert operator.fallback_used is fallback
+        if exponent_relation == "LT_ONE":
+            assert operator.power_exponent is not None and operator.power_exponent < 1
+        elif exponent_relation == "ONE":
+            assert operator.power_exponent == 1
+        elif exponent_relation == "NONE":
+            assert operator.power_exponent is None
+            assert operator.primary_method == "PROPORTIONAL"
+        else:
+            assert operator.power_exponent is not None and operator.power_exponent > 0
 
 
 @pytest.mark.parametrize("invalid_kind", ["H2H_INCOMPLETE", "TOTALS_INCOMPLETE", "QUARTER_LINE"])
@@ -378,6 +724,102 @@ def test_runtime_and_rights_hostile_mutations_fail_before_use(repository_root, t
                 identity_view=view,
             )
         assert caught.value.code == "SOURCE_INVALID"
+
+
+@pytest.mark.parametrize(
+    ("mutation", "value"),
+    (
+        ("PROFILE_ID", "synthetic_unapproved_profile"),
+        ("PROFILE_VERSION", "9.9.9"),
+        ("CONFIG_SHA", "f" * 64),
+    ),
+)
+def test_cmr_ir_006_exact_odds_rights_identity_blocks_stale_and_fresh_requests(
+    repository_root, tmp_path, mutation: str, value: str
+) -> None:
+    context, _view, request, result = build_market_context(repository_root, tmp_path)
+    if mutation == "CONFIG_SHA":
+        changed_odds = context.odds_input.model_copy(
+            update={
+                "provenance": context.odds_input.provenance.model_copy(
+                    update={"rights_config_sha256": value}
+                )
+            }
+        )
+    else:
+        field = "rights_profile_id" if mutation == "PROFILE_ID" else "rights_profile_version"
+        changed_odds = context.odds_input.model_copy(
+            update={"rights": context.odds_input.rights.model_copy(update={field: value})}
+        )
+    changed_source = context.bundle.model_copy(update={"odds_input": changed_odds})
+
+    with pytest.raises(CurrentMarketConstraintError) as stale:
+        CurrentMarketConstraintService().build(
+            request,
+            source=changed_source,
+            identity_view=_view,
+        )
+    assert stale.value.code == ("SOURCE_INVALID" if mutation == "CONFIG_SHA" else "SOURCE_MISMATCH")
+
+    changed_request = bind_current_market_constraint_request(changed_source, _view)
+    assert changed_request.odds_rights_sha256 != request.odds_rights_sha256
+    with pytest.raises(CurrentMarketConstraintError) as fresh:
+        CurrentMarketConstraintService().build(
+            changed_request,
+            source=changed_source,
+            identity_view=_view,
+        )
+    assert fresh.value.code == ("SOURCE_INVALID" if mutation == "CONFIG_SHA" else "RIGHTS_BLOCKED")
+    surfaces = (
+        str(fresh.value),
+        repr(fresh.value),
+        json.dumps(fresh.value.as_error_object(), sort_keys=True),
+    )
+    assert all(value not in surface for surface in surfaces)
+    assert result.lineage.odds_rights_sha256 == current_odds_rights_sha256(context.bundle)
+
+
+@pytest.mark.parametrize("authority_defect", ("PROVIDER", "STATUS"))
+def test_cmr_ir_006_packaged_profile_must_be_provider_matched_and_human_approved(
+    repository_root, tmp_path, monkeypatch, authority_defect: str
+) -> None:
+    context, view, request, _result = build_market_context(repository_root, tmp_path)
+    profile = load_rights_profiles()["the_odds_api_private_analytics_v1"]
+    if authority_defect == "PROVIDER":
+        profile = profile.model_copy(update={"provider_key": "synthetic_wrong_provider"})
+    else:
+        profile = profile.model_copy(update={"status": RightsProfileStatus.DRAFT})
+    monkeypatch.setattr(
+        current_market_module,
+        "load_rights_profiles",
+        lambda: {"the_odds_api_private_analytics_v1": profile},
+    )
+
+    with pytest.raises(CurrentMarketConstraintError) as caught:
+        CurrentMarketConstraintService().build(
+            request,
+            source=context.bundle,
+            identity_view=view,
+        )
+
+    assert caught.value.code == "SOURCE_INVALID"
+    assert "synthetic_wrong_provider" not in str(caught.value)
+
+
+def test_cmr_ir_006_required_odds_effective_right_denial_is_safe(repository_root, tmp_path) -> None:
+    context, view, request, _result = build_market_context(repository_root, tmp_path)
+    denied = context.odds_input.rights.model_copy(update={"private_internal_use": "DENY"})
+    hostile_odds = context.odds_input.model_copy(update={"rights": denied})
+    hostile_source = context.bundle.model_copy(update={"odds_input": hostile_odds})
+
+    with pytest.raises(CurrentMarketConstraintError) as caught:
+        CurrentMarketConstraintService().build(
+            request,
+            source=hostile_source,
+            identity_view=view,
+        )
+
+    assert caught.value.code == "SOURCE_INVALID"
 
 
 def test_semantic_result_is_order_independent_where_source_contract_allows(

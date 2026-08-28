@@ -159,6 +159,68 @@ def test_repository_rejects_disagreeing_fpl_and_odds_canonical_fixture(
 
 
 @pytest.mark.parametrize(
+    "failure",
+    (
+        "NO_PROVIDER",
+        "AMBIGUOUS_PROVIDER",
+        "NON_UUID_PROVIDER",
+        "NO_OFFICIAL_FIXTURE",
+        "AMBIGUOUS_OFFICIAL_FIXTURE",
+        "NO_OPERATOR",
+        "AMBIGUOUS_OPERATOR",
+        "INVALID_OPERATOR_KEY",
+    ),
+)
+def test_canonical_repository_no_result_ambiguity_and_invalid_authority_fail_closed(
+    repository_root, tmp_path, failure: str
+) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+    responses, _canonical = _responses(context)
+    if failure == "NO_PROVIDER":
+        responses[0] = []
+    elif failure == "AMBIGUOUS_PROVIDER":
+        responses[0].append(
+            {
+                "provider_id": UUID("00000000-0000-0000-0000-000000029998"),
+                "provider_key": "the_odds_api",
+                "rights_profile_key": "the_odds_api_private_analytics_v1",
+            }
+        )
+    elif failure == "NON_UUID_PROVIDER":
+        responses[0][0]["provider_id"] = "synthetic-not-a-uuid"
+    elif failure == "NO_OFFICIAL_FIXTURE":
+        responses[1] = []
+    elif failure == "AMBIGUOUS_OFFICIAL_FIXTURE":
+        responses[1].append(
+            {
+                "canonical_entity_id": UUID("00000000-0000-0000-0000-000000029997"),
+                "external_identifier_id": UUID("00000000-0000-0000-0000-000000029996"),
+            }
+        )
+    elif failure == "NO_OPERATOR":
+        responses[-1] = []
+    elif failure == "AMBIGUOUS_OPERATOR":
+        responses[-1].append(
+            {
+                "canonical_entity_id": UUID("00000000-0000-0000-0000-000000029995"),
+                "external_identifier_id": UUID("00000000-0000-0000-0000-000000029994"),
+                "operator_key": "SYNTHETIC_AMBIGUOUS",
+            }
+        )
+    else:
+        responses[-1][0]["operator_key"] = ""
+    session = _ReadOnlySession(responses)
+
+    with pytest.raises(CurrentMarketConstraintError) as caught:
+        CurrentMarketCanonicalIdentityRepository(session).resolve(
+            context.bundle,
+            resolved_at=context.bundle.decision_information_at,
+        )
+
+    assert caught.value.code == "CANONICAL_IDENTITY_UNAVAILABLE"
+
+
+@pytest.mark.parametrize(
     "resolved_at",
     [
         datetime(2026, 8, 24, 10, 0),

@@ -104,6 +104,7 @@ _INSTALLED_SMOKE = r"""
 import json
 import socket
 import sys
+from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
 
@@ -118,11 +119,18 @@ socket.socket.connect = blocked
 socket.socket.connect_ex = blocked
 socket.socket.sendto = blocked
 
-from dmf_pulse.ingestion.current_state import CurrentUnifiedStateBundle
+from dmf_pulse.ingestion.current_state import (
+    CurrentUnifiedStateBundle,
+    current_unified_state_semantic_sha256,
+)
+from dmf_pulse.ingestion.odds.current import current_odds_market_semantic_sha256
 from dmf_pulse.markets.current import (
     CurrentMarketCanonicalIdentityView,
+    CurrentMarketConstraintError,
     CurrentMarketConstraintService,
     bind_current_market_constraint_request,
+    current_odds_rights_sha256,
+    current_odds_temporal_sha256,
 )
 
 source = CurrentUnifiedStateBundle.model_validate_json(Path(sys.argv[1]).read_text(encoding="utf-8"))
@@ -147,18 +155,154 @@ summary = result.safe_summary()
 assert summary.fixture_count == 2
 assert summary.market_ready_count == 2
 assert summary.totals_line_count == 4
+assert request.odds_temporal_sha256 == current_odds_temporal_sha256(source)
+assert request.odds_rights_sha256 == current_odds_rights_sha256(source)
+assert result.lineage.odds_temporal_sha256 == request.odds_temporal_sha256
+assert result.lineage.odds_rights_sha256 == request.odds_rights_sha256
 assert result.runtime.persistence_performed is False
 assert result.runtime.database_write_performed is False
 assert result.runtime.network_called is False
 assert "NO_ACCEPTED_CURRENT_SCORE_PRIOR" in result.limitations
+
+temporal = source.odds_input.temporal.model_copy(
+    update={
+        "request_started_at": source.odds_input.temporal.request_started_at
+        - timedelta(seconds=1)
+    }
+)
+temporal_source = source.model_copy(
+    update={"odds_input": source.odds_input.model_copy(update={"temporal": temporal})}
+)
+try:
+    service.build(request, source=temporal_source, identity_view=view)
+except CurrentMarketConstraintError as error:
+    assert error.code == "SOURCE_MISMATCH"
+else:
+    raise AssertionError("installed wheel accepted a stale temporal request")
+temporal_request = bind_current_market_constraint_request(temporal_source, view)
+temporal_result = service.build(
+    temporal_request,
+    source=temporal_source,
+    identity_view=view,
+)
+assert temporal_request.odds_temporal_sha256 != request.odds_temporal_sha256
+assert temporal_result.semantic_sha256 != result.semantic_sha256
+
+wrong_rights = source.odds_input.rights.model_copy(
+    update={"rights_profile_id": "synthetic_unapproved_profile"}
+)
+rights_source = source.model_copy(
+    update={"odds_input": source.odds_input.model_copy(update={"rights": wrong_rights})}
+)
+rights_request = bind_current_market_constraint_request(rights_source, view)
+try:
+    service.build(rights_request, source=rights_source, identity_view=view)
+except CurrentMarketConstraintError as error:
+    assert error.code == "RIGHTS_BLOCKED"
+    assert "synthetic_unapproved_profile" not in str(error)
+    assert "synthetic_unapproved_profile" not in repr(error)
+    assert "synthetic_unapproved_profile" not in json.dumps(error.as_error_object())
+else:
+    raise AssertionError("installed wheel accepted an unapproved rights profile")
+
+def rehash_market_source(changed_odds):
+    provisional_odds = changed_odds.model_copy(update={"market_semantic_sha256": "0" * 64})
+    checked_odds = provisional_odds.model_copy(
+        update={
+            "market_semantic_sha256": current_odds_market_semantic_sha256(provisional_odds)
+        }
+    )
+    lineage = source.lineage.model_copy(
+        update={"odds_market_semantic_sha256": checked_odds.market_semantic_sha256}
+    )
+    provisional_source = source.model_copy(
+        update={
+            "odds_input": checked_odds,
+            "lineage": lineage,
+            "semantic_sha256": "0" * 64,
+        }
+    )
+    return provisional_source.model_copy(
+        update={
+            "semantic_sha256": current_unified_state_semantic_sha256(provisional_source)
+        }
+    )
+
+events = list(source.odds_input.events)
+event = events[0]
+books = list(event.bookmakers)
+market = books[0].markets[0]
+swapped = tuple(
+    outcome.model_copy(
+        update={
+            "outcome": (
+                "AWAY"
+                if outcome.outcome == "HOME"
+                else "HOME"
+                if outcome.outcome == "AWAY"
+                else "DRAW"
+            )
+        }
+    )
+    for outcome in market.outcomes
+)
+books[0] = books[0].model_copy(
+    update={"markets": (market.model_copy(update={"outcomes": swapped}),)}
+)
+events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+orientation_source = rehash_market_source(
+    source.odds_input.model_copy(update={"events": tuple(events)})
+)
+orientation_request = bind_current_market_constraint_request(orientation_source, view)
+try:
+    service.build(orientation_request, source=orientation_source, identity_view=view)
+except CurrentMarketConstraintError as error:
+    assert error.code == "SOURCE_INVALID"
+else:
+    raise AssertionError("installed wheel accepted swapped HOME/AWAY orientation")
+
+events = list(source.odds_input.events)
+event = events[0]
+books = list(event.bookmakers)
+totals = list(books[0].totals_markets)
+totals[1] = totals[1].model_copy(
+    update={
+        "provider_last_update": source.odds_input.temporal.received_at
+        + timedelta(seconds=1)
+    }
+)
+books[0] = books[0].model_copy(update={"totals_markets": tuple(totals)})
+events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+receipt_source = rehash_market_source(
+    source.odds_input.model_copy(update={"events": tuple(events)})
+)
+receipt_request = bind_current_market_constraint_request(receipt_source, view)
+receipt_result = service.build(receipt_request, source=receipt_source, identity_view=view)
+receipt_fixture = next(
+    item
+    for item in receipt_result.fixtures
+    if any(total.line == Decimal("2.5") for total in item.totals_consensuses)
+)
+receipt_total = next(
+    item for item in receipt_fixture.totals_consensuses if item.line == Decimal("2.5")
+)
+assert receipt_total.eligible_operator_count == 1
+assert any(
+    item.reason == "FUTURE_OBSERVATION" and item.count >= 1
+    for item in receipt_fixture.exclusion_counts
+)
 assert not attempts
 print(json.dumps({
     "fixture_count": summary.fixture_count,
     "market_ready_count": summary.market_ready_count,
     "module_path": __import__("dmf_pulse").__file__,
     "network_requests": len(attempts),
+    "orientation_attack": "BLOCKED",
+    "post_receipt_totals": "EXCLUDED",
+    "rights_attack": "BLOCKED",
     "semantic_sha256": result.semantic_sha256,
     "status": "PASS",
+    "temporal_attack": "BLOCKED",
     "totals_line_count": summary.totals_line_count,
 }, sort_keys=True))
 """
