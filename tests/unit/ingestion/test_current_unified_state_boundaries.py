@@ -2,27 +2,40 @@
 
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta
 from uuid import UUID
 
 import pytest
 
+import dmf_pulse.ingestion.current_state as current_state_module
+import dmf_pulse.ingestion.odds.identity as identity_module
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.ingestion.current_state import (
     CurrentUnifiedStateRequest,
     CurrentUnifiedStateService,
     bind_current_unified_state_request,
+    current_fpl_full_representation_sha256,
 )
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.ingestion.fpl.manager_current import current_fpl_catalogue_view_sha256
 from dmf_pulse.ingestion.odds.current import current_odds_market_semantic_sha256
+from dmf_pulse.ingestion.odds.identity import current_fpl_identity_view_sha256
 
-from .current_identity_test_support import rehash_odds_input
-from .current_unified_state_test_support import build_context, verify
+from .current_identity_test_support import (
+    fixture_binding,
+    fixture_plan,
+    rehash_odds_input,
+    resolve_team_map,
+)
+from .current_unified_state_test_support import build_context, mutate_non_view_fpl, verify
 
 
 @pytest.mark.parametrize(
     "field",
     [
         "fpl_input_semantic_sha256",
+        "fpl_full_representation_sha256",
         "fpl_identity_view_sha256",
         "fpl_catalogue_view_sha256",
         "odds_market_semantic_sha256",
@@ -75,6 +88,7 @@ def test_naive_request_cutoff_is_rejected() -> None:
             target_gameweek=2,
             information_cutoff=datetime(2026, 8, 26, 12),
             fpl_input_semantic_sha256="a" * 64,
+            fpl_full_representation_sha256="a" * 64,
             fpl_identity_view_sha256="a" * 64,
             fpl_catalogue_view_sha256="a" * 64,
             odds_market_semantic_sha256="a" * 64,
@@ -353,3 +367,330 @@ def test_manager_runtime_mutations_block(repository_root, tmp_path, field) -> No
     manager = context.manager_state.model_copy(update={"runtime": runtime})
     with pytest.raises(IngestionError):
         verify(context, manager_state=manager)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "player_status",
+        "chance_this_round",
+        "chance_next_round",
+        "player_news",
+        "player_news_added",
+        "game_settings",
+        "non_target_event_finished",
+        "non_target_event_data_checked",
+        "non_target_event_flags",
+        "fixture_finished",
+        "fixture_started",
+        "fixture_finished_provisional",
+    ],
+)
+def test_full_fpl_representation_binds_each_non_view_mutation(
+    repository_root, tmp_path, mutation
+) -> None:
+    context = build_context(repository_root, tmp_path)
+    changed_fpl = mutate_non_view_fpl(context.fpl_input, mutation)
+
+    assert changed_fpl.semantic_sha256 == context.fpl_input.semantic_sha256
+    assert current_fpl_identity_view_sha256(changed_fpl) == (
+        current_fpl_identity_view_sha256(context.fpl_input)
+    )
+    assert current_fpl_catalogue_view_sha256(changed_fpl) == (
+        current_fpl_catalogue_view_sha256(context.fpl_input)
+    )
+    assert current_fpl_full_representation_sha256(changed_fpl) != (
+        current_fpl_full_representation_sha256(context.fpl_input)
+    )
+
+    with pytest.raises(IngestionError, match="request bindings"):
+        CurrentUnifiedStateService().compose(
+            context.request,
+            fpl_input=changed_fpl,
+            odds_input=context.odds_input,
+            identity_map=context.identity_map,
+            manager_state=context.manager_state,
+            ruleset=context.ruleset,
+            capability=context.capability,
+        )
+    with pytest.raises(IngestionError, match="request bindings"):
+        verify(context, fpl_input=changed_fpl)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["player_status", "game_settings", "non_target_event_flags", "fixture_finished"],
+)
+def test_fresh_fpl_rebind_changes_unified_identity(repository_root, tmp_path, mutation) -> None:
+    context = build_context(repository_root, tmp_path)
+    changed_fpl = mutate_non_view_fpl(context.fpl_input, mutation)
+    rebound = bind_current_unified_state_request(
+        changed_fpl,
+        context.odds_input,
+        context.identity_map,
+        context.manager_state,
+        context.ruleset,
+        context.capability,
+    )
+
+    changed_bundle = CurrentUnifiedStateService().compose(
+        rebound,
+        fpl_input=changed_fpl,
+        odds_input=context.odds_input,
+        identity_map=context.identity_map,
+        manager_state=context.manager_state,
+        ruleset=context.ruleset,
+        capability=context.capability,
+    )
+
+    assert rebound.fpl_full_representation_sha256 != (
+        context.request.fpl_full_representation_sha256
+    )
+    assert changed_bundle.lineage.fpl_full_representation_sha256 != (
+        context.bundle.lineage.fpl_full_representation_sha256
+    )
+    assert changed_bundle.semantic_sha256 != context.bundle.semantic_sha256
+
+
+def test_nonsemantic_fpl_catalogue_order_does_not_change_full_digest(
+    repository_root, tmp_path
+) -> None:
+    context = build_context(repository_root, tmp_path)
+    reordered = context.fpl_input.model_copy(
+        update={
+            "events": tuple(reversed(context.fpl_input.events)),
+            "teams": tuple(reversed(context.fpl_input.teams)),
+            "positions": tuple(reversed(context.fpl_input.positions)),
+            "players": tuple(reversed(context.fpl_input.players)),
+            "fixtures": tuple(reversed(context.fpl_input.fixtures)),
+        }
+    )
+
+    assert current_fpl_full_representation_sha256(reordered) == (
+        current_fpl_full_representation_sha256(context.fpl_input)
+    )
+
+
+def _assert_safe_reconstruction_error(
+    error: IngestionError, *, expected_message: str, forbidden: tuple[object, ...]
+) -> None:
+    assert error.code == "MAPPING_CONFLICT"
+    assert error.message == expected_message
+    assert error.details == {}
+    public_surfaces = "\n".join(
+        (
+            json.dumps(error.as_error_object(), sort_keys=True),
+            str(error),
+            repr(error),
+        )
+    )
+    for value in forbidden:
+        assert str(value) not in public_surfaces
+
+
+@pytest.mark.parametrize(
+    ("upstream_name", "private_value"),
+    [
+        ("bind_current_team_resolution_request", "FPL-TEAM-PRIVATE-700001"),
+        ("resolve_current_team_identities", "PROVIDER-TEAM-PRIVATE-700002"),
+        ("bind_current_fixture_resolution_request", "PROVIDER-EVENT-PRIVATE-700003"),
+        ("resolve_current_fixture_identities", "FPL-FIXTURE-PRIVATE-700004"),
+    ],
+)
+def test_identity_reconstruction_errors_are_detail_free(
+    repository_root, tmp_path, monkeypatch, upstream_name, private_value
+) -> None:
+    context = build_context(repository_root, tmp_path)
+
+    def fail_reconstruction(*args, **kwargs):
+        raise IngestionError(
+            "QUALITY_BLOCKED",
+            f"upstream leaked {private_value}",
+            details={"private_source_value": private_value},
+        )
+
+    monkeypatch.setattr(current_state_module, upstream_name, fail_reconstruction)
+    with pytest.raises(IngestionError) as captured:
+        CurrentUnifiedStateService().compose(
+            context.request,
+            fpl_input=context.fpl_input,
+            odds_input=context.odds_input,
+            identity_map=context.identity_map,
+            manager_state=context.manager_state,
+            ruleset=context.ruleset,
+            capability=context.capability,
+        )
+    _assert_safe_reconstruction_error(
+        captured.value,
+        expected_message="FPL/Odds identity reconstruction failed",
+        forbidden=(private_value,),
+    )
+
+
+def test_incomplete_fixture_coverage_hides_upstream_fixture_id(
+    repository_root, tmp_path, monkeypatch
+) -> None:
+    context = build_context(repository_root, tmp_path)
+    source_fixture = next(
+        fixture
+        for fixture in context.fpl_input.fixtures
+        if fixture.event_identity == context.fpl_input.target_event.identity
+    )
+    synthetic_fixture_id = 900103
+    identity_material = source_fixture.identity.model_dump(
+        mode="json", exclude={"canonical_lookup_sha256"}
+    )
+    identity_material["external_id_text"] = str(synthetic_fixture_id)
+    changed_identity = source_fixture.identity.model_copy(
+        update={
+            "external_id_text": str(synthetic_fixture_id),
+            "canonical_lookup_sha256": canonical_sha256(identity_material),
+        }
+    )
+    extra_fixture = source_fixture.model_copy(
+        update={
+            "identity": changed_identity,
+            "provider_fixture_id": synthetic_fixture_id,
+            "provider_code": synthetic_fixture_id,
+            "kickoff_at": source_fixture.kickoff_at + timedelta(hours=2),
+        }
+    )
+    changed_fpl = context.fpl_input.model_copy(
+        update={"fixtures": (*context.fpl_input.fixtures, extra_fixture)}
+    )
+    team_plan = context.identity_map.team_alias_plan
+    changed_team_map = resolve_team_map(changed_fpl, context.odds_input, team_plan)
+    changed_fixture_plan = fixture_plan(
+        changed_fpl,
+        context.odds_input,
+        team_plan,
+        bindings=(
+            fixture_binding(
+                changed_fpl,
+                context.odds_input,
+                team_plan,
+                fixture=source_fixture,
+            ),
+        ),
+    )
+    provisional_identity_map = context.identity_map.model_copy(
+        update={
+            "fpl_identity_view_sha256": current_fpl_identity_view_sha256(changed_fpl),
+            "team_identity_map_semantic_sha256": changed_team_map.semantic_sha256,
+            "fixture_mapping_plan": changed_fixture_plan,
+            "fixture_mapping_plan_sha256": changed_fixture_plan.sha256,
+        }
+    )
+    provisional_identity_map = provisional_identity_map.model_copy(
+        update={
+            "source_lineage_sha256": identity_module._identity_source_lineage_sha256(
+                provisional_identity_map
+            )
+        }
+    )
+    provisional_identity_map = provisional_identity_map.model_copy(
+        update={
+            "semantic_sha256": identity_module._fpl_odds_identity_map_sha256(
+                provisional_identity_map
+            )
+        }
+    )
+    changed_identity_map = type(context.identity_map).model_validate(
+        provisional_identity_map.model_dump(mode="python")
+    )
+    rebound = bind_current_unified_state_request(
+        changed_fpl,
+        context.odds_input,
+        changed_identity_map,
+        context.manager_state,
+        context.ruleset,
+        context.capability,
+    )
+    original_resolver = current_state_module.resolve_current_fixture_identities
+    internal_error_text = ""
+
+    def observe_internal_error(*args, **kwargs):
+        nonlocal internal_error_text
+        try:
+            return original_resolver(*args, **kwargs)
+        except IngestionError as error:
+            internal_error_text = json.dumps(error.as_error_object(), sort_keys=True)
+            raise
+
+    monkeypatch.setattr(
+        current_state_module, "resolve_current_fixture_identities", observe_internal_error
+    )
+    with pytest.raises(IngestionError) as captured:
+        CurrentUnifiedStateService().compose(
+            rebound,
+            fpl_input=changed_fpl,
+            odds_input=context.odds_input,
+            identity_map=changed_identity_map,
+            manager_state=context.manager_state,
+            ruleset=context.ruleset,
+            capability=context.capability,
+        )
+
+    assert str(synthetic_fixture_id) in internal_error_text
+    _assert_safe_reconstruction_error(
+        captured.value,
+        expected_message="FPL/Odds identity reconstruction failed",
+        forbidden=(synthetic_fixture_id,),
+    )
+
+
+@pytest.mark.parametrize(
+    ("failure_class", "private_values"),
+    [
+        (
+            "catalogue-source",
+            (
+                "FPL-PLAYER-PRIVATE-800001",
+                "PURCHASE-PRICE-PRIVATE-800002",
+                "SELLING-PRICE-PRIVATE-800003",
+                "BANK-PRIVATE-800004",
+                "FT-PRIVATE-800005",
+            ),
+        ),
+        (
+            "rules",
+            (
+                "CAPTAIN-PRIVATE-800006",
+                "VICE-PRIVATE-800007",
+                "BENCH-PRIVATE-800008",
+                "CHIP-TOKEN-PRIVATE-800009",
+                "OPERATOR-REFERENCE-PRIVATE-800010",
+            ),
+        ),
+    ],
+)
+def test_manager_reconstruction_errors_are_detail_free(
+    repository_root, tmp_path, monkeypatch, failure_class, private_values
+) -> None:
+    context = build_context(repository_root, tmp_path)
+
+    def fail_manager_verify(*args, **kwargs):
+        raise IngestionError(
+            "VALIDATION_FAILED",
+            f"upstream {failure_class} leaked {private_values[0]}",
+            details={f"private_{index}": value for index, value in enumerate(private_values)},
+        )
+
+    monkeypatch.setattr(
+        current_state_module.CurrentManagerStateService, "verify", fail_manager_verify
+    )
+    with pytest.raises(IngestionError) as captured:
+        CurrentUnifiedStateService().compose(
+            context.request,
+            fpl_input=context.fpl_input,
+            odds_input=context.odds_input,
+            identity_map=context.identity_map,
+            manager_state=context.manager_state,
+            ruleset=context.ruleset,
+            capability=context.capability,
+        )
+    _assert_safe_reconstruction_error(
+        captured.value,
+        expected_message="current manager reconstruction failed",
+        forbidden=private_values,
+    )

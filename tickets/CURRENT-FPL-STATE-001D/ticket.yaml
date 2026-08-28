@@ -51,4 +51,4 @@ required_public_behavior:
   - complete target fixture coverage while allowing unrelated outside-target Odds events
   - conservative composite rights with distinct FPL and Odds automated-access authority
   - deterministic composition hash, nested tamper verification, and disclosure-safe summary
-acceptance_status: CURRENT_FPL_STATE_001D_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW
+acceptance_status: CURRENT_FPL_STATE_001D_REMEDIATED_PENDING_INDEPENDENT_REREVIEW

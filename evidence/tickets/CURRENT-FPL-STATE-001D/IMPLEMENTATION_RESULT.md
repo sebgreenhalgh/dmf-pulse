@@ -1,118 +1,115 @@
-# CURRENT-FPL-STATE-001D engineering result
+# CURRENT-FPL-STATE-001D engineering and remediation result
 
-## 1. Git
+## 1. Git chronology
 
-- Parent: `716ea3a90c8893081bfebce400020b07ce95a463`.
+- Architectural parent: `716ea3a90c8893081bfebce400020b07ce95a463`.
+- Deficient independently reviewed commit: `049753583053245d6ffce4c1f37da09724b59103`.
+- Deficient tree: `d84f153cbc996d09382a7fc4a5c80edf935fb172`.
+- Deficient exact-SHA CI: run `33123304133`.
+- Independent verdict: `CURRENT_FPL_STATE_001D_REMEDIATION_REQUIRED`.
 - Branch: `integration/current-fpl/CURRENT-FPL-STATE-001D-unified-current-state`.
-- Historical donor: `d4cc759d4600489c21ba738cfc9b357cc380554e` (inspection only).
-- Final HEAD and exact-SHA CI: pending the authorized final commit and push.
+- Remediation commit: `FINAL_REMEDIATION_COMMIT_CONTAINING_THIS_EVIDENCE`; its exact Git SHA is
+  reported by the final handoff because a commit cannot contain its own content-addressed SHA.
+- Exact-SHA remediation CI remains externally observable after push; no post-CI evidence commit is
+  permitted.
 
-## 2. Components
+## 2. Independent findings
 
-`dmf_pulse.ingestion.current_state` provides a strict path-free request, lineage, conservative
-rights, runtime boundary, private bundle, safe summary, deterministic semantic helper, binder,
-and compose/verify service. It embeds all four accepted current source objects unchanged and
-accepts exact rules/capability inputs only for verification and lineage.
+`CFSC-001D-IR-001` (P1) and `CFSC-001D-IR-002` (material P2) were found by independent review of
+`049753...`, not by the original same-agent self-review. Both are closed by the remediation commit
+containing this evidence, subject to independent re-review.
 
-## 3. Common context
+## 3. CFSC-001D-IR-001 remediation
 
-Competition, season, positive target Gameweek, target identity, and deadline come from accepted
-FPL state. FPL, Odds, identity-map, manager, and request cutoffs must be exactly equal. The
-decision-information time is the maximum of FPL usability, Odds usability, mapping decision, and
-manager usability and must be no later than cutoff. GW2 and strict pre-deadline cutoff pass.
+`current_fpl_full_representation_sha256` now canonically hashes the complete materialized accepted
+`CurrentFplInputBundle`, including all events, teams, positions, players, fixtures, game settings,
+provenance, rights, quality, and existing semantic/provenance hashes. Only accepted 001A
+identity-keyed catalogue order is normalized. The digest is bound independently into the 001D
+request and lineage, so it also changes the unified semantic SHA.
 
-## 4. FPL lineage
+This is a local 001D representation-integrity binding. It does not authenticate official FPL,
+replace 001A acquisition semantics, prove manually captured facts true, or authorize automated
+official-FPL access. Accepted 001A source code is unchanged.
 
-The accepted FPL bundle is structurally revalidated through current contracts and manager
-verification. Its bundle semantic, accepted 001B identity view, accepted 001C catalogue view,
-target identity, provider configuration, and rights configuration digests are bound. Exact manual,
-private, transient and no-storage/no-transport rights remain fail closed.
+The hostile matrix proves every independently reported non-view class changes the new digest:
+player status, both chance fields, news, news time, canonical game settings, non-target event
+finished/data-checked/state flags, and fixture finished/started/provisional state. A stale request
+and substituted external family block. Freshly rebound valid objects compose with a different
+unified SHA. The same mutations remain blocked after an attacker updates both nested lineage and
+the top-level semantic SHA.
 
-## 5. Odds lineage
+## 4. CFSC-001D-IR-002 remediation
 
-The accepted Odds input is model-revalidated. Market semantics are recomputed and bound separately
-from the accepted 001B event-identity view and acquisition-provenance digest. Accepted private-use
-rights, raw-retention zero, public/redistribution/backup/model-training denials, quality, quota,
-temporal, and provider-native identity contracts remain intact.
+Every upstream team/fixture binding and identity-resolution `IngestionError` is translated at the
+001D boundary to detail-free `MAPPING_CONFLICT` / `FPL/Odds identity reconstruction failed`.
+`CurrentManagerStateService.verify` failures are translated to detail-free `MAPPING_CONFLICT` /
+`current manager reconstruction failed`. Safe 001D-native classifications remain unchanged.
 
-## 6. Identity bridge
+Tests serialize `as_error_object()` and inspect `str` and `repr`. They cover all four identity
+calls, real incomplete target-fixture coverage whose internal details contain synthetic fixture
+ID `900103`, and manager catalogue/source and rule reconstruction failures. No upstream details,
+IDs, provider strings, market or manager-private values survive the public boundary.
 
-001D independently reconstructs the complete 001B bridge from the exact FPL/Odds sources and the
-embedded approved team/fixture plans, then requires exact result equality. Complete target fixture
-coverage, exact home/away/kickoff/identity, observed participant authority, unrelated outside
-events, and target-collision ambiguity behavior are therefore inherited without weakening.
+## 5. Preserved source behavior
 
-## 7. Manager
+GW2+, strict pre-deadline cutoff, unrelated Odds events, complete target coverage, exact
+home/away/kickoff authority, Odds market and acquisition-provenance bindings, accepted identity
+and manager reconstruction, ACTIVE FULL_SEASON rules, `OPERATOR_DECLARED`, `HUMAN_ATTESTED`,
+`NOT_PROVIDER_VERIFIED`, and transient/private/non-persistent runtime behavior remain unchanged.
+The accepted reduced 001B identity and 001C catalogue view contracts remain separate and tested.
 
-001D model-revalidates 001C and invokes `CurrentManagerStateService.verify` with the exact supplied
-FPL bundle, ACTIVE ruleset, and FULL_SEASON capability. It also cross-checks every squad member's
-element ID, player/team identity, position, current price, and source semantic against FPL. Manager
-facts remain human-attested and not provider-verified; no ownership history adapter is created.
+## 6. Rights and scope
 
-## 8. Rights/runtime
+FPL automated access remains denied. No source acquisition, provider call, database or persistence
+by 001D, market normalisation, availability/minutes model, football-event or points model,
+optimisation, orchestration, Decision Bundle, production activation, PR, merge, independent
+re-review, or human acceptance is implemented or claimed.
 
-FPL automated access remains DENY while accepted Odds automated access remains ALLOW. Whole-bundle
-private/transient use is allowed; persistent/raw/derived storage, cache, backup, public display,
-and redistribution are denied. Storage is `TRANSIENT_IN_MEMORY`; persistence, database, and
-network flags are false.
+## 7. Focused acceptance
 
-## 9. Semantics
+- Focused suite: **114 passed**.
+- Branch-aware focused coverage: **94.46640316205534%** overall (**94% displayed**), 220/227
+  statements and 19/26 branches; `>=90%`: **PASS**.
+- Newly required digest canonicalization, request mismatch, external verify mismatch, identity
+  upstream translation, and manager upstream translation paths are exercised.
 
-The unified semantic digest binds source semantic/provenance identities, target context,
-deadline/cutoff/readiness, identity and manager lineage, rules/capability/selling/chip lineage,
-effective rights/runtime, and limitations. It contains no paths and ignores incidental accepted
-source ordering. `verify` validates the outer object, reconstructs from exact external sources,
-and compares the full expected result.
+## 8. Inherited acceptance
 
-## 10. Disclosure
+- Accepted 001A/001B/001C population: 218 passed.
+- Accepted LIVE-ODDS population: 223 passed.
+- Current rules: 151 passed.
+- Broad Stage-11 population: 322 passed.
+- Broad Stage-14 chips population: 405 passed.
+- PostgreSQL 18.4 integration population: 126 passed, 140 deselected.
+- Migration/data-preservation matrix: PASS through revision `20260807_0006`.
+- 001D product code remained network-free, database-free, and non-persistent.
 
-The safe summary exposes only bounded status/classes, times, counts, coverage, semantic hashes,
-and effective rights/runtime. It excludes every private/provider-specific fact listed in the
-ticket. All committed current-state fixtures are synthetic.
+## 9. Static, build, and installed wheel
 
-## 11. Scope
+Frozen sync checked 40 packages. Diff hygiene, Ruff format/lint, and mypy over 251 source files
+pass. The approved host build produced the sdist and 292-member wheel after Windows sandbox
+application control denied the launcher before execution. Generic, ODD-005, and GCS-008 clean
+wheel verification pass; ODD-005 made zero network requests.
 
-No acquisition, provider call, database/persistence, market normalisation, availability/minutes,
-football-event or points model, optimisation, orchestration, Decision Bundle, production
-activation, PR, merge, or human acceptance is implemented or claimed.
+A separate offline environment outside the source tree imported
+`dmf_pulse.ingestion.current_state` from installed `site-packages` and passed full FPL
+representation binding, stale-request rejection, fresh-rebind changed identity, compose, verify,
+and safe identity-error translation.
 
-## 12. Focused tests
+## 10. Evidence and status
 
-- Unified-state matrix: **77 passed**.
-- Branch-aware executable-surface coverage: **94.09282700421942%** overall (**94% displayed**),
-  204/211 statements and 19/26 branches; gate `>=90%`: **PASS**.
-- GW2+, two-target coverage, future events, source families, rights, time, semantics, disclosure,
-  ordering, rules, nested tamper, and effective storage boundaries: **PASS**.
+Canonical CURRENT-FPL-STATE-001D and authorized mutable PRC-013 manifests, repository validation,
+and secret scanning are sealed after final evidence content. Independent findings remain explicit;
+the original deficient commit is not amended or rewritten.
 
-## 13. Inherited
+Same-agent remediation review records unresolved P0 = 0, P1 historical/closed/unresolved =
+1/1/0, material P2 historical/closed/unresolved = 1/1/0, and unresolved P3 = 0. Independent
+re-review remains required.
 
-- Accepted FPL/identity/manager population: 218 passed.
-- LIVE-ODDS population: 223 passed.
-- Current rules, Stage-11 transfer-state, and Stage-14 chips population: 609 passed.
-- PostgreSQL 18.4 inherited acceptance: 126 passed, 140 deselected; migration matrix PASS.
-- 001D product code remained database-free.
+Status after exact-SHA CI is green:
 
-## 14. Static/build/security
+`CURRENT_FPL_STATE_001D_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`
 
-Frozen sync, diff, Ruff, mypy, build, three clean-wheel checks, direct installed-wheel 001D import,
-repository validation, canonical manifests, and secret scan are recorded in the final command
-ledger.
+Next action:
 
-## 15. Final actions
-
-Canonical manifests bind 1,178 deliverables; repository validation and secret scanning return
-zero findings. The exact final commit/push and observation of all automatic CI jobs for that exact
-SHA remain. No post-green-CI commit is permitted.
-
-## 16. Findings
-
-Same-agent adversarial self-review has unresolved P0 = 0, P1 = 0, material P2 = 0, and P3 = 0.
-Independent review has not been performed or claimed.
-
-## 17. Status
-
-`CURRENT_FPL_STATE_001D_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
-
-## 18. Next action
-
-`INDEPENDENT_REVIEW_CURRENT_FPL_STATE_001D`
+`INDEPENDENT_REREVIEW_CURRENT_FPL_STATE_001D`

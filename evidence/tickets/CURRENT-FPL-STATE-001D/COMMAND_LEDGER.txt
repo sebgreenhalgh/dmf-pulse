@@ -53,3 +53,64 @@ Date: 2026-08-27
 No provider call, real credential, real current source/manager/mapping/market data, product
 database access, persistence, model/optimiser run, PR, merge, human acceptance, or production
 activation was performed or claimed.
+
+Independent-review remediation rerun: 2026-08-28
+
+R1. git fetch origin --prune; pinned ref, ancestry, branch, and worktree inspection
+    PASS: origin/main=716ea3...; origin branch/HEAD=049753...; merge-base=716ea3...; ahead 1,
+    behind 0; clean existing branch. The deficient commit was not amended or rewritten.
+R2. CFSC-001D-IR-001 implementation and hostile regression matrix
+    PASS: complete materialized 001A object representation is canonically bound into request,
+    lineage, unified semantics, compose, and verify without changing accepted 001A code.
+R3. CFSC-001D-IR-002 implementation and serialized disclosure matrix
+    PASS: all identity binding/resolution and manager-service upstream failures translate to
+    generic detail-free errors; actual internal incomplete coverage contained synthetic fixture
+    ID 900103 while public as_error_object/str/repr did not.
+R4. Focused CURRENT-FPL-STATE-001D tests and branch-aware coverage
+    PASS: 114 passed; 94.46640316205534% overall branch-aware coverage (94% displayed), 220/227
+    statements and 19/26 branches. New canonicalization, request mismatch, external verify
+    mismatch, identity translation, and manager translation paths were exercised.
+R5. Accepted 001A/001B/001C population
+    PASS: 218 passed.
+R6. Accepted LIVE-ODDS population
+    PASS: exact non-database matrix 223 passed.
+    INVOCATION NOTE: a preliminary broader selection included PostgreSQL LIVE-ODDS files before
+    the test database environment was started; 244 tests passed and 16 fixtures failed only for
+    missing DMF_TEST_DATABASE_URL. The exact matrix then passed, and the database files passed in
+    the dedicated PostgreSQL gate below.
+R7. Current-rules, Stage-11, and Stage-14 inherited populations
+    PASS: rules 151; broad Stage-11 322; broad Stage-14 405.
+R8. PostgreSQL 18.4 and migration/data-preservation acceptance
+    PASS: migration matrix from 20260803_0005 through 20260807_0006; metadata drift clean;
+    PostgreSQL selection 126 passed and 140 deselected in 209.09 seconds. 001D remained DB-free.
+    INVOCATION NOTE: the first migration-matrix call omitted its required baseline argument and
+    exited at argument parsing before schema work; the pinned-baseline rerun passed.
+R9. uv sync --all-groups --frozen
+    PASS: 40 packages checked.
+R10. git diff --check; uv run ruff format --check .; uv run ruff check .
+     PASS: diff clean; 666 files formatted; lint clean before evidence sealing.
+R11. uv run mypy src/dmf_pulse
+     PASS: 251 source files.
+R12. uv build
+     HOST_BOUNDARY/PASS: Windows sandbox application control denied the launcher before execution;
+     the identical approved host command built the sdist and wheel.
+R13. generic, ODD-005, and GCS-008 installed-wheel verification
+     PASS: generic HEALTHY with 292 wheel members; ODD-005 zero network requests; GCS-008 all 292
+     record members and required resources verified.
+R14. direct offline installed-wheel 001D exercise outside the source tree
+     PASS: current_state imported from site-packages; full representation digest, stale request,
+     fresh rebind, compose, verify, and safe error translation passed without network.
+     INVOCATION NOTE: the first probe lost quotes through PowerShell native argument marshalling;
+     the second used Python-mode validation on JSON-decoded strict models. Both failed before
+     product assertions. Base64 argument transport plus strict model_validate_json then passed,
+     and every temporary environment was removed.
+R15. final evidence, canonical manifests, repository validation, and secret scan
+     PASS: both authorized manifests bind 1,178 deliverables; repository validation returned zero
+     errors and secret scanning returned zero findings.
+R16. descendant remediation commit/push and exact-SHA automatic CI
+     PENDING; no post-green-CI evidence commit is permitted.
+
+No real provider request, credential, current source fact, manager fact, mapping, or market value
+was used. No product database access, persistence, current-data modelling/optimisation, PR, merge,
+human acceptance, or production activation was performed or claimed by the remediation; only
+synthetic inherited optimisation tests were executed.

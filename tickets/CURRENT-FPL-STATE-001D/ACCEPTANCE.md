@@ -10,6 +10,7 @@ and disclosure-minimized. No source acquisition, real current data, market norma
 modelling, optimisation, orchestration, production activation, PR, merge, or human acceptance is
 authorized.
 
-The only clean engineering status is:
+After the independently reported P1 and material-P2 findings are closed and the exact remediation
+SHA passes automatic CI, the only clean engineering status is:
 
-`CURRENT_FPL_STATE_001D_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
+`CURRENT_FPL_STATE_001D_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`

@@ -1299,3 +1299,21 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Complete frozen sync, static, build, clean-wheel, repository, manifest, and secret gates.
 - [ ] Commit and push one exact final SHA, observe its automatic CI fully green, and hand off for
   independent review without a post-CI commit.
+
+### CURRENT-FPL-STATE-001D independent-review remediation
+
+- [x] Preserve deficient reviewed SHA `049753583053245d6ffce4c1f37da09724b59103` as the
+  direct remediation parent and verify the pinned remote refs, merge-base, ancestry, and clean
+  worktree.
+- [x] Close `CFSC-001D-IR-001` locally at the 001D boundary with a canonical full materialized
+  FPL object representation digest bound independently into request, lineage, unified identity,
+  composition, and external verification.
+- [x] Close `CFSC-001D-IR-002` locally at the 001D boundary by translating upstream identity and
+  manager reconstruction failures to generic detail-free public errors.
+- [x] Add the complete hostile non-view FPL mutation/rebind matrix and serialized identity/manager
+  disclosure regressions while preserving the reduced identity and catalogue view contracts.
+- [x] Correct current-ticket evidence without rewriting chronology, regenerate only the
+  authorized CURRENT-FPL-STATE-001D and PRC-013 manifests, and rerun every focused, inherited,
+  PostgreSQL, static, build, installed-wheel, repository, and security gate.
+- [ ] Commit and push one descendant remediation SHA, require exact-SHA automatic CI fully green,
+  and hand off for independent re-review without a post-CI commit.

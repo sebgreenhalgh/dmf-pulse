@@ -66,6 +66,31 @@ class _FrozenModel(BaseModel):
 Sha256 = str
 
 
+def current_fpl_full_representation_sha256(value: CurrentFplInputBundle) -> str:
+    """Bind the complete materialized 001A object supplied to this 001D boundary.
+
+    This local integrity digest neither authenticates official FPL nor replaces 001A's
+    acquisition/source semantic digest. The accepted 001A catalogues are identity-keyed, so their
+    construction order is non-semantic and is normalized before canonical hashing.
+    """
+
+    payload = value.model_dump(mode="json")
+    payload["events"] = sorted(payload["events"], key=lambda item: item["provider_event_id"])
+    payload["teams"] = sorted(payload["teams"], key=lambda item: item["provider_team_id"])
+    payload["positions"] = sorted(
+        payload["positions"],
+        key=lambda item: (item["canonical_position"], item["provider_element_type_id"]),
+    )
+    payload["players"] = sorted(payload["players"], key=lambda item: item["provider_element_id"])
+    payload["fixtures"] = sorted(payload["fixtures"], key=lambda item: item["provider_fixture_id"])
+    return canonical_sha256(
+        {
+            "contract_version": "current-unified-state-fpl-full-representation-v1",
+            "fpl_input": payload,
+        }
+    )
+
+
 class CurrentUnifiedStateRequest(_FrozenModel):
     """Path-free binding of every accepted source needed by the composition."""
 
@@ -73,6 +98,7 @@ class CurrentUnifiedStateRequest(_FrozenModel):
     target_gameweek: int = Field(gt=0)
     information_cutoff: datetime
     fpl_input_semantic_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
+    fpl_full_representation_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
     fpl_identity_view_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
     fpl_catalogue_view_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
     odds_market_semantic_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
@@ -92,6 +118,7 @@ class CurrentUnifiedStateRequest(_FrozenModel):
 
 class CurrentUnifiedStateLineage(_FrozenModel):
     fpl_input_semantic_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
+    fpl_full_representation_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
     fpl_identity_view_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
     fpl_catalogue_view_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
     fpl_provider_config_sha256: Sha256 = Field(pattern=r"^[0-9a-f]{64}$")
@@ -260,6 +287,7 @@ def _build_lineage(
     manager_lineage = manager_state.lineage
     return CurrentUnifiedStateLineage(
         fpl_input_semantic_sha256=fpl_input.semantic_sha256,
+        fpl_full_representation_sha256=current_fpl_full_representation_sha256(fpl_input),
         fpl_identity_view_sha256=current_fpl_identity_view_sha256(fpl_input),
         fpl_catalogue_view_sha256=current_fpl_catalogue_view_sha256(fpl_input),
         fpl_provider_config_sha256=fpl_input.provenance.provider_config_sha256,
@@ -322,6 +350,7 @@ def bind_current_unified_state_request(
         target_gameweek=fpl_input.target_gameweek,
         information_cutoff=fpl_input.provenance.information_cutoff,
         fpl_input_semantic_sha256=fpl_input.semantic_sha256,
+        fpl_full_representation_sha256=current_fpl_full_representation_sha256(fpl_input),
         fpl_identity_view_sha256=current_fpl_identity_view_sha256(fpl_input),
         fpl_catalogue_view_sha256=current_fpl_catalogue_view_sha256(fpl_input),
         odds_market_semantic_sha256=odds_input.market_semantic_sha256,
@@ -392,31 +421,36 @@ def _verify_identity_map(
     fpl_input: CurrentFplInputBundle,
     odds_input: OddsProviderCurrentInput,
 ) -> None:
-    team_plan = identity_map.team_alias_plan
-    team_request = bind_current_team_resolution_request(
-        fpl_input,
-        odds_input,
-        team_plan,
-        mapping_decided_at=identity_map.mapping_decided_at,
-    )
-    team_map = resolve_current_team_identities(fpl_input, odds_input, team_plan, team_request)
-    fixture_plan = identity_map.fixture_mapping_plan
-    fixture_request = bind_current_fixture_resolution_request(
-        fpl_input,
-        odds_input,
-        team_plan,
-        team_map,
-        fixture_plan,
-        mapping_decided_at=identity_map.mapping_decided_at,
-    )
-    expected = resolve_current_fixture_identities(
-        fpl_input,
-        odds_input,
-        team_plan,
-        team_map,
-        fixture_plan,
-        fixture_request,
-    )
+    try:
+        team_plan = identity_map.team_alias_plan
+        team_request = bind_current_team_resolution_request(
+            fpl_input,
+            odds_input,
+            team_plan,
+            mapping_decided_at=identity_map.mapping_decided_at,
+        )
+        team_map = resolve_current_team_identities(fpl_input, odds_input, team_plan, team_request)
+        fixture_plan = identity_map.fixture_mapping_plan
+        fixture_request = bind_current_fixture_resolution_request(
+            fpl_input,
+            odds_input,
+            team_plan,
+            team_map,
+            fixture_plan,
+            mapping_decided_at=identity_map.mapping_decided_at,
+        )
+        expected = resolve_current_fixture_identities(
+            fpl_input,
+            odds_input,
+            team_plan,
+            team_map,
+            fixture_plan,
+            fixture_request,
+        )
+    except IngestionError:
+        raise IngestionError(
+            "MAPPING_CONFLICT", "FPL/Odds identity reconstruction failed"
+        ) from None
     if identity_map != expected:
         raise IngestionError(
             "MAPPING_CONFLICT", "FPL/Odds identity map differs from its exact current sources"
@@ -458,12 +492,15 @@ def _verify_external_family(
         request, fpl_input, odds_input, identity_map, manager_state, ruleset, capability
     )
     _verify_identity_map(identity_map, fpl_input, odds_input)
-    checked_manager = CurrentManagerStateService().verify(
-        manager_state,
-        fpl_input=fpl_input,
-        ruleset=ruleset,
-        capability=capability,
-    )
+    try:
+        checked_manager = CurrentManagerStateService().verify(
+            manager_state,
+            fpl_input=fpl_input,
+            ruleset=ruleset,
+            capability=capability,
+        )
+    except IngestionError:
+        raise IngestionError("MAPPING_CONFLICT", "current manager reconstruction failed") from None
     _verify_manager_catalogue(checked_manager, fpl_input)
     cutoff = request.information_cutoff
     if not (
@@ -576,5 +613,6 @@ __all__ = [
     "CurrentUnifiedStateService",
     "CurrentUnifiedStateSummary",
     "bind_current_unified_state_request",
+    "current_fpl_full_representation_sha256",
     "current_unified_state_semantic_sha256",
 ]

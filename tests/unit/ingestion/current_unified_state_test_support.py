@@ -5,10 +5,11 @@ from __future__ import annotations
 import json
 from copy import deepcopy
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
 from dmf_pulse.ingestion.current_state import (
     CurrentUnifiedStateBundle,
     CurrentUnifiedStateRequest,
@@ -313,10 +314,85 @@ def rehash_bundle(
     )
 
 
+def mutate_non_view_fpl(value: CurrentFplInputBundle, mutation: str) -> CurrentFplInputBundle:
+    """Return a structurally valid 001A object changed outside 001B/001C reduced views."""
+
+    player = value.players[0]
+    if mutation == "player_status":
+        changed_player = player.model_copy(update={"status": "u" if player.status != "u" else "a"})
+    elif mutation == "chance_this_round":
+        chance = 50 if player.chance_of_playing_this_round != 50 else 51
+        changed_player = player.model_copy(update={"chance_of_playing_this_round": chance})
+    elif mutation == "chance_next_round":
+        chance = 25 if player.chance_of_playing_next_round != 25 else 26
+        changed_player = player.model_copy(update={"chance_of_playing_next_round": chance})
+    elif mutation == "player_news":
+        news = (
+            "synthetic review mutation"
+            if player.news != "synthetic review mutation"
+            else "alternate synthetic review mutation"
+        )
+        changed_player = player.model_copy(update={"news": news})
+    elif mutation == "player_news_added":
+        changed_time = value.provenance.information_cutoff - timedelta(hours=1)
+        if player.news_added == changed_time:
+            changed_time -= timedelta(minutes=1)
+        changed_player = player.model_copy(update={"news_added": changed_time})
+    else:
+        changed_player = None
+    if changed_player is not None:
+        return value.model_copy(update={"players": (changed_player, *value.players[1:])})
+
+    if mutation == "game_settings":
+        settings = json.loads(value.game_settings.canonical_json)
+        settings["synthetic_review_mutation"] = not bool(settings.get("synthetic_review_mutation"))
+        changed_settings = value.game_settings.model_copy(
+            update={
+                "canonical_json": canonical_json_bytes(settings).decode("utf-8"),
+                "semantic_sha256": canonical_sha256(settings),
+            }
+        )
+        return value.model_copy(update={"game_settings": changed_settings})
+
+    if mutation.startswith("non_target_event_"):
+        index, event = next(
+            (index, event)
+            for index, event in enumerate(value.events)
+            if event.provider_event_id != value.target_gameweek
+        )
+        if mutation == "non_target_event_finished":
+            updates = {"finished": not bool(event.finished)}
+        elif mutation == "non_target_event_data_checked":
+            updates = {"data_checked": not bool(event.data_checked)}
+        else:
+            updates = {
+                "is_previous": not bool(event.is_previous),
+                "is_current": False,
+                "is_next": False,
+            }
+        changed_event = event.model_copy(update=updates)
+        events = tuple(
+            changed_event if item == index else child for item, child in enumerate(value.events)
+        )
+        return value.model_copy(update={"events": events})
+
+    fixture = value.fixtures[0]
+    fixture_field = {
+        "fixture_finished": "finished",
+        "fixture_started": "started",
+        "fixture_finished_provisional": "finished_provisional",
+    }[mutation]
+    changed_fixture = fixture.model_copy(
+        update={fixture_field: not bool(getattr(fixture, fixture_field))}
+    )
+    return value.model_copy(update={"fixtures": (changed_fixture, *value.fixtures[1:])})
+
+
 __all__ = [
     "CurrentUnifiedTestContext",
     "build_context",
     "build_two_fixture_context",
+    "mutate_non_view_fpl",
     "rehash_bundle",
     "verify",
 ]

@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 99643,
+      "bytes": 100917,
       "path": "PLANS.md",
-      "sha256": "7b48f996dbe9a5611cfb7fb0088bdfdaf75c4242433cdbf432ebc2d06b024696"
+      "sha256": "5a83a82c613c445e14953a1bce54474a6d4911ded7e2ecde0c29b87f5684e8d0"
     },
     {
       "bytes": 2761,
@@ -3251,9 +3251,9 @@
       "sha256": "bff58066db35d55c1548ea3404d176bc0aac476d3e604dabc4c570aa18c9a407"
     },
     {
-      "bytes": 25426,
+      "bytes": 27431,
       "path": "src/dmf_pulse/ingestion/current_state.py",
-      "sha256": "da1dc1a89bc105d1eeb090a007d575e6876175ea14a40c457675dece5ce8a131"
+      "sha256": "2e337b2095bead8325cef428891df340966685010b9b93cb28f6b13706f2c9ee"
     },
     {
       "bytes": 1892,
@@ -5221,9 +5221,9 @@
       "sha256": "9b0feb8da8ee1fb852ca12f889040f6f0e5c50232f913d41632354fa9ab1ff6c"
     },
     {
-      "bytes": 10998,
+      "bytes": 14488,
       "path": "tests/unit/ingestion/current_unified_state_test_support.py",
-      "sha256": "810b74c78dbdb287e7c688de3b90c3673d5f551f209714e380355344e960fed3"
+      "sha256": "2af6115334cdd1a22bee6bc9346449f0976e6df5007e363ade70a41b05aa7606"
     },
     {
       "bytes": 5067,
@@ -5231,14 +5231,14 @@
       "sha256": "8a4be273e47a71c3034d840b45d83e623edfb6e6fbccb748dcdf3d5acfc3a3e1"
     },
     {
-      "bytes": 14251,
+      "bytes": 26329,
       "path": "tests/unit/ingestion/test_current_unified_state_boundaries.py",
-      "sha256": "151340826a4f13c3b729334478c06e4e314b7d5e26ffc6c9973b16f8b0978f6b"
+      "sha256": "94f739ddfe6ec118bf3984b02f1f7dcaaa23b06a7ac7538ce44a933c20b1c1bc"
     },
     {
-      "bytes": 9702,
+      "bytes": 10744,
       "path": "tests/unit/ingestion/test_current_unified_state_tamper.py",
-      "sha256": "cb879e2a8cd1fd726b31189dba0b3bd6f5d36b7ae29ee6f387423de65707c45b"
+      "sha256": "3965d95e2e5065a0d6c03e3250816023c7f18d2d282b7712e532adc3cf64205d"
     },
     {
       "bytes": 16492,
@@ -5716,14 +5716,14 @@
       "sha256": "c27eee869f42467ecdf9746eddcc880c41be1795a95099f654d8647753c2c79e"
     },
     {
-      "bytes": 834,
+      "bytes": 958,
       "path": "tickets/CURRENT-FPL-STATE-001D/ACCEPTANCE.md",
-      "sha256": "1cdccfd5ea1d3cdf6c20bdd61ead925be646a801c3fffaffb15e4b482858fcad"
+      "sha256": "8e70667682e66d5eb236b76894cf28029f4f88c8793b4034837a881536e08b3f"
     },
     {
-      "bytes": 2605,
+      "bytes": 2606,
       "path": "tickets/CURRENT-FPL-STATE-001D/ticket.yaml",
-      "sha256": "b606dabd479d8fb8983bab87dedb40cbbad19a3448edc56f686630a5a2b04fc2"
+      "sha256": "61397d15b9a25dbae3fe4684866a9762be0ce5f98b8f02ece1680c3501ea6c92"
     },
     {
       "bytes": 3923,

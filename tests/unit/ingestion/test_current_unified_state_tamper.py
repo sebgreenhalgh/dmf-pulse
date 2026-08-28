@@ -7,9 +7,15 @@ from datetime import timedelta
 import pytest
 
 from dmf_pulse.chips.inventory import TokenStatus
+from dmf_pulse.ingestion.current_state import current_fpl_full_representation_sha256
 from dmf_pulse.ingestion.errors import IngestionError
 
-from .current_unified_state_test_support import build_context, rehash_bundle, verify
+from .current_unified_state_test_support import (
+    build_context,
+    mutate_non_view_fpl,
+    rehash_bundle,
+    verify,
+)
 
 
 @pytest.mark.parametrize(
@@ -20,6 +26,18 @@ from .current_unified_state_test_support import build_context, rehash_bundle, ve
         "fpl_fixture_kickoff",
         "fpl_target_gameweek",
         "fpl_current_price",
+        "fpl_non_view_player_status",
+        "fpl_non_view_chance_this_round",
+        "fpl_non_view_chance_next_round",
+        "fpl_non_view_player_news",
+        "fpl_non_view_player_news_added",
+        "fpl_non_view_game_settings",
+        "fpl_non_view_non_target_event_finished",
+        "fpl_non_view_non_target_event_data_checked",
+        "fpl_non_view_non_target_event_flags",
+        "fpl_non_view_fixture_finished",
+        "fpl_non_view_fixture_started",
+        "fpl_non_view_fixture_finished_provisional",
         "odds_event_identity",
         "odds_participant",
         "odds_commence",
@@ -81,6 +99,14 @@ def test_rehashed_nested_tamper_never_survives_external_verify(
         tampered = rehash_bundle(
             bundle, fpl_input=fpl.model_copy(update={"players": (player, *fpl.players[1:])})
         )
+    elif mutation.startswith("fpl_non_view_"):
+        nested = mutate_non_view_fpl(fpl, mutation.removeprefix("fpl_non_view_"))
+        lineage = bundle.lineage.model_copy(
+            update={
+                "fpl_full_representation_sha256": current_fpl_full_representation_sha256(nested)
+            }
+        )
+        tampered = rehash_bundle(bundle, fpl_input=nested, lineage=lineage)
     elif mutation in {"odds_event_identity", "odds_participant", "odds_commence"}:
         updates = {
             "odds_event_identity": {"provider_event_id": "tampered-event"},

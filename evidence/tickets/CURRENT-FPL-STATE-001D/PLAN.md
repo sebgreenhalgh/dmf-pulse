@@ -16,6 +16,10 @@
   source-substitution and nested-tamper matrices, at least 90% focused branch coverage, inherited
   predecessor/rules/chip suites, PostgreSQL, static/build/clean-wheel, repository, secret, and
   exact final-SHA CI gates.
+- Independent remediation: preserve reviewed deficient SHA `049753...`; close
+  `CFSC-001D-IR-001` with a complete materialized FPL representation digest at the 001D boundary;
+  close `CFSC-001D-IR-002` with local detail-free identity/manager error translation; retain both
+  findings as independent-review history and require a new independent re-review.
 
 No source acquisition, provider call, real current data, database/persistence by 001D, fuzzy
 mapping, market normalisation, modelling, optimisation, orchestration, Decision Bundle,

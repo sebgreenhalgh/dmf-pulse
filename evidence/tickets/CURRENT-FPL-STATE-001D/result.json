@@ -1,50 +1,67 @@
 {
+  "architectural_parent": "716ea3a90c8893081bfebce400020b07ce95a463",
   "automatic_final_sha_ci": "PENDING_FINAL_PUSH",
   "branch": "integration/current-fpl/CURRENT-FPL-STATE-001D-unified-current-state",
   "coverage": {
-    "branch_aware_percent": 94.09282700421942,
+    "branch_aware_percent": 94.46640316205534,
     "covered_branches": 19,
-    "covered_lines": 204,
-    "focused_tests_passed": 77,
+    "covered_lines": 220,
+    "focused_tests_passed": 114,
     "module": "src/dmf_pulse/ingestion/current_state.py",
     "report": "evidence/tickets/CURRENT-FPL-STATE-001D/coverage.json"
   },
   "database_called_by_001d": false,
+  "deficient_exact_sha_ci": 33123304133,
+  "deficient_reviewed_sha": "049753583053245d6ffce4c1f37da09724b59103",
+  "deficient_tree": "d84f153cbc996d09382a7fc4a5c80edf935fb172",
   "evidence_binding": {
     "deliverable_file_count": 1178,
     "kind": "repository-deliverables-manifest",
     "path": "evidence/tickets/CURRENT-FPL-STATE-001D/current_manifest.json",
     "status": "PASS"
   },
-  "final_commit": "FINAL_COMMIT_CONTAINING_THIS_RESULT",
   "findings": {
-    "material_p2": 0,
-    "p0": 0,
-    "p1": 0,
-    "p3": 0
+    "material_p2": {
+      "closed": 1,
+      "historical": 1,
+      "unresolved": 0
+    },
+    "p0_unresolved": 0,
+    "p1": {
+      "closed": 1,
+      "historical": 1,
+      "unresolved": 0
+    },
+    "p3_unresolved": 0
   },
+  "independent_verdict": "CURRENT_FPL_STATE_001D_REMEDIATION_REQUIRED",
   "inherited": {
-    "non_database_passed": 1050,
+    "current_rules_passed": 151,
+    "live_odds_passed": 223,
     "postgres_passed": 126,
+    "postgres_deselected": 140,
+    "source_family_001a_001b_001c_passed": 218,
+    "stage11_passed": 322,
+    "stage14_passed": 405,
     "status": "PASS"
   },
   "manager_source": "OPERATOR_DECLARED",
   "network_called": false,
-  "parent": "716ea3a90c8893081bfebce400020b07ce95a463",
   "persistence_performed": false,
   "provider_verification": "NOT_PROVIDER_VERIFIED",
+  "remediation_commit": "FINAL_REMEDIATION_COMMIT_CONTAINING_THIS_RESULT",
   "repository_validation": "PASS_ZERO_ERRORS",
   "secret_scan": "PASS_ZERO_FINDINGS",
   "static_and_build": {
     "build": "PASS",
     "frozen_sync": "PASS_40_PACKAGES",
     "gcs008_wheel": "PASS_292_RECORD_MEMBERS",
+    "installed_wheel_001d": "PASS_FROM_SITE_PACKAGES",
     "mypy": "PASS_251_SOURCE_FILES",
     "odd005_wheel": "PASS_ZERO_NETWORK_REQUESTS",
     "ruff": "PASS_666_FILES",
-    "wheel": "PASS_292_FILES",
-    "wheel_001d_import": "PASS_FROM_SITE_PACKAGES"
+    "wheel": "PASS_292_FILES"
   },
-  "status": "CURRENT_FPL_STATE_001D_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "status": "CURRENT_FPL_STATE_001D_REMEDIATED_PENDING_INDEPENDENT_REREVIEW",
   "ticket_id": "CURRENT-FPL-STATE-001D"
 }
