@@ -51,4 +51,4 @@ required_public_behavior:
   - MARKET_READY, H2H_ONLY_DEGRADED, and BLOCKED fixture classifications
   - deterministic material-evidence identity and safe summary/error disclosure
   - explicit transient rights/runtime evidence with zero network and zero database writes
-acceptance_status: CURRENT_MARKETS_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW
+acceptance_status: CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW

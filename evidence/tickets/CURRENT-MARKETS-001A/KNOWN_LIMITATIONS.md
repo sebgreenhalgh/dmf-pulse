@@ -15,6 +15,9 @@
   points, squad/transfer/lineup/captaincy/chip/rank optimisation, Decision Bundle or production
   activation is implemented.
 - Canonical identity resolution requires existing accepted DAT-003 rows. It never creates missing
-  fixtures, providers, operators or external mappings.
+  fixtures, providers, operators or external mappings. Blocking current-market fixture and
+  operator mappings must be HUMAN_VERIFIED; no AUTO_MATCHED approval path is claimed.
+- The seven independently reported findings are engineering-remediated but have not yet received
+  fresh independent re-review. The deficient SHA and historical same-agent claims remain in Git.
 - The result is not human-accepted or production-approved. Every later commit requires separate
   review as applicable.

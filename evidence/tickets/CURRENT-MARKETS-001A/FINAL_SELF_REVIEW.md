@@ -1,60 +1,55 @@
-# CURRENT-MARKETS-001A final adversarial self-review
+# CURRENT-MARKETS-001A adversarial engineering re-review
 
-## P0 review
+## Historical correction
 
-- Wrong FPL/Odds fixture join: **closed** by exact 001B mapping selection, dual-namespace DAT-003
-  canonical convergence, complete identity-view set equality and multi-fixture tests.
-- Post-cutoff Odds accepted: **closed** by decision-information `as_of`, Stage-6 freshness and
-  explicit future/stale totals gates. Blocked fixtures publish no usable constraints.
-- Provider orientation reversed: **closed** by accepted 001B exact home/away/kickoff reconstruction
-  plus provider-native canonical HOME/DRAW/AWAY input use.
-- Restricted derived state persisted: **closed** by pure construction, denied storage rights,
-  offline tests, real PostgreSQL before/after counts and zero product DB writes.
-- Fake Stage-7 provenance: **closed**; no minutes context or score service call exists.
+The self-review stored with deficient SHA `92f368597c22edbf77b236a8c96ddf959e545f59`
+claimed orientation, exact-source binding, receipt-time coherence, mapping authority and all
+critical branches were closed. A later independent review disproved those claims and found
+CMR-IR-001 through CMR-IR-007. The authoritative chronology and per-finding record are in
+`REVIEW_REMEDIATION.md`; those findings were **FOUND BY INDEPENDENT REVIEW**, not by this agent.
 
-Unresolved P0: **0**.
+## Remediation attacks
 
-## P1 review
+- CMR-IR-001: one-book and all-book HOME/AWAY swaps, individual name substitutions and DRAW
+  corruption now block before H2H observation construction. Valid outcome/event permutations are
+  deterministic.
+- CMR-IR-002: each complete Odds temporal-state field changes the local temporal digest; stale
+  requests block and fresh valid rebinds have a different request/result identity.
+- CMR-IR-003: market or bookmaker fallback timestamps after receipt are excluded before alias
+  ranking; a valid older alias remains selectable and all-future aliases contribute nothing.
+- CMR-IR-004: only HUMAN_VERIFIED blocking mappings pass. Every tested AUTO_MATCHED and unresolved
+  governance state blocks.
+- CMR-IR-005: official-FPL lookup requires the exact active provider, fantasy product, PL
+  competition, season, namespace, type and temporal ranges; hostile scope substitutions block.
+- CMR-IR-006: exact packaged rights authority and config are authenticated and hash-bound;
+  profile, version, config, provider/status and effective-right attacks block safely.
+- CMR-IR-007: all seven findings now have direct named regressions. Raw branch coverage is
+  215/232 (92.67241379310344%), above the required 90%.
 
-- Raw Odds prices not bound: **closed**; price mutations change Odds market, 001D, consensus,
-  fixture and bundle semantic hashes, while stale requests fail.
-- H2H vig not removed: **closed** by unchanged accepted Stage-6 power normalisation and tests.
-- Totals vig not removed: **closed** by exact binary power normalisation with proportional
-  sensitivity and exact complement tests.
-- Duplicate bookmaker weighting: **closed** by canonical-operator alias collapse for both families;
-  tied conflicts quality-block rather than select arbitrarily.
-- Missing source/provenance binding: **closed** by exact request and lineage fields.
-- Unsupported totals silently rounded: **closed**; exact half-goal validation rejects quarter lines.
-- Canonical IDs invented: **closed**; product canonical IDs come only from exact accepted SELECTs.
-  Adapter-local UUIDv5 identities are explicitly transient and noncanonical.
-- Full GCS-008 called with fake minutes: **closed**; output stops at `MarketConstraintSet`.
+## Regression and scope review
 
-Unresolved P1: **0**.
+Accepted Stage-6 H2H normalization is reused unchanged. Binary totals power/proportional methods,
+underround/fair/extreme/failure paths, alias conflicts, half-goal lines, mutations and exact
+complements pass. PostgreSQL resolution uses core SELECTs and preserves before/after canonical
+row counts with pending and dirty ORM state; it performs no add, flush, commit, write or market
+persistence.
 
-## Material P2 review
+Rights remain PRIVATE and TRANSIENT_IN_MEMORY with all storage, cache, backup, display and
+redistribution capabilities denied. Runtime reports zero network, persistence and database
+writes. Safe summaries and all error forms expose no provider, bookmaker, price, official fixture
+or canonical-mapping values.
 
-- Target deadline used as cutoff: **closed**; market `as_of` is latest source/resolution readiness,
-  while the accepted 001D cutoff remains a separate lineage/output field.
-- Extra provider events rejected: **closed**; unrelated events are ignored and tested.
-- Ordering changes identity: **closed** for event, bookmaker, outcome and identity-view order where
-  accepted source semantics declare order nonmaterial.
-- Summary/error leaks: **closed** across public summary, message, details object, `str` and `repr`.
-- H2H-only described ready: **closed** by explicit three-state invariants and affected-fixture test.
-- Score prior silently invented: **closed** by exact `NO_ACCEPTED_CURRENT_SCORE_PRIOR` limitation.
+No accepted predecessor, Stage-6 mathematics, GCS-008 contract, Stage-7 implementation,
+data-model schema/migration or optimisation code changed. No score prior, goal rate, minutes
+context, score service invocation, player allocation, FPL points or production action exists.
 
-Unresolved material P2: **0**.
+## Engineering finding accounting
 
-## P3 review
+- P0 unresolved: 0.
+- P1 historical/closed/unresolved: 4 / 4 / 0.
+- Material P2 historical/closed/unresolved: 3 / 3 / 0.
+- P3 unresolved: 0.
 
-No unresolved P3 finding remains. Defensive validators not reached by structurally valid accepted
-inputs were inspected manually in addition to the 92.3154701718908% branch-aware numerical gate.
+This is a same-agent engineering closure assessment, not independent confirmation.
 
-## Scope review
-
-No accepted Stage-6 or GCS-008 source was weakened. No predecessor migration, policy, current
-source compiler, acquisition path, CLI, orchestration or optimiser was changed. No dependency was
-added. No PR, merge, production activation or human-acceptance claim is part of this branch.
-
-Final same-agent verdict:
-
-`CURRENT_MARKETS_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
+`CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`

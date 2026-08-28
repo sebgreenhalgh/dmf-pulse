@@ -54,3 +54,48 @@ Date: 2026-08-28
 No real provider call, credential, current private input, current-market persistence, canonical
 identity creation, score projection, player model, optimisation, PR, merge, human acceptance or
 production activation was performed or claimed.
+
+CURRENT-MARKETS-001A independent-review remediation ledger
+Date: 2026-08-28 through 2026-08-29
+
+18. Exact remediation start and isolation
+    PASS: fetched origin; origin/main remained 4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb;
+    local/remote branch remained deficient SHA 92f368597c22edbf77b236a8c96ddf959e545f59,
+    tree a1c8d15e7394f1106b7563e2b808296acb7f5a93, direct parent/merge-base 4eda6fe9,
+    ahead/behind 1/0. Work used only the dedicated clean clone; CURRENT-AVAILABILITY remained
+    untouched.
+19. CMR-IR-001 through CMR-IR-007 direct adversarial regressions
+    PASS: orientation substitutions block; temporal stale requests block and fresh identity
+    changes; post-receipt totals exclude before alias ranking; only HUMAN_VERIFIED mappings pass;
+    hostile official-FPL scope and exact rights authority substitutions block; critical
+    binary/timestamp/alias/repository paths are directly covered.
+20. Focused branch-aware suite
+    PASS: 87 tests; 781/804 statements (97.13930348258707%); 215/232 branches
+    (92.67241379310344%); combined 96.13899613899613%.
+21. Inherited LIVE-ODDS/001B/001D
+    PASS: 322 tests.
+22. Complete market unit/contract/golden/property suite
+    PASS: 148 tests.
+23. GCS-008 unit/contract/golden/property regression
+    PASS: 158 tests; no live service invocation.
+24. PostgreSQL market identity/normalisation suite
+    PASS: 32 tests, including 19 ticket-specific read-only, mapping governance and official-FPL
+    scope proofs. No canonical row, operator, mapping, normalisation or market-result write.
+25. Inherited DAT-003 PostgreSQL/migration matrix
+    PASS: 90 tests.
+26. Product remediation commit
+    PASS: 30ad5c2e821eb03827e16f24d4b22a44ca3804a2; deficient SHA preserved as an ancestor.
+27. Preliminary static/build/installed-wheel checks
+    PASS: mypy 252 source files; build; generic/ODD/GCS/CURRENT-MARKETS wheel verification.
+    CURRENT-MARKETS wheel blocked orientation, stale-temporal and rights attacks, excluded
+    post-receipt totals and made zero network requests. Wheel contained 293 members.
+28. Corrected remediation evidence and canonical manifests
+    PASS: independent-review chronology preserved; CURRENT-MARKETS and authorized PRC-013 current
+    manifests regenerated with 1,188 deliverables; repository validation zero errors; secret scan
+    zero findings.
+29. Final commit/push and exact-SHA automatic CI
+    PENDING at the time of this mutable ledger entry. The final exact-SHA CI run is intentionally
+    not committed after CI.
+
+The independent findings and deficient same-agent claims are preserved in
+REVIEW_REMEDIATION.md. Engineering closure is pending fresh independent re-review.

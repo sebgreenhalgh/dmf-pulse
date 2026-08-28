@@ -15,4 +15,7 @@ or optimise decisions.
 After the exact final SHA passes all acceptance commands and automatic push CI, the only clean
 engineering status is:
 
-`CURRENT_MARKETS_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
+`CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`
+
+This is an engineering remediation status for CMR-IR-001 through CMR-IR-007. It does not claim
+that a fresh independent re-review has confirmed closure.

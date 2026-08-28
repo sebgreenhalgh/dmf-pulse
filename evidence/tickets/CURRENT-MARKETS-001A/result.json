@@ -3,15 +3,20 @@
   "automatic_final_sha_ci": "PENDING_FINAL_PUSH",
   "branch": "integration/current-markets/CURRENT-MARKETS-001A-transient-market-constraints",
   "coverage": {
-    "branch_aware_percent": 92.3154701718908,
-    "covered_branches": 189,
-    "covered_statements": 724,
-    "focused_tests_passed": 32,
+    "branch_percent": 92.67241379310344,
+    "combined_percent": 96.13899613899613,
+    "covered_branches": 215,
+    "covered_statements": 781,
+    "focused_tests_passed": 87,
     "module": "src/dmf_pulse/markets/current.py",
-    "report": "evidence/tickets/CURRENT-MARKETS-001A/coverage.json"
+    "report": "evidence/tickets/CURRENT-MARKETS-001A/coverage.json",
+    "statement_percent": 97.13930348258707,
+    "total_branches": 232,
+    "total_statements": 804
   },
   "database_read_for_canonical_identity": true,
   "database_write_performed": false,
+  "deficient_independently_reviewed_sha": "92f368597c22edbf77b236a8c96ddf959e545f59",
   "evidence_binding": {
     "deliverable_file_count": 1188,
     "kind": "repository-deliverables-manifest",
@@ -19,21 +24,31 @@
     "status": "PASS"
   },
   "findings": {
+    "material_p2_closed_by_engineering": 3,
+    "material_p2_historical": 3,
     "material_p2_unresolved": 0,
+    "p0_historical": 0,
     "p0_unresolved": 0,
+    "p1_closed_by_engineering": 4,
+    "p1_historical": 4,
     "p1_unresolved": 0,
-    "p3_unresolved": 0
+    "p3_unresolved": 0,
+    "independent_rereview_confirmed": false
   },
-  "implementation_commit": "FINAL_IMPLEMENTATION_COMMIT_CONTAINING_THIS_RESULT",
+  "implementation_remediation_commit": "30ad5c2e821eb03827e16f24d4b22a44ca3804a2",
   "inherited": {
     "dat003_postgres_and_migrations_passed": 90,
-    "live_odds_001b_001d_stage6_gcs008_dat003_unit_passed": 522,
-    "new_readonly_postgres_passed": 1,
+    "gcs008_passed": 158,
+    "live_odds_001b_001d_passed": 322,
+    "market_postgres_passed": 32,
+    "markets_passed": 148,
+    "ticket_readonly_postgres_passed": 19,
     "status": "PASS"
   },
   "limitations": [
     "CURRENT_AVAILABILITY_001A_DATA_BLOCKED",
     "FULL_GCS008_NOT_EXECUTED",
+    "NO_ACCEPTED_CURRENT_MINUTES_HISTORY",
     "NO_ACCEPTED_CURRENT_SCORE_PRIOR",
     "NO_FPL_POINTS_PROJECTIONS",
     "NO_LIVE_STAGE7_MINUTES",
@@ -48,14 +63,14 @@
   "secret_scan": "PASS_ZERO_FINDINGS",
   "static_and_build": {
     "build": "PASS",
-    "current_markets_wheel": "PASS_FROM_SITE_PACKAGES_ZERO_NETWORK",
+    "current_markets_wheel": "PASS_FROM_SITE_PACKAGES_ATTACKS_BLOCKED_ZERO_NETWORK",
     "frozen_sync": "PASS_40_PACKAGES",
     "gcs008_wheel": "PASS_293_RECORD_MEMBERS",
     "generic_wheel": "PASS_293_FILES",
     "mypy": "PASS_252_SOURCE_FILES",
     "odd005_wheel": "PASS_ZERO_NETWORK_REQUESTS",
-    "ruff": "PASS_674_FILES"
+    "ruff": "PASS"
   },
-  "status": "CURRENT_MARKETS_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "status": "CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW",
   "ticket_id": "CURRENT-MARKETS-001A"
 }
