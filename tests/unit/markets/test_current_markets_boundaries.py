@@ -188,6 +188,80 @@ def test_cmr_ir_001_h2h_orientation_corruption_fails_closed(
     assert event.provider_away_team not in serialized
 
 
+@pytest.mark.parametrize("corrupt_outcome", ("HOME", "AWAY", "DRAW"))
+@pytest.mark.parametrize("corrupt_aliases", ("ONE", "ALL"))
+@pytest.mark.parametrize("timestamp_source", ("MARKET", "BOOKMAKER"))
+def test_cmr_ir_010_future_h2h_orientation_corruption_fails_before_exclusion(
+    repository_root,
+    tmp_path,
+    corrupt_outcome: str,
+    corrupt_aliases: str,
+    timestamp_source: str,
+) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+    received_at = context.odds_input.temporal.received_at
+    future_at = received_at + timedelta(seconds=1)
+    valid_at = received_at - timedelta(seconds=1)
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = list(event.bookmakers)
+    selected = range(len(books)) if corrupt_aliases == "ALL" else range(1)
+    for index, book in enumerate(books):
+        market = book.markets[0]
+        outcomes = tuple(
+            outcome.model_copy(update={"provider_name": f"corrupt {corrupt_outcome.lower()}"})
+            if index in selected and outcome.outcome == corrupt_outcome
+            else outcome
+            for outcome in market.outcomes
+        )
+        market_updates: dict[str, object] = {
+            "outcomes": outcomes,
+            "provider_last_update": future_at if index in selected else valid_at,
+        }
+        book_updates: dict[str, object] = {}
+        if timestamp_source == "BOOKMAKER" and index in selected:
+            market_updates.update(
+                provider_last_update=None,
+                provider_last_update_state="NOT_PUBLISHED",
+            )
+            book_updates.update(provider_last_update=future_at, age_at_receipt_seconds=0)
+        book_updates["markets"] = (market.model_copy(update=market_updates),)
+        books[index] = book.model_copy(update=book_updates)
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+
+    for ordered_books in (books, list(reversed(books))):
+        ordered_events = list(changed.odds_input.events)
+        ordered_events[0] = ordered_events[0].model_copy(
+            update={"bookmakers": tuple(ordered_books)}
+        )
+        ordered = recompose(
+            changed,
+            rehash_odds(changed.odds_input, events=tuple(ordered_events)),
+        )
+        alias_view = _one_operator_alias_view(identity_view(ordered))
+        request = bind_current_market_constraint_request(ordered.bundle, alias_view)
+
+        with pytest.raises(CurrentMarketConstraintError) as caught:
+            CurrentMarketConstraintService().build(
+                request,
+                source=ordered.bundle,
+                identity_view=alias_view,
+            )
+
+        assert caught.value.code == "SOURCE_INVALID"
+        serialized = json.dumps(caught.value.as_error_object(), sort_keys=True)
+        forbidden = (
+            event.provider_home_team,
+            event.provider_away_team,
+            books[0].bookmaker_key,
+            books[0].bookmaker_title,
+            format(books[0].markets[0].outcomes[0].decimal_price, "f"),
+            f"corrupt {corrupt_outcome.lower()}",
+        )
+        assert all(value not in serialized for value in forbidden)
+
+
 @pytest.mark.parametrize("mutation", ("REQUEST_STARTED", "RECEIPT", "USABLE"))
 def test_cmr_ir_002_temporal_mutation_invalidates_stale_request_and_result_identity(
     repository_root, tmp_path, mutation: str
@@ -1180,10 +1254,10 @@ def test_cmr_ir_006_required_odds_effective_right_denial_is_safe(repository_root
     assert caught.value.code == "SOURCE_INVALID"
 
 
-def test_semantic_result_is_order_independent_where_source_contract_allows(
+def test_cmr_ir_011_semantic_result_is_order_independent_where_source_contract_allows(
     repository_root, tmp_path
 ) -> None:
-    context, view, _request, result = build_market_context(repository_root, tmp_path)
+    context, view, request, result = build_market_context(repository_root, tmp_path)
     changed_events: list[CurrentOddsEvent] = []
     for event in reversed(context.odds_input.events):
         books = []
@@ -1193,7 +1267,7 @@ def test_semantic_result_is_order_independent_where_source_contract_allows(
             )
             totals = tuple(
                 item.model_copy(update={"outcomes": tuple(reversed(item.outcomes))})
-                for item in bookmaker.totals_markets
+                for item in reversed(bookmaker.totals_markets)
             )
             books.append(
                 bookmaker.model_copy(update={"markets": (market,), "totals_markets": totals})
@@ -1208,14 +1282,16 @@ def test_semantic_result_is_order_independent_where_source_contract_allows(
         fixtures=tuple(reversed(view.fixtures)),
         operators=tuple(reversed(view.operators)),
     )
-    _view, _request, reordered_result = build_from_context(reordered, reordered_view)
+    _view, reordered_request, reordered_result = build_from_context(reordered, reordered_view)
 
     assert reordered.odds_input.market_semantic_sha256 == (
         context.odds_input.market_semantic_sha256
     )
     assert reordered.bundle.semantic_sha256 == context.bundle.semantic_sha256
     assert reordered_view.semantic_sha256 == view.semantic_sha256
+    assert reordered_request == request
     assert reordered_result == result
+    assert reordered_result.safe_summary() == result.safe_summary()
 
 
 def test_provider_aliases_collapse_to_one_canonical_operator(repository_root, tmp_path) -> None:

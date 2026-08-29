@@ -398,7 +398,7 @@ def _current_odds_market_semantic_payload(
                         ),
                     }
                 )
-            for totals_market in bookmaker.totals_markets:
+            for totals_market in sorted(bookmaker.totals_markets, key=lambda item: item.line):
                 markets.append(
                     {
                         "line": format(totals_market.line, "f"),

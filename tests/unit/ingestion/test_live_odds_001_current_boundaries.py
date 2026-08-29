@@ -7,6 +7,7 @@ from collections.abc import Callable
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from itertools import permutations
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -34,6 +35,7 @@ from dmf_pulse.ingestion.odds.current import (
     CurrentOddsTotalsOutcome,
     OddsProviderCurrentInput,
     build_current_odds_input,
+    current_odds_market_semantic_sha256,
 )
 from dmf_pulse.ingestion.odds.models import QuotaSource, QuotaState
 from dmf_pulse.ingestion.odds.parser import OddsBookmaker, ParsedOddsPayload, parse_odds_payload
@@ -111,6 +113,140 @@ def _build(
         transport_id="stdlib_http_client",
         provider_request_id_sha256="2" * 64,
     )
+
+
+def _rehash_supported_markets(
+    value: OddsProviderCurrentInput,
+    *,
+    events: tuple[CurrentOddsEvent, ...],
+) -> OddsProviderCurrentInput:
+    provisional = value.model_copy(update={"events": events, "market_semantic_sha256": "0" * 64})
+    rehashed = provisional.model_copy(
+        update={"market_semantic_sha256": current_odds_market_semantic_sha256(provisional)}
+    )
+    return OddsProviderCurrentInput.model_validate(rehashed.model_dump(mode="python"))
+
+
+def _totals_at_line(
+    market: CurrentOddsTotalsMarket,
+    line: Decimal,
+) -> CurrentOddsTotalsMarket:
+    return market.model_copy(
+        update={
+            "line": line,
+            "outcomes": tuple(
+                outcome.model_copy(update={"point": line}) for outcome in market.outcomes
+            ),
+        }
+    )
+
+
+def _with_first_bookmaker_totals(
+    value: OddsProviderCurrentInput,
+    lines: tuple[Decimal, ...],
+    *,
+    reverse_outcomes: bool = False,
+) -> OddsProviderCurrentInput:
+    events = list(value.events)
+    bookmakers = list(events[0].bookmakers)
+    template = bookmakers[0].totals_markets[0]
+    totals = tuple(_totals_at_line(template, line) for line in lines)
+    if reverse_outcomes:
+        totals = tuple(
+            market.model_copy(update={"outcomes": tuple(reversed(market.outcomes))})
+            for market in totals
+        )
+    bookmakers[0] = bookmakers[0].model_copy(update={"totals_markets": totals})
+    events[0] = events[0].model_copy(update={"bookmakers": tuple(bookmakers)})
+    return _rehash_supported_markets(value, events=tuple(events))
+
+
+def test_cmr_ir_011_totals_line_and_outcome_order_are_semantically_canonical(
+    repository_root: Path,
+) -> None:
+    raw = _value(repository_root)
+    _append_totals(raw)
+    current = _build(parse_odds_payload(_body(raw)))
+    first = _with_first_bookmaker_totals(
+        current,
+        (Decimal("1.5"), Decimal("2.5")),
+    )
+    reversed_lines = _with_first_bookmaker_totals(
+        current,
+        (Decimal("2.5"), Decimal("1.5")),
+    )
+    reversed_outcomes = _with_first_bookmaker_totals(
+        current,
+        (Decimal("1.5"), Decimal("2.5")),
+        reverse_outcomes=True,
+    )
+
+    assert first.market_semantic_sha256 == reversed_lines.market_semantic_sha256
+    assert first.market_semantic_sha256 == reversed_outcomes.market_semantic_sha256
+
+
+def test_cmr_ir_011_three_totals_lines_are_invariant_across_all_permutations(
+    repository_root: Path,
+) -> None:
+    raw = _value(repository_root)
+    _append_totals(raw)
+    current = _build(parse_odds_payload(_body(raw)))
+    line_orders = tuple(permutations((Decimal("1.5"), Decimal("2.5"), Decimal("3.5"))))
+
+    hashes = {
+        _with_first_bookmaker_totals(current, order).market_semantic_sha256 for order in line_orders
+    }
+
+    assert len(hashes) == 1
+
+
+def test_cmr_ir_011_bookmaker_and_event_order_remain_semantically_canonical(
+    repository_root: Path,
+) -> None:
+    raw = _value(repository_root)
+    _append_totals(raw)
+    current = _build(parse_odds_payload(_body(raw)))
+    event = current.events[0]
+    bookmaker_reordered_event = event.model_copy(
+        update={"bookmakers": tuple(reversed(event.bookmakers))}
+    )
+    bookmaker_reordered = _rehash_supported_markets(
+        current,
+        events=(bookmaker_reordered_event,),
+    )
+    second_event = event.model_copy(update={"provider_event_id": "todapi-event-002"})
+    ordered_events = _rehash_supported_markets(current, events=(event, second_event))
+    reversed_events = _rehash_supported_markets(current, events=(second_event, event))
+
+    assert bookmaker_reordered.market_semantic_sha256 == current.market_semantic_sha256
+    assert ordered_events.market_semantic_sha256 == reversed_events.market_semantic_sha256
+
+
+def test_cmr_ir_011_totals_line_set_and_price_mutations_remain_material(
+    repository_root: Path,
+) -> None:
+    raw = _value(repository_root)
+    _append_totals(raw)
+    current = _build(parse_odds_payload(_body(raw)))
+    line_1_5 = _with_first_bookmaker_totals(current, (Decimal("1.5"),))
+    line_2_5 = _with_first_bookmaker_totals(current, (Decimal("2.5"),))
+    price_events = list(line_1_5.events)
+    bookmakers = list(price_events[0].bookmakers)
+    market = bookmakers[0].totals_markets[0]
+    changed_outcomes = tuple(
+        outcome.model_copy(update={"decimal_price": Decimal("1.91")})
+        if outcome.outcome == "OVER"
+        else outcome
+        for outcome in market.outcomes
+    )
+    bookmakers[0] = bookmakers[0].model_copy(
+        update={"totals_markets": (market.model_copy(update={"outcomes": changed_outcomes}),)}
+    )
+    price_events[0] = price_events[0].model_copy(update={"bookmakers": tuple(bookmakers)})
+    changed_price = _rehash_supported_markets(line_1_5, events=tuple(price_events))
+
+    assert line_1_5.market_semantic_sha256 != line_2_5.market_semantic_sha256
+    assert line_1_5.market_semantic_sha256 != changed_price.market_semantic_sha256
 
 
 @pytest.mark.parametrize(

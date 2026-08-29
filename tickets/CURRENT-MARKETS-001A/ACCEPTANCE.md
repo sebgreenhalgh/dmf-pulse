@@ -13,6 +13,13 @@ exact current-event, accepted 001B team-bridge and official-FPL fixture orientat
 one HUMAN_VERIFIED operator mapping applicable at every target occurrence; semantic occurrence
 applicability evidence; and committed PostgreSQL pending/dirty ORM autoflush proofs.
 
+Third-remediation acceptance additionally requires every supplied target H2H market to pass
+HOME/AWAY/DRAW provider-label orientation before receipt-time exclusion. Under the explicit narrow
+CMR-IR-011 authority, the LIVE-ODDS supported-market semantic projection canonicalizes only
+`totals_markets` tuple order by exact Decimal line; stored order, ordinary builder behavior,
+schema/version, market selection, prices, normalization, rights, temporal, quota, identity, and
+persistence remain unchanged.
+
 The accepted GCS-008 `Stage7MinutesContext` requirement remains unchanged. This ticket does not
 invent score rates, call `ScoreDistributionService`, allocate player events, calculate FPL points,
 or optimise decisions.
@@ -22,5 +29,6 @@ engineering status is:
 
 `CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`
 
-CMR-IR-001/002/004/005/006 remain independently closed. This is an engineering remediation
-status for CMR-IR-003/007/008/009 and does not claim fresh independent closure of those findings.
+CMR-IR-002/003/004/005/006/007/009 remain independently closed. CMR-IR-001 and CMR-IR-008 are
+engineering-restored through the CMR-IR-010 regression, while CMR-IR-010/011 are engineering
+remediated. This status does not claim fresh independent closure of those findings.

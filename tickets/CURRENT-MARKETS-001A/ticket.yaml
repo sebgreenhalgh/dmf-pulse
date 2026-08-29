@@ -22,8 +22,10 @@ permissions:
   modelling_or_optimisation: forbidden
   new_runtime_dependency: forbidden
 allowed_areas:
+  - src/dmf_pulse/ingestion/odds/current.py
   - src/dmf_pulse/markets/current.py
   - src/dmf_pulse/markets/__init__.py
+  - tests/unit/ingestion/test_live_odds_001_current_boundaries.py
   - tests/unit/markets/current_market_test_support.py
   - tests/unit/markets/test_current_markets.py
   - tests/unit/markets/test_current_markets_boundaries.py
@@ -43,12 +45,16 @@ exclusions:
   - score-rate inference, score distribution, player events, FPL points, or optimisation
   - CLI, orchestration, Decision Bundle, PR, merge, or production activation
 required_public_behavior:
+  - >-
+    semantically irrelevant totals-market tuple ordering is canonicalized by exact Decimal line
+    only inside the LIVE-ODDS supported-market semantic-hash projection
   - exact 001D, market, provenance, fixture-map, cutoff, policy, and identity-view binding
   - exact target fixture selection through the accepted 001B provider-event bridge
   - >-
     exact current Odds event and official FPL home/away reconstruction through the accepted 001B
     team bridge
   - receipt-time eligibility before H2H or totals canonical-operator alias ranking
+  - provider-facing HOME, AWAY, and DRAW orientation validation before H2H temporal exclusion
   - >-
     one HUMAN_VERIFIED operator mapping applicable to every target occurrence with semantic
     evidence

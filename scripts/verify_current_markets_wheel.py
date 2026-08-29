@@ -236,6 +236,76 @@ def rehash_market_source(changed_odds):
         }
     )
 
+events = []
+for event in source.odds_input.events:
+    books = tuple(
+        book.model_copy(update={"totals_markets": tuple(reversed(book.totals_markets))})
+        for book in event.bookmakers
+    )
+    events.append(event.model_copy(update={"bookmakers": books}))
+totals_order_source = rehash_market_source(
+    source.odds_input.model_copy(update={"events": tuple(events)})
+)
+assert totals_order_source.odds_input.market_semantic_sha256 == (
+    source.odds_input.market_semantic_sha256
+)
+assert totals_order_source.semantic_sha256 == source.semantic_sha256
+totals_order_request = bind_current_market_constraint_request(totals_order_source, view)
+totals_order_result = service.build(
+    totals_order_request,
+    source=totals_order_source,
+    identity_view=view,
+)
+assert totals_order_request == request
+assert totals_order_result == result
+assert totals_order_result.safe_summary() == summary
+
+for corrupt_outcome in ("HOME", "AWAY", "DRAW"):
+    events = list(source.odds_input.events)
+    event = events[0]
+    books = list(event.bookmakers)
+    market = books[0].markets[0]
+    outcomes = tuple(
+        outcome.model_copy(
+            update={"provider_name": f"installed corrupt {corrupt_outcome.lower()}"}
+        )
+        if outcome.outcome == corrupt_outcome
+        else outcome
+        for outcome in market.outcomes
+    )
+    books[0] = books[0].model_copy(
+        update={
+            "markets": (
+                market.model_copy(
+                    update={
+                        "outcomes": outcomes,
+                        "provider_last_update": (
+                            source.odds_input.temporal.received_at + timedelta(seconds=1)
+                        ),
+                    }
+                ),
+            )
+        }
+    )
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    corrupt_source = rehash_market_source(
+        source.odds_input.model_copy(update={"events": tuple(events)})
+    )
+    corrupt_request = bind_current_market_constraint_request(corrupt_source, view)
+    try:
+        service.build(corrupt_request, source=corrupt_source, identity_view=view)
+    except CurrentMarketConstraintError as error:
+        assert error.code == "SOURCE_INVALID"
+        assert f"installed corrupt {corrupt_outcome.lower()}" not in str(error)
+        assert f"installed corrupt {corrupt_outcome.lower()}" not in repr(error)
+        assert f"installed corrupt {corrupt_outcome.lower()}" not in json.dumps(
+            error.as_error_object()
+        )
+    else:
+        raise AssertionError(
+            f"installed wheel accepted corrupt future {corrupt_outcome} orientation"
+        )
+
 events = list(source.odds_input.events)
 event = events[0]
 books = list(event.bookmakers)
@@ -407,6 +477,7 @@ assert any(
 assert not attempts
 print(json.dumps({
     "fixture_count": summary.fixture_count,
+    "future_corrupt_h2h_labels": "BLOCKED_HOME_AWAY_DRAW",
     "market_ready_count": summary.market_ready_count,
     "module_path": __import__("dmf_pulse").__file__,
     "network_requests": len(attempts),
@@ -418,6 +489,7 @@ print(json.dumps({
     "semantic_sha256": result.semantic_sha256,
     "status": "PASS",
     "temporal_attack": "BLOCKED",
+    "totals_line_tuple_order": "SEMANTICALLY_INVARIANT",
     "totals_line_count": summary.totals_line_count,
 }, sort_keys=True))
 """

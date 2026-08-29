@@ -14,6 +14,10 @@
 - Remediation basis: preserve deficient commit `92f368597c22edbf77b236a8c96ddf959e545f59`,
   first remediation `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`, and interrupted re-review
   `f58790c4d2d3ed56a472bd3d52583451dbebab6c` in visible descendant history.
+- Third-remediation basis: preserve reviewed head
+  `ee4a35760a56f84b4f0f50f3d2f898e2037d105a`; close CMR-IR-010 by validating every supplied
+  H2H orientation before receipt-time exclusion, and close CMR-IR-011 through the expressly
+  authorized LIVE-ODDS semantic-hash-only canonicalization of totals-line tuple ordering.
 
 ### CURRENT-MARKETS-001A checkpoints
 
@@ -35,9 +39,14 @@
   exact current-event -> accepted 001B team bridge -> current official-FPL fixture orientation;
   require one operator mapping to cover every target occurrence; and commit explicit pending/dirty
   SQLAlchemy autoflush read-only proofs.
-- [ ] Preserve CMR-IR-001/002/004/005/006 closure, correct remediation chronology/evidence and
-  manifests, pass full focused/inherited/PostgreSQL/static/wheel acceptance, commit and push a
-  normal descendant, inspect exact-SHA CI, and stop for fresh independent re-review.
+- [x] Third remediation: validate HOME/AWAY/DRAW provider labels before temporal exclusion; sort
+  only the LIVE-ODDS semantic projection of totals markets by exact Decimal line; prove direct,
+  downstream, permutation, mutation, and installed-wheel behavior without changing stored order,
+  builder selection, schema, normalization, rights, temporal, quota, identity, or persistence.
+- [ ] Preserve all previously independently closed findings, correct remediation
+  chronology/evidence and manifests, pass full focused/inherited/PostgreSQL/static/wheel
+  acceptance, commit and push a normal descendant, inspect exact-SHA CI, and stop for fresh
+  independent re-review.
 
 ## CURRENT-FPL-STATE-001B transient FPL/Odds identity bridge
 

@@ -899,6 +899,13 @@ def _h2h_quotes(
     candidates: dict[UUID, list[CurrentOddsBookmaker]] = {}
     for bookmaker in event.bookmakers:
         market = bookmaker.markets[0]
+        for outcome in market.outcomes:
+            if (
+                (outcome.outcome == "HOME" and outcome.provider_name != event.provider_home_team)
+                or (outcome.outcome == "AWAY" and outcome.provider_name != event.provider_away_team)
+                or (outcome.outcome == "DRAW" and outcome.provider_name.casefold() != "draw")
+            ):
+                raise CurrentMarketConstraintError("SOURCE_INVALID")
         canonical_operator = identity_view.operator(bookmaker.bookmaker_key)
         observed_at, timestamp_source = _observation_time(bookmaker, market)
         if timestamp_source == "BOOKMAKER":
@@ -912,13 +919,6 @@ def _h2h_quotes(
             )
             warnings.add("H2H_FUTURE_OBSERVATION_EXCLUDED")
             continue
-        for outcome in market.outcomes:
-            if (
-                (outcome.outcome == "HOME" and outcome.provider_name != event.provider_home_team)
-                or (outcome.outcome == "AWAY" and outcome.provider_name != event.provider_away_team)
-                or (outcome.outcome == "DRAW" and outcome.provider_name.casefold() != "draw")
-            ):
-                raise CurrentMarketConstraintError("SOURCE_INVALID")
         candidates.setdefault(canonical_operator.canonical_operator_id, []).append(bookmaker)
     selected_books: list[CurrentOddsBookmaker] = []
     for aliases in candidates.values():
