@@ -18,3 +18,15 @@
 5. Re-run focused, inherited, PostgreSQL, static, build, installed-wheel and security gates.
 6. Regenerate only authorized current manifests, commit/push normally and inspect exact-SHA CI.
 7. Stop at `CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`.
+
+## Second remediation after interrupted re-review
+
+1. Preserve `f58790c4d2d3ed56a472bd3d52583451dbebab6c` and all first-review chronology.
+2. Close CMR-IR-003 by filtering H2H post-receipt aliases before grouping/ranking.
+3. Close CMR-IR-008 by reconstructing exact Odds event, accepted 001B team bridge, and official
+   FPL fixture orientation during `build()` and therefore `verify()`.
+4. Close CMR-IR-009 by requiring one HUMAN_VERIFIED operator mapping to contain every distinct
+   target occurrence and hash-binding disclosure-safe applicability evidence.
+5. Close CMR-IR-007 with committed pending/dirty ORM autoflush regressions and truthful evidence.
+6. Preserve CMR-IR-001/002/004/005/006, rerun full acceptance, create normal descendant commits,
+   push the same branch, inspect exact-SHA CI, and stop for fresh independent re-review.

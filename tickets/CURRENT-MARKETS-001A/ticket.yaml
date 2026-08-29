@@ -45,6 +45,13 @@ exclusions:
 required_public_behavior:
   - exact 001D, market, provenance, fixture-map, cutoff, policy, and identity-view binding
   - exact target fixture selection through the accepted 001B provider-event bridge
+  - >-
+    exact current Odds event and official FPL home/away reconstruction through the accepted 001B
+    team bridge
+  - receipt-time eligibility before H2H or totals canonical-operator alias ranking
+  - >-
+    one HUMAN_VERIFIED operator mapping applicable to every target occurrence with semantic
+    evidence
   - accepted Stage-6 H2H normalisation and consensus without persistence
   - exact-Decimal binary totals normalisation for supported full-time half-goal lines
   - Stage-8-compatible 1X2 and totals constraints with accepted family caps

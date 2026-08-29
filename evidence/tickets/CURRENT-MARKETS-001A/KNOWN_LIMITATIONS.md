@@ -17,7 +17,8 @@
 - Canonical identity resolution requires existing accepted DAT-003 rows. It never creates missing
   fixtures, providers, operators or external mappings. Blocking current-market fixture and
   operator mappings must be HUMAN_VERIFIED; no AUTO_MATCHED approval path is claimed.
-- The seven independently reported findings are engineering-remediated but have not yet received
-  fresh independent re-review. The deficient SHA and historical same-agent claims remain in Git.
+- CMR-IR-001/002/004/005/006 are independently closed. CMR-IR-003/007/008/009 are
+  engineering-remediated at `562e5a586881d9e462075ffd5dad01401b265ff3` but await fresh
+  independent re-review. Deficient and first-remediation chronology remains in Git.
 - The result is not human-accepted or production-approved. Every later commit requires separate
   review as applicable.

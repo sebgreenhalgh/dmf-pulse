@@ -1,55 +1,61 @@
-# CURRENT-MARKETS-001A adversarial engineering re-review
+# CURRENT-MARKETS-001A second-remediation engineering self-review
 
-## Historical correction
+## Reproduced current findings
 
-The self-review stored with deficient SHA `92f368597c22edbf77b236a8c96ddf959e545f59`
-claimed orientation, exact-source binding, receipt-time coherence, mapping authority and all
-critical branches were closed. A later independent review disproved those claims and found
-CMR-IR-001 through CMR-IR-007. The authoritative chronology and per-finding record are in
-`REVIEW_REMEDIATION.md`; those findings were **FOUND BY INDEPENDENT REVIEW**, not by this agent.
+- CMR-IR-003: before the fix, a post-receipt newer H2H alias suppressed an older valid alias.
+  Now market and bookmaker-fallback timestamps are filtered before grouping; the valid older alias
+  remains, all-future aliases contribute nothing, valid newest/tied cases are deterministic, and
+  conflicting ties remain quality-blocked.
+- CMR-IR-007: first-remediation evidence claimed committed pending/dirty Session tests that were
+  absent. Reviewer-only exploratory probes are now distinguished from the two named committed
+  `autoflush=True` PostgreSQL tests. Pending/dirty state remains unflushed and is rolled back;
+  relevant canonical/mapping/operator/market row counts and captured DML remain unchanged/empty.
+- CMR-IR-008: before the fix, a coherently rehashed event participant plus H2H-label swap changed
+  HOME consensus while the accepted 001B map remained unchanged. Exact event identity, both team
+  sides, official-FPL orientation and kickoff now reconstruct in `build()` and `verify()`; the old
+  attack blocks. The independent local outcome-label guard remains.
+- CMR-IR-009: before the fix, operator resolution reduced two occurrences to the earliest time.
+  The resolver now proves every target occurrence against one row, ignores unrelated/non-occurring
+  events, rejects half-covered ranges, and binds a target-occurrence applicability digest.
 
-## Remediation attacks
+## Preserved regressions
 
-- CMR-IR-001: one-book and all-book HOME/AWAY swaps, individual name substitutions and DRAW
-  corruption now block before H2H observation construction. Valid outcome/event permutations are
-  deterministic.
-- CMR-IR-002: each complete Odds temporal-state field changes the local temporal digest; stale
-  requests block and fresh valid rebinds have a different request/result identity.
-- CMR-IR-003: market or bookmaker fallback timestamps after receipt are excluded before alias
-  ranking; a valid older alias remains selectable and all-future aliases contribute nothing.
-- CMR-IR-004: only HUMAN_VERIFIED blocking mappings pass. Every tested AUTO_MATCHED and unresolved
-  governance state blocks.
-- CMR-IR-005: official-FPL lookup requires the exact active provider, fantasy product, PL
-  competition, season, namespace, type and temporal ranges; hostile scope substitutions block.
-- CMR-IR-006: exact packaged rights authority and config are authenticated and hash-bound;
-  profile, version, config, provider/status and effective-right attacks block safely.
-- CMR-IR-007: all seven findings now have direct named regressions. Raw branch coverage is
-  215/232 (92.67241379310344%), above the required 90%.
+CMR-IR-001/002/004/005/006 remain closed: local H2H labels, complete temporal binding,
+HUMAN_VERIFIED authority, exact official-FPL scope, and exact approved Odds rights all pass their
+positive and hostile matrices. H2H vig/consensus, totals binary power/underround/fair/fallback,
+exact complements, half-goal gating, price/line/quality/source mutations, ordering and rehashed
+tamper verification remain green.
 
-## Regression and scope review
+## Coverage and database boundary
 
-Accepted Stage-6 H2H normalization is reused unchanged. Binary totals power/proportional methods,
-underround/fair/extreme/failure paths, alias conflicts, half-goal lines, mutations and exact
-complements pass. PostgreSQL resolution uses core SELECTs and preserves before/after canonical
-row counts with pending and dirty ORM state; it performs no add, flush, commit, write or market
-persistence.
+The focused suite passed 110 tests. Raw current-module statement coverage is 818/841
+(97.26516052318668%); raw branch coverage is 230/248 (92.74193548387096%). These are separate
+figures and both exceed 90%. Newly fixed H2H pre-ranking, cross-source bridge and multi-occurrence
+operator paths have direct tests.
 
-Rights remain PRIVATE and TRANSIENT_IN_MEMORY with all storage, cache, backup, display and
-redistribution capabilities denied. Runtime reports zero network, persistence and database
-writes. Safe summaries and all error forms expose no provider, bookmaker, price, official fixture
-or canonical-mapping values.
+Product source contains no Session add/flush/commit and no SQL INSERT/UPDATE/DELETE. The resolver
+uses SELECTs only. PostgreSQL tests report no autoflush, DML, persistence, canonical creation,
+external identifier/operator creation, normalisation run, market consensus or current-market row.
 
-No accepted predecessor, Stage-6 mathematics, GCS-008 contract, Stage-7 implementation,
-data-model schema/migration or optimisation code changed. No score prior, goal rate, minutes
-context, score service invocation, player allocation, FPL points or production action exists.
+## Rights, disclosure and scope
+
+Rights remain PRIVATE and TRANSIENT_IN_MEMORY; persistent/derived/raw storage, cache, backup,
+public display and redistribution remain denied. Runtime records no network, persistence or
+database write. Summary/error string, repr, object and JSON surfaces expose no official fixture,
+provider event/team, bookmaker, price, mapping or manager-private data.
+
+No sealed upstream source, Stage-6 mathematics, GCS-008, migration or future-stage implementation
+changed. Stage-7 remains DATA_BLOCKED; GCS-008 was not executed live; score prior remains exactly
+`NO_ACCEPTED_CURRENT_SCORE_PRIOR`; player allocation, Stage 9 and optimisation were not started.
 
 ## Engineering finding accounting
 
-- P0 unresolved: 0.
-- P1 historical/closed/unresolved: 4 / 4 / 0.
-- Material P2 historical/closed/unresolved: 3 / 3 / 0.
-- P3 unresolved: 0.
+- P0 unresolved/new: 0 / 0.
+- P1 current engineering-closed/unresolved: CMR-IR-003 and CMR-IR-008 / 0.
+- Material P2 current engineering-closed/unresolved: CMR-IR-007 and CMR-IR-009 / 0.
+- New P1/material P2/P3 found by this self-review: 0 / 0 / 0.
 
-This is a same-agent engineering closure assessment, not independent confirmation.
+This is engineering closure at `562e5a586881d9e462075ffd5dad01401b265ff3`, not independent
+confirmation.
 
 `CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`

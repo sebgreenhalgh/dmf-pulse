@@ -11,8 +11,9 @@
 - Safety: preserve the dirty CURRENT-AVAILABILITY worktree; no source acquisition, network, DB
   write, persistence, score prior/rates, Stage-7 substitution, full GCS-008 execution, player
   allocation, Stage 9, optimisation, PR, merge, production activation, or human-acceptance claim.
-- Remediation basis: preserve deficient commit `92f368597c22edbf77b236a8c96ddf959e545f59`
-  and close independent-review findings CMR-IR-001 through CMR-IR-007 in a visible descendant.
+- Remediation basis: preserve deficient commit `92f368597c22edbf77b236a8c96ddf959e545f59`,
+  first remediation `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`, and interrupted re-review
+  `f58790c4d2d3ed56a472bd3d52583451dbebab6c` in visible descendant history.
 
 ### CURRENT-MARKETS-001A checkpoints
 
@@ -30,9 +31,13 @@
   provider/product/PL-season authority.
 - [x] Add direct unit and PostgreSQL regressions for every historical independent-review finding
   and raise ticket-owned raw branch coverage above 90%.
-- [ ] Correct remediation chronology/evidence and manifests; pass full inherited/static/wheel
-  acceptance; commit and push without amending the deficient SHA; inspect exact-SHA CI; stop for
-  independent re-review.
+- [x] Second remediation: filter H2H future aliases before canonical-operator ranking; reconstruct
+  exact current-event -> accepted 001B team bridge -> current official-FPL fixture orientation;
+  require one operator mapping to cover every target occurrence; and commit explicit pending/dirty
+  SQLAlchemy autoflush read-only proofs.
+- [ ] Preserve CMR-IR-001/002/004/005/006 closure, correct remediation chronology/evidence and
+  manifests, pass full focused/inherited/PostgreSQL/static/wheel acceptance, commit and push a
+  normal descendant, inspect exact-SHA CI, and stop for fresh independent re-review.
 
 ## CURRENT-FPL-STATE-001B transient FPL/Odds identity bridge
 

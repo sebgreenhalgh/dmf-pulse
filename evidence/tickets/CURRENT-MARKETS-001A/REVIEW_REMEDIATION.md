@@ -8,8 +8,12 @@
    `CURRENT_MARKETS_001A_REMEDIATION_REQUIRED`.
 3. Product remediation commit `30ad5c2e821eb03827e16f24d4b22a44ca3804a2` adds the guards and
    direct adversarial regressions described below.
-4. Closure is an engineering remediation claim. A fresh independent re-review has not yet
-   confirmed any closure.
+4. Governance continuation `f58790c4d2d3ed56a472bd3d52583451dbebab6c` was the unit inspected
+   by an interrupted independent re-review. That re-review independently closed
+   CMR-IR-001/002/004/005/006, kept CMR-IR-003/007 open, and found CMR-IR-008/009.
+5. Second-remediation product commit `562e5a586881d9e462075ffd5dad01401b265ff3`
+   closes the four current findings by engineering. Fresh independent re-review has not yet
+   confirmed those closures.
 
 ## Finding record
 
@@ -22,7 +26,7 @@
   disclosure-safe `SOURCE_INVALID`.
 - Direct regressions: one/all-book swaps, individual HOME/AWAY corruption, DRAW corruption, and
   legitimate ordering permutations.
-- Status: **CLOSED BY REMEDIATION `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`**.
+- Status: **CLOSED; CONFIRMED BY INTERRUPTED INDEPENDENT RE-REVIEW**.
 
 ### CMR-IR-002 — P1 — unbound Odds temporal state
 
@@ -32,18 +36,22 @@
   `CurrentOddsTemporalState` and is bound separately into request and lineage.
 - Direct regressions: every temporal field, stale-request substitution, fresh rebind, and
   result-identity change where the mutation remains usable.
-- Status: **CLOSED BY REMEDIATION `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`**.
+- Status: **CLOSED; CONFIRMED BY INTERRUPTED INDEPENDENT RE-REVIEW**.
 
-### CMR-IR-003 — P1 — totals receipt-time coherence
+### CMR-IR-003 — P1 — receipt-time alias selection
 
 - Origin: **FOUND BY INDEPENDENT REVIEW**.
 - Reproduction: totals observations later than the accepted response receipt could enter a
   result when still no later than market `as_of`.
-- Remediation: market and bookmaker-fallback observations later than `received_at` are excluded
-  as `FUTURE_OBSERVATION` before canonical-operator alias ranking.
-- Direct regressions: before/equal/after receipt for both timestamp sources, valid older alias
-  retention, and all-future alias exclusion.
-- Status: **CLOSED BY REMEDIATION `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`**.
+- First remediation: totals market and bookmaker-fallback observations later than `received_at`
+  were excluded before canonical-operator alias ranking. The interrupted independent re-review
+  found that H2H still ranked aliases before applying the receipt boundary.
+- Second remediation: every H2H alias now derives its market or truthful bookmaker-fallback
+  observation time and excludes post-receipt evidence before canonical grouping or ranking.
+- Committed regressions: invalid-newer/valid-older, all-future, newest-valid, tied-identical,
+  tied-conflict, bookmaker fallback, receipt-before-market-as-of, and ordering permutations.
+- Status: **ENGINEERING_CLOSED_AT_562e5a586881d9e462075ffd5dad01401b265ff3;
+  INDEPENDENT CLOSURE PENDING**.
 
 ### CMR-IR-004 — P1 — unapproved mapping authority
 
@@ -54,7 +62,7 @@
   requires `HUMAN_VERIFIED`.
 - Direct regressions: HUMAN_VERIFIED positive; probabilistic/high/low/zero/null AUTO_MATCHED and
   CANDIDATE, UNRESOLVED, CONFLICTED, REJECTED and EXPIRED negatives.
-- Status: **CLOSED BY REMEDIATION `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`**.
+- Status: **CLOSED; CONFIRMED BY INTERRUPTED INDEPENDENT RE-REVIEW**.
 
 ### CMR-IR-005 — material P2 — incomplete official-FPL fixture scope
 
@@ -66,7 +74,7 @@
   applicability/system ranges and HUMAN_VERIFIED authority.
 - Direct regressions: wrong product, inactive provider, wrong/cross competition, wrong season,
   namespace/entity/ranges and ambiguous authority.
-- Status: **CLOSED BY REMEDIATION `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`**.
+- Status: **CLOSED; CONFIRMED BY INTERRUPTED INDEPENDENT RE-REVIEW**.
 
 ### CMR-IR-006 — material P2 — unauthenticated Odds rights identity
 
@@ -78,25 +86,61 @@
   authority into request and lineage.
 - Direct regressions: wrong ID/version/config, provider/status authority mismatch and effective
   capability denial, including safe serialized errors.
-- Status: **CLOSED BY REMEDIATION `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`**.
+- Status: **CLOSED; CONFIRMED BY INTERRUPTED INDEPENDENT RE-REVIEW**.
 
 ### CMR-IR-007 — material P2 — test/evidence quality
 
 - Origin: **FOUND BY INDEPENDENT REVIEW**.
-- Reproduction: the historical same-agent evidence claimed boundaries closed despite reproduced
-  failures, while raw branch coverage was approximately 85.135%.
-- Remediation: this chronology corrects the record; direct tests cover every finding and critical
-  binary-normalizer, timestamp, alias and repository failure path. Focused coverage is 781/804
-  statements (97.13930348258707%), 215/232 branches (92.67241379310344%), and 96.13899613899613%
-  combined.
-- Status: **CLOSED BY REMEDIATION `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`**.
+- Reproduction: first-remediation evidence claimed pending/dirty SQLAlchemy Session coverage that
+  did not exist in the committed suite. Reviewer-only exploratory probes did observe read-only
+  behavior, but those probes were not committed engineering evidence.
+- Second remediation: committed tests
+  `test_cmr_ir_007_pending_orm_state_is_not_autoflushed_by_resolver_selects` and
+  `test_cmr_ir_007_dirty_orm_state_is_not_autoflushed_by_resolver_selects` use PostgreSQL and
+  `autoflush=True`, retain pending/dirty ORM state, observe zero flush/DML, compare canonical,
+  mapping, operator and market-result row counts, and roll back.
+- Coverage: 818/841 statements (97.26516052318668%) and 230/248 branches
+  (92.74193548387096%); both figures are reported separately.
+- Status: **ENGINEERING_CLOSED_AT_562e5a586881d9e462075ffd5dad01401b265ff3;
+  INDEPENDENT CLOSURE PENDING**.
+
+### CMR-IR-008 — P1 — cross-source orientation
+
+- Origin: **FOUND BY INTERRUPTED INDEPENDENT RE-REVIEW**.
+- Reproduction: a coherently swapped and rehashed current Odds event plus matching H2H labels was
+  accepted while the accepted 001B identity map remained unchanged.
+- Remediation: `build()` recomputes the current provider-event identity and exact event fields,
+  reconstructs both accepted 001B team mappings, and checks the official FPL fixture home/away
+  identities and kickoff before any H2H or totals use. The local H2H label guard remains.
+- Committed regressions: coherent full swap, participant-only swap, label-only swap, sealed map
+  mutation, official-FPL orientation mutation, exact home/away team-bridge mismatch, verify-path
+  reconstruction, ordering, and installed-wheel reproduction.
+- Status: **ENGINEERING_CLOSED_AT_562e5a586881d9e462075ffd5dad01401b265ff3;
+  INDEPENDENT CLOSURE PENDING**.
+
+### CMR-IR-009 — material P2 — operator validity at every occurrence
+
+- Origin: **FOUND BY INTERRUPTED INDEPENDENT RE-REVIEW**.
+- Reproduction: one bookmaker occurring at 14:00 and 16:00 was resolved from a mapping valid only
+  at the minimum occurrence.
+- Remediation: target-only occurrence times are collected as sorted unique tuples. One exact
+  HUMAN_VERIFIED mapping row must contain every timestamp; mappings are never combined. A
+  disclosure-safe occurrence digest is embedded in and reconstructed against the identity view.
+- Committed PostgreSQL regressions: ranges covering both, expiring before the second, starting
+  after the first, inclusive lower, excluded upper, bookmaker absent from the later fixture,
+  unrelated outside-target event, and DAT-003 duplicate-current-authority blocking.
+- Status: **ENGINEERING_CLOSED_AT_562e5a586881d9e462075ffd5dad01401b265ff3;
+  INDEPENDENT CLOSURE PENDING**.
 
 ## Engineering finding accounting
 
 - P0 historical/unresolved: 0 / 0.
-- P1 historical/closed/unresolved: 4 / 4 / 0.
-- Material P2 historical/closed/unresolved: 3 / 3 / 0.
+- P1 historical/engineering-closed/unresolved: 5 / 5 / 0.
+- Material P2 historical/engineering-closed/unresolved: 4 / 4 / 0.
 - P3 unresolved: 0.
+
+CMR-IR-001/002/004/005/006 retain their independent closed disposition. CMR-IR-003/007/008/009
+are engineering-closed only and require fresh independent re-review.
 
 Status: `CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`.
 
