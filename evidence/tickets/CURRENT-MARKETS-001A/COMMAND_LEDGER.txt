@@ -138,3 +138,45 @@ Date: 2026-08-29
 
 CMR-IR-001/002/004/005/006 remain independently closed. CMR-IR-003/007/008/009 are engineering
 closed at 562e5a586881d9e462075ffd5dad01401b265ff3 and pending fresh independent re-review.
+
+CURRENT-MARKETS-001A third-remediation ledger
+Date: 2026-08-29
+
+38. Exact third-remediation start and isolation
+    PASS: fetched refs matched origin/main 4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb and reviewed
+    branch ee4a35760a56f84b4f0f50f3d2f898e2037d105a, tree
+    02bd6ad1c849690e6c7c3576cd8d0ff4d5960ab5, ahead/behind 5/0. The dedicated
+    CURRENT-MARKETS worktree was clean; the dirty CURRENT-AVAILABILITY worktree stayed untouched.
+39. CMR-IR-010/011 reproduction and closure
+    PASS: reviewed code placed receipt `continue` before H2H labels and appended totals projections
+    in tuple order. Direct attacks cover every label/source/alias/order combination and two-/three-
+    line/outcome/bookmaker/event permutations while preserving price and line-set materiality.
+40. Third-remediation product/tests commit
+    PASS: 316d52b87f113f9364ee0dab9c296cf8fe0ff544 is a direct normal descendant of ee4a357.
+    Upstream product scope is exactly one exact-Decimal semantic-projection sort in
+    src/dmf_pulse/ingestion/odds/current.py; no stored-order or builder change.
+41. Focused branch-aware suite
+    PASS: exact five-file selector 122 tests; 818/841 statements (97.26516052318668%);
+    230/248 branches (92.74193548387096%); combined 96.23507805325987%.
+42. Inherited tests
+    PASS: FPL/LIVE-ODDS/001B/001D superset 372; markets 173; GCS-008 209; PostgreSQL markets 50;
+    ticket-specific PostgreSQL 29; DAT-003/PostgreSQL migrations 90.
+43. Static/build/installed wheel
+    PASS: frozen sync 40 packages; diff/format/lint; mypy 252 source files; 0.2.0 sdist/wheel;
+    generic, ODD, GCS and CURRENT-MARKETS wheel verifiers. Installed CURRENT-MARKETS blocks
+    corrupt future HOME/AWAY/DRAW, proves totals order source/request/result/summary identity,
+    verifies normal output and attempts zero network requests.
+44. Normal LIVE-ODDS builder impact
+    PASS: semantic SHA before and after is exactly
+    27880ba63a4555ee74f21b8c5acdeccc73c7194d57b8ea663bef8fed4cc44abf. Builder selection,
+    rights, temporal, quota and network behavior are unchanged.
+45. Evidence, canonical manifests, repository validation and secret scan
+    PASS: CURRENT-MARKETS and authorized PRC-013 manifests each contain 1,188 deliverables and
+    were byte-stable across canonical regeneration; repository validation returned zero errors;
+    secret scan returned zero findings.
+46. Final evidence commit/push and exact-SHA automatic CI
+    PENDING. No CI run metadata will be committed after the exact final SHA is pushed.
+
+CMR-IR-002/003/004/005/006/007/009 remain independently closed. CMR-IR-001/008 are engineering
+restored through CMR-IR-010. CMR-IR-010/011 are engineering-closed at 316d52b and pending fresh
+independent re-review.

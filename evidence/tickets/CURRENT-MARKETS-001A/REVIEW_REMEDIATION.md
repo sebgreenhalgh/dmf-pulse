@@ -14,6 +14,13 @@
 5. Second-remediation product commit `562e5a586881d9e462075ffd5dad01401b265ff3`
    closes the four current findings by engineering. Fresh independent re-review has not yet
    confirmed those closures.
+6. Final independent re-review inspected governance continuation
+   `ee4a35760a56f84b4f0f50f3d2f898e2037d105a`. It independently closed
+   CMR-IR-002/003/004/005/006/007/009, found CMR-IR-010 (P1), found CMR-IR-011
+   (material P2), and treated CMR-IR-001/008 as open only through the CMR-IR-010 regression.
+7. Third-remediation product/tests commit `316d52b87f113f9364ee0dab9c296cf8fe0ff544`
+   closes CMR-IR-010/011 by engineering and restores the CMR-IR-001/008 regression. Fresh
+   independent closure remains pending.
 
 ## Finding record
 
@@ -27,6 +34,8 @@
 - Direct regressions: one/all-book swaps, individual HOME/AWAY corruption, DRAW corruption, and
   legitimate ordering permutations.
 - Status: **CLOSED; CONFIRMED BY INTERRUPTED INDEPENDENT RE-REVIEW**.
+- Final-re-review effect: **ENGINEERING_RESTORED_AT_316d52b87f113f9364ee0dab9c296cf8fe0ff544;
+  INDEPENDENT CLOSURE PENDING THROUGH CMR-IR-010**.
 
 ### CMR-IR-002 — P1 — unbound Odds temporal state
 
@@ -52,6 +61,7 @@
   tied-conflict, bookmaker fallback, receipt-before-market-as-of, and ordering permutations.
 - Status: **ENGINEERING_CLOSED_AT_562e5a586881d9e462075ffd5dad01401b265ff3;
   INDEPENDENT CLOSURE PENDING**.
+- Final-re-review disposition: **CLOSED; CONFIRMED BY FINAL INDEPENDENT RE-REVIEW**.
 
 ### CMR-IR-004 — P1 — unapproved mapping authority
 
@@ -103,6 +113,7 @@
   (92.74193548387096%); both figures are reported separately.
 - Status: **ENGINEERING_CLOSED_AT_562e5a586881d9e462075ffd5dad01401b265ff3;
   INDEPENDENT CLOSURE PENDING**.
+- Final-re-review disposition: **CLOSED; CONFIRMED BY FINAL INDEPENDENT RE-REVIEW**.
 
 ### CMR-IR-008 — P1 — cross-source orientation
 
@@ -117,6 +128,8 @@
   reconstruction, ordering, and installed-wheel reproduction.
 - Status: **ENGINEERING_CLOSED_AT_562e5a586881d9e462075ffd5dad01401b265ff3;
   INDEPENDENT CLOSURE PENDING**.
+- Final-re-review effect: **ENGINEERING_RESTORED_AT_316d52b87f113f9364ee0dab9c296cf8fe0ff544;
+  INDEPENDENT CLOSURE PENDING THROUGH CMR-IR-010**.
 
 ### CMR-IR-009 — material P2 — operator validity at every occurrence
 
@@ -131,16 +144,51 @@
   unrelated outside-target event, and DAT-003 duplicate-current-authority blocking.
 - Status: **ENGINEERING_CLOSED_AT_562e5a586881d9e462075ffd5dad01401b265ff3;
   INDEPENDENT CLOSURE PENDING**.
+- Final-re-review disposition: **CLOSED; CONFIRMED BY FINAL INDEPENDENT RE-REVIEW**.
+
+### CMR-IR-010 — P1 — post-receipt H2H label-validation bypass
+
+- Origin: **FOUND BY FINAL INDEPENDENT RE-REVIEW**.
+- Reproduction: a freshly rehashed future H2H alias with a malformed HOME, AWAY or DRAW provider
+  label reached the receipt-time `continue` before the local orientation guard.
+- Remediation: all three supplied H2H outcomes are structurally/orientationally validated before
+  canonical-operator lookup, timestamp derivation, receipt-time exclusion or alias ranking.
+- Direct regressions: HOME/AWAY/DRAW, one/all aliases, market/bookmaker timestamp source, forward
+  and reversed ordering, valid-future/valid-older retention, all-valid-future exclusion,
+  disclosure-safe surfaces, and installed-wheel reproduction.
+- Status: **ENGINEERING_CLOSED_AT_316d52b87f113f9364ee0dab9c296cf8fe0ff544;
+  INDEPENDENT CLOSURE PENDING**.
+
+### CMR-IR-011 — material P2 — totals-market semantic tuple ordering
+
+- Origin: **FOUND BY FINAL INDEPENDENT RE-REVIEW**.
+- Classification: **CONTROLLED UPSTREAM LIVE-ODDS SEMANTIC-CANONICALIZATION CORRECTION**; not a
+  rewrite of the historical accepted LIVE-ODDS capability.
+- Reproduction: valid multi-line `CurrentOddsBookmaker.totals_markets` objects with identical
+  content in reversed tuple order produced different supported-market semantic hashes.
+- Remediation: only `_current_odds_market_semantic_payload()` sorts totals-market projections by
+  exact Decimal line. H2H remains first; stored tuple order, builder selection, schema/version,
+  prices, normalization, rights, temporal, quota, identity and persistence are unchanged.
+- Direct regressions: two-line reversal, all three-line permutations, OVER/UNDER reversal,
+  bookmaker/event order, line-set/price mutations, 001D unified identity, CURRENT-MARKETS
+  request/result/summary and installed-wheel reproduction.
+- Normal builder impact: unchanged semantic SHA-256
+  `27880ba63a4555ee74f21b8c5acdeccc73c7194d57b8ea663bef8fed4cc44abf` before and after.
+- Status: **ENGINEERING_CLOSED_AT_316d52b87f113f9364ee0dab9c296cf8fe0ff544;
+  INDEPENDENT CLOSURE PENDING**.
 
 ## Engineering finding accounting
 
 - P0 historical/unresolved: 0 / 0.
-- P1 historical/engineering-closed/unresolved: 5 / 5 / 0.
-- Material P2 historical/engineering-closed/unresolved: 4 / 4 / 0.
+- P1 historical: 6. Independently closed: CMR-IR-002/003/004. Engineering-restored or closed
+  pending independent confirmation: CMR-IR-001/008/010. Engineering-unresolved: 0.
+- Material P2 historical: 5. Independently closed: CMR-IR-005/006/007/009. Engineering-closed
+  pending independent confirmation: CMR-IR-011. Engineering-unresolved: 0.
 - P3 unresolved: 0.
 
-CMR-IR-001/002/004/005/006 retain their independent closed disposition. CMR-IR-003/007/008/009
-are engineering-closed only and require fresh independent re-review.
+CMR-IR-002/003/004/005/006/007/009 retain their final independent closed disposition.
+CMR-IR-001/008 are engineering-restored through CMR-IR-010; CMR-IR-010/011 are engineering
+closed. Fresh independent confirmation is still required.
 
 Status: `CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`.
 

@@ -30,3 +30,20 @@
 5. Close CMR-IR-007 with committed pending/dirty ORM autoflush regressions and truthful evidence.
 6. Preserve CMR-IR-001/002/004/005/006, rerun full acceptance, create normal descendant commits,
    push the same branch, inspect exact-SHA CI, and stop for fresh independent re-review.
+
+## Third remediation after final independent re-review
+
+1. Preserve reviewed SHA `ee4a35760a56f84b4f0f50f3d2f898e2037d105a` and all earlier
+   chronology and independently closed dispositions.
+2. Close CMR-IR-010 by validating every supplied H2H HOME/AWAY/DRAW label before any
+   receipt-time exclusion or alias ranking, including disclosure-safe and installed-wheel attacks.
+3. Close CMR-IR-011 through the expressly authorized upstream change limited to sorting the
+   supported-market semantic projection of totals lines by exact Decimal line.
+4. Prove direct LIVE-ODDS two-/three-line permutations, outcome/bookmaker/event ordering,
+   content mutations, normal builder stability, 001D/source/request/result identity, and the
+   installed-wheel behavior.
+5. Preserve all closed regressions and unchanged normalization, rights, temporal, quota,
+   identity, database, persistence, Stage-7, GCS-008, score-prior, and future-stage boundaries.
+6. Rerun full focused/inherited/PostgreSQL/static/wheel acceptance, regenerate only current
+   authorized manifests, push normal descendants, inspect exact-SHA CI, and stop for independent
+   re-review.

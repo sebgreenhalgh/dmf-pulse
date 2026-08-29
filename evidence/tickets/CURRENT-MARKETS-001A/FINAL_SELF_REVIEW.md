@@ -1,61 +1,48 @@
-# CURRENT-MARKETS-001A second-remediation engineering self-review
+# CURRENT-MARKETS-001A third-remediation engineering self-review
 
-## Reproduced current findings
+## Reproduced final-review findings
 
-- CMR-IR-003: before the fix, a post-receipt newer H2H alias suppressed an older valid alias.
-  Now market and bookmaker-fallback timestamps are filtered before grouping; the valid older alias
-  remains, all-future aliases contribute nothing, valid newest/tied cases are deterministic, and
-  conflicting ties remain quality-blocked.
-- CMR-IR-007: first-remediation evidence claimed committed pending/dirty Session tests that were
-  absent. Reviewer-only exploratory probes are now distinguished from the two named committed
-  `autoflush=True` PostgreSQL tests. Pending/dirty state remains unflushed and is rolled back;
-  relevant canonical/mapping/operator/market row counts and captured DML remain unchanged/empty.
-- CMR-IR-008: before the fix, a coherently rehashed event participant plus H2H-label swap changed
-  HOME consensus while the accepted 001B map remained unchanged. Exact event identity, both team
-  sides, official-FPL orientation and kickoff now reconstruct in `build()` and `verify()`; the old
-  attack blocks. The independent local outcome-label guard remains.
-- CMR-IR-009: before the fix, operator resolution reduced two occurrences to the earliest time.
-  The resolver now proves every target occurrence against one row, ignores unrelated/non-occurring
-  events, rejects half-covered ranges, and binds a target-occurrence applicability digest.
+- CMR-IR-010: at the reviewed starting head, post-receipt H2H evidence reached `continue` before
+  HOME/AWAY/DRAW provider-label validation. The guard now precedes temporal exclusion. Freshly
+  rehashed corrupt future labels block for every outcome, alias cardinality, timestamp source and
+  ordering; valid future aliases still exclude and valid older aliases remain.
+- CMR-IR-011: at the reviewed starting head, reversing valid multi-line `totals_markets` changed
+  the LIVE-ODDS semantic hash and downstream identities. Exact-Decimal line sorting is now limited
+  to the semantic projection. Two-/three-line and nested ordering permutations are invariant;
+  line-set and price changes remain material.
 
-## Preserved regressions
+## Preserved regressions and boundaries
 
-CMR-IR-001/002/004/005/006 remain closed: local H2H labels, complete temporal binding,
-HUMAN_VERIFIED authority, exact official-FPL scope, and exact approved Odds rights all pass their
-positive and hostile matrices. H2H vig/consensus, totals binary power/underround/fair/fallback,
-exact complements, half-goal gating, price/line/quality/source mutations, ordering and rehashed
-tamper verification remain green.
+CMR-IR-002/003/004/005/006/007/009 remain independently closed. CMR-IR-001 local label behavior
+and CMR-IR-008 authoritative cross-source reconstruction are engineering-restored through the
+CMR-IR-010 regression. Temporal/rights/quality/source/request digests, operator occurrence
+applicability, HUMAN_VERIFIED authority, official-FPL scope and disclosure remain exact.
 
-## Coverage and database boundary
+The upstream change does not alter stored tuple order, the normal LIVE-ODDS builder, preferred
+totals selection, schemas/versions, H2H ordering, Decimal representation, prices, Stage-6
+normalization, rights, temporal, quota, identity, acquisition, database or persistence. The
+normal builder semantic hash is unchanged at
+`27880ba63a4555ee74f21b8c5acdeccc73c7194d57b8ea663bef8fed4cc44abf`.
 
-The focused suite passed 110 tests. Raw current-module statement coverage is 818/841
+## Coverage, package and runtime
+
+The exact focused selector passed 122 tests. Raw current-module statement coverage is 818/841
 (97.26516052318668%); raw branch coverage is 230/248 (92.74193548387096%). These are separate
-figures and both exceed 90%. Newly fixed H2H pre-ranking, cross-source bridge and multi-occurrence
-operator paths have direct tests.
+figures and both exceed 90%. Inherited populations passed 372 source-state, 173 markets, 209
+GCS-008, 50 PostgreSQL markets and 90 DAT-003 PostgreSQL/migration tests.
 
-Product source contains no Session add/flush/commit and no SQL INSERT/UPDATE/DELETE. The resolver
-uses SELECTs only. PostgreSQL tests report no autoflush, DML, persistence, canonical creation,
-external identifier/operator creation, normalisation run, market consensus or current-market row.
+All four installed-wheel gates passed outside the source tree. CURRENT-MARKETS blocked corrupt
+future HOME/AWAY/DRAW, retained valid older H2H, excluded post-receipt evidence, proved complete
+totals order identity and made zero network requests. The package remains `dmf-pulse==0.2.0`.
 
-## Rights, disclosure and scope
+## Adversarial conclusion
 
-Rights remain PRIVATE and TRANSIENT_IN_MEMORY; persistent/derived/raw storage, cache, backup,
-public display and redistribution remain denied. Runtime records no network, persistence or
-database write. Summary/error string, repr, object and JSON surfaces expose no official fixture,
-provider event/team, bookmaker, price, mapping or manager-private data.
+- New P0 found/unresolved: 0 / 0.
+- New P1 found/unresolved: 0 / 0.
+- New material P2 found/unresolved: 0 / 0.
+- New P3 found/unresolved: 0 / 0.
 
-No sealed upstream source, Stage-6 mathematics, GCS-008, migration or future-stage implementation
-changed. Stage-7 remains DATA_BLOCKED; GCS-008 was not executed live; score prior remains exactly
-`NO_ACCEPTED_CURRENT_SCORE_PRIOR`; player allocation, Stage 9 and optimisation were not started.
-
-## Engineering finding accounting
-
-- P0 unresolved/new: 0 / 0.
-- P1 current engineering-closed/unresolved: CMR-IR-003 and CMR-IR-008 / 0.
-- Material P2 current engineering-closed/unresolved: CMR-IR-007 and CMR-IR-009 / 0.
-- New P1/material P2/P3 found by this self-review: 0 / 0 / 0.
-
-This is engineering closure at `562e5a586881d9e462075ffd5dad01401b265ff3`, not independent
-confirmation.
+CMR-IR-010/011 are engineering-closed at
+`316d52b87f113f9364ee0dab9c296cf8fe0ff544`. This is not independent confirmation.
 
 `CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`

@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 103806,
+      "bytes": 104527,
       "path": "PLANS.md",
-      "sha256": "a6bffc9377ac4077f2cac00abf99a1a833182dac78a71ce056803bcb026796ec"
+      "sha256": "5d31c8173677ecf02ae32e142d301ce38110dd183ae25a8e9e6bd9ae7628f00e"
     },
     {
       "bytes": 2761,
@@ -2266,9 +2266,9 @@
       "sha256": "b8b552daa90e60fe562f260131bfcad725b8d183b2b46960823571b2d85e21c6"
     },
     {
-      "bytes": 18050,
+      "bytes": 20819,
       "path": "scripts/verify_current_markets_wheel.py",
-      "sha256": "bbd441260793db5387343a383de2454b451012bcf9ae47add86178ee19d68e1d"
+      "sha256": "89004511ce9c2d43bdab391c87dd4ac65ed4c21288b7b307cd93c26407633873"
     },
     {
       "bytes": 18042,
@@ -3341,9 +3341,9 @@
       "sha256": "5e145c7a32df7054ef7d051cf2cdf0de5a7a8915d8f4b69339ee71f5850bd29a"
     },
     {
-      "bytes": 36464,
+      "bytes": 36500,
       "path": "src/dmf_pulse/ingestion/odds/current.py",
-      "sha256": "e6e01453a8bd3308d412600c87448413a477348c3ecebacdf7de9ec227574fdf"
+      "sha256": "b3b089946f4e8d6a636a2890eaa5fbea44cac2059ee1459ee849fa415dbe950a"
     },
     {
       "bytes": 73659,
@@ -3403,7 +3403,7 @@
     {
       "bytes": 90533,
       "path": "src/dmf_pulse/markets/current.py",
-      "sha256": "352ec6d42aadf920f52c7281e2b1fa868c6150ba26d9d026c900072db83057d2"
+      "sha256": "680d4bd7404e74c5ee64b5e5b61388a722bd841df658662195238fb3f33c77ad"
     },
     {
       "bytes": 14873,
@@ -5331,9 +5331,9 @@
       "sha256": "30b9cae41f942dd77b6accdd7993f5bb0109dcb3123b833807b54810020fcc7b"
     },
     {
-      "bytes": 19195,
+      "bytes": 24218,
       "path": "tests/unit/ingestion/test_live_odds_001_current_boundaries.py",
-      "sha256": "9beda9081dcaa1c89022828ffacae4532a173ffbb343c45b71b4790d2c389f13"
+      "sha256": "a038055135b5c4ad7d864ac3af4fd9d3cdc09a716f5c52e9df94a216884c4261"
     },
     {
       "bytes": 25616,
@@ -5396,9 +5396,9 @@
       "sha256": "1ee3892c8ddf07e9c539e35b79f926ae12260e77a82162598c7cb7967ec4f4ff"
     },
     {
-      "bytes": 53107,
+      "bytes": 56514,
       "path": "tests/unit/markets/test_current_markets_boundaries.py",
-      "sha256": "60a8c130b18b883e3c75b2475de5559670fd405147dab8f510712a3c953308a7"
+      "sha256": "dcc4712872e2d10db74c30b0e33a2e69e34359fb0655a7f315cae79dbb184bd2"
     },
     {
       "bytes": 28150,
@@ -5766,14 +5766,14 @@
       "sha256": "61397d15b9a25dbae3fe4684866a9762be0ce5f98b8f02ece1680c3501ea6c92"
     },
     {
-      "bytes": 1537,
+      "bytes": 2122,
       "path": "tickets/CURRENT-MARKETS-001A/ACCEPTANCE.md",
-      "sha256": "2a4ae8a8ea5e0c5aec346f6c819cca18aadfa269668fdbace670f037dff4f613"
+      "sha256": "3c64322dd634cacfbb044eb5361b210d76edaec6c493ef5d80ef0874ceed93ce"
     },
     {
-      "bytes": 3048,
+      "bytes": 3427,
       "path": "tickets/CURRENT-MARKETS-001A/ticket.yaml",
-      "sha256": "7682f9ce88b5f26bc9e613456aaee0b26371bddb2335a35d8f9e730a958d2a9a"
+      "sha256": "5fe4fcb3b605578015fb36a62903dd4a356dcbe5873dd383173f4ceb54f31a9d"
     },
     {
       "bytes": 3923,
