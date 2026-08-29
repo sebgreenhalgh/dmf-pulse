@@ -1,5 +1,53 @@
 # DMF Pulse execution plans
 
+## CURRENT-MARKETS-001A transient current market constraints
+
+- Parent/branch: authoritative merged main `4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb`
+  on `integration/current-markets/CURRENT-MARKETS-001A-transient-market-constraints`.
+- Scope: verify one accepted `CurrentUnifiedStateBundle`, resolve exact fixture/provider/operator
+  UUIDs through a hash-bound DAT-003 read-only identity view, reuse the accepted Stage-6 H2H
+  consensus and Stage-8 1X2 adapter, add a narrow exact-Decimal binary totals consensus, and emit
+  one private transient `MarketConstraintSet` per target fixture.
+- Safety: preserve the dirty CURRENT-AVAILABILITY worktree; no source acquisition, network, DB
+  write, persistence, score prior/rates, Stage-7 substitution, full GCS-008 execution, player
+  allocation, Stage 9, optimisation, PR, merge, production activation, or human-acceptance claim.
+- Remediation basis: preserve deficient commit `92f368597c22edbf77b236a8c96ddf959e545f59`,
+  first remediation `30ad5c2e821eb03827e16f24d4b22a44ca3804a2`, and interrupted re-review
+  `f58790c4d2d3ed56a472bd3d52583451dbebab6c` in visible descendant history.
+- Third-remediation basis: preserve reviewed head
+  `ee4a35760a56f84b4f0f50f3d2f898e2037d105a`; close CMR-IR-010 by validating every supplied
+  H2H orientation before receipt-time exclusion, and close CMR-IR-011 through the expressly
+  authorized LIVE-ODDS semantic-hash-only canonicalization of totals-line tuple ordering.
+
+### CURRENT-MARKETS-001A checkpoints
+
+- [x] Fetch and verify exact pinned origin/main, preserve the local availability work, create a
+  clean isolated worktree, and reconcile A3/A5/A6/A8 authority plus 001D, DAT-003, Stage-6, and
+  GCS-008 contracts.
+- [x] Freeze ticket contracts and tests for exact source binding, canonical identity, H2H, totals,
+  constraints, cutoffs, rights/runtime, disclosure, mutation, substitution, and determinism.
+- [x] Implement the smallest complete transient market slice without changing accepted Stage-6
+  H2H mathematics or GCS-008 Stage-7 requirements.
+- [x] Pass focused branch coverage and inherited LIVE-ODDS, 001B, 001D, markets, GCS-008, and
+  DAT-003 regressions plus every static/build/wheel/repository/security gate.
+- [x] Add boundary-local exact temporal/rights identities, provider-name orientation validation,
+  pre-ranking totals receipt coherence, HUMAN_VERIFIED-only mappings, and exact official-FPL
+  provider/product/PL-season authority.
+- [x] Add direct unit and PostgreSQL regressions for every historical independent-review finding
+  and raise ticket-owned raw branch coverage above 90%.
+- [x] Second remediation: filter H2H future aliases before canonical-operator ranking; reconstruct
+  exact current-event -> accepted 001B team bridge -> current official-FPL fixture orientation;
+  require one operator mapping to cover every target occurrence; and commit explicit pending/dirty
+  SQLAlchemy autoflush read-only proofs.
+- [x] Third remediation: validate HOME/AWAY/DRAW provider labels before temporal exclusion; sort
+  only the LIVE-ODDS semantic projection of totals markets by exact Decimal line; prove direct,
+  downstream, permutation, mutation, and installed-wheel behavior without changing stored order,
+  builder selection, schema, normalization, rights, temporal, quota, identity, or persistence.
+- [ ] Preserve all previously independently closed findings, correct remediation
+  chronology/evidence and manifests, pass full focused/inherited/PostgreSQL/static/wheel
+  acceptance, commit and push a normal descendant, inspect exact-SHA CI, and stop for fresh
+  independent re-review.
+
 ## CURRENT-FPL-STATE-001B transient FPL/Odds identity bridge
 
 - Parent/branch: human-accepted merged main `ee16489054ff78c59eb67897e5e9e52f785ccd6e`

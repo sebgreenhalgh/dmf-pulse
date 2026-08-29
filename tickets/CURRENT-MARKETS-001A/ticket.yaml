@@ -1,0 +1,67 @@
+ticket_id: CURRENT-MARKETS-001A
+title: Live transient H2H and totals market constraints
+status: ACTIVE
+required_base_commit: 4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb
+expected_branch: integration/current-markets/CURRENT-MARKETS-001A-transient-market-constraints
+objective: >-
+  Convert the exact Odds evidence already bound into an accepted CurrentUnifiedStateBundle into
+  vig-normalised current H2H and full-time half-goal totals consensuses and Stage-8-compatible
+  market constraints without persistence, network access, score projection, or fake Stage-7 data.
+authority_scopes:
+  - A3-data-foundation
+  - A5-odds-manual-import
+  - A6-normalisation
+  - A8-events
+permissions:
+  source_acquisition: forbidden
+  network: forbidden
+  database_read: read_only_canonical_identity_only
+  database_write: forbidden
+  persistence: forbidden
+  score_projection: forbidden
+  modelling_or_optimisation: forbidden
+  new_runtime_dependency: forbidden
+allowed_areas:
+  - src/dmf_pulse/ingestion/odds/current.py
+  - src/dmf_pulse/markets/current.py
+  - src/dmf_pulse/markets/__init__.py
+  - tests/unit/ingestion/test_live_odds_001_current_boundaries.py
+  - tests/unit/markets/current_market_test_support.py
+  - tests/unit/markets/test_current_markets.py
+  - tests/unit/markets/test_current_markets_boundaries.py
+  - tests/unit/markets/test_current_market_contract_invariants.py
+  - tests/unit/markets/test_current_market_identity_repository.py
+  - tests/integration/markets/test_current_market_identity_readonly.py
+  - scripts/verify_current_markets_wheel.py
+  - tickets/CURRENT-MARKETS-001A/**
+  - evidence/tickets/CURRENT-MARKETS-001A/**
+  - evidence/tickets/PRC-013/current_manifest.json
+  - PLANS.md
+exclusions:
+  - official FPL or Odds acquisition
+  - raw or derived current-market persistence
+  - canonical entity, mapping, fixture, provider, or operator creation
+  - Stage-7 minutes fabrication or GCS-008 contract weakening
+  - score-rate inference, score distribution, player events, FPL points, or optimisation
+  - CLI, orchestration, Decision Bundle, PR, merge, or production activation
+required_public_behavior:
+  - >-
+    semantically irrelevant totals-market tuple ordering is canonicalized by exact Decimal line
+    only inside the LIVE-ODDS supported-market semantic-hash projection
+  - exact 001D, market, provenance, fixture-map, cutoff, policy, and identity-view binding
+  - exact target fixture selection through the accepted 001B provider-event bridge
+  - >-
+    exact current Odds event and official FPL home/away reconstruction through the accepted 001B
+    team bridge
+  - receipt-time eligibility before H2H or totals canonical-operator alias ranking
+  - provider-facing HOME, AWAY, and DRAW orientation validation before H2H temporal exclusion
+  - >-
+    one HUMAN_VERIFIED operator mapping applicable to every target occurrence with semantic
+    evidence
+  - accepted Stage-6 H2H normalisation and consensus without persistence
+  - exact-Decimal binary totals normalisation for supported full-time half-goal lines
+  - Stage-8-compatible 1X2 and totals constraints with accepted family caps
+  - MARKET_READY, H2H_ONLY_DEGRADED, and BLOCKED fixture classifications
+  - deterministic material-evidence identity and safe summary/error disclosure
+  - explicit transient rights/runtime evidence with zero network and zero database writes
+acceptance_status: CURRENT_MARKETS_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW

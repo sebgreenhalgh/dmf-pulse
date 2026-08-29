@@ -1,0 +1,182 @@
+CURRENT-MARKETS-001A command ledger
+Date: 2026-08-28
+
+1. Exact ref/worktree/history inspection; git fetch origin --prune
+   PASS: authoritative origin/main and required parent were exactly
+   4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb. The unrelated dirty CURRENT-AVAILABILITY worktree
+   was preserved, and this branch was created in a separate clean worktree.
+2. Authority and accepted-contract inspection
+   PASS: A3/A5/A6/A8, DAT-003, LIVE-ODDS, 001B/001D, Stage-6 and GCS-008 contracts reconciled.
+   No accepted current score prior was found; blocker recorded as NO_ACCEPTED_CURRENT_SCORE_PRIOR.
+3. Preliminary focused tests
+   EXPECTED DEVELOPMENT FAILURES/CLOSED: the first synthetic source refreshed Odds after its
+   accepted fixture-approval window and eager package export created a circular import. The
+   coherent family and lazy export boundary were corrected before final acceptance.
+4. Ticket-owned focused suite and branch-aware coverage
+   PASS: 32 tests; 92.3154701718908% branch-aware product coverage; 724/767 statements and
+   189/222 branches covered. Material uncovered defensive branches were manually inspected.
+5. Inherited LIVE-ODDS/001B/001D/Stage-6/GCS-008/DAT-003 unit matrix
+   PASS: 522 tests.
+6. Disposable PostgreSQL 18.4 canonical identity proof
+   PASS: migrations through 20260807_0006; exact dual-namespace fixture/operator resolution;
+   database-read evidence true; before/after table counts identical; 1 integration test passed.
+7. Inherited DAT-003 PostgreSQL and migration matrix
+   PASS: 90 tests.
+8. uv sync --all-groups --frozen
+   PASS: 40 packages checked.
+9. git diff --check; uv run ruff format --check .; uv run ruff check .
+   PASS: diff clean; 674 files formatted; lint clean.
+10. uv run mypy src/dmf_pulse
+    PASS: 252 source files.
+11. uv build
+    HOST BOUNDARY/PASS: Windows application control denied the sandboxed uv launcher before
+    execution; the identical approved host command built the 0.2.0 sdist and wheel.
+12. uv run python scripts/verify_wheel.py
+    PASS: clean environment outside repository; HEALTHY; 293 wheel files; network fetch disabled.
+    NOTE: after the disposable volume was deliberately recreated for final rebuilt-wheel checks,
+    the first doctor invocation correctly found an unmigrated empty database. The canonical
+    migration command was run and the exact wheel command then passed.
+13. uv run python scripts/verify_odd005_wheel.py
+    PASS: clean isolated database and installed wheel; exact prices; zero network requests.
+    NOTE: the first invocation immediately following another database verifier reported an
+    installed FPL replay startup failure; the exact isolated rerun passed and cleaned its database.
+14. uv run python scripts/verify_gcs008_wheel.py
+    PASS: 293 RECORD members and all required GCS-008 resources verified.
+15. uv run python scripts/verify_current_markets_wheel.py
+    PASS: installed from site-packages outside repository; request binding, two H2H consensuses,
+    four totals consensuses, constraint construction, verify, safe summary and zero network calls.
+16. Canonical manifests, repository validation and secret scan
+    PASS: ticket and authorized mutable PRC-013 manifests contain 1,188 deliverables; repository
+    validation returned zero errors and secret scanning returned zero findings.
+17. Final commit/push and exact-SHA automatic CI
+    PENDING. No PR or post-CI evidence commit is authorized.
+
+No real provider call, credential, current private input, current-market persistence, canonical
+identity creation, score projection, player model, optimisation, PR, merge, human acceptance or
+production activation was performed or claimed.
+
+CURRENT-MARKETS-001A independent-review remediation ledger
+Date: 2026-08-28 through 2026-08-29
+
+18. Exact remediation start and isolation
+    PASS: fetched origin; origin/main remained 4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb;
+    local/remote branch remained deficient SHA 92f368597c22edbf77b236a8c96ddf959e545f59,
+    tree a1c8d15e7394f1106b7563e2b808296acb7f5a93, direct parent/merge-base 4eda6fe9,
+    ahead/behind 1/0. Work used only the dedicated clean clone; CURRENT-AVAILABILITY remained
+    untouched.
+19. CMR-IR-001 through CMR-IR-007 direct adversarial regressions
+    PASS: orientation substitutions block; temporal stale requests block and fresh identity
+    changes; post-receipt totals exclude before alias ranking; only HUMAN_VERIFIED mappings pass;
+    hostile official-FPL scope and exact rights authority substitutions block; critical
+    binary/timestamp/alias/repository paths are directly covered.
+20. Focused branch-aware suite
+    PASS: 87 tests; 781/804 statements (97.13930348258707%); 215/232 branches
+    (92.67241379310344%); combined 96.13899613899613%.
+21. Inherited LIVE-ODDS/001B/001D
+    PASS: 322 tests.
+22. Complete market unit/contract/golden/property suite
+    PASS: 148 tests.
+23. GCS-008 unit/contract/golden/property regression
+    PASS: 158 tests; no live service invocation.
+24. PostgreSQL market identity/normalisation suite
+    PASS: 32 tests, including 19 ticket-specific read-only, mapping governance and official-FPL
+    scope proofs. No canonical row, operator, mapping, normalisation or market-result write.
+25. Inherited DAT-003 PostgreSQL/migration matrix
+    PASS: 90 tests.
+26. Product remediation commit
+    PASS: 30ad5c2e821eb03827e16f24d4b22a44ca3804a2; deficient SHA preserved as an ancestor.
+27. Preliminary static/build/installed-wheel checks
+    PASS: mypy 252 source files; build; generic/ODD/GCS/CURRENT-MARKETS wheel verification.
+    CURRENT-MARKETS wheel blocked orientation, stale-temporal and rights attacks, excluded
+    post-receipt totals and made zero network requests. Wheel contained 293 members.
+28. Corrected remediation evidence and canonical manifests
+    PASS: independent-review chronology preserved; CURRENT-MARKETS and authorized PRC-013 current
+    manifests regenerated with 1,188 deliverables; repository validation zero errors; secret scan
+    zero findings.
+29. Final commit/push and exact-SHA automatic CI
+    PENDING at the time of this mutable ledger entry. The final exact-SHA CI run is intentionally
+    not committed after CI.
+
+The independent findings and deficient same-agent claims are preserved in
+REVIEW_REMEDIATION.md. Engineering closure is pending fresh independent re-review.
+
+CURRENT-MARKETS-001A second-remediation ledger
+Date: 2026-08-29
+
+30. Exact second-remediation start and isolation
+    PASS: origin/main remained 4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb; dedicated branch
+    and remote were f58790c4d2d3ed56a472bd3d52583451dbebab6c; expected ancestry
+    4eda6fe9 -> 92f3685 -> 30ad5c2 -> f58790c was preserved. CURRENT-AVAILABILITY local
+    work remained untouched.
+31. RED reproduction and product closure
+    PASS: CMR-IR-003 invalid-newer H2H suppressed valid older before the fix; CMR-IR-008 coherent
+    cross-source swap was accepted before the fix; CMR-IR-009 earliest-only PostgreSQL range was
+    accepted before the fix; CMR-IR-007 committed pending/dirty tests were absent. Product/tests
+    commit 562e5a586881d9e462075ffd5dad01401b265ff3 closes all four by engineering.
+32. Focused branch-aware suite
+    PASS: 110 tests; 818/841 statements (97.26516052318668%); 230/248 branches
+    (92.74193548387096%); combined 96.23507805325987%.
+33. Committed PostgreSQL evidence
+    PASS: 29 ticket-specific tests, including pending and dirty ORM state with autoflush enabled,
+    zero flush/DML, unchanged canonical/external-identifier/operator/market row counts, rollback,
+    every-occurrence range cases, target-only collection and DAT-003 duplicate blocking.
+34. Inherited tests
+    PASS: FPL/LIVE-ODDS/001B/001D superset 368; markets 161; GCS-008 209; PostgreSQL markets 50;
+    DAT-003/PostgreSQL migrations 90.
+35. Static/build/installed wheel
+    PASS: frozen sync 40 packages; diff/format/lint; mypy 252 source files; 0.2.0 sdist/wheel;
+    generic, ODD, GCS and CURRENT-MARKETS wheel verifiers. CURRENT-MARKETS installed wheel blocked
+    coherent orientation and earliest-only applicability, retained the valid older H2H alias,
+    excluded post-receipt totals, verified normal results and attempted zero network requests.
+36. Evidence and canonical manifests
+    PASS: chronology distinguishes reviewer-only probes from committed tests; only authorized
+    CURRENT-MARKETS and PRC-013 current manifests were regenerated byte-identically; repository
+    validation and secret scan returned zero findings.
+37. Final evidence commit/push and exact-SHA automatic CI
+    PENDING at the time of this mutable ledger entry. No CI run ID/status will be committed after
+    the exact final SHA is pushed.
+
+CMR-IR-001/002/004/005/006 remain independently closed. CMR-IR-003/007/008/009 are engineering
+closed at 562e5a586881d9e462075ffd5dad01401b265ff3 and pending fresh independent re-review.
+
+CURRENT-MARKETS-001A third-remediation ledger
+Date: 2026-08-29
+
+38. Exact third-remediation start and isolation
+    PASS: fetched refs matched origin/main 4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb and reviewed
+    branch ee4a35760a56f84b4f0f50f3d2f898e2037d105a, tree
+    02bd6ad1c849690e6c7c3576cd8d0ff4d5960ab5, ahead/behind 5/0. The dedicated
+    CURRENT-MARKETS worktree was clean; the dirty CURRENT-AVAILABILITY worktree stayed untouched.
+39. CMR-IR-010/011 reproduction and closure
+    PASS: reviewed code placed receipt `continue` before H2H labels and appended totals projections
+    in tuple order. Direct attacks cover every label/source/alias/order combination and two-/three-
+    line/outcome/bookmaker/event permutations while preserving price and line-set materiality.
+40. Third-remediation product/tests commit
+    PASS: 316d52b87f113f9364ee0dab9c296cf8fe0ff544 is a direct normal descendant of ee4a357.
+    Upstream product scope is exactly one exact-Decimal semantic-projection sort in
+    src/dmf_pulse/ingestion/odds/current.py; no stored-order or builder change.
+41. Focused branch-aware suite
+    PASS: exact five-file selector 122 tests; 818/841 statements (97.26516052318668%);
+    230/248 branches (92.74193548387096%); combined 96.23507805325987%.
+42. Inherited tests
+    PASS: FPL/LIVE-ODDS/001B/001D superset 372; markets 173; GCS-008 209; PostgreSQL markets 50;
+    ticket-specific PostgreSQL 29; DAT-003/PostgreSQL migrations 90.
+43. Static/build/installed wheel
+    PASS: frozen sync 40 packages; diff/format/lint; mypy 252 source files; 0.2.0 sdist/wheel;
+    generic, ODD, GCS and CURRENT-MARKETS wheel verifiers. Installed CURRENT-MARKETS blocks
+    corrupt future HOME/AWAY/DRAW, proves totals order source/request/result/summary identity,
+    verifies normal output and attempts zero network requests.
+44. Normal LIVE-ODDS builder impact
+    PASS: semantic SHA before and after is exactly
+    27880ba63a4555ee74f21b8c5acdeccc73c7194d57b8ea663bef8fed4cc44abf. Builder selection,
+    rights, temporal, quota and network behavior are unchanged.
+45. Evidence, canonical manifests, repository validation and secret scan
+    PASS: CURRENT-MARKETS and authorized PRC-013 manifests each contain 1,188 deliverables and
+    were byte-stable across canonical regeneration; repository validation returned zero errors;
+    secret scan returned zero findings.
+46. Final evidence commit/push and exact-SHA automatic CI
+    PENDING. No CI run metadata will be committed after the exact final SHA is pushed.
+
+CMR-IR-002/003/004/005/006/007/009 remain independently closed. CMR-IR-001/008 are engineering
+restored through CMR-IR-010. CMR-IR-010/011 are engineering-closed at 316d52b and pending fresh
+independent re-review.
