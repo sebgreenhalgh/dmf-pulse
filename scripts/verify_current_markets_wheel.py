@@ -124,11 +124,14 @@ from dmf_pulse.ingestion.current_state import (
     current_unified_state_semantic_sha256,
 )
 from dmf_pulse.ingestion.odds.current import current_odds_market_semantic_sha256
+from dmf_pulse.ingestion.odds.identity import current_odds_identity_semantic_sha256
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.markets.current import (
     CurrentMarketCanonicalIdentityView,
     CurrentMarketConstraintError,
     CurrentMarketConstraintService,
     bind_current_market_constraint_request,
+    current_market_identity_view_sha256,
     current_odds_rights_sha256,
     current_odds_temporal_sha256,
 )
@@ -213,7 +216,12 @@ def rehash_market_source(changed_odds):
         }
     )
     lineage = source.lineage.model_copy(
-        update={"odds_market_semantic_sha256": checked_odds.market_semantic_sha256}
+        update={
+            "odds_market_semantic_sha256": checked_odds.market_semantic_sha256,
+            "odds_identity_semantic_sha256": current_odds_identity_semantic_sha256(
+                checked_odds
+            ),
+        }
     )
     provisional_source = source.model_copy(
         update={
@@ -231,25 +239,32 @@ def rehash_market_source(changed_odds):
 events = list(source.odds_input.events)
 event = events[0]
 books = list(event.bookmakers)
-market = books[0].markets[0]
-swapped = tuple(
-    outcome.model_copy(
-        update={
-            "outcome": (
-                "AWAY"
-                if outcome.outcome == "HOME"
-                else "HOME"
-                if outcome.outcome == "AWAY"
-                else "DRAW"
-            )
-        }
+for index, book in enumerate(books):
+    market = book.markets[0]
+    swapped = tuple(
+        outcome.model_copy(
+            update={
+                "provider_name": (
+                    event.provider_away_team
+                    if outcome.outcome == "HOME"
+                    else event.provider_home_team
+                    if outcome.outcome == "AWAY"
+                    else outcome.provider_name
+                )
+            }
+        )
+        for outcome in market.outcomes
     )
-    for outcome in market.outcomes
+    books[index] = book.model_copy(
+        update={"markets": (market.model_copy(update={"outcomes": swapped}),)}
+    )
+events[0] = event.model_copy(
+    update={
+        "provider_home_team": event.provider_away_team,
+        "provider_away_team": event.provider_home_team,
+        "bookmakers": tuple(books),
+    }
 )
-books[0] = books[0].model_copy(
-    update={"markets": (market.model_copy(update={"outcomes": swapped}),)}
-)
-events[0] = event.model_copy(update={"bookmakers": tuple(books)})
 orientation_source = rehash_market_source(
     source.odds_input.model_copy(update={"events": tuple(events)})
 )
@@ -259,7 +274,105 @@ try:
 except CurrentMarketConstraintError as error:
     assert error.code == "SOURCE_INVALID"
 else:
-    raise AssertionError("installed wheel accepted swapped HOME/AWAY orientation")
+    raise AssertionError("installed wheel accepted a coherent cross-source orientation swap")
+
+first_operator, second_operator = view.operators
+aliased_second = second_operator.model_copy(
+    update={
+        "canonical_operator_id": first_operator.canonical_operator_id,
+        "canonical_operator_key": first_operator.canonical_operator_key,
+    }
+)
+alias_provisional = view.model_copy(
+    update={
+        "operators": (first_operator, aliased_second),
+        "semantic_sha256": "0" * 64,
+    }
+)
+alias_view = alias_provisional.model_copy(
+    update={"semantic_sha256": current_market_identity_view_sha256(alias_provisional)}
+)
+events = list(source.odds_input.events)
+event = events[0]
+books = list(event.bookmakers)
+valid_at = source.odds_input.temporal.received_at - timedelta(seconds=1)
+future_at = source.odds_input.temporal.received_at + timedelta(seconds=1)
+books[0] = books[0].model_copy(
+    update={
+        "markets": (
+            books[0].markets[0].model_copy(update={"provider_last_update": future_at}),
+        )
+    }
+)
+books[1] = books[1].model_copy(
+    update={
+        "markets": (
+            books[1].markets[0].model_copy(update={"provider_last_update": valid_at}),
+        )
+    }
+)
+events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+h2h_receipt_source = rehash_market_source(
+    source.odds_input.model_copy(update={"events": tuple(events)})
+)
+h2h_receipt_request = bind_current_market_constraint_request(h2h_receipt_source, alias_view)
+h2h_receipt_result = service.build(
+    h2h_receipt_request,
+    source=h2h_receipt_source,
+    identity_view=alias_view,
+)
+target_mapping = source.identity_map.fixture(event.provider_event_id)
+target_fixture = alias_view.fixture(target_mapping.official_fpl_fixture_id)
+h2h_receipt_fixture = next(
+    item
+    for item in h2h_receipt_result.fixtures
+    if item.canonical_fixture_id == target_fixture.canonical_fixture_id
+)
+assert h2h_receipt_fixture.h2h_consensus is not None
+assert h2h_receipt_fixture.h2h_consensus.operator_count == 1
+assert h2h_receipt_fixture.h2h_consensus.operator_markets[0].observed_at == valid_at
+assert any(
+    item.reason == "FUTURE_OBSERVATION" and item.count >= 1
+    for item in h2h_receipt_fixture.exclusion_counts
+)
+
+operator = view.operators[0]
+target_events = {
+    mapping.provider_event_id for mapping in source.identity_map.fixture_mappings
+}
+earliest_occurrence = min(
+    event.commence_time
+    for event in source.odds_input.events
+    if event.provider_event_id in target_events
+    for bookmaker in event.bookmakers
+    if bookmaker.bookmaker_key == operator.bookmaker_key
+)
+earliest_only_digest = canonical_sha256(
+    {
+        "bookmaker_key": operator.bookmaker_key,
+        "contract_version": "current-market-operator-applicability-v1",
+        "target_occurrence_times": [earliest_occurrence.isoformat()],
+    }
+)
+earliest_operator = operator.model_copy(
+    update={"target_occurrence_times_sha256": earliest_only_digest}
+)
+earliest_provisional = view.model_copy(
+    update={
+        "operators": (earliest_operator, *view.operators[1:]),
+        "semantic_sha256": "0" * 64,
+    }
+)
+earliest_view = earliest_provisional.model_copy(
+    update={"semantic_sha256": current_market_identity_view_sha256(earliest_provisional)}
+)
+earliest_request = bind_current_market_constraint_request(source, earliest_view)
+try:
+    service.build(earliest_request, source=source, identity_view=earliest_view)
+except CurrentMarketConstraintError as error:
+    assert error.code == "CANONICAL_IDENTITY_UNAVAILABLE"
+else:
+    raise AssertionError("installed wheel accepted earliest-only operator applicability")
 
 events = list(source.odds_input.events)
 event = events[0]
@@ -298,6 +411,8 @@ print(json.dumps({
     "module_path": __import__("dmf_pulse").__file__,
     "network_requests": len(attempts),
     "orientation_attack": "BLOCKED",
+    "operator_earliest_only_attack": "BLOCKED",
+    "post_receipt_h2h_alias": "VALID_OLDER_RETAINED",
     "post_receipt_totals": "EXCLUDED",
     "rights_attack": "BLOCKED",
     "semantic_sha256": result.semantic_sha256,

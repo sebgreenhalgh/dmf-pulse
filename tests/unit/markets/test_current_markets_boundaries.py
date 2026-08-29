@@ -36,6 +36,7 @@ from .current_market_test_support import (
     recompose,
     rehash_identity_view,
     rehash_odds,
+    rehash_unified_source,
     replace_odds,
 )
 
@@ -75,6 +76,22 @@ def _changed_h2h_context(context):
         event_index=0,
         bookmaker_index=0,
         h2h_market=market.model_copy(update={"outcomes": outcomes}),
+    )
+
+
+def _one_operator_alias_view(view):
+    first, second = view.operators
+    return rehash_identity_view(
+        view,
+        operators=(
+            first,
+            second.model_copy(
+                update={
+                    "canonical_operator_id": first.canonical_operator_id,
+                    "canonical_operator_key": first.canonical_operator_key,
+                }
+            ),
+        ),
     )
 
 
@@ -544,6 +561,347 @@ def test_cmr_ir_003_all_future_aliases_contribute_nothing(repository_root, tmp_p
     assert {item.reason: item.count for item in affected.exclusion_counts}[
         "FUTURE_OBSERVATION"
     ] == 2
+
+
+@pytest.mark.parametrize("future_fallback", (False, True), ids=("market", "bookmaker-fallback"))
+def test_cmr_ir_003_h2h_future_alias_cannot_suppress_valid_older_alias(
+    repository_root, tmp_path, future_fallback: bool
+) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+    received_at = context.odds_input.temporal.received_at
+    valid_at = received_at - timedelta(seconds=1)
+    future_at = received_at + timedelta(seconds=1)
+    assert future_at <= context.bundle.decision_information_at
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = list(event.bookmakers)
+    future_market_updates: dict[str, object] = {"provider_last_update": future_at}
+    future_book_updates: dict[str, object] = {}
+    if future_fallback:
+        future_market_updates = {
+            "provider_last_update": None,
+            "provider_last_update_state": "NOT_PUBLISHED",
+        }
+        future_book_updates = {
+            "provider_last_update": future_at,
+            "age_at_receipt_seconds": 0,
+        }
+    future_book_updates["markets"] = (books[0].markets[0].model_copy(update=future_market_updates),)
+    books[0] = books[0].model_copy(update=future_book_updates)
+    books[1] = books[1].model_copy(
+        update={
+            "markets": (books[1].markets[0].model_copy(update={"provider_last_update": valid_at}),)
+        }
+    )
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    alias_view = _one_operator_alias_view(identity_view(changed))
+
+    _view, _request, result = build_from_context(changed, alias_view)
+    affected = _fixture_for_event(result, alias_view, changed, 0)
+
+    assert affected.h2h_consensus is not None
+    assert affected.h2h_consensus.operator_count == 1
+    assert affected.h2h_consensus.operator_markets[0].observed_at == valid_at
+    assert {item.reason: item.count for item in affected.exclusion_counts}[
+        "FUTURE_OBSERVATION"
+    ] == 1
+    if future_fallback:
+        assert "H2H_TIMESTAMP_BOOKMAKER_FALLBACK" in affected.warnings
+
+    reversed_events = list(changed.odds_input.events)
+    reversed_events[0] = reversed_events[0].model_copy(
+        update={"bookmakers": tuple(reversed(reversed_events[0].bookmakers))}
+    )
+    reordered = recompose(
+        changed,
+        rehash_odds(changed.odds_input, events=tuple(reversed_events)),
+    )
+    reordered_view = rehash_identity_view(
+        _one_operator_alias_view(identity_view(reordered)),
+        operators=tuple(reversed(_one_operator_alias_view(identity_view(reordered)).operators)),
+    )
+    _view, _request, reordered_result = build_from_context(reordered, reordered_view)
+    assert reordered_result == result
+
+
+def test_cmr_ir_003_h2h_all_future_aliases_contribute_nothing(repository_root, tmp_path) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+    future_at = context.odds_input.temporal.received_at + timedelta(seconds=1)
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = tuple(
+        book.model_copy(
+            update={
+                "markets": (book.markets[0].model_copy(update={"provider_last_update": future_at}),)
+            }
+        )
+        for book in event.bookmakers
+    )
+    events[0] = event.model_copy(update={"bookmakers": books})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    alias_view = _one_operator_alias_view(identity_view(changed))
+
+    _view, _request, result = build_from_context(changed, alias_view)
+    affected = _fixture_for_event(result, alias_view, changed, 0)
+
+    assert affected.h2h_consensus is None
+    assert affected.readiness is CurrentMarketReadiness.BLOCKED
+    assert {item.reason: item.count for item in affected.exclusion_counts}[
+        "FUTURE_OBSERVATION"
+    ] == 1
+
+
+def test_cmr_ir_003_h2h_newest_valid_alias_is_selected(repository_root, tmp_path) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+    received_at = context.odds_input.temporal.received_at
+    newest_at = received_at - timedelta(seconds=1)
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = list(event.bookmakers)
+    for index, observed_at in enumerate((newest_at, newest_at - timedelta(seconds=1))):
+        books[index] = books[index].model_copy(
+            update={
+                "markets": (
+                    books[index]
+                    .markets[0]
+                    .model_copy(update={"provider_last_update": observed_at}),
+                )
+            }
+        )
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    alias_view = _one_operator_alias_view(identity_view(changed))
+
+    _view, _request, result = build_from_context(changed, alias_view)
+    affected = _fixture_for_event(result, alias_view, changed, 0)
+
+    assert affected.h2h_consensus is not None
+    assert affected.h2h_consensus.operator_count == 1
+    assert affected.h2h_consensus.operator_markets[0].observed_at == newest_at
+
+
+def test_cmr_ir_003_h2h_tied_identical_aliases_are_deterministic(repository_root, tmp_path) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+    events = list(context.odds_input.events)
+    event = events[0]
+    books = list(event.bookmakers)
+    tied_at = context.odds_input.temporal.received_at - timedelta(seconds=1)
+    first_market = books[0].markets[0].model_copy(update={"provider_last_update": tied_at})
+    books[0] = books[0].model_copy(update={"markets": (first_market,)})
+    books[1] = books[1].model_copy(
+        update={
+            "markets": (
+                books[1]
+                .markets[0]
+                .model_copy(
+                    update={
+                        "provider_last_update": tied_at,
+                        "outcomes": first_market.outcomes,
+                    }
+                ),
+            )
+        }
+    )
+    events[0] = event.model_copy(update={"bookmakers": tuple(books)})
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    alias_view = _one_operator_alias_view(identity_view(changed))
+    _view, _request, result = build_from_context(changed, alias_view)
+    affected = _fixture_for_event(result, alias_view, changed, 0)
+
+    assert affected.h2h_consensus is not None
+    assert affected.h2h_consensus.operator_count == 1
+    assert affected.h2h_consensus.operator_markets[0].observed_at == tied_at
+
+
+@pytest.mark.parametrize("attack", ("COHERENT_FULL_SWAP", "PARTICIPANTS_ONLY", "LABELS_ONLY"))
+def test_cmr_ir_008_current_event_orientation_is_bound_to_accepted_001b_map(
+    repository_root, tmp_path, attack: str
+) -> None:
+    context, view, _request, result = build_market_context(repository_root, tmp_path)
+    events = list(context.odds_input.events)
+    event = events[0]
+    swap_participants = attack in {"COHERENT_FULL_SWAP", "PARTICIPANTS_ONLY"}
+    swap_labels = attack in {"COHERENT_FULL_SWAP", "LABELS_ONLY"}
+    books = []
+    for book in event.bookmakers:
+        outcomes = tuple(
+            outcome.model_copy(
+                update={
+                    "provider_name": (
+                        event.provider_away_team
+                        if outcome.outcome == "HOME"
+                        else event.provider_home_team
+                        if outcome.outcome == "AWAY"
+                        else outcome.provider_name
+                    )
+                }
+            )
+            if swap_labels
+            else outcome
+            for outcome in book.markets[0].outcomes
+        )
+        books.append(
+            book.model_copy(
+                update={"markets": (book.markets[0].model_copy(update={"outcomes": outcomes}),)}
+            )
+        )
+    event_updates: dict[str, object] = {"bookmakers": tuple(books)}
+    if swap_participants:
+        event_updates.update(
+            provider_home_team=event.provider_away_team,
+            provider_away_team=event.provider_home_team,
+        )
+    events[0] = event.model_copy(update=event_updates)
+    changed_odds = rehash_odds(context.odds_input, events=tuple(events))
+    changed_source = rehash_unified_source(context, odds_input=changed_odds)
+    changed_request = bind_current_market_constraint_request(changed_source, view)
+
+    with pytest.raises(CurrentMarketConstraintError) as built:
+        CurrentMarketConstraintService().build(
+            changed_request,
+            source=changed_source,
+            identity_view=view,
+        )
+    assert built.value.code == "SOURCE_INVALID"
+
+    with pytest.raises(CurrentMarketConstraintError) as verified:
+        CurrentMarketConstraintService().verify(
+            result,
+            changed_request,
+            source=changed_source,
+            identity_view=view,
+        )
+    assert verified.value.code == "SOURCE_INVALID"
+
+
+def test_cmr_ir_008_mutated_001b_mapping_fails_structural_reconstruction(
+    repository_root, tmp_path
+) -> None:
+    context, view, _request, _result = build_market_context(repository_root, tmp_path)
+    mappings = list(context.identity_map.fixture_mappings)
+    mappings[0] = mappings[0].model_copy(
+        update={"provider_home_team": mappings[0].provider_away_team}
+    )
+    changed_map = context.identity_map.model_copy(update={"fixture_mappings": tuple(mappings)})
+    changed_source = context.bundle.model_copy(update={"identity_map": changed_map})
+    changed_request = bind_current_market_constraint_request(changed_source, view)
+
+    with pytest.raises(CurrentMarketConstraintError) as caught:
+        CurrentMarketConstraintService().build(
+            changed_request,
+            source=changed_source,
+            identity_view=view,
+        )
+
+    assert caught.value.code == "SOURCE_INVALID"
+
+
+def test_cmr_ir_008_current_fpl_fixture_orientation_must_match_001b(
+    repository_root, tmp_path
+) -> None:
+    context, view, _request, _result = build_market_context(repository_root, tmp_path)
+    mapping = context.identity_map.fixture_mappings[0]
+    fixtures = list(context.fpl_input.fixtures)
+    index = next(
+        index
+        for index, fixture in enumerate(fixtures)
+        if fixture.provider_fixture_id == mapping.official_fpl_fixture_id
+    )
+    fixture = fixtures[index]
+    fixtures[index] = fixture.model_copy(
+        update={
+            "home_team_identity": fixture.away_team_identity,
+            "away_team_identity": fixture.home_team_identity,
+        }
+    )
+    changed_fpl = context.fpl_input.model_copy(update={"fixtures": tuple(fixtures)})
+    changed_source = rehash_unified_source(context, fpl_input=changed_fpl)
+    changed_request = bind_current_market_constraint_request(changed_source, view)
+
+    with pytest.raises(CurrentMarketConstraintError) as caught:
+        CurrentMarketConstraintService().build(
+            changed_request,
+            source=changed_source,
+            identity_view=view,
+        )
+
+    assert caught.value.code == "SOURCE_INVALID"
+
+
+@pytest.mark.parametrize("side", ("HOME", "AWAY"))
+def test_cmr_ir_008_exact_001b_team_bridge_rejects_side_mismatch(
+    repository_root, tmp_path, side: str
+) -> None:
+    context, _view, _request, _result = build_market_context(repository_root, tmp_path)
+    mapping = context.identity_map.fixture_mappings[0]
+    event = next(
+        item
+        for item in context.odds_input.events
+        if item.provider_event_id == mapping.provider_event_id
+    )
+    if side == "HOME":
+        hostile = mapping.model_copy(
+            update={
+                "official_home_team_id": mapping.official_away_team_id,
+                "official_home_team_identity": mapping.official_away_team_identity,
+            }
+        )
+    else:
+        hostile = mapping.model_copy(
+            update={
+                "official_away_team_id": mapping.official_home_team_id,
+                "official_away_team_identity": mapping.official_home_team_identity,
+            }
+        )
+
+    with pytest.raises(CurrentMarketConstraintError) as caught:
+        current_market_module._require_cross_source_orientation(
+            context.bundle,
+            hostile,
+            event,
+        )
+
+    assert caught.value.code == "SOURCE_INVALID"
+
+
+def test_cmr_ir_009_operator_occurrence_applicability_is_semantically_bound(
+    repository_root, tmp_path
+) -> None:
+    context, view, _request, _result = build_market_context(repository_root, tmp_path)
+    events = list(context.odds_input.events)
+    second_target = events[1]
+    events[1] = second_target.model_copy(
+        update={
+            "bookmakers": tuple(
+                book for book in second_target.bookmakers if book.bookmaker_key != "book_alpha"
+            )
+        }
+    )
+    changed = recompose(context, rehash_odds(context.odds_input, events=tuple(events)))
+    stale_request = bind_current_market_constraint_request(changed.bundle, view)
+
+    with pytest.raises(CurrentMarketConstraintError) as stale:
+        CurrentMarketConstraintService().build(
+            stale_request,
+            source=changed.bundle,
+            identity_view=view,
+        )
+    assert stale.value.code == "CANONICAL_IDENTITY_UNAVAILABLE"
+
+    fresh_view, _fresh_request, fresh_result = build_from_context(changed)
+    original = {item.bookmaker_key: item for item in view.operators}
+    fresh = {item.bookmaker_key: item for item in fresh_view.operators}
+    assert fresh_view.semantic_sha256 != view.semantic_sha256
+    assert (
+        fresh["book_alpha"].target_occurrence_times_sha256
+        != original["book_alpha"].target_occurrence_times_sha256
+    )
+    assert (
+        fresh["book_beta"].target_occurrence_times_sha256
+        == original["book_beta"].target_occurrence_times_sha256
+    )
+    assert len(fresh_result.fixtures) == 2
 
 
 def test_totals_tied_alias_conflict_excludes_operator_line(repository_root, tmp_path) -> None:

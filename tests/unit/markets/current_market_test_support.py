@@ -8,10 +8,16 @@ from decimal import Decimal
 from pathlib import Path
 from uuid import UUID
 
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.ingestion.current_state import (
+    CurrentUnifiedStateBundle,
     CurrentUnifiedStateService,
     bind_current_unified_state_request,
+    current_fpl_full_representation_sha256,
+    current_unified_state_semantic_sha256,
 )
+from dmf_pulse.ingestion.fpl.current import CurrentFplInputBundle
+from dmf_pulse.ingestion.fpl.manager_current import current_fpl_catalogue_view_sha256
 from dmf_pulse.ingestion.odds.current import (
     CurrentOddsMarket,
     CurrentOddsQualityState,
@@ -25,6 +31,9 @@ from dmf_pulse.ingestion.odds.current import (
 from dmf_pulse.ingestion.odds.identity import (
     bind_current_fixture_resolution_request,
     bind_current_team_resolution_request,
+    current_fpl_identity_view_sha256,
+    current_odds_identity_semantic_sha256,
+    current_odds_provider_provenance_sha256,
     resolve_current_fixture_identities,
     resolve_current_team_identities,
 )
@@ -260,6 +269,28 @@ def identity_view(context: CurrentUnifiedTestContext) -> CurrentMarketCanonicalI
             canonical_operator_id=OPERATOR_IDS[key],
             canonical_operator_key=f"SYNTHETIC_{key.upper()}",
             external_mapping_id=UUID(f"00000000-0000-0000-0000-{9300 + index:012d}"),
+            target_occurrence_times_sha256=canonical_sha256(
+                {
+                    "bookmaker_key": key,
+                    "contract_version": "current-market-operator-applicability-v1",
+                    "target_occurrence_times": [
+                        value.isoformat()
+                        for value in sorted(
+                            {
+                                event.commence_time
+                                for event in context.odds_input.events
+                                if event.provider_event_id
+                                in {
+                                    item.provider_event_id
+                                    for item in context.identity_map.fixture_mappings
+                                }
+                                for bookmaker in event.bookmakers
+                                if bookmaker.bookmaker_key == key
+                            }
+                        )
+                    ],
+                }
+            ),
         )
         for index, (key, title) in enumerate(sorted(books.items()), start=1)
     )
@@ -335,6 +366,43 @@ def rehash_identity_view(
     return provisional.model_copy(
         update={"semantic_sha256": current_market_identity_view_sha256(provisional)}
     )
+
+
+def rehash_unified_source(
+    context: CurrentUnifiedTestContext,
+    *,
+    odds_input: OddsProviderCurrentInput | None = None,
+    fpl_input: CurrentFplInputBundle | None = None,
+) -> CurrentUnifiedStateBundle:
+    """Rebuild only mutable 001D outer bindings while retaining its accepted 001B map."""
+
+    selected_odds = odds_input or context.odds_input
+    selected_fpl = fpl_input or context.fpl_input
+    lineage = context.bundle.lineage.model_copy(
+        update={
+            "fpl_input_semantic_sha256": selected_fpl.semantic_sha256,
+            "fpl_full_representation_sha256": current_fpl_full_representation_sha256(selected_fpl),
+            "fpl_identity_view_sha256": current_fpl_identity_view_sha256(selected_fpl),
+            "fpl_catalogue_view_sha256": current_fpl_catalogue_view_sha256(selected_fpl),
+            "odds_market_semantic_sha256": selected_odds.market_semantic_sha256,
+            "odds_identity_semantic_sha256": current_odds_identity_semantic_sha256(selected_odds),
+            "odds_provider_provenance_sha256": current_odds_provider_provenance_sha256(
+                selected_odds
+            ),
+        }
+    )
+    provisional = context.bundle.model_copy(
+        update={
+            "fpl_input": selected_fpl,
+            "odds_input": selected_odds,
+            "lineage": lineage,
+            "semantic_sha256": "0" * 64,
+        }
+    )
+    checked = provisional.model_copy(
+        update={"semantic_sha256": current_unified_state_semantic_sha256(provisional)}
+    )
+    return CurrentUnifiedStateBundle.model_validate(checked.model_dump(mode="python"))
 
 
 def replace_odds(

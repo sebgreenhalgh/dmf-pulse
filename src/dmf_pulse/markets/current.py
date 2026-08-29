@@ -65,6 +65,7 @@ from dmf_pulse.ingestion.odds.current import (
     CurrentOddsMarket,
     CurrentOddsTotalsMarket,
 )
+from dmf_pulse.ingestion.odds.identity import ResolvedCurrentFixture
 from dmf_pulse.markets.consensus import evaluate_market_consensus
 from dmf_pulse.markets.models import (
     ExcludedBook,
@@ -174,6 +175,7 @@ class CurrentMarketCanonicalOperator(_FrozenModel):
     canonical_operator_id: UUID
     canonical_operator_key: str = Field(min_length=1, max_length=120)
     external_mapping_id: UUID
+    target_occurrence_times_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 class CurrentMarketCanonicalIdentityView(_FrozenModel):
@@ -260,6 +262,34 @@ def current_market_identity_view_sha256(value: CurrentMarketCanonicalIdentityVie
             "resolution_cutoff": value.resolution_cutoff.isoformat(),
             "resolved_at": value.resolved_at.isoformat(),
             "schema_version": value.schema_version,
+        }
+    )
+
+
+def _operator_occurrence_times(
+    source: CurrentUnifiedStateBundle,
+) -> dict[str, tuple[datetime, ...]]:
+    target_event_ids = {
+        mapping.provider_event_id for mapping in source.identity_map.fixture_mappings
+    }
+    occurrences: dict[str, set[datetime]] = {}
+    for event in source.odds_input.events:
+        if event.provider_event_id not in target_event_ids:
+            continue
+        for bookmaker in event.bookmakers:
+            occurrences.setdefault(bookmaker.bookmaker_key, set()).add(event.commence_time)
+    return {key: tuple(sorted(values)) for key, values in sorted(occurrences.items())}
+
+
+def _operator_occurrence_times_sha256(
+    bookmaker_key: str,
+    occurrence_times: tuple[datetime, ...],
+) -> str:
+    return canonical_sha256(
+        {
+            "bookmaker_key": bookmaker_key,
+            "contract_version": "current-market-operator-applicability-v1",
+            "target_occurrence_times": [value.isoformat() for value in occurrence_times],
         }
     )
 
@@ -869,6 +899,19 @@ def _h2h_quotes(
     candidates: dict[UUID, list[CurrentOddsBookmaker]] = {}
     for bookmaker in event.bookmakers:
         market = bookmaker.markets[0]
+        canonical_operator = identity_view.operator(bookmaker.bookmaker_key)
+        observed_at, timestamp_source = _observation_time(bookmaker, market)
+        if timestamp_source == "BOOKMAKER":
+            warnings.add("H2H_TIMESTAMP_BOOKMAKER_FALLBACK")
+        if observed_at > source.odds_input.temporal.received_at:
+            exclusions.append(
+                ExcludedBook(
+                    operator_key=canonical_operator.canonical_operator_key,
+                    reason=ExclusionReason.FUTURE_OBSERVATION,
+                )
+            )
+            warnings.add("H2H_FUTURE_OBSERVATION_EXCLUDED")
+            continue
         for outcome in market.outcomes:
             if (
                 (outcome.outcome == "HOME" and outcome.provider_name != event.provider_home_team)
@@ -876,7 +919,6 @@ def _h2h_quotes(
                 or (outcome.outcome == "DRAW" and outcome.provider_name.casefold() != "draw")
             ):
                 raise CurrentMarketConstraintError("SOURCE_INVALID")
-        canonical_operator = identity_view.operator(bookmaker.bookmaker_key)
         candidates.setdefault(canonical_operator.canonical_operator_id, []).append(bookmaker)
     selected_books: list[CurrentOddsBookmaker] = []
     for aliases in candidates.values():
@@ -927,18 +969,7 @@ def _h2h_quotes(
     for bookmaker in selected_books:
         canonical_operator = identity_view.operator(bookmaker.bookmaker_key)
         market = bookmaker.markets[0]
-        observed_at, timestamp_source = _observation_time(bookmaker, market)
-        if observed_at > source.odds_input.temporal.received_at:
-            exclusions.append(
-                ExcludedBook(
-                    operator_key=canonical_operator.canonical_operator_key,
-                    reason=ExclusionReason.FUTURE_OBSERVATION,
-                )
-            )
-            warnings.add("H2H_FUTURE_OBSERVATION_EXCLUDED")
-            continue
-        if timestamp_source == "BOOKMAKER":
-            warnings.add("H2H_TIMESTAMP_BOOKMAKER_FALLBACK")
+        observed_at = _observation_time(bookmaker, market)[0]
         market_id = _transient_uuid(
             "h2h-market",
             {
@@ -1375,15 +1406,93 @@ def _identity_sets_are_exact(
     target_events = [
         event for event in source.odds_input.events if event.provider_event_id in target_event_ids
     ]
+    occurrence_times = _operator_occurrence_times(source)
     expected_operators = {
-        (bookmaker.bookmaker_key, bookmaker.bookmaker_title)
+        (
+            bookmaker.bookmaker_key,
+            bookmaker.bookmaker_title,
+            _operator_occurrence_times_sha256(
+                bookmaker.bookmaker_key,
+                occurrence_times[bookmaker.bookmaker_key],
+            ),
+        )
         for event in target_events
         for bookmaker in event.bookmakers
     }
     observed_operators = {
-        (item.bookmaker_key, item.bookmaker_title) for item in identity_view.operators
+        (
+            item.bookmaker_key,
+            item.bookmaker_title,
+            item.target_occurrence_times_sha256,
+        )
+        for item in identity_view.operators
     }
     return expected_fixtures == observed_fixtures and expected_operators == observed_operators
+
+
+def _provider_event_identity_sha256(event: CurrentOddsEvent) -> str:
+    return canonical_sha256(
+        {
+            "commence_time": event.commence_time.isoformat(),
+            "provider_away_team": event.provider_away_team,
+            "provider_event_id": event.provider_event_id,
+            "provider_home_team": event.provider_home_team,
+            "sport_key": event.sport_key,
+        }
+    )
+
+
+def _require_cross_source_orientation(
+    source: CurrentUnifiedStateBundle,
+    mapping: ResolvedCurrentFixture,
+    event: CurrentOddsEvent,
+) -> None:
+    if (
+        event.provider_event_id != mapping.provider_event_id
+        or event.sport_key != mapping.sport_key
+        or event.commence_time != mapping.provider_commence_time
+        or event.provider_home_team != mapping.provider_home_team
+        or event.provider_away_team != mapping.provider_away_team
+        or _provider_event_identity_sha256(event) != mapping.provider_event_identity_sha256
+    ):
+        raise CurrentMarketConstraintError("SOURCE_INVALID")
+
+    home_matches = tuple(
+        team
+        for team in source.identity_map.team_mappings
+        if team.provider_team_text == mapping.provider_home_team
+    )
+    away_matches = tuple(
+        team
+        for team in source.identity_map.team_mappings
+        if team.provider_team_text == mapping.provider_away_team
+    )
+    if len(home_matches) != 1 or len(away_matches) != 1:
+        raise CurrentMarketConstraintError("SOURCE_INVALID")
+    home = home_matches[0]
+    away = away_matches[0]
+    if (
+        home.official_fpl_team_id != mapping.official_home_team_id
+        or home.official_fpl_team_identity != mapping.official_home_team_identity
+        or away.official_fpl_team_id != mapping.official_away_team_id
+        or away.official_fpl_team_identity != mapping.official_away_team_identity
+    ):
+        raise CurrentMarketConstraintError("SOURCE_INVALID")
+
+    fixture_matches = tuple(
+        fixture
+        for fixture in source.fpl_input.fixtures
+        if fixture.provider_fixture_id == mapping.official_fpl_fixture_id
+    )
+    if len(fixture_matches) != 1:
+        raise CurrentMarketConstraintError("SOURCE_INVALID")
+    official_fixture = fixture_matches[0]
+    if (
+        official_fixture.home_team_identity != mapping.official_home_team_identity
+        or official_fixture.away_team_identity != mapping.official_away_team_identity
+        or official_fixture.kickoff_at != mapping.official_fpl_kickoff_at
+    ):
+        raise CurrentMarketConstraintError("SOURCE_INVALID")
 
 
 def _request_matches(
@@ -1501,6 +1610,7 @@ class CurrentMarketConstraintService:
         ):
             fixture_identity = checked_view.fixture(mapping.official_fpl_fixture_id)
             event = events_by_id[mapping.provider_event_id]
+            _require_cross_source_orientation(checked_source, mapping, event)
             h2h_quotes, adapter_exclusions, timestamp_warnings = _h2h_quotes(
                 source=checked_source,
                 event=event,
@@ -1803,7 +1913,7 @@ class CurrentMarketCanonicalIdentityRepository:
                 item.provider_event_id for item in source.identity_map.fixture_mappings
             }
             bookmaker_by_key: dict[str, CurrentOddsBookmaker] = {}
-            event_time_by_key: dict[str, datetime] = {}
+            event_times_by_key: dict[str, set[datetime]] = {}
             for event_id in target_event_ids:
                 event = event_by_id[event_id]
                 for bookmaker in event.bookmakers:
@@ -1814,12 +1924,16 @@ class CurrentMarketCanonicalIdentityRepository:
                     ):
                         raise CurrentMarketConstraintError("CANONICAL_IDENTITY_UNAVAILABLE")
                     bookmaker_by_key[bookmaker.bookmaker_key] = bookmaker
-                    event_time_by_key[bookmaker.bookmaker_key] = min(
-                        event_time_by_key.get(bookmaker.bookmaker_key, event.commence_time),
-                        event.commence_time,
+                    event_times_by_key.setdefault(bookmaker.bookmaker_key, set()).add(
+                        event.commence_time
                     )
             operator_results: list[CurrentMarketCanonicalOperator] = []
             for bookmaker_key, bookmaker in sorted(bookmaker_by_key.items()):
+                occurrence_times = tuple(sorted(event_times_by_key[bookmaker_key]))
+                valid_at_every_occurrence = tuple(
+                    external_identifier.c.valid_during.op("@>")(event_time)
+                    for event_time in occurrence_times
+                )
                 rows = list(
                     self.session.execute(
                         select(
@@ -1845,9 +1959,7 @@ class CurrentMarketCanonicalIdentityRepository:
                             external_identifier.c.entity_type == "BETTING_OPERATOR",
                             external_identifier.c.external_id_text == bookmaker_key,
                             external_identifier.c.mapping_status == "HUMAN_VERIFIED",
-                            external_identifier.c.valid_during.op("@>")(
-                                event_time_by_key[bookmaker_key]
-                            ),
+                            *valid_at_every_occurrence,
                             external_identifier.c.system_during.op("@>")(
                                 source.identity_map.mapping_decided_at
                             ),
@@ -1867,6 +1979,12 @@ class CurrentMarketCanonicalIdentityRepository:
                         canonical_operator_id=self._one_uuid(rows, "canonical_entity_id"),
                         canonical_operator_key=operator_key,
                         external_mapping_id=self._one_uuid(rows, "external_identifier_id"),
+                        target_occurrence_times_sha256=(
+                            _operator_occurrence_times_sha256(
+                                bookmaker_key,
+                                occurrence_times,
+                            )
+                        ),
                     )
                 )
         except CurrentMarketConstraintError:
