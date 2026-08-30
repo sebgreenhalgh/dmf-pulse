@@ -33,6 +33,7 @@
     "rights_profile_id": "openfootball_football_json_score_prior_v1",
     "status": "HUMAN_APPROVED"
   },
+  "implementation_commit": "3fb67585e48577f9036fef34b87ec27d63e0b2d4",
   "inherited": {
     "complete_repository_population_passed": 3859,
     "gcs008_stage8_passed": 193,

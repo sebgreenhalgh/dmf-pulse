@@ -1,5 +1,8 @@
 # CURRENT-SCORE-PRIOR-001A implementation result
 
+Implementation commit: `3fb67585e48577f9036fef34b87ec27d63e0b2d4`, a direct normal descendant of
+architectural parent `7609f041f4f7a415ef58f0f5c682a9b1d5b16d49`.
+
 ## Delivered capability
 
 The implementation acquires only four public OpenFootball `football.json` files under immutable
