@@ -12,6 +12,7 @@ from uuid import UUID
 import typer
 from pydantic import BaseModel, ValidationError
 
+from dmf_pulse.cli.current_score_prior_cmd import openfootball_app
 from dmf_pulse.cli.odds_cmd import odds_app
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import (
@@ -39,6 +40,7 @@ bundle_app = typer.Typer(help="Inspect immutable FPL source bundles.")
 current_app = typer.Typer(help="Compile manual current FPL files without network or storage.")
 ingest_app.add_typer(fpl_app, name="fpl")
 ingest_app.add_typer(odds_app, name="odds")
+ingest_app.add_typer(openfootball_app, name="openfootball")
 fpl_app.add_typer(bundle_app, name="bundle")
 fpl_app.add_typer(current_app, name="current")
 

@@ -1,0 +1,40 @@
+{
+  "profiles": [
+    {
+      "account_scope": "public commit-pinned OpenFootball football.json content",
+      "approved_at": "2026-08-30T08:40:16.812047Z",
+      "approved_by": "Sebastian Greenhalgh",
+      "approved_purpose": "private internal historical score-prior estimation",
+      "attribution_required": false,
+      "attribution_text": null,
+      "capabilities": {
+        "automated_access": "ALLOW",
+        "backup": "ALLOW",
+        "cache": "ALLOW",
+        "derived_storage": "ALLOW",
+        "manual_import": "ALLOW",
+        "model_training": "ALLOW",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "ALLOW",
+        "redistribution": "DENY",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-08-30T08:40:16.812047Z",
+      "geography_scope": "private UK analytical use",
+      "human_approval_id": "CURRENT-SCORE-PRIOR-001A#openfootball_football_json_score_prior_v1",
+      "notes": "Commit-pinned OpenFootball football.json only; no unrelated datasets, player/image/logo/trademark use, public raw display or product redistribution.",
+      "profile_version": "1.0.0",
+      "provider_key": "openfootball_football_json",
+      "retention_reason": "CC0-1.0 imposes no source retention limit; immutable retention is permitted for reproducibility.",
+      "retention_seconds": null,
+      "rights_profile_id": "openfootball_football_json_score_prior_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": false,
+      "terms_source": "OpenFootball football.json/LICENSE.md",
+      "terms_version": "CC0-1.0; immutable licence blob 670154e3538863b2d9891fd5483160fbdfc89164",
+      "unresolved_rights": []
+    }
+  ],
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,48 @@
+CURRENT-SCORE-PRIOR-001A command ledger
+Date: 2026-08-30
+
+1. Exact base and worktree isolation
+   PASS: fetched origin/main at 7609f041f4f7a415ef58f0f5c682a9b1d5b16d49 and created the dedicated
+   integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior worktree.
+   The unrelated dirty CURRENT-AVAILABILITY checkout was not modified.
+2. Authority and human approval
+   PASS: A3/A8, GCS-008, existing ScorePriorRequest, corrected OpenFootball research and the
+   2026-08-30 human rights approval were reconciled. approved_at is
+   2026-08-30T08:40:16.812047Z and approved_by is Sebastian Greenhalgh.
+3. Exact live immutable snapshot
+   PASS: HTTPS acquisition used only raw.githubusercontent.com, exact commit
+   f27dcbef681db2c3195f9def62316ce497278781 and the four allowlisted paths. Licence and three
+   season byte counts, Git blob SHA-1 values and SHA-256 values matched before use. The result was
+   N=1140, home=1839, away=1567, home rate 1.613158 and away rate 1.374561.
+4. Focused unit/contract/integration suite and branch coverage
+   PASS: 100 tests. Branch-aware coverage exceeds the required 90%; the exact machine report is
+   evidence/tickets/CURRENT-SCORE-PRIOR-001A/coverage.json.
+5. Inherited GCS-008/Stage-8 regression
+   PASS: 193 tests across unit, contract, integration, golden, property and GCS assurance helpers.
+   No live GCS-008 projection was executed.
+6. PostgreSQL and migration population
+   PASS: digest-pinned PostgreSQL 18.4 was created, migrated through 20260807_0006, and the full
+   postgres-or-migration selector passed 250 tests with 3609 deselected. The disposable container,
+   network and volume were removed. The score-prior implementation itself made no database call.
+7. Complete inherited repository population
+   PASS: all 3859 collected tests passed across deterministic partitions: the 250-test
+   postgres-or-migration selector; assurance; contract/golden/integration/property/unit;
+   performance/replay; security; and the unmarked generic-wheel/availability fixtures under the
+   documented disposable PostgreSQL environment. Repeated cross-partition tests were not used to
+   inflate this population. Known Pydantic adversarial-test warnings remained warnings only.
+8. Static and dependency gates
+   PASS: uv sync --all-groups --frozen checked 40 packages; Ruff format/check passed; strict mypy
+   passed 258 source files; git diff --check passed.
+9. Build and installed-wheel verification
+   PASS: dmf-pulse 0.2.0 wheel and sdist built. The ticket verifier installed the wheel into a
+   clean environment outside the repository, loaded both packaged authorities, confirmed exact
+   commit/rates, proved missing rights are zero-call and observed zero network requests.
+10. Repository governance and security
+   PASS: canonical CURRENT-SCORE-PRIOR and authorized PRC-013 manifests were regenerated;
+   repository validation returned zero errors and secret scanning returned zero findings.
+11. Final commit, push, CI, PR, merge, human acceptance and production activation
+    NOT PERFORMED. These remain separate, later-authority steps.
+
+The current target-season rules source verifier continues to report the inherited blocker
+"no official bootstrap capture retrieved within two days". This is unrelated to the historical
+OpenFootball prior and was not relabelled as success.

@@ -1,0 +1,67 @@
+{
+  "architectural_parent": "7609f041f4f7a415ef58f0f5c682a9b1d5b16d49",
+  "automatic_final_sha_ci": "PENDING_FINAL_PUSH",
+  "branch": "integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior",
+  "coverage": {
+    "branch_aware_percent": 95.63318777292577,
+    "branch_percent": 92.85714285714286,
+    "covered_branches": 156,
+    "covered_statements": 720,
+    "focused_tests_passed": 100,
+    "missing_branches": 12,
+    "missing_statements": 28,
+    "report": "evidence/tickets/CURRENT-SCORE-PRIOR-001A/coverage.json",
+    "required_percent": 90,
+    "statement_percent": 96.2566844919786,
+    "total_branches": 168,
+    "total_statements": 748
+  },
+  "database_read_performed": false,
+  "database_write_performed": false,
+  "exact_live_snapshot": {
+    "away_goal_rate": "1.374561",
+    "away_goals": 1567,
+    "commit_sha": "f27dcbef681db2c3195f9def62316ce497278781",
+    "home_goal_rate": "1.613158",
+    "home_goals": 1839,
+    "sample_size": 1140,
+    "status": "PASS"
+  },
+  "human_approval": {
+    "approved_at": "2026-08-30T08:40:16.812047Z",
+    "approved_by": "Sebastian Greenhalgh",
+    "rights_profile_id": "openfootball_football_json_score_prior_v1",
+    "status": "HUMAN_APPROVED"
+  },
+  "inherited": {
+    "complete_repository_population_passed": 3859,
+    "gcs008_stage8_passed": 193,
+    "postgres_migration_passed": 250,
+    "status": "PASS"
+  },
+  "installed_wheel": {
+    "authorities_packaged": true,
+    "clean_environment_outside_repository": true,
+    "network_requests": 0,
+    "rights_zero_call": true,
+    "status": "PASS"
+  },
+  "limitations": [
+    "CURRENT_AVAILABILITY_DATA_BLOCKED",
+    "NO_ACCEPTED_CURRENT_MINUTES_HISTORY",
+    "NOT_CURRENT_TEAM_STRENGTH",
+    "FULL_LIVE_GCS008_NOT_EXECUTED",
+    "PLAYER_ALLOCATION_NOT_STARTED",
+    "STAGE9_NOT_STARTED",
+    "OPTIMISATION_NOT_EXECUTED",
+    "NOT_PRODUCTION_ACTIVE"
+  ],
+  "market_evidence_used": false,
+  "persistence_performed": false,
+  "production_active": false,
+  "repository_validation": "PASS_ZERO_ERRORS_1209_DELIVERABLES",
+  "secret_scan": "PASS_ZERO_FINDINGS",
+  "source_mode": "RECONSTRUCTED",
+  "status": "CURRENT_SCORE_PRIOR_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "ticket_id": "CURRENT-SCORE-PRIOR-001A"
+}

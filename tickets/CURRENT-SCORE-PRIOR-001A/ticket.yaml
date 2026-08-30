@@ -1,0 +1,56 @@
+ticket_id: CURRENT-SCORE-PRIOR-001A
+title: Commit-pinned OpenFootball historical league score prior
+status: ACTIVE
+required_base_commit: 7609f041f4f7a415ef58f0f5c682a9b1d5b16d49
+expected_branch: integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior
+objective: >-
+  Acquire and validate the exact human-approved OpenFootball snapshot, recompute the three most
+  recent complete Premier League season home/away means with exact Decimal arithmetic, and emit
+  one weak league-level ScorePriorRequest with strict reconstructed and usable-time lineage.
+authority_scopes:
+  - A3-data-foundation
+  - A8-events
+permissions:
+  openfootball_network: exact_commit_only
+  raw_source_storage: permitted_but_not_required
+  derived_storage: permitted_but_not_implemented
+  database_read: forbidden
+  database_write: forbidden
+  current_market_input: forbidden
+  current_team_strength_estimation: forbidden
+  new_runtime_dependency: forbidden
+allowed_areas:
+  - config/providers/openfootball_score_prior.json
+  - config/rights/openfootball_profiles.json
+  - src/dmf_pulse/ingestion/openfootball/**
+  - src/dmf_pulse/cli/current_score_prior_cmd.py
+  - src/dmf_pulse/cli/ingest_cmd.py
+  - tests/unit/ingestion/openfootball/**
+  - tests/contract/football_events/test_current_score_prior_contract.py
+  - tests/integration/ingestion/test_openfootball_score_prior_cli.py
+  - scripts/verify_current_score_prior_wheel.py
+  - pyproject.toml
+  - tickets/CURRENT-SCORE-PRIOR-001A/**
+  - evidence/tickets/CURRENT-SCORE-PRIOR-001A/**
+  - evidence/tickets/PRC-013/current_manifest.json
+  - PLANS.md
+exclusions:
+  - mutable OpenFootball master or branch aliases
+  - unrelated OpenFootball datasets, player data, images, logos or trademarks
+  - public raw-data display or redistribution
+  - source or derived database persistence
+  - team/opponent/lineup/regime strength inference
+  - market-derived prior rates or any market dependency
+  - Stage-7 changes, GCS-008 execution, player allocation, Stage 9 or optimisation
+  - production activation, PR, merge or human-acceptance claim
+required_public_behavior:
+  - exact human-approved rights profile and zero-call RIGHTS_BLOCKED behavior
+  - exact immutable commit, path, Git blob SHA-1, raw SHA-256 and byte-size validation
+  - strict duplicate-key-free JSON with no float, string, Boolean or coerced score values
+  - exact object-ft and Premier-League-scoped direct reported-score extraction
+  - 380 matches, 20 teams, 38 appearances each, 380 unique fixtures and 380 valid scores per season
+  - selected 2023/24, 2024/25 and 2025/26 totals and ROUND_HALF_EVEN six-place rates
+  - source mode RECONSTRUCTED with receipt, validation, approval, usable and cutoff ordering
+  - one independent ScorePriorRequest with no market input and no current-team-strength claim
+  - private safe summary, bounded HTTPS, no redirects, no credentials and no database activity
+acceptance_status: CURRENT_SCORE_PRIOR_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW
