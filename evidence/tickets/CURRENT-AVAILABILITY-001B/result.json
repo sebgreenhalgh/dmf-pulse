@@ -1,0 +1,41 @@
+{
+  "architectural_parent": "99418f3316277f4dae347d80358d5dd5a09655b2",
+  "automatic_final_sha_ci": "PENDING_FINAL_PUSH",
+  "branch": "readiness/CURRENT-AVAILABILITY-001B-private-manual-transient-minutes-override",
+  "classification": "PRIVATE_TRANSIENT",
+  "coverage": {
+    "branch_aware_percent": 95.88,
+    "focused_tests_passed": 50,
+    "report": "evidence/tickets/CURRENT-AVAILABILITY-001B/coverage.json",
+    "required_percent": 90
+  },
+  "database_read_performed_by_capability": false,
+  "database_write_performed_by_capability": false,
+  "dirty_001a": {
+    "cached_diff_git_object_after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "cached_diff_git_object_before": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "salvage": "IDEAS_ONLY_NO_FILE_COPY",
+    "status": "UNCHANGED_BY_001B",
+    "worktree_diff_git_object_after": "6228b1b3ddcc3ecc05c32dab2f7f394d42ae2db7",
+    "worktree_diff_git_object_before": "6228b1b3ddcc3ecc05c32dab2f7f394d42ae2db7"
+  },
+  "implementation_commit": "069b721b8958c5771ddb45449ee8519ed348194a",
+  "manual_model_family": "PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1",
+  "model_derived": false,
+  "persistence_class": "TRANSIENT_PRIVATE",
+  "production_active": false,
+  "production_suitable": false,
+  "regressions": {
+    "availability_and_football_events_passed": 376,
+    "current_non_database_passed": 359,
+    "current_non_database_skipped": 1,
+    "current_market_database_passed": 29,
+    "postgres_or_migration_passed": 250,
+    "stage8_manual_integration": "PASS"
+  },
+  "repository_validation": "PASS_ZERO_ERRORS_AFTER_MANIFEST_REFRESH",
+  "secret_scan": "PASS_ZERO_FINDINGS",
+  "status": "CURRENT_AVAILABILITY_001B_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "ticket_id": "CURRENT-AVAILABILITY-001B",
+  "transformation_policy_sha256": "843e98f9849f1420b8cc573f44cb6ee23ed8f26e659bfba1b11de81fa2cc15d2"
+}

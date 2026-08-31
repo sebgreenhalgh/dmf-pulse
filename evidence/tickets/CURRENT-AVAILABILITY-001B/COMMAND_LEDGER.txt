@@ -1,0 +1,57 @@
+CURRENT-AVAILABILITY-001B command ledger
+Date: 2026-08-31
+
+1. Parent, CI, and isolation
+   PASS: `git fetch origin --prune` confirmed origin/main exactly
+   99418f3316277f4dae347d80358d5dd5a09655b2. GitHub run 33401091116 concluded SUCCESS across
+   pre-flight, all eight coverage shards, combined coverage, post-coverage, quality, and sentinel.
+   Work was created in a separate clean worktree and branch.
+2. Dirty CURRENT-AVAILABILITY-001A preservation
+   PASS: startup and final read-only fingerprints match. The tracked worktree diff Git object is
+   6228b1b3ddcc3ecc05c32dab2f7f394d42ae2db7; the cached diff is the empty object
+   e69de29bb2d1d6434b8b29ae775ad8c2e48c5391. Status remained dirty and was not cleaned, staged,
+   formatted, tested, restored, stashed, rebased, or otherwise mutated by this ticket.
+3. 001A salvage classification
+   PASS: reused ideas only: canonical UUID spelling, cutoff/usable/expiry ordering, typed hard
+   eligibility, semantic hashes, and explicit private/transient provenance. Its history/current
+   state adapter and synthetic-history wrapper were superseded; no file was copied wholesale and
+   this branch has no dependency on its uncommitted files.
+4. Focused ticket and contract coverage
+   PASS: 50 tests. Branch-aware total coverage was 95.88% over manual_override.py,
+   manual_override_cmd.py, and minutes_context.py. Exact machine output is coverage.json.
+5. Affected availability and football-events regressions
+   PASS: 376 unit/property/golden/contract/integration tests completed offline in 88.00 seconds.
+6. Current FPL, current market, and current score-prior regressions
+   PASS: 359 non-database tests passed with one documented bind-mount hard-link skip. After the
+   disposable database was migrated, all 29 current-market identity tests passed.
+7. Repository PostgreSQL and migration population
+   PASS: the complete `postgres or migration` selector passed 250 tests with 3684 deselected in
+   316.01 seconds against disposable PostgreSQL 18.4. One inherited Pydantic warning remained a
+   warning only.
+8. Static and dependency gates
+   PASS: `uv sync --all-groups --frozen` checked 40 locked packages; all 701 files passed Ruff
+   format; Ruff lint passed; strict mypy passed 261 source files; `git diff --check` passed.
+9. Build and installed-wheel proof
+   PASS: dmf-pulse 0.2.0 sdist and wheel built. The GCS-008 verifier ran offline in a clean Linux
+   environment outside the source tree, verified 304 RECORD members and packaged Stage-8
+   resources, and validated result SHA
+   31d41317c0cf06002edd8e8fb47c4702706661f2227304182e3c4b8995e06b7e.
+10. Repository governance and security
+    PASS after final manifest generation: the ticket and authoritative PRC-013 repository
+    manifests were refreshed; repository validation returned zero errors; the first-party secret
+    scan returned zero findings.
+11. Implementation checkpoint
+    PASS: 069b721b8958c5771ddb45449ee8519ed348194a contains product, contracts, tests,
+    documentation, and ticket governance and was pushed normally.
+12. Adversarial review
+    PASS: two material output-boundary findings were fixed before checkpoint publication: lexical
+    `dmf-private-transient/..` marker escape and partial writes before a later artifact conflict.
+    Resolved-path marker validation and all-artifact preflight have direct regressions. No P0, P1,
+    or material P2 remains open.
+13. Exact final-SHA CI, PR, merge, tag, acceptance, production
+    PENDING final evidence commit and push for exact-SHA automatic CI. PR, merge, tag, human
+    acceptance, and production activation were NOT PERFORMED.
+
+Windows Application Control blocked the native Hypothesis extension and the verifier's temporary
+Windows environment. The same tests and official verifier passed in Python 3.13.15 Linux using
+the frozen lock and a prewarmed offline dependency cache; no test assertion was weakened.
