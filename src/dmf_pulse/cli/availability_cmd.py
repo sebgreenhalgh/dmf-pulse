@@ -30,6 +30,7 @@ from dmf_pulse.availability.registry import (
 )
 from dmf_pulse.availability.resources import availability_resource_json
 from dmf_pulse.availability.role_model import FROZEN_POLICY_SHA256
+from dmf_pulse.cli.manual_override_cmd import manual_override_command
 from dmf_pulse.database.engine import (
     create_database_engine,
     resolve_test_database_url,
@@ -419,6 +420,9 @@ def predict_command(
         finally:
             engine.dispose()
     _emit(result)
+
+
+availability_app.command("manual-override")(manual_override_command)
 
 
 __all__ = ["availability_app"]

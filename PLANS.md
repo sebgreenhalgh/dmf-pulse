@@ -1,5 +1,31 @@
 # DMF Pulse execution plans
 
+# CURRENT-AVAILABILITY-001B private manual transient minutes override
+
+- Ticket: `CURRENT-AVAILABILITY-001B`; immutable merged parent
+  `99418f3316277f4dae347d80358d5dd5a09655b2` on `main`.
+- Branch: `readiness/CURRENT-AVAILABILITY-001B-private-manual-transient-minutes-override`.
+- Scope: explicit operator-authored integer-weighted fixture scenarios; exact expansion to 256
+  coherent lineups per team; deterministic Stage-7 player/team projections; truthful
+  `PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1` provenance; and the existing validated Stage-8 identity
+  and score-distribution path.
+- Safety: private, transient, manual, grade D, not model-derived, not production-suitable; no
+  historical-observation fabrication, acquisition, network, database, model fitting, Stage 9,
+  optimisation, production activation, PR, merge, tag, or human-acceptance claim.
+
+## CURRENT-AVAILABILITY-001B checkpoints
+
+- [x] Fetch and verify exact parent, green parent CI run `33401091116`, all worktrees, authority,
+  and the read-only dirty 001A evidence fingerprint.
+- [x] Classify 001A: reuse strict identity/time/hard-evidence concepts only; supersede its
+  history/current-state adapter for this bridge; identify no code safe to copy wholesale.
+- [x] Add the strict manual fixture/scenario/provenance contract and exact coherence validation.
+- [x] Add deterministic Stage-7 projection derivation, closed manual family compatibility, and
+  the private transient CLI artifact surface.
+- [x] Prove Stage 8 integration and affected focused/broad regression compatibility.
+- [ ] Pass final static/build/wheel/repository/security gates, seal evidence,
+  adversarial review, cohesive commits, pushes, and exact final-SHA CI.
+
 ## CURRENT-SCORE-PRIOR-001A independent-review remediation
 
 - Reviewed parent: `20036f3f7302580bb80ab6ebb9429620db0b8a9b` on the existing

@@ -1,0 +1,44 @@
+ticket_id: "CURRENT-AVAILABILITY-001B"
+stage: "A7-A8"
+pack_version: "1.0"
+title: "Private manual transient minutes override"
+status: "DRAFT"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+
+required_branch: "readiness/CURRENT-AVAILABILITY-001B-private-manual-transient-minutes-override"
+required_base_commit: "99418f3316277f4dae347d80358d5dd5a09655b2"
+
+objective: >-
+  Convert an explicit private operator-authored mixture of exactly 256 coherent lineup/minutes
+  scenarios per team into truthful Stage-7 projections and the existing validated Stage-8
+  minutes context without claiming historical/model derivation.
+
+user_visible_vertical_slice:
+  command: >-
+    dmf availability manual-override --input fixture_manual_minutes.json
+    --output-dir artifacts/dmf-private-transient
+  expected: >-
+    Deterministic home and away TeamMinutesProjection artifacts, one Stage7MinutesContext, and a
+    provenance manifest identified as PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1.
+
+in_scope:
+  - "Strict canonical fixture/team/player identity and UTC cutoff validation."
+  - "Positive integer scenario counts summing exactly to 256 per team."
+  - "Exact coherent START/BENCH/OUT and official-minute scenario expansion."
+  - "Exact role frequencies, 91-bin PMFs, derived minute summaries, and grade-D provenance."
+  - "Closed Stage-7/Stage-8 support for PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1."
+  - "Private transient immutable CLI output and synthetic offline integration proof."
+
+excluded:
+  - "Historical evidence acquisition or fabricated observations."
+  - "Model training, calibration, smoothing, regression, shrinkage, interpolation, or RNG."
+  - "Network, database, provider, persistence outside the explicit transient output directory."
+  - "Stage 9, FPL optimisation, live orchestration, UI, or production activation."
+  - "Real operator judgements or private current data in Git."
+
+network_allowed: false
+real_credentials_allowed: false
+production_activation_allowed: false
+required_review_output: "review_pack/CURRENT-AVAILABILITY-001B"

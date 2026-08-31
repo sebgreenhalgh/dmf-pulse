@@ -59,6 +59,7 @@ Thumbs.db
 
 # Generated review output
 review_pack/
+dmf-private-transient/
 
 # Regenerable RUL-002 acceptance evidence (the validated ZIP is the immutable review delivery)
 evidence/tickets/RUL-002/*

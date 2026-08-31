@@ -81,7 +81,8 @@
           "NEW_SIGNING",
           "NEW_MANAGER_REGIME",
           "PROMOTED_TEAM_EARLY_REGIME",
-          "BASELINE_MODEL_CAP_B"
+          "BASELINE_MODEL_CAP_B",
+          "MANUAL_TRANSIENT_OVERRIDE"
         ]
       }
     },

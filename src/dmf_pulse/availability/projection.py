@@ -103,6 +103,7 @@ class PlayerMinutesProjection(_FrozenModel):
             "NEW_MANAGER_REGIME",
             "PROMOTED_TEAM_EARLY_REGIME",
             "BASELINE_MODEL_CAP_B",
+            "MANUAL_TRANSIENT_OVERRIDE",
         ],
         ...,
     ]
@@ -169,7 +170,10 @@ class TeamMinutesProjection(_FrozenModel):
     fixture_id: str
     team_id: str
     as_of: str
-    model_family: Literal["REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"]
+    model_family: Literal[
+        "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+        "PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1",
+    ]
     dataset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     model_artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     sample_count: Literal[256]
@@ -228,6 +232,20 @@ class TeamMinutesProjection(_FrozenModel):
         ):
             if _public_probability(expected) != getattr(self, label):
                 raise ValueError(f"{label} does not match player rows")
+        manual_rows = tuple(
+            player
+            for player in self.players
+            if "MANUAL_TRANSIENT_OVERRIDE" in player.confidence_reasons
+        )
+        if self.model_family == "PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1":
+            if len(manual_rows) != len(self.players) or any(
+                player.confidence_grade != "D" for player in self.players
+            ):
+                raise ValueError(
+                    "manual team projections require grade-D manual-transient player provenance"
+                )
+        elif manual_rows:
+            raise ValueError("model-derived team projections cannot contain manual provenance")
         body = self.model_dump(mode="json")
         supplied = body.pop("result_sha256")
         if canonical_sha256(body) != supplied:

@@ -39,7 +39,10 @@
       "format": "date-time"
     },
     "model_family": {
-      "const": "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"
+      "enum": [
+        "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+        "PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1"
+      ]
     },
     "dataset_sha256": {
       "type": "string",

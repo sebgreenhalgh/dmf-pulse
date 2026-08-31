@@ -33,7 +33,10 @@ class TeamMinutesProjectionIdentity(_FrozenModel):
     fixture_id: str
     team_id: str
     as_of: datetime
-    model_family: Literal["REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"]
+    model_family: Literal[
+        "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+        "PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1",
+    ]
     dataset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     model_artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     sample_count: Literal[256]
