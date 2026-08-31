@@ -1,0 +1,81 @@
+{
+  "adapter_version": "openfootball-score-prior-v1",
+  "commit_sha": "f27dcbef681db2c3195f9def62316ce497278781",
+  "commit_timestamp": "2026-05-26T08:25:18Z",
+  "contract_version": "openfootball-score-prior-v1",
+  "expected_away_goal_rate": "1.374561",
+  "expected_home_goal_rate": "1.613158",
+  "host": "raw.githubusercontent.com",
+  "licence": {
+    "blob_sha1": "670154e3538863b2d9891fd5483160fbdfc89164",
+    "byte_size": 6555,
+    "content_sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
+    "path": "LICENSE.md"
+  },
+  "max_json_depth": 12,
+  "max_response_bytes": 131072,
+  "max_text_length": 500,
+  "method_id": "PL_LEAGUE_HOME_AWAY_MEAN_3_COMPLETE_SEASONS_V1",
+  "provider_key": "openfootball_football_json",
+  "repository": "openfootball/football.json",
+  "rounding": "ROUND_HALF_EVEN",
+  "scheme": "https",
+  "seasons": [
+    {
+      "away_goals": 562,
+      "blob_sha1": "f62b11dfaf06cffd1236c2777caebb880a0cfea1",
+      "byte_size": 116669,
+      "content_sha256": "03e13eafbf78dfe00d7e89dd3bf6643986eb6e8fd86c7664aeb8c5bc0bed88d0",
+      "direct_score_count": 0,
+      "expected_appearances_per_team": 38,
+      "expected_matches": 380,
+      "expected_name": "English Premier League 2023/24",
+      "expected_teams": 20,
+      "home_goals": 684,
+      "object_ft_count": 11,
+      "object_ht_ft_count": 369,
+      "path": "2023-24/en.1.json",
+      "season_code": "2023/24"
+    },
+    {
+      "away_goals": 540,
+      "blob_sha1": "504f2e732fbc3c9caeb98e4382b13b094453b840",
+      "byte_size": 110141,
+      "content_sha256": "c3d18f552d83382cd4b6b21127adbbfe38e7f8618ddc979fb5404f2df07d0a75",
+      "direct_score_count": 0,
+      "expected_appearances_per_team": 38,
+      "expected_matches": 380,
+      "expected_name": "English Premier League 2024/25",
+      "expected_teams": 20,
+      "home_goals": 575,
+      "object_ft_count": 16,
+      "object_ht_ft_count": 364,
+      "path": "2024-25/en.1.json",
+      "season_code": "2024/25"
+    },
+    {
+      "away_goals": 465,
+      "blob_sha1": "41e223ee5954e6b634beb4bc70d7188b3183c665",
+      "byte_size": 108493,
+      "content_sha256": "d6070bdf731546ccf97767f062e8af4bd26dd309dee69f6092025bf9c78f43c1",
+      "direct_score_count": 27,
+      "expected_appearances_per_team": 38,
+      "expected_matches": 380,
+      "expected_name": "English Premier League 2025/26",
+      "expected_teams": 20,
+      "home_goals": 580,
+      "object_ft_count": 0,
+      "object_ht_ft_count": 353,
+      "path": "2025-26/en.1.json",
+      "season_code": "2025/26"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "timeouts_seconds": {
+    "connect": 10,
+    "read": 20,
+    "total": 30
+  },
+  "working_precision": 50,
+  "output_quantum": "0.000001"
+}

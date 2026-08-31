@@ -1,0 +1,86 @@
+{
+  "architectural_parent": "7609f041f4f7a415ef58f0f5c682a9b1d5b16d49",
+  "automatic_final_sha_ci": "PENDING_FINAL_PUSH",
+  "branch": "integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior",
+  "coverage": {
+    "branch_aware_percent": 94.94949494949495,
+    "branch_percent": 91.17647058823529,
+    "covered_branches": 186,
+    "covered_statements": 848,
+    "focused_tests_passed": 137,
+    "missing_branches": 18,
+    "missing_statements": 37,
+    "report": "evidence/tickets/CURRENT-SCORE-PRIOR-001A/coverage.json",
+    "required_percent": 90,
+    "statement_percent": 95.81920903954803,
+    "total_branches": 204,
+    "total_statements": 885
+  },
+  "database_read_performed": false,
+  "database_write_performed": false,
+  "exact_live_snapshot": {
+    "away_goal_rate": "1.374561",
+    "away_goals": 1567,
+    "commit_sha": "f27dcbef681db2c3195f9def62316ce497278781",
+    "home_goal_rate": "1.613158",
+    "home_goals": 1839,
+    "sample_size": 1140,
+    "status": "PASS"
+  },
+  "human_approval": {
+    "approved_at": "2026-08-30T08:40:16.812047Z",
+    "approved_by": "Sebastian Greenhalgh",
+    "rights_profile_id": "openfootball_football_json_score_prior_v1",
+    "status": "HUMAN_APPROVED"
+  },
+  "findings": {
+    "CSP-IR-001": "ENGINEERING_CLOSED_PENDING_INDEPENDENT_REREVIEW",
+    "CSP-IR-002": "ENGINEERING_CLOSED_PENDING_INDEPENDENT_REREVIEW",
+    "CSP-IR-003": "ENGINEERING_CLOSED_PENDING_INDEPENDENT_REREVIEW",
+    "CSP-IR-004": "ENGINEERING_CLOSED_PENDING_INDEPENDENT_REREVIEW"
+  },
+  "implementation_commit": "300ea1af1b9e834b011c931391467e9ac7b95aef",
+  "inherited": {
+    "current_fpl_state_001b_001d_passed": 182,
+    "current_markets_passed": 122,
+    "gcs008_stage8_passed": 212,
+    "live_odds_non_database_passed": 189,
+    "live_odds_retention_database_passed": 8,
+    "rights_and_config_passed": 131,
+    "status": "PASS"
+  },
+  "installed_wheel": {
+    "authorities_packaged": true,
+    "bundle_hash_tamper_blocked": true,
+    "clean_environment_outside_repository": true,
+    "conversion_network_requests": 0,
+    "exact_conversion": true,
+    "fixture_bound_bundle": true,
+    "market_free_fresh_import": true,
+    "network_requests": 0,
+    "past_as_of_blocked": true,
+    "reference_rates_unchanged": true,
+    "result_hash_tamper_blocked": true,
+    "rights_zero_call": true,
+    "status": "PASS"
+  },
+  "limitations": [
+    "CURRENT_AVAILABILITY_DATA_BLOCKED",
+    "NO_ACCEPTED_CURRENT_MINUTES_HISTORY",
+    "NOT_CURRENT_TEAM_STRENGTH",
+    "FULL_LIVE_GCS008_NOT_EXECUTED",
+    "PLAYER_ALLOCATION_NOT_STARTED",
+    "STAGE9_NOT_STARTED",
+    "OPTIMISATION_NOT_EXECUTED",
+    "NOT_PRODUCTION_ACTIVE"
+  ],
+  "market_evidence_used": false,
+  "persistence_performed": false,
+  "production_active": false,
+  "repository_validation": "PASS_ZERO_ERRORS_1211_DELIVERABLES",
+  "secret_scan": "PASS_ZERO_FINDINGS",
+  "source_mode": "RECONSTRUCTED",
+  "prior_reviewed_commit": "20036f3f7302580bb80ab6ebb9429620db0b8a9b",
+  "status": "CURRENT_SCORE_PRIOR_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW",
+  "ticket_id": "CURRENT-SCORE-PRIOR-001A"
+}

@@ -10,7 +10,7 @@ from datetime import datetime
 from decimal import ROUND_CEILING, Decimal
 from importlib.resources import files
 from pathlib import Path
-from typing import Annotated, Any, Literal, Self
+from typing import Any, Literal, Self
 from uuid import UUID
 
 import yaml  # type: ignore[import-untyped]
@@ -29,7 +29,6 @@ from dmf_pulse.football_events._decimal import (
     exact_decimal,
     format_utc,
     mapping,
-    nonnegative_decimal,
     parse_utc,
     positive_decimal,
     probability,
@@ -52,6 +51,7 @@ from dmf_pulse.football_events.score_distribution import (
     compose_joint_score_distribution,
 )
 from dmf_pulse.football_events.score_prior import build_score_prior
+from dmf_pulse.football_events.score_prior_request import ScorePriorRequest
 from dmf_pulse.football_events.score_projection import project_to_markets
 from dmf_pulse.markets.models import MarketConsensus, MarketNormalisationResult
 
@@ -79,12 +79,7 @@ class _FrozenModel(BaseModel):
         return type(self).model_validate(data)
 
 
-CANONICAL_NONNEGATIVE_MEASURE_PATTERN = r"^\d+\.\d{6}$"
 CANONICAL_DECIMAL_12_PATTERN = r"^-?\d+\.\d{12}$"
-NonnegativeMeasureJsonInput = Annotated[
-    str,
-    Field(pattern=CANONICAL_NONNEGATIVE_MEASURE_PATTERN),
-]
 
 
 def _require_canonical_embedded_decimals(
@@ -274,34 +269,6 @@ class ScoreBaselinePolicy(_FrozenModel):
     @property
     def sha256(self) -> str:
         return canonical_json_sha256(self.semantic_body)
-
-
-class ScorePriorRequest(_FrozenModel):
-    model_family: Literal["INDEPENDENT_POISSON_V1"] = "INDEPENDENT_POISSON_V1"
-    home_goal_rate: Decimal
-    away_goal_rate: Decimal
-
-    @field_validator(
-        "home_goal_rate",
-        "away_goal_rate",
-        mode="before",
-        json_schema_input_type=NonnegativeMeasureJsonInput,
-    )
-    @classmethod
-    def validate_rate(cls, value: object, info: ValidationInfo) -> Decimal:
-        if info.mode == "json" and (
-            not isinstance(value, str)
-            or re.fullmatch(CANONICAL_NONNEGATIVE_MEASURE_PATTERN, value) is None
-        ):
-            raise ValueError(f"{info.field_name} must use its canonical public decimal string")
-        return nonnegative_decimal(value, label=str(info.field_name))
-
-    def public_dict(self) -> dict[str, str]:
-        return {
-            "away_goal_rate": canonical_decimal_text(self.away_goal_rate),
-            "home_goal_rate": canonical_decimal_text(self.home_goal_rate),
-            "model_family": self.model_family,
-        }
 
 
 class ScoreDistributionRequest(_FrozenModel):

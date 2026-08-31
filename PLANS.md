@@ -1,5 +1,57 @@
 # DMF Pulse execution plans
 
+## CURRENT-SCORE-PRIOR-001A independent-review remediation
+
+- Reviewed parent: `20036f3f7302580bb80ab6ebb9429620db0b8a9b` on the existing
+  `integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior` branch.
+- Scope: close only CSP-IR-001 through CSP-IR-004 through an authenticated fixture-bound prior,
+  mandatory result/bundle/summary semantic verification, a market-free `ScorePriorRequest` leaf
+  contract, and disclosure-safe unexpected-transport translation.
+- Preservation: retain the exact human-approved rights profile, immutable OpenFootball resources,
+  parser, three-season estimator, rates, reconstructed source mode, and all Stage-8 mathematics.
+- Safety: no CURRENT-AVAILABILITY change, Stage-7 fabrication, current-team-strength inference,
+  persistence, provider expansion, optimisation, production activation, PR, merge, or human
+  acceptance.
+
+### Remediation checkpoints
+
+- [x] Fetch and verify exact main/branch/tree/ancestry and the clean dedicated worktree.
+- [x] Add direct RED regressions for CSP-IR-001 through CSP-IR-004.
+- [x] Implement and adversarially verify the four bounded remediation changes.
+- [x] Update ticket governance and installed-wheel proofs without changing estimator/source facts.
+- [x] Pass focused coverage, inherited populations, static/build/wheel/repository/security gates.
+- [ ] Commit product/tests/governance, then seal evidence/manifests in a second descendant commit.
+- [ ] Push normally, require exact remote equality and green exact-SHA CI, then stop for re-review.
+
+## CURRENT-SCORE-PRIOR-001A commit-pinned OpenFootball score prior
+
+- Parent/branch: merged main `7609f041f4f7a415ef58f0f5c682a9b1d5b16d49` on
+  `integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior`.
+- Authority: the 2026-08-30 human approval fixes rights profile
+  `openfootball_football_json_score_prior_v1` version `1.0.0`, OpenFootball commit
+  `f27dcbef681db2c3195f9def62316ce497278781`, selected seasons 2023/24 through 2025/26,
+  and method `PL_LEAGUE_HOME_AWAY_MEAN_3_COMPLETE_SEASONS_V1`.
+- Scope: rights-gated HTTPS acquisition of the exact immutable licence and three season files,
+  strict score-schema and season-completeness validation, exact-Decimal mean estimation,
+  reconstructed/cutoff-safe lineage, and one independent Stage-8 `ScorePriorRequest` safe summary.
+- Safety: no database access or writes, mutable branch aliases, unpinned source, current team-strength
+  inference, market evidence, Stage-7 substitution, score projection, Stage 9, optimisation, public
+  display, redistribution, or production activation.
+
+### CURRENT-SCORE-PRIOR-001A checkpoints
+
+- [x] Verify exact remote main, preserve the dirty CURRENT-AVAILABILITY checkout, create a clean
+  isolated worktree, and reconcile A3/A8 authority, GCS-008 boundaries, corrected research, and
+  human rights approval.
+- [x] Freeze the ticket, rights/provider configuration, tests, parser contract, temporal contract,
+  and expected immutable identities before implementation.
+- [x] Implement the smallest rights-gated acquisition-to-`ScorePriorRequest` vertical slice with
+  no persistence and no market input.
+- [x] Pass focused branch coverage, hostile schema/transport/rights/cutoff tests, inherited GCS-008
+  regressions, static/build/wheel/repository/security gates, and one exact live snapshot check.
+- [x] Seal truthful engineering evidence and stop for independent review without PR, merge, or
+  production-activation claims.
+
 ## CURRENT-MARKETS-001A transient current market constraints
 
 - Parent/branch: authoritative merged main `4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb`
