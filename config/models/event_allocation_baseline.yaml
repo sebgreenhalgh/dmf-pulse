@@ -1,10 +1,12 @@
-schema_version: event-allocation-baseline-v1
-model_version_id: pts-event-allocation-temp-evt-002-v1
+schema_version: event-allocation-baseline-v2
+model_version_id: pts-event-allocation-current-player-port-001a-v1
 source_tag: TEMP-EVT-002
 bps_completeness_mode: EVENT_LINKED_PLUS_AUXILIARY_BASELINE
 auxiliary_source_tag: TEMP-PTS-001
 notes:
   - Team goals are conserved exactly and allocated only to on-pitch eligible players.
+  - Penalties and goalkeeper saves retain timed links to takers, goalkeepers, and shots.
+  - Goalkeeper save rates condition compatible attacking on-target events; saves are never outfield events.
   - Rates are model inputs, never FPL scoring rules.
   - Values below are illustrative defaults for controlled TEST/REPLAY fixtures only.
   - Production calibration is deferred and this file is not a target-season ruleset.

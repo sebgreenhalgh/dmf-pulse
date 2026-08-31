@@ -1,4 +1,4 @@
-"""Coherent TEMP-EVT-002 player-event allocation for one sampled fixture path."""
+"""Coherent current-stack player-event allocation for one sampled fixture path."""
 
 from __future__ import annotations
 
@@ -16,11 +16,15 @@ from dmf_pulse.fpl_points.models import (
     EventAllocationConfig,
     FixtureEventScenario,
     GoalEvent,
+    GoalkeeperSaveEvent,
     GoalMechanism,
     ParticipantState,
     ParticipationScenario,
+    PenaltyEvent,
+    PenaltyOutcome,
     PlayerAllocationProfile,
     PlayerEventVector,
+    PlayerPosition,
     ProjectionMode,
     RulesetIdentity,
     ScorelineCell,
@@ -164,6 +168,7 @@ class _Accumulator:
             team_id=self.participant.team_id,
             position=self.participant.position,
             minutes=self.minutes,
+            on_pitch_interval=self.participant.interval,
             goals_non_penalty=self.goals_non_penalty,
             goals_penalty=self.goals_penalty,
             eligible_assists=self.eligible_assists,
@@ -194,9 +199,14 @@ def _eligible(
     accumulators: dict[str, _Accumulator], team_id: str, minute: float
 ) -> tuple[_Accumulator, ...]:
     return tuple(
-        accumulator
-        for accumulator in accumulators.values()
-        if accumulator.participant.team_id == team_id and accumulator.on_pitch(minute)
+        sorted(
+            (
+                accumulator
+                for accumulator in accumulators.values()
+                if accumulator.participant.team_id == team_id and accumulator.on_pitch(minute)
+            ),
+            key=lambda item: item.participant.player_id,
+        )
     )
 
 
@@ -323,7 +333,7 @@ def _initialize_accumulators(
 ) -> dict[str, _Accumulator]:
     profile_map = {profile.player_id: profile for profile in profiles}
     accumulators: dict[str, _Accumulator] = {}
-    for participant in participation.participants:
+    for participant in sorted(participation.participants, key=lambda item: item.player_id):
         profile = profile_map[participant.player_id]
         effective_end = (
             participant.interval.end_minute if participant.interval is not None else None
@@ -357,7 +367,6 @@ def _allocate_goals(
     accumulators: dict[str, _Accumulator],
     root_seed: int,
     scenario_index: int,
-    degradation: list[str],
     assist_classifier: Callable[[AssistDecisionContext], AssistClassification | None] | None,
 ) -> list[GoalEvent]:
     goal_specs = [participation.home_team_id] * cell.home_goals + [
@@ -398,31 +407,26 @@ def _allocate_goals(
                 )
                 own_goal_player.own_goals += 1
             else:
-                mechanism = GoalMechanism.OPEN_PLAY
-                degradation.append("OWN_GOAL_SHARE_FALLBACK_TO_CREDITED_SCORER")
+                raise FplPointsError(
+                    "NO_ELIGIBLE_OWN_GOAL_PLAYER",
+                    "sampled own goal has no eligible governed own-goal share",
+                )
         if mechanism is not GoalMechanism.OPPONENT_OWN_GOAL:
             weight = (
                 (lambda item: item.profile.penalty_taker_share)
                 if mechanism is GoalMechanism.PENALTY
                 else (lambda item: item.profile.goal_share)
             )
-            try:
-                scorer = _choose_accumulator(
-                    scoring_candidates,
-                    weight,
-                    rng,
-                    code="NO_ELIGIBLE_SCORER",
-                )
-            except FplPointsError:
-                if mechanism is not GoalMechanism.PENALTY:
-                    raise
-                scorer = _choose_accumulator(
-                    scoring_candidates,
-                    lambda item: item.profile.goal_share,
-                    rng,
-                    code="NO_ELIGIBLE_SCORER",
-                )
-                degradation.append("PENALTY_SHARE_FALLBACK_TO_GOAL_SHARE")
+            scorer = _choose_accumulator(
+                scoring_candidates,
+                weight,
+                rng,
+                code=(
+                    "NO_ELIGIBLE_PENALTY_TAKER"
+                    if mechanism is GoalMechanism.PENALTY
+                    else "NO_ELIGIBLE_SCORER"
+                ),
+            )
             if mechanism is GoalMechanism.PENALTY:
                 scorer.goals_penalty += 1
             else:
@@ -517,7 +521,8 @@ def _generate_auxiliary_events(
     root_seed: int,
     scenario_index: int,
 ) -> None:
-    for player_id, accumulator in accumulators.items():
+    for player_id in sorted(accumulators):
+        accumulator = accumulators[player_id]
         minutes = accumulator.minutes
         if minutes <= 0:
             continue
@@ -530,11 +535,6 @@ def _generate_auxiliary_events(
         accumulator.defensive["ball_recoveries"] = _poisson(
             rng, profile.ball_recoveries_per90, minutes
         )
-        if accumulator.participant.position.value == "GK":
-            accumulator.saves = _poisson(rng, profile.goalkeeper_saves_per90, minutes)
-            inside = int(rng.binomial(accumulator.saves, profile.saves_inside_box_fraction))
-            accumulator.bps["saves_inside_box"] = inside
-            accumulator.bps["saves_outside_box"] = accumulator.saves - inside
         if config.bps_completeness_mode is BpsCompletenessMode.EVENT_LINKED_ONLY:
             continue
         rates = profile.bps_auxiliary
@@ -564,9 +564,6 @@ def _generate_auxiliary_events(
         )
         accumulator.bps["recoveries"] = _poisson(rng, rates.recoveries_per90, minutes)
         accumulator.bps["shots_off_target"] = _poisson(rng, rates.shots_off_target_per90, minutes)
-        accumulator.bps["shots_on_target"] += _poisson(
-            rng, rates.shots_on_target_non_goal_per90, minutes
-        )
         accumulator.bps["successful_dribbles"] = _poisson(
             rng, rates.successful_dribbles_per90, minutes
         )
@@ -579,7 +576,7 @@ def _generate_auxiliary_events(
         accumulator.bps["times_tackled"] = _poisson(rng, rates.times_tackled_per90, minutes)
 
 
-def _generate_extra_penalty(
+def _generate_goalkeeper_saves(
     *,
     participation: ParticipationScenario,
     config: EventAllocationConfig,
@@ -587,10 +584,124 @@ def _generate_extra_penalty(
     root_seed: int,
     scenario_index: int,
     degradation: list[str],
-) -> None:
+) -> list[GoalkeeperSaveEvent]:
+    """Sample GK-prior saves and create one compatible timed on-target shot per save."""
+
+    events: list[GoalkeeperSaveEvent] = []
+    goalkeepers = tuple(
+        accumulator
+        for accumulator in sorted(
+            accumulators.values(), key=lambda item: item.participant.player_id
+        )
+        if accumulator.participant.position is PlayerPosition.GK and accumulator.minutes > 0
+    )
+    for goalkeeper in goalkeepers:
+        interval = goalkeeper.participant.interval
+        assert interval is not None
+        count_rng = rng_for(
+            root_seed,
+            "goalkeeper-save-count",
+            scenario_index,
+            goalkeeper.participant.player_id,
+        )
+        save_count = _poisson(
+            count_rng, goalkeeper.profile.goalkeeper_saves_per90, goalkeeper.minutes
+        )
+        attacking_team = (
+            participation.away_team_id
+            if goalkeeper.participant.team_id == participation.home_team_id
+            else participation.home_team_id
+        )
+        for sequence in range(1, save_count + 1):
+            rng = rng_for(
+                root_seed,
+                "goalkeeper-save",
+                scenario_index,
+                goalkeeper.participant.player_id,
+                sequence,
+            )
+            minute = float(rng.uniform(interval.start_minute, interval.end_minute))
+            candidates = _eligible(accumulators, attacking_team, minute)
+            weighted = tuple(
+                candidate
+                for candidate in candidates
+                if candidate.profile.bps_auxiliary.shots_on_target_non_goal_per90 > 0.0
+            )
+            if weighted:
+                shooter = _sample_weighted(
+                    weighted,
+                    tuple(
+                        candidate.profile.bps_auxiliary.shots_on_target_non_goal_per90
+                        for candidate in weighted
+                    ),
+                    rng,
+                )
+            elif config.source_tag == "TEST_SYNTHETIC":
+                shooter = _choose_accumulator(
+                    candidates,
+                    lambda item: item.profile.goal_share,
+                    rng,
+                    code="NO_ELIGIBLE_ON_TARGET_SHOOTER",
+                )
+                degradation.append("TEST_SAVE_SHOOTER_GOAL_SHARE_PROXY")
+            else:
+                raise FplPointsError(
+                    "NO_ELIGIBLE_ON_TARGET_SHOOTER",
+                    "sampled goalkeeper save has no compatible governed shooter share",
+                )
+            goalkeeper.saves += 1
+            if float(rng.random()) < goalkeeper.profile.saves_inside_box_fraction:
+                goalkeeper.bps["saves_inside_box"] += 1
+            else:
+                goalkeeper.bps["saves_outside_box"] += 1
+            shooter.bps["shots_on_target"] += 1
+            events.append(
+                GoalkeeperSaveEvent(
+                    save_id=stable_identifier(
+                        "save",
+                        root_seed,
+                        scenario_index,
+                        goalkeeper.participant.player_id,
+                        sequence,
+                    ),
+                    minute=minute,
+                    attacking_team_id=attacking_team,
+                    defending_team_id=goalkeeper.participant.team_id,
+                    goalkeeper_player_id=goalkeeper.participant.player_id,
+                    shooter_player_id=shooter.participant.player_id,
+                )
+            )
+    return sorted(events, key=lambda event: (event.minute, event.save_id))
+
+
+def _scored_penalty_events(events: list[GoalEvent]) -> list[PenaltyEvent]:
+    return [
+        PenaltyEvent(
+            penalty_id=stable_identifier("penalty-goal", 0, event.goal_id),
+            minute=event.minute,
+            attacking_team_id=event.scoring_team_id,
+            defending_team_id=event.conceding_team_id,
+            taker_player_id=event.scorer_player_id,
+            outcome=PenaltyOutcome.GOAL,
+            goalkeeper_player_id=None,
+            goal_id=event.goal_id,
+        )
+        for event in events
+        if event.mechanism is GoalMechanism.PENALTY and event.scorer_player_id is not None
+    ]
+
+
+def _generate_extra_penalty(
+    *,
+    participation: ParticipationScenario,
+    config: EventAllocationConfig,
+    accumulators: dict[str, _Accumulator],
+    root_seed: int,
+    scenario_index: int,
+) -> tuple[PenaltyEvent | None, GoalkeeperSaveEvent | None]:
     rng = rng_for(root_seed, "extra-penalty", scenario_index)
     if float(rng.random()) >= config.extra_penalty_attempt_probability:
-        return
+        return None, None
     minute = float(rng.uniform(config.goal_time_lower, config.goal_time_upper))
     attacking_team = (
         participation.home_team_id if float(rng.random()) < 0.5 else participation.away_team_id
@@ -607,29 +718,62 @@ def _generate_extra_penalty(
         if item.participant.position.value == "GK"
     )
     if not takers or not keepers:
-        degradation.append("EXTRA_PENALTY_SKIPPED_NO_ELIGIBLE_PARTICIPANT")
-        return
-    try:
-        taker = _choose_accumulator(
-            takers,
-            lambda item: item.profile.penalty_taker_share,
-            rng,
-            code="NO_ELIGIBLE_PENALTY_TAKER",
+        raise FplPointsError(
+            "NO_ELIGIBLE_PENALTY_PARTICIPANT",
+            "sampled penalty lacks an on-pitch taker or defending goalkeeper",
         )
-    except FplPointsError:
-        degradation.append("EXTRA_PENALTY_SKIPPED_NO_POSITIVE_TAKER_SHARE")
-        return
+    taker = _choose_accumulator(
+        takers,
+        lambda item: item.profile.penalty_taker_share,
+        rng,
+        code="NO_ELIGIBLE_PENALTY_TAKER",
+    )
     keeper = (
         keepers[0]
         if len(keepers) == 1
         else _sample_weighted(keepers, tuple(1.0 for _ in keepers), rng)
     )
     taker.penalty_misses += 1
+    penalty_id = stable_identifier("extra-penalty", root_seed, scenario_index)
     if float(rng.random()) < config.extra_penalty_save_probability:
         keeper.penalty_saves += 1
         keeper.saves += 1
         keeper.bps["saves_inside_box"] += 1
         keeper.bps["big_chance_saves"] += 1
+        taker.bps["shots_on_target"] += 1
+        penalty = PenaltyEvent(
+            penalty_id=penalty_id,
+            minute=minute,
+            attacking_team_id=attacking_team,
+            defending_team_id=defending_team,
+            taker_player_id=taker.participant.player_id,
+            outcome=PenaltyOutcome.SAVED,
+            goalkeeper_player_id=keeper.participant.player_id,
+            goal_id=None,
+        )
+        save = GoalkeeperSaveEvent(
+            save_id=stable_identifier("penalty-save", 0, penalty_id),
+            minute=minute,
+            attacking_team_id=attacking_team,
+            defending_team_id=defending_team,
+            goalkeeper_player_id=keeper.participant.player_id,
+            shooter_player_id=taker.participant.player_id,
+            penalty_id=penalty_id,
+        )
+        return penalty, save
+    return (
+        PenaltyEvent(
+            penalty_id=penalty_id,
+            minute=minute,
+            attacking_team_id=attacking_team,
+            defending_team_id=defending_team,
+            taker_player_id=taker.participant.player_id,
+            outcome=PenaltyOutcome.MISSED,
+            goalkeeper_player_id=None,
+            goal_id=None,
+        ),
+        None,
+    )
 
 
 def allocate_fixture_events(
@@ -655,6 +799,12 @@ def allocate_fixture_events(
     degradation: list[str] = [config.source_tag]
     if config.bps_completeness_mode is not BpsCompletenessMode.EVENT_LINKED_ONLY:
         degradation.extend([config.auxiliary_source_tag, "BPS_AUXILIARY_BASELINE_INCOMPLETE"])
+    degradation.extend(
+        [
+            "GOALKEEPER_SAVES_CONDITIONAL_ON_GK_RATE",
+            "SAVED_SHOTS_EVENT_LINKED_TO_ON_PITCH_ATTACKER",
+        ]
+    )
     if projection_mode is not ProjectionMode.PRODUCTION or ruleset.status != "ACTIVE":
         degradation.append("TARGET_RULESET_NOT_ACTIVE_CONFIDENCE_E")
     events = _allocate_goals(
@@ -664,7 +814,6 @@ def allocate_fixture_events(
         accumulators=accumulators,
         root_seed=root_seed,
         scenario_index=scenario_index,
-        degradation=degradation,
         assist_classifier=assist_classifier,
     )
     _mark_match_winning_goal(events, accumulators, cell, participation)
@@ -676,7 +825,7 @@ def allocate_fixture_events(
         root_seed=root_seed,
         scenario_index=scenario_index,
     )
-    _generate_extra_penalty(
+    save_events = _generate_goalkeeper_saves(
         participation=participation,
         config=config,
         accumulators=accumulators,
@@ -684,6 +833,18 @@ def allocate_fixture_events(
         scenario_index=scenario_index,
         degradation=degradation,
     )
+    penalty_events = _scored_penalty_events(events)
+    extra_penalty, extra_save = _generate_extra_penalty(
+        participation=participation,
+        config=config,
+        accumulators=accumulators,
+        root_seed=root_seed,
+        scenario_index=scenario_index,
+    )
+    if extra_penalty is not None:
+        penalty_events.append(extra_penalty)
+    if extra_save is not None:
+        save_events.append(extra_save)
     players = tuple(
         accumulators[player_id].to_model(config.auxiliary_source_tag)
         for player_id in sorted(accumulators)
@@ -698,6 +859,10 @@ def allocate_fixture_events(
         participant_universe_complete=True,
         players=players,
         goals=tuple(events),
+        penalties=tuple(sorted(penalty_events, key=lambda event: (event.minute, event.penalty_id))),
+        goalkeeper_saves=tuple(
+            sorted(save_events, key=lambda event: (event.minute, event.save_id))
+        ),
         ruleset_id=ruleset.ruleset_id,
         ruleset_version=ruleset.ruleset_version,
         ruleset_hash=ruleset.ruleset_hash,

@@ -1464,7 +1464,7 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] PORT.01 preserve the immutable donor central prior and acceptance evidence, implement strict
   packaged loading and explicit current-identity binding, test tamper/missing/mismatch behavior,
   record donor A/B/C/D dispositions, then commit and push.
-- [ ] PORT.02 harden the existing current Stage-9 event allocator for deterministic candidate
+- [x] PORT.02 harden the existing current Stage-9 event allocator for deterministic candidate
   ordering, timed on-pitch goal/assist/penalty/save coherence, exact goal conservation, and donor
   goalkeeper/penalty regressions, then commit and push.
 - [ ] PORT.03 prove both Stage-7 families and the complete private-manual Stage-7 -> current

@@ -13,6 +13,7 @@ from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import OnPitchInterval, ProjectionMode, ScorelineCell
 from tests.support.factories import (
     A_FWD,
+    A_GK,
     AWAY_TEAM_ID,
     H_DEF,
     H_MID,
@@ -29,11 +30,13 @@ def _allocate(
     *,
     cell: ScorelineCell | None = None,
     profiles=None,
+    participants=None,
     **config_updates,
 ):
     request = make_request(
         root_seed=seed,
         scenario_count=1,
+        participants=participants,
         config=allocation_config(**config_updates),
     )
     return allocate_fixture_events(
@@ -210,6 +213,10 @@ def test_penalty_goal_uses_an_on_pitch_taker() -> None:
     assert goal.mechanism.value == "PENALTY"
     assert goal.scorer_player_id == H_MID
     assert next(p for p in scenario.players if p.player_id == H_MID).goals_penalty == 1
+    assert len(scenario.penalties) == 1
+    assert scenario.penalties[0].outcome.value == "GOAL"
+    assert scenario.penalties[0].goal_id == goal.goal_id
+    assert scenario.penalties[0].taker_player_id == goal.scorer_player_id
 
 
 def test_own_goal_reconciles_to_team_score() -> None:
@@ -224,30 +231,30 @@ def test_own_goal_reconciles_to_team_score() -> None:
     assert goal.scorer_player_id is None
 
 
-def test_own_goal_and_penalty_share_fallbacks_are_explicit() -> None:
+def test_missing_own_goal_and_penalty_shares_fail_closed() -> None:
     no_own_goals = tuple(
         profile.model_copy(update={"own_goal_share": 0.0}) for profile in base_profiles()
     )
-    scenario, reasons = _allocate(
-        seed=5,
-        cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
-        profiles=no_own_goals,
-        own_goal_probability=1.0,
-    )
-    assert scenario.goals[0].scorer_player_id is not None
-    assert "OWN_GOAL_SHARE_FALLBACK_TO_CREDITED_SCORER" in reasons
+    with pytest.raises(FplPointsError) as own_goal_error:
+        _allocate(
+            seed=5,
+            cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+            profiles=no_own_goals,
+            own_goal_probability=1.0,
+        )
+    assert own_goal_error.value.code == "NO_ELIGIBLE_OWN_GOAL_PLAYER"
 
     no_penalty_taker = tuple(
         profile.model_copy(update={"penalty_taker_share": 0.0}) for profile in base_profiles()
     )
-    scenario, reasons = _allocate(
-        seed=3,
-        cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
-        profiles=no_penalty_taker,
-        penalty_goal_probability=1.0,
-    )
-    assert scenario.goals[0].scorer_player_id is not None
-    assert "PENALTY_SHARE_FALLBACK_TO_GOAL_SHARE" in reasons
+    with pytest.raises(FplPointsError) as penalty_error:
+        _allocate(
+            seed=3,
+            cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+            profiles=no_penalty_taker,
+            penalty_goal_probability=1.0,
+        )
+    assert penalty_error.value.code == "NO_ELIGIBLE_PENALTY_TAKER"
 
 
 def test_extra_penalty_path_generates_a_miss_and_save() -> None:
@@ -259,3 +266,116 @@ def test_extra_penalty_path_generates_a_miss_and_save() -> None:
     )
     assert sum(player.penalty_misses for player in scenario.players) == 1
     assert sum(player.penalty_saves for player in scenario.players) == 1
+    assert len(scenario.penalties) == 1
+    assert scenario.penalties[0].outcome.value == "SAVED"
+    assert len(scenario.goalkeeper_saves) >= 1
+    penalty_save = next(
+        save
+        for save in scenario.goalkeeper_saves
+        if save.penalty_id == scenario.penalties[0].penalty_id
+    )
+    assert penalty_save.goalkeeper_player_id == scenario.penalties[0].goalkeeper_player_id
+
+
+def test_goalkeeper_saves_are_timed_linked_and_never_assigned_to_outfield_players() -> None:
+    participants = tuple(
+        participant.model_copy(
+            update={
+                "official_minutes": 45,
+                "interval": OnPitchInterval(start_minute=0.0, end_minute=45.0),
+            }
+        )
+        if participant.player_id == A_GK
+        else participant
+        for participant in make_request().participation_scenarios[0].participants
+    )
+    profiles = tuple(
+        profile.model_copy(update={"goalkeeper_saves_per90": 20.0})
+        if profile.player_id in {A_GK, H_DEF}
+        else profile
+        for profile in base_profiles()
+    )
+    scenario, reasons = _allocate(
+        seed=72,
+        cell=ScorelineCell(home_goals=0, away_goals=0, probability="1.000000000000"),
+        participants=participants,
+        profiles=profiles,
+    )
+    players = {player.player_id: player for player in scenario.players}
+
+    assert scenario.goalkeeper_saves
+    assert players[H_DEF].saves == 0
+    assert players[A_GK].saves == len(scenario.goalkeeper_saves)
+    assert "TEST_SAVE_SHOOTER_GOAL_SHARE_PROXY" in reasons
+    for save in scenario.goalkeeper_saves:
+        goalkeeper = players[save.goalkeeper_player_id]
+        shooter = players[save.shooter_player_id]
+        assert goalkeeper.position.value == "GK"
+        assert goalkeeper.on_pitch_interval is not None
+        assert goalkeeper.on_pitch_interval.contains(save.minute)
+        assert shooter.on_pitch_interval is not None
+        assert shooter.on_pitch_interval.contains(save.minute)
+        assert save.minute < 45.0
+    saved_shots = {
+        player_id: sum(save.shooter_player_id == player_id for save in scenario.goalkeeper_saves)
+        for player_id in players
+    }
+    assert all(
+        saved_shots[player_id] <= player.bps.shots_on_target
+        for player_id, player in players.items()
+    )
+
+
+def test_zero_minute_goalkeeper_cannot_receive_save() -> None:
+    participants = tuple(
+        participant.model_copy(update={"official_minutes": 0, "interval": None, "starter": False})
+        if participant.player_id == A_GK
+        else participant
+        for participant in make_request().participation_scenarios[0].participants
+    )
+    profiles = tuple(
+        profile.model_copy(update={"goalkeeper_saves_per90": 1000.0})
+        if profile.player_id == A_GK
+        else profile
+        for profile in base_profiles()
+    )
+    scenario, _ = _allocate(
+        seed=81,
+        cell=ScorelineCell(home_goals=0, away_goals=0, probability="1.000000000000"),
+        participants=participants,
+        profiles=profiles,
+    )
+    goalkeeper = next(player for player in scenario.players if player.player_id == A_GK)
+    assert goalkeeper.minutes == 0
+    assert goalkeeper.saves == 0
+    assert all(save.goalkeeper_player_id != A_GK for save in scenario.goalkeeper_saves)
+
+
+def test_semantic_allocation_is_invariant_to_participant_and_profile_order() -> None:
+    request = make_request(root_seed=91, scenario_count=1)
+    cell = ScorelineCell(home_goals=2, away_goals=1, probability="1.000000000000")
+    left, left_reasons = allocate_fixture_events(
+        cell=cell,
+        participation=request.participation_scenarios[0],
+        profiles=request.allocation_profiles,
+        config=request.allocation_config,
+        ruleset=reference_engine().identity,
+        projection_mode=ProjectionMode.TEST,
+        root_seed=91,
+        scenario_index=0,
+    )
+    reordered_participation = request.participation_scenarios[0].model_copy(
+        update={"participants": tuple(reversed(request.participation_scenarios[0].participants))}
+    )
+    right, right_reasons = allocate_fixture_events(
+        cell=cell,
+        participation=reordered_participation,
+        profiles=tuple(reversed(request.allocation_profiles)),
+        config=request.allocation_config,
+        ruleset=reference_engine().identity,
+        projection_mode=ProjectionMode.TEST,
+        root_seed=91,
+        scenario_index=0,
+    )
+    assert right == left
+    assert right_reasons == left_reasons

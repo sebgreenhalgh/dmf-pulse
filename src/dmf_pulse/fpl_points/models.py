@@ -92,6 +92,12 @@ class GoalMechanism(StrEnum):
     OPPONENT_OWN_GOAL = "OPPONENT_OWN_GOAL"
 
 
+class PenaltyOutcome(StrEnum):
+    GOAL = "GOAL"
+    SAVED = "SAVED"
+    MISSED = "MISSED"
+
+
 class BpsCompletenessMode(StrEnum):
     EVENT_LINKED_ONLY = "EVENT_LINKED_ONLY"
     EVENT_LINKED_PLUS_AUXILIARY_BASELINE = "EVENT_LINKED_PLUS_AUXILIARY_BASELINE"
@@ -593,11 +599,53 @@ class GoalEvent(PointsModel):
         return self
 
 
+class PenaltyEvent(PointsModel):
+    penalty_id: str
+    minute: Annotated[float, Field(ge=0.0, le=130.0)]
+    attacking_team_id: str
+    defending_team_id: str
+    taker_player_id: str
+    outcome: PenaltyOutcome
+    goalkeeper_player_id: str | None
+    goal_id: str | None
+
+    @model_validator(mode="after")
+    def outcome_links_are_exact(self) -> PenaltyEvent:
+        if self.attacking_team_id == self.defending_team_id:
+            raise ValueError("penalty teams must differ")
+        if self.outcome is PenaltyOutcome.GOAL:
+            if self.goal_id is None or self.goalkeeper_player_id is not None:
+                raise ValueError("scored penalty requires one goal link and no save goalkeeper")
+        elif self.outcome is PenaltyOutcome.SAVED:
+            if self.goal_id is not None or self.goalkeeper_player_id is None:
+                raise ValueError("saved penalty requires one goalkeeper and no goal link")
+        elif self.goal_id is not None or self.goalkeeper_player_id is not None:
+            raise ValueError("missed penalty cannot link a goal or save goalkeeper")
+        return self
+
+
+class GoalkeeperSaveEvent(PointsModel):
+    save_id: str
+    minute: Annotated[float, Field(ge=0.0, le=130.0)]
+    attacking_team_id: str
+    defending_team_id: str
+    goalkeeper_player_id: str
+    shooter_player_id: str
+    penalty_id: str | None = None
+
+    @model_validator(mode="after")
+    def teams_differ(self) -> GoalkeeperSaveEvent:
+        if self.attacking_team_id == self.defending_team_id:
+            raise ValueError("save-event teams must differ")
+        return self
+
+
 class PlayerEventVector(PointsModel):
     player_id: str
     team_id: str
     position: PlayerPosition
     minutes: Minutes
+    on_pitch_interval: OnPitchInterval | None = None
     goals_non_penalty: NonNegativeInt
     goals_penalty: NonNegativeInt
     eligible_assists: NonNegativeInt
@@ -616,6 +664,13 @@ class PlayerEventVector(PointsModel):
 
     @model_validator(mode="after")
     def zero_minutes_have_no_events(self) -> PlayerEventVector:
+        if self.on_pitch_interval is not None and (
+            self.minutes == 0
+            or self.on_pitch_interval.end_minute > 90
+            or self.on_pitch_interval.end_minute - self.on_pitch_interval.start_minute
+            != self.minutes
+        ):
+            raise ValueError("event-vector interval must exactly match official minutes")
         if self.minutes == 0:
             values = self.model_dump(mode="python")
             exempt = {"player_id", "team_id", "position", "minutes", "auxiliary_source_tag"}
@@ -642,6 +697,8 @@ class FixtureEventScenario(PointsModel):
     participant_universe_complete: Literal[True]
     players: tuple[PlayerEventVector, ...]
     goals: tuple[GoalEvent, ...]
+    penalties: tuple[PenaltyEvent, ...] = ()
+    goalkeeper_saves: tuple[GoalkeeperSaveEvent, ...] = ()
     ruleset_id: str
     ruleset_version: str
     ruleset_hash: Sha256
@@ -664,6 +721,17 @@ class FixtureEventScenario(PointsModel):
         credited_penalty: dict[str, int] = {player_id: 0 for player_id in ids}
         assists: dict[str, int] = {player_id: 0 for player_id in ids}
         own_goals: dict[str, int] = {player_id: 0 for player_id in ids}
+
+        def require_on_pitch(player: PlayerEventVector, minute: float, *, label: str) -> None:
+            if player.minutes == 0:
+                raise ValueError(f"{label} has zero official minutes")
+            if player.on_pitch_interval is None:
+                if player.auxiliary_source_tag != "TEST_SYNTHETIC":
+                    raise ValueError(f"{label} lacks an exact on-pitch interval")
+                return
+            if not player.on_pitch_interval.contains(minute):
+                raise ValueError(f"{label} occurs outside the on-pitch interval")
+
         for goal in self.goals:
             if {goal.scoring_team_id, goal.conceding_team_id} != valid_teams:
                 raise ValueError("goal event team identity mismatch")
@@ -673,6 +741,7 @@ class FixtureEventScenario(PointsModel):
                 scorer = player_map.get(goal.scorer_player_id)
                 if scorer is None or scorer.team_id != goal.scoring_team_id:
                     raise ValueError("goal scorer identity is outside the scoring team")
+                require_on_pitch(scorer, goal.minute, label="goal scorer event")
                 bucket = (
                     credited_penalty
                     if goal.mechanism is GoalMechanism.PENALTY
@@ -683,6 +752,7 @@ class FixtureEventScenario(PointsModel):
                 own_goal_player = player_map.get(goal.own_goal_player_id)
                 if own_goal_player is None or own_goal_player.team_id != goal.conceding_team_id:
                     raise ValueError("own-goal player identity is outside the conceding team")
+                require_on_pitch(own_goal_player, goal.minute, label="own-goal event")
                 own_goals[own_goal_player.player_id] += 1
             if goal.assister_player_id is not None:
                 assister = player_map.get(goal.assister_player_id)
@@ -692,6 +762,7 @@ class FixtureEventScenario(PointsModel):
                     or assister.minutes == 0
                 ):
                     raise ValueError("assister identity is outside the scoring team")
+                require_on_pitch(assister, goal.minute, label="assist event")
                 assists[assister.player_id] += 1
         for player in self.players:
             if (
@@ -713,6 +784,106 @@ class FixtureEventScenario(PointsModel):
             raise ValueError("player events do not reconcile to team score")
         if len(self.goals) != self.home_goals + self.away_goals:
             raise ValueError("goal event count does not reconcile to scoreline")
+
+        require_event_links = bool(self.penalties or self.goalkeeper_saves) or any(
+            player.auxiliary_source_tag != "TEST_SYNTHETIC" for player in self.players
+        )
+        penalty_ids = [penalty.penalty_id for penalty in self.penalties]
+        save_ids = [save.save_id for save in self.goalkeeper_saves]
+        if len(penalty_ids) != len(set(penalty_ids)):
+            raise ValueError("penalty event IDs must be unique")
+        if len(save_ids) != len(set(save_ids)):
+            raise ValueError("save event IDs must be unique")
+        penalty_map = {penalty.penalty_id: penalty for penalty in self.penalties}
+        goal_map = {goal.goal_id: goal for goal in self.goals}
+        penalty_goal_ids: set[str] = set()
+        penalty_misses = {player_id: 0 for player_id in ids}
+        penalty_saves = {player_id: 0 for player_id in ids}
+        for penalty in self.penalties:
+            if {penalty.attacking_team_id, penalty.defending_team_id} != valid_teams:
+                raise ValueError("penalty event team identity mismatch")
+            taker = player_map.get(penalty.taker_player_id)
+            if taker is None or taker.team_id != penalty.attacking_team_id:
+                raise ValueError("penalty taker identity is outside the attacking team")
+            require_on_pitch(taker, penalty.minute, label="penalty-taker event")
+            if penalty.outcome is PenaltyOutcome.GOAL:
+                assert penalty.goal_id is not None
+                linked_goal = goal_map.get(penalty.goal_id)
+                if (
+                    linked_goal is None
+                    or linked_goal.mechanism is not GoalMechanism.PENALTY
+                    or linked_goal.scorer_player_id != taker.player_id
+                    or linked_goal.minute != penalty.minute
+                    or linked_goal.scoring_team_id != penalty.attacking_team_id
+                ):
+                    raise ValueError("scored penalty does not match exactly one penalty goal")
+                penalty_goal_ids.add(linked_goal.goal_id)
+            else:
+                penalty_misses[taker.player_id] += 1
+            if penalty.outcome is PenaltyOutcome.SAVED:
+                assert penalty.goalkeeper_player_id is not None
+                goalkeeper = player_map.get(penalty.goalkeeper_player_id)
+                if (
+                    goalkeeper is None
+                    or goalkeeper.team_id != penalty.defending_team_id
+                    or goalkeeper.position is not PlayerPosition.GK
+                ):
+                    raise ValueError("saved penalty goalkeeper is invalid")
+                require_on_pitch(goalkeeper, penalty.minute, label="penalty-save event")
+                penalty_saves[goalkeeper.player_id] += 1
+        expected_penalty_goals = {
+            goal.goal_id for goal in self.goals if goal.mechanism is GoalMechanism.PENALTY
+        }
+        if require_event_links and penalty_goal_ids != expected_penalty_goals:
+            raise ValueError("penalty goals and penalty events do not reconcile")
+
+        saves = {player_id: 0 for player_id in ids}
+        shots_saved = {player_id: 0 for player_id in ids}
+        linked_saved_penalties: set[str] = set()
+        for save in self.goalkeeper_saves:
+            if {save.attacking_team_id, save.defending_team_id} != valid_teams:
+                raise ValueError("save event team identity mismatch")
+            goalkeeper = player_map.get(save.goalkeeper_player_id)
+            shooter = player_map.get(save.shooter_player_id)
+            if (
+                goalkeeper is None
+                or goalkeeper.team_id != save.defending_team_id
+                or goalkeeper.position is not PlayerPosition.GK
+            ):
+                raise ValueError("goalkeeper save belongs to an invalid goalkeeper")
+            if shooter is None or shooter.team_id != save.attacking_team_id:
+                raise ValueError("saved shot belongs to an invalid attacking player")
+            require_on_pitch(goalkeeper, save.minute, label="goalkeeper-save event")
+            require_on_pitch(shooter, save.minute, label="saved-shot event")
+            saves[goalkeeper.player_id] += 1
+            shots_saved[shooter.player_id] += 1
+            if save.penalty_id is not None:
+                linked_penalty = penalty_map.get(save.penalty_id)
+                if (
+                    linked_penalty is None
+                    or linked_penalty.outcome is not PenaltyOutcome.SAVED
+                    or linked_penalty.goalkeeper_player_id != goalkeeper.player_id
+                    or linked_penalty.taker_player_id != shooter.player_id
+                    or linked_penalty.minute != save.minute
+                ):
+                    raise ValueError("penalty-save event does not match its penalty")
+                linked_saved_penalties.add(linked_penalty.penalty_id)
+        expected_saved_penalties = {
+            penalty.penalty_id
+            for penalty in self.penalties
+            if penalty.outcome is PenaltyOutcome.SAVED
+        }
+        if linked_saved_penalties != expected_saved_penalties:
+            raise ValueError("saved penalties and goalkeeper-save events do not reconcile")
+        for player in self.players:
+            if require_event_links and (
+                player.penalty_misses != penalty_misses[player.player_id]
+                or player.penalty_saves != penalty_saves[player.player_id]
+                or player.saves != saves[player.player_id]
+            ):
+                raise ValueError("penalty/save records and player event vectors do not reconcile")
+            if shots_saved[player.player_id] > player.bps.shots_on_target:
+                raise ValueError("goalkeeper saves exceed compatible shots on target")
         return self
 
 

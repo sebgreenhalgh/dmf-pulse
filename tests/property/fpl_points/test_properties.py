@@ -47,6 +47,28 @@ def test_many_seeds_preserve_goal_on_pitch_and_integer_invariants(seed: int) -> 
                 if player_id is not None:
                     assert intervals[player_id] is not None
                     assert intervals[player_id].contains(goal.minute)
+        players = {player.player_id: player for player in event.players}
+        for save in event.goalkeeper_saves:
+            goalkeeper = players[save.goalkeeper_player_id]
+            shooter = players[save.shooter_player_id]
+            assert goalkeeper.position.value == "GK"
+            assert intervals[goalkeeper.player_id] is not None
+            assert intervals[goalkeeper.player_id].contains(save.minute)
+            assert intervals[shooter.player_id] is not None
+            assert intervals[shooter.player_id].contains(save.minute)
+        assert all(
+            player.saves
+            == sum(save.goalkeeper_player_id == player.player_id for save in event.goalkeeper_saves)
+            for player in event.players
+        )
+        assert all(
+            player.penalty_misses
+            == sum(
+                penalty.taker_player_id == player.player_id and penalty.outcome.value != "GOAL"
+                for penalty in event.penalties
+            )
+            for player in event.players
+        )
         for score in scenario.players.values():
             assert type(score.total) is int
             components = (
