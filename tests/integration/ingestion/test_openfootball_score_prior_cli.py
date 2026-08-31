@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
-from decimal import Decimal
 
 import pytest
 from typer.testing import CliRunner
 
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.cli import current_score_prior_cmd
 from dmf_pulse.cli.app import app
 from dmf_pulse.ingestion.errors import IngestionError
@@ -15,26 +14,34 @@ from dmf_pulse.ingestion.openfootball.service import CurrentScorePriorSummary
 
 class _FakeResult:
     def safe_summary(self) -> CurrentScorePriorSummary:
-        return CurrentScorePriorSummary(
-            schema_version="current-score-prior-summary-v1",
-            status="CURRENT_SCORE_PRIOR_READY",
-            classification="WEAK_LEAGUE_LEVEL_SUPPORT_PRIOR",
-            method_id="PL_LEAGUE_HOME_AWAY_MEAN_3_COMPLETE_SEASONS_V1",
-            model_family="INDEPENDENT_POISSON_V1",
-            home_goal_rate=Decimal("1.613158"),
-            away_goal_rate=Decimal("1.374561"),
-            sample_size=1140,
-            home_goal_total=1839,
-            away_goal_total=1567,
-            source_commit_sha="f27dcbef681db2c3195f9def62316ce497278781",
-            rights_profile_id="openfootball_football_json_score_prior_v1",
-            source_mode="RECONSTRUCTED",
-            usable_at=datetime(2026, 8, 30, 9, 0, tzinfo=UTC),
-            information_cutoff=datetime(2026, 8, 30, 10, 0, tzinfo=UTC),
-            market_evidence_used=False,
-            current_team_strength_claim=False,
-            production_active=False,
-            semantic_sha256="a" * 64,
+        body: dict[str, object] = {
+            "away_goal_rate": "1.374561",
+            "away_goal_total": 1567,
+            "classification": "WEAK_LEAGUE_LEVEL_SUPPORT_PRIOR",
+            "current_team_strength_claim": False,
+            "home_goal_rate": "1.613158",
+            "home_goal_total": 1839,
+            "information_cutoff": "2026-08-30T10:00:00Z",
+            "market_evidence_used": False,
+            "method_id": "PL_LEAGUE_HOME_AWAY_MEAN_3_COMPLETE_SEASONS_V1",
+            "model_family": "INDEPENDENT_POISSON_V1",
+            "production_active": False,
+            "rights_profile_id": "openfootball_football_json_score_prior_v1",
+            "sample_size": 1140,
+            "schema_version": "current-score-prior-summary-v1",
+            "source_commit_sha": "f27dcbef681db2c3195f9def62316ce497278781",
+            "source_mode": "RECONSTRUCTED",
+            "source_result_semantic_sha256": "b" * 64,
+            "status": "CURRENT_SCORE_PRIOR_READY",
+            "usable_at": "2026-08-30T09:00:00Z",
+        }
+        return CurrentScorePriorSummary.model_validate_json(
+            json.dumps(
+                {
+                    **body,
+                    "semantic_sha256": canonical_sha256(body),
+                }
+            )
         )
 
 

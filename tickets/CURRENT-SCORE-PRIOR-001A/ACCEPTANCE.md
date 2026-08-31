@@ -24,14 +24,40 @@ Engineering acceptance requires all of the following:
    approval/receipt/validation/usable timestamps no later than the information cutoff.
 10. The emitted `ScorePriorRequest` is labelled weak league-level support, remains structurally
     independent of markets, and makes no current team-strength or production-calibration claim.
-11. No database read/write, source persistence, Stage-7 substitution, GCS-008 projection, player
+11. `CurrentScorePriorResult` recomputes and authenticates its semantic SHA during every public
+    validation/deserialization path; rate, total, source, rights, mode or usable-time tampering with
+    a stale or arbitrary hash fails closed.
+12. An immutable `CurrentScorePriorBundle` binds the authenticated source result and exact
+    `fixture_id`, `competition_id`, `home_team_id`, `away_team_id` and `as_of`; teams are distinct,
+    source usability is no later than `as_of`, and every material field is authenticated by the
+    bundle's own semantic SHA.
+13. The supported bundle conversion requires exact downstream fixture, competition, home, away and
+    as-of equality, rejects substitutions/backdating, performs no network, and returns the exact
+    nested authenticated `ScorePriorRequest` without reconstructing either rate.
+14. A safe summary identifies its authenticated source result separately and authenticates its own
+    semantic contents; it can be emitted only from an authenticated source result.
+15. OpenFootball imports `ScorePriorRequest` from a market-free leaf contract. The legacy
+    `dmf_pulse.football_events.service` export is the same class and all inherited GCS-008 behavior
+    remains unchanged; a fresh current-prior import succeeds when `dmf_pulse.markets` is blocked.
+16. Unexpected ordinary exceptions at the injectable transport boundary become bounded typed
+    `SOURCE_UNAVAILABLE` failures with exact call counts and no upstream exception text; control
+    signals derived only from `BaseException` are not caught.
+17. No database read/write, source persistence, Stage-7 substitution, GCS-008 projection, player
     allocation, Stage 9, optimisation, public display, redistribution or production activation is
     performed.
-12. Focused branch coverage is at least 90%; inherited GCS-008, static, build, installed-wheel,
+18. Focused statement and branch coverage are each at least 90%; inherited GCS-008, static, build,
+    installed-wheel,
     repository, manifest and secret gates pass.
 
-Engineering status after these gates:
+Independent-review remediation history is preserved as:
 
-`CURRENT_SCORE_PRIOR_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
+- `CSP-IR-001`: `ENGINEERING_CLOSED_PENDING_INDEPENDENT_REREVIEW`
+- `CSP-IR-002`: `ENGINEERING_CLOSED_PENDING_INDEPENDENT_REREVIEW`
+- `CSP-IR-003`: `ENGINEERING_CLOSED_PENDING_INDEPENDENT_REREVIEW`
+- `CSP-IR-004`: `ENGINEERING_CLOSED_PENDING_INDEPENDENT_REREVIEW`
 
-Next action: `INDEPENDENT_REVIEW_CURRENT_SCORE_PRIOR_001A`.
+Engineering status after these gates, without a human-acceptance or independent-closure claim:
+
+`CURRENT_SCORE_PRIOR_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`
+
+Next action: `INDEPENDENT_REREVIEW_CURRENT_SCORE_PRIOR_001A`.

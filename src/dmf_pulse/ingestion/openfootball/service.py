@@ -6,13 +6,14 @@ from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from itertools import pairwise
-from typing import Literal, Self
+from typing import Any, Literal, Self
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.football_events._decimal import parse_utc
-from dmf_pulse.football_events.service import ScorePriorRequest
+from dmf_pulse.football_events.score_prior_request import ScorePriorRequest
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.models import (
     CapabilityValue,
@@ -63,6 +64,18 @@ _REQUIRED_CAPABILITIES = (
 
 class _FrozenModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True, validate_default=True)
+
+    def model_copy(
+        self,
+        *,
+        update: Mapping[str, Any] | None = None,
+        deep: bool = False,
+    ) -> Self:
+        del deep
+        data = self.model_dump(mode="python", exclude_none=False)
+        if update:
+            data.update(dict(update))
+        return type(self).model_validate(data)
 
 
 class CurrentScorePriorBuildRequest(_FrozenModel):
@@ -156,7 +169,7 @@ class CurrentScorePriorProvenance(_FrozenModel):
         return self
 
 
-class CurrentScorePriorSummary(_FrozenModel):
+class _CurrentScorePriorSummaryBody(_FrozenModel):
     schema_version: Literal["current-score-prior-summary-v1"]
     status: Literal["CURRENT_SCORE_PRIOR_READY"]
     classification: Literal["WEAK_LEAGUE_LEVEL_SUPPORT_PRIOR"]
@@ -175,7 +188,7 @@ class CurrentScorePriorSummary(_FrozenModel):
     market_evidence_used: Literal[False]
     current_team_strength_claim: Literal[False]
     production_active: Literal[False]
-    semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_result_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @field_validator("usable_at", "information_cutoff", mode="before")
     @classmethod
@@ -183,7 +196,21 @@ class CurrentScorePriorSummary(_FrozenModel):
         return parse_utc(value, field_name=info.field_name or "summary timestamp")
 
 
-class CurrentScorePriorResult(_FrozenModel):
+class CurrentScorePriorSummary(_CurrentScorePriorSummaryBody):
+    semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    def verify_semantic_identity(self) -> None:
+        body = self.model_dump(mode="json", exclude={"semantic_sha256"})
+        if canonical_sha256(body) != self.semantic_sha256:
+            raise ValueError("current score-prior summary semantic identity is invalid")
+
+    @model_validator(mode="after")
+    def authenticate_summary(self) -> Self:
+        self.verify_semantic_identity()
+        return self
+
+
+class _CurrentScorePriorResultBody(_FrozenModel):
     schema_version: Literal["current-score-prior-result-v1"]
     status: Literal["CURRENT_SCORE_PRIOR_READY"]
     classification: Literal["WEAK_LEAGUE_LEVEL_SUPPORT_PRIOR"]
@@ -197,10 +224,24 @@ class CurrentScorePriorResult(_FrozenModel):
     market_evidence_used: Literal[False]
     current_team_strength_claim: Literal[False]
     production_active: Literal[False]
+
+
+class CurrentScorePriorResult(_CurrentScorePriorResultBody):
     semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
+    def verify_semantic_identity(self) -> None:
+        body = self.model_dump(mode="json", exclude={"semantic_sha256"})
+        if canonical_sha256(body) != self.semantic_sha256:
+            raise ValueError("current score-prior result semantic identity is invalid")
+
+    @model_validator(mode="after")
+    def authenticate_result(self) -> Self:
+        self.verify_semantic_identity()
+        return self
+
     def safe_summary(self) -> CurrentScorePriorSummary:
-        return CurrentScorePriorSummary.model_validate(
+        self.verify_semantic_identity()
+        body = _CurrentScorePriorSummaryBody.model_validate(
             {
                 "away_goal_rate": self.score_prior_request.away_goal_rate,
                 "away_goal_total": self.away_goal_total,
@@ -216,13 +257,164 @@ class CurrentScorePriorResult(_FrozenModel):
                 "rights_profile_id": self.provenance.rights_profile_id,
                 "sample_size": self.sample_size,
                 "schema_version": "current-score-prior-summary-v1",
-                "semantic_sha256": self.semantic_sha256,
                 "source_commit_sha": self.provenance.source_commit_sha,
                 "source_mode": self.provenance.source_mode,
+                "source_result_semantic_sha256": self.semantic_sha256,
                 "status": self.status,
                 "usable_at": self.provenance.usable_at,
             }
         )
+        return CurrentScorePriorSummary.model_validate(
+            {
+                **body.model_dump(mode="python"),
+                "semantic_sha256": canonical_sha256(body),
+            }
+        )
+
+
+class _CurrentScorePriorBundleBody(_FrozenModel):
+    schema_version: Literal["current-score-prior-bundle-v1"]
+    status: Literal["CURRENT_SCORE_PRIOR_READY"]
+    fixture_id: UUID
+    competition_id: UUID
+    home_team_id: UUID
+    away_team_id: UUID
+    as_of: datetime
+    source_result: CurrentScorePriorResult
+    source_result_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    method_id: Literal["PL_LEAGUE_HOME_AWAY_MEAN_3_COMPLETE_SEASONS_V1"]
+    model_family: Literal["INDEPENDENT_POISSON_V1"]
+    score_prior_request: ScorePriorRequest
+    source_usable_at: datetime
+    source_mode: Literal["RECONSTRUCTED"]
+
+    @field_validator("as_of", "source_usable_at", mode="before")
+    @classmethod
+    def validate_bundle_time(cls, value: object, info: ValidationInfo) -> datetime:
+        return parse_utc(value, field_name=info.field_name or "bundle timestamp")
+
+    @model_validator(mode="after")
+    def validate_bindings(self) -> Self:
+        if self.home_team_id == self.away_team_id:
+            raise ValueError("home_team_id and away_team_id must be distinct")
+        if self.source_result_semantic_sha256 != self.source_result.semantic_sha256:
+            raise ValueError("bundle source-result identity does not match its source")
+        if self.method_id != self.source_result.method_id:
+            raise ValueError("bundle method does not match its source")
+        if self.model_family != self.score_prior_request.model_family:
+            raise ValueError("bundle model family does not match its request")
+        if self.score_prior_request != self.source_result.score_prior_request:
+            raise ValueError("bundle request does not match its authenticated source")
+        if self.source_usable_at != self.source_result.provenance.usable_at:
+            raise ValueError("bundle usable time does not match its source")
+        if self.source_mode != self.source_result.provenance.source_mode:
+            raise ValueError("bundle source mode does not match its source")
+        if self.source_usable_at > self.as_of:
+            raise ValueError("bundle source became usable after its as-of time")
+        return self
+
+
+class CurrentScorePriorBundle(_CurrentScorePriorBundleBody):
+    """Authenticated source prior bound to one exact fixture identity and cutoff."""
+
+    semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    def verify_semantic_identity(self) -> None:
+        self.source_result.verify_semantic_identity()
+        body = self.model_dump(mode="json", exclude={"semantic_sha256"})
+        if canonical_sha256(body) != self.semantic_sha256:
+            raise ValueError("current score-prior bundle semantic identity is invalid")
+
+    @model_validator(mode="after")
+    def authenticate_bundle(self) -> Self:
+        self.verify_semantic_identity()
+        return self
+
+
+def build_current_score_prior_bundle(
+    source_result: CurrentScorePriorResult,
+    *,
+    fixture_id: UUID,
+    competition_id: UUID,
+    home_team_id: UUID,
+    away_team_id: UUID,
+    as_of: datetime,
+) -> CurrentScorePriorBundle:
+    """Bind one authenticated source result to an exact downstream fixture context."""
+
+    try:
+        source_result.verify_semantic_identity()
+        normalized_as_of = parse_utc(as_of, field_name="as_of")
+    except ValueError:
+        raise IngestionError(
+            "VALIDATION_FAILED", "current score-prior source or bundle input is invalid"
+        ) from None
+    if source_result.provenance.usable_at > normalized_as_of:
+        raise IngestionError(
+            "POST_CUTOFF", "current score-prior source became usable after the bundle as-of time"
+        )
+    try:
+        body = _CurrentScorePriorBundleBody.model_validate(
+            {
+                "as_of": normalized_as_of,
+                "away_team_id": away_team_id,
+                "competition_id": competition_id,
+                "fixture_id": fixture_id,
+                "home_team_id": home_team_id,
+                "method_id": source_result.method_id,
+                "model_family": source_result.score_prior_request.model_family,
+                "schema_version": "current-score-prior-bundle-v1",
+                "score_prior_request": source_result.score_prior_request,
+                "source_mode": source_result.provenance.source_mode,
+                "source_result": source_result,
+                "source_result_semantic_sha256": source_result.semantic_sha256,
+                "source_usable_at": source_result.provenance.usable_at,
+                "status": source_result.status,
+            }
+        )
+        return CurrentScorePriorBundle.model_validate(
+            {
+                **body.model_dump(mode="python"),
+                "semantic_sha256": canonical_sha256(body),
+            }
+        )
+    except ValueError:
+        raise IngestionError("VALIDATION_FAILED", "current score-prior bundle is invalid") from None
+
+
+def score_prior_request_from_bundle(
+    bundle: CurrentScorePriorBundle,
+    *,
+    fixture_id: UUID,
+    competition_id: UUID,
+    home_team_id: UUID,
+    away_team_id: UUID,
+    as_of: datetime,
+) -> ScorePriorRequest:
+    """Return the exact nested request only for an exact authenticated binding match."""
+
+    try:
+        bundle.verify_semantic_identity()
+        normalized_as_of = parse_utc(as_of, field_name="as_of")
+    except ValueError:
+        raise IngestionError(
+            "FIXTURE_NOT_APPROVED", "current score-prior bundle authentication failed"
+        ) from None
+    if (
+        fixture_id != bundle.fixture_id
+        or competition_id != bundle.competition_id
+        or home_team_id != bundle.home_team_id
+        or away_team_id != bundle.away_team_id
+        or normalized_as_of != bundle.as_of
+    ):
+        raise IngestionError(
+            "FIXTURE_NOT_APPROVED", "current score-prior bundle does not match the target fixture"
+        )
+    if bundle.source_usable_at > bundle.as_of:
+        raise IngestionError(
+            "POST_CUTOFF", "current score-prior source became usable after the bundle as-of time"
+        )
+    return bundle.score_prior_request
 
 
 def _utc_now() -> datetime:
@@ -245,6 +437,26 @@ def _attach_call_count(error: IngestionError, call_count: int) -> IngestionError
         retryable=error.retryable,
         details=details,
     )
+
+
+def _fetch_resource_without_disclosure(
+    *,
+    config: OpenFootballProviderConfig,
+    resource_path: str,
+    transport: OpenFootballTransport,
+) -> OpenFootballHttpResponse | None:
+    """Preserve typed failures and erase arbitrary transport exception objects."""
+
+    try:
+        return fetch_resource(
+            config=config,
+            resource_path=resource_path,
+            transport=transport,
+        )
+    except IngestionError:
+        raise
+    except Exception:
+        return None
 
 
 def _require_exact_profile(profile: RightsProfile, *, checked_at: datetime) -> None:
@@ -388,11 +600,15 @@ class CurrentScorePriorService:
         try:
             for index, resource in enumerate(configured_resources):
                 call_count += 1
-                response = fetch_resource(
+                response = _fetch_resource_without_disclosure(
                     config=self._config,
                     resource_path=resource.path,
                     transport=self._transport,
                 )
+                if response is None:
+                    raise IngestionError(
+                        "SOURCE_UNAVAILABLE", "OpenFootball transport failed unexpectedly"
+                    )
                 received_at = _sample_clock(self._clock)
                 if received_at > request.information_cutoff:
                     raise IngestionError(
@@ -474,13 +690,12 @@ class CurrentScorePriorService:
                 "seasons": audit_tuple,
                 "status": "CURRENT_SCORE_PRIOR_READY",
             }
-            provisional = CurrentScorePriorResult.model_validate(
-                {**result_body, "semantic_sha256": "0" * 64}
-            )
-            semantic_body = provisional.model_dump(mode="json")
-            del semantic_body["semantic_sha256"]
-            return provisional.model_copy(
-                update={"semantic_sha256": canonical_sha256(semantic_body)}
+            validated_body = _CurrentScorePriorResultBody.model_validate(result_body)
+            return CurrentScorePriorResult.model_validate(
+                {
+                    **validated_body.model_dump(mode="python"),
+                    "semantic_sha256": canonical_sha256(validated_body),
+                }
             )
         except IngestionError as exc:
             raise _attach_call_count(exc, call_count) from exc
@@ -493,9 +708,12 @@ class CurrentScorePriorService:
 
 __all__ = [
     "CurrentScorePriorBuildRequest",
+    "CurrentScorePriorBundle",
     "CurrentScorePriorProvenance",
     "CurrentScorePriorResult",
     "CurrentScorePriorService",
     "CurrentScorePriorSummary",
     "SourceResourceLineage",
+    "build_current_score_prior_bundle",
+    "score_prior_request_from_bundle",
 ]

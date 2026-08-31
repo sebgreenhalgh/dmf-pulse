@@ -5,9 +5,11 @@ from decimal import Decimal
 
 import pytest
 
+from dmf_pulse.football_events.score_prior_request import ScorePriorRequest as LeafScorePriorRequest
 from dmf_pulse.football_events.service import ScorePriorRequest
 from dmf_pulse.ingestion.openfootball import service as score_prior_service
 from dmf_pulse.ingestion.openfootball.service import (
+    CurrentScorePriorBundle,
     CurrentScorePriorResult,
     CurrentScorePriorSummary,
 )
@@ -15,6 +17,7 @@ from dmf_pulse.ingestion.openfootball.service import (
 
 @pytest.mark.contract
 def test_approved_rates_bind_to_existing_stage8_orientation_contract() -> None:
+    assert ScorePriorRequest is LeafScorePriorRequest
     prior = ScorePriorRequest.model_validate_json(
         '{"away_goal_rate":"1.374561","home_goal_rate":"1.613158",'
         '"model_family":"INDEPENDENT_POISSON_V1"}'
@@ -33,6 +36,7 @@ def test_approved_rates_bind_to_existing_stage8_orientation_contract() -> None:
 def test_public_result_and_summary_freeze_non_claim_boundaries() -> None:
     result_schema = CurrentScorePriorResult.model_json_schema()
     summary_schema = CurrentScorePriorSummary.model_json_schema()
+    bundle_schema = CurrentScorePriorBundle.model_json_schema()
 
     for schema in (result_schema, summary_schema):
         serialized = str(schema)
@@ -41,6 +45,17 @@ def test_public_result_and_summary_freeze_non_claim_boundaries() -> None:
         assert "market_evidence_used" in serialized
         assert "current_team_strength_claim" in serialized
     assert "ScorePriorRequest" in result_schema["$defs"]
+    assert "source_result_semantic_sha256" in summary_schema["properties"]
+    for field in (
+        "fixture_id",
+        "competition_id",
+        "home_team_id",
+        "away_team_id",
+        "as_of",
+        "source_result_semantic_sha256",
+        "semantic_sha256",
+    ):
+        assert field in bundle_schema["properties"]
 
 
 @pytest.mark.contract

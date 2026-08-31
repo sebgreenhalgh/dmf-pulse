@@ -1,5 +1,28 @@
 # DMF Pulse execution plans
 
+## CURRENT-SCORE-PRIOR-001A independent-review remediation
+
+- Reviewed parent: `20036f3f7302580bb80ab6ebb9429620db0b8a9b` on the existing
+  `integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior` branch.
+- Scope: close only CSP-IR-001 through CSP-IR-004 through an authenticated fixture-bound prior,
+  mandatory result/bundle/summary semantic verification, a market-free `ScorePriorRequest` leaf
+  contract, and disclosure-safe unexpected-transport translation.
+- Preservation: retain the exact human-approved rights profile, immutable OpenFootball resources,
+  parser, three-season estimator, rates, reconstructed source mode, and all Stage-8 mathematics.
+- Safety: no CURRENT-AVAILABILITY change, Stage-7 fabrication, current-team-strength inference,
+  persistence, provider expansion, optimisation, production activation, PR, merge, or human
+  acceptance.
+
+### Remediation checkpoints
+
+- [x] Fetch and verify exact main/branch/tree/ancestry and the clean dedicated worktree.
+- [x] Add direct RED regressions for CSP-IR-001 through CSP-IR-004.
+- [x] Implement and adversarially verify the four bounded remediation changes.
+- [x] Update ticket governance and installed-wheel proofs without changing estimator/source facts.
+- [ ] Pass focused coverage, inherited populations, static/build/wheel/repository/security gates.
+- [ ] Commit product/tests/governance, then seal evidence/manifests in a second descendant commit.
+- [ ] Push normally, require exact remote equality and green exact-SHA CI, then stop for re-review.
+
 ## CURRENT-SCORE-PRIOR-001A commit-pinned OpenFootball score prior
 
 - Parent/branch: merged main `7609f041f4f7a415ef58f0f5c682a9b1d5b16d49` on
