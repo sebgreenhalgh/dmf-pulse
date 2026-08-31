@@ -5,7 +5,8 @@
 - Current market evidence is completely separate and does not influence either rate.
 - Current availability remains `NO_ACCEPTED_CURRENT_MINUTES_HISTORY`; Stage-7 remains
   `DATA_BLOCKED`.
-- The implementation emits a `ScorePriorRequest` but does not execute full live GCS-008.
+- The supported path emits an authenticated fixture-bound bundle and exact `ScorePriorRequest` but
+  does not execute full live GCS-008.
 - Player allocation and Stage 9 remain `NOT STARTED`; optimisation remains `NOT EXECUTED`.
 - The current target-season rules source verifier retains its unrelated official-bootstrap
   freshness blocker.
@@ -13,3 +14,5 @@
   permit private internal retention.
 - Public display and product redistribution remain denied. Production is not active or authorized.
 - Engineering completion is not independent review, human acceptance, PR authorization or merge.
+- CSP-IR-001 through CSP-IR-004 remain pending fresh independent re-review despite engineering
+  remediation.

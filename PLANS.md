@@ -19,7 +19,7 @@
 - [x] Add direct RED regressions for CSP-IR-001 through CSP-IR-004.
 - [x] Implement and adversarially verify the four bounded remediation changes.
 - [x] Update ticket governance and installed-wheel proofs without changing estimator/source facts.
-- [ ] Pass focused coverage, inherited populations, static/build/wheel/repository/security gates.
+- [x] Pass focused coverage, inherited populations, static/build/wheel/repository/security gates.
 - [ ] Commit product/tests/governance, then seal evidence/manifests in a second descendant commit.
 - [ ] Push normally, require exact remote equality and green exact-SHA CI, then stop for re-review.
 

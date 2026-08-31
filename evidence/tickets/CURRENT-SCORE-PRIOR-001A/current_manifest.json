@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 106472,
+      "bytes": 108022,
       "path": "PLANS.md",
-      "sha256": "b3b8ac36ae1e52e72229059b00a026c90753efd2a7a3eb9d60e2e3320e5a2e72"
+      "sha256": "201a6916221929494c8baa7b5f250d0ace8a30915fe469e992a054fa8d85e86d"
     },
     {
       "bytes": 2761,
@@ -2281,9 +2281,9 @@
       "sha256": "89004511ce9c2d43bdab391c87dd4ac65ed4c21288b7b307cd93c26407633873"
     },
     {
-      "bytes": 7335,
+      "bytes": 14463,
       "path": "scripts/verify_current_score_prior_wheel.py",
-      "sha256": "45c3c0085993123b74c5ea099fb8fb1ddb3296fcec63a66aeb949a8f1649b28e"
+      "sha256": "d6e06fcc2ef1d8ccca74d4023225140f46bc39383f53c0be32f4d1f4415a396c"
     },
     {
       "bytes": 18042,
@@ -3176,14 +3176,19 @@
       "sha256": "e5683c2a034806ec09e52a71ddfe1f06c4b7bb8a461a5187ff847ee8342c5fcc"
     },
     {
+      "bytes": 2044,
+      "path": "src/dmf_pulse/football_events/score_prior_request.py",
+      "sha256": "6b1a3a8fb90c7a1fa34cf85498362ab306ee296f66390df9b32c7d23ebbcc9b5"
+    },
+    {
       "bytes": 12831,
       "path": "src/dmf_pulse/football_events/score_projection.py",
       "sha256": "4fe24403bcca9ba55d767becb2862bbd3912e4bd72aea6c38bf2ec37076b7857"
     },
     {
-      "bytes": 28109,
+      "bytes": 26945,
       "path": "src/dmf_pulse/football_events/service.py",
-      "sha256": "213e91b8e20fe8871ead161e3c3de95d4b81d52b6df2a87610758792bd6faf12"
+      "sha256": "b48c4a336f13671e93128b260be68e7934a77a9dcbb3d1ebe7fa1f3b4b98be50"
     },
     {
       "bytes": 1094,
@@ -3396,9 +3401,9 @@
       "sha256": "be705370ea5860db4880b234b9f09b81abfb28f554dff06e890ce2acab77b013"
     },
     {
-      "bytes": 403,
+      "bytes": 617,
       "path": "src/dmf_pulse/ingestion/openfootball/__init__.py",
-      "sha256": "f3eb930478c41ebe2bd4f33565029f7581ea1e71a862ba93bfa1bc4f8718f05b"
+      "sha256": "6808830c0c4ffd129c052ca1108ee5bfeaf501b0b46982294cd66a63f5e0f626"
     },
     {
       "bytes": 8796,
@@ -3416,9 +3421,9 @@
       "sha256": "776dba26f023c82e4da70dafd70c78efedef464e99f27121f673d0c655963d7d"
     },
     {
-      "bytes": 21332,
+      "bytes": 29852,
       "path": "src/dmf_pulse/ingestion/openfootball/service.py",
-      "sha256": "2ef3675c26cf96c45fc0ab8e9434681f8d26185cfc84e8201edbcdbdec28d193"
+      "sha256": "9abdfe5f15d99db4de5633dae90b852d9ae4877f1b41d012bb62545290c22bac"
     },
     {
       "bytes": 608,
@@ -4001,9 +4006,9 @@
       "sha256": "a5660caaced3193074bcbf1886f53e7989f44513190ce98aa4b81fb7ceb5b579"
     },
     {
-      "bytes": 1802,
+      "bytes": 2384,
       "path": "tests/contract/football_events/test_current_score_prior_contract.py",
-      "sha256": "3806650bb689079f5ff7460d34a6a1fe7429d495e1beafab2eba56f9ebb7855f"
+      "sha256": "4b38edf721ade64335dbef2fe16b5f063bb12ab607fa50e6ff8a187acf6e4634"
     },
     {
       "bytes": 5120,
@@ -4406,9 +4411,9 @@
       "sha256": "8013f6bbdd81a7f45b6a48a78c29b18dc984682705072254857e0a304171d2b4"
     },
     {
-      "bytes": 4715,
+      "bytes": 4960,
       "path": "tests/integration/ingestion/test_openfootball_score_prior_cli.py",
-      "sha256": "2bcd32bee6dc02b2ae12c808698893670d7a61e98e6cc353af073f0468586979"
+      "sha256": "8169109881f16379017f78a6e37be8c78c1da8ed2c40a3fe3311d40a0114b54d"
     },
     {
       "bytes": 8387,
@@ -5316,6 +5321,11 @@
       "sha256": "0aef5595a7e20118138f7baf4882a1c320b7e628ee5283da4ed926450bb929bf"
     },
     {
+      "bytes": 16804,
+      "path": "tests/unit/ingestion/openfootball/test_independent_review_remediation.py",
+      "sha256": "21773065d8955dd8b86bdcdd91e243fbfb8db92f0e8d55d6d20231693e106c8f"
+    },
+    {
       "bytes": 2513,
       "path": "tests/unit/ingestion/openfootball/test_parser.py",
       "sha256": "451e165158418403505a3e7f2cad66cf2a3be90e1fa4a9d5c4288784308bd29d"
@@ -5871,14 +5881,14 @@
       "sha256": "5fe4fcb3b605578015fb36a62903dd4a356dcbe5873dd383173f4ceb54f31a9d"
     },
     {
-      "bytes": 2391,
+      "bytes": 4355,
       "path": "tickets/CURRENT-SCORE-PRIOR-001A/ACCEPTANCE.md",
-      "sha256": "9f68b6ec9c8664780cfc344f9e82b34ff543f40fa2afc12de20857a4e456d25b"
+      "sha256": "a472b1428a163cd8c3d15cc3110f8413b2b35c5e02a2b1afcb9782b3e8f3b742"
     },
     {
-      "bytes": 2989,
+      "bytes": 3546,
       "path": "tickets/CURRENT-SCORE-PRIOR-001A/ticket.yaml",
-      "sha256": "2c7cc7bdd1be708a7abf8f32a874f44a7c3d5c4f801a5a366801fdba91ae72c8"
+      "sha256": "06e3bb88fe6630951d10a00eee04446522fbd5d492b05cf6427f367b0a62e775"
     },
     {
       "bytes": 3923,

@@ -44,3 +44,27 @@ projection, no player allocation, no Stage 9 and no optimisation.
 `CURRENT_SCORE_PRIOR_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`
 
 Next action: `INDEPENDENT_REVIEW_CURRENT_SCORE_PRIOR_001A`.
+
+## Independent-review remediation
+
+Reviewed commit `20036f3f7302580bb80ab6ebb9429620db0b8a9b` produced CSP-IR-001 through
+CSP-IR-004. Substantive remediation commit `300ea1af1b9e834b011c931391467e9ac7b95aef`
+preserves the original estimator, rights decision, selected seasons and immutable source evidence.
+
+- CSP-IR-001: an authenticated `CurrentScorePriorBundle` binds exact fixture, competition,
+  home/away team and as-of identities. Conversion rejects substitution or backdating and returns
+  the exact nested `ScorePriorRequest` without recomputing rates.
+- CSP-IR-002: result, bundle and summary public validation recomputes semantic identity. The
+  summary carries both its own hash and its authenticated source-result hash.
+- CSP-IR-003: `ScorePriorRequest` is defined in a market-free leaf module and re-exported as the
+  identical class from the legacy Stage-8 service path. Frozen GCS schemas and behavior are equal.
+- CSP-IR-004: unexpected ordinary transport exceptions become bounded typed failures with exact
+  call accounting and no exception-text disclosure; `BaseException` control signals propagate.
+
+Remediation verification: 137 focused tests; 848/885 statements and 186/204 branches; inherited
+GCS-008, CURRENT-MARKETS, LIVE-ODDS, CURRENT-FPL-STATE 001B/001D and rights/config populations;
+frozen sync, Ruff, strict mypy, build, generic wheel and enhanced installed-wheel proofs.
+
+`CURRENT_SCORE_PRIOR_001A_REMEDIATED_PENDING_INDEPENDENT_REREVIEW`
+
+Next action: `INDEPENDENT_REREVIEW_CURRENT_SCORE_PRIOR_001A`.

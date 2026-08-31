@@ -49,3 +49,36 @@ Date: 2026-08-30
 The current target-season rules source verifier continues to report the inherited blocker
 "no official bootstrap capture retrieved within two days". This is unrelated to the historical
 OpenFootball prior and was not relabelled as success.
+
+CURRENT-SCORE-PRIOR-001A independent-review remediation ledger
+Date: 2026-08-31
+
+13. Exact remediation start and isolation
+    PASS: origin/main was 7609f041f4f7a415ef58f0f5c682a9b1d5b16d49; the remote branch and clean
+    dedicated worktree were 20036f3f7302580bb80ab6ebb9429620db0b8a9b with tree
+    1b0723f8b60cec38f9bde49b13b01c4a3789f2c3. Required ancestry through 3fb6758, f733bbe and
+    20036f3 was preserved. The unrelated dirty CURRENT-AVAILABILITY worktree was unchanged.
+14. CSP-IR-001 through CSP-IR-004 direct regressions and product closure
+    PASS: exact fixture/competition/home/away/as-of binding and earlier-cutoff refusal; mandatory
+    result, bundle and summary authentication; market-free leaf import with legacy class identity;
+    and bounded unexpected-transport translation with calls 1-4 and no sentinel disclosure.
+15. Substantive remediation commit
+    PASS: 300ea1af1b9e834b011c931391467e9ac7b95aef is a normal direct descendant of the reviewed
+    commit and contains only product, tests, ticket governance, the wheel verifier and plan state.
+16. Focused coverage
+    PASS: 137 tests; 848/885 statements (95.81920903954803%) and 186/204 branches
+    (91.17647058823529%).
+17. Inherited regressions
+    PASS: GCS-008 212; CURRENT-MARKETS 122 against pinned PostgreSQL 18.4; CURRENT-FPL-STATE
+    001B/001D 182; LIVE-ODDS 189 non-database plus 8 database retention tests; rights/config 131.
+18. Frozen sync, static, build and installed wheels
+    PASS: 40 locked packages; diff/format/lint; strict mypy over 259 source files; sdist/wheel;
+    generic verifier and enhanced CURRENT-SCORE-PRIOR verifier. The installed wheel proved exact
+    rates, fixture binding, past-as-of refusal, result/bundle tamper refusal, market-free fresh
+    import, exact conversion, zero conversion network, and zero-call missing rights.
+19. Findings disposition
+    CSP-IR-001, CSP-IR-002, CSP-IR-003 and CSP-IR-004 are
+    ENGINEERING_CLOSED_PENDING_INDEPENDENT_REREVIEW. No independent-closure, human-acceptance,
+    production, PR or merge claim is made.
+20. Final evidence commit, normal push and exact-SHA automatic CI
+    PENDING at the time of this mutable ledger entry. No post-CI commit will be created.
