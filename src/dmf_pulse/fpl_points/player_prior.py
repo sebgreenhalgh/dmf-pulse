@@ -12,7 +12,7 @@ from collections.abc import Mapping
 from datetime import UTC, datetime
 from importlib import resources
 from math import isfinite
-from typing import Annotated, Any, Final, Literal, Self
+from typing import TYPE_CHECKING, Annotated, Any, Final, Literal, Self
 from uuid import UUID, uuid5
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
@@ -25,7 +25,9 @@ from dmf_pulse.fpl_points.models import (
     PlayerPosition,
     PlayerPriorIdentity,
 )
-from dmf_pulse.ingestion.fpl.current import CurrentFplInputBundle
+
+if TYPE_CHECKING:
+    from dmf_pulse.ingestion.fpl.current import CurrentFplInputBundle
 
 _RESOURCE_PACKAGE = "dmf_pulse.fpl_points.resources"
 _PRIOR_RESOURCE = "gw1_private_player_allocation_prior_v1.json"

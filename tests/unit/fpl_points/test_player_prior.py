@@ -11,6 +11,8 @@ import pytest
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.player_prior import (
+    PlayerPriorIdentityBinding,
+    bind_fixture_allocation_profiles,
     build_player_prior_identity_binding,
     load_packaged_player_prior,
     parse_player_prior,
@@ -185,6 +187,25 @@ def test_malformed_prior_and_tampered_acceptance_fail_closed() -> None:
     assert tampered.value.code == "PLAYER_PRIOR_ACCEPTANCE_INVALID"
 
 
+def test_non_object_unsorted_and_incomplete_governed_resources_fail_closed() -> None:
+    with pytest.raises(FplPointsError) as non_object:
+        parse_player_prior(b"[]")
+    assert non_object.value.code == "PLAYER_PRIOR_INVALID"
+
+    unsorted = _prior_payload()
+    unsorted["profiles"] = list(reversed(unsorted["profiles"]))
+    unsorted["lineage"] = list(reversed(unsorted["lineage"]))
+    with pytest.raises(FplPointsError) as order_error:
+        parse_player_prior(unsorted)
+    assert order_error.value.code == "PLAYER_PRIOR_INVALID"
+
+    acceptance = load_packaged_player_prior().historical_acceptance.model_dump(mode="json")
+    acceptance["identity_coverage"]["unresolved_mapping_count"] = 1
+    with pytest.raises(FplPointsError) as coverage_error:
+        parse_player_prior_acceptance(acceptance)
+    assert coverage_error.value.code == "PLAYER_PRIOR_ACCEPTANCE_INVALID"
+
+
 def test_current_fpl_identity_binding_is_exact_and_deterministic(
     repository_root: Path, tmp_path: Path
 ) -> None:
@@ -270,3 +291,97 @@ def test_identity_binding_rejects_missing_duplicate_and_stale_team(
             canonical_team_ids_by_source_id=teams,
         )
     assert stale_error.value.code == "PLAYER_IDENTITY_MISMATCH"
+
+
+def test_identity_binding_scope_cutoff_key_and_team_boundaries_fail_closed(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    prior = load_packaged_player_prior()
+    current_fpl, source_ids = _build_current_fpl(repository_root, tmp_path)
+    players = {
+        source_id: f"20000000-0000-4000-8000-{index:012d}"
+        for index, source_id in enumerate(source_ids, start=1)
+    }
+    teams = {source_id: f"30000000-0000-4000-8000-{source_id:012d}" for source_id in (1, 2)}
+
+    cases = (
+        (
+            current_fpl.model_copy(update={"target_gameweek": 2}),
+            players,
+            teams,
+            "PLAYER_PRIOR_SCOPE_MISMATCH",
+        ),
+        (
+            current_fpl.model_copy(
+                update={
+                    "provenance": current_fpl.provenance.model_copy(
+                        update={"information_cutoff": datetime(2026, 8, 21, 17, 29, 59, tzinfo=UTC)}
+                    )
+                }
+            ),
+            players,
+            teams,
+            "PLAYER_PRIOR_POST_CUTOFF",
+        ),
+        (current_fpl, {}, teams, "PLAYER_PRIOR_MISSING"),
+        (current_fpl, {"bad": next(iter(players.values()))}, teams, "PLAYER_IDENTITY_MISMATCH"),
+        (current_fpl, players, {"bad": next(iter(teams.values()))}, "PLAYER_IDENTITY_MISMATCH"),
+        (current_fpl, players, {1: teams[1]}, "PLAYER_IDENTITY_MISMATCH"),
+        (
+            current_fpl,
+            players,
+            {**teams, 3: "30000000-0000-4000-8000-000000000003"},
+            "PLAYER_IDENTITY_MISMATCH",
+        ),
+    )
+    for bundle, player_map, team_map, expected_code in cases:
+        with pytest.raises(FplPointsError) as caught:
+            build_player_prior_identity_binding(
+                prior,
+                bundle,
+                canonical_player_ids_by_source_id=player_map,
+                canonical_team_ids_by_source_id=team_map,
+            )
+        assert caught.value.code == expected_code
+
+    malformed_player = dict(players)
+    malformed_player[source_ids[0]] = "NOT-A-CANONICAL-UUID"
+    with pytest.raises(FplPointsError) as malformed:
+        build_player_prior_identity_binding(
+            prior,
+            current_fpl,
+            canonical_player_ids_by_source_id=malformed_player,
+            canonical_team_ids_by_source_id=teams,
+        )
+    assert malformed.value.code == "PLAYER_IDENTITY_MISMATCH"
+
+
+def test_fixture_profile_binding_rejects_empty_and_mismatched_prior_identity(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    prior = load_packaged_player_prior()
+    current_fpl, source_ids = _build_current_fpl(repository_root, tmp_path)
+    binding = build_player_prior_identity_binding(
+        prior,
+        current_fpl,
+        canonical_player_ids_by_source_id={
+            source_id: f"40000000-0000-4000-8000-{index:012d}"
+            for index, source_id in enumerate(source_ids, start=1)
+        },
+        canonical_team_ids_by_source_id={
+            source_id: f"50000000-0000-4000-8000-{source_id:012d}" for source_id in (1, 2)
+        },
+    )
+    with pytest.raises(FplPointsError) as empty:
+        bind_fixture_allocation_profiles(prior, binding, ())
+    assert empty.value.code == "PLAYER_PRIOR_MISSING"
+
+    mismatched = PlayerPriorIdentityBinding.model_construct(
+        **{
+            **binding.model_dump(mode="python"),
+            "prior_artifact_sha256": "0" * 64,
+        }
+    )
+    with pytest.raises(FplPointsError) as tampered:
+        bind_fixture_allocation_profiles(prior, mismatched, (object(),))  # type: ignore[arg-type]
+    assert tampered.value.code == "PLAYER_PRIOR_TAMPERED"
