@@ -37,6 +37,15 @@ def _source_identities(request: FixtureSimulationRequest) -> tuple[str, ...]:
     values = {distribution.source_minutes_context_sha256}
     if distribution.source_market_sha256 is not None:
         values.add(distribution.source_market_sha256)
+    if request.player_prior_identity is not None:
+        values.update(
+            {
+                request.player_prior_identity.current_fpl_bundle_sha256,
+                request.player_prior_identity.current_identity_binding_sha256,
+                request.player_prior_identity.artifact_sha256,
+                request.player_prior_identity.historical_acceptance_sha256,
+            }
+        )
     return tuple(sorted(values))
 
 
@@ -123,6 +132,16 @@ def generate_fixture_scenarios(
                 else None
             ),
         )
+        if request.player_prior_identity is not None:
+            degradation = tuple(
+                sorted(
+                    {
+                        *degradation,
+                        *request.player_prior_identity.limitations,
+                        "GOVERNED_DONOR_PRIVATE_GW1_PLAYER_PRIOR",
+                    }
+                )
+            )
         player_scores = rules_engine.score_fixture(event_scenario)
         confidence: Literal["D", "E"] = (
             "E"
@@ -145,6 +164,7 @@ def generate_fixture_scenarios(
                 participation_scenario_id=participation.scenario_id,
                 stage7_minutes_context=participation.stage7_minutes_context,
                 stage7_player_projection_sha256s=(participation.stage7_player_projection_sha256s),
+                player_prior_identity=request.player_prior_identity,
                 fixture_id=request.score_distribution.fixture_id,
                 gameweek_id=request.gameweek_id,
                 players=player_scores,
@@ -164,6 +184,11 @@ def generate_fixture_scenarios(
                             request.score_distribution.policy_sha256,
                             participation.stage7_minutes_context.home.model_artifact_sha256,
                             participation.stage7_minutes_context.away.model_artifact_sha256,
+                            *(
+                                (request.player_prior_identity.artifact_schema_version,)
+                                if request.player_prior_identity is not None
+                                else ()
+                            ),
                         }
                     )
                 ),
@@ -172,6 +197,11 @@ def generate_fixture_scenarios(
                         {
                             participation.stage7_minutes_context.home.dataset_sha256,
                             participation.stage7_minutes_context.away.dataset_sha256,
+                            *(
+                                (request.player_prior_identity.artifact_sha256,)
+                                if request.player_prior_identity is not None
+                                else ()
+                            ),
                         }
                     )
                 ),

@@ -1443,3 +1443,31 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   PostgreSQL, static, build, installed-wheel, repository, and security gate.
 - [ ] Commit and push one descendant remediation SHA, require exact-SHA automatic CI fully green,
   and hand off for independent re-review without a post-CI commit.
+
+# CURRENT-PLAYER-ALLOCATION-PORT-001A current-stack semantic port
+
+- Ticket: `CURRENT-PLAYER-ALLOCATION-PORT-001A`; immutable stacked parent
+  `ddd74fe38ddfae3733ad5189b417123477e9f23e`; immutable donor
+  `f4d75dc5b107901a3619f136c3d3d7d1d7632a3c`.
+- Branch: `readiness/CURRENT-PLAYER-ALLOCATION-PORT-001A`.
+- Scope: preserve the governed private GW1 player-allocation prior, bind it explicitly to current
+  official-FPL and canonical Stage-7 identities, harden coherent event allocation, and prove the
+  real Stage-7 -> Stage-8 -> Stage-9 player-by-scenario points path.
+- Safety: no donor merge/rebase/wholesale cherry-pick; no acquisition, obsolete current-state
+  bridge, alternate score or points model, optimiser, PR, merge, tag, acceptance, or production
+  activation.
+
+## Port checkpoints
+
+- [x] Verify exact parent/donor refs, parent CI, clean isolated worktree, repository authority,
+  current Stage-7/8/9 contracts, and complete donor checkpoint inventory.
+- [x] PORT.01 preserve the immutable donor central prior and acceptance evidence, implement strict
+  packaged loading and explicit current-identity binding, test tamper/missing/mismatch behavior,
+  record donor A/B/C/D dispositions, then commit and push.
+- [ ] PORT.02 harden the existing current Stage-9 event allocator for deterministic candidate
+  ordering, timed on-pitch goal/assist/penalty/save coherence, exact goal conservation, and donor
+  goalkeeper/penalty regressions, then commit and push.
+- [ ] PORT.03 prove both Stage-7 families and the complete private-manual Stage-7 -> current
+  Stage-8 -> allocated coherent scenario -> canonical Stage-9 integer points/matrix/marginals
+  path; complete evidence, broad gates, adversarial review, final push, and exact-SHA CI.
+- [ ] Hand off as implemented pending independent review and not production-active.

@@ -300,6 +300,39 @@ class BpsAuxiliaryRates(PointsModel):
     times_tackled_per90: Annotated[float, Field(ge=0.0)]
 
 
+class PlayerPriorIdentity(PointsModel):
+    """Exact private donor-prior and current-identity binding used by one request."""
+
+    schema_version: Literal["fpl-points-player-prior-identity-v1"] = (
+        "fpl-points-player-prior-identity-v1"
+    )
+    source_type: Literal["GOVERNED_DONOR_PRIVATE_GW1"]
+    artifact_schema_version: Literal["gw1-player-allocation-candidate-v1"]
+    artifact_sha256: Sha256
+    historical_acceptance_schema_version: Literal["gw1-player-allocation-human-acceptance-v1"]
+    historical_acceptance_sha256: Sha256
+    historical_acceptance_status: Literal["HUMAN_ACCEPTED_PRIVATE_GW1_ONLY"]
+    accepted_scope: Literal["PRIVATE_2026_27_GW1_ONLY"]
+    production_activation: Literal[False]
+    information_cutoff_utc: str
+    current_fpl_bundle_sha256: Sha256
+    current_identity_binding_sha256: Sha256
+    confidence_grade: Literal["E"]
+    limitations: tuple[str, ...]
+
+    @field_validator("information_cutoff_utc")
+    @classmethod
+    def prior_cutoff_is_utc(cls, value: str) -> str:
+        _parse_utc(value, label="player prior information_cutoff_utc")
+        return value
+
+    @model_validator(mode="after")
+    def limitations_are_canonical(self) -> PlayerPriorIdentity:
+        if not self.limitations or tuple(sorted(set(self.limitations))) != self.limitations:
+            raise ValueError("player-prior limitations must be non-empty, unique, and sorted")
+        return self
+
+
 class PlayerAllocationProfile(PointsModel):
     player_id: str
     team_id: str
@@ -406,6 +439,7 @@ class FixtureSimulationRequest(PointsModel):
     score_distribution: JointScoreDistribution
     participation_scenarios: tuple[ParticipationScenario, ...]
     allocation_profiles: tuple[PlayerAllocationProfile, ...]
+    player_prior_identity: PlayerPriorIdentity | None = None
     allocation_config: EventAllocationConfig
     expected_ruleset_id: str
     expected_ruleset_version: str
@@ -470,6 +504,16 @@ class FixtureSimulationRequest(PointsModel):
             for participant in scenario.participants:
                 if profile_map[participant.player_id].team_id != participant.team_id:
                     raise ValueError("allocation profile team identity mismatch")
+        if self.player_prior_identity is not None:
+            prior_cutoff = _parse_utc(
+                self.player_prior_identity.information_cutoff_utc,
+                label="player prior information_cutoff_utc",
+            )
+            request_cutoff = _parse_utc(self.information_cutoff_utc, label="information_cutoff_utc")
+            if prior_cutoff > request_cutoff:
+                raise ValueError("player prior is after the Stage-9 information cutoff")
+            if self.projection_mode is ProjectionMode.PRODUCTION:
+                raise ValueError("private GW1 donor prior cannot activate production projection")
         return self
 
 
@@ -711,6 +755,7 @@ class FixturePointScenario(PointsModel):
     participation_scenario_id: str
     stage7_minutes_context: Stage7MinutesContext
     stage7_player_projection_sha256s: dict[str, Sha256]
+    player_prior_identity: PlayerPriorIdentity | None = None
     fixture_id: str
     gameweek_id: str
     players: dict[str, PlayerScenarioScore]

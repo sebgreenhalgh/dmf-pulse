@@ -1,0 +1,37 @@
+ticket_id: "CURRENT-PLAYER-ALLOCATION-PORT-001A"
+stage: "A7-A9"
+pack_version: "1.0"
+title: "Port accepted private player allocation onto the current stack"
+status: "DRAFT"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+
+required_branch: "readiness/CURRENT-PLAYER-ALLOCATION-PORT-001A"
+required_base_commit: "ddd74fe38ddfae3733ad5189b417123477e9f23e"
+immutable_donor_commit: "f4d75dc5b107901a3619f136c3d3d7d1d7632a3c"
+
+objective: >-
+  Semantically port the governed private GW1 player-allocation prior into the current identity,
+  Stage-7, Stage-8 and canonical Stage-9 contracts and prove deterministic coherent
+  player-by-scenario FPL points plus marginals without introducing an optimiser.
+
+in_scope:
+  - "Strict packaged donor-prior and historical private-acceptance validation."
+  - "Explicit official-FPL source identity to current canonical UUID binding."
+  - "Scenario-level goal, assist, own-goal, penalty, save, card, defensive and BPS allocation."
+  - "Exact Stage-8 team-goal conservation and Stage-7 on-pitch coherence."
+  - "Canonical Stage-9 integer scoring, joint player matrix and derived marginals."
+  - "Synthetic offline proof for empirical and private-manual Stage-7 families."
+
+excluded:
+  - "Donor merge, rebase, wholesale cherry-pick, or obsolete current catalogue/Stage-7 code."
+  - "Live history acquisition, licensed data collection, or fabricated player observations."
+  - "Alternative score simulation, direct expected-points model, or alternate FPL scorer."
+  - "Squad, transfer, lineup, captaincy, chip, rank, or any other optimisation."
+  - "PR, merge, tag, human acceptance, production activation, UI, scheduler, or deployment."
+
+network_allowed: false
+real_credentials_allowed: false
+production_activation_allowed: false
+required_review_output: "review_pack/CURRENT-PLAYER-ALLOCATION-PORT-001A"
