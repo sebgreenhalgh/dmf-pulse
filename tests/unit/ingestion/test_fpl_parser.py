@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 
@@ -18,6 +19,7 @@ from dmf_pulse.ingestion.fpl.parser import (
     BootstrapPayload,
     FixturePayload,
     FplResource,
+    _contract_projection,
     parse_fpl_payload,
     parsed_artifact,
 )
@@ -84,6 +86,143 @@ def test_happy_fixtures_have_frozen_hashes_and_typed_values(repository_root: Pat
     assert isinstance(fixtures.payload, FixturePayload)
     assert bootstrap.payload.events[0].deadline_time.utcoffset().total_seconds() == 0
     assert isinstance(bootstrap.payload.elements[0].selected_by_percent, Decimal)
+
+
+def test_contract_projection_recurses_through_json_containers_without_float_coercion() -> None:
+    projected = _contract_projection(
+        {
+            "zero": Decimal("0.0"),
+            "direct": Decimal("1.2500"),
+            "nested": {
+                "decimal": Decimal("2.50"),
+                "list": [
+                    Decimal("3.75"),
+                    {"decimal": Decimal("4.00")},
+                ],
+            },
+            "list_of_dicts": [{"decimal": Decimal("5.000")}],
+            "tuple_of_dicts": ({"decimal": Decimal("6.1250")},),
+            "when": datetime(2026, 9, 1, 12, 30, tzinfo=UTC),
+            "primitives": [True, 7, "value", None],
+        }
+    )
+
+    assert projected == {
+        "zero": "0",
+        "direct": "1.25",
+        "nested": {
+            "decimal": "2.5",
+            "list": ["3.75", {"decimal": "4"}],
+        },
+        "list_of_dicts": [{"decimal": "5"}],
+        "tuple_of_dicts": [{"decimal": "6.125"}],
+        "when": "2026-09-01T12:30:00Z",
+        "primitives": [True, 7, "value", None],
+    }
+    assert json.dumps(projected, allow_nan=False, sort_keys=True)
+
+
+def test_contract_projection_rejects_non_string_mapping_keys() -> None:
+    with pytest.raises(IngestionError) as raised:
+        _contract_projection({1: Decimal("1.25")})
+
+    assert raised.value.code == "INTERNAL_INVARIANT"
+    assert "key" in raised.value.message
+
+
+def test_nested_decimal_bootstrap_hash_is_order_and_text_form_independent(
+    repository_root: Path,
+) -> None:
+    first = _json_fixture(repository_root, "happy_path", FplResource.BOOTSTRAP)
+    second = deepcopy(first)
+    assert isinstance(first, dict) and isinstance(second, dict)
+    first["game_settings"] = {
+        "z": 1.25,
+        "a": {"decimal": 2.5, "values": [3.75, {"decimal": 4.0}]},
+    }
+    second["game_settings"] = {
+        "a": {"values": [3.75, {"decimal": 4.0}], "decimal": 2.5},
+        "z": 1.25,
+    }
+    first_body = json.dumps(first, separators=(",", ":")).encode()
+    second_body = json.dumps(second, separators=(",", ":")).encode()
+    second_body = second_body.replace(b'"z":1.25', b'"z":1.2500')
+
+    first_parsed = parse_fpl_payload(FplResource.BOOTSTRAP, first_body)
+    second_parsed = parse_fpl_payload(FplResource.BOOTSTRAP, second_body)
+
+    assert first_parsed.payload_sha256 != second_parsed.payload_sha256
+    assert first_parsed.semantic_sha256 == second_parsed.semantic_sha256
+    assert isinstance(first_parsed.payload, BootstrapPayload)
+    settings = first_parsed.payload.game_settings
+    assert isinstance(settings["z"], Decimal)
+    assert isinstance(settings["a"], dict)
+    assert isinstance(settings["a"]["values"][1]["decimal"], Decimal)
+    assert not isinstance(settings["z"], float)
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+def test_nested_non_finite_json_numbers_remain_forbidden(
+    repository_root: Path, value: float
+) -> None:
+    body = _json_fixture(repository_root, "happy_path", FplResource.BOOTSTRAP)
+    assert isinstance(body, dict)
+    body["game_settings"] = {"nested": {"value": value}}
+
+    _assert_error(
+        FplResource.BOOTSTRAP,
+        json.dumps(body, separators=(",", ":")).encode(),
+        "MALFORMED_JSON",
+        classification="MALFORMED",
+    )
+
+
+def test_parsed_artifact_recurses_through_nested_dict_values(repository_root: Path) -> None:
+    parsed = parse_fpl_payload(
+        FplResource.BOOTSTRAP,
+        _fixture(repository_root, "happy_path", FplResource.BOOTSTRAP),
+    )
+    assert isinstance(parsed.payload, BootstrapPayload)
+    payload = parsed.payload.model_copy(
+        update={
+            "game_settings": {
+                "nested": {
+                    "decimal": Decimal("2.500"),
+                    "values": [Decimal("3.75"), {"decimal": Decimal("4.00")}],
+                },
+                "tuple": ({"decimal": Decimal("5.0")},),
+                "when": datetime(2026, 9, 1, 12, 30, tzinfo=UTC),
+            }
+        }
+    )
+
+    artifact = parsed_artifact(parsed.model_copy(update={"payload": payload}))
+    artifact_payload = artifact["payload"]
+    assert isinstance(artifact_payload, dict)
+    assert artifact_payload["game_settings"] == {
+        "nested": {
+            "decimal": "2.500",
+            "values": ["3.75", {"decimal": "4.00"}],
+        },
+        "tuple": [{"decimal": "5.0"}],
+        "when": "2026-09-01T12:30:00Z",
+    }
+    assert json.dumps(artifact, allow_nan=False, sort_keys=True)
+
+
+def test_parsed_artifact_rejects_non_string_mapping_keys(repository_root: Path) -> None:
+    parsed = parse_fpl_payload(
+        FplResource.BOOTSTRAP,
+        _fixture(repository_root, "happy_path", FplResource.BOOTSTRAP),
+    )
+    assert isinstance(parsed.payload, BootstrapPayload)
+    payload = parsed.payload.model_copy(update={"game_settings": {1: Decimal("1.25")}})
+
+    with pytest.raises(IngestionError) as raised:
+        parsed_artifact(parsed.model_copy(update={"payload": payload}))
+
+    assert raised.value.code == "INTERNAL_INVARIANT"
+    assert "key" in raised.value.message
 
 
 def test_unknown_additive_paths_are_exact_and_do_not_change_semantic_projection(

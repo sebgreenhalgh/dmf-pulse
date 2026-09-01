@@ -1,0 +1,37 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001C"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Live FPL bootstrap Decimal and nested-dictionary canonicalisation hotfix"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001C"
+required_base_commit: "52480d61bcc7aab52441cc310a7f946510dae5de"
+parent_exact_sha_ci: 33556684536
+objective: >-
+  Correct the local official-FPL parser projection so Decimal and datetime values nested in
+  declared JSON dictionaries are recursively converted before semantic hashing or artifact
+  serialization, without changing the repository-wide canonical JSON contract.
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A12-ops-assurance"
+in_scope:
+  - "Recursive string-keyed dictionary handling in FPL contract projection and parsed artifacts."
+  - "Frozen-hash, Decimal-fidelity, order-independence and non-finite-number regressions."
+  - "Real public bootstrap parse and public-first snapshot progression verification."
+permissions:
+  official_fpl_network: "operator_initiated_low_volume_get_only"
+  authenticated_current_team: "existing_environment_only_after_public_snapshot_progression"
+  authentication_or_credentials: "existing_environment_or_hidden_prompt_only"
+  fpl_raw_storage: "forbidden"
+  fpl_derived_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Generic canonical JSON serializer changes or unrelated semantic-hash refreshes."
+  - "Odds acquisition, current-score-prior, optimiser, captaincy or writeback changes."
+  - "One-command redesign, credential persistence or authenticated-FPL behavior changes."
+  - "PR, merge, tag or production activation."
+required_execution_status: "REAL_PUBLIC_FPL_BOOTSTRAP_CANONICALISATION_VERIFIED"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

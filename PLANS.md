@@ -1577,3 +1577,26 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   retry the one-command only through existing environment mechanisms, and record the next blocker.
 - [ ] Seal ticket evidence/manifests, validate repository and secrets, build, push the final SHA,
   require exact-SHA CI green, and stop without post-CI mutation.
+
+# PRIVATE-V1-ONE-COMMAND-001C live bootstrap canonicalisation hotfix
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001C`; immutable parent
+  `52480d61bcc7aab52441cc310a7f946510dae5de`; parent exact-SHA CI `33556684536`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001C`.
+- Scope: recursively project ordinary string-keyed JSON dictionaries in the local FPL parser and
+  declared artifact path while preserving exact Decimal strings and frozen unrelated hashes.
+- Safety: no generic canonical serializer, Odds, authenticated behavior, one-command architecture,
+  persistence, PR, merge, tag, production activation, or credential-store access changes.
+
+## Hotfix checkpoints
+
+- [x] Verify the exact parent/CI and isolated branch; reproduce the one-request live bootstrap
+  `Decimal is not JSON serializable` failure without retaining or displaying the body.
+- [x] Add red regressions for recursive dictionaries, mixed containers, datetime, Decimal form,
+  mapping keys, order-independent hashes, frozen hashes, artifact safety and non-finite numbers.
+- [x] Implement the narrow local recursive transformation without changing generic canonical JSON.
+- [x] Run focused plus affected ingestion/private-v1, Ruff, mypy, and branch-coverage gates.
+- [x] Prove real Windows bootstrap parse and snapshot progression, run installed-wheel checks, and
+  retry the one-command only through existing runtime credentials.
+- [ ] Seal ticket evidence/manifests, validate repository and secrets, build, push the final SHA,
+  require exact-SHA CI green, and stop without post-CI mutation.

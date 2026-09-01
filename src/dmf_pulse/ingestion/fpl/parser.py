@@ -298,6 +298,15 @@ def parsed_artifact(value: ParsedFplResource) -> dict[str, object]:
                 for name, field in item.__class__.model_fields.items()
                 if field.is_required() or name in item.model_fields_set
             }
+        if isinstance(item, dict):
+            result: dict[str, object] = {}
+            for key, child in item.items():
+                if not isinstance(key, str):
+                    raise IngestionError(
+                        "INTERNAL_INVARIANT", "FPL JSON object key is not a string"
+                    )
+                result[key] = declared(child)
+            return result
         if isinstance(item, list):
             return [declared(child) for child in item]
         if isinstance(item, tuple):
@@ -433,6 +442,13 @@ def _contract_projection(value: object) -> object:
                 projection[name] = {"missingness": "NOT_PUBLISHED"}
             else:
                 projection[name] = _contract_projection(getattr(value, name))
+        return projection
+    if isinstance(value, dict):
+        projection = {}
+        for key, child in value.items():
+            if not isinstance(key, str):
+                raise IngestionError("INTERNAL_INVARIANT", "FPL JSON object key is not a string")
+            projection[key] = _contract_projection(child)
         return projection
     if isinstance(value, list):
         return [_contract_projection(item) for item in value]
