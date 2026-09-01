@@ -91,26 +91,6 @@
       "sha256": "4a85e7700a19dfdfc97bbbc57a78e932c27f9e2d7ae1ebfb597582de71c141ad"
     },
     {
-      "bytes": 1634,
-      "path": ".test-tmp/migration-final-report.json",
-      "sha256": "6230590c082228d080093ee706dc5f61d85068bf756c3c7ba9dcf9222f9b6f47"
-    },
-    {
-      "bytes": 712243,
-      "path": ".test-tmp/migration-final-schema.json",
-      "sha256": "b0f8b2c1f193fe1a1ec5c892db72ffa1369b0fb14eb84aaf8f5be8f965d59ea3"
-    },
-    {
-      "bytes": 245242,
-      "path": ".test-tmp/migration-final.sql",
-      "sha256": "393b10e6fb6c7f734b0d8a5852e5bab5d13b13b9d3af01c530d404658f394881"
-    },
-    {
-      "bytes": 126747,
-      "path": ".test-tmp/new-coverage.json",
-      "sha256": "f817d6304dd6afdd7e396990e51808c2606836435d71e949d55ba4f070bcbbd3"
-    },
-    {
       "bytes": 22690,
       "path": "2026_27_RULES_VERIFICATION_REPORT.md",
       "sha256": "12ee3c80b687a24e26e93bdb371f4588c72b8be427bec67484d9882db949aa51"

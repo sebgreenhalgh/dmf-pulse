@@ -18,13 +18,15 @@ payloads and credentials retained by the real command attempt: zero.
 | PostgreSQL 18.4 migration matrix | PASS; base/baseline/head/downgrade/upgrade matrix, metadata drift and preservation checks |
 | PostgreSQL integration population | PASS; `155 passed, 151 deselected in 277.68s` |
 | Performance population | PASS; `3 passed, 1 deselected in 10.45s` |
-| Whole non-performance collection | `4042 passed, 3 deselected in 1814.45s`; three expected pre-seal/isolation failures were stale manifest plus two tests given an in-repository `--basetemp`; each is rerun after sealing with an external temp root |
+| Whole non-performance collection | `4042 passed, 3 deselected in 1814.45s`; three expected pre-seal/isolation failures were stale manifest plus two tests given an in-repository `--basetemp` |
+| Post-seal isolation/manifest reruns | PASS; both installed-runtime isolation tests passed with an external temp root; clean-checkout manifest test `1 passed in 1.14s` |
 | Ruff format/lint | PASS over `src` and `tests`; zero findings |
 | Strict mypy | PASS; zero issues in 280 source files |
 | Frozen dependency sync | PASS |
 | Build | PASS; `dmf_pulse-0.2.0.tar.gz` and `dmf_pulse-0.2.0-py3-none-any.whl` |
 | Dedicated external installed-wheel one-command proof | PASS; module imported from external `site-packages`; `dmf pulse --help` exposed only `--entry-id`; network-blocked synthetic E2E `1 passed in 32.72s`; temporary environment removed |
-| Secret scan | PASS; zero findings before final sealing; rerun required after manifests |
+| Clean-checkout repository validation | PASS; 1,274-file manifests; zero repository errors |
+| Secret scan | PASS from clean checkout after sealing; zero findings |
 | Genuine operator command | BLOCKED before provider access with exact output `THE_ODDS_API_KEY is missing.`; both required environment credentials absent; provider calls zero |
 | Exact final-SHA CI | Pending final push; must not be inferred before the exact SHA run completes |
 
