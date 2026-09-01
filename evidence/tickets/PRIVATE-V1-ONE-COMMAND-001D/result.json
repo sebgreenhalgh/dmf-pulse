@@ -1,0 +1,11 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI_AND_INDEPENDENT_REVIEW",
+  "external_installed_wheel_current_compilation": "PASS",
+  "game_settings_adapter_status": "PASS",
+  "official_fpl_persistent_artifacts_created": 0,
+  "real_one_command_status": "BLOCKED_MISSING_ODDS_CREDENTIAL",
+  "snapshot_progression": "BOOTSTRAP_FIXTURES_ENTRY_HISTORY_TRANSFERS_PICKS_THEN_FPL_CREDENTIAL_MISSING",
+  "source_tree_windows_current_compilation": "PASS",
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001D"
+}

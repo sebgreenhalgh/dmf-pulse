@@ -16,6 +16,7 @@ from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import ExitStack, contextmanager, suppress
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Literal, Self
 
@@ -99,9 +100,21 @@ def _canonical_game_setting(value: object) -> object:
     """Project parser-accepted settings to canonical JSON."""
 
     if isinstance(value, dict):
-        return {str(key): _canonical_game_setting(child) for key, child in value.items()}
+        result: dict[str, object] = {}
+        for key, child in value.items():
+            if not isinstance(key, str):
+                raise IngestionError("INTERNAL_INVARIANT", "FPL game settings are invalid")
+            result[key] = _canonical_game_setting(child)
+        return result
     if isinstance(value, list):
         return [_canonical_game_setting(child) for child in value]
+    if isinstance(value, Decimal):
+        if not value.is_finite():
+            raise IngestionError("INTERNAL_INVARIANT", "FPL game settings are invalid")
+        if value == 0:
+            return "0"
+        rendered = format(value, "f")
+        return rendered.rstrip("0").rstrip(".") if "." in rendered else rendered
     if value is None or isinstance(value, (bool, int, str)):
         return value
     raise IngestionError("INTERNAL_INVARIANT", "FPL game settings are invalid")

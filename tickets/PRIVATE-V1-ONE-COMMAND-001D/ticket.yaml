@@ -1,0 +1,37 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001D"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Live FPL game-settings Decimal adapter hotfix"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001D"
+required_base_commit: "876b451c7a44502f965fa83f9601f79dcfe816b0"
+parent_exact_sha_ci: 33562042171
+objective: >-
+  Correct the local current-FPL game-settings projection so finite Decimal values admitted by
+  the strict FPL parser compile to deterministic exact JSON-compatible strings, without changing
+  the parser or repository-wide canonical JSON contract.
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A12-ops-assurance"
+in_scope:
+  - "Finite Decimal handling and strict string-key enforcement in the current-FPL adapter."
+  - "Decimal-fidelity, stable-hash, manual/direct compatibility and invalid-type regressions."
+  - "Real public current-input compilation and public-first snapshot progression verification."
+permissions:
+  official_fpl_network: "operator_initiated_low_volume_get_only"
+  authenticated_current_team: "existing_environment_only_after_public_snapshot_progression"
+  authentication_or_credentials: "existing_environment_or_hidden_prompt_only"
+  fpl_raw_storage: "forbidden"
+  fpl_derived_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Parser or generic canonical JSON serializer changes and unrelated hash refreshes."
+  - "Odds, current-score-prior, optimiser, captaincy or writeback changes."
+  - "One-command redesign, credential persistence or authenticated-FPL transport changes."
+  - "PR, merge, tag or production activation."
+required_execution_status: "REAL_PUBLIC_FPL_GAME_SETTINGS_COMPILATION_VERIFIED"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

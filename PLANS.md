@@ -1600,3 +1600,26 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   retry the one-command only through existing runtime credentials.
 - [ ] Seal ticket evidence/manifests, validate repository and secrets, build, push the final SHA,
   require exact-SHA CI green, and stop without post-CI mutation.
+
+# PRIVATE-V1-ONE-COMMAND-001D live game-settings adapter hotfix
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001D`; immutable parent
+  `876b451c7a44502f965fa83f9601f79dcfe816b0`; parent exact-SHA CI `33562042171`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001D`.
+- Scope: accept the strict parser's finite `Decimal` values in the local current-FPL
+  game-settings projection, preserving exact normalized decimal strings and JSON object keys.
+- Safety: no parser, generic canonical serializer, Odds, authentication, score-prior, optimiser,
+  captaincy, one-command architecture, persistence, PR, merge, tag or activation changes.
+
+## Hotfix checkpoints
+
+- [x] Verify the exact parent/CI, authority scopes and isolated branch; retain the 001C live
+  reproduction metadata proving bootstrap and fixtures parse before current-input assembly fails.
+- [x] Add red regressions for direct/nested/list Decimal values, normalization, precision,
+  primitives, unsupported objects, non-string keys, stable hashes and manual/direct compilation.
+- [x] Implement the narrow local adapter correction without changing parser or canonical JSON.
+- [x] Run focused plus affected ingestion/private-v1, branch coverage, Ruff, mypy and frozen sync.
+- [x] Prove real source-tree and installed-wheel bundle compilation, public snapshot progression,
+  and the genuine one-command outcome without retaining bodies, entry ID or credentials.
+- [ ] Seal evidence/manifests, validate repository and secrets, build, push the final SHA, require
+  exact-SHA CI green, and stop without post-CI mutation.
