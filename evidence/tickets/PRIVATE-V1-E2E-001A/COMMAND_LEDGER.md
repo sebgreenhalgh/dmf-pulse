@@ -22,6 +22,7 @@ All commands ran from isolated worktree `review_pack/e2e` on
 | Dedicated installed-wheel private replay | PASS outside source tree with exact lock and DNS/socket guard |
 | Repository validation | PASS, zero errors after active PRC-013 manifest refresh |
 | Secret scan | PASS, zero findings after generated-test cleanup |
+| Linux CI CLI-help portability check | Initial exact-SHA run `33472353791`: 852 shard tests passed, then one ANSI-rendered help-text substring assertion failed; replaced with typed command-option introspection; targeted CLI suite `7 passed in 2.01s`, Ruff and mypy PASS |
 | Synthetic replay manifest | `a4b1c8e2a55fb361bc87481e156641151035bddc6d7730e101334f46c95c187d` |
 | Real current operator attempt | `IMPLEMENTED_REAL_RUN_BLOCKED`; no recommendation or manifest emitted |
 

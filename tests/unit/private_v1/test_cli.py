@@ -5,6 +5,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from typer.core import TyperGroup
+from typer.main import get_command
 from typer.testing import CliRunner
 
 from dmf_pulse.cli.app import app
@@ -20,11 +22,23 @@ def test_private_v1_run_and_replay_are_public_commands() -> None:
     assert root.exit_code == run.exit_code == replay.exit_code == 0
     assert "run" in root.stdout
     assert "replay" in root.stdout
-    assert "--input" in run.stdout
-    assert "--freeze-dir" in run.stdout
-    assert "--output" in run.stdout
-    assert "--bundle" in replay.stdout
-    assert "--output" in replay.stdout
+
+    root_command = get_command(app)
+    assert isinstance(root_command, TyperGroup)
+    private_command = root_command.commands["private-v1"]
+    assert isinstance(private_command, TyperGroup)
+    run_options = {
+        option
+        for parameter in private_command.commands["run"].params
+        for option in getattr(parameter, "opts", ())
+    }
+    replay_options = {
+        option
+        for parameter in private_command.commands["replay"].params
+        for option in getattr(parameter, "opts", ())
+    }
+    assert {"--input", "--freeze-dir", "--output"} <= run_options
+    assert {"--bundle", "--output"} <= replay_options
 
 
 def test_private_v1_cli_rejects_malformed_input_without_disclosure(tmp_path: Path) -> None:

@@ -5736,9 +5736,9 @@
       "sha256": "29be41df854a4fef252c1be4a0f45b171255451c9972cd633bbba3d66da069b9"
     },
     {
-      "bytes": 6525,
+      "bytes": 7041,
       "path": "tests/unit/private_v1/test_cli.py",
-      "sha256": "996a172d5f28693e83ae985c1e5afe745a84feea91c3121bdbd997a144874b3f"
+      "sha256": "312e9c50a93e5ab9d59da9b1eaf40cb79cc63803965ba4906cf85a1e8cb27223"
     },
     {
       "bytes": 7013,
