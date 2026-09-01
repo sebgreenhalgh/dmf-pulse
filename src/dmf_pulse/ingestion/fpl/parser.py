@@ -161,7 +161,10 @@ class PlayerElement(PayloadModel):
     cost_change_start_fall: StrictInt | None = None
     cost_change_event_fall: StrictInt | None = None
     minutes: StrictInt | None = Field(default=None, ge=0)
+    starts: StrictInt | None = Field(default=None, ge=0)
     total_points: StrictInt | None = None
+    can_select: StrictBool | None = None
+    removed: StrictBool | None = None
     optional_fields = frozenset(
         {
             "chance_of_playing_next_round",
@@ -178,7 +181,10 @@ class PlayerElement(PayloadModel):
             "cost_change_start_fall",
             "cost_change_event_fall",
             "minutes",
+            "starts",
             "total_points",
+            "can_select",
+            "removed",
         }
     )
 

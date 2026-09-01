@@ -12,6 +12,7 @@ from dmf_pulse.ingestion.errors import IngestionError
 
 SYSTEMD_CREDENTIAL_DIRECTORY_VARIABLE = "CREDENTIALS_DIRECTORY"
 SYSTEMD_CREDENTIAL_FILE = "the_odds_api_key"
+ODDS_API_KEY_ENVIRONMENT_VARIABLE = "THE_ODDS_API_KEY"
 _MIN_CREDENTIAL_LENGTH = 16
 _MAX_CREDENTIAL_LENGTH = 512
 _ALLOWED_CREDENTIAL_CHARACTERS = frozenset(
@@ -123,6 +124,40 @@ class RuntimeOddsCredentialProvider:
         return None
 
 
+class EnvironmentOddsCredentialProvider:
+    """Resolve the ticket-approved one-command environment secret only at transport time."""
+
+    __slots__ = ("_environment_override", "_use_process_environment")
+
+    def __init__(self, *, environment: Mapping[str, str] | None = None) -> None:
+        self._use_process_environment = environment is None
+        self._environment_override = (
+            None if environment is None else environment.get(ODDS_API_KEY_ENVIRONMENT_VARIABLE)
+        )
+
+    def __repr__(self) -> str:
+        return "EnvironmentOddsCredentialProvider(<runtime-secret>)"
+
+    def get_credential(self) -> str:
+        value = (
+            os.environ.get(ODDS_API_KEY_ENVIRONMENT_VARIABLE)
+            if self._use_process_environment
+            else self._environment_override
+        )
+        if value is None or not value:
+            raise IngestionError(
+                "CREDENTIAL_UNAVAILABLE", f"{ODDS_API_KEY_ENVIRONMENT_VARIABLE} is missing."
+            )
+        return validate_runtime_credential(value)
+
+    def _configured(self) -> bool:
+        return bool(
+            os.environ.get(ODDS_API_KEY_ENVIRONMENT_VARIABLE)
+            if self._use_process_environment
+            else self._environment_override
+        )
+
+
 def credential_is_configured(provider: CredentialProvider) -> bool:
     """Return only whether one valid credential resolves, suppressing all detail."""
 
@@ -147,4 +182,6 @@ def credential_configuration_hint(provider: CredentialProvider) -> bool | None:
         return True
     if isinstance(provider, RuntimeOddsCredentialProvider):
         return bool(provider._credential_directory())
+    if isinstance(provider, EnvironmentOddsCredentialProvider):
+        return provider._configured()
     return None

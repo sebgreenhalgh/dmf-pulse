@@ -1,5 +1,29 @@
 # DMF Pulse execution plans
 
+# PRIVATE-V1-ONE-COMMAND-001A direct private recommendation
+
+- Parent/branch: immutable accepted parent `ba87691c559559757e7cb06f06269a85706268a8`
+  on `readiness/PRIVATE-V1-ONE-COMMAND-001A`.
+- Scope: one `dmf pulse --entry-id <id>` command that performs bounded official-FPL private
+  reads, assembles current provider-observed manager state and accepted current model inputs in
+  memory, and emits the first private recommendation with its no-action comparator.
+- Safety: explicit contractual-risk profile; GET-only allowlist; transient bodies and credentials;
+  no persistence, scraping, write endpoint, cohort access, scheduler, public recommendation,
+  activation, PR, merge, or tag.
+
+## PRIVATE-V1-ONE-COMMAND-001A checkpoints
+
+- [x] Verify the exact parent and green parent CI; reconcile governing authority and inspect the
+  current official-FPL read behavior without retaining response bodies.
+- [x] OC01: implement the separate direct-read rights profile, bounded transport, secret-safe
+  bearer handling, direct official input compilation, and provider-observed manager contracts.
+- [x] OC02: assemble deterministic current mappings, accepted Stage-7 model projections, score
+  priors, ownership, candidate policy, market constraints, and stale-prior assignments in memory.
+- [x] OC03: expose the one-command CLI, pass synthetic network-blocked E2E/adversarial tests, and
+  attempt the real entry only after all engineering gates are green.
+- [ ] Pass full static/test/build/installed-wheel/repository/security gates, seal safe evidence,
+  commit and push the exact final SHA, and require exact-SHA CI success.
+
 # CURRENT-AVAILABILITY-001B private manual transient minutes override
 
 - Ticket: `CURRENT-AVAILABILITY-001B`; immutable merged parent

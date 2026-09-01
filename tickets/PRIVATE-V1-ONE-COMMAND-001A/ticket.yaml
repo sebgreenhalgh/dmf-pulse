@@ -1,0 +1,48 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001A"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Direct FPL read and automatic private recommendation assembly"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001A"
+required_base_commit: "ba87691c559559757e7cb06f06269a85706268a8"
+parent_exact_sha_ci: 33495730710
+objective: >-
+  Provide one operator-initiated, read-only, zero-retention command that acquires official-FPL
+  current facts, current Odds and the accepted score prior; automatically binds the existing
+  Stage 7-11/captaincy inputs; and prints a private non-production recommendation.
+authority_scopes:
+  - "A2-rules"
+  - "A4-FPL-ingestion"
+  - "A5-odds-ingestion"
+  - "A6-market-normalisation"
+  - "A7-minutes"
+  - "A8-event-distribution"
+  - "A9-FPL-points"
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "A12-operational-assurance"
+in_scope:
+  - "Separate accepted-risk official-FPL operator-initiated GET-only rights profile."
+  - "Bounded direct public reads and authenticated current-team read using a bearer token."
+  - "Automatic current catalogue, target GW, manager, Stage-7, Odds, mappings, score prior, ownership, candidate and stale-prior assembly."
+  - "Existing exact Stage 8-11, no-action comparator and captaincy execution."
+  - "Top-level dmf pulse --entry-id command and offline provider-shaped E2E proof."
+permissions:
+  official_fpl_network: "operator_initiated_low_volume_get_only"
+  authenticated_current_team: "read_only_bearer_in_memory"
+  authentication_or_credentials: "environment_or_hidden_prompt_only"
+  fpl_raw_storage: "forbidden"
+  fpl_derived_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Any official-FPL write, automated lineup, transfer, captain or chip action."
+  - "Password collection, browser credential-store access, token persistence or disclosure."
+  - "Mass-manager access, polling, scheduling, redistribution, commercial use or production service."
+  - "Alternative Stage 7-11, scorer, optimiser or captaincy implementation."
+  - "PR, merge, tag or global rules activation."
+required_execution_status: "REAL_PRIVATE_TRANSIENT_RECOMMENDATION"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

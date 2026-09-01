@@ -18,7 +18,7 @@ from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated, Literal, Self
+from typing import TYPE_CHECKING, Annotated, Literal, Self
 
 from pydantic import (
     BaseModel,
@@ -72,6 +72,9 @@ from dmf_pulse.rules.private_transient import (
     validate_private_transient_rules_authority,
 )
 
+if TYPE_CHECKING:
+    from dmf_pulse.ingestion.fpl.manager_provider import ProviderCurrentTeam
+
 CURRENT_MANAGER_CONTRACT_VERSION: Literal["current-manager-state-v1"] = "current-manager-state-v1"
 MAX_MANAGER_DECLARATION_BYTES = 262_144
 SUPPORTED_FPL_SEASON_CODE: Literal["2026/27"] = "2026/27"
@@ -100,6 +103,15 @@ _LIMITATIONS = (
     "NOT_THE_UNIFIED_CURRENT_FPL_STATE_001D_BUNDLE",
     "NO_DOWNSTREAM_OPTIMISATION_EXECUTED",
 )
+_PROVIDER_LIMITATIONS = (
+    "MANAGER_FACTS_PROVIDER_OBSERVED_AT_INFORMATION_CUTOFF",
+    "OFFICIAL_FPL_RESPONSE_MEMORY_ONLY",
+    "NO_PERSISTENCE_CACHE_BACKUP_OR_DATABASE",
+    "ACTIVE_OR_PENDING_FREE_HIT_REQUIRES_UNAVAILABLE_RESTORATION_STATE",
+    "CLUB_QUOTA_GRANDFATHERING_NOT_INFERRED",
+    "NOT_THE_UNIFIED_CURRENT_FPL_STATE_001D_BUNDLE",
+    "NO_DOWNSTREAM_OPTIMISATION_EXECUTED",
+)
 
 
 def _normalize_utc(value: datetime, *, label: str) -> datetime:
@@ -111,9 +123,11 @@ def _normalize_utc(value: datetime, *, label: str) -> datetime:
 class CurrentManagerAttestation(FrozenModel):
     """Explicit human attestation without an account identity or credential."""
 
-    declaration_method: Literal["OPERATOR_DECLARED"] = "OPERATOR_DECLARED"
-    attestation_status: Literal["HUMAN_ATTESTED"] = "HUMAN_ATTESTED"
-    provider_verification: Literal["NOT_PROVIDER_VERIFIED"] = "NOT_PROVIDER_VERIFIED"
+    declaration_method: Literal["OPERATOR_DECLARED", "PROVIDER_OBSERVED"] = "OPERATOR_DECLARED"
+    attestation_status: Literal["HUMAN_ATTESTED", "PROVIDER_OBSERVED"] = "HUMAN_ATTESTED"
+    provider_verification: Literal["NOT_PROVIDER_VERIFIED", "PROVIDER_VERIFIED"] = (
+        "NOT_PROVIDER_VERIFIED"
+    )
     declared_at: datetime
     attested_at: datetime
     operator_reference: StrictStr = Field(
@@ -131,6 +145,17 @@ class CurrentManagerAttestation(FrozenModel):
     def chronology_is_valid(self) -> Self:
         if self.attested_at < self.declared_at:
             raise ValueError("manager attestation cannot precede declaration")
+        expected = (
+            ("OPERATOR_DECLARED", "HUMAN_ATTESTED", "NOT_PROVIDER_VERIFIED")
+            if self.declaration_method == "OPERATOR_DECLARED"
+            else ("PROVIDER_OBSERVED", "PROVIDER_OBSERVED", "PROVIDER_VERIFIED")
+        )
+        if (
+            self.declaration_method,
+            self.attestation_status,
+            self.provider_verification,
+        ) != expected:
+            raise ValueError("manager attestation source labels are inconsistent")
         return self
 
 
@@ -195,7 +220,7 @@ class CurrentManagerDeclaration(FrozenModel):
     """Strict operator-owned declaration parsed from one bounded local JSON object."""
 
     schema_version: Literal["1.0.0"] = "1.0.0"
-    source_class: Literal["OPERATOR_DECLARED"] = "OPERATOR_DECLARED"
+    source_class: Literal["OPERATOR_DECLARED", "PROVIDER_OBSERVED"] = "OPERATOR_DECLARED"
     season_code: Literal["2026/27"] = SUPPORTED_FPL_SEASON_CODE
     target_gameweek: PositiveInt
     information_cutoff: datetime
@@ -221,6 +246,8 @@ class CurrentManagerDeclaration(FrozenModel):
         token_ids = tuple(item.token_id for item in self.chip_tokens)
         if len(token_ids) != len(set(token_ids)):
             raise ValueError("manager chip-token declarations must be unique")
+        if self.source_class != self.attestation.declaration_method:
+            raise ValueError("manager declaration and attestation sources differ")
         return self
 
 
@@ -335,10 +362,10 @@ class CurrentManagerStateLineage(FrozenModel):
 
 
 class CurrentManagerRuntimeBoundary(FrozenModel):
-    manual_import: Literal["ALLOW"] = "ALLOW"
+    manual_import: Literal["ALLOW", "DENY"] = "ALLOW"
     transient_processing: Literal["ALLOW"] = "ALLOW"
     private_internal_use: Literal["ALLOW"] = "ALLOW"
-    automated_access: Literal["DENY"] = "DENY"
+    automated_access: Literal["ALLOW", "DENY"] = "DENY"
     raw_storage: Literal["DENY"] = "DENY"
     derived_storage: Literal["DENY"] = "DENY"
     cache: Literal["DENY"] = "DENY"
@@ -346,7 +373,15 @@ class CurrentManagerRuntimeBoundary(FrozenModel):
     storage_mode: Literal["TRANSIENT_IN_MEMORY"] = "TRANSIENT_IN_MEMORY"
     persistence_performed: Literal[False] = False
     database_accessed: Literal[False] = False
-    network_called: Literal[False] = False
+    network_called: bool = False
+
+    @model_validator(mode="after")
+    def acquisition_is_exact(self) -> Self:
+        if self.network_called != (self.automated_access == "ALLOW"):
+            raise ValueError("manager network and automated-access flags differ")
+        if self.manual_import == self.automated_access:
+            raise ValueError("manager acquisition must be exactly manual or direct")
+        return self
 
 
 class CurrentManagerStateSummary(FrozenModel):
@@ -355,9 +390,11 @@ class CurrentManagerStateSummary(FrozenModel):
     schema_version: Literal["1.0.0"] = "1.0.0"
     contract: Literal["CURRENT_MANAGER_STATE_SUMMARY"] = "CURRENT_MANAGER_STATE_SUMMARY"
     status: Literal["VALID"] = "VALID"
-    source_class: Literal["OPERATOR_DECLARED"] = "OPERATOR_DECLARED"
-    attestation_status: Literal["HUMAN_ATTESTED"] = "HUMAN_ATTESTED"
-    provider_verification: Literal["NOT_PROVIDER_VERIFIED"] = "NOT_PROVIDER_VERIFIED"
+    source_class: Literal["OPERATOR_DECLARED", "PROVIDER_OBSERVED"] = "OPERATOR_DECLARED"
+    attestation_status: Literal["HUMAN_ATTESTED", "PROVIDER_OBSERVED"] = "HUMAN_ATTESTED"
+    provider_verification: Literal["NOT_PROVIDER_VERIFIED", "PROVIDER_VERIFIED"] = (
+        "NOT_PROVIDER_VERIFIED"
+    )
     season_code: Literal["2026/27"] = SUPPORTED_FPL_SEASON_CODE
     target_gameweek: PositiveInt
     declared_at: datetime
@@ -378,7 +415,7 @@ class CurrentManagerStateSummary(FrozenModel):
     storage_mode: Literal["TRANSIENT_IN_MEMORY"] = "TRANSIENT_IN_MEMORY"
     persistence_performed: Literal[False] = False
     database_accessed: Literal[False] = False
-    network_called: Literal[False] = False
+    network_called: bool = False
 
 
 class CurrentManagerStateBundle(FrozenModel):
@@ -388,9 +425,11 @@ class CurrentManagerStateBundle(FrozenModel):
     contract: Literal["CURRENT_MANAGER_STATE_BUNDLE"] = "CURRENT_MANAGER_STATE_BUNDLE"
     current_contract_version: Literal["current-manager-state-v1"] = CURRENT_MANAGER_CONTRACT_VERSION
     status: Literal["VALID"] = "VALID"
-    source_class: Literal["OPERATOR_DECLARED"] = "OPERATOR_DECLARED"
-    attestation_status: Literal["HUMAN_ATTESTED"] = "HUMAN_ATTESTED"
-    provider_verification: Literal["NOT_PROVIDER_VERIFIED"] = "NOT_PROVIDER_VERIFIED"
+    source_class: Literal["OPERATOR_DECLARED", "PROVIDER_OBSERVED"] = "OPERATOR_DECLARED"
+    attestation_status: Literal["HUMAN_ATTESTED", "PROVIDER_OBSERVED"] = "HUMAN_ATTESTED"
+    provider_verification: Literal["NOT_PROVIDER_VERIFIED", "PROVIDER_VERIFIED"] = (
+        "NOT_PROVIDER_VERIFIED"
+    )
     season_code: Literal["2026/27"] = SUPPORTED_FPL_SEASON_CODE
     target_gameweek: PositiveInt
     as_of: datetime
@@ -460,7 +499,10 @@ class CurrentManagerStateBundle(FrozenModel):
             or self.lineage.manager_declaration_semantic_sha256
             != current_manager_declaration_semantic_sha256(self.declaration)
             or self.lineage.chip_inventory_sha256 != self.chip_inventory.inventory_hash
-            or self.limitations != _LIMITATIONS
+            or self.source_class != self.declaration.source_class
+            or self.runtime.network_called != (self.source_class == "PROVIDER_OBSERVED")
+            or self.limitations
+            != (_LIMITATIONS if self.source_class == "OPERATOR_DECLARED" else _PROVIDER_LIMITATIONS)
         ):
             raise ValueError("current manager bundle lineage is inconsistent")
         if not (
@@ -494,6 +536,9 @@ class CurrentManagerStateBundle(FrozenModel):
     def safe_summary(self) -> CurrentManagerStateSummary:
         counts = Counter(token.status.value for token in self.chip_inventory.tokens)
         return CurrentManagerStateSummary(
+            source_class=self.source_class,
+            attestation_status=self.attestation_status,
+            provider_verification=self.provider_verification,
             target_gameweek=self.target_gameweek,
             declared_at=self.attestation.declared_at,
             attested_at=self.attestation.attested_at,
@@ -510,6 +555,7 @@ class CurrentManagerStateBundle(FrozenModel):
             fpl_input_semantic_sha256=self.lineage.fpl_input_semantic_sha256,
             ruleset_sha256=self.lineage.ruleset_sha256,
             chip_bundle_sha256=self.lineage.chip_bundle_sha256,
+            network_called=self.runtime.network_called,
         )
 
 
@@ -708,13 +754,24 @@ def _revalidate_fpl_input(value: CurrentFplInputBundle) -> None:
         raise IngestionError(
             "MAPPING_CONFLICT", "accepted current FPL input failed structural revalidation"
         ) from None
+    direct = value.rights.rights_profile_id == "fpl_official_private_operator_initiated_read_v1"
     expected_decisions = (
-        ("manual_import", "ALLOW"),
-        ("transient_processing", "ALLOW"),
-        ("private_internal_use", "ALLOW"),
-        ("automated_access", "DENY"),
-        ("raw_storage", "DENY"),
-        ("derived_storage", "DENY"),
+        (
+            ("automated_access", "ALLOW"),
+            ("transient_processing", "ALLOW"),
+            ("private_internal_use", "ALLOW"),
+            ("raw_storage", "DENY"),
+            ("derived_storage", "DENY"),
+        )
+        if direct
+        else (
+            ("manual_import", "ALLOW"),
+            ("transient_processing", "ALLOW"),
+            ("private_internal_use", "ALLOW"),
+            ("automated_access", "DENY"),
+            ("raw_storage", "DENY"),
+            ("derived_storage", "DENY"),
+        )
     )
     decisions = tuple((str(item.capability), item.decision) for item in value.rights.decisions)
     if (
@@ -730,12 +787,16 @@ def _revalidate_fpl_input(value: CurrentFplInputBundle) -> None:
     rights = value.rights
     if (
         decisions != expected_decisions
-        or rights.rights_profile_id != "fpl_official_private_manual_v1"
+        or rights.rights_profile_id
+        not in {
+            "fpl_official_private_manual_v1",
+            "fpl_official_private_operator_initiated_read_v1",
+        }
         or rights.rights_profile_version != "1.0.0"
-        or rights.automated_access_profile_value != "DENY"
+        or rights.automated_access_profile_value != ("ALLOW" if direct else "DENY")
         or rights.raw_storage_profile_value != "DENY"
         or rights.derived_storage_profile_value not in {"UNKNOWN", "DENY"}
-        or rights.automated_access != "DENY"
+        or rights.automated_access != ("ALLOW" if direct else "DENY")
         or rights.raw_storage != "DENY"
         or rights.derived_storage != "DENY"
         or rights.cache != "DENY"
@@ -743,9 +804,9 @@ def _revalidate_fpl_input(value: CurrentFplInputBundle) -> None:
         or rights.database_accessed is not False
         or rights.raw_storage_performed is not False
         or rights.derived_storage_performed is not False
-        or rights.operator_delete_required is not True
+        or rights.operator_delete_required is not (not direct)
         or rights.disclosure_mode != "SAFE_SUMMARY_ONLY"
-        or value.provenance.transport_called is not False
+        or value.provenance.transport_called is not direct
         or value.provenance.database_accessed is not False
         or value.provenance.raw_storage_performed is not False
         or value.provenance.derived_storage_performed is not False
@@ -1201,6 +1262,9 @@ def _build_bundle(
         chip_inventory_sha256=inventory.inventory_hash,
     )
     provisional = CurrentManagerStateBundle.model_construct(
+        source_class=canonical_declaration.source_class,
+        attestation_status=canonical_declaration.attestation.attestation_status,
+        provider_verification=canonical_declaration.attestation.provider_verification,
         target_gameweek=canonical_declaration.target_gameweek,
         as_of=canonical_declaration.attestation.declared_at,
         received_at=received_at,
@@ -1217,8 +1281,20 @@ def _build_bundle(
         overall_rank=canonical_declaration.overall_rank,
         attestation=canonical_declaration.attestation,
         lineage=lineage,
-        runtime=CurrentManagerRuntimeBoundary(),
-        limitations=_LIMITATIONS,
+        runtime=CurrentManagerRuntimeBoundary(
+            manual_import=(
+                "ALLOW" if canonical_declaration.source_class == "OPERATOR_DECLARED" else "DENY"
+            ),
+            automated_access=(
+                "DENY" if canonical_declaration.source_class == "OPERATOR_DECLARED" else "ALLOW"
+            ),
+            network_called=canonical_declaration.source_class == "PROVIDER_OBSERVED",
+        ),
+        limitations=(
+            _LIMITATIONS
+            if canonical_declaration.source_class == "OPERATOR_DECLARED"
+            else _PROVIDER_LIMITATIONS
+        ),
         semantic_sha256="0" * 64,
     )
     payload = provisional.model_dump(mode="python")
@@ -1272,6 +1348,85 @@ class CurrentManagerStateService:
             capability,
             received_at=received_at,
             usable_at=usable_at,
+        )
+
+    def compile_provider_observed(
+        self,
+        declaration: CurrentManagerDeclaration,
+        *,
+        fpl_input: CurrentFplInputBundle,
+        ruleset: CompiledRuleset,
+        capability: CapabilityArtifact,
+        private_rules_authority: PrivateTransientRulesAuthority | None = None,
+    ) -> CurrentManagerStateBundle:
+        """Compile an authenticated memory-only provider observation."""
+
+        if declaration.source_class != "PROVIDER_OBSERVED":
+            raise IngestionError(
+                "VALIDATION_FAILED", "provider manager declaration has the wrong source label"
+            )
+        received_at = self._clock_utc()
+        _revalidate_fpl_input(fpl_input)
+        active = _compile_active_rules(
+            ruleset,
+            capability,
+            private_rules_authority=private_rules_authority,
+            information_cutoff=fpl_input.provenance.information_cutoff,
+        )
+        _require_rules_match_catalogue(fpl_input, active)
+        usable_at = self._clock_utc()
+        if usable_at < received_at:
+            raise IngestionError(
+                "INTERNAL_INVARIANT", "current manager service clock moved backwards"
+            )
+        return _build_bundle(
+            declaration,
+            fpl_input,
+            active,
+            capability,
+            received_at=received_at,
+            usable_at=usable_at,
+        )
+
+    def compile_provider_snapshot(
+        self,
+        source: ProviderCurrentTeam,
+        *,
+        fpl_input: CurrentFplInputBundle,
+        ruleset: CompiledRuleset,
+        capability: CapabilityArtifact,
+        observed_at: datetime,
+        overall_points: int | None = None,
+        overall_rank: int | None = None,
+        private_rules_authority: PrivateTransientRulesAuthority | None = None,
+    ) -> CurrentManagerStateBundle:
+        """Adapt and compile one authenticated current-team provider response."""
+
+        from dmf_pulse.ingestion.fpl.manager_provider import (
+            provider_current_manager_declaration,
+        )
+
+        _revalidate_fpl_input(fpl_input)
+        active = _compile_active_rules(
+            ruleset,
+            capability,
+            private_rules_authority=private_rules_authority,
+            information_cutoff=fpl_input.provenance.information_cutoff,
+        )
+        declaration = provider_current_manager_declaration(
+            source,
+            fpl_input,
+            active.chips,
+            observed_at=observed_at,
+            overall_points=overall_points,
+            overall_rank=overall_rank,
+        )
+        return self.compile_provider_observed(
+            declaration,
+            fpl_input=fpl_input,
+            ruleset=ruleset,
+            capability=capability,
+            private_rules_authority=private_rules_authority,
         )
 
     def verify(

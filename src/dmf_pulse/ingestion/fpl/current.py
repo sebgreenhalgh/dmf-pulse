@@ -62,6 +62,9 @@ SUPPORTED_SEASON_CODE: Literal["2026/27"] = "2026/27"
 OFFICIAL_MANUAL_PROFILE_ID: Literal["fpl_official_private_manual_v1"] = (
     "fpl_official_private_manual_v1"
 )
+OFFICIAL_DIRECT_PROFILE_ID: Literal["fpl_official_private_operator_initiated_read_v1"] = (
+    "fpl_official_private_operator_initiated_read_v1"
+)
 
 _POSITION_CODES: Mapping[str, FPLPosition] = {
     "GK": FPLPosition.GK,
@@ -120,6 +123,24 @@ class CurrentFplInputRequest(FrozenModel):
     @classmethod
     def normalize_request_times(cls, value: datetime) -> datetime:
         return _normalize_utc(value, label="current FPL request timestamp")
+
+
+class CurrentFplDirectInputRequest(FrozenModel):
+    """Metadata for one memory-only operator-initiated direct response pair."""
+
+    competition_key: str = Field(min_length=1, max_length=40)
+    season_code: str = Field(pattern=r"^\d{4}/\d{2}$")
+    target_gameweek: int = Field(gt=0)
+    captured_at: datetime
+    information_cutoff: datetime
+    rights_profile_id: Literal["fpl_official_private_operator_initiated_read_v1"] = (
+        OFFICIAL_DIRECT_PROFILE_ID
+    )
+
+    @field_validator("captured_at", "information_cutoff")
+    @classmethod
+    def normalize_request_times(cls, value: datetime) -> datetime:
+        return _normalize_utc(value, label="direct current FPL request timestamp")
 
 
 class CurrentFplIdentity(FrozenModel):
@@ -198,6 +219,10 @@ class CurrentFplPlayer(FrozenModel):
     chance_of_playing_next_round: int | None = Field(default=None, ge=0, le=100)
     news: str | None = None
     news_added: datetime | None = None
+    season_minutes: int | None = Field(default=None, ge=0)
+    season_starts: int | None = Field(default=None, ge=0)
+    can_select: bool | None = None
+    removed: bool | None = None
 
     @field_validator("news_added")
     @classmethod
@@ -306,7 +331,9 @@ class CurrentFplProvenance(FrozenModel):
     provider_product: Literal["fantasy_premierleague"] = "fantasy_premierleague"
     parser_contract_version: Literal["fpl-reference-v1"] = "fpl-reference-v1"
     current_contract_version: Literal["current-fpl-input-v1"] = CURRENT_FPL_CONTRACT_VERSION
-    acquisition_mode: Literal["MANUAL_OPERATOR_CAPTURE"] = "MANUAL_OPERATOR_CAPTURE"
+    acquisition_mode: Literal["MANUAL_OPERATOR_CAPTURE", "OPERATOR_INITIATED_DIRECT_READ"] = (
+        "MANUAL_OPERATOR_CAPTURE"
+    )
     captured_at: datetime
     received_at: datetime
     information_cutoff: datetime
@@ -318,7 +345,7 @@ class CurrentFplProvenance(FrozenModel):
     provider_config_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     rights_config_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     input_bundle_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    transport_called: Literal[False] = False
+    transport_called: bool = False
     database_accessed: Literal[False] = False
     raw_storage_performed: Literal[False] = False
     derived_storage_performed: Literal[False] = False
@@ -332,18 +359,23 @@ class CurrentFplProvenance(FrozenModel):
     def temporal_order_is_valid(self) -> Self:
         if not (self.captured_at <= self.received_at <= self.usable_at <= self.information_cutoff):
             raise ValueError("current FPL provenance timestamps are out of order")
+        if self.transport_called != (self.acquisition_mode == "OPERATOR_INITIATED_DIRECT_READ"):
+            raise ValueError("current FPL acquisition mode and transport flag differ")
         return self
 
 
 class CurrentFplRightsBoundary(FrozenModel):
-    rights_profile_id: Literal["fpl_official_private_manual_v1"] = OFFICIAL_MANUAL_PROFILE_ID
+    rights_profile_id: Literal[
+        "fpl_official_private_manual_v1",
+        "fpl_official_private_operator_initiated_read_v1",
+    ] = OFFICIAL_MANUAL_PROFILE_ID
     rights_profile_version: Literal["1.0.0"] = "1.0.0"
     decisions: tuple[RightsDecision, ...]
     unresolved_rights: tuple[str, ...]
-    automated_access_profile_value: Literal["DENY"] = "DENY"
+    automated_access_profile_value: Literal["ALLOW", "DENY"] = "DENY"
     raw_storage_profile_value: Literal["DENY"] = "DENY"
     derived_storage_profile_value: Literal["UNKNOWN", "DENY"]
-    automated_access: Literal["DENY"] = "DENY"
+    automated_access: Literal["ALLOW", "DENY"] = "DENY"
     raw_storage: Literal["DENY"] = "DENY"
     derived_storage: Literal["DENY"] = "DENY"
     cache: Literal["DENY"] = "DENY"
@@ -351,21 +383,42 @@ class CurrentFplRightsBoundary(FrozenModel):
     database_accessed: Literal[False] = False
     raw_storage_performed: Literal[False] = False
     derived_storage_performed: Literal[False] = False
-    operator_delete_required: Literal[True] = True
+    operator_delete_required: bool = True
     disclosure_mode: Literal["SAFE_SUMMARY_ONLY"] = "SAFE_SUMMARY_ONLY"
 
     @model_validator(mode="after")
     def decision_set_is_exact(self) -> Self:
-        expected = (
-            ("manual_import", "ALLOW"),
-            ("transient_processing", "ALLOW"),
-            ("private_internal_use", "ALLOW"),
-            ("automated_access", "DENY"),
-            ("raw_storage", "DENY"),
-            ("derived_storage", "DENY"),
-        )
+        expected: tuple[tuple[str, str], ...]
+        if self.rights_profile_id == OFFICIAL_MANUAL_PROFILE_ID:
+            expected = (
+                ("manual_import", "ALLOW"),
+                ("transient_processing", "ALLOW"),
+                ("private_internal_use", "ALLOW"),
+                ("automated_access", "DENY"),
+                ("raw_storage", "DENY"),
+                ("derived_storage", "DENY"),
+            )
+            exact = (
+                self.automated_access_profile_value == "DENY"
+                and self.automated_access == "DENY"
+                and self.operator_delete_required is True
+            )
+        else:
+            expected = (
+                ("automated_access", "ALLOW"),
+                ("transient_processing", "ALLOW"),
+                ("private_internal_use", "ALLOW"),
+                ("raw_storage", "DENY"),
+                ("derived_storage", "DENY"),
+            )
+            exact = (
+                self.automated_access_profile_value == "ALLOW"
+                and self.automated_access == "ALLOW"
+                and self.operator_delete_required is False
+                and self.derived_storage_profile_value == "DENY"
+            )
         actual = tuple((item.capability, item.decision) for item in self.decisions)
-        if actual != expected:
+        if actual != expected or not exact:
             raise ValueError("current FPL rights decisions are inconsistent")
         return self
 
@@ -406,21 +459,24 @@ class CurrentFplInputSummary(FrozenModel):
     input_bundle_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     data_quality_status: Literal["PASS", "PASS_WITH_WARNINGS"]
     data_quality_warning_count: int = Field(ge=0)
-    rights_profile_id: Literal["fpl_official_private_manual_v1"] = OFFICIAL_MANUAL_PROFILE_ID
-    manual_import: Literal["ALLOW"] = "ALLOW"
+    rights_profile_id: Literal[
+        "fpl_official_private_manual_v1",
+        "fpl_official_private_operator_initiated_read_v1",
+    ] = OFFICIAL_MANUAL_PROFILE_ID
+    manual_import: Literal["ALLOW", "DENY"] = "ALLOW"
     transient_processing: Literal["ALLOW"] = "ALLOW"
     private_internal_use: Literal["ALLOW"] = "ALLOW"
-    automated_access: Literal["DENY"] = "DENY"
+    automated_access: Literal["ALLOW", "DENY"] = "DENY"
     raw_storage: Literal["DENY"] = "DENY"
     derived_storage_profile_value: Literal["UNKNOWN", "DENY"]
     derived_storage: Literal["DENY"] = "DENY"
     cache: Literal["DENY"] = "DENY"
     backup: Literal["DENY"] = "DENY"
-    transport_called: Literal[False] = False
+    transport_called: bool = False
     database_accessed: Literal[False] = False
     raw_storage_performed: Literal[False] = False
     derived_storage_performed: Literal[False] = False
-    operator_delete_required: Literal[True] = True
+    operator_delete_required: bool = True
 
 
 class CurrentFplInputBundle(FrozenModel):
@@ -497,7 +553,14 @@ class CurrentFplInputBundle(FrozenModel):
             input_bundle_semantic_sha256=self.semantic_sha256,
             data_quality_status=quality_status,
             data_quality_warning_count=self.quality.warning_count,
+            rights_profile_id=self.rights.rights_profile_id,
+            manual_import=(
+                "ALLOW" if self.rights.rights_profile_id == OFFICIAL_MANUAL_PROFILE_ID else "DENY"
+            ),
+            automated_access=self.rights.automated_access,
             derived_storage_profile_value=self.rights.derived_storage_profile_value,
+            transport_called=self.provenance.transport_called,
+            operator_delete_required=self.rights.operator_delete_required,
         )
 
 
@@ -820,28 +883,69 @@ def _rights_profile_is_bounded(profile: RightsProfile) -> bool:
     )
 
 
+def _direct_rights_profile_is_bounded(profile: RightsProfile) -> bool:
+    expected = {
+        RightsCapability.AUTOMATED_ACCESS: CapabilityValue.ALLOW,
+        RightsCapability.TRANSIENT_PROCESSING: CapabilityValue.ALLOW,
+        RightsCapability.PRIVATE_INTERNAL_USE: CapabilityValue.ALLOW,
+        RightsCapability.MANUAL_IMPORT: CapabilityValue.DENY,
+        RightsCapability.RAW_STORAGE: CapabilityValue.DENY,
+        RightsCapability.DERIVED_STORAGE: CapabilityValue.DENY,
+        RightsCapability.CACHE: CapabilityValue.DENY,
+        RightsCapability.BACKUP: CapabilityValue.DENY,
+        RightsCapability.MODEL_TRAINING: CapabilityValue.DENY,
+        RightsCapability.PUBLIC_DISPLAY: CapabilityValue.DENY,
+        RightsCapability.REDISTRIBUTION: CapabilityValue.DENY,
+    }
+    return (
+        profile.rights_profile_id == OFFICIAL_DIRECT_PROFILE_ID
+        and profile.profile_version == "1.0.0"
+        and profile.provider_key == "official_fpl"
+        and profile.status is RightsProfileStatus.HUMAN_APPROVED
+        and profile.retention_seconds == 0
+        and all(profile.capabilities[capability] is value for capability, value in expected.items())
+    )
+
+
 def _rights_boundary(
-    request: CurrentFplInputRequest,
+    request: CurrentFplInputRequest | CurrentFplDirectInputRequest,
     *,
     checked_at: datetime,
 ) -> CurrentFplRightsBoundary:
     profile = load_rights_profiles().get(request.rights_profile_id)
-    if profile is None or not _rights_profile_is_bounded(profile):
+    manual = request.rights_profile_id == OFFICIAL_MANUAL_PROFILE_ID
+    if profile is None or not (
+        _rights_profile_is_bounded(profile)
+        if manual
+        else _direct_rights_profile_is_bounded(profile)
+    ):
         raise IngestionError(
-            "RIGHTS_BLOCKED", "current FPL input requires the approved bounded manual profile"
+            "RIGHTS_BLOCKED", "current FPL input requires an exact approved bounded profile"
         )
     capabilities = (
-        RightsCapability.MANUAL_IMPORT,
-        RightsCapability.TRANSIENT_PROCESSING,
-        RightsCapability.PRIVATE_INTERNAL_USE,
+        (
+            RightsCapability.MANUAL_IMPORT,
+            RightsCapability.TRANSIENT_PROCESSING,
+            RightsCapability.PRIVATE_INTERNAL_USE,
+        )
+        if manual
+        else (
+            RightsCapability.AUTOMATED_ACCESS,
+            RightsCapability.TRANSIENT_PROCESSING,
+            RightsCapability.PRIVATE_INTERNAL_USE,
+        )
     )
     decisions = [
         require_rights(profile, capability, checked_at=checked_at) for capability in capabilities
     ]
     denied = (
-        RightsCapability.AUTOMATED_ACCESS,
-        RightsCapability.RAW_STORAGE,
-        RightsCapability.DERIVED_STORAGE,
+        (
+            RightsCapability.AUTOMATED_ACCESS,
+            RightsCapability.RAW_STORAGE,
+            RightsCapability.DERIVED_STORAGE,
+        )
+        if manual
+        else (RightsCapability.RAW_STORAGE, RightsCapability.DERIVED_STORAGE)
     )
     decisions.extend(
         decide_rights(profile, capability, checked_at=checked_at) for capability in denied
@@ -854,9 +958,13 @@ def _rights_boundary(
         else "DENY"
     )
     return CurrentFplRightsBoundary(
+        rights_profile_id=(OFFICIAL_MANUAL_PROFILE_ID if manual else OFFICIAL_DIRECT_PROFILE_ID),
         decisions=tuple(decisions),
         unresolved_rights=profile.unresolved_rights,
+        automated_access_profile_value="DENY" if manual else "ALLOW",
+        automated_access="DENY" if manual else "ALLOW",
         derived_storage_profile_value=derived_profile_value,
+        operator_delete_required=manual,
     )
 
 
@@ -909,6 +1017,10 @@ def _player_contract(
         chance_of_playing_next_round=player.chance_of_playing_next_round,
         news=player.news,
         news_added=player.news_added,
+        season_minutes=player.minutes,
+        season_starts=player.starts,
+        can_select=player.can_select,
+        removed=player.removed,
     )
 
 
@@ -950,6 +1062,47 @@ class CurrentFplInputService:
             ) from exc
 
     def compile(self, request: CurrentFplInputRequest) -> CurrentFplInputBundle:
+        received_at = self._validate_request(request)
+        rights = _rights_boundary(request, checked_at=received_at)
+        parsed_bootstrap, parsed_fixtures = _parsed_payloads(request)
+        return self._compile_parsed(
+            request,
+            parsed_bootstrap,
+            parsed_fixtures,
+            received_at=received_at,
+            rights=rights,
+            transport_called=False,
+        )
+
+    def compile_direct(
+        self,
+        request: CurrentFplDirectInputRequest,
+        *,
+        bootstrap_body: bytes,
+        fixtures_body: bytes,
+    ) -> CurrentFplInputBundle:
+        """Compile memory-only direct responses without creating a raw write boundary."""
+
+        received_at = self._validate_request(request)
+        rights = _rights_boundary(request, checked_at=received_at)
+        parsed_bootstrap = parse_fpl_payload(
+            FplResource.BOOTSTRAP, bootstrap_body, contract_version=CONTRACT_VERSION
+        )
+        parsed_fixtures = parse_fpl_payload(
+            FplResource.FIXTURES, fixtures_body, contract_version=CONTRACT_VERSION
+        )
+        return self._compile_parsed(
+            request,
+            parsed_bootstrap,
+            parsed_fixtures,
+            received_at=received_at,
+            rights=rights,
+            transport_called=True,
+        )
+
+    def _validate_request(
+        self, request: CurrentFplInputRequest | CurrentFplDirectInputRequest
+    ) -> datetime:
         if request.competition_key != SUPPORTED_COMPETITION_KEY:
             raise IngestionError("VALIDATION_FAILED", "competition metadata is not target EPL")
         if request.season_code != SUPPORTED_SEASON_CODE:
@@ -964,9 +1117,18 @@ class CurrentFplInputService:
             raise IngestionError("VALIDATION_FAILED", "captured_at is after receipt time")
         if received_at > request.information_cutoff:
             raise IngestionError("POST_CUTOFF", "current FPL input was received post-cutoff")
+        return received_at
 
-        rights = _rights_boundary(request, checked_at=received_at)
-        parsed_bootstrap, parsed_fixtures = _parsed_payloads(request)
+    def _compile_parsed(
+        self,
+        request: CurrentFplInputRequest | CurrentFplDirectInputRequest,
+        parsed_bootstrap: ParsedFplResource,
+        parsed_fixtures: ParsedFplResource,
+        *,
+        received_at: datetime,
+        rights: CurrentFplRightsBoundary,
+        transport_called: bool,
+    ) -> CurrentFplInputBundle:
         bootstrap, fixtures = _payload_pair(parsed_bootstrap, parsed_fixtures)
         _require_unique(tuple(event.id for event in bootstrap.events), subject="event")
         target = _target_event(bootstrap.events, request.target_gameweek)
@@ -1068,6 +1230,9 @@ class CurrentFplInputService:
             }
         )
         provenance = CurrentFplProvenance(
+            acquisition_mode=(
+                "OPERATOR_INITIATED_DIRECT_READ" if transport_called else "MANUAL_OPERATOR_CAPTURE"
+            ),
             captured_at=request.captured_at,
             received_at=received_at,
             information_cutoff=request.information_cutoff,
@@ -1079,6 +1244,7 @@ class CurrentFplInputService:
             provider_config_sha256=provider_sha256,
             rights_config_sha256=rights_sha256,
             input_bundle_semantic_sha256=semantic_sha256,
+            transport_called=transport_called,
         )
         return CurrentFplInputBundle(
             target_gameweek=request.target_gameweek,
@@ -1098,9 +1264,11 @@ class CurrentFplInputService:
 
 __all__ = [
     "CURRENT_FPL_CONTRACT_VERSION",
+    "OFFICIAL_DIRECT_PROFILE_ID",
     "OFFICIAL_MANUAL_PROFILE_ID",
     "SUPPORTED_COMPETITION_KEY",
     "SUPPORTED_SEASON_CODE",
+    "CurrentFplDirectInputRequest",
     "CurrentFplEvent",
     "CurrentFplFixture",
     "CurrentFplGameSettings",

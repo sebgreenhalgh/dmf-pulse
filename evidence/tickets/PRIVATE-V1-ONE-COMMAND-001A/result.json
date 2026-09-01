@@ -1,0 +1,8 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "authenticated_current_state_used_in_synthetic_e2e": true,
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI_AND_INDEPENDENT_REVIEW",
+  "official_fpl_persistent_artifacts_created": 0,
+  "real_recommendation_status": "BLOCKED_MISSING_ODDS_AND_FPL_CREDENTIALS",
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001A"
+}

@@ -381,22 +381,37 @@ def _require_source_rights(
     fpl_decisions = tuple(
         (str(decision.capability), decision.decision) for decision in fpl_input.rights.decisions
     )
+    direct = fpl_input.rights.rights_profile_id == "fpl_official_private_operator_initiated_read_v1"
     expected_fpl_decisions = (
-        ("manual_import", "ALLOW"),
-        ("transient_processing", "ALLOW"),
-        ("private_internal_use", "ALLOW"),
-        ("automated_access", "DENY"),
-        ("raw_storage", "DENY"),
-        ("derived_storage", "DENY"),
+        (
+            ("automated_access", "ALLOW"),
+            ("transient_processing", "ALLOW"),
+            ("private_internal_use", "ALLOW"),
+            ("raw_storage", "DENY"),
+            ("derived_storage", "DENY"),
+        )
+        if direct
+        else (
+            ("manual_import", "ALLOW"),
+            ("transient_processing", "ALLOW"),
+            ("private_internal_use", "ALLOW"),
+            ("automated_access", "DENY"),
+            ("raw_storage", "DENY"),
+            ("derived_storage", "DENY"),
+        )
     )
     if (
         fpl_decisions != expected_fpl_decisions
-        or fpl_input.rights.rights_profile_id != "fpl_official_private_manual_v1"
+        or fpl_input.rights.rights_profile_id
+        not in {
+            "fpl_official_private_manual_v1",
+            "fpl_official_private_operator_initiated_read_v1",
+        }
         or fpl_input.rights.rights_profile_version != "1.0.0"
-        or fpl_input.rights.automated_access_profile_value != "DENY"
+        or fpl_input.rights.automated_access_profile_value != ("ALLOW" if direct else "DENY")
         or fpl_input.rights.raw_storage_profile_value != "DENY"
         or fpl_input.rights.derived_storage_profile_value not in {"UNKNOWN", "DENY"}
-        or fpl_input.rights.automated_access != "DENY"
+        or fpl_input.rights.automated_access != ("ALLOW" if direct else "DENY")
         or fpl_input.rights.raw_storage != "DENY"
         or fpl_input.rights.derived_storage != "DENY"
         or fpl_input.rights.cache != "DENY"
@@ -404,9 +419,9 @@ def _require_source_rights(
         or fpl_input.rights.database_accessed is not False
         or fpl_input.rights.raw_storage_performed is not False
         or fpl_input.rights.derived_storage_performed is not False
-        or fpl_input.rights.operator_delete_required is not True
+        or fpl_input.rights.operator_delete_required != (not direct)
         or fpl_input.rights.disclosure_mode != "SAFE_SUMMARY_ONLY"
-        or fpl_input.provenance.transport_called is not False
+        or fpl_input.provenance.transport_called is not direct
         or fpl_input.provenance.database_accessed is not False
         or fpl_input.provenance.raw_storage_performed is not False
         or fpl_input.provenance.derived_storage_performed is not False

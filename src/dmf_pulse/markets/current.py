@@ -188,7 +188,7 @@ class CurrentMarketCanonicalIdentityView(_FrozenModel):
     contract_version: Literal["current-market-identity-view-v1"] = (
         CURRENT_MARKET_IDENTITY_VIEW_VERSION
     )
-    authority: Literal["DAT_003_READ_ONLY", "TEST_ONLY"]
+    authority: Literal["DAT_003_READ_ONLY", "OPERATOR_INITIATED_DETERMINISTIC", "TEST_ONLY"]
     resolved_at: datetime
     resolution_cutoff: datetime
     database_read_performed: bool
@@ -292,6 +292,93 @@ def _operator_occurrence_times_sha256(
             "target_occurrence_times": [value.isoformat() for value in occurrence_times],
         }
     )
+
+
+def build_transient_current_market_identity_view(
+    source: CurrentUnifiedStateBundle,
+    *,
+    resolved_at: datetime,
+) -> CurrentMarketCanonicalIdentityView:
+    """Build run-local deterministic identities without claiming DAT-003 entities."""
+
+    resolved = require_utc(resolved_at)
+    if resolved > source.information_cutoff:
+        raise CurrentMarketConstraintError("CANONICAL_IDENTITY_UNAVAILABLE")
+    occurrence_times = _operator_occurrence_times(source)
+    target_event_ids = {item.provider_event_id for item in source.identity_map.fixture_mappings}
+    events = {
+        item.provider_event_id: item
+        for item in source.odds_input.events
+        if item.provider_event_id in target_event_ids
+    }
+    if set(events) != target_event_ids:
+        raise CurrentMarketConstraintError("CANONICAL_IDENTITY_UNAVAILABLE")
+    fixtures = tuple(
+        CurrentMarketCanonicalFixture(
+            official_fpl_fixture_id=item.official_fpl_fixture_id,
+            official_fpl_fixture_lookup_sha256=(
+                item.official_fpl_fixture_identity.canonical_lookup_sha256
+            ),
+            provider_event_id=item.provider_event_id,
+            provider_event_identity_sha256=item.provider_event_identity_sha256,
+            canonical_fixture_id=uuid5(
+                _TRANSIENT_NAMESPACE,
+                "one-command:fixture:" + item.official_fpl_fixture_identity.canonical_lookup_sha256,
+            ),
+            official_fpl_external_mapping_id=uuid5(
+                _TRANSIENT_NAMESPACE,
+                "one-command:fpl-fixture-map:"
+                + item.official_fpl_fixture_identity.canonical_lookup_sha256,
+            ),
+            odds_event_external_mapping_id=uuid5(
+                _TRANSIENT_NAMESPACE,
+                "one-command:odds-event-map:" + item.provider_event_identity_sha256,
+            ),
+            fixture_binding_sha256=item.fixture_binding_sha256,
+        )
+        for item in sorted(
+            source.identity_map.fixture_mappings,
+            key=lambda value: value.official_fpl_fixture_id,
+        )
+    )
+    bookmaker_by_key = {
+        bookmaker.bookmaker_key: bookmaker
+        for event_id, event in events.items()
+        if event_id in target_event_ids
+        for bookmaker in event.bookmakers
+    }
+    if set(bookmaker_by_key) != set(occurrence_times):
+        raise CurrentMarketConstraintError("CANONICAL_IDENTITY_UNAVAILABLE")
+    operators = tuple(
+        CurrentMarketCanonicalOperator(
+            bookmaker_key=key,
+            bookmaker_title=bookmaker_by_key[key].bookmaker_title,
+            canonical_operator_id=uuid5(_TRANSIENT_NAMESPACE, "one-command:operator:" + key),
+            canonical_operator_key="transient:" + key,
+            external_mapping_id=uuid5(_TRANSIENT_NAMESPACE, "one-command:operator-map:" + key),
+            target_occurrence_times_sha256=_operator_occurrence_times_sha256(
+                key, occurrence_times[key]
+            ),
+        )
+        for key in sorted(bookmaker_by_key)
+    )
+    provider_id = uuid5(
+        _TRANSIENT_NAMESPACE,
+        "one-command:provider:the_odds_api:the_odds_api_private_analytics_v1",
+    )
+    provisional = CurrentMarketCanonicalIdentityView.model_construct(
+        authority="OPERATOR_INITIATED_DETERMINISTIC",
+        resolved_at=resolved,
+        resolution_cutoff=source.information_cutoff,
+        database_read_performed=False,
+        provider_id=provider_id,
+        fixtures=fixtures,
+        operators=operators,
+        semantic_sha256="0" * 64,
+    )
+    payload = provisional.model_dump(mode="python")
+    payload["semantic_sha256"] = current_market_identity_view_sha256(provisional)
+    return CurrentMarketCanonicalIdentityView.model_validate(payload)
 
 
 class CurrentMarketConstraintRequest(_FrozenModel):
@@ -2027,6 +2114,7 @@ __all__ = [
     "CurrentTotalsConsensusOutcome",
     "CurrentTotalsOperatorMarket",
     "bind_current_market_constraint_request",
+    "build_transient_current_market_identity_view",
     "current_fixture_market_constraints_sha256",
     "current_market_constraint_bundle_sha256",
     "current_market_identity_view_sha256",

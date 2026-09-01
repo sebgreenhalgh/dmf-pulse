@@ -374,6 +374,84 @@ def seal_current_gw_stale_prior_policy(
     return CurrentGwStalePriorCarryForwardPolicy.model_validate(payload)
 
 
+def build_automatic_current_gw_stale_prior_policy(
+    prior: GovernedPlayerPrior,
+    current_fpl: CurrentFplInputBundle,
+    *,
+    current_official_fpl_element_ids: tuple[int, ...],
+    declared_at: datetime,
+) -> CurrentGwStalePriorCarryForwardPolicy:
+    """Deterministically assign only required accepted position-fallback donor profiles."""
+
+    current_players = {item.provider_element_id: item for item in current_fpl.players}
+    donor_profiles = {item.player_id: item for item in prior.artifact.profiles}
+    donor_lineage = {item.source_player_id: item for item in prior.artifact.lineage}
+    fallback_by_position: dict[str, int] = {}
+    for source_id, lineage in sorted(donor_lineage.items()):
+        source_player = current_players.get(source_id)
+        profile = donor_profiles.get(lineage.player_id)
+        if (
+            source_player is not None
+            and profile is not None
+            and {
+                lineage.goal_source_level,
+                lineage.assist_source_level,
+                lineage.auxiliary_source_level,
+            }
+            == {"FPL_POSITION"}
+        ):
+            fallback_by_position.setdefault(source_player.position.value, source_id)
+    assignments: list[CurrentGwPriorFallbackAssignment] = []
+    for source_id in current_official_fpl_element_ids:
+        current = current_players.get(source_id)
+        if current is None:
+            raise FplPointsError(
+                "PLAYER_PRIOR_MISSING", "automatic prior scope contains an unknown player"
+            )
+        current_lineage = donor_lineage.get(source_id)
+        profile = (
+            donor_profiles.get(current_lineage.player_id) if current_lineage is not None else None
+        )
+        exact = (
+            current_lineage is not None
+            and profile is not None
+            and current_lineage.player_id
+            == _donor_transient_id("player", current.identity.canonical_lookup_sha256)
+            and profile.team_id
+            == _donor_transient_id("team", current.team_identity.canonical_lookup_sha256)
+        )
+        if exact:
+            continue
+        fallback_id = fallback_by_position.get(current.position.value)
+        if fallback_id is None:
+            raise FplPointsError(
+                "PLAYER_PRIOR_FALLBACK_UNAVAILABLE",
+                "no governed position fallback is available for a current player",
+            )
+        assignments.append(
+            CurrentGwPriorFallbackAssignment(
+                current_official_fpl_element_id=source_id,
+                fallback_official_fpl_element_id=fallback_id,
+                operator_reason=(
+                    "PRIVATE-V1-ONE-COMMAND-001A deterministic same-position carry-forward; "
+                    "no current player history is created."
+                ),
+            )
+        )
+    return seal_current_gw_stale_prior_policy(
+        CurrentGwStalePriorCarryForwardPolicy.model_construct(
+            target_gameweek=current_fpl.target_gameweek,
+            current_fpl_bundle_sha256=current_fpl.semantic_sha256,
+            prior_artifact_sha256=prior.artifact.artifact_sha256,
+            historical_acceptance_sha256=prior.historical_acceptance.acceptance_sha256,
+            original_evidence_cutoff=prior.artifact.information_cutoff,
+            declared_at=declared_at,
+            fallback_assignments=tuple(assignments),
+            semantic_sha256="0" * 64,
+        )
+    )
+
+
 class CurrentGwPlayerPriorBindingEntry(_StrictModel):
     current_player_id: str
     current_team_id: str
@@ -777,10 +855,10 @@ def build_current_gw_player_prior_binding(
             "PLAYER_IDENTITY_MISMATCH",
             "canonical team mapping must cover exactly the requested current teams",
         )
-    if set(assignments) != required_fallback_ids:
+    if not required_fallback_ids <= set(assignments):
         raise FplPointsError(
             "PLAYER_PRIOR_POLICY_MISMATCH",
-            "fallback assignments must cover exactly the players requiring fallback",
+            "fallback assignments do not cover the players requiring fallback",
         )
     ordered = tuple(sorted(entries, key=lambda entry: entry.current_player_id))
     body = {
@@ -970,6 +1048,7 @@ __all__ = [
     "PlayerPriorIdentityBinding",
     "bind_current_gw_fixture_allocation_profiles",
     "bind_fixture_allocation_profiles",
+    "build_automatic_current_gw_stale_prior_policy",
     "build_current_gw_player_prior_binding",
     "build_player_prior_identity_binding",
     "load_packaged_player_prior",

@@ -14,6 +14,10 @@ import yaml  # type: ignore[import-untyped]
 from pydantic import ValidationError
 
 from dmf_pulse.assurance.canonical import canonical_sha256
+from dmf_pulse.availability.current_model import (
+    CurrentModelFixtureMinutesInput,
+    current_model_fixture_sha256,
+)
 from dmf_pulse.availability.manual_override import (
     MANUAL_SAMPLE_COUNT,
     ManualFixtureMinutesInput,
@@ -109,6 +113,20 @@ from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 
 _DECIMAL_CONTEXT = Context(prec=50, rounding=ROUND_HALF_EVEN)
+
+
+def _uses_model_stage7(value: PrivateV1ExecutionInput) -> bool:
+    return all(isinstance(item, CurrentModelFixtureMinutesInput) for item in value.manual_minutes)
+
+
+def _stage7_input_sha256(
+    value: ManualFixtureMinutesInput | CurrentModelFixtureMinutesInput,
+) -> str:
+    return (
+        current_model_fixture_sha256(value)
+        if isinstance(value, CurrentModelFixtureMinutesInput)
+        else manual_fixture_input_sha256(value)
+    )
 
 
 @dataclass(frozen=True)
@@ -221,7 +239,7 @@ def _scenario_map(
 
 
 def _participation_scenarios(
-    value: ManualFixtureMinutesInput,
+    value: ManualFixtureMinutesInput | CurrentModelFixtureMinutesInput,
     *,
     gameweek_id: str,
     home_projection: object,
@@ -234,8 +252,12 @@ def _participation_scenarios(
             "STAGE7_SCENARIO_ALIGNMENT_INVALID",
             "home and away manual scenario identities must match exactly",
         )
-    home_hard = {item.player_id for item in value.home.hard_overrides}
-    away_hard = {item.player_id for item in value.away.hard_overrides}
+    if isinstance(value, CurrentModelFixtureMinutesInput):
+        home_hard = set(value.home.hard_ineligible_player_ids)
+        away_hard = set(value.away.hard_ineligible_player_ids)
+    else:
+        home_hard = {item.player_id for item in value.home.hard_overrides}
+        away_hard = {item.player_id for item in value.away.hard_overrides}
     scenarios: list[Any] = []
     for scenario_id in sorted(home):
         home_scenario = home[scenario_id]
@@ -420,22 +442,28 @@ def _project_fixtures(
     canonical_teams = _canonical_team_by_official(value)
     for fixture_id in sorted(fixture_authority):
         fpl_fixture, _canonical_fixture = fixture_authority[fixture_id]
-        manual = minutes_by_fixture[fixture_id]
+        stage7 = minutes_by_fixture[fixture_id]
         market = markets_by_fixture[fixture_id]
         score_prior = prior_by_fixture[fixture_id]
         expected_home = canonical_teams[int(fpl_fixture.home_team_identity.external_id_text)]
         expected_away = canonical_teams[int(fpl_fixture.away_team_identity.external_id_text)]
         if (
-            manual.home_team_id != expected_home
-            or manual.away_team_id != expected_away
+            stage7.home_team_id != expected_home
+            or stage7.away_team_id != expected_away
             or str(score_prior.home_team_id) != expected_home
             or str(score_prior.away_team_id) != expected_away
         ):
             raise PrivateV1Error(
                 "FIXTURE_IDENTITY_MISMATCH", "fixture team orientation differs across sources"
             )
-        minutes = build_manual_minutes_override(manual)
-        context = Stage7MinutesContext.from_projections(minutes.home, minutes.away)
+        if isinstance(stage7, CurrentModelFixtureMinutesInput):
+            home_projection = stage7.home_projection
+            away_projection = stage7.away_projection
+        else:
+            minutes = build_manual_minutes_override(stage7)
+            home_projection = minutes.home
+            away_projection = minutes.away
+        context = Stage7MinutesContext.from_projections(home_projection, away_projection)
         stage7_context_hashes[fixture_id] = context.semantic_sha256
         try:
             stage8 = ScoreDistributionService().project(
@@ -461,10 +489,10 @@ def _project_fixtures(
         distribution = stage8.distribution
         stage8_hashes[fixture_id] = distribution.result_sha256
         participation = _participation_scenarios(
-            manual,
+            stage7,
             gameweek_id=gameweek_id,
-            home_projection=minutes.home,
-            away_projection=minutes.away,
+            home_projection=home_projection,
+            away_projection=away_projection,
         )
         participant_ids = {
             item.player_id for scenario in participation for item in scenario.participants
@@ -721,7 +749,11 @@ def _stage11_request(
                         "NO_CHIP",
                         "ONE_GAMEWEEK_HORIZON_ZERO_TERMINAL_VALUE",
                         "OPERATOR_ATTESTED_OWNERSHIP_ACQUISITION_GAMEWEEKS",
-                        "PRIVATE_MANUAL_TRANSIENT_STAGE7_NOT_MODEL_DERIVED",
+                        (
+                            "ACCEPTED_REGULARISED_EMPIRICAL_BAYES_COHERENCE_STAGE7"
+                            if _uses_model_stage7(value)
+                            else "PRIVATE_MANUAL_TRANSIENT_STAGE7_NOT_MODEL_DERIVED"
+                        ),
                         "TRANSFER_SCOPE_EXPLICIT_OPERATOR_DECLARATION",
                     }
                 )
@@ -944,6 +976,13 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
             "carry-forward is not covered by that acceptance.\n"
         )
     )
+    stage7_quality = (
+        f"Confidence: {decision.confidence}. Stage 7 uses the accepted "
+        "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1 model with current-season "
+        "provider-observed roles/minutes and early-season shrinkage."
+        if decision.stage7_model_derived
+        else ("Confidence: LOW. Stage 7 is a private manual transient override, NOT_MODEL_DERIVED.")
+    )
     return (
         "DMF PULSE PRIVATE V1 RECOMMENDATION\n"
         f"{transient_banner}"
@@ -978,9 +1017,8 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
         "P(recommended beats no transfer): "
         f"{comparison.probability_recommended_beats_baseline:.1%}\n\n"
         "DATA QUALITY\n"
-        "Confidence: LOW. Stage 7 is a private manual transient override, NOT_MODEL_DERIVED, "
-        "and the player-allocation prior remains the grade-E GW1 candidate with historical "
-        "cutoff and CANDIDATE_NOT_ACCEPTED status.\n"
+        f"{stage7_quality} The player-allocation prior remains the grade-E GW1 candidate with "
+        "historical cutoff and CANDIDATE_NOT_ACCEPTED status.\n"
         f"Player-prior current use: {decision.player_prior_status}\n"
         f"Player-prior evidence cutoff: {_utc_text(decision.player_prior_evidence_cutoff)}\n"
         f"{acceptance_text}"
@@ -1092,10 +1130,33 @@ class PrivateV1RecommendationService:
         )
         matrix_hash = semantic_sha256(gameweek.joint_matrix)
         stage8_policy_hash = load_score_baseline_policy().sha256
+        model_stage7 = _uses_model_stage7(execution)
+        stage7_confidence = (
+            min(
+                (
+                    item.confidence
+                    for item in execution.manual_minutes
+                    if isinstance(item, CurrentModelFixtureMinutesInput)
+                ),
+                key=lambda item: {"LOW": 0, "MEDIUM": 1, "HIGH": 2}[item],
+            )
+            if model_stage7
+            else "LOW"
+        )
         warnings = tuple(
             sorted(
                 {
-                    "MANUAL_STAGE7_PRIVATE_TRANSIENT_NOT_MODEL_DERIVED",
+                    *(
+                        ()
+                        if model_stage7
+                        else ("MANUAL_STAGE7_PRIVATE_TRANSIENT_NOT_MODEL_DERIVED",)
+                    ),
+                    *(
+                        warning
+                        for item in execution.manual_minutes
+                        if isinstance(item, CurrentModelFixtureMinutesInput)
+                        for warning in item.warnings
+                    ),
                     "PLAYER_ALLOCATION_PRIOR_GRADE_E_CANDIDATE_NOT_ACCEPTED",
                     "PLAYER_ALLOCATION_PRIOR_HISTORICAL_GW1_CUTOFF",
                     "DONOR_PRIVATE_ACCEPTANCE_IS_NOT_PORT_ACCEPTANCE",
@@ -1150,8 +1211,7 @@ class PrivateV1RecommendationService:
                 str(item.fixture_id): item.semantic_sha256 for item in execution.score_priors
             },
             stage7_input_sha256_by_fixture={
-                item.fixture_id: manual_fixture_input_sha256(item)
-                for item in execution.manual_minutes
+                item.fixture_id: _stage7_input_sha256(item) for item in execution.manual_minutes
             },
             stage7_context_sha256_by_fixture=stage7_contexts,
             stage8_result_sha256_by_fixture=stage8_hashes,
@@ -1205,9 +1265,13 @@ class PrivateV1RecommendationService:
             no_transfer_tactics=_tactical_decision(baseline, baseline_captain_hash),
             chip_action="NO_CHIP",
             paired_comparison=comparison,
-            stage7_family="PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1",
-            stage7_model_derived=False,
-            confidence="LOW",
+            stage7_family=(
+                "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"
+                if model_stage7
+                else "PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1"
+            ),
+            stage7_model_derived=model_stage7,
+            confidence=stage7_confidence,
             player_prior_status=(
                 "HISTORICAL_GW1_ACCEPTED_SCOPE"
                 if execution.current_state.target_gameweek == 1

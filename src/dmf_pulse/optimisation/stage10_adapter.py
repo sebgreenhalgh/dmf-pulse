@@ -28,6 +28,8 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
 from dmf_pulse.optimisation.tactics import (
     enumerate_tactical_configurations,
     evaluate_tactical_configuration,
+    optimise_fixed_squad_tactics_exact,
+    tactical_configuration_upper_bound,
 )
 
 
@@ -86,34 +88,51 @@ class Stage10TacticalAdapter:
             for item in self.candidate_pool
         }
         squad = CandidateSquad(player_ids=state.squad_ids)
-        tactics, tactical_upper = enumerate_tactical_configurations(
-            squad,
-            players,
-            self.rules,
-            self.policy,
+        supplied_tactics, tactical_upper = enumerate_tactical_configurations(
+            squad, players, self.rules, self.policy
         )
-        best_plan = None
-        best_objective = None
-        tactics_evaluated = 0
-        tied_optima = 0
-        for tactic in tactics:
-            tactics_evaluated += 1
-            plan, objective = evaluate_tactical_configuration(
-                squad,
-                tactic,
-                scenarios,
-                players,
-                self.rules,
-            )
-            if best_objective is None or objective > best_objective:
-                best_plan = plan
-                best_objective = objective
-                tied_optima = 1
-            elif objective == best_objective and best_plan is not None:
-                tied_optima += 1
-                if plan.signature < best_plan.signature:
+        canonical_upper = tactical_configuration_upper_bound(squad, players, self.rules)
+        if tactical_upper == canonical_upper:
+            try:
+                best_plan, _best_objective, tactics_evaluated, tied_optima = (
+                    optimise_fixed_squad_tactics_exact(
+                        squad,
+                        scenarios,
+                        players,
+                        self.rules,
+                        self.policy,
+                    )
+                )
+            except ValueError as exc:
+                raise InfeasiblePolicyError(
+                    f"Stage-10 tactical layer found no legal plan at node {node.node_id}"
+                ) from exc
+        else:
+            # Preserve the explicit injected-enumerator seam used by contract tests and
+            # downstream adapters. Normal canonical enumeration always takes the exact
+            # factored path above.
+            best_plan = None
+            best_objective = None
+            tactics_evaluated = 0
+            tied_optima = 0
+            for tactic in supplied_tactics:
+                tactics_evaluated += 1
+                plan, objective = evaluate_tactical_configuration(
+                    squad, tactic, scenarios, players, self.rules
+                )
+                if best_objective is None or objective > best_objective:
                     best_plan = plan
-        if best_plan is None:
+                    best_objective = objective
+                    tied_optima = 1
+                elif objective == best_objective and best_plan is not None:
+                    tied_optima += 1
+                    if plan.signature < best_plan.signature:
+                        best_plan = plan
+            if best_plan is None:
+                raise InfeasiblePolicyError(
+                    f"Stage-10 tactical layer found no legal plan at node {node.node_id}"
+                )
+        if best_plan is None:  # pragma: no cover - guarded by both exact paths above
             raise InfeasiblePolicyError(
                 f"Stage-10 tactical layer found no legal plan at node {node.node_id}"
             )

@@ -52,6 +52,23 @@ _LIMITATIONS = (
     "NO_DECISION_BUNDLE",
     "NO_PRODUCTION_ACTIVATION",
 )
+_PROVIDER_LIMITATIONS = (
+    *(
+        item
+        for item in _LIMITATIONS
+        if item
+        not in {
+            "MANAGER_STATE_HUMAN_ATTESTED_NOT_PROVIDER_VERIFIED",
+            "OFFICIAL_FPL_INPUT_MANUAL_TRANSIENT_ONLY",
+        }
+    ),
+    "MANAGER_STATE_PROVIDER_OBSERVED_PRIVATE_TRANSIENT",
+    "OFFICIAL_FPL_OPERATOR_INITIATED_DIRECT_READ",
+)
+
+
+def _limitations(manager: CurrentManagerStateBundle) -> tuple[str, ...]:
+    return _LIMITATIONS if manager.source_class == "OPERATOR_DECLARED" else _PROVIDER_LIMITATIONS
 
 
 def _normalize_utc(value: datetime, *, label: str) -> datetime:
@@ -146,7 +163,7 @@ class CurrentUnifiedStateLineage(_FrozenModel):
 class CurrentUnifiedRightsBoundary(_FrozenModel):
     """Conservative whole-bundle rights while retaining distinct source access rights."""
 
-    official_fpl_automated_access: Literal["DENY"] = "DENY"
+    official_fpl_automated_access: Literal["ALLOW", "DENY"] = "DENY"
     odds_automated_access: Literal["ALLOW"] = "ALLOW"
     private_internal_use: Literal["ALLOW"] = "ALLOW"
     transient_processing: Literal["ALLOW"] = "ALLOW"
@@ -184,9 +201,11 @@ class CurrentUnifiedStateSummary(_FrozenModel):
     mapped_target_fixture_count: int = Field(gt=0)
     manager_squad_count: int = Field(gt=0)
     identity_coverage: Literal["COMPLETE"] = "COMPLETE"
-    manager_source_class: Literal["OPERATOR_DECLARED"] = "OPERATOR_DECLARED"
-    manager_attestation_status: Literal["HUMAN_ATTESTED"] = "HUMAN_ATTESTED"
-    manager_provider_verification: Literal["NOT_PROVIDER_VERIFIED"] = "NOT_PROVIDER_VERIFIED"
+    manager_source_class: Literal["OPERATOR_DECLARED", "PROVIDER_OBSERVED"] = "OPERATOR_DECLARED"
+    manager_attestation_status: Literal["HUMAN_ATTESTED", "PROVIDER_OBSERVED"] = "HUMAN_ATTESTED"
+    manager_provider_verification: Literal["NOT_PROVIDER_VERIFIED", "PROVIDER_VERIFIED"] = (
+        "NOT_PROVIDER_VERIFIED"
+    )
     lineage: CurrentUnifiedStateLineage
     rights: CurrentUnifiedRightsBoundary
     runtime: CurrentUnifiedRuntimeBoundary
@@ -254,7 +273,9 @@ class CurrentUnifiedStateBundle(_FrozenModel):
             or self.decision_information_at != expected_decision_time
             or self.decision_information_at > self.information_cutoff
             or self.lineage != _build_lineage(fpl, odds, identity_map, manager)
-            or self.limitations != _LIMITATIONS
+            or self.limitations != _limitations(manager)
+            or self.rights.official_fpl_automated_access
+            != ("ALLOW" if manager.source_class == "PROVIDER_OBSERVED" else "DENY")
             or self.semantic_sha256 != current_unified_state_semantic_sha256(self)
         ):
             raise ValueError("unified current state composition is inconsistent")
@@ -272,6 +293,9 @@ class CurrentUnifiedStateBundle(_FrozenModel):
             odds_event_count=len(self.odds_input.events),
             mapped_target_fixture_count=self.identity_map.coverage.mapped_event_count,
             manager_squad_count=len(self.manager_state.squad),
+            manager_source_class=self.manager_state.source_class,
+            manager_attestation_status=self.manager_state.attestation_status,
+            manager_provider_verification=self.manager_state.provider_verification,
             lineage=self.lineage,
             rights=self.rights,
             runtime=self.runtime,
@@ -516,11 +540,16 @@ def _verify_external_family(
         raise IngestionError("MAPPING_CONFLICT", "unified source cutoffs are not identical")
     if cutoff > fpl_input.target_event.deadline_at:
         raise IngestionError("POST_CUTOFF", "unified source cutoff exceeds the target deadline")
+    expected_manager_provenance = (
+        ("OPERATOR_DECLARED", "HUMAN_ATTESTED", "NOT_PROVIDER_VERIFIED")
+        if fpl_input.provenance.acquisition_mode == "MANUAL_OPERATOR_CAPTURE"
+        else ("PROVIDER_OBSERVED", "PROVIDER_OBSERVED", "PROVIDER_VERIFIED")
+    )
     if (
-        manager_state.source_class != "OPERATOR_DECLARED"
-        or manager_state.attestation_status != "HUMAN_ATTESTED"
-        or manager_state.provider_verification != "NOT_PROVIDER_VERIFIED"
-    ):
+        manager_state.source_class,
+        manager_state.attestation_status,
+        manager_state.provider_verification,
+    ) != expected_manager_provenance:
         raise IngestionError("MAPPING_CONFLICT", "manager verification class is inconsistent")
 
 
@@ -571,9 +600,13 @@ class CurrentUnifiedStateService:
             identity_map=bridge,
             manager_state=manager,
             lineage=_build_lineage(fpl, odds, bridge, manager),
-            rights=CurrentUnifiedRightsBoundary(),
+            rights=CurrentUnifiedRightsBoundary(
+                official_fpl_automated_access=(
+                    "ALLOW" if manager.source_class == "PROVIDER_OBSERVED" else "DENY"
+                )
+            ),
             runtime=CurrentUnifiedRuntimeBoundary(),
-            limitations=_LIMITATIONS,
+            limitations=_limitations(manager),
             semantic_sha256="0" * 64,
         )
         payload = provisional.model_dump(mode="python")

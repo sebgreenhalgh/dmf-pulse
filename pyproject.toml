@@ -56,6 +56,7 @@ packages = ["src/dmf_pulse"]
 "config/rights/odds_profiles.json" = "dmf_pulse/ingestion/resources/odds_profiles.json"
 "config/providers/openfootball_score_prior.json" = "dmf_pulse/ingestion/resources/openfootball_score_prior.json"
 "config/rights/openfootball_profiles.json" = "dmf_pulse/ingestion/resources/openfootball_profiles.json"
+"config/rules/fpl-2026-27" = "dmf_pulse/rules/resources/fpl-2026-27"
 
 [tool.ruff]
 target-version = "py313"

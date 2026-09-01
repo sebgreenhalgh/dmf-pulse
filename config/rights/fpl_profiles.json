@@ -71,6 +71,41 @@
       "unresolved_rights": [
         "persistent derived database rights require confirmation"
       ]
+    },
+    {
+      "account_scope": "One operator-supplied FPL entry in Sebastian's private context",
+      "approved_at": "2026-09-01T00:00:00Z",
+      "approved_by": "PRIVATE-V1-ONE-COMMAND-001A operator approval",
+      "approved_purpose": "low-volume operator-initiated read-only private recommendation; no production service",
+      "attribution_required": false,
+      "attribution_text": null,
+      "capabilities": {
+        "automated_access": "ALLOW",
+        "backup": "DENY",
+        "cache": "DENY",
+        "derived_storage": "DENY",
+        "manual_import": "DENY",
+        "model_training": "DENY",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "DENY",
+        "redistribution": "DENY",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-09-01T00:00:00Z",
+      "geography_scope": "private operator use only",
+      "human_approval_id": "PRIVATE-V1-ONE-COMMAND-001A#fpl_official_private_operator_initiated_read_v1",
+      "notes": "The operator explicitly accepts contractual risk for a sequential, low-volume, read-only use of undocumented official FPL HTTP endpoints. This is not Premier League permission, legal advice, or a licence.",
+      "profile_version": "1.0.0",
+      "provider_key": "official_fpl",
+      "retention_reason": "official FPL response bodies and private manager facts remain memory-only and are released at process exit",
+      "retention_seconds": 0,
+      "rights_profile_id": "fpl_official_private_operator_initiated_read_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": false,
+      "terms_source": "Premier League Terms and Conditions and current FPL application transport observed 2026-09-01",
+      "terms_version": "checked-2026-09-01",
+      "unresolved_rights": []
     }
   ],
   "schema_version": "1.0.0"

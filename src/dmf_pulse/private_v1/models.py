@@ -21,6 +21,7 @@ from pydantic import (
 )
 
 from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
+from dmf_pulse.availability.current_model import CurrentModelFixtureMinutesInput
 from dmf_pulse.availability.manual_override import ManualFixtureMinutesInput
 from dmf_pulse.football_events.score_prior_request import ScorePriorRequest
 from dmf_pulse.fpl_points.models import (
@@ -81,9 +82,9 @@ class PrivateCurrentOwnership(_FrozenModel):
     """Operator-attested acquisition timing absent from current manager state 001C."""
 
     schema_version: Literal["private-current-ownership-v1"] = "private-current-ownership-v1"
-    source_class: Literal["OPERATOR_DECLARED_PRIVATE_TRANSIENT"]
-    attestation_status: Literal["HUMAN_ATTESTED"]
-    provider_verification: Literal["NOT_PROVIDER_VERIFIED"]
+    source_class: Literal["OPERATOR_DECLARED_PRIVATE_TRANSIENT", "PROVIDER_OBSERVED_RECONSTRUCTED"]
+    attestation_status: Literal["HUMAN_ATTESTED", "PROVIDER_OBSERVED"]
+    provider_verification: Literal["NOT_PROVIDER_VERIFIED", "PROVIDER_VERIFIED"]
     target_gameweek: PositiveInt
     declared_at: datetime
     attested_at: datetime
@@ -101,6 +102,13 @@ class PrivateCurrentOwnership(_FrozenModel):
         ids = tuple(member.official_fpl_element_id for member in self.members)
         if ids != tuple(sorted(ids)) or len(ids) != len(set(ids)):
             raise ValueError("ownership members must be unique and ordered by official element ID")
+        expected_status = (
+            ("HUMAN_ATTESTED", "NOT_PROVIDER_VERIFIED")
+            if self.source_class == "OPERATOR_DECLARED_PRIVATE_TRANSIENT"
+            else ("PROVIDER_OBSERVED", "PROVIDER_VERIFIED")
+        )
+        if (self.attestation_status, self.provider_verification) != expected_status:
+            raise ValueError("ownership provenance fields contradict the source class")
         if any(member.acquired_gameweek > self.target_gameweek for member in self.members):
             raise ValueError("ownership acquisition cannot be after the target Gameweek")
         if not self.declared_at <= self.attested_at <= self.information_cutoff:
@@ -165,7 +173,11 @@ class PrivateCanonicalPlayerIdentityMap(_FrozenModel):
     schema_version: Literal["private-current-player-identity-map-v1"] = (
         "private-current-player-identity-map-v1"
     )
-    source_class: Literal["DAT_003_OPERATOR_EXPORT", "REPOSITORY_SYNTHETIC"]
+    source_class: Literal[
+        "DAT_003_OPERATOR_EXPORT",
+        "OPERATOR_INITIATED_DETERMINISTIC",
+        "REPOSITORY_SYNTHETIC",
+    ]
     resolved_at: datetime
     information_cutoff: datetime
     teams: Annotated[tuple[PrivateCanonicalTeamIdentity, ...], Field(min_length=1)]
@@ -271,7 +283,10 @@ class PrivateV1ExecutionInput(_FrozenModel):
     market_identity_view: CurrentMarketCanonicalIdentityView
     market_constraints: CurrentMarketConstraintBundle
     score_priors: Annotated[tuple[PrivateFixtureScorePrior, ...], Field(min_length=1)]
-    manual_minutes: Annotated[tuple[ManualFixtureMinutesInput, ...], Field(min_length=1)]
+    manual_minutes: Annotated[
+        tuple[ManualFixtureMinutesInput | CurrentModelFixtureMinutesInput, ...],
+        Field(min_length=1),
+    ]
     ownership: PrivateCurrentOwnership
     candidate_action_policy: PrivateCandidateActionPolicy
     ruleset: CompiledRuleset
@@ -336,6 +351,10 @@ class PrivateV1ExecutionInput(_FrozenModel):
             or carry_forward.declared_at > current.information_cutoff
         ):
             raise ValueError("current Gameweek requires an exact stale-prior carry-forward policy")
+        if carry_forward is not None and not {
+            item.current_official_fpl_element_id for item in carry_forward.fallback_assignments
+        } <= {item.official_fpl_element_id for item in self.player_identity_map.players}:
+            raise ValueError("stale-prior fallback assignment is outside the player universe")
         if (
             market.season_code != current.season_code
             or market.target_gameweek != current.target_gameweek
@@ -379,6 +398,11 @@ class PrivateV1ExecutionInput(_FrozenModel):
         expected = fixture_sets["markets"]
         if not expected or any(values != expected for values in fixture_sets.values()):
             raise ValueError("markets, score priors and Stage-7 inputs must cover exact fixtures")
+        model_stage7_count = sum(
+            isinstance(item, CurrentModelFixtureMinutesInput) for item in self.manual_minutes
+        )
+        if model_stage7_count not in {0, len(self.manual_minutes)}:
+            raise ValueError("Stage-7 input families cannot be mixed in one execution")
         for collection in (
             self.score_priors,
             self.manual_minutes,
@@ -540,9 +564,12 @@ class PrivateV1Decision(_FrozenModel):
     no_transfer_tactics: PrivateTacticalDecision
     chip_action: Literal["NO_CHIP"]
     paired_comparison: PrivatePairedComparison
-    stage7_family: Literal["PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1"]
-    stage7_model_derived: Literal[False]
-    confidence: Literal["LOW"]
+    stage7_family: Literal[
+        "PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1",
+        "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
+    ]
+    stage7_model_derived: bool
+    confidence: Literal["HIGH", "MEDIUM", "LOW"]
     player_prior_status: Literal[
         "HISTORICAL_GW1_ACCEPTED_SCOPE",
         "PRIVATE_CURRENT_GW_STALE_PRIOR_CARRY_FORWARD_V1",
@@ -565,6 +592,10 @@ class PrivateV1Decision(_FrozenModel):
 
     @model_validator(mode="after")
     def decision_is_canonical_and_sealed(self) -> Self:
+        if self.stage7_model_derived != (
+            self.stage7_family == "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"
+        ):
+            raise ValueError("Stage-7 family and model-derived flag differ")
         if (self.action == "NO_TRANSFER") != (len(self.transfers) == 0):
             raise ValueError("decision action and transfer list disagree")
         if self.resulting_squad != tuple(sorted(self.resulting_squad)):
