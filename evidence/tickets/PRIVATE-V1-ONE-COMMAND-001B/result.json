@@ -1,0 +1,9 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI_AND_INDEPENDENT_REVIEW",
+  "external_installed_wheel_public_reads": "PASS",
+  "official_fpl_persistent_artifacts_created": 0,
+  "real_one_command_status": "BLOCKED_MISSING_ODDS_CREDENTIAL",
+  "source_tree_windows_public_reads": "PASS",
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001B"
+}

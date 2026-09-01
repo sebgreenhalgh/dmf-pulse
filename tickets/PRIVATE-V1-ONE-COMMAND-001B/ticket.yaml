@@ -1,0 +1,38 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001B"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Windows direct-FPL transport hotfix"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001B"
+required_base_commit: "4aa187a7ada60523b5df29856e7e55697e310112"
+parent_exact_sha_ci: 33548371605
+objective: >-
+  Correct the Windows CPython response-reader lifecycle defect that converts a completely read
+  direct official-FPL response into SOURCE_UNAVAILABLE when the underlying socket closes before
+  the sentinel EOF iteration.
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A12-operational-assurance"
+in_scope:
+  - "Smallest cross-platform DirectUrllibTransport response-reader lifecycle correction."
+  - "Semantic closed/detached-socket EOF regression and inherited adversarial transport proofs."
+  - "Real unauthenticated bootstrap and fixtures verification through DirectFplClient."
+permissions:
+  official_fpl_network: "operator_initiated_low_volume_get_only"
+  authenticated_current_team: "not_required_for_transport_diagnosis"
+  authentication_or_credentials: "existing_environment_or_hidden_prompt_only"
+  fpl_raw_storage: "forbidden"
+  fpl_derived_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Odds acquisition changes or credentials during transport diagnosis."
+  - "One-command pipeline redesign or alternate transport architecture."
+  - "Official-FPL writes, TLS weakening, redirects, unbounded reads or timeout removal."
+  - "Credential persistence, browser credential-store access or disclosure."
+  - "PR, merge, tag or production activation."
+required_execution_status: "REAL_PUBLIC_FPL_TRANSPORT_VERIFIED"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

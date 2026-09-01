@@ -166,19 +166,58 @@ class DirectUrllibTransport:
     def __init__(self, monotonic: Callable[[], float] = time.monotonic) -> None:
         self._monotonic = monotonic
 
+    @staticmethod
+    def _set_read_timeout(response: object, timeout_seconds: float) -> None:
+        """Adjust the live socket while allowing CPython's post-body detached state."""
+
+        raw_socket = getattr(getattr(getattr(response, "fp", None), "raw", None), "_sock", None)
+        set_timeout = getattr(raw_socket, "settimeout", None)
+        if not callable(set_timeout):
+            return
+        try:
+            set_timeout(timeout_seconds)
+        except OSError:
+            fileno = getattr(raw_socket, "fileno", None)
+            if not callable(fileno):
+                raise
+            try:
+                descriptor = fileno()
+            except OSError:
+                return
+            if not isinstance(descriptor, int) or descriptor >= 0:
+                raise
+            # HTTPResponse can close the socket after consuming Content-Length while its
+            # stable read() interface still has one authoritative EOF result to return.
+
+    @staticmethod
+    def _declared_content_length(response: object) -> int | None:
+        headers = getattr(response, "headers", None)
+        get_header = getattr(headers, "get", None)
+        if not callable(get_header):
+            return None
+        raw_length = get_header("Content-Length")
+        if raw_length is None:
+            return None
+        try:
+            length = int(raw_length)
+        except (TypeError, ValueError):
+            raise IngestionError("SOURCE_UNAVAILABLE", "FPL source response is invalid") from None
+        if length < 0:
+            raise IngestionError("SOURCE_UNAVAILABLE", "FPL source response is invalid")
+        return length
+
     def _read_bounded(
         self, response: object, request: DirectHttpRequest, *, started_at: float
     ) -> bytes:
         limit = load_provider_config().max_response_bytes
+        declared_length = self._declared_content_length(response)
         chunks: list[bytes] = []
         size = 0
-        raw_socket = getattr(getattr(getattr(response, "fp", None), "raw", None), "_sock", None)
         while size <= limit:
             remaining = request.total_timeout_seconds - (self._monotonic() - started_at)
             if remaining <= 0:
                 raise TimeoutError
-            if raw_socket is not None and hasattr(raw_socket, "settimeout"):
-                raw_socket.settimeout(min(request.read_timeout_seconds, remaining))
+            self._set_read_timeout(response, min(request.read_timeout_seconds, remaining))
             reader = getattr(response, "read", None)
             if not callable(reader):
                 raise IngestionError("SOURCE_UNAVAILABLE", "FPL source response is invalid")
@@ -192,6 +231,8 @@ class DirectUrllibTransport:
         body = b"".join(chunks)
         if len(body) > limit:
             raise IngestionError("PAYLOAD_TOO_LARGE", "FPL response exceeds the byte limit")
+        if declared_length is not None and len(body) != declared_length:
+            raise IngestionError("SOURCE_UNAVAILABLE", "FPL source response is incomplete")
         return body
 
     def _body(self, response: object, request: DirectHttpRequest, *, started_at: float) -> bytes:

@@ -1554,3 +1554,26 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   operator run only when every approved input exists, and seal truthful ticket evidence.
 - [ ] Push one exact final SHA, require its automatic CI fully green, and stop for independent
   review without PR, merge, tag, activation, or post-CI mutation.
+# PRIVATE-V1-ONE-COMMAND-001B Windows direct-FPL transport hotfix
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001B`; immutable parent
+  `4aa187a7ada60523b5df29856e7e55697e310112`; parent exact-SHA CI `33548371605`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001B`.
+- Scope: the smallest cross-platform correction to the bounded `urllib` response-reader lifecycle;
+  preserve HTTPS/GET allowlists, redirect rejection, TLS validation, connect/read/total timeouts,
+  response-size limit, retry/request budgets, zero retention, and secret-safe errors.
+- Safety: no Odds changes, one-command redesign, authenticated probe, persistence, PR, merge, tag,
+  production activation, or credential-store access.
+
+## Hotfix checkpoints
+
+- [x] Verify the exact parent/CI and isolated branch; reproduce the real Windows bootstrap failure
+  through `DirectFplClient` without Odds or authentication.
+- [x] Instrument the response lifecycle with metadata only, add the closed/detached-socket semantic
+  regression and inherited size/timeout/network/TLS/redirect/reader/content-type/secret proofs.
+- [x] Implement the narrow cross-platform reader correction and run focused plus affected
+  ingestion/private-v1, Ruff, mypy, and branch-coverage gates.
+- [x] Prove real Windows bootstrap and fixtures reads, run the installed-wheel transport smoke,
+  retry the one-command only through existing environment mechanisms, and record the next blocker.
+- [ ] Seal ticket evidence/manifests, validate repository and secrets, build, push the final SHA,
+  require exact-SHA CI green, and stop without post-CI mutation.
