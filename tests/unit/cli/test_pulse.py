@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+from typer.core import TyperGroup
+from typer.main import get_command
 from typer.testing import CliRunner
 
 from dmf_pulse.cli import pulse as pulse_module
@@ -17,7 +19,14 @@ def test_pulse_help_exposes_only_the_entry_identifier() -> None:
     result = runner.invoke(app, ["pulse", "--help"])
 
     assert result.exit_code == 0
-    assert "--entry-id" in result.stdout
+    root_command = get_command(app)
+    assert isinstance(root_command, TyperGroup)
+    pulse_options = {
+        option
+        for parameter in root_command.commands["pulse"].params
+        for option in getattr(parameter, "opts", ())
+    }
+    assert pulse_options == {"--entry-id"}
     assert "token" not in result.stdout.casefold()
     assert "bootstrap" not in result.stdout.casefold()
     assert "fixtures" not in result.stdout.casefold()

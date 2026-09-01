@@ -28,6 +28,7 @@ payloads and credentials retained by the real command attempt: zero.
 | Clean-checkout repository validation | PASS; 1,274-file manifests; zero repository errors |
 | Secret scan | PASS from clean checkout after sealing; zero findings |
 | Genuine operator command | BLOCKED before provider access with exact output `THE_ODDS_API_KEY is missing.`; both required environment credentials absent; provider calls zero |
+| Pre-final exact-SHA CI regression | Run `33546116140` correctly failed on Ubuntu because a help-contract test searched Rich's width-dependent rendered text; the command exited zero and declared the correct option. The contract now asserts the Click/Typer parameter surface exactly, with focused proof `6 passed in 2.17s`. |
 | Exact final-SHA CI | Pending final push; must not be inferred before the exact SHA run completes |
 
 Diagnostic full-suite attempts that omitted the separate `migration` marker, placed the temp root
