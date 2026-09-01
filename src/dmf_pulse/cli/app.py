@@ -22,6 +22,7 @@ from dmf_pulse.cli.ingest_cmd import ingest_app
 from dmf_pulse.cli.market_cmd import market_app
 from dmf_pulse.cli.optimise import optimise_app
 from dmf_pulse.cli.prices import prices_app
+from dmf_pulse.cli.private_v1 import private_v1_app
 from dmf_pulse.cli.rank import rank_app
 from dmf_pulse.cli.review_pack_cmd import review_pack_app
 from dmf_pulse.cli.rules_cmd import rules_app
@@ -49,6 +50,7 @@ app.add_typer(review_pack_app, name="review-pack")
 app.add_typer(rules_app, name="rules")
 app.add_typer(optimise_app, name="optimise")
 app.add_typer(prices_app, name="prices")
+app.add_typer(private_v1_app, name="private-v1")
 app.add_typer(rank_app, name="rank")
 app.add_typer(specs_app, name="specs")
 

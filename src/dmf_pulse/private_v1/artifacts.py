@@ -29,6 +29,7 @@ MAX_REPLAY_MANIFEST_BYTES = 256 * 1024
 MAX_DECISION_BYTES = 4 * 1024 * 1024
 MAX_REPORT_BYTES = 512 * 1024
 
+
 def _reject_duplicate_pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
     result: dict[str, object] = {}
     for key, value in pairs:
@@ -106,7 +107,14 @@ def _load_model[ModelT: BaseModel](
             object_pairs_hook=_reject_duplicate_pairs,
             parse_constant=_reject_constant,
         )
-        return model.model_validate(parsed, strict=True)
+        normalized = json.dumps(
+            parsed,
+            allow_nan=False,
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        )
+        return model.model_validate_json(normalized, strict=True)
     except PrivateV1Error:
         raise
     except (UnicodeError, json.JSONDecodeError, ValidationError, TypeError, ValueError):
@@ -195,7 +203,7 @@ def write_synthetic_replay_bundle(
         "report.txt": report_bytes,
     }
     rows = tuple(_file_row(name, body) for name, body in sorted(named.items()))
-    provisional = PrivateReplayManifest(
+    provisional = PrivateReplayManifest.model_construct(
         run_id=execution.run_id,
         code_sha=execution.code_sha,
         execution_input_semantic_sha256=execution.semantic_sha256,
@@ -216,7 +224,9 @@ def write_synthetic_replay_bundle(
     return manifest
 
 
-def verify_replay_bundle(directory: Path) -> tuple[
+def verify_replay_bundle(
+    directory: Path,
+) -> tuple[
     PrivateReplayManifest,
     PrivateV1ExecutionInput,
     PrivateV1Decision,
@@ -224,8 +234,10 @@ def verify_replay_bundle(directory: Path) -> tuple[
 ]:
     """Validate exact replay bytes and return typed, path-independent contents."""
 
+    if directory.is_symlink():
+        raise PrivateV1Error("REPLAY_BUNDLE_INVALID", "replay bundle is unavailable")
     directory = directory.resolve()
-    if not directory.is_dir() or directory.is_symlink():
+    if not directory.is_dir():
         raise PrivateV1Error("REPLAY_BUNDLE_INVALID", "replay bundle is unavailable")
     manifest = load_replay_manifest(directory / "manifest.json")
     expected_names = ("decision.json", "input.json", "report.txt")

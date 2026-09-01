@@ -1491,9 +1491,9 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 
 - [x] Verify pinned parent/branch/CI, isolate a clean worktree, resolve authority, and inventory
   the existing Stage 7-11, captaincy, current-state, reporting, and replay contracts.
-- [ ] E2E.01 add strict execution/ownership/manifest/replay contracts, transient operator
+- [x] E2E.01 add strict execution/ownership/manifest/replay contracts, transient operator
   boundary, typed errors, and foundational hostile tests; commit and push.
-- [ ] E2E.02 implement the complete current-state -> Stage 8 -> Stage 9 -> Stage 11/10 ->
+- [x] E2E.02 implement the complete current-state -> Stage 8 -> Stage 9 -> Stage 11/10 ->
   captain validation -> paired comparator -> decision artifact path and deterministic offline
   full-stack proof; commit and push.
 - [ ] E2E.03 attempt one truthful current private run, freeze/replay only if governing rights and
