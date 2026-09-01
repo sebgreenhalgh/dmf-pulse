@@ -8,6 +8,11 @@ assembly and the top-level `dmf pulse` command. The existing current Odds/OpenFo
 Stage-7 model, Stage 8/9 scorer, optimiser, no-action comparator and captaincy services remain
 the decision authority.
 
+The automatic candidate policy retains the complete provider-selectable non-squad universe for
+the accepted one-transfer private-V1 horizon. Exact-search action/result bounds are derived from
+that declared universe (9,211 unfiltered combinations at 614 incoming players) instead of the
+static 5,000/1,000 defaults; a provider catalogue above 1,000 incoming candidates fails closed.
+
 The offline provider-shaped E2E reaches a computed recommendation without a manufactured final
 points vector or recommendation. Official-FPL write methods, password access, browser credential
 harvesting, provider-body persistence, database writes, replay output, scheduling and production

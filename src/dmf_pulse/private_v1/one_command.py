@@ -78,6 +78,7 @@ class OneCommandRequest:
     entry_id: int
     code_sha: str
     run_at: datetime
+    operator_approved_at: datetime | None = None
     run_id: str = "PRIVATE_V1_ONE_COMMAND"
     root_seed: int = 20260901
     scenario_count: int = 256
@@ -267,6 +268,7 @@ class PrivateV1OneCommandService:
         score_service_factory: Callable[[Callable[[], datetime]], CurrentScorePriorService]
         | None = None,
         recommendation_service: PrivateV1RecommendationService | None = None,
+        clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self._direct_client_factory = direct_client_factory or (
             lambda attestation: DirectFplClient(attestation)
@@ -278,6 +280,7 @@ class PrivateV1OneCommandService:
             lambda clock: CurrentScorePriorService(clock=clock)
         )
         self._recommendation_service = recommendation_service or PrivateV1RecommendationService()
+        self._clock = clock
 
     def run(self, request: OneCommandRequest) -> OneCommandResult:
         if (
@@ -285,26 +288,49 @@ class PrivateV1OneCommandService:
             or request.entry_id <= 0
             or request.run_at.tzinfo is None
             or request.run_at.utcoffset() is None
+            or (
+                request.operator_approved_at is not None
+                and (
+                    request.operator_approved_at.tzinfo is None
+                    or request.operator_approved_at.utcoffset() is None
+                )
+            )
         ):
             raise PrivateV1Error("USAGE_INVALID", "entry ID and run timestamp are invalid")
         run_at = request.run_at.astimezone(UTC)
+        approved_at = (
+            run_at
+            if request.operator_approved_at is None
+            else request.operator_approved_at.astimezone(UTC)
+        )
+        if approved_at > run_at:
+            raise PrivateV1Error("USAGE_INVALID", "operator approval is after the cutoff")
 
-        def clock() -> datetime:
-            return run_at
+        def observed_now() -> datetime:
+            value = self._clock()
+            if value.tzinfo is None or value.utcoffset() is None:
+                raise IngestionError("INTERNAL_INVARIANT", "one-command clock must be aware")
+            value = value.astimezone(UTC)
+            if value > run_at:
+                raise IngestionError("POST_CUTOFF", "input acquisition exceeded its cutoff")
+            return value
 
         try:
-            attestation = DirectFplRunAttestation(attested_at=run_at)
+            attestation = DirectFplRunAttestation(attested_at=approved_at)
             direct_client = self._direct_client_factory(attestation)
             snapshot = acquire_direct_fpl_snapshot(
-                direct_client, entry_id=request.entry_id, captured_at=run_at
+                direct_client,
+                entry_id=request.entry_id,
+                captured_at=run_at,
+                clock=observed_now,
             )
-            ruleset, capability, rules_authority = _rules_authority(run_at)
-            manager = CurrentManagerStateService(clock=clock).compile_provider_snapshot(
+            ruleset, capability, rules_authority = _rules_authority(approved_at)
+            manager = CurrentManagerStateService(clock=observed_now).compile_provider_snapshot(
                 snapshot.current_team,
                 fpl_input=snapshot.fpl_input,
                 ruleset=ruleset,
                 capability=capability,
-                observed_at=run_at,
+                observed_at=observed_now(),
                 overall_points=snapshot.entry.summary_overall_points,
                 overall_rank=snapshot.entry.summary_overall_rank,
                 private_rules_authority=rules_authority,
@@ -320,12 +346,12 @@ class PrivateV1OneCommandService:
             latest_kickoff = max(
                 item.kickoff_at for item in target_fixtures if item.kickoff_at is not None
             )
-            odds = self._odds_service_factory(clock).acquire(
+            odds = self._odds_service_factory(observed_now).acquire(
                 information_cutoff=run_at,
                 commence_to=latest_kickoff + timedelta(seconds=1),
             )
             bridge = build_automatic_current_identity_map(
-                snapshot.fpl_input, odds, decided_at=run_at
+                snapshot.fpl_input, odds, decided_at=observed_now()
             )
             unified_request = bind_current_unified_state_request(
                 snapshot.fpl_input, odds, bridge, manager, ruleset, capability
@@ -340,7 +366,9 @@ class PrivateV1OneCommandService:
                 capability=capability,
                 private_rules_authority=rules_authority,
             )
-            market_view = build_transient_current_market_identity_view(current, resolved_at=run_at)
+            market_view = build_transient_current_market_identity_view(
+                current, resolved_at=observed_now()
+            )
             markets = CurrentMarketConstraintService().build(
                 bind_current_market_constraint_request(current, market_view),
                 source=current,
@@ -350,7 +378,7 @@ class PrivateV1OneCommandService:
             model_minutes = build_automatic_model_minutes(snapshot, player_map, market_view)
             ownership = build_automatic_ownership(snapshot, manager)
             candidates = build_full_candidate_policy(snapshot, manager)
-            source_prior = self._score_service_factory(clock).build(
+            source_prior = self._score_service_factory(observed_now).build(
                 CurrentScorePriorBuildRequest(
                     information_cutoff=run_at,
                     rights_profile_id="openfootball_football_json_score_prior_v1",

@@ -8,7 +8,7 @@ import importlib.metadata
 import os
 import re
 import sys
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Annotated
 
@@ -117,7 +117,8 @@ def pulse_command(
     try:
         if not os.environ.get("THE_ODDS_API_KEY", "").strip():
             raise PrivateV1Error("CREDENTIAL_UNAVAILABLE", "THE_ODDS_API_KEY is missing.")
-        run_at = datetime.now(UTC)
+        approved_at = datetime.now(UTC)
+        information_cutoff = approved_at + timedelta(minutes=5)
         credential_provider = _PromptingCredentialProvider()
         service = PrivateV1OneCommandService(
             direct_client_factory=lambda attestation: DirectFplClient(
@@ -125,7 +126,12 @@ def pulse_command(
             )
         )
         result = service.run(
-            OneCommandRequest(entry_id=entry_id, code_sha=_code_sha(), run_at=run_at)
+            OneCommandRequest(
+                entry_id=entry_id,
+                code_sha=_code_sha(),
+                run_at=information_cutoff,
+                operator_approved_at=approved_at,
+            )
         )
         typer.echo(result.report)
     except PrivateV1Error as exc:

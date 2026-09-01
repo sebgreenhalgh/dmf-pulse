@@ -12,9 +12,23 @@ from dmf_pulse.private_v1.artifacts import (
     write_synthetic_replay_bundle,
 )
 from dmf_pulse.private_v1.errors import PrivateV1Error
-from dmf_pulse.private_v1.service import PrivateV1RecommendationService
+from dmf_pulse.private_v1.service import (
+    PrivateV1RecommendationService,
+    _exact_root_action_upper_bound,
+)
 
 from .e2e_test_support import build_execution_input
+
+
+def test_exact_root_bound_covers_full_current_scale_candidate_universe() -> None:
+    assert (
+        _exact_root_action_upper_bound(
+            squad_size=15,
+            incoming_count=614,
+            maximum_transfers=1,
+        )
+        == 9211
+    )
 
 
 def test_complete_synthetic_run_and_offline_replay(

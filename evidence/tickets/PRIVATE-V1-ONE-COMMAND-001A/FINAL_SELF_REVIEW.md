@@ -10,7 +10,7 @@
 | Missing live minutes treated as zero | No. Missing minutes/starts remain `None` and are omitted from factual history. |
 | Ad-hoc Stage 7 | No. The accepted regularised empirical-Bayes/coherence family and shrinkage resources are invoked. |
 | Hidden fuzzy mapping | No. Mapping uses exact reviewed aliases, fixture side, kickoff and provider identity; ambiguity blocks. |
-| Tiny hand shortlist | No. The policy contains every provider-selectable non-squad player; the declared current-V1 action horizon is one transfer. |
+| Tiny hand shortlist / static optimiser cap | No. The policy contains every provider-selectable non-squad player for the declared one-transfer horizon. Search bounds are deterministically raised to the full unfiltered action upper bound; an abnormal catalogue above 1,000 incoming players fails closed rather than pruning. |
 | Stale prior described as current | No. Original cutoff, grade E, historical GW1 acceptance and explicit current-GW carry-forward warnings remain visible. |
 | Scorer/optimiser/captain duplication | None. Existing Stage 8-11 and captaincy boundaries are called. Exact Stage-10 evaluation was factored to remove repeated autosub work without changing its search space or proof counts. |
 | Comparator/captain mismatch | Existing aligned-scenario comparator and independent captain verification remain mandatory. |

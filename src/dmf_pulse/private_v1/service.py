@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from fractions import Fraction
 from importlib.resources import files
+from math import comb
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -113,6 +114,17 @@ from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 
 _DECIMAL_CONTEXT = Context(prec=50, rounding=ROUND_HALF_EVEN)
+
+
+def _exact_root_action_upper_bound(
+    *, squad_size: int, incoming_count: int, maximum_transfers: int
+) -> int:
+    """Return the finite unfiltered combination bound for exact root enumeration."""
+
+    return sum(
+        comb(squad_size, count) * comb(incoming_count, count)
+        for count in range(min(maximum_transfers, squad_size, incoming_count) + 1)
+    )
 
 
 def _uses_model_stage7(value: PrivateV1ExecutionInput) -> bool:
@@ -727,6 +739,15 @@ def _stage11_request(
     search = load_multi_gameweek_search_policy()
     search_payload = search.model_dump(mode="python")
     search_payload["max_transfers_per_node"] = value.candidate_action_policy.maximum_transfers
+    root_action_upper = _exact_root_action_upper_bound(
+        squad_size=len(value.current_state.manager_state.squad),
+        incoming_count=len(allowed),
+        maximum_transfers=value.candidate_action_policy.maximum_transfers,
+    )
+    search_payload["max_actions_per_state"] = max(search.max_actions_per_state, root_action_upper)
+    search_payload["max_returned_root_candidates"] = max(
+        search.max_returned_root_candidates, root_action_upper
+    )
     search_payload["policy_sha256"] = "0" * 64
     search = seal_search_policy(SearchPolicy.model_validate(search_payload))
     transfer_rules = build_multi_gameweek_transfer_rules(

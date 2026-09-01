@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Annotated
 
@@ -226,22 +227,30 @@ def acquire_direct_fpl_snapshot(
     *,
     entry_id: int,
     captured_at: datetime,
+    clock: Callable[[], datetime] | None = None,
 ) -> DirectFplSnapshot:
     """Acquire one public-first current snapshot and discard all response bytes after parsing."""
 
     if captured_at.tzinfo is None or captured_at.utcoffset() is None:
         raise IngestionError("VALIDATION_FAILED", "capture time must be aware")
-    captured = captured_at.astimezone(UTC)
+    information_cutoff = captured_at.astimezone(UTC)
+    active_clock = clock or (lambda: information_cutoff)
     bootstrap = client.fetch(DirectFplResource.BOOTSTRAP)
-    target_gameweek, live_gameweeks = _target_gameweek(bootstrap, captured_at=captured)
+    observed_at = active_clock()
+    if observed_at.tzinfo is None or observed_at.utcoffset() is None:
+        raise IngestionError("INTERNAL_INVARIANT", "direct FPL clock must be aware")
+    observed_at = observed_at.astimezone(UTC)
+    if observed_at > information_cutoff:
+        raise IngestionError("POST_CUTOFF", "official FPL response arrived after the cutoff")
+    target_gameweek, live_gameweeks = _target_gameweek(bootstrap, captured_at=observed_at)
     fixtures = client.fetch(DirectFplResource.FIXTURES)
-    fpl_input = CurrentFplInputService(clock=lambda: captured).compile_direct(
+    fpl_input = CurrentFplInputService(clock=active_clock).compile_direct(
         CurrentFplDirectInputRequest(
             competition_key="PL",
             season_code="2026/27",
             target_gameweek=target_gameweek,
-            captured_at=captured,
-            information_cutoff=captured,
+            captured_at=observed_at,
+            information_cutoff=information_cutoff,
             rights_profile_id=OFFICIAL_DIRECT_PROFILE_ID,
         ),
         bootstrap_body=bootstrap,
@@ -268,7 +277,7 @@ def acquire_direct_fpl_snapshot(
         for gameweek in live_gameweeks
     }
     return DirectFplSnapshot(
-        captured_at=captured,
+        captured_at=observed_at,
         target_gameweek=target_gameweek,
         fpl_input=fpl_input,
         entry=entry,

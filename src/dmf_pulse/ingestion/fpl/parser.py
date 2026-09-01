@@ -421,6 +421,14 @@ def _contract_projection(value: object) -> object:
     if isinstance(value, BaseModel):
         projection: dict[str, object] = {}
         for name, field in value.__class__.model_fields.items():
+            if (
+                isinstance(value, PlayerElement)
+                and name in {"starts", "can_select", "removed"}
+                and name not in value.model_fields_set
+            ):
+                # Preserve the frozen FPL-004 semantic identity when the direct-read
+                # extension fields are not published. Published values remain hashed.
+                continue
             if name not in value.model_fields_set and not field.is_required():
                 projection[name] = {"missingness": "NOT_PUBLISHED"}
             else:

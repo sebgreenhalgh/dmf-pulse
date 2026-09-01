@@ -296,6 +296,7 @@ def test_rights_loader_uses_installed_resource_when_repository_config_is_absent(
     monkeypatch.setattr(rights_module.resources, "files", lambda _package: ResourceRoot())
     assert set(load_rights_profiles()) == {
         "fpl_official_private_manual_v1",
+        "fpl_official_private_operator_initiated_read_v1",
         "synthetic_test_v1",
     }
 

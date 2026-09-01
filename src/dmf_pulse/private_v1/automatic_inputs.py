@@ -158,6 +158,11 @@ def build_full_candidate_policy(
             and item.removed is not True
         )
     )
+    if len(incoming) > 1000:
+        raise IngestionError(
+            "CANDIDATE_UNIVERSE_UNBOUNDED",
+            "official FPL selectable player universe exceeds the private exact-search bound",
+        )
     return seal_candidate_action_policy(
         PrivateCandidateActionPolicy.model_construct(
             allowed_transfer_in_element_ids=incoming,

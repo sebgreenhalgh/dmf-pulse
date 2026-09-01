@@ -59,7 +59,11 @@ def test_required_profiles_encode_the_conservative_capability_matrix(repository_
     synthetic = profiles["synthetic_test_v1"]
     official = profiles["fpl_official_private_manual_v1"]
 
-    assert set(profiles) == {"synthetic_test_v1", "fpl_official_private_manual_v1"}
+    assert set(profiles) == {
+        "synthetic_test_v1",
+        "fpl_official_private_manual_v1",
+        "fpl_official_private_operator_initiated_read_v1",
+    }
     assert synthetic.status is RightsProfileStatus.HUMAN_APPROVED
     assert synthetic.capabilities[RightsCapability.RAW_STORAGE] is CapabilityValue.ALLOW
     assert synthetic.capabilities[RightsCapability.DERIVED_STORAGE] is CapabilityValue.ALLOW
@@ -78,6 +82,7 @@ def test_default_profile_loader_resolves_repository_resource() -> None:
     assert set(load_rights_profiles()) == {
         "synthetic_test_v1",
         "fpl_official_private_manual_v1",
+        "fpl_official_private_operator_initiated_read_v1",
     }
 
 

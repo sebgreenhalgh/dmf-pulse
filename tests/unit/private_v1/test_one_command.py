@@ -363,6 +363,7 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     repository_root: Path,
 ) -> None:
     direct_bodies, _ = _provider_sources(repository_root)
+    marker = "synthetic-token"
     direct_transport = _DirectTransport(direct_bodies)
     odds = _odds_input(repository_root)
     score_config, score_bodies = synthetic_snapshot()
@@ -371,9 +372,7 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
         return DirectFplClient(
             attestation,
             transport=direct_transport,
-            credential_provider=DirectFplCredentialProvider(
-                {"DMF_FPL_BEARER_TOKEN": "synthetic-token"}
-            ),
+            credential_provider=DirectFplCredentialProvider({"DMF_FPL_BEARER_TOKEN": marker}),
             sleeper=lambda _: None,
             pace_seconds=0,
         )
@@ -392,12 +391,14 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
         direct_client_factory=direct_factory,
         odds_service_factory=lambda clock: _OddsService(odds),
         score_service_factory=score_factory,
+        clock=lambda: RUN_AT,
     )
     result = service.run(
         OneCommandRequest(
             entry_id=42,
             code_sha="a" * 40,
             run_at=RUN_AT,
+            operator_approved_at=RUN_AT - timedelta(minutes=1),
             scenario_count=32,
             root_seed=42,
         )

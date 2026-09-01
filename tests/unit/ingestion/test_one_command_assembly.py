@@ -156,6 +156,7 @@ def test_direct_snapshot_resolves_target_and_auth_state_without_previous_pick_su
     repository_root: Path,
 ) -> None:
     _, _, _, current_team = _context(repository_root)
+    marker = "synthetic-token"
     transport = _DirectResponses(
         (
             json.dumps(_synthetic_bootstrap(repository_root)).encode(),
@@ -169,9 +170,7 @@ def test_direct_snapshot_resolves_target_and_auth_state_without_previous_pick_su
     client = DirectFplClient(
         DirectFplRunAttestation(attested_at=FPL_CAPTURED),
         transport=transport,
-        credential_provider=DirectFplCredentialProvider(
-            {"DMF_FPL_BEARER_TOKEN": "synthetic-token"}
-        ),
+        credential_provider=DirectFplCredentialProvider({"DMF_FPL_BEARER_TOKEN": marker}),
         sleeper=lambda _: None,
         pace_seconds=0,
     )
@@ -283,6 +282,18 @@ def test_ownership_and_full_candidate_universe_are_automatic(repository_root: Pa
     assert all(item.acquired_gameweek == 1 for item in ownership.members)
     assert set(candidates.allowed_transfer_in_element_ids) == expected_incoming
     assert len(identities.players) == len(eligible_fpl.players)
+
+    oversized_players = tuple(
+        eligible_fpl.players[-1].model_copy(
+            update={"provider_element_id": 10_000 + index, "can_select": True, "removed": False}
+        )
+        for index in range(1001)
+    )
+    oversized_snapshot = snapshot.model_copy(
+        update={"fpl_input": eligible_fpl.model_copy(update={"players": oversized_players})}
+    )
+    with pytest.raises(IngestionError, match="selectable player universe exceeds"):
+        build_full_candidate_policy(oversized_snapshot, manager)
 
 
 def test_automatic_stage7_uses_accepted_model_with_global_shrinkage_when_history_missing(
