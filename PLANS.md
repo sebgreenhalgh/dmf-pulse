@@ -1472,3 +1472,32 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   path; complete evidence, broad local gates, and adversarial review fixes.
 - [ ] Push the exact final evidence SHA, observe automatic CI fully green, and hand off as
   implemented pending independent review and not production-active.
+
+# PRIVATE-V1-E2E-001A first repeatable private recommendation
+
+- Ticket: `PRIVATE-V1-E2E-001A`; immutable stacked parent
+  `7f4254905bccf79cdc282d04f4928cba850276be`.
+- Branch: `readiness/PRIVATE-V1-E2E-001A`.
+- Scope: one private application service and CLI surface joining exact current source state,
+  current market constraints, manual transient Stage 7, canonical Stage 8 and Stage 9 joint
+  scenarios, the accepted Stage-11 transfer/no-transfer solver, exact Stage-10 tactics, and the
+  accepted captain/vice evaluator into a reportable, hash-bound decision and offline replay.
+- Safety: current target Gameweek only; explicit `NO CHIP`; TEST/REPLAY bounded optimiser only;
+  no alternative scorer/solver; no guessed manager facts; no official-FPL automation; no secret
+  output; no persistent real FPL/manager payload under current rights; no production activation,
+  PR, merge, tag, or human acceptance.
+
+## E2E checkpoints
+
+- [x] Verify pinned parent/branch/CI, isolate a clean worktree, resolve authority, and inventory
+  the existing Stage 7-11, captaincy, current-state, reporting, and replay contracts.
+- [ ] E2E.01 add strict execution/ownership/manifest/replay contracts, transient operator
+  boundary, typed errors, and foundational hostile tests; commit and push.
+- [ ] E2E.02 implement the complete current-state -> Stage 8 -> Stage 9 -> Stage 11/10 ->
+  captain validation -> paired comparator -> decision artifact path and deterministic offline
+  full-stack proof; commit and push.
+- [ ] E2E.03 attempt one truthful current private run, freeze/replay only if governing rights and
+  inputs permit it, harden reporting/CLI/evidence, and commit and push.
+- [ ] Run all focused, inherited, property, branch-coverage, static, build, installed-wheel,
+  repository, manifest, and secret gates; push the exact final SHA and require exact-SHA CI green.
+- [ ] Independent review and human acceptance remain separate.

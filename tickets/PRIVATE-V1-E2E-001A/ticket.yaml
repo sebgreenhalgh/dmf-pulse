@@ -1,0 +1,52 @@
+ticket_id: "PRIVATE-V1-E2E-001A"
+stage: "PRIVATE-V1-E2E"
+pack_version: "1.0"
+title: "First repeatable real private FPL recommendation"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-E2E-001A"
+required_base_commit: "7f4254905bccf79cdc282d04f4928cba850276be"
+parent_exact_sha_ci: 33453614474
+objective: >-
+  Join the accepted current inputs, Stage-7/8/9 scenario path, Stage-11 transfer optimiser,
+  exact Stage-10 tactics and captain/vice evaluator into one private fail-closed execution and
+  replay surface, prove it fully offline, then attempt one truthful current operator run.
+authority_scopes:
+  - "A2-rules"
+  - "A4-FPL-ingestion"
+  - "A5-odds-ingestion"
+  - "A6-market-normalisation"
+  - "A7-minutes"
+  - "A8-event-distribution"
+  - "A9-FPL-points"
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "A12-operational-assurance"
+  - "B2-multi-GW"
+  - "B4-chips"
+  - "B6-reporting-control"
+in_scope:
+  - "One private application service and one Typer command group with run and replay modes."
+  - "Strict current Gameweek/cutoff/fixture/player/rules/artifact coherence."
+  - "Operator-attested ownership-spell overlay only where Stage 11 requires truthful history."
+  - "Current market constraints passed to ScoreDistributionService.project."
+  - "Manual transient Stage-7 participation passed to the canonical FplPointsService."
+  - "Full Stage-9 Gameweek joint matrix retained through exact Stage-10/11 evaluation."
+  - "No-transfer comparator, common-scenario paired distribution and captain-layer validation."
+  - "Deterministic synthetic replay and one governed truthful current-run attempt."
+permissions:
+  official_fpl_network: "forbidden"
+  authentication_or_credentials: "forbidden"
+  real_input_persistence: "only if every governing rights profile explicitly allows it"
+  synthetic_replay_persistence: "allowed"
+  new_runtime_dependency: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Alternative score, points, squad, transfer, lineup, bench or captain optimiser."
+  - "Guessed manager facts, purchase history, selling prices, mappings or current inputs."
+  - "Automated FPL writes, chips other than explicit NO CHIP, rank optimisation or deployment."
+  - "PR, merge, tag, human acceptance or production activation."
+required_engineering_status: "PRIVATE_V1_E2E_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"
