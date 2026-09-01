@@ -1467,7 +1467,8 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] PORT.02 harden the existing current Stage-9 event allocator for deterministic candidate
   ordering, timed on-pitch goal/assist/penalty/save coherence, exact goal conservation, and donor
   goalkeeper/penalty regressions, then commit and push.
-- [ ] PORT.03 prove both Stage-7 families and the complete private-manual Stage-7 -> current
+- [x] PORT.03 prove both Stage-7 families and the complete private-manual Stage-7 -> current
   Stage-8 -> allocated coherent scenario -> canonical Stage-9 integer points/matrix/marginals
-  path; complete evidence, broad gates, adversarial review, final push, and exact-SHA CI.
-- [ ] Hand off as implemented pending independent review and not production-active.
+  path; complete evidence, broad local gates, and adversarial review fixes.
+- [ ] Push the exact final evidence SHA, observe automatic CI fully green, and hand off as
+  implemented pending independent review and not production-active.

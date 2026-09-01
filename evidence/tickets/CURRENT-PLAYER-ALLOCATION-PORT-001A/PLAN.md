@@ -13,3 +13,7 @@
   marginals, deterministic hashes, and both accepted Stage-7 family identifiers.
 - Complete approximately three pushed checkpoints, broad repository gates, exact-final-SHA CI,
   and adversarial review, then stop pending independent review.
+
+All implementation, local acceptance, build/wheel, manifest, security, and adversarial-review
+steps are engineering-complete. Exact final-SHA CI remains a post-push gate and is deliberately
+not claimed by this pre-push evidence file.

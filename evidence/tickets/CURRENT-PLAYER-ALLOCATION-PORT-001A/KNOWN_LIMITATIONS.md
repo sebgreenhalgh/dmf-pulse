@@ -9,3 +9,7 @@
 - Current Stage 8 supplies team-score distributions, not a full calibrated shot-event process.
   Any bounded save/on-target mechanism added here remains explicitly temporary and low confidence.
 - No squad, transfer, lineup, captaincy, chip, or rank optimisation is part of this ticket.
+- The separate donor private-GW1 acceptance record is historical provenance only. It does not
+  accept this semantic port, its synthetic vertical slice, or any future current-player run.
+- No PR, merge, tag, independent review, human acceptance, production persistence, live
+  orchestration, or production activation is included.

@@ -1,0 +1,54 @@
+{
+  "architectural_parent": "ddd74fe38ddfae3733ad5189b417123477e9f23e",
+  "automatic_final_sha_ci": "PENDING_FINAL_EVIDENCE_PUSH",
+  "branch": "readiness/CURRENT-PLAYER-ALLOCATION-PORT-001A",
+  "coverage": {
+    "branch_arcs_covered": 165,
+    "branch_arcs_total": 192,
+    "branch_aware_combined_percent": 93.05,
+    "focused_tests_passed": 156,
+    "report": "evidence/tickets/CURRENT-PLAYER-ALLOCATION-PORT-001A/coverage.json",
+    "required_combined_percent": 90,
+    "statements_covered": 612,
+    "statements_total": 643
+  },
+  "current_player_identity_source": "CurrentFplInputBundle official element/team identities plus explicit canonical Stage-7 UUID mapping",
+  "dirty_001a": {
+    "cached_diff_git_object_after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "cached_diff_git_object_before": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "status": "UNCHANGED_BY_CURRENT_PLAYER_ALLOCATION_PORT_001A",
+    "worktree_diff_git_object_after": "6228b1b3ddcc3ecc05c32dab2f7f394d42ae2db7",
+    "worktree_diff_git_object_before": "6228b1b3ddcc3ecc05c32dab2f7f394d42ae2db7"
+  },
+  "donor_branch_ref_moved_at_startup": false,
+  "donor_head": "f4d75dc5b107901a3619f136c3d3d7d1d7632a3c",
+  "historical_acceptance_sha256": "39737c6b96e2664f63f19b4ea0c34038d7c0ec5d9afc9f60cc1c6b89749a3352",
+  "historical_acceptance_status": "HUMAN_ACCEPTED_PRIVATE_GW1_ONLY",
+  "implementation_commit": "682d75e4da766d1eac75ebe32b5f3578c787c4db",
+  "player_prior": {
+    "artifact_sha256": "629d6c288f9faa7aa7763f5c578e662511c03d514169f683cbeb6ee81af695be",
+    "confidence_grade": "E",
+    "information_cutoff_utc": "2026-08-21T17:30:00Z",
+    "profile_count": 599,
+    "production_activation": false,
+    "schema_version": "gw1-player-allocation-candidate-v1",
+    "status": "CANDIDATE_NOT_ACCEPTED"
+  },
+  "production_active": false,
+  "regressions": {
+    "affected_non_database_passed": 536,
+    "affected_non_database_skipped": 2,
+    "performance_passed": 3,
+    "postgres_integration_passed": 155,
+    "port_core_passed": 156,
+    "stage7_families": [
+      "PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1",
+      "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"
+    ],
+    "vertical_slice": "PASS"
+  },
+  "repository_validation": "PASS_ZERO_ERRORS_AFTER_MANIFEST_REFRESH",
+  "secret_scan": "PASS_ZERO_FINDINGS",
+  "status": "CURRENT_PLAYER_ALLOCATION_PORT_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "ticket_id": "CURRENT-PLAYER-ALLOCATION-PORT-001A"
+}

@@ -1,0 +1,61 @@
+CURRENT-PLAYER-ALLOCATION-PORT-001A command ledger
+Date: 2026-09-01
+
+1. Parent, donor, CI, and isolation
+   PASS: immutable parent ddd74fe38ddfae3733ad5189b417123477e9f23e and donor
+   f4d75dc5b107901a3619f136c3d3d7d1d7632a3c exist. The intended parent branch resolved exactly;
+   parent CI run 33413309522 was successful in every mandatory job. The donor branch ref had not
+   moved. Work used a separate clean worktree and no merge/rebase/cherry-pick.
+2. Donor forensics
+   PASS: all eleven full checkpoint SHAs were inspected and files/algorithms classified A/B/C/D
+   in DONOR_FORENSICS.md. Obsolete current state, acquisition, calibration, scorer, workflow, and
+   optimiser code were rejected.
+3. PORT.01 prior and identity contract
+   PASS: exact central/acceptance resources, strict loader, current official-FPL identity binding,
+   missing/tamper/mismatch tests, Ruff, strict mypy, and 155 affected Stage-9 tests. Commit
+   2389bfe was pushed.
+4. PORT.02 coherent allocation
+   PASS: canonical candidate ordering; explicit timed goal/assist/own-goal/penalty/save links;
+   goal conservation; goalkeeper-only saves; hostile and property regressions. The complete
+   affected Stage-9 suite passed 162 tests. Commit ec57a48 was pushed.
+5. PORT.03 public vertical slice
+   PASS: current-FPL input -> manual Stage 7 -> Stage7MinutesContext -> real
+   ScoreDistributionService -> current allocation -> canonical Stage-9 rules scoring -> joint
+   matrix/marginals. Both Stage-7 families pass. Fixed input/seed is identical; production mode is
+   rejected. Commit 682d75e4da766d1eac75ebe32b5f3578c787c4db was pushed.
+6. Core port coverage
+   PASS: 156 unit/property/contract/golden/integration tests. Coverage.py branch-aware combined
+   coverage is 93.05% over allocation.py and player_prior.py (612/643 statements, 165/192 branch
+   arcs; allocation 95% combined, player prior 91% combined). Exact output is coverage.json.
+7. Affected regressions
+   PASS: 536 affected Stage-7, Stage-8, current-FPL, Stage-9, and integration tests completed, with
+   two documented environment skips. A diagnostic run without a database produced only the 25
+   expected missing-DMF_TEST_DATABASE_URL setup errors; all were rerun under PostgreSQL.
+8. PostgreSQL and migrations
+   PASS: exact PostgreSQL 18.4 image. Migration matrix upgrade/downgrade/recovery, metadata drift,
+   offline SQL, and schema manifest passed at head 20260807_0006. All 155 `postgres and
+   integration` tests passed. Doctor was HEALTHY and demo/as-of assertions all passed.
+9. Static and portable acceptance
+   PASS: frozen sync used uv 0.11.26/Python 3.13.15; all 705 files passed Ruff format; Ruff lint
+   passed; strict mypy passed 262 source files; git diff --check passed. Performance smoke passed
+   3 tests. Canonical specs, FPL/Odds replay, market read, Stage-8, and rules commands passed.
+10. Build and wheel
+    PASS: dmf-pulse 0.2.0 sdist SHA-256
+    a2b5dbf43928418cc87b6c14ffb26f41abe7089ff52936decc5b4cc116bb8158 and wheel SHA-256
+    9773d25a6c1a5bcb6a72a81a4caad5a1ff5476c74b91f2f733f05bb822d0d555 built. Both inherited
+    clean-wheel verifiers passed and verified 307 RECORD members. A separate offline install
+    outside the repository loaded the public prior and CLI and confirmed raw resource hashes
+    995d0166...ae0 and 67b69a2c...224.
+11. Adversarial review
+    PASS: one material P2 CLI import cycle was found and fixed with a type-only dependency. No P0,
+    P1, or material P2 remains unresolved.
+12. Repository governance and security
+    PASS: the ticket and authoritative PRC-013 repository manifests were refreshed over 1232
+    deliverable files; repository validation returned zero errors; the first-party secret scan
+    returned zero findings.
+13. Exact final-SHA CI, PR, merge, tag, acceptance, production
+    PENDING the final evidence commit/push and exact-SHA automatic CI. PR, merge, tag, human
+    acceptance, and production activation were NOT PERFORMED.
+
+Windows Application Control blocks the native Hypothesis extension. Tests used an isolated
+Python 3.13.15 Linux environment with the frozen lock. No test was weakened.
