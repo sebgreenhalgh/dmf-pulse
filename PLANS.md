@@ -1623,3 +1623,25 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   and the genuine one-command outcome without retaining bodies, entry ID or credentials.
 - [ ] Seal evidence/manifests, validate repository and secrets, build, push the final SHA, require
   exact-SHA CI green, and stop without post-CI mutation.
+
+# PRIVATE-V1-ONE-COMMAND-001E live current-window chip inventory adapter hotfix
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001E`; immutable parent
+  `6d396213671622cfd3145f578e50c54a9e7bdfa2`; parent exact-SHA CI `33566124758`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001E`.
+- Scope: reconcile the authenticated current-FPL chip records to complete governed seasonal chip
+  tokens by activation window, preserving rules-derived unpublished future-token state.
+- Safety: no governed chip-rule, transport, authentication, bootstrap, game-settings, Odds,
+  score-prior, Stage 7-9, optimiser, captaincy, persistence, PR, merge, tag or activation changes.
+
+## Hotfix checkpoints
+
+- [x] Verify the exact parent/CI, isolate the branch, and resolve the governed two-window chip
+  inventory against the live current-window provider response shape.
+- [x] Add GW3/GW20, played-history, future-token and fail-closed mapping regressions.
+- [x] Implement the narrow window-based provider-to-governed-token reconciliation.
+- [x] Run focused and affected tests, branch coverage, Ruff, mypy, frozen sync, build, wheel,
+  repository and secret gates.
+- [x] Check the safe live runtime boundary without displaying identifiers or secrets; record the
+  absent bearer, Odds key and entry-ID mechanism as the exact authenticated-retry blocker.
+- [ ] Seal evidence, push the final SHA, and require exact-SHA CI green.

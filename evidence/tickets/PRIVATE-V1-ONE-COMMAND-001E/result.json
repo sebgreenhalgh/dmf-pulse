@@ -1,0 +1,10 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "authenticated_manager_retry": "BLOCKED_MISSING_RUNTIME_BEARER_AND_ENTRY_ID",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI_AND_LIVE_AUTHENTICATED_VERIFICATION",
+  "governed_chip_rules_changed": false,
+  "installed_wheel_manager_mapping": "PASS",
+  "official_fpl_persistent_artifacts_created": 0,
+  "provider_current_window_mapping": "PASS",
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001E"
+}

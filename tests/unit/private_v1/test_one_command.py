@@ -11,8 +11,6 @@ from uuid import NAMESPACE_URL, uuid5
 import pytest
 
 from dmf_pulse.assurance.canonical import canonical_sha256
-from dmf_pulse.chips.compiler import compile_optimisation_chip_rules
-from dmf_pulse.chips.inventory import build_chip_inventory
 from dmf_pulse.fpl_points.player_prior import load_packaged_player_prior
 from dmf_pulse.ingestion.fpl.direct import (
     DirectFplClient,
@@ -32,8 +30,6 @@ from dmf_pulse.private_v1.one_command import (
     OneCommandRequest,
     PrivateV1OneCommandService,
 )
-from dmf_pulse.rules.chips import build_chip_rules_view
-from dmf_pulse.rules.compiler import compile_ruleset
 from tests.unit.ingestion.current_identity_test_support import KICKOFF
 from tests.unit.ingestion.current_manager_test_support import (
     _synthetic_bootstrap,
@@ -219,29 +215,15 @@ def _provider_sources(repository_root: Path) -> tuple[tuple[bytes, ...], bytes]:
     ordered = [*starters, bench_gk, *bench_outfield]
     candidate_id = next(int(item["id"]) for item in players if int(item["id"]) not in squad)
     next(item for item in players if int(item["id"]) == candidate_id)["can_select"] = True
-    ruleset = compile_ruleset(repository_root / "config/rules/fpl-2026-27")
-    chip_bundle = compile_optimisation_chip_rules(build_chip_rules_view(ruleset))
-    inventory = build_chip_inventory(chip_bundle, current_gameweek=2)
-    chip_names = {
-        "WILDCARD": "wildcard",
-        "FREE_HIT": "freehit",
-        "BENCH_BOOST": "bboost",
-        "TRIPLE_CAPTAIN": "3xc",
-    }
-    chip_numbers: dict[str, int] = {}
-    chips = []
-    for token in inventory.tokens:
-        chip_numbers[token.chip_key] = chip_numbers.get(token.chip_key, 0) + 1
-        chips.append(
-            {
-                "name": chip_names[token.chip_key],
-                "number": chip_numbers[token.chip_key],
-                "status_for_entry": (
-                    "available" if token.status.value == "AVAILABLE" else "unavailable"
-                ),
-                "played_by_entry": [],
-            }
-        )
+    chips = [
+        {
+            "name": name,
+            "number": 1,
+            "status_for_entry": "available",
+            "played_by_entry": [],
+        }
+        for name in ("wildcard", "freehit", "bboost", "3xc")
+    ]
     current_team = {
         "picks": [
             {

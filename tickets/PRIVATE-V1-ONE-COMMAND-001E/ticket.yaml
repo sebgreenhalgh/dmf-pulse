@@ -1,0 +1,37 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001E"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Live FPL current-window chip inventory adapter hotfix"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001E"
+required_base_commit: "6d396213671622cfd3145f578e50c54a9e7bdfa2"
+parent_exact_sha_ci: 33566124758
+objective: >-
+  Reconcile the current-window chip records published by authenticated FPL with the complete
+  governed seasonal token inventory by activation window, retaining rules-derived declarations
+  for unpublished future tokens.
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A12-ops-assurance"
+in_scope:
+  - "Window-based provider chip-record to governed token reconciliation."
+  - "Current, played, unpublished-future and fail-closed ambiguity regressions."
+  - "Safe authenticated manager snapshot and one-command progression verification."
+permissions:
+  official_fpl_network: "operator_initiated_low_volume_get_only"
+  authenticated_current_team: "existing_environment_only"
+  authentication_or_credentials: "existing_environment_only"
+  fpl_raw_storage: "forbidden"
+  fpl_derived_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Governed chips.yaml or chip-inventory policy changes."
+  - "FPL transport, authentication, bootstrap or game-settings changes."
+  - "Odds, score-prior, Stages 7-9, optimiser or captaincy changes."
+  - "PR, merge, tag or production activation."
+required_execution_status: "AUTHENTICATED_MANAGER_STATE_COMPILED"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

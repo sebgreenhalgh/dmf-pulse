@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
-from typing import Annotated, Any
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, ValidationError
 
 from dmf_pulse.chips.definitions import CompiledChipBundle
-from dmf_pulse.chips.inventory import build_chip_inventory
+from dmf_pulse.chips.inventory import ChipInventoryToken, build_chip_inventory
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplInputBundle
 from dmf_pulse.ingestion.fpl.manager_current import (
@@ -113,47 +113,75 @@ def _chip_declarations(
         if chip_key is None:
             raise IngestionError("SCHEMA_DRIFT", "FPL published an unknown chip identity")
         records.setdefault(chip_key, []).append(item)
-    tokens: dict[str, list[Any]] = {}
+    tokens: dict[str, list[ChipInventoryToken]] = {}
     for token in base.tokens:
         tokens.setdefault(token.chip_key, []).append(token)
     if set(records) != set(tokens):
         raise IngestionError("MAPPING_CONFLICT", "FPL chip inventory is incomplete")
 
-    declarations: list[CurrentManagerChipDeclaration] = []
+    declarations = {
+        token.token_id: CurrentManagerChipDeclaration(
+            token_id=token.token_id,
+            status=token.status.value,
+        )
+        for token in base.tokens
+    }
+    mapped_tokens: set[str] = set()
     for chip_key, key_tokens in sorted(tokens.items()):
-        key_records = sorted(records[chip_key], key=lambda item: item.number)
         key_tokens.sort(key=lambda item: (item.activation_start_gameweek, item.token_id))
-        if len(key_records) != len(key_tokens) or tuple(
-            item.number for item in key_records
-        ) != tuple(range(1, len(key_records) + 1)):
-            raise IngestionError("MAPPING_CONFLICT", "FPL chip copies are ambiguous")
-        for record, token in zip(key_records, key_tokens, strict=True):
+        for record in sorted(records[chip_key], key=lambda item: item.number):
             played = tuple(sorted(set(record.played_by_entry)))
             if len(played) != len(record.played_by_entry) or len(played) > 1:
                 raise IngestionError("VALIDATION_FAILED", "FPL chip use history is ambiguous")
             status = record.status_for_entry.casefold()
+            if status not in {"active", "pending", "available", "unavailable"}:
+                raise IngestionError("SCHEMA_DRIFT", "FPL published an unknown chip status")
             if played:
+                if status != "unavailable":
+                    raise IngestionError(
+                        "VALIDATION_FAILED", "FPL chip status contradicts its use history"
+                    )
                 event = played[0]
-                if not token.activation_start_gameweek <= event <= token.activation_end_gameweek:
+                candidates = tuple(
+                    token
+                    for token in key_tokens
+                    if token.activation_start_gameweek <= event <= token.activation_end_gameweek
+                )
+                if not candidates:
                     raise IngestionError("MAPPING_CONFLICT", "FPL chip use is outside its window")
+                if len(candidates) != 1:
+                    raise IngestionError("MAPPING_CONFLICT", "FPL chip copies are ambiguous")
+                mapped_chip = candidates[0]
                 declaration = CurrentManagerChipDeclaration(
-                    token_id=token.token_id, status="USED", used_at_gameweek=event
-                )
-            elif status in {"active", "pending"}:
-                declaration = CurrentManagerChipDeclaration(
-                    token_id=token.token_id,
-                    status="PENDING_CANCELLABLE",
-                    selected_at_gameweek=target_gameweek,
-                )
-            elif status in {"available", "unavailable"}:
-                declaration = CurrentManagerChipDeclaration(
-                    token_id=token.token_id,
-                    status=token.status.value,
+                    token_id=mapped_chip.token_id, status="USED", used_at_gameweek=event
                 )
             else:
-                raise IngestionError("SCHEMA_DRIFT", "FPL published an unknown chip status")
-            declarations.append(declaration)
-    return tuple(sorted(declarations, key=lambda item: item.token_id))
+                candidates = tuple(
+                    token
+                    for token in key_tokens
+                    if token.activation_start_gameweek
+                    <= target_gameweek
+                    <= token.activation_end_gameweek
+                )
+                if len(candidates) != 1:
+                    raise IngestionError("MAPPING_CONFLICT", "FPL current chip copy is ambiguous")
+                mapped_chip = candidates[0]
+                if status in {"active", "pending"}:
+                    declaration = CurrentManagerChipDeclaration(
+                        token_id=mapped_chip.token_id,
+                        status="PENDING_CANCELLABLE",
+                        selected_at_gameweek=target_gameweek,
+                    )
+                else:
+                    declaration = CurrentManagerChipDeclaration(
+                        token_id=mapped_chip.token_id,
+                        status="AVAILABLE" if status == "available" else "UNAVAILABLE",
+                    )
+            if mapped_chip.token_id in mapped_tokens:
+                raise IngestionError("MAPPING_CONFLICT", "FPL chip records are ambiguous")
+            mapped_tokens.add(mapped_chip.token_id)
+            declarations[mapped_chip.token_id] = declaration
+    return tuple(sorted(declarations.values(), key=lambda item: item.token_id))
 
 
 def provider_current_manager_declaration(
