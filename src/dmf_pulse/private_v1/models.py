@@ -277,6 +277,9 @@ class PrivateV1ExecutionInput(_FrozenModel):
     stage9_monte_carlo_policy_sha256: Sha256
     event_allocation_config: EventAllocationConfig
     event_allocation_config_sha256: Sha256
+    expected_stage8_policy_sha256: Sha256
+    expected_player_prior_artifact_sha256: Sha256
+    expected_player_prior_acceptance_sha256: Sha256
     require_stage9_mc_pass: StrictBool
     semantic_sha256: Sha256
 
@@ -329,6 +332,22 @@ class PrivateV1ExecutionInput(_FrozenModel):
             for element_id, item in mapped_players.items()
         ):
             raise ValueError("canonical player map differs from current FPL membership")
+        if not (current_squad | incoming) <= set(mapped_players):
+            raise ValueError("manager and incoming candidates require canonical player mappings")
+        fixture_sets = {
+            "markets": {str(item.canonical_fixture_id) for item in market.fixtures},
+            "score_priors": {str(item.fixture_id) for item in self.score_priors},
+            "minutes": {item.fixture_id for item in self.manual_minutes},
+        }
+        expected = fixture_sets["markets"]
+        if not expected or any(values != expected for values in fixture_sets.values()):
+            raise ValueError("markets, score priors and Stage-7 inputs must cover exact fixtures")
+        for collection in (
+            self.score_priors,
+            self.manual_minutes,
+        ):
+            if len(collection) != len(expected):
+                raise ValueError("fixture-scoped input contains a duplicate identity")
         manual_player_ids = {
             player.player_id
             for fixture in self.manual_minutes
@@ -346,20 +365,6 @@ class PrivateV1ExecutionInput(_FrozenModel):
             str(item.canonical_team_id) for item in self.player_identity_map.teams
         }:
             raise ValueError("Stage-7 team universe differs from the canonical team map")
-        fixture_sets = {
-            "markets": {str(item.canonical_fixture_id) for item in market.fixtures},
-            "score_priors": {str(item.fixture_id) for item in self.score_priors},
-            "minutes": {item.fixture_id for item in self.manual_minutes},
-        }
-        expected = fixture_sets["markets"]
-        if not expected or any(values != expected for values in fixture_sets.values()):
-            raise ValueError("markets, score priors and Stage-7 inputs must cover exact fixtures")
-        for collection in (
-            self.score_priors,
-            self.manual_minutes,
-        ):
-            if len(collection) != len(expected):
-                raise ValueError("fixture-scoped input contains a duplicate identity")
         if any(
             item.information_cutoff != current.information_cutoff for item in self.manual_minutes
         ):
@@ -458,6 +463,7 @@ class PrivateDecisionLineage(_FrozenModel):
     stage8_result_sha256_by_fixture: dict[StrictStr, Sha256]
     stage8_policy_sha256: Sha256
     player_prior_artifact_sha256: Sha256
+    player_prior_acceptance_sha256: Sha256
     player_prior_binding_sha256_by_fixture: dict[StrictStr, Sha256]
     stage9_result_sha256: Sha256
     stage9_joint_matrix_sha256: Sha256
@@ -491,6 +497,8 @@ class PrivateV1Decision(_FrozenModel):
     stage7_model_derived: Literal[False]
     confidence: Literal["LOW"]
     scenario_count: PositiveInt
+    stage9_monte_carlo_status: Literal["PASS", "CONTINUE", "BLOCKED"]
+    stage9_monte_carlo_reasons: tuple[StrictStr, ...]
     solver_optimality: Literal["EXACT_DECLARED_TREE_AND_ACTION_SPACE"]
     action_space_disclosure: StrictStr
     warnings: tuple[StrictStr, ...]
@@ -510,6 +518,8 @@ class PrivateV1Decision(_FrozenModel):
             raise ValueError("resulting squad must be canonically ordered")
         if self.warnings != tuple(sorted(set(self.warnings))):
             raise ValueError("decision warnings must be unique and sorted")
+        if self.stage9_monte_carlo_reasons != tuple(sorted(set(self.stage9_monte_carlo_reasons))):
+            raise ValueError("Stage-9 Monte Carlo reasons must be unique and sorted")
         if self.semantic_sha256 != _semantic_hash(self):
             raise ValueError("private decision semantic hash does not match")
         return self

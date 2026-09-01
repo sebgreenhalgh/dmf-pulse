@@ -1,0 +1,102 @@
+{
+  "artifacts": [
+    {
+      "bytes": 6141,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/ACCEPTANCE_MATRIX.md",
+      "sha256": "d2eac9869bab9e2c50714475f5d048a1e4f4f9221b57bc8d4437f6f46bc7cd8e"
+    },
+    {
+      "bytes": 2703,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/COMMAND_LEDGER.md",
+      "sha256": "ac884ecd01162da01157257bf404ae5330e299c2f9ee61988183af6d06932f02"
+    },
+    {
+      "bytes": 3957,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/contract_inventory.md",
+      "sha256": "b3fbec02b275967fb139c3503729cb30f71612c56fcf560cc96f16950ff39a4e"
+    },
+    {
+      "bytes": 83905,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/coverage.json",
+      "sha256": "c9517b1a2ff834f0dcb2b78323b5522d19870cea5d094febc177677ca31e1e92"
+    },
+    {
+      "bytes": 226597,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/current_manifest.json",
+      "sha256": "2fb02c672162db1852ad7ef56d04d8b1cc231420140b883bda224fa390a82e59"
+    },
+    {
+      "bytes": 2785,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/FINAL_SELF_REVIEW.md",
+      "sha256": "7771c9cb9fc56f362a1efd2833e1a1eab607a862cd242f166d585ae11db42367"
+    },
+    {
+      "bytes": 2113,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/IMPLEMENTATION_RESULT.md",
+      "sha256": "34aaa694a43d51dc1b03b2e79457dbd1aa9a58714e9cc950a1b8874cb3595a0a"
+    },
+    {
+      "bytes": 1624,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/KNOWN_LIMITATIONS.md",
+      "sha256": "4b83e3d101ae625431182195bc262b195e64164c51e669b89326ab54b8b06bb9"
+    },
+    {
+      "bytes": 3262,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/real_run_attempt.md",
+      "sha256": "49269db2c11758d0d70bc0f11641d274c39ea7b1996d945128f24e2811cc6550"
+    },
+    {
+      "bytes": 963,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/result.json",
+      "sha256": "89778a7e5a2e28cf578005a8ba1c0dc21aa647bc227dca2e3124b5fa814a2acc"
+    },
+    {
+      "bytes": 3678,
+      "path": "evidence/tickets/PRIVATE-V1-E2E-001A/SYNTHETIC_PROOF.md",
+      "sha256": "4695b2e342768ca5cee524777b87802bf57f347fb76d1c02438291fef05e9703"
+    }
+  ],
+  "code_commit": null,
+  "commands": [
+    {
+      "gate": "private-v1-fast",
+      "result": "35 passed"
+    },
+    {
+      "gate": "private-v1-full-exact",
+      "result": "1 passed in 358.09s"
+    },
+    {
+      "gate": "broad-regression",
+      "result": "656 passed"
+    },
+    {
+      "gate": "branch-coverage",
+      "result": "90 percent PASS"
+    },
+    {
+      "gate": "clean-wheel-and-network-blocked-replay",
+      "result": "PASS"
+    },
+    {
+      "gate": "repository-validation",
+      "result": "PASS zero errors"
+    },
+    {
+      "gate": "secret-scan",
+      "result": "PASS zero findings"
+    },
+    {
+      "gate": "frozen-sync-and-cli-config-smoke",
+      "result": "PASS"
+    }
+  ],
+  "context_hash": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+  "created_at": "2026-09-01T00:00:00Z",
+  "known_limitations": [
+    "Genuine current private run blocked by unavailable governed inputs, inactive target rules, GW1-only prior, and real replay retention rights.",
+    "Independent review and exact-final-SHA CI remain outstanding."
+  ],
+  "status": "BLOCKED",
+  "ticket_id": "PRIVATE-V1-E2E-001A"
+}

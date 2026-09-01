@@ -1496,8 +1496,9 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] E2E.02 implement the complete current-state -> Stage 8 -> Stage 9 -> Stage 11/10 ->
   captain validation -> paired comparator -> decision artifact path and deterministic offline
   full-stack proof; commit and push.
-- [ ] E2E.03 attempt one truthful current private run, freeze/replay only if governing rights and
+- [x] E2E.03 attempt one truthful current private run, freeze/replay only if governing rights and
   inputs permit it, harden reporting/CLI/evidence, and commit and push.
-- [ ] Run all focused, inherited, property, branch-coverage, static, build, installed-wheel,
-  repository, manifest, and secret gates; push the exact final SHA and require exact-SHA CI green.
+- [x] Run all focused, inherited, property, branch-coverage, static, build, installed-wheel,
+  repository, manifest, and secret gates.
+- [ ] Push the exact final SHA and require exact-SHA CI green.
 - [ ] Independent review and human acceptance remain separate.

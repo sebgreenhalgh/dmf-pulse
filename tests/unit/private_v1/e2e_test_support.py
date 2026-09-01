@@ -15,6 +15,7 @@ from dmf_pulse.availability.manual_override import ManualFixtureMinutesInput
 from dmf_pulse.chips.compiler import compile_optimisation_chip_rules
 from dmf_pulse.chips.inventory import build_chip_inventory
 from dmf_pulse.football_events.score_prior_request import ScorePriorRequest
+from dmf_pulse.football_events.service import load_score_baseline_policy
 from dmf_pulse.fpl_points.models import MonteCarloPolicy, ProjectionMode
 from dmf_pulse.fpl_points.player_prior import load_packaged_player_prior
 from dmf_pulse.ingestion.current_state import (
@@ -653,6 +654,7 @@ def build_execution_input(
             "extra_penalty_save_probability": 0.0,
         }
     )
+    player_prior = load_packaged_player_prior()
     provisional = PrivateV1ExecutionInput.model_construct(
         run_id="PRIVATE_V1_SYNTHETIC_E2E",
         code_sha="a" * 40,
@@ -675,6 +677,11 @@ def build_execution_input(
         stage9_monte_carlo_policy_sha256=canonical_sha256(mc_policy.model_dump(mode="json")),
         event_allocation_config=allocation,
         event_allocation_config_sha256=canonical_sha256(allocation.model_dump(mode="json")),
+        expected_stage8_policy_sha256=load_score_baseline_policy().sha256,
+        expected_player_prior_artifact_sha256=player_prior.artifact.artifact_sha256,
+        expected_player_prior_acceptance_sha256=(
+            player_prior.historical_acceptance.acceptance_sha256
+        ),
         require_stage9_mc_pass=False,
         semantic_sha256="0" * 64,
     )

@@ -239,6 +239,12 @@ def verify_replay_bundle(
     directory = directory.resolve()
     if not directory.is_dir():
         raise PrivateV1Error("REPLAY_BUNDLE_INVALID", "replay bundle is unavailable")
+    try:
+        observed_names = tuple(sorted(item.name for item in directory.iterdir()))
+    except OSError:
+        raise PrivateV1Error("REPLAY_BUNDLE_INVALID", "replay bundle is unavailable") from None
+    if observed_names != ("decision.json", "input.json", "manifest.json", "report.txt"):
+        raise PrivateV1Error("REPLAY_BUNDLE_INVALID", "replay bundle file set is invalid")
     manifest = load_replay_manifest(directory / "manifest.json")
     expected_names = ("decision.json", "input.json", "report.txt")
     if tuple(item.relative_path for item in manifest.files) != expected_names:

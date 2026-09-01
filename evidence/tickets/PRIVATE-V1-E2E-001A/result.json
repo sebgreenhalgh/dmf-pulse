@@ -1,0 +1,22 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "branch": "readiness/PRIVATE-V1-E2E-001A",
+  "engineering_status": "PRIVATE_V1_E2E_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "final_exact_sha_ci": "PENDING_FINAL_PUSH",
+  "immutable_parent": "7f4254905bccf79cdc282d04f4928cba850276be",
+  "parent_exact_sha_ci": "33453614474",
+  "production_active": false,
+  "real_run": {
+    "outcome": "IMPLEMENTED_REAL_RUN_BLOCKED",
+    "recommendation_emitted": false,
+    "replay_manifest_emitted": false
+  },
+  "synthetic_proof": {
+    "decision_sha256": "a51391ad37f89b54281c3fdab1fd07cc9c9860aba14facfa8ab51230a36fa2d8",
+    "installed_wheel_replay": "PASS_NETWORK_BLOCKED",
+    "joint_matrix_sha256": "5583a846e235cbc5d42b3ad1cfea1254cfd328c50c2d00a059a51d8622d72221",
+    "replay_manifest_sha256": "a4b1c8e2a55fb361bc87481e156641151035bddc6d7730e101334f46c95c187d",
+    "status": "PASS_REPOSITORY_OWNED_SYNTHETIC_ONLY"
+  },
+  "ticket_id": "PRIVATE-V1-E2E-001A"
+}

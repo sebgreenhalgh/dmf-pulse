@@ -2,20 +2,24 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from decimal import Decimal
+from uuid import UUID
 
 import pytest
 from pydantic import ValidationError
 
+from dmf_pulse.football_events.score_prior_request import ScorePriorRequest
 from dmf_pulse.private_v1.models import (
     PrivateCandidateActionPolicy,
     PrivateCurrentOwnership,
     PrivateCurrentOwnershipMember,
+    PrivateFixtureScorePrior,
     PrivateGainMass,
     PrivatePairedComparison,
     PrivateReplayFile,
     PrivateReplayManifest,
     seal_candidate_action_policy,
     seal_current_ownership,
+    seal_fixture_score_prior,
     seal_replay_manifest,
 )
 
@@ -146,4 +150,39 @@ def test_replay_manifest_is_relative_stable_and_content_bound() -> None:
             relative_path="C:\\private\\input.json",
             sha256="4" * 64,
             byte_count=10,
+        )
+
+
+def test_fixture_score_prior_cannot_forge_current_bundle_lineage() -> None:
+    provisional = PrivateFixtureScorePrior.model_construct(
+        source_class="REPOSITORY_OWNED_SYNTHETIC",
+        fixture_id=UUID("10000000-0000-4000-8000-000000000001"),
+        competition_id=UUID("20000000-0000-4000-8000-000000000001"),
+        home_team_id=UUID("30000000-0000-4000-8000-000000000001"),
+        away_team_id=UUID("30000000-0000-4000-8000-000000000002"),
+        as_of=_CUTOFF,
+        score_prior_request=ScorePriorRequest(
+            home_goal_rate=Decimal("1.600000"),
+            away_goal_rate=Decimal("1.300000"),
+        ),
+        current_bundle=None,
+        semantic_sha256="0" * 64,
+    )
+    value = seal_fixture_score_prior(provisional)
+    assert value.source_class == "REPOSITORY_OWNED_SYNTHETIC"
+
+    with pytest.raises(ValidationError, match="current score-prior bundle binding differs"):
+        PrivateFixtureScorePrior.model_validate(
+            {
+                **value.model_dump(mode="python"),
+                "source_class": "CURRENT_SCORE_PRIOR_BUNDLE",
+            }
+        )
+
+    with pytest.raises(ValidationError, match="fixture teams must be distinct"):
+        PrivateFixtureScorePrior.model_validate(
+            {
+                **value.model_dump(mode="python"),
+                "away_team_id": value.home_team_id,
+            }
         )

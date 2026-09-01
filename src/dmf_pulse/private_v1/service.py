@@ -321,6 +321,23 @@ def _verify_current_sources(value: PrivateV1ExecutionInput) -> None:
         )
 
 
+def _verify_runtime_artifacts(value: PrivateV1ExecutionInput, prior: GovernedPlayerPrior) -> None:
+    if (
+        prior.artifact.artifact_sha256 != value.expected_player_prior_artifact_sha256
+        or prior.historical_acceptance.acceptance_sha256
+        != value.expected_player_prior_acceptance_sha256
+    ):
+        raise PrivateV1Error(
+            "PLAYER_PRIOR_IDENTITY_MISMATCH",
+            "packaged player-allocation prior differs from the execution contract",
+        )
+    if load_score_baseline_policy().sha256 != value.expected_stage8_policy_sha256:
+        raise PrivateV1Error(
+            "STAGE8_POLICY_IDENTITY_MISMATCH",
+            "packaged Stage-8 policy differs from the execution contract",
+        )
+
+
 def _fixture_authority(value: PrivateV1ExecutionInput) -> dict[str, tuple[Any, Any]]:
     state = value.current_state
     target_identity = state.fpl_input.target_event.identity
@@ -844,20 +861,45 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
     bench = ", ".join(
         (label(tactics.bench_goalkeeper), *(label(item) for item in tactics.bench_outfield_order))
     )
+    current_squad = ", ".join(
+        label(_canonical_player_by_element(value)[item.official_fpl_element_id])
+        for item in value.current_state.manager_state.squad
+    )
+    resulting_squad = ", ".join(label(item) for item in decision.resulting_squad)
+    position_counts = {
+        position: sum(players[item].position.value == position for item in tactics.starting_xi)
+        for position in ("DEF", "MID", "FWD")
+    }
+    formation = "-".join(str(position_counts[item]) for item in ("DEF", "MID", "FWD"))
+    score_prior_classes = ", ".join(sorted({item.source_class for item in value.score_priors}))
+    mc_reasons = (
+        ", ".join(decision.stage9_monte_carlo_reasons)
+        if decision.stage9_monte_carlo_reasons
+        else "NONE"
+    )
     return (
         "DMF PULSE PRIVATE V1 RECOMMENDATION\n"
         f"Run: {decision.run_id}\n"
+        "\nTARGET\n"
         f"Season / Gameweek: {decision.season} / GW{decision.target_gameweek}\n"
         f"Information cutoff: {_utc_text(decision.information_cutoff)}\n"
-        f"Status: {decision.engineering_status}; {decision.activation_status}\n\n"
-        "ACTION\n"
+        f"Status: {decision.engineering_status}; {decision.activation_status}\n"
+        "\nCURRENT STATE\n"
+        f"Squad: {current_squad}\n"
+        f"Bank: {value.current_state.manager_state.bank_tenths / 10:.1f}\n"
+        f"Free transfers: {value.current_state.manager_state.free_transfers}\n"
+        "Chip configuration: NO CHIP\n"
+        "\nRECOMMENDATION\n"
         f"Transfers: {transfers}\n"
-        f"Chip: {decision.chip_action}\n"
+        f"Transfer hit: -{comparison.transfer_hit_points}\n"
+        f"Resulting squad: {resulting_squad}\n"
+        "\nLINEUP\n"
+        f"Formation: {formation}\n"
         f"XI: {xi}\n"
         f"Bench (GK, 1, 2, 3): {bench}\n"
         f"Captain: {label(tactics.captain)}\n"
-        f"Vice-captain: {label(tactics.vice_captain)}\n\n"
-        "NO-ACTION COMPARATOR — IDENTICAL JOINT SCENARIOS\n"
+        f"Vice-captain: {label(tactics.vice_captain)}\n"
+        "\nPROJECTION - NO-ACTION COMPARATOR ON IDENTICAL JOINT SCENARIOS\n"
         f"Recommended before hit: {comparison.recommended_expected_points_before_hit:.2f}\n"
         f"No transfer: {comparison.no_transfer_expected_points:.2f}\n"
         f"Transfer hit: -{comparison.transfer_hit_points}\n"
@@ -867,19 +909,24 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
         f"{comparison.gain_median} / {comparison.gain_p90}\n"
         "P(recommended beats no transfer): "
         f"{comparison.probability_recommended_beats_baseline:.1%}\n\n"
-        "CONFIDENCE AND LIMITATIONS\n"
+        "DATA QUALITY\n"
         "Confidence: LOW. Stage 7 is a private manual transient override, NOT_MODEL_DERIVED, "
         "and the player-allocation prior is the grade-E GW1 candidate with historical cutoff "
         "and CANDIDATE_NOT_ACCEPTED status.\n"
+        f"Score-prior source class: {score_prior_classes}\n"
+        f"Stage-9 Monte Carlo gate: {decision.stage9_monte_carlo_status}; "
+        f"reasons: {mc_reasons}\n"
         f"Declared optimiser scope: {decision.action_space_disclosure}\n"
         "The exact optimality guarantee applies only to that declared candidate/action space and "
         "one-Gameweek zero-terminal-value horizon.\n"
         f"{warnings}\n\n"
         "REPRODUCIBILITY\n"
+        f"Code SHA: {decision.lineage.code_sha}\n"
         f"Execution input hash: {decision.lineage.execution_input_sha256}\n"
         f"Stage-9 joint matrix hash: {decision.lineage.stage9_joint_matrix_sha256}\n"
         f"Decision hash: {decision.semantic_sha256}\n"
-        "A replay command is emitted only when a retention-authorised synthetic bundle is frozen.\n"
+        "Replay: dmf private-v1 replay --bundle <bundle-directory>\n"
+        "The replay manifest hash is emitted alongside a retention-authorised frozen bundle.\n"
     )
 
 
@@ -895,6 +942,7 @@ class PrivateV1RecommendationService:
             ) from None
         _verify_current_sources(execution)
         prior = load_packaged_player_prior()
+        _verify_runtime_artifacts(execution, prior)
         fixture_results, stage7_contexts, stage8_hashes, binding_hashes = _project_fixtures(
             execution, prior
         )
@@ -980,6 +1028,24 @@ class PrivateV1RecommendationService:
                     "NOT_PRODUCTION_ACTIVE",
                     "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE",
                     "EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE",
+                    *(
+                        ("REPOSITORY_OWNED_SYNTHETIC_SCORE_PRIOR_TEST_ONLY",)
+                        if any(
+                            item.source_class == "REPOSITORY_OWNED_SYNTHETIC"
+                            for item in execution.score_priors
+                        )
+                        else ()
+                    ),
+                    *(
+                        ("STAGE9_MC_PASS_NOT_REQUIRED_TEST_ONLY",)
+                        if not execution.require_stage9_mc_pass
+                        else ()
+                    ),
+                    *(
+                        ("REPOSITORY_OWNED_SYNTHETIC_EVENT_ALLOCATION_TEST_ONLY",)
+                        if execution.event_allocation_config.source_tag == "TEST_SYNTHETIC"
+                        else ()
+                    ),
                     *scenario_set.warnings,
                     *optimiser.warnings,
                 }
@@ -1008,6 +1074,7 @@ class PrivateV1RecommendationService:
             stage8_result_sha256_by_fixture=stage8_hashes,
             stage8_policy_sha256=stage8_policy_hash,
             player_prior_artifact_sha256=prior.artifact.artifact_sha256,
+            player_prior_acceptance_sha256=(prior.historical_acceptance.acceptance_sha256),
             player_prior_binding_sha256_by_fixture=binding_hashes,
             stage9_result_sha256=gameweek.result_sha256,
             stage9_joint_matrix_sha256=matrix_hash,
@@ -1039,6 +1106,8 @@ class PrivateV1RecommendationService:
             stage7_model_derived=False,
             confidence="LOW",
             scenario_count=len(scenario_set.scenarios),
+            stage9_monte_carlo_status=gameweek.monte_carlo.stopping_result,
+            stage9_monte_carlo_reasons=tuple(sorted(set(gameweek.monte_carlo.stopping_reasons))),
             solver_optimality="EXACT_DECLARED_TREE_AND_ACTION_SPACE",
             action_space_disclosure=(
                 f"Exact over {len(execution.candidate_action_policy.allowed_transfer_in_element_ids)} "

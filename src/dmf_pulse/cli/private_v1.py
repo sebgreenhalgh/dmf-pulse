@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import json
+from enum import StrEnum
 from pathlib import Path
 from typing import Annotated
 
 import typer
 from pydantic import ValidationError
 
+from dmf_pulse.assurance.canonical import canonical_json_bytes
 from dmf_pulse.private_v1.artifacts import (
     load_execution_input,
     write_synthetic_replay_bundle,
@@ -17,6 +19,11 @@ from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.service import PrivateV1RecommendationService
 
 private_v1_app = typer.Typer(help="Run or replay the private current recommendation path.")
+
+
+class _OutputFormat(StrEnum):
+    REPORT = "report"
+    JSON = "json"
 
 
 def _emit_error(error: PrivateV1Error) -> None:
@@ -50,13 +57,24 @@ def run_command(
             help="New directory for a retention-authorised synthetic replay bundle.",
         ),
     ] = None,
+    output_format: Annotated[
+        _OutputFormat,
+        typer.Option(
+            "--output",
+            help="Emit the human report or the canonical machine-readable decision JSON.",
+        ),
+    ] = _OutputFormat.REPORT,
 ) -> None:
     """Execute the in-memory path; optionally freeze a synthetic-only replay bundle."""
 
     try:
         execution = load_execution_input(input_path)
+        if freeze_dir is not None and execution.retention_class != "SYNTHETIC_REPLAY_ALLOWED":
+            raise PrivateV1Error(
+                "REPLAY_RETENTION_FORBIDDEN",
+                "current source rights do not permit a persistent replay bundle",
+            )
         result = PrivateV1RecommendationService().run(execution)
-        typer.echo(result.report, nl=False)
         if freeze_dir is not None:
             manifest = write_synthetic_replay_bundle(
                 execution,
@@ -64,8 +82,15 @@ def run_command(
                 result.report,
                 freeze_dir,
             )
-            typer.echo(f"Replay manifest: {manifest.manifest_sha256}")
-            typer.echo(f"Replay: dmf private-v1 replay --bundle {freeze_dir}")
+        else:
+            manifest = None
+        if output_format is _OutputFormat.JSON:
+            typer.echo(canonical_json_bytes(result.decision).decode("utf-8"), nl=False)
+        else:
+            typer.echo(result.report, nl=False)
+            if manifest is not None:
+                typer.echo(f"Replay manifest: {manifest.manifest_sha256}")
+                typer.echo(f"Replay: dmf private-v1 replay --bundle {freeze_dir}")
     except PrivateV1Error as exc:
         _emit_error(exc)
         raise typer.Exit(2) from None
@@ -87,13 +112,23 @@ def replay_command(
             help="Frozen synthetic replay bundle directory.",
         ),
     ],
+    output_format: Annotated[
+        _OutputFormat,
+        typer.Option(
+            "--output",
+            help="Emit the human report or the canonical machine-readable decision JSON.",
+        ),
+    ] = _OutputFormat.REPORT,
 ) -> None:
     """Verify and recompute a synthetic replay bundle entirely offline."""
 
     try:
         replay = PrivateV1RecommendationService().replay(bundle)
-        typer.echo(replay.run.report, nl=False)
-        typer.echo(f"Replay verified: {replay.manifest_sha256}")
+        if output_format is _OutputFormat.JSON:
+            typer.echo(canonical_json_bytes(replay.run.decision).decode("utf-8"), nl=False)
+        else:
+            typer.echo(replay.run.report, nl=False)
+            typer.echo(f"Replay verified: {replay.manifest_sha256}")
     except PrivateV1Error as exc:
         _emit_error(exc)
         raise typer.Exit(2) from None
