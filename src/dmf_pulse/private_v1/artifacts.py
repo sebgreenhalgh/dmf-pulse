@@ -129,6 +129,17 @@ def load_execution_input(path: Path) -> PrivateV1ExecutionInput:
     )
 
 
+def load_private_input_model[ModelT: BaseModel](
+    path: Path,
+    model: type[ModelT],
+    *,
+    maximum_bytes: int = MAX_EXECUTION_INPUT_BYTES,
+) -> ModelT:
+    """Load one strict bounded operator-owned JSON model without retaining its bytes."""
+
+    return _load_model(path, model, maximum_bytes=maximum_bytes)
+
+
 def load_replay_manifest(path: Path) -> PrivateReplayManifest:
     return _load_model(
         path,
@@ -279,6 +290,7 @@ def verify_replay_bundle(
 __all__ = [
     "load_execution_input",
     "load_private_decision",
+    "load_private_input_model",
     "load_replay_manifest",
     "verify_replay_bundle",
     "write_synthetic_replay_bundle",

@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 from uuid import UUID, uuid5
 
 from dmf_pulse.assurance.canonical import canonical_sha256
@@ -119,7 +120,14 @@ def _selected_rosters() -> dict[int, tuple[tuple[int, int], ...]]:
     return result
 
 
-def _build_fpl_input(repository_root: Path, working: Path):
+def _build_fpl_input(
+    repository_root: Path,
+    working: Path,
+    *,
+    target_gameweek: int = 1,
+    captured_at: datetime = _CAPTURED,
+    information_cutoff: datetime = _CUTOFF,
+):
     source = repository_root / "fixtures/fpl/FPL-004/happy_path"
     bootstrap = json.loads((source / "bootstrap.json").read_text(encoding="utf-8"))
     fixtures_source = json.loads((source / "fixtures.json").read_text(encoding="utf-8"))
@@ -127,6 +135,11 @@ def _build_fpl_input(repository_root: Path, working: Path):
     original_teams = bootstrap["teams"]
     original_players = bootstrap["elements"]
     templates = {int(item["element_type"]): item for item in original_players}
+    if target_gameweek != 1:
+        target_event = next(item for item in bootstrap["events"] if item["id"] == target_gameweek)
+        target_event["deadline_time"] = (
+            (information_cutoff + timedelta(days=2)).isoformat().replace("+00:00", "Z")
+        )
     teams = []
     for team_id in range(1, 7):
         team = deepcopy(original_teams[(team_id - 1) % len(original_teams)])
@@ -169,8 +182,10 @@ def _build_fpl_input(repository_root: Path, working: Path):
             {
                 "id": 100 + index,
                 "code": 910100 + index,
-                "event": 1,
-                "kickoff_time": f"2026-08-22T{12 + index * 2:02d}:00:00Z",
+                "event": target_gameweek,
+                "kickoff_time": (information_cutoff + timedelta(days=2, hours=index * 2))
+                .isoformat()
+                .replace("+00:00", "Z"),
                 "team_h": home,
                 "team_a": away,
             }
@@ -183,16 +198,16 @@ def _build_fpl_input(repository_root: Path, working: Path):
     fixture_path = working / "fixtures.json"
     bootstrap_path.write_text(json.dumps(bootstrap, sort_keys=True), encoding="utf-8")
     fixture_path.write_text(json.dumps(fixtures, sort_keys=True), encoding="utf-8")
-    clock = iter((_CAPTURED + timedelta(minutes=5), _CAPTURED + timedelta(minutes=6)))
+    clock = iter((captured_at + timedelta(minutes=5), captured_at + timedelta(minutes=6)))
     return CurrentFplInputService(clock=lambda: next(clock)).compile(
         CurrentFplInputRequest(
             bootstrap_path=bootstrap_path,
             fixtures_path=fixture_path,
             competition_key="PL",
             season_code="2026/27",
-            target_gameweek=1,
-            captured_at=_CAPTURED,
-            information_cutoff=_CUTOFF,
+            target_gameweek=target_gameweek,
+            captured_at=captured_at,
+            information_cutoff=information_cutoff,
             rights_profile_id="fpl_official_private_manual_v1",
         )
     )
@@ -229,7 +244,15 @@ def _manager_squad_ids(fpl_input: Any) -> tuple[int, ...]:
     return tuple(sorted(selected))
 
 
-def _compile_manager(working: Path, fpl_input: Any, ruleset: Any, capability: Any):
+def _compile_manager(
+    working: Path,
+    fpl_input: Any,
+    ruleset: Any,
+    capability: Any,
+    *,
+    captured_at: datetime = _CAPTURED,
+    information_cutoff: datetime = _CUTOFF,
+):
     transfer_rules = build_multi_gameweek_transfer_rules(
         ruleset, projection_mode=ProjectionMode.PRODUCTION, capability=capability
     )
@@ -260,19 +283,19 @@ def _compile_manager(working: Path, fpl_input: Any, ruleset: Any, capability: An
         *by_position["FWD"][:2],
     )
     bench_outfield = (by_position["DEF"][4], by_position["MID"][4], by_position["FWD"][2])
-    inventory = build_chip_inventory(chip_rules, current_gameweek=1)
+    inventory = build_chip_inventory(chip_rules, current_gameweek=fpl_input.target_gameweek)
     declaration = {
         "schema_version": "1.0.0",
         "source_class": "OPERATOR_DECLARED",
         "season_code": "2026/27",
-        "target_gameweek": 1,
-        "information_cutoff": _CUTOFF.isoformat().replace("+00:00", "Z"),
+        "target_gameweek": fpl_input.target_gameweek,
+        "information_cutoff": information_cutoff.isoformat().replace("+00:00", "Z"),
         "attestation": {
             "declaration_method": "OPERATOR_DECLARED",
             "attestation_status": "HUMAN_ATTESTED",
             "provider_verification": "NOT_PROVIDER_VERIFIED",
-            "declared_at": (_CAPTURED + timedelta(minutes=10)).isoformat().replace("+00:00", "Z"),
-            "attested_at": (_CAPTURED + timedelta(minutes=11)).isoformat().replace("+00:00", "Z"),
+            "declared_at": (captured_at + timedelta(minutes=10)).isoformat().replace("+00:00", "Z"),
+            "attested_at": (captured_at + timedelta(minutes=11)).isoformat().replace("+00:00", "Z"),
             "operator_reference": "repository-synthetic-private-v1",
         },
         "squad": squad,
@@ -301,7 +324,7 @@ def _compile_manager(working: Path, fpl_input: Any, ruleset: Any, capability: An
     path = working / "manager.json"
     path.write_text(json.dumps(declaration, sort_keys=True), encoding="utf-8")
     request = bind_current_manager_state_request(path, fpl_input, ruleset, capability)
-    clock = iter((_CAPTURED + timedelta(minutes=12), _CAPTURED + timedelta(minutes=13)))
+    clock = iter((captured_at + timedelta(minutes=12), captured_at + timedelta(minutes=13)))
     return CurrentManagerStateService(clock=lambda: next(clock)).compile(
         request, fpl_input=fpl_input, ruleset=ruleset, capability=capability
     )
@@ -321,7 +344,12 @@ def _replace_participants(event: dict[str, Any], home: str, away: str) -> None:
                     outcome["name"] = away
 
 
-def _build_odds(repository_root: Path):
+def _build_odds(
+    repository_root: Path,
+    *,
+    captured_at: datetime = _CAPTURED,
+    information_cutoff: datetime = _CUTOFF,
+):
     raw = json.loads(
         (repository_root / "fixtures/odds/ODD-005/happy_path.json").read_text(encoding="utf-8")
     )
@@ -331,12 +359,16 @@ def _build_odds(repository_root: Path):
     for index, (home, away) in enumerate(((1, 2), (3, 4), (5, 6)), start=1):
         event = deepcopy(template)
         event["id"] = f"private-v1-event-{index}"
-        event["commence_time"] = f"2026-08-22T{12 + index * 2:02d}:00:00Z"
+        event["commence_time"] = (
+            (information_cutoff + timedelta(days=2, hours=index * 2))
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
         _replace_participants(
             event, f"Private Synthetic Club {home}", f"Private Synthetic Club {away}"
         )
         events.append(event)
-    received = _CAPTURED + timedelta(minutes=20)
+    received = captured_at + timedelta(minutes=20)
     body = json.dumps(events, allow_nan=False, separators=(",", ":")).encode()
     odds = build_current_odds_input(
         parse_odds_payload(body),
@@ -344,7 +376,7 @@ def _build_odds(repository_root: Path):
         source_snapshot_id=UUID("00000000-0000-0000-0000-000000008501"),
         request_started_at=received - timedelta(seconds=1),
         received_at=received,
-        information_cutoff=_CUTOFF,
+        information_cutoff=information_cutoff,
         usable_at=received + timedelta(minutes=1),
         quota=QuotaState(
             remaining=498,
@@ -357,7 +389,8 @@ def _build_odds(repository_root: Path):
         sanitized_target=(
             "https://api.the-odds-api.com/v4/sports/soccer_epl/odds?"
             "regions=uk&markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&"
-            "commenceTimeFrom=2026-08-21T17%3A30%3A00Z"
+            "commenceTimeFrom="
+            + quote(information_cutoff.isoformat().replace("+00:00", "Z"), safe="")
         ),
         attempt_count=1,
         transport_call_count=1,
@@ -367,13 +400,37 @@ def _build_odds(repository_root: Path):
     return _fresh_odds(odds)
 
 
-def _unified_context(repository_root: Path, working: Path) -> CurrentUnifiedTestContext:
-    fpl_input = _build_fpl_input(repository_root, working)
+def _unified_context(
+    repository_root: Path,
+    working: Path,
+    *,
+    target_gameweek: int = 1,
+    captured_at: datetime = _CAPTURED,
+    information_cutoff: datetime = _CUTOFF,
+) -> CurrentUnifiedTestContext:
+    fpl_input = _build_fpl_input(
+        repository_root,
+        working,
+        target_gameweek=target_gameweek,
+        captured_at=captured_at,
+        information_cutoff=information_cutoff,
+    )
     ruleset, capability = active_target_rules(repository_root)
-    manager = _compile_manager(working, fpl_input, ruleset, capability)
-    odds = _build_odds(repository_root)
+    manager = _compile_manager(
+        working,
+        fpl_input,
+        ruleset,
+        capability,
+        captured_at=captured_at,
+        information_cutoff=information_cutoff,
+    )
+    odds = _build_odds(
+        repository_root,
+        captured_at=captured_at,
+        information_cutoff=information_cutoff,
+    )
     by_team = {item.provider_team_id: item for item in fpl_input.teams}
-    approved = _CAPTURED + timedelta(minutes=55)
+    approved = captured_at + timedelta(minutes=55)
     aliases = team_plan(
         fpl_input,
         mappings=tuple(
@@ -407,7 +464,7 @@ def _unified_context(repository_root: Path, working: Path) -> CurrentUnifiedTest
         odds,
         aliases,
         mapping_plan,
-        decided_at=_CAPTURED + timedelta(minutes=60),
+        decided_at=captured_at + timedelta(minutes=60),
     )
     request = bind_current_unified_state_request(
         fpl_input, odds, identity, manager, ruleset, capability
@@ -433,7 +490,12 @@ def _unified_context(repository_root: Path, working: Path) -> CurrentUnifiedTest
     )
 
 
-def _identity_map(context: CurrentUnifiedTestContext) -> PrivateCanonicalPlayerIdentityMap:
+def _identity_map(
+    context: CurrentUnifiedTestContext,
+    *,
+    captured_at: datetime = _CAPTURED,
+    information_cutoff: datetime = _CUTOFF,
+) -> PrivateCanonicalPlayerIdentityMap:
     teams = tuple(
         PrivateCanonicalTeamIdentity(
             official_fpl_team_id=item.provider_team_id,
@@ -452,8 +514,8 @@ def _identity_map(context: CurrentUnifiedTestContext) -> PrivateCanonicalPlayerI
     return seal_canonical_player_identity_map(
         PrivateCanonicalPlayerIdentityMap.model_construct(
             source_class="REPOSITORY_SYNTHETIC",
-            resolved_at=_CAPTURED + timedelta(minutes=45),
-            information_cutoff=_CUTOFF,
+            resolved_at=captured_at + timedelta(minutes=45),
+            information_cutoff=information_cutoff,
             teams=teams,
             players=players,
             semantic_sha256="0" * 64,
@@ -504,7 +566,12 @@ def _manual_team(team_id: str, players: tuple[Any, ...]) -> dict[str, Any]:
 
 
 def _manual_inputs(
-    context: CurrentUnifiedTestContext, identities: PrivateCanonicalPlayerIdentityMap, view: Any
+    context: CurrentUnifiedTestContext,
+    identities: PrivateCanonicalPlayerIdentityMap,
+    view: Any,
+    *,
+    captured_at: datetime = _CAPTURED,
+    information_cutoff: datetime = _CUTOFF,
 ):
     mapped_by_element = {item.official_fpl_element_id: item for item in identities.players}
     current_by_team: dict[int, list[Any]] = {
@@ -531,12 +598,12 @@ def _manual_inputs(
             "operator_ref": "repository-synthetic-private-v1",
             "evidence_type": "ANALYST_SCENARIO_JUDGEMENT",
             "source_ref": "REPOSITORY_SYNTHETIC_INPUT",
-            "source_timestamp": (_CAPTURED + timedelta(minutes=41)).isoformat(),
-            "entered_at": (_CAPTURED + timedelta(minutes=42)).isoformat(),
-            "usable_at": (_CAPTURED + timedelta(minutes=43)).isoformat(),
+            "source_timestamp": (captured_at + timedelta(minutes=41)).isoformat(),
+            "entered_at": (captured_at + timedelta(minutes=42)).isoformat(),
+            "usable_at": (captured_at + timedelta(minutes=43)).isoformat(),
             "adjustment_type": "SOFT_SCENARIO_MIXTURE",
             "reason": "Repository-owned deterministic end-to-end scenario.",
-            "expires_at": (_CUTOFF + timedelta(days=1)).isoformat(),
+            "expires_at": (information_cutoff + timedelta(days=1)).isoformat(),
             "fixture_scope_id": fixture_id,
             "classification": "PRIVATE_TRANSIENT",
             "persistence_class": "TRANSIENT_PRIVATE",
@@ -550,8 +617,8 @@ def _manual_inputs(
                     "fixture_id": fixture_id,
                     "home_team_id": team_uuid[home],
                     "away_team_id": team_uuid[away],
-                    "as_of": _CUTOFF,
-                    "information_cutoff": _CUTOFF,
+                    "as_of": information_cutoff,
+                    "information_cutoff": information_cutoff,
                     "provenance": provenance,
                     "home": _manual_team(team_uuid[home], tuple(current_by_team[home])),
                     "away": _manual_team(team_uuid[away], tuple(current_by_team[away])),

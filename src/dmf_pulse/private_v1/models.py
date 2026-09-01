@@ -28,13 +28,18 @@ from dmf_pulse.fpl_points.models import (
     MonteCarloPolicy,
     ProjectionMode,
 )
+from dmf_pulse.fpl_points.player_prior import CurrentGwStalePriorCarryForwardPolicy
 from dmf_pulse.ingestion.current_state import CurrentUnifiedStateBundle
 from dmf_pulse.ingestion.openfootball.service import CurrentScorePriorBundle
 from dmf_pulse.markets.current import (
     CurrentMarketCanonicalIdentityView,
     CurrentMarketConstraintBundle,
 )
-from dmf_pulse.rules.models import CapabilityArtifact, CompiledRuleset
+from dmf_pulse.rules.models import CapabilityArtifact, CompiledRuleset, RulesetStatus
+from dmf_pulse.rules.private_transient import (
+    PrivateTransientRulesAuthority,
+    validate_private_transient_rules_authority,
+)
 
 Sha256 = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 GitSha = Annotated[str, Field(pattern=r"^[0-9a-f]{40}$")]
@@ -271,6 +276,8 @@ class PrivateV1ExecutionInput(_FrozenModel):
     candidate_action_policy: PrivateCandidateActionPolicy
     ruleset: CompiledRuleset
     full_season_capability: CapabilityArtifact
+    private_rules_authority: PrivateTransientRulesAuthority | None = None
+    player_prior_carry_forward_policy: CurrentGwStalePriorCarryForwardPolicy | None = None
     root_seed: Annotated[StrictInt, Field(ge=0, le=2**63 - 1)]
     scenario_count: Annotated[StrictInt, Field(ge=1, le=1_000_000)]
     stage9_monte_carlo_policy: MonteCarloPolicy
@@ -299,6 +306,36 @@ class PrivateV1ExecutionInput(_FrozenModel):
             raise ValueError("synthetic score priors require synthetic replay authority")
         current = self.current_state
         market = self.market_constraints
+        if self.ruleset.status is RulesetStatus.VERIFIED:
+            if (
+                synthetic
+                or self.retention_class != "PRIVATE_TRANSIENT_NO_RETENTION"
+                or self.private_rules_authority is None
+            ):
+                raise ValueError(
+                    "VERIFIED rules require explicit private transient no-retention authority"
+                )
+            validate_private_transient_rules_authority(
+                self.private_rules_authority,
+                ruleset=self.ruleset,
+                capability=self.full_season_capability,
+                information_cutoff=current.information_cutoff,
+            )
+        elif self.private_rules_authority is not None:
+            raise ValueError("private VERIFIED-rules authority cannot be attached to ACTIVE rules")
+        carry_forward = self.player_prior_carry_forward_policy
+        if current.target_gameweek == 1 and carry_forward is not None:
+            raise ValueError("GW1 execution cannot claim current-GW stale carry-forward")
+        if current.target_gameweek > 1 and (
+            carry_forward is None
+            or carry_forward.target_gameweek != current.target_gameweek
+            or carry_forward.current_fpl_bundle_sha256 != current.fpl_input.semantic_sha256
+            or carry_forward.prior_artifact_sha256 != self.expected_player_prior_artifact_sha256
+            or carry_forward.historical_acceptance_sha256
+            != self.expected_player_prior_acceptance_sha256
+            or carry_forward.declared_at > current.information_cutoff
+        ):
+            raise ValueError("current Gameweek requires an exact stale-prior carry-forward policy")
         if (
             market.season_code != current.season_code
             or market.target_gameweek != current.target_gameweek
@@ -465,6 +502,8 @@ class PrivateDecisionLineage(_FrozenModel):
     player_prior_artifact_sha256: Sha256
     player_prior_acceptance_sha256: Sha256
     player_prior_binding_sha256_by_fixture: dict[StrictStr, Sha256]
+    player_prior_carry_forward_policy_sha256: Sha256 | None
+    private_rules_authority_sha256: Sha256 | None
     stage9_result_sha256: Sha256
     stage9_joint_matrix_sha256: Sha256
     optimiser_request_sha256: Sha256
@@ -481,6 +520,14 @@ class PrivateV1Decision(_FrozenModel):
     status: Literal[PrivateDecisionStatus.SUCCESS]
     engineering_status: Literal["PRIVATE_V1_E2E_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"]
     activation_status: Literal["NOT_PRODUCTION_ACTIVE"]
+    execution_status: Literal[
+        "SYNTHETIC_REPLAYABLE_RECOMMENDATION",
+        "REAL_PRIVATE_TRANSIENT_RECOMMENDATION",
+    ]
+    replay_retention: Literal[
+        "ALLOWED_REPOSITORY_OWNED_SYNTHETIC_ONLY",
+        "FORBIDDEN_BY_CURRENT_RIGHTS_PROFILE",
+    ]
     run_id: StrictStr
     season: Literal["2026/27"]
     target_gameweek: PositiveInt
@@ -496,6 +543,12 @@ class PrivateV1Decision(_FrozenModel):
     stage7_family: Literal["PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1"]
     stage7_model_derived: Literal[False]
     confidence: Literal["LOW"]
+    player_prior_status: Literal[
+        "HISTORICAL_GW1_ACCEPTED_SCOPE",
+        "PRIVATE_CURRENT_GW_STALE_PRIOR_CARRY_FORWARD_V1",
+    ]
+    player_prior_evidence_cutoff: datetime
+    player_prior_fallback_player_ids: tuple[StrictStr, ...]
     scenario_count: PositiveInt
     stage9_monte_carlo_status: Literal["PASS", "CONTINUE", "BLOCKED"]
     stage9_monte_carlo_reasons: tuple[StrictStr, ...]
@@ -505,7 +558,7 @@ class PrivateV1Decision(_FrozenModel):
     lineage: PrivateDecisionLineage
     semantic_sha256: Sha256
 
-    @field_validator("information_cutoff")
+    @field_validator("information_cutoff", "player_prior_evidence_cutoff")
     @classmethod
     def cutoff_is_utc(cls, value: datetime) -> datetime:
         return _utc(value, label="information_cutoff")
@@ -516,6 +569,14 @@ class PrivateV1Decision(_FrozenModel):
             raise ValueError("decision action and transfer list disagree")
         if self.resulting_squad != tuple(sorted(self.resulting_squad)):
             raise ValueError("resulting squad must be canonically ordered")
+        if self.player_prior_fallback_player_ids != tuple(
+            sorted(set(self.player_prior_fallback_player_ids))
+        ):
+            raise ValueError("player-prior fallback identities must be unique and sorted")
+        if (self.execution_status == "REAL_PRIVATE_TRANSIENT_RECOMMENDATION") != (
+            self.replay_retention == "FORBIDDEN_BY_CURRENT_RIGHTS_PROFILE"
+        ):
+            raise ValueError("private execution status and replay retention disagree")
         if self.warnings != tuple(sorted(set(self.warnings))):
             raise ValueError("decision warnings must be unique and sorted")
         if self.stage9_monte_carlo_reasons != tuple(sorted(set(self.stage9_monte_carlo_reasons))):

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated
@@ -11,12 +12,41 @@ import typer
 from pydantic import ValidationError
 
 from dmf_pulse.assurance.canonical import canonical_json_bytes
+from dmf_pulse.fpl_points.errors import FplPointsError
+from dmf_pulse.fpl_points.service import load_mc_policy
+from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput
+from dmf_pulse.ingestion.odds.mapping import CurrentFixtureMappingPlan, CurrentTeamAliasPlan
+from dmf_pulse.markets.current import CurrentMarketCanonicalIdentityView
 from dmf_pulse.private_v1.artifacts import (
     load_execution_input,
+    load_private_input_model,
     write_synthetic_replay_bundle,
 )
 from dmf_pulse.private_v1.errors import PrivateV1Error
-from dmf_pulse.private_v1.service import PrivateV1RecommendationService
+from dmf_pulse.private_v1.live import (
+    PrivateLivePriorFallbackInput,
+    PrivateLiveScorePriorInput,
+    PrivateLiveStage7Input,
+    PrivateV1LiveTransientRequest,
+    PrivateV1LiveTransientService,
+)
+from dmf_pulse.private_v1.models import (
+    PrivateCandidateActionPolicy,
+    PrivateCanonicalPlayerIdentityMap,
+    PrivateCurrentOwnership,
+)
+from dmf_pulse.private_v1.service import (
+    PrivateV1RecommendationService,
+    load_packaged_event_allocation_config,
+)
+from dmf_pulse.rules.capabilities import compile_capability_artifact
+from dmf_pulse.rules.compiler import resolve_ruleset
+from dmf_pulse.rules.errors import RulesError
+from dmf_pulse.rules.models import RuleCapability
+from dmf_pulse.rules.private_transient import (
+    PrivateTransientRulesAuthority,
+    seal_private_transient_rules_authority,
+)
 
 private_v1_app = typer.Typer(help="Run or replay the private current recommendation path.")
 
@@ -34,6 +64,153 @@ def _emit_error(error: PrivateV1Error) -> None:
             sort_keys=True,
         )
     )
+
+
+def _utc_timestamp(value: str, *, option: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except (TypeError, ValueError) as exc:
+        raise PrivateV1Error("USAGE_INVALID", f"{option} must be an RFC3339 timestamp") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise PrivateV1Error("USAGE_INVALID", f"{option} must include a UTC offset")
+    return parsed.astimezone(UTC)
+
+
+@private_v1_app.command("live-transient")
+def live_transient_command(
+    bootstrap: Annotated[Path, typer.Option("--bootstrap", exists=True, dir_okay=False)],
+    fixtures: Annotated[Path, typer.Option("--fixtures", exists=True, dir_okay=False)],
+    manager: Annotated[Path, typer.Option("--manager", exists=True, dir_okay=False)],
+    ruleset_path: Annotated[Path, typer.Option("--ruleset", exists=True)],
+    rules_approval_reference: Annotated[str, typer.Option("--rules-approval-reference")],
+    rules_approved_at: Annotated[str, typer.Option("--rules-approved-at")],
+    odds_input: Annotated[Path, typer.Option("--odds-input", exists=True, dir_okay=False)],
+    team_alias_plan: Annotated[
+        Path, typer.Option("--team-alias-plan", exists=True, dir_okay=False)
+    ],
+    fixture_mapping_plan: Annotated[
+        Path, typer.Option("--fixture-mapping-plan", exists=True, dir_okay=False)
+    ],
+    market_identity_view: Annotated[
+        Path, typer.Option("--market-identity-view", exists=True, dir_okay=False)
+    ],
+    player_identity_map: Annotated[
+        Path, typer.Option("--player-identity-map", exists=True, dir_okay=False)
+    ],
+    score_priors: Annotated[Path, typer.Option("--score-priors", exists=True, dir_okay=False)],
+    stage7: Annotated[Path, typer.Option("--stage7", exists=True, dir_okay=False)],
+    ownership: Annotated[Path, typer.Option("--ownership", exists=True, dir_okay=False)],
+    candidate_policy: Annotated[
+        Path, typer.Option("--candidate-policy", exists=True, dir_okay=False)
+    ],
+    mc_policy: Annotated[Path, typer.Option("--mc-policy", exists=True, dir_okay=False)],
+    gameweek: Annotated[int, typer.Option("--gameweek", min=1)],
+    captured_at: Annotated[str, typer.Option("--captured-at")],
+    information_cutoff: Annotated[str, typer.Option("--information-cutoff")],
+    mapping_decided_at: Annotated[str, typer.Option("--mapping-decided-at")],
+    run_id: Annotated[str, typer.Option("--run-id")],
+    code_sha: Annotated[str, typer.Option("--code-sha")],
+    root_seed: Annotated[int, typer.Option("--root-seed", min=0)],
+    scenario_count: Annotated[int, typer.Option("--scenario-count", min=1)],
+    prior_fallbacks: Annotated[
+        Path | None,
+        typer.Option("--prior-fallbacks", exists=True, dir_okay=False),
+    ] = None,
+) -> None:
+    """Display one real private recommendation; never create a replay or output artifact."""
+
+    try:
+        ruleset = resolve_ruleset(ruleset_path)
+        capability = compile_capability_artifact(ruleset, RuleCapability.FULL_SEASON)
+        authority = seal_private_transient_rules_authority(
+            PrivateTransientRulesAuthority.model_construct(
+                ruleset_id=ruleset.ruleset_id,
+                ruleset_version=ruleset.ruleset_version,
+                ruleset_sha256=ruleset.ruleset_hash,
+                capability_sha256=capability.capability_hash,
+                operator_approval_reference=rules_approval_reference,
+                operator_approved_at=_utc_timestamp(
+                    rules_approved_at, option="--rules-approved-at"
+                ),
+                attestation_sha256="0" * 64,
+            )
+        )
+        odds = load_private_input_model(odds_input, OddsProviderCurrentInput)
+        aliases = load_private_input_model(
+            team_alias_plan, CurrentTeamAliasPlan, maximum_bytes=4 * 1024 * 1024
+        )
+        fixture_plan = load_private_input_model(
+            fixture_mapping_plan, CurrentFixtureMappingPlan, maximum_bytes=4 * 1024 * 1024
+        )
+        market_view = load_private_input_model(
+            market_identity_view,
+            CurrentMarketCanonicalIdentityView,
+            maximum_bytes=4 * 1024 * 1024,
+        )
+        player_map = load_private_input_model(
+            player_identity_map,
+            PrivateCanonicalPlayerIdentityMap,
+            maximum_bytes=16 * 1024 * 1024,
+        )
+        prior_set = load_private_input_model(score_priors, PrivateLiveScorePriorInput)
+        minutes_set = load_private_input_model(stage7, PrivateLiveStage7Input)
+        ownership_input = load_private_input_model(
+            ownership, PrivateCurrentOwnership, maximum_bytes=4 * 1024 * 1024
+        )
+        candidates = load_private_input_model(
+            candidate_policy, PrivateCandidateActionPolicy, maximum_bytes=1024 * 1024
+        )
+        fallback_input = (
+            load_private_input_model(
+                prior_fallbacks,
+                PrivateLivePriorFallbackInput,
+                maximum_bytes=4 * 1024 * 1024,
+            )
+            if prior_fallbacks is not None
+            else None
+        )
+        request = PrivateV1LiveTransientRequest(
+            run_id=run_id,
+            code_sha=code_sha,
+            bootstrap_path=bootstrap,
+            fixtures_path=fixtures,
+            manager_declaration_path=manager,
+            target_gameweek=gameweek,
+            captured_at=_utc_timestamp(captured_at, option="--captured-at"),
+            information_cutoff=_utc_timestamp(information_cutoff, option="--information-cutoff"),
+            ruleset=ruleset,
+            full_season_capability=capability,
+            private_rules_authority=authority,
+            odds_input=odds,
+            team_alias_plan=aliases,
+            fixture_mapping_plan=fixture_plan,
+            mapping_decided_at=_utc_timestamp(mapping_decided_at, option="--mapping-decided-at"),
+            market_identity_view=market_view,
+            player_identity_map=player_map,
+            score_priors=prior_set.score_priors,
+            manual_minutes=minutes_set.fixtures,
+            ownership=ownership_input,
+            candidate_action_policy=candidates,
+            prior_fallbacks=fallback_input,
+            root_seed=root_seed,
+            scenario_count=scenario_count,
+            stage9_monte_carlo_policy=load_mc_policy(mc_policy),
+            event_allocation_config=load_packaged_event_allocation_config(),
+        )
+        result = PrivateV1LiveTransientService().run(request)
+        typer.echo(result.report, nl=False)
+        del result
+    except PrivateV1Error as exc:
+        _emit_error(exc)
+        raise typer.Exit(2) from None
+    except (FplPointsError, RulesError) as exc:
+        _emit_error(PrivateV1Error(exc.code, exc.message))
+        raise typer.Exit(2) from None
+    except (ValidationError, ValueError, ArithmeticError, OSError):
+        _emit_error(
+            PrivateV1Error("LIVE_TRANSIENT_FAILED", "live transient execution failed safely")
+        )
+        raise typer.Exit(2) from None
 
 
 @private_v1_app.command("run")

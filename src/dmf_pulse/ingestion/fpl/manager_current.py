@@ -3,7 +3,8 @@
 The operator declaration is human-attested and explicitly not provider verified.  This module
 does not authenticate, call a provider, access a database, or persist either source or derived
 state.  It resolves catalogue-owned facts through the accepted CURRENT-FPL-STATE-001A bundle and
-compiles every rule-owned fact from one ACTIVE FULL_SEASON ruleset.
+compiles every rule-owned fact from one ACTIVE FULL_SEASON ruleset.  A separate explicit private
+transient authority may admit one exact VERIFIED ruleset without changing the ordinary contract.
 """
 
 from __future__ import annotations
@@ -66,6 +67,10 @@ from dmf_pulse.rules.models import (
 )
 from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
+from dmf_pulse.rules.private_transient import (
+    PrivateTransientRulesAuthority,
+    validate_private_transient_rules_authority,
+)
 
 CURRENT_MANAGER_CONTRACT_VERSION: Literal["current-manager-state-v1"] = "current-manager-state-v1"
 MAX_MANAGER_DECLARATION_BYTES = 262_144
@@ -775,6 +780,9 @@ class _ActiveRules:
 def _compile_active_rules(
     ruleset: CompiledRuleset,
     capability: CapabilityArtifact,
+    *,
+    private_rules_authority: PrivateTransientRulesAuthority | None = None,
+    information_cutoff: datetime,
 ) -> _ActiveRules:
     try:
         checked_ruleset = CompiledRuleset.model_validate(ruleset.model_dump(mode="python"))
@@ -787,8 +795,22 @@ def _compile_active_rules(
             raise IngestionError(
                 "MAPPING_CONFLICT", "FULL_SEASON capability differs from the active ruleset"
             )
+        is_active = checked_ruleset.status is RulesetStatus.ACTIVE
+        is_private_verified = private_rules_authority is not None
+        if private_rules_authority is not None:
+            if checked_ruleset.status is not RulesetStatus.VERIFIED:
+                raise IngestionError(
+                    "CONFIGURATION_INVALID",
+                    "private transient rules authority applies only to VERIFIED rules",
+                )
+            validate_private_transient_rules_authority(
+                private_rules_authority,
+                ruleset=checked_ruleset,
+                capability=checked_capability,
+                information_cutoff=information_cutoff,
+            )
         if (
-            checked_ruleset.status is not RulesetStatus.ACTIVE
+            not (is_active or is_private_verified)
             or not checked_ruleset.production_eligible
             or checked_ruleset.schema_version != "1.1"
             or checked_ruleset.season_code != SUPPORTED_RULES_SEASON_CODE
@@ -799,17 +821,19 @@ def _compile_active_rules(
         ):
             raise IngestionError(
                 "CONFIGURATION_INVALID",
-                "current manager state requires ACTIVE target FULL_SEASON rules",
+                "current manager state requires ACTIVE target FULL_SEASON rules or exact "
+                "private transient VERIFIED authority",
             )
+        projection_mode = ProjectionMode.PRODUCTION if is_active else ProjectionMode.REPLAY
         tactical = build_one_gameweek_rules_view(
             checked_ruleset,
-            projection_mode=ProjectionMode.PRODUCTION,
-            capability=checked_capability,
+            projection_mode=projection_mode,
+            capability=checked_capability if is_active else None,
         )
         transfers = build_multi_gameweek_transfer_rules(
             checked_ruleset,
-            projection_mode=ProjectionMode.PRODUCTION,
-            capability=checked_capability,
+            projection_mode=projection_mode,
+            capability=checked_capability if is_active else None,
         )
         chips = compile_optimisation_chip_rules(build_chip_rules_view(checked_ruleset))
     except IngestionError:
@@ -825,8 +849,21 @@ def _compile_active_rules(
     }
     if (
         len(identities) != 1
-        or tactical.manager_capability_hash != capability.capability_hash
-        or (transfers.capability_hash != capability.capability_hash)
+        or (
+            ruleset.status is RulesetStatus.ACTIVE
+            and tactical.manager_capability_hash != capability.capability_hash
+        )
+        or (
+            ruleset.status is RulesetStatus.ACTIVE
+            and transfers.capability_hash != capability.capability_hash
+        )
+        or (
+            ruleset.status is RulesetStatus.VERIFIED
+            and (
+                tactical.manager_capability_hash is not None
+                or transfers.capability_hash is not None
+            )
+        )
     ):
         raise IngestionError("MAPPING_CONFLICT", "compiled current manager rule lineage differs")
     return _ActiveRules(tactical=tactical, transfers=transfers, chips=chips)
@@ -1210,11 +1247,17 @@ class CurrentManagerStateService:
         fpl_input: CurrentFplInputBundle,
         ruleset: CompiledRuleset,
         capability: CapabilityArtifact,
+        private_rules_authority: PrivateTransientRulesAuthority | None = None,
     ) -> CurrentManagerStateBundle:
         received_at = self._clock_utc()
         _revalidate_fpl_input(fpl_input)
         _require_request_bindings(request, fpl_input, ruleset, capability)
-        active = _compile_active_rules(ruleset, capability)
+        active = _compile_active_rules(
+            ruleset,
+            capability,
+            private_rules_authority=private_rules_authority,
+            information_cutoff=fpl_input.provenance.information_cutoff,
+        )
         _require_rules_match_catalogue(fpl_input, active)
         declaration = _parse_declaration(_read_declaration(request.declaration_path))
         usable_at = self._clock_utc()
@@ -1238,6 +1281,7 @@ class CurrentManagerStateService:
         fpl_input: CurrentFplInputBundle,
         ruleset: CompiledRuleset,
         capability: CapabilityArtifact,
+        private_rules_authority: PrivateTransientRulesAuthority | None = None,
     ) -> CurrentManagerStateBundle:
         try:
             checked = CurrentManagerStateBundle.model_validate(value.model_dump(mode="python"))
@@ -1246,7 +1290,12 @@ class CurrentManagerStateService:
                 "MAPPING_CONFLICT", "current manager bundle failed structural revalidation"
             ) from None
         _revalidate_fpl_input(fpl_input)
-        active = _compile_active_rules(ruleset, capability)
+        active = _compile_active_rules(
+            ruleset,
+            capability,
+            private_rules_authority=private_rules_authority,
+            information_cutoff=fpl_input.provenance.information_cutoff,
+        )
         _require_rules_match_catalogue(fpl_input, active)
         expected = _build_bundle(
             checked.declaration,

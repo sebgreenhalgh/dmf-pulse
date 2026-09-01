@@ -1,0 +1,54 @@
+ticket_id: "PRIVATE-V1-LIVE-TRANSIENT-001A"
+stage: "PRIVATE-V1-LIVE-TRANSIENT"
+pack_version: "1.0"
+title: "Zero-retention current private recommendation"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-LIVE-TRANSIENT-001A"
+required_base_commit: "8f1047e24745afbcaf27c8aed7e8fdebc6203cd9"
+parent_exact_sha_ci: 33473963268
+parent_exact_sha_ci_attempt: 2
+objective: >-
+  Admit one exact VERIFIED FULL_SEASON ruleset through an explicit private transient authority,
+  apply a distinct post-GW1 stale-prior policy, and compose approved operator-owned current inputs
+  through the existing private-v1 service without persistent FPL raw, derived, report or replay
+  artifacts.
+authority_scopes:
+  - "A2-rules"
+  - "A4-FPL-ingestion"
+  - "A5-odds-ingestion"
+  - "A6-market-normalisation"
+  - "A7-minutes"
+  - "A8-event-distribution"
+  - "A9-FPL-points"
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "A12-operational-assurance"
+  - "B2-multi-GW"
+  - "B4-chips"
+  - "B6-reporting-control"
+in_scope:
+  - "Hash-sealed PRIVATE_TRANSIENT_DECISION_SUPPORT authority for exact VERIFIED rules only."
+  - "Distinct post-GW1 stale-prior carry-forward with explicit governed position fallbacks."
+  - "Manual current FPL and manager compilation through the accepted transient services."
+  - "Accepted current Odds, market, score-prior, manual Stage-7 and existing Stage 8-11 path."
+  - "Display-only live recommendation with explicit forbidden replay retention."
+permissions:
+  official_fpl_network: "forbidden"
+  authentication_or_credentials: "forbidden"
+  fpl_raw_storage: "forbidden"
+  fpl_derived_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  synthetic_replay_persistence: "unchanged and allowed"
+  production_activation: "forbidden"
+exclusions:
+  - "Global ACTIVE-gate relaxation or mutation of the canonical VERIFIED ruleset."
+  - "Modification or broadening of the packaged GW1 prior acceptance."
+  - "Invented player history, silent zero fill, implicit transfer/team carry-over or new model."
+  - "Official-FPL automation, credential access, database writes or live replay/report output."
+  - "Alternative scorer, optimiser, captaincy implementation, PR, merge, tag or activation."
+required_execution_status: "REAL_PRIVATE_TRANSIENT_RECOMMENDATION"
+required_replay_retention: "FORBIDDEN_BY_CURRENT_RIGHTS_PROFILE"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

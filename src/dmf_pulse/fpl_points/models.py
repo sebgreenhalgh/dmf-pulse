@@ -312,7 +312,10 @@ class PlayerPriorIdentity(PointsModel):
     schema_version: Literal["fpl-points-player-prior-identity-v1"] = (
         "fpl-points-player-prior-identity-v1"
     )
-    source_type: Literal["GOVERNED_DONOR_PRIVATE_GW1"]
+    source_type: Literal[
+        "GOVERNED_DONOR_PRIVATE_GW1",
+        "GOVERNED_STALE_CURRENT_GW_CARRY_FORWARD",
+    ]
     artifact_schema_version: Literal["gw1-player-allocation-candidate-v1"]
     artifact_sha256: Sha256
     historical_acceptance_schema_version: Literal["gw1-player-allocation-human-acceptance-v1"]

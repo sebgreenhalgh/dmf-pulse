@@ -13,15 +13,17 @@ from dmf_pulse.cli.app import app
 from dmf_pulse.private_v1.errors import PrivateV1Error
 
 
-def test_private_v1_run_and_replay_are_public_commands() -> None:
+def test_private_v1_run_replay_and_live_transient_are_public_commands() -> None:
     runner = CliRunner()
     root = runner.invoke(app, ["private-v1", "--help"])
     run = runner.invoke(app, ["private-v1", "run", "--help"])
     replay = runner.invoke(app, ["private-v1", "replay", "--help"])
+    live = runner.invoke(app, ["private-v1", "live-transient", "--help"])
 
-    assert root.exit_code == run.exit_code == replay.exit_code == 0
+    assert root.exit_code == run.exit_code == replay.exit_code == live.exit_code == 0
     assert "run" in root.stdout
     assert "replay" in root.stdout
+    assert "live-transient" in root.stdout
 
     root_command = get_command(app)
     assert isinstance(root_command, TyperGroup)
@@ -37,8 +39,26 @@ def test_private_v1_run_and_replay_are_public_commands() -> None:
         for parameter in private_command.commands["replay"].params
         for option in getattr(parameter, "opts", ())
     }
+    live_options = {
+        option
+        for parameter in private_command.commands["live-transient"].params
+        for option in getattr(parameter, "opts", ())
+    }
     assert {"--input", "--freeze-dir", "--output"} <= run_options
     assert {"--bundle", "--output"} <= replay_options
+    assert {
+        "--bootstrap",
+        "--fixtures",
+        "--manager",
+        "--rules-approval-reference",
+        "--rules-approved-at",
+        "--odds-input",
+        "--score-priors",
+        "--stage7",
+        "--prior-fallbacks",
+    } <= live_options
+    assert "--freeze-dir" not in live_options
+    assert "--output" not in live_options
 
 
 def test_private_v1_cli_rejects_malformed_input_without_disclosure(tmp_path: Path) -> None:

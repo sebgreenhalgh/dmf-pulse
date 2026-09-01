@@ -1,0 +1,8 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI_AND_INDEPENDENT_REVIEW",
+  "persistent_live_artifacts_created": 0,
+  "real_recommendation_status": "BLOCKED_MISSING_OPERATOR_INPUTS",
+  "replay_retention": "FORBIDDEN_BY_CURRENT_RIGHTS_PROFILE",
+  "ticket_id": "PRIVATE-V1-LIVE-TRANSIENT-001A"
+}

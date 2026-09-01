@@ -309,6 +309,119 @@ class PlayerPriorIdentityBinding(_StrictModel):
         return self
 
 
+class CurrentGwPriorFallbackAssignment(_StrictModel):
+    """One explicit operator selection of an existing position-fallback donor profile."""
+
+    current_official_fpl_element_id: Annotated[int, Field(gt=0)]
+    fallback_official_fpl_element_id: Annotated[int, Field(gt=0)]
+    fallback_level: Literal["FPL_POSITION"] = "FPL_POSITION"
+    operator_reason: Annotated[str, Field(min_length=1, max_length=400)]
+
+
+class CurrentGwStalePriorCarryForwardPolicy(_StrictModel):
+    """Distinct non-acceptance policy for stale GW1 evidence after the first Gameweek."""
+
+    schema_version: Literal["private-current-gw-stale-prior-carry-forward-v1"] = (
+        "private-current-gw-stale-prior-carry-forward-v1"
+    )
+    policy_id: Literal["PRIVATE_CURRENT_GW_STALE_PRIOR_CARRY_FORWARD_V1"] = (
+        "PRIVATE_CURRENT_GW_STALE_PRIOR_CARRY_FORWARD_V1"
+    )
+    target_gameweek: Annotated[int, Field(gt=1)]
+    current_fpl_bundle_sha256: Sha256
+    prior_artifact_sha256: Sha256
+    historical_acceptance_sha256: Sha256
+    original_evidence_cutoff: datetime
+    evidence_grade: Literal["E"] = "E"
+    source_artifact_status: Literal["CANDIDATE_NOT_ACCEPTED"] = "CANDIDATE_NOT_ACCEPTED"
+    historical_accepted_scope: Literal["PRIVATE_2026_27_GW1_ONLY"] = "PRIVATE_2026_27_GW1_ONLY"
+    current_use_acceptance_coverage: Literal["NOT_COVERED_BY_HISTORICAL_ACCEPTANCE"] = (
+        "NOT_COVERED_BY_HISTORICAL_ACCEPTANCE"
+    )
+    current_player_history_created: Literal[False] = False
+    production_activation: Literal[False] = False
+    declared_at: datetime
+    fallback_assignments: tuple[CurrentGwPriorFallbackAssignment, ...] = ()
+    semantic_sha256: Sha256
+
+    @field_validator("original_evidence_cutoff", "declared_at")
+    @classmethod
+    def policy_times_are_utc(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("carry-forward policy timestamps must be timezone-aware")
+        return value.astimezone(UTC)
+
+    @model_validator(mode="after")
+    def policy_is_canonical_and_sealed(self) -> Self:
+        current_ids = tuple(
+            item.current_official_fpl_element_id for item in self.fallback_assignments
+        )
+        if current_ids != tuple(sorted(current_ids)) or len(current_ids) != len(set(current_ids)):
+            raise ValueError("carry-forward fallback assignments must be unique and sorted")
+        expected = canonical_sha256(self.model_dump(mode="json", exclude={"semantic_sha256"}))
+        if self.semantic_sha256 != expected:
+            raise ValueError("carry-forward policy semantic hash is invalid")
+        return self
+
+
+def seal_current_gw_stale_prior_policy(
+    value: CurrentGwStalePriorCarryForwardPolicy,
+) -> CurrentGwStalePriorCarryForwardPolicy:
+    payload = value.model_dump(mode="python")
+    payload["semantic_sha256"] = canonical_sha256(
+        value.model_dump(mode="json", exclude={"semantic_sha256"})
+    )
+    return CurrentGwStalePriorCarryForwardPolicy.model_validate(payload)
+
+
+class CurrentGwPlayerPriorBindingEntry(_StrictModel):
+    current_player_id: str
+    current_team_id: str
+    position: PlayerPosition
+    source_player_id: Annotated[int, Field(gt=0)]
+    source_team_id: Annotated[int, Field(gt=0)]
+    source_player_identity_sha256: Sha256
+    source_team_identity_sha256: Sha256
+    assignment_level: Literal["INDIVIDUAL_SAME_TEAM", "FPL_POSITION_FALLBACK"]
+    donor_source_player_id: Annotated[int, Field(gt=0)]
+    donor_player_id: str
+    donor_team_id: str
+
+    @field_validator("current_player_id", "current_team_id", "donor_player_id", "donor_team_id")
+    @classmethod
+    def current_binding_ids_are_canonical(cls, value: str, info: Any) -> str:
+        return _canonical_uuid(value, label=str(info.field_name))
+
+
+class CurrentGwPlayerPriorBinding(_StrictModel):
+    schema_version: Literal["current-gw-player-prior-carry-forward-binding-v1"] = (
+        "current-gw-player-prior-carry-forward-binding-v1"
+    )
+    policy_id: Literal["PRIVATE_CURRENT_GW_STALE_PRIOR_CARRY_FORWARD_V1"]
+    policy_sha256: Sha256
+    source_bundle_sha256: Sha256
+    source_bootstrap_sha256: Sha256
+    prior_artifact_sha256: Sha256
+    historical_acceptance_sha256: Sha256
+    entries: Annotated[tuple[CurrentGwPlayerPriorBindingEntry, ...], Field(min_length=1)]
+    semantic_sha256: Sha256
+
+    @model_validator(mode="after")
+    def binding_is_unique_sorted_and_hash_bound(self) -> Self:
+        current_players = tuple(entry.current_player_id for entry in self.entries)
+        source_players = tuple(entry.source_player_id for entry in self.entries)
+        if (
+            current_players != tuple(sorted(current_players))
+            or len(current_players) != len(set(current_players))
+            or len(source_players) != len(set(source_players))
+        ):
+            raise ValueError("current-GW player-prior binding is ambiguous or unsorted")
+        expected = canonical_sha256(self.model_dump(mode="json", exclude={"semantic_sha256"}))
+        if self.semantic_sha256 != expected:
+            raise ValueError("current-GW player-prior binding hash is invalid")
+        return self
+
+
 def _strict_json_bytes(value: bytes | str | Mapping[str, object], *, code: str) -> bytes:
     try:
         if isinstance(value, bytes):
@@ -515,6 +628,265 @@ def build_player_prior_identity_binding(
         ) from exc
 
 
+def build_current_gw_player_prior_binding(
+    prior: GovernedPlayerPrior,
+    current_fpl: CurrentFplInputBundle,
+    policy: CurrentGwStalePriorCarryForwardPolicy,
+    *,
+    canonical_player_ids_by_source_id: Mapping[int, str],
+    canonical_team_ids_by_source_id: Mapping[int, str],
+) -> CurrentGwPlayerPriorBinding:
+    """Bind stale evidence to current identities with explicit position fallbacks only."""
+
+    if (
+        current_fpl.competition_key != "PL"
+        or current_fpl.season_code != "2026/27"
+        or current_fpl.target_gameweek <= 1
+    ):
+        raise FplPointsError(
+            "PLAYER_PRIOR_SCOPE_MISMATCH",
+            "current-GW stale carry-forward is restricted to 2026/27 after GW1",
+        )
+    if (
+        policy.target_gameweek != current_fpl.target_gameweek
+        or policy.current_fpl_bundle_sha256 != current_fpl.semantic_sha256
+        or policy.prior_artifact_sha256 != prior.artifact.artifact_sha256
+        or policy.historical_acceptance_sha256 != prior.historical_acceptance.acceptance_sha256
+        or policy.original_evidence_cutoff != prior.artifact.information_cutoff
+        or policy.declared_at > current_fpl.provenance.information_cutoff
+        or current_fpl.provenance.information_cutoff < prior.artifact.information_cutoff
+    ):
+        raise FplPointsError(
+            "PLAYER_PRIOR_POLICY_MISMATCH",
+            "stale carry-forward policy differs from its exact current or historical sources",
+        )
+    if not canonical_player_ids_by_source_id:
+        raise FplPointsError("PLAYER_PRIOR_MISSING", "no current player identities were supplied")
+    if any(
+        isinstance(key, bool) or not isinstance(key, int)
+        for key in canonical_player_ids_by_source_id
+    ) or any(
+        isinstance(key, bool) or not isinstance(key, int) for key in canonical_team_ids_by_source_id
+    ):
+        raise FplPointsError(
+            "PLAYER_IDENTITY_MISMATCH", "official-FPL identity keys must be integers"
+        )
+
+    current_players = {player.provider_element_id: player for player in current_fpl.players}
+    current_teams = {team.provider_team_id: team for team in current_fpl.teams}
+    donor_profiles = {profile.player_id: profile for profile in prior.artifact.profiles}
+    donor_lineage = {lineage.source_player_id: lineage for lineage in prior.artifact.lineage}
+    assignments = {
+        item.current_official_fpl_element_id: item for item in policy.fallback_assignments
+    }
+    entries: list[CurrentGwPlayerPriorBindingEntry] = []
+    required_team_ids: set[int] = set()
+    required_fallback_ids: set[int] = set()
+    for source_player_id, raw_current_player_id in canonical_player_ids_by_source_id.items():
+        current_player = current_players.get(source_player_id)
+        if current_player is None:
+            raise FplPointsError(
+                "PLAYER_PRIOR_MISSING", "requested player is absent from current official FPL"
+            )
+        source_team_id = int(current_player.team_identity.external_id_text)
+        current_team = current_teams.get(source_team_id)
+        raw_current_team_id = canonical_team_ids_by_source_id.get(source_team_id)
+        if current_team is None or raw_current_team_id is None:
+            raise FplPointsError(
+                "PLAYER_IDENTITY_MISMATCH", "requested current player team is not mapped exactly"
+            )
+        required_team_ids.add(source_team_id)
+        lineage = donor_lineage.get(source_player_id)
+        donor_profile = donor_profiles.get(lineage.player_id) if lineage is not None else None
+        exact_player_id = _donor_transient_id(
+            "player", current_player.identity.canonical_lookup_sha256
+        )
+        exact_team_id = _donor_transient_id(
+            "team", current_player.team_identity.canonical_lookup_sha256
+        )
+        exact_relationship = (
+            lineage is not None
+            and donor_profile is not None
+            and lineage.player_id == exact_player_id
+            and donor_profile.team_id == exact_team_id
+        )
+        if exact_relationship:
+            if source_player_id in assignments:
+                raise FplPointsError(
+                    "PLAYER_PRIOR_POLICY_MISMATCH",
+                    "fallback was supplied for a valid same-team individual profile",
+                )
+            assert lineage is not None and donor_profile is not None
+            donor_source_player_id = source_player_id
+            assignment_level: Literal["INDIVIDUAL_SAME_TEAM", "FPL_POSITION_FALLBACK"] = (
+                "INDIVIDUAL_SAME_TEAM"
+            )
+        else:
+            assignment = assignments.get(source_player_id)
+            if assignment is None:
+                raise FplPointsError(
+                    "PLAYER_PRIOR_FALLBACK_REQUIRED",
+                    "current player requires an explicit governed position fallback",
+                )
+            required_fallback_ids.add(source_player_id)
+            donor_source_player_id = assignment.fallback_official_fpl_element_id
+            fallback_player = current_players.get(donor_source_player_id)
+            fallback_lineage = donor_lineage.get(donor_source_player_id)
+            if fallback_player is None or fallback_lineage is None:
+                raise FplPointsError(
+                    "PLAYER_PRIOR_FALLBACK_UNAVAILABLE",
+                    "selected fallback donor is not a current player with governed lineage",
+                )
+            donor_profile = donor_profiles.get(fallback_lineage.player_id)
+            if (
+                donor_profile is None
+                or fallback_player.position.value != current_player.position.value
+                or {
+                    fallback_lineage.goal_source_level,
+                    fallback_lineage.assist_source_level,
+                    fallback_lineage.auxiliary_source_level,
+                }
+                != {"FPL_POSITION"}
+            ):
+                raise FplPointsError(
+                    "PLAYER_PRIOR_FALLBACK_UNAVAILABLE",
+                    "selected donor is not a governed fallback for the same FPL position",
+                )
+            lineage = fallback_lineage
+            assignment_level = "FPL_POSITION_FALLBACK"
+        assert lineage is not None and donor_profile is not None
+        entries.append(
+            CurrentGwPlayerPriorBindingEntry(
+                current_player_id=_mapping_uuid(
+                    raw_current_player_id, label="current player identity"
+                ),
+                current_team_id=_mapping_uuid(raw_current_team_id, label="current team identity"),
+                position=PlayerPosition(current_player.position.value),
+                source_player_id=source_player_id,
+                source_team_id=source_team_id,
+                source_player_identity_sha256=current_player.identity.canonical_lookup_sha256,
+                source_team_identity_sha256=current_player.team_identity.canonical_lookup_sha256,
+                assignment_level=assignment_level,
+                donor_source_player_id=donor_source_player_id,
+                donor_player_id=lineage.player_id,
+                donor_team_id=donor_profile.team_id,
+            )
+        )
+    if set(canonical_team_ids_by_source_id) != required_team_ids:
+        raise FplPointsError(
+            "PLAYER_IDENTITY_MISMATCH",
+            "canonical team mapping must cover exactly the requested current teams",
+        )
+    if set(assignments) != required_fallback_ids:
+        raise FplPointsError(
+            "PLAYER_PRIOR_POLICY_MISMATCH",
+            "fallback assignments must cover exactly the players requiring fallback",
+        )
+    ordered = tuple(sorted(entries, key=lambda entry: entry.current_player_id))
+    body = {
+        "schema_version": "current-gw-player-prior-carry-forward-binding-v1",
+        "policy_id": policy.policy_id,
+        "policy_sha256": policy.semantic_sha256,
+        "source_bundle_sha256": current_fpl.semantic_sha256,
+        "source_bootstrap_sha256": current_fpl.provenance.bootstrap_semantic_sha256,
+        "prior_artifact_sha256": prior.artifact.artifact_sha256,
+        "historical_acceptance_sha256": prior.historical_acceptance.acceptance_sha256,
+        "entries": tuple(entry.model_dump(mode="json") for entry in ordered),
+    }
+    try:
+        return CurrentGwPlayerPriorBinding(
+            schema_version="current-gw-player-prior-carry-forward-binding-v1",
+            policy_id=policy.policy_id,
+            policy_sha256=policy.semantic_sha256,
+            source_bundle_sha256=current_fpl.semantic_sha256,
+            source_bootstrap_sha256=current_fpl.provenance.bootstrap_semantic_sha256,
+            prior_artifact_sha256=prior.artifact.artifact_sha256,
+            historical_acceptance_sha256=prior.historical_acceptance.acceptance_sha256,
+            entries=ordered,
+            semantic_sha256=canonical_sha256(body),
+        )
+    except ValidationError as exc:
+        raise FplPointsError(
+            "PLAYER_IDENTITY_MISMATCH", "current-GW player-prior binding is invalid"
+        ) from exc
+
+
+def bind_current_gw_fixture_allocation_profiles(
+    prior: GovernedPlayerPrior,
+    binding: CurrentGwPlayerPriorBinding,
+    participation_scenarios: tuple[ParticipationScenario, ...],
+) -> tuple[tuple[PlayerAllocationProfile, ...], PlayerPriorIdentity]:
+    """Adapt exact or explicit fallback donor profiles to one current fixture."""
+
+    if not participation_scenarios:
+        raise FplPointsError("PLAYER_PRIOR_MISSING", "participation scenario set is empty")
+    if (
+        binding.prior_artifact_sha256 != prior.artifact.artifact_sha256
+        or binding.historical_acceptance_sha256 != prior.historical_acceptance.acceptance_sha256
+    ):
+        raise FplPointsError(
+            "PLAYER_PRIOR_TAMPERED", "carry-forward binding differs from the packaged prior"
+        )
+    expected: dict[str, tuple[str, PlayerPosition]] = {}
+    for scenario in participation_scenarios:
+        for participant in scenario.participants:
+            fact = (participant.team_id, participant.position)
+            previous = expected.setdefault(participant.player_id, fact)
+            if previous != fact:
+                raise FplPointsError(
+                    "PLAYER_IDENTITY_MISMATCH", "Stage-7 player identity changes across scenarios"
+                )
+    entries = {entry.current_player_id: entry for entry in binding.entries}
+    if set(entries) != set(expected):
+        raise FplPointsError(
+            "PLAYER_PRIOR_MISSING", "carry-forward binding does not cover the fixture exactly"
+        )
+    donor_profiles = {profile.player_id: profile for profile in prior.artifact.profiles}
+    adapted: list[PlayerAllocationProfile] = []
+    for current_player_id in sorted(expected):
+        entry = entries[current_player_id]
+        expected_team, expected_position = expected[current_player_id]
+        if entry.current_team_id != expected_team or entry.position is not expected_position:
+            raise FplPointsError(
+                "PLAYER_IDENTITY_MISMATCH", "carry-forward binding differs from Stage-7 identity"
+            )
+        donor_profile = donor_profiles.get(entry.donor_player_id)
+        if donor_profile is None:
+            raise FplPointsError("PLAYER_PRIOR_MISSING", "bound donor profile is unavailable")
+        payload = donor_profile.model_dump(mode="python")
+        payload.update(player_id=current_player_id, team_id=expected_team)
+        adapted.append(PlayerAllocationProfile.model_validate(payload))
+    limitations = tuple(
+        sorted(
+            {
+                *prior.artifact.limitations,
+                "CURRENT_GW_USE_NOT_COVERED_BY_HISTORICAL_GW1_ACCEPTANCE",
+                "CURRENT_PLAYER_HISTORY_NOT_CREATED",
+                "HISTORICAL_GW1_PRIOR_CUTOFF_2026_08_21",
+                "PLAYER_ALLOCATION_PRIOR_GRADE_E_CANDIDATE_NOT_ACCEPTED",
+                "PRIVATE_CURRENT_GW_STALE_PRIOR_CARRY_FORWARD_V1",
+                "NOT_PRODUCTION_ACTIVE",
+            }
+        )
+    )
+    identity = PlayerPriorIdentity(
+        source_type="GOVERNED_STALE_CURRENT_GW_CARRY_FORWARD",
+        artifact_schema_version=prior.artifact.schema_version,
+        artifact_sha256=prior.artifact.artifact_sha256,
+        historical_acceptance_schema_version=prior.historical_acceptance.schema_version,
+        historical_acceptance_sha256=prior.historical_acceptance.acceptance_sha256,
+        historical_acceptance_status=prior.historical_acceptance.status,
+        accepted_scope=prior.historical_acceptance.accepted_scope,
+        production_activation=False,
+        information_cutoff_utc=_utc_text(prior.artifact.information_cutoff),
+        current_fpl_bundle_sha256=binding.source_bundle_sha256,
+        current_identity_binding_sha256=binding.semantic_sha256,
+        confidence_grade="E",
+        limitations=limitations,
+    )
+    return tuple(adapted), identity
+
+
 def bind_fixture_allocation_profiles(
     prior: GovernedPlayerPrior,
     binding: PlayerPriorIdentityBinding,
@@ -588,13 +960,20 @@ def bind_fixture_allocation_profiles(
 
 
 __all__ = [
+    "CurrentGwPlayerPriorBinding",
+    "CurrentGwPlayerPriorBindingEntry",
+    "CurrentGwPriorFallbackAssignment",
+    "CurrentGwStalePriorCarryForwardPolicy",
     "GovernedPlayerPrior",
     "PlayerAllocationPriorArtifact",
     "PlayerPriorHistoricalAcceptance",
     "PlayerPriorIdentityBinding",
+    "bind_current_gw_fixture_allocation_profiles",
     "bind_fixture_allocation_profiles",
+    "build_current_gw_player_prior_binding",
     "build_player_prior_identity_binding",
     "load_packaged_player_prior",
     "parse_player_prior",
     "parse_player_prior_acceptance",
+    "seal_current_gw_stale_prior_policy",
 ]

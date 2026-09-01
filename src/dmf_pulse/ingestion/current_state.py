@@ -34,6 +34,7 @@ from dmf_pulse.ingestion.odds.identity import (
     resolve_current_team_identities,
 )
 from dmf_pulse.rules.models import CapabilityArtifact, CompiledRuleset
+from dmf_pulse.rules.private_transient import PrivateTransientRulesAuthority
 
 CURRENT_UNIFIED_STATE_CONTRACT_VERSION: Literal["current-unified-state-v1"] = (
     "current-unified-state-v1"
@@ -487,6 +488,7 @@ def _verify_external_family(
     manager_state: CurrentManagerStateBundle,
     ruleset: CompiledRuleset,
     capability: CapabilityArtifact,
+    private_rules_authority: PrivateTransientRulesAuthority | None,
 ) -> None:
     _require_request_bindings(
         request, fpl_input, odds_input, identity_map, manager_state, ruleset, capability
@@ -498,6 +500,7 @@ def _verify_external_family(
             fpl_input=fpl_input,
             ruleset=ruleset,
             capability=capability,
+            private_rules_authority=private_rules_authority,
         )
     except IngestionError:
         raise IngestionError("MAPPING_CONFLICT", "current manager reconstruction failed") from None
@@ -534,12 +537,20 @@ class CurrentUnifiedStateService:
         manager_state: CurrentManagerStateBundle,
         ruleset: CompiledRuleset,
         capability: CapabilityArtifact,
+        private_rules_authority: PrivateTransientRulesAuthority | None = None,
     ) -> CurrentUnifiedStateBundle:
         fpl, odds, bridge, manager, checked_ruleset, checked_capability = _revalidate_models(
             fpl_input, odds_input, identity_map, manager_state, ruleset, capability
         )
         _verify_external_family(
-            request, fpl, odds, bridge, manager, checked_ruleset, checked_capability
+            request,
+            fpl,
+            odds,
+            bridge,
+            manager,
+            checked_ruleset,
+            checked_capability,
+            private_rules_authority,
         )
         decision_information_at = max(
             fpl.provenance.usable_at,
@@ -580,6 +591,7 @@ class CurrentUnifiedStateService:
         manager_state: CurrentManagerStateBundle,
         ruleset: CompiledRuleset,
         capability: CapabilityArtifact,
+        private_rules_authority: PrivateTransientRulesAuthority | None = None,
     ) -> CurrentUnifiedStateBundle:
         try:
             checked = CurrentUnifiedStateBundle.model_validate(value.model_dump(mode="python"))
@@ -595,6 +607,7 @@ class CurrentUnifiedStateService:
             manager_state=manager_state,
             ruleset=ruleset,
             capability=capability,
+            private_rules_authority=private_rules_authority,
         )
         if checked != expected:
             raise IngestionError(

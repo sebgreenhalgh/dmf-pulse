@@ -44,7 +44,9 @@ from dmf_pulse.fpl_points.models import (
 )
 from dmf_pulse.fpl_points.player_prior import (
     GovernedPlayerPrior,
+    bind_current_gw_fixture_allocation_profiles,
     bind_fixture_allocation_profiles,
+    build_current_gw_player_prior_binding,
     build_player_prior_identity_binding,
     load_packaged_player_prior,
 )
@@ -295,6 +297,7 @@ def _verify_current_sources(value: PrivateV1ExecutionInput) -> None:
             manager_state=state.manager_state,
             ruleset=value.ruleset,
             capability=value.full_season_capability,
+            private_rules_authority=value.private_rules_authority,
         )
     except IngestionError as exc:
         raise PrivateV1Error(
@@ -397,6 +400,7 @@ def _project_fixtures(
     dict[str, str],
     dict[str, str],
     dict[str, str],
+    set[str],
 ]:
     fixture_authority = _fixture_authority(value)
     current_players, current_teams = _current_identity_maps(value)
@@ -411,6 +415,7 @@ def _project_fixtures(
     stage7_context_hashes: dict[str, str] = {}
     stage8_hashes: dict[str, str] = {}
     binding_hashes: dict[str, str] = {}
+    fallback_player_ids: set[str] = set()
     results: list[FixtureProjectionResult] = []
     canonical_teams = _canonical_team_by_official(value)
     for fixture_id in sorted(fixture_authority):
@@ -481,20 +486,45 @@ def _project_fixtures(
             int(current_teams[team_id].identity.external_id_text): team_id for team_id in team_ids
         }
         try:
-            binding = build_player_prior_identity_binding(
-                prior,
-                value.current_state.fpl_input,
-                canonical_player_ids_by_source_id=source_player_map,
-                canonical_team_ids_by_source_id=source_team_map,
-            )
-            profiles, prior_identity = bind_fixture_allocation_profiles(
-                prior, binding, participation
-            )
+            if value.current_state.target_gameweek == 1:
+                binding = build_player_prior_identity_binding(
+                    prior,
+                    value.current_state.fpl_input,
+                    canonical_player_ids_by_source_id=source_player_map,
+                    canonical_team_ids_by_source_id=source_team_map,
+                )
+                profiles, prior_identity = bind_fixture_allocation_profiles(
+                    prior, binding, participation
+                )
+                binding_sha256 = binding.semantic_sha256
+            else:
+                policy = value.player_prior_carry_forward_policy
+                if policy is None:  # guarded by PrivateV1ExecutionInput
+                    raise PrivateV1Error(
+                        "PLAYER_PRIOR_POLICY_MISSING",
+                        "current Gameweek carry-forward policy is unavailable",
+                    )
+                current_binding = build_current_gw_player_prior_binding(
+                    prior,
+                    value.current_state.fpl_input,
+                    policy,
+                    canonical_player_ids_by_source_id=source_player_map,
+                    canonical_team_ids_by_source_id=source_team_map,
+                )
+                fallback_player_ids.update(
+                    entry.current_player_id
+                    for entry in current_binding.entries
+                    if entry.assignment_level == "FPL_POSITION_FALLBACK"
+                )
+                profiles, prior_identity = bind_current_gw_fixture_allocation_profiles(
+                    prior, current_binding, participation
+                )
+                binding_sha256 = current_binding.semantic_sha256
         except FplPointsError as exc:
             raise PrivateV1Error(
                 exc.code, "current player allocation prior is unavailable"
             ) from None
-        binding_hashes[fixture_id] = binding.semantic_sha256
+        binding_hashes[fixture_id] = binding_sha256
         request = FixtureSimulationRequest(
             schema_version="fpl-points-fixture-request-v1",
             gameweek_id=gameweek_id,
@@ -518,7 +548,13 @@ def _project_fixtures(
                 result.error_code or "STAGE9_BLOCKED", "Stage-9 fixture projection is blocked"
             )
         results.append(result)
-    return tuple(results), stage7_context_hashes, stage8_hashes, binding_hashes
+    return (
+        tuple(results),
+        stage7_context_hashes,
+        stage8_hashes,
+        binding_hashes,
+        fallback_player_ids,
+    )
 
 
 def _manager_state(
@@ -877,8 +913,40 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
         if decision.stage9_monte_carlo_reasons
         else "NONE"
     )
+    transient_banner = (
+        "TRANSIENT PRIVATE DECISION\n"
+        "NOT REPLAYABLE UNDER CURRENT RIGHTS PROFILE\n"
+        "NOT PRODUCTION ACTIVE\n"
+        if decision.execution_status == "REAL_PRIVATE_TRANSIENT_RECOMMENDATION"
+        else "REPOSITORY-OWNED SYNTHETIC REPLAY DECISION\nNOT PRODUCTION ACTIVE\n"
+    )
+    fallback_labels = (
+        ", ".join(label(item) for item in decision.player_prior_fallback_player_ids)
+        if decision.player_prior_fallback_player_ids
+        else "NONE"
+    )
+    replay_text = (
+        "Replay retention: FORBIDDEN_BY_CURRENT_RIGHTS_PROFILE\n"
+        "No live replay bundle or recommendation report was persisted.\n"
+        if decision.replay_retention == "FORBIDDEN_BY_CURRENT_RIGHTS_PROFILE"
+        else (
+            "Replay retention: ALLOWED_REPOSITORY_OWNED_SYNTHETIC_ONLY\n"
+            "Replay: dmf private-v1 replay --bundle <bundle-directory>\n"
+            "The replay manifest hash is emitted alongside a retention-authorised frozen bundle.\n"
+        )
+    )
+    acceptance_text = (
+        "Historical human acceptance scope: PRIVATE_2026_27_GW1_ONLY; this GW1 use is within "
+        "that private scope.\n"
+        if decision.player_prior_status == "HISTORICAL_GW1_ACCEPTED_SCOPE"
+        else (
+            "Historical human acceptance scope: PRIVATE_2026_27_GW1_ONLY; current-GW "
+            "carry-forward is not covered by that acceptance.\n"
+        )
+    )
     return (
         "DMF PULSE PRIVATE V1 RECOMMENDATION\n"
+        f"{transient_banner}"
         f"Run: {decision.run_id}\n"
         "\nTARGET\n"
         f"Season / Gameweek: {decision.season} / GW{decision.target_gameweek}\n"
@@ -911,8 +979,12 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
         f"{comparison.probability_recommended_beats_baseline:.1%}\n\n"
         "DATA QUALITY\n"
         "Confidence: LOW. Stage 7 is a private manual transient override, NOT_MODEL_DERIVED, "
-        "and the player-allocation prior is the grade-E GW1 candidate with historical cutoff "
-        "and CANDIDATE_NOT_ACCEPTED status.\n"
+        "and the player-allocation prior remains the grade-E GW1 candidate with historical "
+        "cutoff and CANDIDATE_NOT_ACCEPTED status.\n"
+        f"Player-prior current use: {decision.player_prior_status}\n"
+        f"Player-prior evidence cutoff: {_utc_text(decision.player_prior_evidence_cutoff)}\n"
+        f"{acceptance_text}"
+        f"Explicit position-fallback players: {fallback_labels}\n"
         f"Score-prior source class: {score_prior_classes}\n"
         f"Stage-9 Monte Carlo gate: {decision.stage9_monte_carlo_status}; "
         f"reasons: {mc_reasons}\n"
@@ -925,8 +997,7 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
         f"Execution input hash: {decision.lineage.execution_input_sha256}\n"
         f"Stage-9 joint matrix hash: {decision.lineage.stage9_joint_matrix_sha256}\n"
         f"Decision hash: {decision.semantic_sha256}\n"
-        "Replay: dmf private-v1 replay --bundle <bundle-directory>\n"
-        "The replay manifest hash is emitted alongside a retention-authorised frozen bundle.\n"
+        f"{replay_text}"
     )
 
 
@@ -943,9 +1014,13 @@ class PrivateV1RecommendationService:
         _verify_current_sources(execution)
         prior = load_packaged_player_prior()
         _verify_runtime_artifacts(execution, prior)
-        fixture_results, stage7_contexts, stage8_hashes, binding_hashes = _project_fixtures(
-            execution, prior
-        )
+        (
+            fixture_results,
+            stage7_contexts,
+            stage8_hashes,
+            binding_hashes,
+            fallback_player_ids,
+        ) = _project_fixtures(execution, prior)
         try:
             scenario_set = assemble_gameweek(fixture_results)
             gameweek = build_gameweek_projection(scenario_set, execution.stage9_monte_carlo_policy)
@@ -1029,6 +1104,14 @@ class PrivateV1RecommendationService:
                     "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE",
                     "EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE",
                     *(
+                        (
+                            "CURRENT_GW_USE_NOT_COVERED_BY_HISTORICAL_GW1_ACCEPTANCE",
+                            "PRIVATE_CURRENT_GW_STALE_PRIOR_CARRY_FORWARD_V1",
+                        )
+                        if execution.current_state.target_gameweek > 1
+                        else ()
+                    ),
+                    *(
                         ("REPOSITORY_OWNED_SYNTHETIC_SCORE_PRIOR_TEST_ONLY",)
                         if any(
                             item.source_class == "REPOSITORY_OWNED_SYNTHETIC"
@@ -1076,6 +1159,16 @@ class PrivateV1RecommendationService:
             player_prior_artifact_sha256=prior.artifact.artifact_sha256,
             player_prior_acceptance_sha256=(prior.historical_acceptance.acceptance_sha256),
             player_prior_binding_sha256_by_fixture=binding_hashes,
+            player_prior_carry_forward_policy_sha256=(
+                execution.player_prior_carry_forward_policy.semantic_sha256
+                if execution.player_prior_carry_forward_policy is not None
+                else None
+            ),
+            private_rules_authority_sha256=(
+                execution.private_rules_authority.attestation_sha256
+                if execution.private_rules_authority is not None
+                else None
+            ),
             stage9_result_sha256=gameweek.result_sha256,
             stage9_joint_matrix_sha256=matrix_hash,
             optimiser_request_sha256=request.request_sha256,
@@ -1090,6 +1183,16 @@ class PrivateV1RecommendationService:
             status=PrivateDecisionStatus.SUCCESS,
             engineering_status=("PRIVATE_V1_E2E_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"),
             activation_status="NOT_PRODUCTION_ACTIVE",
+            execution_status=(
+                "SYNTHETIC_REPLAYABLE_RECOMMENDATION"
+                if execution.retention_class == "SYNTHETIC_REPLAY_ALLOWED"
+                else "REAL_PRIVATE_TRANSIENT_RECOMMENDATION"
+            ),
+            replay_retention=(
+                "ALLOWED_REPOSITORY_OWNED_SYNTHETIC_ONLY"
+                if execution.retention_class == "SYNTHETIC_REPLAY_ALLOWED"
+                else "FORBIDDEN_BY_CURRENT_RIGHTS_PROFILE"
+            ),
             run_id=execution.run_id,
             season=execution.current_state.season_code,
             target_gameweek=execution.current_state.target_gameweek,
@@ -1105,6 +1208,13 @@ class PrivateV1RecommendationService:
             stage7_family="PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1",
             stage7_model_derived=False,
             confidence="LOW",
+            player_prior_status=(
+                "HISTORICAL_GW1_ACCEPTED_SCOPE"
+                if execution.current_state.target_gameweek == 1
+                else "PRIVATE_CURRENT_GW_STALE_PRIOR_CARRY_FORWARD_V1"
+            ),
+            player_prior_evidence_cutoff=prior.artifact.information_cutoff,
+            player_prior_fallback_player_ids=tuple(sorted(fallback_player_ids)),
             scenario_count=len(scenario_set.scenarios),
             stage9_monte_carlo_status=gameweek.monte_carlo.stopping_result,
             stage9_monte_carlo_reasons=tuple(sorted(set(gameweek.monte_carlo.stopping_reasons))),

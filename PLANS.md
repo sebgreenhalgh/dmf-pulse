@@ -1502,3 +1502,31 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   repository, manifest, and secret gates.
 - [ ] Push the exact final SHA and require exact-SHA CI green.
 - [ ] Independent review and human acceptance remain separate.
+
+# PRIVATE-V1-LIVE-TRANSIENT-001A zero-retention current recommendation
+
+- Ticket: `PRIVATE-V1-LIVE-TRANSIENT-001A`; immutable stacked parent
+  `8f1047e24745afbcaf27c8aed7e8fdebc6203cd9`.
+- Branch: `readiness/PRIVATE-V1-LIVE-TRANSIENT-001A`.
+- Scope: a hash-bound private execution attestation for one complete `VERIFIED` target-season
+  ruleset, an explicit stale-prior policy for current Gameweeks after GW1, and one
+  `dmf private-v1 live-transient` command that composes approved operator-owned current inputs
+  entirely in memory through the accepted private-v1 service and displays only the transient
+  recommendation.
+- Safety: preserve every global ACTIVE/production gate and the original GW1 prior acceptance;
+  no official-FPL automation, raw/derived/replay/report persistence, credentials, network,
+  database writes, alternate scorer/solver, PR, merge, tag, production activation, or human
+  acceptance claim.
+
+## Live-transient checkpoints
+
+- [x] Verify exact parent, parent CI attempt, authority, zero-retention rights profile, dirty
+  worktree preservation, and clean isolated branch.
+- [x] LT.01 specify and prove the narrow private VERIFIED-rules attestation and distinct
+  current-Gameweek stale-prior carry-forward contract.
+- [x] LT.02 implement and prove the in-memory live service and CLI, including fail-closed input
+  inventory, disclosure, retention, cleanup, and no-persistence behavior.
+- [x] LT.03 run focused/inherited/static/build/wheel/repository/security gates, attempt the real
+  operator run only when every approved input exists, and seal truthful ticket evidence.
+- [ ] Push one exact final SHA, require its automatic CI fully green, and stop for independent
+  review without PR, merge, tag, activation, or post-CI mutation.
