@@ -1,0 +1,11 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "cli_progress": "PASS_DEFAULT_STDERR_AND_NO_PROGRESS_SUPPRESSION",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI_AND_LIVE_VERIFICATION",
+  "hierarchy_module_branch_coverage_percent": "93",
+  "live_one_command": "BLOCKED_LIVE_RUNTIME_INPUTS_UNAVAILABLE",
+  "penalty_team_usability": "PASS_EXACT_SPARSE_AND_DUPLICATE_ISOLATION",
+  "progress_module_branch_coverage_percent": "93",
+  "provider_bodies_retained": 0,
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001I"
+}

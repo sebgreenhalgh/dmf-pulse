@@ -16,6 +16,8 @@ from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.direct_payloads import (
     CurrentPenaltyHierarchy,
     CurrentPenaltyHierarchyEntry,
+    CurrentPenaltyHierarchyTeam,
+    CurrentPenaltyHierarchyTeamStatus,
     current_penalty_hierarchy_sha256,
 )
 from dmf_pulse.markets.current import CurrentMarketConstraintError, CurrentMarketReadiness
@@ -75,7 +77,31 @@ def _penalty_hierarchy(
     entries: tuple[CurrentPenaltyHierarchyEntry, ...],
     *,
     source_sha256: str | None = None,
+    teams: tuple[CurrentPenaltyHierarchyTeam, ...] | None = None,
 ) -> CurrentPenaltyHierarchy:
+    if teams is None:
+        team_ids = sorted(item.provider_team_id for item in value.current_state.fpl_input.teams)
+        teams = tuple(
+            CurrentPenaltyHierarchyTeam(
+                official_fpl_team_id=team_id,
+                status=(
+                    CurrentPenaltyHierarchyTeamStatus.NO_PUBLISHED_ORDER
+                    if not (
+                        orders := tuple(
+                            item.penalties_order
+                            for item in entries
+                            if item.official_fpl_team_id == team_id
+                        )
+                    )
+                    else (
+                        CurrentPenaltyHierarchyTeamStatus.USABLE_UNIQUE_ORDER
+                        if len(orders) == len(set(orders))
+                        else CurrentPenaltyHierarchyTeamStatus.AMBIGUOUS_DUPLICATE_ORDER
+                    )
+                ),
+            )
+            for team_id in team_ids
+        )
     provisional = CurrentPenaltyHierarchy.model_construct(
         observed_at=value.current_state.information_cutoff,
         information_cutoff=value.current_state.information_cutoff,
@@ -92,6 +118,7 @@ def _penalty_hierarchy(
                 ),
             )
         ),
+        teams=teams,
         semantic_sha256="0" * 64,
     )
     payload = provisional.model_copy(
@@ -130,7 +157,7 @@ def test_penalty_hierarchy_changes_execution_identity_and_rejects_mapping_tamper
     team_id, players = next(
         (team, sorted(rows, key=lambda item: item.official_fpl_element_id))
         for team, rows in sorted(by_team.items())
-        if len(rows) >= 2
+        if len(rows) >= 3
     )
     first, second = players[:2]
     complete = _complete_penalty_entries(execution)
@@ -147,7 +174,7 @@ def test_penalty_hierarchy_changes_execution_identity_and_rejects_mapping_tamper
             CurrentPenaltyHierarchyEntry(
                 official_fpl_element_id=second.official_fpl_element_id,
                 official_fpl_team_id=team_id,
-                penalties_order=2,
+                penalties_order=3,
             ),
         ),
     )
@@ -163,7 +190,7 @@ def test_penalty_hierarchy_changes_execution_identity_and_rejects_mapping_tamper
             CurrentPenaltyHierarchyEntry(
                 official_fpl_element_id=first.official_fpl_element_id,
                 official_fpl_team_id=team_id,
-                penalties_order=2,
+                penalties_order=3,
             ),
         ),
     )
@@ -179,7 +206,7 @@ def test_penalty_hierarchy_changes_execution_identity_and_rejects_mapping_tamper
         for item in result.simulation_request.penalty_taker_hierarchy
     )
     assert len(stage9_entries) == len(base.entries)
-    assert {item.order for item in stage9_entries} == {1, 2}
+    assert {item.order for item in stage9_entries} == {1, 3}
     stage9_profile_ids = {
         profile.player_id
         for result in fixture_results
@@ -205,9 +232,87 @@ def test_penalty_hierarchy_changes_execution_identity_and_rejects_mapping_tamper
     with pytest.raises(ValidationError, match="source binding differs"):
         _replace(execution, current_penalty_hierarchy=wrong_source)
 
-    incomplete = _penalty_hierarchy(execution, base.entries[:-1])
-    with pytest.raises(ValidationError, match="team coverage differs"):
-        _replace(execution, current_penalty_hierarchy=incomplete)
+    with pytest.raises(ValidationError, match="outside the team catalogue"):
+        _penalty_hierarchy(execution, base.entries, teams=base.teams[:-1])
+
+
+def test_ambiguous_team_evidence_is_sealed_but_not_fabricated_for_stage9(
+    execution: PrivateV1ExecutionInput,
+) -> None:
+    by_team: dict[int, list[PrivateCanonicalPlayerIdentity]] = {}
+    for player in execution.player_identity_map.players:
+        by_team.setdefault(player.official_fpl_team_id, []).append(player)
+    team_id, players = next(
+        (team, sorted(rows, key=lambda item: item.official_fpl_element_id))
+        for team, rows in sorted(by_team.items())
+        if len(rows) >= 3
+    )
+    other = tuple(
+        item
+        for item in _complete_penalty_entries(execution)
+        if item.official_fpl_team_id != team_id
+    )
+    hierarchy = _penalty_hierarchy(
+        execution,
+        (
+            *other,
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=players[0].official_fpl_element_id,
+                official_fpl_team_id=team_id,
+                penalties_order=1,
+            ),
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=players[1].official_fpl_element_id,
+                official_fpl_team_id=team_id,
+                penalties_order=1,
+            ),
+        ),
+    )
+    bound = _replace(execution, current_penalty_hierarchy=hierarchy)
+    resealed = _replace(execution, current_penalty_hierarchy=hierarchy)
+    changed_raw_evidence = _penalty_hierarchy(
+        execution,
+        (
+            *other,
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=players[0].official_fpl_element_id,
+                official_fpl_team_id=team_id,
+                penalties_order=1,
+            ),
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=players[2].official_fpl_element_id,
+                official_fpl_team_id=team_id,
+                penalties_order=1,
+            ),
+        ),
+    )
+
+    assert bound.semantic_sha256 == resealed.semantic_sha256
+    assert hierarchy.semantic_sha256 in bound.model_dump_json()
+    assert changed_raw_evidence.semantic_sha256 != hierarchy.semantic_sha256
+    assert (
+        _replace(execution, current_penalty_hierarchy=changed_raw_evidence).semantic_sha256
+        != bound.semantic_sha256
+    )
+    statuses = {item.official_fpl_team_id: item.status for item in hierarchy.teams}
+    assert statuses[team_id] is CurrentPenaltyHierarchyTeamStatus.AMBIGUOUS_DUPLICATE_ORDER
+
+    fixture_results, *_ = _project_fixtures(bound, load_packaged_player_prior())
+    canonical_team = str(
+        next(
+            item.canonical_team_id
+            for item in execution.player_identity_map.teams
+            if item.official_fpl_team_id == team_id
+        )
+    )
+    stage9_entries = tuple(
+        item
+        for result in fixture_results
+        for item in result.simulation_request.penalty_taker_hierarchy
+    )
+    assert not any(item.team_id == canonical_team for item in stage9_entries)
+    assert any(item.team_id != canonical_team for item in stage9_entries)
+    assert all(result.status.value == "SUCCESS" for result in fixture_results)
 
 
 def test_wrong_target_gameweek_and_mixed_cutoff_fail(execution: PrivateV1ExecutionInput) -> None:

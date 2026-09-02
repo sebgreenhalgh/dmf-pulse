@@ -58,6 +58,7 @@ from dmf_pulse.private_v1.models import (
     seal_execution_input,
     seal_fixture_score_prior,
 )
+from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 from dmf_pulse.private_v1.service import (
     PrivateV1RecommendationService,
     load_packaged_event_allocation_config,
@@ -268,6 +269,7 @@ class PrivateV1OneCommandService:
         score_service_factory: Callable[[Callable[[], datetime]], CurrentScorePriorService]
         | None = None,
         recommendation_service: PrivateV1RecommendationService | None = None,
+        progress: ProgressSink | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self._direct_client_factory = direct_client_factory or (
@@ -280,9 +282,11 @@ class PrivateV1OneCommandService:
             lambda clock: CurrentScorePriorService(clock=clock)
         )
         self._recommendation_service = recommendation_service or PrivateV1RecommendationService()
+        self._progress = progress or NullProgress()
         self._clock = clock
 
     def run(self, request: OneCommandRequest) -> OneCommandResult:
+        self._progress.message("DMF Pulse starting")
         if (
             isinstance(request.entry_id, bool)
             or request.entry_id <= 0
@@ -316,25 +320,30 @@ class PrivateV1OneCommandService:
             return value
 
         try:
-            attestation = DirectFplRunAttestation(attested_at=approved_at)
-            direct_client = self._direct_client_factory(attestation)
-            snapshot = acquire_direct_fpl_snapshot(
-                direct_client,
-                entry_id=request.entry_id,
-                captured_at=run_at,
-                clock=observed_now,
-            )
-            ruleset, capability, rules_authority = _rules_authority(approved_at)
-            manager = CurrentManagerStateService(clock=observed_now).compile_provider_snapshot(
-                snapshot.current_team,
-                fpl_input=snapshot.fpl_input,
-                ruleset=ruleset,
-                capability=capability,
-                observed_at=observed_now(),
-                overall_points=snapshot.entry.summary_overall_points,
-                overall_rank=snapshot.entry.summary_overall_rank,
-                private_rules_authority=rules_authority,
-            )
+            with self._progress.stage(
+                started="Acquiring current FPL state...",
+                completed="FPL state ready",
+                failed="current FPL state",
+            ):
+                attestation = DirectFplRunAttestation(attested_at=approved_at)
+                direct_client = self._direct_client_factory(attestation)
+                snapshot = acquire_direct_fpl_snapshot(
+                    direct_client,
+                    entry_id=request.entry_id,
+                    captured_at=run_at,
+                    clock=observed_now,
+                )
+                ruleset, capability, rules_authority = _rules_authority(approved_at)
+                manager = CurrentManagerStateService(clock=observed_now).compile_provider_snapshot(
+                    snapshot.current_team,
+                    fpl_input=snapshot.fpl_input,
+                    ruleset=ruleset,
+                    capability=capability,
+                    observed_at=observed_now(),
+                    overall_points=snapshot.entry.summary_overall_points,
+                    overall_rank=snapshot.entry.summary_overall_rank,
+                    private_rules_authority=rules_authority,
+                )
             target_fixtures = tuple(
                 item
                 for item in snapshot.fpl_input.fixtures
@@ -346,50 +355,70 @@ class PrivateV1OneCommandService:
             latest_kickoff = max(
                 item.kickoff_at for item in target_fixtures if item.kickoff_at is not None
             )
-            odds = self._odds_service_factory(observed_now).acquire(
-                information_cutoff=run_at,
-                commence_to=latest_kickoff + timedelta(seconds=1),
-            )
-            bridge = build_automatic_current_identity_map(
-                snapshot.fpl_input, odds, decided_at=observed_now()
-            )
-            unified_request = bind_current_unified_state_request(
-                snapshot.fpl_input, odds, bridge, manager, ruleset, capability
-            )
-            current = CurrentUnifiedStateService().compose(
-                unified_request,
-                fpl_input=snapshot.fpl_input,
-                odds_input=odds,
-                identity_map=bridge,
-                manager_state=manager,
-                ruleset=ruleset,
-                capability=capability,
-                private_rules_authority=rules_authority,
-            )
-            market_view = build_transient_current_market_identity_view(
-                current, resolved_at=observed_now()
-            )
-            markets = CurrentMarketConstraintService().build(
-                bind_current_market_constraint_request(current, market_view),
-                source=current,
-                identity_view=market_view,
-            )
-            player_map = build_automatic_player_identity_map(snapshot, manager)
-            model_minutes = build_automatic_model_minutes(snapshot, player_map, market_view)
+            with self._progress.stage(
+                started="Acquiring current market odds...",
+                completed="Market odds ready",
+                failed="current market odds",
+            ):
+                odds = self._odds_service_factory(observed_now).acquire(
+                    information_cutoff=run_at,
+                    commence_to=latest_kickoff + timedelta(seconds=1),
+                )
+            with self._progress.stage(
+                started="Resolving current identities...",
+                completed="Current identities ready",
+                failed="current identities",
+            ):
+                bridge = build_automatic_current_identity_map(
+                    snapshot.fpl_input, odds, decided_at=observed_now()
+                )
+                unified_request = bind_current_unified_state_request(
+                    snapshot.fpl_input, odds, bridge, manager, ruleset, capability
+                )
+                current = CurrentUnifiedStateService().compose(
+                    unified_request,
+                    fpl_input=snapshot.fpl_input,
+                    odds_input=odds,
+                    identity_map=bridge,
+                    manager_state=manager,
+                    ruleset=ruleset,
+                    capability=capability,
+                    private_rules_authority=rules_authority,
+                )
+                market_view = build_transient_current_market_identity_view(
+                    current, resolved_at=observed_now()
+                )
+                markets = CurrentMarketConstraintService().build(
+                    bind_current_market_constraint_request(current, market_view),
+                    source=current,
+                    identity_view=market_view,
+                )
+                player_map = build_automatic_player_identity_map(snapshot, manager)
+            with self._progress.stage(
+                started="Building Stage-7 minutes...",
+                completed="Stage-7 minutes ready",
+                failed="Stage-7 minutes",
+            ):
+                model_minutes = build_automatic_model_minutes(snapshot, player_map, market_view)
             ownership = build_automatic_ownership(snapshot, manager)
             candidates = build_full_candidate_policy(snapshot, manager)
-            source_prior = self._score_service_factory(observed_now).build(
-                CurrentScorePriorBuildRequest(
-                    information_cutoff=run_at,
-                    rights_profile_id="openfootball_football_json_score_prior_v1",
+            with self._progress.stage(
+                started="Building current score priors...",
+                completed="Score priors ready",
+                failed="current score priors",
+            ):
+                source_prior = self._score_service_factory(observed_now).build(
+                    CurrentScorePriorBuildRequest(
+                        information_cutoff=run_at,
+                        rights_profile_id="openfootball_football_json_score_prior_v1",
+                    )
                 )
-            )
-            score_priors = _score_priors(
-                source_prior,
-                snapshot=snapshot,
-                market_view=market_view,
-                identity_map=player_map,
-            )
+                score_priors = _score_priors(
+                    source_prior,
+                    snapshot=snapshot,
+                    market_view=market_view,
+                    identity_map=player_map,
+                )
             packaged_prior = load_packaged_player_prior()
             carry_forward = (
                 None
@@ -413,60 +442,78 @@ class PrivateV1OneCommandService:
                 batch_count=2,
             )
             allocation = load_packaged_event_allocation_config()
-            execution = seal_execution_input(
-                PrivateV1ExecutionInput.model_construct(
-                    run_id=request.run_id,
-                    code_sha=request.code_sha,
-                    projection_mode=ProjectionMode.REPLAY,
-                    retention_class="PRIVATE_TRANSIENT_NO_RETENTION",
-                    synthetic_source_attestation=None,
-                    current_state=current,
-                    player_identity_map=player_map,
-                    market_identity_view=market_view,
-                    market_constraints=markets,
-                    score_priors=score_priors,
-                    manual_minutes=model_minutes,
-                    ownership=ownership,
-                    candidate_action_policy=candidates,
-                    ruleset=ruleset,
-                    full_season_capability=capability,
-                    private_rules_authority=rules_authority,
-                    player_prior_carry_forward_policy=carry_forward,
-                    current_penalty_hierarchy=snapshot.current_penalty_hierarchy,
-                    root_seed=request.root_seed,
-                    scenario_count=request.scenario_count,
-                    stage9_monte_carlo_policy=mc_policy,
-                    stage9_monte_carlo_policy_sha256=canonical_sha256(
-                        mc_policy.model_dump(mode="json")
-                    ),
-                    event_allocation_config=allocation,
-                    event_allocation_config_sha256=canonical_sha256(
-                        allocation.model_dump(mode="json")
-                    ),
-                    expected_stage8_policy_sha256=load_score_baseline_policy().sha256,
-                    expected_player_prior_artifact_sha256=(packaged_prior.artifact.artifact_sha256),
-                    expected_player_prior_acceptance_sha256=(
-                        packaged_prior.historical_acceptance.acceptance_sha256
-                    ),
-                    require_stage9_mc_pass=True,
-                    semantic_sha256="0" * 64,
+            with self._progress.stage(
+                started="Sealing execution input...",
+                completed="Execution input ready",
+                failed="execution-input seal",
+            ):
+                execution = seal_execution_input(
+                    PrivateV1ExecutionInput.model_construct(
+                        run_id=request.run_id,
+                        code_sha=request.code_sha,
+                        projection_mode=ProjectionMode.REPLAY,
+                        retention_class="PRIVATE_TRANSIENT_NO_RETENTION",
+                        synthetic_source_attestation=None,
+                        current_state=current,
+                        player_identity_map=player_map,
+                        market_identity_view=market_view,
+                        market_constraints=markets,
+                        score_priors=score_priors,
+                        manual_minutes=model_minutes,
+                        ownership=ownership,
+                        candidate_action_policy=candidates,
+                        ruleset=ruleset,
+                        full_season_capability=capability,
+                        private_rules_authority=rules_authority,
+                        player_prior_carry_forward_policy=carry_forward,
+                        current_penalty_hierarchy=snapshot.current_penalty_hierarchy,
+                        root_seed=request.root_seed,
+                        scenario_count=request.scenario_count,
+                        stage9_monte_carlo_policy=mc_policy,
+                        stage9_monte_carlo_policy_sha256=canonical_sha256(
+                            mc_policy.model_dump(mode="json")
+                        ),
+                        event_allocation_config=allocation,
+                        event_allocation_config_sha256=canonical_sha256(
+                            allocation.model_dump(mode="json")
+                        ),
+                        expected_stage8_policy_sha256=load_score_baseline_policy().sha256,
+                        expected_player_prior_artifact_sha256=(
+                            packaged_prior.artifact.artifact_sha256
+                        ),
+                        expected_player_prior_acceptance_sha256=(
+                            packaged_prior.historical_acceptance.acceptance_sha256
+                        ),
+                        require_stage9_mc_pass=True,
+                        semantic_sha256="0" * 64,
+                    )
                 )
-            )
-            run = self._recommendation_service.run(execution)
-            return OneCommandResult(
+            run = self._recommendation_service.run(execution, progress=self._progress)
+            result = OneCommandResult(
                 status="REAL_PRIVATE_TRANSIENT_RECOMMENDATION",
                 decision=run.decision,
                 report=_display_report(run.decision, snapshot, player_map),
                 fpl_request_count=snapshot.request_count,
                 fpl_endpoint_classes=snapshot.endpoint_classes,
             )
-        except PrivateV1Error:
+            self._progress.message("Recommendation ready")
+            self._progress.finish()
+            return result
+        except PrivateV1Error as exc:
+            if not self._progress.failure_reported:
+                self._progress.failure("one-command recommendation", exc.code)
             raise
         except IngestionError as exc:
+            if not self._progress.failure_reported:
+                self._progress.failure("one-command recommendation", exc.code)
             raise PrivateV1Error(exc.code, exc.message) from None
         except CurrentMarketConstraintError as exc:
+            if not self._progress.failure_reported:
+                self._progress.failure("one-command recommendation", exc.code)
             raise PrivateV1Error(exc.code, exc.message) from None
         except (ValidationError, ValueError, ArithmeticError, KeyError, TypeError):
+            if not self._progress.failure_reported:
+                self._progress.failure("one-command recommendation", "ONE_COMMAND_INPUT_INVALID")
             raise PrivateV1Error(
                 "ONE_COMMAND_INPUT_INVALID", "automatic current input assembly failed"
             ) from None

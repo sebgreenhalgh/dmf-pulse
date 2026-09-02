@@ -11,6 +11,11 @@ from dmf_pulse.fpl_points.models import (
     PENALTY_GOAL_SHARE_PROXY_WARNING,
     PenaltyHierarchyExhaustionPolicy,
 )
+from dmf_pulse.ingestion.fpl.direct_payloads import (
+    CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS,
+    CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE,
+    CurrentPenaltyHierarchyEntry,
+)
 from dmf_pulse.optimisation.models import OneGameweekPlan
 from dmf_pulse.private_v1.artifacts import (
     verify_replay_bundle,
@@ -61,6 +66,42 @@ def test_current_penalty_hierarchy_limitation_is_disclosed_without_false_fallbac
     assert "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" not in result.decision.warnings
 
 
+def test_ambiguous_team_warning_reaches_decision_and_report(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    execution = build_execution_input(repository_root, tmp_path / "ambiguous-hierarchy")
+    complete = _complete_penalty_entries(execution)
+    by_team: dict[int, list[int]] = {}
+    for player in execution.player_identity_map.players:
+        by_team.setdefault(player.official_fpl_team_id, []).append(player.official_fpl_element_id)
+    team_id, player_ids = next(
+        (team, sorted(values)) for team, values in sorted(by_team.items()) if len(values) >= 2
+    )
+    hierarchy = _penalty_hierarchy(
+        execution,
+        (
+            *(item for item in complete if item.official_fpl_team_id != team_id),
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=player_ids[0],
+                official_fpl_team_id=team_id,
+                penalties_order=1,
+            ),
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=player_ids[1],
+                official_fpl_team_id=team_id,
+                penalties_order=1,
+            ),
+        ),
+    )
+
+    result = PrivateV1RecommendationService().run(
+        _replace(execution, current_penalty_hierarchy=hierarchy)
+    )
+
+    assert CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS in result.decision.warnings
+    assert CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS in result.report
+
+
 def test_actual_historical_penalty_role_fallback_is_disclosed() -> None:
     execution = SimpleNamespace(current_penalty_hierarchy=object())
     fixture = SimpleNamespace(warnings=("HISTORICAL_PENALTY_ROLE_FALLBACK_USED",))
@@ -68,6 +109,23 @@ def test_actual_historical_penalty_role_fallback_is_disclosed() -> None:
     assert _penalty_role_limitations(execution, (fixture,)) == (
         "CURRENT_FPL_PENALTY_HIERARCHY_DETERMINISTIC_V1",
         "HISTORICAL_PENALTY_ROLE_FALLBACK_USED",
+    )
+
+
+def test_penalty_hierarchy_team_usability_warnings_reach_private_limitations() -> None:
+    execution = SimpleNamespace(
+        current_penalty_hierarchy=SimpleNamespace(
+            warnings=(
+                CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS,
+                CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE,
+            )
+        )
+    )
+
+    assert _penalty_role_limitations(execution, ()) == (
+        CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS,
+        "CURRENT_FPL_PENALTY_HIERARCHY_DETERMINISTIC_V1",
+        CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE,
     )
 
 

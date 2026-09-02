@@ -27,6 +27,7 @@ from dmf_pulse.private_v1.one_command import (
     OneCommandRequest,
     PrivateV1OneCommandService,
 )
+from dmf_pulse.private_v1.progress import HumanCliProgress, NullProgress
 
 _SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
@@ -111,9 +112,18 @@ def _code_sha() -> str:
 
 def pulse_command(
     entry_id: Annotated[int, typer.Option("--entry-id", min=1, help="Private FPL entry ID.")],
+    no_progress: Annotated[
+        bool,
+        typer.Option("--no-progress", help="Suppress human progress output on STDERR."),
+    ] = False,
 ) -> None:
     """Produce one current private FPL recommendation without retaining provider bodies."""
 
+    progress = (
+        NullProgress()
+        if no_progress
+        else HumanCliProgress(write=lambda value: typer.echo(value, err=True))
+    )
     try:
         if not os.environ.get("THE_ODDS_API_KEY", "").strip():
             raise PrivateV1Error("CREDENTIAL_UNAVAILABLE", "THE_ODDS_API_KEY is missing.")
@@ -123,7 +133,8 @@ def pulse_command(
         service = PrivateV1OneCommandService(
             direct_client_factory=lambda attestation: DirectFplClient(
                 attestation, credential_provider=credential_provider
-            )
+            ),
+            progress=progress,
         )
         result = service.run(
             OneCommandRequest(
@@ -135,6 +146,8 @@ def pulse_command(
         )
         typer.echo(result.report)
     except PrivateV1Error as exc:
+        if not progress.failure_reported:
+            progress.failure("command preflight", exc.code)
         typer.echo(exc.message, err=True)
         raise typer.Exit(2) from exc
 

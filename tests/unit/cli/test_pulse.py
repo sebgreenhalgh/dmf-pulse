@@ -16,7 +16,7 @@ from dmf_pulse.private_v1.errors import PrivateV1Error
 runner = CliRunner()
 
 
-def test_pulse_help_exposes_only_the_entry_identifier() -> None:
+def test_pulse_help_exposes_entry_identifier_and_progress_suppression_only() -> None:
     result = runner.invoke(app, ["pulse", "--help"])
 
     assert result.exit_code == 0
@@ -27,7 +27,7 @@ def test_pulse_help_exposes_only_the_entry_identifier() -> None:
         for parameter in root_command.commands["pulse"].params
         for option in getattr(parameter, "opts", ())
     }
-    assert pulse_options == {"--entry-id"}
+    assert pulse_options == {"--entry-id", "--no-progress"}
     assert "token" not in result.stdout.casefold()
     assert "bootstrap" not in result.stdout.casefold()
     assert "fixtures" not in result.stdout.casefold()
@@ -39,7 +39,7 @@ def test_missing_odds_key_is_the_first_actionable_blocker(monkeypatch) -> None:
     marker = "secret-that-must-not-appear"
     monkeypatch.setenv("DMF_FPL_BEARER_TOKEN", marker)
 
-    result = runner.invoke(app, ["pulse", "--entry-id", "42"])
+    result = runner.invoke(app, ["pulse", "--entry-id", "42", "--no-progress"])
 
     assert result.exit_code == 2
     assert result.stdout == ""
@@ -62,10 +62,19 @@ def test_successful_cli_prints_recommendation_and_passes_only_entry_id(monkeypat
 
     class Service:
         def __init__(self, **kwargs) -> None:
-            assert set(kwargs) == {"direct_client_factory"}
+            assert set(kwargs) == {"direct_client_factory", "progress"}
+            self.progress = kwargs["progress"]
 
         def run(self, request):
             requests.append(request)
+            self.progress.message("DMF Pulse starting")
+            with self.progress.stage(
+                started="Acquiring current FPL state...",
+                completed="FPL state ready",
+                failed="current FPL state",
+            ):
+                pass
+            self.progress.finish()
             return SimpleNamespace(report="DMF PULSE - GW2\n\nRECOMMENDATION\nNO TRANSFER\n")
 
     monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
@@ -74,11 +83,37 @@ def test_successful_cli_prints_recommendation_and_passes_only_entry_id(monkeypat
 
     assert result.exit_code == 0
     assert result.stdout.startswith("DMF PULSE - GW2\n\nRECOMMENDATION")
+    assert "DMF Pulse starting" in result.stderr
+    assert "Acquiring current FPL state..." in result.stderr
+    assert "FPL state ready" in result.stderr
+    assert "Total runtime:" in result.stderr
     assert requests[0].entry_id == 42
     assert len(requests[0].code_sha) == 40
     assert requests[0].operator_approved_at == approved_at
     assert requests[0].run_at == datetime(2026, 9, 2, 0, 5, 38, tzinfo=UTC)
     assert requests[0].run_at.microsecond == 0
+
+
+def test_no_progress_suppresses_observability_and_preserves_report(monkeypatch) -> None:
+    monkeypatch.setenv("THE_ODDS_API_KEY", "synthetic-odds-key")
+    marker = "private-runtime-identifier-that-must-not-appear"
+
+    class Service:
+        def __init__(self, **kwargs) -> None:
+            self.progress = kwargs["progress"]
+
+        def run(self, request):
+            del request
+            self.progress.message(f"forbidden {marker}")
+            return SimpleNamespace(report="UNCHANGED FINAL REPORT")
+
+    monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
+    result = runner.invoke(app, ["pulse", "--entry-id", "42", "--no-progress"])
+
+    assert result.exit_code == 0
+    assert result.stdout == "UNCHANGED FINAL REPORT\n"
+    assert result.stderr == ""
+    assert marker not in result.output
 
 
 def test_expected_service_error_has_no_traceback(monkeypatch) -> None:
@@ -93,7 +128,7 @@ def test_expected_service_error_has_no_traceback(monkeypatch) -> None:
             raise PrivateV1Error("FPL_AUTH_REQUIRED", "Set DMF_FPL_BEARER_TOKEN.")
 
     monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
-    result = runner.invoke(app, ["pulse", "--entry-id", "42"])
+    result = runner.invoke(app, ["pulse", "--entry-id", "42", "--no-progress"])
 
     assert result.exit_code == 2
     assert result.stderr.strip() == "Set DMF_FPL_BEARER_TOKEN."

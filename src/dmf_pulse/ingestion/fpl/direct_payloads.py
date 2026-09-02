@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Annotated, Literal, Self
 
 from pydantic import (
@@ -116,10 +117,27 @@ class CurrentPenaltyHierarchyEntry(_TransientContract):
     penalties_order: PositiveInt
 
 
+class CurrentPenaltyHierarchyTeamStatus(StrEnum):
+    """Whether provider rows can be used without inventing an ordinal tie-break."""
+
+    USABLE_UNIQUE_ORDER = "USABLE_UNIQUE_ORDER"
+    AMBIGUOUS_DUPLICATE_ORDER = "AMBIGUOUS_DUPLICATE_ORDER"
+    NO_PUBLISHED_ORDER = "NO_PUBLISHED_ORDER"
+
+
+class CurrentPenaltyHierarchyTeam(_TransientContract):
+    official_fpl_team_id: PositiveInt
+    status: CurrentPenaltyHierarchyTeamStatus
+
+
+CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS = "CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS"
+CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE = "CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE"
+
+
 class CurrentPenaltyHierarchy(_TransientContract):
     """Memory-only provider-published current penalty-role hierarchy."""
 
-    schema_version: Literal["current-fpl-penalty-hierarchy-v1"] = "current-fpl-penalty-hierarchy-v1"
+    schema_version: Literal["current-fpl-penalty-hierarchy-v2"] = "current-fpl-penalty-hierarchy-v2"
     source_class: Literal["OFFICIAL_FPL_BOOTSTRAP_PROVIDER_PUBLISHED"] = (
         "OFFICIAL_FPL_BOOTSTRAP_PROVIDER_PUBLISHED"
     )
@@ -127,7 +145,18 @@ class CurrentPenaltyHierarchy(_TransientContract):
     information_cutoff: datetime
     source_bootstrap_payload_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     entries: tuple[CurrentPenaltyHierarchyEntry, ...]
+    teams: Annotated[tuple[CurrentPenaltyHierarchyTeam, ...], Field(min_length=1)]
     semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @property
+    def warnings(self) -> tuple[str, ...]:
+        values: list[str] = []
+        statuses = {item.status for item in self.teams}
+        if CurrentPenaltyHierarchyTeamStatus.AMBIGUOUS_DUPLICATE_ORDER in statuses:
+            values.append(CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS)
+        if CurrentPenaltyHierarchyTeamStatus.NO_PUBLISHED_ORDER in statuses:
+            values.append(CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE)
+        return tuple(values)
 
     @field_validator("observed_at", "information_cutoff")
     @classmethod
@@ -151,23 +180,31 @@ class CurrentPenaltyHierarchy(_TransientContract):
             )
         )
         player_ids = tuple(item.official_fpl_element_id for item in self.entries)
-        team_orders = tuple(
-            (item.official_fpl_team_id, item.penalties_order) for item in self.entries
-        )
-        if (
-            self.entries != expected
-            or len(player_ids) != len(set(player_ids))
-            or len(team_orders) != len(set(team_orders))
-        ):
-            raise ValueError("current penalty hierarchy entries are not unique and canonical")
-        for team_id in sorted({item.official_fpl_team_id for item in self.entries}):
+        if self.entries != expected or len(player_ids) != len(set(player_ids)):
+            raise ValueError("current penalty hierarchy player rows are not unique and canonical")
+        expected_teams = tuple(sorted(self.teams, key=lambda item: item.official_fpl_team_id))
+        team_ids = tuple(item.official_fpl_team_id for item in self.teams)
+        if self.teams != expected_teams or len(team_ids) != len(set(team_ids)):
+            raise ValueError("current penalty hierarchy team records are not unique and canonical")
+        if not {item.official_fpl_team_id for item in self.entries} <= set(team_ids):
+            raise ValueError("current penalty hierarchy row is outside the team catalogue")
+        for team in self.teams:
             orders = tuple(
                 item.penalties_order
                 for item in self.entries
-                if item.official_fpl_team_id == team_id
+                if item.official_fpl_team_id == team.official_fpl_team_id
             )
-            if orders != tuple(range(1, len(orders) + 1)):
-                raise ValueError("current penalty hierarchy order is not contiguous")
+            expected_status = (
+                CurrentPenaltyHierarchyTeamStatus.NO_PUBLISHED_ORDER
+                if not orders
+                else (
+                    CurrentPenaltyHierarchyTeamStatus.USABLE_UNIQUE_ORDER
+                    if len(orders) == len(set(orders))
+                    else CurrentPenaltyHierarchyTeamStatus.AMBIGUOUS_DUPLICATE_ORDER
+                )
+            )
+            if team.status is not expected_status:
+                raise ValueError("current penalty hierarchy team usability status differs")
         if self.semantic_sha256 != current_penalty_hierarchy_sha256(self):
             raise ValueError("current penalty hierarchy semantic hash does not match")
         return self
@@ -182,6 +219,7 @@ def current_penalty_hierarchy_sha256(value: CurrentPenaltyHierarchy) -> str:
             "schema_version": value.schema_version,
             "source_bootstrap_payload_sha256": value.source_bootstrap_payload_sha256,
             "source_class": value.source_class,
+            "teams": [item.model_dump(mode="json") for item in value.teams],
         }
     )
 
@@ -230,15 +268,33 @@ def build_current_penalty_hierarchy(
                 ),
             )
         )
-        if {item.official_fpl_team_id for item in ordered} != team_ids:
-            raise ValueError(
-                "published penalty hierarchy does not cover the current team catalogue"
+        teams = tuple(
+            CurrentPenaltyHierarchyTeam(
+                official_fpl_team_id=team_id,
+                status=(
+                    CurrentPenaltyHierarchyTeamStatus.NO_PUBLISHED_ORDER
+                    if not (
+                        orders := tuple(
+                            item.penalties_order
+                            for item in ordered
+                            if item.official_fpl_team_id == team_id
+                        )
+                    )
+                    else (
+                        CurrentPenaltyHierarchyTeamStatus.USABLE_UNIQUE_ORDER
+                        if len(orders) == len(set(orders))
+                        else CurrentPenaltyHierarchyTeamStatus.AMBIGUOUS_DUPLICATE_ORDER
+                    )
+                ),
             )
+            for team_id in sorted(team_ids)
+        )
         provisional = CurrentPenaltyHierarchy.model_construct(
             observed_at=observed_at,
             information_cutoff=information_cutoff,
             source_bootstrap_payload_sha256=source_bootstrap_payload_sha256,
             entries=ordered,
+            teams=teams,
             semantic_sha256="0" * 64,
         )
         sealed = provisional.model_copy(
@@ -454,8 +510,12 @@ def acquire_direct_fpl_snapshot(
 
 
 __all__ = [
+    "CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS",
+    "CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE",
     "CurrentPenaltyHierarchy",
     "CurrentPenaltyHierarchyEntry",
+    "CurrentPenaltyHierarchyTeam",
+    "CurrentPenaltyHierarchyTeamStatus",
     "DirectEntry",
     "DirectEntryHistory",
     "DirectEntryHistoryRow",

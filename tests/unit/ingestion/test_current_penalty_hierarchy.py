@@ -11,6 +11,7 @@ import pytest
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.direct_payloads import (
     CurrentPenaltyHierarchy,
+    CurrentPenaltyHierarchyTeamStatus,
     _target_gameweek,
     build_current_penalty_hierarchy,
     current_penalty_hierarchy_sha256,
@@ -52,6 +53,10 @@ def test_complete_current_hierarchy_is_canonical_hash_bound_and_round_trips(
 
     assert result.source_class == "OFFICIAL_FPL_BOOTSTRAP_PROVIDER_PUBLISHED"
     assert len(result.entries) == 19
+    assert len(result.teams) == len({item.official_fpl_team_id for item in result.teams})
+    assert {item.status for item in result.teams} == {
+        CurrentPenaltyHierarchyTeamStatus.USABLE_UNIQUE_ORDER
+    }
     assert result.semantic_sha256 == current_penalty_hierarchy_sha256(result)
     assert tuple(result.entries) == tuple(
         sorted(
@@ -75,13 +80,6 @@ def test_absent_null_and_zero_role_are_ignored(repository_root, missing_value) -
             player.pop("penalties_order")
         else:
             player["penalties_order"] = missing_value
-        # Restore a contiguous published hierarchy for the affected team.
-        team = player["team"]
-        for order, row in enumerate(
-            (item for item in payload["elements"] if item["team"] == team and item is not player),
-            start=1,
-        ):
-            row["penalties_order"] = order
 
     result = _extract(repository_root, mutate)
     assert len(result.entries) == 18
@@ -97,27 +95,59 @@ def test_unsupported_or_negative_penalty_order_fails_closed(repository_root, inv
         _extract(repository_root, mutate)
 
 
-def test_duplicate_team_order_fails_closed(repository_root) -> None:
+def test_duplicate_team_order_marks_only_that_team_ambiguous_and_remains_hash_bound(
+    repository_root,
+) -> None:
     def mutate(payload) -> None:
         _complete(payload)
         same_team = [item for item in payload["elements"] if item["team"] == 1]
         same_team[1]["penalties_order"] = 1
 
-    with pytest.raises(IngestionError, match="penalty hierarchy"):
-        _extract(repository_root, mutate)
+    result = _extract(repository_root, mutate)
+
+    statuses = {item.official_fpl_team_id: item.status for item in result.teams}
+    assert statuses[1] is CurrentPenaltyHierarchyTeamStatus.AMBIGUOUS_DUPLICATE_ORDER
+    assert all(
+        status is CurrentPenaltyHierarchyTeamStatus.USABLE_UNIQUE_ORDER
+        for team_id, status in statuses.items()
+        if team_id != 1
+    )
+    duplicate_rows = tuple(
+        item
+        for item in result.entries
+        if item.official_fpl_team_id == 1 and item.penalties_order == 1
+    )
+    assert len(duplicate_rows) == 2
+    assert result.semantic_sha256 == current_penalty_hierarchy_sha256(result)
+    assert "CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS" in result.warnings
 
 
-def test_noncontiguous_team_order_fails_closed(repository_root) -> None:
+@pytest.mark.parametrize("orders", ((1, 3), (2, 3, 4)))
+def test_noncontiguous_unique_team_order_is_usable_and_not_renumbered(
+    repository_root, orders
+) -> None:
     def mutate(payload) -> None:
-        _complete(payload)
+        for player in payload["elements"]:
+            player["penalties_order"] = 0
         same_team = [item for item in payload["elements"] if item["team"] == 1]
-        same_team[1]["penalties_order"] = len(same_team) + 1
+        for row, order in zip(same_team[: len(orders)], orders, strict=True):
+            row["penalties_order"] = order
 
-    with pytest.raises(IngestionError, match="penalty hierarchy"):
-        _extract(repository_root, mutate)
+    result = _extract(repository_root, mutate)
+
+    assert (
+        tuple(item.penalties_order for item in result.entries if item.official_fpl_team_id == 1)
+        == orders
+    )
+    statuses = {item.official_fpl_team_id: item.status for item in result.teams}
+    assert statuses[1] is CurrentPenaltyHierarchyTeamStatus.USABLE_UNIQUE_ORDER
+    assert set(statuses.values()) == {
+        CurrentPenaltyHierarchyTeamStatus.USABLE_UNIQUE_ORDER,
+        CurrentPenaltyHierarchyTeamStatus.NO_PUBLISHED_ORDER,
+    }
 
 
-def test_hierarchy_must_cover_the_current_team_catalogue(repository_root) -> None:
+def test_team_status_records_cover_catalogue_when_no_rows_are_published(repository_root) -> None:
     def mutate(payload) -> None:
         seen: set[int] = set()
         for player in payload["elements"]:
@@ -125,8 +155,14 @@ def test_hierarchy_must_cover_the_current_team_catalogue(repository_root) -> Non
                 player["penalties_order"] = 1
                 seen.add(player["team"])
 
-    with pytest.raises(IngestionError, match="penalty hierarchy"):
-        _extract(repository_root, mutate)
+    result = _extract(repository_root, mutate)
+
+    catalogue = {item.official_fpl_team_id for item in result.teams}
+    assert catalogue == {item.official_fpl_team_id for item in _extract(repository_root).teams}
+    assert len(result.entries) == len(catalogue) - 1
+    statuses = {item.official_fpl_team_id: item.status for item in result.teams}
+    assert statuses[1] is CurrentPenaltyHierarchyTeamStatus.NO_PUBLISHED_ORDER
+    assert "CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE" in result.warnings
 
 
 def test_hierarchy_contract_rejects_naive_post_cutoff_and_wrong_hash(repository_root) -> None:

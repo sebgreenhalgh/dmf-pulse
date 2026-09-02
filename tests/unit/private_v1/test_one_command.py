@@ -30,6 +30,7 @@ from dmf_pulse.private_v1.one_command import (
     OneCommandRequest,
     PrivateV1OneCommandService,
 )
+from dmf_pulse.private_v1.progress import HumanCliProgress
 from tests.unit.ingestion.current_identity_test_support import KICKOFF
 from tests.unit.ingestion.current_manager_test_support import (
     _synthetic_bootstrap,
@@ -374,11 +375,13 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
         )
 
     odds_service = _OddsService(odds)
+    progress_output: list[str] = []
     service = PrivateV1OneCommandService(
         direct_client_factory=direct_factory,
         odds_service_factory=lambda clock: odds_service,
         score_service_factory=score_factory,
         clock=lambda: RUN_AT,
+        progress=HumanCliProgress(write=progress_output.append),
     )
     result = service.run(
         OneCommandRequest(
@@ -402,3 +405,46 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     assert odds_service.requests == [(RUN_AT, TARGET_KICKOFF + timedelta(hours=2, seconds=1))]
     assert len(direct_transport.requests) == 8
     assert direct_transport.bodies == []
+    rendered_progress = "\n".join(progress_output)
+    expected_order = (
+        "DMF Pulse starting",
+        "Acquiring current FPL state...",
+        "FPL state ready",
+        "Acquiring current market odds...",
+        "Market odds ready",
+        "Resolving current identities...",
+        "Current identities ready",
+        "Building Stage-7 minutes...",
+        "Stage-7 minutes ready",
+        "Building current score priors...",
+        "Score priors ready",
+        "Sealing execution input...",
+        "Execution input ready",
+        "Stage 8/9 fixture 1/3...",
+        "Stage 8/9 fixture 1/3 complete",
+        "Stage 8/9 fixture 2/3...",
+        "Stage 8/9 fixture 2/3 complete",
+        "Stage 8/9 fixture 3/3...",
+        "Stage 8/9 fixture 3/3 complete",
+        "Stage 8/9 complete",
+        "Assembling joint Gameweek scenarios...",
+        "Joint Gameweek scenarios ready",
+        "Preparing optimiser...",
+        "Optimiser ready",
+        "Exact optimisation starting",
+        "Exact optimisation complete",
+        "Verifying captain / vice-captain...",
+        "Captain verification complete",
+        "Building paired comparator...",
+        "Recommendation ready",
+        "Total runtime:",
+    )
+    offsets = [rendered_progress.index(item) for item in expected_order]
+    assert offsets == sorted(offsets)
+    assert "candidate players:" in rendered_progress
+    assert "maximum transfers:" in rendered_progress
+    assert "root action upper bound:" in rendered_progress
+    assert "% complete" not in rendered_progress
+    assert marker not in rendered_progress
+    assert "one-command-event" not in rendered_progress
+    assert "entry 42" not in rendered_progress.casefold()

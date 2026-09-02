@@ -1741,3 +1741,28 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   exact blocker if a literal private command cannot run.
 - [ ] Seal evidence/manifests, push one final SHA, require exact-SHA CI green and stop without PR,
   merge, tag, activation or post-CI mutation.
+# PRIVATE-V1-ONE-COMMAND-001I live hierarchy robustness and CLI observability
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001I`; immutable parent
+  `83743c204c47982e74328b77a6124cd305c53022`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001I` in isolated worktree
+  `review_pack/one-command-i`; unrelated root-worktree changes remain untouched.
+- Scope: retain and hash-bind all positive provider penalty-order rows; classify the complete
+  current team catalogue as usable unique order, ambiguous duplicate order, or no published
+  order; expose only usable exact ranks to Stage 9 and preserve the governed 001H fallback chain.
+- Operator UX: default-on, STDERR-only monotonic stage timings and truthful N/total fixture
+  progress, 30-second heartbeats for long work, a non-cancelling long-run warning, safe typed
+  failure context, and `--no-progress`; final STDOUT report bytes remain unchanged.
+- Safety: no hierarchy tie-break, rank renumbering, raw body retention, secret/private-state
+  disclosure, persistence, performance change, PR, merge, tag, or activation.
+
+## PRIVATE-V1-ONE-COMMAND-001I checkpoints
+
+- [x] Verify exact immutable parent, isolated clean worktree, predecessor contract, and authority.
+- [x] Write RED hierarchy/status/hash/sealing tests and implement the strict contract change.
+- [x] Write RED progress/heartbeat/disclosure tests and implement in-memory observability hooks.
+- [x] Run focused, inherited, branch-coverage, static, build, wheel, governance, and security gates.
+- [x] Attempt the literal live command only with existing credentials and runtime entry ID; record
+  the real timing output or exact next blocker without retaining private material.
+- [ ] Commit and push one exact implementation SHA, require its automatic CI to pass, and hand off
+  without a post-CI commit, PR, merge, tag, or activation.

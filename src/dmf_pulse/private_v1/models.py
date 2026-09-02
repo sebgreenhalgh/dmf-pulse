@@ -401,7 +401,7 @@ class PrivateV1ExecutionInput(_FrozenModel):
             ):
                 raise ValueError("current penalty hierarchy source binding differs")
             current_team_ids = {item.provider_team_id for item in current.fpl_input.teams}
-            hierarchy_team_ids = {entry.official_fpl_team_id for entry in hierarchy.entries}
+            hierarchy_team_ids = {entry.official_fpl_team_id for entry in hierarchy.teams}
             if hierarchy_team_ids != current_team_ids:
                 raise ValueError("current penalty hierarchy team coverage differs")
             for entry in hierarchy.entries:

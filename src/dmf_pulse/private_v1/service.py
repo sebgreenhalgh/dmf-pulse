@@ -66,6 +66,7 @@ from dmf_pulse.ingestion.current_state import (
     bind_current_unified_state_request,
 )
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.ingestion.fpl.direct_payloads import CurrentPenaltyHierarchyTeamStatus
 from dmf_pulse.markets.current import (
     CurrentMarketConstraintError,
     CurrentMarketConstraintService,
@@ -113,6 +114,7 @@ from dmf_pulse.private_v1.models import (
     PrivateV1ExecutionInput,
     seal_private_decision,
 )
+from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 
@@ -151,6 +153,7 @@ def _penalty_role_limitations(
     limitations: set[str] = set()
     if execution.current_penalty_hierarchy is not None:
         limitations.add("CURRENT_FPL_PENALTY_HIERARCHY_DETERMINISTIC_V1")
+        limitations.update(getattr(execution.current_penalty_hierarchy, "warnings", ()))
     if any(
         "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" in result.warnings for result in fixture_results
     ):
@@ -459,6 +462,7 @@ def _canonical_team_by_official(value: PrivateV1ExecutionInput) -> dict[int, str
 def _project_fixtures(
     value: PrivateV1ExecutionInput,
     prior: GovernedPlayerPrior,
+    progress: ProgressSink | None = None,
 ) -> tuple[
     tuple[FixtureProjectionResult, ...],
     dict[str, str],
@@ -466,6 +470,7 @@ def _project_fixtures(
     dict[str, str],
     set[str],
 ]:
+    active_progress = progress or NullProgress()
     fixture_authority = _fixture_authority(value)
     current_players, current_teams = _current_identity_maps(value)
     minutes_by_fixture = {item.fixture_id: item for item in value.manual_minutes}
@@ -482,7 +487,10 @@ def _project_fixtures(
     fallback_player_ids: set[str] = set()
     results: list[FixtureProjectionResult] = []
     canonical_teams = _canonical_team_by_official(value)
-    for fixture_id in sorted(fixture_authority):
+    ordered_fixture_ids = sorted(fixture_authority)
+    fixture_count = len(ordered_fixture_ids)
+    for fixture_number, fixture_id in enumerate(ordered_fixture_ids, start=1):
+        active_progress.message(f"Stage 8/9 fixture {fixture_number}/{fixture_count}...")
         fpl_fixture, _canonical_fixture = fixture_authority[fixture_id]
         stage7 = minutes_by_fixture[fixture_id]
         market = markets_by_fixture[fixture_id]
@@ -597,9 +605,16 @@ def _project_fixtures(
         binding_hashes[fixture_id] = binding_sha256
         penalty_hierarchy: tuple[PenaltyTakerHierarchyEntry, ...] = ()
         if value.current_penalty_hierarchy is not None:
+            usable_team_ids = {
+                team.official_fpl_team_id
+                for team in value.current_penalty_hierarchy.teams
+                if team.status is CurrentPenaltyHierarchyTeamStatus.USABLE_UNIQUE_ORDER
+            }
             hierarchy_entries: list[PenaltyTakerHierarchyEntry] = []
             for entry in value.current_penalty_hierarchy.entries:
                 if entry.official_fpl_team_id not in source_team_map:
+                    continue
+                if entry.official_fpl_team_id not in usable_team_ids:
                     continue
                 player_id = source_player_map.get(entry.official_fpl_element_id)
                 if player_id is None:
@@ -639,7 +654,13 @@ def _project_fixtures(
             expected_ruleset_version=engine.identity.ruleset_version,
             expected_ruleset_hash=engine.identity.ruleset_hash,
         )
-        result = points.project(request)
+        with active_progress.stage(
+            started=None,
+            completed=f"Stage 8/9 fixture {fixture_number}/{fixture_count} complete",
+            failed=f"Stage 9 fixture {fixture_number}/{fixture_count}",
+            heartbeat=f"Stage 9 fixture {fixture_number}/{fixture_count} still running",
+        ):
+            result = points.project(request)
         if result.status is not SimulationStatus.SUCCESS:
             raise PrivateV1Error(
                 result.error_code or "STAGE9_BLOCKED", "Stage-9 fixture projection is blocked"
@@ -1120,7 +1141,13 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
 class PrivateV1RecommendationService:
     """Execute all accepted public boundaries without transport, persistence, or clock reads."""
 
-    def run(self, value: PrivateV1ExecutionInput) -> PrivateV1RunResult:
+    def run(
+        self,
+        value: PrivateV1ExecutionInput,
+        *,
+        progress: ProgressSink | None = None,
+    ) -> PrivateV1RunResult:
+        active_progress = progress or NullProgress()
         try:
             execution = PrivateV1ExecutionInput.model_validate_json(value.model_dump_json())
         except ValidationError:
@@ -1130,27 +1157,65 @@ class PrivateV1RecommendationService:
         _verify_current_sources(execution)
         prior = load_packaged_player_prior()
         _verify_runtime_artifacts(execution, prior)
-        (
-            fixture_results,
-            stage7_contexts,
-            stage8_hashes,
-            binding_hashes,
-            fallback_player_ids,
-        ) = _project_fixtures(execution, prior)
-        try:
-            scenario_set = assemble_gameweek(fixture_results)
-            gameweek = build_gameweek_projection(scenario_set, execution.stage9_monte_carlo_policy)
-        except (FplPointsError, ValidationError, ValueError) as exc:
-            raise PrivateV1Error(
-                "STAGE9_GAMEWEEK_INVALID", "Stage-9 Gameweek assembly failed"
-            ) from exc
+        with active_progress.stage(
+            started=None,
+            completed="Stage 8/9 complete",
+            failed="Stage 8/9 fixture projection",
+        ):
+            (
+                fixture_results,
+                stage7_contexts,
+                stage8_hashes,
+                binding_hashes,
+                fallback_player_ids,
+            ) = _project_fixtures(execution, prior, active_progress)
+        with active_progress.stage(
+            started="Assembling joint Gameweek scenarios...",
+            completed="Joint Gameweek scenarios ready",
+            failed="Stage 9 Gameweek assembly",
+            heartbeat="Stage 9 Gameweek assembly still running",
+        ):
+            try:
+                scenario_set = assemble_gameweek(fixture_results)
+                gameweek = build_gameweek_projection(
+                    scenario_set, execution.stage9_monte_carlo_policy
+                )
+            except (FplPointsError, ValidationError, ValueError) as exc:
+                raise PrivateV1Error(
+                    "STAGE9_GAMEWEEK_INVALID", "Stage-9 Gameweek assembly failed"
+                ) from exc
         if execution.require_stage9_mc_pass and gameweek.monte_carlo.stopping_result != "PASS":
             raise PrivateV1Error(
                 "STAGE9_MC_QUALITY_BLOCKED", "Stage-9 Monte Carlo quality gate did not pass"
             )
         penalty_role_limitations = _penalty_role_limitations(execution, fixture_results)
-        request, tactical, candidates = _stage11_request(execution, gameweek)
-        optimiser = optimise_multi_gameweek(request, evaluator=tactical)
+        with active_progress.stage(
+            started="Preparing optimiser...",
+            completed="Optimiser ready",
+            failed="Stage 11 request preparation",
+        ):
+            request, tactical, candidates = _stage11_request(execution, gameweek)
+        active_progress.message(f"candidate players: {len(candidates)}")
+        active_progress.message(
+            f"maximum transfers: {execution.candidate_action_policy.maximum_transfers}"
+        )
+        root_action_upper = _exact_root_action_upper_bound(
+            squad_size=len(execution.current_state.manager_state.squad),
+            incoming_count=len(execution.candidate_action_policy.allowed_transfer_in_element_ids),
+            maximum_transfers=execution.candidate_action_policy.maximum_transfers,
+        )
+        active_progress.message(f"root action upper bound: {root_action_upper}")
+        with active_progress.stage(
+            started="Exact optimisation starting",
+            completed="Exact optimisation complete",
+            failed="exact optimisation",
+            heartbeat="Exact optimisation still running",
+            long_warning=(
+                "WARNING: exact optimisation has exceeded the expected private-V1 runtime; "
+                "computation is still active."
+            ),
+        ):
+            optimiser = optimise_multi_gameweek(request, evaluator=tactical)
         if (
             optimiser.status is not MultiGameweekResultStatus.SUCCESS
             or optimiser.solver_status.status is not BackendStatus.OPTIMAL
@@ -1165,24 +1230,34 @@ class PrivateV1RecommendationService:
         baseline_action = optimiser.no_transfer_baseline.current_action
         recommended = _parse_tactical_plan(recommended_action.tactical_evaluation.tactical_plan)
         baseline = _parse_tactical_plan(baseline_action.tactical_evaluation.tactical_plan)
-        recommended_captain_hash = _verify_captain(
-            recommended,
-            scenarios=scenario_set,
-            candidates=candidates,
-            tactical=tactical,
-        )
-        baseline_captain_hash = _verify_captain(
-            baseline,
-            scenarios=scenario_set,
-            candidates=candidates,
-            tactical=tactical,
-        )
-        comparison = _paired_comparison(
-            recommended,
-            baseline,
-            scenarios=scenario_set,
-            hit_points=recommended_action.hit_points,
-        )
+        with active_progress.stage(
+            started="Verifying captain / vice-captain...",
+            completed="Captain verification complete",
+            failed="captain / vice-captain verification",
+        ):
+            recommended_captain_hash = _verify_captain(
+                recommended,
+                scenarios=scenario_set,
+                candidates=candidates,
+                tactical=tactical,
+            )
+            baseline_captain_hash = _verify_captain(
+                baseline,
+                scenarios=scenario_set,
+                candidates=candidates,
+                tactical=tactical,
+            )
+        with active_progress.stage(
+            started="Building paired comparator...",
+            completed="Paired comparator ready",
+            failed="paired comparator",
+        ):
+            comparison = _paired_comparison(
+                recommended,
+                baseline,
+                scenarios=scenario_set,
+                hit_points=recommended_action.hit_points,
+            )
         if comparison.net_expected_uplift != optimiser.recommended_plan.utility.objective_total - (
             optimiser.no_transfer_baseline.utility.objective_total
         ):

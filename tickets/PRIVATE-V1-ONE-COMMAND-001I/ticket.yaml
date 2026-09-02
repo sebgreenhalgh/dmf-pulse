@@ -1,0 +1,40 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001I"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Live penalty-hierarchy robustness and human CLI progress"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001I"
+required_base_commit: "83743c204c47982e74328b77a6124cd305c53022"
+objective: >-
+  Preserve sparse provider penalty ranks, isolate duplicate-rank ambiguity per team without
+  discarding evidence, and make the interactive one-command runtime truthfully observable on
+  STDERR without changing the final recommendation on STDOUT.
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A9-points"
+  - "A11-decision-bundle"
+  - "A12-ops-assurance"
+in_scope:
+  - "Hash-bound full-catalogue penalty-hierarchy team usability records and raw positive rows."
+  - "Exact unique sparse provider ranks for Stage 9; ambiguous/unavailable teams use 001H fallback."
+  - "Default-on interactive STDERR progress, run-local timings, heartbeats and long-run warning."
+  - "Explicit --no-progress suppression and typed disclosure-safe stage failures."
+  - "Safe literal live run or exact runtime-input blocker."
+permissions:
+  official_fpl_network: "operator_initiated_existing_one_command_get_only"
+  official_odds_network: "operator_initiated_existing_one_command_get_only"
+  authentication_or_credentials: "existing_environment_only"
+  raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Penalty-rank renumbering or duplicate-rank tie-breaking."
+  - "Stage-8, Stage-9 or Stage-11 performance optimisation."
+  - "Invented percentage completion or automatic long-stage cancellation."
+  - "Credential, runtime entry, manager state, price, provider body or private hash disclosure."
+  - "Persistence, PR, merge, tag or production activation."
+required_execution_status: "REAL_PRIVATE_TRANSIENT_RECOMMENDATION_OR_EXACT_NEXT_BLOCKER"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"
