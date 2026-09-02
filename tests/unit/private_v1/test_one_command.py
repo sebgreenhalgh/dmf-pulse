@@ -466,8 +466,10 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
         "Joint Gameweek scenarios ready",
         "Preparing optimiser...",
         "Optimiser ready",
-        "Exact optimisation starting",
-        "Exact optimisation complete",
+        "Stage-10 tactical batch starting",
+        "Stage-10 tactical batch ready",
+        "Stage-11 policy selection...",
+        "Stage-11 policy selection complete",
         "Verifying captain / vice-captain...",
         "Captain verification complete",
         "Building paired comparator...",
@@ -484,6 +486,9 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     assert "retained one-transfer actions:" in rendered_progress
     assert "retained two-transfer actions:" in rendered_progress
     assert "exact tactical squads requiring evaluation:" in rendered_progress
+    assert "Stage 10 tactical squads: 1/" in rendered_progress
+    assert "Stage-10 tactical batch ready" in rendered_progress
+    assert "Stage-11 policy selection..." in rendered_progress
     assert "maximum transfers: 2" in rendered_progress
     assert "root action upper bound:" in rendered_progress
     assert "% complete" not in rendered_progress

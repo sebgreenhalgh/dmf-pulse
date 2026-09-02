@@ -17,7 +17,7 @@ from dmf_pulse.ingestion.fpl.direct_payloads import (
     CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE,
     CurrentPenaltyHierarchyEntry,
 )
-from dmf_pulse.optimisation.models import OneGameweekPlan
+from dmf_pulse.optimisation.models import CandidateSquad, OneGameweekPlan
 from dmf_pulse.optimisation.multi_gameweek_models import PlayerCatalogEntry, PlayerPriceState
 from dmf_pulse.optimisation.multi_gameweek_service import optimise_multi_gameweek
 from dmf_pulse.private_v1.artifacts import (
@@ -83,6 +83,50 @@ def test_stage10_evaluates_identical_resulting_squad_once_per_root_node() -> Non
 
     assert first is second
     assert delegate.calls == 1
+
+
+def test_stage10_precompute_populates_existing_memo_in_canonical_batch_order() -> None:
+    class Delegate:
+        rules = object()
+
+        def __init__(self) -> None:
+            self.batch_calls: list[tuple[tuple[str, ...], ...]] = []
+
+        def evaluate_many(self, *, node, squads, progress=None):
+            ordered = tuple(squad.player_ids for squad in squads)
+            self.batch_calls.append(ordered)
+            results = {}
+            for index, squad in enumerate(squads, start=1):
+                results[squad.player_ids] = (node.node_id, squad.player_ids)
+                if progress is not None:
+                    progress((index, len(squads)))
+            return results
+
+        def evaluate(self, *, node, state):
+            raise AssertionError((node, state))
+
+    delegate = Delegate()
+    node = SimpleNamespace(node_id="root")
+    squads = (
+        CandidateSquad(player_ids=("c", "d")),
+        CandidateSquad(player_ids=("a", "b")),
+    )
+    progress: list[tuple[int, int]] = []
+    evaluator = _MemoizedStage10Evaluator(  # type: ignore[arg-type]
+        delegate,
+        prepared_node=node,
+        prepared_squads=squads,
+    )
+
+    evaluator.precompute(progress=progress.append)
+    evaluator.precompute(progress=progress.append)
+
+    assert delegate.batch_calls == [(("a", "b"), ("c", "d"))]
+    assert progress == [(1, 2), (2, 2)]
+    assert evaluator.evaluate(
+        node=node,
+        state=SimpleNamespace(squad_ids=("a", "b")),
+    ) == ("root", ("a", "b"))
 
 
 def test_certified_pointwise_pruning_cannot_remove_toy_optimum() -> None:
@@ -323,6 +367,14 @@ def test_complete_synthetic_run_and_offline_replay(
     execution = build_execution_input(repository_root, tmp_path / "source")
     service = PrivateV1RecommendationService()
     first = service.run(execution)
+
+    reference_request, reference_tactical, _, _ = _stage11_request(
+        execution,
+        first.gameweek_projection,
+    )
+    reference = optimise_multi_gameweek(reference_request, evaluator=reference_tactical)
+
+    assert first.optimiser_result == reference
 
     policy_payload = execution.candidate_action_policy.model_dump(mode="python")
     policy_payload.update(

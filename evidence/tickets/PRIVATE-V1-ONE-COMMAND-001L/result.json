@@ -1,0 +1,14 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "batch_exactness": "PASS_COMPLETE_OLD_NEW_EQUALITY",
+  "benchmark_shape": "263_SQUADS_256_SCENARIOS",
+  "benchmark_speedup": "101.7291795X",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "live_one_command": "BLOCKED_LIVE_RUNTIME_INPUTS_UNAVAILABLE",
+  "parallelism": "NOT_REQUIRED",
+  "provider_bodies_retained": 0,
+  "stage10_accelerated_seconds": "14.8504517",
+  "stage10_reference_seconds": "1510.7242668",
+  "unique_global_appearance_stress_seconds": "14.9435100",
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001L"
+}

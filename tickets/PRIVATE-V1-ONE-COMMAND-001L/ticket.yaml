@@ -1,0 +1,38 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001L"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Exact Stage-10 batch tactical acceleration"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001L"
+required_base_commit: "9ce56b93502b894a5c2763d6f19e013714336b00"
+objective: >-
+  Accelerate the complete 001K fixed-squad Stage-10 set through one exact node-scoped batch
+  kernel while preserving every tactical result, declared logical search count and Stage-11
+  decision semantic.
+authority_scopes:
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+in_scope:
+  - "Node-scoped exact scenario, player, appearance and captain/vice precomputation."
+  - "Exact autosub and base-objective reuse with immutable index/bitmask keys."
+  - "Batch evaluation and existing memo prepopulation for all unique root squads."
+  - "Truthful Stage-10 batch and Stage-11 policy-selection progress."
+  - "Exact old/new golden, multi-squad and private-result equivalence."
+  - "Deterministic live-shaped relative performance evidence and literal live retry."
+permissions:
+  official_fpl_network: "operator_initiated_existing_one_command_get_only"
+  official_odds_network: "operator_initiated_existing_one_command_get_only"
+  authentication_or_credentials: "existing_environment_only"
+  raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Any change to the 001K incoming candidates or legal transfer actions."
+  - "Stage-7, Stage-8, Stage-9, odds, priors or penalty behavior."
+  - "Any approximation, float objective, tactical rule or Stage-11 semantic change."
+  - "Persistence, PR, merge, tag or production activation."
+required_execution_status: "REAL_PRIVATE_TRANSIENT_RECOMMENDATION_OR_EXACT_NEXT_BLOCKER"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

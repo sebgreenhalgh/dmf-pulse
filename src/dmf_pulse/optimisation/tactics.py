@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping, Set
+from dataclasses import dataclass
 from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from fractions import Fraction
 from itertools import combinations, permutations, product
-from math import factorial
+from math import factorial, lcm
 from typing import cast
 
 from dmf_pulse.fpl_points.artifacts import semantic_sha256
@@ -260,6 +261,499 @@ def _base_objective(
         base_points += sum(points[player] for player in substitutes)
         total += weight * base_points
     return total
+
+
+@dataclass(frozen=True)
+class ExactTacticalKernelWork:
+    """Truthful logical and factored work counters for one node kernel."""
+
+    squads_evaluated: int
+    logical_scenario_operations: int
+    appearance_state_xi_visits: int
+    captain_pair_appearance_visits: int
+    goalkeeper_pair_appearance_visits: int
+    autosub_resolution_cache_misses: int
+    canonical_scenario_operations: int
+
+    @property
+    def factored_scenario_operations(self) -> int:
+        """Return expensive state/scenario interpretations after exact reuse."""
+
+        return (
+            self.appearance_state_xi_visits
+            + self.captain_pair_appearance_visits
+            + self.goalkeeper_pair_appearance_visits
+            + self.autosub_resolution_cache_misses
+            + self.canonical_scenario_operations
+        )
+
+
+@dataclass(frozen=True)
+class _AggregatedAppearanceState:
+    appearance_mask: int
+    weighted_player_point_numerators: tuple[int, ...]
+
+
+class ExactTacticalNodeKernel:
+    """Exact reusable Stage-10 representation for every fixed squad at one node.
+
+    Scenario weights are represented by one common integer denominator.  Scenarios
+    with the same appearance mask are combined by summing each player's exact
+    weighted point numerator.  This makes tactical objective comparison integral;
+    the winning tactic is still evaluated by the canonical scenario evaluator.
+    """
+
+    def __init__(
+        self,
+        *,
+        scenarios: tuple[GameweekPointScenario, ...],
+        players: dict[str, CandidatePlayer],
+        rules: OneGameweekRulesView,
+    ) -> None:
+        if not scenarios:
+            raise ValueError("exact tactical node kernel requires scenarios")
+        self.scenarios = scenarios
+        self.players = players
+        self.rules = rules
+        self._player_ids = tuple(sorted(players))
+        self._player_index = {player_id: index for index, player_id in enumerate(self._player_ids)}
+        weights = tuple(weight_fraction(scenario.weight) for scenario in scenarios)
+        self._common_denominator = lcm(*(weight.denominator for weight in weights))
+        aggregated: dict[int, list[int]] = {}
+        for scenario, weight in zip(scenarios, weights, strict=True):
+            numerator = weight.numerator * (self._common_denominator // weight.denominator)
+            mask = 0
+            for player_id in self._player_ids:
+                if scenario.player_appeared[player_id]:
+                    mask |= self._bit(player_id)
+            point_numerators = aggregated.setdefault(mask, [0] * len(self._player_ids))
+            for index, player_id in enumerate(self._player_ids):
+                point_numerators[index] += numerator * scenario.player_points[player_id]
+        self._appearance_states = tuple(
+            _AggregatedAppearanceState(mask, tuple(point_numerators))
+            for mask, point_numerators in sorted(aggregated.items())
+        )
+        self._appeared_point_numerator = {
+            player_id: sum(
+                state.weighted_player_point_numerators[index]
+                for state in self._appearance_states
+                if state.appearance_mask & (1 << index)
+            )
+            for player_id, index in self._player_index.items()
+        }
+        self._captain_bonus_cache: dict[tuple[str, str], int] = {}
+        self._best_captains_cache: dict[
+            tuple[str, ...], tuple[int, tuple[tuple[str, str], ...]]
+        ] = {}
+        self._goalkeeper_bonus_cache: dict[tuple[str, str], int] = {}
+        self._autosub_slots_cache: dict[
+            tuple[
+                tuple[int, int, int],
+                tuple[int, int, int],
+                tuple[int, int, int],
+                int,
+            ],
+            tuple[int, ...],
+        ] = {}
+        self._autosub_tables: dict[
+            tuple[tuple[int, int, int], tuple[int, int, int]], list[int]
+        ] = {}
+        self._squads_evaluated = 0
+        self._logical_scenario_operations = 0
+        self._appearance_state_xi_visits = 0
+        self._captain_pair_appearance_visits = 0
+        self._goalkeeper_pair_appearance_visits = 0
+        self._autosub_resolution_cache_misses = 0
+        self._canonical_scenario_operations = 0
+
+    def _bit(self, player_id: str) -> int:
+        return 1 << self._player_index[player_id]
+
+    def _point_numerator(self, state: _AggregatedAppearanceState, player_id: str) -> int:
+        return state.weighted_player_point_numerators[self._player_index[player_id]]
+
+    def _squad_appearance_states(
+        self, squad: CandidateSquad
+    ) -> tuple[tuple[_AggregatedAppearanceState, ...], dict[str, int]]:
+        """Regroup node states by the 15-player mask relevant to this squad."""
+
+        squad_ids = squad.player_ids
+        local_index = {player_id: index for index, player_id in enumerate(squad_ids)}
+        global_indexes = tuple(self._player_index[player_id] for player_id in squad_ids)
+        squad_mask = sum(1 << index for index in global_indexes)
+        aggregated: dict[int, list[int]] = {}
+        for state in self._appearance_states:
+            appearance_mask = state.appearance_mask & squad_mask
+            point_numerators = aggregated.setdefault(appearance_mask, [0] * len(squad_ids))
+            for local, global_index in enumerate(global_indexes):
+                point_numerators[local] += state.weighted_player_point_numerators[global_index]
+        return (
+            tuple(
+                _AggregatedAppearanceState(mask, tuple(point_numerators))
+                for mask, point_numerators in sorted(aggregated.items())
+            ),
+            local_index,
+        )
+
+    def _captain_bonus_numerator(self, captain: str, vice: str) -> int:
+        key = (captain, vice)
+        cached = self._captain_bonus_cache.get(key)
+        if cached is not None:
+            return cached
+        captain_bit = self._bit(captain)
+        vice_bit = self._bit(vice)
+        multiplier = self.rules.captain_multiplier - 1
+        total = 0
+        for state in self._appearance_states:
+            if state.appearance_mask & captain_bit:
+                total += multiplier * self._point_numerator(state, captain)
+            elif self.rules.vice_captain_fallback and state.appearance_mask & vice_bit:
+                total += multiplier * self._point_numerator(state, vice)
+        self._captain_pair_appearance_visits += len(self._appearance_states)
+        self._captain_bonus_cache[key] = total
+        return total
+
+    def _best_captains(
+        self, starting_xi: tuple[str, ...]
+    ) -> tuple[int, tuple[tuple[str, str], ...]]:
+        key = tuple(sorted(starting_xi))
+        cached = self._best_captains_cache.get(key)
+        if cached is not None:
+            return cached
+        pair_values = tuple(
+            (self._captain_bonus_numerator(captain, vice), captain, vice)
+            for captain, vice in permutations(starting_xi, 2)
+        )
+        best_bonus = max(item[0] for item in pair_values)
+        result = (
+            best_bonus,
+            tuple(
+                sorted(
+                    (captain, vice) for bonus, captain, vice in pair_values if bonus == best_bonus
+                )
+            ),
+        )
+        self._best_captains_cache[key] = result
+        return result
+
+    def _goalkeeper_bonus_numerator(self, starting_gk: str, bench_gk: str) -> int:
+        key = (starting_gk, bench_gk)
+        cached = self._goalkeeper_bonus_cache.get(key)
+        if cached is not None:
+            return cached
+        starting_bit = self._bit(starting_gk)
+        bench_bit = self._bit(bench_gk)
+        total = sum(
+            self._point_numerator(state, bench_gk)
+            for state in self._appearance_states
+            if not state.appearance_mask & starting_bit and state.appearance_mask & bench_bit
+        )
+        self._goalkeeper_pair_appearance_visits += len(self._appearance_states)
+        self._goalkeeper_bonus_cache[key] = total
+        return total
+
+    @staticmethod
+    def _position_code(position: PlayerPosition) -> int:
+        return {
+            PlayerPosition.DEF: 0,
+            PlayerPosition.MID: 1,
+            PlayerPosition.FWD: 2,
+        }[position]
+
+    def _selected_bench_slots(
+        self,
+        *,
+        formation: tuple[int, int, int],
+        absent: tuple[int, int, int],
+        bench_positions: tuple[int, int, int],
+        bench_appeared_mask: int,
+    ) -> tuple[int, ...]:
+        key = (formation, absent, bench_positions, bench_appeared_mask)
+        cached = self._autosub_slots_cache.get(key)
+        if cached is not None:
+            return cached
+        self._autosub_resolution_cache_misses += 1
+        eligible = tuple(
+            (slot, bench_positions[slot])
+            for slot in range(len(bench_positions))
+            if bench_appeared_mask & (1 << slot)
+        )
+        absent_total = sum(absent)
+        if absent_total == 0 or not eligible:
+            self._autosub_slots_cache[key] = ()
+            return ()
+        minimum = (
+            self.rules.lineup_min[PlayerPosition.DEF],
+            self.rules.lineup_min[PlayerPosition.MID],
+            self.rules.lineup_min[PlayerPosition.FWD],
+        )
+        maximum = (
+            self.rules.lineup_max[PlayerPosition.DEF],
+            self.rules.lineup_max[PlayerPosition.MID],
+            self.rules.lineup_max[PlayerPosition.FWD],
+        )
+        best: tuple[tuple[int, ...], tuple[tuple[int, int], ...]] | None = None
+        for selection_mask in range(1 << len(eligible)):
+            selected = tuple(
+                eligible[index] for index in range(len(eligible)) if selection_mask & (1 << index)
+            )
+            if len(selected) > absent_total:
+                continue
+            final = tuple(
+                formation[position]
+                - absent[position]
+                + sum(item[1] == position for item in selected)
+                for position in range(3)
+            )
+            if any(
+                final[position] < minimum[position] or final[position] > maximum[position]
+                for position in range(3)
+            ):
+                continue
+            vector = tuple(
+                1 if selection_mask & (1 << index) else 0 for index in range(len(eligible))
+            )
+            candidate = (vector, selected)
+            if best is None or (len(selected), vector) > (len(best[1]), best[0]):
+                best = candidate
+        if best is None:
+            self._autosub_slots_cache[key] = ()
+            return ()
+        selected = best[1]
+        absent_positions = tuple(
+            position for position, count in enumerate(absent) for _ in range(count)
+        )
+        for outgoing in permutations(absent_positions, len(selected)):
+            active = list(formation)
+            valid = True
+            for player_out, (_, player_in) in zip(outgoing, selected, strict=True):
+                active[player_out] -= 1
+                active[player_in] += 1
+                if any(
+                    active[position] < minimum[position] or active[position] > maximum[position]
+                    for position in range(3)
+                ):
+                    valid = False
+                    break
+            if valid:
+                result = tuple(slot for slot, _ in selected)
+                self._autosub_slots_cache[key] = result
+                return result
+        self._autosub_slots_cache[key] = ()
+        return ()
+
+    def _bench_order_objective_numerators(
+        self,
+        *,
+        starting_outfield: tuple[str, ...],
+        bench_orders: tuple[tuple[str, str, str], ...],
+        appearance_states: tuple[_AggregatedAppearanceState, ...],
+        local_player_index: Mapping[str, int],
+    ) -> tuple[int, ...]:
+        by_position = tuple(
+            tuple(
+                player_id
+                for player_id in starting_outfield
+                if self.players[player_id].position is position
+            )
+            for position in (PlayerPosition.DEF, PlayerPosition.MID, PlayerPosition.FWD)
+        )
+        formation = cast(tuple[int, int, int], tuple(len(group) for group in by_position))
+        position_masks = tuple(
+            sum(self._bit(player_id) for player_id in group) for group in by_position
+        )
+        order_data = []
+        for bench_order in bench_orders:
+            bench_positions = cast(
+                tuple[int, int, int],
+                tuple(
+                    self._position_code(self.players[player_id].position)
+                    for player_id in bench_order
+                ),
+            )
+            table_key = (formation, bench_positions)
+            autosub_table = self._autosub_tables.get(table_key)
+            if autosub_table is None:
+                autosub_table = [-1] * (6 * 6 * 6 * 8)
+                self._autosub_tables[table_key] = autosub_table
+            order_data.append(
+                (
+                    bench_positions,
+                    tuple(self._bit(player_id) for player_id in bench_order),
+                    tuple(local_player_index[player_id] for player_id in bench_order),
+                    autosub_table,
+                )
+            )
+        values = [0] * len(bench_orders)
+        for state in appearance_states:
+            self._appearance_state_xi_visits += 1
+            absent = (
+                formation[0] - (state.appearance_mask & position_masks[0]).bit_count(),
+                formation[1] - (state.appearance_mask & position_masks[1]).bit_count(),
+                formation[2] - (state.appearance_mask & position_masks[2]).bit_count(),
+            )
+            absent_code = absent[0] + 6 * absent[1] + 36 * absent[2]
+            for order_index, (
+                bench_positions,
+                bench_bits,
+                bench_indexes,
+                autosub_table,
+            ) in enumerate(order_data):
+                appeared_mask = (
+                    int(bool(state.appearance_mask & bench_bits[0]))
+                    | (int(bool(state.appearance_mask & bench_bits[1])) << 1)
+                    | (int(bool(state.appearance_mask & bench_bits[2])) << 2)
+                )
+                table_index = (absent_code << 3) | appeared_mask
+                selected_mask = autosub_table[table_index]
+                if selected_mask < 0:
+                    slots = self._selected_bench_slots(
+                        formation=formation,
+                        absent=absent,
+                        bench_positions=bench_positions,
+                        bench_appeared_mask=appeared_mask,
+                    )
+                    selected_mask = sum(1 << slot for slot in slots)
+                    autosub_table[table_index] = selected_mask
+                weighted = state.weighted_player_point_numerators
+                if selected_mask & 1:
+                    values[order_index] += weighted[bench_indexes[0]]
+                if selected_mask & 2:
+                    values[order_index] += weighted[bench_indexes[1]]
+                if selected_mask & 4:
+                    values[order_index] += weighted[bench_indexes[2]]
+        return tuple(values)
+
+    def optimise(
+        self,
+        squad: CandidateSquad,
+        policy: OneGameweekOptimiserPolicy,
+    ) -> tuple[OneGameweekPlan, Fraction, int, int]:
+        """Return the exact fixed-squad result using this node's shared kernel."""
+
+        upper = tactical_configuration_upper_bound(squad, self.players, self.rules)
+        if upper > policy.max_tactical_configurations:
+            raise ResourceLimitError(f"conservative tactical upper bound {upper} exceeds cap")
+        grouped = _players_by_position(squad, self.players)
+        appearance_states, local_player_index = self._squad_appearance_states(squad)
+        outfield = {
+            position: grouped[position]
+            for position in (PlayerPosition.DEF, PlayerPosition.MID, PlayerPosition.FWD)
+        }
+        best_numerator: int | None = None
+        best_signature: str | None = None
+        best_tactic: TacticalConfiguration | None = None
+        tactics_evaluated = 0
+        tied_optima = 0
+        for bench_gk in grouped[PlayerPosition.GK]:
+            starting_gk = next(
+                player for player in grouped[PlayerPosition.GK] if player != bench_gk
+            )
+            goalkeeper_bonus = self._goalkeeper_bonus_numerator(starting_gk, bench_gk)
+            for d_count in range(
+                self.rules.lineup_min[PlayerPosition.DEF],
+                self.rules.lineup_max[PlayerPosition.DEF] + 1,
+            ):
+                for m_count in range(
+                    self.rules.lineup_min[PlayerPosition.MID],
+                    self.rules.lineup_max[PlayerPosition.MID] + 1,
+                ):
+                    f_count = self.rules.starting_size - 1 - d_count - m_count
+                    if (
+                        f_count < self.rules.lineup_min[PlayerPosition.FWD]
+                        or f_count > self.rules.lineup_max[PlayerPosition.FWD]
+                    ):
+                        continue
+                    for defenders, mids, fwds in product(
+                        combinations(outfield[PlayerPosition.DEF], d_count),
+                        combinations(outfield[PlayerPosition.MID], m_count),
+                        combinations(outfield[PlayerPosition.FWD], f_count),
+                    ):
+                        selected = (starting_gk, *defenders, *mids, *fwds)
+                        best_bonus, best_pairs = self._best_captains(selected)
+                        bench_outfield = tuple(
+                            sorted(set(squad.player_ids) - set(selected) - {bench_gk})
+                        )
+                        bench_orders = tuple(
+                            cast(tuple[str, str, str], order)
+                            for order in permutations(bench_outfield)
+                        )
+                        starting_numerator = sum(
+                            self._appeared_point_numerator[player_id] for player_id in selected
+                        )
+                        bench_numerators = self._bench_order_objective_numerators(
+                            starting_outfield=(*defenders, *mids, *fwds),
+                            bench_orders=bench_orders,
+                            appearance_states=appearance_states,
+                            local_player_index=local_player_index,
+                        )
+                        for bench_order, bench_numerator in zip(
+                            bench_orders, bench_numerators, strict=True
+                        ):
+                            tactics_evaluated += len(selected) * (len(selected) - 1)
+                            objective = (
+                                starting_numerator + goalkeeper_bonus + bench_numerator + best_bonus
+                            )
+                            captain, vice = best_pairs[0]
+                            signature = _tactical_signature(
+                                squad,
+                                starting_xi=selected,
+                                bench_goalkeeper=bench_gk,
+                                bench_order=bench_order,
+                                captain=captain,
+                                vice_captain=vice,
+                            )
+                            if best_numerator is None or objective > best_numerator:
+                                best_numerator = objective
+                                best_signature = signature
+                                tied_optima = len(best_pairs)
+                                best_tactic = TacticalConfiguration(
+                                    starting_xi=selected,
+                                    bench_goalkeeper=bench_gk,
+                                    bench_order=bench_order,
+                                    captain=captain,
+                                    vice_captain=vice,
+                                )
+                            elif objective == best_numerator:
+                                tied_optima += len(best_pairs)
+                                if best_signature is None or signature < best_signature:
+                                    best_signature = signature
+                                    best_tactic = TacticalConfiguration(
+                                        starting_xi=selected,
+                                        bench_goalkeeper=bench_gk,
+                                        bench_order=bench_order,
+                                        captain=captain,
+                                        vice_captain=vice,
+                                    )
+        if best_tactic is None or best_numerator is None:
+            raise ValueError("fixed squad has no legal tactical configuration")
+        best_objective = Fraction(best_numerator, self._common_denominator)
+        plan, verified_objective = evaluate_tactical_configuration(
+            squad,
+            best_tactic,
+            self.scenarios,
+            self.players,
+            self.rules,
+        )
+        if verified_objective != best_objective:
+            raise ValueError("node-kernel tactical objective differs from canonical evaluation")
+        self._squads_evaluated += 1
+        self._logical_scenario_operations += tactics_evaluated * len(self.scenarios)
+        self._canonical_scenario_operations += len(self.scenarios)
+        return plan, best_objective, tactics_evaluated, tied_optima
+
+    def work_snapshot(self) -> ExactTacticalKernelWork:
+        """Return immutable counters without affecting tactical semantics."""
+
+        return ExactTacticalKernelWork(
+            squads_evaluated=self._squads_evaluated,
+            logical_scenario_operations=self._logical_scenario_operations,
+            appearance_state_xi_visits=self._appearance_state_xi_visits,
+            captain_pair_appearance_visits=self._captain_pair_appearance_visits,
+            goalkeeper_pair_appearance_visits=self._goalkeeper_pair_appearance_visits,
+            autosub_resolution_cache_misses=self._autosub_resolution_cache_misses,
+            canonical_scenario_operations=self._canonical_scenario_operations,
+        )
 
 
 def optimise_fixed_squad_tactics_exact(

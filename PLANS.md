@@ -1815,3 +1815,29 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   require the repository's exact 8-shard CI to complete the 4,201-test branch-coverage gate.
 - [ ] Commit and push one exact implementation SHA, require exact-SHA CI green, then attempt the
   literal GW3 command only with existing runtime credentials and record timings or exact blocker.
+
+# PRIVATE-V1-ONE-COMMAND-001L exact Stage-10 batch tactical acceleration
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001L`; immutable parent
+  `9ce56b93502b894a5c2763d6f19e013714336b00`; parent exact-SHA CI `33671160751`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001L` in isolated worktree
+  `review_pack/one-command-l`; unrelated root-worktree changes remain untouched.
+- Scope: precompile each Stage-11 node's exact scenario representation, share captain/vice and
+  autosub structure work across the complete 001K resulting-squad set, and prefill the existing
+  memo before unchanged Stage-11 policy selection.
+- Safety: preserve the exact 001K candidate/action scope, Stage-7/8/9 inputs, FPL tactical rules,
+  objective, tie-break, logical search counters, canonical plan publication and transient-only
+  behavior; no approximation, provider write, persistence, PR, merge, tag or activation.
+
+## PRIVATE-V1-ONE-COMMAND-001L checkpoints
+
+- [x] Verify the exact immutable parent, successful parent CI, isolated clean worktree, ticket,
+  and DMFP-12/DMFP-20 A10/A11 authority.
+- [x] Add exact golden, overlapping multi-squad, shuffled-order, private regression, progress and
+  deterministic relative-work performance tests against the retained 001K evaluator.
+- [x] Implement the node-scoped integer-weight tactical kernel, six-bench-order factorisation,
+  cross-squad captain cache, canonical final verification and private root-batch prefill.
+- [x] Run focused and affected tests plus coverage, Ruff, strict mypy, frozen sync, build, clean
+  wheel, repository validation, secret scan and a live-shaped 263-by-256 benchmark.
+- [ ] Commit and push one exact implementation SHA, require exact-SHA CI green, then attempt the
+  literal GW3 command only with existing runtime credentials and record stage timings or blocker.

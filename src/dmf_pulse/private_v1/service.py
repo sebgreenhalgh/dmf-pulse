@@ -79,6 +79,7 @@ from dmf_pulse.markets.current import (
 from dmf_pulse.optimisation.manager_state import ManagerState, OwnershipSpell, seal_manager_state
 from dmf_pulse.optimisation.models import (
     CandidatePlayer,
+    CandidateSquad,
     OneGameweekPlan,
     OneGameweekRulesView,
 )
@@ -372,6 +373,8 @@ class _MemoizedStage10Evaluator:
 
     delegate: Stage10TacticalAdapter
     _cache: dict[tuple[str, tuple[str, ...]], TacticalNodeEvaluation] = field(default_factory=dict)
+    prepared_node: ScenarioTreeNode | None = None
+    prepared_squads: tuple[CandidateSquad, ...] = ()
 
     @property
     def rules(self) -> OneGameweekRulesView:
@@ -384,6 +387,30 @@ class _MemoizedStage10Evaluator:
             result = self.delegate.evaluate(node=node, state=state)
             self._cache[key] = result
         return result
+
+    def precompute(
+        self,
+        *,
+        progress: Callable[[tuple[int, int]], None] | None = None,
+    ) -> None:
+        """Populate the existing node/squad memo through one exact shared kernel."""
+
+        if self.prepared_node is None or not self.prepared_squads:
+            return
+        pending = tuple(
+            squad
+            for squad in sorted(self.prepared_squads, key=lambda item: item.player_ids)
+            if (self.prepared_node.node_id, squad.player_ids) not in self._cache
+        )
+        if not pending:
+            return
+        results = self.delegate.evaluate_many(
+            node=self.prepared_node,
+            squads=pending,
+            progress=progress,
+        )
+        for squad_ids, result in results.items():
+            self._cache[(self.prepared_node.node_id, squad_ids)] = result
 
 
 def load_packaged_event_allocation_config() -> EventAllocationConfig:
@@ -1096,7 +1123,14 @@ def _stage11_request(
         certified_dominated_candidates=certified_dominated,
         pruning_policy=pruning_policy,
     )
-    return request, _MemoizedStage10Evaluator(tactical), candidates, scope
+    memoized = _MemoizedStage10Evaluator(
+        tactical,
+        prepared_node=root,
+        prepared_squads=tuple(
+            CandidateSquad(player_ids=squad_ids) for squad_ids in sorted(squad_signatures)
+        ),
+    )
+    return request, memoized, candidates, scope
 
 
 def _parse_tactical_plan(value: dict[str, object]) -> OneGameweekPlan:
@@ -1454,15 +1488,28 @@ class PrivateV1RecommendationService:
             maximum_transfers=execution.candidate_action_policy.maximum_transfers,
         )
         active_progress.message(f"root action upper bound: {root_action_upper}")
+
+        def batch_progress(value: tuple[int, int]) -> None:
+            completed, total = value
+            if completed == 1 or completed == total or completed % 25 == 0:
+                active_progress.message(f"Stage 10 tactical squads: {completed}/{total} complete")
+
         with active_progress.stage(
-            started="Exact optimisation starting",
-            completed="Exact optimisation complete",
-            failed="exact optimisation",
-            heartbeat="Exact optimisation still running",
+            started="Stage-10 tactical batch starting",
+            completed="Stage-10 tactical batch ready",
+            failed="Stage-10 tactical batch",
+            heartbeat="Stage 10 tactical batch still running",
             long_warning=(
-                "WARNING: exact optimisation has exceeded the expected private-V1 runtime; "
-                "computation is still active."
+                "WARNING: exact Stage-10 tactical evaluation has exceeded the expected "
+                "private-V1 runtime; computation is still active."
             ),
+        ):
+            tactical.precompute(progress=batch_progress)
+        with active_progress.stage(
+            started="Stage-11 policy selection...",
+            completed="Stage-11 policy selection complete",
+            failed="Stage-11 policy selection",
+            heartbeat="Stage-11 policy selection still running",
         ):
             optimiser = optimise_multi_gameweek(request, evaluator=tactical)
         if (
