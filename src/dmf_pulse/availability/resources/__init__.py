@@ -23,7 +23,12 @@ AVAILABILITY_RESOURCE_NAMES: Final[tuple[str, ...]] = (
     "MIN-007G/contexts/rare_bench_60_plus.json",
     "MIN-007G/contexts/stable_xi.json",
 )
-_RESOURCE_ALLOWLIST: Final = frozenset(AVAILABILITY_RESOURCE_NAMES)
+CURRENT_TEAM_PATH_RESOURCE_NAMES: Final[tuple[str, ...]] = (
+    "current_team_path_policy_2026_27.json",
+)
+_RESOURCE_ALLOWLIST: Final = frozenset(
+    (*AVAILABILITY_RESOURCE_NAMES, *CURRENT_TEAM_PATH_RESOURCE_NAMES)
+)
 
 
 def availability_resource_bytes(name: str) -> bytes:
@@ -48,6 +53,7 @@ def availability_resource_json(name: str) -> dict[str, Any]:
 
 __all__ = [
     "AVAILABILITY_RESOURCE_NAMES",
+    "CURRENT_TEAM_PATH_RESOURCE_NAMES",
     "availability_resource_bytes",
     "availability_resource_json",
 ]

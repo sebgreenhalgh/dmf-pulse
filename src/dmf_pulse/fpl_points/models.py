@@ -53,6 +53,7 @@ POINT_COMPONENT_NAMES = (
     "own_goals",
     "bonus",
 )
+PENALTY_GOAL_SHARE_PROXY_WARNING = "CURRENT_PENALTY_HIERARCHY_EXHAUSTED_GOAL_SHARE_PROXY_V1"
 
 
 def _parse_utc(value: str, *, label: str) -> datetime:
@@ -119,6 +120,15 @@ class GameweekAssemblyMode(StrEnum):
     BLANK = "BLANK"
     SINGLE_FIXTURE = "SINGLE_FIXTURE"
     SHARED_OUTCOME_DRAW = "SHARED_OUTCOME_DRAW"
+
+
+class PenaltyHierarchyExhaustionPolicy(StrEnum):
+    """Explicit behavior after current and governed historical penalty roles fail."""
+
+    BLOCK = "BLOCK"
+    PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1 = (
+        "PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1"
+    )
 
 
 class OnPitchInterval(PointsModel):
@@ -457,6 +467,9 @@ class FixtureSimulationRequest(PointsModel):
     participation_scenarios: tuple[ParticipationScenario, ...]
     allocation_profiles: tuple[PlayerAllocationProfile, ...]
     penalty_taker_hierarchy: tuple[PenaltyTakerHierarchyEntry, ...] = ()
+    penalty_hierarchy_exhaustion_policy: PenaltyHierarchyExhaustionPolicy = (
+        PenaltyHierarchyExhaustionPolicy.BLOCK
+    )
     player_prior_identity: PlayerPriorIdentity | None = None
     allocation_config: EventAllocationConfig
     expected_ruleset_id: str
@@ -543,6 +556,12 @@ class FixtureSimulationRequest(PointsModel):
                 raise ValueError("penalty hierarchy player is outside allocation profile universe")
             if profile.team_id != entry.team_id:
                 raise ValueError("penalty hierarchy team identity mismatch")
+        if (
+            self.penalty_hierarchy_exhaustion_policy
+            is PenaltyHierarchyExhaustionPolicy.PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1
+            and self.projection_mode is ProjectionMode.PRODUCTION
+        ):
+            raise ValueError("private penalty-role exhaustion policy cannot run in production")
         if self.player_prior_identity is not None:
             prior_cutoff = _parse_utc(
                 self.player_prior_identity.information_cutoff_utc,

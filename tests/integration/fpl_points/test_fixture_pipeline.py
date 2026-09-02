@@ -13,8 +13,12 @@ from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.gameweek import assemble_blank_gameweek, assemble_gameweek
 from dmf_pulse.fpl_points.gameweek_summaries import build_gameweek_projection
 from dmf_pulse.fpl_points.models import (
+    PENALTY_GOAL_SHARE_PROXY_WARNING,
     FixtureProjectionResult,
     FixtureReadiness,
+    FixtureSimulationRequest,
+    PenaltyHierarchyExhaustionPolicy,
+    PenaltyTakerHierarchyEntry,
     ProjectionMode,
     SimulationStatus,
 )
@@ -22,10 +26,15 @@ from dmf_pulse.fpl_points.rules_adapter import AcceptedRulesAdapter
 from dmf_pulse.fpl_points.service import FplPointsService
 from dmf_pulse.rules.compiler import compile_ruleset
 from tests.support.factories import (
+    A_FWD,
+    AWAY_TEAM_ID,
     FIXTURE_A,
     FIXTURE_B,
+    H_FWD,
     H_MID,
+    HOME_TEAM_ID,
     REFERENCE_RULESET,
+    base_profiles,
     make_request,
     mc_policy,
     reference_engine,
@@ -82,6 +91,43 @@ def test_target_player_points_service_routes_generated_penalties_through_rules_c
     assert all(goal.mechanism.value == "PENALTY" for goal in goals)
     assert all(goal.assist_context is not None for goal in goals)
     assert all(goal.assist_classification.value != "AMBIGUOUS_ASSIST" for goal in goals)
+
+
+def test_private_penalty_proxy_warning_reaches_fixture_and_gameweek_contracts() -> None:
+    base = make_request(scenario_count=32)
+    payload = base.model_dump(mode="python")
+    payload.update(
+        {
+            "allocation_profiles": tuple(
+                profile.model_copy(update={"penalty_taker_share": 0.0})
+                for profile in base_profiles()
+            ),
+            "penalty_taker_hierarchy": (
+                PenaltyTakerHierarchyEntry(
+                    player_id=H_FWD,
+                    team_id=HOME_TEAM_ID,
+                    order=1,
+                ),
+                PenaltyTakerHierarchyEntry(
+                    player_id=A_FWD,
+                    team_id=AWAY_TEAM_ID,
+                    order=1,
+                ),
+            ),
+            "penalty_hierarchy_exhaustion_policy": (
+                PenaltyHierarchyExhaustionPolicy.PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1
+            ),
+            "allocation_config": base.allocation_config.model_copy(
+                update={"penalty_goal_probability": 1.0}
+            ),
+        }
+    )
+    request = FixtureSimulationRequest.model_validate(payload)
+
+    result = FplPointsService(reference_engine(), mc_policy()).project(request)
+    assert result.status is SimulationStatus.SUCCESS
+    assert PENALTY_GOAL_SHARE_PROXY_WARNING in result.warnings
+    assert PENALTY_GOAL_SHARE_PROXY_WARNING in assemble_gameweek((result,)).warnings
 
 
 def test_fixture_bonus_is_ranked_jointly_across_complete_participant_universe() -> None:

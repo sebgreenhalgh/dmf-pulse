@@ -1,0 +1,13 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI_AND_LIVE_VERIFICATION",
+  "goal_share_proxy_policy": "PASS_PRIVATE_NO_RETENTION_OPT_IN",
+  "installed_wheel": "PASS",
+  "live_one_command": "BLOCKED_LIVE_RUNTIME_INPUTS_UNAVAILABLE",
+  "penalty_priority_and_fail_closed": "PASS",
+  "provider_bodies_retained": 0,
+  "stage9_allocator_branch_coverage_percent": "96",
+  "stage7_reconciler_branch_coverage_percent": "91",
+  "stage7_team_path_reconciliation": "PASS",
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001H"
+}

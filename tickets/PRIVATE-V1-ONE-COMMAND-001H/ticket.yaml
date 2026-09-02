@@ -1,0 +1,41 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001H"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Coherent Stage-7 team minutes and private penalty-role exhaustion"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001H"
+required_base_commit: "0c1c5bfdbdc766d28cb70f7ea6df1cf4633c2c5b"
+parent_exact_sha_ci: 33585969539
+objective: >-
+  Reconcile accepted independent Stage-7 conditional-minute draws into deterministic coherent
+  90-minute team paths and add an explicit private no-retention goal-share proxy only after the
+  current penalty hierarchy and governed historical penalty roles are exhausted.
+authority_scopes:
+  - "A7-player-availability-start-and-minutes"
+  - "A9-points"
+  - "A11-decision-bundle"
+  - "A12-ops-assurance"
+in_scope:
+  - "Season-bound exact minimum-L1 reconciliation with paired substitutions and goalkeeper continuity."
+  - "Per-scenario aggregate distortion evidence and semantic hash binding."
+  - "Private no-retention penalty hierarchy exhaustion policy for both Stage-9 penalty routes."
+  - "Fixture, gameweek, private-decision and user-report warning propagation."
+  - "Safe one-command progression or exact next blocker."
+permissions:
+  official_fpl_network: "operator_initiated_existing_one_command_get_only"
+  official_odds_network: "operator_initiated_existing_one_command_get_only"
+  authentication_or_credentials: "existing_environment_only"
+  raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Availability model retraining, probability or expected-minute changes."
+  - "Stage-8 score, hierarchy extraction, donor prior or ordinary goal-allocation changes."
+  - "FPL/Odds transport, authentication, markets, optimiser, captaincy or chip changes."
+  - "Arbitrary, equal-weight, price, ownership, name, club or position penalty fallback."
+  - "Persistence, PR, merge, tag or production activation."
+required_execution_status: "REAL_PRIVATE_TRANSIENT_RECOMMENDATION_OR_EXACT_NEXT_BLOCKER"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

@@ -1716,3 +1716,28 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   runtime entry ID as the exact blocker to a literal private command retry.
 - [ ] Seal manifests/evidence, push the final SHA, require exact-SHA CI green and stop without PR,
   merge, tag, activation or post-CI mutation.
+
+# PRIVATE-V1-ONE-COMMAND-001H coherent team minutes and private penalty exhaustion
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001H`; immutable parent
+  `0c1c5bfdbdc766d28cb70f7ea6df1cf4633c2c5b`; parent exact-SHA CI `33585969539`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001H`.
+- Scope: reconcile accepted Stage-7 independent conditional-minute draws into deterministic,
+  jointly coherent team paths; add the explicit private-current penalty hierarchy exhaustion
+  policy that uses positive on-pitch goal share only after current and historical roles fail.
+- Safety: preserve Stage-7 model/source artifacts, Stage 8, hierarchy extraction, donor priors,
+  transport/authentication, market construction, scorer policy defaults, optimiser, captaincy,
+  chips, persistence, PR, merge, tag and activation.
+
+## Hotfix checkpoints
+
+- [x] Verify the exact parent/CI, isolate the branch, resolve A7/A9/A11/A12 authority, and bind
+  the 2026/27 ordinary-substitution limit to Premier League Handbook Rule L.29.
+- [x] Add RED structural, optimality, deterministic, distortion/hash and penalty-priority tests.
+- [x] Implement the smallest Stage-7 reconciliation contract and private-only Stage-9 policy.
+- [x] Run focused and affected tests, branch coverage, Ruff, mypy, frozen sync, build, wheel,
+  repository and secret gates.
+- [x] Check the safe live boundary without reading or retaining secrets/identifiers; record the
+  exact blocker if a literal private command cannot run.
+- [ ] Seal evidence/manifests, push one final SHA, require exact-SHA CI green and stop without PR,
+  merge, tag, activation or post-CI mutation.

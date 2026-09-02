@@ -9,6 +9,7 @@ from math import exp
 
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import (
+    PENALTY_GOAL_SHARE_PROXY_WARNING,
     AssistClassification,
     BpsCompletenessMode,
     BpsEvents,
@@ -21,6 +22,7 @@ from dmf_pulse.fpl_points.models import (
     ParticipantState,
     ParticipationScenario,
     PenaltyEvent,
+    PenaltyHierarchyExhaustionPolicy,
     PenaltyOutcome,
     PenaltyTakerHierarchyEntry,
     PlayerAllocationProfile,
@@ -227,12 +229,15 @@ def _choose_accumulator(
 def _resolve_penalty_taker(
     candidates: tuple[_Accumulator, ...],
     hierarchy: tuple[PenaltyTakerHierarchyEntry, ...],
+    exhaustion_policy: PenaltyHierarchyExhaustionPolicy,
     rng: NamedRandom,
     degradation: list[str],
 ) -> _Accumulator:
     """Resolve published ordinal role evidence before the governed donor fallback."""
 
-    order_by_player = {item.player_id: item.order for item in hierarchy}
+    team_id = candidates[0].participant.team_id if candidates else None
+    team_hierarchy = tuple(item for item in hierarchy if item.team_id == team_id)
+    order_by_player = {item.player_id: item.order for item in team_hierarchy}
     current = tuple(item for item in candidates if item.participant.player_id in order_by_player)
     if current:
         return min(
@@ -242,14 +247,32 @@ def _resolve_penalty_taker(
                 item.participant.player_id,
             ),
         )
-    selected = _choose_accumulator(
-        candidates,
-        lambda item: item.profile.penalty_taker_share,
-        rng,
-        code="NO_ELIGIBLE_PENALTY_TAKER",
+    historical = tuple(item for item in candidates if item.profile.penalty_taker_share > 0.0)
+    if historical:
+        selected = _sample_weighted(
+            historical,
+            tuple(item.profile.penalty_taker_share for item in historical),
+            rng,
+        )
+        degradation.append("HISTORICAL_PENALTY_ROLE_FALLBACK_USED")
+        return selected
+    if (
+        team_hierarchy
+        and exhaustion_policy
+        is PenaltyHierarchyExhaustionPolicy.PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1
+    ):
+        selected = _choose_accumulator(
+            candidates,
+            lambda item: item.profile.goal_share,
+            rng,
+            code="NO_ELIGIBLE_PENALTY_TAKER",
+        )
+        degradation.append(PENALTY_GOAL_SHARE_PROXY_WARNING)
+        return selected
+    raise FplPointsError(
+        "NO_ELIGIBLE_PENALTY_TAKER",
+        "no eligible player has positive allocation share",
     )
-    degradation.append("HISTORICAL_PENALTY_ROLE_FALLBACK_USED")
-    return selected
 
 
 def _sample_goal_mechanism(config: EventAllocationConfig, rng: NamedRandom) -> GoalMechanism:
@@ -395,6 +418,7 @@ def _allocate_goals(
     config: EventAllocationConfig,
     accumulators: dict[str, _Accumulator],
     penalty_taker_hierarchy: tuple[PenaltyTakerHierarchyEntry, ...],
+    penalty_hierarchy_exhaustion_policy: PenaltyHierarchyExhaustionPolicy,
     degradation: list[str],
     root_seed: int,
     scenario_index: int,
@@ -447,6 +471,7 @@ def _allocate_goals(
                 _resolve_penalty_taker(
                     scoring_candidates,
                     penalty_taker_hierarchy,
+                    penalty_hierarchy_exhaustion_policy,
                     rng,
                     degradation,
                 )
@@ -728,6 +753,7 @@ def _generate_extra_penalty(
     config: EventAllocationConfig,
     accumulators: dict[str, _Accumulator],
     penalty_taker_hierarchy: tuple[PenaltyTakerHierarchyEntry, ...],
+    penalty_hierarchy_exhaustion_policy: PenaltyHierarchyExhaustionPolicy,
     degradation: list[str],
     root_seed: int,
     scenario_index: int,
@@ -758,6 +784,7 @@ def _generate_extra_penalty(
     taker = _resolve_penalty_taker(
         takers,
         penalty_taker_hierarchy,
+        penalty_hierarchy_exhaustion_policy,
         rng,
         degradation,
     )
@@ -820,6 +847,9 @@ def allocate_fixture_events(
     root_seed: int,
     scenario_index: int,
     penalty_taker_hierarchy: tuple[PenaltyTakerHierarchyEntry, ...] = (),
+    penalty_hierarchy_exhaustion_policy: PenaltyHierarchyExhaustionPolicy = (
+        PenaltyHierarchyExhaustionPolicy.BLOCK
+    ),
     assist_classifier: Callable[[AssistDecisionContext], AssistClassification | None] | None = None,
 ) -> tuple[FixtureEventScenario, tuple[str, ...]]:
     """Allocate one coherent exact event vector conditional on score and minutes."""
@@ -847,6 +877,7 @@ def allocate_fixture_events(
         config=config,
         accumulators=accumulators,
         penalty_taker_hierarchy=penalty_taker_hierarchy,
+        penalty_hierarchy_exhaustion_policy=penalty_hierarchy_exhaustion_policy,
         degradation=degradation,
         root_seed=root_seed,
         scenario_index=scenario_index,
@@ -875,6 +906,7 @@ def allocate_fixture_events(
         config=config,
         accumulators=accumulators,
         penalty_taker_hierarchy=penalty_taker_hierarchy,
+        penalty_hierarchy_exhaustion_policy=penalty_hierarchy_exhaustion_policy,
         degradation=degradation,
         root_seed=root_seed,
         scenario_index=scenario_index,

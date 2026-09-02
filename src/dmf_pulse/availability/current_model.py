@@ -6,6 +6,7 @@ import hashlib
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from decimal import Decimal
+from functools import cache, lru_cache
 from typing import Annotated, Any, Literal, Self, cast
 from uuid import UUID
 
@@ -19,10 +20,13 @@ from dmf_pulse.availability.manual_override import (
 )
 from dmf_pulse.availability.models import format_utc, parse_utc
 from dmf_pulse.availability.projection import MinutesPredictionResult, TeamMinutesProjection
+from dmf_pulse.availability.resources import availability_resource_json
 
 CURRENT_MODEL_FAMILY: Literal["REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"] = (
     "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"
 )
+CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_WARNING = "CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_V1"
+_CURRENT_TEAM_PATH_POLICY_RESOURCE = "current_team_path_policy_2026_27.json"
 
 
 class _FrozenModel(BaseModel):
@@ -41,11 +45,268 @@ def _uuid(value: object, *, label: str) -> str:
     return checked
 
 
+class CurrentTeamPathPolicy(_FrozenModel):
+    """Current-season competition constraints for the transient joint-team adapter."""
+
+    schema_version: Literal["current-team-path-policy-v1"]
+    policy_id: Literal["CURRENT-STAGE7-TEAM-PATH-RECONCILIATION-2026-27-V1"]
+    competition_code: Literal["PL"]
+    season_code: Literal["2026/27"]
+    match_minutes: Literal[90]
+    players_on_pitch: Literal[11]
+    goalkeepers_on_pitch: Literal[1]
+    maximum_standard_substitutions: Literal[5]
+    exceptional_substitutions_modelled: Literal[False]
+    source_url: Literal[
+        "https://resources.premierleague.pulselive.com/premierleague/document/2026/07/31/8a890ff9-176c-4364-a8ff-e08f995e2c86/TM2040_PL-Handbook-and-Collateral-2026-27_Digital_31.07.pdf"
+    ]
+    source_locator: Literal["Premier League Handbook 2026/27, Rule L.29, page 237"]
+    source_published_date: Literal["2026-07-31"]
+    semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def policy_is_sealed(self) -> Self:
+        if self.semantic_sha256 != current_team_path_policy_sha256(self):
+            raise ValueError("current team-path policy semantic hash does not match")
+        return self
+
+
+def current_team_path_policy_sha256(value: CurrentTeamPathPolicy) -> str:
+    return canonical_sha256(value.model_dump(mode="json", exclude={"semantic_sha256"}))
+
+
+@lru_cache(maxsize=1)
+def load_current_team_path_policy() -> CurrentTeamPathPolicy:
+    """Load the wheel-contained 2026/27 Premier League team-path constraints."""
+
+    return CurrentTeamPathPolicy.model_validate(
+        availability_resource_json(_CURRENT_TEAM_PATH_POLICY_RESOURCE)
+    )
+
+
+class CurrentTeamMinuteReconciliation(_FrozenModel):
+    """Safe aggregate distortion evidence for one reconciled team scenario."""
+
+    schema_version: Literal["current-team-minute-reconciliation-v1"] = (
+        "current-team-minute-reconciliation-v1"
+    )
+    scenario_id: str = Field(pattern=r"^[A-Z0-9][A-Z0-9_-]{0,63}$")
+    original_team_minutes: Annotated[int, Field(ge=0)]
+    reconciled_team_minutes: Literal[990] = 990
+    adjusted_player_count: Annotated[int, Field(ge=0, le=40)]
+    total_absolute_minute_adjustment: Annotated[int, Field(ge=0)]
+    maximum_absolute_player_adjustment: Annotated[int, Field(ge=0, le=90)]
+    substitution_count: Annotated[int, Field(ge=0, le=5)]
+    original_player_minutes_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    reconciled_player_minutes_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def metrics_are_coherent_and_sealed(self) -> Self:
+        if self.adjusted_player_count == 0:
+            if (
+                self.total_absolute_minute_adjustment != 0
+                or self.maximum_absolute_player_adjustment != 0
+            ):
+                raise ValueError("zero adjusted players require zero minute distortion")
+        elif (
+            self.total_absolute_minute_adjustment <= 0
+            or self.maximum_absolute_player_adjustment <= 0
+            or self.maximum_absolute_player_adjustment > self.total_absolute_minute_adjustment
+        ):
+            raise ValueError("positive adjusted players require coherent minute distortion")
+        if self.semantic_sha256 != current_team_minute_reconciliation_sha256(self):
+            raise ValueError("team-minute reconciliation semantic hash does not match")
+        return self
+
+
+def current_team_minute_reconciliation_sha256(
+    value: CurrentTeamMinuteReconciliation,
+) -> str:
+    return canonical_sha256(value.model_dump(mode="json", exclude={"semantic_sha256"}))
+
+
+def _scenario_minutes_sha256(value: ManualWeightedScenario) -> str:
+    return canonical_sha256(
+        {
+            "scenario_id": value.scenario_id,
+            "players": [
+                {
+                    "official_minutes": item.official_minutes,
+                    "player_id": item.player_id,
+                    "position": item.position,
+                    "role": item.role,
+                }
+                for item in value.players
+            ],
+        }
+    )
+
+
+def validate_current_team_path(
+    scenario: ManualWeightedScenario,
+    policy: CurrentTeamPathPolicy | None = None,
+) -> None:
+    """Reject a vector that cannot describe one continuous legal 90-minute team path."""
+
+    policy = policy or load_current_team_path_policy()
+    starters = tuple(item for item in scenario.players if item.role == "START")
+    bench = tuple(item for item in scenario.players if item.role == "BENCH")
+    if len(starters) != policy.players_on_pitch:
+        raise ValueError("current team path must have exactly 11 kickoff starters")
+    if len(bench) != 9 or sum(item.position == "GK" for item in bench) != 1:
+        raise ValueError("current team path must retain the configured nine-player bench")
+    if sum(item.position == "GK" for item in starters) != policy.goalkeepers_on_pitch:
+        raise ValueError("current team path must have exactly one kickoff goalkeeper")
+    if any(item.role == "OUT" and item.official_minutes != 0 for item in scenario.players):
+        raise ValueError("OUT players cannot enter the current team path")
+
+    entrants = tuple(item for item in bench if item.official_minutes > 0)
+    exits = tuple(item for item in starters if item.official_minutes < policy.match_minutes)
+    if len(entrants) > policy.maximum_standard_substitutions:
+        raise ValueError("current team path exceeds the governed substitution limit")
+    if any(item.official_minutes >= policy.match_minutes for item in entrants):
+        raise ValueError("appearing bench players must enter strictly after kickoff")
+
+    goalkeeper_exits = sorted(item.official_minutes for item in exits if item.position == "GK")
+    goalkeeper_entries = sorted(
+        policy.match_minutes - item.official_minutes for item in entrants if item.position == "GK"
+    )
+    if goalkeeper_exits != goalkeeper_entries:
+        raise ValueError("goalkeeper exit must be paired with the bench goalkeeper")
+    outfield_exits = sorted(item.official_minutes for item in exits if item.position != "GK")
+    outfield_entries = sorted(
+        policy.match_minutes - item.official_minutes for item in entrants if item.position != "GK"
+    )
+    if outfield_exits != outfield_entries:
+        raise ValueError("starter exits and bench entries must be paired at the same minute")
+    if sum(item.official_minutes for item in scenario.players) != (
+        policy.players_on_pitch * policy.match_minutes
+    ):
+        raise ValueError("current team path must contain exactly 990 pre-dismissal team-minutes")
+
+
+def _best_pair_time(starter_target: int, bench_target: int) -> tuple[int, int]:
+    return min(
+        (
+            abs(minute - starter_target) + abs((90 - minute) - bench_target),
+            minute,
+        )
+        for minute in range(1, 90)
+    )
+
+
+def reconcile_current_team_scenario(
+    scenario: ManualWeightedScenario,
+    policy: CurrentTeamPathPolicy | None = None,
+) -> tuple[ManualWeightedScenario, CurrentTeamMinuteReconciliation]:
+    """Find the deterministic minimum-L1 legal team path nearest independent draws."""
+
+    policy = policy or load_current_team_path_policy()
+    starters = tuple(item for item in scenario.players if item.role == "START")
+    bench = tuple(item for item in scenario.players if item.role == "BENCH")
+    if len(starters) != policy.players_on_pitch or len(bench) != 9:
+        raise ValueError("raw current scenario has an invalid role allocation")
+    raw_minutes = {item.player_id: item.official_minutes for item in scenario.players}
+    baseline_cost = sum(
+        abs((policy.match_minutes if item.role == "START" else 0) - item.official_minutes)
+        for item in scenario.players
+    )
+    pair_options: dict[tuple[int, int], tuple[int, int]] = {}
+    for bench_index, entrant in enumerate(bench):
+        for starter_index, outgoing in enumerate(starters):
+            if (entrant.position == "GK") != (outgoing.position == "GK"):
+                continue
+            pair_cost, minute = _best_pair_time(outgoing.official_minutes, entrant.official_minutes)
+            unpaired_cost = abs(policy.match_minutes - outgoing.official_minutes) + abs(
+                entrant.official_minutes
+            )
+            pair_options[(bench_index, starter_index)] = (
+                pair_cost - unpaired_cost,
+                minute,
+            )
+
+    Pair = tuple[str, str, int]
+    SearchResult = tuple[int, tuple[Pair, ...]]
+
+    @cache
+    def search(bench_index: int, used_starters: int) -> SearchResult:
+        if bench_index == len(bench):
+            return 0, ()
+        best = search(bench_index + 1, used_starters)
+        if used_starters.bit_count() >= policy.maximum_standard_substitutions:
+            return best
+        entrant = bench[bench_index]
+        for starter_index, outgoing in enumerate(starters):
+            if used_starters & (1 << starter_index):
+                continue
+            option = pair_options.get((bench_index, starter_index))
+            if option is None:
+                continue
+            delta, minute = option
+            tail_delta, tail_pairs = search(bench_index + 1, used_starters | (1 << starter_index))
+            candidate: SearchResult = (
+                delta + tail_delta,
+                ((entrant.player_id, outgoing.player_id, minute), *tail_pairs),
+            )
+            if (candidate[0], len(candidate[1]), candidate[1]) < (
+                best[0],
+                len(best[1]),
+                best[1],
+            ):
+                best = candidate
+        return best
+
+    total_delta, pairs = search(0, 0)
+    legal_minutes = {
+        item.player_id: policy.match_minutes if item.role == "START" else 0
+        for item in scenario.players
+    }
+    for entrant_id, outgoing_id, minute in pairs:
+        legal_minutes[outgoing_id] = minute
+        legal_minutes[entrant_id] = policy.match_minutes - minute
+    reconciled = ManualWeightedScenario(
+        scenario_id=scenario.scenario_id,
+        count=scenario.count,
+        players=tuple(
+            item.model_copy(update={"official_minutes": legal_minutes[item.player_id]})
+            for item in scenario.players
+        ),
+    )
+    validate_current_team_path(reconciled, policy)
+    adjustments = tuple(
+        abs(legal_minutes[item.player_id] - item.official_minutes) for item in scenario.players
+    )
+    body: dict[str, object] = {
+        "scenario_id": scenario.scenario_id,
+        "original_team_minutes": sum(raw_minutes.values()),
+        "reconciled_team_minutes": policy.players_on_pitch * policy.match_minutes,
+        "adjusted_player_count": sum(item > 0 for item in adjustments),
+        "total_absolute_minute_adjustment": baseline_cost + total_delta,
+        "maximum_absolute_player_adjustment": max(adjustments, default=0),
+        "substitution_count": len(pairs),
+        "original_player_minutes_sha256": _scenario_minutes_sha256(scenario),
+        "reconciled_player_minutes_sha256": _scenario_minutes_sha256(reconciled),
+        "semantic_sha256": "0" * 64,
+    }
+    provisional = CurrentTeamMinuteReconciliation.model_construct(**cast(Any, body))
+    body["semantic_sha256"] = current_team_minute_reconciliation_sha256(provisional)
+    metrics = CurrentTeamMinuteReconciliation.model_validate(body)
+    if metrics.total_absolute_minute_adjustment != sum(adjustments):
+        raise ValueError("team-minute reconciliation objective accounting differs")
+    return reconciled, metrics
+
+
 class CurrentModelTeamScenarios(_FrozenModel):
     team_id: str
     bench_size: Literal[9] = 9
     bench_goalkeeper_slots: Literal[1] = 1
+    team_path_policy: CurrentTeamPathPolicy
     scenarios: Annotated[tuple[ManualWeightedScenario, ...], Field(min_length=256, max_length=256)]
+    reconciliations: Annotated[
+        tuple[CurrentTeamMinuteReconciliation, ...],
+        Field(min_length=256, max_length=256),
+    ]
     hard_ineligible_player_ids: tuple[str, ...] = ()
 
     @field_validator("team_id", mode="before")
@@ -60,6 +321,8 @@ class CurrentModelTeamScenarios(_FrozenModel):
             item.count != 1 for item in self.scenarios
         ):
             raise ValueError("model scenario indices must be the exact 256-sample sequence")
+        if tuple(item.scenario_id for item in self.reconciliations) != expected_ids:
+            raise ValueError("model reconciliation indices must match the 256-sample sequence")
         roster = tuple((item.player_id, item.position) for item in self.scenarios[0].players)
         if any(
             tuple((item.player_id, item.position) for item in scenario.players) != roster
@@ -75,6 +338,14 @@ class CurrentModelTeamScenarios(_FrozenModel):
             for scenario in self.scenarios
         ):
             raise ValueError("hard-ineligible model player is not OUT in every scenario")
+        for scenario, reconciliation in zip(self.scenarios, self.reconciliations, strict=True):
+            validate_current_team_path(scenario, self.team_path_policy)
+            if reconciliation.reconciled_player_minutes_sha256 != _scenario_minutes_sha256(
+                scenario
+            ) or reconciliation.substitution_count != sum(
+                item.role == "BENCH" and item.official_minutes > 0 for item in scenario.players
+            ):
+                raise ValueError("model reconciliation does not bind the coherent team path")
         return self
 
 
@@ -183,7 +454,9 @@ def _team_scenarios(
         if role not in {"START", "BENCH"} or not isinstance(raw_pmf, Sequence):
             raise ValueError("accepted Stage-7 conditional PMF is malformed")
         pmfs[(player_id, role)] = raw_pmf
+    policy = load_current_team_path_policy()
     scenarios: list[ManualWeightedScenario] = []
+    reconciliations: list[CurrentTeamMinuteReconciliation] = []
     for index, value in enumerate(result.core_scenarios):
         if value.get("scenario_index") != index:
             raise ValueError("accepted Stage-7 scenario sequence is malformed")
@@ -219,17 +492,20 @@ def _team_scenarios(
                     }
                 )
             )
-        scenarios.append(
-            ManualWeightedScenario(
-                scenario_id=f"S{index:03d}",
-                count=1,
-                players=tuple(sorted(players, key=lambda item: item.player_id)),
-            )
+        raw_scenario = ManualWeightedScenario(
+            scenario_id=f"S{index:03d}",
+            count=1,
+            players=tuple(sorted(players, key=lambda item: item.player_id)),
         )
+        scenario, reconciliation = reconcile_current_team_scenario(raw_scenario, policy)
+        scenarios.append(scenario)
+        reconciliations.append(reconciliation)
     hard = tuple(sorted(str(item["player_id"]) for item in result.core_hard_eligibility))
     return CurrentModelTeamScenarios(
         team_id=result.team_id,
+        team_path_policy=policy,
         scenarios=tuple(scenarios),
+        reconciliations=tuple(reconciliations),
         hard_ineligible_player_ids=hard,
     )
 
@@ -268,7 +544,7 @@ def build_current_model_fixture_minutes(
         "home_projection": home.projection,
         "away_projection": away.projection,
         "confidence": confidence,
-        "warnings": tuple(sorted(set(warnings))),
+        "warnings": tuple(sorted({*warnings, CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_WARNING})),
         "semantic_sha256": "0" * 64,
     }
     provisional = CurrentModelFixtureMinutesInput.model_construct(**cast(Any, body))
@@ -278,8 +554,16 @@ def build_current_model_fixture_minutes(
 
 __all__ = [
     "CURRENT_MODEL_FAMILY",
+    "CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_WARNING",
     "CurrentModelFixtureMinutesInput",
     "CurrentModelTeamScenarios",
+    "CurrentTeamMinuteReconciliation",
+    "CurrentTeamPathPolicy",
     "build_current_model_fixture_minutes",
     "current_model_fixture_sha256",
+    "current_team_minute_reconciliation_sha256",
+    "current_team_path_policy_sha256",
+    "load_current_team_path_policy",
+    "reconcile_current_team_scenario",
+    "validate_current_team_path",
 ]

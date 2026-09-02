@@ -39,11 +39,13 @@ from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.gameweek import assemble_gameweek
 from dmf_pulse.fpl_points.gameweek_summaries import build_gameweek_projection
 from dmf_pulse.fpl_points.models import (
+    PENALTY_GOAL_SHARE_PROXY_WARNING,
     EventAllocationConfig,
     FixtureProjectionResult,
     FixtureSimulationRequest,
     GameweekProjectionResult,
     GameweekScenarioSet,
+    PenaltyHierarchyExhaustionPolicy,
     PenaltyTakerHierarchyEntry,
     PlayerPosition,
     SimulationStatus,
@@ -153,7 +155,20 @@ def _penalty_role_limitations(
         "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" in result.warnings for result in fixture_results
     ):
         limitations.add("HISTORICAL_PENALTY_ROLE_FALLBACK_USED")
+    if any(PENALTY_GOAL_SHARE_PROXY_WARNING in result.warnings for result in fixture_results):
+        limitations.add(PENALTY_GOAL_SHARE_PROXY_WARNING)
     return tuple(sorted(limitations))
+
+
+def _penalty_hierarchy_exhaustion_policy(
+    execution: PrivateV1ExecutionInput,
+) -> PenaltyHierarchyExhaustionPolicy:
+    if (
+        execution.current_penalty_hierarchy is not None
+        and execution.retention_class == "PRIVATE_TRANSIENT_NO_RETENTION"
+    ):
+        return PenaltyHierarchyExhaustionPolicy.PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1
+    return PenaltyHierarchyExhaustionPolicy.BLOCK
 
 
 @dataclass(frozen=True)
@@ -617,6 +632,7 @@ def _project_fixtures(
             participation_scenarios=participation,
             allocation_profiles=profiles,
             penalty_taker_hierarchy=penalty_hierarchy,
+            penalty_hierarchy_exhaustion_policy=(_penalty_hierarchy_exhaustion_policy(value)),
             player_prior_identity=prior_identity,
             allocation_config=value.event_allocation_config,
             expected_ruleset_id=engine.identity.ruleset_id,

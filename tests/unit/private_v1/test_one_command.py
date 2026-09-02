@@ -398,6 +398,7 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     assert "No action:" in result.report
     assert "Captain:" in result.report
     assert "FPL_API_OPERATOR_INITIATED_ACCEPTED_CONTRACTUAL_RISK" in result.report
+    assert "CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_V1" in result.report
     assert odds_service.requests == [(RUN_AT, TARGET_KICKOFF + timedelta(hours=2, seconds=1))]
     assert len(direct_transport.requests) == 8
     assert direct_transport.bodies == []

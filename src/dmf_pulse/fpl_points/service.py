@@ -122,6 +122,7 @@ def generate_fixture_scenarios(
             participation=participation,
             profiles=request.allocation_profiles,
             penalty_taker_hierarchy=request.penalty_taker_hierarchy,
+            penalty_hierarchy_exhaustion_policy=(request.penalty_hierarchy_exhaustion_policy),
             config=request.allocation_config,
             ruleset=identity,
             projection_mode=request.projection_mode,

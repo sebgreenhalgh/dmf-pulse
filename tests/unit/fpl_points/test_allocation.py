@@ -11,8 +11,10 @@ from dmf_pulse.fpl_points.allocation import (
 )
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import (
+    PENALTY_GOAL_SHARE_PROXY_WARNING,
     FixtureSimulationRequest,
     OnPitchInterval,
+    PenaltyHierarchyExhaustionPolicy,
     PenaltyTakerHierarchyEntry,
     ProjectionMode,
     ScorelineCell,
@@ -40,6 +42,7 @@ def _allocate(
     profiles=None,
     participants=None,
     penalty_hierarchy=(),
+    penalty_exhaustion_policy=PenaltyHierarchyExhaustionPolicy.BLOCK,
     **config_updates,
 ):
     request = make_request(
@@ -53,6 +56,7 @@ def _allocate(
         participation=request.participation_scenarios[0],
         profiles=profiles or request.allocation_profiles,
         penalty_taker_hierarchy=penalty_hierarchy,
+        penalty_hierarchy_exhaustion_policy=penalty_exhaustion_policy,
         config=request.allocation_config,
         ruleset=reference_engine().identity,
         projection_mode=ProjectionMode.TEST,
@@ -322,6 +326,127 @@ def test_off_pitch_current_hierarchy_uses_governed_donor_and_discloses_fallback(
     assert "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" in reasons
 
 
+def test_private_goal_share_proxy_is_used_only_after_current_and_donor_exhaustion() -> None:
+    hierarchy = (PenaltyTakerHierarchyEntry(player_id=H_FWD, team_id=HOME_TEAM_ID, order=1),)
+    no_donor = tuple(
+        profile.model_copy(update={"penalty_taker_share": 0.0}) for profile in base_profiles()
+    )
+
+    scenario, reasons = _allocate(
+        seed=3,
+        cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+        profiles=no_donor,
+        penalty_hierarchy=hierarchy,
+        penalty_exhaustion_policy=(
+            PenaltyHierarchyExhaustionPolicy.PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1
+        ),
+        goal_time_lower=20.0,
+        goal_time_upper=21.0,
+        penalty_goal_probability=1.0,
+    )
+
+    assert scenario.goals[0].scorer_player_id != H_FWD
+    assert PENALTY_GOAL_SHARE_PROXY_WARNING in reasons
+    assert "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" not in reasons
+
+
+def test_positive_historical_donor_beats_opted_in_goal_share_proxy() -> None:
+    hierarchy = (PenaltyTakerHierarchyEntry(player_id=H_FWD, team_id=HOME_TEAM_ID, order=1),)
+    profiles = tuple(
+        profile.model_copy(
+            update={"penalty_taker_share": 1.0 if profile.player_id == H_MID else 0.0}
+        )
+        for profile in base_profiles()
+    )
+
+    scenario, reasons = _allocate(
+        seed=3,
+        cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+        profiles=profiles,
+        penalty_hierarchy=hierarchy,
+        penalty_exhaustion_policy=(
+            PenaltyHierarchyExhaustionPolicy.PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1
+        ),
+        goal_time_lower=20.0,
+        goal_time_upper=21.0,
+        penalty_goal_probability=1.0,
+    )
+
+    assert scenario.goals[0].scorer_player_id == H_MID
+    assert "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" in reasons
+    assert PENALTY_GOAL_SHARE_PROXY_WARNING not in reasons
+
+
+def test_proxy_requires_current_team_hierarchy_and_positive_on_pitch_goal_share() -> None:
+    no_donor = tuple(
+        profile.model_copy(update={"penalty_taker_share": 0.0}) for profile in base_profiles()
+    )
+    policy = PenaltyHierarchyExhaustionPolicy.PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1
+
+    with pytest.raises(FplPointsError) as no_hierarchy:
+        _allocate(
+            seed=3,
+            cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+            profiles=no_donor,
+            penalty_exhaustion_policy=policy,
+            penalty_goal_probability=1.0,
+        )
+    assert no_hierarchy.value.code == "NO_ELIGIBLE_PENALTY_TAKER"
+
+    hierarchy = (PenaltyTakerHierarchyEntry(player_id=H_FWD, team_id=HOME_TEAM_ID, order=1),)
+    no_on_pitch_goal_share = tuple(
+        profile.model_copy(
+            update={
+                "goal_share": 1.0 if profile.player_id == H_FWD else 0.0,
+                "penalty_taker_share": 0.0,
+            }
+        )
+        if profile.team_id == HOME_TEAM_ID
+        else profile
+        for profile in base_profiles()
+    )
+    with pytest.raises(FplPointsError) as zero_proxy:
+        _allocate(
+            seed=3,
+            cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+            profiles=no_on_pitch_goal_share,
+            penalty_hierarchy=hierarchy,
+            penalty_exhaustion_policy=policy,
+            goal_time_lower=20.0,
+            goal_time_upper=21.0,
+            penalty_goal_probability=1.0,
+        )
+    assert zero_proxy.value.code == "NO_ELIGIBLE_PENALTY_TAKER"
+
+
+def test_extra_penalty_route_uses_the_same_private_goal_share_proxy() -> None:
+    hierarchy = (
+        PenaltyTakerHierarchyEntry(player_id=H_FWD, team_id=HOME_TEAM_ID, order=1),
+        PenaltyTakerHierarchyEntry(player_id=A_FWD, team_id=AWAY_TEAM_ID, order=1),
+    )
+    no_donor = tuple(
+        profile.model_copy(update={"penalty_taker_share": 0.0}) for profile in base_profiles()
+    )
+
+    scenario, reasons = _allocate(
+        seed=14,
+        cell=ScorelineCell(home_goals=0, away_goals=0, probability="1.000000000000"),
+        profiles=no_donor,
+        penalty_hierarchy=hierarchy,
+        penalty_exhaustion_policy=(
+            PenaltyHierarchyExhaustionPolicy.PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1
+        ),
+        goal_time_lower=20.0,
+        goal_time_upper=21.0,
+        extra_penalty_attempt_probability=1.0,
+        extra_penalty_save_probability=1.0,
+    )
+
+    assert scenario.penalties
+    assert scenario.penalties[0].taker_player_id not in {H_FWD, A_FWD}
+    assert PENALTY_GOAL_SHARE_PROXY_WARNING in reasons
+
+
 def test_own_goal_reconciles_to_team_score() -> None:
     scenario, _ = _allocate(
         seed=5,
@@ -358,6 +483,9 @@ def test_missing_own_goal_and_penalty_shares_fail_closed() -> None:
             penalty_goal_probability=1.0,
         )
     assert penalty_error.value.code == "NO_ELIGIBLE_PENALTY_TAKER"
+    assert (
+        make_request().penalty_hierarchy_exhaustion_policy is PenaltyHierarchyExhaustionPolicy.BLOCK
+    )
 
 
 def test_extra_penalty_path_generates_a_miss_and_save() -> None:

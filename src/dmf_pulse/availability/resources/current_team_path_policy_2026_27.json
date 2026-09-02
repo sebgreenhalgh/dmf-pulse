@@ -1,0 +1,15 @@
+{
+  "competition_code": "PL",
+  "exceptional_substitutions_modelled": false,
+  "goalkeepers_on_pitch": 1,
+  "match_minutes": 90,
+  "maximum_standard_substitutions": 5,
+  "players_on_pitch": 11,
+  "policy_id": "CURRENT-STAGE7-TEAM-PATH-RECONCILIATION-2026-27-V1",
+  "schema_version": "current-team-path-policy-v1",
+  "season_code": "2026/27",
+  "semantic_sha256": "684db7a2f797df3cced8f0607d8df1e35ffaea1058c8ab642cd90cf9b6e487d6",
+  "source_locator": "Premier League Handbook 2026/27, Rule L.29, page 237",
+  "source_published_date": "2026-07-31",
+  "source_url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/07/31/8a890ff9-176c-4364-a8ff-e08f995e2c86/TM2040_PL-Handbook-and-Collateral-2026-27_Digital_31.07.pdf"
+}

@@ -6,6 +6,7 @@ from math import isclose
 
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.models import (
+    PENALTY_GOAL_SHARE_PROXY_WARNING,
     POINT_COMPONENT_NAMES,
     BpsCompletenessMode,
     ConfidenceGrade,
@@ -16,6 +17,16 @@ from dmf_pulse.fpl_points.models import (
     SimulationStatus,
 )
 from dmf_pulse.fpl_points.seed import stable_identifier
+
+
+def _private_penalty_warnings(
+    fixture_results: tuple[FixtureProjectionResult, ...],
+) -> tuple[str, ...]:
+    return (
+        (PENALTY_GOAL_SHARE_PROXY_WARNING,)
+        if any(PENALTY_GOAL_SHARE_PROXY_WARNING in result.warnings for result in fixture_results)
+        else ()
+    )
 
 
 def assemble_blank_gameweek(
@@ -166,7 +177,7 @@ def assemble_gameweek(
             fixture_result_sha256_by_fixture={
                 result.fixture_id: fixture_result_hashes[result.fixture_id]
             },
-            warnings=(),
+            warnings=_private_penalty_warnings(fixture_results),
         )
     maps = [
         {scenario.outcome_draw_id: scenario for scenario in result.scenarios}
@@ -286,8 +297,14 @@ def assemble_gameweek(
             result.fixture_id: fixture_result_hashes[result.fixture_id]
             for result in fixture_results
         },
-        warnings=(
-            "Cross-fixture injuries, dismissals, fatigue, and readiness transitions are not yet "
-            "propagated; fixture draws share deterministic latent draw identity only.",
+        warnings=tuple(
+            sorted(
+                {
+                    *_private_penalty_warnings(fixture_results),
+                    "Cross-fixture injuries, dismissals, fatigue, and readiness transitions are "
+                    "not yet propagated; fixture draws share deterministic latent draw identity "
+                    "only.",
+                }
+            )
         ),
     )

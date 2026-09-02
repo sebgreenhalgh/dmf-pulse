@@ -7,6 +7,10 @@ from types import SimpleNamespace
 
 import pytest
 
+from dmf_pulse.fpl_points.models import (
+    PENALTY_GOAL_SHARE_PROXY_WARNING,
+    PenaltyHierarchyExhaustionPolicy,
+)
 from dmf_pulse.optimisation.models import OneGameweekPlan
 from dmf_pulse.private_v1.artifacts import (
     verify_replay_bundle,
@@ -16,6 +20,7 @@ from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.service import (
     PrivateV1RecommendationService,
     _exact_root_action_upper_bound,
+    _penalty_hierarchy_exhaustion_policy,
     _penalty_role_limitations,
 )
 
@@ -64,6 +69,34 @@ def test_actual_historical_penalty_role_fallback_is_disclosed() -> None:
         "CURRENT_FPL_PENALTY_HIERARCHY_DETERMINISTIC_V1",
         "HISTORICAL_PENALTY_ROLE_FALLBACK_USED",
     )
+
+
+def test_goal_share_proxy_is_private_no_retention_opt_in_and_disclosed() -> None:
+    private = SimpleNamespace(
+        current_penalty_hierarchy=object(),
+        retention_class="PRIVATE_TRANSIENT_NO_RETENTION",
+    )
+    synthetic = SimpleNamespace(
+        current_penalty_hierarchy=object(),
+        retention_class="SYNTHETIC_REPLAY_ALLOWED",
+    )
+    no_hierarchy = SimpleNamespace(
+        current_penalty_hierarchy=None,
+        retention_class="PRIVATE_TRANSIENT_NO_RETENTION",
+    )
+
+    assert _penalty_hierarchy_exhaustion_policy(private) is (
+        PenaltyHierarchyExhaustionPolicy.PRIVATE_CURRENT_PENALTY_ROLE_GOAL_SHARE_PROXY_V1
+    )
+    assert _penalty_hierarchy_exhaustion_policy(synthetic) is (
+        PenaltyHierarchyExhaustionPolicy.BLOCK
+    )
+    assert _penalty_hierarchy_exhaustion_policy(no_hierarchy) is (
+        PenaltyHierarchyExhaustionPolicy.BLOCK
+    )
+
+    fixture = SimpleNamespace(warnings=(PENALTY_GOAL_SHARE_PROXY_WARNING,))
+    assert PENALTY_GOAL_SHARE_PROXY_WARNING in _penalty_role_limitations(private, (fixture,))
 
 
 def test_complete_synthetic_run_and_offline_replay(
