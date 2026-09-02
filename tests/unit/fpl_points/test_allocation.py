@@ -10,12 +10,20 @@ from dmf_pulse.fpl_points.allocation import (
     validate_goal_share_simplex,
 )
 from dmf_pulse.fpl_points.errors import FplPointsError
-from dmf_pulse.fpl_points.models import OnPitchInterval, ProjectionMode, ScorelineCell
+from dmf_pulse.fpl_points.models import (
+    FixtureSimulationRequest,
+    OnPitchInterval,
+    PenaltyTakerHierarchyEntry,
+    ProjectionMode,
+    ScorelineCell,
+)
 from tests.support.factories import (
+    A_DEF,
     A_FWD,
     A_GK,
     AWAY_TEAM_ID,
     H_DEF,
+    H_FWD,
     H_MID,
     HOME_TEAM_ID,
     allocation_config,
@@ -31,6 +39,7 @@ def _allocate(
     cell: ScorelineCell | None = None,
     profiles=None,
     participants=None,
+    penalty_hierarchy=(),
     **config_updates,
 ):
     request = make_request(
@@ -43,6 +52,7 @@ def _allocate(
         cell=cell or ScorelineCell(home_goals=3, away_goals=2, probability="1.000000000000"),
         participation=request.participation_scenarios[0],
         profiles=profiles or request.allocation_profiles,
+        penalty_taker_hierarchy=penalty_hierarchy,
         config=request.allocation_config,
         ruleset=reference_engine().identity,
         projection_mode=ProjectionMode.TEST,
@@ -219,6 +229,99 @@ def test_penalty_goal_uses_an_on_pitch_taker() -> None:
     assert scenario.penalties[0].taker_player_id == goal.scorer_player_id
 
 
+def test_current_hierarchy_beats_stale_donor_without_becoming_a_probability() -> None:
+    hierarchy = (
+        PenaltyTakerHierarchyEntry(player_id=H_DEF, team_id=HOME_TEAM_ID, order=1),
+        PenaltyTakerHierarchyEntry(player_id=H_MID, team_id=HOME_TEAM_ID, order=2),
+    )
+    profiles = tuple(
+        profile.model_copy(
+            update={"penalty_taker_share": 1.0 if profile.player_id == H_MID else 0.0}
+        )
+        for profile in base_profiles()
+    )
+
+    for seed in (1, 3, 8, 21):
+        scenario, _ = _allocate(
+            seed=seed,
+            cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+            profiles=profiles,
+            penalty_hierarchy=hierarchy,
+            penalty_goal_probability=1.0,
+        )
+        assert scenario.goals[0].scorer_player_id == H_DEF
+
+
+def test_lowest_on_pitch_order_replaces_off_pitch_nominal_first() -> None:
+    hierarchy = (
+        PenaltyTakerHierarchyEntry(player_id=H_FWD, team_id=HOME_TEAM_ID, order=1),
+        PenaltyTakerHierarchyEntry(player_id=H_MID, team_id=HOME_TEAM_ID, order=2),
+    )
+
+    scenario, _ = _allocate(
+        seed=3,
+        cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+        penalty_hierarchy=hierarchy,
+        goal_time_lower=20.0,
+        goal_time_upper=21.0,
+        penalty_goal_probability=1.0,
+    )
+
+    assert scenario.goals[0].scorer_player_id == H_MID
+
+
+@pytest.mark.parametrize(
+    ("goal_time_lower", "goal_time_upper", "expected"),
+    ((40.0, 41.0, H_MID), (70.0, 71.0, H_FWD)),
+)
+def test_hierarchy_uses_substitution_state_at_penalty_event_time(
+    goal_time_lower: float, goal_time_upper: float, expected: str
+) -> None:
+    participants = tuple(
+        participant.model_copy(
+            update={
+                "official_minutes": 60,
+                "interval": OnPitchInterval(start_minute=0.0, end_minute=60.0),
+            }
+        )
+        if participant.player_id == H_MID
+        else participant
+        for participant in make_request().participation_scenarios[0].participants
+    )
+    hierarchy = (
+        PenaltyTakerHierarchyEntry(player_id=H_MID, team_id=HOME_TEAM_ID, order=1),
+        PenaltyTakerHierarchyEntry(player_id=H_FWD, team_id=HOME_TEAM_ID, order=2),
+    )
+
+    scenario, _ = _allocate(
+        seed=3,
+        cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+        participants=participants,
+        penalty_hierarchy=hierarchy,
+        goal_time_lower=goal_time_lower,
+        goal_time_upper=goal_time_upper,
+        penalty_goal_probability=1.0,
+    )
+
+    assert scenario.goals[0].scorer_player_id == expected
+
+
+def test_off_pitch_current_hierarchy_uses_governed_donor_and_discloses_fallback() -> None:
+    hierarchy = (PenaltyTakerHierarchyEntry(player_id=H_FWD, team_id=HOME_TEAM_ID, order=1),)
+
+    scenario, reasons = _allocate(
+        seed=3,
+        cell=ScorelineCell(home_goals=1, away_goals=0, probability="1.000000000000"),
+        penalty_hierarchy=hierarchy,
+        goal_time_lower=20.0,
+        goal_time_upper=21.0,
+        penalty_goal_probability=1.0,
+    )
+
+    assert scenario.goals[0].scorer_player_id == H_MID
+    assert "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" in reasons
+
+
 def test_own_goal_reconciles_to_team_score() -> None:
     scenario, _ = _allocate(
         seed=5,
@@ -275,6 +378,58 @@ def test_extra_penalty_path_generates_a_miss_and_save() -> None:
         if save.penalty_id == scenario.penalties[0].penalty_id
     )
     assert penalty_save.goalkeeper_player_id == scenario.penalties[0].goalkeeper_player_id
+
+
+def test_extra_penalty_route_uses_the_same_current_hierarchy_resolver() -> None:
+    hierarchy = (
+        PenaltyTakerHierarchyEntry(player_id=H_DEF, team_id=HOME_TEAM_ID, order=1),
+        PenaltyTakerHierarchyEntry(player_id=A_DEF, team_id=AWAY_TEAM_ID, order=1),
+    )
+    profiles = tuple(
+        profile.model_copy(update={"penalty_taker_share": 0.0}) for profile in base_profiles()
+    )
+
+    scenario, reasons = _allocate(
+        seed=14,
+        cell=ScorelineCell(home_goals=0, away_goals=0, probability="1.000000000000"),
+        profiles=profiles,
+        penalty_hierarchy=hierarchy,
+        extra_penalty_attempt_probability=1.0,
+        extra_penalty_save_probability=1.0,
+    )
+
+    assert scenario.penalties[0].taker_player_id in {H_DEF, A_DEF}
+    assert "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" not in reasons
+
+
+def test_fixture_request_rejects_invalid_penalty_hierarchy_mapping() -> None:
+    request = make_request()
+
+    def validate(entries) -> FixtureSimulationRequest:
+        payload = request.model_dump(mode="python")
+        payload["penalty_taker_hierarchy"] = entries
+        return FixtureSimulationRequest.model_validate(payload)
+
+    with pytest.raises(ValueError, match="player IDs must be unique"):
+        validate(
+            (
+                {"player_id": H_MID, "team_id": HOME_TEAM_ID, "order": 1},
+                {"player_id": H_MID, "team_id": HOME_TEAM_ID, "order": 2},
+            )
+        )
+    with pytest.raises(ValueError, match="team and order must be unique"):
+        validate(
+            (
+                {"player_id": H_MID, "team_id": HOME_TEAM_ID, "order": 1},
+                {"player_id": H_DEF, "team_id": HOME_TEAM_ID, "order": 1},
+            )
+        )
+    with pytest.raises(ValueError, match="outside allocation profile universe"):
+        validate(({"player_id": "unknown", "team_id": HOME_TEAM_ID, "order": 1},))
+    with pytest.raises(ValueError, match="team identity mismatch"):
+        validate(({"player_id": H_MID, "team_id": AWAY_TEAM_ID, "order": 1},))
+    with pytest.raises(ValueError):
+        validate(({"player_id": H_MID, "team_id": HOME_TEAM_ID, "order": -1},))
 
 
 def test_goalkeeper_saves_are_timed_linked_and_never_assigned_to_outfield_players() -> None:

@@ -31,6 +31,7 @@ from dmf_pulse.fpl_points.models import (
 )
 from dmf_pulse.fpl_points.player_prior import CurrentGwStalePriorCarryForwardPolicy
 from dmf_pulse.ingestion.current_state import CurrentUnifiedStateBundle
+from dmf_pulse.ingestion.fpl.direct_payloads import CurrentPenaltyHierarchy
 from dmf_pulse.ingestion.openfootball.service import CurrentScorePriorBundle
 from dmf_pulse.markets.current import (
     CurrentMarketCanonicalIdentityView,
@@ -293,6 +294,7 @@ class PrivateV1ExecutionInput(_FrozenModel):
     full_season_capability: CapabilityArtifact
     private_rules_authority: PrivateTransientRulesAuthority | None = None
     player_prior_carry_forward_policy: CurrentGwStalePriorCarryForwardPolicy | None = None
+    current_penalty_hierarchy: CurrentPenaltyHierarchy | None = None
     root_seed: Annotated[StrictInt, Field(ge=0, le=2**63 - 1)]
     scenario_count: Annotated[StrictInt, Field(ge=1, le=1_000_000)]
     stage9_monte_carlo_policy: MonteCarloPolicy
@@ -390,6 +392,24 @@ class PrivateV1ExecutionInput(_FrozenModel):
             raise ValueError("canonical player map differs from current FPL membership")
         if not (current_squad | incoming) <= set(mapped_players):
             raise ValueError("manager and incoming candidates require canonical player mappings")
+        hierarchy = self.current_penalty_hierarchy
+        if hierarchy is not None:
+            if (
+                hierarchy.information_cutoff != current.information_cutoff
+                or hierarchy.source_bootstrap_payload_sha256
+                != current.fpl_input.provenance.bootstrap_payload_sha256
+            ):
+                raise ValueError("current penalty hierarchy source binding differs")
+            current_team_ids = {item.provider_team_id for item in current.fpl_input.teams}
+            hierarchy_team_ids = {entry.official_fpl_team_id for entry in hierarchy.entries}
+            if hierarchy_team_ids != current_team_ids:
+                raise ValueError("current penalty hierarchy team coverage differs")
+            for entry in hierarchy.entries:
+                mapping = mapped_players.get(entry.official_fpl_element_id)
+                if mapping is None:
+                    raise ValueError("current penalty hierarchy player is outside the identity map")
+                if mapping.official_fpl_team_id != entry.official_fpl_team_id:
+                    raise ValueError("current penalty hierarchy player/team mapping differs")
         fixture_sets = {
             "markets": {str(item.canonical_fixture_id) for item in market.fixtures},
             "score_priors": {str(item.fixture_id) for item in self.score_priors},

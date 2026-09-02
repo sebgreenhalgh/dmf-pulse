@@ -898,6 +898,18 @@ def _public_pair(values: tuple[Decimal, Decimal]) -> tuple[Decimal, Decimal]:
     return rounded[0], rounded[1]
 
 
+def _public_weight_pair(
+    values: tuple[Decimal, Decimal], *, target_total: Decimal
+) -> tuple[Decimal, Decimal]:
+    """Round an exact pair to the public scale while preserving its intended mass."""
+
+    rounded = [_q12(value) for value in values]
+    residual = target_total - sum(rounded, Decimal(0))
+    winner = max(range(2), key=lambda index: (values[index], -index))
+    rounded[winner] = _q12(rounded[winner] + residual)
+    return rounded[0], rounded[1]
+
+
 def _source_quality_exclusions(
     warnings: tuple[str, ...],
 ) -> tuple[CurrentMarketExclusionCount, ...]:
@@ -1404,7 +1416,10 @@ def _totals_constraints(
     total_weight = _confidence_weight(consensus.confidence_grade)
     half = total_weight / _TWO
     weights = _public_pair((half / total_weight, half / total_weight))
-    effective_weights = (weights[0] * total_weight, weights[1] * total_weight)
+    effective_weights = _public_weight_pair(
+        (weights[0] * total_weight, weights[1] * total_weight),
+        target_total=total_weight,
+    )
     events = (ScoreEvent.TOTAL_OVER, ScoreEvent.TOTAL_UNDER)
     constraints: list[MarketConstraint] = []
     line_key = format(consensus.line, "f").replace(".", "_")

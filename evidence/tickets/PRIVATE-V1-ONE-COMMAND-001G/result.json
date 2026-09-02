@@ -1,0 +1,12 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "changed_module_branch_coverage_percent": "90.21",
+  "current_penalty_hierarchy": "PASS",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI_AND_LIVE_VERIFICATION",
+  "historical_penalty_fallback_disclosure": "PASS",
+  "installed_wheel": "PASS",
+  "live_one_command": "BLOCKED_LIVE_RUNTIME_INPUTS_UNAVAILABLE",
+  "market_pair_canonicalisation": "PASS",
+  "provider_bodies_retained": 0,
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001G"
+}

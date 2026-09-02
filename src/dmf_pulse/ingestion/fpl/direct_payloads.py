@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, Literal, Self
 
 from pydantic import (
     BaseModel,
@@ -15,8 +15,10 @@ from pydantic import (
     TypeAdapter,
     ValidationError,
     field_validator,
+    model_validator,
 )
 
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import (
     OFFICIAL_DIRECT_PROFILE_ID,
@@ -104,6 +106,151 @@ class DirectEventLive(_ProviderModel):
     elements: tuple[DirectLiveElement, ...]
 
 
+class _TransientContract(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+
+class CurrentPenaltyHierarchyEntry(_TransientContract):
+    official_fpl_element_id: PositiveInt
+    official_fpl_team_id: PositiveInt
+    penalties_order: PositiveInt
+
+
+class CurrentPenaltyHierarchy(_TransientContract):
+    """Memory-only provider-published current penalty-role hierarchy."""
+
+    schema_version: Literal["current-fpl-penalty-hierarchy-v1"] = "current-fpl-penalty-hierarchy-v1"
+    source_class: Literal["OFFICIAL_FPL_BOOTSTRAP_PROVIDER_PUBLISHED"] = (
+        "OFFICIAL_FPL_BOOTSTRAP_PROVIDER_PUBLISHED"
+    )
+    observed_at: datetime
+    information_cutoff: datetime
+    source_bootstrap_payload_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    entries: tuple[CurrentPenaltyHierarchyEntry, ...]
+    semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("observed_at", "information_cutoff")
+    @classmethod
+    def normalize_times(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("current penalty hierarchy time must be aware")
+        return value.astimezone(UTC)
+
+    @model_validator(mode="after")
+    def hierarchy_is_canonical_and_sealed(self) -> Self:
+        if self.observed_at > self.information_cutoff:
+            raise ValueError("current penalty hierarchy is post-cutoff")
+        expected = tuple(
+            sorted(
+                self.entries,
+                key=lambda item: (
+                    item.official_fpl_team_id,
+                    item.penalties_order,
+                    item.official_fpl_element_id,
+                ),
+            )
+        )
+        player_ids = tuple(item.official_fpl_element_id for item in self.entries)
+        team_orders = tuple(
+            (item.official_fpl_team_id, item.penalties_order) for item in self.entries
+        )
+        if (
+            self.entries != expected
+            or len(player_ids) != len(set(player_ids))
+            or len(team_orders) != len(set(team_orders))
+        ):
+            raise ValueError("current penalty hierarchy entries are not unique and canonical")
+        for team_id in sorted({item.official_fpl_team_id for item in self.entries}):
+            orders = tuple(
+                item.penalties_order
+                for item in self.entries
+                if item.official_fpl_team_id == team_id
+            )
+            if orders != tuple(range(1, len(orders) + 1)):
+                raise ValueError("current penalty hierarchy order is not contiguous")
+        if self.semantic_sha256 != current_penalty_hierarchy_sha256(self):
+            raise ValueError("current penalty hierarchy semantic hash does not match")
+        return self
+
+
+def current_penalty_hierarchy_sha256(value: CurrentPenaltyHierarchy) -> str:
+    return canonical_sha256(
+        {
+            "entries": [item.model_dump(mode="json") for item in value.entries],
+            "information_cutoff": value.information_cutoff.isoformat(),
+            "observed_at": value.observed_at.isoformat(),
+            "schema_version": value.schema_version,
+            "source_bootstrap_payload_sha256": value.source_bootstrap_payload_sha256,
+            "source_class": value.source_class,
+        }
+    )
+
+
+def build_current_penalty_hierarchy(
+    bootstrap: BootstrapPayload,
+    *,
+    observed_at: datetime,
+    information_cutoff: datetime,
+    source_bootstrap_payload_sha256: str,
+) -> CurrentPenaltyHierarchy:
+    """Extract additive ``penalties_order`` values without retaining the response body."""
+
+    team_ids = {team.id for team in bootstrap.teams}
+    entries: list[CurrentPenaltyHierarchyEntry] = []
+    try:
+        # Iterate the provider catalogue rather than assuming a fixed league-team count.
+        for team_id in sorted(team_ids):
+            for player in bootstrap.elements:
+                if player.team != team_id:
+                    continue
+                extra = player.model_extra or {}
+                if "penalties_order" not in extra or extra["penalties_order"] is None:
+                    continue
+                order = extra["penalties_order"]
+                if isinstance(order, bool) or not isinstance(order, int):
+                    raise ValueError("published penalty order must be an integer")
+                if order == 0:
+                    continue
+                if order < 0:
+                    raise ValueError("published penalty order must not be negative")
+                entries.append(
+                    CurrentPenaltyHierarchyEntry(
+                        official_fpl_element_id=player.id,
+                        official_fpl_team_id=player.team,
+                        penalties_order=order,
+                    )
+                )
+        ordered = tuple(
+            sorted(
+                entries,
+                key=lambda item: (
+                    item.official_fpl_team_id,
+                    item.penalties_order,
+                    item.official_fpl_element_id,
+                ),
+            )
+        )
+        if {item.official_fpl_team_id for item in ordered} != team_ids:
+            raise ValueError(
+                "published penalty hierarchy does not cover the current team catalogue"
+            )
+        provisional = CurrentPenaltyHierarchy.model_construct(
+            observed_at=observed_at,
+            information_cutoff=information_cutoff,
+            source_bootstrap_payload_sha256=source_bootstrap_payload_sha256,
+            entries=ordered,
+            semantic_sha256="0" * 64,
+        )
+        sealed = provisional.model_copy(
+            update={"semantic_sha256": current_penalty_hierarchy_sha256(provisional)}
+        )
+        return CurrentPenaltyHierarchy.model_validate(sealed.model_dump(mode="python"))
+    except (ValidationError, ValueError):
+        raise IngestionError(
+            "VALIDATION_FAILED", "official FPL current penalty hierarchy failed validation"
+        ) from None
+
+
 class DirectFplSnapshot(_ProviderModel):
     captured_at: datetime
     target_gameweek: PositiveInt
@@ -116,6 +263,7 @@ class DirectFplSnapshot(_ProviderModel):
     live_by_gameweek: dict[int, DirectEventLive]
     request_count: PositiveInt
     endpoint_classes: tuple[str, ...]
+    current_penalty_hierarchy: CurrentPenaltyHierarchy | None = None
 
     @field_validator("captured_at")
     @classmethod
@@ -193,12 +341,9 @@ def parse_direct_event_live(body: bytes) -> DirectEventLive:
 
 
 def _target_gameweek(
-    bootstrap_body: bytes, *, captured_at: datetime
+    bootstrap: BootstrapPayload, *, captured_at: datetime
 ) -> tuple[int, tuple[int, ...]]:
-    parsed = parse_fpl_payload(FplResource.BOOTSTRAP, bootstrap_body)
-    if not isinstance(parsed.payload, BootstrapPayload):
-        raise IngestionError("INTERNAL_INVARIANT", "official FPL bootstrap type is invalid")
-    events = parsed.payload.events
+    events = bootstrap.events
     next_events = tuple(item for item in events if item.is_next is True)
     current_events = tuple(item for item in events if item.is_current is True)
     if len(next_events) > 1 or len(current_events) > 1:
@@ -242,7 +387,18 @@ def acquire_direct_fpl_snapshot(
     observed_at = observed_at.astimezone(UTC)
     if observed_at > information_cutoff:
         raise IngestionError("POST_CUTOFF", "official FPL response arrived after the cutoff")
-    target_gameweek, live_gameweeks = _target_gameweek(bootstrap, captured_at=observed_at)
+    parsed_bootstrap = parse_fpl_payload(FplResource.BOOTSTRAP, bootstrap)
+    if not isinstance(parsed_bootstrap.payload, BootstrapPayload):
+        raise IngestionError("INTERNAL_INVARIANT", "official FPL bootstrap type is invalid")
+    target_gameweek, live_gameweeks = _target_gameweek(
+        parsed_bootstrap.payload, captured_at=observed_at
+    )
+    penalty_hierarchy = build_current_penalty_hierarchy(
+        parsed_bootstrap.payload,
+        observed_at=observed_at,
+        information_cutoff=information_cutoff,
+        source_bootstrap_payload_sha256=parsed_bootstrap.payload_sha256,
+    )
     fixtures = client.fetch(DirectFplResource.FIXTURES)
     fpl_input = CurrentFplInputService(clock=active_clock).compile_direct(
         CurrentFplDirectInputRequest(
@@ -256,7 +412,12 @@ def acquire_direct_fpl_snapshot(
         bootstrap_body=bootstrap,
         fixtures_body=fixtures,
     )
-    del bootstrap, fixtures
+    if (
+        penalty_hierarchy.source_bootstrap_payload_sha256
+        != fpl_input.provenance.bootstrap_payload_sha256
+    ):
+        raise IngestionError("INTERNAL_INVARIANT", "official FPL bootstrap hashes differ")
+    del bootstrap, fixtures, parsed_bootstrap
     entry = parse_direct_entry(client.fetch(DirectFplResource.ENTRY, entry_id=entry_id))
     if entry.id != entry_id:
         raise IngestionError("MAPPING_CONFLICT", "official FPL entry identity differs")
@@ -288,10 +449,13 @@ def acquire_direct_fpl_snapshot(
         live_by_gameweek=live,
         request_count=client.request_count,
         endpoint_classes=tuple(item.value for item in client.endpoint_classes),
+        current_penalty_hierarchy=penalty_hierarchy,
     )
 
 
 __all__ = [
+    "CurrentPenaltyHierarchy",
+    "CurrentPenaltyHierarchyEntry",
     "DirectEntry",
     "DirectEntryHistory",
     "DirectEntryHistoryRow",
@@ -302,6 +466,8 @@ __all__ = [
     "DirectPublicPicks",
     "DirectTransfer",
     "acquire_direct_fpl_snapshot",
+    "build_current_penalty_hierarchy",
+    "current_penalty_hierarchy_sha256",
     "parse_direct_entry",
     "parse_direct_event_live",
     "parse_direct_history",

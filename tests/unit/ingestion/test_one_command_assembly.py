@@ -150,6 +150,41 @@ def test_direct_auxiliary_payloads_are_strict_and_missing_live_is_not_zero() -> 
 
     with pytest.raises(IngestionError):
         parse_direct_entry(b'{"id":42,"id":43,"started_event":1}')
+    with pytest.raises(IngestionError):
+        parse_direct_entry(b'{"id":NaN,"started_event":1}')
+    with pytest.raises(IngestionError):
+        parse_direct_history(
+            b'{"current":[{"event":2,"points":0,"total_points":0,"bank":0,"value":1,'
+            b'"event_transfers":0,"event_transfers_cost":0},{"event":1,"points":0,'
+            b'"total_points":0,"bank":0,"value":1,"event_transfers":0,'
+            b'"event_transfers_cost":0}]}'
+        )
+    with pytest.raises(IngestionError):
+        parse_direct_transfers(b"{}")
+    duplicate_transfer = (
+        b'{"element_in":2,"element_in_cost":55,"element_out":1,"element_out_cost":50,'
+        b'"event":2,"time":"2026-08-24T10:00:00Z"}'
+    )
+    with pytest.raises(IngestionError):
+        parse_direct_transfers(b"[" + duplicate_transfer + b"," + duplicate_transfer + b"]")
+    with pytest.raises(IngestionError):
+        parse_direct_transfers(
+            b'[{"element_in":2,"element_in_cost":55,"element_out":1,'
+            b'"element_out_cost":50,"event":2,"time":"2026-08-24T10:00:00"}]'
+        )
+    with pytest.raises(IngestionError):
+        parse_direct_public_picks(
+            json.dumps(
+                {
+                    "picks": [
+                        {"element": index, "position": index, "multiplier": 0}
+                        for index in range(1, 15)
+                    ]
+                }
+            ).encode()
+        )
+    with pytest.raises(IngestionError):
+        parse_direct_event_live(b'{"elements":[{"id":1,"stats":{}},{"id":1,"stats":{}}]}')
 
 
 def test_direct_snapshot_resolves_target_and_auth_state_without_previous_pick_substitution(
@@ -157,9 +192,17 @@ def test_direct_snapshot_resolves_target_and_auth_state_without_previous_pick_su
 ) -> None:
     _, _, _, current_team = _context(repository_root)
     marker = "synthetic-token"
+    bootstrap = _synthetic_bootstrap(repository_root)
+    seen_teams: set[int] = set()
+    for player in bootstrap["elements"]:
+        team_id = int(player["team"])
+        if team_id not in seen_teams:
+            player["penalties_order"] = 1
+            player["penalties_text"] = ""
+            seen_teams.add(team_id)
     transport = _DirectResponses(
         (
-            json.dumps(_synthetic_bootstrap(repository_root)).encode(),
+            json.dumps(bootstrap).encode(),
             json.dumps(_synthetic_fixtures(repository_root)).encode(),
             b'{"id":42,"started_event":1,"summary_overall_points":0}',
             b'{"current":[]}',
@@ -185,6 +228,12 @@ def test_direct_snapshot_resolves_target_and_auth_state_without_previous_pick_su
     )
     assert snapshot.request_count == 6
     assert transport.calls[-1].path == "/api/my-team/42/"
+    assert snapshot.current_penalty_hierarchy is not None
+    assert len(snapshot.current_penalty_hierarchy.entries) == len(bootstrap["teams"])
+    assert (
+        snapshot.current_penalty_hierarchy.source_bootstrap_payload_sha256
+        == snapshot.fpl_input.provenance.bootstrap_payload_sha256
+    )
 
 
 def test_provider_observed_unified_state_and_transient_market_identity_are_accepted(

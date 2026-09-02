@@ -1,0 +1,41 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001G"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Current penalty hierarchy and market-weight canonicalisation"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001G"
+required_base_commit: "90f6f8fede041fd4a7d616c88053d8103700fa64"
+parent_exact_sha_ci: 33576178723
+objective: >-
+  Canonicalise confidence-scaled public totals weights to exactly twelve decimal places and bind
+  the official current FPL penalty-order hierarchy into private execution and both Stage-9 penalty
+  routes, preserving the governed historical donor only as an explicit event-time fallback.
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A6-normalisation"
+  - "A9-points"
+  - "A11-decision-bundle"
+  - "A12-ops-assurance"
+in_scope:
+  - "Exact-Decimal twelve-place totals pair-weight production with deterministic residual allocation."
+  - "Memory-only official-FPL bootstrap penalty-order extraction and hash-bound provenance."
+  - "Event-time ordinal penalty-taker resolution for scored and unconverted penalty attempts."
+  - "Sealed private execution binding, truthful limitations and safe one-command progression."
+permissions:
+  official_fpl_network: "operator_initiated_existing_one_command_get_only"
+  official_odds_network: "operator_initiated_existing_one_command_get_only"
+  authentication_or_credentials: "existing_environment_only"
+  raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Ordinal-to-probability conversion or penalty-probability calibration."
+  - "Name, club, price, ownership, position, xP or ordinary goal-share penalty fallback."
+  - "Additional provider requests, persistence, database writes or raw-body retention."
+  - "Later Stage-9, optimiser, captaincy or recommendation blocker fixes."
+  - "PR, merge, tag or production activation."
+required_execution_status: "REAL_PRIVATE_TRANSIENT_RECOMMENDATION_OR_EXACT_NEXT_BLOCKER"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

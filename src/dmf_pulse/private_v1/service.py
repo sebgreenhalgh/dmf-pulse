@@ -44,6 +44,7 @@ from dmf_pulse.fpl_points.models import (
     FixtureSimulationRequest,
     GameweekProjectionResult,
     GameweekScenarioSet,
+    PenaltyTakerHierarchyEntry,
     PlayerPosition,
     SimulationStatus,
 )
@@ -139,6 +140,20 @@ def _stage7_input_sha256(
         if isinstance(value, CurrentModelFixtureMinutesInput)
         else manual_fixture_input_sha256(value)
     )
+
+
+def _penalty_role_limitations(
+    execution: PrivateV1ExecutionInput,
+    fixture_results: tuple[FixtureProjectionResult, ...],
+) -> tuple[str, ...]:
+    limitations: set[str] = set()
+    if execution.current_penalty_hierarchy is not None:
+        limitations.add("CURRENT_FPL_PENALTY_HIERARCHY_DETERMINISTIC_V1")
+    if any(
+        "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" in result.warnings for result in fixture_results
+    ):
+        limitations.add("HISTORICAL_PENALTY_ROLE_FALLBACK_USED")
+    return tuple(sorted(limitations))
 
 
 @dataclass(frozen=True)
@@ -565,6 +580,31 @@ def _project_fixtures(
                 exc.code, "current player allocation prior is unavailable"
             ) from None
         binding_hashes[fixture_id] = binding_sha256
+        penalty_hierarchy: tuple[PenaltyTakerHierarchyEntry, ...] = ()
+        if value.current_penalty_hierarchy is not None:
+            hierarchy_entries: list[PenaltyTakerHierarchyEntry] = []
+            for entry in value.current_penalty_hierarchy.entries:
+                if entry.official_fpl_team_id not in source_team_map:
+                    continue
+                player_id = source_player_map.get(entry.official_fpl_element_id)
+                if player_id is None:
+                    raise PrivateV1Error(
+                        "PENALTY_HIERARCHY_MAPPING_MISMATCH",
+                        "current penalty hierarchy differs from the fixture player universe",
+                    )
+                hierarchy_entries.append(
+                    PenaltyTakerHierarchyEntry(
+                        player_id=player_id,
+                        team_id=source_team_map[entry.official_fpl_team_id],
+                        order=entry.penalties_order,
+                    )
+                )
+            penalty_hierarchy = tuple(
+                sorted(
+                    hierarchy_entries,
+                    key=lambda item: (item.team_id, item.order, item.player_id),
+                )
+            )
         request = FixtureSimulationRequest(
             schema_version="fpl-points-fixture-request-v1",
             gameweek_id=gameweek_id,
@@ -576,6 +616,7 @@ def _project_fixtures(
             score_distribution=distribution,
             participation_scenarios=participation,
             allocation_profiles=profiles,
+            penalty_taker_hierarchy=penalty_hierarchy,
             player_prior_identity=prior_identity,
             allocation_config=value.event_allocation_config,
             expected_ruleset_id=engine.identity.ruleset_id,
@@ -1091,6 +1132,7 @@ class PrivateV1RecommendationService:
             raise PrivateV1Error(
                 "STAGE9_MC_QUALITY_BLOCKED", "Stage-9 Monte Carlo quality gate did not pass"
             )
+        penalty_role_limitations = _penalty_role_limitations(execution, fixture_results)
         request, tactical, candidates = _stage11_request(execution, gameweek)
         optimiser = optimise_multi_gameweek(request, evaluator=tactical)
         if (
@@ -1185,6 +1227,7 @@ class PrivateV1RecommendationService:
                     "NOT_PRODUCTION_ACTIVE",
                     "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE",
                     "EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE",
+                    *penalty_role_limitations,
                     *(
                         (
                             "CURRENT_GW_USE_NOT_COVERED_BY_HISTORICAL_GW1_ACCEPTANCE",

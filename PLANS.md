@@ -1,5 +1,29 @@
 # DMF Pulse execution plans
 
+# PRIVATE-V1-ONE-COMMAND-001G current penalty hierarchy and market-weight canonicalisation
+
+- Parent/branch: immutable accepted parent `90f6f8fede041fd4a7d616c88053d8103700fa64`
+  on `readiness/PRIVATE-V1-ONE-COMMAND-001G`; successful exact-parent CI `33576178723`.
+- Scope: retain exact current totals mathematics while restoring the public 12-decimal weight
+  contract; extract the official current FPL penalty order from the already-fetched bootstrap;
+  bind it into private execution identity; and resolve both scored and unconverted penalties by
+  event-time ordinal hierarchy before the governed historical donor fallback.
+- Safety: the hierarchy is deterministic role evidence, not a calibrated probability; raw FPL
+  response bytes and credentials remain transient; no extra provider request, persistence, name,
+  price, ownership, position, goal-share or hard-coded club fallback is permitted.
+
+## PRIVATE-V1-ONE-COMMAND-001G checkpoints
+
+- [x] Verify the immutable parent, successful exact-SHA CI, isolated worktree, authority manifest,
+  relevant DMFP-08/09 event-time hierarchy rules, and the two live-proven defect paths.
+- [ ] Add RED producer-scale, payload-contract, Stage-9 hierarchy and execution-identity tests.
+- [ ] Implement the smallest exact-Decimal producer fix and hash-bound transient hierarchy slice.
+- [ ] Pass focused then affected tests, coverage, Ruff, strict mypy, frozen sync, build/wheel,
+  repository validation and secret scan.
+- [ ] Attempt the safe literal one-command retry when existing runtime credentials are available;
+  record only bounded counts, hashes and the exact next blocker or successful recommendation.
+- [ ] Seal evidence, commit and push the isolated branch, then require exact final-SHA CI success.
+
 # PRIVATE-V1-ONE-COMMAND-001A direct private recommendation
 
 - Parent/branch: immutable accepted parent `ba87691c559559757e7cb06f06269a85706268a8`
@@ -1667,3 +1691,28 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Check the safe live boundary without reading secrets; record the absent Odds key, bearer and
   runtime entry ID as the exact blocker to a bounded HTTP 200 and literal-command progression.
 - [ ] Seal evidence, push the final SHA, and require exact-SHA CI green.
+
+# PRIVATE-V1-ONE-COMMAND-001G current penalty hierarchy and market weights
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001G`; immutable parent
+  `90f6f8fede041fd4a7d616c88053d8103700fa64`; parent exact-SHA CI `33576178723`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001G`.
+- Scope: canonicalize confidence-scaled public totals weights to exact twelve-place Decimal pairs;
+  extract the provider-published current penalty order from the already-fetched bootstrap; bind it
+  to private execution and both Stage-9 penalty paths with the governed donor as an explicit
+  event-time fallback only.
+- Safety: no new request, persistence, raw-body retention, ordinal probability model, unrelated
+  goal allocation, optimiser, captaincy, PR, merge, tag or activation change.
+
+## Hotfix checkpoints
+
+- [x] Verify the exact parent/CI, isolate the branch and resolve A4/A6/A9/A11/A12 authority.
+- [x] Add RED exact-pair, bootstrap-contract, Stage-9 event-time and private-binding regressions.
+- [x] Implement the smallest exact-Decimal and current-hierarchy vertical with fail-closed replay
+  coverage and truthful limitation disclosure.
+- [x] Pass focused, affected, contract, property, assurance, PostgreSQL, performance, branch
+  coverage, Ruff, strict mypy, frozen sync, build, installed-wheel and secret gates.
+- [x] Check the safe live boundary without reading secrets; record the absent Odds key, bearer and
+  runtime entry ID as the exact blocker to a literal private command retry.
+- [ ] Seal manifests/evidence, push the final SHA, require exact-SHA CI green and stop without PR,
+  merge, tag, activation or post-CI mutation.

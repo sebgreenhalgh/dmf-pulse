@@ -121,6 +121,7 @@ def generate_fixture_scenarios(
             cell=cell,
             participation=participation,
             profiles=request.allocation_profiles,
+            penalty_taker_hierarchy=request.penalty_taker_hierarchy,
             config=request.allocation_config,
             ruleset=identity,
             projection_mode=request.projection_mode,

@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -15,9 +16,15 @@ from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.service import (
     PrivateV1RecommendationService,
     _exact_root_action_upper_bound,
+    _penalty_role_limitations,
 )
 
 from .e2e_test_support import build_execution_input
+from .test_input_coherence import (
+    _complete_penalty_entries,
+    _penalty_hierarchy,
+    _replace,
+)
 
 
 def test_exact_root_bound_covers_full_current_scale_candidate_universe() -> None:
@@ -28,6 +35,34 @@ def test_exact_root_bound_covers_full_current_scale_candidate_universe() -> None
             maximum_transfers=1,
         )
         == 9211
+    )
+
+
+def test_current_penalty_hierarchy_limitation_is_disclosed_without_false_fallback(
+    repository_root: Path, tmp_path: Path
+) -> None:
+    execution = build_execution_input(repository_root, tmp_path / "penalty-hierarchy")
+    hierarchy = _penalty_hierarchy(
+        execution,
+        _complete_penalty_entries(execution),
+    )
+
+    result = PrivateV1RecommendationService().run(
+        _replace(execution, current_penalty_hierarchy=hierarchy)
+    )
+
+    assert "CURRENT_FPL_PENALTY_HIERARCHY_DETERMINISTIC_V1" in result.decision.warnings
+    assert "CURRENT_FPL_PENALTY_HIERARCHY_DETERMINISTIC_V1" in result.report
+    assert "HISTORICAL_PENALTY_ROLE_FALLBACK_USED" not in result.decision.warnings
+
+
+def test_actual_historical_penalty_role_fallback_is_disclosed() -> None:
+    execution = SimpleNamespace(current_penalty_hierarchy=object())
+    fixture = SimpleNamespace(warnings=("HISTORICAL_PENALTY_ROLE_FALLBACK_USED",))
+
+    assert _penalty_role_limitations(execution, (fixture,)) == (
+        "CURRENT_FPL_PENALTY_HIERARCHY_DETERMINISTIC_V1",
+        "HISTORICAL_PENALTY_ROLE_FALLBACK_USED",
     )
 
 

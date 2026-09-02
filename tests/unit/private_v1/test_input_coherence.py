@@ -13,6 +13,11 @@ from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.fpl_points.models import ProjectionMode
 from dmf_pulse.fpl_points.player_prior import load_packaged_player_prior
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.ingestion.fpl.direct_payloads import (
+    CurrentPenaltyHierarchy,
+    CurrentPenaltyHierarchyEntry,
+    current_penalty_hierarchy_sha256,
+)
 from dmf_pulse.markets.current import CurrentMarketConstraintError, CurrentMarketReadiness
 from dmf_pulse.private_v1 import artifacts, service
 from dmf_pulse.private_v1.errors import PrivateV1Error
@@ -35,6 +40,7 @@ from dmf_pulse.private_v1.service import (
     PrivateV1RecommendationService,
     _fixture_authority,
     _participation_scenarios,
+    _project_fixtures,
     _verify_current_sources,
     _verify_runtime_artifacts,
 )
@@ -62,6 +68,146 @@ def _ownership(value: PrivateV1ExecutionInput, **updates: Any) -> PrivateCurrent
     fields.update(updates)
     fields["semantic_sha256"] = "0" * 64
     return seal_current_ownership(PrivateCurrentOwnership.model_construct(**fields))
+
+
+def _penalty_hierarchy(
+    value: PrivateV1ExecutionInput,
+    entries: tuple[CurrentPenaltyHierarchyEntry, ...],
+    *,
+    source_sha256: str | None = None,
+) -> CurrentPenaltyHierarchy:
+    provisional = CurrentPenaltyHierarchy.model_construct(
+        observed_at=value.current_state.information_cutoff,
+        information_cutoff=value.current_state.information_cutoff,
+        source_bootstrap_payload_sha256=(
+            source_sha256 or value.current_state.fpl_input.provenance.bootstrap_payload_sha256
+        ),
+        entries=tuple(
+            sorted(
+                entries,
+                key=lambda item: (
+                    item.official_fpl_team_id,
+                    item.penalties_order,
+                    item.official_fpl_element_id,
+                ),
+            )
+        ),
+        semantic_sha256="0" * 64,
+    )
+    payload = provisional.model_copy(
+        update={"semantic_sha256": current_penalty_hierarchy_sha256(provisional)}
+    )
+    return CurrentPenaltyHierarchy.model_validate(payload.model_dump(mode="python"))
+
+
+def _complete_penalty_entries(
+    value: PrivateV1ExecutionInput,
+) -> tuple[CurrentPenaltyHierarchyEntry, ...]:
+    first_player_by_team: dict[int, PrivateCanonicalPlayerIdentity] = {}
+    for player in sorted(
+        value.player_identity_map.players,
+        key=lambda item: item.official_fpl_element_id,
+    ):
+        first_player_by_team.setdefault(player.official_fpl_team_id, player)
+    current_team_ids = {item.provider_team_id for item in value.current_state.fpl_input.teams}
+    assert set(first_player_by_team) == current_team_ids
+    return tuple(
+        CurrentPenaltyHierarchyEntry(
+            official_fpl_element_id=first_player_by_team[team_id].official_fpl_element_id,
+            official_fpl_team_id=team_id,
+            penalties_order=1,
+        )
+        for team_id in sorted(current_team_ids)
+    )
+
+
+def test_penalty_hierarchy_changes_execution_identity_and_rejects_mapping_tampering(
+    execution: PrivateV1ExecutionInput,
+) -> None:
+    by_team: dict[int, list[PrivateCanonicalPlayerIdentity]] = {}
+    for player in execution.player_identity_map.players:
+        by_team.setdefault(player.official_fpl_team_id, []).append(player)
+    team_id, players = next(
+        (team, sorted(rows, key=lambda item: item.official_fpl_element_id))
+        for team, rows in sorted(by_team.items())
+        if len(rows) >= 2
+    )
+    first, second = players[:2]
+    complete = _complete_penalty_entries(execution)
+    other_teams = tuple(entry for entry in complete if entry.official_fpl_team_id != team_id)
+    base = _penalty_hierarchy(
+        execution,
+        (
+            *other_teams,
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=first.official_fpl_element_id,
+                official_fpl_team_id=team_id,
+                penalties_order=1,
+            ),
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=second.official_fpl_element_id,
+                official_fpl_team_id=team_id,
+                penalties_order=2,
+            ),
+        ),
+    )
+    swapped = _penalty_hierarchy(
+        execution,
+        (
+            *other_teams,
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=second.official_fpl_element_id,
+                official_fpl_team_id=team_id,
+                penalties_order=1,
+            ),
+            CurrentPenaltyHierarchyEntry(
+                official_fpl_element_id=first.official_fpl_element_id,
+                official_fpl_team_id=team_id,
+                penalties_order=2,
+            ),
+        ),
+    )
+
+    bound = _replace(execution, current_penalty_hierarchy=base)
+    changed = _replace(execution, current_penalty_hierarchy=swapped)
+    assert bound.semantic_sha256 != execution.semantic_sha256
+    assert changed.semantic_sha256 != bound.semantic_sha256
+    fixture_results, *_rest = _project_fixtures(bound, load_packaged_player_prior())
+    stage9_entries = tuple(
+        item
+        for result in fixture_results
+        for item in result.simulation_request.penalty_taker_hierarchy
+    )
+    assert len(stage9_entries) == len(base.entries)
+    assert {item.order for item in stage9_entries} == {1, 2}
+    stage9_profile_ids = {
+        profile.player_id
+        for result in fixture_results
+        for profile in result.simulation_request.allocation_profiles
+    }
+    assert {item.player_id for item in stage9_entries} <= stage9_profile_ids
+
+    wrong_team = next(team for team in sorted(by_team) if team != team_id)
+    tampered_entries = tuple(
+        entry.model_copy(update={"official_fpl_team_id": wrong_team})
+        if entry.official_fpl_element_id == second.official_fpl_element_id
+        else entry
+        for entry in base.entries
+    )
+    tampered = _penalty_hierarchy(
+        execution,
+        tampered_entries,
+    )
+    with pytest.raises(ValidationError, match="player/team mapping differs"):
+        _replace(execution, current_penalty_hierarchy=tampered)
+
+    wrong_source = _penalty_hierarchy(execution, base.entries, source_sha256="f" * 64)
+    with pytest.raises(ValidationError, match="source binding differs"):
+        _replace(execution, current_penalty_hierarchy=wrong_source)
+
+    incomplete = _penalty_hierarchy(execution, base.entries[:-1])
+    with pytest.raises(ValidationError, match="team coverage differs"):
+        _replace(execution, current_penalty_hierarchy=incomplete)
 
 
 def test_wrong_target_gameweek_and_mixed_cutoff_fail(execution: PrivateV1ExecutionInput) -> None:

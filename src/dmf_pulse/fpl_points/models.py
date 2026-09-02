@@ -361,6 +361,14 @@ class PlayerAllocationProfile(PointsModel):
     bps_auxiliary: BpsAuxiliaryRates
 
 
+class PenaltyTakerHierarchyEntry(PointsModel):
+    """Current ordinal role evidence; ``order`` is never a probability weight."""
+
+    player_id: str
+    team_id: str
+    order: Annotated[StrictInt, Field(gt=0)]
+
+
 class EventAllocationConfig(PointsModel):
     model_version_id: str
     source_tag: Literal["TEMP-EVT-002", "TEST_SYNTHETIC"]
@@ -448,6 +456,7 @@ class FixtureSimulationRequest(PointsModel):
     score_distribution: JointScoreDistribution
     participation_scenarios: tuple[ParticipationScenario, ...]
     allocation_profiles: tuple[PlayerAllocationProfile, ...]
+    penalty_taker_hierarchy: tuple[PenaltyTakerHierarchyEntry, ...] = ()
     player_prior_identity: PlayerPriorIdentity | None = None
     allocation_config: EventAllocationConfig
     expected_ruleset_id: str
@@ -513,6 +522,27 @@ class FixtureSimulationRequest(PointsModel):
             for participant in scenario.participants:
                 if profile_map[participant.player_id].team_id != participant.team_id:
                     raise ValueError("allocation profile team identity mismatch")
+        hierarchy_player_ids = tuple(item.player_id for item in self.penalty_taker_hierarchy)
+        hierarchy_team_orders = tuple(
+            (item.team_id, item.order) for item in self.penalty_taker_hierarchy
+        )
+        if len(hierarchy_player_ids) != len(set(hierarchy_player_ids)):
+            raise ValueError("penalty hierarchy player IDs must be unique")
+        if len(hierarchy_team_orders) != len(set(hierarchy_team_orders)):
+            raise ValueError("penalty hierarchy team and order must be unique")
+        if self.penalty_taker_hierarchy != tuple(
+            sorted(
+                self.penalty_taker_hierarchy,
+                key=lambda item: (item.team_id, item.order, item.player_id),
+            )
+        ):
+            raise ValueError("penalty hierarchy must be canonically sorted")
+        for entry in self.penalty_taker_hierarchy:
+            profile = profile_map.get(entry.player_id)
+            if profile is None:
+                raise ValueError("penalty hierarchy player is outside allocation profile universe")
+            if profile.team_id != entry.team_id:
+                raise ValueError("penalty hierarchy team identity mismatch")
         if self.player_prior_identity is not None:
             prior_cutoff = _parse_utc(
                 self.player_prior_identity.information_cutoff_utc,

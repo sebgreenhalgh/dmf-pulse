@@ -143,6 +143,8 @@ def _provider_sources(repository_root: Path) -> tuple[tuple[bytes, ...], bytes]:
                     "removed": False,
                     "starts": 1 if offset <= 11 else 0,
                     "minutes": 90 if offset <= 11 else 0,
+                    "penalties_order": 1 if offset == 1 else 0,
+                    "penalties_text": "",
                 }
             )
             players.append(player)
