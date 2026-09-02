@@ -399,7 +399,12 @@ class PrivateV1OneCommandService:
                 completed="Stage-7 minutes ready",
                 failed="Stage-7 minutes",
             ):
-                model_minutes = build_automatic_model_minutes(snapshot, player_map, market_view)
+                model_minutes = build_automatic_model_minutes(
+                    snapshot,
+                    player_map,
+                    market_view,
+                    progress=self._progress,
+                )
             ownership = build_automatic_ownership(snapshot, manager)
             candidates = build_full_candidate_policy(snapshot, manager)
             with self._progress.stage(

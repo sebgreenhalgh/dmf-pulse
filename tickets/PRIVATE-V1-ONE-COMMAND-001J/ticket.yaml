@@ -1,0 +1,41 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001J"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Current Stage-7 live roster capacity and granular progress"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001J"
+required_base_commit: "88e1bd8779abe125fed4c0387b14e4247aaad15f"
+objective: >-
+  Preserve the exact provider-mapped current club roster in every Stage-7 scenario without
+  widening the manual transient boundary, and expose truthful fixture/team progress with distinct
+  predictor and scenario-adaptation failures.
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A7-minutes"
+  - "A12-ops-assurance"
+in_scope:
+  - "Current-model-specific weighted scenarios over the exact provider-mapped club roster."
+  - "Full-roster semantic hashes, including every zero-minute OUT identity."
+  - "All-256 live-shape roster coherence and deterministic 990-minute reconciliation."
+  - "Fixture/home/away/reconciliation Stage-7 progress on STDERR."
+  - "Typed distinction between predictor blocks and scenario adaptation/reconciliation failures."
+  - "Safe literal live retry or exact runtime-input blocker."
+permissions:
+  official_fpl_network: "operator_initiated_existing_one_command_get_only"
+  official_odds_network: "operator_initiated_existing_one_command_get_only"
+  authentication_or_credentials: "existing_environment_only"
+  raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Widening the operator-authored manual transient roster bound above 40."
+  - "Player pruning or an invented current-roster cap."
+  - "Stage-7 model, artifact, PMF, reconciliation-objective or performance changes."
+  - "Stage-8, Stage-9, penalty, optimiser, captaincy, chip or transport changes."
+  - "Credential, runtime entry, provider body, player identity or private hash disclosure."
+  - "Persistence, PR, merge, tag or production activation."
+required_execution_status: "REAL_PRIVATE_TRANSIENT_RECOMMENDATION_OR_EXACT_NEXT_BLOCKER"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

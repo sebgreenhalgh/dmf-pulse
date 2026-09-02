@@ -13,11 +13,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_sha256
-from dmf_pulse.availability.manual_override import (
-    MANUAL_SAMPLE_COUNT,
-    ManualScenarioPlayer,
-    ManualWeightedScenario,
-)
+from dmf_pulse.availability.manual_override import ManualScenarioPlayer
 from dmf_pulse.availability.models import format_utc, parse_utc
 from dmf_pulse.availability.projection import MinutesPredictionResult, TeamMinutesProjection
 from dmf_pulse.availability.resources import availability_resource_json
@@ -26,6 +22,7 @@ CURRENT_MODEL_FAMILY: Literal["REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"] = (
     "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"
 )
 CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_WARNING = "CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_V1"
+CURRENT_MODEL_SAMPLE_COUNT: Literal[256] = 256
 _CURRENT_TEAM_PATH_POLICY_RESOURCE = "current_team_path_policy_2026_27.json"
 
 
@@ -43,6 +40,38 @@ def _uuid(value: object, *, label: str) -> str:
     if checked != value:
         raise ValueError(f"{label} must be a canonical UUID string")
     return checked
+
+
+class CurrentModelWeightedScenario(_FrozenModel):
+    """One internal current-model sample over the exact provider-mapped club roster."""
+
+    scenario_id: str = Field(pattern=r"^[A-Z0-9][A-Z0-9_-]{0,63}$")
+    count: Annotated[int, Field(ge=1, le=CURRENT_MODEL_SAMPLE_COUNT)]
+    players: Annotated[tuple[ManualScenarioPlayer, ...], Field(min_length=20)]
+
+    @model_validator(mode="before")
+    @classmethod
+    def coerce_players(cls, value: object) -> object:
+        if not isinstance(value, Mapping):
+            return value
+        body = dict(value)
+        if isinstance(body.get("players"), list):
+            body["players"] = tuple(body["players"])
+        return body
+
+    @model_validator(mode="after")
+    def validate_scenario(self) -> Self:
+        ids = [player.player_id for player in self.players]
+        if ids != sorted(ids):
+            raise ValueError("scenario players must be sorted by canonical player_id")
+        if len(ids) != len(set(ids)):
+            raise ValueError("scenario contains a duplicate player")
+        starters = tuple(player for player in self.players if player.role == "START")
+        if len(starters) != 11:
+            raise ValueError("scenario must contain exactly 11 START players")
+        if sum(player.position == "GK" for player in starters) != 1:
+            raise ValueError("scenario must contain exactly one starting GK")
+        return self
 
 
 class CurrentTeamPathPolicy(_FrozenModel):
@@ -126,7 +155,9 @@ def current_team_minute_reconciliation_sha256(
     return canonical_sha256(value.model_dump(mode="json", exclude={"semantic_sha256"}))
 
 
-def _scenario_minutes_sha256(value: ManualWeightedScenario) -> str:
+def current_model_scenario_minutes_sha256(value: CurrentModelWeightedScenario) -> str:
+    """Hash every represented player, including zero-minute OUT identities."""
+
     return canonical_sha256(
         {
             "scenario_id": value.scenario_id,
@@ -144,7 +175,7 @@ def _scenario_minutes_sha256(value: ManualWeightedScenario) -> str:
 
 
 def validate_current_team_path(
-    scenario: ManualWeightedScenario,
+    scenario: CurrentModelWeightedScenario,
     policy: CurrentTeamPathPolicy | None = None,
 ) -> None:
     """Reject a vector that cannot describe one continuous legal 90-minute team path."""
@@ -197,9 +228,9 @@ def _best_pair_time(starter_target: int, bench_target: int) -> tuple[int, int]:
 
 
 def reconcile_current_team_scenario(
-    scenario: ManualWeightedScenario,
+    scenario: CurrentModelWeightedScenario,
     policy: CurrentTeamPathPolicy | None = None,
-) -> tuple[ManualWeightedScenario, CurrentTeamMinuteReconciliation]:
+) -> tuple[CurrentModelWeightedScenario, CurrentTeamMinuteReconciliation]:
     """Find the deterministic minimum-L1 legal team path nearest independent draws."""
 
     policy = policy or load_current_team_path_policy()
@@ -265,7 +296,7 @@ def reconcile_current_team_scenario(
     for entrant_id, outgoing_id, minute in pairs:
         legal_minutes[outgoing_id] = minute
         legal_minutes[entrant_id] = policy.match_minutes - minute
-    reconciled = ManualWeightedScenario(
+    reconciled = CurrentModelWeightedScenario(
         scenario_id=scenario.scenario_id,
         count=scenario.count,
         players=tuple(
@@ -285,8 +316,8 @@ def reconcile_current_team_scenario(
         "total_absolute_minute_adjustment": baseline_cost + total_delta,
         "maximum_absolute_player_adjustment": max(adjustments, default=0),
         "substitution_count": len(pairs),
-        "original_player_minutes_sha256": _scenario_minutes_sha256(scenario),
-        "reconciled_player_minutes_sha256": _scenario_minutes_sha256(reconciled),
+        "original_player_minutes_sha256": current_model_scenario_minutes_sha256(scenario),
+        "reconciled_player_minutes_sha256": current_model_scenario_minutes_sha256(reconciled),
         "semantic_sha256": "0" * 64,
     }
     provisional = CurrentTeamMinuteReconciliation.model_construct(**cast(Any, body))
@@ -302,7 +333,10 @@ class CurrentModelTeamScenarios(_FrozenModel):
     bench_size: Literal[9] = 9
     bench_goalkeeper_slots: Literal[1] = 1
     team_path_policy: CurrentTeamPathPolicy
-    scenarios: Annotated[tuple[ManualWeightedScenario, ...], Field(min_length=256, max_length=256)]
+    scenarios: Annotated[
+        tuple[CurrentModelWeightedScenario, ...],
+        Field(min_length=CURRENT_MODEL_SAMPLE_COUNT, max_length=CURRENT_MODEL_SAMPLE_COUNT),
+    ]
     reconciliations: Annotated[
         tuple[CurrentTeamMinuteReconciliation, ...],
         Field(min_length=256, max_length=256),
@@ -316,7 +350,7 @@ class CurrentModelTeamScenarios(_FrozenModel):
 
     @model_validator(mode="after")
     def scenario_set_is_exact(self) -> Self:
-        expected_ids = tuple(f"S{index:03d}" for index in range(MANUAL_SAMPLE_COUNT))
+        expected_ids = tuple(f"S{index:03d}" for index in range(CURRENT_MODEL_SAMPLE_COUNT))
         if tuple(item.scenario_id for item in self.scenarios) != expected_ids or any(
             item.count != 1 for item in self.scenarios
         ):
@@ -340,8 +374,8 @@ class CurrentModelTeamScenarios(_FrozenModel):
             raise ValueError("hard-ineligible model player is not OUT in every scenario")
         for scenario, reconciliation in zip(self.scenarios, self.reconciliations, strict=True):
             validate_current_team_path(scenario, self.team_path_policy)
-            if reconciliation.reconciled_player_minutes_sha256 != _scenario_minutes_sha256(
-                scenario
+            if reconciliation.reconciled_player_minutes_sha256 != (
+                current_model_scenario_minutes_sha256(scenario)
             ) or reconciliation.substitution_count != sum(
                 item.role == "BENCH" and item.official_minutes > 0 for item in scenario.players
             ):
@@ -455,7 +489,7 @@ def _team_scenarios(
             raise ValueError("accepted Stage-7 conditional PMF is malformed")
         pmfs[(player_id, role)] = raw_pmf
     policy = load_current_team_path_policy()
-    scenarios: list[ManualWeightedScenario] = []
+    scenarios: list[CurrentModelWeightedScenario] = []
     reconciliations: list[CurrentTeamMinuteReconciliation] = []
     for index, value in enumerate(result.core_scenarios):
         if value.get("scenario_index") != index:
@@ -492,7 +526,7 @@ def _team_scenarios(
                     }
                 )
             )
-        raw_scenario = ManualWeightedScenario(
+        raw_scenario = CurrentModelWeightedScenario(
             scenario_id=f"S{index:03d}",
             count=1,
             players=tuple(sorted(players, key=lambda item: item.player_id)),
@@ -554,13 +588,16 @@ def build_current_model_fixture_minutes(
 
 __all__ = [
     "CURRENT_MODEL_FAMILY",
+    "CURRENT_MODEL_SAMPLE_COUNT",
     "CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_WARNING",
     "CurrentModelFixtureMinutesInput",
     "CurrentModelTeamScenarios",
+    "CurrentModelWeightedScenario",
     "CurrentTeamMinuteReconciliation",
     "CurrentTeamPathPolicy",
     "build_current_model_fixture_minutes",
     "current_model_fixture_sha256",
+    "current_model_scenario_minutes_sha256",
     "current_team_minute_reconciliation_sha256",
     "current_team_path_policy_sha256",
     "load_current_team_path_policy",

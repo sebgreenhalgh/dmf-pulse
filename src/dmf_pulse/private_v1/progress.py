@@ -20,7 +20,7 @@ class ProgressSink(Protocol):
         self,
         *,
         started: str | None,
-        completed: str,
+        completed: str | None,
         failed: str,
         heartbeat: str | None = None,
         long_warning: str | None = None,
@@ -44,7 +44,7 @@ class NullProgress:
         self,
         *,
         started: str | None,
-        completed: str,
+        completed: str | None,
         failed: str,
         heartbeat: str | None = None,
         long_warning: str | None = None,
@@ -117,7 +117,7 @@ class HumanCliProgress:
         self,
         *,
         started: str | None,
-        completed: str,
+        completed: str | None,
         failed: str,
         heartbeat: str | None = None,
         long_warning: str | None = None,
@@ -157,7 +157,8 @@ class HumanCliProgress:
             stopped.set()
             if heartbeat_thread is not None:
                 heartbeat_thread.join()
-            self.message(f"{completed} ({self._elapsed(stage_started):.1f}s)")
+            if completed is not None:
+                self.message(f"{completed} ({self._elapsed(stage_started):.1f}s)")
 
     def finish(self) -> None:
         if self._finished:

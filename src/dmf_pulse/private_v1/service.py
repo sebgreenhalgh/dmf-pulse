@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from fractions import Fraction
@@ -17,6 +18,7 @@ from pydantic import ValidationError
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.availability.current_model import (
     CurrentModelFixtureMinutesInput,
+    CurrentModelWeightedScenario,
     current_model_fixture_sha256,
 )
 from dmf_pulse.availability.manual_override import (
@@ -278,8 +280,8 @@ def _participant_row(
 
 
 def _scenario_map(
-    values: tuple[ManualWeightedScenario, ...],
-) -> dict[str, ManualWeightedScenario]:
+    values: Sequence[ManualWeightedScenario | CurrentModelWeightedScenario],
+) -> dict[str, ManualWeightedScenario | CurrentModelWeightedScenario]:
     return {item.scenario_id: item for item in values}
 
 

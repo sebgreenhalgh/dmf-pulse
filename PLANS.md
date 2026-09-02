@@ -1766,3 +1766,27 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   the real timing output or exact next blocker without retaining private material.
 - [ ] Commit and push one exact implementation SHA, require its automatic CI to pass, and hand off
   without a post-CI commit, PR, merge, tag, or activation.
+
+# PRIVATE-V1-ONE-COMMAND-001J current Stage-7 live roster capacity and granular progress
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001J`; immutable parent
+  `88e1bd8779abe125fed4c0387b14e4247aaad15f`; parent exact-SHA CI `33651419913`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001J` in isolated worktree
+  `review_pack/one-command-j`; unrelated root-worktree changes remain untouched.
+- Scope: represent the exact provider-mapped current club roster in all 256 Stage-7 scenarios,
+  retain every zero-minute OUT identity in semantic hashes, distinguish genuine predictor blocks
+  from scenario adaptation failures, and expose fixture/team Stage-7 progress on STDERR.
+- Safety: preserve the manual transient `<=40` boundary, accepted Stage-7 model/artifacts/PMFs and
+  reconciliation objective, Stage 8/9, penalties, optimisation, captaincy, chips, transports,
+  persistence, PR, merge, tag and activation.
+
+## PRIVATE-V1-ONE-COMMAND-001J checkpoints
+
+- [x] Verify the exact immutable parent, successful parent CI, isolated clean worktree, and
+  A4/A7/A12 authority boundaries.
+- [x] Add RED current-roster, full-roster hash, manual-boundary, structural, progress and typed
+  failure regressions.
+- [x] Implement the smallest current-specific scenario contract and granular Stage-7 reporting.
+- [x] Run focused, affected, branch-coverage, static, build, wheel, governance and security gates.
+- [ ] Commit and push one exact implementation SHA, require exact-SHA CI green, then perform the
+  literal private retry with only existing runtime credentials and record the exact next blocker.

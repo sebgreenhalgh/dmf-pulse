@@ -9,13 +9,16 @@ from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
 import pytest
+from pydantic import ValidationError
 
 from dmf_pulse.availability.current_model import (
     CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_WARNING,
     CurrentModelTeamScenarios,
+    CurrentModelWeightedScenario,
     CurrentTeamMinuteReconciliation,
     CurrentTeamPathPolicy,
     build_current_model_fixture_minutes,
+    current_model_scenario_minutes_sha256,
     current_team_minute_reconciliation_sha256,
     load_current_team_path_policy,
     reconcile_current_team_scenario,
@@ -35,7 +38,7 @@ def _raw_scenario(
     *,
     starter_minutes: dict[str, int] | None = None,
     bench_minutes: dict[str, int] | None = None,
-) -> ManualWeightedScenario:
+) -> CurrentModelWeightedScenario:
     starter_minutes = starter_minutes or {}
     bench_minutes = bench_minutes or {}
     starter_positions = ("GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "FWD", "FWD")
@@ -58,18 +61,18 @@ def _raw_scenario(
         )
         for player_id, position in zip(BENCH_IDS, bench_positions, strict=True)
     )
-    return ManualWeightedScenario(
+    return CurrentModelWeightedScenario(
         scenario_id="S000",
         count=1,
         players=tuple(sorted(players, key=lambda item: item.player_id)),
     )
 
 
-def _minutes(value: ManualWeightedScenario) -> dict[str, int]:
+def _minutes(value: CurrentModelWeightedScenario) -> dict[str, int]:
     return {item.player_id: item.official_minutes for item in value.players}
 
 
-def _on_pitch_count(value: ManualWeightedScenario, minute: int) -> tuple[int, int]:
+def _on_pitch_count(value: CurrentModelWeightedScenario, minute: int) -> tuple[int, int]:
     active = tuple(
         item
         for item in value.players
@@ -81,6 +84,189 @@ def _on_pitch_count(value: ManualWeightedScenario, minute: int) -> tuple[int, in
         )
     )
     return len(active), sum(item.position == "GK" for item in active)
+
+
+def _current_roster_scenario(
+    roster_size: int,
+    *,
+    scenario_index: int = 0,
+) -> CurrentModelWeightedScenario:
+    if roster_size < 20:
+        raise ValueError("current roster test helper requires at least 20 players")
+    players = list(_raw_scenario().players)
+    players.extend(
+        ManualScenarioPlayer(
+            player_id=f"30000000-0000-4000-8000-{index:012d}",
+            position="DEF",
+            role="OUT",
+            official_minutes=0,
+        )
+        for index in range(1, roster_size - 19)
+    )
+    return CurrentModelWeightedScenario(
+        scenario_id=f"S{scenario_index:03d}",
+        count=1,
+        players=tuple(sorted(players, key=lambda item: item.player_id)),
+    )
+
+
+@pytest.fixture(scope="module")
+def live_roster_team() -> CurrentModelTeamScenarios:
+    policy = load_current_team_path_policy()
+    scenarios: list[CurrentModelWeightedScenario] = []
+    reconciliations: list[CurrentTeamMinuteReconciliation] = []
+    for index in range(256):
+        scenario, reconciliation = reconcile_current_team_scenario(
+            _current_roster_scenario(43, scenario_index=index), policy
+        )
+        scenarios.append(scenario)
+        reconciliations.append(reconciliation)
+    return CurrentModelTeamScenarios(
+        team_id=TEAM_ID,
+        team_path_policy=policy,
+        scenarios=tuple(scenarios),
+        reconciliations=tuple(reconciliations),
+        hard_ineligible_player_ids=(scenarios[0].players[-1].player_id,),
+    )
+
+
+@pytest.mark.parametrize("roster_size", (39, 40, 41, 43, 60))
+def test_current_scenario_supports_exact_provider_shaped_roster_around_old_boundary(
+    roster_size: int,
+) -> None:
+    raw = _current_roster_scenario(roster_size)
+    reconciled, metrics = reconcile_current_team_scenario(raw)
+
+    validate_current_team_path(reconciled)
+    assert len(reconciled.players) == roster_size
+    assert {item.player_id for item in reconciled.players} == {
+        item.player_id for item in raw.players
+    }
+    assert sum(item.role == "START" for item in reconciled.players) == 11
+    assert sum(item.role == "BENCH" for item in reconciled.players) == 9
+    assert sum(item.role == "OUT" for item in reconciled.players) == roster_size - 20
+    assert sum(item.official_minutes for item in reconciled.players) == 990
+    assert metrics.reconciled_player_minutes_sha256 == current_model_scenario_minutes_sha256(
+        reconciled
+    )
+
+
+def test_current_scenario_hash_binds_roster_size_and_zero_minute_out_identity() -> None:
+    scenarios = {size: _current_roster_scenario(size) for size in (42, 43, 44)}
+    hashes = {
+        size: current_model_scenario_minutes_sha256(value) for size, value in scenarios.items()
+    }
+    assert len(set(hashes.values())) == 3
+
+    changed_payload = scenarios[43].model_dump(mode="python")
+    changed_payload["players"][-1]["player_id"] = "40000000-0000-4000-8000-000000000001"
+    changed = CurrentModelWeightedScenario.model_validate(changed_payload)
+    assert changed.players[-1].role == "OUT"
+    assert changed.players[-1].official_minutes == 0
+    assert current_model_scenario_minutes_sha256(changed) != hashes[43]
+
+
+def test_manual_transient_scenario_still_rejects_41_players() -> None:
+    payload = _current_roster_scenario(41).model_dump(mode="python")
+    with pytest.raises(ValidationError, match="at most 40 items"):
+        ManualWeightedScenario.model_validate(payload)
+
+
+def test_live_43_player_roster_is_preserved_across_all_256_scenarios(
+    live_roster_team: CurrentModelTeamScenarios,
+) -> None:
+    expected_roster = tuple(
+        (item.player_id, item.position) for item in live_roster_team.scenarios[0].players
+    )
+    assert len(expected_roster) == 43
+    assert tuple(item.scenario_id for item in live_roster_team.scenarios) == tuple(
+        f"S{index:03d}" for index in range(256)
+    )
+    assert all(
+        tuple((item.player_id, item.position) for item in scenario.players) == expected_roster
+        for scenario in live_roster_team.scenarios
+    )
+    assert all(
+        sum(item.role == "START" for item in scenario.players) == 11
+        for scenario in live_roster_team.scenarios
+    )
+    assert all(
+        sum(item.role == "BENCH" for item in scenario.players) == 9
+        for scenario in live_roster_team.scenarios
+    )
+    assert all(
+        sum(item.role == "OUT" for item in scenario.players) == 23
+        for scenario in live_roster_team.scenarios
+    )
+    assert all(
+        sum(item.position == "GK" and item.role == "START" for item in scenario.players) == 1
+        and sum(item.position == "GK" and item.role == "BENCH" for item in scenario.players) == 1
+        and sum(item.official_minutes for item in scenario.players) == 990
+        for scenario in live_roster_team.scenarios
+    )
+    assert all(
+        reconciliation.reconciled_player_minutes_sha256
+        == current_model_scenario_minutes_sha256(scenario)
+        for scenario, reconciliation in zip(
+            live_roster_team.scenarios, live_roster_team.reconciliations, strict=True
+        )
+    )
+
+
+@pytest.mark.parametrize("mutation", ("missing", "extra"))
+def test_current_team_scenarios_reject_missing_or_extra_player_in_one_sample(
+    live_roster_team: CurrentModelTeamScenarios,
+    mutation: str,
+) -> None:
+    payload = live_roster_team.model_dump(mode="python")
+    scenario = payload["scenarios"][1]
+    players = list(scenario["players"])
+    if mutation == "missing":
+        players.pop()
+    else:
+        players.append(
+            {
+                "player_id": "40000000-0000-4000-8000-000000000001",
+                "position": "DEF",
+                "role": "OUT",
+                "official_minutes": 0,
+            }
+        )
+    scenario["players"] = tuple(players)
+    with pytest.raises(ValidationError, match="roster changes across samples"):
+        CurrentModelTeamScenarios.model_validate(payload)
+
+
+def test_current_scenario_rejects_duplicate_player_and_invalid_goalkeeper_structure() -> None:
+    duplicate = _current_roster_scenario(43).model_dump(mode="python")
+    duplicate_players = list(duplicate["players"])
+    duplicate_players[-1] = duplicate_players[-2]
+    duplicate["players"] = tuple(duplicate_players)
+    with pytest.raises(ValidationError, match="duplicate player"):
+        CurrentModelWeightedScenario.model_validate(duplicate)
+
+    invalid_goalkeepers = _current_roster_scenario(43).model_dump(mode="python")
+    bench_goalkeeper = next(
+        item
+        for item in invalid_goalkeepers["players"]
+        if item["role"] == "BENCH" and item["position"] == "GK"
+    )
+    bench_goalkeeper["position"] = "DEF"
+    with pytest.raises(ValueError, match="nine-player bench"):
+        validate_current_team_path(CurrentModelWeightedScenario.model_validate(invalid_goalkeepers))
+
+
+def test_current_team_scenarios_reject_active_hard_ineligible_player(
+    live_roster_team: CurrentModelTeamScenarios,
+) -> None:
+    payload = live_roster_team.model_dump(mode="python")
+    payload["hard_ineligible_player_ids"] = (
+        next(
+            item.player_id for item in live_roster_team.scenarios[0].players if item.role == "START"
+        ),
+    )
+    with pytest.raises(ValidationError, match="not OUT"):
+        CurrentModelTeamScenarios.model_validate(payload)
 
 
 def test_current_team_path_policy_is_current_season_bound_and_sealed() -> None:
@@ -282,7 +468,7 @@ def test_reconciliation_contracts_fail_closed_on_hostile_tampering() -> None:
             "role": "BENCH",
         }
     )
-    fewer_starters = ManualWeightedScenario.model_construct(
+    fewer_starters = CurrentModelWeightedScenario.model_construct(
         scenario_id="S000", count=1, players=tuple(players)
     )
     with pytest.raises(ValueError, match="kickoff starters"):
@@ -300,7 +486,7 @@ def test_reconciliation_contracts_fail_closed_on_hostile_tampering() -> None:
             "position": "DEF",
         }
     )
-    no_starting_goalkeeper = ManualWeightedScenario.model_construct(
+    no_starting_goalkeeper = CurrentModelWeightedScenario.model_construct(
         scenario_id="S000", count=1, players=tuple(players)
     )
     with pytest.raises(ValueError, match="kickoff goalkeeper"):
@@ -315,7 +501,7 @@ def test_reconciliation_contracts_fail_closed_on_hostile_tampering() -> None:
         role="OUT",
         official_minutes=1,
     )
-    out_enters = ManualWeightedScenario.model_construct(
+    out_enters = CurrentModelWeightedScenario.model_construct(
         scenario_id="S000",
         count=1,
         players=(*untouched.players, out_player),
@@ -325,7 +511,7 @@ def test_reconciliation_contracts_fail_closed_on_hostile_tampering() -> None:
 
     bench_payload = _raw_scenario().model_dump(mode="python")
     bench_payload["players"][11]["role"] = "OUT"
-    reduced_bench = ManualWeightedScenario.model_validate(bench_payload)
+    reduced_bench = CurrentModelWeightedScenario.model_validate(bench_payload)
     with pytest.raises(ValueError, match="configured nine-player bench"):
         validate_current_team_path(reduced_bench, policy)
     with pytest.raises(ValueError, match="invalid role allocation"):

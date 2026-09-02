@@ -1,0 +1,10 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "current_live_roster": "PASS_43_PLAYERS_ALL_256_SCENARIOS",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI_AND_LIVE_VERIFICATION",
+  "live_one_command": "BLOCKED_LIVE_RUNTIME_INPUTS_UNAVAILABLE",
+  "manual_transient_maximum_players": 40,
+  "progress": "PASS_FIXTURE_HOME_AWAY_RECONCILIATION_TYPED_FAILURES",
+  "provider_bodies_retained": 0,
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001J"
+}

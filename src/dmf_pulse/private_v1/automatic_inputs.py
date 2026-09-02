@@ -14,6 +14,7 @@ from dmf_pulse.availability.current_model import (
 )
 from dmf_pulse.availability.models import format_utc
 from dmf_pulse.availability.pipeline import fit_projection_artifact, predict_minutes_baseline
+from dmf_pulse.availability.projection import MinutesPredictionResult
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplFixture
 from dmf_pulse.ingestion.fpl.direct_payloads import DirectFplSnapshot
@@ -30,6 +31,7 @@ from dmf_pulse.private_v1.models import (
     seal_canonical_player_identity_map,
     seal_current_ownership,
 )
+from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 
 _NAMESPACE = UUID("15b4fe6e-0149-54bb-a936-af6fccf69e89")
 
@@ -299,9 +301,12 @@ def build_automatic_model_minutes(
     snapshot: DirectFplSnapshot,
     identity_map: PrivateCanonicalPlayerIdentityMap,
     market_view: CurrentMarketCanonicalIdentityView,
+    *,
+    progress: ProgressSink | None = None,
 ) -> tuple[CurrentModelFixtureMinutesInput, ...]:
     """Run the accepted model family over current transient rosters and observed live facts."""
 
+    active_progress = progress or NullProgress()
     training = _read_resource("MIN-007/training_dataset.json")
     policy = _read_resource("MIN-007G/minutes_baseline_policy.json")
     artifact = fit_projection_artifact(training, policy=policy)
@@ -316,7 +321,8 @@ def build_automatic_model_minutes(
         if item.event_identity == snapshot.fpl_input.target_event.identity
     }
     outputs: list[CurrentModelFixtureMinutesInput] = []
-    for canonical_fixture in market_view.fixtures:
+    fixture_count = len(market_view.fixtures)
+    for fixture_index, canonical_fixture in enumerate(market_view.fixtures, start=1):
         fixture = target_fixtures.get(canonical_fixture.official_fpl_fixture_id)
         if fixture is None:
             raise IngestionError("MAPPING_CONFLICT", "market fixture is absent from current FPL")
@@ -356,32 +362,67 @@ def build_automatic_model_minutes(
                 "player_overrides": overrides,
             }
 
-        try:
-            home = predict_minutes_baseline(
-                history,
-                artifact,
-                context=context(home_id, fixture_id=canonical_fixture.canonical_fixture_id),
-                policy=policy,
-            )
-            away = predict_minutes_baseline(
-                history,
-                artifact,
-                context=context(away_id, fixture_id=canonical_fixture.canonical_fixture_id),
-                policy=policy,
-            )
-            outputs.append(
-                build_current_model_fixture_minutes(
-                    home,
-                    away,
-                    information_cutoff=snapshot.fpl_input.provenance.information_cutoff,
-                    observed_history_sha256=history_sha256,
-                    warnings=warnings,
+        home_context = context(home_id, fixture_id=canonical_fixture.canonical_fixture_id)
+        away_context = context(away_id, fixture_id=canonical_fixture.canonical_fixture_id)
+
+        def predict(prediction_context: dict[str, object]) -> MinutesPredictionResult:
+            try:
+                result = predict_minutes_baseline(
+                    history,
+                    artifact,
+                    context=prediction_context,
+                    policy=policy,
                 )
-            )
-        except ValueError as exc:
-            raise IngestionError(
-                "CURRENT_MINUTES_MODEL_BLOCKED", "accepted current minutes model could not project"
-            ) from exc
+            except ValueError as exc:
+                raise IngestionError(
+                    "CURRENT_MINUTES_MODEL_BLOCKED",
+                    "accepted current minutes model could not project",
+                ) from exc
+            if result.status != "PROJECTED" or result.projection is None:
+                raise IngestionError(
+                    result.error_code or "CURRENT_MINUTES_MODEL_BLOCKED",
+                    "accepted current minutes predictor returned a blocked result",
+                )
+            return result
+
+        progress_prefix = f"Stage 7 fixture {fixture_index}/{fixture_count}"
+        with active_progress.stage(
+            started=None,
+            completed=f"{progress_prefix} ready",
+            failed=f"{progress_prefix}",
+        ):
+            with active_progress.stage(
+                started=f"{progress_prefix}: predicting home team...",
+                completed=f"{progress_prefix}: home prediction ready",
+                failed=f"{progress_prefix} home team prediction",
+            ):
+                home = predict(home_context)
+            with active_progress.stage(
+                started=f"{progress_prefix}: predicting away team...",
+                completed=f"{progress_prefix}: away prediction ready",
+                failed=f"{progress_prefix} away team prediction",
+            ):
+                away = predict(away_context)
+            with active_progress.stage(
+                started=f"{progress_prefix}: reconciling team scenarios...",
+                completed=None,
+                failed=f"{progress_prefix} scenario adaptation",
+            ):
+                try:
+                    outputs.append(
+                        build_current_model_fixture_minutes(
+                            home,
+                            away,
+                            information_cutoff=snapshot.fpl_input.provenance.information_cutoff,
+                            observed_history_sha256=history_sha256,
+                            warnings=warnings,
+                        )
+                    )
+                except (KeyError, ValueError) as exc:
+                    raise IngestionError(
+                        "CURRENT_STAGE7_SCENARIO_ROSTER_INVALID",
+                        "current Stage-7 scenario adaptation or reconciliation failed",
+                    ) from exc
     return tuple(sorted(outputs, key=lambda item: item.fixture_id))
 
 
