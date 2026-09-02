@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from types import SimpleNamespace
 
 from typer.core import TyperGroup
@@ -51,6 +52,13 @@ def test_successful_cli_prints_recommendation_and_passes_only_entry_id(monkeypat
     monkeypatch.setenv("THE_ODDS_API_KEY", "synthetic-odds-key")
     monkeypatch.setenv("DMF_FPL_BEARER_TOKEN", "synthetic-fpl-key")
     requests = []
+    approved_at = datetime(2026, 9, 2, 0, 0, 38, 492580, tzinfo=UTC)
+
+    class FixedDatetime:
+        @classmethod
+        def now(cls, tz):
+            assert tz is UTC
+            return approved_at
 
     class Service:
         def __init__(self, **kwargs) -> None:
@@ -61,14 +69,16 @@ def test_successful_cli_prints_recommendation_and_passes_only_entry_id(monkeypat
             return SimpleNamespace(report="DMF PULSE - GW2\n\nRECOMMENDATION\nNO TRANSFER\n")
 
     monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
+    monkeypatch.setattr(pulse_module, "datetime", FixedDatetime)
     result = runner.invoke(app, ["pulse", "--entry-id", "42"])
 
     assert result.exit_code == 0
     assert result.stdout.startswith("DMF PULSE - GW2\n\nRECOMMENDATION")
     assert requests[0].entry_id == 42
     assert len(requests[0].code_sha) == 40
-    assert requests[0].operator_approved_at < requests[0].run_at
-    assert (requests[0].run_at - requests[0].operator_approved_at).total_seconds() == 300
+    assert requests[0].operator_approved_at == approved_at
+    assert requests[0].run_at == datetime(2026, 9, 2, 0, 5, 38, tzinfo=UTC)
+    assert requests[0].run_at.microsecond == 0
 
 
 def test_expected_service_error_has_no_traceback(monkeypatch) -> None:

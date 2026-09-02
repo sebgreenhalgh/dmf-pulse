@@ -118,7 +118,7 @@ def pulse_command(
         if not os.environ.get("THE_ODDS_API_KEY", "").strip():
             raise PrivateV1Error("CREDENTIAL_UNAVAILABLE", "THE_ODDS_API_KEY is missing.")
         approved_at = datetime.now(UTC)
-        information_cutoff = approved_at + timedelta(minutes=5)
+        information_cutoff = (approved_at + timedelta(minutes=5)).replace(microsecond=0)
         credential_provider = _PromptingCredentialProvider()
         service = PrivateV1OneCommandService(
             direct_client_factory=lambda attestation: DirectFplClient(

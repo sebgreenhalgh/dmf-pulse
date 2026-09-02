@@ -22,7 +22,8 @@ CUTOFF = datetime(2026, 8, 20, 12, 5, tzinfo=UTC)
 TARGET = (
     "https://api.the-odds-api.com/v4/sports/soccer_epl/odds?regions=uk&"
     "markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&"
-    "commenceTimeFrom=2026-08-20T12%3A05%3A00Z"
+    "commenceTimeFrom=2026-08-20T12%3A05%3A00Z&"
+    "commenceTimeTo=2026-08-23T00%3A00%3A00Z"
 )
 
 
@@ -97,6 +98,7 @@ def test_transient_service_invokes_existing_client_parser_and_current_builder(
 
     assert ranges == [(CUTOFF, datetime(2026, 8, 23, tzinfo=UTC))]
     assert result.provenance.transport_call_count == 1
+    assert "commenceTimeTo" in result.provenance.sanitized_target
     assert result.provenance.raw_payload_retained is False
     assert result.rights.raw_payload_retained is False
     assert result.temporal.information_cutoff == CUTOFF

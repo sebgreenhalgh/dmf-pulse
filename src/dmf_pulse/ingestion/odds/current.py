@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Literal, Self
@@ -38,6 +39,16 @@ _SECRET_FIELD_FRAGMENTS = (
     "token",
 )
 _SUPPORTED_MARKETS = frozenset({"h2h", "totals"})
+_PROVIDER_COMMENCE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+
+
+def _parse_provider_commence_time(value: str, *, label: str) -> datetime:
+    if _PROVIDER_COMMENCE_PATTERN.fullmatch(value) is None:
+        raise ValueError(f"{label} is invalid: canonical whole-second UTC required")
+    try:
+        return datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
+    except ValueError as exc:
+        raise ValueError(f"{label} is invalid: canonical whole-second UTC required") from exc
 
 
 class _FrozenModel(BaseModel):
@@ -281,10 +292,18 @@ class CurrentOddsProvenance(_FrozenModel):
         query_names = [name for name, _value in query]
         parameters = dict(query)
         config = load_provider_config()
+        required_names = {
+            "regions",
+            "markets",
+            "oddsFormat",
+            "dateFormat",
+            "commenceTimeFrom",
+        }
+        allowed_names = required_names | {"commenceTimeTo"}
         if (
             len(query_names) != len(set(query_names))
-            or set(query_names)
-            != {"regions", "markets", "oddsFormat", "dateFormat", "commenceTimeFrom"}
+            or not required_names.issubset(query_names)
+            or not set(query_names).issubset(allowed_names)
             or parameters.get("regions") != "uk"
             or parameters.get("markets") != "h2h,totals"
             or parameters.get("oddsFormat") != "decimal"
@@ -293,6 +312,16 @@ class CurrentOddsProvenance(_FrozenModel):
             or self.attempt_count > config.retry.max_attempts
         ):
             raise ValueError("transport provenance is inconsistent")
+        commence_from = _parse_provider_commence_time(
+            parameters["commenceTimeFrom"], label="provider request cutoff"
+        )
+        raw_commence_to = parameters.get("commenceTimeTo")
+        if raw_commence_to is not None:
+            commence_to = _parse_provider_commence_time(
+                raw_commence_to, label="provider request upper bound"
+            )
+            if commence_to <= commence_from:
+                raise ValueError("provider request upper bound must be later than lower bound")
         return self
 
 
@@ -352,13 +381,10 @@ class OddsProviderCurrentInput(_FrozenModel):
         raw_cutoff = parameters.get("commenceTimeFrom")
         if raw_cutoff is None:
             raise ValueError("provider request cutoff is missing")
-        try:
-            requested_cutoff = datetime.fromisoformat(raw_cutoff.replace("Z", "+00:00"))
-        except ValueError as exc:
-            raise ValueError("provider request cutoff is invalid") from exc
-        if requested_cutoff.tzinfo is None or requested_cutoff.utcoffset() is None:
-            raise ValueError("provider request cutoff must be timezone-aware")
-        if requested_cutoff.astimezone(UTC) != self.temporal.information_cutoff:
+        requested_cutoff = _parse_provider_commence_time(
+            raw_cutoff, label="provider request cutoff"
+        )
+        if requested_cutoff != self.temporal.information_cutoff:
             raise ValueError("provider request cutoff contradicts input cutoff")
         if self.market_semantic_sha256 != current_odds_market_semantic_sha256(self):
             raise ValueError("provider current-market semantic hash is inconsistent")

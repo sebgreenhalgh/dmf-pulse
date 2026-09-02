@@ -1022,7 +1022,13 @@ def _safe_parameters(
         if value is not None:
             if value.tzinfo is None or value.utcoffset() is None:
                 raise IngestionError("CONFIGURATION_INVALID", "commence filter must be UTC-aware")
-            parameters.append((name, value.astimezone(UTC).isoformat().replace("+00:00", "Z")))
+            utc_value = value.astimezone(UTC)
+            if utc_value.microsecond != 0:
+                raise IngestionError(
+                    "CONFIGURATION_INVALID",
+                    "commence filter must use whole-second precision",
+                )
+            parameters.append((name, utc_value.strftime("%Y-%m-%dT%H:%M:%SZ")))
     if commence_from is not None and commence_to is not None and commence_from >= commence_to:
         raise IngestionError("CONFIGURATION_INVALID", "commence filter range is invalid")
     return tuple(parameters)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 from uuid import UUID
@@ -484,6 +484,46 @@ def test_request_fingerprint_and_sanitized_target_never_include_credential(
     assert credential not in repr(request)
     assert credential not in repr(StaticCredentialProvider(credential))
     assert UnavailableCredentialProvider().get_credential() is None
+
+
+def test_commence_parameters_serialize_exact_utc_whole_seconds() -> None:
+    parameters = dict(
+        _safe_parameters(
+            load_provider_config(),
+            datetime(2026, 9, 2, 0, 15, 3, tzinfo=UTC),
+            datetime(
+                2026,
+                9,
+                6,
+                17,
+                30,
+                1,
+                tzinfo=timezone(timedelta(hours=2)),
+            ),
+        )
+    )
+
+    assert parameters["commenceTimeFrom"] == "2026-09-02T00:15:03Z"
+    assert parameters["commenceTimeTo"] == "2026-09-06T15:30:01Z"
+
+
+@pytest.mark.parametrize(
+    ("commence_from", "commence_to"),
+    [
+        (datetime(2026, 9, 2, 0, 15, 3, 1, tzinfo=UTC), None),
+        (
+            datetime(2026, 9, 2, 0, 15, 3, tzinfo=UTC),
+            datetime(2026, 9, 6, 15, 30, 1, 1, tzinfo=UTC),
+        ),
+    ],
+)
+def test_commence_parameters_reject_fractional_seconds(
+    commence_from: datetime, commence_to: datetime | None
+) -> None:
+    with pytest.raises(IngestionError, match="whole-second") as caught:
+        _safe_parameters(load_provider_config(), commence_from, commence_to)
+
+    assert caught.value.code == "CONFIGURATION_INVALID"
 
 
 def test_client_gates_quota_and_credential_before_transport(repository_root: Path) -> None:

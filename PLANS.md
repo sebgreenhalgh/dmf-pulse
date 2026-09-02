@@ -1645,3 +1645,25 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Check the safe live runtime boundary without displaying identifiers or secrets; record the
   absent bearer, Odds key and entry-ID mechanism as the exact authenticated-retry blocker.
 - [ ] Seal evidence, push the final SHA, and require exact-SHA CI green.
+
+# PRIVATE-V1-ONE-COMMAND-001F Odds whole-second window and provenance hotfix
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001F`; immutable parent
+  `ab09382a9660ea8ddef612c31422f6386a30d0b3`; parent exact-SHA CI `33571326273`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001F`.
+- Scope: enforce exact UTC whole-second Odds commence boundaries, establish the literal CLI's
+  canonical whole-second decision cutoff, and accept only the supported optional bounded
+  `commenceTimeTo` provenance shape.
+- Safety: preserve the target-GW latest-kickoff-plus-one-second upper bound and all quality gates;
+  no FPL, manager/chip, rights, consensus, Stage 7-9, optimiser, captaincy or prior changes.
+
+## Hotfix checkpoints
+
+- [x] Verify the exact parent/CI, isolate the branch, and resolve Odds/client/current/CLI authority.
+- [x] Add red serialization, provenance-window and one-command cutoff regressions.
+- [x] Implement the narrow whole-second and bounded-provenance corrections.
+- [x] Run focused and affected tests, branch coverage, Ruff, mypy, frozen sync, build, wheel,
+  repository and secret gates.
+- [x] Check the safe live boundary without reading secrets; record the absent Odds key, bearer and
+  runtime entry ID as the exact blocker to a bounded HTTP 200 and literal-command progression.
+- [ ] Seal evidence, push the final SHA, and require exact-SHA CI green.

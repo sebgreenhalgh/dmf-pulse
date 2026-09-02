@@ -50,6 +50,7 @@ TARGET = (
     "regions=uk&markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&"
     "commenceTimeFrom=2026-08-21T17%3A30%3A00Z"
 )
+BOUNDED_TARGET = TARGET + "&commenceTimeTo=2026-08-23T00%3A00%3A00Z"
 
 
 def _value(repository_root: Path) -> list[dict[str, Any]]:
@@ -438,6 +439,52 @@ def test_provenance_rejects_attempt_count_mismatch(repository_root: Path) -> Non
             attempt_count=2,
             transport_call_count=1,
         )
+
+
+def test_provenance_accepts_required_only_and_bounded_request_shapes(
+    repository_root: Path,
+) -> None:
+    parsed = parse_odds_payload(_body(_value(repository_root)))
+
+    required_only = _build(parsed)
+    bounded = _build(parsed, target=BOUNDED_TARGET)
+
+    assert "commenceTimeTo" not in required_only.provenance.sanitized_target
+    assert "commenceTimeTo" in bounded.provenance.sanitized_target
+
+
+@pytest.mark.parametrize(
+    ("target", "message"),
+    [
+        (
+            BOUNDED_TARGET + "&commenceTimeTo=2026-08-24T00%3A00%3A00Z",
+            "transport provenance is inconsistent",
+        ),
+        (
+            TARGET + "&unexpected=safe-but-unsupported",
+            "transport provenance is inconsistent",
+        ),
+        (
+            TARGET + "&commenceTimeTo=2026-08-21T17%3A30%3A00Z",
+            "upper bound must be later",
+        ),
+        (
+            TARGET.replace("17%3A30%3A00Z", "17%3A30%3A00.123456Z"),
+            "canonical whole-second",
+        ),
+        (
+            TARGET + "&commenceTimeTo=2026-08-23T00%3A00%3A00.1Z",
+            "canonical whole-second",
+        ),
+    ],
+)
+def test_provenance_rejects_duplicate_unknown_or_invalid_commence_windows(
+    repository_root: Path,
+    target: str,
+    message: str,
+) -> None:
+    with pytest.raises(ValidationError, match=message):
+        _build(parse_odds_payload(_body(_value(repository_root))), target=target)
 
 
 def test_outer_contract_rejects_invalid_cutoff_and_semantic_hash(repository_root: Path) -> None:

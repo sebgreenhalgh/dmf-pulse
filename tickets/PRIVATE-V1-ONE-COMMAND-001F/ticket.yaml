@@ -1,0 +1,37 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001F"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "The Odds API whole-second window and provenance hotfix"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001F"
+required_base_commit: "ab09382a9660ea8ddef612c31422f6386a30d0b3"
+parent_exact_sha_ci: 33571326273
+objective: >-
+  Enforce the provider's canonical UTC whole-second commence window, keep the literal one-command
+  logical cutoff identical to its request lower bound, and validate the intentionally bounded
+  optional commenceTimeTo provenance without admitting arbitrary query parameters.
+authority_scopes:
+  - "A5-odds-manual-import"
+  - "A12-ops-assurance"
+in_scope:
+  - "Strict whole-second Odds commence-boundary validation and UTC Z serialization."
+  - "Canonical literal CLI cutoff generation and bounded current-Odds provenance validation."
+  - "Safe live bounded-Odds, transient-current-input and one-command progression verification."
+permissions:
+  official_odds_network: "operator_initiated_low_volume_get_only"
+  official_fpl_network: "operator_initiated_low_volume_get_only_for_full_retry"
+  authentication_or_credentials: "existing_environment_only"
+  odds_raw_storage: "forbidden"
+  fpl_raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "FPL transport/authentication, current manager or chip mapping changes."
+  - "Provider rights, bookmaker consensus or Odds quality-gate changes."
+  - "Stages 7-9, optimiser, captaincy or player-prior changes."
+  - "PR, merge, tag or production activation."
+required_execution_status: "ODDS_BOUNDED_CURRENT_INPUT_COMPILED"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

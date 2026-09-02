@@ -58,9 +58,10 @@ class _DirectTransport:
 class _OddsService:
     def __init__(self, value: object) -> None:
         self.value = value
+        self.requests: list[tuple[object, object]] = []
 
     def acquire(self, *, information_cutoff: object, commence_to: object) -> object:
-        del information_cutoff, commence_to
+        self.requests.append((information_cutoff, commence_to))
         return self.value
 
 
@@ -315,7 +316,8 @@ def _odds_input(repository_root: Path) -> object:
     target = (
         "https://api.the-odds-api.com/v4/sports/soccer_epl/odds?regions=uk&"
         "markets=h2h%2Ctotals&oddsFormat=decimal&dateFormat=iso&"
-        "commenceTimeFrom=2026-09-01T12%3A00%3A00%2B00%3A00"
+        "commenceTimeFrom=2026-09-01T12%3A00%3A00Z&"
+        "commenceTimeTo=2026-09-05T16%3A00%3A01Z"
     )
     return build_current_odds_input(
         parse_odds_payload(body),
@@ -369,9 +371,10 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
             rights_config_identity="b" * 64,
         )
 
+    odds_service = _OddsService(odds)
     service = PrivateV1OneCommandService(
         direct_client_factory=direct_factory,
-        odds_service_factory=lambda clock: _OddsService(odds),
+        odds_service_factory=lambda clock: odds_service,
         score_service_factory=score_factory,
         clock=lambda: RUN_AT,
     )
@@ -393,5 +396,6 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     assert "No action:" in result.report
     assert "Captain:" in result.report
     assert "FPL_API_OPERATOR_INITIATED_ACCEPTED_CONTRACTUAL_RISK" in result.report
+    assert odds_service.requests == [(RUN_AT, TARGET_KICKOFF + timedelta(hours=2, seconds=1))]
     assert len(direct_transport.requests) == 8
     assert direct_transport.bodies == []
