@@ -15,6 +15,7 @@ from dmf_pulse.availability.current_model import (
 from dmf_pulse.availability.models import format_utc
 from dmf_pulse.availability.pipeline import fit_projection_artifact, predict_minutes_baseline
 from dmf_pulse.availability.projection import MinutesPredictionResult
+from dmf_pulse.fpl_points.models import ProjectionMode
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplFixture
 from dmf_pulse.ingestion.fpl.direct_payloads import DirectFplSnapshot
@@ -32,8 +33,11 @@ from dmf_pulse.private_v1.models import (
     seal_current_ownership,
 )
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
+from dmf_pulse.rules.models import CompiledRuleset
+from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 
 _NAMESPACE = UUID("15b4fe6e-0149-54bb-a936-af6fccf69e89")
+PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1 = "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1"
 
 
 def _team_uuid(identity_sha256: str) -> UUID:
@@ -149,6 +153,7 @@ def build_automatic_ownership(
 def build_full_candidate_policy(
     snapshot: DirectFplSnapshot,
     manager: CurrentManagerStateBundle,
+    ruleset: CompiledRuleset,
 ) -> PrivateCandidateActionPolicy:
     squad = {item.official_fpl_element_id for item in manager.squad}
     incoming = tuple(
@@ -165,14 +170,26 @@ def build_full_candidate_policy(
             "CANDIDATE_UNIVERSE_UNBOUNDED",
             "official FPL selectable player universe exceeds the private exact-search bound",
         )
+    transfer_rules = build_multi_gameweek_transfer_rules(
+        ruleset,
+        projection_mode=ProjectionMode.REPLAY,
+    )
+    maximum_transfers = min(
+        manager.free_transfers,
+        transfer_rules.max_transfers_per_deadline,
+        2,
+        len(incoming),
+    )
     return seal_candidate_action_policy(
         PrivateCandidateActionPolicy.model_construct(
             allowed_transfer_in_element_ids=incoming,
-            maximum_transfers=1 if incoming else 0,
+            maximum_transfers=maximum_transfers,
             rationale=(
-                "Complete official-FPL selectable non-squad universe at the transient cutoff; "
-                "no heuristic shortlist; the accepted private-V1 action tree is bounded to one "
-                "current-GW transfer."
+                f"{PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1}: complete official-FPL "
+                "selectable non-squad universe at the transient cutoff is preserved upstream; "
+                "Stage 11 applies the declared deadline-oriented heuristic shortlist and exact "
+                "tactical evaluation within it. Transfer count is bounded by current free "
+                "transfers, compiled rules, and the private two-transfer STANDARD limit."
             ),
             semantic_sha256="0" * 64,
         )

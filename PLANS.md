@@ -1790,3 +1790,28 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Run focused, affected, branch-coverage, static, build, wheel, governance and security gates.
 - [ ] Commit and push one exact implementation SHA, require exact-SHA CI green, then perform the
   literal private retry with only existing runtime credentials and record the exact next blocker.
+
+# PRIVATE-V1-ONE-COMMAND-001K current free-transfer fidelity and bounded transfer search
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001K`; immutable parent
+  `e2961220ed110854eb9c912448f809ff3bad5e20`; parent exact-SHA CI `33659620693`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001K` in isolated worktree
+  `review_pack/one-command-k`; unrelated root-worktree changes remain untouched.
+- Scope: derive the current private transfer-count scope from authenticated free-transfer state
+  and compiled rules; construct a truthful bounded 0/1/2-transfer candidate set; retain exact
+  Stage-10 tactical evaluation and existing joint scenarios for every resulting candidate squad.
+- Safety: preserve the full upstream current player universe and exact squad; no Stage 7-9,
+  penalty, captaincy, transport, chip, persistence, PR, merge, tag, or activation changes.
+
+## PRIVATE-V1-ONE-COMMAND-001K checkpoints
+
+- [x] Verify the exact immutable parent, successful parent CI, isolated clean worktree, ticket,
+  and DMFP-12/DMFP-20 A10/A11/B2 authority.
+- [x] Add RED FT 0/1/2, hit, position-aware enumeration, bounded-vs-exhaustive, cache, pruning,
+  progress and disclosure regressions.
+- [x] Implement the smallest governed private STANDARD candidate generator plus lossless exact
+  action-generation improvements and per-root resulting-squad tactical memoization.
+- [x] Run focused, affected, static, performance, build, wheel, governance and security gates;
+  require the repository's exact 8-shard CI to complete the 4,201-test branch-coverage gate.
+- [ ] Commit and push one exact implementation SHA, require exact-SHA CI green, then attempt the
+  literal GW3 command only with existing runtime credentials and record timings or exact blocker.

@@ -124,7 +124,7 @@ def seal_current_ownership(value: PrivateCurrentOwnership) -> PrivateCurrentOwne
 
 
 class PrivateCandidateActionPolicy(_FrozenModel):
-    """Explicit bounded Stage-11 action space; no hidden transfer-target selection."""
+    """Full upstream incoming universe and the governed private transfer-count scope."""
 
     schema_version: Literal["private-candidate-action-policy-v1"] = (
         "private-candidate-action-policy-v1"
@@ -144,8 +144,6 @@ class PrivateCandidateActionPolicy(_FrozenModel):
             raise ValueError("allowed transfer-in element IDs must be unique and sorted")
         if self.maximum_transfers > 0 and not self.allowed_transfer_in_element_ids:
             raise ValueError("a nonzero transfer scope requires at least one incoming candidate")
-        if self.maximum_transfers == 0 and self.allowed_transfer_in_element_ids:
-            raise ValueError("a no-transfer-only scope cannot contain incoming candidates")
         if self.semantic_sha256 != _semantic_hash(self):
             raise ValueError("candidate action policy semantic hash does not match")
         return self

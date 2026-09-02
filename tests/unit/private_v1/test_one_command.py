@@ -217,8 +217,16 @@ def _provider_sources(repository_root: Path) -> tuple[tuple[bytes, ...], bytes]:
     bench_gk = next(item for item in remaining if position_by_id[item] == "GK")
     bench_outfield = [item for item in remaining if item != bench_gk]
     ordered = [*starters, bench_gk, *bench_outfield]
-    candidate_id = next(int(item["id"]) for item in players if int(item["id"]) not in squad)
-    next(item for item in players if int(item["id"]) == candidate_id)["can_select"] = True
+    candidate_ids = tuple(
+        int(item["id"])
+        for item in players
+        if int(item["id"]) not in squad
+        and int(item["team"]) == 6
+        and int(item["element_type"]) in {1, 2}
+    )[:2]
+    assert len(candidate_ids) == 2
+    for candidate_id in candidate_ids:
+        next(item for item in players if int(item["id"]) == candidate_id)["can_select"] = True
     chips = [
         {
             "name": name,
@@ -245,7 +253,7 @@ def _provider_sources(repository_root: Path) -> tuple[tuple[bytes, ...], bytes]:
         "transfers": {
             "cost": 0,
             "status": "cost",
-            "limit": 1,
+            "limit": 2,
             "made": 0,
             "bank": 100,
             "value": 850,
@@ -402,6 +410,15 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     assert "Captain:" in result.report
     assert "FPL_API_OPERATOR_INITIATED_ACCEPTED_CONTRACTUAL_RISK" in result.report
     assert "CURRENT_STAGE7_TEAM_MINUTES_RECONCILED_V1" in result.report
+    assert "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1" in result.report
+    assert "Exact tactical optimum within the declared bounded transfer candidate set" in (
+        result.decision.action_space_disclosure
+    )
+    assert "Exact tactical optimum within the declared bounded transfer candidate set" in (
+        result.report
+    )
+    assert "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE" in result.report
+    assert "global FPL transfer optimum" not in result.report
     assert odds_service.requests == [(RUN_AT, TARGET_KICKOFF + timedelta(hours=2, seconds=1))]
     assert len(direct_transport.requests) == 8
     assert direct_transport.bodies == []
@@ -460,7 +477,14 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     offsets = [rendered_progress.index(item) for item in expected_order]
     assert offsets == sorted(offsets)
     assert "candidate players:" in rendered_progress
-    assert "maximum transfers:" in rendered_progress
+    assert "free transfers available: 2" in rendered_progress
+    assert "transfer counts considered: 0,1,2" in rendered_progress
+    assert "full selectable incoming universe:" in rendered_progress
+    assert "retained transfer candidates:" in rendered_progress
+    assert "retained one-transfer actions:" in rendered_progress
+    assert "retained two-transfer actions:" in rendered_progress
+    assert "exact tactical squads requiring evaluation:" in rendered_progress
+    assert "maximum transfers: 2" in rendered_progress
     assert "root action upper bound:" in rendered_progress
     assert "% complete" not in rendered_progress
     assert marker not in rendered_progress

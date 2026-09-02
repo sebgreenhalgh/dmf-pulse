@@ -319,7 +319,7 @@ def test_ownership_and_full_candidate_universe_are_automatic(repository_root: Pa
 
     identities = build_automatic_player_identity_map(snapshot, manager)
     ownership = build_automatic_ownership(snapshot, manager)
-    candidates = build_full_candidate_policy(snapshot, manager)
+    candidates = build_full_candidate_policy(snapshot, manager, ruleset)
     squad = {item.official_fpl_element_id for item in manager.squad}
     expected_incoming = {
         item.provider_element_id
@@ -330,7 +330,18 @@ def test_ownership_and_full_candidate_universe_are_automatic(repository_root: Pa
     assert {item.official_fpl_element_id for item in ownership.members} == squad
     assert all(item.acquired_gameweek == 1 for item in ownership.members)
     assert set(candidates.allowed_transfer_in_element_ids) == expected_incoming
+    assert candidates.maximum_transfers == manager.free_transfers == 2
+    assert "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1" in candidates.rationale
     assert len(identities.players) == len(eligible_fpl.players)
+
+    for free_transfers, expected_maximum in ((0, 0), (1, 1), (2, 2)):
+        policy = build_full_candidate_policy(
+            snapshot,
+            manager.model_copy(update={"free_transfers": free_transfers}),
+            ruleset,
+        )
+        assert policy.maximum_transfers == expected_maximum
+        assert set(policy.allowed_transfer_in_element_ids) == expected_incoming
 
     oversized_players = tuple(
         eligible_fpl.players[-1].model_copy(
@@ -342,7 +353,7 @@ def test_ownership_and_full_candidate_universe_are_automatic(repository_root: Pa
         update={"fpl_input": eligible_fpl.model_copy(update={"players": oversized_players})}
     )
     with pytest.raises(IngestionError, match="selectable player universe exceeds"):
-        build_full_candidate_policy(oversized_snapshot, manager)
+        build_full_candidate_policy(oversized_snapshot, manager, ruleset)
 
 
 def test_automatic_stage7_uses_accepted_model_with_global_shrinkage_when_history_missing(

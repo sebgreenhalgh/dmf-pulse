@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections import defaultdict
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from fractions import Fraction
@@ -101,9 +102,16 @@ from dmf_pulse.optimisation.multi_gameweek_policy import (
     load_terminal_value_policy,
 )
 from dmf_pulse.optimisation.multi_gameweek_service import optimise_multi_gameweek
-from dmf_pulse.optimisation.multi_gameweek_solver import information_set_key
+from dmf_pulse.optimisation.multi_gameweek_solver import (
+    action_moves,
+    enumerate_legal_actions,
+    information_set_key,
+)
 from dmf_pulse.optimisation.policy import load_policy as load_one_gameweek_policy
 from dmf_pulse.optimisation.stage10_adapter import Stage10TacticalAdapter
+from dmf_pulse.private_v1.automatic_inputs import (
+    PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1,
+)
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.models import (
     PrivateDecisionLineage,
@@ -121,6 +129,10 @@ from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 
 _DECIMAL_CONTEXT = Context(prec=50, rounding=ROUND_HALF_EVEN)
+_PRIVATE_EXPECTED_CANDIDATES_PER_POSITION = 2
+_PRIVATE_UPSIDE_CANDIDATES_PER_POSITION = 1
+_PRIVATE_VALUE_CANDIDATES_PER_POSITION = 1
+_PRIVATE_MAX_RETAINED_INCOMING = 24
 
 
 def _exact_root_action_upper_bound(
@@ -132,6 +144,166 @@ def _exact_root_action_upper_bound(
         comb(squad_size, count) * comb(incoming_count, count)
         for count in range(min(maximum_transfers, squad_size, incoming_count) + 1)
     )
+
+
+@dataclass(frozen=True)
+class PrivateTransferSearchScope:
+    """Auditable current-root scope produced before exact Stage-10 evaluation."""
+
+    full_incoming_count: int
+    retained_incoming_ids: tuple[str, ...]
+    transfer_counts_considered: tuple[int, ...]
+    one_transfer_actions: int
+    two_transfer_actions: int
+    exact_tactical_squads: int
+    certified_dominated_candidates: int
+    pruning_policy: str | None
+
+
+def _ranked_with_boundary_ties(
+    player_ids: tuple[str, ...],
+    *,
+    limit: int,
+    score: Callable[[str], Decimal],
+) -> set[str]:
+    """Select by a declared metric without an alphabetical or player-ID boundary cut."""
+
+    if len(player_ids) <= limit:
+        return set(player_ids)
+    values = {player_id: score(player_id) for player_id in player_ids}
+    cutoff = sorted(values.values(), reverse=True)[limit - 1]
+    return {player_id for player_id, value in values.items() if value >= cutoff}
+
+
+def _certified_pointwise_dominated(
+    player_ids: tuple[str, ...],
+    *,
+    catalog: dict[str, PlayerCatalogEntry],
+    prices: dict[str, PlayerPriceState],
+    gameweek: GameweekProjectionResult,
+) -> set[str]:
+    """Prove one-GW dominance only within identical club/position feasibility cohorts."""
+
+    groups: dict[tuple[PlayerPosition, str], list[str]] = defaultdict(list)
+    for player_id in player_ids:
+        entry = catalog[player_id]
+        groups[(entry.position, entry.club_id)].append(player_id)
+    dominated: set[str] = set()
+    scenarios = gameweek.scenario_set.scenarios
+    points_by_player = {
+        player_id: tuple(scenario.player_points[player_id] for scenario in scenarios)
+        for player_id in player_ids
+    }
+    appearances_by_player = {
+        player_id: tuple(scenario.player_appeared[player_id] for scenario in scenarios)
+        for player_id in player_ids
+    }
+    for members in groups.values():
+        for player_id in members:
+            for challenger_id in members:
+                if challenger_id == player_id:
+                    continue
+                challenger_price = prices[challenger_id].current_price_tenths
+                player_price = prices[player_id].current_price_tenths
+                if challenger_price > player_price:
+                    continue
+                challenger_points = points_by_player[challenger_id]
+                player_points = points_by_player[player_id]
+                same_appearances = (
+                    appearances_by_player[challenger_id] == appearances_by_player[player_id]
+                )
+                if (
+                    same_appearances
+                    and all(
+                        left >= right
+                        for left, right in zip(challenger_points, player_points, strict=True)
+                    )
+                    and (
+                        challenger_price < player_price
+                        or any(
+                            left > right
+                            for left, right in zip(challenger_points, player_points, strict=True)
+                        )
+                    )
+                ):
+                    dominated.add(player_id)
+                    break
+    return dominated
+
+
+def _bounded_private_incoming_ids(
+    player_ids: tuple[str, ...],
+    *,
+    catalog: dict[str, PlayerCatalogEntry],
+    prices: dict[str, PlayerPriceState],
+    gameweek: GameweekProjectionResult,
+    maximum_transfers: int,
+) -> tuple[tuple[str, ...], int]:
+    """Apply the labelled private STANDARD shortlist; small universes remain exhaustive."""
+
+    if maximum_transfers == 0:
+        return (), 0
+    dominated = _certified_pointwise_dominated(
+        player_ids,
+        catalog=catalog,
+        prices=prices,
+        gameweek=gameweek,
+    )
+    survivors = tuple(player_id for player_id in player_ids if player_id not in dominated)
+    by_position: dict[PlayerPosition, list[str]] = defaultdict(list)
+    for player_id in survivors:
+        by_position[catalog[player_id].position].append(player_id)
+    retained: set[str] = set()
+    for position in PlayerPosition:
+        members = tuple(by_position[position])
+        if len(members) <= (
+            _PRIVATE_EXPECTED_CANDIDATES_PER_POSITION
+            + _PRIVATE_UPSIDE_CANDIDATES_PER_POSITION
+            + _PRIVATE_VALUE_CANDIDATES_PER_POSITION
+        ):
+            retained.update(members)
+            continue
+
+        def expected(player_id: str) -> Decimal:
+            return Decimal(str(gameweek.player_summaries[player_id].expected_points))
+
+        def upside(player_id: str) -> Decimal:
+            summary = gameweek.player_summaries[player_id]
+            return Decimal(str(summary.expected_points)) + Decimal(
+                str(summary.points_standard_deviation)
+            )
+
+        def value(player_id: str) -> Decimal:
+            price = max(prices[player_id].current_price_tenths, 1)
+            return expected(player_id) / Decimal(price)
+
+        retained.update(
+            _ranked_with_boundary_ties(
+                members,
+                limit=_PRIVATE_EXPECTED_CANDIDATES_PER_POSITION,
+                score=expected,
+            )
+        )
+        retained.update(
+            _ranked_with_boundary_ties(
+                members,
+                limit=_PRIVATE_UPSIDE_CANDIDATES_PER_POSITION,
+                score=upside,
+            )
+        )
+        retained.update(
+            _ranked_with_boundary_ties(
+                members,
+                limit=_PRIVATE_VALUE_CANDIDATES_PER_POSITION,
+                score=value,
+            )
+        )
+    if len(retained) > _PRIVATE_MAX_RETAINED_INCOMING:
+        raise PrivateV1Error(
+            "PRIVATE_TRANSFER_SCREEN_UNBOUNDED",
+            "metric-boundary ties exceed the governed private STANDARD candidate limit",
+        )
+    return tuple(sorted(retained)), len(dominated)
 
 
 def _uses_model_stage7(value: PrivateV1ExecutionInput) -> bool:
@@ -732,6 +904,7 @@ def _stage11_request(
     MultiGameweekOptimisationRequest,
     _MemoizedStage10Evaluator,
     dict[str, CandidatePlayer],
+    PrivateTransferSearchScope,
 ]:
     current_players, _teams = _current_identity_maps(value)
     canonical_players = _canonical_player_by_element(value)
@@ -787,7 +960,7 @@ def _stage11_request(
     element_to_player = {
         element_id: player_id for element_id, player_id in canonical_players.items()
     }
-    allowed = tuple(
+    full_allowed = tuple(
         sorted(
             element_to_player[item]
             for item in value.candidate_action_policy.allowed_transfer_in_element_ids
@@ -796,6 +969,21 @@ def _stage11_request(
     root_id = f"GW-{value.current_state.target_gameweek}-CURRENT"
     if gameweek.result_sha256 is None:  # guarded by the successful projection contract
         raise PrivateV1Error("STAGE9_GAMEWEEK_INVALID", "Stage-9 result hash is absent")
+    pruning_policy = (
+        PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1
+        if PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1 in value.candidate_action_policy.rationale
+        else None
+    )
+    certified_dominated = 0
+    allowed = full_allowed
+    if pruning_policy is not None:
+        allowed, certified_dominated = _bounded_private_incoming_ids(
+            full_allowed,
+            catalog={item.player_id: item for item in catalog},
+            prices=prices,
+            gameweek=gameweek,
+            maximum_transfers=value.candidate_action_policy.maximum_transfers,
+        )
     root = ScenarioTreeNode(
         node_id=root_id,
         gameweek=value.current_state.target_gameweek,
@@ -834,11 +1022,12 @@ def _stage11_request(
         value.ruleset,
         projection_mode=value.projection_mode,
     )
+    manager_state = _manager_state(value, root_node_id=root_id)
     request = seal_request(
         MultiGameweekOptimisationRequest(
             request_id=value.run_id,
             projection_mode=value.projection_mode,
-            initial_state=_manager_state(value, root_node_id=root_id),
+            initial_state=manager_state,
             candidate_pool=catalog,
             rules=transfer_rules,
             scenario_tree=tree,
@@ -855,7 +1044,12 @@ def _stage11_request(
                             if _uses_model_stage7(value)
                             else "PRIVATE_MANUAL_TRANSIENT_STAGE7_NOT_MODEL_DERIVED"
                         ),
-                        "TRANSFER_SCOPE_EXPLICIT_OPERATOR_DECLARATION",
+                        (
+                            PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1
+                            if pruning_policy is not None
+                            else "TRANSFER_SCOPE_EXPLICIT_OPERATOR_DECLARATION"
+                        ),
+                        "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE",
                     }
                 )
             ),
@@ -871,7 +1065,38 @@ def _stage11_request(
         policy=load_one_gameweek_policy(),
         scenarios_by_node={root_id: gameweek.scenario_set.scenarios},
     )
-    return request, _MemoizedStage10Evaluator(tactical), candidates
+    actions = enumerate_legal_actions(
+        manager_state,
+        node=root,
+        candidate_pool=catalog,
+        rules=transfer_rules,
+        policy=search,
+    )
+    counts = tuple(sorted({item.transfer_count for item in actions}))
+    expected_counts = tuple(range(value.candidate_action_policy.maximum_transfers + 1))
+    if counts != expected_counts:
+        raise PrivateV1Error(
+            "PRIVATE_TRANSFER_COUNT_SCOPE_INCOMPLETE",
+            "the declared private transfer-count scope has no legal action at every count "
+            f"(available={counts}, retained_incoming={len(allowed)}, "
+            f"certified_removed={certified_dominated})",
+        )
+    current_squad = set(manager_state.squad_ids)
+    squad_signatures = {
+        tuple(sorted((current_squad - set(action.transfers_out)) | set(action.transfers_in)))
+        for action in actions
+    }
+    scope = PrivateTransferSearchScope(
+        full_incoming_count=len(full_allowed),
+        retained_incoming_ids=allowed,
+        transfer_counts_considered=counts,
+        one_transfer_actions=sum(item.transfer_count == 1 for item in actions),
+        two_transfer_actions=sum(item.transfer_count == 2 for item in actions),
+        exact_tactical_squads=len(squad_signatures),
+        certified_dominated_candidates=certified_dominated,
+        pruning_policy=pruning_policy,
+    )
+    return request, _MemoizedStage10Evaluator(tactical), candidates, scope
 
 
 def _parse_tactical_plan(value: dict[str, object]) -> OneGameweekPlan:
@@ -1196,14 +1421,36 @@ class PrivateV1RecommendationService:
             completed="Optimiser ready",
             failed="Stage 11 request preparation",
         ):
-            request, tactical, candidates = _stage11_request(execution, gameweek)
+            request, tactical, candidates, transfer_scope = _stage11_request(execution, gameweek)
         active_progress.message(f"candidate players: {len(candidates)}")
+        active_progress.message(
+            f"free transfers available: {execution.current_state.manager_state.free_transfers}"
+        )
+        active_progress.message(
+            "transfer counts considered: "
+            + ",".join(str(item) for item in transfer_scope.transfer_counts_considered)
+        )
+        active_progress.message(
+            f"full selectable incoming universe: {transfer_scope.full_incoming_count}"
+        )
+        active_progress.message(
+            f"retained transfer candidates: {len(transfer_scope.retained_incoming_ids)}"
+        )
+        active_progress.message(
+            f"retained one-transfer actions: {transfer_scope.one_transfer_actions}"
+        )
+        active_progress.message(
+            f"retained two-transfer actions: {transfer_scope.two_transfer_actions}"
+        )
+        active_progress.message(
+            f"exact tactical squads requiring evaluation: {transfer_scope.exact_tactical_squads}"
+        )
         active_progress.message(
             f"maximum transfers: {execution.candidate_action_policy.maximum_transfers}"
         )
         root_action_upper = _exact_root_action_upper_bound(
             squad_size=len(execution.current_state.manager_state.squad),
-            incoming_count=len(execution.candidate_action_policy.allowed_transfer_in_element_ids),
+            incoming_count=len(transfer_scope.retained_incoming_ids),
             maximum_transfers=execution.candidate_action_policy.maximum_transfers,
         )
         active_progress.message(f"root action upper bound: {root_action_upper}")
@@ -1273,15 +1520,14 @@ class PrivateV1RecommendationService:
         }
         moves = tuple(
             PrivateTransferMove(
-                player_out_id=player_out,
-                player_in_id=player_in,
-                official_fpl_element_out=element_by_player[player_out],
-                official_fpl_element_in=element_by_player[player_in],
+                player_out_id=move.player_out,
+                player_in_id=move.player_in,
+                official_fpl_element_out=element_by_player[move.player_out],
+                official_fpl_element_in=element_by_player[move.player_in],
             )
-            for player_out, player_in in zip(
-                recommended_action.action.transfers_out,
-                recommended_action.action.transfers_in,
-                strict=True,
+            for move in action_moves(
+                recommended_action.action,
+                candidate_pool=request.candidate_pool,
             )
         )
         matrix_hash = semantic_sha256(gameweek.joint_matrix)
@@ -1320,6 +1566,7 @@ class PrivateV1RecommendationService:
                     "NOT_PRODUCTION_ACTIVE",
                     "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE",
                     "EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE",
+                    *((transfer_scope.pruning_policy,) if transfer_scope.pruning_policy else ()),
                     *penalty_role_limitations,
                     *(
                         (
@@ -1441,10 +1688,18 @@ class PrivateV1RecommendationService:
             stage9_monte_carlo_reasons=tuple(sorted(set(gameweek.monte_carlo.stopping_reasons))),
             solver_optimality="EXACT_DECLARED_TREE_AND_ACTION_SPACE",
             action_space_disclosure=(
-                f"Exact over {len(execution.candidate_action_policy.allowed_transfer_in_element_ids)} "
-                "explicit incoming candidate(s), the current squad, at most "
-                f"{execution.candidate_action_policy.maximum_transfers} transfer(s), and the "
-                "declared Stage-9 scenario set."
+                "Exact tactical optimum within the declared bounded transfer candidate set: "
+                f"{len(transfer_scope.retained_incoming_ids)} retained incoming candidate(s) "
+                f"from {transfer_scope.full_incoming_count} selectable player(s), the exact "
+                f"current squad, transfer counts "
+                f"{','.join(str(item) for item in transfer_scope.transfer_counts_considered)}, "
+                f"{transfer_scope.one_transfer_actions} retained one-transfer action(s), "
+                f"{transfer_scope.two_transfer_actions} retained two-transfer action(s), "
+                f"{transfer_scope.exact_tactical_squads} exact tactical squad evaluation(s), "
+                f"{transfer_scope.certified_dominated_candidates} certified pointwise-dominated "
+                "incoming candidate(s) removed, "
+                f"and the declared Stage-9 scenario set. Screening policy: "
+                f"{transfer_scope.pruning_policy or 'EXPLICIT_DECLARED_ACTION_SPACE'}."
             ),
             warnings=warnings,
             lineage=lineage,

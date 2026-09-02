@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from itertools import combinations
 from pathlib import Path
 
 import pytest
@@ -22,6 +23,12 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
 from dmf_pulse.optimisation.multi_gameweek_service import (
     advance_current_action,
     optimise_multi_gameweek,
+)
+from dmf_pulse.optimisation.multi_gameweek_solver import (
+    apply_transfer_action,
+    enumerate_legal_actions,
+    make_transfer_action,
+    resolve_free_transfer_arc,
 )
 
 pytestmark = pytest.mark.unit
@@ -43,6 +50,89 @@ def test_rational_hit_and_ft_path_are_exact() -> None:
     assert current.free_transfers_before == 1
     assert current.free_transfers_after == 1
     assert result.recommended_plan.utility.expected_hit_cost == Decimal(4)
+
+
+def test_two_free_transfers_make_zero_one_and_two_no_hit_but_not_three_in_scope() -> None:
+    request = load_canonical_json(
+        ROOT / "funding_transfer_bundle.json", MultiGameweekOptimisationRequest
+    )
+    arcs = tuple(
+        resolve_free_transfer_arc(
+            request.rules,
+            event="NORMAL",
+            ft_before=2,
+            transfer_count=count,
+        )
+        for count in range(4)
+    )
+
+    assert tuple(item.hit_points for item in arcs[:3]) == (0, 0, 0)
+    assert arcs[3].hit_points == request.rules.hit_cost_per_paid_transfer
+    assert request.search_policy.max_transfers_per_node == 2
+
+
+def test_position_aware_action_generation_preserves_exhaustive_legal_signatures() -> None:
+    request = load_canonical_json(
+        ROOT / "funding_transfer_bundle.json", MultiGameweekOptimisationRequest
+    )
+    node = request.scenario_tree.root
+    state = request.initial_state
+    catalog = {item.player_id: item for item in request.candidate_pool}
+    owned = state.squad_ids
+    allowed = set(node.allowed_transfer_in_ids) or set(catalog)
+    available = tuple(
+        item.player_id
+        for item in request.candidate_pool
+        if item.player_id not in set(owned)
+        and item.player_id in allowed
+        and node.prices[item.player_id].purchasable
+    )
+    exhaustive: set[str] = set()
+    raw_pairs = 0
+    position_compatible_pairs = 0
+    for count in range(request.search_policy.max_transfers_per_node + 1):
+        for outs in combinations(owned, count):
+            for ins in combinations(available, count):
+                raw_pairs += 1
+                if sorted(catalog[item].position for item in outs) == sorted(
+                    catalog[item].position for item in ins
+                ):
+                    position_compatible_pairs += 1
+                action = make_transfer_action(
+                    transfers_out=tuple(outs),
+                    transfers_in=tuple(ins),
+                    event=node.transition_event,
+                )
+                try:
+                    apply_transfer_action(
+                        state,
+                        action,
+                        node=node,
+                        candidate_pool=request.candidate_pool,
+                        rules=request.rules,
+                    )
+                except ValueError:
+                    continue
+                exhaustive.add(action.signature)
+
+    assert raw_pairs > position_compatible_pairs
+    bounded_policy = seal_search_policy(
+        request.search_policy.model_copy(
+            update={
+                "max_actions_per_state": position_compatible_pairs,
+                "policy_sha256": "0" * 64,
+            }
+        )
+    )
+    generated = enumerate_legal_actions(
+        state,
+        node=node,
+        candidate_pool=request.candidate_pool,
+        rules=request.rules,
+        policy=bounded_policy,
+    )
+
+    assert {item.signature for item in generated} == exhaustive
 
 
 def test_roll_transfer_preserves_current_squad_and_banks_ft() -> None:

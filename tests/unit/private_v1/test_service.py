@@ -10,6 +10,7 @@ import pytest
 from dmf_pulse.fpl_points.models import (
     PENALTY_GOAL_SHARE_PROXY_WARNING,
     PenaltyHierarchyExhaustionPolicy,
+    PlayerPosition,
 )
 from dmf_pulse.ingestion.fpl.direct_payloads import (
     CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS,
@@ -17,16 +18,28 @@ from dmf_pulse.ingestion.fpl.direct_payloads import (
     CurrentPenaltyHierarchyEntry,
 )
 from dmf_pulse.optimisation.models import OneGameweekPlan
+from dmf_pulse.optimisation.multi_gameweek_models import PlayerCatalogEntry, PlayerPriceState
+from dmf_pulse.optimisation.multi_gameweek_service import optimise_multi_gameweek
 from dmf_pulse.private_v1.artifacts import (
     verify_replay_bundle,
     write_synthetic_replay_bundle,
 )
+from dmf_pulse.private_v1.automatic_inputs import (
+    PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1,
+)
 from dmf_pulse.private_v1.errors import PrivateV1Error
+from dmf_pulse.private_v1.models import (
+    PrivateCandidateActionPolicy,
+    seal_candidate_action_policy,
+)
 from dmf_pulse.private_v1.service import (
     PrivateV1RecommendationService,
+    _bounded_private_incoming_ids,
     _exact_root_action_upper_bound,
+    _MemoizedStage10Evaluator,
     _penalty_hierarchy_exhaustion_policy,
     _penalty_role_limitations,
+    _stage11_request,
 )
 
 from .e2e_test_support import build_execution_input
@@ -46,6 +59,152 @@ def test_exact_root_bound_covers_full_current_scale_candidate_universe() -> None
         )
         == 9211
     )
+
+
+def test_stage10_evaluates_identical_resulting_squad_once_per_root_node() -> None:
+    class Delegate:
+        rules = object()
+
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def evaluate(self, *, node, state):
+            self.calls += 1
+            return (node.node_id, state.squad_ids)
+
+    delegate = Delegate()
+    evaluator = _MemoizedStage10Evaluator(delegate)  # type: ignore[arg-type]
+    node = SimpleNamespace(node_id="root")
+    first_state = SimpleNamespace(squad_ids=("a", "b"), bank_tenths=0)
+    economically_equivalent = SimpleNamespace(squad_ids=("a", "b"), bank_tenths=10)
+
+    first = evaluator.evaluate(node=node, state=first_state)
+    second = evaluator.evaluate(node=node, state=economically_equivalent)
+
+    assert first is second
+    assert delegate.calls == 1
+
+
+def test_certified_pointwise_pruning_cannot_remove_toy_optimum() -> None:
+    entries = (
+        PlayerCatalogEntry(player_id="best", club_id="club-a", position=PlayerPosition.MID),
+        PlayerCatalogEntry(player_id="dominated", club_id="club-a", position=PlayerPosition.MID),
+        PlayerCatalogEntry(player_id="route", club_id="club-b", position=PlayerPosition.MID),
+    )
+    catalog = {item.player_id: item for item in entries}
+    prices = {
+        "best": PlayerPriceState(current_price_tenths=50),
+        "dominated": PlayerPriceState(current_price_tenths=55),
+        "route": PlayerPriceState(current_price_tenths=40),
+    }
+    scenario = SimpleNamespace(
+        player_points={"best": 8, "dominated": 7, "route": 3},
+        player_appeared={"best": True, "dominated": True, "route": True},
+    )
+    summaries = {
+        player_id: SimpleNamespace(expected_points=points, points_standard_deviation=0)
+        for player_id, points in {"best": 8, "dominated": 7, "route": 3}.items()
+    }
+    gameweek = SimpleNamespace(
+        scenario_set=SimpleNamespace(scenarios=(scenario,)),
+        player_summaries=summaries,
+    )
+
+    retained, certified_count = _bounded_private_incoming_ids(
+        ("best", "dominated", "route"),
+        catalog=catalog,
+        prices=prices,
+        gameweek=gameweek,  # type: ignore[arg-type]
+        maximum_transfers=2,
+    )
+
+    assert retained == ("best", "route")
+    assert certified_count == 1
+
+
+def test_labelled_heuristic_retains_expected_upside_and_price_route_candidates() -> None:
+    player_ids = tuple(f"p{index}" for index in range(6))
+    entries = tuple(
+        PlayerCatalogEntry(
+            player_id=player_id,
+            club_id=f"club-{player_id}",
+            position=PlayerPosition.MID,
+        )
+        for player_id in player_ids
+    )
+    catalog = {item.player_id: item for item in entries}
+    mean = {"p0": 10, "p1": 9, "p2": 8, "p3": 7, "p4": 1, "p5": 0}
+    deviation = {**{player_id: 0 for player_id in player_ids}, "p2": 10}
+    prices = {
+        player_id: PlayerPriceState(current_price_tenths=(10 if player_id == "p3" else 100))
+        for player_id in player_ids
+    }
+    scenario = SimpleNamespace(
+        player_points=mean,
+        player_appeared={player_id: True for player_id in player_ids},
+    )
+    gameweek = SimpleNamespace(
+        scenario_set=SimpleNamespace(scenarios=(scenario,)),
+        player_summaries={
+            player_id: SimpleNamespace(
+                expected_points=mean[player_id],
+                points_standard_deviation=deviation[player_id],
+            )
+            for player_id in player_ids
+        },
+    )
+
+    retained, certified_count = _bounded_private_incoming_ids(
+        player_ids,
+        catalog=catalog,
+        prices=prices,
+        gameweek=gameweek,  # type: ignore[arg-type]
+        maximum_transfers=2,
+    )
+
+    assert retained == ("p0", "p1", "p2", "p3")
+    assert certified_count == 0
+
+
+def test_labelled_heuristic_fails_closed_when_metric_ties_exceed_bound() -> None:
+    player_ids = tuple(f"p{index:02d}" for index in range(25))
+    catalog = {
+        player_id: PlayerCatalogEntry(
+            player_id=player_id,
+            club_id=f"club-{player_id}",
+            position=PlayerPosition.MID,
+        )
+        for player_id in player_ids
+    }
+    prices = {player_id: PlayerPriceState(current_price_tenths=50) for player_id in player_ids}
+    scenario = SimpleNamespace(
+        player_points={player_id: 5 for player_id in player_ids},
+        player_appeared={player_id: True for player_id in player_ids},
+    )
+    gameweek = SimpleNamespace(
+        scenario_set=SimpleNamespace(scenarios=(scenario,)),
+        player_summaries={
+            player_id: SimpleNamespace(expected_points=5, points_standard_deviation=0)
+            for player_id in player_ids
+        },
+    )
+
+    with pytest.raises(PrivateV1Error, match="PRIVATE_TRANSFER_SCREEN_UNBOUNDED"):
+        _bounded_private_incoming_ids(
+            player_ids,
+            catalog=catalog,
+            prices=prices,
+            gameweek=gameweek,  # type: ignore[arg-type]
+            maximum_transfers=2,
+        )
+
+    assert _bounded_private_incoming_ids(
+        player_ids,
+        catalog=catalog,
+        prices=prices,
+        gameweek=gameweek,  # type: ignore[arg-type]
+        maximum_transfers=0,
+    ) == ((), 0)
 
 
 def test_current_penalty_hierarchy_limitation_is_disclosed_without_false_fallback(
@@ -164,6 +323,37 @@ def test_complete_synthetic_run_and_offline_replay(
     execution = build_execution_input(repository_root, tmp_path / "source")
     service = PrivateV1RecommendationService()
     first = service.run(execution)
+
+    policy_payload = execution.candidate_action_policy.model_dump(mode="python")
+    policy_payload.update(
+        {
+            "rationale": (
+                f"{PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1}: toy bounded-search proof."
+            ),
+            "semantic_sha256": "0" * 64,
+        }
+    )
+    bounded_policy = seal_candidate_action_policy(
+        PrivateCandidateActionPolicy.model_construct(**policy_payload)
+    )
+    bounded_execution = _replace(execution, candidate_action_policy=bounded_policy)
+    bounded_request, bounded_tactical, _, bounded_scope = _stage11_request(
+        bounded_execution,
+        first.gameweek_projection,
+    )
+    bounded = optimise_multi_gameweek(bounded_request, evaluator=bounded_tactical)
+
+    assert bounded_scope.retained_incoming_ids == (
+        bounded_request.scenario_tree.root.allowed_transfer_in_ids
+    )
+    assert bounded.recommended_plan is not None
+    assert first.optimiser_result.recommended_plan is not None
+    assert bounded.recommended_plan.current_action.action.signature == (
+        first.optimiser_result.recommended_plan.current_action.action.signature
+    )
+    assert bounded.recommended_plan.utility.objective_total == (
+        first.optimiser_result.recommended_plan.utility.objective_total
+    )
 
     assert first.decision.engineering_status == (
         "PRIVATE_V1_E2E_001A_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW"

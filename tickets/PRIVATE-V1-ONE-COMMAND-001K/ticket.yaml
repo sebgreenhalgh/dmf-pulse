@@ -1,0 +1,41 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001K"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Current free-transfer fidelity and scalable private transfer search"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001K"
+required_base_commit: "e2961220ed110854eb9c912448f809ff3bad5e20"
+objective: >-
+  Derive the private current transfer-count scope from authenticated free transfers and compiled
+  rules, then search a governed bounded 0/1/2-transfer candidate set with exact Stage-10 tactical
+  evaluation and truthful non-global optimality claims.
+authority_scopes:
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW"
+in_scope:
+  - "Full selectable current player universe and exact current manager squad upstream."
+  - "Manager/rules-derived private no-hit transfer counts up to the two-transfer STANDARD limit."
+  - "Certified same-club/position/appearance pointwise dominance and labelled heuristic screening."
+  - "Position-native exact action enumeration and pre-Stage-10 legality checks."
+  - "Per-root canonical resulting-squad Stage-10 memoization."
+  - "Safe progress counts and bounded-search disclosure in the human report."
+  - "Literal live retry or exact runtime-input blocker."
+permissions:
+  official_fpl_network: "operator_initiated_existing_one_command_get_only"
+  official_odds_network: "operator_initiated_existing_one_command_get_only"
+  authentication_or_credentials: "existing_environment_only"
+  raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Stage-7 model or reconciliation changes."
+  - "Stage-8 or Stage-9 football/FPL simulation changes."
+  - "Penalty, captaincy, chip, FPL transport or Odds transport changes."
+  - "A global FPL transfer optimum claim for the heuristic private STANDARD scope."
+  - "Persistence, PR, merge, tag or production activation."
+required_execution_status: "REAL_PRIVATE_TRANSIENT_RECOMMENDATION_OR_EXACT_NEXT_BLOCKER"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

@@ -248,6 +248,10 @@ def _display_report(
         f"{comparison.gain_p90}\n"
         "P(recommendation > baseline): "
         f"{comparison.probability_recommended_beats_baseline:.1%}\n\n"
+        "SEARCH SCOPE\n"
+        f"{decision.action_space_disclosure}\n"
+        "Limitation: ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE; preserving an unused free "
+        "transfer for the following Gameweek is not valued.\n\n"
         "WARNINGS\n"
         f"{warnings}\n"
         "- FPL_API_OPERATOR_INITIATED_ACCEPTED_CONTRACTUAL_RISK\n"
@@ -406,7 +410,7 @@ class PrivateV1OneCommandService:
                     progress=self._progress,
                 )
             ownership = build_automatic_ownership(snapshot, manager)
-            candidates = build_full_candidate_policy(snapshot, manager)
+            candidates = build_full_candidate_policy(snapshot, manager, ruleset)
             with self._progress.stage(
                 started="Building current score priors...",
                 completed="Score priors ready",

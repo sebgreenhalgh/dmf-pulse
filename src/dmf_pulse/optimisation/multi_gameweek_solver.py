@@ -9,6 +9,7 @@ from decimal import Decimal
 from itertools import combinations, product
 
 from dmf_pulse.fpl_points.artifacts import semantic_sha256
+from dmf_pulse.fpl_points.models import PlayerPosition
 from dmf_pulse.optimisation.manager_state import (
     ManagerState,
     OwnershipSpell,
@@ -433,6 +434,12 @@ def enumerate_legal_actions(
         and item.player_id in allowed
         and node.prices[item.player_id].purchasable
     )
+    available_by_position = {
+        position: tuple(
+            player_id for player_id in available if catalog[player_id].position is position
+        )
+        for position in PlayerPosition
+    }
     maximum = min(
         policy.max_transfers_per_node,
         rules.max_transfers_per_deadline,
@@ -447,16 +454,19 @@ def enumerate_legal_actions(
         for outs_raw in combinations(owned, count):
             outs = tuple(sorted(outs_raw))
             out_positions = Counter(catalog[item].position for item in outs)
-            for ins_raw in combinations(available, count):
+            position_choices = tuple(
+                combinations(available_by_position[position], out_positions[position])
+                for position in PlayerPosition
+                if out_positions[position]
+            )
+            for position_parts in product(*position_choices):
                 combinations_considered += 1
                 if combinations_considered > policy.max_actions_per_state:
                     raise ResourceLimitReached(
                         "candidate action combinations exceed max_actions_per_state; "
                         "no incomplete enumeration was labelled optimal"
                     )
-                ins = tuple(sorted(ins_raw))
-                if Counter(catalog[item].position for item in ins) != out_positions:
-                    continue
+                ins = tuple(sorted(player_id for part in position_parts for player_id in part))
                 action = make_transfer_action(
                     transfers_out=outs,
                     transfers_in=ins,

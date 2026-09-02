@@ -1,0 +1,11 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "free_transfer_scope": "PASS_MANAGER_AND_COMPILED_RULES_DERIVED_0_1_2",
+  "live_one_command": "BLOCKED_LIVE_RUNTIME_INPUTS_UNAVAILABLE",
+  "optimality_claim": "EXACT_TACTICAL_OPTIMUM_WITHIN_DECLARED_BOUNDED_TRANSFER_CANDIDATE_SET",
+  "position_aware_enumeration": "PASS_TOY_EXHAUSTIVE_SIGNATURE_EQUIVALENCE",
+  "provider_bodies_retained": 0,
+  "search_policy": "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1",
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001K"
+}
