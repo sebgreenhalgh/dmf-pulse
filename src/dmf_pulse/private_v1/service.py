@@ -141,6 +141,7 @@ from dmf_pulse.private_v1.models import (
 )
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 from dmf_pulse.private_v1.reporting import render_transfer_frontier
+from dmf_pulse.private_v1.rolling_models import PrivateRollingGameweekInput
 from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 
@@ -695,6 +696,8 @@ def _project_fixtures(
     value: PrivateV1ExecutionInput,
     prior: GovernedPlayerPrior,
     progress: ProgressSink | None = None,
+    *,
+    future_gameweek: PrivateRollingGameweekInput | None = None,
 ) -> tuple[
     tuple[FixtureProjectionResult, ...],
     dict[str, str],
@@ -703,16 +706,43 @@ def _project_fixtures(
     set[str],
 ]:
     active_progress = progress or NullProgress()
-    fixture_authority = _fixture_authority(value)
     current_players, current_teams = _current_identity_maps(value)
-    minutes_by_fixture = {item.fixture_id: item for item in value.manual_minutes}
-    prior_by_fixture = {str(item.fixture_id): item for item in value.score_priors}
-    markets_by_fixture = {
-        str(item.canonical_fixture_id): item for item in value.market_constraints.fixtures
-    }
+    if future_gameweek is None:
+        fixture_authority = _fixture_authority(value)
+        minutes_by_fixture = {item.fixture_id: item for item in value.manual_minutes}
+        prior_by_fixture = {str(item.fixture_id): item for item in value.score_priors}
+        constraints_by_fixture = {
+            str(item.canonical_fixture_id): item.constraint_set.constraints
+            for item in value.market_constraints.fixtures
+        }
+        target_gameweek = value.current_state.target_gameweek
+    else:
+        if any(item.market_mode == "BLOCKED" for item in future_gameweek.fixtures):
+            raise PrivateV1Error(
+                "FUTURE_FIXTURE_INPUT_BLOCKED",
+                "at least one future fixture lacks an accepted current-cutoff projection input",
+            )
+        fpl_by_id = {
+            item.provider_fixture_id: item for item in value.current_state.fpl_input.fixtures
+        }
+        fixture_authority = {
+            str(item.canonical_fixture_id): (fpl_by_id[item.official_fpl_fixture_id], item)
+            for item in future_gameweek.fixtures
+        }
+        minutes_by_fixture = {
+            str(item.canonical_fixture_id): item.stage7 for item in future_gameweek.fixtures
+        }
+        prior_by_fixture = {
+            str(item.canonical_fixture_id): item.score_prior for item in future_gameweek.fixtures
+        }
+        constraints_by_fixture = {
+            str(item.canonical_fixture_id): item.market_constraints
+            for item in future_gameweek.fixtures
+        }
+        target_gameweek = future_gameweek.gameweek
     engine = AcceptedRulesAdapter(value.ruleset)
     points = FplPointsService(engine, value.stage9_monte_carlo_policy)
-    gameweek_id = f"GW-{value.current_state.target_gameweek}"
+    gameweek_id = f"GW-{target_gameweek}"
     stage7_context_hashes: dict[str, str] = {}
     stage8_hashes: dict[str, str] = {}
     binding_hashes: dict[str, str] = {}
@@ -725,7 +755,6 @@ def _project_fixtures(
         active_progress.message(f"Stage 8/9 fixture {fixture_number}/{fixture_count}...")
         fpl_fixture, _canonical_fixture = fixture_authority[fixture_id]
         stage7 = minutes_by_fixture[fixture_id]
-        market = markets_by_fixture[fixture_id]
         score_prior = prior_by_fixture[fixture_id]
         expected_home = canonical_teams[int(fpl_fixture.home_team_identity.external_id_text)]
         expected_away = canonical_teams[int(fpl_fixture.away_team_identity.external_id_text)]
@@ -757,7 +786,7 @@ def _project_fixtures(
                     as_of=value.current_state.information_cutoff,
                     minutes_context=context,
                     prior=score_prior.score_prior_request,
-                    constraints=market.constraint_set.constraints,
+                    constraints=constraints_by_fixture[fixture_id],
                 )
             )
         except (IngestionError, ValidationError, ValueError) as exc:
@@ -958,6 +987,8 @@ def _manager_state(
 def _stage11_request(
     value: PrivateV1ExecutionInput,
     gameweek: GameweekProjectionResult,
+    *,
+    future_gameweeks: tuple[GameweekProjectionResult, ...] = (),
 ) -> tuple[
     MultiGameweekOptimisationRequest,
     _MemoizedStage10Evaluator,
@@ -967,7 +998,13 @@ def _stage11_request(
     current_players, _teams = _current_identity_maps(value)
     canonical_players = _canonical_player_by_element(value)
     canonical_teams = _canonical_team_by_official(value)
+    projections = (gameweek, *future_gameweeks)
     scenario_player_ids = set(gameweek.scenario_set.player_ids)
+    if any(set(item.scenario_set.player_ids) != scenario_player_ids for item in projections[1:]):
+        raise PrivateV1Error(
+            "HORIZON_PLAYER_UNIVERSE_MISMATCH",
+            "all private horizon Gameweeks must retain one canonical player universe",
+        )
     required = {
         canonical_players[item.official_fpl_element_id]
         for item in value.current_state.manager_state.squad
@@ -1027,6 +1064,7 @@ def _stage11_request(
     root_id = f"GW-{value.current_state.target_gameweek}-CURRENT"
     if gameweek.result_sha256 is None:  # guarded by the successful projection contract
         raise PrivateV1Error("STAGE9_GAMEWEEK_INVALID", "Stage-9 result hash is absent")
+    declared_transfer_limit = value.candidate_action_policy.maximum_transfers
     pruning_policy = (
         PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1
         if PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1 in value.candidate_action_policy.rationale
@@ -1040,7 +1078,7 @@ def _stage11_request(
             catalog={item.player_id: item for item in catalog},
             prices=prices,
             gameweek=gameweek,
-            maximum_transfers=value.candidate_action_policy.maximum_transfers,
+            maximum_transfers=declared_transfer_limit,
         )
     root = ScenarioTreeNode(
         node_id=root_id,
@@ -1055,20 +1093,62 @@ def _stage11_request(
     root = root.model_copy(
         update={"information_set_key": information_set_key(root, parent_key=None)}
     )
+    nodes = [root]
+    parent = root
+    parent_key = root.information_set_key
+    for future in future_gameweeks:
+        if future.result_sha256 is None:
+            raise PrivateV1Error("STAGE9_GAMEWEEK_INVALID", "future Stage-9 result hash is absent")
+        node_id = f"GW-{future.scenario_set.gameweek_id.removeprefix('GW-')}-CURRENT-CUTOFF-PLAN"
+        preliminary = ScenarioTreeNode(
+            node_id=node_id,
+            parent_id=parent.node_id,
+            gameweek=parent.gameweek + 1,
+            conditional_probability=Decimal(1),
+            information_set_key="pending",
+            points_state_id=future.result_sha256,
+            prices=prices,
+            allowed_transfer_in_ids=allowed,
+            tactical_values=(),
+        )
+        node = preliminary.model_copy(
+            update={"information_set_key": information_set_key(preliminary, parent_key=parent_key)}
+        )
+        nodes.append(node)
+        parent = node
+        parent_key = node.information_set_key
     tree = seal_scenario_tree(
         ScenarioTree(
-            tree_id=f"{value.run_id}-GW-{value.current_state.target_gameweek}",
-            nodes=(root,),
+            tree_id=(
+                f"{value.run_id}-GW-{value.current_state.target_gameweek}"
+                if not future_gameweeks
+                else (
+                    f"{value.run_id}-GW-{value.current_state.target_gameweek}-TO-"
+                    f"{value.current_state.target_gameweek + len(future_gameweeks)}"
+                )
+            ),
+            nodes=tuple(nodes),
             tree_sha256="0" * 64,
         )
     )
+    transfer_rules = build_multi_gameweek_transfer_rules(
+        value.ruleset,
+        projection_mode=value.projection_mode,
+    )
     search = load_multi_gameweek_search_policy()
     search_payload = search.model_dump(mode="python")
-    search_payload["max_transfers_per_node"] = value.candidate_action_policy.maximum_transfers
+    effective_maximum_transfers = min(
+        declared_transfer_limit,
+        search.max_transfers_per_node,
+        transfer_rules.max_transfers_per_deadline,
+        len(allowed),
+        len(value.current_state.manager_state.squad),
+    )
+    search_payload["max_transfers_per_node"] = effective_maximum_transfers
     root_action_upper = _exact_root_action_upper_bound(
         squad_size=len(value.current_state.manager_state.squad),
         incoming_count=len(allowed),
-        maximum_transfers=value.candidate_action_policy.maximum_transfers,
+        maximum_transfers=effective_maximum_transfers,
     )
     search_payload["max_actions_per_state"] = max(search.max_actions_per_state, root_action_upper)
     search_payload["max_returned_root_candidates"] = max(
@@ -1076,10 +1156,6 @@ def _stage11_request(
     )
     search_payload["policy_sha256"] = "0" * 64
     search = seal_search_policy(SearchPolicy.model_validate(search_payload))
-    transfer_rules = build_multi_gameweek_transfer_rules(
-        value.ruleset,
-        projection_mode=value.projection_mode,
-    )
     manager_state = _manager_state(value, root_node_id=root_id)
     request = seal_request(
         MultiGameweekOptimisationRequest(
@@ -1095,7 +1171,11 @@ def _stage11_request(
                 sorted(
                     {
                         "NO_CHIP",
-                        "ONE_GAMEWEEK_HORIZON_ZERO_TERMINAL_VALUE",
+                        (
+                            "ONE_GAMEWEEK_HORIZON_ZERO_TERMINAL_VALUE"
+                            if not future_gameweeks
+                            else "THREE_GAMEWEEK_ZERO_TERMINAL_VALUE_AFTER_HORIZON"
+                        ),
                         "OPERATOR_ATTESTED_OWNERSHIP_ACQUISITION_GAMEWEEKS",
                         (
                             "ACCEPTED_REGULARISED_EMPIRICAL_BAYES_COHERENCE_STAGE7"
@@ -1107,7 +1187,21 @@ def _stage11_request(
                             if pruning_policy is not None
                             else "TRANSFER_SCOPE_EXPLICIT_OPERATOR_DECLARATION"
                         ),
-                        "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE",
+                        (
+                            "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE"
+                            if not future_gameweeks
+                            else "EXPECTED_THREE_GAMEWEEK_POINTS_WITH_LEGAL_RECOURSE"
+                        ),
+                        *(
+                            ()
+                            if not future_gameweeks
+                            else (
+                                "DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1",
+                                "FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1",
+                                "HORIZON_TRANSFER_COUNT_FRONTIER_V1",
+                                "NO_CHIP_EXPLICIT",
+                            )
+                        ),
                     }
                 )
             ),
@@ -1121,7 +1215,10 @@ def _stage11_request(
             projection_mode=value.projection_mode,
         ),
         policy=load_one_gameweek_policy(),
-        scenarios_by_node={root_id: gameweek.scenario_set.scenarios},
+        scenarios_by_node={
+            node.node_id: projection.scenario_set.scenarios
+            for node, projection in zip(nodes, projections, strict=True)
+        },
     )
     actions = enumerate_legal_actions(
         manager_state,
@@ -1131,7 +1228,7 @@ def _stage11_request(
         policy=search,
     )
     counts = tuple(sorted({item.transfer_count for item in actions}))
-    expected_counts = tuple(range(value.candidate_action_policy.maximum_transfers + 1))
+    expected_counts = tuple(range(effective_maximum_transfers + 1))
     if counts != expected_counts:
         raise PrivateV1Error(
             "PRIVATE_TRANSFER_COUNT_SCOPE_INCOMPLETE",

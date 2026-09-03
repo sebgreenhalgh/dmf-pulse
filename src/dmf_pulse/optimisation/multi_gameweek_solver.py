@@ -832,6 +832,22 @@ def select_transfer_count_frontier(
     return tuple(selected)
 
 
+def select_horizon_transfer_count_frontier(
+    candidates: tuple[PolicyCandidate, ...],
+) -> tuple[PolicyCandidate, ...]:
+    """Select the best complete expected-utility policy at each root transfer count."""
+
+    if not candidates:
+        raise InfeasiblePolicyError("no evaluated root policies are available for the frontier")
+    grouped: dict[int, list[PolicyCandidate]] = defaultdict(list)
+    for item in candidates:
+        grouped[item.root_action.transfer_count].append(item)
+    return tuple(
+        select_candidate(tuple(grouped[transfer_count]), mode=ObjectiveMode.EXPECTED)
+        for transfer_count in sorted(grouped)
+    )
+
+
 def _root_sufficient_candidates(
     candidates: list[PolicyCandidate],
 ) -> tuple[PolicyCandidate, ...]:

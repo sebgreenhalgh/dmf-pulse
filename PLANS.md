@@ -1,5 +1,35 @@
 # DMF Pulse execution plans
 
+# PRIVATE-V1-ONE-COMMAND-001N private current three-Gameweek rolling optimiser
+
+- Parent/branch: immutable accepted parent `ad155c077253a0525f0c7406e955240146823f80`
+  on `readiness/PRIVATE-V1-ONE-COMMAND-001N`; successful exact-parent CI `33704284462`.
+- Scope: add an explicit three-consecutive-Gameweek private mode that constructs every horizon
+  projection at the current cutoff, reuses the accepted Stage-11 state/transfer/tree engine,
+  executes only the root action, and reports provisional future recourse plus a horizon-valued
+  root transfer-count frontier.
+- Governed assumptions: `ZERO_FLEXIBILITY_BASELINE_V1` remains disabled after GW+2; future
+  prices hold the current official price constant; future missing markets use the accepted
+  Stage-8 prior-only path with typed coverage; the tree reveals no new information; current
+  candidate pruning and the exact-within-declared-space limitation remain explicit; chips and
+  rank utility remain off.
+
+## PRIVATE-V1-ONE-COMMAND-001N checkpoints
+
+- [x] Verify the immutable parent, successful exact-SHA CI, isolated worktree, authority
+  manifests, governing DMFP excerpts, OPT-010/011, and 001K/001L/001M contracts.
+- [x] Add RED contracts, Stage-11 horizon-frontier cases, private rolling-policy cases, exact
+  independent oracle equivalence, FT-carry/opposite/hit/continuity/nonanticipativity proofs, and
+  one-GW byte/hash compatibility.
+- [x] Implement the smallest separate rolling input/output contract and three-node integration,
+  current-cutoff future Stage-7/8/9 inputs, structured deterministic comparisons, and truthful
+  runtime instrumentation without changing the one-GW default.
+- [x] Pass focused and affected unit/property/contract/golden/integration coverage plus Ruff,
+  strict mypy, frozen sync, build/wheel, repository/manifest/security gates.
+- [ ] Seal synthetic evidence and benchmark results, commit and push the isolated branch, require
+  exact final-SHA CI success, and only then attempt an optional no-retention live run if existing
+  credentials and future sources permit it.
+
 # PRIVATE-V1-ONE-COMMAND-001G current penalty hierarchy and market-weight canonicalisation
 
 - Parent/branch: immutable accepted parent `90f6f8fede041fd4a7d616c88053d8103700fa64`

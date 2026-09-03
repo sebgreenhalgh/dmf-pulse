@@ -1,0 +1,16 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "candidate_scope": "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "future_market_mode": "TYPED_SCORE_PRIOR_ONLY_WHEN_CURRENT_MARKET_ABSENT",
+  "future_price_mode": "FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1",
+  "horizon_gameweeks": 3,
+  "horizon_objective": "EXPECTED_THREE_GAMEWEEK_POINTS_WITH_LEGAL_RECOURSE",
+  "one_gameweek_backward_compatibility": "PASS_BYTE_AND_SEMANTIC_HASH",
+  "provider_bodies_retained": 0,
+  "scenario_tree_mode": "DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1",
+  "solver_scope": "EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE",
+  "terminal_value_mode": "THREE_GAMEWEEK_ZERO_TERMINAL_VALUE_AFTER_HORIZON",
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001N",
+  "transfer_count_scope_source": "CURRENT_FT_COMPILED_RULES_AND_TICKET_BOUNDED_SEARCH_POLICY"
+}

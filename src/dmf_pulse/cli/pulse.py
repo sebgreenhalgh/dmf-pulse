@@ -10,7 +10,7 @@ import re
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal, cast
 
 import typer
 from pydantic import SecretStr
@@ -112,6 +112,13 @@ def _code_sha() -> str:
 
 def pulse_command(
     entry_id: Annotated[int, typer.Option("--entry-id", min=1, help="Private FPL entry ID.")],
+    horizon_gameweeks: Annotated[
+        int,
+        typer.Option(
+            "--horizon-gameweeks",
+            help="Optimisation horizon: 1 (default) or explicit rolling 3-GW mode.",
+        ),
+    ] = 1,
     no_progress: Annotated[
         bool,
         typer.Option("--no-progress", help="Suppress human progress output on STDERR."),
@@ -125,6 +132,8 @@ def pulse_command(
         else HumanCliProgress(write=lambda value: typer.echo(value, err=True))
     )
     try:
+        if horizon_gameweeks not in {1, 3}:
+            raise PrivateV1Error("USAGE_INVALID", "--horizon-gameweeks must be exactly 1 or 3.")
         if not os.environ.get("THE_ODDS_API_KEY", "").strip():
             raise PrivateV1Error("CREDENTIAL_UNAVAILABLE", "THE_ODDS_API_KEY is missing.")
         approved_at = datetime.now(UTC)
@@ -142,6 +151,7 @@ def pulse_command(
                 code_sha=_code_sha(),
                 run_at=information_cutoff,
                 operator_approved_at=approved_at,
+                horizon_gameweeks=cast(Literal[1, 3], horizon_gameweeks),
             )
         )
         typer.echo(result.report)

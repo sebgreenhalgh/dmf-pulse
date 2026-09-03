@@ -14,6 +14,8 @@ from dmf_pulse.optimisation.multi_gameweek_errors import (
 from dmf_pulse.optimisation.multi_gameweek_models import (
     AlternativeAvailability,
     BackendStatus,
+    HorizonTransferCountFrontier,
+    HorizonTransferCountFrontierPoint,
     MultiGameweekLineage,
     MultiGameweekOptimisationRequest,
     MultiGameweekOptimisationResult,
@@ -30,6 +32,7 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
     TransferCountFrontier,
     TransferCountFrontierPoint,
     seal_advance,
+    seal_horizon_transfer_count_frontier,
     seal_request,
     seal_result,
     seal_scenario_tree,
@@ -49,6 +52,7 @@ from dmf_pulse.optimisation.multi_gameweek_solver import (
     observe_node,
     root_node,
     select_candidate,
+    select_horizon_transfer_count_frontier,
     select_materially_distinct_candidate,
     select_transfer_count_frontier,
     solve_frontier,
@@ -203,7 +207,41 @@ def _build_transfer_count_frontier(
     frontier: FrontierResult,
     *,
     assumptions: tuple[str, ...],
-) -> TransferCountFrontier:
+) -> TransferCountFrontier | HorizonTransferCountFrontier:
+    horizon_gameweeks = tuple(sorted({item.gameweek for item in request.scenario_tree.nodes}))
+    if "HORIZON_TRANSFER_COUNT_FRONTIER_V1" in request.assumptions:
+        if len(horizon_gameweeks) <= 1:
+            raise ValueError("horizon transfer-count frontier requires multiple Gameweeks")
+        horizon_points: list[HorizonTransferCountFrontierPoint] = []
+        for candidate in select_horizon_transfer_count_frontier(frontier.candidates):
+            plan = build_plan(
+                request,
+                candidate,
+                plan_kind=PlanKind.TRANSFER_COUNT_FRONTIER,
+                objective_mode=ObjectiveMode.EXPECTED,
+                diagnostics=frontier.diagnostics,
+                assumptions=assumptions,
+            )
+            root = candidate.root_decision
+            horizon_points.append(
+                HorizonTransferCountFrontierPoint(
+                    transfer_count=root.action.transfer_count,
+                    plan=plan,
+                    immediate_expected_points_before_hit=(root.tactical_evaluation.expected_points),
+                    transfer_hit_points=root.hit_points,
+                    current_gameweek_objective=(
+                        root.tactical_evaluation.expected_points - Decimal(root.hit_points)
+                    ),
+                    expected_horizon_utility=plan.utility.expected_horizon_utility,
+                )
+            )
+        return seal_horizon_transfer_count_frontier(
+            HorizonTransferCountFrontier.model_construct(
+                horizon_gameweeks=horizon_gameweeks,
+                points=tuple(horizon_points),
+                frontier_sha256="0" * 64,
+            )
+        )
     points: list[TransferCountFrontierPoint] = []
     for candidate in select_transfer_count_frontier(frontier.candidates):
         plan = build_plan(

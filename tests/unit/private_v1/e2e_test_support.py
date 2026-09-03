@@ -33,6 +33,7 @@ from dmf_pulse.ingestion.odds.current import build_current_odds_input
 from dmf_pulse.ingestion.odds.models import QuotaSource, QuotaState
 from dmf_pulse.ingestion.odds.parser import parse_odds_payload
 from dmf_pulse.optimisation.manager_state import selling_price_tenths
+from dmf_pulse.optimisation.multi_gameweek_policy import load_terminal_value_policy
 from dmf_pulse.private_v1.models import (
     PrivateCandidateActionPolicy,
     PrivateCanonicalPlayerIdentity,
@@ -47,6 +48,14 @@ from dmf_pulse.private_v1.models import (
     seal_current_ownership,
     seal_execution_input,
     seal_fixture_score_prior,
+)
+from dmf_pulse.private_v1.rolling_models import (
+    PrivateRollingFixtureInput,
+    PrivateRollingGameweekInput,
+    PrivateV1RollingExecutionInput,
+    seal_rolling_execution_input,
+    seal_rolling_fixture_input,
+    seal_rolling_gameweek_input,
 )
 from dmf_pulse.private_v1.service import load_packaged_event_allocation_config
 from dmf_pulse.rules.chips import build_chip_rules_view
@@ -127,6 +136,7 @@ def _build_fpl_input(
     target_gameweek: int = 1,
     captured_at: datetime = _CAPTURED,
     information_cutoff: datetime = _CUTOFF,
+    horizon_gameweeks: int = 1,
 ):
     source = repository_root / "fixtures/fpl/FPL-004/happy_path"
     bootstrap = json.loads((source / "bootstrap.json").read_text(encoding="utf-8"))
@@ -135,10 +145,31 @@ def _build_fpl_input(
     original_teams = bootstrap["teams"]
     original_players = bootstrap["elements"]
     templates = {int(item["element_type"]): item for item in original_players}
-    if target_gameweek != 1:
-        target_event = next(item for item in bootstrap["events"] if item["id"] == target_gameweek)
+    existing_events = {int(item["id"]): item for item in bootstrap["events"]}
+    for gameweek in range(target_gameweek, target_gameweek + horizon_gameweeks):
+        if gameweek in existing_events:
+            continue
+        event = deepcopy(bootstrap["events"][-1])
+        event.update(
+            {
+                "id": gameweek,
+                "name": f"Gameweek {gameweek}",
+                "is_current": False,
+                "is_next": False,
+                "is_previous": False,
+                "finished": False,
+                "data_checked": False,
+                "highest_scoring_entry": None,
+                "highest_score": None,
+            }
+        )
+        bootstrap["events"].append(event)
+        existing_events[gameweek] = event
+    for offset in range(horizon_gameweeks):
+        gameweek = target_gameweek + offset
+        target_event = next(item for item in bootstrap["events"] if item["id"] == gameweek)
         target_event["deadline_time"] = (
-            (information_cutoff + timedelta(days=2)).isoformat().replace("+00:00", "Z")
+            (information_cutoff + timedelta(days=2 + offset * 7)).isoformat().replace("+00:00", "Z")
         )
     teams = []
     for team_id in range(1, 7):
@@ -176,21 +207,32 @@ def _build_fpl_input(
             players.append(player)
     fixture_template = fixtures_source[0]
     fixtures = []
-    for index, (home, away) in enumerate(((1, 2), (3, 4), (5, 6)), start=1):
-        fixture = deepcopy(fixture_template)
-        fixture.update(
-            {
-                "id": 100 + index,
-                "code": 910100 + index,
-                "event": target_gameweek,
-                "kickoff_time": (information_cutoff + timedelta(days=2, hours=index * 2))
-                .isoformat()
-                .replace("+00:00", "Z"),
-                "team_h": home,
-                "team_a": away,
-            }
-        )
-        fixtures.append(fixture)
+    for offset in range(horizon_gameweeks):
+        gameweek = target_gameweek + offset
+        for index, (home, away) in enumerate(((1, 2), (3, 4), (5, 6)), start=1):
+            fixture = deepcopy(fixture_template)
+            fixture_id = 100 + index if horizon_gameweeks == 1 else gameweek * 100 + index
+            fixture_code = (
+                910100 + index if horizon_gameweeks == 1 else 910000 + gameweek * 100 + index
+            )
+            fixture.update(
+                {
+                    "id": fixture_id,
+                    "code": fixture_code,
+                    "event": gameweek,
+                    "kickoff_time": (
+                        information_cutoff + timedelta(days=2 + offset * 7, hours=index * 2)
+                    )
+                    .isoformat()
+                    .replace("+00:00", "Z"),
+                    "team_h": home,
+                    "team_a": away,
+                    "finished": False,
+                    "finished_provisional": False,
+                    "started": False,
+                }
+            )
+            fixtures.append(fixture)
     bootstrap["teams"] = teams
     bootstrap["elements"] = players
     working.mkdir(parents=True, exist_ok=True)
@@ -407,6 +449,7 @@ def _unified_context(
     target_gameweek: int = 1,
     captured_at: datetime = _CAPTURED,
     information_cutoff: datetime = _CUTOFF,
+    horizon_gameweeks: int = 1,
 ) -> CurrentUnifiedTestContext:
     fpl_input = _build_fpl_input(
         repository_root,
@@ -414,6 +457,7 @@ def _unified_context(
         target_gameweek=target_gameweek,
         captured_at=captured_at,
         information_cutoff=information_cutoff,
+        horizon_gameweeks=horizon_gameweeks,
     )
     ruleset, capability = active_target_rules(repository_root)
     manager = _compile_manager(
@@ -441,7 +485,16 @@ def _unified_context(
         ),
         approved_at=approved,
     )
-    targets = tuple(sorted(fpl_input.fixtures, key=lambda item: item.provider_fixture_id))
+    targets = tuple(
+        sorted(
+            (
+                item
+                for item in fpl_input.fixtures
+                if item.event_identity == fpl_input.target_event.identity
+            ),
+            key=lambda item: item.provider_fixture_id,
+        )
+    )
     mapping_plan = fixture_plan(
         fpl_input,
         odds,
@@ -632,10 +685,16 @@ def _manual_inputs(
 def build_execution_input(
     repository_root: Path,
     working: Path,
+    *,
+    horizon_gameweeks: int = 1,
 ) -> PrivateV1ExecutionInput:
     """Build the complete deterministic TEST-mode input without network access."""
 
-    context = _unified_context(repository_root, working)
+    context = _unified_context(
+        repository_root,
+        working,
+        horizon_gameweeks=horizon_gameweeks,
+    )
     context = recompose(context, context.odds_input)
     view, _market_request, markets = build_from_context(context)
     identities = _identity_map(context)
@@ -755,4 +814,142 @@ def build_execution_input(
     return seal_execution_input(provisional)
 
 
-__all__ = ["build_execution_input"]
+def build_rolling_execution_input(
+    repository_root: Path,
+    working: Path,
+) -> PrivateV1RollingExecutionInput:
+    """Build a complete three-GW synthetic input from one current-cutoff source family."""
+
+    current = build_execution_input(
+        repository_root,
+        working,
+        horizon_gameweeks=3,
+    )
+    fpl = current.current_state.fpl_input
+    identity = current.player_identity_map
+    current_players = {item.provider_element_id: item for item in fpl.players}
+    mapped_players = {item.official_fpl_element_id: item for item in identity.players}
+    players_by_team: dict[int, list[Any]] = {
+        item.official_fpl_team_id: [] for item in identity.teams
+    }
+    for element_id, mapping in mapped_players.items():
+        players_by_team[mapping.official_fpl_team_id].append(
+            current_players[element_id].model_copy(
+                update={"canonical_player_id": mapping.canonical_player_id}
+            )
+        )
+    teams = {item.official_fpl_team_id: item.canonical_team_id for item in identity.teams}
+    future_gameweeks = []
+    for gameweek in (2, 3):
+        future_fixtures = []
+        fixtures = tuple(
+            item
+            for item in fpl.fixtures
+            if item.event_identity is not None
+            and item.event_identity.external_id_text == str(gameweek)
+        )
+        for fixture in fixtures:
+            fixture_id = uuid5(_PLAYER_NAMESPACE, f"rolling-fixture:{fixture.provider_fixture_id}")
+            home = int(fixture.home_team_identity.external_id_text)
+            away = int(fixture.away_team_identity.external_id_text)
+            provenance = {
+                "supplier_type": "PRIVATE_OPERATOR",
+                "operator_ref": "repository-synthetic-private-v1-rolling",
+                "evidence_type": "ANALYST_SCENARIO_JUDGEMENT",
+                "source_ref": "REPOSITORY_SYNTHETIC_CURRENT_CUTOFF_INPUT",
+                "source_timestamp": (_CAPTURED + timedelta(minutes=41)).isoformat(),
+                "entered_at": (_CAPTURED + timedelta(minutes=42)).isoformat(),
+                "usable_at": (_CAPTURED + timedelta(minutes=43)).isoformat(),
+                "adjustment_type": "SOFT_SCENARIO_MIXTURE",
+                "reason": "Repository-owned current-cutoff future fixture scenario.",
+                "expires_at": (_CUTOFF + timedelta(days=30)).isoformat(),
+                "fixture_scope_id": str(fixture_id),
+                "classification": "PRIVATE_TRANSIENT",
+                "persistence_class": "TRANSIENT_PRIVATE",
+                "model_derived": False,
+                "production_suitable": False,
+            }
+            minutes = ManualFixtureMinutesInput.model_validate(
+                {
+                    "schema_version": "private-manual-transient-minutes-v1",
+                    "fixture_id": str(fixture_id),
+                    "home_team_id": str(teams[home]),
+                    "away_team_id": str(teams[away]),
+                    "as_of": _CUTOFF,
+                    "information_cutoff": _CUTOFF,
+                    "provenance": provenance,
+                    "home": _manual_team(str(teams[home]), tuple(players_by_team[home])),
+                    "away": _manual_team(str(teams[away]), tuple(players_by_team[away])),
+                }
+            )
+            score_prior = seal_fixture_score_prior(
+                PrivateFixtureScorePrior.model_construct(
+                    source_class="REPOSITORY_OWNED_SYNTHETIC",
+                    fixture_id=fixture_id,
+                    competition_id=_COMPETITION_ID,
+                    home_team_id=teams[home],
+                    away_team_id=teams[away],
+                    as_of=_CUTOFF,
+                    score_prior_request=ScorePriorRequest(
+                        home_goal_rate=Decimal("1.600000"),
+                        away_goal_rate=Decimal("1.300000"),
+                    ),
+                    current_bundle=None,
+                    semantic_sha256="0" * 64,
+                )
+            )
+            future_fixtures.append(
+                seal_rolling_fixture_input(
+                    PrivateRollingFixtureInput.model_construct(
+                        official_fpl_fixture_id=fixture.provider_fixture_id,
+                        official_fpl_fixture_lookup_sha256=(
+                            fixture.identity.canonical_lookup_sha256
+                        ),
+                        canonical_fixture_id=fixture_id,
+                        home_official_fpl_team_id=home,
+                        away_official_fpl_team_id=away,
+                        home_canonical_team_id=teams[home],
+                        away_canonical_team_id=teams[away],
+                        kickoff_at=fixture.kickoff_at,
+                        information_cutoff=_CUTOFF,
+                        market_mode="SCORE_PRIOR_ONLY",
+                        market_constraints=(),
+                        blocked_reason=None,
+                        score_prior=score_prior,
+                        stage7=minutes,
+                        warnings=("NO_CURRENT_FUTURE_MARKET_CONSTRAINT",),
+                        semantic_sha256="0" * 64,
+                    )
+                )
+            )
+        future_gameweeks.append(
+            seal_rolling_gameweek_input(
+                PrivateRollingGameweekInput.model_construct(
+                    gameweek=gameweek,
+                    fixtures=tuple(future_fixtures),
+                    semantic_sha256="0" * 64,
+                )
+            )
+        )
+    terminal = load_terminal_value_policy()
+    return seal_rolling_execution_input(
+        PrivateV1RollingExecutionInput.model_construct(
+            horizon_gameweeks=(1, 2, 3),
+            current_execution=current,
+            future_gameweeks=tuple(future_gameweeks),
+            terminal_value_mode="THREE_GAMEWEEK_ZERO_TERMINAL_VALUE_AFTER_HORIZON",
+            terminal_policy_sha256=terminal.policy_sha256,
+            future_price_mode="FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1",
+            scenario_tree_mode="DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1",
+            search_scope_mode="PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1",
+            transfer_count_scope_source=(
+                "CURRENT_FT_COMPILED_RULES_AND_TICKET_BOUNDED_SEARCH_POLICY"
+            ),
+            maximum_transfers_per_deadline=current.candidate_action_policy.maximum_transfers,
+            chip_mode="NO_CHIP_EXPLICIT",
+            semantic_sha256="0" * 64,
+        )
+    )
+
+
+__all__ = ["build_execution_input", "build_rolling_execution_input"]

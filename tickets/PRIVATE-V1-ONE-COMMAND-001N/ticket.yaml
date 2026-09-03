@@ -1,0 +1,49 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Private current three-Gameweek rolling transfer optimiser"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N"
+required_base_commit: "ad155c077253a0525f0c7406e955240146823f80"
+objective: >-
+  Add one explicit three-consecutive-Gameweek private recommendation mode that values the root
+  action through exact compiled transfer economics and legal future recourse in the accepted
+  bounded Stage-11 engine while preserving the historical one-Gameweek path byte-for-byte.
+authority_scopes:
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW-optimiser"
+in_scope:
+  - "Separate hash-bound three-Gameweek private execution and decision contracts."
+  - "Current-cutoff Stage-7, Stage-8 and Stage-9 projections for three consecutive Gameweeks."
+  - "Accepted Stage-11 manager state, ownership spells, bank, FT arcs, hits and recourse."
+  - "Deterministic no-revelation three-node tree and root-action-only execution semantics."
+  - "Horizon-valued exact-count root frontier within the existing bounded candidate family."
+  - "Structured horizon comparison, one-GW comparison, future coverage and runtime evidence."
+governed_modes:
+  horizon: "EXACTLY_THREE_CONSECUTIVE_GAMEWEEKS"
+  terminal: "THREE_GAMEWEEK_ZERO_TERMINAL_VALUE_AFTER_HORIZON"
+  price_path: "FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1"
+  tree: "DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1"
+  candidate_pruning: "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1"
+  optimality: "EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE"
+  chips: "NO_CHIP_EXPLICIT"
+  rank: "POINTS_MODE_ONLY"
+permissions:
+  official_fpl_network: "operator_initiated_existing_one_command_get_only"
+  official_odds_network: "operator_initiated_existing_one_command_get_only"
+  authentication_or_credentials: "existing_environment_only"
+  raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Any five-Gameweek or remaining-season horizon."
+  - "Any new terminal-value coefficient, FT bonus or future-price forecast."
+  - "Any wider transfer-candidate search or global FPL optimum claim."
+  - "Any Stage-7, allocation-prior, penalty or odds-normalisation model change."
+  - "Chips, rank/EO utility, provider writes, persistence, PR, merge, tag or activation."
+required_execution_status: "SYNTHETIC_ACCEPTANCE_AND_OPTIONAL_POST_CI_LIVE_ATTEMPT"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

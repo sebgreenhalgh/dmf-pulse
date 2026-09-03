@@ -26,11 +26,13 @@ from dmf_pulse.ingestion.odds.models import QuotaSource, QuotaState
 from dmf_pulse.ingestion.odds.parser import parse_odds_payload
 from dmf_pulse.ingestion.openfootball.config import load_rights_profiles as load_score_rights
 from dmf_pulse.ingestion.openfootball.service import CurrentScorePriorService
+from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.one_command import (
     OneCommandRequest,
     PrivateV1OneCommandService,
 )
 from dmf_pulse.private_v1.progress import HumanCliProgress
+from dmf_pulse.private_v1.rolling_models import PrivateV1RollingDecision
 from tests.unit.ingestion.current_identity_test_support import KICKOFF
 from tests.unit.ingestion.current_manager_test_support import (
     _synthetic_bootstrap,
@@ -162,12 +164,30 @@ def _provider_sources(repository_root: Path) -> tuple[tuple[bytes, ...], bytes]:
     )
     bootstrap["events"][1].update({"is_next": True, "finished": False, "data_checked": False})
     bootstrap["events"][1]["deadline_time"] = "2026-09-04T17:30:00Z"
+    for gameweek, deadline in (
+        (3, "2026-09-11T17:30:00Z"),
+        (4, "2026-09-18T17:30:00Z"),
+    ):
+        event = deepcopy(bootstrap["events"][1])
+        event.update(
+            {
+                "id": gameweek,
+                "name": f"Gameweek {gameweek}",
+                "deadline_time": deadline,
+                "is_next": False,
+                "finished": False,
+                "data_checked": False,
+            }
+        )
+        bootstrap["events"].append(event)
     fixture_template = _synthetic_fixtures(repository_root)[0]
     fixtures = []
     fixture_id = 100
     for gameweek, kickoff_base in (
         (1, KICKOFF - timedelta(days=7)),
         (2, TARGET_KICKOFF),
+        (3, TARGET_KICKOFF + timedelta(days=7)),
+        (4, TARGET_KICKOFF + timedelta(days=14)),
     ):
         for index, (home, away) in enumerate(((1, 2), (3, 4), (5, 6))):
             fixture_id += 1
@@ -354,6 +374,46 @@ def _odds_input(repository_root: Path) -> object:
     )
 
 
+@pytest.mark.parametrize(
+    "updates",
+    (
+        {"entry_id": True},
+        {"entry_id": 0},
+        {"horizon_gameweeks": 2},
+        {"run_at": datetime(2026, 9, 1, 12)},
+        {"operator_approved_at": datetime(2026, 9, 1, 11, 59)},
+    ),
+)
+def test_one_command_preflight_rejects_invalid_usage_before_acquisition(updates) -> None:
+    request_values = {
+        "entry_id": 42,
+        "code_sha": "a" * 40,
+        "run_at": RUN_AT,
+        "operator_approved_at": RUN_AT - timedelta(minutes=1),
+        **updates,
+    }
+    service = PrivateV1OneCommandService()
+
+    with pytest.raises(PrivateV1Error) as caught:
+        service.run(OneCommandRequest(**request_values))
+
+    assert caught.value.code == "USAGE_INVALID"
+
+
+def test_one_command_preflight_rejects_approval_after_cutoff() -> None:
+    with pytest.raises(PrivateV1Error) as caught:
+        PrivateV1OneCommandService().run(
+            OneCommandRequest(
+                entry_id=42,
+                code_sha="a" * 40,
+                run_at=RUN_AT,
+                operator_approved_at=RUN_AT + timedelta(seconds=1),
+            )
+        )
+
+    assert caught.value.code == "USAGE_INVALID"
+
+
 def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     repository_root: Path,
 ) -> None:
@@ -496,3 +556,97 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     assert marker not in rendered_progress
     assert "one-command-event" not in rendered_progress
     assert "entry 42" not in rendered_progress.casefold()
+
+
+def test_explicit_three_gameweek_one_command_runs_from_one_current_cutoff(
+    repository_root: Path,
+) -> None:
+    direct_bodies, _ = _provider_sources(repository_root)
+    direct_transport = _DirectTransport(direct_bodies)
+    odds_service = _OddsService(_odds_input(repository_root))
+    score_config, score_bodies = synthetic_snapshot()
+    marker = "repository-owned-placeholder"
+
+    def direct_factory(attestation: DirectFplRunAttestation) -> DirectFplClient:
+        return DirectFplClient(
+            attestation,
+            transport=direct_transport,
+            credential_provider=DirectFplCredentialProvider({"DMF_FPL_BEARER_TOKEN": marker}),
+            sleeper=lambda _: None,
+            pace_seconds=0,
+        )
+
+    def score_factory(clock):
+        return CurrentScorePriorService(
+            provider_config=score_config,
+            rights_profiles=load_score_rights(),
+            transport=ScoreTransport(score_bodies),
+            clock=clock,
+            provider_config_identity="a" * 64,
+            rights_config_identity="b" * 64,
+        )
+
+    service = PrivateV1OneCommandService(
+        direct_client_factory=direct_factory,
+        odds_service_factory=lambda clock: odds_service,
+        score_service_factory=score_factory,
+        clock=lambda: RUN_AT,
+    )
+    result = service.run(
+        OneCommandRequest(
+            entry_id=42,
+            code_sha="b" * 40,
+            run_at=RUN_AT,
+            operator_approved_at=RUN_AT - timedelta(minutes=1),
+            scenario_count=8,
+            root_seed=43,
+            horizon_gameweeks=3,
+        )
+    )
+
+    assert isinstance(result.decision, PrivateV1RollingDecision)
+    assert result.decision.horizon_gameweeks == (2, 3, 4)
+    assert result.decision.do_now.actionability == "DO_NOW"
+    assert all(
+        item.actionability == "PROVISIONAL_REOPTIMISE_AT_DEADLINE"
+        for item in result.decision.future_plan
+    )
+    assert tuple(
+        item.fixture_coverage.score_prior_only_fixtures for item in result.decision.future_plan
+    ) == (3, 3)
+    assert result.report.startswith("DMF PULSE - PRIVATE 3-GW ROLLING DECISION")
+    assert "GW2 - DO NOW" in result.report
+    assert result.report.count("PROVISIONAL - REOPTIMISE AT THAT DEADLINE") == 2
+    assert "FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1" in result.report
+    assert "ONE-GW VERSUS 3-GW" in result.report
+    assert {
+        "horizon_input_construction",
+        "stage7_gameweek_2",
+        "stage7_gameweek_3",
+        "stage7_gameweek_4",
+        "stage8_9_gameweek_2",
+        "stage8_9_gameweek_3",
+        "stage8_9_gameweek_4",
+        "joint_scenario_assembly_gameweek_2",
+        "joint_scenario_assembly_gameweek_3",
+        "joint_scenario_assembly_gameweek_4",
+        "action_generation",
+        "tactical_batch_evaluation",
+        "stage11_policy_solving",
+        "report_and_comparator",
+    } <= {item.stage for item in result.stage_timings}
+    assert result.fpl_request_count == 8
+    assert direct_transport.bodies == []
+    assert odds_service.requests == [(RUN_AT, TARGET_KICKOFF + timedelta(hours=2, seconds=1))]
+    print(
+        json.dumps(
+            {
+                "schema_version": "private-v1-rolling-synthetic-benchmark-v1",
+                "stage_timings_ms": {
+                    item.stage: str(item.elapsed_ms) for item in result.stage_timings
+                },
+                "timed_stage_total_ms": str(sum(item.elapsed_ms for item in result.stage_timings)),
+            },
+            sort_keys=True,
+        )
+    )

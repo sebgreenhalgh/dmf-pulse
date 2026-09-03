@@ -5,14 +5,17 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from importlib.resources import files
 from pathlib import Path
+from time import perf_counter
 from typing import Literal
 from uuid import UUID, uuid5
 
 from pydantic import ValidationError
 
 from dmf_pulse.assurance.canonical import canonical_sha256
+from dmf_pulse.availability.current_model import CurrentModelFixtureMinutesInput
 from dmf_pulse.football_events.service import load_score_baseline_policy
 from dmf_pulse.fpl_points.models import MonteCarloPolicy, ProjectionMode
 from dmf_pulse.fpl_points.player_prior import (
@@ -44,10 +47,13 @@ from dmf_pulse.markets.current import (
     bind_current_market_constraint_request,
     build_transient_current_market_identity_view,
 )
+from dmf_pulse.optimisation.multi_gameweek_policy import load_terminal_value_policy
 from dmf_pulse.private_v1.automatic_inputs import (
+    automatic_rolling_fixture_id,
     build_automatic_model_minutes,
     build_automatic_ownership,
     build_automatic_player_identity_map,
+    build_automatic_rolling_model_minutes,
     build_full_candidate_policy,
 )
 from dmf_pulse.private_v1.errors import PrivateV1Error
@@ -60,6 +66,20 @@ from dmf_pulse.private_v1.models import (
 )
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 from dmf_pulse.private_v1.reporting import render_transfer_frontier
+from dmf_pulse.private_v1.rolling import (
+    PrivateRollingStageTiming,
+    PrivateV1RollingRecommendationService,
+    render_rolling_report,
+)
+from dmf_pulse.private_v1.rolling_models import (
+    PrivateRollingFixtureInput,
+    PrivateRollingGameweekInput,
+    PrivateV1RollingDecision,
+    PrivateV1RollingExecutionInput,
+    seal_rolling_execution_input,
+    seal_rolling_fixture_input,
+    seal_rolling_gameweek_input,
+)
 from dmf_pulse.private_v1.service import (
     PrivateV1RecommendationService,
     load_packaged_event_allocation_config,
@@ -84,15 +104,17 @@ class OneCommandRequest:
     run_id: str = "PRIVATE_V1_ONE_COMMAND"
     root_seed: int = 20260901
     scenario_count: int = 256
+    horizon_gameweeks: Literal[1, 3] = 1
 
 
 @dataclass(frozen=True, slots=True)
 class OneCommandResult:
     status: Literal["REAL_PRIVATE_TRANSIENT_RECOMMENDATION"]
-    decision: PrivateV1Decision
+    decision: PrivateV1Decision | PrivateV1RollingDecision
     report: str
     fpl_request_count: int
     fpl_endpoint_classes: tuple[str, ...]
+    stage_timings: tuple[PrivateRollingStageTiming, ...] = ()
     authenticated_current_state_used: Literal[True] = True
     persistence_performed: Literal[False] = False
 
@@ -175,6 +197,121 @@ def _score_priors(
             )
         )
     return tuple(sorted(values, key=lambda value: str(value.fixture_id)))
+
+
+def _future_rolling_inputs(
+    source: CurrentScorePriorResult,
+    *,
+    snapshot: DirectFplSnapshot,
+    identity_map: object,
+    model_minutes_by_gameweek: dict[int, tuple[CurrentModelFixtureMinutesInput, ...]],
+) -> tuple[PrivateRollingGameweekInput, PrivateRollingGameweekInput]:
+    from dmf_pulse.private_v1.models import PrivateCanonicalPlayerIdentityMap
+
+    identities = PrivateCanonicalPlayerIdentityMap.model_validate(identity_map)
+    team_ids = {item.official_fpl_team_id: item.canonical_team_id for item in identities.teams}
+    cutoff = snapshot.fpl_input.provenance.information_cutoff
+    outputs: list[PrivateRollingGameweekInput] = []
+    for gameweek in (snapshot.target_gameweek + 1, snapshot.target_gameweek + 2):
+        fixtures = tuple(
+            sorted(
+                (
+                    item
+                    for item in snapshot.fpl_input.fixtures
+                    if item.event_identity is not None
+                    and item.event_identity.external_id_text == str(gameweek)
+                ),
+                key=lambda item: item.provider_fixture_id,
+            )
+        )
+        stage7_by_fixture = {
+            item.fixture_id: item for item in model_minutes_by_gameweek.get(gameweek, ())
+        }
+        values: list[PrivateRollingFixtureInput] = []
+        for fixture in fixtures:
+            if fixture.kickoff_at is None:
+                raise IngestionError(
+                    "ROLLING_FUTURE_FIXTURE_UNSCHEDULED",
+                    f"official FPL fixture {fixture.provider_fixture_id} has no kickoff",
+                )
+            home_official = int(fixture.home_team_identity.external_id_text)
+            away_official = int(fixture.away_team_identity.external_id_text)
+            canonical_fixture_id = automatic_rolling_fixture_id(
+                fixture.identity.canonical_lookup_sha256
+            )
+            fixture_id = str(canonical_fixture_id)
+            try:
+                home = team_ids[home_official]
+                away = team_ids[away_official]
+                stage7 = stage7_by_fixture[fixture_id]
+            except KeyError as exc:
+                raise IngestionError(
+                    "ROLLING_FUTURE_IDENTITY_UNRESOLVED",
+                    f"GW{gameweek} future fixture identity is incomplete",
+                ) from exc
+            bundle = build_current_score_prior_bundle(
+                source,
+                fixture_id=canonical_fixture_id,
+                competition_id=_COMPETITION_ID,
+                home_team_id=home,
+                away_team_id=away,
+                as_of=cutoff,
+            )
+            prior = seal_fixture_score_prior(
+                PrivateFixtureScorePrior.model_construct(
+                    source_class="CURRENT_SCORE_PRIOR_BUNDLE",
+                    fixture_id=canonical_fixture_id,
+                    competition_id=_COMPETITION_ID,
+                    home_team_id=home,
+                    away_team_id=away,
+                    as_of=cutoff,
+                    score_prior_request=bundle.score_prior_request,
+                    current_bundle=bundle,
+                    semantic_sha256="0" * 64,
+                )
+            )
+            values.append(
+                seal_rolling_fixture_input(
+                    PrivateRollingFixtureInput.model_construct(
+                        official_fpl_fixture_id=fixture.provider_fixture_id,
+                        official_fpl_fixture_lookup_sha256=(
+                            fixture.identity.canonical_lookup_sha256
+                        ),
+                        canonical_fixture_id=canonical_fixture_id,
+                        home_official_fpl_team_id=home_official,
+                        away_official_fpl_team_id=away_official,
+                        home_canonical_team_id=home,
+                        away_canonical_team_id=away,
+                        kickoff_at=fixture.kickoff_at,
+                        information_cutoff=cutoff,
+                        market_mode="SCORE_PRIOR_ONLY",
+                        market_constraints=(),
+                        blocked_reason=None,
+                        score_prior=prior,
+                        stage7=stage7,
+                        warnings=(
+                            "FUTURE_FIXTURE_SCORE_PRIOR_ONLY_NO_CURRENT_MARKET",
+                            "FUTURE_PROJECTION_USES_CURRENT_CUTOFF",
+                        ),
+                        semantic_sha256="0" * 64,
+                    )
+                )
+            )
+        if not values:
+            raise IngestionError(
+                "ROLLING_FUTURE_FIXTURES_UNAVAILABLE",
+                f"official FPL has no assigned fixtures for GW{gameweek}",
+            )
+        outputs.append(
+            seal_rolling_gameweek_input(
+                PrivateRollingGameweekInput.model_construct(
+                    gameweek=gameweek,
+                    fixtures=tuple(values),
+                    semantic_sha256="0" * 64,
+                )
+            )
+        )
+    return outputs[0], outputs[1]
 
 
 def _display_report(
@@ -265,6 +402,27 @@ def _display_report(
     )
 
 
+def _display_rolling_report(
+    decision: PrivateV1RollingDecision,
+    snapshot: DirectFplSnapshot,
+    player_identity_map: object,
+) -> str:
+    from dmf_pulse.private_v1.models import PrivateCanonicalPlayerIdentityMap
+
+    identities = PrivateCanonicalPlayerIdentityMap.model_validate(player_identity_map)
+    player_by_element = {item.provider_element_id: item for item in snapshot.fpl_input.players}
+    element_by_uuid = {
+        str(item.canonical_player_id): item.official_fpl_element_id for item in identities.players
+    }
+
+    def label(player_id: str) -> str:
+        element_id = element_by_uuid[player_id]
+        player = player_by_element[element_id]
+        return f"{player.web_name} [{element_id}]"
+
+    return render_rolling_report(decision, label=label)
+
+
 class PrivateV1OneCommandService:
     """Acquire, assemble, execute, and release one current recommendation in memory."""
 
@@ -277,6 +435,7 @@ class PrivateV1OneCommandService:
         score_service_factory: Callable[[Callable[[], datetime]], CurrentScorePriorService]
         | None = None,
         recommendation_service: PrivateV1RecommendationService | None = None,
+        rolling_recommendation_service: PrivateV1RollingRecommendationService | None = None,
         progress: ProgressSink | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
@@ -290,6 +449,9 @@ class PrivateV1OneCommandService:
             lambda clock: CurrentScorePriorService(clock=clock)
         )
         self._recommendation_service = recommendation_service or PrivateV1RecommendationService()
+        self._rolling_recommendation_service = (
+            rolling_recommendation_service or PrivateV1RollingRecommendationService()
+        )
         self._progress = progress or NullProgress()
         self._clock = clock
 
@@ -298,6 +460,7 @@ class PrivateV1OneCommandService:
         if (
             isinstance(request.entry_id, bool)
             or request.entry_id <= 0
+            or request.horizon_gameweeks not in {1, 3}
             or request.run_at.tzinfo is None
             or request.run_at.utcoffset() is None
             or (
@@ -407,12 +570,34 @@ class PrivateV1OneCommandService:
                 completed="Stage-7 minutes ready",
                 failed="Stage-7 minutes",
             ):
-                model_minutes = build_automatic_model_minutes(
-                    snapshot,
-                    player_map,
-                    market_view,
-                    progress=self._progress,
+                rolling_minutes: dict[int, tuple[CurrentModelFixtureMinutesInput, ...]] | None = (
+                    None
                 )
+                rolling_stage7_timings: tuple[PrivateRollingStageTiming, ...] = ()
+                if request.horizon_gameweeks == 3:
+                    rolling_minutes_result = build_automatic_rolling_model_minutes(
+                        snapshot,
+                        player_map,
+                        market_view,
+                        progress=self._progress,
+                    )
+                    rolling_minutes = rolling_minutes_result.minutes_by_gameweek
+                    rolling_stage7_timings = tuple(
+                        PrivateRollingStageTiming(
+                            stage=f"stage7_gameweek_{gameweek}", elapsed_ms=elapsed_ms
+                        )
+                        for gameweek, elapsed_ms in sorted(
+                            rolling_minutes_result.elapsed_ms_by_gameweek.items()
+                        )
+                    )
+                    model_minutes = rolling_minutes[snapshot.target_gameweek]
+                else:
+                    model_minutes = build_automatic_model_minutes(
+                        snapshot,
+                        player_map,
+                        market_view,
+                        progress=self._progress,
+                    )
             ownership = build_automatic_ownership(snapshot, manager)
             candidates = build_full_candidate_policy(snapshot, manager, ruleset)
             with self._progress.stage(
@@ -501,13 +686,73 @@ class PrivateV1OneCommandService:
                         semantic_sha256="0" * 64,
                     )
                 )
-            run = self._recommendation_service.run(execution, progress=self._progress)
+            if request.horizon_gameweeks == 3:
+                horizon_input_started = perf_counter()
+                if rolling_minutes is None:
+                    raise PrivateV1Error(
+                        "ROLLING_STAGE7_UNAVAILABLE",
+                        "three-GW Stage-7 inputs were not assembled",
+                    )
+                future_gameweeks = _future_rolling_inputs(
+                    source_prior,
+                    snapshot=snapshot,
+                    identity_map=player_map,
+                    model_minutes_by_gameweek=rolling_minutes,
+                )
+                terminal = load_terminal_value_policy()
+                rolling_execution = seal_rolling_execution_input(
+                    PrivateV1RollingExecutionInput.model_construct(
+                        horizon_gameweeks=(
+                            snapshot.target_gameweek,
+                            snapshot.target_gameweek + 1,
+                            snapshot.target_gameweek + 2,
+                        ),
+                        current_execution=execution,
+                        future_gameweeks=future_gameweeks,
+                        terminal_value_mode=("THREE_GAMEWEEK_ZERO_TERMINAL_VALUE_AFTER_HORIZON"),
+                        terminal_policy_sha256=terminal.policy_sha256,
+                        future_price_mode=("FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1"),
+                        scenario_tree_mode=("DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1"),
+                        search_scope_mode="PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1",
+                        transfer_count_scope_source=(
+                            "CURRENT_FT_COMPILED_RULES_AND_TICKET_BOUNDED_SEARCH_POLICY"
+                        ),
+                        maximum_transfers_per_deadline=(
+                            execution.candidate_action_policy.maximum_transfers
+                        ),
+                        chip_mode="NO_CHIP_EXPLICIT",
+                        semantic_sha256="0" * 64,
+                    )
+                )
+                horizon_input_timing = PrivateRollingStageTiming(
+                    stage="horizon_input_construction",
+                    elapsed_ms=Decimal(str((perf_counter() - horizon_input_started) * 1000)),
+                )
+                rolling_run = self._rolling_recommendation_service.run(
+                    rolling_execution,
+                    progress=self._progress,
+                )
+                decision: PrivateV1Decision | PrivateV1RollingDecision = rolling_run.decision
+                report = _display_rolling_report(rolling_run.decision, snapshot, player_map)
+                stage_timings = (
+                    horizon_input_timing,
+                    *rolling_stage7_timings,
+                    *rolling_run.stage_timings,
+                )
+            else:
+                one_gameweek_run = self._recommendation_service.run(
+                    execution, progress=self._progress
+                )
+                decision = one_gameweek_run.decision
+                report = _display_report(decision, snapshot, player_map)
+                stage_timings = ()
             result = OneCommandResult(
                 status="REAL_PRIVATE_TRANSIENT_RECOMMENDATION",
-                decision=run.decision,
-                report=_display_report(run.decision, snapshot, player_map),
+                decision=decision,
+                report=report,
                 fpl_request_count=snapshot.request_count,
                 fpl_endpoint_classes=snapshot.endpoint_classes,
+                stage_timings=stage_timings,
             )
             self._progress.message("Recommendation ready")
             self._progress.finish()

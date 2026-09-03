@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
+from decimal import Decimal
 from importlib.resources import files
+from time import perf_counter
 from typing import Any
 from uuid import UUID, uuid5
 
@@ -50,6 +53,26 @@ def _player_uuid(identity_sha256: str) -> UUID:
 
 def _fixture_uuid(identity_sha256: str) -> UUID:
     return uuid5(_NAMESPACE, "one-command:history-fixture:" + identity_sha256)
+
+
+def automatic_rolling_fixture_id(identity_sha256: str) -> UUID:
+    """Return the current-cutoff canonical identity for a future official fixture."""
+
+    return uuid5(_NAMESPACE, "one-command:rolling-fixture:" + identity_sha256)
+
+
+@dataclass(frozen=True, slots=True)
+class _AutomaticFixtureTarget:
+    gameweek: int
+    fixture: CurrentFplFixture
+    canonical_fixture_id: UUID
+    scenario: str
+
+
+@dataclass(frozen=True, slots=True)
+class AutomaticRollingModelMinutesResult:
+    minutes_by_gameweek: dict[int, tuple[CurrentModelFixtureMinutesInput, ...]]
+    elapsed_ms_by_gameweek: dict[int, Decimal]
 
 
 def build_automatic_player_identity_map(
@@ -314,15 +337,13 @@ def _current_history(
     }, tuple(sorted(warnings))
 
 
-def build_automatic_model_minutes(
+def _build_automatic_model_minutes_for_targets(
     snapshot: DirectFplSnapshot,
     identity_map: PrivateCanonicalPlayerIdentityMap,
-    market_view: CurrentMarketCanonicalIdentityView,
+    targets: tuple[_AutomaticFixtureTarget, ...],
     *,
-    progress: ProgressSink | None = None,
-) -> tuple[CurrentModelFixtureMinutesInput, ...]:
-    """Run the accepted model family over current transient rosters and observed live facts."""
-
+    progress: ProgressSink | None,
+) -> AutomaticRollingModelMinutesResult:
     active_progress = progress or NullProgress()
     training = _read_resource("MIN-007/training_dataset.json")
     policy = _read_resource("MIN-007G/minutes_baseline_policy.json")
@@ -332,21 +353,18 @@ def build_automatic_model_minutes(
     team_map = {item.official_fpl_team_id: item for item in identity_map.teams}
     players = {item.provider_element_id: item for item in snapshot.fpl_input.players}
     mapped_players = {item.official_fpl_element_id: item for item in identity_map.players}
-    target_fixtures = {
-        item.provider_fixture_id: item
-        for item in snapshot.fpl_input.fixtures
-        if item.event_identity == snapshot.fpl_input.target_event.identity
+    outputs: dict[int, list[CurrentModelFixtureMinutesInput]] = {
+        gameweek: [] for gameweek in sorted({item.gameweek for item in targets})
     }
-    outputs: list[CurrentModelFixtureMinutesInput] = []
-    fixture_count = len(market_view.fixtures)
-    for fixture_index, canonical_fixture in enumerate(market_view.fixtures, start=1):
-        fixture = target_fixtures.get(canonical_fixture.official_fpl_fixture_id)
-        if fixture is None:
-            raise IngestionError("MAPPING_CONFLICT", "market fixture is absent from current FPL")
+    elapsed_ms = {gameweek: Decimal(0) for gameweek in outputs}
+    fixture_count = len(targets)
+    for fixture_index, target in enumerate(targets, start=1):
+        fixture_started = perf_counter()
+        fixture = target.fixture
         home_id = int(fixture.home_team_identity.external_id_text)
         away_id = int(fixture.away_team_identity.external_id_text)
 
-        def context(team_id: int, *, fixture_id: UUID) -> dict[str, object]:
+        def context(team_id: int, *, fixture_id: UUID, scenario: str) -> dict[str, object]:
             team_key = f"fpl-team-{team_id}"
             team_rows = [item for item in history["rows"] if item["team_key"] == team_key]
             overrides: dict[str, dict[str, bool]] = {}
@@ -359,7 +377,7 @@ def build_automatic_model_minutes(
                     overrides[f"fpl-{element_id}"] = {"hard_ineligible": True}
             return {
                 "schema_version": "minutes-prediction-context-v1",
-                "scenario": "private-one-command-current",
+                "scenario": scenario,
                 "fixture_id": str(fixture_id),
                 "team_key": team_key,
                 "team_id": str(team_map[team_id].canonical_team_id),
@@ -379,8 +397,16 @@ def build_automatic_model_minutes(
                 "player_overrides": overrides,
             }
 
-        home_context = context(home_id, fixture_id=canonical_fixture.canonical_fixture_id)
-        away_context = context(away_id, fixture_id=canonical_fixture.canonical_fixture_id)
+        home_context = context(
+            home_id,
+            fixture_id=target.canonical_fixture_id,
+            scenario=target.scenario,
+        )
+        away_context = context(
+            away_id,
+            fixture_id=target.canonical_fixture_id,
+            scenario=target.scenario,
+        )
 
         def predict(prediction_context: dict[str, object]) -> MinutesPredictionResult:
             try:
@@ -426,7 +452,7 @@ def build_automatic_model_minutes(
                 failed=f"{progress_prefix} scenario adaptation",
             ):
                 try:
-                    outputs.append(
+                    outputs[target.gameweek].append(
                         build_current_model_fixture_minutes(
                             home,
                             away,
@@ -440,12 +466,126 @@ def build_automatic_model_minutes(
                         "CURRENT_STAGE7_SCENARIO_ROSTER_INVALID",
                         "current Stage-7 scenario adaptation or reconciliation failed",
                     ) from exc
-    return tuple(sorted(outputs, key=lambda item: item.fixture_id))
+        elapsed_ms[target.gameweek] += Decimal(str((perf_counter() - fixture_started) * 1000))
+    return AutomaticRollingModelMinutesResult(
+        minutes_by_gameweek={
+            gameweek: tuple(sorted(values, key=lambda item: item.fixture_id))
+            for gameweek, values in outputs.items()
+        },
+        elapsed_ms_by_gameweek=elapsed_ms,
+    )
+
+
+def build_automatic_model_minutes(
+    snapshot: DirectFplSnapshot,
+    identity_map: PrivateCanonicalPlayerIdentityMap,
+    market_view: CurrentMarketCanonicalIdentityView,
+    *,
+    progress: ProgressSink | None = None,
+) -> tuple[CurrentModelFixtureMinutesInput, ...]:
+    """Run the accepted model family over current transient rosters and observed live facts."""
+
+    target_fixtures = {
+        item.provider_fixture_id: item
+        for item in snapshot.fpl_input.fixtures
+        if item.event_identity == snapshot.fpl_input.target_event.identity
+    }
+    targets: list[_AutomaticFixtureTarget] = []
+    for canonical_fixture in market_view.fixtures:
+        fixture = target_fixtures.get(canonical_fixture.official_fpl_fixture_id)
+        if fixture is None:
+            raise IngestionError("MAPPING_CONFLICT", "market fixture is absent from current FPL")
+        targets.append(
+            _AutomaticFixtureTarget(
+                gameweek=snapshot.target_gameweek,
+                fixture=fixture,
+                canonical_fixture_id=canonical_fixture.canonical_fixture_id,
+                scenario="private-one-command-current",
+            )
+        )
+    result = _build_automatic_model_minutes_for_targets(
+        snapshot,
+        identity_map,
+        tuple(targets),
+        progress=progress,
+    )
+    return result.minutes_by_gameweek[snapshot.target_gameweek]
+
+
+def build_automatic_rolling_model_minutes(
+    snapshot: DirectFplSnapshot,
+    identity_map: PrivateCanonicalPlayerIdentityMap,
+    market_view: CurrentMarketCanonicalIdentityView,
+    *,
+    progress: ProgressSink | None = None,
+) -> AutomaticRollingModelMinutesResult:
+    """Project the exact current/next/following fixture sets from one current cutoff."""
+
+    current_gameweek = snapshot.target_gameweek
+    gameweeks = (current_gameweek, current_gameweek + 1, current_gameweek + 2)
+    current_ids = {
+        item.official_fpl_fixture_id: item.canonical_fixture_id for item in market_view.fixtures
+    }
+    targets: list[_AutomaticFixtureTarget] = []
+    for gameweek in gameweeks:
+        fixtures = tuple(
+            sorted(
+                (
+                    item
+                    for item in snapshot.fpl_input.fixtures
+                    if item.event_identity is not None
+                    and item.event_identity.external_id_text == str(gameweek)
+                ),
+                key=lambda item: item.provider_fixture_id,
+            )
+        )
+        if not fixtures:
+            raise IngestionError(
+                "ROLLING_FUTURE_FIXTURES_UNAVAILABLE",
+                f"official FPL has no assigned fixtures for GW{gameweek}",
+            )
+        for fixture in fixtures:
+            if fixture.kickoff_at is None:
+                raise IngestionError(
+                    "ROLLING_FUTURE_FIXTURE_UNSCHEDULED",
+                    f"official FPL fixture {fixture.provider_fixture_id} has no kickoff",
+                )
+            canonical_fixture_id = current_ids.get(fixture.provider_fixture_id)
+            if gameweek == current_gameweek and canonical_fixture_id is None:
+                raise IngestionError(
+                    "MAPPING_CONFLICT",
+                    "current market identity view does not cover every current fixture",
+                )
+            targets.append(
+                _AutomaticFixtureTarget(
+                    gameweek=gameweek,
+                    fixture=fixture,
+                    canonical_fixture_id=(
+                        canonical_fixture_id
+                        if canonical_fixture_id is not None
+                        else automatic_rolling_fixture_id(fixture.identity.canonical_lookup_sha256)
+                    ),
+                    scenario=(
+                        "private-one-command-current"
+                        if gameweek == current_gameweek
+                        else "private-one-command-current-cutoff-future"
+                    ),
+                )
+            )
+    return _build_automatic_model_minutes_for_targets(
+        snapshot,
+        identity_map,
+        tuple(targets),
+        progress=progress,
+    )
 
 
 __all__ = [
+    "AutomaticRollingModelMinutesResult",
+    "automatic_rolling_fixture_id",
     "build_automatic_model_minutes",
     "build_automatic_ownership",
     "build_automatic_player_identity_map",
+    "build_automatic_rolling_model_minutes",
     "build_full_candidate_policy",
 ]

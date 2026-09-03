@@ -677,6 +677,81 @@ class TransferCountFrontier(OptimisationModel):
         return self
 
 
+class HorizonTransferCountFrontierPoint(OptimisationModel):
+    """Best complete horizon policy at one exact root transfer count."""
+
+    transfer_count: NonNegativeInt
+    plan: MultiGameweekPlan
+    immediate_expected_points_before_hit: Decimal
+    transfer_hit_points: NonNegativeInt
+    current_gameweek_objective: Decimal
+    expected_horizon_utility: Decimal
+
+    @model_validator(mode="after")
+    def point_reconciles(self) -> HorizonTransferCountFrontierPoint:
+        current = self.plan.current_action
+        if self.plan.plan_kind is not PlanKind.TRANSFER_COUNT_FRONTIER:
+            raise ValueError("horizon frontier point plan has the wrong plan kind")
+        if self.plan.objective_mode is not ObjectiveMode.EXPECTED:
+            raise ValueError("horizon frontier point must retain the expected objective")
+        if current.action.transfer_count != self.transfer_count:
+            raise ValueError("horizon frontier point transfer count differs from its root action")
+        if current.tactical_evaluation.expected_points != self.immediate_expected_points_before_hit:
+            raise ValueError("horizon frontier immediate points differ from Stage 10")
+        if current.hit_points != self.transfer_hit_points:
+            raise ValueError("horizon frontier hit differs from its compiled transition")
+        if (
+            self.immediate_expected_points_before_hit - Decimal(self.transfer_hit_points)
+            != self.current_gameweek_objective
+        ):
+            raise ValueError("horizon frontier current objective does not reconcile")
+        if self.expected_horizon_utility != self.plan.utility.expected_horizon_utility:
+            raise ValueError("horizon frontier value differs from its complete policy")
+        return self
+
+
+class HorizonTransferCountFrontier(OptimisationModel):
+    """Canonical exact-count frontier selected by complete expected horizon utility."""
+
+    schema_version: Literal["horizon-transfer-count-frontier-v1"] = (
+        "horizon-transfer-count-frontier-v1"
+    )
+    objective_scope: Literal["EXPECTED_HORIZON_UTILITY"] = "EXPECTED_HORIZON_UTILITY"
+    horizon_gameweeks: tuple[PositiveInt, ...] = Field(min_length=2)
+    points: tuple[HorizonTransferCountFrontierPoint, ...]
+    frontier_sha256: Sha256
+
+    @model_validator(mode="after")
+    def frontier_is_canonical_and_sealed(self) -> HorizonTransferCountFrontier:
+        if self.horizon_gameweeks != tuple(
+            range(
+                self.horizon_gameweeks[0], self.horizon_gameweeks[0] + len(self.horizon_gameweeks)
+            )
+        ):
+            raise ValueError("horizon frontier Gameweeks must be consecutive")
+        if not self.points or self.points[0].transfer_count != 0:
+            raise ValueError("horizon transfer-count frontier requires the hold policy")
+        counts = tuple(item.transfer_count for item in self.points)
+        if counts != tuple(sorted(set(counts))):
+            raise ValueError("horizon frontier points must be canonically ordered")
+        if any(
+            tuple(
+                sorted(
+                    {
+                        point.plan.current_action.gameweek,
+                        *(item.gameweek for item in point.plan.future_policy),
+                    }
+                )
+            )
+            != self.horizon_gameweeks
+            for point in self.points
+        ):
+            raise ValueError("horizon frontier plan Gameweeks differ from its declared horizon")
+        if self.frontier_sha256 != _hash_without(self, "frontier_sha256"):
+            raise ValueError("horizon transfer-count frontier semantic hash does not match")
+        return self
+
+
 class AlternativeAvailability(StrEnum):
     DISTINCT = "DISTINCT"
     NO_MATERIALLY_DISTINCT_PLAN = "NO_MATERIALLY_DISTINCT_PLAN"
@@ -752,7 +827,7 @@ class MultiGameweekOptimisationResult(OptimisationModel):
     conservative_plan: PlanAlternative
     high_upside_plan: PlanAlternative
     no_transfer_baseline: MultiGameweekPlan | None = None
-    transfer_count_frontier: TransferCountFrontier | None = None
+    transfer_count_frontier: TransferCountFrontier | HorizonTransferCountFrontier | None = None
     marginal_value_of_each_move: MoveAttribution | None = None
     current_action: TransferAction | None = None
     future_policy: tuple[NodeDecision, ...] = ()
@@ -944,6 +1019,17 @@ def seal_transfer_count_frontier(value: TransferCountFrontier) -> TransferCountF
 def verify_transfer_count_frontier_hash(value: TransferCountFrontier) -> None:
     if value.frontier_sha256 != _hash_without(value, "frontier_sha256"):
         raise ValueError("transfer-count frontier semantic hash does not match")
+
+
+def seal_horizon_transfer_count_frontier(
+    value: HorizonTransferCountFrontier,
+) -> HorizonTransferCountFrontier:
+    return value.model_copy(update={"frontier_sha256": _hash_without(value, "frontier_sha256")})
+
+
+def verify_horizon_transfer_count_frontier_hash(value: HorizonTransferCountFrontier) -> None:
+    if value.frontier_sha256 != _hash_without(value, "frontier_sha256"):
+        raise ValueError("horizon transfer-count frontier semantic hash does not match")
 
 
 def _result_hash(value: MultiGameweekOptimisationResult) -> str:
