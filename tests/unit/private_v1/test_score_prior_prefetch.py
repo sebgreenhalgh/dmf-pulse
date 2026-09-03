@@ -114,9 +114,7 @@ def test_three_gameweek_prefetch_survives_compute_beyond_five_minute_cutoff(
             return DirectFplClient(
                 attestation,
                 transport=direct_transport,
-                credential_provider=DirectFplCredentialProvider(
-                    {"DMF_FPL_BEARER_TOKEN": marker}
-                ),
+                credential_provider=DirectFplCredentialProvider({"DMF_FPL_BEARER_TOKEN": marker}),
                 sleeper=lambda _: None,
                 pace_seconds=0,
             )

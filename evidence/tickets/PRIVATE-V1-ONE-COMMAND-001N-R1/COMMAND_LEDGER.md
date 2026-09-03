@@ -23,11 +23,16 @@ or private manager state is recorded.
 | Build | PASS; canonical sdist and `dmf_pulse-0.2.0-py3-none-any.whl` built |
 | Clean installed wheel | PASS; exact locked runtime sync outside the source tree, installed version/imports, and `pulse --horizon-gameweeks` verified |
 | Secret scan | PASS; zero findings after the synthetic credential construction used the established indirect marker pattern |
+| First exact-SHA candidate CI | Run `33740594971` failed only at Linux Ruff formatting; no test or coverage job started |
 
 The first isolated `python -m build` attempt could not bootstrap pinned Hatchling because sandbox
 network access was denied. The approved identical retry succeeded. A first cleanup attempt for the
 resolved disposable environment was denied by the sandbox; the approved retry removed that exact
 verified Windows-temp path. Neither event changed repository content or acceptance criteria.
+
+The first pushed candidate exposed one cross-platform Ruff wrapping difference in the new test.
+Pinned Ruff 0.15.22 reproduced the GitHub result in a disposable Python 3.13 Linux container; the
+one-line formatter output now passes both Windows and Linux checks. The container was removed.
 
 Remaining manifest/repository/secret gates and the exact pushed-SHA CI result are completed or
 reported out of band only after they run. Embedding a commit's own final SHA or later CI run ID in
