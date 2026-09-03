@@ -5301,9 +5301,9 @@
       "sha256": "08dda00ff7c979dbfb2bbc281c7f58aebd920c3b71fc37926ac44a55dd2e3d76"
     },
     {
-      "bytes": 10926,
+      "bytes": 11002,
       "path": "tests/unit/cli/test_pulse.py",
-      "sha256": "418e5ad9941aeca6cc541747c3fbfdfc655e8bfe9e4b8b14a0a27d89162dcdf0"
+      "sha256": "248cb635319ea9bb5003c5c83c640aef8f0c802194fe71828f38160872310d0e"
     },
     {
       "bytes": 11125,

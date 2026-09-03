@@ -7,6 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from typer._click._compat import strip_ansi
 from typer.core import TyperGroup
 from typer.main import get_command
 from typer.testing import CliRunner
@@ -21,6 +22,7 @@ runner = CliRunner()
 
 def test_pulse_help_exposes_entry_identifier_and_progress_suppression_only() -> None:
     result = runner.invoke(app, ["pulse", "--help"], color=False)
+    help_output = strip_ansi(result.stdout)
 
     assert result.exit_code == 0
     root_command = get_command(app)
@@ -31,12 +33,12 @@ def test_pulse_help_exposes_entry_identifier_and_progress_suppression_only() -> 
         for option in getattr(parameter, "opts", ())
     }
     assert pulse_options == {"--entry-id", "--horizon-gameweeks", "--no-progress"}
-    assert "--horizon-gameweeks" in result.stdout
-    assert "Optimisation horizon" in result.stdout
-    assert "token" not in result.stdout.casefold()
-    assert "bootstrap" not in result.stdout.casefold()
-    assert "fixtures" not in result.stdout.casefold()
-    assert "score-prior" not in result.stdout.casefold()
+    assert "--horizon-gameweeks" in help_output
+    assert "Optimisation horizon" in help_output
+    assert "token" not in help_output.casefold()
+    assert "bootstrap" not in help_output.casefold()
+    assert "fixtures" not in help_output.casefold()
+    assert "score-prior" not in help_output.casefold()
 
 
 def test_missing_odds_key_is_the_first_actionable_blocker(monkeypatch) -> None:
