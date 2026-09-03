@@ -9,6 +9,11 @@ from dmf_pulse.private_v1.models import (
     PrivateCurrentOwnership,
     PrivateCurrentOwnershipMember,
     PrivateFixtureScorePrior,
+    PrivateFreeTransferState,
+    PrivateFrontierComparison,
+    PrivateTransferFrontier,
+    PrivateTransferFrontierDelta,
+    PrivateTransferFrontierPoint,
     PrivateV1ExecutionInput,
 )
 from dmf_pulse.private_v1.service import (
@@ -25,6 +30,11 @@ __all__ = [
     "PrivateCurrentOwnership",
     "PrivateCurrentOwnershipMember",
     "PrivateFixtureScorePrior",
+    "PrivateFreeTransferState",
+    "PrivateFrontierComparison",
+    "PrivateTransferFrontier",
+    "PrivateTransferFrontierDelta",
+    "PrivateTransferFrontierPoint",
     "PrivateV1Error",
     "PrivateV1ExecutionInput",
     "PrivateV1RecommendationService",

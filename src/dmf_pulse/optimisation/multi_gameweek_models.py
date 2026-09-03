@@ -498,6 +498,7 @@ class PlanKind(StrEnum):
     CONSERVATIVE = "CONSERVATIVE"
     HIGH_UPSIDE = "HIGH_UPSIDE"
     NO_TRANSFER_BASELINE = "NO_TRANSFER_BASELINE"
+    TRANSFER_COUNT_FRONTIER = "TRANSFER_COUNT_FRONTIER"
 
 
 class UtilityBreakdown(OptimisationModel):
@@ -624,6 +625,58 @@ class MultiGameweekPlan(OptimisationModel):
         return self
 
 
+class TransferCountFrontierPoint(OptimisationModel):
+    """Best already-evaluated root policy at one exact transfer count."""
+
+    transfer_count: NonNegativeInt
+    plan: MultiGameweekPlan
+    immediate_expected_points_before_hit: Decimal
+    transfer_hit_points: NonNegativeInt
+    current_gameweek_objective: Decimal
+
+    @model_validator(mode="after")
+    def point_reconciles(self) -> TransferCountFrontierPoint:
+        current = self.plan.current_action
+        if self.plan.plan_kind is not PlanKind.TRANSFER_COUNT_FRONTIER:
+            raise ValueError("frontier point plan has the wrong plan kind")
+        if self.plan.objective_mode is not ObjectiveMode.EXPECTED:
+            raise ValueError("frontier point must retain the expected-objective policy")
+        if current.action.transfer_count != self.transfer_count:
+            raise ValueError("frontier point transfer count differs from its root action")
+        if current.tactical_evaluation.expected_points != self.immediate_expected_points_before_hit:
+            raise ValueError("frontier point expected points differ from Stage 10")
+        if current.hit_points != self.transfer_hit_points:
+            raise ValueError("frontier point hit differs from its compiled transition")
+        if (
+            self.immediate_expected_points_before_hit - Decimal(self.transfer_hit_points)
+            != self.current_gameweek_objective
+        ):
+            raise ValueError("frontier point current objective does not reconcile")
+        return self
+
+
+class TransferCountFrontier(OptimisationModel):
+    """Canonical exact-count frontier selected from one Stage-11 evaluated family."""
+
+    schema_version: Literal["transfer-count-frontier-v1"] = "transfer-count-frontier-v1"
+    objective_scope: Literal["CURRENT_GAMEWEEK_POINTS_AFTER_HIT"] = (
+        "CURRENT_GAMEWEEK_POINTS_AFTER_HIT"
+    )
+    points: tuple[TransferCountFrontierPoint, ...]
+    frontier_sha256: Sha256
+
+    @model_validator(mode="after")
+    def frontier_is_canonical_and_sealed(self) -> TransferCountFrontier:
+        if not self.points or self.points[0].transfer_count != 0:
+            raise ValueError("transfer-count frontier requires at least the hold plan")
+        counts = tuple(item.transfer_count for item in self.points)
+        if counts != tuple(sorted(set(counts))):
+            raise ValueError("transfer-count frontier points must be canonically ordered")
+        if self.frontier_sha256 != _hash_without(self, "frontier_sha256"):
+            raise ValueError("transfer-count frontier semantic hash does not match")
+        return self
+
+
 class AlternativeAvailability(StrEnum):
     DISTINCT = "DISTINCT"
     NO_MATERIALLY_DISTINCT_PLAN = "NO_MATERIALLY_DISTINCT_PLAN"
@@ -699,6 +752,7 @@ class MultiGameweekOptimisationResult(OptimisationModel):
     conservative_plan: PlanAlternative
     high_upside_plan: PlanAlternative
     no_transfer_baseline: MultiGameweekPlan | None = None
+    transfer_count_frontier: TransferCountFrontier | None = None
     marginal_value_of_each_move: MoveAttribution | None = None
     current_action: TransferAction | None = None
     future_policy: tuple[NodeDecision, ...] = ()
@@ -788,6 +842,7 @@ class MultiGameweekOptimisationResult(OptimisationModel):
             or self.conservative_plan.plan is not None
             or self.high_upside_plan.plan is not None
             or self.no_transfer_baseline is not None
+            or self.transfer_count_frontier is not None
             or self.marginal_value_of_each_move is not None
             or self.current_action is not None
             or self.future_policy
@@ -882,12 +937,29 @@ def verify_plan_hash(value: MultiGameweekPlan) -> None:
         raise ValueError("multi-Gameweek plan semantic hash does not match")
 
 
+def seal_transfer_count_frontier(value: TransferCountFrontier) -> TransferCountFrontier:
+    return value.model_copy(update={"frontier_sha256": _hash_without(value, "frontier_sha256")})
+
+
+def verify_transfer_count_frontier_hash(value: TransferCountFrontier) -> None:
+    if value.frontier_sha256 != _hash_without(value, "frontier_sha256"):
+        raise ValueError("transfer-count frontier semantic hash does not match")
+
+
+def _result_hash(value: MultiGameweekOptimisationResult) -> str:
+    payload = value.model_dump(mode="json")
+    payload["result_sha256"] = None
+    if value.transfer_count_frontier is None:
+        payload.pop("transfer_count_frontier")
+    return semantic_sha256(payload)
+
+
 def seal_result(value: MultiGameweekOptimisationResult) -> MultiGameweekOptimisationResult:
-    return value.model_copy(update={"result_sha256": _hash_without(value, "result_sha256")})
+    return value.model_copy(update={"result_sha256": _result_hash(value)})
 
 
 def verify_result_hash(value: MultiGameweekOptimisationResult) -> None:
-    if value.result_sha256 != _hash_without(value, "result_sha256"):
+    if value.result_sha256 != _result_hash(value):
         raise ValueError("multi-Gameweek result semantic hash does not match")
 
 

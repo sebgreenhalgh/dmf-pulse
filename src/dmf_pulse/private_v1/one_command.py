@@ -59,6 +59,7 @@ from dmf_pulse.private_v1.models import (
     seal_fixture_score_prior,
 )
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
+from dmf_pulse.private_v1.reporting import render_transfer_frontier
 from dmf_pulse.private_v1.service import (
     PrivateV1RecommendationService,
     load_packaged_event_allocation_config,
@@ -194,6 +195,8 @@ def _display_report(
         player = player_by_element[element_id]
         return f"{player.web_name} [{element_id}]"
 
+    frontier = render_transfer_frontier(decision.transfer_frontier, label=label)
+    frontier_section = f"{frontier}\n\n" if frontier else ""
     transfers = (
         "NO TRANSFER"
         if not decision.transfers
@@ -227,6 +230,7 @@ def _display_report(
     )
     return (
         f"DMF PULSE - GW{decision.target_gameweek}\n\n"
+        f"{frontier_section}"
         "RECOMMENDATION\n"
         f"Transfer: {transfers}\n"
         f"Cost: {len(decision.transfers)} transfer(s)\n"

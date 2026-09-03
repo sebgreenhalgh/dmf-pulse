@@ -1,0 +1,13 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "backward_compatibility": "PASS_LEGACY_OPTIONAL_FIELD_PARSE_AND_HASH",
+  "canonical_recommendation_equality": "PASS_BYTE_IDENTICAL_FROZEN_SYNTHETIC_FIELDS",
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "frontier_selection": "PASS_EXACT_COUNT_CURRENT_GAMEWEEK_POINTS_AFTER_COMPILED_HIT",
+  "future_free_transfer_value_included": false,
+  "objective": "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE",
+  "performance_median_delta_percent": "0.36",
+  "provider_bodies_retained": 0,
+  "stage10_additional_evaluations": 0,
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001M"
+}

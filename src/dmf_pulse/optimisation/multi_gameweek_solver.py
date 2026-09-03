@@ -711,8 +711,12 @@ class PolicyCandidate:
         )
 
     @property
+    def root_decision(self) -> NodeDecision:
+        return min(self.decisions, key=lambda item: (item.gameweek, item.node_id))
+
+    @property
     def root_action(self) -> TransferAction:
-        return min(self.decisions, key=lambda item: (item.gameweek, item.node_id)).action
+        return self.root_decision.action
 
 
 @dataclass
@@ -793,6 +797,39 @@ def select_candidate(
     }[mode]
     best = max(metric(item) for item in eligible)
     return min((item for item in eligible if metric(item) == best), key=lambda item: item.tie_key)
+
+
+def select_transfer_count_frontier(
+    candidates: tuple[PolicyCandidate, ...],
+) -> tuple[PolicyCandidate, ...]:
+    """Select each exact-count current-GW optimum from an evaluated Stage-11 family."""
+
+    if not candidates:
+        raise InfeasiblePolicyError("no evaluated root actions are available for the frontier")
+    grouped: dict[int, list[PolicyCandidate]] = defaultdict(list)
+    for item in candidates:
+        grouped[item.root_action.transfer_count].append(item)
+    selected: list[PolicyCandidate] = []
+    for transfer_count in sorted(grouped):
+        values = grouped[transfer_count]
+        best = max(
+            item.root_decision.tactical_evaluation.expected_points
+            - Decimal(item.root_decision.hit_points)
+            for item in values
+        )
+        selected.append(
+            min(
+                (
+                    item
+                    for item in values
+                    if item.root_decision.tactical_evaluation.expected_points
+                    - Decimal(item.root_decision.hit_points)
+                    == best
+                ),
+                key=lambda item: item.tie_key,
+            )
+        )
+    return tuple(selected)
 
 
 def _root_sufficient_candidates(

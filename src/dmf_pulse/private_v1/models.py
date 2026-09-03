@@ -24,6 +24,7 @@ from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
 from dmf_pulse.availability.current_model import CurrentModelFixtureMinutesInput
 from dmf_pulse.availability.manual_override import ManualFixtureMinutesInput
 from dmf_pulse.football_events.score_prior_request import ScorePriorRequest
+from dmf_pulse.fpl_points.artifacts import semantic_sha256 as fpl_semantic_sha256
 from dmf_pulse.fpl_points.models import (
     EventAllocationConfig,
     MonteCarloPolicy,
@@ -528,6 +529,231 @@ class PrivatePairedComparison(_FrozenModel):
         return self
 
 
+class PrivateFrontierComparison(_FrozenModel):
+    """One exact-count plan compared with hold on the same weighted scenarios."""
+
+    scenario_count: PositiveInt
+    plan_expected_points_before_hit: Decimal
+    baseline_expected_points: Decimal
+    transfer_hit_points: NonNegativeInt
+    plan_expected_points_after_hit: Decimal
+    expected_uplift: Decimal
+    gain_p10: StrictInt
+    gain_median: StrictInt
+    gain_p90: StrictInt
+    probability_plan_beats_hold: Decimal = Field(ge=Decimal("0"), le=Decimal("1"))
+    probability_gain_at_least_four: Decimal = Field(ge=Decimal("0"), le=Decimal("1"))
+    probability_loss_at_least_four: Decimal = Field(ge=Decimal("0"), le=Decimal("1"))
+    gain_pmf: tuple[PrivateGainMass, ...]
+    semantic_sha256: Sha256
+
+    @model_validator(mode="after")
+    def comparison_reconciles(self) -> Self:
+        if (
+            self.plan_expected_points_before_hit - self.transfer_hit_points
+            != self.plan_expected_points_after_hit
+            or self.plan_expected_points_after_hit - self.baseline_expected_points
+            != self.expected_uplift
+            or not self.gain_p10 <= self.gain_median <= self.gain_p90
+            or sum((item.probability for item in self.gain_pmf), Decimal(0)) != Decimal(1)
+            or self.semantic_sha256 != _semantic_hash(self)
+        ):
+            raise ValueError("frontier paired comparison does not reconcile")
+        return self
+
+
+class PrivateFreeTransferState(_FrozenModel):
+    """Compiled FT transition with immediate and next-deadline states kept distinct."""
+
+    transition_event: StrictStr
+    unlimited_transfers_without_hits: StrictBool
+    manager_state_before: NonNegativeInt
+    effective_before_action: NonNegativeInt
+    transfer_count: NonNegativeInt
+    used_by_action: NonNegativeInt
+    paid_transfers: NonNegativeInt
+    hit_points: NonNegativeInt
+    remaining_immediately_after_action: NonNegativeInt
+    granted_for_next_deadline: NonNegativeInt
+    next_decision_deadline: NonNegativeInt
+    maximum_free_transfers: PositiveInt
+    semantic_sha256: Sha256
+
+    @model_validator(mode="after")
+    def transition_reconciles(self) -> Self:
+        ordinary_counts_reconcile = self.unlimited_transfers_without_hits or (
+            self.used_by_action + self.paid_transfers == self.transfer_count
+        )
+        unlimited_counts_reconcile = not self.unlimited_transfers_without_hits or (
+            self.used_by_action == 0 and self.paid_transfers == 0 and self.hit_points == 0
+        )
+        if (
+            not ordinary_counts_reconcile
+            or not unlimited_counts_reconcile
+            or self.used_by_action > self.effective_before_action
+            or self.remaining_immediately_after_action
+            != self.effective_before_action - self.used_by_action
+            or self.next_decision_deadline > self.maximum_free_transfers
+            or self.semantic_sha256 != _semantic_hash(self)
+        ):
+            raise ValueError("free-transfer transition does not reconcile")
+        return self
+
+
+class PrivateTransferFrontierPoint(_FrozenModel):
+    transfer_count: NonNegativeInt
+    action_id: StrictStr
+    action_signature: StrictStr
+    action_sha256: Sha256
+    transfers: tuple[PrivateTransferMove, ...]
+    resulting_squad: tuple[StrictStr, ...]
+    tactics: PrivateTacticalDecision
+    formation: tuple[PositiveInt, PositiveInt, PositiveInt]
+    comparison_vs_hold: PrivateFrontierComparison
+    bank_after_tenths: NonNegativeInt
+    free_transfer_state: PrivateFreeTransferState
+    tactical_plan_sha256: Sha256
+    stage11_plan_sha256: Sha256
+    semantic_sha256: Sha256
+
+    @model_validator(mode="after")
+    def point_is_canonical_and_sealed(self) -> Self:
+        transfer_out = tuple(sorted(item.player_out_id for item in self.transfers))
+        transfer_in = tuple(sorted(item.player_in_id for item in self.transfers))
+        action_digest = fpl_semantic_sha256(
+            {
+                "event": self.free_transfer_state.transition_event,
+                "transfers_out": transfer_out,
+                "transfers_in": transfer_in,
+            }
+        )
+        expected_action_id = f"transfer-{action_digest[:32]}"
+        expected_action_signature = (
+            f"{self.free_transfer_state.transition_event}|"
+            f"{','.join(transfer_out)}->{','.join(transfer_in)}"
+        )
+        expected_action_sha256 = fpl_semantic_sha256(
+            {
+                "action_id": expected_action_id,
+                "transfers_out": transfer_out,
+                "transfers_in": transfer_in,
+                "transition_event": self.free_transfer_state.transition_event,
+            }
+        )
+        tactical_ids = {
+            *self.tactics.starting_xi,
+            self.tactics.bench_goalkeeper,
+            *self.tactics.bench_outfield_order,
+        }
+        if (
+            len(self.transfers) != self.transfer_count
+            or len(transfer_out) != len(set(transfer_out))
+            or len(transfer_in) != len(set(transfer_in))
+            or self.action_id != expected_action_id
+            or self.action_signature != expected_action_signature
+            or self.action_sha256 != expected_action_sha256
+            or self.resulting_squad != tuple(sorted(set(self.resulting_squad)))
+            or len(self.resulting_squad) != 15
+            or tactical_ids != set(self.resulting_squad)
+            or sum(self.formation) != 10
+            or not 3 <= self.formation[0] <= 5
+            or not 2 <= self.formation[1] <= 5
+            or not 1 <= self.formation[2] <= 3
+            or self.comparison_vs_hold.transfer_hit_points != self.free_transfer_state.hit_points
+            or self.free_transfer_state.transfer_count != self.transfer_count
+            or self.semantic_sha256 != _semantic_hash(self)
+        ):
+            raise ValueError("private transfer-frontier point does not reconcile")
+        return self
+
+
+class PrivateTransferFrontierDelta(_FrozenModel):
+    lower_transfer_count: NonNegativeInt
+    higher_transfer_count: PositiveInt
+    immediate_expected_points_delta: Decimal
+    plan_relationship: Literal["STRICT_EXTENSION", "NON_NESTED"]
+    nested_incremental_transfers: tuple[PrivateTransferMove, ...] = ()
+
+    @model_validator(mode="after")
+    def delta_reconciles(self) -> Self:
+        if self.lower_transfer_count >= self.higher_transfer_count:
+            raise ValueError("frontier delta transfer counts must increase")
+        if self.plan_relationship == "NON_NESTED" and self.nested_incremental_transfers:
+            raise ValueError("a non-nested frontier delta cannot claim an incremental move")
+        if self.plan_relationship == "STRICT_EXTENSION" and not self.nested_incremental_transfers:
+            raise ValueError("a strict frontier extension must expose its incremental move")
+        return self
+
+
+class PrivateTransferFrontier(_FrozenModel):
+    schema_version: Literal["private-transfer-frontier-v1"] = "private-transfer-frontier-v1"
+    objective: Literal["ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE"]
+    future_free_transfer_value_included: Literal[False] = False
+    points: tuple[PrivateTransferFrontierPoint, ...]
+    deltas: tuple[PrivateTransferFrontierDelta, ...]
+    action_space_disclosure: StrictStr
+    stage9_projection_sha256: Sha256
+    stage9_joint_scenario_sha256: Sha256
+    optimiser_request_sha256: Sha256
+    optimiser_result_sha256: Sha256
+    candidate_action_policy_sha256: Sha256
+    semantic_sha256: Sha256
+
+    @model_validator(mode="after")
+    def frontier_is_canonical_and_sealed(self) -> Self:
+        if not self.points:
+            raise ValueError("frontier requires at least the hold plan")
+        counts = tuple(item.transfer_count for item in self.points)
+        if counts != tuple(sorted(set(counts))):
+            raise ValueError("frontier points must be canonically ordered")
+        if self.points[0].transfer_count != 0:
+            raise ValueError("frontier requires at least the hold plan")
+        expected_pairs = tuple(
+            (lower.transfer_count, higher.transfer_count)
+            for lower, higher in zip(self.points, self.points[1:], strict=False)
+        )
+        actual_pairs = tuple(
+            (item.lower_transfer_count, item.higher_transfer_count) for item in self.deltas
+        )
+        expected_values = tuple(
+            higher.comparison_vs_hold.plan_expected_points_after_hit
+            - lower.comparison_vs_hold.plan_expected_points_after_hit
+            for lower, higher in zip(self.points, self.points[1:], strict=False)
+        )
+        actual_values = tuple(item.immediate_expected_points_delta for item in self.deltas)
+        if (
+            actual_pairs != expected_pairs
+            or actual_values != expected_values
+            or self.semantic_sha256 != _semantic_hash(self)
+        ):
+            raise ValueError("private transfer frontier does not reconcile")
+        return self
+
+
+def seal_private_frontier_comparison(
+    value: PrivateFrontierComparison,
+) -> PrivateFrontierComparison:
+    return value.model_copy(update={"semantic_sha256": _semantic_hash(value)})
+
+
+def seal_private_free_transfer_state(
+    value: PrivateFreeTransferState,
+) -> PrivateFreeTransferState:
+    return value.model_copy(update={"semantic_sha256": _semantic_hash(value)})
+
+
+def seal_private_transfer_frontier_point(
+    value: PrivateTransferFrontierPoint,
+) -> PrivateTransferFrontierPoint:
+    return value.model_copy(update={"semantic_sha256": _semantic_hash(value)})
+
+
+def seal_private_transfer_frontier(
+    value: PrivateTransferFrontier,
+) -> PrivateTransferFrontier:
+    return value.model_copy(update={"semantic_sha256": _semantic_hash(value)})
+
+
 class PrivateDecisionLineage(_FrozenModel):
     current_state_sha256: Sha256
     player_identity_map_sha256: Sha256
@@ -582,6 +808,7 @@ class PrivateV1Decision(_FrozenModel):
     no_transfer_tactics: PrivateTacticalDecision
     chip_action: Literal["NO_CHIP"]
     paired_comparison: PrivatePairedComparison
+    transfer_frontier: PrivateTransferFrontier | None = None
     stage7_family: Literal[
         "PRIVATE_MANUAL_TRANSIENT_OVERRIDE_V1",
         "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1",
@@ -608,6 +835,12 @@ class PrivateV1Decision(_FrozenModel):
     def cutoff_is_utc(cls, value: datetime) -> datetime:
         return _utc(value, label="information_cutoff")
 
+    def semantic_hash(self) -> str:
+        payload = self.model_dump(mode="json", exclude={"semantic_sha256"})
+        if self.transfer_frontier is None:
+            payload.pop("transfer_frontier")
+        return canonical_sha256(payload)
+
     @model_validator(mode="after")
     def decision_is_canonical_and_sealed(self) -> Self:
         if self.stage7_model_derived != (
@@ -630,13 +863,53 @@ class PrivateV1Decision(_FrozenModel):
             raise ValueError("decision warnings must be unique and sorted")
         if self.stage9_monte_carlo_reasons != tuple(sorted(set(self.stage9_monte_carlo_reasons))):
             raise ValueError("Stage-9 Monte Carlo reasons must be unique and sorted")
-        if self.semantic_sha256 != _semantic_hash(self):
+        if self.transfer_frontier is not None:
+            frontier = self.transfer_frontier
+            recommended = next(
+                (
+                    item
+                    for item in frontier.points
+                    if item.transfer_count == len(self.transfers)
+                    and item.action_signature.endswith(
+                        "|"
+                        + ",".join(sorted(move.player_out_id for move in self.transfers))
+                        + "->"
+                        + ",".join(sorted(move.player_in_id for move in self.transfers))
+                    )
+                ),
+                None,
+            )
+            if (
+                frontier.action_space_disclosure != self.action_space_disclosure
+                or frontier.stage9_projection_sha256 != self.lineage.stage9_result_sha256
+                or frontier.stage9_joint_scenario_sha256 != self.lineage.stage9_joint_matrix_sha256
+                or frontier.optimiser_request_sha256 != self.lineage.optimiser_request_sha256
+                or frontier.optimiser_result_sha256 != self.lineage.optimiser_result_sha256
+                or frontier.candidate_action_policy_sha256
+                != self.lineage.candidate_action_policy_sha256
+                or recommended is None
+                or recommended.transfers != self.transfers
+                or recommended.resulting_squad != self.resulting_squad
+                or recommended.tactics != self.tactics
+                or recommended.comparison_vs_hold.plan_expected_points_before_hit
+                != self.paired_comparison.recommended_expected_points_before_hit
+                or recommended.comparison_vs_hold.baseline_expected_points
+                != self.paired_comparison.no_transfer_expected_points
+                or recommended.comparison_vs_hold.transfer_hit_points
+                != self.paired_comparison.transfer_hit_points
+                or recommended.comparison_vs_hold.plan_expected_points_after_hit
+                != self.paired_comparison.recommended_expected_points_after_hit
+                or recommended.comparison_vs_hold.expected_uplift
+                != self.paired_comparison.net_expected_uplift
+            ):
+                raise ValueError("private decision and transfer frontier disagree")
+        if self.semantic_sha256 != self.semantic_hash():
             raise ValueError("private decision semantic hash does not match")
         return self
 
 
 def seal_private_decision(value: PrivateV1Decision) -> PrivateV1Decision:
-    return value.model_copy(update={"semantic_sha256": _semantic_hash(value)})
+    return value.model_copy(update={"semantic_sha256": value.semantic_hash()})
 
 
 class PrivateReplayFile(_FrozenModel):
@@ -679,11 +952,16 @@ __all__ = [
     "PrivateCurrentOwnershipMember",
     "PrivateDecisionLineage",
     "PrivateDecisionStatus",
+    "PrivateFreeTransferState",
+    "PrivateFrontierComparison",
     "PrivateGainMass",
     "PrivatePairedComparison",
     "PrivateReplayFile",
     "PrivateReplayManifest",
     "PrivateTacticalDecision",
+    "PrivateTransferFrontier",
+    "PrivateTransferFrontierDelta",
+    "PrivateTransferFrontierPoint",
     "PrivateTransferMove",
     "PrivateV1Decision",
     "PrivateV1ExecutionInput",
@@ -692,5 +970,9 @@ __all__ = [
     "seal_current_ownership",
     "seal_execution_input",
     "seal_private_decision",
+    "seal_private_free_transfer_state",
+    "seal_private_frontier_comparison",
+    "seal_private_transfer_frontier",
+    "seal_private_transfer_frontier_point",
     "seal_replay_manifest",
 ]

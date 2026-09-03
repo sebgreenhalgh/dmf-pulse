@@ -5,7 +5,7 @@
     "error_code": null,
     "objective": "63.0",
     "request_sha256": "7a90fdc354e25c572a44c4d2e53014b0bbcab50f8fa05533fa043acb73fdbac0",
-    "result_sha256": "68bbd3278b8395e7618fbd548f616d6f6e4aab0fb4a07ff3e735a40ab783a819",
+    "result_sha256": "030449d964523935ef08a2a434a2a743a10b5caef724b03d069c12db63b02272",
     "status": "SUCCESS"
   },
   "funding_transfer_bundle": {
@@ -14,7 +14,7 @@
     "error_code": null,
     "objective": "74",
     "request_sha256": "159075a4b34b889811f9b755b80121c6edc2023a3d4f24762eaae704f2ada879",
-    "result_sha256": "cd6a6b7913dad8d7926834cbec3586ef890266e8935920f16217e57ccc67e61c",
+    "result_sha256": "9c0a28d9991c374f89fbc430d4c2c0239f9573b0a89eeafe98187952ded8c6f7",
     "status": "SUCCESS"
   },
   "futures_identical_until_revelation": {
@@ -23,7 +23,7 @@
     "error_code": null,
     "objective": "100.0",
     "request_sha256": "26aeaf5d4e6b585e172ce6259bd86b085623007d5fa5f6c36bcfeececfe1ac23",
-    "result_sha256": "3c84d52617f7cf7c7f4f509a29814654d15058b8e90e2ad2049132d66edab7bd",
+    "result_sha256": "5f0245505347e31bdb9ed02d84dbdc4af0e616db7d927f6b39f160dce883d8c2",
     "status": "SUCCESS"
   },
   "horizon_reversal": {
@@ -32,7 +32,7 @@
     "error_code": null,
     "objective": "71",
     "request_sha256": "9860c9b099414281d46d3df06b04852dd792057c08f92146eb5b75a319f194b3",
-    "result_sha256": "4fe5e9ea49cf681599985b689273236bfde681128605a11a498cca77d58bdad7",
+    "result_sha256": "aaf45e6d3d7238cf0c1a34401355d3fdec2b348bd1349bbb358e32bec03247cf",
     "status": "SUCCESS"
   },
   "illegal_manager_state": {
@@ -59,7 +59,7 @@
     "error_code": null,
     "objective": "70.0",
     "request_sha256": "d06c853464ac25ddbfd1642399a30195f474ad0773d8e3a4da19dd086d87af5d",
-    "result_sha256": "f60986da0474e65c1ad8899e324da82ccb6245aee33628f6c04f3dcab21b26b1",
+    "result_sha256": "1ca517a3a961fea6ef024dcf12d43b80dc0ff9d12f8ece5f547277315f9b75fd",
     "status": "SUCCESS"
   },
   "malformed_scenario_probabilities_tree": {
@@ -77,7 +77,7 @@
     "error_code": null,
     "objective": "30",
     "request_sha256": "455697108bc39e558230a6b96f7e2fc8982af2e3ec23c2bf75bf43498c4241cb",
-    "result_sha256": "e63a8c879e771a893d2042cb555fd4a73b3189a354abaa41b5bde9538497bdc3",
+    "result_sha256": "76b4912e42094aba02e7bda297ac7a39c032a340bb3b54654c9a237f40e8c060",
     "status": "SUCCESS"
   },
   "postponed_reassigned_fixture": {
@@ -86,7 +86,7 @@
     "error_code": null,
     "objective": "70.0",
     "request_sha256": "665c0bfd7d324d2ee54f8750b3d9f93fc905c34299e2f5933cf7fc18a649e661",
-    "result_sha256": "4eda98708795140280ec737f1e72ecff6a5552170dc2b9026f28bf0910761674",
+    "result_sha256": "b0dcd9d538347847600f0079202b5916730613e7293ec4d2c62191dabc08f057",
     "status": "SUCCESS"
   },
   "price_change_blocks_later_route": {
@@ -95,7 +95,7 @@
     "error_code": null,
     "objective": "68",
     "request_sha256": "42e56be2ac8befaa2047290fb0a4421c2c9637c5afc5f63954b40a5841277d3e",
-    "result_sha256": "b25e80cbf65c03423f9c6fd788ace21233fe338912f94eab6e9a9b4366fd6533",
+    "result_sha256": "b0fe5d6f2485cb3c6c2e9768cb1a484790513534403e4f59f99caf6d36002d1f",
     "status": "SUCCESS"
   },
   "price_fall": {
@@ -104,7 +104,7 @@
     "error_code": null,
     "objective": "72",
     "request_sha256": "057e33d508f1384ed480afb234e26520996241d7e8c8f047c267c6592a69ac66",
-    "result_sha256": "68e294bdea2d695d4e308c21ea70f68340f35033adcf9b6edb37bff99c3e4f3c",
+    "result_sha256": "87e9b762ecdbf5ae167ec22182abeda0d710ef42894cbbad34af305ffac37e54",
     "status": "SUCCESS"
   },
   "rational_hit": {
@@ -113,7 +113,7 @@
     "error_code": null,
     "objective": "76",
     "request_sha256": "3317bbd015cab889c31681651d06254f05f9d1a74a5e2c541c746f876f67b999",
-    "result_sha256": "1b3b1fd6675d9ee5d79d49c8603950fb2366713909a11fcb293aaa5c6b6fe34b",
+    "result_sha256": "abfef4d0c69dc8d01997094d4275a784a19a0c5ee4ac32d488e6e3079e4dde3d",
     "status": "SUCCESS"
   },
   "repurchase_resets_cohort": {
@@ -122,7 +122,7 @@
     "error_code": null,
     "objective": "142",
     "request_sha256": "38291686c316fde2498c1fbba9fec82ce98dede793a0e6707c91048672654bc2",
-    "result_sha256": "521703008aa13612f8e1e18c224fc47aa801f169173c1bc3dc6c7b1751794134",
+    "result_sha256": "9e6e9bea0306c6f12372b9c7d88b19c5164089a50e8dfe4e1dba31677396298b",
     "status": "SUCCESS"
   },
   "resource_limit_incumbent": {
@@ -140,7 +140,7 @@
     "error_code": null,
     "objective": "72",
     "request_sha256": "629db342ba56b26f104f8364356d0cba20305d07244099f9da4b55a58a6bbe7f",
-    "result_sha256": "daf2ecaf48518698cd541bd15e9278125969e57e70b00bf5a1dac150971cc7a5",
+    "result_sha256": "8e0ede8f095ecd92e146d296f1c3cbde538c2b815a7ec5992499ce0b80be7421",
     "status": "SUCCESS"
   },
   "roll_ft": {
@@ -149,7 +149,7 @@
     "error_code": null,
     "objective": "66",
     "request_sha256": "8fa65bcf4550a160cd0d4b50d5d9b51c2922f7680c427edb3d72231243ef4eca",
-    "result_sha256": "695d2a8697e2e903b3bc4073bfc250f175080c78e7d6b077ca4b73167b5ccc7c",
+    "result_sha256": "2a2cc4cee172978c73a8c5627b9df3f680268247c42bbdd3b8ebabed72d3c27d",
     "status": "SUCCESS"
   },
   "simple_one_ft": {
@@ -158,7 +158,7 @@
     "error_code": null,
     "objective": "72",
     "request_sha256": "90cf49dde909f34512614b22a91fb852c3a79638260b645c1a372c6f12e537d4",
-    "result_sha256": "bcb7923798e266b8d6c49d67e5b41eb0ee4c580892a2b415928f989db0c2bce3",
+    "result_sha256": "7177866ae464225d3cc58225cb10abe6cc31ab252c91e58420943699652ad10d",
     "status": "SUCCESS"
   },
   "terminal_value_reversal": {
@@ -167,7 +167,7 @@
     "error_code": null,
     "objective": "34.5",
     "request_sha256": "cd88fef10fff72c0616fa0e7fa5fec3511c1dd2f4e74b7ede191d02da3773315",
-    "result_sha256": "0dbf529bd60d7417a5aaf8a0ece16b50bbd2a5cae94e3cf82cc25120482387f4",
+    "result_sha256": "580efe11468f0d22019a883e4ac1ee1698415d3eb44f57b2f91820f200337967",
     "status": "SUCCESS"
   },
   "tied_plans": {
@@ -176,7 +176,7 @@
     "error_code": null,
     "objective": "72",
     "request_sha256": "9bccbe2ff2abec1d89410392587d22d8717d94304858b68d8f9b09fc1772c6f6",
-    "result_sha256": "b8c98172aeb4655e74d29c0c8bbc5d50046978b606ac08f744ed17986630e622",
+    "result_sha256": "4e80f338060ec03706ef86954c8050abe582f301379af11388b3a022b0d44966",
     "status": "SUCCESS"
   }
 }

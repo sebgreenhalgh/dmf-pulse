@@ -10,7 +10,7 @@ from fractions import Fraction
 from importlib.resources import files
 from math import comb
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 import yaml  # type: ignore[import-untyped]
@@ -85,6 +85,7 @@ from dmf_pulse.optimisation.models import (
 )
 from dmf_pulse.optimisation.multi_gameweek_models import (
     BackendStatus,
+    FreeTransferArc,
     MultiGameweekOptimisationRequest,
     MultiGameweekOptimisationResult,
     MultiGameweekResultStatus,
@@ -94,6 +95,8 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
     ScenarioTreeNode,
     SearchPolicy,
     TacticalNodeEvaluation,
+    TransferAction,
+    TransferMove,
     seal_request,
     seal_scenario_tree,
     seal_search_policy,
@@ -107,6 +110,8 @@ from dmf_pulse.optimisation.multi_gameweek_solver import (
     action_moves,
     enumerate_legal_actions,
     information_set_key,
+    make_transfer_action,
+    resolve_free_transfer_arc,
 )
 from dmf_pulse.optimisation.policy import load_policy as load_one_gameweek_policy
 from dmf_pulse.optimisation.stage10_adapter import Stage10TacticalAdapter
@@ -117,15 +122,25 @@ from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.models import (
     PrivateDecisionLineage,
     PrivateDecisionStatus,
+    PrivateFreeTransferState,
+    PrivateFrontierComparison,
     PrivateGainMass,
     PrivatePairedComparison,
     PrivateTacticalDecision,
+    PrivateTransferFrontier,
+    PrivateTransferFrontierDelta,
+    PrivateTransferFrontierPoint,
     PrivateTransferMove,
     PrivateV1Decision,
     PrivateV1ExecutionInput,
     seal_private_decision,
+    seal_private_free_transfer_state,
+    seal_private_frontier_comparison,
+    seal_private_transfer_frontier,
+    seal_private_transfer_frontier_point,
 )
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
+from dmf_pulse.private_v1.reporting import render_transfer_frontier
 from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 
@@ -159,6 +174,22 @@ class PrivateTransferSearchScope:
     exact_tactical_squads: int
     certified_dominated_candidates: int
     pruning_policy: str | None
+
+
+def _action_space_disclosure(scope: PrivateTransferSearchScope) -> str:
+    return (
+        "Exact tactical optimum within the declared bounded transfer candidate set: "
+        f"{len(scope.retained_incoming_ids)} retained incoming candidate(s) "
+        f"from {scope.full_incoming_count} selectable player(s), the exact "
+        f"current squad, transfer counts "
+        f"{','.join(str(item) for item in scope.transfer_counts_considered)}, "
+        f"{scope.one_transfer_actions} retained one-transfer action(s), "
+        f"{scope.two_transfer_actions} retained two-transfer action(s), "
+        f"{scope.exact_tactical_squads} exact tactical squad evaluation(s), "
+        f"{scope.certified_dominated_candidates} certified pointwise-dominated "
+        "incoming candidate(s) removed, and the declared Stage-9 scenario set. "
+        f"Screening policy: {scope.pruning_policy or 'EXPLICIT_DECLARED_ACTION_SPACE'}."
+    )
 
 
 def _ranked_with_boundary_ties(
@@ -1182,6 +1213,90 @@ def _tactical_decision(plan: OneGameweekPlan, captain_hash: str) -> PrivateTacti
     )
 
 
+def _private_free_transfer_state(
+    arc: FreeTransferArc,
+    *,
+    manager_state_before: int,
+) -> PrivateFreeTransferState:
+    return seal_private_free_transfer_state(
+        PrivateFreeTransferState.model_construct(
+            transition_event=arc.event,
+            unlimited_transfers_without_hits=arc.unlimited_transfers_without_hits,
+            manager_state_before=manager_state_before,
+            effective_before_action=arc.effective_ft_before,
+            transfer_count=arc.transfer_count,
+            used_by_action=arc.free_used,
+            paid_transfers=arc.paid_transfers,
+            hit_points=arc.hit_points,
+            remaining_immediately_after_action=arc.effective_ft_before - arc.free_used,
+            granted_for_next_deadline=arc.earned_for_next_deadline,
+            next_decision_deadline=arc.ft_after,
+            maximum_free_transfers=arc.maximum_free_transfers,
+            semantic_sha256="0" * 64,
+        )
+    )
+
+
+def _frontier_relationship(
+    lower: TransferAction,
+    higher: TransferAction,
+    *,
+    candidate_pool: tuple[PlayerCatalogEntry, ...],
+) -> tuple[Literal["STRICT_EXTENSION", "NON_NESTED"], tuple[TransferMove, ...]]:
+    lower_out = set(lower.transfers_out)
+    lower_in = set(lower.transfers_in)
+    higher_out = set(higher.transfers_out)
+    higher_in = set(higher.transfers_in)
+    if (
+        lower.transition_event == higher.transition_event
+        and lower_out < higher_out
+        and lower_in < higher_in
+        and len(higher_out - lower_out) == len(higher_in - lower_in)
+    ):
+        incremental = make_transfer_action(
+            transfers_out=tuple(higher_out - lower_out),
+            transfers_in=tuple(higher_in - lower_in),
+            event=higher.transition_event,
+        )
+        return "STRICT_EXTENSION", action_moves(incremental, candidate_pool=candidate_pool)
+    return "NON_NESTED", ()
+
+
+def _private_transfer_moves(
+    action: TransferAction,
+    *,
+    candidate_pool: tuple[PlayerCatalogEntry, ...],
+    element_by_player: dict[str, int],
+) -> tuple[PrivateTransferMove, ...]:
+    return tuple(
+        PrivateTransferMove(
+            player_out_id=move.player_out,
+            player_in_id=move.player_in,
+            official_fpl_element_out=element_by_player[move.player_out],
+            official_fpl_element_in=element_by_player[move.player_in],
+        )
+        for move in action_moves(action, candidate_pool=candidate_pool)
+    )
+
+
+def _formation(
+    plan: OneGameweekPlan,
+    *,
+    candidates: dict[str, CandidatePlayer],
+) -> tuple[int, int, int]:
+    starting_xi = plan.tactical_configuration.starting_xi
+    defenders = sum(
+        candidates[player_id].position is PlayerPosition.DEF for player_id in starting_xi
+    )
+    midfielders = sum(
+        candidates[player_id].position is PlayerPosition.MID for player_id in starting_xi
+    )
+    forwards = sum(
+        candidates[player_id].position is PlayerPosition.FWD for player_id in starting_xi
+    )
+    return defenders, midfielders, forwards
+
+
 def _quantile(masses: dict[int, Fraction], probability: Fraction) -> int:
     total = sum(masses.values(), Fraction(0))
     cumulative = Fraction(0)
@@ -1197,16 +1312,16 @@ def _decimal(value: Fraction) -> Decimal:
         return Decimal(value.numerator) / Decimal(value.denominator)
 
 
-def _paired_comparison(
-    recommended: OneGameweekPlan,
+def _frontier_comparison(
+    plan: OneGameweekPlan,
     baseline: OneGameweekPlan,
     *,
     scenarios: GameweekScenarioSet,
     hit_points: int,
-) -> PrivatePairedComparison:
-    recommended_scores = {
+) -> PrivateFrontierComparison:
+    plan_scores = {
         (item.scenario_id, item.outcome_draw_id): item.manager_points
-        for item in recommended.scenario_scores
+        for item in plan.scenario_scores
     }
     baseline_scores = {
         (item.scenario_id, item.outcome_draw_id): item.manager_points
@@ -1216,7 +1331,7 @@ def _paired_comparison(
         (item.scenario_id, item.outcome_draw_id): Fraction(str(item.weight))
         for item in scenarios.scenarios
     }
-    if not recommended_scores.keys() == baseline_scores.keys() == scenario_weights.keys():
+    if not plan_scores.keys() == baseline_scores.keys() == scenario_weights.keys():
         raise PrivateV1Error(
             "COMPARATOR_SCENARIO_MISMATCH", "recommendation and baseline scenarios differ"
         )
@@ -1225,39 +1340,78 @@ def _paired_comparison(
         raise PrivateV1Error("COMPARATOR_INVALID", "scenario weights are invalid")
     normalized = {key: weight / total_weight for key, weight in scenario_weights.items()}
     gain_masses: dict[int, Fraction] = {}
-    expected_recommended = Fraction(0)
+    expected_plan = Fraction(0)
     expected_baseline = Fraction(0)
     for key, weight in normalized.items():
-        recommended_points = recommended_scores[key]
+        plan_points = plan_scores[key]
         baseline_points = baseline_scores[key]
-        gain = recommended_points - hit_points - baseline_points
+        gain = plan_points - hit_points - baseline_points
         gain_masses[gain] = gain_masses.get(gain, Fraction(0)) + weight
-        expected_recommended += weight * recommended_points
+        expected_plan += weight * plan_points
         expected_baseline += weight * baseline_points
-    gain_expected = expected_recommended - hit_points - expected_baseline
+    gain_expected = expected_plan - hit_points - expected_baseline
+    return seal_private_frontier_comparison(
+        PrivateFrontierComparison.model_construct(
+            scenario_count=len(normalized),
+            plan_expected_points_before_hit=_decimal(expected_plan),
+            baseline_expected_points=_decimal(expected_baseline),
+            transfer_hit_points=hit_points,
+            plan_expected_points_after_hit=_decimal(expected_plan) - hit_points,
+            expected_uplift=_decimal(gain_expected),
+            gain_p10=_quantile(gain_masses, Fraction(1, 10)),
+            gain_median=_quantile(gain_masses, Fraction(1, 2)),
+            gain_p90=_quantile(gain_masses, Fraction(9, 10)),
+            probability_plan_beats_hold=_decimal(
+                sum((mass for points, mass in gain_masses.items() if points > 0), Fraction(0))
+            ),
+            probability_gain_at_least_four=_decimal(
+                sum((mass for points, mass in gain_masses.items() if points >= 4), Fraction(0))
+            ),
+            probability_loss_at_least_four=_decimal(
+                sum((mass for points, mass in gain_masses.items() if points <= -4), Fraction(0))
+            ),
+            gain_pmf=tuple(
+                PrivateGainMass(points=points, probability=_decimal(mass))
+                for points, mass in sorted(gain_masses.items())
+            ),
+            semantic_sha256="0" * 64,
+        )
+    )
+
+
+def _paired_comparison(
+    recommended: OneGameweekPlan,
+    baseline: OneGameweekPlan,
+    *,
+    scenarios: GameweekScenarioSet,
+    hit_points: int,
+) -> PrivatePairedComparison:
+    frontier = _frontier_comparison(
+        recommended,
+        baseline,
+        scenarios=scenarios,
+        hit_points=hit_points,
+    )
+    return _paired_comparison_from_frontier(frontier)
+
+
+def _paired_comparison_from_frontier(
+    frontier: PrivateFrontierComparison,
+) -> PrivatePairedComparison:
     provisional = PrivatePairedComparison.model_construct(
-        scenario_count=len(normalized),
-        recommended_expected_points_before_hit=_decimal(expected_recommended),
-        no_transfer_expected_points=_decimal(expected_baseline),
-        transfer_hit_points=hit_points,
-        recommended_expected_points_after_hit=_decimal(expected_recommended) - hit_points,
-        net_expected_uplift=_decimal(gain_expected),
-        gain_p10=_quantile(gain_masses, Fraction(1, 10)),
-        gain_median=_quantile(gain_masses, Fraction(1, 2)),
-        gain_p90=_quantile(gain_masses, Fraction(9, 10)),
-        probability_recommended_beats_baseline=_decimal(
-            sum((mass for points, mass in gain_masses.items() if points > 0), Fraction(0))
-        ),
-        probability_gain_at_least_four=_decimal(
-            sum((mass for points, mass in gain_masses.items() if points >= 4), Fraction(0))
-        ),
-        probability_loss_at_least_four=_decimal(
-            sum((mass for points, mass in gain_masses.items() if points <= -4), Fraction(0))
-        ),
-        gain_pmf=tuple(
-            PrivateGainMass(points=points, probability=_decimal(mass))
-            for points, mass in sorted(gain_masses.items())
-        ),
+        scenario_count=frontier.scenario_count,
+        recommended_expected_points_before_hit=frontier.plan_expected_points_before_hit,
+        no_transfer_expected_points=frontier.baseline_expected_points,
+        transfer_hit_points=frontier.transfer_hit_points,
+        recommended_expected_points_after_hit=frontier.plan_expected_points_after_hit,
+        net_expected_uplift=frontier.expected_uplift,
+        gain_p10=frontier.gain_p10,
+        gain_median=frontier.gain_median,
+        gain_p90=frontier.gain_p90,
+        probability_recommended_beats_baseline=frontier.probability_plan_beats_hold,
+        probability_gain_at_least_four=frontier.probability_gain_at_least_four,
+        probability_loss_at_least_four=frontier.probability_loss_at_least_four,
+        gain_pmf=frontier.gain_pmf,
         semantic_sha256="0" * 64,
     )
     payload = provisional.model_dump(mode="python")
@@ -1267,6 +1421,143 @@ def _paired_comparison(
     return PrivatePairedComparison.model_validate(payload)
 
 
+def _build_private_transfer_frontier(
+    optimiser: MultiGameweekOptimisationResult,
+    *,
+    request: MultiGameweekOptimisationRequest,
+    scenarios: GameweekScenarioSet,
+    baseline: OneGameweekPlan,
+    candidates: dict[str, CandidatePlayer],
+    tactical: _MemoizedStage10Evaluator,
+    element_by_player: dict[str, int],
+    action_space_disclosure: str,
+    stage9_projection_sha256: str,
+    stage9_joint_scenario_sha256: str,
+    candidate_action_policy_sha256: str,
+) -> tuple[PrivateTransferFrontier, dict[str, str]]:
+    source = optimiser.transfer_count_frontier
+    if source is None:
+        raise PrivateV1Error(
+            "TRANSFER_FRONTIER_UNAVAILABLE",
+            "complete Stage-11 result omitted the evaluated transfer-count frontier",
+        )
+    points: list[PrivateTransferFrontierPoint] = []
+    captain_hashes: dict[str, str] = {}
+    actions: list[TransferAction] = []
+    for item in source.points:
+        decision = item.plan.current_action
+        plan = _parse_tactical_plan(decision.tactical_evaluation.tactical_plan)
+        captain_hash = _verify_captain(
+            plan,
+            scenarios=scenarios,
+            candidates=candidates,
+            tactical=tactical,
+        )
+        captain_hashes[decision.tactical_evaluation.tactical_plan_sha256] = captain_hash
+        comparison = _frontier_comparison(
+            plan,
+            baseline,
+            scenarios=scenarios,
+            hit_points=decision.hit_points,
+        )
+        if comparison.plan_expected_points_after_hit != item.current_gameweek_objective:
+            raise PrivateV1Error(
+                "FRONTIER_OBJECTIVE_MISMATCH",
+                "paired current-GW frontier value differs from Stage-11 selection",
+            )
+        arc = resolve_free_transfer_arc(
+            request.rules,
+            event=decision.action.transition_event,
+            ft_before=decision.free_transfers_before,
+            transfer_count=decision.action.transfer_count,
+        )
+        if (
+            arc.paid_transfers != decision.paid_transfers
+            or arc.hit_points != decision.hit_points
+            or arc.ft_after != decision.free_transfers_after
+        ):
+            raise PrivateV1Error(
+                "FRONTIER_FT_TRANSITION_MISMATCH",
+                "frontier FT disclosure differs from the accepted Stage-11 transition",
+            )
+        moves = _private_transfer_moves(
+            decision.action,
+            candidate_pool=request.candidate_pool,
+            element_by_player=element_by_player,
+        )
+        point = seal_private_transfer_frontier_point(
+            PrivateTransferFrontierPoint.model_construct(
+                transfer_count=decision.action.transfer_count,
+                action_id=decision.action.action_id,
+                action_signature=decision.action.signature,
+                action_sha256=semantic_sha256(decision.action.model_dump(mode="json")),
+                transfers=moves,
+                resulting_squad=decision.squad_after,
+                tactics=_tactical_decision(plan, captain_hash),
+                formation=_formation(plan, candidates=candidates),
+                comparison_vs_hold=comparison,
+                bank_after_tenths=decision.bank_after_tenths,
+                free_transfer_state=_private_free_transfer_state(
+                    arc,
+                    manager_state_before=decision.free_transfers_before,
+                ),
+                tactical_plan_sha256=decision.tactical_evaluation.tactical_plan_sha256,
+                stage11_plan_sha256=item.plan.plan_sha256,
+                semantic_sha256="0" * 64,
+            )
+        )
+        points.append(point)
+        actions.append(decision.action)
+    deltas: list[PrivateTransferFrontierDelta] = []
+    for lower_point, higher_point, lower_action, higher_action in zip(
+        points[:-1],
+        points[1:],
+        actions[:-1],
+        actions[1:],
+        strict=True,
+    ):
+        relationship, incremental = _frontier_relationship(
+            lower_action,
+            higher_action,
+            candidate_pool=request.candidate_pool,
+        )
+        deltas.append(
+            PrivateTransferFrontierDelta(
+                lower_transfer_count=lower_point.transfer_count,
+                higher_transfer_count=higher_point.transfer_count,
+                immediate_expected_points_delta=(
+                    higher_point.comparison_vs_hold.plan_expected_points_after_hit
+                    - lower_point.comparison_vs_hold.plan_expected_points_after_hit
+                ),
+                plan_relationship=relationship,
+                nested_incremental_transfers=tuple(
+                    PrivateTransferMove(
+                        player_out_id=move.player_out,
+                        player_in_id=move.player_in,
+                        official_fpl_element_out=element_by_player[move.player_out],
+                        official_fpl_element_in=element_by_player[move.player_in],
+                    )
+                    for move in incremental
+                ),
+            )
+        )
+    frontier = seal_private_transfer_frontier(
+        PrivateTransferFrontier.model_construct(
+            objective="ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE",
+            points=tuple(points),
+            deltas=tuple(deltas),
+            action_space_disclosure=action_space_disclosure,
+            stage9_projection_sha256=stage9_projection_sha256,
+            stage9_joint_scenario_sha256=stage9_joint_scenario_sha256,
+            optimiser_request_sha256=request.request_sha256,
+            optimiser_result_sha256=optimiser.result_sha256,
+            candidate_action_policy_sha256=candidate_action_policy_sha256,
+            semantic_sha256="0" * 64,
+        )
+    )
+    return frontier, captain_hashes
+
+
 def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
     players, _teams = _current_identity_maps(value)
 
@@ -1274,6 +1565,8 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
         player = players[player_id]
         return f"{player.web_name} [FPL {player.provider_element_id}]"
 
+    frontier = render_transfer_frontier(decision.transfer_frontier, label=label)
+    frontier_section = f"\n{frontier}\n" if frontier else ""
     transfers = (
         "NO TRANSFER"
         if not decision.transfers
@@ -1356,6 +1649,7 @@ def _report(value: PrivateV1ExecutionInput, decision: PrivateV1Decision) -> str:
         f"Bank: {value.current_state.manager_state.bank_tenths / 10:.1f}\n"
         f"Free transfers: {value.current_state.manager_state.free_transfers}\n"
         "Chip configuration: NO CHIP\n"
+        f"{frontier_section}"
         "\nRECOMMENDATION\n"
         f"Transfers: {transfers}\n"
         f"Transfer hit: -{comparison.transfer_hit_points}\n"
@@ -1517,6 +1811,7 @@ class PrivateV1RecommendationService:
             or optimiser.solver_status.status is not BackendStatus.OPTIMAL
             or optimiser.recommended_plan is None
             or optimiser.no_transfer_baseline is None
+            or optimiser.transfer_count_frontier is None
         ):
             raise PrivateV1Error(
                 optimiser.error_code or "OPTIMISER_BLOCKED",
@@ -1526,33 +1821,64 @@ class PrivateV1RecommendationService:
         baseline_action = optimiser.no_transfer_baseline.current_action
         recommended = _parse_tactical_plan(recommended_action.tactical_evaluation.tactical_plan)
         baseline = _parse_tactical_plan(baseline_action.tactical_evaluation.tactical_plan)
+        if gameweek.result_sha256 is None:  # guarded by GameweekProjectionResult
+            raise PrivateV1Error("STAGE9_GAMEWEEK_INVALID", "Stage-9 result hash is absent")
+        current_players, _teams = _current_identity_maps(execution)
+        element_by_player = {
+            player_id: item.provider_element_id for player_id, item in current_players.items()
+        }
+        matrix_hash = semantic_sha256(gameweek.joint_matrix)
+        action_space_disclosure = _action_space_disclosure(transfer_scope)
         with active_progress.stage(
             started="Verifying captain / vice-captain...",
             completed="Captain verification complete",
             failed="captain / vice-captain verification",
         ):
-            recommended_captain_hash = _verify_captain(
-                recommended,
+            private_frontier, captain_hashes = _build_private_transfer_frontier(
+                optimiser,
+                request=request,
                 scenarios=scenario_set,
+                baseline=baseline,
                 candidates=candidates,
                 tactical=tactical,
+                element_by_player=element_by_player,
+                action_space_disclosure=action_space_disclosure,
+                stage9_projection_sha256=gameweek.result_sha256,
+                stage9_joint_scenario_sha256=matrix_hash,
+                candidate_action_policy_sha256=(execution.candidate_action_policy.semantic_sha256),
             )
-            baseline_captain_hash = _verify_captain(
-                baseline,
-                scenarios=scenario_set,
-                candidates=candidates,
-                tactical=tactical,
+            try:
+                recommended_captain_hash = captain_hashes[
+                    recommended_action.tactical_evaluation.tactical_plan_sha256
+                ]
+                baseline_captain_hash = captain_hashes[
+                    baseline_action.tactical_evaluation.tactical_plan_sha256
+                ]
+            except KeyError:
+                raise PrivateV1Error(
+                    "FRONTIER_RECOMMENDATION_MISMATCH",
+                    "canonical recommendation or hold is absent from the transfer frontier",
+                ) from None
+            recommended_frontier_point = next(
+                (
+                    item
+                    for item in private_frontier.points
+                    if item.action_id == recommended_action.action.action_id
+                ),
+                None,
             )
+            if recommended_frontier_point is None:
+                raise PrivateV1Error(
+                    "FRONTIER_RECOMMENDATION_MISMATCH",
+                    "canonical recommendation is absent from the transfer frontier",
+                )
         with active_progress.stage(
             started="Building paired comparator...",
             completed="Paired comparator ready",
             failed="paired comparator",
         ):
-            comparison = _paired_comparison(
-                recommended,
-                baseline,
-                scenarios=scenario_set,
-                hit_points=recommended_action.hit_points,
+            comparison = _paired_comparison_from_frontier(
+                recommended_frontier_point.comparison_vs_hold
             )
         if comparison.net_expected_uplift != optimiser.recommended_plan.utility.objective_total - (
             optimiser.no_transfer_baseline.utility.objective_total
@@ -1561,23 +1887,11 @@ class PrivateV1RecommendationService:
                 "COMPARATOR_OBJECTIVE_MISMATCH",
                 "paired current-GW gain differs from the one-GW Stage-11 objective",
             )
-        current_players, _teams = _current_identity_maps(execution)
-        element_by_player = {
-            player_id: item.provider_element_id for player_id, item in current_players.items()
-        }
-        moves = tuple(
-            PrivateTransferMove(
-                player_out_id=move.player_out,
-                player_in_id=move.player_in,
-                official_fpl_element_out=element_by_player[move.player_out],
-                official_fpl_element_in=element_by_player[move.player_in],
-            )
-            for move in action_moves(
-                recommended_action.action,
-                candidate_pool=request.candidate_pool,
-            )
+        moves = _private_transfer_moves(
+            recommended_action.action,
+            candidate_pool=request.candidate_pool,
+            element_by_player=element_by_player,
         )
-        matrix_hash = semantic_sha256(gameweek.joint_matrix)
         stage8_policy_hash = load_score_baseline_policy().sha256
         model_stage7 = _uses_model_stage7(execution)
         stage7_confidence = (
@@ -1646,8 +1960,6 @@ class PrivateV1RecommendationService:
                 }
             )
         )
-        if gameweek.result_sha256 is None:  # guarded by GameweekProjectionResult
-            raise PrivateV1Error("STAGE9_GAMEWEEK_INVALID", "Stage-9 result hash is absent")
         lineage = PrivateDecisionLineage(
             current_state_sha256=execution.current_state.semantic_sha256,
             player_identity_map_sha256=execution.player_identity_map.semantic_sha256,
@@ -1716,6 +2028,7 @@ class PrivateV1RecommendationService:
             no_transfer_tactics=_tactical_decision(baseline, baseline_captain_hash),
             chip_action="NO_CHIP",
             paired_comparison=comparison,
+            transfer_frontier=private_frontier,
             stage7_family=(
                 "REGULARISED_EMPIRICAL_BAYES_COHERENCE_V1"
                 if model_stage7
@@ -1734,20 +2047,7 @@ class PrivateV1RecommendationService:
             stage9_monte_carlo_status=gameweek.monte_carlo.stopping_result,
             stage9_monte_carlo_reasons=tuple(sorted(set(gameweek.monte_carlo.stopping_reasons))),
             solver_optimality="EXACT_DECLARED_TREE_AND_ACTION_SPACE",
-            action_space_disclosure=(
-                "Exact tactical optimum within the declared bounded transfer candidate set: "
-                f"{len(transfer_scope.retained_incoming_ids)} retained incoming candidate(s) "
-                f"from {transfer_scope.full_incoming_count} selectable player(s), the exact "
-                f"current squad, transfer counts "
-                f"{','.join(str(item) for item in transfer_scope.transfer_counts_considered)}, "
-                f"{transfer_scope.one_transfer_actions} retained one-transfer action(s), "
-                f"{transfer_scope.two_transfer_actions} retained two-transfer action(s), "
-                f"{transfer_scope.exact_tactical_squads} exact tactical squad evaluation(s), "
-                f"{transfer_scope.certified_dominated_candidates} certified pointwise-dominated "
-                "incoming candidate(s) removed, "
-                f"and the declared Stage-9 scenario set. Screening policy: "
-                f"{transfer_scope.pruning_policy or 'EXPLICIT_DECLARED_ACTION_SPACE'}."
-            ),
+            action_space_disclosure=action_space_disclosure,
             warnings=warnings,
             lineage=lineage,
             semantic_sha256="0" * 64,

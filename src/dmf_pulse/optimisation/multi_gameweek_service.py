@@ -27,12 +27,16 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
     ScenarioTreeNode,
     SolverDiagnostics,
     StateAdvanceResult,
+    TransferCountFrontier,
+    TransferCountFrontierPoint,
     seal_advance,
     seal_request,
     seal_result,
     seal_scenario_tree,
+    seal_transfer_count_frontier,
     verify_advance_hash,
     verify_result_hash,
+    verify_transfer_count_frontier_hash,
 )
 from dmf_pulse.optimisation.multi_gameweek_solver import (
     FrontierResult,
@@ -46,6 +50,7 @@ from dmf_pulse.optimisation.multi_gameweek_solver import (
     root_node,
     select_candidate,
     select_materially_distinct_candidate,
+    select_transfer_count_frontier,
     solve_frontier,
     validate_plan,
     validate_request,
@@ -193,6 +198,44 @@ def _build_alternative(
     )
 
 
+def _build_transfer_count_frontier(
+    request: MultiGameweekOptimisationRequest,
+    frontier: FrontierResult,
+    *,
+    assumptions: tuple[str, ...],
+) -> TransferCountFrontier:
+    points: list[TransferCountFrontierPoint] = []
+    for candidate in select_transfer_count_frontier(frontier.candidates):
+        plan = build_plan(
+            request,
+            candidate,
+            plan_kind=PlanKind.TRANSFER_COUNT_FRONTIER,
+            objective_mode=ObjectiveMode.EXPECTED,
+            diagnostics=frontier.diagnostics,
+            assumptions=assumptions,
+        )
+        root = candidate.root_decision
+        points.append(
+            TransferCountFrontierPoint(
+                transfer_count=root.action.transfer_count,
+                plan=plan,
+                immediate_expected_points_before_hit=(root.tactical_evaluation.expected_points),
+                transfer_hit_points=root.hit_points,
+                current_gameweek_objective=(
+                    root.tactical_evaluation.expected_points - Decimal(root.hit_points)
+                ),
+            )
+        )
+    value = seal_transfer_count_frontier(
+        TransferCountFrontier.model_construct(
+            points=tuple(points),
+            frontier_sha256="0" * 64,
+        )
+    )
+    verify_transfer_count_frontier_hash(value)
+    return value
+
+
 def optimise_multi_gameweek(
     request: MultiGameweekOptimisationRequest,
     *,
@@ -280,6 +323,11 @@ def optimise_multi_gameweek(
             "A complete incumbent policy is returned, but a configured resource cap prevented "
             "an optimality proof."
         )
+    transfer_count_frontier = (
+        _build_transfer_count_frontier(request, frontier, assumptions=assumptions)
+        if frontier.complete
+        else None
+    )
     baseline_candidate = None
     baseline = None
     try:
@@ -384,6 +432,7 @@ def optimise_multi_gameweek(
         conservative_plan=conservative,
         high_upside_plan=upside,
         no_transfer_baseline=baseline,
+        transfer_count_frontier=transfer_count_frontier,
         marginal_value_of_each_move=attribution,
         current_action=recommended.current_action.action,
         future_policy=recommended.future_policy,

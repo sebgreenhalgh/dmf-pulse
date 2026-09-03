@@ -1,0 +1,40 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001M"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Transfer frontier and free-transfer carry disclosure"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001M"
+required_base_commit: "7001d507142cbef8c1d54bff88b3fa67810e65a2"
+objective: >-
+  Expose the exact best already-evaluated current-Gameweek root action at every available
+  transfer count, paired against hold, with compiled free-transfer transition disclosure and
+  no change to the canonical recommendation or one-Gameweek objective.
+authority_scopes:
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW-optimiser"
+in_scope:
+  - "Deterministic exact-count selection from the existing Stage-11 evaluated root family."
+  - "Typed, frozen, hash-bound optimisation and private decision frontier contracts."
+  - "Paired current-Gameweek comparisons against hold on identical Stage-9 scenarios."
+  - "Compiled immediate and next-deadline free-transfer state disclosure."
+  - "Concise structured human rendering including correct non-nested frontier deltas."
+  - "Backward parsing and legacy hash verification when the additive field is absent."
+permissions:
+  official_fpl_network: "none_required"
+  official_odds_network: "none_required"
+  authentication_or_credentials: "forbidden"
+  raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Any Stage-7, Stage-8, Stage-9, projection, odds, prior or scoring change."
+  - "Any candidate pruning, action-universe, tactical or canonical selection change."
+  - "Any terminal value or points valuation for a saved free transfer."
+  - "Multi-Gameweek rolling optimisation, chip activation or rank-aware strategy."
+  - "Provider writes, persistence, PR, merge, tag or production activation."
+required_execution_status: "SYNTHETIC_ACCEPTANCE_ONLY"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

@@ -405,7 +405,8 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
     assert result.status == "REAL_PRIVATE_TRANSIENT_RECOMMENDATION"
     assert result.persistence_performed is False
     assert result.fpl_request_count == 8
-    assert result.report.startswith("DMF PULSE - GW2\n\nRECOMMENDATION")
+    assert result.report.startswith("DMF PULSE - GW2\n\nTRANSFER FRONTIER")
+    assert "\n\nRECOMMENDATION\n" in result.report
     assert "No action:" in result.report
     assert "Captain:" in result.report
     assert "FPL_API_OPERATOR_INITIATED_ACCEPTED_CONTRACTUAL_RISK" in result.report

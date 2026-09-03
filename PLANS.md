@@ -1841,3 +1841,29 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   wheel, repository validation, secret scan and a live-shaped 263-by-256 benchmark.
 - [ ] Commit and push one exact implementation SHA, require exact-SHA CI green, then attempt the
   literal GW3 command only with existing runtime credentials and record stage timings or blocker.
+
+# PRIVATE-V1-ONE-COMMAND-001M transfer frontier and free-transfer carry disclosure
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001M`; immutable parent
+  `7001d507142cbef8c1d54bff88b3fa67810e65a2`; parent exact-SHA CI `33688833338`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001M` in isolated worktree
+  `review_pack/one-command-m`; unrelated root-worktree changes remain untouched.
+- Scope: select the exact best already-evaluated root action at every available transfer count,
+  disclose paired current-Gameweek evidence versus hold, and expose compiled FT transition state
+  without changing the canonical recommendation or rerunning Stage 10 per frontier bucket.
+- Safety: preserve the 001K/001L candidate/action/scenario scope, exact tactics, objective and
+  tie-break; do not assign future points to saved transfers or change Stage 7-9, chips, providers,
+  persistence, PR, merge, tag or activation.
+
+## PRIVATE-V1-ONE-COMMAND-001M checkpoints
+
+- [x] Verify the exact immutable parent, successful parent CI, isolated clean worktree, ticket,
+  and DMFP-02/10/12/16/18/20 A10/A11/B2 authority.
+- [x] Add RED exact-bucket, tie-break, non-nested, FT-state, bank, paired-scenario, compatibility,
+  order-invariance, roundtrip, performance and hostile-input regressions.
+- [x] Implement the smallest additive Stage-11/private frontier contracts and deterministic human
+  renderer using the existing evaluated root family and compiled FT transitions.
+- [x] Run focused and affected tests plus coverage, Ruff, strict mypy, frozen sync, build, clean
+  wheel, repository validation, evidence validation and secret scan.
+- [ ] Commit and push one exact implementation SHA, require exact-SHA CI green, then stop without
+  implementing the future rolling 3-5 Gameweek optimiser.
