@@ -1,0 +1,27 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "acquisition_cutoff": "UNCHANGED_OPERATOR_APPROVAL_PLUS_FIVE_MINUTES",
+  "acquisition_order": [
+    "CURRENT_FPL",
+    "CURRENT_ODDS",
+    "OPENFOOTBALL_SCORE_PRIOR",
+    "IDENTITY_RESOLUTION",
+    "STAGE_7_AND_LATER_DETERMINISTIC_COMPUTATION",
+    "CURRENT_AND_FUTURE_FIXTURE_BINDING"
+  ],
+  "engineering_status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "horizon_gameweeks": [
+    1,
+    3
+  ],
+  "openfootball_transport_calls_per_command": 4,
+  "post_stage7_external_transport_calls": 0,
+  "provider_bodies_retained": 0,
+  "semantic_compatibility": "PASS",
+  "synthetic_compute_after_acquisition": [
+    "SEVEN_MINUTES_AFTER_ACQUISITION_PASS",
+    "NINE_MINUTES_AFTER_ACQUISITION_PASS"
+  ],
+  "ticket_id": "PRIVATE-V1-ONE-COMMAND-001N-R1",
+  "unresolved_p0_p1_material_p2": []
+}

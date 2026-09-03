@@ -1,5 +1,30 @@
 # DMF Pulse execution plans
 
+# PRIVATE-V1-ONE-COMMAND-001N-R1 score-prior acquisition ordering remediation
+
+- Parent/branch: immutable accepted parent `ba8d9917c75ba94e5739c605f38407d4438ff41c`
+  on `readiness/PRIVATE-V1-ONE-COMMAND-001N`; successful exact-parent CI `33725396189`.
+- Scope: acquire and authenticate the one OpenFootball source-prior result before long Stage-7
+  computation, retain its real in-memory provenance, and bind that same result to current and
+  future fixture identities after deterministic identity/Stage-7 work.
+- Safety: preserve the five-minute acquisition cutoff, four-call source contract, source/bundle
+  hashes, one-GW and three-GW decision semantics, every Stage-7 through Stage-11 policy, transient
+  behavior, and all 001N limitations; no provider, model, optimisation, persistence or activation
+  change.
+
+## PRIVATE-V1-ONE-COMMAND-001N-R1 checkpoints
+
+- [x] Verify the immutable parent, exact-SHA CI, isolated worktree, A3/A8/A10/A11/B2 authority,
+  OpenFootball lifecycle contract, and the post-Stage-7 acquisition defect.
+- [x] Add RED five-minute-window, prefetch/order, exact-call-count, provenance/binding, timing
+  invariance, one-GW and three-GW compatibility regressions.
+- [x] Implement the smallest prefetch-then-bind orchestration correction without changing the
+  cutoff, timestamps, source service, Stage-7 runtime, or decision semantics.
+- [x] Pass focused/affected coverage, Ruff, mypy, frozen sync, build/wheel, manifest, repository,
+  and secret gates; seal bounded evidence with no private material.
+- [ ] Commit and push one final SHA, require exact-SHA sharded CI green, then attempt the literal
+  private three-GW command only when all existing runtime inputs are present.
+
 # PRIVATE-V1-ONE-COMMAND-001N private current three-Gameweek rolling optimiser
 
 - Parent/branch: immutable accepted parent `ad155c077253a0525f0c7406e955240146823f80`

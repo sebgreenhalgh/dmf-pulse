@@ -536,6 +536,17 @@ class PrivateV1OneCommandService:
                     commence_to=latest_kickoff + timedelta(seconds=1),
                 )
             with self._progress.stage(
+                started="Acquiring current score-prior source...",
+                completed="Score-prior source ready",
+                failed="current score-prior source",
+            ):
+                source_prior = self._score_service_factory(observed_now).build(
+                    CurrentScorePriorBuildRequest(
+                        information_cutoff=run_at,
+                        rights_profile_id="openfootball_football_json_score_prior_v1",
+                    )
+                )
+            with self._progress.stage(
                 started="Resolving current identities...",
                 completed="Current identities ready",
                 failed="current identities",
@@ -601,16 +612,10 @@ class PrivateV1OneCommandService:
             ownership = build_automatic_ownership(snapshot, manager)
             candidates = build_full_candidate_policy(snapshot, manager, ruleset)
             with self._progress.stage(
-                started="Building current score priors...",
+                started="Binding current score priors...",
                 completed="Score priors ready",
-                failed="current score priors",
+                failed="current score-prior binding",
             ):
-                source_prior = self._score_service_factory(observed_now).build(
-                    CurrentScorePriorBuildRequest(
-                        information_cutoff=run_at,
-                        rights_profile_id="openfootball_football_json_score_prior_v1",
-                    )
-                )
                 score_priors = _score_priors(
                     source_prior,
                     snapshot=snapshot,

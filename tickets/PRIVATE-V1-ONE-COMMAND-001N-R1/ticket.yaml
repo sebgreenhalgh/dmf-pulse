@@ -1,0 +1,42 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R1"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Three-GW input-acquisition cutoff ordering remediation"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R1-score-prior-prefetch"
+required_base_commit: "ba8d9917c75ba94e5739c605f38407d4438ff41c"
+objective: >-
+  Acquire and authenticate the approved OpenFootball source-prior result before long deterministic
+  Stage-7 work can exhaust the acquisition cutoff, then bind that same in-memory result to exact
+  current and future fixture identities without changing decision semantics.
+authority_scopes:
+  - "A3-data-foundation"
+  - "A8-events"
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW"
+allowed_areas:
+  - "src/dmf_pulse/private_v1/one_command.py"
+  - "tests/unit/private_v1/test_score_prior_prefetch.py"
+  - "tests/unit/private_v1/test_one_command.py"
+  - "tickets/PRIVATE-V1-ONE-COMMAND-001N-R1/**"
+  - "evidence/tickets/PRIVATE-V1-ONE-COMMAND-001N-R1/**"
+  - "evidence/tickets/PRC-013/current_manifest.json"
+  - "PLANS.md"
+required_behavior:
+  - "The one OpenFootball acquisition starts and becomes usable no later than the unchanged cutoff."
+  - "The authenticated source result is retained in memory across long deterministic computation."
+  - "Current and future fixture bundles bind the retained result after identities are available."
+  - "Exactly four OpenFootball transport calls occur per command, independent of horizon fixtures."
+  - "Real receipt, validation, usable, cutoff, rights, commit and semantic provenance is preserved."
+  - "One-GW and three-GW decisions remain semantically compatible with identical frozen inputs."
+exclusions:
+  - "Any acquisition-cutoff extension, bypass, backdating or timestamp rewriting."
+  - "Any Stage-7 through Stage-11, projection, search, FT, terminal, price, chip or rank change."
+  - "Any duplicate per-Gameweek or per-fixture OpenFootball acquisition."
+  - "Any provider-body persistence, PR, merge, tag or production activation."
+required_execution_status: "SYNTHETIC_ACCEPTANCE_AND_OPTIONAL_POST_CI_LIVE_ATTEMPT"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"
