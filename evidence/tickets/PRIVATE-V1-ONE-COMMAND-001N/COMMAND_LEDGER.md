@@ -28,7 +28,7 @@ private manager state is recorded.
 | Generic wheel verifier | BLOCKED only at its database phase because local `DMF_TEST_DATABASE_URL` is absent; the gate was not weakened or bypassed |
 | Local generated launcher | Windows application-control blocked the disposable `dmf.exe`; the verifier-approved importlib entry-point invocation passed from the installed wheel |
 | Repository/ticket manifest/secret validation | PASS after final manifest generation; zero secret findings |
-| Exact final-SHA CI | Pending final commit and push; mandatory before any optional live run |
+| Exact final-SHA CI | First candidate run `33720824173` exposed one ANSI-colour-sensitive help assertion after 606 passing shard tests; portable test remediation verified locally, replacement exact-SHA run pending |
 | Optional private live run | Not attempted before exact-SHA CI, as required |
 
 The first broad coverage pass exposed an 87.73% aggregate rather than a test failure. Additional
@@ -42,6 +42,11 @@ was rerun serially. An initial repository validation correctly reported the acti
 an initial secret scan flagged a repository-owned synthetic credential literal. A first
 remediation still used a sensitive-named variable and was correctly rejected; the final indirect
 neutral marker passed with zero findings.
+
+The first candidate exact-SHA workflow registered the rolling option correctly and passed
+pre-flight, but GitHub's forced ANSI styling split the raw help text consumed by one assertion.
+The help probe now explicitly disables colour while retaining its independent exact option-set
+contract. The affected CLI file passes both normally and with CI/forced-colour environment signals.
 
 The final implementation SHA is necessarily reported out of band because embedding a commit's own
 hash in its contents is self-referential. Exact-SHA CI is recorded in the completion handoff after

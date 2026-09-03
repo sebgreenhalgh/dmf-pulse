@@ -20,7 +20,7 @@ runner = CliRunner()
 
 
 def test_pulse_help_exposes_entry_identifier_and_progress_suppression_only() -> None:
-    result = runner.invoke(app, ["pulse", "--help"])
+    result = runner.invoke(app, ["pulse", "--help"], color=False)
 
     assert result.exit_code == 0
     root_command = get_command(app)
