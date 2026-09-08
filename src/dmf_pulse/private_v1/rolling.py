@@ -29,7 +29,10 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
 )
 from dmf_pulse.optimisation.multi_gameweek_policy import load_terminal_value_policy
 from dmf_pulse.optimisation.multi_gameweek_service import optimise_multi_gameweek
-from dmf_pulse.optimisation.multi_gameweek_solver import resolve_free_transfer_arc
+from dmf_pulse.optimisation.multi_gameweek_solver import (
+    Stage11SearchProfile,
+    resolve_free_transfer_arc,
+)
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.models import PrivateGainMass, PrivateTransferMove
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
@@ -741,6 +744,7 @@ class PrivateV1RollingRecommendationService:
             projection_tuple[0],
             future_gameweeks=projection_tuple[1:],
         )
+        tactical.progress_message = active_progress.message
         record("action_generation", started)
         started = perf_counter()
         with active_progress.stage(
@@ -758,8 +762,36 @@ class PrivateV1RollingRecommendationService:
             failed="Stage-11 three-GW policy solving",
             heartbeat="Stage-11 three-GW policy solving still running",
         ):
-            optimiser = optimise_multi_gameweek(request, evaluator=tactical)
+            stage11_profile = Stage11SearchProfile(progress=active_progress.message)
+            optimiser = optimise_multi_gameweek(
+                request,
+                evaluator=tactical,
+                prefer_deterministic_linear=True,
+                profile=stage11_profile,
+            )
         record("stage11_policy_solving", started)
+        for item in sorted(stage11_profile.nodes.values(), key=lambda value: value.depth):
+            tactical_counts = tactical.counters_by_node.get(item.node_id)
+            active_progress.message(
+                f"Stage-11 GW{item.gameweek}: states={item.memo_misses}, "
+                f"memo_hits={item.memo_hits}, actions={item.legal_actions_generated}, "
+                f"tactical_requests={item.tactical_evaluator_calls}, "
+                f"states_solved={item.states_solved}"
+            )
+            if tactical_counts is not None:
+                active_progress.message(
+                    f"Stage-11 GW{item.gameweek} tactical: "
+                    f"unique_evaluations={tactical_counts.evaluated_squads}, "
+                    f"cache_hits={tactical_counts.cache_hits}, "
+                    f"cache_misses={tactical_counts.cache_misses}, "
+                    f"batches={tactical_counts.batch_calls}, "
+                    f"individual_calls={tactical_counts.individual_calls}"
+                )
+        active_progress.message(
+            f"Stage-11 tactical cache: hits={tactical.cache_hits}, "
+            f"misses={tactical.cache_misses}, batches={tactical.batch_calls}, "
+            f"individual_calls={tactical.individual_calls}"
+        )
         if (
             optimiser.status is not MultiGameweekResultStatus.SUCCESS
             or optimiser.solver_status.status is not BackendStatus.OPTIMAL

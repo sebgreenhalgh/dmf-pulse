@@ -1,0 +1,177 @@
+{
+  "parent_sha": "43229ea760bc2b3587a4ed05e22bef3c9e505497",
+  "branch_instrumentation": true,
+  "method": "New-side diff executable lines and branch arcs originating on those lines; no exclusions added",
+  "covered": 461,
+  "total": 465,
+  "percent_combined": 99.13978494623656,
+  "files": {
+    "src/dmf_pulse/optimisation/manager_state.py": {
+      "changed_executable_lines": 2,
+      "covered_changed_lines": 2,
+      "changed_branches": 0,
+      "covered_changed_branches": 0,
+      "missing_changed_lines": [],
+      "missing_changed_branches": [],
+      "percent_combined": 100.0,
+      "whole_module_summary": {
+        "covered_lines": 124,
+        "num_statements": 124,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 2,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 50,
+        "num_partial_branches": 0,
+        "covered_branches": 50,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    "src/dmf_pulse/optimisation/multi_gameweek_service.py": {
+      "changed_executable_lines": 6,
+      "covered_changed_lines": 6,
+      "changed_branches": 4,
+      "covered_changed_branches": 4,
+      "missing_changed_lines": [],
+      "missing_changed_branches": [],
+      "percent_combined": 100.0,
+      "whole_module_summary": {
+        "covered_lines": 179,
+        "num_statements": 192,
+        "percent_covered": 90.0,
+        "percent_covered_display": "90",
+        "missing_lines": 13,
+        "excluded_lines": 0,
+        "percent_statements_covered": 93.22916666666667,
+        "percent_statements_covered_display": "93",
+        "num_branches": 58,
+        "num_partial_branches": 10,
+        "covered_branches": 46,
+        "missing_branches": 12,
+        "percent_branches_covered": 79.3103448275862,
+        "percent_branches_covered_display": "79"
+      }
+    },
+    "src/dmf_pulse/optimisation/multi_gameweek_solver.py": {
+      "changed_executable_lines": 254,
+      "covered_changed_lines": 253,
+      "changed_branches": 94,
+      "covered_changed_branches": 92,
+      "missing_changed_lines": [
+        1619
+      ],
+      "missing_changed_branches": [
+        [
+          1077,
+          -1067
+        ],
+        [
+          1618,
+          1619
+        ]
+      ],
+      "percent_combined": 99.13793103448276,
+      "whole_module_summary": {
+        "covered_lines": 799,
+        "num_statements": 857,
+        "percent_covered": 90.27661357921207,
+        "percent_covered_display": "90",
+        "missing_lines": 58,
+        "excluded_lines": 0,
+        "percent_statements_covered": 93.23220536756126,
+        "percent_statements_covered_display": "93",
+        "num_branches": 336,
+        "num_partial_branches": 58,
+        "covered_branches": 278,
+        "missing_branches": 58,
+        "percent_branches_covered": 82.73809523809524,
+        "percent_branches_covered_display": "83"
+      }
+    },
+    "src/dmf_pulse/optimisation/stage10_adapter.py": {
+      "changed_executable_lines": 25,
+      "covered_changed_lines": 25,
+      "changed_branches": 4,
+      "covered_changed_branches": 4,
+      "missing_changed_lines": [],
+      "missing_changed_branches": [],
+      "percent_combined": 100.0,
+      "whole_module_summary": {
+        "covered_lines": 101,
+        "num_statements": 109,
+        "percent_covered": 89.47368421052632,
+        "percent_covered_display": "89",
+        "missing_lines": 8,
+        "excluded_lines": 19,
+        "percent_statements_covered": 92.66055045871559,
+        "percent_statements_covered_display": "93",
+        "num_branches": 24,
+        "num_partial_branches": 2,
+        "covered_branches": 18,
+        "missing_branches": 6,
+        "percent_branches_covered": 75.0,
+        "percent_branches_covered_display": "75"
+      }
+    },
+    "src/dmf_pulse/private_v1/rolling.py": {
+      "changed_executable_lines": 10,
+      "covered_changed_lines": 10,
+      "changed_branches": 4,
+      "covered_changed_branches": 3,
+      "missing_changed_lines": [],
+      "missing_changed_branches": [
+        [
+          781,
+          773
+        ]
+      ],
+      "percent_combined": 92.85714285714286,
+      "whole_module_summary": {
+        "covered_lines": 238,
+        "num_statements": 251,
+        "percent_covered": 91.47540983606558,
+        "percent_covered_display": "91",
+        "missing_lines": 13,
+        "excluded_lines": 0,
+        "percent_statements_covered": 94.8207171314741,
+        "percent_statements_covered_display": "95",
+        "num_branches": 54,
+        "num_partial_branches": 13,
+        "covered_branches": 41,
+        "missing_branches": 13,
+        "percent_branches_covered": 75.92592592592592,
+        "percent_branches_covered_display": "76"
+      }
+    },
+    "src/dmf_pulse/private_v1/service.py": {
+      "changed_executable_lines": 56,
+      "covered_changed_lines": 56,
+      "changed_branches": 6,
+      "covered_changed_branches": 6,
+      "missing_changed_lines": [],
+      "missing_changed_branches": [],
+      "percent_combined": 100.0,
+      "whole_module_summary": {
+        "covered_lines": 649,
+        "num_statements": 703,
+        "percent_covered": 89.80301274623406,
+        "percent_covered_display": "90",
+        "missing_lines": 54,
+        "excluded_lines": 2,
+        "percent_statements_covered": 92.31863442389758,
+        "percent_statements_covered_display": "92",
+        "num_branches": 160,
+        "num_partial_branches": 32,
+        "covered_branches": 126,
+        "missing_branches": 34,
+        "percent_branches_covered": 78.75,
+        "percent_branches_covered_display": "79"
+      }
+    }
+  },
+  "repository_floor": "Unchanged 90 percent complete repository statement/branch CI gate remains mandatory"
+}

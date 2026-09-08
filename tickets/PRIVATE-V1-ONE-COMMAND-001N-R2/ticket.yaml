@@ -1,0 +1,40 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R2"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Exact three-GW Stage-11 policy-solve acceleration"
+status: "ACTIVE"
+owner: "Sebastian Greenhalgh"
+implementer_role: "chatgpt_implementation"
+reviewer_role: "fresh_independent_review_and_human"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R2-stage11-exact-acceleration"
+required_base_commit: "43229ea760bc2b3587a4ed05e22bef3c9e505497"
+objective: >-
+  Materially accelerate the exact deterministic private three-Gameweek Stage-11 solve without
+  changing the horizon, action space, objective, tactical values, frontier, alternatives, legal
+  transitions, canonical tie-break or any decision semantic.
+authority_scopes:
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW"
+in_scope:
+  - "Disclosure-safe deterministic Stage-11 profiling by depth and operation class."
+  - "Exact future-node Stage-10 batching over reachable deduplicated squad signatures."
+  - "Economically sufficient internal continuation equivalence only where formally proven."
+  - "Explicit fail-closed deterministic-linear-tree dispatch if a specialised path is used."
+  - "Truthful Stage-11 progress counters without percentages, ETAs or player identities."
+  - "Generic-enumerator differential tests and a reproducible live-shaped benchmark."
+permissions:
+  official_fpl_network: "optional_post_ci_operator_initiated_existing_one_command_get_only"
+  official_odds_network: "optional_post_ci_operator_initiated_existing_one_command_get_only"
+  authentication_or_credentials: "existing_environment_only"
+  raw_storage: "forbidden"
+  cache_or_backup: "forbidden"
+  production_activation: "forbidden"
+exclusions:
+  - "Any horizon, candidate-shortlist, transfer-count, scenario, objective or tie-break change."
+  - "Any Stage-7, Stage-8, Stage-9 or Stage-10 mathematical approximation."
+  - "Any change to FT, hit, bank, selling-price, terminal-value, future-price or chip semantics."
+  - "Any beam, top-K, arbitrary state cap, heuristic transfer value or widened search space."
+  - "Any provider, provenance, rights, R1 cutoff, persistence, PR, merge, tag or activation change."
+required_execution_status: "SYNTHETIC_ACCEPTANCE_AND_OPTIONAL_POST_CI_LIVE_ATTEMPT"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

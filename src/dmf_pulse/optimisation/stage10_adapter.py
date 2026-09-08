@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from dmf_pulse.fpl_points.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.models import GameweekPointScenario
@@ -41,9 +41,33 @@ class TacticalEvaluator(Protocol):
     ) -> TacticalNodeEvaluation: ...
 
 
+@runtime_checkable
+class SquadOnlyTacticalEvaluator(TacticalEvaluator, Protocol):
+    """Explicit promise: value depends on fixed node inputs and active squad IDs only."""
+
+    @property
+    def squad_only(self) -> bool: ...
+
+
+@runtime_checkable
+class NodeBatchTacticalEvaluator(TacticalEvaluator, Protocol):
+    """Optional exact node/squad batch seam consumed by accelerated Stage 11."""
+
+    def precompute_node(
+        self,
+        *,
+        node: ScenarioTreeNode,
+        squads: tuple[CandidateSquad, ...],
+    ) -> None: ...
+
+
 @dataclass(frozen=True)
 class StaticTacticalEvaluator:
     """Consume immutable Stage-10 records embedded in TEST/REPLAY fixtures."""
+
+    @property
+    def squad_only(self) -> bool:
+        return True
 
     def evaluate(self, *, node: ScenarioTreeNode, state: ManagerState) -> TacticalNodeEvaluation:
         record = next(
@@ -73,6 +97,16 @@ class Stage10TacticalAdapter:
     rules: OneGameweekRulesView
     policy: OneGameweekOptimiserPolicy
     scenarios_by_node: Mapping[str, tuple[GameweekPointScenario, ...]]
+    _node_kernels: dict[str, ExactTacticalNodeKernel] = field(
+        default_factory=dict,
+        init=False,
+        repr=False,
+        compare=False,
+    )
+
+    @property
+    def squad_only(self) -> bool:
+        return True
 
     def _players(self, node: ScenarioTreeNode) -> dict[str, CandidatePlayer]:
         return {
@@ -84,6 +118,33 @@ class Stage10TacticalAdapter:
             )
             for item in self.candidate_pool
         }
+
+    def _node_kernel(self, node: ScenarioTreeNode) -> ExactTacticalNodeKernel:
+        kernel = self._node_kernels.get(node.node_id)
+        scenarios = self.scenarios_by_node.get(node.node_id)
+        if scenarios is None:
+            raise InfeasiblePolicyError(
+                f"node {node.node_id} has no Stage-9 joint scenarios for Stage 10"
+            )
+        players = self._players(node)
+        if (
+            kernel is not None
+            and kernel.scenarios == scenarios
+            and kernel.players == players
+            and kernel.rules == self.rules
+        ):
+            return kernel
+        # A caller may reuse an adapter with a changed node/point snapshot. Rebuild rather
+        # than reuse values from a different exact tactical problem under the same node ID.
+        kernel = ExactTacticalNodeKernel(
+            # Frozen Pydantic containers can still contain mutable dictionaries. Keep a
+            # snapshot so in-place input mutation cannot silently reuse a stale kernel.
+            scenarios=tuple(item.model_copy(deep=True) for item in scenarios),
+            players=players,
+            rules=self.rules.model_copy(deep=True),
+        )
+        self._node_kernels[node.node_id] = kernel
+        return kernel
 
     @staticmethod
     def _sealed_evaluation(
@@ -209,7 +270,7 @@ class Stage10TacticalAdapter:
                 f"node {node.node_id} has no Stage-9 joint scenarios for Stage 10"
             )
         players = self._players(node)
-        kernel = ExactTacticalNodeKernel(scenarios=scenarios, players=players, rules=self.rules)
+        kernel = self._node_kernel(node)
         unique = tuple(
             CandidateSquad(player_ids=player_ids)
             for player_ids in sorted({squad.player_ids for squad in squads})

@@ -44,6 +44,7 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
 from dmf_pulse.optimisation.multi_gameweek_solver import (
     FrontierResult,
     PolicyCandidate,
+    Stage11SearchProfile,
     apply_transfer_action,
     build_move_attribution,
     build_plan,
@@ -278,6 +279,8 @@ def optimise_multi_gameweek(
     request: MultiGameweekOptimisationRequest,
     *,
     evaluator: TacticalEvaluator | None = None,
+    prefer_deterministic_linear: bool = False,
+    profile: Stage11SearchProfile | None = None,
 ) -> MultiGameweekOptimisationResult:
     """Optimise a policy; expose only its root transition as executable."""
 
@@ -290,7 +293,15 @@ def optimise_multi_gameweek(
                 "the bounded exact enumerator is authorised for TEST/REPLAY only; no approved "
                 "unrestricted production solver/capability is present",
             )
-        frontier = solve_frontier(request, evaluator)
+        if prefer_deterministic_linear or profile is not None:
+            frontier = solve_frontier(
+                request,
+                evaluator,
+                prefer_deterministic_linear=prefer_deterministic_linear,
+                profile=profile,
+            )
+        else:
+            frontier = solve_frontier(request, evaluator)
     except CapabilityBlockedError as exc:
         return _failure_result(
             request,
@@ -369,7 +380,15 @@ def optimise_multi_gameweek(
     baseline_candidate = None
     baseline = None
     try:
-        baseline_frontier = solve_frontier(request, evaluator, root_no_transfer_only=True)
+        if prefer_deterministic_linear:
+            baseline_frontier = solve_frontier(
+                request,
+                evaluator,
+                root_no_transfer_only=True,
+                prefer_deterministic_linear=True,
+            )
+        else:
+            baseline_frontier = solve_frontier(request, evaluator, root_no_transfer_only=True)
         baseline_candidate = select_candidate(
             baseline_frontier.candidates,
             mode=ObjectiveMode.EXPECTED,

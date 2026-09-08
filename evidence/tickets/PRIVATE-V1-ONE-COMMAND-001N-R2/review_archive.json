@@ -1,0 +1,14 @@
+{
+  "files": 20,
+  "payload_bytes": 376004,
+  "archive_bytes": 93405,
+  "archive_sha256": "9aaba3fa0f615ddaa93a257b69d4bc301e70aa0b4e53de515584b19cb4e84e70",
+  "excluded": [
+    "full repository manifests",
+    "raw coverage",
+    "logs",
+    "private data",
+    "environments",
+    "build outputs"
+  ]
+}

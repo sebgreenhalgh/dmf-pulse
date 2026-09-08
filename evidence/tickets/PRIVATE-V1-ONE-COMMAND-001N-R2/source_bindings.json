@@ -1,0 +1,61 @@
+{
+  "ticket": "PRIVATE-V1-ONE-COMMAND-001N-R2",
+  "parent_sha": "43229ea760bc2b3587a4ed05e22bef3c9e505497",
+  "inputs": [
+    {
+      "path": "scripts/benchmark_stage11_policy.py",
+      "bytes": 14669,
+      "sha256": "523d5a3cf906054d6a295e8a8646087574def01d948e5b5ed9385f7a469b8db2"
+    },
+    {
+      "path": "src/dmf_pulse/optimisation/manager_state.py",
+      "bytes": 9836,
+      "sha256": "47c5c6e474ebc81c3794d83b068cf573456813385fbbb003bbd0d8483880ff72"
+    },
+    {
+      "path": "src/dmf_pulse/optimisation/multi_gameweek_service.py",
+      "bytes": 24840,
+      "sha256": "96beb44dd2ffe016898d643c82d45616d23fdcec61e4f084fb90332dac2ae4b2"
+    },
+    {
+      "path": "src/dmf_pulse/optimisation/multi_gameweek_solver.py",
+      "bytes": 81504,
+      "sha256": "4076cc194fbe2eed8e6524662e9dff449bc834b4792e13a240eb57954576e52f"
+    },
+    {
+      "path": "src/dmf_pulse/optimisation/stage10_adapter.py",
+      "bytes": 11775,
+      "sha256": "ba0329aef2c36eec1952fa6e2b178f18b63680dd283864c509461ae2e8dd713d"
+    },
+    {
+      "path": "src/dmf_pulse/private_v1/rolling.py",
+      "bytes": 44032,
+      "sha256": "f1d4a89b5f73aa2a0035c563714683321a726496ed411f79febd4026a9c77063"
+    },
+    {
+      "path": "src/dmf_pulse/private_v1/service.py",
+      "bytes": 94488,
+      "sha256": "ea7b61af0d56fd4ec036659004d8866939e2db13646200cf6ef32f4739451ee0"
+    },
+    {
+      "path": "tests/unit/optimisation/test_stage11_exact_acceleration.py",
+      "bytes": 34676,
+      "sha256": "d58056639fb1942c487badaac7616185e06616e1a7867bccca2aef353d67d14c"
+    },
+    {
+      "path": "specs/manifests/authority_manifest.json",
+      "bytes": 13573,
+      "sha256": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac"
+    },
+    {
+      "path": "specs/approved/DMFP-12_SQUAD_TRANSFER_AND_LINEUP_OPTIMISER.txt",
+      "bytes": 94914,
+      "sha256": "cba15ba9c72ff68c0ea8dca6ac5cf9075bbb34eefca06e86060cf33f824a84f6"
+    },
+    {
+      "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt",
+      "bytes": 160816,
+      "sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72"
+    }
+  ]
+}

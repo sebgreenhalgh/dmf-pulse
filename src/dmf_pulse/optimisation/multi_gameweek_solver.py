@@ -4,21 +4,24 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from collections.abc import Callable, Iterator
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from itertools import combinations, product
+from time import perf_counter
 
 from dmf_pulse.fpl_points.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.models import PlayerPosition
 from dmf_pulse.optimisation.manager_state import (
     ManagerState,
     OwnershipSpell,
+    continuation_state_fingerprint,
     seal_manager_state,
     selling_price_tenths,
     state_fingerprint,
     validate_manager_state,
 )
 from dmf_pulse.optimisation.models import (
+    CandidateSquad,
     OneGameweekPlan,
     SearchScope,
 )
@@ -61,7 +64,12 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
     verify_search_policy_hash,
     verify_terminal_policy_hash,
 )
-from dmf_pulse.optimisation.stage10_adapter import StaticTacticalEvaluator, TacticalEvaluator
+from dmf_pulse.optimisation.stage10_adapter import (
+    NodeBatchTacticalEvaluator,
+    SquadOnlyTacticalEvaluator,
+    StaticTacticalEvaluator,
+    TacticalEvaluator,
+)
 
 
 @dataclass(frozen=True)
@@ -421,11 +429,29 @@ def enumerate_legal_actions(
     rules: TransferRules,
     policy: SearchPolicy,
     root_no_transfer_only: bool = False,
+    applied_transitions: dict[str, AppliedTransfer] | None = None,
+    profile: Stage11NodeProfile | None = None,
+    precheck_economics: bool = False,
 ) -> tuple[TransferAction, ...]:
     """Enumerate all legal actions; caps fail rather than silently prune."""
 
     catalog = {item.player_id: item for item in candidate_pool}
     owned = state.squad_ids
+    selling: dict[str, int] = {}
+    owned_clubs: Counter[str] = Counter()
+    if precheck_economics:
+        # Prove the state valid once before the lossless affordability/club filter.
+        # Surviving actions still use the unchanged canonical transition function.
+        validate_manager_state(state, candidate_pool=candidate_pool, rules=rules)
+        selling = {
+            item.player_id: selling_price_tenths(
+                purchase_price_tenths=item.purchase_price_tenths,
+                current_price_tenths=node.prices[item.player_id].current_price_tenths,
+                rule=rules.selling_price_rule,
+            )
+            for item in state.active_spells
+        }
+        owned_clubs.update(item.club_id for item in state.active_spells)
     allowed = set(node.allowed_transfer_in_ids) if node.allowed_transfer_in_ids else set(catalog)
     available = tuple(
         item.player_id
@@ -461,19 +487,35 @@ def enumerate_legal_actions(
             )
             for position_parts in product(*position_choices):
                 combinations_considered += 1
+                if profile is not None:
+                    profile.action_combinations_considered += 1
                 if combinations_considered > policy.max_actions_per_state:
                     raise ResourceLimitReached(
                         "candidate action combinations exceed max_actions_per_state; "
                         "no incomplete enumeration was labelled optimal"
                     )
                 ins = tuple(sorted(player_id for part in position_parts for player_id in part))
+                if precheck_economics:
+                    bank_after = (
+                        state.bank_tenths
+                        + sum(selling[p] for p in outs)
+                        - sum(node.prices[p].current_price_tenths for p in ins)
+                    )
+                    clubs = owned_clubs.copy()
+                    clubs.subtract(catalog[p].club_id for p in outs)
+                    clubs.update(catalog[p].club_id for p in ins)
+                    if bank_after < 0 or max(clubs.values()) > rules.max_players_per_club:
+                        if profile is not None:
+                            profile.legality_precheck_rejections += 1
+                        continue
                 action = make_transfer_action(
                     transfers_out=outs,
                     transfers_in=ins,
                     event=node.transition_event,
                 )
+                started = perf_counter()
                 try:
-                    apply_transfer_action(
+                    transition = apply_transfer_action(
                         state,
                         action,
                         node=node,
@@ -482,7 +524,17 @@ def enumerate_legal_actions(
                     )
                 except ValueError:
                     continue
+                finally:
+                    if profile is not None:
+                        profile.transition_applications += 1
+                        profile.transition_seconds += perf_counter() - started
                 actions.append(action)
+                if applied_transitions is not None:
+                    applied_transitions[action.action_id] = transition
+                if profile is not None:
+                    profile.legal_actions_generated += 1
+                    profile.transfer_count_distribution[action.transfer_count] += 1
+                    profile.unique_resulting_squads.add(transition.state.squad_ids)
     actions.sort(key=lambda item: item.signature)
     if not actions:
         raise InfeasiblePolicyError("state has no legal configured transfer action")
@@ -727,6 +779,134 @@ class SearchCounters:
     pareto_candidates: int = 0
 
 
+@dataclass
+class Stage11NodeProfile:
+    """Disclosure-safe physical work counters for one Stage-11 decision node."""
+
+    node_id: str
+    gameweek: int
+    depth: int
+    states_entered: int = 0
+    states_solved: int = 0
+    legal_actions_generated: int = 0
+    action_combinations_considered: int = 0
+    legality_precheck_rejections: int = 0
+    transition_applications: int = 0
+    tactical_evaluator_calls: int = 0
+    policy_candidates_generated: int = 0
+    pareto_candidates_retained: int = 0
+    memo_hits: int = 0
+    memo_misses: int = 0
+    action_enumeration_seconds: float = 0.0
+    transition_seconds: float = 0.0
+    tactical_seconds: float = 0.0
+    pareto_seconds: float = 0.0
+    peak_retained_frontier: int = 0
+    transfer_count_distribution: Counter[int] = field(default_factory=Counter)
+    unique_full_state_fingerprints: set[str] = field(default_factory=set)
+    unique_economic_state_fingerprints: set[str] = field(default_factory=set)
+    unique_active_history_fingerprints: set[str] = field(default_factory=set)
+    unique_resulting_squads: set[tuple[str, ...]] = field(default_factory=set)
+
+    @property
+    def economically_equivalent_full_states(self) -> int:
+        return max(
+            0,
+            len(self.unique_full_state_fingerprints) - len(self.unique_economic_state_fingerprints),
+        )
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "node_id": self.node_id,
+            "gameweek": self.gameweek,
+            "depth": self.depth,
+            "states_entered": self.states_entered,
+            "states_solved": self.states_solved,
+            "unique_current_state_fingerprints": len(self.unique_full_state_fingerprints),
+            "unique_economic_state_fingerprints": len(self.unique_economic_state_fingerprints),
+            "economically_equivalent_full_states": self.economically_equivalent_full_states,
+            "closed_history_only_duplicates": max(
+                0,
+                len(self.unique_full_state_fingerprints)
+                - len(self.unique_active_history_fingerprints),
+            ),
+            "legal_actions_generated": self.legal_actions_generated,
+            "transfer_count_distribution": {
+                str(key): value for key, value in sorted(self.transfer_count_distribution.items())
+            },
+            "action_combinations_considered": self.action_combinations_considered,
+            "legality_precheck_rejections": self.legality_precheck_rejections,
+            "transition_applications": self.transition_applications,
+            "unique_resulting_active_squads": len(self.unique_resulting_squads),
+            "tactical_evaluator_calls": self.tactical_evaluator_calls,
+            "policy_candidates_generated": self.policy_candidates_generated,
+            "pareto_candidates_retained": self.pareto_candidates_retained,
+            "memo_hits": self.memo_hits,
+            "memo_misses": self.memo_misses,
+            "action_enumeration_seconds": self.action_enumeration_seconds,
+            "transition_seconds": self.transition_seconds,
+            "tactical_seconds": self.tactical_seconds,
+            "pareto_seconds": self.pareto_seconds,
+            "peak_retained_frontier": self.peak_retained_frontier,
+        }
+
+
+@dataclass
+class Stage11SearchProfile:
+    """Run-local Stage-11 instrumentation; never enters semantic result hashes."""
+
+    fast_path_used: bool = False
+    nodes: dict[str, Stage11NodeProfile] = field(default_factory=dict)
+    progress: Callable[[str], None] | None = None
+    _last_report_at: float = 0.0
+
+    def report_progress(self, *, gameweek: int, force: bool = False) -> None:
+        if self.progress is None:
+            return
+        now = perf_counter()
+        if not force and now - self._last_report_at < 30:
+            return
+        self._last_report_at = now
+        self.progress(
+            f"Stage-11 GW{gameweek}: "
+            f"unique_states={sum(len(n.unique_economic_state_fingerprints) for n in self.nodes.values())}, "
+            f"states_solved={sum(n.states_solved for n in self.nodes.values())}, "
+            f"memo_hits={self.memo_hits}, "
+            f"action_candidates={sum(n.action_combinations_considered for n in self.nodes.values())}, "
+            f"tactical_squads={sum(len(n.unique_resulting_squads) for n in self.nodes.values())}"
+        )
+
+    @property
+    def memo_hits(self) -> int:
+        return sum(item.memo_hits for item in self.nodes.values())
+
+    @property
+    def memo_misses(self) -> int:
+        return sum(item.memo_misses for item in self.nodes.values())
+
+    @property
+    def economically_equivalent_full_states(self) -> int:
+        return sum(item.economically_equivalent_full_states for item in self.nodes.values())
+
+    def node(self, value: ScenarioTreeNode, *, depth: int) -> Stage11NodeProfile:
+        return self.nodes.setdefault(
+            value.node_id,
+            Stage11NodeProfile(node_id=value.node_id, gameweek=value.gameweek, depth=depth),
+        )
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "fast_path_used": self.fast_path_used,
+            "memo_hits": self.memo_hits,
+            "memo_misses": self.memo_misses,
+            "economically_equivalent_full_states": (self.economically_equivalent_full_states),
+            "nodes": [
+                item.as_dict()
+                for item in sorted(self.nodes.values(), key=lambda value: value.depth)
+            ],
+        }
+
+
 @dataclass(frozen=True)
 class FrontierResult:
     candidates: tuple[PolicyCandidate, ...]
@@ -873,15 +1053,90 @@ class BoundedExactEnumerator:
     root_no_transfer_only: bool = False
     counters: SearchCounters = field(default_factory=SearchCounters)
     memo: dict[tuple[str, str], tuple[PolicyCandidate, ...]] = field(default_factory=dict)
+    profile: Stage11SearchProfile | None = None
+    _prevalidated_transitions: dict[tuple[str, str], AppliedTransfer] = field(default_factory=dict)
 
-    def enumerate(self) -> FrontierResult:
-        root = root_node(self.request.scenario_tree)
+    def _node_profile(self, node: ScenarioTreeNode) -> Stage11NodeProfile | None:
+        if self.profile is None:
+            return None
+        return self.profile.node(
+            node,
+            depth=len(path_to_node(self.request.scenario_tree, node.node_id)) - 1,
+        )
+
+    def _record_state(self, node: ScenarioTreeNode, state: ManagerState) -> None:
+        profile = self._node_profile(node)
+        if profile is None:
+            return
+        profile.states_entered += 1
+        profile.unique_full_state_fingerprints.add(state_fingerprint(state))
+        profile.unique_economic_state_fingerprints.add(continuation_state_fingerprint(state))
+        profile.unique_active_history_fingerprints.add(
+            state_fingerprint(state.model_copy(update={"ownership_spells": state.active_spells}))
+        )
+        if self.profile is not None:
+            self.profile.report_progress(gameweek=node.gameweek)
+
+    def _capture_prevalidated_transitions(self) -> bool:
+        return False
+
+    def _prepare_tactical_batch(
+        self,
+        *,
+        node: ScenarioTreeNode,
+        transitions: tuple[AppliedTransfer, ...],
+    ) -> None:
+        del node, transitions
+
+    def _actions(
+        self,
+        state: ManagerState,
+        *,
+        node: ScenarioTreeNode,
+        root_no_transfer_only: bool = False,
+    ) -> tuple[TransferAction, ...]:
+        profile = self._node_profile(node)
+        captured: dict[str, AppliedTransfer] | None = (
+            {} if self._capture_prevalidated_transitions() else None
+        )
+        started = perf_counter()
         actions = enumerate_legal_actions(
-            self.request.initial_state,
-            node=root,
+            state,
+            node=node,
             candidate_pool=self.request.candidate_pool,
             rules=self.request.rules,
             policy=self.request.search_policy,
+            root_no_transfer_only=root_no_transfer_only,
+            applied_transitions=captured,
+            profile=profile,
+            precheck_economics=self._capture_prevalidated_transitions(),
+        )
+        if profile is not None:
+            profile.action_enumeration_seconds += perf_counter() - started
+        if captured is not None:
+            for action_id, transition in captured.items():
+                self._prevalidated_transitions[(state.state_sha256, action_id)] = transition
+            self._prepare_tactical_batch(node=node, transitions=tuple(captured.values()))
+        return actions
+
+    def _memo_key(self, node_id: str, state: ManagerState) -> tuple[str, str]:
+        return node_id, state_fingerprint(state)
+
+    def _cached_frontier(
+        self,
+        node_id: str,
+        state: ManagerState,
+        cached: tuple[PolicyCandidate, ...],
+    ) -> tuple[PolicyCandidate, ...]:
+        del node_id, state
+        return cached
+
+    def enumerate(self) -> FrontierResult:
+        root = root_node(self.request.scenario_tree)
+        self._record_state(root, self.request.initial_state)
+        actions = self._actions(
+            self.request.initial_state,
+            node=root,
             root_no_transfer_only=self.root_no_transfer_only,
         )
         candidates: list[PolicyCandidate] = []
@@ -906,9 +1161,19 @@ class BoundedExactEnumerator:
             )
         if not candidates:
             raise InfeasiblePolicyError("declared tree/action space contains no feasible policy")
+        started = perf_counter()
         pareto = _pareto_frontier(candidates)
+        root_profile = self._node_profile(root)
+        if root_profile is not None:
+            root_profile.pareto_seconds += perf_counter() - started
+            root_profile.pareto_candidates_retained += len(pareto)
+            root_profile.peak_retained_frontier = max(
+                root_profile.peak_retained_frontier, len(pareto)
+            )
         self.counters.pareto_candidates += len(pareto)
         retained = _root_sufficient_candidates(candidates)
+        if root_profile is not None:
+            root_profile.states_solved += 1
         if len(retained) > self.request.search_policy.max_returned_root_candidates:
             return FrontierResult(
                 candidates=retained,
@@ -967,30 +1232,38 @@ class BoundedExactEnumerator:
         )
 
     def _enumerate_node(self, node_id: str, state: ManagerState) -> tuple[PolicyCandidate, ...]:
-        key = (node_id, state_fingerprint(state))
+        node = node_map(self.request.scenario_tree)[node_id]
+        self._record_state(node, state)
+        profile = self._node_profile(node)
+        key = self._memo_key(node_id, state)
         cached = self.memo.get(key)
         if cached is not None:
-            return cached
+            if profile is not None:
+                profile.memo_hits += 1
+            return self._cached_frontier(node_id, state, cached)
+        if profile is not None:
+            profile.memo_misses += 1
         if self.counters.state_expansions >= self.request.search_policy.max_state_expansions:
             raise ResourceLimitReached(
                 "state-expansion cap reached before complete exhaustion",
                 counters=self.counters,
             )
         self.counters.state_expansions += 1
-        node = node_map(self.request.scenario_tree)[node_id]
-        actions = enumerate_legal_actions(
+        actions = self._actions(
             state,
             node=node,
-            candidate_pool=self.request.candidate_pool,
-            rules=self.request.rules,
-            policy=self.request.search_policy,
         )
         generated: list[PolicyCandidate] = []
         for action in actions:
             generated.extend(self._generate_for_action(node_id, state, action))
         if not generated:
             raise InfeasiblePolicyError(f"node {node_id} has no complete contingent policy")
+        started = perf_counter()
         frontier = _pareto_frontier(generated)
+        if profile is not None:
+            profile.pareto_seconds += perf_counter() - started
+            profile.pareto_candidates_retained += len(frontier)
+            profile.peak_retained_frontier = max(profile.peak_retained_frontier, len(frontier))
         self.counters.pareto_candidates += len(frontier)
         if len(frontier) > self.request.search_policy.max_policy_candidates:
             raise ResourceLimitReached(
@@ -998,6 +1271,8 @@ class BoundedExactEnumerator:
                 counters=self.counters,
             )
         self.memo[key] = frontier
+        if profile is not None:
+            profile.states_solved += 1
         return frontier
 
     def _generate_for_action(
@@ -1008,14 +1283,28 @@ class BoundedExactEnumerator:
     ) -> Iterator[PolicyCandidate]:
         self.counters.action_candidates += 1
         node = node_map(self.request.scenario_tree)[node_id]
-        transition = apply_transfer_action(
-            state,
-            action,
-            node=node,
-            candidate_pool=self.request.candidate_pool,
-            rules=self.request.rules,
+        profile = self._node_profile(node)
+        transition = self._prevalidated_transitions.pop(
+            (state.state_sha256, action.action_id), None
         )
+        if transition is None:
+            started = perf_counter()
+            transition = apply_transfer_action(
+                state,
+                action,
+                node=node,
+                candidate_pool=self.request.candidate_pool,
+                rules=self.request.rules,
+            )
+            if profile is not None:
+                profile.transition_applications += 1
+                profile.transition_seconds += perf_counter() - started
+                profile.unique_resulting_squads.add(transition.state.squad_ids)
+        started = perf_counter()
         tactical = self.evaluator.evaluate(node=node, state=transition.state)
+        if profile is not None:
+            profile.tactical_evaluator_calls += 1
+            profile.tactical_seconds += perf_counter() - started
         arc = transition.free_transfer_arc
         decision = NodeDecision(
             node_id=node.node_id,
@@ -1050,6 +1339,7 @@ class BoundedExactEnumerator:
                 terminal_value=terminal,
             )
             yield self._candidate(
+                node_id=node_id,
                 decisions=(decision,),
                 leaf_values=(leaf,),
                 expected=leaf.expected_utility,
@@ -1101,6 +1391,7 @@ class BoundedExactEnumerator:
                 total=bank_value + ft_value + liquidation_value,
             )
             yield self._candidate(
+                node_id=node_id,
                 decisions=tuple(decisions),
                 leaf_values=tuple(leaf_values),
                 expected=expected,
@@ -1112,6 +1403,7 @@ class BoundedExactEnumerator:
     def _candidate(
         self,
         *,
+        node_id: str,
         decisions: tuple[NodeDecision, ...],
         leaf_values: tuple[CandidateLeaf, ...],
         expected: Decimal,
@@ -1120,6 +1412,9 @@ class BoundedExactEnumerator:
         terminal: TerminalValueBreakdown,
     ) -> PolicyCandidate:
         self.counters.policy_candidates += 1
+        profile = self._node_profile(node_map(self.request.scenario_tree)[node_id])
+        if profile is not None:
+            profile.policy_candidates_generated += 1
         if self.counters.policy_candidates > self.request.search_policy.max_policy_candidates:
             raise ResourceLimitReached(
                 "generated policy count exceeds max_policy_candidates before exact exhaustion",
@@ -1145,16 +1440,212 @@ class BoundedExactEnumerator:
         )
 
 
+_PRIVATE_LINEAR_ASSUMPTIONS = frozenset(
+    {
+        "DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1",
+        "EXPECTED_THREE_GAMEWEEK_POINTS_WITH_LEGAL_RECOURSE",
+        "FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1",
+        "NO_CHIP_EXPLICIT",
+        "THREE_GAMEWEEK_ZERO_TERMINAL_VALUE_AFTER_HORIZON",
+    }
+)
+
+
+def deterministic_linear_fast_path_eligible(
+    request: MultiGameweekOptimisationRequest,
+) -> bool:
+    """Return whether the request exactly satisfies the narrow private fast-path proof."""
+
+    if not set(request.assumptions) >= _PRIVATE_LINEAR_ASSUMPTIONS:
+        return False
+    nodes = tuple(sorted(request.scenario_tree.nodes, key=lambda item: item.gameweek))
+    if len(nodes) != 3:
+        return False
+    if len({item.node_id for item in nodes}) != 3:
+        return False
+    if any(item.transition_event != "NORMAL" for item in nodes):
+        return False
+    # The generic state model can represent replay histories beyond its current GW.
+    # Such histories may affect later cohort ordering/overlap validation. They are
+    # outside this proof: every memoised continuation here follows the root deadline,
+    # so all pre-existing spell starts/closures must already be in the past by then.
+    if any(
+        spell.started_gameweek > nodes[0].gameweek
+        or (spell.ended_gameweek is not None and spell.ended_gameweek > nodes[0].gameweek)
+        for spell in request.initial_state.ownership_spells
+    ):
+        return False
+    if tuple(item.gameweek for item in nodes) != tuple(
+        range(nodes[0].gameweek, nodes[0].gameweek + 3)
+    ):
+        return False
+    if (
+        nodes[0].parent_id is not None
+        or nodes[1].parent_id != nodes[0].node_id
+        or nodes[2].parent_id != nodes[1].node_id
+        or any(item.conditional_probability != Decimal(1) for item in nodes)
+    ):
+        return False
+    if any(
+        item.revealed_information or item.availability_state or item.fixture_state for item in nodes
+    ):
+        return False
+    root = nodes[0]
+    if any(
+        item.prices != root.prices
+        or item.allowed_transfer_in_ids != root.allowed_transfer_in_ids
+        or item.transition_event != root.transition_event
+        for item in nodes[1:]
+    ):
+        return False
+    terminal = request.terminal_policy
+    return (
+        not terminal.enabled
+        and terminal.bank_points_per_tenth == Decimal(0)
+        and terminal.free_transfer_points == Decimal(0)
+        and terminal.liquidation_points_per_tenth == Decimal(0)
+    )
+
+
+@dataclass
+class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
+    """Exact private three-node DP with economic memoisation and replayable histories."""
+
+    def enumerate(self) -> FrontierResult:
+        if not (
+            deterministic_linear_fast_path_eligible(self.request)
+            and isinstance(self.evaluator, SquadOnlyTacticalEvaluator)
+            and self.evaluator.squad_only
+        ):
+            raise InputInvalidError(
+                "request does not satisfy deterministic private three-GW preconditions"
+            )
+        return super().enumerate()
+
+    def _capture_prevalidated_transitions(self) -> bool:
+        return True
+
+    def _memo_key(self, node_id: str, state: ManagerState) -> tuple[str, str]:
+        return node_id, continuation_state_fingerprint(state)
+
+    def _prepare_tactical_batch(
+        self,
+        *,
+        node: ScenarioTreeNode,
+        transitions: tuple[AppliedTransfer, ...],
+    ) -> None:
+        if not isinstance(self.evaluator, NodeBatchTacticalEvaluator):
+            return
+        squads = tuple(
+            CandidateSquad(player_ids=player_ids)
+            for player_ids in sorted({item.state.squad_ids for item in transitions})
+        )
+        started = perf_counter()
+        self.evaluator.precompute_node(node=node, squads=squads)
+        profile = self._node_profile(node)
+        if profile is not None:
+            profile.tactical_seconds += perf_counter() - started
+
+    def _cached_frontier(
+        self,
+        node_id: str,
+        state: ManagerState,
+        cached: tuple[PolicyCandidate, ...],
+    ) -> tuple[PolicyCandidate, ...]:
+        return tuple(self._rebase_candidate(node_id, state, item) for item in cached)
+
+    def _rebase_candidate(
+        self,
+        node_id: str,
+        state: ManagerState,
+        candidate: PolicyCandidate,
+    ) -> PolicyCandidate:
+        nodes = node_map(self.request.scenario_tree)
+        children = children_by_parent(self.request.scenario_tree)
+        expected_node = nodes[node_id]
+        current_state = state
+        rebased: list[NodeDecision] = []
+        for cached_decision in sorted(
+            candidate.decisions, key=lambda item: (item.gameweek, item.node_id)
+        ):
+            if cached_decision.node_id != expected_node.node_id:
+                raise ValueError("cached deterministic continuation is not a linear node suffix")
+            profile = self._node_profile(expected_node)
+            started = perf_counter()
+            transition = apply_transfer_action(
+                current_state,
+                cached_decision.action,
+                node=expected_node,
+                candidate_pool=self.request.candidate_pool,
+                rules=self.request.rules,
+            )
+            if profile is not None:
+                profile.transition_applications += 1
+                profile.transition_seconds += perf_counter() - started
+                profile.unique_resulting_squads.add(transition.state.squad_ids)
+            if continuation_state_fingerprint(transition.state) != continuation_state_fingerprint(
+                cached_decision.state_after
+            ):
+                raise ValueError("economic memo rebase changed continuation state semantics")
+            started = perf_counter()
+            tactical = self.evaluator.evaluate(node=expected_node, state=transition.state)
+            if profile is not None:
+                profile.tactical_evaluator_calls += 1
+                profile.tactical_seconds += perf_counter() - started
+            if tactical != cached_decision.tactical_evaluation:
+                raise ValueError("economic memo rebase changed exact tactical semantics")
+            arc = transition.free_transfer_arc
+            rebased.append(
+                cached_decision.model_copy(
+                    update={
+                        "state_before_sha256": current_state.state_sha256,
+                        "state_after": transition.state,
+                        "bank_before_tenths": current_state.bank_tenths,
+                        "bank_after_tenths": transition.state.bank_tenths,
+                        "free_transfers_before": current_state.free_transfers,
+                        "free_transfers_after": transition.state.free_transfers,
+                        "paid_transfers": arc.paid_transfers,
+                        "hit_points": arc.hit_points,
+                        "selling_prices": transition.selling_prices,
+                        "buying_prices": transition.buying_prices,
+                        "squad_after": transition.state.squad_ids,
+                        "tactical_evaluation": tactical,
+                    }
+                )
+            )
+            child_nodes = children.get(expected_node.node_id, ())
+            if child_nodes:
+                if len(child_nodes) != 1:
+                    raise ValueError("deterministic continuation unexpectedly branches")
+                expected_node = child_nodes[0]
+                current_state = observe_node(transition.state, node=expected_node)
+        return replace(candidate, decisions=tuple(rebased))
+
+
 def solve_frontier(
     request: MultiGameweekOptimisationRequest,
     evaluator: TacticalEvaluator,
     *,
     root_no_transfer_only: bool = False,
+    prefer_deterministic_linear: bool = False,
+    profile: Stage11SearchProfile | None = None,
 ) -> FrontierResult:
-    return BoundedExactEnumerator(
+    use_fast_path = (
+        prefer_deterministic_linear
+        and deterministic_linear_fast_path_eligible(request)
+        and isinstance(evaluator, SquadOnlyTacticalEvaluator)
+        and evaluator.squad_only
+    )
+    if profile is not None:
+        profile.fast_path_used = use_fast_path
+    enumerator_type = (
+        DeterministicLinearExactEnumerator if use_fast_path else BoundedExactEnumerator
+    )
+    return enumerator_type(
         request=request,
         evaluator=evaluator,
         root_no_transfer_only=root_no_transfer_only,
+        profile=profile,
     ).enumerate()
 
 

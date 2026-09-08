@@ -10,6 +10,7 @@ from fractions import Fraction
 from importlib.resources import files
 from math import comb
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Literal
 from uuid import UUID
 
@@ -400,6 +401,16 @@ class PrivateV1ReplayResult:
 
 
 @dataclass
+class _TacticalCacheCounters:
+    cache_hits: int = 0
+    cache_misses: int = 0
+    individual_calls: int = 0
+    batch_calls: int = 0
+    evaluated_squads: int = 0
+    evaluation_seconds: float = 0.0
+
+
+@dataclass
 class _MemoizedStage10Evaluator:
     """Cache the canonical exact result for repeated Stage-11 visits to one squad."""
 
@@ -407,18 +418,91 @@ class _MemoizedStage10Evaluator:
     _cache: dict[tuple[str, tuple[str, ...]], TacticalNodeEvaluation] = field(default_factory=dict)
     prepared_node: ScenarioTreeNode | None = None
     prepared_squads: tuple[CandidateSquad, ...] = ()
+    cache_hits: int = 0
+    cache_misses: int = 0
+    individual_calls: int = 0
+    batch_calls: int = 0
+    batched_squads: int = 0
+    progress_message: Callable[[str], None] | None = None
+    counters_by_node: dict[str, _TacticalCacheCounters] = field(default_factory=dict)
+    _last_progress_at: float = 0.0
+
+    @property
+    def squad_only(self) -> bool:
+        return True
 
     @property
     def rules(self) -> OneGameweekRulesView:
         return self.delegate.rules
 
     def evaluate(self, *, node: ScenarioTreeNode, state: ManagerState) -> TacticalNodeEvaluation:
+        counters = self.counters_by_node.setdefault(node.node_id, _TacticalCacheCounters())
         key = (node.node_id, state.squad_ids)
         result = self._cache.get(key)
         if result is None:
+            counters.cache_misses += 1
+            counters.individual_calls += 1
+            self.cache_misses += 1
+            self.individual_calls += 1
+            started = perf_counter()
             result = self.delegate.evaluate(node=node, state=state)
+            counters.evaluation_seconds += perf_counter() - started
+            counters.evaluated_squads += 1
             self._cache[key] = result
+        else:
+            counters.cache_hits += 1
+            self.cache_hits += 1
         return result
+
+    def precompute_node(
+        self,
+        *,
+        node: ScenarioTreeNode,
+        squads: tuple[CandidateSquad, ...],
+        progress: Callable[[tuple[int, int]], None] | None = None,
+    ) -> None:
+        """Batch every not-yet-cached unique squad through the node's exact kernel."""
+
+        unique = tuple(
+            CandidateSquad(player_ids=player_ids)
+            for player_ids in sorted({squad.player_ids for squad in squads})
+        )
+        pending = tuple(
+            squad for squad in unique if (node.node_id, squad.player_ids) not in self._cache
+        )
+        counters = self.counters_by_node.setdefault(node.node_id, _TacticalCacheCounters())
+        counters.cache_hits += len(unique) - len(pending)
+        counters.cache_misses += len(pending)
+        self.cache_hits += len(unique) - len(pending)
+        self.cache_misses += len(pending)
+        if not pending:
+            return
+        self.batch_calls += 1
+        counters.batch_calls += 1
+        self.batched_squads += len(pending)
+
+        def observe(value: tuple[int, int]) -> None:
+            if progress is not None:
+                progress(value)
+            completed, total = value
+            now = perf_counter()
+            if self.progress_message is not None and now - self._last_progress_at >= 30:
+                self._last_progress_at = now
+                self.progress_message(
+                    f"Stage-11 GW{node.gameweek} tactical batch: {completed}/{total} complete; "
+                    f"cache_hits={self.cache_hits}, cache_misses={self.cache_misses}"
+                )
+
+        started = perf_counter()
+        results = self.delegate.evaluate_many(
+            node=node,
+            squads=pending,
+            progress=observe,
+        )
+        counters.evaluation_seconds += perf_counter() - started
+        counters.evaluated_squads += len(results)
+        for squad_ids, result in results.items():
+            self._cache[(node.node_id, squad_ids)] = result
 
     def precompute(
         self,
@@ -429,20 +513,11 @@ class _MemoizedStage10Evaluator:
 
         if self.prepared_node is None or not self.prepared_squads:
             return
-        pending = tuple(
-            squad
-            for squad in sorted(self.prepared_squads, key=lambda item: item.player_ids)
-            if (self.prepared_node.node_id, squad.player_ids) not in self._cache
-        )
-        if not pending:
-            return
-        results = self.delegate.evaluate_many(
+        self.precompute_node(
             node=self.prepared_node,
-            squads=pending,
+            squads=self.prepared_squads,
             progress=progress,
         )
-        for squad_ids, result in results.items():
-            self._cache[(self.prepared_node.node_id, squad_ids)] = result
 
 
 def load_packaged_event_allocation_config() -> EventAllocationConfig:

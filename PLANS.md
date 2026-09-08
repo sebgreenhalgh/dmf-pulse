@@ -1922,3 +1922,31 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   wheel, repository validation, evidence validation and secret scan.
 - [ ] Commit and push one exact implementation SHA, require exact-SHA CI green, then stop without
   implementing the future rolling 3-5 Gameweek optimiser.
+
+# PRIVATE-V1-ONE-COMMAND-001N-R2 exact three-GW Stage-11 policy-solve acceleration
+
+- Ticket: `PRIVATE-V1-ONE-COMMAND-001N-R2`; immutable parent
+  `43229ea760bc2b3587a4ed05e22bef3c9e505497`; parent exact-SHA CI `33741523810`.
+- Branch: `readiness/PRIVATE-V1-ONE-COMMAND-001N-R2-stage11-exact-acceleration` in isolated
+  worktree `review_pack/one-command-n-r2`; unrelated root-worktree changes remain untouched.
+- Scope: profile the exact deterministic three-node private solve, remove redundant Stage-11
+  structural/tactical work with proven exact transformations, and expose truthful aggregate
+  progress without private player identities.
+- Safety: preserve the three-GW horizon, retained incoming shortlist, 0/1/2 transfer scope,
+  ownership-cohort selling prices, FT/hit/bank transitions, Stage-10 exact tactics, Stage-9
+  scenarios, objective, frontier, alternatives, tie-break, terminal/price/chip modes, R1 cutoff,
+  providers, persistence, PR, merge, tag and activation.
+
+## PRIVATE-V1-ONE-COMMAND-001N-R2 checkpoints
+
+- [x] Verify the exact immutable parent and green CI, isolate the branch, and resolve the
+  A10/A11/B2 authority plus 001L/001M/001N contracts.
+- [x] Add deterministic Stage-11 instrumentation and capture the retained solver bottleneck on a
+  synthetic live-shaped 15-player, 3-GW, 0/1/2-transfer workload.
+- [x] Add oracle/differential and hostile exactness tests, then implement the smallest material
+  future-node batching and/or economically sufficient continuation optimisation supported by the
+  measurements.
+- [x] Run the benchmark and every focused/inherited acceptance gate; seal bounded evidence and
+  manifests without private identifiers or provider bodies.
+- [ ] Commit and push one exact final SHA, require exact-SHA CI green, then attempt the literal
+  private 3-GW retry only if all runtime inputs already exist in the operator environment.

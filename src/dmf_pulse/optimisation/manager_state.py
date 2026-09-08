@@ -137,6 +137,38 @@ def state_fingerprint(value: ManagerState) -> str:
     )
 
 
+def continuation_state_fingerprint(value: ManagerState) -> str:
+    """Hash exactly the state that can affect future legal transitions and value.
+
+    Closed ownership spells remain on ``ManagerState`` for replay and provenance, but cannot
+    affect a later action. Active purchase/current prices remain because they govern selling
+    value; club/position identity, bank, free transfers and rules lineage remain because they
+    govern legality and transition economics.
+    """
+
+    return semantic_sha256(
+        {
+            "current_gameweek": value.current_gameweek,
+            "observed_node_id": value.observed_node_id,
+            "bank_tenths": value.bank_tenths,
+            "free_transfers": value.free_transfers,
+            "ruleset_id": value.ruleset_id,
+            "ruleset_version": value.ruleset_version,
+            "ruleset_hash": value.ruleset_hash,
+            "active_ownership": [
+                {
+                    "player_id": item.player_id,
+                    "club_id": item.club_id,
+                    "position": item.position.value,
+                    "purchase_price_tenths": item.purchase_price_tenths,
+                    "current_price_tenths": item.current_price_tenths,
+                }
+                for item in value.active_spells
+            ],
+        }
+    )
+
+
 def selling_price_tenths(
     *,
     purchase_price_tenths: int,
