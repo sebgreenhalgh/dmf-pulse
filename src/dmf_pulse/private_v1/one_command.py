@@ -670,6 +670,7 @@ class PrivateV1OneCommandService:
                         private_rules_authority=rules_authority,
                         player_prior_carry_forward_policy=carry_forward,
                         current_penalty_hierarchy=snapshot.current_penalty_hierarchy,
+                        entry_quality=snapshot.entry_quality,
                         root_seed=request.root_seed,
                         scenario_count=request.scenario_count,
                         stage9_monte_carlo_policy=mc_policy,

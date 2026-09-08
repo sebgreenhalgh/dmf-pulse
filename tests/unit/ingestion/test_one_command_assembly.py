@@ -234,6 +234,8 @@ def test_direct_snapshot_resolves_target_and_auth_state_without_previous_pick_su
         snapshot.current_penalty_hierarchy.source_bootstrap_payload_sha256
         == snapshot.fpl_input.provenance.bootstrap_payload_sha256
     )
+    assert snapshot.entry_quality is not None
+    assert snapshot.entry_quality.duplicate_summary_fields == ()
 
 
 def test_provider_observed_unified_state_and_transient_market_identity_are_accepted(

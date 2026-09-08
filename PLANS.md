@@ -1,5 +1,32 @@
 # DMF Pulse execution plans
 
+# PRIVATE-V1-ONE-COMMAND-001N-R3 official-FPL entry duplicate-summary reconciliation
+
+- Parent/branch: immutable accepted parent `de57ec634fbf5d9eb8bb86ae4eb2270661b354f9`
+  on `readiness/PRIVATE-V1-ONE-COMMAND-001N-R2-stage11-exact-acceleration`; successful
+  exact-parent CI `34221968877`.
+- Scope: retain entry-endpoint top-level occurrences only long enough to apply a narrow known
+  summary-key contract; strictly reconcile a conflicting current overall rank against the
+  canonical matching history row; carry typed source quality to the private report and its
+  semantic inputs.
+- Safety: preserve generic duplicate rejection and every non-entry endpoint; reject duplicate
+  identity, started-event, unknown top-level, nested, malformed and ambiguous decision-relevant
+  facts; retain no provider body; do not change Stage 7--11, the one-/three-GW objectives,
+  transfer/FT/price/chip/rank strategy semantics, cutoffs, rights or request budget.
+
+## PRIVATE-V1-ONE-COMMAND-001N-R3 checkpoints
+
+- [x] Verify the immutable parent, exact-parent CI, isolated worktree, A3/A4/A10/A11/B2
+  authority, and the strict-parser failure class.
+- [ ] Add RED entry-resolution contracts for every allowed/rejected duplicate shape, history
+  coherence, optional-rank propagation, warnings/hash binding and unchanged other endpoints.
+- [ ] Implement the smallest entry-only observation/resolution path and transient quality
+  propagation without a first-/last-wins path.
+- [ ] Pass focused and inherited parser/snapshot/manager/private one-command/rolling/R1/R2
+  coverage, then static/build/wheel/repository/security gates.
+- [ ] Seal bounded synthetic evidence, commit and push one final SHA, require exact-SHA CI
+  success, then attempt the optional literal private run only when existing runtime inputs exist.
+
 # PRIVATE-V1-ONE-COMMAND-001N-R1 score-prior acquisition ordering remediation
 
 - Parent/branch: immutable accepted parent `ba8d9917c75ba94e5739c605f38407d4438ff41c`

@@ -52,6 +52,72 @@ class DirectEntry(_ProviderModel):
     summary_overall_rank: PositiveInt | None = None
 
 
+class DirectEntryOverallPointsStatus(StrEnum):
+    DIRECT_UNAMBIGUOUS = "DIRECT_UNAMBIGUOUS"
+    DUPLICATE_UNAMBIGUOUS = "DUPLICATE_UNAMBIGUOUS"
+
+
+class DirectEntryOverallRankStatus(StrEnum):
+    DIRECT_UNAMBIGUOUS = "DIRECT_UNAMBIGUOUS"
+    DUPLICATE_UNAMBIGUOUS = "DUPLICATE_UNAMBIGUOUS"
+    HISTORY_RECONCILED = "HISTORY_RECONCILED"
+    AMBIGUOUS_UNAVAILABLE = "AMBIGUOUS_UNAVAILABLE"
+    UNAVAILABLE = "UNAVAILABLE"
+
+
+CURRENT_FPL_ENTRY_DUPLICATE_SUMMARY_FIELDS_OBSERVED = (
+    "CURRENT_FPL_ENTRY_DUPLICATE_SUMMARY_FIELDS_OBSERVED"
+)
+CURRENT_FPL_ENTRY_EVENT_RANK_AMBIGUOUS_DISCARDED = (
+    "CURRENT_FPL_ENTRY_EVENT_RANK_AMBIGUOUS_DISCARDED"
+)
+CURRENT_FPL_ENTRY_OVERALL_RANK_RECONCILED_FROM_HISTORY_V1 = (
+    "CURRENT_FPL_ENTRY_OVERALL_RANK_RECONCILED_FROM_HISTORY_V1"
+)
+CURRENT_FPL_ENTRY_OVERALL_RANK_AMBIGUOUS_UNAVAILABLE = (
+    "CURRENT_FPL_ENTRY_OVERALL_RANK_AMBIGUOUS_UNAVAILABLE"
+)
+
+
+class DirectEntryQuality(_ProviderModel):
+    """Bounded source-quality facts; never provider values or response bytes."""
+
+    duplicate_summary_fields: tuple[str, ...] = ()
+    overall_points_status: DirectEntryOverallPointsStatus
+    overall_rank_status: DirectEntryOverallRankStatus
+    warnings: tuple[str, ...] = ()
+
+    @model_validator(mode="after")
+    def quality_is_canonical(self) -> Self:
+        allowed = {
+            "summary_event_points",
+            "summary_event_rank",
+            "summary_overall_points",
+            "summary_overall_rank",
+        }
+        if (
+            self.duplicate_summary_fields != tuple(sorted(set(self.duplicate_summary_fields)))
+            or not set(self.duplicate_summary_fields) <= allowed
+            or self.warnings != tuple(sorted(set(self.warnings)))
+        ):
+            raise ValueError("entry source-quality facts are not canonical")
+        return self
+
+
+class DirectEntryResolution(_ProviderModel):
+    entry: DirectEntry
+    quality: DirectEntryQuality
+
+    def require_known_overall_rank(self) -> int:
+        """Guard future rank-aware callers against treating ambiguity as a real rank."""
+
+        if self.entry.summary_overall_rank is None:
+            raise IngestionError(
+                "OVERALL_RANK_UNAVAILABLE", "official FPL overall rank is unavailable"
+            )
+        return self.entry.summary_overall_rank
+
+
 class DirectEntryHistoryRow(_ProviderModel):
     event: PositiveInt
     points: StrictInt
@@ -320,6 +386,7 @@ class DirectFplSnapshot(_ProviderModel):
     request_count: PositiveInt
     endpoint_classes: tuple[str, ...]
     current_penalty_hierarchy: CurrentPenaltyHierarchy | None = None
+    entry_quality: DirectEntryQuality | None = None
 
     @field_validator("captured_at")
     @classmethod
@@ -355,7 +422,142 @@ def _parse_json[ProviderValue: BaseModel](
 
 
 def parse_direct_entry(body: bytes) -> DirectEntry:
-    return _parse_json(body, DirectEntry, label="entry")
+    return resolve_direct_entry(body).entry
+
+
+class _EntryObjectPairs(list[tuple[str, object]]):
+    """A JSON object whose occurrences have not yet been collapsed."""
+
+
+def _entry_object_pairs(pairs: list[tuple[str, object]]) -> _EntryObjectPairs:
+    return _EntryObjectPairs(pairs)
+
+
+def _entry_value(value: object) -> object:
+    if isinstance(value, _EntryObjectPairs):
+        result: dict[str, object] = {}
+        for key, nested in value:
+            if key in result:
+                raise ValueError("duplicate provider key")
+            result[key] = _entry_value(nested)
+        return result
+    if isinstance(value, list):
+        return [_entry_value(item) for item in value]
+    return value
+
+
+def _entry_summary_value(value: object, adapter: TypeAdapter[object]) -> object:
+    return adapter.validate_python(value)
+
+
+def _entry_top_level(
+    pairs: _EntryObjectPairs,
+) -> tuple[dict[str, object], dict[str, tuple[object, ...]]]:
+    occurrences: dict[str, list[object]] = {}
+    for key, value in pairs:
+        occurrences.setdefault(key, []).append(_entry_value(value))
+    allowed = {
+        "summary_event_points",
+        "summary_event_rank",
+        "summary_overall_points",
+        "summary_overall_rank",
+    }
+    result: dict[str, object] = {}
+    retained: dict[str, tuple[object, ...]] = {}
+    points_adapter: TypeAdapter[object] = TypeAdapter(NonNegativeInt | None)
+    rank_adapter: TypeAdapter[object] = TypeAdapter(PositiveInt | None)
+    for key, values_list in occurrences.items():
+        values = tuple(values_list)
+        adapter = (
+            points_adapter
+            if key in {"summary_event_points", "summary_overall_points"}
+            else rank_adapter
+        )
+        if len(values) == 1:
+            result[key] = _entry_summary_value(values[0], adapter) if key in allowed else values[0]
+            continue
+        if key not in allowed:
+            raise ValueError("duplicate provider key")
+        checked = tuple(_entry_summary_value(item, adapter) for item in values)
+        if key in {"summary_event_points", "summary_overall_points"} and len(set(checked)) != 1:
+            raise ValueError("conflicting provider summary points")
+        if key == "summary_overall_rank" and len(set(checked)) == 1:
+            result[key] = checked[0]
+        elif key == "summary_event_rank":
+            result[key] = checked[0] if len(set(checked)) == 1 else None
+        elif key in {"summary_event_points", "summary_overall_points"}:
+            result[key] = checked[0]
+        retained[key] = checked
+    return result, retained
+
+
+def resolve_direct_entry(
+    body: bytes,
+    *,
+    history: DirectEntryHistory | None = None,
+    target_gameweek: int | None = None,
+) -> DirectEntryResolution:
+    """Resolve the sole documented entry-summary duplicate serialization, fail closed otherwise."""
+
+    try:
+        raw = json.loads(
+            body.decode("utf-8"), object_pairs_hook=_entry_object_pairs, parse_constant=_constant
+        )
+        if not isinstance(raw, _EntryObjectPairs):
+            raise ValueError("entry must be an object")
+        payload, duplicates = _entry_top_level(raw)
+        entry = DirectEntry.model_validate(payload)
+    except (UnicodeError, json.JSONDecodeError, ValidationError, ValueError):
+        raise IngestionError(
+            "VALIDATION_FAILED", "official FPL entry failed schema validation"
+        ) from None
+    duplicate_fields = tuple(sorted(duplicates))
+    warnings: set[str] = (
+        {CURRENT_FPL_ENTRY_DUPLICATE_SUMMARY_FIELDS_OBSERVED} if duplicate_fields else set()
+    )
+    points_status = (
+        DirectEntryOverallPointsStatus.DUPLICATE_UNAMBIGUOUS
+        if "summary_overall_points" in duplicates
+        else DirectEntryOverallPointsStatus.DIRECT_UNAMBIGUOUS
+    )
+    rank_status = DirectEntryOverallRankStatus.DIRECT_UNAMBIGUOUS
+    rank_values = duplicates.get("summary_overall_rank")
+    if rank_values is not None and len(set(rank_values)) == 1:
+        rank_status = DirectEntryOverallRankStatus.DUPLICATE_UNAMBIGUOUS
+    elif rank_values is not None:
+        matching: tuple[DirectEntryHistoryRow, ...] = ()
+        if history is not None and target_gameweek is not None and target_gameweek > 1:
+            matching = tuple(
+                row
+                for row in history.current
+                if row.event == target_gameweek - 1
+                and row.total_points == entry.summary_overall_points
+                and row.overall_rank is not None
+            )
+            if history.current[-1:] != matching:
+                matching = ()
+        candidates = set(rank_values)
+        if len(matching) == 1 and matching[0].overall_rank in candidates:
+            entry = entry.model_copy(update={"summary_overall_rank": matching[0].overall_rank})
+            rank_status = DirectEntryOverallRankStatus.HISTORY_RECONCILED
+            warnings.add(CURRENT_FPL_ENTRY_OVERALL_RANK_RECONCILED_FROM_HISTORY_V1)
+        else:
+            entry = entry.model_copy(update={"summary_overall_rank": None})
+            rank_status = DirectEntryOverallRankStatus.AMBIGUOUS_UNAVAILABLE
+            warnings.add(CURRENT_FPL_ENTRY_OVERALL_RANK_AMBIGUOUS_UNAVAILABLE)
+    elif entry.summary_overall_rank is None:
+        rank_status = DirectEntryOverallRankStatus.UNAVAILABLE
+    if "summary_event_rank" in duplicates and len(set(duplicates["summary_event_rank"])) > 1:
+        warnings.add(CURRENT_FPL_ENTRY_EVENT_RANK_AMBIGUOUS_DISCARDED)
+    return DirectEntryResolution(
+        entry=entry,
+        quality=DirectEntryQuality(
+            duplicate_summary_fields=duplicate_fields,
+            overall_points_status=points_status,
+            overall_rank_status=rank_status,
+            warnings=tuple(sorted(warnings)),
+        ),
+    )
 
 
 def parse_direct_history(body: bytes) -> DirectEntryHistory:
@@ -474,10 +676,16 @@ def acquire_direct_fpl_snapshot(
     ):
         raise IngestionError("INTERNAL_INVARIANT", "official FPL bootstrap hashes differ")
     del bootstrap, fixtures, parsed_bootstrap
-    entry = parse_direct_entry(client.fetch(DirectFplResource.ENTRY, entry_id=entry_id))
+    entry_body = client.fetch(DirectFplResource.ENTRY, entry_id=entry_id)
+    history_body = client.fetch(DirectFplResource.HISTORY, entry_id=entry_id)
+    history = parse_direct_history(history_body)
+    entry_resolution = resolve_direct_entry(
+        entry_body, history=history, target_gameweek=target_gameweek
+    )
+    del entry_body, history_body
+    entry = entry_resolution.entry
     if entry.id != entry_id:
         raise IngestionError("MAPPING_CONFLICT", "official FPL entry identity differs")
-    history = parse_direct_history(client.fetch(DirectFplResource.HISTORY, entry_id=entry_id))
     transfers = parse_direct_transfers(client.fetch(DirectFplResource.TRANSFERS, entry_id=entry_id))
     latest_public_picks = None
     if live_gameweeks:
@@ -506,10 +714,15 @@ def acquire_direct_fpl_snapshot(
         request_count=client.request_count,
         endpoint_classes=tuple(item.value for item in client.endpoint_classes),
         current_penalty_hierarchy=penalty_hierarchy,
+        entry_quality=entry_resolution.quality,
     )
 
 
 __all__ = [
+    "CURRENT_FPL_ENTRY_DUPLICATE_SUMMARY_FIELDS_OBSERVED",
+    "CURRENT_FPL_ENTRY_EVENT_RANK_AMBIGUOUS_DISCARDED",
+    "CURRENT_FPL_ENTRY_OVERALL_RANK_AMBIGUOUS_UNAVAILABLE",
+    "CURRENT_FPL_ENTRY_OVERALL_RANK_RECONCILED_FROM_HISTORY_V1",
     "CURRENT_FPL_PENALTY_HIERARCHY_AMBIGUOUS",
     "CURRENT_FPL_PENALTY_HIERARCHY_UNAVAILABLE",
     "CurrentPenaltyHierarchy",
@@ -519,6 +732,10 @@ __all__ = [
     "DirectEntry",
     "DirectEntryHistory",
     "DirectEntryHistoryRow",
+    "DirectEntryOverallPointsStatus",
+    "DirectEntryOverallRankStatus",
+    "DirectEntryQuality",
+    "DirectEntryResolution",
     "DirectEventLive",
     "DirectFplSnapshot",
     "DirectLiveElement",
@@ -533,4 +750,5 @@ __all__ = [
     "parse_direct_history",
     "parse_direct_public_picks",
     "parse_direct_transfers",
+    "resolve_direct_entry",
 ]

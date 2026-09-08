@@ -32,7 +32,7 @@ from dmf_pulse.fpl_points.models import (
 )
 from dmf_pulse.fpl_points.player_prior import CurrentGwStalePriorCarryForwardPolicy
 from dmf_pulse.ingestion.current_state import CurrentUnifiedStateBundle
-from dmf_pulse.ingestion.fpl.direct_payloads import CurrentPenaltyHierarchy
+from dmf_pulse.ingestion.fpl.direct_payloads import CurrentPenaltyHierarchy, DirectEntryQuality
 from dmf_pulse.ingestion.openfootball.service import CurrentScorePriorBundle
 from dmf_pulse.markets.current import (
     CurrentMarketCanonicalIdentityView,
@@ -294,6 +294,7 @@ class PrivateV1ExecutionInput(_FrozenModel):
     private_rules_authority: PrivateTransientRulesAuthority | None = None
     player_prior_carry_forward_policy: CurrentGwStalePriorCarryForwardPolicy | None = None
     current_penalty_hierarchy: CurrentPenaltyHierarchy | None = None
+    entry_quality: DirectEntryQuality | None = None
     root_seed: Annotated[StrictInt, Field(ge=0, le=2**63 - 1)]
     scenario_count: Annotated[StrictInt, Field(ge=1, le=1_000_000)]
     stage9_monte_carlo_policy: MonteCarloPolicy

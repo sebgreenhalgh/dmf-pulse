@@ -892,6 +892,7 @@ class PrivateV1RollingRecommendationService:
                 for warning in projection.scenario_set.warnings
             ),
             *(warning for item in decisions for warning in item.limitations),
+            *(current.entry_quality.warnings if current.entry_quality is not None else ()),
         }
         provisional = PrivateV1RollingDecision.model_construct(
             status="SUCCESS",

@@ -2102,6 +2102,11 @@ class PrivateV1RecommendationService:
                     *((transfer_scope.pruning_policy,) if transfer_scope.pruning_policy else ()),
                     *penalty_role_limitations,
                     *(
+                        execution.entry_quality.warnings
+                        if execution.entry_quality is not None
+                        else ()
+                    ),
+                    *(
                         (
                             "CURRENT_GW_USE_NOT_COVERED_BY_HISTORICAL_GW1_ACCEPTANCE",
                             "PRIVATE_CURRENT_GW_STALE_PRIOR_CARRY_FORWARD_V1",
