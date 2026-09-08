@@ -234,10 +234,20 @@ class ScenarioTree(OptimisationModel):
         return roots[0]
 
 
+class TransferActionScope(OptimisationModel):
+    """Root-only declaration and continuation permission, sealed in the search policy."""
+
+    root_maximum_transfers: NonNegativeInt
+    continuation_mode: Literal["FREE_TRANSFERS_ONLY", "RULES_BOUNDED"]
+
+
 class SearchPolicy(OptimisationModel):
     schema_version: Literal["multi-gameweek-search-policy-v1"] = "multi-gameweek-search-policy-v1"
     backend: Literal["BOUNDED_EXACT_MULTISTAGE_ENUMERATOR"] = "BOUNDED_EXACT_MULTISTAGE_ENUMERATOR"
     max_transfers_per_node: NonNegativeInt
+    transfer_action_scope: TransferActionScope | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     max_actions_per_state: PositiveInt
     max_state_expansions: PositiveInt
     max_policy_candidates: PositiveInt
@@ -499,6 +509,7 @@ class PlanKind(StrEnum):
     HIGH_UPSIDE = "HIGH_UPSIDE"
     NO_TRANSFER_BASELINE = "NO_TRANSFER_BASELINE"
     TRANSFER_COUNT_FRONTIER = "TRANSFER_COUNT_FRONTIER"
+    ROOT_ACTION_COUNTERFACTUAL = "ROOT_ACTION_COUNTERFACTUAL"
 
 
 class UtilityBreakdown(OptimisationModel):
@@ -827,6 +838,9 @@ class MultiGameweekOptimisationResult(OptimisationModel):
     conservative_plan: PlanAlternative
     high_upside_plan: PlanAlternative
     no_transfer_baseline: MultiGameweekPlan | None = None
+    root_action_counterfactual_plan: MultiGameweekPlan | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     transfer_count_frontier: TransferCountFrontier | HorizonTransferCountFrontier | None = None
     marginal_value_of_each_move: MoveAttribution | None = None
     current_action: TransferAction | None = None

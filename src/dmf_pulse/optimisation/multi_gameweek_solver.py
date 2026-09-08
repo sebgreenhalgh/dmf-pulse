@@ -421,6 +421,27 @@ def apply_transfer_action(
     )
 
 
+def maximum_transfer_count(
+    state: ManagerState, *, node: ScenarioTreeNode, rules: TransferRules, policy: SearchPolicy
+) -> int:
+    """Resolve the declared root or continuation limit at this exact decision state."""
+
+    maximum = min(policy.max_transfers_per_node, rules.max_transfers_per_deadline)
+    scope = policy.transfer_action_scope
+    if scope is None:
+        return maximum
+    if node.parent_id is None:
+        return min(maximum, scope.root_maximum_transfers)
+    if scope.continuation_mode == "FREE_TRANSFERS_ONLY":
+        event = rules.event_rules[node.transition_event]
+        if not event.unlimited_transfers_without_hits:
+            available = (
+                event.reset_before if event.reset_before is not None else state.free_transfers
+            )
+            maximum = min(maximum, available)
+    return maximum
+
+
 def enumerate_legal_actions(
     state: ManagerState,
     *,
@@ -467,8 +488,7 @@ def enumerate_legal_actions(
         for position in PlayerPosition
     }
     maximum = min(
-        policy.max_transfers_per_node,
-        rules.max_transfers_per_deadline,
+        maximum_transfer_count(state, node=node, rules=rules, policy=policy),
         len(owned),
         len(available),
     )
@@ -534,6 +554,9 @@ def enumerate_legal_actions(
                 if profile is not None:
                     profile.legal_actions_generated += 1
                     profile.transfer_count_distribution[action.transfer_count] += 1
+                    profile.actions_by_free_transfers[
+                        (state.free_transfers, action.transfer_count)
+                    ] += 1
                     profile.unique_resulting_squads.add(transition.state.squad_ids)
     actions.sort(key=lambda item: item.signature)
     if not actions:
@@ -803,6 +826,7 @@ class Stage11NodeProfile:
     pareto_seconds: float = 0.0
     peak_retained_frontier: int = 0
     transfer_count_distribution: Counter[int] = field(default_factory=Counter)
+    actions_by_free_transfers: Counter[tuple[int, int]] = field(default_factory=Counter)
     unique_full_state_fingerprints: set[str] = field(default_factory=set)
     unique_economic_state_fingerprints: set[str] = field(default_factory=set)
     unique_active_history_fingerprints: set[str] = field(default_factory=set)
@@ -835,6 +859,10 @@ class Stage11NodeProfile:
                 str(key): value for key, value in sorted(self.transfer_count_distribution.items())
             },
             "action_combinations_considered": self.action_combinations_considered,
+            "actions_by_free_transfers": {
+                f"ft={ft},transfers={count}": value
+                for (ft, count), value in sorted(self.actions_by_free_transfers.items())
+            },
             "legality_precheck_rejections": self.legality_precheck_rejections,
             "transition_applications": self.transition_applications,
             "unique_resulting_active_squads": len(self.unique_resulting_squads),
@@ -1762,6 +1790,10 @@ def validate_plan(
             else observe_node(replayed[node.parent_id].state, node=node)
         )
         emitted = by_node[node.node_id]
+        if emitted.action.transfer_count > maximum_transfer_count(
+            before, node=node, rules=request.rules, policy=request.search_policy
+        ):
+            raise ValueError("decision exceeds the declared root or continuation action scope")
         if emitted.information_set_key != node.information_set_key:
             raise ValueError("decision information-set key differs from the node")
         if emitted.state_before_sha256 != before.state_sha256:

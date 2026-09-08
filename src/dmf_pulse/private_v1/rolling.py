@@ -399,19 +399,13 @@ def _rolling_frontier(
 def _one_gameweek_comparison(
     one_gameweek: MultiGameweekPlan,
     rolling: MultiGameweekPlan,
-    frontier: PrivateRollingFrontier,
-    source_frontier: HorizonTransferCountFrontier,
+    counter_source: MultiGameweekPlan,
     *,
     request: MultiGameweekOptimisationRequest,
     element_by_player: dict[str, int],
 ) -> PrivateOneGameweekVersusRollingComparison:
-    transfer_count = one_gameweek.current_action.action.transfer_count
-    counter_source = next(
-        item.plan for item in source_frontier.points if item.transfer_count == transfer_count
-    )
-    counter_private = next(
-        item for item in frontier.points if item.transfer_count == transfer_count
-    )
+    if counter_source.current_action.action != one_gameweek.current_action.action:
+        raise PrivateV1Error("COUNTERFACTUAL_ACTION_MISMATCH", "counterfactual root action differs")
     rolling_utility = rolling.utility
     counter_utility = counter_source.utility
     return PrivateOneGameweekVersusRollingComparison(
@@ -430,10 +424,9 @@ def _one_gameweek_comparison(
             candidate_pool=request.candidate_pool,
             element_by_player=element_by_player,
         ),
-        counterfactual_basis="THREE_GAMEWEEK_FRONTIER_AT_ONE_GAMEWEEK_TRANSFER_COUNT",
-        counterfactual_action_matches_one_gameweek_action=(
-            counter_private.action_signature == one_gameweek.current_action.action.signature
-        ),
+        counterfactual_basis="ACTUAL_ONE_GAMEWEEK_ROOT_ACTION_WITH_OPTIMAL_CONTINUATION",
+        counterfactual_action_matches_one_gameweek_action=True,
+        counterfactual_horizon_utility=counter_utility.expected_horizon_utility,
         current_gameweek_points_difference=(
             rolling_utility.current_gameweek_contribution
             - counter_utility.current_gameweek_contribution
@@ -522,7 +515,9 @@ def render_rolling_report(
         f"Scenario tree: {decision.scenario_tree_mode}",
         f"Search: {decision.search_scope_mode}",
         f"Transfer-count scope source: {decision.transfer_count_scope_source}",
-        f"Derived maximum transfers per deadline: {decision.maximum_transfers_per_deadline}",
+        f"Root maximum transfers: {decision.maximum_transfers_per_deadline}",
+        f"Future transfer scope: {decision.continuation_transfer_mode}",
+        f"Maximum future transfers allowed by search/rules: {decision.continuation_maximum_transfers}",
         f"Chips: {decision.chip_mode}",
         "",
         "DO NOW",
@@ -564,6 +559,16 @@ def render_rolling_report(
     ]
     for item in decision.by_gameweek:
         coverage = item.fixture_coverage
+        maximum_considered = (
+            decision.maximum_transfers_per_deadline
+            if item == decision.do_now
+            else min(
+                decision.continuation_maximum_transfers,
+                item.free_transfer_state.effective_before_action,
+            )
+            if decision.continuation_transfer_mode == "FREE_TRANSFERS_ONLY"
+            else decision.continuation_maximum_transfers
+        )
         actionability_label = (
             "DO NOW"
             if item.actionability == "DO_NOW"
@@ -573,6 +578,7 @@ def render_rolling_report(
             (
                 f"GW{item.gameweek} - {actionability_label}",
                 f"  Transfers: {moves(item)}; hit: -{item.hit_points}",
+                f"  Maximum transfers considered at this state: {maximum_considered}",
                 (
                     f"  Expected points after hit: {item.expected_manager_points_after_hit:.2f}; "
                     f"FT before/next: {item.free_transfer_state.manager_state_before}/"
@@ -606,9 +612,10 @@ def render_rolling_report(
             f"Three-GW moves: {move_list(comparison.three_gameweek_transfers)}",
             f"Counterfactual basis: {comparison.counterfactual_basis}",
             (
-                "Matched-count action equals one-GW action: "
+                "Counterfactual action equals one-GW action: "
                 f"{'YES' if comparison.counterfactual_action_matches_one_gameweek_action else 'NO'}"
             ),
+            f"One-GW action counterfactual three-GW utility: {comparison.counterfactual_horizon_utility}",
             "WHY CHANGED - STRUCTURED DECOMPOSITION",
             f"Current-GW points difference: {comparison.current_gameweek_points_difference:+.2f}",
             f"Later-GW points difference: {comparison.future_gameweek_points_difference:+.2f}",
@@ -755,6 +762,17 @@ class PrivateV1RollingRecommendationService:
         ):
             tactical.precompute()
         record("tactical_batch_evaluation", started)
+        one_request, _unused, _one_candidates, _one_scope = _stage11_request(
+            current, projection_tuple[0]
+        )
+        one_gameweek = optimise_multi_gameweek(one_request, evaluator=tactical)
+        if one_gameweek.recommended_plan is None or (
+            one_gameweek.status is not MultiGameweekResultStatus.SUCCESS
+        ):
+            raise PrivateV1Error(
+                one_gameweek.error_code or "ONE_GAMEWEEK_COMPARATOR_BLOCKED",
+                "accepted one-GW comparator could not be reproduced",
+            )
         started = perf_counter()
         with active_progress.stage(
             started="Stage-11 three-GW policy solving...",
@@ -768,6 +786,7 @@ class PrivateV1RollingRecommendationService:
                 evaluator=tactical,
                 prefer_deterministic_linear=True,
                 profile=stage11_profile,
+                root_action_counterfactual=one_gameweek.recommended_plan.current_action.action,
             )
         record("stage11_policy_solving", started)
         for item in sorted(stage11_profile.nodes.values(), key=lambda value: value.depth):
@@ -777,6 +796,13 @@ class PrivateV1RollingRecommendationService:
                 f"memo_hits={item.memo_hits}, actions={item.legal_actions_generated}, "
                 f"tactical_requests={item.tactical_evaluator_calls}, "
                 f"states_solved={item.states_solved}"
+            )
+            active_progress.message(
+                f"Stage-11 GW{item.gameweek} actions by FT/count: "
+                + ", ".join(
+                    f"{ft}/{count}={total}"
+                    for (ft, count), total in sorted(item.actions_by_free_transfers.items())
+                )
             )
             if tactical_counts is not None:
                 active_progress.message(
@@ -803,17 +829,11 @@ class PrivateV1RollingRecommendationService:
                 optimiser.error_code or "ROLLING_OPTIMISER_BLOCKED",
                 "Stage 11 did not return a complete exact three-GW recommendation",
             )
-        one_request, _unused, _one_candidates, _one_scope = _stage11_request(
-            current,
-            projection_tuple[0],
-        )
-        one_gameweek = optimise_multi_gameweek(one_request, evaluator=tactical)
-        if one_gameweek.recommended_plan is None or (
-            one_gameweek.status is not MultiGameweekResultStatus.SUCCESS
-        ):
+        counterfactual = optimiser.root_action_counterfactual_plan
+        if counterfactual is None:
             raise PrivateV1Error(
-                one_gameweek.error_code or "ONE_GAMEWEEK_COMPARATOR_BLOCKED",
-                "accepted one-GW comparator could not be reproduced",
+                "ONE_GAMEWEEK_COUNTERFACTUAL_UNAVAILABLE",
+                "exact actual one-GW action continuation is absent",
             )
         current_players, _teams = _current_identity_maps(current)
         element_by_player = {
@@ -870,8 +890,7 @@ class PrivateV1RollingRecommendationService:
         one_comparison = _one_gameweek_comparison(
             one_gameweek.recommended_plan,
             recommended,
-            frontier,
-            optimiser.transfer_count_frontier,
+            counterfactual,
             request=request,
             element_by_player=element_by_player,
         )
@@ -914,6 +933,12 @@ class PrivateV1RollingRecommendationService:
             search_scope_mode=execution.search_scope_mode,
             transfer_count_scope_source=execution.transfer_count_scope_source,
             maximum_transfers_per_deadline=execution.maximum_transfers_per_deadline,
+            continuation_maximum_transfers=request.search_policy.max_transfers_per_node,
+            continuation_transfer_mode=(
+                request.search_policy.transfer_action_scope.continuation_mode
+                if request.search_policy.transfer_action_scope is not None
+                else "RULES_BOUNDED"
+            ),
             chip_mode=execution.chip_mode,
             do_now=decisions[0],
             by_gameweek=decisions,

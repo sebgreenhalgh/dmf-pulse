@@ -29,6 +29,7 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
     ScenarioTreeNode,
     SolverDiagnostics,
     StateAdvanceResult,
+    TransferAction,
     TransferCountFrontier,
     TransferCountFrontierPoint,
     seal_advance,
@@ -281,6 +282,7 @@ def optimise_multi_gameweek(
     evaluator: TacticalEvaluator | None = None,
     prefer_deterministic_linear: bool = False,
     profile: Stage11SearchProfile | None = None,
+    root_action_counterfactual: TransferAction | None = None,
 ) -> MultiGameweekOptimisationResult:
     """Optimise a policy; expose only its root transition as executable."""
 
@@ -344,7 +346,25 @@ def optimise_multi_gameweek(
         )
 
     assumptions = _standard_assumptions(request)
+    counterfactual_plan = None
     try:
+        if root_action_counterfactual is not None:
+            if not frontier.complete:
+                raise ValueError("action counterfactual requires complete exact enumeration")
+            matching = tuple(
+                item
+                for item in frontier.candidates
+                if item.root_action == root_action_counterfactual
+            )
+            counterfactual_plan = build_plan(
+                request,
+                select_candidate(matching, mode=ObjectiveMode.EXPECTED),
+                plan_kind=PlanKind.ROOT_ACTION_COUNTERFACTUAL,
+                objective_mode=ObjectiveMode.EXPECTED,
+                diagnostics=frontier.diagnostics,
+                assumptions=assumptions,
+            )
+            validate_plan(request, counterfactual_plan, evaluator=evaluator)
         recommended_candidate = select_candidate(frontier.candidates, mode=ObjectiveMode.EXPECTED)
         recommended = build_plan(
             request,
@@ -486,6 +506,7 @@ def optimise_multi_gameweek(
         status=status,
         request_id=request.request_id,
         recommended_plan=recommended,
+        root_action_counterfactual_plan=counterfactual_plan,
         conservative_plan=conservative,
         high_upside_plan=upside,
         no_transfer_baseline=baseline,

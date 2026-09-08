@@ -1,0 +1,19 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R4"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Future FT action-scope fidelity and actual one-GW action counterfactual"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R4-ft-scope-and-comparator"
+required_base_commit: "47215656bac92d0ef72077b79e179a8c001915bc"
+authority_scopes:
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW"
+objective: >-
+  Preserve the current root transfer cap and incoming shortlist while allowing valid
+  state-dependent continuation transfers. Compare the selected three-GW policy against
+  the actual one-GW root action followed by its exact optimal continuation.
+exclusions:
+  - "Stage 7/8/9 modelling, shortlist, chips, prices, rank, ingestion and R1 cutoff changes"
+  - "Approximation, unsafe truncation, PR, merge, tag or production activation"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

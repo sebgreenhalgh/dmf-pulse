@@ -97,6 +97,7 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
     SearchPolicy,
     TacticalNodeEvaluation,
     TransferAction,
+    TransferActionScope,
     TransferMove,
     seal_request,
     seal_scenario_tree,
@@ -1220,12 +1221,34 @@ def _stage11_request(
         len(value.current_state.manager_state.squad),
     )
     search_payload["max_transfers_per_node"] = effective_maximum_transfers
+    if future_gameweeks:
+        search_payload["max_transfers_per_node"] = min(
+            search.max_transfers_per_node,
+            transfer_rules.max_transfers_per_deadline,
+            len(allowed),
+            len(value.current_state.manager_state.squad),
+        )
+        search_payload["transfer_action_scope"] = TransferActionScope(
+            root_maximum_transfers=effective_maximum_transfers,
+            continuation_mode=(
+                "FREE_TRANSFERS_ONLY" if pruning_policy is not None else "RULES_BOUNDED"
+            ),
+        )
     root_action_upper = _exact_root_action_upper_bound(
         squad_size=len(value.current_state.manager_state.squad),
         incoming_count=len(allowed),
         maximum_transfers=effective_maximum_transfers,
     )
     search_payload["max_actions_per_state"] = max(search.max_actions_per_state, root_action_upper)
+    if future_gameweeks:
+        search_payload["max_actions_per_state"] = max(
+            search.max_actions_per_state,
+            _exact_root_action_upper_bound(
+                squad_size=len(value.current_state.manager_state.squad),
+                incoming_count=len(allowed),
+                maximum_transfers=int(search_payload["max_transfers_per_node"]),
+            ),
+        )
     search_payload["max_returned_root_candidates"] = max(
         search.max_returned_root_candidates, root_action_upper
     )

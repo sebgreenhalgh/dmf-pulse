@@ -406,8 +406,9 @@ class PrivateOneGameweekVersusRollingComparison(_RollingModel):
     three_gameweek_action_signature: StrictStr
     one_gameweek_transfers: tuple[PrivateTransferMove, ...]
     three_gameweek_transfers: tuple[PrivateTransferMove, ...]
-    counterfactual_basis: Literal["THREE_GAMEWEEK_FRONTIER_AT_ONE_GAMEWEEK_TRANSFER_COUNT"]
+    counterfactual_basis: Literal["ACTUAL_ONE_GAMEWEEK_ROOT_ACTION_WITH_OPTIMAL_CONTINUATION"]
     counterfactual_action_matches_one_gameweek_action: StrictBool
+    counterfactual_horizon_utility: Decimal
     current_gameweek_points_difference: Decimal
     future_gameweek_points_difference: Decimal
     expected_hit_cost_difference: Decimal
@@ -417,6 +418,8 @@ class PrivateOneGameweekVersusRollingComparison(_RollingModel):
 
     @model_validator(mode="after")
     def decomposition_reconciles(self) -> Self:
+        if not self.counterfactual_action_matches_one_gameweek_action:
+            raise ValueError("counterfactual must use the actual one-GW root action")
         expected = (
             self.current_gameweek_points_difference
             + self.future_gameweek_points_difference
@@ -456,6 +459,8 @@ class PrivateRollingDecisionLineage(_RollingModel):
 
 
 class PrivateV1RollingDecision(_RollingModel):
+    continuation_maximum_transfers: NonNegativeInt
+    continuation_transfer_mode: Literal["FREE_TRANSFERS_ONLY", "RULES_BOUNDED"]
     schema_version: Literal["private-v1-rolling-decision-v1"] = "private-v1-rolling-decision-v1"
     status: Literal["SUCCESS"]
     activation_status: Literal["NOT_PRODUCTION_ACTIVE"]
@@ -510,13 +515,17 @@ class PrivateV1RollingDecision(_RollingModel):
             raise ValueError("rolling future decisions must be provisional")
         if self.action_space_disclosure != self.transfer_frontier.action_space_disclosure:
             raise ValueError("rolling action-space disclosures differ")
-        if any(
-            item.transfer_count > self.maximum_transfers_per_deadline for item in self.by_gameweek
-        ) or any(
+        if self.do_now.transfer_count > self.maximum_transfers_per_deadline or any(
             item.transfer_count > self.maximum_transfers_per_deadline
             for item in self.transfer_frontier.points
         ):
             raise ValueError("rolling transfer count exceeds its derived governed scope")
+        for item in self.future_plan:
+            maximum = self.continuation_maximum_transfers
+            if self.continuation_transfer_mode == "FREE_TRANSFERS_ONLY":
+                maximum = min(maximum, item.free_transfer_state.effective_before_action)
+            if item.transfer_count > maximum:
+                raise ValueError("rolling future transfer count exceeds its state scope")
         if self.warnings != tuple(sorted(set(self.warnings))):
             raise ValueError("rolling warnings must be unique and sorted")
         if self.semantic_sha256 != _semantic_hash(self):

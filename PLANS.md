@@ -1,5 +1,19 @@
 # DMF Pulse execution plans
 
+# PRIVATE-V1-ONE-COMMAND-001N-R4
+
+- Parent: `47215656bac92d0ef72077b79e179a8c001915bc`; full CI `34251969815` passed.
+- Confirmed defects: root FT-derived cap leaks into continuation scope; comparator selects by
+  count instead of actual root action. A10/A11/B2 authority and DMFP-12 sections 8.3--8.6 govern
+  exact FT transitions, recourse, hit costs and configured practical caps. 001K bounds automatic
+  private transfers by available FTs and two-transfer STANDARD scope; explicit generic paid
+  transfer contracts remain unchanged.
+- Implement optional hash-bound root/continuation scope, preserving serialization when absent;
+  reuse each root action's exact best retained policy for the actual one-GW counterfactual.
+- Checkpoints: RED tests; scope/comparator implementation; exact oracle differential and hostile
+  economic/comparator tests; incremental benchmark; all acceptance gates; regenerate manifest;
+  push and monitor full exact-SHA CI; optional live retry with existing inputs only.
+
 # PRIVATE-V1-ONE-COMMAND-001N-R3 official-FPL entry duplicate-summary reconciliation
 
 - Parent/branch: immutable accepted parent `de57ec634fbf5d9eb8bb86ae4eb2270661b354f9`
