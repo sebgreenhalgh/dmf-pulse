@@ -24,11 +24,14 @@ from dmf_pulse.optimisation.multi_gameweek_solver import (  # noqa: E402
     solve_frontier,
 )
 from dmf_pulse.private_v1.horizon_candidates import bounded_horizon_screen  # noqa: E402
-from scripts.profile_horizon_candidate_pressure import pressure_fixture, v2_pressure  # noqa: E402
 from tests.unit.private_v1.horizon_oracle_support import (  # noqa: E402
     HorizonPointsEvaluator,
     oracle_fixture,
     with_candidates,
+)
+from tests.unit.private_v1.horizon_pressure_support import (  # noqa: E402
+    pressure_fixture,
+    v2_pressure,
 )
 from tests.unit.private_v1.test_bounded_horizon_oracle import with_node_candidates  # noqa: E402
 

@@ -4,7 +4,7 @@ import pytest
 
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.horizon_candidates import bounded_horizon_screen
-from scripts.profile_horizon_candidate_pressure import pressure_fixture, v2_pressure
+from tests.unit.private_v1.horizon_pressure_support import pressure_fixture, v2_pressure
 from tests.unit.private_v1.test_horizon_candidate_screen import screen_fixture
 
 
@@ -111,8 +111,8 @@ def test_pressure_action_counts_match_canonical_simultaneous_ft2_enumeration():
     from dmf_pulse.optimisation.manager_state import seal_manager_state
     from dmf_pulse.optimisation.multi_gameweek_models import seal_search_policy
     from dmf_pulse.optimisation.multi_gameweek_solver import enumerate_legal_actions
-    from scripts.profile_horizon_candidate_pressure import projected_legal_actions
     from tests.unit.private_v1.horizon_oracle_support import oracle_fixture
+    from tests.unit.private_v1.horizon_pressure_support import projected_legal_actions
 
     fixture = pressure_fixture()
     ids = fixture[0][:8]

@@ -2023,3 +2023,7 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [x] Benchmark pressure/near-limit/FT2 cases, run local acceptance gates and regenerate manifests.
 - [ ] Commit/push exact SHA and require complete exact-SHA CI. Optional live retry only
   with already-present runtime inputs; no PR, merge, tag, activation or next ticket.
+- First publication `cd831dd868430f744fc4a3c09b47fc9a4cce7961` failed CI `34501801411`
+  at coverage-plan collection: a test imported the CLI `scripts` namespace. Shared diagnostics
+  moved to pytest-importable test support with unchanged bodies/production bytes. The exact
+  planner now collects 4,389 eligible tests and all 20 R6 candidate/oracle tests pass.

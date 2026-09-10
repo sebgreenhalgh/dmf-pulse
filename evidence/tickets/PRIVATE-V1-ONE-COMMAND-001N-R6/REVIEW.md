@@ -81,6 +81,10 @@ Ruff, strict mypy, frozen sync, build, clean external installed-wheel checks, au
 repository/manifests and secret scan passed. Exact-SHA CI is still a separate publication gate.
 The full actual synthetic three-GW recommendation stack also ran from the installed wheel
 in a clean external offline environment, with automatic V3 scope and the exact pinned comparator.
+The first publication's CI exposed a test-only import-path defect during shard-plan collection.
+Moving shared diagnostics from the CLI script into test support fixes the exact CI entry point
+(4,389 eligible tests); all 20 R6 capacity/oracle tests pass afterward. Production and diagnostic
+function bodies remain byte-identical. No CI selector, import mode or coverage threshold changed.
 
 - This remains heuristic candidate admission, exact only inside its declared action space.
   The targeted full-universe matches are not a global optimality proof.

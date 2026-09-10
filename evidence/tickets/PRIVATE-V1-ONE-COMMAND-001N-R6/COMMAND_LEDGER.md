@@ -57,6 +57,27 @@ All tests/profiles use repository-owned synthetic inputs. No live credentials or
 Publication CI is checked after committing/pushing the immutable implementation SHA and
 reported at handoff; it cannot be certified by this pre-publication ledger.
 
+## Exact-SHA collection remediation
+
+First candidate `cd831dd868430f744fc4a3c09b47fc9a4cce7961`, CI `34501801411`, failed at
+`Generate deterministic coverage shard plan`; coverage jobs did not run. The exact local
+`uv run python scripts/ci_coverage_shards.py plan ...` reproduced the failure. Exposing pytest
+collection with the same script-directory import path identified `ModuleNotFoundError: scripts`
+in the new capacity test. `python -m pytest` had included the repository root on its import path,
+masking that test-helper placement error during earlier local runs.
+
+Shared diagnostic functions moved to `tests/unit/private_v1/horizon_pressure_support.py`;
+tests and CLI wrappers now import test support without modifying pytest/CI configuration.
+AST source-span comparison proves all three moved helper bodies unchanged, and the complete
+production/configuration/authority/dependency/CI tree is byte-identical to the first candidate.
+Therefore the recorded final production coverage, benchmark and installed-wheel results remain
+applicable. This is not a production semantic change or a collection/coverage bypass.
+
+- Exact CI planner entry point after fix: PASS, 4,389 eligible nodeids, eight complete shards;
+  eligible-nodeid SHA256 `fdbab76ada2292737991ec5654523f547cd27d8340e4e6450cfdae7b81052f8c`.
+- R6 capacity/oracle files after extraction: **20 passed in 70.92s**.
+- Final manifest, static, build and secret gates are rerun before publishing the corrected SHA.
+
 Development corrections: explicit PowerShell test paths replaced an unexpanded pytest wildcard;
 the external CLI smoke uses the canonical installed `dmf pulse` entry point, not a nonexistent
 `pulse.exe`. These checks failed clearly before correction. No production command contract,
