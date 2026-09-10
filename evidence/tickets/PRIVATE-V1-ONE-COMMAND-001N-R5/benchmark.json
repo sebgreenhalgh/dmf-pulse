@@ -1,0 +1,865 @@
+{
+  "exact_fast_generic_equality": true,
+  "large_screen": {
+    "R4_post_dominance": 600,
+    "R4_retained": 8,
+    "R5_post_dominance": 600,
+    "R5_retained": 9,
+    "audit": {
+      "certified_dominated_candidates": 0,
+      "horizon_gameweeks": [
+        1,
+        2,
+        3
+      ],
+      "maximum_retained": 24,
+      "policy": "PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2",
+      "retained_incoming_ids": [
+        "candidate-000",
+        "candidate-001",
+        "candidate-002",
+        "candidate-003",
+        "candidate-004",
+        "candidate-005",
+        "candidate-006",
+        "candidate-007",
+        "candidate-599"
+      ],
+      "retention_categories": [
+        [
+          "DEF:GW1:EXPECTED",
+          2
+        ],
+        [
+          "DEF:GW1:UPSIDE",
+          1
+        ],
+        [
+          "DEF:GW1:VALUE",
+          1
+        ],
+        [
+          "DEF:GW2:EXPECTED",
+          2
+        ],
+        [
+          "DEF:GW2:UPSIDE",
+          1
+        ],
+        [
+          "DEF:GW2:VALUE",
+          1
+        ],
+        [
+          "DEF:GW3:EXPECTED",
+          2
+        ],
+        [
+          "DEF:GW3:UPSIDE",
+          1
+        ],
+        [
+          "DEF:GW3:VALUE",
+          1
+        ],
+        [
+          "DEF:HORIZON:EXPECTED",
+          2
+        ],
+        [
+          "DEF:HORIZON:VALUE",
+          1
+        ],
+        [
+          "FWD:GW1:EXPECTED",
+          2
+        ],
+        [
+          "FWD:GW1:UPSIDE",
+          1
+        ],
+        [
+          "FWD:GW1:VALUE",
+          1
+        ],
+        [
+          "FWD:GW2:EXPECTED",
+          2
+        ],
+        [
+          "FWD:GW2:UPSIDE",
+          1
+        ],
+        [
+          "FWD:GW2:VALUE",
+          1
+        ],
+        [
+          "FWD:GW3:EXPECTED",
+          2
+        ],
+        [
+          "FWD:GW3:UPSIDE",
+          1
+        ],
+        [
+          "FWD:GW3:VALUE",
+          1
+        ],
+        [
+          "FWD:HORIZON:EXPECTED",
+          2
+        ],
+        [
+          "FWD:HORIZON:VALUE",
+          1
+        ],
+        [
+          "GK:GW1:EXPECTED",
+          2
+        ],
+        [
+          "GK:GW1:UPSIDE",
+          1
+        ],
+        [
+          "GK:GW1:VALUE",
+          1
+        ],
+        [
+          "GK:GW2:EXPECTED",
+          2
+        ],
+        [
+          "GK:GW2:UPSIDE",
+          1
+        ],
+        [
+          "GK:GW2:VALUE",
+          1
+        ],
+        [
+          "GK:GW3:EXPECTED",
+          2
+        ],
+        [
+          "GK:GW3:UPSIDE",
+          1
+        ],
+        [
+          "GK:GW3:VALUE",
+          1
+        ],
+        [
+          "GK:HORIZON:EXPECTED",
+          2
+        ],
+        [
+          "GK:HORIZON:VALUE",
+          1
+        ],
+        [
+          "MID:GW1:EXPECTED",
+          2
+        ],
+        [
+          "MID:GW1:UPSIDE",
+          1
+        ],
+        [
+          "MID:GW1:VALUE",
+          1
+        ],
+        [
+          "MID:GW2:EXPECTED",
+          2
+        ],
+        [
+          "MID:GW2:UPSIDE",
+          1
+        ],
+        [
+          "MID:GW2:VALUE",
+          1
+        ],
+        [
+          "MID:GW3:EXPECTED",
+          2
+        ],
+        [
+          "MID:GW3:UPSIDE",
+          1
+        ],
+        [
+          "MID:GW3:VALUE",
+          1
+        ],
+        [
+          "MID:HORIZON:EXPECTED",
+          2
+        ],
+        [
+          "MID:HORIZON:VALUE",
+          1
+        ],
+        [
+          "ONE_GW_COUNTERFACTUAL_COMPATIBILITY",
+          8
+        ]
+      ],
+      "semantic_sha256": "57f6041ee6963bd17c2cb8941acde36d9048b7b0c9646fe860422a7206c32045"
+    },
+    "full_incoming": 600,
+    "screen_seconds": 0.010242699994705617
+  },
+  "large_search_measurements": {
+    "R4": {
+      "full_incoming": 600,
+      "post_dominance": 600,
+      "profile": {
+        "economically_equivalent_full_states": 774,
+        "fast_path_used": true,
+        "memo_hits": 774,
+        "memo_misses": 440,
+        "nodes": [
+          {
+            "action_combinations_considered": 31,
+            "action_enumeration_seconds": 0.029685800007428043,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 1,
+              "ft=1,transfers=1": 30
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 0,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 1,
+            "legal_actions_generated": 31,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 0,
+            "node_id": "root",
+            "pareto_candidates_retained": 1,
+            "pareto_seconds": 6.500000017695129e-05,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 31,
+            "states_entered": 1,
+            "states_solved": 1,
+            "tactical_evaluator_calls": 31,
+            "tactical_seconds": 0.0015367000014521182,
+            "transfer_count_distribution": {
+              "0": 1,
+              "1": 30
+            },
+            "transition_applications": 31,
+            "transition_seconds": 0.027370899988454767,
+            "unique_current_state_fingerprints": 1,
+            "unique_economic_state_fingerprints": 1,
+            "unique_resulting_active_squads": 31
+          },
+          {
+            "action_combinations_considered": 1183,
+            "action_enumeration_seconds": 1.2086191999842413,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 30,
+              "ft=1,transfers=1": 774,
+              "ft=2,transfers=0": 1,
+              "ft=2,transfers=1": 30,
+              "ft=2,transfers=2": 348
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 1,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 2,
+            "legal_actions_generated": 1183,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 31,
+            "node_id": "next",
+            "pareto_candidates_retained": 31,
+            "pareto_seconds": 0.0024358000664506108,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 1183,
+            "states_entered": 31,
+            "states_solved": 31,
+            "tactical_evaluator_calls": 1183,
+            "tactical_seconds": 0.030346600018674508,
+            "transfer_count_distribution": {
+              "0": 31,
+              "1": 804,
+              "2": 348
+            },
+            "transition_applications": 1183,
+            "transition_seconds": 1.11990920023527,
+            "unique_current_state_fingerprints": 31,
+            "unique_economic_state_fingerprints": 31,
+            "unique_resulting_active_squads": 379
+          },
+          {
+            "action_combinations_considered": 17491,
+            "action_enumeration_seconds": 18.33340510018752,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 378,
+              "ft=1,transfers=1": 8352,
+              "ft=2,transfers=0": 30,
+              "ft=2,transfers=1": 774,
+              "ft=2,transfers=2": 7578,
+              "ft=3,transfers=0": 1,
+              "ft=3,transfers=1": 30,
+              "ft=3,transfers=2": 348
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 2,
+            "economically_equivalent_full_states": 774,
+            "gameweek": 3,
+            "legal_actions_generated": 17491,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 774,
+            "memo_misses": 409,
+            "node_id": "last",
+            "pareto_candidates_retained": 409,
+            "pareto_seconds": 0.033062200105632655,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 17491,
+            "states_entered": 1183,
+            "states_solved": 409,
+            "tactical_evaluator_calls": 18265,
+            "tactical_seconds": 0.2968756980262697,
+            "transfer_count_distribution": {
+              "0": 409,
+              "1": 9156,
+              "2": 7926
+            },
+            "transition_applications": 18265,
+            "transition_seconds": 17.7943289999821,
+            "unique_current_state_fingerprints": 1183,
+            "unique_economic_state_fingerprints": 409,
+            "unique_resulting_active_squads": 2357
+          }
+        ]
+      },
+      "retained": 8,
+      "root_actions": 31,
+      "seconds": 25.98156139999628,
+      "tactical_unique_node_squads": 2767
+    },
+    "R5": {
+      "full_incoming": 600,
+      "post_dominance": 600,
+      "profile": {
+        "economically_equivalent_full_states": 954,
+        "fast_path_used": true,
+        "memo_hits": 954,
+        "memo_misses": 527,
+        "nodes": [
+          {
+            "action_combinations_considered": 34,
+            "action_enumeration_seconds": 0.03248140000505373,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 1,
+              "ft=1,transfers=1": 33
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 0,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 1,
+            "legal_actions_generated": 34,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 0,
+            "node_id": "root",
+            "pareto_candidates_retained": 1,
+            "pareto_seconds": 7.009999535512179e-05,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 34,
+            "states_entered": 1,
+            "states_solved": 1,
+            "tactical_evaluator_calls": 34,
+            "tactical_seconds": 0.0020071000035386533,
+            "transfer_count_distribution": {
+              "0": 1,
+              "1": 33
+            },
+            "transition_applications": 34,
+            "transition_seconds": 0.02995889999147039,
+            "unique_current_state_fingerprints": 1,
+            "unique_economic_state_fingerprints": 1,
+            "unique_resulting_active_squads": 34
+          },
+          {
+            "action_combinations_considered": 1447,
+            "action_enumeration_seconds": 1.4683407000266016,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 33,
+              "ft=1,transfers=1": 954,
+              "ft=2,transfers=0": 1,
+              "ft=2,transfers=1": 33,
+              "ft=2,transfers=2": 426
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 1,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 2,
+            "legal_actions_generated": 1447,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 34,
+            "node_id": "next",
+            "pareto_candidates_retained": 34,
+            "pareto_seconds": 0.0029802000208292156,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 1447,
+            "states_entered": 34,
+            "states_solved": 34,
+            "tactical_evaluator_calls": 1447,
+            "tactical_seconds": 0.04082259986898862,
+            "transfer_count_distribution": {
+              "0": 34,
+              "1": 987,
+              "2": 426
+            },
+            "transition_applications": 1447,
+            "transition_seconds": 1.362599299987778,
+            "unique_current_state_fingerprints": 34,
+            "unique_economic_state_fingerprints": 34,
+            "unique_resulting_active_squads": 460
+          },
+          {
+            "action_combinations_considered": 24100,
+            "action_enumeration_seconds": 25.021432199937408,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 459,
+              "ft=1,transfers=1": 11574,
+              "ft=2,transfers=0": 33,
+              "ft=2,transfers=1": 954,
+              "ft=2,transfers=2": 10620,
+              "ft=3,transfers=0": 1,
+              "ft=3,transfers=1": 33,
+              "ft=3,transfers=2": 426
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 2,
+            "economically_equivalent_full_states": 954,
+            "gameweek": 3,
+            "legal_actions_generated": 24100,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 954,
+            "memo_misses": 493,
+            "node_id": "last",
+            "pareto_candidates_retained": 493,
+            "pareto_seconds": 0.04967750013747718,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 24100,
+            "states_entered": 1447,
+            "states_solved": 493,
+            "tactical_evaluator_calls": 25054,
+            "tactical_seconds": 0.4098991001374088,
+            "transfer_count_distribution": {
+              "0": 493,
+              "1": 12561,
+              "2": 11046
+            },
+            "transition_applications": 25054,
+            "transition_seconds": 24.23905070082401,
+            "unique_current_state_fingerprints": 1447,
+            "unique_economic_state_fingerprints": 493,
+            "unique_resulting_active_squads": 3186
+          }
+        ]
+      },
+      "retained": 9,
+      "root_actions": 34,
+      "seconds": 34.83272059999581,
+      "tactical_unique_node_squads": 3680
+    }
+  },
+  "measurements": {
+    "R4": {
+      "full_incoming": 5,
+      "post_dominance": 5,
+      "profile": {
+        "economically_equivalent_full_states": 50,
+        "fast_path_used": true,
+        "memo_hits": 50,
+        "memo_misses": 42,
+        "nodes": [
+          {
+            "action_combinations_considered": 11,
+            "action_enumeration_seconds": 0.005429500000900589,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 1,
+              "ft=1,transfers=1": 10
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 0,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 1,
+            "legal_actions_generated": 11,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 0,
+            "node_id": "root",
+            "pareto_candidates_retained": 1,
+            "pareto_seconds": 1.8699996871873736e-05,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 11,
+            "states_entered": 1,
+            "states_solved": 1,
+            "tactical_evaluator_calls": 11,
+            "tactical_seconds": 0.00042159999429713935,
+            "transfer_count_distribution": {
+              "0": 1,
+              "1": 10
+            },
+            "transition_applications": 11,
+            "transition_seconds": 0.004775499997776933,
+            "unique_current_state_fingerprints": 1,
+            "unique_economic_state_fingerprints": 1,
+            "unique_resulting_active_squads": 11
+          },
+          {
+            "action_combinations_considered": 81,
+            "action_enumeration_seconds": 0.04504130000714213,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 10,
+              "ft=1,transfers=1": 50,
+              "ft=2,transfers=0": 1,
+              "ft=2,transfers=1": 10,
+              "ft=2,transfers=2": 10
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 1,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 2,
+            "legal_actions_generated": 81,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 11,
+            "node_id": "next",
+            "pareto_candidates_retained": 11,
+            "pareto_seconds": 0.00011789999553002417,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 81,
+            "states_entered": 11,
+            "states_solved": 11,
+            "tactical_evaluator_calls": 81,
+            "tactical_seconds": 0.001220100064529106,
+            "transfer_count_distribution": {
+              "0": 11,
+              "1": 60,
+              "2": 10
+            },
+            "transition_applications": 81,
+            "transition_seconds": 0.03966399992350489,
+            "unique_current_state_fingerprints": 11,
+            "unique_economic_state_fingerprints": 11,
+            "unique_resulting_active_squads": 21
+          },
+          {
+            "action_combinations_considered": 151,
+            "action_enumeration_seconds": 0.08535779995145276,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 20,
+              "ft=1,transfers=1": 50,
+              "ft=2,transfers=0": 10,
+              "ft=2,transfers=1": 50,
+              "ft=3,transfers=0": 1,
+              "ft=3,transfers=1": 10,
+              "ft=3,transfers=2": 10
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 2,
+            "economically_equivalent_full_states": 50,
+            "gameweek": 3,
+            "legal_actions_generated": 151,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 50,
+            "memo_misses": 31,
+            "node_id": "last",
+            "pareto_candidates_retained": 31,
+            "pareto_seconds": 0.0003639000206021592,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 151,
+            "states_entered": 81,
+            "states_solved": 31,
+            "tactical_evaluator_calls": 201,
+            "tactical_seconds": 0.0022356999543262646,
+            "transfer_count_distribution": {
+              "0": 31,
+              "1": 110,
+              "2": 10
+            },
+            "transition_applications": 201,
+            "transition_seconds": 0.0975955000903923,
+            "unique_current_state_fingerprints": 81,
+            "unique_economic_state_fingerprints": 31,
+            "unique_resulting_active_squads": 21
+          }
+        ]
+      },
+      "retained": 2,
+      "root_actions": 11,
+      "seconds": 0.23756890000368003,
+      "tactical_unique_node_squads": 53
+    },
+    "R5": {
+      "full_incoming": 5,
+      "post_dominance": 5,
+      "profile": {
+        "economically_equivalent_full_states": 300,
+        "fast_path_used": true,
+        "memo_hits": 300,
+        "memo_misses": 122,
+        "nodes": [
+          {
+            "action_combinations_considered": 21,
+            "action_enumeration_seconds": 0.010796500006108545,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 1,
+              "ft=1,transfers=1": 20
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 0,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 1,
+            "legal_actions_generated": 21,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 0,
+            "node_id": "root",
+            "pareto_candidates_retained": 1,
+            "pareto_seconds": 2.5200002710334957e-05,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 21,
+            "states_entered": 1,
+            "states_solved": 1,
+            "tactical_evaluator_calls": 21,
+            "tactical_seconds": 0.0006861999863758683,
+            "transfer_count_distribution": {
+              "0": 1,
+              "1": 20
+            },
+            "transition_applications": 21,
+            "transition_seconds": 0.009869599976809695,
+            "unique_current_state_fingerprints": 1,
+            "unique_economic_state_fingerprints": 1,
+            "unique_resulting_active_squads": 21
+          },
+          {
+            "action_combinations_considered": 401,
+            "action_enumeration_seconds": 0.18384229997172952,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 20,
+              "ft=1,transfers=1": 300,
+              "ft=2,transfers=0": 1,
+              "ft=2,transfers=1": 20,
+              "ft=2,transfers=2": 60
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 1,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 2,
+            "legal_actions_generated": 401,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 21,
+            "node_id": "next",
+            "pareto_candidates_retained": 21,
+            "pareto_seconds": 0.00046299994573928416,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 401,
+            "states_entered": 21,
+            "states_solved": 21,
+            "tactical_evaluator_calls": 401,
+            "tactical_seconds": 0.0051142999145668,
+            "transfer_count_distribution": {
+              "0": 21,
+              "1": 320,
+              "2": 60
+            },
+            "transition_applications": 401,
+            "transition_seconds": 0.1681862999976147,
+            "unique_current_state_fingerprints": 21,
+            "unique_economic_state_fingerprints": 21,
+            "unique_resulting_active_squads": 81
+          },
+          {
+            "action_combinations_considered": 1981,
+            "action_enumeration_seconds": 1.0674202999507543,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 80,
+              "ft=1,transfers=1": 900,
+              "ft=2,transfers=0": 20,
+              "ft=2,transfers=1": 300,
+              "ft=2,transfers=2": 600,
+              "ft=3,transfers=0": 1,
+              "ft=3,transfers=1": 20,
+              "ft=3,transfers=2": 60
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 2,
+            "economically_equivalent_full_states": 300,
+            "gameweek": 3,
+            "legal_actions_generated": 1981,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 300,
+            "memo_misses": 101,
+            "node_id": "last",
+            "pareto_candidates_retained": 101,
+            "pareto_seconds": 0.0027874001243617386,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 1981,
+            "states_entered": 401,
+            "states_solved": 101,
+            "tactical_evaluator_calls": 2281,
+            "tactical_seconds": 0.019418799434788525,
+            "transfer_count_distribution": {
+              "0": 101,
+              "1": 1220,
+              "2": 660
+            },
+            "transition_applications": 2281,
+            "transition_seconds": 1.0986253005685285,
+            "unique_current_state_fingerprints": 401,
+            "unique_economic_state_fingerprints": 101,
+            "unique_resulting_active_squads": 121
+          }
+        ]
+      },
+      "retained": 4,
+      "root_actions": 21,
+      "seconds": 1.8387910000019474,
+      "tactical_unique_node_squads": 223
+    },
+    "R5_GENERIC": {
+      "full_incoming": 5,
+      "post_dominance": 5,
+      "profile": {
+        "economically_equivalent_full_states": 300,
+        "fast_path_used": false,
+        "memo_hits": 0,
+        "memo_misses": 422,
+        "nodes": [
+          {
+            "action_combinations_considered": 21,
+            "action_enumeration_seconds": 0.008711999995284714,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 1,
+              "ft=1,transfers=1": 20
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 0,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 1,
+            "legal_actions_generated": 21,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 0,
+            "node_id": "root",
+            "pareto_candidates_retained": 1,
+            "pareto_seconds": 4.850000550504774e-05,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 21,
+            "states_entered": 1,
+            "states_solved": 1,
+            "tactical_evaluator_calls": 21,
+            "tactical_seconds": 0.0015029999922262505,
+            "transfer_count_distribution": {
+              "0": 1,
+              "1": 20
+            },
+            "transition_applications": 42,
+            "transition_seconds": 0.02264789998298511,
+            "unique_current_state_fingerprints": 1,
+            "unique_economic_state_fingerprints": 1,
+            "unique_resulting_active_squads": 21
+          },
+          {
+            "action_combinations_considered": 401,
+            "action_enumeration_seconds": 0.2551727000391111,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 20,
+              "ft=1,transfers=1": 300,
+              "ft=2,transfers=0": 1,
+              "ft=2,transfers=1": 20,
+              "ft=2,transfers=2": 60
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 1,
+            "economically_equivalent_full_states": 0,
+            "gameweek": 2,
+            "legal_actions_generated": 401,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 21,
+            "node_id": "next",
+            "pareto_candidates_retained": 21,
+            "pareto_seconds": 0.0006448000349337235,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 401,
+            "states_entered": 21,
+            "states_solved": 21,
+            "tactical_evaluator_calls": 401,
+            "tactical_seconds": 0.006841299822553992,
+            "transfer_count_distribution": {
+              "0": 21,
+              "1": 320,
+              "2": 60
+            },
+            "transition_applications": 802,
+            "transition_seconds": 0.4949069997819606,
+            "unique_current_state_fingerprints": 21,
+            "unique_economic_state_fingerprints": 21,
+            "unique_resulting_active_squads": 81
+          },
+          {
+            "action_combinations_considered": 6181,
+            "action_enumeration_seconds": 4.034582800071803,
+            "actions_by_free_transfers": {
+              "ft=1,transfers=0": 360,
+              "ft=1,transfers=1": 3900,
+              "ft=2,transfers=0": 40,
+              "ft=2,transfers=1": 600,
+              "ft=2,transfers=2": 1200,
+              "ft=3,transfers=0": 1,
+              "ft=3,transfers=1": 20,
+              "ft=3,transfers=2": 60
+            },
+            "closed_history_only_duplicates": 0,
+            "depth": 2,
+            "economically_equivalent_full_states": 300,
+            "gameweek": 3,
+            "legal_actions_generated": 6181,
+            "legality_precheck_rejections": 0,
+            "memo_hits": 0,
+            "memo_misses": 401,
+            "node_id": "last",
+            "pareto_candidates_retained": 401,
+            "pareto_seconds": 0.012952299992321059,
+            "peak_retained_frontier": 1,
+            "policy_candidates_generated": 6181,
+            "states_entered": 401,
+            "states_solved": 401,
+            "tactical_evaluator_calls": 6181,
+            "tactical_seconds": 0.052062099683098495,
+            "transfer_count_distribution": {
+              "0": 401,
+              "1": 4520,
+              "2": 1260
+            },
+            "transition_applications": 12362,
+            "transition_seconds": 7.709547400692827,
+            "unique_current_state_fingerprints": 401,
+            "unique_economic_state_fingerprints": 101,
+            "unique_resulting_active_squads": 121
+          }
+        ]
+      },
+      "retained": 4,
+      "root_actions": 21,
+      "seconds": 9.579354499990586,
+      "tactical_unique_node_squads": 223
+    }
+  },
+  "runtime_claim": "SYNTHETIC_TACTICAL_EVALUATOR_NOT_LIVE_STAGE10_TIMING",
+  "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY"
+}

@@ -167,7 +167,10 @@ class PrivateV1RollingExecutionInput(_RollingModel):
     terminal_policy_sha256: Sha256
     future_price_mode: Literal["FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1"]
     scenario_tree_mode: Literal["DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1"]
-    search_scope_mode: Literal["PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1"]
+    search_scope_mode: Literal[
+        "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1",
+        "PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2",
+    ]
     transfer_count_scope_source: Literal[
         "CURRENT_FT_COMPILED_RULES_AND_TICKET_BOUNDED_SEARCH_POLICY"
     ]
@@ -476,7 +479,9 @@ class PrivateV1RollingDecision(_RollingModel):
     terminal_value_mode: Literal["THREE_GAMEWEEK_ZERO_TERMINAL_VALUE_AFTER_HORIZON"]
     future_price_mode: Literal["FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1"]
     scenario_tree_mode: Literal["DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1"]
-    search_scope_mode: Literal["PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1"]
+    search_scope_mode: Literal[
+        "PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2", "EXPLICIT_DECLARED_ACTION_SPACE"
+    ]
     transfer_count_scope_source: Literal[
         "CURRENT_FT_COMPILED_RULES_AND_TICKET_BOUNDED_SEARCH_POLICY"
     ]

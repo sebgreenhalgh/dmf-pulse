@@ -42,7 +42,15 @@ def test_automatic_root_cap_and_shortlist_remain_unchanged_when_future_scope_is_
     )
     assert rolling.search_policy.transfer_action_scope.root_maximum_transfers == 1
     assert rolling.search_policy.transfer_action_scope.continuation_mode == "FREE_TRANSFERS_ONLY"
-    assert one_scope == rolling_scope
+    from dataclasses import replace
+
+    assert rolling_scope.pruning_policy == "PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2"
+    assert rolling_scope.horizon_screen is not None
+    assert one_scope == replace(
+        rolling_scope, pruning_policy=one_scope.pruning_policy, horizon_screen=None
+    )
+    assert rolling_scope.horizon_screen.horizon_gameweeks == (1, 2, 3)
+    assert any("HORIZON_CANDIDATE_SCREEN_SHA256:" in item for item in rolling.assumptions)
     assert all(
         node.allowed_transfer_in_ids == one.scenario_tree.root.allowed_transfer_in_ids
         for node in rolling.scenario_tree.nodes
@@ -64,3 +72,21 @@ def test_automatic_root_cap_and_shortlist_remain_unchanged_when_future_scope_is_
     )
     type(ft_decision).model_validate_json(ft_decision.model_dump_json())
     assert "Future transfer scope: FREE_TRANSFERS_ONLY" in render_rolling_report(ft_decision)
+    from dmf_pulse.private_v1.rolling_models import seal_rolling_execution_input
+
+    automatic = seal_rolling_execution_input(
+        type(execution).model_construct(
+            **{
+                **{name: getattr(execution, name) for name in type(execution).model_fields},
+                "current_execution": current,
+            }
+        )
+    )
+    automatic_run = PrivateV1RollingRecommendationService().run(automatic)
+    assert "PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2" in automatic_run.report
+    assert "Screening: HORIZON_AWARE" in automatic_run.report
+    assert "Certified horizon-dominated: 0" in automatic_run.report
+    assert "Candidate horizon: GW1,GW2,GW3" in automatic_run.report
+    assert "Retention categories (overlapping):" in automatic_run.report
+    assert "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1" not in automatic_run.report
+    assert automatic_run.optimiser_result.root_action_counterfactual_plan is not None

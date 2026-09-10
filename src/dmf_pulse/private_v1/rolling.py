@@ -514,6 +514,7 @@ def render_rolling_report(
         f"Price path: {decision.future_price_mode}",
         f"Scenario tree: {decision.scenario_tree_mode}",
         f"Search: {decision.search_scope_mode}",
+        f"Candidate scope: {decision.action_space_disclosure}",
         f"Transfer-count scope source: {decision.transfer_count_scope_source}",
         f"Root maximum transfers: {decision.maximum_transfers_per_deadline}",
         f"Future transfer scope: {decision.continuation_transfer_mode}",
@@ -752,6 +753,7 @@ class PrivateV1RollingRecommendationService:
             future_gameweeks=projection_tuple[1:],
         )
         tactical.progress_message = active_progress.message
+        active_progress.message(_action_space_disclosure(scope))
         record("action_generation", started)
         started = perf_counter()
         with active_progress.stage(
@@ -849,7 +851,7 @@ class PrivateV1RollingRecommendationService:
         }
         action_space_disclosure = (
             _action_space_disclosure(scope)
-            + " Three-Gameweek mode reuses that current-cutoff shortlist at every declared "
+            + " Three-Gameweek mode reuses this declared current-cutoff candidate union at every "
             "future node; exactness is only within this bounded action space."
         )
         started = perf_counter()
@@ -903,7 +905,7 @@ class PrivateV1RollingRecommendationService:
             "DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1",
             "INDEPENDENT_GAMEWEEK_SCENARIO_PRODUCT_NO_INFORMATION_REVELATION_V1",
             "CROSS_GAMEWEEK_READINESS_AND_INJURY_TRANSITIONS_NOT_MODELLED",
-            execution.search_scope_mode,
+            scope.pruning_policy or "EXPLICIT_DECLARED_ACTION_SPACE",
             *optimiser.warnings,
             *(
                 warning
@@ -930,7 +932,7 @@ class PrivateV1RollingRecommendationService:
             terminal_value_mode=execution.terminal_value_mode,
             future_price_mode=execution.future_price_mode,
             scenario_tree_mode=execution.scenario_tree_mode,
-            search_scope_mode=execution.search_scope_mode,
+            search_scope_mode=scope.pruning_policy or "EXPLICIT_DECLARED_ACTION_SPACE",
             transfer_count_scope_source=execution.transfer_count_scope_source,
             maximum_transfers_per_deadline=execution.maximum_transfers_per_deadline,
             continuation_maximum_transfers=request.search_policy.max_transfers_per_node,

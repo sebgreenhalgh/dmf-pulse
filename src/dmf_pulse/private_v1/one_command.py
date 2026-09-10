@@ -719,7 +719,7 @@ class PrivateV1OneCommandService:
                         terminal_policy_sha256=terminal.policy_sha256,
                         future_price_mode=("FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1"),
                         scenario_tree_mode=("DETERMINISTIC_NO_NEW_INFORMATION_REVELATION_V1"),
-                        search_scope_mode="PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1",
+                        search_scope_mode="PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2",
                         transfer_count_scope_source=(
                             "CURRENT_FT_COMPILED_RULES_AND_TICKET_BOUNDED_SEARCH_POLICY"
                         ),

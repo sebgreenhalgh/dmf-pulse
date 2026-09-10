@@ -1,5 +1,23 @@
 # DMF Pulse execution plans
 
+## PRIVATE-V1-ONE-COMMAND-001N-R5
+
+- Exact parent `56a0776e8e13bfae31297b6b40f631361e1fce95`; CI `34259589435`, all 12 jobs
+  verified successful before implementation. Isolated R5 worktree preserves unrelated edits.
+- Confirmed root-only metric screening and pointwise dominance are reused at all horizon nodes.
+- Authority: A10/A11/B2, DMFP-12 candidate pruning/runtime/disclosure and FT recourse, DMFP-20
+  ADR-OPT-001 through 006; preserve one-GW 001K and R2/R4 exactness contracts.
+- RED tests first: future value, false dominance, ties/cap, one-GW compatibility, reduced
+  exhaustive oracle with budget/club/FT interactions, and exact accelerated/generic equality.
+- Prefer one horizon union at all nodes, explicit V2 metrics and hash-bound aggregate audit.
+  Keep the legacy one-GW shortlist available for its actual-action counterfactual.
+- Horizon dominance must be conservative: pointwise substitution alone does not prove safe
+  removal when both players can be owned during the horizon. Do not emit false certificates.
+- Profile screen and exact search before deciding the versioned STANDARD bound; preserve full
+  boundary ties and fail closed on scope/resource overflow, never truncate by identifier.
+- Run all acceptance, frozen build/wheel, coverage, security and manifests; publish one SHA and
+  wait for full exact-SHA CI. Optional live only with existing runtime inputs. No next ticket.
+
 # PRIVATE-V1-ONE-COMMAND-001N-R4
 
 - Parent: `47215656bac92d0ef72077b79e179a8c001915bc`; full CI `34251969815` passed.

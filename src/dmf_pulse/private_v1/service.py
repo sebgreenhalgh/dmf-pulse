@@ -177,9 +177,28 @@ class PrivateTransferSearchScope:
     exact_tactical_squads: int
     certified_dominated_candidates: int
     pruning_policy: str | None
+    horizon_screen: HorizonCandidateScreen | None = None
 
 
 def _action_space_disclosure(scope: PrivateTransferSearchScope) -> str:
+    if scope.horizon_screen is not None:
+        screen = scope.horizon_screen
+        return (
+            f"Screening: HORIZON_AWARE; Search: {screen.policy}; "
+            f"Full selectable incoming: {scope.full_incoming_count}; "
+            f"Certified horizon-dominated: {screen.certified_dominated_candidates}; "
+            f"Post-dominance incoming: {scope.full_incoming_count}; "
+            f"Retained horizon candidates: {len(screen.retained_incoming_ids)}; "
+            f"Candidate horizon: {','.join(f'GW{gw}' for gw in screen.horizon_gameweeks)}; "
+            f"STANDARD retained bound: {screen.maximum_retained}; "
+            "Dominance: CONSERVATIVE_NO_HORIZON_REMOVALS; "
+            "Retention categories (overlapping): "
+            + ", ".join(f"{reason}={count}" for reason, count in screen.retention_categories)
+            + f"; screen SHA256: {screen.semantic_sha256}; "
+            f"root transfer counts: {scope.transfer_counts_considered}; "
+            f"root one/two-transfer actions: {scope.one_transfer_actions}/{scope.two_transfer_actions}; "
+            "EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE."
+        )
     return (
         "Exact tactical optimum within the declared bounded transfer candidate set: "
         f"{len(scope.retained_incoming_ids)} retained incoming candidate(s) "
@@ -339,6 +358,124 @@ def _bounded_private_incoming_ids(
             "metric-boundary ties exceed the governed private STANDARD candidate limit",
         )
     return tuple(sorted(retained)), len(dominated)
+
+
+PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2 = "PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2"
+_PRIVATE_HORIZON_STANDARD_MAX_RETAINED_INCOMING = 24
+
+
+@dataclass(frozen=True)
+class HorizonCandidateScreen:
+    """Hash-bound heuristic union, never a claim of global FPL optimality."""
+
+    retained_incoming_ids: tuple[str, ...]
+    horizon_gameweeks: tuple[int, ...]
+    retention_categories: tuple[tuple[str, int], ...]
+    semantic_sha256: str
+    certified_dominated_candidates: int = 0
+    policy: str = PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2
+    maximum_retained: int = _PRIVATE_HORIZON_STANDARD_MAX_RETAINED_INCOMING
+
+
+def _horizon_private_incoming_ids(
+    player_ids: tuple[str, ...],
+    *,
+    catalog: dict[str, PlayerCatalogEntry],
+    prices: dict[str, PlayerPriceState],
+    gameweeks: tuple[GameweekProjectionResult, ...],
+    maximum_transfers: int,
+) -> HorizonCandidateScreen:
+    """Union per-GW and additive horizon metrics within the versioned STANDARD budget.
+
+    No horizon dominance removals: even pointwise, same-club, equal-appearance superiority
+    does not prove substitution when both players can be owned or exchanged along a route.
+    All current squad members remain outside this incoming-only screen.
+    """
+
+    ids = tuple(sorted(set(player_ids)))
+    horizon = tuple(int(g.scenario_set.gameweek_id.removeprefix("GW-")) for g in gameweeks)
+    if len(horizon) != 3 or horizon != tuple(range(horizon[0], horizon[0] + 3)):
+        raise PrivateV1Error(
+            "HORIZON_SCREEN_INPUT_INVALID", "three consecutive projections required"
+        )
+    if any(g.result_sha256 is None for g in gameweeks):
+        raise PrivateV1Error("HORIZON_SCREEN_INPUT_INVALID", "sealed projection hashes required")
+    buckets: dict[str, set[str]] = {}
+    legacy, _ = _bounded_private_incoming_ids(
+        ids,
+        catalog=catalog,
+        prices=prices,
+        gameweek=gameweeks[0],
+        maximum_transfers=maximum_transfers,
+    )
+    buckets["ONE_GW_COUNTERFACTUAL_COMPATIBILITY"] = set(legacy)
+    for position in PlayerPosition:
+        members = tuple(p for p in ids if catalog[p].position == position)
+        if len(members) <= 4:
+            buckets[f"{position.value}:SMALL_UNIVERSE"] = set(members)
+            continue
+        if len({prices[p].current_price_tenths for p in members}) > 1:
+            buckets[f"{position.value}:PRICE_ROUTE"] = _ranked_with_boundary_ties(
+                members, limit=1, score=lambda p: -Decimal(prices[p].current_price_tenths)
+            )
+        aggregate = {p: Decimal(0) for p in members}
+        with localcontext(Context(prec=28, rounding=ROUND_HALF_EVEN)):
+            for gw, projection in zip(horizon, gameweeks, strict=True):
+                means = {
+                    p: Decimal(str(projection.player_summaries[p].expected_points)) for p in members
+                }
+                upsides = {
+                    p: means[p]
+                    + Decimal(str(projection.player_summaries[p].points_standard_deviation))
+                    for p in members
+                }
+                values = {
+                    p: means[p] / Decimal(max(prices[p].current_price_tenths, 1)) for p in members
+                }
+                for p in members:
+                    aggregate[p] += means[p]
+                for metric, limit, scores in (
+                    ("EXPECTED", 2, means),
+                    ("UPSIDE", 1, upsides),
+                    ("VALUE", 1, values),
+                ):
+                    buckets[f"{position.value}:GW{gw}:{metric}"] = _ranked_with_boundary_ties(
+                        members, limit=limit, score=scores.__getitem__
+                    )
+            horizon_values = {
+                p: aggregate[p] / Decimal(max(prices[p].current_price_tenths, 1)) for p in members
+            }
+            for metric, limit, scores in (("EXPECTED", 2, aggregate), ("VALUE", 1, horizon_values)):
+                buckets[f"{position.value}:HORIZON:{metric}"] = _ranked_with_boundary_ties(
+                    members, limit=limit, score=scores.__getitem__
+                )
+    retained = tuple(sorted(set().union(*buckets.values())))
+    if len(retained) > _PRIVATE_HORIZON_STANDARD_MAX_RETAINED_INCOMING:
+        raise PrivateV1Error(
+            "PRIVATE_HORIZON_TRANSFER_SCREEN_UNBOUNDED",
+            f"complete horizon metric union ({len(retained)}) exceeds V2 STANDARD retained "
+            f"bound ({_PRIVATE_HORIZON_STANDARD_MAX_RETAINED_INCOMING}); no tie or bucket was truncated",
+        )
+    digest = canonical_sha256(
+        {
+            "policy": PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V2,
+            "maximum_retained": _PRIVATE_HORIZON_STANDARD_MAX_RETAINED_INCOMING,
+            "root_maximum_transfers": maximum_transfers,
+            "horizon": horizon,
+            "projections": tuple(g.result_sha256 for g in gameweeks),
+            "catalog": {p: catalog[p].model_dump(mode="json") for p in ids},
+            "prices": {p: prices[p].model_dump(mode="json") for p in ids},
+            "buckets": {name: tuple(sorted(values)) for name, values in sorted(buckets.items())},
+            "retained": retained,
+            "dominance": "CONSERVATIVE_NO_HORIZON_REMOVALS",
+        }
+    )
+    return HorizonCandidateScreen(
+        retained_incoming_ids=retained,
+        horizon_gameweeks=horizon,
+        retention_categories=tuple((name, len(values)) for name, values in sorted(buckets.items())),
+        semantic_sha256=digest,
+    )
 
 
 def _uses_model_stage7(value: PrivateV1ExecutionInput) -> bool:
@@ -1147,8 +1284,19 @@ def _stage11_request(
         else None
     )
     certified_dominated = 0
+    horizon_screen = None
     allowed = full_allowed
-    if pruning_policy is not None:
+    if pruning_policy is not None and future_gameweeks:
+        horizon_screen = _horizon_private_incoming_ids(
+            full_allowed,
+            catalog={item.player_id: item for item in catalog},
+            prices=prices,
+            gameweeks=(gameweek, *future_gameweeks),
+            maximum_transfers=declared_transfer_limit,
+        )
+        allowed = horizon_screen.retained_incoming_ids
+        pruning_policy = horizon_screen.policy
+    elif pruning_policy is not None:
         allowed, certified_dominated = _bounded_private_incoming_ids(
             full_allowed,
             catalog={item.player_id: item for item in catalog},
@@ -1281,7 +1429,7 @@ def _stage11_request(
                             else "PRIVATE_MANUAL_TRANSIENT_STAGE7_NOT_MODEL_DERIVED"
                         ),
                         (
-                            PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1
+                            pruning_policy
                             if pruning_policy is not None
                             else "TRANSFER_SCOPE_EXPLICIT_OPERATOR_DECLARATION"
                         ),
@@ -1289,6 +1437,13 @@ def _stage11_request(
                             "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE"
                             if not future_gameweeks
                             else "EXPECTED_THREE_GAMEWEEK_POINTS_WITH_LEGAL_RECOURSE"
+                        ),
+                        *(
+                            ()
+                            if horizon_screen is None
+                            else (
+                                f"HORIZON_CANDIDATE_SCREEN_SHA256:{horizon_screen.semantic_sha256}",
+                            )
                         ),
                         *(
                             ()
@@ -1348,6 +1503,7 @@ def _stage11_request(
         exact_tactical_squads=len(squad_signatures),
         certified_dominated_candidates=certified_dominated,
         pruning_policy=pruning_policy,
+        horizon_screen=horizon_screen,
     )
     memoized = _MemoizedStage10Evaluator(
         tactical,

@@ -1,0 +1,18 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R5"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Horizon-aware candidate screening with exact bounded recourse"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R5-horizon-candidate-scope"
+required_base_commit: "56a0776e8e13bfae31297b6b40f631361e1fce95"
+authority_scopes:
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW"
+objective: >-
+  Permit current and future transfer choices motivated by every active horizon projection,
+  with an explicit bounded metric union and conservative horizon dominance certification.
+exclusions:
+  - "One-GW screen changes, provider acquisition, Stage 7/8/9 modelling, chips, prices and rank"
+  - "Approximate Stage 10, incomplete exactness claims, PR, merge, tag or activation"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"
