@@ -1521,7 +1521,10 @@ def deterministic_linear_fast_path_eligible(
     root = nodes[0]
     if any(
         item.prices != root.prices
-        or item.allowed_transfer_in_ids != root.allowed_transfer_in_ids
+        or (
+            item.allowed_transfer_in_ids != root.allowed_transfer_in_ids
+            and "SEALED_NODE_SPECIFIC_CANDIDATE_SCOPE_V1" not in request.assumptions
+        )
         or item.transition_event != root.transition_event
         for item in nodes[1:]
     ):
@@ -1554,6 +1557,8 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
         return True
 
     def _memo_key(self, node_id: str, state: ManagerState) -> tuple[str, str]:
+        # R6: node ID is part of the key and fixes that node's sealed candidate set.
+        # Equal economics are reused only at the same node, never across node scopes.
         return node_id, continuation_state_fingerprint(state)
 
     def _prepare_tactical_batch(

@@ -747,11 +747,39 @@ class PrivateV1RollingRecommendationService:
             raise PrivateV1Error("ROLLING_HORIZON_INCOMPLETE", "three projections are required")
         projection_tuple = (projections[0], projections[1], projections[2])
         started = perf_counter()
+        with active_progress.stage(
+            started="Actual one-GW comparator solving...",
+            completed="Actual one-GW comparator ready",
+            failed="actual one-GW comparator",
+            heartbeat="Actual one-GW comparator still running",
+        ):
+            one_request, one_tactical, _one_candidates, _one_scope = _stage11_request(
+                current, projection_tuple[0]
+            )
+            one_tactical.progress_message = active_progress.message
+            one_tactical.precompute()
+            one_gameweek = optimise_multi_gameweek(one_request, evaluator=one_tactical)
+            if one_gameweek.recommended_plan is None or (
+                one_gameweek.status is not MultiGameweekResultStatus.SUCCESS
+            ):
+                raise PrivateV1Error(
+                    one_gameweek.error_code or "ONE_GAMEWEEK_COMPARATOR_BLOCKED",
+                    "accepted one-GW comparator could not be reproduced",
+                )
+        record("one_gameweek_comparator", started)
+        started = perf_counter()
         request, tactical, candidates, scope = _stage11_request(
             current,
             projection_tuple[0],
             future_gameweeks=projection_tuple[1:],
+            protected_incoming_ids=one_gameweek.recommended_plan.current_action.action.transfers_in,
         )
+        # Both requests use the identical root projection, catalog and tactical policy.
+        # Reuse its squad-only cache while adding the future-node scenario adapter.
+        one_tactical.delegate = tactical.delegate
+        one_tactical.prepared_node = tactical.prepared_node
+        one_tactical.prepared_squads = tactical.prepared_squads
+        tactical = one_tactical
         tactical.progress_message = active_progress.message
         active_progress.message(_action_space_disclosure(scope))
         record("action_generation", started)
@@ -764,17 +792,6 @@ class PrivateV1RollingRecommendationService:
         ):
             tactical.precompute()
         record("tactical_batch_evaluation", started)
-        one_request, _unused, _one_candidates, _one_scope = _stage11_request(
-            current, projection_tuple[0]
-        )
-        one_gameweek = optimise_multi_gameweek(one_request, evaluator=tactical)
-        if one_gameweek.recommended_plan is None or (
-            one_gameweek.status is not MultiGameweekResultStatus.SUCCESS
-        ):
-            raise PrivateV1Error(
-                one_gameweek.error_code or "ONE_GAMEWEEK_COMPARATOR_BLOCKED",
-                "accepted one-GW comparator could not be reproduced",
-            )
         started = perf_counter()
         with active_progress.stage(
             started="Stage-11 three-GW policy solving...",
@@ -851,7 +868,7 @@ class PrivateV1RollingRecommendationService:
         }
         action_space_disclosure = (
             _action_space_disclosure(scope)
-            + " Three-Gameweek mode reuses this declared current-cutoff candidate union at every "
+            + " Three-Gameweek mode uses declared current-cutoff candidate scope at each "
             "future node; exactness is only within this bounded action space."
         )
         started = perf_counter()

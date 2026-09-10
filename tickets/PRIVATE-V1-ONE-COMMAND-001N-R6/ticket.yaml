@@ -1,0 +1,18 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R6"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Bounded node-specific horizon candidate scope"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R6-bounded-horizon-candidate-search"
+required_base_commit: "9c02ed86bf181c0a7e75c5983f08d23fe8824dc9"
+authority_scopes:
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW"
+objective: >-
+  Resolve synthetic live-shaped V2 115-candidate pressure with finite, objective/economic
+  node-specific scopes, complete final metric ties and exact retained-space recourse.
+exclusions:
+  - "One-GW recommendation semantics, provider acquisition and Stage 7/8/9 model changes"
+  - "Chips, rank, future prices/markets, terminal/objective changes, PR, merge, tag or activation"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

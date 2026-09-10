@@ -2009,3 +2009,17 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   manifests without private identifiers or provider bodies.
 - [ ] Commit and push one exact final SHA, require exact-SHA CI green, then attempt the literal
   private 3-GW retry only if all runtime inputs already exist in the operator environment.
+# PRIVATE-V1-ONE-COMMAND-001N-R6 bounded horizon candidate search
+
+- Immutable parent: `9c02ed86bf181c0a7e75c5983f08d23fe8824dc9`; CI `34483828704`,
+  all 12 jobs verified successful. Isolated `review_pack/one-command-n-r6` worktree.
+- Authority: A10/A11/B2; ADR-PROD-002, ADR-OPT-001..005 and ADR-UNC-005/007;
+  DMFP-12 sections 25, 26 and 38. Preserve explicit heuristic/escape-candidate labels.
+- [x] Verify parent and inspect V2 full bucket union then retained-count guard.
+- [x] Profile V2 bucket/tie/overlap pressure on synthetic live-shaped universes.
+- [x] Write RED capacity, node-scope, tie, comparator and oracle tests.
+- [x] Implement measured V3 remaining-horizon scope, protected actual one-GW action,
+  hash-bound budgets and safe aggregate diagnostics; retain exact solver/model semantics.
+- [x] Benchmark pressure/near-limit/FT2 cases, run local acceptance gates and regenerate manifests.
+- [ ] Commit/push exact SHA and require complete exact-SHA CI. Optional live retry only
+  with already-present runtime inputs; no PR, merge, tag, activation or next ticket.

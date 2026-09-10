@@ -121,6 +121,10 @@ from dmf_pulse.private_v1.automatic_inputs import (
     PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1,
 )
 from dmf_pulse.private_v1.errors import PrivateV1Error
+from dmf_pulse.private_v1.horizon_candidates import (
+    BoundedHorizonScreen,
+    bounded_horizon_screen,
+)
 from dmf_pulse.private_v1.models import (
     PrivateDecisionLineage,
     PrivateDecisionStatus,
@@ -178,9 +182,34 @@ class PrivateTransferSearchScope:
     certified_dominated_candidates: int
     pruning_policy: str | None
     horizon_screen: HorizonCandidateScreen | None = None
+    bounded_screen: BoundedHorizonScreen | None = None
 
 
 def _action_space_disclosure(scope: PrivateTransferSearchScope) -> str:
+    if scope.bounded_screen is not None:
+        screen_v3 = scope.bounded_screen
+        return (
+            f"Screening: HORIZON_AWARE; Search: {screen_v3.policy}; "
+            f"Full selectable incoming: {scope.full_incoming_count}; "
+            "Certified horizon-dominated: 0; Equivalence compressed: 0; "
+            f"STANDARD per-node retained bound: {screen_v3.maximum_retained}; "
+            f"action-combination budget per state: {screen_v3.maximum_action_combinations}; "
+            + " | ".join(
+                f"Candidate node: GW{node.horizon_gameweeks[0]}; "
+                f"Candidate horizon: {','.join(f'GW{gw}' for gw in node.horizon_gameweeks)}; "
+                f"Retained candidates: {len(node.retained_incoming_ids)}; "
+                f"protected: {node.protected_count}; final-tie expansion memberships: {node.tie_expansion}; "
+                f"largest final tie: {node.largest_final_tie}; "
+                "Retention categories (overlapping): "
+                + ", ".join(f"{name}={count}" for name, count in node.retention_categories)
+                for node in screen_v3.nodes
+            )
+            + f"; screen SHA256: {screen_v3.semantic_sha256}; "
+            f"root transfer counts: {scope.transfer_counts_considered}; "
+            f"root one/two-transfer actions: {scope.one_transfer_actions}/{scope.two_transfer_actions}; "
+            "No certified dominance or equivalence removal; heuristic escape buckets; "
+            "EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE."
+        )
     if scope.horizon_screen is not None:
         screen = scope.horizon_screen
         return (
@@ -1202,6 +1231,7 @@ def _stage11_request(
     gameweek: GameweekProjectionResult,
     *,
     future_gameweeks: tuple[GameweekProjectionResult, ...] = (),
+    protected_incoming_ids: tuple[str, ...] | None = None,
 ) -> tuple[
     MultiGameweekOptimisationRequest,
     _MemoizedStage10Evaluator,
@@ -1284,18 +1314,23 @@ def _stage11_request(
         else None
     )
     certified_dominated = 0
-    horizon_screen = None
+    bounded_screen = None
     allowed = full_allowed
     if pruning_policy is not None and future_gameweeks:
-        horizon_screen = _horizon_private_incoming_ids(
+        if protected_incoming_ids is None:
+            raise PrivateV1Error(
+                "HORIZON_COMPARATOR_ACTION_REQUIRED",
+                "solve the accepted one-GW recommendation before constructing automatic horizon scope",
+            )
+        bounded_screen = bounded_horizon_screen(
             full_allowed,
             catalog={item.player_id: item for item in catalog},
             prices=prices,
             gameweeks=(gameweek, *future_gameweeks),
-            maximum_transfers=declared_transfer_limit,
+            protected_incoming_ids=protected_incoming_ids,
         )
-        allowed = horizon_screen.retained_incoming_ids
-        pruning_policy = horizon_screen.policy
+        allowed = bounded_screen.nodes[0].retained_incoming_ids
+        pruning_policy = bounded_screen.policy
     elif pruning_policy is not None:
         allowed, certified_dominated = _bounded_private_incoming_ids(
             full_allowed,
@@ -1320,7 +1355,7 @@ def _stage11_request(
     nodes = [root]
     parent = root
     parent_key = root.information_set_key
-    for future in future_gameweeks:
+    for future_index, future in enumerate(future_gameweeks, start=1):
         if future.result_sha256 is None:
             raise PrivateV1Error("STAGE9_GAMEWEEK_INVALID", "future Stage-9 result hash is absent")
         node_id = f"GW-{future.scenario_set.gameweek_id.removeprefix('GW-')}-CURRENT-CUTOFF-PLAN"
@@ -1332,7 +1367,11 @@ def _stage11_request(
             information_set_key="pending",
             points_state_id=future.result_sha256,
             prices=prices,
-            allowed_transfer_in_ids=allowed,
+            allowed_transfer_in_ids=(
+                allowed
+                if bounded_screen is None
+                else bounded_screen.nodes[future_index].retained_incoming_ids
+            ),
             tactical_values=(),
         )
         node = preliminary.model_copy(
@@ -1373,7 +1412,7 @@ def _stage11_request(
         search_payload["max_transfers_per_node"] = min(
             search.max_transfers_per_node,
             transfer_rules.max_transfers_per_deadline,
-            len(allowed),
+            max(len(node.allowed_transfer_in_ids or ()) for node in nodes),
             len(value.current_state.manager_state.squad),
         )
         search_payload["transfer_action_scope"] = TransferActionScope(
@@ -1393,10 +1432,12 @@ def _stage11_request(
             search.max_actions_per_state,
             _exact_root_action_upper_bound(
                 squad_size=len(value.current_state.manager_state.squad),
-                incoming_count=len(allowed),
+                incoming_count=max(len(node.allowed_transfer_in_ids or ()) for node in nodes),
                 maximum_transfers=int(search_payload["max_transfers_per_node"]),
             ),
         )
+    if bounded_screen is not None:
+        search_payload["max_actions_per_state"] = bounded_screen.maximum_action_combinations
     search_payload["max_returned_root_candidates"] = max(
         search.max_returned_root_candidates, root_action_upper
     )
@@ -1440,9 +1481,10 @@ def _stage11_request(
                         ),
                         *(
                             ()
-                            if horizon_screen is None
+                            if bounded_screen is None
                             else (
-                                f"HORIZON_CANDIDATE_SCREEN_SHA256:{horizon_screen.semantic_sha256}",
+                                f"HORIZON_CANDIDATE_SCREEN_SHA256:{bounded_screen.semantic_sha256}",
+                                "SEALED_NODE_SPECIFIC_CANDIDATE_SCOPE_V1",
                             )
                         ),
                         *(
@@ -1503,7 +1545,7 @@ def _stage11_request(
         exact_tactical_squads=len(squad_signatures),
         certified_dominated_candidates=certified_dominated,
         pruning_policy=pruning_policy,
-        horizon_screen=horizon_screen,
+        bounded_screen=bounded_screen,
     )
     memoized = _MemoizedStage10Evaluator(
         tactical,
