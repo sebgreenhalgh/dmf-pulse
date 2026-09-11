@@ -14,37 +14,71 @@ def main():
     parser.add_argument("--code-root", type=Path, required=True)
     parser.add_argument("--fixture-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--synthetic-fixed-build-identity", action="store_true")
     args = parser.parse_args()
     root = args.code_root.resolve()
     sys.path[:0] = [str(root / "src"), str(root)]
 
+    from dmf_pulse.markets import consensus, normalisation
     from dmf_pulse.private_v1.models import seal_candidate_action_policy, seal_execution_input
     from dmf_pulse.private_v1.rolling import PrivateV1RollingRecommendationService
-    from dmf_pulse.private_v1.rolling_models import seal_rolling_execution_input
+    from dmf_pulse.private_v1.rolling_models import (
+        PrivateV1RollingExecutionInput,
+        seal_rolling_execution_input,
+    )
     from tests.unit.private_v1.e2e_test_support import build_rolling_execution_input
 
-    execution = build_rolling_execution_input(root, args.fixture_dir.resolve())
-    current = execution.current_execution
-    # Preserve the synthetic factory's frozen projection/scenario input. The real
-    # automatic V3 assembly is selected by its existing contract marker.
-    policy = seal_candidate_action_policy(
-        current.candidate_action_policy.model_copy(
-            update={"rationale": "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1"}
+    actual_build_identity = normalisation.code_identity()
+    if args.synthetic_fixed_build_identity:
+        # Test-only provenance input freezing. Both real normalisation and exact
+        # source verification still run; no verification method is replaced.
+        # Native build identities necessarily differ when package bytes differ.
+        def synthetic_identity():
+            return "dmf-pulse-0.2.0:source-sha256:" + "a" * 64
+
+        normalisation.code_identity = synthetic_identity
+        consensus.code_identity = synthetic_identity
+
+    frozen_path = args.fixture_dir.resolve() / "frozen-execution.json"
+    if frozen_path.exists():
+        execution = PrivateV1RollingExecutionInput.model_validate_json(frozen_path.read_bytes())
+    else:
+        execution = build_rolling_execution_input(root, args.fixture_dir.resolve())
+        current = execution.current_execution
+        # Preserve the synthetic factory's projection/scenario input; select the
+        # existing automatic V3 assembly contract and validate every new seal.
+        policy = seal_candidate_action_policy(
+            type(current.candidate_action_policy).model_construct(
+                **{
+                    **current.candidate_action_policy.model_dump(),
+                    "rationale": "PRIVATE_CURRENT_TRANSFER_CANDIDATE_PRUNING_V1",
+                }
+            )
         )
-    )
-    current = seal_execution_input(current.model_copy(update={"candidate_action_policy": policy}))
-    execution = seal_rolling_execution_input(
-        execution.model_copy(
-            update={
-                "current_execution": current,
-                "search_scope_mode": "PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3",
-            }
+        current = seal_execution_input(
+            type(current).model_construct(
+                **{
+                    **current.__dict__,
+                    "candidate_action_policy": policy,
+                }
+            )
         )
-    )
+        execution = seal_rolling_execution_input(
+            type(execution).model_construct(
+                **{
+                    **execution.__dict__,
+                    "current_execution": current,
+                    "search_scope_mode": "PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3",
+                }
+            )
+        )
+        frozen_path.write_text(execution.model_dump_json(), encoding="utf-8", newline="\n")
     wall, cpu = perf_counter(), process_time()
     result = PrivateV1RollingRecommendationService().run(execution)
     payload = {
         "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+        "actual_build_identity": actual_build_identity,
+        "synthetic_fixed_build_identity": args.synthetic_fixed_build_identity,
         "wall_seconds": perf_counter() - wall,
         "cpu_seconds": process_time() - cpu,
         "execution_sha256": execution.semantic_sha256,

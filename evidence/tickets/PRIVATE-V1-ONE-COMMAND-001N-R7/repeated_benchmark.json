@@ -1,0 +1,145 @@
+{
+  "conservative_cpu_speedup": 5.456584850884139,
+  "conservative_wall_speedup": 5.464416973637068,
+  "excluded_samples": "R6 repeated samples 1/2 used current shared canonical helpers and are excluded from the baseline.",
+  "median_cpu_speedup": 7.551585169263837,
+  "median_wall_speedup": 7.505038588442327,
+  "method": "One separate 8-squad warm-up before each fresh 847-squad/256-scenario kernel; no coverage, profiler or network; source-isolated R6 shared helpers.",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.9",
+  "r6": {
+    "cpu_seconds": {
+      "maximum": 506.0625,
+      "median": 439.171875,
+      "minimum": 323.046875
+    },
+    "samples": [
+      {
+        "artifact": "repeated-r6-3.json",
+        "artifact_sha256": "a25caeeaa1074fbfb98b13ba5e9cb96e85f2e9a3e84ea07fe1ec4748e9b8c494",
+        "cpu_seconds": 323.046875,
+        "semantic_sha256": "26258b0493a9dfb584d061477e80a567caf0a6d9d61912f074fa1c498843d30d",
+        "squads_per_wall_second": 2.4996102666399205,
+        "wall_seconds": 338.8528249000083,
+        "work": {
+          "appearance_state_xi_visits": 75224050,
+          "autosub_resolution_cache_misses": 6060,
+          "canonical_scenario_operations": 216832,
+          "captain_pair_appearance_visits": 167090,
+          "goalkeeper_pair_appearance_visits": 4900,
+          "logical_scenario_operations": 78710016000,
+          "squads_evaluated": 847
+        }
+      },
+      {
+        "artifact": "isolated-r6-4.json",
+        "artifact_sha256": "83391f143e6ac095fdf409280fe461504bea9993e43304767270bd581acce904",
+        "cpu_seconds": 439.171875,
+        "semantic_sha256": "26258b0493a9dfb584d061477e80a567caf0a6d9d61912f074fa1c498843d30d",
+        "squads_per_wall_second": 1.8542478779759226,
+        "wall_seconds": 456.78898169999593,
+        "work": {
+          "appearance_state_xi_visits": 75224050,
+          "autosub_resolution_cache_misses": 6060,
+          "canonical_scenario_operations": 216832,
+          "captain_pair_appearance_visits": 167090,
+          "goalkeeper_pair_appearance_visits": 4900,
+          "logical_scenario_operations": 78710016000,
+          "squads_evaluated": 847
+        }
+      },
+      {
+        "artifact": "isolated-r6-5.json",
+        "artifact_sha256": "d3aa81a6d4998b5eac96f4730dd49adfbee22ef324102f4193177169ec483862",
+        "cpu_seconds": 506.0625,
+        "semantic_sha256": "26258b0493a9dfb584d061477e80a567caf0a6d9d61912f074fa1c498843d30d",
+        "squads_per_wall_second": 1.579430239591201,
+        "wall_seconds": 536.2693322999985,
+        "work": {
+          "appearance_state_xi_visits": 75224050,
+          "autosub_resolution_cache_misses": 6060,
+          "canonical_scenario_operations": 216832,
+          "captain_pair_appearance_visits": 167090,
+          "goalkeeper_pair_appearance_visits": 4900,
+          "logical_scenario_operations": 78710016000,
+          "squads_evaluated": 847
+        }
+      }
+    ],
+    "squads_per_median_wall_second": 1.8542478779759226,
+    "wall_seconds": {
+      "maximum": 536.2693322999985,
+      "median": 456.78898169999593,
+      "minimum": 338.8528249000083
+    }
+  },
+  "r7": {
+    "cpu_seconds": {
+      "maximum": 59.203125,
+      "median": 58.15625,
+      "minimum": 58.109375
+    },
+    "samples": [
+      {
+        "artifact": "repeated-r7-1.json",
+        "artifact_sha256": "b565984aa07bb809451291e85c478063c899cbd67693371c1d19688d2ca51c60",
+        "cpu_seconds": 58.15625,
+        "semantic_sha256": "26258b0493a9dfb584d061477e80a567caf0a6d9d61912f074fa1c498843d30d",
+        "squads_per_wall_second": 14.074478300668682,
+        "wall_seconds": 60.1798505000188,
+        "work": {
+          "appearance_state_xi_visits": 30136425,
+          "autosub_resolution_cache_misses": 5496,
+          "canonical_scenario_operations": 216832,
+          "captain_pair_appearance_visits": 171990,
+          "goalkeeper_pair_appearance_visits": 4900,
+          "logical_scenario_operations": 78710016000,
+          "squads_evaluated": 847
+        }
+      },
+      {
+        "artifact": "repeated-r7-2.json",
+        "artifact_sha256": "629c0a293989d96c5590c100692579c8290db86c713d6ac4929199ba509b088b",
+        "cpu_seconds": 58.109375,
+        "semantic_sha256": "26258b0493a9dfb584d061477e80a567caf0a6d9d61912f074fa1c498843d30d",
+        "squads_per_wall_second": 13.916201876746598,
+        "wall_seconds": 60.86430820001988,
+        "work": {
+          "appearance_state_xi_visits": 30136425,
+          "autosub_resolution_cache_misses": 5496,
+          "canonical_scenario_operations": 216832,
+          "captain_pair_appearance_visits": 171990,
+          "goalkeeper_pair_appearance_visits": 4900,
+          "logical_scenario_operations": 78710016000,
+          "squads_evaluated": 847
+        }
+      },
+      {
+        "artifact": "repeated-r7-3.json",
+        "artifact_sha256": "e185f937328865a0e65a797b1743ee94ee05252756d1fb425b457bbd04182af7",
+        "cpu_seconds": 59.203125,
+        "semantic_sha256": "26258b0493a9dfb584d061477e80a567caf0a6d9d61912f074fa1c498843d30d",
+        "squads_per_wall_second": 13.65891276850466,
+        "wall_seconds": 62.01079210001626,
+        "work": {
+          "appearance_state_xi_visits": 30136425,
+          "autosub_resolution_cache_misses": 5496,
+          "canonical_scenario_operations": 216832,
+          "captain_pair_appearance_visits": 171990,
+          "goalkeeper_pair_appearance_visits": 4900,
+          "logical_scenario_operations": 78710016000,
+          "squads_evaluated": 847
+        }
+      }
+    ],
+    "squads_per_median_wall_second": 13.916201876746598,
+    "wall_seconds": {
+      "maximum": 62.01079210001626,
+      "median": 60.86430820001988,
+      "minimum": 60.1798505000188
+    }
+  },
+  "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "status": "PERFORMANCE_AND_TACTICAL_EQUALITY_ONLY_NOT_FULL_ACCEPTANCE",
+  "timing_caveat": "Substantial baseline CPU/wall variation. Also report conservative fastest-R6 / slowest-R7 ratio; do not attribute slower baseline samples entirely to algorithm changes."
+}

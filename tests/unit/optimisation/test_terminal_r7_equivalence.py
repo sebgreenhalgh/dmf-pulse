@@ -129,6 +129,33 @@ def test_terminal_specialisation_falls_back_outside_proof():
     )
 
 
+@pytest.mark.parametrize(
+    "coefficient", ["bank_points_per_tenth", "free_transfer_points", "liquidation_points_per_tenth"]
+)
+def test_each_nonzero_terminal_coefficient_disables_coalescing(coefficient):
+    request, node, _, _ = setup_terminal()
+    terminal = request.terminal_policy.model_copy(update={"enabled": True, coefficient: Decimal(1)})
+    assert not terminal_coalescing_eligible(
+        request.model_copy(update={"terminal_policy": terminal}), node
+    )
+
+
+def test_paid_continuation_falls_back_to_original_purchase_fingerprint():
+    request, node, state, points = setup_terminal()
+    scope = request.search_policy.transfer_action_scope.model_copy(
+        update={"continuation_mode": "RULES_BOUNDED"}
+    )
+    policy = seal_search_policy(
+        request.search_policy.model_copy(update={"transfer_action_scope": scope})
+    )
+    request = seal_request(request.model_copy(update={"search_policy": policy}))
+    assert not terminal_coalescing_eligible(request, node)
+    solver = DeterministicLinearExactEnumerator(request, HorizonPointsEvaluator(points))
+    assert solver._memo_key(node.node_id, state) != solver._memo_key(
+        node.node_id, with_purchase(state, 51)
+    )
+
+
 def test_closed_history_coalesces_but_replay_preserves_closed_spell():
     request, node, state, points = setup_terminal()
     catalog_entry = next(p for p in request.candidate_pool if p.player_id == "p15")

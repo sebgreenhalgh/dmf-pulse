@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 150478,
+      "bytes": 151644,
       "path": "PLANS.md",
-      "sha256": "a13294fb4ac8ce1e612ed6901266e5b3f1982b929eaae9703043ef7a933ee8cf"
+      "sha256": "352ce3c470b7fcfb93941e5e2276af9c68b74b398df05def69452f2a7ecd049b"
     },
     {
       "bytes": 2761,
@@ -2236,6 +2236,11 @@
       "sha256": "b77b3f996cede2bd981f565bdc361a15bb0e0c36753d8df49886ed578a8ca7e9"
     },
     {
+      "bytes": 3428,
+      "path": "scripts/collect_r7_benchmark.py",
+      "sha256": "c304b7e535fcc203b3033603916a082125a613cea079b63c1ec961c4ee17be40"
+    },
+    {
       "bytes": 5898,
       "path": "scripts/generate_authority_manifests.py",
       "sha256": "fcd0c96d8ed9029a7992bce29a46bdef7ac39743d42382e23cb51fe0f2eeb559"
@@ -2296,14 +2301,29 @@
       "sha256": "c1e0d771996d7f2465c57c90e279b12beef21a12bfe5d46165ca7b457a2cae36"
     },
     {
-      "bytes": 10865,
+      "bytes": 11485,
       "path": "scripts/profile_live_scale_exact.py",
-      "sha256": "f1187cbdfa1339b93cea9860887c2ef06bda6bb43aeb46cb7c841854e6c15278"
+      "sha256": "c3b09f5d54dc08de0e7d730d3b097304eab3e59781913783ef59a7162f8347a5"
     },
     {
       "bytes": 20980,
       "path": "scripts/reconcile_2026_27_official_sources.py",
       "sha256": "8f3f647037095f5824eba808f0c19e4d57e83fe5f26b763e785d7648fda3e10e"
+    },
+    {
+      "bytes": 4498,
+      "path": "scripts/replay_r7_frozen_service.py",
+      "sha256": "c3cf4a10b108000dbe07ee074863abdd39519ddd558d2b1f5e7bcdf7123f8fa3"
+    },
+    {
+      "bytes": 5056,
+      "path": "scripts/replay_r7_physical_search.py",
+      "sha256": "fdc5ada5c239957450e9705fc9dec5c57bef751cf793be541caa2a2d76586354"
+    },
+    {
+      "bytes": 3577,
+      "path": "scripts/report_r7_changed_coverage.py",
+      "sha256": "29dbf8da44a9016b6ee7f82a76215461aad7f60c28549d6c0104c77f40cf896d"
     },
     {
       "bytes": 97467,
@@ -2409,6 +2429,11 @@
       "bytes": 12612,
       "path": "scripts/verify_pts009_wheel.py",
       "sha256": "3e931ee01df2f0d5d7147cdec50570f3e8814e191adc1905f95079e7920735c4"
+    },
+    {
+      "bytes": 2306,
+      "path": "scripts/verify_r7_private_wheel.py",
+      "sha256": "28039c72ac6fa992bab3cfdb24bb67ee6cbee9dc436794b1b0a8cb5882cad386"
     },
     {
       "bytes": 25494,
@@ -3646,9 +3671,9 @@
       "sha256": "0561d48bb7d30fbc8a3cc7a58c5be6a7e77d94aa53b99e103658b32fc0205526"
     },
     {
-      "bytes": 4475,
+      "bytes": 7449,
       "path": "src/dmf_pulse/optimisation/autosub_evaluator.py",
-      "sha256": "af8f4f10412477bf261b3a6cddc16447057087aa5d7bd4f52069217184a77dbd"
+      "sha256": "8b1cbe47f77876a6b5d21c542e6346ba82e4df74d1bf4ce56c6e38eca4302d83"
     },
     {
       "bytes": 5287,
@@ -3701,9 +3726,9 @@
       "sha256": "af50bcd604bf9cec92845ffdbc3823893c86a5e8e51d935476ade27e25151f80"
     },
     {
-      "bytes": 83327,
+      "bytes": 96141,
       "path": "src/dmf_pulse/optimisation/multi_gameweek_solver.py",
-      "sha256": "c463c61a312fd3ebdffe11814a31708167e71528e5fad5fa2cee9fbeb3d86859"
+      "sha256": "747e3069191458b31ca71fcb525d860e8f0bd30c1fdae42c6c395a384638c99e"
     },
     {
       "bytes": 520,
@@ -3741,9 +3766,9 @@
       "sha256": "ba0329aef2c36eec1952fa6e2b178f18b63680dd283864c509461ae2e8dd713d"
     },
     {
-      "bytes": 52659,
+      "bytes": 54385,
       "path": "src/dmf_pulse/optimisation/tactics.py",
-      "sha256": "44ad882b14d8f4954a24e1be9cc9b4369f1a9d65ca419e059b5ea0271ad3855e"
+      "sha256": "b74a98f52cefe65e81454ae811e49d0ac1838ff7eddea6f9e97288b5a00db3b4"
     },
     {
       "bytes": 12474,
@@ -3911,9 +3936,9 @@
       "sha256": "06848fe589b9547ac9debc39eb727b5769dd807c9391c4b7de05506b2d274237"
     },
     {
-      "bytes": 46846,
+      "bytes": 48258,
       "path": "src/dmf_pulse/private_v1/rolling.py",
-      "sha256": "de0eeec40558a61ddf7481796dea3fb33c2bd06f8bfdfdbedbae0be35c0276f9"
+      "sha256": "84e255cea1190d5ab7bcbdfd66b4510d25f2f1892006d6ef1b07255488edbafd"
     },
     {
       "bytes": 25685,
@@ -3921,9 +3946,9 @@
       "sha256": "652147085aa8af8e1809a1facc67e2498306711d0710005951b56d566d547159"
     },
     {
-      "bytes": 105662,
+      "bytes": 105942,
       "path": "src/dmf_pulse/private_v1/service.py",
-      "sha256": "79902dd8cbda6cfceac73de111c7559c63422833ff68667f8a77cb6d22397897"
+      "sha256": "61eb8a2ebd76eff7affb539f8ce7676b065bd6946d63f68bc652696c98bc856a"
     },
     {
       "bytes": 1,
@@ -5891,6 +5916,11 @@
       "sha256": "4a086b1703d41fbe6532a7a7aabf1e8bddb8c58dc0698409a0716c40bb283a03"
     },
     {
+      "bytes": 3167,
+      "path": "tests/unit/optimisation/test_r7_canonical_primitives.py",
+      "sha256": "75f2ffa1e9ca10c075f5595711c6174e28b02df365dc08b2dad17cd379412a18"
+    },
+    {
       "bytes": 1788,
       "path": "tests/unit/optimisation/test_service.py",
       "sha256": "c8a1afb2b58c54c1a61a2b43f8913ef8a8c414435d0dd22511a83a96e6aa706e"
@@ -5909,6 +5939,16 @@
       "bytes": 34676,
       "path": "tests/unit/optimisation/test_stage11_exact_acceleration.py",
       "sha256": "d58056639fb1942c487badaac7616185e06616e1a7867bccca2aef353d67d14c"
+    },
+    {
+      "bytes": 2643,
+      "path": "tests/unit/optimisation/test_stage11_r7_layers.py",
+      "sha256": "6031abe6ded2c5a216168211761ff2dc85720a6a0fdeca40851b3252671825ee"
+    },
+    {
+      "bytes": 8210,
+      "path": "tests/unit/optimisation/test_terminal_r7_equivalence.py",
+      "sha256": "36ed697ee84b4c9613be4128b3464270a39dd3277347ccf0aeca2f390fc0ea50"
     },
     {
       "bytes": 6136,

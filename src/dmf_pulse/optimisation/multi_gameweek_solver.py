@@ -829,7 +829,7 @@ class Stage11NodeProfile:
     layer_solve_seconds: float = 0.0
     layer_solve_cpu_seconds: float = 0.0
     tactical_cpu_seconds: float = 0.0
-    tactical_batch_calls: int = 0
+    node_batch_requests: int = 0
     peak_retained_frontier: int = 0
     transfer_count_distribution: Counter[int] = field(default_factory=Counter)
     actions_by_free_transfers: Counter[tuple[int, int]] = field(default_factory=Counter)
@@ -886,7 +886,7 @@ class Stage11NodeProfile:
             "layer_solve_seconds": self.layer_solve_seconds,
             "layer_solve_cpu_seconds": self.layer_solve_cpu_seconds,
             "tactical_cpu_seconds": self.tactical_cpu_seconds,
-            "tactical_batch_calls": self.tactical_batch_calls,
+            "node_batch_requests": self.node_batch_requests,
             "peak_retained_frontier": self.peak_retained_frontier,
         }
 
@@ -899,8 +899,8 @@ class Stage11SearchProfile:
     nodes: dict[str, Stage11NodeProfile] = field(default_factory=dict)
     progress: Callable[[str], None] | None = None
     _last_report_at: float = 0.0
-    exact_accelerator: str = "R6_RECURSIVE_EXACT"
-    cumulative_combination_limit: int | None = None
+    exact_accelerator: str = "GENERIC_EXACT"
+    cumulative_legal_action_limit: int | None = None
 
     def report_progress(self, *, gameweek: int, force: bool = False) -> None:
         if self.progress is None:
@@ -940,7 +940,8 @@ class Stage11SearchProfile:
         return {
             "fast_path_used": self.fast_path_used,
             "exact_accelerator": self.exact_accelerator,
-            "cumulative_combination_limit": self.cumulative_combination_limit,
+            "cumulative_legal_action_limit": self.cumulative_legal_action_limit,
+            "cumulative_state_expansions": sum(n.states_solved for n in self.nodes.values()),
             "cumulative_action_combinations": sum(
                 n.action_combinations_considered for n in self.nodes.values()
             ),
@@ -1640,6 +1641,7 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
     _terminal_contexts: dict[str, str | None] = field(default_factory=dict)
     _discovery_profiles: dict[str, Stage11NodeProfile] = field(default_factory=dict)
     _whole_run_combinations: int = 0
+    _whole_run_legal_actions: int = 0
 
     def _node_profile(self, node: ScenarioTreeNode) -> Stage11NodeProfile | None:
         profile = super()._node_profile(node)
@@ -1668,7 +1670,14 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
             self.evaluator, NodeBatchTacticalEvaluator
         ):
             self._prepare_layers()
-        return super().enumerate()
+        root_profile = self._node_profile(self.request.scenario_tree.root)
+        started_wall, started_cpu = perf_counter(), process_time()
+        try:
+            return super().enumerate()
+        finally:
+            if root_profile is not None:
+                root_profile.layer_solve_seconds += perf_counter() - started_wall
+                root_profile.layer_solve_cpu_seconds += process_time() - started_cpu
 
     def _prepare_layers(self) -> None:
         """Discover exact reachable states forward; evaluate and solve layers backward.
@@ -1688,7 +1697,7 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
         pending: dict[str, set[tuple[str, ...]]] = {}
         if self.profile is not None:
             self.profile.exact_accelerator = "R7_TERMINAL_SALE_QUOTIENT_LAYERED_EXACT_V1"
-            self.profile.cumulative_combination_limit = (
+            self.profile.cumulative_legal_action_limit = (
                 self.request.search_policy.max_policy_candidates
             )
         self._collecting_layer = True
@@ -1709,16 +1718,19 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                     self._whole_run_combinations += (
                         node_profile.action_combinations_considered - before_combinations
                     )
-                    # Reuse the existing whole-policy work envelope (250,000 in
-                    # private V3). The measured 67,062-combination shape and the
-                    # reported live ~68k action shape fit, without narrowing scope.
+                    self._whole_run_legal_actions += len(actions)
+                    # Govern retained transitions and potential tactical work with
+                    # the existing 250,000 STANDARD policy envelope. The measured
+                    # 67,062 and reported live ~68k legal-action shapes fit. Raw
+                    # rejected combinations are tracked, not mistaken for legal
+                    # tactical work; their inherited per-state/state caps remain.
                     if (
-                        self._whole_run_combinations
+                        self._whole_run_legal_actions
                         > self.request.search_policy.max_policy_candidates
                     ):
                         self._prevalidated_transitions.clear()
                         raise ResourceLimitReached(
-                            f"cumulative exact action combinations {self._whole_run_combinations} exceed whole-policy work envelope {self.request.search_policy.max_policy_candidates} before tactical evaluation; no scope truncated",
+                            f"cumulative exact legal actions {self._whole_run_legal_actions} exceed whole-policy work envelope {self.request.search_policy.max_policy_candidates} before tactical evaluation; no scope truncated",
                             counters=self.counters,
                         )
                     self._layer_actions[key] = actions
@@ -1767,7 +1779,7 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
             if profile is not None:
                 profile.tactical_seconds += perf_counter() - started
                 profile.tactical_cpu_seconds += process_time() - started_cpu
-                profile.tactical_batch_calls += 1
+                profile.node_batch_requests += 1
             if depth:
                 solve_wall, solve_cpu = perf_counter(), process_time()
                 for state in layers[depth].values():
@@ -1918,6 +1930,7 @@ def solve_frontier(
     )
     if profile is not None:
         profile.fast_path_used = use_fast_path
+        profile.exact_accelerator = "R6_RECURSIVE_EXACT" if use_fast_path else "GENERIC_EXACT"
     enumerator_type = (
         DeterministicLinearExactEnumerator if use_fast_path else BoundedExactEnumerator
     )

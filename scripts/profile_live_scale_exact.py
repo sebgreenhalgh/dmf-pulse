@@ -19,6 +19,11 @@ from pydantic import TypeAdapter
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+# Baseline timing must also use the immutable canonical evaluator, not only the
+# old kernel class with current shared helpers. Select its source before imports.
+if "--baseline-root" in sys.argv:
+    baseline_root = Path(sys.argv[sys.argv.index("--baseline-root") + 1]).resolve()
+    sys.path[:0] = [str(baseline_root / "src"), str(baseline_root)]
 
 from dmf_pulse.assurance.canonical import canonical_sha256  # noqa: E402
 from dmf_pulse.fpl_points.models import PlayerPosition, ProjectionMode  # noqa: E402

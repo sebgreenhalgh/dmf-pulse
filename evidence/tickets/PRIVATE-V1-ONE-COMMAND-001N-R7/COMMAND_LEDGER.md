@@ -93,3 +93,35 @@ requested. No new cumulative STANDARD guards installed to conceal residual work.
 - Current status: repeated physical timing, new guard/canonical tests, actual physical
   Stage-10/11 and full private-stack frozen replay, full regression/coverage/local
   acceptance and exact-SHA CI still pending. No final acceptance or push yet.
+
+### Resume validation checkpoint (not publication acceptance)
+
+- Corrected the cumulative envelope to count retained **legal actions**, not raw
+  rejected combinations. Existing per-state combination/state limits remain;
+  the inherited 250,000 STANDARD policy envelope bounds cumulative retained
+  transitions before tactical evaluation. A hostile unaffordable-input test
+  proves raw combinations cannot incorrectly consume that legal-work allowance.
+- Targeted R7/R2/R4 and new terminal/layer/guard/canonical matrix: **93 passed in
+  399.74s**. All three nonzero terminal coefficients and paid continuation fallback
+  are covered. Full Ruff/format: PASS (782 files); mypy: PASS (285 source files).
+- Real Stage-10/11 frozen replay: exact equality of the entire sealed request,
+  complete candidates and final result, with no excluded result/hash fields.
+  Both evaluate 395 unique node/squads with 256 joint scenarios; R6 uses 48 physical
+  batches, R7 uses 3. Correctness runs overlapped other validation and are not
+  primary benchmark samples (263.60s / 58.13s wall respectively).
+- Native full-stack builds cannot consume identical upstream market artifacts:
+  existing market provenance hashes the **whole installed package**. R6 artifacts
+  correctly fail R7 exact-source verification; no production check was changed.
+  The synthetic replay explicitly freezes only market build identity in both
+  processes while recording actual package identities separately. All actual
+  upstream calculations and source verification still execute. With this labelled
+  synthetic provenance input, execution/request/projections/full decision/full
+  optimiser result/one-GW result match exactly, including all hashes. This is
+  algorithm-semantic evidence, not a claim of native cross-build provenance identity.
+- Repeated isolated tactical outputs all have semantic SHA256
+  `26258b0493a9dfb584d061477e80a567caf0a6d9d61912f074fa1c498843d30d`.
+  R6 samples 1/2 loaded current shared helpers and are excluded. Valid R6 samples
+  are repeated-r6-3, isolated-r6-4, isolated-r6-5; R7 samples 1/2/3 are valid.
+  R6 timing variability must be disclosed, not presented as an unqualified gain.
+- Broad fresh branch coverage, final structural replay, build/installed wheel and
+  remaining publication gates are running/pending. Nothing has been pushed.

@@ -851,7 +851,7 @@ class PrivateV1RollingRecommendationService:
         active_progress.message(
             f"Stage-11 accelerator={stage11_profile.exact_accelerator}, "
             f"cumulative_combinations={sum(n.action_combinations_considered for n in stage11_profile.nodes.values())}, "
-            f"combination_limit={stage11_profile.cumulative_combination_limit}"
+            f"cumulative_legal_action_limit={stage11_profile.cumulative_legal_action_limit}"
         )
         active_progress.message(
             f"Stage-11 tactical cache: hits={tactical.cache_hits}, "

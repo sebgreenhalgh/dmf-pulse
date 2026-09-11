@@ -1,4 +1,67 @@
-# R7 performance stop — NOT ACCEPTED / NOT PRODUCTION READY
+# R7 resumed acceptance review — local validation in progress
+
+The original stop below is historical checkpoint evidence. The resume preserves
+`65f344dc0661179dbd3963ae2fc8a8ad3aad2ff6`; no R7 commit has been pushed.
+The >5x tactical performance floor is now met, but broad branch coverage and
+independent review/publication gates remain pending. This is not final acceptance.
+
+## Resumed architecture and exactness
+
+- Terminal-only decision quotient: sealed request/node/rules, active IDs/club/
+  position/current price/exact integer sale proceeds, bank and FT. Different
+  original purchase prices may share work only when sale proceeds agree. At the
+  deterministic static-price, chip-free, FT-only final node with zero terminal
+  value, no remaining decision observes another purchase-price function. Nonfinal,
+  paid, nonzero terminal-value and unsupported requests retain existing behavior.
+  Every reused candidate is replayed through full transfer validation against the
+  caller's complete ownership history; state objects from other histories are
+  never substituted. Hostile separation, fallback and replay tests pass.
+- Forward discovery enumerates legal transitions once per canonical state and
+  retains validated transitions under the cumulative legal-work envelope. Backward
+  layers collect unique squads and populate the exact node cache before computing
+  unchanged Pareto frontiers. All full-history rebases remain validated.
+- Bench arithmetic separates official substitution legality from player points.
+  Six bench orders use exact packed integer lanes with an explicit absolute signed
+  bound and offset; no lane can carry/borrow into its neighbor. Negative and
+  512-bit hostile numerators match the retained original arithmetic. Existing
+  outfield/GK factoring, captain reuse and all legal configurations are preserved.
+- Canonical final evaluation still constructs every scenario score, event,
+  captain/vice resolution, distribution and plan. Node-local interpretation and a
+  bounded LRU of official resolver outputs are reused within the adapter's sealed
+  input context; canonical verification is never skipped.
+- Whole-run STANDARD legal work uses the existing 250,000 policy envelope after
+  measuring 67,062 legal actions. Rejected combinations remain diagnostic and retain
+  inherited per-state/state caps. Known violations fail before tactical work;
+  no dynamic candidate/action pruning or false exact guarantee is introduced.
+
+## Resumed evidence
+
+Repeated 847x256 samples are bound in `repeated_benchmark.json`. R7 median wall/CPU
+is 60.8643s / 58.15625s, 13.9162 squads/sec. R6 median is 456.7890s / 439.171875s,
+with substantial baseline variation. Median ratios are 7.505x wall / 7.552x CPU;
+the conservative fastest-R6/slowest-R7 ratios are 5.464x / 5.457x. The 10x target
+is not claimed. Full tactical semantic hash and logical/canonical work are unchanged.
+
+Actual Stage-10/11 frozen replay matches every request/candidate/result field,
+including hashes, alternatives and attribution (395 node/squads; 48 to 3 batches).
+The full 12-candidate structural request/candidates/squad inventory also match
+exactly (8,997 node/squads; one batch/node); its tactical surrogate and suspended
+wall time are explicitly not physical performance evidence.
+
+Full private-stack semantic replay freezes a labelled synthetic market build
+identity because native market provenance intentionally hashes all package bytes.
+All calculations and exact-source verification still run. Every decision field
+and hash matches with this common provenance input. Separately, the R7 native-build
+full service passes from a clean offline installed wheel outside the source tree,
+without that override. This does not claim native R6 artifacts verify under R7.
+
+Targeted suite: 93 passed. Full formatting/lint, strict typing, frozen sync, build,
+installed wheel, specification validation, secrets, repository validation, canonical
+manifests (4 tests), and CI collection (4,418 eligible tests) pass at this checkpoint.
+Final fresh changed-code coverage and all exact-SHA CI remain pending. Independent
+review has been requested, not claimed. No live run/PR/merge/tag/activation.
+
+## Historical checkpoint stop (65f344dc)
 
 The user's section 22 stopping condition applies. The tested exact kernel prototype
 achieved 3.51x wall / 3.60x CPU acceleration, below the required 5x minimum. This is

@@ -2052,3 +2052,12 @@ economic equivalence/replay first, then layered node batches, further bench and
 canonical verification reuse. Require repeated >5x benchmark and all frozen/generic
 equality plus local gates before publication. Previous STOP is historical evidence,
 not the current work status. No live run during development.
+
+Resume validation checkpoint: terminal sale-price equivalence/full-history replay,
+explicit backward layers, node-wide batches, exact signed bench packing and
+canonical primitive reuse implemented. Repeated conservative wall/CPU speedups
+5.464x/5.457x; 93 targeted tests and complete real Stage-10/11 equality passed.
+Full private-stack equality uses an explicitly synthetic frozen market build
+identity; native R7 clean-wheel full service also passed without that override.
+Broad/focused branch coverage, independent review and final exact-SHA CI remain
+pending. Preserve local work; do not push before all publication gates are met.
