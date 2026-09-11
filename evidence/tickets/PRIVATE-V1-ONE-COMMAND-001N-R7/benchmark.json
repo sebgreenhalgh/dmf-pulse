@@ -1,0 +1,50 @@
+{
+  "status": "PERFORMANCE_TARGET_NOT_MET_NOT_ACCEPTED",
+  "baseline_sha": "5878a39448456df0d07d58823e6dfa7c8e574715",
+  "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "required_minimum_speedup": 5,
+  "direct_kernel": {
+    "squads": 847,
+    "scenarios": 256,
+    "sequential_uninstrumented_runs": true,
+    "all_complete_tactical_results_equal": true,
+    "semantic_sha256": "26258b0493a9dfb584d061477e80a567caf0a6d9d61912f074fa1c498843d30d",
+    "r6": {"wall_seconds": 339.69596929999534, "cpu_seconds": 326.328125, "squads_per_second": 2.4934060941182077, "appearance_state_xi_visits": 75224050},
+    "r7_prototype": {"wall_seconds": 96.83276670001214, "cpu_seconds": 90.75, "squads_per_second": 8.747039136287468, "appearance_state_xi_visits": 30136425},
+    "wall_speedup": 3.508068403667255,
+    "cpu_speedup": 3.5959022038567494,
+    "unchanged_logical_scenario_operations": 78710016000,
+    "unchanged_canonical_scenario_operations": 216832
+  },
+  "search_shape": {
+    "physical_tactical_timing": false,
+    "fast_path_used": true,
+    "complete": true,
+    "incoming_per_node": [12, 12, 12],
+    "root_actions": 46,
+    "second_node_states": 46,
+    "terminal_economic_states": 892,
+    "terminal_legal_actions": 64288,
+    "terminal_unique_squads": 8104,
+    "all_unique_node_squads": 8997,
+    "memo_hits": 1836,
+    "terminal_batch_calls": 614,
+    "wall_seconds": 44.183781700005056,
+    "cpu_seconds": 42.28125
+  },
+  "residual_instrumented_profile": {
+    "squads": 32,
+    "scenarios": 256,
+    "kernel_cumulative_seconds": 8.595,
+    "bench_factoring_cumulative_seconds": 5.845,
+    "canonical_final_evaluation_cumulative_seconds": 2.105,
+    "timings_are_inclusive_not_additive": true
+  },
+  "local_full_artifact_hashes": {
+    "review_pack/r7/r6-kernel-family847.json": "dd5892cb6fcc841f6ebfc041def81be4d4a98b2ac083fbe145f30e39b806d071",
+    "review_pack/r7/r7-kernel-family847.json": "3825667f1a4bbf585312f229b13eb72c71b22cb749b4bf107d4590ea5815e50a",
+    "review_pack/r7/r6-search-shape.json": "bb27356723433fd43519259fc4ad0cba9cdd012bb4ebe8c543fd34c29231152b",
+    "review_pack/r7/r7-final-residual-profile.json": "3bbee0ececb43fe98584762ac13988fd25c9f4646e7042c18a75ee8b72e04121"
+  },
+  "not_established": ["fivefold_acceleration", "production_shaped_complete_stage10_stage11_differential", "new_terminal_coalescing_proof", "whole_run_governance", "full_r7_acceptance", "exact_sha_ci", "live_retry"]
+}

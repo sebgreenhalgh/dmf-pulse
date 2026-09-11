@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import cProfile
+import importlib.util
 import io
 import json
 import pstats
@@ -13,6 +14,8 @@ from dataclasses import asdict
 from itertools import combinations, product
 from pathlib import Path
 from time import perf_counter, process_time
+
+from pydantic import TypeAdapter
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -79,6 +82,9 @@ def main():
     parser.add_argument("--limit", type=int, default=32)
     parser.add_argument("--scenarios", type=int, default=8)
     parser.add_argument("--mode", choices=("kernel", "search"), default="kernel")
+    parser.add_argument("--baseline-root", type=Path)
+    parser.add_argument("--reference", type=Path)
+    parser.add_argument("--no-profile", action="store_true")
     args = parser.parse_args()
     if args.limit < 1:
         parser.error("limit must be positive")
@@ -115,7 +121,9 @@ def main():
         evaluator = HorizonPointsEvaluator(points)
         profile = Stage11SearchProfile(progress=lambda message: print(message, flush=True))
         wall, cpu = perf_counter(), process_time()
-        result = solve_frontier(request, evaluator, profile=profile)
+        result = solve_frontier(
+            request, evaluator, profile=profile, prefer_deterministic_linear=True
+        )
         payload = {
             "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
             "mode": "SEARCH_SHAPE_WITH_SURROGATE_NOT_TACTICAL_TIMING",
@@ -126,7 +134,9 @@ def main():
             "tactical_batch_calls": evaluator.batch_calls,
             "unique_tactical_squads": len(evaluator.cache),
             "request": request.model_dump(mode="json"),
-            "candidates": [c.model_dump(mode="json") for c in result.candidates],
+            "candidates": [
+                TypeAdapter(type(c)).dump_python(c, mode="json") for c in result.candidates
+            ],
             "squads_by_node": {
                 node.node_id: sorted(
                     squad for node_id, squad in evaluator.cache if node_id == node.node_id
@@ -184,18 +194,34 @@ def main():
             )
         scenarios = tuple(expanded)
     rules = build_one_gameweek_rules_view(synthetic_ruleset(), projection_mode=ProjectionMode.TEST)
-    kernel = ExactTacticalNodeKernel(scenarios=scenarios, players=catalog, rules=rules)
+    kernel_type = ExactTacticalNodeKernel
+    if args.baseline_root is not None:
+        spec = importlib.util.spec_from_file_location(
+            "r7_frozen_r6_tactics", args.baseline_root / "src/dmf_pulse/optimisation/tactics.py"
+        )
+        if spec is None or spec.loader is None:
+            raise ValueError("baseline kernel module unavailable")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+        kernel_type = module.ExactTacticalNodeKernel
+    kernel = kernel_type(scenarios=scenarios, players=catalog, rules=rules)
     profiler = cProfile.Profile()
     wall, cpu = perf_counter(), process_time()
-    profiler.enable()
+    if not args.no_profile:
+        profiler.enable()
     results = [kernel.optimise(squad, _policy()) for squad in selected]
-    profiler.disable()
+    if not args.no_profile:
+        profiler.disable()
     elapsed_wall, elapsed_cpu = perf_counter() - wall, process_time() - cpu
     output = io.StringIO()
-    pstats.Stats(profiler, stream=output).strip_dirs().sort_stats("cumulative").print_stats(35)
+    if not args.no_profile:
+        pstats.Stats(profiler, stream=output).strip_dirs().sort_stats("cumulative").print_stats(35)
     payload = {
         "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
-        "mode": "CPROFILE_INSTRUMENTED_DIRECT_EXACT_KERNEL",
+        "mode": "UNINSTRUMENTED_DIRECT_EXACT_KERNEL"
+        if args.no_profile
+        else "CPROFILE_INSTRUMENTED_DIRECT_EXACT_KERNEL",
         "family_size": len(family),
         "squads": len(selected),
         "scenario_count": len(scenarios),
@@ -216,6 +242,12 @@ def main():
         "profile": output.getvalue(),
     }
     payload["semantic_sha256"] = canonical_sha256(payload["semantic_results"])
+    if args.reference is not None:
+        reference = json.loads(args.reference.read_text(encoding="utf-8"))
+        assert reference["semantic_results"] == json.loads(json.dumps(payload["semantic_results"]))
+        payload["all_reference_results_equal"] = True
+        payload["wall_speedup"] = reference["wall_seconds"] / elapsed_wall
+        payload["cpu_speedup"] = reference["cpu_seconds"] / elapsed_cpu
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"

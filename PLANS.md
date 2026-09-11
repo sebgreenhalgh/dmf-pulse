@@ -2038,3 +2038,8 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 - [ ] Prove generic and frozen R6 equality, measure >5x bottleneck acceleration.
 - [ ] Run all acceptance commands, manifests, review evidence and exact-SHA CI.
 - [ ] Optional live retry only after green CI and demonstrated practical runtime.
+
+R7 checkpoint status: STOP / NOT ACCEPTED under user section 22. Exact kernel
+prototype matches all 847 frozen outputs but reaches only 3.51x wall / 3.60x CPU,
+below the 5x minimum. See R7 REVIEW.md and COMMAND_LEDGER.md. Do not resume by
+claiming these results satisfy the performance or full acceptance gate.
