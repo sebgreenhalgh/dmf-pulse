@@ -1,0 +1,19 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R7"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Live-scale exact Stage-11 and Stage-10 acceleration"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R7-live-scale-exact-acceleration"
+required_base_commit: "5878a39448456df0d07d58823e6dfa7c8e574715"
+authority_scopes:
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW"
+objective: >-
+  Profile and accelerate the exact frozen R6 action space at live scale, preserving
+  all decision semantics and adding non-semantic cumulative-work governance.
+exclusions:
+  - "V3 candidate scope, retained limits, root/future FT semantics, objective and terminal changes"
+  - "Stage 7/8/9 models, prices, chips, rank, future markets, heuristic action pruning"
+  - "PR, merge, tag, production activation and next model-quality ticket"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

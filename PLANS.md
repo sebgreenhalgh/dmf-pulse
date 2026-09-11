@@ -2027,3 +2027,14 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   at coverage-plan collection: a test imported the CLI `scripts` namespace. Shared diagnostics
   moved to pytest-importable test support with unchanged bodies/production bytes. The exact
   planner now collects 4,389 eligible tests and all 20 R6 candidate/oracle tests pass.
+
+## PRIVATE-V1-ONE-COMMAND-001N-R7 — exact live-scale acceleration
+
+- [x] Verify immutable R6 SHA and all 12 parent CI jobs; isolate R7 worktree.
+- [x] Read user scope and accepted exact tactical/cohort/nonanticipativity authority.
+- [ ] Build frozen live-shape and overlapping-squad wall/CPU profiling harness first.
+- [ ] Implement measured exact reuse with differential proofs, unchanged V3 bytes.
+- [ ] Evaluate terminal equivalence/layered batching; add cumulative work governance.
+- [ ] Prove generic and frozen R6 equality, measure >5x bottleneck acceleration.
+- [ ] Run all acceptance commands, manifests, review evidence and exact-SHA CI.
+- [ ] Optional live retry only after green CI and demonstrated practical runtime.
