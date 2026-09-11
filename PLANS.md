@@ -2043,3 +2043,12 @@ R7 checkpoint status: STOP / NOT ACCEPTED under user section 22. Exact kernel
 prototype matches all 847 frozen outputs but reaches only 3.51x wall / 3.60x CPU,
 below the 5x minimum. See R7 REVIEW.md and COMMAND_LEDGER.md. Do not resume by
 claiming these results satisfy the performance or full acceptance gate.
+
+### R7 resumed from 65f344dc (user resume-only instruction)
+
+Checkpoint verified: correct branch, exact HEAD, clean worktree. Preserve all
+existing prototype work. No intermediate pushes. Implement hostile terminal-only
+economic equivalence/replay first, then layered node batches, further bench and
+canonical verification reuse. Require repeated >5x benchmark and all frozen/generic
+equality plus local gates before publication. Previous STOP is historical evidence,
+not the current work status. No live run during development.

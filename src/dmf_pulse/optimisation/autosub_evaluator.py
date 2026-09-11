@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections import OrderedDict
 from decimal import Decimal
 from fractions import Fraction
 
@@ -15,7 +16,70 @@ from dmf_pulse.optimisation.models import (
     ScenarioManagerScore,
     TacticalConfiguration,
 )
-from dmf_pulse.rules.one_gameweek import resolve_outfield_substitutions
+from dmf_pulse.rules.one_gameweek import AutoSubstitutionResolution, resolve_outfield_substitutions
+
+
+class CanonicalScenarioPrimitives:
+    """Node-local immutable input interpretation shared by canonical evaluations.
+
+    Only official resolver outputs are cached; every score, captain fallback,
+    event and final plan is still constructed by the canonical evaluator.
+    """
+
+    def __init__(
+        self,
+        scenarios: tuple[GameweekPointScenario, ...],
+        players: dict[str, CandidatePlayer],
+        rules: OneGameweekRulesView,
+    ) -> None:
+        self.players = players
+        self.rules = rules
+        self.positions = {p: value.position for p, value in players.items()}
+        self.scenarios = {id(s): s for s in scenarios}
+        self.appeared = {
+            id(s): frozenset(p for p, value in s.player_appeared.items() if value)
+            for s in scenarios
+        }
+        self.weights = {id(s): weight_fraction(s.weight) for s in scenarios}
+        self.resolutions: OrderedDict[
+            tuple[tuple[str, ...], tuple[str, ...], frozenset[str]],
+            tuple[AutoSubstitutionResolution, ...],
+        ] = OrderedDict()
+
+    def validate(
+        self,
+        scenario: GameweekPointScenario,
+        players: dict[str, CandidatePlayer],
+        rules: OneGameweekRulesView,
+    ) -> None:
+        if (
+            self.scenarios.get(id(scenario)) is not scenario
+            or self.players is not players
+            or self.rules is not rules
+        ):
+            raise ValueError("canonical primitive context belongs to different sealed node inputs")
+
+    def resolve(
+        self, starting: tuple[str, ...], bench: tuple[str, ...], appeared: frozenset[str]
+    ) -> tuple[AutoSubstitutionResolution, ...]:
+        relevant = frozenset(p for p in (*starting, *bench) if p in appeared)
+        key = (starting, bench, relevant)
+        cached = self.resolutions.get(key)
+        if cached is not None:
+            self.resolutions.move_to_end(key)
+            return cached
+        resolved = resolve_outfield_substitutions(
+            starting_outfield=starting,
+            bench_outfield=bench,
+            positions=self.positions,
+            appeared=set(relevant),
+            lineup_min=self.rules.lineup_min,
+            lineup_max=self.rules.lineup_max,
+        )
+        self.resolutions[key] = resolved
+        if len(self.resolutions) > 4096:
+            self.resolutions.popitem(last=False)
+        return resolved
 
 
 def canonical_weight_token(weight: float) -> str:
@@ -31,8 +95,16 @@ def evaluate_scenario(
     tactic: TacticalConfiguration,
     players: dict[str, CandidatePlayer],
     rules: OneGameweekRulesView,
+    *,
+    primitives: CanonicalScenarioPrimitives | None = None,
 ) -> tuple[ScenarioManagerScore, Fraction]:
-    appeared = {player for player, value in scenario.player_appeared.items() if value}
+    if primitives is not None:
+        primitives.validate(scenario, players, rules)
+    appeared = (
+        primitives.appeared[id(scenario)]
+        if primitives is not None
+        else frozenset(player for player, value in scenario.player_appeared.items() if value)
+    )
     active = list(tactic.starting_xi)
     events: list[AutosubEvent] = []
     starting_gk_index = next(
@@ -61,13 +133,17 @@ def evaluate_scenario(
     starting_outfield = tuple(
         player for player in tactic.starting_xi if players[player].position is not PlayerPosition.GK
     )
-    resolution = resolve_outfield_substitutions(
-        starting_outfield=starting_outfield,
-        bench_outfield=tactic.outfield_bench_order,
-        positions={player: players[player].position for player in players},
-        appeared=appeared,
-        lineup_min=rules.lineup_min,
-        lineup_max=rules.lineup_max,
+    resolution = (
+        primitives.resolve(starting_outfield, tactic.outfield_bench_order, appeared)
+        if primitives is not None
+        else resolve_outfield_substitutions(
+            starting_outfield=starting_outfield,
+            bench_outfield=tactic.outfield_bench_order,
+            positions={player: players[player].position for player in players},
+            appeared=set(appeared),
+            lineup_min=rules.lineup_min,
+            lineup_max=rules.lineup_max,
+        )
     )
     for item in resolution:
         if item.player_out in active:  # pragma: no branch - resolver emits only starter absences
@@ -105,7 +181,11 @@ def evaluate_scenario(
         ]
     score = base_points + captain_bonus_points
     bench_contribution_points = sum(scenario.player_points[event.player_in] for event in events)
-    fraction = weight_fraction(scenario.weight)
+    fraction = (
+        primitives.weights[id(scenario)]
+        if primitives is not None
+        else weight_fraction(scenario.weight)
+    )
     weighted = fraction * score
     return (
         ScenarioManagerScore(

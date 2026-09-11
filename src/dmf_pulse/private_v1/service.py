@@ -10,7 +10,7 @@ from fractions import Fraction
 from importlib.resources import files
 from math import comb
 from pathlib import Path
-from time import perf_counter
+from time import perf_counter, process_time
 from typing import Any, Literal
 from uuid import UUID
 
@@ -575,6 +575,7 @@ class _TacticalCacheCounters:
     batch_calls: int = 0
     evaluated_squads: int = 0
     evaluation_seconds: float = 0.0
+    evaluation_cpu_seconds: float = 0.0
 
 
 @dataclass
@@ -612,8 +613,10 @@ class _MemoizedStage10Evaluator:
             self.cache_misses += 1
             self.individual_calls += 1
             started = perf_counter()
+            started_cpu = process_time()
             result = self.delegate.evaluate(node=node, state=state)
             counters.evaluation_seconds += perf_counter() - started
+            counters.evaluation_cpu_seconds += process_time() - started_cpu
             counters.evaluated_squads += 1
             self._cache[key] = result
         else:
@@ -661,12 +664,14 @@ class _MemoizedStage10Evaluator:
                 )
 
         started = perf_counter()
+        started_cpu = process_time()
         results = self.delegate.evaluate_many(
             node=node,
             squads=pending,
             progress=observe,
         )
         counters.evaluation_seconds += perf_counter() - started
+        counters.evaluation_cpu_seconds += process_time() - started_cpu
         counters.evaluated_squads += len(results)
         for squad_ids, result in results.items():
             self._cache[(node.node_id, squad_ids)] = result

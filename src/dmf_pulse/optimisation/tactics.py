@@ -13,7 +13,11 @@ from typing import cast
 
 from dmf_pulse.fpl_points.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.models import GameweekPointScenario, PlayerPosition
-from dmf_pulse.optimisation.autosub_evaluator import evaluate_scenario, weight_fraction
+from dmf_pulse.optimisation.autosub_evaluator import (
+    CanonicalScenarioPrimitives,
+    evaluate_scenario,
+    weight_fraction,
+)
 from dmf_pulse.optimisation.errors import ResourceLimitError
 from dmf_pulse.optimisation.legality import validate_tactical_configuration
 from dmf_pulse.optimisation.models import (
@@ -316,6 +320,7 @@ class ExactTacticalNodeKernel:
         self.scenarios = scenarios
         self.players = players
         self.rules = rules
+        self._canonical_primitives = CanonicalScenarioPrimitives(scenarios, players, rules)
         self._player_ids = tuple(sorted(players))
         self._player_index = {player_id: index for index, player_id in enumerate(self._player_ids)}
         weights = tuple(weight_fraction(scenario.weight) for scenario in scenarios)
@@ -370,6 +375,11 @@ class ExactTacticalNodeKernel:
             tuple[tuple[str, ...], tuple[tuple[str, str, str], ...]], tuple[int, ...]
         ] = OrderedDict()
         self._ranked_captain_pairs: tuple[tuple[int, int, str, str], ...] | None = None
+        self._bench_selection_templates: dict[
+            tuple[tuple[int, int, int], tuple[tuple[int, int, int], ...]],
+            dict[int, tuple[int, int, int]],
+        ] = {}
+        self._packed_coefficients: dict[int, tuple[int, ...]] = {}
 
     def _bit(self, player_id: str) -> int:
         return 1 << self._player_index[player_id]
@@ -623,45 +633,62 @@ class ExactTacticalNodeKernel:
                 total[0] += weighted[indexes[0]]
                 total[1] += weighted[indexes[1]]
                 total[2] += weighted[indexes[2]]
-        values = []
-        for order in bench_orders:
-            permutation = tuple(bench.index(p) for p in order)
-            positions = cast(
-                tuple[int, int, int],
-                tuple(self._position_code(self.players[p].position) for p in order),
+        order_indexes = tuple(
+            cast(tuple[int, int, int], tuple(bench.index(p) for p in order))
+            for order in bench_orders
+        )
+        bench_positions = tuple(self._position_code(self.players[p].position) for p in bench)
+        position_orders = tuple(
+            cast(tuple[int, int, int], tuple(bench_positions[i] for i in order))
+            for order in order_indexes
+        )
+        # Identity-free templates select point-vector lanes, never player values.
+        template_key = (formation, (*position_orders, *order_indexes))
+        template = self._bench_selection_templates.setdefault(template_key, {})
+        absolute_bound = sum(abs(v) for weighted in sufficient.values() for v in weighted)
+        width = absolute_bound.bit_length() + 1
+        offset = 1 << (width - 1)
+        coefficients = self._packed_coefficients.get(width)
+        if coefficients is None:
+            coefficients = tuple(
+                sum(1 << (width * lane) for lane in range(6) if mask & (1 << lane))
+                for mask in range(64)
             )
-            table = self._autosub_tables.get((formation, positions))
-            if table is None:
-                table = [-1] * (6 * 6 * 6 * 8)
-                self._autosub_tables[(formation, positions)] = table
-            value = 0
-            for code, grouped_weighted in sufficient.items():
+            self._packed_coefficients[width] = coefficients
+        packed = offset * coefficients[(1 << len(bench_orders)) - 1]
+        for code, grouped_weighted in sufficient.items():
+            selection = template.get(code)
+            if selection is None:
+                masks_by_player = [0, 0, 0]
                 appeared = code & 7
-                reordered = (
-                    ((appeared >> permutation[0]) & 1)
-                    | (((appeared >> permutation[1]) & 1) << 1)
-                    | (((appeared >> permutation[2]) & 1) << 2)
-                )
-                table_index = (code & ~7) | reordered
-                selected = table[table_index]
-                if selected < 0:
-                    absent_code = code >> 3
+                absent_code = code >> 3
+                for order_index, (order, positions) in enumerate(
+                    zip(order_indexes, position_orders, strict=True)
+                ):
+                    reordered = sum(
+                        ((appeared >> original) & 1) << slot for slot, original in enumerate(order)
+                    )
                     slots = self._selected_bench_slots(
                         formation=formation,
                         absent=(absent_code % 6, (absent_code // 6) % 6, absent_code // 36),
                         bench_positions=positions,
                         bench_appeared_mask=reordered,
                     )
-                    selected = sum(1 << slot for slot in slots)
-                    table[table_index] = selected
-                if selected & 1:
-                    value += grouped_weighted[permutation[0]]
-                if selected & 2:
-                    value += grouped_weighted[permutation[1]]
-                if selected & 4:
-                    value += grouped_weighted[permutation[2]]
-            values.append(value)
-        result = tuple(values)
+                    for slot in slots:
+                        masks_by_player[order[slot]] |= 1 << order_index
+                selection = cast(tuple[int, int, int], tuple(masks_by_player))
+                template[code] = selection
+            packed += (
+                grouped_weighted[0] * coefficients[selection[0]]
+                + grouped_weighted[1] * coefficients[selection[1]]
+                + grouped_weighted[2] * coefficients[selection[2]]
+            )
+        # Each lane is offset +/- at most absolute_bound, strictly inside its
+        # radix. Thus signed contributions cannot carry/borrow into another lane.
+        lane_mask = (1 << width) - 1
+        result = tuple(
+            ((packed >> (width * i)) & lane_mask) - offset for i in range(len(bench_orders))
+        )
         self._bench_values_cache[key] = result
         if len(self._bench_values_cache) > 4096:
             self._bench_values_cache.popitem(last=False)
@@ -877,6 +904,7 @@ class ExactTacticalNodeKernel:
             self.scenarios,
             self.players,
             self.rules,
+            primitives=self._canonical_primitives,
         )
         if verified_objective != best_objective:
             raise ValueError("node-kernel tactical objective differs from canonical evaluation")
@@ -1065,6 +1093,7 @@ def evaluate_tactical_configuration(
     *,
     search_scope: SearchScope = SearchScope.FIXED_SQUAD,
     report_budget: bool = False,
+    primitives: CanonicalScenarioPrimitives | None = None,
 ) -> tuple[OneGameweekPlan, Fraction]:
     report = validate_tactical_configuration(squad, tactic, players, rules)
     if not report.legal:
@@ -1072,11 +1101,16 @@ def evaluate_tactical_configuration(
     scores: list[ScenarioManagerScore] = []
     total = Fraction(0)
     for scenario in scenarios:
-        score, weighted = evaluate_scenario(scenario, tactic, players, rules)
+        score, weighted = evaluate_scenario(scenario, tactic, players, rules, primitives=primitives)
         scores.append(score)
         total += weighted
     weighted_scores = tuple(
-        (score, weight_fraction(scenario.weight))
+        (
+            score,
+            primitives.weights[id(scenario)]
+            if primitives is not None
+            else weight_fraction(scenario.weight),
+        )
         for score, scenario in zip(scores, scenarios, strict=True)
     )
     masses_by_points: dict[int, Fraction] = {}

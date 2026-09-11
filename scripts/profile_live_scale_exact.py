@@ -85,6 +85,7 @@ def main():
     parser.add_argument("--baseline-root", type=Path)
     parser.add_argument("--reference", type=Path)
     parser.add_argument("--no-profile", action="store_true")
+    parser.add_argument("--warmup", action="store_true")
     args = parser.parse_args()
     if args.limit < 1:
         parser.error("limit must be positive")
@@ -205,6 +206,11 @@ def main():
         sys.modules[spec.name] = module
         spec.loader.exec_module(module)
         kernel_type = module.ExactTacticalNodeKernel
+    if args.warmup:
+        warm_kernel = kernel_type(scenarios=scenarios, players=catalog, rules=rules)
+        for squad in selected[:8]:
+            warm_kernel.optimise(squad, _policy())
+        del warm_kernel
     kernel = kernel_type(scenarios=scenarios, players=catalog, rules=rules)
     profiler = cProfile.Profile()
     wall, cpu = perf_counter(), process_time()

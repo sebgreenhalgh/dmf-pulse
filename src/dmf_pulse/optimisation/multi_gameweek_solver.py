@@ -7,7 +7,7 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from itertools import combinations, product
-from time import perf_counter
+from time import perf_counter, process_time
 
 from dmf_pulse.fpl_points.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.models import PlayerPosition
@@ -824,6 +824,12 @@ class Stage11NodeProfile:
     transition_seconds: float = 0.0
     tactical_seconds: float = 0.0
     pareto_seconds: float = 0.0
+    layer_discovery_seconds: float = 0.0
+    layer_discovery_cpu_seconds: float = 0.0
+    layer_solve_seconds: float = 0.0
+    layer_solve_cpu_seconds: float = 0.0
+    tactical_cpu_seconds: float = 0.0
+    tactical_batch_calls: int = 0
     peak_retained_frontier: int = 0
     transfer_count_distribution: Counter[int] = field(default_factory=Counter)
     actions_by_free_transfers: Counter[tuple[int, int]] = field(default_factory=Counter)
@@ -875,6 +881,12 @@ class Stage11NodeProfile:
             "transition_seconds": self.transition_seconds,
             "tactical_seconds": self.tactical_seconds,
             "pareto_seconds": self.pareto_seconds,
+            "layer_discovery_seconds": self.layer_discovery_seconds,
+            "layer_discovery_cpu_seconds": self.layer_discovery_cpu_seconds,
+            "layer_solve_seconds": self.layer_solve_seconds,
+            "layer_solve_cpu_seconds": self.layer_solve_cpu_seconds,
+            "tactical_cpu_seconds": self.tactical_cpu_seconds,
+            "tactical_batch_calls": self.tactical_batch_calls,
             "peak_retained_frontier": self.peak_retained_frontier,
         }
 
@@ -887,6 +899,8 @@ class Stage11SearchProfile:
     nodes: dict[str, Stage11NodeProfile] = field(default_factory=dict)
     progress: Callable[[str], None] | None = None
     _last_report_at: float = 0.0
+    exact_accelerator: str = "R6_RECURSIVE_EXACT"
+    cumulative_combination_limit: int | None = None
 
     def report_progress(self, *, gameweek: int, force: bool = False) -> None:
         if self.progress is None:
@@ -925,6 +939,18 @@ class Stage11SearchProfile:
     def as_dict(self) -> dict[str, object]:
         return {
             "fast_path_used": self.fast_path_used,
+            "exact_accelerator": self.exact_accelerator,
+            "cumulative_combination_limit": self.cumulative_combination_limit,
+            "cumulative_action_combinations": sum(
+                n.action_combinations_considered for n in self.nodes.values()
+            ),
+            "cumulative_legal_actions": sum(n.legal_actions_generated for n in self.nodes.values()),
+            "cumulative_unique_node_squads": sum(
+                len(n.unique_resulting_squads) for n in self.nodes.values()
+            ),
+            "cumulative_tactical_requests": sum(
+                n.tactical_evaluator_calls for n in self.nodes.values()
+            ),
             "memo_hits": self.memo_hits,
             "memo_misses": self.memo_misses,
             "economically_equivalent_full_states": (self.economically_equivalent_full_states),
@@ -1538,9 +1564,95 @@ def deterministic_linear_fast_path_eligible(
     )
 
 
+def terminal_coalescing_eligible(
+    request: MultiGameweekOptimisationRequest, node: ScenarioTreeNode
+) -> bool:
+    """The sale-price quotient is valid only at the zero-value FT-only final node."""
+    scope = request.search_policy.transfer_action_scope
+    return (
+        deterministic_linear_fast_path_eligible(request)
+        and node == max(request.scenario_tree.nodes, key=lambda item: item.gameweek)
+        and scope is not None
+        and scope.continuation_mode == "FREE_TRANSFERS_ONLY"
+    )
+
+
+def terminal_decision_fingerprint(
+    state: ManagerState,
+    node: ScenarioTreeNode,
+    rules: TransferRules,
+    *,
+    context_sha256: str | None = None,
+) -> str:
+    """Decision-only quotient for valid states in terminal_coalescing_eligible.
+
+    At a final zero-value node, purchase price is observed only by the integer
+    sale-proceeds function. Equal proceeds, bank, FT and squad imply equal legal
+    actions and exact transition economics; node/squad fixes tactical values.
+    Full provenance remains on the caller and every memo hit is replayed through
+    apply_transfer_action, including its complete-history validation. This key is
+    never used for nonterminal continuation or terminal liquidation value.
+    """
+    return semantic_sha256(
+        {
+            "context": context_sha256 or _terminal_context_fingerprint(node, rules),
+            "rules_lineage": (state.ruleset_id, state.ruleset_version, state.ruleset_hash),
+            "gameweek": state.current_gameweek,
+            "observed_node_id": state.observed_node_id,
+            "bank": state.bank_tenths,
+            "ft": state.free_transfers,
+            "active": [
+                (
+                    s.player_id,
+                    s.club_id,
+                    s.position.value,
+                    s.current_price_tenths,
+                    selling_price_tenths(
+                        purchase_price_tenths=s.purchase_price_tenths,
+                        current_price_tenths=s.current_price_tenths,
+                        rule=rules.selling_price_rule,
+                    ),
+                )
+                for s in state.active_spells
+            ],
+        }
+    )
+
+
+def _terminal_context_fingerprint(node: ScenarioTreeNode, rules: TransferRules) -> str:
+    return semantic_sha256(
+        {
+            "node_id": node.node_id,
+            "information_set_key": node.information_set_key,
+            "scope": node.allowed_transfer_in_ids,
+            "prices": {p: v.model_dump(mode="json") for p, v in node.prices.items()},
+            "rules": rules.model_dump(mode="json"),
+        }
+    )
+
+
 @dataclass
 class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
     """Exact private three-node DP with economic memoisation and replayable histories."""
+
+    _collecting_layer: bool = False
+    _layer_actions: dict[tuple[str, str], tuple[TransferAction, ...]] = field(default_factory=dict)
+    _terminal_contexts: dict[str, str | None] = field(default_factory=dict)
+    _discovery_profiles: dict[str, Stage11NodeProfile] = field(default_factory=dict)
+    _whole_run_combinations: int = 0
+
+    def _node_profile(self, node: ScenarioTreeNode) -> Stage11NodeProfile | None:
+        profile = super()._node_profile(node)
+        if profile is None and self._collecting_layer:
+            return self._discovery_profiles.setdefault(
+                node.node_id,
+                Stage11NodeProfile(
+                    node.node_id,
+                    node.gameweek,
+                    node.gameweek - self.request.scenario_tree.root.gameweek,
+                ),
+            )
+        return profile
 
     def enumerate(self) -> FrontierResult:
         if not (
@@ -1551,7 +1663,130 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
             raise InputInvalidError(
                 "request does not satisfy deterministic private three-GW preconditions"
             )
+        final_node = max(self.request.scenario_tree.nodes, key=lambda item: item.gameweek)
+        if terminal_coalescing_eligible(self.request, final_node) and isinstance(
+            self.evaluator, NodeBatchTacticalEvaluator
+        ):
+            self._prepare_layers()
         return super().enumerate()
+
+    def _prepare_layers(self) -> None:
+        """Discover exact reachable states forward; evaluate and solve layers backward.
+
+        Retain already-validated transitions under the inherited whole-policy work
+        envelope, then consume them during backward scoring. Memo hits for another
+        history still replay; no action/frontier is pruned.
+        """
+        nodes = tuple(sorted(self.request.scenario_tree.nodes, key=lambda n: n.gameweek))
+        layers: list[dict[tuple[str, str], ManagerState]] = [
+            {
+                self._memo_key(
+                    nodes[0].node_id, self.request.initial_state
+                ): self.request.initial_state
+            }
+        ]
+        pending: dict[str, set[tuple[str, ...]]] = {}
+        if self.profile is not None:
+            self.profile.exact_accelerator = "R7_TERMINAL_SALE_QUOTIENT_LAYERED_EXACT_V1"
+            self.profile.cumulative_combination_limit = (
+                self.request.search_policy.max_policy_candidates
+            )
+        self._collecting_layer = True
+        try:
+            for depth, node in enumerate(nodes):
+                discovery_wall, discovery_cpu = perf_counter(), process_time()
+                squads: set[tuple[str, ...]] = set()
+                next_states: dict[tuple[str, str], ManagerState] = {}
+                for key, state in sorted(layers[depth].items()):
+                    node_profile = self._node_profile(node)
+                    assert node_profile is not None
+                    before_combinations = node_profile.action_combinations_considered
+                    actions = super()._actions(
+                        state,
+                        node=node,
+                        root_no_transfer_only=self.root_no_transfer_only and depth == 0,
+                    )
+                    self._whole_run_combinations += (
+                        node_profile.action_combinations_considered - before_combinations
+                    )
+                    # Reuse the existing whole-policy work envelope (250,000 in
+                    # private V3). The measured 67,062-combination shape and the
+                    # reported live ~68k action shape fit, without narrowing scope.
+                    if (
+                        self._whole_run_combinations
+                        > self.request.search_policy.max_policy_candidates
+                    ):
+                        self._prevalidated_transitions.clear()
+                        raise ResourceLimitReached(
+                            f"cumulative exact action combinations {self._whole_run_combinations} exceed whole-policy work envelope {self.request.search_policy.max_policy_candidates} before tactical evaluation; no scope truncated",
+                            counters=self.counters,
+                        )
+                    self._layer_actions[key] = actions
+                    for action in actions:
+                        transition = self._prevalidated_transitions[
+                            (state.state_sha256, action.action_id)
+                        ]
+                        squads.add(transition.state.squad_ids)
+                        if depth + 1 < len(nodes):
+                            child = nodes[depth + 1]
+                            observed = observe_node(transition.state, node=child)
+                            next_states.setdefault(
+                                self._memo_key(child.node_id, observed), observed
+                            )
+                    if self.profile is not None:
+                        self.profile.report_progress(gameweek=node.gameweek)
+                pending[node.node_id] = squads
+                if self.profile is not None:
+                    node_profile = self._node_profile(node)
+                    assert node_profile is not None
+                    node_profile.layer_discovery_seconds += perf_counter() - discovery_wall
+                    node_profile.layer_discovery_cpu_seconds += process_time() - discovery_cpu
+                if depth + 1 < len(nodes):
+                    layers.append(next_states)
+                    if (
+                        sum(len(layer) for layer in layers[1:])
+                        > self.request.search_policy.max_state_expansions
+                    ):
+                        raise ResourceLimitReached(
+                            "reachable layer states exceed state-expansion cap before tactical evaluation",
+                            counters=self.counters,
+                        )
+        finally:
+            self._collecting_layer = False
+        # A node-wide batch populates the exact node/squad cache before frontier work.
+        for depth in reversed(range(len(nodes))):
+            node = nodes[depth]
+            batch_squads = tuple(
+                CandidateSquad(player_ids=ids) for ids in sorted(pending.pop(node.node_id))
+            )
+            started = perf_counter()
+            assert isinstance(self.evaluator, NodeBatchTacticalEvaluator)
+            started_cpu = process_time()
+            self.evaluator.precompute_node(node=node, squads=batch_squads)
+            profile = self._node_profile(node)
+            if profile is not None:
+                profile.tactical_seconds += perf_counter() - started
+                profile.tactical_cpu_seconds += process_time() - started_cpu
+                profile.tactical_batch_calls += 1
+            if depth:
+                solve_wall, solve_cpu = perf_counter(), process_time()
+                for state in layers[depth].values():
+                    self._enumerate_node(node.node_id, state)
+                if profile is not None:
+                    profile.layer_solve_seconds += perf_counter() - solve_wall
+                    profile.layer_solve_cpu_seconds += process_time() - solve_cpu
+
+    def _actions(
+        self,
+        state: ManagerState,
+        *,
+        node: ScenarioTreeNode,
+        root_no_transfer_only: bool = False,
+    ) -> tuple[TransferAction, ...]:
+        cached = self._layer_actions.get(self._memo_key(node.node_id, state))
+        if cached is not None:
+            return cached
+        return super()._actions(state, node=node, root_no_transfer_only=root_no_transfer_only)
 
     def _capture_prevalidated_transitions(self) -> bool:
         return True
@@ -1559,6 +1794,18 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
     def _memo_key(self, node_id: str, state: ManagerState) -> tuple[str, str]:
         # R6: node ID is part of the key and fixes that node's sealed candidate set.
         # Equal economics are reused only at the same node, never across node scopes.
+        node = node_map(self.request.scenario_tree)[node_id]
+        if node_id not in self._terminal_contexts:
+            self._terminal_contexts[node_id] = (
+                _terminal_context_fingerprint(node, self.request.rules)
+                if terminal_coalescing_eligible(self.request, node)
+                else None
+            )
+        context = self._terminal_contexts[node_id]
+        if context is not None:
+            return node_id, terminal_decision_fingerprint(
+                state, node, self.request.rules, context_sha256=context
+            )
         return node_id, continuation_state_fingerprint(state)
 
     def _prepare_tactical_batch(
@@ -1567,7 +1814,7 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
         node: ScenarioTreeNode,
         transitions: tuple[AppliedTransfer, ...],
     ) -> None:
-        if not isinstance(self.evaluator, NodeBatchTacticalEvaluator):
+        if self._collecting_layer or not isinstance(self.evaluator, NodeBatchTacticalEvaluator):
             return
         squads = tuple(
             CandidateSquad(player_ids=player_ids)
@@ -1616,8 +1863,8 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                 profile.transition_applications += 1
                 profile.transition_seconds += perf_counter() - started
                 profile.unique_resulting_squads.add(transition.state.squad_ids)
-            if continuation_state_fingerprint(transition.state) != continuation_state_fingerprint(
-                cached_decision.state_after
+            if self._memo_key(expected_node.node_id, transition.state) != self._memo_key(
+                expected_node.node_id, cached_decision.state_after
             ):
                 raise ValueError("economic memo rebase changed continuation state semantics")
             started = perf_counter()

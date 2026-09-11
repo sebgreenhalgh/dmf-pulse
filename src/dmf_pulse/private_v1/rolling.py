@@ -817,6 +817,11 @@ class PrivateV1RollingRecommendationService:
                 f"states_solved={item.states_solved}"
             )
             active_progress.message(
+                f"Stage-11 GW{item.gameweek} exact work: combinations={item.action_combinations_considered}, "
+                f"discovery_wall={item.layer_discovery_seconds:.3f}s, discovery_cpu={item.layer_discovery_cpu_seconds:.3f}s, "
+                f"solve_wall={item.layer_solve_seconds:.3f}s, solve_cpu={item.layer_solve_cpu_seconds:.3f}s"
+            )
+            active_progress.message(
                 f"Stage-11 GW{item.gameweek} actions by FT/count: "
                 + ", ".join(
                     f"{ft}/{count}={total}"
@@ -832,6 +837,22 @@ class PrivateV1RollingRecommendationService:
                     f"batches={tactical_counts.batch_calls}, "
                     f"individual_calls={tactical_counts.individual_calls}"
                 )
+                active_progress.message(
+                    f"Stage-11 GW{item.gameweek} tactical timing: wall={tactical_counts.evaluation_seconds:.3f}s, "
+                    f"cpu={tactical_counts.evaluation_cpu_seconds:.3f}s"
+                )
+            kernel = tactical.delegate._node_kernels.get(item.node_id)
+            if kernel is not None:
+                work = kernel.work_snapshot()
+                active_progress.message(
+                    f"Stage-11 GW{item.gameweek} kernel work: logical={work.logical_scenario_operations}, "
+                    f"factored={work.factored_scenario_operations}, canonical={work.canonical_scenario_operations}"
+                )
+        active_progress.message(
+            f"Stage-11 accelerator={stage11_profile.exact_accelerator}, "
+            f"cumulative_combinations={sum(n.action_combinations_considered for n in stage11_profile.nodes.values())}, "
+            f"combination_limit={stage11_profile.cumulative_combination_limit}"
+        )
         active_progress.message(
             f"Stage-11 tactical cache: hits={tactical.cache_hits}, "
             f"misses={tactical.cache_misses}, batches={tactical.batch_calls}, "

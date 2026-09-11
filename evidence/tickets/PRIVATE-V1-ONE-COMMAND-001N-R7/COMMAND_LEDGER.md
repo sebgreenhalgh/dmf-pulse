@@ -61,3 +61,35 @@ requested. No new cumulative STANDARD guards installed to conceal residual work.
 - First-party secret scan: zero findings; `git diff --check`: PASS.
 - Final checkpoint remains local/unpublished because the performance stop condition
   was reached; there is no R7 exact-SHA CI result and no accepted final release SHA.
+
+## Resume-only continuation (new user instruction)
+
+- Verified exact branch, clean worktree and HEAD `65f344dc0661179dbd3963ae2fc8a8ad3aad2ff6`.
+  Resumed in place, without reset/recreation or intermediate push. Historical STOP
+  above is superseded by the user's explicit resume instruction, not acceptance.
+- Terminal sale-price fingerprint RED: missing imports. Implemented final-node-only
+  eligibility, separate decision fingerprint and full-history replay. Corrected
+  synthetic terminal advancement through legal hold transitions and closed-spell
+  catalog metadata; no test assertion weakened.
+- Layer batching RED: generic candidates equal but 37 terminal batches instead of one.
+  Forward exact reachability plus backwards node batches/frontiers implemented.
+- Terminal/layer suite: 17 passed in 157.21s, including all complete generic candidate
+  fields for root/future/budget/club cases and 50/51 purchase-cohort variants.
+- Packed bench integers preserve all orders with explicit signed absolute bounds;
+  node-local canonical scenario interpretation/resolver reuse preserves verification.
+  Existing tactical/factoring suite: 7 passed in 16.26s.
+- 847x256 packed-only full differential: 67.2579756 wall / 64.578125 CPU, 5.0506x;
+  with canonical reuse: 60.8718921 wall / 57.96875 CPU, 5.5805x. All 847 outputs equal.
+  These are exploratory single samples, NOT final repeated performance acceptance.
+- Frozen structural request, complete candidates and squads-by-node compare exactly
+  to R6. Initial layered variant used 1 batch/node but replayed transitions twice,
+  costing 82.14s vs 44.18s surrogate baseline. Keep validated transitions under a
+  cumulative envelope and consume them backward to remove that repeated work.
+- Added pre-tactical cumulative combination discovery guard using the inherited
+  max_policy_candidates envelope (250,000 STANDARD), plus unchanged state cap.
+  Measured 67,062-combination structural shape fits. Added fail-before-batch tests.
+- Added non-semantic discovery/solve/tactical CPU+wall counters and logical/factored
+  kernel progress disclosures. Candidate, objective, FT and scenario inputs unchanged.
+- Current status: repeated physical timing, new guard/canonical tests, actual physical
+  Stage-10/11 and full private-stack frozen replay, full regression/coverage/local
+  acceptance and exact-SHA CI still pending. No final acceptance or push yet.
