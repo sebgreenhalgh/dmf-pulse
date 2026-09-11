@@ -19,6 +19,9 @@ def test_canonical_reused_primitives_preserve_all_scores_events_hashes_and_rejec
     rules = build_one_gameweek_rules_view(synthetic_ruleset(), projection_mode=ProjectionMode.TEST)
     kernel = ExactTacticalNodeKernel(scenarios=scenarios, players=players, rules=rules)
     context = CanonicalScenarioPrimitives(scenarios, players, rules)
+    # Fill unrelated entries to force physical LRU eviction, never a skipped solve.
+    for i in range(4096):
+        context.resolutions[((f"unused-{i}",), (), frozenset())] = ()
     for squad in _squads():
         plan, _, _, _ = kernel.optimise(squad, _policy())
         tactic = plan.tactical_configuration
@@ -39,6 +42,8 @@ def test_canonical_reused_primitives_preserve_all_scores_events_hashes_and_rejec
             evaluate_tactical_configuration(
                 squad, tactic, scenarios, dict(players), rules, primitives=context
             )
+    assert len(context.resolutions) == 4096
+    assert (("unused-0",), (), frozenset()) not in context.resolutions
 
 
 def test_packed_bench_lanes_do_not_overflow_or_borrow_for_large_signed_numerators():
@@ -71,6 +76,30 @@ def test_packed_bench_lanes_do_not_overflow_or_borrow_for_large_signed_numerator
         "appearance_states": states,
         "local_player_index": indexes,
     }
+    for i in range(4096):
+        kernel._bench_values_cache[((f"unused-{i}",), kwargs["bench_orders"])] = (0,) * 6
     assert kernel._bench_order_objective_numerators(
         **kwargs
     ) == kernel._reference_bench_order_objective_numerators(**kwargs)
+    assert len(kernel._bench_values_cache) == 4096
+    assert (("unused-0",), kwargs["bench_orders"]) not in kernel._bench_values_cache
+
+
+def test_direct_captain_pair_initialisation_is_exact_and_empty_xi_fails_closed():
+    players = {p.player_id: p for p in _players()}
+    rules = build_one_gameweek_rules_view(synthetic_ruleset(), projection_mode=ProjectionMode.TEST)
+    kernel = ExactTacticalNodeKernel(
+        scenarios=_scenarios(tuple(players)), players=players, rules=rules
+    )
+    xi = _squads()[0].player_ids[:11]
+    values = {
+        (captain, vice): kernel._captain_bonus_numerator(captain, vice)
+        for captain, vice in permutations(xi, 2)
+    }
+    best = max(values.values())
+    assert kernel._best_captains(xi) == (
+        best,
+        tuple(sorted(pair for pair, value in values.items() if value == best)),
+    )
+    with pytest.raises(ValueError, match="no captain pair"):
+        kernel._best_captains(())

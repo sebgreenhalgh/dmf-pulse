@@ -41,6 +41,28 @@ def summarize(paths):
     return result
 
 
+def compare_pair(directory, baseline_name, current_name, keys):
+    paths = (directory / baseline_name, directory / current_name)
+    baseline, current = (json.loads(path.read_bytes()) for path in paths)
+    assert all(baseline[key] == current[key] for key in keys)
+    records = []
+    for path in paths:
+        with path.open("rb") as source:
+            records.append(
+                {"artifact": path.name, "sha256": hashlib.file_digest(source, "sha256").hexdigest()}
+            )
+    return {
+        "all_selected_fields_exactly_equal": True,
+        "compared_fields_without_nested_exclusions": keys,
+        "artifacts": records,
+        "equal_payload_json_sha256": hashlib.sha256(
+            json.dumps(
+                {key: current[key] for key in keys}, sort_keys=True, separators=(",", ":")
+            ).encode()
+        ).hexdigest(),
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--directory", type=Path, required=True)
@@ -68,6 +90,46 @@ def main():
         "median_cpu_speedup": r6["cpu_seconds"]["median"] / r7["cpu_seconds"]["median"],
         "conservative_wall_speedup": r6["wall_seconds"]["minimum"] / r7["wall_seconds"]["maximum"],
         "conservative_cpu_speedup": r6["cpu_seconds"]["minimum"] / r7["cpu_seconds"]["maximum"],
+        "frozen_differentials": {
+            "structural_labelled_tactical_surrogate": compare_pair(
+                args.directory,
+                "r6-search-shape.json",
+                "whole-public-search-shape.json",
+                ("request", "candidates", "squads_by_node"),
+            ),
+            "real_stage10_stage11": compare_pair(
+                args.directory,
+                "frozen-physical-r6.json",
+                "frozen-physical-r7.json",
+                ("request", "candidates", "result"),
+            ),
+            "full_private_stack_synthetic_fixed_market_build_identity": compare_pair(
+                args.directory,
+                "fixed-service-r6.json",
+                "fixed-service-r7.json",
+                (
+                    "execution_sha256",
+                    "request",
+                    "decision",
+                    "optimiser_result",
+                    "one_gameweek_result",
+                    "projection_hashes",
+                ),
+            ),
+        },
+        "production_source_sha256": {
+            name: hashlib.sha256(
+                (Path(__file__).resolve().parents[1] / "src/dmf_pulse" / name).read_bytes()
+            ).hexdigest()
+            for name in (
+                "optimisation/autosub_evaluator.py",
+                "optimisation/multi_gameweek_service.py",
+                "optimisation/tactics.py",
+                "optimisation/multi_gameweek_solver.py",
+                "private_v1/rolling.py",
+                "private_v1/service.py",
+            )
+        },
     }
     assert payload["conservative_wall_speedup"] > 5
     assert r7["squads_per_median_wall_second"] > 12.45

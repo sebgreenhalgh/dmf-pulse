@@ -125,3 +125,95 @@ requested. No new cumulative STANDARD guards installed to conceal residual work.
   R6 timing variability must be disclosed, not presented as an unqualified gain.
 - Broad fresh branch coverage, final structural replay, build/installed wheel and
   remaining publication gates are running/pending. Nothing has been pushed.
+
+### Final-code local gates completed during broad regression run
+
+- Full structural replay: request, every complete candidate and every node/squad
+  entry exactly equal R6. 67,062 legal actions, 8,997 node/squads, 3 node batches.
+  1,283s wall vs 68.75s CPU includes suspension; excluded from performance claims.
+- `uv sync --frozen`: PASS, 40 packages. `uv build --no-build-isolation`: PASS,
+  0.2.0 wheel/sdist. `uv run python scripts/verify_current_score_prior_wheel.py`:
+  PASS, offline/external environment and native rights/hash defenses intact.
+- `uv run python scripts/verify_r7_private_wheel.py --synthetic-execution review_pack/r7/native-wheel-input/frozen-execution.json`:
+  PASS, installed `dmf pulse --help` and full native-build private three-GW service;
+  decision SHA256 `06a33e5e8266d5808f3358e5a23c31c1db848a469f6173fc8710ce91f135000c`.
+  The harness streams only repository-owned synthetic execution through stdin;
+  the initial command-line payload correctly encountered Windows error 206.
+- Full Ruff/format: PASS, 785 files; mypy: PASS, 285 source files. Specs validation:
+  PASS, 94 decisions/22 documents/19 scopes. Secret scan: zero findings. Read-only
+  repository validator: zero errors. `git diff --check`: PASS.
+- Canonical PRC-013 and R7 manifest generation: PASS; manifest integration: 4 passed.
+  Manifests must be regenerated again after final evidence/test edits.
+- CI collection using the full checkpoint SHA: PASS, 4,418 eligible tests at that
+  checkpoint. Additional defense tests require a final recollection. An abbreviated
+  SHA was rejected by the collector as designed; the command was corrected.
+- Canonical review builder: `REVIEW_TICKET_UNSUPPORTED`. No contract/authority
+  bypass. Prepare a separately labelled supplementary capped archive only.
+- Fresh final focused coverage: 27 passed (8 generic variants deliberately excluded
+  from this focused run, but included in the targeted/broad matrices). Separate real
+  private-service/counter coverage: 2 passed, plus 1 individual-CPU-counter test passed.
+  Combined completed runs: **344/344 = 100%** changed executable lines plus originating
+  branch arcs, including smallest statement origins for multiline edits.
+  Exploratory interrupted coverage is excluded from this combined data.
+  Coverage summary SHA256 `cbbf5bc511b7c4a1ff37672502e4e3564ef18b33b881fca1c4595cdbe02a5975`;
+  full JSON SHA256 `a6ad66f719e1ddc94de51b77d75c3a113ada9848d4a2ab3360fac874dc652538`.
+  This is not the unchanged whole-repository CI threshold.
+- Exact source scope audit: V3 screen, rolling input models, one-command assembly,
+  ingestion, Stage-7/8/9 modelling, configuration, dependencies and CI files remain
+  byte-identical to R6. Production source hashes and all frozen comparison artifact
+  hashes are now included in `repeated_benchmark.json`.
+- Broad regression and independent review remain pending. No push or live run.
+
+### Whole-public-solve correction and current production snapshot
+
+- The first broad coverage run completed: **585 passed in 4243.12s**. During final
+  audit, found that the public solver's separate no-transfer baseline had its own
+  enumerator budget and was absent from the main profile. This was a governance
+  gap, not a tactical/objective mismatch. Preserve the completed run as checkpoint
+  evidence; rerun the entire matrix on the correction below.
+- Added one physical `Stage11WorkBudget` per public solve, shared by the full
+  frontier and baseline, with shared profile accounting. It cannot relax either
+  sealed policy cap. Plan construction, root/future actions, candidate screening,
+  FT rules and mathematical selection remain unchanged. A baseline budget failure
+  follows the existing fail-closed baseline-error contract and emits no recommendation.
+- Shared legal/state boundary and complete generic tests: 4 passed; larger supplied
+  budget versus tighter sealed-policy tests: 2 passed. Corrected fresh coverage:
+  34 passed, plus 2 completed appended defense cases. **367/367 = 100%** across all
+  six changed production files. Summary SHA256
+  `91c7eaa1caab9bf79884c2575d9299d66b518569d57bf23a1537bd831d66b3af`;
+  full JSON SHA256 `fe11650eb6150f09dd9c79d6645e942d622a9c23e087e83fced565cf75e840f9`.
+- `profile_live_scale_exact.py --mode search --public-search --no-profile`:
+  complete, **130,317 cumulative legal/actions combinations**, 1,788 solved states
+  including both roots, 8,997 unique node/squads. Existing 250,000 legal-action and
+  25,000 non-root state envelopes admit the complete measured shape. This is a
+  labelled tactical surrogate; its timings are not the primary tactical benchmark.
+- Corrected real Stage-10/11 replay and fixed-provenance full private replay again
+  match every selected semantic field, with no nested hash/decision exclusions.
+  `repeated_benchmark.json` binds their refreshed artifacts and six source hashes.
+  Tactical source bytes/primary timing samples are unchanged by this budget fix.
+- Corrected frozen sync, build and both clean external wheel checks: PASS.
+  Native full private wheel decision SHA256:
+  `c60d65afc0138b6947dd0b0256924f954c4365f573012682f99c5979cb8b5554`.
+  Input: `review_pack/r7/native-budget-wheel-input/frozen-execution.json`.
+- Corrected full regression command (without coverage overhead; fresh changed-code
+  branch coverage is measured separately above) is running:
+  `uv run python -m pytest tests/unit/private_v1 tests/unit/optimisation tests/property/optimisation tests/contract/optimisation tests/golden/optimisation tests/unit/ingestion/test_fpl_entry_duplicate_resolution.py tests/unit/ingestion/test_one_command_assembly.py -q --tb=short -p no:cacheprovider --basetemp=review_pack/r7/final-budget-regressions`.
+- Independent review, final manifest/evidence reconciliation and publication remain
+  pending. Read-only remote check confirms no R7 branch has been published.
+
+### Automated local gates complete; independent review remains a publication gate
+
+- Corrected full command above: **592 passed in 1130.93s**. The two subsequently
+  added oversized-shared-budget defense cases separately passed; all production
+  bytes stayed fixed throughout these final runs.
+- Corrected final CI collection: **4,427 eligible tests**, node-ID set SHA256
+  `de31324c53047545cd0b7666ecad252fe9a196d46255d967c2932df249e7e605`.
+- Final Ruff/format, strict mypy, secret scan and specification validation: PASS.
+  Canonical manifests/repository validation are reconciled again when sealing this
+  local checkpoint; supplementary archive binds exact committed source bytes.
+- Independent review was requested through a nonblocking user question. No
+  permission for another agent and no independent review result have been received.
+  Do not infer permission or call author checks an independent review. Do not push
+  before this repository-required acceptance gate is cleared.
+- R7 remains **NOT PUSHED**; exact-SHA R7 CI, PR, merge, tag, activation and live retry
+  have not been performed. Parent CI is not evidence for this local candidate.

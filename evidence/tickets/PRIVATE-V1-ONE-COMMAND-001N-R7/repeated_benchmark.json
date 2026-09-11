@@ -2,10 +2,80 @@
   "conservative_cpu_speedup": 5.456584850884139,
   "conservative_wall_speedup": 5.464416973637068,
   "excluded_samples": "R6 repeated samples 1/2 used current shared canonical helpers and are excluded from the baseline.",
+  "frozen_differentials": {
+    "full_private_stack_synthetic_fixed_market_build_identity": {
+      "all_selected_fields_exactly_equal": true,
+      "artifacts": [
+        {
+          "artifact": "fixed-service-r6.json",
+          "sha256": "4a0ca65b49f2858d20b829cbace62773e79506d99758f0e1857e4e7d2bb46ce8"
+        },
+        {
+          "artifact": "fixed-service-r7.json",
+          "sha256": "7b95d4d1d5cc6139ea4a3918f86130295ae3bf69501a58b638acc517ba46524b"
+        }
+      ],
+      "compared_fields_without_nested_exclusions": [
+        "execution_sha256",
+        "request",
+        "decision",
+        "optimiser_result",
+        "one_gameweek_result",
+        "projection_hashes"
+      ],
+      "equal_payload_json_sha256": "58a85c321e9fae71d81f6126516950cc8657f5c28c502c2b3966c36f166ded73"
+    },
+    "real_stage10_stage11": {
+      "all_selected_fields_exactly_equal": true,
+      "artifacts": [
+        {
+          "artifact": "frozen-physical-r6.json",
+          "sha256": "d1edf60fb1c2e3a8b7011587f9d0aff50f2b4230ff3673ee86690013a254395b"
+        },
+        {
+          "artifact": "frozen-physical-r7.json",
+          "sha256": "9116dda4bbe030c0110a68db2772f5dfe1baef137f4afca0688aaa9b40274447"
+        }
+      ],
+      "compared_fields_without_nested_exclusions": [
+        "request",
+        "candidates",
+        "result"
+      ],
+      "equal_payload_json_sha256": "12460eb4eb12fdc0ee351ad8e94c529be4d8c535b14cb36a438e4cb72e3d2afd"
+    },
+    "structural_labelled_tactical_surrogate": {
+      "all_selected_fields_exactly_equal": true,
+      "artifacts": [
+        {
+          "artifact": "r6-search-shape.json",
+          "sha256": "bb27356723433fd43519259fc4ad0cba9cdd012bb4ebe8c543fd34c29231152b"
+        },
+        {
+          "artifact": "whole-public-search-shape.json",
+          "sha256": "4489158fe1d381b04a6548963009624f9ce6b9be87bc283705db8f79b7f75a44"
+        }
+      ],
+      "compared_fields_without_nested_exclusions": [
+        "request",
+        "candidates",
+        "squads_by_node"
+      ],
+      "equal_payload_json_sha256": "02097ac59b7296c5b3f363df259d9713dee03c8afb2b98403c0cd6f6f069c634"
+    }
+  },
   "median_cpu_speedup": 7.551585169263837,
   "median_wall_speedup": 7.505038588442327,
   "method": "One separate 8-squad warm-up before each fresh 847-squad/256-scenario kernel; no coverage, profiler or network; source-isolated R6 shared helpers.",
   "platform": "Windows-11-10.0.26200-SP0",
+  "production_source_sha256": {
+    "optimisation/autosub_evaluator.py": "8b1cbe47f77876a6b5d21c542e6346ba82e4df74d1bf4ce56c6e38eca4302d83",
+    "optimisation/multi_gameweek_service.py": "7396d7fe0fc7b786a7a6935e2e8b49b0b706f36622263e6021a9bc40d9298ff3",
+    "optimisation/multi_gameweek_solver.py": "0c4f8948b93fd8016088dc2d59e571475f56aa1fa74d77efc113615f1570ad7a",
+    "optimisation/tactics.py": "b74a98f52cefe65e81454ae811e49d0ac1838ff7eddea6f9e97288b5a00db3b4",
+    "private_v1/rolling.py": "84e255cea1190d5ab7bcbdfd66b4510d25f2f1892006d6ef1b07255488edbafd",
+    "private_v1/service.py": "61eb8a2ebd76eff7affb539f8ce7676b065bd6946d63f68bc652696c98bc856a"
+  },
   "python": "3.13.9",
   "r6": {
     "cpu_seconds": {

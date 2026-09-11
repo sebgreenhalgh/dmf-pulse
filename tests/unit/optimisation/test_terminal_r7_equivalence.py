@@ -1,5 +1,6 @@
 """Terminal-only economic equivalence must not weaken complete-history replay."""
 
+from dataclasses import replace
 from decimal import Decimal
 
 import pytest
@@ -15,7 +16,11 @@ from dmf_pulse.optimisation.multi_gameweek_solver import (
     terminal_coalescing_eligible,
     terminal_decision_fingerprint,
 )
-from tests.unit.private_v1.horizon_oracle_support import HorizonPointsEvaluator, oracle_fixture
+from tests.unit.private_v1.horizon_oracle_support import (
+    HorizonPointsEvaluator,
+    oracle_fixture,
+    with_candidates,
+)
 
 
 def setup_terminal():
@@ -154,6 +159,15 @@ def test_paid_continuation_falls_back_to_original_purchase_fingerprint():
     assert solver._memo_key(node.node_id, state) != solver._memo_key(
         node.node_id, with_purchase(state, 51)
     )
+    # Empty scope means the whole catalog in the inherited contract; an owned
+    # player gives an explicit nonempty scope with no possible incoming move.
+    hold_only = with_candidates(request, (request.initial_state.squad_ids[0],))
+    fallback = solve_frontier(
+        hold_only, HorizonPointsEvaluator(points), prefer_deterministic_linear=True
+    )
+    generic = solve_frontier(hold_only, HorizonPointsEvaluator(points))
+    assert fallback.complete and generic.complete
+    assert fallback.candidates == generic.candidates
 
 
 def test_closed_history_coalesces_but_replay_preserves_closed_spell():
@@ -188,6 +202,23 @@ def test_closed_history_coalesces_but_replay_preserves_closed_spell():
     replay = solver._enumerate_node(node.node_id, other)
     assert solver.counters.state_expansions == before
     assert all(closed in p.decisions[0].state_after.ownership_spells for p in replay)
+
+
+def test_corrupted_terminal_memo_economics_are_rejected_during_replay():
+    request, node, state, points = setup_terminal()
+    solver = DeterministicLinearExactEnumerator(request, HorizonPointsEvaluator(points))
+    candidate = solver._enumerate_node(node.node_id, state)[0]
+    decision = candidate.decisions[0]
+    wrong_state = seal_manager_state(
+        decision.state_after.model_copy(
+            update={"bank_tenths": decision.state_after.bank_tenths + 1}
+        )
+    )
+    corrupted = replace(
+        candidate, decisions=(decision.model_copy(update={"state_after": wrong_state}),)
+    )
+    with pytest.raises(ValueError, match="changed continuation state semantics"):
+        solver._rebase_candidate(node.node_id, state, corrupted)
 
 
 @pytest.mark.parametrize("case", ["root", "future", "budget", "club"])

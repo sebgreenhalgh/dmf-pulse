@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 151644,
+      "bytes": 152711,
       "path": "PLANS.md",
-      "sha256": "352ce3c470b7fcfb93941e5e2276af9c68b74b398df05def69452f2a7ecd049b"
+      "sha256": "3c95f416399a543428a6821eb83e3c9bab8b1bb089afa926200e60e8488f8c7f"
     },
     {
       "bytes": 2761,
@@ -2236,9 +2236,9 @@
       "sha256": "b77b3f996cede2bd981f565bdc361a15bb0e0c36753d8df49886ed578a8ca7e9"
     },
     {
-      "bytes": 3428,
+      "bytes": 5852,
       "path": "scripts/collect_r7_benchmark.py",
-      "sha256": "c304b7e535fcc203b3033603916a082125a613cea079b63c1ec961c4ee17be40"
+      "sha256": "9356e3ab99ac671590ccbaa14d7184dd8159b539487743f77d3a4e83bfbdf3b6"
     },
     {
       "bytes": 5898,
@@ -2301,9 +2301,9 @@
       "sha256": "c1e0d771996d7f2465c57c90e279b12beef21a12bfe5d46165ca7b457a2cae36"
     },
     {
-      "bytes": 11485,
+      "bytes": 12930,
       "path": "scripts/profile_live_scale_exact.py",
-      "sha256": "c3b09f5d54dc08de0e7d730d3b097304eab3e59781913783ef59a7162f8347a5"
+      "sha256": "7b1080e14d853e8a036d0e958c7e3c7ed9127fcb3e5629dcd7e6c5940820e69e"
     },
     {
       "bytes": 20980,
@@ -2316,9 +2316,9 @@
       "sha256": "c3cf4a10b108000dbe07ee074863abdd39519ddd558d2b1f5e7bcdf7123f8fa3"
     },
     {
-      "bytes": 5056,
+      "bytes": 5202,
       "path": "scripts/replay_r7_physical_search.py",
-      "sha256": "fdc5ada5c239957450e9705fc9dec5c57bef751cf793be541caa2a2d76586354"
+      "sha256": "841823742aa5e834a7db5cf25d5c20fd8540cd315d9c161bc485afaa7cf3ccd1"
     },
     {
       "bytes": 3577,
@@ -3721,14 +3721,14 @@
       "sha256": "104797988f83150fe1972a92b357a95d7d2e879b5b0cbb0e5c793ba3e80de6b3"
     },
     {
-      "bytes": 25820,
+      "bytes": 26191,
       "path": "src/dmf_pulse/optimisation/multi_gameweek_service.py",
-      "sha256": "af50bcd604bf9cec92845ffdbc3823893c86a5e8e51d935476ade27e25151f80"
+      "sha256": "7396d7fe0fc7b786a7a6935e2e8b49b0b706f36622263e6021a9bc40d9298ff3"
     },
     {
-      "bytes": 96141,
+      "bytes": 96996,
       "path": "src/dmf_pulse/optimisation/multi_gameweek_solver.py",
-      "sha256": "747e3069191458b31ca71fcb525d860e8f0bd30c1fdae42c6c395a384638c99e"
+      "sha256": "0c4f8948b93fd8016088dc2d59e571475f56aa1fa74d77efc113615f1570ad7a"
     },
     {
       "bytes": 520,
@@ -5916,9 +5916,9 @@
       "sha256": "4a086b1703d41fbe6532a7a7aabf1e8bddb8c58dc0698409a0716c40bb283a03"
     },
     {
-      "bytes": 3167,
+      "bytes": 4517,
       "path": "tests/unit/optimisation/test_r7_canonical_primitives.py",
-      "sha256": "75f2ffa1e9ca10c075f5595711c6174e28b02df365dc08b2dad17cd379412a18"
+      "sha256": "b74db2adf57358d5241ba1da1e531bee22de667406a2abc5f5f05ab818b896ba"
     },
     {
       "bytes": 1788,
@@ -5941,14 +5941,14 @@
       "sha256": "d58056639fb1942c487badaac7616185e06616e1a7867bccca2aef353d67d14c"
     },
     {
-      "bytes": 2643,
+      "bytes": 5935,
       "path": "tests/unit/optimisation/test_stage11_r7_layers.py",
-      "sha256": "6031abe6ded2c5a216168211761ff2dc85720a6a0fdeca40851b3252671825ee"
+      "sha256": "70acb5740f8825a2e1a0fd855f54ebc4a3c9c4d0f10b88cb1a649373f1611b37"
     },
     {
-      "bytes": 8210,
+      "bytes": 9560,
       "path": "tests/unit/optimisation/test_terminal_r7_equivalence.py",
-      "sha256": "36ed697ee84b4c9613be4128b3464270a39dd3277347ccf0aeca2f390fc0ea50"
+      "sha256": "0a76ae3d9c72b3452d9d4f9037d42160788ef4ae7563771df21ac12ae16f8c14"
     },
     {
       "bytes": 6136,

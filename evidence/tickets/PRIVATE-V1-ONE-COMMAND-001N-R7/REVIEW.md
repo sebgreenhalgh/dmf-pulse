@@ -1,9 +1,11 @@
-# R7 resumed acceptance review — local validation in progress
+# R7 local candidate — automated gates passed; independent review pending
 
 The original stop below is historical checkpoint evidence. The resume preserves
 `65f344dc0661179dbd3963ae2fc8a8ad3aad2ff6`; no R7 commit has been pushed.
-The >5x tactical performance floor is now met, but broad branch coverage and
-independent review/publication gates remain pending. This is not final acceptance.
+The >5x tactical performance floor and automated local gates are met. Required
+independent review has not been performed; permission for a separate read-only
+reviewer was requested but has not been received. No push or exact-SHA R7 CI yet.
+This is a local review candidate, not final R7 acceptance.
 
 ## Resumed architecture and exactness
 
@@ -29,8 +31,11 @@ independent review/publication gates remain pending. This is not final acceptanc
   captain/vice resolution, distribution and plan. Node-local interpretation and a
   bounded LRU of official resolver outputs are reused within the adapter's sealed
   input context; canonical verification is never skipped.
-- Whole-run STANDARD legal work uses the existing 250,000 policy envelope after
-  measuring 67,062 legal actions. Rejected combinations remain diagnostic and retain
+- Whole-run STANDARD legal work shares the existing 250,000 policy envelope across
+  the public frontier **and its separate no-transfer baseline**. The measured whole
+  public solve has 130,317 legal actions (main frontier alone: 67,062). The inherited
+  non-root state-expansion cap is shared too. A supplied budget cannot relax either
+  sealed policy limit. Rejected combinations remain diagnostic and retain
   inherited per-state/state caps. Known violations fail before tactical work;
   no dynamic candidate/action pruning or false exact guarantee is introduced.
 
@@ -47,6 +52,9 @@ including hashes, alternatives and attribution (395 node/squads; 48 to 3 batches
 The full 12-candidate structural request/candidates/squad inventory also match
 exactly (8,997 node/squads; one batch/node); its tactical surrogate and suspended
 wall time are explicitly not physical performance evidence.
+These fixed-price families retain the same terminal economic state counts as R6;
+no additional terminal compression is claimed for them. Hostile same-sale/different-
+purchase and closed-history tests prove the broader terminal quotient/replay seam.
 
 Full private-stack semantic replay freezes a labelled synthetic market build
 identity because native market provenance intentionally hashes all package bytes.
@@ -55,11 +63,17 @@ and hash matches with this common provenance input. Separately, the R7 native-bu
 full service passes from a clean offline installed wheel outside the source tree,
 without that override. This does not claim native R6 artifacts verify under R7.
 
-Targeted suite: 93 passed. Full formatting/lint, strict typing, frozen sync, build,
+Initial targeted suite: 93 passed. Corrected full regression matrix: **592 passed**;
+two additional sealed-budget defense cases also passed. Full formatting/lint, strict typing, frozen sync, build,
 installed wheel, specification validation, secrets, repository validation, canonical
-manifests (4 tests), and CI collection (4,418 eligible tests) pass at this checkpoint.
-Final fresh changed-code coverage and all exact-SHA CI remain pending. Independent
-review has been requested, not claimed. No live run/PR/merge/tag/activation.
+manifests (4 tests), and CI collection (4,427 eligible tests) pass.
+Fresh completed coverage runs cover 367/367 changed executable lines and originating
+branch arcs (100%) across six production files. The earlier 585-test broad run is
+retained as historical checkpoint evidence; final acceptance evidence is the
+corrected 592-test run and completed fresh coverage cases. Corrected frozen equality
+and native installed-wheel checks pass. Independent review and exact-SHA CI remain
+pending. No live run/PR/merge/tag/activation. No unresolved implementation P0/P1 was
+found in author checks; that is not an independent review verdict.
 
 ## Historical checkpoint stop (65f344dc)
 

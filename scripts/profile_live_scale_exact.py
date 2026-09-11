@@ -87,6 +87,7 @@ def main():
     parser.add_argument("--limit", type=int, default=32)
     parser.add_argument("--scenarios", type=int, default=8)
     parser.add_argument("--mode", choices=("kernel", "search"), default="kernel")
+    parser.add_argument("--public-search", action="store_true")
     parser.add_argument("--baseline-root", type=Path)
     parser.add_argument("--reference", type=Path)
     parser.add_argument("--no-profile", action="store_true")
@@ -150,6 +151,26 @@ def main():
                 for node in request.scenario_tree.nodes
             },
         }
+        if args.public_search:
+            from dmf_pulse.optimisation.multi_gameweek_service import optimise_multi_gameweek
+
+            public_profile = Stage11SearchProfile(
+                progress=lambda message: print(message, flush=True)
+            )
+            public_wall, public_cpu = perf_counter(), process_time()
+            public_result = optimise_multi_gameweek(
+                request,
+                evaluator=evaluator,
+                prefer_deterministic_linear=True,
+                profile=public_profile,
+            )
+            assert public_result.status.value == "SUCCESS"
+            payload["whole_public_solve"] = {
+                "profile": public_profile.as_dict(),
+                "wall_seconds": perf_counter() - public_wall,
+                "cpu_seconds": process_time() - public_cpu,
+                "result": public_result.model_dump(mode="json"),
+            }
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(
             json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
@@ -159,10 +180,22 @@ def main():
                 {
                     k: v
                     for k, v in payload.items()
-                    if k not in {"request", "candidates", "squads_by_node"}
+                    if k not in {"request", "candidates", "squads_by_node", "whole_public_solve"}
                 }
             )
         )
+        if args.public_search:
+            print(
+                json.dumps(
+                    {
+                        "whole_public_solve": {
+                            key: value
+                            for key, value in payload["whole_public_solve"]["profile"].items()
+                            if key.startswith("cumulative_") or key == "exact_accelerator"
+                        }
+                    }
+                )
+            )
         return
     # Evenly spaced deterministic sample includes heterogeneous positional replacements.
     selected = tuple(

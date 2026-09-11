@@ -87,7 +87,10 @@ def main():
     assert frontier.complete
     # Cached physical tactics make this second pass inexpensive; it exercises
     # full plan/frontier/alternative/move-attribution assembly on the same inputs.
-    result = optimise_multi_gameweek(request, evaluator=evaluator, prefer_deterministic_linear=True)
+    public_profile = Stage11SearchProfile()
+    result = optimise_multi_gameweek(
+        request, evaluator=evaluator, prefer_deterministic_linear=True, profile=public_profile
+    )
     payload = {
         "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
         "mode": "REAL_STAGE10_STAGE11_FROZEN_DIFFERENTIAL",
@@ -99,6 +102,7 @@ def main():
         ],
         "result": result.model_dump(mode="json"),
         "profile": profile.as_dict(),
+        "whole_public_solve_profile": public_profile.as_dict(),
         "unique_tactical_squads": len(evaluator._cache),
         "batch_calls": evaluator.batch_calls,
         "scenario_count": 256,

@@ -2032,10 +2032,10 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 
 - [x] Verify immutable R6 SHA and all 12 parent CI jobs; isolate R7 worktree.
 - [x] Read user scope and accepted exact tactical/cohort/nonanticipativity authority.
-- [ ] Build frozen live-shape and overlapping-squad wall/CPU profiling harness first.
-- [ ] Implement measured exact reuse with differential proofs, unchanged V3 bytes.
-- [ ] Evaluate terminal equivalence/layered batching; add cumulative work governance.
-- [ ] Prove generic and frozen R6 equality, measure >5x bottleneck acceleration.
+- [x] Build frozen live-shape and overlapping-squad wall/CPU profiling harness first.
+- [x] Implement measured exact reuse with differential proofs, unchanged V3 bytes.
+- [x] Evaluate terminal equivalence/layered batching; add cumulative work governance.
+- [x] Prove generic and frozen R6 equality, measure >5x bottleneck acceleration.
 - [ ] Run all acceptance commands, manifests, review evidence and exact-SHA CI.
 - [ ] Optional live retry only after green CI and demonstrated practical runtime.
 
@@ -2061,3 +2061,18 @@ Full private-stack equality uses an explicitly synthetic frozen market build
 identity; native R7 clean-wheel full service also passed without that override.
 Broad/focused branch coverage, independent review and final exact-SHA CI remain
 pending. Preserve local work; do not push before all publication gates are met.
+
+Final audit corrected whole-run governance to share one physical budget and profile
+across the public frontier and its separate no-transfer baseline. Large synthetic
+public solve: 130,317 legal actions, 8,997 unique node/squads, within the inherited
+250,000 envelope. Current six-file changed-code coverage is 367/367 (100%); corrected
+frozen physical/private equality and native installed wheel pass. First broad run
+passed 585 tests; the complete matrix is rerunning against this final correction.
+Independent review permission is still pending; nothing has been pushed.
+
+Corrected final automated gates: 592 broad regression tests passed; two additional
+sealed-budget defense cases passed; fresh changed-code coverage 367/367 (100%).
+Frozen R6 comparisons, native clean wheel, static/security/specification gates and
+CI collection (4,427 eligible tests) pass. Independent review is not yet authorized
+or performed, so preserve a clean local review candidate without pushing. Exact-SHA
+R7 CI remains pending; do not claim final acceptance or production readiness.

@@ -1633,6 +1633,16 @@ def _terminal_context_fingerprint(node: ScenarioTreeNode, rules: TransferRules) 
 
 
 @dataclass
+class Stage11WorkBudget:
+    """Physical budget shared by frontier and baseline within one public solve."""
+
+    legal_action_limit: int
+    state_expansion_limit: int
+    legal_actions: int = 0
+    state_expansions: int = 0
+
+
+@dataclass
 class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
     """Exact private three-node DP with economic memoisation and replayable histories."""
 
@@ -1642,6 +1652,7 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
     _discovery_profiles: dict[str, Stage11NodeProfile] = field(default_factory=dict)
     _whole_run_combinations: int = 0
     _whole_run_legal_actions: int = 0
+    work_budget: Stage11WorkBudget | None = None
 
     def _node_profile(self, node: ScenarioTreeNode) -> Stage11NodeProfile | None:
         profile = super()._node_profile(node)
@@ -1687,6 +1698,16 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
         history still replay; no action/frontier is pruned.
         """
         nodes = tuple(sorted(self.request.scenario_tree.nodes, key=lambda n: n.gameweek))
+        budget = self.work_budget or Stage11WorkBudget(
+            self.request.search_policy.max_policy_candidates,
+            self.request.search_policy.max_state_expansions,
+        )
+        legal_action_limit = min(
+            budget.legal_action_limit, self.request.search_policy.max_policy_candidates
+        )
+        state_expansion_limit = min(
+            budget.state_expansion_limit, self.request.search_policy.max_state_expansions
+        )
         layers: list[dict[tuple[str, str], ManagerState]] = [
             {
                 self._memo_key(
@@ -1697,9 +1718,7 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
         pending: dict[str, set[tuple[str, ...]]] = {}
         if self.profile is not None:
             self.profile.exact_accelerator = "R7_TERMINAL_SALE_QUOTIENT_LAYERED_EXACT_V1"
-            self.profile.cumulative_legal_action_limit = (
-                self.request.search_policy.max_policy_candidates
-            )
+            self.profile.cumulative_legal_action_limit = legal_action_limit
         self._collecting_layer = True
         try:
             for depth, node in enumerate(nodes):
@@ -1719,18 +1738,16 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                         node_profile.action_combinations_considered - before_combinations
                     )
                     self._whole_run_legal_actions += len(actions)
+                    budget.legal_actions += len(actions)
                     # Govern retained transitions and potential tactical work with
                     # the existing 250,000 STANDARD policy envelope. The measured
                     # 67,062 and reported live ~68k legal-action shapes fit. Raw
                     # rejected combinations are tracked, not mistaken for legal
                     # tactical work; their inherited per-state/state caps remain.
-                    if (
-                        self._whole_run_legal_actions
-                        > self.request.search_policy.max_policy_candidates
-                    ):
+                    if budget.legal_actions > legal_action_limit:
                         self._prevalidated_transitions.clear()
                         raise ResourceLimitReached(
-                            f"cumulative exact legal actions {self._whole_run_legal_actions} exceed whole-policy work envelope {self.request.search_policy.max_policy_candidates} before tactical evaluation; no scope truncated",
+                            f"cumulative exact legal actions {budget.legal_actions} exceed whole-policy work envelope {legal_action_limit} before tactical evaluation; no scope truncated",
                             counters=self.counters,
                         )
                     self._layer_actions[key] = actions
@@ -1756,8 +1773,8 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                 if depth + 1 < len(nodes):
                     layers.append(next_states)
                     if (
-                        sum(len(layer) for layer in layers[1:])
-                        > self.request.search_policy.max_state_expansions
+                        budget.state_expansions + sum(len(layer) for layer in layers[1:])
+                        > state_expansion_limit
                     ):
                         raise ResourceLimitReached(
                             "reachable layer states exceed state-expansion cap before tactical evaluation",
@@ -1765,6 +1782,7 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                         )
         finally:
             self._collecting_layer = False
+        budget.state_expansions += sum(len(layer) for layer in layers[1:])
         # A node-wide batch populates the exact node/squad cache before frontier work.
         for depth in reversed(range(len(nodes))):
             node = nodes[depth]
@@ -1921,6 +1939,7 @@ def solve_frontier(
     root_no_transfer_only: bool = False,
     prefer_deterministic_linear: bool = False,
     profile: Stage11SearchProfile | None = None,
+    work_budget: Stage11WorkBudget | None = None,
 ) -> FrontierResult:
     use_fast_path = (
         prefer_deterministic_linear
@@ -1934,12 +1953,15 @@ def solve_frontier(
     enumerator_type = (
         DeterministicLinearExactEnumerator if use_fast_path else BoundedExactEnumerator
     )
-    return enumerator_type(
+    enumerator = enumerator_type(
         request=request,
         evaluator=evaluator,
         root_no_transfer_only=root_no_transfer_only,
         profile=profile,
-    ).enumerate()
+    )
+    if isinstance(enumerator, DeterministicLinearExactEnumerator):
+        enumerator.work_budget = work_budget
+    return enumerator.enumerate()
 
 
 def build_plan(

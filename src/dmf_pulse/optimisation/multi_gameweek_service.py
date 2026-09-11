@@ -46,6 +46,7 @@ from dmf_pulse.optimisation.multi_gameweek_solver import (
     FrontierResult,
     PolicyCandidate,
     Stage11SearchProfile,
+    Stage11WorkBudget,
     apply_transfer_action,
     build_move_attribution,
     build_plan,
@@ -287,6 +288,14 @@ def optimise_multi_gameweek(
     """Optimise a policy; expose only its root transition as executable."""
 
     evaluator = evaluator or StaticTacticalEvaluator()
+    work_budget = (
+        Stage11WorkBudget(
+            request.search_policy.max_policy_candidates,
+            request.search_policy.max_state_expansions,
+        )
+        if prefer_deterministic_linear
+        else None
+    )
     try:
         validate_request(request)
         if request.projection_mode is ProjectionMode.PRODUCTION:
@@ -301,6 +310,7 @@ def optimise_multi_gameweek(
                 evaluator,
                 prefer_deterministic_linear=prefer_deterministic_linear,
                 profile=profile,
+                work_budget=work_budget,
             )
         else:
             frontier = solve_frontier(request, evaluator)
@@ -406,6 +416,8 @@ def optimise_multi_gameweek(
                 evaluator,
                 root_no_transfer_only=True,
                 prefer_deterministic_linear=True,
+                profile=profile,
+                work_budget=work_budget,
             )
         else:
             baseline_frontier = solve_frontier(request, evaluator, root_no_transfer_only=True)
