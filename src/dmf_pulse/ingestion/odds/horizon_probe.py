@@ -42,6 +42,7 @@ from dmf_pulse.ingestion.odds.parser import (
     ParsedOddsPayload,
     parse_odds_payload,
 )
+from dmf_pulse.markets.models import canonical_decimal_text
 from dmf_pulse.markets.policy import load_market_normalisation_policy
 
 PROFILE_ID = "the_odds_api_private_analytics_v1"
@@ -144,7 +145,21 @@ class HorizonObservation:
                         for row in rows
                     ),
                     "paired_supported_totals": sum(
-                        any(b.paired_lines for b in row.books) for row in rows
+                        any(b.totals == "PAIRED_HALF_GOAL" for b in row.books) for row in rows
+                    ),
+                    "temporally_eligible_totals": sum(
+                        row.status == "MATCHED"
+                        and any(b.totals_temporally_eligible for b in row.books)
+                        for row in rows
+                    ),
+                    "missing_totals": sum(
+                        any(b.totals == "MISSING" for b in row.books) for row in rows
+                    ),
+                    "unsupported_totals": sum(
+                        any(b.totals == "UNSUPPORTED" for b in row.books) for row in rows
+                    ),
+                    "invalid_totals": sum(
+                        any(b.totals == "INVALID" for b in row.books) for row in rows
                     ),
                     "no_h2h": sum(any(b.h2h == "ABSENT" for b in row.books) for row in rows),
                     "totals_only": sum(
@@ -320,7 +335,7 @@ def _book(
             sides.add(side)
         for line, sides in sorted(by_line.items()):
             if sides == {"OVER", "UNDER"}:
-                lines.append(format(line, "f"))
+                lines.append(canonical_decimal_text(line))
             else:
                 degradations.add("TOTALS_INCOMPLETE_LINE")
         if not totals.outcomes:

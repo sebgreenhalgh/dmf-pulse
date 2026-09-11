@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 from copy import deepcopy
 from dataclasses import replace
@@ -29,6 +30,16 @@ pytestmark = pytest.mark.unit
 NOW = datetime(2026, 8, 24, 10, tzinfo=UTC)
 CUTOFF = NOW + timedelta(minutes=5)
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def _script():
+    spec = importlib.util.spec_from_file_location(
+        "r8a_probe_operator", ROOT / "scripts/probe_horizon_market_coverage.py"
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def fpl_sources():
@@ -399,7 +410,7 @@ def test_complete_source_hash_tampering(fpl):
 
 
 def test_operator_rights_pending_before_any_transport(monkeypatch):
-    from scripts import probe_horizon_market_coverage as script
+    script = _script()
 
     def forbidden(*args, **kwargs):
         pytest.fail("transport/model boundary must not be invoked")
@@ -413,7 +424,7 @@ def test_operator_rights_pending_before_any_transport(monkeypatch):
 
 
 def test_safe_argument_error_never_echoes_input(capsys):
-    from scripts.probe_horizon_market_coverage import main
+    main = _script().main
 
     assert main(["--entry-id", "synthetic-private-value"]) == 2
     assert "synthetic-private-value" not in capsys.readouterr().err
@@ -428,7 +439,8 @@ def test_full_official_snapshot_to_probe_no_models(monkeypatch, bad_body):
         DirectFplCredentialProvider,
         DirectFplRunAttestation,
     )
-    from scripts import probe_horizon_market_coverage as script
+
+    script = _script()
     from tests.unit.ingestion.test_fpl_manager_provider import _context
     from tests.unit.ingestion.test_one_command_assembly import _DirectResponses
 
@@ -570,7 +582,7 @@ def test_existing_production_sources_unchanged():
 
 
 def test_rights_flags_do_not_upgrade_profile():
-    from scripts.probe_horizon_market_coverage import live_rights_blocker
+    live_rights_blocker = _script().live_rights_blocker
 
     profile = load_rights_profiles()["the_odds_api_private_analytics_v1"]
     now = datetime(2026, 9, 11, tzinfo=UTC)
@@ -599,7 +611,7 @@ def test_rights_flags_do_not_upgrade_profile():
 def test_operator_safe_exception_boundary(monkeypatch, failure_code):
     from types import SimpleNamespace
 
-    from scripts import probe_horizon_market_coverage as script
+    script = _script()
 
     monkeypatch.setattr(script, "live_rights_blocker", lambda *args: None)
     monkeypatch.setattr(script.EnvironmentOddsCredentialProvider, "_configured", lambda _: True)
@@ -626,7 +638,7 @@ def test_operator_safe_exception_boundary(monkeypatch, failure_code):
 
 @pytest.mark.parametrize("missing", ["odds", "fpl"])
 def test_missing_credentials_not_attempted(monkeypatch, missing):
-    from scripts import probe_horizon_market_coverage as script
+    script = _script()
 
     monkeypatch.setattr(script, "live_rights_blocker", lambda *args: None)
     monkeypatch.setattr(
@@ -639,7 +651,7 @@ def test_missing_credentials_not_attempted(monkeypatch, missing):
 
 
 def test_main_safe_output_and_help(monkeypatch, capsys):
-    from scripts import probe_horizon_market_coverage as script
+    script = _script()
 
     monkeypatch.setattr(script, "run_operator", lambda *args: {"status": "OBSERVATION_ONLY"})
     assert script.main(["--entry-id", "42"]) == 0
@@ -652,7 +664,7 @@ def test_main_safe_output_and_help(monkeypatch, capsys):
     "time", [NOW.replace(tzinfo=None), NOW - timedelta(seconds=1), CUTOFF + timedelta(seconds=1)]
 )
 def test_acquisition_clock_rejects_before_network(time):
-    from scripts.probe_horizon_market_coverage import acquire_probe
+    acquire_probe = _script().acquire_probe
 
     with pytest.raises(IngestionError):
         acquire_probe(
@@ -661,7 +673,7 @@ def test_acquisition_clock_rejects_before_network(time):
 
 
 def test_invalid_entry_before_network():
-    from scripts.probe_horizon_market_coverage import acquire_probe
+    acquire_probe = _script().acquire_probe
 
     with pytest.raises(IngestionError):
         acquire_probe(
@@ -694,3 +706,25 @@ def test_fpl_context_tampering_cannot_reuse_observation(fpl):
     )
     with pytest.raises(IngestionError):
         verify_observation(result, source, altered)
+
+
+def test_invalid_totals_are_not_counted_as_supported(fpl):
+    row = event()
+    market = totals()
+    market["outcomes"].append(deepcopy(market["outcomes"][0]))
+    row["bookmakers"][0]["markets"].append(market)
+    counts = observe(fpl, [row]).safe_summary()["by_gameweek"][0]
+    assert counts["paired_supported_totals"] == 0
+    assert counts["invalid_totals"] == 1
+    assert counts["complete_h2h"] == counts["temporally_eligible_h2h"] == 1
+
+
+def test_line_scale_and_outcome_order_do_not_change_diagnostics(fpl):
+    row = event()
+    row["bookmakers"][0]["markets"].append(totals())
+    left = json.dumps([row]).replace('"point": 2.5', '"point": 2.50', 1).encode()
+    row["bookmakers"][0]["markets"][1]["outcomes"].reverse()
+    text = json.dumps([row])
+    prefix, suffix = text.rsplit('"point": 2.5', 1)
+    right = (prefix + '"point": 2.50' + suffix).encode()
+    assert observe(fpl, left).fixtures == observe(fpl, right).fixtures

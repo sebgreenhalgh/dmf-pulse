@@ -16,6 +16,11 @@
 - Run focused regressions, static/build/wheel/security/repository/manifest gates; then
   independent read-only review, exact reviewed SHA publication and complete exact-SHA CI.
 - Stop after R8A. No R8B, live recommendation, PR, merge, tag or activation.
+- Corrected candidate: 83 focused tests, 322 affected regressions, 96% focused branch
+  coverage and clean external installed-wheel proof passed. Two independent P2
+  findings reproduced and repaired (totals classification and decimal-line ordering).
+- Broad local run was superseded/interrupted; complete global coverage and DB-backed
+  gates remain mandatory exact-SHA CI, not claimed from the focused local report.
 
 ## PRIVATE-V1-ONE-COMMAND-001N-R5
 

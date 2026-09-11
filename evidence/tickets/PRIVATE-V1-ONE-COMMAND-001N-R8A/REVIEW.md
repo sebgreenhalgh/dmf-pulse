@@ -1,4 +1,4 @@
-# R8A local engineering candidate — independent review pending
+# R8A corrected local candidate — independent re-review pending at snapshot time
 
 This candidate adds only a transient coverage classifier, operator script and
 focused synthetic tests, plus ticket/plan/manifest evidence. It does not change
@@ -34,9 +34,11 @@ No broad web research repeated. The reported newer terms are NOT self-ratified.
   marker representation correction; scanner and allowlist were not changed.
 - Canonical PRC-013 and R8A manifests regenerated, 1368 files each at this checkpoint.
 - Authority and repository validators passed. Protected source/config/CI diff is empty.
-- Full local non-PostgreSQL/non-performance suite under the repository coverage
-  floor is RUNNING, not yet claimed successful. PostgreSQL/performance acceptance
-  additionally requires the unchanged complete exact-SHA CI.
+- The initial broad local coverage run was interrupted when independent review
+  required source fixes; it is NOT a full-suite pass for this candidate. Final
+  local validation is the focused branch gate and affected regressions below.
+  The unchanged whole-repository 90% combined coverage, PostgreSQL/performance
+  and inherited database-backed wheel acceptance require full exact-SHA CI.
 
 Installed gate is an ignored local harness at review_pack/r8a/verify_installed_probe.py,
 reusing the repository's offline clean-wheel environment procedure. Its sample is
@@ -66,5 +68,35 @@ Live coverage NOT observed: CURRENT_TERMS_AND_APPLICABLE_ACCOUNT_REVIEW_PENDING.
 No credentials inspected. The profile still records July terms and a future
 approved account; neither research nor runtime flags can upgrade that authority.
 
-Independent review pending. Candidate not pushed; no R8A exact-SHA CI yet.
+## Independent findings and corrected-candidate evidence
+
+The separate fresh-context read-only reviewer assessed local c08020ac86998e3a8b689472bf918074c5fb8262:
+no P0/P1; two material P2 findings required remediation before push.
+
+1. Invalid totals retaining a paired line were counted as supported in terminal output.
+   Corrected to require typed PAIRED_HALF_GOAL state; separate missing/unsupported/invalid
+   and temporally eligible totals counts now disclose degradation without blocking H2H.
+2. Equivalent 2.50/2.5 point spelling made line output depend on outcome order.
+   Corrected with the existing context-independent canonical_decimal_text serializer.
+
+Both were reproduced with RED synthetic tests before correction. Both now pass.
+An additional exact-CI-launcher check found namespace script import dependence;
+tests now load the operator script by explicit repository-relative file location.
+No production import-path change was needed.
+
+Final corrected local gates:
+- 83 focused tests passed through both Python-module and CI-style pytest launchers.
+- 322 affected ingestion regressions passed in 15.93 seconds.
+- Fresh focused branch coverage: 372 statements, 112 branches, 11 missed statements;
+  classifier 96%, script 97%, combined 96%, unchanged 90% minimum. This is NOT a
+  whole-repository coverage claim. Collection uses file-directory source matching
+  because the script is deliberately loaded by file rather than a package alias.
+- Rebuilt wheel/sdist and reran the clean external installed synthetic gate: PASS.
+- The inherited verify_odd005_wheel.py local attempt reported missing
+  DMF_TEST_DATABASE_URL; Docker daemon was unavailable. No database was created,
+  no credentials inspected. This inherited gate remains mandatory in exact-SHA CI.
+
+Independent re-review is pending at this evidence snapshot. Candidate not pushed;
+no R8A exact-SHA CI yet. Final external review/CI results are reported at handoff
+without changing the exact reviewed/published commit merely to restamp this file.
 No PR, merge, tag, activation, live recommendation or R8B.
