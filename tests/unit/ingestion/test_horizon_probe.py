@@ -411,6 +411,12 @@ def test_complete_source_hash_tampering(fpl):
 
 def test_operator_rights_pending_before_any_transport(monkeypatch):
     script = _script()
+    profile = load_rights_profiles()["the_odds_api_private_analytics_v1"].model_copy(
+        update={"terms_version": "checked-2026-07-25"}
+    )
+    monkeypatch.setattr(
+        script, "load_rights_profiles", lambda: {profile.rights_profile_id: profile}
+    )
 
     def forbidden(*args, **kwargs):
         pytest.fail("transport/model boundary must not be invoked")
@@ -584,7 +590,15 @@ def test_existing_production_sources_unchanged():
 def test_rights_flags_do_not_upgrade_profile():
     live_rights_blocker = _script().live_rights_blocker
 
-    profile = load_rights_profiles()["the_odds_api_private_analytics_v1"]
+    # Preserve the historical placeholder case independently of later human approvals.
+    profile = load_rights_profiles()["the_odds_api_private_analytics_v1"].model_copy(
+        update={
+            "checked_at": datetime(2026, 7, 25, tzinfo=UTC),
+            "approved_at": datetime(2026, 7, 25, tzinfo=UTC),
+            "account_scope": "one future approved private account",
+            "terms_version": "checked-2026-07-25",
+        }
+    )
     now = datetime(2026, 9, 11, tzinfo=UTC)
     assert live_rights_blocker(profile, profile.human_approval_id, True, now) is not None
     # Synthetic-only later ratification object; never written or installed.

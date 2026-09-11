@@ -1,5 +1,19 @@
 # DMF Pulse execution plans
 
+## PRIVATE-V1-ONE-COMMAND-001N-R8A-R1
+
+- Resume only from verified R8A parent b258c6e9c560ff0dd1e6f358f7fe3f74610e1578;
+  parent CI 34639186932 passed all twelve jobs. Isolated descendant worktree.
+- Timestamp blocker resolved by human-supplied actual terms review
+  2026-09-11T21:21:31Z and approval reaffirmation 2026-09-11T21:22:20Z.
+- Record DMF-R8A-PRIVATE-RIGHTS-2026-09-11 in canonical Odds metadata only;
+  preserve capabilities, unresolved rights, all FPL rights and executable code.
+- Add RED governance gates, reconcile metadata, run affected offline tests and
+  installed-wheel resource/gate verification, static/build/repository/security gates.
+- Preserve historical pending evidence. Regenerate mutable manifests; obtain one
+  fresh read-only independent review, publish and require exact-SHA CI success.
+- No live provider calls, credential inspection, R8B, PR, merge, tag or activation.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R8A
 
 - Verified immutable R7 parent c60d5b34a7d8922cd274d1ef28648b9e6235d718 and CI

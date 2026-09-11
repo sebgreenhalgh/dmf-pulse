@@ -36,10 +36,10 @@
       "unresolved_rights": []
     },
     {
-      "account_scope": "one future approved private account",
-      "approved_at": "2026-07-25T00:00:00Z",
-      "approved_by": "ODD-005 frozen contract",
-      "approved_purpose": "private internal analytical use with credential and quota gate",
+      "account_scope": "Sebastian-owned and authorized private The Odds API account",
+      "approved_at": "2026-09-11T21:22:20Z",
+      "approved_by": "Sebastian",
+      "approved_purpose": "Private, operator-initiated observation of current EPL H2H/totals market coverage across the officially assigned three-Gameweek horizon for DMF Pulse R8A.",
       "attribution_required": false,
       "attribution_text": null,
       "capabilities": {
@@ -55,10 +55,10 @@
         "redistribution": "DENY",
         "transient_processing": "ALLOW"
       },
-      "checked_at": "2026-07-25T00:00:00Z",
-      "geography_scope": "private UK analytical use",
-      "human_approval_id": "13_ODDS_RIGHTS_RETENTION_AND_EXPORT_CONTRACT#the_odds_api_private_analytics_v1",
-      "notes": "Engineering rights profile; not legal advice.",
+      "checked_at": "2026-09-11T21:21:31Z",
+      "geography_scope": "United Kingdom private use",
+      "human_approval_id": "DMF-R8A-PRIVATE-RIGHTS-2026-09-11",
+      "notes": "Sebastian-owned and authorized account; United Kingdom private use; R8A-only approval. Terms published 2026-08-31, reviewed at checked_at; human approval reaffirmed at approved_at. Operational restrictions and historical lineage: tickets/PRIVATE-V1-ONE-COMMAND-001N-R8A-R1/HUMAN-APPROVAL.md. Capability matrix and unresolved rights unchanged; not legal advice.",
       "profile_version": "1.0.0",
       "provider_key": "the_odds_api",
       "retention_reason": null,
@@ -67,7 +67,7 @@
       "status": "HUMAN_APPROVED",
       "termination_deletion_required": true,
       "terms_source": "The Odds API Terms and Conditions",
-      "terms_version": "checked-2026-07-25",
+      "terms_version": "checked-2026-08-31",
       "unresolved_rights": [
         "raw historical retention requires explicit review",
         "model training and backup require explicit review",

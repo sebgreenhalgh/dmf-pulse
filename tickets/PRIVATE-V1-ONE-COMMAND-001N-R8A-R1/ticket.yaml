@@ -1,0 +1,27 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R8A-R1"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Human rights approval reconciliation only"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R8A-R1-rights-approval-reconciliation"
+required_base_commit: "b258c6e9c560ff0dd1e6f358f7fe3f74610e1578"
+authority_scopes:
+  - "A5-odds-manual-import"
+  - "A4-FPL-ingestion"
+objective: >-
+  Record the subsequently supplied human R8A-only approval and exact reaffirmation
+  time in governed Odds metadata. Preserve executable behavior and source rights
+  capabilities; verify native installed authority without credentials or providers.
+allowed_areas:
+  - "config/rights/odds_profiles.json"
+  - "tests/unit/ingestion/test_horizon_probe.py"
+  - "tests/unit/ingestion/test_horizon_rights_approval.py"
+  - "tickets/PRIVATE-V1-ONE-COMMAND-001N-R8A-R1/**"
+  - "evidence/tickets/PRIVATE-V1-ONE-COMMAND-001N-R8A-R1/**"
+  - "evidence/tickets/PRC-013/current_manifest.json"
+  - "PLANS.md"
+exclusions:
+  - "live providers, credential inspection, R8B, recommendations"
+  - "executable source changes, FPL rights changes, capability expansion"
+  - "dependencies, CI, PR, merge, tag, activation"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"
