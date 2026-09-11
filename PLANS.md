@@ -1,5 +1,22 @@
 # DMF Pulse execution plans
 
+## PRIVATE-V1-ONE-COMMAND-001N-R8A
+
+- Verified immutable R7 parent c60d5b34a7d8922cd274d1ef28648b9e6235d718 and CI
+  34619880451: all twelve jobs successful. Work is isolated; other worktrees untouched.
+- Authority: A4/A5/A6, DMFP-04 rights/account/zero-cost boundaries, DMFP-20
+  ADR-DATA-003/004/007 and ADR-SRC-001/002/004. Supplied R8 research is design input only.
+- Add RED synthetic coverage/mapping/time/quota/provenance tests, then a separate
+  observation classifier and operator script reusing existing FPL/Odds transports.
+- Keep ordinary recommendation, parser, models, optimisation, dependencies and CI byte-identical.
+- Preserve complete response provenance, actual timestamps, exclusive fixture classification
+  and overlapping market diagnostics; never claim consensus or projection acceptance.
+- Live rights review of the reported 2026-08-31 terms and applicable account/geography
+  remains PENDING. Do not change human approval or use live credentials during engineering.
+- Run focused regressions, static/build/wheel/security/repository/manifest gates; then
+  independent read-only review, exact reviewed SHA publication and complete exact-SHA CI.
+- Stop after R8A. No R8B, live recommendation, PR, merge, tag or activation.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R5
 
 - Exact parent `56a0776e8e13bfae31297b6b40f631361e1fce95`; CI `34259589435`, all 12 jobs

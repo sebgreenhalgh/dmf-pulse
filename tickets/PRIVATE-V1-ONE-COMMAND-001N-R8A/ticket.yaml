@@ -1,0 +1,29 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R8A"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Horizon market coverage observation probe"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R8A-horizon-market-coverage-probe"
+required_base_commit: "c60d5b34a7d8922cd274d1ef28648b9e6235d718"
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A5-odds-manual-import"
+  - "A6-normalisation"
+objective: >-
+  Observe current-cutoff UK H2H/totals coverage across the officially assigned
+  scheduled and unstarted three-Gameweek horizon, without model invocation or
+  recommendation changes. Research is design input, not rights approval.
+allowed_areas:
+  - "src/dmf_pulse/ingestion/odds/horizon_probe.py"
+  - "scripts/probe_horizon_market_coverage.py"
+  - "tests/unit/ingestion/test_horizon_probe.py"
+  - "tickets/PRIVATE-V1-ONE-COMMAND-001N-R8A/**"
+  - "evidence/tickets/PRIVATE-V1-ONE-COMMAND-001N-R8A/**"
+  - "evidence/tickets/PRC-013/current_manifest.json"
+  - "PLANS.md"
+exclusions:
+  - "R8B, numerical consensus, market-backed projections or recommendations"
+  - "ordinary pulse, parser policy, provider transports, models and optimisation changes"
+  - "dependencies, CI, rights approval or permission expansion"
+  - "PR, merge, tag, activation, live recommendation, live observation before all gates"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"
