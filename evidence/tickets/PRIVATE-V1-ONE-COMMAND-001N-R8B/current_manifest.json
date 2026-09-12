@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 156424,
+      "bytes": 156983,
       "path": "PLANS.md",
-      "sha256": "45d0ec8ee3c7552cca8edb017e26e5d35c6601fdd8595636eedb445d1f785f63"
+      "sha256": "3b7f9624a2be508f7434a1fb970c57c16305c3bd8954a0cd589232282a6d9b00"
     },
     {
       "bytes": 2761,
@@ -316,9 +316,9 @@
       "sha256": "1691229b120054b8d4c65c7d74e5a0f6d9d11947f1a8f261d26649314268011d"
     },
     {
-      "bytes": 3462,
+      "bytes": 3666,
       "path": "config/rights/odds_profiles.json",
-      "sha256": "a60d541e683c3e5a10e3b9504313ca9ac2a6fcf5650cfda2d4cd7ca8e2d9331c"
+      "sha256": "ef2ce414afec4db9903c9702bc0e4f429b4703176ae63f97629a8a7fe83cb4a0"
     },
     {
       "bytes": 1760,
@@ -5771,9 +5771,9 @@
       "sha256": "77417ebb35254d089c4aa3f54ca2f2fb0ee02d968f6e8a5bac7a46a168b444e3"
     },
     {
-      "bytes": 4740,
+      "bytes": 7431,
       "path": "tests/unit/ingestion/test_horizon_rights_approval.py",
-      "sha256": "109431fdf0b032fe80ac1d16b447505440cd38b85baa2ff8466921fa71a0da3f"
+      "sha256": "681366d95fdbc4cd317b09c830402a77aae5c5ae0f617361387abb5ca63ebca5"
     },
     {
       "bytes": 11253,
@@ -6839,6 +6839,21 @@
       "bytes": 1379,
       "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R8A/ticket.yaml",
       "sha256": "af987eefb0685a0784fb0474fa029c535f7515640a2a4725f8ba7d8a3146daf8"
+    },
+    {
+      "bytes": 496,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R8B-R1/ACCEPTANCE.md",
+      "sha256": "81fc42595c32efa23ee9163dbeb13f0dc7b4fd31c1fb8f9447f1c68a0e4cd2dd"
+    },
+    {
+      "bytes": 1757,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R8B-R1/HUMAN-APPROVAL.md",
+      "sha256": "fb6911932f2f4f2f3db5df22f1ad15e66020fa59cd0f02893f60b25d4a015af7"
+    },
+    {
+      "bytes": 1266,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R8B-R1/ticket.yaml",
+      "sha256": "baf0344e9708b61679ceede7e1f6a8db3dc171598fc4533b757ee763a6af1515"
     },
     {
       "bytes": 764,

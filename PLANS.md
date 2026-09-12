@@ -2049,6 +2049,15 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   scenarios, objective, frontier, alternatives, tie-break, terminal/price/chip modes, R1 cutoff,
   providers, persistence, PR, merge, tag and activation.
 
+## PRIVATE-V1-ONE-COMMAND-001N-R8B-R1 live rights approval reconciliation
+
+- [x] Verify immutable R8B parent `b13619123584800c8817961d81b0d9e0bec34f06`, its
+  complete exact-SHA CI, and isolate the requested governance-only descendant.
+- [ ] Record only the supplied R8B human authority, preserve terms/capabilities/FPL/R8B
+  executable bytes, and create immutable descendant evidence.
+- [ ] Run offline authority, installed-wheel, repository and scope gates; obtain independent
+  read-only review before publishing one exact SHA and requiring exact-SHA CI.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R2 checkpoints
 
 - [x] Verify the exact immutable parent and green CI, isolate the branch, and resolve the
