@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from datetime import UTC, datetime
+from typing import Literal
 
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.current import CurrentFplInputBundle, CurrentFplTeam
@@ -64,17 +65,33 @@ def build_automatic_current_mapping_plans(
     odds_input: OddsProviderCurrentInput,
     *,
     decided_at: datetime,
+    event_scope: Literal["FULL_RESPONSE", "ROOT_EXACT_KICKOFFS"] = "FULL_RESPONSE",
 ) -> tuple[CurrentTeamAliasPlan, CurrentFixtureMappingPlan]:
     """Create exact in-memory plans; any name, orientation, or kickoff ambiguity blocks."""
 
     if decided_at.tzinfo is None or decided_at.utcoffset() is None:
         raise IngestionError("VALIDATION_FAILED", "mapping decision time must be aware")
     decided = decided_at.astimezone(UTC)
+    target_fixtures = tuple(
+        item
+        for item in fpl_input.fixtures
+        if item.event_identity == fpl_input.target_event.identity
+    )
+    target_kickoffs = {item.kickoff_at for item in target_fixtures}
+    # A horizon response is still one complete provider response.  Current-root
+    # mapping deliberately considers only events which could bind the root's
+    # exact UTC fixture set; unrelated future/outside events remain in the
+    # accepted source for their own horizon binding and cannot degrade root
+    # completeness merely by being present.
+    target_events = tuple(
+        event for event in odds_input.events if event.commence_time in target_kickoffs
+    )
+    mapping_events = target_events if event_scope == "ROOT_EXACT_KICKOFFS" else odds_input.events
     provider_texts = tuple(
         sorted(
             {
                 text
-                for event in odds_input.events
+                for event in mapping_events
                 for text in (event.provider_home_team, event.provider_away_team)
             }
         )
@@ -100,13 +117,8 @@ def build_automatic_current_mapping_plans(
         team_mappings=aliases,
     )
     team_by_text = {item.provider_team_text: item for item in aliases}
-    target_fixtures = tuple(
-        item
-        for item in fpl_input.fixtures
-        if item.event_identity == fpl_input.target_event.identity
-    )
     bindings: list[CurrentFixtureBinding] = []
-    for event in odds_input.events:
+    for event in target_events:
         home = team_by_text[event.provider_home_team]
         away = team_by_text[event.provider_away_team]
         matches = tuple(
@@ -165,14 +177,19 @@ def build_automatic_current_identity_map(
     odds_input: OddsProviderCurrentInput,
     *,
     decided_at: datetime,
+    event_scope: Literal["FULL_RESPONSE", "ROOT_EXACT_KICKOFFS"] = "FULL_RESPONSE",
 ) -> FplOddsIdentityMap:
     """Build and resolve both exact transient mapping stages in one deterministic call."""
 
     team_plan, fixture_plan = build_automatic_current_mapping_plans(
-        fpl_input, odds_input, decided_at=decided_at
+        fpl_input, odds_input, decided_at=decided_at, event_scope=event_scope
     )
     team_request = bind_current_team_resolution_request(
-        fpl_input, odds_input, team_plan, mapping_decided_at=decided_at
+        fpl_input,
+        odds_input,
+        team_plan,
+        mapping_decided_at=decided_at,
+        event_scope=event_scope,
     )
     team_map = resolve_current_team_identities(fpl_input, odds_input, team_plan, team_request)
     fixture_request = bind_current_fixture_resolution_request(

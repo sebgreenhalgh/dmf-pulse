@@ -151,7 +151,11 @@ class CurrentOddsBookmaker(_FrozenModel):
     bookmaker_title: str = Field(min_length=1, max_length=500)
     provider_last_update: datetime
     age_at_receipt_seconds: int = Field(ge=0)
-    markets: tuple[CurrentOddsMarket, ...] = Field(min_length=1, max_length=1)
+    # A horizon response may contain a future event for which a bookmaker has
+    # not published H2H yet.  It is retained as source evidence and is never
+    # converted into a root constraint unless the caller has required H2H for
+    # that event's official kickoff.
+    markets: tuple[CurrentOddsMarket, ...] = Field(max_length=1)
     totals_markets: tuple[CurrentOddsTotalsMarket, ...] = ()
 
     @model_validator(mode="after")
@@ -168,7 +172,7 @@ class CurrentOddsEvent(_FrozenModel):
     commence_time: datetime
     provider_home_team: str = Field(min_length=1, max_length=500)
     provider_away_team: str = Field(min_length=1, max_length=500)
-    bookmakers: tuple[CurrentOddsBookmaker, ...] = Field(min_length=1)
+    bookmakers: tuple[CurrentOddsBookmaker, ...] = ()
 
     @model_validator(mode="after")
     def validate_teams(self) -> CurrentOddsEvent:
@@ -639,6 +643,7 @@ def _provider_events(
     *,
     received_at: datetime,
     information_cutoff: datetime,
+    required_h2h_commence_times: frozenset[datetime] | None,
 ) -> tuple[tuple[CurrentOddsEvent, ...], tuple[str, ...], tuple[str, ...]]:
     blockers: set[str] = set()
     warnings: set[str] = set()
@@ -655,6 +660,10 @@ def _provider_events(
 
     seen_event_ids: set[str] = set()
     for event in parsed.events:
+        h2h_required = (
+            required_h2h_commence_times is None
+            or event.commence_time in required_h2h_commence_times
+        )
         if event.id in seen_event_ids:
             blockers.add("DUPLICATE_PROVIDER_EVENT_ID")
             continue
@@ -664,7 +673,7 @@ def _provider_events(
             continue
         if event.commence_time <= information_cutoff:
             blockers.add("EVENT_NOT_PREMATCH_AT_CUTOFF")
-        if not event.bookmakers:
+        if not event.bookmakers and h2h_required:
             blockers.add("BOOKMAKER_MISSING")
         seen_bookmakers: set[str] = set()
         current_bookmakers: list[CurrentOddsBookmaker] = []
@@ -681,7 +690,23 @@ def _provider_events(
                 market.key for market in bookmaker.markets if market.key not in _SUPPORTED_MARKETS
             )
             if len(requested) != 1:
-                blockers.add("REQUESTED_MARKET_MISSING_OR_DUPLICATED")
+                if h2h_required or len(requested) > 1:
+                    blockers.add("REQUESTED_MARKET_MISSING_OR_DUPLICATED")
+                else:
+                    warnings.add("H2H_MISSING")
+                    age_seconds = int((received_at - bookmaker.last_update).total_seconds())
+                    if age_seconds < 0:
+                        blockers.add("PROVIDER_TIMESTAMP_AFTER_RECEIPT")
+                        age_seconds = 0
+                    current_bookmakers.append(
+                        CurrentOddsBookmaker(
+                            bookmaker_key=bookmaker.key,
+                            bookmaker_title=bookmaker.title,
+                            provider_last_update=bookmaker.last_update,
+                            age_at_receipt_seconds=age_seconds,
+                            markets=(),
+                        )
+                    )
                 continue
             market = requested[0]
             if market.last_update is not None and market.last_update > received_at:
@@ -741,16 +766,15 @@ def _provider_events(
                     totals_markets=tuple(current_totals),
                 )
             )
-        if current_bookmakers:
-            current_events.append(
-                CurrentOddsEvent(
-                    provider_event_id=event.id,
-                    commence_time=event.commence_time,
-                    provider_home_team=event.home_team,
-                    provider_away_team=event.away_team,
-                    bookmakers=tuple(current_bookmakers),
-                )
+        current_events.append(
+            CurrentOddsEvent(
+                provider_event_id=event.id,
+                commence_time=event.commence_time,
+                provider_home_team=event.home_team,
+                provider_away_team=event.away_team,
+                bookmakers=tuple(current_bookmakers),
             )
+        )
 
     warnings.update(f"ADDITIVE_UNSUPPORTED_MARKET:{key}" for key in additive_markets)
     if blockers:
@@ -782,6 +806,7 @@ def build_current_odds_input(
     transport_call_count: int,
     transport_id: Literal["stdlib_http_client", "stdlib_urllib", "injected"],
     provider_request_id_sha256: str | None,
+    required_h2h_commence_times: tuple[datetime, ...] | None = None,
 ) -> OddsProviderCurrentInput:
     """Validate one response into a cutoff-safe provider-native current input."""
 
@@ -816,10 +841,25 @@ def build_current_odds_input(
             details={"blockers": ["QUOTA_SOURCE_INVALID"]},
         )
 
+    required_h2h_times: frozenset[datetime] | None
+    if required_h2h_commence_times is None:
+        required_h2h_times = None
+    else:
+        if any(
+            value.tzinfo is None or value.utcoffset() is None
+            for value in required_h2h_commence_times
+        ):
+            raise IngestionError(
+                "VALIDATION_FAILED", "required H2H kickoffs must be timezone-aware"
+            )
+        required_h2h_times = frozenset(
+            value.astimezone(UTC) for value in required_h2h_commence_times
+        )
     events, event_warnings, additive_markets = _provider_events(
         parsed,
         received_at=received,
         information_cutoff=cutoff,
+        required_h2h_commence_times=required_h2h_times,
     )
     warnings = tuple(sorted(set((*parsed.warnings, *event_warnings))))
     temporal = CurrentOddsTemporalState(

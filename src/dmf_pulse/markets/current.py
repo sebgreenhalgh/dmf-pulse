@@ -997,6 +997,9 @@ def _h2h_quotes(
     exclusions: list[ExcludedBook] = []
     candidates: dict[UUID, list[CurrentOddsBookmaker]] = {}
     for bookmaker in event.bookmakers:
+        if not bookmaker.markets:
+            warnings.add("H2H_UNAVAILABLE")
+            continue
         market = bookmaker.markets[0]
         for outcome in market.outcomes:
             if (
@@ -1558,7 +1561,6 @@ def _require_cross_source_orientation(
         or _provider_event_identity_sha256(event) != mapping.provider_event_identity_sha256
     ):
         raise CurrentMarketConstraintError("SOURCE_INVALID")
-
     home_matches = tuple(
         team
         for team in source.identity_map.team_mappings
@@ -1580,7 +1582,6 @@ def _require_cross_source_orientation(
         or away.official_fpl_team_identity != mapping.official_away_team_identity
     ):
         raise CurrentMarketConstraintError("SOURCE_INVALID")
-
     fixture_matches = tuple(
         fixture
         for fixture in source.fpl_input.fixtures
@@ -1595,6 +1596,129 @@ def _require_cross_source_orientation(
         or official_fixture.kickoff_at != mapping.official_fpl_kickoff_at
     ):
         raise CurrentMarketConstraintError("SOURCE_INVALID")
+
+
+def build_exact_fixture_market_constraints(
+    *,
+    source: CurrentUnifiedStateBundle,
+    event: CurrentOddsEvent,
+    fixture: CurrentMarketCanonicalFixture,
+    identity_view: CurrentMarketCanonicalIdentityView,
+    mapping_cutoff: datetime,
+    policy: MarketNormalisationPolicy,
+    score_policy: ScoreBaselinePolicy,
+    market_as_of: datetime,
+) -> CurrentFixtureMarketConstraints:
+    """Apply the single accepted H2H/totals kernel to one already exact binding.
+
+    Both the root wrapper and the R8B future wrapper call this function.  It is
+    intentionally blind to gameweek: the caller supplies an independently
+    verified exact FPL/provider/canonical fixture binding and the full original
+    current source remains the provenance authority.
+    """
+
+    h2h_quotes, adapter_exclusions, timestamp_warnings = _h2h_quotes(
+        source=source,
+        event=event,
+        fixture=fixture,
+        identity_view=identity_view,
+    )
+    h2h_evaluation = evaluate_market_consensus(
+        h2h_quotes,
+        as_of=market_as_of,
+        mapping_cutoff=mapping_cutoff,
+        policy=policy,
+        initial_exclusions=adapter_exclusions,
+        initial_warnings=timestamp_warnings,
+    )
+    exclusions: Counter[str] = Counter(item.reason.value for item in h2h_evaluation.exclusions)
+    warnings = set(h2h_evaluation.warnings)
+    lines = sorted(
+        {market.line for bookmaker in event.bookmakers for market in bookmaker.totals_markets}
+    )
+    totals_consensuses: list[CurrentTotalsConsensus] = []
+    for line in lines:
+        totals = _totals_consensus(
+            source=source,
+            event=event,
+            fixture=fixture,
+            identity_view=identity_view,
+            line=line,
+            policy=policy,
+            exclusions=exclusions,
+            as_of=market_as_of,
+        )
+        if totals is not None:
+            totals_consensuses.append(totals)
+    h2h_consensus = h2h_evaluation.consensus
+    if h2h_consensus is None:
+        readiness = CurrentMarketReadiness.BLOCKED
+        constraints = MarketConstraintSet(
+            as_of=market_as_of,
+            constraints=(),
+            source_result_sha256=None,
+        )
+    else:
+        h2h_set = constraints_from_market_consensus(
+            h2h_consensus,
+            fixture_id=fixture.canonical_fixture_id,
+            as_of=market_as_of,
+            uncertainty_floor=score_policy.projection.market_uncertainty_floor,
+        )
+        combined = list(h2h_set.constraints)
+        for totals in totals_consensuses:
+            combined.extend(
+                _totals_constraints(
+                    totals,
+                    uncertainty_floor=score_policy.projection.market_uncertainty_floor,
+                )
+            )
+        source_result_sha256 = canonical_sha256(
+            {
+                "h2h": h2h_consensus.result_sha256,
+                "totals": [item.result_sha256 for item in totals_consensuses],
+            }
+        )
+        constraints = cap_market_family_weights(
+            MarketConstraintSet(
+                as_of=market_as_of,
+                constraints=tuple(combined),
+                source_result_sha256=source_result_sha256,
+            ),
+            score_policy.projection.family_cap_map,
+        )
+        readiness = (
+            CurrentMarketReadiness.MARKET_READY
+            if totals_consensuses
+            else CurrentMarketReadiness.H2H_ONLY_DEGRADED
+        )
+    safe_fixture_hash = canonical_sha256(
+        {
+            "canonical_fixture_id": str(fixture.canonical_fixture_id),
+            "fixture_binding_sha256": fixture.fixture_binding_sha256,
+            "official_fpl_fixture_lookup_sha256": fixture.official_fpl_fixture_lookup_sha256,
+            "provider_event_identity_sha256": fixture.provider_event_identity_sha256,
+        }
+    )
+    provisional = CurrentFixtureMarketConstraints.model_construct(
+        canonical_fixture_id=fixture.canonical_fixture_id,
+        safe_target_fixture_identity_sha256=safe_fixture_hash,
+        readiness=readiness,
+        h2h_consensus=h2h_consensus,
+        totals_consensuses=tuple(totals_consensuses),
+        constraint_set=constraints,
+        exclusion_counts=tuple(
+            CurrentMarketExclusionCount(reason=reason, count=count)
+            for reason, count in sorted(exclusions.items())
+            if count
+        ),
+        warnings=tuple(sorted(warnings)),
+        semantic_sha256="0" * 64,
+    )
+    fixture_payload = provisional.model_dump(mode="python")
+    fixture_payload["h2h_consensus"] = h2h_consensus
+    fixture_payload["semantic_sha256"] = current_fixture_market_constraints_sha256(provisional)
+    return CurrentFixtureMarketConstraints.model_validate(fixture_payload)
 
 
 def _request_matches(
@@ -1713,118 +1837,18 @@ class CurrentMarketConstraintService:
             fixture_identity = checked_view.fixture(mapping.official_fpl_fixture_id)
             event = events_by_id[mapping.provider_event_id]
             _require_cross_source_orientation(checked_source, mapping, event)
-            h2h_quotes, adapter_exclusions, timestamp_warnings = _h2h_quotes(
-                source=checked_source,
-                event=event,
-                fixture=fixture_identity,
-                identity_view=checked_view,
-            )
-            h2h_evaluation = evaluate_market_consensus(
-                h2h_quotes,
-                as_of=market_as_of,
-                mapping_cutoff=checked_source.identity_map.mapping_decided_at,
-                policy=policy,
-                initial_exclusions=adapter_exclusions,
-                initial_warnings=timestamp_warnings,
-            )
-            exclusions: Counter[str] = Counter(
-                item.reason.value for item in h2h_evaluation.exclusions
-            )
-            warnings = set(h2h_evaluation.warnings)
-            lines = sorted(
-                {
-                    market.line
-                    for bookmaker in event.bookmakers
-                    for market in bookmaker.totals_markets
-                }
-            )
-            totals_consensuses: list[CurrentTotalsConsensus] = []
-            for line in lines:
-                totals = _totals_consensus(
+            fixture_results.append(
+                build_exact_fixture_market_constraints(
                     source=checked_source,
                     event=event,
                     fixture=fixture_identity,
                     identity_view=checked_view,
-                    line=line,
+                    mapping_cutoff=checked_source.identity_map.mapping_decided_at,
                     policy=policy,
-                    exclusions=exclusions,
-                    as_of=market_as_of,
+                    score_policy=score_policy,
+                    market_as_of=market_as_of,
                 )
-                if totals is not None:
-                    totals_consensuses.append(totals)
-            h2h_consensus = h2h_evaluation.consensus
-            if h2h_consensus is None:
-                readiness = CurrentMarketReadiness.BLOCKED
-                constraints = MarketConstraintSet(
-                    as_of=market_as_of,
-                    constraints=(),
-                    source_result_sha256=None,
-                )
-            else:
-                h2h_set = constraints_from_market_consensus(
-                    h2h_consensus,
-                    fixture_id=fixture_identity.canonical_fixture_id,
-                    as_of=market_as_of,
-                    uncertainty_floor=score_policy.projection.market_uncertainty_floor,
-                )
-                combined = list(h2h_set.constraints)
-                for totals in totals_consensuses:
-                    combined.extend(
-                        _totals_constraints(
-                            totals,
-                            uncertainty_floor=score_policy.projection.market_uncertainty_floor,
-                        )
-                    )
-                source_result_sha256 = canonical_sha256(
-                    {
-                        "h2h": h2h_consensus.result_sha256,
-                        "totals": [item.result_sha256 for item in totals_consensuses],
-                    }
-                )
-                constraints = cap_market_family_weights(
-                    MarketConstraintSet(
-                        as_of=market_as_of,
-                        constraints=tuple(combined),
-                        source_result_sha256=source_result_sha256,
-                    ),
-                    score_policy.projection.family_cap_map,
-                )
-                readiness = (
-                    CurrentMarketReadiness.MARKET_READY
-                    if totals_consensuses
-                    else CurrentMarketReadiness.H2H_ONLY_DEGRADED
-                )
-            safe_fixture_hash = canonical_sha256(
-                {
-                    "canonical_fixture_id": str(fixture_identity.canonical_fixture_id),
-                    "fixture_binding_sha256": mapping.fixture_binding_sha256,
-                    "official_fpl_fixture_lookup_sha256": (
-                        mapping.official_fpl_fixture_identity.canonical_lookup_sha256
-                    ),
-                    "provider_event_identity_sha256": mapping.provider_event_identity_sha256,
-                }
             )
-            provisional = CurrentFixtureMarketConstraints.model_construct(
-                canonical_fixture_id=fixture_identity.canonical_fixture_id,
-                safe_target_fixture_identity_sha256=safe_fixture_hash,
-                readiness=readiness,
-                h2h_consensus=h2h_consensus,
-                totals_consensuses=tuple(totals_consensuses),
-                constraint_set=constraints,
-                exclusion_counts=tuple(
-                    CurrentMarketExclusionCount(reason=reason, count=count)
-                    for reason, count in sorted(exclusions.items())
-                    if count
-                ),
-                warnings=tuple(sorted(warnings)),
-                semantic_sha256="0" * 64,
-            )
-            fixture_payload = provisional.model_dump(mode="python")
-            fixture_payload["h2h_consensus"] = h2h_consensus
-            fixture_payload["semantic_sha256"] = current_fixture_market_constraints_sha256(
-                provisional
-            )
-            fixture_results.append(CurrentFixtureMarketConstraints.model_validate(fixture_payload))
         fixture_results.sort(key=lambda item: str(item.canonical_fixture_id))
         provisional_bundle = CurrentMarketConstraintBundle.model_construct(
             target_gameweek=checked_source.target_gameweek,
@@ -2129,6 +2153,7 @@ __all__ = [
     "CurrentTotalsConsensusOutcome",
     "CurrentTotalsOperatorMarket",
     "bind_current_market_constraint_request",
+    "build_exact_fixture_market_constraints",
     "build_transient_current_market_identity_view",
     "current_fixture_market_constraints_sha256",
     "current_market_constraint_bundle_sha256",

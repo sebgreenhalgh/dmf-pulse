@@ -36,6 +36,7 @@ class CurrentOddsTransientService:
         *,
         information_cutoff: datetime,
         commence_to: datetime,
+        required_h2h_commence_times: tuple[datetime, ...] | None = None,
     ) -> OddsProviderCurrentInput:
         if information_cutoff.tzinfo is None or information_cutoff.utcoffset() is None:
             raise IngestionError("VALIDATION_FAILED", "Odds cutoff must be timezone-aware")
@@ -83,6 +84,7 @@ class CurrentOddsTransientService:
             transport_call_count=fetched.transport_call_count,
             transport_id=transport_id,
             provider_request_id_sha256=fetched.provider_request_id_sha256,
+            required_h2h_commence_times=required_h2h_commence_times,
         )
 
 

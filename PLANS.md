@@ -1,5 +1,22 @@
 # DMF Pulse execution plans
 
+## PRIVATE-V1-ONE-COMMAND-001N-R8B
+
+- Verify immutable R8A-R1 parent e4d5774ca6f426e6231ae24e8f2cfc003b1fd5e6
+  and all-success CI 34650133584. Work only in an isolated R8B worktree.
+- For three-GW requests, acquire exactly one existing current Odds response bounded
+  by the complete official horizon; preserve the one-GW root request unchanged.
+- Partition only semantically in memory while retaining complete-response provenance.
+  Keep root current-market strictness and use an independently verifiable future
+  evidence/binding contract for exact official/canonical/provider identities.
+- Extract/reuse the accepted current H2H/totals consensus kernel; do not duplicate
+  policy or market mathematics. Future fallbacks are explicit, integrity failures block.
+- Preserve R7 optimisation, V3 screening, Stage-7, FPL/Odds rights, R8A observation
+  behavior and zero retention. No credential inspection, live call, recommendation,
+  R8B rights expansion, PR, merge, tag or activation.
+- Add deterministic hostile/differential/full rolling tests; run complete acceptance,
+  fresh read-only independent review, exact-reviewed-SHA CI, then stop.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R8A-R1
 
 - Resume only from verified R8A parent b258c6e9c560ff0dd1e6f358f7fe3f74610e1578;

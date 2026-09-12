@@ -26,6 +26,7 @@ from dmf_pulse.availability.manual_override import ManualFixtureMinutesInput
 from dmf_pulse.football_events.market_constraints import MarketConstraint
 from dmf_pulse.fpl_points.models import ProjectionMode
 from dmf_pulse.optimisation.models import NonNegativeInt, Sha256
+from dmf_pulse.private_v1.horizon_markets import HorizonFutureMarketEvidence
 from dmf_pulse.private_v1.models import (
     PrivateFixtureScorePrior,
     PrivateFreeTransferState,
@@ -74,6 +75,7 @@ class PrivateRollingFixtureInput(_RollingModel):
     information_cutoff: datetime
     market_mode: Literal["MARKET_BACKED", "SCORE_PRIOR_ONLY", "BLOCKED"]
     market_constraints: tuple[MarketConstraint, ...]
+    market_evidence: HorizonFutureMarketEvidence | None = None
     blocked_reason: StrictStr | None = None
     score_prior: PrivateFixtureScorePrior
     stage7: ManualFixtureMinutesInput | CurrentModelFixtureMinutesInput
@@ -108,15 +110,50 @@ class PrivateRollingFixtureInput(_RollingModel):
         ):
             raise ValueError("future fixture Stage-7/prior identity or cutoff differs")
         if self.market_mode == "MARKET_BACKED":
-            if not self.market_constraints or self.blocked_reason is not None:
+            if (
+                not self.market_constraints
+                or self.blocked_reason is not None
+                or self.market_evidence is None
+                or self.market_evidence.classification != "MARKET_BACKED"
+                or self.market_evidence.constraints != self.market_constraints
+            ):
                 raise ValueError("market-backed fixture requires constraints and no blocker")
         elif self.market_mode == "SCORE_PRIOR_ONLY":
-            if self.market_constraints or self.blocked_reason is not None:
+            if (
+                self.market_constraints
+                or self.blocked_reason is not None
+                or (
+                    self.market_evidence is not None
+                    and self.market_evidence.classification == "MARKET_BACKED"
+                )
+            ):
                 raise ValueError("score-prior-only fixture cannot carry market evidence")
+            # Current-cutoff execution is only allowed to fall back after the
+            # complete, original Odds response has classified this fixture.
+            # Repository-owned synthetic replay fixtures predate that source
+            # contract and deliberately have no provider evidence to verify.
+            if self.score_prior.source_class == "CURRENT_SCORE_PRIOR_BUNDLE" and (
+                self.market_evidence is None
+                or self.market_evidence.classification not in {"NO_EVENT", "H2H_UNAVAILABLE"}
+            ):
+                raise ValueError(
+                    "current score-prior-only fixture requires unavailable-market evidence"
+                )
         elif self.market_constraints or not self.blocked_reason:
             raise ValueError("blocked future fixture requires one typed blocker")
         if any(item.usable_at > self.information_cutoff for item in self.market_constraints):
             raise ValueError("future market constraint is post-cutoff")
+        if self.market_evidence is not None and (
+            self.market_evidence.official_fpl_fixture_id != self.official_fpl_fixture_id
+            or self.market_evidence.official_fpl_fixture_lookup_sha256
+            != self.official_fpl_fixture_lookup_sha256
+            or self.market_evidence.canonical_fixture_id != self.canonical_fixture_id
+            or self.market_evidence.home_official_fpl_team_id != self.home_official_fpl_team_id
+            or self.market_evidence.away_official_fpl_team_id != self.away_official_fpl_team_id
+            or self.market_evidence.kickoff_at != self.kickoff_at
+            or self.market_evidence.information_cutoff != self.information_cutoff
+        ):
+            raise ValueError("future market evidence identity or cutoff differs")
         if self.warnings != tuple(sorted(set(self.warnings))):
             raise ValueError("future fixture warnings must be unique and sorted")
         if self.semantic_sha256 != _semantic_hash(self):

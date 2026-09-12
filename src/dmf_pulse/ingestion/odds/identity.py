@@ -75,6 +75,7 @@ class CurrentTeamResolutionRequest(_FrozenIdentityModel):
         CURRENT_TEAM_RESOLUTION_REQUEST_VERSION
     )
     mapping_decided_at: datetime
+    event_scope: Literal["FULL_RESPONSE", "ROOT_EXACT_KICKOFFS"] = "FULL_RESPONSE"
     fpl_input_semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     fpl_identity_view_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     odds_provider_provenance_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -125,6 +126,7 @@ class CurrentTeamIdentityMap(_FrozenIdentityModel):
     season_code: Literal["2026/27"] = "2026/27"
     target_gameweek: int = Field(gt=0)
     mapping_decided_at: datetime
+    event_scope: Literal["FULL_RESPONSE", "ROOT_EXACT_KICKOFFS"] = "FULL_RESPONSE"
     information_cutoff: datetime
     fpl_usable_at: datetime
     odds_usable_at: datetime
@@ -305,11 +307,13 @@ def bind_current_team_resolution_request(
     plan: CurrentTeamAliasPlan,
     *,
     mapping_decided_at: datetime,
+    event_scope: Literal["FULL_RESPONSE", "ROOT_EXACT_KICKOFFS"] = "FULL_RESPONSE",
 ) -> CurrentTeamResolutionRequest:
     """Bind exact inputs and alias authority before resolving any team."""
 
     return CurrentTeamResolutionRequest(
         mapping_decided_at=mapping_decided_at,
+        event_scope=event_scope,
         fpl_input_semantic_sha256=fpl_input.semantic_sha256,
         fpl_identity_view_sha256=current_fpl_identity_view_sha256(fpl_input),
         odds_provider_provenance_sha256=current_odds_provider_provenance_sha256(odds_input),
@@ -334,6 +338,22 @@ def _revalidate_source_structures(
         raise IngestionError(
             "MAPPING_CONFLICT", "accepted LIVE-ODDS market semantic hash is inconsistent"
         )
+
+
+def _scoped_events(
+    fpl_input: CurrentFplInputBundle,
+    odds_input: OddsProviderCurrentInput,
+    *,
+    event_scope: Literal["FULL_RESPONSE", "ROOT_EXACT_KICKOFFS"],
+) -> tuple[CurrentOddsEvent, ...]:
+    if event_scope == "FULL_RESPONSE":
+        return odds_input.events
+    root_kickoffs = {
+        fixture.kickoff_at
+        for fixture in _target_gameweek_fixtures(fpl_input)
+        if fixture.kickoff_at is not None
+    }
+    return tuple(event for event in odds_input.events if event.commence_time in root_kickoffs)
 
 
 def _require_exact_bound_hashes(
@@ -544,6 +564,7 @@ def _team_identity_map_sha256(value: CurrentTeamIdentityMap) -> str:
             "competition_key": value.competition_key,
             "contract": value.contract,
             "database_accessed": value.database_accessed,
+            "event_scope": value.event_scope,
             "fpl_derived_storage": value.fpl_derived_storage,
             "fpl_identity_view_sha256": value.fpl_identity_view_sha256,
             "fpl_input_semantic_sha256": value.fpl_input_semantic_sha256,
@@ -588,11 +609,12 @@ def resolve_current_team_identities(
     cutoff = _require_current_context(fpl_input, odds_input, plan, request)
     fpl_teams = _team_by_id(fpl_input)
 
+    scoped_events = _scoped_events(fpl_input, odds_input, event_scope=request.event_scope)
     observed_provider_team_texts = tuple(
         sorted(
             {
                 text
-                for event in odds_input.events
+                for event in scoped_events
                 for text in (event.provider_home_team, event.provider_away_team)
             }
         )
@@ -613,7 +635,7 @@ def resolve_current_team_identities(
             )
         resolved.append(_resolved_team(alias, fpl_team=fpl_team))
     by_provider = {mapping.provider_team_text: mapping for mapping in resolved}
-    for event in odds_input.events:
+    for event in scoped_events:
         if (
             by_provider[event.provider_home_team].official_fpl_team_id
             == by_provider[event.provider_away_team].official_fpl_team_id
@@ -637,6 +659,7 @@ def resolve_current_team_identities(
         semantic_sha256="0" * 64,
         target_gameweek=fpl_input.target_gameweek,
         mapping_decided_at=request.mapping_decided_at,
+        event_scope=request.event_scope,
         information_cutoff=cutoff,
         fpl_usable_at=fpl_input.provenance.usable_at,
         odds_usable_at=odds_input.temporal.usable_at,
@@ -654,6 +677,7 @@ def resolve_current_team_identities(
         semantic_sha256=_team_identity_map_sha256(provisional),
         target_gameweek=fpl_input.target_gameweek,
         mapping_decided_at=request.mapping_decided_at,
+        event_scope=request.event_scope,
         information_cutoff=cutoff,
         fpl_usable_at=fpl_input.provenance.usable_at,
         odds_usable_at=odds_input.temporal.usable_at,
@@ -818,6 +842,7 @@ class FplOddsIdentityMap(_FrozenIdentityModel):
     target_gameweek: int = Field(gt=0)
     official_deadline_at: datetime
     mapping_decided_at: datetime
+    event_scope: Literal["FULL_RESPONSE", "ROOT_EXACT_KICKOFFS"] = "FULL_RESPONSE"
     information_cutoff: datetime
     fpl_usable_at: datetime
     odds_usable_at: datetime
@@ -893,6 +918,7 @@ class FplOddsIdentityMap(_FrozenIdentityModel):
         reconstructed_team_map = CurrentTeamIdentityMap(
             target_gameweek=self.target_gameweek,
             mapping_decided_at=self.mapping_decided_at,
+            event_scope=self.event_scope,
             information_cutoff=self.information_cutoff,
             fpl_usable_at=self.fpl_usable_at,
             odds_usable_at=self.odds_usable_at,
@@ -1327,6 +1353,7 @@ def _identity_source_lineage_sha256(value: FplOddsIdentityMap) -> str:
         {
             "fixture_mapping_plan_sha256": value.fixture_mapping_plan_sha256,
             "fixture_mapping_plan_version": value.fixture_mapping_plan_version,
+            "event_scope": value.event_scope,
             "fpl_identity_view_sha256": value.fpl_identity_view_sha256,
             "fpl_input_semantic_sha256": value.fpl_input_semantic_sha256,
             "fpl_usable_at": value.fpl_usable_at.isoformat(),
@@ -1354,6 +1381,7 @@ def _fpl_odds_identity_map_sha256(value: FplOddsIdentityMap) -> str:
             "competition_key": value.competition_key,
             "contract": value.contract,
             "coverage": value.coverage.model_dump(mode="json"),
+            "event_scope": value.event_scope,
             "fixture_mapping_plan_sha256": value.fixture_mapping_plan_sha256,
             "fixture_mapping_plan_version": value.fixture_mapping_plan_version,
             "fixture_match_policy": value.fixture_match_policy,
@@ -1431,6 +1459,7 @@ def resolve_current_fixture_identities(
             },
         )
     events_by_id = {event.provider_event_id: event for event in odds_input.events}
+    scoped_events = _scoped_events(fpl_input, odds_input, event_scope=team_map.event_scope)
     target_by_id = {fixture.provider_fixture_id: fixture for fixture in target_fixtures}
 
     resolved: list[ResolvedCurrentFixture] = []
@@ -1486,7 +1515,7 @@ def resolve_current_fixture_identities(
         )
 
     outside_ids: list[str] = []
-    for event in sorted(odds_input.events, key=lambda item: item.provider_event_id):
+    for event in sorted(scoped_events, key=lambda item: item.provider_event_id):
         if event.provider_event_id in mapped_provider_ids:
             continue
         home = team_map.team(event.provider_home_team)
@@ -1509,6 +1538,13 @@ def resolve_current_fixture_identities(
             )
         outside_ids.append(event.provider_event_id)
 
+    outside_ids.extend(
+        event.provider_event_id
+        for event in odds_input.events
+        if event.provider_event_id not in mapped_provider_ids
+        and event.provider_event_id not in outside_ids
+    )
+
     if mapped_fixture_ids != target_fixture_ids:
         raise IngestionError(
             "QUALITY_BLOCKED",
@@ -1529,7 +1565,7 @@ def resolve_current_fixture_identities(
         outside_target_provider_event_count=len(outside_ids),
         target_fpl_fixture_count=len(target_fixture_ids),
         mapped_event_count=len(fixture_mappings),
-        outside_target_provider_event_ids=tuple(outside_ids),
+        outside_target_provider_event_ids=tuple(sorted(outside_ids)),
     )
     provisional = FplOddsIdentityMap.model_construct(
         schema_version="1.0.0",
@@ -1553,6 +1589,7 @@ def resolve_current_fixture_identities(
         target_gameweek=fpl_input.target_gameweek,
         official_deadline_at=fpl_input.target_event.deadline_at,
         mapping_decided_at=request.mapping_decided_at,
+        event_scope=team_map.event_scope,
         information_cutoff=cutoff,
         fpl_usable_at=fpl_input.provenance.usable_at,
         odds_usable_at=odds_input.temporal.usable_at,

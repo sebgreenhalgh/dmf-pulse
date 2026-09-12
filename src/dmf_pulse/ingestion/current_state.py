@@ -453,6 +453,7 @@ def _verify_identity_map(
             odds_input,
             team_plan,
             mapping_decided_at=identity_map.mapping_decided_at,
+            event_scope=identity_map.event_scope,
         )
         team_map = resolve_current_team_identities(fpl_input, odds_input, team_plan, team_request)
         fixture_plan = identity_map.fixture_mapping_plan

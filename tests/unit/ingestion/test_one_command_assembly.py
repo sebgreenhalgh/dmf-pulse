@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
+from datetime import timedelta
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
@@ -275,6 +276,36 @@ def test_provider_observed_unified_state_and_transient_market_identity_are_accep
     assert view.authority == "OPERATOR_INITIATED_DETERMINISTIC"
     assert view.database_read_performed is False
     assert markets.target_gameweek == 2
+
+
+def test_horizon_root_identity_scope_ignores_benign_future_event(repository_root: Path) -> None:
+    fpl, _ruleset, _capability, _provider_body = _context(repository_root)
+    root = _provider_names_for_synthetic_clubs(build_odds_input(repository_root, cutoff=CUTOFF))
+    future = root.events[0].model_copy(
+        update={
+            "provider_event_id": "synthetic-benign-future-event",
+            "commence_time": root.events[0].commence_time + timedelta(days=7),
+        }
+    )
+    horizon = rehash_odds_input(root, events=(*root.events, future))
+
+    root_bridge = build_automatic_current_identity_map(fpl, root, decided_at=CUTOFF)
+    horizon_bridge = build_automatic_current_identity_map(
+        fpl,
+        horizon,
+        decided_at=CUTOFF,
+        event_scope="ROOT_EXACT_KICKOFFS",
+    )
+
+    assert horizon_bridge.event_scope == "ROOT_EXACT_KICKOFFS"
+    assert horizon_bridge.fixture_mappings == root_bridge.fixture_mappings
+    assert (
+        horizon_bridge.coverage.all_provider_event_count
+        == root_bridge.coverage.all_provider_event_count + 1
+    )
+    assert horizon_bridge.coverage.outside_target_provider_event_ids == (
+        "synthetic-benign-future-event",
+    )
 
 
 def test_ownership_and_full_candidate_universe_are_automatic(repository_root: Path) -> None:

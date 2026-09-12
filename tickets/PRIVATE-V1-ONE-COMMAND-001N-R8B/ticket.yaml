@@ -1,0 +1,33 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R8B"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Three-Gameweek horizon market integration"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R8B-horizon-market-integration"
+required_base_commit: "e4d5774ca6f426e6231ae24e8f2cfc003b1fd5e6"
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A5-odds-manual-import"
+  - "A6-normalisation"
+  - "B2-multi-GW"
+objective: >-
+  Reuse one current-cutoff, complete-horizon Odds response for root and future
+  private rolling fixtures, with exact evidence bindings and explicit score-prior
+  fallback, without altering accepted market or optimisation semantics.
+allowed_areas:
+  - "src/dmf_pulse/private_v1/**"
+  - "src/dmf_pulse/ingestion/current_state.py"
+  - "src/dmf_pulse/ingestion/odds/**"
+  - "src/dmf_pulse/markets/current.py"
+  - "tests/unit/private_v1/**"
+  - "tests/unit/ingestion/**"
+  - "tests/unit/markets/**"
+  - "tickets/PRIVATE-V1-ONE-COMMAND-001N-R8B/**"
+  - "evidence/tickets/PRIVATE-V1-ONE-COMMAND-001N-R8B/**"
+  - "evidence/tickets/PRC-013/current_manifest.json"
+  - "PLANS.md"
+exclusions:
+  - "live provider/FPL execution, credential inspection, recommendation execution"
+  - "rights expansion, R8A probe semantic changes, R7 optimiser/V3/Stage-7 changes"
+  - "dependencies, CI, PR, merge, tag, activation"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"

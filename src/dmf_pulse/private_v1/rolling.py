@@ -17,6 +17,7 @@ from dmf_pulse.fpl_points.gameweek import assemble_gameweek
 from dmf_pulse.fpl_points.gameweek_summaries import build_gameweek_projection
 from dmf_pulse.fpl_points.models import GameweekProjectionResult, GameweekScenarioSet
 from dmf_pulse.fpl_points.player_prior import load_packaged_player_prior
+from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.optimisation.models import CandidatePlayer
 from dmf_pulse.optimisation.multi_gameweek_models import (
     BackendStatus,
@@ -34,6 +35,7 @@ from dmf_pulse.optimisation.multi_gameweek_solver import (
     resolve_free_transfer_arc,
 )
 from dmf_pulse.private_v1.errors import PrivateV1Error
+from dmf_pulse.private_v1.horizon_markets import verify_future_market_evidence
 from dmf_pulse.private_v1.models import PrivateGainMass, PrivateTransferMove
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 from dmf_pulse.private_v1.rolling_models import (
@@ -686,6 +688,31 @@ class PrivateV1RollingRecommendationService:
                 "at least one future fixture lacks an accepted current-cutoff projection input",
             )
         _verify_current_sources(current)
+        official_fixtures = {
+            item.provider_fixture_id: item for item in current.current_state.fpl_input.fixtures
+        }
+        for future_gameweek in execution.future_gameweeks:
+            for fixture in future_gameweek.fixtures:
+                if fixture.market_evidence is None:
+                    continue
+                official = official_fixtures.get(fixture.official_fpl_fixture_id)
+                if official is None:
+                    raise PrivateV1Error(
+                        "FUTURE_FIXTURE_INPUT_BLOCKED",
+                        "future market evidence lacks its official FPL fixture",
+                    )
+                try:
+                    verify_future_market_evidence(
+                        fixture.market_evidence,
+                        current.current_state,
+                        fixture=official,
+                        canonical_fixture_id=fixture.canonical_fixture_id,
+                    )
+                except IngestionError as exc:
+                    raise PrivateV1Error(
+                        "FUTURE_FIXTURE_INPUT_BLOCKED",
+                        "future market evidence failed exact-source verification",
+                    ) from exc
         prior = load_packaged_player_prior()
         _verify_runtime_artifacts(current, prior)
         projections: list[GameweekProjectionResult] = []

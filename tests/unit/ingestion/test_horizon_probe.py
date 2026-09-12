@@ -578,8 +578,8 @@ def test_existing_production_sources_unchanged():
 
     # Parent bytes, independent of Git availability or CI clone depth.
     expected = {
-        "private_v1/one_command.py": "843b68c6b2b11f09aad08feb671dfcc471f22525b93fafce8ade5862dc403294",
-        "private_v1/rolling.py": "84e255cea1190d5ab7bcbdfd66b4510d25f2f1892006d6ef1b07255488edbafd",
+        "private_v1/service.py": "61eb8a2ebd76eff7affb539f8ce7676b065bd6946d63f68bc652696c98bc856a",
+        "optimisation/multi_gameweek_solver.py": "0c4f8948b93fd8016088dc2d59e571475f56aa1fa74d77efc113615f1570ad7a",
         "ingestion/odds/parser.py": "d92f7dd0fd2bed1ebc031cdad70d8398de19180de57ddc6a446219521621feb0",
         "ingestion/odds/client.py": "9dbbd5f6e9c89a38b10bc02da517be088883ac01a1c39a791c9892aed64d28c9",
     }

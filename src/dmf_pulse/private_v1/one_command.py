@@ -23,6 +23,7 @@ from dmf_pulse.fpl_points.player_prior import (
     load_packaged_player_prior,
 )
 from dmf_pulse.ingestion.current_state import (
+    CurrentUnifiedStateBundle,
     CurrentUnifiedStateService,
     bind_current_unified_state_request,
 )
@@ -57,6 +58,7 @@ from dmf_pulse.private_v1.automatic_inputs import (
     build_full_candidate_policy,
 )
 from dmf_pulse.private_v1.errors import PrivateV1Error
+from dmf_pulse.private_v1.horizon_markets import build_future_market_evidence
 from dmf_pulse.private_v1.models import (
     PrivateFixtureScorePrior,
     PrivateV1Decision,
@@ -202,6 +204,7 @@ def _score_priors(
 def _future_rolling_inputs(
     source: CurrentScorePriorResult,
     *,
+    market_source: CurrentUnifiedStateBundle,
     snapshot: DirectFplSnapshot,
     identity_map: object,
     model_minutes_by_gameweek: dict[int, tuple[CurrentModelFixtureMinutesInput, ...]],
@@ -270,6 +273,27 @@ def _future_rolling_inputs(
                     semantic_sha256="0" * 64,
                 )
             )
+            evidence = build_future_market_evidence(
+                market_source,
+                fixture=fixture,
+                canonical_fixture_id=canonical_fixture_id,
+            )
+            if evidence.classification == "MARKET_BACKED":
+                market_mode = "MARKET_BACKED"
+                market_constraints = evidence.constraints
+                warnings = (*evidence.warnings, "FUTURE_PROJECTION_USES_CURRENT_CUTOFF")
+            elif evidence.classification == "NO_EVENT":
+                market_mode = "SCORE_PRIOR_ONLY"
+                market_constraints = ()
+                warnings = (
+                    "FUTURE_FIXTURE_SCORE_PRIOR_ONLY_NO_CURRENT_MARKET",
+                    *evidence.warnings,
+                    "FUTURE_PROJECTION_USES_CURRENT_CUTOFF",
+                )
+            else:
+                market_mode = "SCORE_PRIOR_ONLY"
+                market_constraints = ()
+                warnings = (*evidence.warnings, "FUTURE_PROJECTION_USES_CURRENT_CUTOFF")
             values.append(
                 seal_rolling_fixture_input(
                     PrivateRollingFixtureInput.model_construct(
@@ -284,15 +308,13 @@ def _future_rolling_inputs(
                         away_canonical_team_id=away,
                         kickoff_at=fixture.kickoff_at,
                         information_cutoff=cutoff,
-                        market_mode="SCORE_PRIOR_ONLY",
-                        market_constraints=(),
+                        market_mode=market_mode,
+                        market_constraints=market_constraints,
+                        market_evidence=evidence,
                         blocked_reason=None,
                         score_prior=prior,
                         stage7=stage7,
-                        warnings=(
-                            "FUTURE_FIXTURE_SCORE_PRIOR_ONLY_NO_CURRENT_MARKET",
-                            "FUTURE_PROJECTION_USES_CURRENT_CUTOFF",
-                        ),
+                        warnings=tuple(sorted(set(warnings))),
                         semantic_sha256="0" * 64,
                     )
                 )
@@ -523,18 +545,60 @@ class PrivateV1OneCommandService:
             )
             if not target_fixtures:
                 raise IngestionError("TARGET_GAMEWEEK_UNRESOLVED", "target fixtures are absent")
+            if request.horizon_gameweeks == 3:
+                horizon_gameweeks = {
+                    snapshot.target_gameweek,
+                    snapshot.target_gameweek + 1,
+                    snapshot.target_gameweek + 2,
+                }
+                horizon_fixtures_list = []
+                horizon_gameweeks_found: set[int] = set()
+                for item in snapshot.fpl_input.fixtures:
+                    identity = item.event_identity
+                    if identity is None or not identity.external_id_text.isdecimal():
+                        continue
+                    gameweek = int(identity.external_id_text)
+                    if gameweek in horizon_gameweeks:
+                        horizon_fixtures_list.append(item)
+                        horizon_gameweeks_found.add(gameweek)
+                horizon_fixtures = tuple(horizon_fixtures_list)
+                if (
+                    not horizon_fixtures
+                    or any(
+                        item.kickoff_at is None or item.started is True for item in horizon_fixtures
+                    )
+                    or horizon_gameweeks_found != horizon_gameweeks
+                ):
+                    raise IngestionError(
+                        "ROLLING_HORIZON_FIXTURES_UNAVAILABLE",
+                        "official FPL three-Gameweek horizon is incomplete or started",
+                    )
+            else:
+                horizon_fixtures = target_fixtures
             latest_kickoff = max(
-                item.kickoff_at for item in target_fixtures if item.kickoff_at is not None
+                item.kickoff_at for item in horizon_fixtures if item.kickoff_at is not None
             )
             with self._progress.stage(
                 started="Acquiring current market odds...",
                 completed="Market odds ready",
                 failed="current market odds",
             ):
-                odds = self._odds_service_factory(observed_now).acquire(
-                    information_cutoff=run_at,
-                    commence_to=latest_kickoff + timedelta(seconds=1),
-                )
+                odds_service = self._odds_service_factory(observed_now)
+                if request.horizon_gameweeks == 3:
+                    odds = odds_service.acquire(
+                        information_cutoff=run_at,
+                        commence_to=latest_kickoff + timedelta(seconds=1),
+                        required_h2h_commence_times=tuple(
+                            item.kickoff_at
+                            for item in target_fixtures
+                            if item.kickoff_at is not None
+                        ),
+                    )
+                else:
+                    odds = odds_service.acquire(
+                        information_cutoff=run_at,
+                        commence_to=latest_kickoff + timedelta(seconds=1),
+                    )
             with self._progress.stage(
                 started="Acquiring current score-prior source...",
                 completed="Score-prior source ready",
@@ -552,7 +616,12 @@ class PrivateV1OneCommandService:
                 failed="current identities",
             ):
                 bridge = build_automatic_current_identity_map(
-                    snapshot.fpl_input, odds, decided_at=observed_now()
+                    snapshot.fpl_input,
+                    odds,
+                    decided_at=observed_now(),
+                    event_scope=(
+                        "ROOT_EXACT_KICKOFFS" if request.horizon_gameweeks == 3 else "FULL_RESPONSE"
+                    ),
                 )
                 unified_request = bind_current_unified_state_request(
                     snapshot.fpl_input, odds, bridge, manager, ruleset, capability
@@ -701,6 +770,7 @@ class PrivateV1OneCommandService:
                     )
                 future_gameweeks = _future_rolling_inputs(
                     source_prior,
+                    market_source=current,
                     snapshot=snapshot,
                     identity_map=player_map,
                     model_minutes_by_gameweek=rolling_minutes,

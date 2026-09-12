@@ -63,7 +63,13 @@ class _OddsService:
         self.value = value
         self.requests: list[tuple[object, object]] = []
 
-    def acquire(self, *, information_cutoff: object, commence_to: object) -> object:
+    def acquire(
+        self,
+        *,
+        information_cutoff: object,
+        commence_to: object,
+        required_h2h_commence_times: tuple[object, ...] | None = None,
+    ) -> object:
         self.requests.append((information_cutoff, commence_to))
         return self.value
 
@@ -308,40 +314,44 @@ def _provider_sources(repository_root: Path) -> tuple[tuple[bytes, ...], bytes]:
     return direct_bodies, json.dumps(fixtures).encode()
 
 
-def _odds_input(repository_root: Path) -> object:
+def _odds_input(repository_root: Path, *, horizon_market_coverage: bool = False) -> object:
     raw = json.loads(
         (repository_root / "fixtures/odds/ODD-005/happy_path.json").read_text(encoding="utf-8")
     )
     template = raw[0]
     events = []
-    for index, (home, away) in enumerate(((1, 2), (3, 4), (5, 6))):
-        event = deepcopy(template)
-        old_home = event["home_team"]
-        old_away = event["away_team"]
-        home_name = f"One Command Club {home}"
-        away_name = f"One Command Club {away}"
-        event.update(
-            {
-                "id": f"one-command-event-{index + 1}",
-                "commence_time": (TARGET_KICKOFF + timedelta(hours=index))
-                .isoformat()
-                .replace("+00:00", "Z"),
-                "home_team": home_name,
-                "away_team": away_name,
-            }
-        )
-        for bookmaker in event["bookmakers"]:
-            bookmaker["last_update"] = "2026-09-01T11:55:00Z"
-            for market in bookmaker["markets"]:
-                market["last_update"] = "2026-09-01T11:55:00Z"
-                if market["key"] != "h2h":
-                    continue
-                for outcome in market["outcomes"]:
-                    if outcome["name"] == old_home:
-                        outcome["name"] = home_name
-                    elif outcome["name"] == old_away:
-                        outcome["name"] = away_name
-        events.append(event)
+    kickoff_bases = (TARGET_KICKOFF,)
+    if horizon_market_coverage:
+        kickoff_bases += (TARGET_KICKOFF + timedelta(days=7),)
+    for gameweek_offset, kickoff_base in enumerate(kickoff_bases):
+        for index, (home, away) in enumerate(((1, 2), (3, 4), (5, 6))):
+            event = deepcopy(template)
+            old_home = event["home_team"]
+            old_away = event["away_team"]
+            home_name = f"One Command Club {home}"
+            away_name = f"One Command Club {away}"
+            event.update(
+                {
+                    "id": f"one-command-event-{gameweek_offset + 1}-{index + 1}",
+                    "commence_time": (kickoff_base + timedelta(hours=index))
+                    .isoformat()
+                    .replace("+00:00", "Z"),
+                    "home_team": home_name,
+                    "away_team": away_name,
+                }
+            )
+            for bookmaker in event["bookmakers"]:
+                bookmaker["last_update"] = "2026-09-01T11:55:00Z"
+                for market in bookmaker["markets"]:
+                    market["last_update"] = "2026-09-01T11:55:00Z"
+                    if market["key"] != "h2h":
+                        continue
+                    for outcome in market["outcomes"]:
+                        if outcome["name"] == old_home:
+                            outcome["name"] = home_name
+                        elif outcome["name"] == old_away:
+                            outcome["name"] = away_name
+            events.append(event)
     body = json.dumps(events, separators=(",", ":")).encode()
     profile: RightsProfile = load_rights_profiles()["the_odds_api_private_analytics_v1"]
     target = (
@@ -371,6 +381,11 @@ def _odds_input(repository_root: Path) -> object:
         transport_call_count=1,
         transport_id="injected",
         provider_request_id_sha256=canonical_sha256("one-command-request"),
+        required_h2h_commence_times=(
+            tuple(TARGET_KICKOFF + timedelta(hours=index) for index in range(3))
+            if horizon_market_coverage
+            else None
+        ),
     )
 
 
@@ -565,7 +580,7 @@ def test_explicit_three_gameweek_one_command_runs_from_one_current_cutoff(
 ) -> None:
     direct_bodies, _ = _provider_sources(repository_root)
     direct_transport = _DirectTransport(direct_bodies)
-    odds_service = _OddsService(_odds_input(repository_root))
+    odds_service = _OddsService(_odds_input(repository_root, horizon_market_coverage=True))
     score_config, score_bodies = synthetic_snapshot()
     marker = "repository-owned-placeholder"
 
@@ -614,8 +629,11 @@ def test_explicit_three_gameweek_one_command_runs_from_one_current_cutoff(
         for item in result.decision.future_plan
     )
     assert tuple(
+        item.fixture_coverage.market_backed_fixtures for item in result.decision.future_plan
+    ) == (3, 0)
+    assert tuple(
         item.fixture_coverage.score_prior_only_fixtures for item in result.decision.future_plan
-    ) == (3, 3)
+    ) == (0, 3)
     assert result.report.startswith("DMF PULSE - PRIVATE 3-GW ROLLING DECISION")
     assert "GW2 - DO NOW" in result.report
     assert result.report.count("PROVISIONAL - REOPTIMISE AT THAT DEADLINE") == 2
@@ -639,7 +657,9 @@ def test_explicit_three_gameweek_one_command_runs_from_one_current_cutoff(
     } <= {item.stage for item in result.stage_timings}
     assert result.fpl_request_count == 8
     assert direct_transport.bodies == []
-    assert odds_service.requests == [(RUN_AT, TARGET_KICKOFF + timedelta(hours=2, seconds=1))]
+    assert odds_service.requests == [
+        (RUN_AT, TARGET_KICKOFF + timedelta(days=14, hours=2, seconds=1))
+    ]
     print(
         json.dumps(
             {

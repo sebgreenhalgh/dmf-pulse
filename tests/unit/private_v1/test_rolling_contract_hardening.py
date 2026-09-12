@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 
 import pytest
@@ -77,28 +77,36 @@ def test_future_market_modes_accept_cutoff_evidence_and_reject_post_cutoff(
     constraint = rolling_execution.current_execution.market_constraints.fixtures[
         0
     ].constraint_set.constraints[0]
-    market_backed = seal_rolling_fixture_input(
-        _construct(
-            fixture,
-            market_mode="MARKET_BACKED",
-            market_constraints=(constraint,),
-            semantic_sha256="0" * 64,
-        )
-    )
-
-    assert market_backed.market_mode == "MARKET_BACKED"
-    with pytest.raises(ValueError, match="post-cutoff"):
+    # R8B refuses an otherwise valid copied root constraint: MARKET_BACKED
+    # requires its independently reconstructable future source evidence.
+    with pytest.raises(ValueError, match="requires constraints"):
         seal_rolling_fixture_input(
             _construct(
-                market_backed,
-                market_constraints=(
-                    constraint.model_copy(
-                        update={"usable_at": fixture.information_cutoff + timedelta(seconds=1)}
-                    ),
-                ),
+                fixture,
+                market_mode="MARKET_BACKED",
+                market_constraints=(constraint,),
                 semantic_sha256="0" * 64,
             )
         )
+
+
+def test_current_score_prior_fallback_cannot_drop_source_evidence(rolling_execution) -> None:
+    fixture = rolling_execution.future_gameweeks[0].fixtures[0]
+    current_prior = _construct(
+        fixture.score_prior,
+        source_class="CURRENT_SCORE_PRIOR_BUNDLE",
+        current_bundle=None,
+        semantic_sha256="0" * 64,
+    )
+    with pytest.raises(
+        ValueError, match="current score-prior-only fixture requires unavailable-market evidence"
+    ):
+        _construct(
+            fixture,
+            score_prior=current_prior,
+            market_evidence=None,
+            semantic_sha256="0" * 64,
+        ).fixture_is_coherent_and_sealed()
 
 
 def test_gameweek_and_execution_fixture_sets_are_canonical_and_complete(
