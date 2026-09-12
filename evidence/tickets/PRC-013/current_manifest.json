@@ -6121,9 +6121,9 @@
       "sha256": "20d1f47dc3ee6242ce82067dda09be56a7fddac4094c8c246aaf1e245fe2ad67"
     },
     {
-      "bytes": 10243,
+      "bytes": 10422,
       "path": "tests/unit/private_v1/test_score_prior_prefetch.py",
-      "sha256": "6d0bdfccd18d15a802c4f7f15574f234f67db4c6f38b5ef6e3e0f5178155f832"
+      "sha256": "e161d58ff3153e810bd031cb533cb1a7ce6632955fc026be1066d60ddc7c28a7"
     },
     {
       "bytes": 21697,

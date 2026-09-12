@@ -69,11 +69,18 @@ class _RecordingOddsService(_OddsService):
         self._clock = clock
         self._events = events
 
-    def acquire(self, *, information_cutoff: object, commence_to: object) -> object:
+    def acquire(
+        self,
+        *,
+        information_cutoff: object,
+        commence_to: object,
+        required_h2h_commence_times: tuple[object, ...] | None = None,
+    ) -> object:
         self._events.append(("ODDS", self._clock()))
         return super().acquire(
             information_cutoff=information_cutoff,
             commence_to=commence_to,
+            required_h2h_commence_times=required_h2h_commence_times,
         )
 
 
