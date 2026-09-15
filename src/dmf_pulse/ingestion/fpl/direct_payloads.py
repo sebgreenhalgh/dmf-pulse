@@ -6,6 +6,7 @@ import json
 from collections.abc import Callable
 from datetime import UTC, datetime
 from enum import StrEnum
+from hashlib import sha256
 from typing import Annotated, Literal, Self
 
 from pydantic import (
@@ -162,6 +163,20 @@ class DirectPublicPicks(_ProviderModel):
 class DirectLiveStats(_ProviderModel):
     minutes: NonNegativeInt | None = None
     starts: NonNegativeInt | None = None
+    goals_scored: NonNegativeInt | None = None
+    assists: NonNegativeInt | None = None
+    own_goals: NonNegativeInt | None = None
+    penalties_saved: NonNegativeInt | None = None
+    penalties_missed: NonNegativeInt | None = None
+    yellow_cards: NonNegativeInt | None = None
+    red_cards: NonNegativeInt | None = None
+    saves: NonNegativeInt | None = None
+    clearances_blocks_interceptions: NonNegativeInt | None = None
+    tackles: NonNegativeInt | None = None
+    recoveries: NonNegativeInt | None = None
+    defensive_contribution: NonNegativeInt | None = None
+    bonus: NonNegativeInt | None = None
+    bps: StrictInt | None = None
 
 
 class DirectLiveElement(_ProviderModel):
@@ -169,8 +184,23 @@ class DirectLiveElement(_ProviderModel):
     stats: DirectLiveStats
 
 
-class DirectEventLive(_ProviderModel):
+class _DirectEventLivePayload(_ProviderModel):
     elements: tuple[DirectLiveElement, ...]
+
+
+class DirectEventLive(_DirectEventLivePayload):
+    """Parsed event-live facts plus non-retained safe source lineage."""
+
+    source_body_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def source_lineage_is_sealed(self) -> Self:
+        if self.semantic_sha256 != canonical_sha256(
+            {"elements": [item.model_dump(mode="json") for item in self.elements]}
+        ):
+            raise ValueError("event-live semantic hash does not match")
+        return self
 
 
 class _TransientContract(BaseModel):
@@ -591,11 +621,17 @@ def parse_direct_public_picks(body: bytes) -> DirectPublicPicks:
 
 
 def parse_direct_event_live(body: bytes) -> DirectEventLive:
-    value = _parse_json(body, DirectEventLive, label="event live")
+    value = _parse_json(body, _DirectEventLivePayload, label="event live")
     ids = tuple(item.id for item in value.elements)
     if len(ids) != len(set(ids)):
         raise IngestionError("VALIDATION_FAILED", "official FPL live elements are duplicated")
-    return value
+    return DirectEventLive(
+        elements=value.elements,
+        source_body_sha256=sha256(body).hexdigest(),
+        semantic_sha256=canonical_sha256(
+            {"elements": [item.model_dump(mode="json") for item in value.elements]}
+        ),
+    )
 
 
 def _target_gameweek(

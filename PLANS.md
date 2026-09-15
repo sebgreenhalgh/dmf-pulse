@@ -1,5 +1,20 @@
 # DMF Pulse execution plans
 
+## PRIVATE-V1-ONE-COMMAND-001N-R9A
+
+- Work from immutable R8B-R1 parent `6802441f5a60723929bf5a930b6ea9380f5178c1` in an
+  isolated worktree. Treat the supplied FLR archive as unrelated data, not authority.
+- Extend only the already-acquired official event-live parser allowlist and retain safe
+  in-memory raw-body/semantic digests. Add a pure sealed current-player Gameweek-aggregate
+  evidence assembler with current identity binding, missingness and reconciliation states.
+- Keep the evidence path unreferenced by Stage 7--11 and the ordinary private command:
+  no Stage-9 prior/profile/numerical update, request increase, persistence, training,
+  rights change, provider call, credential read, live probe or recommendation.
+- Prove strict provider parsing, zero/missing distinction, source-window bounds, current
+  identity binding, no historical-team attribution, reconciliation, deterministic hashes,
+  no persistence, and frozen recommendation equality. Run repository assurance, manifests,
+  independent read-only review, exact-SHA CI, then stop.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R8B
 
 - Verify immutable R8A-R1 parent e4d5774ca6f426e6231ae24e8f2cfc003b1fd5e6

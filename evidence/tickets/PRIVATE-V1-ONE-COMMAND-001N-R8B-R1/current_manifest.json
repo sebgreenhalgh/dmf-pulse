@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 156983,
+      "bytes": 158040,
       "path": "PLANS.md",
-      "sha256": "3b7f9624a2be508f7434a1fb970c57c16305c3bd8954a0cd589232282a6d9b00"
+      "sha256": "27e1efde5839f88cea72016bda1ad96f2d0abe4a5cb2b609f42a0f6c4f9f9c65"
     },
     {
       "bytes": 2761,
@@ -3461,14 +3461,19 @@
       "sha256": "7be8882932b83fc319a111e9c17fb875f91936299c49c2058f4b2141fbc5e492"
     },
     {
+      "bytes": 19722,
+      "path": "src/dmf_pulse/ingestion/fpl/current_player_history.py",
+      "sha256": "20fea68f46cb67d4fef68af8ff1512536ed824e59cf5e587d72e18668daea8fd"
+    },
+    {
       "bytes": 21164,
       "path": "src/dmf_pulse/ingestion/fpl/direct.py",
       "sha256": "f73495ac7edf724f3dddd5bb1f094dc02d58007684d8d75006af00bc9aa8f492"
     },
     {
-      "bytes": 29572,
+      "bytes": 31073,
       "path": "src/dmf_pulse/ingestion/fpl/direct_payloads.py",
-      "sha256": "0631959df5937f50f89c18d54b6a57f861d90cb3be69455ce6ae6cb27bc87935"
+      "sha256": "5cd37de6f32e73ff3b0bc174eec11bc064104dc875eeedc25fa5f7341ff47ef9"
     },
     {
       "bytes": 63489,
@@ -5666,6 +5671,11 @@
       "sha256": "c8ce4f2cce235dd878d9fc58201991134e41dd630becd41739a8bdae2c2b271a"
     },
     {
+      "bytes": 5642,
+      "path": "tests/unit/ingestion/test_current_player_history.py",
+      "sha256": "5c9edb67cb67db4ad2ce3be0d2b4ef73574ef4130a20cd1b186077fc043f3f35"
+    },
+    {
       "bytes": 5067,
       "path": "tests/unit/ingestion/test_current_unified_state.py",
       "sha256": "8a4be273e47a71c3034d840b45d83e623edfb6e6fbccb748dcdf3d5acfc3a3e1"
@@ -6864,6 +6874,16 @@
       "bytes": 1394,
       "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R8B/ticket.yaml",
       "sha256": "a81d837f3d1beb7b630df62da58ed7fe6ca163a6255196b7e500424b3b19e4b0"
+    },
+    {
+      "bytes": 686,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9A/ACCEPTANCE.md",
+      "sha256": "2ad65617bc202cabdbdab0c0ed8151e1dbe7c431463e6b61f016f5e4df0d9e50"
+    },
+    {
+      "bytes": 1134,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9A/ticket.yaml",
+      "sha256": "776aa12db3a51538d1e7c63fc7aff1161a8bfb370b9e5c969a86283de8bb6f7e"
     },
     {
       "bytes": 2426,

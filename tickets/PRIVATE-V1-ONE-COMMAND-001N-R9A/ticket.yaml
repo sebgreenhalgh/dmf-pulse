@@ -1,0 +1,25 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R9A"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Current-player historical evidence foundation"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R9A-current-player-history-evidence"
+required_base_commit: "6802441f5a60723929bf5a930b6ea9380f5178c1"
+authority_scopes:
+  - "A4-FPL-ingestion"
+  - "A9-FPL-points"
+objective: >-
+  Expose, identity-bind, validate and summarize already-acquired finalized official-FPL
+  Gameweek player facts as transient evidence only, without changing private recommendations.
+allowed_areas:
+  - "src/dmf_pulse/ingestion/fpl/direct_payloads.py"
+  - "src/dmf_pulse/ingestion/fpl/current_player_history.py"
+  - "tests/unit/ingestion/**"
+  - "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9A/**"
+  - "evidence/tickets/PRIVATE-V1-ONE-COMMAND-001N-R9A/**"
+  - "evidence/tickets/PRC-013/current_manifest.json"
+  - "PLANS.md"
+exclusions:
+  - "Stage-7/Stage-9/Stage-11 or recommendation semantics"
+  - "new provider endpoints, persistence, training, rights, dependencies, CI, live execution"
+required_activation_status: "NOT_PRODUCTION_ACTIVE"
