@@ -184,7 +184,7 @@ def synthetic_shadow(repository_root: Path, **kwargs):
     return compile_current_player_shadow(**synthetic_inputs(repository_root, **kwargs))
 
 
-def synthetic_stage9_request(shadow, *, scenario_count=64, team_indexes=(0, 1)):
+def synthetic_stage9_request(shadow, *, scenario_count=64, team_indexes=(0, 1), future_minutes=90):
     from uuid import UUID, uuid5
 
     from dmf_pulse.assurance.canonical import canonical_sha256
@@ -218,8 +218,14 @@ def synthetic_stage9_request(shadow, *, scenario_count=64, team_indexes=(0, 1)):
             assert len(selected) == number
             chosen.extend(selected)
     participants = tuple(
-        participant(e.binding.current_player_id, e.binding.current_team_id, e.binding.position)
-        for e in chosen
+        participant(
+            e.binding.current_player_id,
+            e.binding.current_team_id,
+            e.binding.position,
+            minutes=future_minutes if i == 1 else 90,
+            end=float(future_minutes if i == 1 else 90),
+        )
+        for i, e in enumerate(chosen)
     )
     cutoff = world.posterior.information_cutoff.isoformat().replace("+00:00", "Z")
     projections = tuple(

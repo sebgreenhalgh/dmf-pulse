@@ -82,6 +82,68 @@ def test_formula_zero_exposure_and_strength():
     )
 
 
+@pytest.mark.parametrize("world_index", (0, 1, 2), ids=("CENTRAL", "LOW", "HIGH"))
+def test_all_world_rates_match_pinned_historical_gamma_arithmetic(world_index):
+    # Literal equivalent-parameter arithmetic from b4353dbdcebd31f2a807bee90ec04b3ee8b07389,
+    # src/dmf_pulse/player_evidence/empirical_bayes.py:75-84 gamma_poisson_posterior.
+    # Here kappa is the *reconstructed historical posterior precision*, NOT the
+    # original role-prior kappa applied again. No historical module or Git at runtime.
+    world = load_historical_rate_resource().worlds[world_index]
+    compared = 0
+    for row in world.rates:
+        for channel in ("goal", "assist", "yellow", "red", "save"):
+            mean = getattr(row, f"{channel}_mean_per90")
+            variance = getattr(row, f"{channel}_variance_per90")
+            if mean == 0 or variance == 0:
+                continue  # Structural/degenerate priors have their own no-update tests.
+            precision = mean / variance
+            for events, minutes in ((0, 90), (3, 360), (12, 1080)):
+                alpha = mean * precision + events
+                beta = precision + minutes / 90.0
+                historical_mean = alpha / beta
+                historical_variance = alpha / (beta * beta)
+                result = gamma_poisson_update(mean, variance, events, minutes)
+                assert result[0] == historical_mean
+                # R9B mean/beta avoids a potentially overflowing beta square;
+                # algebraically identical variance may differ by floating rounding.
+                assert result[1] == pytest.approx(historical_variance, rel=5e-15, abs=0)
+                compared += 1
+    assert compared > 599 * 4
+
+
+@pytest.mark.parametrize("central_kappa", (10.0, 7.0, 30.0))
+def test_three_strengths_and_fixed_observed_rate_exposure_response(central_kappa):
+    # Match the prior mean/likelihood across worlds to isolate precision sensitivity.
+    mean = 0.2
+    deltas = []
+    for multiplier in (0.5, 1.0, 2.0):
+        variance = mean / (central_kappa * multiplier)
+        small = gamma_poisson_update(mean, variance, 1, 90)[0]
+        large = gamma_poisson_update(mean, variance, 4, 360)[0]
+        assert mean < small < large < 1.0  # Same observed rate, more exposure.
+        deltas.append(large - mean)
+    assert deltas[0] > deltas[1] > deltas[2] > 0
+
+
+def test_compiled_assist_is_exact_stale_weight_times_rate_ratio(repository_root):
+    shadow = synthetic_shadow(repository_root)
+    for world in shadow.worlds:
+        updated = 0
+        for stale, profile, entry in zip(
+            world.stale_profiles, world.profiles, world.posterior.entries, strict=True
+        ):
+            rate = entry.rates[0]
+            assert rate.channel == "assist"
+            if rate.status == "UPDATED":
+                assert profile.assist_share == stale.assist_share * (
+                    rate.posterior_mean_per90 / rate.historical_mean_per90
+                )
+                updated += 1
+            else:
+                assert profile.assist_share == stale.assist_share
+        assert updated > 0
+
+
 @given(st.integers(0, 100), st.integers(1, 10000))
 def test_math_metamorphic(events, minutes):
     value = gamma_poisson_update(0.2, 0.02, events, minutes)[0]

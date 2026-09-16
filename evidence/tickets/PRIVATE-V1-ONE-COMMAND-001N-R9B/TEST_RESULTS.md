@@ -5,7 +5,7 @@ requires independent clearance and a subsequent all-green exact-SHA run.
 
 | Gate | Observed result |
 | --- | --- |
-| Final focused R9B tests | 85 passed, 31.00 seconds |
+| Final focused R9B tests after independent-review remediation | 93 passed, 30.16 seconds |
 | Broad ingestion / availability / points / private / R7 / rolling regressions | 1792 passed, one warning, 4783.82 seconds |
 | Three added production modules | 458/464 statements, 127/134 branches; combined 97.8261%; zero coverage exclusions |
 | Ruff format / check | 810 files formatted; all checks passed |
@@ -22,7 +22,8 @@ DMF_TEST_DATABASE_URL was supplied. It did not pass locally. The dedicated R9B
 external installed-wheel test above passed; complete database CI is still required.
 
 The broad suite started before the final extra contract tests and the outfield-save
-guard refinement; the 85-test final focused run includes those final changes.
+guard refinement; the 93-test final focused run includes those final changes and
+the independent-review all-world equivalence/assist/exposure regressions.
 No existing production module is edited. Broad tests exclude postgres, migration
 and performance markers; complete CI remains mandatory, including database jobs.
 The broad run suppressed warning detail; its one warning is not a failure. Earlier
@@ -49,7 +50,7 @@ and unique. The synthetic window has 2636 rows and 659 minutes/starts matches, n
 the user-supplied live 2549 rows / 610 complete / 49 partial metadata. No live
 assignment breakdown or current player values were inspected.
 
-Three-world compile warm-up is excluded. Final three-sample median is 2.1722s;
+Three-world compile warm-up is excluded. Final three-sample median is 2.1847s;
 resource loading is outside timing. An earlier run under concurrent regression
 load measured 5.35s. These are local compiler timings, not total live acquisition,
 summary, projection or recommendation latency, and not a cross-machine guarantee.
@@ -68,3 +69,10 @@ canonical final tactical verification. Squad choice, captain and XI do not chang
 expected manager utility delta is -0.9375. Price/hit/FT scope is not modeled. A
 rolling Stage-11 shadow decision is **not executed**, represented as null rather
 than false. This demonstrates measured movement, not improved predictive accuracy.
+
+Independent audit additionally checked all 1797 source-derived rows and 22167
+equivalent historical/R9B Gamma cases; maximum relative floating difference was
+3.2520570017142904e-16. The committed regression copies the pinned historical
+function's equivalent-parameter arithmetic for all three worlds, using exact mean
+equality and relative variance tolerance 5e-15 (only evaluation-order rounding).
+The normal recommendation differential uses exact equality, not that tolerance.

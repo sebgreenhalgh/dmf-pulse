@@ -168,7 +168,7 @@
     {
       "bytes": 159393,
       "path": "PLANS.md",
-      "sha256": "a70137f1bc6ad426e367d96850dc6238c16524bdd61e5e9e8464e832ceaca16b"
+      "sha256": "a430a9db35e07d3e508a6d85823bf6acbdbc5641d55e3b58c71161f2fe9133bd"
     },
     {
       "bytes": 2761,
@@ -3371,9 +3371,9 @@
       "sha256": "68790c9e950eb06ccd8d9ab0739a472f92e9b12a5570749ca02ee633af475ee9"
     },
     {
-      "bytes": 16356,
+      "bytes": 16529,
       "path": "src/dmf_pulse/fpl_points/current_player_shadow_diagnostics.py",
-      "sha256": "c66b8fb1f1b3b552a1e3c304274e428959fa05145074d7a2f02561542c37b953"
+      "sha256": "47c129570d7765c3bc8325e0cbe85e220fc8edf8cd3ad0cf2bd2274f31d4ef90"
     },
     {
       "bytes": 579,
@@ -5601,9 +5601,9 @@
       "sha256": "654570b7dabaebbdb76e039c72672de05c0cbc328f70e06969e7cf38a863bd3f"
     },
     {
-      "bytes": 12500,
+      "bytes": 12691,
       "path": "tests/unit/fpl_points/current_shadow_support.py",
-      "sha256": "b5638e3b9eddc37c1685f88dd272bfd571e8f2715fc56c9f73857acda696b998"
+      "sha256": "8d226533cd5bf93012ea599d3221477ffe68c38d978b7dfd3879f6ef14a60ddd"
     },
     {
       "bytes": 10410,
@@ -5626,14 +5626,14 @@
       "sha256": "5bcc735a9f64f78355e40a4002febb8acc13cea7f4970152e0fbc92ea48b2a9b"
     },
     {
-      "bytes": 9083,
+      "bytes": 12176,
       "path": "tests/unit/fpl_points/test_current_player_shadow.py",
-      "sha256": "d93e6bf7726d6461f3b275651423e76227746b8a04cc5bd8eff391939360d476"
+      "sha256": "92c2c02e1c5f9352bce036353f0b4df3537f8bda543d7fbf2d51fbd8a0148f91"
     },
     {
-      "bytes": 7367,
+      "bytes": 7676,
       "path": "tests/unit/fpl_points/test_current_player_shadow_diagnostics.py",
-      "sha256": "d0bf9b75c288bc893e341a04225ab7b5d2e2b1b079adda5050ff3ca5da71b83a"
+      "sha256": "51ee5ee5ffbda09ccf4c3beec02246480d0819aa13ff474494f965dab3a5c3b8"
     },
     {
       "bytes": 3517,
@@ -5641,9 +5641,9 @@
       "sha256": "38a019c5c4957f236e2fd476db33200e9ddcfb5884ec797b460a4a47f4da859f"
     },
     {
-      "bytes": 3185,
+      "bytes": 4462,
       "path": "tests/unit/fpl_points/test_current_player_shadow_stage9.py",
-      "sha256": "23631d07e5b5ec543e52360ba4e9aa9efd24ca95b4a9e3cac790edf83731c879"
+      "sha256": "238469f9c5296fd9fc2e525cbcafc0d7ee41382e9ee7dba2dc85649a85168972"
     },
     {
       "bytes": 5088,

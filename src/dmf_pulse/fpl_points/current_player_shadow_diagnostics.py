@@ -79,7 +79,7 @@ class CurrentPlayerAllocationMovementSummary(SealedModel):
     world: str
     strata: tuple[MovementStratum, ...]
     status_counts: tuple[tuple[str, int], ...]
-    zero_exposure_discipline_excluded_rows: Count
+    zero_exposure_discipline_excluded_channel_rows: Count
     zero_exposure_discipline_excluded_events: Count
     total_goal_rate_diagnostic: tuple[MovementStratum, ...]
 
@@ -226,7 +226,9 @@ def _movements(
                     world=world.posterior.sensitivity_world,
                     strata=tuple(strata),
                     status_counts=tuple(sorted(statuses.items())),
-                    zero_exposure_discipline_excluded_rows=sum(
+                    # Yellow/red are separate observed likelihood channels; a
+                    # player-GW with both fields contributes two channel-rows.
+                    zero_exposure_discipline_excluded_channel_rows=sum(
                         r.zero_exposure_discipline_excluded_rows for e in entries for r in e.rates
                     ),
                     zero_exposure_discipline_excluded_events=sum(

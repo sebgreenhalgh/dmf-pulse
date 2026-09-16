@@ -28,4 +28,16 @@ unsplit CBI, unsupported BPS auxiliaries and no predictive-accuracy acceptance.
 
 ## Independent review
 
-Pending fresh read-only review. No clearance or exact-SHA CI success is claimed yet.
+Fresh-context read-only reviewer inspected the complete parent diff and authority,
+independently verified all 1797 source rows and 22167 equivalent Gamma cases, ran
+the focused suite, inspected packaged bytes and independently compared both active
+replays. No active recommendation or rights mutation was found.
+
+| ID | Severity | Finding | Resolution |
+| --- | --- | --- | --- |
+| R9B-IR-001 | P2 material acceptance gap | Explicit all-world historical equivalence and assist/exposure tests missing | Added pinned-formula parity across every applicable donor/channel in CENTRAL/LOW/HIGH, exact compiled assist ratio, all-strength exposure response and future Stage-7 perturbation; 93 tests pass |
+| R9B-IR-002 | P3 | Aggregate discipline excluded rows could be mistaken for unique source rows | Renamed to excluded_channel_rows, documented unit and added assertion |
+
+The reviewer has inspected both remediations and reported no other finding. Final
+exact-commit re-review and publication clearance are pending at this checkpoint.
+No exact-SHA CI success is claimed before the actual run.

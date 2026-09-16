@@ -40,6 +40,14 @@ def test_summary_determinism_safe_surface_and_six_comparisons(
     assert summary["historical_donor_count"] == 599
     assert summary["current_player_count"] == 20
     assert summary["individual_prior_count"] + summary["fallback_prior_count"] == 20
+    zero_minute_rows = sum(
+        row.minutes == 0 for entry in inputs["history"].entries for row in entry.observations
+    )
+    assert zero_minute_rows > 0
+    assert all(
+        item["zero_exposure_discipline_excluded_channel_rows"] == 2 * zero_minute_rows
+        for item in summary["movement"]
+    )
     text = json.dumps(summary)
     for forbidden in (
         "Synthetic",

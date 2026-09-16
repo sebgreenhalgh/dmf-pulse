@@ -5,7 +5,7 @@
   "source_isolated_parent_worktree": true,
   "synthetic_fixed_build_identity": true,
   "native_parent_build_identity": "dmf-pulse-0.2.0:source-sha256:3cf48fa53e94c775d81ea0417a4575b7319fbbe8cb35fd7f82291d9a9bce103c",
-  "native_candidate_build_identity": "dmf-pulse-0.2.0:source-sha256:f5b277910e8c0166afd9a7f581db5fdb6a5559361c2ca7a5488687f84b56a40e",
+  "native_candidate_build_identity": "dmf-pulse-0.2.0:source-sha256:b95c9daa6f527ddab67e369279909f042a7f411b9bca222dffd54cc530f8a59f",
   "execution_sha256": "41787e1d23f9735943afda62aa24e7098942ddf8c136415f31a4e1bed9f68772",
   "projection_hashes": [
     "0e12e0c7a2a31db92e1bc9cd02055eac28b9fcb37569a57c349ec745f2a06004",

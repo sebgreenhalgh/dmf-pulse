@@ -89,3 +89,23 @@ Independent review, publication and exact-SHA CI remain pending at this checkpoi
   its installed foundation ticket list. It was not weakened or extended out of
   scope. A bounded Git source-delta archive is used as a supplementary review aid,
   not a canonical acceptance certificate; the reviewer inspects the full Git diff.
+
+## Independent-review remediation validation
+
+- Hygiene checkpoint: `44d305c7ddedc04081bbb9a1cadb542b79a459ad`.
+- Reviewer identified one material P2 missing acceptance-test matrix, not a formula
+  defect. Added all-donor/channel three-world historical arithmetic parity, matched
+  three-strength/fixed-rate exposure response, exact compiled assist ratio, and
+  a resealed Stage-7 future-minute perturbation proving no posterior reweighting.
+- Reviewer P3 unit ambiguity resolved: aggregate discipline exclusions are now
+  explicitly `zero_exposure_discipline_excluded_channel_rows`, not unique player-GWs.
+  A fully published yellow/red player-GW can contribute two channel-rows, including
+  observed-zero counts. Excluded event sums and rate numerics are unchanged.
+- Repeated the exact focused coverage command above: **93 passed in 30.16s**,
+  97.8261% combined coverage. Ruff format/check and strict mypy passed. Refreshed
+  synthetic summaries, active replay, sdist/wheel, and external R9B wheel check:
+  all passed; shadow/resource and active numerical hashes remain unchanged.
+- Latest native build identity is recorded separately in ACTIVE_PATH_DIFFERENTIAL;
+  the diagnostic-label source change is not numerical recommendation drift.
+- Supplementary review archive checkpoint: 29 files, 1770895 uncompressed bytes
+  under a 5 MiB cap; canonical builder unsupported status remains disclosed.

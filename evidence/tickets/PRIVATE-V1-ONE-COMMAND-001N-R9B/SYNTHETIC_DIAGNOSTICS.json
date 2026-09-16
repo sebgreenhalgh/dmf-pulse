@@ -1,12 +1,12 @@
 {
   "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY_NOT_A_LIVE_OBSERVATION",
   "compiler_seconds": {
-    "median": 2.1721828000154346,
+    "median": 2.1846836000913754,
     "resource_loaded_before_timing": true,
     "samples": [
-      2.1721828000154346,
-      2.144107099971734,
-      2.266993600060232
+      2.1846836000913754,
+      2.1064149000449106,
+      2.1984843000536785
     ],
     "warmup_excluded": true
   },
@@ -512,7 +512,7 @@
     "model_training_performed": false,
     "movement": [
       {
-        "semantic_sha256": "e6df7e55f7019245f48474c6f99fc45f258033a8a62577517bcea0f816ad27e0",
+        "semantic_sha256": "6a7f543c9ca7fbad60e320af8301b017afa4e84fe1d99a0273f6a5f7649825c5",
         "source_shadow_sha256": "6b0822816ba003b806b122e61fa2736cca76ffe42644a51c57bb2ad00a5c83ca",
         "status_counts": [
           [
@@ -1965,11 +1965,11 @@
           }
         ],
         "world": "CENTRAL_TEMPORARY",
-        "zero_exposure_discipline_excluded_events": 224,
-        "zero_exposure_discipline_excluded_rows": 1056
+        "zero_exposure_discipline_excluded_channel_rows": 1056,
+        "zero_exposure_discipline_excluded_events": 224
       },
       {
-        "semantic_sha256": "231d51e034a39d8a018ad80f3e2b12d48ea53313ac56fda48b0b812129bf29b5",
+        "semantic_sha256": "ebb608263b23297b526008d7b92275b59aa4b0da4537cdd42e012ed96dea6416",
         "source_shadow_sha256": "6b0822816ba003b806b122e61fa2736cca76ffe42644a51c57bb2ad00a5c83ca",
         "status_counts": [
           [
@@ -3422,11 +3422,11 @@
           }
         ],
         "world": "LOW_SHRINKAGE",
-        "zero_exposure_discipline_excluded_events": 224,
-        "zero_exposure_discipline_excluded_rows": 1056
+        "zero_exposure_discipline_excluded_channel_rows": 1056,
+        "zero_exposure_discipline_excluded_events": 224
       },
       {
-        "semantic_sha256": "dd4efb9038f10c4adb4b7ca89f317c53ddae536574db6427ec687e94c483eb03",
+        "semantic_sha256": "85b8f745bd73282c017ce32881f93615ca758766db8bf2f39276975a127d7860",
         "source_shadow_sha256": "6b0822816ba003b806b122e61fa2736cca76ffe42644a51c57bb2ad00a5c83ca",
         "status_counts": [
           [
@@ -4879,8 +4879,8 @@
           }
         ],
         "world": "HIGH_SHRINKAGE",
-        "zero_exposure_discipline_excluded_events": 224,
-        "zero_exposure_discipline_excluded_rows": 1056
+        "zero_exposure_discipline_excluded_channel_rows": 1056,
+        "zero_exposure_discipline_excluded_events": 224
       }
     ],
     "new_network_requests": 0,

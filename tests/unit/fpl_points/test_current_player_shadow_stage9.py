@@ -52,6 +52,30 @@ def test_offline_harness_rejects_identity_mutation_and_invalid_squad(repository_
         compare_stage9(request, shadow.worlds[0], reference_engine(), frozen_squad=("unknown",))
 
 
+def test_future_stage7_minutes_do_not_reweight_shadow_posteriors_or_assists(repository_root):
+    shadow = synthetic_shadow(repository_root, count=120)
+    before_hash = shadow.semantic_sha256
+    full = synthetic_stage9_request(shadow, scenario_count=4, future_minutes=90)
+    reduced = synthetic_stage9_request(shadow, scenario_count=4, future_minutes=60)
+    assert full.participation_scenarios != reduced.participation_scenarios
+    assert (
+        full.participation_scenarios[0].stage7_minutes_context
+        != reduced.participation_scenarios[0].stage7_minutes_context
+    )
+    for world in shadow.worlds:
+        first = dict(ablation_requests(full, world))
+        second = dict(ablation_requests(reduced, world))
+        assert (
+            first["ALL_SUPPORTED"].allocation_profiles
+            == second["ALL_SUPPORTED"].allocation_profiles
+        )
+        assert first["ASSIST_ONLY"].allocation_profiles == second["ASSIST_ONLY"].allocation_profiles
+        assert first["ALL_SUPPORTED"].participation_scenarios == full.participation_scenarios
+        assert second["ALL_SUPPORTED"].participation_scenarios == reduced.participation_scenarios
+    assert shadow.semantic_sha256 == before_hash
+    assert shadow == synthetic_shadow(repository_root, count=120)
+
+
 def test_offline_exact_stage10_provided_squad_sensitivity(repository_root):
     from dmf_pulse.fpl_points.rules_adapter import AcceptedRulesAdapter
     from dmf_pulse.rules.compiler import compile_ruleset

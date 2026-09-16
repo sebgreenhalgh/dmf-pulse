@@ -14,7 +14,7 @@
   hostile self-review then fresh read-only independent review. Publish only a cleared
   candidate and wait for all exact-SHA CI jobs. R9C remains a draft human decision.
 - Local checkpoint: source-isolated active replay exact-equal with common synthetic
-  provenance; 1792 broad and 85 final focused tests passed, combined changed-code
+  provenance; 1792 broad and 93 final focused tests passed, combined changed-code
   coverage 97.83%; wheel/source synthetic hash equal. Three-world diagnostics,
   ablations and limited Stage-10 sensitivity complete; rolling shadow remains an
   explicit R9C adapter requirement. Independent review/publication/CI are pending.
