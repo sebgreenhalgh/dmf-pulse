@@ -74,3 +74,18 @@ Source-isolated replay equality is recorded in ACTIVE_PATH_DIFFERENTIAL.json.
   fixed to assert exact Decimal equality, not a tolerance or altered result.
 
 Independent review, publication and exact-SHA CI remain pending at this checkpoint.
+
+## Publication hygiene
+
+- Local implementation checkpoint: `53fac8339dd06891787713ea08e45d29d5c6c2f8`.
+- Manifest tests: 8 passed in 2.04s. Repository validator: zero errors. Secret scan:
+  zero findings. Diff whitespace check passed.
+- Git index/newline inspection caught a Windows CRLF in the generated compact
+  resource. The generator now explicitly emits LF and bounds local Git reads to
+  30 seconds. Regenerated numerical/resource semantic hash is unchanged; current
+  manifests now describe the exact Git-published bytes. No model change.
+- `uv run python scripts/build_review_pack.py --ticket PRIVATE-V1-ONE-COMMAND-001N-R9B --output review_pack/R9B --baseline b4d4c774ac4150a6fbdeb579c143a0458fa9156b`
+  returned REVIEW_TICKET_UNSUPPORTED: the existing canonical builder only supports
+  its installed foundation ticket list. It was not weakened or extended out of
+  scope. A bounded Git source-delta archive is used as a supplementary review aid,
+  not a canonical acceptance certificate; the reviewer inspects the full Git diff.

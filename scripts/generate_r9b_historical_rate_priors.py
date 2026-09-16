@@ -27,6 +27,7 @@ def _artifact(name: str) -> dict[str, object]:
         cwd=_ROOT,
         check=True,
         capture_output=True,
+        timeout=30,
     )
     value = json.loads(result.stdout)
     if not isinstance(value, dict):
@@ -95,7 +96,9 @@ def main() -> None:
     )
     HistoricalRateResource.model_validate_json(json.dumps(payload))
     _OUTPUT.write_text(
-        json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8"
+        json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
 
 

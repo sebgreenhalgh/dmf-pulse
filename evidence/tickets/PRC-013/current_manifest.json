@@ -2301,9 +2301,9 @@
       "sha256": "7808f3fcee338d2c0db7fc138b0fd69ae1d36d4764f789adb3001acda7e6fef2"
     },
     {
-      "bytes": 4172,
+      "bytes": 4223,
       "path": "scripts/generate_r9b_historical_rate_priors.py",
-      "sha256": "e00fe0f46e891f769ed3fb78749779b2e3cfafb49c8c1830f13d88f44965badf"
+      "sha256": "cd4ae08314e33dfca44e7cf69de1062baad9d3d9d1ff13c9fe3c4e818ff339dd"
     },
     {
       "bytes": 1238,
@@ -3436,9 +3436,9 @@
       "sha256": "995d0166c7d5cdd86f18948f6d374044da116881758622fc98f1ca3718c5fae0"
     },
     {
-      "bytes": 760273,
+      "bytes": 760272,
       "path": "src/dmf_pulse/fpl_points/resources/r9b_historical_rate_priors_v1.json",
-      "sha256": "b2b16845e27996de082a7cb3d6bf5d09348475d54356c370a3b03485a8412a81"
+      "sha256": "4901b537a933237182e52ffaa23421e2d5d53df1b50f6b4730fe7134f8c22fe3"
     },
     {
       "bytes": 21185,
