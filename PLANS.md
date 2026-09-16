@@ -1,5 +1,16 @@
 # DMF Pulse execution plans
 
+## PRIVATE-V1-ONE-COMMAND-001N-R9C-D2
+
+- Parent is accepted R9C-D1 `483c0c8cb858381b89c2cf14954c50b1c6ddd306` in an
+  isolated diagnostic branch. No provider call or retry is authorized.
+- Add only a slotted probe-local acquisition wrapper that records finite resource classes,
+  fetch completion, and per-logical transport-attempt deltas. Preserve the direct client,
+  model, rights and all active paths byte-identically.
+- Prove safe trace behavior with offline fake delegates, including retries and PICKs
+  parse/transport failures; validate differential, manifests, wheel and independent review
+  before exact-SHA CI.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R9C-D1
 
 - Parent is accepted R9B `32dc27ff78cf492c14e41e17d542fdde95691a9a`; work only in

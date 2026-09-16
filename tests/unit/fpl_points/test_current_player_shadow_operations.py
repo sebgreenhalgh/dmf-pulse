@@ -57,6 +57,7 @@ def test_operator_mocked_acquisition_safe_success_and_sanitized_failure(
 
     class FakeClient:
         request_count = 11
+        endpoint_classes = ()
 
         def __init__(self, *args, **kwargs):
             return None

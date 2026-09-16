@@ -11,7 +11,7 @@ import json
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
-from typing import Final, Literal, Never
+from typing import Final, Literal, Never, cast
 
 from pydantic import Field
 
@@ -27,6 +27,7 @@ from dmf_pulse.ingestion.fpl.current_player_history import build_current_player_
 from dmf_pulse.ingestion.fpl.direct import (
     DIRECT_FPL_PROFILE_ID,
     DirectFplClient,
+    DirectFplResource,
     DirectFplRunAttestation,
 )
 from dmf_pulse.ingestion.fpl.direct_payloads import DirectFplSnapshot, acquire_direct_fpl_snapshot
@@ -34,7 +35,64 @@ from dmf_pulse.ingestion.models import FrozenModel, RightsCapability
 from dmf_pulse.ingestion.rights import load_rights_profiles, require_rights
 from dmf_pulse.private_v1.automatic_inputs import _player_uuid, _team_uuid
 
-DIAGNOSTIC_SCHEMA_VERSION: Final = "r9c-shadow-probe-diagnostics-v1"
+DIAGNOSTIC_SCHEMA_VERSION: Final = "r9c-shadow-probe-diagnostics-v2"
+
+
+class _AcquisitionTraceClient:
+    """Delegate fetches while retaining only a closed, identifier-free trace."""
+
+    __slots__ = (
+        "_delegate",
+        "_last_logical_fetch_completed",
+        "_last_logical_resource",
+        "_last_logical_transport_attempts",
+    )
+
+    def __init__(self, delegate: DirectFplClient) -> None:
+        self._delegate = delegate
+        self._last_logical_resource: DirectFplResource | None = None
+        self._last_logical_fetch_completed: bool | None = None
+        self._last_logical_transport_attempts = 0
+
+    @property
+    def request_count(self) -> int:
+        return self._delegate.request_count
+
+    @property
+    def endpoint_classes(self) -> tuple[DirectFplResource, ...]:
+        return tuple(getattr(self._delegate, "endpoint_classes", ()))
+
+    @property
+    def last_logical_resource(self) -> DirectFplResource | None:
+        return self._last_logical_resource
+
+    @property
+    def last_logical_fetch_completed(self) -> bool | None:
+        return self._last_logical_fetch_completed
+
+    @property
+    def last_logical_transport_attempts(self) -> int:
+        return self._last_logical_transport_attempts
+
+    def fetch(
+        self,
+        resource: DirectFplResource,
+        *,
+        entry_id: int | None = None,
+        gameweek: int | None = None,
+    ) -> bytes:
+        before = self._delegate.request_count
+        self._last_logical_resource = resource
+        self._last_logical_fetch_completed = False
+        self._last_logical_transport_attempts = 0
+        try:
+            result = self._delegate.fetch(resource, entry_id=entry_id, gameweek=gameweek)
+        except Exception:
+            self._last_logical_transport_attempts = self._delegate.request_count - before
+            raise
+        self._last_logical_transport_attempts = self._delegate.request_count - before
+        self._last_logical_fetch_completed = True
+        return result
 
 
 class ShadowProbeFailureReason(StrEnum):
@@ -69,11 +127,15 @@ class ShadowProbeFailureStage(StrEnum):
 class ShadowProbeBlockedResult(FrozenModel):
     """Closed, aggregate-only result. It deliberately has no error-details field."""
 
-    diagnostic_schema_version: Literal["r9c-shadow-probe-diagnostics-v1"]
+    diagnostic_schema_version: Literal["r9c-shadow-probe-diagnostics-v2"]
     status: Literal["BLOCKED"]
     reason_code: ShadowProbeFailureReason
     failure_stage: ShadowProbeFailureStage
     fpl_acquisition_requests: int = Field(ge=0)
+    fpl_endpoint_classes: tuple[DirectFplResource, ...] = ()
+    last_logical_resource: DirectFplResource | None = None
+    last_logical_fetch_completed: bool | None = None
+    last_logical_transport_attempts: int = Field(ge=0, default=0)
     odds_requests: Literal[0] = 0
     stage7_11_invocations: Literal[0] = 0
     persistence_performed: Literal[False] = False
@@ -88,7 +150,7 @@ class ShadowProbeBlockedResult(FrozenModel):
 def _blocked(
     reason_code: ShadowProbeFailureReason,
     failure_stage: ShadowProbeFailureStage,
-    direct: DirectFplClient | None,
+    direct: _AcquisitionTraceClient | None,
 ) -> dict[str, object]:
     """Convert a known boundary failure without examining or serialising it."""
     request_count = 0 if direct is None else direct.request_count
@@ -98,6 +160,14 @@ def _blocked(
         reason_code=reason_code,
         failure_stage=failure_stage,
         fpl_acquisition_requests=request_count,
+        fpl_endpoint_classes=() if direct is None else direct.endpoint_classes,
+        last_logical_resource=None if direct is None else direct.last_logical_resource,
+        last_logical_fetch_completed=(
+            None if direct is None else direct.last_logical_fetch_completed
+        ),
+        last_logical_transport_attempts=(
+            0 if direct is None else direct.last_logical_transport_attempts
+        ),
     ).public_dict()
 
 
@@ -151,7 +221,7 @@ def run_operator(
     clock: Callable[[], datetime] = lambda: datetime.now(UTC),
 ) -> dict[str, object]:
     """One attempt only; failure payloads never inspect or disclose exceptions."""
-    direct: DirectFplClient | None = None
+    direct: _AcquisitionTraceClient | None = None
     try:
         approved = clock()
         if (
@@ -217,7 +287,9 @@ def run_operator(
         )
     try:
         # Existing client independently enforces the approved-profile and denied-storage gates.
-        direct = DirectFplClient(DirectFplRunAttestation(attested_at=approved))
+        direct = _AcquisitionTraceClient(
+            DirectFplClient(DirectFplRunAttestation(attested_at=approved))
+        )
     except Exception:
         return _blocked(
             ShadowProbeFailureReason.UNEXPECTED_INTERNAL_FAILURE,
@@ -226,7 +298,10 @@ def run_operator(
         )
     try:
         snapshot = acquire_direct_fpl_snapshot(
-            direct, entry_id=entry_id, captured_at=cutoff, clock=observed_now
+            cast(DirectFplClient, direct),
+            entry_id=entry_id,
+            captured_at=cutoff,
+            clock=observed_now,
         )
     except Exception:
         return _blocked(

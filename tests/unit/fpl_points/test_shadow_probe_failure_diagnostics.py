@@ -30,6 +30,7 @@ SENTINELS = (
 class FakeClient:
     def __init__(self, *args, request_count=11, **kwargs):
         self.request_count = request_count
+        self.endpoint_classes = ()
 
 
 def _clock() -> datetime:
@@ -54,6 +55,10 @@ def _assert_safe(result, capsys, caplog):
         "reason_code",
         "failure_stage",
         "fpl_acquisition_requests",
+        "fpl_endpoint_classes",
+        "last_logical_resource",
+        "last_logical_fetch_completed",
+        "last_logical_transport_attempts",
         "odds_requests",
         "stage7_11_invocations",
         "persistence_performed",
@@ -61,7 +66,10 @@ def _assert_safe(result, capsys, caplog):
         "model_input_status",
         "retry_performed",
     }
-    assert result["diagnostic_schema_version"] == "r9c-shadow-probe-diagnostics-v1"
+    assert result["diagnostic_schema_version"] == "r9c-shadow-probe-diagnostics-v2"
+    assert result["fpl_endpoint_classes"] == []
+    assert result["last_logical_resource"] is result["last_logical_fetch_completed"] is None
+    assert result["last_logical_transport_attempts"] == 0
     assert result["odds_requests"] == result["stage7_11_invocations"] == 0
     assert result["persistence_performed"] is result["model_training_performed"] is False
     assert result["model_input_status"] == "SHADOW_NOT_MODEL_INPUT"
@@ -78,7 +86,7 @@ def _raise_secret(*args, **kwargs):
 
 def test_blocked_contract_is_closed_and_strict():
     result = probe.ShadowProbeBlockedResult(
-        diagnostic_schema_version="r9c-shadow-probe-diagnostics-v1",
+        diagnostic_schema_version="r9c-shadow-probe-diagnostics-v2",
         status="BLOCKED",
         reason_code=probe.ShadowProbeFailureReason.FPL_ACQUISITION_FAILED,
         failure_stage=probe.ShadowProbeFailureStage.ACQUIRE_FPL_SNAPSHOT,
@@ -220,7 +228,7 @@ def test_cutoff_acquisition_six_request_shape_and_unexpected_are_closed(
     def fails_after_six(*args, **kwargs):
         acquisitions.append(1)
         direct = args[0]
-        direct.request_count += 6
+        direct._delegate.request_count += 6
         raise IngestionError("SOURCE_UNAVAILABLE", SENTINELS[0])
 
     monkeypatch.setattr(probe, "acquire_direct_fpl_snapshot", fails_after_six)
