@@ -17,7 +17,8 @@
   provenance; 1792 broad and 93 final focused tests passed, combined changed-code
   coverage 97.83%; wheel/source synthetic hash equal. Three-world diagnostics,
   ablations and limited Stage-10 sensitivity complete; rolling shadow remains an
-  explicit R9C adapter requirement. Independent review/publication/CI are pending.
+  explicit R9C adapter requirement. Independent review cleared the complete candidate
+  after remediation; publication and complete exact-SHA CI remain the terminal gates.
 
 ## PRIVATE-V1-ONE-COMMAND-001N-R9A
 

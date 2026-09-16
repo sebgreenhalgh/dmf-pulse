@@ -109,3 +109,17 @@ Independent review, publication and exact-SHA CI remain pending at this checkpoi
   the diagnostic-label source change is not numerical recommendation drift.
 - Supplementary review archive checkpoint: 29 files, 1770895 uncompressed bytes
   under a 5 MiB cap; canonical builder unsupported status remains disclosed.
+
+## Publication clearance
+
+Independent read-only final verdict for implementation candidate
+`ddf413a1fd38938df454009d485d6f90d0d65b17`:
+**CLEAR_FOR_PUSH_AND_EXACT_SHA_CI**. No unresolved findings; reviewer final focused
+run 93 passed in 21.10s. Final Ruff format/check passed on all 810 files and Git
+LF/clean-worktree checks passed. This review record is metadata-only; source and
+test bytes are unchanged from the independently cleared candidate.
+
+Publication sequence (to be observed after this record is sealed): normal push,
+local/remote exact SHA equality, all 12 mandatory dmf-pulse-ci jobs green, final
+clean worktree, then stop. The final operator handoff reports the actual CI URL,
+SHA and job results; this pre-publication record does not invent a future result.

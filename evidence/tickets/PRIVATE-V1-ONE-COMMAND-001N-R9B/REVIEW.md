@@ -38,6 +38,16 @@ replays. No active recommendation or rights mutation was found.
 | R9B-IR-001 | P2 material acceptance gap | Explicit all-world historical equivalence and assist/exposure tests missing | Added pinned-formula parity across every applicable donor/channel in CENTRAL/LOW/HIGH, exact compiled assist ratio, all-strength exposure response and future Stage-7 perturbation; 93 tests pass |
 | R9B-IR-002 | P3 | Aggregate discipline excluded rows could be mistaken for unique source rows | Renamed to excluded_channel_rows, documented unit and added assertion |
 
-The reviewer has inspected both remediations and reported no other finding. Final
-exact-commit re-review and publication clearance are pending at this checkpoint.
-No exact-SHA CI success is claimed before the actual run.
+Final independent verdict: **CLEAR_FOR_PUSH_AND_EXACT_SHA_CI** for exact candidate
+`ddf413a1fd38938df454009d485d6f90d0d65b17`, compared with immutable parent
+`b4d4c774ac4150a6fbdeb579c143a0458fa9156b`. No unresolved P0/P1/P2/P3 findings.
+The reviewer reran all 93 focused tests on that pin (21.10s), verified a clean
+worktree and the refreshed wheel/summary/replay evidence. The independent historical
+function comparison covered 22167 cases with maximum relative arithmetic difference
+3.2520570017142904e-16. It independently matched all source-derived resource rows.
+
+The subsequent review-record commit changes documentation/manifests only and must
+receive final SHA acknowledgement before normal publication. This verdict permits
+push and exact-SHA CI; it does not claim CI success, live observation authorization,
+activation, PR, merge or tag approval. Exact-SHA CI is observed after publication,
+not self-certified inside the commit whose CI is being evaluated.
