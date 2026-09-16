@@ -10,3 +10,10 @@ Injected profiles require exact Stage-7 identity/team coverage and separate
 non-active provenance. Only R9B's existing assist, yellow-card, red-card and
 goalkeeper-save profile fields may differ. No full four-world Stage-11
 comparison is included in this ticket.
+
+## A1.02-CI-R1
+
+The inherited R8A/R8B static digest guards freeze only their still-unmodified
+provider, optimiser, executable and rights surfaces. They explicitly exclude
+the two A1-owned files whose behavior is protected by A1 semantic-invariant
+tests: `private_v1/service.py` and `private_v1/rolling.py`.

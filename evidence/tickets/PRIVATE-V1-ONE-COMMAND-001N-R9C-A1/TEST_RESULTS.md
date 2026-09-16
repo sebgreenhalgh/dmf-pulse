@@ -12,3 +12,14 @@ live snapshot, persistence, fitting or activation was used.
   passed.
 
 The full four-world three-GW Stage-11 comparison was deliberately not run.
+
+## A1.02-CI-R1
+
+- Reproduced the two failed legacy whole-file SHA guards exactly.
+- Reconciled only their misleading inclusion of the intentional A1 service and
+  rolling changes; all other historical provider/optimizer/rights digests stay
+  exact.
+- Horizon probe and rights approval tests: 102 passed.
+- A1/R9B/rolling focused regression: 66 passed in 166.290 seconds.
+- `src/dmf_pulse/**` is byte-identical to A1.02 parent
+  `3b478e841fefa3d3f251275b59673367a6d5865c`.

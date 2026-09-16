@@ -30,6 +30,12 @@ pytestmark = pytest.mark.unit
 NOW = datetime(2026, 8, 24, 10, tzinfo=UTC)
 CUTOFF = NOW + timedelta(minutes=5)
 ROOT = Path(__file__).resolve().parents[3]
+_R8A_UNMODIFIED_SOURCE_HASHES = {
+    # A1 intentionally evolves private_v1/service.py through semantic resolver tests.
+    "optimisation/multi_gameweek_solver.py": "0c4f8948b93fd8016088dc2d59e571475f56aa1fa74d77efc113615f1570ad7a",
+    "ingestion/odds/parser.py": "d92f7dd0fd2bed1ebc031cdad70d8398de19180de57ddc6a446219521621feb0",
+    "ingestion/odds/client.py": "9dbbd5f6e9c89a38b10bc02da517be088883ac01a1c39a791c9892aed64d28c9",
+}
 
 
 def _script():
@@ -573,18 +579,21 @@ def test_inherited_depth_and_body_limits(fpl, body):
         observe(fpl, body)
 
 
-def test_existing_production_sources_unchanged():
+def test_unmodified_provider_and_optimizer_sources_remain_parent_identical():
     import hashlib
 
     # Parent bytes, independent of Git availability or CI clone depth.
-    expected = {
-        "private_v1/service.py": "61eb8a2ebd76eff7affb539f8ce7676b065bd6946d63f68bc652696c98bc856a",
-        "optimisation/multi_gameweek_solver.py": "0c4f8948b93fd8016088dc2d59e571475f56aa1fa74d77efc113615f1570ad7a",
-        "ingestion/odds/parser.py": "d92f7dd0fd2bed1ebc031cdad70d8398de19180de57ddc6a446219521621feb0",
-        "ingestion/odds/client.py": "9dbbd5f6e9c89a38b10bc02da517be088883ac01a1c39a791c9892aed64d28c9",
-    }
-    for name, digest in expected.items():
+    for name, digest in _R8A_UNMODIFIED_SOURCE_HASHES.items():
         assert hashlib.sha256((ROOT / "src/dmf_pulse" / name).read_bytes()).hexdigest() == digest
+
+
+def test_r8a_static_guard_excludes_only_intentionally_evolving_a1_service():
+    assert "private_v1/service.py" not in _R8A_UNMODIFIED_SOURCE_HASHES
+    assert set(_R8A_UNMODIFIED_SOURCE_HASHES) == {
+        "optimisation/multi_gameweek_solver.py",
+        "ingestion/odds/parser.py",
+        "ingestion/odds/client.py",
+    }
 
 
 def test_rights_flags_do_not_upgrade_profile():

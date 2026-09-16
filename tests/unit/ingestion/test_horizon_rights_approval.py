@@ -34,6 +34,18 @@ _UNRESOLVED = (
     "model training and backup require explicit review",
     "public product is a new purpose",
 )
+_R8B_UNMODIFIED_EXECUTABLE_HASHES = {
+    "ingestion/current_state.py": "03a97b7fc9aef3536d01542d34a39bda5b2fcb29cfc3b67b4b637612947277e6",
+    "ingestion/odds/automatic_mapping.py": "e45e09e5c6aef2b4b7693a132a26571a5fe38d47b6fc9ff65b55d4187b13d182",
+    "ingestion/odds/current.py": "f8e131d2413bcccc2b78959779f0dae0618800f188b524fd2ea5b5299c47e5a9",
+    "ingestion/odds/identity.py": "0c4fd04c32bade5a447d151208d464727854cdc717b81170c94c0cbcaaa5ae2b",
+    "ingestion/odds/transient.py": "6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e",
+    "markets/current.py": "5e018a571ebf0bf0a33da7b8e87894f7bb31eb14b93b5b31102d586ba9924b17",
+    "private_v1/horizon_markets.py": "0696abaf10f73f24d56db6e18fc52fe473b046a00708244d5fd0342e5ada6554",
+    "private_v1/one_command.py": "87621a94ee6b3ec4470057023f28bfd2f3d8eca8da9028a2febf1d8b16d97162",
+    # A1 intentionally evolves private_v1/rolling.py through its private seam.
+    "private_v1/rolling_models.py": "32750351fe73dbe8e9e3350971ef12b3e5e05ea89dc820ec25cbda2a3f3d7bdc",
+}
 
 
 @pytest.fixture
@@ -149,22 +161,12 @@ def test_missing_required_capability_rejected_by_schema(governed_gate, capabilit
         RightsProfile.model_validate(raw)
 
 
-def test_r8b_executables_and_fpl_rights_remain_parent_identical(repository_root) -> None:
+def test_r8b_provider_rights_and_unmodified_executables_remain_parent_identical(
+    repository_root,
+) -> None:
     import hashlib
 
-    expected = {
-        "ingestion/current_state.py": "03a97b7fc9aef3536d01542d34a39bda5b2fcb29cfc3b67b4b637612947277e6",
-        "ingestion/odds/automatic_mapping.py": "e45e09e5c6aef2b4b7693a132a26571a5fe38d47b6fc9ff65b55d4187b13d182",
-        "ingestion/odds/current.py": "f8e131d2413bcccc2b78959779f0dae0618800f188b524fd2ea5b5299c47e5a9",
-        "ingestion/odds/identity.py": "0c4fd04c32bade5a447d151208d464727854cdc717b81170c94c0cbcaaa5ae2b",
-        "ingestion/odds/transient.py": "6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e",
-        "markets/current.py": "5e018a571ebf0bf0a33da7b8e87894f7bb31eb14b93b5b31102d586ba9924b17",
-        "private_v1/horizon_markets.py": "0696abaf10f73f24d56db6e18fc52fe473b046a00708244d5fd0342e5ada6554",
-        "private_v1/one_command.py": "87621a94ee6b3ec4470057023f28bfd2f3d8eca8da9028a2febf1d8b16d97162",
-        "private_v1/rolling.py": "4e153c4ab01ec750e3130fc6902170a64f5228bcd5f2bf19817d0f8970010696",
-        "private_v1/rolling_models.py": "32750351fe73dbe8e9e3350971ef12b3e5e05ea89dc820ec25cbda2a3f3d7bdc",
-    }
-    for relative, digest in expected.items():
+    for relative, digest in _R8B_UNMODIFIED_EXECUTABLE_HASHES.items():
         assert (
             hashlib.sha256((repository_root / "src/dmf_pulse" / relative).read_bytes()).hexdigest()
             == digest
@@ -173,3 +175,8 @@ def test_r8b_executables_and_fpl_rights_remain_parent_identical(repository_root)
         hashlib.sha1((repository_root / "config/rights/fpl_profiles.json").read_bytes()).hexdigest()
         == "cbe6afa0eacc175a6500152460ec04ff4ac990a0"
     )
+
+
+def test_r8b_static_guard_excludes_only_intentionally_evolving_a1_rolling():
+    assert "private_v1/rolling.py" not in _R8B_UNMODIFIED_EXECUTABLE_HASHES
+    assert len(_R8B_UNMODIFIED_EXECUTABLE_HASHES) == 9

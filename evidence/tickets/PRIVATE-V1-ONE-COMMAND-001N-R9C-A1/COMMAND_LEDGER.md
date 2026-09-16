@@ -9,3 +9,10 @@
 - `uv run python scripts/validate_repository.py` and repository manifest tests — PASS.
 
 No network or live execution command appears in this ledger.
+
+## A1.02-CI-R1
+
+- Reproduced the two failing static guard tests: FAIL as expected on A1.02.
+- `pytest tests/unit/ingestion/test_horizon_probe.py`
+  `tests/unit/ingestion/test_horizon_rights_approval.py` — PASS (102).
+- A1/R9B/rolling focused regression — PASS (66).

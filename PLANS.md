@@ -13,6 +13,11 @@
 - Seal A1.01 as a durable checkpoint after focused regression and isolation
   tests; then validate the A1.02 adapter only with synthetic R9B material,
   manifests and independent read-only review before publication.
+- A1.02-CI-R1 reconciles only two inherited whole-file historical guards that
+  falsely included the intentionally evolving A1 service and rolling files.
+  Retain all other R8A/R8B provider, optimiser and rights digest checks; no
+  source, provider, rights or active-path change is permitted. A1.03 remains
+  blocked until the replacement exact-SHA CI passes.
 
 ## PRIVATE-V1-ONE-COMMAND-001N-R9C-D2
 
