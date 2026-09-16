@@ -1,5 +1,16 @@
 # DMF Pulse execution plans
 
+## PRIVATE-V1-ONE-COMMAND-001N-R9C-D1
+
+- Parent is accepted R9B `32dc27ff78cf492c14e41e17d542fdde95691a9a`; work only in
+  this isolated diagnostic branch. No live retry or probe is permitted.
+- Replace the dedicated probe's coarse blocked result with finite, fixed safe stages
+  and reason codes. Preserve request count but never retain error text, response data,
+  credentials or private identifiers.
+- Keep the R9B compiler/resource, rights and all active recommendation code identical.
+  Validate with mocks and synthetic fixtures, hostile leakage tests and independent
+  review, then exact-SHA CI. A later observation remains a separate human action.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R9B (resumed)
 
 - Immutable parent: `b4d4c774ac4150a6fbdeb579c143a0458fa9156b`; isolated existing

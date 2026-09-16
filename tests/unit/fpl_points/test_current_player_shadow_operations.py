@@ -74,9 +74,10 @@ def test_operator_mocked_acquisition_safe_success_and_sanitized_failure(
     def fail(*args, **kwargs):
         raise ValueError("DO_NOT_ECHO_PRIVATE_PROVIDER_VALUE")
 
-    monkeypatch.setattr(probe, "observe_snapshot", fail)
+    monkeypatch.setattr(probe, "safe_shadow_summary", fail)
     result = probe.run_operator(42, profile.human_approval_id, True, clock=clock)
     assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "SAFE_SUMMARY_FAILED"
     assert "DO_NOT_ECHO" not in json.dumps(result)
     monkeypatch.setattr(probe, "run_operator", lambda *args, **kwargs: result)
     assert probe.main(["--entry-id", "42"]) == 2
