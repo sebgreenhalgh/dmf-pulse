@@ -1,0 +1,28 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R9B"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Current-player fixed-hyperparameter three-world posterior shadow"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R9B-current-player-eb-shadow"
+required_base_commit: "b4d4c774ac4150a6fbdeb579c143a0458fa9156b"
+authority_scopes: ["A4-FPL-ingestion", "A9-points"]
+objective: >-
+  Compile and diagnose current-player conjugate posteriors in an isolated transient
+  shadow path. Preserve all active recommendation semantics and existing rights.
+allowed_areas:
+  - "src/dmf_pulse/fpl_points/current_player_*.py"
+  - "src/dmf_pulse/fpl_points/resources/r9b_historical_rate_priors_v1.json"
+  - "scripts/*r9b*.py"
+  - "scripts/probe_current_player_posterior_shadow.py"
+  - "tests/unit/fpl_points/*shadow*.py"
+  - "tests/unit/fpl_points/*posterior*.py"
+  - "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9B/**"
+  - "evidence/tickets/PRIVATE-V1-ONE-COMMAND-001N-R9B/**"
+  - "evidence/tickets/*/current_manifest.json"
+  - "PLANS.md"
+exclusions:
+  - "Active Stage 7-11, R7, R8B, V3, rights, dependency and acquisition changes"
+  - "Live requests, credentials, recommendations, current-data persistence or training"
+  - "Goal-share, penalties, own goals, defensive components and BPS auxiliary updates"
+  - "PR, merge, tag, activation and R9C implementation branch"
+required_activation_status: "SHADOW_NOT_MODEL_INPUT"

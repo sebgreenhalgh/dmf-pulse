@@ -1,5 +1,24 @@
 # DMF Pulse execution plans
 
+## PRIVATE-V1-ONE-COMMAND-001N-R9B (resumed)
+
+- Immutable parent: `b4d4c774ac4150a6fbdeb579c143a0458fa9156b`; isolated existing
+  `review_pack/one-command-n-r9b` worktree. Preserve unrelated work.
+- Verify all historical source digests and seal the 599-donor, three-world resource.
+- Add pure identity-bound conjugate shadow updates with explicit field missingness,
+  exposure exclusions, unsupported-field invariants and aggregate diagnostics.
+- Test adversarial and metamorphic cases before offline Stage-9 comparison work.
+- Keep all ordinary recommendation code, rights and acquisition byte-identical.
+  No live provider requests, credentials, current-data persistence or activation.
+- Validate regression/differential, coverage, wheel, manifests and security; perform
+  hostile self-review then fresh read-only independent review. Publish only a cleared
+  candidate and wait for all exact-SHA CI jobs. R9C remains a draft human decision.
+- Local checkpoint: source-isolated active replay exact-equal with common synthetic
+  provenance; 1792 broad and 85 final focused tests passed, combined changed-code
+  coverage 97.83%; wheel/source synthetic hash equal. Three-world diagnostics,
+  ablations and limited Stage-10 sensitivity complete; rolling shadow remains an
+  explicit R9C adapter requirement. Independent review/publication/CI are pending.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R9A
 
 - Work from immutable R8B-R1 parent `6802441f5a60723929bf5a930b6ea9380f5178c1` in an

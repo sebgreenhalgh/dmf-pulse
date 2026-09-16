@@ -1,0 +1,28 @@
+{
+  "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "parent_sha": "b4d4c774ac4150a6fbdeb579c143a0458fa9156b",
+  "harness": "scripts/replay_r7_frozen_service.py",
+  "source_isolated_parent_worktree": true,
+  "synthetic_fixed_build_identity": true,
+  "native_parent_build_identity": "dmf-pulse-0.2.0:source-sha256:3cf48fa53e94c775d81ea0417a4575b7319fbbe8cb35fd7f82291d9a9bce103c",
+  "native_candidate_build_identity": "dmf-pulse-0.2.0:source-sha256:f5b277910e8c0166afd9a7f581db5fdb6a5559361c2ca7a5488687f84b56a40e",
+  "execution_sha256": "41787e1d23f9735943afda62aa24e7098942ddf8c136415f31a4e1bed9f68772",
+  "projection_hashes": [
+    "0e12e0c7a2a31db92e1bc9cd02055eac28b9fcb37569a57c349ec745f2a06004",
+    "ec8f9d918f1bbee5c8a506ff796495ca77fd802bbc0c001d3d83992372ad89ea",
+    "2fbd7014017f8d77536e755292df6106cb32d2cb540a991a74e8cabdf096c7aa"
+  ],
+  "exact_equal_fields": [
+    "decision",
+    "execution_sha256",
+    "one_gameweek_result",
+    "optimiser_result",
+    "projection_hashes",
+    "request",
+    "source",
+    "synthetic_fixed_build_identity"
+  ],
+  "excluded_fields": ["actual_build_identity", "wall_seconds", "cpu_seconds"],
+  "interpretation": "ACTIVE_NUMERICS_EXACT_EQUAL_WITH_EXPLICIT_COMMON_SYNTHETIC_BUILD_PROVENANCE",
+  "live_execution": false
+}

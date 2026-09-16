@@ -1,0 +1,5626 @@
+{
+  "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY_NOT_A_LIVE_OBSERVATION",
+  "compiler_seconds": {
+    "median": 2.1721828000154346,
+    "resource_loaded_before_timing": true,
+    "samples": [
+      2.1721828000154346,
+      2.144107099971734,
+      2.266993600060232
+    ],
+    "warmup_excluded": true
+  },
+  "stage10_decision_sensitivity": {
+    "captain_changed": false,
+    "decision_scope": "EXACT_R7_STAGE10_KERNEL_DECLARED_SQUADS_NOT_STAGE11_TRANSFER_OPTIMALITY",
+    "expected_manager_utility_delta": "-0.9375",
+    "fixture_count": 3,
+    "interpretation": "MODEL_MOVEMENT_NOT_MODEL_ACCURACY",
+    "paired_manager_gain_mean": "-0.9375",
+    "price_hit_ft_scope": "NOT_MODELLED_IN_PROVIDED_SQUAD_EXPERIMENT",
+    "provided_squad_count": 2,
+    "rolling_action_changed": null,
+    "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+    "squad_choice_changed": false,
+    "stage11_not_executed": true,
+    "starting_xi_changed": false,
+    "upstream_rules_and_scenarios_held_fixed": true,
+    "world_sha256": "a1f076e7d5411a480a71e497d0d077194e5ee9f30f8ea4d4d54f59c05c002e8c"
+  },
+  "stage9_paired_ablation": {
+    "comparison_limitations": [
+      "REFERENCE_RULES_SYNTHETIC_EXPERIMENT_NOT_TARGET_SEASON_ACCEPTANCE",
+      "FIXED_NAMED_STREAMS_AND_SCENARIO_INDEXES; CONDITIONAL_EVENT_BRANCHES_CAN_CHANGE_DOWNSTREAM_DRAWS",
+      "PAIRED_FINITE_MONTE_CARLO_ESTIMATES_NOT_NOISE_FREE_ANALYTIC_EFFECTS",
+      "COMPONENT_EFFECTS_CAN_INTERACT; ABLATION_DELTAS_NEED_NOT_ADD"
+    ],
+    "frozen_squad_interpretation": "RAW_POINTS_SUM_OF_DECLARED_PLAYER_SUBSET_NOT_MANAGER_TACTICS",
+    "frozen_squad_size": 15,
+    "interpretation": "MODEL_MOVEMENT_NOT_MODEL_ACCURACY",
+    "paired_stage7_stage8_equal": true,
+    "player_count": 22,
+    "root_seed": 12345,
+    "scenario_count": 256,
+    "shadow_world_sha256": "a1f076e7d5411a480a71e497d0d077194e5ee9f30f8ea4d4d54f59c05c002e8c",
+    "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+    "stage8_sha256": "7b398dac9f58cb3624e85aa32bdf714a7291a3a7d19574d1f9193e0f3b0a2bda",
+    "variants": {
+      "ALL_SUPPORTED": {
+        "mean_player_xp_delta": -0.08629261363636363,
+        "numeric_scenario_sha256": "ba9b241f6fa4ad84e462dead102985f0836c337800aca60fc5e66d0214388532",
+        "paired_squad_delta": {
+          "mean": -1.546875,
+          "median": -1.0,
+          "p10": -7.0,
+          "p90": 3.0,
+          "probability_shadow_greater": 0.2734375
+        },
+        "rank_position_changed_count": 18,
+        "squad_expected_points_delta": -1.546875,
+        "squad_points_p10": 47.0,
+        "squad_points_p90": 70.0,
+        "squad_points_variance": 86.81797790527344,
+        "stage9_mean_absolute_player_xp_change": 0.3185369318181818,
+        "stage9_p90_absolute_player_xp_change": 0.57734375
+      },
+      "ASSIST_ONLY": {
+        "mean_player_xp_delta": 0.0005326704545454545,
+        "numeric_scenario_sha256": "706923250e8677b882425c60d65b12bdb667bc21cff9a5740e3a3ca30ef504b2",
+        "paired_squad_delta": {
+          "mean": 0.0625,
+          "median": 0.0,
+          "p10": -4.0,
+          "p90": 4.5,
+          "probability_shadow_greater": 0.33984375
+        },
+        "rank_position_changed_count": 20,
+        "squad_expected_points_delta": 0.0625,
+        "squad_points_p10": 48.0,
+        "squad_points_p90": 72.0,
+        "squad_points_variance": 86.93846130371094,
+        "stage9_mean_absolute_player_xp_change": 0.3215553977272727,
+        "stage9_p90_absolute_player_xp_change": 0.49062500000000003
+      },
+      "DISCIPLINE_ONLY": {
+        "mean_player_xp_delta": -0.09410511363636363,
+        "numeric_scenario_sha256": "e38e2092800d1241c6608f17aa6bae46f5da2239efb597eae28cf8800b7a175c",
+        "paired_squad_delta": {
+          "mean": -1.796875,
+          "median": -2.0,
+          "p10": -4.0,
+          "p90": 0.0,
+          "probability_shadow_greater": 0.05859375
+        },
+        "rank_position_changed_count": 12,
+        "squad_expected_points_delta": -1.796875,
+        "squad_points_p10": 46.0,
+        "squad_points_p90": 70.0,
+        "squad_points_variance": 86.45274353027344,
+        "stage9_mean_absolute_player_xp_change": 0.15056818181818182,
+        "stage9_p90_absolute_player_xp_change": 0.30781250000000004
+      },
+      "GK_SAVE_ONLY": {
+        "mean_player_xp_delta": 0.007102272727272727,
+        "numeric_scenario_sha256": "a213256176a3894de06d16756536fd033eef498c9ceb1844a5c8d9d194caac37",
+        "paired_squad_delta": {
+          "mean": 0.16796875,
+          "median": 0.0,
+          "p10": 0.0,
+          "p90": 1.0,
+          "probability_shadow_greater": 0.1796875
+        },
+        "rank_position_changed_count": 4,
+        "squad_expected_points_delta": 0.16796875,
+        "squad_points_p10": 48.0,
+        "squad_points_p90": 72.0,
+        "squad_points_variance": 84.491943359375,
+        "stage9_mean_absolute_player_xp_change": 0.014204545454545454,
+        "stage9_p90_absolute_player_xp_change": 0.011328125000000008
+      },
+      "STALE": {
+        "mean_player_xp_delta": 0.0,
+        "numeric_scenario_sha256": "c4dac62c5c828e5ab376c74cedcff2d6df795f692d2798bcc7596f209df80bc0",
+        "paired_squad_delta": {
+          "mean": 0.0,
+          "median": 0.0,
+          "p10": 0.0,
+          "p90": 0.0,
+          "probability_shadow_greater": 0.0
+        },
+        "rank_position_changed_count": 0,
+        "squad_expected_points_delta": 0.0,
+        "squad_points_p10": 48.0,
+        "squad_points_p90": 71.0,
+        "squad_points_variance": 84.88816833496094,
+        "stage9_mean_absolute_player_xp_change": 0.0,
+        "stage9_p90_absolute_player_xp_change": 0.0
+      }
+    },
+    "world": "CENTRAL_TEMPORARY"
+  },
+  "summary": {
+    "assist_weight_interpretation": "PROPENSITY_WEIGHTS_NORMALIZED_ON_PITCH_BY_STAGE9; TEAM_TV_IS_CATALOGUE_DIAGNOSTIC_ONLY",
+    "complete_reconciled_players": 659,
+    "current_history_evidence_sha256": "e1312227cf288197b32efaa245f60a9d87cdcf296d5bd85fe11ccf38697cb0b0",
+    "current_player_count": 659,
+    "current_prior_binding_sha256": "1b1ce2ab97afcbf3be8c8080b5b391f392b4f2e2be0b7340be451b97aa3b8167",
+    "fallback_prior_count": 658,
+    "goal_share_status": "GOAL_SHARE_CURRENT_HISTORY_UPDATE_BLOCKED_NO_NONPENALTY_DECOMPOSITION",
+    "group_interpretation": "CURRENT_CATALOGUE_POSITION_AND_TEAM_NOT_HISTORICAL_MEMBERSHIP",
+    "historical_donor_count": 599,
+    "historical_resource_sha256": "ca3084edded94fda8b0818f4277aca335f25e8112bb9379f47c11c2ad4b29909",
+    "history_rows": 2636,
+    "individual_prior_count": 1,
+    "interpretation": "MODEL_MOVEMENT_NOT_MODEL_ACCURACY",
+    "model_gaps": {
+      "completed_gameweek_count": 4,
+      "gaps": [
+        "BPS_AUXILIARY_NOT_CURRENT_PLAYER_CALIBRATED",
+        "CBI_COMPONENT_SPLIT_UNAVAILABLE",
+        "CURRENT_FPL_ASSIST_HISTORICAL_ASSIST_SEMANTIC_BRIDGE",
+        "CURRENT_PLAYER_HISTORY_ONLY_FOUR_COMPLETED_GWS",
+        "CURRENT_RECOVERY_KAPPA_NOT_GOVERNED",
+        "CURRENT_TACKLE_KAPPA_NOT_GOVERNED",
+        "GOAL_NONPENALTY_DECOMPOSITION_UNAVAILABLE",
+        "NO_CURRENT_DATA_HYPERPARAMETER_FITTING",
+        "PENALTY_ROLE_SEPARATE_CURRENT_PATH",
+        "SHRINKAGE_STRENGTH_NOT_CALIBRATED"
+      ],
+      "position_evidence": [
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": 3951.4663560155996,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 2112,
+          "observed_exposure_minutes": 41400,
+          "position": "DEF",
+          "positive_exposure_rows": 528,
+          "rate_per90": 4.591304347826087,
+          "row_rate_variance": 3.0596877869605144,
+          "rows_with_observed_exposure": 660,
+          "statistic": "combined_cbi",
+          "zero_exposure_count": 528
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": 757.3875510761932,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 1056,
+          "observed_exposure_minutes": 41400,
+          "position": "DEF",
+          "positive_exposure_rows": 528,
+          "rate_per90": 2.2956521739130435,
+          "row_rate_variance": 0.7649219467401286,
+          "rows_with_observed_exposure": 660,
+          "statistic": "tackles",
+          "zero_exposure_count": 264
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": 0.0,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 2640,
+          "observed_exposure_minutes": 41400,
+          "position": "DEF",
+          "positive_exposure_rows": 528,
+          "rate_per90": 5.739130434782608,
+          "row_rate_variance": 4.780762167125804,
+          "rows_with_observed_exposure": 660,
+          "statistic": "recoveries",
+          "zero_exposure_count": 660
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 4224,
+          "observed_exposure_minutes": 41400,
+          "position": "DEF",
+          "positive_exposure_rows": 528,
+          "rate_per90": 9.182608695652174,
+          "row_rate_variance": 12.238751147842057,
+          "rows_with_observed_exposure": 660,
+          "statistic": "defensive_contribution",
+          "zero_exposure_count": 1056
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 7392,
+          "observed_exposure_minutes": 41400,
+          "position": "DEF",
+          "positive_exposure_rows": 528,
+          "rate_per90": 16.069565217391304,
+          "row_rate_variance": 37.4811753902663,
+          "rows_with_observed_exposure": 660,
+          "statistic": "bps",
+          "zero_exposure_count": -264
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 0,
+          "observed_exposure_minutes": 41400,
+          "position": "DEF",
+          "positive_exposure_rows": 528,
+          "rate_per90": 0.0,
+          "row_rate_variance": 0.0,
+          "rows_with_observed_exposure": 660,
+          "statistic": "bonus",
+          "zero_exposure_count": 0
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": 4003.0072215288465,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 2128,
+          "observed_exposure_minutes": 41940,
+          "position": "FWD",
+          "positive_exposure_rows": 532,
+          "rate_per90": 4.5665236051502145,
+          "row_rate_variance": 2.9849058737068233,
+          "rows_with_observed_exposure": 660,
+          "statistic": "combined_cbi",
+          "zero_exposure_count": 512
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": 767.2665191337087,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 1064,
+          "observed_exposure_minutes": 41940,
+          "position": "FWD",
+          "positive_exposure_rows": 532,
+          "rate_per90": 2.2832618025751072,
+          "row_rate_variance": 0.7462264684267058,
+          "rows_with_observed_exposure": 660,
+          "statistic": "tackles",
+          "zero_exposure_count": 256
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": 0.0,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 2660,
+          "observed_exposure_minutes": 41940,
+          "position": "FWD",
+          "positive_exposure_rows": 532,
+          "rate_per90": 5.708154506437769,
+          "row_rate_variance": 4.663915427666912,
+          "rows_with_observed_exposure": 660,
+          "statistic": "recoveries",
+          "zero_exposure_count": 640
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 4256,
+          "observed_exposure_minutes": 41940,
+          "position": "FWD",
+          "positive_exposure_rows": 532,
+          "rate_per90": 9.133047210300429,
+          "row_rate_variance": 11.939623494827293,
+          "rows_with_observed_exposure": 660,
+          "statistic": "defensive_contribution",
+          "zero_exposure_count": 1024
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 7448,
+          "observed_exposure_minutes": 41940,
+          "position": "FWD",
+          "positive_exposure_rows": 532,
+          "rate_per90": 15.982832618025752,
+          "row_rate_variance": 36.56509695290859,
+          "rows_with_observed_exposure": 660,
+          "statistic": "bps",
+          "zero_exposure_count": -256
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 0,
+          "observed_exposure_minutes": 41940,
+          "position": "FWD",
+          "positive_exposure_rows": 532,
+          "rate_per90": 0.0,
+          "row_rate_variance": 0.0,
+          "rows_with_observed_exposure": 660,
+          "statistic": "bonus",
+          "zero_exposure_count": 0
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": 920.0,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 2096,
+          "observed_exposure_minutes": 41400,
+          "position": "GK",
+          "positive_exposure_rows": 524,
+          "rate_per90": 4.556521739130435,
+          "row_rate_variance": 2.9536740283200276,
+          "rows_with_observed_exposure": 660,
+          "statistic": "combined_cbi",
+          "zero_exposure_count": 544
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": 4.539473684210526,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 1048,
+          "observed_exposure_minutes": 41400,
+          "position": "GK",
+          "positive_exposure_rows": 524,
+          "rate_per90": 2.2782608695652176,
+          "row_rate_variance": 0.7384185070800069,
+          "rows_with_observed_exposure": 660,
+          "statistic": "tackles",
+          "zero_exposure_count": 272
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": 0.0,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 2620,
+          "observed_exposure_minutes": 41400,
+          "position": "GK",
+          "positive_exposure_rows": 524,
+          "rate_per90": 5.695652173913044,
+          "row_rate_variance": 4.615115669250044,
+          "rows_with_observed_exposure": 660,
+          "statistic": "recoveries",
+          "zero_exposure_count": 680
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 4192,
+          "observed_exposure_minutes": 41400,
+          "position": "GK",
+          "positive_exposure_rows": 524,
+          "rate_per90": 9.11304347826087,
+          "row_rate_variance": 11.81469611328011,
+          "rows_with_observed_exposure": 660,
+          "statistic": "defensive_contribution",
+          "zero_exposure_count": 1088
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 7336,
+          "observed_exposure_minutes": 41400,
+          "position": "GK",
+          "positive_exposure_rows": 524,
+          "rate_per90": 15.947826086956521,
+          "row_rate_variance": 36.18250684692034,
+          "rows_with_observed_exposure": 660,
+          "statistic": "bps",
+          "zero_exposure_count": -272
+        },
+        {
+          "available_rows": 660,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 0,
+          "observed_exposure_minutes": 41400,
+          "position": "GK",
+          "positive_exposure_rows": 524,
+          "rate_per90": 0.0,
+          "row_rate_variance": 0.0,
+          "rows_with_observed_exposure": 660,
+          "statistic": "bonus",
+          "zero_exposure_count": 0
+        },
+        {
+          "available_rows": 656,
+          "inherited_expectation_at_observed_exposure": 1207.7834358837338,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 2096,
+          "observed_exposure_minutes": 41220,
+          "position": "MID",
+          "positive_exposure_rows": 524,
+          "rate_per90": 4.576419213973799,
+          "row_rate_variance": 3.0152089039100285,
+          "rows_with_observed_exposure": 656,
+          "statistic": "combined_cbi",
+          "zero_exposure_count": 528
+        },
+        {
+          "available_rows": 656,
+          "inherited_expectation_at_observed_exposure": 326.74257461391215,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 1048,
+          "observed_exposure_minutes": 41220,
+          "position": "MID",
+          "positive_exposure_rows": 524,
+          "rate_per90": 2.2882096069868996,
+          "row_rate_variance": 0.7538022259775071,
+          "rows_with_observed_exposure": 656,
+          "statistic": "tackles",
+          "zero_exposure_count": 264
+        },
+        {
+          "available_rows": 656,
+          "inherited_expectation_at_observed_exposure": 0.0,
+          "limitation": "DESCRIPTIVE_ONLY_PROVIDER_DEFINITIONS_NOT_PROVEN_EQUIVALENT",
+          "observed_count_at_positive_exposure": 2620,
+          "observed_exposure_minutes": 41220,
+          "position": "MID",
+          "positive_exposure_rows": 524,
+          "rate_per90": 5.720524017467249,
+          "row_rate_variance": 4.71126391235942,
+          "rows_with_observed_exposure": 656,
+          "statistic": "recoveries",
+          "zero_exposure_count": 660
+        },
+        {
+          "available_rows": 656,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 4192,
+          "observed_exposure_minutes": 41220,
+          "position": "MID",
+          "positive_exposure_rows": 524,
+          "rate_per90": 9.152838427947598,
+          "row_rate_variance": 12.060835615640114,
+          "rows_with_observed_exposure": 656,
+          "statistic": "defensive_contribution",
+          "zero_exposure_count": 1056
+        },
+        {
+          "available_rows": 656,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 7336,
+          "observed_exposure_minutes": 41220,
+          "position": "MID",
+          "positive_exposure_rows": 524,
+          "rate_per90": 16.017467248908297,
+          "row_rate_variance": 36.93630907289785,
+          "rows_with_observed_exposure": 656,
+          "statistic": "bps",
+          "zero_exposure_count": -264
+        },
+        {
+          "available_rows": 656,
+          "inherited_expectation_at_observed_exposure": null,
+          "limitation": "DIAGNOSTIC_ONLY_NOT_ALLOCATION_COMPONENT_EVIDENCE",
+          "observed_count_at_positive_exposure": 0,
+          "observed_exposure_minutes": 41220,
+          "position": "MID",
+          "positive_exposure_rows": 524,
+          "rate_per90": 0.0,
+          "row_rate_variance": 0.0,
+          "rows_with_observed_exposure": 656,
+          "statistic": "bonus",
+          "zero_exposure_count": 0
+        }
+      ],
+      "semantic_sha256": "630af4c0bb3c8ff9389b5f4cb002736a868f7f216605b3279dadd3d20adf6afd",
+      "source_history_sha256": "e1312227cf288197b32efaa245f60a9d87cdcf296d5bd85fe11ccf38697cb0b0",
+      "source_shadow_sha256": "6b0822816ba003b806b122e61fa2736cca76ffe42644a51c57bb2ad00a5c83ca"
+    },
+    "model_input_status": "SHADOW_NOT_MODEL_INPUT",
+    "model_training_performed": false,
+    "movement": [
+      {
+        "semantic_sha256": "e6df7e55f7019245f48474c6f99fc45f258033a8a62577517bcea0f816ad27e0",
+        "source_shadow_sha256": "6b0822816ba003b806b122e61fa2736cca76ffe42644a51c57bb2ad00a5c83ca",
+        "status_counts": [
+          [
+            "assist:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "assist:UPDATED",
+            527
+          ],
+          [
+            "red:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "red:UPDATED",
+            527
+          ],
+          [
+            "save:NO_CURRENT_EXPOSURE",
+            34
+          ],
+          [
+            "save:STRUCTURAL_NON_GK_ZERO",
+            494
+          ],
+          [
+            "save:UPDATED",
+            131
+          ],
+          [
+            "total_goal_diagnostic:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "total_goal_diagnostic:UPDATED",
+            527
+          ],
+          [
+            "yellow:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "yellow:UPDATED",
+            527
+          ]
+        ],
+        "strata": [
+          {
+            "dimension": "ALL",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.11391756652745769,
+                  "median": 0.008491103219470213,
+                  "p75": 0.08319370243090278,
+                  "p90": 0.09633947250580845,
+                  "p95": 0.10056111653903428
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    395
+                  ],
+                  [
+                    0.005,
+                    361
+                  ],
+                  [
+                    0.01,
+                    264
+                  ],
+                  [
+                    0.02,
+                    264
+                  ],
+                  [
+                    0.05,
+                    263
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 659,
+                  "maximum": 8.18380308119571,
+                  "median": 0.28571428571428575,
+                  "p75": 6.871831212453466,
+                  "p90": 7.134225586201974,
+                  "p95": 8.183803081195709
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.4369883040935672,
+                  "median": 0.04773170488162873,
+                  "p75": 0.30794501819477016,
+                  "p90": 0.35143540669856455,
+                  "p95": 0.41041084445235954
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 659,
+                  "maximum": 13.0239651416122,
+                  "median": 0.3636363636363637,
+                  "p75": 2.0107254678147353,
+                  "p90": 2.679775571773565,
+                  "p95": 10.474153297682708
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.12495888157894736,
+                  "median": 0.0003699365389947182,
+                  "p75": 0.0005800118745215134,
+                  "p90": 0.0006963511322253526,
+                  "p95": 0.1170670469490079
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 659,
+                  "maximum": 189.93749999999997,
+                  "median": 0.11764705882352942,
+                  "p75": 0.11764705882352948,
+                  "p90": 0.11764705882352948,
+                  "p95": 23.745365161823038
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.6524853801169583,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.023205741626794563,
+                  "p95": 0.023205741626794563
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.21296495120845538,
+                  "median": 0.007574130829445509,
+                  "p75": 0.007574130829445509,
+                  "p90": 0.21296495120845538,
+                  "p95": 0.21296495120845538
+                },
+                "relative_denominator_unavailable_count": 494
+              }
+            ],
+            "player_count": 659,
+            "value": "ALL"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.11391756652745769,
+                  "median": 0.008491103219470213,
+                  "p75": 0.08319370243090278,
+                  "p90": 0.09668167176012252,
+                  "p95": 0.10130314153839048
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    394
+                  ],
+                  [
+                    0.005,
+                    360
+                  ],
+                  [
+                    0.01,
+                    263
+                  ],
+                  [
+                    0.02,
+                    263
+                  ],
+                  [
+                    0.05,
+                    263
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 658,
+                  "maximum": 8.18380308119571,
+                  "median": 0.28571428571428575,
+                  "p75": 6.871831212453466,
+                  "p90": 7.265422773076228,
+                  "p95": 8.183803081195709
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.4369883040935672,
+                  "median": 0.04773170488162873,
+                  "p75": 0.30794501819477016,
+                  "p90": 0.35143540669856455,
+                  "p95": 0.41041084445235954
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 658,
+                  "maximum": 13.0239651416122,
+                  "median": 0.3636363636363637,
+                  "p75": 2.0107254678147353,
+                  "p90": 2.679775571773565,
+                  "p95": 10.474153297682708
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.12495888157894736,
+                  "median": 0.0003699365389947182,
+                  "p75": 0.0005800118745215134,
+                  "p90": 0.0006963511322253526,
+                  "p95": 0.1170670469490079
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 658,
+                  "maximum": 189.93749999999997,
+                  "median": 0.11764705882352942,
+                  "p75": 0.11764705882352948,
+                  "p90": 0.11764705882352948,
+                  "p95": 23.745365161823038
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.6524853801169583,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.023205741626794563,
+                  "p95": 0.023205741626794563
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.21296495120845538,
+                  "median": 0.007574130829445509,
+                  "p75": 0.007574130829445509,
+                  "p90": 0.21296495120845538,
+                  "p95": 0.21296495120845538
+                },
+                "relative_denominator_unavailable_count": 493
+              }
+            ],
+            "player_count": 658,
+            "value": "FPL_POSITION_FALLBACK"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.03554245955620244,
+                  "median": 0.03554245955620244,
+                  "p75": 0.03554245955620244,
+                  "p90": 0.03554245955620244,
+                  "p95": 0.03554245955620244
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    1
+                  ],
+                  [
+                    0.005,
+                    1
+                  ],
+                  [
+                    0.01,
+                    1
+                  ],
+                  [
+                    0.02,
+                    1
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.8825986520178745,
+                  "median": 0.8825986520178745,
+                  "p75": 0.8825986520178745,
+                  "p90": 0.8825986520178745,
+                  "p95": 0.8825986520178745
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.02044087031572743,
+                  "median": 0.02044087031572743,
+                  "p75": 0.02044087031572743,
+                  "p90": 0.02044087031572743,
+                  "p95": 0.02044087031572743
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.15037593984962414,
+                  "median": 0.15037593984962414,
+                  "p75": 0.15037593984962414,
+                  "p90": 0.15037593984962414,
+                  "p95": 0.15037593984962414
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.000261571569048857,
+                  "median": 0.000261571569048857,
+                  "p75": 0.000261571569048857,
+                  "p90": 0.000261571569048857,
+                  "p95": 0.000261571569048857
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.08064516129032252,
+                  "median": 0.08064516129032252,
+                  "p75": 0.08064516129032252,
+                  "p90": 0.08064516129032252,
+                  "p95": 0.08064516129032252
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 1
+              }
+            ],
+            "player_count": 1,
+            "value": "INDIVIDUAL_SAME_TEAM"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    0
+                  ],
+                  [
+                    0.005,
+                    0
+                  ],
+                  [
+                    0.01,
+                    0
+                  ],
+                  [
+                    0.02,
+                    0
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 34,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 98
+              }
+            ],
+            "player_count": 132,
+            "value": "0-89"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.11391756652745769,
+                  "median": 0.052015105042505574,
+                  "p75": 0.10278719153710457,
+                  "p90": 0.11391756652745769,
+                  "p95": 0.11391756652745769
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    99
+                  ],
+                  [
+                    0.005,
+                    66
+                  ],
+                  [
+                    0.01,
+                    66
+                  ],
+                  [
+                    0.02,
+                    66
+                  ],
+                  [
+                    0.05,
+                    66
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 132,
+                  "maximum": 8.18380308119571,
+                  "median": 4.175234873931188,
+                  "p75": 8.183803081195709,
+                  "p90": 8.18380308119571,
+                  "p95": 8.18380308119571
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.4369883040935672,
+                  "median": 0.03403359999208491,
+                  "p75": 0.41041084445235954,
+                  "p90": 0.41527506923900465,
+                  "p95": 0.4369883040935672
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 13.0239651416122,
+                  "median": 0.22222222222222232,
+                  "p75": 2.679775571773565,
+                  "p90": 3.163706732483217,
+                  "p95": 13.0239651416122
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.12495888157894736,
+                  "median": 0.0003081313083395541,
+                  "p75": 0.0003699365389947182,
+                  "p90": 0.0003699365389947182,
+                  "p95": 0.12469186869166045
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 189.93749999999997,
+                  "median": 0.06250000000000006,
+                  "p75": 0.06250000000000006,
+                  "p90": 0.06250000000000006,
+                  "p95": 25.291950484436978
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.6524853801169583,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.6524853801169583,
+                  "p95": 0.6524853801169583
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 32,
+                  "maximum": 0.21296495120845538,
+                  "median": 0.21296495120845538,
+                  "p75": 0.21296495120845538,
+                  "p90": 0.21296495120845538,
+                  "p95": 0.21296495120845538
+                },
+                "relative_denominator_unavailable_count": 100
+              }
+            ],
+            "player_count": 132,
+            "value": "180-269"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.09565507399718032,
+                  "median": 0.03554245955620244,
+                  "p75": 0.08319370243090278,
+                  "p90": 0.09565507399718032,
+                  "p95": 0.09565507399718032
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    296
+                  ],
+                  [
+                    0.005,
+                    295
+                  ],
+                  [
+                    0.01,
+                    198
+                  ],
+                  [
+                    0.02,
+                    198
+                  ],
+                  [
+                    0.05,
+                    197
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 395,
+                  "maximum": 6.871831212453466,
+                  "median": 0.8825986520178745,
+                  "p75": 6.871831212453466,
+                  "p90": 6.871831212453466,
+                  "p95": 6.871831212453466
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.35143540669856455,
+                  "median": 0.05569134544159349,
+                  "p75": 0.30794501819477016,
+                  "p90": 0.3159046587547349,
+                  "p95": 0.35143540669856455
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 395,
+                  "maximum": 10.474153297682708,
+                  "median": 0.36363636363636376,
+                  "p75": 2.0107254678147353,
+                  "p90": 2.4066691447589954,
+                  "p95": 10.474153297682708
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.11756965944272445,
+                  "median": 0.0005800118745215134,
+                  "p75": 0.0006963511322253526,
+                  "p90": 0.0006963511322253526,
+                  "p95": 0.1170670469490079
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 395,
+                  "maximum": 178.70588235294116,
+                  "median": 0.11764705882352948,
+                  "p75": 0.11764705882352948,
+                  "p90": 0.11764705882352948,
+                  "p95": 23.745365161823038
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.023205741626794563,
+                  "median": 0.0,
+                  "p75": 0.011602870813397281,
+                  "p90": 0.023205741626794563,
+                  "p95": 0.023205741626794563
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 99,
+                  "maximum": 0.007574130829445509,
+                  "median": 0.007574130829445509,
+                  "p75": 0.007574130829445509,
+                  "p90": 0.007574130829445509,
+                  "p95": 0.007574130829445509
+                },
+                "relative_denominator_unavailable_count": 296
+              }
+            ],
+            "player_count": 395,
+            "value": "360+"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0990770665403202,
+                  "median": 0.08319370243090278,
+                  "p75": 0.08319370243090278,
+                  "p90": 0.0990770665403202,
+                  "p95": 0.0990770665403202
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    131
+                  ],
+                  [
+                    0.005,
+                    131
+                  ],
+                  [
+                    0.01,
+                    131
+                  ],
+                  [
+                    0.02,
+                    131
+                  ],
+                  [
+                    0.05,
+                    131
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 165,
+                  "maximum": 8.18380308119571,
+                  "median": 6.871831212453466,
+                  "p75": 6.871831212453466,
+                  "p90": 8.18380308119571,
+                  "p95": 8.18380308119571
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.41041084445235954,
+                  "median": 0.05569134544159349,
+                  "p75": 0.30794501819477016,
+                  "p90": 0.30794501819477016,
+                  "p95": 0.41041084445235954
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 2.679775571773565,
+                  "median": 0.3636363636363637,
+                  "p75": 2.0107254678147353,
+                  "p90": 2.0107254678147353,
+                  "p95": 2.679775571773565
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.12469186869166045,
+                  "median": 0.0005800118745215134,
+                  "p75": 0.0005800118745215134,
+                  "p90": 0.0005800118745215134,
+                  "p95": 0.1170670469490079
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 25.291950484436978,
+                  "median": 0.11764705882352948,
+                  "p75": 0.11764705882352948,
+                  "p90": 0.11764705882352948,
+                  "p95": 23.745365161823038
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 165
+              }
+            ],
+            "player_count": 165,
+            "value": "DEF"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.11391756652745769,
+                  "median": 0.09565507399718032,
+                  "p75": 0.09565507399718032,
+                  "p90": 0.11391756652745769,
+                  "p95": 0.11391756652745769
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    133
+                  ],
+                  [
+                    0.005,
+                    132
+                  ],
+                  [
+                    0.01,
+                    132
+                  ],
+                  [
+                    0.02,
+                    132
+                  ],
+                  [
+                    0.05,
+                    131
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 165,
+                  "maximum": 8.183803081195709,
+                  "median": 6.871831212453466,
+                  "p75": 6.871831212453466,
+                  "p90": 8.183803081195709,
+                  "p95": 8.183803081195709
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.41041084445235954,
+                  "median": 0.05569134544159349,
+                  "p75": 0.30794501819477016,
+                  "p90": 0.30794501819477016,
+                  "p95": 0.41041084445235954
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 2.679775571773565,
+                  "median": 0.3636363636363637,
+                  "p75": 2.0107254678147353,
+                  "p90": 2.0107254678147353,
+                  "p95": 2.679775571773565
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.12469186869166045,
+                  "median": 0.0005800118745215134,
+                  "p75": 0.0005800118745215134,
+                  "p90": 0.0005800118745215134,
+                  "p95": 0.1170670469490079
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 25.291950484436978,
+                  "median": 0.11764705882352948,
+                  "p75": 0.11764705882352948,
+                  "p90": 0.11764705882352948,
+                  "p95": 23.745365161823038
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 165
+              }
+            ],
+            "player_count": 165,
+            "value": "FWD"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0003277374437731345,
+                  "median": 0.0003277374437731345,
+                  "p75": 0.0003277374437731345,
+                  "p90": 0.0003277374437731345,
+                  "p95": 0.0003277374437731345
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    0
+                  ],
+                  [
+                    0.005,
+                    0
+                  ],
+                  [
+                    0.01,
+                    0
+                  ],
+                  [
+                    0.02,
+                    0
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.2857142857142857,
+                  "median": 0.2857142857142857,
+                  "p75": 0.2857142857142857,
+                  "p90": 0.2857142857142857,
+                  "p95": 0.2857142857142857
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.4369883040935672,
+                  "median": 0.012200956937799042,
+                  "p75": 0.35143540669856455,
+                  "p90": 0.35143540669856455,
+                  "p95": 0.4369883040935672
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 13.0239651416122,
+                  "median": 0.3636363636363636,
+                  "p75": 10.474153297682708,
+                  "p90": 10.474153297682708,
+                  "p95": 13.0239651416122
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.12495888157894736,
+                  "median": 7.739938080495357e-05,
+                  "p75": 7.739938080495357e-05,
+                  "p90": 7.739938080495357e-05,
+                  "p95": 0.11756965944272445
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 189.93749999999997,
+                  "median": 0.11764705882352942,
+                  "p75": 0.11764705882352942,
+                  "p90": 0.11764705882352942,
+                  "p95": 178.70588235294116
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.6524853801169583,
+                  "median": 0.023205741626794563,
+                  "p75": 0.023205741626794563,
+                  "p90": 0.6524853801169583,
+                  "p95": 0.6524853801169583
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.21296495120845538,
+                  "median": 0.007574130829445509,
+                  "p75": 0.007574130829445509,
+                  "p90": 0.21296495120845538,
+                  "p95": 0.21296495120845538
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "GK"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.06178964154863614,
+                  "median": 0.008491103219470213,
+                  "p75": 0.008491103219470213,
+                  "p90": 0.008491103219470213,
+                  "p95": 0.008491103219470213
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    131
+                  ],
+                  [
+                    0.005,
+                    98
+                  ],
+                  [
+                    0.01,
+                    1
+                  ],
+                  [
+                    0.02,
+                    1
+                  ],
+                  [
+                    0.05,
+                    1
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 164,
+                  "maximum": 2.0791389344000732,
+                  "median": 0.28571428571428575,
+                  "p75": 0.28571428571428575,
+                  "p90": 0.28571428571428575,
+                  "p95": 0.28571428571428575
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.41527506923900465,
+                  "median": 0.04773170488162873,
+                  "p75": 0.3159046587547349,
+                  "p90": 0.3159046587547349,
+                  "p95": 0.41527506923900465
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 164,
+                  "maximum": 3.163706732483217,
+                  "median": 0.36363636363636376,
+                  "p75": 2.4066691447589954,
+                  "p90": 2.4066691447589954,
+                  "p95": 3.163706732483217
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.1246300634610053,
+                  "median": 0.0006963511322253526,
+                  "p75": 0.0006963511322253526,
+                  "p90": 0.0006963511322253526,
+                  "p95": 0.11695070769130406
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 164,
+                  "maximum": 21.0559870281536,
+                  "median": 0.11764705882352942,
+                  "p75": 0.11764705882352942,
+                  "p90": 0.11764705882352942,
+                  "p95": 19.7585760264975
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 164
+              }
+            ],
+            "player_count": 164,
+            "value": "MID"
+          }
+        ],
+        "total_goal_rate_diagnostic": [
+          {
+            "dimension": "ALL",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.33322368421052634,
+                  "median": 0.010132834176548644,
+                  "p75": 0.18593711633971022,
+                  "p90": 0.2775704243880849,
+                  "p95": 0.2897159355502287
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 659,
+                  "maximum": 506.50000000000006,
+                  "median": 0.2857142857142857,
+                  "p75": 0.5324353328098246,
+                  "p90": 8.062887692690715,
+                  "p95": 434.0000000000001
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 659,
+            "value": "ALL"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.33322368421052634,
+                  "median": 0.010132834176548644,
+                  "p75": 0.18593711633971022,
+                  "p90": 0.2785649108132588,
+                  "p95": 0.2918107454306037
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 658,
+                  "maximum": 506.50000000000006,
+                  "median": 0.2857142857142857,
+                  "p75": 0.5324353328098246,
+                  "p90": 8.209063300637371,
+                  "p95": 434.0000000000001
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 658,
+            "value": "FPL_POSITION_FALLBACK"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.012429524895371621,
+                  "median": 0.012429524895371621,
+                  "p75": 0.012429524895371621,
+                  "p90": 0.012429524895371621,
+                  "p95": 0.012429524895371621
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.135135135135135,
+                  "median": 0.135135135135135,
+                  "p75": 0.135135135135135,
+                  "p90": 0.135135135135135,
+                  "p95": 0.135135135135135
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 1,
+            "value": "INDIVIDUAL_SAME_TEAM"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 132,
+            "value": "0-89"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.33322368421052634,
+                  "median": 0.032057084369077865,
+                  "p75": 0.2882031167478766,
+                  "p90": 0.32742251339701334,
+                  "p95": 0.33322368421052634
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 132,
+                  "maximum": 506.50000000000006,
+                  "median": 0.1666666666666667,
+                  "p75": 2.8989540552745052,
+                  "p90": 9.232292556263635,
+                  "p95": 506.50000000000006
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 132,
+            "value": "180-269"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.28552631578947374,
+                  "median": 0.09977716937457551,
+                  "p75": 0.2755814515377371,
+                  "p90": 0.2755814515377371,
+                  "p95": 0.28552631578947374
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 395,
+                  "maximum": 434.0000000000001,
+                  "median": 0.28571428571428575,
+                  "p75": 7.7705364767974014,
+                  "p90": 7.7705364767974014,
+                  "p95": 434.0000000000001
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 395,
+            "value": "360+"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.32742251339701334,
+                  "median": 0.010132834176548644,
+                  "p75": 0.2755814515377371,
+                  "p90": 0.2755814515377371,
+                  "p95": 0.32742251339701334
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 165,
+                  "maximum": 9.232292556263635,
+                  "median": 0.2857142857142857,
+                  "p75": 7.7705364767974014,
+                  "p90": 7.7705364767974014,
+                  "p95": 9.232292556263635
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "DEF"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.32742251339701334,
+                  "median": 0.010132834176548644,
+                  "p75": 0.2755814515377371,
+                  "p90": 0.2755814515377371,
+                  "p95": 0.32742251339701334
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 165,
+                  "maximum": 9.232292556263635,
+                  "median": 0.2857142857142857,
+                  "p75": 7.7705364767974014,
+                  "p90": 7.7705364767974014,
+                  "p95": 9.232292556263635
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "FWD"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.33322368421052634,
+                  "median": 0.00018796992481203009,
+                  "p75": 0.28552631578947374,
+                  "p90": 0.28552631578947374,
+                  "p95": 0.33322368421052634
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 165,
+                  "maximum": 506.50000000000006,
+                  "median": 0.28571428571428575,
+                  "p75": 434.0000000000001,
+                  "p90": 434.0000000000001,
+                  "p95": 506.50000000000006
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "GK"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.2751299845314976,
+                  "median": 0.09977716937457551,
+                  "p75": 0.18593711633971022,
+                  "p90": 0.18593711633971022,
+                  "p95": 0.2751299845314976
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 164,
+                  "maximum": 0.787841221611462,
+                  "median": 0.2857142857142857,
+                  "p75": 0.5324353328098246,
+                  "p90": 0.5324353328098246,
+                  "p95": 0.787841221611462
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 164,
+            "value": "MID"
+          }
+        ],
+        "world": "CENTRAL_TEMPORARY",
+        "zero_exposure_discipline_excluded_events": 224,
+        "zero_exposure_discipline_excluded_rows": 1056
+      },
+      {
+        "semantic_sha256": "231d51e034a39d8a018ad80f3e2b12d48ea53313ac56fda48b0b812129bf29b5",
+        "source_shadow_sha256": "6b0822816ba003b806b122e61fa2736cca76ffe42644a51c57bb2ad00a5c83ca",
+        "status_counts": [
+          [
+            "assist:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "assist:UPDATED",
+            527
+          ],
+          [
+            "red:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "red:UPDATED",
+            527
+          ],
+          [
+            "save:NO_CURRENT_EXPOSURE",
+            34
+          ],
+          [
+            "save:STRUCTURAL_NON_GK_ZERO",
+            494
+          ],
+          [
+            "save:UPDATED",
+            131
+          ],
+          [
+            "total_goal_diagnostic:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "total_goal_diagnostic:UPDATED",
+            527
+          ],
+          [
+            "yellow:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "yellow:UPDATED",
+            527
+          ]
+        ],
+        "strata": [
+          {
+            "dimension": "ALL",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.19528725690421322,
+                  "median": 0.013208382785842552,
+                  "p75": 0.1294124260036266,
+                  "p90": 0.15300670537539549,
+                  "p95": 0.17239048549548738
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    396
+                  ],
+                  [
+                    0.005,
+                    395
+                  ],
+                  [
+                    0.01,
+                    361
+                  ],
+                  [
+                    0.02,
+                    264
+                  ],
+                  [
+                    0.05,
+                    263
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 659,
+                  "maximum": 14.029376710621221,
+                  "median": 0.4444444444444445,
+                  "p75": 10.68951521937206,
+                  "p90": 11.357487517622046,
+                  "p95": 14.02937671062122
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.7150717703349282,
+                  "median": 0.07000650049305546,
+                  "p75": 0.4516526933523295,
+                  "p90": 0.515438596491228,
+                  "p95": 0.6715813818311337
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 659,
+                  "maximum": 21.311942959001783,
+                  "median": 0.5333333333333334,
+                  "p75": 2.949064019461611,
+                  "p90": 4.385087299265833,
+                  "p95": 15.362091503267973
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.23521671826625387,
+                  "median": 0.0006963511322253526,
+                  "p75": 0.0010379159859858658,
+                  "p90": 0.0012461020260874731,
+                  "p95": 0.20948839980348782
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 659,
+                  "maximum": 357.5294117647059,
+                  "median": 0.2105263157894737,
+                  "p75": 0.21052631578947376,
+                  "p90": 0.21052631578947378,
+                  "p95": 42.49170607905175
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 1.0677033492822958,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.03403508771929875,
+                  "p95": 0.03403508771929875
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.34848810197747254,
+                  "median": 0.011108725216520099,
+                  "p75": 0.011108725216520099,
+                  "p90": 0.34848810197747254,
+                  "p95": 0.34848810197747254
+                },
+                "relative_denominator_unavailable_count": 494
+              }
+            ],
+            "player_count": 659,
+            "value": "ALL"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.19528725690421322,
+                  "median": 0.013208382785842552,
+                  "p75": 0.1294124260036266,
+                  "p90": 0.1551116671763974,
+                  "p95": 0.1736625283515266
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    395
+                  ],
+                  [
+                    0.005,
+                    394
+                  ],
+                  [
+                    0.01,
+                    360
+                  ],
+                  [
+                    0.02,
+                    263
+                  ],
+                  [
+                    0.05,
+                    263
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 658,
+                  "maximum": 14.029376710621221,
+                  "median": 0.4444444444444445,
+                  "p75": 10.68951521937206,
+                  "p90": 11.691473666747036,
+                  "p95": 14.02937671062122
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.7150717703349282,
+                  "median": 0.07000650049305546,
+                  "p75": 0.4516526933523295,
+                  "p90": 0.515438596491228,
+                  "p95": 0.6715813818311337
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 658,
+                  "maximum": 21.311942959001783,
+                  "median": 0.5333333333333334,
+                  "p75": 2.949064019461611,
+                  "p90": 4.385087299265833,
+                  "p95": 15.362091503267973
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.23521671826625387,
+                  "median": 0.0006963511322253526,
+                  "p75": 0.0010379159859858658,
+                  "p90": 0.0012461020260874731,
+                  "p95": 0.20948839980348782
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 658,
+                  "maximum": 357.5294117647059,
+                  "median": 0.2105263157894737,
+                  "p75": 0.21052631578947376,
+                  "p90": 0.21052631578947378,
+                  "p95": 42.49170607905175
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 1.0677033492822958,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.03403508771929875,
+                  "p95": 0.03403508771929875
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.34848810197747254,
+                  "median": 0.011108725216520099,
+                  "p75": 0.011108725216520099,
+                  "p90": 0.34848810197747254,
+                  "p95": 0.34848810197747254
+                },
+                "relative_denominator_unavailable_count": 493
+              }
+            ],
+            "player_count": 658,
+            "value": "FPL_POSITION_FALLBACK"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.03561019256529186,
+                  "median": 0.03561019256529186,
+                  "p75": 0.03561019256529186,
+                  "p90": 0.03561019256529186,
+                  "p95": 0.03561019256529186
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    1
+                  ],
+                  [
+                    0.005,
+                    1
+                  ],
+                  [
+                    0.01,
+                    1
+                  ],
+                  [
+                    0.02,
+                    1
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.8842806139098169,
+                  "median": 0.8842806139098169,
+                  "p75": 0.8842806139098169,
+                  "p90": 0.8842806139098169,
+                  "p95": 0.8842806139098169
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.026146973752170163,
+                  "median": 0.026146973752170163,
+                  "p75": 0.026146973752170163,
+                  "p90": 0.026146973752170163,
+                  "p95": 0.026146973752170163
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.19235363717271925,
+                  "median": 0.19235363717271925,
+                  "p75": 0.19235363717271925,
+                  "p90": 0.19235363717271925,
+                  "p95": 0.19235363717271925
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.0011061604619430287,
+                  "median": 0.0011061604619430287,
+                  "p75": 0.0011061604619430287,
+                  "p90": 0.0011061604619430287,
+                  "p95": 0.0011061604619430287
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.3410404624277457,
+                  "median": 0.3410404624277457,
+                  "p75": 0.3410404624277457,
+                  "p90": 0.3410404624277457,
+                  "p95": 0.3410404624277457
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 1
+              }
+            ],
+            "player_count": 1,
+            "value": "INDIVIDUAL_SAME_TEAM"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    0
+                  ],
+                  [
+                    0.005,
+                    0
+                  ],
+                  [
+                    0.01,
+                    0
+                  ],
+                  [
+                    0.02,
+                    0
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 34,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 98
+              }
+            ],
+            "player_count": 132,
+            "value": "0-89"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.19528725690421322,
+                  "median": 0.08916875150143816,
+                  "p75": 0.17620661406360788,
+                  "p90": 0.19528725690421322,
+                  "p95": 0.19528725690421322
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    100
+                  ],
+                  [
+                    0.005,
+                    99
+                  ],
+                  [
+                    0.01,
+                    66
+                  ],
+                  [
+                    0.02,
+                    66
+                  ],
+                  [
+                    0.05,
+                    66
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 132,
+                  "maximum": 14.029376710621221,
+                  "median": 7.157545498167752,
+                  "p75": 14.02937671062122,
+                  "p90": 14.029376710621221,
+                  "p95": 14.029376710621221
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.7150717703349282,
+                  "median": 0.05569134544159349,
+                  "p75": 0.6715813818311337,
+                  "p90": 0.6795410223910985,
+                  "p95": 0.7150717703349282
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 21.311942959001783,
+                  "median": 0.36363636363636376,
+                  "p75": 4.385087299265833,
+                  "p90": 5.176974653154355,
+                  "p95": 21.311942959001783
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.23521671826625387,
+                  "median": 0.0005800118745215134,
+                  "p75": 0.0006963511322253526,
+                  "p90": 0.0006963511322253526,
+                  "p95": 0.23471410577253732
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 357.5294117647059,
+                  "median": 0.11764705882352948,
+                  "p75": 0.11764705882352948,
+                  "p90": 0.11764705882352948,
+                  "p95": 47.608377382469605
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 1.0677033492822958,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 1.0677033492822958,
+                  "p95": 1.0677033492822958
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 32,
+                  "maximum": 0.34848810197747254,
+                  "median": 0.34848810197747254,
+                  "p75": 0.34848810197747254,
+                  "p90": 0.34848810197747254,
+                  "p95": 0.34848810197747254
+                },
+                "relative_denominator_unavailable_count": 100
+              }
+            ],
+            "player_count": 132,
+            "value": "180-269"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.14879678177339165,
+                  "median": 0.03561019256529186,
+                  "p75": 0.1294124260036266,
+                  "p90": 0.14879678177339165,
+                  "p95": 0.14879678177339165
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    296
+                  ],
+                  [
+                    0.005,
+                    296
+                  ],
+                  [
+                    0.01,
+                    295
+                  ],
+                  [
+                    0.02,
+                    198
+                  ],
+                  [
+                    0.05,
+                    197
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 395,
+                  "maximum": 10.689515219372062,
+                  "median": 0.8842806139098169,
+                  "p75": 10.68951521937206,
+                  "p90": 10.689515219372062,
+                  "p95": 10.689515219372062
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.515438596491228,
+                  "median": 0.08168063998100378,
+                  "p75": 0.4516526933523295,
+                  "p90": 0.4633268328402778,
+                  "p95": 0.515438596491228
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 395,
+                  "maximum": 15.362091503267973,
+                  "median": 0.5333333333333334,
+                  "p75": 2.949064019461611,
+                  "p90": 3.529781412313193,
+                  "p95": 15.362091503267973
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.21038781163434905,
+                  "median": 0.0010379159859858658,
+                  "p75": 0.0012461020260874731,
+                  "p90": 0.0012461020260874731,
+                  "p95": 0.20948839980348782
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 395,
+                  "maximum": 319.7894736842106,
+                  "median": 0.21052631578947376,
+                  "p75": 0.21052631578947378,
+                  "p90": 0.21052631578947378,
+                  "p95": 42.49170607905175
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.03403508771929875,
+                  "median": 0.0,
+                  "p75": 0.017017543859649376,
+                  "p90": 0.03403508771929875,
+                  "p95": 0.03403508771929875
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 99,
+                  "maximum": 0.011108725216520099,
+                  "median": 0.011108725216520099,
+                  "p75": 0.011108725216520099,
+                  "p90": 0.011108725216520099,
+                  "p95": 0.011108725216520099
+                },
+                "relative_denominator_unavailable_count": 296
+              }
+            ],
+            "player_count": 395,
+            "value": "360+"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.1698463997834061,
+                  "median": 0.1294124260036266,
+                  "p75": 0.1294124260036266,
+                  "p90": 0.1698463997834061,
+                  "p95": 0.1698463997834061
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    132
+                  ],
+                  [
+                    0.005,
+                    131
+                  ],
+                  [
+                    0.01,
+                    131
+                  ],
+                  [
+                    0.02,
+                    131
+                  ],
+                  [
+                    0.05,
+                    131
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 165,
+                  "maximum": 14.029376710621221,
+                  "median": 10.689515219372062,
+                  "p75": 10.689515219372062,
+                  "p90": 14.029376710621221,
+                  "p95": 14.029376710621221
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.6715813818311337,
+                  "median": 0.08168063998100378,
+                  "p75": 0.4516526933523295,
+                  "p90": 0.4516526933523295,
+                  "p95": 0.6715813818311337
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 4.385087299265833,
+                  "median": 0.5333333333333334,
+                  "p75": 2.949064019461611,
+                  "p90": 2.949064019461611,
+                  "p95": 4.385087299265833
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.23471410577253732,
+                  "median": 0.0010379159859858658,
+                  "p75": 0.0010379159859858658,
+                  "p90": 0.0010379159859858658,
+                  "p95": 0.20948839980348782
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 47.608377382469605,
+                  "median": 0.21052631578947376,
+                  "p75": 0.21052631578947376,
+                  "p90": 0.21052631578947376,
+                  "p95": 42.49170607905175
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 165
+              }
+            ],
+            "player_count": 165,
+            "value": "DEF"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.19528725690421322,
+                  "median": 0.14879678177339165,
+                  "p75": 0.14879678177339165,
+                  "p90": 0.19528725690421322,
+                  "p95": 0.19528725690421322
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    133
+                  ],
+                  [
+                    0.005,
+                    133
+                  ],
+                  [
+                    0.01,
+                    132
+                  ],
+                  [
+                    0.02,
+                    132
+                  ],
+                  [
+                    0.05,
+                    131
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 165,
+                  "maximum": 14.02937671062122,
+                  "median": 10.68951521937206,
+                  "p75": 10.68951521937206,
+                  "p90": 14.02937671062122,
+                  "p95": 14.02937671062122
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.6715813818311337,
+                  "median": 0.08168063998100378,
+                  "p75": 0.4516526933523295,
+                  "p90": 0.4516526933523295,
+                  "p95": 0.6715813818311337
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 4.385087299265833,
+                  "median": 0.5333333333333334,
+                  "p75": 2.949064019461611,
+                  "p90": 2.949064019461611,
+                  "p95": 4.385087299265833
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.23471410577253732,
+                  "median": 0.0010379159859858658,
+                  "p75": 0.0010379159859858658,
+                  "p90": 0.0010379159859858658,
+                  "p95": 0.20948839980348782
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 47.608377382469605,
+                  "median": 0.21052631578947376,
+                  "p75": 0.21052631578947376,
+                  "p90": 0.21052631578947376,
+                  "p95": 42.49170607905175
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 165
+              }
+            ],
+            "player_count": 165,
+            "value": "FWD"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0005098138014248759,
+                  "median": 0.0005098138014248759,
+                  "p75": 0.0005098138014248759,
+                  "p90": 0.0005098138014248759,
+                  "p95": 0.0005098138014248759
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    0
+                  ],
+                  [
+                    0.005,
+                    0
+                  ],
+                  [
+                    0.01,
+                    0
+                  ],
+                  [
+                    0.02,
+                    0
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.4444444444444445,
+                  "median": 0.4444444444444445,
+                  "p75": 0.4444444444444445,
+                  "p90": 0.4444444444444445,
+                  "p95": 0.4444444444444445
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.7150717703349282,
+                  "median": 0.017894736842105262,
+                  "p75": 0.515438596491228,
+                  "p90": 0.515438596491228,
+                  "p95": 0.7150717703349282
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 21.311942959001783,
+                  "median": 0.5333333333333333,
+                  "p75": 15.362091503267973,
+                  "p90": 15.362091503267973,
+                  "p95": 21.311942959001783
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.23521671826625387,
+                  "median": 0.0001385041551246538,
+                  "p75": 0.0001385041551246538,
+                  "p90": 0.0001385041551246538,
+                  "p95": 0.21038781163434905
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 357.5294117647059,
+                  "median": 0.21052631578947378,
+                  "p75": 0.21052631578947378,
+                  "p90": 0.21052631578947378,
+                  "p95": 319.7894736842106
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 1.0677033492822958,
+                  "median": 0.03403508771929875,
+                  "p75": 0.03403508771929875,
+                  "p90": 1.0677033492822958,
+                  "p95": 1.0677033492822958
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.34848810197747254,
+                  "median": 0.011108725216520099,
+                  "p75": 0.011108725216520099,
+                  "p90": 0.34848810197747254,
+                  "p95": 0.34848810197747254
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "GK"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.09611722018676735,
+                  "median": 0.013208382785842552,
+                  "p75": 0.013208382785842552,
+                  "p90": 0.013208382785842552,
+                  "p95": 0.013208382785842552
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    131
+                  ],
+                  [
+                    0.005,
+                    131
+                  ],
+                  [
+                    0.01,
+                    98
+                  ],
+                  [
+                    0.02,
+                    1
+                  ],
+                  [
+                    0.05,
+                    1
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 164,
+                  "maximum": 3.2342161201778925,
+                  "median": 0.4444444444444445,
+                  "p75": 0.4444444444444445,
+                  "p90": 0.4444444444444445,
+                  "p95": 0.4444444444444445
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.6795410223910985,
+                  "median": 0.07000650049305546,
+                  "p75": 0.4633268328402778,
+                  "p90": 0.4633268328402778,
+                  "p95": 0.6795410223910985
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 164,
+                  "maximum": 5.176974653154355,
+                  "median": 0.5333333333333334,
+                  "p75": 3.529781412313193,
+                  "p90": 3.529781412313193,
+                  "p95": 5.176974653154355
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.2345977665148335,
+                  "median": 0.0012461020260874731,
+                  "p75": 0.0012461020260874731,
+                  "p90": 0.0012461020260874731,
+                  "p95": 0.20928021376338624
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 164,
+                  "maximum": 39.63479911181853,
+                  "median": 0.2105263157894737,
+                  "p75": 0.2105263157894737,
+                  "p90": 0.2105263157894737,
+                  "p95": 35.35745183689027
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 164
+              }
+            ],
+            "player_count": 164,
+            "value": "MID"
+          }
+        ],
+        "total_goal_rate_diagnostic": [
+          {
+            "dimension": "ALL",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.5712406015037594,
+                  "median": 0.015762186496853445,
+                  "p75": 0.28923551430621597,
+                  "p90": 0.44415204678362574,
+                  "p95": 0.4806158355738008
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 659,
+                  "maximum": 868.2857142857143,
+                  "median": 0.4444444444444444,
+                  "p75": 0.828232739926394,
+                  "p90": 12.835358396765422,
+                  "p95": 675.1111111111112
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 659,
+            "value": "ALL"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.5712406015037594,
+                  "median": 0.015762186496853445,
+                  "p75": 0.28923551430621597,
+                  "p90": 0.44415204678362574,
+                  "p95": 0.485098052333698
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 658,
+                  "maximum": 868.2857142857143,
+                  "median": 0.4444444444444444,
+                  "p75": 0.828232739926394,
+                  "p90": 13.209287002083485,
+                  "p95": 675.1111111111112
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 658,
+            "value": "FPL_POSITION_FALLBACK"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.0171862388356587,
+                  "median": 0.0171862388356587,
+                  "p75": 0.0171862388356587,
+                  "p90": 0.0171862388356587,
+                  "p95": 0.0171862388356587
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.16260162601626013,
+                  "median": 0.16260162601626013,
+                  "p75": 0.16260162601626013,
+                  "p90": 0.16260162601626013,
+                  "p95": 0.16260162601626013
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 1,
+            "value": "INDIVIDUAL_SAME_TEAM"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 132,
+            "value": "0-89"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.5712406015037594,
+                  "median": 0.054955001775562076,
+                  "p75": 0.49406248585350276,
+                  "p90": 0.5612957372520229,
+                  "p95": 0.5712406015037594
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 132,
+                  "maximum": 868.2857142857143,
+                  "median": 0.2857142857142857,
+                  "p75": 4.969635523327724,
+                  "p90": 15.82678723930909,
+                  "p95": 868.2857142857143
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 132,
+            "value": "180-269"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.44415204678362574,
+                  "median": 0.15520893013822856,
+                  "p75": 0.428682257947591,
+                  "p90": 0.428682257947591,
+                  "p95": 0.44415204678362574
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 395,
+                  "maximum": 675.1111111111112,
+                  "median": 0.4444444444444445,
+                  "p75": 12.087501186129291,
+                  "p90": 12.087501186129291,
+                  "p95": 675.1111111111112
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 395,
+            "value": "360+"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.5612957372520229,
+                  "median": 0.015762186496853445,
+                  "p75": 0.428682257947591,
+                  "p90": 0.428682257947591,
+                  "p95": 0.5612957372520229
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 165,
+                  "maximum": 15.82678723930909,
+                  "median": 0.4444444444444444,
+                  "p75": 12.087501186129291,
+                  "p90": 12.087501186129291,
+                  "p95": 15.82678723930909
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "DEF"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.5612957372520229,
+                  "median": 0.015762186496853445,
+                  "p75": 0.428682257947591,
+                  "p90": 0.428682257947591,
+                  "p95": 0.5612957372520229
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 165,
+                  "maximum": 15.82678723930909,
+                  "median": 0.4444444444444444,
+                  "p75": 12.087501186129291,
+                  "p90": 12.087501186129291,
+                  "p95": 15.82678723930909
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "FWD"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.5712406015037594,
+                  "median": 0.00029239766081871346,
+                  "p75": 0.44415204678362574,
+                  "p90": 0.44415204678362574,
+                  "p95": 0.5712406015037594
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 165,
+                  "maximum": 868.2857142857143,
+                  "median": 0.4444444444444445,
+                  "p75": 675.1111111111112,
+                  "p90": 675.1111111111112,
+                  "p95": 868.2857142857143
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "GK"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.471651402053996,
+                  "median": 0.15520893013822856,
+                  "p75": 0.28923551430621597,
+                  "p90": 0.28923551430621597,
+                  "p95": 0.471651402053996
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 164,
+                  "maximum": 1.350584951333935,
+                  "median": 0.4444444444444444,
+                  "p75": 0.828232739926394,
+                  "p90": 0.828232739926394,
+                  "p95": 1.350584951333935
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 164,
+            "value": "MID"
+          }
+        ],
+        "world": "LOW_SHRINKAGE",
+        "zero_exposure_discipline_excluded_events": 224,
+        "zero_exposure_discipline_excluded_rows": 1056
+      },
+      {
+        "semantic_sha256": "dd4efb9038f10c4adb4b7ca89f317c53ddae536574db6427ec687e94c483eb03",
+        "source_shadow_sha256": "6b0822816ba003b806b122e61fa2736cca76ffe42644a51c57bb2ad00a5c83ca",
+        "status_counts": [
+          [
+            "assist:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "assist:UPDATED",
+            527
+          ],
+          [
+            "red:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "red:UPDATED",
+            527
+          ],
+          [
+            "save:NO_CURRENT_EXPOSURE",
+            34
+          ],
+          [
+            "save:STRUCTURAL_NON_GK_ZERO",
+            494
+          ],
+          [
+            "save:UPDATED",
+            131
+          ],
+          [
+            "total_goal_diagnostic:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "total_goal_diagnostic:UPDATED",
+            527
+          ],
+          [
+            "yellow:NO_CURRENT_EXPOSURE",
+            132
+          ],
+          [
+            "yellow:UPDATED",
+            527
+          ]
+        ],
+        "strata": [
+          {
+            "dimension": "ALL",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.0621368544695224,
+                  "median": 0.004953143544690956,
+                  "p75": 0.04852965975135996,
+                  "p90": 0.05579879316502186,
+                  "p95": 0.056432599295472056
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    394
+                  ],
+                  [
+                    0.005,
+                    264
+                  ],
+                  [
+                    0.01,
+                    264
+                  ],
+                  [
+                    0.02,
+                    264
+                  ],
+                  [
+                    0.05,
+                    164
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 659,
+                  "maximum": 4.463892589743116,
+                  "median": 0.16666666666666663,
+                  "p75": 4.008568207264522,
+                  "p90": 4.099633083760262,
+                  "p95": 4.463892589743116
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.24580592105263158,
+                  "median": 0.029169375205439788,
+                  "p75": 0.18818862223013735,
+                  "p90": 0.21476608187134502,
+                  "p95": 0.2308561000044523
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 659,
+                  "maximum": 7.325980392156863,
+                  "median": 0.2222222222222223,
+                  "p75": 1.2287766747756717,
+                  "p90": 1.5073737591226308,
+                  "p95": 6.400871459694989
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.06449490662139219,
+                  "median": 0.00019093498786824144,
+                  "p75": 0.0003081313083395541,
+                  "p90": 0.0003699365389947182,
+                  "p95": 0.062191868691660455
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 659,
+                  "maximum": 98.03225806451613,
+                  "median": 0.06249999999999994,
+                  "p75": 0.06250000000000006,
+                  "p90": 0.06250000000000006,
+                  "p95": 12.61472524221849
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.36702302631578965,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.014181286549707739,
+                  "p95": 0.014181286549707739
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.11979278505475634,
+                  "median": 0.00462863550688335,
+                  "p75": 0.00462863550688335,
+                  "p90": 0.11979278505475634,
+                  "p95": 0.11979278505475634
+                },
+                "relative_denominator_unavailable_count": 494
+              }
+            ],
+            "player_count": 659,
+            "value": "ALL"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.0621368544695224,
+                  "median": 0.004953143544690956,
+                  "p75": 0.04852965975135996,
+                  "p90": 0.05579879316502186,
+                  "p95": 0.05674950236069679
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    393
+                  ],
+                  [
+                    0.005,
+                    263
+                  ],
+                  [
+                    0.01,
+                    263
+                  ],
+                  [
+                    0.02,
+                    263
+                  ],
+                  [
+                    0.05,
+                    164
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 658,
+                  "maximum": 4.463892589743116,
+                  "median": 0.16666666666666663,
+                  "p75": 4.008568207264522,
+                  "p90": 4.145165522008131,
+                  "p95": 4.463892589743116
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.24580592105263158,
+                  "median": 0.029169375205439788,
+                  "p75": 0.18818862223013735,
+                  "p90": 0.21476608187134502,
+                  "p95": 0.2308561000044523
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 658,
+                  "maximum": 7.325980392156863,
+                  "median": 0.2222222222222223,
+                  "p75": 1.2287766747756717,
+                  "p90": 1.5073737591226308,
+                  "p95": 6.400871459694989
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.06449490662139219,
+                  "median": 0.00019093498786824144,
+                  "p75": 0.0003081313083395541,
+                  "p90": 0.0003699365389947182,
+                  "p95": 0.062191868691660455
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 658,
+                  "maximum": 98.03225806451613,
+                  "median": 0.06249999999999994,
+                  "p75": 0.06250000000000006,
+                  "p90": 0.06250000000000006,
+                  "p95": 12.61472524221849
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.36702302631578965,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.014181286549707739,
+                  "p95": 0.014181286549707739
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.11979278505475634,
+                  "median": 0.00462863550688335,
+                  "p75": 0.00462863550688335,
+                  "p90": 0.11979278505475634,
+                  "p95": 0.11979278505475634
+                },
+                "relative_denominator_unavailable_count": 493
+              }
+            ],
+            "player_count": 658,
+            "value": "FPL_POSITION_FALLBACK"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.03405670572959301,
+                  "median": 0.03405670572959301,
+                  "p75": 0.03405670572959301,
+                  "p90": 0.03405670572959301,
+                  "p95": 0.03405670572959301
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    1
+                  ],
+                  [
+                    0.005,
+                    1
+                  ],
+                  [
+                    0.01,
+                    1
+                  ],
+                  [
+                    0.02,
+                    1
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.845704066190962,
+                  "median": 0.845704066190962,
+                  "p75": 0.845704066190962,
+                  "p90": 0.845704066190962,
+                  "p95": 0.845704066190962
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.01259497809061863,
+                  "median": 0.01259497809061863,
+                  "p75": 0.01259497809061863,
+                  "p90": 0.01259497809061863,
+                  "p95": 0.01259497809061863
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.09265660603036802,
+                  "median": 0.09265660603036802,
+                  "p75": 0.09265660603036802,
+                  "p90": 0.09265660603036802,
+                  "p95": 0.09265660603036802
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.00047266902628125213,
+                  "median": 0.00047266902628125213,
+                  "p75": 0.00047266902628125213,
+                  "p90": 0.00047266902628125213,
+                  "p95": 0.00047266902628125213
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.1457286432160806,
+                  "median": 0.1457286432160806,
+                  "p75": 0.1457286432160806,
+                  "p90": 0.1457286432160806,
+                  "p95": 0.1457286432160806
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 1
+              }
+            ],
+            "player_count": 1,
+            "value": "INDIVIDUAL_SAME_TEAM"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    0
+                  ],
+                  [
+                    0.005,
+                    0
+                  ],
+                  [
+                    0.01,
+                    0
+                  ],
+                  [
+                    0.02,
+                    0
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 34,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 98
+              }
+            ],
+            "player_count": 132,
+            "value": "0-89"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0621368544695224,
+                  "median": 0.028371875477730322,
+                  "p75": 0.0560657408384207,
+                  "p90": 0.0621368544695224,
+                  "p95": 0.0621368544695224
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    99
+                  ],
+                  [
+                    0.005,
+                    66
+                  ],
+                  [
+                    0.01,
+                    66
+                  ],
+                  [
+                    0.02,
+                    66
+                  ],
+                  [
+                    0.05,
+                    66
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 132,
+                  "maximum": 4.463892589743116,
+                  "median": 2.2774008403261035,
+                  "p75": 4.463892589743116,
+                  "p90": 4.463892589743116,
+                  "p95": 4.463892589743116
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.24580592105263158,
+                  "median": 0.019143899995547747,
+                  "p75": 0.2308561000044523,
+                  "p90": 0.23359222644694017,
+                  "p95": 0.24580592105263158
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 7.325980392156863,
+                  "median": 0.125,
+                  "p75": 1.5073737591226308,
+                  "p90": 1.7795850370218098,
+                  "p95": 7.325980392156863
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.06449490662139219,
+                  "median": 0.00015903551398170537,
+                  "p75": 0.00019093498786824144,
+                  "p90": 0.00019093498786824144,
+                  "p95": 0.06435709351827636
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 132,
+                  "maximum": 98.03225806451613,
+                  "median": 0.032258064516129066,
+                  "p75": 0.03225806451612911,
+                  "p90": 0.03225806451612911,
+                  "p95": 13.053909927451343
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.36702302631578965,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.36702302631578965,
+                  "p95": 0.36702302631578965
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 32,
+                  "maximum": 0.11979278505475634,
+                  "median": 0.11979278505475634,
+                  "p75": 0.11979278505475634,
+                  "p90": 0.11979278505475634,
+                  "p95": 0.11979278505475634
+                },
+                "relative_denominator_unavailable_count": 100
+              }
+            ],
+            "player_count": 132,
+            "value": "180-269"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.05579879316502186,
+                  "median": 0.03405670572959301,
+                  "p75": 0.04852965975135996,
+                  "p90": 0.05579879316502186,
+                  "p95": 0.05579879316502186
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    295
+                  ],
+                  [
+                    0.005,
+                    198
+                  ],
+                  [
+                    0.01,
+                    198
+                  ],
+                  [
+                    0.02,
+                    198
+                  ],
+                  [
+                    0.05,
+                    98
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 395,
+                  "maximum": 4.008568207264522,
+                  "median": 0.845704066190962,
+                  "p75": 4.008568207264522,
+                  "p90": 4.008568207264522,
+                  "p95": 4.008568207264522
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.21476608187134502,
+                  "median": 0.03403359999208491,
+                  "p75": 0.18818862223013735,
+                  "p90": 0.19305284701678244,
+                  "p95": 0.21476608187134502
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 395,
+                  "maximum": 6.400871459694989,
+                  "median": 0.22222222222222238,
+                  "p75": 1.2287766747756717,
+                  "p90": 1.4707422551304974,
+                  "p95": 6.400871459694989
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.06245888157894737,
+                  "median": 0.0003081313083395541,
+                  "p75": 0.0003699365389947182,
+                  "p90": 0.0003699365389947182,
+                  "p95": 0.062191868691660455
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 395,
+                  "maximum": 94.9375,
+                  "median": 0.06250000000000006,
+                  "p75": 0.06250000000000006,
+                  "p90": 0.06250000000000006,
+                  "p95": 12.61472524221849
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.014181286549707739,
+                  "median": 0.0,
+                  "p75": 0.0070906432748538695,
+                  "p90": 0.014181286549707739,
+                  "p95": 0.014181286549707739
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 99,
+                  "maximum": 0.00462863550688335,
+                  "median": 0.00462863550688335,
+                  "p75": 0.00462863550688335,
+                  "p90": 0.00462863550688335,
+                  "p95": 0.00462863550688335
+                },
+                "relative_denominator_unavailable_count": 296
+              }
+            ],
+            "player_count": 395,
+            "value": "360+"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.054042036294720125,
+                  "median": 0.04852965975135996,
+                  "p75": 0.04852965975135996,
+                  "p90": 0.054042036294720125,
+                  "p95": 0.054042036294720125
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    131
+                  ],
+                  [
+                    0.005,
+                    131
+                  ],
+                  [
+                    0.01,
+                    131
+                  ],
+                  [
+                    0.02,
+                    131
+                  ],
+                  [
+                    0.05,
+                    33
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 165,
+                  "maximum": 4.463892589743116,
+                  "median": 4.008568207264522,
+                  "p75": 4.008568207264522,
+                  "p90": 4.463892589743116,
+                  "p95": 4.463892589743116
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.2308561000044523,
+                  "median": 0.03403359999208491,
+                  "p75": 0.18818862223013735,
+                  "p90": 0.18818862223013735,
+                  "p95": 0.2308561000044523
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 1.5073737591226308,
+                  "median": 0.2222222222222223,
+                  "p75": 1.2287766747756717,
+                  "p90": 1.2287766747756717,
+                  "p95": 1.5073737591226308
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.06435709351827636,
+                  "median": 0.0003081313083395541,
+                  "p75": 0.0003081313083395541,
+                  "p90": 0.0003081313083395541,
+                  "p95": 0.062191868691660455
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 13.053909927451343,
+                  "median": 0.06250000000000006,
+                  "p75": 0.06250000000000006,
+                  "p90": 0.06250000000000006,
+                  "p95": 12.61472524221849
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 165
+              }
+            ],
+            "player_count": 165,
+            "value": "DEF"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0621368544695224,
+                  "median": 0.05579879316502186,
+                  "p75": 0.05579879316502186,
+                  "p90": 0.0621368544695224,
+                  "p95": 0.0621368544695224
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    132
+                  ],
+                  [
+                    0.005,
+                    132
+                  ],
+                  [
+                    0.01,
+                    132
+                  ],
+                  [
+                    0.02,
+                    132
+                  ],
+                  [
+                    0.05,
+                    131
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 165,
+                  "maximum": 4.463892589743116,
+                  "median": 4.008568207264522,
+                  "p75": 4.008568207264522,
+                  "p90": 4.463892589743116,
+                  "p95": 4.463892589743116
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.2308561000044523,
+                  "median": 0.03403359999208491,
+                  "p75": 0.18818862223013735,
+                  "p90": 0.18818862223013735,
+                  "p95": 0.2308561000044523
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 1.5073737591226308,
+                  "median": 0.2222222222222223,
+                  "p75": 1.2287766747756717,
+                  "p90": 1.2287766747756717,
+                  "p95": 1.5073737591226308
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.06435709351827636,
+                  "median": 0.0003081313083395541,
+                  "p75": 0.0003081313083395541,
+                  "p90": 0.0003081313083395541,
+                  "p95": 0.062191868691660455
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 13.053909927451343,
+                  "median": 0.06250000000000006,
+                  "p75": 0.06250000000000006,
+                  "p90": 0.06250000000000006,
+                  "p95": 12.61472524221849
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 165
+              }
+            ],
+            "player_count": 165,
+            "value": "FWD"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.0001911801755343284,
+                  "median": 0.0001911801755343284,
+                  "p75": 0.0001911801755343284,
+                  "p90": 0.0001911801755343284,
+                  "p95": 0.0001911801755343284
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    0
+                  ],
+                  [
+                    0.005,
+                    0
+                  ],
+                  [
+                    0.01,
+                    0
+                  ],
+                  [
+                    0.02,
+                    0
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.1666666666666666,
+                  "median": 0.1666666666666666,
+                  "p75": 0.1666666666666666,
+                  "p90": 0.1666666666666666,
+                  "p95": 0.1666666666666666
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.24580592105263158,
+                  "median": 0.007456140350877192,
+                  "p75": 0.21476608187134502,
+                  "p90": 0.21476608187134502,
+                  "p95": 0.24580592105263158
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 7.325980392156863,
+                  "median": 0.22222222222222218,
+                  "p75": 6.400871459694989,
+                  "p90": 6.400871459694989,
+                  "p95": 7.325980392156863
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.06449490662139219,
+                  "median": 4.11184210526316e-05,
+                  "p75": 4.11184210526316e-05,
+                  "p90": 4.11184210526316e-05,
+                  "p95": 0.06245888157894737
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 98.03225806451613,
+                  "median": 0.06250000000000003,
+                  "p75": 0.06250000000000003,
+                  "p90": 0.06250000000000003,
+                  "p95": 94.9375
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.36702302631578965,
+                  "median": 0.014181286549707739,
+                  "p75": 0.014181286549707739,
+                  "p90": 0.36702302631578965,
+                  "p95": 0.36702302631578965
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 165,
+                  "maximum": 0.11979278505475634,
+                  "median": 0.00462863550688335,
+                  "p75": 0.00462863550688335,
+                  "p90": 0.11979278505475634,
+                  "p95": 0.11979278505475634
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "GK"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.036043957570037755,
+                  "median": 0.004953143544690956,
+                  "p75": 0.004953143544690956,
+                  "p90": 0.004953143544690956,
+                  "p95": 0.004953143544690956
+                },
+                "assist_threshold_counts": [
+                  [
+                    0.0025,
+                    131
+                  ],
+                  [
+                    0.005,
+                    1
+                  ],
+                  [
+                    0.01,
+                    1
+                  ],
+                  [
+                    0.02,
+                    1
+                  ],
+                  [
+                    0.05,
+                    0
+                  ]
+                ],
+                "field": "assist_share",
+                "relative": {
+                  "count": 164,
+                  "maximum": 1.2128310450667095,
+                  "median": 0.16666666666666663,
+                  "p75": 0.16666666666666663,
+                  "p90": 0.16666666666666663,
+                  "p95": 0.16666666666666663
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.23359222644694017,
+                  "median": 0.029169375205439788,
+                  "p75": 0.19305284701678244,
+                  "p90": 0.19305284701678244,
+                  "p95": 0.23359222644694017
+                },
+                "assist_threshold_counts": [],
+                "field": "yellow_cards_per90",
+                "relative": {
+                  "count": 164,
+                  "maximum": 1.7795850370218098,
+                  "median": 0.22222222222222238,
+                  "p75": 1.4707422551304974,
+                  "p90": 1.4707422551304974,
+                  "p95": 1.7795850370218098
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.06432519404438984,
+                  "median": 0.0003699365389947182,
+                  "p75": 0.0003699365389947182,
+                  "p90": 0.0003699365389947182,
+                  "p95": 0.062130063461005296
+                },
+                "assist_threshold_counts": [],
+                "field": "red_cards_per90",
+                "relative": {
+                  "count": 164,
+                  "maximum": 10.867606208079277,
+                  "median": 0.06249999999999994,
+                  "p75": 0.06249999999999994,
+                  "p90": 0.06249999999999994,
+                  "p95": 10.4967435140768
+                },
+                "relative_denominator_unavailable_count": 0
+              },
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "goalkeeper_saves_per90",
+                "relative": {
+                  "count": 0,
+                  "maximum": null,
+                  "median": null,
+                  "p75": null,
+                  "p90": null,
+                  "p95": null
+                },
+                "relative_denominator_unavailable_count": 164
+              }
+            ],
+            "player_count": 164,
+            "value": "MID"
+          }
+        ],
+        "total_goal_rate_diagnostic": [
+          {
+            "dimension": "ALL",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 659,
+                  "maximum": 0.18175837320574165,
+                  "median": 0.0059108199363200435,
+                  "p75": 0.10846331786483093,
+                  "p90": 0.16191608089304949,
+                  "p95": 0.16776072561112923
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 659,
+                  "maximum": 276.2727272727273,
+                  "median": 0.16666666666666669,
+                  "p75": 0.31058727747239756,
+                  "p90": 4.633409543794842,
+                  "p95": 253.16666666666669
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 659,
+            "value": "ALL"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 658,
+                  "maximum": 0.18175837320574165,
+                  "median": 0.0059108199363200435,
+                  "p75": 0.10846331786483093,
+                  "p90": 0.16249619797440093,
+                  "p95": 0.16836257964476334
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 658,
+                  "maximum": 276.2727272727273,
+                  "median": 0.16666666666666669,
+                  "p75": 0.31058727747239756,
+                  "p90": 4.683707843293022,
+                  "p95": 253.16666666666669
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 658,
+            "value": "FPL_POSITION_FALLBACK"
+          },
+          {
+            "dimension": "ASSIGNMENT",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 1,
+                  "maximum": 0.007687261356141201,
+                  "median": 0.007687261356141201,
+                  "p75": 0.007687261356141201,
+                  "p90": 0.007687261356141201,
+                  "p95": 0.007687261356141201
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 1,
+                  "maximum": 0.10101010101010101,
+                  "median": 0.10101010101010101,
+                  "p75": 0.10101010101010101,
+                  "p90": 0.10101010101010101,
+                  "p95": 0.10101010101010101
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 1,
+            "value": "INDIVIDUAL_SAME_TEAM"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 132,
+                  "maximum": 0.0,
+                  "median": 0.0,
+                  "p75": 0.0,
+                  "p90": 0.0,
+                  "p95": 0.0
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 132,
+            "value": "0-89"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 132,
+                  "maximum": 0.18175837320574165,
+                  "median": 0.017485682383133385,
+                  "p75": 0.1572017000442963,
+                  "p90": 0.1785940982165527,
+                  "p95": 0.18175837320574165
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 132,
+                  "maximum": 276.2727272727273,
+                  "median": 0.090909090909091,
+                  "p75": 1.5812476665133666,
+                  "p90": 5.035795939780164,
+                  "p95": 276.2727272727273
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 132,
+            "value": "180-269"
+          },
+          {
+            "dimension": "OBSERVED_MINUTES",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 395,
+                  "maximum": 0.16655701754385965,
+                  "median": 0.0582033488018357,
+                  "p75": 0.16075584673034662,
+                  "p90": 0.16075584673034662,
+                  "p95": 0.16655701754385965
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 395,
+                  "maximum": 253.16666666666669,
+                  "median": 0.1666666666666667,
+                  "p75": 4.532812944798484,
+                  "p90": 4.532812944798484,
+                  "p95": 253.16666666666669
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 395,
+            "value": "360+"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.1785940982165527,
+                  "median": 0.0059108199363200435,
+                  "p75": 0.16075584673034662,
+                  "p90": 0.16075584673034662,
+                  "p95": 0.1785940982165527
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 165,
+                  "maximum": 5.035795939780164,
+                  "median": 0.1666666666666667,
+                  "p75": 4.532812944798484,
+                  "p90": 4.532812944798484,
+                  "p95": 5.035795939780164
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "DEF"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.1785940982165527,
+                  "median": 0.0059108199363200435,
+                  "p75": 0.16075584673034662,
+                  "p90": 0.16075584673034662,
+                  "p95": 0.1785940982165527
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 165,
+                  "maximum": 5.035795939780164,
+                  "median": 0.1666666666666667,
+                  "p75": 4.532812944798484,
+                  "p90": 4.532812944798484,
+                  "p95": 5.035795939780164
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "FWD"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 165,
+                  "maximum": 0.18175837320574165,
+                  "median": 0.00010964912280701756,
+                  "p75": 0.16655701754385965,
+                  "p90": 0.16655701754385965,
+                  "p95": 0.18175837320574165
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 165,
+                  "maximum": 276.2727272727273,
+                  "median": 0.16666666666666669,
+                  "p75": 253.16666666666669,
+                  "p90": 253.16666666666669,
+                  "p95": 276.2727272727273
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 165,
+            "value": "GK"
+          },
+          {
+            "dimension": "POSITION",
+            "fields": [
+              {
+                "absolute": {
+                  "count": 164,
+                  "maximum": 0.15007090065354417,
+                  "median": 0.0582033488018357,
+                  "p75": 0.10846331786483093,
+                  "p90": 0.10846331786483093,
+                  "p95": 0.15007090065354417
+                },
+                "assist_threshold_counts": [],
+                "field": "TOTAL_GOAL_RATE_POSTERIOR_DIAGNOSTIC",
+                "relative": {
+                  "count": 164,
+                  "maximum": 0.42973157542443385,
+                  "median": 0.1666666666666666,
+                  "p75": 0.31058727747239756,
+                  "p90": 0.31058727747239756,
+                  "p95": 0.42973157542443385
+                },
+                "relative_denominator_unavailable_count": 0
+              }
+            ],
+            "player_count": 164,
+            "value": "MID"
+          }
+        ],
+        "world": "HIGH_SHRINKAGE",
+        "zero_exposure_discipline_excluded_events": 224,
+        "zero_exposure_discipline_excluded_rows": 1056
+      }
+    ],
+    "new_network_requests": 0,
+    "partial_reconciliation_players": 0,
+    "persistence_performed": false,
+    "reconciliation_failures": 0,
+    "shadow_semantic_sha256": "6b0822816ba003b806b122e61fa2736cca76ffe42644a51c57bb2ad00a5c83ca",
+    "source_gameweeks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "target_gameweek": 5,
+    "world_sensitivity": {
+      "comparisons": [
+        {
+          "fields": [
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.11391756652745769,
+                "median": 0.008491103219470213,
+                "p75": 0.08319370243090278,
+                "p90": 0.09633947250580845,
+                "p95": 0.10056111653903428
+              },
+              "assist_threshold_counts": [
+                [
+                  0.0025,
+                  395
+                ],
+                [
+                  0.005,
+                  361
+                ],
+                [
+                  0.01,
+                  264
+                ],
+                [
+                  0.02,
+                  264
+                ],
+                [
+                  0.05,
+                  263
+                ]
+              ],
+              "field": "assist_share",
+              "relative": {
+                "count": 659,
+                "maximum": 8.18380308119571,
+                "median": 0.28571428571428575,
+                "p75": 6.871831212453466,
+                "p90": 7.134225586201974,
+                "p95": 8.183803081195709
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.4369883040935672,
+                "median": 0.04773170488162873,
+                "p75": 0.30794501819477016,
+                "p90": 0.35143540669856455,
+                "p95": 0.41041084445235954
+              },
+              "assist_threshold_counts": [],
+              "field": "yellow_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 13.0239651416122,
+                "median": 0.3636363636363637,
+                "p75": 2.0107254678147353,
+                "p90": 2.679775571773565,
+                "p95": 10.474153297682708
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.12495888157894736,
+                "median": 0.0003699365389947182,
+                "p75": 0.0005800118745215134,
+                "p90": 0.0006963511322253526,
+                "p95": 0.1170670469490079
+              },
+              "assist_threshold_counts": [],
+              "field": "red_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 189.93749999999997,
+                "median": 0.11764705882352942,
+                "p75": 0.11764705882352948,
+                "p90": 0.11764705882352948,
+                "p95": 23.745365161823038
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.6524853801169583,
+                "median": 0.0,
+                "p75": 0.0,
+                "p90": 0.023205741626794563,
+                "p95": 0.023205741626794563
+              },
+              "assist_threshold_counts": [],
+              "field": "goalkeeper_saves_per90",
+              "relative": {
+                "count": 165,
+                "maximum": 0.21296495120845538,
+                "median": 0.007574130829445509,
+                "p75": 0.007574130829445509,
+                "p90": 0.21296495120845538,
+                "p95": 0.21296495120845538
+              },
+              "relative_denominator_unavailable_count": 494
+            }
+          ],
+          "left": "STALE",
+          "right": "CENTRAL_TEMPORARY",
+          "team_assist_tv": {
+            "count": 5,
+            "maximum": 0.44708783616063275,
+            "median": 0.4437404185155738,
+            "p75": 0.4439191701613575,
+            "p90": 0.44582036976092265,
+            "p95": 0.4464541029607777
+          },
+          "team_assist_tv_undefined_count": 0
+        },
+        {
+          "fields": [
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.19528725690421322,
+                "median": 0.013208382785842552,
+                "p75": 0.1294124260036266,
+                "p90": 0.15300670537539549,
+                "p95": 0.17239048549548738
+              },
+              "assist_threshold_counts": [
+                [
+                  0.0025,
+                  396
+                ],
+                [
+                  0.005,
+                  395
+                ],
+                [
+                  0.01,
+                  361
+                ],
+                [
+                  0.02,
+                  264
+                ],
+                [
+                  0.05,
+                  263
+                ]
+              ],
+              "field": "assist_share",
+              "relative": {
+                "count": 659,
+                "maximum": 14.029376710621221,
+                "median": 0.4444444444444445,
+                "p75": 10.68951521937206,
+                "p90": 11.357487517622046,
+                "p95": 14.02937671062122
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.7150717703349282,
+                "median": 0.07000650049305546,
+                "p75": 0.4516526933523295,
+                "p90": 0.515438596491228,
+                "p95": 0.6715813818311337
+              },
+              "assist_threshold_counts": [],
+              "field": "yellow_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 21.311942959001783,
+                "median": 0.5333333333333334,
+                "p75": 2.949064019461611,
+                "p90": 4.385087299265833,
+                "p95": 15.362091503267973
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.23521671826625387,
+                "median": 0.0006963511322253526,
+                "p75": 0.0010379159859858658,
+                "p90": 0.0012461020260874731,
+                "p95": 0.20948839980348782
+              },
+              "assist_threshold_counts": [],
+              "field": "red_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 357.5294117647059,
+                "median": 0.2105263157894737,
+                "p75": 0.21052631578947376,
+                "p90": 0.21052631578947378,
+                "p95": 42.49170607905175
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 1.0677033492822958,
+                "median": 0.0,
+                "p75": 0.0,
+                "p90": 0.03403508771929875,
+                "p95": 0.03403508771929875
+              },
+              "assist_threshold_counts": [],
+              "field": "goalkeeper_saves_per90",
+              "relative": {
+                "count": 165,
+                "maximum": 0.34848810197747254,
+                "median": 0.011108725216520099,
+                "p75": 0.011108725216520099,
+                "p90": 0.34848810197747254,
+                "p95": 0.34848810197747254
+              },
+              "relative_denominator_unavailable_count": 494
+            }
+          ],
+          "left": "STALE",
+          "right": "LOW_SHRINKAGE",
+          "team_assist_tv": {
+            "count": 5,
+            "maximum": 0.4912885297329769,
+            "median": 0.4878552379182272,
+            "p75": 0.4896039973204433,
+            "p90": 0.4906147167679634,
+            "p95": 0.49095162325047015
+          },
+          "team_assist_tv_undefined_count": 0
+        },
+        {
+          "fields": [
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.0621368544695224,
+                "median": 0.004953143544690956,
+                "p75": 0.04852965975135996,
+                "p90": 0.05579879316502186,
+                "p95": 0.056432599295472056
+              },
+              "assist_threshold_counts": [
+                [
+                  0.0025,
+                  394
+                ],
+                [
+                  0.005,
+                  264
+                ],
+                [
+                  0.01,
+                  264
+                ],
+                [
+                  0.02,
+                  264
+                ],
+                [
+                  0.05,
+                  164
+                ]
+              ],
+              "field": "assist_share",
+              "relative": {
+                "count": 659,
+                "maximum": 4.463892589743116,
+                "median": 0.16666666666666663,
+                "p75": 4.008568207264522,
+                "p90": 4.099633083760262,
+                "p95": 4.463892589743116
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.24580592105263158,
+                "median": 0.029169375205439788,
+                "p75": 0.18818862223013735,
+                "p90": 0.21476608187134502,
+                "p95": 0.2308561000044523
+              },
+              "assist_threshold_counts": [],
+              "field": "yellow_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 7.325980392156863,
+                "median": 0.2222222222222223,
+                "p75": 1.2287766747756717,
+                "p90": 1.5073737591226308,
+                "p95": 6.400871459694989
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.06449490662139219,
+                "median": 0.00019093498786824144,
+                "p75": 0.0003081313083395541,
+                "p90": 0.0003699365389947182,
+                "p95": 0.062191868691660455
+              },
+              "assist_threshold_counts": [],
+              "field": "red_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 98.03225806451613,
+                "median": 0.06249999999999994,
+                "p75": 0.06250000000000006,
+                "p90": 0.06250000000000006,
+                "p95": 12.61472524221849
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.36702302631578965,
+                "median": 0.0,
+                "p75": 0.0,
+                "p90": 0.014181286549707739,
+                "p95": 0.014181286549707739
+              },
+              "assist_threshold_counts": [],
+              "field": "goalkeeper_saves_per90",
+              "relative": {
+                "count": 165,
+                "maximum": 0.11979278505475634,
+                "median": 0.00462863550688335,
+                "p75": 0.00462863550688335,
+                "p90": 0.11979278505475634,
+                "p95": 0.11979278505475634
+              },
+              "relative_denominator_unavailable_count": 494
+            }
+          ],
+          "left": "STALE",
+          "right": "HIGH_SHRINKAGE",
+          "team_assist_tv": {
+            "count": 5,
+            "maximum": 0.3789079631951041,
+            "median": 0.3757798480669703,
+            "p75": 0.37598947522324794,
+            "p90": 0.37774056800636163,
+            "p95": 0.3783242656007329
+          },
+          "team_assist_tv_undefined_count": 0
+        },
+        {
+          "fields": [
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.08136969037675554,
+                "median": 0.004717279566372339,
+                "p75": 0.0462187235727238,
+                "p90": 0.05666723286958704,
+                "p95": 0.07182936895645309
+              },
+              "assist_threshold_counts": [
+                [
+                  0.0025,
+                  393
+                ],
+                [
+                  0.005,
+                  263
+                ],
+                [
+                  0.01,
+                  263
+                ],
+                [
+                  0.02,
+                  263
+                ],
+                [
+                  0.05,
+                  164
+                ]
+              ],
+              "field": "assist_share",
+              "relative": {
+                "count": 659,
+                "maximum": 0.6365090341924481,
+                "median": 0.22222222222222227,
+                "p75": 0.4849804199153696,
+                "p90": 0.5152861427707922,
+                "p95": 0.6365090341924481
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.278083466241361,
+                "median": 0.022274795611426722,
+                "p75": 0.14370767515755933,
+                "p90": 0.16400318979266348,
+                "p95": 0.26117053737877416
+              },
+              "assist_threshold_counts": [],
+              "field": "yellow_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 0.590986766845086,
+                "median": 0.2666666666666666,
+                "p75": 0.31166526529167304,
+                "p90": 0.42599554657966965,
+                "p95": 0.4634281885485608
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.11025783668730652,
+                "median": 0.00032641459323063445,
+                "p75": 0.00045790411146435237,
+                "p90": 0.0005497508938621205,
+                "p95": 0.09242135285447992
+              },
+              "assist_threshold_counts": [],
+              "field": "red_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 0.8777317801097527,
+                "median": 0.10526315789473684,
+                "p75": 0.10526315789473685,
+                "p90": 0.10526315789473695,
+                "p95": 0.7575697830537746
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.4152179691653375,
+                "median": 0.0,
+                "p75": 0.0,
+                "p90": 0.010829346092504188,
+                "p95": 0.010829346092504188
+              },
+              "assist_threshold_counts": [],
+              "field": "goalkeeper_saves_per90",
+              "relative": {
+                "count": 165,
+                "maximum": 0.11172882665240894,
+                "median": 0.0035615701856187188,
+                "p75": 0.0035615701856187188,
+                "p90": 0.11172882665240894,
+                "p95": 0.11172882665240894
+              },
+              "relative_denominator_unavailable_count": 494
+            }
+          ],
+          "left": "CENTRAL_TEMPORARY",
+          "right": "LOW_SHRINKAGE",
+          "team_assist_tv": {
+            "count": 5,
+            "maximum": 0.045684827159085756,
+            "median": 0.04411481940265342,
+            "p75": 0.04420069357234417,
+            "p90": 0.04509117372438912,
+            "p95": 0.045388000441737436
+          },
+          "team_assist_tv_undefined_count": 0
+        },
+        {
+          "fields": [
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.05178071205793529,
+                "median": 0.003537959674779257,
+                "p75": 0.03466404267954282,
+                "p90": 0.04089203071484702,
+                "p95": 0.045709598426833746
+              },
+              "assist_threshold_counts": [
+                [
+                  0.0025,
+                  360
+                ],
+                [
+                  0.005,
+                  263
+                ],
+                [
+                  0.01,
+                  263
+                ],
+                [
+                  0.02,
+                  263
+                ],
+                [
+                  0.05,
+                  33
+                ]
+              ],
+              "field": "assist_share",
+              "relative": {
+                "count": 659,
+                "maximum": 0.405051203577012,
+                "median": 0.16666666666666677,
+                "p75": 0.36373531493652683,
+                "p90": 0.3719984926646258,
+                "p95": 0.405051203577012
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.19118238304093566,
+                "median": 0.01856232967618894,
+                "p75": 0.11975639596463283,
+                "p90": 0.13666932482721955,
+                "p95": 0.17955474444790726
+              },
+              "assist_threshold_counts": [],
+              "field": "yellow_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 0.4063034022059966,
+                "median": 0.22222222222222224,
+                "p75": 0.25972105440972765,
+                "p90": 0.31860687962713563,
+                "p95": 0.35499628881639134
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.060463974957555164,
+                "median": 0.00017900155112647673,
+                "p75": 0.00027188056618195934,
+                "p90": 0.00032641459323063445,
+                "p95": 0.054875178257347446
+              },
+              "assist_threshold_counts": [],
+              "field": "red_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 0.48133678264083196,
+                "median": 0.06249999999999998,
+                "p75": 0.06250000000000003,
+                "p90": 0.06250000000000008,
+                "p95": 0.4498070586881787
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.2854623538011687,
+                "median": 0.0,
+                "p75": 0.0,
+                "p90": 0.009024455077086824,
+                "p95": 0.009024455077086824
+              },
+              "assist_threshold_counts": [],
+              "field": "goalkeeper_saves_per90",
+              "relative": {
+                "count": 165,
+                "maximum": 0.07681356832353092,
+                "median": 0.002967975154682266,
+                "p75": 0.002967975154682266,
+                "p90": 0.07681356832353092,
+                "p95": 0.07681356832353092
+              },
+              "relative_denominator_unavailable_count": 494
+            }
+          ],
+          "left": "CENTRAL_TEMPORARY",
+          "right": "HIGH_SHRINKAGE",
+          "team_assist_tv": {
+            "count": 5,
+            "maximum": 0.06989033943573021,
+            "median": 0.06796057044860347,
+            "p75": 0.06817987296552863,
+            "p90": 0.06920615284764958,
+            "p95": 0.06954824614168989
+          },
+          "team_assist_tv_undefined_count": 0
+        },
+        {
+          "fields": [
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.13315040243469084,
+                "median": 0.008255239241151596,
+                "p75": 0.08088276625226662,
+                "p90": 0.09755926358443406,
+                "p95": 0.11753896738328684
+              },
+              "assist_threshold_counts": [
+                [
+                  0.0025,
+                  394
+                ],
+                [
+                  0.005,
+                  393
+                ],
+                [
+                  0.01,
+                  263
+                ],
+                [
+                  0.02,
+                  263
+                ],
+                [
+                  0.05,
+                  263
+                ]
+              ],
+              "field": "assist_share",
+              "relative": {
+                "count": 659,
+                "maximum": 0.6364524826979819,
+                "median": 0.5000000000000002,
+                "p75": 0.5715332831797645,
+                "p90": 0.5845171230834109,
+                "p95": 0.6364524826979818
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.46926584928229664,
+                "median": 0.04083712528761566,
+                "p75": 0.26346407112219217,
+                "p90": 0.30067251461988304,
+                "p95": 0.4407252818266814
+              },
+              "assist_threshold_counts": [],
+              "field": "yellow_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 0.6666666666666667,
+                "median": 0.5343856803464506,
+                "p75": 0.6666666666666666,
+                "p90": 0.6666666666666667,
+                "p95": 0.6666666666666667
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.17072181164486167,
+                "median": 0.0005054161443571112,
+                "p75": 0.0007297846776463117,
+                "p90": 0.000876165487092755,
+                "p95": 0.14729653111182736
+              },
+              "assist_threshold_counts": [],
+              "field": "red_cards_per90",
+              "relative": {
+                "count": 659,
+                "maximum": 0.7386934673366838,
+                "median": 0.18750000000000003,
+                "p75": 0.1875000000000001,
+                "p90": 0.1875000000000001,
+                "p95": 0.6869581244416584
+              },
+              "relative_denominator_unavailable_count": 0
+            },
+            {
+              "absolute": {
+                "count": 659,
+                "maximum": 0.7006803229665062,
+                "median": 0.0,
+                "p75": 0.0,
+                "p90": 0.019853801169591012,
+                "p95": 0.019853801169591012
+              },
+              "assist_threshold_counts": [],
+              "field": "goalkeeper_saves_per90",
+              "relative": {
+                "count": 165,
+                "maximum": 0.16959387078562205,
+                "median": 0.006552883896215567,
+                "p75": 0.006552883896215567,
+                "p90": 0.16959387078562205,
+                "p95": 0.16959387078562205
+              },
+              "relative_denominator_unavailable_count": 494
+            }
+          ],
+          "left": "LOW_SHRINKAGE",
+          "right": "HIGH_SHRINKAGE",
+          "team_assist_tv": {
+            "count": 5,
+            "maximum": 0.11557516659481597,
+            "median": 0.11207538985125688,
+            "p75": 0.11238056653787282,
+            "p90": 0.11429732657203871,
+            "p95": 0.11493624658342734
+          },
+          "team_assist_tv_undefined_count": 0
+        }
+      ],
+      "interpretation": "MODEL_MOVEMENT_NOT_MODEL_ACCURACY",
+      "semantic_sha256": "b5e75b5dfac2e65c238b35621e7ceb8e179e5fe24f3882541f8744d8a7894040",
+      "source_shadow_sha256": "6b0822816ba003b806b122e61fa2736cca76ffe42644a51c57bb2ad00a5c83ca"
+    }
+  }
+}
