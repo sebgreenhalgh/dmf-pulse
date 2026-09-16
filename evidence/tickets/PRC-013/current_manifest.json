@@ -7001,6 +7001,16 @@
       "sha256": "e8c9f4ef5a58626f7bc7fead78aa63a7950b59d389075ad4162561dcc406fd70"
     },
     {
+      "bytes": 623,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1/ACCEPTANCE.md",
+      "sha256": "3fbfb0361e3013308ac57ad4d30bb5a79122708fa93f1a10e70691a249824ef0"
+    },
+    {
+      "bytes": 1364,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1/ticket.yaml",
+      "sha256": "e63b1853a2768389c2e9cfa1ee0057bfe14d41782ea60af37cd15a10e13196a4"
+    },
+    {
       "bytes": 854,
       "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-D1/ACCEPTANCE.md",
       "sha256": "18bf83aa8494887a250ef55d1f3e213fe584c8a25fa5b9c7a0c84699bc44de83"

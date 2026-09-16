@@ -1,0 +1,26 @@
+ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R9C-A1"
+stage: "PRIVATE-V1-ONE-COMMAND"
+pack_version: "1.0"
+title: "Offline R9B shadow decision-sensitivity adapter"
+status: "ACTIVE"
+required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1-three-gw-shadow-decision-adapter"
+required_base_commit: "00aa08acc9b67323fd85e0a6cc95d3f0a1a04a25"
+authority_scopes: ["A9-points", "A10-tactical", "A11-rolling"]
+objective: >-
+  Add a private offline-only resolver seam and bind pre-compiled R9B shadow worlds
+  to the existing fixture projector without changing the active recommendation path.
+allowed_areas:
+  - "src/dmf_pulse/private_v1/service.py"
+  - "src/dmf_pulse/private_v1/rolling.py"
+  - "src/dmf_pulse/private_v1/shadow_adapter.py"
+  - "tests/unit/private_v1/test_a1_allocation_injection.py"
+  - "tests/unit/private_v1/test_a1_shadow_adapter.py"
+  - "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1/**"
+  - "evidence/tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1/**"
+  - "evidence/tickets/PRC-013/current_manifest.json"
+  - "PLANS.md"
+exclusions:
+  - "Provider action, credentials, persistence, fitting, training, rights and activation"
+  - "Stage 7, Stage 8, Stage-9 allocation mathematics, Stage 10, Stage 11 and ordinary CLI behavior"
+  - "Full four-world Stage-11 comparison, PR, merge, tag and production activation"
+required_activation_status: "SHADOW_NOT_MODEL_INPUT"
