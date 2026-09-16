@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 160762,
+      "bytes": 161560,
       "path": "PLANS.md",
-      "sha256": "3605b01e5db4e2dfdccb29806aa4369bd53e2ffe019913425b016cbec0e97265"
+      "sha256": "025ecd194b4e033b9b8c12288cd39839f8140998cfa2fccf1e52e7cd615803db"
     },
     {
       "bytes": 2761,
@@ -4006,9 +4006,9 @@
       "sha256": "06848fe589b9547ac9debc39eb727b5769dd807c9391c4b7de05506b2d274237"
     },
     {
-      "bytes": 49605,
+      "bytes": 49947,
       "path": "src/dmf_pulse/private_v1/rolling.py",
-      "sha256": "4e153c4ab01ec750e3130fc6902170a64f5228bcd5f2bf19817d0f8970010696"
+      "sha256": "59552ef8b9bd442442b326fcee4629bfde1a54a8e9e045c6e653b4fc8db88198"
     },
     {
       "bytes": 27766,
@@ -4016,9 +4016,14 @@
       "sha256": "32750351fe73dbe8e9e3350971ef12b3e5e05ea89dc820ec25cbda2a3f3d7bdc"
     },
     {
-      "bytes": 105942,
+      "bytes": 109932,
       "path": "src/dmf_pulse/private_v1/service.py",
-      "sha256": "61eb8a2ebd76eff7affb539f8ce7676b065bd6946d63f68bc652696c98bc856a"
+      "sha256": "8b2f73c1ff3d8743b2b3e1bfbf0f6c0c642064187f585148138292672ba3687c"
+    },
+    {
+      "bytes": 7285,
+      "path": "src/dmf_pulse/private_v1/shadow_adapter.py",
+      "sha256": "5e1519ce023c41e7b6f99de87eeebf90172d1d18aa72c26d499e7915816c9dfd"
     },
     {
       "bytes": 1,
@@ -6139,6 +6144,16 @@
       "bytes": 6837,
       "path": "tests/unit/private_v1/horizon_pressure_support.py",
       "sha256": "81b0cc0a7cba9cdb712d83a326d09e13b1609f4d5042a0c90c4a003d4a02d0df"
+    },
+    {
+      "bytes": 6339,
+      "path": "tests/unit/private_v1/test_a1_allocation_injection.py",
+      "sha256": "00b978971e9c6bc2c88d82b7ea0fc00526a28287867394d98e33e5e998edfb7b"
+    },
+    {
+      "bytes": 5753,
+      "path": "tests/unit/private_v1/test_a1_shadow_adapter.py",
+      "sha256": "fd8d2c49e8bf6e92b91bf774934859e3db82e41280ae6ec031a083a0b1a60c7d"
     },
     {
       "bytes": 6152,
