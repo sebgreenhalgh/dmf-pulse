@@ -1,5 +1,19 @@
 # DMF Pulse execution plans
 
+## PRIVATE-V1-ONE-COMMAND-001N-R9C-A1
+
+- Immutable parent: D2 `00aa08acc9b67323fd85e0a6cc95d3f0a1a04a25`, in the isolated A1
+  worktree only. Finish the private resolver seam without changing its literal
+  no-resolver stale binding path, then add the offline-only R9B shadow-world
+  adapter.
+- Reuse the existing Stage-7/8 projector and Stage-9 service; do not expose
+  selection through production construction, configuration or CLI. Shadow
+  provenance is non-active, no live/provider acquisition is allowed, and the
+  full four-world Stage-11 comparison is explicitly deferred.
+- Seal A1.01 as a durable checkpoint after focused regression and isolation
+  tests; then validate the A1.02 adapter only with synthetic R9B material,
+  manifests and independent read-only review before publication.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R9C-D2
 
 - Parent is accepted R9C-D1 `483c0c8cb858381b89c2cf14954c50b1c6ddd306` in an

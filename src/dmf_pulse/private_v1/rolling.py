@@ -58,6 +58,7 @@ from dmf_pulse.private_v1.service import (
     _action_space_disclosure,
     _current_identity_maps,
     _decimal,
+    _FixtureAllocationProfileResolver,
     _MemoizedStage10Evaluator,
     _parse_tactical_plan,
     _private_free_transfer_state,
@@ -641,6 +642,13 @@ def render_rolling_report(
 class PrivateV1RollingRecommendationService:
     """Build and solve one exact declared private three-GW policy in memory."""
 
+    def __init__(
+        self,
+        *,
+        _allocation_profile_resolver: _FixtureAllocationProfileResolver | None = None,
+    ) -> None:
+        self._allocation_profile_resolver = _allocation_profile_resolver
+
     def run(
         self,
         value: PrivateV1RollingExecutionInput,
@@ -738,6 +746,7 @@ class PrivateV1RollingRecommendationService:
                     prior,
                     active_progress,
                     future_gameweek=future,
+                    _allocation_profile_resolver=self._allocation_profile_resolver,
                 )
             record(f"stage8_9_gameweek_{gameweek}", started)
             fixture_results, stage7_contexts, stage8_hashes, binding_hashes, fallback = projected

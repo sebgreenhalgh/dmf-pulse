@@ -11,7 +11,7 @@ from importlib.resources import files
 from math import comb
 from pathlib import Path
 from time import perf_counter, process_time
-from typing import Any, Literal
+from typing import Any, Literal, Protocol
 from uuid import UUID
 
 import yaml  # type: ignore[import-untyped]
@@ -51,7 +51,9 @@ from dmf_pulse.fpl_points.models import (
     GameweekScenarioSet,
     PenaltyHierarchyExhaustionPolicy,
     PenaltyTakerHierarchyEntry,
+    PlayerAllocationProfile,
     PlayerPosition,
+    PlayerPriorIdentity,
     SimulationStatus,
 )
 from dmf_pulse.fpl_points.player_prior import (
@@ -156,6 +158,33 @@ _PRIVATE_EXPECTED_CANDIDATES_PER_POSITION = 2
 _PRIVATE_UPSIDE_CANDIDATES_PER_POSITION = 1
 _PRIVATE_VALUE_CANDIDATES_PER_POSITION = 1
 _PRIVATE_MAX_RETAINED_INCOMING = 24
+
+
+@dataclass(frozen=True, slots=True)
+class _FixtureAllocationResolution:
+    """Test-only replacement for one fixture's active allocation binding."""
+
+    profiles: tuple[PlayerAllocationProfile, ...]
+    prior_identity: PlayerPriorIdentity | None
+    binding_sha256: str
+    fallback_player_ids: frozenset[str]
+    shadow_provenance: Any | None = None
+
+
+class _FixtureAllocationProfileResolver(Protocol):
+    def __call__(
+        self,
+        *,
+        fixture_id: str,
+        gameweek_id: str,
+        home_team_id: str,
+        away_team_id: str,
+        participant_ids: frozenset[str],
+        participation: tuple[Any, ...],
+        source_player_map: dict[int, str],
+        source_team_map: dict[int, str],
+        information_cutoff_utc: str,
+    ) -> _FixtureAllocationResolution: ...
 
 
 def _exact_root_action_upper_bound(
@@ -945,6 +974,7 @@ def _project_fixtures(
     progress: ProgressSink | None = None,
     *,
     future_gameweek: PrivateRollingGameweekInput | None = None,
+    _allocation_profile_resolver: _FixtureAllocationProfileResolver | None = None,
 ) -> tuple[
     tuple[FixtureProjectionResult, ...],
     dict[str, str],
@@ -1023,6 +1053,9 @@ def _project_fixtures(
             away_projection = minutes.away
         context = Stage7MinutesContext.from_projections(home_projection, away_projection)
         stage7_context_hashes[fixture_id] = context.semantic_sha256
+        profiles: tuple[PlayerAllocationProfile, ...]
+        prior_identity: PlayerPriorIdentity | None
+        binding_sha256: str
         try:
             stage8 = ScoreDistributionService().project(
                 ScoreDistributionRequest(
@@ -1072,7 +1105,7 @@ def _project_fixtures(
             int(current_teams[team_id].identity.external_id_text): team_id for team_id in team_ids
         }
         try:
-            if value.current_state.target_gameweek == 1:
+            if _allocation_profile_resolver is None and value.current_state.target_gameweek == 1:
                 binding = build_player_prior_identity_binding(
                     prior,
                     value.current_state.fpl_input,
@@ -1083,7 +1116,7 @@ def _project_fixtures(
                     prior, binding, participation
                 )
                 binding_sha256 = binding.semantic_sha256
-            else:
+            elif _allocation_profile_resolver is None:
                 policy = value.player_prior_carry_forward_policy
                 if policy is None:  # guarded by PrivateV1ExecutionInput
                     raise PrivateV1Error(
@@ -1106,6 +1139,59 @@ def _project_fixtures(
                     prior, current_binding, participation
                 )
                 binding_sha256 = current_binding.semantic_sha256
+            else:
+                try:
+                    resolved = _allocation_profile_resolver(
+                        fixture_id=fixture_id,
+                        gameweek_id=gameweek_id,
+                        home_team_id=home_projection.team_id,
+                        away_team_id=away_projection.team_id,
+                        participant_ids=frozenset(participant_ids),
+                        participation=participation,
+                        source_player_map=source_player_map,
+                        source_team_map=source_team_map,
+                        information_cutoff_utc=_utc_text(value.current_state.information_cutoff),
+                    )
+                except (TypeError, ValueError) as exc:
+                    raise PrivateV1Error(
+                        "SHADOW_RESOLUTION_INVALID",
+                        "injected allocation profile resolution is invalid",
+                    ) from exc
+                profile_ids = tuple(item.player_id for item in resolved.profiles)
+                if len(set(profile_ids)) != len(profile_ids) or set(profile_ids) != participant_ids:
+                    raise PrivateV1Error(
+                        "SHADOW_PROFILE_PARTICIPANT_MISMATCH",
+                        "injected allocation profiles differ from the Stage-7 participant universe",
+                    )
+                participant_teams = {
+                    item.player_id: item.team_id
+                    for scenario in participation
+                    for item in scenario.participants
+                }
+                if any(
+                    participant_teams[item.player_id] != item.team_id for item in resolved.profiles
+                ):
+                    raise PrivateV1Error(
+                        "SHADOW_PROFILE_TEAM_MISMATCH",
+                        "injected allocation profile team differs from Stage-7 participation",
+                    )
+                if resolved.prior_identity is not None or resolved.shadow_provenance is None:
+                    raise PrivateV1Error(
+                        "SHADOW_PROVENANCE_INVALID",
+                        "injected allocation profiles require separate non-active provenance",
+                    )
+                if (
+                    getattr(resolved.shadow_provenance, "semantic_sha256", None)
+                    != resolved.binding_sha256
+                ):
+                    raise PrivateV1Error(
+                        "SHADOW_PROVENANCE_BINDING_MISMATCH",
+                        "injected allocation profiles and shadow provenance differ",
+                    )
+                profiles = resolved.profiles
+                prior_identity = resolved.prior_identity
+                binding_sha256 = resolved.binding_sha256
+                fallback_player_ids.update(resolved.fallback_player_ids)
         except FplPointsError as exc:
             raise PrivateV1Error(
                 exc.code, "current player allocation prior is unavailable"
