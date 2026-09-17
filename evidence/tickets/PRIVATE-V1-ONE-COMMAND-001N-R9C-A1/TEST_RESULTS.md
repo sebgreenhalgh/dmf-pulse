@@ -58,6 +58,9 @@ live snapshot, persistence, fitting or activation was used.
   `dmf --help` passes outside the source tree. The initial unconstrained wheel
   environment resolved Typer 0.27.2 and failed; pinning the accepted lock's
   Typer 0.27.0 restored the required CLI behavior.
+- Authority review remediation resolves every declared ticket scope exactly in
+  `specs/manifests/authority_manifest.json`: A9 points, A10 one-GW optimizer,
+  A11 decision bundle, and B2 multi-GW. Repository validation remains green.
 
 ## A1.02-CI-R1
 

@@ -5,7 +5,11 @@ title: "Offline R9B four-world three-Gameweek decision comparison"
 status: "ACTIVE"
 required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1-three-gw-shadow-decision-adapter"
 required_base_commit: "978be35e0cfc8a0fa91b931ebd4a2040d1175a2b"
-authority_scopes: ["A9-points", "A10-tactical", "A11-rolling"]
+authority_scopes:
+  - "A9-points"
+  - "A10-one-GW-optimiser"
+  - "A11-decision-bundle"
+  - "B2-multi-GW"
 objective: >-
   Compare literal stale and pre-compiled R9B shadow worlds through the existing
   three-Gameweek rolling service without changing the active recommendation path.

@@ -49,6 +49,10 @@ No network or live execution command appears in this ledger.
 - Clean wheel import and CLI help: PASS outside the source tree with the frozen
   Typer 0.27.0 lock. An unconstrained install selected Typer 0.27.2 and failed
   CLI import; that non-frozen dependency result is not represented as a pass.
+- Independent review found stale non-existent ticket authority aliases
+  `A10-tactical` and `A11-rolling`. Remediation maps the ticket to the canonical
+  `A9-points`, `A10-one-GW-optimiser`, `A11-decision-bundle`, and `B2-multi-GW`
+  scopes; no code, model, optimizer, artifact or runtime semantics changed.
 
 ## A1.02-CI-R1
 
