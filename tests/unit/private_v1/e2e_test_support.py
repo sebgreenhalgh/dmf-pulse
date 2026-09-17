@@ -137,6 +137,7 @@ def _build_fpl_input(
     captured_at: datetime = _CAPTURED,
     information_cutoff: datetime = _CUTOFF,
     horizon_gameweeks: int = 1,
+    historical_gameweeks: int = 0,
 ):
     source = repository_root / "fixtures/fpl/FPL-004/happy_path"
     bootstrap = json.loads((source / "bootstrap.json").read_text(encoding="utf-8"))
@@ -146,7 +147,10 @@ def _build_fpl_input(
     original_players = bootstrap["elements"]
     templates = {int(item["element_type"]): item for item in original_players}
     existing_events = {int(item["id"]): item for item in bootstrap["events"]}
-    for gameweek in range(target_gameweek, target_gameweek + horizon_gameweeks):
+    for gameweek in range(
+        target_gameweek - historical_gameweeks,
+        target_gameweek + horizon_gameweeks,
+    ):
         if gameweek in existing_events:
             continue
         event = deepcopy(bootstrap["events"][-1])
@@ -165,6 +169,36 @@ def _build_fpl_input(
         )
         bootstrap["events"].append(event)
         existing_events[gameweek] = event
+    if historical_gameweeks:
+        if target_gameweek <= historical_gameweeks:
+            raise ValueError("synthetic history must precede the target Gameweek")
+        for event in bootstrap["events"]:
+            gameweek = int(event["id"])
+            if target_gameweek - historical_gameweeks <= gameweek < target_gameweek:
+                event.update(
+                    {
+                        "is_current": False,
+                        "is_next": False,
+                        "is_previous": gameweek == target_gameweek - 1,
+                        "finished": True,
+                        "data_checked": True,
+                        "deadline_time": (
+                            information_cutoff - timedelta(days=(target_gameweek - gameweek) * 7)
+                        )
+                        .isoformat()
+                        .replace("+00:00", "Z"),
+                    }
+                )
+            elif gameweek == target_gameweek:
+                event.update(
+                    {
+                        "is_current": False,
+                        "is_next": True,
+                        "is_previous": False,
+                        "finished": False,
+                        "data_checked": False,
+                    }
+                )
     for offset in range(horizon_gameweeks):
         gameweek = target_gameweek + offset
         target_event = next(item for item in bootstrap["events"] if item["id"] == gameweek)
@@ -204,6 +238,14 @@ def _build_fpl_input(
                     "news_added": None,
                 }
             )
+            if historical_gameweeks:
+                # The optional synthetic history below supplies a complete
+                # finalized source window.  Bootstrap totals intentionally
+                # reconcile with those known rows.
+                player.update(
+                    minutes=90 * historical_gameweeks,
+                    starts=historical_gameweeks,
+                )
             players.append(player)
     fixture_template = fixtures_source[0]
     fixtures = []

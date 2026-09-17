@@ -11,7 +11,23 @@ live snapshot, persistence, fitting or activation was used.
 - Ruff, strict mypy, repository validator and repository-manifest integration:
   passed.
 
-The full four-world three-GW Stage-11 comparison was deliberately not run.
+## A1.03
+
+- Four-world canonical rolling regression: PASS (2 tests; one shared real
+  four-world Stage-9 -> Stage-10 -> Stage-11 run).
+- The synthetic probe produced comparison hash
+  `ac9a238ef8fd37750eec6680ae29e1826c23aa838b7b81747ce57e6b0a9b361d`.
+- All six pairwise world comparisons were `ROBUST` for this deliberately small
+  candidate universe; Stage-7/8 context/distribution, scenario identity and
+  candidate-screen hashes were exact-equal. This is an observed synthetic
+  result, not an assertion about a live decision.
+- Classification-contract tests separately exercise `ROBUST`,
+  `ROOT_SENSITIVE`, and `CONTINUATION_SENSITIVE` without constructing another
+  optimiser or projector.
+- No cross-world plan re-evaluation is reported: the accepted rolling service
+  has no sealed public evaluation seam for an already-legal fixed policy, and
+  A1.03 must not recreate Stage-11 evaluation outside that service.
+- A1 seam/adapter/four-world focused regression: 13 passed in 161.56 seconds.
 
 ## A1.02-CI-R1
 

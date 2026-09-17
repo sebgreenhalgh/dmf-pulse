@@ -8,8 +8,21 @@ normal no-resolver baseline.
 
 Injected profiles require exact Stage-7 identity/team coverage and separate
 non-active provenance. Only R9B's existing assist, yellow-card, red-card and
-goalkeeper-save profile fields may differ. No full four-world Stage-11
-comparison is included in this ticket.
+goalkeeper-save profile fields may differ.
+
+## A1.03
+
+The offline synthetic comparison invokes `PrivateV1RollingRecommendationService`
+four times: literal stale construction with no resolver, then each already
+sealed R9B world. Each call has fresh service/resolver state. The comparison
+requires exact equality of Stage-7 contexts, Stage-8 distributions, scenario
+IDs/weights and rolling input identity before it records Stage-9/Stage-11
+differences. Candidate-screen scope is separately hashed and disclosed.
+
+`scripts/compare_r9c_a1_three_gw_shadow.py` is repository-only, no-argument,
+synthetic output for manual review. It makes no network request and does not
+write a result file. It neither exposes a normal world selector nor changes
+the stale active path.
 
 ## A1.02-CI-R1
 

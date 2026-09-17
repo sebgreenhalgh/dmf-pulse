@@ -1,20 +1,25 @@
 ticket_id: "PRIVATE-V1-ONE-COMMAND-001N-R9C-A1"
 stage: "PRIVATE-V1-ONE-COMMAND"
 pack_version: "1.0"
-title: "Offline R9B shadow decision-sensitivity adapter"
+title: "Offline R9B four-world three-Gameweek decision comparison"
 status: "ACTIVE"
 required_branch: "readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1-three-gw-shadow-decision-adapter"
-required_base_commit: "00aa08acc9b67323fd85e0a6cc95d3f0a1a04a25"
+required_base_commit: "978be35e0cfc8a0fa91b931ebd4a2040d1175a2b"
 authority_scopes: ["A9-points", "A10-tactical", "A11-rolling"]
 objective: >-
-  Add a private offline-only resolver seam and bind pre-compiled R9B shadow worlds
-  to the existing fixture projector without changing the active recommendation path.
+  Compare literal stale and pre-compiled R9B shadow worlds through the existing
+  three-Gameweek rolling service without changing the active recommendation path.
 allowed_areas:
   - "src/dmf_pulse/private_v1/service.py"
   - "src/dmf_pulse/private_v1/rolling.py"
   - "src/dmf_pulse/private_v1/shadow_adapter.py"
+  - "src/dmf_pulse/private_v1/shadow_comparison.py"
   - "tests/unit/private_v1/test_a1_allocation_injection.py"
   - "tests/unit/private_v1/test_a1_shadow_adapter.py"
+  - "tests/unit/private_v1/a1_03_support.py"
+  - "tests/unit/private_v1/e2e_test_support.py"
+  - "tests/unit/private_v1/test_a1_03_shadow_comparison.py"
+  - "scripts/compare_r9c_a1_three_gw_shadow.py"
   - "tests/unit/ingestion/test_horizon_probe.py"
   - "tests/unit/ingestion/test_horizon_rights_approval.py"
   - "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1/**"
@@ -24,5 +29,5 @@ allowed_areas:
 exclusions:
   - "Provider action, credentials, persistence, fitting, training, rights and activation"
   - "Stage 7, Stage 8, Stage-9 allocation mathematics, Stage 10, Stage 11 and ordinary CLI behavior"
-  - "Full four-world Stage-11 comparison, PR, merge, tag and production activation"
+  - "PR, merge, tag and production activation"
 required_activation_status: "SHADOW_NOT_MODEL_INPUT"

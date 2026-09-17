@@ -18,6 +18,15 @@
   Retain all other R8A/R8B provider, optimiser and rights digest checks; no
   source, provider, rights or active-path change is permitted. A1.03 remains
   blocked until the replacement exact-SHA CI passes.
+- A1.03 starts only from the sealed remediation SHA `978be35e0cfc8a0fa91b931ebd4a2040d1175a2b`
+  and its successful exact-SHA CI.  Run four offline synthetic worlds through
+  the existing rolling service: literal stale (no resolver) and the sealed
+  CENTRAL_TEMPORARY, LOW_SHRINKAGE and HIGH_SHRINKAGE resolver worlds.  Add
+  immutable comparison/report contracts that prove common Stage-7/8 inputs,
+  disclose any candidate-screen divergence, and keep all alternate-world
+  state private to the comparison harness.  No live acquisition, ordinary
+  path selection, optimiser/projector duplication, active-prior change, or
+  activation is in scope.
 
 ## PRIVATE-V1-ONE-COMMAND-001N-R9C-D2
 
