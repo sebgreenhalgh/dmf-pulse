@@ -24,6 +24,16 @@ No network or live execution command appears in this ledger.
   `tests/unit/private_v1/test_a1_03_shadow_comparison.py -q` - PASS (13 in
   161.56 seconds).
 
+## A1.03 review remediation (pre-artifact checkpoint)
+
+- History-window resolver plus adapter regression: PASS (8).
+- A1.01/A1.02/history/rolling regression: PASS (20 in 163.71 seconds).
+- Real root-sensitive, real continuation-sensitive, sealing and reverse-order
+  comparison regression: PASS (5 in 119.76 seconds).
+- Changed production source Ruff and strict mypy: PASS.
+- No provider, credential, private entry, persistence, training or activation
+  command was executed.
+
 ## A1.02-CI-R1
 
 - Reproduced the two failing static guard tests: FAIL as expected on A1.02.

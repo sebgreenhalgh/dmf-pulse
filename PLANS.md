@@ -2223,3 +2223,14 @@ Frozen R6 comparisons, native clean wheel, static/security/specification gates a
 CI collection (4,427 eligible tests) pass. Independent review is not yet authorized
 or performed, so preserve a clean local review candidate without pushing. Exact-SHA
 R7 CI remains pending; do not claim final acceptance or production readiness.
+
+## R9C-A1.03 review remediation
+
+- [x] Preserve the local GW5 remediation and bind the compiled shadow to the complete finalized
+  GW1--4 window and rolling GW5--7 horizon.
+- [x] Replace fabricated comparator examples with real canonical Stage-11 root-sensitive and
+  continuation-sensitive synthetic cases using one common legal candidate universe.
+- [x] Seal complete world/pair/control/workload contracts and prove actual reverse execution-order
+  isolation while retaining literal no-resolver STALE construction.
+- [ ] Commit the implementation checkpoint, generate deterministic root/continuation artifacts at
+  that exact SHA, then complete broad gates and fresh independent read-only review before push.

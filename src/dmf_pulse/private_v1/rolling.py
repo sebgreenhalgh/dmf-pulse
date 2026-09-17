@@ -79,6 +79,22 @@ class PrivateRollingStageTiming:
     elapsed_ms: Decimal
 
 
+@dataclass(frozen=True, slots=True)
+class PrivateRollingStage11Work:
+    """Immutable count-only proof that the canonical Stage-11 solver ran."""
+
+    exact_accelerator: str
+    node_count: int
+    cumulative_state_expansions: int
+    cumulative_action_combinations: int
+    cumulative_legal_actions: int
+    cumulative_unique_node_squads: int
+    cumulative_tactical_requests: int
+    memo_hits: int
+    memo_misses: int
+    semantic_sha256: str
+
+
 @dataclass(frozen=True)
 class PrivateV1RollingRunResult:
     decision: PrivateV1RollingDecision
@@ -91,6 +107,7 @@ class PrivateV1RollingRunResult:
     optimiser_result: MultiGameweekOptimisationResult
     optimiser_request: MultiGameweekOptimisationRequest
     one_gameweek_optimiser_result: MultiGameweekOptimisationResult
+    stage11_work: PrivateRollingStage11Work
     stage_timings: tuple[PrivateRollingStageTiming, ...]
 
 
@@ -1097,6 +1114,24 @@ class PrivateV1RollingRecommendationService:
             binding_hashes_by_gameweek,
             fallback_player_ids,
         )
+        stage11_nodes = tuple(stage11_profile.nodes.values())
+        stage11_work_payload = {
+            "exact_accelerator": stage11_profile.exact_accelerator,
+            "node_count": len(stage11_nodes),
+            "cumulative_state_expansions": sum(item.states_solved for item in stage11_nodes),
+            "cumulative_action_combinations": sum(
+                item.action_combinations_considered for item in stage11_nodes
+            ),
+            "cumulative_legal_actions": sum(item.legal_actions_generated for item in stage11_nodes),
+            "cumulative_unique_node_squads": sum(
+                len(item.unique_resulting_squads) for item in stage11_nodes
+            ),
+            "cumulative_tactical_requests": sum(
+                item.tactical_evaluator_calls for item in stage11_nodes
+            ),
+            "memo_hits": stage11_profile.memo_hits,
+            "memo_misses": stage11_profile.memo_misses,
+        }
         return PrivateV1RollingRunResult(
             decision=sealed,
             report=report,
@@ -1104,11 +1139,32 @@ class PrivateV1RollingRecommendationService:
             optimiser_result=optimiser,
             optimiser_request=request,
             one_gameweek_optimiser_result=one_gameweek,
+            stage11_work=PrivateRollingStage11Work(
+                exact_accelerator=stage11_profile.exact_accelerator,
+                node_count=len(stage11_nodes),
+                cumulative_state_expansions=sum(item.states_solved for item in stage11_nodes),
+                cumulative_action_combinations=sum(
+                    item.action_combinations_considered for item in stage11_nodes
+                ),
+                cumulative_legal_actions=sum(
+                    item.legal_actions_generated for item in stage11_nodes
+                ),
+                cumulative_unique_node_squads=sum(
+                    len(item.unique_resulting_squads) for item in stage11_nodes
+                ),
+                cumulative_tactical_requests=sum(
+                    item.tactical_evaluator_calls for item in stage11_nodes
+                ),
+                memo_hits=stage11_profile.memo_hits,
+                memo_misses=stage11_profile.memo_misses,
+                semantic_sha256=canonical_sha256(stage11_work_payload),
+            ),
             stage_timings=tuple(timings),
         )
 
 
 __all__ = [
+    "PrivateRollingStage11Work",
     "PrivateRollingStageTiming",
     "PrivateV1RollingRecommendationService",
     "PrivateV1RollingRunResult",

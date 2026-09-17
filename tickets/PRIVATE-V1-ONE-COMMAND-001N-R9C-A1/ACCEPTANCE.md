@@ -19,10 +19,18 @@ requires exact equality of Stage-7 contexts, Stage-8 distributions, scenario
 IDs/weights and rolling input identity before it records Stage-9/Stage-11
 differences. Candidate-screen scope is separately hashed and disclosed.
 
-`scripts/compare_r9c_a1_three_gw_shadow.py` is repository-only, no-argument,
-synthetic output for manual review. It makes no network request and does not
-write a result file. It neither exposes a normal world selector nor changes
-the stale active path.
+`scripts/compare_r9c_a1_three_gw_shadow.py` is a repository-only deterministic
+synthetic evidence generator. Its case selector chooses only the two sealed
+repository fixtures; it is not exposed through the normal command, environment,
+configuration or service factory. It makes no network request and writes only
+to an explicitly supplied evidence path. It neither exposes a runtime world
+selector nor changes the stale active path.
+
+Review remediation binds target GW5 to complete finalized GW1--4 history and
+the GW5--7 horizon. The root-sensitive and continuation-sensitive acceptance
+outcomes must be produced by the real rolling service and exact Stage-11 solver,
+with Stage-7, Stage-8, randomness, scenarios, candidates, prices, manager state,
+rules and work-budget semantics aligned across all four worlds.
 
 ## A1.02-CI-R1
 

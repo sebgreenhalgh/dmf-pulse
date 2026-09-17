@@ -19,6 +19,7 @@ allowed_areas:
   - "tests/unit/private_v1/a1_03_support.py"
   - "tests/unit/private_v1/e2e_test_support.py"
   - "tests/unit/private_v1/test_a1_03_shadow_comparison.py"
+  - "tests/unit/private_v1/test_a1_03_history_binding.py"
   - "scripts/compare_r9c_a1_three_gw_shadow.py"
   - "tests/unit/ingestion/test_horizon_probe.py"
   - "tests/unit/ingestion/test_horizon_rights_approval.py"

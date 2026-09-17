@@ -18,7 +18,10 @@ from dmf_pulse.chips.inventory import build_chip_inventory
 from dmf_pulse.football_events.score_prior_request import ScorePriorRequest
 from dmf_pulse.football_events.service import load_score_baseline_policy
 from dmf_pulse.fpl_points.models import MonteCarloPolicy, ProjectionMode
-from dmf_pulse.fpl_points.player_prior import load_packaged_player_prior
+from dmf_pulse.fpl_points.player_prior import (
+    build_automatic_current_gw_stale_prior_policy,
+    load_packaged_player_prior,
+)
 from dmf_pulse.ingestion.current_state import (
     CurrentUnifiedStateService,
     bind_current_unified_state_request,
@@ -492,6 +495,7 @@ def _unified_context(
     captured_at: datetime = _CAPTURED,
     information_cutoff: datetime = _CUTOFF,
     horizon_gameweeks: int = 1,
+    historical_gameweeks: int = 0,
 ) -> CurrentUnifiedTestContext:
     fpl_input = _build_fpl_input(
         repository_root,
@@ -500,6 +504,7 @@ def _unified_context(
         captured_at=captured_at,
         information_cutoff=information_cutoff,
         horizon_gameweeks=horizon_gameweeks,
+        historical_gameweeks=historical_gameweeks,
     )
     ruleset, capability = active_target_rules(repository_root)
     manager = _compile_manager(
@@ -618,13 +623,28 @@ def _identity_map(
     )
 
 
-def _manual_team(team_id: str, players: tuple[Any, ...]) -> dict[str, Any]:
+def _manual_team(
+    team_id: str,
+    players: tuple[Any, ...],
+    *,
+    forced_low_minute_player_ids: frozenset[UUID] = frozenset(),
+) -> dict[str, Any]:
     ordered = sorted(players, key=lambda item: str(item.canonical_player_id))
     goalkeeper_ids = [item.canonical_player_id for item in ordered if item.position.value == "GK"]
     outfield_ids = [item.canonical_player_id for item in ordered if item.position.value != "GK"]
     scenarios = []
     for scenario_index in range(4):
         starting_goalkeeper = goalkeeper_ids[scenario_index % 2]
+        forced_goalkeepers = set(goalkeeper_ids) & forced_low_minute_player_ids
+        if forced_goalkeepers:
+            available_goalkeepers = [
+                player_id for player_id in goalkeeper_ids if player_id not in forced_goalkeepers
+            ]
+            if len(forced_goalkeepers) != 1 or len(available_goalkeepers) != 1:
+                raise ValueError("synthetic forced bench requires exactly one alternate goalkeeper")
+            starting_goalkeeper = (
+                next(iter(forced_goalkeepers)) if scenario_index == 0 else available_goalkeepers[0]
+            )
         starting_outfield = {
             outfield_ids[(scenario_index * 5 + offset) % len(outfield_ids)] for offset in range(10)
         }
@@ -632,13 +652,16 @@ def _manual_team(team_id: str, players: tuple[Any, ...]) -> dict[str, Any]:
         rows = []
         for player_index, item in enumerate(ordered):
             starting = item.canonical_player_id in starters
+            forced_low_minute = item.canonical_player_id in forced_low_minute_player_ids
             rows.append(
                 {
                     "player_id": str(item.canonical_player_id),
                     "position": item.position.value,
                     "role": "START" if starting else "BENCH",
                     "official_minutes": (
-                        90 - 10 * ((player_index + scenario_index) % 4)
+                        (1 if starting else 0)
+                        if forced_low_minute
+                        else 90 - 10 * ((player_index + scenario_index) % 4)
                         if starting
                         else 20 * ((player_index + scenario_index) % 2)
                     ),
@@ -667,6 +690,7 @@ def _manual_inputs(
     *,
     captured_at: datetime = _CAPTURED,
     information_cutoff: datetime = _CUTOFF,
+    forced_low_minute_element_ids: frozenset[int] = frozenset(),
 ):
     mapped_by_element = {item.official_fpl_element_id: item for item in identities.players}
     current_by_team: dict[int, list[Any]] = {
@@ -681,6 +705,10 @@ def _manual_inputs(
     team_uuid = {
         item.official_fpl_team_id: str(item.canonical_team_id) for item in identities.teams
     }
+    forced_low_minute_player_ids = frozenset(
+        mapped_by_element[element_id].canonical_player_id
+        for element_id in forced_low_minute_element_ids
+    )
     fixture_by_official = {item.provider_fixture_id: item for item in context.fpl_input.fixtures}
     results = []
     for item in sorted(view.fixtures, key=lambda value: value.official_fpl_fixture_id):
@@ -715,8 +743,16 @@ def _manual_inputs(
                     "as_of": information_cutoff,
                     "information_cutoff": information_cutoff,
                     "provenance": provenance,
-                    "home": _manual_team(team_uuid[home], tuple(current_by_team[home])),
-                    "away": _manual_team(team_uuid[away], tuple(current_by_team[away])),
+                    "home": _manual_team(
+                        team_uuid[home],
+                        tuple(current_by_team[home]),
+                        forced_low_minute_player_ids=forced_low_minute_player_ids,
+                    ),
+                    "away": _manual_team(
+                        team_uuid[away],
+                        tuple(current_by_team[away]),
+                        forced_low_minute_player_ids=forced_low_minute_player_ids,
+                    ),
                 }
             )
         )
@@ -729,18 +765,38 @@ def build_execution_input(
     working: Path,
     *,
     horizon_gameweeks: int = 1,
+    target_gameweek: int = 1,
+    historical_gameweeks: int = 0,
+    force_candidate_low_current_minutes: bool = False,
 ) -> PrivateV1ExecutionInput:
     """Build the complete deterministic TEST-mode input without network access."""
 
     context = _unified_context(
         repository_root,
         working,
+        target_gameweek=target_gameweek,
         horizon_gameweeks=horizon_gameweeks,
+        historical_gameweeks=historical_gameweeks,
     )
     context = recompose(context, context.odds_input)
     view, _market_request, markets = build_from_context(context)
     identities = _identity_map(context)
-    manual = _manual_inputs(context, identities, view)
+    current_squad = {item.official_fpl_element_id for item in context.manager_state.squad}
+    incoming = next(
+        item.provider_element_id
+        for item in sorted(context.fpl_input.players, key=lambda value: value.provider_element_id)
+        if item.position.value == "GK"
+        and int(item.team_identity.external_id_text) == 1
+        and item.provider_element_id not in current_squad
+    )
+    manual = _manual_inputs(
+        context,
+        identities,
+        view,
+        forced_low_minute_element_ids=(
+            frozenset({incoming}) if force_candidate_low_current_minutes else frozenset()
+        ),
+    )
     manual_by_fixture = {item.fixture_id: item for item in manual}
     score_bundles = tuple(
         seal_fixture_score_prior(
@@ -767,7 +823,7 @@ def build_execution_input(
             source_class="OPERATOR_DECLARED_PRIVATE_TRANSIENT",
             attestation_status="HUMAN_ATTESTED",
             provider_verification="NOT_PROVIDER_VERIFIED",
-            target_gameweek=1,
+            target_gameweek=target_gameweek,
             declared_at=_CAPTURED + timedelta(minutes=47),
             attested_at=_CAPTURED + timedelta(minutes=48),
             information_cutoff=_CUTOFF,
@@ -777,14 +833,6 @@ def build_execution_input(
             ),
             semantic_sha256="0" * 64,
         )
-    )
-    current_squad = set(squad_ids)
-    incoming = next(
-        item.provider_element_id
-        for item in sorted(context.fpl_input.players, key=lambda value: value.provider_element_id)
-        if item.position.value == "GK"
-        and int(item.team_identity.external_id_text) == 1
-        and item.provider_element_id not in current_squad
     )
     candidates = seal_candidate_action_policy(
         PrivateCandidateActionPolicy.model_construct(
@@ -823,6 +871,18 @@ def build_execution_input(
         }
     )
     player_prior = load_packaged_player_prior()
+    carry_forward = (
+        None
+        if target_gameweek == 1
+        else build_automatic_current_gw_stale_prior_policy(
+            player_prior,
+            context.fpl_input,
+            current_official_fpl_element_ids=tuple(
+                sorted(item.provider_element_id for item in context.fpl_input.players)
+            ),
+            declared_at=_CUTOFF,
+        )
+    )
     provisional = PrivateV1ExecutionInput.model_construct(
         run_id="PRIVATE_V1_SYNTHETIC_E2E",
         code_sha="a" * 40,
@@ -850,6 +910,7 @@ def build_execution_input(
         expected_player_prior_acceptance_sha256=(
             player_prior.historical_acceptance.acceptance_sha256
         ),
+        player_prior_carry_forward_policy=carry_forward,
         require_stage9_mc_pass=False,
         semantic_sha256="0" * 64,
     )
@@ -859,6 +920,10 @@ def build_execution_input(
 def build_rolling_execution_input(
     repository_root: Path,
     working: Path,
+    *,
+    target_gameweek: int = 1,
+    historical_gameweeks: int = 0,
+    force_candidate_low_current_minutes: bool = False,
 ) -> PrivateV1RollingExecutionInput:
     """Build a complete three-GW synthetic input from one current-cutoff source family."""
 
@@ -866,6 +931,9 @@ def build_rolling_execution_input(
         repository_root,
         working,
         horizon_gameweeks=3,
+        target_gameweek=target_gameweek,
+        historical_gameweeks=historical_gameweeks,
+        force_candidate_low_current_minutes=force_candidate_low_current_minutes,
     )
     fpl = current.current_state.fpl_input
     identity = current.player_identity_map
@@ -882,7 +950,7 @@ def build_rolling_execution_input(
         )
     teams = {item.official_fpl_team_id: item.canonical_team_id for item in identity.teams}
     future_gameweeks = []
-    for gameweek in (2, 3):
+    for gameweek in (target_gameweek + 1, target_gameweek + 2):
         future_fixtures = []
         fixtures = tuple(
             item
@@ -976,7 +1044,7 @@ def build_rolling_execution_input(
     terminal = load_terminal_value_policy()
     return seal_rolling_execution_input(
         PrivateV1RollingExecutionInput.model_construct(
-            horizon_gameweeks=(1, 2, 3),
+            horizon_gameweeks=(target_gameweek, target_gameweek + 1, target_gameweek + 2),
             current_execution=current,
             future_gameweeks=tuple(future_gameweeks),
             terminal_value_mode="THREE_GAMEWEEK_ZERO_TERMINAL_VALUE_AFTER_HORIZON",

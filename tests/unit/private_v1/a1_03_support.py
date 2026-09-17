@@ -1,9 +1,7 @@
 """Offline synthetic inputs for the R9C-A1.03 four-world rolling comparison.
 
-The rolling execution remains the sealed GW1 synthetic family.  A separate,
-same-catalogue GW5 view supplies only finalized synthetic history to the pure
-R9B compiler; it performs no provider acquisition and shares the exact
-canonical player/team identities and cutoff with the rolling input.
+The rolling execution and the pure R9B compiler share one sealed GW5 target
+and finalized GW1--4 window. It performs no provider acquisition.
 """
 
 from __future__ import annotations
@@ -24,28 +22,33 @@ from dmf_pulse.ingestion.fpl.direct_payloads import DirectFplSnapshot, parse_dir
 from dmf_pulse.private_v1.rolling_models import PrivateV1RollingExecutionInput
 from tests.unit.private_v1.e2e_test_support import (
     _CUTOFF,
-    _build_fpl_input,
     build_rolling_execution_input,
 )
 
 
 def build_a1_03_inputs(
-    repository_root: Path, working: Path
+    repository_root: Path,
+    working: Path,
+    *,
+    candidate_saves_per_gameweek: int = 3,
+    force_candidate_low_current_minutes: bool = False,
 ) -> tuple[PrivateV1RollingExecutionInput, object]:
     """Return a sealed rolling input and a matching three-world shadow.
 
-    This is deliberately test-only construction.  The current execution stays
-    on its accepted GW1 stale path; the compiler's later target Gameweek exists
-    solely to make its finalized history-window contract satisfiable.
+    This is deliberately test-only construction. Its rolling and history
+    contracts share exactly one target Gameweek and source window.
     """
 
-    execution = build_rolling_execution_input(repository_root, working / "rolling")
-    shadow_fpl = _build_fpl_input(
+    execution = build_rolling_execution_input(
         repository_root,
-        working / "history",
+        working / "rolling",
         target_gameweek=5,
-        horizon_gameweeks=3,
         historical_gameweeks=4,
+        force_candidate_low_current_minutes=force_candidate_low_current_minutes,
+    )
+    shadow_fpl = execution.current_execution.current_state.fpl_input
+    candidate_id = (
+        execution.current_execution.candidate_action_policy.allowed_transfer_in_element_ids[0]
     )
     canonical_players = {
         item.official_fpl_element_id: str(item.canonical_player_id)
@@ -59,7 +62,6 @@ def build_a1_03_inputs(
     for gameweek in range(1, 5):
         rows = []
         for player in shadow_fpl.players:
-            is_goalkeeper = player.position.value == "GK"
             rows.append(
                 {
                     "id": player.provider_element_id,
@@ -73,7 +75,11 @@ def build_a1_03_inputs(
                         "penalties_missed": 0,
                         "yellow_cards": int(player.provider_element_id % 13 == 0),
                         "red_cards": 0,
-                        "saves": 3 if is_goalkeeper else 0,
+                        "saves": (
+                            candidate_saves_per_gameweek
+                            if player.provider_element_id == candidate_id
+                            else 0
+                        ),
                         "clearances_blocks_interceptions": 4,
                         "tackles": 2,
                         "recoveries": 5,

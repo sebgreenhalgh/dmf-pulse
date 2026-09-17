@@ -29,6 +29,19 @@ live snapshot, persistence, fitting or activation was used.
   A1.03 must not recreate Stage-11 evaluation outside that service.
 - A1 seam/adapter/four-world focused regression: 13 passed in 161.56 seconds.
 
+## A1.03 review remediation (pre-artifact checkpoint)
+
+- Exact coherent information set: target GW5, finalized history GW1--4,
+  rolling horizon GW5--7.
+- Purpose-built root case: real canonical solves produce more than one current
+  root action with a common candidate/action universe.
+- Purpose-built continuation case: all four worlds retain one root action while
+  STALE versus shadow worlds differ in real GW6/GW7 actions.
+- All four solves report OPTIMAL with recommendation, hold baseline, transfer
+  frontier and nonzero Stage-11 work counts.
+- Pairwise classification, tamper rejection and actual reverse-order cache
+  isolation pass. No manually altered optimizer result remains.
+
 ## A1.02-CI-R1
 
 - Reproduced the two failed legacy whole-file SHA guards exactly.

@@ -66,7 +66,7 @@ class ShadowFixtureAllocationProfileResolver:
         source_team_map: dict[int, str],
         information_cutoff_utc: str,
     ) -> _FixtureAllocationResolution:
-        del fixture_id, gameweek_id
+        del fixture_id
         if (
             not participant_ids
             or len(source_player_map) != len(participant_ids)
@@ -77,6 +77,18 @@ class ShadowFixtureAllocationProfileResolver:
             raise ValueError("shadow fixture team mapping differs from fixture context")
         if information_cutoff_utc != _utc_text(self._selected.posterior.information_cutoff):
             raise ValueError("shadow cutoff differs from fixture cutoff")
+        target_gameweek = self._selected.posterior.target_gameweek
+        if self._selected.posterior.source_gameweeks != tuple(range(1, target_gameweek)):
+            raise ValueError("shadow source window is incomplete for the target Gameweek")
+        allowed_gameweek_ids = {
+            f"GW-{target_gameweek}",
+            f"GW-{target_gameweek + 1}",
+            f"GW-{target_gameweek + 2}",
+        }
+        if gameweek_id not in allowed_gameweek_ids or any(
+            gameweek >= target_gameweek for gameweek in self._selected.posterior.source_gameweeks
+        ):
+            raise ValueError("shadow target/source window differs from rolling horizon")
 
         expected: dict[str, tuple[str, Any]] = {}
         for scenario in participation:
