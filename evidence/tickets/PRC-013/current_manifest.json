@@ -6166,9 +6166,9 @@
       "sha256": "20c93668a9b74efa38433b95fc62851f70625b1ba5202aad4069c25677c1bbbe"
     },
     {
-      "bytes": 6629,
+      "bytes": 8311,
       "path": "tests/unit/private_v1/test_a1_03_shadow_comparison.py",
-      "sha256": "b79754ae265b1a8d67a2911106a96a7c78946f5d07542591692231e2eaf23c4f"
+      "sha256": "e2f84b398850d5a2814d5a9e140111392580bf776183a7233819cc42bd2f33f0"
     },
     {
       "bytes": 6339,
@@ -6176,9 +6176,9 @@
       "sha256": "00b978971e9c6bc2c88d82b7ea0fc00526a28287867394d98e33e5e998edfb7b"
     },
     {
-      "bytes": 5753,
+      "bytes": 7277,
       "path": "tests/unit/private_v1/test_a1_shadow_adapter.py",
-      "sha256": "fd8d2c49e8bf6e92b91bf774934859e3db82e41280ae6ec031a083a0b1a60c7d"
+      "sha256": "73599365fa4e4fb2063f6ef7a3c2d2b26ab4812cf1471f0ad55568d5c56eab03"
     },
     {
       "bytes": 6152,

@@ -48,6 +48,16 @@ live snapshot, persistence, fitting or activation was used.
 - Both artifacts canonically reproduce at implementation checkpoint
   `6612c386118a8d5c0b8be3da5c3b3b45210608aa`; timing measurements are
   explicitly non-semantic diagnostics.
+- Final focused matrix: 93 R9B/Stage-9 tests, 221 exact Stage-10/Stage-11 tests,
+  and all 185 private-v1 unit tests pass.
+- Branch coverage across changed production modules is 91%: comparison 95%,
+  adapter 92%, rolling 88%. The rolling file contains substantial inherited
+  paths; all new Stage-11 work-disclosure lines execute in the real solves.
+- Artifact/seal/adapter supplemental run: 10 passed in 239.71 seconds.
+- Frozen-lock installed wheel imports the new contracts from site-packages and
+  `dmf --help` passes outside the source tree. The initial unconstrained wheel
+  environment resolved Typer 0.27.2 and failed; pinning the accepted lock's
+  Typer 0.27.0 restored the required CLI behavior.
 
 ## A1.02-CI-R1
 

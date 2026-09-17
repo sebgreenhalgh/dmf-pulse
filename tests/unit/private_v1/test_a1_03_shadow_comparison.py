@@ -105,11 +105,46 @@ def test_contract_rejects_unsealed_tampering_and_false_control(
     comparison, _execution, _shadow = root_case
     with pytest.raises(ValueError, match="semantic hash"):
         replace(comparison.results[0], prices_sha256="f" * 64)
+    with pytest.raises(ValueError, match="decision signature"):
+        replace(comparison.results[0].decision_signature, captain="tampered-player")
+    with pytest.raises(ValueError, match="worlds must differ"):
+        replace(comparison.pairs[0], left=comparison.pairs[0].right)
+    with pytest.raises(ValueError, match="pairwise comparison semantic hash"):
+        replace(comparison.pairs[0], semantic_sha256="f" * 64)
     with pytest.raises(ValueError, match="controls"):
         replace(
             comparison,
             stage7_identical_across_worlds=False,
             semantic_sha256=comparison.semantic_sha256,
+        )
+    with pytest.raises(ValueError, match="incomplete or noncanonical"):
+        replace(
+            comparison,
+            world_set=("HIGH_SHRINKAGE", "LOW_SHRINKAGE", "CENTRAL_TEMPORARY", "STALE"),
+        )
+    with pytest.raises(ValueError, match="canonical six world pairs"):
+        replace(comparison, pairs=comparison.pairs[:-1])
+    with pytest.raises(ValueError, match="target, history, and horizon"):
+        replace(comparison, horizon_gameweeks=(5, 6, 8))
+    with pytest.raises(ValueError, match="comparison semantic hash"):
+        replace(comparison, semantic_sha256="f" * 64)
+    with pytest.raises(ValueError, match="forty lowercase hex"):
+        build_shadow_comparison_artifact(
+            comparison,
+            generating_implementation_sha="not-a-sha",
+            case="ROOT_SENSITIVE",
+        )
+
+
+def test_invalid_execution_order_blocks_before_any_solve(
+    root_case: tuple[FourWorldShadowComparison, Any, Any],
+) -> None:
+    _comparison, execution, shadow = root_case
+    with pytest.raises(ValueError, match="each comparison world exactly once"):
+        run_four_world_shadow_comparison(
+            execution,
+            shadow,
+            _world_order=("STALE", "STALE", "LOW_SHRINKAGE", "HIGH_SHRINKAGE"),
         )
 
 

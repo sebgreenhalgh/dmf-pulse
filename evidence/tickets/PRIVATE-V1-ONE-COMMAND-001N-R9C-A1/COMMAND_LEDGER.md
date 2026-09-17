@@ -39,6 +39,16 @@ No network or live execution command appears in this ledger.
 - Independently regenerated both artifacts: artifact and comparison semantic
   hashes exact-equal; file bytes intentionally differ only in non-semantic
   diagnostic timings.
+- R9B/Stage-9 focused regression: PASS (93 in 26.75 seconds).
+- Exact Stage-10/Stage-11 focused regression: PASS (221 in 35.26 seconds).
+- Complete `tests/unit/private_v1`: PASS (185 in 879.55 seconds).
+- Changed-module branch coverage acceptance: PASS (91% aggregate; comparison
+  95%, adapter 92%, rolling 88%, with inherited rolling misses disclosed).
+- Full Ruff format/check, strict mypy (293 source files), frozen sync, build,
+  validator, manifest tests (4), secret scan and `git diff --check`: PASS.
+- Clean wheel import and CLI help: PASS outside the source tree with the frozen
+  Typer 0.27.0 lock. An unconstrained install selected Typer 0.27.2 and failed
+  CLI import; that non-frozen dependency result is not represented as a pass.
 
 ## A1.02-CI-R1
 
