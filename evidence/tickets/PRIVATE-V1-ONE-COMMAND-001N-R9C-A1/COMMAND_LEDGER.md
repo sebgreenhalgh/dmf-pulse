@@ -33,6 +33,12 @@ No network or live execution command appears in this ledger.
 - Changed production source Ruff and strict mypy: PASS.
 - No provider, credential, private entry, persistence, training or activation
   command was executed.
+- Implementation checkpoint: `6612c386118a8d5c0b8be3da5c3b3b45210608aa`.
+- Generated root-sensitive and continuation-sensitive artifacts in parallel
+  using the offline repository script and that exact implementation SHA.
+- Independently regenerated both artifacts: artifact and comparison semantic
+  hashes exact-equal; file bytes intentionally differ only in non-semantic
+  diagnostic timings.
 
 ## A1.02-CI-R1
 

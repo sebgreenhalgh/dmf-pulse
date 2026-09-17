@@ -1,0 +1,1526 @@
+{
+  "activation_status": "NOT_PRODUCTION_ACTIVE",
+  "artifact_schema_version": "r9c-a1-synthetic-four-world-comparison-artifact-v1",
+  "artifact_semantic_sha256": "f5ed1f8b64eb0270cca1a08de20bbbef67839de8d4d79d75f72cdab17a568cc1",
+  "candidate_universe_disclosure": "IDENTICAL_CANONICAL_CANDIDATE_AND_LEGAL_ACTION_UNIVERSE_ACROSS_WORLDS",
+  "case": "ROOT_SENSITIVE",
+  "comparison": {
+    "candidate_universe_same_across_worlds": true,
+    "experiment_mode": "SYNTHETIC_OFFLINE_NOT_ACTIVE",
+    "history_gameweeks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "horizon_gameweeks": [
+      5,
+      6,
+      7
+    ],
+    "information_cutoff_utc": "2026-08-21T17:30:00Z",
+    "manager_state_identical_across_worlds": true,
+    "model_input_status": "SHADOW_NOT_MODEL_INPUT",
+    "new_network_requests": 0,
+    "pairs": [
+      {
+        "candidate_screen_equal": true,
+        "captain_changed": false,
+        "classification": "WORLD_SENSITIVE_ROOT_ACTION",
+        "continuation_changed": true,
+        "full_plan_changed": true,
+        "hold_utility_delta": "82",
+        "left": "STALE",
+        "optimal_utility_delta": "127",
+        "right": "CENTRAL_TEMPORARY",
+        "root_action_changed": true,
+        "semantic_sha256": "6ddc6a78e1f68354fdeab9315036d608c7ec43770505fb1ffa375238c96bd0a4",
+        "starting_xi_changed": true,
+        "uplift_delta": "45",
+        "vice_captain_changed": true
+      },
+      {
+        "candidate_screen_equal": true,
+        "captain_changed": false,
+        "classification": "WORLD_SENSITIVE_ROOT_ACTION",
+        "continuation_changed": true,
+        "full_plan_changed": true,
+        "hold_utility_delta": "88",
+        "left": "STALE",
+        "optimal_utility_delta": "137",
+        "right": "LOW_SHRINKAGE",
+        "root_action_changed": true,
+        "semantic_sha256": "6853397e12ea0b0da9abe1574e873cffb6d31ec4662b97eea9e2aa832ead6665",
+        "starting_xi_changed": true,
+        "uplift_delta": "49",
+        "vice_captain_changed": true
+      },
+      {
+        "candidate_screen_equal": true,
+        "captain_changed": false,
+        "classification": "WORLD_SENSITIVE_ROOT_ACTION",
+        "continuation_changed": true,
+        "full_plan_changed": true,
+        "hold_utility_delta": "72",
+        "left": "STALE",
+        "optimal_utility_delta": "111",
+        "right": "HIGH_SHRINKAGE",
+        "root_action_changed": true,
+        "semantic_sha256": "7b4e3e56682aea30a8f64ea9512de802f827d747c21aa3d2fd69b0ddd1682153",
+        "starting_xi_changed": true,
+        "uplift_delta": "39",
+        "vice_captain_changed": true
+      },
+      {
+        "candidate_screen_equal": true,
+        "captain_changed": false,
+        "classification": "UTILITY_ONLY_MOVEMENT",
+        "continuation_changed": false,
+        "full_plan_changed": false,
+        "hold_utility_delta": "6",
+        "left": "CENTRAL_TEMPORARY",
+        "optimal_utility_delta": "10",
+        "right": "LOW_SHRINKAGE",
+        "root_action_changed": false,
+        "semantic_sha256": "c7bf41c5b4b80451d9a2cbd29cf90573e09c079378c7ce6d0950beb924b95c55",
+        "starting_xi_changed": false,
+        "uplift_delta": "4",
+        "vice_captain_changed": false
+      },
+      {
+        "candidate_screen_equal": true,
+        "captain_changed": false,
+        "classification": "UTILITY_ONLY_MOVEMENT",
+        "continuation_changed": false,
+        "full_plan_changed": false,
+        "hold_utility_delta": "-10",
+        "left": "CENTRAL_TEMPORARY",
+        "optimal_utility_delta": "-16",
+        "right": "HIGH_SHRINKAGE",
+        "root_action_changed": false,
+        "semantic_sha256": "0a907bfd4373070a5f1294b705ce77077059dc38caa2c6efa51bbd310229a40f",
+        "starting_xi_changed": false,
+        "uplift_delta": "-6",
+        "vice_captain_changed": false
+      },
+      {
+        "candidate_screen_equal": true,
+        "captain_changed": false,
+        "classification": "UTILITY_ONLY_MOVEMENT",
+        "continuation_changed": false,
+        "full_plan_changed": false,
+        "hold_utility_delta": "-16",
+        "left": "LOW_SHRINKAGE",
+        "optimal_utility_delta": "-26",
+        "right": "HIGH_SHRINKAGE",
+        "root_action_changed": false,
+        "semantic_sha256": "6e5935d2405a8ced559550ee44501f8c129876d2c00d78d75d8629c0338af4c2",
+        "starting_xi_changed": false,
+        "uplift_delta": "-10",
+        "vice_captain_changed": false
+      }
+    ],
+    "persistence_performed": false,
+    "prices_identical_across_worlds": true,
+    "production_activation": false,
+    "results": [
+      {
+        "baseline_expected_horizon_utility": "117",
+        "candidate_policy_sha256": "8ca1933fb1ff6ce24ba88c5be5f400641ea151f80b20627cd519f44ca6212787",
+        "candidate_screen_node_count": 3,
+        "candidate_screen_sha256": "99898f67ebd1473d1e5eec1b264b28db0a338c6a35752d6774ada6a0a436ad05",
+        "decision_signature": {
+          "by_gameweek_action_signatures": [
+            "cd34f3787d77e4c20daddc48f2adf45929000bf5f0efd536be39f24d8bb75979",
+            "f33bafe68e1ff56387ca656959468f3c14da23b7e8994cf16c849476f6f9df21",
+            "471e302bbb41e24b4197707ce191f36fb1b6ee79f1b17edead42a2488e104be4"
+          ],
+          "by_gameweek_hit_points": [
+            0,
+            0,
+            0
+          ],
+          "by_gameweek_transfers": [
+            [],
+            [],
+            [
+              [
+                "ce4ab141-d293-5c59-8131-ee194678761f",
+                "742d26d3-d84d-5971-8cb7-bc69858af624"
+              ]
+            ]
+          ],
+          "captain": "6706a2b4-0840-5c52-b247-cb185c3ed9f3",
+          "optimiser_result_sha256": "3b5e60f033259354021ced281747119c9ccc8320400fe0e3c1adb1d74e567db7",
+          "root_action_signature": "cd34f3787d77e4c20daddc48f2adf45929000bf5f0efd536be39f24d8bb75979",
+          "root_free_transfer_state_sha256": "0b4d344527d019ff2be6d7b4db4209609613d386a4f8d7ebb7e6c96917c70c3a",
+          "root_hit_points": 0,
+          "root_squad_sha256": "51222f5505dbb4d75984a1f49ce92c16f53e9f7d92576d1d32f8d85686cf2e12",
+          "root_transfers": [],
+          "semantic_sha256": "abc0e468d39c6a63c156772ff4f6d28b12eed8e0fdf853701a6adf4e84a7b805",
+          "starting_xi": [
+            "0fea93ed-1ff6-556c-a630-ae408bb021d7",
+            "3d80118b-ae62-53eb-bb85-92d6dfd7e00e",
+            "3f60f3c6-97fc-5ad0-8636-95dafc76fd11",
+            "6706a2b4-0840-5c52-b247-cb185c3ed9f3",
+            "73efc116-08dc-5290-abe9-b9e378c44ee6",
+            "82826d3e-f67e-54aa-8a27-027231d3095f",
+            "a44a50b4-c29d-5893-b7e7-ff74a740d5f5",
+            "b93fb38c-f2da-506c-964e-5f27de4ad5c7",
+            "ddb1ade3-d161-5b36-895d-46d0c27fb7d3",
+            "ef89cf1c-f265-5484-860d-7e5077f697f7",
+            "f8859d5f-7fe4-5364-b961-ee13cbfae051"
+          ],
+          "tactical_plan_sha256s": [
+            "ba9a68575d5c2d3991df7cd6d3c401f1820cde9a3df60845af0e2cf36ebe911c",
+            "9bb28ecdcd87aa67a26ee2d5a39920d1df5d9e4138f263ce724fe0c8a7ac9bd7",
+            "bd88e33d8a346be3b9e020e915880c4629583162f9d23cdd907de6cfe7e66ff9"
+          ],
+          "tactical_selection_signatures": [
+            "5c3a7d128b348b0aa6e333b3adf44b511e22568174e917d2ebff3068f14a46e7",
+            "d67af5e05a7d6931b04dc3b43188c3c480268377ebc5bcc933434299b94b05ea",
+            "f4ed7785bd7799445ad86b82f0ddc7801011cdd6f5692383adac6df3d442a079"
+          ],
+          "vice_captain": "f8859d5f-7fe4-5364-b961-ee13cbfae051"
+        },
+        "expected_uplift": "0",
+        "fixture_order_sha256": "8eb85c72847bb60e3308ca0ce2e4149a26942e8cdc9e346e4ff7280f665cb8fd",
+        "frontier_sha256": "ee80ce50819c21bc0ec51b23f2bdb963b30fc62a2b46126d554aea914632331d",
+        "gain_median": 0,
+        "gain_p10": 0,
+        "gain_p90": 0,
+        "horizon_frontier_present": true,
+        "manager_state_sha256": "1454084daaee7c18b65df224efd8976f0c6e569df1ddee6684fd741cb6e59aaa",
+        "no_transfer_baseline_present": true,
+        "optimiser_request_sha256": "5b7cc5ba0674a0653faa4e15eebc1d85814bf0d2c18dc6a41a8cb9ed4cdaf2f0",
+        "plan_expected_horizon_utility": "117",
+        "prices_sha256": "3f50355a257eb6d24deb22da7751ac12dc5bd8b4b4f2675b8a39a8494869e704",
+        "probability_plan_beats_baseline": "0",
+        "recommended_plan_present": true,
+        "rolling_decision_sha256": "137931b72ac84e0f5a3ed7b38aad522e01ce5c9aa5e1fc432aa30bb47e224b92",
+        "root_randomness_sha256": "b441a9ceb0b942caacab36903481ee3a2f1a75a7f73b686f6043e893f4865ee4",
+        "rules_sha256": "6ea1b77017ae62e81488cc9dc86731b7f25c9ef72e4588ebb5c04650d7ab4a95",
+        "scenario_alignment_sha256_by_gameweek": [
+          [
+            5,
+            "0281fc67729eeb04657d84de74788ef4d9179689866b2c6bd5b86d4291103483"
+          ],
+          [
+            6,
+            "7e3df077eb075c97eb85b8c5d5ab72b392dc1dc400df689d8d14634fc883f43c"
+          ],
+          [
+            7,
+            "6194d52e17cb9ddfee9b9f704f67ed99eb900268c3815cd66ac530f1967ceac4"
+          ]
+        ],
+        "semantic_sha256": "269ebae8eff54f2ad234c24334f8913f93aa3f39afdb26ce5ac69b6e49af6e79",
+        "solver_status": "OPTIMAL",
+        "stage11_work": {
+          "cumulative_action_combinations": 19,
+          "cumulative_legal_actions": 14,
+          "cumulative_state_expansions": 9,
+          "cumulative_tactical_requests": 15,
+          "cumulative_unique_node_squads": 6,
+          "exact_accelerator": "R6_RECURSIVE_EXACT",
+          "memo_hits": 1,
+          "memo_misses": 7,
+          "node_count": 3,
+          "semantic_sha256": "2fe9b8c52cad52681e4c231343bbee6b584d1e90dfc038c279dd59753fc7e77e"
+        },
+        "stage7_context_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "ec2019e7dc2c8065444c9af7d410c7c75edb9e5fe9cc2687e6cb56c9e3a633e3"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "1e896aabb5bd8a83f57784ab31ab0ed3a5769fb553ecedd16d00dc921d211cd0"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "48fd6e4eb7ca6b8ed54e431d926cb748b089711ed8e1f140e7c14bd02420d051"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "ff2c8933551c627c9b0b8e0159876eed5fb10aa82f6b254bac644534c66cfb62"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "6cbf8ad1a131c24f7be5e18b18a714fda0f69f086e5d6aecaadd884ab147cfac"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "7c800daff53f6d97a464b5873511a66b224d3a554251a2f784d8394f696fb1bb"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "70f92c4d021d8acb57d427f9ab19e2f7e617d42b483a708edf2f6d6cd3bcc66a"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "8490dffdd6477151817c32198d21084816caf3ef8376c1a7ac15761090ef0fe5"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "f4c0bf580dab809a191eaf92473e8d29f9530e1dc63585ab6f1040da1c52ff6c"
+              ]
+            ]
+          ]
+        ],
+        "stage8_distribution_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "7a2cc224c1f887a4d7a3f51727ac16d0af93cad8f89d8407b1da64d033841d16"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "7738a32e91704c7db533b61786639b725224e9b98f998dd85e33fb9523efab1f"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "1893b212175e2189fb6aedcf1c0b1ae603aaa7bad98090959d338b7fd1e95f9d"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "9fb0aaf950c91b8bdcc4ceb2c4d075346fd5eabb0eab59994243c1a67466b982"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "656eb87ba9e55f56fbbaaf1b1a8f3e0385a3e8a2d83b88dc454eac278e1c3cdc"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "eee3d4227a139cb1fe6202f0ea518d9726811b53bf97845caf47083e96799f56"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "efda4afb005bd4eac5af5d93ac5cee379a53ec37827112ba98a968bb837155b7"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "1b379ad737a3a452b5b68644ef9d4e4c9a6275b15a0df24fea4e1ea9f8c8fdbe"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "a50c9ef97fa25a6d531c5cf3bf1e41c1439cd8e2027896840dc43e2ae563128e"
+              ]
+            ]
+          ]
+        ],
+        "stage9_fixture_projection_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "532dfe372f70411d1f8eaa822d6e28bf8336c8de68054611bc4f880db6c6aeec"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "c3c20f624a2e0fd62e7f0b2c59c53ab0f777dbcebe2e8e62275eeca422bfa3bc"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "15712ef928f6287e119908ae9257fbc12e51c5f5bd378f94bd278fdccc893841"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "38c52f452576771559a5fb2908794446434af19eb2ae5dfce6c147d2b9c75938"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "f46a65fe4ca300c54de64bffe75afa4f58afe94bdb8b1edd01354fa7970f212f"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "dc6aecedd7c82ae374b4a85dc9e2b559d78ee993c6a3289547f3f7f304ecc68d"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "5abbe758e3f61ef8e0425f755c8027292b716d0b780b7dceaf2c3c39bc664a7c"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "5535d8bac55fd5f07453df518f3ac2b55aca1fbbe57146e48329daa62474beed"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "22e2abd8a201ba82a4658f64a682524e923dba23137f1c0f6a381ce64a8cfb41"
+              ]
+            ]
+          ]
+        ],
+        "stage9_gameweek_projection_sha256_by_gameweek": [
+          [
+            5,
+            "5ed47818cecafdae5675facdda398666d1eebad9d7d89f397f192f31271f4e39"
+          ],
+          [
+            6,
+            "faf88eb56fb2684466fe98b6cdb255e20c9bcbc2d0ec182d58590c44524f7270"
+          ],
+          [
+            7,
+            "62764b448955d9b330f31a546518e9b129166e6abadccbd4d693bddc85f2b92e"
+          ]
+        ],
+        "terminal_policy_sha256": "57bcb218ec1cd946b331a4de8d90c664f13c220d468d484e94d45fabbcefb27d",
+        "timing_ms_by_stage": [
+          [
+            "stage8_9_gameweek_5",
+            "3686.205600039102"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_5",
+            "432.02710000332445"
+          ],
+          [
+            "stage8_9_gameweek_6",
+            "1043.1884999852628"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_6",
+            "308.3997000940144"
+          ],
+          [
+            "stage8_9_gameweek_7",
+            "1051.0213000234216"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_7",
+            "316.96339999325573"
+          ],
+          [
+            "one_gameweek_comparator",
+            "50.32709997612983"
+          ],
+          [
+            "action_generation",
+            "10.823899996466935"
+          ],
+          [
+            "tactical_batch_evaluation",
+            "0.027699978090822697"
+          ],
+          [
+            "stage11_policy_solving",
+            "116.5213999338448"
+          ],
+          [
+            "report_and_comparator",
+            "102.54830005578697"
+          ]
+        ],
+        "work_budget_semantics_sha256": "67cf6f12ebf7a4bc187db9424cdb618b3e932244b92440157058b5c884870166",
+        "world": "STALE"
+      },
+      {
+        "baseline_expected_horizon_utility": "199",
+        "candidate_policy_sha256": "8ca1933fb1ff6ce24ba88c5be5f400641ea151f80b20627cd519f44ca6212787",
+        "candidate_screen_node_count": 3,
+        "candidate_screen_sha256": "99898f67ebd1473d1e5eec1b264b28db0a338c6a35752d6774ada6a0a436ad05",
+        "decision_signature": {
+          "by_gameweek_action_signatures": [
+            "73d866af806ee96181354fe7a8ba38c7bcc4a370cad3f883f44d9fac2efc3920",
+            "dc189c010f7366e8fe4501fb3929c27264acd02c1d3a50728ac086948e185b28",
+            "c2c8097d409346b0dddaa9036c5d10ecb22bb00bb5cfc575c6a3d5a79034a43c"
+          ],
+          "by_gameweek_hit_points": [
+            0,
+            0,
+            0
+          ],
+          "by_gameweek_transfers": [
+            [
+              [
+                "ce4ab141-d293-5c59-8131-ee194678761f",
+                "742d26d3-d84d-5971-8cb7-bc69858af624"
+              ]
+            ],
+            [],
+            []
+          ],
+          "captain": "6706a2b4-0840-5c52-b247-cb185c3ed9f3",
+          "optimiser_result_sha256": "fd475e0f4a27cb6cc6f4168196e002b9277e2216b7e5e0529cfdee4e977c4509",
+          "root_action_signature": "73d866af806ee96181354fe7a8ba38c7bcc4a370cad3f883f44d9fac2efc3920",
+          "root_free_transfer_state_sha256": "c58607a944d3b4f532fa07e697362231150dfcce8da81a1721510b723d225117",
+          "root_hit_points": 0,
+          "root_squad_sha256": "e8ff61d6efd9fb91baeead4c575c2bc0aa2476bc04e8a5e288203bfca6bdcd80",
+          "root_transfers": [
+            [
+              "ce4ab141-d293-5c59-8131-ee194678761f",
+              "742d26d3-d84d-5971-8cb7-bc69858af624"
+            ]
+          ],
+          "semantic_sha256": "51acf40e6ec652d60b100f52cd754c8cbf0883c92a53708aed5b5f7df0677601",
+          "starting_xi": [
+            "0fea93ed-1ff6-556c-a630-ae408bb021d7",
+            "3d80118b-ae62-53eb-bb85-92d6dfd7e00e",
+            "3f60f3c6-97fc-5ad0-8636-95dafc76fd11",
+            "6706a2b4-0840-5c52-b247-cb185c3ed9f3",
+            "73efc116-08dc-5290-abe9-b9e378c44ee6",
+            "742d26d3-d84d-5971-8cb7-bc69858af624",
+            "82826d3e-f67e-54aa-8a27-027231d3095f",
+            "a44a50b4-c29d-5893-b7e7-ff74a740d5f5",
+            "ddb1ade3-d161-5b36-895d-46d0c27fb7d3",
+            "ef89cf1c-f265-5484-860d-7e5077f697f7",
+            "f8859d5f-7fe4-5364-b961-ee13cbfae051"
+          ],
+          "tactical_plan_sha256s": [
+            "6e8c185389becf38df4f89d096881a6af4ab17c379dec39b9faea27f1747a5a6",
+            "076e1cf31df207d3c055134f3b1746b0d3e1ae766d0cbc9b9b7396a2b94518e2",
+            "017173f94e3d9843716739cb066850ed96cc508e5d82cea3cd122c4ded339d15"
+          ],
+          "tactical_selection_signatures": [
+            "8da4ae54ba3740669b3399b05325630ae44f2f8060cc4aa4a6b3f7a6660f85f1",
+            "9b2841426d243e663d89a50d727f1972ae77ed3fc65927ff97ec5ed17dac6854",
+            "2e9611f6e615ec32c9aac3d2c443efa026d00f745e89fefeeeb802b9657eff63"
+          ],
+          "vice_captain": "742d26d3-d84d-5971-8cb7-bc69858af624"
+        },
+        "expected_uplift": "45",
+        "fixture_order_sha256": "8eb85c72847bb60e3308ca0ce2e4149a26942e8cdc9e346e4ff7280f665cb8fd",
+        "frontier_sha256": "cc32606d38afdf132ff0cfcd338ec4aea9ac52e607cc5d198a4008cddf08a1df",
+        "gain_median": 45,
+        "gain_p10": 45,
+        "gain_p90": 45,
+        "horizon_frontier_present": true,
+        "manager_state_sha256": "1454084daaee7c18b65df224efd8976f0c6e569df1ddee6684fd741cb6e59aaa",
+        "no_transfer_baseline_present": true,
+        "optimiser_request_sha256": "6b21ed094591709358236b560e1044f17cea9d2bf77ce431b28c04d85d8003f9",
+        "plan_expected_horizon_utility": "244",
+        "prices_sha256": "3f50355a257eb6d24deb22da7751ac12dc5bd8b4b4f2675b8a39a8494869e704",
+        "probability_plan_beats_baseline": "1",
+        "recommended_plan_present": true,
+        "rolling_decision_sha256": "3b3502f2867b2899d5ba8358fb52107d7ac1596cef726a3db1c280ee304b7950",
+        "root_randomness_sha256": "b441a9ceb0b942caacab36903481ee3a2f1a75a7f73b686f6043e893f4865ee4",
+        "rules_sha256": "6ea1b77017ae62e81488cc9dc86731b7f25c9ef72e4588ebb5c04650d7ab4a95",
+        "scenario_alignment_sha256_by_gameweek": [
+          [
+            5,
+            "0281fc67729eeb04657d84de74788ef4d9179689866b2c6bd5b86d4291103483"
+          ],
+          [
+            6,
+            "7e3df077eb075c97eb85b8c5d5ab72b392dc1dc400df689d8d14634fc883f43c"
+          ],
+          [
+            7,
+            "6194d52e17cb9ddfee9b9f704f67ed99eb900268c3815cd66ac530f1967ceac4"
+          ]
+        ],
+        "semantic_sha256": "b1865bef0d5bcc289c541f51721e279782e5b6bb471cb2e2d28538dfaf6ef08b",
+        "solver_status": "OPTIMAL",
+        "stage11_work": {
+          "cumulative_action_combinations": 19,
+          "cumulative_legal_actions": 14,
+          "cumulative_state_expansions": 9,
+          "cumulative_tactical_requests": 15,
+          "cumulative_unique_node_squads": 6,
+          "exact_accelerator": "R6_RECURSIVE_EXACT",
+          "memo_hits": 1,
+          "memo_misses": 7,
+          "node_count": 3,
+          "semantic_sha256": "2fe9b8c52cad52681e4c231343bbee6b584d1e90dfc038c279dd59753fc7e77e"
+        },
+        "stage7_context_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "ec2019e7dc2c8065444c9af7d410c7c75edb9e5fe9cc2687e6cb56c9e3a633e3"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "1e896aabb5bd8a83f57784ab31ab0ed3a5769fb553ecedd16d00dc921d211cd0"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "48fd6e4eb7ca6b8ed54e431d926cb748b089711ed8e1f140e7c14bd02420d051"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "ff2c8933551c627c9b0b8e0159876eed5fb10aa82f6b254bac644534c66cfb62"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "6cbf8ad1a131c24f7be5e18b18a714fda0f69f086e5d6aecaadd884ab147cfac"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "7c800daff53f6d97a464b5873511a66b224d3a554251a2f784d8394f696fb1bb"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "70f92c4d021d8acb57d427f9ab19e2f7e617d42b483a708edf2f6d6cd3bcc66a"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "8490dffdd6477151817c32198d21084816caf3ef8376c1a7ac15761090ef0fe5"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "f4c0bf580dab809a191eaf92473e8d29f9530e1dc63585ab6f1040da1c52ff6c"
+              ]
+            ]
+          ]
+        ],
+        "stage8_distribution_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "7a2cc224c1f887a4d7a3f51727ac16d0af93cad8f89d8407b1da64d033841d16"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "7738a32e91704c7db533b61786639b725224e9b98f998dd85e33fb9523efab1f"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "1893b212175e2189fb6aedcf1c0b1ae603aaa7bad98090959d338b7fd1e95f9d"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "9fb0aaf950c91b8bdcc4ceb2c4d075346fd5eabb0eab59994243c1a67466b982"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "656eb87ba9e55f56fbbaaf1b1a8f3e0385a3e8a2d83b88dc454eac278e1c3cdc"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "eee3d4227a139cb1fe6202f0ea518d9726811b53bf97845caf47083e96799f56"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "efda4afb005bd4eac5af5d93ac5cee379a53ec37827112ba98a968bb837155b7"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "1b379ad737a3a452b5b68644ef9d4e4c9a6275b15a0df24fea4e1ea9f8c8fdbe"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "a50c9ef97fa25a6d531c5cf3bf1e41c1439cd8e2027896840dc43e2ae563128e"
+              ]
+            ]
+          ]
+        ],
+        "stage9_fixture_projection_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "d1ae73ef8b85005b80ccef62ca5601de5cb89dfb2c682e93c7c78b4449b14161"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "44ed368966521f55234117742ee67b93f7bc27fa1ae56dbb317b702974abe376"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "a3786cdbd14d20e26efb6d581ce817257820e27b8f3fc3614c8bf0f5d27c86dd"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "0d1ac35b1af4c225fdd7b8880f6d6a6a3cc01dd73701855157d901262779c15a"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "5d40637e6c01d95a7b3448bb6b7146bf6df56ee0f70282cfaf5c01af38169650"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "f3df4c72c69f129fc7c7be9cfc2b704e881dc903055c383f10d5ffc7e7bc1598"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "8ca81ba02eeec3bb16cbe49fc013b171b7965ddfda631b0b3c6fa9a14c451f6c"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "cca886eeb7aef08bbf0bdbc620630b0de95e90c4ad1400f33588ad48763c41f0"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "f55f1bad20bbbabd5bb45ab148d8fa650cccae03bba3680f76b0cda74b742867"
+              ]
+            ]
+          ]
+        ],
+        "stage9_gameweek_projection_sha256_by_gameweek": [
+          [
+            5,
+            "d5436f678a429752ce43e42bcfc9e581cbada00a55d9a9d80c6c6ba8160b02f0"
+          ],
+          [
+            6,
+            "40e5fb2071e7b9ed2fc9616974675953def65f13baf944ebafc7f7a24e4a5ec5"
+          ],
+          [
+            7,
+            "26043c0d7716eb8d40cce9598bdd6a200e899b3456ee411575f37a94157da9a8"
+          ]
+        ],
+        "terminal_policy_sha256": "57bcb218ec1cd946b331a4de8d90c664f13c220d468d484e94d45fabbcefb27d",
+        "timing_ms_by_stage": [
+          [
+            "stage8_9_gameweek_5",
+            "3557.3940998874605"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_5",
+            "406.7261000163853"
+          ],
+          [
+            "stage8_9_gameweek_6",
+            "973.3857000246644"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_6",
+            "421.2591000832617"
+          ],
+          [
+            "stage8_9_gameweek_7",
+            "1256.7976999562234"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_7",
+            "376.46840000525117"
+          ],
+          [
+            "one_gameweek_comparator",
+            "48.200099961832166"
+          ],
+          [
+            "action_generation",
+            "8.442900027148426"
+          ],
+          [
+            "tactical_batch_evaluation",
+            "0.02459995448589325"
+          ],
+          [
+            "stage11_policy_solving",
+            "109.85840007197112"
+          ],
+          [
+            "report_and_comparator",
+            "106.48889990989119"
+          ]
+        ],
+        "work_budget_semantics_sha256": "67cf6f12ebf7a4bc187db9424cdb618b3e932244b92440157058b5c884870166",
+        "world": "CENTRAL_TEMPORARY"
+      },
+      {
+        "baseline_expected_horizon_utility": "205",
+        "candidate_policy_sha256": "8ca1933fb1ff6ce24ba88c5be5f400641ea151f80b20627cd519f44ca6212787",
+        "candidate_screen_node_count": 3,
+        "candidate_screen_sha256": "99898f67ebd1473d1e5eec1b264b28db0a338c6a35752d6774ada6a0a436ad05",
+        "decision_signature": {
+          "by_gameweek_action_signatures": [
+            "73d866af806ee96181354fe7a8ba38c7bcc4a370cad3f883f44d9fac2efc3920",
+            "dc189c010f7366e8fe4501fb3929c27264acd02c1d3a50728ac086948e185b28",
+            "c2c8097d409346b0dddaa9036c5d10ecb22bb00bb5cfc575c6a3d5a79034a43c"
+          ],
+          "by_gameweek_hit_points": [
+            0,
+            0,
+            0
+          ],
+          "by_gameweek_transfers": [
+            [
+              [
+                "ce4ab141-d293-5c59-8131-ee194678761f",
+                "742d26d3-d84d-5971-8cb7-bc69858af624"
+              ]
+            ],
+            [],
+            []
+          ],
+          "captain": "6706a2b4-0840-5c52-b247-cb185c3ed9f3",
+          "optimiser_result_sha256": "a8a83b88c009483ca211cd95a3ad7c47cc27baf8ffff45a1dbbff577543fabb3",
+          "root_action_signature": "73d866af806ee96181354fe7a8ba38c7bcc4a370cad3f883f44d9fac2efc3920",
+          "root_free_transfer_state_sha256": "c58607a944d3b4f532fa07e697362231150dfcce8da81a1721510b723d225117",
+          "root_hit_points": 0,
+          "root_squad_sha256": "e8ff61d6efd9fb91baeead4c575c2bc0aa2476bc04e8a5e288203bfca6bdcd80",
+          "root_transfers": [
+            [
+              "ce4ab141-d293-5c59-8131-ee194678761f",
+              "742d26d3-d84d-5971-8cb7-bc69858af624"
+            ]
+          ],
+          "semantic_sha256": "e6d01b406e823a484e54eae1f43c24797ab4b735ff60b1d52c25e0dda3cdfe0b",
+          "starting_xi": [
+            "0fea93ed-1ff6-556c-a630-ae408bb021d7",
+            "3d80118b-ae62-53eb-bb85-92d6dfd7e00e",
+            "3f60f3c6-97fc-5ad0-8636-95dafc76fd11",
+            "6706a2b4-0840-5c52-b247-cb185c3ed9f3",
+            "73efc116-08dc-5290-abe9-b9e378c44ee6",
+            "742d26d3-d84d-5971-8cb7-bc69858af624",
+            "82826d3e-f67e-54aa-8a27-027231d3095f",
+            "a44a50b4-c29d-5893-b7e7-ff74a740d5f5",
+            "ddb1ade3-d161-5b36-895d-46d0c27fb7d3",
+            "ef89cf1c-f265-5484-860d-7e5077f697f7",
+            "f8859d5f-7fe4-5364-b961-ee13cbfae051"
+          ],
+          "tactical_plan_sha256s": [
+            "e04b34ecc0ad0668b2f93e7795f9f3c68a6d59c884b0b8ef72717a2f6022db10",
+            "c895687c292bc94caa3707ea00b1957bacf31700dd44e4c79c914b5ee38115f8",
+            "5601b3c54aa60069c859169cb6a3ef4b0bd928a8bd26edf8a17f470569c1186b"
+          ],
+          "tactical_selection_signatures": [
+            "8da4ae54ba3740669b3399b05325630ae44f2f8060cc4aa4a6b3f7a6660f85f1",
+            "9b2841426d243e663d89a50d727f1972ae77ed3fc65927ff97ec5ed17dac6854",
+            "2e9611f6e615ec32c9aac3d2c443efa026d00f745e89fefeeeb802b9657eff63"
+          ],
+          "vice_captain": "742d26d3-d84d-5971-8cb7-bc69858af624"
+        },
+        "expected_uplift": "49",
+        "fixture_order_sha256": "8eb85c72847bb60e3308ca0ce2e4149a26942e8cdc9e346e4ff7280f665cb8fd",
+        "frontier_sha256": "ffe883ccbf90007c81278c5b0b1582450ce110ebd674717781e8c409e32cbd3b",
+        "gain_median": 49,
+        "gain_p10": 49,
+        "gain_p90": 49,
+        "horizon_frontier_present": true,
+        "manager_state_sha256": "1454084daaee7c18b65df224efd8976f0c6e569df1ddee6684fd741cb6e59aaa",
+        "no_transfer_baseline_present": true,
+        "optimiser_request_sha256": "8b128768b94af11d5519d6e21b67d93a87b688aa8ee87d6c254209fbed446261",
+        "plan_expected_horizon_utility": "254",
+        "prices_sha256": "3f50355a257eb6d24deb22da7751ac12dc5bd8b4b4f2675b8a39a8494869e704",
+        "probability_plan_beats_baseline": "1",
+        "recommended_plan_present": true,
+        "rolling_decision_sha256": "b3d46ee512b0876320ed44072f54b75694e4730971ec268ea1a292e1da0ff5f0",
+        "root_randomness_sha256": "b441a9ceb0b942caacab36903481ee3a2f1a75a7f73b686f6043e893f4865ee4",
+        "rules_sha256": "6ea1b77017ae62e81488cc9dc86731b7f25c9ef72e4588ebb5c04650d7ab4a95",
+        "scenario_alignment_sha256_by_gameweek": [
+          [
+            5,
+            "0281fc67729eeb04657d84de74788ef4d9179689866b2c6bd5b86d4291103483"
+          ],
+          [
+            6,
+            "7e3df077eb075c97eb85b8c5d5ab72b392dc1dc400df689d8d14634fc883f43c"
+          ],
+          [
+            7,
+            "6194d52e17cb9ddfee9b9f704f67ed99eb900268c3815cd66ac530f1967ceac4"
+          ]
+        ],
+        "semantic_sha256": "3b94fe085b9073a4f1afac1c11a86ac966d5c79c991c6ce77b29b95769cb0d3d",
+        "solver_status": "OPTIMAL",
+        "stage11_work": {
+          "cumulative_action_combinations": 19,
+          "cumulative_legal_actions": 14,
+          "cumulative_state_expansions": 9,
+          "cumulative_tactical_requests": 15,
+          "cumulative_unique_node_squads": 6,
+          "exact_accelerator": "R6_RECURSIVE_EXACT",
+          "memo_hits": 1,
+          "memo_misses": 7,
+          "node_count": 3,
+          "semantic_sha256": "2fe9b8c52cad52681e4c231343bbee6b584d1e90dfc038c279dd59753fc7e77e"
+        },
+        "stage7_context_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "ec2019e7dc2c8065444c9af7d410c7c75edb9e5fe9cc2687e6cb56c9e3a633e3"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "1e896aabb5bd8a83f57784ab31ab0ed3a5769fb553ecedd16d00dc921d211cd0"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "48fd6e4eb7ca6b8ed54e431d926cb748b089711ed8e1f140e7c14bd02420d051"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "ff2c8933551c627c9b0b8e0159876eed5fb10aa82f6b254bac644534c66cfb62"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "6cbf8ad1a131c24f7be5e18b18a714fda0f69f086e5d6aecaadd884ab147cfac"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "7c800daff53f6d97a464b5873511a66b224d3a554251a2f784d8394f696fb1bb"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "70f92c4d021d8acb57d427f9ab19e2f7e617d42b483a708edf2f6d6cd3bcc66a"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "8490dffdd6477151817c32198d21084816caf3ef8376c1a7ac15761090ef0fe5"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "f4c0bf580dab809a191eaf92473e8d29f9530e1dc63585ab6f1040da1c52ff6c"
+              ]
+            ]
+          ]
+        ],
+        "stage8_distribution_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "7a2cc224c1f887a4d7a3f51727ac16d0af93cad8f89d8407b1da64d033841d16"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "7738a32e91704c7db533b61786639b725224e9b98f998dd85e33fb9523efab1f"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "1893b212175e2189fb6aedcf1c0b1ae603aaa7bad98090959d338b7fd1e95f9d"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "9fb0aaf950c91b8bdcc4ceb2c4d075346fd5eabb0eab59994243c1a67466b982"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "656eb87ba9e55f56fbbaaf1b1a8f3e0385a3e8a2d83b88dc454eac278e1c3cdc"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "eee3d4227a139cb1fe6202f0ea518d9726811b53bf97845caf47083e96799f56"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "efda4afb005bd4eac5af5d93ac5cee379a53ec37827112ba98a968bb837155b7"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "1b379ad737a3a452b5b68644ef9d4e4c9a6275b15a0df24fea4e1ea9f8c8fdbe"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "a50c9ef97fa25a6d531c5cf3bf1e41c1439cd8e2027896840dc43e2ae563128e"
+              ]
+            ]
+          ]
+        ],
+        "stage9_fixture_projection_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "bb6580559b9091134e3557f3272eb4b8f178ecbd06aaa05acbc6c5455e9b73d7"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "cb4e4cc0c64b98627d77fe9820de78e7c9927e14aa417e333a7d0b7c7eee95f0"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "f4d6f0feb45aa848911b79751309350605281570c50cccbde467b6434efcba2d"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "0aec09fd242a79b0f1d5bf50dd5185a1eb6c09fa56253ca425aa2ef661f0872b"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "283161c752ada9d45bebbea9e260830cb6686e1b517249042ba088442cf08e44"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "d3a3abfe5ca812bc74448add8576aee0140b3ffc686539f86ce1eb50b3094a79"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "8d943ec818f80389351f2607ec0d1313f62cdd93241194c662e8425b3df07e28"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "413f7ed9f4bdd74381b687383958875dbd762fdd2088212dea185c296be821e9"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "2efe923aa92d961b6cdc07f03a6cc914fc4f6a66daded8b4ccb1eda48ecb8eb8"
+              ]
+            ]
+          ]
+        ],
+        "stage9_gameweek_projection_sha256_by_gameweek": [
+          [
+            5,
+            "63e0005e0d73726b5c602c0d14cbba1d76809224889595c48e304b5a9e22499c"
+          ],
+          [
+            6,
+            "805aa704eddfc185fa66c07c09a01ec4f07f71ba1d6441a7a4b7b5aac33e16c7"
+          ],
+          [
+            7,
+            "c89714aa05de9f8699f39387203c46cf18afbc1b69da88ba6e82c5bbb806d2f5"
+          ]
+        ],
+        "terminal_policy_sha256": "57bcb218ec1cd946b331a4de8d90c664f13c220d468d484e94d45fabbcefb27d",
+        "timing_ms_by_stage": [
+          [
+            "stage8_9_gameweek_5",
+            "3895.289700012654"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_5",
+            "366.08810001052916"
+          ],
+          [
+            "stage8_9_gameweek_6",
+            "1180.2086000097916"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_6",
+            "424.17379992548376"
+          ],
+          [
+            "stage8_9_gameweek_7",
+            "2235.1286999182776"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_7",
+            "717.4595999531448"
+          ],
+          [
+            "one_gameweek_comparator",
+            "97.7325999410823"
+          ],
+          [
+            "action_generation",
+            "21.30400005262345"
+          ],
+          [
+            "tactical_batch_evaluation",
+            "0.05679996684193611"
+          ],
+          [
+            "stage11_policy_solving",
+            "396.73510007560253"
+          ],
+          [
+            "report_and_comparator",
+            "215.6819999217987"
+          ]
+        ],
+        "work_budget_semantics_sha256": "67cf6f12ebf7a4bc187db9424cdb618b3e932244b92440157058b5c884870166",
+        "world": "LOW_SHRINKAGE"
+      },
+      {
+        "baseline_expected_horizon_utility": "189",
+        "candidate_policy_sha256": "8ca1933fb1ff6ce24ba88c5be5f400641ea151f80b20627cd519f44ca6212787",
+        "candidate_screen_node_count": 3,
+        "candidate_screen_sha256": "99898f67ebd1473d1e5eec1b264b28db0a338c6a35752d6774ada6a0a436ad05",
+        "decision_signature": {
+          "by_gameweek_action_signatures": [
+            "73d866af806ee96181354fe7a8ba38c7bcc4a370cad3f883f44d9fac2efc3920",
+            "dc189c010f7366e8fe4501fb3929c27264acd02c1d3a50728ac086948e185b28",
+            "c2c8097d409346b0dddaa9036c5d10ecb22bb00bb5cfc575c6a3d5a79034a43c"
+          ],
+          "by_gameweek_hit_points": [
+            0,
+            0,
+            0
+          ],
+          "by_gameweek_transfers": [
+            [
+              [
+                "ce4ab141-d293-5c59-8131-ee194678761f",
+                "742d26d3-d84d-5971-8cb7-bc69858af624"
+              ]
+            ],
+            [],
+            []
+          ],
+          "captain": "6706a2b4-0840-5c52-b247-cb185c3ed9f3",
+          "optimiser_result_sha256": "d6f6850af4ad40c059bd8d542eb2c32d414a0a709893c97f0f350261ca7f26ca",
+          "root_action_signature": "73d866af806ee96181354fe7a8ba38c7bcc4a370cad3f883f44d9fac2efc3920",
+          "root_free_transfer_state_sha256": "c58607a944d3b4f532fa07e697362231150dfcce8da81a1721510b723d225117",
+          "root_hit_points": 0,
+          "root_squad_sha256": "e8ff61d6efd9fb91baeead4c575c2bc0aa2476bc04e8a5e288203bfca6bdcd80",
+          "root_transfers": [
+            [
+              "ce4ab141-d293-5c59-8131-ee194678761f",
+              "742d26d3-d84d-5971-8cb7-bc69858af624"
+            ]
+          ],
+          "semantic_sha256": "fda8913db5a0555b0aada0a47f14cca41e70ff082a54070ef160a0c0f0456d84",
+          "starting_xi": [
+            "0fea93ed-1ff6-556c-a630-ae408bb021d7",
+            "3d80118b-ae62-53eb-bb85-92d6dfd7e00e",
+            "3f60f3c6-97fc-5ad0-8636-95dafc76fd11",
+            "6706a2b4-0840-5c52-b247-cb185c3ed9f3",
+            "73efc116-08dc-5290-abe9-b9e378c44ee6",
+            "742d26d3-d84d-5971-8cb7-bc69858af624",
+            "82826d3e-f67e-54aa-8a27-027231d3095f",
+            "a44a50b4-c29d-5893-b7e7-ff74a740d5f5",
+            "ddb1ade3-d161-5b36-895d-46d0c27fb7d3",
+            "ef89cf1c-f265-5484-860d-7e5077f697f7",
+            "f8859d5f-7fe4-5364-b961-ee13cbfae051"
+          ],
+          "tactical_plan_sha256s": [
+            "03abfc966e227c518c404d18690f515b06fcf2044b9c2fe2998663d5b86d1d28",
+            "3d62cce128a2e3b0321f490e2c2d48b746444c65d20f7170d20152f08a7d2ef0",
+            "1e3664420e95a6f6351794db9a45131476adeef06c81fc0f6a61867bc2253a3e"
+          ],
+          "tactical_selection_signatures": [
+            "8da4ae54ba3740669b3399b05325630ae44f2f8060cc4aa4a6b3f7a6660f85f1",
+            "9b2841426d243e663d89a50d727f1972ae77ed3fc65927ff97ec5ed17dac6854",
+            "2e9611f6e615ec32c9aac3d2c443efa026d00f745e89fefeeeb802b9657eff63"
+          ],
+          "vice_captain": "742d26d3-d84d-5971-8cb7-bc69858af624"
+        },
+        "expected_uplift": "39",
+        "fixture_order_sha256": "8eb85c72847bb60e3308ca0ce2e4149a26942e8cdc9e346e4ff7280f665cb8fd",
+        "frontier_sha256": "979e45be7de46b3d75929cfa203acbb9105af975af976c666c4a5ecbbfd3ad92",
+        "gain_median": 39,
+        "gain_p10": 39,
+        "gain_p90": 39,
+        "horizon_frontier_present": true,
+        "manager_state_sha256": "1454084daaee7c18b65df224efd8976f0c6e569df1ddee6684fd741cb6e59aaa",
+        "no_transfer_baseline_present": true,
+        "optimiser_request_sha256": "770d181008c38f05dc826fb34e1f2c2225b70ecd575ca04c8cc0cf0471c73d66",
+        "plan_expected_horizon_utility": "228",
+        "prices_sha256": "3f50355a257eb6d24deb22da7751ac12dc5bd8b4b4f2675b8a39a8494869e704",
+        "probability_plan_beats_baseline": "1",
+        "recommended_plan_present": true,
+        "rolling_decision_sha256": "76b98d3a9527591ddcd5fe6f88475fa1b1f21c1660f0c658bf853e6b6b6b78ff",
+        "root_randomness_sha256": "b441a9ceb0b942caacab36903481ee3a2f1a75a7f73b686f6043e893f4865ee4",
+        "rules_sha256": "6ea1b77017ae62e81488cc9dc86731b7f25c9ef72e4588ebb5c04650d7ab4a95",
+        "scenario_alignment_sha256_by_gameweek": [
+          [
+            5,
+            "0281fc67729eeb04657d84de74788ef4d9179689866b2c6bd5b86d4291103483"
+          ],
+          [
+            6,
+            "7e3df077eb075c97eb85b8c5d5ab72b392dc1dc400df689d8d14634fc883f43c"
+          ],
+          [
+            7,
+            "6194d52e17cb9ddfee9b9f704f67ed99eb900268c3815cd66ac530f1967ceac4"
+          ]
+        ],
+        "semantic_sha256": "371a472cb32d423e9f1fc09416fe8142dd30ba76db5cdc9f46a6e764911888ed",
+        "solver_status": "OPTIMAL",
+        "stage11_work": {
+          "cumulative_action_combinations": 19,
+          "cumulative_legal_actions": 14,
+          "cumulative_state_expansions": 9,
+          "cumulative_tactical_requests": 15,
+          "cumulative_unique_node_squads": 6,
+          "exact_accelerator": "R6_RECURSIVE_EXACT",
+          "memo_hits": 1,
+          "memo_misses": 7,
+          "node_count": 3,
+          "semantic_sha256": "2fe9b8c52cad52681e4c231343bbee6b584d1e90dfc038c279dd59753fc7e77e"
+        },
+        "stage7_context_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "ec2019e7dc2c8065444c9af7d410c7c75edb9e5fe9cc2687e6cb56c9e3a633e3"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "1e896aabb5bd8a83f57784ab31ab0ed3a5769fb553ecedd16d00dc921d211cd0"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "48fd6e4eb7ca6b8ed54e431d926cb748b089711ed8e1f140e7c14bd02420d051"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "ff2c8933551c627c9b0b8e0159876eed5fb10aa82f6b254bac644534c66cfb62"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "6cbf8ad1a131c24f7be5e18b18a714fda0f69f086e5d6aecaadd884ab147cfac"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "7c800daff53f6d97a464b5873511a66b224d3a554251a2f784d8394f696fb1bb"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "70f92c4d021d8acb57d427f9ab19e2f7e617d42b483a708edf2f6d6cd3bcc66a"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "8490dffdd6477151817c32198d21084816caf3ef8376c1a7ac15761090ef0fe5"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "f4c0bf580dab809a191eaf92473e8d29f9530e1dc63585ab6f1040da1c52ff6c"
+              ]
+            ]
+          ]
+        ],
+        "stage8_distribution_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "7a2cc224c1f887a4d7a3f51727ac16d0af93cad8f89d8407b1da64d033841d16"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "7738a32e91704c7db533b61786639b725224e9b98f998dd85e33fb9523efab1f"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "1893b212175e2189fb6aedcf1c0b1ae603aaa7bad98090959d338b7fd1e95f9d"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "9fb0aaf950c91b8bdcc4ceb2c4d075346fd5eabb0eab59994243c1a67466b982"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "656eb87ba9e55f56fbbaaf1b1a8f3e0385a3e8a2d83b88dc454eac278e1c3cdc"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "eee3d4227a139cb1fe6202f0ea518d9726811b53bf97845caf47083e96799f56"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "efda4afb005bd4eac5af5d93ac5cee379a53ec37827112ba98a968bb837155b7"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "1b379ad737a3a452b5b68644ef9d4e4c9a6275b15a0df24fea4e1ea9f8c8fdbe"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "a50c9ef97fa25a6d531c5cf3bf1e41c1439cd8e2027896840dc43e2ae563128e"
+              ]
+            ]
+          ]
+        ],
+        "stage9_fixture_projection_sha256_by_gameweek": [
+          [
+            5,
+            [
+              [
+                "00000000-0000-0000-0000-000000009101",
+                "96fb4eebe1a88adab57152cb2973cfb217068a3555c48fcca0e3576e57ea645a"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009102",
+                "27a6c01f9f39f094fead1fa56f08df3a1b30be317608b2b7203d97251bc8493d"
+              ],
+              [
+                "00000000-0000-0000-0000-000000009103",
+                "38a87fa82e5aff31050114845e001862efadfcdb06aac80809c8688e5e6619ed"
+              ]
+            ]
+          ],
+          [
+            6,
+            [
+              [
+                "500c1ebc-3f7e-51ce-88b4-aa15749731b6",
+                "59ccdfb60e7b9f11f0c9e63e9746172d432ba71c4d52497ae5175fa6f85f735a"
+              ],
+              [
+                "5f63854d-bf20-56bc-964f-151593009103",
+                "e04d90e801d4fc7d03a910e931d34b1ab286ad091b3bfe78f342d1e2095f9044"
+              ],
+              [
+                "a505320c-b783-56b9-af74-6560653e386a",
+                "bb88370b62f65e5ed14c239e64c0dd24cd5fdb5f7758205b90ace3c70b5e1b16"
+              ]
+            ]
+          ],
+          [
+            7,
+            [
+              [
+                "1334d71f-0d3a-5265-b1d9-64d3a84a77de",
+                "36fac1a6649fe5ae4ec3a70e806ebe44fdd4de9a9b3291b1d74d410539e6d7b4"
+              ],
+              [
+                "495b27c2-3ab6-54ae-8f7d-d104556c0736",
+                "b26e9c217f2b64067c1a79c467cc50cf39a687f583dc75c4bbdb9fe933d02f48"
+              ],
+              [
+                "7d6130a9-e0c2-5df4-8318-968b36270f75",
+                "f90f047af6e73e3b261436391a8c6fe3b4ec8a25d22a803d924943cc2e313b9e"
+              ]
+            ]
+          ]
+        ],
+        "stage9_gameweek_projection_sha256_by_gameweek": [
+          [
+            5,
+            "ffb06e8ae42c60847aafb15b2c45ca8cca29a162006d4650328ca01219b1d8aa"
+          ],
+          [
+            6,
+            "79c5efefd8599a5848dce6c545882406afe92803f633b09a5ca4720c14ec6ed3"
+          ],
+          [
+            7,
+            "90532cbf95c595d4170801546ac32937cc1ea451edeeadd037ebdd57ba115a12"
+          ]
+        ],
+        "terminal_policy_sha256": "57bcb218ec1cd946b331a4de8d90c664f13c220d468d484e94d45fabbcefb27d",
+        "timing_ms_by_stage": [
+          [
+            "stage8_9_gameweek_5",
+            "5908.412300050259"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_5",
+            "828.0157999834046"
+          ],
+          [
+            "stage8_9_gameweek_6",
+            "1867.0876999385655"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_6",
+            "660.2407000027597"
+          ],
+          [
+            "stage8_9_gameweek_7",
+            "2085.0863999221474"
+          ],
+          [
+            "joint_scenario_assembly_gameweek_7",
+            "663.2782999658957"
+          ],
+          [
+            "one_gameweek_comparator",
+            "47.315799980424345"
+          ],
+          [
+            "action_generation",
+            "9.034499991685152"
+          ],
+          [
+            "tactical_batch_evaluation",
+            "0.026000081561505795"
+          ],
+          [
+            "stage11_policy_solving",
+            "109.24900008831173"
+          ],
+          [
+            "report_and_comparator",
+            "108.11689996626228"
+          ]
+        ],
+        "work_budget_semantics_sha256": "67cf6f12ebf7a4bc187db9424cdb618b3e932244b92440157058b5c884870166",
+        "world": "HIGH_SHRINKAGE"
+      }
+    ],
+    "rolling_execution_input_sha256": "9d3fdfa42c29709b59a7dc034bf69d6ed4c1c152e093c99406bd35c5bb1e57f9",
+    "root_randomness_aligned": true,
+    "rules_identical_across_worlds": true,
+    "scenario_identity_aligned": true,
+    "schema_version": "r9c-a1-four-world-three-gw-shadow-comparison-v1",
+    "semantic_sha256": "5aa7f90b0ac9c5c8c8036a360822754948a77afa368df403547b7ec7e391b417",
+    "shadow_sha256": "4e6a21ce7c6d07dc13adbfa9395dc62b5b965d8b511a0c1a1c16146aa908d741",
+    "stage7_identical_across_worlds": true,
+    "stage8_identical_across_worlds": true,
+    "target_gameweek": 5,
+    "work_budget_semantics_identical_across_worlds": true,
+    "world_set": [
+      "STALE",
+      "CENTRAL_TEMPORARY",
+      "LOW_SHRINKAGE",
+      "HIGH_SHRINKAGE"
+    ]
+  },
+  "comparison_semantic_sha256": "5aa7f90b0ac9c5c8c8036a360822754948a77afa368df403547b7ec7e391b417",
+  "evidence_class": "SYNTHETIC",
+  "execution_mode": "OFFLINE",
+  "generating_implementation_sha": "6612c386118a8d5c0b8be3da5c3b3b45210608aa",
+  "pair_semantic_sha256s": [
+    [
+      "STALE",
+      "CENTRAL_TEMPORARY",
+      "6ddc6a78e1f68354fdeab9315036d608c7ec43770505fb1ffa375238c96bd0a4"
+    ],
+    [
+      "STALE",
+      "LOW_SHRINKAGE",
+      "6853397e12ea0b0da9abe1574e873cffb6d31ec4662b97eea9e2aa832ead6665"
+    ],
+    [
+      "STALE",
+      "HIGH_SHRINKAGE",
+      "7b4e3e56682aea30a8f64ea9512de802f827d747c21aa3d2fd69b0ddd1682153"
+    ],
+    [
+      "CENTRAL_TEMPORARY",
+      "LOW_SHRINKAGE",
+      "c7bf41c5b4b80451d9a2cbd29cf90573e09c079378c7ce6d0950beb924b95c55"
+    ],
+    [
+      "CENTRAL_TEMPORARY",
+      "HIGH_SHRINKAGE",
+      "0a907bfd4373070a5f1294b705ce77077059dc38caa2c6efa51bbd310229a40f"
+    ],
+    [
+      "LOW_SHRINKAGE",
+      "HIGH_SHRINKAGE",
+      "6e5935d2405a8ced559550ee44501f8c129876d2c00d78d75d8629c0338af4c2"
+    ]
+  ],
+  "scenario_pairing_disclosure": "COMMON_STAGE7_STAGE8_SCENARIO_IDENTITIES_AND_PROBABILITIES; EVENT_ALLOCATION_RANDOM_CONSUMPTION_MAY_DIVERGE_BY_WORLD",
+  "synthetic_input_semantic_sha256": "9d3fdfa42c29709b59a7dc034bf69d6ed4c1c152e093c99406bd35c5bb1e57f9",
+  "timing_status": "NON_SEMANTIC_DIAGNOSTIC_MEASUREMENTS",
+  "world_result_semantic_sha256s": [
+    [
+      "STALE",
+      "269ebae8eff54f2ad234c24334f8913f93aa3f39afdb26ce5ac69b6e49af6e79"
+    ],
+    [
+      "CENTRAL_TEMPORARY",
+      "b1865bef0d5bcc289c541f51721e279782e5b6bb471cb2e2d28538dfaf6ef08b"
+    ],
+    [
+      "LOW_SHRINKAGE",
+      "3b94fe085b9073a4f1afac1c11a86ac966d5c79c991c6ce77b29b95769cb0d3d"
+    ],
+    [
+      "HIGH_SHRINKAGE",
+      "371a472cb32d423e9f1fc09416fe8142dd30ba76db5cdc9f46a6e764911888ed"
+    ]
+  ]
+}

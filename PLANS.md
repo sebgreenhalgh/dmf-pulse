@@ -2232,5 +2232,6 @@ R7 CI remains pending; do not claim final acceptance or production readiness.
   continuation-sensitive synthetic cases using one common legal candidate universe.
 - [x] Seal complete world/pair/control/workload contracts and prove actual reverse execution-order
   isolation while retaining literal no-resolver STALE construction.
-- [ ] Commit the implementation checkpoint, generate deterministic root/continuation artifacts at
-  that exact SHA, then complete broad gates and fresh independent read-only review before push.
+- [x] Commit implementation checkpoint `6612c386118a8d5c0b8be3da5c3b3b45210608aa` and
+  generate canonically reproducible root/continuation artifacts at that exact SHA.
+- [ ] Complete broad gates and fresh independent read-only review before push.
