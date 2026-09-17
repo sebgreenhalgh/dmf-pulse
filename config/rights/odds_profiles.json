@@ -37,9 +37,9 @@
     },
     {
       "account_scope": "Sebastian-owned and authorized private The Odds API account",
-      "approved_at": "2026-09-12T12:29:46Z",
+      "approved_at": "2026-09-17T14:43:36Z",
       "approved_by": "Sebastian",
-      "approved_purpose": "private operator-initiated live R8B three-GW recommendation execution within the existing private boundaries",
+      "approved_purpose": "one private operator-initiated R9C-A2 live transient four-world decision observation using one frozen current information set through the existing three-Gameweek decision pipeline",
       "attribution_required": false,
       "attribution_text": null,
       "capabilities": {
@@ -57,8 +57,8 @@
       },
       "checked_at": "2026-09-11T21:21:31Z",
       "geography_scope": "United Kingdom private use",
-      "human_approval_id": "DMF-R8B-PRIVATE-RIGHTS-2026-09-12",
-      "notes": "Sebastian-owned and authorized account; United Kingdom private use; one private operator-initiated R8B three-GW recommendation execution. Terms published 2026-08-31, reviewed at checked_at; human approval recorded at approved_at. Zero retention, no public redistribution, no training, no scheduled harvesting and no production activation. Historical R8A-only authority remains preserved at tickets/PRIVATE-V1-ONE-COMMAND-001N-R8A-R1/HUMAN-APPROVAL.md; current authority evidence: tickets/PRIVATE-V1-ONE-COMMAND-001N-R8B-R1/HUMAN-APPROVAL.md. Capability matrix and unresolved rights unchanged; not legal advice.",
+      "human_approval_id": "DMF-R9C-A2-PRIVATE-RIGHTS-2026-09-17",
+      "notes": "Sebastian-owned and authorized account; United Kingdom private use; exactly one operator-initiated R9C-A2 live transient four-world decision observation using one frozen current information set. Terms published 2026-08-31, reviewed at checked_at; human approval recorded at approved_at. Zero retention, no public redistribution, no training or calibration, no scheduled harvesting, no automatic retry and no production activation. Historical R8A and R8B authorities remain preserved in their original ticket evidence; current authority evidence: tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A2/HUMAN-APPROVAL.md. Capability matrix and unresolved rights unchanged; this is not provider endorsement, a licence grant or legal advice.",
       "profile_version": "1.0.0",
       "provider_key": "the_odds_api",
       "retention_reason": null,

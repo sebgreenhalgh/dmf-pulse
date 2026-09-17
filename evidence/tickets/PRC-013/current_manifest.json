@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 163334,
+      "bytes": 165051,
       "path": "PLANS.md",
-      "sha256": "2a7643569ee226bd5381fe7790aec9581c1d243924af4c76f53a059290c78adc"
+      "sha256": "5ed13c5a70e14418ff6d863117829b47a3390fdf191fa6f411bb71ba288b59b3"
     },
     {
       "bytes": 2761,
@@ -316,9 +316,9 @@
       "sha256": "1691229b120054b8d4c65c7d74e5a0f6d9d11947f1a8f261d26649314268011d"
     },
     {
-      "bytes": 3666,
+      "bytes": 3855,
       "path": "config/rights/odds_profiles.json",
-      "sha256": "ef2ce414afec4db9903c9702bc0e4f429b4703176ae63f97629a8a7fe83cb4a0"
+      "sha256": "78fc27ce1ef776b96c77d5c8b7e5a676c7ec12a0e2799c0745d406b593faa1ed"
     },
     {
       "bytes": 1760,
@@ -2366,6 +2366,11 @@
       "sha256": "be301f8c6f0a73ef0df903495578856354c4156bf94ddf4dedf7e4331b035f49"
     },
     {
+      "bytes": 2417,
+      "path": "scripts/run_r9c_a2_live_shadow.py",
+      "sha256": "c05851cb12b3f8e72742cf90c0b007f89dcbeb1919b3b055f9d59bf5da63d37d"
+    },
+    {
       "bytes": 1061,
       "path": "scripts/scan_secrets.py",
       "sha256": "1645db9a607d26dfd53337f0116bbd640fa6082e41258d8dc389f900145e2da1"
@@ -3521,9 +3526,9 @@
       "sha256": "20fea68f46cb67d4fef68af8ff1512536ed824e59cf5e587d72e18668daea8fd"
     },
     {
-      "bytes": 21164,
+      "bytes": 21436,
       "path": "src/dmf_pulse/ingestion/fpl/direct.py",
-      "sha256": "f73495ac7edf724f3dddd5bb1f094dc02d58007684d8d75006af00bc9aa8f492"
+      "sha256": "1fcf74ac35ccd81a6a6e28138edb86460ccc42596804d04236c14632809810a4"
     },
     {
       "bytes": 31073,
@@ -3651,9 +3656,9 @@
       "sha256": "776dba26f023c82e4da70dafd70c78efedef464e99f27121f673d0c655963d7d"
     },
     {
-      "bytes": 29852,
+      "bytes": 30052,
       "path": "src/dmf_pulse/ingestion/openfootball/service.py",
-      "sha256": "9abdfe5f15d99db4de5633dae90b852d9ae4877f1b41d012bb62545290c22bac"
+      "sha256": "a2b723970a081d70ab3b9e37a6da85e26241cac5b1d02af8f6622a95bc6e4463"
     },
     {
       "bytes": 608,
@@ -3991,14 +3996,19 @@
       "sha256": "5ceb322ee33b6c573864335842ff83f490f955204958082027a1e12545d7a35b"
     },
     {
+      "bytes": 46218,
+      "path": "src/dmf_pulse/private_v1/live_shadow_observation.py",
+      "sha256": "92c8f25dfdc2aad4938ded2503c0319e218e9a1f9dd5704344cd9b65ccd7330b"
+    },
+    {
       "bytes": 44770,
       "path": "src/dmf_pulse/private_v1/models.py",
       "sha256": "ba7c9b940910ecc28bd70a2c79393f5549f5b05de43a35f2e5af852f18fd2465"
     },
     {
-      "bytes": 38015,
+      "bytes": 40593,
       "path": "src/dmf_pulse/private_v1/one_command.py",
-      "sha256": "87621a94ee6b3ec4470057023f28bfd2f3d8eca8da9028a2febf1d8b16d97162"
+      "sha256": "73857ea53994e7479155477bb0fb10f5af560579f11a31a8b313623d31a9d8b7"
     },
     {
       "bytes": 5403,
@@ -4026,9 +4036,9 @@
       "sha256": "8b2f73c1ff3d8743b2b3e1bfbf0f6c0c642064187f585148138292672ba3687c"
     },
     {
-      "bytes": 7939,
+      "bytes": 7933,
       "path": "src/dmf_pulse/private_v1/shadow_adapter.py",
-      "sha256": "e90b645595e6b5dda5d3b37840c328a3efb234cd1fe45671f6d40e3cde353d08"
+      "sha256": "35f6efcdcdc4adf1a517063dd8b9b4156c4490e2bd0e500fc644e04cd3179c9f"
     },
     {
       "bytes": 28024,
@@ -5886,9 +5896,9 @@
       "sha256": "6411cf26d055ae3b6cbe8f27670dab5e06693c48e447208edab38c1e51adb635"
     },
     {
-      "bytes": 7648,
+      "bytes": 7812,
       "path": "tests/unit/ingestion/test_horizon_rights_approval.py",
-      "sha256": "738e4afe5e0c32116d645203f53dc1da3e335a312ce2a8af76fad226bca27cda"
+      "sha256": "ad57a35330c612b032c1308ee824156f0000337fdf0596232488380918803a69"
     },
     {
       "bytes": 11253,
@@ -6146,6 +6156,11 @@
       "sha256": "991bf9ffbbd9cb41ab98290b8728541192ece32104b8c18618ec4474eca047c0"
     },
     {
+      "bytes": 4077,
+      "path": "tests/unit/private_v1/a2_test_support.py",
+      "sha256": "221d904b60245bacd7637653116a6928af9569b61ad3e54ab129618ad5b85c06"
+    },
+    {
       "bytes": 43087,
       "path": "tests/unit/private_v1/e2e_test_support.py",
       "sha256": "971c76f853e261ca5d0f3e9823e47a5f531c30229baf5215ca7ad1064b818832"
@@ -6179,6 +6194,16 @@
       "bytes": 7277,
       "path": "tests/unit/private_v1/test_a1_shadow_adapter.py",
       "sha256": "73599365fa4e4fb2063f6ef7a3c2d2b26ab4812cf1471f0ad55568d5c56eab03"
+    },
+    {
+      "bytes": 7652,
+      "path": "tests/unit/private_v1/test_a2_live_shadow_observation.py",
+      "sha256": "d3c8716fda589c811e76f9ebd6c8253aa3a9cc356782c7e252b49d427225e7b8"
+    },
+    {
+      "bytes": 17946,
+      "path": "tests/unit/private_v1/test_a2_preparation.py",
+      "sha256": "c148dc1982019f889011d822ba69eec523aac3e3c7e430ba7d4953ec2d6556cb"
     },
     {
       "bytes": 6152,
@@ -7034,6 +7059,21 @@
       "bytes": 1792,
       "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1/ticket.yaml",
       "sha256": "310c08ed115e6d026d3fc553fbcb1aa7ec4a9a7cb137c5c3920faeb11c9b9e28"
+    },
+    {
+      "bytes": 1119,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A2/ACCEPTANCE.md",
+      "sha256": "25c61dba83c7fce464af7500a700b5eeb55ed24a54fcb48b5caa49c564f5c9bd"
+    },
+    {
+      "bytes": 1788,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A2/HUMAN-APPROVAL.md",
+      "sha256": "257d798759d0ee50f793fc1eb09ba5ddaa4f402d8eb1c46350e52f1d7587da08"
+    },
+    {
+      "bytes": 1983,
+      "path": "tickets/PRIVATE-V1-ONE-COMMAND-001N-R9C-A2/ticket.yaml",
+      "sha256": "f731b212bcd57e692fd166a82656412c3d8fb237fc0af8927825b33a0bc638bb"
     },
     {
       "bytes": 854,

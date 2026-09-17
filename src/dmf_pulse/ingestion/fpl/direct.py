@@ -375,6 +375,7 @@ class DirectFplClient:
         maximum_requests: int = 24,
         maximum_attempts: int = 3,
         pace_seconds: float = 0.25,
+        before_request: Callable[[], None] | None = None,
     ) -> None:
         self._attestation = attestation
         self._profile = profile or load_rights_profiles()[DIRECT_FPL_PROFILE_ID]
@@ -388,6 +389,7 @@ class DirectFplClient:
         self._maximum_requests = maximum_requests
         self._maximum_attempts = maximum_attempts
         self._pace_seconds = pace_seconds
+        self._before_request = before_request
         self._request_count = 0
         self._endpoint_classes: list[DirectFplResource] = []
         if not _profile_is_exact(self._profile):
@@ -445,6 +447,8 @@ class DirectFplClient:
         gameweek: int | None = None,
     ) -> bytes:
         path = direct_path(resource, entry_id=entry_id, gameweek=gameweek)
+        if self._before_request is not None:
+            self._before_request()
         credential = (
             self._credential_provider.get() if resource is DirectFplResource.MY_TEAM else None
         )
@@ -454,6 +458,8 @@ class DirectFplClient:
                 raise IngestionError("REQUEST_BUDGET_EXHAUSTED", "FPL request budget exhausted")
             if self._request_count:
                 self._sleeper(self._pace_seconds)
+            if self._before_request is not None:
+                self._before_request()
             self._request_count += 1
             self._endpoint_classes.append(resource)
             response = self._transport.send(request)

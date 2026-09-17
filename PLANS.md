@@ -2235,3 +2235,29 @@ R7 CI remains pending; do not claim final acceptance or production readiness.
 - [x] Commit implementation checkpoint `6612c386118a8d5c0b8be3da5c3b3b45210608aa` and
   generate canonically reproducible root/continuation artifacts at that exact SHA.
 - [ ] Complete broad gates and fresh independent read-only review before push.
+
+## R9C-A2 one-shot live four-world shadow observation
+
+- Immutable parent: `f6c3bbf0c768ca83d2b4b993425fb5ff7f6e7ef7`; exact-SHA CI
+  `35224587426` succeeded. Work is isolated on
+  `readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A2-live-three-gw-shadow-observation`.
+- Scope: add a private acquire-once/assemble-once seam, compile one fixed-hyperparameter
+  current-player shadow from that same in-memory FPL snapshot, then compare literal STALE and
+  the three sealed R9B worlds through four fresh canonical rolling services.
+- Safety: no active selector, no training/calibration, no retention, no A1 artifact drift, no
+  provider access during engineering, and no live attempt before rights-purpose clearance,
+  independent implementation clearance, publication, and complete exact-SHA CI.
+
+### R9C-A2 checkpoints
+
+- [x] Verify immutable parent/CI, fetch origin, create the isolated branch, and resolve exact
+  A4/A5/A9/A10/A11/A12/B2 authority scopes.
+- [x] Add strict offline tests for acquire-once preparation, same-snapshot history/shadow,
+  network denial during four-world solves, safe output/failure contracts, zero retention/training,
+  active-path equality, and unchanged A1 artifact hashes.
+- [x] Implement the minimal private preparation seam and separate live-transient A2 envelope,
+  retaining literal no-resolver STALE construction and canonical Stage 9--11 services.
+- [ ] Run focused and broad gates, build/wheel, repository/manifest/security validation, and
+  obtain fresh rights-purpose plus implementation reviews.
+- [ ] Publish one sealed implementation SHA and require exact-SHA CI green. Perform at most one
+  operator attempt only if every live gate, including provider-purpose review, is clear.

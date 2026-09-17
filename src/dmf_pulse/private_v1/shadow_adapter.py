@@ -1,4 +1,4 @@
-"""Offline-only R9C A1 binding of compiled R9B shadows to a fixture universe.
+"""Non-active R9C binding of compiled R9B shadows to a fixture universe.
 
 This module deliberately has no route from ordinary service construction.  Its
 resolver is injected only by synthetic comparison code and carries non-active
@@ -22,7 +22,7 @@ from dmf_pulse.private_v1.service import _FixtureAllocationResolution
 
 @dataclass(frozen=True, slots=True)
 class ShadowFixtureAllocationProvenance:
-    """Non-active lineage for one synthetic shadow fixture resolution."""
+    """Non-active lineage for one isolated shadow fixture resolution."""
 
     schema_version: str
     sensitivity_world: World

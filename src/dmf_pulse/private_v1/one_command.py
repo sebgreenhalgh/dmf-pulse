@@ -9,7 +9,7 @@ from decimal import Decimal
 from importlib.resources import files
 from pathlib import Path
 from time import perf_counter
-from typing import Literal
+from typing import Literal, Protocol
 from uuid import UUID, uuid5
 
 from pydantic import ValidationError
@@ -60,6 +60,7 @@ from dmf_pulse.private_v1.automatic_inputs import (
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.horizon_markets import build_future_market_evidence
 from dmf_pulse.private_v1.models import (
+    PrivateCanonicalPlayerIdentityMap,
     PrivateFixtureScorePrior,
     PrivateV1Decision,
     PrivateV1ExecutionInput,
@@ -71,6 +72,7 @@ from dmf_pulse.private_v1.reporting import render_transfer_frontier
 from dmf_pulse.private_v1.rolling import (
     PrivateRollingStageTiming,
     PrivateV1RollingRecommendationService,
+    PrivateV1RollingRunResult,
     render_rolling_report,
 )
 from dmf_pulse.private_v1.rolling_models import (
@@ -119,6 +121,32 @@ class OneCommandResult:
     stage_timings: tuple[PrivateRollingStageTiming, ...] = ()
     authenticated_current_state_used: Literal[True] = True
     persistence_performed: Literal[False] = False
+
+
+@dataclass(frozen=True, slots=True)
+class _PrivateV1PreparedRollingContext:
+    """One sealed, memory-only provider information set for a private rolling run."""
+
+    snapshot: DirectFplSnapshot
+    rolling_execution: PrivateV1RollingExecutionInput
+    player_identity_map: PrivateCanonicalPlayerIdentityMap
+    fpl_request_count: int
+    fpl_endpoint_classes: tuple[str, ...]
+    odds_request_count: int
+    odds_endpoint_classes: tuple[str, ...]
+    score_prior_acquisition_count: Literal[1]
+    fpl_rights_profile_id: str
+    odds_rights_profile_id: str
+    information_cutoff: datetime
+
+
+class _PreparedRollingRunner(Protocol):
+    def __call__(
+        self,
+        prepared: _PrivateV1PreparedRollingContext,
+        *,
+        progress: ProgressSink,
+    ) -> PrivateV1RollingRunResult: ...
 
 
 def _rules_path() -> Path:
@@ -458,6 +486,8 @@ class PrivateV1OneCommandService:
         | None = None,
         recommendation_service: PrivateV1RecommendationService | None = None,
         rolling_recommendation_service: PrivateV1RollingRecommendationService | None = None,
+        _prepared_rolling_runner: _PreparedRollingRunner | None = None,
+        _provider_request_guard: Callable[[], None] | None = None,
         progress: ProgressSink | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
@@ -474,6 +504,8 @@ class PrivateV1OneCommandService:
         self._rolling_recommendation_service = (
             rolling_recommendation_service or PrivateV1RollingRecommendationService()
         )
+        self._prepared_rolling_runner = _prepared_rolling_runner
+        self._provider_request_guard = _provider_request_guard
         self._progress = progress or NullProgress()
         self._clock = clock
 
@@ -518,6 +550,8 @@ class PrivateV1OneCommandService:
                 completed="FPL state ready",
                 failed="current FPL state",
             ):
+                if self._provider_request_guard is not None:
+                    self._provider_request_guard()
                 attestation = DirectFplRunAttestation(attested_at=approved_at)
                 direct_client = self._direct_client_factory(attestation)
                 snapshot = acquire_direct_fpl_snapshot(
@@ -583,6 +617,8 @@ class PrivateV1OneCommandService:
                 completed="Market odds ready",
                 failed="current market odds",
             ):
+                if self._provider_request_guard is not None:
+                    self._provider_request_guard()
                 odds_service = self._odds_service_factory(observed_now)
                 if request.horizon_gameweeks == 3:
                     odds = odds_service.acquire(
@@ -604,6 +640,8 @@ class PrivateV1OneCommandService:
                 completed="Score-prior source ready",
                 failed="current score-prior source",
             ):
+                if self._provider_request_guard is not None:
+                    self._provider_request_guard()
                 source_prior = self._score_service_factory(observed_now).build(
                     CurrentScorePriorBuildRequest(
                         information_cutoff=run_at,
@@ -804,9 +842,28 @@ class PrivateV1OneCommandService:
                     stage="horizon_input_construction",
                     elapsed_ms=Decimal(str((perf_counter() - horizon_input_started) * 1000)),
                 )
-                rolling_run = self._rolling_recommendation_service.run(
-                    rolling_execution,
-                    progress=self._progress,
+                if self._provider_request_guard is not None:
+                    self._provider_request_guard()
+                prepared = _PrivateV1PreparedRollingContext(
+                    snapshot=snapshot,
+                    rolling_execution=rolling_execution,
+                    player_identity_map=player_map,
+                    fpl_request_count=snapshot.request_count,
+                    fpl_endpoint_classes=snapshot.endpoint_classes,
+                    odds_request_count=odds.provenance.transport_call_count,
+                    odds_endpoint_classes=("THE_ODDS_API_EPL_H2H_TOTALS_HORIZON",),
+                    score_prior_acquisition_count=1,
+                    fpl_rights_profile_id=snapshot.fpl_input.rights.rights_profile_id,
+                    odds_rights_profile_id=odds.rights.rights_profile_id,
+                    information_cutoff=run_at,
+                )
+                rolling_run = (
+                    self._rolling_recommendation_service.run(
+                        rolling_execution,
+                        progress=self._progress,
+                    )
+                    if self._prepared_rolling_runner is None
+                    else self._prepared_rolling_runner(prepared, progress=self._progress)
                 )
                 decision: PrivateV1Decision | PrivateV1RollingDecision = rolling_run.decision
                 report = _display_rolling_report(rolling_run.decision, snapshot, player_map)

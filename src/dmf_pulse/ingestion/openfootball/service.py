@@ -546,6 +546,7 @@ class CurrentScorePriorService:
         rights_profiles: Mapping[str, RightsProfile] | None = None,
         transport: OpenFootballTransport | None = None,
         clock: Callable[[], datetime] = _utc_now,
+        before_request: Callable[[], None] | None = None,
         provider_config_identity: str | None = None,
         rights_config_identity: str | None = None,
     ) -> None:
@@ -555,6 +556,7 @@ class CurrentScorePriorService:
         )
         self._transport = transport if transport is not None else HttpClientOpenFootballTransport()
         self._clock = clock
+        self._before_request = before_request
         self._provider_config_sha256 = provider_config_identity or (
             provider_config_sha256()
             if provider_config is None
@@ -599,6 +601,8 @@ class CurrentScorePriorService:
         configured_resources = (self._config.licence, *self._config.seasons)
         try:
             for index, resource in enumerate(configured_resources):
+                if self._before_request is not None:
+                    self._before_request()
                 call_count += 1
                 response = _fetch_resource_without_disclosure(
                     config=self._config,
