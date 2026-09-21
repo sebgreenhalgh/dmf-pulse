@@ -1,0 +1,18 @@
+{
+  "coverage": {
+    "branch_percent": 91.55844155844156,
+    "covered_branches": 141,
+    "covered_statements": 576,
+    "focused_tests_passed": 195,
+    "overall_percent": 95.2191235059761,
+    "statement_percent": 96.16026711185309,
+    "total_branches": 154,
+    "total_statements": 599
+  },
+  "frozen_sync_packages_checked": 40,
+  "inherited_ingestion_tests_passed": 972,
+  "inherited_stage8_tests_passed": 212,
+  "mypy_source_files": 260,
+  "status": "PASS",
+  "ticket_id": "CURRENT-TEAM-STRENGTH-001A-P0"
+}

@@ -1,0 +1,13 @@
+{
+  "alias_count": 56,
+  "canonical_club_count": 42,
+  "clean_environment_outside_repository": true,
+  "clean_import_network_requests": 0,
+  "identity_semantic_sha256": "55f36445b0aabc77add11560e3ea550cbc07ec114db48dbf664e7177c65331ef",
+  "policy_semantic_sha256": "e8d28521fcb90b625a8dbeff4f72de3b178d16ed7cae748a7429d0e42cdd9fd7",
+  "rights_profiles_packaged": true,
+  "sdist_sha256": "2795fae3217c40e8133eee1d2329dcec61ea423b36c0665d06fd46e6fc437e93",
+  "status": "PASS",
+  "wheel": "dmf_pulse-0.2.0-py3-none-any.whl",
+  "wheel_sha256": "a584b3e24659fd29b3429eb181f5abc11579f39ca7ee24918dfab55a3273ae98"
+}

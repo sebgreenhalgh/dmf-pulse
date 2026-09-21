@@ -27,6 +27,7 @@ allowed_areas:
   - tests/unit/ingestion/openfootball/**
   - scripts/generate_current_team_strength_p0_artifacts.py
   - scripts/verify_current_team_strength_p0_wheel.py
+  - scripts/build_current_team_strength_p0_review_pack.py
   - scripts/validate_repository.py
   - pyproject.toml
   - tickets/CURRENT-TEAM-STRENGTH-001A-P0/**
@@ -51,4 +52,4 @@ required_public_behavior:
   - locked 1 percent, 0.15, 0.50, 10 Gameweek, and 100 fixture materiality gates
   - shadow-only reconstructed research and separate uncertainty/promotion decisions
   - installed-wheel packaged authority validation without network access
-acceptance_status: IMPLEMENTED_PENDING_INDEPENDENT_REVIEW
+acceptance_status: CLEAR_FOR_IMPLEMENTATION_PENDING_PUBLICATION
