@@ -2293,7 +2293,7 @@ Worktree: isolated from the existing dirty availability checkout.
   tests; seal and push.
 - [x] 001A.02: structural effect-coded float64 damped Newton, fixed shrinkage/cohort/decay,
   covariance and authenticated model; mathematical/adversarial tests; seal and push.
-- [ ] 001A.03: authenticated fixture adapter/bundle, typed fallback, real unchanged Stage-8
+- [x] 001A.03: authenticated fixture adapter/bundle, typed fallback, real unchanged Stage-8
   compatibility, inference performance; seal and push.
 - [ ] 001A.04: deterministic reconstructed 2025/26 replay, research reproduction, public shadow
   command, explicit golden, installed-wheel demonstration; seal and push.
@@ -2315,3 +2315,10 @@ remain outstanding (initial source/kernel coverage population: 87%, not final ac
 reassessment findings closed. 493 focused/inherited tests pass. Real private 30-fixture
 cold-cache adapter benchmark: 59.5991ms. Existing balanced-market Stage-8 projection converges;
 a separate inherited H/D/A-only non-convergence remains a visible fallback regression.
+Published checkpoint 001A.03: `65bdda75bce313b96973f26e25db3323ff7bed87`.
+001A.04 local replay: original baseline 2.9519886029949367, candidate 2.887816503690368,
+delta -0.06417209930456869; governed D+2 candidate 2.887749425936601. Only origin 34 differs.
+Both are RECONSTRUCTED; the original-date predicate emits metrics only, not governed artifacts.
+The explicit 2e-6 predeclared research tolerance passes. Clean offline installed-wheel CLI
+reproduces the 6,080-match semantic model. A linked-worktree sdist-ignore leak was caught
+before publication and closed with an explicit private-output exclusion and archive checks.

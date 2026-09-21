@@ -1,0 +1,15 @@
+{
+  "clean_environment_outside_repository": true,
+  "command": "dmf events team-strength fit-reconstructed",
+  "dataset_mode": "RECONSTRUCTED",
+  "eligible_matches": 6080,
+  "installed_import": true,
+  "locked_runtime_only": true,
+  "model_semantic_sha256": "10335a94d4466f487eac92d86325d5d2dc66a8813ae872fd907f131f5c22281b",
+  "offline_installation": true,
+  "packaged_golden": "c32233b55d0242fa9abc74d9823235dcf8a93b16845eff80617f646166a7d1ad",
+  "private_distribution_material": false,
+  "production_active": false,
+  "status": "PASS",
+  "wheel": "dmf_pulse-0.2.0-py3-none-any.whl"
+}

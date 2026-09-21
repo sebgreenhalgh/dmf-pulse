@@ -49,6 +49,10 @@ path = "src/dmf_pulse/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/dmf_pulse"]
 
+[tool.hatch.build.targets.sdist]
+# Linked worktrees must not rely on VCS-ignore discovery to protect retained evidence.
+exclude = ["/review_pack", "/dist", "/.venv"]
+
 [tool.hatch.build.targets.wheel.force-include]
 "config/providers/fpl.json" = "dmf_pulse/ingestion/resources/fpl.json"
 "config/rights/fpl_profiles.json" = "dmf_pulse/ingestion/resources/fpl_profiles.json"

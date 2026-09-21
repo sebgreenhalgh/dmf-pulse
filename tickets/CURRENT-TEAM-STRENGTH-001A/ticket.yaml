@@ -18,6 +18,7 @@ allowed_areas:
   - src/dmf_pulse/ingestion/openfootball/team_strength_*.py
   - src/dmf_pulse/football_events/team_strength_*.py
   - src/dmf_pulse/evaluation/team_strength_*.py
+  - src/dmf_pulse/evaluation/resources/team_strength_golden.json
   - src/dmf_pulse/cli/**
   - tests/**
   - scripts/*team_strength*.py
@@ -25,6 +26,7 @@ allowed_areas:
   - evidence/tickets/CURRENT-TEAM-STRENGTH-001A/**
   - evidence/tickets/PRC-013/current_manifest.json
   - PLANS.md
+  - pyproject.toml # explicit sdist private-evidence exclusion only; dependencies unchanged
 exclusions:
   - ScorePriorRequest or existing Stage-8 mathematics/schema changes
   - private_v1 or ordinary dmf pulse changes
