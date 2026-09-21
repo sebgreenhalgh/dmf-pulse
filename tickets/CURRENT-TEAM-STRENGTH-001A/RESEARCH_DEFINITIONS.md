@@ -36,6 +36,13 @@ governed model artifact or fixture bundle. The governed replay enforces D+2. Bot
 RECONSTRUCTED. The research contract review accepted this separation; no tolerance adjustment
 may disguise the population difference.
 
+Predeclared reproduction tolerance, before running the new historical replay: absolute
+`0.000002` for baseline/candidate exact-score log loss and their difference against the
+six-place research targets. This includes research rounding and the original L-BFGS stopping
+error versus the tighter approved Newton solution. It is not a retuning allowance. The
+governed D+2 report must state its separate value and population; this tolerance does not
+authorize treating that population as the original research reproduction.
+
 Research metrics normalize identical 0..36 joint score support for both models. Totals Brier is
 the mean of over-1.5, over-2.5, and over-3.5 Briers. Goal RPS is the mean of the two marginal
 sum-of-squared-CDF-errors over thresholds 0..35. Goal MAEs use the unrounded Poisson means.
@@ -53,3 +60,18 @@ in ignored local storage. Tests use synthetic inputs. Mandatory real-corpus acce
 an explicit private input directory, performs no network access, and fails if unavailable or
 inauthentic. It is not skipped, replaced by synthetic evidence, or claimed as public CI coverage.
 Published evidence is limited to code, source identities and safe aggregate summaries.
+
+## Model and execution identity
+
+`TeamStrengthModelStateV1.semantic_sha256` authenticates the deterministic dataset-bound
+fit, coefficients, numerical diagnostics, information/covariance lower triangles and policy.
+The separately hashed `TeamStrengthModelArtifactV1` execution envelope binds this state to
+actual `fitted_at` and `usable_at`. Repeating identical semantic input reproduces the model
+identity, not necessarily the execution envelope bytes. Immutable persistence addresses both
+identities and uses exclusive publication; no `latest` alias, overwrite, or database exists.
+
+The accepted reusable Stage-8 solver uses Decimal. It is deliberately not changed or reused
+inside binary64 fitting. The ticket-local Cholesky factorization supplies the required small
+SPD solve and inverse. Near-optimum line search permits only an eight-ulp objective difference
+with a strictly improved gradient (or an already-converged gradient); both final convergence
+criteria still apply. No jitter, coefficient clipping or pseudo-inverse is used.

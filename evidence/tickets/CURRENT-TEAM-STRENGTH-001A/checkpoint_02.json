@@ -1,0 +1,18 @@
+{
+  "checkpoint": "001A.02_MODEL_KERNEL",
+  "classification": "INTERMEDIATE_NOT_FINAL_ACCEPTANCE",
+  "previous_checkpoint_sha": "45efa590547328370b23513729c0af43819ceb70",
+  "commands": [
+    {"command": "uv run --frozen python -m pytest tests/unit/ingestion/openfootball tests/integration/ingestion/test_openfootball_score_prior_cli.py tests/unit/football_events/test_team_strength_numerics.py tests/unit/football_events/test_team_strength_model.py -q", "exit_code": 0, "result": "311 passed in 23.24s"},
+    {"command": "uv run --frozen python scripts/verify_team_strength_model.py --corpus-root review_pack/private_openfootball_corpus --private-artifact-root review_pack/private_team_strength --summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/checkpoint_02_model.json", "exit_code": 0, "result": "PASS; same semantic state from repeated fits; full parameters retained privately"},
+    {"command": "uv run --frozen python -m mypy src/dmf_pulse", "exit_code": 0, "result": "Success: no issues found in 266 source files"},
+    {"command": "uv run --frozen python -m ruff check .", "exit_code": 0, "result": "All checks passed!"},
+    {"command": "uv run --frozen python -m ruff format --check .", "exit_code": 0, "result": "714 files already formatted"}
+  ],
+  "independent_review": "CHECKPOINT_CLEAR_NO_UNRESOLVED_P0_P1_MATERIAL_P2",
+  "review_remediation": "Validate private artifact containment before mkdir and recheck afterward",
+  "source_kernel_initial_coverage_percent": 87,
+  "coverage_status": "INTERMEDIATE_BELOW_FINAL_TARGET_REQUIRES_HARDENING",
+  "activation": "SHADOW_NOT_MODEL_INPUT",
+  "replay_status": "NOT_YET_IMPLEMENTED_OR_ACCEPTED"
+}

@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 110924,
+      "bytes": 111367,
       "path": "PLANS.md",
-      "sha256": "7e6290e6258f0934b6b63bcdccf7aae89f8d0d5482081003b89fdf654f5060c5"
+      "sha256": "911c2bcacd569ca13fda23d22f365d6d51b8a5d8c4011627d760599eb89523e5"
     },
     {
       "bytes": 2761,
@@ -2386,6 +2386,11 @@
       "sha256": "b99e5e60ca30c04b555e3988b8a5a5f97d4329e4757e0c184d223ed41890ef66"
     },
     {
+      "bytes": 4046,
+      "path": "scripts/verify_team_strength_model.py",
+      "sha256": "89e2c67ca683728f855b7e8b43e09cca869b286427ab954a332cafdaa180dddf"
+    },
+    {
       "bytes": 25494,
       "path": "scripts/verify_wheel.py",
       "sha256": "d141c86a128861650aceec89f0683dff86884442b50dc714d66f694478ee4c52"
@@ -3231,6 +3236,21 @@
       "sha256": "b48c4a336f13671e93128b260be68e7934a77a9dcbb3d1ebe7fa1f3b4b98be50"
     },
     {
+      "bytes": 19227,
+      "path": "src/dmf_pulse/football_events/team_strength_model.py",
+      "sha256": "406339d0519eeaffee0fb305c52f2732c356f079d0e1af8f7ef5f8355623f164"
+    },
+    {
+      "bytes": 14049,
+      "path": "src/dmf_pulse/football_events/team_strength_numerics.py",
+      "sha256": "cc82edc6c501802207edcf4545a14b704bc54848edf400b67523be0997ad7d36"
+    },
+    {
+      "bytes": 2446,
+      "path": "src/dmf_pulse/football_events/team_strength_store.py",
+      "sha256": "1d59031d361da63397dffb062a39324eae73b8f55baa817e45ac47aecaa2ad70"
+    },
+    {
       "bytes": 1094,
       "path": "src/dmf_pulse/fpl_points/__init__.py",
       "sha256": "85fe4a17db8f163e8dfbb7f20f6326afe570f2806f2596f92a80f82a84499e64"
@@ -3476,9 +3496,9 @@
       "sha256": "3e7a6b59224dd877965ed15324c7c44b6e4155504a013ecfa04d76fb97ada9d4"
     },
     {
-      "bytes": 24395,
+      "bytes": 24398,
       "path": "src/dmf_pulse/ingestion/openfootball/team_strength_data.py",
-      "sha256": "7f9ae3e8aa421ff4e0b1c5fdd661f0f7929fc393c76cc5a2593019720b1e244d"
+      "sha256": "45e4d3be59fb0481edf8a0c76fa99fc248700612487454649084fd17cc3e7602"
     },
     {
       "bytes": 27001,
@@ -5231,6 +5251,11 @@
       "sha256": "b4a09235e5a8af67d9d3f5a1d5b8e3ad4af223a128af41d2c9ae2f462958e74a"
     },
     {
+      "bytes": 4275,
+      "path": "tests/unit/football_events/team_strength_support.py",
+      "sha256": "2f39b96227260564ae889fb6982f3bd7afa1cd5624641c190e3c2e799949c7a7"
+    },
+    {
       "bytes": 3763,
       "path": "tests/unit/football_events/test_coherence_adversarial.py",
       "sha256": "343b7107c3d3e5619b5ed6015726fbb68bb35565a98779a1e3e0b7a249db0e69"
@@ -5304,6 +5329,16 @@
       "bytes": 3153,
       "path": "tests/unit/football_events/test_service_and_artifacts.py",
       "sha256": "654570b7dabaebbdb76e039c72672de05c0cbc328f70e06969e7cf38a863bd3f"
+    },
+    {
+      "bytes": 5127,
+      "path": "tests/unit/football_events/test_team_strength_model.py",
+      "sha256": "facf4ad500c30a69e982d84312c15acc58e7bfd9ff603907af0ad9dd25377ef9"
+    },
+    {
+      "bytes": 10798,
+      "path": "tests/unit/football_events/test_team_strength_numerics.py",
+      "sha256": "8b5f2aebd47178091ddef808d93dc976d9e3bb24ae4e9827c5d8303f654af068"
     },
     {
       "bytes": 10410,
@@ -5986,9 +6021,9 @@
       "sha256": "e457089486b9a923f51f6ee198a5a332e58ab3b83853b1a5653ee91935721647"
     },
     {
-      "bytes": 3863,
+      "bytes": 5423,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001A/RESEARCH_DEFINITIONS.md",
-      "sha256": "7cd965de9a5e6990e676326bed4b535f13b79256f2089916f1cdb681533ebe93"
+      "sha256": "6b0a85e847e653f37388a5f993b1dc7bbdd00dcf8f5ae2c25f541e381868e4d1"
     },
     {
       "bytes": 1463,
