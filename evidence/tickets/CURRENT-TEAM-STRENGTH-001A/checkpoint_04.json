@@ -1,0 +1,30 @@
+{
+  "checkpoint": "001A.04_REPLAY_PUBLIC_SLICE",
+  "classification": "INTERMEDIATE_NOT_FINAL_ACCEPTANCE",
+  "previous_checkpoint_sha": "65bdda75bce313b96973f26e25db3323ff7bed87",
+  "previous_checkpoint_exact_sha_ci": {"run": 35665780914, "conclusion": "success"},
+  "commands": [
+    {"command": "uv run --frozen python scripts/verify_team_strength_replay.py --corpus-root review_pack/private_openfootball_corpus --private-artifact-root review_pack/private_team_strength_replay --report evidence/tickets/CURRENT-TEAM-STRENGTH-001A/reconstructed_replay.json", "exit_code": 0, "result": "38 origins; 380 holdout fixtures; original research and governed D+2 replay PASS; 220.903639 seconds"},
+    {"command": "uv run --frozen python -m pytest tests/unit/ingestion/openfootball tests/unit/football_events tests/unit/evaluation/test_team_strength_replay.py tests/unit/cli/test_team_strength_cli.py tests/integration/ingestion/test_openfootball_score_prior_cli.py -q", "exit_code": 0, "result": "503 passed in 59.97s before final three report-validation regressions"},
+    {"command": "uv run --frozen python -m pytest tests/unit/evaluation/test_team_strength_replay.py tests/unit/cli/test_team_strength_cli.py -q", "exit_code": 0, "result": "22 passed in 17.70s after report-validation remediation"},
+    {"command": "uv build --no-sources", "exit_code": 0, "result": "wheel and sdist rebuilt with explicit private-evidence exclusion"},
+    {"command": "uv run --frozen python scripts/verify_team_strength_wheel.py --corpus-root review_pack/private_openfootball_corpus --summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/installed_wheel_summary.json", "exit_code": 0, "result": "PASS: clean offline external runtime-only installation; actual shadow CLI; 6080 matches; same semantic model"},
+    {"command": "uv run --frozen python -m mypy", "exit_code": 0, "result": "Success: no issues found in 269 source files"},
+    {"command": "uv run --frozen python -m ruff check .", "exit_code": 0, "result": "All checks passed!"}
+  ],
+  "replay_semantic_sha256": "c32233b55d0242fa9abc74d9823235dcf8a93b16845eff80617f646166a7d1ad",
+  "research_target_absolute_tolerance_predeclared": "0.000002",
+  "subsequent_golden_metric_absolute_tolerance": "0.000000001",
+  "research_regime": "ORIGINAL_RESEARCH_DATE_BEFORE_ORIGIN_METRICS_ONLY",
+  "governed_regime": "GOVERNED_D_PLUS_2_RECONSTRUCTED",
+  "differing_training_origins": [34],
+  "raw_or_per_fixture_data_published": false,
+  "production_active": false,
+  "independent_review": "CHECKPOINT_CLEAR_NO_UNRESOLVED_P0_P1_MATERIAL_P2; 22 focused tests independently passed; not final whole-ticket verdict",
+  "remediations": [
+    "Explicit sdist exclusion closes linked-worktree ignored private-material packaging leak; unshipped local archive replaced and audited",
+    "Installed-wheel verification metric field corrected from exact_score_log_loss to exact_log_loss",
+    "Independent-review material P2 closed with field-specific regime, baseline ordering and delta arithmetic checks plus resealed contradiction regressions"
+  ],
+  "final_acceptance_outstanding": ["new-path branch coverage", "full hardening", "fresh whole-ticket independent review", "final exact-SHA CI"]
+}

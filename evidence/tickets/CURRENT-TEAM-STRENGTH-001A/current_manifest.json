@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 111803,
+      "bytes": 112429,
       "path": "PLANS.md",
-      "sha256": "ee3af60d32bdb4e71ac082a564b528d10cfdeb553ec3bc68c3158bc1eaafa600"
+      "sha256": "6d700b0ec9c9fea732b5c7de8a92fc533c462b58c6cf801c68adb24904c52dd1"
     },
     {
       "bytes": 2761,
@@ -2066,9 +2066,9 @@
       "sha256": "c7e738545760f566371e59bc01803864c51d9904f262fc404fecad3d1dc9cf10"
     },
     {
-      "bytes": 3120,
+      "bytes": 3287,
       "path": "pyproject.toml",
-      "sha256": "61a031efae4a70b2ca94f743a0e09524b4414c5731f7fd0a8d8e670ca98543ad"
+      "sha256": "b19f1429ffb295f363ddaa43f8d086d2bf42f64904d964be41788b59b9fb0e71"
     },
     {
       "bytes": 2059,
@@ -2286,6 +2286,11 @@
       "sha256": "57a61640e4f242c750eaec8aafac3b22b1a580debb2654579d0775815f693037"
     },
     {
+      "bytes": 1961,
+      "path": "scripts/update_team_strength_golden.py",
+      "sha256": "b131e61e426c9a7fac7d1b3f7782f5bd36c334a43aa0ba82ae409ec510e4c5ad"
+    },
+    {
       "bytes": 10155,
       "path": "scripts/validate_gcs008_acceptance.py",
       "sha256": "2c32f1d357215cb9ee92a703368f6b1d51fc9f7c8477e43af61295fbc675465f"
@@ -2394,6 +2399,16 @@
       "bytes": 4046,
       "path": "scripts/verify_team_strength_model.py",
       "sha256": "89e2c67ca683728f855b7e8b43e09cca869b286427ab954a332cafdaa180dddf"
+    },
+    {
+      "bytes": 2267,
+      "path": "scripts/verify_team_strength_replay.py",
+      "sha256": "e4c156acbff4b994c33814140acba4583d1fcd88b75dba94a0e3ea25381110ab"
+    },
+    {
+      "bytes": 5855,
+      "path": "scripts/verify_team_strength_wheel.py",
+      "sha256": "9b399086ab2e3a6360e894f7c3d9e6977c81517732f4b219f333a8e040f9e150"
     },
     {
       "bytes": 25494,
@@ -2841,9 +2856,9 @@
       "sha256": "89dc89d2774deaab1411c3a9a98f666b1670c48257a9acd9411388aa31c19750"
     },
     {
-      "bytes": 6426,
+      "bytes": 6546,
       "path": "src/dmf_pulse/cli/events.py",
-      "sha256": "681d78ca1c756d9f158baa73f74bf7ad9e114146d1b5acd2c3d0567b1b90f782"
+      "sha256": "eafa2a8b948475f22a7e95a2e178a62de4f80cf5a45f670202da13276546b392"
     },
     {
       "bytes": 1972,
@@ -2899,6 +2914,11 @@
       "bytes": 1854,
       "path": "src/dmf_pulse/cli/specs_cmd.py",
       "sha256": "2017bd1f82c8e9723cb5709abe7a5ad71bde90269c68f7dc6164f27116778bd7"
+    },
+    {
+      "bytes": 7413,
+      "path": "src/dmf_pulse/cli/team_strength.py",
+      "sha256": "e59e119093f330dd87e3169549bf5f53822e621ea6ced70c8c93c96872225c62"
     },
     {
       "bytes": 662,
@@ -3136,9 +3156,19 @@
       "sha256": "a1207826b9bffeb598ee9b398839fa05266faacc67800a551e812a8b71af17b9"
     },
     {
+      "bytes": 20964,
+      "path": "src/dmf_pulse/evaluation/resources/team_strength_golden.json",
+      "sha256": "121ebf4e5d9a6ef4999992176aacbf60a9da36ef2ca6be4cbea723004ffd17ba"
+    },
+    {
       "bytes": 7501,
       "path": "src/dmf_pulse/evaluation/service.py",
       "sha256": "9b3a96448ce9e1c8bd06fd992d084f28d6a1015cb7c9bb2f2c1b639a95c0d6f4"
+    },
+    {
+      "bytes": 19079,
+      "path": "src/dmf_pulse/evaluation/team_strength_replay.py",
+      "sha256": "520f3537c99a482ea1a58f5cdcde52e94db35497b44af57e6047c29e3645822d"
     },
     {
       "bytes": 2333,
@@ -5186,6 +5216,11 @@
       "sha256": "09b89b6912a433404e0a3708977dd7ca44b0338a346f18084e8f7fc099642fee"
     },
     {
+      "bytes": 3777,
+      "path": "tests/unit/cli/test_team_strength_cli.py",
+      "sha256": "03858423b8836cb742f5274fa739013ffe0e58e3c9731f9877f36cbe9f4e6419"
+    },
+    {
       "bytes": 9905,
       "path": "tests/unit/config/test_loader.py",
       "sha256": "fbaf8044fd378e48ad7b01583bc63bdaece1c7233b51b8ba9e89169081db8ace"
@@ -5259,6 +5294,11 @@
       "bytes": 10784,
       "path": "tests/unit/evaluation/test_regret_reports_artifacts.py",
       "sha256": "b4a09235e5a8af67d9d3f5a1d5b8e3ad4af223a128af41d2c9ae2f462958e74a"
+    },
+    {
+      "bytes": 6517,
+      "path": "tests/unit/evaluation/test_team_strength_replay.py",
+      "sha256": "4790e2e69fc68f8d3b417a1c6707bf2e1d9c8e608f77c207da0538cfb97cd72c"
     },
     {
       "bytes": 4275,
@@ -6031,9 +6071,9 @@
       "sha256": "f4b9986b875edce66b1e76f19957ab6703cecaa54556df0b997a0587267c0fc2"
     },
     {
-      "bytes": 1632,
+      "bytes": 3122,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001A/ACCEPTANCE.md",
-      "sha256": "e457089486b9a923f51f6ee198a5a332e58ab3b83853b1a5653ee91935721647"
+      "sha256": "6e9da7f51a7d2886166e6988b28878ddd545e9549dbf929b758fd0c42c68370f"
     },
     {
       "bytes": 6709,
@@ -6041,9 +6081,9 @@
       "sha256": "074d41bb84c0389d85385d0afecdddf9cba543d2e22a17ea763df3fdc3b68466"
     },
     {
-      "bytes": 1463,
+      "bytes": 1620,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001A/ticket.yaml",
-      "sha256": "29e7e63c758dd2ddd04f6cd5b277f61c0cc9616ed8828639b062d7ebb257d410"
+      "sha256": "634a2da97c9f57165003b920ea0c7c205ff3d222c8f14c64c60d001ad4563c26"
     },
     {
       "bytes": 3923,
