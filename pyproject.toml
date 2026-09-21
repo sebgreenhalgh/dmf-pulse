@@ -57,6 +57,8 @@ packages = ["src/dmf_pulse"]
 "config/providers/openfootball_score_prior.json" = "dmf_pulse/ingestion/resources/openfootball_score_prior.json"
 "config/rights/openfootball_profiles.json" = "dmf_pulse/ingestion/resources/openfootball_profiles.json"
 "config/rules/fpl-2026-27" = "dmf_pulse/rules/resources/fpl-2026-27"
+"config/providers/openfootball_historical_team_identity.json" = "dmf_pulse/ingestion/resources/openfootball_historical_team_identity.json"
+"config/models/current_team_strength_governance.json" = "dmf_pulse/ingestion/resources/current_team_strength_governance.json"
 
 [tool.ruff]
 target-version = "py313"

@@ -1,0 +1,3116 @@
+{
+  "additional_alias_count": 14,
+  "alias_count": 56,
+  "ambiguous_mapping_count": 0,
+  "canonical_club_count": 42,
+  "canonical_clubs": [
+    {
+      "canonical_name": "Reading FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7106-bcf0-dec0ae50d825",
+      "canonical_team_identity_sha256": "36961a8326961bef321d446c6ee051a5a5754331903a7bb8d07fd9bbfadbe8fa",
+      "continuity_note": "Single accepted Premier League corpus season; season membership is not identity.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Reading FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2012/13"
+      ],
+      "semantic_sha256": "d2bd52e7b91e59a712b2c87c282d65e8ee82c0f4bda8cd3df2f11c9fd28b0f5d"
+    },
+    {
+      "canonical_name": "Brighton & Hove Albion FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7128-a139-726538c55c11",
+      "canonical_team_identity_sha256": "f79f892426e5be37c5239fe6eea3ddfdcff903a5027907c6859aa4c3eee5008d",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "5",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Brighton",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Brighton & Hove Albion",
+        "Brighton & Hove Albion FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "ae86ace908c34805094f35ab7b539797dfe0e9367c03648fefcce0c65665d899"
+    },
+    {
+      "canonical_name": "Chelsea FC",
+      "canonical_team_id": "01a0c4f8-e0bc-71ce-a570-290a916e6f65",
+      "canonical_team_identity_sha256": "d70805910884aa47028d0597b5d265a77d07fda8c6e08adf0a2f63352d797301",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "6",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Chelsea",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Chelsea FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "4268831bf0af6b8eb9e049a0fda2f05adbef62dcd2f5dea2454b1f8d4070de6d"
+    },
+    {
+      "canonical_name": "Queens Park Rangers",
+      "canonical_team_id": "01a0c4f8-e0bc-7220-9ae3-fb11c1e90f34",
+      "canonical_team_identity_sha256": "14865a5835b25849eb885dfdd5ecbc9be7f1971b5c4b89f8b4acd5c2e490c0d3",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Queens Park Rangers"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2011/12",
+        "2012/13",
+        "2014/15"
+      ],
+      "semantic_sha256": "ec851eeca9a64337032f55b00f21cc156c176bebef1c18480f8379ba9892bea3"
+    },
+    {
+      "canonical_name": "Leeds United FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7253-ae6d-cef2d502db48",
+      "canonical_team_identity_sha256": "40d1a34db319e168f1a1fede476c5f3a01144ea10dea28cb206d3661cbe00643",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "13",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Leeds",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Leeds United FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "bd728614bf7e2a5ac88b305788489d9eb091aa54869c9ef09c7c0bf8676b4270"
+    },
+    {
+      "canonical_name": "West Ham United FC",
+      "canonical_team_id": "01a0c4f8-e0bc-72ee-9a5a-1068df8399c2",
+      "canonical_team_identity_sha256": "ca8e2971dec56d52167e9ce993a8331927fb0e56950f14e35307d249b3ff60d0",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "West Ham United",
+        "West Ham United FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26"
+      ],
+      "semantic_sha256": "4f39da1c5af261b3f3c8c1c884c42b6754f0beb6308407cc3c34183a9023366a"
+    },
+    {
+      "canonical_name": "Swansea City",
+      "canonical_team_id": "01a0c4f8-e0bc-7434-9ab3-19511ca010b6",
+      "canonical_team_identity_sha256": "76352e729236c924251d4e0c2c55185d1cbe0f21374e003c97cce46d9d01da29",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Swansea City"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18"
+      ],
+      "semantic_sha256": "0dfe40693ca935618b8bbe091e9c6228f30576b23b81b6f2df8ebe10da61b357"
+    },
+    {
+      "canonical_name": "Ipswich Town FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7461-8e09-b55eb1026ad7",
+      "canonical_team_identity_sha256": "448ced7a28abb66d00bdd398b5dd4205256daf53901ed821fe026a311574d51f",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "12",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Ipswich Town",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Ipswich Town FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2024/25",
+        "2026/27"
+      ],
+      "semantic_sha256": "6fda44f480b07a34753eac897297c5ed4b77e071518605496ead1aac4622e2f9"
+    },
+    {
+      "canonical_name": "Manchester United FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7515-8253-456ec6337a5a",
+      "canonical_team_identity_sha256": "4ee7389ae336e2512a84a190c0297d8b2ef153de4d04eaf746e77db946346bc3",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "16",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Man Utd",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Manchester United",
+        "Manchester United FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "0fe143ab777b8559265aa10724e6162481a505984cb95a444a9e211e46796c57"
+    },
+    {
+      "canonical_name": "West Bromwich Albion FC",
+      "canonical_team_id": "01a0c4f8-e0bc-75b0-afa5-5a488cb7b216",
+      "canonical_team_identity_sha256": "f3cb1a6507ed6d70ad7e3b0d85d98ce087a7a9ba0fc4f16f420761fffbeca0d2",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "West Bromwich Albion",
+        "West Bromwich Albion FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2020/21"
+      ],
+      "semantic_sha256": "851099b55d65d98eefe14084cb86a70150a79d115981d946097be6e86940198b"
+    },
+    {
+      "canonical_name": "Hull City AFC",
+      "canonical_team_id": "01a0c4f8-e0bc-7714-8ce8-d9ee1469e43d",
+      "canonical_team_identity_sha256": "60fec0567ad2e2272b4fe2395bbc1bd7ee4a7d0066a3071f45a5f1cabafcb929",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "11",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Hull City",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Hull City",
+        "Hull City AFC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2013/14",
+        "2014/15",
+        "2016/17",
+        "2026/27"
+      ],
+      "semantic_sha256": "0aeefe83da55af5858c5cab0137f79b4196a3fc298296c8dccc82968097294df"
+    },
+    {
+      "canonical_name": "Newcastle United FC",
+      "canonical_team_id": "01a0c4f8-e0bc-77bc-aa95-9e3213ac3de8",
+      "canonical_team_identity_sha256": "4ff7a092e7f92bd3e1d62a4f625c33fdb2bf5a40bc96dc4461ff2672a19b3ed4",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "17",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Newcastle",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Newcastle United",
+        "Newcastle United FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "6d13889bd86b4c41256a22d3b448e4f6b425182dafc9a78466a224d6b8c67e59"
+    },
+    {
+      "canonical_name": "Nottingham Forest FC",
+      "canonical_team_id": "01a0c4f8-e0bc-77e7-b285-5486e1d82bb2",
+      "canonical_team_identity_sha256": "f20e428b9dc5ceba85023857177ce6021e5beeaee7dfc2b36de065b91cfbd88e",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "18",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Nott'm Forest",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Nottingham Forest FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "6ae46b7d34d3abe13ef7fe856fcade442c66e177f83cc4dbf11880f46b21f92b"
+    },
+    {
+      "canonical_name": "Middlesbrough FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7800-bba1-e528a0d13d05",
+      "canonical_team_identity_sha256": "2eddbf0438a2d96ebd852ddf490cc1599dbcb5a13bf7fad0ffe8459ced1bc9a1",
+      "continuity_note": "Single accepted Premier League corpus season; season membership is not identity.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Middlesbrough FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2016/17"
+      ],
+      "semantic_sha256": "5be0e00c8dbba699891f56ee3a013f20559588f5c10340c00648bfef26e2219e"
+    },
+    {
+      "canonical_name": "Everton FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7839-b1ba-7791c432434c",
+      "canonical_team_identity_sha256": "10e6593af26221a0801390b80b8b7534119424a605f3c045f940641d2dab8519",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "9",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Everton",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Everton FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "abd7ea8c1e47e01621b656b54dba599db438eafc01755b847cb78751b4c4fc59"
+    },
+    {
+      "canonical_name": "Luton Town FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7864-a0fb-367cdfe15ade",
+      "canonical_team_identity_sha256": "b5fc827d05e47d4b6647f82c39f3a40c63d1cffd3638cf1700f63adc117a88b5",
+      "continuity_note": "Single accepted Premier League corpus season; season membership is not identity.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Luton Town FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2023/24"
+      ],
+      "semantic_sha256": "e609fb2691e62b1463e33a20e6cb92e859ce69d06bbecdadc1e2a1a11d922ad4"
+    },
+    {
+      "canonical_name": "Birmingham City",
+      "canonical_team_id": "01a0c4f8-e0bc-7870-bd5d-d9d356f8dd94",
+      "canonical_team_identity_sha256": "5a1da3c51c999b8162683b4e810cc37caa97fe89e095d66da6fe0ebed1dd1cfd",
+      "continuity_note": "Single accepted Premier League corpus season; season membership is not identity.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Birmingham City"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11"
+      ],
+      "semantic_sha256": "d334ee2764e5ab661b890c1923d8c16f02f256c3938e2efacc62f87229f8addf"
+    },
+    {
+      "canonical_name": "Leicester City FC",
+      "canonical_team_id": "01a0c4f8-e0bc-78d4-a520-27e556dfe45c",
+      "canonical_team_identity_sha256": "36f46844ea92f20ef5430cb8ce87ab532f900fa6ef025a5dd466efa660977a3a",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Leicester City",
+        "Leicester City FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2024/25"
+      ],
+      "semantic_sha256": "2bee019e0352311f30b53e9c072ea3290df7f03f8f8836c4f5efe4364c5b850a"
+    },
+    {
+      "canonical_name": "Wigan Athletic",
+      "canonical_team_id": "01a0c4f8-e0bc-78fb-8591-7c42f207a1c9",
+      "canonical_team_identity_sha256": "647b35ee47906cdd4fa9fa7fa837485d1767292c7db8d52020cf21b158dd22fd",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Wigan Athletic"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13"
+      ],
+      "semantic_sha256": "b5aee4b19cebc342e62708a4af314b7ce4c9d12e1b8ed4b985aa980731cedf81"
+    },
+    {
+      "canonical_name": "Fulham FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7904-8867-2f27a3c31340",
+      "canonical_team_identity_sha256": "76fb563a4c50d5db9f3e6601d9bb5ca96f9b893f45bf2b206b6475daa145d907",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "10",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Fulham",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Fulham FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2018/19",
+        "2020/21",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "46d3c8247d5b6e254569add70721761c3bea8f3a07d681f8eea5739bed286dcd"
+    },
+    {
+      "canonical_name": "Cardiff City",
+      "canonical_team_id": "01a0c4f8-e0bc-7913-a465-a7a3559052cf",
+      "canonical_team_identity_sha256": "1267e9d1ef69ece0febe33907b5059698b12c3170b009cd9918e9624aee20de1",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Cardiff City"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2013/14",
+        "2018/19"
+      ],
+      "semantic_sha256": "e347ca661c618e9ad1c1de4c135ad4749a5c298cb012d43ca65825c0a45c8e0b"
+    },
+    {
+      "canonical_name": "Bolton Wanderers",
+      "canonical_team_id": "01a0c4f8-e0bc-7925-b4f9-7aece951102b",
+      "canonical_team_identity_sha256": "ce9f1fb2a07ac345a528dd58b2d937ba3d2a8bab9347d3f70e85b3b876544cf2",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Bolton Wanderers"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12"
+      ],
+      "semantic_sha256": "4756b36f42a2a5b2dc91fd65ad6bb2cff25c4329adb07d10fdcb2d082543cc11"
+    },
+    {
+      "canonical_name": "Crystal Palace FC",
+      "canonical_team_id": "01a0c4f8-e0bc-79a1-8f3a-90a98b5f44c5",
+      "canonical_team_identity_sha256": "a6659888ca54d199e183c447387ea09d2f4bd412f280c98c0d4fb8403e29a6d1",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "8",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Crystal Palace",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Crystal Palace",
+        "Crystal Palace FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "3f1a61a56dcf1601a151a356b0e244cc29d7b1e4529dac5a0ec1c6faf28ec7d0"
+    },
+    {
+      "canonical_name": "Manchester City FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7bcd-9ab2-1c9c2d59e64a",
+      "canonical_team_identity_sha256": "16c491dfadbbb1847c24ae48a876940950dcf11ff95e0b8691a95077f3bb0a38",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "15",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Man City",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Manchester City",
+        "Manchester City FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "c0733790f824cf91c00ff6708e365c091cd266209ed2dc1ddc4f6056d927f557"
+    },
+    {
+      "canonical_name": "Blackburn Rovers",
+      "canonical_team_id": "01a0c4f8-e0bc-7c97-8ad5-45cd67b649dc",
+      "canonical_team_identity_sha256": "0f4644a9d1c7ad8ac8e11f7871a71e1a5126a7d8cb0aeda3243b5d575530f2a1",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Blackburn Rovers"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12"
+      ],
+      "semantic_sha256": "ffbffdd15b2b9f8b8d154b27edadb57e69554db027d719a2b01cb50245587a80"
+    },
+    {
+      "canonical_name": "Watford FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7c9f-bb35-f9ef1f885a3d",
+      "canonical_team_identity_sha256": "afd4900cc1a3e02407cebc6b982103f2479c86c4285f159f4556e26fc08e9637",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Watford FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2021/22"
+      ],
+      "semantic_sha256": "1b55c67d196e6d127e03a318b13bf940e1233cfe133d9e729677ba099ddac427"
+    },
+    {
+      "canonical_name": "Sunderland AFC",
+      "canonical_team_id": "01a0c4f8-e0bc-7d0d-bafd-cfd8f4b6afcd",
+      "canonical_team_identity_sha256": "f39fda9b4aa6bab4ace14bf82c4c66b76ae7af3543438a9010514b51f12e8cc7",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "20",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Sunderland",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Sunderland AFC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "5d2d3b9228025b7b57e3b086ffa9e786a0fcd55853a4912db8f067f501f173db"
+    },
+    {
+      "canonical_name": "Arsenal FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7d1a-be3c-a724e6040810",
+      "canonical_team_identity_sha256": "ebc804ca0e2b8ae1ec9a1fa17532ee3fd61af97c0f564ff98f3ad65bc5ce5385",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "1",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Arsenal",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Arsenal FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "f215825af9f0e72b12dcdfcee676463656e4b780831340390ecb08db710b9fc1"
+    },
+    {
+      "canonical_name": "Burnley FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7d5b-9084-5a7af83c3b05",
+      "canonical_team_identity_sha256": "c71668f61cfb459a5a2ecd0d9d84b111ccbac4e7ef29db85c994897cc941651d",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Burnley FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2014/15",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2023/24",
+        "2025/26"
+      ],
+      "semantic_sha256": "026bf201c5ca9a171356acf799eaade978fd42c610d66153b40db0b656c0b785"
+    },
+    {
+      "canonical_name": "Brentford FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7dbf-ab3d-6a8d8dd29d79",
+      "canonical_team_identity_sha256": "176a7ca60c9ad1cd9b14b405474bced4fae031b5d7e471eeebcc529ac2afd161",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "4",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Brentford",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Brentford FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "6707111ff66efc0ea205aa1cab0c6fa70c37432c4776ae0b7bd3e1ab76581057"
+    },
+    {
+      "canonical_name": "Liverpool FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7e0d-97dd-5347da800b7d",
+      "canonical_team_identity_sha256": "1ade1ce944306e593e0c95dba06ecd4f7336ee0d587c1977ebc9ca3b2398ab47",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "14",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Liverpool",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Liverpool FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "0246b7e73c7815da6b67b7d667ca8b0d0ca05821981f7a9fdd5acf9c65a2054e"
+    },
+    {
+      "canonical_name": "Aston Villa FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7e36-9574-e16ffc1da3bf",
+      "canonical_team_identity_sha256": "43b6e724c746392925ada99f6f369fea2b6fb026ce194782c30e375804ab3cab",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "2",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Aston Villa",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Aston Villa",
+        "Aston Villa FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "701ade01760d3c91d56faee311b655aefef917185c8e786ef87ef4e8f67ee6ae"
+    },
+    {
+      "canonical_name": "Tottenham Hotspur FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7e48-b3c5-5248392e35d3",
+      "canonical_team_identity_sha256": "e8b82915dd2a49eb3ea6df2be1e7478e1755b1796d822601cbda94e96833a4a5",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "19",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Spurs",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Tottenham Hotspur",
+        "Tottenham Hotspur FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "9e17034ddc60b83ec0f9b470fdb2fc41b201c6530907bd802a349ce0f03a9b94"
+    },
+    {
+      "canonical_name": "Blackpool FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7e4c-a106-c0b3512e7b75",
+      "canonical_team_identity_sha256": "dd3cd45fe46c2d294058f05fffef04f181aad6f2925e737ac0f61c3eaf66561a",
+      "continuity_note": "Single accepted Premier League corpus season; season membership is not identity.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Blackpool FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11"
+      ],
+      "semantic_sha256": "2a818dbdebe87bab24ea4f8d263b71cc86bc265938ec1ff3907808b8ad97e482"
+    },
+    {
+      "canonical_name": "Southampton FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7e58-9fc8-43adef9017ca",
+      "canonical_team_identity_sha256": "e72e2bee9911be5d7ff09923c20167001d862258d6581b02d347a604280d59f3",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Southampton FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2024/25"
+      ],
+      "semantic_sha256": "fe72f06dbb5653cc0651075bde260061eb8c2fdb6071ead72107759648a57fee"
+    },
+    {
+      "canonical_name": "Huddersfield Town",
+      "canonical_team_id": "01a0c4f8-e0bc-7eae-99ed-6d514d63202c",
+      "canonical_team_identity_sha256": "4ec674e6bbc559a0c9bbe621c81a1f9623ce4457b63b87e924f6961be4636826",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Huddersfield Town"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2017/18",
+        "2018/19"
+      ],
+      "semantic_sha256": "3f62f178ab55aa9116de3a9db0f1333ff747d1e4747a193b416fb6d2663918db"
+    },
+    {
+      "canonical_name": "Stoke City",
+      "canonical_team_id": "01a0c4f8-e0bc-7ecf-a6e5-e1de844c0601",
+      "canonical_team_identity_sha256": "b466e074074340deb3e9ce2d0fc1ae6ee42d37e9be48b3d06ef038029b32dd5c",
+      "continuity_note": "Continuous Premier League membership within the accepted corpus.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Stoke City"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18"
+      ],
+      "semantic_sha256": "d8768ef098899891fe7a6a11df622db204e3083fa8be5266ef8116a44bd8ae46"
+    },
+    {
+      "canonical_name": "Norwich City FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7edf-bb04-f8f37dc9dd5f",
+      "canonical_team_identity_sha256": "389348f50ce961499ddc0833e002f1586936596515c2bb272868a9952332900f",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Norwich City",
+        "Norwich City FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2015/16",
+        "2019/20",
+        "2021/22"
+      ],
+      "semantic_sha256": "9b8067bb5fd1ea08227016447b47dcedc73c9e72e7891f6bc60017b1d23eb2c7"
+    },
+    {
+      "canonical_name": "AFC Bournemouth",
+      "canonical_team_id": "01a0c4f8-e0bc-7f69-b0dc-770ddc83e3a8",
+      "canonical_team_identity_sha256": "c98137e5c69a5cdc3808fec408d41580509d6891561942134aba5110735a2207",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "3",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Bournemouth",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "AFC Bournemouth"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "019c2c84141a384299aebaf13fad2a0d811dfaeda795f2b99c8b7f0e96bf0512"
+    },
+    {
+      "canonical_name": "Sheffield United FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7f8a-8849-0d6aa5a0433e",
+      "canonical_team_identity_sha256": "5a8f3e7ccef883503155ff17b505ea1a58c181439c9a1dfa4da5a1a0871424fa",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Sheffield United",
+        "Sheffield United FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2019/20",
+        "2020/21",
+        "2023/24"
+      ],
+      "semantic_sha256": "c5b9c8df8ad8dcfabc302f77d202d3c4f02a87a97fb5f5a96c451c9f208e2b30"
+    },
+    {
+      "canonical_name": "Wolverhampton Wanderers FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7fa3-8655-9ab3e800c17b",
+      "canonical_team_identity_sha256": "e4f67c9b4db4069c9032d94f6e0b119d9cb7901ec6edd0c6be36aac4d86f5a9a",
+      "continuity_note": "Canonical identity preserved across relegation and later Premier League return.",
+      "current_fpl_external_identifier": null,
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Wolverhampton Wanderers",
+        "Wolverhampton Wanderers FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2010/11",
+        "2011/12",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26"
+      ],
+      "semantic_sha256": "d223394696b35bfd7e298b70689089f965b0bbcfd2a8170a4196f4342a7bcbd9"
+    },
+    {
+      "canonical_name": "Coventry City FC",
+      "canonical_team_id": "01a0c4f8-e0bc-7fdb-b5f7-b5152bfdfa13",
+      "canonical_team_identity_sha256": "14ceec64cae79d7a1754d3f5fe5e75abb512cbc033c6aab79ea9e8c2370d5510",
+      "continuity_note": "Single accepted Premier League corpus season; season membership is not identity.",
+      "current_fpl_external_identifier": {
+        "external_id_text": "7",
+        "mapping_method": "MANUAL",
+        "mapping_status": "HUMAN_VERIFIED",
+        "observed_display_name": "Coventry City",
+        "provider_key": "official_fpl",
+        "season_scope": "2026/27"
+      },
+      "entity_type": "TEAM",
+      "evidence": [
+        "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1",
+        "CURRENT-TEAM-STRENGTH-001A-R reviewed identity table"
+      ],
+      "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
+      "openfootball_aliases": [
+        "Coventry City FC"
+      ],
+      "registered_at": "2026-09-21T17:14:39.069428Z",
+      "registration_authority": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_membership": [
+        "2026/27"
+      ],
+      "semantic_sha256": "e5bfc9e2c0c46588bcf2d007059a5f4dc432fcead7808278ac38b2c69b34d2dc"
+    }
+  ],
+  "canonical_ordering": "canonical_team_id,source_team_name,season_scope",
+  "competition": "English Premier League",
+  "decided_at": "2026-09-21T17:14:39.069428Z",
+  "mapping_authority": "Sebastian Greenhalgh",
+  "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+  "provider_key": "openfootball_football_json",
+  "record_count": 56,
+  "records": [
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7106-bcf0-dec0ae50d825",
+      "canonical_team_identity_sha256": "36961a8326961bef321d446c6ee051a5a5754331903a7bb8d07fd9bbfadbe8fa",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2012/13"
+      ],
+      "semantic_sha256": "c4a5e7e480004fc4944a857b1476411a0624c46f4fe8c5906f90f426b51eb204",
+      "source_identity_sha256": "11da1fe64e4341fc94a6bac39356c03f974a12d0184449e3fcecae51ba7690aa",
+      "source_snapshot_identity": "22d87a445db0c27f31e4eb9c2605123c22a23e4c5337f9a7102e6e41be97faf3",
+      "source_team_name": "Reading FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7128-a139-726538c55c11",
+      "canonical_team_identity_sha256": "f79f892426e5be37c5239fe6eea3ddfdcff903a5027907c6859aa4c3eee5008d",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2017/18",
+        "2018/19",
+        "2019/20"
+      ],
+      "semantic_sha256": "c0c96130ba9cfed2bc9e545152449806fd0794467d113724c5830de27fe2fafa",
+      "source_identity_sha256": "015d6577e8ce2242eb8ad274e6413722b796a974abb974501c50f20ab3981efc",
+      "source_snapshot_identity": "67ea1abb33c2f0d6447bb3244fbded28532ee37f579026468bf58bf1091fb38a",
+      "source_team_name": "Brighton & Hove Albion"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7128-a139-726538c55c11",
+      "canonical_team_identity_sha256": "f79f892426e5be37c5239fe6eea3ddfdcff903a5027907c6859aa4c3eee5008d",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "f9b10c1c81be6c9ff626cacfe0c820cf632cf95946fdff1ccf096c98e631ef71",
+      "source_identity_sha256": "f41037345d2c8b85fbfeac50fee304a52d8c483b2a8cf792352e7d80bbadd58b",
+      "source_snapshot_identity": "1176f1690cee0d43c164f0e3bdf8debefbbf86a0f224ddd387cdd1501240944c",
+      "source_team_name": "Brighton & Hove Albion FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-71ce-a570-290a916e6f65",
+      "canonical_team_identity_sha256": "d70805910884aa47028d0597b5d265a77d07fda8c6e08adf0a2f63352d797301",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "4971d8a53c25af78695066295c7d428d18b41c324a68e47674dd7a2d351c6053",
+      "source_identity_sha256": "c8505082f63c6d73f323ee1a9979ce87e884c7aab759b1104bf379e8f37e10c6",
+      "source_snapshot_identity": "78b42143c350382deb95b00d163a68c2ccd3902aec19cab0b667a55810ac283a",
+      "source_team_name": "Chelsea FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7220-9ae3-fb11c1e90f34",
+      "canonical_team_identity_sha256": "14865a5835b25849eb885dfdd5ecbc9be7f1971b5c4b89f8b4acd5c2e490c0d3",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2011/12",
+        "2012/13",
+        "2014/15"
+      ],
+      "semantic_sha256": "d84b2b57b4dbe8c1866c16a6ffe0e4dbeb88ee2afcd5985063f8d4a1748c0b19",
+      "source_identity_sha256": "fefcc8e1d7c7c484c18a5a835b58ce9873873c3f2571320077840e3c23027801",
+      "source_snapshot_identity": "2001c8c540e6f3e4a8b97606636e06c9afddf51c35fdc8603a5a631257a6395f",
+      "source_team_name": "Queens Park Rangers"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7253-ae6d-cef2d502db48",
+      "canonical_team_identity_sha256": "40d1a34db319e168f1a1fede476c5f3a01144ea10dea28cb206d3661cbe00643",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "059a1f15e19a240823a4ca3e91818bc50d3cc2878dc1a75b10b8cc509c36fc33",
+      "source_identity_sha256": "687d4d90fe5298732fa683ec41545cfd9ad4058efa5db689dc9057c354c4b8a5",
+      "source_snapshot_identity": "4ca4b4bc90eeb552a4fdd5cbb71e71a4ad307aea5d863358f9a9e851f8a960e9",
+      "source_team_name": "Leeds United FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-72ee-9a5a-1068df8399c2",
+      "canonical_team_identity_sha256": "ca8e2971dec56d52167e9ce993a8331927fb0e56950f14e35307d249b3ff60d0",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20"
+      ],
+      "semantic_sha256": "53b90fea65fb709d3f82cb4a041b4871a80efe5cb627a4f9bd5f2cc3e500cebb",
+      "source_identity_sha256": "02b2c4d7b185e25e28647e39c1209a3f768283410eb5760731cd3345ce319a01",
+      "source_snapshot_identity": "03ae5bdb30b129d26b24b7a335bd1efdc34ecf24e4777457987870d729d629cd",
+      "source_team_name": "West Ham United"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-72ee-9a5a-1068df8399c2",
+      "canonical_team_identity_sha256": "ca8e2971dec56d52167e9ce993a8331927fb0e56950f14e35307d249b3ff60d0",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26"
+      ],
+      "semantic_sha256": "a539815f34ec65b20c3837353959b2fa585876eb507e8a7ca9a82c290a860da8",
+      "source_identity_sha256": "81bc83f676c8af329da43a7579e53989315a43ba65defe4e4cd3656d7f191cf1",
+      "source_snapshot_identity": "93afdf7ac5501daa6cbfc273330543bb5e01daa925f7ab52024fb7a60a7ceaab",
+      "source_team_name": "West Ham United FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7434-9ab3-19511ca010b6",
+      "canonical_team_identity_sha256": "76352e729236c924251d4e0c2c55185d1cbe0f21374e003c97cce46d9d01da29",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18"
+      ],
+      "semantic_sha256": "e38e8398211e36bde97a4f8145583286e5886ae41ce2a512d71aaac0e51aafb1",
+      "source_identity_sha256": "68f760bdc18313b72fc72f8250aff2f27702290eb1132bdab5abd6ed1cf62408",
+      "source_snapshot_identity": "f5349bd27c8f9403ecfd93cae58db8556180bad3d16ecc054ab8b3fdc0897c0a",
+      "source_team_name": "Swansea City"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7461-8e09-b55eb1026ad7",
+      "canonical_team_identity_sha256": "448ced7a28abb66d00bdd398b5dd4205256daf53901ed821fe026a311574d51f",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2024/25",
+        "2026/27"
+      ],
+      "semantic_sha256": "519451d1160a54f3ced67d9b277fe05dccf8b8ffdedc956a2033319d22b1275c",
+      "source_identity_sha256": "745ab405ac94ab2f59c7915853a885cea712e2cd91e20b8c34b30f51e5abee67",
+      "source_snapshot_identity": "7a5cb8724294f7f169ecaf7253c579589931cbe3afa7717e6e2d399a873e12d3",
+      "source_team_name": "Ipswich Town FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7515-8253-456ec6337a5a",
+      "canonical_team_identity_sha256": "4ee7389ae336e2512a84a190c0297d8b2ef153de4d04eaf746e77db946346bc3",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20"
+      ],
+      "semantic_sha256": "969d3545049c15085900d04560ff77a82428dc2a4e977b9c2bef358a90f35a42",
+      "source_identity_sha256": "8072860ceef85eb784c8457ea4db5d81827097f0072613a1d5e57edd70bcd304",
+      "source_snapshot_identity": "a7846a8a416959bfc3dca26560427cb8d6f304835576da3349cd6eaedff75019",
+      "source_team_name": "Manchester United"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7515-8253-456ec6337a5a",
+      "canonical_team_identity_sha256": "4ee7389ae336e2512a84a190c0297d8b2ef153de4d04eaf746e77db946346bc3",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "e864e74d815e3b5dc62b53a4ba6cccfa12ddd7eea54ed0e3bfbac4c2d501391c",
+      "source_identity_sha256": "c4c3568f4066922b6312e08d80fa6766f2b80b04b6be66a7a63baf2ebf62014c",
+      "source_snapshot_identity": "1176f1690cee0d43c164f0e3bdf8debefbbf86a0f224ddd387cdd1501240944c",
+      "source_team_name": "Manchester United FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-75b0-afa5-5a488cb7b216",
+      "canonical_team_identity_sha256": "f3cb1a6507ed6d70ad7e3b0d85d98ce087a7a9ba0fc4f16f420761fffbeca0d2",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18"
+      ],
+      "semantic_sha256": "741e534c78924a64f2638e60bb3aeef42036b84c1943233668e2194023a0e4ca",
+      "source_identity_sha256": "640d77d746f4fa961dca36de686f93ca05156af35d478a2f2371efbc87d5413d",
+      "source_snapshot_identity": "fd089079cca6e9519db97454f1e5ae04f0163d80d8acaf9c00d34703bffdd872",
+      "source_team_name": "West Bromwich Albion"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-75b0-afa5-5a488cb7b216",
+      "canonical_team_identity_sha256": "f3cb1a6507ed6d70ad7e3b0d85d98ce087a7a9ba0fc4f16f420761fffbeca0d2",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21"
+      ],
+      "semantic_sha256": "bb50580733952baffa98ac77c34def4e337f3f81dbc3bbf4619ce24fdf82ca8b",
+      "source_identity_sha256": "bb5f7dc017a3f67fee3c2af1f4310512a95fb46d9093289a80b703ca75eacc9b",
+      "source_snapshot_identity": "9819a25d45de3b00f9a72349590e938a39632407bc571d1dd7dcc5a9e74b1a62",
+      "source_team_name": "West Bromwich Albion FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7714-8ce8-d9ee1469e43d",
+      "canonical_team_identity_sha256": "60fec0567ad2e2272b4fe2395bbc1bd7ee4a7d0066a3071f45a5f1cabafcb929",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2013/14",
+        "2014/15",
+        "2016/17"
+      ],
+      "semantic_sha256": "77792ac3f38763e8f6b9a3c61e6a9d3ad4a671c615572d7c8dba0be105456627",
+      "source_identity_sha256": "e255fcb9ae0a2c8929e29cafb7b17ef1caa04f53b39992470ef5ce65214b230f",
+      "source_snapshot_identity": "f3be8ce56e6c822e92501bf33a47e06919af1b9be37831616ad70edbb6970554",
+      "source_team_name": "Hull City"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7714-8ce8-d9ee1469e43d",
+      "canonical_team_identity_sha256": "60fec0567ad2e2272b4fe2395bbc1bd7ee4a7d0066a3071f45a5f1cabafcb929",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2026/27"
+      ],
+      "semantic_sha256": "df5a9dd0b6da745a07220d45e71cdd3c19ea62cdda407e368d3ba1efe22c01f1",
+      "source_identity_sha256": "d2f4908f4bf90836c95831d7765b7982642aba062599c1d9d8421c9c26f2617a",
+      "source_snapshot_identity": "624b1b29ec49e354190c991af220af40972e50d93e35187c737fb4ccbb883672",
+      "source_team_name": "Hull City AFC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-77bc-aa95-9e3213ac3de8",
+      "canonical_team_identity_sha256": "4ff7a092e7f92bd3e1d62a4f625c33fdb2bf5a40bc96dc4461ff2672a19b3ed4",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2017/18",
+        "2018/19",
+        "2019/20"
+      ],
+      "semantic_sha256": "f3e381418b7f3c6b727e1b82e045106440ca9465f2e81cd41eb8abc86d5035ef",
+      "source_identity_sha256": "0f1cfc9d2ce23766115c126a7ff2789c5f79af23190037f036a64748b1b8ca92",
+      "source_snapshot_identity": "8a9fa7da3d9a330fb980db29df340737a104e31c0de806ad0b133b9e1b0c6e1e",
+      "source_team_name": "Newcastle United"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-77bc-aa95-9e3213ac3de8",
+      "canonical_team_identity_sha256": "4ff7a092e7f92bd3e1d62a4f625c33fdb2bf5a40bc96dc4461ff2672a19b3ed4",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "54f2b25b91bc4096d5b14195a8100d56edc015d777468a5589945d47dd3dd9af",
+      "source_identity_sha256": "219f3b4cbcbcab70a8ce7684a5b4409d0464a44026d6c2f4819d21d07e847179",
+      "source_snapshot_identity": "1176f1690cee0d43c164f0e3bdf8debefbbf86a0f224ddd387cdd1501240944c",
+      "source_team_name": "Newcastle United FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-77e7-b285-5486e1d82bb2",
+      "canonical_team_identity_sha256": "f20e428b9dc5ceba85023857177ce6021e5beeaee7dfc2b36de065b91cfbd88e",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "abcf1df112f4e5585487f2ccc40b2870e2f150909fc8948926bf9589c4fcd223",
+      "source_identity_sha256": "f871dc79c65d0c30d15b53c0614f8ca9b10e71c54f71e43a9d4e66e4db6ef9cd",
+      "source_snapshot_identity": "43a482bc7af40c614677b1c5cac5249ce7b642424a0d56979757f4e5d78553ca",
+      "source_team_name": "Nottingham Forest FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7800-bba1-e528a0d13d05",
+      "canonical_team_identity_sha256": "2eddbf0438a2d96ebd852ddf490cc1599dbcb5a13bf7fad0ffe8459ced1bc9a1",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2016/17"
+      ],
+      "semantic_sha256": "e400375a6884e20ce2045dad189b36c2371f170c57ba93c028248082607dcfbd",
+      "source_identity_sha256": "5280a7780c3396cb1eb0cffa5e5d02e108050f7030696868a1aab18d07ec79e8",
+      "source_snapshot_identity": "4ba63c1a97335e542712882986f6da5ca86972994d14845f530a521c36684f7a",
+      "source_team_name": "Middlesbrough FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7839-b1ba-7791c432434c",
+      "canonical_team_identity_sha256": "10e6593af26221a0801390b80b8b7534119424a605f3c045f940641d2dab8519",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "cf1350981218f45434c247b75783c39ff026fecb833a74bc28859b6d591c933d",
+      "source_identity_sha256": "351576e1a431677236e18eb75e8a4c44e31a2fe4b4b1be84a216c8cbf2fcf03c",
+      "source_snapshot_identity": "78b42143c350382deb95b00d163a68c2ccd3902aec19cab0b667a55810ac283a",
+      "source_team_name": "Everton FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7864-a0fb-367cdfe15ade",
+      "canonical_team_identity_sha256": "b5fc827d05e47d4b6647f82c39f3a40c63d1cffd3638cf1700f63adc117a88b5",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2023/24"
+      ],
+      "semantic_sha256": "953055ae49b1b50eaee435fe8c5bb855d13b289e41d86b77cfbb320b3ee2cc4a",
+      "source_identity_sha256": "8bab0b45f5a6f946d1456090817028133283f166199d280a9fa52b137b2d5554",
+      "source_snapshot_identity": "85d508c1310235d0b3132ac764a74921ceaea4e39d3cad2f3d10908bfb88a678",
+      "source_team_name": "Luton Town FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7870-bd5d-d9d356f8dd94",
+      "canonical_team_identity_sha256": "5a1da3c51c999b8162683b4e810cc37caa97fe89e095d66da6fe0ebed1dd1cfd",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11"
+      ],
+      "semantic_sha256": "49868899e23f69df7235b2b2d3a7b577e25f60d07e0bde4daac50c6c202da31d",
+      "source_identity_sha256": "a3eabf9e802ef2466e958c3b6518edadab19c8fa29e9c3b94acf34f808ec35b9",
+      "source_snapshot_identity": "f1e28c5137bcfbd5ff6de422c7ea66fd724fc394bae478980307efdb65e3817f",
+      "source_team_name": "Birmingham City"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-78d4-a520-27e556dfe45c",
+      "canonical_team_identity_sha256": "36f46844ea92f20ef5430cb8ce87ab532f900fa6ef025a5dd466efa660977a3a",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20"
+      ],
+      "semantic_sha256": "323d9d05c2350aa7a3d7adee08b6948df0901cdc27bb950a1b1e65a1ae1c3cd7",
+      "source_identity_sha256": "afff3758a4007d27d69865834a2e08f51b3d7bf275ebbf00081d14dec2339065",
+      "source_snapshot_identity": "83ba0e67f8db681893ac9226ca77e5aa4f872cf830bdb23988c08987bc4051ab",
+      "source_team_name": "Leicester City"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-78d4-a520-27e556dfe45c",
+      "canonical_team_identity_sha256": "36f46844ea92f20ef5430cb8ce87ab532f900fa6ef025a5dd466efa660977a3a",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2024/25"
+      ],
+      "semantic_sha256": "d670750e332deba68cac666c13f2316f80422965e233a670ca529e5721440efe",
+      "source_identity_sha256": "feabd462ef129297e70bfc06a1cd5d83a33396bab27cbb319dfc46a7fd1a1be7",
+      "source_snapshot_identity": "89871421b97f2729240d371429a60770f1f5dcac6eade5fcb52284d5a5f87ae0",
+      "source_team_name": "Leicester City FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-78fb-8591-7c42f207a1c9",
+      "canonical_team_identity_sha256": "647b35ee47906cdd4fa9fa7fa837485d1767292c7db8d52020cf21b158dd22fd",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13"
+      ],
+      "semantic_sha256": "ad327ed5adecaaf2e7fe24df6a80730c8cde7d178ab2df04740b8d70fdc34988",
+      "source_identity_sha256": "95d128f8407ba1874e1b6600c9e2cc4028e030732739964b0c1296210d36625c",
+      "source_snapshot_identity": "7d94b0f5481409e0052084c8b208d2ceba16b899cf939047b2983b279b2ac92e",
+      "source_team_name": "Wigan Athletic"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7904-8867-2f27a3c31340",
+      "canonical_team_identity_sha256": "76fb563a4c50d5db9f3e6601d9bb5ca96f9b893f45bf2b206b6475daa145d907",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2018/19",
+        "2020/21",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "4102e36349ffaedc891ae8743aa2a78029cf7ba3dba6b93b587ee45cad84fb6d",
+      "source_identity_sha256": "c231258a49127baa9521369843c46d226d4f3ea504576fbf9943a8049d69675d",
+      "source_snapshot_identity": "7dd49af3cc86f9aec6b09da79a2ad962647085dedbba2f3ef2deb6ab37b0189c",
+      "source_team_name": "Fulham FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7913-a465-a7a3559052cf",
+      "canonical_team_identity_sha256": "1267e9d1ef69ece0febe33907b5059698b12c3170b009cd9918e9624aee20de1",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2013/14",
+        "2018/19"
+      ],
+      "semantic_sha256": "03425b80ed11a2c830340e59256e1ea49e2b7b8cd08886c27294cfe116d76590",
+      "source_identity_sha256": "97dd9a936bbfcabe3102f71eeacb0622055aea7b7e69a241d361559cf98169b2",
+      "source_snapshot_identity": "3c272c4c10fdbd2f72bd2132d219ae23441c4690b08a727f429be012a74876ca",
+      "source_team_name": "Cardiff City"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7925-b4f9-7aece951102b",
+      "canonical_team_identity_sha256": "ce9f1fb2a07ac345a528dd58b2d937ba3d2a8bab9347d3f70e85b3b876544cf2",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12"
+      ],
+      "semantic_sha256": "557a18da4f26930ed4c7e1745200c770d04797a0731817ee623c585dfd293def",
+      "source_identity_sha256": "47fe276561b44e913efc21f56dfa8f4abbe39b7e033cc1e418309000ae5a5bd1",
+      "source_snapshot_identity": "faa913ba62c41ab87450c0a0f58dcbefe9a1a2294588f53e1e1daac238e46c78",
+      "source_team_name": "Bolton Wanderers"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-79a1-8f3a-90a98b5f44c5",
+      "canonical_team_identity_sha256": "a6659888ca54d199e183c447387ea09d2f4bd412f280c98c0d4fb8403e29a6d1",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20"
+      ],
+      "semantic_sha256": "eebda2f3ab27a458490e3050d975e5b7f30d5897bdb344a72196b0b4e721e4fa",
+      "source_identity_sha256": "7634e1dd5cdb162646f5c51418c8b9e38a0d0226353620dcb2b62a80753e72cb",
+      "source_snapshot_identity": "735ce3477664783db54abf234cbcc28c24eb5a67a1293d5031f04e6c0eb1251d",
+      "source_team_name": "Crystal Palace"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-79a1-8f3a-90a98b5f44c5",
+      "canonical_team_identity_sha256": "a6659888ca54d199e183c447387ea09d2f4bd412f280c98c0d4fb8403e29a6d1",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "307bd67df118b07fd4b1b0434fd6803290fd19b8a4bdce7d6e12c4bda5302050",
+      "source_identity_sha256": "62ce2e4a118d90583c4f530094b4c895c486f33aa39024ec6c023ffc06ee2b00",
+      "source_snapshot_identity": "1176f1690cee0d43c164f0e3bdf8debefbbf86a0f224ddd387cdd1501240944c",
+      "source_team_name": "Crystal Palace FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7bcd-9ab2-1c9c2d59e64a",
+      "canonical_team_identity_sha256": "16c491dfadbbb1847c24ae48a876940950dcf11ff95e0b8691a95077f3bb0a38",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20"
+      ],
+      "semantic_sha256": "897c873df0e93fa10f26fdbfdda020268b7a613b01799d1c80ef66de4c838ae3",
+      "source_identity_sha256": "ba46f9b3795d8343a36c021266b4f5babfd74b006a28fff5a0450aecc5573bb3",
+      "source_snapshot_identity": "a7846a8a416959bfc3dca26560427cb8d6f304835576da3349cd6eaedff75019",
+      "source_team_name": "Manchester City"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7bcd-9ab2-1c9c2d59e64a",
+      "canonical_team_identity_sha256": "16c491dfadbbb1847c24ae48a876940950dcf11ff95e0b8691a95077f3bb0a38",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "c0ecba3d2d15270f66f9ec066c2e0536faea007780e33f104d2f9f1f841d51c0",
+      "source_identity_sha256": "cc9a039196c810bae452040aa4e06416c56b091388b035e16e98dde252f31a44",
+      "source_snapshot_identity": "1176f1690cee0d43c164f0e3bdf8debefbbf86a0f224ddd387cdd1501240944c",
+      "source_team_name": "Manchester City FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7c97-8ad5-45cd67b649dc",
+      "canonical_team_identity_sha256": "0f4644a9d1c7ad8ac8e11f7871a71e1a5126a7d8cb0aeda3243b5d575530f2a1",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12"
+      ],
+      "semantic_sha256": "9aab2968825779b69bcfdb7639b5879f346afa9a07a9ff21993bcc398a19cffc",
+      "source_identity_sha256": "1bfd903c31ecdd7c31b3d6e09dfe11e28f8b6bbc34bfed604d26a47752dc8928",
+      "source_snapshot_identity": "faa913ba62c41ab87450c0a0f58dcbefe9a1a2294588f53e1e1daac238e46c78",
+      "source_team_name": "Blackburn Rovers"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7c9f-bb35-f9ef1f885a3d",
+      "canonical_team_identity_sha256": "afd4900cc1a3e02407cebc6b982103f2479c86c4285f159f4556e26fc08e9637",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2021/22"
+      ],
+      "semantic_sha256": "c77a5ff47cedf99ed7ca343bbca6650b01aaaac7158cb8a91412b6968c765901",
+      "source_identity_sha256": "529a45b5de1f09c8f5daf620a4e8b1ae6948d4c19a008b8eb4045d0992c5e254",
+      "source_snapshot_identity": "64cfceb7dac334d5310564714f6e6e6d1eb8144572cbcadd74dc0173791774d1",
+      "source_team_name": "Watford FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7d0d-bafd-cfd8f4b6afcd",
+      "canonical_team_identity_sha256": "f39fda9b4aa6bab4ace14bf82c4c66b76ae7af3543438a9010514b51f12e8cc7",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "6d0c3ac0d8ffe2fc48ac19ff69116d973dd54b6c1cbb620c5c28da79b9d47a60",
+      "source_identity_sha256": "22321f1cc3599ba5d291e07aadbe30b342e057807a7ae5c589d59e6c99c43ad6",
+      "source_snapshot_identity": "2389a9578c1d5337819b55c8a86185923e93fefe6f1e60f4376a3bf2a6a43bc6",
+      "source_team_name": "Sunderland AFC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7d1a-be3c-a724e6040810",
+      "canonical_team_identity_sha256": "ebc804ca0e2b8ae1ec9a1fa17532ee3fd61af97c0f564ff98f3ad65bc5ce5385",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "75163ae5576cb46aa4f7a3cf7f92fb0d96177d76c1ee2c2dedbbc672e5a595c6",
+      "source_identity_sha256": "28871a552a879ebf690cd561490b69c234c18ae72182197ccb23a2f3e05328c4",
+      "source_snapshot_identity": "78b42143c350382deb95b00d163a68c2ccd3902aec19cab0b667a55810ac283a",
+      "source_team_name": "Arsenal FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7d5b-9084-5a7af83c3b05",
+      "canonical_team_identity_sha256": "c71668f61cfb459a5a2ecd0d9d84b111ccbac4e7ef29db85c994897cc941651d",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2014/15",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2023/24",
+        "2025/26"
+      ],
+      "semantic_sha256": "43ae3373366053fa00c2e32defc253794591d7d0326ae06397b2a4836d9c80f9",
+      "source_identity_sha256": "337f7a886b8545033be60840990203aed69acf133d14110fad822bf9c97df07c",
+      "source_snapshot_identity": "9ae56bf6001e7cf081281b2e86f4813fcffc84abc7d60b03d29fc248296d453c",
+      "source_team_name": "Burnley FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7dbf-ab3d-6a8d8dd29d79",
+      "canonical_team_identity_sha256": "176a7ca60c9ad1cd9b14b405474bced4fae031b5d7e471eeebcc529ac2afd161",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "1a084b0b346da4bbd0645e34a7ca673a522f2b49d49ed6fc75b524ddcb75e6f4",
+      "source_identity_sha256": "685a00682a24deefcd28797cd274918cfd34f7163896044f439dd9c38d911f5b",
+      "source_snapshot_identity": "74b1a37cc4ae10765533930986fd17ee9fe6a8116a1ad95a4d393feddd658963",
+      "source_team_name": "Brentford FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7e0d-97dd-5347da800b7d",
+      "canonical_team_identity_sha256": "1ade1ce944306e593e0c95dba06ecd4f7336ee0d587c1977ebc9ca3b2398ab47",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "232f7d8a91d281363682b8e21e4963a120619377055bab06ecea3485b9500b2e",
+      "source_identity_sha256": "4e720b31885137d4b94c7cbf348ad9450d5ddac54404c2c1ed43beff4dd4b116",
+      "source_snapshot_identity": "78b42143c350382deb95b00d163a68c2ccd3902aec19cab0b667a55810ac283a",
+      "source_team_name": "Liverpool FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7e36-9574-e16ffc1da3bf",
+      "canonical_team_identity_sha256": "43b6e724c746392925ada99f6f369fea2b6fb026ce194782c30e375804ab3cab",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2019/20"
+      ],
+      "semantic_sha256": "8508e0591fb02d656e57cd004e9892f67a93cc1229d8a82ab38594c310607578",
+      "source_identity_sha256": "19cd2b66e51250a1e3571a5cdb5ef09c1db8c63d7d5a651828f4ced6a32046c4",
+      "source_snapshot_identity": "9ffa2b4b67ce2ad887c78200b9f6220327f7d2e0ce17ab37e9e4d8bbbf158a7e",
+      "source_team_name": "Aston Villa"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7e36-9574-e16ffc1da3bf",
+      "canonical_team_identity_sha256": "43b6e724c746392925ada99f6f369fea2b6fb026ce194782c30e375804ab3cab",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "923c6e27304dd97d3318af0a8ddeba0f5c1c9e2bf010614c853536a19dcdcd15",
+      "source_identity_sha256": "5e910ed975156d4be21f4e932cc33e7227b0105bbc51752e462543f79e36890d",
+      "source_snapshot_identity": "1176f1690cee0d43c164f0e3bdf8debefbbf86a0f224ddd387cdd1501240944c",
+      "source_team_name": "Aston Villa FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7e48-b3c5-5248392e35d3",
+      "canonical_team_identity_sha256": "e8b82915dd2a49eb3ea6df2be1e7478e1755b1796d822601cbda94e96833a4a5",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20"
+      ],
+      "semantic_sha256": "ebb718d6f91e4f1036c2a0405eef6926e8e5bf333e03b44c91512b085d1e42a6",
+      "source_identity_sha256": "fb4be479f35ed08b8d44756f9cca6188d768e0a050135a2e9bbc3dad4b1f7d43",
+      "source_snapshot_identity": "a7846a8a416959bfc3dca26560427cb8d6f304835576da3349cd6eaedff75019",
+      "source_team_name": "Tottenham Hotspur"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7e48-b3c5-5248392e35d3",
+      "canonical_team_identity_sha256": "e8b82915dd2a49eb3ea6df2be1e7478e1755b1796d822601cbda94e96833a4a5",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "7e7ad2908113e6b3f7679e6fe9ea39d212de8a62804955a614bf17441c80a64c",
+      "source_identity_sha256": "409701df2e0c27da89d44c49d5997fe78b7f5b2e43f43a24934334fe64b4dfbc",
+      "source_snapshot_identity": "1176f1690cee0d43c164f0e3bdf8debefbbf86a0f224ddd387cdd1501240944c",
+      "source_team_name": "Tottenham Hotspur FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7e4c-a106-c0b3512e7b75",
+      "canonical_team_identity_sha256": "dd3cd45fe46c2d294058f05fffef04f181aad6f2925e737ac0f61c3eaf66561a",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11"
+      ],
+      "semantic_sha256": "70338577b8a9dd14dc75cfd8a3b99b94521a53741da38666a54cccebca176547",
+      "source_identity_sha256": "cc614519e8fcde142ebd5016d5570335cb29aac85499f4de3166d4129293dfe0",
+      "source_snapshot_identity": "f1e28c5137bcfbd5ff6de422c7ea66fd724fc394bae478980307efdb65e3817f",
+      "source_team_name": "Blackpool FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7e58-9fc8-43adef9017ca",
+      "canonical_team_identity_sha256": "e72e2bee9911be5d7ff09923c20167001d862258d6581b02d347a604280d59f3",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2024/25"
+      ],
+      "semantic_sha256": "b3f718e5f7298650bd93f73c55ae304c2afc475af17ca177dd142a26a964ad3f",
+      "source_identity_sha256": "03730d5e297e5af11e75a72ff1738a3ba356f3bc78c93469cdc210ad1fb50a5a",
+      "source_snapshot_identity": "1240fe9c7624d8f11245bc031f5fac77c37cd3bad82a2f54f4266df56d6da529",
+      "source_team_name": "Southampton FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7eae-99ed-6d514d63202c",
+      "canonical_team_identity_sha256": "4ec674e6bbc559a0c9bbe621c81a1f9623ce4457b63b87e924f6961be4636826",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2017/18",
+        "2018/19"
+      ],
+      "semantic_sha256": "8192415ba838e776d1950ced87866877c74591722c30d7388a41e3b7b846d03a",
+      "source_identity_sha256": "e375cd9692ac9e1c507cf0243af12fda19743469bb643113477a0e84c58420b3",
+      "source_snapshot_identity": "ee5d3b40690048dd991d829c80c14aab5a285dac2147213445df2cb6e7a88556",
+      "source_team_name": "Huddersfield Town"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7ecf-a6e5-e1de844c0601",
+      "canonical_team_identity_sha256": "b466e074074340deb3e9ce2d0fc1ae6ee42d37e9be48b3d06ef038029b32dd5c",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2014-15/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2014/15",
+        "2015/16",
+        "2016/17",
+        "2017/18"
+      ],
+      "semantic_sha256": "ab45b62905497b1c8c287d084bc51736cbb4d58beccd34546f5242d7e2c41fe6",
+      "source_identity_sha256": "6e4d6c4978df02fa1bf21163b07a1869d7780baf2e64ad28884c80b2883147e9",
+      "source_snapshot_identity": "fd089079cca6e9519db97454f1e5ae04f0163d80d8acaf9c00d34703bffdd872",
+      "source_team_name": "Stoke City"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7edf-bb04-f8f37dc9dd5f",
+      "canonical_team_identity_sha256": "389348f50ce961499ddc0833e002f1586936596515c2bb272868a9952332900f",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2012-13/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2013-14/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2011/12",
+        "2012/13",
+        "2013/14",
+        "2015/16",
+        "2019/20"
+      ],
+      "semantic_sha256": "514e6bf8ca912343d56c8247178802a24baf3b2db03e02deb58c68c39ad42877",
+      "source_identity_sha256": "50bfca6260d0d98153e005edc396072a32030d67d61fff1cd484f648d96e7fb7",
+      "source_snapshot_identity": "5fecacd4da9bc2d413a7676ce956ef5b8bd929b051d9d512429cd2596a20f0e8",
+      "source_team_name": "Norwich City"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7edf-bb04-f8f37dc9dd5f",
+      "canonical_team_identity_sha256": "389348f50ce961499ddc0833e002f1586936596515c2bb272868a9952332900f",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2021/22"
+      ],
+      "semantic_sha256": "b7cb5b1a6bb676ac6636561aecbd74baa53832dd9da7200d66011c2d9d5428cf",
+      "source_identity_sha256": "8eb0c4910675232d7be6228d6c9301ef8985ee1b2502745190e0b4d8aefea89a",
+      "source_snapshot_identity": "68bff0d76027c73695538b6ee95e5ca9b38083160dbb627ed4ef46276e16fba3",
+      "source_team_name": "Norwich City FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7f69-b0dc-770ddc83e3a8",
+      "canonical_team_identity_sha256": "c98137e5c69a5cdc3808fec408d41580509d6891561942134aba5110735a2207",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2015-16/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2016-17/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2017-18/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2015/16",
+        "2016/17",
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26",
+        "2026/27"
+      ],
+      "semantic_sha256": "2d94d231d1871feddae7ceae11d5ce0ac1c38835ca191831c627b0e568e7aa3e",
+      "source_identity_sha256": "91003df735c36b4514f04cc0e94c065894689ee5aeb4d09eca69c5bce33a46e3",
+      "source_snapshot_identity": "e282471f6795cbcc3c486a15ddba32b01656b66585a34ca35b97f921a027e3b3",
+      "source_team_name": "AFC Bournemouth"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7f8a-8849-0d6aa5a0433e",
+      "canonical_team_identity_sha256": "5a8f3e7ccef883503155ff17b505ea1a58c181439c9a1dfa4da5a1a0871424fa",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2019/20"
+      ],
+      "semantic_sha256": "cb10d78f47d81954c13e7bb9851fdd48fa06eae62ef7c0c63cfa50955eb8577c",
+      "source_identity_sha256": "185fdca084cd8d7eeeea1d4a00de3e8ecd420638dd281d8cf62db1f9a57f9e57",
+      "source_snapshot_identity": "71cd2ef4d5e30e6bb99481fa1e966d3c4a14f22c695c8f50a12e877c3c025ede",
+      "source_team_name": "Sheffield United"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7f8a-8849-0d6aa5a0433e",
+      "canonical_team_identity_sha256": "5a8f3e7ccef883503155ff17b505ea1a58c181439c9a1dfa4da5a1a0871424fa",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2023/24"
+      ],
+      "semantic_sha256": "83b3905590f6eb8162adffdafe144f21f2e9fbe240abd08832e6fd4425e7b95d",
+      "source_identity_sha256": "7a05e2603c1426fbfe9368cdf43ae18b8ac4a0010f78b008a69f61d2d7b7fbc8",
+      "source_snapshot_identity": "1a95845aa6aa5791cc07038a513d2159100fd325e76cd8bdca2942348da9e920",
+      "source_team_name": "Sheffield United FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7fa3-8655-9ab3e800c17b",
+      "canonical_team_identity_sha256": "e4f67c9b4db4069c9032d94f6e0b119d9cb7901ec6edd0c6be36aac4d86f5a9a",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2010-11/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2011-12/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2018-19/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2019-20/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2010/11",
+        "2011/12",
+        "2018/19",
+        "2019/20"
+      ],
+      "semantic_sha256": "702924d9a7700a0bb162cd2a718349bc5964417ebaca52d78fd9c4461d028d66",
+      "source_identity_sha256": "54a2262f4b7290e920200d0ceb46bcf4a40aff24c32e90c0121488e7499f7cb6",
+      "source_snapshot_identity": "9c230da55fb78e014c4e87a7049e7bfc2466a61ceb94f989e0413f3238a06076",
+      "source_team_name": "Wolverhampton Wanderers"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7fa3-8655-9ab3e800c17b",
+      "canonical_team_identity_sha256": "e4f67c9b4db4069c9032d94f6e0b119d9cb7901ec6edd0c6be36aac4d86f5a9a",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2020-21/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2021-22/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2022-23/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2023-24/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2024-25/en.1.json",
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2025-26/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2020/21",
+        "2021/22",
+        "2022/23",
+        "2023/24",
+        "2024/25",
+        "2025/26"
+      ],
+      "semantic_sha256": "baf620374d153ea263d347925d38a3cd4b7b46ded6490c89bc2822f04a9f8af5",
+      "source_identity_sha256": "e1532f6cc977dbdee51e5a9d6e7cfafda87c532b5e948e4557b6873d1141eb75",
+      "source_snapshot_identity": "93afdf7ac5501daa6cbfc273330543bb5e01daa925f7ab52024fb7a60a7ceaab",
+      "source_team_name": "Wolverhampton Wanderers FC"
+    },
+    {
+      "canonical_team_id": "01a0c4f8-e0bc-7fdb-b5f7-b5152bfdfa13",
+      "canonical_team_identity_sha256": "14ceec64cae79d7a1754d3f5fe5e75abb512cbc033c6aab79ea9e8c2370d5510",
+      "decided_at": "2026-09-21T17:14:39.069428Z",
+      "evidence": [
+        "openfootball/football.json@40b3e1b7391932d133287115106304444bf297e1:2026-27/en.1.json"
+      ],
+      "mapping_authority": "Sebastian Greenhalgh",
+      "mapping_decision_id": "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1",
+      "season_scope": [
+        "2026/27"
+      ],
+      "semantic_sha256": "10a25ea39b2c0be65f3b2956243084a2cac6e16194d19ec1260b5ac256e42857",
+      "source_identity_sha256": "f0c857238fa4ec71331ebce76c7bcf7dc52887b30b38711d213efba985e85469",
+      "source_snapshot_identity": "624b1b29ec49e354190c991af220af40972e50d93e35187c737fb4ccbb883672",
+      "source_team_name": "Coventry City FC"
+    }
+  ],
+  "root_semantic_sha256": "b0c0a73f97f9369aea217db0fba31dcd41d52be8a597dc10741ef4bf2fa19876",
+  "schema_version": "openfootball-historical-team-identity-v1",
+  "seasons_covered": [
+    "2010/11",
+    "2011/12",
+    "2012/13",
+    "2013/14",
+    "2014/15",
+    "2015/16",
+    "2016/17",
+    "2017/18",
+    "2018/19",
+    "2019/20",
+    "2020/21",
+    "2021/22",
+    "2022/23",
+    "2023/24",
+    "2024/25",
+    "2025/26",
+    "2026/27"
+  ],
+  "source_commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+  "source_snapshots": [
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "a94631cc82fd4034d4da5f5594d32cb191942f0b594e3a9cd9dcf29fe7dfa707",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2010-11/en.1.json",
+      "season_code": "2010/11",
+      "semantic_sha256": "e8cdc1de2f993301b5a05d253986fb377e8282f1f43a3c773325292c0109af3f"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "94e29260ec3500ba69e1ffe829576b0c6297cb570ecc223ab13a2fdcae81fb98",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2011-12/en.1.json",
+      "season_code": "2011/12",
+      "semantic_sha256": "c2fcce4f31a4f5a99f70b878b536107f785f94ceae68c9fc5b49cfd477e089c4"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "d41f9131f9dda654bff9067ffd370468b895b5ed4e9691a4b5cad2b2550fbc8b",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2012-13/en.1.json",
+      "season_code": "2012/13",
+      "semantic_sha256": "7e5d2d2f71c6ba290de554f1b77fda8680564da69f95aa21fc0cebc18f7e4d5d"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "821ea8a8a078753993ed1cc9f86fb739ec18824ef07aee1df4e83f6915e29782",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2013-14/en.1.json",
+      "season_code": "2013/14",
+      "semantic_sha256": "0b04642d2dbdf73849d184ef364b3d8388c29505af5d9cddfcad4c24544ed83c"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "2f24151bffd3d377810f3d2e85ead0f1b3dfef00153c6ea31f5e9ced63281a4d",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2014-15/en.1.json",
+      "season_code": "2014/15",
+      "semantic_sha256": "3ec8cfd5ef5ab5ca935e28f374d7da81640d37eeed212fce0584c2802e6919ae"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "4d8ab70f5d2c29231320be7404310bc1b0fbc6e6be0284e5ee667f581406fead",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2015-16/en.1.json",
+      "season_code": "2015/16",
+      "semantic_sha256": "690dbb608c9adb25dcdbd5eb9cde6ef9b63ffa890d0e637a529a464652327634"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "9c8cdb27355678ab81aacbbabc34a08d00b399aacc28ef4b733da4954a344f17",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2016-17/en.1.json",
+      "season_code": "2016/17",
+      "semantic_sha256": "74ae09b9f8479dce059a5da26807824b8a950d0b0bc910e4bb3530dcbd7b8fa2"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "b635f2442a94aa91d85f282fc5e8f7f5dc4f0d04e3e30c4472102f5708d7548c",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2017-18/en.1.json",
+      "season_code": "2017/18",
+      "semantic_sha256": "681174052e8690bc48dd802ea292b9db6114a978125c7461276c96dbb087d07d"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "e2224d86f0605a5a1b5b019c845cdecb13aca1d88035686d4159b875250d4730",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2018-19/en.1.json",
+      "season_code": "2018/19",
+      "semantic_sha256": "6c4bb556e714b91cfd150f6d5444b3302df5fa02a1b809c4035d5236d215123e"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "9e1695f85ce5553f762e809dea357ec0a95838939be89569060a83c4e98a302d",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2019-20/en.1.json",
+      "season_code": "2019/20",
+      "semantic_sha256": "d32bcdc6a5dfcada7f02db9ba1b7c6484901efb7d5a24181d17b00ae5e3c5a83"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "21ddf26b48469da530c51ccc4857bf1a534bda3aed08766b55185efb142e9a20",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2020-21/en.1.json",
+      "season_code": "2020/21",
+      "semantic_sha256": "6eb525abb59a000d1379ba6bc9ac594d9d555a78d76b5af99cce6636f44c1f8e"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "fbdfd426fa18fa2f8630b77de87c082734da495ac4668d6d72f29f76b73b9564",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2021-22/en.1.json",
+      "season_code": "2021/22",
+      "semantic_sha256": "c61ea52d811028146033a04a12296038163c08abfbace6af6665b045d9ed73b2"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "8d09f0f9846981626cdfec48903e1f21e7c79aabe6f92535c9e092e8e79b808b",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2022-23/en.1.json",
+      "season_code": "2022/23",
+      "semantic_sha256": "7b22306ce76eb414b5c48584681b5fd845ccc27da9c50d8eba3f5e4c28e87642"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "03e13eafbf78dfe00d7e89dd3bf6643986eb6e8fd86c7664aeb8c5bc0bed88d0",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2023-24/en.1.json",
+      "season_code": "2023/24",
+      "semantic_sha256": "124a29f1c46a9f606dd093b8c2d0d5984c495ba91e98f2dd7fc23e37a16528eb"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "c3d18f552d83382cd4b6b21127adbbfe38e7f8618ddc979fb5404f2df07d0a75",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2024-25/en.1.json",
+      "season_code": "2024/25",
+      "semantic_sha256": "adf24daab9ab52053153b113012c0d4095b40882e312e9ffdc650d7f8ac8ed0f"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "d6070bdf731546ccf97767f062e8af4bd26dd309dee69f6092025bf9c78f43c1",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2025-26/en.1.json",
+      "season_code": "2025/26",
+      "semantic_sha256": "f21bb11415025c5d0613dc09d22e854b42ccbf34a2e151118a7447bea5388ae1"
+    },
+    {
+      "commit_sha": "40b3e1b7391932d133287115106304444bf297e1",
+      "content_sha256": "ce34ad5440bca6b19679aa23b4feeb6c8150db1eb0774a4dc0e22624cd85cbc6",
+      "dataset_mode": "RECONSTRUCTED",
+      "path": "2026-27/en.1.json",
+      "season_code": "2026/27",
+      "semantic_sha256": "4f56cab79376e7d13b1aed183ef26a80e51e68ae49c52e8ca05e3e28ddf558af"
+    }
+  ],
+  "unresolved_club_count": 0
+}

@@ -1556,7 +1556,15 @@ def validate_repository(root: Path) -> list[str]:
 
 
 def _active_ticket(root: Path) -> str:
-    for ticket_id in ("GCS-008", "NRM-006", "ODD-005", "FPL-004", "DAT-003", "RUL-002"):
+    for ticket_id in (
+        "CURRENT-TEAM-STRENGTH-001A-P0",
+        "GCS-008",
+        "NRM-006",
+        "ODD-005",
+        "FPL-004",
+        "DAT-003",
+        "RUL-002",
+    ):
         if (root / f"tickets/{ticket_id}/ticket.yaml").is_file():
             return ticket_id
     return "FND-001"

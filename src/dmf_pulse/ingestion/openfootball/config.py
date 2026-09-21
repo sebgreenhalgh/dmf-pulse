@@ -19,6 +19,7 @@ from dmf_pulse.ingestion.models import RightsProfile
 PROVIDER_RESOURCE = "ingestion/resources/openfootball_score_prior.json"
 RIGHTS_RESOURCE = "ingestion/resources/openfootball_profiles.json"
 APPROVED_PROFILE_ID = "openfootball_football_json_score_prior_v1"
+TEAM_STRENGTH_APPROVED_PROFILE_ID = "openfootball_football_json_team_strength_v1"
 APPROVED_COMMIT_SHA = "f27dcbef681db2c3195f9def62316ce497278781"
 
 _SHA1 = re.compile(r"^[0-9a-f]{40}$")
@@ -251,7 +252,10 @@ def load_rights_profiles(path: Path | None = None) -> dict[str, RightsProfile]:
             "CONFIGURATION_INVALID", "OpenFootball rights configuration is invalid"
         ) from exc
     result = {profile.rights_profile_id: profile for profile in profiles}
-    if len(result) != len(profiles) or set(result) != {APPROVED_PROFILE_ID}:
+    if len(result) != len(profiles) or set(result) != {
+        APPROVED_PROFILE_ID,
+        TEAM_STRENGTH_APPROVED_PROFILE_ID,
+    }:
         raise IngestionError(
             "CONFIGURATION_INVALID", "OpenFootball rights profile identity is invalid"
         )
@@ -291,6 +295,7 @@ def rights_config_sha256(path: Path | None = None) -> str:
 __all__ = [
     "APPROVED_COMMIT_SHA",
     "APPROVED_PROFILE_ID",
+    "TEAM_STRENGTH_APPROVED_PROFILE_ID",
     "OpenFootballProviderConfig",
     "OpenFootballResourceConfig",
     "OpenFootballSeasonConfig",

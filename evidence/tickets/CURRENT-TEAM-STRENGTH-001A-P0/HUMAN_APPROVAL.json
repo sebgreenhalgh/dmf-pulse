@@ -1,0 +1,14 @@
+{
+  "approval_id": "CURRENT-TEAM-STRENGTH-001A#openfootball_football_json_team_strength_v1",
+  "approved_at": "2026-09-21T17:14:39.069428Z",
+  "approved_by": "Sebastian Greenhalgh",
+  "approved_purpose": "Private internal Premier League team-strength estimation and private internal fixture-specific score-prior generation for DMF Pulse.",
+  "geography_scope": "private UK analytical use",
+  "licence": "CC0-1.0",
+  "profile_version": "1.0.0",
+  "provider_key": "openfootball_football_json",
+  "rights_profile_id": "openfootball_football_json_team_strength_v1",
+  "status": "HUMAN_APPROVED",
+  "terms_source": "OpenFootball football.json/LICENSE.md",
+  "ticket_id": "CURRENT-TEAM-STRENGTH-001A-P0"
+}

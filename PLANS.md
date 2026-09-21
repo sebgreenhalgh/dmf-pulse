@@ -2261,3 +2261,22 @@ R7 CI remains pending; do not claim final acceptance or production readiness.
   obtain fresh rights-purpose plus implementation reviews.
 - [ ] Publish one sealed implementation SHA and require exact-SHA CI green. Perform at most one
   operator attempt only if every live gate, including provider-purpose review, is clear.
+
+## CURRENT-TEAM-STRENGTH-001A-P0 authority, identity, and policy closure
+
+- [x] Verify `origin/main` and create the isolated ticket branch from
+  `99418f3316277f4dae347d80358d5dd5a09655b2`.
+- [x] Record the separate human-approved OpenFootball team-strength rights profile without
+  changing the accepted score-prior profile.
+- [x] Register 42 nondeterministic UUIDv7 canonical clubs and seal every exact OpenFootball
+  alias/season mapping with zero unresolved or ambiguous mappings.
+- [x] Add strict, packaged loaders for the identity artifact and the approved finality,
+  freshness, research, uncertainty, and materiality policies.
+- [x] Add fail-closed identity, semantic-hash, temporal, rights, packaging, and scope tests.
+- [ ] Run all literal acceptance commands and record exact evidence.
+- [ ] Obtain independent review, remediate all P0/P1/material P2 findings, seal evidence, push,
+  and verify exact-SHA CI.
+
+Scope guard: this P0 ticket contains governance and canonical identity only. It must not fit a
+team-strength model, generate fixture rates, change Stage 8, touch `private_v1`, use Odds/private
+FPL data, or activate production behavior.

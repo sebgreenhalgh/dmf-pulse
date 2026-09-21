@@ -1,0 +1,54 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001A-P0
+title: Current team-strength precursor authority, identity, temporal, and materiality closure
+status: ACTIVE
+required_base_commit: 99418f3316277f4dae347d80358d5dd5a09655b2
+expected_branch: integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-P0-authority-identity-policy
+objective: >-
+  Record the approved private OpenFootball purpose, create the immutable reviewed historical
+  OpenFootball-to-canonical-club identity registry, and lock source-finality, source-freshness,
+  provisional shadow-research, uncertainty, and materiality policy before 001A implementation.
+authority_scopes:
+  - A3-data-foundation
+  - A8-events
+permissions:
+  openfootball_network: forbidden_for_deterministic_acceptance
+  private_fpl_access: forbidden
+  odds_access: forbidden
+  database_read: forbidden
+  database_write: forbidden
+  statistical_model_implementation: forbidden
+  production_activation: forbidden
+allowed_areas:
+  - config/rights/openfootball_profiles.json
+  - config/providers/openfootball_historical_team_identity.json
+  - config/models/current_team_strength_governance.json
+  - src/dmf_pulse/ingestion/openfootball/config.py
+  - src/dmf_pulse/ingestion/openfootball/team_strength_governance.py
+  - tests/unit/ingestion/openfootball/**
+  - scripts/generate_current_team_strength_p0_artifacts.py
+  - scripts/verify_current_team_strength_p0_wheel.py
+  - scripts/validate_repository.py
+  - pyproject.toml
+  - tickets/CURRENT-TEAM-STRENGTH-001A-P0/**
+  - evidence/tickets/CURRENT-TEAM-STRENGTH-001A-P0/**
+  - PLANS.md
+exclusions:
+  - attack or defence fitting
+  - Newton solver or time-decay implementation
+  - fitted parameters, covariance estimation, or fixture lambda generation
+  - ScorePriorRequest generation from team strength
+  - Stage 7, Stage 8, Stage 9, Stage 10, or Stage 11 behavior changes
+  - private_v1 changes
+  - Odds or private FPL access
+  - production activation, PR, merge, tag, or human acceptance claim
+required_public_behavior:
+  - separate exact purpose-bound OpenFootball rights profile
+  - 42 nondeterministic UUIDv7 canonical club registrations
+  - 56 exact season-scoped source aliases over 17 seasons
+  - zero unresolved or ambiguous mappings and no runtime fuzzy matching
+  - exact semantic hashes at source, mapping, club, registry, and policy levels
+  - D+2 midnight UTC eligibility and exact 24-hour and 72-hour freshness boundaries
+  - locked 1 percent, 0.15, 0.50, 10 Gameweek, and 100 fixture materiality gates
+  - shadow-only reconstructed research and separate uncertainty/promotion decisions
+  - installed-wheel packaged authority validation without network access
+acceptance_status: IMPLEMENTED_PENDING_INDEPENDENT_REVIEW

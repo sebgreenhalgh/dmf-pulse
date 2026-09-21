@@ -9,6 +9,7 @@ from dmf_pulse.ingestion.models import CapabilityValue, RightsCapability
 from dmf_pulse.ingestion.openfootball.config import (
     APPROVED_COMMIT_SHA,
     APPROVED_PROFILE_ID,
+    TEAM_STRENGTH_APPROVED_PROFILE_ID,
     load_provider_config,
     load_rights_profiles,
     provider_config_sha256,
@@ -50,6 +51,40 @@ def test_human_approved_rights_profile_is_exact_and_private() -> None:
     assert profile.retention_seconds is None
     assert profile.unresolved_rights == ()
     assert len(rights_config_sha256()) == 64
+
+
+@pytest.mark.contract
+def test_team_strength_rights_profile_is_purpose_bound_and_private() -> None:
+    profiles = load_rights_profiles()
+    profile = profiles[TEAM_STRENGTH_APPROVED_PROFILE_ID]
+
+    assert set(profiles) == {APPROVED_PROFILE_ID, TEAM_STRENGTH_APPROVED_PROFILE_ID}
+    assert profile.approved_by == "Sebastian Greenhalgh"
+    assert profile.human_approval_id == (
+        "CURRENT-TEAM-STRENGTH-001A#openfootball_football_json_team_strength_v1"
+    )
+    assert profile.profile_version == "1.0.0"
+    assert profile.approved_purpose == (
+        "Private internal Premier League team-strength estimation and private internal "
+        "fixture-specific score-prior generation for DMF Pulse."
+    )
+    allowed = {
+        RightsCapability.AUTOMATED_ACCESS,
+        RightsCapability.TRANSIENT_PROCESSING,
+        RightsCapability.RAW_STORAGE,
+        RightsCapability.DERIVED_STORAGE,
+        RightsCapability.CACHE,
+        RightsCapability.BACKUP,
+        RightsCapability.MODEL_TRAINING,
+        RightsCapability.PRIVATE_INTERNAL_USE,
+        RightsCapability.MANUAL_IMPORT,
+    }
+    assert all(profile.capabilities[item] is CapabilityValue.ALLOW for item in allowed)
+    assert profile.capabilities[RightsCapability.PUBLIC_DISPLAY] is CapabilityValue.DENY
+    assert profile.capabilities[RightsCapability.REDISTRIBUTION] is CapabilityValue.DENY
+    assert profile.retention_seconds is None
+    assert profile.geography_scope == "private UK analytical use"
+    assert profile.unresolved_rights == ()
 
 
 @pytest.mark.security
