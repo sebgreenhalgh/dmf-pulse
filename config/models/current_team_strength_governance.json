@@ -1,0 +1,108 @@
+{
+  "human_approval": {
+    "approval_id": "CURRENT-TEAM-STRENGTH-001A#openfootball_football_json_team_strength_v1",
+    "approved_at": "2026-09-21T17:14:39.069428Z",
+    "approved_by": "Sebastian Greenhalgh",
+    "rights_profile_id": "openfootball_football_json_team_strength_v1",
+    "rights_profile_version": "1.0.0"
+  },
+  "materiality_policy": {
+    "calibration_relative_harm_limit": "0.01",
+    "player_xp_materiality_per_gw": "0.15",
+    "production_promotion_requires_separate_human_approval": true,
+    "prospective_min_gameweeks": 10,
+    "prospective_min_labelled_fixtures": 100,
+    "root_action_switch_always_material": true,
+    "subgroup_relative_harm_limit": "0.01",
+    "transfer_horizon_gameweeks": 3,
+    "transfer_horizon_materiality_points": "0.50"
+  },
+  "model_implementation_present": false,
+  "production_active": false,
+  "schema_version": "current-team-strength-governance-v1",
+  "selected_shadow_policy": {
+    "attack_effective_prior_matches": 12,
+    "decimal_boundary": "SERIALIZED_RATE_AND_ARTIFACT_ONLY",
+    "defence_effective_prior_matches": 12,
+    "entrant_policy": "HISTORICAL_PROMOTED_CLUB_COHORT_CENTRE",
+    "fitting_algorithm": "FLOAT64_ANALYTIC_DAMPED_NEWTON",
+    "half_life_days": 365,
+    "home_advantage": "ONE_FITTED_GLOBAL_EFFECT",
+    "maximum_output_rate": "8.000000",
+    "model_family": "REGULARISED_TIME_WEIGHTED_INDEPENDENT_POISSON_TEAM_STRENGTH_V1",
+    "parameter_uncertainty": {
+      "covariance_retained": true,
+      "hessian_retained": true,
+      "plugin_prediction_status": "SHADOW_ONLY",
+      "uncertainty_ticket_required_before_production": "CURRENT-TEAM-STRENGTH-001U"
+    },
+    "public_contract": "INDEPENDENT_POISSON_V1_SCORE_PRIOR_REQUEST_UNCHANGED",
+    "training_evidence": "ALL_ELIGIBLE_RESULTS_STRICTLY_BEFORE_FORECAST_CUTOFF",
+    "training_start_season": "2010/11"
+  },
+  "semantic_sha256": "ff04de46f08711d85fb0de24f5a9257618b82d7422ae349bff2e033d082f4d21",
+  "source_finality_policy": {
+    "ambiguous_or_abandoned_action": "QUARANTINE_PENDING_GOVERNED_RESOLUTION",
+    "correction_policy": "NEW_IMMUTABLE_DESCENDANT_NO_FROZEN_FORECAST_MUTATION",
+    "eligibility_not_before": "00:00:00Z_ON_SOURCE_MATCH_DATE_PLUS_2_CALENDAR_DAYS",
+    "live_required_conditions": [
+      "IMMUTABLE_COMMIT_AND_VALIDATED_FILE_HASH",
+      "RECEIVED_AND_VALIDATED_BEFORE_CUTOFF",
+      "RECEIVED_AT_NO_LATER_THAN_CUTOFF",
+      "USABLE_AT_NO_LATER_THAN_CUTOFF",
+      "EXACTLY_ONE_CANONICAL_FIXTURE_AND_TWO_CANONICAL_CLUBS",
+      "RECOGNIZED_FULL_TIME_SCORE",
+      "NO_NON_FINAL_STATUS",
+      "UNKNOWN_NONEMPTY_STATUS_QUARANTINED",
+      "ELIGIBILITY_LAG_SATISFIED"
+    ],
+    "match_date_lag_calendar_days": 2,
+    "postponed_policy": "REVISED_PLAYED_DATE_MUST_SATISFY_FULL_POLICY",
+    "reconstructed_policy": "FINAL_CURRENT_VINTAGE_RECONSTRUCTED_ONLY_NO_HISTORICAL_AVAILABILITY_CLAIM",
+    "same_day_use_allowed": false
+  },
+  "source_freshness_policy": {
+    "degraded": {
+      "action": "RETAIN_LATEST_SEALED_ARTIFACT_WITH_VISIBLE_WARNING_NO_CURRENT_REFIT_CLAIM",
+      "maximum_retrieval_age_hours_inclusive": 72,
+      "minimum_retrieval_age_hours_exclusive": 24,
+      "missing_due_must_equal": 0,
+      "validation_must_pass": true
+    },
+    "due_definition": "SCHEDULED_ROWS_WITH_ELIGIBILITY_NOT_BEFORE_NO_LATER_THAN_CUTOFF",
+    "fresh": {
+      "action": "TEAM_STRENGTH_REFIT_ALLOWED",
+      "maximum_retrieval_age_hours_inclusive": 24,
+      "missing_due_must_equal": 0,
+      "validation_must_pass": true
+    },
+    "missing_due_definition": "DUE_ROWS_WITHOUT_AN_ELIGIBLE_FINAL_SCORE",
+    "repository_commit_age_alone_defines_freshness": false,
+    "retrieval_age_definition": "CUTOFF_MINUS_LATEST_SUCCESSFUL_USABLE_OPENFOOTBALL_SNAPSHOT_RETRIEVAL",
+    "stale_blocked": {
+      "action": "NO_NEW_CURRENT_ARTIFACT_USE_GOVERNED_LEAGUE_PRIOR_FALLBACK_IF_LEGAL",
+      "any_condition": [
+        "MISSING_DUE_GREATER_THAN_ZERO",
+        "RETRIEVAL_AGE_GREATER_THAN_72_HOURS",
+        "UNRESOLVED_CANONICAL_MAPPING",
+        "AMBIGUOUS_STATUS",
+        "INVALID_SCHEMA",
+        "INVALID_SOURCE_LINEAGE"
+      ]
+    }
+  },
+  "statistical_research_evidence": {
+    "baseline_exact_score_log_loss": "2.951989",
+    "bootstrap_block": "GAMEWEEK",
+    "candidate_minus_baseline": "-0.064172",
+    "classification": "RECONSTRUCTED_OUT_OF_TIME_SHADOW_EVIDENCE",
+    "confidence_interval_95": [
+      "-0.100400",
+      "-0.028708"
+    ],
+    "production_superiority_claimed": false,
+    "selected_exact_score_log_loss": "2.887816"
+  },
+  "status": "GOVERNANCE_ONLY_NO_MODEL_IMPLEMENTATION",
+  "ticket_id": "CURRENT-TEAM-STRENGTH-001A-P0"
+}

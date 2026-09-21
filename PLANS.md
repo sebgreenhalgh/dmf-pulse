@@ -1417,3 +1417,21 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   PostgreSQL, static, build, installed-wheel, repository, and security gate.
 - [ ] Commit and push one descendant remediation SHA, require exact-SHA automatic CI fully green,
   and hand off for independent re-review without a post-CI commit.
+## CURRENT-TEAM-STRENGTH-001A-P0 authority, identity, and policy closure
+
+- [x] Verify `origin/main` and create the isolated ticket branch from
+  `99418f3316277f4dae347d80358d5dd5a09655b2`.
+- [x] Record the separate human-approved OpenFootball team-strength rights profile without
+  changing the accepted score-prior profile.
+- [x] Register 42 nondeterministic UUIDv7 canonical clubs and seal every exact OpenFootball
+  alias/season mapping with zero unresolved or ambiguous mappings.
+- [x] Add strict, packaged loaders for the identity artifact and the approved finality,
+  freshness, research, uncertainty, and materiality policies.
+- [x] Add fail-closed identity, semantic-hash, temporal, rights, packaging, and scope tests.
+- [ ] Run all literal acceptance commands and record exact evidence.
+- [ ] Obtain independent review, remediate all P0/P1/material P2 findings, seal evidence, push,
+  and verify exact-SHA CI.
+
+Scope guard: this P0 ticket contains governance and canonical identity only. It must not fit a
+team-strength model, generate fixture rates, change Stage 8, touch `private_v1`, use Odds/private
+FPL data, or activate production behavior.
