@@ -173,6 +173,7 @@ def test_source_snapshot_invariants_fail_closed(
     "mutate",
     [
         lambda item: item.update({"canonical_team_id": "00000000-0000-4000-8000-000000000001"}),
+        lambda item: item.update({"registered_at": "2026-09-21T17:17:20Z"}),
         lambda item: item.update(
             {"openfootball_aliases": list(reversed(item["openfootball_aliases"]))}
         ),
@@ -188,6 +189,16 @@ def test_canonical_registration_invariants_fail_closed(
     item = copy.deepcopy(next(club for club in clubs if len(club["openfootball_aliases"]) > 1))
     mutate(item)
     _rehash_club(item)
+
+    with pytest.raises(ValidationError):
+        _validate_json(CanonicalClubRegistration, item)
+
+
+def test_canonical_registration_identity_hash_mismatch_fails_closed() -> None:
+    item = copy.deepcopy(_load(IDENTITY_PATH)["canonical_clubs"][0])
+    item["canonical_team_identity_sha256"] = "0" * 64
+    body = {key: value for key, value in item.items() if key != "semantic_sha256"}
+    item["semantic_sha256"] = canonical_sha256(body)
 
     with pytest.raises(ValidationError):
         _validate_json(CanonicalClubRegistration, item)
@@ -256,6 +267,93 @@ def test_mapping_to_unregistered_club_fails_closed() -> None:
             item["season_scope"],
         ),
     )
+    _rehash_identity(value)
+
+    with pytest.raises(ValidationError):
+        _validate_json(OpenFootballHistoricalTeamIdentityV1, value)
+
+
+def test_registry_rejects_source_snapshot_commit_mismatch() -> None:
+    value = _load(IDENTITY_PATH)
+    snapshot = value["source_snapshots"][0]
+    snapshot["commit_sha"] = "1" * 40
+    body = {key: item for key, item in snapshot.items() if key != "semantic_sha256"}
+    snapshot["semantic_sha256"] = canonical_sha256(body)
+    _rehash_identity(value)
+
+    with pytest.raises(ValidationError):
+        _validate_json(OpenFootballHistoricalTeamIdentityV1, value)
+
+
+def test_registry_rejects_shared_canonical_id() -> None:
+    value = _load(IDENTITY_PATH)
+    value["canonical_clubs"][1] = copy.deepcopy(value["canonical_clubs"][0])
+    _rehash_identity(value)
+
+    with pytest.raises(ValidationError):
+        _validate_json(OpenFootballHistoricalTeamIdentityV1, value)
+
+
+def test_registry_rejects_mapping_target_identity_mismatch() -> None:
+    value = _load(IDENTITY_PATH)
+    record = value["records"][0]
+    record["canonical_team_identity_sha256"] = "0" * 64
+    _rehash_record(record)
+    _rehash_identity(value)
+
+    with pytest.raises(ValidationError):
+        _validate_json(OpenFootballHistoricalTeamIdentityV1, value)
+
+
+def test_registry_rejects_mapping_season_without_snapshot() -> None:
+    value = _load(IDENTITY_PATH)
+    record = value["records"][0]
+    record["season_scope"] = ["2027/28"]
+    record["source_identity_sha256"] = canonical_sha256(
+        {
+            "competition": "English Premier League",
+            "provider_key": "openfootball_football_json",
+            "season_scope": record["season_scope"],
+            "source_team_name": record["source_team_name"],
+        }
+    )
+    _rehash_record(record)
+    value["records"] = sorted(
+        value["records"],
+        key=lambda item: (
+            item["canonical_team_id"],
+            item["source_team_name"],
+            item["season_scope"],
+        ),
+    )
+    _rehash_identity(value)
+
+    with pytest.raises(ValidationError):
+        _validate_json(OpenFootballHistoricalTeamIdentityV1, value)
+
+
+def test_registry_rejects_mapping_snapshot_identity_mismatch() -> None:
+    value = _load(IDENTITY_PATH)
+    record = value["records"][0]
+    record["source_snapshot_identity"] = "0" * 64
+    _rehash_record(record)
+    _rehash_identity(value)
+
+    with pytest.raises(ValidationError):
+        _validate_json(OpenFootballHistoricalTeamIdentityV1, value)
+
+
+def test_registry_rejects_duplicate_current_fpl_external_id() -> None:
+    value = _load(IDENTITY_PATH)
+    clubs = [
+        club
+        for club in value["canonical_clubs"]
+        if club["current_fpl_external_identifier"] is not None
+    ]
+    clubs[1]["current_fpl_external_identifier"]["external_id_text"] = clubs[0][
+        "current_fpl_external_identifier"
+    ]["external_id_text"]
+    _rehash_club(clubs[1])
     _rehash_identity(value)
 
     with pytest.raises(ValidationError):

@@ -61,7 +61,7 @@
       "notes": "English Premier League immutable commit-pinned source material only; no public display, redistribution, public/commercial API, unrelated competitions, player/image/logo/trademark expansion, private FPL or Odds data, automatic action, or broader-purpose inference.",
       "profile_version": "1.0.0",
       "provider_key": "openfootball_football_json",
-      "retention_reason": "CC0-1.0 permits immutable raw, derived, canonical identity, model, covariance and diagnostic retention for the approved private purpose and reproducibility.",
+      "retention_reason": "CC0-1.0 permits immutable raw, derived, canonical identity, model, covariance and diagnostic retention for the approved private purpose and reproducibility, provided exact source commit, source path, content hashes, licence identity, retrieval time and usable_at provenance are retained.",
       "retention_seconds": null,
       "rights_profile_id": "openfootball_football_json_team_strength_v1",
       "status": "HUMAN_APPROVED",

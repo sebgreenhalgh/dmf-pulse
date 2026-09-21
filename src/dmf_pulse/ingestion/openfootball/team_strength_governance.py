@@ -30,10 +30,10 @@ TEAM_STRENGTH_APPROVAL_ID = "CURRENT-TEAM-STRENGTH-001A#openfootball_football_js
 IDENTITY_MAPPING_DECISION_ID = "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1"
 IDENTITY_SOURCE_COMMIT = "40b3e1b7391932d133287115106304444bf297e1"
 APPROVED_IDENTITY_SEMANTIC_SHA256 = (
-    "b0c0a73f97f9369aea217db0fba31dcd41d52be8a597dc10741ef4bf2fa19876"
+    "55f36445b0aabc77add11560e3ea550cbc07ec114db48dbf664e7177c65331ef"
 )
 APPROVED_GOVERNANCE_SEMANTIC_SHA256 = (
-    "ff04de46f08711d85fb0de24f5a9257618b82d7422ae349bff2e033d082f4d21"
+    "e8d28521fcb90b625a8dbeff4f72de3b178d16ed7cae748a7429d0e42cdd9fd7"
 )
 
 Sha256 = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
@@ -122,6 +122,12 @@ class SeasonScopedExternalIdentifier(_FrozenModel):
     observed_display_name: str = Field(min_length=1, max_length=80)
     provider_key: Literal["official_fpl"]
     season_scope: Literal["2026/27"]
+    source_evidence_path: Literal[
+        "evidence/tickets/RUL-2026-27/sources/api-bootstrap-static-faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7.json"
+    ]
+    source_snapshot_sha256: Literal[
+        "faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7"
+    ]
 
 
 class CanonicalClubRegistration(_FrozenModel):
@@ -148,6 +154,9 @@ class CanonicalClubRegistration(_FrozenModel):
     def validate_registration(self) -> Self:
         if self.canonical_team_id.version != 7:
             raise ValueError("canonical team ID must be UUIDv7")
+        generated_at = datetime.fromtimestamp((self.canonical_team_id.int >> 80) / 1000, UTC)
+        if self.registered_at != generated_at:
+            raise ValueError("canonical team registration time must match UUIDv7 creation time")
         if self.openfootball_aliases != tuple(sorted(set(self.openfootball_aliases))):
             raise ValueError("OpenFootball aliases must be unique and sorted")
         if self.season_membership != tuple(sorted(set(self.season_membership))):
@@ -388,6 +397,7 @@ class SelectedShadowPolicy(_FrozenModel):
     maximum_output_rate: Decimal
     model_family: Literal["REGULARISED_TIME_WEIGHTED_INDEPENDENT_POISSON_TEAM_STRENGTH_V1"]
     parameter_uncertainty: ParameterUncertaintyPolicy
+    output_rate_strictly_positive: Literal[True]
     public_contract: Literal["INDEPENDENT_POISSON_V1_SCORE_PRIOR_REQUEST_UNCHANGED"]
     training_evidence: Literal["ALL_ELIGIBLE_RESULTS_STRICTLY_BEFORE_FORECAST_CUTOFF"]
     training_start_season: Literal["2010/11"]

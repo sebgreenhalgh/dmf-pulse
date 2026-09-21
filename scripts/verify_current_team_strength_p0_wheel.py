@@ -151,6 +151,8 @@ assert policy.materiality_policy.prospective_min_gameweeks == 10
 assert policy.materiality_policy.prospective_min_labelled_fixtures == 100
 assert policy.model_implementation_present is False
 assert policy.production_active is False
+assert policy.selected_shadow_policy.output_rate_strictly_positive is True
+assert policy.selected_shadow_policy.maximum_output_rate == Decimal("8.000000")
 
 old_id = resolve_openfootball_team(
     identity, season_code="2019/20", source_team_name="Manchester City"

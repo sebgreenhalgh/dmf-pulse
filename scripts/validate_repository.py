@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import math
@@ -1556,21 +1557,16 @@ def validate_repository(root: Path) -> list[str]:
 
 
 def _active_ticket(root: Path) -> str:
-    for ticket_id in (
-        "CURRENT-TEAM-STRENGTH-001A-P0",
-        "GCS-008",
-        "NRM-006",
-        "ODD-005",
-        "FPL-004",
-        "DAT-003",
-        "RUL-002",
-    ):
+    for ticket_id in ("GCS-008", "NRM-006", "ODD-005", "FPL-004", "DAT-003", "RUL-002"):
         if (root / f"tickets/{ticket_id}/ticket.yaml").is_file():
             return ticket_id
     return "FND-001"
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ticket")
+    arguments = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     errors = validate_repository(root)
     result = {
@@ -1578,7 +1574,12 @@ def main() -> int:
         "errors": errors,
         "status": "PASS" if not errors else "FAIL",
     }
-    active_ticket = _active_ticket(root)
+    active_ticket = arguments.ticket or _active_ticket(root)
+    if (
+        re.fullmatch(r"[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+", active_ticket) is None
+        or not (root / "tickets" / active_ticket / "ticket.yaml").is_file()
+    ):
+        parser.error("--ticket must identify an existing governed ticket")
     report_path = (
         root / "evidence" / "tickets" / active_ticket / "repository_validation_report.json"
     )

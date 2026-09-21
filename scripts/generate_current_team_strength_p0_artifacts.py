@@ -11,8 +11,14 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_COMMIT = "40b3e1b7391932d133287115106304444bf297e1"
 DECIDED_AT = "2026-09-21T17:14:39.069428Z"
+REGISTRATION_AT = "2026-09-21T17:17:19.932000Z"
 MAPPING_DECISION_ID = "CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1"
 MAPPING_AUTHORITY = "Sebastian Greenhalgh"
+FPL_2026_27_SOURCE_PATH = (
+    "evidence/tickets/RUL-2026-27/sources/"
+    "api-bootstrap-static-faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7.json"
+)
+FPL_2026_27_SOURCE_SHA256 = "faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7"
 
 
 def _canonical_bytes(value: object) -> bytes:
@@ -440,7 +446,7 @@ def build_identity_artifact() -> dict[str, Any]:
             "canonical_team_id": canonical_id,
             "entity_type": "TEAM",
             "id_generation_method": "NONDETERMINISTIC_UUIDV7_REGISTRATION",
-            "registered_at": DECIDED_AT,
+            "registered_at": REGISTRATION_AT,
             "registration_authority": MAPPING_DECISION_ID,
         }
         identity_sha = _sha256(identity_material)
@@ -454,6 +460,8 @@ def build_identity_artifact() -> dict[str, Any]:
                 "observed_display_name": display_name,
                 "provider_key": "official_fpl",
                 "season_scope": "2026/27",
+                "source_evidence_path": FPL_2026_27_SOURCE_PATH,
+                "source_snapshot_sha256": FPL_2026_27_SOURCE_SHA256,
             }
         clubs.append(
             _reviewed(
@@ -564,6 +572,7 @@ def build_governance_policy() -> dict[str, Any]:
             "half_life_days": 365,
             "home_advantage": "ONE_FITTED_GLOBAL_EFFECT",
             "maximum_output_rate": "8.000000",
+            "output_rate_strictly_positive": True,
             "model_family": "REGULARISED_TIME_WEIGHTED_INDEPENDENT_POISSON_TEAM_STRENGTH_V1",
             "parameter_uncertainty": {
                 "covariance_retained": True,
@@ -644,10 +653,11 @@ def build_identity_review(identity: dict[str, Any]) -> str:
     lines = [
         "# CURRENT-TEAM-STRENGTH-001A-P0 canonical identity review",
         "",
-            f"- Decision: `{MAPPING_DECISION_ID}`",
-            f"- Decided by: `{MAPPING_AUTHORITY}`",
-            f"- Decided at: `{DECIDED_AT}`",
-            f"- Source commit: `{SOURCE_COMMIT}`",
+        f"- Decision: `{MAPPING_DECISION_ID}`",
+        f"- Decided by: `{MAPPING_AUTHORITY}`",
+        f"- Decided at: `{DECIDED_AT}`",
+        f"- Canonical registrations created at: `{REGISTRATION_AT}`",
+        f"- Source commit: `{SOURCE_COMMIT}`",
         "",
         "| Canonical club | Canonical UUIDv7 | Exact OpenFootball aliases | Seasons | Current FPL external ID | Continuity | Evidence |",
         "|---|---|---|---|---|---|---|",
@@ -680,6 +690,8 @@ def build_identity_review(identity: dict[str, Any]) -> str:
             "Repository inspection found no pre-existing governed club registry to reuse. These",
             "are the minimum one-time nondeterministic UUIDv7 canonical TEAM registrations under",
             "the existing canonical-entity identity rule; no database mutation is performed by P0.",
+            "Current FPL external IDs are bound to accepted public static bootstrap evidence",
+            f"`{FPL_2026_27_SOURCE_PATH}` (SHA-256 `{FPL_2026_27_SOURCE_SHA256}`).",
             "",
             "## Review result",
             "",
