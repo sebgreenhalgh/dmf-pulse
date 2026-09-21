@@ -75,3 +75,21 @@ inside binary64 fitting. The ticket-local Cholesky factorization supplies the re
 SPD solve and inverse. Near-optimum line search permits only an eight-ulp objective difference
 with a strictly improved gradient (or an already-converged gradient); both final convergence
 criteria still apply. No jitter, coefficient clipping or pseudo-inverse is used.
+
+## Fixture/source reassessment boundary
+
+Fixture adapter authentication caches complete serialized input, not mutable model references
+or equality-normalized Decimal values. Public preparation returns independent validated copies.
+A compact authenticated current-source assessment binds dataset, mode, competition, fixture
+registry, season, cutoff, source identities, retrieval/usable times and due-result status.
+It permits P0-degraded reuse of the latest sealed model without inventing a maximum model age
+or claiming a current refit. The fixture bundle retains both the model cutoff and the newer
+source-completeness assessment. Without reassessment, artifact-only inference conservatively
+uses the original source retrieval timestamps. No fallback is computed inside fitting.
+
+Real Stage-8 compatibility uses its existing balanced-market synthetic fixture and unchanged
+public service. An additional H/D/A-only case (rates 2.024967/1.476651, targets .55/.25/.20,
+uncertainty .05) triggers the inherited visible `PROJECTION_DID_NOT_CONVERGE` fallback under
+the default Decimal context. This is preserved and tested, not counted as successful constrained
+projection and not repaired by changing Stage-8 mathematics in this ticket. Compatibility is
+not a universal-convergence claim.
