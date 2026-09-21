@@ -16,4 +16,4 @@ The calibration/subgroup rule cannot override failure of the primary proper-scor
 movement and transfer thresholds are decision diagnostics, not promotion targets.
 
 The enclosing governance artifact semantic SHA-256 is
-`ff04de46f08711d85fb0de24f5a9257618b82d7422ae349bff2e033d082f4d21`.
+`e8d28521fcb90b625a8dbeff4f72de3b178d16ed7cae748a7429d0e42cdd9fd7`.

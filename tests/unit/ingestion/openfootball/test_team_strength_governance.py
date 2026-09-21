@@ -35,6 +35,10 @@ def test_historical_identity_registry_is_complete_and_canonical() -> None:
     assert identity.ambiguous_mapping_count == 0
     assert len({club.canonical_team_id for club in identity.canonical_clubs}) == 42
     assert all(club.canonical_team_id.version == 7 for club in identity.canonical_clubs)
+    assert all(
+        club.registered_at == datetime.fromtimestamp((club.canonical_team_id.int >> 80) / 1000, UTC)
+        for club in identity.canonical_clubs
+    )
     assert identity.root_semantic_sha256 == APPROVED_IDENTITY_SEMANTIC_SHA256
 
 
@@ -141,6 +145,9 @@ def test_current_fpl_ids_are_external_and_season_scoped() -> None:
     assert len(external) == 20
     assert {item.season_scope for item in external} == {"2026/27"}
     assert {item.provider_key for item in external} == {"official_fpl"}
+    assert {item.source_snapshot_sha256 for item in external} == {
+        "faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7"
+    }
     assert len({item.external_id_text for item in external}) == 20
     canonical_ids = {str(club.canonical_team_id) for club in identity.canonical_clubs}
     assert canonical_ids.isdisjoint({item.external_id_text for item in external})
@@ -162,6 +169,8 @@ def test_locked_governance_policy_is_exact_and_nonactivating() -> None:
     assert materiality.production_promotion_requires_separate_human_approval is True
     assert policy.model_implementation_present is False
     assert policy.production_active is False
+    assert policy.selected_shadow_policy.output_rate_strictly_positive is True
+    assert policy.selected_shadow_policy.maximum_output_rate == Decimal("8.000000")
     assert policy.semantic_sha256 == APPROVED_GOVERNANCE_SEMANTIC_SHA256
 
 

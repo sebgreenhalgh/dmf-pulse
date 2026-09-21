@@ -83,6 +83,16 @@ def test_team_strength_rights_profile_is_purpose_bound_and_private() -> None:
     assert profile.capabilities[RightsCapability.PUBLIC_DISPLAY] is CapabilityValue.DENY
     assert profile.capabilities[RightsCapability.REDISTRIBUTION] is CapabilityValue.DENY
     assert profile.retention_seconds is None
+    assert profile.retention_reason is not None
+    for required_provenance in (
+        "source commit",
+        "source path",
+        "content hashes",
+        "licence identity",
+        "retrieval time",
+        "usable_at provenance",
+    ):
+        assert required_provenance in profile.retention_reason
     assert profile.geography_scope == "private UK analytical use"
     assert profile.unresolved_rights == ()
 

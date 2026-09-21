@@ -30,6 +30,7 @@
     "home_advantage": "ONE_FITTED_GLOBAL_EFFECT",
     "maximum_output_rate": "8.000000",
     "model_family": "REGULARISED_TIME_WEIGHTED_INDEPENDENT_POISSON_TEAM_STRENGTH_V1",
+    "output_rate_strictly_positive": true,
     "parameter_uncertainty": {
       "covariance_retained": true,
       "hessian_retained": true,
@@ -40,7 +41,7 @@
     "training_evidence": "ALL_ELIGIBLE_RESULTS_STRICTLY_BEFORE_FORECAST_CUTOFF",
     "training_start_season": "2010/11"
   },
-  "semantic_sha256": "ff04de46f08711d85fb0de24f5a9257618b82d7422ae349bff2e033d082f4d21",
+  "semantic_sha256": "e8d28521fcb90b625a8dbeff4f72de3b178d16ed7cae748a7429d0e42cdd9fd7",
   "source_finality_policy": {
     "ambiguous_or_abandoned_action": "QUARANTINE_PENDING_GOVERNED_RESOLUTION",
     "correction_policy": "NEW_IMMUTABLE_DESCENDANT_NO_FROZEN_FORECAST_MUTATION",

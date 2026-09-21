@@ -18,9 +18,11 @@ Approved purpose:
 The profile permits automated and manual acquisition of public immutable source snapshots,
 transient processing, immutable raw and derived storage, caching, backup, model training,
 private internal use, reproducibility, and retention of identity/model/diagnostic artifacts for
-this purpose. It denies public display and redistribution and excludes unrelated competitions,
-player/image/logo/trademark expansion, public/commercial APIs, private FPL data, manager/entry
-data, Odds/bookmaker data, automatic action, and inferred expansion to broader purposes.
+this purpose, provided exact source commit, source path, content hashes, licence identity,
+retrieval time, and `usable_at` provenance are retained. It denies public display and
+redistribution and excludes unrelated competitions, player/image/logo/trademark expansion,
+public/commercial APIs, private FPL data, manager/entry data, Odds/bookmaker data, automatic
+action, and inferred expansion to broader purposes.
 
 This records the stated DMF Pulse human approval. It is not provider endorsement, legal advice,
 or permission beyond the source terms.

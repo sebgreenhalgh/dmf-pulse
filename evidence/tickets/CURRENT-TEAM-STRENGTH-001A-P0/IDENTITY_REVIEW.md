@@ -3,6 +3,7 @@
 - Decision: `CURRENT-TEAM-STRENGTH-001A-P0#historical-club-identity-v1`
 - Decided by: `Sebastian Greenhalgh`
 - Decided at: `2026-09-21T17:14:39.069428Z`
+- Canonical registrations created at: `2026-09-21T17:17:19.932000Z`
 - Source commit: `40b3e1b7391932d133287115106304444bf297e1`
 
 | Canonical club | Canonical UUIDv7 | Exact OpenFootball aliases | Seasons | Current FPL external ID | Continuity | Evidence |
@@ -53,6 +54,8 @@
 Repository inspection found no pre-existing governed club registry to reuse. These
 are the minimum one-time nondeterministic UUIDv7 canonical TEAM registrations under
 the existing canonical-entity identity rule; no database mutation is performed by P0.
+Current FPL external IDs are bound to accepted public static bootstrap evidence
+`evidence/tickets/RUL-2026-27/sources/api-bootstrap-static-faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7.json` (SHA-256 `faff6a660d48d3fde513b9601379f33086240db9b07598101f48169c68cbd1e7`).
 
 ## Review result
 
@@ -63,7 +66,7 @@ the existing canonical-entity identity rule; no database mutation is performed b
 - seasons: `17`
 - unresolved clubs: `0`
 - ambiguous mappings: `0`
-- root semantic SHA-256: `b0c0a73f97f9369aea217db0fba31dcd41d52be8a597dc10741ef4bf2fa19876`
+- root semantic SHA-256: `55f36445b0aabc77add11560e3ea550cbc07ec114db48dbf664e7177c65331ef`
 
 All mappings are explicit human-reviewed registrations. Names and current FPL IDs are
 evidence/external identifiers only; neither is canonical identity. No fuzzy matching is

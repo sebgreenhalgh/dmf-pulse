@@ -7,6 +7,7 @@
   "licence": "CC0-1.0",
   "profile_version": "1.0.0",
   "provider_key": "openfootball_football_json",
+  "retention_condition": "Retain exact source commit, source path, content hashes, licence identity, retrieval time and usable_at provenance.",
   "rights_profile_id": "openfootball_football_json_team_strength_v1",
   "status": "HUMAN_APPROVED",
   "terms_source": "OpenFootball football.json/LICENSE.md",
