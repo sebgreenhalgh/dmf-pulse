@@ -1435,3 +1435,27 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 Scope guard: this P0 ticket contains governance and canonical identity only. It must not fit a
 team-strength model, generate fixture rates, change Stage 8, touch `private_v1`, use Odds/private
 FPL data, or activate production behavior.
+
+## CURRENT-TEAM-STRENGTH-001A public-core shadow implementation
+
+Parent: `1a6bbc2cfc259f4aeb688c21360af2f1433a176e` (P0 CI 35640436688 success).
+Branch: `integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-independent-poisson`.
+Worktree: isolated from the existing dirty availability checkout.
+
+- [x] Fetch and verify immutable remote parent, P0 independent-review verdict, and clean branch.
+- [x] Authenticate P0 contracts and recover exact original research definitions and source bytes.
+- [ ] 001A.01: immutable individual-match source dataset, rights, identity, temporal and freshness
+  tests; seal and push.
+- [ ] 001A.02: structural effect-coded float64 damped Newton, fixed shrinkage/cohort/decay,
+  covariance and authenticated model; mathematical/adversarial tests; seal and push.
+- [ ] 001A.03: authenticated fixture adapter/bundle, typed fallback, real unchanged Stage-8
+  compatibility, inference performance; seal and push.
+- [ ] 001A.04: deterministic reconstructed 2025/26 replay, research reproduction, public shadow
+  command, explicit golden, installed-wheel demonstration; seal and push.
+- [ ] 001A.05: adversarial self-review, fresh independent review and remediation, >=90% new-path
+  branch coverage, complete acceptance, capped evidence, final push and exact-SHA green CI.
+
+Scope: shadow only; no production/private activation, new runtime dependency, club remapping,
+Stage-8 math/schema change, Odds/FPL acquisition, or follow-on 001P/001U/001B implementation.
+P0 remains normative and immutable. Any unresolved research definition blocks the affected
+implementation; do not infer a penalty or revise the locked historical target to match output.

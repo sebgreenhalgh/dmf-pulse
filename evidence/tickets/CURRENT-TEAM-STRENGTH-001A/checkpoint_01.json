@@ -1,0 +1,37 @@
+{
+  "checkpoint": "001A.01_SOURCE_DATASET",
+  "classification": "INTERMEDIATE_NOT_FINAL_ACCEPTANCE",
+  "parent": "1a6bbc2cfc259f4aeb688c21360af2f1433a176e",
+  "network_calls_for_acceptance": 0,
+  "source_commit": "40b3e1b7391932d133287115106304444bf297e1",
+  "source_paths": "2010-11/en.1.json through 2025-26/en.1.json; 2026-27/en.1.json validation only",
+  "historical_matches": 6080,
+  "historical_seasons": 16,
+  "dataset_mode": "RECONSTRUCTED",
+  "dataset_training_cutoff": "2026-06-01T00:00:00Z",
+  "dataset_information_cutoff": "MAXIMUM_AUTHENTICATED_CORPUS_USABLE_AT",
+  "dataset_semantic_sha256": "b4de6ce2e4ab1c0e6b7e766ac1de3e60ed539593e13b24f805a0e68cfd6e7c51",
+  "identity_registry_sha256": "55f36445b0aabc77add11560e3ea550cbc07ec114db48dbf664e7177c65331ef",
+  "governance_sha256": "e8d28521fcb90b625a8dbeff4f72de3b178d16ed7cae748a7429d0e42cdd9fd7",
+  "fixture_registry_sha256": "de447eb368a807d4edf701a75c094a8b3f4925aa3e87cbff9b9f4fadd63eba18",
+  "private_corpus_content_sha256": "5a3882ee17da73deaf0f175dcce28999edd95aa5506911eea2274cefcaa59cc8",
+  "rights_profile": "openfootball_football_json_team_strength_v1",
+  "commands": [
+    {"command": "uv run --frozen python -m pytest tests/unit/ingestion/openfootball tests/integration/ingestion/test_openfootball_score_prior_cli.py -q", "exit_code": 0, "result": "277 passed in 14.53s"},
+    {"command": "uv run --frozen python scripts/verify_team_strength_corpus.py --corpus-root review_pack/private_openfootball_corpus", "exit_code": 0, "result": "PASS; 6080 historical matches; 16 seasons; 0 network calls"},
+    {"command": "uv run --frozen python -m mypy src/dmf_pulse", "exit_code": 0, "result": "Success: no issues found in 263 source files"},
+    {"command": "uv run --frozen python -m ruff check .", "exit_code": 0, "result": "All checks passed!"},
+    {"command": "uv run --frozen python -m ruff format --check .", "exit_code": 0, "result": "707 files already formatted"},
+    {"command": "uv run --frozen python scripts/scan_secrets.py", "exit_code": 0, "result": "PASS; finding_count=0"},
+    {"command": "git diff --check", "exit_code": 0, "result": "no whitespace errors"}
+  ],
+  "review_remediations": [
+    "P1 missing complete source season: enforce authenticated fixture-registry season completeness",
+    "P2 malformed nested full-time score: leaf arrays only",
+    "P2 ineffective acquisition tests: explicit synthetic-licence digest double, branch assertions and post-fetch clock tests; real licence verified separately",
+    "P2 unchecked existing import manifest: authenticate retained corpus before any writes"
+  ],
+  "independent_source_review": "FOUR_FINDINGS_CLOSED_NO_P0_P1_MATERIAL_P2; 77 focused tests independently passed; source checkpoint only",
+  "publication": "CODE_SYNTHETIC_TESTS_IDENTITIES_AND_SAFE_AGGREGATES_ONLY",
+  "production_active": false
+}
