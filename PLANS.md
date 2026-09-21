@@ -2295,7 +2295,7 @@ Worktree: isolated from the existing dirty availability checkout.
   covariance and authenticated model; mathematical/adversarial tests; seal and push.
 - [x] 001A.03: authenticated fixture adapter/bundle, typed fallback, real unchanged Stage-8
   compatibility, inference performance; seal and push.
-- [ ] 001A.04: deterministic reconstructed 2025/26 replay, research reproduction, public shadow
+- [x] 001A.04: deterministic reconstructed 2025/26 replay, research reproduction, public shadow
   command, explicit golden, installed-wheel demonstration; seal and push.
 - [ ] 001A.05: adversarial self-review, fresh independent review and remediation, >=90% new-path
   branch coverage, complete acceptance, capped evidence, final push and exact-SHA green CI.
@@ -2322,3 +2322,10 @@ Both are RECONSTRUCTED; the original-date predicate emits metrics only, not gove
 The explicit 2e-6 predeclared research tolerance passes. Clean offline installed-wheel CLI
 reproduces the 6,080-match semantic model. A linked-worktree sdist-ignore leak was caught
 before publication and closed with an explicit private-output exclusion and archive checks.
+Published checkpoint 001A.04: `43ea12860fd6f8d668e498994188354caa2a5ad4`.
+001A.05 fresh independent whole-ticket verdict: `CLEAR_FOR_TEAM_STRENGTH_001A_SHADOW_USE`.
+Review closed LIVE midnight completeness, pre-hash UTC normalization and canonical evaluation
+scope findings. Final focused/inherited population: 578 passed; one performance test separately
+passes without instrumentation. Actual new-path branch coverage: 382/398 = 95.9799%, zero
+excluded lines. Repeat complete replay authenticates the identical golden. Final private
+30-fixture adapter benchmark: 63.3772ms. Final exact-SHA CI is still required before handoff.

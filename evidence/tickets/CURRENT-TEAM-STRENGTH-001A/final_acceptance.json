@@ -1,0 +1,50 @@
+{
+  "ticket": "CURRENT-TEAM-STRENGTH-001A",
+  "status": "LOCAL_GATES_PASS_FINAL_EXACT_SHA_CI_REQUIRED",
+  "human_acceptance": false,
+  "production_activation": false,
+  "parent_sha": "1a6bbc2cfc259f4aeb688c21360af2f1433a176e",
+  "published_checkpoint_shas": [
+    "45efa590547328370b23513729c0af43819ceb70",
+    "357f64d1edba8db4df26d30e1b8bb7b80904e95f",
+    "65bdda75bce313b96973f26e25db3323ff7bed87",
+    "43ea12860fd6f8d668e498994188354caa2a5ad4"
+  ],
+  "commands": [
+    {"command": "uv run --frozen python -m coverage run --branch --data-file=review_pack/focused-final-data -m pytest tests/unit/ingestion/openfootball tests/unit/football_events tests/contract/football_events tests/unit/evaluation/test_team_strength_replay.py tests/unit/cli/test_team_strength_cli.py tests/integration/ingestion/test_openfootball_score_prior_cli.py -m 'not performance' -q", "exit_code": 0, "result": "578 passed, 1 deselected in 141.82s"},
+    {"command": "uv run --frozen python -m coverage json --data-file=review_pack/focused-final-data -o review_pack/focused-final-report.json --fail-under=0", "exit_code": 0, "result": "branch-instrumented JSON written"},
+    {"command": "uv run --frozen python scripts/verify_team_strength_coverage.py --coverage-json review_pack/focused-final-report.json --summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/final_branch_coverage.json", "exit_code": 0, "result": "382/398 actual branches = 95.97989949748744%; zero excluded lines"},
+    {"command": "uv run --frozen python -m pytest tests/unit/football_events/test_team_strength_adapter.py -m performance -q", "exit_code": 0, "result": "1 passed, 26 deselected in 8.92s"},
+    {"command": "uv run --frozen python scripts/verify_team_strength_model.py --corpus-root review_pack/private_openfootball_corpus --private-artifact-root review_pack/private_team_strength --summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/final_model_summary.json", "exit_code": 0, "result": "PASS; 6080 matches; repeated semantic identity; fit 2.827121 seconds"},
+    {"command": "uv run --frozen python scripts/verify_team_strength_adapter.py --corpus-root review_pack/private_openfootball_corpus --private-artifact-root review_pack/private_team_strength --model-summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/checkpoint_02_model.json --summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/final_adapter_summary.json", "exit_code": 0, "result": "PASS; 30 cold-cache calls in 63.3772 milliseconds"},
+    {"command": "uv run --frozen python scripts/verify_team_strength_replay.py --corpus-root review_pack/private_openfootball_corpus --private-artifact-root review_pack/private_team_strength_replay --report evidence/tickets/CURRENT-TEAM-STRENGTH-001A/reconstructed_replay.json", "exit_code": 0, "result": "Second complete 38-origin golden-verified replay PASS; 218.068829 seconds; identical semantic report"},
+    {"command": "uv sync --all-groups --frozen", "exit_code": 0, "result": "Checked 40 packages; no dependency or lockfile change"},
+    {"command": "uv build --no-sources", "exit_code": 0, "result": "wheel and sdist built; private-material archive assertions passed"},
+    {"command": "uv run --frozen python scripts/verify_team_strength_wheel.py --corpus-root review_pack/private_openfootball_corpus --summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/installed_wheel_summary.json", "exit_code": 0, "result": "PASS; fresh offline runtime-only external install; actual dmf shadow command; identical model state"},
+    {"command": "uv run --frozen python -m ruff format --check .", "exit_code": 0, "result": "729 files already formatted"},
+    {"command": "uv run --frozen python -m ruff check .", "exit_code": 0, "result": "All checks passed!"},
+    {"command": "uv run --frozen python -m mypy", "exit_code": 0, "result": "Success: no issues found in 269 source files"},
+    {"command": "uv run --frozen python scripts/scan_secrets.py", "exit_code": 0, "result": "PASS; zero findings"},
+    {"command": "git diff --check", "exit_code": 0, "result": "PASS"},
+    {"command": "uv run --frozen python scripts/generate_repository_manifest.py --ticket PRC-013", "exit_code": 0, "result": "1255 canonical files"},
+    {"command": "uv run --frozen python scripts/generate_repository_manifest.py --ticket CURRENT-TEAM-STRENGTH-001A", "exit_code": 0, "result": "1255 canonical files"},
+    {"command": "uv run --frozen python scripts/validate_repository.py --ticket CURRENT-TEAM-STRENGTH-001A", "exit_code": 0, "result": "PASS; zero errors"},
+    {"command": "uv run --frozen python scripts/build_team_strength_review_pack.py", "exit_code": 0, "result": "PASS; 62 reviewed public-safe files; per-entry hashes verified; 2MiB entry and 8MiB aggregate caps"}
+  ],
+  "nonpassing_attempts_disclosed": [
+    "Redundant serial local whole-repository branch suite canceled before completion; not counted as pass. Complete inherited acceptance uses unchanged exact-SHA eight-shard CI.",
+    "One newly installed Windows console launcher was transiently blocked by Application Control; a fresh unchanged offline-wheel retry passed. No security policy was modified.",
+    "One real adapter benchmark exceeded 100ms during concurrent coverage workload; not counted as pass. Post-focused-coverage cold-cache run passed at63.3772ms; threshold unchanged."
+  ],
+  "independent_review": "CLEAR_FOR_TEAM_STRENGTH_001A_SHADOW_USE",
+  "activation_boundary": "SHADOW_NOT_MODEL_INPUT",
+  "score_prior_request_unchanged": true,
+  "stage8_mathematics_unchanged": true,
+  "league_prior_retained": true,
+  "private_v1_unchanged": true,
+  "odds_or_fpl_training_data": false,
+  "current_2026_27_used_for_policy_selection": false,
+  "parameter_covariance_retained": true,
+  "parameter_mixture_active": false,
+  "required_before_production": "CURRENT-TEAM-STRENGTH-001U"
+}

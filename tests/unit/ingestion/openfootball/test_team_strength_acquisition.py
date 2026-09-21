@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import timedelta
+from datetime import UTC, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -16,6 +16,7 @@ from dmf_pulse.ingestion.openfootball.client import (
     OpenFootballHttpResponse,
 )
 from dmf_pulse.ingestion.openfootball.team_strength_acquisition import (
+    _fetch,
     acquire_team_strength_snapshot,
 )
 from dmf_pulse.ingestion.openfootball.team_strength_corpus import load_reconstructed_corpus
@@ -89,11 +90,17 @@ def test_acquisition_uses_pinned_credential_free_boundary() -> None:
     )
 
 
-def test_acquisition_success_with_synthetic_licence_double(licence_digest_double: None) -> None:
+@pytest.mark.parametrize("offset", [0, 2, -5])
+def test_acquisition_success_with_synthetic_licence_double(
+    licence_digest_double: None, offset: int
+) -> None:
     body, lineage = source()
     fixtures = registry()
     transport = Transport(body)
-    times = iter(STAMP + timedelta(seconds=i) for i in range(4))
+    times = iter(
+        (STAMP + timedelta(seconds=i)).astimezone(timezone(timedelta(hours=offset)))
+        for i in range(4)
+    )
     result = acquire_team_strength_snapshot(
         resource=lineage.resource,
         expected_resource_sha256=canonical_sha256(lineage.resource),
@@ -107,6 +114,25 @@ def test_acquisition_success_with_synthetic_licence_double(licence_digest_double
         seconds=3
     )
     assert result.snapshot.matches[0].home_goals == 2
+    assert result.snapshot.lineage.usable_at.tzinfo is UTC
+
+
+def test_fetch_rejects_unapproved_path_and_sanitizes_transport_failure() -> None:
+    body, lineage = source()
+    transport = Transport(body)
+    with pytest.raises(ValueError, match="allowlisted"):
+        _fetch(lineage.resource, "other/competition.json", transport)
+    assert transport.requests == []
+
+    class Broken:
+        transport_id = "OFFLINE_BROKEN_TEST"
+
+        def send(self, request):
+            raise OSError("synthetic private exception body")
+
+    with pytest.raises(ValueError, match="source acquisition failed") as error:
+        _fetch(lineage.resource, lineage.resource.path, Broken())
+    assert "private exception" not in str(error.value)
 
 
 @pytest.mark.parametrize("failure", ["descriptor", "fixture", "licence", "status", "body", "clock"])

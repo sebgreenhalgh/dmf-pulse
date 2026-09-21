@@ -86,6 +86,27 @@ It permits P0-degraded reuse of the latest sealed model without inventing a maxi
 or claiming a current refit. The fixture bundle retains both the model cutoff and the newer
 source-completeness assessment. Without reassessment, artifact-only inference conservatively
 uses the original source retrieval timestamps. No fallback is computed inside fitting.
+For LIVE_OBSERVED inference, the authenticated completeness assessment must be on the same
+UTC calendar date as `as_of`: another D+2 result can become due at midnight even while source
+retrieval age remains within 24/72 hours. Crossing midnight requires a newly built dataset
+assessment; it does not require a refit when P0 permits degraded sealed-model reuse.
+
+## Evaluation authority resolution
+
+The evaluation scope is `B1-backtesting` in authority_manifest.json, not `A15-evaluation`.
+Resolved decisions: ADR-DATA-004/005/006, ADR-EVAL-001/002/003/004/005/006 and
+ADR-IMPL-001/003. DMFP-20 locators: lines 546–628, 2058–2225, 2758–2841.
+DMFP-15 sections 0, 3, 4, 7, 10, 12, 26 and 27 control reconstructed classification,
+cutoff-safe rolling origins, immutable inputs, proper metrics and no holdout retuning.
+The B0–B5 ladder, sequential decision replay and prospective/calibration promotion gates
+remain required before broader model/policy trust; 001A claims none of that acceptance.
+Its narrow result is reconstructed football-prior reproduction and shadow capability only.
+
+Authority byte identities at review:
+
+- authority_manifest.json: `b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac`
+- DMFP-15: `0feec95bb9a3fb31b5ccc504699681a8170d7c349c18accefc6e3047ab9a15ed`
+- DMFP-20: `7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72`
 
 Real Stage-8 compatibility uses its existing balanced-market synthetic fixture and unchanged
 public service. An additional H/D/A-only case (rates 2.024967/1.476651, targets .55/.25/.20,

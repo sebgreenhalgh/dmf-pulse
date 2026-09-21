@@ -7,7 +7,7 @@ objective: Implement the locked public-core model, authenticated fixture adapter
 authority_scopes:
   - A3-data-foundation
   - A8-events
-  - A15-evaluation
+  - B1-backtesting
 permissions:
   deterministic_acceptance_network: forbidden
   private_fpl_access: forbidden
@@ -33,4 +33,4 @@ exclusions:
   - new runtime dependencies or operator-selectable numerical policy
   - public redistribution of raw corpus or derived per-fixture/model data
   - production activation, parameter mixtures, 001P, 001U, 001B
-acceptance_status: IMPLEMENTATION_IN_PROGRESS
+acceptance_status: LOCAL_GATES_AND_INDEPENDENT_REVIEW_CLEAR_EXACT_SHA_CI_REQUIRED

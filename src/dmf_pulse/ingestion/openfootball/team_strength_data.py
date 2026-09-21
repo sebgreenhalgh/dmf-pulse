@@ -92,6 +92,9 @@ class SealedEvidence(FrozenEvidence):
 
 def seal[T: SealedEvidence](model: type[T], /, **values: Any) -> T:
     """Construct only after computing the hash; all validators still run."""
+    # Hash the same UTC instants that validation serializes, not an input
+    # timezone spelling. Naive timestamps still fail before sealing.
+    values = {key: FrozenEvidence.utc_datetimes(value) for key, value in values.items()}
     draft = model.model_construct(**values, semantic_sha256="0" * 64)
     values["semantic_sha256"] = canonical_sha256(
         draft.model_dump(mode="json", exclude={"semantic_sha256"})

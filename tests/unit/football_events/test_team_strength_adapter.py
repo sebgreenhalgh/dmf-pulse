@@ -262,6 +262,7 @@ def test_half_even_boundary_and_decimal_context_independence() -> None:
         assert bundle() == expected
 
 
+@pytest.mark.performance
 def test_thirty_fixture_inferences_under_100ms() -> None:
     artifact = synthetic_artifact()
     matches = tuple(
