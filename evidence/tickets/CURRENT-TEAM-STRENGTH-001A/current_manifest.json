@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 112429,
+      "bytes": 113057,
       "path": "PLANS.md",
-      "sha256": "6d700b0ec9c9fea732b5c7de8a92fc533c462b58c6cf801c68adb24904c52dd1"
+      "sha256": "ffe31b182200ccb95e4c8c9200fb7df33e23bea084db9c7924d6aca1043d6a51"
     },
     {
       "bytes": 2761,
@@ -2171,6 +2171,11 @@
       "sha256": "7e55515447b450345ec637d115711ff79ae3ff5c02642b8cf5f12da35f679379"
     },
     {
+      "bytes": 3238,
+      "path": "scripts/build_team_strength_review_pack.py",
+      "sha256": "af586ab06a3e22ff39e576c9e08be9aed35676c2e288116cce2a8cdd9f417346"
+    },
+    {
       "bytes": 1058,
       "path": "scripts/calculate_review_payload.py",
       "sha256": "b3801807c506863135d3e09ff730b4f18d899e6f16bfd16cd2cddc6e40c9a506"
@@ -2394,6 +2399,11 @@
       "bytes": 3129,
       "path": "scripts/verify_team_strength_corpus.py",
       "sha256": "b99e5e60ca30c04b555e3988b8a5a5f97d4329e4757e0c184d223ed41890ef66"
+    },
+    {
+      "bytes": 2345,
+      "path": "scripts/verify_team_strength_coverage.py",
+      "sha256": "50fc6cecf7778b12ba261a4a3869f2574e23a3b91822355433105041e328699a"
     },
     {
       "bytes": 4046,
@@ -3271,9 +3281,9 @@
       "sha256": "b48c4a336f13671e93128b260be68e7934a77a9dcbb3d1ebe7fa1f3b4b98be50"
     },
     {
-      "bytes": 19101,
+      "bytes": 19647,
       "path": "src/dmf_pulse/football_events/team_strength_adapter.py",
-      "sha256": "51315b612a187270ed21ffaa2062ded145e10993c2048d0200862218165e54c6"
+      "sha256": "0833d4d21ebdd1b16b506ae614253d0671f8b95fced43769e6cfcf7d1ba6bc06"
     },
     {
       "bytes": 19227,
@@ -3536,9 +3546,9 @@
       "sha256": "3e7a6b59224dd877965ed15324c7c44b6e4155504a013ecfa04d76fb97ada9d4"
     },
     {
-      "bytes": 24398,
+      "bytes": 24630,
       "path": "src/dmf_pulse/ingestion/openfootball/team_strength_data.py",
-      "sha256": "45e4d3be59fb0481edf8a0c76fa99fc248700612487454649084fd17cc3e7602"
+      "sha256": "b8f1b9f6fcb81328231f39bd58303ec8f5e0963f8f3ea9faffbb4974777d0bb0"
     },
     {
       "bytes": 27001,
@@ -5381,9 +5391,14 @@
       "sha256": "654570b7dabaebbdb76e039c72672de05c0cbc328f70e06969e7cf38a863bd3f"
     },
     {
-      "bytes": 17495,
+      "bytes": 17520,
       "path": "tests/unit/football_events/test_team_strength_adapter.py",
-      "sha256": "99b00efa50a25cc43ac906cba868d9f9cd5373454dff5956e7d97a83b7d62d70"
+      "sha256": "eeff4547585328857ee5d9fe442a8459de97f0f5cd50ae1ad47559a470dc0bab"
+    },
+    {
+      "bytes": 11743,
+      "path": "tests/unit/football_events/test_team_strength_hardening.py",
+      "sha256": "39d43fd983814eb61a874f6bed4b24c1a950c12270748cd2aea168404078e791"
     },
     {
       "bytes": 5127,
@@ -5496,9 +5511,14 @@
       "sha256": "8e01432e5f0e6989bf5c4f84cc9ea89bbe29e901b4fa6ccb699970d28a4b275e"
     },
     {
-      "bytes": 6301,
+      "bytes": 7193,
       "path": "tests/unit/ingestion/openfootball/test_team_strength_acquisition.py",
-      "sha256": "1f0a2c61713942abbb89e4474bd4d97049f5aa8105b223663d136544566a483d"
+      "sha256": "961ca3961d3b97147d02dbc69f5335c0965c31b565fef7a53339eabb568e60b5"
+    },
+    {
+      "bytes": 1898,
+      "path": "tests/unit/ingestion/openfootball/test_team_strength_corpus.py",
+      "sha256": "65d88191beba1385aa3b42a12dd922e1785321f88a0720126fb8846e9bcf7fc8"
     },
     {
       "bytes": 13871,
@@ -5514,6 +5534,11 @@
       "bytes": 15122,
       "path": "tests/unit/ingestion/openfootball/test_team_strength_governance_boundaries.py",
       "sha256": "8809a193eabb6cbb7566bc4c566afef180e2575ed50137331630f5d70e8a83dd"
+    },
+    {
+      "bytes": 4931,
+      "path": "tests/unit/ingestion/openfootball/test_team_strength_sealed_boundaries.py",
+      "sha256": "2110ac24ca6d9fe39794d8f12bfdca4935be6132f867d030180918d66cb90cf1"
     },
     {
       "bytes": 5067,
@@ -6071,19 +6096,19 @@
       "sha256": "f4b9986b875edce66b1e76f19957ab6703cecaa54556df0b997a0587267c0fc2"
     },
     {
-      "bytes": 3122,
+      "bytes": 4713,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001A/ACCEPTANCE.md",
-      "sha256": "6e9da7f51a7d2886166e6988b28878ddd545e9549dbf929b758fd0c42c68370f"
+      "sha256": "a2a8e3e3ccb918772b19e58c6d8be0d4699d6c8244ab902eadb6b8ed83636880"
     },
     {
-      "bytes": 6709,
+      "bytes": 8087,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001A/RESEARCH_DEFINITIONS.md",
-      "sha256": "074d41bb84c0389d85385d0afecdddf9cba543d2e22a17ea763df3fdc3b68466"
+      "sha256": "792f020d511d0ccfbcdf075d1f843e5bed93e884201c1dfdca14de39c3e09209"
     },
     {
-      "bytes": 1620,
+      "bytes": 1656,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001A/ticket.yaml",
-      "sha256": "634a2da97c9f57165003b920ea0c7c205ff3d222c8f14c64c60d001ad4563c26"
+      "sha256": "ec0c314c4e58daa0368a3edb39dcae935aed1e45da9a774e08ea905c8a593da9"
     },
     {
       "bytes": 3923,

@@ -45,3 +45,21 @@ change it. The public golden contains aggregate metrics and source/model identit
 No raw results or per-fixture forecasts are packaged. The wheel script inspects both archives,
 installs locked runtime dependencies offline in a fresh external environment and runs the
 real public command against explicit private input. It fails if that input is unavailable.
+
+Final local population and actual branch gate:
+
+```text
+uv run --frozen python -m coverage run --branch --data-file=review_pack/focused-final-data -m pytest tests/unit/ingestion/openfootball tests/unit/football_events tests/contract/football_events tests/unit/evaluation/test_team_strength_replay.py tests/unit/cli/test_team_strength_cli.py tests/integration/ingestion/test_openfootball_score_prior_cli.py -m "not performance" -q
+uv run --frozen python -m coverage json --data-file=review_pack/focused-final-data -o review_pack/focused-final-report.json --fail-under=0
+uv run --frozen python scripts/verify_team_strength_coverage.py --coverage-json review_pack/focused-final-report.json --summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/final_branch_coverage.json
+uv run --frozen python -m pytest tests/unit/football_events/test_team_strength_adapter.py -m performance -q
+uv run --frozen python scripts/build_team_strength_review_pack.py
+```
+
+`--fail-under=0` only permits reporting a deliberately focused population against the whole
+repository source inventory; the following mandatory verifier independently enforces >=90%
+actual branch coverage across every new source/model/store/adapter module with zero exclusions.
+Timing is separately executed without instrumentation, with the unchanged <100ms ceiling.
+The complete inherited population, PostgreSQL and overall repository coverage floor run through
+the unchanged canonical eight-shard exact-SHA CI. A redundant serial local whole-repository
+coverage attempt was canceled before completion and is not counted as a passing gate.

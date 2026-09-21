@@ -180,6 +180,14 @@ def _context(
                 "source assessment cutoff is incompatible with fixture/model"
             )
         freshness = _assessment_freshness(source_assessment, as_of)
+    assessed_at = (
+        source_assessment.information_cutoff if source_assessment else model.information_cutoff
+    )
+    # D+2 due status changes at UTC midnight even if retrieval age remains
+    # within 24/72 hours. LIVE evidence needs a new completeness assessment
+    # after that boundary; elapsed age alone cannot establish missing_due=0.
+    if model.dataset_mode == "LIVE_OBSERVED" and as_of.astimezone(UTC).date() != assessed_at.date():
+        raise StrengthEvidenceError("live due completeness requires a new UTC-day assessment")
     if freshness is SourceFreshnessState.STALE_BLOCKED:
         raise StrengthEvidenceError("sealed model source is stale; governed preparation required")
     return artifact, freshness, source_assessment

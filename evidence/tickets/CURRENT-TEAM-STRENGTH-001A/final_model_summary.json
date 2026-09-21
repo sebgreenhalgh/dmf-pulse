@@ -1,0 +1,60 @@
+{
+  "attack_prior_matches": 12,
+  "attack_range": [
+    "-0.27414690571759615",
+    "0.3696230640893553"
+  ],
+  "classification": "RECONSTRUCTED",
+  "cohort_attack_centre": "-0.24829001468635714",
+  "cohort_defence_centre": "-0.18212944500880582",
+  "cohort_entrant_seasons": 42,
+  "covariance_elements": 3403,
+  "dataset_semantic_sha256": "b4de6ce2e4ab1c0e6b7e766ac1de3e60ed539593e13b24f805a0e68cfd6e7c51",
+  "defence_prior_matches": 12,
+  "defence_range": [
+    "-0.28261070050193643",
+    "0.43202398817120335"
+  ],
+  "eligible_matches": 6080,
+  "execution_envelope_sha256": "044cae53b429b7a06f2dab81c3e1bdc317bfdbef319a65a3ce8616c3d9aa4055",
+  "fit_seconds": 2.827121,
+  "half_life_days": 365,
+  "home_effect": "0.1750167368645352",
+  "information_cutoff": "2026-09-21T22:06:53.650882+00:00",
+  "kappa_attack": "16.79407894736842",
+  "kappa_defence": "16.79407894736842",
+  "limitations": [
+    "PLUGIN_PREDICTION_SHADOW_ONLY",
+    "PARAMETER_MIXTURE_NOT_PROPAGATED",
+    "CURRENT-TEAM-STRENGTH-001U_REQUIRED_BEFORE_PRODUCTION"
+  ],
+  "model_family": "REGULARISED_TIME_WEIGHTED_INDEPENDENT_POISSON_TEAM_STRENGTH_V1",
+  "model_semantic_sha256": "10335a94d4466f487eac92d86325d5d2dc66a8813ae872fd907f131f5c22281b",
+  "mu": "0.255765451477812",
+  "network_calls": 0,
+  "numerics": {
+    "attack_constraint_residual": "-1.1058862159352145E-17",
+    "convergence": "CONVERGED_BOTH_CRITERIA",
+    "defence_constraint_residual": "-3.469446951953614E-18",
+    "gradient_infinity": "7.28579668818341E-10",
+    "implementation": "PYTHON_BINARY64_ANALYTIC_DAMPED_NEWTON_V1",
+    "iterations": 4,
+    "line_search_halvings": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "objective": "1006.3672417382709",
+    "relative_objective_change": "8.227426378621971E-13"
+  },
+  "parameter_covariance": "ASYMPTOTIC_LOCAL_PENALISED_V1",
+  "penalty_mean": "UNWEIGHTED",
+  "performance_environment": "Windows CPU, Python 3.13.9, locked uv environment; no NumPy/SciPy",
+  "semantic_reproduction": "PASS",
+  "shadow_only": true,
+  "status": "PASS",
+  "team_count": 41,
+  "training_cutoff": "2026-06-01T00:00:00+00:00",
+  "weighted_observation_count": "1164.402695482325"
+}
