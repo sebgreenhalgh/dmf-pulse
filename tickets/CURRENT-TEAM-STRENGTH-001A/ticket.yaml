@@ -1,0 +1,34 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001A
+title: Regularised time-weighted independent-Poisson EPL team-strength shadow prior
+status: ACTIVE
+required_base_commit: 1a6bbc2cfc259f4aeb688c21360af2f1433a176e
+expected_branch: integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-independent-poisson
+objective: Implement the locked public-core model, authenticated fixture adapter and reconstructed replay without production activation.
+authority_scopes:
+  - A3-data-foundation
+  - A8-events
+  - A15-evaluation
+permissions:
+  deterministic_acceptance_network: forbidden
+  private_fpl_access: forbidden
+  odds_access: forbidden
+  database: forbidden
+  production_activation: forbidden
+allowed_areas:
+  - src/dmf_pulse/ingestion/openfootball/team_strength_*.py
+  - src/dmf_pulse/football_events/team_strength_*.py
+  - src/dmf_pulse/evaluation/team_strength_*.py
+  - src/dmf_pulse/cli/**
+  - tests/**
+  - scripts/*team_strength*.py
+  - tickets/CURRENT-TEAM-STRENGTH-001A/**
+  - evidence/tickets/CURRENT-TEAM-STRENGTH-001A/**
+  - evidence/tickets/PRC-013/current_manifest.json
+  - PLANS.md
+exclusions:
+  - ScorePriorRequest or existing Stage-8 mathematics/schema changes
+  - private_v1 or ordinary dmf pulse changes
+  - new runtime dependencies or operator-selectable numerical policy
+  - public redistribution of raw corpus or derived per-fixture/model data
+  - production activation, parameter mixtures, 001P, 001U, 001B
+acceptance_status: IMPLEMENTATION_IN_PROGRESS
