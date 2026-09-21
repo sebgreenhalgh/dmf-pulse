@@ -1,0 +1,26 @@
+{
+  "checkpoint": "001A.03_FIXTURE_ADAPTER",
+  "classification": "INTERMEDIATE_NOT_FINAL_ACCEPTANCE",
+  "previous_checkpoint_sha": "357f64d1edba8db4df26d30e1b8bb7b80904e95f",
+  "commands": [
+    {"command": "uv run --frozen python -m pytest tests/unit/football_events tests/contract/football_events tests/unit/ingestion/openfootball tests/integration/ingestion/test_openfootball_score_prior_cli.py -q", "exit_code": 0, "result": "493 passed in 48.48s"},
+    {"command": "uv run --frozen python scripts/verify_team_strength_adapter.py --corpus-root review_pack/private_openfootball_corpus --private-artifact-root review_pack/private_team_strength --model-summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/checkpoint_02_model.json --summary evidence/tickets/CURRENT-TEAM-STRENGTH-001A/checkpoint_03_adapter.json", "exit_code": 0, "result": "PASS; 30 full cold-cache requests in 59.5991ms"},
+    {"command": "uv run --frozen python -m mypy src/dmf_pulse", "exit_code": 0, "result": "Success: no issues found in 267 source files"},
+    {"command": "uv run --frozen python -m ruff check .", "exit_code": 0, "result": "All checks passed!"},
+    {"command": "uv run --frozen python -m ruff format --check .", "exit_code": 0, "result": "717 files already formatted"}
+  ],
+  "independent_review": "CHECKPOINT_CLEAR_NO_UNRESOLVED_P0_P1_MATERIAL_P2; 27 adapter tests independently passed",
+  "review_remediations": [
+    "P1 mutable cached artifact escaped through preparation: independent public copy",
+    "P1 Decimal-equality cache bypass: cache by complete serialized content",
+    "P2 degraded-ready artifact could not emit: authenticated current-source reassessment bound into fixture bundle"
+  ],
+  "stage8_prior_only": "PASS_REAL_PUBLIC_SERVICE",
+  "stage8_constrained": "PASS_REAL_PUBLIC_SERVICE_EXISTING_BALANCED_MARKET_FIXTURE",
+  "stage8_inherited_edge": "HDA_ONLY_NONCONVERGENCE_REMAINS_EXPLICIT_DEGRADED_FALLBACK; NOT CLAIMED_AS_PROJECTION_SUCCESS",
+  "score_prior_request_unchanged": true,
+  "stage8_mathematics_unchanged": true,
+  "private_v1_unchanged": true,
+  "league_prior_retained": true,
+  "activation": "SHADOW_NOT_MODEL_INPUT"
+}

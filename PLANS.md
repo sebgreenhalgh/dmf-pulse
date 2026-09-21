@@ -2291,7 +2291,7 @@ Worktree: isolated from the existing dirty availability checkout.
 - [x] Authenticate P0 contracts and recover exact original research definitions and source bytes.
 - [x] 001A.01: immutable individual-match source dataset, rights, identity, temporal and freshness
   tests; seal and push.
-- [ ] 001A.02: structural effect-coded float64 damped Newton, fixed shrinkage/cohort/decay,
+- [x] 001A.02: structural effect-coded float64 damped Newton, fixed shrinkage/cohort/decay,
   covariance and authenticated model; mathematical/adversarial tests; seal and push.
 - [ ] 001A.03: authenticated fixture adapter/bundle, typed fallback, real unchanged Stage-8
   compatibility, inference performance; seal and push.
@@ -2306,7 +2306,12 @@ P0 remains normative and immutable. Any unresolved research definition blocks th
 implementation; do not infer a penalty or revise the locked historical target to match output.
 
 Published checkpoint 001A.01: `45efa590547328370b23513729c0af43819ceb70`.
+Published checkpoint 001A.02: `357f64d1edba8db4df26d30e1b8bb7b80904e95f`.
 001A.02 numerical/model implementation passed independent checkpoint review; no outstanding
 P0/P1/material P2. The full retained 6,080-match reconstructed fit took 2.58 seconds; repeated
 semantic model identity agreed. Full replay and >=90% combined new-path branch acceptance
 remain outstanding (initial source/kernel coverage population: 87%, not final acceptance).
+001A.03 independently reviewed: cache identity/public-return tampering and degraded-source
+reassessment findings closed. 493 focused/inherited tests pass. Real private 30-fixture
+cold-cache adapter benchmark: 59.5991ms. Existing balanced-market Stage-8 projection converges;
+a separate inherited H/D/A-only non-convergence remains a visible fallback regression.
