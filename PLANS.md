@@ -2289,7 +2289,7 @@ Worktree: isolated from the existing dirty availability checkout.
 
 - [x] Fetch and verify immutable remote parent, P0 independent-review verdict, and clean branch.
 - [x] Authenticate P0 contracts and recover exact original research definitions and source bytes.
-- [ ] 001A.01: immutable individual-match source dataset, rights, identity, temporal and freshness
+- [x] 001A.01: immutable individual-match source dataset, rights, identity, temporal and freshness
   tests; seal and push.
 - [ ] 001A.02: structural effect-coded float64 damped Newton, fixed shrinkage/cohort/decay,
   covariance and authenticated model; mathematical/adversarial tests; seal and push.
@@ -2304,3 +2304,9 @@ Scope: shadow only; no production/private activation, new runtime dependency, cl
 Stage-8 math/schema change, Odds/FPL acquisition, or follow-on 001P/001U/001B implementation.
 P0 remains normative and immutable. Any unresolved research definition blocks the affected
 implementation; do not infer a penalty or revise the locked historical target to match output.
+
+Published checkpoint 001A.01: `45efa590547328370b23513729c0af43819ceb70`.
+001A.02 numerical/model implementation passed independent checkpoint review; no outstanding
+P0/P1/material P2. The full retained 6,080-match reconstructed fit took 2.58 seconds; repeated
+semantic model identity agreed. Full replay and >=90% combined new-path branch acceptance
+remain outstanding (initial source/kernel coverage population: 87%, not final acceptance).

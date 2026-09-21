@@ -90,7 +90,7 @@ class SealedEvidence(FrozenEvidence):
         return self
 
 
-def seal[T: SealedEvidence](model: type[T], **values: Any) -> T:
+def seal[T: SealedEvidence](model: type[T], /, **values: Any) -> T:
     """Construct only after computing the hash; all validators still run."""
     draft = model.model_construct(**values, semantic_sha256="0" * 64)
     values["semantic_sha256"] = canonical_sha256(
