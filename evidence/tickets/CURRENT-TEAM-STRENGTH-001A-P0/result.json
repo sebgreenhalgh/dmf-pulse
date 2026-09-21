@@ -1,0 +1,38 @@
+{
+  "automatic_final_sha_ci": "PENDING_FINAL_PUSH",
+  "branch": "integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-P0-authority-identity-policy",
+  "coverage": {
+    "branch_percent": 91.55844155844156,
+    "focused_tests_passed": 195,
+    "statement_percent": 96.16026711185309
+  },
+  "identity": {
+    "additional_alias_count": 14,
+    "ambiguous_mapping_count": 0,
+    "canonical_club_count": 42,
+    "record_and_alias_count": 56,
+    "root_semantic_sha256": "55f36445b0aabc77add11560e3ea550cbc07ec114db48dbf664e7177c65331ef",
+    "season_count": 17,
+    "unresolved_club_count": 0
+  },
+  "implementation_commit": "0c2ce2497ca6ff0776fe3da251672775354f6604",
+  "immutable_parent": "99418f3316277f4dae347d80358d5dd5a09655b2",
+  "no_model_implementation": true,
+  "production_active": false,
+  "remediation_commit": "a3651703a99295dc60c9345e0854537fa52feeeb",
+  "review": {
+    "material_p2_open": 0,
+    "p0_open": 0,
+    "p1_open": 0,
+    "verdict": "CLEAR_FOR_CURRENT_TEAM_STRENGTH_001A_IMPLEMENTATION"
+  },
+  "rights": {
+    "approval_id": "CURRENT-TEAM-STRENGTH-001A#openfootball_football_json_team_strength_v1",
+    "existing_score_prior_profile_unchanged": true,
+    "profile_id": "openfootball_football_json_team_strength_v1",
+    "registry_sha256": "b90075563647a69a87e201aa70fe6f44034828afd9ad3926decf5c45bb53b17c"
+  },
+  "status": "CURRENT_TEAM_STRENGTH_001A_P0_ENGINEERING_COMPLETE_PENDING_FINAL_PUSH",
+  "team_strength_governance_semantic_sha256": "e8d28521fcb90b625a8dbeff4f72de3b178d16ed7cae748a7429d0e42cdd9fd7",
+  "ticket_id": "CURRENT-TEAM-STRENGTH-001A-P0"
+}

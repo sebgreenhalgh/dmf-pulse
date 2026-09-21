@@ -1,0 +1,46 @@
+CURRENT-TEAM-STRENGTH-001A-P0 command ledger
+Date: 2026-09-21
+
+1. Git isolation and immutable parent
+   PASS: origin/main and branch parent were exactly
+   99418f3316277f4dae347d80358d5dd5a09655b2. The branch was created in the isolated
+   review_pack/cts-p0 worktree; the unrelated dirty CURRENT-AVAILABILITY worktree was untouched.
+2. Frozen dependency sync
+   PASS: `uv sync --all-groups --frozen` checked 40 locked packages.
+3. Deterministic authority generation
+   PASS: `python scripts/generate_current_team_strength_p0_artifacts.py` reproduced the committed
+   identity, policy and review artifacts byte-for-byte.
+4. Focused OpenFootball tests and coverage
+   PASS: 195 tests; 576/599 statements (96.1603%), 141/154 branches (91.5584%), combined 95.2191%.
+5. Broader inherited ingestion population
+   PASS: 972 non-PostgreSQL unit ingestion tests.
+6. Stage-8/football-events regression
+   PASS: 212 tests; no Stage-8 file or behavior change.
+7. Static gates
+   PASS: Ruff format/check across 698 Python files and strict mypy across 260 source files.
+8. Build and installed wheel
+   PASS: uv built dmf-pulse 0.2.0 sdist/wheel. The fresh wheel installed outside the repository,
+   loaded exact rights/identity/policy resources, validated 42 clubs/56 aliases and made zero
+   network calls.
+9. Authority and repository manifests
+   PASS: canonical authority generation reported 94 decisions and 19 scopes without drift;
+   PRC-013 and ticket current manifests each recorded 1221 repository deliverables.
+10. Repository validation
+    PASS: `python scripts/validate_repository.py --ticket CURRENT-TEAM-STRENGTH-001A-P0`
+    returned zero errors.
+11. Security and whitespace
+    PASS: first-party secret scan returned zero findings; `git diff --check` passed.
+12. Independent review
+    PASS: first review found three material P2 items and one P3. Commit a365170 closed all four;
+    focused rereview found no P0/P1/material P2 and returned
+    CLEAR_FOR_CURRENT_TEAM_STRENGTH_001A_IMPLEMENTATION.
+
+Truthful diagnostic history:
+
+- An unconstrained local `pytest -q` was interrupted after database-backed populations reported
+  setup errors because Docker Desktop was not running. No pass was claimed; exact-SHA CI supplies
+  the governed PostgreSQL service.
+- The first repository-validator run correctly failed against the pre-change manifest; it passed
+  after canonical manifest regeneration.
+- A stale ignored wheel correctly failed the post-remediation smoke; the wheel was rebuilt from
+  a365170 and then passed. No stale-wheel success is claimed.

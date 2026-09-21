@@ -1,0 +1,15 @@
+{"command":"git fetch origin and verify origin/main","exit_code":0,"result":"PASS: exact immutable parent 99418f3316277f4dae347d80358d5dd5a09655b2"}
+{"command":"uv sync --all-groups --frozen","exit_code":0,"result":"PASS: 40 packages checked"}
+{"command":"python scripts/generate_current_team_strength_p0_artifacts.py and git diff --exit-code","exit_code":0,"result":"PASS: deterministic artifacts unchanged"}
+{"command":"pytest tests/unit/ingestion/openfootball with branch coverage","exit_code":0,"result":"PASS: 195 tests; 96.1603% statements; 91.5584% branches"}
+{"command":"pytest tests/unit/ingestion -m not-postgres","exit_code":0,"result":"PASS: 972 tests"}
+{"command":"pytest inherited Stage-8 and football-events populations","exit_code":0,"result":"PASS: 212 tests"}
+{"command":"ruff format --check . and ruff check .","exit_code":0,"result":"PASS: 698 files formatted; lint clean"}
+{"command":"mypy src/dmf_pulse","exit_code":0,"result":"PASS: 260 source files"}
+{"command":"uv build","exit_code":0,"result":"PASS: dmf-pulse 0.2.0 sdist and wheel"}
+{"command":"python scripts/verify_current_team_strength_p0_wheel.py","exit_code":0,"result":"PASS: clean external install; exact authorities; zero network"}
+{"command":"python scripts/generate_authority_manifests.py","exit_code":0,"result":"PASS: 94 decisions and 19 scopes; no drift"}
+{"command":"python scripts/generate_repository_manifest.py --ticket PRC-013 and --ticket CURRENT-TEAM-STRENGTH-001A-P0","exit_code":0,"result":"PASS: 1221 files in each manifest"}
+{"command":"python scripts/validate_repository.py --ticket CURRENT-TEAM-STRENGTH-001A-P0","exit_code":0,"result":"PASS: zero errors"}
+{"command":"python scripts/scan_secrets.py","exit_code":0,"result":"PASS: zero findings"}
+{"command":"git diff --check","exit_code":0,"result":"PASS"}

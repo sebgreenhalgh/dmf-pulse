@@ -2273,9 +2273,9 @@ R7 CI remains pending; do not claim final acceptance or production readiness.
 - [x] Add strict, packaged loaders for the identity artifact and the approved finality,
   freshness, research, uncertainty, and materiality policies.
 - [x] Add fail-closed identity, semantic-hash, temporal, rights, packaging, and scope tests.
-- [ ] Run all literal acceptance commands and record exact evidence.
-- [ ] Obtain independent review, remediate all P0/P1/material P2 findings, seal evidence, push,
-  and verify exact-SHA CI.
+- [x] Run all literal acceptance commands and record exact evidence.
+- [x] Obtain independent review, remediate all P0/P1/material P2 findings, and seal evidence.
+- [ ] Push, verify remote equality and exact-SHA CI, then leave the isolated worktree clean.
 
 Scope guard: this P0 ticket contains governance and canonical identity only. It must not fit a
 team-strength model, generate fixture rates, change Stage 8, touch `private_v1`, use Odds/private
