@@ -55,3 +55,15 @@ remains explicitly unclaimed, as explained in OFFLINE-ACCEPTANCE.md.
 
 This verdict permits a separate fresh-authorization decision only. It does not
 authorize live execution, reuse of the consumed approval, or production activation.
+
+## CI-only follow-up review
+
+After the first published run's cleanup-time cancellation, the same independent
+reviewer reviewed the four static scheduling weights, regression, capped-pack
+allowlist and evidence. Independent shard-planner tests: 35 passed. No new
+P0/P1/material P2 finding. Production code, test selectors, coverage thresholds,
+timeouts, workflows, mathematics and authorization gates are unchanged.
+
+`CLEAR_FOR_TEAM_STRENGTH_L1_FRESH_REAUTHORIZATION_DECISION` is retained.
+The reviewer explicitly requires verification of the new exact-SHA CI gates;
+the cancelled first run is not all-green acceptance or live authorization.

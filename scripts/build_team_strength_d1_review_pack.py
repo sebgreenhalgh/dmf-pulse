@@ -13,6 +13,7 @@ def build():
     names = {
         "PLANS.md",
         "scripts/build_team_strength_d1_review_pack.py",
+        "scripts/ci_coverage_shards.py",
         "scripts/verify_team_strength_l1_wheel.py",
         "src/dmf_pulse/private_v1/service.py",
         "src/dmf_pulse/private_v1/team_strength_comparison.py",
@@ -28,6 +29,7 @@ def build():
         "tests/unit/private_v1/test_team_strength_shadow_comparison.py",
         "tests/unit/private_v1/test_team_strength_l1.py",
         "tests/unit/private_v1/test_team_strength_l1_e2e.py",
+        "tests/unit/scripts/test_ci_coverage_shards.py",
     }
     # Only this offline ticket's documentation and coverage summary may be added.
     for pattern in (

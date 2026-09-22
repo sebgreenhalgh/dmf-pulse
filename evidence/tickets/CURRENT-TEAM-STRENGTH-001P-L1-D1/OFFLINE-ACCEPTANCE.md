@@ -85,3 +85,26 @@ uv run --offline coverage run --branch --data-file=review_pack/d1.coverage -m py
 
 No assertion of historical root cause, live execution success or production
 promotion follows from any offline result.
+
+## Post-seal CI scheduling hardening
+
+Run `35760625057`, exact SHA `09b977d4da81958c210fc4f8d5caa58bdc39617a`,
+covered the complete 5,248-test non-performance collection. Seven coverage jobs
+passed. Shard 2 also passed all 524 tests (2071.27s) and uploaded its coverage,
+but GitHub cancelled the job at its unchanged 35-minute limit during cleanup.
+Consequently this run is not an all-green acceptance claim. No test failure or
+provider execution occurred; combined/post-coverage gates did not run.
+
+The timestamped module output independently shows A2 preparation taking 782s,
+A1 comparison 290s, ordinary one-command 476s, and D1 diagnostics at least 279s.
+Small test-count defaults underestimated these modules and colocated A2 with the
+11-minute generated-data L1 slice. Four explicit static weights (900/350/600/400)
+correct scheduling only. The selector, complete population, eight-shard algorithm,
+35-minute timeout, artifact verification, coverage thresholds, workflow and all
+production code remain unchanged. A deterministic exactly-once partition test
+guards the heavy-module separation; no golden/model output is changed.
+
+Offline planner/workflow contracts: 57 passed. Full replanning collects 5,249
+tests (the original 5,248 plus the new scheduling regression), zero omitted,
+duplicate or unexpected node IDs. A2 and L1 occupy separate shards. Scheduling
+is a deterministic static policy; CI does not consult runtime history.

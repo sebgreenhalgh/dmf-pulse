@@ -58,6 +58,15 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/unit/private_v1/test_team_strength_l1_e2e.py": 1000,
     "tests/unit/private_v1/test_team_strength_l1.py": 200,
     "tests/unit/ingestion/openfootball/test_team_strength_current.py": 250,
+    # D1 run 35760625057: every test passed, but shard 2 hit the 35-minute
+    # job limit during cleanup. A2 preparation took 782s and the A1 comparison
+    # 290s despite small node counts; ordinary one-command took 476s, and D1
+    # diagnostics at least 279s. Static scheduling only: selectors, timeout,
+    # complete collection, artifact verification and coverage gates are unchanged.
+    "tests/unit/private_v1/test_a1_03_shadow_comparison.py": 350,
+    "tests/unit/private_v1/test_a2_preparation.py": 900,
+    "tests/unit/private_v1/test_one_command.py": 600,
+    "tests/unit/private_v1/test_team_strength_d1_diagnostics.py": 400,
 }
 
 _GIT_SHA = re.compile(r"^[0-9a-f]{40}$")

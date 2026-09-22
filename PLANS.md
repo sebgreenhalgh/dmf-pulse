@@ -2410,3 +2410,10 @@ must remain unchanged. The real candidate-count witness exposes the old derived
 work-budget equality defect; it does not prove the historical failure cause.
 Never inspect credentials, reconstruct private context, execute an observation,
 relax a numerical gate, change ordinary activation, or create a new live authority.
+
+D1 post-seal CI hardening: run `35760625057` on `09b977d` passed all test
+executions, but shard 2 reached its 35-minute job limit during cleanup after
+524 passing tests and coverage upload. Four static module-cost hints now reflect
+the observed slow synthetic populations; no test selector, timeout, coverage gate,
+workflow, dependency or production code changes. Validate deterministic complete
+partitioning, refresh independent review/evidence, and publish a new exact-SHA run.

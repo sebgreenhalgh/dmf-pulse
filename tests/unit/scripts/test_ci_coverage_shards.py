@@ -157,6 +157,34 @@ def test_heavy_override_uses_deterministic_lightest_shard_tie_break() -> None:
     assert plan["shards"][1]["nodeids"] == sorted(nodeids[1:])
 
 
+def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -> None:
+    module = _module()
+    paths = (
+        "tests/unit/private_v1/test_team_strength_l1_e2e.py",
+        "tests/unit/private_v1/test_a2_preparation.py",
+        "tests/unit/private_v1/test_one_command.py",
+        "tests/unit/private_v1/test_team_strength_d1_diagnostics.py",
+        "tests/unit/private_v1/test_a1_03_shadow_comparison.py",
+    )
+    nodeids = tuple(f"{path}::test_synthetic" for path in paths)
+    assert [module._estimated_file_weight(path, 1) for path in paths] == [
+        1000,
+        900,
+        600,
+        400,
+        350,
+    ]
+    plan = module.build_plan(nodeids, shard_count=3, git_sha=GIT_SHA)
+    assert plan == module.build_plan(reversed(nodeids), shard_count=3, git_sha=GIT_SHA)
+    owners = {
+        nodeid: shard["shard_index"] for shard in plan["shards"] for nodeid in shard["nodeids"]
+    }
+    assert set(owners) == set(nodeids)
+    assert owners[nodeids[0]] != owners[nodeids[1]]
+    assert plan["partition"]["complete"] is True
+    assert plan["marker_expression"] == "not performance"
+
+
 @pytest.mark.parametrize("shard_count", [True, 0, -1, 5])
 def test_invalid_or_unavoidably_empty_shard_count_fails(shard_count: int) -> None:
     module = _module()
