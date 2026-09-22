@@ -2340,7 +2340,7 @@ excluded lines. Repeat complete replay authenticates the identical golden. Final
   installed-wheel model identity, static/build/repository/security gates; publish checkpoint.
 - [x] 001P.02 implementation: authenticated private-only prior seam, exact full-horizon coverage, source
   freshness, P0 season-scoped identity binding, and hard input controls; publish.
-- [ ] 001P.03: two fresh canonical rolling solves, common random numbers, projection movement,
+- [x] 001P.03 implementation: two fresh canonical rolling solves, common random numbers, projection movement,
   decision signatures, deterministic materiality/confounding classification, safe summary; publish.
 - [ ] 001P.04: five real optimiser synthetic cases, baseline-purity proof; publish.
 - [ ] 001P.05: adversarial and fresh independent review, remediation, full offline assurance,

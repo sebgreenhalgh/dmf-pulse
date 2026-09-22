@@ -47,6 +47,12 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/unit/availability/test_audit0073_cli_semantics.py": 45,
     "tests/unit/optimisation/test_r2b_semantics.py": 270,
     "tests/unit/optimisation/test_service.py": 650,
+    # 001P real-model preparation and canonical solves: local branch-coverage
+    # comparison measured 587s; the five-case group gets a conservative static
+    # estimate. These only balance modules: no selector, timeout or gate changes.
+    "tests/unit/private_v1/test_team_strength_shadow_comparison.py": 650,
+    "tests/unit/private_v1/test_team_strength_shadow_cases.py": 1800,
+    "tests/unit/private_v1/test_team_strength_shadow_inputs.py": 100,
 }
 
 _GIT_SHA = re.compile(r"^[0-9a-f]{40}$")

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 from functools import lru_cache, partial
 from pathlib import Path
@@ -11,7 +12,7 @@ from unittest.mock import patch
 from uuid import UUID
 
 from dmf_pulse.football_events.team_strength_model import fit_team_strength, memberships
-from dmf_pulse.ingestion.fpl.direct_payloads import DirectFplSnapshot
+from dmf_pulse.ingestion.fpl.direct_payloads import DirectFplSnapshot, parse_direct_event_live
 from dmf_pulse.ingestion.openfootball.team_strength_data import (
     FixtureRegistration,
     FixtureRegistry,
@@ -22,7 +23,18 @@ from dmf_pulse.ingestion.openfootball.team_strength_data import (
     seal,
 )
 from dmf_pulse.ingestion.openfootball.team_strength_governance import load_historical_team_identity
+from dmf_pulse.private_v1.automatic_inputs import (
+    _AutomaticFixtureTarget,
+    _build_automatic_model_minutes_for_targets,
+)
+from dmf_pulse.private_v1.models import seal_execution_input
 from dmf_pulse.private_v1.one_command import _PrivateV1PreparedRollingContext
+from dmf_pulse.private_v1.rolling_models import (
+    seal_rolling_execution_input,
+    seal_rolling_fixture_input,
+    seal_rolling_gameweek_input,
+)
+from dmf_pulse.private_v1.team_strength_shadow_inputs import horizon_fixtures
 from tests.unit.private_v1 import e2e_test_support as support
 
 STAMP = datetime(2026, 10, 1, tzinfo=UTC)
@@ -71,7 +83,17 @@ def synthetic_strength(variant: int = 0, mode: str = "RECONSTRUCTED"):
                 if season != "2026/27":
                     h = 1 + serial % 3
                     a = serial % 3
-                    if variant:
+                    if variant == 2:
+                        # A separate, legitimate near-league synthetic data-generating
+                        # process, not a model-policy change or historical retuning.
+                        raw = hashlib.sha256(f"001P|{season}|{home}|{away}".encode()).digest()
+                        u, v = (
+                            int.from_bytes(raw[:4], "big") % 10,
+                            int.from_bytes(raw[4:8], "big") % 10,
+                        )
+                        h = (0, 0, 1, 1, 1, 2, 2, 2, 3, 4)[u]
+                        a = (0, 0, 0, 1, 1, 1, 2, 2, 3, 3)[v]
+                    elif variant:
                         h += (clubs.index(home) + variant) % 2
                         a += (clubs.index(away) + variant) % 2
                     row["score"] = {"ft": [h, a]}
@@ -190,3 +212,74 @@ def synthetic_prepared(root: Path, working: Path, *, low_current_minutes: bool =
         odds_rights_profile_id="the_odds_api_private_analytics_v1",
         information_cutoff=CUTOFF,
     )
+
+
+def synthetic_model_prepared(root: Path, working: Path):
+    """Fit/predict real Stage 7 once before either prior world exists."""
+    prepared = synthetic_prepared(root, working)
+    execution = prepared.rolling_execution
+    current = execution.current_execution
+    fpl = current.current_state.fpl_input
+    live = {}
+    for gw in range(1, 5):
+        live[gw] = parse_direct_event_live(
+            json.dumps(
+                {
+                    "elements": [
+                        {
+                            "id": player.provider_element_id,
+                            "stats": {
+                                "minutes": 80 if player.provider_element_id % 23 < 11 else 15,
+                                "starts": int(player.provider_element_id % 23 < 11),
+                            },
+                        }
+                        for player in fpl.players
+                    ]
+                },
+                sort_keys=True,
+            ).encode()
+        )
+    snapshot = DirectFplSnapshot.model_construct(
+        **(dict(prepared.snapshot) | {"live_by_gameweek": live})
+    )
+    targets = tuple(
+        _AutomaticFixtureTarget(
+            gameweek=row.gameweek,
+            fixture=row.official,
+            canonical_fixture_id=row.prior.fixture_id,
+            scenario="private-one-command-current"
+            if row.gameweek == 5
+            else "private-one-command-current-cutoff-future",
+        )
+        for row in horizon_fixtures(execution)
+    )
+    minutes = _build_automatic_model_minutes_for_targets(
+        snapshot, prepared.player_identity_map, targets, progress=None
+    )
+    current = seal_execution_input(
+        type(current).model_construct(
+            **(dict(current) | {"manual_minutes": minutes.minutes_by_gameweek[5]})
+        )
+    )
+    future = []
+    for gw in execution.future_gameweeks:
+        by_id = {row.fixture_id: row for row in minutes.minutes_by_gameweek[gw.gameweek]}
+        fixtures = tuple(
+            seal_rolling_fixture_input(
+                type(row).model_construct(
+                    **(dict(row) | {"stage7": by_id[str(row.canonical_fixture_id)]})
+                )
+            )
+            for row in gw.fixtures
+        )
+        future.append(
+            seal_rolling_gameweek_input(
+                type(gw).model_construct(**(dict(gw) | {"fixtures": fixtures}))
+            )
+        )
+    execution = seal_rolling_execution_input(
+        type(execution).model_construct(
+            **(dict(execution) | {"current_execution": current, "future_gameweeks": tuple(future)})
+        )
+    )
+    return replace(prepared, snapshot=snapshot, rolling_execution=execution)

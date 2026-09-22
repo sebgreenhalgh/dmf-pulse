@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 171651,
+      "bytes": 171666,
       "path": "PLANS.md",
-      "sha256": "f17e601a6aaab8b4ecdae21f3953bc6f058a4dd0f883db075a240d57332e311c"
+      "sha256": "a88dc0612a5f3e5f4736f2979d57897bc40ce6dbe826969bdd0cbf994e74da32"
     },
     {
       "bytes": 2761,
@@ -2256,9 +2256,9 @@
       "sha256": "683d62aff383d66ff66cfdfe278f1744189473155252d0e0b632cc98b291febb"
     },
     {
-      "bytes": 37833,
+      "bytes": 38286,
       "path": "scripts/ci_coverage_shards.py",
-      "sha256": "b77b3f996cede2bd981f565bdc361a15bb0e0c36753d8df49886ed578a8ca7e9"
+      "sha256": "80a5a3ac775f3f30df3cf0db8bb348470f5cd2ae4a89f012a2f761c14c2e2113"
     },
     {
       "bytes": 5852,
@@ -2284,6 +2284,11 @@
       "bytes": 2153,
       "path": "scripts/compare_r9c_a1_three_gw_shadow.py",
       "sha256": "cfca6c73c8cd70c2480ec05120eef693c898cefd318f47c3575ad1216276d430"
+    },
+    {
+      "bytes": 5567,
+      "path": "scripts/explore_team_strength_shadow_cases.py",
+      "sha256": "98b3ead654685988a99f97d48bb91e43eb24a72dd9456669163e8960cf5810c4"
     },
     {
       "bytes": 5898,
@@ -4184,6 +4189,16 @@
       "bytes": 28024,
       "path": "src/dmf_pulse/private_v1/shadow_comparison.py",
       "sha256": "f57479ec51b7035b053394c8b97859530cb36555a726c5ec070479fc111cb59f"
+    },
+    {
+      "bytes": 18545,
+      "path": "src/dmf_pulse/private_v1/team_strength_comparison.py",
+      "sha256": "8592b6e496509b94b4c45be85d3373238623370a2cb015a9963d1f2ac3d2c037"
+    },
+    {
+      "bytes": 16757,
+      "path": "src/dmf_pulse/private_v1/team_strength_comparison_models.py",
+      "sha256": "e97e9f5aaed2cb0bfe56f274d1ce04b3146974900971c67cf4beb6c75c816beb"
     },
     {
       "bytes": 17755,
@@ -6386,9 +6401,14 @@
       "sha256": "81b0cc0a7cba9cdb712d83a326d09e13b1609f4d5042a0c90c4a003d4a02d0df"
     },
     {
-      "bytes": 7135,
+      "bytes": 4631,
+      "path": "tests/unit/private_v1/team_strength_case_support.py",
+      "sha256": "2b27e8b9050a398858d4f266e73c41bd37062352ee791be35f9cab57cd5af221"
+    },
+    {
+      "bytes": 10907,
       "path": "tests/unit/private_v1/team_strength_shadow_support.py",
-      "sha256": "5a62d1b4730a3d053e74b4359f1e9c38e6fafd9e0bb582f7422aa31a18a13273"
+      "sha256": "2a8e966ecc418d70641d92a82b39f66f198d92b5812fecca14ee66fe9702ccce"
     },
     {
       "bytes": 5512,
@@ -6514,6 +6534,21 @@
       "bytes": 7650,
       "path": "tests/unit/private_v1/test_stage7_progress.py",
       "sha256": "2c7eccd97a1417640d6670049ac7da622284222fb203eb0b5c8b8b97a25a2c64"
+    },
+    {
+      "bytes": 5459,
+      "path": "tests/unit/private_v1/test_team_strength_comparison_contracts.py",
+      "sha256": "7095ffba78ae7b71681ad2b65f9a58e19beb1c26a4f3b6d8b24ac6ba0acbb8d8"
+    },
+    {
+      "bytes": 1871,
+      "path": "tests/unit/private_v1/test_team_strength_shadow_cases.py",
+      "sha256": "11d0874781bfdcddd2ce0ecd1f6f187b1484b62c8198964ac8a82df2a6a7c9fd"
+    },
+    {
+      "bytes": 13192,
+      "path": "tests/unit/private_v1/test_team_strength_shadow_comparison.py",
+      "sha256": "330880700ec2618e91b1c3200e8720ae6834980e328726509093d4c4aad2bf12"
     },
     {
       "bytes": 17798,
