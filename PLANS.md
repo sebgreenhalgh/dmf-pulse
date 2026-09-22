@@ -2440,3 +2440,10 @@ Phase A FPL/Odds requests must remain zero. L2 remains unused by this agent.
 No PR/merge/tag, live invocation, generic reset, automatic retry, private data
 persistence, model activation, parameter mixtures or 001U work. Existing process-local
 one-shot guards are unchanged; do not claim a new durable cross-process ledger.
+
+L2 post-seal CI correction: `be25495475eb3ca1ac9c3a4a4dc459d4760c97d8`
+run `35784439584` exposed stale L1 purpose/time literals in the inherited horizon
+rights test. Update those test literals to exact L2 authority, retain all capability
+denial assertions and add old-reference rejection. Production remains unchanged.
+126 inherited rights/probe/L2 tests pass; obtain supplemental review, refresh safe
+evidence/manifests, publish the descendant and require its own exact-SHA green CI.

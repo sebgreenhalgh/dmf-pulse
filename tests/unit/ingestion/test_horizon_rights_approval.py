@@ -1,4 +1,4 @@
-"""Current L1 metadata; the generic legacy probe check does not ratify purpose."""
+"""Current L2 metadata; the generic legacy probe check does not ratify purpose."""
 
 from __future__ import annotations
 
@@ -14,8 +14,8 @@ from dmf_pulse.ingestion.odds.config import load_rights_profiles
 from tests.unit.ingestion.test_horizon_probe import _script
 
 pytestmark = pytest.mark.unit
-APPROVAL = "DMF-CTS-001P-LIVE-RIGHTS-2026-09-22"
-NOW = datetime(2026, 9, 22, 12, 15, tzinfo=UTC)
+APPROVAL = "DMF-CTS-001P-L2-LIVE-RIGHTS-2026-09-22"
+NOW = datetime(2026, 9, 22, 19, 8, tzinfo=UTC)
 _CAPABILITIES = {
     RightsCapability.AUTOMATED_ACCESS: CapabilityValue.ALLOW,
     RightsCapability.BACKUP: CapabilityValue.UNKNOWN,
@@ -86,21 +86,28 @@ def test_current_governed_approval_and_exact_metadata(governed_gate):
     assert profile.account_scope == "Sebastian-owned and authorized private The Odds API account"
     assert profile.geography_scope == "United Kingdom private use"
     assert profile.approved_purpose == (
-        "one private operator-initiated CURRENT-TEAM-STRENGTH-001P-L1 live transient two-world "
-        "decision-materiality observation comparing LEAGUE_BASELINE and TEAM_STRENGTH_SHADOW "
-        "using one frozen current information set through the existing three-Gameweek Stage 8 "
-        "to Stage 11 pipeline"
+        "one private operator-initiated CURRENT-TEAM-STRENGTH-001P-L2 live transient two-world "
+        "team-strength decision-materiality observation comparing LEAGUE_BASELINE and "
+        "TEAM_STRENGTH_SHADOW using one frozen three-Gameweek information set through the "
+        "existing Stage 8 to Stage 11 pipeline with D1 safe failure diagnostics"
     )
     assert profile.terms_source == "The Odds API Terms and Conditions"
     assert profile.terms_version == "checked-2026-08-31"
     assert profile.checked_at == datetime(2026, 9, 11, 21, 21, 31, tzinfo=UTC)
-    assert profile.approved_at == datetime(2026, 9, 22, 12, 14, 22, tzinfo=UTC)
+    assert profile.approved_at == datetime(2026, 9, 22, 19, 7, 31, tzinfo=UTC)
     assert profile.capabilities == _CAPABILITIES
     assert profile.unresolved_rights == _UNRESOLVED
     assert gate(profile, APPROVAL, True, NOW) is None
 
 
-@pytest.mark.parametrize("reference,confirmed", [("different-approval", True), (APPROVAL, False)])
+@pytest.mark.parametrize(
+    "reference,confirmed",
+    [
+        ("different-approval", True),
+        ("DMF-CTS-001P-LIVE-RIGHTS-2026-09-22", True),
+        (APPROVAL, False),
+    ],
+)
 def test_operator_confirmation_still_required(governed_gate, reference, confirmed):
     gate, profile = governed_gate
     assert (

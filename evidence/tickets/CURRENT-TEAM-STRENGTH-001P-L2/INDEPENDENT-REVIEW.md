@@ -10,6 +10,14 @@ Supplemental review of the explicit review-pack builder and final purpose/public
 readiness/review records found no material issue and reaffirmed the verdict. All
 four reviewed production/operator raw hashes remained equal.
 
+Post-seal supplemental review covered the inherited horizon-rights test correction
+and archive inclusion. The reviewer confirmed no expectation weakening or
+authorization/behavior expansion: exact L2 literals and a post-approval test clock,
+additional historical-reference rejection, unchanged capability/terms/metadata and
+credential/socket guards. Independent focused rerun: 42 passed in 1.94s;
+`git diff --check` passed. All four production hashes remain unchanged and the
+verdict is retained, still conditional on the corrected descendant's green CI.
+
 The reviewer verified exact fresh-pair validation, immutable consumed L1 rejection
 before credentials, purpose-only Odds changes and exact hash, unchanged FPL and
 OpenFootball scope, D1 control/diagnostic/comparison semantics, models and Stage

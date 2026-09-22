@@ -8,7 +8,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TICKET = "CURRENT-TEAM-STRENGTH-001P-L2"
 NAMES = (
-    "PLANS.md",
     "config/rights/odds_profiles.json",
     "scripts/build_team_strength_l2_review_pack.py",
     "scripts/run_team_strength_l1.py",
@@ -20,6 +19,7 @@ NAMES = (
     "tests/unit/private_v1/test_team_strength_l1_cli.py",
     "tests/unit/private_v1/test_team_strength_l1_e2e.py",
     "tests/unit/private_v1/test_team_strength_d1_diagnostics.py",
+    "tests/unit/ingestion/test_horizon_rights_approval.py",
     f"tickets/{TICKET}/HUMAN-APPROVAL.md",
     f"tickets/{TICKET}/ACCEPTANCE.md",
     f"tickets/{TICKET}/ticket.yaml",

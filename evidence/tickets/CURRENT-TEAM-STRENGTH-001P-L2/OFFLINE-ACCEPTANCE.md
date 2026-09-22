@@ -20,6 +20,8 @@ The Phase B command is supplied to the human only, not run by the agent.
 | `uv run --offline pytest -q tests/unit/ingestion/openfootball tests/unit/football_events tests/unit/fpl_points tests/unit/optimisation tests/property/football_events tests/property/fpl_points tests/property/optimisation tests/unit/private_v1/test_horizon_markets.py tests/unit/evaluation/test_team_strength_replay.py` | 1,185 passed, 659.60s; P0/001A/readiness/replay and relevant Stage 8-11 unit/property regressions |
 | `uv run --offline pytest -q tests/contract/football_events tests/contract/fpl_points tests/contract/optimisation tests/golden/football_events tests/golden/fpl_points tests/golden/optimisation tests/integration/football_events tests/integration/fpl_points tests/integration/optimisation` | 128 passed, 229.99s |
 | `uv run --offline pytest -q tests/integration/repository/test_manifests.py tests/unit/assurance/test_manifests.py tests/unit/assurance/test_secret_scan.py` | 31 passed, 2.47s |
+| `uv run --offline pytest -q tests/unit/ingestion/test_horizon_rights_approval.py tests/unit/ingestion/test_horizon_probe.py tests/unit/private_v1/test_team_strength_l2.py` | 126 passed, 3.89s; final inherited purpose-metadata correction, unchanged capability-denial checks and extra old-reference rejection |
+| `uv run --offline pytest -q tests/unit/ingestion tests/contract/odds` | 1,344 passed, 283.72s; broad inherited ingestion/Odds regression after the metadata-test correction |
 | `uv sync --all-groups --frozen --offline` | PASS, 40 packages; no dependency change |
 | `uv run --offline ruff format --check .` | PASS, 896 files |
 | `uv run --offline ruff check .` | PASS |
@@ -81,3 +83,25 @@ must identify and verify the exact committed SHA, remote equality, clean worktre
 and successful mandatory CI run. A final public reassessment must precede that
 handoff; actual Phase B also rechecks before credentials. Historical L1 stays
 consumed, L2 is unconsumed by the agent, and production remains inactive.
+
+## Post-seal inherited test correction
+
+Initial published checkpoint `be25495475eb3ca1ac9c3a4a4dc459d4760c97d8`, CI
+`35784439584`, is not a green acceptance claim. Coverage shard 5 reported seven
+failures and 746 passes: `test_horizon_rights_approval.py` still pinned L1's
+approval, purpose text, capture timestamp and a pre-L2 test clock. Its six
+capability-denial cases consequently stopped at the earlier purpose gate instead
+of reaching their intended unchanged RIGHTS_BLOCKED assertions. This inherited
+population was missed in the initial focused local selection.
+
+The correction updates only those test metadata literals to the approved L2
+values, places the synthetic clock after approval, and adds explicit rejection of
+the historical L1 reference. Capability matrices, denial assertions, stale terms,
+schema checks, network/credential guards and all production/rights files remain
+unchanged. No model golden, numerical tolerance, solver, runtime policy, rights
+or CI workflow is modified. The 126-test inherited rights/probe/L2 population now
+passes. The 20-entry archive substitutes this corrected test for the redundant
+PLANS copy; its source-only boundary and caps are unchanged.
+
+A new immutable descendant and fresh exact-SHA CI are required. No prior green
+result is reused for this descendant, and Phase B remains human-only.

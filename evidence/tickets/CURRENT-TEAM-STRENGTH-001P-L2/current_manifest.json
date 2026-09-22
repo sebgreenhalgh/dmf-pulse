@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 177863,
+      "bytes": 178349,
       "path": "PLANS.md",
-      "sha256": "dad9829d17b47a208cf6284b804fd60d2fb443dfd15aab600289343dce384707"
+      "sha256": "b0eca96e33e89c64de730ff89676d97c0411d79fe8145f3c9b97179131f235ce"
     },
     {
       "bytes": 2761,
@@ -2236,9 +2236,9 @@
       "sha256": "affc93b7827d27b5f7c521911a30d756cb8617fe3ebeab091309a0f9a9064d31"
     },
     {
-      "bytes": 3353,
+      "bytes": 3397,
       "path": "scripts/build_team_strength_l2_review_pack.py",
-      "sha256": "bedf36e184cb28c3a26266fbe733962d372c9ff6302f3de6332be25516c22c88"
+      "sha256": "b0f51c651a879bb99adb2b8b5a801bd5e7769229fe67c7b7fa5d45c079b74d31"
     },
     {
       "bytes": 3238,
@@ -6191,9 +6191,9 @@
       "sha256": "238a4d6526c8edb50004565999b5a32ce6ac9319a0548817840953b619efd4bd"
     },
     {
-      "bytes": 7919,
+      "bytes": 8048,
       "path": "tests/unit/ingestion/test_horizon_rights_approval.py",
-      "sha256": "d5d74893f00a969431e52cdec4e3979a496170228d77c460028b498888c54cb1"
+      "sha256": "623eb76ea8ba7970f7b21a24fde1bbff8897128016e037a627b076a63814c08d"
     },
     {
       "bytes": 11253,
