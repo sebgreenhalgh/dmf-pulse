@@ -2329,3 +2329,23 @@ scope findings. Final focused/inherited population: 578 passed; one performance 
 passes without instrumentation. Actual new-path branch coverage: 382/398 = 95.9799%, zero
 excluded lines. Repeat complete replay authenticates the identical golden. Final private
 30-fixture adapter benchmark: 63.3772ms. Final exact-SHA CI is still required before handoff.
+# CURRENT-TEAM-STRENGTH-001P private three-GW shadow comparison
+
+- [x] Verify remote private `f39ba4ee3ea748cf60c5743e48f7f68cc6784a71`, public
+  `6b96f5b85692fb3ec368ee261ad93a554128e017`, and common base
+  `99418f3316277f4dae347d80358d5dd5a09655b2`; isolate the worktree from user edits.
+- [x] Cherry-pick the exact eight public commits chronologically; retain both plan histories,
+  all wheel resources, and regenerate only the conflicted current PRC-013 manifest.
+- [x] 001P.01: exact public/private preservation, 92 focused regressions, real replay, external
+  installed-wheel model identity, static/build/repository/security gates; publish checkpoint.
+- [ ] 001P.02: authenticated private-only prior seam, exact full-horizon coverage, source
+  freshness, P0 season-scoped identity binding, and hard input controls; publish.
+- [ ] 001P.03: two fresh canonical rolling solves, common random numbers, projection movement,
+  decision signatures, deterministic materiality/confounding classification, safe summary; publish.
+- [ ] 001P.04: five real optimiser synthetic cases, baseline-purity proof; publish.
+- [ ] 001P.05: adversarial and fresh independent review, remediation, full offline assurance,
+  installed-wheel validation, exact-SHA green CI, remote equality and clean handoff.
+
+Scope: explicit shadow comparison only. No live FPL/Odds/OpenFootball action, A2 execution,
+credentials, private live persistence, ordinary CLI/config activation, Stage-8/fitting/R9B
+mathematics changes, PR, merge, tag, or automatic live observation after CI.

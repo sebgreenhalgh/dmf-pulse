@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "scope": "001P.01_LINEAGE_ONLY_NOT_COMPARISON_ACCEPTANCE",
+  "private_parent": "f39ba4ee3ea748cf60c5743e48f7f68cc6784a71",
+  "public_source": "6b96f5b85692fb3ec368ee261ad93a554128e017",
+  "common_base": "99418f3316277f4dae347d80358d5dd5a09655b2",
+  "integrated_head": "508049a560c0ebc9fad7b65e8be1d9a837b7646f",
+  "public_sequence": [
+    "0c2ce2497ca6ff0776fe3da251672775354f6604",
+    "a3651703a99295dc60c9345e0854537fa52feeeb",
+    "1a6bbc2cfc259f4aeb688c21360af2f1433a176e",
+    "45efa590547328370b23513729c0af43819ceb70",
+    "357f64d1edba8db4df26d30e1b8bb7b80904e95f",
+    "65bdda75bce313b96973f26e25db3323ff7bed87",
+    "43ea12860fd6f8d668e498994188354caa2a5ad4",
+    "6b96f5b85692fb3ec368ee261ad93a554128e017"
+  ],
+  "integrated_sequence": [
+    "75d5581bf67377ae347f0d233f8028a7a47bc49c",
+    "d246e4210268374c40a9794baa6e02191c32f0cb",
+    "1f83d5593f311a3c6543837a58f7ef24ad5707db",
+    "d76a664792464063b885cd27f6c22c467b0a46fc",
+    "f8abe9f62aad009f9b25cc363e8902ed011fcb0b",
+    "b02bfb00e9f67c5ca3ebd72e1de26d6296ec166f",
+    "a092e8b6b491c3ef89dd4ab8017b465d6102cc0d",
+    "508049a560c0ebc9fad7b65e8be1d9a837b7646f"
+  ],
+  "public_preserved_file_count": 87,
+  "public_mismatches": [],
+  "private_preserved_paths": [
+    "src/dmf_pulse/private_v1",
+    "src/dmf_pulse/availability",
+    "src/dmf_pulse/fpl_points",
+    "src/dmf_pulse/optimisation",
+    "src/dmf_pulse/cli/private_v1.py",
+    "src/dmf_pulse/cli/pulse.py",
+    "src/dmf_pulse/cli/app.py"
+  ],
+  "private_mismatches": [],
+  "conflict_resolution": "RETAIN_BOTH_PLANS_AND_PACKAGE_RESOURCES_REGENERATE_CURRENT_MANIFEST",
+  "provider_calls": 0,
+  "production_activation": false
+}

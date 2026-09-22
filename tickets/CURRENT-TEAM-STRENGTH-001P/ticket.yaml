@@ -1,0 +1,35 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001P
+title: Private three-Gameweek score-prior shadow decision-materiality comparison
+status: ACTIVE
+required_base_commit: f39ba4ee3ea748cf60c5743e48f7f68cc6784a71
+public_source_commit: 6b96f5b85692fb3ec368ee261ad93a554128e017
+required_branch: readiness/CURRENT-TEAM-STRENGTH-001P-private-three-gw-shadow
+authority_scopes:
+  - A3-data-foundation
+  - A8-events
+  - A9-points
+  - A10-one-GW-optimiser
+  - A11-decision-bundle
+  - A12-ops-assurance
+  - B2-multi-GW
+objective: Compare literal private league baseline and authenticated team-strength shadow through two real canonical rolling solves on one frozen information set.
+permissions:
+  provider_execution: forbidden
+  credentials: forbidden
+  live_private_persistence: forbidden
+  production_activation: forbidden
+required_activation_status: SHADOW_NOT_MODEL_INPUT
+allowed_areas:
+  - exact eight-commit public P0 and 001A integration with faithful conflict resolution
+  - src/dmf_pulse/private_v1/**
+  - tests/unit/private_v1/**
+  - scripts/*team_strength*shadow*.py
+  - tickets/CURRENT-TEAM-STRENGTH-001P/**
+  - evidence/tickets/CURRENT-TEAM-STRENGTH-001P/**
+  - evidence/tickets/PRC-013/current_manifest.json
+  - PLANS.md
+exclusions:
+  - ordinary dmf pulse, config, environment or factory activation
+  - Stage-8 mathematics, team-strength fitting mathematics and R9B changes
+  - live providers, A2 execution, new approval consumption and private live retention
+  - parameter mixtures, optimizer approximation, PR, merge and accepted tags
