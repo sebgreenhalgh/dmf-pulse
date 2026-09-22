@@ -33,6 +33,7 @@ from dmf_pulse.availability.manual_override import (
 )
 from dmf_pulse.chips.captaincy import optimise_captain_vice
 from dmf_pulse.football_events.minutes_context import Stage7MinutesContext
+from dmf_pulse.football_events.score_prior_request import ScorePriorRequest
 from dmf_pulse.football_events.service import (
     ScoreDistributionRequest,
     ScoreDistributionService,
@@ -130,6 +131,7 @@ from dmf_pulse.private_v1.horizon_candidates import (
 from dmf_pulse.private_v1.models import (
     PrivateDecisionLineage,
     PrivateDecisionStatus,
+    PrivateFixtureScorePrior,
     PrivateFreeTransferState,
     PrivateFrontierComparison,
     PrivateGainMass,
@@ -149,7 +151,10 @@ from dmf_pulse.private_v1.models import (
 )
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 from dmf_pulse.private_v1.reporting import render_transfer_frontier
-from dmf_pulse.private_v1.rolling_models import PrivateRollingGameweekInput
+from dmf_pulse.private_v1.rolling_models import (
+    PrivateRollingGameweekInput,
+    PrivateV1RollingExecutionInput,
+)
 from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 
@@ -185,6 +190,17 @@ class _FixtureAllocationProfileResolver(Protocol):
         source_team_map: dict[int, str],
         information_cutoff_utc: str,
     ) -> _FixtureAllocationResolution: ...
+
+
+class _FixtureScorePriorResolver(Protocol):
+    """Private shadow-only seam; ordinary factories never construct a resolver."""
+
+    @property
+    def input_sha256(self) -> str: ...
+
+    def validate_execution(self, execution: PrivateV1RollingExecutionInput) -> None: ...
+
+    def resolve(self, prior: PrivateFixtureScorePrior, gameweek: int) -> ScorePriorRequest: ...
 
 
 def _exact_root_action_upper_bound(
@@ -975,6 +991,7 @@ def _project_fixtures(
     *,
     future_gameweek: PrivateRollingGameweekInput | None = None,
     _allocation_profile_resolver: _FixtureAllocationProfileResolver | None = None,
+    _score_prior_resolver: _FixtureScorePriorResolver | None = None,
 ) -> tuple[
     tuple[FixtureProjectionResult, ...],
     dict[str, str],
@@ -1033,6 +1050,11 @@ def _project_fixtures(
         fpl_fixture, _canonical_fixture = fixture_authority[fixture_id]
         stage7 = minutes_by_fixture[fixture_id]
         score_prior = prior_by_fixture[fixture_id]
+        prior_request = (
+            score_prior.score_prior_request
+            if _score_prior_resolver is None
+            else _score_prior_resolver.resolve(score_prior, target_gameweek)
+        )
         expected_home = canonical_teams[int(fpl_fixture.home_team_identity.external_id_text)]
         expected_away = canonical_teams[int(fpl_fixture.away_team_identity.external_id_text)]
         if (
@@ -1065,7 +1087,7 @@ def _project_fixtures(
                     away_team_id=UUID(expected_away),
                     as_of=value.current_state.information_cutoff,
                     minutes_context=context,
-                    prior=score_prior.score_prior_request,
+                    prior=prior_request,
                     constraints=constraints_by_fixture[fixture_id],
                 )
             )

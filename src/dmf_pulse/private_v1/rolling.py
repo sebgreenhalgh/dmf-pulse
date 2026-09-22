@@ -59,6 +59,7 @@ from dmf_pulse.private_v1.service import (
     _current_identity_maps,
     _decimal,
     _FixtureAllocationProfileResolver,
+    _FixtureScorePriorResolver,
     _MemoizedStage10Evaluator,
     _parse_tactical_plan,
     _private_free_transfer_state,
@@ -663,8 +664,14 @@ class PrivateV1RollingRecommendationService:
         self,
         *,
         _allocation_profile_resolver: _FixtureAllocationProfileResolver | None = None,
+        _score_prior_resolver: _FixtureScorePriorResolver | None = None,
     ) -> None:
+        if _allocation_profile_resolver is not None and _score_prior_resolver is not None:
+            raise PrivateV1Error(
+                "SHADOW_ABLATION_CONFLICT", "score-prior shadow requires ordinary player allocation"
+            )
         self._allocation_profile_resolver = _allocation_profile_resolver
+        self._score_prior_resolver = _score_prior_resolver
 
     def run(
         self,
@@ -691,6 +698,8 @@ class PrivateV1RollingRecommendationService:
                 "private rolling execution input failed validation",
             ) from None
         current = execution.current_execution
+        if self._score_prior_resolver is not None:
+            self._score_prior_resolver.validate_execution(execution)
         terminal = load_terminal_value_policy()
         if (
             execution.terminal_policy_sha256 != terminal.policy_sha256
@@ -764,6 +773,7 @@ class PrivateV1RollingRecommendationService:
                     active_progress,
                     future_gameweek=future,
                     _allocation_profile_resolver=self._allocation_profile_resolver,
+                    _score_prior_resolver=self._score_prior_resolver,
                 )
             record(f"stage8_9_gameweek_{gameweek}", started)
             fixture_results, stage7_contexts, stage8_hashes, binding_hashes, fallback = projected
@@ -1006,6 +1016,8 @@ class PrivateV1RollingRecommendationService:
             *(warning for item in decisions for warning in item.limitations),
             *(current.entry_quality.warnings if current.entry_quality is not None else ()),
         }
+        if self._score_prior_resolver is not None:
+            warnings.add("SCORE_PRIOR_SHADOW_NOT_MODEL_INPUT")
         provisional = PrivateV1RollingDecision.model_construct(
             status="SUCCESS",
             activation_status="NOT_PRODUCTION_ACTIVE",
@@ -1043,7 +1055,11 @@ class PrivateV1RollingRecommendationService:
             action_space_disclosure=action_space_disclosure,
             warnings=tuple(sorted(warnings)),
             lineage=PrivateRollingDecisionLineage(
-                rolling_execution_input_sha256=execution.semantic_sha256,
+                rolling_execution_input_sha256=(
+                    execution.semantic_sha256
+                    if self._score_prior_resolver is None
+                    else self._score_prior_resolver.input_sha256
+                ),
                 current_execution_input_sha256=current.semantic_sha256,
                 current_manager_state_sha256=request.initial_state.state_sha256,
                 stage7_input_sha256_by_gameweek={

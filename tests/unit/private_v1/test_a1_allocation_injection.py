@@ -164,5 +164,6 @@ def test_a1_world_execution_order_isolated(repository_root, tmp_path) -> None:
 
 def test_a1_ordinary_constructor_has_no_public_world_selector() -> None:
     parameters = inspect.signature(PrivateV1RollingRecommendationService).parameters
-    assert tuple(parameters) == ("_allocation_profile_resolver",)
+    assert tuple(parameters) == ("_allocation_profile_resolver", "_score_prior_resolver")
     assert all(name.startswith("_") for name in parameters)
+    assert all(parameter.default is None for parameter in parameters.values())

@@ -141,6 +141,7 @@ def _build_fpl_input(
     information_cutoff: datetime = _CUTOFF,
     horizon_gameweeks: int = 1,
     historical_gameweeks: int = 0,
+    horizon_fixture_pairs: tuple[tuple[tuple[int, int], ...], ...] | None = None,
 ):
     source = repository_root / "fixtures/fpl/FPL-004/happy_path"
     bootstrap = json.loads((source / "bootstrap.json").read_text(encoding="utf-8"))
@@ -254,7 +255,12 @@ def _build_fpl_input(
     fixtures = []
     for offset in range(horizon_gameweeks):
         gameweek = target_gameweek + offset
-        for index, (home, away) in enumerate(((1, 2), (3, 4), (5, 6)), start=1):
+        pairs = (
+            ((1, 2), (3, 4), (5, 6))
+            if horizon_fixture_pairs is None
+            else horizon_fixture_pairs[offset]
+        )
+        for index, (home, away) in enumerate(pairs, start=1):
             fixture = deepcopy(fixture_template)
             fixture_id = 100 + index if horizon_gameweeks == 1 else gameweek * 100 + index
             fixture_code = (

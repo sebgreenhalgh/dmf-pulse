@@ -2338,7 +2338,7 @@ excluded lines. Repeat complete replay authenticates the identical golden. Final
   all wheel resources, and regenerate only the conflicted current PRC-013 manifest.
 - [x] 001P.01: exact public/private preservation, 92 focused regressions, real replay, external
   installed-wheel model identity, static/build/repository/security gates; publish checkpoint.
-- [ ] 001P.02: authenticated private-only prior seam, exact full-horizon coverage, source
+- [x] 001P.02 implementation: authenticated private-only prior seam, exact full-horizon coverage, source
   freshness, P0 season-scoped identity binding, and hard input controls; publish.
 - [ ] 001P.03: two fresh canonical rolling solves, common random numbers, projection movement,
   decision signatures, deterministic materiality/confounding classification, safe summary; publish.

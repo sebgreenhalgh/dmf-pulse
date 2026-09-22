@@ -51,6 +51,7 @@ Bounded checkpoint command:
 Bounded checkpoint population: **92 passed in 529.07 seconds**. This includes the real ordinary
 one-command stack, explicit three-GW one-command run, A2 preparation/provider-closure fixtures,
 A1 default-service semantic equality, P0 governance and the public fixture adapter. The broader
-inherited population remains running and is not yet claimed as passed here. These are checkpoint
+inherited population subsequently completed: **787 passed, 1 performance test deselected in
+1216.73 seconds**. Both runs used network-denied fixtures. These are checkpoint
 gates, not final 001P acceptance. No score-prior seam, comparison implementation, activation, live provider action,
 private live retention, PR, merge or tag has been performed at this checkpoint preparation.

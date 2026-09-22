@@ -1,0 +1,25 @@
+{
+  "build_provenance": "Market evidence rebuilt under each exact package; propagated SHA values and information-set content IDs (bijective to GW) normalised for content comparison only; production authentication unchanged.",
+  "classification": "SYNTHETIC_OFFLINE",
+  "decisions_reports_projections_and_optimiser_semantics_equal": true,
+  "default_service_construction": true,
+  "private_parent": "f39ba4ee3ea748cf60c5743e48f7f68cc6784a71",
+  "production_activation": false,
+  "provider_calls": 0,
+  "semantic_results": {
+    "decision_content_sha256": "2203936e09098aab46d02e3934ab1234444bd7005c24d8c05fb57e8bb3b7fcbf",
+    "execution_content_sha256": "06afb50de30798c2be34b01256ca869f8d9e1e12b190c7b05a5dc06948a9cff2",
+    "one_gameweek_result_content_sha256": "bb625507592ddcdd74926f93ab2a28624cdb3692e1d447f4b63b5aece02ec1af",
+    "optimiser_request_content_sha256": "bc41e387ec3d593745ba4e5f170b1b60a03de3c72860bd1360cbcd4f722bfe2d",
+    "optimiser_result_content_sha256": "e3f1da9f5ae1b21583b577a1dfb0f5c529217f12a5ce6278852e7dc1bd583b00",
+    "projection_content_sha256s": [
+      "589671acd6055ed935be681cefa3e5982851b79cfdd36fb3cf22d06aa2899d79",
+      "94db1ac0a4bbdb2990dd22737a6aadf5c74d4254b9f5884621cbfb50ff736d35",
+      "95cd42ac2d19db29b23961c9b8db6705b16dfafef3d0e6e6ec2dc11973ae3514"
+    ],
+    "report_content_sha256": "47e22a2a42cb988bd409586df25cf164a3986a238f0a69a7960572ca23136710",
+    "stage11_work_content_sha256": "03b857a1d84cecc9ed6762261d56234dab538af2aeed449c342e0dc1445e8ecd"
+  },
+  "separate_processes": true,
+  "status": "PASS"
+}
