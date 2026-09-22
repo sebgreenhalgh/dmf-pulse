@@ -2344,8 +2344,10 @@ excluded lines. Repeat complete replay authenticates the identical golden. Final
   decision signatures, deterministic materiality/confounding classification, safe summary; publish.
 - [x] 001P.04: five real optimiser synthetic cases, baseline-purity proof, fresh 100% direct
   branch coverage and real external installed-wheel comparison; publish.
-- [ ] 001P.05: adversarial and fresh independent review, remediation, full offline assurance,
-  installed-wheel validation, exact-SHA green CI, remote equality and clean handoff.
+- [x] 001P.05 local seal: adversarial and fresh independent review, remediation, offline
+  assurance, installed-wheel validation, canonical manifests and capped review archive.
+- [ ] Post-seal publication gate: exact-final-SHA green CI, remote equality and clean handoff;
+  report these post-commit facts in the final response without modifying the sealed tree.
 
 Scope: explicit shadow comparison only. No live FPL/Odds/OpenFootball action, A2 execution,
 credentials, private live persistence, ordinary CLI/config activation, Stage-8/fitting/R9B

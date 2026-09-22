@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 171748,
+      "bytes": 171931,
       "path": "PLANS.md",
-      "sha256": "51f40040899b7fba0727e9b76d48a46079fccf69764781d55db7d0d8cb3deb67"
+      "sha256": "53292d6fcda61ff4d07f9003cbb539d6d5956c37fe22c407f42f627c2754dba8"
     },
     {
       "bytes": 2761,
@@ -2229,6 +2229,11 @@
       "bytes": 3238,
       "path": "scripts/build_team_strength_review_pack.py",
       "sha256": "af586ab06a3e22ff39e576c9e08be9aed35676c2e288116cce2a8cdd9f417346"
+    },
+    {
+      "bytes": 3016,
+      "path": "scripts/build_team_strength_shadow_review_pack.py",
+      "sha256": "f7526c8f910a4bffd9abbfef1e7abef8327dac7f8f2e707351217ae66d6ab6f2"
     },
     {
       "bytes": 1058,
@@ -6911,9 +6916,9 @@
       "sha256": "48d7189de968afcf331121fddfd189fdf5e73972373aa2e841357b88dd6b5c4d"
     },
     {
-      "bytes": 1526,
+      "bytes": 1611,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001P/ticket.yaml",
-      "sha256": "152f97308e3a5cb423ed2f79491272ef88c582c9ef1f5ca0ce4491712aa4c2f5"
+      "sha256": "d0750eefd76f1fb9a0aeaef6a396f5678b33511efeab86ee54f31b60ea372cd4"
     },
     {
       "bytes": 3923,
