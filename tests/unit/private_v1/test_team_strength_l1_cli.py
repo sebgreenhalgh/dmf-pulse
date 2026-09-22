@@ -21,7 +21,7 @@ def test_operator_has_no_output_or_scenario_override(capsys):
             ["observe", "--output", "private", "--entry-id", "secret-marker"]
         )
     text = capsys.readouterr().err
-    assert "secret-marker" not in text and "Invalid L1 operator arguments" in text
+    assert "secret-marker" not in text and "Invalid L2 operator arguments" in text
 
 
 def observe_args():

@@ -288,8 +288,8 @@ def test_consumed_authority_blocks_before_any_credentials_or_provider():
 
     with pytest.raises(authority.ConsumedL1ApprovalError):
         authority.validate_l1_authority(
-            approval=authority.APPROVAL,
-            attestation=authority.ATTESTATION,
+            approval=authority.L1_APPROVAL,
+            attestation=authority.L1_ATTESTATION,
             checked_at=datetime(2026, 10, 1, tzinfo=UTC),
         )
     service = live.TeamStrengthL1ObservationService(
@@ -298,7 +298,9 @@ def test_consumed_authority_blocks_before_any_credentials_or_provider():
         odds_credentials=ForbiddenCredentials(),
     )
     result = service.run(
-        live.L1OperatorRequest(42, "a" * 40, authority.APPROVAL, authority.ATTESTATION, "0" * 64),
+        live.L1OperatorRequest(
+            42, "a" * 40, authority.L1_APPROVAL, authority.L1_ATTESTATION, "0" * 64
+        ),
         None,
     )
     assert result["reason"] == "AUTHORITY_CONSUMED" and result["prior_l1_one_shot_consumed"]

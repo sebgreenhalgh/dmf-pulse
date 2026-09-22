@@ -1,4 +1,4 @@
-"""Offline L1 operator/authority smoke from a runtime-only external installed wheel."""
+"""Offline L2 authority/consumed-L1 smoke in a runtime-only external wheel."""
 
 import json
 import shutil
@@ -25,14 +25,15 @@ socket.create_connection = denied
 socket.getaddrinfo = denied
 socket.socket.connect = denied
 import dmf_pulse
-from dmf_pulse.private_v1.team_strength_live_authority import validate_l1_authority, APPROVAL, ATTESTATION, ConsumedL1ApprovalError
+from dmf_pulse.private_v1.team_strength_live_authority import validate_l1_authority, APPROVAL, ATTESTATION, L1_APPROVAL, L1_ATTESTATION, ConsumedL1ApprovalError
 from dmf_pulse.private_v1.team_strength_diagnostics import ComparisonTrace, ComparisonStage, ComparisonReason, safe_comparison_failure
 from dmf_pulse.private_v1.team_strength_live import L1OperatorRequest, TeamStrengthL1ObservationService
 from dmf_pulse.ingestion.openfootball.team_strength_current import discover_current_resource
 assert Path(dmf_pulse.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
 stamp = datetime(2026, 10, 1, tzinfo=UTC)
+validate_l1_authority(approval=APPROVAL, attestation=ATTESTATION, checked_at=stamp)
 try:
-    validate_l1_authority(approval=APPROVAL, attestation=ATTESTATION, checked_at=stamp)
+    validate_l1_authority(approval=L1_APPROVAL, attestation=L1_ATTESTATION, checked_at=stamp)
 except ConsumedL1ApprovalError:
     consumed = True
 else:
@@ -48,13 +49,17 @@ result = TeamStrengthL1ObservationService(clock=lambda: stamp).run(
 assert result['reason'] == 'AUTHORITY_INVALID' and not result['private_attempt_consumed']
 assert result['fpl_requests'] == result['odds_requests'] == 0
 result = TeamStrengthL1ObservationService(clock=lambda: stamp).run(
-    L1OperatorRequest(42, 'a'*40, APPROVAL, ATTESTATION, '0'*64), None)
+    L1OperatorRequest(42, 'a'*40, L1_APPROVAL, L1_ATTESTATION, '0'*64), None)
 assert result['reason'] == 'AUTHORITY_CONSUMED' and result['fresh_live_authorization_required']
+assert result['fpl_requests'] == result['odds_requests'] == 0
+result = TeamStrengthL1ObservationService(clock=lambda: stamp).run(
+    L1OperatorRequest(42, 'a'*40, APPROVAL, ATTESTATION, '0'*64), None)
+assert result['reason'] == 'PUBLIC_READINESS_INVALID' and not result['private_attempt_consumed']
 assert result['fpl_requests'] == result['odds_requests'] == 0
 diagnostic = safe_comparison_failure(ComparisonTrace().failure(
     ComparisonStage.SEAL_COMPARISON, ComparisonReason.COMPARISON_SEAL_FAILED, ValueError('private')))
 assert diagnostic['stage'] == 'SEAL_COMPARISON' and 'private' not in json.dumps(diagnostic)
-print(json.dumps({'installed_import': True, 'consumed_authority_blocked': consumed, 'closed_diagnostic': True, 'mutable_source_rejected': True,
+print(json.dumps({'installed_import': True, 'l2_authority_valid': True, 'public_unavailable_before_consumption': True, 'consumed_authority_blocked': consumed, 'closed_diagnostic': True, 'mutable_source_rejected': True,
     'wrong_purpose_blocked_before_providers': True, 'provider_calls': 0, 'production_activation': False}))
 """
 

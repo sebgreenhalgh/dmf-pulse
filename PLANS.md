@@ -2417,3 +2417,26 @@ executions, but shard 2 reached its 35-minute job limit during cleanup after
 the observed slow synthetic populations; no test selector, timeout, coverage gate,
 workflow, dependency or production code changes. Validate deterministic complete
 partitioning, refresh independent review/evidence, and publish a new exact-SHA run.
+
+## CURRENT-TEAM-STRENGTH-001P-L2 — Phase A only
+
+Exact parent: `4d712ecf84e9c1f01a0f29354bd93c5296befb35`.
+The newest human instruction overrides the execution section of the supplied
+ticket: STOP AFTER PHASE A. Do not invoke live L2. The human executes Phase B.
+
+- [x] Fetch/verify exact remote D1 parent; create isolated clean L2 worktree.
+- [x] Read controlling rights/temporal authority and obtain independent purpose review.
+- [x] Preserve historical consumed L1 pair; add only the exact current L2 pair.
+- [x] Update only approved Odds purpose metadata and its exact semantic binding.
+- [x] Preserve FPL/OpenFootball rights, D1 diagnostics/controls, network gate and maths.
+- [x] Add authority/no-expansion regressions; run offline focused/inherited acceptance.
+- [x] Authenticate/reassess retained public-only current readiness, or use the accepted
+  public-only preflight if necessary; no FPL/Odds calls or credential inspection.
+- [x] Fresh final independent review; static/build/wheel/manifests/security gates.
+- [ ] Commit/push; exact-SHA mandatory CI all green; clean local/remote-equal handoff.
+- [ ] Return public-readiness path/hash and exact terminal command, without executing it.
+
+Phase A FPL/Odds requests must remain zero. L2 remains unused by this agent.
+No PR/merge/tag, live invocation, generic reset, automatic retry, private data
+persistence, model activation, parameter mixtures or 001U work. Existing process-local
+one-shot guards are unchanged; do not claim a new durable cross-process ledger.

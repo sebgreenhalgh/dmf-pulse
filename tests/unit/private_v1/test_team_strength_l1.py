@@ -28,12 +28,6 @@ from tests.unit.private_v1.team_strength_shadow_support import STAMP, synthetic_
 pytestmark = pytest.mark.unit
 
 
-@pytest.fixture(autouse=True)
-def archived_l1_authority(monkeypatch):
-    """Historical synthetic L1 behaviour only; the actual approval is consumed."""
-    monkeypatch.setattr(authority, "CONSUMED_APPROVALS", frozenset())
-
-
 @pytest.fixture(scope="module")
 def readiness():
     dataset, artifact = synthetic_strength(mode="LIVE_OBSERVED")

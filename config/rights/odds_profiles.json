@@ -37,9 +37,9 @@
     },
     {
       "account_scope": "Sebastian-owned and authorized private The Odds API account",
-      "approved_at": "2026-09-22T12:14:22Z",
+      "approved_at": "2026-09-22T19:07:31Z",
       "approved_by": "Sebastian",
-      "approved_purpose": "one private operator-initiated CURRENT-TEAM-STRENGTH-001P-L1 live transient two-world decision-materiality observation comparing LEAGUE_BASELINE and TEAM_STRENGTH_SHADOW using one frozen current information set through the existing three-Gameweek Stage 8 to Stage 11 pipeline",
+      "approved_purpose": "one private operator-initiated CURRENT-TEAM-STRENGTH-001P-L2 live transient two-world team-strength decision-materiality observation comparing LEAGUE_BASELINE and TEAM_STRENGTH_SHADOW using one frozen three-Gameweek information set through the existing Stage 8 to Stage 11 pipeline with D1 safe failure diagnostics",
       "attribution_required": false,
       "attribution_text": null,
       "capabilities": {
@@ -57,8 +57,8 @@
       },
       "checked_at": "2026-09-11T21:21:31Z",
       "geography_scope": "United Kingdom private use",
-      "human_approval_id": "DMF-CTS-001P-LIVE-RIGHTS-2026-09-22",
-      "notes": "Exactly one Sebastian-authorized CURRENT-TEAM-STRENGTH-001P-L1 private transient two-world observation. Zero private retention; no automatic retry, scheduled harvesting, training, calibration, public display, redistribution or activation. First FPL/Odds request consumes the attempt; public OpenFootball preflight does not. Account, UK geography, terms metadata, capability matrix and unresolved rights remain unchanged. Historical R9C-A2 approval is preserved in its ticket evidence and cannot authorize L1. Current authority: tickets/CURRENT-TEAM-STRENGTH-001P-L1/HUMAN-APPROVAL.md. approved_at records capture of the human approval; this is not provider endorsement, a licence grant or legal advice.",
+      "human_approval_id": "DMF-CTS-001P-L2-LIVE-RIGHTS-2026-09-22",
+      "notes": "Exactly one Sebastian-authorized CURRENT-TEAM-STRENGTH-001P-L2 private transient two-world observation. Zero private retention; no automatic retry, repeated or scheduled acquisition, persistent Odds storage, backup, training, calibration, public display, redistribution or production activation. First attempted FPL/Odds transport consumes the attempt, including failure; public OpenFootball preflight does not. Account, UK geography, terms metadata, capability matrix and unresolved rights remain unchanged. Historical L1 approval remains consumed and non-reusable; R9C-A2 approval remains historical only. Current authority: tickets/CURRENT-TEAM-STRENGTH-001P-L2/HUMAN-APPROVAL.md. approved_at records capture of the human approval; this is not provider endorsement, a licence grant or legal advice.",
       "profile_version": "1.0.0",
       "provider_key": "the_odds_api",
       "retention_reason": null,
