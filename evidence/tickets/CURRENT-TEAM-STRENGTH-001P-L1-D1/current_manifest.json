@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 175234,
+      "bytes": 175857,
       "path": "PLANS.md",
-      "sha256": "97e5fd25404add02eb4ad8bcfea09a0ddeb7b9e0213fe3dc5df0eb639c020930"
+      "sha256": "64cb1d356e29f622db002acbdde8d3d29ff7e1d0da679a11b0fd5377977dc8be"
     },
     {
       "bytes": 2761,
@@ -6626,9 +6626,9 @@
       "sha256": "5b3443bf80fb4247fedc6ec1c3e1966fd82d5d5d6c497d7f742ac4354191c74c"
     },
     {
-      "bytes": 4253,
+      "bytes": 4551,
       "path": "tests/unit/private_v1/test_team_strength_d1_markets.py",
-      "sha256": "a056d73b7ee3d710e69ff4ac65d5e8cc53594e6e9e88e1019a7bcc2f6ea7015a"
+      "sha256": "4c3eb1da95b839a6d3d7f45830fb3ce797f580b0719c9b3f04cc41113aa68e92"
     },
     {
       "bytes": 13952,

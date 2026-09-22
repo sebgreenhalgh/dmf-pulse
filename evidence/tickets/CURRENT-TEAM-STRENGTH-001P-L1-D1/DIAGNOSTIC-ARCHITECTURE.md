@@ -69,7 +69,11 @@ it BLOCKED, claim fitted market convergence, alter numerical tolerances or retry
 At Decimal precision 28, the seven unique baseline/candidate priors yielded:
 full market 7 PROJECTED; H2H only 6 PROJECTED and 1 DEGRADED prior fallback;
 prior only 7 PRIOR_ONLY (all outer results PROJECTED). The paired matrix reuses
-the baseline in each of the six cases. The real private Stage-8 hook test also
+the baseline in each of the six cases. Specifically, the H2H-only low-total
+candidate (0.8/0.65) uses the existing fallback while its baseline converges;
+the other five candidate priors converge. This independently demonstrates a
+prior-dependent compatibility boundary without claiming the historical cause.
+The real private Stage-8 hook test also
 exercises an accepted generated-fixture prior fallback before an injected later
 failure, proving that it clears the failed-fixture location and counts fallback.
 

@@ -13,6 +13,9 @@ No private credentials or historical private snapshot were inspected.
 | `uv run --offline pytest -q tests/unit/private_v1/test_team_strength_d1_diagnostics.py tests/unit/private_v1/test_team_strength_d1_controls.py tests/unit/private_v1/test_team_strength_d1_markets.py` | 113 passed, 138.42s on final reviewed behavior; every major fixture-heavy boundary, real market matrix and control witness |
 | Final fast diagnostic coverage command in `coverage-summary.json` | 69 passed, 20 fixture-heavy cases deselected (covered by complete direct run); 208/208 statements, 26/26 branches, no exclusions |
 | `uv run --offline pytest -q tests/integration/repository/test_manifests.py tests/unit/assurance/test_manifests.py tests/unit/assurance/test_secret_scan.py` | 31 passed, 2.54s |
+| `uv run --offline pytest -q tests/unit/private_v1/test_team_strength_comparison_contracts.py` | 13 passed, 1.31s |
+| Final pinned H2H compatibility matrix rerun: `uv run --offline pytest -q tests/unit/private_v1/test_team_strength_d1_markets.py` | 22 passed, 9.88s; exact low-total shadow fallback/baseline convergence distinction |
+| Instrumented 001P/L1/A2/ordinary population (full command below) | 209 passed, 3590.62s; five exact-parent comparisons, generated-data L1 no-write slice, A2 four worlds and ordinary three-GW execution |
 | `uv run --offline pytest -q tests/contract/football_events tests/contract/fpl_points tests/contract/optimisation tests/golden/football_events tests/golden/fpl_points tests/golden/optimisation tests/integration/football_events tests/integration/fpl_points tests/integration/optimisation` | 128 passed, 225.10s |
 | `uv run --offline pytest -q tests/unit/private_v1/test_team_strength_d1_diagnostics.py -k 'signature_failure or completed_worlds'` | 3 passed, 80 deselected; final additional nested control/signature/timing wrapping |
 | `uv run --offline ruff format --check .` | PASS, 894 files |
@@ -33,11 +36,21 @@ The source-only capped archive is built with
 `uv run --offline python scripts/build_team_strength_d1_review_pack.py`.
 No runtime directory, private artifact or response body is eligible for that pack.
 
-## In-progress acceptance (not yet claimed passed)
+## Acceptance scope and sealing
 
-The instrumented 001P input/comparison/five-case differential, L1 generated-data,
-A2 preparation and ordinary one-command population is running. Final review
-and final Git sealing remain separate gates.
+All local D1 acceptance populations above are complete. Source checkpoint
+`5584852338fa1d5b873a25158b23751c9dea9e65` contains the final reviewed production
+code. Subsequent changes strengthen the synthetic H2H expectation and close
+documentation/manifests only. The five parent comparisons prove unchanged
+signatures, movements, fixture outputs, decisions and classifications; substituting
+only the authorized input-control identity makes complete parent/D1 comparisons
+equal. The generated-data L1 slice passes under filesystem-write denial.
+
+The long population began before the final diagnostic-only hardening; every final
+diagnostic path was separately rerun in the complete 113-test population and the
+fresh 100% coverage run. There is no mathematical or solver change between them.
+Final independent review and Git/CI facts are distinct gates, recorded without
+claiming any live provider execution or production acceptance.
 
 ## Verification issues and limits
 

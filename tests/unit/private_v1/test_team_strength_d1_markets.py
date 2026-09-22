@@ -59,6 +59,14 @@ def test_real_stage8_realistic_two_world_market_matrix(case, home, away, coverag
         assert result.error_code is None and result.distribution is not None
         diagnostics = result.distribution.diagnostics
         assert diagnostics.constraint_count == len(constraints)
+        expected = (
+            "PRIOR_ONLY"
+            if coverage == "PRIOR"
+            else "DEGRADED"
+            if coverage == "H2H" and case == "low_total" and world == "TEAM_STRENGTH_SHADOW"
+            else "PROJECTED"
+        )
+        assert diagnostics.projection_status == expected
         if diagnostics.projection_status == "DEGRADED":
             assert diagnostics.solver_error_code == "PROJECTION_DID_NOT_CONVERGE"
             assert "NUMERICAL_FALLBACK_TO_PRIOR" in result.distribution.confidence_reasons
