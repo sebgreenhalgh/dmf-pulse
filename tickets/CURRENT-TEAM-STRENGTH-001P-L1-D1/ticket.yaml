@@ -1,0 +1,18 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001P-L1-D1
+title: Offline safe two-world failure localisation
+status: ACTIVE
+required_base_commit: 06cbd10719fee3cde87dbb2f9698d81567672618
+required_branch: readiness/CURRENT-TEAM-STRENGTH-001P-L1-D1-safe-comparison-failure-diagnostics
+parent_ci_run: 35732906193
+parent_ci_status: SUCCESS
+historical_one_shot_consumed: true
+provider_access_authorized: false
+fresh_live_authorization_created: false
+human_scope_clarification: Correct control identity now; preserve decisions, projections and classifications, but allow comparison hashes to change.
+required_review_verdict: CLEAR_FOR_TEAM_STRENGTH_L1_FRESH_REAUTHORIZATION_DECISION
+exclusions:
+  - provider access, credential inspection or private context reconstruction
+  - retry or reuse of consumed L1 authorization
+  - model or Stage-8/9/10/11 mathematics changes
+  - new live authorization, production activation or ordinary path selection
+  - private persistence, PR, merge or accepted tag

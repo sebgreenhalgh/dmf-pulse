@@ -58,9 +58,14 @@ from dmf_pulse.private_v1.team_strength_comparison import (
     run_team_strength_shadow_comparison,
     safe_team_strength_summary,
 )
+from dmf_pulse.private_v1.team_strength_diagnostics import (
+    TeamStrengthComparisonFailure,
+    safe_comparison_failure,
+)
 from dmf_pulse.private_v1.team_strength_live_authority import (
     APPROVAL,
     ATTESTATION,
+    ConsumedL1ApprovalError,
     validate_l1_authority,
 )
 from dmf_pulse.private_v1.team_strength_live_network import (
@@ -88,6 +93,7 @@ class L1Stage(StrEnum):
 class L1Reason(StrEnum):
     RUNTIME_INPUT_INVALID = "RUNTIME_INPUT_INVALID"
     AUTHORITY_INVALID = "AUTHORITY_INVALID"
+    AUTHORITY_CONSUMED = "AUTHORITY_CONSUMED"
     PUBLIC_READINESS_INVALID = "PUBLIC_READINESS_INVALID"
     SOURCE_STALE = "SOURCE_STALE"
     CREDENTIAL_UNAVAILABLE = "CREDENTIAL_UNAVAILABLE"
@@ -424,6 +430,19 @@ class TeamStrengthL1ObservationService:
             )
         except _ObservationComplete as completed:
             return completed.summary
+        except ConsumedL1ApprovalError:
+            return {
+                **self._blocked(L1Stage.VALIDATE_RIGHTS, L1Reason.AUTHORITY_CONSUMED),
+                "prior_l1_one_shot_consumed": True,
+                "fresh_live_authorization_required": True,
+            }
+        except TeamStrengthComparisonFailure as failure:
+            try:
+                diagnostic = safe_comparison_failure(failure)
+            except Exception:
+                # A forged/tampered diagnostic is not a disclosure escape hatch.
+                return self._blocked(stage, reason)
+            return {**self._blocked(stage, reason), **diagnostic}
         except (Exception, KeyboardInterrupt):
             # No exception text, chained traceback, provider payload or entry ID
             # escapes this terminal boundary, including unexpected failures.

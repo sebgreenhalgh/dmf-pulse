@@ -2375,3 +2375,29 @@ Attestation: `CURRENT-TEAM-STRENGTH-001P-L1#ONE-SHOT-2026-09-22`.
 Public OpenFootball evidence may be retained separately. No live FPL/Odds body, private
 comparison artifact or player catalogue may be written, cached, redirected, committed or uploaded.
 No change to accepted model/Stage-8/001P mathematics or ordinary `dmf pulse`.
+
+## CURRENT-TEAM-STRENGTH-001P-L1-D1 offline failure localisation
+
+Exact parent: `06cbd10719fee3cde87dbb2f9698d81567672618`.
+The newest user-reported safe L1 result supersedes the earlier pre-provider block:
+prior private one-shot consumed, no retry authorized. No private context retained;
+historical root cause cannot be inferred from the coarse comparison failure.
+
+- [x] Read D1/authority and isolate the exact-parent branch; preserve unrelated edits.
+- [x] Add closed diagnostic stages/reasons, per-world progress and scoped Stage-8
+  observation; preserve successful semantic records and all Stage-8-to-11 maths.
+- [x] Audit every hard control, random-input identity and candidate-screen boundary.
+- [x] Add every-boundary injections, disclosure attacks, realistic real Stage-8
+  market matrix, and parent-equivalent real successful synthetic comparisons.
+- [x] Explicitly prevent reuse of consumed L1 authority; no new live approval.
+- [ ] Run offline inherited/focused/coverage/static/build/wheel/governance/security
+  acceptance; publish source-only evidence and capped review pack.
+- [ ] Fresh independent review and resolve all P0/P1/material P2; seal and hand off.
+
+D1 provider requests must all remain zero (FPL, Odds, live OpenFootball).
+Human clarification authorizes corrected input/derived control identity now;
+comparison/container hashes may change, but decisions/projections/classifications
+must remain unchanged. The real candidate-count witness exposes the old derived
+work-budget equality defect; it does not prove the historical failure cause.
+Never inspect credentials, reconstruct private context, execute an observation,
+relax a numerical gate, change ordinary activation, or create a new live authority.

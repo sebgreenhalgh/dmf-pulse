@@ -1,0 +1,18 @@
+{
+  "classification": "SYNTHETIC_OFFLINE",
+  "command": "uv run --offline coverage run --branch --data-file=review_pack/d1-safe-reviewed.coverage -m pytest -q tests/unit/private_v1/test_team_strength_d1_diagnostics.py -k 'not public_comparison and not post_solve and not actual_private and not remaining_boundaries'",
+  "coverage_report_command": "uv run --offline coverage json --data-file=review_pack/d1-safe-reviewed.coverage --include='*/team_strength_diagnostics.py' -o review_pack/d1-diagnostic-coverage-reviewed.json",
+  "test_result": {"passed": 69, "deselected": 20},
+  "production_path": "src/dmf_pulse/private_v1/team_strength_diagnostics.py",
+  "covered_statements": 208,
+  "total_statements": 208,
+  "covered_branches": 26,
+  "total_branches": 26,
+  "branch_percent": 100,
+  "excluded_lines": 0,
+  "missing_lines": [],
+  "missing_branches": [],
+  "provider_requests": {"FPL": 0, "ODDS": 0, "LIVE_OPENFOOTBALL": 0},
+  "private_live_data_persisted": false,
+  "production_activation": false
+}

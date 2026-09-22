@@ -20,6 +20,9 @@ from tests.unit.ingestion.openfootball.conftest import FakeTransport, synthetic_
 from tests.unit.private_v1.l1_test_support import deny_writes
 from tests.unit.private_v1.team_strength_shadow_support import PAIRS, STAMP
 from tests.unit.private_v1.test_one_command import _DirectTransport, _provider_sources
+from tests.unit.private_v1.test_team_strength_l1 import (
+    archived_l1_authority as archived_l1_authority,
+)
 from tests.unit.private_v1.test_team_strength_l1 import readiness as readiness
 from tests.unit.private_v1.test_team_strength_l1 import request, service
 

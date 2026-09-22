@@ -155,6 +155,12 @@ from dmf_pulse.private_v1.rolling_models import (
     PrivateRollingGameweekInput,
     PrivateV1RollingExecutionInput,
 )
+from dmf_pulse.private_v1.team_strength_diagnostics import (
+    note_stage8_blocked,
+    note_stage8_input,
+    note_stage8_input_failure,
+    note_stage8_projected,
+)
 from dmf_pulse.rules.multi_gameweek import build_multi_gameweek_transfer_rules
 from dmf_pulse.rules.one_gameweek import build_one_gameweek_rules_view
 
@@ -1078,6 +1084,11 @@ def _project_fixtures(
         profiles: tuple[PlayerAllocationProfile, ...]
         prior_identity: PlayerPriorIdentity | None
         binding_sha256: str
+        note_stage8_input(
+            target_gameweek,
+            fixture_number,
+            tuple(item.family for item in constraints_by_fixture[fixture_id]),
+        )
         try:
             stage8 = ScoreDistributionService().project(
                 ScoreDistributionRequest(
@@ -1092,14 +1103,19 @@ def _project_fixtures(
                 )
             )
         except (IngestionError, ValidationError, ValueError) as exc:
+            note_stage8_input_failure(exc)
             raise PrivateV1Error(
                 "STAGE8_INPUT_INVALID", "Stage-8 fixture input is invalid"
             ) from exc
         if stage8.status != "PROJECTED" or stage8.distribution is None:
+            note_stage8_blocked(stage8.error_code)
             raise PrivateV1Error(
                 stage8.error_code or "STAGE8_BLOCKED", "Stage-8 fixture projection is blocked"
             )
         distribution = stage8.distribution
+        note_stage8_projected(
+            prior_fallback=distribution.diagnostics.projection_status == "DEGRADED"
+        )
         stage8_hashes[fixture_id] = distribution.result_sha256
         participation = _participation_scenarios(
             stage7,

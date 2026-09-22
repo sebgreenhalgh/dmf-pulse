@@ -1,8 +1,9 @@
 """Explicit two-world, provider-free 001P experiment; never a normal service factory.
 
-No transport, filesystem, acquisition, model fit, player-prior resolver, or activation
-exists here. The prepared current-model Stage-7 projections are already materialised;
-unprepared manual-minute inputs are rejected by this comparison route.
+No transport, filesystem writes, acquisition, model fit, player-prior resolver, or
+activation exists here. D1 reads only the packaged input search policy for control
+identity. Current-model Stage-7 projections are already materialised; unprepared
+manual-minute inputs are rejected by this comparison route.
 """
 
 from __future__ import annotations
@@ -16,6 +17,8 @@ from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.availability.current_model import CurrentModelFixtureMinutesInput
 from dmf_pulse.football_events.market_constraints import MarketFamily
 from dmf_pulse.ingestion.openfootball.team_strength_data import authenticate, seal
+from dmf_pulse.optimisation.multi_gameweek_models import SearchPolicy
+from dmf_pulse.optimisation.multi_gameweek_policy import load_multi_gameweek_search_policy
 from dmf_pulse.private_v1.one_command import _PrivateV1PreparedRollingContext
 from dmf_pulse.private_v1.rolling import (
     PrivateV1RollingRecommendationService,
@@ -44,6 +47,17 @@ from dmf_pulse.private_v1.team_strength_comparison_models import (
     summarise_movements,
     tactics_hash,
 )
+from dmf_pulse.private_v1.team_strength_diagnostics import (
+    ComparisonReason as FailureReason,
+)
+from dmf_pulse.private_v1.team_strength_diagnostics import (
+    ComparisonStage as FailureStage,
+)
+from dmf_pulse.private_v1.team_strength_diagnostics import (
+    ComparisonTrace,
+    comparison_boundary,
+    note_control_divergence,
+)
 from dmf_pulse.private_v1.team_strength_shadow_inputs import (
     TeamStrengthShadowInput,
     TeamStrengthShadowPreparation,
@@ -58,6 +72,36 @@ class TeamStrengthComparisonRun:
     timings: ComparisonTimings
 
 
+def _input_work_budget_control(
+    execution: PrivateV1RollingExecutionInput, effective: SearchPolicy
+) -> str:
+    """Separate governed inputs from shortlist-dependent request limits (D1).
+
+    Derived limits remain authenticated in each world's optimiser_request_sha256.
+    This changes comparison identities, not any request, solve or classification.
+    """
+    scope = effective.transfer_action_scope
+    return canonical_sha256(
+        {
+            "identity_version": "TEAM_STRENGTH_INPUT_WORK_BUDGET_V1",
+            "input_policy": load_multi_gameweek_search_policy().model_dump(mode="json"),
+            "maximum_transfers_per_deadline": execution.maximum_transfers_per_deadline,
+            "search_scope_mode": execution.search_scope_mode,
+            "continuation_mode": scope.continuation_mode if scope is not None else None,
+            "effective_invariant_settings": effective.model_dump(
+                mode="json",
+                exclude={
+                    "policy_sha256",
+                    "max_transfers_per_node",
+                    "max_actions_per_state",
+                    "max_returned_root_candidates",
+                    "transfer_action_scope",
+                },
+            ),
+        }
+    )
+
+
 def _controls(
     execution: PrivateV1RollingExecutionInput, run: PrivateV1RollingRunResult
 ) -> tuple[tuple[str, str], ...]:
@@ -66,6 +110,9 @@ def _controls(
     controls = _control_hashes(execution, run)
     controls.update(
         {
+            "work_budget": _input_work_budget_control(
+                execution, run.optimiser_request.search_policy
+            ),
             "frozen_execution": execution.semantic_sha256,
             "current_source": current.current_state.semantic_sha256,
             "stage7_inputs": canonical_sha256(lineage.stage7_input_sha256_by_gameweek),
@@ -114,20 +161,27 @@ def _world(
 ) -> PriorWorldResult:
     decision = PrivateV1RollingDecision.model_validate_json(run.decision.model_dump_json())
     rows = decision.by_gameweek
-    signature = seal(
-        DecisionSignature,
-        by_gameweek=rows,
-        action_sha256s=tuple(action_hash(row) for row in rows),
-        tactical_selection_sha256s=tuple(tactics_hash(row) for row in rows),
-        candidate_screen_sha256=_candidate_screen_sha(run)[0],
-        utility=decision.horizon_comparison,
-    )
+    with comparison_boundary(
+        FailureStage.BUILD_DECISION_MATERIALITY, FailureReason.MATERIALITY_COMPARISON_FAILED
+    ):
+        signature = seal(
+            DecisionSignature,
+            by_gameweek=rows,
+            action_sha256s=tuple(action_hash(row) for row in rows),
+            tactical_selection_sha256s=tuple(tactics_hash(row) for row in rows),
+            candidate_screen_sha256=_candidate_screen_sha(run)[0],
+            utility=decision.horizon_comparison,
+        )
+    with comparison_boundary(
+        FailureStage.RECONCILE_HARD_CONTROLS, FailureReason.HARD_CONTROL_DIVERGENCE
+    ):
+        controls = _controls(execution, run)
     return seal(
         PriorWorldResult,
         world=world,
         signature=signature,
         rolling_decision_sha256=decision.semantic_sha256,
-        controls=_controls(execution, run),
+        controls=controls,
         stage8_sha256s=tuple(
             (gw, fixture, digest)
             for gw, fixtures in sorted(
@@ -252,40 +306,63 @@ def _compare_runs(
     alternative: PrivateV1RollingRunResult,
 ) -> TeamStrengthDecisionComparison:
     execution = prepared.rolling_execution
-    if baseline.decision.lineage.rolling_execution_input_sha256 != execution.semantic_sha256 or (
-        alternative.decision.lineage.rolling_execution_input_sha256 != shadow.semantic_sha256
+    with comparison_boundary(
+        FailureStage.RECONCILE_WORLD_BINDINGS, FailureReason.WORLD_BINDING_MISMATCH
     ):
-        raise ValueError("comparison runs do not bind their exact prior worlds")
-    worlds = (
-        _world("LEAGUE_BASELINE", execution, baseline),
-        _world("TEAM_STRENGTH_SHADOW", execution, alternative),
-    )
-    if worlds[0].controls != worlds[1].controls:
-        raise ValueError("prior-world hard controls diverged")
-    rows = _movements(execution, baseline, alternative)
-    movement = summarise_movements(rows)
-    fixtures = _fixture_comparisons(execution, shadow, worlds)
-    return seal(
-        TeamStrengthDecisionComparison,
-        experiment_class="SYNTHETIC_OFFLINE"
-        if execution.current_execution.retention_class == "SYNTHETIC_REPLAY_ALLOWED"
-        else "PRIVATE_TRANSIENT",
-        information_cutoff=prepared.information_cutoff,
-        horizon=execution.horizon_gameweeks,
-        fpl_request_count=prepared.fpl_request_count,
-        odds_request_count=prepared.odds_request_count,
-        baseline_execution_sha256=execution.semantic_sha256,
-        shadow_input_sha256=shadow.semantic_sha256,
-        model_sha256=shadow.artifact.model.semantic_sha256,
-        dataset_mode=shadow.artifact.model.dataset_mode,
-        freshness=shadow.fixtures[0].public_bundle.retrieval_freshness_at_as_of,
-        worlds=worlds,
-        fixtures=fixtures,
-        market_coverage=summarise_coverage(fixtures),
-        player_movements=rows,
-        movement=movement,
-        comparison=compare_signatures(worlds[0].signature, worlds[1].signature, movement),
-    )
+        if (
+            baseline.decision.lineage.rolling_execution_input_sha256 != execution.semantic_sha256
+            or (
+                alternative.decision.lineage.rolling_execution_input_sha256
+                != shadow.semantic_sha256
+            )
+        ):
+            raise ValueError("comparison runs do not bind their exact prior worlds")
+        worlds = (
+            _world("LEAGUE_BASELINE", execution, baseline),
+            _world("TEAM_STRENGTH_SHADOW", execution, alternative),
+        )
+    with comparison_boundary(
+        FailureStage.RECONCILE_HARD_CONTROLS, FailureReason.HARD_CONTROL_DIVERGENCE
+    ):
+        if worlds[0].controls != worlds[1].controls:
+            note_control_divergence(worlds[0].controls, worlds[1].controls)
+            raise ValueError("prior-world hard controls diverged")
+    with comparison_boundary(
+        FailureStage.BUILD_PLAYER_MOVEMENT, FailureReason.PLAYER_PROJECTION_COVERAGE_MISMATCH
+    ):
+        rows = _movements(execution, baseline, alternative)
+        movement = summarise_movements(rows)
+    with comparison_boundary(
+        FailureStage.BUILD_FIXTURE_PRIOR_COMPARISON, FailureReason.STAGE8_HORIZON_COVERAGE_MISMATCH
+    ):
+        fixtures = _fixture_comparisons(execution, shadow, worlds)
+        market_coverage = summarise_coverage(fixtures)
+    with comparison_boundary(
+        FailureStage.BUILD_DECISION_MATERIALITY, FailureReason.MATERIALITY_COMPARISON_FAILED
+    ):
+        materiality = compare_signatures(worlds[0].signature, worlds[1].signature, movement)
+    with comparison_boundary(FailureStage.SEAL_COMPARISON, FailureReason.COMPARISON_SEAL_FAILED):
+        return seal(
+            TeamStrengthDecisionComparison,
+            experiment_class="SYNTHETIC_OFFLINE"
+            if execution.current_execution.retention_class == "SYNTHETIC_REPLAY_ALLOWED"
+            else "PRIVATE_TRANSIENT",
+            information_cutoff=prepared.information_cutoff,
+            horizon=execution.horizon_gameweeks,
+            fpl_request_count=prepared.fpl_request_count,
+            odds_request_count=prepared.odds_request_count,
+            baseline_execution_sha256=execution.semantic_sha256,
+            shadow_input_sha256=shadow.semantic_sha256,
+            model_sha256=shadow.artifact.model.semantic_sha256,
+            dataset_mode=shadow.artifact.model.dataset_mode,
+            freshness=shadow.fixtures[0].public_bundle.retrieval_freshness_at_as_of,
+            worlds=worlds,
+            fixtures=fixtures,
+            market_coverage=market_coverage,
+            player_movements=rows,
+            movement=movement,
+            comparison=materiality,
+        )
 
 
 def _timing(run: PrivateV1RollingRunResult, *, projection: bool) -> Decimal:
@@ -314,6 +391,30 @@ def run_team_strength_shadow_comparison(
     _world_order: tuple[World, World] = ("LEAGUE_BASELINE", "TEAM_STRENGTH_SHADOW"),
 ) -> TeamStrengthComparisonRun | TeamStrengthShadowPreparation:
     """Consume one frozen provider-free preparation; no factories or transports accepted."""
+    trace = ComparisonTrace()
+    with (
+        trace.activate(),
+        comparison_boundary(
+            FailureStage.VALIDATE_COMPARISON_INPUT, FailureReason.COMPARISON_INPUT_INVALID
+        ),
+    ):
+        return _run_comparison(
+            prepared,
+            preparation,
+            preparation_ms=preparation_ms,
+            _world_order=_world_order,
+            trace=trace,
+        )
+
+
+def _run_comparison(
+    prepared: _PrivateV1PreparedRollingContext,
+    preparation: TeamStrengthShadowPreparation,
+    *,
+    preparation_ms: Decimal | None,
+    _world_order: tuple[World, World],
+    trace: ComparisonTrace,
+) -> TeamStrengthComparisonRun | TeamStrengthShadowPreparation:
     started = perf_counter()
     if len(set(_world_order)) != 2 or set(_world_order) != {
         "LEAGUE_BASELINE",
@@ -337,47 +438,70 @@ def run_team_strength_shadow_comparison(
     if preparation.shadow_input is None:
         return preparation
     shadow = preparation.shadow_input
-    _TeamStrengthShadowResolver(shadow).validate_execution(execution)
-    if any(
-        not isinstance(row.stage7, CurrentModelFixtureMinutesInput)
-        for row in horizon_fixtures(execution)
+    with comparison_boundary(
+        FailureStage.VALIDATE_SHADOW_RESOLVER, FailureReason.SHADOW_RESOLVER_INVALID
     ):
-        raise ValueError(
-            "private comparison requires already prepared current-model Stage-7 projections"
-        )
+        _TeamStrengthShadowResolver(shadow).validate_execution(execution)
+    with comparison_boundary(
+        FailureStage.VALIDATE_STAGE7_CONTROL, FailureReason.STAGE7_CONTROL_INVALID
+    ):
+        if any(
+            not isinstance(row.stage7, CurrentModelFixtureMinutesInput)
+            for row in horizon_fixtures(execution)
+        ):
+            raise ValueError(
+                "private comparison requires already prepared current-model Stage-7 projections"
+            )
     frozen_bytes = execution.model_dump_json()
     runs: dict[World, PrivateV1RollingRunResult] = {}
     for world in _world_order:
         # Literal ordinary default, never an emulation through a baseline resolver.
-        service = (
-            PrivateV1RollingRecommendationService()
+        with comparison_boundary(
+            FailureStage.RUN_LEAGUE_BASELINE_WORLD
             if world == "LEAGUE_BASELINE"
-            else PrivateV1RollingRecommendationService(
-                _score_prior_resolver=_TeamStrengthShadowResolver(shadow)
-            )
-        )
-        runs[world] = service.run(execution)
-        if (
-            execution.model_dump_json() != frozen_bytes
-            or prepared.rolling_execution.model_dump_json() != frozen_bytes
+            else FailureStage.RUN_TEAM_STRENGTH_WORLD,
+            FailureReason.BASELINE_WORLD_FAILED
+            if world == "LEAGUE_BASELINE"
+            else FailureReason.TEAM_STRENGTH_WORLD_FAILED,
         ):
-            raise ValueError("frozen execution changed during comparison")
+            trace.start_world(world)
+            service = (
+                PrivateV1RollingRecommendationService()
+                if world == "LEAGUE_BASELINE"
+                else PrivateV1RollingRecommendationService(
+                    _score_prior_resolver=_TeamStrengthShadowResolver(shadow)
+                )
+            )
+            runs[world] = service.run(execution)
+            trace.complete_world(world)
+        with comparison_boundary(
+            FailureStage.RECONCILE_WORLD_BINDINGS, FailureReason.WORLD_BINDING_MISMATCH
+        ):
+            if (
+                execution.model_dump_json() != frozen_bytes
+                or prepared.rolling_execution.model_dump_json() != frozen_bytes
+            ):
+                raise ValueError("frozen execution changed during comparison")
     baseline, alternative = runs["LEAGUE_BASELINE"], runs["TEAM_STRENGTH_SHADOW"]
     comparison = _compare_runs(prepared, shadow, baseline, alternative)
-    projection_times = (_timing(baseline, projection=True), _timing(alternative, projection=True))
-    solve_times = (_timing(baseline, projection=False), _timing(alternative, projection=False))
-    total = Decimal(str((perf_counter() - started) * 1000))
-    return TeamStrengthComparisonRun(
-        comparison=comparison,
-        timings=ComparisonTimings(
-            preparation_ms=preparation_ms,
-            baseline_projection_ms=projection_times[0],
-            baseline_solve_ms=solve_times[0],
-            shadow_projection_ms=projection_times[1],
-            shadow_solve_ms=solve_times[1],
-            comparison_overhead_ms=total - sum((*projection_times, *solve_times), Decimal(0)),
-        ),
-    )
+    with comparison_boundary(FailureStage.BUILD_TIMINGS, FailureReason.COMPARISON_TIMING_FAILED):
+        projection_times = (
+            _timing(baseline, projection=True),
+            _timing(alternative, projection=True),
+        )
+        solve_times = (_timing(baseline, projection=False), _timing(alternative, projection=False))
+        total = Decimal(str((perf_counter() - started) * 1000))
+        return TeamStrengthComparisonRun(
+            comparison=comparison,
+            timings=ComparisonTimings(
+                preparation_ms=preparation_ms,
+                baseline_projection_ms=projection_times[0],
+                baseline_solve_ms=solve_times[0],
+                shadow_projection_ms=projection_times[1],
+                shadow_solve_ms=solve_times[1],
+                comparison_overhead_ms=total - sum((*projection_times, *solve_times), Decimal(0)),
+            ),
+        )
 
 
 def safe_team_strength_summary(run: TeamStrengthComparisonRun) -> dict[str, object]:

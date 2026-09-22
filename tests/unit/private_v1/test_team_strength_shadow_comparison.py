@@ -166,7 +166,7 @@ def test_frozen_prepared_context_mismatch_blocks(comparison_inputs):
     from datetime import timedelta
 
     prepared, preparation = comparison_inputs
-    with pytest.raises(ValueError, match="prepared context"):
+    with pytest.raises(ValueError, match="VALIDATE_COMPARISON_INPUT"):
         run_team_strength_shadow_comparison(
             replace(
                 prepared, information_cutoff=prepared.information_cutoff + timedelta(seconds=1)
@@ -265,7 +265,7 @@ def test_unprepared_manual_stage7_is_not_recomputed(repository_root, tmp_path):
         expected_artifact_sha256=artifact.semantic_sha256,
         fixture_registry=dataset.fixture_registry,
     )
-    with pytest.raises(ValueError, match="already prepared"):
+    with pytest.raises(ValueError, match="VALIDATE_STAGE7_CONTROL"):
         run_team_strength_shadow_comparison(prepared, preparation)
 
 
@@ -319,5 +319,5 @@ def test_frozen_input_mutation_during_solve_fails(comparison_inputs, real_compar
         return baseline
 
     monkeypatch.setattr(PrivateV1RollingRecommendationService, "run", corrupt)
-    with pytest.raises(ValueError, match="changed during"):
+    with pytest.raises(ValueError, match="RECONCILE_WORLD_BINDINGS"):
         run_team_strength_shadow_comparison(prepared, preparation)
