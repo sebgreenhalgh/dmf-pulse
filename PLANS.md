@@ -2342,7 +2342,8 @@ excluded lines. Repeat complete replay authenticates the identical golden. Final
   freshness, P0 season-scoped identity binding, and hard input controls; publish.
 - [x] 001P.03 implementation: two fresh canonical rolling solves, common random numbers, projection movement,
   decision signatures, deterministic materiality/confounding classification, safe summary; publish.
-- [ ] 001P.04: five real optimiser synthetic cases, baseline-purity proof; publish.
+- [x] 001P.04: five real optimiser synthetic cases, baseline-purity proof, fresh 100% direct
+  branch coverage and real external installed-wheel comparison; publish.
 - [ ] 001P.05: adversarial and fresh independent review, remediation, full offline assurance,
   installed-wheel validation, exact-SHA green CI, remote equality and clean handoff.
 

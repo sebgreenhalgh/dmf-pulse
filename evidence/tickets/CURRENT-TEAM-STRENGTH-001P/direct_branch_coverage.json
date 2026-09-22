@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "source_checkpoint": "425db35615aa6992522ddba154796f748925c751",
+  "command": "uv run --frozen --offline python -m coverage run --data-file=review_pack/.coverage-team-strength-001p -m pytest tests/unit/private_v1/test_team_strength_shadow_inputs.py tests/unit/private_v1/test_team_strength_shadow_comparison.py tests/unit/private_v1/test_team_strength_comparison_contracts.py -q --junitxml=review_pack/001p-final-direct.xml",
+  "tests_passed": 64,
+  "elapsed_seconds": 712.19,
+  "fresh_data_file": true,
+  "covered_statements": 484,
+  "statements": 484,
+  "covered_branches": 124,
+  "branches": 124,
+  "branch_percent": 100.0,
+  "excluded_lines": 0,
+  "files": {
+    "team_strength_shadow_inputs.py": {"covered_statements": 162, "statements": 162, "covered_branches": 48, "branches": 48},
+    "team_strength_comparison.py": {"covered_statements": 114, "statements": 114, "covered_branches": 34, "branches": 34},
+    "team_strength_comparison_models.py": {"covered_statements": 208, "statements": 208, "covered_branches": 42, "branches": 42}
+  }
+}

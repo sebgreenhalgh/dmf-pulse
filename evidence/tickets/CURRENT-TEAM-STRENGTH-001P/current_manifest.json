@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 171666,
+      "bytes": 171748,
       "path": "PLANS.md",
-      "sha256": "a88dc0612a5f3e5f4736f2979d57897bc40ce6dbe826969bdd0cbf994e74da32"
+      "sha256": "51f40040899b7fba0727e9b76d48a46079fccf69764781d55db7d0d8cb3deb67"
     },
     {
       "bytes": 2761,
@@ -2561,9 +2561,19 @@
       "sha256": "324259ba04637842cf2d372a16688ed9ea7068447bd55517bc0b8967d87e3a22"
     },
     {
-      "bytes": 3042,
+      "bytes": 3707,
+      "path": "scripts/verify_team_strength_shadow_cases.py",
+      "sha256": "736ce29c7508420c3733e033c18be27a17fdca67d01dce786d48829e8d0d2163"
+    },
+    {
+      "bytes": 4245,
       "path": "scripts/verify_team_strength_shadow_lineage.py",
-      "sha256": "f1030962feaaa1a64a1adfc4549be34d7eb7f1d1969f3cf4127e1e38ed76f858"
+      "sha256": "b0a8581928821111d07d438bfa983d585f90248253bc06738e6ffda8e628b52a"
+    },
+    {
+      "bytes": 6387,
+      "path": "scripts/verify_team_strength_shadow_wheel.py",
+      "sha256": "26065fbe7addaed6e3d55bc9274bcf4cfd6a33310b06e654e0eada7104d4469e"
     },
     {
       "bytes": 5855,

@@ -1,0 +1,15 @@
+{
+  "classification": "TEAM_STRENGTH_ROOT_ACTION_MATERIAL",
+  "clean_environment_outside_repository": true,
+  "comparison_sha256": "d97abcf624a050492ee137659f05fdf767074e6c2e1e928592641d2c13b39278",
+  "installed_import": true,
+  "locked_runtime_only": true,
+  "offline_installation": true,
+  "player_count": 120,
+  "private_live_persistence": false,
+  "production_activation": false,
+  "provider_requests_during_solves": 0,
+  "status": "PASS",
+  "synthetic_only": true,
+  "utility_delta": "-5"
+}

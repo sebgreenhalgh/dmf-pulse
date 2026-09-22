@@ -24,6 +24,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--integration-commit", default="508049a560c0ebc9fad7b65e8be1d9a837b7646f")
+    parser.add_argument("--verify-current-tree", action="store_true")
     args = parser.parse_args()
     assert git("merge-base", PRIVATE, PUBLIC) == COMMON
     integrated = git("rev-parse", args.integration_commit + "^{commit}")
@@ -70,6 +71,25 @@ def main() -> None:
         "provider_calls": 0,
         "production_activation": False,
     }
+    if args.verify_current_tree:
+        current_public_diff = git("diff", "--name-only", PUBLIC, "--", *preserved)
+        assert not current_public_diff, "current public commit-owned content changed"
+        current_private_diff = git("diff", "--name-only", PRIVATE, "--", *private_paths)
+        permitted = {
+            "src/dmf_pulse/private_v1/rolling.py",
+            "src/dmf_pulse/private_v1/service.py",
+            "src/dmf_pulse/private_v1/team_strength_shadow_inputs.py",
+            "src/dmf_pulse/private_v1/team_strength_comparison.py",
+            "src/dmf_pulse/private_v1/team_strength_comparison_models.py",
+        }
+        assert set(current_private_diff.splitlines()) <= permitted
+        report.update(
+            scope="001P_FINAL_CURRENT_TREE_PUBLIC_PRESERVATION_AND_PRIVATE_SCOPE",
+            current_tree_parent=git("rev-parse", "HEAD"),
+            current_public_mismatches=current_public_diff.splitlines(),
+            current_private_changed_paths=current_private_diff.splitlines(),
+            note="Private seam behavior is separately checked by the cross-build baseline regression.",
+        )
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, sort_keys=True))
