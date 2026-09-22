@@ -34,7 +34,9 @@ _R8A_UNMODIFIED_SOURCE_HASHES = {
     # A1 intentionally evolves private_v1/service.py through semantic resolver tests.
     "optimisation/multi_gameweek_solver.py": "0c4f8948b93fd8016088dc2d59e571475f56aa1fa74d77efc113615f1570ad7a",
     "ingestion/odds/parser.py": "d92f7dd0fd2bed1ebc031cdad70d8398de19180de57ddc6a446219521621feb0",
-    "ingestion/odds/client.py": "9dbbd5f6e9c89a38b10bc02da517be088883ac01a1c39a791c9892aed64d28c9",
+    # L1 adds only an explicit single-attempt override; inherited default retry
+    # behavior is separately asserted by test_team_strength_l1.
+    "ingestion/odds/client.py": "a9b483aacd5e3c12a5dbdd049ad5c3dd51f0917a5d867ad1d4237b3c031d1c64",
 }
 
 

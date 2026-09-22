@@ -53,6 +53,11 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/unit/private_v1/test_team_strength_shadow_comparison.py": 650,
     "tests/unit/private_v1/test_team_strength_shadow_cases.py": 1800,
     "tests/unit/private_v1/test_team_strength_shadow_inputs.py": 100,
+    # L1 adds one real two-world/provider-shaped preparation plus authenticated
+    # public readiness tests. Static balancing only; no selection/gate changes.
+    "tests/unit/private_v1/test_team_strength_l1_e2e.py": 1000,
+    "tests/unit/private_v1/test_team_strength_l1.py": 200,
+    "tests/unit/ingestion/openfootball/test_team_strength_current.py": 250,
 }
 
 _GIT_SHA = re.compile(r"^[0-9a-f]{40}$")

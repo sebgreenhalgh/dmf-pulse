@@ -1284,7 +1284,15 @@ class OddsClient:
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         sleeper: Callable[[float], None] = time.sleep,
         monotonic: Callable[[], float] = time.monotonic,
+        maximum_attempts: Literal[1] | None = None,
     ) -> None:
+        # An explicit one-shot operator may narrow, never expand, the accepted
+        # provider retry policy. Ordinary construction retains its exact default.
+        if maximum_attempts is not None and (
+            type(maximum_attempts) is not int or maximum_attempts != 1
+        ):
+            raise ValueError("only a single-attempt override is supported")
+        self._maximum_attempts = maximum_attempts
         self._profile = profile
         self._credential_provider = credential_provider or UnavailableCredentialProvider()
         self._transport_factory = transport_factory
@@ -1360,7 +1368,8 @@ class OddsClient:
         deadline_started = self._monotonic()
         minimum_elapsed_seconds = 0.0
         attempt_request = request
-        for attempt in range(1, config.retry.max_attempts + 1):
+        maximum_attempts = self._maximum_attempts or config.retry.max_attempts
+        for attempt in range(1, maximum_attempts + 1):
             if attempt > 1:
                 refreshed_request, refreshed_elapsed = _bounded_retry_request(
                     request,
@@ -1415,7 +1424,7 @@ class OddsClient:
                     raise IngestionError(
                         "INTERNAL_INVARIANT", "odds client clock must be timezone-aware"
                     ) from None
-                retry_scheduled = safe_error.retryable and attempt < config.retry.max_attempts
+                retry_scheduled = safe_error.retryable and attempt < maximum_attempts
                 next_request: OddsHttpRequest | None = None
                 next_minimum_elapsed = minimum_elapsed_seconds
                 if retry_scheduled:
@@ -1522,7 +1531,7 @@ class OddsClient:
                 retry_scheduled = (
                     response_error.retryable
                     and not quota_blocks_retry
-                    and attempt < config.retry.max_attempts
+                    and attempt < maximum_attempts
                 )
                 delay_seconds = 0
                 if retry_scheduled and response.status_code == 429:

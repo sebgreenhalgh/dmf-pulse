@@ -1,0 +1,14 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001P-L1
+title: One-shot live transient team-strength decision-materiality observation
+status: ACTIVE
+required_base_commit: 338571d535d701cbf0251cfeff23dabe171667d3
+required_branch: readiness/CURRENT-TEAM-STRENGTH-001P-L1-one-shot-live-observation
+approval_reference: DMF-CTS-001P-LIVE-RIGHTS-2026-09-22
+execution_attestation: CURRENT-TEAM-STRENGTH-001P-L1#ONE-SHOT-2026-09-22
+phase_a: implementation, offline acceptance, independent review, push and exact-SHA CI
+phase_b: public readiness followed by at most one private transport-attempt session
+exclusions:
+  - ordinary dmf pulse or production activation
+  - accepted 001A or 001P mathematics changes
+  - private persistence or output redirection
+  - automatic retry, repeated private observations, PR, merge or accepted tag

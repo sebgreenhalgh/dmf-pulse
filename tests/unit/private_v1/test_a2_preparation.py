@@ -54,6 +54,27 @@ pytestmark = pytest.mark.unit
 A2_CUTOFF = datetime(2026, 9, 17, 15, tzinfo=UTC)
 
 
+@pytest.fixture(autouse=True)
+def archived_a2_authority(monkeypatch):
+    """Historical offline A2 tests use their archived purpose, not current L1.
+
+    Runtime A2 rejection against the current L1 profile is separately tested in
+    test_team_strength_l1. No runtime validator or old acceptance is weakened.
+    """
+    profiles = load_odds_rights()
+    profile_id = "the_odds_api_private_analytics_v1"
+    archived = profiles[profile_id].model_copy(
+        update={
+            "approved_at": datetime(2026, 9, 17, 14, 43, 36, tzinfo=UTC),
+            "human_approval_id": A2_APPROVAL_REFERENCE,
+            "approved_purpose": "one private operator-initiated R9C-A2 live transient four-world decision observation using one frozen current information set through the existing three-Gameweek decision pipeline",
+        }
+    )
+    restored = {**profiles, profile_id: archived}
+    monkeypatch.setattr(a2, "load_odds_rights", lambda: restored)
+    monkeypatch.setattr(__name__ + ".load_odds_rights", lambda: restored)
+
+
 def _request(**updates) -> A2OperatorRequest:
     values = {
         "entry_id": 42,

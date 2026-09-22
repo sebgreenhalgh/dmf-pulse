@@ -2352,3 +2352,26 @@ excluded lines. Repeat complete replay authenticates the identical golden. Final
 Scope: explicit shadow comparison only. No live FPL/Odds/OpenFootball action, A2 execution,
 credentials, private live persistence, ordinary CLI/config activation, Stage-8/fitting/R9B
 mathematics changes, PR, merge, tag, or automatic live observation after CI.
+
+## CURRENT-TEAM-STRENGTH-001P-L1 governed one-shot observation
+
+Exact parent: `338571d535d701cbf0251cfeff23dabe171667d3`.
+Approval: `DMF-CTS-001P-LIVE-RIGHTS-2026-09-22`.
+Attestation: `CURRENT-TEAM-STRENGTH-001P-L1#ONE-SHOT-2026-09-22`.
+
+- [x] Verify remote exact parent and create clean isolated L1 branch.
+- [x] Fresh independent provider-purpose review; preserve FPL/OpenFootball authority.
+- [x] Phase A implementation: narrow immutable public discovery/current preparation, exact Odds authority,
+  one-attempt guarded acquisition, provider-closed accepted two-world comparison and safe output.
+- [x] Offline tests, inherited regressions, strict static/build/wheel/coverage/manifests/security gates.
+- [x] Adversarial and independent execution review; all three findings remediated, exact-code
+  verdict CLEAR_FOR_CURRENT_TEAM_STRENGTH_001P_L1_ONE_SHOT_EXECUTION.
+- [ ] Post-seal publication gate: push, exact-SHA all-green CI, remote equality and clean tree;
+  report these post-commit facts at handoff without modifying the sealed tree.
+- [ ] Phase B: current public readiness first; exactly one private invocation only after all gates
+  and an operator-supplied FPL entry. First private transport attempt consumes the approval.
+- [ ] Emit safe terminal result only; stop, never retry or activate.
+
+Public OpenFootball evidence may be retained separately. No live FPL/Odds body, private
+comparison artifact or player catalogue may be written, cached, redirected, committed or uploaded.
+No change to accepted model/Stage-8/001P mathematics or ordinary `dmf pulse`.

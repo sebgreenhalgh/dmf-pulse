@@ -1,0 +1,30 @@
+{
+  "classification": "OFFLINE_GENERATED_DATA_ONLY",
+  "covered_branches": 98,
+  "covered_lines": 405,
+  "excluded_lines": 0,
+  "files": {
+    "src/dmf_pulse/ingestion/openfootball/team_strength_current.py": {
+      "covered_branches": 39,
+      "num_branches": 42
+    },
+    "src/dmf_pulse/private_v1/team_strength_live.py": {
+      "covered_branches": 35,
+      "num_branches": 38
+    },
+    "src/dmf_pulse/private_v1/team_strength_live_authority.py": {
+      "covered_branches": 8,
+      "num_branches": 8
+    },
+    "src/dmf_pulse/private_v1/team_strength_live_network.py": {
+      "covered_branches": 16,
+      "num_branches": 16
+    }
+  },
+  "num_branches": 104,
+  "num_statements": 410,
+  "percent_branches_covered": 94.23076923076923,
+  "principal_vertical_slice": "REAL_STAGE7_AND_TWO_REAL_STAGE8_TO_STAGE11_SOLVES",
+  "private_provider_calls": 0,
+  "ticket": "CURRENT-TEAM-STRENGTH-001P-L1"
+}
