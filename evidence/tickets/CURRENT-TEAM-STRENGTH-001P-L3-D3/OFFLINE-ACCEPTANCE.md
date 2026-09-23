@@ -65,16 +65,28 @@ Run `35914280411` then passed pre-flight and five shards. Parallel-runner timing
 showed D3 at 1,482 seconds, the five-case module still executing after 1,697
 seconds, and an inherited optimiser service at 734 seconds. D3's shard completed
 all 592 tests in 34m38s before cleanup was cancelled; no assertion failure was
-reported in any cancelled shard. D3 and the five-case suite now use standalone
-`6000` weights, R2C retains a conservative `2400` hint so it can safely absorb
-light modules, and the remaining measured heavy modules use conservative
-approximately two-times-wall-time hints. Selection and gates remain unchanged.
+reported in any cancelled shard. D3 and the five-case suite then used standalone
+`6000` weights, R2C received a conservative heavy hint, and the remaining
+measured heavy modules received conservative approximately two-times-wall-time
+hints. Selection and gates remained unchanged.
 Run `35924448502` passed pre-flight and seven shards. Its sole timeout had spent
 about 22 minutes on inherited work before entering the approximately 12-minute
 A2 preparation module; it reported no assertion failure. A2 now has a `2800`
 hint that prevents another 22-minute coassignment without wasting a shard, and
 the last observed inherited 1--4 minute modules have explicit wall-time hints.
 The unchanged complete population remains mandatory.
+Run `35929503354` then passed pre-flight and six shards, including the isolated
+D3 and five-case suites and the rebalanced A2 shard. Its two cancellations
+reported no assertion failure. One reached the L1 end-to-end module after about
+22 minutes and remained there until the job limit; the other reached the shadow
+comparison module after about 27 minutes. The exact logs also exposed a
+previously default-weighted 215-second Odds model-configuration module. L1
+end-to-end and these newly measured inherited modules now have conservative
+static hints so those final slow paths receive materially less coassigned work.
+The same run measured isolated D3 at 25m14s and the five-case suite at 27m10s;
+the final deterministic partition uses only their proven bounded headroom for
+fast coassignment, while the measured L1 end-to-end path receives its own heavy
+tier. No selector, test, timeout or quality gate changes.
 
 The six inherited comparison tests that had asserted the old broad `ValueError`
 ancestry now assert `TeamStrengthComparisonFailure` plus exact safe stage/reason.

@@ -2517,6 +2517,11 @@ Exact parent: `b774056f20e855d7a755186fe62489e3d393ecfe`.
 - [x] Isolate A2 preparation from the 22 minutes of inherited work exposed by
   exact-SHA run `35924448502`, which passed pre-flight and seven shards before
   its sole shard timeout without an assertion failure.
+- [x] Rebalance the remaining L1 end-to-end and shadow-comparison paths exposed
+  by exact-SHA run `35929503354`, which passed pre-flight and six shards,
+  including both D3-specific standalone suites and the A2 assignment, with no
+  assertion failure in its two timed-out shards; use the proven 25m14s D3 and
+  27m10s five-case durations for bounded fast-test coassignment only.
 - [ ] Complete inherited acceptance, independent review, publication and exact-SHA CI.
 
 D3 is offline-only: provider requests and credential inspection remain zero. It

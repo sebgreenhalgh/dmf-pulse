@@ -36,9 +36,9 @@ DEFAULT_NODEID_WEIGHT = 1
 # file took about 940 seconds under branch coverage while several one-gameweek
 # optimiser and prepared-runner modules take about 90-1,200 seconds each.
 FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
-    "tests/assurance/optimisation/test_r2c_artifact_validation.py": 2400,
+    "tests/assurance/optimisation/test_r2c_artifact_validation.py": 3200,
     "tests/assurance/optimisation/test_surface.py": 500,
-    "tests/contract/optimisation/test_r2a_contract_gates.py": 270,
+    "tests/contract/optimisation/test_r2a_contract_gates.py": 500,
     "tests/golden/optimisation/test_golden.py": 500,
     "tests/golden/optimisation/test_three_gameweek_ft_carry.py": 180,
     "tests/integration/availability/test_min007g_service.py": 45,
@@ -50,8 +50,9 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/unit/availability/test_audit0073_cli_semantics.py": 45,
     "tests/unit/availability/test_current_model.py": 180,
     "tests/unit/optimisation/test_r2b_semantics.py": 250,
-    "tests/unit/optimisation/test_service.py": 1500,
+    "tests/unit/optimisation/test_service.py": 2800,
     "tests/unit/optimisation/test_future_transfer_scope.py": 350,
+    "tests/unit/optimisation/test_stage10_r7_factoring.py": 100,
     "tests/unit/optimisation/test_stage11_exact_acceleration.py": 80,
     "tests/unit/optimisation/test_terminal_r7_equivalence.py": 850,
     "tests/unit/optimisation/test_three_gameweek_horizon.py": 130,
@@ -59,12 +60,12 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     # 001P real-model preparation and canonical solves: local branch-coverage
     # comparison measured 587s; the five-case group gets a conservative static
     # estimate. These only balance modules: no selector, timeout or gate changes.
-    "tests/unit/private_v1/test_team_strength_shadow_comparison.py": 1300,
-    "tests/unit/private_v1/test_team_strength_shadow_cases.py": 6000,
+    "tests/unit/private_v1/test_team_strength_shadow_comparison.py": 3000,
+    "tests/unit/private_v1/test_team_strength_shadow_cases.py": 4800,
     "tests/unit/private_v1/test_team_strength_shadow_inputs.py": 150,
     # L1 adds one real two-world/provider-shaped preparation plus authenticated
     # public readiness tests. Static balancing only; no selection/gate changes.
-    "tests/unit/private_v1/test_team_strength_l1_e2e.py": 1350,
+    "tests/unit/private_v1/test_team_strength_l1_e2e.py": 5000,
     "tests/unit/private_v1/test_team_strength_l1.py": 270,
     "tests/unit/ingestion/openfootball/test_team_strength_current.py": 200,
     # D1 run 35760625057: every test passed, but shard 2 hit the 35-minute
@@ -74,7 +75,7 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     # complete collection, artifact verification and coverage gates are unchanged.
     "tests/unit/private_v1/test_a1_03_shadow_comparison.py": 580,
     "tests/unit/private_v1/test_a2_preparation.py": 2800,
-    "tests/unit/private_v1/test_one_command.py": 1300,
+    "tests/unit/private_v1/test_one_command.py": 2400,
     "tests/unit/private_v1/test_team_strength_d1_diagnostics.py": 750,
     # Exact-SHA run 35902055457 exposed additional inherited modules whose
     # node-count estimates understated measured branch-coverage runtime. These
@@ -85,7 +86,10 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": 180,
     "tests/unit/ingestion/test_fpl_current_game_settings.py": 150,
     "tests/unit/ingestion/test_fpl_current_input.py": 450,
+    "tests/unit/ingestion/test_odds_model_config_boundaries.py": 450,
+    "tests/unit/ingestion/test_one_command_assembly.py": 90,
     "tests/unit/markets/test_current_market_contract_invariants.py": 70,
+    "tests/unit/markets/test_current_market_weight_canonicalisation.py": 55,
     "tests/unit/markets/test_current_markets_boundaries.py": 190,
     "tests/unit/markets/test_repository_persistence_boundaries.py": 570,
     "tests/unit/private_v1/test_a1_allocation_injection.py": 470,
@@ -93,14 +97,16 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/unit/private_v1/test_bounded_horizon_oracle.py": 540,
     "tests/unit/private_v1/test_future_scope_assembly.py": 220,
     "tests/unit/private_v1/test_horizon_candidate_oracle.py": 540,
+    "tests/unit/private_v1/test_horizon_markets.py": 60,
+    "tests/unit/private_v1/test_rolling_contracts.py": 50,
     "tests/unit/private_v1/test_rolling_service.py": 190,
     "tests/unit/private_v1/test_score_prior_prefetch.py": 680,
     "tests/unit/private_v1/test_service.py": 140,
     # D3 exact-SHA runs 35889911797 / 35896662500 placed this real prepared-runner
-    # seam after 27m / 24m of inherited work. Its unchanged four generated-context
-    # runs then reached the 35-minute job limit. Use the existing heavy-module
-    # tier to isolate it; collection, selectors and gates remain unchanged.
-    "tests/unit/private_v1/test_team_strength_d3_seam.py": 6000,
+    # seam after 27m / 24m of inherited work. Exact-SHA run 35929503354 measured
+    # the isolated seam at 25m14s and the five-case suite at 27m10s, permitting
+    # only bounded fast coassignment; collection, selectors and gates are unchanged.
+    "tests/unit/private_v1/test_team_strength_d3_seam.py": 4500,
 }
 
 _GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
