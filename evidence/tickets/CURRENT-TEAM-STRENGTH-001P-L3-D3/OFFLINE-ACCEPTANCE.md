@@ -48,8 +48,8 @@ assigns the measured D3 module a static balancing weight. This changes no test
 selection, timeout, coverage gate, production code, or model/decision behavior.
 Run `35896662500` confirmed that a measured-runtime weight alone still left
 approximately 24 minutes of inherited default-weight work beside D3. The D3
-module therefore uses the planner's existing `1800` heavy-module tier to isolate
-the unchanged seam cases rather than weaken tests or widen the job timeout.
+module initially used the planner's existing `1800` heavy-module tier rather
+than weaken tests or widen the job timeout.
 Run `35902055457` then proved that D3 itself completed on its isolated shard, but
 two other shards exposed inherited modules whose node-count estimates materially
 understated their measured branch-coverage runtime. Their exact-SHA measured
@@ -59,8 +59,16 @@ unchanged `not performance` selector and 35-minute job limit.
 Replacement run `35909009743` passed pre-flight and seven of eight shards. Its
 sole remaining timeout contained the legacy R2C assurance module (946 seconds),
 an inherited repository-persistence module (270 seconds), and other measured
-costs; it reached 91% with no assertion failure. R2C now uses the proven `1800`
-heavy tier, and the newly measured inherited costs have explicit static hints.
+costs; it reached 91% with no assertion failure. R2C was moved into the heavy
+tier, and the newly measured inherited costs received explicit static hints.
+Run `35914280411` then passed pre-flight and five shards. Parallel-runner timing
+showed D3 at 1,482 seconds, the five-case module still executing after 1,697
+seconds, and an inherited optimiser service at 734 seconds. D3's shard completed
+all 592 tests in 34m38s before cleanup was cancelled; no assertion failure was
+reported in any cancelled shard. D3 and the five-case suite now use standalone
+`6000` weights, R2C retains a conservative `2400` hint so it can safely absorb
+light modules, and the remaining measured heavy modules use conservative
+approximately two-times-wall-time hints. Selection and gates remain unchanged.
 
 The six inherited comparison tests that had asserted the old broad `ValueError`
 ancestry now assert `TeamStrengthComparisonFailure` plus exact safe stage/reason.

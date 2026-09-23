@@ -36,66 +36,66 @@ DEFAULT_NODEID_WEIGHT = 1
 # file took about 940 seconds under branch coverage while several one-gameweek
 # optimiser and prepared-runner modules take about 90-1,200 seconds each.
 FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
-    "tests/assurance/optimisation/test_r2c_artifact_validation.py": 1800,
-    "tests/assurance/optimisation/test_surface.py": 320,
+    "tests/assurance/optimisation/test_r2c_artifact_validation.py": 2400,
+    "tests/assurance/optimisation/test_surface.py": 500,
     "tests/contract/optimisation/test_r2a_contract_gates.py": 270,
-    "tests/golden/optimisation/test_golden.py": 270,
-    "tests/golden/optimisation/test_three_gameweek_ft_carry.py": 110,
+    "tests/golden/optimisation/test_golden.py": 500,
+    "tests/golden/optimisation/test_three_gameweek_ft_carry.py": 180,
     "tests/integration/availability/test_min007g_service.py": 45,
-    "tests/integration/availability/test_audit0073_cli_mapping.py": 130,
+    "tests/integration/availability/test_audit0073_cli_mapping.py": 190,
     "tests/integration/migrations/test_migrations.py": 65,
-    "tests/integration/optimisation/test_integration.py": 340,
+    "tests/integration/optimisation/test_integration.py": 700,
     "tests/property/optimisation/test_oracle_equivalence.py": 45,
     "tests/unit/availability/test_audit0073_cli_semantics.py": 45,
-    "tests/unit/availability/test_current_model.py": 110,
-    "tests/unit/optimisation/test_r2b_semantics.py": 270,
-    "tests/unit/optimisation/test_service.py": 650,
-    "tests/unit/optimisation/test_future_transfer_scope.py": 240,
-    "tests/unit/optimisation/test_terminal_r7_equivalence.py": 500,
-    "tests/unit/prices/test_configuration_contracts.py": 400,
+    "tests/unit/availability/test_current_model.py": 180,
+    "tests/unit/optimisation/test_r2b_semantics.py": 250,
+    "tests/unit/optimisation/test_service.py": 1500,
+    "tests/unit/optimisation/test_future_transfer_scope.py": 350,
+    "tests/unit/optimisation/test_terminal_r7_equivalence.py": 850,
+    "tests/unit/prices/test_configuration_contracts.py": 550,
     # 001P real-model preparation and canonical solves: local branch-coverage
     # comparison measured 587s; the five-case group gets a conservative static
     # estimate. These only balance modules: no selector, timeout or gate changes.
-    "tests/unit/private_v1/test_team_strength_shadow_comparison.py": 800,
-    "tests/unit/private_v1/test_team_strength_shadow_cases.py": 1800,
-    "tests/unit/private_v1/test_team_strength_shadow_inputs.py": 100,
+    "tests/unit/private_v1/test_team_strength_shadow_comparison.py": 1300,
+    "tests/unit/private_v1/test_team_strength_shadow_cases.py": 6000,
+    "tests/unit/private_v1/test_team_strength_shadow_inputs.py": 150,
     # L1 adds one real two-world/provider-shaped preparation plus authenticated
     # public readiness tests. Static balancing only; no selection/gate changes.
-    "tests/unit/private_v1/test_team_strength_l1_e2e.py": 1000,
-    "tests/unit/private_v1/test_team_strength_l1.py": 200,
-    "tests/unit/ingestion/openfootball/test_team_strength_current.py": 300,
+    "tests/unit/private_v1/test_team_strength_l1_e2e.py": 1350,
+    "tests/unit/private_v1/test_team_strength_l1.py": 270,
+    "tests/unit/ingestion/openfootball/test_team_strength_current.py": 200,
     # D1 run 35760625057: every test passed, but shard 2 hit the 35-minute
     # job limit during cleanup. A2 preparation took 782s and the A1 comparison
     # 290s despite small node counts; ordinary one-command took 476s, and D1
     # diagnostics at least 279s. Static scheduling only: selectors, timeout,
     # complete collection, artifact verification and coverage gates are unchanged.
-    "tests/unit/private_v1/test_a1_03_shadow_comparison.py": 350,
-    "tests/unit/private_v1/test_a2_preparation.py": 900,
-    "tests/unit/private_v1/test_one_command.py": 800,
-    "tests/unit/private_v1/test_team_strength_d1_diagnostics.py": 500,
+    "tests/unit/private_v1/test_a1_03_shadow_comparison.py": 580,
+    "tests/unit/private_v1/test_a2_preparation.py": 1550,
+    "tests/unit/private_v1/test_one_command.py": 1300,
+    "tests/unit/private_v1/test_team_strength_d1_diagnostics.py": 750,
     # Exact-SHA run 35902055457 exposed additional inherited modules whose
     # node-count estimates understated measured branch-coverage runtime. These
     # conservative total-file weights restore runtime-aware distribution only;
     # complete collection, selectors, timeout and quality gates are unchanged.
-    "tests/unit/ingestion/test_current_unified_state_boundaries.py": 300,
-    "tests/unit/ingestion/test_fpl_client.py": 160,
-    "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": 110,
-    "tests/unit/ingestion/test_fpl_current_game_settings.py": 90,
-    "tests/unit/markets/test_current_markets_boundaries.py": 120,
-    "tests/unit/markets/test_repository_persistence_boundaries.py": 400,
-    "tests/unit/private_v1/test_a1_allocation_injection.py": 330,
-    "tests/unit/private_v1/test_a2_live_shadow_observation.py": 120,
-    "tests/unit/private_v1/test_bounded_horizon_oracle.py": 320,
-    "tests/unit/private_v1/test_future_scope_assembly.py": 130,
-    "tests/unit/private_v1/test_horizon_candidate_oracle.py": 320,
-    "tests/unit/private_v1/test_rolling_service.py": 150,
-    "tests/unit/private_v1/test_score_prior_prefetch.py": 420,
-    "tests/unit/private_v1/test_service.py": 90,
+    "tests/unit/ingestion/test_current_unified_state_boundaries.py": 500,
+    "tests/unit/ingestion/test_fpl_client.py": 260,
+    "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": 180,
+    "tests/unit/ingestion/test_fpl_current_game_settings.py": 150,
+    "tests/unit/markets/test_current_markets_boundaries.py": 190,
+    "tests/unit/markets/test_repository_persistence_boundaries.py": 570,
+    "tests/unit/private_v1/test_a1_allocation_injection.py": 470,
+    "tests/unit/private_v1/test_a2_live_shadow_observation.py": 200,
+    "tests/unit/private_v1/test_bounded_horizon_oracle.py": 540,
+    "tests/unit/private_v1/test_future_scope_assembly.py": 220,
+    "tests/unit/private_v1/test_horizon_candidate_oracle.py": 540,
+    "tests/unit/private_v1/test_rolling_service.py": 190,
+    "tests/unit/private_v1/test_score_prior_prefetch.py": 680,
+    "tests/unit/private_v1/test_service.py": 140,
     # D3 exact-SHA runs 35889911797 / 35896662500 placed this real prepared-runner
     # seam after 27m / 24m of inherited work. Its unchanged four generated-context
     # runs then reached the 35-minute job limit. Use the existing heavy-module
     # tier to isolate it; collection, selectors and gates remain unchanged.
-    "tests/unit/private_v1/test_team_strength_d3_seam.py": 1800,
+    "tests/unit/private_v1/test_team_strength_d3_seam.py": 6000,
 }
 
 _GIT_SHA = re.compile(r"^[0-9a-f]{40}$")

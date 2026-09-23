@@ -153,7 +153,7 @@ def test_heavy_override_uses_deterministic_lightest_shard_tie_break() -> None:
     )
     plan = module.build_plan(nodeids, shard_count=2, git_sha=GIT_SHA)
     assert plan["shards"][0]["nodeids"] == [heavy]
-    assert plan["shards"][0]["estimated_weight"] == 1800
+    assert plan["shards"][0]["estimated_weight"] == 2400
     assert plan["shards"][1]["nodeids"] == sorted(nodeids[1:])
 
 
@@ -169,12 +169,12 @@ def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -
     )
     nodeids = tuple(f"{path}::test_synthetic" for path in paths)
     assert [module._estimated_file_weight(path, 1) for path in paths] == [
-        1000,
-        900,
-        800,
-        500,
-        350,
-        1800,
+        1350,
+        1550,
+        1300,
+        750,
+        580,
+        6000,
     ]
     plan = module.build_plan(nodeids, shard_count=3, git_sha=GIT_SHA)
     assert plan == module.build_plan(reversed(nodeids), shard_count=3, git_sha=GIT_SHA)
@@ -190,26 +190,26 @@ def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -
 def test_measured_inherited_costs_are_explicit_static_balancing_hints() -> None:
     module = _module()
     expected = {
-        "tests/golden/optimisation/test_three_gameweek_ft_carry.py": 110,
-        "tests/integration/availability/test_audit0073_cli_mapping.py": 130,
-        "tests/unit/availability/test_current_model.py": 110,
-        "tests/unit/ingestion/test_current_unified_state_boundaries.py": 300,
-        "tests/unit/ingestion/test_fpl_client.py": 160,
-        "tests/unit/ingestion/test_fpl_current_game_settings.py": 90,
-        "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": 110,
-        "tests/unit/markets/test_current_markets_boundaries.py": 120,
-        "tests/unit/markets/test_repository_persistence_boundaries.py": 400,
-        "tests/unit/optimisation/test_future_transfer_scope.py": 240,
-        "tests/unit/optimisation/test_terminal_r7_equivalence.py": 500,
-        "tests/unit/prices/test_configuration_contracts.py": 400,
-        "tests/unit/private_v1/test_a1_allocation_injection.py": 330,
-        "tests/unit/private_v1/test_a2_live_shadow_observation.py": 120,
-        "tests/unit/private_v1/test_bounded_horizon_oracle.py": 320,
-        "tests/unit/private_v1/test_future_scope_assembly.py": 130,
-        "tests/unit/private_v1/test_horizon_candidate_oracle.py": 320,
-        "tests/unit/private_v1/test_rolling_service.py": 150,
-        "tests/unit/private_v1/test_score_prior_prefetch.py": 420,
-        "tests/unit/private_v1/test_service.py": 90,
+        "tests/golden/optimisation/test_three_gameweek_ft_carry.py": 180,
+        "tests/integration/availability/test_audit0073_cli_mapping.py": 190,
+        "tests/unit/availability/test_current_model.py": 180,
+        "tests/unit/ingestion/test_current_unified_state_boundaries.py": 500,
+        "tests/unit/ingestion/test_fpl_client.py": 260,
+        "tests/unit/ingestion/test_fpl_current_game_settings.py": 150,
+        "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": 180,
+        "tests/unit/markets/test_current_markets_boundaries.py": 190,
+        "tests/unit/markets/test_repository_persistence_boundaries.py": 570,
+        "tests/unit/optimisation/test_future_transfer_scope.py": 350,
+        "tests/unit/optimisation/test_terminal_r7_equivalence.py": 850,
+        "tests/unit/prices/test_configuration_contracts.py": 550,
+        "tests/unit/private_v1/test_a1_allocation_injection.py": 470,
+        "tests/unit/private_v1/test_a2_live_shadow_observation.py": 200,
+        "tests/unit/private_v1/test_bounded_horizon_oracle.py": 540,
+        "tests/unit/private_v1/test_future_scope_assembly.py": 220,
+        "tests/unit/private_v1/test_horizon_candidate_oracle.py": 540,
+        "tests/unit/private_v1/test_rolling_service.py": 190,
+        "tests/unit/private_v1/test_score_prior_prefetch.py": 680,
+        "tests/unit/private_v1/test_service.py": 140,
     }
     assert {path: module._estimated_file_weight(path, 1) for path in expected} == expected
 

@@ -2510,6 +2510,10 @@ Exact parent: `b774056f20e855d7a755186fe62489e3d393ecfe`.
 - [x] Isolate legacy R2C and add the last measured inherited costs from
   exact-SHA run `35909009743`, which passed pre-flight and seven shards before
   its sole R2C-heavy shard timed out at 91% without an assertion failure.
+- [x] Account for parallel-runner wall-time expansion observed in exact-SHA run
+  `35914280411` by making D3 and the five-case suite standalone groups, retaining
+  R2C as a measured light-work absorber, and scaling all remaining heavy-module
+  hints conservatively.
 - [ ] Complete inherited acceptance, independent review, publication and exact-SHA CI.
 
 D3 is offline-only: provider requests and credential inspection remain zero. It
