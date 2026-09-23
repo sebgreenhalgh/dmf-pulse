@@ -2526,3 +2526,24 @@ Exact parent: `b774056f20e855d7a755186fe62489e3d393ecfe`.
 
 D3 is offline-only: provider requests and credential inspection remain zero. It
 does not modify model, Stage 8-11, materiality, network-denial or decision semantics.
+
+## CI runtime stabilisation — Phase 1
+
+Exact parent: `42242a886c059fc96b3ed33e8fd4f2521a2379a2`.
+Dedicated branch: `infra/ci-runtime-overhaul-2026-09-24`.
+
+- [x] Verify the canonical D3 baseline and isolate the dedicated remediation branch.
+- [x] Review the prepared three-commit CI-only change for preserved selection, coverage,
+  artifact, acceptance, and fail-closed sentinel semantics.
+- [x] Expand the mandatory branch-coverage matrix from 8 to 16 shards and set only the
+  coverage-shard safety ceiling to 120 minutes.
+- [x] Remove the duplicate PostgreSQL integration and broad GCS-008 pytest reruns while
+  retaining their tests in the exact `not performance` shard population.
+- [x] Prove real collection and a complete, disjoint, exactly-once 16-shard plan.
+- [x] Run focused workflow, shard-helper, validator, Ruff, and repository checks; refresh
+  the active repository manifest for intentional governed file changes.
+- [ ] Commit and push the corrected exact SHA; require its GitHub Actions run to finish green.
+
+No production code, numerical behavior, rules, provider boundary, test case, assertion,
+marker, skip, retry, coverage threshold, PR, merge, or acceptance/tag state changes in this
+phase. Static weight replacement and historical Stage-8/GCS-008 cleanup remain Phase-2 debt.

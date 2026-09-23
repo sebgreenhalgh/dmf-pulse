@@ -26,6 +26,10 @@ MANDATORY_RESULT_VARIABLES = {
     "COMBINED_COVERAGE_RESULT",
     "POST_COVERAGE_RESULT",
 }
+REDUNDANT_PYTEST_COMMANDS = (
+    'uv run pytest -m "postgres and integration" tests/integration',
+    "uv run pytest tests/unit/football_events",
+)
 
 
 def _workflow() -> dict[str, Any]:
@@ -392,6 +396,16 @@ def test_repository_validator_rejects_unsafe_sentinel_mutations(mutation: str) -
     _validator_module()._validate_sharded_coverage_ci_contract(mutated, errors)
     assert errors
     assert any("quality sentinel" in error for error in errors)
+
+
+@pytest.mark.parametrize("command", REDUNDANT_PYTEST_COMMANDS)
+def test_redundant_pytest_populations_cannot_be_reintroduced(command: str) -> None:
+    workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
+    assert command not in workflow
+
+    errors: list[str] = []
+    _validator_module()._validate_sharded_coverage_ci_contract(workflow + "\n" + command, errors)
+    assert any("redundant pytest execution" in error for error in errors)
 
 
 def test_artifact_transport_and_failure_policy_have_no_soft_paths() -> None:

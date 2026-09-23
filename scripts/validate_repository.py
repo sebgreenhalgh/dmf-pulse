@@ -921,6 +921,16 @@ def _validate_sharded_coverage_ci_contract(ci: str, errors: list[str]) -> None:
     if obsolete_monolith in ci:
         errors.append("ci.yml sharded architecture retains the obsolete monolithic coverage run")
 
+    redundant_pytest_commands = (
+        'uv run pytest -m "postgres and integration" tests/integration',
+        "uv run pytest tests/unit/football_events",
+    )
+    for command in redundant_pytest_commands:
+        if command in ci:
+            errors.append(
+                "ci.yml sharded architecture contains redundant pytest execution: " + command
+            )
+
     for match in re.finditer(r"(?m)^\s*timeout-minutes:\s*(\d+)\s*$", ci):
         if int(match.group(1)) > 120:
             errors.append("ci.yml sharded architecture must not increase a job timeout above 120")

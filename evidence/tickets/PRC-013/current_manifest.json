@@ -66,9 +66,9 @@
       "sha256": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2"
     },
     {
-      "bytes": 14896,
+      "bytes": 14508,
       "path": ".github/workflows/ci.yml",
-      "sha256": "2eed6410224fbbc5b7f8fdf35c08fdf566bef4fb8c685d8671cafd531c250c02"
+      "sha256": "49ab292df75f9b9861feac524c0e371f51a8331feeea4e1354323eb458e3be80"
     },
     {
       "bytes": 1740,
@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 183122,
+      "bytes": 184424,
       "path": "PLANS.md",
-      "sha256": "e04090bcc9ae533bfc6b308222b4a0785a7b5fdccdebfee7157b072f27ff1b4f"
+      "sha256": "f3085922dc41369fc009bf8566e0e93bc3dba6bbd3200405a7b64db7ae27cbcc"
     },
     {
       "bytes": 2761,
@@ -2476,9 +2476,9 @@
       "sha256": "dd362da8a9a81be532f0e6901045b6dfca7998d113b5c070a9448e01070d8998"
     },
     {
-      "bytes": 74610,
+      "bytes": 74555,
       "path": "scripts/validate_repository.py",
-      "sha256": "a01073b9cec98ec2019e64288be8726fbc7b3f0360e9397e3710c1987b0b958d"
+      "sha256": "e58c975556a5c28c88c852320f11394eab8c9860968c3ec71dbb0162478a199d"
     },
     {
       "bytes": 8785,
@@ -6851,9 +6851,9 @@
       "sha256": "7bca87167a44f4c9c3c00e9c22c5fd26e3b26aa83cf189e9ff9e9c34c2ff1627"
     },
     {
-      "bytes": 16627,
+      "bytes": 17096,
       "path": "tests/unit/scripts/test_ci_workflow_contract.py",
-      "sha256": "ef1bbd33d0a4ffb95439010085e5bfb0d9cde06bc08c539208b6d62a597784bb"
+      "sha256": "9d116167d1821e753bb81683b7bac389b9af245a3e1c729713ee299c52895457"
     },
     {
       "bytes": 4064,
