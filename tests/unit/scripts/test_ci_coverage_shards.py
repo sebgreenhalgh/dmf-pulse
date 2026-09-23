@@ -174,7 +174,7 @@ def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -
         600,
         400,
         350,
-        700,
+        1800,
     ]
     plan = module.build_plan(nodeids, shard_count=3, git_sha=GIT_SHA)
     assert plan == module.build_plan(reversed(nodeids), shard_count=3, git_sha=GIT_SHA)

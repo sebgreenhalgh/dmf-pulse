@@ -46,6 +46,10 @@ at 93%, immediately after inherited tests and while entering the four real D3
 seam cases; it reported no assertion failure. The deterministic planner now
 assigns the measured D3 module a static balancing weight. This changes no test
 selection, timeout, coverage gate, production code, or model/decision behavior.
+Run `35896662500` confirmed that a measured-runtime weight alone still left
+approximately 24 minutes of inherited default-weight work beside D3. The D3
+module therefore uses the planner's existing `1800` heavy-module tier to isolate
+the unchanged seam cases rather than weaken tests or widen the job timeout.
 
 The six inherited comparison tests that had asserted the old broad `ValueError`
 ancestry now assert `TeamStrengthComparisonFailure` plus exact safe stage/reason.
