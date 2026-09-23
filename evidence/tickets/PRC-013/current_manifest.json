@@ -2291,9 +2291,9 @@
       "sha256": "683d62aff383d66ff66cfdfe278f1744189473155252d0e0b632cc98b291febb"
     },
     {
-      "bytes": 39663,
+      "bytes": 39670,
       "path": "scripts/ci_coverage_shards.py",
-      "sha256": "f0e9ad9a10fea6eaef8fbfdfde7a6455002879149048de78a2c58eab8a85ef5b"
+      "sha256": "df07c1e2ee5f361aad43b938ec96846f8a82eeabb40744604edc6f832a38bdba"
     },
     {
       "bytes": 5852,
@@ -6846,9 +6846,9 @@
       "sha256": "0a12b45a45e943bf148e484fbe3138cce9c151d843184a9dc55a8748a2f3d10f"
     },
     {
-      "bytes": 18396,
+      "bytes": 18397,
       "path": "tests/unit/scripts/test_ci_coverage_shards.py",
-      "sha256": "1c41ff465fbbdbd257813afb650bdbadf4e9e0c8bbb9cc453c47adac9e538673"
+      "sha256": "182d74aba9b3d599e4f1cc222f174395b84e25ccddb935e9b3d83103438f133e"
     },
     {
       "bytes": 16627,
