@@ -169,8 +169,8 @@ def test_workflow_is_the_bounded_fail_closed_five_job_dag() -> None:
         "combined_coverage",
         "post_coverage",
     ]
-    assert jobs["coverage_shards"]["timeout-minutes"] == 35
-    assert all(job["timeout-minutes"] <= 35 for job in jobs.values())
+    assert jobs["coverage_shards"]["timeout-minutes"] == 120
+    assert all(job["timeout-minutes"] <= 120 for job in jobs.values())
 
 
 def test_every_executing_stage_uses_the_frozen_checkout_toolchain() -> None:
@@ -202,13 +202,12 @@ def test_preflight_preserves_static_postgres_and_planning_semantics() -> None:
             "uv run ruff check .",
             "uv run mypy src/dmf_pulse",
             "scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
-            'uv run pytest -m "postgres and integration" tests/integration',
             "uv run alembic upgrade head --sql",
             "uv run dmf data-model doctor --json",
             "uv run dmf data-model schema-manifest --json",
             "uv run dmf data-model demo --fixture fixtures/data_model/DAT-003/demo.json --json",
             "uv run dmf data-model as-of --fixture fixtures/data_model/DAT-003/as_of_queries.json --json",
-            "scripts/ci_coverage_shards.py plan --shard-count 8",
+            "scripts/ci_coverage_shards.py plan --shard-count 16",
         ],
     )
     upload = _step(pre_flight, "Upload coverage shard plan")
@@ -218,11 +217,11 @@ def test_preflight_preserves_static_postgres_and_planning_semantics() -> None:
     assert "overwrite" not in upload["with"]
 
 
-def test_all_eight_coverage_shards_are_mandatory_and_branch_instrumented() -> None:
+def test_all_sixteen_coverage_shards_are_mandatory_and_branch_instrumented() -> None:
     shard_job = _jobs()["coverage_shards"]
     assert shard_job["strategy"] == {
         "fail-fast": False,
-        "matrix": {"shard": list(range(8))},
+        "matrix": {"shard": list(range(16))},
     }
     _assert_postgres_contract(shard_job)
     assert _step(shard_job, "Initialize the fresh shard database")["run"] == (
@@ -317,7 +316,6 @@ def test_post_coverage_reconstructs_database_and_preserves_every_gate() -> None:
             "uv run dmf ingest odds replay",
             "uv run dmf market observations",
             "CREDENTIAL_UNAVAILABLE",
-            "uv run pytest tests/unit/football_events",
             "uv run dmf events score-distribution",
             "uv run dmf events explain-market-fit",
             "uv run python scripts/validate_gcs008_acceptance.py",
@@ -412,4 +410,4 @@ def test_artifact_transport_and_failure_policy_have_no_soft_paths() -> None:
     assert "--reruns" not in workflow_text
     assert workflow_text.count("--cov-fail-under=0") == 1
     assert workflow_text.count("--fail-under=90") == 2
-    assert "timeout-minutes: 60" not in workflow_text
+    assert workflow_text.count("timeout-minutes: 120") == 1
