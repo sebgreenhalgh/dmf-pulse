@@ -208,9 +208,7 @@ def test_measured_inherited_costs_are_explicit_static_balancing_hints() -> None:
         "tests/unit/private_v1/test_score_prior_prefetch.py": 420,
         "tests/unit/private_v1/test_service.py": 90,
     }
-    assert {
-        path: module._estimated_file_weight(path, 1) for path in expected
-    } == expected
+    assert {path: module._estimated_file_weight(path, 1) for path in expected} == expected
 
 
 @pytest.mark.parametrize("shard_count", [True, 0, -1, 5])
