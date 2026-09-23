@@ -91,21 +91,6 @@
       "sha256": "4a85e7700a19dfdfc97bbbc57a78e932c27f9e2d7ae1ebfb597582de71c141ad"
     },
     {
-      "bytes": 68851,
-      "path": ".test-tmp-d3-coverage/001p-compare0/bootstrap.json",
-      "sha256": "ea888dc1a0b8b29419046d927cc0b55481057ea43e5e02537490b35d95d61ffa"
-    },
-    {
-      "bytes": 2943,
-      "path": ".test-tmp-d3-coverage/001p-compare0/fixtures.json",
-      "sha256": "ce0d87eade65e8d7ead06e99667a7d55e9f035cc9c0b987b0e5f286a73c72d2a"
-    },
-    {
-      "bytes": 3460,
-      "path": ".test-tmp-d3-coverage/001p-compare0/manager.json",
-      "sha256": "6b9ad7e0050aa817cc6044074f7ffcaa4e3da0f110272268f65745649731c636"
-    },
-    {
       "bytes": 22690,
       "path": "2026_27_RULES_VERIFICATION_REPORT.md",
       "sha256": "12ee3c80b687a24e26e93bdb371f4588c72b8be427bec67484d9882db949aa51"
