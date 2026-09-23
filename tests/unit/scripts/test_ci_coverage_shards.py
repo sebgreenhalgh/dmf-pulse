@@ -153,7 +153,7 @@ def test_heavy_override_uses_deterministic_lightest_shard_tie_break() -> None:
     )
     plan = module.build_plan(nodeids, shard_count=2, git_sha=GIT_SHA)
     assert plan["shards"][0]["nodeids"] == [heavy]
-    assert plan["shards"][0]["estimated_weight"] == 1050
+    assert plan["shards"][0]["estimated_weight"] == 1800
     assert plan["shards"][1]["nodeids"] == sorted(nodeids[1:])
 
 
@@ -171,8 +171,8 @@ def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -
     assert [module._estimated_file_weight(path, 1) for path in paths] == [
         1000,
         900,
-        600,
-        400,
+        800,
+        500,
         350,
         1800,
     ]
@@ -190,21 +190,24 @@ def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -
 def test_measured_inherited_costs_are_explicit_static_balancing_hints() -> None:
     module = _module()
     expected = {
-        "tests/integration/availability/test_audit0073_cli_mapping.py": 110,
+        "tests/golden/optimisation/test_three_gameweek_ft_carry.py": 110,
+        "tests/integration/availability/test_audit0073_cli_mapping.py": 130,
         "tests/unit/availability/test_current_model.py": 110,
         "tests/unit/ingestion/test_current_unified_state_boundaries.py": 300,
         "tests/unit/ingestion/test_fpl_client.py": 160,
+        "tests/unit/ingestion/test_fpl_current_game_settings.py": 90,
         "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": 110,
         "tests/unit/markets/test_current_markets_boundaries.py": 120,
-        "tests/unit/optimisation/test_future_transfer_scope.py": 200,
-        "tests/unit/optimisation/test_terminal_r7_equivalence.py": 430,
-        "tests/unit/prices/test_configuration_contracts.py": 330,
-        "tests/unit/private_v1/test_a1_allocation_injection.py": 280,
+        "tests/unit/markets/test_repository_persistence_boundaries.py": 400,
+        "tests/unit/optimisation/test_future_transfer_scope.py": 240,
+        "tests/unit/optimisation/test_terminal_r7_equivalence.py": 500,
+        "tests/unit/prices/test_configuration_contracts.py": 400,
+        "tests/unit/private_v1/test_a1_allocation_injection.py": 330,
         "tests/unit/private_v1/test_a2_live_shadow_observation.py": 120,
         "tests/unit/private_v1/test_bounded_horizon_oracle.py": 320,
         "tests/unit/private_v1/test_future_scope_assembly.py": 130,
         "tests/unit/private_v1/test_horizon_candidate_oracle.py": 320,
-        "tests/unit/private_v1/test_rolling_service.py": 120,
+        "tests/unit/private_v1/test_rolling_service.py": 150,
         "tests/unit/private_v1/test_score_prior_prefetch.py": 420,
         "tests/unit/private_v1/test_service.py": 90,
     }

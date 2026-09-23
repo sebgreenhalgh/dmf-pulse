@@ -2507,6 +2507,9 @@ Exact parent: `b774056f20e855d7a755186fe62489e3d393ecfe`.
 - [x] Calibrate inherited slow-module weights from exact-SHA run `35902055457`
   after the isolated D3 shard passed and two redistributed shards exposed
   materially understated node-count costs.
+- [x] Isolate legacy R2C and add the last measured inherited costs from
+  exact-SHA run `35909009743`, which passed pre-flight and seven shards before
+  its sole R2C-heavy shard timed out at 91% without an assertion failure.
 - [ ] Complete inherited acceptance, independent review, publication and exact-SHA CI.
 
 D3 is offline-only: provider requests and credential inspection remain zero. It

@@ -56,6 +56,11 @@ understated their measured branch-coverage runtime. Their exact-SHA measured
 costs are now represented by deterministic static total-file hints. This remains
 scheduling-only: all 5,297 eligible nodeids stay complete and disjoint under the
 unchanged `not performance` selector and 35-minute job limit.
+Replacement run `35909009743` passed pre-flight and seven of eight shards. Its
+sole remaining timeout contained the legacy R2C assurance module (946 seconds),
+an inherited repository-persistence module (270 seconds), and other measured
+costs; it reached 91% with no assertion failure. R2C now uses the proven `1800`
+heavy tier, and the newly measured inherited costs have explicit static hints.
 
 The six inherited comparison tests that had asserted the old broad `ValueError`
 ancestry now assert `TeamStrengthComparisonFailure` plus exact safe stage/reason.
