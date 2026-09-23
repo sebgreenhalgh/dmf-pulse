@@ -21,6 +21,11 @@ from dmf_pulse.private_v1.team_strength_comparison import (
     run_team_strength_shadow_comparison,
     safe_team_strength_summary,
 )
+from dmf_pulse.private_v1.team_strength_diagnostics import (
+    ComparisonReason,
+    ComparisonStage,
+    TeamStrengthComparisonFailure,
+)
 from dmf_pulse.private_v1.team_strength_shadow_inputs import (
     TeamStrengthShadowPreparation,
     prepare_team_strength_shadow,
@@ -158,21 +163,25 @@ def test_unavailable_world_never_runs_solver(comparison_inputs, monkeypatch):
     ],
 )
 def test_invalid_execution_options_fail_before_solve(comparison_inputs, updates):
-    with pytest.raises(ValueError):
+    with pytest.raises(TeamStrengthComparisonFailure) as caught:
         run_team_strength_shadow_comparison(*comparison_inputs, **updates)
+    assert caught.value.diagnostic.stage == ComparisonStage.VALIDATE_COMPARISON_INPUT
+    assert caught.value.diagnostic.reason == ComparisonReason.COMPARISON_INPUT_INVALID
 
 
 def test_frozen_prepared_context_mismatch_blocks(comparison_inputs):
     from datetime import timedelta
 
     prepared, preparation = comparison_inputs
-    with pytest.raises(ValueError, match="VALIDATE_COMPARISON_INPUT"):
+    with pytest.raises(TeamStrengthComparisonFailure) as caught:
         run_team_strength_shadow_comparison(
             replace(
                 prepared, information_cutoff=prepared.information_cutoff + timedelta(seconds=1)
             ),
             preparation,
         )
+    assert caught.value.diagnostic.stage == ComparisonStage.VALIDATE_COMPARISON_INPUT
+    assert caught.value.diagnostic.reason == ComparisonReason.COMPARISON_INPUT_INVALID
 
 
 @pytest.mark.parametrize(
@@ -265,8 +274,10 @@ def test_unprepared_manual_stage7_is_not_recomputed(repository_root, tmp_path):
         expected_artifact_sha256=artifact.semantic_sha256,
         fixture_registry=dataset.fixture_registry,
     )
-    with pytest.raises(ValueError, match="VALIDATE_STAGE7_CONTROL"):
+    with pytest.raises(TeamStrengthComparisonFailure) as caught:
         run_team_strength_shadow_comparison(prepared, preparation)
+    assert caught.value.diagnostic.stage == ComparisonStage.VALIDATE_STAGE7_CONTROL
+    assert caught.value.diagnostic.reason == ComparisonReason.STAGE7_CONTROL_INVALID
 
 
 def test_projection_and_stage8_coverage_divergence_fail(comparison_inputs, real_comparison):
@@ -319,5 +330,7 @@ def test_frozen_input_mutation_during_solve_fails(comparison_inputs, real_compar
         return baseline
 
     monkeypatch.setattr(PrivateV1RollingRecommendationService, "run", corrupt)
-    with pytest.raises(ValueError, match="RECONCILE_WORLD_BINDINGS"):
+    with pytest.raises(TeamStrengthComparisonFailure) as caught:
         run_team_strength_shadow_comparison(prepared, preparation)
+    assert caught.value.diagnostic.stage == ComparisonStage.RECONCILE_WORLD_BINDINGS
+    assert caught.value.diagnostic.reason == ComparisonReason.WORLD_BINDING_MISMATCH

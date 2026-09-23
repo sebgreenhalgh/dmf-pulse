@@ -1,7 +1,7 @@
-"""Historical L1/L2 operator experiment, never selected by ordinary dmf pulse.
+"""Historical L1/L2/L3 operator experiment, never selected by ordinary dmf pulse.
 
-Both live authorities are consumed. Legacy L1 names and the historical run identity
-remain for offline regression only; D2 adds closed wrapper-failure localisation.
+All three live authorities are consumed. Legacy L1 names and the historical run
+identity remain for offline regression only; D3 repairs diagnostic transport.
 
 Only an allowlisted summary escapes. The prepared-context callback completes via
 a private exception carrying that summary, because the inherited callback return
@@ -55,6 +55,7 @@ from dmf_pulse.private_v1.one_command import (
     PrivateV1OneCommandService,
     _PrivateV1PreparedRollingContext,
 )
+from dmf_pulse.private_v1.prepared_control import PreparedRollingControlFlow
 from dmf_pulse.private_v1.progress import ProgressSink
 from dmf_pulse.private_v1.team_strength_comparison import (
     TeamStrengthComparisonRun,
@@ -108,6 +109,9 @@ class L1Reason(StrEnum):
     CREDENTIAL_UNAVAILABLE = "CREDENTIAL_UNAVAILABLE"
     FROZEN_CONTEXT_FAILED = "FROZEN_CONTEXT_FAILED"
     SHADOW_UNAVAILABLE = "SHADOW_UNAVAILABLE"
+    CURRENT_ARTIFACT_UNAVAILABLE = "CURRENT_ARTIFACT_UNAVAILABLE"
+    CURRENT_SOURCE_ASSESSMENT_UNAVAILABLE = "CURRENT_SOURCE_ASSESSMENT_UNAVAILABLE"
+    INCOMPLETE_FIXTURE_COVERAGE = "INCOMPLETE_FIXTURE_COVERAGE"
     TWO_WORLD_COMPARISON_FAILED = "TWO_WORLD_COMPARISON_FAILED"
     SAFE_SUMMARY_FAILED = "SAFE_SUMMARY_FAILED"
     COMPARISON_INVOCATION_FAILED = "COMPARISON_INVOCATION_FAILED"
@@ -128,13 +132,13 @@ class L1OperatorRequest:
     readiness_sha256: str
 
 
-class _ObservationComplete(Exception):
+class _ObservationComplete(PreparedRollingControlFlow):
     def __init__(self, summary: dict[str, object]) -> None:
         super().__init__("safe observation complete")
         self.summary = summary
 
 
-class _LiveWrapperFailure(ValueError):
+class _LiveWrapperFailure(PreparedRollingControlFlow):
     """Closed wrapper failure; no nested exception text is retained or emitted."""
 
     def __init__(self, stage: L1Stage, reason: L1Reason) -> None:
@@ -152,6 +156,13 @@ _PROVIDER_COUNTER_ORDER = (
     "LEAGUE_ACQUISITIONS",
     "DENIED_SENDS",
 )
+
+_SHADOW_PREPARATION_FAILURES = {
+    "SOURCE_STALE": L1Reason.SOURCE_STALE,
+    "CURRENT_ARTIFACT_UNAVAILABLE": L1Reason.CURRENT_ARTIFACT_UNAVAILABLE,
+    "CURRENT_SOURCE_ASSESSMENT_UNAVAILABLE": L1Reason.CURRENT_SOURCE_ASSESSMENT_UNAVAILABLE,
+    "INCOMPLETE_FIXTURE_COVERAGE": L1Reason.INCOMPLETE_FIXTURE_COVERAGE,
+}
 
 
 def _counter_deltas(before: tuple[int, ...], after: tuple[int, ...]) -> dict[str, int]:
@@ -536,7 +547,16 @@ class TeamStrengthL1ObservationService:
                     source_assessment=assessment,
                 )
                 if preparation.shadow_input is None:
-                    raise ValueError("complete shadow unavailable")
+                    raise _LiveWrapperFailure(
+                        L1Stage.PREPARE_TEAM_STRENGTH_SHADOW,
+                        _SHADOW_PREPARATION_FAILURES.get(
+                            preparation.reason, L1Reason.SHADOW_UNAVAILABLE
+                        ),
+                    )
+                stage, reason = (
+                    L1Stage.INVOKE_TWO_WORLD_COMPARISON,
+                    L1Reason.COMPARISON_INVOCATION_FAILED,
+                )
                 run, before, after = self._invoke_two_world_comparison(prepared, preparation, gate)
                 stage, reason = (
                     L1Stage.BUILD_SAFE_SUCCESS_SUMMARY,
@@ -581,6 +601,7 @@ class TeamStrengthL1ObservationService:
                 **self._blocked(L1Stage.VALIDATE_RIGHTS, L1Reason.AUTHORITY_CONSUMED),
                 "prior_l1_one_shot_consumed": True,
                 "prior_l2_one_shot_consumed": True,
+                "prior_l3_one_shot_consumed": True,
                 "fresh_live_authorization_required": True,
             }
         except TeamStrengthComparisonFailure as failure:

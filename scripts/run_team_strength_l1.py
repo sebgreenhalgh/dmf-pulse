@@ -1,6 +1,6 @@
-"""Separate public preflight and terminal-only private L3 observation.
+"""Public preflight and disabled historical private observation surface.
 
-Legacy filename retained; L1/L2 are consumed and the exact L3 pair is current.
+Legacy filename retained; L1/L2/L3 are consumed and no current pair exists.
 This script has no retry loop, output-file option, normal CLI registration, model
 selector, scenario-count override or player-allocation override.
 """
@@ -34,9 +34,7 @@ class _Parser(argparse.ArgumentParser):
 
 
 def parser() -> argparse.ArgumentParser:
-    result = _Parser(
-        description="Separate public readiness and one-shot private CTS L3 observation"
-    )
+    result = _Parser(description="Public readiness and disabled historical CTS observation surface")
     commands = result.add_subparsers(dest="command", required=True, parser_class=_Parser)
     public = commands.add_parser("public-preflight")
     public.add_argument("--commit", required=True)

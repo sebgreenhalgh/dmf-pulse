@@ -67,6 +67,7 @@ from dmf_pulse.private_v1.models import (
     seal_execution_input,
     seal_fixture_score_prior,
 )
+from dmf_pulse.private_v1.prepared_control import PreparedRollingControlFlow
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 from dmf_pulse.private_v1.reporting import render_transfer_frontier
 from dmf_pulse.private_v1.rolling import (
@@ -890,6 +891,10 @@ class PrivateV1OneCommandService:
             self._progress.message("Recommendation ready")
             self._progress.finish()
             return result
+        except PreparedRollingControlFlow:
+            # Explicit experimental callback control flow is handled only by
+            # its owning outer service. It is not ordinary input invalidity.
+            raise
         except PrivateV1Error as exc:
             if not self._progress.failure_reported:
                 self._progress.failure("one-command recommendation", exc.code)

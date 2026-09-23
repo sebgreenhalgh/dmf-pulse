@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 from dmf_pulse.football_events.market_constraints import MarketFamily
 from dmf_pulse.football_events.service import ScoreDistributionError
 from dmf_pulse.private_v1.errors import PrivateV1Error
+from dmf_pulse.private_v1.prepared_control import PreparedRollingControlFlow
 
 World = Literal["LEAGUE_BASELINE", "TEAM_STRENGTH_SHADOW"]
 
@@ -142,7 +143,7 @@ class ComparisonFailureDiagnostic(BaseModel):
         return self
 
 
-class TeamStrengthComparisonFailure(ValueError):
+class TeamStrengthComparisonFailure(PreparedRollingControlFlow):
     """Only the frozen closed diagnostic is serializable; exception text is unused."""
 
     def __init__(self, diagnostic: ComparisonFailureDiagnostic) -> None:

@@ -1,0 +1,12 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001P-L3-D3
+status: ACTIVE
+implementation_parent: b774056f20e855d7a755186fe62489e3d393ecfe
+branch: readiness/CURRENT-TEAM-STRENGTH-001P-L3-D3-prepared-runner-diagnostic-propagation
+scope: offline prepared-runner exception transport and fallback diagnostics only
+historical_l1_consumed: true
+historical_l2_consumed: true
+historical_l3_consumed: true
+new_live_authority: false
+provider_access: false
+production_activation: false
+required_review: CLEAR_FOR_TEAM_STRENGTH_L4_REAUTHORIZATION_DECISION

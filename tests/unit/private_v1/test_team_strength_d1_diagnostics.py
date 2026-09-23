@@ -305,6 +305,7 @@ def test_consumed_authority_blocks_before_any_credentials_or_provider():
     )
     assert result["reason"] == "AUTHORITY_CONSUMED" and result["prior_l1_one_shot_consumed"]
     assert result["prior_l2_one_shot_consumed"]
+    assert result["prior_l3_one_shot_consumed"]
     assert result["fpl_requests"] == result["odds_requests"] == 0
     assert not result["private_attempt_consumed"] and result["fresh_live_authorization_required"]
 

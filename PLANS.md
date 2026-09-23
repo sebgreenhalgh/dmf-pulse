@@ -2488,3 +2488,21 @@ Exact parent: `d2a5e49c1e6b95b89bdcbf5ef23f05ecb67e00db`.
 
 Phase A performs no private provider access and does not consume L3. The human
 operator alone executes Phase B locally.
+
+## CURRENT-TEAM-STRENGTH-001P-L3-D3 prepared-runner diagnostic propagation
+
+Exact parent: `b774056f20e855d7a755186fe62489e3d393ecfe`.
+
+- [x] Reproduce the parent `ValueError` interception mechanism at the real prepared
+  callback seam without claiming the erased historical L3 reason.
+- [x] Separate approved prepared-runner control flow from ordinary input errors.
+- [x] Preserve D1 diagnostics, D2 wrapper failures and successful completion through
+  the real one-command callback boundary.
+- [x] Keep ordinary `ValueError` sanitisation as `ONE_COMMAND_INPUT_INVALID`.
+- [x] Advance the fallback state before comparison invocation and preserve all four
+  finite shadow-preparation reasons.
+- [x] Mark L1, L2 and L3 permanently consumed; create no L4 authority.
+- [ ] Complete inherited acceptance, independent review, publication and exact-SHA CI.
+
+D3 is offline-only: provider requests and credential inspection remain zero. It
+does not modify model, Stage 8-11, materiality, network-denial or decision semantics.

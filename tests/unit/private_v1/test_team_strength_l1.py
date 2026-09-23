@@ -87,10 +87,11 @@ def test_invalid_authority_or_input_never_reaches_provider(readiness, changes):
     assert "42" not in json.dumps(result)
 
 
-def test_both_historical_purposes_consumed_and_old_a2_runtime_rejected():
+def test_all_three_historical_purposes_consumed_and_old_a2_runtime_rejected():
     for approval, attestation in (
         (authority.L1_APPROVAL, authority.L1_ATTESTATION),
         (authority.L2_APPROVAL, authority.L2_ATTESTATION),
+        (authority.L3_APPROVAL, authority.L3_ATTESTATION),
     ):
         with pytest.raises(authority.ConsumedL1ApprovalError):
             authority.validate_l1_authority(
@@ -226,6 +227,60 @@ def test_repeated_acquisition_or_unreconciled_context_is_rejected(readiness, mon
     monkeypatch.setattr(live, "PrivateV1OneCommandService", ErroneousCaller)
     result = offline_run(service(), request(readiness), readiness)
     assert result["reason"] == "FROZEN_CONTEXT_FAILED" and not result["private_attempt_consumed"]
+
+
+@pytest.mark.parametrize(
+    "reason,status",
+    [
+        ("SOURCE_STALE", "TEAM_STRENGTH_WORLD_UNAVAILABLE"),
+        ("CURRENT_ARTIFACT_UNAVAILABLE", "TEAM_STRENGTH_WORLD_UNAVAILABLE"),
+        ("CURRENT_SOURCE_ASSESSMENT_UNAVAILABLE", "TEAM_STRENGTH_WORLD_UNAVAILABLE"),
+        (
+            "INCOMPLETE_FIXTURE_COVERAGE",
+            "TEAM_STRENGTH_COMPARISON_BLOCKED_INCOMPLETE_FIXTURE_COVERAGE",
+        ),
+    ],
+)
+def test_shadow_preparation_safe_reason_is_preserved(readiness, monkeypatch, reason, status):
+    from types import SimpleNamespace
+
+    from dmf_pulse.ingestion.fpl.direct import DirectFplRunAttestation
+    from dmf_pulse.private_v1.progress import NullProgress
+    from dmf_pulse.private_v1.team_strength_shadow_inputs import TeamStrengthShadowPreparation
+
+    unavailable = seal(TeamStrengthShadowPreparation, status=status, reason=reason)
+
+    class PreparedCaller:
+        def __init__(self, **kwargs):
+            self.options = kwargs
+
+        def run(self, request):
+            del request
+            options = self.options
+            options["direct_client_factory"](DirectFplRunAttestation(attested_at=STAMP))
+            options["odds_service_factory"](options["clock"]).acquire(
+                information_cutoff=STAMP,
+                commence_to=STAMP + timedelta(days=1),
+            )
+            options["score_service_factory"](options["clock"]).build(None)
+            options["_prepared_rolling_runner"](
+                SimpleNamespace(
+                    fpl_request_count=0,
+                    odds_request_count=0,
+                    score_prior_acquisition_count=1,
+                    rolling_execution=object(),
+                ),
+                progress=NullProgress(),
+            )
+
+    monkeypatch.setattr(live.CurrentOddsTransientService, "acquire", lambda *args, **kwargs: None)
+    monkeypatch.setattr(live.CurrentScorePriorService, "build", lambda *args, **kwargs: None)
+    monkeypatch.setattr(live, "PrivateV1OneCommandService", PreparedCaller)
+    monkeypatch.setattr(live, "prepare_team_strength_shadow", lambda *args, **kwargs: unavailable)
+    result = offline_run(service(), request(readiness), readiness)
+    assert result["stage"] == "PREPARE_TEAM_STRENGTH_SHADOW"
+    assert result["reason"] == reason
+    assert not result["comparison_invocation_started"]
 
 
 def test_stale_public_source_never_consumes(readiness):
