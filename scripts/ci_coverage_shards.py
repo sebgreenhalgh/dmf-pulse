@@ -67,6 +67,11 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/unit/private_v1/test_a2_preparation.py": 900,
     "tests/unit/private_v1/test_one_command.py": 600,
     "tests/unit/private_v1/test_team_strength_d1_diagnostics.py": 400,
+    # D3 exact-SHA run 35889911797 placed this real prepared-runner seam on a
+    # default-weight shard after 27 minutes of inherited work. Its four full
+    # generated-context runs then reached the 35-minute job limit. Balance the
+    # measured module explicitly; collection, selectors and gates are unchanged.
+    "tests/unit/private_v1/test_team_strength_d3_seam.py": 700,
 }
 
 _GIT_SHA = re.compile(r"^[0-9a-f]{40}$")

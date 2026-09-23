@@ -165,6 +165,7 @@ def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -
         "tests/unit/private_v1/test_one_command.py",
         "tests/unit/private_v1/test_team_strength_d1_diagnostics.py",
         "tests/unit/private_v1/test_a1_03_shadow_comparison.py",
+        "tests/unit/private_v1/test_team_strength_d3_seam.py",
     )
     nodeids = tuple(f"{path}::test_synthetic" for path in paths)
     assert [module._estimated_file_weight(path, 1) for path in paths] == [
@@ -173,6 +174,7 @@ def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -
         600,
         400,
         350,
+        700,
     ]
     plan = module.build_plan(nodeids, shard_count=3, git_sha=GIT_SHA)
     assert plan == module.build_plan(reversed(nodeids), shard_count=3, git_sha=GIT_SHA)

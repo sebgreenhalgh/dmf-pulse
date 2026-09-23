@@ -40,6 +40,13 @@ consumed, and no L4 authority exists.
 - Repository validator: passed with zero errors.
 - Capped deterministic review pack: 20 entries.
 
+Exact-SHA run `35889911797` proved the corrected clean manifest and passed seven
+of eight coverage shards. The remaining shard reached its 35-minute job limit
+at 93%, immediately after inherited tests and while entering the four real D3
+seam cases; it reported no assertion failure. The deterministic planner now
+assigns the measured D3 module a static balancing weight. This changes no test
+selection, timeout, coverage gate, production code, or model/decision behavior.
+
 The six inherited comparison tests that had asserted the old broad `ValueError`
 ancestry now assert `TeamStrengthComparisonFailure` plus exact safe stage/reason.
 No production mathematics changed to satisfy those tests.
