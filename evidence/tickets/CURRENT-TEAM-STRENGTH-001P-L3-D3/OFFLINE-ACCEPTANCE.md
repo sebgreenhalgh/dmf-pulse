@@ -69,6 +69,12 @@ reported in any cancelled shard. D3 and the five-case suite now use standalone
 `6000` weights, R2C retains a conservative `2400` hint so it can safely absorb
 light modules, and the remaining measured heavy modules use conservative
 approximately two-times-wall-time hints. Selection and gates remain unchanged.
+Run `35924448502` passed pre-flight and seven shards. Its sole timeout had spent
+about 22 minutes on inherited work before entering the approximately 12-minute
+A2 preparation module; it reported no assertion failure. A2 now has a `2800`
+hint that prevents another 22-minute coassignment without wasting a shard, and
+the last observed inherited 1--4 minute modules have explicit wall-time hints.
+The unchanged complete population remains mandatory.
 
 The six inherited comparison tests that had asserted the old broad `ValueError`
 ancestry now assert `TeamStrengthComparisonFailure` plus exact safe stage/reason.

@@ -44,6 +44,7 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/integration/availability/test_min007g_service.py": 45,
     "tests/integration/availability/test_audit0073_cli_mapping.py": 190,
     "tests/integration/migrations/test_migrations.py": 65,
+    "tests/integration/markets/test_current_market_identity_readonly.py": 220,
     "tests/integration/optimisation/test_integration.py": 700,
     "tests/property/optimisation/test_oracle_equivalence.py": 45,
     "tests/unit/availability/test_audit0073_cli_semantics.py": 45,
@@ -51,7 +52,9 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/unit/optimisation/test_r2b_semantics.py": 250,
     "tests/unit/optimisation/test_service.py": 1500,
     "tests/unit/optimisation/test_future_transfer_scope.py": 350,
+    "tests/unit/optimisation/test_stage11_exact_acceleration.py": 80,
     "tests/unit/optimisation/test_terminal_r7_equivalence.py": 850,
+    "tests/unit/optimisation/test_three_gameweek_horizon.py": 130,
     "tests/unit/prices/test_configuration_contracts.py": 550,
     # 001P real-model preparation and canonical solves: local branch-coverage
     # comparison measured 587s; the five-case group gets a conservative static
@@ -70,7 +73,7 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     # diagnostics at least 279s. Static scheduling only: selectors, timeout,
     # complete collection, artifact verification and coverage gates are unchanged.
     "tests/unit/private_v1/test_a1_03_shadow_comparison.py": 580,
-    "tests/unit/private_v1/test_a2_preparation.py": 1550,
+    "tests/unit/private_v1/test_a2_preparation.py": 2800,
     "tests/unit/private_v1/test_one_command.py": 1300,
     "tests/unit/private_v1/test_team_strength_d1_diagnostics.py": 750,
     # Exact-SHA run 35902055457 exposed additional inherited modules whose
@@ -81,6 +84,8 @@ FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
     "tests/unit/ingestion/test_fpl_client.py": 260,
     "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": 180,
     "tests/unit/ingestion/test_fpl_current_game_settings.py": 150,
+    "tests/unit/ingestion/test_fpl_current_input.py": 450,
+    "tests/unit/markets/test_current_market_contract_invariants.py": 70,
     "tests/unit/markets/test_current_markets_boundaries.py": 190,
     "tests/unit/markets/test_repository_persistence_boundaries.py": 570,
     "tests/unit/private_v1/test_a1_allocation_injection.py": 470,
