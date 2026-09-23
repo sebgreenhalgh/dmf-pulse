@@ -2504,6 +2504,9 @@ Exact parent: `b774056f20e855d7a755186fe62489e3d393ecfe`.
 - [x] Mark L1, L2 and L3 permanently consumed; create no L4 authority.
 - [x] Give the measured full-seam D3 module a static CI balancing weight without
   changing collection, selectors, timeouts or quality gates.
+- [x] Calibrate inherited slow-module weights from exact-SHA run `35902055457`
+  after the isolated D3 shard passed and two redistributed shards exposed
+  materially understated node-count costs.
 - [ ] Complete inherited acceptance, independent review, publication and exact-SHA CI.
 
 D3 is offline-only: provider requests and credential inspection remain zero. It

@@ -50,6 +50,12 @@ Run `35896662500` confirmed that a measured-runtime weight alone still left
 approximately 24 minutes of inherited default-weight work beside D3. The D3
 module therefore uses the planner's existing `1800` heavy-module tier to isolate
 the unchanged seam cases rather than weaken tests or widen the job timeout.
+Run `35902055457` then proved that D3 itself completed on its isolated shard, but
+two other shards exposed inherited modules whose node-count estimates materially
+understated their measured branch-coverage runtime. Their exact-SHA measured
+costs are now represented by deterministic static total-file hints. This remains
+scheduling-only: all 5,297 eligible nodeids stay complete and disjoint under the
+unchanged `not performance` selector and 35-minute job limit.
 
 The six inherited comparison tests that had asserted the old broad `ValueError`
 ancestry now assert `TeamStrengthComparisonFailure` plus exact safe stage/reason.
