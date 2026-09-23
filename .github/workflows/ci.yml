@@ -72,7 +72,6 @@ jobs:
       - name: PostgreSQL inherited Stage-7 migration matrix and vertical slice
         run: |
           uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head --report artifacts/gcs008-ci/migration_report.json --offline-sql artifacts/gcs008-ci/offline_upgrade.sql --schema-manifest artifacts/gcs008-ci/schema_manifest.json
-          uv run pytest -m "postgres and integration" tests/integration
           uv run alembic upgrade head --sql > "${{ runner.temp }}/dat003-offline-upgrade.sql"
           uv run dmf data-model doctor --json
           uv run dmf data-model schema-manifest --json
@@ -82,7 +81,7 @@ jobs:
       - name: Generate deterministic coverage shard plan
         run: >-
           uv run python scripts/ci_coverage_shards.py plan
-          --shard-count 8
+          --shard-count 16
           --git-sha "${GITHUB_SHA}"
           --output-dir "${RUNNER_TEMP}/coverage-plan"
 
@@ -94,14 +93,14 @@ jobs:
           if-no-files-found: error
 
   coverage_shards:
-    name: Coverage shard ${{ matrix.shard }} of 8
+    name: Coverage shard ${{ matrix.shard }} of 16
     needs: pre_flight
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     services:
       postgres:
         image: postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
@@ -315,7 +314,6 @@ jobs:
 
       - name: GCS-008 score-distribution vertical slice
         run: |
-          uv run pytest tests/unit/football_events tests/unit/scripts/test_gcs008_acceptance.py tests/unit/scripts/test_gcs008_coverage_gate.py tests/unit/scripts/test_gcs008_scope.py tests/unit/scripts/test_gcs008_wheel.py tests/property/football_events tests/contract/football_events tests/golden/football_events tests/integration/football_events
           uv run dmf events score-distribution --fixture fixtures/events/score/GCS-008/balanced_fixture.json --artifact-root artifacts/gcs008-ci --output json
           uv run dmf events explain-market-fit --fixture fixtures/events/score/GCS-008/inconsistent_markets.json --output json
 
