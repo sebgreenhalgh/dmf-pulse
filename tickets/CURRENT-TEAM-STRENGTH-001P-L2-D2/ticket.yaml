@@ -1,0 +1,19 @@
+schema_version: DMF_TICKET_V1
+ticket_id: CURRENT-TEAM-STRENGTH-001P-L2-D2
+status: ACTIVE
+title: Close remaining live-wrapper diagnostic blind spots
+parent_sha: c11f4fee160043aafcb4008d4deb0ffa3ef709eb
+execution_mode: OFFLINE_ONLY
+live_authority: NONE
+historical_authorities:
+  l1: CONSUMED
+  l2: CONSUMED
+required_verdict: CLEAR_FOR_TEAM_STRENGTH_L3_REAUTHORIZATION_DECISION
+constraints:
+  provider_access: FORBIDDEN
+  live_retry: FORBIDDEN
+  new_authorization: FORBIDDEN
+  private_persistence: FORBIDDEN
+  production_activation: FORBIDDEN
+  stage_8_to_11_mathematics_change: FORBIDDEN
+  team_strength_mathematics_change: FORBIDDEN

@@ -20,8 +20,8 @@ from tests.unit.ingestion.openfootball.conftest import FakeTransport, synthetic_
 from tests.unit.private_v1.l1_test_support import deny_writes
 from tests.unit.private_v1.team_strength_shadow_support import PAIRS, STAMP
 from tests.unit.private_v1.test_one_command import _DirectTransport, _provider_sources
+from tests.unit.private_v1.test_team_strength_l1 import offline_run, request, service
 from tests.unit.private_v1.test_team_strength_l1 import readiness as readiness
-from tests.unit.private_v1.test_team_strength_l1 import request, service
 
 pytestmark = pytest.mark.unit
 
@@ -164,7 +164,7 @@ def test_real_one_preparation_two_canonical_worlds_no_private_writes(
         else STAMP + timedelta(minutes=1, microseconds=123456)
     )
     with deny_writes():
-        result = active.run(request(readiness), readiness)
+        result = offline_run(active, request(readiness), readiness)
     assert result["status"] == "CURRENT_TEAM_STRENGTH_001P_L2_LIVE_OBSERVATION_COMPLETE", (
         result,
         count,

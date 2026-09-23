@@ -2447,3 +2447,29 @@ rights test. Update those test literals to exact L2 authority, retain all capabi
 denial assertions and add old-reference rejection. Production remains unchanged.
 126 inherited rights/probe/L2 tests pass; obtain supplemental review, refresh safe
 evidence/manifests, publish the descendant and require its own exact-SHA green CI.
+
+## CURRENT-TEAM-STRENGTH-001P-L2-D2 offline wrapper localisation
+
+Exact parent: `c11f4fee160043aafcb4008d4deb0ffa3ef709eb`.
+Historical L1 and L2 one-shot authorities are consumed. D2 is offline-only and
+does not create a current live authority or establish the historical L2 root cause.
+
+- [x] Isolate the immutable parent and audit every path between comparison call and
+  safe terminal summary.
+- [x] Split invocation, counter reconciliation, result validation, diagnostic
+  serialization and success-summary construction into finite safe stages/reasons.
+- [x] Add invocation start/return markers and named nonnegative provider-counter
+  deltas that distinguish actual sends from denied sends.
+- [x] Reproduce offline that a caught/suppressed closed-gate denial can increment
+  `DENIED_SENDS` during an otherwise successful comparison return.
+- [x] Preserve typed D1 diagnostics; close tampered diagnostic serialization.
+- [x] Mark both historical approvals consumed before credentials/provider access.
+- [x] Complete focused/inherited/static/build/wheel/coverage/assurance acceptance.
+- [x] Obtain independent review and fix all P0/P1/material P2 findings; verdict:
+  `CLEAR_FOR_TEAM_STRENGTH_L3_REAUTHORIZATION_DECISION`.
+- [ ] Publish the exact green SHA, require exact-SHA CI, and confirm local/remote
+  equality.
+
+Provider requests must remain zero for FPL, Odds and live OpenFootball. Do not
+retry L2, inspect credentials, create L3 authority, modify provider rights, change
+Stage 8-11/team-strength mathematics, persist private context, or activate the model.

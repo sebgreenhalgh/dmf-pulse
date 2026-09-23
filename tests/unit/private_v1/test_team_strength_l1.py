@@ -6,6 +6,7 @@ import json
 from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal
+from unittest.mock import patch
 
 import pytest
 
@@ -20,6 +21,7 @@ from dmf_pulse.ingestion.odds.credentials import (
 )
 from dmf_pulse.ingestion.openfootball.team_strength_current import CurrentTeamStrengthReadiness
 from dmf_pulse.ingestion.openfootball.team_strength_data import seal
+from dmf_pulse.ingestion.rights import load_rights_profiles as load_fpl_rights
 from dmf_pulse.private_v1 import team_strength_live as live
 from dmf_pulse.private_v1 import team_strength_live_authority as authority
 from dmf_pulse.private_v1.team_strength_live_network import OneShotNetworkGate, fpl_endpoint
@@ -61,6 +63,12 @@ def service(**kwargs):
     )
 
 
+def offline_run(active, operator_request, ready):
+    """Exercise historical wrapper computation without minting live authority."""
+    with patch.object(live, "validate_l1_authority", lambda **_: None):
+        return active.run(operator_request, ready)
+
+
 @pytest.mark.parametrize(
     "changes",
     [
@@ -79,10 +87,15 @@ def test_invalid_authority_or_input_never_reaches_provider(readiness, changes):
     assert "42" not in json.dumps(result)
 
 
-def test_exact_purposes_and_old_a2_runtime_rejected():
-    authority.validate_l1_authority(
-        approval=authority.APPROVAL, attestation=authority.ATTESTATION, checked_at=STAMP
-    )
+def test_both_historical_purposes_consumed_and_old_a2_runtime_rejected():
+    for approval, attestation in (
+        (authority.L1_APPROVAL, authority.L1_ATTESTATION),
+        (authority.L2_APPROVAL, authority.L2_ATTESTATION),
+    ):
+        with pytest.raises(authority.ConsumedL1ApprovalError):
+            authority.validate_l1_authority(
+                approval=approval, attestation=attestation, checked_at=STAMP
+            )
     from dmf_pulse.private_v1.live_shadow_observation import (
         A2FailureReason,
         R9CA2LiveShadowObservationService,
@@ -94,26 +107,11 @@ def test_exact_purposes_and_old_a2_runtime_rejected():
     assert result.fpl_request_attempt_count == result.odds_acquisition_attempt_count == 0
 
 
-@pytest.mark.parametrize("profile_kind", ["FPL", "ODDS"])
-@pytest.mark.parametrize(
-    "field,value",
-    [
-        ("human_approval_id", "old"),
-        ("approved_purpose", "broader purpose"),
-        ("geography_scope", "other"),
-        ("retention_seconds", 10),
-    ],
-)
-def test_authority_drift_fails(profile_kind, field, value, monkeypatch):
-    loader = "load_fpl_rights" if profile_kind == "FPL" else "load_odds_rights"
-    profile_id = authority.FPL_PROFILE if profile_kind == "FPL" else authority.ODDS_PROFILE
-    profiles = getattr(authority, loader)()
-    profiles = {**profiles, profile_id: profiles[profile_id].model_copy(update={field: value})}
-    monkeypatch.setattr(authority, loader, lambda: profiles)
-    with pytest.raises(ValueError, match="exact"):
-        authority.validate_l1_authority(
-            approval=authority.APPROVAL, attestation=authority.ATTESTATION, checked_at=STAMP
-        )
+def test_historical_rights_hashes_remain_exact_but_cannot_authorize():
+    fpl = load_fpl_rights()[authority.FPL_PROFILE]
+    odds = load_rights_profiles()[authority.ODDS_PROFILE]
+    assert authority.profile_sha(fpl) == authority.FPL_PROFILE_SHA
+    assert authority.profile_sha(odds) == authority.ODDS_PROFILE_SHA
 
 
 @pytest.mark.parametrize("checked_at", [STAMP.replace(tzinfo=None), STAMP - timedelta(days=30)])
@@ -139,7 +137,7 @@ def test_first_fpl_transport_attempt_consumes_even_failure_no_retry(readiness, r
 
     transport = Broken()
     active = service(fpl_transport=transport)
-    result = active.run(request(readiness), readiness)
+    result = offline_run(active, request(readiness), readiness)
     assert result["private_attempt_consumed"] is True
     assert result["fpl_requests"] == transport.calls == 1
     assert result["odds_requests"] == 0
@@ -156,7 +154,7 @@ def test_missing_credential_before_transport_does_not_consume(readiness):
     active = live.TeamStrengthL1ObservationService(
         clock=lambda: STAMP + timedelta(minutes=1), fpl_credentials=DirectFplCredentialProvider({})
     )
-    result = active.run(request(readiness), readiness)
+    result = offline_run(active, request(readiness), readiness)
     assert result["reason"] == "CREDENTIAL_UNAVAILABLE"
     assert not result["private_attempt_consumed"]
 
@@ -170,7 +168,7 @@ def test_post_cutoff_artifact_and_unexpected_onecommand_return_fail_closed(readi
         usable_at=STAMP + timedelta(hours=1),
     )
     future = reseal(readiness, artifact=artifact)
-    result = service().run(request(future), future)
+    result = offline_run(service(), request(future), future)
     assert result["reason"] == "PUBLIC_READINESS_INVALID" and not result["private_attempt_consumed"]
 
     class UnexpectedReturn:
@@ -181,7 +179,7 @@ def test_post_cutoff_artifact_and_unexpected_onecommand_return_fail_closed(readi
             return object()
 
     monkeypatch.setattr(live, "PrivateV1OneCommandService", UnexpectedReturn)
-    result = service().run(request(readiness), readiness)
+    result = offline_run(service(), request(readiness), readiness)
     assert result["reason"] == "FROZEN_CONTEXT_FAILED" and not result["private_attempt_consumed"]
 
 
@@ -226,13 +224,13 @@ def test_repeated_acquisition_or_unreconciled_context_is_rejected(readiness, mon
     monkeypatch.setattr(live.CurrentOddsTransientService, "acquire", lambda *args, **kwargs: None)
     monkeypatch.setattr(live.CurrentScorePriorService, "build", lambda *args, **kwargs: None)
     monkeypatch.setattr(live, "PrivateV1OneCommandService", ErroneousCaller)
-    result = service().run(request(readiness), readiness)
+    result = offline_run(service(), request(readiness), readiness)
     assert result["reason"] == "FROZEN_CONTEXT_FAILED" and not result["private_attempt_consumed"]
 
 
 def test_stale_public_source_never_consumes(readiness):
     active = live.TeamStrengthL1ObservationService(clock=lambda: STAMP + timedelta(hours=73))
-    result = active.run(request(readiness), readiness)
+    result = offline_run(active, request(readiness), readiness)
     assert result["reason"] == "SOURCE_STALE"
     assert result["status"] == "TEAM_STRENGTH_PUBLIC_PREFLIGHT_BLOCKED"
     assert not result["private_attempt_consumed"]

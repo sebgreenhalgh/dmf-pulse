@@ -1,0 +1,25 @@
+{
+  "branch_coverage_percent": 100.0,
+  "changed_branches": 12,
+  "changed_statements": 85,
+  "covered_branches": 12,
+  "covered_statements": 85,
+  "immutable_parent": "c11f4fee160043aafcb4008d4deb0ffa3ef709eb",
+  "method": "coverage.py branch data intersected with git-added executable lines",
+  "production_files": {
+    "src/dmf_pulse/private_v1/team_strength_live.py": {
+      "changed_branches": 12,
+      "changed_statements": 76,
+      "covered_branches": 12,
+      "covered_statements": 76
+    },
+    "src/dmf_pulse/private_v1/team_strength_live_authority.py": {
+      "changed_branches": 0,
+      "changed_statements": 9,
+      "covered_branches": 0,
+      "covered_statements": 9
+    }
+  },
+  "schema_version": "DMF_DIFFERENTIAL_COVERAGE_V1",
+  "statement_coverage_percent": 100.0
+}

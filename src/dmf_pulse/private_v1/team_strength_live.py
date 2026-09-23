@@ -1,6 +1,7 @@
-"""Explicit L2 operator experiment, never selected by ordinary dmf pulse.
+"""Historical L1/L2 operator experiment, never selected by ordinary dmf pulse.
 
-Legacy L1 Python names are retained; only current authority/run identity changes.
+Both live authorities are consumed. Legacy L1 names and the historical run identity
+remain for offline regression only; D2 adds closed wrapper-failure localisation.
 
 Only an allowlisted summary escapes. The prepared-context callback completes via
 a private exception carrying that summary, because the inherited callback return
@@ -78,6 +79,7 @@ from dmf_pulse.private_v1.team_strength_live_network import (
 )
 from dmf_pulse.private_v1.team_strength_shadow_inputs import (
     TeamStrengthShadowInput,
+    TeamStrengthShadowPreparation,
     prepare_team_strength_shadow,
 )
 
@@ -90,6 +92,11 @@ class L1Stage(StrEnum):
     PREPARE_TEAM_STRENGTH_SHADOW = "PREPARE_TEAM_STRENGTH_SHADOW"
     RUN_TWO_WORLD_COMPARISON = "RUN_TWO_WORLD_COMPARISON"
     BUILD_SAFE_SUMMARY = "BUILD_SAFE_SUMMARY"
+    INVOKE_TWO_WORLD_COMPARISON = "INVOKE_TWO_WORLD_COMPARISON"
+    RECONCILE_POST_COMPARISON_PROVIDER_COUNTERS = "RECONCILE_POST_COMPARISON_PROVIDER_COUNTERS"
+    VALIDATE_COMPARISON_RESULT_TYPE = "VALIDATE_COMPARISON_RESULT_TYPE"
+    SERIALIZE_COMPARISON_DIAGNOSTIC = "SERIALIZE_COMPARISON_DIAGNOSTIC"
+    BUILD_SAFE_SUCCESS_SUMMARY = "BUILD_SAFE_SUCCESS_SUMMARY"
 
 
 class L1Reason(StrEnum):
@@ -103,6 +110,12 @@ class L1Reason(StrEnum):
     SHADOW_UNAVAILABLE = "SHADOW_UNAVAILABLE"
     TWO_WORLD_COMPARISON_FAILED = "TWO_WORLD_COMPARISON_FAILED"
     SAFE_SUMMARY_FAILED = "SAFE_SUMMARY_FAILED"
+    COMPARISON_INVOCATION_FAILED = "COMPARISON_INVOCATION_FAILED"
+    PROVIDER_COUNTER_RECONCILIATION_FAILED = "PROVIDER_COUNTER_RECONCILIATION_FAILED"
+    PROVIDER_COUNTER_DIVERGENCE_DURING_COMPARISON = "PROVIDER_COUNTER_DIVERGENCE_DURING_COMPARISON"
+    COMPARISON_RESULT_TYPE_INVALID = "COMPARISON_RESULT_TYPE_INVALID"
+    SAFE_COMPARISON_DIAGNOSTIC_INVALID = "SAFE_COMPARISON_DIAGNOSTIC_INVALID"
+    SAFE_SUCCESS_SUMMARY_FAILED = "SAFE_SUCCESS_SUMMARY_FAILED"
     ALREADY_INVOKED = "ALREADY_INVOKED"
 
 
@@ -119,6 +132,42 @@ class _ObservationComplete(Exception):
     def __init__(self, summary: dict[str, object]) -> None:
         super().__init__("safe observation complete")
         self.summary = summary
+
+
+class _LiveWrapperFailure(ValueError):
+    """Closed wrapper failure; no nested exception text is retained or emitted."""
+
+    def __init__(self, stage: L1Stage, reason: L1Reason) -> None:
+        self.stage = stage
+        self.reason = reason
+        super().__init__("closed live wrapper failure")
+
+
+_PROVIDER_COUNTER_ORDER = (
+    "FPL_SENDS",
+    "ODDS_SENDS",
+    "OPENFOOTBALL_SENDS",
+    "FPL_SESSIONS",
+    "ODDS_ACQUISITIONS",
+    "LEAGUE_ACQUISITIONS",
+    "DENIED_SENDS",
+)
+
+
+def _counter_deltas(before: tuple[int, ...], after: tuple[int, ...]) -> dict[str, int]:
+    if (
+        len(before) != len(_PROVIDER_COUNTER_ORDER)
+        or len(after) != len(_PROVIDER_COUNTER_ORDER)
+        or any(type(value) is not int for value in (*before, *after))
+    ):
+        raise ValueError("provider counter shape invalid")
+    deltas = {
+        name: right - left
+        for name, left, right in zip(_PROVIDER_COUNTER_ORDER, before, after, strict=True)
+    }
+    if any(value < 0 for value in deltas.values()):
+        raise ValueError("provider counter moved backwards")
+    return deltas
 
 
 def _prior_movement(
@@ -192,6 +241,9 @@ class TeamStrengthL1ObservationService:
         self._odds_credentials = odds_credentials or EnvironmentOddsCredentialProvider()
         self._invoked = False
         self._gate: OneShotNetworkGate | None = None
+        self._comparison_invocation_started = False
+        self._comparison_invocation_returned = False
+        self._provider_counter_deltas: dict[str, int] | None = None
 
     def guard_network_event(self) -> None:
         """Standalone operator audit hook: deny uninstrumented post-freeze I/O."""
@@ -203,7 +255,7 @@ class TeamStrengthL1ObservationService:
 
     def _blocked(self, stage: L1Stage, reason: L1Reason) -> dict[str, object]:
         gate = self._gate
-        return {
+        result: dict[str, object] = {
             "status": "TEAM_STRENGTH_PUBLIC_PREFLIGHT_BLOCKED"
             if stage == L1Stage.ASSESS_TEAM_STRENGTH_SOURCE
             and reason != L1Reason.CREDENTIAL_UNAVAILABLE
@@ -218,6 +270,127 @@ class TeamStrengthL1ObservationService:
             "retry_performed": False,
             "persistence": False,
             "production_activation": False,
+            "comparison_invocation_started": self._comparison_invocation_started,
+            "comparison_invocation_returned": self._comparison_invocation_returned,
+        }
+        if self._provider_counter_deltas is not None:
+            result["provider_counter_deltas"] = dict(self._provider_counter_deltas)
+        return result
+
+    def _invoke_two_world_comparison(
+        self,
+        prepared: _PrivateV1PreparedRollingContext,
+        preparation: TeamStrengthShadowPreparation,
+        gate: OneShotNetworkGate,
+    ) -> tuple[TeamStrengthComparisonRun, tuple[int, ...], tuple[int, ...]]:
+        try:
+            before = gate.counters()
+        except (Exception, KeyboardInterrupt):
+            raise _LiveWrapperFailure(
+                L1Stage.RECONCILE_POST_COMPARISON_PROVIDER_COUNTERS,
+                L1Reason.PROVIDER_COUNTER_RECONCILIATION_FAILED,
+            ) from None
+        self._comparison_invocation_started = True
+        try:
+            run = run_team_strength_shadow_comparison(prepared, preparation)
+        except TeamStrengthComparisonFailure:
+            raise
+        except (Exception, KeyboardInterrupt):
+            raise _LiveWrapperFailure(
+                L1Stage.INVOKE_TWO_WORLD_COMPARISON,
+                L1Reason.COMPARISON_INVOCATION_FAILED,
+            ) from None
+        self._comparison_invocation_returned = True
+        try:
+            after = gate.counters()
+            deltas = _counter_deltas(before, after)
+        except (Exception, KeyboardInterrupt):
+            raise _LiveWrapperFailure(
+                L1Stage.RECONCILE_POST_COMPARISON_PROVIDER_COUNTERS,
+                L1Reason.PROVIDER_COUNTER_RECONCILIATION_FAILED,
+            ) from None
+        if before != after:
+            self._provider_counter_deltas = deltas
+            raise _LiveWrapperFailure(
+                L1Stage.RECONCILE_POST_COMPARISON_PROVIDER_COUNTERS,
+                L1Reason.PROVIDER_COUNTER_DIVERGENCE_DURING_COMPARISON,
+            )
+        if not isinstance(run, TeamStrengthComparisonRun):
+            raise _LiveWrapperFailure(
+                L1Stage.VALIDATE_COMPARISON_RESULT_TYPE,
+                L1Reason.COMPARISON_RESULT_TYPE_INVALID,
+            )
+        return run, before, after
+
+    def _build_safe_success_summary(
+        self,
+        *,
+        run: TeamStrengthComparisonRun,
+        shadow: TeamStrengthShadowInput,
+        gate: OneShotNetworkGate,
+        prepared: _PrivateV1PreparedRollingContext,
+        before: tuple[int, ...],
+        after: tuple[int, ...],
+        request: L1OperatorRequest,
+        ready: CurrentTeamStrengthReadiness,
+    ) -> dict[str, object]:
+        try:
+            summary = safe_team_strength_summary(run)
+            worlds = cast(tuple[dict[str, object], ...], summary["worlds"])
+            for world, result in zip(worlds, run.comparison.worlds, strict=True):
+                world["continuation_transfer_counts"] = tuple(
+                    row.transfer_count for row in result.signature.by_gameweek[1:]
+                )
+            summary.update(
+                status="CURRENT_TEAM_STRENGTH_001P_L2_LIVE_OBSERVATION_COMPLETE",
+                private_attempt_consumed=gate.consumed,
+                retry_performed=False,
+                approval=APPROVAL,
+                attestation=ATTESTATION,
+                code_sha=request.code_sha,
+                interpretation="DECISION_MATERIALITY_NOT_MODEL_ACCURACY",
+                fpl_endpoint_classes=prepared.fpl_endpoint_classes,
+                odds_endpoint_classes=prepared.odds_endpoint_classes,
+                acquisition_counts={
+                    "FPL": gate.fpl_sessions,
+                    "ODDS": gate.odds_acquisitions,
+                    "LEAGUE_PRIOR": gate.league_acquisitions,
+                },
+                provider_counters_before=before,
+                provider_counters_after=after,
+                provider_counter_order=_PROVIDER_COUNTER_ORDER,
+                comparison_invocation_started=True,
+                comparison_invocation_returned=True,
+                prior_movement_by_gameweek=_prior_movement(run, shadow),
+                public_artifact_sha256=ready.artifact.semantic_sha256,
+                parameter_mixture_active=False,
+                ordinary_path_changed=False,
+            )
+            return cast(dict[str, object], json_safe(summary))
+        except (Exception, KeyboardInterrupt):
+            raise _LiveWrapperFailure(
+                L1Stage.BUILD_SAFE_SUCCESS_SUMMARY,
+                L1Reason.SAFE_SUCCESS_SUMMARY_FAILED,
+            ) from None
+
+    def _comparison_failure_result(
+        self, failure: TeamStrengthComparisonFailure
+    ) -> dict[str, object]:
+        try:
+            diagnostic = safe_comparison_failure(failure)
+        except (Exception, KeyboardInterrupt):
+            return self._blocked(
+                L1Stage.SERIALIZE_COMPARISON_DIAGNOSTIC,
+                L1Reason.SAFE_COMPARISON_DIAGNOSTIC_INVALID,
+            )
+        # D1's exact stage/reason and all existing safe fields intentionally
+        # override the invocation wrapper's generic location.
+        return {
+            **self._blocked(
+                L1Stage.INVOKE_TWO_WORLD_COMPARISON,
+                L1Reason.COMPARISON_INVOCATION_FAILED,
+            ),
+            **diagnostic,
         }
 
     def run(
@@ -364,54 +537,23 @@ class TeamStrengthL1ObservationService:
                 )
                 if preparation.shadow_input is None:
                     raise ValueError("complete shadow unavailable")
+                run, before, after = self._invoke_two_world_comparison(prepared, preparation, gate)
                 stage, reason = (
-                    L1Stage.RUN_TWO_WORLD_COMPARISON,
-                    L1Reason.TWO_WORLD_COMPARISON_FAILED,
+                    L1Stage.BUILD_SAFE_SUCCESS_SUMMARY,
+                    L1Reason.SAFE_SUCCESS_SUMMARY_FAILED,
                 )
-                before = gate.counters()
-                run = run_team_strength_shadow_comparison(prepared, preparation)
-                after = gate.counters()
-                if before != after or not isinstance(run, TeamStrengthComparisonRun):
-                    raise ValueError("comparison request delta or result invalid")
-                stage, reason = L1Stage.BUILD_SAFE_SUMMARY, L1Reason.SAFE_SUMMARY_FAILED
-                summary = safe_team_strength_summary(run)
-                worlds = cast(tuple[dict[str, object], ...], summary["worlds"])
-                for world, result in zip(worlds, run.comparison.worlds, strict=True):
-                    world["continuation_transfer_counts"] = tuple(
-                        row.transfer_count for row in result.signature.by_gameweek[1:]
+                raise _ObservationComplete(
+                    self._build_safe_success_summary(
+                        run=run,
+                        shadow=preparation.shadow_input,
+                        gate=gate,
+                        prepared=prepared,
+                        before=before,
+                        after=after,
+                        request=request,
+                        ready=ready,
                     )
-                summary.update(
-                    status="CURRENT_TEAM_STRENGTH_001P_L2_LIVE_OBSERVATION_COMPLETE",
-                    private_attempt_consumed=gate.consumed,
-                    retry_performed=False,
-                    approval=APPROVAL,
-                    attestation=ATTESTATION,
-                    code_sha=request.code_sha,
-                    interpretation="DECISION_MATERIALITY_NOT_MODEL_ACCURACY",
-                    fpl_endpoint_classes=prepared.fpl_endpoint_classes,
-                    odds_endpoint_classes=prepared.odds_endpoint_classes,
-                    acquisition_counts={
-                        "FPL": gate.fpl_sessions,
-                        "ODDS": gate.odds_acquisitions,
-                        "LEAGUE_PRIOR": gate.league_acquisitions,
-                    },
-                    provider_counters_before=before,
-                    provider_counters_after=after,
-                    provider_counter_order=(
-                        "FPL_SENDS",
-                        "ODDS_SENDS",
-                        "OPENFOOTBALL_SENDS",
-                        "FPL_SESSIONS",
-                        "ODDS_ACQUISITIONS",
-                        "LEAGUE_ACQUISITIONS",
-                        "DENIED_SENDS",
-                    ),
-                    prior_movement_by_gameweek=_prior_movement(run, preparation.shadow_input),
-                    public_artifact_sha256=ready.artifact.semantic_sha256,
-                    parameter_mixture_active=False,
-                    ordinary_path_changed=False,
                 )
-                raise _ObservationComplete(cast(dict[str, object], json_safe(summary)))
 
             PrivateV1OneCommandService(
                 direct_client_factory=direct_factory,
@@ -432,19 +574,17 @@ class TeamStrengthL1ObservationService:
             )
         except _ObservationComplete as completed:
             return completed.summary
+        except _LiveWrapperFailure as failure:
+            return self._blocked(failure.stage, failure.reason)
         except ConsumedL1ApprovalError:
             return {
                 **self._blocked(L1Stage.VALIDATE_RIGHTS, L1Reason.AUTHORITY_CONSUMED),
                 "prior_l1_one_shot_consumed": True,
+                "prior_l2_one_shot_consumed": True,
                 "fresh_live_authorization_required": True,
             }
         except TeamStrengthComparisonFailure as failure:
-            try:
-                diagnostic = safe_comparison_failure(failure)
-            except Exception:
-                # A forged/tampered diagnostic is not a disclosure escape hatch.
-                return self._blocked(stage, reason)
-            return {**self._blocked(stage, reason), **diagnostic}
+            return self._comparison_failure_result(failure)
         except (Exception, KeyboardInterrupt):
             # No exception text, chained traceback, provider payload or entry ID
             # escapes this terminal boundary, including unexpected failures.

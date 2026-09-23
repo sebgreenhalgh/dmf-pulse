@@ -304,6 +304,7 @@ def test_consumed_authority_blocks_before_any_credentials_or_provider():
         None,
     )
     assert result["reason"] == "AUTHORITY_CONSUMED" and result["prior_l1_one_shot_consumed"]
+    assert result["prior_l2_one_shot_consumed"]
     assert result["fpl_requests"] == result["odds_requests"] == 0
     assert not result["private_attempt_consumed"] and result["fresh_live_authorization_required"]
 
@@ -327,7 +328,10 @@ def test_l1_serializes_only_valid_closed_comparison_diagnostic(monkeypatch, tamp
         live.L1OperatorRequest(42, "a" * 40, authority.APPROVAL, authority.ATTESTATION, "0" * 64),
         None,
     )
-    assert result["reason"] == ("AUTHORITY_INVALID" if tamper else "COMPARISON_SEAL_FAILED")
+    assert result["reason"] == (
+        "SAFE_COMPARISON_DIAGNOSTIC_INVALID" if tamper else "COMPARISON_SEAL_FAILED"
+    )
+    assert result["stage"] == ("SERIALIZE_COMPARISON_DIAGNOSTIC" if tamper else "SEAL_COMPARISON")
     assert "private secret" not in str(result)
 
 

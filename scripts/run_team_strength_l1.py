@@ -1,7 +1,7 @@
-"""Separate public preflight and terminal-only private L2 observation.
+"""Historical public preflight and disabled terminal-only private observation.
 
-Legacy filename retained; the sole current authority is the exact L2 pair.
-Publication/review/exact-SHA CI are operator gates documented in the L2 ticket.
+Legacy filename retained; L1 and L2 are consumed and no current authority exists.
+Any future live purpose requires a separately reviewed authorization.
 This script has no retry loop, output-file option, normal CLI registration, model
 selector, scenario-count override or player-allocation override.
 """
@@ -36,7 +36,7 @@ class _Parser(argparse.ArgumentParser):
 
 def parser() -> argparse.ArgumentParser:
     result = _Parser(
-        description="Separate public readiness and one-shot private CTS L2 observation"
+        description="Historical CTS operator surface; L1/L2 live authorities are consumed"
     )
     commands = result.add_subparsers(dest="command", required=True, parser_class=_Parser)
     public = commands.add_parser("public-preflight")
