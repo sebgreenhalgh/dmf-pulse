@@ -1,8 +1,9 @@
-"""D2 keeps both historical authorities consumed and provider rights unchanged."""
+"""L3 exact authority, consumed history, and no provider-capability expansion."""
 
 from __future__ import annotations
 
 import hashlib
+import json
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,12 +14,14 @@ from dmf_pulse.private_v1 import team_strength_live as live
 from dmf_pulse.private_v1 import team_strength_live_authority as authority
 
 pytestmark = pytest.mark.unit
-PARENT = "c11f4fee160043aafcb4008d4deb0ffa3ef709eb"
+PARENT = "d2a5e49c1e6b95b89bdcbf5ef23f05ecb67e00db"
 STAMP = datetime(2026, 10, 1, tzinfo=UTC)
 OLD_APPROVAL = "DMF-CTS-001P-LIVE-RIGHTS-2026-09-22"
 OLD_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L1#ONE-SHOT-2026-09-22"
 NEW_APPROVAL = "DMF-CTS-001P-L2-LIVE-RIGHTS-2026-09-22"
 NEW_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L2#ONE-SHOT-2026-09-22"
+L3_APPROVAL = "DMF-CTS-001P-L3-LIVE-RIGHTS-2026-09-23"
+L3_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L3#ONE-SHOT-2026-09-23"
 
 
 def parent_text(path: str) -> str:
@@ -52,7 +55,7 @@ def blocked(approval: str, attestation: str):
     assert result["retry_performed"] is False
     assert result["production_activation"] is False
     assert result["status"] in {
-        "CURRENT_TEAM_STRENGTH_001P_L2_LIVE_EXECUTION_NOT_COMPLETED",
+        "CURRENT_TEAM_STRENGTH_001P_L3_LIVE_EXECUTION_NOT_COMPLETED",
         "TEAM_STRENGTH_PUBLIC_PREFLIGHT_BLOCKED",
     }
     return result
@@ -88,22 +91,68 @@ def test_no_unknown_pair_can_authorize(approval, attestation):
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
 
 
-def test_legacy_aliases_name_consumed_l2_and_no_current_pair_exists():
-    assert (authority.APPROVAL, authority.ATTESTATION) == (NEW_APPROVAL, NEW_ATTESTATION)
-    assert NEW_APPROVAL in authority.CONSUMED_APPROVALS
-    assert blocked(NEW_APPROVAL, NEW_ATTESTATION)["reason"] == "AUTHORITY_CONSUMED"
+def test_exact_l3_pair_and_pinned_rights_pass_before_credentials():
+    assert (authority.APPROVAL, authority.ATTESTATION) == (L3_APPROVAL, L3_ATTESTATION)
+    assert L3_APPROVAL not in authority.CONSUMED_APPROVALS
+    authority.validate_l1_authority(
+        approval=L3_APPROVAL, attestation=L3_ATTESTATION, checked_at=STAMP
+    )
+    assert (
+        authority.profile_sha(authority.load_fpl_rights()[authority.FPL_PROFILE])
+        == authority.FPL_PROFILE_SHA
+    )
+    assert (
+        authority.profile_sha(authority.load_odds_rights()[authority.ODDS_PROFILE])
+        == authority.ODDS_PROFILE_SHA
+    )
+    assert blocked(L3_APPROVAL, L3_ATTESTATION)["reason"] == "PUBLIC_READINESS_INVALID"
+
+
+@pytest.mark.parametrize(
+    "approval,attestation",
+    [(L3_APPROVAL, "wrong"), ("wrong", L3_ATTESTATION)],
+)
+def test_l3_mismatch_fails_closed(approval, attestation):
+    assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
+
+
+def test_old_odds_profile_sha_is_rejected(monkeypatch):
+    monkeypatch.setattr(
+        authority,
+        "ODDS_PROFILE_SHA",
+        "bc5dfa98500459bc50c00e4cd44a30e64e0df04957f383ec8107947ac5350faf",
+    )
+    with pytest.raises(ValueError, match="provider purpose"):
+        authority.validate_l1_authority(
+            approval=L3_APPROVAL, attestation=L3_ATTESTATION, checked_at=STAMP
+        )
 
 
 @pytest.mark.parametrize(
     "path",
     [
-        "config/rights/odds_profiles.json",
         "config/rights/fpl_profiles.json",
         "config/rights/openfootball_profiles.json",
     ],
 )
 def test_provider_rights_are_byte_identical_to_l2_parent(path):
     assert Path(path).read_text(encoding="utf-8") == parent_text(path)
+
+
+def test_only_odds_purpose_metadata_changes_without_capability_expansion():
+    before = json.loads(parent_text("config/rights/odds_profiles.json"))
+    after = json.loads(Path("config/rights/odds_profiles.json").read_text(encoding="utf-8"))
+    assert before["profiles"][0] == after["profiles"][0]
+    left, right = before["profiles"][1], after["profiles"][1]
+    assert {key for key in left if left[key] != right[key]} == {
+        "approved_at",
+        "approved_purpose",
+        "human_approval_id",
+        "notes",
+    }
+    assert left["capabilities"] == right["capabilities"]
+    assert right["retention_seconds"] == 0
+    assert right["human_approval_id"] == L3_APPROVAL
 
 
 @pytest.mark.parametrize(

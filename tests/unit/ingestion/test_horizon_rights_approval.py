@@ -14,7 +14,7 @@ from dmf_pulse.ingestion.odds.config import load_rights_profiles
 from tests.unit.ingestion.test_horizon_probe import _script
 
 pytestmark = pytest.mark.unit
-APPROVAL = "DMF-CTS-001P-L2-LIVE-RIGHTS-2026-09-22"
+APPROVAL = "DMF-CTS-001P-L3-LIVE-RIGHTS-2026-09-23"
 NOW = datetime(2026, 9, 22, 19, 8, tzinfo=UTC)
 _CAPABILITIES = {
     RightsCapability.AUTOMATED_ACCESS: CapabilityValue.ALLOW,
@@ -86,15 +86,15 @@ def test_current_governed_approval_and_exact_metadata(governed_gate):
     assert profile.account_scope == "Sebastian-owned and authorized private The Odds API account"
     assert profile.geography_scope == "United Kingdom private use"
     assert profile.approved_purpose == (
-        "one private operator-initiated CURRENT-TEAM-STRENGTH-001P-L2 live transient two-world "
+        "one private operator-initiated CURRENT-TEAM-STRENGTH-001P-L3 live transient two-world "
         "team-strength decision-materiality observation comparing LEAGUE_BASELINE and "
         "TEAM_STRENGTH_SHADOW using one frozen three-Gameweek information set through the "
-        "existing Stage 8 to Stage 11 pipeline with D1 safe failure diagnostics"
+        "existing Stage 8 to Stage 11 pipeline with complete D1 and D2 safe failure diagnostics"
     )
     assert profile.terms_source == "The Odds API Terms and Conditions"
     assert profile.terms_version == "checked-2026-08-31"
     assert profile.checked_at == datetime(2026, 9, 11, 21, 21, 31, tzinfo=UTC)
-    assert profile.approved_at == datetime(2026, 9, 22, 19, 7, 31, tzinfo=UTC)
+    assert profile.approved_at == datetime(2026, 9, 23, 10, 12, 58, tzinfo=UTC)
     assert profile.capabilities == _CAPABILITIES
     assert profile.unresolved_rights == _UNRESOLVED
     assert gate(profile, APPROVAL, True, NOW) is None
@@ -105,6 +105,7 @@ def test_current_governed_approval_and_exact_metadata(governed_gate):
     [
         ("different-approval", True),
         ("DMF-CTS-001P-LIVE-RIGHTS-2026-09-22", True),
+        ("DMF-CTS-001P-L2-LIVE-RIGHTS-2026-09-22", True),
         (APPROVAL, False),
     ],
 )

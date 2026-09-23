@@ -165,7 +165,7 @@ def test_real_one_preparation_two_canonical_worlds_no_private_writes(
     )
     with deny_writes():
         result = offline_run(active, request(readiness), readiness)
-    assert result["status"] == "CURRENT_TEAM_STRENGTH_001P_L2_LIVE_OBSERVATION_COMPLETE", (
+    assert result["status"] == "CURRENT_TEAM_STRENGTH_001P_L3_LIVE_OBSERVATION_COMPLETE", (
         result,
         count,
         errors,

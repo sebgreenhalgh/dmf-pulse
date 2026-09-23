@@ -2473,3 +2473,18 @@ does not create a current live authority or establish the historical L2 root cau
 Provider requests must remain zero for FPL, Odds and live OpenFootball. Do not
 retry L2, inspect credentials, create L3 authority, modify provider rights, change
 Stage 8-11/team-strength mathematics, persist private context, or activate the model.
+
+## CURRENT-TEAM-STRENGTH-001P-L3 Phase A only
+
+Exact parent: `d2a5e49c1e6b95b89bdcbf5ef23f05ecb67e00db`.
+
+- [x] Add one exact current L3 approval/attestation while retaining consumed L1/L2.
+- [x] Update only L3 Odds purpose metadata and bind its exact semantic SHA.
+- [x] Verify standing FPL purpose adequacy without changing it.
+- [x] Authenticate and reassess retained public readiness: FRESH, missing_due=0.
+- [x] Preserve D1/D2 diagnostics and all model/Stage 8-11 mathematics.
+- [x] Complete offline acceptance and pre-publication independent review.
+- [ ] Publish the exact SHA, require exact-SHA CI, and confirm local/remote equality.
+
+Phase A performs no private provider access and does not consume L3. The human
+operator alone executes Phase B locally.
