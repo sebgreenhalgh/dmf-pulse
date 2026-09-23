@@ -6846,9 +6846,9 @@
       "sha256": "0a12b45a45e943bf148e484fbe3138cce9c151d843184a9dc55a8748a2f3d10f"
     },
     {
-      "bytes": 19791,
+      "bytes": 19777,
       "path": "tests/unit/scripts/test_ci_coverage_shards.py",
-      "sha256": "75c4a861f37e1a0d9602ca6a6ef07e8af5419391f3e860dfcc1561df8fff34b6"
+      "sha256": "50a84edbeed64139c7cb619f3ad1c8a14fcfa773154ddcfcf8d077cd87eed7e3"
     },
     {
       "bytes": 16627,
