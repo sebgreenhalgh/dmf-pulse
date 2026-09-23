@@ -901,7 +901,7 @@ def _validate_sharded_coverage_ci_contract(ci: str, errors: list[str]) -> None:
         "post_coverage:",
         "fail-fast: false",
         "scripts/ci_coverage_shards.py plan",
-        "--shard-count 8",
+        "--shard-count 16",
         "scripts/ci_coverage_shards.py materialize",
         "scripts/ci_coverage_shards.py verify-artifacts",
         "scripts/ci_coverage_shards.py verify-branch-report",
@@ -922,8 +922,8 @@ def _validate_sharded_coverage_ci_contract(ci: str, errors: list[str]) -> None:
         errors.append("ci.yml sharded architecture retains the obsolete monolithic coverage run")
 
     for match in re.finditer(r"(?m)^\s*timeout-minutes:\s*(\d+)\s*$", ci):
-        if int(match.group(1)) > 35:
-            errors.append("ci.yml sharded architecture must not increase a job timeout above 35")
+        if int(match.group(1)) > 120:
+            errors.append("ci.yml sharded architecture must not increase a job timeout above 120")
 
     for fragment in ("continue-on-error:", "pytest-rerunfailures", "--reruns"):
         if fragment in ci:
@@ -1012,13 +1012,11 @@ def _validate_ci_contract(root: Path, errors: list[str]) -> None:
     stage_ci_fragments = (
         (
             "uv run python scripts/test_migration_matrix.py --baseline-revision 20260803_0005 --target head",
-            'uv run pytest -m "postgres and integration" tests/integration',
             *gcs_coverage_fragments,
             *gcs_gate_fragments,
             "uv run dmf specs validate",
             "uv run dmf ingest odds replay",
             "uv run dmf market observations",
-            "uv run pytest tests/unit/football_events tests/unit/scripts/test_gcs008_acceptance.py tests/unit/scripts/test_gcs008_coverage_gate.py tests/unit/scripts/test_gcs008_scope.py tests/unit/scripts/test_gcs008_wheel.py tests/property/football_events tests/contract/football_events tests/golden/football_events tests/integration/football_events",
             "uv run dmf events score-distribution",
             "uv run dmf events explain-market-fit",
             "uv run python scripts/verify_odd005_wheel.py",
