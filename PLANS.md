@@ -2559,11 +2559,11 @@ Dedicated branch: `infra/test-suite-rationalisation-2026-09-24`.
   weakening the mandatory full-CI correctness gate.
 - [x] 2.03 Reduce duplicated setup and redundant coverage only where successor ownership and
   targeted counterfactual evidence are recorded.
-- [ ] 2.04 Run focused regression, isolation/order, collection, coverage, repository, build,
+- [x] 2.04 Run focused regression, isolation/order, collection, coverage, repository, build,
   security, and exact literal acceptance checks.
-- [ ] 2.05 Record reproducible before/after counts, timings, coverage, removals, ownership,
+- [x] 2.05 Record reproducible before/after counts, timings, coverage, removals, ownership,
   and retained safeguards in the ticket evidence bundle.
-- [ ] 2.06 Complete adversarial review, commit and push the exact SHA, then require its
+- [x] 2.06 Complete adversarial review, commit and push the exact SHA, then require its
   mandatory GitHub Actions run to finish green.
 
 Production semantics, target-season rules, provider rights, numerical behavior, public

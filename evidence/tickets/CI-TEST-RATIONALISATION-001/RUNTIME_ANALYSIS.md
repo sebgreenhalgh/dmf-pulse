@@ -24,3 +24,15 @@ No measured test is removed on timing evidence alone. Deep modules remain in man
 full CI. The new fast command excludes the versioned deep set while retaining pure
 unit/property/contract/security work; the nightly command repeats the deep set and
 performance population without weakening the blocking gate.
+
+## Exact-SHA CI comparison
+
+The code-bearing Phase-2 checkpoint run `35950179886` completed successfully in
+31m33s. Its 16 coverage jobs ranged from 7m19s to 26m28s and totalled 14,018 job
+seconds. Phase 1 was 24m59s, 8m41s to 20m38s, and 13,526 job seconds. Phase 2 is
+therefore not claimed as a full-acceptance runtime reduction: aggregate shard cost
+was 3.6% higher and critical-path wall time was 6m34s higher in this observation.
+The selection and production workload are unchanged apart from replacing two
+redundant nodes with two cheap cadence tests. The wider critical path reinforces
+the documented static-weight/timing-history debt; it does not justify weakening
+the blocking population.

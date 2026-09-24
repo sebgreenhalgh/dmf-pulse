@@ -16,19 +16,20 @@
   },
   "phase2": {
     "branch_coverage": {
-      "covered": null,
-      "percent": null,
-      "status": "PENDING_FINAL_EXACT_SHA_CI",
-      "total": null
+      "covered": 13459,
+      "percent": 92,
+      "status": "PASS",
+      "total": 15522
     },
-    "coverage_shard_range": null,
+    "coverage_shard_range": "00:07:19-00:26:28",
     "fast_development": {
       "nodeids_sha256": "d892e3e457efdc2bdbb33cd1198e0f0cc403650cd38150bc9c8a686b02fc95af",
       "runtime_seconds": 217.77,
       "tests": 2117
     },
-    "full_ci_wall_clock": null,
-    "github_actions_run_id": null,
+    "full_ci_wall_clock": "00:31:33",
+    "github_actions_run_id": 35950179886,
+    "measured_checkpoint_sha": "d84aad776e0b43245771e448c23856f1b77b7c78",
     "non_performance_tests": 5300,
     "performance_tests": 4,
     "test_modules": 427,
@@ -46,7 +47,13 @@
   "runtime_cost": {
     "baseline_aggregate_coverage_shard_job_seconds": 13526,
     "measured_top_20_local_seconds": 2922.95,
-    "phase2_aggregate_coverage_shard_job_seconds": null,
-    "status": "PENDING_FINAL_EXACT_SHA_CI"
+    "phase2_aggregate_coverage_shard_job_seconds": 14018,
+    "status": "MEASURED_CHECKPOINT_SUCCESS"
+  },
+  "coverage_delta": {
+    "covered_branch_delta": -2,
+    "covered_branch_percentage_point_delta": -0.012885,
+    "explanation": "The exact artifact diff is limited to the older-captured-at reuse guards at persistence.py lines 2189-2191 and 2263-2265. No ingestion production or test file changed. Their execution depends on the permitted winner in a concurrency race, so the two-hit difference is run-order coverage variance rather than removed semantic protection.",
+    "statement_delta": -4
   }
 }
