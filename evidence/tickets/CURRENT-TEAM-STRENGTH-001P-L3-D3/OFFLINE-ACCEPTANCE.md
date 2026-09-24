@@ -91,3 +91,35 @@ tier. No selector, test, timeout or quality gate changes.
 The six inherited comparison tests that had asserted the old broad `ValueError`
 ancestry now assert `TeamStrengthComparisonFailure` plus exact safe stage/reason.
 No production mathematics changed to satisfy those tests.
+
+## Final closure
+
+The canonical integrated implementation was published at
+`9239630f355007ba3def2b3cab88a2995d749a22` on
+`readiness/CURRENT-TEAM-STRENGTH-001P-L3-D3-prepared-runner-diagnostic-propagation`.
+Local and remote refs were equal and the tracked worktree was clean. Exact-SHA
+GitHub Actions run `36028866023` completed successfully, including all 16
+coverage shards, the combined branch-data gate, post-coverage acceptance,
+installed-wheel verification, repository validation, and the first-party secret
+scan.
+
+The Phase 1--3 CI remediation commits are infrastructure/test changes. The five
+D3 production paths remain byte-identical to implementation commit
+`62d3da6567dddd94b5e9e6c1dc5beda0ba67d70d`; the integrated tree therefore
+preserves the independently reviewed D3 semantics. The earlier independent
+technical review was conditional only on clean publication, remote equality,
+and green mandatory exact-SHA CI. Those objective conditions are now satisfied;
+no new independent human review is claimed.
+
+The bounded historical L3 conclusion remains exactly:
+
+- shadow preparation succeeded sufficiently to start comparison invocation;
+- comparison invocation did not return normally;
+- the historical detailed failure was erased by the proven `ValueError`
+  interception mechanism;
+- the exact underlying historical comparison failure remains unknown.
+
+L1, L2, and L3 remain consumed. No L4 authority, approval, attestation, provider
+access, retry, or production activation was created or performed during closure.
+
+Final verdict: `CLEAR_FOR_TEAM_STRENGTH_L4_REAUTHORIZATION_DECISION`.

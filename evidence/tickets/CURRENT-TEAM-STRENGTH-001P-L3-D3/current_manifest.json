@@ -66,9 +66,9 @@
       "sha256": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2"
     },
     {
-      "bytes": 14896,
+      "bytes": 14554,
       "path": ".github/workflows/ci.yml",
-      "sha256": "2eed6410224fbbc5b7f8fdf35c08fdf566bef4fb8c685d8671cafd531c250c02"
+      "sha256": "1baba8f14ae530ca415842ffe3bd83d8747cac861b98cbe8b1f70ca37fa22fd4"
     },
     {
       "bytes": 1740,
@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 183122,
+      "bytes": 187068,
       "path": "PLANS.md",
-      "sha256": "e04090bcc9ae533bfc6b308222b4a0785a7b5fdccdebfee7157b072f27ff1b4f"
+      "sha256": "98b17a46ebd666fc1fc2ab3a9b5f316af0a7dee7b7ff96f18a9ccf0574ce20ea"
     },
     {
       "bytes": 2761,
@@ -176,9 +176,9 @@
       "sha256": "61be6787023b0d4309c47cf3551c7a095a816ba0a922f62d4d2e3c2f8bb8e174"
     },
     {
-      "bytes": 6265,
+      "bytes": 8676,
       "path": "README.md",
-      "sha256": "c058012bdf737265892b8f192e218cf5e4d32909c1b94e6b76781200147f7fa4"
+      "sha256": "66d6748b0172f97f16684cadb5ea68b0389122097349a1385d3378f5ad3976fb"
     },
     {
       "bytes": 2072,
@@ -434,6 +434,16 @@
       "bytes": 903,
       "path": "config/rules/fpl-2026-27/transfers.yaml",
       "sha256": "23f3a26b61a341df110cc562c5d362a8cb0828452253dd05c2484dd1687c71e2"
+    },
+    {
+      "bytes": 3487,
+      "path": "config/testing/cadence.json",
+      "sha256": "b6b39cbf736e99093352b62be139db666c1bce9b510797b72a1516e7eefd958f"
+    },
+    {
+      "bytes": 7782,
+      "path": "config/testing/runtime_history.json",
+      "sha256": "ebd67c216319b104c5785b0e1a2494bb737495fb973d03eb72394f159d4ae763"
     },
     {
       "bytes": 852,
@@ -2291,9 +2301,9 @@
       "sha256": "683d62aff383d66ff66cfdfe278f1744189473155252d0e0b632cc98b291febb"
     },
     {
-      "bytes": 42047,
+      "bytes": 64346,
       "path": "scripts/ci_coverage_shards.py",
-      "sha256": "207dab5c8b3bf2050433d3975d7a5be4174e29f58a06d8af3e5a3ad170c797a2"
+      "sha256": "35d6376527fd31b33f5b58386c85b4b8c6e7db92459339bcacbb1f3057ca6d44"
     },
     {
       "bytes": 5852,
@@ -2461,6 +2471,11 @@
       "sha256": "57a61640e4f242c750eaec8aafac3b22b1a580debb2654579d0775815f693037"
     },
     {
+      "bytes": 17705,
+      "path": "scripts/test_suite.py",
+      "sha256": "a57036985f2272d0317843f8e40cc214a53a6b3f981eec9f2924e17e41877814"
+    },
+    {
       "bytes": 1961,
       "path": "scripts/update_team_strength_golden.py",
       "sha256": "b131e61e426c9a7fac7d1b3f7782f5bd36c334a43aa0ba82ae409ec510e4c5ad"
@@ -2476,9 +2491,9 @@
       "sha256": "dd362da8a9a81be532f0e6901045b6dfca7998d113b5c070a9448e01070d8998"
     },
     {
-      "bytes": 74610,
+      "bytes": 74894,
       "path": "scripts/validate_repository.py",
-      "sha256": "a01073b9cec98ec2019e64288be8726fbc7b3f0360e9397e3710c1987b0b958d"
+      "sha256": "87c098600db86eecc81bae4dc679f7a98d1f02e2601388838e39c8324fb4f55a"
     },
     {
       "bytes": 8785,
@@ -6386,9 +6401,9 @@
       "sha256": "b74db2adf57358d5241ba1da1e531bee22de667406a2abc5f5f05ab818b896ba"
     },
     {
-      "bytes": 1788,
+      "bytes": 1372,
       "path": "tests/unit/optimisation/test_service.py",
-      "sha256": "c8a1afb2b58c54c1a61a2b43f8913ef8a8c414435d0dd22511a83a96e6aa706e"
+      "sha256": "edb8217b7eed762a3786886895c45eec689391ca99d32b815b25317a78cfbece"
     },
     {
       "bytes": 9768,
@@ -6681,9 +6696,9 @@
       "sha256": "a552e2e7b005f82fca2f7c069c7a77cbf83bedba3c90539d25feb3443be38ab8"
     },
     {
-      "bytes": 5287,
+      "bytes": 5120,
       "path": "tests/unit/private_v1/test_team_strength_l2.py",
-      "sha256": "81d2fe92a5f4aa8d114c33853ca6c01e3c2de2ca6b6655ac0464d50ec4f9cd0a"
+      "sha256": "516b810ee249ed7ea4569def1758c00a3972d40d0713e4c2c281e998ef84143d"
     },
     {
       "bytes": 2531,
@@ -6846,14 +6861,14 @@
       "sha256": "0a12b45a45e943bf148e484fbe3138cce9c151d843184a9dc55a8748a2f3d10f"
     },
     {
-      "bytes": 20990,
+      "bytes": 25365,
       "path": "tests/unit/scripts/test_ci_coverage_shards.py",
-      "sha256": "7bca87167a44f4c9c3c00e9c22c5fd26e3b26aa83cf189e9ff9e9c34c2ff1627"
+      "sha256": "c420d903c4396e8841bfc0dfd24e726211e7903d539345fd4d2cab0b069179aa"
     },
     {
-      "bytes": 16627,
+      "bytes": 17868,
       "path": "tests/unit/scripts/test_ci_workflow_contract.py",
-      "sha256": "ef1bbd33d0a4ffb95439010085e5bfb0d9cde06bc08c539208b6d62a597784bb"
+      "sha256": "c8e94ac5fce9524f30fccaf8d12bfb285f317d9dbccc8231d22e3ef61937f609"
     },
     {
       "bytes": 4064,
@@ -6879,6 +6894,11 @@
       "bytes": 296,
       "path": "tests/unit/scripts/test_opt010_repository_validation.py",
       "sha256": "99bf4647b80f26ff66dea3942e3437864c8f011105bc2958abfe499dc24ce270"
+    },
+    {
+      "bytes": 3761,
+      "path": "tests/unit/scripts/test_test_suite.py",
+      "sha256": "e9171d6efc76013b70b289e994ab97bdb255a7f9f1b536c38131eff44b206d14"
     },
     {
       "bytes": 8568,

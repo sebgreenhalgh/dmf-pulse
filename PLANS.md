@@ -2522,7 +2522,9 @@ Exact parent: `b774056f20e855d7a755186fe62489e3d393ecfe`.
   including both D3-specific standalone suites and the A2 assignment, with no
   assertion failure in its two timed-out shards; use the proven 25m14s D3 and
   27m10s five-case durations for bounded fast-test coassignment only.
-- [ ] Complete inherited acceptance, independent review, publication and exact-SHA CI.
+- [x] Complete inherited acceptance, conditional independent-review closure,
+  publication, and exact-SHA CI at canonical SHA
+  `9239630f355007ba3def2b3cab88a2995d749a22`, run `36028866023` (`SUCCESS`).
 
 D3 is offline-only: provider requests and credential inspection remain zero. It
 does not modify model, Stage 8-11, materiality, network-denial or decision semantics.
