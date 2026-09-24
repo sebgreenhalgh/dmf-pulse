@@ -1,0 +1,43 @@
+{
+  "comparison": {
+    "eligible_nodeid_count": 5300,
+    "eligible_nodeid_sha256": "93303c8ea155f66831338f1e6cd854b1af2c9bb6deaab22fbdec5e075d4dc30e",
+    "selection_equal": true,
+    "shard_count": 16
+  },
+  "new_runtime_plan": {
+    "estimated_module_count": 13,
+    "estimated_seconds": {
+      "imbalance_ratio": 1.167246,
+      "maximum": 977.0,
+      "median": 837.68,
+      "minimum": 837.013,
+      "spread": 139.987,
+      "total": 13543.895
+    },
+    "fallback_module_count": 404,
+    "manifest_module_count": 20,
+    "measured_module_count": 7,
+    "node_partition_exception_count": 2,
+    "runtime_history_sha256": "8262815ce6f7b3b36dc755c6650c93ed612b03e5564b339560fd6fdebcc940de",
+    "static_override_count": 0
+  },
+  "phase2_plan": {
+    "runtime_reestimated_seconds": {
+      "imbalance_ratio": 3.590777,
+      "maximum": 1604.0,
+      "median": 667.0,
+      "minimum": 446.7,
+      "spread": 1157.3,
+      "total": 12157.18
+    },
+    "static_override_count": 53,
+    "static_weight_units": {
+      "maximum": 5000,
+      "minimum": 2455,
+      "spread": 2545,
+      "total": 48203
+    }
+  },
+  "schema_version": "ci-runtime-scheduling-benchmark-v1"
+}

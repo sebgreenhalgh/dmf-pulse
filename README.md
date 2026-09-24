@@ -91,6 +91,30 @@ mandatory acceptance population. `nightly` repeats the explicitly expensive
 assurance modules and performance tests; it does not remove those correctness
 tests from blocking full acceptance.
 
+The mandatory non-performance coverage population is partitioned by whole test
+module using the versioned observations in
+`config/testing/runtime_history.json`. Manifest modules prefer the conservative
+maximum of their five most recent measured observations, falling back to an
+explicitly labelled calibrated estimate when no measured sample exists; unknown
+modules use the documented node-count fallback. Timing data can change placement only: pytest collection
+still owns selection, and the plan proves a complete, disjoint partition.
+Whole-module grouping remains the default. The manifest contains two documented
+node-partition exceptions where measured evidence shows independent dominant
+cases; adding another exception requires an explicit reason and evidence reference.
+
+Maintainers can merge one offline observation set deterministically with:
+
+```text
+uv run python scripts/ci_coverage_shards.py update-timings --input <observations.json> --manifest config/testing/runtime_history.json --output config/testing/runtime_history.json
+```
+
+The input schema is `ci-runtime-observations-v1`, with one immutable source
+object (`id`, `kind`, `observed_at_utc`, `description`, `reference`) and a `modules`
+object mapping canonical repository-relative `tests/**/*.py` paths to positive
+seconds. The updater rejects unknown paths and conflicting replays, preserves
+unmentioned modules, retains five observations per module, and is idempotent
+for an identical source.
+
 Canonical quality commands are executable without Make:
 
 ```text

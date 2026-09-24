@@ -1,9 +1,10 @@
 """Plan, transport, and verify deterministic branch-coverage shards for CI.
 
-The planner owns the semantic selector used by CI (``not performance``).  It
-collects nodeids through pytest, keeps every test module intact, and uses a
-static longest-processing-time partition.  Runtime history is deliberately
-not consulted: a repository commit must always produce the same plan.
+The planner owns the semantic selector used by CI (``not performance``). It
+collects nodeids through pytest and uses a versioned runtime manifest with
+deterministic longest-processing-time placement. Modules stay intact unless a
+manifest-declared, evidence-backed exception permits node partitioning.
+Timing changes placement only; collection remains the sole source of selection.
 """
 
 from __future__ import annotations
@@ -13,7 +14,9 @@ import contextlib
 import hashlib
 import io
 import json
+import math
 import re
+import statistics
 import subprocess
 import sys
 from collections.abc import Iterable, Mapping, Sequence
@@ -23,93 +26,17 @@ import pytest
 from coverage import CoverageData
 
 MARKER_EXPRESSION = "not performance"
-SCHEMA_VERSION = "ci-coverage-shard-plan-v1"
+SCHEMA_VERSION = "ci-coverage-shard-plan-v2"
 SHARD_RESULT_SCHEMA_VERSION = "ci-coverage-shard-result-v1"
 BRANCH_REPORT_SCHEMA_VERSION = "ci-coverage-branch-proof-v1"
-ALGORITHM = "module-grouped-lpt-v1"
-DEFAULT_FILE_WEIGHT = 5
-DEFAULT_NODEID_WEIGHT = 1
-
-# These total-file estimates are static balancing hints, not test-selection
-# policy.  They are based on the repository's sealed OPT-010 runtime evidence
-# and exact-SHA Actions observations.  In particular, a four-test assurance
-# file took about 940 seconds under branch coverage while several one-gameweek
-# optimiser and prepared-runner modules take about 90-1,200 seconds each.
-FILE_WEIGHT_OVERRIDES: Mapping[str, int] = {
-    "tests/assurance/optimisation/test_r2c_artifact_validation.py": 3200,
-    "tests/assurance/optimisation/test_surface.py": 500,
-    "tests/contract/optimisation/test_r2a_contract_gates.py": 500,
-    "tests/golden/optimisation/test_golden.py": 500,
-    "tests/golden/optimisation/test_three_gameweek_ft_carry.py": 180,
-    "tests/integration/availability/test_min007g_service.py": 45,
-    "tests/integration/availability/test_audit0073_cli_mapping.py": 190,
-    "tests/integration/migrations/test_migrations.py": 65,
-    "tests/integration/markets/test_current_market_identity_readonly.py": 220,
-    "tests/integration/optimisation/test_integration.py": 700,
-    "tests/property/optimisation/test_oracle_equivalence.py": 45,
-    "tests/unit/availability/test_audit0073_cli_semantics.py": 45,
-    "tests/unit/availability/test_current_model.py": 180,
-    "tests/unit/optimisation/test_r2b_semantics.py": 250,
-    "tests/unit/optimisation/test_service.py": 2800,
-    "tests/unit/optimisation/test_future_transfer_scope.py": 350,
-    "tests/unit/optimisation/test_stage10_r7_factoring.py": 100,
-    "tests/unit/optimisation/test_stage11_exact_acceleration.py": 80,
-    "tests/unit/optimisation/test_terminal_r7_equivalence.py": 850,
-    "tests/unit/optimisation/test_three_gameweek_horizon.py": 130,
-    "tests/unit/prices/test_configuration_contracts.py": 550,
-    # 001P real-model preparation and canonical solves: local branch-coverage
-    # comparison measured 587s; the five-case group gets a conservative static
-    # estimate. These only balance modules: no selector, timeout or gate changes.
-    "tests/unit/private_v1/test_team_strength_shadow_comparison.py": 3000,
-    "tests/unit/private_v1/test_team_strength_shadow_cases.py": 4800,
-    "tests/unit/private_v1/test_team_strength_shadow_inputs.py": 150,
-    # L1 adds one real two-world/provider-shaped preparation plus authenticated
-    # public readiness tests. Static balancing only; no selection/gate changes.
-    "tests/unit/private_v1/test_team_strength_l1_e2e.py": 5000,
-    "tests/unit/private_v1/test_team_strength_l1.py": 270,
-    "tests/unit/ingestion/openfootball/test_team_strength_current.py": 200,
-    # D1 run 35760625057: every test passed, but shard 2 hit the 35-minute
-    # job limit during cleanup. A2 preparation took 782s and the A1 comparison
-    # 290s despite small node counts; ordinary one-command took 476s, and D1
-    # diagnostics at least 279s. Static scheduling only: selectors, timeout,
-    # complete collection, artifact verification and coverage gates are unchanged.
-    "tests/unit/private_v1/test_a1_03_shadow_comparison.py": 580,
-    "tests/unit/private_v1/test_a2_preparation.py": 2800,
-    "tests/unit/private_v1/test_one_command.py": 2400,
-    "tests/unit/private_v1/test_team_strength_d1_diagnostics.py": 750,
-    # Exact-SHA run 35902055457 exposed additional inherited modules whose
-    # node-count estimates understated measured branch-coverage runtime. These
-    # conservative total-file weights restore runtime-aware distribution only;
-    # complete collection, selectors, timeout and quality gates are unchanged.
-    "tests/unit/ingestion/test_current_unified_state_boundaries.py": 500,
-    "tests/unit/ingestion/test_fpl_client.py": 260,
-    "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": 180,
-    "tests/unit/ingestion/test_fpl_current_game_settings.py": 150,
-    "tests/unit/ingestion/test_fpl_current_input.py": 450,
-    "tests/unit/ingestion/test_odds_model_config_boundaries.py": 450,
-    "tests/unit/ingestion/test_one_command_assembly.py": 90,
-    "tests/unit/markets/test_current_market_contract_invariants.py": 70,
-    "tests/unit/markets/test_current_market_weight_canonicalisation.py": 55,
-    "tests/unit/markets/test_current_markets_boundaries.py": 190,
-    "tests/unit/markets/test_repository_persistence_boundaries.py": 570,
-    "tests/unit/private_v1/test_a1_allocation_injection.py": 470,
-    "tests/unit/private_v1/test_a2_live_shadow_observation.py": 200,
-    "tests/unit/private_v1/test_bounded_horizon_oracle.py": 540,
-    "tests/unit/private_v1/test_future_scope_assembly.py": 220,
-    "tests/unit/private_v1/test_horizon_candidate_oracle.py": 540,
-    "tests/unit/private_v1/test_horizon_markets.py": 60,
-    "tests/unit/private_v1/test_rolling_contracts.py": 50,
-    "tests/unit/private_v1/test_rolling_service.py": 190,
-    "tests/unit/private_v1/test_score_prior_prefetch.py": 680,
-    "tests/unit/private_v1/test_service.py": 140,
-    # D3 exact-SHA runs 35889911797 / 35896662500 placed this real prepared-runner
-    # seam after 27m / 24m of inherited work. Exact-SHA run 35929503354 measured
-    # the isolated seam at 25m14s and the five-case suite at 27m10s, permitting
-    # only bounded fast coassignment; collection, selectors and gates are unchanged.
-    "tests/unit/private_v1/test_team_strength_d3_seam.py": 4500,
-}
+RUNTIME_HISTORY_SCHEMA_VERSION = "ci-runtime-history-v1"
+RUNTIME_OBSERVATIONS_SCHEMA_VERSION = "ci-runtime-observations-v1"
+ALGORITHM = "runtime-informed-lpt-v2"
+DEFAULT_RUNTIME_HISTORY_PATH = Path("config/testing/runtime_history.json")
 
 _GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
+_SOURCE_ID = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
+_UTC_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 _DRIVE_PATH = re.compile(r"^[A-Za-z]:")
 _SHARD_METADATA_NAME = re.compile(r"^shard-(\d{2,})\.json$")
 _SHARD_COVERAGE_NAME = re.compile(r"^coverage-data-shard-(\d{2,})$")
@@ -164,12 +91,47 @@ def _require_integer(
     return value
 
 
+def _require_number(
+    value: object,
+    *,
+    label: str,
+    minimum: float = 0.0,
+) -> float:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(value)
+        or float(value) < minimum
+    ):
+        raise ShardPlannerError(f"{label} must be a finite number >= {minimum}")
+    return float(value)
+
+
 def _require_exact_keys(value: Mapping[str, object], expected: set[str], *, label: str) -> None:
     actual = set(value)
     if actual != expected:
         missing = sorted(expected - actual)
         extra = sorted(actual - expected)
         raise ShardPlannerError(f"{label} keys are invalid; missing={missing}, extra={extra}")
+
+
+def normalize_module_path(value: str) -> str:
+    """Return one canonical repository-relative Python test-module path."""
+
+    if not isinstance(value, str) or not value:
+        raise ShardPlannerError("test module path must be a non-empty string")
+    if "::" in value or any(character in value for character in ("\x00", "\r", "\n")):
+        raise ShardPlannerError(f"test module path is invalid: {value!r}")
+    normalized = value.replace("\\", "/")
+    if normalized.startswith("/") or _DRIVE_PATH.match(normalized):
+        raise ShardPlannerError(f"test module path must be repository-relative: {value!r}")
+    raw_parts = normalized.split("/")
+    if any(part in {"", ".", ".."} for part in raw_parts):
+        raise ShardPlannerError(f"test module path is unsafe: {value!r}")
+    path = PurePosixPath(*raw_parts)
+    if not path.parts or path.parts[0] != "tests" or path.suffix != ".py":
+        raise ShardPlannerError(f"test module path must be a Python test under tests/: {value!r}")
+    return path.as_posix()
 
 
 def normalize_nodeid(value: str) -> str:
@@ -182,16 +144,11 @@ def normalize_nodeid(value: str) -> str:
     file_part, separator, test_part = value.partition("::")
     if not separator or not test_part:
         raise ShardPlannerError(f"nodeid has no test suffix: {value!r}")
-    normalized_file = file_part.replace("\\", "/")
-    if normalized_file.startswith("/") or _DRIVE_PATH.match(normalized_file):
-        raise ShardPlannerError(f"nodeid file path must be repository-relative: {value!r}")
-    raw_parts = normalized_file.split("/")
-    if any(part in {"", ".", ".."} for part in raw_parts):
-        raise ShardPlannerError(f"nodeid file path is unsafe: {value!r}")
-    path = PurePosixPath(*raw_parts)
-    if not path.parts or path.parts[0] != "tests" or path.suffix != ".py":
-        raise ShardPlannerError(f"nodeid file path must be a Python test under tests/: {value!r}")
-    return f"{path.as_posix()}::{test_part}"
+    try:
+        normalized_file = normalize_module_path(file_part)
+    except ShardPlannerError as exc:
+        raise ShardPlannerError(f"nodeid file path is invalid: {value!r}") from exc
+    return f"{normalized_file}::{test_part}"
 
 
 def _nodeid_file(nodeid: str) -> str:
@@ -231,23 +188,275 @@ def collect_eligible_nodeids() -> tuple[str, ...]:
     return normalize_nodeids(plugin.nodeids)
 
 
-def _estimated_file_weight(path: str, nodeid_count: int) -> int:
-    return FILE_WEIGHT_OVERRIDES.get(
-        path,
-        DEFAULT_FILE_WEIGHT + DEFAULT_NODEID_WEIGHT * nodeid_count,
+def validate_runtime_history(value: object) -> dict[str, object]:
+    """Fail closed on malformed timing data without requiring entries to be current."""
+
+    history = _mapping(value, label="runtime history")
+    _require_exact_keys(
+        history,
+        {
+            "estimator",
+            "fallback",
+            "max_samples_per_module",
+            "modules",
+            "node_partition_exceptions",
+            "schema_version",
+            "sources",
+        },
+        label="runtime history",
     )
+    if history["schema_version"] != RUNTIME_HISTORY_SCHEMA_VERSION:
+        raise ShardPlannerError("runtime history schema_version is unsupported")
+    if history["estimator"] != "measured-preferred-max-recent-5-v1":
+        raise ShardPlannerError("runtime history estimator is unsupported")
+    max_samples = _require_integer(
+        history["max_samples_per_module"],
+        label="runtime history.max_samples_per_module",
+        minimum=1,
+    )
+    if max_samples != 5:
+        raise ShardPlannerError("runtime history max_samples_per_module must be 5")
 
+    fallback = _mapping(history["fallback"], label="runtime history.fallback")
+    _require_exact_keys(
+        fallback,
+        {"base_seconds", "per_node_seconds", "source"},
+        label="runtime history.fallback",
+    )
+    _require_number(fallback["base_seconds"], label="fallback.base_seconds", minimum=0.001)
+    _require_number(fallback["per_node_seconds"], label="fallback.per_node_seconds", minimum=0.001)
+    if not isinstance(fallback["source"], str) or not fallback["source"].strip():
+        raise ShardPlannerError("fallback.source must be a non-empty string")
 
-def _weight_model_sha256() -> str:
-    return hashlib.sha256(
-        _canonical_json(
-            {
-                "default_file_weight": DEFAULT_FILE_WEIGHT,
-                "default_nodeid_weight": DEFAULT_NODEID_WEIGHT,
-                "file_weight_overrides": dict(sorted(FILE_WEIGHT_OVERRIDES.items())),
-            }
+    sources_value = history["sources"]
+    if not isinstance(sources_value, list) or not sources_value:
+        raise ShardPlannerError("runtime history.sources must be a non-empty array")
+    sources: dict[str, Mapping[str, object]] = {}
+    source_order: dict[str, int] = {}
+    previous_source_key: tuple[str, str] | None = None
+    for position, raw_source in enumerate(sources_value):
+        source = _mapping(raw_source, label=f"runtime history.sources[{position}]")
+        _require_exact_keys(
+            source,
+            {"description", "id", "kind", "observed_at_utc", "reference"},
+            label=f"runtime history.sources[{position}]",
         )
-    ).hexdigest()
+        source_id = source["id"]
+        if not isinstance(source_id, str) or _SOURCE_ID.fullmatch(source_id) is None:
+            raise ShardPlannerError(f"runtime source id is invalid at position {position}")
+        if source_id in sources:
+            raise ShardPlannerError(f"runtime source id is duplicated: {source_id}")
+        observed_at = source["observed_at_utc"]
+        if not isinstance(observed_at, str) or _UTC_TIMESTAMP.fullmatch(observed_at) is None:
+            raise ShardPlannerError(f"runtime source observed_at_utc is invalid: {source_id}")
+        for field in ("description", "reference"):
+            if not isinstance(source[field], str) or not str(source[field]).strip():
+                raise ShardPlannerError(f"runtime source {source_id}.{field} must be non-empty")
+        if source["kind"] not in {"estimated", "measured"}:
+            raise ShardPlannerError(f"runtime source {source_id}.kind is invalid")
+        source_key = (observed_at, source_id)
+        if previous_source_key is not None and source_key <= previous_source_key:
+            raise ShardPlannerError("runtime history.sources must be chronological and unique")
+        previous_source_key = source_key
+        sources[source_id] = source
+        source_order[source_id] = position
+
+    modules = _mapping(history["modules"], label="runtime history.modules")
+    for raw_path, raw_entry in modules.items():
+        path = normalize_module_path(raw_path)
+        if path != raw_path:
+            raise ShardPlannerError(f"runtime module path is noncanonical: {raw_path!r}")
+        entry = _mapping(raw_entry, label=f"runtime module {path}")
+        _require_exact_keys(
+            entry,
+            {"estimated_seconds", "observations", "sample_count"},
+            label=f"runtime module {path}",
+        )
+        observations_value = entry["observations"]
+        if (
+            not isinstance(observations_value, list)
+            or not observations_value
+            or len(observations_value) > max_samples
+        ):
+            raise ShardPlannerError(
+                f"runtime module {path}.observations must contain 1-{max_samples} samples"
+            )
+        observation_seconds: list[float] = []
+        observation_sources: list[str] = []
+        for index, raw_observation in enumerate(observations_value):
+            observation = _mapping(raw_observation, label=f"runtime module {path} sample {index}")
+            _require_exact_keys(
+                observation,
+                {"seconds", "source_id"},
+                label=f"runtime module {path} sample {index}",
+            )
+            source_id = observation["source_id"]
+            if not isinstance(source_id, str) or source_id not in sources:
+                raise ShardPlannerError(
+                    f"runtime module {path} references an unknown source: {source_id!r}"
+                )
+            if source_id in observation_sources:
+                raise ShardPlannerError(
+                    f"runtime module {path} repeats source observation {source_id}"
+                )
+            observation_sources.append(source_id)
+            observation_seconds.append(
+                _require_number(
+                    observation["seconds"],
+                    label=f"runtime module {path} sample {index}.seconds",
+                    minimum=0.001,
+                )
+            )
+        if observation_sources != sorted(observation_sources, key=source_order.__getitem__):
+            raise ShardPlannerError(f"runtime module {path} observations are not chronological")
+        if _require_integer(
+            entry["sample_count"], label=f"runtime module {path}.sample_count"
+        ) != len(observation_seconds):
+            raise ShardPlannerError(f"runtime module {path}.sample_count is inconsistent")
+        estimate = _require_number(
+            entry["estimated_seconds"],
+            label=f"runtime module {path}.estimated_seconds",
+            minimum=0.001,
+        )
+        measured_seconds = [
+            seconds
+            for seconds, source_id in zip(observation_seconds, observation_sources, strict=True)
+            if sources[source_id]["kind"] == "measured"
+        ]
+        expected_estimate = max(measured_seconds or observation_seconds)
+        if not math.isclose(estimate, expected_estimate, rel_tol=0.0, abs_tol=0.000_001):
+            raise ShardPlannerError(f"runtime module {path}.estimated_seconds is inconsistent")
+
+    exceptions = _mapping(
+        history["node_partition_exceptions"],
+        label="runtime history.node_partition_exceptions",
+    )
+    for raw_path, raw_exception in exceptions.items():
+        path = normalize_module_path(raw_path)
+        if path != raw_path or path not in modules:
+            raise ShardPlannerError(f"node-partition exception is unknown: {raw_path!r}")
+        exception = _mapping(raw_exception, label=f"node-partition exception {path}")
+        _require_exact_keys(
+            exception,
+            {"estimated_seconds_per_node", "reason", "reference"},
+            label=f"node-partition exception {path}",
+        )
+        for field in ("reason", "reference"):
+            if not isinstance(exception[field], str) or not str(exception[field]).strip():
+                raise ShardPlannerError(f"node-partition exception {path}.{field} is empty")
+        per_node = _require_number(
+            exception["estimated_seconds_per_node"],
+            label=f"node-partition exception {path}.estimated_seconds_per_node",
+            minimum=0.001,
+        )
+        module = _mapping(modules[path], label=f"runtime module {path}")
+        if per_node > float(module["estimated_seconds"]):
+            raise ShardPlannerError(f"node-partition exception {path} exceeds its module estimate")
+    return dict(history)
+
+
+def load_runtime_history(path: Path = DEFAULT_RUNTIME_HISTORY_PATH) -> dict[str, object]:
+    return validate_runtime_history(_read_json(path, label="runtime history"))
+
+
+def _runtime_history_sha256(history: Mapping[str, object]) -> str:
+    return hashlib.sha256(_canonical_json(history)).hexdigest()
+
+
+def _estimated_module_seconds(
+    history: Mapping[str, object], path: str, nodeid_count: int
+) -> tuple[float, str, str]:
+    modules = _mapping(history["modules"], label="runtime history.modules")
+    entry = modules.get(path)
+    if entry is not None:
+        module = _mapping(entry, label=f"runtime module {path}")
+        estimate = round(float(module["estimated_seconds"]), 3)
+        observations = _string_mapping_list(
+            module["observations"], label=f"runtime module {path}.observations"
+        )
+        dominant = next(
+            observation
+            for observation in reversed(observations)
+            if math.isclose(float(observation["seconds"]), estimate, rel_tol=0.0, abs_tol=0.000_001)
+        )
+        sources = {
+            source["id"]: source
+            for source in _string_mapping_list(history["sources"], label="runtime sources")
+        }
+        source = sources[dominant["source_id"]]
+        return estimate, "manifest", str(source["kind"])
+    fallback = _mapping(history["fallback"], label="runtime history.fallback")
+    estimate = max(
+        float(fallback["base_seconds"]),
+        float(fallback["per_node_seconds"]) * nodeid_count,
+    )
+    return round(estimate, 3), "fallback", "fallback"
+
+
+def _partition_granularity(history: Mapping[str, object], path: str) -> str:
+    exceptions = _mapping(
+        history["node_partition_exceptions"],
+        label="runtime history.node_partition_exceptions",
+    )
+    return "node" if path in exceptions else "module"
+
+
+def _node_partition_seconds(history: Mapping[str, object], path: str) -> float:
+    exceptions = _mapping(
+        history["node_partition_exceptions"],
+        label="runtime history.node_partition_exceptions",
+    )
+    exception = _mapping(exceptions[path], label=f"node-partition exception {path}")
+    return round(float(exception["estimated_seconds_per_node"]), 3)
+
+
+def _runtime_summary(shards: Sequence[Mapping[str, object]]) -> dict[str, object]:
+    loads = [float(shard["estimated_seconds"]) for shard in shards]
+    minimum = min(loads)
+    maximum = max(loads)
+    median = float(statistics.median(loads))
+    max_index = loads.index(maximum)
+    max_modules = _string_mapping_list(shards[max_index]["modules"], label="max shard modules")
+    dominant = max(max_modules, key=lambda module: float(module["estimated_seconds"]))
+    unique_modules = {
+        str(module["path"]): module
+        for shard in shards
+        for module in _string_mapping_list(shard["modules"], label="shard modules")
+    }
+    outlier_threshold = 2.0 * median
+    outlier = maximum > outlier_threshold
+    explains = not outlier or float(dominant["estimated_seconds"]) >= maximum - median
+    return {
+        "estimated_spread_seconds": round(maximum - minimum, 3),
+        "fallback_module_count": sum(
+            module["timing_source"] == "fallback" for module in unique_modules.values()
+        ),
+        "estimated_module_count": sum(
+            module["estimate_kind"] == "estimated" for module in unique_modules.values()
+        ),
+        "imbalance_ratio": round(maximum / minimum, 6),
+        "manifest_module_count": sum(
+            module["timing_source"] == "manifest" for module in unique_modules.values()
+        ),
+        "measured_module_count": sum(
+            module["estimate_kind"] == "measured" for module in unique_modules.values()
+        ),
+        "max_estimated_shard_seconds": round(maximum, 3),
+        "median_estimated_shard_seconds": round(median, 3),
+        "min_estimated_shard_seconds": round(minimum, 3),
+        "quality": {
+            "dominant_module_explains_outlier": explains,
+            "dominant_module_path": dominant["path"],
+            "outlier_threshold_seconds": round(outlier_threshold, 3),
+            "status": "PASS" if explains else "FAIL",
+        },
+    }
+
+
+def _string_mapping_list(value: object, *, label: str) -> list[Mapping[str, object]]:
+    if not isinstance(value, list):
+        raise ShardPlannerError(f"{label} must be an array")
+    return [_mapping(item, label=f"{label} item") for item in value]
 
 
 def _plan_sha256(value: Mapping[str, object]) -> str:
@@ -261,11 +470,15 @@ def build_plan(
     *,
     shard_count: int,
     git_sha: str,
+    runtime_history: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
-    """Build a deterministic complete module-grouped LPT partition."""
+    """Build a deterministic complete runtime-informed LPT partition."""
 
     sha = _require_git_sha(git_sha)
     count = _require_integer(shard_count, label="shard_count", minimum=1)
+    history = validate_runtime_history(
+        load_runtime_history() if runtime_history is None else runtime_history
+    )
     eligible = normalize_nodeids(nodeids)
     grouped: dict[str, list[str]] = {}
     for nodeid in eligible:
@@ -275,22 +488,45 @@ def build_plan(
             "shard_count cannot exceed the eligible test-file count while module grouping is required"
         )
 
-    groups = [
-        {
-            "estimated_weight": _estimated_file_weight(path, len(file_nodeids)),
-            "nodeids": tuple(file_nodeids),
-            "path": path,
-        }
-        for path, file_nodeids in grouped.items()
-    ]
-    groups.sort(key=lambda item: (-int(item["estimated_weight"]), str(item["path"])))
+    groups: list[dict[str, object]] = []
+    for path, file_nodeids in grouped.items():
+        estimate, timing_source, estimate_kind = _estimated_module_seconds(
+            history, path, len(file_nodeids)
+        )
+        granularity = _partition_granularity(history, path)
+        grouped_nodeids = (
+            tuple((nodeid,) for nodeid in file_nodeids)
+            if granularity == "node"
+            else (tuple(file_nodeids),)
+        )
+        group_estimate = (
+            _node_partition_seconds(history, path) if granularity == "node" else estimate
+        )
+        for group_nodeids in grouped_nodeids:
+            groups.append(
+                {
+                    "estimate_kind": estimate_kind,
+                    "estimated_seconds": group_estimate,
+                    "nodeids": group_nodeids,
+                    "partition_granularity": granularity,
+                    "path": path,
+                    "timing_source": timing_source,
+                }
+            )
+    groups.sort(
+        key=lambda item: (
+            -float(item["estimated_seconds"]),
+            str(item["path"]),
+            tuple(item["nodeids"]),  # type: ignore[arg-type]
+        )
+    )
 
     shard_groups: list[list[dict[str, object]]] = [[] for _ in range(count)]
-    shard_weights = [0] * count
+    shard_loads = [0.0] * count
     for group in groups:
-        shard_index = min(range(count), key=lambda index: (shard_weights[index], index))
+        shard_index = min(range(count), key=lambda index: (shard_loads[index], index))
         shard_groups[shard_index].append(group)
-        shard_weights[shard_index] += int(group["estimated_weight"])
+        shard_loads[shard_index] += float(group["estimated_seconds"])
 
     shards: list[dict[str, object]] = []
     assigned: list[str] = []
@@ -302,11 +538,34 @@ def build_plan(
                 for nodeid in group["nodeids"]  # type: ignore[union-attr]
             )
         )
-        test_files = tuple(sorted(str(group["path"]) for group in values))
+        test_files = tuple(sorted({str(group["path"]) for group in values}))
+        diagnostics_by_path: dict[str, dict[str, object]] = {}
+        for group in values:
+            path = str(group["path"])
+            diagnostic = diagnostics_by_path.setdefault(
+                path,
+                {
+                    "estimate_kind": group["estimate_kind"],
+                    "estimated_seconds": 0.0,
+                    "nodeid_count": 0,
+                    "partition_granularity": group["partition_granularity"],
+                    "path": path,
+                    "timing_source": group["timing_source"],
+                },
+            )
+            diagnostic["estimated_seconds"] = round(
+                float(diagnostic["estimated_seconds"]) + float(group["estimated_seconds"]),
+                3,
+            )
+            diagnostic["nodeid_count"] = int(diagnostic["nodeid_count"]) + len(
+                group["nodeids"]  # type: ignore[arg-type]
+            )
+        module_diagnostics = [diagnostics_by_path[path] for path in sorted(diagnostics_by_path)]
         assigned.extend(shard_nodeids)
         shards.append(
             {
-                "estimated_weight": shard_weights[shard_index],
+                "estimated_seconds": round(shard_loads[shard_index], 3),
+                "modules": module_diagnostics,
                 "nodeid_count": len(shard_nodeids),
                 "nodeid_sha256": _digest_strings(shard_nodeids),
                 "nodeids": list(shard_nodeids),
@@ -338,13 +597,18 @@ def build_plan(
             "unexpected_nodeid_count": unexpected_count,
         },
         "plan_sha256": "",
+        "runtime_history_sha256": _runtime_history_sha256(history),
+        "runtime_summary": _runtime_summary(shards),
         "schema_version": SCHEMA_VERSION,
         "shard_count": count,
         "shards": shards,
-        "weight_model_sha256": _weight_model_sha256(),
     }
+    summary = _mapping(plan["runtime_summary"], label="runtime summary")
+    quality = _mapping(summary["quality"], label="runtime summary.quality")
+    if quality["status"] != "PASS":
+        raise ShardPlannerError("runtime plan fails the pathological-packing quality check")
     plan["plan_sha256"] = _plan_sha256(plan)
-    validate_plan(plan, expected_git_sha=sha)
+    validate_plan(plan, expected_git_sha=sha, runtime_history=history)
     return plan
 
 
@@ -364,9 +628,13 @@ def validate_plan(
     value: object,
     *,
     expected_git_sha: str | None = None,
+    runtime_history: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Validate every redundant plan invariant and return the typed mapping."""
 
+    history = validate_runtime_history(
+        load_runtime_history() if runtime_history is None else runtime_history
+    )
     plan = _mapping(value, label="plan")
     _require_exact_keys(
         plan,
@@ -378,10 +646,11 @@ def validate_plan(
             "marker_expression",
             "partition",
             "plan_sha256",
+            "runtime_history_sha256",
+            "runtime_summary",
             "schema_version",
             "shard_count",
             "shards",
-            "weight_model_sha256",
         },
         label="plan",
     )
@@ -394,14 +663,23 @@ def validate_plan(
     sha = _require_git_sha(plan["git_sha"])
     if expected_git_sha is not None and sha != _require_git_sha(expected_git_sha):
         raise ShardPlannerError("plan git_sha does not match the expected commit")
-    if plan["weight_model_sha256"] != _weight_model_sha256():
-        raise ShardPlannerError("plan weight model does not match this repository commit")
+    if plan["runtime_history_sha256"] != _runtime_history_sha256(history):
+        raise ShardPlannerError("plan runtime history does not match the supplied manifest")
     if plan["plan_sha256"] != _plan_sha256(plan):
         raise ShardPlannerError("plan_sha256 is inconsistent")
     shard_count = _require_integer(plan["shard_count"], label="plan.shard_count", minimum=1)
     shards_value = plan["shards"]
     if not isinstance(shards_value, list) or len(shards_value) != shard_count:
         raise ShardPlannerError("plan shards do not match shard_count")
+    planned_nodeids = [
+        normalize_nodeid(nodeid)
+        for raw_shard in shards_value
+        for nodeid in _string_list(
+            _mapping(raw_shard, label="plan shard")["nodeids"],
+            label="plan shard nodeids",
+        )
+    ]
+    global_file_counts = _counts(_nodeid_file(nodeid) for nodeid in planned_nodeids)
 
     all_nodeids: list[str] = []
     file_owner: dict[str, int] = {}
@@ -412,7 +690,8 @@ def validate_plan(
         _require_exact_keys(
             shard,
             {
-                "estimated_weight",
+                "estimated_seconds",
+                "modules",
                 "nodeid_count",
                 "nodeid_sha256",
                 "nodeids",
@@ -449,23 +728,74 @@ def validate_plan(
             shard["test_file_count"], label=f"plan.shards[{position}].test_file_count"
         ) != len(test_files):
             raise ShardPlannerError(f"plan shard {index} test_file_count is inconsistent")
-        expected_weight = sum(
-            _estimated_file_weight(
-                path,
-                sum(_nodeid_file(nodeid) == path for nodeid in nodeids),
+        modules = _string_mapping_list(shard["modules"], label=f"plan.shards[{position}].modules")
+        module_paths: list[str] = []
+        expected_shard_seconds = 0.0
+        for module_position, module in enumerate(modules):
+            module_label = f"plan.shards[{position}].modules[{module_position}]"
+            _require_exact_keys(
+                module,
+                {
+                    "estimate_kind",
+                    "estimated_seconds",
+                    "nodeid_count",
+                    "partition_granularity",
+                    "path",
+                    "timing_source",
+                },
+                label=module_label,
             )
-            for path in test_files
+            module_path = normalize_module_path(module.get("path"))  # type: ignore[arg-type]
+            module_paths.append(module_path)
+            module_nodeid_count = sum(_nodeid_file(nodeid) == module_path for nodeid in nodeids)
+            if (
+                _require_integer(
+                    module["nodeid_count"], label=f"{module_label}.nodeid_count", minimum=1
+                )
+                != module_nodeid_count
+            ):
+                raise ShardPlannerError(f"{module_label}.nodeid_count is inconsistent")
+            total_module_nodeids = global_file_counts[module_path]
+            module_seconds, expected_source, expected_kind = _estimated_module_seconds(
+                history, module_path, total_module_nodeids
+            )
+            expected_granularity = _partition_granularity(history, module_path)
+            expected_seconds = (
+                round(_node_partition_seconds(history, module_path) * module_nodeid_count, 3)
+                if expected_granularity == "node"
+                else module_seconds
+            )
+            actual_seconds = _require_number(
+                module["estimated_seconds"],
+                label=f"{module_label}.estimated_seconds",
+                minimum=0.001,
+            )
+            if not math.isclose(actual_seconds, expected_seconds, rel_tol=0.0, abs_tol=0.000_001):
+                raise ShardPlannerError(f"{module_label}.estimated_seconds is inconsistent")
+            if module["timing_source"] != expected_source:
+                raise ShardPlannerError(f"{module_label}.timing_source is inconsistent")
+            if module["estimate_kind"] != expected_kind:
+                raise ShardPlannerError(f"{module_label}.estimate_kind is inconsistent")
+            if module["partition_granularity"] != expected_granularity:
+                raise ShardPlannerError(f"{module_label}.partition_granularity is inconsistent")
+            expected_shard_seconds += expected_seconds
+        if module_paths != sorted(module_paths) or module_paths != test_files:
+            raise ShardPlannerError(f"plan shard {index} modules are inconsistent")
+        actual_shard_seconds = _require_number(
+            shard["estimated_seconds"],
+            label=f"plan.shards[{position}].estimated_seconds",
+            minimum=0.001,
         )
-        if (
-            _require_integer(
-                shard["estimated_weight"],
-                label=f"plan.shards[{position}].estimated_weight",
-                minimum=1,
-            )
-            != expected_weight
+        if not math.isclose(
+            actual_shard_seconds,
+            round(expected_shard_seconds, 3),
+            rel_tol=0.0,
+            abs_tol=0.000_001,
         ):
-            raise ShardPlannerError(f"plan shard {index} estimated_weight is inconsistent")
+            raise ShardPlannerError(f"plan shard {index} estimated_seconds is inconsistent")
         for path in test_files:
+            if _partition_granularity(history, path) == "node":
+                continue
             previous = file_owner.setdefault(path, index)
             if previous != index:
                 raise ShardPlannerError(f"test module {path} is split across shards")
@@ -502,6 +832,14 @@ def validate_plan(
         "unexpected_nodeid_count": 0,
     }:
         raise ShardPlannerError("plan does not assert a complete, disjoint partition")
+    expected_summary = _runtime_summary(
+        [_mapping(shard, label="plan shard") for shard in shards_value]
+    )
+    if plan["runtime_summary"] != expected_summary:
+        raise ShardPlannerError("plan runtime_summary is inconsistent")
+    quality = _mapping(expected_summary["quality"], label="runtime summary.quality")
+    if quality["status"] != "PASS":
+        raise ShardPlannerError("runtime plan fails the pathological-packing quality check")
     return dict(plan)
 
 
@@ -512,8 +850,17 @@ def _read_json(path: Path, *, label: str) -> object:
         raise ShardPlannerError(f"{label} is unreadable JSON: {path}") from exc
 
 
-def load_plan(path: Path, *, expected_git_sha: str | None = None) -> dict[str, object]:
-    return validate_plan(_read_json(path, label="plan"), expected_git_sha=expected_git_sha)
+def load_plan(
+    path: Path,
+    *,
+    expected_git_sha: str | None = None,
+    runtime_history: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    return validate_plan(
+        _read_json(path, label="plan"),
+        expected_git_sha=expected_git_sha,
+        runtime_history=runtime_history,
+    )
 
 
 def _write_immutable(path: Path, content: bytes) -> None:
@@ -530,6 +877,156 @@ def _write_immutable(path: Path, content: bytes) -> None:
             raise ShardPlannerError(
                 f"refusing to overwrite different existing output: {path}"
             ) from None
+
+
+def _validate_runtime_observations(value: object) -> dict[str, object]:
+    observations = _mapping(value, label="runtime observations")
+    _require_exact_keys(
+        observations,
+        {"modules", "schema_version", "source"},
+        label="runtime observations",
+    )
+    if observations["schema_version"] != RUNTIME_OBSERVATIONS_SCHEMA_VERSION:
+        raise ShardPlannerError("runtime observations schema_version is unsupported")
+    source = _mapping(observations["source"], label="runtime observations.source")
+    _require_exact_keys(
+        source,
+        {"description", "id", "kind", "observed_at_utc", "reference"},
+        label="runtime observations.source",
+    )
+    source_id = source["id"]
+    if not isinstance(source_id, str) or _SOURCE_ID.fullmatch(source_id) is None:
+        raise ShardPlannerError("runtime observations source id is invalid")
+    observed_at = source["observed_at_utc"]
+    if not isinstance(observed_at, str) or _UTC_TIMESTAMP.fullmatch(observed_at) is None:
+        raise ShardPlannerError("runtime observations source observed_at_utc is invalid")
+    for field in ("description", "reference"):
+        if not isinstance(source[field], str) or not str(source[field]).strip():
+            raise ShardPlannerError(f"runtime observations source.{field} must be non-empty")
+    if source["kind"] not in {"estimated", "measured"}:
+        raise ShardPlannerError("runtime observations source.kind is invalid")
+    modules = _mapping(observations["modules"], label="runtime observations.modules")
+    if not modules:
+        raise ShardPlannerError("runtime observations.modules must not be empty")
+    for raw_path, seconds in modules.items():
+        path = normalize_module_path(raw_path)
+        if path != raw_path:
+            raise ShardPlannerError(f"runtime observation path is noncanonical: {raw_path!r}")
+        _require_number(seconds, label=f"runtime observation {path}", minimum=0.001)
+    return dict(observations)
+
+
+def update_runtime_history(
+    *,
+    manifest_path: Path,
+    observations_path: Path,
+    output_path: Path,
+    repository_root: Path = Path("."),
+) -> dict[str, object]:
+    """Merge one immutable timing source into the bounded runtime history."""
+
+    history = load_runtime_history(manifest_path)
+    incoming = _validate_runtime_observations(
+        _read_json(observations_path, label="runtime observations")
+    )
+    root = repository_root.resolve()
+    incoming_modules = _mapping(incoming["modules"], label="runtime observations.modules")
+    for path in incoming_modules:
+        candidate = (root / Path(path)).resolve()
+        try:
+            candidate.relative_to(root)
+        except ValueError as exc:
+            raise ShardPlannerError(f"runtime observation escaped repository root: {path}") from exc
+        if not candidate.is_file():
+            raise ShardPlannerError(f"runtime observation module does not exist: {path}")
+
+    updated = json.loads(_canonical_json(history))
+    sources = updated["sources"]
+    assert isinstance(sources, list)
+    raw_source = dict(_mapping(incoming["source"], label="runtime observations.source"))
+    source_id = str(raw_source["id"])
+    matching_sources = [source for source in sources if source["id"] == source_id]
+    if matching_sources and matching_sources[0] != raw_source:
+        raise ShardPlannerError(f"runtime source id has conflicting metadata: {source_id}")
+    source_added = not matching_sources
+    if source_added:
+        sources.append(raw_source)
+        sources.sort(key=lambda source: (source["observed_at_utc"], source["id"]))
+    source_order = {source["id"]: index for index, source in enumerate(sources)}
+
+    modules = updated["modules"]
+    assert isinstance(modules, dict)
+    added = 0
+    changed = 0
+    unchanged = 0
+    pruned = 0
+    max_samples = int(updated["max_samples_per_module"])
+    for path, raw_seconds in sorted(incoming_modules.items()):
+        seconds = round(float(raw_seconds), 3)
+        entry = modules.get(path)
+        if entry is None:
+            modules[path] = {
+                "estimated_seconds": seconds,
+                "observations": [{"seconds": seconds, "source_id": source_id}],
+                "sample_count": 1,
+            }
+            added += 1
+            continue
+        observations = entry["observations"]
+        assert isinstance(observations, list)
+        matching = [item for item in observations if item["source_id"] == source_id]
+        if matching:
+            if not math.isclose(
+                float(matching[0]["seconds"]), seconds, rel_tol=0.0, abs_tol=0.000_001
+            ):
+                raise ShardPlannerError(f"runtime source {source_id} conflicts for module {path}")
+            unchanged += 1
+            continue
+        observations.append({"seconds": seconds, "source_id": source_id})
+        observations.sort(key=lambda item: source_order[item["source_id"]])
+        if len(observations) > max_samples:
+            removed = len(observations) - max_samples
+            del observations[:removed]
+            pruned += removed
+        entry["sample_count"] = len(observations)
+        measured_seconds = [
+            float(item["seconds"])
+            for item in observations
+            if sources[source_order[item["source_id"]]]["kind"] == "measured"
+        ]
+        all_seconds = [float(item["seconds"]) for item in observations]
+        entry["estimated_seconds"] = max(measured_seconds or all_seconds)
+        changed += 1
+
+    updated["modules"] = dict(sorted(modules.items()))
+    validated = validate_runtime_history(updated)
+    content = _canonical_json(validated)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        existing = output_path.read_bytes()
+    except FileNotFoundError:
+        existing = None
+    except OSError as exc:
+        raise ShardPlannerError(
+            f"runtime history output cannot be inspected: {output_path}"
+        ) from exc
+    if existing != content:
+        try:
+            output_path.write_bytes(content)
+        except OSError as exc:
+            raise ShardPlannerError(
+                f"runtime history output cannot be written: {output_path}"
+            ) from exc
+    return {
+        "added_module_count": added,
+        "changed_module_count": changed,
+        "removed_observation_count": pruned,
+        "runtime_history_sha256": _runtime_history_sha256(validated),
+        "schema_version": RUNTIME_HISTORY_SCHEMA_VERSION,
+        "source_added": source_added,
+        "status": "PASS",
+        "unchanged_module_count": unchanged,
+    }
 
 
 def _shard_width(shard_count: int) -> int:
@@ -552,8 +1049,13 @@ def _require_directory_contents(directory: Path, expected: set[str], *, label: s
         )
 
 
-def write_plan_outputs(plan: object, output_dir: Path) -> tuple[Path, ...]:
-    validated = validate_plan(plan)
+def write_plan_outputs(
+    plan: object,
+    output_dir: Path,
+    *,
+    runtime_history: Mapping[str, object] | None = None,
+) -> tuple[Path, ...]:
+    validated = validate_plan(plan, runtime_history=runtime_history)
     shards = validated["shards"]
     assert isinstance(shards, list)
     shard_count = int(validated["shard_count"])
@@ -895,19 +1397,32 @@ def _command_plan(arguments: argparse.Namespace) -> dict[str, object]:
     git_sha = _require_git_sha(arguments.git_sha)
     if _head_sha() != git_sha:
         raise ShardPlannerError("Git HEAD does not match --git-sha")
+    runtime_history = load_runtime_history(arguments.runtime_history)
     plan = build_plan(
         collect_eligible_nodeids(),
         shard_count=arguments.shard_count,
         git_sha=git_sha,
+        runtime_history=runtime_history,
     )
-    write_plan_outputs(plan, arguments.output_dir)
+    write_plan_outputs(plan, arguments.output_dir, runtime_history=runtime_history)
     return {
         "eligible_nodeid_count": plan["eligible_nodeid_count"],
         "eligible_nodeid_sha256": plan["eligible_nodeid_sha256"],
+        "runtime_history_sha256": plan["runtime_history_sha256"],
+        "runtime_summary": plan["runtime_summary"],
         "schema_version": SCHEMA_VERSION,
         "shard_count": plan["shard_count"],
         "status": "PASS",
     }
+
+
+def _command_update_timings(arguments: argparse.Namespace) -> dict[str, object]:
+    return update_runtime_history(
+        manifest_path=arguments.manifest,
+        observations_path=arguments.input,
+        output_path=arguments.output,
+        repository_root=arguments.repository_root,
+    )
 
 
 def _command_materialize(arguments: argparse.Namespace) -> dict[str, object]:
@@ -952,7 +1467,15 @@ def _parser() -> argparse.ArgumentParser:
     plan.add_argument("--shard-count", type=int, required=True)
     plan.add_argument("--git-sha", required=True)
     plan.add_argument("--output-dir", type=Path, required=True)
+    plan.add_argument("--runtime-history", type=Path, default=DEFAULT_RUNTIME_HISTORY_PATH)
     plan.set_defaults(handler=_command_plan)
+
+    update = subparsers.add_parser("update-timings")
+    update.add_argument("--manifest", type=Path, default=DEFAULT_RUNTIME_HISTORY_PATH)
+    update.add_argument("--input", type=Path, required=True)
+    update.add_argument("--output", type=Path, default=DEFAULT_RUNTIME_HISTORY_PATH)
+    update.add_argument("--repository-root", type=Path, default=Path("."))
+    update.set_defaults(handler=_command_update_timings)
 
     materialize = subparsers.add_parser("materialize")
     materialize.add_argument("--plan", type=Path, required=True)

@@ -83,6 +83,7 @@ jobs:
           uv run python scripts/ci_coverage_shards.py plan
           --shard-count 16
           --git-sha "${GITHUB_SHA}"
+          --runtime-history config/testing/runtime_history.json
           --output-dir "${RUNNER_TEMP}/coverage-plan"
 
       - name: Upload coverage shard plan

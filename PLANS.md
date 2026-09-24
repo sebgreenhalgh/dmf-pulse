@@ -2569,3 +2569,24 @@ Dedicated branch: `infra/test-suite-rationalisation-2026-09-24`.
 Production semantics, target-season rules, provider rights, numerical behavior, public
 contracts, coverage thresholds, and fail-closed safeguards remain frozen. No PR, merge,
 tag, live provider call, credential access, test retry, or hidden exclusion is authorised.
+
+## CI critical-path optimisation — Phase 3
+
+Exact parent: `8bb6e0f2e0b35f5976994fdc1fae9ffb94aa3712`.
+Dedicated branch: `infra/runtime-informed-ci-scheduling-2026-09-24`.
+
+- [x] 3.01 Define and validate a versioned module-runtime manifest with robust estimates
+  and a deterministic conservative fallback.
+- [x] 3.02 Replace the 53-entry static override table with manifest-backed module-grouped
+  LPT placement while preserving the exact selector and partition.
+- [x] 3.03 Add explainable per-module/per-shard runtime diagnostics and a non-brittle
+  pathological-packing quality check.
+- [x] 3.04 Add an explicit offline timing-update command with strict path/schema validation
+  and deterministic bounded history.
+- [x] 3.05 Benchmark old and new placement against the same 5,300-node Phase-2 collection.
+- [ ] 3.06 Run focused acceptance, adversarial review, push the exact SHA, and require the
+  full GitHub Actions workflow to finish green.
+
+All 5,304 tests remain blocking and the Phase-2 fast-suite selection remains frozen.
+Production code, scientific behavior, provider boundaries, rules, rights, coverage gates,
+the 16-shard matrix, and the 120-minute safety ceiling are out of scope for change.

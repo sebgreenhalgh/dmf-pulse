@@ -215,6 +215,10 @@ def test_preflight_preserves_static_postgres_and_planning_semantics() -> None:
         ],
     )
     upload = _step(pre_flight, "Upload coverage shard plan")
+    plan_command = _normalise(
+        _step(pre_flight, "Generate deterministic coverage shard plan")["run"]
+    )
+    assert "--runtime-history config/testing/runtime_history.json" in plan_command
     assert upload["uses"] == "actions/upload-artifact@v7"
     assert upload["with"]["name"] == "coverage-plan-${{ github.sha }}"
     assert upload["with"]["if-no-files-found"] == "error"

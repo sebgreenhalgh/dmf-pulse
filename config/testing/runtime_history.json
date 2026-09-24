@@ -1,0 +1,201 @@
+{
+  "estimator": "measured-preferred-max-recent-5-v1",
+  "fallback": {
+    "base_seconds": 2.0,
+    "per_node_seconds": 0.36,
+    "source": "Phase-2 fast-suite 217.77s / 2,117 nodes, conservatively scaled by the 3.5x median isolated CI/local ratio"
+  },
+  "max_samples_per_module": 5,
+  "modules": {
+    "tests/assurance/optimisation/test_r2c_artifact_validation.py": {
+      "estimated_seconds": 977.0,
+      "observations": [
+        {"seconds": 864.4, "source_id": "phase2-local-profile-ci-calibrated"},
+        {"seconds": 977.0, "source_id": "phase2-run-35950179886"},
+        {"seconds": 668.0, "source_id": "phase2-run-35952828470"}
+      ],
+      "sample_count": 3
+    },
+    "tests/assurance/optimisation/test_surface.py": {
+      "estimated_seconds": 217.18,
+      "observations": [
+        {"seconds": 217.18, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/optimisation/test_r2a_contract_gates.py": {
+      "estimated_seconds": 214.55,
+      "observations": [
+        {"seconds": 214.55, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/optimisation/test_golden.py": {
+      "estimated_seconds": 214.13,
+      "observations": [
+        {"seconds": 214.13, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/optimisation/test_integration.py": {
+      "estimated_seconds": 215.36,
+      "observations": [
+        {"seconds": 215.36, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/markets/test_repository_persistence_boundaries.py": {
+      "estimated_seconds": 2.77,
+      "observations": [
+        {"seconds": 2.77, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_service.py": {
+      "estimated_seconds": 513.0,
+      "observations": [
+        {"seconds": 429.03, "source_id": "phase2-local-profile-ci-calibrated"},
+        {"seconds": 439.0, "source_id": "phase2-run-35950179886"},
+        {"seconds": 513.0, "source_id": "phase2-run-35952828470"}
+      ],
+      "sample_count": 3
+    },
+    "tests/unit/optimisation/test_terminal_r7_equivalence.py": {
+      "estimated_seconds": 341.36,
+      "observations": [
+        {"seconds": 341.36, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/prices/test_configuration_contracts.py": {
+      "estimated_seconds": 2.0,
+      "observations": [
+        {"seconds": 2.0, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_a1_03_shadow_comparison.py": {
+      "estimated_seconds": 392.21,
+      "observations": [
+        {"seconds": 392.21, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_a2_preparation.py": {
+      "estimated_seconds": 794.0,
+      "observations": [
+        {"seconds": 800.77, "source_id": "phase2-local-profile-ci-calibrated"},
+        {"seconds": 794.0, "source_id": "phase2-run-35950179886"},
+        {"seconds": 462.0, "source_id": "phase2-run-35952828470"}
+      ],
+      "sample_count": 3
+    },
+    "tests/unit/private_v1/test_bounded_horizon_oracle.py": {
+      "estimated_seconds": 254.31,
+      "observations": [
+        {"seconds": 254.31, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_horizon_candidate_oracle.py": {
+      "estimated_seconds": 259.18,
+      "observations": [
+        {"seconds": 259.18, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_one_command.py": {
+      "estimated_seconds": 583.24,
+      "observations": [
+        {"seconds": 583.24, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_score_prior_prefetch.py": {
+      "estimated_seconds": 316.72,
+      "observations": [
+        {"seconds": 316.72, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_d1_diagnostics.py": {
+      "estimated_seconds": 446.29,
+      "observations": [
+        {"seconds": 446.29, "source_id": "phase2-local-profile-ci-calibrated"}
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_d3_seam.py": {
+      "estimated_seconds": 1504.0,
+      "observations": [
+        {"seconds": 1444.66, "source_id": "phase2-local-profile-ci-calibrated"},
+        {"seconds": 1504.0, "source_id": "phase2-run-35950179886"},
+        {"seconds": 1491.0, "source_id": "phase2-run-35952828470"}
+      ],
+      "sample_count": 3
+    },
+    "tests/unit/private_v1/test_team_strength_l1_e2e.py": {
+      "estimated_seconds": 672.0,
+      "observations": [
+        {"seconds": 704.9, "source_id": "phase2-local-profile-ci-calibrated"},
+        {"seconds": 662.0, "source_id": "phase2-run-35950179886"},
+        {"seconds": 672.0, "source_id": "phase2-run-35952828470"}
+      ],
+      "sample_count": 3
+    },
+    "tests/unit/private_v1/test_team_strength_shadow_cases.py": {
+      "estimated_seconds": 1604.0,
+      "observations": [
+        {"seconds": 1851.36, "source_id": "phase2-local-profile-ci-calibrated"},
+        {"seconds": 1588.0, "source_id": "phase2-run-35950179886"},
+        {"seconds": 1604.0, "source_id": "phase2-run-35952828470"}
+      ],
+      "sample_count": 3
+    },
+    "tests/unit/private_v1/test_team_strength_shadow_comparison.py": {
+      "estimated_seconds": 662.0,
+      "observations": [
+        {"seconds": 675.96, "source_id": "phase2-local-profile-ci-calibrated"},
+        {"seconds": 646.0, "source_id": "phase2-run-35950179886"},
+        {"seconds": 662.0, "source_id": "phase2-run-35952828470"}
+      ],
+      "sample_count": 3
+    }
+  },
+  "node_partition_exceptions": {
+    "tests/unit/private_v1/test_team_strength_d3_seam.py": {
+      "estimated_seconds_per_node": 300.8,
+      "reason": "Phase-2 controlled reuse experiment found only 1.19s setup benefit; four state-isolated calls each took 96.68-100.54s",
+      "reference": "evidence/tickets/CI-TEST-RATIONALISATION-001/SETUP_REUSE_REVIEW.md"
+    },
+    "tests/unit/private_v1/test_team_strength_shadow_cases.py": {
+      "estimated_seconds_per_node": 598.143,
+      "reason": "Five independent canonical case calls took 84.06-92.65s each; duplicating the 83.23s immutable model setup trades bounded aggregate work for removal of the 26m44s critical-path floor",
+      "reference": "evidence/tickets/CI-RUNTIME-SCHEDULING-001/ARCHITECTURE.md"
+    }
+  },
+  "schema_version": "ci-runtime-history-v1",
+  "sources": [
+    {
+      "description": "Twenty isolated Phase-2 module measurements without coverage, calibrated by the 3.5x median ratio from seven isolated exact-SHA CI jobs",
+      "id": "phase2-local-profile-ci-calibrated",
+      "kind": "estimated",
+      "observed_at_utc": "2026-09-24T03:06:46Z",
+      "reference": "evidence/tickets/CI-TEST-RATIONALISATION-001/runtime_profile.json"
+    },
+    {
+      "description": "First Phase-2 exact-SHA run; shards 0-6 each contained one measured module",
+      "id": "phase2-run-35950179886",
+      "kind": "measured",
+      "observed_at_utc": "2026-09-24T03:08:12Z",
+      "reference": "github-actions:35950179886"
+    },
+    {
+      "description": "Final Phase-2 exact-SHA run; shards 0-6 each contained one measured module",
+      "id": "phase2-run-35952828470",
+      "kind": "measured",
+      "observed_at_utc": "2026-09-24T03:46:12Z",
+      "reference": "github-actions:35952828470"
+    }
+  ]
+}

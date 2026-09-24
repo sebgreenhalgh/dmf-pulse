@@ -34,6 +34,39 @@ def _nodeids() -> tuple[str, ...]:
     )
 
 
+def _history(estimates: dict[str, float] | None = None) -> dict:
+    source_id = "unit-profile"
+    modules = {
+        path: {
+            "estimated_seconds": seconds,
+            "observations": [{"seconds": seconds, "source_id": source_id}],
+            "sample_count": 1,
+        }
+        for path, seconds in sorted((estimates or {}).items())
+    }
+    return {
+        "estimator": "measured-preferred-max-recent-5-v1",
+        "fallback": {
+            "base_seconds": 2.0,
+            "per_node_seconds": 0.36,
+            "source": "Unit-test fallback.",
+        },
+        "max_samples_per_module": 5,
+        "modules": modules,
+        "node_partition_exceptions": {},
+        "schema_version": "ci-runtime-history-v1",
+        "sources": [
+            {
+                "description": "Unit-test observation.",
+                "id": source_id,
+                "kind": "measured",
+                "observed_at_utc": "2026-09-24T00:00:00Z",
+                "reference": "unit-test",
+            }
+        ],
+    }
+
+
 def _write_plan(module: ModuleType, root: Path, *, shard_count: int = 2) -> tuple[dict, Path]:
     plan = module.build_plan(_nodeids(), shard_count=shard_count, git_sha=GIT_SHA)
     module.write_plan_outputs(plan, root)
@@ -145,16 +178,34 @@ def test_module_nodeids_are_kept_together() -> None:
 
 def test_heavy_override_uses_deterministic_lightest_shard_tie_break() -> None:
     module = _module()
-    heavy = "tests/assurance/optimisation/test_r2c_artifact_validation.py::test_heavy"
+    heavy = "tests/unit/heavy/test_work.py::test_heavy"
+    second_heavy = "tests/unit/heavy/test_work.py::test_second_heavy"
     nodeids = (
         heavy,
+        second_heavy,
         "tests/unit/a/test_a.py::test_a",
         "tests/unit/b/test_b.py::test_b",
     )
-    plan = module.build_plan(nodeids, shard_count=2, git_sha=GIT_SHA)
-    assert plan["shards"][0]["nodeids"] == [heavy]
-    assert plan["shards"][0]["estimated_weight"] == 3200
-    assert plan["shards"][1]["nodeids"] == sorted(nodeids[1:])
+    history = _history({"tests/unit/heavy/test_work.py": 20.0})
+    history["node_partition_exceptions"] = {
+        "tests/unit/heavy/test_work.py": {
+            "estimated_seconds_per_node": 10.0,
+            "reason": "Independent measured calls.",
+            "reference": "unit-test",
+        }
+    }
+    plan = module.build_plan(nodeids, shard_count=2, git_sha=GIT_SHA, runtime_history=history)
+    owners = {
+        nodeid: shard["shard_index"] for shard in plan["shards"] for nodeid in shard["nodeids"]
+    }
+    assert owners[heavy] != owners[second_heavy]
+    assert [shard["estimated_seconds"] for shard in plan["shards"]] == [12.0, 12.0]
+    assert all(
+        any(item["partition_granularity"] == "node" for item in shard["modules"])
+        for shard in plan["shards"]
+    )
+    assert plan["runtime_summary"]["manifest_module_count"] == 1
+    assert plan["runtime_summary"]["fallback_module_count"] == 2
 
 
 def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -> None:
@@ -168,16 +219,11 @@ def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -
         "tests/unit/private_v1/test_team_strength_d3_seam.py",
     )
     nodeids = tuple(f"{path}::test_synthetic" for path in paths)
-    assert [module._estimated_file_weight(path, 1) for path in paths] == [
-        5000,
-        2800,
-        2400,
-        750,
-        580,
-        4500,
-    ]
-    plan = module.build_plan(nodeids, shard_count=3, git_sha=GIT_SHA)
-    assert plan == module.build_plan(reversed(nodeids), shard_count=3, git_sha=GIT_SHA)
+    history = _history(dict(zip(paths, (50.0, 28.0, 24.0, 7.5, 5.8, 45.0), strict=True)))
+    plan = module.build_plan(nodeids, shard_count=3, git_sha=GIT_SHA, runtime_history=history)
+    assert plan == module.build_plan(
+        reversed(nodeids), shard_count=3, git_sha=GIT_SHA, runtime_history=history
+    )
     owners = {
         nodeid: shard["shard_index"] for shard in plan["shards"] for nodeid in shard["nodeids"]
     }
@@ -189,43 +235,71 @@ def test_d1_static_costs_keep_expensive_modules_apart_without_dropping_tests() -
 
 def test_measured_inherited_costs_are_explicit_static_balancing_hints() -> None:
     module = _module()
-    expected = {
-        "tests/contract/optimisation/test_r2a_contract_gates.py": 500,
-        "tests/golden/optimisation/test_three_gameweek_ft_carry.py": 180,
-        "tests/integration/availability/test_audit0073_cli_mapping.py": 190,
-        "tests/integration/markets/test_current_market_identity_readonly.py": 220,
-        "tests/unit/availability/test_current_model.py": 180,
-        "tests/unit/ingestion/test_current_unified_state_boundaries.py": 500,
-        "tests/unit/ingestion/test_fpl_client.py": 260,
-        "tests/unit/ingestion/test_fpl_current_game_settings.py": 150,
-        "tests/unit/ingestion/test_fpl_current_input.py": 450,
-        "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": 180,
-        "tests/unit/ingestion/test_odds_model_config_boundaries.py": 450,
-        "tests/unit/ingestion/test_one_command_assembly.py": 90,
-        "tests/unit/markets/test_current_market_contract_invariants.py": 70,
-        "tests/unit/markets/test_current_market_weight_canonicalisation.py": 55,
-        "tests/unit/markets/test_current_markets_boundaries.py": 190,
-        "tests/unit/markets/test_repository_persistence_boundaries.py": 570,
-        "tests/unit/optimisation/test_future_transfer_scope.py": 350,
-        "tests/unit/optimisation/test_stage10_r7_factoring.py": 100,
-        "tests/unit/optimisation/test_stage11_exact_acceleration.py": 80,
-        "tests/unit/optimisation/test_service.py": 2800,
-        "tests/unit/optimisation/test_terminal_r7_equivalence.py": 850,
-        "tests/unit/optimisation/test_three_gameweek_horizon.py": 130,
-        "tests/unit/prices/test_configuration_contracts.py": 550,
-        "tests/unit/private_v1/test_a1_allocation_injection.py": 470,
-        "tests/unit/private_v1/test_a2_live_shadow_observation.py": 200,
-        "tests/unit/private_v1/test_bounded_horizon_oracle.py": 540,
-        "tests/unit/private_v1/test_future_scope_assembly.py": 220,
-        "tests/unit/private_v1/test_horizon_candidate_oracle.py": 540,
-        "tests/unit/private_v1/test_horizon_markets.py": 60,
-        "tests/unit/private_v1/test_rolling_contracts.py": 50,
-        "tests/unit/private_v1/test_rolling_service.py": 190,
-        "tests/unit/private_v1/test_score_prior_prefetch.py": 680,
-        "tests/unit/private_v1/test_service.py": 140,
-        "tests/unit/private_v1/test_team_strength_shadow_comparison.py": 3000,
-    }
-    assert {path: module._estimated_file_weight(path, 1) for path in expected} == expected
+    first = module.build_plan(
+        _nodeids(),
+        shard_count=2,
+        git_sha=GIT_SHA,
+        runtime_history=_history({"tests/unit/alpha/test_first.py": 50.0}),
+    )
+    second = module.build_plan(
+        _nodeids(),
+        shard_count=2,
+        git_sha=GIT_SHA,
+        runtime_history=_history({"tests/unit/beta/test_second.py": 50.0}),
+    )
+    first_assigned = sorted(nodeid for shard in first["shards"] for nodeid in shard["nodeids"])
+    second_assigned = sorted(nodeid for shard in second["shards"] for nodeid in shard["nodeids"])
+    assert first_assigned == second_assigned == sorted(_nodeids())
+    assert first["eligible_nodeid_sha256"] == second["eligible_nodeid_sha256"]
+    assert first["plan_sha256"] != second["plan_sha256"]
+    history = _history({"tests/unit/a/test_a.py": 4.0})
+    history["modules"]["tests/unit/a/test_a.py"]["estimated_seconds"] = 3.0
+    with pytest.raises(module.ShardPlannerError, match="estimated_seconds is inconsistent"):
+        module.validate_runtime_history(history)
+    shards = [
+        {
+            "estimated_seconds": 100.0,
+            "modules": [
+                {
+                    "estimate_kind": "measured",
+                    "estimated_seconds": 50.0,
+                    "path": "tests/unit/a/test_a.py",
+                    "timing_source": "manifest",
+                },
+                {
+                    "estimate_kind": "measured",
+                    "estimated_seconds": 50.0,
+                    "path": "tests/unit/b/test_b.py",
+                    "timing_source": "manifest",
+                },
+            ],
+        },
+        {
+            "estimated_seconds": 10.0,
+            "modules": [
+                {
+                    "estimate_kind": "fallback",
+                    "estimated_seconds": 10.0,
+                    "path": "tests/unit/c/test_c.py",
+                    "timing_source": "fallback",
+                }
+            ],
+        },
+        {
+            "estimated_seconds": 10.0,
+            "modules": [
+                {
+                    "estimate_kind": "fallback",
+                    "estimated_seconds": 10.0,
+                    "path": "tests/unit/d/test_d.py",
+                    "timing_source": "fallback",
+                }
+            ],
+        },
+    ]
+    summary = module._runtime_summary(shards)
+    assert summary["quality"]["status"] == "FAIL"
+    assert summary["quality"]["dominant_module_explains_outlier"] is False
 
 
 @pytest.mark.parametrize("shard_count", [True, 0, -1, 5])
@@ -278,6 +352,71 @@ def test_plan_outputs_are_canonical_resumable_and_refuse_different_overwrite(
     (output_dir / "plan.json").write_text("different", encoding="utf-8")
     with pytest.raises(module.ShardPlannerError, match="overwrite"):
         module.write_plan_outputs(plan, output_dir)
+    retained = "tests/unit/scripts/test_ci_workflow_contract.py"
+    measured = "tests/unit/scripts/test_ci_coverage_shards.py"
+    history = _history({retained: 8.0, measured: 4.0})
+    manifest = tmp_path / "history.json"
+    observations = tmp_path / "observations.json"
+    output = tmp_path / "updated.json"
+    manifest.write_bytes(module._canonical_json(history))
+    observations.write_bytes(
+        module._canonical_json(
+            {
+                "modules": {measured: 3.0},
+                "schema_version": "ci-runtime-observations-v1",
+                "source": {
+                    "description": "Exact CI module observation.",
+                    "id": "ci-run-123",
+                    "kind": "measured",
+                    "observed_at_utc": "2026-09-24T01:00:00Z",
+                    "reference": "run:123",
+                },
+            }
+        )
+    )
+    result = module.update_runtime_history(
+        manifest_path=manifest,
+        observations_path=observations,
+        output_path=output,
+    )
+    first_bytes = output.read_bytes()
+    updated = module.load_runtime_history(output)
+    assert result["changed_module_count"] == 1
+    assert result["source_added"] is True
+    assert retained in updated["modules"]
+    assert updated["modules"][measured]["estimated_seconds"] == 4.0
+    repeat = module.update_runtime_history(
+        manifest_path=output,
+        observations_path=observations,
+        output_path=output,
+    )
+    assert repeat["unchanged_module_count"] == 1
+    assert repeat["source_added"] is False
+    assert output.read_bytes() == first_bytes
+    missing_manifest = tmp_path / "missing-history.json"
+    missing_observations = tmp_path / "missing-observations.json"
+    missing_manifest.write_bytes(module._canonical_json(_history()))
+    missing_observations.write_bytes(
+        module._canonical_json(
+            {
+                "modules": {"tests/unit/missing/test_missing.py": 3.0},
+                "schema_version": "ci-runtime-observations-v1",
+                "source": {
+                    "description": "Exact CI module observation.",
+                    "id": "ci-run-124",
+                    "kind": "measured",
+                    "observed_at_utc": "2026-09-24T01:01:00Z",
+                    "reference": "run:124",
+                },
+            }
+        )
+    )
+    with pytest.raises(module.ShardPlannerError, match="does not exist"):
+        module.update_runtime_history(
+            manifest_path=missing_manifest,
+            observations_path=missing_observations,
+            output_path=tmp_path / "missing-output.json",
+        )
 
 
 def test_collection_uses_exact_marker_and_normalizes_plugin_nodeids(
