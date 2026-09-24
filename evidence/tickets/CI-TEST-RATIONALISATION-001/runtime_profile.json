@@ -1,0 +1,256 @@
+{
+  "schema_version": "dmf-test-runtime-profile-v1",
+  "baseline_git_sha": "3d86e6ae62efc01daa85b2b0991596a80f9847db",
+  "baseline_ci": {
+    "aggregate_coverage_shard_job_seconds": 13526,
+    "coverage_shard_range": "00:08:41-00:20:38",
+    "github_actions_run_id": 35939674480,
+    "workflow_wall_clock": "00:24:59"
+  },
+  "methodology": {
+    "command_pattern": ".venv/Scripts/python.exe -m pytest -q --durations=20 <module>",
+    "coverage_enabled": false,
+    "execution": "isolated modules, sequential, Windows, Python 3.13.9",
+    "note": "Wall times are directly comparable within this profile. Phase-1 CI times include Ubuntu setup, PostgreSQL service, and branch-coverage instrumentation and are reported separately."
+  },
+  "summary": {
+    "fast_development": {
+      "nodeids_sha256": "d892e3e457efdc2bdbb33cd1198e0f0cc403650cd38150bc9c8a686b02fc95af",
+      "passed": 2117,
+      "seconds": 217.77
+    },
+    "measured_module_count": 20,
+    "measured_wall_seconds": 2922.95,
+    "phase1_scheduler_weight_share_percent": 74.2,
+    "phase1_scheduler_weight_share_basis": "The same 20 modules account for 35,760 of 48,197 deterministic Phase-1 planner weight units. This is scheduling evidence, not a claim that weights are literal seconds.",
+    "setup_reuse_experiment": {
+      "after_seconds": 411.57,
+      "before_seconds": 412.76,
+      "disposition": "REVERTED_NO_MATERIAL_BENEFIT"
+    }
+  },
+  "modules": [
+    {
+      "path": "tests/unit/private_v1/test_team_strength_shadow_cases.py",
+      "test_count": 5,
+      "wall_seconds": 528.96,
+      "dominant_pattern": "one module-scoped real model preparation followed by five distinct canonical world comparisons"
+    },
+    {
+      "path": "tests/unit/private_v1/test_team_strength_d3_seam.py",
+      "test_count": 5,
+      "wall_seconds": 412.76,
+      "dominant_pattern": "four full prepared-runner invocations with distinct injected failure contracts; one cheap type-family contract"
+    },
+    {
+      "path": "tests/assurance/optimisation/test_r2c_artifact_validation.py",
+      "test_count": 4,
+      "wall_seconds": 246.97,
+      "dominant_pattern": "three independent plan/artifact recomputations plus one cheap fail-closed helper case"
+    },
+    {
+      "path": "tests/unit/private_v1/test_a2_preparation.py",
+      "test_count": 24,
+      "wall_seconds": 228.79,
+      "dominant_pattern": "one full four-world one-shot preparation node; 23 inexpensive boundary tests"
+    },
+    {
+      "path": "tests/unit/private_v1/test_team_strength_l1_e2e.py",
+      "test_count": 1,
+      "wall_seconds": 201.4,
+      "dominant_pattern": "single real preparation and two canonical worlds"
+    },
+    {
+      "path": "tests/unit/private_v1/test_team_strength_shadow_comparison.py",
+      "test_count": 23,
+      "wall_seconds": 193.13,
+      "dominant_pattern": "174.70-second module setup is already shared by the downstream validation cases"
+    },
+    {
+      "path": "tests/unit/private_v1/test_one_command.py",
+      "test_count": 8,
+      "wall_seconds": 166.64,
+      "dominant_pattern": "two real decision-stack nodes; six inexpensive preflight and contract nodes"
+    },
+    {
+      "path": "tests/unit/private_v1/test_team_strength_d1_diagnostics.py",
+      "test_count": 89,
+      "wall_seconds": 127.51,
+      "dominant_pattern": "94.62-second shared comparison setup plus typed boundary cases"
+    },
+    {
+      "path": "tests/unit/optimisation/test_service.py",
+      "test_count": 3,
+      "wall_seconds": 122.58,
+      "dominant_pattern": "two distinct exact optimiser solves and one cheap production gate"
+    },
+    {
+      "path": "tests/unit/private_v1/test_a1_03_shadow_comparison.py",
+      "test_count": 7,
+      "wall_seconds": 112.06,
+      "dominant_pattern": "two real canonical setup variants and one world-order isolation solve"
+    },
+    {
+      "path": "tests/unit/optimisation/test_terminal_r7_equivalence.py",
+      "test_count": 21,
+      "wall_seconds": 97.53,
+      "dominant_pattern": "eight generic-versus-accelerated solver equivalence states"
+    },
+    {
+      "path": "tests/unit/private_v1/test_score_prior_prefetch.py",
+      "test_count": 5,
+      "wall_seconds": 90.49,
+      "dominant_pattern": "one three-gameweek cutoff/prefetch execution; four inexpensive cases"
+    },
+    {
+      "path": "tests/unit/private_v1/test_horizon_candidate_oracle.py",
+      "test_count": 4,
+      "wall_seconds": 74.05,
+      "dominant_pattern": "four complete-universe oracle comparisons"
+    },
+    {
+      "path": "tests/unit/private_v1/test_bounded_horizon_oracle.py",
+      "test_count": 7,
+      "wall_seconds": 72.66,
+      "dominant_pattern": "five complete-universe oracle comparisons and two inexpensive guards"
+    },
+    {
+      "path": "tests/assurance/optimisation/test_surface.py",
+      "test_count": 11,
+      "wall_seconds": 62.05,
+      "dominant_pattern": "one canonical request/plan validation solve; ten inexpensive assurance cases"
+    },
+    {
+      "path": "tests/integration/optimisation/test_integration.py",
+      "test_count": 1,
+      "wall_seconds": 61.53,
+      "dominant_pattern": "single optimisation-lineage integration solve"
+    },
+    {
+      "path": "tests/contract/optimisation/test_r2a_contract_gates.py",
+      "test_count": 10,
+      "wall_seconds": 61.3,
+      "dominant_pattern": "one appearance-inference solve; nine inexpensive contract gates"
+    },
+    {
+      "path": "tests/golden/optimisation/test_golden.py",
+      "test_count": 1,
+      "wall_seconds": 61.18,
+      "dominant_pattern": "single stable golden optimisation signature"
+    },
+    {
+      "path": "tests/unit/markets/test_repository_persistence_boundaries.py",
+      "test_count": 20,
+      "wall_seconds": 0.79,
+      "dominant_pattern": "historical coverage-weight inflation; current isolated execution is sub-second"
+    },
+    {
+      "path": "tests/unit/prices/test_configuration_contracts.py",
+      "test_count": 18,
+      "wall_seconds": 0.57,
+      "dominant_pattern": "historical coverage-weight inflation; current isolated execution is sub-second"
+    }
+  ],
+  "slowest_individual_phases": [
+    {
+      "seconds": 222.61,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_a2_preparation.py::test_one_shot_prepares_once_then_runs_four_worlds_without_more_provider_calls"
+    },
+    {
+      "seconds": 185.17,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_l1_e2e.py::test_real_one_preparation_two_canonical_worlds_no_private_writes"
+    },
+    {
+      "seconds": 174.7,
+      "phase": "setup",
+      "nodeid": "tests/unit/private_v1/test_team_strength_shadow_comparison.py::test_two_real_worlds_keep_controls_and_publish_safe_summary"
+    },
+    {
+      "seconds": 123.21,
+      "phase": "call",
+      "nodeid": "tests/assurance/optimisation/test_r2c_artifact_validation.py::test_validate_result_recomputes_plan_evaluation_and_lineage"
+    },
+    {
+      "seconds": 121.43,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_one_command.py::test_explicit_three_gameweek_one_command_runs_from_one_current_cutoff"
+    },
+    {
+      "seconds": 101.29,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_d3_seam.py::test_d1_failure_survives_real_one_command_callback_seam"
+    },
+    {
+      "seconds": 100.21,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_d3_seam.py::test_d2_wrapper_failure_survives_real_one_command_callback_seam"
+    },
+    {
+      "seconds": 99.92,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_d3_seam.py::test_parent_valueerror_masking_mechanism_is_reproduced_at_real_seam"
+    },
+    {
+      "seconds": 96.37,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_d3_seam.py::test_ordinary_valueerror_is_still_sanitized_by_real_one_command_seam"
+    },
+    {
+      "seconds": 94.86,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[A_ROBUST]"
+    },
+    {
+      "seconds": 94.62,
+      "phase": "setup",
+      "nodeid": "tests/unit/private_v1/test_team_strength_d1_diagnostics.py::test_public_comparison_reports_which_world_started_and_completed[LEAGUE_BASELINE]"
+    },
+    {
+      "seconds": 93.07,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[B_ROOT]"
+    },
+    {
+      "seconds": 89.24,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_score_prior_prefetch.py::test_three_gameweek_prefetch_survives_compute_beyond_five_minute_cutoff"
+    },
+    {
+      "seconds": 85.68,
+      "phase": "setup",
+      "nodeid": "tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[A_ROBUST]"
+    },
+    {
+      "seconds": 85.36,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[E_SCREEN]"
+    },
+    {
+      "seconds": 84.33,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[D_TACTICS]"
+    },
+    {
+      "seconds": 84.2,
+      "phase": "call",
+      "nodeid": "tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[C_CONTINUATION]"
+    },
+    {
+      "seconds": 61.89,
+      "phase": "call",
+      "nodeid": "tests/assurance/optimisation/test_r2c_artifact_validation.py::test_result_artifact_requires_exact_canonical_detached_and_embedded_hashes"
+    },
+    {
+      "seconds": 61.46,
+      "phase": "call",
+      "nodeid": "tests/assurance/optimisation/test_r2c_artifact_validation.py::test_result_artifact_path_is_confined_and_immutable"
+    },
+    {
+      "seconds": 61.45,
+      "phase": "call",
+      "nodeid": "tests/assurance/optimisation/test_surface.py::test_plan_validator_and_canonical_request_hash"
+    }
+  ]
+}

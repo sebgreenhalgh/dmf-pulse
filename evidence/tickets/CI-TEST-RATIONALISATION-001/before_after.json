@@ -1,0 +1,52 @@
+{
+  "schema_version": "dmf-test-rationalisation-before-after-v1",
+  "baseline": {
+    "branch_coverage": {
+      "covered": 13461,
+      "percent": 92,
+      "total": 15522
+    },
+    "coverage_shard_range": "00:08:41-00:20:38",
+    "full_ci_wall_clock": "00:24:59",
+    "github_actions_run_id": 35939674480,
+    "non_performance_tests": 5300,
+    "performance_tests": 4,
+    "test_modules": 426,
+    "tests": 5304
+  },
+  "phase2": {
+    "branch_coverage": {
+      "covered": null,
+      "percent": null,
+      "status": "PENDING_FINAL_EXACT_SHA_CI",
+      "total": null
+    },
+    "coverage_shard_range": null,
+    "fast_development": {
+      "nodeids_sha256": "d892e3e457efdc2bdbb33cd1198e0f0cc403650cd38150bc9c8a686b02fc95af",
+      "runtime_seconds": 217.77,
+      "tests": 2117
+    },
+    "full_ci_wall_clock": null,
+    "github_actions_run_id": null,
+    "non_performance_tests": 5300,
+    "performance_tests": 4,
+    "test_modules": 427,
+    "tests": 5304
+  },
+  "disposition": {
+    "added_cadence_contract_tests": 2,
+    "baseline_nodes_accounted": 5304,
+    "consolidated_parameter_clusters": 1,
+    "expensive_setups_newly_shared": 0,
+    "moved_exclusively_to_nightly": 0,
+    "removed_redundant_tests": 2,
+    "still_blocking": 5304
+  },
+  "runtime_cost": {
+    "baseline_aggregate_coverage_shard_job_seconds": 13526,
+    "measured_top_20_local_seconds": 2922.95,
+    "phase2_aggregate_coverage_shard_job_seconds": null,
+    "status": "PENDING_FINAL_EXACT_SHA_CI"
+  }
+}

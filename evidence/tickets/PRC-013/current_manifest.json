@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 184503,
+      "bytes": 185743,
       "path": "PLANS.md",
-      "sha256": "af305f75cd4bf0ee4eb902576eace3e563a652f560f3550bad69748892ee270b"
+      "sha256": "95dfbe821453a090331a8bfba4f00aedcaa918fec6e04a7be6fee49e7a39d3da"
     },
     {
       "bytes": 2761,
@@ -176,9 +176,9 @@
       "sha256": "61be6787023b0d4309c47cf3551c7a095a816ba0a922f62d4d2e3c2f8bb8e174"
     },
     {
-      "bytes": 6265,
+      "bytes": 7209,
       "path": "README.md",
-      "sha256": "c058012bdf737265892b8f192e218cf5e4d32909c1b94e6b76781200147f7fa4"
+      "sha256": "a545bd79ecb104b260341e6c131213b04ee0cc52ad99a3cbf6360577e0ee9dc3"
     },
     {
       "bytes": 2072,
@@ -434,6 +434,11 @@
       "bytes": 903,
       "path": "config/rules/fpl-2026-27/transfers.yaml",
       "sha256": "23f3a26b61a341df110cc562c5d362a8cb0828452253dd05c2484dd1687c71e2"
+    },
+    {
+      "bytes": 3487,
+      "path": "config/testing/cadence.json",
+      "sha256": "b6b39cbf736e99093352b62be139db666c1bce9b510797b72a1516e7eefd958f"
     },
     {
       "bytes": 852,
@@ -2459,6 +2464,11 @@
       "bytes": 42766,
       "path": "scripts/test_migration_matrix.py",
       "sha256": "57a61640e4f242c750eaec8aafac3b22b1a580debb2654579d0775815f693037"
+    },
+    {
+      "bytes": 17705,
+      "path": "scripts/test_suite.py",
+      "sha256": "a57036985f2272d0317843f8e40cc214a53a6b3f981eec9f2924e17e41877814"
     },
     {
       "bytes": 1961,
@@ -6386,9 +6396,9 @@
       "sha256": "b74db2adf57358d5241ba1da1e531bee22de667406a2abc5f5f05ab818b896ba"
     },
     {
-      "bytes": 1788,
+      "bytes": 1372,
       "path": "tests/unit/optimisation/test_service.py",
-      "sha256": "c8a1afb2b58c54c1a61a2b43f8913ef8a8c414435d0dd22511a83a96e6aa706e"
+      "sha256": "edb8217b7eed762a3786886895c45eec689391ca99d32b815b25317a78cfbece"
     },
     {
       "bytes": 9768,
@@ -6681,9 +6691,9 @@
       "sha256": "a552e2e7b005f82fca2f7c069c7a77cbf83bedba3c90539d25feb3443be38ab8"
     },
     {
-      "bytes": 5287,
+      "bytes": 5120,
       "path": "tests/unit/private_v1/test_team_strength_l2.py",
-      "sha256": "81d2fe92a5f4aa8d114c33853ca6c01e3c2de2ca6b6655ac0464d50ec4f9cd0a"
+      "sha256": "516b810ee249ed7ea4569def1758c00a3972d40d0713e4c2c281e998ef84143d"
     },
     {
       "bytes": 2531,
@@ -6879,6 +6889,11 @@
       "bytes": 296,
       "path": "tests/unit/scripts/test_opt010_repository_validation.py",
       "sha256": "99bf4647b80f26ff66dea3942e3437864c8f011105bc2958abfe499dc24ce270"
+    },
+    {
+      "bytes": 3761,
+      "path": "tests/unit/scripts/test_test_suite.py",
+      "sha256": "e9171d6efc76013b70b289e994ab97bdb255a7f9f1b536c38131eff44b206d14"
     },
     {
       "bytes": 8568,

@@ -2548,3 +2548,24 @@ Dedicated branch: `infra/ci-runtime-overhaul-2026-09-24`.
 No production code, numerical behavior, rules, provider boundary, test case, assertion,
 marker, skip, retry, coverage threshold, PR, merge, or acceptance/tag state changes in this
 phase. Static weight replacement and historical Stage-8/GCS-008 cleanup remain Phase-2 debt.
+
+## Test-suite rationalisation — Phase 2
+
+Exact parent: `3d86e6ae62efc01daa85b2b0991596a80f9847db`.
+Dedicated branch: `infra/test-suite-rationalisation-2026-09-24`.
+
+- [x] 2.01 Inventory every collected test module and establish measured runtime/cost evidence.
+- [x] 2.02 Define explicit fast, checkpoint, full, and nightly cadence contracts without
+  weakening the mandatory full-CI correctness gate.
+- [x] 2.03 Reduce duplicated setup and redundant coverage only where successor ownership and
+  targeted counterfactual evidence are recorded.
+- [ ] 2.04 Run focused regression, isolation/order, collection, coverage, repository, build,
+  security, and exact literal acceptance checks.
+- [ ] 2.05 Record reproducible before/after counts, timings, coverage, removals, ownership,
+  and retained safeguards in the ticket evidence bundle.
+- [ ] 2.06 Complete adversarial review, commit and push the exact SHA, then require its
+  mandatory GitHub Actions run to finish green.
+
+Production semantics, target-season rules, provider rights, numerical behavior, public
+contracts, coverage thresholds, and fail-closed safeguards remain frozen. No PR, merge,
+tag, live provider call, credential access, test retry, or hidden exclusion is authorised.

@@ -89,9 +89,14 @@ def test_historical_l1_l2_l3_are_consumed_before_provider_checks(approval, attes
 
 @pytest.mark.parametrize(
     "approval,attestation",
-    [("wrong", NEW_ATTESTATION), ("wrong", OLD_ATTESTATION), ("wrong", "wrong")],
+    [
+        ("wrong", NEW_ATTESTATION),
+        ("wrong", OLD_ATTESTATION),
+        ("wrong", L3_ATTESTATION),
+        ("wrong", "wrong"),
+    ],
 )
-def test_no_unknown_pair_can_authorize(approval, attestation):
+def test_no_unknown_l1_l2_l3_or_l4_pair_can_authorize(approval, attestation):
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
 
 
@@ -103,14 +108,6 @@ def test_exact_l3_pair_is_consumed_and_no_current_pair_exists():
     assert result["prior_l1_one_shot_consumed"]
     assert result["prior_l2_one_shot_consumed"]
     assert result["prior_l3_one_shot_consumed"]
-
-
-@pytest.mark.parametrize(
-    "approval,attestation",
-    [("wrong", L3_ATTESTATION), ("wrong", "wrong")],
-)
-def test_unknown_l4_pair_fails_closed(approval, attestation):
-    assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
 
 
 @pytest.mark.parametrize(

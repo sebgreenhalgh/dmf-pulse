@@ -72,6 +72,25 @@ uv run pytest -m "postgres or migration" tests/integration/data_model tests/inte
 
 ## Quality and acceptance
 
+The repository-wide test cadences are explicit and deterministic:
+
+```text
+uv run python scripts/test_suite.py run fast
+uv run python scripts/test_suite.py run checkpoint --target tests/unit/<subsystem>
+uv run python scripts/test_suite.py run full
+uv run python scripts/test_suite.py run nightly
+```
+
+`fast` contains pure unit, property, contract, and security modules except the
+versioned cross-boundary roots and deep-assurance list in
+`config/testing/cadence.json`; database and performance markers are excluded.
+`checkpoint` runs caller-selected subsystem targets with performance tests
+excluded, and is the normal command while changing an excluded subsystem. `full`
+contains every non-performance test plus every performance test and remains the
+mandatory acceptance population. `nightly` repeats the explicitly expensive
+assurance modules and performance tests; it does not remove those correctness
+tests from blocking full acceptance.
+
 Canonical quality commands are executable without Make:
 
 ```text
