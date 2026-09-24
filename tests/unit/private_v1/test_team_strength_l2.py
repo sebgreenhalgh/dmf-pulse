@@ -1,8 +1,9 @@
-"""D3 permanently consumes L1/L2/L3 and creates no L4 authority."""
+"""L4 exact authority, consumed history, and no provider-capability expansion."""
 
 from __future__ import annotations
 
 import hashlib
+import json
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,7 +14,7 @@ from dmf_pulse.private_v1 import team_strength_live as live
 from dmf_pulse.private_v1 import team_strength_live_authority as authority
 
 pytestmark = pytest.mark.unit
-PARENT = "b774056f20e855d7a755186fe62489e3d393ecfe"
+PARENT = "433d7160c0f15588009aff44acc1dd479cb8982d"
 STAMP = datetime(2026, 10, 1, tzinfo=UTC)
 OLD_APPROVAL = "DMF-CTS-001P-LIVE-RIGHTS-2026-09-22"
 OLD_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L1#ONE-SHOT-2026-09-22"
@@ -21,6 +22,8 @@ NEW_APPROVAL = "DMF-CTS-001P-L2-LIVE-RIGHTS-2026-09-22"
 NEW_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L2#ONE-SHOT-2026-09-22"
 L3_APPROVAL = "DMF-CTS-001P-L3-LIVE-RIGHTS-2026-09-23"
 L3_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L3#ONE-SHOT-2026-09-23"
+L4_APPROVAL = "DMF-CTS-001P-L4-LIVE-RIGHTS-2026-09-24"
+L4_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L4#ONE-SHOT-2026-09-24"
 
 
 def parent_text(path: str) -> str:
@@ -54,7 +57,7 @@ def blocked(approval: str, attestation: str):
     assert result["retry_performed"] is False
     assert result["production_activation"] is False
     assert result["status"] in {
-        "CURRENT_TEAM_STRENGTH_001P_L3_LIVE_EXECUTION_NOT_COMPLETED",
+        "CURRENT_TEAM_STRENGTH_001P_L4_LIVE_EXECUTION_NOT_COMPLETED",
         "TEAM_STRENGTH_PUBLIC_PREFLIGHT_BLOCKED",
     }
     return result
@@ -100,26 +103,79 @@ def test_no_unknown_l1_l2_l3_or_l4_pair_can_authorize(approval, attestation):
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
 
 
-def test_exact_l3_pair_is_consumed_and_no_current_pair_exists():
-    assert (authority.APPROVAL, authority.ATTESTATION) == (L3_APPROVAL, L3_ATTESTATION)
-    assert L3_APPROVAL in authority.CONSUMED_APPROVALS
-    result = blocked(L3_APPROVAL, L3_ATTESTATION)
-    assert result["reason"] == "AUTHORITY_CONSUMED"
-    assert result["prior_l1_one_shot_consumed"]
-    assert result["prior_l2_one_shot_consumed"]
-    assert result["prior_l3_one_shot_consumed"]
+def test_exact_l4_pair_and_pinned_rights_pass_before_credentials():
+    assert (authority.APPROVAL, authority.ATTESTATION) == (L4_APPROVAL, L4_ATTESTATION)
+    assert L4_APPROVAL not in authority.CONSUMED_APPROVALS
+    authority.validate_l1_authority(
+        approval=L4_APPROVAL, attestation=L4_ATTESTATION, checked_at=STAMP
+    )
+    assert (
+        authority.profile_sha(authority.load_fpl_rights()[authority.FPL_PROFILE])
+        == authority.FPL_PROFILE_SHA
+    )
+    assert (
+        authority.profile_sha(authority.load_odds_rights()[authority.ODDS_PROFILE])
+        == authority.ODDS_PROFILE_SHA
+    )
+    assert blocked(L4_APPROVAL, L4_ATTESTATION)["reason"] == "PUBLIC_READINESS_INVALID"
+
+
+@pytest.mark.parametrize(
+    "approval,attestation",
+    [(L4_APPROVAL, "wrong"), ("wrong", L4_ATTESTATION)],
+)
+def test_l4_mismatch_fails_closed(approval, attestation):
+    assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
+
+
+def test_old_odds_profile_sha_is_rejected(monkeypatch):
+    monkeypatch.setattr(
+        authority,
+        "ODDS_PROFILE_SHA",
+        "8f0c23ee3e451640710892d80b6f02f4a9749265b0eb9e0211dcf8f14869a75d",
+    )
+    with pytest.raises(ValueError, match="provider purpose"):
+        authority.validate_l1_authority(
+            approval=L4_APPROVAL, attestation=L4_ATTESTATION, checked_at=STAMP
+        )
 
 
 @pytest.mark.parametrize(
     "path",
     [
         "config/rights/fpl_profiles.json",
-        "config/rights/odds_profiles.json",
         "config/rights/openfootball_profiles.json",
     ],
 )
 def test_provider_rights_are_byte_identical_to_l3_parent(path):
     assert Path(path).read_text(encoding="utf-8") == parent_text(path)
+
+
+def test_only_odds_purpose_metadata_changes_without_capability_expansion():
+    before = json.loads(parent_text("config/rights/odds_profiles.json"))
+    after = json.loads(Path("config/rights/odds_profiles.json").read_text(encoding="utf-8"))
+    assert before["profiles"][0] == after["profiles"][0]
+    left, right = before["profiles"][1], after["profiles"][1]
+    assert {key for key in left if left[key] != right[key]} == {
+        "approved_at",
+        "approved_purpose",
+        "human_approval_id",
+        "notes",
+    }
+    assert left["capabilities"] == right["capabilities"]
+    assert right["retention_seconds"] == 0
+    assert right["human_approval_id"] == L4_APPROVAL
+
+
+def test_d3_live_control_flow_is_preserved_except_l4_terminal_identity():
+    before = parent_text("src/dmf_pulse/private_v1/team_strength_live.py")
+    expected = before.replace(
+        "CURRENT_TEAM_STRENGTH_001P_L3", "CURRENT_TEAM_STRENGTH_001P_L4"
+    ).replace("CURRENT-TEAM-STRENGTH-001P-L3", "CURRENT-TEAM-STRENGTH-001P-L4")
+    assert (
+        Path("src/dmf_pulse/private_v1/team_strength_live.py").read_text(encoding="utf-8")
+        == expected
+    )
 
 
 @pytest.mark.parametrize(

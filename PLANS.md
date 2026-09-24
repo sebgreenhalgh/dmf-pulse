@@ -2592,3 +2592,18 @@ Dedicated branch: `infra/runtime-informed-ci-scheduling-2026-09-24`.
 All 5,304 tests remain blocking and the Phase-2 fast-suite selection remains frozen.
 Production code, scientific behavior, provider boundaries, rules, rights, coverage gates,
 the 16-shard matrix, and the 120-minute safety ceiling are out of scope for change.
+
+## CURRENT-TEAM-STRENGTH-001P-L4 Phase A only
+
+Exact parent: `433d7160c0f15588009aff44acc1dd479cb8982d`.
+
+- [x] Add one exact current L4 approval/attestation while retaining consumed L1/L2/L3.
+- [x] Update only L4 Odds purpose metadata and bind its exact semantic SHA.
+- [x] Independently verify standing FPL purpose adequacy without changing it.
+- [x] Authenticate and reassess retained public readiness as governed sealed-artifact reuse.
+- [x] Preserve D1/D2/D3 diagnostics and all model/Stage 8-11 mathematics.
+- [x] Complete full offline acceptance and independent review.
+- [ ] Publish the exact SHA, require exact-SHA CI, and confirm local/remote equality.
+
+Phase A performs no private provider access and does not consume L4. Only the human
+operator may execute the separately handed-off Phase B command.

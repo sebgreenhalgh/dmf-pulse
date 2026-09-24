@@ -270,7 +270,7 @@ class TeamStrengthL1ObservationService:
             "status": "TEAM_STRENGTH_PUBLIC_PREFLIGHT_BLOCKED"
             if stage == L1Stage.ASSESS_TEAM_STRENGTH_SOURCE
             and reason != L1Reason.CREDENTIAL_UNAVAILABLE
-            else "CURRENT_TEAM_STRENGTH_001P_L3_LIVE_EXECUTION_NOT_COMPLETED",
+            else "CURRENT_TEAM_STRENGTH_001P_L4_LIVE_EXECUTION_NOT_COMPLETED",
             "stage": stage.value,
             "reason": reason.value,
             "private_attempt_consumed": gate.consumed if gate else False,
@@ -353,7 +353,7 @@ class TeamStrengthL1ObservationService:
                     row.transfer_count for row in result.signature.by_gameweek[1:]
                 )
             summary.update(
-                status="CURRENT_TEAM_STRENGTH_001P_L3_LIVE_OBSERVATION_COMPLETE",
+                status="CURRENT_TEAM_STRENGTH_001P_L4_LIVE_OBSERVATION_COMPLETE",
                 private_attempt_consumed=gate.consumed,
                 retry_performed=False,
                 approval=APPROVAL,
@@ -589,7 +589,7 @@ class TeamStrengthL1ObservationService:
                     run_at=cutoff,
                     operator_approved_at=started,
                     horizon_gameweeks=3,
-                    run_id="CURRENT-TEAM-STRENGTH-001P-L3",
+                    run_id="CURRENT-TEAM-STRENGTH-001P-L4",
                 )
             )
         except _ObservationComplete as completed:

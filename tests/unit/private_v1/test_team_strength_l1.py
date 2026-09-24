@@ -108,11 +108,14 @@ def test_all_three_historical_purposes_consumed_and_old_a2_runtime_rejected():
     assert result.fpl_request_attempt_count == result.odds_acquisition_attempt_count == 0
 
 
-def test_historical_rights_hashes_remain_exact_but_cannot_authorize():
+def test_current_l4_rights_hashes_are_exact_and_authorize_before_credentials():
     fpl = load_fpl_rights()[authority.FPL_PROFILE]
     odds = load_rights_profiles()[authority.ODDS_PROFILE]
     assert authority.profile_sha(fpl) == authority.FPL_PROFILE_SHA
     assert authority.profile_sha(odds) == authority.ODDS_PROFILE_SHA
+    authority.validate_l1_authority(
+        approval=authority.APPROVAL, attestation=authority.ATTESTATION, checked_at=STAMP
+    )
 
 
 @pytest.mark.parametrize("checked_at", [STAMP.replace(tzinfo=None), STAMP - timedelta(days=30)])
