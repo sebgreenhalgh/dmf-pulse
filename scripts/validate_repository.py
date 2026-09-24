@@ -931,6 +931,11 @@ def _validate_sharded_coverage_ci_contract(ci: str, errors: list[str]) -> None:
                 "ci.yml sharded architecture contains redundant pytest execution: " + command
             )
 
+    if re.search(r"(?m)^\s*run:\s*uv run pytest -m performance\s*$", ci) is None:
+        errors.append("ci.yml sharded architecture must select performance tests repository-wide")
+    if "uv run pytest -m performance tests/performance" in ci:
+        errors.append("ci.yml sharded architecture retains incomplete performance selection")
+
     for match in re.finditer(r"(?m)^\s*timeout-minutes:\s*(\d+)\s*$", ci):
         if int(match.group(1)) > 120:
             errors.append("ci.yml sharded architecture must not increase a job timeout above 120")

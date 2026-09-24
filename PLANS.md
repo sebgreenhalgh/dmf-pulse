@@ -2537,8 +2537,9 @@ Dedicated branch: `infra/ci-runtime-overhaul-2026-09-24`.
   artifact, acceptance, and fail-closed sentinel semantics.
 - [x] Expand the mandatory branch-coverage matrix from 8 to 16 shards and set only the
   coverage-shard safety ceiling to 120 minutes.
-- [x] Remove the duplicate PostgreSQL integration and broad GCS-008 pytest reruns while
-  retaining their tests in the exact `not performance` shard population.
+- [x] Remove the duplicate PostgreSQL integration and broad GCS-008 pytest reruns; retain
+  their non-performance tests in the exact shard population and route the one marked
+  performance case through the repository-wide performance gate.
 - [x] Prove real collection and a complete, disjoint, exactly-once 16-shard plan.
 - [x] Run focused workflow, shard-helper, validator, Ruff, and repository checks; refresh
   the active repository manifest for intentional governed file changes.

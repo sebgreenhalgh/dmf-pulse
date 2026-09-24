@@ -309,11 +309,14 @@ def test_post_coverage_reconstructs_database_and_preserves_every_gate() -> None:
         "path": "evidence/tickets/GCS-008",
         "digest-mismatch": "error",
     }
+    assert _step(post, "Performance smoke (without coverage)")["run"] == (
+        "uv run pytest -m performance"
+    )
     commands = _runs(post)
     _assert_fragments_in_order(
         commands,
         [
-            "uv run pytest -m performance tests/performance",
+            "uv run pytest -m performance",
             "uv run dmf specs validate",
             "uv run dmf ingest fpl validate",
             "uv run dmf ingest fpl replay",
@@ -406,6 +409,18 @@ def test_redundant_pytest_populations_cannot_be_reintroduced(command: str) -> No
     errors: list[str] = []
     _validator_module()._validate_sharded_coverage_ci_contract(workflow + "\n" + command, errors)
     assert any("redundant pytest execution" in error for error in errors)
+
+
+def test_repository_validator_rejects_directory_limited_performance_selection() -> None:
+    workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
+    mutated = workflow.replace(
+        "uv run pytest -m performance",
+        "uv run pytest -m performance tests/performance",
+        1,
+    )
+    errors: list[str] = []
+    _validator_module()._validate_sharded_coverage_ci_contract(mutated, errors)
+    assert any("performance selection" in error for error in errors)
 
 
 def test_artifact_transport_and_failure_policy_have_no_soft_paths() -> None:
