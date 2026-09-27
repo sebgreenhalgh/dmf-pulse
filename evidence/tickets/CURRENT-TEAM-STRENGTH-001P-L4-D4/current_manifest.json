@@ -4256,9 +4256,9 @@
       "sha256": "06848fe589b9547ac9debc39eb727b5769dd807c9391c4b7de05506b2d274237"
     },
     {
-      "bytes": 56894,
+      "bytes": 57012,
       "path": "src/dmf_pulse/private_v1/rolling.py",
-      "sha256": "75f2da98cf7070f87be09984c108c4993d6e34cbb769b4fd5933560a23d319b5"
+      "sha256": "e583972d3d9d881343d504984b05ab938439b0bb26ad3ba2642696024acdd255"
     },
     {
       "bytes": 27766,

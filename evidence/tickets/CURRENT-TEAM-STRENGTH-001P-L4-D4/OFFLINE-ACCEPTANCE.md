@@ -40,5 +40,13 @@ used, and no credential source was inspected.
 - Independent review has no unresolved P0, P1 or material P2 finding and returned
   `CLEAR_FOR_TEAM_STRENGTH_L5_REAUTHORIZATION_DECISION`.
 
+Initial exact-SHA run `36318338973` exposed two inherited minimal blocked-result
+test doubles without `solver_status`. The comparison-only observation now reads
+that optional diagnostic field safely; real optimiser results retain the same
+status, and ordinary blocked-result behavior is restored. The exact failing
+parametrization passed 2/2, the focused inherited population passed 92/92, and
+the optimiser-diagnostic subset passed 7/7. Independent re-review found no
+semantic or disclosure drift and retained the required verdict.
+
 Publication and exact-SHA CI are recorded at closure without changing the
 diagnostic semantics.
